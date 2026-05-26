@@ -26,13 +26,13 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Prateek Sharma | Comic Book Portfolio",
+  title: "Prateek Sharma | Portfolio",
   description:
     "Crafting Digital Worlds, One Panel at a Time — Portfolio of Prateek Sharma, developer, designer, and storyteller.",
   keywords: ["portfolio", "web developer", "Prateek Sharma", "comic book", "pop art"],
   authors: [{ name: "Prateek Sharma" }],
   openGraph: {
-    title: "Prateek Sharma | Comic Book Portfolio",
+    title: "Prateek Sharma | Portfolio",
     description: "Crafting Digital Worlds, One Panel at a Time",
     type: "website",
   },
