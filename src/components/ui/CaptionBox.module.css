@@ -1,0 +1,55 @@
+/* ============================================
+   CaptionBox Component Styles
+   ============================================ */
+
+.caption {
+  position: absolute;
+  z-index: 10;
+  display: inline-block;
+  padding: 10px 16px;
+  background-color: var(--pop-yellow);
+  border: 2px solid var(--pop-black);
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--pop-black);
+  max-width: 260px;
+  box-shadow: var(--shadow-pop-sm);
+}
+
+/* ---- Positions ---- */
+
+.topLeft {
+  top: 12px;
+  left: 12px;
+  transform: rotate(-1.5deg);
+}
+
+.topRight {
+  top: 12px;
+  right: 12px;
+  transform: rotate(1.5deg);
+}
+
+.bottomLeft {
+  bottom: 12px;
+  left: 12px;
+  transform: rotate(1deg);
+}
+
+.bottomRight {
+  bottom: 12px;
+  right: 12px;
+  transform: rotate(-1deg);
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 640px) {
+  .caption {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    max-width: 200px;
+  }
+}

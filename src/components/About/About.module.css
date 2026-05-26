@@ -1,0 +1,162 @@
+/* ===== ABOUT SECTION ===== */
+.about {
+  position: relative;
+  background: var(--pop-white);
+  padding: var(--section-padding);
+  border-top: 5px solid var(--pop-black);
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.sectionTitle {
+  font-family: 'Bangers', cursive;
+  font-size: var(--fs-section-title);
+  text-align: center;
+  color: var(--pop-black);
+  margin-bottom: 3rem;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  justify-content: center;
+  letter-spacing: 0.04em;
+}
+
+.titleDecoration {
+  display: inline-block;
+  transform: rotate(8deg);
+}
+
+/* Two-column grid */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  align-items: start;
+}
+
+/* Image column */
+.imageColumn {
+  display: flex;
+  justify-content: center;
+}
+
+.profilePanel {
+  width: 100%;
+  max-width: 360px;
+  border-radius: 8px;
+}
+
+.imageWrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.profileImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.halftoneOverlay {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    circle,
+    var(--pop-blue) 1px,
+    transparent 1px
+  );
+  background-size: 8px 8px;
+  opacity: 0.08;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+/* Text column */
+.textColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.bioBubble {
+  background: var(--pop-white);
+}
+
+.bioText {
+  font-size: var(--fs-body);
+  line-height: 1.8;
+  color: var(--pop-black);
+}
+
+.bioText strong {
+  color: var(--pop-red);
+}
+
+/* Fun facts scattered */
+.funFacts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.factBox {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  max-width: none !important;
+  width: 100%;
+  font-size: var(--fs-small);
+  text-align: center;
+}
+
+.funFacts > div {
+  display: flex;
+}
+
+.funFacts > div:nth-child(1) {
+  transform: rotate(-1.5deg);
+}
+
+.funFacts > div:nth-child(2) {
+  transform: rotate(1.5deg);
+}
+
+.funFacts > div:nth-child(3) {
+  transform: rotate(-1deg);
+}
+
+.funFacts > div:nth-child(4) {
+  transform: rotate(2deg);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .profilePanel {
+    max-width: 260px;
+  }
+
+  .funFacts {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .bioBubble::after,
+  .bioBubble::before {
+    left: 50% !important;
+    transform: translateX(-50%);
+  }
+}

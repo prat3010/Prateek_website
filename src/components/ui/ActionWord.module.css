@@ -1,0 +1,129 @@
+/* ============================================
+   ActionWord Component Styles
+   ============================================ */
+
+.wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Starburst explosion behind the text */
+.starburst {
+  position: absolute;
+  inset: -20%;
+  z-index: 0;
+  clip-path: polygon(
+    50% 0%,
+    61% 15%,
+    78% 2%,
+    72% 22%,
+    95% 20%,
+    82% 35%,
+    100% 44%,
+    85% 52%,
+    97% 67%,
+    78% 65%,
+    83% 85%,
+    65% 74%,
+    58% 95%,
+    50% 78%,
+    42% 95%,
+    35% 74%,
+    17% 85%,
+    22% 65%,
+    3% 67%,
+    15% 52%,
+    0% 44%,
+    18% 35%,
+    5% 20%,
+    28% 22%,
+    22% 2%,
+    39% 15%
+  );
+}
+
+.word {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-headline);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--action-color, var(--pop-red));
+  -webkit-text-stroke: 2px var(--pop-black);
+  paint-order: stroke fill;
+  text-shadow:
+    3px 3px 0 var(--pop-black),
+    -1px -1px 0 var(--pop-black),
+    1px -1px 0 var(--pop-black),
+    -1px 1px 0 var(--pop-black);
+  animation: actionPulse 2s ease-in-out infinite;
+  line-height: 1.1;
+  user-select: none;
+}
+
+/* ---- Sizes ---- */
+
+.sm {
+  font-size: 1.5rem;
+}
+
+.sm .starburst {
+  inset: -15%;
+}
+
+.md {
+  font-size: 3rem;
+}
+
+.lg {
+  font-size: 5rem;
+  letter-spacing: 4px;
+}
+
+.lg .starburst {
+  inset: -25%;
+}
+
+.xl {
+  font-size: 7rem;
+  letter-spacing: 5px;
+}
+
+.xl .starburst {
+  inset: -30%;
+}
+
+/* ---- Animation ---- */
+
+@keyframes actionPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 640px) {
+  .sm {
+    font-size: 1.2rem;
+  }
+
+  .md {
+    font-size: 2rem;
+  }
+
+  .lg {
+    font-size: 3rem;
+    letter-spacing: 2px;
+  }
+
+  .xl {
+    font-size: 4.5rem;
+    letter-spacing: 3px;
+  }
+}

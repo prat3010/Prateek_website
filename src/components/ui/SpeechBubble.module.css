@@ -1,0 +1,242 @@
+/* ============================================
+   SpeechBubble Component Styles
+   ============================================ */
+
+.bubble {
+  position: relative;
+  display: inline-block;
+  padding: 16px 24px;
+  border: 3px solid var(--pop-black);
+  border-radius: var(--radius-bubble);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--pop-black);
+  max-width: 100%;
+  transform: rotate(-1deg);
+}
+
+.bubble::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+/* ---- Direction tails ---- */
+
+.left::after {
+  top: 50%;
+  left: -20px;
+  transform: translateY(-50%);
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right: 20px solid var(--pop-black);
+}
+
+.left::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -15px;
+  transform: translateY(-50%);
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 16px solid var(--bubble-bg, var(--pop-yellow));
+  z-index: 1;
+}
+
+.right::after {
+  top: 50%;
+  right: -20px;
+  transform: translateY(-50%);
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 20px solid var(--pop-black);
+}
+
+.right::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -15px;
+  transform: translateY(-50%);
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 16px solid var(--bubble-bg, var(--pop-yellow));
+  z-index: 1;
+}
+
+.top::after {
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 20px solid var(--pop-black);
+}
+
+.top::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 16px solid var(--bubble-bg, var(--pop-yellow));
+  z-index: 1;
+}
+
+.bottom::after {
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 20px solid var(--pop-black);
+}
+
+.bottom::before {
+  content: '';
+  position: absolute;
+  bottom: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 16px solid var(--bubble-bg, var(--pop-yellow));
+  z-index: 1;
+}
+
+/* ---- Thought variant ---- */
+
+.thought {
+  border-radius: 30px;
+  padding: 20px 28px;
+  border: 3px solid var(--pop-black);
+  /* Cloud-like bumpy border via outline + box-shadow trick */
+  box-shadow:
+    -8px -8px 0 -3px var(--bubble-bg, var(--pop-yellow)),
+    -8px -8px 0 0px var(--pop-black),
+    8px -6px 0 -3px var(--bubble-bg, var(--pop-yellow)),
+    8px -6px 0 0px var(--pop-black),
+    -6px 8px 0 -3px var(--bubble-bg, var(--pop-yellow)),
+    -6px 8px 0 0px var(--pop-black),
+    10px 6px 0 -3px var(--bubble-bg, var(--pop-yellow)),
+    10px 6px 0 0px var(--pop-black);
+}
+
+/* Thought bubble uses small circles instead of a pointer tail */
+.thought::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--bubble-bg, var(--pop-yellow));
+  border: 2px solid var(--pop-black);
+}
+
+.thought::before {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--bubble-bg, var(--pop-yellow));
+  border: 2px solid var(--pop-black);
+}
+
+.thought.left::after {
+  top: auto;
+  bottom: -16px;
+  left: 24px;
+  right: auto;
+  transform: none;
+  border-top: none;
+  border-bottom: none;
+  border-right: none;
+  border-left: none;
+  border: 2px solid var(--pop-black);
+}
+
+.thought.left::before {
+  top: auto;
+  bottom: -28px;
+  left: 14px;
+  right: auto;
+  transform: none;
+  border-top: none;
+  border-bottom: none;
+  border-right: none;
+  border-left: none;
+  border: 2px solid var(--pop-black);
+}
+
+.thought.right::after {
+  top: auto;
+  bottom: -16px;
+  right: 24px;
+  left: auto;
+  transform: none;
+  border-top: none;
+  border-bottom: none;
+  border-right: none;
+  border-left: none;
+  border: 2px solid var(--pop-black);
+}
+
+.thought.right::before {
+  top: auto;
+  bottom: -28px;
+  right: 14px;
+  left: auto;
+  transform: none;
+  border-top: none;
+  border-bottom: none;
+  border-right: none;
+  border-left: none;
+  border: 2px solid var(--pop-black);
+}
+
+.thought.top::after {
+  top: -16px;
+  left: 50%;
+  bottom: auto;
+  transform: translateX(-50%);
+  border: 2px solid var(--pop-black);
+}
+
+.thought.top::before {
+  top: -28px;
+  left: 50%;
+  bottom: auto;
+  transform: translateX(-50%);
+  border: 2px solid var(--pop-black);
+}
+
+.thought.bottom::after {
+  bottom: -16px;
+  left: 50%;
+  top: auto;
+  transform: translateX(-50%);
+  border: 2px solid var(--pop-black);
+}
+
+.thought.bottom::before {
+  bottom: -28px;
+  left: 50%;
+  top: auto;
+  transform: translateX(-50%);
+  border: 2px solid var(--pop-black);
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 640px) {
+  .bubble {
+    padding: 12px 16px;
+    font-size: 0.9rem;
+  }
+}

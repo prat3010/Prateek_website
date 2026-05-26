@@ -1,0 +1,51 @@
+.muteButton {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  z-index: 9990;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid #1A1A2E;
+  background: #FFF8E1;
+  color: #1A1A2E;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    3px 3px 0 #1A1A2E,
+    0 0 0 0 transparent;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
+  font-size: 0;
+}
+
+.muteButton:hover {
+  transform: translate(-1px, -1px);
+  box-shadow:
+    4px 4px 0 #1A1A2E;
+  background: #FFEA00;
+}
+
+.muteButton:active {
+  transform: translate(2px, 2px);
+  box-shadow:
+    1px 1px 0 #1A1A2E;
+}
+
+.muteButton:focus-visible {
+  outline: 3px solid #2979FF;
+  outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+  .muteButton {
+    bottom: 1rem;
+    right: 1rem;
+    width: 40px;
+    height: 40px;
+  }
+}

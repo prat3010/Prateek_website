@@ -1,0 +1,267 @@
+/* ============================================
+   Navbar Component Styles
+   ============================================ */
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  height: 72px;
+  background-color: rgba(255, 248, 225, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 4px solid var(--pop-black);
+  transition: box-shadow 0.3s ease;
+}
+
+.navbar.scrolled {
+  box-shadow: 0 4px 12px rgba(26, 26, 46, 0.25);
+}
+
+/* ---- Logo ---- */
+
+.logo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
+}
+
+.logoBurst {
+  position: absolute;
+  inset: -6px;
+  background: var(--pop-red);
+  clip-path: polygon(
+    50% 0%,
+    63% 18%,
+    82% 5%,
+    74% 27%,
+    98% 28%,
+    80% 42%,
+    100% 55%,
+    80% 58%,
+    90% 78%,
+    70% 68%,
+    62% 92%,
+    50% 75%,
+    38% 92%,
+    30% 68%,
+    10% 78%,
+    20% 58%,
+    0% 55%,
+    20% 42%,
+    2% 28%,
+    26% 27%,
+    18% 5%,
+    37% 18%
+  );
+  z-index: 0;
+}
+
+.logoText {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-headline);
+  font-size: 1.5rem;
+  color: var(--pop-white);
+  -webkit-text-stroke: 1px var(--pop-black);
+  paint-order: stroke fill;
+  line-height: 1;
+  letter-spacing: 1px;
+}
+
+/* ---- Desktop nav links ---- */
+
+.navLinks {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.navLink {
+  position: relative;
+  font-family: var(--font-headline);
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  color: var(--pop-black);
+  padding: 8px 14px;
+  text-transform: uppercase;
+  transition: color 0.2s ease;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.navLink:hover {
+  color: var(--pop-red);
+}
+
+/* Active jagged underline */
+.navLink.active::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 10%;
+  width: 80%;
+  height: 4px;
+  background: var(--pop-red);
+  clip-path: polygon(
+    0% 50%,
+    5% 0%,
+    10% 100%,
+    15% 0%,
+    20% 80%,
+    25% 10%,
+    30% 100%,
+    35% 0%,
+    40% 70%,
+    45% 20%,
+    50% 100%,
+    55% 0%,
+    60% 80%,
+    65% 10%,
+    70% 100%,
+    75% 0%,
+    80% 90%,
+    85% 10%,
+    90% 100%,
+    95% 0%,
+    100% 50%
+  );
+}
+
+/* ---- Hamburger button ---- */
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: 2px solid var(--pop-black);
+  border-radius: 6px;
+  padding: 6px;
+  cursor: pointer;
+  z-index: 1001;
+  transition: background-color 0.2s ease;
+}
+
+.hamburger:hover {
+  background-color: var(--pop-yellow);
+}
+
+.hamburgerLine {
+  display: block;
+  width: 100%;
+  height: 3px;
+  background: var(--pop-black);
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.hamburger.open .hamburgerLine:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.hamburger.open .hamburgerLine:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.open .hamburgerLine:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+/* ---- Mobile overlay ---- */
+
+.mobileOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background-color: var(--pop-cream);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  border: 5px solid var(--pop-black);
+  animation: slideIn 0.3s ease-out;
+}
+
+.mobileOverlay.open {
+  display: flex;
+}
+
+.mobileNavLink {
+  font-family: var(--font-headline);
+  font-size: 2rem;
+  letter-spacing: 2px;
+  color: var(--pop-black);
+  text-transform: uppercase;
+  padding: 12px 24px;
+  text-decoration: none;
+  transition: color 0.2s ease, transform 0.2s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.mobileNavLink:hover {
+  color: var(--pop-red);
+  transform: scale(1.1);
+}
+
+.mobileNavLink.active {
+  color: var(--pop-red);
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-underline-offset: 6px;
+}
+
+/* Ben-Day dot background on overlay */
+.mobileOverlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, var(--pop-black) 1px, transparent 1px);
+  background-size: 10px 10px;
+  opacity: 0.04;
+  pointer-events: none;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 16px;
+    height: 64px;
+  }
+
+  .navLinks {
+    display: none;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+}
