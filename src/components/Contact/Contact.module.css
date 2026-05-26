@@ -133,7 +133,24 @@
   box-shadow: 2px 2px 0 var(--pop-black);
 }
 
+.submitBtn:disabled {
+  background: var(--pop-cream);
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: translate(0);
+  box-shadow: 2px 2px 0 var(--pop-black);
+}
+
 .successText {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--pop-black);
+  text-align: center;
+  padding: 0.25rem;
+}
+
+.errorText {
   font-family: var(--font-body);
   font-size: 1rem;
   font-weight: 700;

@@ -36,13 +36,45 @@ const socialLinks = [
 
 export default function Contact() {
   const confettiRef = useRef<ConfettiBurstHandle>(null);
-  const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    confettiRef.current?.triggerConfetti();
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 4000);
+    setStatus('loading');
+    setErrorMessage('');
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const name = formData.get('name') as string;
+    const email = formData.get('email') as string;
+    const message = formData.get('message') as string;
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, message }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setStatus('success');
+        confettiRef.current?.triggerConfetti();
+        form.reset();
+        // Reset status after a few seconds
+        setTimeout(() => setStatus('idle'), 5000);
+      } else {
+        setStatus('error');
+        setErrorMessage(data.error || 'Something went wrong. Please try again!');
+      }
+    } catch (err) {
+      setStatus('error');
+      setErrorMessage('Network error. Please check your connection and try again.');
+    }
   };
 
   return (
@@ -72,6 +104,7 @@ export default function Contact() {
                 </label>
                 <input
                   id="contact-name"
+                  name="name"
                   type="text"
                   required
                   className={styles.input}
@@ -85,6 +118,7 @@ export default function Contact() {
                 </label>
                 <input
                   id="contact-email"
+                  name="email"
                   type="email"
                   required
                   className={styles.input}
@@ -98,6 +132,7 @@ export default function Contact() {
                 </label>
                 <textarea
                   id="contact-message"
+                  name="message"
                   required
                   rows={5}
                   className={styles.textarea}
@@ -105,13 +140,23 @@ export default function Contact() {
                 />
               </div>
 
-              <button type="submit" className={styles.submitBtn}>
-                SEND IT! 💥
+              <button 
+                type="submit" 
+                className={styles.submitBtn}
+                disabled={status === 'loading'}
+              >
+                {status === 'loading' ? 'SENDING... ⚡' : 'SEND IT! 💥'}
               </button>
 
-              {submitted && (
+              {status === 'success' && (
                 <SpeechBubble direction="top" color="var(--pop-green)">
                   <p className={styles.successText}>Message sent! 🎉 I&apos;ll get back to you soon!</p>
+                </SpeechBubble>
+              )}
+
+              {status === 'error' && (
+                <SpeechBubble direction="top" color="var(--pop-red)">
+                  <p className={styles.errorText}>💥 {errorMessage}</p>
                 </SpeechBubble>
               )}
             </form>
