@@ -31,6 +31,9 @@ export const metadata: Metadata = {
     "Crafting Digital Worlds, One Panel at a Time — Portfolio of Prateek Sharma, developer, designer, and storyteller.",
   keywords: ["portfolio", "web developer", "Prateek Sharma", "comic book", "pop art"],
   authors: [{ name: "Prateek Sharma" }],
+  icons: {
+    icon: "/icon.svg",
+  },
   openGraph: {
     title: "Prateek Sharma | Portfolio",
     description: "Crafting Digital Worlds, One Panel at a Time",
