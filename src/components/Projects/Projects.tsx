@@ -43,7 +43,7 @@ export default function Projects() {
               >
                 <div className={styles.panelImageWrapper}>
                   <Image
-                    src={project.image}
+                    src={isNoir ? project.image.replace(/\.png$/, '-noir.png') : project.image}
                     alt={project.title}
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
@@ -108,7 +108,7 @@ export default function Projects() {
 
             <div className={styles.modalImageWrapper}>
               <Image
-                src={selected.image}
+                src={isNoir ? selected.image.replace(/\.png$/, '-noir.png') : selected.image}
                 alt={selected.title}
                 width={600}
                 height={400}
