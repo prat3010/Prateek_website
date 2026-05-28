@@ -154,9 +154,27 @@
     gap: 0.75rem;
   }
 
-  .bioBubble::after,
-  .bioBubble::before {
+  .bioBubble::after {
+    top: -20px;
+    bottom: auto;
     left: 50% !important;
+    right: auto;
     transform: translateX(-50%);
+    border-top: none;
+    border-bottom: 20px solid var(--pop-black);
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+  }
+
+  .bioBubble::before {
+    top: -15px;
+    bottom: auto;
+    left: 50% !important;
+    right: auto;
+    transform: translateX(-50%);
+    border-top: none;
+    border-bottom: 16px solid var(--bubble-bg, var(--pop-yellow));
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
   }
 }
