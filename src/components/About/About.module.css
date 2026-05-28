@@ -88,14 +88,40 @@
   background: var(--pop-white);
 }
 
+:global([data-theme='noir']) .bioBubble {
+  --bubble-bg: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+  box-shadow: 4px 4px 0px rgba(255, 255, 255, 0.3) !important;
+}
+
+:global([data-theme='noir']) .bioBubble::before {
+  border-right-color: #ffffff !important;
+  border-left-color: #ffffff !important;
+  border-bottom-color: #ffffff !important;
+  border-top-color: #ffffff !important;
+}
+
 .bioText {
   font-size: var(--fs-body);
   line-height: 1.8;
   color: var(--pop-black);
 }
 
+:global([data-theme='noir']) .bioText {
+  color: #000000 !important;
+  font-family: var(--font-code) !important;
+}
+
 .bioText strong {
   color: var(--pop-red);
+}
+
+:global([data-theme='noir']) .bioText strong {
+  color: #ff1744 !important;
+  font-family: var(--font-code) !important;
+  font-weight: bold !important;
 }
 
 /* Fun facts scattered */

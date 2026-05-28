@@ -3,6 +3,7 @@
 import React from 'react';
 import type { Skill } from '@/data/skills';
 import { categoryColors } from '@/data/skills';
+import { useTheme } from '@/context/ThemeContext';
 import styles from './Skills.module.css';
 
 interface SkillCardProps {
@@ -11,6 +12,7 @@ interface SkillCardProps {
 }
 
 export default function SkillCard({ skill, index }: SkillCardProps) {
+  const { isNoir } = useTheme();
   // Deterministic "random" rotation based on index
   const rotation = ((index * 7 + 3) % 5) - 2; // Values between -2 and 2
 
@@ -19,8 +21,8 @@ export default function SkillCard({ skill, index }: SkillCardProps) {
       className={styles.card}
       style={{
         transform: `rotate(${rotation}deg)`,
-        '--card-bg': categoryColors[skill.category],
-        '--skill-color': skill.color,
+        '--card-bg': isNoir ? '#121214' : categoryColors[skill.category],
+        '--skill-color': isNoir ? '#FAFAFA' : skill.color,
       } as React.CSSProperties}
     >
       {/* Hover KAPOW */}
@@ -31,7 +33,7 @@ export default function SkillCard({ skill, index }: SkillCardProps) {
       <div className={styles.cardHeader}>
         <span
           className={styles.skillDot}
-          style={{ background: skill.color }}
+          style={{ background: isNoir ? '#FAFAFA' : skill.color }}
           aria-hidden="true"
         />
         <h3 className={styles.skillName}>{skill.name}</h3>
@@ -43,7 +45,7 @@ export default function SkillCard({ skill, index }: SkillCardProps) {
             className={styles.powerBarFill}
             style={{
               width: `${skill.level}%`,
-              background: skill.color,
+              background: isNoir ? '#FAFAFA' : skill.color,
             }}
           />
         </div>

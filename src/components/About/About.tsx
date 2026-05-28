@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { useTheme } from '@/context/ThemeContext';
 import ComicPanel from '@/components/ui/ComicPanel';
 import SpeechBubble from '@/components/ui/SpeechBubble';
 import CaptionBox from '@/components/ui/CaptionBox';
@@ -17,6 +18,8 @@ const funFacts = [
 ];
 
 export default function About() {
+  const { isNoir } = useTheme();
+
   return (
     <section id="about" className={styles.about} aria-label="About me">
       <div className={styles.container}>
@@ -24,7 +27,13 @@ export default function About() {
           <h2 className={styles.sectionTitle}>
             ORIGIN STORY
             <span className={styles.titleDecoration}>
-              <ActionWord word="WOW!" color="var(--pop-pink)" size="md" animated={false} />
+              <ActionWord
+                word="WOW!"
+                color={isNoir ? '#000000' : 'var(--pop-pink)'}
+                starburstColor={isNoir ? '#FFFFFF' : undefined}
+                size="md"
+                animated={false}
+              />
             </span>
           </h2>
         </ScrollReveal>
@@ -35,7 +44,7 @@ export default function About() {
             <ComicPanel tilt={-2} className={styles.profilePanel}>
               <div className={styles.imageWrapper}>
                 <Image
-                  src="/images/profile-comic-v2.png"
+                  src={isNoir ? '/images/profile-noir.jpg' : '/images/profile-comic-v2.png'}
                   alt="Prateek Sharma portrait"
                   width={400}
                   height={480}
@@ -62,13 +71,16 @@ export default function About() {
             </ScrollReveal>
 
             <div className={styles.funFacts}>
-              {funFacts.map((fact, index) => (
-                <ScrollReveal key={fact} delay={300 + index * 120}>
-                  <CaptionBox className={styles.factBox}>
-                    {fact}
-                  </CaptionBox>
-                </ScrollReveal>
-              ))}
+              {funFacts.map((fact, index) => {
+                const displayFact = isNoir ? fact.replace(/^\S+\s+/, '') : fact;
+                return (
+                  <ScrollReveal key={fact} delay={300 + index * 120}>
+                    <CaptionBox className={styles.factBox}>
+                      {displayFact}
+                    </CaptionBox>
+                  </ScrollReveal>
+                );
+              })}
             </div>
           </div>
         </div>

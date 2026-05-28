@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTheme } from '@/context/ThemeContext';
 import styles from './Navbar.module.css';
 
 export interface NavItem {
@@ -28,6 +29,7 @@ export default function Navbar({ items, className }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>(navItems[0]?.href ?? '');
+  const { isNoir, toggleTheme } = useTheme();
 
   /* ---------- Scroll tracking ---------- */
   useEffect(() => {
@@ -95,32 +97,44 @@ export default function Navbar({ items, className }: NavbarProps) {
         <span className={styles.logoText}>PS</span>
       </a>
 
-      {/* ---- Desktop links ---- */}
-      <ul className={styles.navLinks}>
-        {navItems.map((item) => (
-          <li key={item.href}>
-            <a
-              href={item.href}
-              className={`${styles.navLink} ${activeSection === item.href ? styles.active : ''}`}
-              onClick={(e) => handleNavClick(e, item.href)}
-            >
-              {item.label}
-            </a>
-          </li>
-        ))}
-      </ul>
+      {/* ---- Right Side Controls Group ---- */}
+      <div className={styles.rightGroup}>
+        {/* ---- Desktop links ---- */}
+        <ul className={styles.navLinks}>
+          {navItems.map((item) => (
+            <li key={item.href}>
+              <a
+                href={item.href}
+                className={`${styles.navLink} ${activeSection === item.href ? styles.active : ''}`}
+                onClick={(e) => handleNavClick(e, item.href)}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
 
-      {/* ---- Hamburger ---- */}
-      <button
-        className={`${styles.hamburger} ${mobileOpen ? styles.open : ''}`}
-        onClick={() => setMobileOpen((prev) => !prev)}
-        aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-        aria-expanded={mobileOpen}
-      >
-        <span className={styles.hamburgerLine} />
-        <span className={styles.hamburgerLine} />
-        <span className={styles.hamburgerLine} />
-      </button>
+        {/* ---- Theme Toggle Switch ---- */}
+        <button
+          onClick={toggleTheme}
+          className={styles.themeToggle}
+          aria-label={isNoir ? 'Switch to Color mode' : 'Switch to Noir mode'}
+        >
+          {isNoir ? '⚡ COLOR' : '🕶️ NOIR'}
+        </button>
+
+        {/* ---- Hamburger ---- */}
+        <button
+          className={`${styles.hamburger} ${mobileOpen ? styles.open : ''}`}
+          onClick={() => setMobileOpen((prev) => !prev)}
+          aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={mobileOpen}
+        >
+          <span className={styles.hamburgerLine} />
+          <span className={styles.hamburgerLine} />
+          <span className={styles.hamburgerLine} />
+        </button>
+      </div>
 
       {/* ---- Mobile overlay ---- */}
       <div

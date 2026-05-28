@@ -1,0 +1,19 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999999; /* Higher than everything else */
+  pointer-events: none;
+  animation: inkSpill 0.85s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+  will-change: clip-path;
+}
+
+@keyframes inkSpill {
+  0% {
+    clip-path: circle(0% at var(--x, 50%) var(--y, 50%));
+  }
+  100% {
+    clip-path: circle(150% at var(--x, 50%) var(--y, 50%));
+  }
+}

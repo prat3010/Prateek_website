@@ -2,6 +2,7 @@
 
 import React, { useRef, useState, type FormEvent } from 'react';
 import { Code2, Globe, MessageCircle, Mail, Phone } from 'lucide-react';
+import { useTheme } from '@/context/ThemeContext';
 import ActionWord from '@/components/ui/ActionWord';
 import SpeechBubble from '@/components/ui/SpeechBubble';
 import ScrollReveal from '@/components/effects/ScrollReveal';
@@ -38,6 +39,7 @@ export default function Contact() {
   const confettiRef = useRef<ConfettiBurstHandle>(null);
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const { isNoir } = useTheme();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -89,7 +91,12 @@ export default function Contact() {
           <h2 className={styles.sectionTitle}>
             SEND A SIGNAL!
             <span className={styles.titleAction}>
-              <ActionWord word="SEND!" color="var(--pop-orange)" size="lg" />
+              <ActionWord
+                word="SEND!"
+                color={isNoir ? '#000000' : 'var(--pop-orange)'}
+                starburstColor={isNoir ? '#FFFFFF' : undefined}
+                size="lg"
+              />
             </span>
           </h2>
         </ScrollReveal>

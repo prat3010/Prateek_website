@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { skills, categoryLabels, type SkillCategory } from '@/data/skills';
+import { useTheme } from '@/context/ThemeContext';
 import ActionWord from '@/components/ui/ActionWord';
 import ScrollReveal from '@/components/effects/ScrollReveal';
 import SkillCard from './SkillCard';
@@ -22,6 +23,7 @@ const tabLabels: Record<string, string> = {
 
 export default function Skills() {
   const [activeCategory, setActiveCategory] = useState<'all' | SkillCategory>('all');
+  const { isNoir } = useTheme();
 
   const filteredSkills = useMemo(
     () =>
@@ -41,7 +43,12 @@ export default function Skills() {
           <h2 className={styles.sectionTitle}>
             SUPER POWERS
             <span className={styles.titleAction}>
-              <ActionWord word="ZAP!" color="var(--pop-yellow)" size="lg" />
+              <ActionWord
+                word="ZAP!"
+                color={isNoir ? '#000000' : 'var(--pop-yellow)'}
+                starburstColor={isNoir ? '#FFFFFF' : undefined}
+                size="lg"
+              />
             </span>
           </h2>
         </ScrollReveal>

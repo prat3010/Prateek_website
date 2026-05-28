@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { projects } from '@/data/projects';
+import { useTheme } from '@/context/ThemeContext';
 import ActionWord from '@/components/ui/ActionWord';
 import ScrollReveal from '@/components/effects/ScrollReveal';
 import styles from './Projects.module.css';
@@ -10,6 +11,7 @@ import styles from './Projects.module.css';
 export default function Projects() {
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const selected = projects.find((p) => p.id === selectedProject);
+  const { isNoir } = useTheme();
 
   return (
     <section id="projects" className={styles.projects} aria-label="Projects">
@@ -18,7 +20,12 @@ export default function Projects() {
           <h2 className={styles.sectionTitle}>
             EPIC ADVENTURES
             <span className={styles.titleAction}>
-              <ActionWord word="BAM!" color="var(--pop-red)" size="lg" />
+              <ActionWord
+                word="BAM!"
+                color={isNoir ? '#FFFFFF' : 'var(--pop-red)'}
+                starburstColor={isNoir ? '#000000' : undefined}
+                size="lg"
+              />
             </span>
           </h2>
         </ScrollReveal>
@@ -47,7 +54,8 @@ export default function Projects() {
                   <span className={styles.panelAction}>
                     <ActionWord
                       word={project.actionWord}
-                      color={project.color}
+                      color={isNoir ? '#000000' : project.color}
+                      starburstColor={isNoir ? '#FFFFFF' : undefined}
                       size="md"
                     />
                   </span>
@@ -89,7 +97,12 @@ export default function Projects() {
             </button>
 
             <div className={styles.modalHeader}>
-              <ActionWord word={selected.actionWord} color={selected.color} size="lg" />
+              <ActionWord
+                word={selected.actionWord}
+                color={isNoir ? '#FFFFFF' : selected.color}
+                starburstColor={isNoir ? '#000000' : undefined}
+                size="lg"
+              />
               <h3 className={styles.modalTitle}>{selected.title}</h3>
             </div>
 

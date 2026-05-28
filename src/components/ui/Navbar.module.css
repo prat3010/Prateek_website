@@ -11,7 +11,7 @@
   justify-content: space-between;
   padding: 0 32px;
   height: 72px;
-  background-color: rgba(255, 248, 225, 0.92);
+  background-color: var(--navbar-bg, rgba(255, 248, 225, 0.92));
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border-bottom: 4px solid var(--pop-black);
@@ -264,4 +264,65 @@
   .hamburger {
     display: flex;
   }
+}
+
+/* ---- Controls Group & Theme Toggle Switch ---- */
+.rightGroup {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.themeToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-family: var(--font-headline);
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background-color: var(--pop-yellow);
+  color: var(--pop-black);
+  border: 3px solid var(--pop-black);
+  box-shadow: 3px 3px 0px var(--pop-black);
+  cursor: pointer;
+  transition: 
+    transform 0.15s var(--transition-bounce), 
+    box-shadow 0.15s ease,
+    background-color 0.4s ease,
+    border-color 0.4s ease,
+    color 0.4s ease;
+  user-select: none;
+  border-radius: 4px;
+}
+
+.themeToggle:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0px var(--pop-black);
+  background-color: var(--pop-pink);
+  color: var(--pop-white);
+}
+
+.themeToggle:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px var(--pop-black);
+}
+
+[data-theme='noir'] .themeToggle {
+  background-color: #121214;
+  color: #FFFFFF;
+  border-color: #FFFFFF;
+  box-shadow: 3px 3px 0px #FFFFFF;
+}
+
+[data-theme='noir'] .themeToggle:hover {
+  background-color: var(--pop-red);
+  color: #FFFFFF;
+  box-shadow: 4px 4px 0px #FFFFFF;
+}
+
+[data-theme='noir'] .themeToggle:active {
+  box-shadow: 1px 1px 0px #FFFFFF;
 }

@@ -3,11 +3,14 @@
 import React from 'react';
 import Image from 'next/image';
 import { useTypewriter } from '@/hooks/useTypewriter';
+import { useTheme } from '@/context/ThemeContext';
 import ActionWord from '@/components/ui/ActionWord';
 import ComicPanel from '@/components/ui/ComicPanel';
 import styles from './Hero.module.css';
 
 export default function Hero() {
+  const { isNoir } = useTheme();
+  
   const { displayText, isDone } = useTypewriter({
     text: 'Crafting Digital Worlds, One Panel at a Time',
     speed: 55,
@@ -32,7 +35,12 @@ export default function Hero() {
         <div className={styles.textSide}>
           {/* Floating POW action word */}
           <div className={styles.powWrapper}>
-            <ActionWord word="POW!" color="var(--pop-yellow)" size="xl" />
+            <ActionWord
+              word="POW!"
+              color={isNoir ? '#000000' : 'var(--pop-yellow)'}
+              starburstColor={isNoir ? '#FFFFFF' : undefined}
+              size="xl"
+            />
           </div>
 
           <h1 className={styles.headline}>
@@ -60,7 +68,7 @@ export default function Hero() {
         <div className={styles.imageSide}>
           <ComicPanel tilt={2} className={styles.heroPanel}>
             <Image
-              src="/images/hero-illustration.png"
+              src={isNoir ? '/images/hero-noir.png' : '/images/hero-illustration.png'}
               alt="Prateek Sharma hero illustration"
               width={500}
               height={500}
@@ -70,7 +78,12 @@ export default function Hero() {
           </ComicPanel>
           {/* Small floating action words */}
           <div className={styles.floatingZap}>
-            <ActionWord word="ZAP!" color="var(--pop-blue)" size="md" />
+            <ActionWord
+              word="ZAP!"
+              color={isNoir ? '#FFFFFF' : 'var(--pop-blue)'}
+              starburstColor={isNoir ? '#000000' : undefined}
+              size="md"
+            />
           </div>
         </div>
       </div>

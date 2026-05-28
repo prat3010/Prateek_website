@@ -127,3 +127,18 @@
     letter-spacing: 3px;
   }
 }
+
+/* ---- Noir Theme Overrides ---- */
+:global([data-theme='noir']) .starburst {
+  display: none !important;
+}
+
+:global([data-theme='noir']) .word {
+  font-family: var(--font-nosifer), var(--font-creepster), cursive !important;
+  color: #ff1744 !important; /* Crimson blood red */
+  -webkit-text-stroke: 1.5px #000000 !important; /* Thin black outline */
+  paint-order: stroke fill;
+  text-shadow: 3px 3px 0px #000000 !important; /* Hard drop shadow for comic feel */
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}

@@ -282,3 +282,15 @@
   }
 
 }
+
+:global([data-theme='noir']) .panel img,
+:global([data-theme='noir']) .panelImageWrapper img,
+:global([data-theme='noir']) .modalImageWrapper img {
+  filter: grayscale(1) contrast(1.1) brightness(0.85);
+  transition: filter var(--transition-normal);
+}
+
+:global([data-theme='noir']) .panel:hover img,
+:global([data-theme='noir']) .panelImageWrapper:hover img {
+  filter: grayscale(0) contrast(1) brightness(1);
+}

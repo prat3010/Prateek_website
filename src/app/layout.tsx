@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bangers, Comic_Neue, JetBrains_Mono } from "next/font/google";
+import { Bangers, Comic_Neue, JetBrains_Mono, Creepster, Nosifer } from "next/font/google";
 import "./globals.css";
 import ClientLayout from "./ClientLayout";
 
@@ -21,6 +21,20 @@ const comicNeue = Comic_Neue({
 const jetbrainsMono = JetBrains_Mono({
   weight: ["400", "700"],
   variable: "--font-jetbrains-mono",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const creepster = Creepster({
+  weight: "400",
+  variable: "--font-creepster",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const nosifer = Nosifer({
+  weight: "400",
+  variable: "--font-nosifer",
   subsets: ["latin"],
   display: "swap",
 });
@@ -49,8 +63,29 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${bangers.variable} ${comicNeue.variable} ${jetbrainsMono.variable}`}
+      className={`${bangers.variable} ${comicNeue.variable} ${jetbrainsMono.variable} ${creepster.variable} ${nosifer.variable}`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var saved = localStorage.getItem('theme');
+                  if (saved === 'noir') {
+                    document.documentElement.setAttribute('data-theme', 'noir');
+                  } else if (saved === 'light') {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                  } else {
+                    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    document.documentElement.setAttribute('data-theme', prefersDark ? 'noir' : 'light');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body>
         <ClientLayout>{children}</ClientLayout>
       </body>

@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useCallback } from 'react';
+import { useTheme } from '@/context/ThemeContext';
 import styles from './CursorTrail.module.css';
 
 const POP_COLORS = ['#FF1744', '#2979FF', '#FFEA00', '#FF4081', '#00E676', '#FF9100'];
+const NOIR_COLORS = ['#FAFAFA', '#E0E0E3', '#C0C0C4', '#8A8A93', '#4A4A50', '#27272A'];
 const TRAIL_LENGTH = 18;
 const BASE_DOT_RADIUS = 8;
 
@@ -15,12 +17,15 @@ interface TrailDot {
 }
 
 export default function CursorTrail() {
+  const { isNoir } = useTheme();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const trailRef = useRef<TrailDot[]>([]);
   const mouseRef = useRef({ x: -100, y: -100 });
   const frameRef = useRef<number>(0);
   const colorIndexRef = useRef(0);
   const isTouchDevice = useRef(false);
+
+  const colors = isNoir ? NOIR_COLORS : POP_COLORS;
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -41,7 +46,7 @@ export default function CursorTrail() {
         age: 0,
         colorIndex: colorIndexRef.current,
       });
-      colorIndexRef.current = (colorIndexRef.current + 1) % POP_COLORS.length;
+      colorIndexRef.current = (colorIndexRef.current + 1) % colors.length;
     }
 
     // Trim trail to max length
@@ -62,12 +67,12 @@ export default function CursorTrail() {
 
       ctx.beginPath();
       ctx.arc(dot.x, dot.y, radius, 0, Math.PI * 2);
-      ctx.fillStyle = POP_COLORS[dot.colorIndex];
+      ctx.fillStyle = colors[dot.colorIndex % colors.length];
       ctx.globalAlpha = opacity;
       ctx.fill();
 
       // Add a small black outline for the comic-book feel
-      ctx.strokeStyle = '#1A1A2E';
+      ctx.strokeStyle = isNoir ? '#000000' : '#1A1A2E';
       ctx.lineWidth = 1;
       ctx.globalAlpha = opacity * 0.6;
       ctx.stroke();
@@ -76,7 +81,7 @@ export default function CursorTrail() {
     ctx.globalAlpha = 1;
 
     frameRef.current = requestAnimationFrame(draw);
-  }, []);
+  }, [isNoir, colors]);
 
   useEffect(() => {
     // Don't enable on touch/coarse-pointer devices

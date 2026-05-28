@@ -7,8 +7,10 @@ import {
   useImperativeHandle,
   forwardRef,
 } from 'react';
+import { useTheme } from '@/context/ThemeContext';
 
 const POP_COLORS = ['#FF1744', '#2979FF', '#FFEA00', '#FF4081', '#00E676', '#FF9100'];
+const NOIR_COLORS = ['#FAFAFA', '#E0E0E3', '#C0C0C4', '#8A8A93', '#4A4A50', '#27272A'];
 const PARTICLE_COUNT = 60;
 const GRAVITY = 0.35;
 const DURATION_MS = 2200;
@@ -35,11 +37,14 @@ export interface ConfettiBurstHandle {
 }
 
 const ConfettiBurst = forwardRef<ConfettiBurstHandle>(function ConfettiBurst(_, ref) {
+  const { isNoir } = useTheme();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<Particle[]>([]);
   const frameRef = useRef<number>(0);
   const isActiveRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const colors = isNoir ? NOIR_COLORS : POP_COLORS;
 
   const resizeCanvas = useCallback(() => {
     const canvas = canvasRef.current;
@@ -127,7 +132,7 @@ const ConfettiBurst = forwardRef<ConfettiBurstHandle>(function ConfettiBurst(_, 
 
       ctx.globalAlpha = Math.max(0, p.opacity);
       ctx.fillStyle = p.color;
-      ctx.strokeStyle = '#1A1A2E';
+      ctx.strokeStyle = isNoir ? '#000000' : '#1A1A2E';
       ctx.lineWidth = 1;
 
       switch (p.shape) {
@@ -154,7 +159,7 @@ const ConfettiBurst = forwardRef<ConfettiBurstHandle>(function ConfettiBurst(_, 
       isActiveRef.current = false;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
-  }, []);
+  }, [isNoir, colors]);
 
   const triggerConfetti = useCallback(
     (originX?: number, originY?: number) => {
@@ -176,7 +181,7 @@ const ConfettiBurst = forwardRef<ConfettiBurstHandle>(function ConfettiBurst(_, 
           vx: Math.cos(angle) * speed,
           vy: Math.sin(angle) * speed - 4 - Math.random() * 4, // bias upward
           size: 4 + Math.random() * 8,
-          color: POP_COLORS[Math.floor(Math.random() * POP_COLORS.length)],
+          color: colors[Math.floor(Math.random() * colors.length)],
           shape: shapes[Math.floor(Math.random() * shapes.length)],
           rotation: Math.random() * Math.PI * 2,
           rotationSpeed: (Math.random() - 0.5) * 0.15,

@@ -18,6 +18,13 @@
   box-shadow: var(--shadow-pop-sm);
 }
 
+:global([data-theme='noir']) .caption {
+  background-color: #121214 !important;
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+  box-shadow: 2px 2px 0px #ffffff !important;
+}
+
 /* ---- Positions ---- */
 
 .topLeft {
