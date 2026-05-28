@@ -141,4 +141,24 @@
   text-shadow: 3px 3px 0px #000000 !important; /* Hard drop shadow for comic feel */
   letter-spacing: 0.05em;
   text-transform: uppercase;
+  position: relative !important;
+  top: -12px !important; /* Compensate for the dripping font vertical alignment */
+}
+
+:global([data-theme='noir']) .sm {
+  font-size: 1.1rem !important;
+}
+
+:global([data-theme='noir']) .md {
+  font-size: 1.8rem !important;
+}
+
+:global([data-theme='noir']) .lg {
+  font-size: 2.8rem !important; /* Proportionate size for section headers */
+  letter-spacing: 2px !important;
+}
+
+:global([data-theme='noir']) .xl {
+  font-size: 4rem !important;
+  letter-spacing: 3px !important;
 }
