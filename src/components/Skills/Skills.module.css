@@ -239,3 +239,34 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Noir Mode overrides for filter tabs to look like detective board caption box labels */
+:global([data-theme='noir']) .tab {
+  background: #121214 !important;
+  color: #ffffff !important;
+  border: 3px solid #ffffff !important;
+  border-radius: 0px !important;
+  box-shadow: 3px 3px 0px #ffffff !important;
+  font-family: var(--font-comic-neue), 'Comic Neue', sans-serif !important;
+  font-weight: bold !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease !important;
+}
+
+:global([data-theme='noir']) .tab:hover {
+  background: #cca34b !important; /* Muted yellow hover */
+  color: #000000 !important;
+  border-color: #ffffff !important;
+  transform: scale(1.05) !important;
+  box-shadow: 4px 4px 0px #ffffff !important;
+}
+
+:global([data-theme='noir']) .tabActive {
+  background: #c5a059 !important; /* Active mustard yellow */
+  color: #000000 !important;
+  border: 3px solid #ffffff !important;
+  border-radius: 0px !important;
+  box-shadow: 4px 4px 0px #ffffff !important;
+  transform: rotate(0deg) scale(1.05) !important;
+}
