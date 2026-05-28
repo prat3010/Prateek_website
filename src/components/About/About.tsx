@@ -59,14 +59,26 @@ export default function About() {
           <div className={styles.textColumn}>
             <ScrollReveal delay={200}>
               <SpeechBubble direction="left" className={styles.bioBubble}>
-                <p className={styles.bioText}>
-                  Hey there! I&apos;m <strong>Prateek Sharma</strong> — an AI-augmented
-                  builder who turns ideas into reality at warp speed. By blending creative
-                  vision with the power of artificial intelligence, I craft digital experiences
-                  and functional apps without getting bogged down by traditional coding limits.
-                  For me, the real superpower isn&apos;t memorizing syntax—it&apos;s having the
-                  vision, the prompt, and the AI sidekick to build anything.
-                </p>
+                {isNoir ? (
+                  <p className={styles.bioText}>
+                    They stare at screens, praying to a god of syntax and semicolons. I don’t.
+                    <br /><br />
+                    My name is <strong>Prateek Sharma</strong>. I’m an AI-augmented builder, dragging ideas out of the dark and into reality at warp speed. While traditional coders suffocate in the mud of legacy frameworks, I use artificial intelligence to bypass the limits entirely.
+                    <br /><br />
+                    In this city, the real superpower isn&apos;t memorizing code. It’s having the vision, the command, and an AI sidekick that never sleeps.
+                    <br /><br />
+                    You want it built? I&apos;ll have it running before the rain stops.
+                  </p>
+                ) : (
+                  <p className={styles.bioText}>
+                    Hey there! I&apos;m <strong>Prateek Sharma</strong> — an AI-augmented
+                    builder who turns ideas into reality at warp speed. By blending creative
+                    vision with the power of artificial intelligence, I craft digital experiences
+                    and functional apps without getting bogged down by traditional coding limits.
+                    For me, the real superpower isn&apos;t memorizing syntax—it&apos;s having the
+                    vision, the prompt, and the AI sidekick to build anything.
+                  </p>
+                )}
               </SpeechBubble>
             </ScrollReveal>
 
