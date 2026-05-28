@@ -242,7 +242,7 @@
 
 /* Noir Mode overrides for ZAP! titleAction positioning and filter tabs */
 :global([data-theme='noir']) .titleAction {
-  transform: rotate(12deg) translateY(2px) !important;
+  transform: rotate(12deg) translateY(12px) !important;
 }
 
 :global([data-theme='noir']) .tab {
