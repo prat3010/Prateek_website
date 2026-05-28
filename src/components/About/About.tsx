@@ -17,6 +17,13 @@ const funFacts = [
   '🌍 Based in India, building future-proof experiences',
 ];
 
+const funFactsNoir = [
+  'Co-piloted by neural shadows and synthetic ghosts.',
+  'Raising apps out of the ether before the ink dries.',
+  'Orchestrating virtual puppets and raw prototype grids.',
+  'Based in India, forging code to survive the digital decay.',
+];
+
 export default function About() {
   const { isNoir } = useTheme();
 
@@ -83,16 +90,13 @@ export default function About() {
             </ScrollReveal>
 
             <div className={styles.funFacts}>
-              {funFacts.map((fact, index) => {
-                const displayFact = isNoir ? fact.replace(/^\S+\s+/, '') : fact;
-                return (
-                  <ScrollReveal key={fact} delay={300 + index * 120}>
-                    <CaptionBox className={styles.factBox}>
-                      {displayFact}
-                    </CaptionBox>
-                  </ScrollReveal>
-                );
-              })}
+              {(isNoir ? funFactsNoir : funFacts).map((fact, index) => (
+                <ScrollReveal key={fact} delay={300 + index * 120}>
+                  <CaptionBox className={styles.factBox}>
+                    {fact}
+                  </CaptionBox>
+                </ScrollReveal>
+              ))}
             </div>
           </div>
         </div>
