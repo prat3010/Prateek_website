@@ -240,7 +240,11 @@
   }
 }
 
-/* Noir Mode overrides for filter tabs to look like detective board caption box labels */
+/* Noir Mode overrides for ZAP! titleAction positioning and filter tabs */
+:global([data-theme='noir']) .titleAction {
+  transform: rotate(12deg) translateY(2px) !important;
+}
+
 :global([data-theme='noir']) .tab {
   background: #121214 !important;
   color: #ffffff !important;

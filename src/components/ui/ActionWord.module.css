@@ -142,7 +142,7 @@
   letter-spacing: 0.05em;
   text-transform: uppercase;
   position: relative !important;
-  top: 6px !important; /* Compensate for the dripping font vertical alignment */
+  top: -4px !important; /* Compensate for the dripping font vertical alignment */
 }
 
 :global([data-theme='noir']) .sm {
