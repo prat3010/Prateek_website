@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTheme } from '@/context/ThemeContext';
 import styles from './Footer.module.css';
 
 export interface SocialLink {
@@ -66,6 +67,7 @@ const defaultSocials: SocialLink[] = [
 export default function Footer({ socials, className }: FooterProps) {
   const socialLinks = socials ?? defaultSocials;
   const year = new Date().getFullYear();
+  const { isNoir } = useTheme();
 
   return (
     <footer className={`${styles.footer} ${className ?? ''}`}>
@@ -86,7 +88,7 @@ export default function Footer({ socials, className }: FooterProps) {
       <div className={styles.content}>
         {/* Tagline */}
         <p className={styles.tagline}>
-          Made with <span className={styles.heart}>❤️</span> and{' '}
+          Made with <span className={styles.heart}>{isNoir ? '🖤' : '❤️'}</span> and{' '}
           <span className={styles.pow}>POW!</span> by Prateek Sharma
         </p>
 
