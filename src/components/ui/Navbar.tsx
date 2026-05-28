@@ -120,7 +120,7 @@ export default function Navbar({ items, className }: NavbarProps) {
           className={styles.themeToggle}
           aria-label={isNoir ? 'Switch to Color mode' : 'Switch to Noir mode'}
         >
-          {isNoir ? '⚡ COLOR' : '🕶️ NOIR'}
+          {isNoir ? '⚡ POP ART' : '🕶️ NOIR'}
         </button>
 
         {/* ---- Hamburger ---- */}

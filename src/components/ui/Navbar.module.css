@@ -310,19 +310,20 @@
   box-shadow: 1px 1px 0px var(--pop-black);
 }
 
-[data-theme='noir'] .themeToggle {
-  background-color: #121214;
-  color: #FFFFFF;
-  border-color: #FFFFFF;
-  box-shadow: 3px 3px 0px #FFFFFF;
+:global([data-theme='noir']) .themeToggle {
+  background-color: #121214 !important;
+  color: #FFFFFF !important;
+  border-color: #FFFFFF !important;
+  box-shadow: 3px 3px 0px #FFFFFF !important;
 }
 
-[data-theme='noir'] .themeToggle:hover {
-  background-color: var(--pop-red);
-  color: #FFFFFF;
-  box-shadow: 4px 4px 0px #FFFFFF;
+:global([data-theme='noir']) .themeToggle:hover {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+  border-color: #FFFFFF !important;
+  box-shadow: 4px 4px 0px #FFFFFF !important;
 }
 
-[data-theme='noir'] .themeToggle:active {
-  box-shadow: 1px 1px 0px #FFFFFF;
+:global([data-theme='noir']) .themeToggle:active {
+  box-shadow: 1px 1px 0px #FFFFFF !important;
 }
