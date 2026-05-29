@@ -21,7 +21,7 @@ export const projects: Project[] = [
       'Earth Evolution Simulator is a scenario-driven simulation game where players guide a planet through ten distinct evolutionary eras. By resolving high-stakes ecological and geological decisions, players navigate random events and path-dependent consequences to steer the planet toward one of four cosmic endings. The Python Flask backend maintains game state in-session and records player run telemetry into a local SQLite database, while a custom game engine models planetary habitability by tracking dynamic variables and applying a deferred trigger system ("echoes") for earlier decisions.',
     image: '/images/project-earth-simulator.png',
     tags: ['Python', 'Flask', 'SQLite3', 'Jinja2', 'JavaScript', 'CSS'],
-    liveUrl: '',
+    liveUrl: 'https://earth-evolution-simulator.onrender.com',
     githubUrl: 'https://github.com/prat3010/earth-evolution-simulator',
     color: '#00E676',
     actionWord: 'BOOM!',

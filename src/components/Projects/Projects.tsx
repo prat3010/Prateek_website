@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { ExternalLink, Code2 } from 'lucide-react';
 import { projects } from '@/data/projects';
 import { useTheme } from '@/context/ThemeContext';
 import ActionWord from '@/components/ui/ActionWord';
@@ -142,6 +143,30 @@ export default function Projects() {
               ))}
             </div>
 
+            <div className={styles.modalActions}>
+              {selected.liveUrl && (
+                <a
+                  href={selected.liveUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="comic-btn comic-btn-blue"
+                  style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
+                >
+                  PLAY GAME <ExternalLink size={16} />
+                </a>
+              )}
+              {selected.githubUrl && (
+                <a
+                  href={selected.githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="comic-btn comic-btn-outline"
+                  style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
+                >
+                  GITHUB <Code2 size={16} />
+                </a>
+              )}
+            </div>
 
           </div>
         </div>

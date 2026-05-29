@@ -242,6 +242,12 @@
   margin-bottom: 1.5rem;
 }
 
+.modalActions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
 
 /* ---- Animations ---- */
 
@@ -293,4 +299,24 @@
 :global([data-theme='noir']) .panel:hover img,
 :global([data-theme='noir']) .panelImageWrapper:hover img {
   filter: grayscale(0) contrast(1) brightness(1);
+}
+
+:global([data-theme='noir']) .tag {
+  background: #000000 !important;
+  color: #fafafa !important;
+  border: 2px solid #fafafa !important;
+}
+
+:global([data-theme='noir']) .panelTitle {
+  color: #fafafa !important;
+  text-shadow: 2px 2px 0 #000000 !important;
+}
+
+:global([data-theme='noir']) .panelOverlay {
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.98) 0%,
+    rgba(0, 0, 0, 0.85) 60%,
+    rgba(0, 0, 0, 0.3) 100%
+  ) !important;
 }
