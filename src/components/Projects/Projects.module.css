@@ -390,3 +390,9 @@
   background: transparent !important;
   box-shadow: 2px 2px 0 #4a4a50 !important;
 }
+
+:global([data-theme='noir']) .modalClose {
+  background: #000000 !important;
+  color: #fafafa !important;
+  border-color: #fafafa !important;
+}
