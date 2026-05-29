@@ -216,6 +216,19 @@ export default function Playground() {
 
         <ScrollReveal delay={120}>
           <div className={styles.desk}>
+            {/* Fallback Mobile Warning Card */}
+            <div className={styles.mobileWarning}>
+              <span className={styles.warningIcon}>{isNoir ? '🕶️' : '⚠️'}</span>
+              <h3 className={styles.warningHeader}>
+                {isNoir ? 'CASE FILE ENCRYPTED' : 'ACCESS RESTRICTED!'}
+              </h3>
+              <p className={styles.warningText}>
+                {isNoir
+                  ? 'City grid analysis requires desktop access. Please review this case file from a larger monitor.'
+                  : 'Powering up the algorithm engine requires a desktop terminal. Please load this page on a desktop screen to start experimenting!'}
+              </p>
+            </div>
+
             <div className={styles.panelLayout}>
               {/* Interactive Pathfinder Grid */}
               <Pathfinder

@@ -531,3 +531,67 @@
     transform: scale(1);
   }
 }
+
+.mobileWarning {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  background: var(--pop-white);
+  border: 4px solid var(--pop-black);
+  border-radius: 6px;
+  box-shadow: 8px 8px 0 var(--pop-black);
+}
+
+:global([data-theme='noir']) .mobileWarning {
+  background: #1C1C24;
+  border-color: #3F3F4E;
+  box-shadow: 8px 8px 0 #000000;
+  color: #E2E2EC;
+}
+
+.warningHeader {
+  font-family: var(--font-headline);
+  font-size: 2.2rem;
+  color: var(--pop-red);
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 0 var(--pop-black);
+  text-transform: uppercase;
+}
+
+:global([data-theme='noir']) .warningHeader {
+  color: #5A5A72;
+  text-shadow: none;
+}
+
+.warningText {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--pop-black);
+  max-width: 450px;
+  margin: 0;
+}
+
+:global([data-theme='noir']) .warningText {
+  color: #B0B0C4;
+}
+
+.warningIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 992px) {
+  .panelLayout {
+    display: none !important;
+  }
+  .console {
+    display: none !important;
+  }
+  .mobileWarning {
+    display: flex !important;
+  }
+}
