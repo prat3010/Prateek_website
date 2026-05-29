@@ -115,7 +115,7 @@ export default function Contact() {
                   type="text"
                   required
                   className={styles.input}
-                  placeholder="Peter Parker"
+                  placeholder={isNoir ? 'Sam Spade' : 'Peter Parker'}
                 />
               </div>
 
@@ -129,7 +129,7 @@ export default function Contact() {
                   type="email"
                   required
                   className={styles.input}
-                  placeholder="spidey@dailybugle.com"
+                  placeholder={isNoir ? 'spade@privateeye.com' : 'spidey@dailybugle.com'}
                 />
               </div>
 
@@ -143,7 +143,11 @@ export default function Contact() {
                   required
                   rows={5}
                   className={styles.textarea}
-                  placeholder="With great power comes great responsibility..."
+                  placeholder={
+                    isNoir
+                      ? 'The stuff that dreams are made of...'
+                      : 'With great power comes great responsibility...'
+                  }
                 />
               </div>
 
