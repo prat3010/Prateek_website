@@ -1,7 +1,6 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { useSoundEffect } from '@/hooks/useSoundEffect';
 
 export type Theme = 'light' | 'noir';
 
@@ -21,8 +20,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [transitionCoords, setTransitionCoords] = useState({ x: 50, y: 50 });
   const [pendingTheme, setPendingTheme] = useState<Theme | null>(null);
-  
-  const { play } = useSoundEffect();
 
   // Initialize theme on mount from localStorage or system preference
   useEffect(() => {
@@ -56,12 +53,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       setPendingTheme(nextTheme);
       setIsTransitioning(true);
 
-      // Play click/whoosh sounds
-      play('click');
-      setTimeout(() => {
-        play('whoosh');
-      }, 50);
-
       // Halfway through the 800ms transition, flip the actual theme (when screen is covered)
       setTimeout(() => {
         setTheme(nextTheme);
@@ -75,7 +66,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         setPendingTheme(null);
       }, 850);
     },
-    [theme, isTransitioning, play]
+    [theme, isTransitioning]
   );
 
   const isNoir = theme === 'noir';
