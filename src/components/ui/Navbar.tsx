@@ -83,7 +83,9 @@ export default function Navbar({ items, className }: NavbarProps) {
 
   return (
     <nav
-      className={`${styles.navbar} ${scrolled ? styles.scrolled : ''} ${className ?? ''}`}
+      className={`${styles.navbar} ${scrolled ? styles.scrolled : ''} ${
+        mobileOpen ? styles.menuOpen : ''
+      } ${className ?? ''}`}
       role="navigation"
       aria-label="Main navigation"
     >

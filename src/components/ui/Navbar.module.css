@@ -18,6 +18,11 @@
   transition: box-shadow 0.3s ease;
 }
 
+.navbar.menuOpen {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
 .navbar.scrolled {
   box-shadow: 0 4px 12px rgba(26, 26, 46, 0.25);
 }
