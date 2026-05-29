@@ -53,8 +53,25 @@ export default function Skills() {
           </h2>
         </ScrollReveal>
 
+        {/* Method of Operation (M.O.) Banner */}
+        <ScrollReveal delay={80}>
+          <div className={styles.moBanner}>
+            <div className={styles.moBadge}>
+              {isNoir ? 'CASE FILE' : 'MY M.O.'}
+            </div>
+            <div className={styles.moHeader}>
+              {isNoir ? 'DEVELOPMENT METHODOLOGY' : 'METHOD OF OPERATION'}
+            </div>
+            <p className={styles.moText}>
+              {isNoir
+                ? 'Subject operates through AI orchestration. Directs autonomous agents and advanced models to synthesize code. Zero manual syntax writing; absolute focus on system architecture, product design, and debugging.'
+                : 'I don’t write syntax line-by-line by hand—I command powerful AI systems (like Cursor, Gemini, and v0) to manifest my ideas. I focus 100% of my energy on high-level system architecture, product design, UX, and orchestration.'}
+            </p>
+          </div>
+        </ScrollReveal>
+
         {/* Category filter tabs */}
-        <ScrollReveal delay={100}>
+        <ScrollReveal delay={120}>
           <div className={styles.tabs} role="tablist" aria-label="Filter skills by category">
             {categories.map((cat) => (
               <button

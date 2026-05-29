@@ -39,18 +39,7 @@ export default function SkillCard({ skill, index }: SkillCardProps) {
         <h3 className={styles.skillName}>{skill.name}</h3>
       </div>
 
-      <div className={styles.powerBar}>
-        <div className={styles.powerBarTrack}>
-          <div
-            className={styles.powerBarFill}
-            style={{
-              width: `${skill.level}%`,
-              background: isNoir ? '#FAFAFA' : skill.color,
-            }}
-          />
-        </div>
-        <span className={styles.powerLevel}>{skill.level}%</span>
-      </div>
+      <p className={styles.skillDescription}>{skill.description}</p>
 
       <span className={styles.categoryBadge}>
         {skill.category.toUpperCase()}

@@ -106,6 +106,8 @@
   transition: transform 0.3s var(--transition-bounce),
     box-shadow 0.3s ease;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .card:hover {
@@ -161,51 +163,70 @@
   line-height: 1.2;
 }
 
-/* Power level bar */
-.powerBar {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-}
-
-.powerBarTrack {
-  flex: 1;
-  height: 10px;
-  border: 2px solid var(--pop-black);
-  background: rgba(255, 255, 255, 0.6);
-  overflow: hidden;
-}
-
-.powerBarFill {
-  height: 100%;
-  transition: width 0.8s var(--transition-bounce);
+/* ===== M.O. BANNER ===== */
+.moBanner {
   position: relative;
+  max-width: 850px;
+  margin: 0 auto 3rem auto;
+  background: var(--pop-yellow);
+  border: 4px solid var(--pop-black);
+  padding: 1.75rem 2rem 1.5rem 2rem;
+  box-shadow: 8px 8px 0 var(--pop-black);
+  transform: rotate(-0.5deg);
+  transition: transform 0.3s var(--transition-bounce), box-shadow 0.3s ease;
 }
 
-/* Animated stripes on fill bar */
-.powerBarFill::after {
-  content: '';
+.moBanner:hover {
+  transform: scale(1.01) rotate(0.2deg);
+  box-shadow: 10px 10px 0 var(--pop-black);
+}
+
+.moBadge {
   position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    -45deg,
-    transparent,
-    transparent 3px,
-    rgba(255, 255, 255, 0.3) 3px,
-    rgba(255, 255, 255, 0.3) 6px
-  );
+  top: -16px;
+  left: 20px;
+  background: var(--pop-red);
+  color: var(--pop-white);
+  border: 3px solid var(--pop-black);
+  padding: 0.2rem 0.8rem;
+  font-family: 'Bangers', cursive;
+  font-size: 1.15rem;
+  letter-spacing: 0.05em;
+  box-shadow: 3px 3px 0 var(--pop-black);
+  transform: rotate(-2deg);
 }
 
-.powerLevel {
+.moHeader {
   font-family: 'Bangers', cursive;
-  font-size: 0.85rem;
+  font-size: 1.75rem;
   color: var(--pop-black);
-  min-width: 2.5rem;
-  text-align: right;
+  margin-bottom: 0.5rem;
+  margin-top: 0.25rem;
+  letter-spacing: 0.04em;
+}
+
+.moText {
+  font-family: var(--font-comic-neue), 'Comic Neue', sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--pop-black);
+  font-weight: 700;
+}
+
+/* ===== SKILL DESCRIPTION ===== */
+.skillDescription {
+  flex-grow: 1;
+  font-family: var(--font-comic-neue), 'Comic Neue', sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--pop-black);
+  margin-bottom: 1.25rem;
+  font-weight: 550;
+  opacity: 0.95;
 }
 
 .categoryBadge {
+  align-self: flex-start;
   display: inline-block;
   font-family: 'Bangers', cursive;
   font-size: 0.7rem;
@@ -214,6 +235,69 @@
   background: var(--pop-black);
   color: var(--pop-white);
   border: 2px solid var(--pop-black);
+}
+
+/* ===== NOIR THEME OVERRIDES ===== */
+:global([data-theme='noir']) .moBanner {
+  background: #121214 !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 6px 6px 0px #ffffff !important;
+  transform: none !important;
+  padding: 1.5rem 1.75rem;
+}
+
+:global([data-theme='noir']) .moBanner:hover {
+  transform: scale(1.01) !important;
+  box-shadow: 8px 8px 0px #ffffff !important;
+}
+
+:global([data-theme='noir']) .moBadge {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: none !important;
+  top: -14px;
+  left: 15px;
+  transform: none !important;
+  font-family: var(--font-comic-neue), 'Comic Neue', sans-serif !important;
+  font-weight: bold !important;
+  font-size: 0.9rem !important;
+  text-transform: uppercase;
+}
+
+:global([data-theme='noir']) .moHeader {
+  color: #ffffff !important;
+  font-family: monospace, Courier, sans-serif !important;
+  font-size: 1.35rem !important;
+  font-weight: bold !important;
+  border-bottom: 1px dashed #ffffff;
+  padding-bottom: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+:global([data-theme='noir']) .moText {
+  color: #e4e4e7 !important;
+  font-family: monospace, Courier, sans-serif !important;
+  font-size: 0.92rem !important;
+  font-weight: normal !important;
+  line-height: 1.5 !important;
+}
+
+:global([data-theme='noir']) .skillDescription {
+  color: #a1a1aa !important;
+  font-family: monospace, Courier, sans-serif !important;
+  font-size: 0.85rem !important;
+  font-weight: normal !important;
+  line-height: 1.4 !important;
+}
+
+:global([data-theme='noir']) .categoryBadge {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 2px solid #ffffff !important;
+  font-family: var(--font-comic-neue), 'Comic Neue', sans-serif !important;
+  font-weight: bold !important;
+  font-size: 0.7rem !important;
 }
 
 /* ===== RESPONSIVE ===== */

@@ -1,7 +1,7 @@
 export interface Skill {
   name: string;
   icon: string;
-  level: number;
+  description: string;
   category: 'frontend' | 'backend' | 'tools' | 'creative';
   color: string;
 }
@@ -27,28 +27,28 @@ export const skills: Skill[] = [
   {
     name: 'React / Next.js',
     icon: 'atom',
-    level: 80,
+    description: 'Directing AI to synthesize React components, manage application state, and orchestrate client/server code.',
     category: 'frontend',
     color: '#61DAFB',
   },
   {
     name: 'HTML5 & CSS3',
     icon: 'paintbrush',
-    level: 90,
+    description: 'Steering AI to generate responsive structures, layout systems, and clean HTML/CSS code.',
     category: 'frontend',
     color: '#1572B6',
   },
   {
     name: 'Responsive Design',
     icon: 'layout',
-    level: 88,
+    description: 'Polishing viewport dynamics, media-query triggers, and adaptive structures.',
     category: 'frontend',
     color: '#FF1744',
   },
   {
     name: 'UI/UX Animations',
     icon: 'sparkles',
-    level: 85,
+    description: 'Guiding smooth transition curves, GSAP sequences, and Framer Motion effects.',
     category: 'frontend',
     color: '#FF4081',
   },
@@ -57,28 +57,28 @@ export const skills: Skill[] = [
   {
     name: 'LLM Prompting',
     icon: 'brain',
-    level: 95,
+    description: 'The steering wheel. Writing structured prompts, orchestrating agent context, and debugging models.',
     category: 'backend',
     color: '#FFEB3B',
   },
   {
     name: 'AI Agent Orchestration',
     icon: 'bot',
-    level: 92,
+    description: 'Designing and running autonomous multi-agent networks to perform complex development tasks.',
     category: 'backend',
     color: '#9C27B0',
   },
   {
     name: 'Python',
     icon: 'terminal',
-    level: 70,
+    description: 'Instructing AI to write utility scripts, automation tasks, and backend helper scripts.',
     category: 'backend',
     color: '#3776AB',
   },
   {
     name: 'API Integrations',
     icon: 'server',
-    level: 88,
+    description: 'Connecting data pipes, authenticating services, and handling fetch payloads.',
     category: 'backend',
     color: '#339933',
   },
@@ -87,21 +87,21 @@ export const skills: Skill[] = [
   {
     name: 'AI Dev Tools (Cursor, v0)',
     icon: 'sparkles',
-    level: 95,
+    description: "My main workspace. Vibe-coding at speed using Cursor's composer and v0's visual prototyping.",
     category: 'tools',
     color: '#00E5FF',
   },
   {
     name: 'Git & GitHub',
     icon: 'git-branch',
-    level: 85,
+    description: 'Managing branch workflows, commit history, and deployment sync.',
     category: 'tools',
     color: '#F05032',
   },
   {
     name: 'Vercel Deployment',
     icon: 'cloud',
-    level: 88,
+    description: 'Instantly launching web apps and setting up serverless preview branches.',
     category: 'tools',
     color: '#000000',
   },
@@ -110,21 +110,21 @@ export const skills: Skill[] = [
   {
     name: 'Figma',
     icon: 'figma',
-    level: 80,
+    description: 'Reviewing and translating design blueprints into prompt templates and CSS variables.',
     category: 'creative',
     color: '#F24E1E',
   },
   {
     name: 'Rapid Prototyping',
     icon: 'zap',
-    level: 98,
+    description: 'Turning paper ideas into functional interactive software in record time using AI speed.',
     category: 'creative',
     color: '#FF9100',
   },
   {
     name: 'AI Image Generation',
     icon: 'image',
-    level: 90,
+    description: 'Using Midjourney, DALL-E, or Imagen to generate custom illustrations and graphical assets.',
     category: 'creative',
     color: '#E040FB',
   },
