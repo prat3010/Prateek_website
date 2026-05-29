@@ -58,6 +58,15 @@ export default function Projects() {
                 onClick={() => setSelectedProject(project.id)}
                 aria-label={`View ${project.title} project details`}
               >
+                {/* Status Badge */}
+                <div
+                  className={`${styles.statusBadge} ${
+                    project.isLive ? styles.statusLive : styles.statusSoon
+                  }`}
+                >
+                  {project.isLive ? 'LIVE NOW' : 'COMING SOON'}
+                </div>
+
                 <div className={styles.panelImageWrapper}>
                   <Image
                     src={isNoir ? project.image.replace(/\.png$/, '-noir.png') : project.image}
@@ -144,27 +153,48 @@ export default function Projects() {
             </div>
 
             <div className={styles.modalActions}>
-              {selected.liveUrl && (
-                <a
-                  href={selected.liveUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="comic-btn comic-btn-blue"
-                  style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
-                >
-                  PLAY GAME <ExternalLink size={16} />
-                </a>
-              )}
-              {selected.githubUrl && (
-                <a
-                  href={selected.githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="comic-btn comic-btn-outline"
-                  style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
-                >
-                  GITHUB <Code2 size={16} />
-                </a>
+              {selected.isLive ? (
+                <>
+                  {selected.liveUrl && (
+                    <a
+                      href={selected.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="comic-btn comic-btn-blue"
+                      style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
+                    >
+                      PLAY GAME <ExternalLink size={16} />
+                    </a>
+                  )}
+                  {selected.githubUrl && (
+                    <a
+                      href={selected.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="comic-btn comic-btn-outline"
+                      style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
+                    >
+                      GITHUB <Code2 size={16} />
+                    </a>
+                  )}
+                </>
+              ) : (
+                <>
+                  <button
+                    disabled
+                    className={`${styles.disabledBtn} comic-btn`}
+                    style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
+                  >
+                    COMING SOON <ExternalLink size={16} />
+                  </button>
+                  <button
+                    disabled
+                    className={`${styles.disabledBtn} comic-btn comic-btn-outline`}
+                    style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
+                  >
+                    CODE UNDER DEV <Code2 size={16} />
+                  </button>
+                </>
               )}
             </div>
 

@@ -9,6 +9,7 @@ export interface Project {
   githubUrl: string;
   color: string;
   actionWord: string;
+  isLive: boolean;
 }
 
 export const projects: Project[] = [
@@ -25,6 +26,7 @@ export const projects: Project[] = [
     githubUrl: 'https://github.com/prat3010/earth-evolution-simulator',
     color: '#00E676',
     actionWord: 'BOOM!',
+    isLive: true,
   },
   {
     id: 'paintmix-ai',
@@ -39,6 +41,7 @@ export const projects: Project[] = [
     githubUrl: 'https://github.com/prat3010/paintmix-ai',
     color: '#FF9100',
     actionWord: 'SPLAT!',
+    isLive: false,
   },
   {
     id: 'iss-tracker',
@@ -53,6 +56,7 @@ export const projects: Project[] = [
     githubUrl: 'https://github.com/prat3010/iss-tracker',
     color: '#2979FF',
     actionWord: 'WHOOSH!',
+    isLive: false,
   },
   {
     id: 'metawipe',
@@ -67,5 +71,6 @@ export const projects: Project[] = [
     githubUrl: 'https://github.com/prat3010/metawipe',
     color: '#00E676',
     actionWord: 'ZAP!',
+    isLive: false,
   },
 ];

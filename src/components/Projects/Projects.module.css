@@ -320,3 +320,73 @@
     rgba(0, 0, 0, 0.3) 100%
   ) !important;
 }
+
+/* ---- Status Badge & Disabled Button Styles ---- */
+
+.statusBadge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 10;
+  padding: 0.3rem 0.6rem;
+  font-family: var(--font-headline);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 3px solid var(--pop-black);
+  border-radius: 4px;
+  box-shadow: 2px 2px 0 var(--pop-black);
+  transform: rotate(-3deg);
+  transition: transform 0.25s ease;
+  pointer-events: none;
+}
+
+.statusLive {
+  background: var(--pop-green);
+  color: var(--pop-black);
+}
+
+.statusSoon {
+  background: var(--pop-orange);
+  color: var(--pop-white);
+}
+
+/* Hover effect on parent panel shifts badge */
+.panel:hover .statusBadge {
+  transform: scale(1.05) rotate(-5deg);
+}
+
+/* Disabled Actions styling */
+.disabledBtn {
+  opacity: 0.6;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: var(--shadow-comic-sm) !important;
+  pointer-events: none; /* Disables click and interaction entirely */
+}
+
+.disabledBtn:hover {
+  transform: none !important;
+  box-shadow: var(--shadow-comic-sm) !important;
+}
+
+/* Noir overrides for accessibility contrast */
+:global([data-theme='noir']) .statusLive {
+  background: #000000 !important;
+  color: #fafafa !important;
+  border: 3px solid #fafafa !important;
+}
+
+:global([data-theme='noir']) .statusSoon {
+  background: #000000 !important;
+  color: #8a8a93 !important;
+  border: 3px solid #8a8a93 !important;
+}
+
+:global([data-theme='noir']) .disabledBtn {
+  border-color: #4a4a50 !important;
+  color: #4a4a50 !important;
+  background: transparent !important;
+  box-shadow: 2px 2px 0 #4a4a50 !important;
+}
