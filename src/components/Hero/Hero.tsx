@@ -1,18 +1,26 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useTypewriter } from '@/hooks/useTypewriter';
 import { useTheme } from '@/context/ThemeContext';
 import ActionWord from '@/components/ui/ActionWord';
 import ComicPanel from '@/components/ui/ComicPanel';
+import { standardTaglines, noirTaglines } from '@/data/taglines';
 import styles from './Hero.module.css';
 
 export default function Hero() {
   const { isNoir } = useTheme();
+  const [tagline, setTagline] = useState('');
+
+  useEffect(() => {
+    const list = isNoir ? noirTaglines : standardTaglines;
+    const randomIndex = Math.floor(Math.random() * list.length);
+    setTagline(list[randomIndex]);
+  }, [isNoir]);
   
   const { displayText, isDone } = useTypewriter({
-    text: 'Crafting Digital Worlds, One Panel at a Time',
+    text: tagline,
     speed: 55,
     delay: 600,
   });

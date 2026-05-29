@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 interface UseTypewriterOptions {
   text: string;
@@ -19,25 +19,24 @@ export function useTypewriter({
   const [isTyping, setIsTyping] = useState(false);
   const [isDone, setIsDone] = useState(false);
 
-  const startTyping = useCallback(() => {
-    setDisplayText('');
-    setIsTyping(true);
-    setIsDone(false);
-  }, []);
-
+  // Reset and restart the typewriter process whenever the target text or delay changes
   useEffect(() => {
-    let timeout: ReturnType<typeof setTimeout>;
+    setDisplayText('');
+    setIsTyping(false);
+    setIsDone(false);
 
-    // Initial delay before typing starts
-    timeout = setTimeout(() => {
+    if (!text) return;
+
+    const timeout = setTimeout(() => {
       setIsTyping(true);
     }, delay);
 
     return () => clearTimeout(timeout);
-  }, [delay]);
+  }, [text, delay]);
 
+  // Handle character-by-character typing
   useEffect(() => {
-    if (!isTyping) return;
+    if (!isTyping || !text) return;
 
     if (displayText.length < text.length) {
       const timeout = setTimeout(() => {
@@ -50,12 +49,15 @@ export function useTypewriter({
 
       if (loop) {
         const timeout = setTimeout(() => {
-          startTyping();
+          setDisplayText('');
+          setIsTyping(true);
+          setIsDone(false);
         }, 2000);
         return () => clearTimeout(timeout);
       }
     }
-  }, [displayText, isTyping, text, speed, loop, startTyping]);
+  }, [displayText, isTyping, text, speed, loop]);
 
   return { displayText, isTyping, isDone };
 }
+
