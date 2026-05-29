@@ -35,7 +35,7 @@ export default function About() {
             ORIGIN STORY
             <span className={styles.titleDecoration}>
               <ActionWord
-                word="WOW!"
+                word={isNoir ? 'CLUE!' : 'WOW!'}
                 color={isNoir ? '#000000' : 'var(--pop-pink)'}
                 starburstColor={isNoir ? '#FFFFFF' : undefined}
                 size="md"

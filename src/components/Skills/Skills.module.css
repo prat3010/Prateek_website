@@ -358,3 +358,19 @@
   box-shadow: 4px 4px 0px #ffffff !important;
   transform: rotate(0deg) scale(1.05) !important;
 }
+
+/* KAPOW hover overrides in Noir Mode */
+:global([data-theme='noir']) .kapow {
+  font-family: var(--font-nosifer), var(--font-creepster), cursive !important;
+  color: #ff1744 !important;
+  -webkit-text-stroke: 1.5px #000000 !important;
+  paint-order: stroke fill !important;
+  text-shadow: 3px 3px 0px #000000 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+}
+
+:global([data-theme='noir']) .card:hover .kapow {
+  opacity: 0.9 !important;
+}
+

@@ -8,6 +8,22 @@ import ActionWord from '@/components/ui/ActionWord';
 import ScrollReveal from '@/components/effects/ScrollReveal';
 import styles from './Projects.module.css';
 
+const getActionWord = (word: string, isNoir: boolean) => {
+  if (!isNoir) return word;
+  switch (word) {
+    case 'BOOM!':
+      return 'DOOM!';
+    case 'SPLAT!':
+      return 'DRIP...';
+    case 'WHOOSH!':
+      return 'ESCAPE!';
+    case 'ZAP!':
+      return 'SHADOW!';
+    default:
+      return word;
+  }
+};
+
 export default function Projects() {
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const selected = projects.find((p) => p.id === selectedProject);
@@ -21,7 +37,7 @@ export default function Projects() {
             EPIC ADVENTURES
             <span className={styles.titleAction}>
               <ActionWord
-                word="BAM!"
+                word={isNoir ? 'CASE!' : 'BAM!'}
                 color={isNoir ? '#FFFFFF' : 'var(--pop-red)'}
                 starburstColor={isNoir ? '#000000' : undefined}
                 size="lg"
@@ -53,7 +69,7 @@ export default function Projects() {
                 <div className={styles.panelOverlay}>
                   <span className={styles.panelAction}>
                     <ActionWord
-                      word={project.actionWord}
+                      word={getActionWord(project.actionWord, isNoir)}
                       color={isNoir ? '#000000' : project.color}
                       starburstColor={isNoir ? '#FFFFFF' : undefined}
                       size="md"
@@ -98,7 +114,7 @@ export default function Projects() {
 
             <div className={styles.modalHeader}>
               <ActionWord
-                word={selected.actionWord}
+                word={getActionWord(selected.actionWord, isNoir)}
                 color={isNoir ? '#FFFFFF' : selected.color}
                 starburstColor={isNoir ? '#000000' : undefined}
                 size="lg"

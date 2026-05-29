@@ -92,7 +92,7 @@ export default function Contact() {
             SEND A SIGNAL!
             <span className={styles.titleAction}>
               <ActionWord
-                word="SEND!"
+                word={isNoir ? 'SIGNAL!' : 'SEND!'}
                 color={isNoir ? '#000000' : 'var(--pop-orange)'}
                 starburstColor={isNoir ? '#FFFFFF' : undefined}
                 size="lg"

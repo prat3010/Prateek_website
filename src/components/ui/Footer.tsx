@@ -73,23 +73,23 @@ export default function Footer({ socials, className }: FooterProps) {
     <footer className={`${styles.footer} ${className ?? ''}`}>
       {/* Corner action word decorations */}
       <span className={`${styles.cornerDecoration} ${styles.topLeft}`} aria-hidden="true">
-        POW!
+        {isNoir ? 'GRIT!' : 'POW!'}
       </span>
       <span className={`${styles.cornerDecoration} ${styles.topRight}`} aria-hidden="true">
-        ZAP!
+        {isNoir ? 'SHADOW!' : 'ZAP!'}
       </span>
       <span className={`${styles.cornerDecoration} ${styles.bottomLeft}`} aria-hidden="true">
-        WHAM!
+        {isNoir ? 'DUSK!' : 'WHAM!'}
       </span>
       <span className={`${styles.cornerDecoration} ${styles.bottomRight}`} aria-hidden="true">
-        BAM!
+        {isNoir ? 'CASE!' : 'BAM!'}
       </span>
 
       <div className={styles.content}>
         {/* Tagline */}
         <p className={styles.tagline}>
           Made with <span className={styles.heart}>{isNoir ? '🖤' : '❤️'}</span> and{' '}
-          <span className={styles.pow}>POW!</span> by Prateek Sharma
+          <span className={styles.pow}>{isNoir ? 'GRIT!' : 'POW!'}</span> by Prateek Sharma
         </p>
 
         {/* Social links */}

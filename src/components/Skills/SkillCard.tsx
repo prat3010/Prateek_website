@@ -27,7 +27,7 @@ export default function SkillCard({ skill, index }: SkillCardProps) {
     >
       {/* Hover KAPOW */}
       <span className={styles.kapow} aria-hidden="true">
-        KAPOW!
+        {isNoir ? 'SILENCE...' : 'KAPOW!'}
       </span>
 
       <div className={styles.cardHeader}>

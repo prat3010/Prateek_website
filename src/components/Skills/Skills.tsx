@@ -44,7 +44,7 @@ export default function Skills() {
             SUPER POWERS
             <span className={styles.titleAction}>
               <ActionWord
-                word="ZAP!"
+                word={isNoir ? 'SHADOW!' : 'ZAP!'}
                 color={isNoir ? '#000000' : 'var(--pop-yellow)'}
                 starburstColor={isNoir ? '#FFFFFF' : undefined}
                 size="lg"

@@ -36,7 +36,7 @@ export default function Hero() {
           {/* Floating POW action word */}
           <div className={styles.powWrapper}>
             <ActionWord
-              word="POW!"
+              word={isNoir ? 'GRIT!' : 'POW!'}
               color={isNoir ? '#000000' : 'var(--pop-yellow)'}
               starburstColor={isNoir ? '#FFFFFF' : undefined}
               size="xl"
@@ -79,7 +79,7 @@ export default function Hero() {
           {/* Small floating action words */}
           <div className={styles.floatingZap}>
             <ActionWord
-              word="ZAP!"
+              word={isNoir ? 'SHADOW!' : 'ZAP!'}
               color={isNoir ? '#FFFFFF' : 'var(--pop-blue)'}
               starburstColor={isNoir ? '#000000' : undefined}
               size="md"
