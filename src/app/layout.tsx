@@ -55,6 +55,33 @@ export const metadata: Metadata = {
   },
 };
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Prateek Sharma",
+  "jobTitle": "Full Stack Developer & Designer",
+  "url": "https://prateeq.in",
+  "description": "Portfolio of Prateek Sharma — developer, designer, and storyteller crafting high-performance web applications and interactive experiences.",
+  "sameAs": [
+    "https://github.com/prat3010",
+    "https://linkedin.com/in/freshlimevodka",
+    "https://x.com/3010prateek",
+    "https://instagram.com/freshlimevodka"
+  ],
+  "knowsAbout": [
+    "React",
+    "Next.js",
+    "Flutter",
+    "Dart",
+    "Python",
+    "FastAPI",
+    "Flask",
+    "UI/UX Design",
+    "AI Prototyping",
+    "AI Agent Orchestration"
+  ]
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -84,6 +111,10 @@ export default function RootLayout({
               })();
             `,
           }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
       <body>
