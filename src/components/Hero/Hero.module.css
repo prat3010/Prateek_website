@@ -83,6 +83,48 @@
   display: inline;
 }
 
+.highlightText {
+  color: var(--pop-red);
+}
+
+.vibeBox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  background: var(--pop-yellow);
+  border: 3px solid var(--pop-black);
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-comic-sm);
+  transform: rotate(-1deg);
+  max-width: 500px;
+  width: 100%;
+}
+
+.vibeLabel {
+  font-family: var(--font-headline);
+  font-size: 1.1rem;
+  color: var(--pop-red);
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+:global([data-theme='noir']) .highlightText {
+  color: #c5a059 !important;
+}
+
+:global([data-theme='noir']) .vibeBox {
+  background: #1e1e24 !important;
+  border-color: #fafafa !important;
+  box-shadow: 3px 3px 0px #fafafa !important;
+  transform: rotate(0.5deg) !important;
+}
+
+:global([data-theme='noir']) .vibeLabel {
+  color: #c5a059 !important;
+}
+
 .cursor {
   display: inline-block;
   color: var(--pop-red);

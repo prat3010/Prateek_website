@@ -52,17 +52,34 @@ export default function Hero() {
           </div>
 
           <h1 className={styles.headline}>
+            {isNoir ? (
+              <>
+                SHADOWS &<br />
+                <span className={styles.highlightText}>SYNTAX.</span>
+              </>
+            ) : (
+              <>
+                CRAFTING DIGITAL<br />
+                <span className={styles.highlightText}>WORLDS.</span>
+              </>
+            )}
+          </h1>
+
+          <p className={styles.subtitle}>
+            Prateek Sharma — Developer • Designer • Storyteller
+          </p>
+
+          <div className={styles.vibeBox} aria-live="polite">
+            <span className={styles.vibeLabel}>
+              {isNoir ? 'CONFESSIONAL:' : 'NARRATOR:'}
+            </span>{' '}
             <span className={styles.typedText}>
               {displayText}
               <span className={`${styles.cursor} ${isDone ? styles.cursorBlink : ''}`}>
                 |
               </span>
             </span>
-          </h1>
-
-          <p className={styles.subtitle}>
-            Prateek Sharma — Developer • Designer • Storyteller
-          </p>
+          </div>
 
           <a
             href="#projects"
