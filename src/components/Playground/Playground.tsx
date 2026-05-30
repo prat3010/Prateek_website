@@ -33,10 +33,73 @@ export default function Playground() {
   const [algorithm, setAlgorithm] = useState<'dijkstra' | 'astar' | 'bfs' | 'dfs'>('dijkstra');
   const [logs, setLogs] = useState<LogEntry[]>([]);
 
+  // Launch overlay state
+  const [isLaunched, setIsLaunched] = useState(false);
+  const [isBooting, setIsBooting] = useState(false);
+  const [bootLogs, setBootLogs] = useState<string[]>([]);
+
   const consoleRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  const bootLinesNormal = [
+    '⚡ CONNECTING ENGINE TO COORD_GRID...',
+    '⚡ SHIFTING HEURISTICS INDEX MATRIX...',
+    '⚡ BOOTING DIJKSTRA & A-STAR ALGORITHMS...',
+    '⚡ VERIFYING TOUCH SENSOR CAPABILITIES...',
+    '🚀 LAB CORE 100% ONLINE. SIMULATOR READY!'
+  ];
 
+  const bootLinesNoir = [
+    '🕶️ RETRIEVING ARCHIVED CRIME REPORTS...',
+    '🕶️ MAPPING CITY STREETS COORD SECTOR #11...',
+    '🕶️ RESOLVING EVIDENCE FILE BOUNDARIES...',
+    '🕶️ MOUNTING CRIME SCENE BARRICADES...',
+    '📁 DECRYPTION COMPLETE. DESK UNLOCKED.'
+  ];
+
+  // Mobile body scroll lock when simulation is launched in fullscreen
+  useEffect(() => {
+    if (isLaunched) {
+      const isMobile = window.innerWidth <= 992;
+      if (isMobile) {
+        document.body.style.overflow = 'hidden';
+        document.body.style.position = 'relative';
+      }
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+    };
+  }, [isLaunched]);
+
+  // Launch boot sequence orchestrator
+  const handleLaunch = () => {
+    setIsBooting(true);
+    setBootLogs([]);
+
+    const lines = isNoir ? bootLinesNoir : bootLinesNormal;
+    let index = 0;
+
+    const interval = setInterval(() => {
+      if (index < lines.length) {
+        setBootLogs((prev) => [...prev, lines[index]]);
+        index++;
+      } else {
+        clearInterval(interval);
+        setTimeout(() => {
+          setIsLaunched(true);
+          setIsBooting(false);
+        }, 300);
+      }
+    }, 150);
+  };
+
+  const handleExitFullscreen = () => {
+    setIsLaunched(false);
+  };
 
   // Auto-scroll console to bottom locally
   useEffect(() => {
@@ -215,19 +278,90 @@ export default function Playground() {
         </ScrollReveal>
 
         <ScrollReveal delay={120}>
-          <div className={styles.desk}>
-            {/* Fallback Mobile Warning Card */}
-            <div className={styles.mobileWarning}>
-              <span className={styles.warningIcon}>{isNoir ? '🕶️' : '⚠️'}</span>
-              <h3 className={styles.warningHeader}>
-                {isNoir ? 'CASE FILE ENCRYPTED' : 'ACCESS RESTRICTED!'}
-              </h3>
-              <p className={styles.warningText}>
-                {isNoir
-                  ? 'City grid analysis requires desktop access. Please review this case file from a larger monitor.'
-                  : 'Powering up the algorithm engine requires a desktop terminal. Please load this page on a desktop screen to start experimenting!'}
-              </p>
-            </div>
+          <div className={`${styles.desk} ${isLaunched ? styles.fullscreenMobile : ''}`}>
+            
+            {/* Header only visible in mobile fullscreen mode */}
+            {isLaunched && (
+              <div className={styles.fullscreenHeader}>
+                <span className={styles.fullscreenTitle}>
+                  {isNoir ? '🕶️ CASE #404 SEARCH' : '⚡ PATHFINDER MOBILE'}
+                </span>
+                <button
+                  type="button"
+                  className={styles.exitBtn}
+                  onClick={handleExitFullscreen}
+                  disabled={isRunning}
+                >
+                  {isNoir ? 'Close Ledger' : 'Exit Simulator'}
+                </button>
+              </div>
+            )}
+
+            {/* Launch Overlay (Desktop & Boot Sequence Overlay) */}
+            {(!isLaunched || isBooting) && (
+              <div className={styles.launchOverlay}>
+                <div className={styles.scanline}></div>
+                <div className={styles.crtContent}>
+                  <h3 className={styles.overlayTitle}>
+                    {isNoir ? '🕵️ CASE LEDGER ACCESS' : '⚡ PATH CORE v2.5'}
+                  </h3>
+                  
+                  {/* Themed Boot Logs / Diagnostic Specs */}
+                  <div className={styles.sysLogs}>
+                    {isBooting ? (
+                      bootLogs.map((log, index) => (
+                        <p key={index} className={styles.sysLogLine}>{log}</p>
+                      ))
+                    ) : (
+                      <>
+                        <p className={styles.sysLogLine}>
+                          {isNoir ? 'STATUS: ACCESS RESTRICTED' : 'SYSTEM STATUS: STANDBY'}
+                        </p>
+                        <p className={styles.sysLogLine}>
+                          {isNoir ? 'SECURITY LAYER: DEEP-GRID CORES' : 'PROCESSOR: 8-BIT CYBER-CORE'}
+                        </p>
+                        <p className={styles.sysLogLine}>
+                          {isNoir ? 'LEDGER METHOD: TYPE-4 ANALYTICS' : 'GRAPH MATRIX: 300 CELLS (20x15)'}
+                        </p>
+                      </>
+                    )}
+                  </div>
+
+                  {!isBooting && (
+                    <button
+                      type="button"
+                      className={styles.launchBtn}
+                      onClick={handleLaunch}
+                    >
+                      {isNoir ? 'Decrypt Ledger' : 'Launch Simulator'}
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Mobile Launcher Card (Displayed in place when not booted on mobile) */}
+            {!isLaunched && !isBooting && (
+              <div className={styles.mobileWarning}>
+                <span className={styles.warningIcon}>{isNoir ? '🕶️' : '⚠️'}</span>
+                <h3 className={styles.warningHeader}>
+                  {isNoir ? 'CASE FILE ENCRYPTED' : 'ACCESS RESTRICTED!'}
+                </h3>
+                <p className={styles.warningText}>
+                  {isNoir
+                    ? 'City grid analysis requires desk clearance. Touch below to decrypt coordinates on your mobile terminal.'
+                    : 'Powering up the algorithm engine requires terminal clearance. Touch below to launch the mobile visualizer!'}
+                </p>
+                <button
+                  type="button"
+                  className={styles.launchBtn}
+                  onClick={handleLaunch}
+                  style={{ marginTop: '1.5rem', display: 'inline-block' }}
+                >
+                  {isNoir ? 'Decrypt Ledger' : 'Launch Simulator'}
+                </button>
+              </div>
+            )}
 
             <div className={styles.panelLayout}>
               {/* Interactive Pathfinder Grid */}

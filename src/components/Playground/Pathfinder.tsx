@@ -104,6 +104,94 @@ export default function Pathfinder({
     }
   };
 
+  // Touch Handlers for Mobile Draw/Drag Support
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (isRunning) return;
+
+    const touch = e.touches[0];
+    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+    if (!element) return;
+
+    const cellElement = element.closest(`[data-col]`);
+    if (!cellElement) return;
+
+    const col = parseInt(cellElement.getAttribute('data-col') || '', 10);
+    const row = parseInt(cellElement.getAttribute('data-row') || '', 10);
+    if (isNaN(col) || isNaN(row)) return;
+
+    const key = `${col},${row}`;
+    const isStart = col === startNode.col && row === startNode.row;
+    const isEnd = col === endNode.col && row === endNode.row;
+
+    if (isStart) {
+      setInteractionMode('drag-start');
+    } else if (isEnd) {
+      setInteractionMode('drag-end');
+    } else {
+      if (walls.has(key)) {
+        setInteractionMode('erase-walls');
+        const newWalls = new Set(walls);
+        newWalls.delete(key);
+        setWalls(newWalls);
+      } else {
+        setInteractionMode('draw-walls');
+        const newWalls = new Set(walls);
+        newWalls.add(key);
+        setWalls(newWalls);
+      }
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (isRunning || interactionMode === 'idle') return;
+
+    // Prevent scrolling while drawing on the grid
+    if (e.cancelable) {
+      e.preventDefault();
+    }
+
+    const touch = e.touches[0];
+    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+    if (!element) return;
+
+    const cellElement = element.closest(`[data-col]`);
+    if (!cellElement) return;
+
+    const col = parseInt(cellElement.getAttribute('data-col') || '', 10);
+    const row = parseInt(cellElement.getAttribute('data-row') || '', 10);
+    if (isNaN(col) || isNaN(row)) return;
+
+    const key = `${col},${row}`;
+    const isStart = col === startNode.col && row === startNode.row;
+    const isEnd = col === endNode.col && row === endNode.row;
+
+    if (interactionMode === 'drag-start') {
+      if (!isEnd && !walls.has(key)) {
+        setStartNode({ col, row });
+      }
+    } else if (interactionMode === 'drag-end') {
+      if (!isStart && !walls.has(key)) {
+        setEndNode({ col, row });
+      }
+    } else if (interactionMode === 'draw-walls') {
+      if (!isStart && !isEnd && !walls.has(key)) {
+        const newWalls = new Set(walls);
+        newWalls.add(key);
+        setWalls(newWalls);
+      }
+    } else if (interactionMode === 'erase-walls') {
+      if (walls.has(key)) {
+        const newWalls = new Set(walls);
+        newWalls.delete(key);
+        setWalls(newWalls);
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setInteractionMode('idle');
+  };
+
   // Render grid cells
   const cells: React.ReactNode[] = [];
   for (let r = 0; r < rows; r++) {
@@ -144,6 +232,8 @@ export default function Pathfinder({
           className={cellClass}
           onMouseDown={(e) => handleCellMouseDown(c, r, e)}
           onMouseEnter={() => handleCellMouseEnter(c, r)}
+          data-col={c}
+          data-row={r}
           role="gridcell"
           aria-label={`Cell col ${c}, row ${r}. ${
             isStart ? 'Start' : isEnd ? 'End' : isWall ? 'Wall' : isPath ? 'Path' : isVisited ? 'Visited' : 'Empty'
@@ -164,6 +254,9 @@ export default function Pathfinder({
           gridTemplateRows: `repeat(${rows}, 1fr)`,
         }}
         role="grid"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         {cells}
       </div>
