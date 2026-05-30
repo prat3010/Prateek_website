@@ -19,6 +19,8 @@ export default function SkillCard({ skill, index }: SkillCardProps) {
   return (
     <div
       className={styles.card}
+      data-category={skill.category}
+      data-index={String(index + 1).padStart(2, '0')}
       style={{
         transform: `rotate(${rotation}deg)`,
         '--card-bg': isNoir ? '#121214' : categoryColors[skill.category],
