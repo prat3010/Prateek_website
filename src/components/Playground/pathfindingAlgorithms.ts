@@ -286,3 +286,171 @@ export function* runDFS(
 
   yield { type: 'no-path' };
 }
+
+/**
+ * Greedy Best-First Search Generator
+ */
+export function* runGreedyBestFirst(
+  start: GridNode,
+  end: GridNode,
+  cols: number,
+  rows: number,
+  walls: Set<string>
+): Generator<PathfindingStep, void, unknown> {
+  const visited = new Set<string>();
+  const prev: Record<string, GridNode | null> = {};
+  const openSet: GridNode[] = [start];
+  const openSetKeys = new Set<string>([nodeToKey(start)]);
+
+  while (openSet.length > 0) {
+    // Sort openSet by Manhattan distance to end node only (Greedy)
+    openSet.sort((a, b) => getManhattanDistance(a, end) - getManhattanDistance(b, end));
+    const current = openSet.shift()!;
+    const currentKey = nodeToKey(current);
+    openSetKeys.delete(currentKey);
+
+    if (isSameNode(current, end)) {
+      const path: GridNode[] = [];
+      let temp: GridNode | null = current;
+      while (temp) {
+        path.unshift(temp);
+        temp = prev[nodeToKey(temp)] || null;
+      }
+      yield { type: 'path', path };
+      return;
+    }
+
+    visited.add(currentKey);
+
+    if (!isSameNode(current, start) && !isSameNode(current, end)) {
+      yield { type: 'visit', col: current.col, row: current.row };
+    }
+
+    const neighbors = getNeighbors(current, cols, rows);
+    for (const neighbor of neighbors) {
+      const neighborKey = nodeToKey(neighbor);
+      if (walls.has(neighborKey) || visited.has(neighborKey) || openSetKeys.has(neighborKey)) continue;
+
+      prev[neighborKey] = current;
+      openSet.push(neighbor);
+      openSetKeys.add(neighborKey);
+    }
+  }
+
+  yield { type: 'no-path' };
+}
+
+/**
+ * Bidirectional Breadth-First Search (BFS) Pathfinding Generator
+ */
+export function* runBidirectionalBFS(
+  start: GridNode,
+  end: GridNode,
+  cols: number,
+  rows: number,
+  walls: Set<string>
+): Generator<PathfindingStep, void, unknown> {
+  const queueForward: GridNode[] = [start];
+  const queueBackward: GridNode[] = [end];
+
+  const prevForward: Record<string, GridNode | null> = { [nodeToKey(start)]: null };
+  const prevBackward: Record<string, GridNode | null> = { [nodeToKey(end)]: null };
+
+  const visitedForward = new Set<string>([nodeToKey(start)]);
+  const visitedBackward = new Set<string>([nodeToKey(end)]);
+
+  while (queueForward.length > 0 && queueBackward.length > 0) {
+    // Expand forward search front
+    const currentF = queueForward.shift()!;
+    const currentFKey = nodeToKey(currentF);
+
+    if (visitedBackward.has(currentFKey)) {
+      yield { type: 'path', path: mergePaths(currentFKey, prevForward, prevBackward) };
+      return;
+    }
+
+    if (!isSameNode(currentF, start) && !isSameNode(currentF, end)) {
+      yield { type: 'visit', col: currentF.col, row: currentF.row };
+    }
+
+    const neighborsF = getNeighbors(currentF, cols, rows);
+    for (const neighbor of neighborsF) {
+      const neighborKey = nodeToKey(neighbor);
+      if (walls.has(neighborKey) || visitedForward.has(neighborKey)) continue;
+
+      visitedForward.add(neighborKey);
+      prevForward[neighborKey] = currentF;
+      queueForward.push(neighbor);
+
+      if (visitedBackward.has(neighborKey)) {
+        yield { type: 'path', path: mergePaths(neighborKey, prevForward, prevBackward) };
+        return;
+      }
+    }
+
+    // Expand backward search front
+    const currentB = queueBackward.shift()!;
+    const currentBKey = nodeToKey(currentB);
+
+    if (visitedForward.has(currentBKey)) {
+      yield { type: 'path', path: mergePaths(currentBKey, prevForward, prevBackward) };
+      return;
+    }
+
+    if (!isSameNode(currentB, start) && !isSameNode(currentB, end)) {
+      yield { type: 'visit', col: currentB.col, row: currentB.row };
+    }
+
+    const neighborsB = getNeighbors(currentB, cols, rows);
+    for (const neighbor of neighborsB) {
+      const neighborKey = nodeToKey(neighbor);
+      if (walls.has(neighborKey) || visitedBackward.has(neighborKey)) continue;
+
+      visitedBackward.add(neighborKey);
+      prevBackward[neighborKey] = currentB;
+      queueBackward.push(neighbor);
+
+      if (visitedForward.has(neighborKey)) {
+        yield { type: 'path', path: mergePaths(neighborKey, prevForward, prevBackward) };
+        return;
+      }
+    }
+  }
+
+  yield { type: 'no-path' };
+}
+
+// Helper to merge paths from forward and backward searches
+const mergePaths = (
+  intersectionKey: string,
+  prevForward: Record<string, GridNode | null>,
+  prevBackward: Record<string, GridNode | null>
+): GridNode[] => {
+  const path: GridNode[] = [];
+
+  // Reconstruct path backward from intersection to start
+  let currentKey: string | null = intersectionKey;
+  while (currentKey) {
+    const node = keyToNode(currentKey);
+    path.unshift(node);
+    const parentNode: GridNode | null = prevForward[currentKey] || null;
+    currentKey = parentNode ? nodeToKey(parentNode) : null;
+  }
+
+  // Reconstruct path forward from intersection to end
+  const nextNode: GridNode | null = prevBackward[intersectionKey] || null;
+  currentKey = nextNode ? nodeToKey(nextNode) : null;
+  while (currentKey) {
+    const node = keyToNode(currentKey);
+    path.push(node);
+    const parentNode: GridNode | null = prevBackward[currentKey] || null;
+    currentKey = parentNode ? nodeToKey(parentNode) : null;
+  }
+
+  return path;
+};
+
+const keyToNode = (key: string): GridNode => {
+  const [col, row] = key.split(',').map(Number);
+  return { col, row };
+};

@@ -5,7 +5,7 @@ import { useTheme } from '@/context/ThemeContext';
 import ActionWord from '@/components/ui/ActionWord';
 import ScrollReveal from '@/components/effects/ScrollReveal';
 import Pathfinder from './Pathfinder';
-import { GridNode, runDijkstra, runAStar, runBFS, runDFS, PathfindingStep } from './pathfindingAlgorithms';
+import { GridNode, runDijkstra, runAStar, runBFS, runDFS, runGreedyBestFirst, runBidirectionalBFS, PathfindingStep } from './pathfindingAlgorithms';
 import styles from './Playground.module.css';
 
 const GRID_COLS = 20;
@@ -30,7 +30,7 @@ export default function Playground() {
   // Controls state
   const [isRunning, setIsRunning] = useState(false);
   const [speed, setSpeed] = useState(3); // 1 = Slowest, 5 = Fastest
-  const [algorithm, setAlgorithm] = useState<'dijkstra' | 'astar' | 'bfs' | 'dfs'>('dijkstra');
+  const [algorithm, setAlgorithm] = useState<'dijkstra' | 'astar' | 'bfs' | 'dfs' | 'greedy' | 'bidirectional'>('dijkstra');
   const [logs, setLogs] = useState<LogEntry[]>([]);
 
   // Launch overlay state
@@ -166,6 +166,8 @@ export default function Playground() {
     else if (algorithm === 'astar') algoName = "A* Heuristic Search";
     else if (algorithm === 'bfs') algoName = "Breadth-First Search";
     else if (algorithm === 'dfs') algoName = "Depth-First Search";
+    else if (algorithm === 'greedy') algoName = "Greedy Best-First Search";
+    else if (algorithm === 'bidirectional') algoName = "Bidirectional BFS";
 
     addLog(isNoir 
       ? `Initializing ${algoName}. Calculating optimal vectors...`
@@ -180,6 +182,10 @@ export default function Playground() {
       generator = runAStar(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
     } else if (algorithm === 'bfs') {
       generator = runBFS(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
+    } else if (algorithm === 'greedy') {
+      generator = runGreedyBestFirst(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
+    } else if (algorithm === 'bidirectional') {
+      generator = runBidirectionalBFS(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
     } else {
       generator = runDFS(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
     }
@@ -390,7 +396,7 @@ export default function Playground() {
                   <select
                     className={styles.select}
                     value={algorithm}
-                    onChange={(e) => setAlgorithm(e.target.value as 'dijkstra' | 'astar' | 'bfs' | 'dfs')}
+                    onChange={(e) => setAlgorithm(e.target.value as 'dijkstra' | 'astar' | 'bfs' | 'dfs' | 'greedy' | 'bidirectional')}
                     disabled={isRunning}
                   >
                     <option value="dijkstra">
@@ -399,8 +405,14 @@ export default function Playground() {
                     <option value="astar">
                       {isNoir ? 'A* Search (Heuristic Scan)' : 'A* Search (Guided Manhattan)'}
                     </option>
+                    <option value="greedy">
+                      {isNoir ? 'Greedy Scan (Tunnel Vision)' : 'Greedy Best-First (Heuristic Scan)'}
+                    </option>
                     <option value="bfs">
                       {isNoir ? 'BFS (Spread Search)' : 'BFS (Unweighted Wave)'}
+                    </option>
+                    <option value="bidirectional">
+                      {isNoir ? 'Bidirectional Sweep (Dual Encircling)' : 'Bidirectional BFS (Dual Search)'}
                     </option>
                     <option value="dfs">
                       {isNoir ? 'DFS (Winding Probe)' : 'DFS (Backtracking Path)'}
