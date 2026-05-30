@@ -48,11 +48,7 @@ export default function CursorTrail() {
         y,
         age: 0,
         colorIndex: colorIndexRef.current,
-        shape: isNoir
-          ? 'crosshair'
-          : Math.random() > 0.45
-          ? 'circle'
-          : 'star',
+        shape: isNoir ? 'crosshair' : 'circle',
         angle: Math.random() * Math.PI * 2,
         angleSpeed: (Math.random() - 0.5) * 0.05,
       });
