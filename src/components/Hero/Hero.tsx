@@ -34,7 +34,7 @@ export default function Hero() {
   };
 
   return (
-    <section className={styles.hero} aria-label="Hero">
+    <section id="home" className={styles.hero} aria-label="Hero">
       {/* Speed lines background */}
       <div className={styles.speedLines} aria-hidden="true" />
       <div className={styles.benDayDots} aria-hidden="true" />
