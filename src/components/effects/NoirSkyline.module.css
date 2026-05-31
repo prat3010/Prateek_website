@@ -295,6 +295,16 @@
   50% { opacity: 1; }
 }
 
+.bridgeBeacon {
+  fill: #ffffff;
+  animation: bridgeBeaconFlash 2.0s step-start infinite;
+}
+
+@keyframes bridgeBeaconFlash {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
 /* ─ Rolling River Fog ─ */
 .fog1 {
   animation: fogDriftLeft 35s ease-in-out infinite alternate;
@@ -340,6 +350,7 @@
   .blimpGroup,
   .blimpSpotlight,
   .blimpBeacon,
+  .bridgeBeacon,
   .fog1,
   .fog2 {
     animation: none !important;
@@ -347,7 +358,8 @@
   .billboardLight {
     opacity: 0.15;
   }
-  .blimpBeacon {
+  .blimpBeacon,
+  .bridgeBeacon {
     opacity: 0.8;
   }
   .blimpSpotlight {

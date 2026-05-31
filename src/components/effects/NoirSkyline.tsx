@@ -716,6 +716,9 @@ export default function NoirSkyline() {
               {/* LEFT ROOFTOP SECTION */}
               <path d="M -50 1080 L -50 820 L 460 820 L 460 1080 Z" />
 
+              {/* Solid mask under the bridge deck to block background lines/windows */}
+              <path d="M 460 856 Q 880 826 1420 856 L 1420 1080 L 460 1080 Z" fill="var(--color-bg)" stroke="none" />
+
               {/* Left Parapet Brick Mortar Lines */}
               <g stroke="rgba(250, 250, 250, 0.50)" strokeWidth="1.0" fill="none">
                 <line x1="-50" y1="835" x2="460" y2="835" />
@@ -1091,6 +1094,15 @@ export default function NoirSkyline() {
 
               {/* MIDDLE BRIDGE STRUCTURE (Fills the gap between rooftops) */}
               <path d="M 850 1080 L 850 780 L 870 730 L 890 730 L 910 780 L 910 1080 Z" />
+
+              {/* Steel Plate Joint Seams on Tower Legs */}
+              <path 
+                d="M 850 750 L 870 750 M 890 750 L 910 750 M 850 780 L 870 780 M 890 780 L 910 780 M 850 810 L 870 810 M 890 810 L 910 810 M 850 840 L 870 840 M 890 840 L 910 840 M 850 870 L 870 870 M 890 870 L 910 870 M 850 900 L 870 900 M 890 900 L 910 900 M 850 930 L 870 930 M 890 930 L 910 930 M 850 960 L 870 960 M 890 960 L 910 960 M 850 990 L 870 990 M 890 990 L 910 990 M 850 1020 L 870 1020 M 890 1020 L 910 1020 M 850 1050 L 870 1050 M 890 1050 L 910 1050 M 860 730 L 860 1080 M 900 730 L 900 1080" 
+                stroke="rgba(250, 250, 250, 0.22)" 
+                strokeWidth="0.8" 
+                fill="none" 
+              />
+
               {/* Bridge Tower Structural Steel Trusses */}
               <g stroke="rgba(250, 250, 250, 0.30)" strokeWidth="0.9" fill="none">
                 <line x1="870" y1="730" x2="870" y2="780" />
@@ -1117,12 +1129,63 @@ export default function NoirSkyline() {
                 <line x1="910" y1="850" x2="890" y2="910" />
                 <line x1="890" y1="910" x2="910" y2="910" />
               </g>
-              {/* Bridge arches */}
-              <path d="M 865 840 A 12 25 0 0 1 895 840" fill="none" />
-              <path d="M 865 910 A 12 25 0 0 1 895 910" fill="none" />
+
+              {/* Decorative Art Deco Tower Crown Plates */}
+              <g stroke="rgba(250, 250, 250, 0.48)" strokeWidth="1.2" fill="var(--color-bg)">
+                <polygon points="864,730 896,730 896,726 864,726" />
+                <polygon points="871,726 889,726 889,720 871,720" />
+                <polygon points="877,720 883,720 880,712" />
+              </g>
+
+              {/* Warning Beacon at Tower Peak */}
+              <circle cx="880" cy="710" r="2.0" className={styles.bridgeBeacon} />
+
+              {/* Detailed double gothic arches */}
+              <g fill="none">
+                <path d="M 865 840 A 12 25 0 0 1 895 840" stroke="rgba(250, 250, 250, 0.48)" strokeWidth="1.2" />
+                <path d="M 868 840 A 9 20 0 0 1 892 840" stroke="rgba(250, 250, 250, 0.35)" strokeWidth="0.8" />
+                <path d="M 865 910 A 12 25 0 0 1 895 910" stroke="rgba(250, 250, 250, 0.48)" strokeWidth="1.2" />
+                <path d="M 868 910 A 9 20 0 0 1 892 910" stroke="rgba(250, 250, 250, 0.35)" strokeWidth="0.8" />
+              </g>
+
               {/* Bridge Cables */}
-              <path d="M 880 730 Q 670 820 460 850" fill="none" strokeWidth="1" />
-              <path d="M 880 730 Q 1150 820 1420 850" fill="none" strokeWidth="1" />
+              {/* Thick Main Cables */}
+              <path d="M 880 730 Q 670 820 460 850" fill="none" strokeWidth="2.2" stroke="rgba(250, 250, 250, 0.48)" />
+              <path d="M 880 730 Q 1150 820 1420 850" fill="none" strokeWidth="2.2" stroke="rgba(250, 250, 250, 0.48)" />
+              {/* Secondary parallel accent cables */}
+              <path d="M 880 726 Q 670 816 460 846" fill="none" strokeWidth="0.8" stroke="rgba(250, 250, 250, 0.35)" />
+              <path d="M 880 726 Q 1150 816 1420 846" fill="none" strokeWidth="0.8" stroke="rgba(250, 250, 250, 0.35)" />
+
+              {/* Cable clamps (nodes where suspenders connect) */}
+              <g fill="rgba(250, 250, 250, 0.85)" stroke="none">
+                {/* Left side clamps */}
+                <circle cx="500" cy="843.7" r="1.3" />
+                <circle cx="530" cy="838.3" r="1.3" />
+                <circle cx="560" cy="832.3" r="1.3" />
+                <circle cx="590" cy="825.7" r="1.3" />
+                <circle cx="620" cy="818.4" r="1.3" />
+                <circle cx="650" cy="810.6" r="1.3" />
+                <circle cx="680" cy="802.1" r="1.3" />
+                <circle cx="710" cy="793.0" r="1.3" />
+                <circle cx="740" cy="783.3" r="1.3" />
+                <circle cx="770" cy="773.0" r="1.3" />
+                <circle cx="800" cy="762.1" r="1.3" />
+                <circle cx="830" cy="750.6" r="1.3" />
+
+                {/* Right side clamps */}
+                <circle cx="930" cy="746.2" r="1.3" />
+                <circle cx="960" cy="755.3" r="1.3" />
+                <circle cx="990" cy="764.2" r="1.3" />
+                <circle cx="1020" cy="772.6" r="1.3" />
+                <circle cx="1050" cy="780.7" r="1.3" />
+                <circle cx="1080" cy="788.4" r="1.3" />
+                <circle cx="1110" cy="795.8" r="1.3" />
+                <circle cx="1140" cy="802.8" r="1.3" />
+                <circle cx="1170" cy="809.4" r="1.3" />
+                <circle cx="1200" cy="815.6" r="1.3" />
+                <circle cx="1230" cy="821.5" r="1.3" />
+                <circle cx="1260" cy="827.0" r="1.3" />
+              </g>
 
               {/* Bridge Roadway Deck (Warren Truss/Steel Girder Structure) */}
               <g stroke="rgba(250, 250, 250, 0.48)" fill="none">
@@ -1132,6 +1195,9 @@ export default function NoirSkyline() {
                 <path d="M 460 856 Q 880 826 1420 856" strokeWidth="1.5" />
                 {/* Vertical Steel Posts (follow the curve) */}
                 <path d="M 480 848 L 480 854 M 500 847 L 500 853 M 520 845 L 520 851 M 540 843 L 540 849 M 560 841 L 560 847 M 580 839 L 580 845 M 600 837 L 600 843 M 620 835 L 620 841 M 640 833 L 640 839 M 660 831 L 660 837 M 680 830 L 680 836 M 700 828 L 700 834 M 720 827 L 720 833 M 740 825 L 740 831 M 760 824 L 760 830 M 780 823 L 780 829 M 800 822 L 800 828 M 820 821 L 820 827 M 840 820 L 840 826 M 920 820 L 920 826 M 940 821 L 940 827 M 960 822 L 960 828 M 980 823 L 980 829 M 1000 824 L 1000 830 M 1020 825 L 1020 831 M 1040 827 L 1040 833 M 1060 828 L 1060 834 M 1080 830 L 1080 836 M 1100 831 L 1100 837 M 1120 833 L 1120 839 M 1140 835 L 1140 841 M 1160 837 L 1160 843 M 1180 839 L 1180 845 M 1200 841 L 1200 847 M 1220 843 L 1220 849 M 1240 845 L 1240 851 M 1260 847 L 1260 853 M 1280 848 L 1280 854 M 1300 850 L 1300 856 M 1320 850 L 1320 856 M 1340 850 L 1340 856 M 1360 850 L 1360 856 M 1380 850 L 1380 856 M 1400 850 L 1400 856" strokeWidth="0.8" stroke="rgba(250, 250, 250, 0.30)" />
+                {/* Warren Truss Diagonals (calculated zigzags) */}
+                <path d="M 460 850.0 L 480 854.6 L 500 847.3 L 520 852.1 L 540 844.9 L 560 849.8 L 580 842.8 L 600 847.8 L 620 840.9 L 640 846.1 L 660 839.4 L 680 844.7 L 700 838.0 L 720 843.5 L 740 837.0 L 760 842.5 L 780 836.1 L 800 841.8 L 820 835.5 L 840 841.3" strokeWidth="0.8" stroke="rgba(250, 250, 250, 0.30)" />
+                <path d="M 920 835.0 L 940 841.1 L 960 835.2 L 980 841.3 L 1000 835.5 L 1020 841.8 L 1040 836.1 L 1060 842.4 L 1080 836.8 L 1100 843.2 L 1120 837.7 L 1140 844.3 L 1160 838.8 L 1180 845.4 L 1200 840.1 L 1220 846.8 L 1240 841.5 L 1260 848.3 L 1280 843.1 L 1300 850.0 L 1320 844.9 L 1340 851.9 L 1360 846.8 L 1380 853.9 L 1400 848.9 L 1420 856.0" strokeWidth="0.8" stroke="rgba(250, 250, 250, 0.30)" />
               </g>
 
               {/* Roadway traffic lights & car silhouettes */}
@@ -1251,17 +1317,25 @@ export default function NoirSkyline() {
                 <path d="M 1020 951 Q 1005 950 988 953" fill="none" stroke="rgba(250, 250, 250, 0.15)" strokeWidth="0.8" />
               </g>
 
-              {/* Bridge Streetlights (Glowing dots along deck) */}
+              {/* Curved Streetlight Poles & Arms */}
+              <path 
+                d="M 550 844.3 L 550 832.3 Q 550 830.3 546 830.3 M 650 839.7 L 650 827.7 Q 650 825.7 646 825.7 M 750 836.7 L 750 824.7 Q 750 822.7 746 822.7 M 850 835.2 L 850 823.2 Q 850 821.2 846 821.2 M 950 835.1 L 950 823.1 Q 950 821.1 954 821.1 M 1050 836.2 L 1050 824.2 Q 1050 822.2 1054 822.2 M 1150 838.5 L 1150 826.5 Q 1150 824.5 1154 824.5 M 1250 841.9 L 1250 829.9 Q 1250 827.9 1254 827.9 M 1350 846.3 L 1350 834.3 Q 1350 832.3 1354 832.3"
+                stroke="rgba(250, 250, 250, 0.35)"
+                strokeWidth="0.8"
+                fill="none"
+              />
+
+              {/* Bridge Streetlights (Glowing dots along deck curved arms) */}
               <g fill="#fafafa" stroke="none">
-                <circle cx="550" cy="840" r="1.8" opacity="0.85" />
-                <circle cx="650" cy="833" r="1.8" opacity="0.85" />
-                <circle cx="750" cy="828" r="1.8" opacity="0.85" />
-                <circle cx="850" cy="825" r="1.8" opacity="0.85" />
-                <circle cx="950" cy="825" r="1.8" opacity="0.85" />
-                <circle cx="1050" cy="828" r="1.8" opacity="0.85" />
-                <circle cx="1150" cy="833" r="1.8" opacity="0.85" />
-                <circle cx="1250" cy="840" r="1.8" opacity="0.85" />
-                <circle cx="1350" cy="848" r="1.8" opacity="0.85" />
+                <circle cx="546" cy="830.3" r="1.8" opacity="0.85" />
+                <circle cx="646" cy="825.7" r="1.8" opacity="0.85" />
+                <circle cx="746" cy="822.7" r="1.8" opacity="0.85" />
+                <circle cx="846" cy="821.2" r="1.8" opacity="0.85" />
+                <circle cx="954" cy="821.1" r="1.8" opacity="0.85" />
+                <circle cx="1054" cy="822.2" r="1.8" opacity="0.85" />
+                <circle cx="1154" cy="824.5" r="1.8" opacity="0.85" />
+                <circle cx="1254" cy="827.9" r="1.8" opacity="0.85" />
+                <circle cx="1354" cy="832.3" r="1.8" opacity="0.85" />
               </g>
 
               {/* Hanging Power Lines / Catenary wires */}
