@@ -63,6 +63,12 @@ export default function NoirSkyline() {
 
   return (
     <div className={`${styles.container} ${isActive ? styles.active : ''}`}>
+      {/* ── Vignette Overlay ── */}
+      <div className={styles.vignette} aria-hidden="true" />
+
+      {/* ── Grain Texture Overlay ── */}
+      <div className={styles.grain} aria-hidden="true" />
+
       {/* ── Layer 0: Sky backdrop, Searchlights, and Rain ── */}
       <div className={styles.layer}>
         <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%' }}>
@@ -238,7 +244,16 @@ export default function NoirSkyline() {
           style={{ width: '100%', height: '100%' }}
         >
           <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%' }}>
-            <g className={styles.buildingGroup} stroke="rgba(250, 250, 250, 0.22)" strokeWidth="0.8">
+            <defs>
+              <pattern id="hatch-bg" width="6" height="6" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="0" x2="0" y2="6" stroke="rgba(250, 250, 250, 0.08)" strokeWidth="0.8" />
+              </pattern>
+              <filter id="bgSketchFilter" x="-20%" y="-20%" width="140%" height="140%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" xChannelSelector="R" yChannelSelector="G" />
+              </filter>
+            </defs>
+            <g className={styles.buildingGroup} stroke="rgba(250, 250, 250, 0.22)" strokeWidth="0.8" filter="url(#bgSketchFilter)">
               {/* Left distant skyscrapers */}
               <path d="M 50 1080 L 50 780 L 90 780 L 90 740 L 120 740 L 120 1080 Z" />
               <line x1="90" y1="740" x2="90" y2="780" />
@@ -247,7 +262,7 @@ export default function NoirSkyline() {
               <line x1="105" y1="740" x2="105" y2="1080" strokeDasharray="2 8" />
               
               {/* Stepped Needle Tower (Left-Mid) */}
-              <path d="M 220 1080 L 220 720 L 230 720 L 230 650 L 240 650 L 240 540 L 246 540 L 246 450 L 250 450 L 250 350 L 251 350 L 252 280 L 253 350 L 254 350 L 254 450 L 258 450 L 258 540 L 264 540 L 264 650 L 274 650 L 274 720 L 284 720 L 284 1080 Z" />
+              <path d="M 220 1080 L 220 720 L 230 720 L 230 650 L 240 650 L 240 540 L 246 540 L 246 450 L 250 450 L 250 350 L 254 350 L 254 450 L 258 450 L 258 540 L 264 540 L 264 650 L 274 650 L 274 720 L 284 720 L 284 1080 Z" />
               <line x1="220" y1="720" x2="284" y2="720" />
               <line x1="230" y1="650" x2="274" y2="650" />
               <line x1="240" y1="540" x2="264" y2="540" />
@@ -255,7 +270,7 @@ export default function NoirSkyline() {
               <line x1="269" y1="720" x2="269" y2="1080" strokeDasharray="3 6" />
               <line x1="245" y1="650" x2="245" y2="1080" />
               <line x1="259" y1="650" x2="259" y2="1080" />
-              <line x1="252" y1="350" x2="252" y2="650" />
+              <line x1="252" y1="280" x2="252" y2="650" />
               
               {/* Chrysler-inspired Arched Spire Tower (Left-Center) */}
               <path d="M 450 1080 L 450 670 L 458 640 L 468 640 L 468 590 L 478 590 L 478 535 L 488 500 L 498 340 L 508 500 L 518 535 L 518 590 L 528 590 L 528 640 L 538 640 L 546 670 L 546 1080 Z" />
@@ -270,9 +285,9 @@ export default function NoirSkyline() {
               <line x1="498" y1="340" x2="490" y2="480" />
               <line x1="498" y1="340" x2="506" y2="480" />
               <line x1="498" y1="340" x2="516" y2="480" />
-
+ 
               {/* Empire State Building (Center) */}
-              <path d="M 920 1080 L 920 830 L 928 830 L 928 750 L 938 750 L 938 610 L 946 610 L 946 460 L 954 460 L 954 320 L 956 320 L 957 240 L 958 320 L 960 320 L 960 460 L 968 460 L 968 610 L 976 610 L 976 750 L 986 750 L 986 830 L 994 830 L 994 1080 Z" />
+              <path d="M 920 1080 L 920 830 L 928 830 L 928 750 L 938 750 L 938 610 L 946 610 L 946 460 L 954 460 L 954 320 L 960 320 L 960 460 L 968 460 L 968 610 L 976 610 L 976 750 L 986 750 L 986 830 L 994 830 L 994 1080 Z" />
               {/* Empire State Details */}
               <line x1="920" y1="830" x2="994" y2="830" />
               <line x1="928" y1="750" x2="986" y2="750" />
@@ -290,7 +305,7 @@ export default function NoirSkyline() {
               <line x1="970" y1="610" x2="970" y2="1080" />
               <line x1="975" y1="750" x2="975" y2="1080" />
               <line x1="985" y1="830" x2="985" y2="1080" />
-
+ 
               {/* Flat top tower with twin antenna (Right-Mid) */}
               <path d="M 1320 1080 L 1320 620 L 1420 620 L 1420 1080 Z" />
               <line x1="1350" y1="620" x2="1350" y2="540" />
@@ -299,7 +314,7 @@ export default function NoirSkyline() {
               <line x1="1360" y1="620" x2="1360" y2="1080" strokeDasharray="5 5" />
               <line x1="1380" y1="620" x2="1380" y2="1080" strokeDasharray="5 5" />
               <line x1="1400" y1="620" x2="1400" y2="1080" strokeDasharray="5 5" />
-
+ 
               {/* Steeped Block Tower (Far Right) */}
               <path d="M 1720 1080 L 1720 740 L 1735 740 L 1735 680 L 1750 680 L 1750 580 L 1790 580 L 1790 680 L 1805 680 L 1805 740 L 1820 740 L 1820 1080 Z" />
               <line x1="1720" y1="740" x2="1820" y2="740" />
@@ -308,8 +323,8 @@ export default function NoirSkyline() {
               <line x1="1760" y1="580" x2="1760" y2="1080" strokeDasharray="2 6" />
               <line x1="1770" y1="580" x2="1770" y2="1080" strokeDasharray="2 6" />
               <line x1="1780" y1="580" x2="1780" y2="1080" strokeDasharray="2 6" />
-
-
+ 
+ 
               {/* ── NEW: Art Deco Tower (Gap 1: x=140-200) ── */}
               <path d="M 140 1080 L 140 700 L 155 700 L 155 660 L 170 660 L 170 620 L 175 580 L 180 620 L 195 620 L 195 660 L 200 660 L 200 1080 Z" />
               <line x1="155" y1="660" x2="195" y2="660" />
@@ -317,7 +332,7 @@ export default function NoirSkyline() {
               <line x1="160" y1="700" x2="160" y2="1080" strokeDasharray="2 7" />
               <line x1="180" y1="700" x2="180" y2="1080" strokeDasharray="2 7" />
               <line x1="170" y1="660" x2="170" y2="1080" strokeDasharray="2 7" />
-
+ 
               {/* ── NEW: Slim Needle Spire (Gap 2a: x=630-670) ── */}
               <path d="M 630 1080 L 630 640 L 640 640 L 640 520 L 650 400 L 660 520 L 660 640 L 670 640 L 670 1080 Z" />
               <line x1="630" y1="640" x2="670" y2="640" />
@@ -325,7 +340,7 @@ export default function NoirSkyline() {
               <line x1="650" y1="400" x2="650" y2="520" />
               <line x1="645" y1="640" x2="645" y2="1080" strokeDasharray="2 8" />
               <line x1="655" y1="640" x2="655" y2="1080" strokeDasharray="2 8" />
-
+ 
               {/* ── NEW: Twin Tower Complex (Gap 2b: x=740-840) ── */}
               <path d="M 740 1080 L 740 590 L 780 590 L 780 1080 Z" />
               <path d="M 800 1080 L 800 550 L 840 550 L 840 1080 Z" />
@@ -341,7 +356,7 @@ export default function NoirSkyline() {
               <line x1="825" y1="550" x2="825" y2="1080" strokeDasharray="2 7" />
               {/* Antenna on taller tower */}
               <line x1="820" y1="550" x2="820" y2="480" />
-
+ 
               {/* ── NEW: Setback Office Block (Gap 3a: x=1050-1140) ── */}
               <path d="M 1050 1080 L 1050 680 L 1070 680 L 1070 600 L 1100 600 L 1100 530 L 1110 530 L 1110 600 L 1140 600 L 1140 1080 Z" />
               <line x1="1050" y1="680" x2="1140" y2="680" />
@@ -350,7 +365,7 @@ export default function NoirSkyline() {
               <line x1="1080" y1="600" x2="1080" y2="1080" strokeDasharray="3 6" />
               <line x1="1120" y1="600" x2="1120" y2="1080" strokeDasharray="3 6" />
               <line x1="1130" y1="680" x2="1130" y2="1080" strokeDasharray="3 6" />
-
+ 
               {/* ── NEW: Narrow Deco Tower (Gap 3b: x=1200-1260) ── */}
               <path d="M 1200 1080 L 1200 640 L 1215 640 L 1215 560 L 1225 520 L 1235 560 L 1245 560 L 1245 640 L 1260 640 L 1260 1080 Z" />
               <line x1="1200" y1="640" x2="1260" y2="640" />
@@ -358,7 +373,7 @@ export default function NoirSkyline() {
               <line x1="1225" y1="520" x2="1225" y2="560" />
               <line x1="1220" y1="640" x2="1220" y2="1080" strokeDasharray="2 8" />
               <line x1="1240" y1="640" x2="1240" y2="1080" strokeDasharray="2 8" />
-
+ 
               {/* Distant Inhabited Window Grids (office lights) */}
               <g fill="none">
                 {/* Empire State windows - Glowing */}
@@ -371,7 +386,7 @@ export default function NoirSkyline() {
                   <line x1="948" y1="610" x2="948" y2="830" strokeDashoffset="2" />
                   <line x1="972" y1="610" x2="972" y2="830" strokeDashoffset="6" />
                 </g>
-
+ 
                 {/* Chrysler windows - Glowing */}
                 <g className={styles.glowingWindow} strokeWidth="1.0" strokeDasharray="2 7">
                   <line x1="474" y1="670" x2="474" y2="1000" />
@@ -382,7 +397,7 @@ export default function NoirSkyline() {
                   <line x1="482" y1="670" x2="482" y2="1000" strokeDashoffset="5" />
                   <line x1="522" y1="670" x2="522" y2="1000" strokeDashoffset="1" />
                 </g>
-
+ 
                 {/* Stepped Needle Tower windows */}
                 <g className={styles.glowingWindow} strokeWidth="0.8" strokeDasharray="3 9">
                   <line x1="242" y1="720" x2="242" y2="1000" />
@@ -390,50 +405,61 @@ export default function NoirSkyline() {
                 <g className={styles.glowingWindowDim} strokeWidth="0.8" strokeDasharray="3 9">
                   <line x1="262" y1="720" x2="262" y2="1000" strokeDashoffset="4" />
                 </g>
-
-                {/* Asynchronous Flickering Window Cells (Layer 1) */}
-                <g strokeWidth="1.0" fill="none">
-                  {/* Empire State */}
-                  <line x1="950" y1="650" x2="950" y2="653" className={styles.windowFlicker1} />
-                  <line x1="950" y1="710" x2="950" y2="713" className={styles.windowFlicker3} />
-                  <line x1="966" y1="550" x2="966" y2="553" className={styles.windowFlicker2} />
-                  <line x1="966" y1="780" x2="966" y2="783" className={styles.windowFlicker4} />
-                  
-                  {/* Chrysler */}
-                  <line x1="488" y1="600" x2="488" y2="603" className={styles.windowFlicker2} />
-                  <line x1="508" y1="560" x2="508" y2="563" className={styles.windowFlicker4} />
-
-                  {/* Flat top tower */}
-                  <line x1="1360" y1="680" x2="1360" y2="683" className={styles.windowFlicker1} />
-                  <line x1="1380" y1="750" x2="1380" y2="753" className={styles.windowFlicker3} />
-                  <line x1="1340" y1="820" x2="1340" y2="823" className={styles.windowFlicker2} />
-                  <line x1="1400" y1="710" x2="1400" y2="713" className={styles.windowFlicker4} />
-
-                  {/* Stepped block tower */}
-                  <line x1="1760" y1="630" x2="1760" y2="633" className={styles.windowFlicker1} />
-                  <line x1="1780" y1="700" x2="1780" y2="703" className={styles.windowFlicker3} />
-
-                  {/* NEW: Art Deco tower */}
-                  <line x1="170" y1="680" x2="170" y2="683" className={styles.windowFlicker2} />
-
-                  {/* NEW: Twin towers */}
-                  <line x1="755" y1="650" x2="755" y2="653" className={styles.windowFlicker1} />
-                  <line x1="825" y1="610" x2="825" y2="613" className={styles.windowFlicker4} />
-
-                  {/* NEW: Setback office */}
-                  <line x1="1080" y1="640" x2="1080" y2="643" className={styles.windowFlicker3} />
-                  <line x1="1120" y1="700" x2="1120" y2="703" className={styles.windowFlicker1} />
-
-                  {/* NEW: Narrow Deco tower */}
-                  <line x1="1220" y1="680" x2="1220" y2="683" className={styles.windowFlicker2} />
-                </g>
+ 
+                {/* Shadow overlay paths for wobbly hatching depth */}
+                <path d="M 498 1080 L 498 340 L 508 500 L 518 535 L 518 590 L 528 590 L 528 640 L 538 640 L 546 670 L 546 1080 Z" className={styles.shadowHatchBg} />
+                <path d="M 957 1080 L 957 320 L 960 320 L 960 460 L 968 460 L 968 610 L 976 610 L 976 750 L 986 750 L 986 830 L 994 830 L 994 1080 Z" className={styles.shadowHatchBg} />
+                <path d="M 252 1080 L 252 350 L 254 350 L 254 450 L 258 450 L 258 540 L 264 540 L 264 650 L 274 650 L 274 720 L 284 720 L 284 1080 Z" className={styles.shadowHatchBg} />
+                <path d="M 760 1080 L 760 590 L 780 590 L 780 1080 Z" className={styles.shadowHatchBg} />
+                <path d="M 820 1080 L 820 550 L 840 550 L 840 1080 Z" className={styles.shadowHatchBg} />
+                <path d="M 1370 1080 L 1370 620 L 1420 620 L 1420 1080 Z" className={styles.shadowHatchBg} />
+                <path d="M 1770 1080 L 1770 580 L 1790 580 L 1790 680 L 1805 680 L 1805 740 L 1820 740 L 1820 1080 Z" className={styles.shadowHatchBg} />
+                <path d="M 170 1080 L 170 620 L 195 620 L 195 660 L 200 660 L 200 1080 Z" className={styles.shadowHatchBg} />
+                <path d="M 1095 1080 L 1095 530 L 1100 530 L 1110 530 L 1110 600 L 1140 600 L 1140 1080 Z" className={styles.shadowHatchBg} />
+                <path d="M 1230 1080 L 1230 520 L 1235 560 L 1245 560 L 1245 640 L 1260 640 L 1260 1080 Z" className={styles.shadowHatchBg} />
               </g>
+            </g>
+
+            {/* Asynchronous Flickering Window Cells (Layer 1 - Unfiltered for performance) */}
+            <g strokeWidth="1.0" fill="none">
+              {/* Empire State */}
+              <line x1="950" y1="650" x2="950" y2="653" className={styles.windowFlicker1} />
+              <line x1="950" y1="710" x2="950" y2="713" className={styles.windowFlicker3} />
+              <line x1="966" y1="550" x2="966" y2="553" className={styles.windowFlicker2} />
+              <line x1="966" y1="780" x2="966" y2="783" className={styles.windowFlicker4} />
+              
+              {/* Chrysler */}
+              <line x1="488" y1="600" x2="488" y2="603" className={styles.windowFlicker2} />
+              <line x1="508" y1="560" x2="508" y2="563" className={styles.windowFlicker4} />
+
+              {/* Flat top tower */}
+              <line x1="1360" y1="680" x2="1360" y2="683" className={styles.windowFlicker1} />
+              <line x1="1380" y1="750" x2="1380" y2="753" className={styles.windowFlicker3} />
+              <line x1="1340" y1="820" x2="1340" y2="823" className={styles.windowFlicker2} />
+              <line x1="1400" y1="710" x2="1400" y2="713" className={styles.windowFlicker4} />
+
+              {/* Stepped block tower */}
+              <line x1="1760" y1="630" x2="1760" y2="633" className={styles.windowFlicker1} />
+              <line x1="1780" y1="700" x2="1780" y2="703" className={styles.windowFlicker3} />
+
+              {/* NEW: Art Deco tower */}
+              <line x1="170" y1="680" x2="170" y2="683" className={styles.windowFlicker2} />
+
+              {/* NEW: Twin towers */}
+              <line x1="755" y1="650" x2="755" y2="653" className={styles.windowFlicker1} />
+              <line x1="825" y1="610" x2="825" y2="613" className={styles.windowFlicker4} />
+
+              {/* NEW: Setback office */}
+              <line x1="1080" y1="640" x2="1080" y2="643" className={styles.windowFlicker3} />
+              <line x1="1120" y1="700" x2="1120" y2="703" className={styles.windowFlicker1} />
+
+              {/* NEW: Narrow Deco tower */}
+              <line x1="1220" y1="680" x2="1220" y2="683" className={styles.windowFlicker2} />
             </g>
           </svg>
         </motion.div>
       </motion.div>
 
-      {/* ── Layer 2: Midground Buildings (Parallax Scale 1.35, Masking Fill) ── */}
       <motion.div
         style={{ scale: midScale, y: midY, zIndex: 2 }}
         className={styles.layer}
@@ -444,8 +470,17 @@ export default function NoirSkyline() {
           style={{ width: '100%', height: '100%' }}
         >
           <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%' }}>
+            <defs>
+              <pattern id="hatch-mid" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="0" x2="0" y2="8" stroke="rgba(250, 250, 250, 0.15)" strokeWidth="1.0" />
+              </pattern>
+              <filter id="midSketchFilter" x="-20%" y="-20%" width="140%" height="140%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" />
+              </filter>
+            </defs>
             {/* Midground buildings (Solid fill masks Layer 1) */}
-            <g className={styles.buildingGroup} fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.32)" strokeWidth="1.2">
+            <g className={styles.buildingGroup} fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.32)" strokeWidth="1.2" filter="url(#midSketchFilter)">
               {/* Far Left block */}
               <path d="M -10 1080 L -10 790 L 80 790 L 80 1080 Z" />
 
@@ -462,8 +497,6 @@ export default function NoirSkyline() {
                   <line x1="230" y1="640" x2="230" y2="1000" strokeDashoffset="1" />
                 </g>
               </g>
-
-
 
               {/* Blocky Spire (Center-Left) */}
               <path d="M 330 1080 L 330 710 L 370 710 L 370 540 L 373 540 L 373 450 L 377 450 L 377 540 L 380 540 L 380 710 L 420 710 L 420 1080 Z" />
@@ -564,11 +597,6 @@ export default function NoirSkyline() {
               </g>
               {/* Roof-top details: Mechanical room */}
               <path d="M 1505 670 L 1505 645 L 1540 645 L 1540 670 Z" />
-              
-
-
-
-
 
               {/* ── NEW: Slab Building (Gap 1a: x=565-640) ── */}
               <path d="M 565 1080 L 565 690 L 640 690 L 640 1080 Z" />
@@ -688,16 +716,32 @@ export default function NoirSkyline() {
                 </g>
               </g>
 
-              {/* Asynchronous Flickering Window Cells (Layer 2) */}
-              <g strokeWidth="1.0" fill="none">
-                {/* Staggered double-tower (Left) */}
-                <line x1="170" y1="780" x2="170" y2="783" className={styles.windowFlicker2} />
-                <line x1="210" y1="730" x2="210" y2="733" className={styles.windowFlicker4} />
+              {/* Shadow overlay paths for wobbly hatching depth */}
+              <path d="M 155 1080 L 155 680 L 190 680 L 190 1080 Z" className={styles.shadowHatchMid} />
+              <path d="M 225 1080 L 225 620 L 260 620 L 260 1080 Z" className={styles.shadowHatchMid} />
+              <path d="M 375 1080 L 375 450 L 377 450 L 377 540 L 380 540 L 380 710 L 420 710 L 420 1080 Z" className={styles.shadowHatchMid} />
+              <path d="M 735 1080 L 735 635 L 760 610 L 790 610 L 790 1080 Z" className={styles.shadowHatchMid} />
+              <path d="M 1175 1080 L 1175 590 L 1210 590 L 1210 650 L 1240 650 L 1240 1080 Z" className={styles.shadowHatchMid} />
+              <path d="M 1275 1080 L 1275 590 L 1300 590 L 1300 1080 Z" className={styles.shadowHatchMid} />
+              <path d="M 1550 1080 L 1550 670 L 1610 670 L 1610 1080 Z" className={styles.shadowHatchMid} />
+              <path d="M 602.5 1080 L 602.5 690 L 640 690 L 640 1080 Z" className={styles.shadowHatchMid} />
+              <path d="M 665 1080 L 665 580 L 672 580 L 680 620 L 680 1080 Z" className={styles.shadowHatchMid} />
+              <path d="M 880 1080 L 880 720 L 930 720 L 930 1080 Z" className={styles.shadowHatchMid} />
+              <path d="M 995 1080 L 995 560 L 1000 560 L 1030 560 L 1030 600 L 1040 600 L 1040 1080 Z" className={styles.shadowHatchMid} />
+              <path d="M 1075 1080 L 1075 500 L 1085 580 L 1085 660 L 1095 660 L 1095 1080 Z" className={styles.shadowHatchMid} />
+              <path d="M 1740 1080 L 1740 600 L 1750 600 L 1750 650 L 1780 650 L 1780 1080 Z" className={styles.shadowHatchMid} />
+              <path d="M 1890 1080 L 1890 680 L 1930 680 L 1930 1080 Z" className={styles.shadowHatchMid} />
+            </g>
 
-                {/* Hotel building */}
-                <line x1="1530" y1="720" x2="1530" y2="723" className={styles.windowFlicker1} />
-                <line x1="1570" y1="760" x2="1570" y2="763" className={styles.windowFlicker3} />
-              </g>
+            {/* Asynchronous Flickering Window Cells (Layer 2 - Unfiltered for performance) */}
+            <g strokeWidth="1.0" fill="none">
+              {/* Staggered double-tower (Left) */}
+              <line x1="170" y1="780" x2="170" y2="783" className={styles.windowFlicker2} />
+              <line x1="210" y1="730" x2="210" y2="733" className={styles.windowFlicker4} />
+
+              {/* Hotel building */}
+              <line x1="1530" y1="720" x2="1530" y2="723" className={styles.windowFlicker1} />
+              <line x1="1570" y1="760" x2="1570" y2="763" className={styles.windowFlicker3} />
             </g>
           </svg>
         </motion.div>
@@ -710,7 +754,7 @@ export default function NoirSkyline() {
       >
         <motion.div
           animate={{ x: mouseOffset.x * -42, y: mouseOffset.y * -28 }}
-          transition={{ type: 'spring', damping: 24, stiffness: 75 }}
+          transition={{ type: 'spring', damping: 24, stiffness: 80 }}
           style={{ width: '100%', height: '100%' }}
         >
           <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%' }}>
@@ -735,9 +779,19 @@ export default function NoirSkyline() {
                 <stop offset="60%" stopColor="rgba(250, 250, 250, 0.04)" />
                 <stop offset="100%" stopColor="rgba(250, 250, 250, 0)" />
               </linearGradient>
+
+              <pattern id="hatch-fg" width="10" height="10" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="0" x2="0" y2="10" stroke="rgba(250, 250, 250, 0.22)" strokeWidth="1.2" />
+              </pattern>
+
+              <filter id="fgSketchFilter" x="-20%" y="-20%" width="140%" height="140%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G" />
+              </filter>
             </defs>
-            {/* Foreground elements */}
-            <g className={styles.buildingGroup} fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.48)" strokeWidth="1.8">
+
+            {/* Group A: Foreground Static Elements (Sketch-Filtered for hand-drawn look) */}
+            <g className={styles.buildingGroup} fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.48)" strokeWidth="1.8" filter="url(#fgSketchFilter)">
               
               {/* LEFT ROOFTOP SECTION */}
               <path d="M -50 1080 L -50 820 L 460 820 L 460 1080 Z" />
@@ -781,44 +835,44 @@ export default function NoirSkyline() {
                 <line x1="410" y1="835" x2="410" y2="847" />
                 <line x1="450" y1="835" x2="450" y2="847" />
 
-                 {/* Left Facade Scattered Brick Patches */}
-                 {/* Patch L1 (under fire escape, x=100-160) */}
-                 <line x1="100" y1="931" x2="160" y2="931" />
-                 <line x1="100" y1="943" x2="160" y2="943" />
-                 <line x1="100" y1="955" x2="160" y2="955" />
-                 <line x1="100" y1="967" x2="160" y2="967" />
-                 <line x1="120" y1="931" x2="120" y2="943" />
-                 <line x1="150" y1="931" x2="150" y2="943" />
-                 <line x1="105" y1="943" x2="105" y2="955" />
-                 <line x1="135" y1="943" x2="135" y2="955" />
-                 <line x1="120" y1="955" x2="120" y2="967" />
-                 <line x1="150" y1="955" x2="150" y2="967" />
+                {/* Left Facade Scattered Brick Patches */}
+                {/* Patch L1 (under fire escape, x=100-160) */}
+                <line x1="100" y1="931" x2="160" y2="931" />
+                <line x1="100" y1="943" x2="160" y2="943" />
+                <line x1="100" y1="955" x2="160" y2="955" />
+                <line x1="100" y1="967" x2="160" y2="967" />
+                <line x1="120" y1="931" x2="120" y2="943" />
+                <line x1="150" y1="931" x2="150" y2="943" />
+                <line x1="105" y1="943" x2="105" y2="955" />
+                <line x1="135" y1="943" x2="135" y2="955" />
+                <line x1="120" y1="955" x2="120" y2="967" />
+                <line x1="150" y1="955" x2="150" y2="967" />
 
-                 {/* Patch L2 (right-center, x=290-360) */}
-                 <line x1="290" y1="919" x2="360" y2="919" />
-                 <line x1="290" y1="931" x2="360" y2="931" />
-                 <line x1="290" y1="943" x2="360" y2="943" />
-                 <line x1="290" y1="955" x2="360" y2="955" />
-                 <line x1="310" y1="919" x2="310" y2="931" />
-                 <line x1="340" y1="919" x2="340" y2="931" />
-                 <line x1="295" y1="931" x2="295" y2="943" />
-                 <line x1="325" y1="931" x2="325" y2="943" />
-                 <line x1="355" y1="931" x2="355" y2="943" />
-                 <line x1="310" y1="943" x2="310" y2="955" />
-                 <line x1="340" y1="943" x2="340" y2="955" />
+                {/* Patch L2 (right-center, x=290-360) */}
+                <line x1="290" y1="919" x2="360" y2="919" />
+                <line x1="290" y1="931" x2="360" y2="931" />
+                <line x1="290" y1="943" x2="360" y2="943" />
+                <line x1="290" y1="955" x2="360" y2="955" />
+                <line x1="310" y1="919" x2="310" y2="931" />
+                <line x1="340" y1="919" x2="340" y2="931" />
+                <line x1="295" y1="931" x2="295" y2="943" />
+                <line x1="325" y1="931" x2="325" y2="943" />
+                <line x1="355" y1="931" x2="355" y2="943" />
+                <line x1="310" y1="943" x2="310" y2="955" />
+                <line x1="340" y1="943" x2="340" y2="955" />
 
-                 {/* Patch L3 (lower left, x=30-90) */}
-                 <line x1="30" y1="1003" x2="90" y2="1003" />
-                 <line x1="30" y1="1015" x2="90" y2="1015" />
-                 <line x1="30" y1="1027" x2="90" y2="1027" />
-                 <line x1="30" y1="1039" x2="90" y2="1039" />
-                 <line x1="50" y1="1003" x2="50" y2="1015" />
-                 <line x1="80" y1="1003" x2="80" y2="1015" />
-                 <line x1="35" y1="1015" x2="35" y2="1027" />
-                 <line x1="65" y1="1015" x2="65" y2="1027" />
-                 <line x1="50" y1="1027" x2="50" y2="1039" />
-                 <line x1="80" y1="1027" x2="80" y2="1039" />
-               </g>
+                {/* Patch L3 (lower left, x=30-90) */}
+                <line x1="30" y1="1003" x2="90" y2="1003" />
+                <line x1="30" y1="1015" x2="90" y2="1015" />
+                <line x1="30" y1="1027" x2="90" y2="1027" />
+                <line x1="30" y1="1039" x2="90" y2="1039" />
+                <line x1="50" y1="1003" x2="50" y2="1015" />
+                <line x1="80" y1="1003" x2="80" y2="1015" />
+                <line x1="35" y1="1015" x2="35" y2="1027" />
+                <line x1="65" y1="1015" x2="65" y2="1027" />
+                <line x1="50" y1="1027" x2="50" y2="1039" />
+                <line x1="80" y1="1027" x2="80" y2="1039" />
+              </g>
               
               {/* Retro TV Yagi Antenna on left rooftop */}
               <g stroke="rgba(250, 250, 250, 0.48)" strokeWidth="1.5" fill="none">
@@ -843,11 +897,8 @@ export default function NoirSkyline() {
                 <polygon points="255,805 240,750 300,750 285,812" fill="rgba(250, 250, 250, 0.05)" stroke="none" />
               </g>
 
-              {/* Detective Billboard Rebranded */}
+              {/* Detective Billboard Support Frame & Sign (Static) */}
               <g>
-                {/* Spotlight cone shining up */}
-                <polygon points="130,820 80,695 180,695" fill="url(#leftLightGrad)" stroke="none" className={styles.billboardLight} />
-                
                 {/* Scaffold support frame */}
                 <line x1="90" y1="820" x2="98" y2="760" />
                 <line x1="170" y1="820" x2="162" y2="760" />
@@ -869,7 +920,7 @@ export default function NoirSkyline() {
                 <text x="154" y="740" textAnchor="middle" fontFamily="var(--font-code)" fontWeight="bold" fontSize="7.8" fill="rgba(250,250,250,0.85)" stroke="none">GIN</text>
               </g>
 
-              {/* Rooftop Penthouse Brick Access Shed */}
+              {/* Rooftop Penthouse Brick Access Shed (Static part) */}
               <g fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.48)" strokeWidth="1.8">
                 {/* Main Shed Structure */}
                 <rect x="290" y="750" width="65" height="70" />
@@ -935,24 +986,6 @@ export default function NoirSkyline() {
                 <polygon points="316,769 292,820 340,820" fill="url(#downwardLightGrad)" stroke="none" />
               </g>
 
-              {/* Cat Silhouette sitting on penthouse roof */}
-              <g>
-                {/* Cat Body */}
-                <path d="M 314 750 C 314 738, 326 738, 326 750 Z" fill="var(--color-bg)" />
-                {/* Cat Head */}
-                <circle cx="320" cy="728" r="5" fill="var(--color-bg)" />
-                {/* Cat Ears */}
-                <polygon points="316,725 313,718 318,721" fill="var(--color-bg)" />
-                <polygon points="324,725 327,718 322,721" fill="var(--color-bg)" />
-                {/* Cat Tail (Twitchy!) */}
-                <path d="M 325 746 Q 332 743 329 735 T 333 725" fill="none" className={styles.catTail} />
-                {/* Glowing Cat Eyes (blinking) */}
-                <g className={styles.catEyes} fill="#fafafa" stroke="none">
-                  <circle cx="318.5" cy="727.5" r="0.8" />
-                  <circle cx="321.5" cy="727.5" r="0.8" />
-                </g>
-              </g>
-
               {/* Parapet Wall Cap details on left roof */}
               <line x1="-50" y1="826" x2="460" y2="826" strokeWidth="0.8" />
               <line x1="40" y1="820" x2="40" y2="1080" stroke="rgba(250, 250, 250, 0.2)" strokeWidth="1" />
@@ -975,13 +1008,6 @@ export default function NoirSkyline() {
               <rect x="354" y="754" width="34" height="6" />
               {/* Exhaust Fan Housing */}
               <ellipse cx="371" cy="750" rx="9" ry="4" fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.48)" strokeWidth="1" />
-              {/* Spinning Fan Blades */}
-              <g className={styles.fanBlade}>
-                <line x1="371" y1="750" x2="366" y2="748" stroke="rgba(250, 250, 250, 0.85)" strokeWidth="1" />
-                <line x1="371" y1="750" x2="376" y2="752" stroke="rgba(250, 250, 250, 0.85)" strokeWidth="1" />
-                <line x1="371" y1="750" x2="369" y2="753" stroke="rgba(250, 250, 250, 0.85)" strokeWidth="1" />
-                <line x1="371" y1="750" x2="373" y2="747" stroke="rgba(250, 250, 250, 0.85)" strokeWidth="1" />
-              </g>
 
               {/* RIGHT ROOFTOP SECTION */}
               <path d="M 1420 1080 L 1420 760 L 1970 760 L 1970 1080 Z" />
@@ -1054,7 +1080,6 @@ export default function NoirSkyline() {
                 <line x1="1630" y1="959" x2="1630" y2="971" />
               </g>
 
-
               {/* Roof HVAC Unit */}
               <rect x="1750" y="715" width="65" height="45" />
               {/* HVAC Grid */}
@@ -1062,31 +1087,18 @@ export default function NoirSkyline() {
               <line x1="1760" y1="735" x2="1805" y2="735" strokeWidth="0.8" />
               <line x1="1760" y1="745" x2="1805" y2="745" strokeWidth="0.8" />
 
-              {/* Industrial Blower Unit with Spinning Fan Wheel */}
+              {/* Industrial Blower Unit (Static parts) */}
               <g fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.48)" strokeWidth="1.2">
                 <rect x="1587" y="725" width="22" height="35" rx="1" />
                 {/* Fan casing circle */}
                 <circle cx="1598" cy="742" r="8" />
-                
-                {/* Blower wheel spokes (blades inside the casing circle) */}
-                <circle cx="1598" cy="742" r="1.5" fill="rgba(250, 250, 250, 0.85)" stroke="none" />
-                <g className={styles.blowerFan}>
-                  <line x1="1598" y1="742" x2="1598" y2="734" stroke="rgba(250, 250, 250, 0.85)" strokeWidth="0.8" />
-                  <line x1="1598" y1="742" x2="1598" y2="750" stroke="rgba(250, 250, 250, 0.85)" strokeWidth="0.8" />
-                  <line x1="1598" y1="742" x2="1590" y2="742" stroke="rgba(250, 250, 250, 0.85)" strokeWidth="0.8" />
-                  <line x1="1598" y1="742" x2="1606" y2="742" stroke="rgba(250, 250, 250, 0.85)" strokeWidth="0.8" />
-                  <line x1="1598" y1="742" x2="1592" y2="736" stroke="rgba(250, 250, 250, 0.6)" strokeWidth="0.6" />
-                  <line x1="1598" y1="742" x2="1604" y2="748" stroke="rgba(250, 250, 250, 0.6)" strokeWidth="0.6" />
-                  <line x1="1598" y1="742" x2="1592" y2="748" stroke="rgba(250, 250, 250, 0.6)" strokeWidth="0.6" />
-                  <line x1="1598" y1="742" x2="1604" y2="736" stroke="rgba(250, 250, 250, 0.6)" strokeWidth="0.6" />
-                </g>
 
                 {/* Exhaust Pipe Stack */}
                 <line x1="1598" y1="725" x2="1598" y2="717" />
                 <line x1="1595" y1="717" x2="1601" y2="717" strokeWidth="1.5" />
               </g>
 
-              {/* Rooftop Clothesline with Swaying Laundry */}
+              {/* Rooftop Clothesline (Static posts & wire) */}
               <g>
                 {/* Left & Right Posts */}
                 <line x1="1640" y1="760" x2="1640" y2="710" />
@@ -1095,23 +1107,6 @@ export default function NoirSkyline() {
                 <line x1="1700" y1="710" x2="1710" y2="710" strokeWidth="1" />
                 {/* Sagging Line */}
                 <path d="M 1640 715 Q 1672 725 1705 715" fill="none" strokeWidth="0.8" />
-                
-                {/* Detailed Comic-Noir Laundry Clothes */}
-                {/* Trench Coat (Sway 1) */}
-                <g className={styles.laundry1}>
-                  <path d="M 1648 718 L 1645 724 L 1642 728 L 1644 738 L 1648 735 L 1648 756 L 1662 756 L 1662 735 L 1666 738 L 1668 728 L 1665 724 L 1662 718 Z" fill="var(--color-bg)" strokeWidth="1" />
-                  <line x1="1655" y1="718" x2="1655" y2="756" stroke="rgba(250, 250, 250, 0.4)" strokeWidth="0.6" />
-                  <line x1="1648" y1="735" x2="1662" y2="735" stroke="rgba(250, 250, 250, 0.4)" strokeWidth="0.6" />
-                </g>
-                {/* Trousers (Sway 2) */}
-                <g className={styles.laundry2}>
-                  <path d="M 1670 720 L 1667 750 L 1673 750 L 1676 730 L 1679 750 L 1685 750 L 1682 720 Z" fill="var(--color-bg)" strokeWidth="1" />
-                </g>
-                {/* Fedora Hat (Sway 3) */}
-                <g className={styles.laundry3}>
-                  <path d="M 1687 728 C 1687 724, 1690 717, 1695 717 C 1700 717, 1703 724, 1703 728 C 1706 728, 1708 729, 1708 731 C 1708 733, 1682 733, 1682 731 C 1682 729, 1684 728, 1687 728 Z" fill="var(--color-bg)" strokeWidth="1" />
-                  <path d="M 1688 728 Q 1695 727 1702 728 L 1702 726 Q 1695 725 1688 726 Z" fill="rgba(250, 250, 250, 0.85)" stroke="none" />
-                </g>
               </g>
 
               {/* Roof Chimney Duct for Steam */}
@@ -1193,9 +1188,6 @@ export default function NoirSkyline() {
                 <polygon points="871,726 889,726 889,720 871,720" />
                 <polygon points="877,720 883,720 880,712" />
               </g>
-
-              {/* Warning Beacon at Tower Peak */}
-              <circle cx="880" cy="710" r="2.0" className={styles.bridgeBeacon} />
 
               {/* Detailed double gothic arches */}
               <g fill="none">
@@ -1305,15 +1297,137 @@ export default function NoirSkyline() {
                 <path d="M 920 835.0 L 940 841.1 L 960 835.2 L 980 841.3 L 1000 835.5 L 1020 841.8 L 1040 836.1 L 1060 842.4 L 1080 836.8 L 1100 843.2 L 1120 837.7 L 1140 844.3 L 1160 838.8 L 1180 845.4 L 1200 840.1 L 1220 846.8 L 1240 841.5 L 1260 848.3 L 1280 843.1 L 1300 850.0 L 1320 844.9 L 1340 851.9 L 1360 846.8 L 1380 853.9 L 1400 848.9 L 1420 856.0" strokeWidth="0.8" stroke="rgba(250, 250, 250, 0.30)" />
               </g>
 
-              {/* Roadway traffic lights & car silhouettes */}
+              {/* Roadway traffic light trails (Static lines) */}
               <g fill="rgba(250, 250, 250, 0.85)" stroke="none">
                 {/* Outbound Traffic Light Trail (glowing headlights) */}
                 <path d="M 460 852 Q 880 822 1420 852" fill="none" stroke="rgba(250, 250, 250, 0.25)" strokeWidth="0.8" />
                 {/* Inbound Traffic Light Trail (glowing taillights) */}
                 <path d="M 460 854 Q 880 824 1420 854" fill="none" stroke="rgba(250, 250, 250, 0.2)" strokeWidth="0.8" />
+              </g>
 
-                {/* Animated Bridge Traffic Dots (Staggered Outbound Headlights and Inbound Taillights) */}
-                
+              {/* River waterline & Tugboat under the bridge (Static) */}
+              <line x1="460" y1="950" x2="1420" y2="950" stroke="rgba(250, 250, 250, 0.16)" strokeWidth="1" strokeDasharray="8 6" />
+              
+              <g>
+                {/* Tugboat hull */}
+                <path d="M 1030 950 L 1070 950 L 1065 941 L 1035 941 Z" fill="var(--color-bg)" />
+                {/* Cabin */}
+                <rect x="1040" y="933" width="16" height="8" fill="var(--color-bg)" strokeWidth="1" />
+                {/* Smokestack */}
+                <line x1="1052" y1="933" x2="1052" y2="926" strokeWidth="1.2" />
+                {/* Smoke puffs */}
+                <circle cx="1050" cy="922" r="2" fill="none" stroke="rgba(250,250,250,0.3)" strokeWidth="0.8" />
+                <circle cx="1047" cy="918" r="3" fill="none" stroke="rgba(250,250,250,0.2)" strokeWidth="0.8" />
+                {/* Propeller wake wave ripples */}
+                <path d="M 1026 947 Q 1010 945 995 948" fill="none" stroke="rgba(250, 250, 250, 0.2)" strokeWidth="0.8" />
+                <path d="M 1020 951 Q 1005 950 988 953" fill="none" stroke="rgba(250, 250, 250, 0.15)" strokeWidth="0.8" />
+              </g>
+
+              {/* Curved Streetlight Poles & Arms (Static) */}
+              <path 
+                d="M 550 844.3 L 550 832.3 Q 550 830.3 546 830.3 M 650 839.7 L 650 827.7 Q 650 825.7 646 825.7 M 750 836.7 L 750 824.7 Q 750 822.7 746 822.7 M 850 835.2 L 850 823.2 Q 850 821.2 846 821.2 M 950 835.1 L 950 823.1 Q 950 821.1 954 821.1 M 1050 836.2 L 1050 824.2 Q 1050 822.2 1054 822.2 M 1150 838.5 L 1150 826.5 Q 1150 824.5 1154 824.5 M 1250 841.9 L 1250 829.9 Q 1250 827.9 1254 827.9 M 1350 846.3 L 1350 834.3 Q 1350 832.3 1354 832.3"
+                stroke="rgba(250, 250, 250, 0.35)"
+                strokeWidth="0.8"
+                fill="none"
+              />
+
+              {/* Hanging Power Lines / Catenary wires (Static) */}
+              <g stroke="rgba(250, 250, 250, 0.28)" strokeWidth="0.8" fill="none">
+                <path d="M 450 820 Q 650 900 850 780" />
+                <path d="M 450 835 Q 650 915 850 795" />
+                <path d="M 910 780 Q 1165 915 1420 760" />
+              </g>
+
+              {/* Shadow overlay paths for wobbly hatching depth (Static) */}
+              <path d="M 205 1080 L 205 820 L 460 820 L 460 1080 Z" className={styles.shadowHatchFg} />
+              <path d="M 1695 1080 L 1695 760 L 1970 760 L 1970 1080 Z" className={styles.shadowHatchFg} />
+              <path d="M 890 730 L 910 780 L 910 1080 L 890 1080 Z" className={styles.shadowHatchFg} />
+              <path d="M 880 935 L 918 935 L 918 950 L 928 950 L 928 968 L 922 968 L 922 1080 L 880 1080 Z" className={styles.shadowHatchFg} />
+              <path d="M 322 750 L 355 750 L 355 820 L 322 820 Z" className={styles.shadowHatchFg} />
+              <path d="M 1782 715 L 1815 715 L 1815 760 L 1782 760 Z" className={styles.shadowHatchFg} />
+            </g>
+
+            {/* Group B: Unfiltered Foreground Animating Elements (Separated to bypass displacement map redraw cost for GPU performance) */}
+            <g fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.48)" strokeWidth="1.8" className={styles.buildingGroup}>
+              {/* Animated Billboard Spotlight */}
+              <polygon points="130,820 80,695 180,695" fill="url(#leftLightGrad)" stroke="none" className={styles.billboardLight} />
+
+              {/* Cat Silhouette sitting on penthouse roof (Animating tail & blinking eyes) */}
+              <g>
+                {/* Cat Body */}
+                <path d="M 314 750 C 314 738, 326 738, 326 750 Z" fill="var(--color-bg)" />
+                {/* Cat Head */}
+                <circle cx="320" cy="728" r="5" fill="var(--color-bg)" />
+                {/* Cat Ears */}
+                <polygon points="316,725 313,718 318,721" fill="var(--color-bg)" />
+                <polygon points="324,725 327,718 322,721" fill="var(--color-bg)" />
+                {/* Cat Tail (Twitchy!) */}
+                <path d="M 325 746 Q 332 743 329 735 T 333 725" fill="none" className={styles.catTail} />
+                {/* Glowing Cat Eyes (blinking) */}
+                <g className={styles.catEyes} fill="#fafafa" stroke="none">
+                  <circle cx="318.5" cy="727.5" r="0.8" />
+                  <circle cx="321.5" cy="727.5" r="0.8" />
+                </g>
+              </g>
+
+              {/* Spinning Fan Blades (Animating) */}
+              <g className={styles.fanBlade}>
+                <line x1="371" y1="750" x2="366" y2="748" stroke="rgba(250, 250, 250, 0.85)" strokeWidth="1" />
+                <line x1="371" y1="750" x2="376" y2="752" stroke="rgba(250, 250, 250, 0.85)" strokeWidth="1" />
+                <line x1="371" y1="750" x2="369" y2="753" stroke="rgba(250, 250, 250, 0.85)" strokeWidth="1" />
+                <line x1="371" y1="750" x2="373" y2="747" stroke="rgba(250, 250, 250, 0.85)" strokeWidth="1" />
+              </g>
+
+              {/* Blower wheel spokes (Animating) */}
+              <circle cx="1598" cy="742" r="1.5" fill="rgba(250, 250, 250, 0.85)" stroke="none" />
+              <g className={styles.blowerFan}>
+                <line x1="1598" y1="742" x2="1598" y2="734" stroke="rgba(250, 250, 250, 0.85)" strokeWidth="0.8" />
+                <line x1="1598" y1="742" x2="1598" y2="750" stroke="rgba(250, 250, 250, 0.85)" strokeWidth="0.8" />
+                <line x1="1598" y1="742" x2="1590" y2="742" stroke="rgba(250, 250, 250, 0.85)" strokeWidth="0.8" />
+                <line x1="1598" y1="742" x2="1606" y2="742" stroke="rgba(250, 250, 250, 0.85)" strokeWidth="0.8" />
+                <line x1="1598" y1="742" x2="1592" y2="736" stroke="rgba(250, 250, 250, 0.6)" strokeWidth="0.6" />
+                <line x1="1598" y1="742" x2="1604" y2="748" stroke="rgba(250, 250, 250, 0.6)" strokeWidth="0.6" />
+                <line x1="1598" y1="742" x2="1592" y2="748" stroke="rgba(250, 250, 250, 0.6)" strokeWidth="0.6" />
+                <line x1="1598" y1="742" x2="1604" y2="736" stroke="rgba(250, 250, 250, 0.6)" strokeWidth="0.6" />
+              </g>
+
+              {/* Swaying Laundry (Animating) */}
+              <g>
+                {/* Trench Coat (Sway 1) */}
+                <g className={styles.laundry1}>
+                  <path d="M 1648 718 L 1645 724 L 1642 728 L 1644 738 L 1648 735 L 1648 756 L 1662 756 L 1662 735 L 1666 738 L 1668 728 L 1665 724 L 1662 718 Z" fill="var(--color-bg)" strokeWidth="1" />
+                  <line x1="1655" y1="718" x2="1655" y2="756" stroke="rgba(250, 250, 250, 0.4)" strokeWidth="0.6" />
+                  <line x1="1648" y1="735" x2="1662" y2="735" stroke="rgba(250, 250, 250, 0.4)" strokeWidth="0.6" />
+                </g>
+                {/* Trousers (Sway 2) */}
+                <g className={styles.laundry2}>
+                  <path d="M 1670 720 L 1667 750 L 1673 750 L 1676 730 L 1679 750 L 1685 750 L 1682 720 Z" fill="var(--color-bg)" strokeWidth="1" />
+                </g>
+                {/* Fedora Hat (Sway 3) */}
+                <g className={styles.laundry3}>
+                  <path d="M 1687 728 C 1687 724, 1690 717, 1695 717 C 1700 717, 1703 724, 1703 728 C 1706 728, 1708 729, 1708 731 C 1708 733, 1682 733, 1682 731 C 1682 729, 1684 728, 1687 728 Z" fill="var(--color-bg)" strokeWidth="1" />
+                  <path d="M 1688 728 Q 1695 727 1702 728 L 1702 726 Q 1695 725 1688 726 Z" fill="rgba(250, 250, 250, 0.85)" stroke="none" />
+                </g>
+              </g>
+
+              {/* Warning Beacon at Tower Peak (Animating) */}
+              <circle cx="880" cy="710" r="2.0" className={styles.bridgeBeacon} />
+
+              {/* Bridge Streetlights (Glowing dots, Animating opacity subtly) */}
+              <g fill="#fafafa" stroke="none">
+                <circle cx="546" cy="830.3" r="1.8" opacity="0.85" />
+                <circle cx="646" cy="825.7" r="1.8" opacity="0.85" />
+                <circle cx="746" cy="822.7" r="1.8" opacity="0.85" />
+                <circle cx="846" cy="821.2" r="1.8" opacity="0.85" />
+                <circle cx="954" cy="821.1" r="1.8" opacity="0.85" />
+                <circle cx="1054" cy="822.2" r="1.8" opacity="0.85" />
+                <circle cx="1154" cy="824.5" r="1.8" opacity="0.85" />
+                <circle cx="1254" cy="827.9" r="1.8" opacity="0.85" />
+                <circle cx="1354" cy="832.3" r="1.8" opacity="0.85" />
+              </g>
+
+              {/* Animated Bridge Traffic Dots (Staggered Outbound Headlights and Inbound Taillights) */}
+              <g fill="rgba(250, 250, 250, 0.85)" stroke="none">
                 {/* Outbound Headlights (Left to Right, bright white) */}
                 <circle cx={reducedMotion ? 588 : 0} cy={reducedMotion ? 841.6 : 0} r="0.9" className={styles.trafficHeadlight}>
                   {!reducedMotion && (
@@ -1372,110 +1486,21 @@ export default function NoirSkyline() {
                   )}
                 </circle>
               </g>
-
-              {/* Vertical Bridge Suspender Ropes */}
-              <g stroke="rgba(250, 250, 250, 0.28)" strokeWidth="0.8" fill="none">
-                {/* Left side suspenders */}
-                <line x1="500" y1="847.3" x2="500" y2="843.7" />
-                <line x1="530" y1="845.5" x2="530" y2="838.3" />
-                <line x1="560" y1="843.8" x2="560" y2="832.3" />
-                <line x1="590" y1="842.3" x2="590" y2="825.7" />
-                <line x1="620" y1="840.9" x2="620" y2="818.4" />
-                <line x1="650" y1="839.7" x2="650" y2="810.6" />
-                <line x1="680" y1="838.7" x2="680" y2="802.1" />
-                <line x1="710" y1="837.7" x2="710" y2="793.0" />
-                <line x1="740" y1="837.0" x2="740" y2="783.3" />
-                <line x1="770" y1="836.3" x2="770" y2="773.0" />
-                <line x1="800" y1="835.8" x2="800" y2="762.1" />
-                <line x1="830" y1="835.4" x2="830" y2="750.6" />
-                
-                {/* Right side suspenders */}
-                <line x1="930" y1="835.0" x2="930" y2="746.2" />
-                <line x1="960" y1="835.2" x2="960" y2="755.3" />
-                <line x1="990" y1="835.4" x2="990" y2="764.2" />
-                <line x1="1020" y1="835.8" x2="1020" y2="772.6" />
-                <line x1="1050" y1="836.2" x2="1050" y2="780.7" />
-                <line x1="1080" y1="836.8" x2="1080" y2="788.4" />
-                <line x1="1110" y1="837.5" x2="1110" y2="795.8" />
-                <line x1="1140" y1="838.3" x2="1140" y2="802.8" />
-                <line x1="1170" y1="839.1" x2="1170" y2="809.4" />
-                <line x1="1200" y1="840.1" x2="1200" y2="815.6" />
-                <line x1="1230" y1="841.2" x2="1230" y2="821.5" />
-                <line x1="1260" y1="842.3" x2="1260" y2="827.0" />
-              </g>
-
-              {/* River waterline & Tugboat under the bridge */}
-              <line x1="460" y1="950" x2="1420" y2="950" stroke="rgba(250, 250, 250, 0.16)" strokeWidth="1" strokeDasharray="8 6" />
-              
-              <g>
-                {/* Tugboat hull */}
-                <path d="M 1030 950 L 1070 950 L 1065 941 L 1035 941 Z" fill="var(--color-bg)" />
-                {/* Cabin */}
-                <rect x="1040" y="933" width="16" height="8" fill="var(--color-bg)" strokeWidth="1" />
-                {/* Smokestack */}
-                <line x1="1052" y1="933" x2="1052" y2="926" strokeWidth="1.2" />
-                {/* Smoke puffs */}
-                <circle cx="1050" cy="922" r="2" fill="none" stroke="rgba(250,250,250,0.3)" strokeWidth="0.8" />
-                <circle cx="1047" cy="918" r="3" fill="none" stroke="rgba(250,250,250,0.2)" strokeWidth="0.8" />
-                {/* Propeller wake wave ripples */}
-                <path d="M 1026 947 Q 1010 945 995 948" fill="none" stroke="rgba(250, 250, 250, 0.2)" strokeWidth="0.8" />
-                <path d="M 1020 951 Q 1005 950 988 953" fill="none" stroke="rgba(250, 250, 250, 0.15)" strokeWidth="0.8" />
-              </g>
-
-              {/* Curved Streetlight Poles & Arms */}
-              <path 
-                d="M 550 844.3 L 550 832.3 Q 550 830.3 546 830.3 M 650 839.7 L 650 827.7 Q 650 825.7 646 825.7 M 750 836.7 L 750 824.7 Q 750 822.7 746 822.7 M 850 835.2 L 850 823.2 Q 850 821.2 846 821.2 M 950 835.1 L 950 823.1 Q 950 821.1 954 821.1 M 1050 836.2 L 1050 824.2 Q 1050 822.2 1054 822.2 M 1150 838.5 L 1150 826.5 Q 1150 824.5 1154 824.5 M 1250 841.9 L 1250 829.9 Q 1250 827.9 1254 827.9 M 1350 846.3 L 1350 834.3 Q 1350 832.3 1354 832.3"
-                stroke="rgba(250, 250, 250, 0.35)"
-                strokeWidth="0.8"
-                fill="none"
-              />
-
-              {/* Bridge Streetlights (Glowing dots along deck curved arms) */}
-              <g fill="#fafafa" stroke="none">
-                <circle cx="546" cy="830.3" r="1.8" opacity="0.85" />
-                <circle cx="646" cy="825.7" r="1.8" opacity="0.85" />
-                <circle cx="746" cy="822.7" r="1.8" opacity="0.85" />
-                <circle cx="846" cy="821.2" r="1.8" opacity="0.85" />
-                <circle cx="954" cy="821.1" r="1.8" opacity="0.85" />
-                <circle cx="1054" cy="822.2" r="1.8" opacity="0.85" />
-                <circle cx="1154" cy="824.5" r="1.8" opacity="0.85" />
-                <circle cx="1254" cy="827.9" r="1.8" opacity="0.85" />
-                <circle cx="1354" cy="832.3" r="1.8" opacity="0.85" />
-              </g>
-
-              {/* Hanging Power Lines / Catenary wires */}
-              <g stroke="rgba(250, 250, 250, 0.28)" strokeWidth="0.8" fill="none">
-                <path d="M 450 820 Q 650 900 850 780" />
-                <path d="M 450 835 Q 650 915 850 795" />
-                <path d="M 910 780 Q 1165 915 1420 760" />
-              </g>
             </g>
 
-            {/* Rising Steam/Smoke Paths (CSS Animated) */}
+            {/* Group C: Rising Steam/Smoke Paths (CSS Animated - Unfiltered Wavy Bezier curves for maximum performance) */}
             <g fill="none" stroke="rgba(250, 250, 250, 0.45)" strokeWidth="1">
               {/* Steam from Chimney 1 (Left Roof x=228, y=775) */}
-              <path 
-                d="M 228 770 Q 220 740 228 720 T 222 670" 
-                className={styles.steam} 
-              />
+              <path d="M 228 770 C 222 745, 234 720, 226 695 C 220 675, 228 655, 222 635" className={styles.steam} />
               
               {/* Steam from Chimney 2 (Left Roof x=371, y=754) */}
-              <path 
-                d="M 371 750 Q 380 720 371 700 T 378 650" 
-                className={styles.steamDelayed} 
-              />
+              <path d="M 371 750 C 378 725, 366 700, 374 675 C 380 655, 372 635, 378 615" className={styles.steamDelayed} />
 
-               {/* Steam from Chimney 3 (Right Roof x=1869, y=694) */}
-              <path 
-                d="M 1869 690 Q 1860 660 1869 640 T 1860 590" 
-                className={styles.steam} 
-              />
+              {/* Steam from Chimney 3 (Right Roof x=1869, y=694) */}
+              <path d="M 1869 690 C 1861 665, 1873 640, 1865 615 C 1859 595, 1867 575, 1861 555" className={styles.steam} />
 
               {/* Steam from Industrial Blower (Right Roof x=1598, y=715) */}
-              <path 
-                d="M 1598 710 Q 1607 680 1598 660 T 1605 610" 
-                className={styles.steamDelayed} 
-              />
+              <path d="M 1598 710 C 1606 685, 1594 660, 1602 635 C 1608 615, 1600 595, 1606 575" className={styles.steamDelayed} />
             </g>
 
             {/* Rolling River Fog/Mist Layers (Layered depth and gradient texture) */}

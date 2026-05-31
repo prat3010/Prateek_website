@@ -93,18 +93,25 @@
 }
 
 :global([data-theme='noir']) .bioBubble {
-  --bubble-bg: #ffffff !important;
-  background-color: #ffffff !important;
-  color: #000000 !important;
-  border-color: #ffffff !important;
-  box-shadow: 4px 4px 0px rgba(255, 255, 255, 0.3) !important;
+  --bubble-bg: #dfdbd2 !important;
+  background-color: #dfdbd2 !important;
+  color: #1c1c1f !important;
+  border-color: #1c1c1f !important;
+  box-shadow: 4px 4px 0px #1c1c1f !important;
+}
+
+:global([data-theme='noir']) .bioBubble::after {
+  border-right-color: #1c1c1f !important;
+  border-left-color: #1c1c1f !important;
+  border-bottom-color: #1c1c1f !important;
+  border-top-color: #1c1c1f !important;
 }
 
 :global([data-theme='noir']) .bioBubble::before {
-  border-right-color: #ffffff !important;
-  border-left-color: #ffffff !important;
-  border-bottom-color: #ffffff !important;
-  border-top-color: #ffffff !important;
+  border-right-color: #dfdbd2 !important;
+  border-left-color: #dfdbd2 !important;
+  border-bottom-color: #dfdbd2 !important;
+  border-top-color: #dfdbd2 !important;
 }
 
 .bioText {
@@ -114,7 +121,7 @@
 }
 
 :global([data-theme='noir']) .bioText {
-  color: #000000 !important;
+  color: #1c1c1f !important;
   font-family: var(--font-code) !important;
 }
 
@@ -123,7 +130,7 @@
 }
 
 :global([data-theme='noir']) .bioText strong {
-  color: #ff1744 !important;
+  color: #b71c1c !important; /* Vintage stamp red */
   font-family: var(--font-code) !important;
   font-weight: bold !important;
 }

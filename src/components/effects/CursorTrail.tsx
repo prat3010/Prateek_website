@@ -19,10 +19,98 @@ interface TrailDot {
   angleSpeed: number;
 }
 
+interface SmokeParticle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  size: number;
+  maxSize: number;
+  opacity: number;
+  lifetime: number;
+  maxLifetime: number;
+}
+
+const drawCigarette = (ctx: CanvasRenderingContext2D, x: number, y: number, angle: number) => {
+  const L = 35;
+  const W = 6;
+  
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angle);
+  
+  // 1. Filter (orange/brown)
+  const filterLength = L * 0.35;
+  ctx.fillStyle = '#C88A3B'; // Amber filter color
+  ctx.fillRect(0, -W / 2, filterLength, W);
+  
+  // Filter band (darker wrapping line)
+  ctx.fillStyle = '#9C611E';
+  ctx.fillRect(filterLength - 1.5, -W / 2, 1.5, W);
+  
+  // 2. White Paper Body
+  ctx.fillStyle = '#F4F4F6';
+  ctx.fillRect(filterLength, -W / 2, L - filterLength, W);
+  
+  // Paper texture lines (very subtle grey)
+  ctx.strokeStyle = '#D1D1D6';
+  ctx.lineWidth = 0.5;
+  ctx.beginPath();
+  ctx.moveTo(filterLength, -W / 4);
+  ctx.lineTo(L - 3, -W / 4);
+  ctx.moveTo(filterLength, W / 4);
+  ctx.lineTo(L - 3, W / 4);
+  ctx.stroke();
+
+  // 3. Ash Tip (textured grey/black/white)
+  const ashLength = 3;
+  const ashStart = L - ashLength;
+  
+  // Dark grey base ash
+  ctx.fillStyle = '#4A4A4F';
+  ctx.fillRect(ashStart, -W / 2, ashLength, W);
+  
+  // Speckled light ash on the very tip
+  ctx.fillStyle = '#C2C2C9';
+  ctx.fillRect(L - 1.5, -W / 3, 1.5, W * 2 / 3);
+  
+  // 4. Glowing Ember (lit tip)
+  ctx.save();
+  ctx.shadowColor = '#FF3C00';
+  ctx.shadowBlur = 8;
+  ctx.fillStyle = '#FF5500';
+  ctx.beginPath();
+  ctx.arc(ashStart, 0, W / 2, -Math.PI / 2, Math.PI / 2);
+  ctx.fill();
+  
+  // Inner white-hot core
+  ctx.shadowColor = '#FFFFCC';
+  ctx.shadowBlur = 4;
+  ctx.fillStyle = '#FFFFE0';
+  ctx.beginPath();
+  ctx.arc(ashStart, 0, W / 3, -Math.PI / 2, Math.PI / 2);
+  ctx.fill();
+  ctx.restore();
+  
+  // 5. Cigarette Outline (black for noir comic outline styling)
+  ctx.strokeStyle = '#18181B';
+  ctx.lineWidth = 1.0;
+  ctx.strokeRect(0, -W / 2, L, W);
+  
+  ctx.restore();
+};
+
 export default function CursorTrail() {
   const { isNoir } = useTheme();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const trailRef = useRef<TrailDot[]>([]);
+  const smokeRef = useRef<SmokeParticle[]>([]);
+  const cigStateRef = useRef({
+    x: -100,
+    y: -100,
+    angle: Math.PI / 4,
+    initialized: false,
+  });
   const mouseRef = useRef({ x: -100, y: -100 });
   const frameRef = useRef<number>(0);
   const colorIndexRef = useRef(0);
@@ -38,111 +126,233 @@ export default function CursorTrail() {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const trail = trailRef.current;
     const { x, y } = mouseRef.current;
 
-    // Add new dot at current mouse position
-    if (x > 0 && y > 0) {
-      trail.unshift({
-        x,
-        y,
-        age: 0,
-        colorIndex: colorIndexRef.current,
-        shape: isNoir ? 'crosshair' : 'circle',
-        angle: Math.random() * Math.PI * 2,
-        angleSpeed: (Math.random() - 0.5) * 0.05,
-      });
-      colorIndexRef.current = (colorIndexRef.current + 1) % colors.length;
-    }
+    if (isNoir) {
+      // Clear normal trail
+      trailRef.current = [];
 
-    // Trim trail to max length
-    while (trail.length > TRAIL_LENGTH) {
-      trail.pop();
-    }
+      const cig = cigStateRef.current;
+      const isMouseActive = x > 0 && y > 0;
 
-    // Age and draw each dot
-    for (let i = trail.length - 1; i >= 0; i--) {
-      const dot = trail[i];
-      dot.age++;
-      dot.angle += dot.angleSpeed;
-
-      const progress = i / TRAIL_LENGTH; // 0 = newest, 1 = oldest
-      const radius = BASE_DOT_RADIUS * (1 - progress * 0.7);
-      const opacity = 1 - progress * 0.85;
-
-      if (opacity <= 0 || radius <= 0) continue;
-
-      if (dot.shape === 'star') {
-        ctx.save();
-        ctx.translate(dot.x, dot.y);
-        ctx.rotate(dot.angle);
-
-        ctx.beginPath();
-        const spikes = 4;
-        const outerRadius = radius * 1.35;
-        const innerRadius = radius * 0.45;
-        let rot = (Math.PI / 2) * 3;
-        let step = Math.PI / spikes;
-
-        ctx.moveTo(0, -outerRadius);
-        for (let j = 0; j < spikes; j++) {
-          let sx = Math.cos(rot) * outerRadius;
-          let sy = Math.sin(rot) * outerRadius;
-          ctx.lineTo(sx, sy);
-          rot += step;
-
-          sx = Math.cos(rot) * innerRadius;
-          sy = Math.sin(rot) * innerRadius;
-          ctx.lineTo(sx, sy);
-          rot += step;
+      if (isMouseActive) {
+        if (!cig.initialized) {
+          cig.x = x;
+          cig.y = y;
+          cig.initialized = true;
+        } else {
+          // Cigarette lags/trails behind mouse cursor
+          cig.x += (x - cig.x) * 0.25;
+          cig.y += (y - cig.y) * 0.25;
         }
-        ctx.lineTo(0, -outerRadius);
-        ctx.closePath();
 
-        ctx.fillStyle = colors[dot.colorIndex % colors.length];
-        ctx.globalAlpha = opacity;
-        ctx.fill();
+        // Calculate direction cigarette points
+        // Cigarette points away from movement direction (i.e. towards mouse-to-cigarette vector)
+        const dx = x - cig.x;
+        const dy = y - cig.y;
+        const dist = Math.hypot(dx, dy);
 
-        ctx.strokeStyle = '#1A1A2E';
-        ctx.lineWidth = 1.5;
-        ctx.globalAlpha = opacity * 0.8;
-        ctx.stroke();
+        let targetAngle = cig.angle;
+        if (dist > 1.5) {
+          targetAngle = Math.atan2(-dy, -dx);
+        } else {
+          // Idle floating micro-animation
+          targetAngle = cig.angle + Math.sin(Date.now() * 0.003) * 0.001;
+        }
 
-        ctx.restore();
-      } else if (dot.shape === 'crosshair') {
-        ctx.save();
-        ctx.translate(dot.x, dot.y);
-        ctx.rotate(dot.angle);
+        // Normalize angle difference to [-PI, PI] to avoid spinning glitch
+        let angleDiff = targetAngle - cig.angle;
+        while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+        while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+        cig.angle += angleDiff * 0.15;
 
-        ctx.beginPath();
-        // Inner reticle circle
-        ctx.arc(0, 0, radius * 0.45, 0, Math.PI * 2);
-        // Horizontal scope reticle
-        ctx.moveTo(-radius * 1.2, 0);
-        ctx.lineTo(radius * 1.2, 0);
-        // Vertical scope reticle
-        ctx.moveTo(0, -radius * 1.2);
-        ctx.lineTo(0, radius * 1.2);
+        // Spawn smoke particles from the burning tip (ember) of the cigarette
+        const L = 35;
+        const ashLength = 3;
+        const tipX = cig.x + Math.cos(cig.angle) * (L - ashLength);
+        const tipY = cig.y + Math.sin(cig.angle) * (L - ashLength);
 
-        ctx.strokeStyle = colors[dot.colorIndex % colors.length];
-        ctx.lineWidth = 1.5;
-        ctx.globalAlpha = opacity;
-        ctx.stroke();
-
-        ctx.restore();
+        // Spawn smoke puffs
+        if (Math.random() < 0.5) {
+          smokeRef.current.push({
+            x: tipX,
+            y: tipY,
+            // Small wind drift opposite to cigarette's direction of movement
+            vx: (Math.random() - 0.5) * 0.35 - Math.cos(cig.angle) * 0.15,
+            // Smoke rises upwards
+            vy: -Math.random() * 0.8 - 0.4,
+            size: Math.random() * 1.5 + 1.5,
+            maxSize: Math.random() * 12 + 10,
+            opacity: Math.random() * 0.15 + 0.35,
+            lifetime: 0,
+            maxLifetime: Math.random() * 35 + 40,
+          });
+        }
       } else {
-        // Circle
-        ctx.beginPath();
-        ctx.arc(dot.x, dot.y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = colors[dot.colorIndex % colors.length];
-        ctx.globalAlpha = opacity;
-        ctx.fill();
+        cig.initialized = false;
+      }
 
-        // Add a small black outline for the comic-book feel
-        ctx.strokeStyle = '#1A1A2E';
-        ctx.lineWidth = 1.5;
-        ctx.globalAlpha = opacity * 0.8;
-        ctx.stroke();
+      // Update and draw smoke particles
+      const smoke = smokeRef.current;
+      
+      // Prevent unbounded growth of particle system
+      while (smoke.length > 80) {
+        smoke.shift();
+      }
+
+      for (let i = smoke.length - 1; i >= 0; i--) {
+        const p = smoke[i];
+        p.lifetime++;
+        
+        // Physics update
+        p.x += p.vx;
+        p.y += p.vy;
+        
+        // Add smooth wave sway as it rises
+        p.vx += Math.sin(p.lifetime * 0.07) * 0.015;
+
+        // Smoke particles expand as they rise
+        p.size = p.size + (p.maxSize - p.size) * 0.04;
+        
+        // Smoke particles fade out over lifetime
+        const lifeRatio = p.lifetime / p.maxLifetime;
+        p.opacity = (1 - lifeRatio) * 0.35;
+
+        if (p.lifetime >= p.maxLifetime) {
+          smoke.splice(i, 1);
+          continue;
+        }
+
+        // Draw soft smoke cloud
+        ctx.save();
+        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
+        // Smokey grey gradient
+        grad.addColorStop(0, `rgba(200, 200, 202, ${p.opacity})`);
+        grad.addColorStop(0.3, `rgba(180, 180, 182, ${p.opacity * 0.6})`);
+        grad.addColorStop(0.7, `rgba(140, 140, 142, ${p.opacity * 0.2})`);
+        grad.addColorStop(1, 'rgba(140, 140, 142, 0)');
+        
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Draw the cigarette itself on top of the smoke
+      if (isMouseActive) {
+        drawCigarette(ctx, cig.x, cig.y, cig.angle);
+      }
+
+    } else {
+      // Clear smoke and cigarette initialization state
+      smokeRef.current = [];
+      cigStateRef.current.initialized = false;
+
+      // Add new dot at current mouse position
+      const trail = trailRef.current;
+      if (x > 0 && y > 0) {
+        trail.unshift({
+          x,
+          y,
+          age: 0,
+          colorIndex: colorIndexRef.current,
+          shape: 'circle',
+          angle: Math.random() * Math.PI * 2,
+          angleSpeed: (Math.random() - 0.5) * 0.05,
+        });
+        colorIndexRef.current = (colorIndexRef.current + 1) % colors.length;
+      }
+
+      // Trim trail to max length
+      while (trail.length > TRAIL_LENGTH) {
+        trail.pop();
+      }
+
+      // Age and draw each dot
+      for (let i = trail.length - 1; i >= 0; i--) {
+        const dot = trail[i];
+        dot.age++;
+        dot.angle += dot.angleSpeed;
+
+        const progress = i / TRAIL_LENGTH; // 0 = newest, 1 = oldest
+        const radius = BASE_DOT_RADIUS * (1 - progress * 0.7);
+        const opacity = 1 - progress * 0.85;
+
+        if (opacity <= 0 || radius <= 0) continue;
+
+        if (dot.shape === 'star') {
+          ctx.save();
+          ctx.translate(dot.x, dot.y);
+          ctx.rotate(dot.angle);
+
+          ctx.beginPath();
+          const spikes = 4;
+          const outerRadius = radius * 1.35;
+          const innerRadius = radius * 0.45;
+          let rot = (Math.PI / 2) * 3;
+          let step = Math.PI / spikes;
+
+          ctx.moveTo(0, -outerRadius);
+          for (let j = 0; j < spikes; j++) {
+            let sx = Math.cos(rot) * outerRadius;
+            let sy = Math.sin(rot) * outerRadius;
+            ctx.lineTo(sx, sy);
+            rot += step;
+
+            sx = Math.cos(rot) * innerRadius;
+            sy = Math.sin(rot) * innerRadius;
+            ctx.lineTo(sx, sy);
+            rot += step;
+          }
+          ctx.lineTo(0, -outerRadius);
+          ctx.closePath();
+
+          ctx.fillStyle = colors[dot.colorIndex % colors.length];
+          ctx.globalAlpha = opacity;
+          ctx.fill();
+
+          ctx.strokeStyle = '#1A1A2E';
+          ctx.lineWidth = 1.5;
+          ctx.globalAlpha = opacity * 0.8;
+          ctx.stroke();
+
+          ctx.restore();
+        } else if (dot.shape === 'crosshair') {
+          ctx.save();
+          ctx.translate(dot.x, dot.y);
+          ctx.rotate(dot.angle);
+
+          ctx.beginPath();
+          // Inner reticle circle
+          ctx.arc(0, 0, radius * 0.45, 0, Math.PI * 2);
+          // Horizontal scope reticle
+          ctx.moveTo(-radius * 1.2, 0);
+          ctx.lineTo(radius * 1.2, 0);
+          // Vertical scope reticle
+          ctx.moveTo(0, -radius * 1.2);
+          ctx.lineTo(0, radius * 1.2);
+
+          ctx.strokeStyle = colors[dot.colorIndex % colors.length];
+          ctx.lineWidth = 1.5;
+          ctx.globalAlpha = opacity;
+          ctx.stroke();
+
+          ctx.restore();
+        } else {
+          // Circle
+          ctx.beginPath();
+          ctx.arc(dot.x, dot.y, radius, 0, Math.PI * 2);
+          ctx.fillStyle = colors[dot.colorIndex % colors.length];
+          ctx.globalAlpha = opacity;
+          ctx.fill();
+
+          // Add a small black outline for the comic-book feel
+          ctx.strokeStyle = '#1A1A2E';
+          ctx.lineWidth = 1.5;
+          ctx.globalAlpha = opacity * 0.8;
+          ctx.stroke();
+        }
       }
     }
 
