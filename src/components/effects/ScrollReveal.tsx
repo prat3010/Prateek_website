@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, type ReactNode } from 'react';
+import { useRef, useState, useEffect, type ReactNode } from 'react';
 import { motion, useInView } from 'framer-motion';
 
 type Direction = 'up' | 'down' | 'left' | 'right';
@@ -25,11 +25,6 @@ function getOffset(direction: Direction): { x: number; y: number } {
   }
 }
 
-function usePrefersReducedMotion(): boolean {
-  if (typeof window === 'undefined') return false;
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
-
 export default function ScrollReveal({
   children,
   direction = 'up',
@@ -38,7 +33,18 @@ export default function ScrollReveal({
 }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-80px' });
-  const prefersReducedMotion = usePrefersReducedMotion();
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const listener = (e: MediaQueryListEvent) => {
+      setPrefersReducedMotion(e.matches);
+    };
+    mediaQuery.addEventListener('change', listener);
+    return () => mediaQuery.removeEventListener('change', listener);
+  }, []);
 
   // Respect prefers-reduced-motion: render children without animation
   if (prefersReducedMotion) {

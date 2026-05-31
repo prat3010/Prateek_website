@@ -32,26 +32,41 @@ export default function Navbar({ items, className }: NavbarProps) {
   const [activeSection, setActiveSection] = useState<string>(navItems[0]?.href ?? '');
   const { isNoir, toggleTheme } = useTheme();
 
-  /* ---------- Scroll tracking ---------- */
+  /* ---------- Scroll tracking for background color ---------- */
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
-
-      // Determine active section
-      const scrollPos = window.scrollY + 120;
-      for (let i = navItems.length - 1; i >= 0; i--) {
-        const id = navItems[i].href.replace('#', '');
-        const el = document.getElementById(id);
-        if (el && el.offsetTop <= scrollPos) {
-          setActiveSection(navItems[i].href);
-          break;
-        }
-      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  /* ---------- Intersection Observer for Section Tracking ---------- */
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: '-30% 0px -30% 0px', // Focus on middle portion of screen
+      threshold: 0.15,
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const href = `#${entry.target.id}`;
+          setActiveSection(href);
+        }
+      });
+    }, observerOptions);
+
+    navItems.forEach((item) => {
+      const id = item.href.replace('#', '');
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
   }, [navItems]);
 
   /* ---------- Lock body scroll when mobile menu open ---------- */

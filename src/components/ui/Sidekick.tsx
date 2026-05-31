@@ -167,9 +167,9 @@ export default function Sidekick() {
       setIsIdle(false);
     };
 
-    window.addEventListener('scroll', resetActivity);
+    window.addEventListener('scroll', resetActivity, { passive: true });
     window.addEventListener('click', resetActivity);
-    window.addEventListener('touchstart', resetActivity);
+    window.addEventListener('touchstart', resetActivity, { passive: true });
 
     const interval = setInterval(() => {
       const elapsed = Date.now() - lastActivityRef.current;

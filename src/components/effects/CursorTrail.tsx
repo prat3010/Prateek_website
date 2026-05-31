@@ -115,6 +115,7 @@ export default function CursorTrail() {
   const frameRef = useRef<number>(0);
   const colorIndexRef = useRef(0);
   const isTouchDevice = useRef(false);
+  const isLoopActiveRef = useRef(false);
 
   const colors = isNoir ? NOIR_COLORS : POP_COLORS;
 
@@ -358,8 +359,23 @@ export default function CursorTrail() {
 
     ctx.globalAlpha = 1;
 
-    frameRef.current = requestAnimationFrame(draw);
+    const hasItemsToDraw = isNoir
+      ? (smokeRef.current.length > 0 || (mouseRef.current.x > 0 && mouseRef.current.y > 0))
+      : (trailRef.current.length > 0 || (mouseRef.current.x > 0 && mouseRef.current.y > 0));
+
+    if (hasItemsToDraw) {
+      frameRef.current = requestAnimationFrame(draw);
+    } else {
+      isLoopActiveRef.current = false;
+    }
   }, [isNoir, colors]);
+
+  const wakeLoop = useCallback(() => {
+    if (!isLoopActiveRef.current) {
+      isLoopActiveRef.current = true;
+      frameRef.current = requestAnimationFrame(draw);
+    }
+  }, [draw]);
 
   useEffect(() => {
     // Don't enable on touch/coarse-pointer devices
@@ -383,6 +399,7 @@ export default function CursorTrail() {
 
     const handleMouseMove = (e: MouseEvent) => {
       mouseRef.current = { x: e.clientX, y: e.clientY };
+      wakeLoop();
     };
 
     const handleMouseLeave = () => {
@@ -394,6 +411,7 @@ export default function CursorTrail() {
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     document.addEventListener('mouseleave', handleMouseLeave);
 
+    isLoopActiveRef.current = true;
     frameRef.current = requestAnimationFrame(draw);
 
     return () => {
@@ -402,7 +420,7 @@ export default function CursorTrail() {
       document.removeEventListener('mouseleave', handleMouseLeave);
       cancelAnimationFrame(frameRef.current);
     };
-  }, [draw]);
+  }, [draw, wakeLoop]);
 
   // Don't render canvas on touch devices
   if (typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches) {

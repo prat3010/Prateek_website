@@ -1,8 +1,72 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { GridNode } from './pathfindingAlgorithms';
 import styles from './Playground.module.css';
+
+interface CellProps {
+  col: number;
+  row: number;
+  isStart: boolean;
+  isEnd: boolean;
+  isWall: boolean;
+  isVisited: boolean;
+  isPath: boolean;
+  isNoir: boolean;
+  onMouseDown: (col: number, row: number, e: React.MouseEvent) => void;
+  onMouseEnter: (col: number, row: number) => void;
+}
+
+const Cell = React.memo(function Cell({
+  col,
+  row,
+  isStart,
+  isEnd,
+  isWall,
+  isVisited,
+  isPath,
+  isNoir,
+  onMouseDown,
+  onMouseEnter,
+}: CellProps) {
+  let cellClass = styles.cell;
+  if (isStart) cellClass += ` ${styles.cellStart}`;
+  else if (isEnd) cellClass += ` ${styles.cellEnd}`;
+  else if (isWall) cellClass += ` ${styles.cellWall}`;
+  else if (isPath) cellClass += ` ${styles.cellPath}`;
+  else if (isVisited) cellClass += ` ${styles.cellVisited}`;
+
+  let nodeContent = null;
+  if (isStart) {
+    nodeContent = (
+      <span className={styles.nodeIcon} aria-label="Start Node">
+        {isNoir ? '🕶️' : '🦸'}
+      </span>
+    );
+  } else if (isEnd) {
+    nodeContent = (
+      <span className={styles.nodeIcon} aria-label="End Node">
+        {isNoir ? '📁' : '🌀'}
+      </span>
+    );
+  }
+
+  return (
+    <div
+      className={cellClass}
+      onMouseDown={(e) => onMouseDown(col, row, e)}
+      onMouseEnter={() => onMouseEnter(col, row)}
+      data-col={col}
+      data-row={row}
+      role="gridcell"
+      aria-label={`Cell col ${col}, row ${row}. ${
+        isStart ? 'Start' : isEnd ? 'End' : isWall ? 'Wall' : isPath ? 'Path' : isVisited ? 'Visited' : 'Empty'
+      }`}
+    >
+      {nodeContent}
+    </div>
+  );
+});
 
 interface PathfinderProps {
   cols: number;
@@ -47,7 +111,7 @@ export default function Pathfinder({
     return () => window.removeEventListener('mouseup', handleMouseUp);
   }, []);
 
-  const handleCellMouseDown = (col: number, row: number, e: React.MouseEvent) => {
+  const handleCellMouseDown = useCallback((col: number, row: number, e: React.MouseEvent) => {
     if (isRunning) return;
     e.preventDefault();
 
@@ -62,19 +126,23 @@ export default function Pathfinder({
     } else {
       if (walls.has(key)) {
         setInteractionMode('erase-walls');
-        const newWalls = new Set(walls);
-        newWalls.delete(key);
-        setWalls(newWalls);
+        setWalls((prev) => {
+          const newWalls = new Set(prev);
+          newWalls.delete(key);
+          return newWalls;
+        });
       } else {
         setInteractionMode('draw-walls');
-        const newWalls = new Set(walls);
-        newWalls.add(key);
-        setWalls(newWalls);
+        setWalls((prev) => {
+          const newWalls = new Set(prev);
+          newWalls.add(key);
+          return newWalls;
+        });
       }
     }
-  };
+  }, [isRunning, startNode.col, startNode.row, endNode.col, endNode.row, walls, setWalls]);
 
-  const handleCellMouseEnter = (col: number, row: number) => {
+  const handleCellMouseEnter = useCallback((col: number, row: number) => {
     if (isRunning || interactionMode === 'idle') return;
 
     const key = `${col},${row}`;
@@ -91,18 +159,22 @@ export default function Pathfinder({
       }
     } else if (interactionMode === 'draw-walls') {
       if (!isStart && !isEnd && !walls.has(key)) {
-        const newWalls = new Set(walls);
-        newWalls.add(key);
-        setWalls(newWalls);
+        setWalls((prev) => {
+          const newWalls = new Set(prev);
+          newWalls.add(key);
+          return newWalls;
+        });
       }
     } else if (interactionMode === 'erase-walls') {
       if (walls.has(key)) {
-        const newWalls = new Set(walls);
-        newWalls.delete(key);
-        setWalls(newWalls);
+        setWalls((prev) => {
+          const newWalls = new Set(prev);
+          newWalls.delete(key);
+          return newWalls;
+        });
       }
     }
-  };
+  }, [isRunning, interactionMode, startNode.col, startNode.row, endNode.col, endNode.row, walls, setStartNode, setEndNode, setWalls]);
 
   // Touch Handlers for Mobile Draw/Drag Support
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -203,44 +275,20 @@ export default function Pathfinder({
       const isVisited = visitedNodes.has(key);
       const isPath = pathNodes.has(key);
 
-      let cellClass = styles.cell;
-      if (isStart) cellClass += ` ${styles.cellStart}`;
-      else if (isEnd) cellClass += ` ${styles.cellEnd}`;
-      else if (isWall) cellClass += ` ${styles.cellWall}`;
-      else if (isPath) cellClass += ` ${styles.cellPath}`;
-      else if (isVisited) cellClass += ` ${styles.cellVisited}`;
-
-      // Start/End Icon emojis corresponding to themes
-      let nodeContent = null;
-      if (isStart) {
-        nodeContent = (
-          <span className={styles.nodeIcon} aria-label="Start Node">
-            {isNoir ? '🕶️' : '🦸'}
-          </span>
-        );
-      } else if (isEnd) {
-        nodeContent = (
-          <span className={styles.nodeIcon} aria-label="End Node">
-            {isNoir ? '📁' : '🌀'}
-          </span>
-        );
-      }
-
       cells.push(
-        <div
+        <Cell
           key={key}
-          className={cellClass}
-          onMouseDown={(e) => handleCellMouseDown(c, r, e)}
-          onMouseEnter={() => handleCellMouseEnter(c, r)}
-          data-col={c}
-          data-row={r}
-          role="gridcell"
-          aria-label={`Cell col ${c}, row ${r}. ${
-            isStart ? 'Start' : isEnd ? 'End' : isWall ? 'Wall' : isPath ? 'Path' : isVisited ? 'Visited' : 'Empty'
-          }`}
-        >
-          {nodeContent}
-        </div>
+          col={c}
+          row={r}
+          isStart={isStart}
+          isEnd={isEnd}
+          isWall={isWall}
+          isVisited={isVisited}
+          isPath={isPath}
+          isNoir={isNoir}
+          onMouseDown={handleCellMouseDown}
+          onMouseEnter={handleCellMouseEnter}
+        />
       );
     }
   }

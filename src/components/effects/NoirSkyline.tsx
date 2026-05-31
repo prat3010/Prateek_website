@@ -57,9 +57,11 @@ export default function NoirSkyline() {
     };
   }, []);
 
-  if (!mounted) return null;
+  
 
   const isActive = theme === 'noir' || pendingTheme === 'noir';
+
+  if (!mounted || !isActive) return null;
 
   return (
     <div className={`${styles.container} ${isActive ? styles.active : ''}`}>
@@ -71,7 +73,58 @@ export default function NoirSkyline() {
 
       {/* ── Layer 0: Sky backdrop, Searchlights, and Rain ── */}
       <div className={styles.layer}>
-        <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%' }}>
+        <Layer0 />
+      </div>
+
+      {/* ── Layer 1: Background Buildings (Parallax Scale 1.12) ── */}
+      <motion.div
+        style={{ scale: bgScale, y: bgY, zIndex: 1 }}
+        className={styles.layer}
+      >
+        <motion.div
+          animate={{ x: mouseOffset.x * -10, y: mouseOffset.y * -8 }}
+          transition={{ type: 'spring', damping: 30, stiffness: 90 }}
+          style={{ width: '100%', height: '100%' }}
+        >
+          <Layer1 />
+        </motion.div>
+      </motion.div>
+
+      <motion.div
+        style={{ scale: midScale, y: midY, zIndex: 2 }}
+        className={styles.layer}
+      >
+        <motion.div
+          animate={{ x: mouseOffset.x * -24, y: mouseOffset.y * -16 }}
+          transition={{ type: 'spring', damping: 28, stiffness: 85 }}
+          style={{ width: '100%', height: '100%' }}
+        >
+          <Layer2 />
+        </motion.div>
+      </motion.div>
+
+      {/* ── Layer 3: Foreground Rooftops (Parallax Scale 1.8, Masks midground, high opacity) ── */}
+      <motion.div
+        style={{ scale: fgScale, y: fgY, opacity: fgOpacity, zIndex: 3 }}
+        className={styles.layer}
+      >
+        <motion.div
+          animate={{ x: mouseOffset.x * -42, y: mouseOffset.y * -28 }}
+          transition={{ type: 'spring', damping: 24, stiffness: 80 }}
+          style={{ width: '100%', height: '100%' }}
+        >
+          <Layer3 reducedMotion={reducedMotion} />
+        </motion.div>
+      </motion.div>
+
+    </div>
+  );
+}
+
+
+const Layer0 = React.memo(function Layer0() {
+  return (
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%' }}>
           <defs>
             {/* Left Searchlight Gradient */}
             <linearGradient id="leftLightGrad" x1="0" y1="1" x2="0" y2="0">
@@ -231,19 +284,14 @@ export default function NoirSkyline() {
             <path d="M 30 15 Q 35 10 40 15 Q 45 10 50 15" />
           </g>
         </svg>
-      </div>
+  );
+});
+Layer0.displayName = 'Layer0';
 
-      {/* ── Layer 1: Background Buildings (Parallax Scale 1.12) ── */}
-      <motion.div
-        style={{ scale: bgScale, y: bgY, zIndex: 1 }}
-        className={styles.layer}
-      >
-        <motion.div
-          animate={{ x: mouseOffset.x * -10, y: mouseOffset.y * -8 }}
-          transition={{ type: 'spring', damping: 30, stiffness: 90 }}
-          style={{ width: '100%', height: '100%' }}
-        >
-          <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%' }}>
+
+const Layer1 = React.memo(function Layer1() {
+  return (
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%' }}>
             <defs>
               <pattern id="hatch-bg" width="6" height="6" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
                 <line x1="0" y1="0" x2="0" y2="6" stroke="rgba(250, 250, 250, 0.08)" strokeWidth="0.8" />
@@ -457,19 +505,14 @@ export default function NoirSkyline() {
               <line x1="1220" y1="680" x2="1220" y2="683" className={styles.windowFlicker2} />
             </g>
           </svg>
-        </motion.div>
-      </motion.div>
+  );
+});
+Layer1.displayName = 'Layer1';
 
-      <motion.div
-        style={{ scale: midScale, y: midY, zIndex: 2 }}
-        className={styles.layer}
-      >
-        <motion.div
-          animate={{ x: mouseOffset.x * -24, y: mouseOffset.y * -16 }}
-          transition={{ type: 'spring', damping: 28, stiffness: 85 }}
-          style={{ width: '100%', height: '100%' }}
-        >
-          <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%' }}>
+
+const Layer2 = React.memo(function Layer2() {
+  return (
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%' }}>
             <defs>
               <pattern id="hatch-mid" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
                 <line x1="0" y1="0" x2="0" y2="8" stroke="rgba(250, 250, 250, 0.15)" strokeWidth="1.0" />
@@ -744,20 +787,14 @@ export default function NoirSkyline() {
               <line x1="1570" y1="760" x2="1570" y2="763" className={styles.windowFlicker3} />
             </g>
           </svg>
-        </motion.div>
-      </motion.div>
+  );
+});
+Layer2.displayName = 'Layer2';
 
-      {/* ── Layer 3: Foreground Rooftops (Parallax Scale 1.8, Masks midground, high opacity) ── */}
-      <motion.div
-        style={{ scale: fgScale, y: fgY, opacity: fgOpacity, zIndex: 3 }}
-        className={styles.layer}
-      >
-        <motion.div
-          animate={{ x: mouseOffset.x * -42, y: mouseOffset.y * -28 }}
-          transition={{ type: 'spring', damping: 24, stiffness: 80 }}
-          style={{ width: '100%', height: '100%' }}
-        >
-          <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%' }}>
+
+const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: boolean }) {
+  return (
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%' }}>
             <defs>
               {/* Fog Mist Vertical Linear Gradient */}
               <linearGradient id="fogGradient" x1="0" y1="1" x2="0" y2="0">
@@ -1519,9 +1556,6 @@ export default function NoirSkyline() {
               />
             </g>
           </svg>
-        </motion.div>
-      </motion.div>
-
-    </div>
   );
-}
+});
+Layer3.displayName = 'Layer3';
