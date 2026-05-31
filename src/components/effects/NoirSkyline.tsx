@@ -1097,37 +1097,68 @@ export default function NoirSkyline() {
 
               {/* Steel Plate Joint Seams on Tower Legs */}
               <path 
-                d="M 850 750 L 870 750 M 890 750 L 910 750 M 850 780 L 870 780 M 890 780 L 910 780 M 850 810 L 870 810 M 890 810 L 910 810 M 850 840 L 870 840 M 890 840 L 910 840 M 850 870 L 870 870 M 890 870 L 910 870 M 850 900 L 870 900 M 890 900 L 910 900 M 850 930 L 870 930 M 890 930 L 910 930 M 850 960 L 870 960 M 890 960 L 910 960 M 850 990 L 870 990 M 890 990 L 910 990 M 850 1020 L 870 1020 M 890 1020 L 910 1020 M 850 1050 L 870 1050 M 890 1050 L 910 1050 M 860 730 L 860 1080 M 900 730 L 900 1080" 
+                d="M 850 750 L 870 750 M 890 750 L 910 750 M 850 780 L 870 780 M 890 780 L 910 780 M 850 810 L 870 810 M 890 810 L 910 810 M 850 840 L 870 840 M 890 840 L 910 840 M 850 870 L 870 870 M 890 870 L 910 870 M 850 900 L 870 900 M 890 900 L 910 900 M 850 930 L 870 930 M 890 930 L 910 930 M 860 730 L 860 935 M 900 730 L 900 935" 
                 stroke="rgba(250, 250, 250, 0.22)" 
                 strokeWidth="0.8" 
                 fill="none" 
               />
 
-              {/* Bridge Tower Structural Steel Trusses */}
+              {/* Bridge Tower Structural Steel Trusses (Extended above and below deck) */}
               <g stroke="rgba(250, 250, 250, 0.30)" strokeWidth="0.9" fill="none">
+                {/* Inner legs vertical lines */}
                 <line x1="870" y1="730" x2="870" y2="780" />
                 <line x1="890" y1="730" x2="890" y2="780" />
-                {/* Diagonal Cross-bracing (X trusses) in tower panels */}
+                
+                {/* Upper Center Trusses (above deck) */}
                 <line x1="870" y1="730" x2="890" y2="760" />
                 <line x1="890" y1="730" x2="870" y2="760" />
                 <line x1="870" y1="760" x2="890" y2="760" />
                 <line x1="870" y1="760" x2="890" y2="790" />
                 <line x1="890" y1="760" x2="870" y2="790" />
                 <line x1="850" y1="790" x2="910" y2="790" strokeWidth="1.2" />
-                {/* Left Leg Panel Diagonals */}
+
+                {/* Left Leg Upper Diagonals */}
                 <line x1="850" y1="790" x2="870" y2="850" />
                 <line x1="870" y1="790" x2="850" y2="850" />
                 <line x1="850" y1="850" x2="870" y2="850" />
                 <line x1="850" y1="850" x2="870" y2="910" />
                 <line x1="870" y1="850" x2="850" y2="910" />
                 <line x1="850" y1="910" x2="870" y2="910" />
-                {/* Right Leg Panel Diagonals */}
+
+                {/* Right Leg Upper Diagonals */}
                 <line x1="890" y1="790" x2="910" y2="850" />
                 <line x1="910" y1="790" x2="890" y2="850" />
                 <line x1="890" y1="850" x2="910" y2="850" />
                 <line x1="890" y1="850" x2="910" y2="910" />
                 <line x1="910" y1="850" x2="890" y2="910" />
                 <line x1="890" y1="910" x2="910" y2="910" />
+
+                {/* Lower Inner columns extending below deck */}
+                <line x1="870" y1="850" x2="870" y2="935" />
+                <line x1="890" y1="850" x2="890" y2="935" />
+
+                {/* Lower Center Trusses (below deck, x=870-890) */}
+                <line x1="870" y1="850" x2="890" y2="880" />
+                <line x1="890" y1="850" x2="870" y2="880" />
+                <line x1="870" y1="880" x2="890" y2="880" />
+                
+                <line x1="870" y1="880" x2="890" y2="910" />
+                <line x1="890" y1="880" x2="870" y2="910" />
+                <line x1="870" y1="910" x2="890" y2="910" strokeWidth="1.2" />
+
+                <line x1="870" y1="910" x2="890" y2="935" />
+                <line x1="890" y1="910" x2="870" y2="935" />
+                <line x1="870" y1="935" x2="890" y2="935" strokeWidth="1.4" />
+
+                {/* Left Leg Lower Diagonals (x=850-870, y=910-935) */}
+                <line x1="850" y1="910" x2="870" y2="935" />
+                <line x1="870" y1="910" x2="850" y2="935" />
+                <line x1="850" y1="935" x2="870" y2="935" strokeWidth="1.2" />
+
+                {/* Right Leg Lower Diagonals (x=890-910, y=910-935) */}
+                <line x1="890" y1="910" x2="910" y2="935" />
+                <line x1="910" y1="910" x2="890" y2="935" />
+                <line x1="890" y1="935" x2="910" y2="935" strokeWidth="1.2" />
               </g>
 
               {/* Decorative Art Deco Tower Crown Plates */}
@@ -1146,6 +1177,54 @@ export default function NoirSkyline() {
                 <path d="M 868 840 A 9 20 0 0 1 892 840" stroke="rgba(250, 250, 250, 0.35)" strokeWidth="0.8" />
                 <path d="M 865 910 A 12 25 0 0 1 895 910" stroke="rgba(250, 250, 250, 0.48)" strokeWidth="1.2" />
                 <path d="M 868 910 A 9 20 0 0 1 892 910" stroke="rgba(250, 250, 250, 0.35)" strokeWidth="0.8" />
+              </g>
+
+              {/* Concrete Pier / Caisson Base at the Waterline */}
+              <g fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.48)" strokeWidth="1.5">
+                {/* Stepped Block 1 (Top) */}
+                <rect x="842" y="935" width="76" height="15" rx="2" />
+                {/* Stepped Block 2 (Middle, water contact) */}
+                <rect x="832" y="950" width="96" height="18" rx="3" />
+                {/* Stepped Block 3 (Submerged Pier) */}
+                <rect x="838" y="968" width="84" height="112" />
+              </g>
+
+              {/* Art Deco Recessed Panel Grooves on concrete base */}
+              <g stroke="rgba(250, 250, 250, 0.22)" strokeWidth="1.0" fill="none">
+                <line x1="860" y1="968" x2="860" y2="1080" />
+                <line x1="880" y1="968" x2="880" y2="1080" />
+                <line x1="900" y1="968" x2="900" y2="1080" />
+                {/* Horizontal banding accents on concrete pier */}
+                <line x1="838" y1="990" x2="922" y2="990" />
+                <line x1="838" y1="1025" x2="922" y2="1025" />
+                <line x1="838" y1="1060" x2="922" y2="1060" />
+              </g>
+
+              {/* Protective Harbor Dolphin Piles next to tower */}
+              {/* Left dolphin piles */}
+              <g fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.4)" strokeWidth="1">
+                <rect x="783" y="934" width="4.5" height="50" rx="1.2" />
+                <rect x="791" y="930" width="4.5" height="54" rx="1.2" />
+                <rect x="787" y="926" width="4.5" height="58" rx="1.2" />
+                {/* Steel cable wraps binding them */}
+                <path d="M 783 942 L 795.5 942 M 783 944 L 795.5 944 M 783 955 L 795.5 955 M 783 957 L 795.5 957" stroke="rgba(250,250,250,0.6)" strokeWidth="0.8" fill="none" />
+              </g>
+              {/* Right dolphin piles */}
+              <g fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.4)" strokeWidth="1">
+                <rect x="972" y="934" width="4.5" height="50" rx="1.2" />
+                <rect x="964" y="930" width="4.5" height="54" rx="1.2" />
+                <rect x="968" y="926" width="4.5" height="58" rx="1.2" />
+                {/* Steel cable wraps binding them */}
+                <path d="M 964 942 L 976.5 942 M 964 944 L 976.5 944 M 964 955 L 976.5 955 M 964 957 L 976.5 957" stroke="rgba(250,250,250,0.6)" strokeWidth="0.8" fill="none" />
+              </g>
+
+              {/* Stylized water reflection ripples under the concrete pier */}
+              <g stroke="rgba(250, 250, 250, 0.25)" strokeWidth="0.8" fill="none">
+                <line x1="810" y1="974" x2="950" y2="974" strokeDasharray="6 4" />
+                <line x1="825" y1="984" x2="935" y2="984" strokeDasharray="5 5" />
+                <line x1="840" y1="994" x2="920" y2="994" strokeDasharray="4 6" />
+                <line x1="855" y1="1004" x2="905" y2="1004" strokeDasharray="3 7" />
+                <line x1="865" y1="1014" x2="895" y2="1014" strokeDasharray="2 8" />
               </g>
 
               {/* Bridge Cables */}
