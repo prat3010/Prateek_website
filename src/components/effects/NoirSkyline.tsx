@@ -255,7 +255,7 @@ export default function NoirSkyline() {
               <line x1="269" y1="720" x2="269" y2="1080" strokeDasharray="3 6" />
               <line x1="245" y1="650" x2="245" y2="1080" />
               <line x1="259" y1="650" x2="259" y2="1080" />
-              <line x1="252" y1="280" x2="252" y2="650" />
+              <line x1="252" y1="350" x2="252" y2="650" />
               
               {/* Chrysler-inspired Arched Spire Tower (Left-Center) */}
               <path d="M 450 1080 L 450 670 L 458 640 L 468 640 L 468 590 L 478 590 L 478 535 L 488 500 L 498 340 L 508 500 L 518 535 L 518 590 L 528 590 L 528 640 L 538 640 L 546 670 L 546 1080 Z" />
