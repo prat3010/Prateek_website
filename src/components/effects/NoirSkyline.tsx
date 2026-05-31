@@ -87,6 +87,13 @@ export default function NoirSkyline() {
               <stop offset="60%" stopColor="rgba(255, 255, 255, 0.08)" />
               <stop offset="100%" stopColor="rgba(255, 255, 255, 0)" />
             </linearGradient>
+
+            {/* Radial Moon Glow Gradient */}
+            <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="rgba(255, 255, 255, 0.45)" />
+              <stop offset="70%" stopColor="rgba(255, 255, 255, 0.08)" />
+              <stop offset="100%" stopColor="rgba(255, 255, 255, 0)" />
+            </radialGradient>
           </defs>
 
           {/* Twinkling Starfield */}
@@ -106,6 +113,19 @@ export default function NoirSkyline() {
             <circle cx="1520" cy="90" r="1.1" className={styles.star1} />
             <circle cx="1700" cy="110" r="0.7" className={styles.star2} />
             <circle cx="1820" cy="140" r="1.0" className={styles.star3} />
+          </g>
+
+          {/* Glowing Noir Full Moon & Clouds */}
+          <g pointerEvents="none">
+            {/* Soft outer glow */}
+            <circle cx="650" cy="250" r="100" fill="url(#moonGlow)" stroke="none" />
+            {/* Main Moon body */}
+            <circle cx="650" cy="250" r="50" fill="rgba(250, 250, 250, 0.12)" stroke="rgba(250, 250, 250, 0.22)" strokeWidth="0.8" />
+            
+            {/* Wispy cloud silhouettes passing in front of the moon */}
+            <path d="M 500 240 Q 650 260 800 240 Q 650 220 500 240 Z" fill="rgba(250, 250, 250, 0.04)" stroke="none" />
+            <path d="M 550 265 Q 670 280 790 265 Q 670 250 550 265 Z" fill="rgba(250, 250, 250, 0.03)" stroke="none" />
+            <path d="M 460 215 Q 600 230 740 215 Q 600 200 460 215 Z" fill="rgba(250, 250, 250, 0.03)" stroke="none" />
           </g>
 
           {/* Detailed Gliding Retro Airship/Dirigible */}
@@ -220,15 +240,14 @@ export default function NoirSkyline() {
           <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%' }}>
             <g className={styles.buildingGroup} stroke="rgba(250, 250, 250, 0.22)" strokeWidth="0.8">
               {/* Left distant skyscrapers */}
-              <path d="M 50 1080 L 50 780 L 90 780 L 90 740 L 120 740 L 120 1080" />
+              <path d="M 50 1080 L 50 780 L 90 780 L 90 740 L 120 740 L 120 1080 Z" />
               <line x1="90" y1="740" x2="90" y2="780" />
               <line x1="60" y1="780" x2="60" y2="1080" strokeDasharray="2 8" />
               <line x1="75" y1="780" x2="75" y2="1080" strokeDasharray="2 8" />
               <line x1="105" y1="740" x2="105" y2="1080" strokeDasharray="2 8" />
               
               {/* Stepped Needle Tower (Left-Mid) */}
-              <path d="M 220 1080 L 220 720 L 230 720 L 230 650 L 240 650 L 240 540 L 246 540 L 246 450 L 250 450 L 250 350" />
-              <path d="M 254 350 L 254 450 L 258 450 L 258 540 L 264 540 L 264 650 L 274 650 L 274 720 L 284 720 L 284 1080" />
+              <path d="M 220 1080 L 220 720 L 230 720 L 230 650 L 240 650 L 240 540 L 246 540 L 246 450 L 250 450 L 250 350 L 251 350 L 252 280 L 253 350 L 254 350 L 254 450 L 258 450 L 258 540 L 264 540 L 264 650 L 274 650 L 274 720 L 284 720 L 284 1080 Z" />
               <line x1="220" y1="720" x2="284" y2="720" />
               <line x1="230" y1="650" x2="274" y2="650" />
               <line x1="240" y1="540" x2="264" y2="540" />
@@ -236,9 +255,10 @@ export default function NoirSkyline() {
               <line x1="269" y1="720" x2="269" y2="1080" strokeDasharray="3 6" />
               <line x1="245" y1="650" x2="245" y2="1080" />
               <line x1="259" y1="650" x2="259" y2="1080" />
+              <line x1="252" y1="280" x2="252" y2="650" />
               
               {/* Chrysler-inspired Arched Spire Tower (Left-Center) */}
-              <path d="M 450 1080 L 450 670 L 458 640 L 468 640 L 468 590 L 478 590 L 478 535 L 488 500 L 498 340 L 508 500 L 518 535 L 518 590 L 528 590 L 528 640 L 538 640 L 546 670 L 546 1080" />
+              <path d="M 450 1080 L 450 670 L 458 640 L 468 640 L 468 590 L 478 590 L 478 535 L 488 500 L 498 340 L 508 500 L 518 535 L 518 590 L 528 590 L 528 640 L 538 640 L 546 670 L 546 1080 Z" />
               {/* Chrysler internal details */}
               <path d="M 478 535 A 10 10 0 0 1 518 535" />
               <path d="M 468 590 A 20 20 0 0 1 528 590" />
@@ -272,7 +292,7 @@ export default function NoirSkyline() {
               <line x1="985" y1="830" x2="985" y2="1080" />
 
               {/* Flat top tower with twin antenna (Right-Mid) */}
-              <path d="M 1320 1080 L 1320 620 L 1420 620 L 1420 1080" />
+              <path d="M 1320 1080 L 1320 620 L 1420 620 L 1420 1080 Z" />
               <line x1="1350" y1="620" x2="1350" y2="540" />
               <line x1="1390" y1="620" x2="1390" y2="520" />
               <line x1="1340" y1="620" x2="1340" y2="1080" strokeDasharray="5 5" />
@@ -281,7 +301,7 @@ export default function NoirSkyline() {
               <line x1="1400" y1="620" x2="1400" y2="1080" strokeDasharray="5 5" />
 
               {/* Steeped Block Tower (Far Right) */}
-              <path d="M 1720 1080 L 1720 740 L 1735 740 L 1735 680 L 1750 680 L 1750 580 L 1790 580 L 1790 680 L 1805 680 L 1805 740 L 1820 740 L 1820 1080" />
+              <path d="M 1720 1080 L 1720 740 L 1735 740 L 1735 680 L 1750 680 L 1750 580 L 1790 580 L 1790 680 L 1805 680 L 1805 740 L 1820 740 L 1820 1080 Z" />
               <line x1="1720" y1="740" x2="1820" y2="740" />
               <line x1="1735" y1="680" x2="1805" y2="680" />
               <line x1="1750" y1="580" x2="1790" y2="580" />
@@ -291,7 +311,7 @@ export default function NoirSkyline() {
 
 
               {/* ── NEW: Art Deco Tower (Gap 1: x=140-200) ── */}
-              <path d="M 140 1080 L 140 700 L 155 700 L 155 660 L 170 660 L 170 620 L 175 580 L 180 620 L 195 620 L 195 660 L 200 660 L 200 1080" />
+              <path d="M 140 1080 L 140 700 L 155 700 L 155 660 L 170 660 L 170 620 L 175 580 L 180 620 L 195 620 L 195 660 L 200 660 L 200 1080 Z" />
               <line x1="155" y1="660" x2="195" y2="660" />
               <line x1="140" y1="700" x2="200" y2="700" />
               <line x1="160" y1="700" x2="160" y2="1080" strokeDasharray="2 7" />
@@ -299,7 +319,7 @@ export default function NoirSkyline() {
               <line x1="170" y1="660" x2="170" y2="1080" strokeDasharray="2 7" />
 
               {/* ── NEW: Slim Needle Spire (Gap 2a: x=630-670) ── */}
-              <path d="M 630 1080 L 630 640 L 640 640 L 640 520 L 650 400 L 660 520 L 660 640 L 670 640 L 670 1080" />
+              <path d="M 630 1080 L 630 640 L 640 640 L 640 520 L 650 400 L 660 520 L 660 640 L 670 640 L 670 1080 Z" />
               <line x1="630" y1="640" x2="670" y2="640" />
               <line x1="640" y1="520" x2="660" y2="520" />
               <line x1="650" y1="400" x2="650" y2="520" />
@@ -307,8 +327,8 @@ export default function NoirSkyline() {
               <line x1="655" y1="640" x2="655" y2="1080" strokeDasharray="2 8" />
 
               {/* ── NEW: Twin Tower Complex (Gap 2b: x=740-840) ── */}
-              <path d="M 740 1080 L 740 590 L 780 590 L 780 1080" />
-              <path d="M 800 1080 L 800 550 L 840 550 L 840 1080" />
+              <path d="M 740 1080 L 740 590 L 780 590 L 780 1080 Z" />
+              <path d="M 800 1080 L 800 550 L 840 550 L 840 1080 Z" />
               <line x1="740" y1="590" x2="780" y2="590" />
               <line x1="800" y1="550" x2="840" y2="550" />
               {/* Twin tower connecting skybridge */}
@@ -323,7 +343,7 @@ export default function NoirSkyline() {
               <line x1="820" y1="550" x2="820" y2="480" />
 
               {/* ── NEW: Setback Office Block (Gap 3a: x=1050-1140) ── */}
-              <path d="M 1050 1080 L 1050 680 L 1070 680 L 1070 600 L 1100 600 L 1100 530 L 1110 530 L 1110 600 L 1140 600 L 1140 1080" />
+              <path d="M 1050 1080 L 1050 680 L 1070 680 L 1070 600 L 1100 600 L 1100 530 L 1110 530 L 1110 600 L 1140 600 L 1140 1080 Z" />
               <line x1="1050" y1="680" x2="1140" y2="680" />
               <line x1="1070" y1="600" x2="1140" y2="600" />
               <line x1="1060" y1="680" x2="1060" y2="1080" strokeDasharray="3 6" />
@@ -332,7 +352,7 @@ export default function NoirSkyline() {
               <line x1="1130" y1="680" x2="1130" y2="1080" strokeDasharray="3 6" />
 
               {/* ── NEW: Narrow Deco Tower (Gap 3b: x=1200-1260) ── */}
-              <path d="M 1200 1080 L 1200 640 L 1215 640 L 1215 560 L 1225 520 L 1235 560 L 1245 560 L 1245 640 L 1260 640 L 1260 1080" />
+              <path d="M 1200 1080 L 1200 640 L 1215 640 L 1215 560 L 1225 520 L 1235 560 L 1245 560 L 1245 640 L 1260 640 L 1260 1080 Z" />
               <line x1="1200" y1="640" x2="1260" y2="640" />
               <line x1="1215" y1="560" x2="1245" y2="560" />
               <line x1="1225" y1="520" x2="1225" y2="560" />
@@ -707,6 +727,13 @@ export default function NoirSkyline() {
                 <stop offset="0%" stopColor="rgba(255, 255, 255, 0.55)" />
                 <stop offset="50%" stopColor="rgba(255, 255, 255, 0.2)" />
                 <stop offset="100%" stopColor="rgba(255, 255, 255, 0)" />
+              </linearGradient>
+
+              {/* Billboard Spotlight Gradient */}
+              <linearGradient id="leftLightGrad" x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0%" stopColor="rgba(250, 250, 250, 0.15)" />
+                <stop offset="60%" stopColor="rgba(250, 250, 250, 0.04)" />
+                <stop offset="100%" stopColor="rgba(250, 250, 250, 0)" />
               </linearGradient>
             </defs>
             {/* Foreground elements */}
