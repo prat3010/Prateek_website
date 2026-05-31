@@ -30,6 +30,10 @@
   opacity: 0.05;
 }
 
+:global([data-theme='noir']) .panel::after {
+  display: none !important;
+}
+
 .panel:hover {
   box-shadow: var(--shadow-pop-lg);
   transform: translateY(-2px);

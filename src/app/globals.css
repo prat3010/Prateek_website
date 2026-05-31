@@ -196,6 +196,22 @@
   scrollbar-color: #4a4a50 #08080a !important;
 }
 
+/* ─ Hide all dot / halftone overlays in Noir mode so they don't bleed over the skyline ─ */
+[data-theme='noir'] .halftone-overlay::after,
+[data-theme='noir'] .halftone-overlay-medium::after,
+[data-theme='noir'] .halftone-overlay-heavy::after,
+[data-theme='noir'] .halftone-overlay-color::after,
+[data-theme='noir'] .dot-bg {
+  display: none !important;
+}
+
+/* ─ Make sections transparent in Noir mode to reveal the fixed skyline background ─ */
+[data-theme='noir'] section {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
 /* ─ Theme Transition Classes ─ */
 body,
 section,

@@ -1,0 +1,426 @@
+.container {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  overflow: hidden;
+  background-color: transparent;
+  opacity: 0;
+  transition: opacity var(--transition-slow);
+}
+
+.active {
+  opacity: 1;
+}
+
+.layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 100%; /* Scale up from bottom center */
+}
+
+/* Searchlights */
+.searchlight {
+  transform-origin: 50% 100%;
+  opacity: 0.12;
+  mix-blend-mode: screen;
+}
+
+.searchlightLeft {
+  animation: sweepLeft 15s ease-in-out infinite alternate;
+}
+
+.searchlightRight {
+  animation: sweepRight 18s ease-in-out infinite alternate;
+}
+
+@keyframes sweepLeft {
+  0% {
+    transform: rotate(-25deg);
+  }
+  100% {
+    transform: rotate(20deg);
+  }
+}
+
+@keyframes sweepRight {
+  0% {
+    transform: rotate(25deg);
+  }
+  100% {
+    transform: rotate(-20deg);
+  }
+}
+
+
+
+/* Rooftop Twitching Cat Tail */
+.catTail {
+  transform-origin: 325px 746px;
+  animation: twitch 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes twitch {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(10deg);
+  }
+}
+
+/* Drifting Steam / Smoke rising from chimneys */
+.steam {
+  animation: rise 5s ease-out infinite;
+  transform-origin: bottom center;
+}
+
+.steamDelayed {
+  animation: rise 6s ease-out infinite 2s;
+  transform-origin: bottom center;
+}
+
+@keyframes rise {
+  0% {
+    transform: translateY(0) scale(1) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.3;
+  }
+  40% {
+    transform: translateY(-30px) scale(1.4) translateX(-8px);
+    opacity: 0.15;
+  }
+  80% {
+    transform: translateY(-70px) scale(1.8) translateX(-18px);
+    opacity: 0.05;
+  }
+  100% {
+    transform: translateY(-100px) scale(2.2) translateX(-25px);
+    opacity: 0;
+  }
+}
+
+/* Media query to respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .searchlightLeft,
+  .searchlightRight,
+  .steam,
+  .steamDelayed,
+  .catTail {
+    animation: none !important;
+  }
+  .searchlight {
+    opacity: 0.04;
+  }
+}
+
+/* ─ Laundry Swaying with staggered origin anchors and sways ─ */
+.laundry1 {
+  transform-origin: 1656px 718px;
+  animation: sway1 4s ease-in-out infinite alternate;
+}
+
+.laundry2 {
+  transform-origin: 1676px 720px;
+  animation: sway2 4.5s ease-in-out infinite alternate -1.2s;
+}
+
+.laundry3 {
+  transform-origin: 1695px 728px;
+  animation: sway3 3.8s ease-in-out infinite alternate -2.5s;
+}
+
+@keyframes sway1 {
+  0% { transform: rotate(-5deg); }
+  100% { transform: rotate(5deg); }
+}
+
+@keyframes sway2 {
+  0% { transform: rotate(-3deg); }
+  100% { transform: rotate(6deg); }
+}
+
+@keyframes sway3 {
+  0% { transform: rotate(-7deg); }
+  100% { transform: rotate(4deg); }
+}
+
+
+/* ─ Billboard Light Pulse ─ */
+.billboardLight {
+  animation: pulse 3.5s infinite ease-in-out alternate;
+  transform-origin: 50% 100%;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.12;
+  }
+  100% {
+    opacity: 0.35;
+  }
+}
+
+/* ─ Flock of Gliding Birds ─ */
+.flock {
+  animation: flight 35s linear infinite;
+}
+
+@keyframes flight {
+  0% {
+    transform: translate(-150px, 280px) scale(0.7);
+  }
+  100% {
+    transform: translate(2100px, 120px) scale(1.1);
+  }
+}
+
+/* ─ Twinkling Stars ─ */
+.star1 {
+  animation: twinkle 4s infinite alternate;
+}
+
+.star2 {
+  animation: twinkle 5s infinite alternate -1.5s;
+}
+
+.star3 {
+  animation: twinkle 6s infinite alternate -3.0s;
+}
+
+@keyframes twinkle {
+  0% {
+    opacity: 0.15;
+  }
+  100% {
+    opacity: 0.85;
+  }
+}
+
+
+/* ─ Blinking Cat Eyes ─ */
+.catEyes {
+  transform-origin: 320px 727.5px;
+  animation: catBlink 6s infinite;
+}
+
+@keyframes catBlink {
+  0%, 93%, 97%, 100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  95% {
+    transform: scaleY(0.1);
+    opacity: 0.2;
+  }
+}
+
+/* ─ Spinning Exhaust Fan ─ */
+.fanBlade {
+  transform-origin: 371px 750px;
+  animation: spin 1.2s linear infinite;
+}
+
+/* ─ Spinning Blower Fan ─ */
+.blowerFan {
+  transform-origin: 1598px 742px;
+  animation: spin 0.8s linear infinite; /* Spinning off-sync & faster than the left fan */
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─ Glowing Window Lights ─ */
+.glowingWindow {
+  stroke: #c5a059 !important;
+  opacity: 0.85 !important;
+  filter: drop-shadow(0 0 2px rgba(197, 160, 89, 0.95)) drop-shadow(0 0 0.5px rgba(197, 160, 89, 0.8));
+}
+
+.glowingWindowDim {
+  stroke: #c5a059 !important;
+  opacity: 0.4 !important;
+}
+
+
+/* ─ Slow-Gliding Retro Blimp ─ */
+.blimpGroup {
+  animation: blimpFlight 85s linear infinite;
+}
+
+@keyframes blimpFlight {
+  0% {
+    transform: translate(-300px, 40px);
+  }
+  100% {
+    transform: translate(2100px, 10px);
+  }
+}
+
+.blimpSpotlight {
+  transform-origin: 195px 212px;
+  animation: blimpSpotlightSweep 10s ease-in-out infinite alternate;
+  mix-blend-mode: screen;
+  opacity: 0.75;
+}
+
+@keyframes blimpSpotlightSweep {
+  0% {
+    transform: rotate(-12deg);
+  }
+  100% {
+    transform: rotate(18deg);
+  }
+}
+
+.blimpBeacon {
+  fill: #ffffff;
+  animation: beaconFlash 1.2s step-start infinite;
+}
+
+@keyframes beaconFlash {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+/* ─ Rolling River Fog ─ */
+.fog1 {
+  animation: fogDriftLeft 35s ease-in-out infinite alternate;
+  transform-origin: center;
+}
+
+.fog2 {
+  animation: fogDriftRight 42s ease-in-out infinite alternate;
+  transform-origin: center;
+}
+
+@keyframes fogDriftLeft {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-150px);
+  }
+}
+
+@keyframes fogDriftRight {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(120px);
+  }
+}
+
+/* ─ Update prefers-reduced-motion overrides ─ */
+@media (prefers-reduced-motion: reduce) {
+  .laundry1,
+  .laundry2,
+  .laundry3,
+  .billboardLight,
+  .flock,
+  .star1,
+  .star2,
+  .star3,
+  .catEyes,
+  .fanBlade,
+  .blowerFan,
+  .blimpGroup,
+  .blimpSpotlight,
+  .blimpBeacon,
+  .fog1,
+  .fog2 {
+    animation: none !important;
+  }
+  .billboardLight {
+    opacity: 0.15;
+  }
+  .blimpBeacon {
+    opacity: 0.8;
+  }
+  .blimpSpotlight {
+    opacity: 0.25;
+  }
+  .windowFlicker1,
+  .windowFlicker2,
+  .windowFlicker3,
+  .windowFlicker4 {
+    animation: none !important;
+    opacity: 0.6 !important;
+  }
+}
+
+/* ─ Asynchronous Window Flickering (Cycle: 50s, 85s, 120s, 160s) ─ */
+.windowFlicker1,
+.windowFlicker2,
+.windowFlicker3,
+.windowFlicker4 {
+  stroke: #c5a059 !important;
+  filter: drop-shadow(0 0 2px rgba(197, 160, 89, 0.95)) drop-shadow(0 0 0.5px rgba(197, 160, 89, 0.8));
+}
+
+.windowFlicker1 {
+  animation: cycleCell1 50s infinite ease-in-out;
+}
+
+.windowFlicker2 {
+  animation: cycleCell2 85s infinite ease-in-out;
+}
+
+.windowFlicker3 {
+  animation: cycleCell3 120s infinite ease-in-out;
+}
+
+.windowFlicker4 {
+  animation: cycleCell4 160s infinite ease-in-out;
+}
+
+@keyframes cycleCell1 {
+  0%, 30%, 72%, 100% { opacity: 0.85; }
+  32%, 70% { opacity: 0.05; }
+}
+
+@keyframes cycleCell2 {
+  0%, 15%, 57%, 100% { opacity: 0.05; }
+  17%, 55% { opacity: 0.85; }
+}
+
+@keyframes cycleCell3 {
+  0%, 45%, 82%, 100% { opacity: 0.85; }
+  47%, 80% { opacity: 0.05; }
+}
+
+@keyframes cycleCell4 {
+  0%, 25%, 77%, 100% { opacity: 0.05; }
+  27%, 75% { opacity: 0.85; }
+}
+
+/* ─ Bridge Highway Traffic (Glowing Dots) ─ */
+.trafficHeadlight {
+  fill: #ffffff !important;
+  opacity: 0.95;
+  filter: drop-shadow(0 0 1.5px rgba(255, 255, 255, 0.95));
+}
+
+.trafficTaillight {
+  fill: #ffffff !important;
+  opacity: 0.35;
+}
+
+.buildingGroup {
+  fill: var(--color-bg) !important;
+}
+
+

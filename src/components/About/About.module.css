@@ -77,6 +77,10 @@
   pointer-events: none;
 }
 
+:global([data-theme='noir']) .halftoneOverlay {
+  display: none !important;
+}
+
 /* Text column */
 .textColumn {
   display: flex;

@@ -129,7 +129,7 @@
 }
 
 /* ---- Noir Theme Overrides ---- */
-:global([data-theme='noir']) .starburst {
+:global([data-theme='noir']) .wrapper .starburst {
   display: none !important;
 }
 

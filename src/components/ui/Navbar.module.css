@@ -243,6 +243,10 @@
   pointer-events: none;
 }
 
+:global([data-theme='noir']) .mobileOverlay::before {
+  display: none !important;
+}
+
 @keyframes slideIn {
   from {
     opacity: 0;

@@ -331,3 +331,9 @@
   transform: translate(1px, 1px) !important;
   box-shadow: 3px 3px 0px #000000 !important;
 }
+
+/* Hide pop-art overlays in noir mode so they don't bleed over the fixed skyline */
+:global([data-theme='noir']) .benDayDots,
+:global([data-theme='noir']) .speedLines {
+  display: none !important;
+}
