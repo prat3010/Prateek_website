@@ -79,6 +79,15 @@ function getMockData(): PageVisit[] {
   return mockVisits.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 }
 
+const safeDecode = (str: string | null) => {
+  if (!str) return '';
+  try {
+    return decodeURIComponent(str);
+  } catch (e) {
+    return str;
+  }
+};
+
 export default async function AnalyticsPage() {
   let isDemoMode = false;
   let visits: PageVisit[] = [];
@@ -473,8 +482,8 @@ export default async function AnalyticsPage() {
                   
                   <span className="text-[var(--color-text-muted)]">{getRelativeTime(visit.created_at)}</span>
                   
-                  <span className="text-[var(--pop-pink)] font-code">
-                    {visit.city && visit.country ? `📍 ${visit.city}, ${visit.country}` : visit.country || 'Local/Unknown'}
+                  <span className="text-[var(--pop-pink)] font-code mr-1.5">
+                    {visit.city && visit.country ? `📍 ${safeDecode(visit.city)}, ${visit.country}` : visit.country || 'Local/Unknown'}
                   </span>
 
                   <span className="text-[var(--color-text)]">

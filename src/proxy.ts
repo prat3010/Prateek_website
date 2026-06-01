@@ -31,8 +31,18 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
 
   // Get geolocation headers (populated automatically by Vercel in production)
   const country = request.headers.get('x-vercel-ip-country') || 'Local/Unknown';
-  const region = request.headers.get('x-vercel-ip-country-region') || '';
-  const city = request.headers.get('x-vercel-ip-city') || '';
+  const rawRegion = request.headers.get('x-vercel-ip-country-region') || '';
+  const rawCity = request.headers.get('x-vercel-ip-city') || '';
+
+  // Vercel sends geolocation headers URL-encoded (e.g., "Amb%C4%81la" for "Ambāla")
+  let region = rawRegion;
+  let city = rawCity;
+  try {
+    if (rawRegion) region = decodeURIComponent(rawRegion);
+    if (rawCity) city = decodeURIComponent(rawCity);
+  } catch (e) {
+    console.error('Failed to decode geolocation headers:', e);
+  }
 
   // Get Referrer
   const referrer = request.headers.get('referer') || '';
