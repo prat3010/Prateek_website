@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { supabase } from '@/data/supabase';
 import RefreshButton from './RefreshButton';
+import styles from './analytics.module.css';
 import { 
   Eye, 
   Users, 
@@ -295,12 +296,12 @@ export default async function AnalyticsPage(props: {
   };
 
   return (
-    <div className="container section-padding min-h-screen pt-12 md:pt-16 max-w-6xl">
+    <div className={styles.dashboardContainer} style={{ paddingTop: '80px', paddingBottom: '80px' }}>
       {/* --- Back to Website Button --- */}
-      <div className="mb-6 animate-pop-in">
+      <div className={styles.backBtnContainer}>
         <Link 
           href="/" 
-          className="inline-flex items-center gap-2 font-headline uppercase text-sm px-4 py-2 border-2 border-[var(--pop-black)] bg-[var(--surface-primary)] text-[var(--color-text)] hover:bg-[var(--pop-yellow)] hover:text-[var(--pop-black)] comic-shadow-sm transition-all rounded-md rotate-[-0.5deg]"
+          className={styles.backBtn}
         >
           <ArrowLeft size={16} /> Return to Portfolio
         </Link>
@@ -322,7 +323,7 @@ export default async function AnalyticsPage(props: {
       </div>
 
       {/* --- Timeframe Filter Buttons --- */}
-      <div className="flex flex-wrap gap-3 mb-6">
+      <div className={styles.filterContainer}>
         {[
           { label: '🕒 Last 24 Hours', value: '24h' },
           { label: '📅 Last 7 Days', value: '7d' },
@@ -372,130 +373,127 @@ export default async function AnalyticsPage(props: {
         </div>
       )}
 
-
       {/* --- Overview Grid (KPIs) --- */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className={styles.kpiGrid}>
         {/* KPI: Pageviews */}
-        <div className="comic-panel bg-[var(--surface-primary)] p-6 flex items-center justify-between comic-shadow relative overflow-hidden">
-          <div className="absolute right-[-10px] bottom-[-10px] opacity-10 text-[var(--color-text)]">
+        <div className={styles.kpiCard}>
+          <div className={styles.kpiCardIconBg}>
             <Eye size={120} />
           </div>
-          <div>
-            <span className="font-headline text-lg uppercase text-[var(--color-text-muted)]">Page Views</span>
-            <h2 className="text-5xl font-headline text-stroke text-[var(--pop-red)] leading-none mt-1">
+          <div className={styles.kpiCardContent}>
+            <span className={styles.kpiCardLabel}>Page Views</span>
+            <h2 className={`${styles.kpiCardValue} ${styles.textRed}`}>
               {totalViews.toLocaleString()}
             </h2>
-            <p className="font-body text-xs font-bold uppercase text-[var(--color-text-muted)] mt-2">
+            <p className={styles.kpiCardSubtext}>
               Accumulated actions
             </p>
           </div>
-          <div className="p-4 bg-[var(--pop-red)] text-white comic-border rounded-full comic-shadow-sm">
+          <div className={`${styles.kpiCardBadge} ${styles.bgRed}`}>
             <Eye size={24} />
           </div>
         </div>
 
         {/* KPI: Unique Visitors */}
-        <div className="comic-panel bg-[var(--surface-primary)] p-6 flex items-center justify-between comic-shadow relative overflow-hidden">
-          <div className="absolute right-[-10px] bottom-[-10px] opacity-10 text-[var(--color-text)]">
+        <div className={styles.kpiCard}>
+          <div className={styles.kpiCardIconBg}>
             <Users size={120} />
           </div>
-          <div>
-            <span className="font-headline text-lg uppercase text-[var(--color-text-muted)]">Unique Visitors</span>
-            <h2 className="text-5xl font-headline text-stroke text-[var(--pop-blue)] leading-none mt-1">
+          <div className={styles.kpiCardContent}>
+            <span className={styles.kpiCardLabel}>Unique Visitors</span>
+            <h2 className={`${styles.kpiCardValue} ${styles.textBlue}`}>
               {uniqueVisitors.toLocaleString()}
             </h2>
-            <p className="font-body text-xs font-bold uppercase text-[var(--color-text-muted)] mt-2">
+            <p className={styles.kpiCardSubtext}>
               Based on daily IP hashes
             </p>
           </div>
-          <div className="p-4 bg-[var(--pop-blue)] text-white comic-border rounded-full comic-shadow-sm">
+          <div className={`${styles.kpiCardBadge} ${styles.bgBlue}`}>
             <Users size={24} />
           </div>
         </div>
 
         {/* KPI: Bot Traffic */}
-        <div className="comic-panel bg-[var(--surface-primary)] p-6 flex items-center justify-between comic-shadow relative overflow-hidden">
-          <div className="absolute right-[-10px] bottom-[-10px] opacity-10 text-[var(--color-text)]">
+        <div className={styles.kpiCard}>
+          <div className={styles.kpiCardIconBg}>
             <Database size={120} />
           </div>
-          <div>
-            <span className="font-headline text-lg uppercase text-[var(--color-text-muted)]">Spam & Crawler Hits</span>
-            <h2 className="text-5xl font-headline text-stroke text-[var(--pop-green)] leading-none mt-1">
+          <div className={styles.kpiCardContent}>
+            <span className={styles.kpiCardLabel}>Spam & Crawler Hits</span>
+            <h2 className={`${styles.kpiCardValue} ${styles.textGreen}`}>
               {totalBots.toLocaleString()}
             </h2>
-            <p className="font-body text-xs font-bold uppercase text-[var(--color-text-muted)] mt-2">
+            <p className={styles.kpiCardSubtext}>
               Filtered search bots
             </p>
           </div>
-          <div className="p-4 bg-[var(--pop-green)] text-[var(--pop-black)] comic-border rounded-full comic-shadow-sm">
+          <div className={`${styles.kpiCardBadge} ${styles.bgGreen}`}>
             <Database size={24} />
           </div>
         </div>
       </div>
 
       {/* --- Traffic Timeline (Daily Views) --- */}
-      <div className="comic-panel bg-[var(--surface-primary)] p-6 mb-8">
-        <h2 className="text-2xl font-headline uppercase leading-none mb-6 flex items-center border-b-2 border-[var(--pop-black)] pb-2">
+      <div className={styles.timelineSection}>
+        <h2 className={styles.timelineHeader}>
           <TrendingUp className="mr-2 text-[var(--pop-red)]" /> Traffic Timeline (Last 14 Days)
         </h2>
         
-        <div className="h-64 flex items-end gap-2 pt-6 pb-2 px-4 border-b-2 border-l-2 border-[var(--pop-black)] relative">
+        <div className={styles.timelineChart}>
           {dailyViews.map((day, idx) => {
             const heightPct = (day.count / maxViews) * 100;
             return (
-              <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end group relative">
+              <div key={idx} className={styles.chartColumn}>
                 {/* Tooltip on Hover */}
-                <div className="absolute top-[-35px] opacity-0 group-hover:opacity-100 transition-opacity bg-[var(--pop-black)] text-[var(--pop-white)] text-xs font-bold py-1 px-2 border-2 border-[var(--pop-black)] rounded pointer-events-none whitespace-nowrap z-10 comic-shadow-sm">
+                <div className={styles.chartTooltip}>
                   {day.count} views ({day.label})
                 </div>
                 
                 {/* Bar */}
                 <div 
-                  className="w-full bg-[var(--pop-yellow)] border-2 border-[var(--pop-black)] comic-shadow-sm group-hover:bg-[var(--pop-red)] group-hover:translate-y-[-2px] transition-all relative"
+                  className={styles.chartBar}
                   style={{ height: `${Math.max(heightPct, 3)}%` }}
                 >
-                  {day.count > 0 && (
-                    <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle,_var(--pop-black)_1px,_transparent_1px)] bg-[size:4px_4px]" />
-                  )}
+                  {day.count > 0 && <div className={styles.chartBarStripes} />}
                 </div>
                 
                 {/* Label */}
-                <span className="text-[10px] font-body font-bold mt-2 text-[var(--color-text-muted)] rotate-[-45deg] origin-top-left translate-y-1 block max-w-full truncate">
+                <span className={styles.chartLabel}>
                   {day.label}
                 </span>
               </div>
             );
           })}
         </div>
-        <div className="h-8"></div> {/* Spacer to offset rotated labels */}
+        <div className={styles.chartSpacer} />
       </div>
 
       {/* --- Second Row: Pages and Devices --- */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
+      <div className={styles.layoutGrid}>
         
         {/* Popular Pages Panel */}
-        <div className="comic-panel lg:col-span-8 bg-[var(--surface-primary)] p-6">
-          <h2 className="text-2xl font-headline uppercase leading-none mb-4 flex items-center border-b-2 border-[var(--pop-black)] pb-2">
+        <div className={styles.panel}>
+          <h2 className={styles.panelHeader}>
             <Compass className="mr-2 text-[var(--pop-red)]" /> POPULAR DESTINATIONS
           </h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left font-body text-sm">
+          <div className={styles.tableContainer}>
+            <table className={styles.analyticsTable}>
               <thead>
-                <tr className="border-b border-[var(--pop-black)] text-[var(--color-text-muted)] uppercase text-xs font-bold">
-                  <th className="py-2">PAGE PATH</th>
-                  <th className="py-2 text-right">VIEWS</th>
-                  <th className="py-2 text-right">PERCENTAGE</th>
+                <tr>
+                  <th>PAGE PATH</th>
+                  <th style={{ textAlign: 'right' }}>VIEWS</th>
+                  <th style={{ textAlign: 'right' }}>PERCENTAGE</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-zinc-800">
+              <tbody className={styles.analyticsTable}>
                 {popularPages.map((page, index) => {
                   const percent = Math.round((page.count / (totalViews || 1)) * 100);
                   return (
-                    <tr key={index} className="hover:bg-slate-50 dark:hover:bg-zinc-900 font-bold">
-                      <td className="py-3 font-code text-xs text-[var(--pop-blue)]">{page.path}</td>
-                      <td className="py-3 text-right">{page.count}</td>
-                      <td className="py-3 text-right">
-                        <span className="px-2 py-0.5 bg-[var(--pop-yellow)] border border-[var(--pop-black)] text-[var(--pop-black)] text-xs rounded">
+                    <tr key={index}>
+                      <td className={styles.pathCell}>{page.path}</td>
+                      <td style={{ textAlign: 'right' }}>{page.count}</td>
+                      <td style={{ textAlign: 'right' }}>
+                        <span className={styles.pctBadge}>
                           {percent}%
                         </span>
                       </td>
@@ -504,7 +502,7 @@ export default async function AnalyticsPage(props: {
                 })}
                 {popularPages.length === 0 && (
                   <tr>
-                    <td colSpan={3} className="py-8 text-center text-[var(--color-text-muted)] italic">
+                    <td colSpan={3} style={{ textAlign: 'center', padding: '32px 0', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
                       No page views recorded yet.
                     </td>
                   </tr>
@@ -515,156 +513,157 @@ export default async function AnalyticsPage(props: {
         </div>
 
         {/* Devices Panel */}
-        <div className="comic-panel lg:col-span-4 bg-[var(--surface-primary)] p-6 flex flex-col justify-between">
-          <div>
-            <h2 className="text-2xl font-headline uppercase leading-none mb-6 flex items-center border-b-2 border-[var(--pop-black)] pb-2">
-              <Smartphone className="mr-2 text-[var(--pop-blue)]" /> DEVICE MIX
-            </h2>
-            
-            {/* Custom Pop Art Bars */}
-            <div className="space-y-4">
-              {/* Desktop Bar */}
-              <div>
-                <div className="flex justify-between font-body text-xs font-bold mb-1">
-                  <span className="flex items-center"><Tv size={14} className="mr-1" /> DESKTOP ({desktopCount})</span>
-                  <span>{desktopPct}%</span>
+        <div className={styles.panel}>
+          <div className={styles.devicesFlex}>
+            <div>
+              <h2 className={styles.panelHeader}>
+                <Smartphone className="mr-2 text-[var(--pop-blue)]" /> DEVICE MIX
+              </h2>
+              
+              <div className={styles.deviceMixList}>
+                {/* Desktop Bar */}
+                <div className={styles.deviceBarWrapper}>
+                  <div className={styles.deviceLabelRow}>
+                    <span><Tv size={14} style={{ marginRight: '4px' }} /> DESKTOP ({desktopCount})</span>
+                    <span>{desktopPct}%</span>
+                  </div>
+                  <div className={styles.deviceTrack}>
+                    <div 
+                      className={`${styles.deviceFill} ${styles.bgBlue}`}
+                      style={{ width: `${desktopPct}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="w-full h-6 bg-slate-100 dark:bg-zinc-800 border-2 border-[var(--pop-black)] comic-shadow-sm overflow-hidden">
-                  <div 
-                    className="h-full bg-[var(--pop-blue)] border-r-2 border-[var(--pop-black)]" 
-                    style={{ width: `${desktopPct}%` }}
-                  />
-                </div>
-              </div>
 
-              {/* Mobile Bar */}
-              <div>
-                <div className="flex justify-between font-body text-xs font-bold mb-1">
-                  <span className="flex items-center"><Smartphone size={14} className="mr-1" /> MOBILE ({mobileCount})</span>
-                  <span>{mobilePct}%</span>
+                {/* Mobile Bar */}
+                <div className={styles.deviceBarWrapper}>
+                  <div className={styles.deviceLabelRow}>
+                    <span><Smartphone size={14} style={{ marginRight: '4px' }} /> MOBILE ({mobileCount})</span>
+                    <span>{mobilePct}%</span>
+                  </div>
+                  <div className={styles.deviceTrack}>
+                    <div 
+                      className={`${styles.deviceFill} ${styles.bgRed}`} 
+                      style={{ width: `${mobilePct}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="w-full h-6 bg-slate-100 dark:bg-zinc-800 border-2 border-[var(--pop-black)] comic-shadow-sm overflow-hidden">
-                  <div 
-                    className="h-full bg-[var(--pop-red)] border-r-2 border-[var(--pop-black)]" 
-                    style={{ width: `${mobilePct}%` }}
-                  />
-                </div>
-              </div>
 
-              {/* Tablet Bar */}
-              <div>
-                <div className="flex justify-between font-body text-xs font-bold mb-1">
-                  <span className="flex items-center"><Tablet size={14} className="mr-1" /> TABLET ({tabletCount})</span>
-                  <span>{tabletPct}%</span>
-                </div>
-                <div className="w-full h-6 bg-slate-100 dark:bg-zinc-800 border-2 border-[var(--pop-black)] comic-shadow-sm overflow-hidden">
-                  <div 
-                    className="h-full bg-[var(--pop-yellow)] border-r-2 border-[var(--pop-black)]" 
-                    style={{ width: `${tabletPct}%` }}
-                  />
+                {/* Tablet Bar */}
+                <div className={styles.deviceBarWrapper}>
+                  <div className={styles.deviceLabelRow}>
+                    <span><Tablet size={14} style={{ marginRight: '4px' }} /> TABLET ({tabletCount})</span>
+                    <span>{tabletPct}%</span>
+                  </div>
+                  <div className={styles.deviceTrack}>
+                    <div 
+                      className={`${styles.deviceFill} ${styles.bgYellow}`} 
+                      style={{ width: `${tabletPct}%` }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          
-          <div className="pt-4 mt-4 border-t border-dashed border-gray-300 dark:border-zinc-700 font-body text-xs text-[var(--color-text-muted)] italic text-center">
-            Derived from parsing HTTP user-agent header.
+            
+            <div className={styles.devicesPanelFooter}>
+              Derived from parsing HTTP user-agent header.
+            </div>
           </div>
         </div>
       </div>
 
       {/* --- Third Row: Referrers & Countries --- */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+      <div className={styles.halfGrid}>
         
         {/* Referrers Panel */}
-        <div className="comic-panel bg-[var(--surface-primary)] p-6">
-          <h2 className="text-2xl font-headline uppercase leading-none mb-4 flex items-center border-b-2 border-[var(--pop-black)] pb-2">
+        <div className={styles.panel}>
+          <h2 className={styles.panelHeader}>
             <ExternalLink className="mr-2 text-[var(--pop-green)]" /> TRAFFIC ORIGINS
           </h2>
-          <div className="space-y-3 font-body font-bold text-sm">
+          <div className={styles.rowList}>
             {topReferrers.map((ref, idx) => (
-              <div key={idx} className="flex justify-between items-center py-1">
-                <span className="text-[var(--color-text)] truncate max-w-[250px]">{ref.name}</span>
-                <span className="px-3 py-1 bg-slate-100 dark:bg-zinc-800 border border-[var(--pop-black)] rounded-full text-xs">
+              <div key={idx} className={styles.rowItem}>
+                <span className={styles.truncateText} title={ref.name}>{ref.name}</span>
+                <span className={styles.countBadge}>
                   {ref.count} views
                 </span>
               </div>
             ))}
             {topReferrers.length === 0 && (
-              <p className="text-[var(--color-text-muted)] italic text-xs">No referrer data recorded yet.</p>
+              <p className={styles.panelSubtext}>No referrer data recorded yet.</p>
             )}
           </div>
         </div>
 
         {/* Countries Panel */}
-        <div className="comic-panel bg-[var(--surface-primary)] p-6">
-          <h2 className="text-2xl font-headline uppercase leading-none mb-4 flex items-center border-b-2 border-[var(--pop-black)] pb-2">
+        <div className={styles.panel}>
+          <h2 className={styles.panelHeader}>
             <MapPin className="mr-2 text-[var(--pop-pink)]" /> TOP VISITOR GEOGRAPHIES
           </h2>
-          <div className="space-y-3 font-body font-bold text-sm">
+          <div className={styles.rowList}>
             {topCountries.map((country, idx) => (
-              <div key={idx} className="flex justify-between items-center py-1">
+              <div key={idx} className={styles.rowItem}>
                 <span className="flex items-center gap-1.5">{country.flag} {country.name}</span>
-                <span className="px-3 py-1 bg-[var(--pop-pink)] border border-[var(--pop-black)] text-white rounded text-xs comic-shadow-sm">
+                <span className={`${styles.countBadge} ${styles.pinkBadge}`}>
                   {country.count} visits
                 </span>
               </div>
             ))}
             {topCountries.length === 0 && (
-              <p className="text-[var(--color-text-muted)] italic text-xs">No geo data recorded yet (available in production).</p>
+              <p className={styles.panelSubtext}>No geo data recorded yet (available in production).</p>
             )}
           </div>
         </div>
       </div>
 
       {/* --- Live Activity Feed --- */}
-      <div className="comic-panel bg-[var(--surface-primary)] p-6 mb-8">
-        <h2 className="text-2xl font-headline uppercase leading-none mb-4 flex items-center border-b-2 border-[var(--pop-black)] pb-2">
+      <div className={styles.feedSection}>
+        <h2 className={styles.panelHeader}>
           <Clock className="mr-2 text-[var(--pop-red)]" /> LIVE ACTION FEED
         </h2>
-        <div className="space-y-3 max-h-[450px] overflow-y-auto pr-2">
+        <div className={styles.feedList}>
           {visits.length === 0 && (
-            <p className="font-body text-sm text-[var(--color-text-muted)] italic text-center py-12">
+            <p style={{ textAlign: 'center', padding: '48px 0', color: 'var(--color-text-muted)', fontStyle: 'italic', fontSize: '14px' }}>
               Waiting for actions... Go visit some pages to log data!
             </p>
           )}
-          {visits.slice(0, 20).map((visit, index) => { // Increased slice slightly for feed density
+          {visits.slice(0, 20).map((visit, index) => {
             const isVisitBot = visit.is_bot;
-            const badgeColor = isVisitBot 
-              ? 'bg-[var(--pop-green)] text-[var(--pop-black)]' 
+            const badgeClass = isVisitBot 
+              ? styles.badgeCrawler 
               : visit.device === 'mobile' 
-              ? 'bg-[var(--pop-red)] text-white' 
-              : 'bg-[var(--pop-blue)] text-white';
+              ? styles.badgeMobile 
+              : visit.device === 'tablet'
+              ? styles.badgeTablet
+              : styles.badgeDesktop;
 
             return (
               <div 
                 key={index} 
-                className={`p-3 border-2 border-[var(--pop-black)] rounded-md comic-shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-2 ${
-                  isVisitBot ? 'bg-slate-50 dark:bg-zinc-900 border-dashed opacity-75' : 'bg-[var(--surface-secondary)]'
-                }`}
+                className={`${styles.feedItem} ${isVisitBot ? styles.feedItemBot : ''}`}
               >
-                <div className="flex flex-wrap items-center gap-2 font-body text-xs font-bold">
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-headline uppercase border border-[var(--pop-black)] ${badgeColor}`}>
+                <div className={styles.feedRowPrimary}>
+                  <span className={`${styles.badge} ${badgeClass}`}>
                     {isVisitBot ? 'CRAWLER' : visit.device?.toUpperCase() || 'DESKTOP'}
                   </span>
                   
-                  <span className="text-[var(--color-text-muted)]">{getRelativeTime(visit.created_at)}</span>
+                  <span className={styles.timeText}>{getRelativeTime(visit.created_at)}</span>
                   
-                  <span className="text-[var(--pop-pink)] font-code mr-1.5">
+                  <span className={styles.geoText}>
                     {visit.country && visit.country !== 'Local/Unknown' && visit.country !== 'Unknown'
                       ? `📍 ${getFlagEmoji(visit.country)} ${visit.city ? safeDecode(visit.city) + ', ' : ''}${getCountryName(visit.country)}`
                       : '📍 Local / Unknown'}
                   </span>
 
-                  <span className="text-[var(--color-text)]">
-                    visited <code className="font-code text-[var(--pop-blue)] font-bold">{visit.path}</code>
+                  <span>
+                    visited <code className={styles.pathCode}>{visit.path}</code>
                   </span>
                 </div>
 
-                <div className="font-body text-[10px] text-[var(--color-text-muted)] flex flex-wrap gap-2">
+                <div className={styles.feedRowSecondary}>
                   <span>Browser: {visit.browser} ({visit.os})</span>
                   {visit.referrer && (
-                    <span className="truncate max-w-[200px]" title={visit.referrer}>
+                    <span className={styles.refText} title={visit.referrer}>
                       Ref: {visit.referrer}
                     </span>
                   )}
