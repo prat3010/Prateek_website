@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { supabase } from '@/data/supabase';
 import RefreshButton from './RefreshButton';
 import { 
@@ -13,7 +14,10 @@ import {
   ExternalLink,
   ShieldAlert,
   HelpCircle,
-  Database
+  Database,
+  ArrowLeft,
+  TrendingUp,
+  Calendar
 } from 'lucide-react';
 
 export const revalidate = 0; // Force server rendering on every request
@@ -52,8 +56,8 @@ function getMockData(): PageVisit[] {
   const mockVisits: PageVisit[] = [];
   const now = new Date();
   
-  for (let i = 0; i < 150; i++) {
-    const date = new Date(now.getTime() - Math.floor(Math.random() * 15 * 24 * 60 * 60 * 1000)); // last 15 days
+  for (let i = 0; i < 250; i++) { // Increased count for better timeline filtering
+    const date = new Date(now.getTime() - Math.floor(Math.random() * 32 * 24 * 60 * 60 * 1000)); // last 32 days
     const isBot = Math.random() < 0.12; // 12% bots
     const deviceIndex = Math.random();
     const device = isBot ? 'desktop' : deviceIndex < 0.55 ? 'desktop' : deviceIndex < 0.9 ? 'mobile' : 'tablet';
@@ -88,19 +92,73 @@ const safeDecode = (str: string | null) => {
   }
 };
 
-export default async function AnalyticsPage() {
+// Helper to get flag emoji programmatically
+const getFlagEmoji = (countryCode: string | null): string => {
+  if (!countryCode || countryCode === 'Local/Unknown' || countryCode === 'Unknown') return '🌐';
+  if (countryCode.length === 2) {
+    try {
+      const codePoints = countryCode
+        .toUpperCase()
+        .split('')
+        .map(char => 127397 + char.charCodeAt(0));
+      return String.fromCodePoint(...codePoints);
+    } catch (e) {
+      return '🌐';
+    }
+  }
+  // Fallback map for mock data full country names
+  const mockFlags: Record<string, string> = {
+    'United States': '🇺🇸',
+    'India': '🇮🇳',
+    'United Kingdom': '🇬🇧',
+    'Germany': '🇩🇪',
+    'Canada': '🇨🇦',
+    'Singapore': '🇸🇬',
+    'Australia': '🇦🇺',
+  };
+  return mockFlags[countryCode] || '🌐';
+};
+
+// Helper to get full country name using Intl.DisplayNames
+const getCountryName = (countryCode: string | null): string => {
+  if (!countryCode || countryCode === 'Local/Unknown' || countryCode === 'Unknown') return 'Local / Unknown';
+  if (countryCode.length > 2) return countryCode;
+  try {
+    const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
+    return regionNames.of(countryCode.toUpperCase()) || countryCode;
+  } catch (e) {
+    return countryCode;
+  }
+};
+
+export default async function AnalyticsPage(props: {
+  searchParams: Promise<{ range?: string }>;
+}) {
+  const { range = '7d' } = await props.searchParams;
   let isDemoMode = false;
   let visits: PageVisit[] = [];
   let errorMsg = '';
+
+  // Get timeframe filter dates
+  let daysLimit = 7;
+  if (range === '24h') daysLimit = 1;
+  else if (range === '30d') daysLimit = 30;
+  else if (range === 'all') daysLimit = 365;
+
+  const cutoffDateStr = new Date(Date.now() - daysLimit * 24 * 60 * 60 * 1000).toISOString();
 
   if (!supabase) {
     isDemoMode = true;
     visits = getMockData();
   } else {
     try {
-      const { data, error } = await supabase
-        .from('page_visits')
-        .select('*')
+      let query = supabase.from('page_visits').select('*');
+      
+      if (range !== 'all') {
+        query = query.gte('created_at', cutoffDateStr);
+      }
+      
+      const { data, error } = await query
         .order('created_at', { ascending: false })
         .limit(2000); // Pull up to last 2000 rows for in-memory analysis
 
@@ -113,6 +171,12 @@ export default async function AnalyticsPage() {
       errorMsg = e.message || 'Failed to fetch data';
       visits = getMockData();
     }
+  }
+
+  // Filter in-memory if in Demo Mode (mock data generated locally)
+  if (isDemoMode) {
+    const cutoffTime = Date.now() - daysLimit * 24 * 60 * 60 * 1000;
+    visits = visits.filter(v => new Date(v.created_at).getTime() >= cutoffTime);
   }
 
   // --- Aggregate Stats ---
@@ -166,7 +230,12 @@ export default async function AnalyticsPage() {
     }
   });
   const topCountries = Object.entries(countryCounts)
-    .map(([name, count]) => ({ name, count }))
+    .map(([code, count]) => ({
+      code,
+      name: getCountryName(code),
+      flag: getFlagEmoji(code),
+      count
+    }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
 
@@ -184,6 +253,33 @@ export default async function AnalyticsPage() {
   const mobilePct = Math.round((mobileCount / totalDeviceVisits) * 100);
   const tabletPct = Math.round((tabletCount / totalDeviceVisits) * 100);
 
+  // 5. Daily views for the timeline chart (last 14 days)
+  const dailyViews: { dateStr: string; label: string; count: number }[] = [];
+  const today = new Date();
+  
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
+    const dateStr = d.toISOString().split('T')[0]; // YYYY-MM-DD
+    
+    // Label format e.g. "Jun 1"
+    const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    dailyViews.push({ dateStr, label, count: 0 });
+  }
+
+  realVisits.forEach(v => {
+    try {
+      const vDateStr = new Date(v.created_at).toISOString().split('T')[0];
+      const dayEntry = dailyViews.find(d => d.dateStr === vDateStr);
+      if (dayEntry) {
+        dayEntry.count++;
+      }
+    } catch (e) {
+      // Ignore parsing errors for malformed dates
+    }
+  });
+
+  const maxViews = Math.max(...dailyViews.map(d => d.count), 1);
+
   // Format relative timestamp helper
   const getRelativeTime = (isoString: string) => {
     const date = new Date(isoString);
@@ -199,9 +295,19 @@ export default async function AnalyticsPage() {
   };
 
   return (
-    <div className="container section-padding min-h-screen pt-28">
+    <div className="container section-padding min-h-screen pt-12 md:pt-16 max-w-6xl">
+      {/* --- Back to Website Button --- */}
+      <div className="mb-6 animate-pop-in">
+        <Link 
+          href="/" 
+          className="inline-flex items-center gap-2 font-headline uppercase text-sm px-4 py-2 border-2 border-[var(--pop-black)] bg-[var(--surface-primary)] text-[var(--color-text)] hover:bg-[var(--pop-yellow)] hover:text-[var(--pop-black)] comic-shadow-sm transition-all rounded-md rotate-[-0.5deg]"
+        >
+          <ArrowLeft size={16} /> Return to Portfolio
+        </Link>
+      </div>
+
       {/* --- Pop Art Header Banner --- */}
-      <div className="comic-panel halftone-overlay bg-[var(--pop-yellow)] p-6 mb-8 text-[var(--pop-black)] rotate-[-1deg] relative">
+      <div className="comic-panel halftone-overlay bg-[var(--pop-yellow)] p-6 mb-6 text-[var(--pop-black)] rotate-[-1deg] relative">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-4xl md:text-5xl font-headline text-stroke uppercase leading-none mb-1">
@@ -213,6 +319,30 @@ export default async function AnalyticsPage() {
           </div>
           <RefreshButton />
         </div>
+      </div>
+
+      {/* --- Timeframe Filter Buttons --- */}
+      <div className="flex flex-wrap gap-3 mb-6">
+        {[
+          { label: '🕒 Last 24 Hours', value: '24h' },
+          { label: '📅 Last 7 Days', value: '7d' },
+          { label: '📊 Last 30 Days', value: '30d' },
+          { label: '🌐 All Time (2k)', value: 'all' },
+        ].map((btn) => {
+          const isActive = range === btn.value;
+          return (
+            <Link
+              key={btn.value}
+              href={`/admin/analytics?range=${btn.value}`}
+              className={`comic-btn text-xs font-headline ${
+                isActive ? 'comic-btn-yellow scale-[1.03] translate-y-[-2px]' : 'comic-btn-outline'
+              }`}
+              style={{ padding: '6px 12px' }}
+            >
+              {btn.label}
+            </Link>
+          );
+        })}
       </div>
 
       {/* --- Alert configuration box if in demo mode --- */}
@@ -241,6 +371,7 @@ export default async function AnalyticsPage() {
           </div>
         </div>
       )}
+
 
       {/* --- Overview Grid (KPIs) --- */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -300,6 +431,43 @@ export default async function AnalyticsPage() {
             <Database size={24} />
           </div>
         </div>
+      </div>
+
+      {/* --- Traffic Timeline (Daily Views) --- */}
+      <div className="comic-panel bg-[var(--surface-primary)] p-6 mb-8">
+        <h2 className="text-2xl font-headline uppercase leading-none mb-6 flex items-center border-b-2 border-[var(--pop-black)] pb-2">
+          <TrendingUp className="mr-2 text-[var(--pop-red)]" /> Traffic Timeline (Last 14 Days)
+        </h2>
+        
+        <div className="h-64 flex items-end gap-2 pt-6 pb-2 px-4 border-b-2 border-l-2 border-[var(--pop-black)] relative">
+          {dailyViews.map((day, idx) => {
+            const heightPct = (day.count / maxViews) * 100;
+            return (
+              <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end group relative">
+                {/* Tooltip on Hover */}
+                <div className="absolute top-[-35px] opacity-0 group-hover:opacity-100 transition-opacity bg-[var(--pop-black)] text-[var(--pop-white)] text-xs font-bold py-1 px-2 border-2 border-[var(--pop-black)] rounded pointer-events-none whitespace-nowrap z-10 comic-shadow-sm">
+                  {day.count} views ({day.label})
+                </div>
+                
+                {/* Bar */}
+                <div 
+                  className="w-full bg-[var(--pop-yellow)] border-2 border-[var(--pop-black)] comic-shadow-sm group-hover:bg-[var(--pop-red)] group-hover:translate-y-[-2px] transition-all relative"
+                  style={{ height: `${Math.max(heightPct, 3)}%` }}
+                >
+                  {day.count > 0 && (
+                    <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle,_var(--pop-black)_1px,_transparent_1px)] bg-[size:4px_4px]" />
+                  )}
+                </div>
+                
+                {/* Label */}
+                <span className="text-[10px] font-body font-bold mt-2 text-[var(--color-text-muted)] rotate-[-45deg] origin-top-left translate-y-1 block max-w-full truncate">
+                  {day.label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+        <div className="h-8"></div> {/* Spacer to offset rotated labels */}
       </div>
 
       {/* --- Second Row: Pages and Devices --- */}
@@ -436,7 +604,7 @@ export default async function AnalyticsPage() {
           <div className="space-y-3 font-body font-bold text-sm">
             {topCountries.map((country, idx) => (
               <div key={idx} className="flex justify-between items-center py-1">
-                <span>📍 {country.name}</span>
+                <span className="flex items-center gap-1.5">{country.flag} {country.name}</span>
                 <span className="px-3 py-1 bg-[var(--pop-pink)] border border-[var(--pop-black)] text-white rounded text-xs comic-shadow-sm">
                   {country.count} visits
                 </span>
@@ -460,7 +628,7 @@ export default async function AnalyticsPage() {
               Waiting for actions... Go visit some pages to log data!
             </p>
           )}
-          {visits.slice(0, 15).map((visit, index) => {
+          {visits.slice(0, 20).map((visit, index) => { // Increased slice slightly for feed density
             const isVisitBot = visit.is_bot;
             const badgeColor = isVisitBot 
               ? 'bg-[var(--pop-green)] text-[var(--pop-black)]' 
@@ -483,7 +651,9 @@ export default async function AnalyticsPage() {
                   <span className="text-[var(--color-text-muted)]">{getRelativeTime(visit.created_at)}</span>
                   
                   <span className="text-[var(--pop-pink)] font-code mr-1.5">
-                    {visit.city && visit.country ? `📍 ${safeDecode(visit.city)}, ${visit.country}` : visit.country || 'Local/Unknown'}
+                    {visit.country && visit.country !== 'Local/Unknown' && visit.country !== 'Unknown'
+                      ? `📍 ${getFlagEmoji(visit.country)} ${visit.city ? safeDecode(visit.city) + ', ' : ''}${getCountryName(visit.country)}`
+                      : '📍 Local / Unknown'}
                   </span>
 
                   <span className="text-[var(--color-text)]">
