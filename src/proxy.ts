@@ -1,0 +1,84 @@
+import { NextResponse, userAgent } from 'next/server';
+import type { NextRequest, NextFetchEvent } from 'next/server';
+import { supabase } from '@/data/supabase';
+
+// Helper to hash IP addresses with a daily rotating salt (GDPR compliant unique visitor tracking)
+async function getIpHash(ip: string): Promise<string> {
+  const today = new Date().toISOString().split('T')[0]; // Daily rotating salt
+  const encoder = new TextEncoder();
+  const data = encoder.encode(ip + '-' + today);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+export async function proxy(request: NextRequest, event: NextFetchEvent) {
+  // If Supabase is not configured yet, silently pass
+  if (!supabase) {
+    return NextResponse.next();
+  }
+
+  const { pathname } = request.nextUrl;
+  
+  // Skip tracking for the admin dashboard itself to avoid padding your own view stats during debugging
+  if (pathname.startsWith('/admin')) {
+    return NextResponse.next();
+  }
+
+  // Retrieve IP address from headers
+  const forwardedFor = request.headers.get('x-forwarded-for');
+  const ip = forwardedFor ? forwardedFor.split(',')[0] : '127.0.0.1';
+
+  // Get geolocation headers (populated automatically by Vercel in production)
+  const country = request.headers.get('x-vercel-ip-country') || 'Local/Unknown';
+  const region = request.headers.get('x-vercel-ip-country-region') || '';
+  const city = request.headers.get('x-vercel-ip-city') || '';
+
+  // Get Referrer
+  const referrer = request.headers.get('referer') || '';
+
+  // Parse User Agent via Next.js helper
+  const { device, browser, os, isBot } = userAgent(request);
+
+  // Run the logging asynchronously using event.waitUntil
+  // This sends the data in the background and does NOT add to the page load latency.
+  event.waitUntil(
+    (async () => {
+      try {
+        const ipHash = await getIpHash(ip);
+        
+        await supabase.from('page_visits').insert({
+          path: pathname || '/',
+          country,
+          region,
+          city,
+          browser: browser.name || 'Unknown',
+          os: os.name || 'Unknown',
+          device: device.type || 'desktop', // fallback to desktop if type is undefined
+          referrer,
+          ip_hash: ipHash,
+          is_bot: isBot || false,
+        });
+      } catch (error) {
+        console.error('Error logging page visit to Supabase:', error);
+      }
+    })()
+  );
+
+  return NextResponse.next();
+}
+
+// Next.js proxy configuration matcher
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico, icon.svg, etc. (standard assets)
+     * - robots.txt, sitemap.xml, etc.
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|icon.svg|robots.txt|sitemap.xml|images/).*)',
+  ],
+};
