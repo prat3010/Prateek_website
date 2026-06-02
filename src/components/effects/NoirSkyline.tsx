@@ -896,6 +896,16 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
                 <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" result="noise" />
                 <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G" />
               </filter>
+              
+              {/* River Gradients */}
+              <linearGradient id="riverGradPopart" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#A1DEDC" />
+                <stop offset="100%" stopColor="#7FB3D5" />
+              </linearGradient>
+              <linearGradient id="riverGradNoir" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#111116" />
+                <stop offset="100%" stopColor="#070709" />
+              </linearGradient>
             </defs>
 
             {/* Group A: Foreground Static Elements (Sketch-Filtered for hand-drawn look) */}
@@ -904,8 +914,8 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
               {/* LEFT ROOFTOP SECTION */}
               <path d="M -50 1080 L -50 820 L 460 820 L 460 1080 Z" className={styles.bldFgLeftRoof} />
 
-              {/* Solid mask under the bridge deck to block background lines/windows */}
-              <path d="M 460 856 Q 880 826 1420 856 L 1420 1080 L 460 1080 Z" fill="var(--skyline-fill-bg)" stroke="none" />
+              {/* River water body under the bridge */}
+              <rect x="460" y="950" width="960" height="130" fill="var(--skyline-river-fill)" stroke="none" />
 
               {/* Left Parapet Brick Mortar Lines */}
               <g stroke="var(--skyline-mortar-stroke)" strokeWidth="1.0" fill="none">
@@ -1416,6 +1426,20 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
               {/* River waterline & Tugboat under the bridge (Static) */}
               <line x1="460" y1="950" x2="1420" y2="950" stroke="var(--skyline-stroke-fine)" strokeWidth="1" strokeDasharray="8 6" />
               
+              {/* Stylized River Waves/Ripples across the river */}
+              <g stroke="var(--skyline-stroke-fine)" strokeWidth="0.8" fill="none">
+                {/* Row 1 (near waterline) */}
+                <path d="M 500 960 Q 515 958 530 960 M 570 962 Q 585 960 600 962 M 700 958 Q 715 956 730 958 M 1100 960 Q 1115 958 1130 960 M 1250 962 Q 1265 960 1280 962" />
+                {/* Row 2 */}
+                <path d="M 470 980 Q 490 977 510 980 M 620 978 Q 640 975 660 978 M 760 982 Q 780 979 800 982 M 1180 978 Q 1200 975 1220 978 M 1330 982 Q 1350 979 1370 982" />
+                {/* Row 3 */}
+                <path d="M 530 1005 Q 555 1002 580 1005 M 690 1008 Q 715 1005 740 1008 M 1060 1005 Q 1085 1002 1110 1005 M 1210 1008 Q 1235 1005 1260 1008" />
+                {/* Row 4 */}
+                <path d="M 480 1035 Q 510 1031 540 1035 M 710 1038 Q 740 1034 770 1038 M 980 1035 Q 1010 1031 1040 1035 M 1280 1038 Q 1310 1034 1340 1038" />
+                {/* Row 5 (bottom) */}
+                <path d="M 580 1065 Q 615 1061 650 1065 M 1080 1065 Q 1115 1061 1150 1065 M 1200 1068 Q 1235 1064 1270 1068" />
+              </g>
+
               <g className={styles.bldFgTugboat}>
                 {/* Tugboat hull */}
                 <path d="M 1030 950 L 1070 950 L 1065 941 L 1035 941 Z" fill="var(--skyline-tugboat-hull)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
