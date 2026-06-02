@@ -35,10 +35,6 @@ export default function Hero() {
 
   return (
     <section id="home" className={styles.hero} aria-label="Hero">
-      {/* Speed lines background */}
-      <div className={styles.speedLines} aria-hidden="true" />
-      <div className={styles.benDayDots} aria-hidden="true" />
-
       <div className={styles.content}>
         <div className={styles.textSide}>
           {/* Floating POW action word */}

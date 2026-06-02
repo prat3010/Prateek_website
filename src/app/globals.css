@@ -205,12 +205,13 @@
   display: none !important;
 }
 
-/* ─ Make sections transparent in Noir mode to reveal the fixed skyline background ─ */
-[data-theme='noir'] section {
+/* ─ Make sections transparent to reveal the fixed skyline background ─ */
+section {
   background: transparent !important;
   background-color: transparent !important;
   background-image: none !important;
 }
+
 
 /* ─ Theme Transition Classes ─ */
 body,

@@ -467,23 +467,244 @@
 }
 
 .buildingGroup {
-  fill: var(--color-bg) !important;
+  fill: var(--skyline-fill-bg) !important;
 }
 
 .shadowHatchBg {
-  fill: url(#hatch-bg) !important;
+  fill: var(--skyline-hatch-bg) !important;
   stroke: none !important;
 }
 
 .shadowHatchMid {
-  fill: url(#hatch-mid) !important;
+  fill: var(--skyline-hatch-mid) !important;
   stroke: none !important;
 }
 
 .shadowHatchFg {
-  fill: url(#hatch-fg) !important;
+  fill: var(--skyline-hatch-fg) !important;
   stroke: none !important;
 }
+
+/* ── Theme Definitions ── */
+
+.darkNoir {
+  --skyline-sky-bg: transparent;
+  --skyline-stroke-fg: rgba(250, 250, 250, 0.48);
+  --skyline-stroke-mid: rgba(250, 250, 250, 0.35);
+  --skyline-stroke-fine: rgba(250, 250, 250, 0.22);
+  --skyline-stroke-bold: rgba(250, 250, 250, 0.6);
+  --skyline-mortar-stroke: rgba(250, 250, 250, 0.50);
+  
+  --skyline-fill-bg: var(--color-bg);
+  
+  --skyline-hatch-bg: url(#hatch-bg);
+  --skyline-hatch-mid: url(#hatch-mid);
+  --skyline-hatch-fg: url(#hatch-fg);
+  
+  --skyline-left-light-grad: url(#leftLightGrad);
+  --skyline-downward-light-grad: url(#downwardLightGrad);
+  --skyline-downward-light: url(#downwardLightGrad);
+  
+  --skyline-searchlight-left: url(#leftLightGrad);
+  --skyline-searchlight-right: url(#rightLightGrad);
+  --skyline-blimp-spotlight: url(#blimpLightGrad);
+  --skyline-blimp-envelope: var(--color-bg);
+  --skyline-blimp-stroke: rgba(250, 250, 250, 0.48);
+  --skyline-blimp-stroke-fine: rgba(250, 250, 250, 0.25);
+  
+  --skyline-shed-door: var(--color-bg);
+  --skyline-bulb-glow: #fafafa;
+  --skyline-light-ray: rgba(250, 250, 250, 0.05);
+  
+  --skyline-billboard-bg: var(--color-bg);
+  --skyline-billboard-text: rgba(250, 250, 250, 0.85);
+  
+  --skyline-laundry-coat: var(--color-bg);
+  --skyline-laundry-trousers: var(--color-bg);
+  --skyline-laundry-fedora: var(--color-bg);
+  --skyline-laundry-fedora-band: rgba(250, 250, 250, 0.85);
+  
+  --skyline-tugboat-hull: var(--color-bg);
+  --skyline-tugboat-cabin: var(--color-bg);
+  --skyline-tugboat-smoke: rgba(250, 250, 250, 0.3);
+  
+  --skyline-cat-fill: var(--color-bg);
+  --skyline-cat-eyes: #fafafa;
+  
+  --skyline-pigeon-stroke: rgba(250, 250, 250, 0.28);
+  --skyline-cloud-fill: rgba(250, 250, 250, 0.05);
+  
+  --skyline-traffic-headlight-trail: rgba(250, 250, 250, 0.25);
+  --skyline-traffic-taillight-trail: rgba(250, 250, 250, 0.2);
+}
+
+.lightPopart {
+  --pop-cyan: #A1DEDC;       /* soft pastel cyan */
+  --pop-blue: #A9D5EF;       /* soft pastel blue */
+  --pop-yellow: #FFF3A8;     /* soft pastel yellow */
+  --pop-pink: #F8CAD1;       /* soft pastel pink */
+  --pop-magenta: #F7B5B9;    /* soft pastel rose */
+  --pop-orange: #FFD4C2;     /* soft pastel peach/orange */
+  --pop-red: #FAA3AB;        /* soft pastel red */
+  --pop-green: #C9EFCD;      /* soft pastel mint */
+  --pop-cream: #FFF9E6;      /* soft cream background */
+  --pop-white: #FAF9F6;      /* warm off-white */
+  --pop-black: #1A1A2E;
+  
+  /* Additional pastel tones for structures */
+  --pop-roof-gray: #E8E6DF;  /* warm soft gray to fill the lower section */
+  --pop-pier-gray: #DAD6CE;  /* warm concrete gray for piers */
+  --pop-bridge-red: #FAA3AB; /* soft pastel red for bridge tower */
+  --pop-brick-brown: #D7A494; /* soft pastel brick brown */
+
+  --skyline-sky-bg: url(#skyGradPopart);
+  --skyline-stroke-fg: var(--pop-black);
+  --skyline-stroke-mid: var(--pop-black);
+  --skyline-stroke-fine: rgba(26, 26, 46, 0.35);
+  --skyline-stroke-bold: var(--pop-black);
+  --skyline-mortar-stroke: rgba(26, 26, 46, 0.22);
+  
+  --skyline-fill-bg: var(--pop-roof-gray);
+  
+  --skyline-hatch-bg: url(#hatch-bg-black);
+  --skyline-hatch-mid: url(#hatch-mid-black);
+  --skyline-hatch-fg: url(#hatch-fg-black);
+  
+  --skyline-left-light-grad: url(#leftLightGradPopart);
+  --skyline-downward-light-grad: url(#downwardLightGradPopart);
+  --skyline-downward-light: url(#downwardLightGradPopart);
+  
+  --skyline-searchlight-left: url(#leftLightGradPopart);
+  --skyline-searchlight-right: url(#rightLightGradPopart);
+  --skyline-blimp-spotlight: url(#blimpLightGradPopart);
+  --skyline-blimp-envelope: var(--pop-yellow);
+  --skyline-blimp-stroke: var(--pop-black);
+  --skyline-blimp-stroke-fine: rgba(26, 26, 46, 0.4);
+  
+  --skyline-shed-door: var(--pop-orange);
+  --skyline-bulb-glow: var(--pop-yellow);
+  --skyline-light-ray: rgba(255, 243, 168, 0.15);
+  
+  --skyline-billboard-bg: var(--pop-pink);
+  --skyline-billboard-text: var(--pop-white);
+  
+  --skyline-laundry-coat: var(--pop-yellow);
+  --skyline-laundry-trousers: var(--pop-blue);
+  --skyline-laundry-fedora: var(--pop-magenta);
+  --skyline-laundry-fedora-band: var(--pop-cyan);
+  
+  --skyline-tugboat-hull: var(--pop-red);
+  --skyline-tugboat-cabin: var(--pop-white);
+  --skyline-tugboat-smoke: rgba(26, 26, 46, 0.25);
+  
+  --skyline-cat-fill: var(--pop-black);
+  --skyline-cat-eyes: var(--pop-yellow);
+  
+  --skyline-pigeon-stroke: var(--pop-black);
+  --skyline-cloud-fill: rgba(255, 255, 255, 0.45);
+  
+  --skyline-traffic-headlight-trail: rgba(255, 243, 168, 0.35);
+  --skyline-traffic-taillight-trail: rgba(250, 163, 171, 0.3);
+}
+
+/* Conic Sunburst Wedges */
+.sunburstRays {
+  display: none;
+}
+
+.lightPopart .sunburstRays {
+  display: block;
+  fill: var(--pop-yellow) !important;
+  opacity: 0.16;
+  mix-blend-mode: multiply;
+  stroke: none !important;
+}
+
+/* Light pop-art specific overrides to hide night details */
+.lightPopart .moonBody,
+.lightPopart .moonGlow,
+.lightPopart .star1,
+.lightPopart .star2,
+.lightPopart .star3,
+.lightPopart .fog1,
+.lightPopart .fog2 {
+  display: none !important;
+}
+
+.lightPopart .vignette {
+  background: none !important;
+}
+
+/* Light pop-art window colors - replace neon yellow glow with retro solid colors */
+.lightPopart .glowingWindow,
+.lightPopart .windowFlicker1,
+.lightPopart .windowFlicker2,
+.lightPopart .windowFlicker3,
+.lightPopart .windowFlicker4 {
+  stroke: var(--pop-yellow) !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+.lightPopart .glowingWindowDim {
+  stroke: var(--pop-cyan) !important;
+  opacity: 0.8 !important;
+}
+
+.lightPopart .trafficHeadlight {
+  fill: var(--pop-yellow) !important;
+  filter: drop-shadow(0 0 1.5px var(--pop-yellow)) !important;
+  opacity: 1 !important;
+}
+
+.lightPopart .trafficTaillight {
+  fill: var(--pop-red) !important;
+  opacity: 0.9 !important;
+}
+
+/* ── Light Pop-Art Buildings Individual Coloring ── */
+
+/* Layer 1 (Background Buildings) */
+.lightPopart .bldBgSkyscrapers { fill: var(--pop-blue) !important; }
+.lightPopart .bldBgNeedle { fill: var(--pop-cyan) !important; }
+.lightPopart .bldBgChrysler { fill: var(--pop-pink) !important; }
+.lightPopart .bldBgEmpire { fill: var(--pop-cream) !important; }
+.lightPopart .bldBgFlatTop { fill: var(--pop-orange) !important; }
+.lightPopart .bldBgStepped { fill: var(--pop-green) !important; }
+.lightPopart .bldBgArtDecoGap1 { fill: var(--pop-magenta) !important; }
+.lightPopart .bldBgSlimNeedleGap2a { fill: var(--pop-cyan) !important; }
+.lightPopart .bldBgTwinLeft { fill: var(--pop-yellow) !important; }
+.lightPopart .bldBgTwinRight { fill: var(--pop-yellow) !important; }
+.lightPopart .bldBgSetbackGap3a { fill: var(--pop-blue) !important; }
+.lightPopart .bldBgNarrowDecoGap3b { fill: var(--pop-pink) !important; }
+
+/* Layer 2 (Midground Buildings) */
+.lightPopart .bldMidFarLeft { fill: var(--pop-pink) !important; }
+.lightPopart .bldMidStaggered { fill: var(--pop-green) !important; }
+.lightPopart .bldMidBlockySpire { fill: var(--pop-orange) !important; }
+.lightPopart .bldMidFlatiron { fill: var(--pop-magenta) !important; }
+.lightPopart .bldMidCitigroup { fill: var(--pop-cyan) !important; }
+.lightPopart .bldMidSetbacks { fill: var(--pop-blue) !important; }
+.lightPopart .bldMidClock { fill: var(--pop-cream) !important; }
+.lightPopart .bldMidWaterTower { fill: var(--pop-yellow) !important; }
+.lightPopart .bldMidSlab { fill: var(--pop-pink) !important; }
+.lightPopart .bldMidNarrow { fill: var(--pop-green) !important; }
+.lightPopart .bldMidWarehouse { fill: var(--pop-orange) !important; }
+.lightPopart .bldMidGlass { fill: var(--pop-cyan) !important; }
+.lightPopart .bldMidSlimSpire { fill: var(--pop-magenta) !important; }
+.lightPopart .bldMidFarRight { fill: var(--pop-blue) !important; }
+.lightPopart .bldMidEdge { fill: var(--pop-pink) !important; }
+
+/* Layer 3 (Foreground Buildings & Structures) */
+.lightPopart .bldFgLeftRoof { fill: var(--pop-brick-brown) !important; }
+.lightPopart .bldFgRightRoof { fill: var(--pop-brick-brown) !important; }
+.lightPopart .bldFgShed { fill: var(--pop-white) !important; }
+.lightPopart .bldFgChimney { fill: var(--pop-orange) !important; }
+.lightPopart .bldFgHvac { fill: var(--pop-blue) !important; }
+.lightPopart .bldFgBlower { fill: var(--pop-green) !important; }
+.lightPopart .bldFgBridgeTower { fill: var(--pop-bridge-red) !important; }
+.lightPopart .bldFgBridgePier { fill: var(--pop-pier-gray) !important; }
+.lightPopart .bldFgDolphinPiles { fill: var(--pop-orange) !important; }
 
 
 

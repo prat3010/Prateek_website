@@ -83,9 +83,6 @@ export default function Contact() {
     <section id="contact" className={styles.contact} aria-label="Contact">
       <ConfettiBurst ref={confettiRef} />
 
-      {/* Decorative speed lines */}
-      <div className={styles.speedLines} aria-hidden="true" />
-
       <div className={styles.container}>
         <ScrollReveal>
           <h2 className={styles.sectionTitle}>

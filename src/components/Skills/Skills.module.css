@@ -7,18 +7,6 @@
   overflow: hidden;
 }
 
-.speedLinesBg {
-  position: absolute;
-  inset: 0;
-  background: repeating-conic-gradient(
-    from 0deg at 50% 120%,
-    transparent 0deg,
-    transparent 4deg,
-    rgba(26, 26, 46, 0.02) 4deg,
-    rgba(26, 26, 46, 0.02) 4.5deg
-  );
-  z-index: 0;
-}
 
 .container {
   position: relative;

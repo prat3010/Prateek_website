@@ -35,9 +35,6 @@ export default function Skills() {
 
   return (
     <section id="skills" className={styles.skills} aria-label="Skills">
-      {/* Background speed lines */}
-      <div className={styles.speedLinesBg} aria-hidden="true" />
-
       <div className={styles.container}>
         <ScrollReveal>
           <h2 className={styles.sectionTitle}>

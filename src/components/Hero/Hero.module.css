@@ -10,30 +10,6 @@
   padding: 2rem clamp(1rem, 4vw, 4rem);
 }
 
-/* Ben-Day dot halftone pattern */
-.benDayDots {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(circle, var(--pop-yellow) 1.5px, transparent 1.5px);
-  background-size: 12px 12px;
-  opacity: 0.25;
-  z-index: 0;
-  animation: dotPulse 4s ease-in-out infinite;
-}
-
-/* Speed lines radiating from center-right */
-.speedLines {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background: repeating-conic-gradient(
-    from 0deg at 70% 50%,
-    transparent 0deg,
-    transparent 3.5deg,
-    rgba(26, 26, 46, 0.03) 3.5deg,
-    rgba(26, 26, 46, 0.03) 4deg
-  );
-}
 
 /* Main content grid */
 .content {
@@ -405,11 +381,6 @@
   box-shadow: 3px 3px 0px #000000 !important;
 }
 
-/* Hide pop-art overlays in noir mode so they don't bleed over the fixed skyline */
-:global([data-theme='noir']) .benDayDots,
-:global([data-theme='noir']) .speedLines {
-  display: none !important;
-}
 
 /* Noir Mode overrides for telemetry badge */
 :global([data-theme='noir']) .telemetryBadge {

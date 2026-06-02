@@ -59,12 +59,10 @@ export default function NoirSkyline() {
 
   
 
-  const isActive = theme === 'noir' || pendingTheme === 'noir';
-
-  if (!mounted || !isActive) return null;
+  if (!mounted) return null;
 
   return (
-    <div className={`${styles.container} ${isActive ? styles.active : ''}`}>
+    <div className={`${styles.container} ${styles.active} ${theme === 'light' ? styles.lightPopart : styles.darkNoir}`}>
       {/* ── Vignette Overlay ── */}
       <div className={styles.vignette} aria-hidden="true" />
 
@@ -123,6 +121,21 @@ export default function NoirSkyline() {
 
 
 const Layer0 = React.memo(function Layer0() {
+  // Generate 24 conic rays radiating from the center of the horizon (960, 450)
+  const raysCount = 24;
+  const raysPath = Array.from({ length: raysCount }).map((_, i) => {
+    const angle1 = (i * 360) / raysCount;
+    const angle2 = ((i + 0.5) * 360) / raysCount;
+    const r = 2500;
+    const rad1 = (angle1 * Math.PI) / 180;
+    const rad2 = (angle2 * Math.PI) / 180;
+    const x1 = 960 + r * Math.cos(rad1);
+    const y1 = 450 + r * Math.sin(rad1);
+    const x2 = 960 + r * Math.cos(rad2);
+    const y2 = 450 + r * Math.sin(rad2);
+    return `M 960 450 L ${x1.toFixed(1)} ${y1.toFixed(1)} L ${x2.toFixed(1)} ${y2.toFixed(1)} Z`;
+  }).join(' ');
+
   return (
     <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%' }}>
           <defs>
@@ -153,7 +166,41 @@ const Layer0 = React.memo(function Layer0() {
               <stop offset="70%" stopColor="rgba(255, 255, 255, 0.08)" />
               <stop offset="100%" stopColor="rgba(255, 255, 255, 0)" />
             </radialGradient>
+
+            {/* Left Searchlight Gradient Popart */}
+            <linearGradient id="leftLightGradPopart" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0%" stopColor="rgba(41, 121, 255, 0.25)" />
+              <stop offset="60%" stopColor="rgba(41, 121, 255, 0.06)" />
+              <stop offset="100%" stopColor="rgba(41, 121, 255, 0)" />
+            </linearGradient>
+
+            {/* Right Searchlight Gradient Popart */}
+            <linearGradient id="rightLightGradPopart" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0%" stopColor="rgba(255, 23, 68, 0.25)" />
+              <stop offset="50%" stopColor="rgba(255, 23, 68, 0.06)" />
+              <stop offset="100%" stopColor="rgba(255, 23, 68, 0)" />
+            </linearGradient>
+
+            {/* Blimp Searchlight Gradient Popart */}
+            <linearGradient id="blimpLightGradPopart" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="rgba(0, 230, 118, 0.35)" />
+              <stop offset="60%" stopColor="rgba(0, 230, 118, 0.1)" />
+              <stop offset="100%" stopColor="rgba(0, 230, 118, 0)" />
+            </linearGradient>
+
+            {/* Sky Gradient Popart */}
+            <radialGradient id="skyGradPopart" cx="50%" cy="40%" r="70%">
+              <stop offset="0%" stopColor="#FFFDF6" />
+              <stop offset="40%" stopColor="#FFE082" />
+              <stop offset="100%" stopColor="#90CAF9" />
+            </radialGradient>
           </defs>
+
+          {/* Sky background layer (uses radial gradient in Popart, transparent in Noir) */}
+          <rect width="100%" height="100%" fill="var(--skyline-sky-bg)" />
+
+          {/* Pop-art Conic Sunburst Rays */}
+          <path d={raysPath} className={styles.sunburstRays} fill="none" />
 
           {/* Twinkling Starfield */}
           <g fill="#fafafa" stroke="none">
@@ -177,14 +224,14 @@ const Layer0 = React.memo(function Layer0() {
           {/* Glowing Noir Full Moon & Clouds */}
           <g pointerEvents="none">
             {/* Soft outer glow */}
-            <circle cx="650" cy="250" r="100" fill="url(#moonGlow)" stroke="none" />
+            <circle cx="650" cy="250" r="100" fill="url(#moonGlow)" stroke="none" className={styles.moonGlow} />
             {/* Main Moon body */}
-            <circle cx="650" cy="250" r="50" fill="rgba(250, 250, 250, 0.12)" stroke="rgba(250, 250, 250, 0.22)" strokeWidth="0.8" />
+            <circle cx="650" cy="250" r="50" fill="rgba(250, 250, 250, 0.12)" stroke="rgba(250, 250, 250, 0.22)" strokeWidth="0.8" className={styles.moonBody} />
             
             {/* Wispy cloud silhouettes passing in front of the moon */}
-            <path d="M 500 240 Q 650 260 800 240 Q 650 220 500 240 Z" fill="rgba(250, 250, 250, 0.04)" stroke="none" />
-            <path d="M 550 265 Q 670 280 790 265 Q 670 250 550 265 Z" fill="rgba(250, 250, 250, 0.03)" stroke="none" />
-            <path d="M 460 215 Q 600 230 740 215 Q 600 200 460 215 Z" fill="rgba(250, 250, 250, 0.03)" stroke="none" />
+            <path d="M 500 240 Q 650 260 800 240 Q 650 220 500 240 Z" fill="var(--skyline-cloud-fill)" stroke="none" />
+            <path d="M 550 265 Q 670 280 790 265 Q 670 250 550 265 Z" fill="var(--skyline-cloud-fill)" stroke="none" />
+            <path d="M 460 215 Q 600 230 740 215 Q 600 200 460 215 Z" fill="var(--skyline-cloud-fill)" stroke="none" />
           </g>
 
           {/* Detailed Gliding Retro Airship/Dirigible */}
@@ -192,7 +239,7 @@ const Layer0 = React.memo(function Layer0() {
             {/* Sweeping Spotlight beam from the front of the gondola */}
             <polygon 
               points="195,212 230,420 320,400" 
-              fill="url(#blimpLightGrad)" 
+              fill="var(--skyline-blimp-spotlight)" 
               className={styles.blimpSpotlight} 
               stroke="none"
             />
@@ -200,59 +247,59 @@ const Layer0 = React.memo(function Layer0() {
             {/* Structural envelope outline */}
             <path 
               d="M 104 180 C 104 160, 135 154, 185 154 C 225 154, 250 168, 250 180 C 250 192, 225 206, 185 206 C 135 206, 104 200, 104 180 Z" 
-              fill="var(--color-bg)" 
-              stroke="rgba(250, 250, 250, 0.75)" 
+              fill="var(--skyline-blimp-envelope)" 
+              stroke="var(--skyline-blimp-stroke)" 
               strokeWidth="1.2" 
             />
             {/* Long envelope longitudinal panel lines */}
-            <path d="M 105 180 Q 177 159 249 180" fill="none" stroke="rgba(250, 250, 250, 0.3)" strokeWidth="0.8" />
-            <path d="M 105 180 Q 177 201 249 180" fill="none" stroke="rgba(250, 250, 250, 0.3)" strokeWidth="0.8" />
+            <path d="M 105 180 Q 177 159 249 180" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
+            <path d="M 105 180 Q 177 201 249 180" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
             
             {/* Extra detailed longitudinal panel lines for premium texture */}
-            <path d="M 104.5 180 Q 177 169 249.5 180" fill="none" stroke="rgba(250, 250, 250, 0.25)" strokeWidth="0.6" />
-            <path d="M 104.5 180 Q 177 191 249.5 180" fill="none" stroke="rgba(250, 250, 250, 0.25)" strokeWidth="0.6" />
+            <path d="M 104.5 180 Q 177 169 249.5 180" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.6" />
+            <path d="M 104.5 180 Q 177 191 249.5 180" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.6" />
 
             {/* Vertical framing bands (ribs) */}
-            <path d="M 130 162 A 18 18 0 0 0 130 198" fill="none" stroke="rgba(250, 250, 250, 0.2)" strokeWidth="0.8" />
-            <path d="M 160 154 A 26 26 0 0 0 160 206" fill="none" stroke="rgba(250, 250, 250, 0.2)" strokeWidth="0.8" />
-            <path d="M 190 154 A 26 26 0 0 0 190 206" fill="none" stroke="rgba(250, 250, 250, 0.2)" strokeWidth="0.8" />
-            <path d="M 220 162 A 18 18 0 0 0 220 198" fill="none" stroke="rgba(250, 250, 250, 0.2)" strokeWidth="0.8" />
+            <path d="M 130 162 A 18 18 0 0 0 130 198" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
+            <path d="M 160 154 A 26 26 0 0 0 160 206" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
+            <path d="M 190 154 A 26 26 0 0 0 190 206" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
+            <path d="M 220 162 A 18 18 0 0 0 220 198" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
             {/* Nose cap lines */}
-            <path d="M 238 171 A 11 11 0 0 0 238 189" fill="none" stroke="rgba(250, 250, 250, 0.35)" strokeWidth="0.8" />
+            <path d="M 238 171 A 11 11 0 0 0 238 189" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
 
             {/* Aerodynamic stabilizers & fins */}
             {/* Top Fin */}
-            <path d="M 115 170 L 92 153 L 90 178 L 118 178 Z" fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.75)" strokeWidth="1" />
+            <path d="M 115 170 L 92 153 L 90 178 L 118 178 Z" fill="var(--skyline-blimp-envelope)" stroke="var(--skyline-blimp-stroke)" strokeWidth="1" />
             {/* Top fin hinge and rudder line */}
-            <line x1="96" y1="156" x2="94" y2="178" stroke="rgba(250, 250, 250, 0.5)" strokeWidth="0.8" />
+            <line x1="96" y1="156" x2="94" y2="178" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
 
             {/* Bottom Fin */}
-            <path d="M 115 190 L 92 207 L 90 182 L 118 182 Z" fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.75)" strokeWidth="1" />
+            <path d="M 115 190 L 92 207 L 90 182 L 118 182 Z" fill="var(--skyline-blimp-envelope)" stroke="var(--skyline-blimp-stroke)" strokeWidth="1" />
             {/* Bottom fin hinge and rudder line */}
-            <line x1="96" y1="204" x2="94" y2="182" stroke="rgba(250, 250, 250, 0.5)" strokeWidth="0.8" />
+            <line x1="96" y1="204" x2="94" y2="182" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
 
             {/* Rear Propeller Engine Pod */}
-            <rect x="135" y="202" width="10" height="4" rx="0.5" fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.75)" strokeWidth="0.8" />
+            <rect x="135" y="202" width="10" height="4" rx="0.5" fill="var(--skyline-blimp-envelope)" stroke="var(--skyline-blimp-stroke)" strokeWidth="0.8" />
             {/* Spin blades */}
-            <line x1="130" y1="199" x2="130" y2="209" stroke="rgba(250, 250, 250, 0.6)" strokeWidth="1" />
+            <line x1="130" y1="199" x2="130" y2="209" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="1" />
 
             {/* Gondola Cabin (connected by struts and rigging) */}
             {/* Structural struts */}
-            <line x1="165" y1="200" x2="165" y2="204" stroke="rgba(250, 250, 250, 0.75)" strokeWidth="0.8" />
-            <line x1="180" y1="200" x2="180" y2="204" stroke="rgba(250, 250, 250, 0.75)" strokeWidth="0.8" />
-            <line x1="195" y1="200" x2="195" y2="204" stroke="rgba(250, 250, 250, 0.75)" strokeWidth="0.8" />
+            <line x1="165" y1="200" x2="165" y2="204" stroke="var(--skyline-blimp-stroke)" strokeWidth="0.8" />
+            <line x1="180" y1="200" x2="180" y2="204" stroke="var(--skyline-blimp-stroke)" strokeWidth="0.8" />
+            <line x1="195" y1="200" x2="195" y2="204" stroke="var(--skyline-blimp-stroke)" strokeWidth="0.8" />
             {/* Rigging lines cross bracing */}
-            <line x1="165" y1="200" x2="180" y2="204" stroke="rgba(250, 250, 250, 0.4)" strokeWidth="0.5" />
-            <line x1="180" y1="200" x2="165" y2="204" stroke="rgba(250, 250, 250, 0.4)" strokeWidth="0.5" />
-            <line x1="180" y1="200" x2="195" y2="204" stroke="rgba(250, 250, 250, 0.4)" strokeWidth="0.5" />
-            <line x1="195" y1="200" x2="180" y2="204" stroke="rgba(250, 250, 250, 0.4)" strokeWidth="0.5" />
+            <line x1="165" y1="200" x2="180" y2="204" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.5" />
+            <line x1="180" y1="200" x2="165" y2="204" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.5" />
+            <line x1="180" y1="200" x2="195" y2="204" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.5" />
+            <line x1="195" y1="200" x2="180" y2="204" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.5" />
 
             {/* Gondola Body */}
-            <path d="M 158 204 L 202 204 L 197 212 L 163 212 Z" fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.75)" strokeWidth="1" />
+            <path d="M 158 204 L 202 204 L 197 212 L 163 212 Z" fill="var(--skyline-blimp-envelope)" stroke="var(--skyline-blimp-stroke)" strokeWidth="1" />
             {/* Cabin windows */}
-            <rect x="168" y="206" width="5" height="3" rx="0.3" fill="none" stroke="rgba(250, 250, 250, 0.5)" strokeWidth="0.6" />
-            <rect x="177" y="206" width="5" height="3" rx="0.3" fill="none" stroke="rgba(250, 250, 250, 0.5)" strokeWidth="0.6" />
-            <rect x="186" y="206" width="5" height="3" rx="0.3" fill="none" stroke="rgba(250, 250, 250, 0.5)" strokeWidth="0.6" />
+            <rect x="168" y="206" width="5" height="3" rx="0.3" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.6" />
+            <rect x="177" y="206" width="5" height="3" rx="0.3" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.6" />
+            <rect x="186" y="206" width="5" height="3" rx="0.3" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.6" />
 
             {/* White Tail flashing beacon */}
             <circle cx="89" cy="153" r="1.5" className={styles.blimpBeacon} />
@@ -264,18 +311,18 @@ const Layer0 = React.memo(function Layer0() {
           <g opacity="0.6">
             <polygon 
               points="380,1080 180,0 480,0" 
-              fill="url(#leftLightGrad)" 
+              fill="var(--skyline-searchlight-left)" 
               className={`${styles.searchlight} ${styles.searchlightLeft}`} 
             />
             <polygon 
               points="1480,1080 1320,0 1620,0" 
-              fill="url(#rightLightGrad)" 
+              fill="var(--skyline-searchlight-right)" 
               className={`${styles.searchlight} ${styles.searchlightRight}`} 
             />
           </g>
 
           {/* Flock of gliding pigeons */}
-          <g className={styles.flock} fill="none" stroke="rgba(250, 250, 250, 0.16)" strokeWidth="0.8">
+          <g className={styles.flock} fill="none" stroke="var(--skyline-pigeon-stroke)" strokeWidth="0.8">
             {/* Bird 1 */}
             <path d="M 0 0 Q 5 -5 10 0 Q 15 -5 20 0" />
             {/* Bird 2 */}
@@ -296,21 +343,24 @@ const Layer1 = React.memo(function Layer1() {
               <pattern id="hatch-bg" width="6" height="6" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
                 <line x1="0" y1="0" x2="0" y2="6" stroke="rgba(250, 250, 250, 0.08)" strokeWidth="0.8" />
               </pattern>
+              <pattern id="hatch-bg-black" width="6" height="6" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="0" x2="0" y2="6" stroke="rgba(26, 26, 46, 0.08)" strokeWidth="0.8" />
+              </pattern>
               <filter id="bgSketchFilter" x="-20%" y="-20%" width="140%" height="140%">
                 <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" result="noise" />
                 <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" xChannelSelector="R" yChannelSelector="G" />
               </filter>
             </defs>
-            <g className={styles.buildingGroup} stroke="rgba(250, 250, 250, 0.22)" strokeWidth="0.8" filter="url(#bgSketchFilter)">
+            <g className={styles.buildingGroup} stroke="var(--skyline-stroke-bg)" strokeWidth="0.8" filter="url(#bgSketchFilter)">
               {/* Left distant skyscrapers */}
-              <path d="M 50 1080 L 50 780 L 90 780 L 90 740 L 120 740 L 120 1080 Z" />
+              <path d="M 50 1080 L 50 780 L 90 780 L 90 740 L 120 740 L 120 1080 Z" className={styles.bldBgSkyscrapers} />
               <line x1="90" y1="740" x2="90" y2="780" />
               <line x1="60" y1="780" x2="60" y2="1080" strokeDasharray="2 8" />
               <line x1="75" y1="780" x2="75" y2="1080" strokeDasharray="2 8" />
               <line x1="105" y1="740" x2="105" y2="1080" strokeDasharray="2 8" />
               
               {/* Stepped Needle Tower (Left-Mid) */}
-              <path d="M 220 1080 L 220 720 L 230 720 L 230 650 L 240 650 L 240 540 L 246 540 L 246 450 L 250 450 L 250 350 L 254 350 L 254 450 L 258 450 L 258 540 L 264 540 L 264 650 L 274 650 L 274 720 L 284 720 L 284 1080 Z" />
+              <path d="M 220 1080 L 220 720 L 230 720 L 230 650 L 240 650 L 240 540 L 246 540 L 246 450 L 250 450 L 250 350 L 254 350 L 254 450 L 258 450 L 258 540 L 264 540 L 264 650 L 274 650 L 274 720 L 284 720 L 284 1080 Z" className={styles.bldBgNeedle} />
               <line x1="220" y1="720" x2="284" y2="720" />
               <line x1="230" y1="650" x2="274" y2="650" />
               <line x1="240" y1="540" x2="264" y2="540" />
@@ -321,7 +371,7 @@ const Layer1 = React.memo(function Layer1() {
               <line x1="252" y1="280" x2="252" y2="650" />
               
               {/* Chrysler-inspired Arched Spire Tower (Left-Center) */}
-              <path d="M 450 1080 L 450 670 L 458 640 L 468 640 L 468 590 L 478 590 L 478 535 L 488 500 L 498 340 L 508 500 L 518 535 L 518 590 L 528 590 L 528 640 L 538 640 L 546 670 L 546 1080 Z" />
+              <path d="M 450 1080 L 450 670 L 458 640 L 468 640 L 468 590 L 478 590 L 478 535 L 488 500 L 498 340 L 508 500 L 518 535 L 518 590 L 528 590 L 528 640 L 538 640 L 546 670 L 546 1080 Z" className={styles.bldBgChrysler} />
               {/* Chrysler internal details */}
               <path d="M 478 535 A 10 10 0 0 1 518 535" />
               <path d="M 468 590 A 20 20 0 0 1 528 590" />
@@ -335,7 +385,7 @@ const Layer1 = React.memo(function Layer1() {
               <line x1="498" y1="340" x2="516" y2="480" />
  
               {/* Empire State Building (Center) */}
-              <path d="M 920 1080 L 920 830 L 928 830 L 928 750 L 938 750 L 938 610 L 946 610 L 946 460 L 954 460 L 954 320 L 960 320 L 960 460 L 968 460 L 968 610 L 976 610 L 976 750 L 986 750 L 986 830 L 994 830 L 994 1080 Z" />
+              <path d="M 920 1080 L 920 830 L 928 830 L 928 750 L 928 750 L 938 750 L 938 610 L 946 610 L 946 460 L 954 460 L 954 320 L 960 320 L 960 460 L 968 460 L 968 610 L 976 610 L 976 750 L 986 750 L 986 830 L 994 830 L 994 1080 Z" className={styles.bldBgEmpire} />
               {/* Empire State Details */}
               <line x1="920" y1="830" x2="994" y2="830" />
               <line x1="928" y1="750" x2="986" y2="750" />
@@ -355,7 +405,7 @@ const Layer1 = React.memo(function Layer1() {
               <line x1="985" y1="830" x2="985" y2="1080" />
  
               {/* Flat top tower with twin antenna (Right-Mid) */}
-              <path d="M 1320 1080 L 1320 620 L 1420 620 L 1420 1080 Z" />
+              <path d="M 1320 1080 L 1320 620 L 1420 620 L 1420 1080 Z" className={styles.bldBgFlatTop} />
               <line x1="1350" y1="620" x2="1350" y2="540" />
               <line x1="1390" y1="620" x2="1390" y2="520" />
               <line x1="1340" y1="620" x2="1340" y2="1080" strokeDasharray="5 5" />
@@ -364,7 +414,7 @@ const Layer1 = React.memo(function Layer1() {
               <line x1="1400" y1="620" x2="1400" y2="1080" strokeDasharray="5 5" />
  
               {/* Steeped Block Tower (Far Right) */}
-              <path d="M 1720 1080 L 1720 740 L 1735 740 L 1735 680 L 1750 680 L 1750 580 L 1790 580 L 1790 680 L 1805 680 L 1805 740 L 1820 740 L 1820 1080 Z" />
+              <path d="M 1720 1080 L 1720 740 L 1735 740 L 1735 680 L 1750 680 L 1750 580 L 1790 580 L 1790 680 L 1805 680 L 1805 740 L 1820 740 L 1820 1080 Z" className={styles.bldBgStepped} />
               <line x1="1720" y1="740" x2="1820" y2="740" />
               <line x1="1735" y1="680" x2="1805" y2="680" />
               <line x1="1750" y1="580" x2="1790" y2="580" />
@@ -374,7 +424,7 @@ const Layer1 = React.memo(function Layer1() {
  
  
               {/* ── NEW: Art Deco Tower (Gap 1: x=140-200) ── */}
-              <path d="M 140 1080 L 140 700 L 155 700 L 155 660 L 170 660 L 170 620 L 175 580 L 180 620 L 195 620 L 195 660 L 200 660 L 200 1080 Z" />
+              <path d="M 140 1080 L 140 700 L 155 700 L 155 660 L 170 660 L 170 620 L 175 580 L 180 620 L 195 620 L 195 660 L 200 660 L 200 1080 Z" className={styles.bldBgArtDecoGap1} />
               <line x1="155" y1="660" x2="195" y2="660" />
               <line x1="140" y1="700" x2="200" y2="700" />
               <line x1="160" y1="700" x2="160" y2="1080" strokeDasharray="2 7" />
@@ -382,7 +432,7 @@ const Layer1 = React.memo(function Layer1() {
               <line x1="170" y1="660" x2="170" y2="1080" strokeDasharray="2 7" />
  
               {/* ── NEW: Slim Needle Spire (Gap 2a: x=630-670) ── */}
-              <path d="M 630 1080 L 630 640 L 640 640 L 640 520 L 650 400 L 660 520 L 660 640 L 670 640 L 670 1080 Z" />
+              <path d="M 630 1080 L 630 640 L 640 640 L 640 520 L 650 400 L 660 520 L 660 640 L 670 640 L 670 1080 Z" className={styles.bldBgSlimNeedleGap2a} />
               <line x1="630" y1="640" x2="670" y2="640" />
               <line x1="640" y1="520" x2="660" y2="520" />
               <line x1="650" y1="400" x2="650" y2="520" />
@@ -390,8 +440,8 @@ const Layer1 = React.memo(function Layer1() {
               <line x1="655" y1="640" x2="655" y2="1080" strokeDasharray="2 8" />
  
               {/* ── NEW: Twin Tower Complex (Gap 2b: x=740-840) ── */}
-              <path d="M 740 1080 L 740 590 L 780 590 L 780 1080 Z" />
-              <path d="M 800 1080 L 800 550 L 840 550 L 840 1080 Z" />
+              <path d="M 740 1080 L 740 590 L 780 590 L 780 1080 Z" className={styles.bldBgTwinLeft} />
+              <path d="M 800 1080 L 800 550 L 840 550 L 840 1080 Z" className={styles.bldBgTwinRight} />
               <line x1="740" y1="590" x2="780" y2="590" />
               <line x1="800" y1="550" x2="840" y2="550" />
               {/* Twin tower connecting skybridge */}
@@ -406,7 +456,7 @@ const Layer1 = React.memo(function Layer1() {
               <line x1="820" y1="550" x2="820" y2="480" />
  
               {/* ── NEW: Setback Office Block (Gap 3a: x=1050-1140) ── */}
-              <path d="M 1050 1080 L 1050 680 L 1070 680 L 1070 600 L 1100 600 L 1100 530 L 1110 530 L 1110 600 L 1140 600 L 1140 1080 Z" />
+              <path d="M 1050 1080 L 1050 680 L 1070 680 L 1070 600 L 1100 600 L 1100 530 L 1110 530 L 1110 600 L 1140 600 L 1140 1080 Z" className={styles.bldBgSetbackGap3a} />
               <line x1="1050" y1="680" x2="1140" y2="680" />
               <line x1="1070" y1="600" x2="1140" y2="600" />
               <line x1="1060" y1="680" x2="1060" y2="1080" strokeDasharray="3 6" />
@@ -415,7 +465,7 @@ const Layer1 = React.memo(function Layer1() {
               <line x1="1130" y1="680" x2="1130" y2="1080" strokeDasharray="3 6" />
  
               {/* ── NEW: Narrow Deco Tower (Gap 3b: x=1200-1260) ── */}
-              <path d="M 1200 1080 L 1200 640 L 1215 640 L 1215 560 L 1225 520 L 1235 560 L 1245 560 L 1245 640 L 1260 640 L 1260 1080 Z" />
+              <path d="M 1200 1080 L 1200 640 L 1215 640 L 1215 560 L 1225 520 L 1235 560 L 1245 560 L 1245 640 L 1260 640 L 1260 1080 Z" className={styles.bldBgNarrowDecoGap3b} />
               <line x1="1200" y1="640" x2="1260" y2="640" />
               <line x1="1215" y1="560" x2="1245" y2="560" />
               <line x1="1225" y1="520" x2="1225" y2="560" />
@@ -517,18 +567,21 @@ const Layer2 = React.memo(function Layer2() {
               <pattern id="hatch-mid" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
                 <line x1="0" y1="0" x2="0" y2="8" stroke="rgba(250, 250, 250, 0.15)" strokeWidth="1.0" />
               </pattern>
+              <pattern id="hatch-mid-black" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="0" x2="0" y2="8" stroke="rgba(26, 26, 46, 0.15)" strokeWidth="1.0" />
+              </pattern>
               <filter id="midSketchFilter" x="-20%" y="-20%" width="140%" height="140%">
                 <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
                 <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" />
               </filter>
             </defs>
             {/* Midground buildings (Solid fill masks Layer 1) */}
-            <g className={styles.buildingGroup} fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.32)" strokeWidth="1.2" filter="url(#midSketchFilter)">
+            <g className={styles.buildingGroup} stroke="var(--skyline-stroke-mid)" strokeWidth="1.2" filter="url(#midSketchFilter)">
               {/* Far Left block */}
-              <path d="M -10 1080 L -10 790 L 80 790 L 80 1080 Z" />
+              <path d="M -10 1080 L -10 790 L 80 790 L 80 1080 Z" className={styles.bldMidFarLeft} />
 
               {/* Staggered double-tower (Left) */}
-              <path d="M 120 1080 L 120 680 L 190 680 L 190 620 L 260 620 L 260 1080 Z" />
+              <path d="M 120 1080 L 120 680 L 190 680 L 190 620 L 260 620 L 260 1080 Z" className={styles.bldMidStaggered} />
               {/* Window grid outlines on Left Tower */}
               <g strokeWidth="0.8" fill="none">
                 <g className={styles.glowingWindow} strokeDasharray="2.5 8">
@@ -542,21 +595,21 @@ const Layer2 = React.memo(function Layer2() {
               </g>
 
               {/* Blocky Spire (Center-Left) */}
-              <path d="M 330 1080 L 330 710 L 370 710 L 370 540 L 373 540 L 373 450 L 377 450 L 377 540 L 380 540 L 380 710 L 420 710 L 420 1080 Z" />
+              <path d="M 330 1080 L 330 710 L 370 710 L 370 540 L 373 540 L 373 450 L 377 450 L 377 540 L 380 540 L 380 710 L 420 710 L 420 1080 Z" className={styles.bldMidBlockySpire} />
 
               {/* Flatiron wedge tower (Left-Center) */}
-              <path d="M 475 1080 L 475 665 L 505 640 L 525 640 L 540 665 L 540 1080 Z" />
+              <path d="M 475 1080 L 475 665 L 505 640 L 525 640 L 540 665 L 540 1080 Z" className={styles.bldMidFlatiron} />
               {/* Flatiron vertical wedge lines */}
-              <line x1="505" y1="640" x2="505" y2="1080" stroke="rgba(250, 250, 250, 0.25)" fill="none" />
-              <line x1="525" y1="640" x2="525" y2="1080" stroke="rgba(250, 250, 250, 0.25)" fill="none" />
-              <g stroke="rgba(250, 250, 250, 0.14)" strokeWidth="0.8" strokeDasharray="2 10" fill="none">
+              <line x1="505" y1="640" x2="505" y2="1080" stroke="var(--skyline-stroke-mid)" fill="none" opacity="0.8" />
+              <line x1="525" y1="640" x2="525" y2="1080" stroke="var(--skyline-stroke-mid)" fill="none" opacity="0.8" />
+              <g stroke="var(--skyline-stroke-fine)" strokeWidth="0.8" strokeDasharray="2 10" fill="none">
                 <line x1="490" y1="675" x2="490" y2="1080" />
                 <line x1="515" y1="655" x2="515" y2="1080" />
                 <line x1="530" y1="675" x2="530" y2="1080" />
               </g>
 
               {/* Citigroup-style Slanted Roof (Center-Right) */}
-              <path d="M 680 1080 L 680 690 L 760 610 L 790 610 L 790 1080 Z" />
+              <path d="M 680 1080 L 680 690 L 760 610 L 790 610 L 790 1080 Z" className={styles.bldMidCitigroup} />
               {/* Citibank window grids */}
               <g strokeWidth="0.8" fill="none">
                 <g className={styles.glowingWindow} strokeDasharray="3 10">
@@ -570,32 +623,32 @@ const Layer2 = React.memo(function Layer2() {
               </g>
 
               {/* Block Tower with setbacks (Right-Mid) */}
-              <path d="M 1110 1080 L 1110 650 L 1140 650 L 1140 590 L 1210 590 L 1210 650 L 1240 650 L 1240 1080 Z" />
-              <g stroke="rgba(250, 250, 250, 0.15)" strokeWidth="0.8" fill="none">
+              <path d="M 1110 1080 L 1110 650 L 1140 650 L 1140 590 L 1210 590 L 1210 650 L 1240 650 L 1240 1080 Z" className={styles.bldMidSetbacks} />
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" opacity="0.8">
                 <line x1="1175" y1="590" x2="1175" y2="530" />
                 {/* Horizontal window lines */}
-                <line x1="1150" y1="605" x2="1200" y2="605" stroke="rgba(250, 250, 250, 0.18)" strokeDasharray="4 6" />
-                <line x1="1150" y1="620" x2="1200" y2="620" stroke="rgba(250, 250, 250, 0.18)" strokeDasharray="4 6" />
-                <line x1="1150" y1="635" x2="1200" y2="635" stroke="rgba(250, 250, 250, 0.18)" strokeDasharray="4 6" />
+                <line x1="1150" y1="605" x2="1200" y2="605" strokeDasharray="4 6" />
+                <line x1="1150" y1="620" x2="1200" y2="620" strokeDasharray="4 6" />
+                <line x1="1150" y1="635" x2="1200" y2="635" strokeDasharray="4 6" />
               </g>
 
               {/* Glowing Clock Tower (11:45 PM Detective Time) */}
-              <path d="M 1250 1080 L 1250 590 L 1300 590 L 1300 1080 Z" />
+              <path d="M 1250 1080 L 1250 590 L 1300 590 L 1300 1080 Z" className={styles.bldMidClock} />
               {/* Top dome and spire cap */}
               <path d="M 1255 590 L 1255 570 Q 1275 550 1295 570 L 1295 590" />
               <line x1="1275" y1="550" x2="1275" y2="530" strokeWidth="1" />
               {/* Clock Face Circle */}
-              <circle cx="1275" cy="580" r="10" fill="rgba(250, 250, 250, 0.85)" stroke="var(--color-bg)" strokeWidth="1.2" />
+              <circle cx="1275" cy="580" r="10" fill="var(--skyline-clock-face)" stroke="var(--skyline-clock-border)" strokeWidth="1.2" />
               {/* Clock hands pointing at 11:45 */}
-              <line x1="1275" y1="580" x2="1275" y2="572" stroke="var(--color-bg)" strokeWidth="1" /> {/* Minute hand */}
-              <line x1="1275" y1="580" x2="1268" y2="583" stroke="var(--color-bg)" strokeWidth="1.2" /> {/* Hour hand */}
+              <line x1="1275" y1="580" x2="1275" y2="572" stroke="var(--skyline-clock-details)" strokeWidth="1" /> {/* Minute hand */}
+              <line x1="1275" y1="580" x2="1268" y2="583" stroke="var(--skyline-clock-details)" strokeWidth="1.2" /> {/* Hour hand */}
               {/* Clock Face Details (Roman marker lines at 12, 3, 6, 9) */}
-              <line x1="1275" y1="571" x2="1275" y2="573" stroke="var(--color-bg)" strokeWidth="0.8" />
-              <line x1="1284" y1="580" x2="1282" y2="580" stroke="var(--color-bg)" strokeWidth="0.8" />
-              <line x1="1275" y1="589" x2="1275" y2="587" stroke="var(--color-bg)" strokeWidth="0.8" />
-              <line x1="1266" y1="580" x2="1268" y2="580" stroke="var(--color-bg)" strokeWidth="0.8" />
+              <line x1="1275" y1="571" x2="1275" y2="573" stroke="var(--skyline-clock-details)" strokeWidth="0.8" />
+              <line x1="1284" y1="580" x2="1282" y2="580" stroke="var(--skyline-clock-details)" strokeWidth="0.8" />
+              <line x1="1275" y1="589" x2="1275" y2="587" stroke="var(--skyline-clock-details)" strokeWidth="0.8" />
+              <line x1="1266" y1="580" x2="1268" y2="580" stroke="var(--skyline-clock-details)" strokeWidth="0.8" />
               {/* Ring border for aesthetic */}
-              <circle cx="1275" cy="580" r="12" fill="none" stroke="rgba(250, 250, 250, 0.5)" strokeWidth="0.6" />
+              <circle cx="1275" cy="580" r="12" fill="none" stroke="var(--skyline-stroke-mid)" strokeWidth="0.6" />
               {/* Clock Tower windows */}
               <g strokeWidth="0.8" fill="none">
                 <g className={styles.glowingWindow} strokeDasharray="4 8">
@@ -625,7 +678,7 @@ const Layer2 = React.memo(function Layer2() {
               </g>
 
               {/* Medium Tower with Water Tower on roof & Neon Sign (Right) */}
-              <path d="M 1490 1080 L 1490 670 L 1610 670 L 1610 1080 Z" />
+              <path d="M 1490 1080 L 1490 670 L 1610 670 L 1610 1080 Z" className={styles.bldMidWaterTower} />
               {/* Hotel windows grid */}
               <g strokeWidth="0.8" fill="none">
                 <g className={styles.glowingWindow} strokeDasharray="2.5 8">
@@ -642,11 +695,11 @@ const Layer2 = React.memo(function Layer2() {
               <path d="M 1505 670 L 1505 645 L 1540 645 L 1540 670 Z" />
 
               {/* ── NEW: Slab Building (Gap 1a: x=565-640) ── */}
-              <path d="M 565 1080 L 565 690 L 640 690 L 640 1080 Z" />
+              <path d="M 565 1080 L 565 690 L 640 690 L 640 1080 Z" className={styles.bldMidSlab} />
               {/* Roof cornice line */}
               <line x1="562" y1="690" x2="643" y2="690" strokeWidth="1.4" />
               {/* Horizontal floor bands */}
-              <g stroke="rgba(250, 250, 250, 0.18)" strokeWidth="0.8" fill="none">
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" opacity="0.8">
                 <line x1="565" y1="730" x2="640" y2="730" />
                 <line x1="565" y1="770" x2="640" y2="770" />
                 <line x1="565" y1="810" x2="640" y2="810" />
@@ -664,19 +717,19 @@ const Layer2 = React.memo(function Layer2() {
               </g>
 
               {/* ── NEW: Narrow Tower (Gap 1b: x=650-680) ── */}
-              <path d="M 650 1080 L 650 620 L 658 580 L 672 580 L 680 620 L 680 1080 Z" />
+              <path d="M 650 1080 L 650 620 L 658 580 L 672 580 L 680 620 L 680 1080 Z" className={styles.bldMidNarrow} />
               <line x1="650" y1="620" x2="680" y2="620" />
               <line x1="658" y1="580" x2="672" y2="580" />
-              <line x1="665" y1="580" x2="665" y2="1080" stroke="rgba(250, 250, 250, 0.18)" strokeWidth="0.8" strokeDasharray="2 8" fill="none" />
+              <line x1="665" y1="580" x2="665" y2="1080" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" strokeDasharray="2 8" fill="none" opacity="0.8" />
               {/* Antenna mast */}
               <line x1="665" y1="580" x2="665" y2="540" />
 
               {/* ── NEW: Wide Warehouse (Gap 2a: x=830-930) ── */}
-              <path d="M 830 1080 L 830 720 L 930 720 L 930 1080 Z" />
+              <path d="M 830 1080 L 830 720 L 930 720 L 930 1080 Z" className={styles.bldMidWarehouse} />
               {/* Sawtooth roof detail */}
-              <path d="M 830 720 L 855 695 L 855 720 L 880 695 L 880 720 L 905 695 L 905 720 L 930 720" fill="var(--color-bg)" />
+              <path d="M 830 720 L 855 695 L 855 720 L 880 695 L 880 720 L 905 695 L 905 720 L 930 720" fill="var(--skyline-fill-bg)" />
               {/* Internal pillars */}
-              <g stroke="rgba(250, 250, 250, 0.2)" strokeWidth="0.8" fill="none">
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" opacity="0.8">
                 <line x1="855" y1="720" x2="855" y2="1080" />
                 <line x1="880" y1="720" x2="880" y2="1080" />
                 <line x1="905" y1="720" x2="905" y2="1080" />
@@ -694,11 +747,11 @@ const Layer2 = React.memo(function Layer2() {
               </g>
 
               {/* ── NEW: Glass Office Tower (Gap 2b: x=950-1030) ── */}
-              <path d="M 950 1080 L 950 600 L 960 600 L 960 560 L 990 560 L 990 520 L 1000 520 L 1000 560 L 1030 560 L 1030 600 L 1040 600 L 1040 1080 Z" />
+              <path d="M 950 1080 L 950 600 L 960 600 L 960 560 L 990 560 L 990 520 L 1000 520 L 1000 560 L 1030 560 L 1030 600 L 1040 600 L 1040 1080 Z" className={styles.bldMidGlass} />
               <line x1="950" y1="600" x2="1040" y2="600" />
               <line x1="960" y1="560" x2="1030" y2="560" />
               {/* Vertical mullions */}
-              <g stroke="rgba(250, 250, 250, 0.18)" strokeWidth="0.8" fill="none" strokeDasharray="3 7">
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" strokeDasharray="3 7" opacity="0.8">
                 <line x1="970" y1="600" x2="970" y2="1080" />
                 <line x1="990" y1="560" x2="990" y2="1080" />
                 <line x1="1010" y1="600" x2="1010" y2="1080" />
@@ -716,7 +769,7 @@ const Layer2 = React.memo(function Layer2() {
               </g>
 
               {/* ── NEW: Slim Spire (Gap 2c: x=1055-1095) ── */}
-              <path d="M 1055 1080 L 1055 660 L 1065 660 L 1065 580 L 1075 500 L 1085 580 L 1085 660 L 1095 660 L 1095 1080 Z" />
+              <path d="M 1055 1080 L 1055 660 L 1065 660 L 1065 580 L 1075 500 L 1085 580 L 1085 660 L 1095 660 L 1095 1080 Z" className={styles.bldMidSlimSpire} />
               <line x1="1055" y1="660" x2="1095" y2="660" />
               <line x1="1065" y1="580" x2="1085" y2="580" />
               <line x1="1075" y1="500" x2="1075" y2="580" />
@@ -727,10 +780,10 @@ const Layer2 = React.memo(function Layer2() {
               </g>
 
               {/* ── NEW: Far Right Tower (Gap 3a: x=1700-1780) ── */}
-              <path d="M 1700 1080 L 1700 650 L 1730 650 L 1730 600 L 1750 600 L 1750 650 L 1780 650 L 1780 1080 Z" />
+              <path d="M 1700 1080 L 1700 650 L 1730 650 L 1730 600 L 1750 600 L 1750 650 L 1780 650 L 1780 1080 Z" className={styles.bldMidFarRight} />
               <line x1="1700" y1="650" x2="1780" y2="650" />
               <line x1="1730" y1="600" x2="1750" y2="600" />
-              <g stroke="rgba(250, 250, 250, 0.18)" strokeWidth="0.8" fill="none" strokeDasharray="3 8">
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" strokeDasharray="3 8" opacity="0.8">
                 <line x1="1720" y1="660" x2="1720" y2="1080" />
                 <line x1="1740" y1="610" x2="1740" y2="1080" />
                 <line x1="1760" y1="660" x2="1760" y2="1080" />
@@ -744,11 +797,11 @@ const Layer2 = React.memo(function Layer2() {
               </g>
 
               {/* ── NEW: Edge Building (Gap 3b: x=1850-1930) ── */}
-              <path d="M 1850 1080 L 1850 680 L 1930 680 L 1930 1080 Z" />
+              <path d="M 1850 1080 L 1850 680 L 1930 680 L 1930 1080 Z" className={styles.bldMidEdge} />
               <line x1="1850" y1="680" x2="1930" y2="680" />
               {/* Rooftop mast */}
               <line x1="1890" y1="680" x2="1890" y2="620" />
-              <g stroke="rgba(250, 250, 250, 0.15)" strokeWidth="0.8" fill="none" strokeDasharray="2 8">
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" strokeDasharray="2 8" opacity="0.8">
                 <line x1="1870" y1="690" x2="1870" y2="1080" />
                 <line x1="1910" y1="690" x2="1910" y2="1080" />
               </g>
@@ -810,6 +863,13 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
                 <stop offset="100%" stopColor="rgba(255, 255, 255, 0)" />
               </linearGradient>
 
+              {/* Downward Light Bulb Gradient Popart */}
+              <linearGradient id="downwardLightGradPopart" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="rgba(255, 234, 0, 0.5)" />
+                <stop offset="50%" stopColor="rgba(255, 234, 0, 0.15)" />
+                <stop offset="100%" stopColor="rgba(255, 234, 0, 0)" />
+              </linearGradient>
+
               {/* Billboard Spotlight Gradient */}
               <linearGradient id="leftLightGrad" x1="0" y1="1" x2="0" y2="0">
                 <stop offset="0%" stopColor="rgba(250, 250, 250, 0.15)" />
@@ -817,8 +877,19 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
                 <stop offset="100%" stopColor="rgba(250, 250, 250, 0)" />
               </linearGradient>
 
+              {/* Billboard Spotlight Gradient Popart */}
+              <linearGradient id="leftLightGradPopart" x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0%" stopColor="rgba(255, 64, 129, 0.25)" />
+                <stop offset="60%" stopColor="rgba(255, 64, 129, 0.06)" />
+                <stop offset="100%" stopColor="rgba(255, 64, 129, 0)" />
+              </linearGradient>
+
               <pattern id="hatch-fg" width="10" height="10" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
                 <line x1="0" y1="0" x2="0" y2="10" stroke="rgba(250, 250, 250, 0.22)" strokeWidth="1.2" />
+              </pattern>
+
+              <pattern id="hatch-fg-black" width="10" height="10" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="0" x2="0" y2="10" stroke="rgba(26, 26, 46, 0.22)" strokeWidth="1.2" />
               </pattern>
 
               <filter id="fgSketchFilter" x="-20%" y="-20%" width="140%" height="140%">
@@ -828,16 +899,16 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
             </defs>
 
             {/* Group A: Foreground Static Elements (Sketch-Filtered for hand-drawn look) */}
-            <g className={styles.buildingGroup} fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.48)" strokeWidth="1.8" filter="url(#fgSketchFilter)">
+            <g className={styles.buildingGroup} stroke="var(--skyline-stroke-fg)" strokeWidth="1.8" filter="url(#fgSketchFilter)">
               
               {/* LEFT ROOFTOP SECTION */}
-              <path d="M -50 1080 L -50 820 L 460 820 L 460 1080 Z" />
+              <path d="M -50 1080 L -50 820 L 460 820 L 460 1080 Z" className={styles.bldFgLeftRoof} />
 
               {/* Solid mask under the bridge deck to block background lines/windows */}
-              <path d="M 460 856 Q 880 826 1420 856 L 1420 1080 L 460 1080 Z" fill="var(--color-bg)" stroke="none" />
+              <path d="M 460 856 Q 880 826 1420 856 L 1420 1080 L 460 1080 Z" fill="var(--skyline-fill-bg)" stroke="none" />
 
               {/* Left Parapet Brick Mortar Lines */}
-              <g stroke="rgba(250, 250, 250, 0.50)" strokeWidth="1.0" fill="none">
+              <g stroke="var(--skyline-mortar-stroke)" strokeWidth="1.0" fill="none">
                 <line x1="-50" y1="835" x2="460" y2="835" />
                 <line x1="-50" y1="847" x2="460" y2="847" />
                 <line x1="-50" y1="859" x2="460" y2="859" />
@@ -912,7 +983,7 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
               </g>
               
               {/* Retro TV Yagi Antenna on left rooftop */}
-              <g stroke="rgba(250, 250, 250, 0.48)" strokeWidth="1.5" fill="none">
+              <g stroke="var(--skyline-stroke-fg)" strokeWidth="1.5" fill="none">
                 <line x1="415" y1="820" x2="415" y2="750" />
                 {/* Crossbars */}
                 <line x1="400" y1="760" x2="430" y2="760" />
@@ -922,16 +993,16 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
               </g>
 
               {/* Rooftop Water Puddle on left rooftop */}
-              <ellipse cx="150" cy="820" rx="28" ry="2.5" fill="rgba(250, 250, 250, 0.16)" stroke="rgba(250, 250, 250, 0.45)" strokeWidth="0.8" />
+              <ellipse cx="150" cy="820" rx="28" ry="2.5" fill="var(--skyline-puddle-fill)" stroke="var(--skyline-puddle-stroke)" strokeWidth="0.8" />
 
               {/* Slanted Glass Skylight */}
-              <g fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.48)" strokeWidth="1.2">
+              <g fill="var(--bld-fg-left-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2">
                 <polygon points="255,820 255,805 285,812 285,820" />
                 {/* Glass pane partitions */}
-                <line x1="265" y1="810" x2="265" y2="820" strokeWidth="0.8" />
-                <line x1="275" y1="815" x2="275" y2="820" strokeWidth="0.8" />
+                <line x1="265" y1="810" x2="265" y2="820" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
+                <line x1="275" y1="815" x2="275" y2="820" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
                 {/* Internal glow / light rays shining out */}
-                <polygon points="255,805 240,750 300,750 285,812" fill="rgba(250, 250, 250, 0.05)" stroke="none" />
+                <polygon points="255,805 240,750 300,750 285,812" fill="var(--skyline-light-ray)" stroke="none" />
               </g>
 
               {/* Detective Billboard Support Frame & Sign (Static) */}
@@ -939,33 +1010,33 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
                 {/* Scaffold support frame */}
                 <line x1="90" y1="820" x2="98" y2="760" />
                 <line x1="170" y1="820" x2="162" y2="760" />
-                <line x1="98" y1="760" x2="162" y2="760" strokeWidth="1" />
-                <line x1="98" y1="760" x2="170" y2="820" strokeWidth="0.8" opacity="0.5" />
-                <line x1="162" y1="760" x2="90" y2="820" strokeWidth="0.8" opacity="0.5" />
+                <line x1="98" y1="760" x2="162" y2="760" stroke="var(--skyline-stroke-mid)" strokeWidth="1" />
+                <line x1="98" y1="760" x2="170" y2="820" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" opacity="0.5" />
+                <line x1="162" y1="760" x2="90" y2="820" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" opacity="0.5" />
 
                 {/* Sign Board */}
-                <rect x="80" y="700" width="100" height="60" rx="3" fill="var(--color-bg)" />
+                <rect x="80" y="700" width="100" height="60" rx="3" fill="var(--skyline-billboard-bg)" stroke="var(--skyline-stroke-fg)" strokeWidth="1.8" />
                 {/* Border line */}
-                <rect x="84" y="704" width="92" height="52" fill="none" strokeWidth="0.8" stroke="rgba(250, 250, 250, 0.4)" />
+                <rect x="84" y="704" width="92" height="52" fill="none" strokeWidth="0.8" stroke="var(--skyline-stroke-mid)" />
                 
                 {/* Cocktail Glass Logo */}
-                <path d="M 104 718 L 124 718 L 114 734 Z" fill="none" strokeWidth="1.2" /> {/* Glass Bowl */}
-                <line x1="114" y1="734" x2="114" y2="746" strokeWidth="1.5" /> {/* Stem */}
-                <line x1="107" y1="746" x2="121" y2="746" strokeWidth="1.5" /> {/* Base */}
+                <path d="M 104 718 L 124 718 L 114 734 Z" fill="none" stroke="var(--skyline-billboard-text)" strokeWidth="1.2" /> {/* Glass Bowl */}
+                <line x1="114" y1="734" x2="114" y2="746" stroke="var(--skyline-billboard-text)" strokeWidth="1.5" /> {/* Stem */}
+                <line x1="107" y1="746" x2="121" y2="746" stroke="var(--skyline-billboard-text)" strokeWidth="1.5" /> {/* Base */}
                 
-                <text x="154" y="728" textAnchor="middle" fontFamily="var(--font-code)" fontWeight="bold" fontSize="7.8" fill="rgba(250,250,250,0.85)" stroke="none">NOIR</text>
-                <text x="154" y="740" textAnchor="middle" fontFamily="var(--font-code)" fontWeight="bold" fontSize="7.8" fill="rgba(250,250,250,0.85)" stroke="none">GIN</text>
+                <text x="154" y="728" textAnchor="middle" fontFamily="var(--font-code)" fontWeight="bold" fontSize="7.8" fill="var(--skyline-billboard-text)" stroke="none">NOIR</text>
+                <text x="154" y="740" textAnchor="middle" fontFamily="var(--font-code)" fontWeight="bold" fontSize="7.8" fill="var(--skyline-billboard-text)" stroke="none">GIN</text>
               </g>
 
               {/* Rooftop Penthouse Brick Access Shed (Static part) */}
-              <g fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.48)" strokeWidth="1.8">
+              <g className={styles.bldFgShed} stroke="var(--skyline-stroke-fg)" strokeWidth="1.8">
                 {/* Main Shed Structure */}
                 <rect x="290" y="750" width="65" height="70" />
                 {/* Roof Cap */}
                 <line x1="288" y1="750" x2="357" y2="750" />
                 
                 {/* Brick Mortar Details inside Shed (excluding door x=304-328, y=771-820) */}
-                <g stroke="rgba(250, 250, 250, 0.50)" strokeWidth="1.0" fill="none">
+                <g stroke="var(--skyline-mortar-stroke)" strokeWidth="1.0" fill="none">
                   {/* Rows */}
                   <line x1="290" y1="760" x2="355" y2="760" />
                   <line x1="290" y1="770" x2="355" y2="770" />
@@ -1005,30 +1076,30 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
                 </g>
 
                 {/* Wooden Access Door */}
-                <rect x="304" y="771" width="24" height="49" strokeWidth="1.2" />
+                <rect x="304" y="771" width="24" height="49" fill="var(--skyline-shed-door)" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
                 {/* Inset Panels */}
-                <rect x="308" y="776" width="16" height="17" fill="none" stroke="rgba(250, 250, 250, 0.4)" strokeWidth="0.8" />
-                <rect x="308" y="797" width="16" height="19" fill="none" stroke="rgba(250, 250, 250, 0.4)" strokeWidth="0.8" />
+                <rect x="308" y="776" width="16" height="17" fill="none" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
+                <rect x="308" y="797" width="16" height="19" fill="none" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
                 
                 {/* Vintage Keyhole */}
-                <circle cx="323" cy="798" r="1.2" fill="rgba(250, 250, 250, 0.85)" stroke="none" />
-                <path d="M 322.5 798 L 321.5 801.5 L 324.5 801.5 Z" fill="rgba(250, 250, 250, 0.85)" stroke="none" />
+                <circle cx="323" cy="798" r="1.2" fill="var(--skyline-stroke-fg)" stroke="none" />
+                <path d="M 322.5 798 L 321.5 801.5 L 324.5 801.5 Z" fill="var(--skyline-stroke-fg)" stroke="none" />
 
                 {/* Light fixture */}
-                <line x1="316" y1="750" x2="316" y2="762" strokeWidth="1.0" />
-                <rect x="314" y="762" width="4" height="3" strokeWidth="0.8" />
-                <circle cx="316" cy="767" r="2.2" fill="#fafafa" stroke="none" />
-                <circle cx="316" cy="767" r="2.6" fill="none" strokeWidth="0.5" />
+                <line x1="316" y1="750" x2="316" y2="762" stroke="var(--skyline-stroke-mid)" strokeWidth="1.0" />
+                <rect x="314" y="762" width="4" height="3" stroke="var(--skyline-stroke-fg)" strokeWidth="0.8" />
+                <circle cx="316" cy="767" r="2.2" fill="var(--skyline-bulb-glow)" stroke="none" />
+                <circle cx="316" cy="767" r="2.6" fill="none" stroke="var(--skyline-stroke-fg)" strokeWidth="0.5" />
                 {/* Light cone casting downwards */}
-                <polygon points="316,769 292,820 340,820" fill="url(#downwardLightGrad)" stroke="none" />
+                <polygon points="316,769 292,820 340,820" fill="var(--skyline-downward-light)" stroke="none" />
               </g>
 
               {/* Parapet Wall Cap details on left roof */}
-              <line x1="-50" y1="826" x2="460" y2="826" strokeWidth="0.8" />
-              <line x1="40" y1="820" x2="40" y2="1080" stroke="rgba(250, 250, 250, 0.2)" strokeWidth="1" />
+              <line x1="-50" y1="826" x2="460" y2="826" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
+              <line x1="40" y1="820" x2="40" y2="1080" stroke="var(--skyline-stroke-fine)" strokeWidth="1" />
               
               {/* Fire Escape details hanging on the left facade */}
-              <g stroke="rgba(250, 250, 250, 0.43)" strokeWidth="1.2" fill="none">
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="1.2" fill="none">
                 {/* Railings */}
                 <path d="M 15 850 L 85 850 M 15 890 L 85 890 M 15 930 L 85 930" />
                 <path d="M 15 850 L 15 950 M 85 850 L 85 950" />
@@ -1038,20 +1109,20 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
               </g>
 
               {/* Rooftop Pipe Chimneys with Steam path generators */}
-              <rect x="220" y="780" width="16" height="40" />
-              <rect x="215" y="775" width="26" height="6" />
+              <rect x="220" y="780" width="16" height="40" className={styles.bldFgChimney} />
+              <rect x="215" y="775" width="26" height="6" className={styles.bldFgChimney} />
 
-              <rect x="360" y="760" width="22" height="60" />
-              <rect x="354" y="754" width="34" height="6" />
+              <rect x="360" y="760" width="22" height="60" className={styles.bldFgChimney} />
+              <rect x="354" y="754" width="34" height="6" className={styles.bldFgChimney} />
               {/* Exhaust Fan Housing */}
-              <ellipse cx="371" cy="750" rx="9" ry="4" fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.48)" strokeWidth="1" />
+              <ellipse cx="371" cy="750" rx="9" ry="4" fill="var(--skyline-fill-bg)" stroke="var(--skyline-stroke-mid)" strokeWidth="1" />
 
               {/* RIGHT ROOFTOP SECTION */}
-              <path d="M 1420 1080 L 1420 760 L 1970 760 L 1970 1080 Z" />
-              <line x1="1420" y1="766" x2="1970" y2="766" strokeWidth="0.8" />
+              <path d="M 1420 1080 L 1420 760 L 1970 760 L 1970 1080 Z" className={styles.bldFgRightRoof} />
+              <line x1="1420" y1="766" x2="1970" y2="766" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
 
               {/* Right Parapet Brick Mortar Lines */}
-              <g stroke="rgba(250, 250, 250, 0.50)" strokeWidth="1.0" fill="none">
+              <g stroke="var(--skyline-mortar-stroke)" strokeWidth="1.0" fill="none">
                 <line x1="1420" y1="775" x2="1970" y2="775" />
                 <line x1="1420" y1="787" x2="1970" y2="787" />
                 <line x1="1420" y1="799" x2="1970" y2="799" />
@@ -1118,51 +1189,51 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
               </g>
 
               {/* Roof HVAC Unit */}
-              <rect x="1750" y="715" width="65" height="45" />
+              <rect x="1750" y="715" width="65" height="45" className={styles.bldFgHvac} />
               {/* HVAC Grid */}
-              <line x1="1760" y1="725" x2="1805" y2="725" strokeWidth="0.8" />
-              <line x1="1760" y1="735" x2="1805" y2="735" strokeWidth="0.8" />
-              <line x1="1760" y1="745" x2="1805" y2="745" strokeWidth="0.8" />
+              <line x1="1760" y1="725" x2="1805" y2="725" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
+              <line x1="1760" y1="735" x2="1805" y2="735" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
+              <line x1="1760" y1="745" x2="1805" y2="745" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
 
               {/* Industrial Blower Unit (Static parts) */}
-              <g fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.48)" strokeWidth="1.2">
+              <g className={styles.bldFgBlower} stroke="var(--skyline-stroke-fg)" strokeWidth="1.2">
                 <rect x="1587" y="725" width="22" height="35" rx="1" />
                 {/* Fan casing circle */}
                 <circle cx="1598" cy="742" r="8" />
 
                 {/* Exhaust Pipe Stack */}
-                <line x1="1598" y1="725" x2="1598" y2="717" />
-                <line x1="1595" y1="717" x2="1601" y2="717" strokeWidth="1.5" />
+                <line x1="1598" y1="725" x2="1598" y2="717" stroke="var(--skyline-stroke-fg)" />
+                <line x1="1595" y1="717" x2="1601" y2="717" stroke="var(--skyline-stroke-fg)" strokeWidth="1.5" />
               </g>
 
               {/* Rooftop Clothesline (Static posts & wire) */}
-              <g>
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="1" fill="none">
                 {/* Left & Right Posts */}
                 <line x1="1640" y1="760" x2="1640" y2="710" />
                 <line x1="1705" y1="760" x2="1705" y2="710" />
-                <line x1="1635" y1="710" x2="1645" y2="710" strokeWidth="1" />
-                <line x1="1700" y1="710" x2="1710" y2="710" strokeWidth="1" />
+                <line x1="1635" y1="710" x2="1645" y2="710" />
+                <line x1="1700" y1="710" x2="1710" y2="710" />
                 {/* Sagging Line */}
-                <path d="M 1640 715 Q 1672 725 1705 715" fill="none" strokeWidth="0.8" />
+                <path d="M 1640 715 Q 1672 725 1705 715" strokeWidth="0.8" />
               </g>
 
               {/* Roof Chimney Duct for Steam */}
-              <rect x="1860" y="700" width="18" height="60" />
-              <rect x="1854" y="694" width="30" height="6" />
+              <rect x="1860" y="700" width="18" height="60" className={styles.bldFgChimney} />
+              <rect x="1854" y="694" width="30" height="6" className={styles.bldFgChimney} />
 
               {/* MIDDLE BRIDGE STRUCTURE (Fills the gap between rooftops) */}
-              <path d="M 850 1080 L 850 780 L 870 730 L 890 730 L 910 780 L 910 1080 Z" />
+              <path d="M 850 1080 L 850 780 L 870 730 L 890 730 L 910 780 L 910 1080 Z" className={styles.bldFgBridgeTower} />
 
               {/* Steel Plate Joint Seams on Tower Legs */}
               <path 
                 d="M 850 750 L 870 750 M 890 750 L 910 750 M 850 780 L 870 780 M 890 780 L 910 780 M 850 810 L 870 810 M 890 810 L 910 810 M 850 840 L 870 840 M 890 840 L 910 840 M 850 870 L 870 870 M 890 870 L 910 870 M 850 900 L 870 900 M 890 900 L 910 900 M 850 930 L 870 930 M 890 930 L 910 930 M 860 730 L 860 935 M 900 730 L 900 935" 
-                stroke="rgba(250, 250, 250, 0.22)" 
+                stroke="var(--skyline-stroke-fine)" 
                 strokeWidth="0.8" 
                 fill="none" 
               />
 
               {/* Bridge Tower Structural Steel Trusses (Extended above and below deck) */}
-              <g stroke="rgba(250, 250, 250, 0.30)" strokeWidth="0.9" fill="none">
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.9" fill="none">
                 {/* Inner legs vertical lines */}
                 <line x1="870" y1="730" x2="870" y2="780" />
                 <line x1="890" y1="730" x2="890" y2="780" />
@@ -1220,7 +1291,7 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
               </g>
 
               {/* Decorative Art Deco Tower Crown Plates */}
-              <g stroke="rgba(250, 250, 250, 0.48)" strokeWidth="1.2" fill="var(--color-bg)">
+              <g stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" fill="var(--skyline-fill-bg)">
                 <polygon points="864,730 896,730 896,726 864,726" />
                 <polygon points="871,726 889,726 889,720 871,720" />
                 <polygon points="877,720 883,720 880,712" />
@@ -1228,14 +1299,14 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
 
               {/* Detailed double gothic arches */}
               <g fill="none">
-                <path d="M 865 840 A 12 25 0 0 1 895 840" stroke="rgba(250, 250, 250, 0.48)" strokeWidth="1.2" />
-                <path d="M 868 840 A 9 20 0 0 1 892 840" stroke="rgba(250, 250, 250, 0.35)" strokeWidth="0.8" />
-                <path d="M 865 910 A 12 25 0 0 1 895 910" stroke="rgba(250, 250, 250, 0.48)" strokeWidth="1.2" />
-                <path d="M 868 910 A 9 20 0 0 1 892 910" stroke="rgba(250, 250, 250, 0.35)" strokeWidth="0.8" />
+                <path d="M 865 840 A 12 25 0 0 1 895 840" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
+                <path d="M 868 840 A 9 20 0 0 1 892 840" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
+                <path d="M 865 910 A 12 25 0 0 1 895 910" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
+                <path d="M 868 910 A 9 20 0 0 1 892 910" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
               </g>
 
               {/* Concrete Pier / Caisson Base at the Waterline */}
-              <g fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.48)" strokeWidth="1.5">
+              <g className={styles.bldFgBridgePier} stroke="var(--skyline-stroke-fg)" strokeWidth="1.5">
                 {/* Stepped Block 1 (Top) */}
                 <rect x="842" y="935" width="76" height="15" rx="2" />
                 {/* Stepped Block 2 (Middle, water contact) */}
@@ -1245,7 +1316,7 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
               </g>
 
               {/* Art Deco Recessed Panel Grooves on concrete base */}
-              <g stroke="rgba(250, 250, 250, 0.22)" strokeWidth="1.0" fill="none">
+              <g stroke="var(--skyline-stroke-fine)" strokeWidth="1.0" fill="none">
                 <line x1="860" y1="968" x2="860" y2="1080" />
                 <line x1="880" y1="968" x2="880" y2="1080" />
                 <line x1="900" y1="968" x2="900" y2="1080" />
@@ -1257,24 +1328,24 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
 
               {/* Protective Harbor Dolphin Piles next to tower */}
               {/* Left dolphin piles */}
-              <g fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.4)" strokeWidth="1">
+              <g className={styles.bldFgDolphinPiles} stroke="var(--skyline-stroke-mid)" strokeWidth="1">
                 <rect x="783" y="934" width="4.5" height="50" rx="1.2" />
                 <rect x="791" y="930" width="4.5" height="54" rx="1.2" />
                 <rect x="787" y="926" width="4.5" height="58" rx="1.2" />
                 {/* Steel cable wraps binding them */}
-                <path d="M 783 942 L 795.5 942 M 783 944 L 795.5 944 M 783 955 L 795.5 955 M 783 957 L 795.5 957" stroke="rgba(250,250,250,0.6)" strokeWidth="0.8" fill="none" />
+                <path d="M 783 942 L 795.5 942 M 783 944 L 795.5 944 M 783 955 L 795.5 955 M 783 957 L 795.5 957" stroke="var(--skyline-stroke-fg)" strokeWidth="0.8" fill="none" />
               </g>
               {/* Right dolphin piles */}
-              <g fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.4)" strokeWidth="1">
+              <g className={styles.bldFgDolphinPiles} stroke="var(--skyline-stroke-mid)" strokeWidth="1">
                 <rect x="972" y="934" width="4.5" height="50" rx="1.2" />
                 <rect x="964" y="930" width="4.5" height="54" rx="1.2" />
                 <rect x="968" y="926" width="4.5" height="58" rx="1.2" />
                 {/* Steel cable wraps binding them */}
-                <path d="M 964 942 L 976.5 942 M 964 944 L 976.5 944 M 964 955 L 976.5 955 M 964 957 L 976.5 957" stroke="rgba(250,250,250,0.6)" strokeWidth="0.8" fill="none" />
+                <path d="M 964 942 L 976.5 942 M 964 944 L 976.5 944 M 964 955 L 976.5 955 M 964 957 L 976.5 957" stroke="var(--skyline-stroke-fg)" strokeWidth="0.8" fill="none" />
               </g>
 
               {/* Stylized water reflection ripples under the concrete pier */}
-              <g stroke="rgba(250, 250, 250, 0.25)" strokeWidth="0.8" fill="none">
+              <g stroke="var(--skyline-stroke-fine)" strokeWidth="0.8" fill="none">
                 <line x1="810" y1="974" x2="950" y2="974" strokeDasharray="6 4" />
                 <line x1="825" y1="984" x2="935" y2="984" strokeDasharray="5 5" />
                 <line x1="840" y1="994" x2="920" y2="994" strokeDasharray="4 6" />
@@ -1284,14 +1355,14 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
 
               {/* Bridge Cables */}
               {/* Thick Main Cables */}
-              <path d="M 880 730 Q 670 820 460 850" fill="none" strokeWidth="2.2" stroke="rgba(250, 250, 250, 0.48)" />
-              <path d="M 880 730 Q 1150 820 1420 850" fill="none" strokeWidth="2.2" stroke="rgba(250, 250, 250, 0.48)" />
+              <path d="M 880 730 Q 670 820 460 850" fill="none" strokeWidth="2.2" stroke="var(--skyline-stroke-fg)" />
+              <path d="M 880 730 Q 1150 820 1420 850" fill="none" strokeWidth="2.2" stroke="var(--skyline-stroke-fg)" />
               {/* Secondary parallel accent cables */}
-              <path d="M 880 726 Q 670 816 460 846" fill="none" strokeWidth="0.8" stroke="rgba(250, 250, 250, 0.35)" />
-              <path d="M 880 726 Q 1150 816 1420 846" fill="none" strokeWidth="0.8" stroke="rgba(250, 250, 250, 0.35)" />
+              <path d="M 880 726 Q 670 816 460 846" fill="none" strokeWidth="0.8" stroke="var(--skyline-stroke-mid)" />
+              <path d="M 880 726 Q 1150 816 1420 846" fill="none" strokeWidth="0.8" stroke="var(--skyline-stroke-mid)" />
 
               {/* Cable clamps (nodes where suspenders connect) */}
-              <g fill="rgba(250, 250, 250, 0.85)" stroke="none">
+              <g fill="var(--skyline-stroke-fg)" stroke="none">
                 {/* Left side clamps */}
                 <circle cx="500" cy="843.7" r="1.3" />
                 <circle cx="530" cy="838.3" r="1.3" />
@@ -1322,54 +1393,54 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
               </g>
 
               {/* Bridge Roadway Deck (Warren Truss/Steel Girder Structure) */}
-              <g stroke="rgba(250, 250, 250, 0.48)" fill="none">
+              <g stroke="var(--skyline-stroke-fg)" fill="none">
                 {/* Upper Deck Chord */}
                 <path d="M 460 850 Q 880 820 1420 850" strokeWidth="1.5" />
                 {/* Lower Deck Chord */}
                 <path d="M 460 856 Q 880 826 1420 856" strokeWidth="1.5" />
                 {/* Vertical Steel Posts (follow the curve) */}
-                <path d="M 480 848 L 480 854 M 500 847 L 500 853 M 520 845 L 520 851 M 540 843 L 540 849 M 560 841 L 560 847 M 580 839 L 580 845 M 600 837 L 600 843 M 620 835 L 620 841 M 640 833 L 640 839 M 660 831 L 660 837 M 680 830 L 680 836 M 700 828 L 700 834 M 720 827 L 720 833 M 740 825 L 740 831 M 760 824 L 760 830 M 780 823 L 780 829 M 800 822 L 800 828 M 820 821 L 820 827 M 840 820 L 840 826 M 920 820 L 920 826 M 940 821 L 940 827 M 960 822 L 960 828 M 980 823 L 980 829 M 1000 824 L 1000 830 M 1020 825 L 1020 831 M 1040 827 L 1040 833 M 1060 828 L 1060 834 M 1080 830 L 1080 836 M 1100 831 L 1100 837 M 1120 833 L 1120 839 M 1140 835 L 1140 841 M 1160 837 L 1160 843 M 1180 839 L 1180 845 M 1200 841 L 1200 847 M 1220 843 L 1220 849 M 1240 845 L 1240 851 M 1260 847 L 1260 853 M 1280 848 L 1280 854 M 1300 850 L 1300 856 M 1320 850 L 1320 856 M 1340 850 L 1340 856 M 1360 850 L 1360 856 M 1380 850 L 1380 856 M 1400 850 L 1400 856" strokeWidth="0.8" stroke="rgba(250, 250, 250, 0.30)" />
+                <path d="M 480 848 L 480 854 M 500 847 L 500 853 M 520 845 L 520 851 M 540 843 L 540 849 M 560 841 L 560 847 M 580 839 L 580 845 M 600 837 L 600 843 M 620 835 L 620 841 M 640 833 L 640 839 M 660 831 L 660 837 M 680 830 L 680 836 M 700 828 L 700 834 M 720 827 L 720 833 M 740 825 L 740 831 M 760 824 L 760 830 M 780 823 L 780 829 M 800 822 L 800 828 M 820 821 L 820 827 M 840 820 L 840 826 M 920 820 L 920 826 M 940 821 L 940 827 M 960 822 L 960 828 M 980 823 L 980 829 M 1000 824 L 1000 830 M 1020 825 L 1020 831 M 1040 827 L 1040 833 M 1060 828 L 1060 834 M 1080 830 L 1080 836 M 1100 831 L 1100 837 M 1120 833 L 1120 839 M 1140 835 L 1140 841 M 1160 837 L 1160 843 M 1180 839 L 1180 845 M 1200 841 L 1200 847 M 1220 843 L 1220 849 M 1240 845 L 1240 851 M 1260 847 L 1260 853 M 1280 848 L 1280 854 M 1300 850 L 1300 856 M 1320 850 L 1320 856 M 1340 850 L 1340 856 M 1360 850 L 1360 856 M 1380 850 L 1380 856 M 1400 850 L 1400 856" strokeWidth="0.8" stroke="var(--skyline-stroke-mid)" />
                 {/* Warren Truss Diagonals (calculated zigzags) */}
-                <path d="M 460 850.0 L 480 854.6 L 500 847.3 L 520 852.1 L 540 844.9 L 560 849.8 L 580 842.8 L 600 847.8 L 620 840.9 L 640 846.1 L 660 839.4 L 680 844.7 L 700 838.0 L 720 843.5 L 740 837.0 L 760 842.5 L 780 836.1 L 800 841.8 L 820 835.5 L 840 841.3" strokeWidth="0.8" stroke="rgba(250, 250, 250, 0.30)" />
-                <path d="M 920 835.0 L 940 841.1 L 960 835.2 L 980 841.3 L 1000 835.5 L 1020 841.8 L 1040 836.1 L 1060 842.4 L 1080 836.8 L 1100 843.2 L 1120 837.7 L 1140 844.3 L 1160 838.8 L 1180 845.4 L 1200 840.1 L 1220 846.8 L 1240 841.5 L 1260 848.3 L 1280 843.1 L 1300 850.0 L 1320 844.9 L 1340 851.9 L 1360 846.8 L 1380 853.9 L 1400 848.9 L 1420 856.0" strokeWidth="0.8" stroke="rgba(250, 250, 250, 0.30)" />
+                <path d="M 460 850.0 L 480 854.6 L 500 847.3 L 520 852.1 L 540 844.9 L 560 849.8 L 580 842.8 L 600 847.8 L 620 840.9 L 640 846.1 L 660 839.4 L 680 844.7 L 700 838.0 L 720 843.5 L 740 837.0 L 760 842.5 L 780 836.1 L 800 841.8 L 820 835.5 L 840 841.3" strokeWidth="0.8" stroke="var(--skyline-stroke-mid)" />
+                <path d="M 920 835.0 L 940 841.1 L 960 835.2 L 980 841.3 L 1000 835.5 L 1020 841.8 L 1040 836.1 L 1060 842.4 L 1080 836.8 L 1100 843.2 L 1120 837.7 L 1140 844.3 L 1160 838.8 L 1180 845.4 L 1200 840.1 L 1220 846.8 L 1240 841.5 L 1260 848.3 L 1280 843.1 L 1300 850.0 L 1320 844.9 L 1340 851.9 L 1360 846.8 L 1380 853.9 L 1400 848.9 L 1420 856.0" strokeWidth="0.8" stroke="var(--skyline-stroke-mid)" />
               </g>
 
               {/* Roadway traffic light trails (Static lines) */}
-              <g fill="rgba(250, 250, 250, 0.85)" stroke="none">
+              <g stroke="none">
                 {/* Outbound Traffic Light Trail (glowing headlights) */}
-                <path d="M 460 852 Q 880 822 1420 852" fill="none" stroke="rgba(250, 250, 250, 0.25)" strokeWidth="0.8" />
+                <path d="M 460 852 Q 880 822 1420 852" fill="none" stroke="var(--skyline-traffic-headlight-trail)" strokeWidth="0.8" />
                 {/* Inbound Traffic Light Trail (glowing taillights) */}
-                <path d="M 460 854 Q 880 824 1420 854" fill="none" stroke="rgba(250, 250, 250, 0.2)" strokeWidth="0.8" />
+                <path d="M 460 854 Q 880 824 1420 854" fill="none" stroke="var(--skyline-traffic-taillight-trail)" strokeWidth="0.8" />
               </g>
 
               {/* River waterline & Tugboat under the bridge (Static) */}
-              <line x1="460" y1="950" x2="1420" y2="950" stroke="rgba(250, 250, 250, 0.16)" strokeWidth="1" strokeDasharray="8 6" />
+              <line x1="460" y1="950" x2="1420" y2="950" stroke="var(--skyline-stroke-fine)" strokeWidth="1" strokeDasharray="8 6" />
               
-              <g>
+              <g className={styles.bldFgTugboat}>
                 {/* Tugboat hull */}
-                <path d="M 1030 950 L 1070 950 L 1065 941 L 1035 941 Z" fill="var(--color-bg)" />
+                <path d="M 1030 950 L 1070 950 L 1065 941 L 1035 941 Z" fill="var(--skyline-tugboat-hull)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
                 {/* Cabin */}
-                <rect x="1040" y="933" width="16" height="8" fill="var(--color-bg)" strokeWidth="1" />
+                <rect x="1040" y="933" width="16" height="8" fill="var(--skyline-tugboat-cabin)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
                 {/* Smokestack */}
-                <line x1="1052" y1="933" x2="1052" y2="926" strokeWidth="1.2" />
+                <line x1="1052" y1="933" x2="1052" y2="926" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
                 {/* Smoke puffs */}
-                <circle cx="1050" cy="922" r="2" fill="none" stroke="rgba(250,250,250,0.3)" strokeWidth="0.8" />
-                <circle cx="1047" cy="918" r="3" fill="none" stroke="rgba(250,250,250,0.2)" strokeWidth="0.8" />
+                <circle cx="1050" cy="922" r="2" fill="none" stroke="var(--skyline-tugboat-smoke)" strokeWidth="0.8" />
+                <circle cx="1047" cy="918" r="3" fill="none" stroke="var(--skyline-tugboat-smoke)" strokeWidth="0.8" />
                 {/* Propeller wake wave ripples */}
-                <path d="M 1026 947 Q 1010 945 995 948" fill="none" stroke="rgba(250, 250, 250, 0.2)" strokeWidth="0.8" />
-                <path d="M 1020 951 Q 1005 950 988 953" fill="none" stroke="rgba(250, 250, 250, 0.15)" strokeWidth="0.8" />
+                <path d="M 1026 947 Q 1010 945 995 948" fill="none" stroke="var(--skyline-stroke-fine)" strokeWidth="0.8" />
+                <path d="M 1020 951 Q 1005 950 988 953" fill="none" stroke="var(--skyline-stroke-fine)" strokeWidth="0.8" />
               </g>
 
               {/* Curved Streetlight Poles & Arms (Static) */}
               <path 
                 d="M 550 844.3 L 550 832.3 Q 550 830.3 546 830.3 M 650 839.7 L 650 827.7 Q 650 825.7 646 825.7 M 750 836.7 L 750 824.7 Q 750 822.7 746 822.7 M 850 835.2 L 850 823.2 Q 850 821.2 846 821.2 M 950 835.1 L 950 823.1 Q 950 821.1 954 821.1 M 1050 836.2 L 1050 824.2 Q 1050 822.2 1054 822.2 M 1150 838.5 L 1150 826.5 Q 1150 824.5 1154 824.5 M 1250 841.9 L 1250 829.9 Q 1250 827.9 1254 827.9 M 1350 846.3 L 1350 834.3 Q 1350 832.3 1354 832.3"
-                stroke="rgba(250, 250, 250, 0.35)"
+                stroke="var(--skyline-stroke-mid)"
                 strokeWidth="0.8"
                 fill="none"
               />
 
               {/* Hanging Power Lines / Catenary wires (Static) */}
-              <g stroke="rgba(250, 250, 250, 0.28)" strokeWidth="0.8" fill="none">
+              <g stroke="var(--skyline-stroke-fine)" strokeWidth="0.8" fill="none">
                 <path d="M 450 820 Q 650 900 850 780" />
                 <path d="M 450 835 Q 650 915 850 795" />
                 <path d="M 910 780 Q 1165 915 1420 760" />
@@ -1385,23 +1456,23 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
             </g>
 
             {/* Group B: Unfiltered Foreground Animating Elements (Separated to bypass displacement map redraw cost for GPU performance) */}
-            <g fill="var(--color-bg)" stroke="rgba(250, 250, 250, 0.48)" strokeWidth="1.8" className={styles.buildingGroup}>
+            <g fill="var(--skyline-fill-bg)" stroke="var(--skyline-stroke-fg)" strokeWidth="1.8" className={styles.buildingGroup}>
               {/* Animated Billboard Spotlight */}
-              <polygon points="130,820 80,695 180,695" fill="url(#leftLightGrad)" stroke="none" className={styles.billboardLight} />
+              <polygon points="130,820 80,695 180,695" fill="var(--skyline-left-light-grad)" stroke="none" className={styles.billboardLight} />
 
               {/* Cat Silhouette sitting on penthouse roof (Animating tail & blinking eyes) */}
               <g>
                 {/* Cat Body */}
-                <path d="M 314 750 C 314 738, 326 738, 326 750 Z" fill="var(--color-bg)" />
+                <path d="M 314 750 C 314 738, 326 738, 326 750 Z" fill="var(--skyline-cat-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
                 {/* Cat Head */}
-                <circle cx="320" cy="728" r="5" fill="var(--color-bg)" />
+                <circle cx="320" cy="728" r="5" fill="var(--skyline-cat-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
                 {/* Cat Ears */}
-                <polygon points="316,725 313,718 318,721" fill="var(--color-bg)" />
-                <polygon points="324,725 327,718 322,721" fill="var(--color-bg)" />
+                <polygon points="316,725 313,718 318,721" fill="var(--skyline-cat-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                <polygon points="324,725 327,718 322,721" fill="var(--skyline-cat-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
                 {/* Cat Tail (Twitchy!) */}
-                <path d="M 325 746 Q 332 743 329 735 T 333 725" fill="none" className={styles.catTail} />
+                <path d="M 325 746 Q 332 743 329 735 T 333 725" fill="none" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" className={styles.catTail} />
                 {/* Glowing Cat Eyes (blinking) */}
-                <g className={styles.catEyes} fill="#fafafa" stroke="none">
+                <g className={styles.catEyes} fill="var(--skyline-cat-eyes)" stroke="none">
                   <circle cx="318.5" cy="727.5" r="0.8" />
                   <circle cx="321.5" cy="727.5" r="0.8" />
                 </g>
@@ -1409,41 +1480,41 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
 
               {/* Spinning Fan Blades (Animating) */}
               <g className={styles.fanBlade}>
-                <line x1="371" y1="750" x2="366" y2="748" stroke="rgba(250, 250, 250, 0.85)" strokeWidth="1" />
-                <line x1="371" y1="750" x2="376" y2="752" stroke="rgba(250, 250, 250, 0.85)" strokeWidth="1" />
-                <line x1="371" y1="750" x2="369" y2="753" stroke="rgba(250, 250, 250, 0.85)" strokeWidth="1" />
-                <line x1="371" y1="750" x2="373" y2="747" stroke="rgba(250, 250, 250, 0.85)" strokeWidth="1" />
+                <line x1="371" y1="750" x2="366" y2="748" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                <line x1="371" y1="750" x2="376" y2="752" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                <line x1="371" y1="750" x2="369" y2="753" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                <line x1="371" y1="750" x2="373" y2="747" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
               </g>
 
               {/* Blower wheel spokes (Animating) */}
-              <circle cx="1598" cy="742" r="1.5" fill="rgba(250, 250, 250, 0.85)" stroke="none" />
+              <circle cx="1598" cy="742" r="1.5" fill="var(--skyline-stroke-fg)" stroke="none" />
               <g className={styles.blowerFan}>
-                <line x1="1598" y1="742" x2="1598" y2="734" stroke="rgba(250, 250, 250, 0.85)" strokeWidth="0.8" />
-                <line x1="1598" y1="742" x2="1598" y2="750" stroke="rgba(250, 250, 250, 0.85)" strokeWidth="0.8" />
-                <line x1="1598" y1="742" x2="1590" y2="742" stroke="rgba(250, 250, 250, 0.85)" strokeWidth="0.8" />
-                <line x1="1598" y1="742" x2="1606" y2="742" stroke="rgba(250, 250, 250, 0.85)" strokeWidth="0.8" />
-                <line x1="1598" y1="742" x2="1592" y2="736" stroke="rgba(250, 250, 250, 0.6)" strokeWidth="0.6" />
-                <line x1="1598" y1="742" x2="1604" y2="748" stroke="rgba(250, 250, 250, 0.6)" strokeWidth="0.6" />
-                <line x1="1598" y1="742" x2="1592" y2="748" stroke="rgba(250, 250, 250, 0.6)" strokeWidth="0.6" />
-                <line x1="1598" y1="742" x2="1604" y2="736" stroke="rgba(250, 250, 250, 0.6)" strokeWidth="0.6" />
+                <line x1="1598" y1="742" x2="1598" y2="734" stroke="var(--skyline-stroke-fg)" strokeWidth="0.8" />
+                <line x1="1598" y1="742" x2="1598" y2="750" stroke="var(--skyline-stroke-fg)" strokeWidth="0.8" />
+                <line x1="1598" y1="742" x2="1590" y2="742" stroke="var(--skyline-stroke-fg)" strokeWidth="0.8" />
+                <line x1="1598" y1="742" x2="1606" y2="742" stroke="var(--skyline-stroke-fg)" strokeWidth="0.8" />
+                <line x1="1598" y1="742" x2="1592" y2="736" stroke="var(--skyline-stroke-mid)" strokeWidth="0.6" />
+                <line x1="1598" y1="742" x2="1604" y2="748" stroke="var(--skyline-stroke-mid)" strokeWidth="0.6" />
+                <line x1="1598" y1="742" x2="1592" y2="748" stroke="var(--skyline-stroke-mid)" strokeWidth="0.6" />
+                <line x1="1598" y1="742" x2="1604" y2="736" stroke="var(--skyline-stroke-mid)" strokeWidth="0.6" />
               </g>
 
               {/* Swaying Laundry (Animating) */}
               <g>
                 {/* Trench Coat (Sway 1) */}
                 <g className={styles.laundry1}>
-                  <path d="M 1648 718 L 1645 724 L 1642 728 L 1644 738 L 1648 735 L 1648 756 L 1662 756 L 1662 735 L 1666 738 L 1668 728 L 1665 724 L 1662 718 Z" fill="var(--color-bg)" strokeWidth="1" />
-                  <line x1="1655" y1="718" x2="1655" y2="756" stroke="rgba(250, 250, 250, 0.4)" strokeWidth="0.6" />
-                  <line x1="1648" y1="735" x2="1662" y2="735" stroke="rgba(250, 250, 250, 0.4)" strokeWidth="0.6" />
+                  <path d="M 1648 718 L 1645 724 L 1642 728 L 1644 738 L 1648 735 L 1648 756 L 1662 756 L 1662 735 L 1666 738 L 1668 728 L 1665 724 L 1662 718 Z" fill="var(--skyline-laundry-coat)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                  <line x1="1655" y1="718" x2="1655" y2="756" stroke="var(--skyline-stroke-mid)" strokeWidth="0.6" />
+                  <line x1="1648" y1="735" x2="1662" y2="735" stroke="var(--skyline-stroke-mid)" strokeWidth="0.6" />
                 </g>
                 {/* Trousers (Sway 2) */}
                 <g className={styles.laundry2}>
-                  <path d="M 1670 720 L 1667 750 L 1673 750 L 1676 730 L 1679 750 L 1685 750 L 1682 720 Z" fill="var(--color-bg)" strokeWidth="1" />
+                  <path d="M 1670 720 L 1667 750 L 1673 750 L 1676 730 L 1679 750 L 1685 750 L 1682 720 Z" fill="var(--skyline-laundry-trousers)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
                 </g>
                 {/* Fedora Hat (Sway 3) */}
                 <g className={styles.laundry3}>
-                  <path d="M 1687 728 C 1687 724, 1690 717, 1695 717 C 1700 717, 1703 724, 1703 728 C 1706 728, 1708 729, 1708 731 C 1708 733, 1682 733, 1682 731 C 1682 729, 1684 728, 1687 728 Z" fill="var(--color-bg)" strokeWidth="1" />
-                  <path d="M 1688 728 Q 1695 727 1702 728 L 1702 726 Q 1695 725 1688 726 Z" fill="rgba(250, 250, 250, 0.85)" stroke="none" />
+                  <path d="M 1687 728 C 1687 724, 1690 717, 1695 717 C 1700 717, 1703 724, 1703 728 C 1706 728, 1708 729, 1708 731 C 1708 733, 1682 733, 1682 731 C 1682 729, 1684 728, 1687 728 Z" fill="var(--skyline-laundry-fedora)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                  <path d="M 1688 728 Q 1695 727 1702 728 L 1702 726 Q 1695 725 1688 726 Z" fill="var(--skyline-laundry-fedora-band)" stroke="none" />
                 </g>
               </g>
 
@@ -1451,7 +1522,7 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
               <circle cx="880" cy="710" r="2.0" className={styles.bridgeBeacon} />
 
               {/* Bridge Streetlights (Glowing dots, Animating opacity subtly) */}
-              <g fill="#fafafa" stroke="none">
+              <g fill="var(--skyline-bulb-glow)" stroke="none">
                 <circle cx="546" cy="830.3" r="1.8" opacity="0.85" />
                 <circle cx="646" cy="825.7" r="1.8" opacity="0.85" />
                 <circle cx="746" cy="822.7" r="1.8" opacity="0.85" />
@@ -1526,7 +1597,7 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
             </g>
 
             {/* Group C: Rising Steam/Smoke Paths (CSS Animated - Unfiltered Wavy Bezier curves for maximum performance) */}
-            <g fill="none" stroke="rgba(250, 250, 250, 0.45)" strokeWidth="1">
+            <g fill="none" stroke="var(--skyline-stroke-mid)" strokeWidth="1">
               {/* Steam from Chimney 1 (Left Roof x=228, y=775) */}
               <path d="M 228 770 C 222 745, 234 720, 226 695 C 220 675, 228 655, 222 635" className={styles.steam} />
               

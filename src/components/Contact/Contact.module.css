@@ -9,17 +9,6 @@
   overflow: hidden;
 }
 
-.speedLines {
-  position: absolute;
-  inset: 0;
-  background: repeating-conic-gradient(
-    from 0deg at 50% 50%,
-    transparent 0deg,
-    rgba(26, 26, 46, 0.03) 2deg,
-    transparent 4deg
-  );
-  pointer-events: none;
-}
 
 .container {
   max-width: 1000px;
