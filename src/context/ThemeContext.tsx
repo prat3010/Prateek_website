@@ -19,8 +19,8 @@ interface ThemeTransitionContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 const ThemeTransitionContext = createContext<ThemeTransitionContextType | undefined>(undefined);
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('light');
+export function ThemeProvider({ children, initialTheme }: { children: React.ReactNode; initialTheme?: Theme }) {
+  const [theme, setTheme] = useState<Theme>(initialTheme || 'light');
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [transitionCoords, setTransitionCoords] = useState({ x: 50, y: 50 });
   const [pendingTheme, setPendingTheme] = useState<Theme | null>(null);
@@ -43,11 +43,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     if (savedTheme === 'noir' || savedTheme === 'light') {
       setTheme(savedTheme);
       document.documentElement.setAttribute('data-theme', savedTheme);
+      document.cookie = `theme=${savedTheme}; path=/; max-age=31536000; SameSite=Lax`;
     } else {
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const initialTheme: Theme = prefersDark ? 'noir' : 'light';
-      setTheme(initialTheme);
-      document.documentElement.setAttribute('data-theme', initialTheme);
+      const systemTheme: Theme = prefersDark ? 'noir' : 'light';
+      setTheme(systemTheme);
+      document.documentElement.setAttribute('data-theme', systemTheme);
+      document.cookie = `theme=${systemTheme}; path=/; max-age=31536000; SameSite=Lax`;
     }
   }, []);
 
@@ -76,6 +78,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         setTheme(nextTheme);
         document.documentElement.setAttribute('data-theme', nextTheme);
         localStorage.setItem('theme', nextTheme);
+        document.cookie = `theme=${nextTheme}; path=/; max-age=31536000; SameSite=Lax`;
       }, 400);
 
       // End transition

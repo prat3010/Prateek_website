@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Bangers, Comic_Neue, JetBrains_Mono, Nosifer } from "next/font/google";
 import "./globals.css";
 import ClientLayout from "./ClientLayout";
+import { cookies } from "next/headers";
+import { Theme } from "@/context/ThemeContext";
 
 const bangers = Bangers({
   weight: "400",
@@ -80,14 +82,19 @@ const jsonLd = {
   ]
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const themeCookie = cookieStore.get('theme')?.value;
+  const initialTheme: Theme = themeCookie === 'noir' || themeCookie === 'light' ? themeCookie : 'light';
+
   return (
     <html
       lang="en"
+      data-theme={initialTheme}
       className={`${bangers.variable} ${comicNeue.variable} ${jetbrainsMono.variable} ${nosifer.variable}`}
     >
       <head>
@@ -97,7 +104,7 @@ export default function RootLayout({
               (function() {
                 try {
                   var saved = localStorage.getItem('theme');
-                  var isNoir = false;
+                  var isNoir = ${initialTheme === 'noir'};
                   if (saved === 'noir') {
                     isNoir = true;
                     document.documentElement.setAttribute('data-theme', 'noir');
@@ -105,9 +112,11 @@ export default function RootLayout({
                     isNoir = false;
                     document.documentElement.setAttribute('data-theme', 'light');
                   } else {
-                    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                    isNoir = prefersDark;
-                    document.documentElement.setAttribute('data-theme', prefersDark ? 'noir' : 'light');
+                    if (!saved) {
+                      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                      isNoir = prefersDark;
+                      document.documentElement.setAttribute('data-theme', prefersDark ? 'noir' : 'light');
+                    }
                   }
                   
                   // Inject dynamic preload link for correct LCP Hero image
@@ -127,7 +136,7 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <ClientLayout>{children}</ClientLayout>
+        <ClientLayout initialTheme={initialTheme}>{children}</ClientLayout>
       </body>
     </html>
   );

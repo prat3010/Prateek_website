@@ -44,8 +44,17 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
     console.error('Failed to decode geolocation headers:', e);
   }
 
-  // Get Referrer
-  const referrer = request.headers.get('referer') || '';
+  // Get Referrer & Sanitize to Domain to protect privacy and prevent spam
+  let referrer = request.headers.get('referer') || '';
+  if (referrer) {
+    try {
+      const refUrl = new URL(referrer);
+      referrer = refUrl.hostname;
+    } catch (e) {
+      // Fallback: truncate to maximum 100 characters to prevent spam payloads
+      referrer = referrer.slice(0, 100);
+    }
+  }
 
   // Parse User Agent via Next.js helper
   const { device, browser, os, isBot } = userAgent(request);
@@ -78,7 +87,7 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
   return NextResponse.next();
 }
 
-// Next.js proxy configuration matcher
+// Next.js middleware configuration matcher
 export const config = {
   matcher: [
     /*
@@ -88,6 +97,7 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico, icon.svg, etc. (standard assets)
      * - robots.txt, sitemap.xml, etc.
+     * - images (static theme assets)
      */
     '/((?!api|_next/static|_next/image|favicon.ico|icon.svg|robots.txt|sitemap.xml|images/).*)',
   ],

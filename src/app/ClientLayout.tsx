@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import Navbar from '@/components/ui/Navbar';
 import Footer from '@/components/ui/Footer';
 import Sidekick from '@/components/ui/Sidekick';
-import { ThemeProvider } from '@/context/ThemeContext';
+import { ThemeProvider, Theme } from '@/context/ThemeContext';
 import ThemeTransition from '@/components/effects/ThemeTransition';
 import { LazyMotion, domAnimation } from 'framer-motion';
 
@@ -17,12 +17,12 @@ const NoirSkyline = dynamic(() => import('@/components/effects/NoirSkyline'), {
 });
 const CursorTrail = dynamic(() => import('@/components/effects/CursorTrail'), { ssr: false });
 
-export default function ClientLayout({ children }: { children: React.ReactNode }) {
+export default function ClientLayout({ children, initialTheme }: { children: React.ReactNode; initialTheme?: Theme }) {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith('/admin');
 
   return (
-    <ThemeProvider>
+    <ThemeProvider initialTheme={initialTheme}>
       <LazyMotion features={domAnimation}>
         <ThemeTransition />
         {!isAdminRoute && <NoirSkyline />}

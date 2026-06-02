@@ -17,7 +17,7 @@ interface HeroProps {
 
 export default function Hero({ taglines }: HeroProps) {
   const { isNoir } = useTheme();
-  const [tagline, setTagline] = useState('');
+  const [tagline, setTagline] = useState(isNoir ? taglines.noir[0] : taglines.standard[0]);
 
   useEffect(() => {
     const list = isNoir ? taglines.noir : taglines.standard;
@@ -81,9 +81,13 @@ export default function Hero({ taglines }: HeroProps) {
               {isNoir ? 'CONFESSIONAL:' : 'NARRATOR:'}
             </span>{' '}
             <span className={styles.typedText}>
-              {displayText}
-              <span className={`${styles.cursor} ${isDone ? styles.cursorBlink : ''}`}>
-                |
+              {/* Screen reader and SEO friendly hidden container holding the full tagline */}
+              <span className="sr-only">{tagline}</span>
+              <span aria-hidden="true">
+                {displayText}
+                <span className={`${styles.cursor} ${isDone ? styles.cursorBlink : ''}`}>
+                  |
+                </span>
               </span>
             </span>
           </div>

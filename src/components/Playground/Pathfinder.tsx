@@ -13,8 +13,6 @@ interface CellProps {
   isVisited: boolean;
   isPath: boolean;
   isNoir: boolean;
-  onMouseDown: (col: number, row: number, e: React.MouseEvent) => void;
-  onMouseEnter: (col: number, row: number) => void;
 }
 
 const Cell = React.memo(function Cell({
@@ -26,8 +24,6 @@ const Cell = React.memo(function Cell({
   isVisited,
   isPath,
   isNoir,
-  onMouseDown,
-  onMouseEnter,
 }: CellProps) {
   let cellClass = styles.cell;
   if (isStart) cellClass += ` ${styles.cellStart}`;
@@ -54,8 +50,6 @@ const Cell = React.memo(function Cell({
   return (
     <div
       className={cellClass}
-      onMouseDown={(e) => onMouseDown(col, row, e)}
-      onMouseEnter={() => onMouseEnter(col, row)}
       data-col={col}
       data-row={row}
       role="gridcell"
@@ -111,8 +105,16 @@ export default function Pathfinder({
     return () => window.removeEventListener('mouseup', handleMouseUp);
   }, []);
 
-  const handleCellMouseDown = useCallback((col: number, row: number, e: React.MouseEvent) => {
+  const handleGridMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (isRunning) return;
+    const target = e.target as HTMLElement;
+    const cellElement = target.closest('[data-col]');
+    if (!cellElement) return;
+
+    const col = parseInt(cellElement.getAttribute('data-col') || '', 10);
+    const row = parseInt(cellElement.getAttribute('data-row') || '', 10);
+    if (isNaN(col) || isNaN(row)) return;
+
     e.preventDefault();
 
     const key = `${col},${row}`;
@@ -142,8 +144,15 @@ export default function Pathfinder({
     }
   }, [isRunning, startNode.col, startNode.row, endNode.col, endNode.row, walls, setWalls]);
 
-  const handleCellMouseEnter = useCallback((col: number, row: number) => {
+  const handleGridMouseOver = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (isRunning || interactionMode === 'idle') return;
+    const target = e.target as HTMLElement;
+    const cellElement = target.closest('[data-col]');
+    if (!cellElement) return;
+
+    const col = parseInt(cellElement.getAttribute('data-col') || '', 10);
+    const row = parseInt(cellElement.getAttribute('data-row') || '', 10);
+    if (isNaN(col) || isNaN(row)) return;
 
     const key = `${col},${row}`;
     const isStart = col === startNode.col && row === startNode.row;
@@ -286,8 +295,6 @@ export default function Pathfinder({
           isVisited={isVisited}
           isPath={isPath}
           isNoir={isNoir}
-          onMouseDown={handleCellMouseDown}
-          onMouseEnter={handleCellMouseEnter}
         />
       );
     }
@@ -302,6 +309,8 @@ export default function Pathfinder({
           gridTemplateRows: `repeat(${rows}, 1fr)`,
         }}
         role="grid"
+        onMouseDown={handleGridMouseDown}
+        onMouseOver={handleGridMouseOver}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
