@@ -112,6 +112,9 @@ export default function Footer({ socials, className }: FooterProps) {
         {/* Copyright */}
         <p className={styles.copyright}>
           © {year} Prateek Sharma. All rights reserved.
+          <a href="/admin/analytics" className={styles.analyticsLink}>
+            📊 Site Analytics
+          </a>
         </p>
       </div>
     </footer>

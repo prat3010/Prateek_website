@@ -161,6 +161,33 @@
   color: var(--pop-orange);
 }
 
+.analyticsLink {
+  color: var(--pop-yellow);
+  text-decoration: none;
+  margin-left: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s ease, transform 0.2s ease;
+  font-weight: 600;
+}
+
+.analyticsLink:hover {
+  color: var(--pop-pink);
+  text-decoration: underline;
+  transform: scale(1.05) rotate(-1deg);
+}
+
+:global([data-theme='noir']) .analyticsLink {
+  color: var(--pop-white);
+  opacity: 0.7;
+}
+
+:global([data-theme='noir']) .analyticsLink:hover {
+  color: var(--pop-red);
+  opacity: 1;
+}
+
 /* ---- Responsive ---- */
 
 @media (max-width: 640px) {

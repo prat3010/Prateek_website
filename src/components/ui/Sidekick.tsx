@@ -13,6 +13,7 @@ const BYTE_QUOTES = [
   "ZAP! That bug was toasted! ⚡",
   "I'm keeping an eye on your scrollbar. Keep scrolling! 📜",
   "Beep boop! Prateek's coding stats are off the charts! 📈",
+  "Wait! I'm monitoring our live edge middleware telemetry... check out the stats page! 📈",
 ];
 
 // Random click quotes for Noir Mode (Clue)
@@ -24,6 +25,7 @@ const CLUE_QUOTES = [
   "In this town, you either fix the memory leak, or it leaks you.",
   "Evidence points to a major database query anomaly. Keep digging.",
   "Just another night in the terminal grid. Watch your step.",
+  "Evidence logged in the edge files. See the live case record telemetry... if you dare.",
 ];
 
 // Contextual section speech comments

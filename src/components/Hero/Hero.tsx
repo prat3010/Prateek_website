@@ -81,13 +81,24 @@ export default function Hero() {
             </span>
           </div>
 
-          <a
-            href="#projects"
-            className={styles.ctaButton}
-            onClick={handleScrollToProjects}
-          >
-            <span className={styles.ctaText}>View My Work →</span>
-          </a>
+          <div className={styles.ctaContainer}>
+            <a
+              href="#projects"
+              className={styles.ctaButton}
+              onClick={handleScrollToProjects}
+            >
+              <span className={styles.ctaText}>View My Work →</span>
+            </a>
+
+            <a
+              href="/admin/analytics"
+              className={styles.telemetryBadge}
+              aria-label="View live edge telemetry analytics"
+            >
+              <span className={styles.pulseDot} />
+              <span className={styles.ctaText}>📈 Live Telemetry</span>
+            </a>
+          </div>
         </div>
 
         <div className={styles.imageSide}>

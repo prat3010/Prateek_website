@@ -253,6 +253,75 @@
   z-index: 5;
 }
 
+.ctaContainer {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.telemetryBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--pop-white);
+  color: var(--pop-black);
+  border: 3px solid var(--pop-black);
+  padding: 0.6rem 1.2rem;
+  border-radius: 20px;
+  font-family: var(--font-headline);
+  font-size: 1.1rem;
+  text-decoration: none;
+  box-shadow: 3px 3px 0px var(--pop-black);
+  transition: transform 0.25s var(--transition-bounce), box-shadow 0.25s ease, background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.telemetryBadge:hover {
+  transform: scale(1.04) translateY(-1px);
+  box-shadow: 5px 5px 0px var(--pop-black);
+  background-color: var(--pop-yellow);
+}
+
+.pulseDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #00E676;
+  box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.7);
+  animation: pulse 1.6s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 8px rgba(0, 230, 118, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(0, 230, 118, 0);
+  }
+}
+
+@keyframes pulseNoir {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(255, 23, 68, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 8px rgba(255, 23, 68, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(255, 23, 68, 0);
+  }
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .hero {
@@ -288,6 +357,10 @@
 
   .ctaButton {
     display: inline-block;
+  }
+
+  .ctaContainer {
+    justify-content: center;
   }
 
   .ctaButton::after,
@@ -336,4 +409,25 @@
 :global([data-theme='noir']) .benDayDots,
 :global([data-theme='noir']) .speedLines {
   display: none !important;
+}
+
+/* Noir Mode overrides for telemetry badge */
+:global([data-theme='noir']) .telemetryBadge {
+  background: #121214 !important;
+  color: #FFFFFF !important;
+  border-color: #FFFFFF !important;
+  box-shadow: 3px 3px 0px #FFFFFF !important;
+  border-radius: 0px !important;
+}
+
+:global([data-theme='noir']) .telemetryBadge:hover {
+  background: #FFFFFF !important;
+  color: #000000 !important;
+  box-shadow: 5px 5px 0px #FFFFFF !important;
+}
+
+:global([data-theme='noir']) .pulseDot {
+  background-color: #FF1744;
+  box-shadow: 0 0 0 0 rgba(255, 23, 68, 0.7);
+  animation: pulseNoir 1.6s infinite;
 }
