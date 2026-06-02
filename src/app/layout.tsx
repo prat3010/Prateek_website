@@ -33,11 +33,15 @@ const nosifer = Nosifer({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://prateeq.in"),
   title: "Prateeq Sharma | Portfolio",
   description:
     "Crafting Digital Worlds, One Panel at a Time — Portfolio of Prateeq Sharma, developer, designer, and storyteller.",
   keywords: ["portfolio", "web developer", "Prateeq Sharma", "Prateeq", "comic book", "pop art"],
   authors: [{ name: "Prateeq Sharma" }],
+  alternates: {
+    canonical: "/",
+  },
   icons: {
     icon: "/icon.svg",
   },
@@ -45,6 +49,7 @@ export const metadata: Metadata = {
     title: "Prateeq Sharma | Portfolio",
     description: "Crafting Digital Worlds, One Panel at a Time",
     type: "website",
+    url: "https://prateeq.in",
   },
 };
 
