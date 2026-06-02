@@ -322,29 +322,22 @@
 .heroImage {
   display: block;
   width: 100%;
-  height: auto;
-  object-fit: cover;
-  transition: opacity 0.3s ease-in-out;
+  aspect-ratio: 1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url('/images/hero-illustration.webp');
+  transition: background-image 0.3s ease-in-out;
+}
+
+:global([data-theme='noir']) .heroImage {
+  background-image: url('/images/hero-noir.webp');
 }
 
 .imageWrapper {
   position: relative;
   width: 100%;
   overflow: hidden;
-}
-
-.visibleImage {
-  opacity: 1;
-}
-
-.hiddenImage {
-  opacity: 0;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
 }
 
 .floatingZap {

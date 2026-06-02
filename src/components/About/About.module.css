@@ -59,8 +59,15 @@
 .profileImage {
   display: block;
   width: 100%;
-  height: auto;
-  object-fit: cover;
+  aspect-ratio: 400 / 480;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url('/images/profile-comic.webp');
+}
+
+:global([data-theme='noir']) .profileImage {
+  background-image: url('/images/profile-noir.webp');
 }
 
 

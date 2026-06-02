@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import { useTheme } from '@/context/ThemeContext';
 import ComicPanel from '@/components/ui/ComicPanel';
 import SpeechBubble from '@/components/ui/SpeechBubble';
@@ -50,12 +49,10 @@ export default function About() {
           <ScrollReveal delay={100} className={styles.imageColumn}>
             <ComicPanel tilt={-2} className={styles.profilePanel}>
               <div className={styles.imageWrapper}>
-                <Image
-                  src={isNoir ? '/images/profile-noir.webp' : '/images/profile-comic.webp'}
-                  alt="Prateeq Sharma portrait"
-                  width={400}
-                  height={480}
+                <div 
                   className={styles.profileImage}
+                  role="img"
+                  aria-label="Prateeq Sharma portrait"
                 />
               </div>
             </ComicPanel>

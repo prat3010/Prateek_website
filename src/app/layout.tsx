@@ -97,14 +97,25 @@ export default function RootLayout({
               (function() {
                 try {
                   var saved = localStorage.getItem('theme');
+                  var isNoir = false;
                   if (saved === 'noir') {
+                    isNoir = true;
                     document.documentElement.setAttribute('data-theme', 'noir');
                   } else if (saved === 'light') {
+                    isNoir = false;
                     document.documentElement.setAttribute('data-theme', 'light');
                   } else {
                     var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    isNoir = prefersDark;
                     document.documentElement.setAttribute('data-theme', prefersDark ? 'noir' : 'light');
                   }
+                  
+                  // Inject dynamic preload link for correct LCP Hero image
+                  var link = document.createElement('link');
+                  link.rel = 'preload';
+                  link.as = 'image';
+                  link.href = isNoir ? '/images/hero-noir.webp' : '/images/hero-illustration.webp';
+                  document.head.appendChild(link);
                 } catch (e) {}
               })();
             `,

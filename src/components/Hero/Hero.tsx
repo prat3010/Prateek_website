@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useTypewriter } from '@/hooks/useTypewriter';
 import { useTheme } from '@/context/ThemeContext';
@@ -112,21 +111,10 @@ export default function Hero({ taglines }: HeroProps) {
         <div className={styles.imageSide}>
           <ComicPanel tilt={2} className={styles.heroPanel}>
             <div className={styles.imageWrapper}>
-              <Image
-                src="/images/hero-illustration.webp"
-                alt="Prateeq Sharma hero illustration"
-                width={500}
-                height={500}
-                priority
-                className={`${styles.heroImage} ${isNoir ? styles.hiddenImage : styles.visibleImage}`}
-              />
-              <Image
-                src="/images/hero-noir.webp"
-                alt="Prateeq Sharma hero noir illustration"
-                width={500}
-                height={500}
-                priority
-                className={`${styles.heroImage} ${!isNoir ? styles.hiddenImage : styles.visibleImage}`}
+              <div 
+                className={styles.heroImage}
+                role="img"
+                aria-label="Prateeq Sharma hero illustration"
               />
             </div>
           </ComicPanel>

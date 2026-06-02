@@ -31,71 +31,83 @@ interface SmokeParticle {
   maxLifetime: number;
 }
 
-const drawCigarette = (ctx: CanvasRenderingContext2D, x: number, y: number, angle: number) => {
+const drawCigarette = (ctx: CanvasRenderingContext2D, x: number, y: number, angle: number, fade: number = 1.0) => {
   const L = 35;
   const W = 6;
   
+  const activeL = L * fade;
+  if (activeL <= 0) return;
+
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(angle);
   
   // 1. Filter (orange/brown)
   const filterLength = L * 0.35;
+  const drawFilterLength = Math.min(filterLength, activeL);
   ctx.fillStyle = '#C88A3B'; // Amber filter color
-  ctx.fillRect(0, -W / 2, filterLength, W);
+  ctx.fillRect(0, -W / 2, drawFilterLength, W);
   
   // Filter band (darker wrapping line)
-  ctx.fillStyle = '#9C611E';
-  ctx.fillRect(filterLength - 1.5, -W / 2, 1.5, W);
+  if (activeL >= filterLength) {
+    ctx.fillStyle = '#9C611E';
+    ctx.fillRect(filterLength - 1.5, -W / 2, 1.5, W);
+  }
   
   // 2. White Paper Body
-  ctx.fillStyle = '#F4F4F6';
-  ctx.fillRect(filterLength, -W / 2, L - filterLength, W);
-  
-  // Paper texture lines (very subtle grey)
-  ctx.strokeStyle = '#D1D1D6';
-  ctx.lineWidth = 0.5;
-  ctx.beginPath();
-  ctx.moveTo(filterLength, -W / 4);
-  ctx.lineTo(L - 3, -W / 4);
-  ctx.moveTo(filterLength, W / 4);
-  ctx.lineTo(L - 3, W / 4);
-  ctx.stroke();
+  if (activeL > filterLength) {
+    ctx.fillStyle = '#F4F4F6';
+    ctx.fillRect(filterLength, -W / 2, activeL - filterLength, W);
+    
+    // Paper texture lines (very subtle grey)
+    ctx.strokeStyle = '#D1D1D6';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(filterLength, -W / 4);
+    ctx.lineTo(activeL - 3, -W / 4);
+    ctx.moveTo(filterLength, W / 4);
+    ctx.lineTo(activeL - 3, W / 4);
+    ctx.stroke();
+  }
 
-  // 3. Ash Tip (textured grey/black/white)
-  const ashLength = 3;
-  const ashStart = L - ashLength;
+  // 3. Ash Tip (textured grey/black/white) at the active tip
+  const ashLength = Math.min(3, activeL);
+  const ashStart = activeL - ashLength;
   
-  // Dark grey base ash
-  ctx.fillStyle = '#4A4A4F';
-  ctx.fillRect(ashStart, -W / 2, ashLength, W);
+  if (ashLength > 0) {
+    // Dark grey base ash
+    ctx.fillStyle = '#4A4A4F';
+    ctx.fillRect(ashStart, -W / 2, ashLength, W);
+    
+    // Speckled light ash on the very tip
+    ctx.fillStyle = '#C2C2C9';
+    ctx.fillRect(activeL - Math.min(1.5, ashLength), -W / 3, Math.min(1.5, ashLength), W * 2 / 3);
+  }
   
-  // Speckled light ash on the very tip
-  ctx.fillStyle = '#C2C2C9';
-  ctx.fillRect(L - 1.5, -W / 3, 1.5, W * 2 / 3);
+  // 4. Glowing Ember (lit tip) at the active tip
+  if (ashLength > 0) {
+    ctx.save();
+    ctx.shadowColor = '#FF3C00';
+    ctx.shadowBlur = 8;
+    ctx.fillStyle = '#FF5500';
+    ctx.beginPath();
+    ctx.arc(ashStart, 0, W / 2, -Math.PI / 2, Math.PI / 2);
+    ctx.fill();
+    
+    // Inner white-hot core
+    ctx.shadowColor = '#FFFFCC';
+    ctx.shadowBlur = 4;
+    ctx.fillStyle = '#FFFFE0';
+    ctx.beginPath();
+    ctx.arc(ashStart, 0, W / 3, -Math.PI / 2, Math.PI / 2);
+    ctx.fill();
+    ctx.restore();
+  }
   
-  // 4. Glowing Ember (lit tip)
-  ctx.save();
-  ctx.shadowColor = '#FF3C00';
-  ctx.shadowBlur = 8;
-  ctx.fillStyle = '#FF5500';
-  ctx.beginPath();
-  ctx.arc(ashStart, 0, W / 2, -Math.PI / 2, Math.PI / 2);
-  ctx.fill();
-  
-  // Inner white-hot core
-  ctx.shadowColor = '#FFFFCC';
-  ctx.shadowBlur = 4;
-  ctx.fillStyle = '#FFFFE0';
-  ctx.beginPath();
-  ctx.arc(ashStart, 0, W / 3, -Math.PI / 2, Math.PI / 2);
-  ctx.fill();
-  ctx.restore();
-  
-  // 5. Cigarette Outline (black for noir comic outline styling)
+  // 5. Outline of the remaining cigarette
   ctx.strokeStyle = '#18181B';
   ctx.lineWidth = 1.0;
-  ctx.strokeRect(0, -W / 2, L, W);
+  ctx.strokeRect(0, -W / 2, activeL, W);
   
   ctx.restore();
 };
@@ -114,6 +126,7 @@ export default function CursorTrail() {
     initialized: false,
   });
   const mouseRef = useRef({ x: -100, y: -100 });
+  const lastMouseMoveTimeRef = useRef<number>(Date.now());
   const frameRef = useRef<number>(0);
   const colorIndexRef = useRef(0);
   const isTouchDevice = useRef(false);
@@ -130,15 +143,17 @@ export default function CursorTrail() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const { x, y } = mouseRef.current;
+    const isMouseActive = x > 0 && y > 0;
+    const idleDuration = Date.now() - lastMouseMoveTimeRef.current;
 
     if (isNoir) {
       // Clear normal trail
       trailRef.current = [];
 
       const cig = cigStateRef.current;
-      const isMouseActive = x > 0 && y > 0;
+      const fade = Math.max(0, 1 - Math.max(0, idleDuration - 5000) / 1000);
 
-      if (isMouseActive) {
+      if (isMouseActive && fade > 0) {
         if (!cig.initialized) {
           cig.x = x;
           cig.y = y;
@@ -171,12 +186,13 @@ export default function CursorTrail() {
 
         // Spawn smoke particles from the burning tip (ember) of the cigarette
         const L = 35;
+        const activeL = L * fade;
         const ashLength = 3;
-        const tipX = cig.x + Math.cos(cig.angle) * (L - ashLength);
-        const tipY = cig.y + Math.sin(cig.angle) * (L - ashLength);
+        const tipX = cig.x + Math.cos(cig.angle) * (activeL - ashLength);
+        const tipY = cig.y + Math.sin(cig.angle) * (activeL - ashLength);
 
-        // Spawn smoke puffs
-        if (Math.random() < 0.5) {
+        // Spawn smoke puffs (scaling spawn probability as cigarette fades out)
+        if (Math.random() < 0.5 * fade) {
           smokeRef.current.push({
             x: tipX,
             y: tipY,
@@ -243,8 +259,11 @@ export default function CursorTrail() {
       }
 
       // Draw the cigarette itself on top of the smoke
-      if (isMouseActive) {
-        drawCigarette(ctx, cig.x, cig.y, cig.angle);
+      if (isMouseActive && fade > 0) {
+        ctx.save();
+        ctx.globalAlpha = fade;
+        drawCigarette(ctx, cig.x, cig.y, cig.angle, fade);
+        ctx.restore();
       }
 
     } else {
@@ -252,9 +271,19 @@ export default function CursorTrail() {
       smokeRef.current = [];
       cigStateRef.current.initialized = false;
 
-      // Add new dot at current mouse position
+      // Age and filter existing dots from the previous frame
+      trailRef.current = trailRef.current
+        .map(dot => ({
+          ...dot,
+          age: dot.age + 1,
+          angle: dot.angle + dot.angleSpeed,
+        }))
+        .filter(dot => dot.age < TRAIL_LENGTH);
+
       const trail = trailRef.current;
-      if (x > 0 && y > 0) {
+
+      // Add new dot at current mouse position if mouse is active and moving
+      if (isMouseActive && idleDuration < 150) {
         trail.unshift({
           x,
           y,
@@ -272,13 +301,11 @@ export default function CursorTrail() {
         trail.pop();
       }
 
-      // Age and draw each dot
+      // Draw each dot
       for (let i = trail.length - 1; i >= 0; i--) {
         const dot = trail[i];
-        dot.age++;
-        dot.angle += dot.angleSpeed;
 
-        const progress = i / TRAIL_LENGTH; // 0 = newest, 1 = oldest
+        const progress = dot.age / TRAIL_LENGTH; // 0 = newest, 1 = oldest
         const radius = BASE_DOT_RADIUS * (1 - progress * 0.7);
         const opacity = 1 - progress * 0.85;
 
@@ -361,9 +388,13 @@ export default function CursorTrail() {
 
     ctx.globalAlpha = 1;
 
+    const fade = isNoir
+      ? Math.max(0, 1 - Math.max(0, idleDuration - 5000) / 1000)
+      : 1;
+
     const hasItemsToDraw = isNoir
-      ? (smokeRef.current.length > 0 || (mouseRef.current.x > 0 && mouseRef.current.y > 0))
-      : (trailRef.current.length > 0 || (mouseRef.current.x > 0 && mouseRef.current.y > 0));
+      ? (smokeRef.current.length > 0 || (isMouseActive && fade > 0))
+      : (trailRef.current.length > 0 || (isMouseActive && idleDuration < 150));
 
     if (hasItemsToDraw) {
       frameRef.current = requestAnimationFrame(draw);
@@ -408,6 +439,7 @@ export default function CursorTrail() {
 
     const handleMouseMove = (e: MouseEvent) => {
       mouseRef.current = { x: e.clientX, y: e.clientY };
+      lastMouseMoveTimeRef.current = Date.now();
       wakeLoop();
     };
 
