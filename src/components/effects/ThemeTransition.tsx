@@ -5,23 +5,27 @@ import { useThemeTransition } from '@/context/ThemeContext';
 import styles from './ThemeTransition.module.css';
 
 export default function ThemeTransition() {
-  const { isTransitioning, transitionCoords, pendingTheme } = useThemeTransition();
+  const { isTransitioning, pendingTheme } = useThemeTransition();
 
   if (!isTransitioning || !pendingTheme) return null;
 
   const bgStyle = pendingTheme === 'noir' ? '#08080a' : '#FFF8E1';
+  const borderStyle = pendingTheme === 'noir' ? '#FAFAFA' : '#1A1A2E';
 
   return (
     <div
-      className={styles.overlay}
+      className={styles.container}
       style={
         {
-          '--x': `${transitionCoords.x}%`,
-          '--y': `${transitionCoords.y}%`,
-          backgroundColor: bgStyle,
+          '--panel-bg': bgStyle,
+          '--panel-border': borderStyle,
         } as React.CSSProperties
       }
       aria-hidden="true"
-    />
+    >
+      <div className={styles.panel} />
+      <div className={styles.panel} />
+      <div className={styles.panel} />
+    </div>
   );
 }

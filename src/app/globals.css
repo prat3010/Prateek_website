@@ -1150,3 +1150,10 @@ html.no-scroll, body.no-scroll {
     transform: scale(1);
   }
 }
+
+/* Disable all CSS transitions and scroll animations during theme switch transition to prevent repaint jank */
+html.is-theme-transitioning,
+html.is-theme-transitioning * {
+  transition: none !important;
+  scroll-behavior: auto !important;
+}

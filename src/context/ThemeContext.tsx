@@ -72,6 +72,7 @@ export function ThemeProvider({ children, initialTheme }: { children: React.Reac
       setPendingTheme(nextTheme);
       setIsTransitioning(true);
       isTransitioningRef.current = true;
+      document.documentElement.classList.add('is-theme-transitioning');
 
       // Halfway through the 800ms transition, flip the actual theme (when screen is covered)
       setTimeout(() => {
@@ -86,6 +87,7 @@ export function ThemeProvider({ children, initialTheme }: { children: React.Reac
         setIsTransitioning(false);
         isTransitioningRef.current = false;
         setPendingTheme(null);
+        document.documentElement.classList.remove('is-theme-transitioning');
       }, 850);
     },
     []
