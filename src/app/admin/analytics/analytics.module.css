@@ -49,6 +49,10 @@
   margin-bottom: 24px;
 }
 
+:global([data-theme='noir']) .filterContainer a:hover {
+  color: var(--pop-white) !important;
+}
+
 /* KPI Cards Grid */
 .kpiGrid {
   display: grid;
@@ -594,6 +598,11 @@
   position: relative;
 }
 
+:global([data-theme='noir']) .headerBanner {
+  background-color: var(--surface-secondary);
+  color: var(--color-text);
+}
+
 .headerContent {
   display: flex;
   flex-direction: column;
@@ -635,6 +644,10 @@
   color: var(--pop-black) !important;
   transform: scale(1.03) translateY(-2px);
   box-shadow: var(--shadow-comic);
+}
+
+:global([data-theme='noir']) .activeFilter {
+  color: var(--pop-white) !important;
 }
 
 .warningAlert {

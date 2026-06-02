@@ -167,7 +167,7 @@ const Layer0 = React.memo(function Layer0() {
   }).join(' ');
 
   return (
-    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%' }}>
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
           <defs>
             {/* Left Searchlight Gradient */}
             <linearGradient id="leftLightGrad" x1="0" y1="1" x2="0" y2="0">
@@ -368,7 +368,7 @@ Layer0.displayName = 'Layer0';
 
 const Layer1 = React.memo(function Layer1({}: LayerProps) {
   return (
-    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%' }}>
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
             <defs>
               <pattern id="hatch-bg" width="6" height="6" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
                 <line x1="0" y1="0" x2="0" y2="6" stroke="rgba(250, 250, 250, 0.08)" strokeWidth="0.8" />
@@ -379,7 +379,7 @@ const Layer1 = React.memo(function Layer1({}: LayerProps) {
             </defs>
             <g className={styles.buildingGroup} stroke="var(--skyline-stroke-bg)" strokeWidth="0.8">
               {/* Left distant skyscrapers */}
-              <path d="M 50 1080 L 50 780 L 90 780 L 90 740 L 120 740 L 120 1080 Z" className={styles.bldBgSkyscrapers} />
+              <path d="M -1000 1080 L -1000 820 L -350 820 L -350 780 L -250 780 L -250 800 L -100 800 L -100 760 L -50 760 L -50 1080 Z M 50 1080 L 50 780 L 90 780 L 90 740 L 120 740 L 120 1080 Z" className={styles.bldBgSkyscrapers} />
               <line x1="90" y1="740" x2="90" y2="780" />
               <line x1="60" y1="780" x2="60" y2="1080" strokeDasharray="2 8" />
               <line x1="75" y1="780" x2="75" y2="1080" strokeDasharray="2 8" />
@@ -440,7 +440,7 @@ const Layer1 = React.memo(function Layer1({}: LayerProps) {
               <line x1="1400" y1="620" x2="1400" y2="1080" strokeDasharray="5 5" />
  
               {/* Steeped Block Tower (Far Right) */}
-              <path d="M 1720 1080 L 1720 740 L 1735 740 L 1735 680 L 1750 680 L 1750 580 L 1790 580 L 1790 680 L 1805 680 L 1805 740 L 1820 740 L 1820 1080 Z" className={styles.bldBgStepped} />
+              <path d="M 1720 1080 L 1720 740 L 1735 740 L 1735 680 L 1750 680 L 1750 580 L 1790 580 L 1790 680 L 1805 680 L 1805 740 L 1820 740 L 1820 1080 Z M 1840 1080 L 1840 760 L 1890 760 L 1890 700 L 1940 700 L 1940 760 L 1990 760 L 1990 1080 Z M 2010 1080 L 2010 730 L 2070 730 L 2070 1080 Z M 2090 1080 L 2090 750 L 2170 750 L 2170 690 L 2250 690 L 2250 1080 Z M 2270 1080 L 2270 720 L 2920 720 L 2920 1080 Z" className={styles.bldBgStepped} />
               <line x1="1720" y1="740" x2="1820" y2="740" />
               <line x1="1735" y1="680" x2="1805" y2="680" />
               <line x1="1750" y1="580" x2="1790" y2="580" />
@@ -588,7 +588,7 @@ Layer1.displayName = 'Layer1';
 
 const Layer2 = React.memo(function Layer2({}: LayerProps) {
   return (
-    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%' }}>
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
             <defs>
               <pattern id="hatch-mid" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
                 <line x1="0" y1="0" x2="0" y2="8" stroke="rgba(250, 250, 250, 0.15)" strokeWidth="1.0" />
@@ -600,7 +600,7 @@ const Layer2 = React.memo(function Layer2({}: LayerProps) {
             {/* Midground buildings (Solid fill masks Layer 1) */}
             <g className={styles.buildingGroup} stroke="var(--skyline-stroke-mid)" strokeWidth="1.2">
               {/* Far Left block */}
-              <path d="M -10 1080 L -10 790 L 80 790 L 80 1080 Z" className={styles.bldMidFarLeft} />
+              <path d="M -1000 1080 L -1000 730 L -330 730 L -330 760 L -80 760 L -80 790 L 80 790 L 80 1080 Z" className={styles.bldMidFarLeft} />
 
               {/* Staggered double-tower (Left) */}
               <path d="M 120 1080 L 120 680 L 190 680 L 190 620 L 260 620 L 260 1080 Z" className={styles.bldMidStaggered} />
@@ -819,7 +819,7 @@ const Layer2 = React.memo(function Layer2({}: LayerProps) {
               </g>
 
               {/* ── NEW: Edge Building (Gap 3b: x=1850-1930) ── */}
-              <path d="M 1850 1080 L 1850 680 L 1930 680 L 1930 1080 Z" className={styles.bldMidEdge} />
+              <path d="M 1850 1080 L 1850 680 L 1930 680 L 1930 720 L 2010 720 L 2010 660 L 2070 660 L 2070 700 L 2170 700 L 2170 650 L 2920 650 L 2920 1080 Z" className={styles.bldMidEdge} />
               <line x1="1850" y1="680" x2="1930" y2="680" />
               {/* Rooftop mast */}
               <line x1="1890" y1="680" x2="1890" y2="620" />
@@ -848,7 +848,7 @@ const Layer2 = React.memo(function Layer2({}: LayerProps) {
               <path d="M 995 1080 L 995 560 L 1000 560 L 1030 560 L 1030 600 L 1040 600 L 1040 1080 Z" className={styles.shadowHatchMid} />
               <path d="M 1075 1080 L 1075 500 L 1085 580 L 1085 660 L 1095 660 L 1095 1080 Z" className={styles.shadowHatchMid} />
               <path d="M 1740 1080 L 1740 600 L 1750 600 L 1750 650 L 1780 650 L 1780 1080 Z" className={styles.shadowHatchMid} />
-              <path d="M 1890 1080 L 1890 680 L 1930 680 L 1930 1080 Z" className={styles.shadowHatchMid} />
+              <path d="M 1890 1080 L 1890 680 L 1930 680 L 1930 720 L 2010 720 L 2010 660 L 2070 660 L 2070 700 L 2170 700 L 2170 650 L 2920 650 L 2920 1080 Z" className={styles.shadowHatchMid} />
             </g>
 
             {/* Asynchronous Flickering Window Cells (Layer 2 - Unfiltered for performance) */}
@@ -869,7 +869,7 @@ Layer2.displayName = 'Layer2';
 
 const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
   return (
-    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%' }}>
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
             <defs>
               {/* Fog Mist Vertical Linear Gradient */}
               <linearGradient id="fogGradient" x1="0" y1="1" x2="0" y2="0">
@@ -929,20 +929,20 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
             <g className={styles.buildingGroup} stroke="var(--skyline-stroke-fg)" strokeWidth="1.8">
               
               {/* LEFT ROOFTOP SECTION */}
-              <path d="M -50 1080 L -50 820 L 460 820 L 460 1080 Z" className={styles.bldFgLeftRoof} />
+              <path d="M -1000 1080 L -1000 820 L 460 820 L 460 1080 Z" className={styles.bldFgLeftRoof} />
 
               {/* River water body under the bridge */}
               <rect x="460" y="950" width="960" height="130" fill="var(--skyline-river-fill)" stroke="none" />
 
               {/* Left Parapet Brick Mortar Lines */}
               <g stroke="var(--skyline-mortar-stroke)" strokeWidth="1.0" fill="none">
-                <line x1="-50" y1="835" x2="460" y2="835" />
-                <line x1="-50" y1="847" x2="460" y2="847" />
-                <line x1="-50" y1="859" x2="460" y2="859" />
-                <line x1="-50" y1="871" x2="460" y2="871" />
-                <line x1="-50" y1="883" x2="460" y2="883" />
-                <line x1="-50" y1="895" x2="460" y2="895" />
-                <line x1="-50" y1="907" x2="460" y2="907" />
+                <line x1="-1000" y1="835" x2="460" y2="835" />
+                <line x1="-1000" y1="847" x2="460" y2="847" />
+                <line x1="-1000" y1="859" x2="460" y2="859" />
+                <line x1="-1000" y1="871" x2="460" y2="871" />
+                <line x1="-1000" y1="883" x2="460" y2="883" />
+                <line x1="-1000" y1="895" x2="460" y2="895" />
+                <line x1="-1000" y1="907" x2="460" y2="907" />
 
                 {/* Staggered Vertical Brick Joints */}
                 <line x1="30" y1="826" x2="30" y2="835" />
@@ -1195,7 +1195,7 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
               </g>
 
               {/* Parapet Wall Cap details on left roof */}
-              <line x1="-50" y1="826" x2="460" y2="826" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
+              <line x1="-1000" y1="826" x2="460" y2="826" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
               <line x1="40" y1="820" x2="40" y2="1080" stroke="var(--skyline-stroke-fine)" strokeWidth="1" />
               
               {/* Fire Escape details hanging on the left facade */}
@@ -1218,16 +1218,16 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
               <ellipse cx="371" cy="750" rx="9" ry="4" fill="var(--skyline-fill-bg)" stroke="var(--skyline-stroke-mid)" strokeWidth="1" />
 
               {/* RIGHT ROOFTOP SECTION */}
-              <path d="M 1420 1080 L 1420 760 L 1970 760 L 1970 1080 Z" className={styles.bldFgRightRoof} />
-              <line x1="1420" y1="766" x2="1970" y2="766" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
+              <path d="M 1420 1080 L 1420 760 L 2920 760 L 2920 1080 Z" className={styles.bldFgRightRoof} />
+              <line x1="1420" y1="766" x2="2920" y2="766" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
 
               {/* Right Parapet Brick Mortar Lines */}
               <g stroke="var(--skyline-mortar-stroke)" strokeWidth="1.0" fill="none">
-                <line x1="1420" y1="775" x2="1970" y2="775" />
-                <line x1="1420" y1="787" x2="1970" y2="787" />
-                <line x1="1420" y1="799" x2="1970" y2="799" />
-                <line x1="1420" y1="811" x2="1970" y2="811" />
-                <line x1="1420" y1="823" x2="1970" y2="823" />
+                <line x1="1420" y1="775" x2="2920" y2="775" />
+                <line x1="1420" y1="787" x2="2920" y2="787" />
+                <line x1="1420" y1="799" x2="2920" y2="799" />
+                <line x1="1420" y1="811" x2="2920" y2="811" />
+                <line x1="1420" y1="823" x2="2920" y2="823" />
 
                 <line x1="1450" y1="766" x2="1450" y2="775" />
                 <line x1="1490" y1="766" x2="1490" y2="775" />
@@ -1634,7 +1634,7 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
 
               {/* Shadow overlay paths for wobbly hatching depth (Static) */}
               <path d="M 205 1080 L 205 820 L 460 820 L 460 1080 Z" className={styles.shadowHatchFg} />
-              <path d="M 1695 1080 L 1695 760 L 1970 760 L 1970 1080 Z" className={styles.shadowHatchFg} />
+              <path d="M 1695 1080 L 1695 760 L 2920 760 L 2920 1080 Z" className={styles.shadowHatchFg} />
               <path d="M 890 730 L 910 780 L 910 1080 L 890 1080 Z" className={styles.shadowHatchFg} />
               <path d="M 880 935 L 918 935 L 918 950 L 928 950 L 928 968 L 922 968 L 922 1080 L 880 1080 Z" className={styles.shadowHatchFg} />
               <path d="M 322 750 L 355 750 L 355 820 L 322 820 Z" className={styles.shadowHatchFg} />
@@ -1809,13 +1809,13 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
             <g fill="url(#fogGradient)" stroke="none">
               {/* Fog Layer 1 (Drifts left) */}
               <path 
-                d="M -300 920 C 100 890, 400 890, 800 915 C 1200 895, 1600 895, 2220 920 L 2220 1080 L -300 1080 Z" 
+                d="M -1000 920 C 100 890, 400 890, 800 915 C 1200 895, 1600 895, 2920 920 L 2920 1080 L -1000 1080 Z" 
                 opacity="0.3" 
                 className={styles.fog1} 
               />
               {/* Fog Layer 2 (Drifts right) */}
               <path 
-                d="M -300 935 C 200 915, 700 905, 1100 930 C 1500 910, 1800 920, 2220 935 L 2220 1080 L -300 1080 Z" 
+                d="M -1000 935 C 200 915, 700 905, 1100 930 C 1500 910, 1800 920, 2920 935 L 2920 1080 L -1000 1080 Z" 
                 opacity="0.2" 
                 className={styles.fog2} 
               />
