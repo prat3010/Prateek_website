@@ -381,6 +381,11 @@ export default function CursorTrail() {
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     // Don't enable on touch/coarse-pointer devices
     if (window.matchMedia('(pointer: coarse)').matches) {
       isTouchDevice.current = true;
@@ -433,7 +438,7 @@ export default function CursorTrail() {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       cancelAnimationFrame(frameRef.current);
     };
-  }, [draw, wakeLoop]);
+  }, [mounted, draw, wakeLoop]);
 
   if (!mounted || isTouch) {
     return null;
