@@ -109,7 +109,7 @@ export default function Navbar({ items, className }: NavbarProps) {
         href="#home"
         className={styles.logo}
         onClick={(e) => handleNavClick(e, '#home')}
-        aria-label="Prateek Sharma — go to home"
+        aria-label="Prateeq Sharma — go to home"
       >
         <span className={styles.logoBurst} />
         <span className={styles.logoText}>PS</span>

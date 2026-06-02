@@ -12,7 +12,7 @@ const BYTE_QUOTES = [
   "Semicolons are tiny ninjas hiding in your syntax... 🥷",
   "ZAP! That bug was toasted! ⚡",
   "I'm keeping an eye on your scrollbar. Keep scrolling! 📜",
-  "Beep boop! Prateek's coding stats are off the charts! 📈",
+  "Beep boop! Prateeq's coding stats are off the charts! 📈",
   "Wait! I'm monitoring our live edge middleware telemetry... check out the stats page! 📈",
 ];
 
@@ -31,11 +31,11 @@ const CLUE_QUOTES = [
 // Contextual section speech comments
 const COMMENTS: Record<string, { light: string; noir: string }> = {
   home: {
-    light: "Meet Prateek! Developer, Designer, and Storyteller. Let's explore his world! 🚀",
-    noir: "Case record: Prateek Sharma. Let's inspect the files and see what clues we gather.",
+    light: "Meet Prateeq! Developer, Designer, and Storyteller. Let's explore his world! 🚀",
+    noir: "Case record: Prateeq Sharma. Let's inspect the files and see what clues we gather.",
   },
   about: {
-    light: "Wait, Prateek does programming AND comic drawing? Talk about multiclassing! 🎨",
+    light: "Wait, Prateeq does programming AND comic drawing? Talk about multiclassing! 🎨",
     noir: "The ledger says he's a seasoned operator. Codes by day, designs by night.",
   },
   skills: {

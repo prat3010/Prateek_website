@@ -89,7 +89,7 @@ export default function Footer({ socials, className }: FooterProps) {
         {/* Tagline */}
         <p className={styles.tagline}>
           Made with <span className={styles.heart}>{isNoir ? '🖤' : '❤️'}</span> and{' '}
-          <span className={styles.pow}>{isNoir ? 'GRIT!' : 'POW!'}</span> by Prateek Sharma
+          <span className={styles.pow}>{isNoir ? 'GRIT!' : 'POW!'}</span> by Prateeq Sharma
         </p>
 
         {/* Social links */}
@@ -111,7 +111,7 @@ export default function Footer({ socials, className }: FooterProps) {
 
         {/* Copyright */}
         <p className={styles.copyright}>
-          © {year} Prateek Sharma. All rights reserved.
+          © {year} Prateeq Sharma. All rights reserved.
           <a href="/admin/analytics" className={styles.analyticsLink}>
             📊 Site Analytics
           </a>

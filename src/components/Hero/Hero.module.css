@@ -118,14 +118,130 @@
   51%, 100% { opacity: 0; }
 }
 
-.subtitle {
+/* Subtitle Branding & Badges Container */
+.subtitleContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+  align-items: flex-start;
+}
+
+.brandingName {
+  font-family: var(--font-headline);
+  font-size: clamp(2rem, 4.5vw, 3.8rem);
+  letter-spacing: 0.06em;
+  color: var(--pop-white);
+  text-shadow: 
+    3px 3px 0px var(--pop-black),
+    -1.5px -1.5px 0px var(--pop-black),  
+     1.5px -1.5px 0px var(--pop-black),
+    -1.5px  1.5px 0px var(--pop-black),
+     1.5px  1.5px 0px var(--pop-black);
+  position: relative;
+  display: inline-block;
+  transform: rotate(-1.5deg);
+  transition: transform 0.3s var(--transition-bounce), text-shadow 0.3s ease;
+  user-select: none;
+}
+
+.brandingName:hover {
+  transform: scale(1.08) rotate(1deg);
+  text-shadow: 
+    5px 5px 0px var(--pop-red),
+    -1.5px -1.5px 0px var(--pop-black),  
+     1.5px -1.5px 0px var(--pop-black),
+    -1.5px  1.5px 0px var(--pop-black),
+     1.5px  1.5px 0px var(--pop-black);
+}
+
+.taglineBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.tagBadge {
   font-family: var(--font-body);
-  font-size: clamp(1rem, 2vw, 1.4rem);
-  color: var(--pop-black);
-  opacity: 0.85;
-  margin-bottom: 2rem;
+  font-size: clamp(0.85rem, 1.8vw, 1.1rem);
   font-weight: 700;
-  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--pop-black);
+  background: var(--pop-white);
+  padding: 0.4rem 1rem;
+  border: 3px solid var(--pop-black);
+  border-radius: 20px;
+  box-shadow: 3px 3px 0px var(--pop-black);
+  transition: transform 0.25s var(--transition-bounce), box-shadow 0.25s ease, background-color 0.2s ease, color 0.2s ease;
+  cursor: default;
+}
+
+.tagBadge:nth-child(1):hover {
+  background-color: var(--pop-red);
+  color: var(--pop-white);
+  transform: translateY(-3px) rotate(-2deg);
+  box-shadow: 5px 5px 0px var(--pop-black);
+}
+
+.tagBadge:nth-child(2):hover {
+  background-color: var(--pop-yellow);
+  transform: translateY(-3px) rotate(3deg);
+  box-shadow: 5px 5px 0px var(--pop-black);
+}
+
+.tagBadge:nth-child(3):hover {
+  background-color: var(--pop-blue);
+  color: var(--pop-white);
+  transform: translateY(-3px) rotate(-1deg);
+  box-shadow: 5px 5px 0px var(--pop-black);
+}
+
+/* Noir Theme Overrides for Branding Name and Badges */
+:global([data-theme='noir']) .subtitleContainer {
+  gap: 0.5rem;
+}
+
+:global([data-theme='noir']) .brandingName {
+  font-family: var(--font-code);
+  font-size: clamp(1.8rem, 3.8vw, 3rem);
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--pop-pink);
+  text-shadow: none;
+  border-bottom: 2px dashed var(--pop-pink);
+  padding-bottom: 2px;
+  transform: none;
+  transition: color 0.25s ease, border-color 0.25s ease;
+}
+
+:global([data-theme='noir']) .brandingName:hover {
+  transform: none;
+  color: #cca34b;
+  border-color: #cca34b;
+}
+
+:global([data-theme='noir']) .tagBadge {
+  font-family: var(--font-code);
+  font-size: clamp(0.75rem, 1.5vw, 0.95rem);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+  color: #e0e0e3;
+  background: #1e1e24;
+  border: 2px solid #555562;
+  border-radius: 0px;
+  box-shadow: 2px 2px 0px #555562;
+  padding: 0.25rem 0.75rem;
+}
+
+:global([data-theme='noir']) .tagBadge:hover {
+  background-color: #fafafa !important;
+  color: #08080a !important;
+  border-color: #fafafa !important;
+  box-shadow: 4px 4px 0px #cca34b !important;
+  transform: translate(-2px, -2px) !important;
 }
 
 /* CTA Button — speech bubble style */

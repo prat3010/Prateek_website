@@ -40,16 +40,16 @@ const nosifer = Nosifer({
 });
 
 export const metadata: Metadata = {
-  title: "Prateek Sharma | Portfolio",
+  title: "Prateeq Sharma | Portfolio",
   description:
-    "Crafting Digital Worlds, One Panel at a Time — Portfolio of Prateek Sharma, developer, designer, and storyteller.",
-  keywords: ["portfolio", "web developer", "Prateek Sharma", "comic book", "pop art"],
-  authors: [{ name: "Prateek Sharma" }],
+    "Crafting Digital Worlds, One Panel at a Time — Portfolio of Prateeq Sharma, developer, designer, and storyteller.",
+  keywords: ["portfolio", "web developer", "Prateeq Sharma", "Prateeq", "comic book", "pop art"],
+  authors: [{ name: "Prateeq Sharma" }],
   icons: {
     icon: "/icon.svg",
   },
   openGraph: {
-    title: "Prateek Sharma | Portfolio",
+    title: "Prateeq Sharma | Portfolio",
     description: "Crafting Digital Worlds, One Panel at a Time",
     type: "website",
   },
@@ -58,10 +58,10 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Person",
-  "name": "Prateek Sharma",
+  "name": "Prateeq Sharma",
   "jobTitle": "Full Stack Developer & Designer",
   "url": "https://prateeq.in",
-  "description": "Portfolio of Prateek Sharma — developer, designer, and storyteller crafting high-performance web applications and interactive experiences.",
+  "description": "Portfolio of Prateeq Sharma — developer, designer, and storyteller crafting high-performance web applications and interactive experiences.",
   "sameAs": [
     "https://github.com/prat3010",
     "https://linkedin.com/in/freshlimevodka",

@@ -52,7 +52,7 @@ export default function About() {
               <div className={styles.imageWrapper}>
                 <Image
                   src={isNoir ? '/images/profile-noir.jpg' : '/images/profile-comic-v2.png'}
-                  alt="Prateek Sharma portrait"
+                  alt="Prateeq Sharma portrait"
                   width={400}
                   height={480}
                   className={styles.profileImage}
@@ -70,13 +70,13 @@ export default function About() {
                   <p className={styles.bioText}>
                     They stare at screens, praying to a god of syntax and semicolons. I don&apos;t.
                     <br /><br />
-                    My name is <strong>Prateek Sharma</strong>. I&apos;m a developer and designer, bringing ideas out of the dark and into reality at warp speed. While traditional coders get lost in legacy frameworks, I combine solid software engineering with AI orchestration to build fast, polished web applications.
+                    My name is <strong>Prateeq Sharma</strong>. I&apos;m a developer and designer, bringing ideas out of the dark and into reality at warp speed. While traditional coders get lost in legacy frameworks, I combine solid software engineering with AI orchestration to build fast, polished web applications.
                     <br /><br />
                     In this city, the real superpower isn&apos;t memorizing boilerplate code. It&apos;s having the vision to design, the skill to build, and the tools to make it happen before the rain stops.
                   </p>
                 ) : (
                   <p className={styles.bioText}>
-                    Hey there! I&apos;m <strong>Prateek Sharma</strong> — a full-stack developer and designer who crafts high-performance web applications and digital experiences. By blending creative vision, clean frontend engineering, and modern AI orchestration, I turn complex ideas into functional products at warp speed. Whether it&apos;s building interactive apps or designing premium interfaces, I focus on delivering speed, precision, and high-impact results.
+                    Hey there! I&apos;m <strong>Prateeq Sharma</strong> — a full-stack developer and designer who crafts high-performance web applications and digital experiences. By blending creative vision, clean frontend engineering, and modern AI orchestration, I turn complex ideas into functional products at warp speed. Whether it&apos;s building interactive apps or designing premium interfaces, I focus on delivering speed, precision, and high-impact results.
                   </p>
                 )}
               </SpeechBubble>

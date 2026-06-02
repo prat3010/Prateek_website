@@ -61,9 +61,14 @@ export default function Hero() {
             )}
           </h1>
 
-          <p className={styles.subtitle}>
-            Prateek Sharma — Developer • Designer • Storyteller
-          </p>
+          <div className={styles.subtitleContainer}>
+            <span className={styles.brandingName}>PRATEEQ</span>
+            <div className={styles.taglineBadges}>
+              <span className={styles.tagBadge}>Developer</span>
+              <span className={styles.tagBadge}>Designer</span>
+              <span className={styles.tagBadge}>Storyteller</span>
+            </div>
+          </div>
 
           <div className={styles.vibeBox} aria-live="polite">
             <span className={styles.vibeLabel}>
@@ -101,7 +106,7 @@ export default function Hero() {
           <ComicPanel tilt={2} className={styles.heroPanel}>
             <Image
               src={isNoir ? '/images/hero-noir.png' : '/images/hero-illustration.png'}
-              alt="Prateek Sharma hero illustration"
+              alt="Prateeq Sharma hero illustration"
               width={500}
               height={500}
               priority
