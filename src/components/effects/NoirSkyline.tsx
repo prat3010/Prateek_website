@@ -366,8 +366,7 @@ const Layer0 = React.memo(function Layer0() {
 Layer0.displayName = 'Layer0';
 
 
-const Layer1 = React.memo(function Layer1({ isMobile, reducedMotion }: LayerProps) {
-  const skipFilter = isMobile || reducedMotion;
+const Layer1 = React.memo(function Layer1({}: LayerProps) {
   return (
     <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%' }}>
             <defs>
@@ -377,12 +376,8 @@ const Layer1 = React.memo(function Layer1({ isMobile, reducedMotion }: LayerProp
               <pattern id="hatch-bg-black" width="6" height="6" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
                 <line x1="0" y1="0" x2="0" y2="6" stroke="rgba(26, 26, 46, 0.08)" strokeWidth="0.8" />
               </pattern>
-              <filter id="bgSketchFilter" x="-20%" y="-20%" width="140%" height="140%">
-                <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" result="noise" />
-                <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" xChannelSelector="R" yChannelSelector="G" />
-              </filter>
             </defs>
-            <g className={styles.buildingGroup} stroke="var(--skyline-stroke-bg)" strokeWidth="0.8" filter={skipFilter ? undefined : "url(#bgSketchFilter)"}>
+            <g className={styles.buildingGroup} stroke="var(--skyline-stroke-bg)" strokeWidth="0.8">
               {/* Left distant skyscrapers */}
               <path d="M 50 1080 L 50 780 L 90 780 L 90 740 L 120 740 L 120 1080 Z" className={styles.bldBgSkyscrapers} />
               <line x1="90" y1="740" x2="90" y2="780" />
@@ -591,8 +586,7 @@ const Layer1 = React.memo(function Layer1({ isMobile, reducedMotion }: LayerProp
 Layer1.displayName = 'Layer1';
 
 
-const Layer2 = React.memo(function Layer2({ isMobile, reducedMotion }: LayerProps) {
-  const skipFilter = isMobile || reducedMotion;
+const Layer2 = React.memo(function Layer2({}: LayerProps) {
   return (
     <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%' }}>
             <defs>
@@ -602,13 +596,9 @@ const Layer2 = React.memo(function Layer2({ isMobile, reducedMotion }: LayerProp
               <pattern id="hatch-mid-black" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
                 <line x1="0" y1="0" x2="0" y2="8" stroke="rgba(26, 26, 46, 0.15)" strokeWidth="1.0" />
               </pattern>
-              <filter id="midSketchFilter" x="-20%" y="-20%" width="140%" height="140%">
-                <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
-                <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" />
-              </filter>
             </defs>
             {/* Midground buildings (Solid fill masks Layer 1) */}
-            <g className={styles.buildingGroup} stroke="var(--skyline-stroke-mid)" strokeWidth="1.2" filter={skipFilter ? undefined : "url(#midSketchFilter)"}>
+            <g className={styles.buildingGroup} stroke="var(--skyline-stroke-mid)" strokeWidth="1.2">
               {/* Far Left block */}
               <path d="M -10 1080 L -10 790 L 80 790 L 80 1080 Z" className={styles.bldMidFarLeft} />
 
@@ -877,8 +867,7 @@ const Layer2 = React.memo(function Layer2({ isMobile, reducedMotion }: LayerProp
 Layer2.displayName = 'Layer2';
 
 
-const Layer3 = React.memo(function Layer3({ isMobile, reducedMotion }: LayerProps) {
-  const skipFilter = isMobile || reducedMotion;
+const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
   return (
     <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%' }}>
             <defs>
@@ -924,11 +913,6 @@ const Layer3 = React.memo(function Layer3({ isMobile, reducedMotion }: LayerProp
               <pattern id="hatch-fg-black" width="10" height="10" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
                 <line x1="0" y1="0" x2="0" y2="10" stroke="rgba(26, 26, 46, 0.22)" strokeWidth="1.2" />
               </pattern>
-
-              <filter id="fgSketchFilter" x="-20%" y="-20%" width="140%" height="140%">
-                <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" result="noise" />
-                <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G" />
-              </filter>
               
               {/* River Gradients */}
               <linearGradient id="riverGradPopart" x1="0" y1="0" x2="0" y2="1">
@@ -942,7 +926,7 @@ const Layer3 = React.memo(function Layer3({ isMobile, reducedMotion }: LayerProp
             </defs>
 
             {/* Group A: Foreground Static Elements (Sketch-Filtered for hand-drawn look) */}
-            <g className={styles.buildingGroup} stroke="var(--skyline-stroke-fg)" strokeWidth="1.8" filter={skipFilter ? undefined : "url(#fgSketchFilter)"}>
+            <g className={styles.buildingGroup} stroke="var(--skyline-stroke-fg)" strokeWidth="1.8">
               
               {/* LEFT ROOFTOP SECTION */}
               <path d="M -50 1080 L -50 820 L 460 820 L 460 1080 Z" className={styles.bldFgLeftRoof} />
