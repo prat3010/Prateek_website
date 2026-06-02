@@ -994,16 +994,89 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
               
               {/* Retro TV Yagi Antenna on left rooftop */}
               <g stroke="var(--skyline-stroke-fg)" strokeWidth="1.5" fill="none">
-                <line x1="415" y1="820" x2="415" y2="750" />
+                <line x1="440" y1="820" x2="440" y2="750" />
                 {/* Crossbars */}
-                <line x1="400" y1="760" x2="430" y2="760" />
-                <line x1="404" y1="772" x2="426" y2="772" />
-                <line x1="408" y1="784" x2="422" y2="784" />
-                <line x1="411" y1="796" x2="419" y2="796" />
+                <line x1="425" y1="760" x2="455" y2="760" />
+                <line x1="429" y1="772" x2="451" y2="772" />
+                <line x1="433" y1="784" x2="447" y2="784" />
+                <line x1="436" y1="796" x2="444" y2="796" />
               </g>
 
               {/* Rooftop Water Puddle on left rooftop */}
               <ellipse cx="150" cy="820" rx="28" ry="2.5" fill="var(--skyline-puddle-fill)" stroke="var(--skyline-puddle-stroke)" strokeWidth="0.8" />
+
+              {/* Left Rooftop Water Tank */}
+              <g>
+                {/* Trestle Support Legs */}
+                <line x1="381" y1="820" x2="384" y2="792" strokeWidth="1.2" />
+                <line x1="411" y1="820" x2="408" y2="792" strokeWidth="1.2" />
+                <line x1="391" y1="820" x2="393" y2="792" strokeWidth="0.8" opacity="0.6" />
+                <line x1="401" y1="820" x2="399" y2="792" strokeWidth="0.8" opacity="0.6" />
+                
+                {/* Cross Bracing */}
+                <line x1="384" y1="792" x2="409" y2="806" strokeWidth="0.8" opacity="0.5" />
+                <line x1="408" y1="792" x2="383" y2="806" strokeWidth="0.8" opacity="0.5" />
+                <line x1="383" y1="806" x2="411" y2="820" strokeWidth="0.8" opacity="0.5" />
+                <line x1="409" y1="806" x2="381" y2="820" strokeWidth="0.8" opacity="0.5" />
+                
+                {/* Horizontal Struts */}
+                <line x1="383" y1="806" x2="409" y2="806" strokeWidth="0.8" />
+                <line x1="382" y1="792" x2="410" y2="792" strokeWidth="1.6" />
+                
+                {/* Center Pipe */}
+                <line x1="396" y1="792" x2="396" y2="820" strokeWidth="2.2" />
+                
+                {/* Tank Barrel Body */}
+                <rect x="380" y="748" width="32" height="44" className={styles.bldFgLeftWaterTankBody} />
+                
+                {/* Vertical Staves (Planks) */}
+                <line x1="384" y1="748" x2="384" y2="792" strokeWidth="0.6" stroke="var(--skyline-stroke-fine)" />
+                <line x1="388" y1="748" x2="388" y2="792" strokeWidth="0.6" stroke="var(--skyline-stroke-fine)" />
+                <line x1="392" y1="748" x2="392" y2="792" strokeWidth="0.6" stroke="var(--skyline-stroke-fine)" />
+                <line x1="396" y1="748" x2="396" y2="792" strokeWidth="0.6" stroke="var(--skyline-stroke-fine)" />
+                <line x1="400" y1="748" x2="400" y2="792" strokeWidth="0.6" stroke="var(--skyline-stroke-fine)" />
+                <line x1="404" y1="748" x2="404" y2="792" strokeWidth="0.6" stroke="var(--skyline-stroke-fine)" />
+                <line x1="408" y1="748" x2="408" y2="792" strokeWidth="0.6" stroke="var(--skyline-stroke-fine)" />
+                
+                {/* Horizontal Steel Hoops */}
+                <line x1="380" y1="753" x2="412" y2="753" strokeWidth="0.8" />
+                <line x1="380" y1="762" x2="412" y2="762" strokeWidth="0.8" />
+                <line x1="380" y1="771" x2="412" y2="771" strokeWidth="0.8" />
+                <line x1="380" y1="779" x2="412" y2="779" strokeWidth="0.8" />
+                <line x1="380" y1="786" x2="412" y2="786" strokeWidth="0.8" />
+                <line x1="380" y1="790" x2="412" y2="790" strokeWidth="0.8" />
+                
+                {/* Conical Roof */}
+                <polygon points="378,748 396,726 414,748" className={styles.bldFgLeftWaterTankRoof} />
+                <line x1="396" y1="726" x2="378" y2="748" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
+                <line x1="396" y1="726" x2="384" y2="748" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
+                <line x1="396" y1="726" x2="390" y2="748" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
+                <line x1="396" y1="726" x2="396" y2="748" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
+                <line x1="396" y1="726" x2="402" y2="748" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
+                <line x1="396" y1="726" x2="408" y2="748" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
+                <line x1="396" y1="726" x2="414" y2="748" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
+                
+                {/* Finial Peak */}
+                <line x1="396" y1="726" x2="396" y2="718" strokeWidth="1.2" />
+                <circle cx="396" cy="718" r="1.2" fill="var(--skyline-stroke-fg)" stroke="none" />
+                
+                {/* Side Ladder */}
+                <line x1="375" y1="795" x2="375" y2="744" strokeWidth="0.8" stroke="var(--skyline-stroke-mid)" />
+                <line x1="378" y1="795" x2="378" y2="744" strokeWidth="0.8" stroke="var(--skyline-stroke-mid)" />
+                <line x1="375" y1="748" x2="378" y2="748" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
+                <line x1="375" y1="752" x2="378" y2="752" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
+                <line x1="375" y1="756" x2="378" y2="756" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
+                <line x1="375" y1="760" x2="378" y2="760" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
+                <line x1="375" y1="764" x2="378" y2="764" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
+                <line x1="375" y1="768" x2="378" y2="768" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
+                <line x1="375" y1="772" x2="378" y2="772" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
+                <line x1="375" y1="776" x2="378" y2="776" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
+                <line x1="375" y1="780" x2="378" y2="780" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
+                <line x1="375" y1="784" x2="378" y2="784" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
+                <line x1="375" y1="788" x2="378" y2="788" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
+                <line x1="375" y1="792" x2="378" y2="792" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
+              </g>
+
 
               {/* Slanted Glass Skylight */}
               <g fill="var(--bld-fg-left-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2">
@@ -1230,6 +1303,78 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
               {/* Roof Chimney Duct for Steam */}
               <rect x="1860" y="700" width="18" height="60" className={styles.bldFgChimney} />
               <rect x="1854" y="694" width="30" height="6" className={styles.bldFgChimney} />
+
+              {/* Right Rooftop Water Tank */}
+              <g>
+                {/* Trestle Support Legs */}
+                <line x1="1445" y1="760" x2="1448" y2="725" strokeWidth="1.4" />
+                <line x1="1485" y1="760" x2="1482" y2="725" strokeWidth="1.4" />
+                <line x1="1457" y1="760" x2="1459" y2="725" strokeWidth="0.8" opacity="0.6" />
+                <line x1="1473" y1="760" x2="1471" y2="725" strokeWidth="0.8" opacity="0.6" />
+                
+                {/* Cross Bracing */}
+                <line x1="1448" y1="725" x2="1483" y2="742" strokeWidth="0.8" opacity="0.5" />
+                <line x1="1482" y1="725" x2="1447" y2="742" strokeWidth="0.8" opacity="0.5" />
+                <line x1="1447" y1="742" x2="1485" y2="760" strokeWidth="0.8" opacity="0.5" />
+                <line x1="1483" y1="742" x2="1445" y2="760" strokeWidth="0.8" opacity="0.5" />
+                
+                {/* Horizontal Struts */}
+                <line x1="1447" y1="742" x2="1483" y2="742" strokeWidth="0.8" />
+                <line x1="1446" y1="725" x2="1484" y2="725" strokeWidth="1.8" />
+                
+                {/* Center Pipe */}
+                <line x1="1465" y1="725" x2="1465" y2="760" strokeWidth="2.5" />
+                
+                {/* Tank Barrel Body */}
+                <rect x="1445" y="670" width="40" height="55" className={styles.bldFgRightWaterTankBody} />
+                
+                {/* Vertical Staves (Planks) */}
+                <line x1="1450" y1="670" x2="1450" y2="725" strokeWidth="0.6" stroke="var(--skyline-stroke-fine)" />
+                <line x1="1455" y1="670" x2="1455" y2="725" strokeWidth="0.6" stroke="var(--skyline-stroke-fine)" />
+                <line x1="1460" y1="670" x2="1460" y2="725" strokeWidth="0.6" stroke="var(--skyline-stroke-fine)" />
+                <line x1="1465" y1="670" x2="1465" y2="725" strokeWidth="0.6" stroke="var(--skyline-stroke-fine)" />
+                <line x1="1470" y1="670" x2="1470" y2="725" strokeWidth="0.6" stroke="var(--skyline-stroke-fine)" />
+                <line x1="1475" y1="670" x2="1475" y2="725" strokeWidth="0.6" stroke="var(--skyline-stroke-fine)" />
+                <line x1="1480" y1="670" x2="1480" y2="725" strokeWidth="0.6" stroke="var(--skyline-stroke-fine)" />
+                
+                {/* Horizontal Steel Hoops */}
+                <line x1="1445" y1="676" x2="1485" y2="676" strokeWidth="0.8" />
+                <line x1="1445" y1="686" x2="1485" y2="686" strokeWidth="0.8" />
+                <line x1="1445" y1="697" x2="1485" y2="697" strokeWidth="0.8" />
+                <line x1="1445" y1="707" x2="1485" y2="707" strokeWidth="0.8" />
+                <line x1="1445" y1="716" x2="1485" y2="716" strokeWidth="0.8" />
+                <line x1="1445" y1="721" x2="1485" y2="721" strokeWidth="0.8" />
+                
+                {/* Conical Roof */}
+                <polygon points="1442,670 1465,642 1488,670" className={styles.bldFgRightWaterTankRoof} />
+                <line x1="1465" y1="642" x2="1442" y2="670" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
+                <line x1="1465" y1="642" x2="1449" y2="670" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
+                <line x1="1465" y1="642" x2="1457" y2="670" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
+                <line x1="1465" y1="642" x2="1465" y2="670" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
+                <line x1="1465" y1="642" x2="1473" y2="670" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
+                <line x1="1465" y1="642" x2="1481" y2="670" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
+                <line x1="1465" y1="642" x2="1488" y2="670" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
+                
+                {/* Finial Peak */}
+                <line x1="1465" y1="642" x2="1465" y2="632" strokeWidth="1.2" />
+                <circle cx="1465" cy="632" r="1.5" fill="var(--skyline-stroke-fg)" stroke="none" />
+                
+                {/* Side Ladder */}
+                <line x1="1490" y1="728" x2="1490" y2="666" strokeWidth="0.8" stroke="var(--skyline-stroke-mid)" />
+                <line x1="1493.5" y1="728" x2="1493.5" y2="666" strokeWidth="0.8" stroke="var(--skyline-stroke-mid)" />
+                <line x1="1490" y1="670" x2="1493.5" y2="670" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
+                <line x1="1490" y1="675" x2="1493.5" y2="675" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
+                <line x1="1490" y1="680" x2="1493.5" y2="680" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
+                <line x1="1490" y1="685" x2="1493.5" y2="685" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
+                <line x1="1490" y1="690" x2="1493.5" y2="690" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
+                <line x1="1490" y1="695" x2="1493.5" y2="695" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
+                <line x1="1490" y1="700" x2="1493.5" y2="700" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
+                <line x1="1490" y1="705" x2="1493.5" y2="705" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
+                <line x1="1490" y1="710" x2="1493.5" y2="710" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
+                <line x1="1490" y1="715" x2="1493.5" y2="715" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
+                <line x1="1490" y1="720" x2="1493.5" y2="720" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
+                <line x1="1490" y1="725" x2="1493.5" y2="725" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
+              </g>
 
               {/* MIDDLE BRIDGE STRUCTURE (Fills the gap between rooftops) */}
               <path d="M 850 1080 L 850 780 L 870 730 L 890 730 L 910 780 L 910 1080 Z" className={styles.bldFgBridgeTower} />
@@ -1477,6 +1622,14 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
               <path d="M 880 935 L 918 935 L 918 950 L 928 950 L 928 968 L 922 968 L 922 1080 L 880 1080 Z" className={styles.shadowHatchFg} />
               <path d="M 322 750 L 355 750 L 355 820 L 322 820 Z" className={styles.shadowHatchFg} />
               <path d="M 1782 715 L 1815 715 L 1815 760 L 1782 760 Z" className={styles.shadowHatchFg} />
+
+              {/* Left water tank shadow hatches */}
+              <path d="M 396 748 L 412 748 L 412 792 L 396 792 Z" className={styles.shadowHatchFg} />
+              <path d="M 396 726 L 414 748 L 396 748 Z" className={styles.shadowHatchFg} />
+              
+              {/* Right water tank shadow hatches */}
+              <path d="M 1465 670 L 1485 670 L 1485 725 L 1465 725 Z" className={styles.shadowHatchFg} />
+              <path d="M 1465 642 L 1488 670 L 1465 670 Z" className={styles.shadowHatchFg} />
             </g>
 
             {/* Group B: Unfiltered Foreground Animating Elements (Separated to bypass displacement map redraw cost for GPU performance) */}

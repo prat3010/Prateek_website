@@ -708,3 +708,10 @@
 .lightPopart .bldFgBridgePier { fill: var(--pop-pier-gray) !important; }
 .lightPopart .bldFgDolphinPiles { fill: var(--pop-orange) !important; }
 
+/* Foreground Water Tanks (Popart Colors) */
+.lightPopart .bldFgLeftWaterTankBody { fill: var(--pop-orange) !important; }
+.lightPopart .bldFgLeftWaterTankRoof { fill: var(--pop-red) !important; }
+.lightPopart .bldFgRightWaterTankBody { fill: var(--pop-yellow) !important; }
+.lightPopart .bldFgRightWaterTankRoof { fill: var(--pop-blue) !important; }
+
+
