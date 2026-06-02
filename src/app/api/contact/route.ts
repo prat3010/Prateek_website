@@ -1,15 +1,50 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;');
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { name, email, message } = body;
 
-    // Validate inputs
+    // Validate existence
     if (!name || !email || !message) {
       return NextResponse.json(
         { error: 'Name, email, and message are required fields.' },
+        { status: 400 }
+      );
+    }
+
+    // Validate type
+    if (typeof name !== 'string' || typeof email !== 'string' || typeof message !== 'string') {
+      return NextResponse.json(
+        { error: 'Name, email, and message must be strings.' },
+        { status: 400 }
+      );
+    }
+
+    // Validate length constraints
+    if (name.length > 100 || email.length > 254 || message.length > 5000) {
+      return NextResponse.json(
+        { error: 'Input size limits exceeded.' },
+        { status: 400 }
+      );
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { error: 'Invalid email address format.' },
         { status: 400 }
       );
     }
@@ -24,13 +59,21 @@ export async function POST(request: Request) {
 
     const resend = new Resend(process.env.RESEND_API_KEY);
 
+    // Escape HTML special characters for HTML email context
+    const escapedName = escapeHtml(name);
+    const escapedEmail = escapeHtml(email);
+    const escapedMessage = escapeHtml(message);
+
+    // Sanitize name for subject line to prevent CRLF injection or HTML tags in the subject
+    const cleanSubjectName = name.replace(/[\r\n]/g, '').replace(/<[^>]*>/g, '').trim();
+
     // Send the email
     // onboarding@resend.dev is the default unverified domain sender
     const { data, error } = await resend.emails.send({
       from: 'Portfolio Contact Form <onboarding@resend.dev>',
       to: '3010prateeksharma@gmail.com',
       replyTo: email,
-      subject: `New Portfolio Signal from ${name}`,
+      subject: `New Portfolio Signal from ${cleanSubjectName}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -111,15 +154,15 @@ export async function POST(request: Request) {
               <div class="content">
                 <div class="field">
                   <div class="label">Sender Name</div>
-                  <div class="value">${name}</div>
+                  <div class="value">${escapedName}</div>
                 </div>
                 <div class="field">
                   <div class="label">Sender Email</div>
-                  <div class="value"><a href="mailto:${email}">${email}</a></div>
+                  <div class="value"><a href="mailto:${escapedEmail}">${escapedEmail}</a></div>
                 </div>
                 <div class="field">
                   <div class="label">Message</div>
-                  <div class="message-box">${message}</div>
+                  <div class="message-box">${escapedMessage}</div>
                 </div>
               </div>
               <div class="footer">

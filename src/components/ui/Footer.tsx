@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { useTheme } from '@/context/ThemeContext';
 import styles from './Footer.module.css';
 
@@ -112,9 +113,9 @@ export default function Footer({ socials, className }: FooterProps) {
         {/* Copyright */}
         <p className={styles.copyright}>
           © {year} Prateeq Sharma. All rights reserved.
-          <a href="/admin/analytics" className={styles.analyticsLink}>
+          <Link href="/admin/analytics" className={styles.analyticsLink}>
             📊 Site Analytics
-          </a>
+          </Link>
         </p>
       </div>
     </footer>

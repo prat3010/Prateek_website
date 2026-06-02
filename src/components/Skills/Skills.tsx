@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { skills, categoryLabels, type SkillCategory } from '@/data/skills';
+import { categoryLabels, type SkillCategory, type Skill } from '@/data/skills';
 import { useTheme } from '@/context/ThemeContext';
 import ActionWord from '@/components/ui/ActionWord';
 import ScrollReveal from '@/components/effects/ScrollReveal';
@@ -21,7 +21,11 @@ const tabLabels: Record<string, string> = {
   ...categoryLabels,
 };
 
-export default function Skills() {
+interface SkillsProps {
+  skills: Skill[];
+}
+
+export default function Skills({ skills }: SkillsProps) {
   const [activeCategory, setActiveCategory] = useState<'all' | SkillCategory>('all');
   const { isNoir } = useTheme();
 
@@ -30,7 +34,7 @@ export default function Skills() {
       activeCategory === 'all'
         ? skills
         : skills.filter((s) => s.category === activeCategory),
-    [activeCategory]
+    [activeCategory, skills]
   );
 
   return (

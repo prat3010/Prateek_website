@@ -845,6 +845,7 @@
     display: flex !important;
     flex-direction: column !important;
     gap: 1.5rem !important;
+    overscroll-behavior: none !important;
   }
   
   :global([data-theme='noir']) .desk.fullscreenMobile {
@@ -877,4 +878,29 @@
   :global([data-theme='noir']) .desk.fullscreenMobile .fullscreenHeader {
     border-bottom-color: #3F3F4E !important;
   }
+}
+
+/* Global visualizer classes for direct-DOM manipulation (bypasses module hashing) */
+:global(.visualizer-visited) {
+  background-color: rgba(0, 229, 255, 0.7) !important;
+  animation: visitShockwave 0.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+}
+
+:global([data-theme='noir'] .visualizer-visited) {
+  background-color: rgba(100, 110, 140, 0.4) !important;
+  animation: visitInkSpill 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+:global(.visualizer-path) {
+  background-color: var(--pop-yellow) !important;
+  border-color: var(--pop-black) !important;
+  animation: pathGlow 0.4s ease forwards;
+  z-index: 3;
+}
+
+:global([data-theme='noir'] .visualizer-path) {
+  background-color: #00E5FF !important;
+  box-shadow: 0 0 10px #00E5FF, 0 0 20px #00D5EC;
+  border-color: #00E5FF !important;
+  animation: pathNeon 0.4s ease forwards;
 }

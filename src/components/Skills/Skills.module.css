@@ -127,6 +127,18 @@
   opacity: 0.7;
 }
 
+.kapowNoir {
+  display: none;
+}
+
+:global([data-theme='noir']) .kapowPop {
+  display: none;
+}
+
+:global([data-theme='noir']) .kapowNoir {
+  display: inline;
+}
+
 /* Card inner layout */
 .cardHeader {
   display: flex;
@@ -140,6 +152,7 @@
   height: 12px;
   border-radius: 50%;
   border: 2px solid var(--pop-black);
+  background-color: var(--skill-color);
   flex-shrink: 0;
 }
 
@@ -284,6 +297,9 @@
 }
 
 :global([data-theme='noir']) .card {
+  background-color: #121214 !important;
+  color: #FAFAFA !important;
+  --skill-color: #FAFAFA !important;
   border: 2px solid #ffffff !important;
   border-top-left-radius: 0px !important;
   border-top-right-radius: 4px !important;
@@ -402,7 +418,7 @@
 
 /* KAPOW hover overrides in Noir Mode */
 :global([data-theme='noir']) .kapow {
-  font-family: var(--font-nosifer), var(--font-creepster), cursive !important;
+  font-family: var(--font-nosifer), cursive !important;
   color: #ff1744 !important;
   -webkit-text-stroke: 1.5px #000000 !important;
   paint-order: stroke fill !important;

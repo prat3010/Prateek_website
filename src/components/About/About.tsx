@@ -51,13 +51,12 @@ export default function About() {
             <ComicPanel tilt={-2} className={styles.profilePanel}>
               <div className={styles.imageWrapper}>
                 <Image
-                  src={isNoir ? '/images/profile-noir.jpg' : '/images/profile-comic-v2.png'}
+                  src={isNoir ? '/images/profile-noir.webp' : '/images/profile-comic.webp'}
                   alt="Prateeq Sharma portrait"
                   width={400}
                   height={480}
                   className={styles.profileImage}
                 />
-                <div className={styles.halftoneOverlay} aria-hidden="true" />
               </div>
             </ComicPanel>
           </ScrollReveal>

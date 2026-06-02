@@ -163,6 +163,28 @@ export default function Sidekick() {
 
   // 4. Inactivity Idle/Sleep check loop
   useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+
+    const startInterval = () => {
+      if (interval) return;
+      interval = setInterval(() => {
+        const elapsed = Date.now() - lastActivityRef.current;
+        if (elapsed > 45000) {
+          setIsAsleep(true);
+          setIsIdle(false);
+        } else if (elapsed > 15000) {
+          setIsIdle(true);
+        }
+      }, 1000);
+    };
+
+    const stopInterval = () => {
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+      }
+    };
+
     const resetActivity = () => {
       lastActivityRef.current = Date.now();
       setIsAsleep(false);
@@ -173,21 +195,30 @@ export default function Sidekick() {
     window.addEventListener('click', resetActivity);
     window.addEventListener('touchstart', resetActivity, { passive: true });
 
-    const interval = setInterval(() => {
-      const elapsed = Date.now() - lastActivityRef.current;
-      if (elapsed > 45000) {
-        setIsAsleep(true);
-        setIsIdle(false);
-      } else if (elapsed > 15000) {
-        setIsIdle(true);
+    // Handle tab visibility change
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopInterval();
+      } else {
+        // Reset activity when returning to tab to prevent immediate sleeping
+        lastActivityRef.current = Date.now();
+        startInterval();
       }
-    }, 1000);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Initial start if visible
+    if (!document.hidden) {
+      startInterval();
+    }
 
     return () => {
       window.removeEventListener('scroll', resetActivity);
       window.removeEventListener('click', resetActivity);
       window.removeEventListener('touchstart', resetActivity);
-      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      stopInterval();
     };
   }, []);
 
@@ -198,18 +229,49 @@ export default function Sidekick() {
       return;
     }
 
-    const interval = setInterval(() => {
-      smokeCounterRef.current++;
-      const nextId = smokeCounterRef.current;
-      
-      setSmokePuffs(prev => [...prev, nextId]);
-      
-      setTimeout(() => {
-        setSmokePuffs(prev => prev.filter(pId => pId !== nextId));
-      }, 2000);
-    }, 3500);
+    let interval: NodeJS.Timeout | null = null;
 
-    return () => clearInterval(interval);
+    const startInterval = () => {
+      if (interval) return;
+      interval = setInterval(() => {
+        smokeCounterRef.current++;
+        const nextId = smokeCounterRef.current;
+        
+        setSmokePuffs(prev => [...prev, nextId]);
+        
+        setTimeout(() => {
+          setSmokePuffs(prev => prev.filter(pId => pId !== nextId));
+        }, 2000);
+      }, 3500);
+    };
+
+    const stopInterval = () => {
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+      }
+    };
+
+    // Handle tab visibility change
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopInterval();
+        setSmokePuffs([]); // clear active particles to free up DOM nodes when tab is inactive
+      } else {
+        startInterval();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    if (!document.hidden) {
+      startInterval();
+    }
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      stopInterval();
+    };
   }, [isNoir, isAsleep]);
 
   // 6. Click Handler to fire random messages

@@ -133,9 +133,10 @@ const getCountryName = (countryCode: string | null): string => {
 };
 
 export default async function AnalyticsPage(props: {
-  searchParams: Promise<{ range?: string }>;
+  searchParams?: Promise<{ range?: string }>;
 }) {
-  const { range = '7d' } = await props.searchParams;
+  const searchParams = props?.searchParams ? await props.searchParams : null;
+  const range = searchParams?.range || '7d';
   let isDemoMode = false;
   let visits: PageVisit[] = [];
   let errorMsg = '';
@@ -308,13 +309,13 @@ export default async function AnalyticsPage(props: {
       </div>
 
       {/* --- Pop Art Header Banner --- */}
-      <div className="comic-panel halftone-overlay bg-[var(--pop-yellow)] p-6 mb-6 text-[var(--pop-black)] rotate-[-1deg] relative">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className={`comic-panel ${styles.headerBanner}`}>
+        <div className={styles.headerContent}>
           <div>
-            <h1 className="text-4xl md:text-5xl font-headline text-stroke uppercase leading-none mb-1">
+            <h1 className={`font-headline text-stroke uppercase ${styles.headerTitle}`}>
               Analytics Action Panel!
             </h1>
-            <p className="font-body text-sm font-bold uppercase tracking-wide opacity-80">
+            <p className={`font-body ${styles.headerSub}`}>
               {isDemoMode ? '⚡ SYSTEM IN DEMO MODE (SHOWING SIMULATED METRICS)' : '🔌 LIVE VISITOR DATA LINKED SECURELY'}
             </p>
           </div>
@@ -336,7 +337,7 @@ export default async function AnalyticsPage(props: {
               key={btn.value}
               href={`/admin/analytics?range=${btn.value}`}
               className={`comic-btn text-xs font-headline ${
-                isActive ? 'comic-btn-yellow scale-[1.03] translate-y-[-2px]' : 'comic-btn-outline'
+                isActive ? `comic-btn-yellow ${styles.activeFilter}` : 'comic-btn-outline'
               }`}
               style={{ padding: '6px 12px' }}
             >
@@ -348,26 +349,26 @@ export default async function AnalyticsPage(props: {
 
       {/* --- Alert configuration box if in demo mode --- */}
       {isDemoMode && (
-        <div className="comic-panel border-[var(--pop-red)] bg-[var(--surface-elevated)] p-5 mb-8 flex flex-col md:flex-row items-start gap-4">
-          <div className="p-3 bg-[var(--pop-red)] text-white comic-border-thin comic-shadow-sm rounded-lg">
+        <div className={`comic-panel ${styles.warningAlert}`}>
+          <div className={styles.warningIconWrapper}>
             <ShieldAlert size={28} />
           </div>
           <div>
-            <h3 className="font-headline text-xl text-[var(--pop-red)] uppercase leading-none mb-2">
+            <h3 className={`font-headline ${styles.warningTitle}`}>
               Supabase Configuration Missing!
             </h3>
             {errorMsg ? (
-              <p className="font-body text-sm text-red-500 mb-2">
+              <p className={`font-body ${styles.warningError}`}>
                 Database Error: {errorMsg}
               </p>
             ) : (
-              <p className="font-body text-sm text-[var(--color-text-muted)] mb-2">
-                The database keys are not configured in your <code className="font-code text-xs px-1 py-0.5 border border-dashed rounded bg-slate-100 dark:bg-zinc-800">.env.local</code>. We are displaying mock data so you can test the UI layout.
+              <p className={`font-body ${styles.warningDesc}`}>
+                The database keys are not configured in your <code className={`font-code ${styles.warningCode}`}>.env.local</code>. We are displaying mock data so you can test the UI layout.
               </p>
             )}
-            <div className="text-sm font-body font-bold flex flex-wrap gap-x-4 gap-y-1">
-              <span className="text-[var(--pop-blue)]">👉 Step 1: Run table SQL in your Supabase Console</span>
-              <span className="text-[var(--pop-green)]">👉 Step 2: Set keys in .env.local to go Live!</span>
+            <div className={`font-body ${styles.warningSteps}`}>
+              <span className={styles.stepBlue}>👉 Step 1: Run table SQL in your Supabase Console</span>
+              <span className={styles.stepGreen}>👉 Step 2: Set keys in .env.local to go Live!</span>
             </div>
           </div>
         </div>
@@ -603,7 +604,7 @@ export default async function AnalyticsPage(props: {
           <div className={styles.rowList}>
             {topCountries.map((country, idx) => (
               <div key={idx} className={styles.rowItem}>
-                <span className="flex items-center gap-1.5">{country.flag} {country.name}</span>
+                <span className={styles.countryRow}>{country.flag} {country.name}</span>
                 <span className={`${styles.countBadge} ${styles.pinkBadge}`}>
                   {country.count} visits
                 </span>

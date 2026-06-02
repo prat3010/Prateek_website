@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { useTheme } from '@/context/ThemeContext';
 import styles from './CursorTrail.module.css';
 
@@ -102,6 +102,8 @@ const drawCigarette = (ctx: CanvasRenderingContext2D, x: number, y: number, angl
 
 export default function CursorTrail() {
   const { isNoir } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const [isTouch, setIsTouch] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const trailRef = useRef<TrailDot[]>([]);
   const smokeRef = useRef<SmokeParticle[]>([]);
@@ -378,9 +380,11 @@ export default function CursorTrail() {
   }, [draw]);
 
   useEffect(() => {
+    setMounted(true);
     // Don't enable on touch/coarse-pointer devices
-    if (typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches) {
+    if (window.matchMedia('(pointer: coarse)').matches) {
       isTouchDevice.current = true;
+      setIsTouch(true);
       return;
     }
 
@@ -406,10 +410,18 @@ export default function CursorTrail() {
       mouseRef.current = { x: -100, y: -100 };
     };
 
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(frameRef.current);
+        isLoopActiveRef.current = false;
+      }
+    };
+
     handleResize();
     window.addEventListener('resize', handleResize, { passive: true });
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     document.addEventListener('mouseleave', handleMouseLeave);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     isLoopActiveRef.current = true;
     frameRef.current = requestAnimationFrame(draw);
@@ -418,12 +430,12 @@ export default function CursorTrail() {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseleave', handleMouseLeave);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       cancelAnimationFrame(frameRef.current);
     };
   }, [draw, wakeLoop]);
 
-  // Don't render canvas on touch devices
-  if (typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches) {
+  if (!mounted || isTouch) {
     return null;
   }
 

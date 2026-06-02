@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bangers, Comic_Neue, JetBrains_Mono, Creepster, Nosifer } from "next/font/google";
+import { Bangers, Comic_Neue, JetBrains_Mono, Nosifer } from "next/font/google";
 import "./globals.css";
 import ClientLayout from "./ClientLayout";
 
@@ -11,7 +11,7 @@ const bangers = Bangers({
 });
 
 const comicNeue = Comic_Neue({
-  weight: ["300", "400", "700"],
+  weight: ["400", "700"],
   style: ["normal", "italic"],
   variable: "--font-comic-neue",
   subsets: ["latin"],
@@ -21,13 +21,6 @@ const comicNeue = Comic_Neue({
 const jetbrainsMono = JetBrains_Mono({
   weight: ["400", "700"],
   variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const creepster = Creepster({
-  weight: "400",
-  variable: "--font-creepster",
   subsets: ["latin"],
   display: "swap",
 });
@@ -90,7 +83,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${bangers.variable} ${comicNeue.variable} ${jetbrainsMono.variable} ${creepster.variable} ${nosifer.variable}`}
+      className={`${bangers.variable} ${comicNeue.variable} ${jetbrainsMono.variable} ${nosifer.variable}`}
     >
       <head>
         <script

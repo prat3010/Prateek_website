@@ -219,8 +219,25 @@ const ConfettiBurst = forwardRef<ConfettiBurstHandle>(function ConfettiBurst(_, 
   useEffect(() => {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas, { passive: true });
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        isActiveRef.current = false;
+        cancelAnimationFrame(frameRef.current);
+        particlesRef.current = [];
+        if (timerRef.current) clearTimeout(timerRef.current);
+        const canvas = canvasRef.current;
+        if (canvas) {
+          const ctx = canvas.getContext('2d');
+          if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
       window.removeEventListener('resize', resizeCanvas);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       cancelAnimationFrame(frameRef.current);
       if (timerRef.current) clearTimeout(timerRef.current);
     };

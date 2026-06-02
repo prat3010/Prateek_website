@@ -1,4 +1,9 @@
+import 'server-only';
 import { createClient } from '@supabase/supabase-js';
+
+if (typeof window !== 'undefined') {
+  throw new Error('Security Error: This database module can only be executed on the server.');
+}
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;

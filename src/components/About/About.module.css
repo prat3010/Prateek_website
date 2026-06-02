@@ -63,23 +63,7 @@
   object-fit: cover;
 }
 
-.halftoneOverlay {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(
-    circle,
-    var(--pop-blue) 1px,
-    transparent 1px
-  );
-  background-size: 8px 8px;
-  opacity: 0.08;
-  mix-blend-mode: multiply;
-  pointer-events: none;
-}
 
-:global([data-theme='noir']) .halftoneOverlay {
-  display: none !important;
-}
 
 /* Text column */
 .textColumn {

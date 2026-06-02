@@ -62,16 +62,16 @@ export default function Playground() {
     if (isLaunched) {
       const isMobile = window.innerWidth <= 992;
       if (isMobile) {
-        document.body.style.overflow = 'hidden';
-        document.body.style.position = 'relative';
+        document.body.classList.add('no-scroll');
+        document.documentElement.classList.add('no-scroll');
       }
     } else {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
+      document.body.classList.remove('no-scroll');
+      document.documentElement.classList.remove('no-scroll');
     }
     return () => {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
+      document.body.classList.remove('no-scroll');
+      document.documentElement.classList.remove('no-scroll');
     };
   }, [isLaunched]);
 
@@ -128,6 +128,9 @@ export default function Playground() {
   // Clear path and visited marks
   const clearPath = useCallback(() => {
     if (isRunning) return;
+    // Remove custom visualizer classes from DOM directly
+    document.querySelectorAll('.visualizer-visited').forEach(el => el.classList.remove('visualizer-visited'));
+    document.querySelectorAll('.visualizer-path').forEach(el => el.classList.remove('visualizer-path'));
     setVisitedNodes(new Set<string>());
     setPathNodes(new Set<string>());
     addLog(isNoir ? 'Cleared search markers.' : 'Cleaned the graph! Ready for next run.');
@@ -143,6 +146,9 @@ export default function Playground() {
   // Full reset
   const resetGrid = useCallback(() => {
     if (isRunning) return;
+    // Remove custom visualizer classes from DOM directly
+    document.querySelectorAll('.visualizer-visited').forEach(el => el.classList.remove('visualizer-visited'));
+    document.querySelectorAll('.visualizer-path').forEach(el => el.classList.remove('visualizer-path'));
     setStartNode({ col: 3, row: 7 });
     setEndNode({ col: 16, row: 7 });
     setWalls(new Set<string>());
@@ -157,6 +163,8 @@ export default function Playground() {
     if (isRunning) return;
 
     // Reset markers before starting
+    document.querySelectorAll('.visualizer-visited').forEach(el => el.classList.remove('visualizer-visited'));
+    document.querySelectorAll('.visualizer-path').forEach(el => el.classList.remove('visualizer-path'));
     setVisitedNodes(new Set<string>());
     setPathNodes(new Set<string>());
     setIsRunning(true);
@@ -205,17 +213,34 @@ export default function Playground() {
       if (val.type === 'visit' && val.col !== undefined && val.row !== undefined) {
         const key = `${val.col},${val.row}`;
         localVisited.add(key);
-        setVisitedNodes(new Set(localVisited));
+        
+        // Directly inject visualizer-visited class into DOM cell to avoid React re-renders during active search loop
+        const el = document.querySelector(`[data-col="${val.col}"][data-row="${val.row}"]`);
+        if (el) {
+          el.classList.add('visualizer-visited');
+        }
         
         // Schedule next iteration
         timerRef.current = setTimeout(step, SPEED_DELAYS[speed - 1]);
       } 
       else if (val.type === 'path' && val.path) {
+        // Direct DOM update for path styling
+        val.path.forEach((node) => {
+          const el = document.querySelector(`[data-col="${node.col}"][data-row="${node.row}"]`);
+          if (el) {
+            el.classList.add('visualizer-path');
+          }
+        });
+
+        // Sync final visited & path sets to React state in a single batch render at the end
+        setVisitedNodes(new Set(localVisited));
+
         const newPath = new Set<string>();
         val.path.forEach((node) => {
           newPath.add(`${node.col},${node.row}`);
         });
         setPathNodes(newPath);
+
         setIsRunning(false);
         addLog(isNoir 
           ? `Path identified: shortest path found with cost of ${val.path.length} blocks.`
@@ -223,6 +248,9 @@ export default function Playground() {
         );
       } 
       else if (val.type === 'no-path') {
+        // Sync final visited set to React state in a single batch render at the end
+        setVisitedNodes(new Set(localVisited));
+
         setIsRunning(false);
         addLog(isNoir 
           ? 'WARNING: Target unreachable. Barriers block all viable paths.'

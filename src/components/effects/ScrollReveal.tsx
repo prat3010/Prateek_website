@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, useEffect, type ReactNode } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { m, useInView } from 'framer-motion';
 
 type Direction = 'up' | 'down' | 'left' | 'right';
 
@@ -54,7 +54,7 @@ export default function ScrollReveal({
   const offset = getOffset(direction);
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       className={className}
       initial={{ opacity: 0, x: offset.x, y: offset.y }}
@@ -71,6 +71,6 @@ export default function ScrollReveal({
       }}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }

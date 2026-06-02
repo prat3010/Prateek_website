@@ -2,22 +2,29 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useTypewriter } from '@/hooks/useTypewriter';
 import { useTheme } from '@/context/ThemeContext';
 import ActionWord from '@/components/ui/ActionWord';
 import ComicPanel from '@/components/ui/ComicPanel';
-import { standardTaglines, noirTaglines } from '@/data/taglines';
 import styles from './Hero.module.css';
 
-export default function Hero() {
+interface HeroProps {
+  taglines: {
+    standard: string[];
+    noir: string[];
+  };
+}
+
+export default function Hero({ taglines }: HeroProps) {
   const { isNoir } = useTheme();
   const [tagline, setTagline] = useState('');
 
   useEffect(() => {
-    const list = isNoir ? noirTaglines : standardTaglines;
+    const list = isNoir ? taglines.noir : taglines.standard;
     const randomIndex = Math.floor(Math.random() * list.length);
     setTagline(list[randomIndex]);
-  }, [isNoir]);
+  }, [isNoir, taglines]);
   
   const { displayText, isDone } = useTypewriter({
     text: tagline,
@@ -91,27 +98,37 @@ export default function Hero() {
               <span className={styles.ctaText}>View My Work →</span>
             </a>
 
-            <a
+            <Link
               href="/admin/analytics"
               className={styles.telemetryBadge}
               aria-label="View live edge telemetry analytics"
             >
               <span className={styles.pulseDot} />
               <span className={styles.ctaText}>📈 Live Telemetry</span>
-            </a>
+            </Link>
           </div>
         </div>
 
         <div className={styles.imageSide}>
           <ComicPanel tilt={2} className={styles.heroPanel}>
-            <Image
-              src={isNoir ? '/images/hero-noir.png' : '/images/hero-illustration.png'}
-              alt="Prateeq Sharma hero illustration"
-              width={500}
-              height={500}
-              priority
-              className={styles.heroImage}
-            />
+            <div className={styles.imageWrapper}>
+              <Image
+                src="/images/hero-illustration.webp"
+                alt="Prateeq Sharma hero illustration"
+                width={500}
+                height={500}
+                priority
+                className={`${styles.heroImage} ${isNoir ? styles.hiddenImage : styles.visibleImage}`}
+              />
+              <Image
+                src="/images/hero-noir.webp"
+                alt="Prateeq Sharma hero noir illustration"
+                width={500}
+                height={500}
+                priority
+                className={`${styles.heroImage} ${!isNoir ? styles.hiddenImage : styles.visibleImage}`}
+              />
+            </div>
           </ComicPanel>
           {/* Small floating action words */}
           <div className={styles.floatingZap}>

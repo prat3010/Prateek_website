@@ -104,12 +104,12 @@
   --z-toast: 700;
 
   /* ─ Ben-Day Dot Pattern ─ */
-  --dot-pattern: radial-gradient(circle, var(--pop-black) 1px, transparent 1px);
-  --dot-size: 20px;
-  --dot-pattern-light: radial-gradient(circle, rgba(26, 26, 46, 0.08) 1px, transparent 1px);
-  --dot-pattern-medium: radial-gradient(circle, rgba(26, 26, 46, 0.15) 1px, transparent 1px);
-  --dot-pattern-heavy: radial-gradient(circle, rgba(26, 26, 46, 0.25) 1px, transparent 1px);
-  --dot-pattern-color: radial-gradient(circle, var(--pop-red) 1px, transparent 1px);
+  --dot-pattern: radial-gradient(circle, var(--pop-black) 2.2px, transparent 2.2px);
+  --dot-size: 18px;
+  --dot-pattern-light: radial-gradient(circle, rgba(26, 26, 46, 0.18) 1.8px, transparent 1.8px);
+  --dot-pattern-medium: radial-gradient(circle, rgba(26, 26, 46, 0.28) 2.2px, transparent 2.2px);
+  --dot-pattern-heavy: radial-gradient(circle, rgba(26, 26, 46, 0.42) 2.5px, transparent 2.5px);
+  --dot-pattern-color: radial-gradient(circle, rgba(255, 23, 68, 0.28) 2.2px, transparent 2.2px);
 
   /* ─ Transition Tokens ─ */
   --transition-fast: 150ms ease;
@@ -170,11 +170,11 @@
   --shadow-comic-color: 4px 4px 0px var(--pop-black);
 
   /* ─ Halftone Dot Patterns ─ */
-  --dot-pattern: radial-gradient(circle, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-  --dot-pattern-light: radial-gradient(circle, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  --dot-pattern-medium: radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
-  --dot-pattern-heavy: radial-gradient(circle, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
-  --dot-pattern-color: radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  --dot-pattern: radial-gradient(circle, rgba(255, 255, 255, 0.18) 2.2px, transparent 2.2px);
+  --dot-pattern-light: radial-gradient(circle, rgba(255, 255, 255, 0.08) 1.8px, transparent 1.8px);
+  --dot-pattern-medium: radial-gradient(circle, rgba(255, 255, 255, 0.14) 2.2px, transparent 2.2px);
+  --dot-pattern-heavy: radial-gradient(circle, rgba(255, 255, 255, 0.22) 2.5px, transparent 2.5px);
+  --dot-pattern-color: radial-gradient(circle, rgba(255, 255, 255, 0.14) 2.2px, transparent 2.2px);
 }
 
 /* ─ Scrollbar Styling Override in Noir Mode ─ */
@@ -196,11 +196,7 @@
   scrollbar-color: #4a4a50 #08080a !important;
 }
 
-/* ─ Hide all dot / halftone overlays in Noir mode so they don't bleed over the skyline ─ */
-[data-theme='noir'] .halftone-overlay::after,
-[data-theme='noir'] .halftone-overlay-medium::after,
-[data-theme='noir'] .halftone-overlay-heavy::after,
-[data-theme='noir'] .halftone-overlay-color::after,
+/* ─ Hide all dot backgrounds in Noir mode ─ */
 [data-theme='noir'] .dot-bg {
   display: none !important;
 }
@@ -386,32 +382,6 @@ table {
 }
 
 /* ── Ben-Day / Halftone Patterns ───────────────────────────── */
-.halftone-overlay {
-  position: relative;
-}
-
-.halftone-overlay::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: var(--dot-pattern-light);
-  background-size: var(--dot-size) var(--dot-size);
-  pointer-events: none;
-  z-index: 1;
-  mix-blend-mode: multiply;
-}
-
-.halftone-overlay-medium::after {
-  background-image: var(--dot-pattern-medium);
-}
-
-.halftone-overlay-heavy::after {
-  background-image: var(--dot-pattern-heavy);
-}
-
-.halftone-overlay-color::after {
-  background-image: var(--dot-pattern-color);
-}
 
 /* Standalone dot background */
 .dot-bg {
@@ -1129,7 +1099,6 @@ table {
     color: black;
   }
 
-  .halftone-overlay::after,
   .speed-lines::before,
   .speed-lines-diagonal::before,
   .speed-lines-radial::before {
@@ -1141,5 +1110,43 @@ table {
   .comic-shadow-lg,
   .comic-shadow-xl {
     box-shadow: none;
+  }
+}
+
+/* Prevent body scroll bounce and scroll locks on mobile */
+html.no-scroll, body.no-scroll {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+
+/* Loading & Skeleton Styles */
+.skyline-skeleton {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background: #0f0f15;
+}
+
+.section-skeleton {
+  width: 100%;
+  margin: 32px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--surface-primary);
+  border: 3px solid var(--pop-black);
+  box-shadow: var(--shadow-comic-sm);
+  animation: skeletonPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes skeletonPulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(0.995);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1);
   }
 }

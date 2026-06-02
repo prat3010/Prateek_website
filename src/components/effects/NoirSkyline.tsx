@@ -1,14 +1,19 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { m, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
 import { useTheme } from '@/context/ThemeContext';
 import styles from './NoirSkyline.module.css';
 
+interface LayerProps {
+  isMobile?: boolean;
+  reducedMotion?: boolean;
+}
+
 export default function NoirSkyline() {
-  const { theme, pendingTheme } = useTheme();
+  const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
+  const [isMobile, setIsMobile] = useState(false);
 
   // Track scroll position of the page
   const { scrollYProgress } = useScroll();
@@ -24,15 +29,41 @@ export default function NoirSkyline() {
   // Foreground (Layer 3): Scales from 1.0 to 1.25, moves down slowly (Y from 0 to 50px)
   const fgScale = useTransform(scrollYProgress, [0, 1], [1, 1.25]);
   const fgY = useTransform(scrollYProgress, [0, 1], [0, 50]);
-  const fgOpacity = useTransform(scrollYProgress, [0, 1], [1, 1]);
 
+  // Motion values for tracking mouse cursor coordinates
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
 
+  // Distinct springs per layer to create organic lag
+  const springX1 = useSpring(mouseX, { damping: 30, stiffness: 90 });
+  const springY1 = useSpring(mouseY, { damping: 30, stiffness: 90 });
+
+  const springX2 = useSpring(mouseX, { damping: 28, stiffness: 85 });
+  const springY2 = useSpring(mouseY, { damping: 28, stiffness: 85 });
+
+  const springX3 = useSpring(mouseX, { damping: 24, stiffness: 80 });
+  const springY3 = useSpring(mouseY, { damping: 24, stiffness: 80 });
+
+  // Transforms for mouse offsets
+  const layer1X = useTransform(springX1, (x) => x * -10);
+  const layer1Y = useTransform(springY1, (y) => y * -8);
+
+  const layer2X = useTransform(springX2, (x) => x * -24);
+  const layer2Y = useTransform(springY2, (y) => y * -16);
+
+  const layer3X = useTransform(springX3, (x) => x * -42);
+  const layer3Y = useTransform(springY3, (y) => y * -28);
 
   const [reducedMotion, setReducedMotion] = useState(false);
 
   // Track mouse coordinates for subtle parallax offset
   useEffect(() => {
     setMounted(true);
+    const isMobileDevice =
+      window.matchMedia('(max-width: 768px)').matches ||
+      window.matchMedia('(pointer: coarse)').matches;
+    setIsMobile(isMobileDevice);
+
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     setReducedMotion(mediaQuery.matches);
 
@@ -41,23 +72,28 @@ export default function NoirSkyline() {
     };
     mediaQuery.addEventListener('change', mediaListener);
 
+    let rafId: number | null = null;
     const handleMouseMove = (e: MouseEvent) => {
-      // Respect prefers-reduced-motion
       if (mediaQuery.matches) return;
-
-      const x = (e.clientX / window.innerWidth) - 0.5;
-      const y = (e.clientY / window.innerHeight) - 0.5;
-      setMouseOffset({ x, y });
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const x = (e.clientX / window.innerWidth) - 0.5;
+        const y = (e.clientY / window.innerHeight) - 0.5;
+        mouseX.set(x);
+        mouseY.set(y);
+      });
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
+    if (!isMobileDevice && !mediaQuery.matches) {
+      window.addEventListener('mousemove', handleMouseMove);
+    }
+
     return () => {
       mediaQuery.removeEventListener('change', mediaListener);
       window.removeEventListener('mousemove', handleMouseMove);
+      if (rafId) cancelAnimationFrame(rafId);
     };
-  }, []);
-
-  
+  }, [mouseX, mouseY]);
 
   if (!mounted) return null;
 
@@ -75,45 +111,39 @@ export default function NoirSkyline() {
       </div>
 
       {/* ── Layer 1: Background Buildings (Parallax Scale 1.12) ── */}
-      <motion.div
+      <m.div
         style={{ scale: bgScale, y: bgY, zIndex: 1 }}
         className={styles.layer}
       >
-        <motion.div
-          animate={{ x: mouseOffset.x * -10, y: mouseOffset.y * -8 }}
-          transition={{ type: 'spring', damping: 30, stiffness: 90 }}
-          style={{ width: '100%', height: '100%' }}
+        <m.div
+          style={{ x: layer1X, y: layer1Y, width: '100%', height: '100%' }}
         >
-          <Layer1 />
-        </motion.div>
-      </motion.div>
+          <Layer1 isMobile={isMobile} reducedMotion={reducedMotion} />
+        </m.div>
+      </m.div>
 
-      <motion.div
+      <m.div
         style={{ scale: midScale, y: midY, zIndex: 2 }}
         className={styles.layer}
       >
-        <motion.div
-          animate={{ x: mouseOffset.x * -24, y: mouseOffset.y * -16 }}
-          transition={{ type: 'spring', damping: 28, stiffness: 85 }}
-          style={{ width: '100%', height: '100%' }}
+        <m.div
+          style={{ x: layer2X, y: layer2Y, width: '100%', height: '100%' }}
         >
-          <Layer2 />
-        </motion.div>
-      </motion.div>
+          <Layer2 isMobile={isMobile} reducedMotion={reducedMotion} />
+        </m.div>
+      </m.div>
 
       {/* ── Layer 3: Foreground Rooftops (Parallax Scale 1.8, Masks midground, high opacity) ── */}
-      <motion.div
-        style={{ scale: fgScale, y: fgY, opacity: fgOpacity, zIndex: 3 }}
+      <m.div
+        style={{ scale: fgScale, y: fgY, zIndex: 3 }}
         className={styles.layer}
       >
-        <motion.div
-          animate={{ x: mouseOffset.x * -42, y: mouseOffset.y * -28 }}
-          transition={{ type: 'spring', damping: 24, stiffness: 80 }}
-          style={{ width: '100%', height: '100%' }}
+        <m.div
+          style={{ x: layer3X, y: layer3Y, width: '100%', height: '100%' }}
         >
-          <Layer3 reducedMotion={reducedMotion} />
-        </motion.div>
-      </motion.div>
+          <Layer3 isMobile={isMobile} reducedMotion={reducedMotion} />
+        </m.div>
+      </m.div>
 
     </div>
   );
@@ -336,7 +366,8 @@ const Layer0 = React.memo(function Layer0() {
 Layer0.displayName = 'Layer0';
 
 
-const Layer1 = React.memo(function Layer1() {
+const Layer1 = React.memo(function Layer1({ isMobile, reducedMotion }: LayerProps) {
+  const skipFilter = isMobile || reducedMotion;
   return (
     <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%' }}>
             <defs>
@@ -351,7 +382,7 @@ const Layer1 = React.memo(function Layer1() {
                 <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" xChannelSelector="R" yChannelSelector="G" />
               </filter>
             </defs>
-            <g className={styles.buildingGroup} stroke="var(--skyline-stroke-bg)" strokeWidth="0.8" filter="url(#bgSketchFilter)">
+            <g className={styles.buildingGroup} stroke="var(--skyline-stroke-bg)" strokeWidth="0.8" filter={skipFilter ? undefined : "url(#bgSketchFilter)"}>
               {/* Left distant skyscrapers */}
               <path d="M 50 1080 L 50 780 L 90 780 L 90 740 L 120 740 L 120 1080 Z" className={styles.bldBgSkyscrapers} />
               <line x1="90" y1="740" x2="90" y2="780" />
@@ -560,7 +591,8 @@ const Layer1 = React.memo(function Layer1() {
 Layer1.displayName = 'Layer1';
 
 
-const Layer2 = React.memo(function Layer2() {
+const Layer2 = React.memo(function Layer2({ isMobile, reducedMotion }: LayerProps) {
+  const skipFilter = isMobile || reducedMotion;
   return (
     <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%' }}>
             <defs>
@@ -576,7 +608,7 @@ const Layer2 = React.memo(function Layer2() {
               </filter>
             </defs>
             {/* Midground buildings (Solid fill masks Layer 1) */}
-            <g className={styles.buildingGroup} stroke="var(--skyline-stroke-mid)" strokeWidth="1.2" filter="url(#midSketchFilter)">
+            <g className={styles.buildingGroup} stroke="var(--skyline-stroke-mid)" strokeWidth="1.2" filter={skipFilter ? undefined : "url(#midSketchFilter)"}>
               {/* Far Left block */}
               <path d="M -10 1080 L -10 790 L 80 790 L 80 1080 Z" className={styles.bldMidFarLeft} />
 
@@ -845,7 +877,8 @@ const Layer2 = React.memo(function Layer2() {
 Layer2.displayName = 'Layer2';
 
 
-const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: boolean }) {
+const Layer3 = React.memo(function Layer3({ isMobile, reducedMotion }: LayerProps) {
+  const skipFilter = isMobile || reducedMotion;
   return (
     <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%' }}>
             <defs>
@@ -909,7 +942,7 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: { reducedMotion: bo
             </defs>
 
             {/* Group A: Foreground Static Elements (Sketch-Filtered for hand-drawn look) */}
-            <g className={styles.buildingGroup} stroke="var(--skyline-stroke-fg)" strokeWidth="1.8" filter="url(#fgSketchFilter)">
+            <g className={styles.buildingGroup} stroke="var(--skyline-stroke-fg)" strokeWidth="1.8" filter={skipFilter ? undefined : "url(#fgSketchFilter)"}>
               
               {/* LEFT ROOFTOP SECTION */}
               <path d="M -50 1080 L -50 820 L 460 820 L 460 1080 Z" className={styles.bldFgLeftRoof} />

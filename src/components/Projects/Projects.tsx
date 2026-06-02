@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { ExternalLink, Code2 } from 'lucide-react';
-import { projects } from '@/data/projects';
+import { type Project } from '@/data/projects';
 import { useTheme } from '@/context/ThemeContext';
 import ActionWord from '@/components/ui/ActionWord';
 import ScrollReveal from '@/components/effects/ScrollReveal';
@@ -25,7 +25,11 @@ const getActionWord = (word: string, isNoir: boolean) => {
   }
 };
 
-export default function Projects() {
+interface ProjectsProps {
+  projects: Project[];
+}
+
+export default function Projects({ projects }: ProjectsProps) {
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const selected = projects.find((p) => p.id === selectedProject);
   const { isNoir } = useTheme();
@@ -69,7 +73,7 @@ export default function Projects() {
 
                 <div className={styles.panelImageWrapper}>
                   <Image
-                    src={isNoir ? project.image.replace(/\.png$/, '-noir.png') : project.image}
+                    src={isNoir ? project.image.replace(/\.webp$/, '-noir.webp') : project.image}
                     alt={project.title}
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
@@ -134,7 +138,7 @@ export default function Projects() {
 
             <div className={styles.modalImageWrapper}>
               <Image
-                src={isNoir ? selected.image.replace(/\.png$/, '-noir.png') : selected.image}
+                src={isNoir ? selected.image.replace(/\.webp$/, '-noir.webp') : selected.image}
                 alt={selected.title}
                 width={600}
                 height={400}

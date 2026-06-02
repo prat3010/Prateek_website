@@ -1,7 +1,4 @@
-'use client';
-
 import React from 'react';
-import { useTheme } from '@/context/ThemeContext';
 import styles from './ActionWord.module.css';
 
 export interface ActionWordProps {
@@ -29,7 +26,6 @@ export default function ActionWord({
   rotation = 0,
   className,
 }: ActionWordProps) {
-  const { isNoir } = useTheme();
   const textColor = color ?? 'var(--pop-red)';
   const burstColor = starburstColor ?? 'var(--pop-yellow)';
 
@@ -39,12 +35,10 @@ export default function ActionWord({
       style={{ transform: `rotate(${rotation}deg)` }}
       aria-hidden="true"
     >
-      {!isNoir && (
-        <span
-          className={styles.starburst}
-          style={{ backgroundColor: burstColor }}
-        />
-      )}
+      <span
+        className={styles.starburst}
+        style={{ backgroundColor: burstColor }}
+      />
       <span
         className={styles.word}
         style={{ '--action-color': textColor } as React.CSSProperties}

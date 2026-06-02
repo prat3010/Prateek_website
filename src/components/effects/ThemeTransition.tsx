@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-import { useTheme } from '@/context/ThemeContext';
+import { useThemeTransition } from '@/context/ThemeContext';
 import styles from './ThemeTransition.module.css';
 
 export default function ThemeTransition() {
-  const { isTransitioning, transitionCoords, pendingTheme } = useTheme();
+  const { isTransitioning, transitionCoords, pendingTheme } = useThemeTransition();
 
   if (!isTransitioning || !pendingTheme) return null;
 

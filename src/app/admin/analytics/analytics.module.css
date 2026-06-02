@@ -584,3 +584,145 @@
     font-size: 8px;
   }
 }
+
+.headerBanner {
+  background-color: var(--pop-yellow);
+  padding: 24px;
+  margin-bottom: 24px;
+  color: var(--pop-black);
+  transform: rotate(-1deg);
+  position: relative;
+}
+
+.headerContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .headerContent {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.headerTitle {
+  font-size: 36px;
+  text-transform: uppercase;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+@media (min-width: 768px) {
+  .headerTitle {
+    font-size: 48px;
+  }
+}
+
+.headerSub {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.8;
+}
+
+.activeFilter {
+  background-color: var(--pop-yellow) !important;
+  color: var(--pop-black) !important;
+  transform: scale(1.03) translateY(-2px);
+  box-shadow: var(--shadow-comic);
+}
+
+.warningAlert {
+  border-color: var(--pop-red) !important;
+  background-color: var(--surface-elevated);
+  padding: 20px;
+  margin-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .warningAlert {
+    flex-direction: row;
+  }
+}
+
+.warningIconWrapper {
+  padding: 12px;
+  background-color: var(--pop-red);
+  color: #ffffff;
+  border: 2px solid var(--pop-black);
+  box-shadow: 2px 2px 0px 0px var(--pop-black);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.warningTitle {
+  font-size: 20px;
+  color: var(--pop-red);
+  text-transform: uppercase;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.warningError {
+  font-size: 14px;
+  color: #ef4444;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.warningDesc {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.warningCode {
+  font-size: 12px;
+  padding: 2px 4px;
+  border: 1px dashed var(--pop-black);
+  border-radius: 4px;
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+:global(.dark) .warningCode {
+  background-color: #27272a;
+  color: #f4f4f5;
+  border-color: var(--pop-white);
+}
+
+.warningSteps {
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+
+.stepBlue {
+  color: var(--pop-blue);
+}
+
+.stepGreen {
+  color: var(--pop-green);
+}
+
+.countryRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
