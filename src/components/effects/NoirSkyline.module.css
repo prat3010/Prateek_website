@@ -491,6 +491,7 @@
   --skyline-sky-bg: transparent;
   --skyline-stroke-fg: rgba(250, 250, 250, 0.48);
   --skyline-stroke-mid: rgba(250, 250, 250, 0.35);
+  --skyline-stroke-bg: rgba(250, 250, 250, 0.22);
   --skyline-stroke-fine: rgba(250, 250, 250, 0.22);
   --skyline-stroke-bold: rgba(250, 250, 250, 0.6);
   --skyline-mortar-stroke: rgba(250, 250, 250, 0.50);
@@ -561,6 +562,7 @@
   --skyline-sky-bg: url(#skyGradPopart);
   --skyline-stroke-fg: var(--pop-black);
   --skyline-stroke-mid: var(--pop-black);
+  --skyline-stroke-bg: rgba(26, 26, 46, 0.35);
   --skyline-stroke-fine: rgba(26, 26, 46, 0.35);
   --skyline-stroke-bold: var(--pop-black);
   --skyline-mortar-stroke: rgba(26, 26, 46, 0.22);
