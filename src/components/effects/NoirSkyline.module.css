@@ -429,49 +429,31 @@
 
 @keyframes tugboatTransitAnim {
   0% {
-    transform: translate(0px, 0px) scaleX(1) rotate(0deg);
-  }
-  12% {
-    transform: translate(300px, 35px) scaleX(1) rotate(1.5deg);
-  }
-  15% {
-    transform: translate(320px, 38px) scaleX(1) rotate(4deg);
-  }
-  16.5% {
-    transform: translate(320px, 38px) scaleX(-1) rotate(-4deg);
-  }
-  32% {
-    transform: translate(-250px, 10px) scaleX(-1) rotate(1deg);
+    transform: translate(-800px, -13px) scaleX(1) rotate(2.5deg);
   }
   45% {
-    transform: translate(-530px, 0px) scaleX(-1) rotate(0deg);
+    transform: translate(600px, 69px) scaleX(1) rotate(2.5deg);
+  }
+  47% {
+    transform: translate(620px, 70px) scaleX(1) rotate(2.5deg);
+  }
+  48% {
+    transform: translate(620px, 70px) scaleX(-1) rotate(2.5deg);
   }
   50% {
-    transform: translate(-540px, 2px) scaleX(-1) rotate(2deg);
+    transform: translate(600px, 69px) scaleX(-1) rotate(2.5deg);
   }
-  52.5% {
-    transform: translate(-540px, 2px) scaleX(1) rotate(-2deg);
+  95% {
+    transform: translate(-800px, -13px) scaleX(-1) rotate(2.5deg);
   }
-  65% {
-    transform: translate(-330px, 30px) scaleX(1) rotate(2deg);
-  }
-  78% {
-    transform: translate(-30px, 40px) scaleX(1) rotate(1deg);
-  }
-  88% {
-    transform: translate(270px, 50px) scaleX(1) rotate(1.5deg);
-  }
-  91% {
-    transform: translate(280px, 50px) scaleX(1) rotate(3deg);
-  }
-  92.5% {
-    transform: translate(280px, 50px) scaleX(-1) rotate(-3deg);
+  97% {
+    transform: translate(-820px, -14px) scaleX(-1) rotate(2.5deg);
   }
   98% {
-    transform: translate(30px, 5px) scaleX(-1) rotate(1deg);
+    transform: translate(-820px, -14px) scaleX(1) rotate(2.5deg);
   }
   100% {
-    transform: translate(0px, 0px) scaleX(1) rotate(0deg);
+    transform: translate(-800px, -13px) scaleX(1) rotate(2.5deg);
   }
 }
 
