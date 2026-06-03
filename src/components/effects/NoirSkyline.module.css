@@ -497,6 +497,7 @@
   --skyline-mortar-stroke: rgba(250, 250, 250, 0.50);
   
   --skyline-fill-bg: var(--color-bg);
+  --skyline-window-dark-fill: rgba(0, 0, 0, 0.45);
   --skyline-river-fill: url(#riverGradNoir);
   
   --skyline-hatch-bg: url(#hatch-bg);
@@ -568,6 +569,7 @@
   --skyline-mortar-stroke: rgba(26, 26, 46, 0.22);
   
   --skyline-fill-bg: var(--pop-roof-gray);
+  --skyline-window-dark-fill: #855447;
   --skyline-river-fill: url(#riverGradPopart);
   
   --skyline-hatch-bg: url(#hatch-bg-black);
