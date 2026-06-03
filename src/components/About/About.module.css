@@ -63,7 +63,7 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  background-image: url('/images/profile-comic.webp');
+  background-image: url('/images/profile-comic-pastel.png');
 }
 
 :global([data-theme='noir']) .profileImage {
