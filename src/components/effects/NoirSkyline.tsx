@@ -1861,6 +1861,38 @@ const Layer3 = React.memo(function Layer3({ isMobile, reducedMotion }: LayerProp
                 <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 868 910 A 9 20 0 0 1 892 910" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
               </g>
 
+              <g className={styles.tugboatTransit}>
+                <g className={styles.tugboatBobbing}>
+                  <g className={styles.bldFgTugboat}>
+                    {/* Tugboat hull */}
+                    <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1030 950 L 1070 950 L 1065 941 L 1035 941 Z" fill="var(--skyline-tugboat-hull)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                    {/* Cabin */}
+                    <WobblyRect wobble={wobble} wobbleStrength={strength} x="1040" y="933" width="16" height="8" fill="var(--skyline-tugboat-cabin)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                    {/* Cabin window */}
+                    <WobblyRect
+                      wobble={wobble}
+                      wobbleStrength={strength}
+                      x="1043"
+                      y="935"
+                      width="4"
+                      height="4"
+                      className={styles.tugboatWindow}
+                      fill="var(--skyline-bulb-glow)"
+                      stroke="none"
+                    />
+                    {/* Smokestack */}
+                    <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1052" y1="933" x2="1052" y2="926" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
+                    {/* Smoke puffs */}
+                    <circle cx="1052" cy="924" r="1.5" className={styles.smokePuff1} fill="none" stroke="var(--skyline-tugboat-smoke)" strokeWidth="0.8" />
+                    <circle cx="1052" cy="924" r="1.5" className={styles.smokePuff2} fill="none" stroke="var(--skyline-tugboat-smoke)" strokeWidth="0.8" />
+                    <circle cx="1052" cy="924" r="1.5" className={styles.smokePuff3} fill="none" stroke="var(--skyline-tugboat-smoke)" strokeWidth="0.8" />
+                    {/* Propeller wake wave ripples */}
+                    <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1026 947 Q 1010 945 995 948" className={styles.tugboatWake1} fill="none" stroke="var(--skyline-stroke-fine)" strokeWidth="0.8" />
+                    <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1020 951 Q 1005 950 988 953" className={styles.tugboatWake2} fill="none" stroke="var(--skyline-stroke-fine)" strokeWidth="0.8" />
+                  </g>
+                </g>
+              </g>
+
               {/* Concrete Pier / Caisson Base at the Waterline */}
               <g className={styles.bldFgBridgePier} stroke="var(--skyline-stroke-fg)" strokeWidth="1.5">
                 {/* Stepped Block 1 (Top) */}
@@ -1989,21 +2021,6 @@ const Layer3 = React.memo(function Layer3({ isMobile, reducedMotion }: LayerProp
                 <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 480 1035 Q 510 1031 540 1035 M 710 1038 Q 740 1034 770 1038 M 980 1035 Q 1010 1031 1040 1035 M 1280 1038 Q 1310 1034 1340 1038" />
                 {/* Row 5 (bottom) */}
                 <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 580 1065 Q 615 1061 650 1065 M 1080 1065 Q 1115 1061 1150 1065 M 1200 1068 Q 1235 1064 1270 1068" />
-              </g>
-
-              <g className={styles.bldFgTugboat}>
-                {/* Tugboat hull */}
-                <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1030 950 L 1070 950 L 1065 941 L 1035 941 Z" fill="var(--skyline-tugboat-hull)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-                {/* Cabin */}
-                <WobblyRect wobble={wobble} wobbleStrength={strength} x="1040" y="933" width="16" height="8" fill="var(--skyline-tugboat-cabin)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-                {/* Smokestack */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1052" y1="933" x2="1052" y2="926" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
-                {/* Smoke puffs */}
-                <circle cx="1050" cy="922" r="2" fill="none" stroke="var(--skyline-tugboat-smoke)" strokeWidth="0.8" />
-                <circle cx="1047" cy="918" r="3" fill="none" stroke="var(--skyline-tugboat-smoke)" strokeWidth="0.8" />
-                {/* Propeller wake wave ripples */}
-                <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1026 947 Q 1010 945 995 948" fill="none" stroke="var(--skyline-stroke-fine)" strokeWidth="0.8" />
-                <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1020 951 Q 1005 950 988 953" fill="none" stroke="var(--skyline-stroke-fine)" strokeWidth="0.8" />
               </g>
 
               {/* Curved Streetlight Poles & Arms (Static) */}

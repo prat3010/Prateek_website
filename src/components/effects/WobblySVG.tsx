@@ -251,8 +251,6 @@ export function wobblePath(
           endY += currentY;
         }
 
-        const modifiedArgs = [...args];
-
         if (upperCmd === 'C') {
           for (let i = 0; i < args.length; i += 6) {
             if (i + 5 < args.length) {
@@ -264,87 +262,116 @@ export function wobblePath(
                 cx2 += currentX; cy2 += currentY;
                 tx += currentX; ty += currentY;
               }
-              const d1 = getDisplacement(cx1, cy1, wobbleStrength, freqVal, octVal);
-              const d2 = getDisplacement(cx2, cy2, wobbleStrength, freqVal, octVal);
-              const dt = getDisplacement(tx, ty, wobbleStrength, freqVal, octVal);
-
-              modifiedArgs[i] = Number((cx1 + d1.dx).toFixed(1));
-              modifiedArgs[i+1] = Number((cy1 + d1.dy).toFixed(1));
-              modifiedArgs[i+2] = Number((cx2 + d2.dx).toFixed(1));
-              modifiedArgs[i+3] = Number((cy2 + d2.dy).toFixed(1));
-              modifiedArgs[i+4] = Number((tx + dt.dx).toFixed(1));
-              modifiedArgs[i+5] = Number((ty + dt.dy).toFixed(1));
+              
+              // Approximate cubic bezier curve with 12 segments
+              const steps = 12;
+              let prevX = currentX;
+              let prevY = currentY;
+              for (let step = 1; step <= steps; step++) {
+                const t = step / steps;
+                const mt = 1 - t;
+                const mt2 = mt * mt;
+                const mt3 = mt2 * mt;
+                const t2 = t * t;
+                const t3 = t2 * t;
+                
+                const px = mt3 * currentX + 3 * mt2 * t * cx1 + 3 * mt * t2 * cx2 + t3 * tx;
+                const py = mt3 * currentY + 3 * mt2 * t * cy1 + 3 * mt * t2 * cy2 + t3 * ty;
+                
+                wobbleLine(prevX, prevY, px, py, segLenVal, wobbleStrength, freqVal, octVal, result);
+                prevX = px;
+                prevY = py;
+              }
+              currentX = tx;
+              currentY = ty;
             }
           }
         } else if (upperCmd === 'Q') {
           for (let i = 0; i < args.length; i += 4) {
             if (i + 3 < args.length) {
-              let cx1 = args[i], cy1 = args[i+1];
+              let cx = args[i], cy = args[i+1];
               let tx = args[i+2], ty = args[i+3];
               if (isRelative) {
-                cx1 += currentX; cy1 += currentY;
+                cx += currentX; cy += currentY;
                 tx += currentX; ty += currentY;
               }
-              const d1 = getDisplacement(cx1, cy1, wobbleStrength, freqVal, octVal);
-              const dt = getDisplacement(tx, ty, wobbleStrength, freqVal, octVal);
-
-              modifiedArgs[i] = Number((cx1 + d1.dx).toFixed(1));
-              modifiedArgs[i+1] = Number((cy1 + d1.dy).toFixed(1));
-              modifiedArgs[i+2] = Number((tx + dt.dx).toFixed(1));
-              modifiedArgs[i+3] = Number((ty + dt.dy).toFixed(1));
-            }
-          }
-        } else if (upperCmd === 'S') {
-          for (let i = 0; i < args.length; i += 4) {
-            if (i + 3 < args.length) {
-              let cx2 = args[i], cy2 = args[i+1];
-              let tx = args[i+2], ty = args[i+3];
-              if (isRelative) {
-                cx2 += currentX; cy2 += currentY;
-                tx += currentX; ty += currentY;
+              
+              // Approximate quadratic bezier curve with 10 segments
+              const steps = 10;
+              let prevX = currentX;
+              let prevY = currentY;
+              for (let step = 1; step <= steps; step++) {
+                const t = step / steps;
+                const mt = 1 - t;
+                const mt2 = mt * mt;
+                const t2 = t * t;
+                
+                const px = mt2 * currentX + 2 * mt * t * cx + t2 * tx;
+                const py = mt2 * currentY + 2 * mt * t * cy + t2 * ty;
+                
+                wobbleLine(prevX, prevY, px, py, segLenVal, wobbleStrength, freqVal, octVal, result);
+                prevX = px;
+                prevY = py;
               }
-              const d2 = getDisplacement(cx2, cy2, wobbleStrength, freqVal, octVal);
-              const dt = getDisplacement(tx, ty, wobbleStrength, freqVal, octVal);
-
-              modifiedArgs[i] = Number((cx2 + d2.dx).toFixed(1));
-              modifiedArgs[i+1] = Number((cy2 + d2.dy).toFixed(1));
-              modifiedArgs[i+2] = Number((tx + dt.dx).toFixed(1));
-              modifiedArgs[i+3] = Number((ty + dt.dy).toFixed(1));
-            }
-          }
-        } else if (upperCmd === 'T') {
-          for (let i = 0; i < args.length; i += 2) {
-            if (i + 1 < args.length) {
-              let tx = args[i], ty = args[i+1];
-              if (isRelative) {
-                tx += currentX; ty += currentY;
-              }
-              const dt = getDisplacement(tx, ty, wobbleStrength, freqVal, octVal);
-              modifiedArgs[i] = Number((tx + dt.dx).toFixed(1));
-              modifiedArgs[i+1] = Number((ty + dt.dy).toFixed(1));
-            }
-          }
-        } else if (upperCmd === 'A') {
-          for (let i = 0; i < args.length; i += 7) {
-            if (i + 6 < args.length) {
-              let tx = args[i+5], ty = args[i+6];
-              if (isRelative) {
-                tx += currentX; ty += currentY;
-              }
-              const dt = getDisplacement(tx, ty, wobbleStrength, freqVal, octVal);
-              modifiedArgs[i+5] = Number((tx + dt.dx).toFixed(1));
-              modifiedArgs[i+6] = Number((ty + dt.dy).toFixed(1));
+              currentX = tx;
+              currentY = ty;
             }
           }
         } else {
-          const dt = getDisplacement(endX, endY, wobbleStrength, freqVal, octVal);
-          modifiedArgs[args.length - 2] = Number((endX + dt.dx).toFixed(1));
-          modifiedArgs[args.length - 1] = Number((endY + dt.dy).toFixed(1));
-        }
+          // Keep original control-point shifting logic for S, T, A as fallback
+          const modifiedArgs = [...args];
+          if (upperCmd === 'S') {
+            for (let i = 0; i < args.length; i += 4) {
+              if (i + 3 < args.length) {
+                let cx2 = args[i], cy2 = args[i+1];
+                let tx = args[i+2], ty = args[i+3];
+                if (isRelative) {
+                  cx2 += currentX; cy2 += currentY;
+                  tx += currentX; ty += currentY;
+                }
+                const d2 = getDisplacement(cx2, cy2, wobbleStrength, freqVal, octVal);
+                const dt = getDisplacement(tx, ty, wobbleStrength, freqVal, octVal);
 
-        result.push(`${upperCmd} ${modifiedArgs.join(' ')}`);
-        currentX = endX;
-        currentY = endY;
+                modifiedArgs[i] = Number((cx2 + d2.dx).toFixed(1));
+                modifiedArgs[i+1] = Number((cy2 + d2.dy).toFixed(1));
+                modifiedArgs[i+2] = Number((tx + dt.dx).toFixed(1));
+                modifiedArgs[i+3] = Number((ty + dt.dy).toFixed(1));
+              }
+            }
+          } else if (upperCmd === 'T') {
+            for (let i = 0; i < args.length; i += 2) {
+              if (i + 1 < args.length) {
+                let tx = args[i], ty = args[i+1];
+                if (isRelative) {
+                  tx += currentX; ty += currentY;
+                }
+                const dt = getDisplacement(tx, ty, wobbleStrength, freqVal, octVal);
+                modifiedArgs[i] = Number((tx + dt.dx).toFixed(1));
+                modifiedArgs[i+1] = Number((ty + dt.dy).toFixed(1));
+              }
+            }
+          } else if (upperCmd === 'A') {
+            for (let i = 0; i < args.length; i += 7) {
+              if (i + 6 < args.length) {
+                let tx = args[i+5], ty = args[i+6];
+                if (isRelative) {
+                  tx += currentX; ty += currentY;
+                }
+                const dt = getDisplacement(tx, ty, wobbleStrength, freqVal, octVal);
+                modifiedArgs[i+5] = Number((tx + dt.dx).toFixed(1));
+                modifiedArgs[i+6] = Number((ty + dt.dy).toFixed(1));
+              }
+            }
+          } else {
+            const dt = getDisplacement(endX, endY, wobbleStrength, freqVal, octVal);
+            modifiedArgs[args.length - 2] = Number((endX + dt.dx).toFixed(1));
+            modifiedArgs[args.length - 1] = Number((endY + dt.dy).toFixed(1));
+          }
+
+          result.push(`${upperCmd} ${modifiedArgs.join(' ')}`);
+          currentX = endX;
+          currentY = endY;
+        }
       } else {
         result.push(cmd + (args.length ? ' ' + args.join(' ') : ''));
       }
