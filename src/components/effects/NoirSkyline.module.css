@@ -730,10 +730,10 @@
   --skyline-sky-bg: url(#skyGradPopart);
   --skyline-stroke-fg: var(--pop-black);
   --skyline-stroke-mid: var(--pop-black);
-  --skyline-stroke-bg: rgba(26, 26, 46, 0.52);
-  --skyline-stroke-fine: rgba(26, 26, 46, 0.52);
+  --skyline-stroke-bg: var(--pop-black);
+  --skyline-stroke-fine: rgba(26, 26, 46, 0.75);
   --skyline-stroke-bold: var(--pop-black);
-  --skyline-mortar-stroke: rgba(26, 26, 46, 0.72);
+  --skyline-mortar-stroke: var(--pop-black);
   
   --skyline-fill-bg: var(--pop-roof-gray);
   --skyline-window-dark-fill: #855447;
@@ -811,20 +811,34 @@
   background: none !important;
 }
 
-/* Light pop-art window colors - replace neon yellow glow with retro solid colors */
-.lightPopart .glowingWindow,
-.lightPopart .windowFlicker1,
-.lightPopart .windowFlicker2,
-.lightPopart .windowFlicker3,
-.lightPopart .windowFlicker4 {
+/* Light pop-art window colors - replace neon yellow glow with retro solid colors and box shapes */
+.lightPopart .glowingWindow {
   stroke: var(--pop-yellow) !important;
+  stroke-width: 4.5px !important;
+  stroke-dasharray: 4.5px 7px !important;
+  stroke-linecap: butt !important;
   opacity: 1 !important;
   filter: none !important;
 }
 
 .lightPopart .glowingWindowDim {
   stroke: var(--pop-cyan) !important;
-  opacity: 0.8 !important;
+  stroke-width: 4.5px !important;
+  stroke-dasharray: 4.5px 7px !important;
+  stroke-linecap: butt !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+.lightPopart .windowFlicker1,
+.lightPopart .windowFlicker2,
+.lightPopart .windowFlicker3,
+.lightPopart .windowFlicker4 {
+  stroke: var(--pop-yellow) !important;
+  stroke-width: 4.5px !important;
+  stroke-linecap: butt !important;
+  opacity: 1 !important;
+  filter: none !important;
 }
 
 .lightPopart .trafficHeadlight {
