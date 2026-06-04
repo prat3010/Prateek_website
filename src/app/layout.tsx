@@ -96,6 +96,7 @@ export default async function RootLayout({
       lang="en"
       data-theme={initialTheme}
       className={`${bangers.variable} ${comicNeue.variable} ${jetbrainsMono.variable} ${nosifer.variable}`}
+      suppressHydrationWarning
     >
       <head>
         <script

@@ -8,6 +8,8 @@ interface ThemeContextType {
   theme: Theme;
   toggleTheme: (e?: React.MouseEvent<HTMLButtonElement>) => void;
   isNoir: boolean;
+  isDetailsHidden: boolean;
+  toggleDetailsHidden: () => void;
 }
 
 interface ThemeTransitionContextType {
@@ -24,6 +26,20 @@ export function ThemeProvider({ children, initialTheme }: { children: React.Reac
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [transitionCoords, setTransitionCoords] = useState({ x: 50, y: 50 });
   const [pendingTheme, setPendingTheme] = useState<Theme | null>(null);
+  const [isDetailsHidden, setIsDetailsHidden] = useState(false);
+
+  // Sync details visibility state with root HTML element class
+  useEffect(() => {
+    if (isDetailsHidden) {
+      document.documentElement.classList.add('ui-details-hidden');
+    } else {
+      document.documentElement.classList.remove('ui-details-hidden');
+    }
+  }, [isDetailsHidden]);
+
+  const toggleDetailsHidden = useCallback(() => {
+    setIsDetailsHidden(prev => !prev);
+  }, []);
 
   // Decouple toggleTheme callback from theme/isTransitioning changes using refs
   const themeRef = useRef<Theme>(theme);
@@ -99,7 +115,9 @@ export function ThemeProvider({ children, initialTheme }: { children: React.Reac
     theme,
     toggleTheme,
     isNoir,
-  }), [theme, toggleTheme, isNoir]);
+    isDetailsHidden,
+    toggleDetailsHidden,
+  }), [theme, toggleTheme, isNoir, isDetailsHidden, toggleDetailsHidden]);
 
   const transitionValue = useMemo(() => ({
     isTransitioning,

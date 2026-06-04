@@ -16,6 +16,7 @@ const NoirSkyline = dynamic(() => import('@/components/effects/NoirSkyline'), {
   loading: () => <div className="skyline-skeleton" />
 });
 const CursorTrail = dynamic(() => import('@/components/effects/CursorTrail'), { ssr: false });
+const ZenToggle = dynamic(() => import('@/components/ui/ZenToggle'), { ssr: false });
 
 export default function ClientLayout({ children, initialTheme }: { children: React.ReactNode; initialTheme?: Theme }) {
   const pathname = usePathname();
@@ -31,6 +32,7 @@ export default function ClientLayout({ children, initialTheme }: { children: Rea
         {!isAdminRoute && <Navbar />}
         <main>{children}</main>
         {!isAdminRoute && <Footer />}
+        {!isAdminRoute && <ZenToggle />}
       </LazyMotion>
     </ThemeProvider>
   );
