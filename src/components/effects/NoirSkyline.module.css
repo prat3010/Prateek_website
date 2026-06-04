@@ -689,6 +689,9 @@
   --skyline-cat-fill: var(--color-bg);
   --skyline-cat-eyes: #fafafa;
   
+  --skyline-gargoyle-fill: var(--color-bg);
+  --skyline-gargoyle-eyes: #ff453a;
+  
   --skyline-pigeon-stroke: rgba(250, 250, 250, 0.28);
   --skyline-cloud-fill: rgba(250, 250, 250, 0.05);
   
@@ -760,6 +763,9 @@
   
   --skyline-cat-fill: var(--pop-black);
   --skyline-cat-eyes: var(--pop-yellow);
+  
+  --skyline-gargoyle-fill: var(--pop-black);
+  --skyline-gargoyle-eyes: #ff2a55;
   
   --skyline-pigeon-stroke: var(--pop-black);
   --skyline-cloud-fill: rgba(255, 255, 255, 0.45);
@@ -872,6 +878,35 @@
 .lightPopart .bldFgLeftWaterTankRoof { fill: var(--pop-red) !important; }
 .lightPopart .bldFgRightWaterTankBody { fill: var(--pop-yellow) !important; }
 .lightPopart .bldFgRightWaterTankRoof { fill: var(--pop-blue) !important; }
+
+/* ── Interactive Gargoyle ── */
+.gargoyleEyes {
+  transform-origin: 0px -25px;
+  animation: gargoyleBlink 8s infinite;
+}
+
+@keyframes gargoyleBlink {
+  0%, 94%, 98%, 100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  96% {
+    transform: scaleY(0.15);
+    opacity: 0.2;
+  }
+}
+
+.gargoyleEyesAwake {
+  fill: var(--skyline-gargoyle-eyes) !important;
+  filter: drop-shadow(0 0 3px var(--skyline-gargoyle-eyes)) drop-shadow(0 0 1px var(--skyline-gargoyle-eyes));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gargoyleEyes {
+    animation: none !important;
+  }
+}
+
 
 
 
