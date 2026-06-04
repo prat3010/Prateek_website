@@ -625,6 +625,15 @@
   fill: var(--skyline-fill-bg) !important;
 }
 
+.brickOverlay {
+  opacity: 0.85;
+  transition: opacity var(--transition-slow);
+}
+
+.darkNoir .brickOverlay {
+  opacity: 0.45;
+}
+
 .shadowHatchBg {
   fill: var(--skyline-hatch-bg) !important;
   stroke: none !important;
@@ -644,12 +653,12 @@
 
 .darkNoir {
   --skyline-sky-bg: transparent;
-  --skyline-stroke-fg: rgba(250, 250, 250, 0.48);
-  --skyline-stroke-mid: rgba(250, 250, 250, 0.35);
-  --skyline-stroke-bg: rgba(250, 250, 250, 0.22);
-  --skyline-stroke-fine: rgba(250, 250, 250, 0.22);
-  --skyline-stroke-bold: rgba(250, 250, 250, 0.6);
-  --skyline-mortar-stroke: rgba(250, 250, 250, 0.50);
+  --skyline-stroke-fg: rgba(250, 250, 250, 0.44);
+  --skyline-stroke-mid: rgba(250, 250, 250, 0.30);
+  --skyline-stroke-bg: rgba(250, 250, 250, 0.18);
+  --skyline-stroke-fine: rgba(250, 250, 250, 0.18);
+  --skyline-stroke-bold: rgba(250, 250, 250, 0.54);
+  --skyline-mortar-stroke: rgba(250, 250, 250, 0.38);
   
   --skyline-fill-bg: var(--color-bg);
   --skyline-window-dark-fill: rgba(0, 0, 0, 0.45);
@@ -721,10 +730,10 @@
   --skyline-sky-bg: url(#skyGradPopart);
   --skyline-stroke-fg: var(--pop-black);
   --skyline-stroke-mid: var(--pop-black);
-  --skyline-stroke-bg: rgba(26, 26, 46, 0.35);
-  --skyline-stroke-fine: rgba(26, 26, 46, 0.35);
+  --skyline-stroke-bg: rgba(26, 26, 46, 0.52);
+  --skyline-stroke-fine: rgba(26, 26, 46, 0.52);
   --skyline-stroke-bold: var(--pop-black);
-  --skyline-mortar-stroke: rgba(26, 26, 46, 0.22);
+  --skyline-mortar-stroke: rgba(26, 26, 46, 0.72);
   
   --skyline-fill-bg: var(--pop-roof-gray);
   --skyline-window-dark-fill: #855447;
