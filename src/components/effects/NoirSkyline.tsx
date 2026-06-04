@@ -1020,6 +1020,41 @@ const Layer2 = React.memo(function Layer2({ isMobile, reducedMotion }: LayerProp
                   </g>
                 </g>
               </g>
+
+              {/* Slower Sailboat (Drifting in background) */}
+              <g className={styles.sailboatTransit}>
+                <g className={styles.sailboatBobbing}>
+                  <g>
+                    {/* Sailboat hull */}
+                    <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1030 950 L 1070 950 L 1075 943 L 1025 943 Z" fill="var(--skyline-sailboat-hull)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                    {/* Mast */}
+                    <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1050" y1="943" x2="1050" y2="905" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
+                    {/* Main Sail */}
+                    <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1050 908 L 1050 940 L 1032 940 Z" fill="var(--skyline-sailboat-sail)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                    {/* Jib Sail */}
+                    <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1052 914 L 1052 940 L 1064 940 Z" fill="var(--skyline-sailboat-sail)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                    {/* Wake */}
+                    <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1076 948 Q 1090 947 1100 950" className={styles.sailboatWake} fill="none" stroke="var(--skyline-stroke-fine)" strokeWidth="0.8" />
+                  </g>
+                </g>
+              </g>
+
+              {/* Speedy Speedboat (Foreground, fast transit) */}
+              <g className={styles.speedboatTransit}>
+                <g className={styles.speedboatBobbing}>
+                  <g>
+                    {/* Speedboat hull */}
+                    <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1032 950 L 1068 950 L 1073 944 L 1045 944 Z" fill="var(--skyline-speedboat-hull)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                    {/* Windshield */}
+                    <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1047 944 L 1052 939 L 1060 939 L 1059 944 Z" fill="var(--skyline-speedboat-windshield)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                    {/* Antenna mast */}
+                    <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1058" y1="939" x2="1058" y2="932" stroke="var(--skyline-stroke-fg)" strokeWidth="0.8" />
+                    {/* Speedboat wakes */}
+                    <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1030 948 Q 1010 944 985 949" className={styles.speedboatWake1} fill="none" stroke="var(--skyline-stroke-fine)" strokeWidth="1" />
+                    <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1028 951 Q 1005 948 975 955" className={styles.speedboatWake2} fill="none" stroke="var(--skyline-stroke-fine)" strokeWidth="1" />
+                  </g>
+                </g>
+              </g>
             </g>
       </svg>
 
