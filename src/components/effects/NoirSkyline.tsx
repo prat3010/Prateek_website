@@ -1843,9 +1843,108 @@ const Layer3 = React.memo(function Layer3({ isMobile, reducedMotion }: LayerProp
               </linearGradient>
             </defs>
 
-            {/* Group A: Foreground Static Elements (Wobbled for hand-drawn look) */}
+             {/* Group A: Foreground Static Elements (Wobbled for hand-drawn look) */}
             <g className={styles.buildingGroup} stroke="var(--skyline-stroke-fg)" strokeWidth="1.8">
               
+              {/* Distant Background Shoreline / Docks at the Waterline (y = 938 to 950) */}
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="1.0" fill="var(--skyline-fill-bg)">
+                {/* Horizontal concrete seawall slab */}
+                <WobblyRect wobble={wobble} wobbleStrength={strength} x="460" y="938" width="960" height="12" fill="var(--skyline-fill-bg)" className={styles.buildingGroup} stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
+
+                {/* Coping stone horizontal accent line */}
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="460" y1="944" x2="1420" y2="944" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
+
+                {/* Vertical concrete block joint lines */}
+                {Array.from({ length: 39 }).map((_, i) => {
+                  const x = 460 + i * 25;
+                  return x > 460 && x < 1420 ? (
+                    <WobblyLine key={`seawall-seam-${i}`} wobble={wobble} wobbleStrength={strength} x1={x} y1="938" x2={x} y2="950" stroke="var(--skyline-stroke-mid)" strokeWidth="0.6" />
+                  ) : null;
+                })}
+
+                {/* Miniature dock streetlights */}
+                {/* Spaced along the promenade: x = 485, 755, 985, 1225 */}
+                {[485, 755, 985, 1225].map((x, i) => (
+                  <g key={`dock-light-${i}`} stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
+                    <WobblyLine wobble={wobble} wobbleStrength={strength} x1={x} y1="938" x2={x} y2="918" />
+                    <WobblyPath wobble={wobble} wobbleStrength={strength} d={`M ${x} 918 Q ${x} 914 ${x + 3} 914`} />
+                    <circle cx={x + 3} cy={915} r="1" fill="var(--skyline-bulb-glow)" stroke="none" />
+                  </g>
+                ))}
+
+                {/* Mooring Bollards spaced along the edge of the seawall */}
+                {[510, 590, 710, 790, 955, 1035, 1115, 1195, 1320].map((x, i) => (
+                  <g key={`bollard-${i}`} stroke="var(--skyline-stroke-fg)" strokeWidth="0.8">
+                    <WobblyLine wobble={wobble} wobbleStrength={strength} x1={x - 2} y1="934" x2={x + 2} y2="934" strokeWidth="1.0" />
+                    <WobblyLine wobble={wobble} wobbleStrength={strength} x1={x} y1="934" x2={x} y2="938" strokeWidth="1.4" />
+                  </g>
+                ))}
+
+                {/* Stacked Cargo Crates on the docks */}
+                {/* Left crates (near Warehouse 1) */}
+                <WobblyRect wobble={wobble} wobbleStrength={strength} x="502" y="930" width="8" height="8" />
+                <WobblyRect wobble={wobble} wobbleStrength={strength} x="510" y="932" width="6" height="6" />
+                <WobblyRect wobble={wobble} wobbleStrength={strength} x="503" y="924" width="6" height="6" />
+                {/* Right crates (near Warehouse 4) */}
+                <WobblyRect wobble={wobble} wobbleStrength={strength} x="1318" y="930" width="8" height="8" />
+                <WobblyRect wobble={wobble} wobbleStrength={strength} x="1319" y="922" width="8" height="8" />
+                <WobblyRect wobble={wobble} wobbleStrength={strength} x="1326" y="932" width="6" height="6" />
+
+                {/* Left side warehouses */}
+                {/* Warehouse 1 (Pitched roof) */}
+                <WobblyRect wobble={wobble} wobbleStrength={strength} x="470" y="918" width="30" height="20" />
+                <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="470,918 485,906 500,918" />
+                
+                {/* Warehouse 2 (Flat roof with small skylight) */}
+                <WobblyRect wobble={wobble} wobbleStrength={strength} x="575" y="922" width="35" height="16" />
+                <WobblyRect wobble={wobble} wobbleStrength={strength} x="588" y="918" width="9" height="4" />
+
+                {/* Distant Gantry Crane 1 (Left) */}
+                <g strokeWidth="0.8">
+                  {/* Legs */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 520 938 L 535 893 L 550 938" fill="none" />
+                  {/* Boom arm */}
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="508" y1="893" x2="565" y2="878" />
+                  {/* Upper support tower & trusses */}
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="535" y1="893" x2="535" y2="868" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="535" y1="868" x2="565" y2="878" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="535" y1="868" x2="508" y2="893" />
+                  {/* Cabin block */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="529" y="893" width="12" height="8" />
+                </g>
+
+                {/* Moored Cargo Ship (Center-Left) */}
+                <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 625 938 L 690 938 L 685 926 L 630 926 Z" />
+                {/* Superstructure & Funnel */}
+                <WobblyRect wobble={wobble} wobbleStrength={strength} x="668" y="912" width="14" height="14" />
+                <WobblyRect wobble={wobble} wobbleStrength={strength} x="674" y="904" width="4" height="8" />
+                {/* Cargo containers on deck */}
+                <WobblyRect wobble={wobble} wobbleStrength={strength} x="636" y="918" width="12" height="8" />
+                <WobblyRect wobble={wobble} wobbleStrength={strength} x="650" y="918" width="12" height="8" />
+
+                {/* Right side warehouses */}
+                {/* Warehouse 3 (Pitched roof) */}
+                <WobblyRect wobble={wobble} wobbleStrength={strength} x="1335" y="916" width="45" height="22" />
+                <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="1335,916 1357.5,904 1380,916" />
+
+                {/* Warehouse 4 (Flat roof) */}
+                <WobblyRect wobble={wobble} wobbleStrength={strength} x="1385" y="922" width="30" height="16" />
+
+                {/* Distant Gantry Crane 2 (Right) */}
+                <g strokeWidth="0.8">
+                  {/* Legs */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1260 938 L 1275 893 L 1290 938" fill="none" />
+                  {/* Boom arm */}
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1235" y1="878" x2="1292" y2="893" />
+                  {/* Upper support tower & trusses */}
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1275" y1="893" x2="1275" y2="868" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1275" y1="868" x2="1235" y2="878" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1275" y1="868" x2="1292" y2="893" />
+                  {/* Cabin block */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1269" y="893" width="12" height="8" />
+                </g>
+              </g>
+
               {/* River water body under the bridge */}
               <WobblyRect wobble={wobble} wobbleStrength={strength} x="460" y="950" width="960" height="300" fill="var(--skyline-river-fill)" stroke="none" />
 
