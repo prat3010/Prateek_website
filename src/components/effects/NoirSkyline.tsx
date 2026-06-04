@@ -1287,8 +1287,6 @@ const RunningCat: React.FC<RunningCatProps> = ({ reducedMotion }) => {
     </g>
   );
 };
-
-
 const Layer3 = React.memo(function Layer3({ isMobile, reducedMotion }: LayerProps) {
   const wobble = !reducedMotion;
   const strength = 4.0; // Heavy foreground wobbly brush style
