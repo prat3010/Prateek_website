@@ -120,6 +120,39 @@ export default function NoirSkyline() {
 
   return (
     <div className={`${styles.container} ${styles.active} ${theme === 'light' ? styles.lightPopart : styles.darkNoir}`}>
+      {/* ── Global Watercolor Pattern Definitions ── */}
+      <svg style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }} aria-hidden="true">
+        <defs>
+          <pattern id="wc-sky" width="1" height="1" patternContentUnits="objectBoundingBox">
+            <image href="/images/textures/watercolor_sky_blue.png" width="1" height="1" preserveAspectRatio="xMidYMid slice" />
+          </pattern>
+          <pattern id="wc-river" width="1" height="1" patternContentUnits="objectBoundingBox">
+            <image href="/images/textures/watercolor_teal_river.png" width="1" height="1" preserveAspectRatio="xMidYMid slice" />
+          </pattern>
+          <pattern id="wc-blue" width="1" height="1" patternContentUnits="objectBoundingBox">
+            <image href="/images/textures/watercolor_pastel_blue.png" width="1" height="1" preserveAspectRatio="xMidYMid slice" />
+          </pattern>
+          <pattern id="wc-pink" width="1" height="1" patternContentUnits="objectBoundingBox">
+            <image href="/images/textures/watercolor_pastel_pink.png" width="1" height="1" preserveAspectRatio="xMidYMid slice" />
+          </pattern>
+          <pattern id="wc-yellow" width="1" height="1" patternContentUnits="objectBoundingBox">
+            <image href="/images/textures/watercolor_pastel_yellow.png" width="1" height="1" preserveAspectRatio="xMidYMid slice" />
+          </pattern>
+          <pattern id="wc-orange" width="1" height="1" patternContentUnits="objectBoundingBox">
+            <image href="/images/textures/watercolor_pastel_orange.png" width="1" height="1" preserveAspectRatio="xMidYMid slice" />
+          </pattern>
+          <pattern id="wc-green" width="1" height="1" patternContentUnits="objectBoundingBox">
+            <image href="/images/textures/watercolor_pastel_green.png" width="1" height="1" preserveAspectRatio="xMidYMid slice" />
+          </pattern>
+          <pattern id="wc-cyan" width="1" height="1" patternContentUnits="objectBoundingBox">
+            <image href="/images/textures/watercolor_pastel_cyan.png" width="1" height="1" preserveAspectRatio="xMidYMid slice" />
+          </pattern>
+          <pattern id="wc-red" width="1" height="1" patternContentUnits="objectBoundingBox">
+            <image href="/images/textures/watercolor_pastel_red.png" width="1" height="1" preserveAspectRatio="xMidYMid slice" />
+          </pattern>
+        </defs>
+      </svg>
+
       {/* ── Vignette Overlay ── */}
       <div className={styles.vignette} aria-hidden="true" />
 

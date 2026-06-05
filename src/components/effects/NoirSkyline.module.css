@@ -927,28 +927,28 @@
 }
 
 .lightPopart {
-  --pop-cyan: #A1DEDC;       /* soft pastel cyan */
-  --pop-blue: #A9D5EF;       /* soft pastel blue */
-  --pop-yellow: #FFF3A8;     /* soft pastel yellow */
-  --pop-pink: #F8CAD1;       /* soft pastel pink */
-  --pop-magenta: #F7B5B9;    /* soft pastel rose */
-  --pop-orange: #FFD4C2;     /* soft pastel peach/orange */
-  --pop-red: #FAA3AB;        /* soft pastel red */
-  --pop-green: #C9EFCD;      /* soft pastel mint */
-  --pop-cream: #FFF9E6;      /* soft cream background */
-  --pop-white: #FAF9F6;      /* warm off-white */
+  --pop-cyan: url(#wc-cyan);       /* soft pastel cyan watercolor */
+  --pop-blue: url(#wc-blue);       /* soft pastel blue watercolor */
+  --pop-yellow: url(#wc-yellow);     /* soft pastel yellow watercolor */
+  --pop-pink: url(#wc-pink);       /* soft pastel pink watercolor */
+  --pop-magenta: url(#wc-pink);    /* soft pastel rose watercolor */
+  --pop-orange: url(#wc-orange);     /* soft pastel peach/orange watercolor */
+  --pop-red: url(#wc-red);        /* soft pastel red watercolor */
+  --pop-green: url(#wc-green);      /* soft pastel mint watercolor */
+  --pop-cream: url(#wc-yellow);      /* soft cream background watercolor */
+  --pop-white: url(#wc-yellow);      /* warm off-white watercolor */
   --pop-black: #1A1A2E;
   
   /* Additional pastel tones for structures */
-  --pop-roof-gray: #E8E6DF;  /* warm soft gray to fill the lower section */
-  --pop-pier-gray: #DAD6CE;  /* warm concrete gray for piers */
-  --pop-bridge-red: #FAA3AB; /* soft pastel red for bridge tower */
-  --pop-brick-brown: #D7A494; /* soft pastel brick brown */
+  --pop-roof-gray: url(#wc-yellow);  /* warm soft yellow/cream for lower roof */
+  --pop-pier-gray: url(#wc-blue);  /* blue watercolor for piers */
+  --pop-bridge-red: url(#wc-red); /* soft red watercolor for bridge tower */
+  --pop-brick-brown: url(#wc-red); /* soft red watercolor for brick brown */
 
   --skyline-window-deco-stroke: var(--pop-black);
   --skyline-window-deco-fill: #c8a696;
 
-  --skyline-sky-bg: url(#skyGradPopart);
+  --skyline-sky-bg: url(#wc-sky);
   --skyline-stroke-fg: var(--pop-black);
   --skyline-stroke-mid: var(--pop-black);
   --skyline-stroke-bg: var(--pop-black);
@@ -958,7 +958,7 @@
   
   --skyline-fill-bg: var(--pop-roof-gray);
   --skyline-window-dark-fill: #855447;
-  --skyline-river-fill: url(#riverGradPopart);
+  --skyline-river-fill: url(#wc-river);
   
   --skyline-hatch-bg: url(#hatch-bg-black);
   --skyline-hatch-mid: url(#hatch-mid-black);
@@ -1020,11 +1020,7 @@
 }
 
 .lightPopart .sunburstRays {
-  display: block;
-  fill: var(--pop-yellow) !important;
-  opacity: 0.16;
-  mix-blend-mode: multiply;
-  stroke: none !important;
+  display: none !important;
 }
 
 /* Light pop-art specific overrides to hide night details */
