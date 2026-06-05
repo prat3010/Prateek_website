@@ -327,7 +327,7 @@ export default async function AnalyticsPage(props: {
         </Link>
       </div>
 
-      {/* --- Pop Art Header Banner --- */}
+      {/* --- Azure Header Banner --- */}
       <div className={`comic-panel ${styles.headerBanner}`}>
         <div className={styles.headerContent}>
           <div>

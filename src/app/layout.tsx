@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   title: "Prateeq Sharma | Portfolio",
   description:
     "Crafting Digital Worlds, One Panel at a Time — Portfolio of Prateeq Sharma, developer, designer, and storyteller.",
-  keywords: ["portfolio", "web developer", "Prateeq Sharma", "Prateeq", "comic book", "pop art"],
+  keywords: ["portfolio", "web developer", "Prateeq Sharma", "Prateeq", "comic book", "azure", "watercolor", "illustration"],
   authors: [{ name: "Prateeq Sharma" }],
   alternates: {
     canonical: "/",
