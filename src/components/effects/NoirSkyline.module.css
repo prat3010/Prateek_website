@@ -1124,6 +1124,9 @@
 .lightPopart .bldMidSlimSpire { fill: var(--pop-magenta) !important; }
 .lightPopart .bldMidFarRight { fill: var(--pop-blue) !important; }
 .lightPopart .bldMidEdge { fill: var(--pop-pink) !important; }
+.lightPopart .bldMidLeftGap { fill: var(--pop-yellow) !important; }
+.lightPopart .bldMidRightGap { fill: var(--pop-green) !important; }
+
 
 /* Layer 3 (Foreground Buildings & Structures) */
 .lightPopart .bldFgLeftRoof { fill: var(--pop-brick-brown) !important; }

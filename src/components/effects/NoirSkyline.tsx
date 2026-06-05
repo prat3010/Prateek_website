@@ -23,6 +23,10 @@ export default function NoirSkyline() {
   const bgScale = useTransform(scrollYProgress, [0, 1], [1, 1.06]);
   const bgY = useTransform(scrollYProgress, [0, 1], [0, 15]);
 
+  // Far Midground (Layer 1.5): Scales from 1.0 to 1.10, moves down (Y from 0 to 25px)
+  const midBgScale = useTransform(scrollYProgress, [0, 1], [1, 1.10]);
+  const midBgY = useTransform(scrollYProgress, [0, 1], [0, 25]);
+
   // Midground (Layer 2): Scales from 1.0 to 1.15, moves down (Y from 0 to 35px)
   const midScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
   const midY = useTransform(scrollYProgress, [0, 1], [0, 35]);
@@ -43,6 +47,9 @@ export default function NoirSkyline() {
   const springX1 = useSpring(mouseX, { damping: 30, stiffness: 90 });
   const springY1 = useSpring(mouseY, { damping: 30, stiffness: 90 });
 
+  const springX1_5 = useSpring(mouseX, { damping: 29, stiffness: 87 });
+  const springY1_5 = useSpring(mouseY, { damping: 29, stiffness: 87 });
+
   const springX2 = useSpring(mouseX, { damping: 28, stiffness: 85 });
   const springY2 = useSpring(mouseY, { damping: 28, stiffness: 85 });
 
@@ -55,6 +62,9 @@ export default function NoirSkyline() {
   // Transforms for mouse offsets
   const layer1X = useTransform(springX1, (x) => x * -10);
   const layer1Y = useTransform(springY1, (y) => y * -8);
+
+  const layer1_5X = useTransform(springX1_5, (x) => x * -17);
+  const layer1_5Y = useTransform(springY1_5, (y) => y * -12);
 
   const layer2X = useTransform(springX2, (x) => x * -24);
   const layer2Y = useTransform(springY2, (y) => y * -16);
@@ -130,6 +140,18 @@ export default function NoirSkyline() {
           style={{ x: layer1X, y: layer1Y, width: '100%', height: '100%', willChange: 'transform' }}
         >
           <Layer1 isMobile={isMobile} reducedMotion={reducedMotion} />
+        </m.div>
+      </m.div>
+
+      {/* ── Layer 1.5: Far Midground Buildings (Parallax Scale 1.10) ── */}
+      <m.div
+        style={{ scale: midBgScale, y: midBgY, zIndex: 1 }}
+        className={styles.layer}
+      >
+        <m.div
+          style={{ x: layer1_5X, y: layer1_5Y, width: '100%', height: '100%', willChange: 'transform' }}
+        >
+          <Layer1_5 isMobile={isMobile} reducedMotion={reducedMotion} />
         </m.div>
       </m.div>
 
@@ -893,6 +915,114 @@ const Layer1 = React.memo(function Layer1({ isMobile, reducedMotion }: LayerProp
 });
 Layer1.displayName = 'Layer1';
 
+const Layer1_5 = React.memo(function Layer1_5({ isMobile, reducedMotion }: LayerProps) {
+  const wobble = !reducedMotion;
+  const strength = 2.5; // Far midground wobble (between Layer 1 and Layer 2)
+  return (
+    <>
+      {/* Static Layer */}
+      <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
+            <g className={styles.buildingGroup} stroke="var(--skyline-stroke-mid)" strokeWidth="1.2">
+              {/* Blocky Spire (Center-Left) */}
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 330 1080 L 330 710 L 370 710 L 370 540 L 373 540 L 373 450 L 377 450 L 377 540 L 380 540 L 380 710 L 420 710 L 420 1080 Z" className={styles.bldMidBlockySpire} />
+              {/* Double cornices & vertical ribs for Blocky Spire */}
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="327" y1="710" x2="373" y2="710" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="330" y1="715" x2="370" y2="715" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="377" y1="710" x2="423" y2="710" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="380" y1="715" x2="420" y2="715" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="367" y1="540" x2="383" y2="540" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="370" y1="545" x2="380" y2="545" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="350" y1="715" x2="350" y2="1080" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="400" y1="715" x2="400" y2="1080" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="373" y1="545" x2="373" y2="1080" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="377" y1="545" x2="377" y2="1080" />
+              </g>
+
+              {/* Slab Building */}
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 565 1080 L 565 690 L 640 690 L 640 1080 Z" className={styles.bldMidSlab} />
+              {/* Double cornice and vertical ribs for Slab Building */}
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="562" y1="695" x2="643" y2="695" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="590" y1="695" x2="590" y2="1080" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="610" y1="695" x2="610" y2="1080" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="630" y1="695" x2="630" y2="1080" />
+              </g>
+              {/* Roof cornice line */}
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="562" y1="690" x2="643" y2="690" strokeWidth="1.4" />
+              {/* Horizontal floor bands */}
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" opacity="0.8">
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="565" y1="730" x2="640" y2="730" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="565" y1="770" x2="640" y2="770" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="565" y1="810" x2="640" y2="810" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="565" y1="850" x2="640" y2="850" />
+              </g>
+              {/* Window columns */}
+              <g strokeWidth="0.8" fill="none">
+                <g className={styles.glowingWindow} strokeDasharray="3 9">
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="580" y1="700" x2="580" y2="1000" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="620" y1="700" x2="620" y2="1000" strokeDashoffset="5" />
+                </g>
+                <g className={styles.glowingWindowDim} strokeDasharray="3 9">
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="600" y1="700" x2="600" y2="1000" strokeDashoffset="2" />
+                </g>
+              </g>
+
+              {/* Wide Warehouse */}
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 830 1080 L 830 720 L 930 720 L 930 1080 Z" className={styles.bldMidWarehouse} />
+              {/* Sawtooth roof detail */}
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 830 720 L 855 695 L 855 720 L 880 695 L 880 720 L 905 695 L 905 720 L 930 720" fill="var(--skyline-fill-bg)" />
+              {/* Internal pillars */}
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" opacity="0.8">
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="855" y1="720" x2="855" y2="1080" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="880" y1="720" x2="880" y2="1080" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="905" y1="720" x2="905" y2="1080" />
+              </g>
+              {/* Windows */}
+              <g strokeWidth="0.8" fill="none">
+                <g className={styles.glowingWindow} strokeDasharray="4 10">
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="845" y1="730" x2="845" y2="1000" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="895" y1="730" x2="895" y2="1000" strokeDashoffset="5" />
+                </g>
+                <g className={styles.glowingWindowDim} strokeDasharray="4 10">
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="870" y1="730" x2="870" y2="1000" strokeDashoffset="3" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="920" y1="730" x2="920" y2="1000" strokeDashoffset="7" />
+                </g>
+              </g>
+
+              {/* Block Tower with setbacks */}
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1110 1080 L 1110 650 L 1140 650 L 1140 590 L 1210 590 L 1210 650 L 1240 650 L 1240 1080 Z" className={styles.bldMidSetbacks} />
+              {/* Double cornices & vertical ribs for Block Tower Setbacks */}
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1107" y1="650" x2="1143" y2="650" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1110" y1="655" x2="1140" y2="655" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1207" y1="650" x2="1243" y2="650" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1210" y1="655" x2="1240" y2="655" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1137" y1="590" x2="1213" y2="590" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1140" y1="595" x2="1210" y2="595" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1125" y1="655" x2="1125" y2="1080" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1225" y1="655" x2="1225" y2="1080" />
+              </g>
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" opacity="0.8">
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1175" y1="590" x2="1175" y2="530" />
+                {/* Horizontal window lines */}
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1150" y1="605" x2="1200" y2="605" strokeDasharray="4 6" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1150" y1="620" x2="1200" y2="620" strokeDasharray="4 6" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1150" y1="635" x2="1200" y2="635" strokeDasharray="4 6" />
+              </g>
+
+              {/* Shadow overlay paths for wobbly hatching depth */}
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 375 1080 L 375 450 L 377 450 L 377 540 L 380 540 L 380 710 L 420 710 L 420 1080 Z" className={styles.shadowHatchMid} />
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 602.5 1080 L 602.5 690 L 640 690 L 640 1080 Z" className={styles.shadowHatchMid} />
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 880 1080 L 880 720 L 930 720 L 930 1080 Z" className={styles.shadowHatchMid} />
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1175 1080 L 1175 590 L 1210 590 L 1210 650 L 1240 650 L 1240 1080 Z" className={styles.shadowHatchMid} />
+            </g>
+      </svg>
+    </>
+  );
+});
+Layer1_5.displayName = 'Layer1_5';
+
 interface RealtimeClockProps {
   wobble: boolean;
   strength: number;
@@ -1002,20 +1132,24 @@ const Layer2 = React.memo(function Layer2({ isMobile, reducedMotion }: LayerProp
                 </g>
               </g>
 
-              {/* Blocky Spire (Center-Left) */}
-              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 330 1080 L 330 710 L 370 710 L 370 540 L 373 540 L 373 450 L 377 450 L 377 540 L 380 540 L 380 710 L 420 710 L 420 1080 Z" className={styles.bldMidBlockySpire} />
-              {/* Double cornices & vertical ribs for Blocky Spire */}
+
+              {/* Left Gap Building (Gap 0a: x=415-475) */}
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 415 1080 L 415 710 L 425 710 L 425 670 L 465 670 L 465 710 L 475 710 L 475 1080 Z" className={styles.bldMidLeftGap} />
+              {/* Cornices & facade ribs for Left Gap Building */}
               <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="327" y1="710" x2="373" y2="710" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="330" y1="715" x2="370" y2="715" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="377" y1="710" x2="423" y2="710" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="380" y1="715" x2="420" y2="715" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="367" y1="540" x2="383" y2="540" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="370" y1="545" x2="380" y2="545" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="350" y1="715" x2="350" y2="1080" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="400" y1="715" x2="400" y2="1080" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="373" y1="545" x2="373" y2="1080" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="377" y1="545" x2="377" y2="1080" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="412" y1="710" x2="478" y2="710" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="415" y1="715" x2="475" y2="715" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="422" y1="670" x2="468" y2="670" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="425" y1="675" x2="465" y2="675" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="435" y1="675" x2="435" y2="1080" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="455" y1="675" x2="455" y2="1080" />
+              </g>
+              {/* Window grid outlines on Left Gap Building */}
+              <g strokeWidth="0.8" fill="none">
+                <g className={styles.glowingWindowDim} strokeDasharray="3 9">
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="435" y1="685" x2="435" y2="1000" strokeDashoffset="4" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="455" y1="685" x2="455" y2="1000" strokeDashoffset="1" />
+                </g>
               </g>
 
               {/* Flatiron wedge tower (Left-Center) */}
@@ -1059,26 +1193,6 @@ const Layer2 = React.memo(function Layer2({ isMobile, reducedMotion }: LayerProp
                 </g>
               </g>
 
-              {/* Block Tower with setbacks (Right-Mid) */}
-              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1110 1080 L 1110 650 L 1140 650 L 1140 590 L 1210 590 L 1210 650 L 1240 650 L 1240 1080 Z" className={styles.bldMidSetbacks} />
-              {/* Double cornices & vertical ribs for Block Tower Setbacks */}
-              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1107" y1="650" x2="1143" y2="650" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1110" y1="655" x2="1140" y2="655" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1207" y1="650" x2="1243" y2="650" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1210" y1="655" x2="1240" y2="655" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1137" y1="590" x2="1213" y2="590" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1140" y1="595" x2="1210" y2="595" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1125" y1="655" x2="1125" y2="1080" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1225" y1="655" x2="1225" y2="1080" />
-              </g>
-              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" opacity="0.8">
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1175" y1="590" x2="1175" y2="530" />
-                {/* Horizontal window lines */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1150" y1="605" x2="1200" y2="605" strokeDasharray="4 6" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1150" y1="620" x2="1200" y2="620" strokeDasharray="4 6" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1150" y1="635" x2="1200" y2="635" strokeDasharray="4 6" />
-              </g>
 
               {/* Glowing Clock Tower (11:45 PM Detective Time) */}
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1250 1080 L 1250 590 L 1300 590 L 1300 1080 Z" className={styles.bldMidClock} />
@@ -1122,6 +1236,25 @@ const Layer2 = React.memo(function Layer2({ isMobile, reducedMotion }: LayerProp
                 </g>
               </g>
 
+              {/* Right Gap Building (Gap 2d: x=1300-1460) */}
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1300 1080 L 1300 680 L 1380 680 L 1380 630 L 1460 630 L 1460 1080 Z" className={styles.bldMidRightGap} />
+              {/* Cornices & facade ribs for Right Gap Building */}
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1297" y1="680" x2="1383" y2="680" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1300" y1="685" x2="1380" y2="685" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1377" y1="630" x2="1463" y2="630" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1380" y1="635" x2="1460" y2="635" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1340" y1="685" x2="1340" y2="1080" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1420" y1="635" x2="1420" y2="1080" />
+              </g>
+              {/* Window grid outlines on Right Gap Building */}
+              <g strokeWidth="0.8" fill="none">
+                <g className={styles.glowingWindow} strokeDasharray="3 9">
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1340" y1="695" x2="1340" y2="1000" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1420" y1="645" x2="1420" y2="1000" strokeDashoffset="4" />
+                </g>
+              </g>
+
               {/* Medium Tower with Water Tower on roof & Neon Sign (Right) */}
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1490 1080 L 1490 670 L 1610 670 L 1610 1080 Z" className={styles.bldMidWaterTower} />
               {/* Double cornices & vertical ribs for Hotel building */}
@@ -1148,34 +1281,6 @@ const Layer2 = React.memo(function Layer2({ isMobile, reducedMotion }: LayerProp
               {/* Roof-top details: Mechanical room */}
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1505 670 L 1505 645 L 1540 645 L 1540 670 Z" />
 
-              {/* ── NEW: Slab Building (Gap 1a: x=565-640) ── */}
-              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 565 1080 L 565 690 L 640 690 L 640 1080 Z" className={styles.bldMidSlab} />
-              {/* Double cornice and vertical ribs for Slab Building */}
-              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="562" y1="695" x2="643" y2="695" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="590" y1="695" x2="590" y2="1080" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="610" y1="695" x2="610" y2="1080" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="630" y1="695" x2="630" y2="1080" />
-              </g>
-              {/* Roof cornice line */}
-              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="562" y1="690" x2="643" y2="690" strokeWidth="1.4" />
-              {/* Horizontal floor bands */}
-              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" opacity="0.8">
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="565" y1="730" x2="640" y2="730" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="565" y1="770" x2="640" y2="770" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="565" y1="810" x2="640" y2="810" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="565" y1="850" x2="640" y2="850" />
-              </g>
-              {/* Window columns */}
-              <g strokeWidth="0.8" fill="none">
-                <g className={styles.glowingWindow} strokeDasharray="3 9">
-                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="580" y1="700" x2="580" y2="1000" />
-                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="620" y1="700" x2="620" y2="1000" strokeDashoffset="5" />
-                </g>
-                <g className={styles.glowingWindowDim} strokeDasharray="3 9">
-                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="600" y1="700" x2="600" y2="1000" strokeDashoffset="2" />
-                </g>
-              </g>
 
               {/* ── NEW: Narrow Tower (Gap 1b: x=650-680) ── */}
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 650 1080 L 650 620 L 658 580 L 672 580 L 680 620 L 680 1080 Z" className={styles.bldMidNarrow} />
@@ -1185,27 +1290,6 @@ const Layer2 = React.memo(function Layer2({ isMobile, reducedMotion }: LayerProp
               {/* Antenna mast */}
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="665" y1="580" x2="665" y2="540" />
 
-              {/* ── NEW: Wide Warehouse (Gap 2a: x=830-930) ── */}
-              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 830 1080 L 830 720 L 930 720 L 930 1080 Z" className={styles.bldMidWarehouse} />
-              {/* Sawtooth roof detail */}
-              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 830 720 L 855 695 L 855 720 L 880 695 L 880 720 L 905 695 L 905 720 L 930 720" fill="var(--skyline-fill-bg)" />
-              {/* Internal pillars */}
-              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" opacity="0.8">
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="855" y1="720" x2="855" y2="1080" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="880" y1="720" x2="880" y2="1080" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="905" y1="720" x2="905" y2="1080" />
-              </g>
-              {/* Windows */}
-              <g strokeWidth="0.8" fill="none">
-                <g className={styles.glowingWindow} strokeDasharray="4 10">
-                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="845" y1="730" x2="845" y2="1000" />
-                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="895" y1="730" x2="895" y2="1000" strokeDashoffset="5" />
-                </g>
-                <g className={styles.glowingWindowDim} strokeDasharray="4 10">
-                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="870" y1="730" x2="870" y2="1000" strokeDashoffset="3" />
-                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="920" y1="730" x2="920" y2="1000" strokeDashoffset="7" />
-                </g>
-              </g>
 
               {/* ── NEW: Glass Office Tower (Gap 2b: x=950-1030) ── */}
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 950 1080 L 950 600 L 960 600 L 960 560 L 990 560 L 990 520 L 1000 520 L 1000 560 L 1030 560 L 1030 600 L 1040 600 L 1040 1080 Z" className={styles.bldMidGlass} />
@@ -1299,18 +1383,18 @@ const Layer2 = React.memo(function Layer2({ isMobile, reducedMotion }: LayerProp
               {/* Shadow overlay paths for wobbly hatching depth */}
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 155 1080 L 155 680 L 190 680 L 190 1080 Z" className={styles.shadowHatchMid} />
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 225 1080 L 225 620 L 260 620 L 260 1080 Z" className={styles.shadowHatchMid} />
-              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 375 1080 L 375 450 L 377 450 L 377 540 L 380 540 L 380 710 L 420 710 L 420 1080 Z" className={styles.shadowHatchMid} />
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 735 1080 L 735 635 L 760 610 L 790 610 L 790 1080 Z" className={styles.shadowHatchMid} />
-              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1175 1080 L 1175 590 L 1210 590 L 1210 650 L 1240 650 L 1240 1080 Z" className={styles.shadowHatchMid} />
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1275 1080 L 1275 590 L 1300 590 L 1300 1080 Z" className={styles.shadowHatchMid} />
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1550 1080 L 1550 670 L 1610 670 L 1610 1080 Z" className={styles.shadowHatchMid} />
-              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 602.5 1080 L 602.5 690 L 640 690 L 640 1080 Z" className={styles.shadowHatchMid} />
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 665 1080 L 665 580 L 672 580 L 680 620 L 680 1080 Z" className={styles.shadowHatchMid} />
-              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 880 1080 L 880 720 L 930 720 L 930 1080 Z" className={styles.shadowHatchMid} />
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 995 1080 L 995 560 L 1000 560 L 1030 560 L 1030 600 L 1040 600 L 1040 1080 Z" className={styles.shadowHatchMid} />
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1075 1080 L 1075 500 L 1085 580 L 1085 660 L 1095 660 L 1095 1080 Z" className={styles.shadowHatchMid} />
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1740 1080 L 1740 600 L 1750 600 L 1750 650 L 1780 650 L 1780 1080 Z" className={styles.shadowHatchMid} />
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1890 1080 L 1890 680 L 1930 680 L 1930 720 L 2010 720 L 2010 660 L 2070 660 L 2070 700 L 2170 700 L 2170 650 L 2920 650 L 2920 1080 Z" className={styles.shadowHatchMid} />
+              
+              {/* New midground buildings shadow hatches */}
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 445 1080 L 445 670 L 465 670 L 465 710 L 475 710 L 475 1080 Z" className={styles.shadowHatchMid} />
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1340 1080 L 1340 680 L 1380 680 L 1380 1080 Z M 1420 1080 L 1420 630 L 1460 630 L 1460 1080 Z" className={styles.shadowHatchMid} />
             </g>
 
             {/* Distant Background Shoreline / Docks at the Waterline (y = 938 to 950) */}
@@ -1497,6 +1581,14 @@ const Layer2 = React.memo(function Layer2({ isMobile, reducedMotion }: LayerProp
               {/* Hotel building */}
               <line x1="1530" y1="720" x2="1530" y2="723" className={styles.windowFlicker1} />
               <line x1="1570" y1="760" x2="1570" y2="763" className={styles.windowFlicker3} />
+
+              {/* Left Gap Building */}
+              <line x1="435" y1="720" x2="435" y2="723" className={styles.windowFlicker2} />
+              <line x1="455" y1="760" x2="455" y2="763" className={styles.windowFlicker4} />
+
+              {/* Right Gap Building */}
+              <line x1="1340" y1="730" x2="1340" y2="733" className={styles.windowFlicker1} />
+              <line x1="1420" y1="690" x2="1420" y2="693" className={styles.windowFlicker3} />
             </g>
       </svg>
     </>
