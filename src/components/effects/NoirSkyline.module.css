@@ -921,6 +921,9 @@
   --skyline-clock-border: var(--skyline-stroke-mid);
   --skyline-clock-details: #1a1a2e;
   --skyline-clock-seconds: #ff453a;
+  
+  --skyline-window-deco-stroke: rgba(250, 250, 250, 0.65);
+  --skyline-window-deco-fill: rgba(250, 250, 250, 0.18);
 }
 
 .lightPopart {
@@ -941,6 +944,9 @@
   --pop-pier-gray: #DAD6CE;  /* warm concrete gray for piers */
   --pop-bridge-red: #FAA3AB; /* soft pastel red for bridge tower */
   --pop-brick-brown: #D7A494; /* soft pastel brick brown */
+
+  --skyline-window-deco-stroke: var(--pop-black);
+  --skyline-window-deco-fill: #c8a696;
 
   --skyline-sky-bg: url(#skyGradPopart);
   --skyline-stroke-fg: var(--pop-black);

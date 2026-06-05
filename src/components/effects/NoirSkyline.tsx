@@ -896,6 +896,17 @@ const Layer2 = React.memo(function Layer2({ isMobile, reducedMotion }: LayerProp
 
               {/* Staggered double-tower (Left) */}
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 120 1080 L 120 680 L 190 680 L 190 620 L 260 620 L 260 1080 Z" className={styles.bldMidStaggered} />
+              {/* Double cornices & vertical ribs for Staggered Tower */}
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="117" y1="680" x2="193" y2="680" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="120" y1="685" x2="190" y2="685" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="187" y1="620" x2="263" y2="620" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="190" y1="625" x2="260" y2="625" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="135" y1="685" x2="135" y2="1080" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="175" y1="685" x2="175" y2="1080" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="205" y1="625" x2="205" y2="1080" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="245" y1="625" x2="245" y2="1080" />
+              </g>
               {/* Window grid outlines on Left Tower */}
               <g strokeWidth="0.8" fill="none">
                 <g className={styles.glowingWindow} strokeDasharray="2.5 8">
@@ -910,9 +921,31 @@ const Layer2 = React.memo(function Layer2({ isMobile, reducedMotion }: LayerProp
 
               {/* Blocky Spire (Center-Left) */}
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 330 1080 L 330 710 L 370 710 L 370 540 L 373 540 L 373 450 L 377 450 L 377 540 L 380 540 L 380 710 L 420 710 L 420 1080 Z" className={styles.bldMidBlockySpire} />
+              {/* Double cornices & vertical ribs for Blocky Spire */}
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="327" y1="710" x2="373" y2="710" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="330" y1="715" x2="370" y2="715" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="377" y1="710" x2="423" y2="710" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="380" y1="715" x2="420" y2="715" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="367" y1="540" x2="383" y2="540" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="370" y1="545" x2="380" y2="545" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="350" y1="715" x2="350" y2="1080" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="400" y1="715" x2="400" y2="1080" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="373" y1="545" x2="373" y2="1080" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="377" y1="545" x2="377" y2="1080" />
+              </g>
 
               {/* Flatiron wedge tower (Left-Center) */}
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 475 1080 L 475 665 L 505 640 L 525 640 L 540 665 L 540 1080 Z" className={styles.bldMidFlatiron} />
+              {/* Double cornices & additional ribbing for Flatiron wedge */}
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="502" y1="640" x2="528" y2="640" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="505" y1="645" x2="525" y2="645" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="472" y1="665" x2="543" y2="665" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="475" y1="670" x2="540" y2="670" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="483" y1="670" x2="483" y2="1080" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="532" y1="670" x2="532" y2="1080" />
+              </g>
               {/* Flatiron vertical wedge lines */}
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="505" y1="640" x2="505" y2="1080" stroke="var(--skyline-stroke-mid)" fill="none" opacity="0.8" />
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="525" y1="640" x2="525" y2="1080" stroke="var(--skyline-stroke-mid)" fill="none" opacity="0.8" />
@@ -924,6 +957,13 @@ const Layer2 = React.memo(function Layer2({ isMobile, reducedMotion }: LayerProp
 
               {/* Citigroup-style Slanted Roof (Center-Right) */}
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 680 1080 L 680 690 L 760 610 L 790 610 L 790 1080 Z" className={styles.bldMidCitigroup} />
+              {/* Parallel slanted cornice & center rib for Citigroup */}
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="680" y1="700" x2="750" y2="630" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="757" y1="610" x2="793" y2="610" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="760" y1="615" x2="790" y2="615" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="730" y1="640" x2="730" y2="1080" />
+              </g>
               {/* Citibank window grids */}
               <g strokeWidth="0.8" fill="none">
                 <g className={styles.glowingWindow} strokeDasharray="3 10">
@@ -938,6 +978,17 @@ const Layer2 = React.memo(function Layer2({ isMobile, reducedMotion }: LayerProp
 
               {/* Block Tower with setbacks (Right-Mid) */}
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1110 1080 L 1110 650 L 1140 650 L 1140 590 L 1210 590 L 1210 650 L 1240 650 L 1240 1080 Z" className={styles.bldMidSetbacks} />
+              {/* Double cornices & vertical ribs for Block Tower Setbacks */}
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1107" y1="650" x2="1143" y2="650" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1110" y1="655" x2="1140" y2="655" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1207" y1="650" x2="1243" y2="650" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1210" y1="655" x2="1240" y2="655" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1137" y1="590" x2="1213" y2="590" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1140" y1="595" x2="1210" y2="595" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1125" y1="655" x2="1125" y2="1080" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1225" y1="655" x2="1225" y2="1080" />
+              </g>
               <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" opacity="0.8">
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1175" y1="590" x2="1175" y2="530" />
                 {/* Horizontal window lines */}
@@ -993,6 +1044,15 @@ const Layer2 = React.memo(function Layer2({ isMobile, reducedMotion }: LayerProp
 
               {/* Medium Tower with Water Tower on roof & Neon Sign (Right) */}
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1490 1080 L 1490 670 L 1610 670 L 1610 1080 Z" className={styles.bldMidWaterTower} />
+              {/* Double cornices & vertical ribs for Hotel building */}
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1487" y1="670" x2="1613" y2="670" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1490" y1="675" x2="1610" y2="675" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1502" y1="645" x2="1543" y2="645" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1505" y1="650" x2="1540" y2="650" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1520" y1="675" x2="1520" y2="1080" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="675" x2="1580" y2="1080" />
+              </g>
               {/* Hotel windows grid */}
               <g strokeWidth="0.8" fill="none">
                 <g className={styles.glowingWindow} strokeDasharray="2.5 8">
@@ -1010,6 +1070,13 @@ const Layer2 = React.memo(function Layer2({ isMobile, reducedMotion }: LayerProp
 
               {/* ── NEW: Slab Building (Gap 1a: x=565-640) ── */}
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 565 1080 L 565 690 L 640 690 L 640 1080 Z" className={styles.bldMidSlab} />
+              {/* Double cornice and vertical ribs for Slab Building */}
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="562" y1="695" x2="643" y2="695" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="590" y1="695" x2="590" y2="1080" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="610" y1="695" x2="610" y2="1080" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="630" y1="695" x2="630" y2="1080" />
+              </g>
               {/* Roof cornice line */}
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="562" y1="690" x2="643" y2="690" strokeWidth="1.4" />
               {/* Horizontal floor bands */}
@@ -1062,6 +1129,15 @@ const Layer2 = React.memo(function Layer2({ isMobile, reducedMotion }: LayerProp
 
               {/* ── NEW: Glass Office Tower (Gap 2b: x=950-1030) ── */}
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 950 1080 L 950 600 L 960 600 L 960 560 L 990 560 L 990 520 L 1000 520 L 1000 560 L 1030 560 L 1030 600 L 1040 600 L 1040 1080 Z" className={styles.bldMidGlass} />
+              {/* Double cornices for Glass Office Tower setbacks */}
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="947" y1="600" x2="963" y2="600" strokeWidth="1.0" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1027" y1="600" x2="1043" y2="600" strokeWidth="1.0" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="957" y1="560" x2="993" y2="560" strokeWidth="1.0" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="997" y1="560" x2="1033" y2="560" strokeWidth="1.0" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="987" y1="520" x2="1003" y2="520" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="990" y1="525" x2="1000" y2="525" />
+              </g>
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="950" y1="600" x2="1040" y2="600" />
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="960" y1="560" x2="1030" y2="560" />
               {/* Vertical mullions */}
@@ -1084,6 +1160,13 @@ const Layer2 = React.memo(function Layer2({ isMobile, reducedMotion }: LayerProp
 
               {/* ── NEW: Slim Spire (Gap 2c: x=1055-1095) ── */}
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1055 1080 L 1055 660 L 1065 660 L 1065 580 L 1075 500 L 1085 580 L 1085 660 L 1095 660 L 1095 1080 Z" className={styles.bldMidSlimSpire} />
+              {/* Double cornices for Slim Spire */}
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1052" y1="660" x2="1068" y2="660" strokeWidth="1.0" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1082" y1="660" x2="1098" y2="660" strokeWidth="1.0" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1062" y1="580" x2="1088" y2="580" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1065" y1="585" x2="1085" y2="585" />
+              </g>
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1055" y1="660" x2="1095" y2="660" />
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1065" y1="580" x2="1085" y2="580" />
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1075" y1="500" x2="1075" y2="580" />
@@ -1095,6 +1178,13 @@ const Layer2 = React.memo(function Layer2({ isMobile, reducedMotion }: LayerProp
 
               {/* ── NEW: Far Right Tower (Gap 3a: x=1700-1780) ── */}
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1700 1080 L 1700 650 L 1730 650 L 1730 600 L 1750 600 L 1750 650 L 1780 650 L 1780 1080 Z" className={styles.bldMidFarRight} />
+              {/* Double cornices for Far Right Tower */}
+              <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1697" y1="650" x2="1733" y2="650" strokeWidth="1.0" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1747" y1="650" x2="1783" y2="650" strokeWidth="1.0" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1727" y1="600" x2="1753" y2="600" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1730" y1="605" x2="1750" y2="605" />
+              </g>
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1700" y1="650" x2="1780" y2="650" />
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1730" y1="600" x2="1750" y2="600" />
               <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" strokeDasharray="3 8" opacity="0.8">
@@ -2631,6 +2721,177 @@ const Layer3 = React.memo(function Layer3({ isMobile, reducedMotion }: LayerProp
                   <WobblyLine wobble={wobble} wobbleStrength={strength} x1="401" y1="1120" x2="401" y2="1142" strokeWidth="0.6" />
                   <WobblyLine wobble={wobble} wobbleStrength={strength} x1="433" y1="1120" x2="433" y2="1142" strokeWidth="0.6" />
                 </g>
+                {/* Left Facade Row 1 Window Decorations (Arched) */}
+                <g fill="none">
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 90 850 L 96 850 Q 93 861 92 872 L 90 872 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 108 850 L 102 850 Q 105 861 106 872 L 108 872 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="130" y="850" width="22" height="28" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="130" y1="855" x2="152" y2="855" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="130" y1="860" x2="152" y2="860" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="130" y1="865" x2="152" y2="865" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="130" y1="870" x2="152" y2="870" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="130" y1="875" x2="152" y2="875" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 235 850 L 241 850 Q 238 861 237 872 L 235 872 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 253 850 L 247 850 Q 250 861 251 872 L 253 872 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="360" y="850" width="22" height="28" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="360" y1="855" x2="382" y2="855" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="360" y1="860" x2="382" y2="860" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="360" y1="865" x2="382" y2="865" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="360" y1="870" x2="382" y2="870" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="360" y1="875" x2="382" y2="875" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                </g>
+
+                {/* Left Facade Row Decorations (y=895) */}
+                <g fill="none">
+                  {/* Col 0 (x=50): SCL */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 50 895 L 57 895 Q 54 906 52 917 L 50 917 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 2 (x=114): HDB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="114" y="895" width="18" height="11" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="114" y1="898" x2="132" y2="898" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="114" y1="901" x2="132" y2="901" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="114" y1="904" x2="132" y2="904" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="114" y1="906" x2="132" y2="906" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 4 (x=200): FCB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="200" y="895" width="18" height="22" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="200" y1="899" x2="218" y2="899" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="200" y1="903" x2="218" y2="903" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="200" y1="907" x2="218" y2="907" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="200" y1="911" x2="218" y2="911" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="200" y1="915" x2="218" y2="915" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 6 (x=360): SCR */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 378 895 L 371 895 Q 374 906 376 917 L 378 917 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 7 (x=392): PS */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="392" y="895" width="18" height="13" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="392" y1="908" x2="410" y2="908" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="401" y1="908" x2="401" y2="912" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                </g>
+
+                {/* Left Facade Row Decorations (y=940) */}
+                <g fill="none">
+                  {/* Col 1 (x=82): FCB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="82" y="940" width="18" height="22" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="82" y1="944" x2="100" y2="944" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="82" y1="948" x2="100" y2="948" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="82" y1="952" x2="100" y2="952" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="82" y1="956" x2="100" y2="956" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="82" y1="960" x2="100" y2="960" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 3 (x=146): SC */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 146 940 L 152 940 Q 149 951 148 962 L 146 962 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 164 940 L 158 940 Q 161 951 162 962 L 164 962 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 5 (x=232): SCL */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 232 940 L 239 940 Q 236 951 234 962 L 232 962 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 7 (x=392): HDB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="392" y="940" width="18" height="11" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="392" y1="943" x2="410" y2="943" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="392" y1="946" x2="410" y2="946" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="392" y1="949" x2="410" y2="949" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="392" y1="951" x2="410" y2="951" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 8 (x=424): PS */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="424" y="940" width="18" height="13" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="424" y1="953" x2="442" y2="953" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="433" y1="953" x2="433" y2="957" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                </g>
+
+                {/* Left Facade Row Decorations (y=985) */}
+                <g fill="none">
+                  {/* Col 0 (x=50): HDB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="50" y="985" width="18" height="11" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="50" y1="988" x2="68" y2="988" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="50" y1="991" x2="68" y2="991" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="50" y1="994" x2="68" y2="994" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="50" y1="996" x2="68" y2="996" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 2 (x=114): SCL */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 114 985 L 121 985 Q 118 996 116 1007 L 114 1007 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 4 (x=200): PS */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="200" y="985" width="18" height="13" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="200" y1="998" x2="218" y2="998" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="209" y1="998" x2="209" y2="1002" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 5 (x=232): FCB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="232" y="985" width="18" height="22" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="232" y1="989" x2="250" y2="989" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="232" y1="993" x2="250" y2="993" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="232" y1="997" x2="250" y2="997" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="232" y1="1001" x2="250" y2="1001" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="232" y1="1005" x2="250" y2="1005" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 7 (x=392): SC */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 392 985 L 398 985 Q 395 996 394 1007 L 392 1007 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 410 985 L 404 985 Q 407 996 408 1007 L 410 1007 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                </g>
+
+                {/* Left Facade Row Decorations (y=1030) */}
+                <g fill="none">
+                  {/* Col 1 (x=82): SCR */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 100 1030 L 93 1030 Q 96 1041 98 1052 L 100 1052 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 2 (x=114): FCB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="114" y="1030" width="18" height="22" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="114" y1="1034" x2="132" y2="1034" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="114" y1="1038" x2="132" y2="1038" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="114" y1="1042" x2="132" y2="1042" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="114" y1="1046" x2="132" y2="1046" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="114" y1="1050" x2="132" y2="1050" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 4 (x=200): HDB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="200" y="1030" width="18" height="11" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="200" y1="1033" x2="218" y2="1033" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="200" y1="1036" x2="218" y2="1036" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="200" y1="1039" x2="218" y2="1039" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="200" y1="1041" x2="218" y2="1041" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 6 (x=360): PS */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="360" y="1030" width="18" height="13" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="360" y1="1043" x2="378" y2="1043" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="369" y1="1043" x2="369" y2="1047" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 8 (x=424): SCL */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 424 1030 L 431 1030 Q 428 1041 426 1052 L 424 1052 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                </g>
+
+                {/* Left Facade Row Decorations (y=1075) */}
+                <g fill="none">
+                  {/* Col 0 (x=50): SC */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 50 1075 L 56 1075 Q 53 1086 52 1097 L 50 1097 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 68 1075 L 62 1075 Q 65 1086 66 1097 L 68 1097 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 2 (x=114): PS */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="114" y="1075" width="18" height="13" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="114" y1="1088" x2="132" y2="1088" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="123" y1="1088" x2="123" y2="1092" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 3 (x=146): HDB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="146" y="1075" width="18" height="11" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="146" y1="1078" x2="164" y2="1078" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="146" y1="1081" x2="164" y2="1081" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="146" y1="1084" x2="164" y2="1084" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="146" y1="1086" x2="164" y2="1086" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 5 (x=232): SCR */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 250 1075 L 243 1075 Q 246 1086 248 1097 L 250 1097 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 7 (x=392): FCB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="392" y="1075" width="18" height="22" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="392" y1="1079" x2="410" y2="1079" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="392" y1="1083" x2="410" y2="1083" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="392" y1="1087" x2="410" y2="1087" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="392" y1="1091" x2="410" y2="1091" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="392" y1="1095" x2="410" y2="1095" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                </g>
+
+                {/* Left Facade Row Decorations (y=1120) */}
+                <g fill="none">
+                  {/* Col 1 (x=82): HDB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="82" y="1120" width="18" height="11" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="82" y1="1123" x2="100" y2="1123" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="82" y1="1126" x2="100" y2="1126" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="82" y1="1129" x2="100" y2="1129" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="82" y1="1131" x2="100" y2="1131" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 3 (x=146): FCB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="146" y="1120" width="18" height="22" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="146" y1="1124" x2="164" y2="1124" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="146" y1="1128" x2="164" y2="1128" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="146" y1="1132" x2="164" y2="1132" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="146" y1="1136" x2="164" y2="1136" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="146" y1="1140" x2="164" y2="1140" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 4 (x=200): SC */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 200 1120 L 206 1120 Q 203 1131 202 1142 L 200 1142 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 218 1120 L 212 1120 Q 215 1131 216 1142 L 218 1142 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 6 (x=360): SCL */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 360 1120 L 367 1120 Q 364 1131 362 1142 L 360 1142 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 8 (x=424): SCR */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 442 1120 L 435 1120 Q 438 1131 440 1142 L 442 1142 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                </g>
 
                 {/* Decorative horizontal band / stringcourse between arched and rectangular rows */}
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="0" y1="885" x2="460" y2="885" stroke="var(--skyline-stroke-mid)" strokeWidth="1.0" />
@@ -2964,6 +3225,228 @@ const Layer3 = React.memo(function Layer3({ isMobile, reducedMotion }: LayerProp
                   <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1741" y1="1110" x2="1741" y2="1132" strokeWidth="0.6" />
                   <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1849" y1="1110" x2="1849" y2="1132" strokeWidth="0.6" />
                   <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1881" y1="1110" x2="1881" y2="1132" strokeWidth="0.6" />
+                </g>
+                {/* Row 1 Window Decorations (Arched) */}
+                <g fill="none">
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1480 790 L 1486 790 Q 1483 801 1482 812 L 1480 812 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1498 790 L 1492 790 Q 1495 801 1496 812 L 1498 812 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1580" y="790" width="22" height="28" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="795" x2="1602" y2="795" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="800" x2="1602" y2="800" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="805" x2="1602" y2="805" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="810" x2="1602" y2="810" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="815" x2="1602" y2="815" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1620 790 L 1626 790 Q 1623 801 1622 812 L 1620 812 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1638 790 L 1632 790 Q 1635 801 1636 812 L 1638 812 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1740" y="790" width="22" height="28" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1740" y1="795" x2="1762" y2="795" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1740" y1="800" x2="1762" y2="800" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1740" y1="805" x2="1762" y2="805" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1740" y1="810" x2="1762" y2="810" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1740" y1="815" x2="1762" y2="815" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1880 790 L 1886 790 Q 1883 801 1882 812 L 1880 812 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1898 790 L 1892 790 Q 1895 801 1896 812 L 1898 812 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                </g>
+
+                {/* Row Decorations (y=840) */}
+                <g fill="none">
+                  {/* Col 0 (x=1440): SCL */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1440 840 L 1447 840 Q 1444 851 1442 862 L 1440 862 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 2 (x=1504): HDB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1504" y="840" width="18" height="11" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1504" y1="843" x2="1522" y2="843" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1504" y1="846" x2="1522" y2="846" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1504" y1="849" x2="1522" y2="849" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1504" y1="851" x2="1522" y2="851" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 4 (x=1580): FCB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1580" y="840" width="18" height="22" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="844" x2="1598" y2="844" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="848" x2="1598" y2="848" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="852" x2="1598" y2="852" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="856" x2="1598" y2="856" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="860" x2="1598" y2="860" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 6 (x=1700): SCR */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1718 840 L 1711 840 Q 1714 851 1716 862 L 1718 862 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 7 (x=1732): PS */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1732" y="840" width="18" height="13" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="853" x2="1750" y2="853" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1741" y1="853" x2="1741" y2="857" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 9 (x=1872): HDB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1872" y="840" width="18" height="11" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1872" y1="843" x2="1890" y2="843" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1872" y1="846" x2="1890" y2="846" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1872" y1="849" x2="1890" y2="849" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1872" y1="851" x2="1890" y2="851" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                </g>
+
+                {/* Row Decorations (y=885) */}
+                <g fill="none">
+                  {/* Col 1 (x=1472): FCB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1472" y="885" width="18" height="22" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1472" y1="889" x2="1490" y2="889" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1472" y1="893" x2="1490" y2="893" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1472" y1="897" x2="1490" y2="897" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1472" y1="901" x2="1490" y2="901" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1472" y1="905" x2="1490" y2="905" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 3 (x=1536): SC */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1536 885 L 1542 885 Q 1539 896 1538 907 L 1536 907 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1554 885 L 1548 885 Q 1551 896 1552 907 L 1554 907 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 5 (x=1612): SCL */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1612 885 L 1619 885 Q 1616 896 1614 907 L 1612 907 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 7 (x=1732): HDB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1732" y="885" width="18" height="11" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="888" x2="1750" y2="888" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="891" x2="1750" y2="891" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="894" x2="1750" y2="894" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="896" x2="1750" y2="896" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 8 (x=1840): PS */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1840" y="885" width="18" height="13" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1840" y1="898" x2="1858" y2="898" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1849" y1="898" x2="1849" y2="902" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                </g>
+
+                {/* Row Decorations (y=930) */}
+                <g fill="none">
+                  {/* Col 0 (x=1440): HDB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1440" y="930" width="18" height="11" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1440" y1="933" x2="1458" y2="933" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1440" y1="936" x2="1458" y2="936" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1440" y1="939" x2="1458" y2="939" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1440" y1="941" x2="1458" y2="941" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 2 (x=1504): SCL */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1504 930 L 1511 930 Q 1508 941 1506 952 L 1504 952 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 4 (x=1580): PS */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1580" y="930" width="18" height="13" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="943" x2="1598" y2="943" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1589" y1="943" x2="1589" y2="947" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 5 (x=1612): FCB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1612" y="930" width="18" height="22" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1612" y1="934" x2="1630" y2="934" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1612" y1="938" x2="1630" y2="938" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1612" y1="942" x2="1630" y2="942" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1612" y1="946" x2="1630" y2="946" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1612" y1="950" x2="1630" y2="950" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 7 (x=1732): SC */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1732 930 L 1738 930 Q 1735 941 1734 952 L 1732 952 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1750 930 L 1744 930 Q 1747 941 1748 952 L 1750 952 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 9 (x=1872): SCR */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1890 930 L 1883 930 Q 1886 941 1888 952 L 1890 952 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                </g>
+
+                {/* Row Decorations (y=975) */}
+                <g fill="none">
+                  {/* Col 1 (x=1472): SCR */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1490 975 L 1483 975 Q 1486 986 1488 997 L 1490 997 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 2 (x=1504): FCB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1504" y="975" width="18" height="22" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1504" y1="979" x2="1522" y2="979" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1504" y1="983" x2="1522" y2="983" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1504" y1="987" x2="1522" y2="987" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1504" y1="991" x2="1522" y2="991" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1504" y1="995" x2="1522" y2="995" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 4 (x=1580): HDB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1580" y="975" width="18" height="11" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="978" x2="1598" y2="978" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="981" x2="1598" y2="981" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="984" x2="1598" y2="984" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="986" x2="1598" y2="986" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 6 (x=1700): PS */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1700" y="975" width="18" height="13" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1700" y1="988" x2="1718" y2="988" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1709" y1="988" x2="1709" y2="992" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 8 (x=1840): SCL */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1840 975 L 1847 975 Q 1844 986 1842 997 L 1840 997 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 9 (x=1872): FCB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1872" y="975" width="18" height="22" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1872" y1="979" x2="1890" y2="979" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1872" y1="983" x2="1890" y2="983" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1872" y1="987" x2="1890" y2="987" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1872" y1="991" x2="1890" y2="991" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1872" y1="995" x2="1890" y2="995" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                </g>
+
+                {/* Row Decorations (y=1020) */}
+                <g fill="none">
+                  {/* Col 0 (x=1440): SC */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1440 1020 L 1446 1020 Q 1443 1031 1442 1042 L 1440 1042 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1458 1020 L 1452 1020 Q 1455 1031 1456 1042 L 1458 1042 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 2 (x=1504): PS */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1504" y="1020" width="18" height="13" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1504" y1="1033" x2="1522" y2="1033" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1513" y1="1033" x2="1513" y2="1037" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 3 (x=1536): HDB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1536" y="1020" width="18" height="11" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1536" y1="1023" x2="1554" y2="1023" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1536" y1="1026" x2="1554" y2="1026" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1536" y1="1029" x2="1554" y2="1029" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1536" y1="1031" x2="1554" y2="1031" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 5 (x=1612): SCR */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1630 1020 L 1623 1020 Q 1626 1031 1628 1042 L 1630 1042 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 7 (x=1732): FCB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1732" y="1020" width="18" height="22" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="1024" x2="1750" y2="1024" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="1028" x2="1750" y2="1028" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="1032" x2="1750" y2="1032" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="1036" x2="1750" y2="1036" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="1040" x2="1750" y2="1040" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 9 (x=1872): SCL */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1872 1020 L 1879 1020 Q 1876 1031 1874 1042 L 1872 1042 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                </g>
+
+                {/* Row Decorations (y=1065) */}
+                <g fill="none">
+                  {/* Col 1 (x=1472): HDB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1472" y="1065" width="18" height="11" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1472" y1="1068" x2="1490" y2="1068" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1472" y1="1071" x2="1490" y2="1071" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1472" y1="1074" x2="1490" y2="1074" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1472" y1="1076" x2="1490" y2="1076" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 3 (x=1536): FCB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1536" y="1065" width="18" height="22" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1536" y1="1069" x2="1554" y2="1069" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1536" y1="1073" x2="1554" y2="1073" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1536" y1="1077" x2="1554" y2="1077" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1536" y1="1081" x2="1554" y2="1081" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1536" y1="1085" x2="1554" y2="1085" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 4 (x=1580): SC */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1580 1065 L 1586 1065 Q 1583 1076 1582 1087 L 1580 1087 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1598 1065 L 1592 1065 Q 1595 1076 1596 1087 L 1598 1087 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 6 (x=1700): SCL */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1700 1065 L 1707 1065 Q 1704 1076 1702 1087 L 1700 1087 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 8 (x=1840): SCR */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1858 1065 L 1851 1065 Q 1854 1076 1856 1087 L 1858 1087 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 9 (x=1872): PS */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1872" y="1065" width="18" height="13" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1872" y1="1078" x2="1890" y2="1078" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1881" y1="1078" x2="1881" y2="1082" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                </g>
+
+                {/* Row Decorations (y=1110) */}
+                <g fill="none">
+                  {/* Col 0 (x=1440): FCB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1440" y="1110" width="18" height="22" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1440" y1="1114" x2="1458" y2="1114" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1440" y1="1118" x2="1458" y2="1118" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1440" y1="1122" x2="1458" y2="1122" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1440" y1="1126" x2="1458" y2="1126" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1440" y1="1130" x2="1458" y2="1130" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 1 (x=1472): SCL */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1472 1110 L 1479 1110 Q 1476 1121 1474 1132 L 1472 1132 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 3 (x=1536): SCR */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1554 1110 L 1547 1110 Q 1550 1121 1552 1132 L 1554 1132 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  {/* Col 5 (x=1612): HDB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1612" y="1110" width="18" height="11" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1612" y1="1113" x2="1630" y2="1113" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1612" y1="1116" x2="1630" y2="1116" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1612" y1="1119" x2="1630" y2="1119" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1612" y1="1121" x2="1630" y2="1121" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 7 (x=1732): PS */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1732" y="1110" width="18" height="13" fill="var(--skyline-window-deco-fill)" stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="1123" x2="1750" y2="1123" strokeWidth={0.8} stroke="var(--skyline-window-deco-stroke)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1741" y1="1123" x2="1741" y2="1127" strokeWidth={0.5} stroke="var(--skyline-window-deco-stroke)" />
+                  {/* Col 8 (x=1840): SC */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1840 1110 L 1846 1110 Q 1843 1121 1842 1132 L 1840 1132 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1858 1110 L 1852 1110 Q 1855 1121 1856 1132 L 1858 1132 Z" fill="var(--skyline-window-deco-fill)" stroke="var(--skyline-window-deco-stroke)" strokeWidth={0.4} />
                 </g>
                 {/* Row 1 Window Decorations (Arched) */}
                 <g fill="none">
