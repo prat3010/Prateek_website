@@ -2965,6 +2965,228 @@ const Layer3 = React.memo(function Layer3({ isMobile, reducedMotion }: LayerProp
                   <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1849" y1="1110" x2="1849" y2="1132" strokeWidth="0.6" />
                   <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1881" y1="1110" x2="1881" y2="1132" strokeWidth="0.6" />
                 </g>
+                {/* Row 1 Window Decorations (Arched) */}
+                <g fill="none">
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1480 790 L 1486 790 Q 1483 801 1482 812 L 1480 812 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1498 790 L 1492 790 Q 1495 801 1496 812 L 1498 812 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1580" y="790" width="22" height="28" fill="var(--skyline-stroke-mid)" opacity={0.12} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="795" x2="1602" y2="795" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="800" x2="1602" y2="800" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="805" x2="1602" y2="805" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="810" x2="1602" y2="810" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="815" x2="1602" y2="815" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1620 790 L 1626 790 Q 1623 801 1622 812 L 1620 812 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1638 790 L 1632 790 Q 1635 801 1636 812 L 1638 812 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1740" y="790" width="22" height="28" fill="var(--skyline-stroke-mid)" opacity={0.12} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1740" y1="795" x2="1762" y2="795" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1740" y1="800" x2="1762" y2="800" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1740" y1="805" x2="1762" y2="805" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1740" y1="810" x2="1762" y2="810" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1740" y1="815" x2="1762" y2="815" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1880 790 L 1886 790 Q 1883 801 1882 812 L 1880 812 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1898 790 L 1892 790 Q 1895 801 1896 812 L 1898 812 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                </g>
+
+                {/* Row Decorations (y=840) */}
+                <g fill="none">
+                  {/* Col 0 (x=1440): SCL */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1440 840 L 1447 840 Q 1444 851 1442 862 L 1440 862 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  {/* Col 2 (x=1504): HDB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1504" y="840" width="18" height="11" fill="var(--skyline-stroke-mid)" opacity={0.12} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1504" y1="843" x2="1522" y2="843" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1504" y1="846" x2="1522" y2="846" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1504" y1="849" x2="1522" y2="849" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1504" y1="851" x2="1522" y2="851" strokeWidth={0.8} stroke="var(--skyline-stroke-mid)" />
+                  {/* Col 4 (x=1580): FCB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1580" y="840" width="18" height="22" fill="var(--skyline-stroke-mid)" opacity={0.12} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="844" x2="1598" y2="844" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="848" x2="1598" y2="848" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="852" x2="1598" y2="852" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="856" x2="1598" y2="856" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="860" x2="1598" y2="860" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  {/* Col 6 (x=1700): SCR */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1718 840 L 1711 840 Q 1714 851 1716 862 L 1718 862 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  {/* Col 7 (x=1732): PS */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1732" y="840" width="18" height="13" fill="var(--skyline-stroke-mid)" opacity={0.2} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="853" x2="1750" y2="853" strokeWidth={0.8} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1741" y1="853" x2="1741" y2="857" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  {/* Col 9 (x=1872): HDB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1872" y="840" width="18" height="11" fill="var(--skyline-stroke-mid)" opacity={0.12} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1872" y1="843" x2="1890" y2="843" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1872" y1="846" x2="1890" y2="846" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1872" y1="849" x2="1890" y2="849" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1872" y1="851" x2="1890" y2="851" strokeWidth={0.8} stroke="var(--skyline-stroke-mid)" />
+                </g>
+
+                {/* Row Decorations (y=885) */}
+                <g fill="none">
+                  {/* Col 1 (x=1472): FCB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1472" y="885" width="18" height="22" fill="var(--skyline-stroke-mid)" opacity={0.12} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1472" y1="889" x2="1490" y2="889" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1472" y1="893" x2="1490" y2="893" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1472" y1="897" x2="1490" y2="897" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1472" y1="901" x2="1490" y2="901" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1472" y1="905" x2="1490" y2="905" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  {/* Col 3 (x=1536): SC */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1536 885 L 1542 885 Q 1539 896 1538 907 L 1536 907 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1554 885 L 1548 885 Q 1551 896 1552 907 L 1554 907 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  {/* Col 5 (x=1612): SCL */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1612 885 L 1619 885 Q 1616 896 1614 907 L 1612 907 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  {/* Col 7 (x=1732): HDB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1732" y="885" width="18" height="11" fill="var(--skyline-stroke-mid)" opacity={0.12} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="888" x2="1750" y2="888" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="891" x2="1750" y2="891" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="894" x2="1750" y2="894" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="896" x2="1750" y2="896" strokeWidth={0.8} stroke="var(--skyline-stroke-mid)" />
+                  {/* Col 8 (x=1840): PS */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1840" y="885" width="18" height="13" fill="var(--skyline-stroke-mid)" opacity={0.2} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1840" y1="898" x2="1858" y2="898" strokeWidth={0.8} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1849" y1="898" x2="1849" y2="902" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                </g>
+
+                {/* Row Decorations (y=930) */}
+                <g fill="none">
+                  {/* Col 0 (x=1440): HDB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1440" y="930" width="18" height="11" fill="var(--skyline-stroke-mid)" opacity={0.12} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1440" y1="933" x2="1458" y2="933" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1440" y1="936" x2="1458" y2="936" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1440" y1="939" x2="1458" y2="939" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1440" y1="941" x2="1458" y2="941" strokeWidth={0.8} stroke="var(--skyline-stroke-mid)" />
+                  {/* Col 2 (x=1504): SCL */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1504 930 L 1511 930 Q 1508 941 1506 952 L 1504 952 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  {/* Col 4 (x=1580): PS */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1580" y="930" width="18" height="13" fill="var(--skyline-stroke-mid)" opacity={0.2} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="943" x2="1598" y2="943" strokeWidth={0.8} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1589" y1="943" x2="1589" y2="947" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  {/* Col 5 (x=1612): FCB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1612" y="930" width="18" height="22" fill="var(--skyline-stroke-mid)" opacity={0.12} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1612" y1="934" x2="1630" y2="934" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1612" y1="938" x2="1630" y2="938" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1612" y1="942" x2="1630" y2="942" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1612" y1="946" x2="1630" y2="946" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1612" y1="950" x2="1630" y2="950" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  {/* Col 7 (x=1732): SC */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1732 930 L 1738 930 Q 1735 941 1734 952 L 1732 952 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1750 930 L 1744 930 Q 1747 941 1748 952 L 1750 952 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  {/* Col 9 (x=1872): SCR */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1890 930 L 1883 930 Q 1886 941 1888 952 L 1890 952 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                </g>
+
+                {/* Row Decorations (y=975) */}
+                <g fill="none">
+                  {/* Col 1 (x=1472): SCR */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1490 975 L 1483 975 Q 1486 986 1488 997 L 1490 997 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  {/* Col 2 (x=1504): FCB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1504" y="975" width="18" height="22" fill="var(--skyline-stroke-mid)" opacity={0.12} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1504" y1="979" x2="1522" y2="979" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1504" y1="983" x2="1522" y2="983" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1504" y1="987" x2="1522" y2="987" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1504" y1="991" x2="1522" y2="991" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1504" y1="995" x2="1522" y2="995" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  {/* Col 4 (x=1580): HDB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1580" y="975" width="18" height="11" fill="var(--skyline-stroke-mid)" opacity={0.12} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="978" x2="1598" y2="978" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="981" x2="1598" y2="981" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="984" x2="1598" y2="984" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1580" y1="986" x2="1598" y2="986" strokeWidth={0.8} stroke="var(--skyline-stroke-mid)" />
+                  {/* Col 6 (x=1700): PS */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1700" y="975" width="18" height="13" fill="var(--skyline-stroke-mid)" opacity={0.2} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1700" y1="988" x2="1718" y2="988" strokeWidth={0.8} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1709" y1="988" x2="1709" y2="992" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  {/* Col 8 (x=1840): SCL */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1840 975 L 1847 975 Q 1844 986 1842 997 L 1840 997 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  {/* Col 9 (x=1872): FCB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1872" y="975" width="18" height="22" fill="var(--skyline-stroke-mid)" opacity={0.12} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1872" y1="979" x2="1890" y2="979" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1872" y1="983" x2="1890" y2="983" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1872" y1="987" x2="1890" y2="987" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1872" y1="991" x2="1890" y2="991" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1872" y1="995" x2="1890" y2="995" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                </g>
+
+                {/* Row Decorations (y=1020) */}
+                <g fill="none">
+                  {/* Col 0 (x=1440): SC */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1440 1020 L 1446 1020 Q 1443 1031 1442 1042 L 1440 1042 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1458 1020 L 1452 1020 Q 1455 1031 1456 1042 L 1458 1042 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  {/* Col 2 (x=1504): PS */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1504" y="1020" width="18" height="13" fill="var(--skyline-stroke-mid)" opacity={0.2} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1504" y1="1033" x2="1522" y2="1033" strokeWidth={0.8} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1513" y1="1033" x2="1513" y2="1037" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  {/* Col 3 (x=1536): HDB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1536" y="1020" width="18" height="11" fill="var(--skyline-stroke-mid)" opacity={0.12} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1536" y1="1023" x2="1554" y2="1023" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1536" y1="1026" x2="1554" y2="1026" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1536" y1="1029" x2="1554" y2="1029" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1536" y1="1031" x2="1554" y2="1031" strokeWidth={0.8} stroke="var(--skyline-stroke-mid)" />
+                  {/* Col 5 (x=1612): SCR */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1630 1020 L 1623 1020 Q 1626 1031 1628 1042 L 1630 1042 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  {/* Col 7 (x=1732): FCB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1732" y="1020" width="18" height="22" fill="var(--skyline-stroke-mid)" opacity={0.12} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="1024" x2="1750" y2="1024" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="1028" x2="1750" y2="1028" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="1032" x2="1750" y2="1032" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="1036" x2="1750" y2="1036" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="1040" x2="1750" y2="1040" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  {/* Col 9 (x=1872): SCL */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1872 1020 L 1879 1020 Q 1876 1031 1874 1042 L 1872 1042 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                </g>
+
+                {/* Row Decorations (y=1065) */}
+                <g fill="none">
+                  {/* Col 1 (x=1472): HDB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1472" y="1065" width="18" height="11" fill="var(--skyline-stroke-mid)" opacity={0.12} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1472" y1="1068" x2="1490" y2="1068" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1472" y1="1071" x2="1490" y2="1071" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1472" y1="1074" x2="1490" y2="1074" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1472" y1="1076" x2="1490" y2="1076" strokeWidth={0.8} stroke="var(--skyline-stroke-mid)" />
+                  {/* Col 3 (x=1536): FCB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1536" y="1065" width="18" height="22" fill="var(--skyline-stroke-mid)" opacity={0.12} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1536" y1="1069" x2="1554" y2="1069" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1536" y1="1073" x2="1554" y2="1073" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1536" y1="1077" x2="1554" y2="1077" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1536" y1="1081" x2="1554" y2="1081" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1536" y1="1085" x2="1554" y2="1085" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  {/* Col 4 (x=1580): SC */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1580 1065 L 1586 1065 Q 1583 1076 1582 1087 L 1580 1087 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1598 1065 L 1592 1065 Q 1595 1076 1596 1087 L 1598 1087 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  {/* Col 6 (x=1700): SCL */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1700 1065 L 1707 1065 Q 1704 1076 1702 1087 L 1700 1087 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  {/* Col 8 (x=1840): SCR */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1858 1065 L 1851 1065 Q 1854 1076 1856 1087 L 1858 1087 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  {/* Col 9 (x=1872): PS */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1872" y="1065" width="18" height="13" fill="var(--skyline-stroke-mid)" opacity={0.2} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1872" y1="1078" x2="1890" y2="1078" strokeWidth={0.8} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1881" y1="1078" x2="1881" y2="1082" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                </g>
+
+                {/* Row Decorations (y=1110) */}
+                <g fill="none">
+                  {/* Col 0 (x=1440): FCB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1440" y="1110" width="18" height="22" fill="var(--skyline-stroke-mid)" opacity={0.12} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1440" y1="1114" x2="1458" y2="1114" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1440" y1="1118" x2="1458" y2="1118" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1440" y1="1122" x2="1458" y2="1122" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1440" y1="1126" x2="1458" y2="1126" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1440" y1="1130" x2="1458" y2="1130" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  {/* Col 1 (x=1472): SCL */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1472 1110 L 1479 1110 Q 1476 1121 1474 1132 L 1472 1132 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  {/* Col 3 (x=1536): SCR */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1554 1110 L 1547 1110 Q 1550 1121 1552 1132 L 1554 1132 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  {/* Col 5 (x=1612): HDB */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1612" y="1110" width="18" height="11" fill="var(--skyline-stroke-mid)" opacity={0.12} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1612" y1="1113" x2="1630" y2="1113" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1612" y1="1116" x2="1630" y2="1116" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1612" y1="1119" x2="1630" y2="1119" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1612" y1="1121" x2="1630" y2="1121" strokeWidth={0.8} stroke="var(--skyline-stroke-mid)" />
+                  {/* Col 7 (x=1732): PS */}
+                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1732" y="1110" width="18" height="13" fill="var(--skyline-stroke-mid)" opacity={0.2} stroke="none" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="1123" x2="1750" y2="1123" strokeWidth={0.8} stroke="var(--skyline-stroke-mid)" />
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1741" y1="1123" x2="1741" y2="1127" strokeWidth={0.5} stroke="var(--skyline-stroke-mid)" />
+                  {/* Col 8 (x=1840): SC */}
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1840 1110 L 1846 1110 Q 1843 1121 1842 1132 L 1840 1132 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1858 1110 L 1852 1110 Q 1855 1121 1856 1132 L 1858 1132 Z" fill="var(--skyline-stroke-mid)" opacity={0.15} stroke="var(--skyline-stroke-mid)" strokeWidth={0.4} />
+                </g>
 
                 {/* Decorative horizontal stringcourse bands */}
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1420" y1="828" x2="1920" y2="828" stroke="var(--skyline-stroke-mid)" strokeWidth="1.0" />
