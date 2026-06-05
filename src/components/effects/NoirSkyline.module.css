@@ -710,6 +710,12 @@
     animation: none !important;
     opacity: 0.6 !important;
   }
+  .beaconRed1,
+  .beaconRed2,
+  .beaconRed3 {
+    animation: none !important;
+    opacity: 0.95 !important;
+  }
 }
 
 /* ─ Asynchronous Window Flickering (Cycle: 50s, 85s, 120s, 160s) ─ */
@@ -755,6 +761,57 @@
 @keyframes cycleCell4 {
   0%, 25%, 77%, 100% { opacity: 0.05; }
   27%, 75% { opacity: 0.85; }
+}
+
+/* ─ Aviation Warning Beacons (Blinking Red Lights) ─ */
+.beaconRed1,
+.beaconRed2,
+.beaconRed3 {
+  fill: #ff3b30;
+  transition: opacity var(--transition-slow);
+}
+
+/* Noir Mode - Glow effect */
+.darkNoir .beaconRed1,
+.darkNoir .beaconRed2,
+.darkNoir .beaconRed3 {
+  fill: #ff3b30 !important;
+  filter: drop-shadow(0 0 3px rgba(255, 59, 48, 0.95)) drop-shadow(0 0 1px rgba(255, 59, 48, 0.8));
+}
+
+/* Pop-Art Mode - Flat solid red with no glow */
+.lightPopart .beaconRed1,
+.lightPopart .beaconRed2,
+.lightPopart .beaconRed3 {
+  fill: var(--pop-red) !important;
+  filter: none !important;
+}
+
+.beaconRed1 {
+  animation: blinkRed1 1.2s step-start infinite;
+}
+
+.beaconRed2 {
+  animation: blinkRed2 1.8s step-start infinite 0.4s;
+}
+
+.beaconRed3 {
+  animation: blinkRed3 2.4s step-start infinite 0.8s;
+}
+
+@keyframes blinkRed1 {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 1; }
+}
+
+@keyframes blinkRed2 {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 1; }
+}
+
+@keyframes blinkRed3 {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 1; }
 }
 
 /* ─ Bridge Highway Traffic (Glowing Dots) ─ */
@@ -859,6 +916,11 @@
   
   --skyline-traffic-headlight-trail: rgba(250, 250, 250, 0.25);
   --skyline-traffic-taillight-trail: rgba(250, 250, 250, 0.2);
+  
+  --skyline-clock-face: #fff3a8;
+  --skyline-clock-border: var(--skyline-stroke-mid);
+  --skyline-clock-details: #1a1a2e;
+  --skyline-clock-seconds: #ff453a;
 }
 
 .lightPopart {
@@ -939,6 +1001,11 @@
   
   --skyline-traffic-headlight-trail: rgba(255, 243, 168, 0.35);
   --skyline-traffic-taillight-trail: rgba(250, 163, 171, 0.3);
+  
+  --skyline-clock-face: var(--pop-white);
+  --skyline-clock-border: var(--pop-black);
+  --skyline-clock-details: var(--pop-black);
+  --skyline-clock-seconds: var(--pop-red);
 }
 
 /* Conic Sunburst Wedges */
@@ -1026,6 +1093,14 @@
 .lightPopart .bldBgSetbackGap3a { fill: var(--pop-blue) !important; }
 .lightPopart .bldBgNarrowDecoGap3b { fill: var(--pop-pink) !important; }
 
+/* Background Water Tanks (Popart Colors) */
+.lightPopart .bldBgWaterTank1Body { fill: var(--pop-yellow) !important; }
+.lightPopart .bldBgWaterTank1Roof { fill: var(--pop-red) !important; }
+.lightPopart .bldBgWaterTank2Body { fill: var(--pop-green) !important; }
+.lightPopart .bldBgWaterTank2Roof { fill: var(--pop-pink) !important; }
+.lightPopart .bldBgWaterTank3Body { fill: var(--pop-orange) !important; }
+.lightPopart .bldBgWaterTank3Roof { fill: var(--pop-cyan) !important; }
+
 /* Layer 2 (Midground Buildings) */
 .lightPopart .bldMidFarLeft { fill: var(--pop-pink) !important; }
 .lightPopart .bldMidStaggered { fill: var(--pop-green) !important; }
@@ -1086,6 +1161,22 @@
   .gargoyleEyes {
     animation: none !important;
   }
+}
+
+.clockFace {
+  transition: fill var(--transition-slow), stroke var(--transition-slow);
+}
+
+.darkNoir .clockFace {
+  filter: drop-shadow(0 0 3px rgba(255, 243, 168, 0.8)) drop-shadow(0 0 1px rgba(255, 243, 168, 0.5));
+}
+
+.clockSeconds {
+  transition: stroke var(--transition-slow);
+}
+
+.darkNoir .clockSeconds {
+  filter: drop-shadow(0 0 1px rgba(255, 69, 58, 0.6));
 }
 
 
