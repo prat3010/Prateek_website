@@ -873,6 +873,69 @@ const Layer1 = React.memo(function Layer1({ isMobile, reducedMotion }: LayerProp
 });
 Layer1.displayName = 'Layer1';
 
+interface RealtimeClockProps {
+  wobble: boolean;
+  strength: number;
+}
+
+function RealtimeClock({ wobble, strength }: RealtimeClockProps) {
+  const [time, setTime] = useState<Date | null>(null);
+
+  useEffect(() => {
+    setTime(new Date());
+    const interval = setInterval(() => {
+      setTime(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  if (!time) {
+    // Fallback static hands pointing at 11:45 PM detective time during SSR / initial load
+    return (
+      <g>
+        {/* Clock Face Circle */}
+        <circle cx="1275" cy="580" r="10" fill="var(--skyline-clock-face)" stroke="var(--skyline-clock-border)" strokeWidth="1.2" className={styles.clockFace} />
+        {/* Clock hands pointing at 11:45 */}
+        <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1275" y1="580" x2="1275" y2="572" stroke="var(--skyline-clock-details)" strokeWidth="1" /> {/* Minute hand */}
+        <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1275" y1="580" x2="1268" y2="583" stroke="var(--skyline-clock-details)" strokeWidth="1.2" /> {/* Hour hand */}
+      </g>
+    );
+  }
+
+  const hours = time.getHours();
+  const minutes = time.getMinutes();
+  const seconds = time.getSeconds();
+
+  // Compute angles
+  const secondsAngle = seconds * 6;
+  const minutesAngle = minutes * 6 + seconds * 0.1;
+  const hoursAngle = (hours % 12) * 30 + minutes * 0.5;
+
+  return (
+    <g>
+      {/* Clock Face Circle */}
+      <circle cx="1275" cy="580" r="10" fill="var(--skyline-clock-face)" stroke="var(--skyline-clock-border)" strokeWidth="1.2" className={styles.clockFace} />
+      
+      {/* Hour Hand (pointing straight up at 12 when angle is 0, length = 5.5 units) */}
+      <g transform={`rotate(${hoursAngle}, 1275, 580)`}>
+        <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1275" y1="580" x2="1275" y2="574.5" stroke="var(--skyline-clock-details)" strokeWidth="1.3" />
+      </g>
+
+      {/* Minute Hand (pointing straight up at 12 when angle is 0, length = 8 units) */}
+      <g transform={`rotate(${minutesAngle}, 1275, 580)`}>
+        <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1275" y1="580" x2="1275" y2="572" stroke="var(--skyline-clock-details)" strokeWidth="0.9" />
+      </g>
+
+      {/* Second Hand (pointing straight up at 12 when angle is 0, length = 9 units) */}
+      <g transform={`rotate(${secondsAngle}, 1275, 580)`}>
+        <line x1="1275" y1="580" x2="1275" y2="571" stroke="var(--skyline-clock-seconds)" strokeWidth="0.6" className={styles.clockSeconds} />
+      </g>
+      
+      {/* Center Pin */}
+      <circle cx="1275" cy="580" r="1.2" fill="var(--skyline-clock-details)" />
+    </g>
+  );
+}
 
 const Layer2 = React.memo(function Layer2({ isMobile, reducedMotion }: LayerProps) {
   const wobble = !reducedMotion;
@@ -1002,11 +1065,8 @@ const Layer2 = React.memo(function Layer2({ isMobile, reducedMotion }: LayerProp
               {/* Top dome and spire cap */}
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1255 590 L 1255 570 Q 1275 550 1295 570 L 1295 590" />
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1275" y1="550" x2="1275" y2="530" strokeWidth="1" />
-              {/* Clock Face Circle */}
-              <circle cx="1275" cy="580" r="10" fill="var(--skyline-clock-face)" stroke="var(--skyline-clock-border)" strokeWidth="1.2" />
-              {/* Clock hands pointing at 11:45 */}
-              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1275" y1="580" x2="1275" y2="572" stroke="var(--skyline-clock-details)" strokeWidth="1" /> {/* Minute hand */}
-              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1275" y1="580" x2="1268" y2="583" stroke="var(--skyline-clock-details)" strokeWidth="1.2" /> {/* Hour hand */}
+              {/* Realtime Clock Face */}
+              <RealtimeClock wobble={wobble} strength={strength} />
               {/* Clock Face Details (Roman marker lines at 12, 3, 6, 9) */}
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1275" y1="571" x2="1275" y2="573" stroke="var(--skyline-clock-details)" strokeWidth="0.8" />
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1284" y1="580" x2="1282" y2="580" stroke="var(--skyline-clock-details)" strokeWidth="0.8" />
