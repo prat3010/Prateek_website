@@ -65,11 +65,11 @@
 }
 
 .searchlightLeft {
-  animation: sweepLeft 15s ease-in-out infinite alternate;
+  animation: sweepLeft 17s ease-in-out infinite alternate;
 }
 
 .searchlightRight {
-  animation: sweepRight 18s ease-in-out infinite alternate;
+  animation: sweepRight 23s ease-in-out infinite alternate;
 }
 
 @keyframes sweepLeft {
@@ -109,12 +109,12 @@
 
 /* Drifting Steam / Smoke rising from chimneys */
 .steam {
-  animation: rise 5s ease-out infinite;
+  animation: rise 8s ease-out infinite;
   transform-origin: bottom center;
 }
 
 .steamDelayed {
-  animation: rise 6s ease-out infinite 2s;
+  animation: rise 9s ease-out infinite 4s;
   transform-origin: bottom center;
 }
 
@@ -203,7 +203,7 @@
 
 /* ─ Flock of Gliding Birds ─ */
 .flock {
-  animation: flight 35s linear infinite;
+  animation: flight 28s linear infinite;
 }
 
 @keyframes flight {
@@ -291,7 +291,7 @@
 
 /* ─ Slow-Gliding Retro Blimp ─ */
 .blimpGroup {
-  animation: blimpFlight 85s linear infinite;
+  animation: blimpFlight 115s linear infinite;
 }
 
 @keyframes blimpFlight {
@@ -371,7 +371,7 @@
 /* ─ Chugging Tugboat (Option 1) ─ */
 .tugboatTransit {
   transform-origin: 1050px 941px;
-  animation: tugboatTransitAnim 90s linear infinite;
+  animation: tugboatTransitAnim 75s linear infinite;
 }
 
 .tugboatBobbing {
@@ -447,7 +447,7 @@
 /* ─ Speedboat (Foreground, Faster) ─ */
 .speedboatTransit {
   transform-origin: 1050px 941px;
-  animation: speedboatTransitAnim 38s linear infinite;
+  animation: speedboatTransitAnim 25s linear infinite;
 }
 
 .speedboatBobbing {
