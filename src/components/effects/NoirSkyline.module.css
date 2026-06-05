@@ -1098,6 +1098,7 @@
 .lightPopart .bldBgTwinRight { fill: var(--pop-yellow) !important; }
 .lightPopart .bldBgSetbackGap3a { fill: var(--pop-blue) !important; }
 .lightPopart .bldBgNarrowDecoGap3b { fill: var(--pop-pink) !important; }
+.lightPopart .bldBgBlockGap1b { fill: var(--pop-blue) !important; }
 
 /* Background Water Tanks (Popart Colors) */
 .lightPopart .bldBgWaterTank1Body { fill: var(--pop-yellow) !important; }

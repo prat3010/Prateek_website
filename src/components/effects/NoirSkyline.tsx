@@ -496,7 +496,7 @@ const Layer1 = React.memo(function Layer1({ isMobile, reducedMotion }: LayerProp
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="965" y1="460" x2="965" y2="1080" />
  
               {/* Flat top tower with twin antenna (Right-Mid) */}
-              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1320 1080 L 1320 620 L 1420 620 L 1420 1080 Z" className={styles.bldBgFlatTop} />
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1290 1080 L 1290 620 L 1420 620 L 1420 1080 Z" className={styles.bldBgFlatTop} />
               {/* Flat Top Rooftop Water Tower (Highly Detailed, scaled foreground design) */}
               <g>
                 {/* Trestle Support Legs */}
@@ -559,6 +559,7 @@ const Layer1 = React.memo(function Layer1({ isMobile, reducedMotion }: LayerProp
 
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1350" y1="620" x2="1350" y2="540" />
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1390" y1="620" x2="1390" y2="520" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1310" y1="620" x2="1310" y2="1080" strokeDasharray="5 5" />
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1340" y1="620" x2="1340" y2="1080" strokeDasharray="5 5" />
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1360" y1="620" x2="1360" y2="1080" strokeDasharray="5 5" />
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1380" y1="620" x2="1380" y2="1080" strokeDasharray="5 5" />
@@ -697,7 +698,7 @@ const Layer1 = React.memo(function Layer1({ isMobile, reducedMotion }: LayerProp
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="820" y1="550" x2="820" y2="480" />
  
               {/* ── NEW: Setback Office Block (Gap 3a: x=1050-1140) ── */}
-              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1050 1080 L 1050 680 L 1070 680 L 1070 600 L 1100 600 L 1100 530 L 1110 530 L 1110 600 L 1140 600 L 1140 1080 Z" className={styles.bldBgSetbackGap3a} />
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1030 1080 L 1030 680 L 1070 680 L 1070 600 L 1100 600 L 1100 530 L 1110 530 L 1110 600 L 1140 600 L 1140 1080 Z" className={styles.bldBgSetbackGap3a} />
               {/* Setback Office Rooftop Water Tower (Highly Detailed, scaled foreground design) */}
               <g>
                 {/* Trestle Support Legs */}
@@ -758,8 +759,8 @@ const Layer1 = React.memo(function Layer1({ isMobile, reducedMotion }: LayerProp
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1075" y1="586" x2="1076.5" y2="586" strokeWidth="0.3" stroke="var(--skyline-stroke-mid)" />
               </g>
 
-              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1050" y1="680" x2="1140" y2="680" />
-              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1050" y1="683" x2="1140" y2="683" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1030" y1="680" x2="1140" y2="680" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1030" y1="683" x2="1140" y2="683" />
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1070" y1="600" x2="1140" y2="600" />
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1070" y1="603" x2="1140" y2="603" />
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1060" y1="680" x2="1060" y2="1080" strokeDasharray="3 6" />
@@ -781,6 +782,13 @@ const Layer1 = React.memo(function Layer1({ isMobile, reducedMotion }: LayerProp
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1225" y1="560" x2="1225" y2="1080" />
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1235" y1="560" x2="1235" y2="1080" />
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1245" y1="560" x2="1245" y2="1080" />
+
+              {/* ── NEW: Background Block Tower (Gap 1b: x=530-595) ── */}
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 530 1080 L 530 650 L 595 650 L 595 1080 Z" className={styles.bldBgBlockGap1b} />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="530" y1="650" x2="595" y2="650" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="530" y1="653" x2="595" y2="653" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="550" y1="650" x2="550" y2="1080" strokeDasharray="3 6" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="575" y1="650" x2="575" y2="1080" strokeDasharray="3 6" />
  
               {/* Distant Inhabited Window Grids (office lights) */}
               <g fill="none">
@@ -813,6 +821,14 @@ const Layer1 = React.memo(function Layer1({ isMobile, reducedMotion }: LayerProp
                 <g className={styles.glowingWindowDim} strokeWidth="0.8" strokeDasharray="3 9">
                   <WobblyLine wobble={wobble} wobbleStrength={strength} x1="262" y1="720" x2="262" y2="1000" strokeDashoffset="4" />
                 </g>
+
+                {/* Background Block Tower windows */}
+                <g className={styles.glowingWindow} strokeWidth="0.8" strokeDasharray="3 9">
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="550" y1="660" x2="550" y2="1000" />
+                </g>
+                <g className={styles.glowingWindowDim} strokeWidth="0.8" strokeDasharray="3 9">
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="575" y1="660" x2="575" y2="1000" strokeDashoffset="4" />
+                </g>
  
                 {/* Shadow overlay paths for wobbly hatching depth */}
                 <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 498 1080 L 498 340 L 508 500 L 518 535 L 518 590 L 528 590 L 528 640 L 538 640 L 546 670 L 546 1080 Z" className={styles.shadowHatchBg} />
@@ -825,6 +841,7 @@ const Layer1 = React.memo(function Layer1({ isMobile, reducedMotion }: LayerProp
                 <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 170 1080 L 170 620 L 195 620 L 195 660 L 200 660 L 200 1080 Z" className={styles.shadowHatchBg} />
                 <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1095 1080 L 1095 530 L 1100 530 L 1110 530 L 1110 600 L 1140 600 L 1140 1080 Z" className={styles.shadowHatchBg} />
                 <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1230 1080 L 1230 520 L 1235 560 L 1245 560 L 1245 640 L 1260 640 L 1260 1080 Z" className={styles.shadowHatchBg} />
+                <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 562.5 1080 L 562.5 650 L 595 650 L 595 1080 Z" className={styles.shadowHatchBg} />
               </g>
             </g>
       </svg>
@@ -866,6 +883,9 @@ const Layer1 = React.memo(function Layer1({ isMobile, reducedMotion }: LayerProp
  
               {/* NEW: Narrow Deco tower */}
               <line x1="1220" y1="680" x2="1220" y2="683" className={styles.windowFlicker2} />
+
+              {/* NEW: Background Block tower */}
+              <line x1="550" y1="680" x2="550" y2="683" className={styles.windowFlicker3} />
             </g>
       </svg>
     </>
