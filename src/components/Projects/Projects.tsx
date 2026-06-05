@@ -72,14 +72,13 @@ export default function Projects({ projects }: ProjectsProps) {
                 </div>
 
                 <div className={styles.panelImageWrapper}>
-                  <div 
+                  <Image
+                    src={isNoir ? project.image.replace(/\.webp$/, '-noir.webp') : project.image}
+                    alt={project.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     className={styles.panelImage}
-                    style={{
-                      '--bg-light': `url(${project.image})`,
-                      '--bg-dark': `url(${project.image.replace(/\.webp$/, '-noir.webp')})`,
-                    } as React.CSSProperties}
-                    role="img"
-                    aria-label={project.title}
+                    style={{ objectFit: 'cover' }}
                   />
                 </div>
                 <div className={styles.panelOverlay}>
