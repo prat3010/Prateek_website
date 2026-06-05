@@ -14,7 +14,7 @@ interface LayerProps {
 export default function NoirSkyline() {
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+
 
   // Track scroll position of the page
   const { scrollYProgress } = useScroll();
@@ -83,7 +83,7 @@ export default function NoirSkyline() {
     const isMobileDevice =
       window.matchMedia('(max-width: 768px)').matches ||
       window.matchMedia('(pointer: coarse)').matches;
-    setIsMobile(isMobileDevice);
+
 
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     setReducedMotion(mediaQuery.matches);
@@ -172,7 +172,7 @@ export default function NoirSkyline() {
         <m.div
           style={{ x: layer1X, y: layer1Y, width: '100%', height: '100%', willChange: 'transform' }}
         >
-          <Layer1 isMobile={isMobile} reducedMotion={reducedMotion} />
+          <Layer1 reducedMotion={reducedMotion} />
         </m.div>
       </m.div>
 
@@ -184,7 +184,7 @@ export default function NoirSkyline() {
         <m.div
           style={{ x: layer1_5X, y: layer1_5Y, width: '100%', height: '100%', willChange: 'transform' }}
         >
-          <Layer1_5 isMobile={isMobile} reducedMotion={reducedMotion} />
+          <Layer1_5 reducedMotion={reducedMotion} />
         </m.div>
       </m.div>
 
@@ -195,7 +195,7 @@ export default function NoirSkyline() {
         <m.div
           style={{ x: layer2X, y: layer2Y, width: '100%', height: '100%', willChange: 'transform' }}
         >
-          <Layer2 isMobile={isMobile} reducedMotion={reducedMotion} />
+          <Layer2 reducedMotion={reducedMotion} />
         </m.div>
       </m.div>
 
@@ -219,7 +219,7 @@ export default function NoirSkyline() {
         <m.div
           style={{ x: layer3X, y: layer3Y, width: '100%', height: '100%', willChange: 'transform' }}
         >
-          <Layer3 isMobile={isMobile} reducedMotion={reducedMotion} />
+          <Layer3 reducedMotion={reducedMotion} />
         </m.div>
       </m.div>
 
@@ -444,7 +444,7 @@ const Layer0 = React.memo(function Layer0() {
 Layer0.displayName = 'Layer0';
 
 
-const Layer1 = React.memo(function Layer1({ isMobile, reducedMotion }: LayerProps) {
+const Layer1 = React.memo(function Layer1({ reducedMotion }: LayerProps) {
   const wobble = !reducedMotion;
   const strength = 2.0; // Subtle background wobble
   return (
@@ -948,7 +948,7 @@ const Layer1 = React.memo(function Layer1({ isMobile, reducedMotion }: LayerProp
 });
 Layer1.displayName = 'Layer1';
 
-const Layer1_5 = React.memo(function Layer1_5({ isMobile, reducedMotion }: LayerProps) {
+const Layer1_5 = React.memo(function Layer1_5({ reducedMotion }: LayerProps) {
   const wobble = !reducedMotion;
   const strength = 2.5; // Far midground wobble (between Layer 1 and Layer 2)
   return (
@@ -1120,7 +1120,7 @@ function RealtimeClock({ wobble, strength }: RealtimeClockProps) {
   );
 }
 
-const Layer2 = React.memo(function Layer2({ isMobile, reducedMotion }: LayerProps) {
+const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
   const wobble = !reducedMotion;
   const strength = 3.0; // Medium midground wobble
   return (
@@ -2528,7 +2528,7 @@ const InteractiveGargoyle: React.FC<InteractiveGargoyleProps> = ({ reducedMotion
 };
 
 
-const Layer3 = React.memo(function Layer3({ isMobile, reducedMotion }: LayerProps) {
+const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
   const wobble = !reducedMotion;
   const strength = 4.0; // Heavy foreground wobbly brush style
   return (
