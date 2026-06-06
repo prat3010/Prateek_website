@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTypewriter } from '@/hooks/useTypewriter';
 import { useTheme } from '@/context/ThemeContext';
-import ActionWord from '@/components/ui/ActionWord';
 import ComicPanel from '@/components/ui/ComicPanel';
 import styles from './Hero.module.css';
 
@@ -43,16 +42,6 @@ export default function Hero({ taglines }: HeroProps) {
     <section id="home" className={styles.hero} aria-label="Hero">
       <div className={styles.content}>
         <div className={styles.textSide}>
-          {/* Floating POW action word */}
-          <div className={styles.powWrapper}>
-            <ActionWord
-              word={isNoir ? 'GRIT!' : 'POW!'}
-              color={isNoir ? '#000000' : 'var(--pop-yellow)'}
-              starburstColor={isNoir ? '#FFFFFF' : undefined}
-              size="xl"
-            />
-          </div>
-
           <h1 className={styles.headline}>
             {isNoir ? (
               <>
@@ -122,15 +111,6 @@ export default function Hero({ taglines }: HeroProps) {
               />
             </div>
           </ComicPanel>
-          {/* Small floating action words */}
-          <div className={styles.floatingZap}>
-            <ActionWord
-              word={isNoir ? 'SHADOW!' : 'ZAP!'}
-              color={isNoir ? '#FFFFFF' : 'var(--pop-blue)'}
-              starburstColor={isNoir ? '#000000' : undefined}
-              size="md"
-            />
-          </div>
         </div>
       </div>
 

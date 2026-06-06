@@ -7,7 +7,6 @@ import ComicPanel from '@/components/ui/ComicPanel';
 import SpeechBubble from '@/components/ui/SpeechBubble';
 import CaptionBox from '@/components/ui/CaptionBox';
 import ScrollReveal from '@/components/effects/ScrollReveal';
-import ActionWord from '@/components/ui/ActionWord';
 import styles from './About.module.css';
 
 const funFacts = [
@@ -33,15 +32,6 @@ export default function About() {
         <ScrollReveal>
           <h2 className={styles.sectionTitle}>
             ORIGIN STORY
-            <span className={styles.titleDecoration}>
-              <ActionWord
-                word={isNoir ? 'CLUE!' : 'WOW!'}
-                color={isNoir ? '#000000' : 'var(--pop-pink)'}
-                starburstColor={isNoir ? '#FFFFFF' : undefined}
-                size="md"
-                animated={false}
-              />
-            </span>
           </h2>
         </ScrollReveal>
 

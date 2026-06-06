@@ -26,10 +26,6 @@
   letter-spacing: 0.04em;
 }
 
-.titleDecoration {
-  display: inline-block;
-  transform: rotate(8deg);
-}
 
 /* Two-column grid */
 .grid {

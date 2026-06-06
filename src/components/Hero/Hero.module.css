@@ -28,22 +28,6 @@
   position: relative;
 }
 
-.powWrapper {
-  position: absolute;
-  top: -7.5rem;
-  left: -3rem;
-  z-index: 3;
-  animation: heroFloat 3s ease-in-out infinite;
-}
-
-@keyframes heroFloat {
-  0%, 100% {
-    transform: translateY(0) rotate(-8deg) scale(1);
-  }
-  50% {
-    transform: translateY(-15px) rotate(4deg) scale(1.08);
-  }
-}
 
 .headline {
   font-family: var(--font-headline);
@@ -340,13 +324,6 @@
   overflow: hidden;
 }
 
-.floatingZap {
-  position: absolute;
-  bottom: -1rem;
-  right: 0;
-  z-index: 3;
-  animation: heroFloat 2.5s ease-in-out infinite 0.5s;
-}
 
 /* Bottom decorative edge */
 .bottomEdge {
@@ -453,13 +430,6 @@
     max-width: 280px;
   }
 
-  .powWrapper {
-    position: relative;
-    top: auto;
-    left: auto;
-    margin-bottom: 0.5rem;
-    display: inline-block;
-  }
 
   .ctaButton {
     display: inline-block;
@@ -475,10 +445,6 @@
     transform: translateX(-50%);
   }
 
-  .floatingZap {
-    bottom: -0.5rem;
-    right: -0.5rem;
-  }
 }
 
 /* Noir Mode overrides for CTA button to look like detective board caption box */

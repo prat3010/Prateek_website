@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Navbar from '@/components/ui/Navbar';
 import Footer from '@/components/ui/Footer';
-import Sidekick from '@/components/ui/Sidekick';
 import { ThemeProvider, Theme } from '@/context/ThemeContext';
 import ThemeTransition from '@/components/effects/ThemeTransition';
 import { LazyMotion, domAnimation } from 'framer-motion';
@@ -28,7 +27,6 @@ export default function ClientLayout({ children, initialTheme }: { children: Rea
         <ThemeTransition />
         {!isAdminRoute && <NoirSkyline />}
         {!isAdminRoute && <CursorTrail />}
-        {!isAdminRoute && <Sidekick />}
         {!isAdminRoute && <Navbar />}
         <main>{children}</main>
         {!isAdminRoute && <Footer />}

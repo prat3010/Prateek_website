@@ -8,7 +8,6 @@ export interface Project {
   liveUrl: string;
   githubUrl: string;
   color: string;
-  actionWord: string;
   isLive: boolean;
 }
 
@@ -25,7 +24,6 @@ export const projects: Project[] = [
     liveUrl: 'https://earth-evolution-simulator.onrender.com',
     githubUrl: 'https://github.com/prat3010/earth-evolution-simulator',
     color: '#00E676',
-    actionWord: 'BOOM!',
     isLive: true,
   },
   {
@@ -40,7 +38,6 @@ export const projects: Project[] = [
     liveUrl: 'https://paintmix-ai.web.app',
     githubUrl: 'https://github.com/prat3010/paintmix-ai',
     color: '#FF9100',
-    actionWord: 'SPLAT!',
     isLive: false,
   },
   {
@@ -55,7 +52,6 @@ export const projects: Project[] = [
     liveUrl: 'https://iss-tracker.pythonanywhere.com',
     githubUrl: 'https://github.com/prat3010/iss-tracker',
     color: '#2979FF',
-    actionWord: 'WHOOSH!',
     isLive: false,
   },
   {
@@ -70,7 +66,6 @@ export const projects: Project[] = [
     liveUrl: 'https://play.google.com/store/apps/details?id=com.metawipe',
     githubUrl: 'https://github.com/prat3010/metawipe',
     color: '#00E676',
-    actionWord: 'ZAP!',
     isLive: false,
   },
 ];

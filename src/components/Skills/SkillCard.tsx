@@ -23,11 +23,6 @@ export default function SkillCard({ skill, index }: SkillCardProps) {
         '--skill-color': skill.color,
       } as React.CSSProperties}
     >
-      {/* Hover KAPOW */}
-      <span className={styles.kapow} aria-hidden="true">
-        <span className={styles.kapowPop}>KAPOW!</span>
-        <span className={styles.kapowNoir}>SILENCE...</span>
-      </span>
 
       <div className={styles.cardHeader}>
         <span

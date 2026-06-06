@@ -5,25 +5,8 @@ import Image from 'next/image';
 import { ExternalLink, Code2 } from 'lucide-react';
 import { type Project } from '@/data/projects';
 import { useTheme } from '@/context/ThemeContext';
-import ActionWord from '@/components/ui/ActionWord';
 import ScrollReveal from '@/components/effects/ScrollReveal';
 import styles from './Projects.module.css';
-
-const getActionWord = (word: string, isNoir: boolean) => {
-  if (!isNoir) return word;
-  switch (word) {
-    case 'BOOM!':
-      return 'DOOM!';
-    case 'SPLAT!':
-      return 'DRIP...';
-    case 'WHOOSH!':
-      return 'ESCAPE!';
-    case 'ZAP!':
-      return 'SHADOW!';
-    default:
-      return word;
-  }
-};
 
 interface ProjectsProps {
   projects: Project[];
@@ -40,14 +23,6 @@ export default function Projects({ projects }: ProjectsProps) {
         <ScrollReveal>
           <h2 className={styles.sectionTitle}>
             EPIC ADVENTURES
-            <span className={styles.titleAction}>
-              <ActionWord
-                word={isNoir ? 'CASE!' : 'BAM!'}
-                color={isNoir ? '#FFFFFF' : 'var(--pop-red)'}
-                starburstColor={isNoir ? '#000000' : undefined}
-                size="lg"
-              />
-            </span>
           </h2>
         </ScrollReveal>
 
@@ -82,14 +57,6 @@ export default function Projects({ projects }: ProjectsProps) {
                   />
                 </div>
                 <div className={styles.panelOverlay}>
-                  <span className={styles.panelAction}>
-                    <ActionWord
-                      word={getActionWord(project.actionWord, isNoir)}
-                      color={isNoir ? '#000000' : project.color}
-                      starburstColor={isNoir ? '#FFFFFF' : undefined}
-                      size="md"
-                    />
-                  </span>
                   <h3 className={styles.panelTitle}>{project.title}</h3>
                   <p className={styles.panelDesc}>{project.description}</p>
                   <div className={styles.panelTags}>
@@ -128,12 +95,6 @@ export default function Projects({ projects }: ProjectsProps) {
             </button>
 
             <div className={styles.modalHeader}>
-              <ActionWord
-                word={getActionWord(selected.actionWord, isNoir)}
-                color={isNoir ? '#FFFFFF' : selected.color}
-                starburstColor={isNoir ? '#000000' : undefined}
-                size="lg"
-              />
               <h3 className={styles.modalTitle}>{selected.title}</h3>
             </div>
 

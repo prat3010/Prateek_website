@@ -3,7 +3,6 @@
 import React, { useState, useMemo } from 'react';
 import { categoryLabels, type SkillCategory, type Skill } from '@/data/skills';
 import { useTheme } from '@/context/ThemeContext';
-import ActionWord from '@/components/ui/ActionWord';
 import ScrollReveal from '@/components/effects/ScrollReveal';
 import SkillCard from './SkillCard';
 import styles from './Skills.module.css';
@@ -43,14 +42,6 @@ export default function Skills({ skills }: SkillsProps) {
         <ScrollReveal>
           <h2 className={styles.sectionTitle}>
             SUPER POWERS
-            <span className={styles.titleAction}>
-              <ActionWord
-                word={isNoir ? 'SHADOW!' : 'ZAP!'}
-                color={isNoir ? '#000000' : 'var(--pop-yellow)'}
-                starburstColor={isNoir ? '#FFFFFF' : undefined}
-                size="lg"
-              />
-            </span>
           </h2>
         </ScrollReveal>
 

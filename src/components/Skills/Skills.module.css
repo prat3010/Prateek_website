@@ -31,11 +31,6 @@
   letter-spacing: 0.04em;
 }
 
-.titleAction {
-  display: inline-block;
-  transform: rotate(12deg) translateY(-8px);
-}
-
 /* ===== CATEGORY TABS ===== */
 .tabs {
   display: flex;
@@ -52,7 +47,6 @@
   padding: 0.5rem 1.25rem;
   border: var(--border-medium);
   background: var(--pop-white);
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.015'/%3E%3C/svg%3E");
   color: var(--pop-black);
   cursor: pointer;
   transition: all 0.2s var(--transition-bounce);
@@ -89,7 +83,6 @@
 .card {
   position: relative;
   background: var(--card-bg, var(--pop-white));
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.035'/%3E%3C/svg%3E");
   border: var(--border-medium);
   padding: 1.25rem;
   box-shadow: var(--shadow-comic);
@@ -104,41 +97,6 @@
   transform: scale(1.08) rotate(0deg) !important;
   box-shadow: var(--shadow-comic-xl);
   z-index: 10;
-}
-
-/* KAPOW! overlay on hover */
-.kapow {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0) rotate(-15deg);
-  font-family: var(--font-headline);
-  font-size: 2rem;
-  color: var(--pop-red);
-  text-shadow: 2px 2px 0 var(--pop-black);
-  -webkit-text-stroke: 1px var(--pop-black);
-  opacity: 0;
-  transition: all 0.3s var(--transition-bounce);
-  z-index: 5;
-  pointer-events: none;
-  white-space: nowrap;
-}
-
-.card:hover .kapow {
-  transform: translate(-50%, -50%) scale(1) rotate(-8deg);
-  opacity: 0.7;
-}
-
-.kapowNoir {
-  display: none;
-}
-
-:global([data-theme='noir']) .kapowPop {
-  display: none;
-}
-
-:global([data-theme='noir']) .kapowNoir {
-  display: inline;
 }
 
 /* Card inner layout */
@@ -172,7 +130,6 @@
   max-width: 850px;
   margin: 0 auto 3rem auto;
   background: var(--pop-yellow);
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.015'/%3E%3C/svg%3E");
   border: var(--border-medium);
   padding: 1.75rem 2rem 1.5rem 2rem;
   box-shadow: var(--shadow-comic-lg);
@@ -384,10 +341,6 @@
   }
 }
 
-/* Noir Mode overrides for ZAP! titleAction positioning and filter tabs */
-:global([data-theme='noir']) .titleAction {
-  transform: rotate(12deg) translateY(12px) !important;
-}
 
 :global([data-theme='noir']) .tab {
   background: #121214 !important;
@@ -419,18 +372,4 @@
   transform: rotate(0deg) scale(1.05) !important;
 }
 
-/* KAPOW hover overrides in Noir Mode */
-:global([data-theme='noir']) .kapow {
-  font-family: var(--font-nosifer), cursive !important;
-  color: #ff1744 !important;
-  -webkit-text-stroke: 1.5px #000000 !important;
-  paint-order: stroke fill !important;
-  text-shadow: 3px 3px 0px #000000 !important;
-  letter-spacing: 0.05em !important;
-  text-transform: uppercase !important;
-}
-
-:global([data-theme='noir']) .card:hover .kapow {
-  opacity: 0.9 !important;
-}
 

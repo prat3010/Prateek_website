@@ -2,7 +2,6 @@
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useTheme } from '@/context/ThemeContext';
-import ActionWord from '@/components/ui/ActionWord';
 import ScrollReveal from '@/components/effects/ScrollReveal';
 import Pathfinder from './Pathfinder';
 import { GridNode, runDijkstra, runAStar, runBFS, runDFS, runGreedyBestFirst, runBidirectionalBFS, PathfindingStep } from './pathfindingAlgorithms';
@@ -244,7 +243,7 @@ export default function Playground() {
         setIsRunning(false);
         addLog(isNoir 
           ? `Path identified: shortest path found with cost of ${val.path.length} blocks.`
-          : `BOOM! Success! Route found in ${val.path.length} jumps!`
+          : `Success! Route found in ${val.path.length} jumps!`
         );
       } 
       else if (val.type === 'no-path') {
@@ -254,7 +253,7 @@ export default function Playground() {
         setIsRunning(false);
         addLog(isNoir 
           ? 'WARNING: Target unreachable. Barriers block all viable paths.'
-          : 'WHACK! Blocked! No route exists from Start to End!'
+          : 'Blocked! No route exists from Start to End!'
         );
       }
     };
@@ -286,14 +285,6 @@ export default function Playground() {
         <ScrollReveal>
           <h2 className={styles.sectionTitle}>
             {isNoir ? 'THE DETECTIVE’S DESK' : 'THE ALGORITHM LAB'}
-            <span className={styles.titleAction}>
-              <ActionWord
-                word={isNoir ? 'CASE!' : 'POW!'}
-                color={isNoir ? '#FFFFFF' : 'var(--pop-yellow)'}
-                starburstColor={isNoir ? '#000000' : undefined}
-                size="lg"
-              />
-            </span>
           </h2>
         </ScrollReveal>
 
