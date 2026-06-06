@@ -80,16 +80,20 @@ export default function NoirSkyline() {
   // Track mouse coordinates for subtle parallax offset
   useEffect(() => {
     setMounted(true);
+
+    // Low-end device: fewer than 4 CPU threads — throttle all animation
+    const cores = navigator.hardwareConcurrency ?? 4;
+    const lowEnd = cores < 4;
+
     const isMobileDevice =
       window.matchMedia('(max-width: 768px)').matches ||
       window.matchMedia('(pointer: coarse)').matches;
 
-
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setReducedMotion(mediaQuery.matches);
+    setReducedMotion(mediaQuery.matches || lowEnd);
 
     const mediaListener = (e: MediaQueryListEvent) => {
-      setReducedMotion(e.matches);
+      setReducedMotion(e.matches || lowEnd);
     };
     mediaQuery.addEventListener('change', mediaListener);
 
@@ -105,7 +109,8 @@ export default function NoirSkyline() {
       });
     };
 
-    if (!isMobileDevice && !mediaQuery.matches) {
+    // Skip mouse parallax on mobile, reduced-motion, or low-end devices
+    if (!isMobileDevice && !mediaQuery.matches && !lowEnd) {
       window.addEventListener('mousemove', handleMouseMove);
     }
 
@@ -166,11 +171,15 @@ export default function NoirSkyline() {
 
       {/* ── Layer 1: Background Buildings (Parallax Scale 1.12) ── */}
       <m.div
-        style={{ scale: bgScale, y: bgY, zIndex: 1, willChange: 'transform' }}
+        style={reducedMotion
+          ? { zIndex: 1 }
+          : { scale: bgScale, y: bgY, zIndex: 1, willChange: 'transform' }}
         className={styles.layer}
       >
         <m.div
-          style={{ x: layer1X, y: layer1Y, width: '100%', height: '100%', willChange: 'transform' }}
+          style={reducedMotion
+            ? { width: '100%', height: '100%' }
+            : { x: layer1X, y: layer1Y, width: '100%', height: '100%', willChange: 'transform' }}
         >
           <Layer1 reducedMotion={reducedMotion} />
         </m.div>
@@ -178,22 +187,30 @@ export default function NoirSkyline() {
 
       {/* ── Layer 1.5: Far Midground Buildings (Parallax Scale 1.10) ── */}
       <m.div
-        style={{ scale: midBgScale, y: midBgY, zIndex: 1, willChange: 'transform' }}
+        style={reducedMotion
+          ? { zIndex: 1 }
+          : { scale: midBgScale, y: midBgY, zIndex: 1, willChange: 'transform' }}
         className={styles.layer}
       >
         <m.div
-          style={{ x: layer1_5X, y: layer1_5Y, width: '100%', height: '100%', willChange: 'transform' }}
+          style={reducedMotion
+            ? { width: '100%', height: '100%' }
+            : { x: layer1_5X, y: layer1_5Y, width: '100%', height: '100%', willChange: 'transform' }}
         >
           <Layer1_5 reducedMotion={reducedMotion} />
         </m.div>
       </m.div>
 
       <m.div
-        style={{ scale: midScale, y: midY, zIndex: 2, willChange: 'transform' }}
+        style={reducedMotion
+          ? { zIndex: 2 }
+          : { scale: midScale, y: midY, zIndex: 2, willChange: 'transform' }}
         className={styles.layer}
       >
         <m.div
-          style={{ x: layer2X, y: layer2Y, width: '100%', height: '100%', willChange: 'transform' }}
+          style={reducedMotion
+            ? { width: '100%', height: '100%' }
+            : { x: layer2X, y: layer2Y, width: '100%', height: '100%', willChange: 'transform' }}
         >
           <Layer2 reducedMotion={reducedMotion} />
         </m.div>
@@ -201,11 +218,15 @@ export default function NoirSkyline() {
 
       {/* ── Layer 2.5: Bridge Structure (Parallax Scale bridgeScale) ── */}
       <m.div
-        style={{ scale: bridgeScale, y: bridgeY, zIndex: 2, willChange: 'transform' }}
+        style={reducedMotion
+          ? { zIndex: 2 }
+          : { scale: bridgeScale, y: bridgeY, zIndex: 2, willChange: 'transform' }}
         className={styles.layer}
       >
         <m.div
-          style={{ x: bridgeLayerX, y: bridgeLayerY, width: '100%', height: '100%', willChange: 'transform' }}
+          style={reducedMotion
+            ? { width: '100%', height: '100%' }
+            : { x: bridgeLayerX, y: bridgeLayerY, width: '100%', height: '100%', willChange: 'transform' }}
         >
           <BridgeLayer reducedMotion={reducedMotion} />
         </m.div>
@@ -213,11 +234,15 @@ export default function NoirSkyline() {
 
       {/* ── Layer 3: Foreground Rooftops (Parallax Scale 1.8, Masks midground, high opacity) ── */}
       <m.div
-        style={{ scale: fgScale, y: fgY, zIndex: 3, willChange: 'transform' }}
+        style={reducedMotion
+          ? { zIndex: 3 }
+          : { scale: fgScale, y: fgY, zIndex: 3, willChange: 'transform' }}
         className={styles.layer}
       >
         <m.div
-          style={{ x: layer3X, y: layer3Y, width: '100%', height: '100%', willChange: 'transform' }}
+          style={reducedMotion
+            ? { width: '100%', height: '100%' }
+            : { x: layer3X, y: layer3Y, width: '100%', height: '100%', willChange: 'transform' }}
         >
           <Layer3 reducedMotion={reducedMotion} />
         </m.div>
