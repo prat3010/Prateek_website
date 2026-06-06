@@ -166,7 +166,7 @@ export default function NoirSkyline() {
 
       {/* ── Layer 1: Background Buildings (Parallax Scale 1.12) ── */}
       <m.div
-        style={{ scale: bgScale, y: bgY, zIndex: 1 }}
+        style={{ scale: bgScale, y: bgY, zIndex: 1, willChange: 'transform' }}
         className={styles.layer}
       >
         <m.div
@@ -178,7 +178,7 @@ export default function NoirSkyline() {
 
       {/* ── Layer 1.5: Far Midground Buildings (Parallax Scale 1.10) ── */}
       <m.div
-        style={{ scale: midBgScale, y: midBgY, zIndex: 1 }}
+        style={{ scale: midBgScale, y: midBgY, zIndex: 1, willChange: 'transform' }}
         className={styles.layer}
       >
         <m.div
@@ -189,7 +189,7 @@ export default function NoirSkyline() {
       </m.div>
 
       <m.div
-        style={{ scale: midScale, y: midY, zIndex: 2 }}
+        style={{ scale: midScale, y: midY, zIndex: 2, willChange: 'transform' }}
         className={styles.layer}
       >
         <m.div
@@ -201,7 +201,7 @@ export default function NoirSkyline() {
 
       {/* ── Layer 2.5: Bridge Structure (Parallax Scale bridgeScale) ── */}
       <m.div
-        style={{ scale: bridgeScale, y: bridgeY, zIndex: 2 }}
+        style={{ scale: bridgeScale, y: bridgeY, zIndex: 2, willChange: 'transform' }}
         className={styles.layer}
       >
         <m.div
@@ -213,7 +213,7 @@ export default function NoirSkyline() {
 
       {/* ── Layer 3: Foreground Rooftops (Parallax Scale 1.8, Masks midground, high opacity) ── */}
       <m.div
-        style={{ scale: fgScale, y: fgY, zIndex: 3 }}
+        style={{ scale: fgScale, y: fgY, zIndex: 3, willChange: 'transform' }}
         className={styles.layer}
       >
         <m.div
