@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Playfair_Display, Lora, JetBrains_Mono, Nosifer } from "next/font/google";
 import "./globals.css";
 import ClientLayout from "./ClientLayout";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { cookies } from "next/headers";
 import { Theme } from "@/context/ThemeContext";
 
@@ -135,6 +136,7 @@ export default async function RootLayout({
       </head>
       <body>
         <ClientLayout initialTheme={initialTheme}>{children}</ClientLayout>
+        <SpeedInsights />
       </body>
     </html>
   );
