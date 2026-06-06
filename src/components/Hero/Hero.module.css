@@ -305,22 +305,13 @@
 
 .heroImage {
   display: block;
-  width: 100%;
-  aspect-ratio: 1;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-image: url('/images/hero-illustration.webp');
-  transition: background-image 0.3s ease-in-out;
-}
-
-:global([data-theme='noir']) .heroImage {
-  background-image: url('/images/hero-noir.webp');
+  /* sizing and objectFit handled by next/image */
 }
 
 .imageWrapper {
   position: relative;
   width: 100%;
+  aspect-ratio: 1;
   overflow: hidden;
 }
 
