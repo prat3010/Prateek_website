@@ -16,10 +16,10 @@ export const skillCategoryLabels: Record<SkillCategory, string> = {
 };
 
 export const skillCategoryColors: Record<SkillCategory, string> = {
-  frontend: '#FF1744',
-  backend: '#2979FF',
-  tools: '#FF9100',
-  creative: '#FF4081',
+  frontend: 'var(--pop-red)',
+  backend: 'var(--pop-blue)',
+  tools: 'var(--pop-orange)',
+  creative: 'var(--pop-pink)',
 };
 
 export const skills: Skill[] = [

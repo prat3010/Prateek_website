@@ -1,21 +1,18 @@
 import type { Metadata } from "next";
-import { Bangers, Comic_Neue, JetBrains_Mono, Nosifer } from "next/font/google";
+import { Playfair_Display, Lora, JetBrains_Mono, Nosifer } from "next/font/google";
 import "./globals.css";
 import ClientLayout from "./ClientLayout";
 import { cookies } from "next/headers";
 import { Theme } from "@/context/ThemeContext";
 
-const bangers = Bangers({
-  weight: "400",
-  variable: "--font-bangers",
+const playfairDisplay = Playfair_Display({
+  variable: "--font-playfair-display",
   subsets: ["latin"],
   display: "swap",
 });
 
-const comicNeue = Comic_Neue({
-  weight: ["400", "700"],
-  style: ["normal", "italic"],
-  variable: "--font-comic-neue",
+const lora = Lora({
+  variable: "--font-lora",
   subsets: ["latin"],
   display: "swap",
 });
@@ -95,7 +92,7 @@ export default async function RootLayout({
     <html
       lang="en"
       data-theme={initialTheme}
-      className={`${bangers.variable} ${comicNeue.variable} ${jetbrainsMono.variable} ${nosifer.variable}`}
+      className={`${playfairDisplay.variable} ${lora.variable} ${jetbrainsMono.variable} ${nosifer.variable}`}
       suppressHydrationWarning
     >
       <head>

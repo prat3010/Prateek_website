@@ -7,21 +7,21 @@
 
 /* ── CSS Custom Properties (Design Tokens) ─────────────────── */
 :root {
-  /* ─ Color Palette ─ */
-  --pop-red: #FF1744;
-  --pop-blue: #2979FF;
-  --pop-yellow: #FFEA00;
-  --pop-pink: #FF4081;
-  --pop-green: #00E676;
-  --pop-orange: #FF9100;
-  --pop-black: #1A1A2E;
-  --pop-white: #FAFAFA;
-  --pop-cream: #FFF8E1;
+  /* ─ Color Palette (Muted Watercolor Tones) ─ */
+  --pop-red: #D95D67;       /* Soft dusty rose / terracotta */
+  --pop-blue: #5A8EB6;      /* Soft slate / steel blue */
+  --pop-yellow: #F4DC95;    /* Soft ochre / pastel yellow */
+  --pop-pink: #DF8B98;      /* Soft rose / peach pink */
+  --pop-green: #79B48B;     /* Soft sage / mint green */
+  --pop-orange: #E28E66;    /* Soft apricot / amber orange */
+  --pop-black: #2B2B36;     /* Warm graphite charcoal ink */
+  --pop-white: #FAF9F6;     /* Warm off-white / linen */
+  --pop-cream: #F7F2E8;     /* Cold-press watercolor paper */
 
   /* ─ Semantic Colors ─ */
   --color-bg: var(--pop-cream);
   --color-text: var(--pop-black);
-  --color-text-muted: #4a4a5a;
+  --color-text-muted: #5d5d6d;
   --color-border: var(--pop-black);
   --color-link: var(--pop-blue);
   --color-link-hover: var(--pop-red);
@@ -33,29 +33,31 @@
   --surface-secondary: var(--pop-cream);
   --surface-elevated: #FFFFFF;
 
-  /* ─ Shadow Tokens ─ */
-  --shadow-comic: 4px 4px 0px var(--pop-black);
-  --shadow-comic-sm: 2px 2px 0px var(--pop-black);
-  --shadow-comic-lg: 6px 6px 0px var(--pop-black);
-  --shadow-comic-xl: 8px 8px 0px var(--pop-black);
-  --shadow-comic-hover: 6px 6px 0px var(--pop-black);
-  --shadow-comic-active: 2px 2px 0px var(--pop-black);
-  --shadow-comic-color: 4px 4px 0px var(--pop-red);
+  /* ─ Shadow Tokens (Soft Sketch Offsets) ─ */
+  --shadow-comic: 3px 3px 0px rgba(43, 43, 54, 0.18);
+  --shadow-comic-sm: 1.5px 1.5px 0px rgba(43, 43, 54, 0.18);
+  --shadow-comic-lg: 5px 5px 0px rgba(43, 43, 54, 0.12);
+  --shadow-comic-xl: 7px 7px 0px rgba(43, 43, 54, 0.10);
+  --shadow-comic-hover: 5px 5px 0px rgba(43, 43, 54, 0.18);
+  --shadow-comic-active: 1px 1px 0px rgba(43, 43, 54, 0.18);
+  --shadow-comic-color: 3px 3px 0px var(--pop-red);
 
-  /* ─ Border Tokens ─ */
-  --border-thin: 2px solid var(--pop-black);
-  --border-medium: 3px solid var(--pop-black);
-  --border-thick: 5px solid var(--pop-black);
+  /* ─ Border Tokens (Thin Ink Lines) ─ */
+  --border-thin: 1px solid var(--color-border);
+  --border-medium: 1.5px solid var(--color-border);
+  --border-thick: 3px solid var(--color-border);
   --border-radius-sm: 4px;
   --border-radius-md: 8px;
   --border-radius-lg: 12px;
   --border-radius-xl: 16px;
   --border-radius-round: 50%;
 
-  /* ─ Typography ─ */
-  --font-headline: var(--font-bangers), 'Bangers', cursive;
-  --font-body: var(--font-comic-neue), 'Comic Neue', cursive;
+  /* ─ Typography (Ink & Wash Serif Style) ─ */
+  --font-headline: var(--font-playfair-display), 'Playfair Display', serif;
+  --font-body: var(--font-lora), 'Lora', serif;
   --font-code: var(--font-jetbrains-mono), 'JetBrains Mono', monospace;
+  --font-bangers: var(--font-playfair-display);
+  --font-comic-neue: var(--font-lora);
 
   --text-xs: clamp(0.7rem, 0.65rem + 0.25vw, 0.8rem);
   --text-sm: clamp(0.8rem, 0.75rem + 0.25vw, 0.9rem);
@@ -72,8 +74,8 @@
   --leading-snug: 1.25;
   --leading-normal: 1.5;
   --leading-relaxed: 1.7;
-  --letter-spacing-headline: 0.05em;
-  --letter-spacing-action: 0.1em;
+  --letter-spacing-headline: 0.02em;
+  --letter-spacing-action: 0.05em;
 
   /* ─ Spacing Scale ─ */
   --space-xs: 0.25rem;
@@ -103,13 +105,13 @@
   --z-popover: 600;
   --z-toast: 700;
 
-  /* ─ Ben-Day Dot Pattern ─ */
+  /* ─ Ben-Day Dot Pattern (Soft Sketchbook Dots) ─ */
   --dot-pattern: radial-gradient(circle, var(--pop-black) 2.2px, transparent 2.2px);
   --dot-size: 18px;
-  --dot-pattern-light: radial-gradient(circle, rgba(26, 26, 46, 0.18) 1.8px, transparent 1.8px);
-  --dot-pattern-medium: radial-gradient(circle, rgba(26, 26, 46, 0.28) 2.2px, transparent 2.2px);
-  --dot-pattern-heavy: radial-gradient(circle, rgba(26, 26, 46, 0.42) 2.5px, transparent 2.5px);
-  --dot-pattern-color: radial-gradient(circle, rgba(255, 23, 68, 0.28) 2.2px, transparent 2.2px);
+  --dot-pattern-light: radial-gradient(circle, rgba(43, 43, 54, 0.04) 1px, transparent 1px);
+  --dot-pattern-medium: radial-gradient(circle, rgba(43, 43, 54, 0.08) 1.5px, transparent 1.5px);
+  --dot-pattern-heavy: radial-gradient(circle, rgba(43, 43, 54, 0.12) 2px, transparent 2px);
+  --dot-pattern-color: radial-gradient(circle, rgba(217, 93, 103, 0.08) 1.5px, transparent 1.5px);
 
   /* ─ Transition Tokens ─ */
   --transition-fast: 150ms ease;
@@ -126,11 +128,13 @@
   --ease-pop: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* ── Noir Theme Overrides ──────────────────────────────────── */
+/* ── Noir Theme Overrides (Preserves Original Comic-Noir Style) ──────────────────────────────────── */
 [data-theme='noir'] {
   /* ─ Typography Monospace Overrides ─ */
   --font-headline: var(--font-code), 'JetBrains Mono', monospace;
   --font-body: var(--font-code), 'JetBrains Mono', monospace;
+  --font-bangers: var(--font-code);
+  --font-comic-neue: var(--font-code);
 
   /* ─ Color Palette (Whole Monochromatic) ─ */
   --pop-red: #FAFAFA;
@@ -159,6 +163,11 @@
   --surface-primary: var(--pop-white);
   --surface-secondary: #0c0c0e;
   --surface-elevated: #1a1a1f;
+
+  /* ─ Border Overrides (Keep original comic thickness in dark mode) ─ */
+  --border-thin: 2px solid var(--color-border);
+  --border-medium: 3px solid var(--color-border);
+  --border-thick: 5px solid var(--color-border);
 
   /* ─ Shadow Tokens ─ */
   --shadow-comic: 4px 4px 0px var(--pop-black);
@@ -262,8 +271,13 @@ body {
   line-height: var(--leading-normal);
   color: var(--color-text);
   background-color: var(--color-bg);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E");
   min-height: 100dvh;
   overflow-x: hidden;
+}
+
+[data-theme='noir'] body {
+  background-image: none !important;
 }
 
 img,

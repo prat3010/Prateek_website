@@ -12,7 +12,7 @@
 }
 
 .sectionTitle {
-  font-family: 'Bangers', cursive;
+  font-family: var(--font-headline);
   font-size: var(--fs-section-title);
   text-align: center;
   color: var(--pop-black);
