@@ -4,7 +4,7 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import { useTheme } from '@/context/ThemeContext';
 import styles from './CursorTrail.module.css';
 
-const POP_COLORS = ['#FF1744', '#2979FF', '#FFEA00', '#FF4081', '#00E676', '#FF9100'];
+const POP_COLORS = ['#D95D67', '#5A8EB6', '#F4DC95', '#DF8B98', '#79B48B', '#E28E66'];
 const NOIR_COLORS = ['#FAFAFA', '#E0E0E3', '#C0C0C4', '#8A8A93', '#4A4A50', '#27272A'];
 const TRAIL_LENGTH = 18;
 const BASE_DOT_RADIUS = 8;
