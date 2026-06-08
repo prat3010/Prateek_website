@@ -14,8 +14,6 @@ export default function Hero({ taglines }: HeroProps) {
   return (
     <section id="home" className={styles.hero} aria-label="Hero">
       <HeroClient taglines={taglines} />
-      {/* Decorative bottom edge — static, no JS needed */}
-      <div className={styles.bottomEdge} aria-hidden="true" />
     </section>
   );
 }

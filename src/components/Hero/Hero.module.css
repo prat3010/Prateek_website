@@ -316,16 +316,6 @@
 }
 
 
-/* Bottom decorative edge */
-.bottomEdge {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 6px;
-  background: var(--pop-black);
-  z-index: 5;
-}
 
 .ctaContainer {
   display: flex;
