@@ -4,7 +4,6 @@ import React, { useRef, useState, type FormEvent } from 'react';
 import { Code2, Globe, MessageCircle, Mail, Phone } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import SpeechBubble from '@/components/ui/SpeechBubble';
-import ScrollReveal from '@/components/effects/ScrollReveal';
 import ConfettiBurst, { type ConfettiBurstHandle } from '@/components/effects/ConfettiBurst';
 import styles from './Contact.module.css';
 
@@ -83,15 +82,12 @@ export default function Contact() {
       <ConfettiBurst ref={confettiRef} />
 
       <div className={styles.container}>
-        <ScrollReveal>
-          <h2 className={styles.sectionTitle}>
-            SEND A SIGNAL!
-          </h2>
-        </ScrollReveal>
+        <h2 className={styles.sectionTitle}>
+          SEND A SIGNAL!
+        </h2>
 
         <div className={styles.grid}>
-          {/* Form */}
-          <ScrollReveal delay={100} className={styles.formColumn}>
+          <div className={styles.formColumn}>
             <form className={styles.form} onSubmit={handleSubmit}>
               <div className={styles.field}>
                 <label htmlFor="contact-name" className={styles.label}>
@@ -159,10 +155,9 @@ export default function Contact() {
                 </SpeechBubble>
               )}
             </form>
-          </ScrollReveal>
+          </div>
 
-          {/* Social Links */}
-          <ScrollReveal delay={200} className={styles.socialColumn}>
+          <div className={styles.socialColumn}>
             <div className={styles.socialCard}>
               <h3 className={styles.socialTitle}>Find me online</h3>
               <p className={styles.socialDesc}>
@@ -184,7 +179,7 @@ export default function Contact() {
                 ))}
               </div>
             </div>
-          </ScrollReveal>
+          </div>
         </div>
       </div>
     </section>

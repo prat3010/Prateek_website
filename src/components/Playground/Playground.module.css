@@ -1,5 +1,5 @@
 .playground {
-  padding: 6rem 0;
+  padding-block: var(--section-padding);
   background: var(--pop-blue-light, #E8F5E9);
   position: relative;
   overflow: hidden;

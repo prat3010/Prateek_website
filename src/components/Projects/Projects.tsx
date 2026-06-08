@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { ExternalLink, Code2 } from 'lucide-react';
 import { type Project } from '@/data/projects';
 import { useTheme } from '@/context/ThemeContext';
-import ScrollReveal from '@/components/effects/ScrollReveal';
 import styles from './Projects.module.css';
 
 interface ProjectsProps {
@@ -20,16 +19,14 @@ export default function Projects({ projects }: ProjectsProps) {
   return (
     <section id="projects" className={styles.projects} aria-label="Projects">
       <div className={styles.container}>
-        <ScrollReveal>
-          <h2 className={styles.sectionTitle}>
-            EPIC ADVENTURES
-          </h2>
-        </ScrollReveal>
+        <h2 className={styles.sectionTitle}>
+          EPIC ADVENTURES
+        </h2>
 
         <div className={styles.grid}>
           {projects.map((project, index) => (
-            <ScrollReveal key={project.id} delay={100 + index * 80}>
               <button
+                key={project.id}
                 className={`${styles.panel} ${styles[`area${index}`]}`}
                 style={{
                   '--panel-color': project.color,
@@ -68,7 +65,6 @@ export default function Projects({ projects }: ProjectsProps) {
                   </div>
                 </div>
               </button>
-            </ScrollReveal>
           ))}
         </div>
       </div>

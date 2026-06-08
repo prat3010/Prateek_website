@@ -6,7 +6,6 @@ import { useTheme } from '@/context/ThemeContext';
 import ComicPanel from '@/components/ui/ComicPanel';
 import SpeechBubble from '@/components/ui/SpeechBubble';
 import CaptionBox from '@/components/ui/CaptionBox';
-import ScrollReveal from '@/components/effects/ScrollReveal';
 import styles from './About.module.css';
 
 const funFacts = [
@@ -29,15 +28,12 @@ export default function About() {
   return (
     <section id="about" className={styles.about} aria-label="About me">
       <div className={styles.container}>
-        <ScrollReveal>
-          <h2 className={styles.sectionTitle}>
-            ORIGIN STORY
-          </h2>
-        </ScrollReveal>
+        <h2 className={styles.sectionTitle}>
+          ORIGIN STORY
+        </h2>
 
         <div className={styles.grid}>
-          {/* Left: Profile image */}
-          <ScrollReveal delay={100} className={styles.imageColumn}>
+          <div className={styles.imageColumn}>
             <ComicPanel tilt={-2} className={styles.profilePanel}>
               <div className={styles.imageWrapper}>
                 <Image
@@ -50,35 +46,30 @@ export default function About() {
                 />
               </div>
             </ComicPanel>
-          </ScrollReveal>
+          </div>
 
-          {/* Right: Bio + Fun facts */}
           <div className={styles.textColumn}>
-            <ScrollReveal delay={200}>
-              <SpeechBubble direction="left" className={styles.bioBubble}>
-                {isNoir ? (
-                  <p className={styles.bioText}>
-                    They stare at screens, praying to a god of syntax and semicolons. I don&apos;t.
-                    <br /><br />
-                    My name is <strong>Prateeq Sharma</strong>. I&apos;m a developer and designer, bringing ideas out of the dark and into reality at warp speed. While traditional coders get lost in legacy frameworks, I combine solid software engineering with AI orchestration to build fast, polished web applications.
-                    <br /><br />
-                    In this city, the real superpower isn&apos;t memorizing boilerplate code. It&apos;s having the vision to design, the skill to build, and the tools to make it happen before the rain stops.
-                  </p>
-                ) : (
-                  <p className={styles.bioText}>
-                    Hey there! I&apos;m <strong>Prateeq Sharma</strong> — a full-stack developer and designer who crafts high-performance web applications and digital experiences. By blending creative vision, clean frontend engineering, and modern AI orchestration, I turn complex ideas into functional products at warp speed. Whether it&apos;s building interactive apps or designing premium interfaces, I focus on delivering speed, precision, and high-impact results.
-                  </p>
-                )}
-              </SpeechBubble>
-            </ScrollReveal>
+            <SpeechBubble direction="left" className={styles.bioBubble}>
+              {isNoir ? (
+                <p className={styles.bioText}>
+                  They stare at screens, praying to a god of syntax and semicolons. I don&apos;t.
+                  <br /><br />
+                  My name is <strong>Prateeq Sharma</strong>. I&apos;m a developer and designer, bringing ideas out of the dark and into reality at warp speed. While traditional coders get lost in legacy frameworks, I combine solid software engineering with AI orchestration to build fast, polished web applications.
+                  <br /><br />
+                  In this city, the real superpower isn&apos;t memorizing boilerplate code. It&apos;s having the vision to design, the skill to build, and the tools to make it happen before the rain stops.
+                </p>
+              ) : (
+                <p className={styles.bioText}>
+                  Hey there! I&apos;m <strong>Prateeq Sharma</strong> — a full-stack developer and designer who crafts high-performance web applications and digital experiences. By blending creative vision, clean frontend engineering, and modern AI orchestration, I turn complex ideas into functional products at warp speed. Whether it&apos;s building interactive apps or designing premium interfaces, I focus on delivering speed, precision, and high-impact results.
+                </p>
+              )}
+            </SpeechBubble>
 
             <div className={styles.funFacts}>
-              {(isNoir ? funFactsNoir : funFacts).map((fact, index) => (
-                <ScrollReveal key={fact} delay={300 + index * 120}>
-                  <CaptionBox className={styles.factBox}>
-                    {fact}
-                  </CaptionBox>
-                </ScrollReveal>
+              {(isNoir ? funFactsNoir : funFacts).map((fact) => (
+                <CaptionBox key={fact} className={styles.factBox}>
+                  {fact}
+                </CaptionBox>
               ))}
             </div>
           </div>

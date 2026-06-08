@@ -2,7 +2,6 @@
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useTheme } from '@/context/ThemeContext';
-import ScrollReveal from '@/components/effects/ScrollReveal';
 import Pathfinder from './Pathfinder';
 import { GridNode, runDijkstra, runAStar, runBFS, runDFS, runGreedyBestFirst, runBidirectionalBFS, PathfindingStep } from './pathfindingAlgorithms';
 import styles from './Playground.module.css';
@@ -282,15 +281,11 @@ export default function Playground() {
   return (
     <section id="playground" className={styles.playground} aria-label="Playground">
       <div className={styles.container}>
-        <ScrollReveal>
-          <h2 className={styles.sectionTitle}>
-            {isNoir ? 'THE DETECTIVE’S DESK' : 'THE ALGORITHM LAB'}
-          </h2>
-        </ScrollReveal>
+        <h2 className={styles.sectionTitle}>
+          {isNoir ? 'THE DETECTIVE’S DESK' : 'THE ALGORITHM LAB'}
+        </h2>
 
-        {/* M.O. Banner style for visualizer guidelines */}
-        <ScrollReveal delay={80}>
-          <div className={styles.moBanner}>
+        <div className={styles.moBanner}>
             <div className={styles.moBadge}>
               {isNoir ? 'INSTRUCTIONS' : 'INSTRUCTIONS'}
             </div>
@@ -299,11 +294,9 @@ export default function Playground() {
                 ? 'Case files are active. Drag the Detective (🕶️) and the Evidence file (📁) on the grid map. Click and hold to sketch brick wall barricades (obstacles). Select target computation methods below.'
                 : 'Welcome to the lab! Drag our hero (🦸) and the portal (🌀) to set your coordinates. Click and drag on empty cells to paint laser barriers. Hit visualize and watch the search algorithm expand!'}
             </p>
-          </div>
-        </ScrollReveal>
+        </div>
 
-        <ScrollReveal delay={120}>
-          <div className={`${styles.desk} ${isLaunched ? styles.fullscreenMobile : ''}`}>
+        <div className={`${styles.desk} ${isLaunched ? styles.fullscreenMobile : ''}`}>
             
             {/* Header only visible in mobile fullscreen mode */}
             {isLaunched && (
@@ -512,8 +505,7 @@ export default function Playground() {
                 </p>
               ))}
             </div>
-          </div>
-        </ScrollReveal>
+        </div>
       </div>
     </section>
   );

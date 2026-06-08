@@ -2,7 +2,7 @@
 .about {
   position: relative;
   background: var(--pop-white);
-  padding: var(--section-padding);
+  padding-block: var(--section-padding);
 }
 
 .container {

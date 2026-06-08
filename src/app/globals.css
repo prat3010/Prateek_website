@@ -93,6 +93,8 @@
   --max-width-narrow: 960px;
   --max-width-wide: 1440px;
   --gutter: clamp(1rem, 2vw, 2rem);
+  --section-padding: var(--space-4xl);
+  --fs-section-title: clamp(2.5rem, 6vw, 4.5rem);
 
   /* ─ Z-Index Scale ─ */
   --z-base: 0;
@@ -1093,6 +1095,7 @@ table {
 @media (max-width: 480px) {
   :root {
     --dot-size: 14px;
+    --section-padding: var(--space-2xl);
   }
 
   .section-padding {
@@ -1103,6 +1106,7 @@ table {
 @media (min-width: 481px) and (max-width: 768px) {
   :root {
     --dot-size: 16px;
+    --section-padding: var(--space-3xl);
   }
 
   .section-padding {
