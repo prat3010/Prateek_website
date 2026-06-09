@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useState, type FormEvent } from 'react';
+import { useLenis } from 'lenis/react';
 import { Code2, Globe, MessageCircle, Mail, Phone } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import SpeechBubble from '@/components/ui/SpeechBubble';
@@ -38,6 +39,7 @@ export default function Contact() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const { isNoir } = useTheme();
+  const lenis = useLenis();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -65,7 +67,7 @@ export default function Contact() {
         setStatus('success');
         confettiRef.current?.triggerConfetti();
         form.reset();
-        // Reset status after a few seconds
+        lenis?.scrollTo('#contact', { duration: 1.0, offset: -80 });
         setTimeout(() => setStatus('idle'), 5000);
       } else {
         setStatus('error');

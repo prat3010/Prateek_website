@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { m, useTransform, useMotionValue, useSpring } from 'framer-motion';
 import { useTheme } from '@/context/ThemeContext';
 import { useLenisScroll } from '@/context/LenisProvider';
@@ -15,7 +15,7 @@ interface LayerProps {
 export default function NoirSkyline() {
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const { scrollProgress: scrollYProgress } = useLenisScroll();
+  const { scrollProgress: scrollYProgress, velocity: scrollVelocity } = useLenisScroll();
 
   // Background (Layer 1): Scales from 1.0 to 1.09, moves down slightly (Y from 0 to 22px)
   const bgScale = useTransform(scrollYProgress, [0, 1], [1, 1.09]);
@@ -36,6 +36,24 @@ export default function NoirSkyline() {
   // Foreground (Layer 3): Scales from 1.0 to 1.40, moves down slowly (Y from 0 to 75px)
   const fgScale = useTransform(scrollYProgress, [0, 1], [1, 1.40]);
   const fgY = useTransform(scrollYProgress, [0, 1], [0, 75]);
+
+  // Velocity-based bounce snap for layer overshoot
+  const velocityBounce = useMotionValue(0);
+  const smoothBounce = useSpring(velocityBounce, { damping: 10, stiffness: 200 });
+
+  useEffect(() => {
+    const unsub = scrollVelocity.on('change', (v) => {
+      const bounce = Math.min(Math.abs(v) / 800, 1) * 6 * Math.sign(v);
+      velocityBounce.set(bounce);
+    });
+    return unsub;
+  }, [scrollVelocity, velocityBounce]);
+
+  const bgBounce = useTransform(smoothBounce, (v) => v * 1.0);
+  const midBgBounce = useTransform(smoothBounce, (v) => v * 1.5);
+  const midBounce = useTransform(smoothBounce, (v) => v * 2.0);
+  const bridgeBounce = useTransform(smoothBounce, (v) => v * 2.5);
+  const fgBounce = useTransform(smoothBounce, (v) => v * 3.0);
 
   // Motion values for tracking mouse cursor coordinates
   const mouseX = useMotionValue(0);
@@ -168,81 +186,91 @@ export default function NoirSkyline() {
       </div>
 
       {/* ── Layer 1: Background Buildings (Parallax Scale 1.12) ── */}
-      <m.div
-        style={reducedMotion
-          ? { zIndex: 1 }
-          : { scale: bgScale, y: bgY, zIndex: 1, willChange: 'transform' }}
-        className={styles.layer}
-      >
+      <m.div style={reducedMotion ? {} : { y: bgBounce, willChange: 'transform' }}>
         <m.div
           style={reducedMotion
-            ? { width: '100%', height: '100%' }
-            : { x: layer1X, y: layer1Y, width: '100%', height: '100%', willChange: 'transform' }}
+            ? { zIndex: 1 }
+            : { scale: bgScale, y: bgY, zIndex: 1, willChange: 'transform' }}
+          className={styles.layer}
         >
-          <Layer1 reducedMotion={reducedMotion} />
+          <m.div
+            style={reducedMotion
+              ? { width: '100%', height: '100%' }
+              : { x: layer1X, y: layer1Y, width: '100%', height: '100%', willChange: 'transform' }}
+          >
+            <Layer1 reducedMotion={reducedMotion} />
+          </m.div>
         </m.div>
       </m.div>
 
       {/* ── Layer 1.5: Far Midground Buildings (Parallax Scale 1.10) ── */}
-      <m.div
-        style={reducedMotion
-          ? { zIndex: 1 }
-          : { scale: midBgScale, y: midBgY, zIndex: 1, willChange: 'transform' }}
-        className={styles.layer}
-      >
+      <m.div style={reducedMotion ? {} : { y: midBgBounce, willChange: 'transform' }}>
         <m.div
           style={reducedMotion
-            ? { width: '100%', height: '100%' }
-            : { x: layer1_5X, y: layer1_5Y, width: '100%', height: '100%', willChange: 'transform' }}
+            ? { zIndex: 1 }
+            : { scale: midBgScale, y: midBgY, zIndex: 1, willChange: 'transform' }}
+          className={styles.layer}
         >
-          <Layer1_5 reducedMotion={reducedMotion} />
+          <m.div
+            style={reducedMotion
+              ? { width: '100%', height: '100%' }
+              : { x: layer1_5X, y: layer1_5Y, width: '100%', height: '100%', willChange: 'transform' }}
+          >
+            <Layer1_5 reducedMotion={reducedMotion} />
+          </m.div>
         </m.div>
       </m.div>
 
-      <m.div
-        style={reducedMotion
-          ? { zIndex: 2 }
-          : { scale: midScale, y: midY, zIndex: 2, willChange: 'transform' }}
-        className={styles.layer}
-      >
+      <m.div style={reducedMotion ? {} : { y: midBounce, willChange: 'transform' }}>
         <m.div
           style={reducedMotion
-            ? { width: '100%', height: '100%' }
-            : { x: layer2X, y: layer2Y, width: '100%', height: '100%', willChange: 'transform' }}
+            ? { zIndex: 2 }
+            : { scale: midScale, y: midY, zIndex: 2, willChange: 'transform' }}
+          className={styles.layer}
         >
-          <Layer2 reducedMotion={reducedMotion} />
+          <m.div
+            style={reducedMotion
+              ? { width: '100%', height: '100%' }
+              : { x: layer2X, y: layer2Y, width: '100%', height: '100%', willChange: 'transform' }}
+          >
+            <Layer2 reducedMotion={reducedMotion} />
+          </m.div>
         </m.div>
       </m.div>
 
       {/* ── Layer 2.5: Bridge Structure (Parallax Scale bridgeScale) ── */}
-      <m.div
-        style={reducedMotion
-          ? { zIndex: 2 }
-          : { scale: bridgeScale, y: bridgeY, zIndex: 2, willChange: 'transform' }}
-        className={styles.layer}
-      >
+      <m.div style={reducedMotion ? {} : { y: bridgeBounce, willChange: 'transform' }}>
         <m.div
           style={reducedMotion
-            ? { width: '100%', height: '100%' }
-            : { x: bridgeLayerX, y: bridgeLayerY, width: '100%', height: '100%', willChange: 'transform' }}
+            ? { zIndex: 2 }
+            : { scale: bridgeScale, y: bridgeY, zIndex: 2, willChange: 'transform' }}
+          className={styles.layer}
         >
-          <BridgeLayer reducedMotion={reducedMotion} />
+          <m.div
+            style={reducedMotion
+              ? { width: '100%', height: '100%' }
+              : { x: bridgeLayerX, y: bridgeLayerY, width: '100%', height: '100%', willChange: 'transform' }}
+          >
+            <BridgeLayer reducedMotion={reducedMotion} />
+          </m.div>
         </m.div>
       </m.div>
 
       {/* ── Layer 3: Foreground Rooftops (Parallax Scale 1.8, Masks midground, high opacity) ── */}
-      <m.div
-        style={reducedMotion
-          ? { zIndex: 3 }
-          : { scale: fgScale, y: fgY, zIndex: 3, willChange: 'transform' }}
-        className={styles.layer}
-      >
+      <m.div style={reducedMotion ? {} : { y: fgBounce, willChange: 'transform' }}>
         <m.div
           style={reducedMotion
-            ? { width: '100%', height: '100%' }
-            : { x: layer3X, y: layer3Y, width: '100%', height: '100%', willChange: 'transform' }}
+            ? { zIndex: 3 }
+            : { scale: fgScale, y: fgY, zIndex: 3, willChange: 'transform' }}
+          className={styles.layer}
         >
-          <Layer3 reducedMotion={reducedMotion} />
+          <m.div
+            style={reducedMotion
+              ? { width: '100%', height: '100%' }
+              : { x: layer3X, y: layer3Y, width: '100%', height: '100%', willChange: 'transform' }}
+          >
+            <Layer3 reducedMotion={reducedMotion} />
+          </m.div>
         </m.div>
       </m.div>
 

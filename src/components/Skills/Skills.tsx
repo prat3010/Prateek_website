@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { useLenis } from 'lenis/react';
 import { categoryLabels, type SkillCategory, type Skill } from '@/data/skills';
 import { useTheme } from '@/context/ThemeContext';
 import SkillCard from './SkillCard';
@@ -32,6 +33,7 @@ interface SkillsProps {
 export default function Skills({ skills }: SkillsProps) {
   const [activeCategory, setActiveCategory] = useState<'all' | SkillCategory>('all');
   const { isNoir } = useTheme();
+  const lenis = useLenis();
 
   const filteredSkills = useMemo(
     () =>
@@ -67,7 +69,10 @@ export default function Skills({ skills }: SkillsProps) {
               role="tab"
               aria-selected={activeCategory === cat}
               className={`${styles.tab} ${activeCategory === cat ? styles.tabActive : ''}`}
-              onClick={() => setActiveCategory(cat)}
+              onClick={() => {
+                setActiveCategory(cat);
+                lenis?.scrollTo('#skills', { duration: 0.8, offset: -70 });
+              }}
             >
               {tabLabels[cat]}
             </button>

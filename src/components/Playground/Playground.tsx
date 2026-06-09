@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { useLenis } from 'lenis/react';
 import { useTheme } from '@/context/ThemeContext';
 import Pathfinder from './Pathfinder';
 import { GridNode, runDijkstra, runAStar, runBFS, runDFS, runGreedyBestFirst, runBidirectionalBFS, PathfindingStep } from './pathfindingAlgorithms';
@@ -17,6 +18,7 @@ interface LogEntry {
 
 export default function Playground() {
   const { isNoir } = useTheme();
+  const lenis = useLenis();
 
   // Grid coordinates state
   const [startNode, setStartNode] = useState<GridNode>({ col: 3, row: 7 });
@@ -60,18 +62,15 @@ export default function Playground() {
     if (isLaunched) {
       const isMobile = window.innerWidth <= 992;
       if (isMobile) {
-        document.body.classList.add('no-scroll');
-        document.documentElement.classList.add('no-scroll');
+        lenis?.stop();
       }
     } else {
-      document.body.classList.remove('no-scroll');
-      document.documentElement.classList.remove('no-scroll');
+      lenis?.start();
     }
     return () => {
-      document.body.classList.remove('no-scroll');
-      document.documentElement.classList.remove('no-scroll');
+      lenis?.start();
     };
-  }, [isLaunched]);
+  }, [isLaunched, lenis]);
 
   // Launch boot sequence orchestrator
   const handleLaunch = () => {

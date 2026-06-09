@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useLenis } from 'lenis/react';
 import Image from 'next/image';
 import { ExternalLink, Code2 } from 'lucide-react';
 import { type Project } from '@/data/projects';
@@ -15,6 +16,15 @@ export default function Projects({ projects }: ProjectsProps) {
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const selected = projects.find((p) => p.id === selectedProject);
   const { isNoir } = useTheme();
+  const lenis = useLenis();
+
+  useEffect(() => {
+    if (selectedProject) {
+      lenis?.stop();
+    } else {
+      lenis?.start();
+    }
+  }, [selectedProject, lenis]);
 
   return (
     <section id="projects" className={styles.projects} aria-label="Projects">

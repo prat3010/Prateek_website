@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useEffect } from 'react';
-import { m, useMotionValue, useSpring, useTransform, useReducedMotion } from 'framer-motion';
+import { m, useMotionValue, useSpring, useReducedMotion } from 'framer-motion';
 import { useLenisScroll } from '@/context/LenisProvider';
 
 interface Props {
@@ -20,23 +20,28 @@ export default function ScrollSection({ children, direction, verticalOffset, ver
   const prefersReducedMotion = useReducedMotion();
   const maxPRef = useRef(1);
 
-  const x = useTransform(smoothProgress, (p) => {
-    const vw = typeof window !== 'undefined' ? window.innerWidth : 0;
-    const start = direction === 'right' ? vw : -vw;
-    if (centerOnly) {
-      return start * (1 - Math.min(p / (maxPRef.current || 1), 1));
-    }
-    const end = direction === 'right' ? -vw : vw;
-    return start + (end - start) * p;
-  });
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
 
-  const y = useTransform(smoothProgress, (p) => {
-    if (!verticalOffset) return 0;
-    if (p <= verticalDelay) return 0;
-    const t = Math.min((p - verticalDelay) / (0.5 - verticalDelay), 1);
-    const eased = 1 - Math.pow(1 - t, 2);
-    return -verticalOffset * (1 - eased);
-  });
+  useEffect(() => {
+    const unsub = smoothProgress.on('change', (p) => {
+      const vw = window.innerWidth;
+      const start = direction === 'right' ? vw : -vw;
+      if (centerOnly) {
+        x.set(start * (1 - Math.min(p / (maxPRef.current || 1), 1)));
+      } else {
+        const end = direction === 'right' ? -vw : vw;
+        x.set(start + (end - start) * p);
+      }
+      if (verticalOffset) {
+        if (p <= verticalDelay) { y.set(0); return; }
+        const t = Math.min((p - verticalDelay) / (0.5 - verticalDelay), 1);
+        const eased = 1 - Math.pow(1 - t, 2);
+        y.set(-verticalOffset * (1 - eased));
+      }
+    });
+    return unsub;
+  }, [smoothProgress, direction, verticalOffset, verticalDelay, centerOnly]);
 
   useEffect(() => {
     const el = wrapperRef.current;

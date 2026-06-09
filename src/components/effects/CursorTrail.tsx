@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { useTheme } from '@/context/ThemeContext';
+import { useLenisScroll } from '@/context/LenisProvider';
 import styles from './CursorTrail.module.css';
 
 const POP_COLORS = ['#D95D67', '#5A8EB6', '#F4DC95', '#DF8B98', '#79B48B', '#E28E66'];
@@ -119,6 +120,15 @@ export default function CursorTrail() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const trailRef = useRef<TrailDot[]>([]);
   const smokeRef = useRef<SmokeParticle[]>([]);
+  const { velocity: scrollVelocity } = useLenisScroll();
+  const velocityRef = useRef(0);
+  useEffect(() => {
+    const unsub = scrollVelocity.on('change', (v) => {
+      velocityRef.current = v;
+    });
+    return unsub;
+  }, [scrollVelocity]);
+
   const cigStateRef = useRef({
     x: -100,
     y: -100,
@@ -226,6 +236,7 @@ export default function CursorTrail() {
         // Physics update
         p.x += p.vx;
         p.y += p.vy;
+        p.vy += velocityRef.current * 0.003;
         
         // Add smooth wave sway as it rises
         p.vx += Math.sin(p.lifetime * 0.07) * 0.015;
@@ -302,11 +313,12 @@ export default function CursorTrail() {
       }
 
       // Draw each dot
+      const scrollPulse = Math.min(Math.abs(velocityRef.current) / 500, 1) * 3;
       for (let i = trail.length - 1; i >= 0; i--) {
         const dot = trail[i];
 
         const progress = dot.age / TRAIL_LENGTH; // 0 = newest, 1 = oldest
-        const radius = BASE_DOT_RADIUS * (1 - progress * 0.7);
+        const radius = (BASE_DOT_RADIUS + scrollPulse) * (1 - progress * 0.7);
         const opacity = 1 - progress * 0.85;
 
         if (opacity <= 0 || radius <= 0) continue;
