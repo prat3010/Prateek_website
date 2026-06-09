@@ -17,25 +17,25 @@ export default function NoirSkyline() {
   const [mounted, setMounted] = useState(false);
   const { scrollProgress: scrollYProgress } = useLenisScroll();
 
-  // Background (Layer 1): Scales from 1.0 to 1.06, moves down slightly (Y from 0 to 15px)
-  const bgScale = useTransform(scrollYProgress, [0, 1], [1, 1.06]);
-  const bgY = useTransform(scrollYProgress, [0, 1], [0, 15]);
+  // Background (Layer 1): Scales from 1.0 to 1.09, moves down slightly (Y from 0 to 22px)
+  const bgScale = useTransform(scrollYProgress, [0, 1], [1, 1.09]);
+  const bgY = useTransform(scrollYProgress, [0, 1], [0, 22]);
 
-  // Far Midground (Layer 1.5): Scales from 1.0 to 1.10, moves down (Y from 0 to 25px)
-  const midBgScale = useTransform(scrollYProgress, [0, 1], [1, 1.10]);
-  const midBgY = useTransform(scrollYProgress, [0, 1], [0, 25]);
+  // Far Midground (Layer 1.5): Scales from 1.0 to 1.16, moves down (Y from 0 to 38px)
+  const midBgScale = useTransform(scrollYProgress, [0, 1], [1, 1.16]);
+  const midBgY = useTransform(scrollYProgress, [0, 1], [0, 38]);
 
-  // Midground (Layer 2): Scales from 1.0 to 1.15, moves down (Y from 0 to 35px)
-  const midScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
-  const midY = useTransform(scrollYProgress, [0, 1], [0, 35]);
+  // Midground (Layer 2): Scales from 1.0 to 1.24, moves down (Y from 0 to 52px)
+  const midScale = useTransform(scrollYProgress, [0, 1], [1, 1.24]);
+  const midY = useTransform(scrollYProgress, [0, 1], [0, 52]);
 
-  // Bridge (Layer 2.5): Scales from 1.0 to 1.20, moves down (Y from 0 to 42px)
-  const bridgeScale = useTransform(scrollYProgress, [0, 1], [1, 1.20]);
-  const bridgeY = useTransform(scrollYProgress, [0, 1], [0, 42]);
+  // Bridge (Layer 2.5): Scales from 1.0 to 1.32, moves down (Y from 0 to 62px)
+  const bridgeScale = useTransform(scrollYProgress, [0, 1], [1, 1.32]);
+  const bridgeY = useTransform(scrollYProgress, [0, 1], [0, 62]);
 
-  // Foreground (Layer 3): Scales from 1.0 to 1.25, moves down slowly (Y from 0 to 50px)
-  const fgScale = useTransform(scrollYProgress, [0, 1], [1, 1.25]);
-  const fgY = useTransform(scrollYProgress, [0, 1], [0, 50]);
+  // Foreground (Layer 3): Scales from 1.0 to 1.40, moves down slowly (Y from 0 to 75px)
+  const fgScale = useTransform(scrollYProgress, [0, 1], [1, 1.40]);
+  const fgY = useTransform(scrollYProgress, [0, 1], [0, 75]);
 
   // Motion values for tracking mouse cursor coordinates
   const mouseX = useMotionValue(0);

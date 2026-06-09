@@ -21,11 +21,12 @@ export default function ScrollSection({ children, direction, verticalOffset, ver
   const maxPRef = useRef(1);
 
   const x = useTransform(smoothProgress, (p) => {
-    const start = direction === 'right' ? window.innerWidth : -window.innerWidth;
+    const vw = typeof window !== 'undefined' ? window.innerWidth : 0;
+    const start = direction === 'right' ? vw : -vw;
     if (centerOnly) {
       return start * (1 - Math.min(p / (maxPRef.current || 1), 1));
     }
-    const end = direction === 'right' ? -window.innerWidth : window.innerWidth;
+    const end = direction === 'right' ? -vw : vw;
     return start + (end - start) * p;
   });
 
