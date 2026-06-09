@@ -4,6 +4,7 @@ import React, { useRef, useState, type FormEvent } from 'react';
 import { useLenis } from 'lenis/react';
 import { Code2, Globe, MessageCircle, Mail, Phone } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
+import { NAVBAR_SCROLL_OFFSET } from '@/lib/constants';
 import SpeechBubble from '@/components/ui/SpeechBubble';
 import ConfettiBurst, { type ConfettiBurstHandle } from '@/components/effects/ConfettiBurst';
 import styles from './Contact.module.css';
@@ -67,7 +68,7 @@ export default function Contact() {
         setStatus('success');
         confettiRef.current?.triggerConfetti();
         form.reset();
-        lenis?.scrollTo('#contact', { duration: 1.0, offset: -80 });
+        lenis?.scrollTo('#contact', { duration: 1.0, offset: NAVBAR_SCROLL_OFFSET });
         setTimeout(() => setStatus('idle'), 5000);
       } else {
         setStatus('error');

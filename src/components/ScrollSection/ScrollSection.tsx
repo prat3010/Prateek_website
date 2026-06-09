@@ -8,11 +8,11 @@ interface Props {
   children: React.ReactNode;
   direction: 'left' | 'right';
   verticalOffset?: number;
-  verticalDelay?: number;
   centerOnly?: boolean;
+  gap?: number;
 }
 
-export default function ScrollSection({ children, direction, verticalOffset, verticalDelay = 0, centerOnly }: Props) {
+export default function ScrollSection({ children, direction, verticalOffset, centerOnly, gap = 0 }: Props) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useLenisScroll();
   const rawProgress = useMotionValue(0);
@@ -27,21 +27,40 @@ export default function ScrollSection({ children, direction, verticalOffset, ver
     const unsub = smoothProgress.on('change', (p) => {
       const vw = window.innerWidth;
       const start = direction === 'right' ? vw : -vw;
+
       if (centerOnly) {
         x.set(start * (1 - Math.min(p / (maxPRef.current || 1), 1)));
-      } else {
-        const end = direction === 'right' ? -vw : vw;
-        x.set(start + (end - start) * p);
+        y.set(0);
+        return;
       }
+
+      const end = direction === 'right' ? -vw : vw;
+
       if (verticalOffset) {
-        if (p <= verticalDelay) { y.set(0); return; }
-        const t = Math.min((p - verticalDelay) / (0.5 - verticalDelay), 1);
-        const eased = 1 - Math.pow(1 - t, 2);
-        y.set(-verticalOffset * (1 - eased));
+        const entryEnd = 0.3;
+        const verticalEnd = 0.6;
+
+        if (p < entryEnd) {
+          const t = p / entryEnd;
+          x.set(start + (0 - start) * t);
+          y.set(0);
+        } else if (p < verticalEnd) {
+          const t = (p - entryEnd) / (verticalEnd - entryEnd);
+          const eased = 1 - Math.pow(1 - t, 2);
+          x.set(0);
+          y.set(-verticalOffset * eased);
+        } else {
+          const t = (p - verticalEnd) / (1 - verticalEnd);
+          x.set(0 + (end - 0) * t);
+          y.set(-verticalOffset);
+        }
+      } else {
+        x.set(start + (end - start) * p);
+        y.set(0);
       }
     });
     return unsub;
-  }, [smoothProgress, direction, verticalOffset, verticalDelay, centerOnly]);
+  }, [smoothProgress, direction, verticalOffset, centerOnly]);
 
   useEffect(() => {
     const el = wrapperRef.current;
@@ -74,14 +93,19 @@ export default function ScrollSection({ children, direction, verticalOffset, ver
 
     const unsub = scrollY.on('change', update);
 
+    let resizeTimer: ReturnType<typeof setTimeout>;
     const onResize = () => {
-      measure();
-      update(scrollY.get());
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        measure();
+        update(scrollY.get());
+      }, 100);
     };
     window.addEventListener('resize', onResize);
 
     return () => {
       unsub();
+      clearTimeout(resizeTimer);
       window.removeEventListener('resize', onResize);
     };
   }, [scrollY, rawProgress]);
@@ -91,7 +115,7 @@ export default function ScrollSection({ children, direction, verticalOffset, ver
   }
 
   return (
-    <div ref={wrapperRef}>
+    <div ref={wrapperRef} style={gap ? { marginBottom: gap } : undefined}>
       <m.div style={{ x, y, willChange: 'transform' }}>
         {children}
       </m.div>

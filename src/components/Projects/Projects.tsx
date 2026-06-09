@@ -24,6 +24,7 @@ export default function Projects({ projects }: ProjectsProps) {
     } else {
       lenis?.start();
     }
+    return () => lenis?.start();
   }, [selectedProject, lenis]);
 
   return (

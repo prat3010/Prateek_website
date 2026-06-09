@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useLenis } from 'lenis/react';
 import { useTypewriter } from '@/hooks/useTypewriter';
+import { NAVBAR_SCROLL_OFFSET } from '@/lib/constants';
 import { useTheme } from '@/context/ThemeContext';
 import ComicPanel from '@/components/ui/ComicPanel';
 import styles from './Hero.module.css';
@@ -36,7 +37,7 @@ export default function HeroClient({ taglines }: HeroClientProps) {
   const handleScrollToProjects = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     if (lenis) {
-      lenis.scrollTo('#projects', { duration: 1.5 });
+      lenis.scrollTo('#projects', { duration: 1.5, offset: NAVBAR_SCROLL_OFFSET });
     }
   };
 

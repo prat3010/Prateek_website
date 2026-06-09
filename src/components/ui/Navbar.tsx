@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useLenis } from 'lenis/react';
 import { useTheme } from '@/context/ThemeContext';
 import { useLenisScroll } from '@/context/LenisProvider';
+import { NAVBAR_SCROLL_OFFSET } from '@/lib/constants';
 import styles from './Navbar.module.css';
 
 export interface NavItem {
@@ -85,7 +86,7 @@ export default function Navbar({ items, className }: NavbarProps) {
     (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
       e.preventDefault();
       if (lenis) {
-        lenis.scrollTo(href, { duration: 1.5, offset: 0 });
+        lenis.scrollTo(href, { duration: 1.5, offset: NAVBAR_SCROLL_OFFSET });
       }
       setActiveSection(href);
       setMobileOpen(false);
