@@ -8,7 +8,6 @@ interface LenisContextValue {
   scrollY: MotionValue<number>;
   scrollProgress: MotionValue<number>;
   velocity: MotionValue<number>;
-  direction: MotionValue<number>;
 }
 
 const LenisContext = createContext<LenisContextValue | null>(null);
@@ -18,7 +17,6 @@ function LenisSync({ children }: { children: ReactNode }) {
   const scrollY = useMotionValue(0);
   const scrollProgress = useMotionValue(0);
   const velocity = useMotionValue(0);
-  const direction = useMotionValue(0);
 
   useEffect(() => {
     if (!lenis) return;
@@ -26,13 +24,12 @@ function LenisSync({ children }: { children: ReactNode }) {
       scrollY.set(lenis.scroll);
       scrollProgress.set(lenis.progress);
       velocity.set(lenis.velocity);
-      direction.set(lenis.direction);
     });
     return unsub;
-  }, [lenis, scrollY, scrollProgress, velocity, direction]);
+  }, [lenis, scrollY, scrollProgress, velocity]);
 
   return (
-    <LenisContext.Provider value={{ scrollY, scrollProgress, velocity, direction }}>
+    <LenisContext.Provider value={{ scrollY, scrollProgress, velocity }}>
       {children}
     </LenisContext.Provider>
   );

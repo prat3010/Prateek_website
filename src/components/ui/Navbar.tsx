@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, type MouseEvent } from 'react';
 import { useLenis } from 'lenis/react';
 import { useTheme } from '@/context/ThemeContext';
 import { useLenisScroll } from '@/context/LenisProvider';
@@ -83,7 +83,7 @@ export default function Navbar({ items, className }: NavbarProps) {
 
   /* ---------- Smooth scroll handler ---------- */
   const handleNavClick = useCallback(
-    (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    (e: MouseEvent<HTMLAnchorElement>, href: string) => {
       e.preventDefault();
       if (lenis) {
         lenis.scrollTo(href, { duration: 1.5, offset: NAVBAR_SCROLL_OFFSET });

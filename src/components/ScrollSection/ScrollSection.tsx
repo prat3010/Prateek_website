@@ -50,8 +50,7 @@ export default function ScrollSection({ children, direction, verticalOffset, cen
           x.set(0);
           y.set(-verticalOffset * eased);
         } else {
-          const t = (p - verticalEnd) / (1 - verticalEnd);
-          x.set(0 + (end - 0) * t);
+          x.set(end * (p - verticalEnd) / (1 - verticalEnd));
           y.set(-verticalOffset);
         }
       } else {
@@ -111,7 +110,7 @@ export default function ScrollSection({ children, direction, verticalOffset, cen
   }, [scrollY, rawProgress]);
 
   if (prefersReducedMotion) {
-    return <section>{children}</section>;
+    return <div ref={wrapperRef} style={gap ? { marginBottom: gap } : undefined}>{children}</div>;
   }
 
   return (

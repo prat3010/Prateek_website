@@ -139,7 +139,6 @@ export default function CursorTrail() {
   const lastMouseMoveTimeRef = useRef<number>(Date.now());
   const frameRef = useRef<number>(0);
   const colorIndexRef = useRef(0);
-  const isTouchDevice = useRef(false);
   const isLoopActiveRef = useRef(false);
 
   const colors = isNoir ? NOIR_COLORS : POP_COLORS;
@@ -431,7 +430,6 @@ export default function CursorTrail() {
 
     // Don't enable on touch/coarse-pointer devices
     if (window.matchMedia('(pointer: coarse)').matches) {
-      isTouchDevice.current = true;
       setIsTouch(true);
       return;
     }
