@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useLenis } from 'lenis/react';
 import { useTheme } from '@/context/ThemeContext';
+import { useLenisScroll } from '@/context/LenisProvider';
 import styles from './Navbar.module.css';
 
 export interface NavItem {
@@ -31,23 +33,22 @@ export default function Navbar({ items, className }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>(navItems[0]?.href ?? '');
   const { isNoir, toggleTheme } = useTheme();
+  const { scrollY } = useLenisScroll();
+  const lenis = useLenis();
 
   /* ---------- Scroll tracking for background color ---------- */
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    const unsub = scrollY.on('change', (latest) => {
+      setScrolled(latest > 20);
+    });
+    return unsub;
+  }, [scrollY]);
 
   /* ---------- Intersection Observer for Section Tracking ---------- */
   useEffect(() => {
     const observerOptions = {
       root: null,
-      rootMargin: '-30% 0px -30% 0px', // Focus on middle portion of screen
+      rootMargin: '-30% 0px -30% 0px',
       threshold: 0.15,
     };
 
@@ -71,29 +72,25 @@ export default function Navbar({ items, className }: NavbarProps) {
 
   /* ---------- Lock body scroll when mobile menu open ---------- */
   useEffect(() => {
+    if (!lenis) return;
     if (mobileOpen) {
-      document.body.style.overflow = 'hidden';
+      lenis.stop();
     } else {
-      document.body.style.overflow = '';
+      lenis.start();
     }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [mobileOpen]);
+  }, [mobileOpen, lenis]);
 
   /* ---------- Smooth scroll handler ---------- */
   const handleNavClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
       e.preventDefault();
-      const id = href.replace('#', '');
-      const el = document.getElementById(id);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (lenis) {
+        lenis.scrollTo(href, { duration: 1.5, offset: 0 });
       }
       setActiveSection(href);
       setMobileOpen(false);
     },
-    [],
+    [lenis],
   );
 
   return (

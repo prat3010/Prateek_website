@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
-import { m, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
+import { m, useTransform, useMotionValue, useSpring } from 'framer-motion';
 import { useTheme } from '@/context/ThemeContext';
+import { useLenisScroll } from '@/context/LenisProvider';
 import styles from './NoirSkyline.module.css';
 import { WobblyPath, WobblyLine, WobblyRect, WobblyPolygon } from './WobblySVG';
 
@@ -14,10 +15,7 @@ interface LayerProps {
 export default function NoirSkyline() {
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
-
-
-  // Track scroll position of the page
-  const { scrollYProgress } = useScroll();
+  const { scrollProgress: scrollYProgress } = useLenisScroll();
 
   // Background (Layer 1): Scales from 1.0 to 1.06, moves down slightly (Y from 0 to 15px)
   const bgScale = useTransform(scrollYProgress, [0, 1], [1, 1.06]);

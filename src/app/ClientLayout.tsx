@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import Navbar from '@/components/ui/Navbar';
 import Footer from '@/components/ui/Footer';
 import { ThemeProvider, Theme } from '@/context/ThemeContext';
+import { LenisProvider } from '@/context/LenisProvider';
 import ThemeTransition from '@/components/effects/ThemeTransition';
 import { LazyMotion, domAnimation } from 'framer-motion';
 
@@ -24,13 +25,15 @@ export default function ClientLayout({ children, initialTheme }: { children: Rea
   return (
     <ThemeProvider initialTheme={initialTheme}>
       <LazyMotion features={domAnimation}>
-        <ThemeTransition />
-        {!isAdminRoute && <NoirSkyline />}
-        {!isAdminRoute && <CursorTrail />}
-        {!isAdminRoute && <Navbar />}
-        <main>{children}</main>
-        {!isAdminRoute && <Footer />}
-        {!isAdminRoute && <ZenToggle />}
+        <LenisProvider>
+          <ThemeTransition />
+          {!isAdminRoute && <NoirSkyline />}
+          {!isAdminRoute && <CursorTrail />}
+          {!isAdminRoute && <Navbar />}
+          <main>{children}</main>
+          {!isAdminRoute && <Footer />}
+          {!isAdminRoute && <ZenToggle />}
+        </LenisProvider>
       </LazyMotion>
     </ThemeProvider>
   );

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useLenis } from 'lenis/react';
 import { useTypewriter } from '@/hooks/useTypewriter';
 import { useTheme } from '@/context/ThemeContext';
 import ComicPanel from '@/components/ui/ComicPanel';
@@ -18,6 +19,7 @@ interface HeroClientProps {
 export default function HeroClient({ taglines }: HeroClientProps) {
   const { isNoir } = useTheme();
   const [tagline, setTagline] = useState(isNoir ? taglines.noir[0] : taglines.standard[0]);
+  const lenis = useLenis();
 
   useEffect(() => {
     const list = isNoir ? taglines.noir : taglines.standard;
@@ -33,9 +35,8 @@ export default function HeroClient({ taglines }: HeroClientProps) {
 
   const handleScrollToProjects = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    const el = document.getElementById('projects');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+    if (lenis) {
+      lenis.scrollTo('#projects', { duration: 1.5 });
     }
   };
 
