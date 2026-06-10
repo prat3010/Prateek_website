@@ -104,7 +104,7 @@ function HeroClientContent({ taglines, isNoir }: HeroClientProps & { isNoir: boo
         <ComicPanel tilt={2} className={styles.heroPanel}>
           <div className={styles.imageWrapper}>
             <Image
-              src={isNoir ? '/images/hero-noir.webp' : '/images/hero-illustration.webp'}
+              src={isNoir ? '/images/hero-noir.webp' : '/images/hero-illustration-wavy.png'}
               alt="Prateeq Sharma hero illustration"
               fill
               priority
