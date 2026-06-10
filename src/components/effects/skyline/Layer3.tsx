@@ -168,6 +168,8 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
                 
                 {/* Conical Roof */}
                 <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="378,748 396,726 414,748" className={styles.bldFgLeftWaterTankRoof} />
+                {/* warning beacon at left tank roof peak */}
+                <circle cx="396" cy="726" r="2.2" className={styles.waterTankBeacon} />
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="396" y1="726" x2="378" y2="748" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="396" y1="726" x2="384" y2="748" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="396" y1="726" x2="390" y2="748" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
@@ -242,6 +244,11 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
                 
                 {/* Brick Mortar Details inside Shed (Removed) */}
 
+                {/* Neon EXIT Sign above the door */}
+                <g className={styles.exitNeonSign}>
+                  <rect x="306" y="756" width="20" height="9" rx="1" fill="#000" stroke="#39ff14" strokeWidth="0.8" />
+                  <text x="316" y="763" textAnchor="middle" fontFamily="var(--font-code)" fontWeight="bold" fontSize="4.8" fill="#39ff14" stroke="none">EXIT</text>
+                </g>
                 {/* Wooden Access Door */}
                 <WobblyRect wobble={wobble} wobbleStrength={strength} x="304" y="771" width="24" height="49" fill="var(--skyline-shed-door)" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
                 {/* Inset Panels */}
@@ -724,7 +731,8 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
 
               <WobblyRect wobble={wobble} wobbleStrength={strength} x="360" y="760" width="22" height="60" className={styles.bldFgChimney} />
               <WobblyRect wobble={wobble} wobbleStrength={strength} x="354" y="754" width="34" height="6" className={styles.bldFgChimney} />
-              {/* Exhaust Fan Housing */}
+              {/* Exhaust Fan Housing & backplate */}
+              <ellipse cx="371" cy="750" rx="8.5" ry="3.5" fill="none" className={styles.exhaustGlowBackplate} />
               <ellipse cx="371" cy="750" rx="9" ry="4" fill="var(--skyline-fill-bg)" stroke="var(--skyline-stroke-mid)" strokeWidth="1" />
 
               {/* Gothic Corbel/Pedestal for Gargoyle at the corner of the right building */}
@@ -1101,7 +1109,8 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
               {/* Industrial Blower Unit (Static parts) */}
               <g className={styles.bldFgBlower} stroke="var(--skyline-stroke-fg)" strokeWidth="1.2">
                 <WobblyRect wobble={wobble} wobbleStrength={strength} x="1587" y="725" width="22" height="35" rx="1" />
-                {/* Fan casing circle */}
+                {/* Fan casing circle & backplate */}
+                <circle cx="1598" cy="742" r="7.5" fill="none" className={styles.fanGlowBackplate} />
                 <circle cx="1598" cy="742" r="8" />
 
                 {/* Exhaust Pipe Stack */}
@@ -1167,6 +1176,8 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
                 
                 {/* Conical Roof */}
                 <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="1442,670 1465,642 1488,670" className={styles.bldFgRightWaterTankRoof} />
+                {/* warning beacon at right tank roof peak */}
+                <circle cx="1465" cy="642" r="2.2" className={styles.waterTankBeacon} />
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1465" y1="642" x2="1442" y2="670" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1465" y1="642" x2="1449" y2="670" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1465" y1="642" x2="1457" y2="670" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />

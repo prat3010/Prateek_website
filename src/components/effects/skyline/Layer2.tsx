@@ -107,6 +107,8 @@ const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
 
           {/* Citigroup-style Slanted Roof (Center-Right) */}
           <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 680 1080 L 680 690 L 760 610 L 790 610 L 790 1080 Z" className={styles.bldMidCitigroup} />
+          {/* Glowing neon trace line along Citigroup roof slope */}
+          <line x1="680" y1="690" x2="760" y2="610" stroke="none" className={styles.citigroupNeonRoofTrace} />
           {/* Parallel slanted cornice & center rib for Citigroup */}
           <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
             <WobblyLine wobble={wobble} wobbleStrength={strength} x1="680" y1="700" x2="750" y2="630" />

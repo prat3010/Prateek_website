@@ -299,6 +299,8 @@ const Layer1 = React.memo(function Layer1({ reducedMotion }: LayerProps) {
           <WobblyLine wobble={wobble} wobbleStrength={strength} x1="640" y1="520" x2="660" y2="520" />
           <WobblyLine wobble={wobble} wobbleStrength={strength} x1="640" y1="523" x2="660" y2="523" />
           <WobblyLine wobble={wobble} wobbleStrength={strength} x1="650" y1="400" x2="650" y2="520" />
+          {/* Glowing neon spire line in Noir mode */}
+          <line x1="650" y1="400" x2="650" y2="520" stroke="none" className={styles.neonSpireTrace} />
           <WobblyLine wobble={wobble} wobbleStrength={strength} x1="645" y1="640" x2="645" y2="1080" strokeDasharray="2 8" />
           <WobblyLine wobble={wobble} wobbleStrength={strength} x1="655" y1="640" x2="655" y2="1080" strokeDasharray="2 8" />
 
@@ -312,6 +314,8 @@ const Layer1 = React.memo(function Layer1({ reducedMotion }: LayerProps) {
           {/* Twin tower connecting skybridge */}
           <WobblyLine wobble={wobble} wobbleStrength={strength} x1="780" y1="680" x2="800" y2="680" fill="none" />
           <WobblyLine wobble={wobble} wobbleStrength={strength} x1="780" y1="685" x2="800" y2="685" fill="none" />
+          {/* Glowing neon skybridge line in Noir mode */}
+          <line x1="781" y1="682" x2="799" y2="682" stroke="none" className={styles.skybridgeNeonTrace} />
           {/* Internal columns */}
           <WobblyLine wobble={wobble} wobbleStrength={strength} x1="755" y1="590" x2="755" y2="1080" strokeDasharray="2 7" fill="none" />
           <WobblyLine wobble={wobble} wobbleStrength={strength} x1="765" y1="590" x2="765" y2="1080" strokeDasharray="2 7" fill="none" />

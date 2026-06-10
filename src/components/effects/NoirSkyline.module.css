@@ -886,7 +886,7 @@
   
   --skyline-shed-door: var(--color-bg);
   --skyline-bulb-glow: #fafafa;
-  --skyline-light-ray: rgba(250, 250, 250, 0.05);
+  --skyline-light-ray: rgba(255, 230, 0, 0.12);
   
   --skyline-billboard-bg: var(--color-bg);
   --skyline-billboard-text: rgba(250, 250, 250, 0.85);
@@ -915,8 +915,8 @@
   --skyline-pigeon-fill: var(--color-bg);
   --skyline-cloud-fill: rgba(250, 250, 250, 0.05);
   
-  --skyline-traffic-headlight-trail: rgba(250, 250, 250, 0.25);
-  --skyline-traffic-taillight-trail: rgba(250, 250, 250, 0.2);
+  --skyline-traffic-headlight-trail: rgba(0, 240, 255, 0.45);
+  --skyline-traffic-taillight-trail: rgba(255, 42, 85, 0.45);
   
   --skyline-clock-face: #fff3a8;
   --skyline-clock-border: var(--skyline-stroke-mid);
@@ -1472,6 +1472,129 @@
   animation: neonSignFlicker 12s infinite 3s;
 }
 
+/* ---- Neon Skyline Objects overrides ---- */
+/* Water tank flashing warning beacons */
+.waterTankBeacon {
+  fill: #ff3b30;
+  transition: opacity var(--transition-slow);
+  animation: blinkRed1 1.5s step-start infinite;
+}
+
+.darkNoir .waterTankBeacon {
+  fill: var(--neon-pink) !important;
+  filter: drop-shadow(0 0 5px var(--neon-pink)) drop-shadow(0 0 2px var(--neon-pink)) !important;
+  animation: blinkRed1 1.5s step-start infinite !important;
+}
+
+.lightPopart .waterTankBeacon {
+  fill: var(--pop-red) !important;
+  filter: none !important;
+}
+
+/* Penthouse access door Exit sign */
+.exitNeonSign rect {
+  stroke: #555562;
+  transition: stroke 0.3s ease;
+}
+
+.exitNeonSign text {
+  fill: #8a8a93;
+  transition: fill 0.3s ease;
+}
+
+.darkNoir .exitNeonSign rect {
+  stroke: var(--neon-green) !important;
+  filter: drop-shadow(0 0 3px rgba(57, 255, 20, 0.7)) !important;
+  animation: neonSignFlicker 11s infinite 1.0s;
+}
+
+.darkNoir .exitNeonSign text {
+  fill: var(--neon-green) !important;
+  filter: drop-shadow(0 0 3px rgba(57, 255, 20, 0.7)) !important;
+  animation: neonSignFlicker 11s infinite 1.0s;
+}
+
+.lightPopart .exitNeonSign rect {
+  stroke: var(--pop-black) !important;
+  filter: none !important;
+}
+
+.lightPopart .exitNeonSign text {
+  fill: var(--pop-black) !important;
+  filter: none !important;
+}
+
+/* Glowing fan casing backplates */
+.fanGlowBackplate,
+.exhaustGlowBackplate {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.darkNoir .fanGlowBackplate {
+  opacity: 0.8 !important;
+  fill: rgba(0, 240, 255, 0.25) !important;
+  filter: drop-shadow(0 0 4px var(--neon-cyan)) !important;
+}
+
+.darkNoir .exhaustGlowBackplate {
+  opacity: 0.8 !important;
+  fill: rgba(255, 42, 85, 0.25) !important;
+  filter: drop-shadow(0 0 4px var(--neon-pink)) !important;
+}
+
+/* Citigroup slanted roof trace line */
+.citigroupNeonRoofTrace {
+  stroke: none;
+}
+
+.darkNoir .citigroupNeonRoofTrace {
+  stroke: var(--neon-cyan) !important;
+  stroke-width: 2.2 !important;
+  filter: drop-shadow(0 0 5px var(--neon-cyan)) drop-shadow(0 0 2px var(--neon-cyan)) !important;
+}
+
+/* Needle Spire trace line */
+.neonSpireTrace {
+  stroke: none;
+}
+
+.darkNoir .neonSpireTrace {
+  stroke: var(--neon-pink) !important;
+  stroke-width: 2.2 !important;
+  filter: drop-shadow(0 0 5px var(--neon-pink)) drop-shadow(0 0 2px var(--neon-pink)) !important;
+}
+
+/* Twin towers skybridge trace line */
+.skybridgeNeonTrace {
+  stroke: none;
+}
+
+.darkNoir .skybridgeNeonTrace {
+  stroke: var(--neon-yellow) !important;
+  stroke-width: 1.5 !important;
+  filter: drop-shadow(0 0 4px var(--neon-yellow)) !important;
+}
+
+/* Bridge warning beacon override */
+.darkNoir .bridgeBeacon {
+  fill: var(--neon-pink) !important;
+  filter: drop-shadow(0 0 5px var(--neon-pink)) drop-shadow(0 0 2px var(--neon-pink)) !important;
+}
+
+/* Bridge moving traffic headlight/taillight glows */
+.darkNoir .trafficHeadlight {
+  fill: var(--neon-cyan) !important;
+  filter: drop-shadow(0 0 3px var(--neon-cyan)) !important;
+  opacity: 0.95 !important;
+}
+
+.darkNoir .trafficTaillight {
+  fill: var(--neon-pink) !important;
+  filter: drop-shadow(0 0 3px var(--neon-pink)) !important;
+  opacity: 0.95 !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hotelNeonText text,
   .billboardNeon path,
@@ -1480,6 +1603,9 @@
   .hotelSignBoard,
   .barNeonSign text,
   .rightWallGraffiti,
+  .waterTankBeacon,
+  .exitNeonSign rect,
+  .exitNeonSign text,
   .puddleRipple1,
   .puddleRipple2 {
     animation: none !important;
