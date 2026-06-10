@@ -7,8 +7,6 @@ import styles from '../NoirSkyline.module.css';
 const BILLBOARD_SIDES = { left: 95, right: 165 };
 const BILLBOARD_Y = 698;
 const ARC_PEAK = 10;
-const SCURRY_TICKS = 6;
-const TICK_MS = 80;
 
 const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) => {
   const [side, setSide] = useState<'left' | 'right'>('left');
@@ -19,18 +17,44 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
 
   const scurryingRef = useRef(false);
   const alertRef = useRef(alert);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const rafRef = useRef<number | null>(null);
   const pigeonRef = useRef<SVGGElement>(null);
   const { velocity: scrollVelocity } = useLenisScroll();
   const velocityRef = useRef(0);
 
-  useEffect(() => { alertRef.current = alert; }, [alert]);
+  const sideRef = useRef(side);
+  const boundingRectRef = useRef<DOMRect | null>(null);
+
+  useEffect(() => {
+    sideRef.current = side;
+    boundingRectRef.current = null; // Invalidate box when side updates
+  }, [side]);
+
+  useEffect(() => {
+    alertRef.current = alert;
+  }, [alert]);
 
   useEffect(() => {
     if (reducedMotion) return;
-    const unsub = scrollVelocity.on('change', (v) => { velocityRef.current = Math.abs(v); });
+    const unsub = scrollVelocity.on('change', (v) => {
+      velocityRef.current = Math.abs(v);
+    });
     return unsub;
   }, [reducedMotion, scrollVelocity]);
+
+  // Invalidate cached bounding box on window scroll or resize
+  useEffect(() => {
+    if (reducedMotion) return;
+    const handleScrollOrResize = () => {
+      boundingRectRef.current = null;
+    };
+    window.addEventListener('scroll', handleScrollOrResize, { passive: true });
+    window.addEventListener('resize', handleScrollOrResize, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScrollOrResize);
+      window.removeEventListener('resize', handleScrollOrResize);
+    };
+  }, [reducedMotion]);
 
   useEffect(() => {
     if (reducedMotion) return;
@@ -39,46 +63,63 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
       if (scurryingRef.current) return;
       scurryingRef.current = true;
       setScurrying(true);
+      boundingRectRef.current = null; // Clear cached position on scurry start
 
-      const startX = BILLBOARD_SIDES[side];
+      const startX = BILLBOARD_SIDES[sideRef.current];
       const endX = BILLBOARD_SIDES[nextSide];
-      let tick = 0;
+      const duration = 480; // ms (equivalent to 6 * 80ms)
+      let startTime: number | null = null;
 
-      intervalRef.current = setInterval(() => {
-        tick++;
-        const t = tick / SCURRY_TICKS;
-        const t2 = t * t;
-        const eased = t < 0.5 ? 2 * t2 : 1 - (-2 * t + 2) ** 2 / 2;
+      const animate = (timestamp: number) => {
+        if (!startTime) startTime = timestamp;
+        const elapsed = timestamp - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Smooth quadratic ease-in-out curve
+        const t = progress;
+        const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+
         setPosX(startX + eased * (endX - startX));
-        setPosY(BILLBOARD_Y - ARC_PEAK * Math.sin(Math.PI * t));
+        setPosY(BILLBOARD_Y - ARC_PEAK * Math.sin(Math.PI * progress));
+        boundingRectRef.current = null; // Invalidate during movement
 
-        if (tick >= SCURRY_TICKS) {
-          if (intervalRef.current) clearInterval(intervalRef.current);
-          intervalRef.current = null;
+        if (progress < 1) {
+          rafRef.current = requestAnimationFrame(animate);
+        } else {
           setPosX(endX);
           setPosY(BILLBOARD_Y);
           setSide(nextSide);
           setScurrying(false);
           scurryingRef.current = false;
+          boundingRectRef.current = null;
         }
-      }, TICK_MS);
+      };
+
+      rafRef.current = requestAnimationFrame(animate);
     };
 
     const handleInteraction = (e: MouseEvent) => {
       if (scurryingRef.current) return;
-      const rect = pigeonRef.current?.getBoundingClientRect();
+      if (!pigeonRef.current) return;
+
+      if (!boundingRectRef.current) {
+        boundingRectRef.current = pigeonRef.current.getBoundingClientRect();
+      }
+      const rect = boundingRectRef.current;
       if (!rect) return;
+
       const padding = 25;
       const isOver = e.clientX >= rect.left - padding && e.clientX <= rect.right + padding &&
                      e.clientY >= rect.top - padding && e.clientY <= rect.bottom + padding;
       if (!isOver) return;
-      const nextSide = side === 'left' ? 'right' : 'left';
+
+      const nextSide = sideRef.current === 'left' ? 'right' : 'left';
       startScurry(nextSide);
     };
 
     window.addEventListener('mousemove', handleInteraction, { capture: true, passive: true });
     return () => window.removeEventListener('mousemove', handleInteraction, { capture: true });
-  }, [reducedMotion, side]);
+  }, [reducedMotion]);
 
   useEffect(() => {
     if (reducedMotion) return;
@@ -91,7 +132,9 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
   }, [reducedMotion]);
 
   useEffect(() => {
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
   }, []);
 
   const facingLeft = side === 'right';

@@ -73,6 +73,10 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
   const velocityRef = useRef(0);
   const { velocity: scrollVelocity } = useLenisScroll();
 
+  const stateStartTimeRef = useRef<number>(0);
+  const rafRef = useRef<number | null>(null);
+  const boundingRectRef = useRef<DOMRect | null>(null);
+
   useEffect(() => {
     if (reducedMotion) return;
     const unsub = scrollVelocity.on('change', (v) => {
@@ -83,15 +87,36 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
 
   useEffect(() => {
     stateRef.current = state;
+    stateStartTimeRef.current = performance.now();
+    boundingRectRef.current = null; // Invalidate cached rect on state change
   }, [state]);
 
-  // Global mousemove and click detection to bypass browser pointer-event bugs
+  // Invalidate cached bounding box on window scroll or resize
+  useEffect(() => {
+    if (reducedMotion) return;
+    const handleScrollOrResize = () => {
+      boundingRectRef.current = null;
+    };
+    window.addEventListener('scroll', handleScrollOrResize, { passive: true });
+    window.addEventListener('resize', handleScrollOrResize, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScrollOrResize);
+      window.removeEventListener('resize', handleScrollOrResize);
+    };
+  }, [reducedMotion]);
+
+  // Global mousemove and click detection with cached bounding box
   useEffect(() => {
     if (reducedMotion) return;
 
     const handleGlobalInteraction = (e: MouseEvent) => {
       if (stateRef.current !== 'sitting' && stateRef.current !== 'blinking') return;
-      const rect = gargoyleRef.current?.getBoundingClientRect();
+      if (!gargoyleRef.current) return;
+
+      if (!boundingRectRef.current) {
+        boundingRectRef.current = gargoyleRef.current.getBoundingClientRect();
+      }
+      const rect = boundingRectRef.current;
       if (!rect) return;
 
       const padding = 15; // px hover boundary padding
@@ -118,6 +143,72 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
     };
   }, [reducedMotion]);
 
+  // Smooth position updates using requestAnimationFrame
+  useEffect(() => {
+    if (reducedMotion) return;
+
+    const tick = () => {
+      const currentState = stateRef.current;
+      const elapsed = performance.now() - stateStartTimeRef.current;
+
+      if (['sitting', 'blinking', 'awakening'].includes(currentState)) {
+        setPosX(1426);
+        setPosY(756);
+        setScale(1.0);
+        setOpacity(1.0);
+      } else if (currentState === 'leaping') {
+        const progress = Math.min(elapsed / 640, 1); // 8 ticks * 80ms = 640ms
+        setPosX(1426 - progress * 66);
+        setPosY((756 - progress * 76) - 35 * Math.sin(Math.PI * progress));
+        setScale(1.0);
+        setOpacity(1.0);
+      } else if (currentState === 'gliding_fg') {
+        const speedX = -0.25; // -20px per 80ms = -0.25px/ms
+        const x = Math.max(-80, 1360 + speedX * elapsed);
+        setPosX(x);
+        if (x > 200) {
+          setScale(1.0);
+          setOpacity(1.0);
+          setPosY(680 + Math.sin((1360 - x) * 0.0038) * 250);
+        } else {
+          const ratio = Math.max(0, Math.min(1, (x - (-80)) / (200 - (-80))));
+          setScale(0.35 + ratio * 0.65);
+          setOpacity(0.55 + ratio * 0.45);
+          setPosY(420 + ratio * (400 - 420));
+        }
+      } else if (currentState === 'gliding_bg') {
+        const speedX = 0.125; // 10px per 80ms = 0.125px/ms
+        const x = Math.min(2000, -80 + speedX * elapsed);
+        setPosX(x);
+        setPosY(420 + Math.sin((elapsed / 80) * 0.15) * 15);
+        setScale(0.35);
+        setOpacity(0.55);
+      } else if (currentState === 'returning') {
+        const speedX = -0.25; // -20px per 80ms = -0.25px/ms
+        const x = Math.max(1488, 2000 + speedX * elapsed);
+        setPosX(x);
+        const ratio = Math.max(0, Math.min(1, (x - 1488) / (2000 - 1488)));
+        setScale(1.0 - ratio * 0.65);
+        setOpacity(1.0 - ratio * 0.45);
+        setPosY(710 - ratio * (710 - 420));
+      } else if (currentState === 'landing') {
+        const progress = Math.min(elapsed / 480, 1); // 6 ticks * 80ms = 480ms
+        setPosX(1488 - progress * 62);
+        setPosY(710 - progress * (710 - 756));
+        setScale(1.0);
+        setOpacity(1.0);
+      }
+
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [reducedMotion]);
+
+  // State flow interval timer (80ms ticks)
   useEffect(() => {
     if (reducedMotion) return;
 
@@ -157,104 +248,38 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
           setState('leaping');
         }
       } else if (currentState === 'leaping') {
-        // Leap up and left (parabolic path from right building corner)
-        const t = ticks;
-        const tMax = 8;
-        
-        const nextX = 1426 - (t / tMax) * 66;
-        const yLinear = 756 - (t / tMax) * 76;
-        const yArc = 35 * Math.sin(Math.PI * (t / tMax));
-        const nextY = yLinear - yArc;
-
-        setPosX(nextX);
-        setPosY(nextY);
-        setScale(1.0);
-        setOpacity(1.0);
-
-        if (t >= tMax) {
+        if (ticks >= 8) {
           ticksRef.current = 0;
-          setPosX(1360);
-          setPosY(680);
           setState('gliding_fg');
         }
       } else if (currentState === 'gliding_fg') {
-        // Glide left and swoop low over the river deck with smooth scaling/opacity fade
-        const nextX = posX - 20;
-        setPosX(nextX);
-
-        if (nextX > 200) {
-          setScale(1.0);
-          setOpacity(1.0);
-          // Swoops low toward y: 930 at bridge center (x: 947), then climbs back up towards 400
-          setPosY(680 + Math.sin((1360 - nextX) * 0.0038) * 250);
-        } else {
-          const ratio = Math.max(0, Math.min(1, (nextX - (-80)) / (200 - (-80))));
-          setScale(0.35 + ratio * (1.0 - 0.35));
-          setOpacity(0.55 + ratio * (1.0 - 0.55));
-          setPosY(420 + ratio * (400 - 420));
-        }
-
-        if (nextX < -80) {
+        // Total distance is 1440px. At 20px/tick, that's exactly 72 ticks
+        if (ticks >= 72) {
           ticksRef.current = 0;
-          setPosX(-80);
-          setPosY(420); // Fly higher in the background sky
-          setScale(0.35);
-          setOpacity(0.55);
           setState('gliding_bg');
         }
       } else if (currentState === 'gliding_bg') {
-        // Distant small silhouette gliding right
-        const nextX = posX + 10;
-        setPosX(nextX);
-        setPosY(420 + Math.sin(ticks * 0.15) * 15);
-        setScale(0.35);
-        setOpacity(0.55);
-
-        if (nextX > 2000) {
+        // Total distance is 2080px. At 10px/tick, that's exactly 208 ticks
+        if (ticks >= 208) {
           ticksRef.current = 0;
-          setPosX(2000);
-          setPosY(710);
           setState('returning');
         }
       } else if (currentState === 'returning') {
-        // Return from right in foreground with smooth scaling back up
-        const nextX = posX - 20;
-        setPosX(nextX);
-        const ratio = Math.max(0, Math.min(1, (nextX - 1488) / (2000 - 1488)));
-        setScale(1.0 - ratio * (1.0 - 0.35));
-        setOpacity(1.0 - ratio * (1.0 - 0.55));
-        setPosY(710 - ratio * (710 - 420));
-
-        if (nextX <= 1488) {
+        // Total distance is 512px. At 20px/tick, that's exactly 26 ticks
+        if (ticks >= 26) {
           ticksRef.current = 0;
           setState('landing');
         }
       } else if (currentState === 'landing') {
-        const t = ticks;
-        const tMax = 6;
-        
-        // Linear interpolation back to perch (1426, 756)
-        const startX = 1488;
-        const startY = posY;
-        const nextX = startX - (t / tMax) * (startX - 1426);
-        const nextY = startY - (t / tMax) * (startY - 756);
-
-        setPosX(nextX);
-        setPosY(nextY);
-        setScale(1.0);
-        setOpacity(1.0);
-
-        if (t >= tMax) {
+        if (ticks >= 6) {
           ticksRef.current = 0;
-          setPosX(1426);
-          setPosY(756);
           setState('sitting');
         }
       }
     }, 80);
 
     return () => clearInterval(interval);
-  }, [reducedMotion, posX, posY]);
+  }, [reducedMotion]);
 
   // ── Pigeon on the same pedestal ──
   const [pigeonOffsetX, setPigeonOffsetX] = useState(0);

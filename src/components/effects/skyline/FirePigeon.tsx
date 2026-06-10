@@ -15,20 +15,98 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
   const fireRef = useRef<SVGGElement>(null);
   const { velocity: scrollVelocity } = useLenisScroll();
 
+  const boundingRectRef = useRef<DOMRect | null>(null);
+
   useEffect(() => {
     if (reducedMotion) return;
     const unsub = scrollVelocity.on('change', (v) => { velocityRef.current = Math.abs(v); });
     return unsub;
   }, [reducedMotion, scrollVelocity]);
 
-  useEffect(() => { stateRef.current = state; }, [state]);
+  useEffect(() => {
+    stateRef.current = state;
+    boundingRectRef.current = null; // Invalidate cached rect on state change
+  }, [state]);
+
+  // Invalidate cached bounding box on window scroll or resize
+  useEffect(() => {
+    if (reducedMotion) return;
+    const handleScrollOrResize = () => {
+      boundingRectRef.current = null;
+    };
+    window.addEventListener('scroll', handleScrollOrResize, { passive: true });
+    window.addEventListener('resize', handleScrollOrResize, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScrollOrResize);
+      window.removeEventListener('resize', handleScrollOrResize);
+    };
+  }, [reducedMotion]);
+
+  // Smooth position interpolation during hopping states
+  useEffect(() => {
+    if (reducedMotion) return;
+
+    if (state === 'hopping_down') {
+      let startTime: number | null = null;
+      const duration = 480; // ms (equivalent to 6 ticks * 80ms)
+      let rafId: number | null = null;
+
+      const animateDown = (timestamp: number) => {
+        if (!startTime) startTime = timestamp;
+        const elapsed = timestamp - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Smooth quadratic ease-in-out curve
+        const eased = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+        setPosY(PLATFORMS[0] + eased * (PLATFORMS[1] - PLATFORMS[0]));
+        boundingRectRef.current = null;
+
+        if (progress < 1) {
+          rafId = requestAnimationFrame(animateDown);
+        }
+      };
+      rafId = requestAnimationFrame(animateDown);
+      return () => {
+        if (rafId) cancelAnimationFrame(rafId);
+      };
+    } else if (state === 'hopping_up') {
+      let startTime: number | null = null;
+      const duration = 480; // ms
+      let rafId: number | null = null;
+
+      const animateUp = (timestamp: number) => {
+        if (!startTime) startTime = timestamp;
+        const elapsed = timestamp - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Smooth quadratic ease-in-out curve
+        const eased = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+        setPosY(PLATFORMS[1] - eased * (PLATFORMS[1] - PLATFORMS[0]));
+        boundingRectRef.current = null;
+
+        if (progress < 1) {
+          rafId = requestAnimationFrame(animateUp);
+        }
+      };
+      rafId = requestAnimationFrame(animateUp);
+      return () => {
+        if (rafId) cancelAnimationFrame(rafId);
+      };
+    }
+  }, [state, reducedMotion]);
 
   useEffect(() => {
     if (reducedMotion) return;
     const handleGlobalInteraction = (e: MouseEvent) => {
       if (stateRef.current !== 'idle' && stateRef.current !== 'alert') return;
-      const rect = fireRef.current?.getBoundingClientRect();
+      if (!fireRef.current) return;
+
+      if (!boundingRectRef.current) {
+        boundingRectRef.current = fireRef.current.getBoundingClientRect();
+      }
+      const rect = boundingRectRef.current;
       if (!rect) return;
+
       const padding = 20;
       const isOver = e.clientX >= rect.left - padding && e.clientX <= rect.right + padding &&
                      e.clientY >= rect.top - padding && e.clientY <= rect.bottom + padding;
@@ -59,8 +137,7 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
         return;
       }
       if (currentState === 'hopping_down') {
-        const t = ticks / 6;
-        setPosY(PLATFORMS[0] + t * (PLATFORMS[1] - PLATFORMS[0]));
+        // Position is handled by requestAnimationFrame, interval handles duration timer
         if (ticks >= 6) {
           ticksRef.current = 0;
           setPosY(PLATFORMS[1]);
@@ -72,8 +149,7 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
           setState('hopping_up');
         }
       } else if (currentState === 'hopping_up') {
-        const t = ticks / 6;
-        setPosY(PLATFORMS[1] - t * (PLATFORMS[1] - PLATFORMS[0]));
+        // Position is handled by requestAnimationFrame, interval handles duration timer
         if (ticks >= 6) {
           ticksRef.current = 0;
           setPosY(PLATFORMS[0]);
