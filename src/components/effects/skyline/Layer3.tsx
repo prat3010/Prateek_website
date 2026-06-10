@@ -90,6 +90,24 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M -1000 1250 L -1000 820 L 460 820 L 460 1250 Z" className={styles.bldFgLeftRoof} />
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M -1000 1250 L -1000 820 L 460 820 L 460 1250 Z" fill="url(#brick-fg)" stroke="none" pointerEvents="none" className={styles.brickOverlay} />
 
+              {/* Utility cable on left roof */}
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 345 755 Q 362 762 380 748" fill="none" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
+
+              {/* Left Rooftop Graffiti Tag */}
+              <g className={styles.rooftopGraffiti}>
+                <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 312 872 L 306 860 L 316 868 Z" fill="none" />
+                <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 328 872 L 334 860 L 324 868 Z" fill="none" />
+                <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 310 872 C 310 880, 330 880, 330 872 C 330 864, 310 864, 310 872 Z" fill="none" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="305" y1="872" x2="299" y2="871" fill="none" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="305" y1="875" x2="298" y2="876" fill="none" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="335" y1="872" x2="341" y2="871" fill="none" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="335" y1="875" x2="342" y2="876" fill="none" />
+                <path d="M 308 887 L 308 893 L 313 887 L 313 893 Z" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" />
+                <path d="M 317 887 A 3 3 0 0 0 323 887 A 3 3 0 0 0 317 887 Z" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" />
+                <path d="M 326 887 L 326 893 M 326 887 L 330 887 L 330 893" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" />
+                <path d="M 333 887 L 333 893 M 333 887 H 337 V 890 H 333 M 335 890 L 338 893" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" />
+              </g>
+
               {/* Left Parapet Brick Mortar Lines (Removed) */}
               
               {/* Retro TV Yagi Antenna on left rooftop */}
@@ -104,6 +122,8 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
 
               {/* Rooftop Water Puddle on left rooftop */}
               <ellipse cx="150" cy="820" rx="28" ry="2.5" fill="var(--skyline-puddle-fill)" stroke="var(--skyline-puddle-stroke)" strokeWidth="0.8" />
+              <ellipse cx="150" cy="820" rx="28" ry="2.5" className={styles.puddleRipple1} fill="none" stroke="var(--skyline-puddle-stroke)" strokeWidth="0.6" />
+              <ellipse cx="150" cy="820" rx="28" ry="2.5" className={styles.puddleRipple2} fill="none" stroke="var(--skyline-puddle-stroke)" strokeWidth="0.6" />
 
               {/* Left Rooftop Water Tank */}
               <g>
@@ -274,9 +294,13 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
                 <g stroke="var(--skyline-stroke-mid)" strokeWidth="1.0">
                   <WobblyRect wobble={wobble} wobbleStrength={strength} x="50" y="895" width="18" height="22" />
                   <WobblyRect wobble={wobble} wobbleStrength={strength} x="82" y="895" width="18" height="22" />
+                  {/* Cat Silhouette in window */}
+                  <path d="M 87 917 C 87 909 89 907 91 907 C 93 907 95 909 95 917 Z M 88.5 907 L 87.5 903 L 90.5 906 Z M 91.5 906 L 94.5 903 L 93.5 907 Z M 95 915 Q 98 911 98 906" fill="var(--skyline-fill-bg)" stroke="var(--skyline-stroke-mid)" strokeWidth="0.5" />
                   <WobblyRect wobble={wobble} wobbleStrength={strength} x="114" y="895" width="18" height="22" />
                   <WobblyRect wobble={wobble} wobbleStrength={strength} x="146" y="895" width="18" height="22" />
                   <WobblyRect wobble={wobble} wobbleStrength={strength} x="200" y="895" width="18" height="22" />
+                  {/* Potted Plant Silhouette in window */}
+                  <path d="M 206 917 L 207 912 L 211 912 L 212 917 Z M 209 912 Q 205 902 201 905 M 209 912 Q 209 898 209 899 M 209 912 Q 213 902 217 905" fill="var(--skyline-fill-bg)" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
                   <WobblyRect wobble={wobble} wobbleStrength={strength} x="232" y="895" width="18" height="22" />
                   <WobblyRect wobble={wobble} wobbleStrength={strength} x="360" y="895" width="18" height="22" />
                   <WobblyRect wobble={wobble} wobbleStrength={strength} x="392" y="895" width="18" height="22" />
@@ -701,7 +725,10 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
               {/* RIGHT ROOFTOP SECTION */}
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1420 1250 L 1420 760 L 2920 760 L 2920 1250 Z" className={styles.bldFgRightRoof} />
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1420 1250 L 1420 760 L 2920 760 L 2920 1250 Z" fill="url(#brick-fg)" stroke="none" pointerEvents="none" className={styles.brickOverlay} />
-              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1420" y1="766" x2="2920" y2="766" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1420" y1="766" x2="2920" y2="766" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" />
+
+              {/* Utility cable on right roof */}
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1609 728 Q 1680 745 1750 725" fill="none" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
 
               {/* Right Parapet Brick Mortar Lines (Removed) */}
 
@@ -742,6 +769,13 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
                 <g stroke="var(--skyline-stroke-mid)" strokeWidth="1.0">
                   <WobblyRect wobble={wobble} wobbleStrength={strength} x="1440" y="840" width="18" height="22" />
                   <WobblyRect wobble={wobble} wobbleStrength={strength} x="1472" y="840" width="18" height="22" />
+                  {/* Detective Silhouette in window */}
+                  <g fill="var(--skyline-fill-bg)" stroke="var(--skyline-stroke-mid)" strokeWidth="0.6">
+                    <path d="M 1474 862 C 1474 853 1476 851 1481 851 C 1486 851 1488 853 1488 862 Z" />
+                    <circle cx="1481" cy="848" r="3" />
+                    <ellipse cx="1481" cy="845" rx="5" ry="1" />
+                    <path d="M 1478.5 845 L 1479 841 L 1483 841 L 1483.5 845 Z" />
+                  </g>
                   <WobblyRect wobble={wobble} wobbleStrength={strength} x="1504" y="840" width="18" height="22" />
                   <WobblyRect wobble={wobble} wobbleStrength={strength} x="1536" y="840" width="18" height="22" />
                   <WobblyRect wobble={wobble} wobbleStrength={strength} x="1580" y="840" width="18" height="22" />
@@ -1189,8 +1223,12 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
                   <line x1="1655" y1="718" x2="1655" y2="756" stroke="var(--skyline-stroke-mid)" strokeWidth="0.6" />
                   <line x1="1648" y1="735" x2="1662" y2="735" stroke="var(--skyline-stroke-mid)" strokeWidth="0.6" />
                 </g>
-                {/* Trousers (Sway 2) */}
+                {/* Trousers and Socks (Sway 2) */}
                 <g className={styles.laundry2}>
+                  {/* Socks */}
+                  <path d="M 1664 722 L 1664 732 L 1667 734 L 1668 732 L 1666 730 L 1666 722 Z" fill="var(--skyline-laundry-trousers)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.8" />
+                  <path d="M 1668 722 L 1668 732 L 1671 734 L 1672 732 L 1670 730 L 1670 722 Z" fill="var(--skyline-laundry-coat)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.8" />
+                  {/* Trousers */}
                   <path d="M 1670 720 L 1667 750 L 1673 750 L 1676 730 L 1679 750 L 1685 750 L 1682 720 Z" fill="var(--skyline-laundry-trousers)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
                 </g>
                 {/* Fedora Hat (Sway 3) */}

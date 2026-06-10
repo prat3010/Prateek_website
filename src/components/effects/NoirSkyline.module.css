@@ -1223,6 +1223,87 @@
   filter: drop-shadow(0 0 1px rgba(255, 69, 58, 0.6));
 }
 
+/* ── Hotel Neon Sign ── */
+.hotelNeonText text {
+  font-family: var(--font-code);
+  font-size: 8px;
+  font-weight: 800;
+  fill: #ff2a55;
+  text-anchor: middle;
+  stroke: none;
+}
+
+.darkNoir .hotelNeonText text {
+  fill: #ff2a55 !important;
+  filter: drop-shadow(0 0 3px rgba(255, 42, 85, 0.95)) drop-shadow(0 0 1px rgba(255, 42, 85, 0.8));
+  animation: neonSignFlicker 6s infinite;
+}
+
+.lightPopart .hotelNeonText text {
+  fill: var(--pop-black) !important;
+  filter: none !important;
+}
+
+@keyframes neonSignFlicker {
+  0%, 94%, 96%, 100% { opacity: 1; }
+  95% { opacity: 0.35; }
+  97%, 99% { opacity: 0.15; }
+  98% { opacity: 0.85; }
+}
+
+/* ── Puddle Ripples ── */
+.puddleRipple1,
+.puddleRipple2 {
+  transform-origin: 150px 820px;
+  opacity: 0;
+}
+
+.puddleRipple1 {
+  animation: puddleRipple 5s infinite linear;
+}
+
+.puddleRipple2 {
+  animation: puddleRipple 5s infinite linear 2.5s;
+}
+
+@keyframes puddleRipple {
+  0% {
+    transform: scale(0.2);
+    opacity: 0.8;
+  }
+  80% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+/* ── Rooftop Graffiti ── */
+.rooftopGraffiti {
+  fill: none;
+  stroke: rgba(250, 250, 250, 0.25);
+  stroke-width: 1.5px;
+}
+
+.lightPopart .rooftopGraffiti {
+  stroke: rgba(26, 26, 46, 0.35) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hotelNeonText text,
+  .puddleRipple1,
+  .puddleRipple2 {
+    animation: none !important;
+  }
+  .puddleRipple1 {
+    opacity: 0.3 !important;
+    transform: scale(1) !important;
+  }
+}
+
+
 
 
 

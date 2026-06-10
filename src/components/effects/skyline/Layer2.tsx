@@ -483,6 +483,25 @@ const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
             </g>
           </g>
         </g>
+
+        {/* HOTEL Neon Sign (Blade Sign hanging off the left edge of Hotel building x=1490) */}
+        <g stroke="none" fill="none">
+          {/* Supporting brackets */}
+          <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1475" y1="685" x2="1490" y2="685" stroke="var(--skyline-stroke-mid)" strokeWidth="1" fill="none" />
+          <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1475" y1="745" x2="1490" y2="745" stroke="var(--skyline-stroke-mid)" strokeWidth="1" fill="none" />
+          
+          {/* Sign board background */}
+          <WobblyRect wobble={wobble} wobbleStrength={strength} x="1474" y="680" width="12" height="70" fill="var(--skyline-billboard-bg)" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
+          
+          {/* Neon Letters */}
+          <g className={styles.hotelNeonText} fill="none" stroke="none">
+            <text x="1480" y="694" textAnchor="middle">H</text>
+            <text x="1480" y="707" textAnchor="middle">O</text>
+            <text x="1480" y="720" textAnchor="middle">T</text>
+            <text x="1480" y="733" textAnchor="middle">E</text>
+            <text x="1480" y="746" textAnchor="middle">L</text>
+          </g>
+        </g>
       </svg>
 
       {/* Animated Layer (Unfiltered) */}

@@ -42,10 +42,18 @@ const Layer1_5 = React.memo(function Layer1_5({ reducedMotion }: LayerProps) {
           <WobblyLine wobble={wobble} wobbleStrength={strength} x1="562" y1="690" x2="643" y2="690" strokeWidth="1.4" />
           {/* Horizontal floor bands */}
           <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" opacity="0.8">
-            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="565" y1="730" x2="640" y2="730" />
-            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="565" y1="770" x2="640" y2="770" />
-            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="565" y1="810" x2="640" y2="810" />
-            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="565" y1="850" x2="640" y2="850" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="565" y1="710" x2="640" y2="710" fill="none" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="565" y1="730" x2="640" y2="730" fill="none" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="565" y1="750" x2="640" y2="750" fill="none" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="565" y1="770" x2="640" y2="770" fill="none" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="565" y1="790" x2="640" y2="790" fill="none" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="565" y1="810" x2="640" y2="810" fill="none" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="565" y1="830" x2="640" y2="830" fill="none" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="565" y1="850" x2="640" y2="850" fill="none" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="565" y1="870" x2="640" y2="870" fill="none" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="565" y1="910" x2="640" y2="910" fill="none" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="565" y1="950" x2="640" y2="950" fill="none" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="565" y1="990" x2="640" y2="990" fill="none" />
           </g>
           {/* Window columns */}
           <g strokeWidth="0.8" fill="none">
@@ -71,13 +79,25 @@ const Layer1_5 = React.memo(function Layer1_5({ reducedMotion }: LayerProps) {
           {/* Windows */}
           <g strokeWidth="0.8" fill="none">
             <g className={styles.glowingWindow} strokeDasharray="4 10">
-              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="845" y1="730" x2="845" y2="1000" />
-              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="895" y1="730" x2="895" y2="1000" strokeDashoffset="5" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="845" y1="730" x2="845" y2="1000" fill="none" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="895" y1="730" x2="895" y2="1000" strokeDashoffset="5" fill="none" />
             </g>
             <g className={styles.glowingWindowDim} strokeDasharray="4 10">
-              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="870" y1="730" x2="870" y2="1000" strokeDashoffset="3" />
-              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="920" y1="730" x2="920" y2="1000" strokeDashoffset="7" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="870" y1="730" x2="870" y2="1000" strokeDashoffset="3" fill="none" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="920" y1="730" x2="920" y2="1000" strokeDashoffset="7" fill="none" />
             </g>
+          </g>
+
+          {/* Industrial warehouse truss bracing */}
+          <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" opacity="0.6">
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="830" y1="720" x2="855" y2="938" fill="none" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="855" y1="720" x2="830" y2="938" fill="none" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="855" y1="720" x2="880" y2="938" fill="none" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="880" y1="720" x2="855" y2="938" fill="none" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="880" y1="720" x2="905" y2="938" fill="none" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="905" y1="720" x2="880" y2="938" fill="none" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="905" y1="720" x2="930" y2="938" fill="none" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="930" y1="720" x2="905" y2="938" fill="none" />
           </g>
 
           {/* Block Tower with setbacks */}
@@ -106,6 +126,12 @@ const Layer1_5 = React.memo(function Layer1_5({ reducedMotion }: LayerProps) {
           <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 602.5 1080 L 602.5 690 L 640 690 L 640 1080 Z" className={styles.shadowHatchMid} />
           <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 880 1080 L 880 720 L 930 720 L 930 1080 Z" className={styles.shadowHatchMid} />
           <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1175 1080 L 1175 590 L 1210 590 L 1210 650 L 1240 650 L 1240 1080 Z" className={styles.shadowHatchMid} />
+        </g>
+
+        {/* Aviation Warning Beacons */}
+        <g stroke="none">
+          <circle cx="375" cy="450" r="2.0" className={styles.beaconRed2} fill="#ff3b30" stroke="none" />
+          <circle cx="1175" cy="530" r="2.0" className={styles.beaconRed3} fill="#ff3b30" stroke="none" />
         </g>
       </svg>
     </>
