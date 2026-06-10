@@ -912,6 +912,7 @@
   --skyline-gargoyle-eyes: #ff453a;
   
   --skyline-pigeon-stroke: rgba(250, 250, 250, 0.28);
+  --skyline-pigeon-fill: var(--color-bg);
   --skyline-cloud-fill: rgba(250, 250, 250, 0.05);
   
   --skyline-traffic-headlight-trail: rgba(250, 250, 250, 0.25);
@@ -1003,6 +1004,7 @@
   --skyline-gargoyle-eyes: #ff2a55;
   
   --skyline-pigeon-stroke: var(--pop-black);
+  --skyline-pigeon-fill: var(--pop-black);
   --skyline-cloud-fill: rgba(255, 255, 255, 0.45);
   
   --skyline-traffic-headlight-trail: rgba(255, 243, 168, 0.35);
@@ -1163,8 +1165,32 @@
   filter: drop-shadow(0 0 3px var(--skyline-gargoyle-eyes)) drop-shadow(0 0 1px var(--skyline-gargoyle-eyes));
 }
 
+/* ── Pigeon Animations ── */
+.pigeonBob {
+  transform-origin: 0 0;
+  animation: pigeonBodyBob 2s ease-in-out infinite;
+}
+
+@keyframes pigeonBodyBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.5px); }
+}
+
+.pigeonHeadBob {
+  transform-origin: 3px -5.5px;
+  animation: pigeonHeadPeck 3s ease-in-out infinite;
+}
+
+@keyframes pigeonHeadPeck {
+  0%, 75%, 100% { transform: rotate(0deg); }
+  80% { transform: rotate(-18deg); }
+  85% { transform: rotate(-4deg); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .gargoyleEyes {
+  .gargoyleEyes,
+  .pigeonBob,
+  .pigeonHeadBob {
     animation: none !important;
   }
 }

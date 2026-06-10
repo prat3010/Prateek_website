@@ -2133,6 +2133,58 @@ const RunningCat: React.FC<RunningCatProps> = ({ reducedMotion }) => {
 };
 
 
+// Symmetric 6-frame wing cycle with eased spacing: 0% → 20% → 50% → 100% → 50% → 20%
+const WING_FRAMES = [
+  { // 0 — full up
+    left: 'M -3 -12 C -24 -26, -38 -18, -44 -6 C -37 -3, -29 -8, -23 -3 C -18 1, -10 -1, -3 -10 Z',
+    right: 'M 3 -12 C 24 -26, 38 -18, 44 -6 C 37 -3, 29 -8, 22 -3 C 18 1, 10 -1, 3 -10 Z',
+    ribL1: 'M -3 -12 C -18 -12, -29 -8, -44 -6',
+    ribL2: 'M -3 -12 C -15 -8, -21 -4, -23 -3',
+    ribR1: 'M 3 -12 C 18 -12, 29 -8, 44 -6',
+    ribR2: 'M 3 -12 C 15 -8, 21 -4, 22 -3',
+  },
+  { // 1 — 20% down (finer near apex)
+    left: 'M -3 -12 C -24 -22, -38 -14, -44 -3 C -37 0, -29 -5, -23 -1 C -18 3, -10 0, -3 -10 Z',
+    right: 'M 3 -12 C 24 -22, 38 -14, 44 -3 C 37 0, 29 -5, 22 -1 C 18 3, 10 0, 3 -10 Z',
+    ribL1: 'M -3 -12 C -18 -10, -29 -6, -44 -3',
+    ribL2: 'M -3 -12 C -15 -7, -21 -2, -23 -1',
+    ribR1: 'M 3 -12 C 18 -10, 29 -6, 44 -3',
+    ribR2: 'M 3 -12 C 15 -7, 21 -2, 22 -1',
+  },
+  { // 2 — 50% down (fastest mid-stroke)
+    left: 'M -3 -12 C -24 -16, -38 -8, -44 2 C -37 4, -29 -1, -23 3 C -18 5, -10 2, -3 -10 Z',
+    right: 'M 3 -12 C 24 -16, 38 -8, 44 2 C 37 4, 29 -1, 22 3 C 18 5, 10 2, 3 -10 Z',
+    ribL1: 'M -3 -12 C -18 -8, -29 -2, -44 2',
+    ribL2: 'M -3 -12 C -15 -5, -21 1, -23 3',
+    ribR1: 'M 3 -12 C 18 -8, 29 -2, 44 2',
+    ribR2: 'M 3 -12 C 15 -5, 21 1, 22 3',
+  },
+  { // 3 — full down
+    left: 'M -3 -12 C -24 -6, -38 2, -44 10 C -37 11, -29 6, -23 9 C -18 10, -10 5, -3 -10 Z',
+    right: 'M 3 -12 C 24 -6, 38 2, 44 10 C 37 11, 29 6, 23 9 C 18 10, 10 5, 3 -10 Z',
+    ribL1: 'M -3 -12 C -18 -4, -29 4, -44 10',
+    ribL2: 'M -3 -12 C -15 -2, -21 5, -23 9',
+    ribR1: 'M 3 -12 C 18 -4, 29 4, 44 10',
+    ribR2: 'M 3 -12 C 15 -2, 21 5, 22 9',
+  },
+  { // 4 — 50% up (ascending)
+    left: 'M -3 -12 C -24 -16, -38 -8, -44 2 C -37 4, -29 -1, -23 3 C -18 5, -10 2, -3 -10 Z',
+    right: 'M 3 -12 C 24 -16, 38 -8, 44 2 C 37 4, 29 -1, 22 3 C 18 5, 10 2, 3 -10 Z',
+    ribL1: 'M -3 -12 C -18 -8, -29 -2, -44 2',
+    ribL2: 'M -3 -12 C -15 -5, -21 1, -23 3',
+    ribR1: 'M 3 -12 C 18 -8, 29 -2, 44 2',
+    ribR2: 'M 3 -12 C 15 -5, 21 1, 22 3',
+  },
+  { // 5 — 20% up (ascending)
+    left: 'M -3 -12 C -24 -22, -38 -14, -44 -3 C -37 0, -29 -5, -23 -1 C -18 3, -10 0, -3 -10 Z',
+    right: 'M 3 -12 C 24 -22, 38 -14, 44 -3 C 37 0, 29 -5, 22 -1 C 18 3, 10 0, 3 -10 Z',
+    ribL1: 'M -3 -12 C -18 -10, -29 -6, -44 -3',
+    ribL2: 'M -3 -12 C -15 -7, -21 -2, -23 -1',
+    ribR1: 'M 3 -12 C 18 -10, 29 -6, 44 -3',
+    ribR2: 'M 3 -12 C 15 -7, 21 -2, 22 -1',
+  },
+];
+
 interface InteractiveGargoyleProps {
   reducedMotion?: boolean;
 }
@@ -2336,6 +2388,23 @@ const InteractiveGargoyle: React.FC<InteractiveGargoyleProps> = ({ reducedMotion
     return () => clearInterval(interval);
   }, [reducedMotion, posX, posY]);
 
+  // ── Pigeon on the same pedestal ──
+  const [pigeonOffsetX, setPigeonOffsetX] = useState(0);
+  const [pigeonAlert, setPigeonAlert] = useState(false);
+
+  useEffect(() => {
+    if (state === 'awakening' || state === 'leaping') {
+      setPigeonAlert(true);
+    } else if (['gliding_fg', 'gliding_bg', 'returning', 'landing'].includes(state)) {
+      setPigeonAlert(false);
+      setPigeonOffsetX(15);
+    } else if (state === 'sitting' || state === 'blinking') {
+      setPigeonOffsetX(0);
+      const timer = setTimeout(() => setPigeonAlert(false), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [state]);
+
   const handleMouseEnter = () => {
     setState((s) => {
       if (s === 'sitting' || s === 'blinking') {
@@ -2483,38 +2552,24 @@ const InteractiveGargoyle: React.FC<InteractiveGargoyleProps> = ({ reducedMotion
         case 'gliding_bg':
         case 'returning':
         case 'landing': {
-          const isFastFlap = state === 'leaping' || state === 'returning' || state === 'landing';
-          const isWingUp = isFastFlap 
-            ? frameIndex % 2 === 0 
-            : Math.floor(frameIndex / 3) === 0;
+          const frame = frameIndex;
+
+          const leftWing = WING_FRAMES[frame].left;
+          const rightWing = WING_FRAMES[frame].right;
+          const ribLeft1 = WING_FRAMES[frame].ribL1;
+          const ribLeft2 = WING_FRAMES[frame].ribL2;
+          const ribRight1 = WING_FRAMES[frame].ribR1;
+          const ribRight2 = WING_FRAMES[frame].ribR2;
 
           return (
             <g>
-              {isWingUp ? (
-                <>
-                  {/* Wings fully spread for flight - Scalloped Gothic shape */}
-                  <path d="M -3 -12 C -24 -26, -38 -18, -44 -6 C -37 -3, -29 -8, -23 -3 C -18 1, -10 -1, -3 -10 Z" fill={fillValue} stroke={strokeValue} strokeWidth="1" />
-                  <path d="M 3 -12 C 24 -26, 38 -18, 44 -6 C 37 -3, 29 -8, 22 -3 C 18 1, 10 -1, 3 -10 Z" fill={fillValue} stroke={strokeValue} strokeWidth="1" />
-                  
-                  {/* Wing structural ribs */}
-                  <path d="M -3 -12 C -18 -12, -29 -8, -44 -6" fill="none" stroke={strokeValue} strokeWidth="0.8" />
-                  <path d="M -3 -12 C -15 -8, -21 -4, -23 -3" fill="none" stroke={strokeValue} strokeWidth="0.8" />
-                  <path d="M 3 -12 C 18 -12, 29 -8, 44 -6" fill="none" stroke={strokeValue} strokeWidth="0.8" />
-                  <path d="M 3 -12 C 15 -8, 21 -4, 22 -3" fill="none" stroke={strokeValue} strokeWidth="0.8" />
-                </>
-              ) : (
-                <>
-                  {/* Wings flapped down for flight */}
-                  <path d="M -3 -12 C -24 -6, -38 2, -44 10 C -37 11, -29 6, -23 9 C -18 10, -10 5, -3 -10 Z" fill={fillValue} stroke={strokeValue} strokeWidth="1" />
-                  <path d="M 3 -12 C 24 -6, 38 2, 44 10 C 37 11, 29 6, 23 9 C 18 10, 10 5, 3 -10 Z" fill={fillValue} stroke={strokeValue} strokeWidth="1" />
-                  
-                  {/* Wing structural ribs for flapped state */}
-                  <path d="M -3 -12 C -18 -4, -29 4, -44 10" fill="none" stroke={strokeValue} strokeWidth="0.8" />
-                  <path d="M -3 -12 C -15 -2, -21 5, -23 9" fill="none" stroke={strokeValue} strokeWidth="0.8" />
-                  <path d="M 3 -12 C 18 -4, 29 4, 44 10" fill="none" stroke={strokeValue} strokeWidth="0.8" />
-                  <path d="M 3 -12 C 15 -2, 21 5, 22 9" fill="none" stroke={strokeValue} strokeWidth="0.8" />
-                </>
-              )}
+              <path d={leftWing} fill={fillValue} stroke={strokeValue} strokeWidth="1" />
+              <path d={rightWing} fill={fillValue} stroke={strokeValue} strokeWidth="1" />
+
+              <path d={ribLeft1} fill="none" stroke={strokeValue} strokeWidth="0.8" />
+              <path d={ribLeft2} fill="none" stroke={strokeValue} strokeWidth="0.8" />
+              <path d={ribRight1} fill="none" stroke={strokeValue} strokeWidth="0.8" />
+              <path d={ribRight2} fill="none" stroke={strokeValue} strokeWidth="0.8" />
 
               {/* Stretched gliding body */}
               <path d="M -16 -4 C -14 -12, 12 -12, 14 -4 C 10 -2, -12 -2, -16 -4 Z" fill={fillValue} stroke={strokeValue} strokeWidth="1" />
@@ -2624,19 +2679,231 @@ const InteractiveGargoyle: React.FC<InteractiveGargoyleProps> = ({ reducedMotion
   }
 
   return (
+    <>
+      <g
+        ref={gargoyleRef}
+        transform={`translate(${posX}, ${posY})`}
+        onMouseEnter={handleMouseEnter}
+        onClick={handleMouseEnter}
+        style={{
+          cursor: (state === 'sitting' || state === 'blinking') ? 'pointer' : 'default',
+          pointerEvents: 'auto',
+          opacity
+        }}
+      >
+        <rect x="-35" y="-35" width="70" height="45" fill="black" opacity="0" style={{ pointerEvents: 'all' }} />
+        {renderFrame()}
+      </g>
+
+      {/* Pigeon on the same pedestal */}
+      <g transform={`translate(${1440 + pigeonOffsetX}, 759)`}>
+        <g transform="scale(1.5)">
+          <g className={pigeonAlert ? styles.pigeonHeadBob : styles.pigeonBob}>
+            <ellipse cx="0" cy="-3" rx="3" ry="2.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.6" />
+            <circle cx="3" cy="-5.5" r="1.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.6" />
+            <path d="M 4 -5.5 L 5.5 -5 L 4 -4.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
+            <path d="M -3 -2 L -5 -1 L -3 -0.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
+            <line x1="-1" y1="0" x2="-1.5" y2="1.5" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
+            <line x1="1" y1="0" x2="1.5" y2="1.5" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
+            {pigeonAlert ? (
+              <path d="M -1 -2 C -6 -8, -3 -1, 0 -2 C 3 -1, 6 -8, 1 -2" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
+            ) : null}
+          </g>
+        </g>
+      </g>
+    </>
+  );
+};
+
+
+/* ── Billboard Pigeon ── */
+const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) => {
+  const BILLBOARD_SIDES = { left: 95, right: 165 };
+  const BILLBOARD_Y = 698;
+  const [side, setSide] = useState<'left' | 'right'>('right');
+  const [alert, setAlert] = useState(false);
+  const velocityRef = useRef(0);
+  const sideRef = useRef(side);
+  const alertRef = useRef(alert);
+  const pigeonRef = useRef<SVGGElement>(null);
+  const movingRef = useRef(false);
+  const { velocity: scrollVelocity } = useLenisScroll();
+
+  useEffect(() => { sideRef.current = side; }, [side]);
+  useEffect(() => { alertRef.current = alert; }, [alert]);
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    const unsub = scrollVelocity.on('change', (v) => { velocityRef.current = Math.abs(v); });
+    return unsub;
+  }, [reducedMotion, scrollVelocity]);
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    const handleInteraction = (e: MouseEvent) => {
+      if (movingRef.current) return;
+      const rect = pigeonRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const padding = 25;
+      const isOver = e.clientX >= rect.left - padding && e.clientX <= rect.right + padding &&
+                     e.clientY >= rect.top - padding && e.clientY <= rect.bottom + padding;
+      if (isOver) {
+        movingRef.current = true;
+        setSide(s => s === 'left' ? 'right' : 'left');
+        setAlert(true);
+        setTimeout(() => {
+          setAlert(false);
+          movingRef.current = false;
+        }, 400);
+      }
+    };
+    window.addEventListener('mousemove', handleInteraction, { capture: true, passive: true });
+    return () => window.removeEventListener('mousemove', handleInteraction, { capture: true });
+  }, [reducedMotion]);
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    const interval = setInterval(() => {
+      const vel = velocityRef.current;
+      if (vel > 60 && !alertRef.current) setAlert(true);
+      else if (vel <= 60 && alertRef.current && !movingRef.current) setAlert(false);
+    }, 200);
+    return () => clearInterval(interval);
+  }, [reducedMotion]);
+
+  const curX = BILLBOARD_SIDES[side];
+
+  if (reducedMotion) {
+    return (
+      <g ref={pigeonRef} transform={`translate(${BILLBOARD_SIDES.right}, ${BILLBOARD_Y})`}>
+        <g transform="scale(1.5)">
+          <g className={styles.pigeonBob}>
+            <ellipse cx="0" cy="-3" rx="3" ry="2.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.6" />
+            <circle cx="3" cy="-5.5" r="1.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.6" />
+            <path d="M 4 -5.5 L 5.5 -5 L 4 -4.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
+            <path d="M -3 -2 L -5 -1 L -3 -0.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
+            <line x1="-1" y1="0" x2="-1.5" y2="1.5" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
+            <line x1="1" y1="0" x2="1.5" y2="1.5" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
+          </g>
+        </g>
+      </g>
+    );
+  }
+
+  return (
     <g
-      ref={gargoyleRef}
-      transform={`translate(${posX}, ${posY})`}
-      onMouseEnter={handleMouseEnter}
-      onClick={handleMouseEnter}
+      ref={pigeonRef}
       style={{
-        cursor: (state === 'sitting' || state === 'blinking') ? 'pointer' : 'default',
-        pointerEvents: 'auto',
-        opacity
+        transform: `translate(${curX}px, ${BILLBOARD_Y}px)`,
+        transition: 'transform 0.35s ease',
       }}
     >
-      <rect x="-35" y="-35" width="70" height="45" fill="black" opacity="0" style={{ pointerEvents: 'all' }} />
-      {renderFrame()}
+      <g transform="scale(1.5)">
+        <g className={alert ? styles.pigeonHeadBob : styles.pigeonBob}>
+          <ellipse cx="0" cy="-3" rx="3" ry="2.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.6" />
+          <circle cx="3" cy="-5.5" r="1.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.6" />
+          <path d="M 4 -5.5 L 5.5 -5 L 4 -4.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
+          <path d="M -3 -2 L -5 -1 L -3 -0.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
+          <line x1="-1" y1="0" x2="-1.5" y2="1.5" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
+          <line x1="1" y1="0" x2="1.5" y2="1.5" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
+        </g>
+      </g>
+    </g>
+  );
+};
+
+/* ── Fire Escape Pigeon ── */
+const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) => {
+  const PLATFORMS = [952, 997];
+  const [state, setState] = useState<'idle' | 'alert' | 'hopping_down' | 'waiting' | 'hopping_up'>('idle');
+  const [posY, setPosY] = useState(PLATFORMS[0]);
+  const ticksRef = useRef(0);
+  const stateRef = useRef(state);
+  const velocityRef = useRef(0);
+  const fireRef = useRef<SVGGElement>(null);
+  const { velocity: scrollVelocity } = useLenisScroll();
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    const unsub = scrollVelocity.on('change', (v) => { velocityRef.current = Math.abs(v); });
+    return unsub;
+  }, [reducedMotion, scrollVelocity]);
+
+  useEffect(() => { stateRef.current = state; }, [state]);
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    const handleGlobalInteraction = (e: MouseEvent) => {
+      if (stateRef.current !== 'idle' && stateRef.current !== 'alert') return;
+      const rect = fireRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const padding = 20;
+      const isOver = e.clientX >= rect.left - padding && e.clientX <= rect.right + padding &&
+                     e.clientY >= rect.top - padding && e.clientY <= rect.bottom + padding;
+      if (isOver && stateRef.current === 'idle') {
+        setState('alert');
+      }
+    };
+    window.addEventListener('mousemove', handleGlobalInteraction, { capture: true, passive: true });
+    return () => window.removeEventListener('mousemove', handleGlobalInteraction, { capture: true });
+  }, [reducedMotion]);
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    const interval = setInterval(() => {
+      const currentState = stateRef.current;
+      if (currentState === 'idle') {
+        ticksRef.current = 0;
+        if (velocityRef.current > 60) setState('alert');
+        return;
+      }
+      ticksRef.current++;
+      const ticks = ticksRef.current;
+      if (currentState === 'alert') {
+        if (ticks >= 4) {
+          ticksRef.current = 0;
+          setState(velocityRef.current > 60 ? 'hopping_down' : 'idle');
+        }
+        return;
+      }
+      if (currentState === 'hopping_down') {
+        const t = ticks / 6;
+        setPosY(PLATFORMS[0] + t * (PLATFORMS[1] - PLATFORMS[0]));
+        if (ticks >= 6) {
+          ticksRef.current = 0;
+          setPosY(PLATFORMS[1]);
+          setState('waiting');
+        }
+      } else if (currentState === 'waiting') {
+        if (ticks >= 36) {
+          ticksRef.current = 0;
+          setState('hopping_up');
+        }
+      } else if (currentState === 'hopping_up') {
+        const t = ticks / 6;
+        setPosY(PLATFORMS[1] - t * (PLATFORMS[1] - PLATFORMS[0]));
+        if (ticks >= 6) {
+          ticksRef.current = 0;
+          setPosY(PLATFORMS[0]);
+          setState('idle');
+        }
+      }
+    }, 80);
+    return () => clearInterval(interval);
+  }, [reducedMotion]);
+
+  return (
+    <g ref={fireRef} transform={`translate(1675, ${posY})`}>
+      <g transform="scale(1.5)">
+        <g className={state === 'alert' ? styles.pigeonHeadBob : styles.pigeonBob}>
+          <ellipse cx="0" cy="-3" rx="3" ry="2.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.6" />
+          <circle cx="3" cy="-5.5" r="1.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.6" />
+          <path d="M 4 -5.5 L 5.5 -5 L 4 -4.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
+          <path d="M -3 -2 L -5 -1 L -3 -0.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
+          <line x1="-1" y1="0" x2="-1.5" y2="1.5" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
+          <line x1="1" y1="0" x2="1.5" y2="1.5" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
+        </g>
+      </g>
     </g>
   );
 };
@@ -4232,6 +4499,10 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
 
               {/* Interactive wobbly Gargoyle sitting on right building roof peak */}
               <InteractiveGargoyle reducedMotion={reducedMotion} />
+
+              {/* Pigeons */}
+              <BillboardPigeon reducedMotion={reducedMotion} />
+              <FirePigeon reducedMotion={reducedMotion} />
 
               {/* Spinning Fan Blades (Animating) */}
               <g className={styles.fanBlade}>
