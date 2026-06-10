@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Playfair_Display, Lora, JetBrains_Mono, Nosifer } from "next/font/google";
+import { cookies } from "next/headers";
+import { Playfair_Display, Lora, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import ClientLayout from "./ClientLayout";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -21,13 +22,6 @@ const lora = Lora({
 const jetbrainsMono = JetBrains_Mono({
   weight: ["400", "700"],
   variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const nosifer = Nosifer({
-  weight: "400",
-  variable: "--font-nosifer",
   subsets: ["latin"],
   display: "swap",
 });
@@ -80,18 +74,20 @@ const jsonLd = {
   ]
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const initialTheme: Theme = 'light';
+  const cookieStore = await cookies();
+  const themeCookie = cookieStore.get('theme')?.value;
+  const initialTheme: Theme = themeCookie === 'noir' || themeCookie === 'light' ? themeCookie : 'light';
 
   return (
     <html
       lang="en"
       data-theme={initialTheme}
-      className={`${playfairDisplay.variable} ${lora.variable} ${jetbrainsMono.variable} ${nosifer.variable}`}
+      className={`${playfairDisplay.variable} ${lora.variable} ${jetbrainsMono.variable}`}
       suppressHydrationWarning
     >
       <head>
@@ -114,7 +110,8 @@ export default function RootLayout({
             `,
           }}
         />
-        <Script id="json-ld" type="application/ld+json" strategy="beforeInteractive"
+        <script
+          type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>

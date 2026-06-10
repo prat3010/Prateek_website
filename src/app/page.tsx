@@ -1,13 +1,15 @@
+import dynamic from 'next/dynamic';
 import Hero from '@/components/Hero/Hero';
-import About from '@/components/About/About';
-import Skills from '@/components/Skills/Skills';
-import Projects from '@/components/Projects/Projects';
-import Playground from '@/components/Playground/Playground';
-import Contact from '@/components/Contact/Contact';
 import ScrollSection from '@/components/ScrollSection/ScrollSection';
 import { projects } from '@/data/projects';
 import { skills } from '@/data/skills';
 import { standardTaglines, noirTaglines } from '@/data/taglines';
+
+const About = dynamic(() => import('@/components/About/About'));
+const Skills = dynamic(() => import('@/components/Skills/Skills'));
+const Projects = dynamic(() => import('@/components/Projects/Projects'));
+const Playground = dynamic(() => import('@/components/Playground/Playground'));
+const Contact = dynamic(() => import('@/components/Contact/Contact'));
 
 export default function Home() {
   return (
