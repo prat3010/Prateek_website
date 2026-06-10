@@ -775,38 +775,56 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
                 {/* Row 1: Arched windows below parapet (y=790-818) */}
                 <g stroke="var(--skyline-stroke-mid)" strokeWidth="1.2">
                   {/* Arched window 1 */}
-                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1440" y="790" width="22" height="28" />
-                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1440 790 A 11 11 0 0 1 1462 790" />
+                  <g className={styles.interactiveWindowGroup}>
+                    <WobblyRect wobble={wobble} wobbleStrength={strength} x="1440" y="790" width="22" height="28" />
+                    <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1440 790 A 11 11 0 0 1 1462 790" />
+                  </g>
                   {/* Arched window 2 */}
-                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1480" y="790" width="22" height="28" />
-                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1480 790 A 11 11 0 0 1 1502 790" />
+                  <g className={styles.interactiveWindowGroup}>
+                    <WobblyRect wobble={wobble} wobbleStrength={strength} x="1480" y="790" width="22" height="28" />
+                    <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1480 790 A 11 11 0 0 1 1502 790" />
+                  </g>
                   {/* Arched window 3 */}
-                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1520" y="790" width="22" height="28" />
-                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1520 790 A 11 11 0 0 1 1542 790" />
+                  <g className={styles.interactiveWindowGroup}>
+                    <WobblyRect wobble={wobble} wobbleStrength={strength} x="1520" y="790" width="22" height="28" />
+                    <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1520 790 A 11 11 0 0 1 1542 790" />
+                  </g>
                   {/* Arched window 4 */}
-                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1580" y="790" width="22" height="28" />
-                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1580 790 A 11 11 0 0 1 1602 790" />
+                  <g className={styles.interactiveWindowGroup}>
+                    <WobblyRect wobble={wobble} wobbleStrength={strength} x="1580" y="790" width="22" height="28" />
+                    <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1580 790 A 11 11 0 0 1 1602 790" />
+                  </g>
                   {/* Arched window 5 */}
-                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1620" y="790" width="22" height="28" />
-                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1620 790 A 11 11 0 0 1 1642 790" />
+                  <g className={styles.interactiveWindowGroup}>
+                    <WobblyRect wobble={wobble} wobbleStrength={strength} x="1620" y="790" width="22" height="28" />
+                    <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1620 790 A 11 11 0 0 1 1642 790" />
+                  </g>
                   {/* Arched window 6 */}
-                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1700" y="790" width="22" height="28" />
-                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1700 790 A 11 11 0 0 1 1722 790" />
+                  <g className={styles.interactiveWindowGroup}>
+                    <WobblyRect wobble={wobble} wobbleStrength={strength} x="1700" y="790" width="22" height="28" />
+                    <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1700 790 A 11 11 0 0 1 1722 790" />
+                  </g>
                   {/* Arched window 7 */}
-                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1740" y="790" width="22" height="28" />
-                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1740 790 A 11 11 0 0 1 1762 790" />
+                  <g className={styles.interactiveWindowGroup}>
+                    <WobblyRect wobble={wobble} wobbleStrength={strength} x="1740" y="790" width="22" height="28" />
+                    <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1740 790 A 11 11 0 0 1 1762 790" />
+                  </g>
                   {/* Arched window 8 */}
-                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1840" y="790" width="22" height="28" />
-                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1840 790 A 11 11 0 0 1 1862 790" />
+                  <g className={styles.interactiveWindowGroup}>
+                    <WobblyRect wobble={wobble} wobbleStrength={strength} x="1840" y="790" width="22" height="28" />
+                    <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1840 790 A 11 11 0 0 1 1862 790" />
+                  </g>
                   {/* Arched window 9 */}
-                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1880" y="790" width="22" height="28" />
-                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1880 790 A 11 11 0 0 1 1902 790" />
+                  <g className={styles.interactiveWindowGroup}>
+                    <WobblyRect wobble={wobble} wobbleStrength={strength} x="1880" y="790" width="22" height="28" />
+                    <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1880 790 A 11 11 0 0 1 1902 790" />
+                  </g>
                 </g>
 
                 {/* Row 2: Rectangular windows (y=840-862) */}
                 <g stroke="var(--skyline-stroke-mid)" strokeWidth="1.0">
-                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1440" y="840" width="18" height="22" />
-                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1472" y="840" width="18" height="22" />
+                  <WobblyRect className={styles.interactiveWindow} wobble={wobble} wobbleStrength={strength} x="1440" y="840" width="18" height="22" />
+                  <WobblyRect className={styles.interactiveWindow} wobble={wobble} wobbleStrength={strength} x="1472" y="840" width="18" height="22" />
                   {/* Detective Silhouette in window */}
                   <g fill="var(--skyline-fill-bg)" stroke="var(--skyline-stroke-mid)" strokeWidth="0.6">
                     <path d="M 1474 862 C 1474 853 1476 851 1481 851 C 1486 851 1488 853 1488 862 Z" />
@@ -814,14 +832,14 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
                     <ellipse cx="1481" cy="845" rx="5" ry="1" />
                     <path d="M 1478.5 845 L 1479 841 L 1483 841 L 1483.5 845 Z" />
                   </g>
-                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1504" y="840" width="18" height="22" />
-                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1536" y="840" width="18" height="22" />
-                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1580" y="840" width="18" height="22" />
-                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1612" y="840" width="18" height="22" />
-                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1700" y="840" width="18" height="22" />
-                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1732" y="840" width="18" height="22" />
-                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1840" y="840" width="18" height="22" />
-                  <WobblyRect wobble={wobble} wobbleStrength={strength} x="1872" y="840" width="18" height="22" />
+                  <WobblyRect className={styles.interactiveWindow} wobble={wobble} wobbleStrength={strength} x="1504" y="840" width="18" height="22" />
+                  <WobblyRect className={styles.interactiveWindow} wobble={wobble} wobbleStrength={strength} x="1536" y="840" width="18" height="22" />
+                  <WobblyRect className={styles.interactiveWindow} wobble={wobble} wobbleStrength={strength} x="1580" y="840" width="18" height="22" />
+                  <WobblyRect className={styles.interactiveWindow} wobble={wobble} wobbleStrength={strength} x="1612" y="840" width="18" height="22" />
+                  <WobblyRect className={styles.interactiveWindow} wobble={wobble} wobbleStrength={strength} x="1700" y="840" width="18" height="22" />
+                  <WobblyRect className={styles.interactiveWindow} wobble={wobble} wobbleStrength={strength} x="1732" y="840" width="18" height="22" />
+                  <WobblyRect className={styles.interactiveWindow} wobble={wobble} wobbleStrength={strength} x="1840" y="840" width="18" height="22" />
+                  <WobblyRect className={styles.interactiveWindow} wobble={wobble} wobbleStrength={strength} x="1872" y="840" width="18" height="22" />
                   {/* Mullions */}
                   <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1449" y1="840" x2="1449" y2="862" strokeWidth="0.6" />
                   <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1481" y1="840" x2="1481" y2="862" strokeWidth="0.6" />
