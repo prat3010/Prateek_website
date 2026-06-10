@@ -2726,13 +2726,13 @@ const InteractiveGargoyle: React.FC<InteractiveGargoyleProps> = ({ reducedMotion
 
 
 /* ── Billboard Pigeon ── */
-const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) => {
-  const BILLBOARD_SIDES = { left: 95, right: 165 };
-  const BILLBOARD_Y = 698;
-  const ARC_PEAK = 10;
-  const SCURRY_TICKS = 6;
-  const TICK_MS = 80;
+const BILLBOARD_SIDES = { left: 95, right: 165 };
+const BILLBOARD_Y = 698;
+const ARC_PEAK = 10;
+const SCURRY_TICKS = 6;
+const TICK_MS = 80;
 
+const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) => {
   const [side, setSide] = useState<'left' | 'right'>('left');
   const [alert, setAlert] = useState(false);
   const [scurrying, setScurrying] = useState(false);
@@ -2854,8 +2854,9 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
 };
 
 /* ── Fire Escape Pigeon ── */
+const PLATFORMS = [952, 997];
+
 const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) => {
-  const PLATFORMS = [952, 997];
   const [state, setState] = useState<'idle' | 'alert' | 'hopping_down' | 'waiting' | 'hopping_up'>('idle');
   const [posY, setPosY] = useState(PLATFORMS[0]);
   const ticksRef = useRef(0);

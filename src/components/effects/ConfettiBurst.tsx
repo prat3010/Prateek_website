@@ -44,8 +44,6 @@ const ConfettiBurst = forwardRef<ConfettiBurstHandle>(function ConfettiBurst(_, 
   const isActiveRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const colors = isNoir ? NOIR_COLORS : POP_COLORS;
-
   const resizeCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -159,7 +157,7 @@ const ConfettiBurst = forwardRef<ConfettiBurstHandle>(function ConfettiBurst(_, 
       isActiveRef.current = false;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
-  }, [isNoir, colors]);
+  }, [isNoir]);
 
   const triggerConfetti = useCallback(
     (originX?: number, originY?: number) => {
@@ -168,6 +166,7 @@ const ConfettiBurst = forwardRef<ConfettiBurstHandle>(function ConfettiBurst(_, 
 
       resizeCanvas();
 
+      const colors = isNoir ? NOIR_COLORS : POP_COLORS;
       const shapes: ParticleShape[] = ['star', 'circle', 'exclamation'];
       const particles: Particle[] = [];
 
@@ -211,7 +210,7 @@ const ConfettiBurst = forwardRef<ConfettiBurstHandle>(function ConfettiBurst(_, 
         }
       }, DURATION_MS);
     },
-    [draw, resizeCanvas]
+    [isNoir, draw, resizeCanvas]
   );
 
   useImperativeHandle(ref, () => ({ triggerConfetti }), [triggerConfetti]);

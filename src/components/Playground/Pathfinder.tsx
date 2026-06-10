@@ -273,9 +273,10 @@ export default function Pathfinder({
     setInteractionMode('idle');
   };
 
-  // Render grid cells
-  const cells: React.ReactNode[] = [];
+  // Render grid cells grouped by rows
+  const gridRows: React.ReactNode[] = [];
   for (let r = 0; r < rows; r++) {
+    const rowCells: React.ReactNode[] = [];
     for (let c = 0; c < cols; c++) {
       const key = `${c},${r}`;
       const isStart = c === startNode.col && r === startNode.row;
@@ -284,7 +285,7 @@ export default function Pathfinder({
       const isVisited = visitedNodes.has(key);
       const isPath = pathNodes.has(key);
 
-      cells.push(
+      rowCells.push(
         <Cell
           key={key}
           col={c}
@@ -298,6 +299,11 @@ export default function Pathfinder({
         />
       );
     }
+    gridRows.push(
+      <div key={`row-${r}`} role="row" style={{ display: 'contents' }}>
+        {rowCells}
+      </div>
+    );
   }
 
   return (
@@ -315,7 +321,7 @@ export default function Pathfinder({
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {cells}
+        {gridRows}
       </div>
     </div>
   );

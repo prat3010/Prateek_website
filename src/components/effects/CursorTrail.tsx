@@ -448,7 +448,7 @@ export default function CursorTrail() {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       cancelAnimationFrame(frameRef.current);
     };
-  }, [isTouch]);
+  }, [isTouch, wakeLoop]);
 
   if (isTouch) {
     return null;
