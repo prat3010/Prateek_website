@@ -1595,6 +1595,47 @@
   opacity: 0.95 !important;
 }
 
+/* Glowing Foreground Windows in Noir Mode */
+.glowingForegroundWindowPink,
+.glowingForegroundWindowCyan,
+.glowingForegroundWindowYellow {
+  transition: fill 0.3s ease, stroke 0.3s ease, filter 0.3s ease !important;
+}
+
+.darkNoir .glowingForegroundWindowPink,
+.darkNoir .glowingForegroundWindowPink rect {
+  fill: var(--neon-pink) !important;
+  stroke: var(--neon-pink) !important;
+  opacity: 0.85 !important;
+  filter: drop-shadow(0 0 3px rgba(255, 42, 85, 0.9)) drop-shadow(0 0 1px rgba(255, 42, 85, 0.6)) !important;
+}
+.darkNoir .glowingForegroundWindowPink path {
+  fill: var(--neon-pink) !important;
+  stroke: var(--neon-pink) !important;
+  filter: drop-shadow(0 0 3px rgba(255, 42, 85, 0.9)) drop-shadow(0 0 1px rgba(255, 42, 85, 0.6)) !important;
+}
+
+.darkNoir .glowingForegroundWindowCyan,
+.darkNoir .glowingForegroundWindowCyan rect {
+  fill: var(--neon-cyan) !important;
+  stroke: var(--neon-cyan) !important;
+  opacity: 0.85 !important;
+  filter: drop-shadow(0 0 3px rgba(0, 240, 255, 0.9)) drop-shadow(0 0 1px rgba(0, 240, 255, 0.6)) !important;
+}
+.darkNoir .glowingForegroundWindowCyan path {
+  fill: var(--neon-cyan) !important;
+  stroke: var(--neon-cyan) !important;
+  filter: drop-shadow(0 0 3px rgba(0, 240, 255, 0.9)) drop-shadow(0 0 1px rgba(0, 240, 255, 0.6)) !important;
+}
+
+.darkNoir .glowingForegroundWindowYellow,
+.darkNoir .glowingForegroundWindowYellow rect {
+  fill: var(--neon-yellow) !important;
+  stroke: var(--neon-yellow) !important;
+  opacity: 0.85 !important;
+  filter: drop-shadow(0 0 3px rgba(255, 230, 0, 0.9)) drop-shadow(0 0 1px rgba(255, 230, 0, 0.6)) !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hotelNeonText text,
   .billboardNeon path,
