@@ -2393,16 +2393,25 @@ const InteractiveGargoyle: React.FC<InteractiveGargoyleProps> = ({ reducedMotion
   const [pigeonAlert, setPigeonAlert] = useState(false);
 
   useEffect(() => {
+    let timer1: NodeJS.Timeout | null = null;
+    let timer2: NodeJS.Timeout | null = null;
+
     if (state === 'awakening' || state === 'leaping') {
-      setPigeonAlert(true);
+      timer1 = setTimeout(() => setPigeonAlert(true), 0);
     } else if (['gliding_fg', 'gliding_bg', 'returning', 'landing'].includes(state)) {
-      setPigeonAlert(false);
-      setPigeonOffsetX(15);
+      timer1 = setTimeout(() => {
+        setPigeonAlert(false);
+        setPigeonOffsetX(15);
+      }, 0);
     } else if (state === 'sitting' || state === 'blinking') {
-      setPigeonOffsetX(0);
-      const timer = setTimeout(() => setPigeonAlert(false), 800);
-      return () => clearTimeout(timer);
+      timer1 = setTimeout(() => setPigeonOffsetX(0), 0);
+      timer2 = setTimeout(() => setPigeonAlert(false), 800);
     }
+
+    return () => {
+      if (timer1) clearTimeout(timer1);
+      if (timer2) clearTimeout(timer2);
+    };
   }, [state]);
 
   const handleMouseEnter = () => {
