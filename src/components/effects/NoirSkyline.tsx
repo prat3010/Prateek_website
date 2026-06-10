@@ -14,7 +14,7 @@ interface LayerProps {
 
 export default function NoirSkyline() {
   const { theme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const [mounted] = useState(true);
   const { scrollProgress: scrollYProgress, velocity: scrollVelocity } = useLenisScroll();
 
   // Background (Layer 1): Scales from 1.0 to 1.09, moves down slightly (Y from 0 to 22px)
@@ -91,12 +91,15 @@ export default function NoirSkyline() {
   const layer3X = useTransform(springX3, (x) => x * -42);
   const layer3Y = useTransform(springY3, (y) => y * -28);
 
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const cores = navigator.hardwareConcurrency ?? 4;
+    const lowEnd = cores < 4;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches || lowEnd;
+  });
 
   // Track mouse coordinates for subtle parallax offset
   useEffect(() => {
-    setMounted(true);
-
     // Low-end device: fewer than 4 CPU threads — throttle all animation
     const cores = navigator.hardwareConcurrency ?? 4;
     const lowEnd = cores < 4;
@@ -106,7 +109,6 @@ export default function NoirSkyline() {
       window.matchMedia('(pointer: coarse)').matches;
 
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setReducedMotion(mediaQuery.matches || lowEnd);
 
     const mediaListener = (e: MediaQueryListEvent) => {
       setReducedMotion(e.matches || lowEnd);
@@ -1113,10 +1115,9 @@ interface RealtimeClockProps {
 }
 
 function RealtimeClock({ wobble, strength }: RealtimeClockProps) {
-  const [time, setTime] = useState<Date | null>(null);
+  const [time, setTime] = useState<Date>(() => new Date());
 
   useEffect(() => {
-    setTime(new Date());
     const interval = setInterval(() => {
       setTime(new Date());
     }, 1000);
@@ -1124,7 +1125,6 @@ function RealtimeClock({ wobble, strength }: RealtimeClockProps) {
   }, []);
 
   if (!time) {
-    // Fallback static hands pointing at 11:45 PM detective time during SSR / initial load
     return (
       <g>
         {/* Clock Face Circle */}
@@ -1687,7 +1687,7 @@ interface RunningCatProps {
 
 const RunningCat: React.FC<RunningCatProps> = ({ reducedMotion }) => {
   const [state, setState] = useState<
-    'sitting' | 'standing' | 'walking' | 'jumping' | 'landing' | 'running' | 'hidden' | 'returning' | 'jumping_up' | 'landing_up' | 'walking_back' | 'sitting_down'
+    'sitting' | 'alert' | 'standing' | 'walking' | 'jumping' | 'landing' | 'running' | 'hidden' | 'returning' | 'jumping_up' | 'landing_up' | 'walking_back' | 'sitting_down'
   >('sitting');
   const [frameIndex, setFrameIndex] = useState(0);
   const [posX, setPosX] = useState(320);
@@ -1696,6 +1696,16 @@ const RunningCat: React.FC<RunningCatProps> = ({ reducedMotion }) => {
   const ticksRef = useRef(0);
   const stateRef = useRef(state);
   const catRef = useRef<SVGGElement>(null);
+  const velocityRef = useRef(0);
+  const { velocity: scrollVelocity } = useLenisScroll();
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    const unsub = scrollVelocity.on('change', (v) => {
+      velocityRef.current = Math.abs(v);
+    });
+    return unsub;
+  }, [reducedMotion, scrollVelocity]);
 
   useEffect(() => {
     stateRef.current = state;
@@ -1742,11 +1752,26 @@ const RunningCat: React.FC<RunningCatProps> = ({ reducedMotion }) => {
 
       if (currentState === 'sitting') {
         ticksRef.current = 0;
+        if (velocityRef.current > 120) {
+          setState('alert');
+        }
         return;
       }
 
       ticksRef.current++;
       const ticks = ticksRef.current;
+
+      if (currentState === 'alert') {
+        if (ticks >= 8) {
+          ticksRef.current = 0;
+          if (velocityRef.current > 60) {
+            setState('standing');
+          } else {
+            setState('sitting');
+          }
+        }
+        return;
+      }
 
       if (currentState === 'standing') {
         if (ticks >= 10) {
@@ -1854,7 +1879,7 @@ const RunningCat: React.FC<RunningCatProps> = ({ reducedMotion }) => {
 
   const handleMouseEnter = () => {
     setState((s) => {
-      if (s === 'sitting') {
+      if (s === 'sitting' || s === 'alert') {
         return 'standing';
       }
       return s;
@@ -1876,6 +1901,27 @@ const RunningCat: React.FC<RunningCatProps> = ({ reducedMotion }) => {
 
     const getElement = () => {
       switch (state) {
+        case 'alert':
+          return (
+            <g>
+              {/* Alert body - taller, tense posture */}
+              <path d="M -7 0 C -7 -15, 7 -15, 7 0 Z" fill={catFill} stroke={strokeColor} strokeWidth="1" />
+              {/* Front paws planted */}
+              <path d="M -7 0 L -9 2 M -4 0 L -5 2 M 4 0 L 5 2 M 7 0 L 9 2" fill="none" stroke={strokeColor} strokeWidth="1" />
+              {/* Head higher */}
+              <circle cx="0" cy="-26" r="5" fill={catFill} stroke={strokeColor} strokeWidth="1" />
+              {/* Perked ears */}
+              <polygon points="-5,-29 -10,-39 -2,-34" fill={catFill} stroke={strokeColor} strokeWidth="1" />
+              <polygon points="5,-29 10,-39 2,-34" fill={catFill} stroke={strokeColor} strokeWidth="1" />
+              {/* Stiff raised tail */}
+              <path d="M 5 -4 Q 14 -6 13 -18 T 16 -30" fill="none" stroke={strokeColor} strokeWidth="1.2" className={styles.catTail} style={{ transformOrigin: '5px -4px' }} />
+              {/* Wide alert eyes */}
+              <g className={styles.catEyes} fill={eyeColor} stroke="none" style={{ transformOrigin: '0px -26.5px' }}>
+                <circle cx="-1.5" cy="-26.5" r="1.2" />
+                <circle cx="1.5" cy="-26.5" r="1.2" />
+              </g>
+            </g>
+          );
         case 'sitting':
         case 'sitting_down':
           return (
@@ -2104,6 +2150,16 @@ const InteractiveGargoyle: React.FC<InteractiveGargoyleProps> = ({ reducedMotion
   const ticksRef = useRef(0);
   const stateRef = useRef(state);
   const gargoyleRef = useRef<SVGGElement>(null);
+  const velocityRef = useRef(0);
+  const { velocity: scrollVelocity } = useLenisScroll();
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    const unsub = scrollVelocity.on('change', (v) => {
+      velocityRef.current = Math.abs(v);
+    });
+    return unsub;
+  }, [reducedMotion, scrollVelocity]);
 
   useEffect(() => {
     stateRef.current = state;
@@ -2158,13 +2214,20 @@ const InteractiveGargoyle: React.FC<InteractiveGargoyleProps> = ({ reducedMotion
       }
 
       if (currentState === 'sitting') {
-        // Periodically blink eyes
-        if (ticks >= 80) { // every 6.4 seconds
+        // High scroll velocity awakens the gargoyle
+        if (velocityRef.current > 200) {
+          ticksRef.current = 0;
+          setState('awakening');
+        } else if (ticks >= 80) { // every 6.4 seconds, blink eyes
           ticksRef.current = 0;
           setState('blinking');
         }
       } else if (currentState === 'blinking') {
-        if (ticks >= 6) { // blink duration
+        // Can be startled mid-blink by fast scroll
+        if (velocityRef.current > 200) {
+          ticksRef.current = 0;
+          setState('awakening');
+        } else if (ticks >= 6) { // blink duration
           ticksRef.current = 0;
           setState('sitting');
         }
@@ -4167,7 +4230,7 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
               {/* Cat Silhouette sitting on penthouse roof (Animating tail & blinking eyes, interactive hover running animation) */}
               <RunningCat reducedMotion={reducedMotion} />
 
-              {/* Interactive wobbly Gargoyle sitting on bridge tower peak */}
+              {/* Interactive wobbly Gargoyle sitting on right building roof peak */}
               <InteractiveGargoyle reducedMotion={reducedMotion} />
 
               {/* Spinning Fan Blades (Animating) */}

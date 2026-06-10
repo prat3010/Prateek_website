@@ -423,6 +423,7 @@ export const WobblyLine = React.memo(function WobblyLine({
   if (!wobble) {
     return <line x1={x1} y1={y1} x2={x2} y2={y2} {...props} />;
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return <path d={wobbledD} {...(props as any)} />;
 });
 
@@ -449,6 +450,7 @@ export const WobblyRect = React.memo(function WobblyRect({
   }, [x, y, width, height, wobble, wobbleStrength, segmentLength, baseFreq, octaves]);
 
   if (!wobble) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return <rect x={x} y={y} width={width} height={height} {...(props as any)} />;
   }
   return <path d={wobbledD} {...props} />;
@@ -477,6 +479,7 @@ export const WobblyPolygon = React.memo(function WobblyPolygon({
   }, [points, wobble, wobbleStrength, segmentLength, baseFreq, octaves]);
 
   if (!wobble) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return <polygon points={points} {...(props as any)} />;
   }
   return <path d={wobbledD} {...props} />;

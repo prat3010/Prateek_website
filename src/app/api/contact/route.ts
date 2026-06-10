@@ -180,10 +180,11 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true, data }, { status: 200 });
-  } catch (error: any) {
-    console.error('Contact route error:', error);
+  } catch (e: unknown) {
+    console.error('Contact route error:', e);
+    const message = e instanceof Error ? e.message : 'An internal server error occurred.';
     return NextResponse.json(
-      { error: error?.message || 'An internal server error occurred.' },
+      { error: message },
       { status: 500 }
     );
   }

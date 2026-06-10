@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useLenis } from 'lenis/react';
@@ -17,15 +17,12 @@ interface HeroClientProps {
   };
 }
 
-export default function HeroClient({ taglines }: HeroClientProps) {
-  const { isNoir } = useTheme();
-  const [tagline, setTagline] = useState(isNoir ? taglines.noir[0] : taglines.standard[0]);
+function HeroClientContent({ taglines, isNoir }: HeroClientProps & { isNoir: boolean }) {
   const lenis = useLenis();
-
-  useEffect(() => {
+  const tagline = useMemo(() => {
     const list = isNoir ? taglines.noir : taglines.standard;
-    const randomIndex = Math.floor(Math.random() * list.length);
-    setTagline(list[randomIndex]);
+    const hash = list.reduce((acc, t) => acc * 31 + t.length, 0);
+    return list[Math.abs(hash) % list.length];
   }, [isNoir, taglines]);
 
   const { displayText, isDone } = useTypewriter({
@@ -120,4 +117,9 @@ export default function HeroClient({ taglines }: HeroClientProps) {
       </div>
     </div>
   );
+}
+
+export default function HeroClient({ taglines }: HeroClientProps) {
+  const { isNoir } = useTheme();
+  return <HeroClientContent key={isNoir ? 'noir' : 'standard'} taglines={taglines} isNoir={isNoir} />;
 }

@@ -115,8 +115,9 @@ const drawCigarette = (ctx: CanvasRenderingContext2D, x: number, y: number, angl
 
 export default function CursorTrail() {
   const { isNoir } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  const [isTouch, setIsTouch] = useState(false);
+  const [isTouch] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+  );
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const trailRef = useRef<TrailDot[]>([]);
   const smokeRef = useRef<SmokeParticle[]>([]);
@@ -136,12 +137,14 @@ export default function CursorTrail() {
     initialized: false,
   });
   const mouseRef = useRef({ x: -100, y: -100 });
+  // eslint-disable-next-line react-hooks/purity
   const lastMouseMoveTimeRef = useRef<number>(Date.now());
   const frameRef = useRef<number>(0);
   const colorIndexRef = useRef(0);
   const isLoopActiveRef = useRef(false);
 
   const colors = isNoir ? NOIR_COLORS : POP_COLORS;
+  const drawRef = useRef<(() => void) | null>(null);
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -156,7 +159,6 @@ export default function CursorTrail() {
     const idleDuration = Date.now() - lastMouseMoveTimeRef.current;
 
     if (isNoir) {
-      // Clear normal trail
       trailRef.current = [];
 
       const cig = cigStateRef.current;
@@ -168,13 +170,10 @@ export default function CursorTrail() {
           cig.y = y;
           cig.initialized = true;
         } else {
-          // Cigarette lags/trails behind mouse cursor
           cig.x += (x - cig.x) * 0.25;
           cig.y += (y - cig.y) * 0.25;
         }
 
-        // Calculate direction cigarette points
-        // Cigarette points away from movement direction (i.e. towards mouse-to-cigarette vector)
         const dx = x - cig.x;
         const dy = y - cig.y;
         const dist = Math.hypot(dx, dy);
@@ -183,31 +182,25 @@ export default function CursorTrail() {
         if (dist > 1.5) {
           targetAngle = Math.atan2(-dy, -dx);
         } else {
-          // Idle floating micro-animation
           targetAngle = cig.angle + Math.sin(Date.now() * 0.003) * 0.001;
         }
 
-        // Normalize angle difference to [-PI, PI] to avoid spinning glitch
         let angleDiff = targetAngle - cig.angle;
         while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
         while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
         cig.angle += angleDiff * 0.15;
 
-        // Spawn smoke particles from the burning tip (ember) of the cigarette
         const L = 35;
         const activeL = L * fade;
         const ashLength = 3;
         const tipX = cig.x + Math.cos(cig.angle) * (activeL - ashLength);
         const tipY = cig.y + Math.sin(cig.angle) * (activeL - ashLength);
 
-        // Spawn smoke puffs (scaling spawn probability as cigarette fades out)
         if (Math.random() < 0.5 * fade) {
           smokeRef.current.push({
             x: tipX,
             y: tipY,
-            // Small wind drift opposite to cigarette's direction of movement
             vx: (Math.random() - 0.5) * 0.35 - Math.cos(cig.angle) * 0.15,
-            // Smoke rises upwards
             vy: -Math.random() * 0.8 - 0.4,
             size: Math.random() * 1.5 + 1.5,
             maxSize: Math.random() * 12 + 10,
@@ -220,10 +213,8 @@ export default function CursorTrail() {
         cig.initialized = false;
       }
 
-      // Update and draw smoke particles
       const smoke = smokeRef.current;
       
-      // Prevent unbounded growth of particle system
       while (smoke.length > 80) {
         smoke.shift();
       }
@@ -232,18 +223,14 @@ export default function CursorTrail() {
         const p = smoke[i];
         p.lifetime++;
         
-        // Physics update
         p.x += p.vx;
         p.y += p.vy;
         p.vy += velocityRef.current * 0.003;
         
-        // Add smooth wave sway as it rises
         p.vx += Math.sin(p.lifetime * 0.07) * 0.015;
 
-        // Smoke particles expand as they rise
         p.size = p.size + (p.maxSize - p.size) * 0.04;
         
-        // Smoke particles fade out over lifetime
         const lifeRatio = p.lifetime / p.maxLifetime;
         p.opacity = (1 - lifeRatio) * 0.35;
 
@@ -252,10 +239,8 @@ export default function CursorTrail() {
           continue;
         }
 
-        // Draw soft smoke cloud
         ctx.save();
         const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
-        // Smokey grey gradient
         grad.addColorStop(0, `rgba(200, 200, 202, ${p.opacity})`);
         grad.addColorStop(0.3, `rgba(180, 180, 182, ${p.opacity * 0.6})`);
         grad.addColorStop(0.7, `rgba(140, 140, 142, ${p.opacity * 0.2})`);
@@ -268,7 +253,6 @@ export default function CursorTrail() {
         ctx.restore();
       }
 
-      // Draw the cigarette itself on top of the smoke
       if (isMouseActive && fade > 0) {
         ctx.save();
         ctx.globalAlpha = fade;
@@ -277,11 +261,9 @@ export default function CursorTrail() {
       }
 
     } else {
-      // Clear smoke and cigarette initialization state
       smokeRef.current = [];
       cigStateRef.current.initialized = false;
 
-      // Age and filter existing dots from the previous frame
       trailRef.current = trailRef.current
         .map(dot => ({
           ...dot,
@@ -292,7 +274,6 @@ export default function CursorTrail() {
 
       const trail = trailRef.current;
 
-      // Add new dot at current mouse position if mouse is active and moving
       if (isMouseActive && idleDuration < 150) {
         trail.unshift({
           x,
@@ -306,17 +287,15 @@ export default function CursorTrail() {
         colorIndexRef.current = (colorIndexRef.current + 1) % colors.length;
       }
 
-      // Trim trail to max length
       while (trail.length > TRAIL_LENGTH) {
         trail.pop();
       }
 
-      // Draw each dot
       const scrollPulse = Math.min(Math.abs(velocityRef.current) / 500, 1) * 3;
       for (let i = trail.length - 1; i >= 0; i--) {
         const dot = trail[i];
 
-        const progress = dot.age / TRAIL_LENGTH; // 0 = newest, 1 = oldest
+        const progress = dot.age / TRAIL_LENGTH;
         const radius = (BASE_DOT_RADIUS + scrollPulse) * (1 - progress * 0.7);
         const opacity = 1 - progress * 0.85;
 
@@ -332,7 +311,7 @@ export default function CursorTrail() {
           const outerRadius = radius * 1.35;
           const innerRadius = radius * 0.45;
           let rot = (Math.PI / 2) * 3;
-          let step = Math.PI / spikes;
+          const step = Math.PI / spikes;
 
           ctx.moveTo(0, -outerRadius);
           for (let j = 0; j < spikes; j++) {
@@ -365,12 +344,9 @@ export default function CursorTrail() {
           ctx.rotate(dot.angle);
 
           ctx.beginPath();
-          // Inner reticle circle
           ctx.arc(0, 0, radius * 0.45, 0, Math.PI * 2);
-          // Horizontal scope reticle
           ctx.moveTo(-radius * 1.2, 0);
           ctx.lineTo(radius * 1.2, 0);
-          // Vertical scope reticle
           ctx.moveTo(0, -radius * 1.2);
           ctx.lineTo(0, radius * 1.2);
 
@@ -381,14 +357,12 @@ export default function CursorTrail() {
 
           ctx.restore();
         } else {
-          // Circle
           ctx.beginPath();
           ctx.arc(dot.x, dot.y, radius, 0, Math.PI * 2);
           ctx.fillStyle = colors[dot.colorIndex % colors.length];
           ctx.globalAlpha = opacity;
           ctx.fill();
 
-          // Add a small black outline for the comic-book feel
           ctx.strokeStyle = '#1A1A2E';
           ctx.lineWidth = 1.5;
           ctx.globalAlpha = opacity * 0.8;
@@ -408,31 +382,25 @@ export default function CursorTrail() {
       : (trailRef.current.length > 0 || (isMouseActive && idleDuration < 150));
 
     if (hasItemsToDraw) {
-      frameRef.current = requestAnimationFrame(draw);
+      frameRef.current = requestAnimationFrame(() => drawRef.current?.());
     } else {
       isLoopActiveRef.current = false;
     }
   }, [isNoir, colors]);
 
+  useEffect(() => {
+    drawRef.current = draw;
+  }, [draw]);
+
   const wakeLoop = useCallback(() => {
     if (!isLoopActiveRef.current) {
       isLoopActiveRef.current = true;
-      frameRef.current = requestAnimationFrame(draw);
+      frameRef.current = requestAnimationFrame(() => drawRef.current?.());
     }
-  }, [draw]);
-
-  useEffect(() => {
-    setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (!mounted) return;
-
-    // Don't enable on touch/coarse-pointer devices
-    if (window.matchMedia('(pointer: coarse)').matches) {
-      setIsTouch(true);
-      return;
-    }
+    if (isTouch) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -471,7 +439,7 @@ export default function CursorTrail() {
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     isLoopActiveRef.current = true;
-    frameRef.current = requestAnimationFrame(draw);
+    frameRef.current = requestAnimationFrame(() => drawRef.current?.());
 
     return () => {
       window.removeEventListener('resize', handleResize);
@@ -480,9 +448,9 @@ export default function CursorTrail() {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       cancelAnimationFrame(frameRef.current);
     };
-  }, [mounted, draw, wakeLoop]);
+  }, [isTouch]);
 
-  if (!mounted || isTouch) {
+  if (isTouch) {
     return null;
   }
 

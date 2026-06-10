@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useTheme } from '@/context/ThemeContext';
 import styles from './Footer.module.css';
@@ -67,7 +67,7 @@ const defaultSocials: SocialLink[] = [
 
 export default function Footer({ socials, className }: FooterProps) {
   const socialLinks = socials ?? defaultSocials;
-  const year = new Date().getFullYear();
+  const [year] = useState(() => new Date().getFullYear());
   const { isNoir } = useTheme();
 
   return (

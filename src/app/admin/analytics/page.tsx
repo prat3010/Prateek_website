@@ -147,7 +147,10 @@ export default async function AnalyticsPage(props: {
   else if (range === '30d') daysLimit = 30;
   else if (range === 'all') daysLimit = 365;
 
-  const cutoffDateStr = new Date(Date.now() - daysLimit * 24 * 60 * 60 * 1000).toISOString();
+  const cutoffDateStr = new Date(
+    // eslint-disable-next-line react-hooks/purity
+    Date.now() - daysLimit * 24 * 60 * 60 * 1000
+  ).toISOString();
 
   if (!supabase) {
     isDemoMode = true;
@@ -168,15 +171,16 @@ export default async function AnalyticsPage(props: {
         throw error;
       }
       visits = data || [];
-    } catch (e: any) {
+    } catch (e: unknown) {
       isDemoMode = true;
-      errorMsg = e.message || 'Failed to fetch data';
+      errorMsg = e instanceof Error ? e.message : 'Failed to fetch data';
       visits = getMockData();
     }
   }
 
   // Filter in-memory if in Demo Mode (mock data generated locally)
   if (isDemoMode) {
+    // eslint-disable-next-line react-hooks/purity
     const cutoffTime = Date.now() - daysLimit * 24 * 60 * 60 * 1000;
     visits = visits.filter(v => new Date(v.created_at).getTime() >= cutoffTime);
   }

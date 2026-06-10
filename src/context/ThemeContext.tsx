@@ -21,8 +21,12 @@ interface ThemeTransitionContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 const ThemeTransitionContext = createContext<ThemeTransitionContextType | undefined>(undefined);
 
+function getInitialTheme(initialTheme?: Theme): Theme {
+  return initialTheme || 'light';
+}
+
 export function ThemeProvider({ children, initialTheme }: { children: React.ReactNode; initialTheme?: Theme }) {
-  const [theme, setTheme] = useState<Theme>(initialTheme || 'light');
+  const [theme, setTheme] = useState<Theme>(() => getInitialTheme(initialTheme));
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [transitionCoords, setTransitionCoords] = useState({ x: 50, y: 50 });
   const [pendingTheme, setPendingTheme] = useState<Theme | null>(null);
@@ -53,20 +57,19 @@ export function ThemeProvider({ children, initialTheme }: { children: React.Reac
     isTransitioningRef.current = isTransitioning;
   }, [isTransitioning]);
 
-  // Initialize theme on mount from localStorage or system preference
+  // Sync theme from localStorage after hydration; the <head> blocking script
+  // already sets data-theme, so this reconciles React state to match.
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as Theme | null;
-    if (savedTheme === 'noir' || savedTheme === 'light') {
-      setTheme(savedTheme);
-      document.documentElement.setAttribute('data-theme', savedTheme);
-      document.cookie = `theme=${savedTheme}; path=/; max-age=31536000; SameSite=Lax`;
-    } else {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const systemTheme: Theme = prefersDark ? 'noir' : 'light';
-      setTheme(systemTheme);
-      document.documentElement.setAttribute('data-theme', systemTheme);
-      document.cookie = `theme=${systemTheme}; path=/; max-age=31536000; SameSite=Lax`;
-    }
+    const timer = setTimeout(() => {
+      const savedTheme = localStorage.getItem('theme') as Theme | null;
+      const resolved: Theme = savedTheme === 'noir' || savedTheme === 'light'
+        ? savedTheme
+        : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'noir' : 'light';
+      setTheme(resolved);
+      document.documentElement.setAttribute('data-theme', resolved);
+      document.cookie = `theme=${resolved}; path=/; max-age=31536000; SameSite=Lax`;
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const toggleTheme = useCallback(

@@ -17,24 +17,27 @@ export function useTypewriter({
 }: UseTypewriterOptions) {
   const [displayText, setDisplayText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [isDone, setIsDone] = useState(false);
 
-  // Reset and restart the typewriter process whenever the target text or delay changes
+  const isDone = !loop && !isTyping && text !== '' && displayText === text;
+
   useEffect(() => {
-    setDisplayText('');
-    setIsTyping(false);
-    setIsDone(false);
+    const resetTimer = setTimeout(() => {
+      setDisplayText('');
+      setIsTyping(false);
+    }, 0);
 
-    if (!text) return;
+    if (!text) return () => clearTimeout(resetTimer);
 
-    const timeout = setTimeout(() => {
+    const delayTimer = setTimeout(() => {
       setIsTyping(true);
     }, delay);
 
-    return () => clearTimeout(timeout);
+    return () => {
+      clearTimeout(resetTimer);
+      clearTimeout(delayTimer);
+    };
   }, [text, delay]);
 
-  // Handle character-by-character typing
   useEffect(() => {
     if (!isTyping || !text) return;
 
@@ -43,21 +46,21 @@ export function useTypewriter({
         setDisplayText(text.slice(0, displayText.length + 1));
       }, speed);
       return () => clearTimeout(timeout);
-    } else {
-      setIsTyping(false);
-      setIsDone(true);
-
-      if (loop) {
-        const timeout = setTimeout(() => {
-          setDisplayText('');
-          setIsTyping(true);
-          setIsDone(false);
-        }, 2000);
-        return () => clearTimeout(timeout);
-      }
     }
+
+    if (!loop) {
+      const doneTimer = setTimeout(() => {
+        setIsTyping(false);
+      }, 0);
+      return () => clearTimeout(doneTimer);
+    }
+
+    const loopTimer = setTimeout(() => {
+      setDisplayText('');
+      setIsTyping(true);
+    }, 2000);
+    return () => clearTimeout(loopTimer);
   }, [displayText, isTyping, text, speed, loop]);
 
   return { displayText, isTyping, isDone };
 }
-
