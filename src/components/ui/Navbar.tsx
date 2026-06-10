@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, type MouseEvent } from 'react';
+import { useState, useEffect, useCallback, useMemo, type MouseEvent } from 'react';
 import { useLenis } from 'lenis/react';
 import { useTheme } from '@/context/ThemeContext';
 import { useLenisScroll } from '@/context/LenisProvider';
@@ -29,7 +29,7 @@ const defaultItems: NavItem[] = [
 ];
 
 export default function Navbar({ items, className }: NavbarProps) {
-  const navItems = items ?? defaultItems;
+  const navItems = useMemo(() => items ?? defaultItems, [items]);
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>(navItems[0]?.href ?? '');

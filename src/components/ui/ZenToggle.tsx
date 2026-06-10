@@ -6,7 +6,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import styles from './ZenToggle.module.css';
 
 export default function ZenToggle() {
-  const { isNoir, isDetailsHidden, toggleDetailsHidden } = useTheme();
+  const { isDetailsHidden, toggleDetailsHidden } = useTheme();
 
   return (
     <div className={styles.container}>

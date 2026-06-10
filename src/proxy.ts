@@ -50,7 +50,7 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
     try {
       const refUrl = new URL(referrer);
       referrer = refUrl.hostname;
-    } catch (e) {
+    } catch {
       // Fallback: truncate to maximum 100 characters to prevent spam payloads
       referrer = referrer.slice(0, 100);
     }

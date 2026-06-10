@@ -4,7 +4,6 @@ import { Playfair_Display, Lora, JetBrains_Mono, Nosifer } from "next/font/googl
 import "./globals.css";
 import ClientLayout from "./ClientLayout";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { cookies } from "next/headers";
 import { Theme } from "@/context/ThemeContext";
 
 const playfairDisplay = Playfair_Display({
@@ -81,14 +80,12 @@ const jsonLd = {
   ]
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieStore = await cookies();
-  const themeCookie = cookieStore.get('theme')?.value;
-  const initialTheme: Theme = themeCookie === 'noir' || themeCookie === 'light' ? themeCookie : 'light';
+  const initialTheme: Theme = 'light';
 
   return (
     <html

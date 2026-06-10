@@ -74,7 +74,7 @@ export default function Contact() {
         setStatus('error');
         setErrorMessage(data.error || 'Something went wrong. Please try again!');
       }
-    } catch (err) {
+    } catch {
       setStatus('error');
       setErrorMessage('Network error. Please check your connection and try again.');
     }

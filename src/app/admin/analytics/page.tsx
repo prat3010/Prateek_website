@@ -17,8 +17,7 @@ import {
   HelpCircle,
   Database,
   ArrowLeft,
-  TrendingUp,
-  Calendar
+  TrendingUp
 } from 'lucide-react';
 
 export const revalidate = 300; // Cache dashboard queries for 5 minutes (ISR) to optimize database hits
@@ -88,7 +87,7 @@ const safeDecode = (str: string | null) => {
   if (!str) return '';
   try {
     return decodeURIComponent(str);
-  } catch (e) {
+  } catch {
     return str;
   }
 };
@@ -103,7 +102,7 @@ const getFlagEmoji = (countryCode: string | null): string => {
         .split('')
         .map(char => 127397 + char.charCodeAt(0));
       return String.fromCodePoint(...codePoints);
-    } catch (e) {
+    } catch {
       return '🌐';
     }
   }
@@ -127,7 +126,7 @@ const getCountryName = (countryCode: string | null): string => {
   try {
     const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
     return regionNames.of(countryCode.toUpperCase()) || countryCode;
-  } catch (e) {
+  } catch {
     return countryCode;
   }
 };
@@ -244,7 +243,7 @@ export default async function AnalyticsPage(props: {
             } else {
               cleanRef = v.referrer;
             }
-          } catch (e) {
+          } catch {
             cleanRef = v.referrer;
           }
         }
@@ -269,7 +268,7 @@ export default async function AnalyticsPage(props: {
         if (dayEntry) {
           dayEntry.count++;
         }
-      } catch (e) {
+      } catch {
         // Ignore parsing errors for malformed dates
       }
     }
