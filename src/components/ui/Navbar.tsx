@@ -71,6 +71,17 @@ export default function Navbar({ items, className }: NavbarProps) {
     return () => observer.disconnect();
   }, [navItems]);
 
+  /* ---------- Close mobile menu on desktop resize ---------- */
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setMobileOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   /* ---------- Lock body scroll when mobile menu open ---------- */
   useEffect(() => {
     if (!lenis) return;

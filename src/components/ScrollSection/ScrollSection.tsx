@@ -18,14 +18,25 @@ interface SectionMetrics {
   sectionHeight: number;
   windowH: number;
   totalScrollable: number;
+  maxReachable: number;
 }
 
 function measure(el: HTMLElement): SectionMetrics {
+  const sectionStart = el.offsetTop;
+  const sectionHeight = el.offsetHeight;
+  const windowH = window.innerHeight;
+  const totalScrollable = document.documentElement.scrollHeight - window.innerHeight;
+  const denominator = sectionHeight + windowH;
+  const maxReachable = denominator > 0
+    ? Math.max(0, Math.min(1, (totalScrollable + windowH - sectionStart) / denominator))
+    : 1;
+
   return {
-    sectionStart: el.offsetTop,
-    sectionHeight: el.offsetHeight,
-    windowH: window.innerHeight,
-    totalScrollable: document.documentElement.scrollHeight - window.innerHeight,
+    sectionStart,
+    sectionHeight,
+    windowH,
+    totalScrollable,
+    maxReachable,
   };
 }
 
@@ -34,6 +45,7 @@ export default function ScrollSection({ children, direction, verticalOffset, cen
   const { scrollY } = useLenisScroll();
   const prefersReducedMotion = useReducedMotion();
   const [isMobile, setIsMobile] = useState(false);
+  const [isMeasured, setIsMeasured] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -44,9 +56,8 @@ export default function ScrollSection({ children, direction, verticalOffset, cen
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const maxPRef = useRef(1);
   const metricsRef = useRef<SectionMetrics>({
-    sectionStart: 0, sectionHeight: 0, windowH: 0, totalScrollable: 0,
+    sectionStart: 0, sectionHeight: 0, windowH: 0, totalScrollable: 0, maxReachable: 1,
   });
 
   const directionRef = useRef(direction);
@@ -66,11 +77,7 @@ export default function ScrollSection({ children, direction, verticalOffset, cen
     const latest = scrollY.get();
     const m = metricsRef.current;
     if (!m.sectionHeight) return 0;
-    const maxReachable = Math.max(0, Math.min(1,
-      (m.totalScrollable + m.windowH - m.sectionStart) / (m.sectionHeight + m.windowH)
-    ));
-    maxPRef.current = maxReachable;
-    return Math.max(0, Math.min(maxReachable,
+    return Math.max(0, Math.min(m.maxReachable,
       (latest + m.windowH - m.sectionStart) / (m.sectionHeight + m.windowH)
     ));
   });
@@ -88,7 +95,7 @@ export default function ScrollSection({ children, direction, verticalOffset, cen
     const start = dir === 'right' ? vw : -vw;
 
     if (cO) {
-      return start * (1 - Math.min(p / (maxPRef.current || 1), 1));
+      return start * (1 - Math.min(p / (metricsRef.current.maxReachable || 1), 1));
     }
 
     const end = dir === 'right' ? -vw : vw;
@@ -125,10 +132,12 @@ export default function ScrollSection({ children, direction, verticalOffset, cen
     if (!el) return;
 
     metricsRef.current = measure(el);
+    setIsMeasured(true);
     resizeTick.set(resizeTick.get() + 1);
 
     const ro = new ResizeObserver(() => {
       metricsRef.current = measure(el);
+      setIsMeasured(true);
       resizeTick.set(resizeTick.get() + 1);
     });
 
@@ -142,9 +151,16 @@ export default function ScrollSection({ children, direction, verticalOffset, cen
 
   return (
     <div ref={wrapperRef} style={gap ? { marginBottom: gap } : undefined}>
-      <m.div className={styles.scrollInner} style={{ x, y }}>
+      <m.div 
+        className={styles.scrollInner} 
+        style={{ x, y }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isMeasured ? 1 : 0 }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
+      >
         {children}
       </m.div>
     </div>
   );
 }
+

@@ -59,15 +59,18 @@ export default function Playground() {
 
   // Mobile body scroll lock when simulation is launched in fullscreen
   useEffect(() => {
-    if (isLaunched) {
-      const isMobile = window.innerWidth <= 992;
-      if (isMobile) {
+    const handleResize = () => {
+      if (isLaunched && window.innerWidth <= 992) {
         lenis?.stop();
+      } else {
+        lenis?.start();
       }
-    } else {
-      lenis?.start();
-    }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
     return () => {
+      window.removeEventListener('resize', handleResize);
       lenis?.start();
     };
   }, [isLaunched, lenis]);
