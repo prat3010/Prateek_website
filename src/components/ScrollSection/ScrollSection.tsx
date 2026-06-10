@@ -82,7 +82,27 @@ export default function ScrollSection({ children, direction, verticalOffset, cen
     ));
   });
 
-  const smoothProgress = useSpring(rawProgress, { stiffness: 80, damping: 20, mass: 1 });
+  const smoothProgress = useSpring(rawProgress, { stiffness: 85, damping: 22, mass: 1 });
+
+  // Scroll-linked opacity: soft fade-in as it enters, solid in the center, soft fade-out as it exits
+  const scrollOpacity = useTransform(() => {
+    if (!isMeasured) return 0;
+    const p = smoothProgress.get();
+    const cO = centerOnlyRef.current;
+
+    if (cO) {
+      const maxP = metricsRef.current.maxReachable || 1;
+      return Math.min(p / (maxP * 0.4 || 0.4), 1);
+    }
+
+    if (p < 0.25) {
+      return p / 0.25;
+    } else if (p < 0.7) {
+      return 1;
+    } else {
+      return Math.max(0, 1 - (p - 0.7) / 0.25);
+    }
+  });
 
   const x = useTransform(() => {
     const p = smoothProgress.get();
@@ -91,26 +111,36 @@ export default function ScrollSection({ children, direction, verticalOffset, cen
     const dir = directionRef.current;
     const vO = verticalOffsetRef.current;
     const cO = centerOnlyRef.current;
-    const vw = window.innerWidth;
-    const start = dir === 'right' ? vw : -vw;
+
+    // Subtle travel distance (180px) instead of viewport-wide flying
+    const travelDistance = 180;
+    const start = dir === 'right' ? travelDistance : -travelDistance;
 
     if (cO) {
-      return start * (1 - Math.min(p / (metricsRef.current.maxReachable || 1), 1));
+      const maxP = metricsRef.current.maxReachable || 1;
+      return start * (1 - Math.min(p / (maxP || 1), 1));
     }
 
-    const end = dir === 'right' ? -vw : vw;
+    const end = dir === 'right' ? -travelDistance : travelDistance;
 
     if (vO) {
       if (p < 0.3) {
-        return start + (0 - start) * (p / 0.3);
+        return start * (1 - p / 0.3);
       } else if (p < 0.6) {
         return 0;
       } else {
-        return end * (p - 0.6) / 0.4;
+        return end * Math.min((p - 0.6) / 0.3, 1);
       }
     }
 
-    return start + (end - start) * p;
+    // Standard section: Slide in, settle at 0 for reading, then slide out
+    if (p < 0.3) {
+      return start * (1 - p / 0.3);
+    } else if (p < 0.7) {
+      return 0;
+    } else {
+      return end * Math.min((p - 0.7) / 0.3, 1);
+    }
   });
 
   const y = useTransform(() => {
@@ -153,10 +183,7 @@ export default function ScrollSection({ children, direction, verticalOffset, cen
     <div ref={wrapperRef} style={gap ? { marginBottom: gap } : undefined}>
       <m.div 
         className={styles.scrollInner} 
-        style={{ x, y }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: isMeasured ? 1 : 0 }}
-        transition={{ duration: 0.2, ease: 'easeOut' }}
+        style={{ x, y, opacity: scrollOpacity }}
       >
         {children}
       </m.div>
