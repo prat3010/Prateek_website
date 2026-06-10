@@ -71,7 +71,8 @@
 }
 
 :global([data-theme='noir']) .highlightText {
-  color: #c5a059 !important;
+  color: var(--neon-pink) !important;
+  text-shadow: var(--neon-pink-glow) !important;
 }
 
 :global([data-theme='noir']) .vibeBox {
@@ -82,7 +83,8 @@
 }
 
 :global([data-theme='noir']) .vibeLabel {
-  color: #c5a059 !important;
+  color: var(--neon-yellow) !important;
+  text-shadow: var(--neon-yellow-glow) !important;
 }
 
 .cursor {
@@ -202,8 +204,9 @@
 
 :global([data-theme='noir']) .brandingName:hover {
   transform: none;
-  color: #cca34b;
-  border-color: #cca34b;
+  color: var(--neon-cyan) !important;
+  border-color: var(--neon-cyan) !important;
+  text-shadow: var(--neon-cyan-glow) !important;
 }
 
 :global([data-theme='noir']) .tagBadge {
@@ -220,12 +223,28 @@
   padding: 0.25rem 0.75rem;
 }
 
-:global([data-theme='noir']) .tagBadge:hover {
-  background-color: #fafafa !important;
-  color: #08080a !important;
-  border-color: #fafafa !important;
-  box-shadow: 4px 4px 0px #cca34b !important;
-  transform: translate(-2px, -2px) !important;
+:global([data-theme='noir']) .tagBadge:nth-child(1):hover {
+  background-color: #1e1e24 !important;
+  color: var(--neon-pink) !important;
+  border-color: var(--neon-pink) !important;
+  box-shadow: 0 0 10px var(--neon-pink) !important;
+  transform: translateY(-2px) !important;
+}
+
+:global([data-theme='noir']) .tagBadge:nth-child(2):hover {
+  background-color: #1e1e24 !important;
+  color: var(--neon-cyan) !important;
+  border-color: var(--neon-cyan) !important;
+  box-shadow: 0 0 10px var(--neon-cyan) !important;
+  transform: translateY(-2px) !important;
+}
+
+:global([data-theme='noir']) .tagBadge:nth-child(3):hover {
+  background-color: #1e1e24 !important;
+  color: var(--neon-yellow) !important;
+  border-color: var(--neon-yellow) !important;
+  box-shadow: 0 0 10px var(--neon-yellow) !important;
+  transform: translateY(-2px) !important;
 }
 
 /* CTA Button — speech bubble style */
@@ -449,8 +468,8 @@
 
 :global([data-theme='noir']) .ctaButton:hover {
   transform: translate(-3px, -3px) !important;
-  box-shadow: 7px 7px 0px #000000 !important;
-  background: #cca34b !important;
+  box-shadow: 5px 5px 0px #000000, 0 0 12px var(--neon-yellow) !important;
+  background: var(--neon-yellow) !important;
 }
 
 :global([data-theme='noir']) .ctaButton:active {

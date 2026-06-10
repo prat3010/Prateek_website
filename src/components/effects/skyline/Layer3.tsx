@@ -222,13 +222,15 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
                 {/* Border line */}
                 <WobblyRect wobble={wobble} wobbleStrength={strength} x="84" y="704" width="92" height="52" fill="none" strokeWidth="0.8" stroke="var(--skyline-stroke-mid)" />
                 
-                {/* Cocktail Glass Logo */}
-                <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 104 718 L 124 718 L 114 734 Z" fill="none" stroke="#ff1493" strokeWidth="1.2" /> {/* Glass Bowl */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="114" y1="734" x2="114" y2="746" stroke="#ff1493" strokeWidth="1.5" /> {/* Stem */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="107" y1="746" x2="121" y2="746" stroke="#ff1493" strokeWidth="1.5" /> {/* Base */}
-                
-                <text x="154" y="728" textAnchor="middle" fontFamily="var(--font-code)" fontWeight="bold" fontSize="7.8" fill="#ff1493" stroke="none">NOIR</text>
-                <text x="154" y="740" textAnchor="middle" fontFamily="var(--font-code)" fontWeight="bold" fontSize="7.8" fill="#ff1493" stroke="none">GIN</text>
+                {/* Cocktail Glass Logo & Neon Text */}
+                <g className={styles.billboardNeon}>
+                  <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 104 718 L 124 718 L 114 734 Z" fill="none" stroke="#ff1493" strokeWidth="1.2" /> {/* Glass Bowl */}
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="114" y1="734" x2="114" y2="746" stroke="#ff1493" strokeWidth="1.5" /> {/* Stem */}
+                  <WobblyLine wobble={wobble} wobbleStrength={strength} x1="107" y1="746" x2="121" y2="746" stroke="#ff1493" strokeWidth="1.5" /> {/* Base */}
+                  
+                  <text x="154" y="728" textAnchor="middle" fontFamily="var(--font-code)" fontWeight="bold" fontSize="7.8" fill="#ff1493" stroke="none">NOIR</text>
+                  <text x="154" y="740" textAnchor="middle" fontFamily="var(--font-code)" fontWeight="bold" fontSize="7.8" fill="#ff1493" stroke="none">GIN</text>
+                </g>
               </g>
 
               {/* Rooftop Penthouse Brick Access Shed (Static part) */}

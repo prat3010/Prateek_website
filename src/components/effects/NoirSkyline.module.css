@@ -873,13 +873,13 @@
   --skyline-hatch-mid: url(#hatch-mid);
   --skyline-hatch-fg: url(#hatch-fg);
   
-  --skyline-left-light-grad: url(#leftLightGrad);
+  --skyline-left-light-grad: url(#leftLightGradNeon);
   --skyline-downward-light-grad: url(#downwardLightGrad);
   --skyline-downward-light: url(#downwardLightGrad);
   
-  --skyline-searchlight-left: url(#leftLightGrad);
-  --skyline-searchlight-right: url(#rightLightGrad);
-  --skyline-blimp-spotlight: url(#blimpLightGrad);
+  --skyline-searchlight-left: url(#leftLightGradNeon);
+  --skyline-searchlight-right: url(#rightLightGradNeon);
+  --skyline-blimp-spotlight: url(#blimpLightGradNeon);
   --skyline-blimp-envelope: var(--color-bg);
   --skyline-blimp-stroke: rgba(250, 250, 250, 0.48);
   --skyline-blimp-stroke-fine: rgba(250, 250, 250, 0.25);
@@ -1374,8 +1374,112 @@
   }
 }
 
+/* ── Neon-Noir Skyline Additions ── */
+
+/* Billboard Neon Sign (Layer 3 Left Rooftop) */
+.billboardNeon path,
+.billboardNeon line {
+  stroke: #ff1493 !important;
+  transition: stroke 0.3s ease;
+}
+
+.billboardNeon text {
+  fill: #ff1493 !important;
+  stroke: none !important;
+  font-family: var(--font-code) !important;
+  font-weight: 800 !important;
+  transition: fill 0.3s ease;
+}
+
+.darkNoir .billboardNeon path,
+.darkNoir .billboardNeon line {
+  stroke: #ff1493 !important;
+  filter: drop-shadow(0 0 3px rgba(255, 20, 147, 0.95)) drop-shadow(0 0 1px rgba(255, 20, 147, 0.8));
+  animation: neonSignFlicker 7s infinite 1.5s;
+}
+
+.darkNoir .billboardNeon text {
+  fill: #ff1493 !important;
+  filter: drop-shadow(0 0 3px rgba(255, 20, 147, 0.95)) drop-shadow(0 0 1px rgba(255, 20, 147, 0.8));
+  animation: neonSignFlicker 7s infinite 1.5s;
+}
+
+/* Hotel Sign Board Rect glow */
+.darkNoir .hotelSignBoard {
+  stroke: #ff2a55 !important;
+  filter: drop-shadow(0 0 3px rgba(255, 42, 85, 0.8));
+  animation: neonSignFlicker 9s infinite 0.5s;
+}
+
+/* New BAR Neon Sign (Layer 2 Flatiron building) */
+.barNeonSign text {
+  font-family: var(--font-code);
+  font-size: 7.5px;
+  font-weight: 800;
+  fill: #00f0ff;
+  text-anchor: middle;
+  stroke: none;
+}
+
+.darkNoir .barNeonSign text {
+  fill: #00f0ff !important;
+  filter: drop-shadow(0 0 3px rgba(0, 240, 255, 0.95)) drop-shadow(0 0 1px rgba(0, 240, 255, 0.8));
+  animation: neonSignFlicker 8s infinite 0.2s;
+}
+
+.lightPopart .barNeonSign text {
+  fill: var(--pop-black) !important;
+  filter: none !important;
+}
+
+/* Colorful glowing windows */
+.glowingWindowPink {
+  stroke: #ff2a55 !important;
+  opacity: 0.85 !important;
+  filter: drop-shadow(0 0 2.5px rgba(255, 42, 85, 0.95)) drop-shadow(0 0 0.5px rgba(255, 42, 85, 0.8));
+}
+
+.glowingWindowCyan {
+  stroke: #00f0ff !important;
+  opacity: 0.85 !important;
+  filter: drop-shadow(0 0 2.5px rgba(0, 240, 255, 0.95)) drop-shadow(0 0 0.5px rgba(0, 240, 255, 0.8));
+}
+
+.lightPopart .glowingWindowPink {
+  stroke: var(--pop-pink) !important;
+  stroke-width: 4.5px !important;
+  stroke-dasharray: 4.5px 7px !important;
+  stroke-linecap: butt !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+.lightPopart .glowingWindowCyan {
+  stroke: var(--pop-cyan) !important;
+  stroke-width: 4.5px !important;
+  stroke-dasharray: 4.5px 7px !important;
+  stroke-linecap: butt !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+/* Neon UV Green wall graffiti (Layer 3 right wall) */
+.darkNoir .rightWallGraffiti {
+  stroke: #39ff14 !important;
+  filter: drop-shadow(0 0 3px rgba(57, 255, 20, 0.9)) drop-shadow(0 0 1px rgba(57, 255, 20, 0.6));
+  opacity: 0.9;
+  stroke-width: 2px !important;
+  animation: neonSignFlicker 12s infinite 3s;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hotelNeonText text,
+  .billboardNeon path,
+  .billboardNeon line,
+  .billboardNeon text,
+  .hotelSignBoard,
+  .barNeonSign text,
+  .rightWallGraffiti,
   .puddleRipple1,
   .puddleRipple2 {
     animation: none !important;

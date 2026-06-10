@@ -41,8 +41,10 @@ const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
           </g>
           {/* Window grid outlines on Left Tower */}
           <g strokeWidth="0.8" fill="none">
-            <g className={styles.glowingWindow} strokeDasharray="2.5 8">
+            <g className={styles.glowingWindowPink} strokeDasharray="2.5 8">
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="150" y1="700" x2="150" y2="1000" />
+            </g>
+            <g className={styles.glowingWindowCyan} strokeDasharray="2.5 8">
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="210" y1="640" x2="210" y2="1000" strokeDashoffset="3" />
             </g>
             <g className={styles.glowingWindowDim} strokeDasharray="2.5 8">
@@ -90,6 +92,19 @@ const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
             <WobblyLine wobble={wobble} wobbleStrength={strength} x1="530" y1="675" x2="530" y2="1080" />
           </g>
 
+          {/* BAR Neon Sign on Flatiron building */}
+          <g className={styles.barNeonSign}>
+            {/* Supporting brackets */}
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="495" y1="678" x2="505" y2="678" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="495" y1="718" x2="505" y2="718" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" />
+            {/* Sign board background */}
+            <WobblyRect wobble={wobble} wobbleStrength={strength} x="492" y="675" width="13" height="47" rx="1" fill="var(--skyline-billboard-bg)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+            {/* Letters */}
+            <text x="498.5" y="687" textAnchor="middle">B</text>
+            <text x="498.5" y="700.5" textAnchor="middle">A</text>
+            <text x="498.5" y="714" textAnchor="middle">R</text>
+          </g>
+
           {/* Citigroup-style Slanted Roof (Center-Right) */}
           <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 680 1080 L 680 690 L 760 610 L 790 610 L 790 1080 Z" className={styles.bldMidCitigroup} />
           {/* Parallel slanted cornice & center rib for Citigroup */}
@@ -101,7 +116,7 @@ const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
           </g>
           {/* Citibank window grids */}
           <g strokeWidth="0.8" fill="none">
-            <g className={styles.glowingWindow} strokeDasharray="3 10">
+            <g className={styles.glowingWindowCyan} strokeDasharray="3 10">
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="700" y1="695" x2="700" y2="1000" />
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="740" y1="655" x2="740" y2="1000" strokeDashoffset="4" />
             </g>
@@ -137,10 +152,12 @@ const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
 
           {/* Extra window grid lights in midground layer */}
           <g strokeWidth="0.8" fill="none">
-            <g className={styles.glowingWindow} strokeDasharray="3 10">
+            <g className={styles.glowingWindowPink} strokeDasharray="3 10">
               {/* Staggered window lights on Citigroup slanted roof building */}
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="708" y1="700" x2="708" y2="1000" />
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="752" y1="660" x2="752" y2="1000" strokeDashoffset="5" />
+            </g>
+            <g className={styles.glowingWindowCyan} strokeDasharray="3 10">
               {/* Staggered windows on Staggered double-tower left */}
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="140" y1="720" x2="140" y2="1000" strokeDashoffset="2" />
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="220" y1="670" x2="220" y2="1000" strokeDashoffset="6" />
@@ -185,9 +202,13 @@ const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
           </g>
           {/* Hotel windows grid */}
           <g strokeWidth="0.8" fill="none">
-            <g className={styles.glowingWindow} strokeDasharray="2.5 8">
+            <g className={styles.glowingWindowPink} strokeDasharray="2.5 8">
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1510" y1="690" x2="1510" y2="1000" />
+            </g>
+            <g className={styles.glowingWindowCyan} strokeDasharray="2.5 8">
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1550" y1="690" x2="1550" y2="1000" strokeDashoffset="3" />
+            </g>
+            <g className={styles.glowingWindowPink} strokeDasharray="2.5 8">
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1590" y1="690" x2="1590" y2="1000" strokeDashoffset="6" />
             </g>
             <g className={styles.glowingWindowDim} strokeDasharray="2.5 8">
@@ -228,7 +249,7 @@ const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
           </g>
           {/* Windows */}
           <g strokeWidth="0.8" fill="none">
-            <g className={styles.glowingWindow} strokeDasharray="2.5 9">
+            <g className={styles.glowingWindowCyan} strokeDasharray="2.5 9">
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="975" y1="610" x2="975" y2="1000" />
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1015" y1="610" x2="1015" y2="1000" strokeDashoffset="4" />
             </g>
@@ -491,7 +512,7 @@ const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
           <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1475" y1="745" x2="1490" y2="745" stroke="var(--skyline-stroke-mid)" strokeWidth="1" fill="none" />
           
           {/* Sign board background */}
-          <WobblyRect wobble={wobble} wobbleStrength={strength} x="1474" y="680" width="12" height="70" fill="var(--skyline-billboard-bg)" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
+          <WobblyRect wobble={wobble} wobbleStrength={strength} x="1474" y="680" width="12" height="70" fill="var(--skyline-billboard-bg)" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" className={styles.hotelSignBoard} />
           
           {/* Neon Letters */}
           <g className={styles.hotelNeonText} fill="none" stroke="none">

@@ -214,16 +214,63 @@
   }
 }
 
-/* Noir Mode overrides for social links card */
+:global([data-theme='noir']) .sectionTitle {
+  color: var(--neon-pink) !important;
+  text-shadow: var(--neon-pink-glow) !important;
+}
+
+:global([data-theme='noir']) .form {
+  background: #121214 !important;
+  border-color: #555562 !important;
+  box-shadow: 6px 6px 0px #1c1c1f !important;
+}
+
+:global([data-theme='noir']) .input,
+:global([data-theme='noir']) .textarea {
+  background: #121214 !important;
+  color: #fafafa !important;
+  border-color: #555562 !important;
+}
+
+:global([data-theme='noir']) .input:focus,
+:global([data-theme='noir']) .textarea:focus {
+  border-color: var(--neon-cyan) !important;
+  box-shadow: 0 0 10px var(--neon-cyan) !important;
+  background: #121214 !important;
+  color: #fafafa !important;
+}
+
+:global([data-theme='noir']) .submitBtn {
+  background: #1e1e24 !important;
+  color: #ffffff !important;
+  border-color: #555562 !important;
+  box-shadow: 4px 4px 0px #1c1c1f !important;
+  transition: transform 0.15s, box-shadow 0.15s, background-color 0.2s, border-color 0.2s, color 0.2s !important;
+}
+
+:global([data-theme='noir']) .submitBtn:hover {
+  background-color: #1e1e24 !important;
+  color: var(--neon-pink) !important;
+  border-color: var(--neon-pink) !important;
+  box-shadow: 0 0 12px var(--neon-pink) !important;
+  transform: translateY(-2px) !important;
+}
+
+:global([data-theme='noir']) .submitBtn:active {
+  transform: translateY(1px) !important;
+  box-shadow: 2px 2px 0px #1c1c1f !important;
+}
+
 :global([data-theme='noir']) .socialCard {
   background: #121214 !important;
-  border-color: #ffffff !important;
+  border-color: var(--neon-pink) !important;
   color: #ffffff !important;
-  box-shadow: 6px 6px 0px #ffffff !important;
+  box-shadow: 6px 6px 0px var(--neon-pink) !important;
 }
 
 :global([data-theme='noir']) .socialTitle {
-  color: #ffffff !important;
+  color: var(--neon-pink) !important;
+  text-shadow: var(--neon-pink-glow) !important;
 }
 
 :global([data-theme='noir']) .socialDesc {
@@ -237,7 +284,9 @@
 }
 
 :global([data-theme='noir']) .socialLink:hover {
-  background: #ffffff !important;
-  color: #000000 !important;
-  border-color: #000000 !important;
+  background: #121214 !important;
+  color: var(--neon-cyan) !important;
+  border-color: var(--neon-cyan) !important;
+  box-shadow: 0 0 10px var(--neon-cyan) !important;
+  transform: translateX(4px) !important;
 }

@@ -434,7 +434,7 @@ const Layer1 = React.memo(function Layer1({ reducedMotion }: LayerProps) {
           {/* Distant Inhabited Window Grids (office lights) */}
           <g fill="none">
             {/* Empire State windows - Glowing */}
-            <g className={styles.glowingWindow} strokeWidth="1.0" strokeDasharray="2.5 8">
+            <g className={styles.glowingWindowPink} strokeWidth="1.0" strokeDasharray="2.5 8">
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="942" y1="610" x2="942" y2="830" />
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="966" y1="610" x2="966" y2="830" strokeDashoffset="4" />
             </g>
@@ -445,7 +445,7 @@ const Layer1 = React.memo(function Layer1({ reducedMotion }: LayerProps) {
             </g>
 
             {/* Chrysler windows - Glowing */}
-            <g className={styles.glowingWindow} strokeWidth="1.0" strokeDasharray="2 7">
+            <g className={styles.glowingWindowCyan} strokeWidth="1.0" strokeDasharray="2 7">
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="474" y1="670" x2="474" y2="1000" />
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="514" y1="670" x2="514" y2="1000" strokeDashoffset="3" />
             </g>
@@ -456,7 +456,7 @@ const Layer1 = React.memo(function Layer1({ reducedMotion }: LayerProps) {
             </g>
 
             {/* Stepped Needle Tower windows */}
-            <g className={styles.glowingWindow} strokeWidth="0.8" strokeDasharray="3 9">
+            <g className={styles.glowingWindowPink} strokeWidth="0.8" strokeDasharray="3 9">
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="242" y1="720" x2="242" y2="1000" />
             </g>
             <g className={styles.glowingWindowDim} strokeWidth="0.8" strokeDasharray="3 9">
@@ -464,7 +464,7 @@ const Layer1 = React.memo(function Layer1({ reducedMotion }: LayerProps) {
             </g>
 
             {/* Background Block Tower windows */}
-            <g className={styles.glowingWindow} strokeWidth="0.8" strokeDasharray="3 9">
+            <g className={styles.glowingWindowCyan} strokeWidth="0.8" strokeDasharray="3 9">
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="550" y1="660" x2="550" y2="1000" />
             </g>
             <g className={styles.glowingWindowDim} strokeWidth="0.8" strokeDasharray="3 9">

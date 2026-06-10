@@ -327,12 +327,30 @@
 }
 
 :global([data-theme='noir']) .themeToggle:hover {
-  background-color: #FFFFFF !important;
-  color: #000000 !important;
-  border-color: #FFFFFF !important;
-  box-shadow: 4px 4px 0px #FFFFFF !important;
+  background-color: #121214 !important;
+  color: var(--neon-yellow) !important;
+  border-color: var(--neon-yellow) !important;
+  box-shadow: 0 0 10px var(--neon-yellow) !important;
+  transform: translate(-1px, -1px) !important;
 }
 
 :global([data-theme='noir']) .themeToggle:active {
-  box-shadow: 1px 1px 0px #FFFFFF !important;
+  box-shadow: 0 0 5px var(--neon-yellow) !important;
+  transform: translate(1px, 1px) !important;
+}
+
+/* ─ Neon navigation links overrides ─ */
+:global([data-theme='noir']) .navLink:hover {
+  color: var(--neon-cyan) !important;
+  text-shadow: var(--neon-cyan-glow) !important;
+}
+
+:global([data-theme='noir']) .navLink.active::after {
+  background: var(--neon-cyan) !important;
+  box-shadow: 0 0 8px var(--neon-cyan) !important;
+}
+
+:global([data-theme='noir']) .mobileNavLink:hover {
+  color: var(--neon-cyan) !important;
+  text-shadow: var(--neon-cyan-glow) !important;
 }

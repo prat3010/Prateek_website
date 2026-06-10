@@ -203,3 +203,23 @@
     font-size: 0.9rem;
   }
 }
+
+/* ── Neon Noir Footer Overrides ── */
+:global([data-theme='noir']) .footer {
+  border-top: 5px solid var(--neon-pink) !important;
+  box-shadow: 0 -4px 12px rgba(255, 42, 85, 0.25) !important;
+}
+
+:global([data-theme='noir']) .socialLink:hover {
+  background-color: #121214 !important;
+  border-color: var(--neon-pink) !important;
+  color: var(--neon-pink) !important;
+  box-shadow: 0 0 10px var(--neon-pink) !important;
+  transform: scale(1.15) rotate(-3deg) !important;
+}
+
+:global([data-theme='noir']) .analyticsLink:hover {
+  color: var(--neon-yellow) !important;
+  text-shadow: var(--neon-yellow-glow) !important;
+  opacity: 1 !important;
+}

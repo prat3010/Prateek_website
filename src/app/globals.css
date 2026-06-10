@@ -186,6 +186,18 @@
   --dot-pattern-medium: radial-gradient(circle, rgba(255, 255, 255, 0.14) 2.2px, transparent 2.2px);
   --dot-pattern-heavy: radial-gradient(circle, rgba(255, 255, 255, 0.22) 2.5px, transparent 2.5px);
   --dot-pattern-color: radial-gradient(circle, rgba(255, 255, 255, 0.14) 2.2px, transparent 2.2px);
+
+  /* ─ Neon Design Tokens for Cyber-Noir Mode ─ */
+  --neon-pink: #ff2a55;
+  --neon-cyan: #00f0ff;
+  --neon-yellow: #ffe600;
+  --neon-green: #39ff14;
+  --neon-purple: #bd00ff;
+  --neon-pink-glow: 0 0 4px var(--neon-pink), 0 0 12px rgba(255, 42, 85, 0.4);
+  --neon-cyan-glow: 0 0 4px var(--neon-cyan), 0 0 12px rgba(0, 240, 255, 0.4);
+  --neon-yellow-glow: 0 0 4px var(--neon-yellow), 0 0 12px rgba(255, 230, 0, 0.4);
+  --neon-green-glow: 0 0 4px var(--neon-green), 0 0 12px rgba(57, 255, 20, 0.4);
+  --neon-purple-glow: 0 0 4px var(--neon-purple), 0 0 12px rgba(189, 0, 255, 0.4);
 }
 
 /* ─ Scrollbar Styling Override in Noir Mode ─ */

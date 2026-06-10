@@ -71,6 +71,27 @@ const Layer0 = React.memo(function Layer0() {
           <stop offset="100%" stopColor="rgba(0, 230, 118, 0)" />
         </linearGradient>
 
+        {/* Left Searchlight Gradient Neon (Cyan) */}
+        <linearGradient id="leftLightGradNeon" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stopColor="rgba(0, 240, 255, 0.25)" />
+          <stop offset="60%" stopColor="rgba(0, 240, 255, 0.06)" />
+          <stop offset="100%" stopColor="rgba(0, 240, 255, 0)" />
+        </linearGradient>
+
+        {/* Right Searchlight Gradient Neon (Pink) */}
+        <linearGradient id="rightLightGradNeon" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stopColor="rgba(255, 42, 85, 0.25)" />
+          <stop offset="50%" stopColor="rgba(255, 42, 85, 0.06)" />
+          <stop offset="100%" stopColor="rgba(255, 42, 85, 0)" />
+        </linearGradient>
+
+        {/* Blimp Searchlight Gradient Neon (Yellow) */}
+        <linearGradient id="blimpLightGradNeon" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="rgba(255, 230, 0, 0.35)" />
+          <stop offset="60%" stopColor="rgba(255, 230, 0, 0.1)" />
+          <stop offset="100%" stopColor="rgba(255, 230, 0, 0)" />
+        </linearGradient>
+
         {/* Sky Gradient Popart */}
         <radialGradient id="skyGradPopart" cx="50%" cy="40%" r="70%">
           <stop offset="0%" stopColor="#FFFDF6" />

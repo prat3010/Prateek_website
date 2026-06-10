@@ -8,6 +8,124 @@ import { LayerProps } from './types';
 const BridgeLayer = React.memo(function BridgeLayer({ reducedMotion }: LayerProps) {
   const wobble = !reducedMotion;
   const strength = 3.5;
+
+  // Main Cable Y equation
+  const getCableY = (x: number) => {
+    if (x < 880) {
+      // Left cable: M 880 730 Q 670 820 400 860
+      const t = (-7 + Math.sqrt(49 + (880 - x) / 15)) / 2;
+      return (1 - t) * (1 - t) * 730 + 2 * (1 - t) * t * 820 + t * t * 860;
+    } else {
+      // Right cable: M 880 730 Q 1150 820 1480 860
+      const t = (-9 + Math.sqrt(81 + (x - 880) / 15)) / 2;
+      return (1 - t) * (1 - t) * 730 + 2 * (1 - t) * t * 820 + t * t * 860;
+    }
+  };
+
+  // Roadway Deck Y equation
+  // M 400 854 Q 880 820 1480 854
+  const getDeckY = (x: number) => {
+    const u = (-8 + Math.sqrt(64 + (x - 400) / 30)) / 2;
+    return (1 - u) * (1 - u) * 854 + 2 * (1 - u) * u * 820 + u * u * 854;
+  };
+
+  // Generate dynamic suspender lines
+  const suspenders = React.useMemo(() => {
+    const lines: React.ReactNode[] = [];
+    // Left side suspenders (from x=415 to x=835 at 15px intervals)
+    for (let x = 415; x <= 835; x += 15) {
+      const y1 = getCableY(x);
+      const y2 = getDeckY(x);
+      lines.push(
+        <WobblyLine
+          key={`susp-l-${x}`}
+          wobble={wobble}
+          wobbleStrength={strength}
+          x1={x}
+          y1={y1}
+          x2={x}
+          y2={y2}
+          stroke="var(--skyline-stroke-fine)"
+          strokeWidth="0.7"
+          fill="none"
+        />
+      );
+    }
+    // Right side suspenders (from x=925 to x=1465 at 15px intervals)
+    for (let x = 925; x <= 1465; x += 15) {
+      const y1 = getCableY(x);
+      const y2 = getDeckY(x);
+      lines.push(
+        <WobblyLine
+          key={`susp-r-${x}`}
+          wobble={wobble}
+          wobbleStrength={strength}
+          x1={x}
+          y1={y1}
+          x2={x}
+          y2={y2}
+          stroke="var(--skyline-stroke-fine)"
+          strokeWidth="0.7"
+          fill="none"
+        />
+      );
+    }
+    return lines;
+  }, [wobble, strength]);
+
+  // Generate handrail stanchions
+  const stanchions = React.useMemo(() => {
+    const posts: React.ReactNode[] = [];
+    for (let x = 405; x <= 1475; x += 15) {
+      if (x >= 845 && x <= 915) continue; // Skip the tower area
+      const y = getDeckY(x);
+      posts.push(
+        <WobblyLine
+          key={`stanchion-${x}`}
+          wobble={wobble}
+          wobbleStrength={strength}
+          x1={x}
+          y1={y}
+          x2={x}
+          y2={y - 4.5}
+          stroke="var(--skyline-stroke-mid)"
+          strokeWidth="0.6"
+          fill="none"
+        />
+      );
+    }
+    return posts;
+  }, [wobble, strength]);
+
+  // Streetlight glow cones
+  const streetlightCones = React.useMemo(() => {
+    const streetlights = [
+      { cx: 546, cy: 830.3 },
+      { cx: 646, cy: 825.7 },
+      { cx: 746, cy: 822.7 },
+      { cx: 846, cy: 821.2 },
+      { cx: 954, cy: 821.1 },
+      { cx: 1054, cy: 822.2 },
+      { cx: 1154, cy: 824.5 },
+      { cx: 1254, cy: 827.9 },
+      { cx: 1354, cy: 832.3 }
+    ];
+    return streetlights.map((light, idx) => {
+      const roadY = getDeckY(light.cx);
+      const points = `${light.cx},${light.cy} ${light.cx - 9},${roadY} ${light.cx + 9},${roadY}`;
+      return (
+        <WobblyPolygon
+          key={`light-cone-${idx}`}
+          wobble={wobble}
+          wobbleStrength={1.5}
+          points={points}
+          fill="var(--skyline-light-ray)"
+          stroke="none"
+        />
+      );
+    });
+  }, [wobble]);
+
   return (
     <>
       {/* Static Layer */}
@@ -91,6 +209,11 @@ const BridgeLayer = React.memo(function BridgeLayer({ reducedMotion }: LayerProp
                 <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="877,720 883,720 880,712" />
               </g>
 
+              {/* Tower Spire Mast and Guy-wires */}
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="880" y1="712" x2="880" y2="670" stroke="var(--skyline-stroke-fg)" strokeWidth="1.5" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="880" y1="670" x2="864" y2="726" stroke="var(--skyline-stroke-fine)" strokeWidth="0.8" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="880" y1="670" x2="896" y2="726" stroke="var(--skyline-stroke-fine)" strokeWidth="0.8" />
+
               {/* Detailed double gothic arches */}
               <g fill="none">
                 <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 865 840 A 12 25 0 0 1 895 840" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
@@ -144,6 +267,9 @@ const BridgeLayer = React.memo(function BridgeLayer({ reducedMotion }: LayerProp
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="865" y1="1014" x2="895" y2="1014" strokeDasharray="2 8" />
               </g>
 
+              {/* Streetlight Glow Cones */}
+              {streetlightCones}
+
               {/* Bridge Cables (Extended ends from 460/1420 to 400/1480) */}
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 880 730 Q 670 820 400 860" fill="none" strokeWidth="2.2" stroke="var(--skyline-stroke-fg)" />
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 880 730 Q 1150 820 1480 860" fill="none" strokeWidth="2.2" stroke="var(--skyline-stroke-fg)" />
@@ -178,6 +304,9 @@ const BridgeLayer = React.memo(function BridgeLayer({ reducedMotion }: LayerProp
                 <circle cx="1260" cy="827.0" r="1.3" />
               </g>
 
+              {/* Vertical Suspender Cables */}
+              {suspenders}
+
               {/* Bridge Roadway Deck (Warren Truss/Steel Girder Structure, Extended) */}
               <g stroke="var(--skyline-stroke-fg)" fill="none">
                 <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 400 854 Q 880 820 1480 854" strokeWidth="1.5" />
@@ -186,6 +315,10 @@ const BridgeLayer = React.memo(function BridgeLayer({ reducedMotion }: LayerProp
                 <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 400 854.0 L 420 858.2 L 440 850.5 L 460 854.9 L 480 848.1 L 500 852.3 L 520 845.2 L 540 849.5 L 560 842.1 L 580 846.5 L 600 839.2 L 620 843.8 L 640 836.4 L 660 841.1 L 680 833.9 L 700 838.4 L 720 831.2 L 740 836.0 L 760 828.5 L 780 833.1 L 800 825.8 L 820 830.4 L 840 823.1 L 860 827.8" strokeWidth="0.8" stroke="var(--skyline-stroke-mid)" />
                 <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 900 827.8 L 920 823.1 L 940 830.4 L 960 825.8 L 980 833.1 L 1000 828.5 L 1020 836.0 L 1040 831.2 L 1060 838.4 L 1080 833.9 L 1100 841.1 L 1120 836.4 L 1140 843.8 L 1160 839.2 L 1180 846.5 L 1200 842.1 L 1220 849.5 L 1240 845.2 L 1260 852.3 L 1280 848.1 L 1300 854.9 L 1320 850.5 L 1340 858.2 L 1360 854.0 M 1360 854.0 L 1380 858.5 L 1400 851.2 L 1420 856.0 L 1440 848.9 L 1460 853.9 L 1480 848.9" strokeWidth="0.8" stroke="var(--skyline-stroke-mid)" />
               </g>
+
+              {/* Pedestrian Handrail & Stanchions */}
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 400 850 Q 880 816 1480 850" fill="none" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
+              {stanchions}
 
               {/* Roadway traffic light trails (Static lines, Extended) */}
               <g stroke="none">
@@ -232,7 +365,7 @@ const BridgeLayer = React.memo(function BridgeLayer({ reducedMotion }: LayerProp
       <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0, pointerEvents: 'none' }}>
             <g fill="var(--skyline-fill-bg)" stroke="var(--skyline-stroke-fg)" strokeWidth="1.8" className={styles.buildingGroup}>
               {/* Warning Beacon at Tower Peak */}
-              <circle cx="880" cy="710" r="2.0" className={styles.bridgeBeacon} />
+              <circle cx="880" cy="670" r="2.2" className={styles.bridgeBeacon} />
 
               {/* Bridge Streetlights */}
               <g fill="var(--skyline-bulb-glow)" stroke="none">
