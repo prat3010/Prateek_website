@@ -415,4 +415,110 @@
   background: #000000 !important;
   color: #fafafa !important;
   border-color: #fafafa !important;
+  transition: transform 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s !important;
 }
+
+:global([data-theme='noir']) .modalClose:hover {
+  border-color: var(--neon-pink) !important;
+  color: var(--neon-pink) !important;
+  box-shadow: 0 0 12px var(--neon-pink) !important;
+}
+
+/* ---- Neon Cyber-Noir Overrides ---- */
+:global([data-theme='noir']) .sectionTitle {
+  color: var(--neon-pink) !important;
+  text-shadow: var(--neon-pink-glow) !important;
+}
+
+:global([data-theme='noir']) .panel {
+  background-color: #121214 !important;
+  border-color: #555562 !important;
+  box-shadow: 4px 4px 0px #1c1c1f !important;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease !important;
+}
+
+/* Individual Panel Hover Glows */
+:global([data-theme='noir']) .panel:nth-child(1):hover {
+  border-color: var(--neon-cyan) !important;
+  box-shadow: 0 0 15px var(--neon-cyan) !important;
+}
+:global([data-theme='noir']) .panel:nth-child(1):hover .statusLive,
+:global([data-theme='noir']) .panel:nth-child(1):hover .statusSoon {
+  border-color: var(--neon-cyan) !important;
+  color: var(--neon-cyan) !important;
+  box-shadow: 0 0 8px var(--neon-cyan) !important;
+}
+:global([data-theme='noir']) .panel:nth-child(1):hover .tag {
+  border-color: var(--neon-cyan) !important;
+  color: var(--neon-cyan) !important;
+  box-shadow: 0 0 5px var(--neon-cyan) !important;
+}
+
+:global([data-theme='noir']) .panel:nth-child(2):hover {
+  border-color: var(--neon-pink) !important;
+  box-shadow: 0 0 15px var(--neon-pink) !important;
+}
+:global([data-theme='noir']) .panel:nth-child(2):hover .statusLive,
+:global([data-theme='noir']) .panel:nth-child(2):hover .statusSoon {
+  border-color: var(--neon-pink) !important;
+  color: var(--neon-pink) !important;
+  box-shadow: 0 0 8px var(--neon-pink) !important;
+}
+:global([data-theme='noir']) .panel:nth-child(2):hover .tag {
+  border-color: var(--neon-pink) !important;
+  color: var(--neon-pink) !important;
+  box-shadow: 0 0 5px var(--neon-pink) !important;
+}
+
+:global([data-theme='noir']) .panel:nth-child(3):hover {
+  border-color: var(--neon-yellow) !important;
+  box-shadow: 0 0 15px var(--neon-yellow) !important;
+}
+:global([data-theme='noir']) .panel:nth-child(3):hover .statusLive,
+:global([data-theme='noir']) .panel:nth-child(3):hover .statusSoon {
+  border-color: var(--neon-yellow) !important;
+  color: var(--neon-yellow) !important;
+  box-shadow: 0 0 8px var(--neon-yellow) !important;
+}
+:global([data-theme='noir']) .panel:nth-child(3):hover .tag {
+  border-color: var(--neon-yellow) !important;
+  color: var(--neon-yellow) !important;
+  box-shadow: 0 0 5px var(--neon-yellow) !important;
+}
+
+:global([data-theme='noir']) .panel:nth-child(4):hover {
+  border-color: var(--neon-green) !important;
+  box-shadow: 0 0 15px var(--neon-green) !important;
+}
+:global([data-theme='noir']) .panel:nth-child(4):hover .statusLive,
+:global([data-theme='noir']) .panel:nth-child(4):hover .statusSoon {
+  border-color: var(--neon-green) !important;
+  color: var(--neon-green) !important;
+  box-shadow: 0 0 8px var(--neon-green) !important;
+}
+:global([data-theme='noir']) .panel:nth-child(4):hover .tag {
+  border-color: var(--neon-green) !important;
+  color: var(--neon-green) !important;
+  box-shadow: 0 0 5px var(--neon-green) !important;
+}
+
+/* Modal Neon Glows */
+:global([data-theme='noir']) .modalContent {
+  background: #121214 !important;
+  border: 4px solid var(--neon-pink) !important;
+  box-shadow: 0 0 25px var(--neon-pink) !important;
+}
+:global([data-theme='noir']) .modalTitle {
+  color: var(--neon-pink) !important;
+  text-shadow: var(--neon-pink-glow) !important;
+}
+:global([data-theme='noir']) .modalDescription {
+  color: #e0e0e3 !important;
+}
+:global([data-theme='noir']) .modalTags .tag {
+  background: #121214 !important;
+  border-color: var(--neon-pink) !important;
+  color: var(--neon-pink) !important;
+  box-shadow: 0 0 8px var(--neon-pink) !important;
+}
+

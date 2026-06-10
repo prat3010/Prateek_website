@@ -197,25 +197,27 @@
   border: var(--border-thin);
 }
 
-/* ===== NOIR THEME OVERRIDES ===== */
+
 :global([data-theme='noir']) .moBanner {
   background: #121214 !important;
-  border: 2px solid #ffffff !important;
-  box-shadow: 6px 6px 0px #ffffff !important;
+  border: 2px solid var(--neon-yellow) !important;
+  box-shadow: 0 0 15px rgba(255, 230, 0, 0.2) !important;
   transform: none !important;
   padding: 1.5rem 1.75rem;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
 }
 
 :global([data-theme='noir']) .moBanner:hover {
   transform: scale(1.01) !important;
-  box-shadow: 8px 8px 0px #ffffff !important;
+  border-color: var(--neon-yellow) !important;
+  box-shadow: 0 0 20px var(--neon-yellow) !important;
 }
 
 :global([data-theme='noir']) .moBadge {
   background: #000000 !important;
-  color: #ffffff !important;
-  border: 2px solid #ffffff !important;
-  box-shadow: none !important;
+  color: var(--neon-yellow) !important;
+  border: 2px solid var(--neon-yellow) !important;
+  box-shadow: 0 0 8px var(--neon-yellow) !important;
   top: -14px;
   left: 15px;
   transform: none !important;
@@ -230,7 +232,7 @@
   font-family: monospace, Courier, sans-serif !important;
   font-size: 1.35rem !important;
   font-weight: bold !important;
-  border-bottom: 1px dashed #ffffff;
+  border-bottom: 1px dashed var(--neon-yellow) !important;
   padding-bottom: 0.35rem;
   margin-bottom: 0.75rem;
 }
@@ -258,21 +260,15 @@
 :global([data-theme='noir']) .card {
   background-color: #121214 !important;
   color: #FAFAFA !important;
-  --skill-color: #FAFAFA !important;
-  border: 2px solid #ffffff !important;
+  border: 2px solid #555562 !important;
   border-top-left-radius: 0px !important;
   border-top-right-radius: 4px !important;
   border-bottom-left-radius: 4px !important;
   border-bottom-right-radius: 4px !important;
-  box-shadow: 4px 4px 0px #ffffff !important;
+  box-shadow: 4px 4px 0px #1c1c1f !important;
   margin-top: 1.5rem !important;
   overflow: visible !important;
-}
-
-:global([data-theme='noir']) .card:hover {
-  transform: scale(1.04) rotate(0deg) !important;
-  box-shadow: 6px 6px 0px #ffffff !important;
-  z-index: 10;
+  transition: transform 0.3s var(--transition-bounce), border-color 0.3s ease, box-shadow 0.3s ease !important;
 }
 
 :global([data-theme='noir']) .card::before {
@@ -283,9 +279,9 @@
   height: 20px;
   padding: 0 10px;
   background: #121214;
-  border-top: 2px solid #ffffff;
-  border-left: 2px solid #ffffff;
-  border-right: 2px solid #ffffff;
+  border-top: 2px solid #555562;
+  border-left: 2px solid #555562;
+  border-right: 2px solid #555562;
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
   color: #ffffff;
@@ -298,6 +294,80 @@
   justify-content: center;
   letter-spacing: 0.08em;
   z-index: 2;
+  transition: border-color 0.3s ease, color 0.3s ease !important;
+}
+
+/* Category-specific card hover glows & top tabs */
+/* Card: Frontend - Neon Pink */
+:global([data-theme='noir']) .card[data-category='frontend']:hover {
+  transform: scale(1.04) rotate(0deg) !important;
+  border-color: var(--neon-pink) !important;
+  box-shadow: 0 0 15px var(--neon-pink) !important;
+  z-index: 10;
+}
+:global([data-theme='noir']) .card[data-category='frontend']:hover::before {
+  border-top-color: var(--neon-pink) !important;
+  border-left-color: var(--neon-pink) !important;
+  border-right-color: var(--neon-pink) !important;
+  color: var(--neon-pink) !important;
+}
+:global([data-theme='noir']) .card[data-category='frontend'] .skillDot {
+  background-color: var(--neon-pink) !important;
+  box-shadow: 0 0 8px var(--neon-pink) !important;
+}
+
+/* Card: Backend - Neon Cyan */
+:global([data-theme='noir']) .card[data-category='backend']:hover {
+  transform: scale(1.04) rotate(0deg) !important;
+  border-color: var(--neon-cyan) !important;
+  box-shadow: 0 0 15px var(--neon-cyan) !important;
+  z-index: 10;
+}
+:global([data-theme='noir']) .card[data-category='backend']:hover::before {
+  border-top-color: var(--neon-cyan) !important;
+  border-left-color: var(--neon-cyan) !important;
+  border-right-color: var(--neon-cyan) !important;
+  color: var(--neon-cyan) !important;
+}
+:global([data-theme='noir']) .card[data-category='backend'] .skillDot {
+  background-color: var(--neon-cyan) !important;
+  box-shadow: 0 0 8px var(--neon-cyan) !important;
+}
+
+/* Card: Tools - Neon Yellow */
+:global([data-theme='noir']) .card[data-category='tools']:hover {
+  transform: scale(1.04) rotate(0deg) !important;
+  border-color: var(--neon-yellow) !important;
+  box-shadow: 0 0 15px var(--neon-yellow) !important;
+  z-index: 10;
+}
+:global([data-theme='noir']) .card[data-category='tools']:hover::before {
+  border-top-color: var(--neon-yellow) !important;
+  border-left-color: var(--neon-yellow) !important;
+  border-right-color: var(--neon-yellow) !important;
+  color: var(--neon-yellow) !important;
+}
+:global([data-theme='noir']) .card[data-category='tools'] .skillDot {
+  background-color: var(--neon-yellow) !important;
+  box-shadow: 0 0 8px var(--neon-yellow) !important;
+}
+
+/* Card: Creative - Neon Purple */
+:global([data-theme='noir']) .card[data-category='creative']:hover {
+  transform: scale(1.04) rotate(0deg) !important;
+  border-color: var(--neon-purple) !important;
+  box-shadow: 0 0 15px var(--neon-purple) !important;
+  z-index: 10;
+}
+:global([data-theme='noir']) .card[data-category='creative']:hover::before {
+  border-top-color: var(--neon-purple) !important;
+  border-left-color: var(--neon-purple) !important;
+  border-right-color: var(--neon-purple) !important;
+  color: var(--neon-purple) !important;
+}
+:global([data-theme='noir']) .card[data-category='creative'] .skillDot {
+  background-color: var(--neon-purple) !important;
+  box-shadow: 0 0 8px var(--neon-purple) !important;
 }
 
 :global([data-theme='noir']) .card::after {
@@ -340,35 +410,37 @@
   }
 }
 
-
+/* Category Tabs Styling */
 :global([data-theme='noir']) .tab {
   background: #121214 !important;
   color: #ffffff !important;
-  border: 3px solid #ffffff !important;
+  border: 3px solid #555562 !important;
   border-radius: 0px !important;
-  box-shadow: 3px 3px 0px #ffffff !important;
+  box-shadow: 3px 3px 0px #1c1c1f !important;
   font-family: var(--font-comic-neue), 'Comic Neue', sans-serif !important;
   font-weight: bold !important;
   text-transform: uppercase !important;
   letter-spacing: 0.05em !important;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
 }
 
 :global([data-theme='noir']) .tab:hover {
-  background: #cca34b !important; /* Muted yellow hover */
-  color: #000000 !important;
-  border-color: #ffffff !important;
+  background: #121214 !important;
+  color: var(--neon-cyan) !important;
+  border-color: var(--neon-cyan) !important;
   transform: scale(1.05) !important;
-  box-shadow: 4px 4px 0px #ffffff !important;
+  box-shadow: 0 0 12px var(--neon-cyan) !important;
 }
 
 :global([data-theme='noir']) .tabActive {
-  background: #c5a059 !important; /* Active mustard yellow */
-  color: #000000 !important;
-  border: 3px solid #ffffff !important;
+  background: #121214 !important;
+  color: var(--neon-pink) !important;
+  border: 3px solid var(--neon-pink) !important;
   border-radius: 0px !important;
-  box-shadow: 4px 4px 0px #ffffff !important;
+  box-shadow: 0 0 12px var(--neon-pink) !important;
   transform: rotate(0deg) scale(1.05) !important;
 }
+
+
 
 

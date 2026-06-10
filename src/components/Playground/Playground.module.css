@@ -894,8 +894,130 @@
 }
 
 :global([data-theme='noir'] .visualizer-path) {
-  background-color: #00E5FF !important;
-  box-shadow: 0 0 10px #00E5FF, 0 0 20px #00D5EC;
-  border-color: #00E5FF !important;
+  background-color: var(--neon-yellow) !important;
+  box-shadow: 0 0 12px var(--neon-yellow), 0 0 25px var(--neon-yellow) !important;
+  border-color: var(--neon-yellow) !important;
   animation: pathNeon 0.4s ease forwards;
 }
+
+/* ---- Playground Cyber-Noir Neon Overrides ---- */
+:global([data-theme='noir']) .sectionTitle {
+  color: var(--neon-pink) !important;
+  text-shadow: var(--neon-pink-glow) !important;
+}
+
+:global([data-theme='noir']) .moBanner {
+  background: #121214 !important;
+  border-color: var(--neon-cyan) !important;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.2) !important;
+}
+
+:global([data-theme='noir']) .moBadge {
+  background: #000000 !important;
+  color: var(--neon-cyan) !important;
+  border-color: var(--neon-cyan) !important;
+  box-shadow: 0 0 8px var(--neon-cyan) !important;
+}
+
+:global([data-theme='noir']) .desk {
+  background: #121214 !important;
+  border-color: var(--neon-cyan) !important;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.25) !important;
+}
+
+:global([data-theme='noir']) .gridWrapper {
+  background: #000000 !important;
+  border-color: var(--neon-cyan) !important;
+  box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.15) !important;
+}
+
+:global([data-theme='noir']) .cellPath {
+  background-color: var(--neon-yellow) !important;
+  box-shadow: 0 0 12px var(--neon-yellow), 0 0 25px var(--neon-yellow) !important;
+  border-color: var(--neon-yellow) !important;
+}
+
+:global([data-theme='noir']) .btnPrimary {
+  background: #1e1e24 !important;
+  border-color: var(--neon-pink) !important;
+  color: var(--neon-pink) !important;
+  box-shadow: 0 0 10px rgba(255, 42, 85, 0.25) !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.25s ease, color 0.25s ease !important;
+}
+:global([data-theme='noir']) .btnPrimary:hover:not(:disabled) {
+  background: #1e1e24 !important;
+  border-color: var(--neon-pink) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 15px var(--neon-pink) !important;
+  transform: translate(-2px, -2px) !important;
+}
+:global([data-theme='noir']) .btnPrimary:active:not(:disabled) {
+  transform: translate(2px, 2px) !important;
+  box-shadow: 0 0 5px var(--neon-pink) !important;
+}
+
+:global([data-theme='noir']) .btnSecondary {
+  background: #121214 !important;
+  border-color: var(--neon-yellow) !important;
+  color: var(--neon-yellow) !important;
+  box-shadow: 0 0 10px rgba(255, 230, 0, 0.2) !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.25s ease, color 0.25s ease !important;
+}
+:global([data-theme='noir']) .btnSecondary:hover:not(:disabled) {
+  border-color: var(--neon-yellow) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 15px var(--neon-yellow) !important;
+  transform: translate(-2px, -2px) !important;
+}
+:global([data-theme='noir']) .btnSecondary:active:not(:disabled) {
+  transform: translate(2px, 2px) !important;
+  box-shadow: 0 0 5px var(--neon-yellow) !important;
+}
+
+:global([data-theme='noir']) .console {
+  background: #050508 !important;
+  color: var(--neon-cyan) !important;
+  border-color: var(--neon-cyan) !important;
+  box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.15) !important;
+}
+
+:global([data-theme='noir']) .launchOverlay {
+  background: rgba(8, 8, 10, 0.96) !important;
+  border-color: var(--neon-cyan) !important;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.25) !important;
+}
+:global([data-theme='noir']) .overlayTitle {
+  color: var(--neon-cyan) !important;
+  text-shadow: var(--neon-cyan-glow) !important;
+}
+:global([data-theme='noir']) .sysLogs {
+  background: #000000 !important;
+  color: var(--neon-green) !important;
+  border-color: var(--neon-green) !important;
+  box-shadow: 0 0 10px rgba(57, 255, 20, 0.2) !important;
+}
+:global([data-theme='noir']) .launchBtn {
+  background: #121214 !important;
+  border-color: var(--neon-pink) !important;
+  color: var(--neon-pink) !important;
+  box-shadow: 0 0 12px var(--neon-pink) !important;
+  animation: pulseNeonPinkButton 2s infinite ease-in-out !important;
+}
+:global([data-theme='noir']) .launchBtn:hover:not(:disabled) {
+  border-color: var(--neon-pink) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 20px var(--neon-pink) !important;
+}
+
+:global([data-theme='noir']) .exitBtn:hover {
+  border-color: var(--neon-pink) !important;
+  color: var(--neon-pink) !important;
+  box-shadow: 0 0 8px var(--neon-pink) !important;
+}
+
+@keyframes pulseNeonPinkButton {
+  0% { transform: scale(1); box-shadow: 0 0 12px var(--neon-pink); }
+  50% { transform: scale(1.04); box-shadow: 0 0 22px var(--neon-pink); }
+  100% { transform: scale(1); box-shadow: 0 0 12px var(--neon-pink); }
+}
+
