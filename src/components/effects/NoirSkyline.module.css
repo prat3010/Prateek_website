@@ -1187,10 +1187,22 @@
   85% { transform: rotate(-4deg); }
 }
 
+.pigeonFlutter {
+  transform-origin: -1px -4px;
+  animation: wingFlutter 0.12s ease-in-out infinite;
+}
+
+@keyframes wingFlutter {
+  0% { transform: rotate(10deg); }
+  50% { transform: rotate(-15deg); }
+  100% { transform: rotate(10deg); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .gargoyleEyes,
   .pigeonBob,
-  .pigeonHeadBob {
+  .pigeonHeadBob,
+  .pigeonFlutter {
     animation: none !important;
   }
 }
