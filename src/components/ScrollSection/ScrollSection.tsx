@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { m, useMotionValue, useSpring, useReducedMotion, useTransform } from 'framer-motion';
 import { useLenisScroll } from '@/context/LenisProvider';
 import styles from './ScrollSection.module.css';
@@ -33,6 +33,17 @@ export default function ScrollSection({ children, direction, verticalOffset, cen
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useLenisScroll();
   const prefersReducedMotion = useReducedMotion();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const maxPRef = useRef(1);
   const metricsRef = useRef<SectionMetrics>({
     sectionStart: 0, sectionHeight: 0, windowH: 0, totalScrollable: 0,
@@ -125,7 +136,7 @@ export default function ScrollSection({ children, direction, verticalOffset, cen
     return () => ro.disconnect();
   }, [resizeTick]);
 
-  if (prefersReducedMotion) {
+  if (prefersReducedMotion || isMobile) {
     return <div ref={wrapperRef} style={gap ? { marginBottom: gap } : undefined}>{children}</div>;
   }
 

@@ -185,93 +185,118 @@ export default function Pathfinder({
     }
   }, [isRunning, interactionMode, startNode.col, startNode.row, endNode.col, endNode.row, walls, setStartNode, setEndNode, setWalls]);
 
-  // Touch Handlers for Mobile Draw/Drag Support
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (isRunning) return;
+  const gridInnerRef = useRef<HTMLDivElement>(null);
 
-    const touch = e.touches[0];
-    const element = document.elementFromPoint(touch.clientX, touch.clientY);
-    if (!element) return;
+  // Touch Handlers for Mobile Draw/Drag Support with non-passive options
+  useEffect(() => {
+    const gridEl = gridInnerRef.current;
+    if (!gridEl) return;
 
-    const cellElement = element.closest(`[data-col]`);
-    if (!cellElement) return;
+    const onTouchStart = (e: TouchEvent) => {
+      if (isRunning) return;
 
-    const col = parseInt(cellElement.getAttribute('data-col') || '', 10);
-    const row = parseInt(cellElement.getAttribute('data-row') || '', 10);
-    if (isNaN(col) || isNaN(row)) return;
+      const touch = e.touches[0];
+      const element = document.elementFromPoint(touch.clientX, touch.clientY);
+      if (!element) return;
 
-    const key = `${col},${row}`;
-    const isStart = col === startNode.col && row === startNode.row;
-    const isEnd = col === endNode.col && row === endNode.row;
+      const cellElement = element.closest(`[data-col]`);
+      if (!cellElement) return;
 
-    if (isStart) {
-      setInteractionMode('drag-start');
-    } else if (isEnd) {
-      setInteractionMode('drag-end');
-    } else {
-      if (walls.has(key)) {
-        setInteractionMode('erase-walls');
-        const newWalls = new Set(walls);
-        newWalls.delete(key);
-        setWalls(newWalls);
+      const col = parseInt(cellElement.getAttribute('data-col') || '', 10);
+      const row = parseInt(cellElement.getAttribute('data-row') || '', 10);
+      if (isNaN(col) || isNaN(row)) return;
+
+      const key = `${col},${row}`;
+      const isStart = col === startNode.col && row === startNode.row;
+      const isEnd = col === endNode.col && row === endNode.row;
+
+      if (isStart) {
+        setInteractionMode('drag-start');
+      } else if (isEnd) {
+        setInteractionMode('drag-end');
       } else {
-        setInteractionMode('draw-walls');
-        const newWalls = new Set(walls);
-        newWalls.add(key);
-        setWalls(newWalls);
+        if (walls.has(key)) {
+          setInteractionMode('erase-walls');
+          setWalls((prev) => {
+            const newWalls = new Set(prev);
+            newWalls.delete(key);
+            return newWalls;
+          });
+        } else {
+          setInteractionMode('draw-walls');
+          setWalls((prev) => {
+            const newWalls = new Set(prev);
+            newWalls.add(key);
+            return newWalls;
+          });
+        }
       }
-    }
-  };
+    };
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (isRunning || interactionMode === 'idle') return;
+    const onTouchMove = (e: TouchEvent) => {
+      if (isRunning || interactionMode === 'idle') return;
 
-    // Prevent scrolling while drawing on the grid
-    if (e.cancelable) {
-      e.preventDefault();
-    }
-
-    const touch = e.touches[0];
-    const element = document.elementFromPoint(touch.clientX, touch.clientY);
-    if (!element) return;
-
-    const cellElement = element.closest(`[data-col]`);
-    if (!cellElement) return;
-
-    const col = parseInt(cellElement.getAttribute('data-col') || '', 10);
-    const row = parseInt(cellElement.getAttribute('data-row') || '', 10);
-    if (isNaN(col) || isNaN(row)) return;
-
-    const key = `${col},${row}`;
-    const isStart = col === startNode.col && row === startNode.row;
-    const isEnd = col === endNode.col && row === endNode.row;
-
-    if (interactionMode === 'drag-start') {
-      if (!isEnd && !walls.has(key)) {
-        setStartNode({ col, row });
+      // Prevent scrolling while drawing on the grid
+      if (e.cancelable) {
+        e.preventDefault();
       }
-    } else if (interactionMode === 'drag-end') {
-      if (!isStart && !walls.has(key)) {
-        setEndNode({ col, row });
-      }
-    } else if (interactionMode === 'draw-walls') {
-      if (!isStart && !isEnd && !walls.has(key)) {
-        const newWalls = new Set(walls);
-        newWalls.add(key);
-        setWalls(newWalls);
-      }
-    } else if (interactionMode === 'erase-walls') {
-      if (walls.has(key)) {
-        const newWalls = new Set(walls);
-        newWalls.delete(key);
-        setWalls(newWalls);
-      }
-    }
-  };
 
-  const handleTouchEnd = () => {
-    setInteractionMode('idle');
-  };
+      const touch = e.touches[0];
+      const element = document.elementFromPoint(touch.clientX, touch.clientY);
+      if (!element) return;
+
+      const cellElement = element.closest(`[data-col]`);
+      if (!cellElement) return;
+
+      const col = parseInt(cellElement.getAttribute('data-col') || '', 10);
+      const row = parseInt(cellElement.getAttribute('data-row') || '', 10);
+      if (isNaN(col) || isNaN(row)) return;
+
+      const key = `${col},${row}`;
+      const isStart = col === startNode.col && row === startNode.row;
+      const isEnd = col === endNode.col && row === endNode.row;
+
+      if (interactionMode === 'drag-start') {
+        if (!isEnd && !walls.has(key)) {
+          setStartNode({ col, row });
+        }
+      } else if (interactionMode === 'drag-end') {
+        if (!isStart && !walls.has(key)) {
+          setEndNode({ col, row });
+        }
+      } else if (interactionMode === 'draw-walls') {
+        if (!isStart && !isEnd && !walls.has(key)) {
+          setWalls((prev) => {
+            const newWalls = new Set(prev);
+            newWalls.add(key);
+            return newWalls;
+          });
+        }
+      } else if (interactionMode === 'erase-walls') {
+        if (walls.has(key)) {
+          setWalls((prev) => {
+            const newWalls = new Set(prev);
+            newWalls.delete(key);
+            return newWalls;
+          });
+        }
+      }
+    };
+
+    const onTouchEnd = () => {
+      setInteractionMode('idle');
+    };
+
+    gridEl.addEventListener('touchstart', onTouchStart, { passive: false });
+    gridEl.addEventListener('touchmove', onTouchMove, { passive: false });
+    gridEl.addEventListener('touchend', onTouchEnd);
+
+    return () => {
+      gridEl.removeEventListener('touchstart', onTouchStart);
+      gridEl.removeEventListener('touchmove', onTouchMove);
+      gridEl.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [isRunning, interactionMode, startNode, endNode, walls, setStartNode, setEndNode, setWalls]);
 
   // Render grid cells grouped by rows
   const gridRows: React.ReactNode[] = [];
@@ -309,6 +334,7 @@ export default function Pathfinder({
   return (
     <div className={styles.gridWrapper} ref={gridRef}>
       <div
+        ref={gridInnerRef}
         className={styles.grid}
         style={{
           gridTemplateColumns: `repeat(${cols}, 1fr)`,
@@ -317,9 +343,6 @@ export default function Pathfinder({
         role="grid"
         onMouseDown={handleGridMouseDown}
         onMouseOver={handleGridMouseOver}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
       >
         {gridRows}
       </div>

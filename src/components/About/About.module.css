@@ -190,7 +190,7 @@
     right: auto;
     transform: translateX(-50%);
     border-top: none;
-    border-bottom: 16px solid var(--bubble-bg, var(--pop-yellow));
+    border-bottom: 16px solid var(--bubble-bg, var(--pop-white));
     border-left: 8px solid transparent;
     border-right: 8px solid transparent;
   }
