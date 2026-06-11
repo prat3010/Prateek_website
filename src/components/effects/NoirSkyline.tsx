@@ -96,29 +96,32 @@ export default function NoirSkyline() {
     if (typeof window === 'undefined') return false;
     const cores = navigator.hardwareConcurrency ?? 4;
     const lowEnd = cores < 4;
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches || lowEnd;
+    const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches || lowEnd || isMobileDevice;
   });
 
-  // Track mouse coordinates for subtle parallax offset
+  // Track mouse coordinates for subtle parallax offset & update reducedMotion on resize
   useEffect(() => {
-    // Low-end device: fewer than 4 CPU threads — throttle all animation
     const cores = navigator.hardwareConcurrency ?? 4;
     const lowEnd = cores < 4;
-
-    const isMobileDevice =
-      window.matchMedia('(max-width: 768px)').matches ||
-      window.matchMedia('(pointer: coarse)').matches;
-
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
+    const checkReducedMotion = () => {
+      const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
+      setReducedMotion(mediaQuery.matches || lowEnd || isMobileDevice);
+    };
+
     const mediaListener = (e: MediaQueryListEvent) => {
-      setReducedMotion(e.matches || lowEnd);
+      const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
+      setReducedMotion(e.matches || lowEnd || isMobileDevice);
     };
     mediaQuery.addEventListener('change', mediaListener);
+    window.addEventListener('resize', checkReducedMotion);
 
     let rafId: number | null = null;
     const handleMouseMove = (e: MouseEvent) => {
-      if (mediaQuery.matches) return;
+      const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
+      if (mediaQuery.matches || isMobileDevice) return;
       if (rafId) cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
         const x = (e.clientX / window.innerWidth) - 0.5;
@@ -128,13 +131,14 @@ export default function NoirSkyline() {
       });
     };
 
-    // Skip mouse parallax on mobile, reduced-motion, or low-end devices
+    const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
     if (!isMobileDevice && !mediaQuery.matches && !lowEnd) {
       window.addEventListener('mousemove', handleMouseMove);
     }
 
     return () => {
       mediaQuery.removeEventListener('change', mediaListener);
+      window.removeEventListener('resize', checkReducedMotion);
       window.removeEventListener('mousemove', handleMouseMove);
       if (rafId) cancelAnimationFrame(rafId);
     };
@@ -143,7 +147,7 @@ export default function NoirSkyline() {
   if (!mounted) return null;
 
   return (
-    <div className={`${styles.container} ${styles.active} ${theme === 'light' ? styles.lightPopart : styles.darkNoir}`}>
+    <div className={`${styles.container} ${styles.active} ${theme === 'light' ? styles.lightPopart : styles.darkNoir} ${reducedMotion ? styles.reducedMotion : ''}`}>
       {/* ── Global Watercolor Pattern Definitions ── */}
       <svg style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }} aria-hidden="true">
         <defs>

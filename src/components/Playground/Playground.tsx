@@ -19,6 +19,16 @@ interface LogEntry {
 export default function Playground() {
   const { isNoir } = useTheme();
   const lenis = useLenis();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Grid coordinates state
   const [startNode, setStartNode] = useState<GridNode>({ col: 3, row: 7 });
@@ -279,6 +289,29 @@ export default function Playground() {
       default: return 'Cruise';
     }
   };
+
+  if (isMobile) {
+    return (
+      <section id="playground" className={styles.playground} aria-label="Playground">
+        <div className={styles.container}>
+          <h2 className={styles.sectionTitle}>
+            {isNoir ? 'THE DETECTIVE’S DESK' : 'THE ALGORITHM LAB'}
+          </h2>
+          <div className={styles.mobileWarning} style={{ display: 'flex' }}>
+            <span className={styles.warningIcon}>{isNoir ? '🕶️' : '🛸'}</span>
+            <h3 className={styles.warningHeader}>
+              {isNoir ? 'CASE FILE ENCRYPTED' : 'ACCESS RESTRICTED!'}
+            </h3>
+            <p className={styles.warningText}>
+              {isNoir
+                ? 'City grid analysis requires desk clearance. Decrypt coordinate maps on your desktop terminal to run calculations.'
+                : 'Powering up the algorithm engine requires terminal clearance. Visit this site on a desktop screen to sketch laser walls and run pathfinding simulations!'}
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="playground" className={styles.playground} aria-label="Playground">

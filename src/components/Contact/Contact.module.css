@@ -207,12 +207,38 @@
 @media (max-width: 768px) {
   .grid {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 
   .form {
     padding: 1.5rem;
   }
+
+  .socialCard {
+    padding: 1.5rem;
+  }
+
+  .socialLinks {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
 }
+
+@media (max-width: 480px) {
+  .form {
+    padding: 1.25rem 1rem;
+  }
+
+  .socialCard {
+    padding: 1.25rem 1rem;
+  }
+
+  .socialLinks {
+    grid-template-columns: 1fr;
+  }
+}
+
 
 :global([data-theme='noir']) .sectionTitle {
   color: var(--neon-pink) !important;

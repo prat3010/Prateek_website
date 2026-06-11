@@ -1661,6 +1661,123 @@
   }
 }
 
+/* ─ Disable all backdrop CSS animations under reducedMotion class ─ */
+.reducedMotion .searchlightLeft,
+.reducedMotion .searchlightRight,
+.reducedMotion .steam,
+.reducedMotion .steamDelayed,
+.reducedMotion .catTail {
+  animation: none !important;
+}
+.reducedMotion .searchlight {
+  opacity: 0.04;
+}
+
+.reducedMotion .laundry1,
+.reducedMotion .laundry2,
+.reducedMotion .laundry3,
+.reducedMotion .billboardLight,
+.reducedMotion .flock,
+.reducedMotion .star1,
+.reducedMotion .star2,
+.reducedMotion .star3,
+.reducedMotion .catEyes,
+.reducedMotion .fanBlade,
+.reducedMotion .blowerFan,
+.reducedMotion .blimpGroup,
+.reducedMotion .blimpSpotlight,
+.reducedMotion .blimpBeacon,
+.reducedMotion .bridgeBeacon,
+.reducedMotion .fog1,
+.reducedMotion .fog2,
+.reducedMotion .grain,
+.reducedMotion .tugboatTransit,
+.reducedMotion .tugboatBobbing,
+.reducedMotion .tugboatWindow,
+.reducedMotion .smokePuff1,
+.reducedMotion .smokePuff2,
+.reducedMotion .smokePuff3,
+.reducedMotion .tugboatWake1,
+.reducedMotion .tugboatWake2,
+.reducedMotion .sailboatTransit,
+.reducedMotion .sailboatBobbing,
+.reducedMotion .sailboatWake,
+.reducedMotion .speedboatTransit,
+.reducedMotion .speedboatBobbing,
+.reducedMotion .speedboatWake1,
+.reducedMotion .speedboatWake2 {
+  animation: none !important;
+}
+.reducedMotion .billboardLight {
+  opacity: 0.15;
+}
+.reducedMotion .blimpBeacon,
+.reducedMotion .bridgeBeacon {
+  opacity: 0.8;
+}
+.reducedMotion .blimpSpotlight {
+  opacity: 0.25;
+}
+.reducedMotion .tugboatWindow {
+  opacity: 0.85 !important;
+}
+.reducedMotion .smokePuff1,
+.reducedMotion .smokePuff2,
+.reducedMotion .smokePuff3 {
+  opacity: 0.3 !important;
+}
+.reducedMotion .tugboatWake1,
+.reducedMotion .tugboatWake2,
+.reducedMotion .sailboatWake,
+.reducedMotion .speedboatWake1,
+.reducedMotion .speedboatWake2 {
+  opacity: 0.5 !important;
+}
+.reducedMotion .windowFlicker1,
+.reducedMotion .windowFlicker2,
+.reducedMotion .windowFlicker3,
+.reducedMotion .windowFlicker4 {
+  animation: none !important;
+  opacity: 0.6 !important;
+}
+.reducedMotion .beaconRed1,
+.reducedMotion .beaconRed2,
+.reducedMotion .beaconRed3 {
+  animation: none !important;
+  opacity: 0.95 !important;
+}
+
+.reducedMotion .gargoyleEyes,
+.reducedMotion .pigeonBob,
+.reducedMotion .pigeonHeadBob,
+.reducedMotion .pigeonFlutter {
+  animation: none !important;
+}
+
+.reducedMotion .hotelNeonText text,
+.reducedMotion .billboardNeon path,
+.reducedMotion .billboardNeon line,
+.reducedMotion .billboardNeon text,
+.reducedMotion .hotelSignBoard,
+.reducedMotion .barNeonSign text,
+.reducedMotion .rightWallGraffiti,
+.reducedMotion .waterTankBeacon,
+.reducedMotion .exitNeonSign rect,
+.reducedMotion .exitNeonSign text,
+.reducedMotion .puddleRipple1,
+.reducedMotion .puddleRipple2 {
+  animation: none !important;
+}
+.reducedMotion .puddleRipple1 {
+  opacity: 0.3 !important;
+  transform: scale(1) !important;
+}
+.reducedMotion .drippingDrop {
+  animation: none !important;
+  opacity: 0 !important;
+}
+
+
 
 
 
