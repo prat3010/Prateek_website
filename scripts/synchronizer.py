@@ -95,13 +95,17 @@ def call_gemini(prompt, file_data=None, file_mime=None):
         st.error(f"API Connection Error: {e}")
         return None
 
-# Helper to generate a skill proposal from a technology tag using Gemini
-def generate_skill_from_tag(tag_name):
+# Helper to generate skill proposals from a list of technology tags in a single batch call to avoid 429 rate limits
+def generate_skills_from_tags_batch(tags_list):
+    if not tags_list:
+        return []
+    tags_str = ", ".join([f'"{t}"' for t in tags_list])
     prompt = f"""
-    You are an expert AI orchestrator. Generate a structured JSON object representing a Skill entry for the technology tag "{tag_name}".
+    You are an expert AI orchestrator. Generate a list of structured Skill entries for the following technology tags: {tags_str}.
     
-    The JSON structure must match this exact format:
+    For each tag, output a structured JSON object. The response must be a JSON array of objects, where each object matches this format:
     {{
+      "tag": "the original lowercase tag name that was passed",
       "name": "Formatted capitalization of the technology (e.g. 'react' -> 'React / Next.js', 'fastapi' -> 'FastAPI', 'excel' -> 'Microsoft Excel', 'supabase' -> 'Supabase', etc.)",
       "icon": "A lowercase string representing a relevant Lucide icon (e.g. 'atom', 'server', 'database', 'terminal', 'layout', 'paintbrush', 'sparkles', 'brain', 'bot', 'git-branch', 'cloud', 'figma', 'zap', 'image', 'file-text')",
       "description": "A short 1-sentence description of the skill in an AI-orchestrated tone matching the portfolio brand (e.g., 'Directing AI to synthesize React components...', 'Steering AI to generate responsive structures...', 'Instructing AI to write Python utility scripts...'). Maximum 15 words.",
@@ -109,17 +113,22 @@ def generate_skill_from_tag(tag_name):
       "color": "A hex color code suitable for the technology brand"
     }}
     
-    Do not return any conversational text, markdown packaging, or backticks. Only return the raw JSON object.
+    Do not return any conversational text, markdown packaging, or backticks. Only return the raw JSON array of objects.
     """
     try:
         res = call_gemini(prompt)
-        if res:
+        if isinstance(res, list):
             return res
+        elif isinstance(res, dict):
+            for key in ["skills", "list", "array"]:
+                if key in res and isinstance(res[key], list):
+                    return res[key]
+            return [res]
     except Exception as e:
-        st.error(f"Error generating skill for tag '{tag_name}': {e}")
-    return None
+        st.error(f"Error generating skills in batch: {e}")
+    return []
 
-# Helper to check a list of tags and generate pending skills for new ones
+# Helper to check a list of tags and generate pending skills for new ones using batch processing
 def check_and_add_pending_skills(tags_list):
     current_skills = parse_skills_file()
     existing_skill_names = {s.get("name", "").lower() for s in current_skills}
@@ -129,6 +138,7 @@ def check_and_add_pending_skills(tags_list):
         st.session_state.pending_skills = []
     pending_names = {s.get("name", "").lower() for s in st.session_state.pending_skills}
     
+    new_tags = []
     for tag in tags_list:
         tag_clean = tag.strip().lower()
         if not tag_clean:
@@ -146,11 +156,20 @@ def check_and_add_pending_skills(tags_list):
                 break
                 
         if not is_existing:
-            st.toast(f"🔍 New skill tag detected: '{tag_clean}'. Generating details...")
-            skill_proposal = generate_skill_from_tag(tag_clean)
-            if skill_proposal:
-                st.session_state.pending_skills.append(skill_proposal)
-                st.toast(f"💡 Generated skill proposal: '{skill_proposal.get('name')}'")
+            new_tags.append(tag_clean)
+            
+    if new_tags:
+        # Process in batches of 5 to stay well within limits
+        batch_tags = new_tags[:5]
+        st.toast(f"🔍 New tags detected: {', '.join(batch_tags)}. Calling Gemini (Batch)...")
+        proposals = generate_skills_from_tags_batch(batch_tags)
+        if proposals:
+            added_count = 0
+            for prop in proposals:
+                if prop.get("name"):
+                    st.session_state.pending_skills.append(prop)
+                    added_count += 1
+            st.toast(f"💡 Generated {added_count} skill proposals!")
 
 # ==========================================
 # TS Data Parsers (Projects, Resume, Certs)
