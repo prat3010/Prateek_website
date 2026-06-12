@@ -147,16 +147,20 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
   useEffect(() => {
     if (reducedMotion) return;
 
+    const isMovingState = ['leaping', 'gliding_fg', 'gliding_bg', 'returning', 'landing'].includes(state);
+    if (!isMovingState) {
+      setPosX(1426);
+      setPosY(756);
+      setScale(1.0);
+      setOpacity(1.0);
+      return;
+    }
+
     const tick = () => {
       const currentState = stateRef.current;
       const elapsed = performance.now() - stateStartTimeRef.current;
 
-      if (['sitting', 'blinking', 'awakening'].includes(currentState)) {
-        setPosX(1426);
-        setPosY(756);
-        setScale(1.0);
-        setOpacity(1.0);
-      } else if (currentState === 'leaping') {
+      if (currentState === 'leaping') {
         const progress = Math.min(elapsed / 640, 1); // 8 ticks * 80ms = 640ms
         setPosX(1426 - progress * 66);
         setPosY((756 - progress * 76) - 35 * Math.sin(Math.PI * progress));
@@ -206,7 +210,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [reducedMotion]);
+  }, [state, reducedMotion]);
 
   // State flow interval timer (80ms ticks)
   useEffect(() => {
