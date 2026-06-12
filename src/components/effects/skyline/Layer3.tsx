@@ -674,37 +674,56 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="268" y1="962" x2="342" y2="962" strokeWidth="0.8" />
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="268" y1="1007" x2="342" y2="1007" strokeWidth="0.8" />
 
-                {/* Zigzag diagonal ladders between platforms */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="335" y1="878" x2="275" y2="925" strokeWidth="1.0" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="275" y1="925" x2="335" y2="970" strokeWidth="1.0" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="335" y1="970" x2="275" y2="1015" strokeWidth="1.0" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="275" y1="1015" x2="335" y2="1060" strokeWidth="1.0" />
+                {/* Platform railing details: Mid-rails & Pickets */}
+                {[878, 925, 970, 1015].map((y, idx) => {
+                  const yTop = idx === 0 ? 870 : idx === 1 ? 917 : idx === 2 ? 962 : 1007;
+                  const yMid = yTop + (y - yTop) / 2;
+                  const pickets = [274, 281, 288, 295, 302, 309, 316, 323, 330, 337];
+                  return (
+                    <g key={`left-platform-details-${y}`}>
+                      <WobblyLine wobble={wobble} wobbleStrength={strength} x1="268" y1={yMid} x2="342" y2={yMid} strokeWidth="0.6" />
+                      {pickets.map(px => (
+                        <WobblyLine key={`p-${px}`} wobble={wobble} wobbleStrength={strength} x1={px} y1={yTop} x2={px} y2={y} strokeWidth="0.5" />
+                      ))}
+                    </g>
+                  );
+                })}
 
-                {/* Ladder rungs (small horizontal steps on diagonals) */}
-                {/* Ladder 1: 335,878 → 275,925 */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="325" y1="886" x2="331" y2="882" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="315" y1="894" x2="321" y2="890" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="305" y1="902" x2="311" y2="898" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="295" y1="910" x2="301" y2="906" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="285" y1="918" x2="291" y2="914" strokeWidth="0.7" />
-                {/* Ladder 2: 275,925 → 335,970 */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="285" y1="933" x2="279" y2="929" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="295" y1="941" x2="289" y2="937" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="305" y1="949" x2="299" y2="945" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="315" y1="957" x2="309" y2="953" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="325" y1="965" x2="319" y2="961" strokeWidth="0.7" />
-                {/* Ladder 3: 335,970 → 275,1015 */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="325" y1="978" x2="331" y2="974" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="315" y1="986" x2="321" y2="982" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="305" y1="994" x2="311" y2="990" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="295" y1="1002" x2="301" y2="998" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="285" y1="1010" x2="291" y2="1006" strokeWidth="0.7" />
-                {/* Ladder 4: 275,1015 → 335,1060 */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="285" y1="1023" x2="279" y2="1019" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="295" y1="1031" x2="289" y2="1027" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="305" y1="1039" x2="299" y2="1035" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="315" y1="1047" x2="309" y2="1043" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="325" y1="1055" x2="319" y2="1051" strokeWidth="0.7" />
+                {/* Double-stringer Diagonal Staircases with steps, handrails, and supports */}
+                {[
+                  { y1: 878, y2: 925, x1: 335, x2: 275 },
+                  { y1: 925, y2: 970, x1: 275, x2: 335 },
+                  { y1: 970, y2: 1015, x1: 335, x2: 275 },
+                  { y1: 1015, y2: 1060, x1: 275, x2: 335 }
+                ].map((stair, idx) => {
+                  const { x1, y1, x2, y2 } = stair;
+                  const tVals = [1/6, 2/6, 3/6, 4/6, 5/6];
+                  
+                  const post1_t = 0.2;
+                  const post1_y = y1 + post1_t * (y2 - y1);
+                  const post1_x = x1 + post1_t * (x2 - x1);
+                  
+                  const post2_t = 0.8;
+                  const post2_y = y1 + post2_t * (y2 - y1);
+                  const post2_x = x1 + post2_t * (x2 - x1);
+
+                  return (
+                    <g key={`left-stair-${idx}`}>
+                      <WobblyLine wobble={wobble} wobbleStrength={strength} x1={x1 - 3.5} y1={y1} x2={x2 - 3.5} y2={y2} strokeWidth="1.0" />
+                      <WobblyLine wobble={wobble} wobbleStrength={strength} x1={x1 + 3.5} y1={y1} x2={x2 + 3.5} y2={y2} strokeWidth="1.0" />
+                      {tVals.map((t, stepIdx) => {
+                        const yStep = y1 + t * (y2 - y1);
+                        const xCent = x1 + t * (x2 - x1);
+                        return (
+                          <WobblyLine key={`step-${stepIdx}`} wobble={wobble} wobbleStrength={strength} x1={xCent - 3.5} y1={yStep} x2={xCent + 3.5} y2={yStep} strokeWidth="0.8" />
+                        );
+                      })}
+                      <WobblyLine wobble={wobble} wobbleStrength={strength} x1={x1} y1={y1 - 7} x2={x2} y2={y2 - 7} strokeWidth="0.8" />
+                      <WobblyLine wobble={wobble} wobbleStrength={strength} x1={post1_x} y1={post1_y} x2={post1_x} y2={post1_y - 7} strokeWidth="0.6" />
+                      <WobblyLine wobble={wobble} wobbleStrength={strength} x1={post2_x} y1={post2_y} x2={post2_x} y2={post2_y - 7} strokeWidth="0.6" />
+                    </g>
+                  );
+                })}
 
                 {/* Drop-down retractable bottom ladder segment */}
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="305" y1="1060" x2="305" y2="1250" strokeWidth="1.0" />
@@ -1031,72 +1050,87 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1690" y1="770" x2="1690" y2="1250" />
 
                 {/* Landing platforms (horizontal) */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1658" y1="818" x2="1692" y2="818" strokeWidth="1.5" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1658" y1="862" x2="1692" y2="862" strokeWidth="1.5" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1658" y1="907" x2="1692" y2="907" strokeWidth="1.5" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1658" y1="952" x2="1692" y2="952" strokeWidth="1.5" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1658" y1="997" x2="1692" y2="997" strokeWidth="1.5" />
+                {[818, 862, 907, 952, 997, 1042, 1087, 1132, 1177, 1222].map(y => (
+                  <WobblyLine key={`right-platform-${y}`} wobble={wobble} wobbleStrength={strength} x1="1658" y1={y} x2="1692" y2={y} strokeWidth="1.5" />
+                ))}
 
-                {/* Railings (short verticals on each platform) */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1658" y1="810" x2="1658" y2="818" strokeWidth="0.8" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1692" y1="810" x2="1692" y2="818" strokeWidth="0.8" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1658" y1="854" x2="1658" y2="862" strokeWidth="0.8" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1692" y1="854" x2="1692" y2="862" strokeWidth="0.8" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1658" y1="899" x2="1658" y2="907" strokeWidth="0.8" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1692" y1="899" x2="1692" y2="907" strokeWidth="0.8" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1658" y1="944" x2="1658" y2="952" strokeWidth="0.8" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1692" y1="944" x2="1692" y2="952" strokeWidth="0.8" />
-                {/* Top railing bars */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1658" y1="810" x2="1692" y2="810" strokeWidth="0.8" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1658" y1="854" x2="1692" y2="854" strokeWidth="0.8" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1658" y1="899" x2="1692" y2="899" strokeWidth="0.8" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1658" y1="944" x2="1692" y2="944" strokeWidth="0.8" />
+                {/* Platform railing details: Top rail, Mid rail, End posts & Pickets */}
+                {[818, 862, 907, 952, 997, 1042, 1087, 1132, 1177].map((y) => {
+                  const yTop = y - 8;
+                  const yMid = y - 4;
+                  const pickets = [1663, 1668, 1673, 1678, 1683, 1688];
+                  return (
+                    <g key={`right-platform-details-${y}`}>
+                      {/* Railing end posts */}
+                      <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1658" y1={yTop} x2="1658" y2={y} strokeWidth="0.8" />
+                      <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1692" y1={yTop} x2="1692" y2={y} strokeWidth="0.8" />
+                      {/* Top rail */}
+                      <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1658" y1={yTop} x2="1692" y2={yTop} strokeWidth="0.8" />
+                      {/* Mid rail */}
+                      <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1658" y1={yMid} x2="1692" y2={yMid} strokeWidth="0.6" />
+                      {/* Pickets */}
+                      {pickets.map(px => (
+                        <WobblyLine key={`p-${px}`} wobble={wobble} wobbleStrength={strength} x1={px} y1={yTop} x2={px} y2={y} strokeWidth="0.5" />
+                      ))}
+                    </g>
+                  );
+                })}
 
-                {/* Zigzag diagonal ladders between platforms */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1688" y1="818" x2="1662" y2="862" strokeWidth="1.0" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1662" y1="862" x2="1688" y2="907" strokeWidth="1.0" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1688" y1="907" x2="1662" y2="952" strokeWidth="1.0" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1662" y1="952" x2="1688" y2="997" strokeWidth="1.0" />
+                {/* Double-stringer Diagonal Staircases with steps, handrails, and supports */}
+                {[
+                  { y1: 818, y2: 862, x1: 1688, x2: 1662 },
+                  { y1: 862, y2: 907, x1: 1662, x2: 1688 },
+                  { y1: 907, y2: 952, x1: 1688, x2: 1662 },
+                  { y1: 952, y2: 997, x1: 1662, x2: 1688 },
+                  { y1: 997, y2: 1042, x1: 1688, x2: 1662 },
+                  { y1: 1042, y2: 1087, x1: 1662, x2: 1688 },
+                  { y1: 1087, y2: 1132, x1: 1688, x2: 1662 },
+                  { y1: 1132, y2: 1177, x1: 1662, x2: 1688 },
+                  { y1: 1177, y2: 1222, x1: 1688, x2: 1662 }
+                ].map((stair, idx) => {
+                  const { x1, y1, x2, y2 } = stair;
+                  const tVals = [1/5, 2/5, 3/5, 4/5];
+                  
+                  const post1_t = 0.25;
+                  const post1_y = y1 + post1_t * (y2 - y1);
+                  const post1_x = x1 + post1_t * (x2 - x1);
+                  
+                  const post2_t = 0.75;
+                  const post2_y = y1 + post2_t * (y2 - y1);
+                  const post2_x = x1 + post2_t * (x2 - x1);
 
-                {/* Ladder rungs */}
-                {/* Ladder 1: 1688,818 → 1662,862 */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1685" y1="826" x2="1681" y2="830" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1680" y1="834" x2="1676" y2="838" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1675" y1="842" x2="1671" y2="846" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1670" y1="850" x2="1666" y2="854" strokeWidth="0.7" />
-                {/* Ladder 2: 1662,862 → 1688,907 */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1665" y1="870" x2="1669" y2="874" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1670" y1="878" x2="1674" y2="882" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1675" y1="886" x2="1679" y2="890" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1680" y1="894" x2="1684" y2="898" strokeWidth="0.7" />
-                {/* Ladder 3: 1688,907 → 1662,952 */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1685" y1="915" x2="1681" y2="919" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1680" y1="923" x2="1676" y2="927" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1675" y1="931" x2="1671" y2="935" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1670" y1="939" x2="1666" y2="943" strokeWidth="0.7" />
-                {/* Ladder 4: 1662,952 → 1688,997 */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1665" y1="960" x2="1669" y2="964" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1670" y1="968" x2="1674" y2="972" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1675" y1="976" x2="1679" y2="980" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1680" y1="984" x2="1684" y2="988" strokeWidth="0.7" />
+                  return (
+                    <g key={`right-stair-${idx}`}>
+                      <WobblyLine wobble={wobble} wobbleStrength={strength} x1={x1 - 2} y1={y1} x2={x2 - 2} y2={y2} strokeWidth="1.0" />
+                      <WobblyLine wobble={wobble} wobbleStrength={strength} x1={x1 + 2} y1={y1} x2={x2 + 2} y2={y2} strokeWidth="1.0" />
+                      {tVals.map((t, stepIdx) => {
+                        const yStep = y1 + t * (y2 - y1);
+                        const xCent = x1 + t * (x2 - x1);
+                        return (
+                          <WobblyLine key={`step-${stepIdx}`} wobble={wobble} wobbleStrength={strength} x1={xCent - 2} y1={yStep} x2={xCent + 2} y2={yStep} strokeWidth="0.8" />
+                        );
+                      })}
+                      <WobblyLine wobble={wobble} wobbleStrength={strength} x1={x1} y1={y1 - 7} x2={x2} y2={y2 - 7} strokeWidth="0.8" />
+                      <WobblyLine wobble={wobble} wobbleStrength={strength} x1={post1_x} y1={post1_y} x2={post1_x} y2={post1_y - 7} strokeWidth="0.6" />
+                      <WobblyLine wobble={wobble} wobbleStrength={strength} x1={post2_x} y1={post2_y} x2={post2_x} y2={post2_y - 7} strokeWidth="0.6" />
+                    </g>
+                  );
+                })}
 
                 {/* Drop-down retractable bottom ladder */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1675" y1="997" x2="1675" y2="1020" strokeWidth="1.0" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1672" y1="1003" x2="1678" y2="1003" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1672" y1="1009" x2="1678" y2="1009" strokeWidth="0.7" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1672" y1="1015" x2="1678" y2="1015" strokeWidth="0.7" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1675" y1="1222" x2="1675" y2="1250" strokeWidth="1.0" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1672" y1="1228" x2="1678" y2="1228" strokeWidth="0.7" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1672" y1="1234" x2="1678" y2="1234" strokeWidth="0.7" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1672" y1="1240" x2="1678" y2="1240" strokeWidth="0.7" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1672" y1="1246" x2="1678" y2="1246" strokeWidth="0.7" />
 
                 {/* Bracket supports attaching to wall */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1658" y1="818" x2="1652" y2="818" strokeWidth="1.5" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1658" y1="862" x2="1652" y2="862" strokeWidth="1.5" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1658" y1="907" x2="1652" y2="907" strokeWidth="1.5" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1658" y1="952" x2="1652" y2="952" strokeWidth="1.5" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1658" y1="997" x2="1652" y2="997" strokeWidth="1.5" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1692" y1="818" x2="1698" y2="818" strokeWidth="1.5" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1692" y1="862" x2="1698" y2="862" strokeWidth="1.5" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1692" y1="907" x2="1698" y2="907" strokeWidth="1.5" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1692" y1="952" x2="1698" y2="952" strokeWidth="1.5" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1692" y1="997" x2="1698" y2="997" strokeWidth="1.5" />
+                {[818, 862, 907, 952, 997, 1042, 1087, 1132, 1177, 1222].map(y => (
+                  <React.Fragment key={`right-support-${y}`}>
+                    <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1658" y1={y} x2="1652" y2={y} strokeWidth="1.5" />
+                    <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1692" y1={y} x2="1698" y2={y} strokeWidth="1.5" />
+                  </React.Fragment>
+                ))}
               </g>
 
               {/* Roof HVAC Unit */}
