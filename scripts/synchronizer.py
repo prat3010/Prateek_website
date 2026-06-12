@@ -872,18 +872,18 @@ st.markdown("""
 
     /* Core Page Styling */
     .stApp {
-        background-color: #F7F2E8 !important;
-        color: #2B2B36 !important;
+        background-color: #000000 !important;
+        color: #ffffff !important;
     }
     
     /* Section Headers */
     .section-header {
         font-size: 1.6rem;
         font-weight: 900;
-        color: #2B2B36;
+        color: #ffffff;
         margin-top: 0.5rem;
         margin-bottom: 1.2rem;
-        border-bottom: 3px solid #2B2B36;
+        border-bottom: 2px solid #ffffff;
         padding-bottom: 5px;
         display: inline-block;
         letter-spacing: 0.5px;
@@ -891,114 +891,108 @@ st.markdown("""
 
     /* Target bordered containers in Streamlit */
     div[data-testid="stVerticalBlockBorder"] {
-        background-color: #FAF9F6 !important;
-        border: 3px solid #2B2B36 !important;
-        border-radius: 8px !important;
+        background-color: #000000 !important;
+        border: 2px solid #ffffff !important;
+        border-radius: 6px !important;
         padding: 24px !important;
         margin-bottom: 24px !important;
-        box-shadow: 4px 4px 0px 0px #2B2B36 !important;
+        box-shadow: none !important;
         transition: all 0.2s ease !important;
     }
     div[data-testid="stVerticalBlockBorder"]:hover {
-        border-color: #2B2B36 !important;
-        box-shadow: 6px 6px 0px 0px #E28E66 !important;
+        border-color: #ffffff !important;
     }
 
     /* Target expanders */
     details[data-testid="stExpander"] {
-        background-color: #FAF9F6 !important;
-        border: 2.5px solid #2B2B36 !important;
-        border-radius: 6px !important;
+        background-color: #000000 !important;
+        border: 1.5px solid #ffffff !important;
+        border-radius: 4px !important;
         margin-bottom: 12px !important;
-        box-shadow: 3px 3px 0px 0px #2B2B36 !important;
+        box-shadow: none !important;
         transition: all 0.2s ease !important;
     }
     details[data-testid="stExpander"]:hover {
-        border-color: #2B2B36 !important;
-        box-shadow: 4px 4px 0px 0px #5A8EB6 !important;
+        border-color: #ffffff !important;
     }
     summary[data-testid="stExpanderSummary"] {
         font-weight: 700 !important;
-        color: #2B2B36 !important;
+        color: #ffffff !important;
     }
 
     /* Buttons styling */
     button[data-testid="baseButton-primary"] {
-        background-color: #E28E66 !important; /* Apricot Orange */
-        color: #FAF9F6 !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
         font-weight: 800 !important;
         text-transform: uppercase !important;
         letter-spacing: 0.5px !important;
-        border: 2.5px solid #2B2B36 !important;
+        border: 2px solid #ffffff !important;
         border-radius: 4px !important;
-        box-shadow: 3px 3px 0px 0px #2B2B36 !important;
+        box-shadow: none !important;
         transition: all 0.1s ease !important;
         padding: 0.5rem 1.5rem !important;
     }
     button[data-testid="baseButton-primary"]:hover {
-        background-color: #f7a072 !important;
-        color: #FAF9F6 !important;
-        transform: translate(-1.5px, -1.5px) !important;
-        box-shadow: 4.5px 4.5px 0px 0px #2B2B36 !important;
+        background-color: #cccccc !important;
+        color: #000000 !important;
+        border-color: #cccccc !important;
     }
     button[data-testid="baseButton-primary"]:active {
         transform: translate(1px, 1px) !important;
-        box-shadow: 1px 1px 0px 0px #2B2B36 !important;
     }
 
     button[data-testid="baseButton-secondary"] {
-        background-color: #FAF9F6 !important;
-        color: #2B2B36 !important;
+        background-color: #000000 !important;
+        color: #ffffff !important;
         font-weight: 700 !important;
-        border: 2.5px solid #2B2B36 !important;
+        border: 2px solid #ffffff !important;
         border-radius: 4px !important;
-        box-shadow: 2px 2px 0px 0px #2B2B36 !important;
+        box-shadow: none !important;
         transition: all 0.1s ease !important;
     }
     button[data-testid="baseButton-secondary"]:hover {
-        border-color: #2B2B36 !important;
-        color: #5A8EB6 !important; /* Slate Blue */
-        transform: translate(-1.5px, -1.5px) !important;
-        box-shadow: 3.5px 3.5px 0px 0px #2B2B36 !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        border-color: #ffffff !important;
     }
     button[data-testid="baseButton-secondary"]:active {
         transform: translate(1px, 1px) !important;
-        box-shadow: 1px 1px 0px 0px #2B2B36 !important;
     }
 
     /* Danger hover styles for delete buttons */
     button[id^="del_exp_"]:hover, button[id^="del_edu_"]:hover, button[id^="rem_bul_"]:hover, button[id^="delete_"]:hover {
-        border-color: #D95D67 !important;
-        color: #D95D67 !important;
-        box-shadow: 3.5px 3.5px 0px 0px #D95D67 !important;
+        border-color: #ff3b30 !important;
+        color: #ff3b30 !important;
+        background-color: #000000 !important;
     }
 
     /* Inputs */
     .stTextInput>div>div>input, .stTextArea>div>div>textarea, .stSelectbox>div>div>div {
-        background-color: #FAF9F6 !important;
-        color: #2B2B36 !important;
-        border: 2.5px solid #2B2B36 !important;
-        border-radius: 6px !important;
+        background-color: #000000 !important;
+        color: #ffffff !important;
+        border: 2px solid #ffffff !important;
+        border-radius: 4px !important;
         transition: border-color 0.2s !important;
     }
     .stTextInput>div>div>input:focus, .stTextArea>div>div>textarea:focus {
-        border-color: #5A8EB6 !important;
-        box-shadow: 0 0 0 1px #5A8EB6 !important;
+        border-color: #ffffff !important;
+        box-shadow: 0 0 0 1px #ffffff !important;
     }
     
     /* Labels and small text */
     label[data-testid="stWidgetLabel"] p {
-        color: #2B2B36 !important;
+        color: #ffffff !important;
         font-weight: 700 !important;
     }
 
     /* Sidebar Styling */
     section[data-testid="stSidebar"] {
-        background-color: #2B2B36 !important; /* Charcoal dark theme for sidebar */
-        border-right: 3px solid #2B2B36 !important;
+        background-color: #000000 !important;
+        border-right: 2px solid #ffffff !important;
     }
     section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] li, section[data-testid="stSidebar"] span {
-        color: #e0e0e3 !important;
+        color: #ffffff !important;
     }
     section[data-testid="stSidebar"] h1, section[data-testid="stSidebar"] h2, section[data-testid="stSidebar"] h3 {
         color: #ffffff !important;
@@ -1006,30 +1000,30 @@ st.markdown("""
         font-weight: 800 !important;
     }
     section[data-testid="stSidebar"] .stButton>button {
-        background-color: #FAF9F6 !important;
-        color: #2B2B36 !important;
-        border: 2px solid #FAF9F6 !important;
+        background-color: #000000 !important;
+        color: #ffffff !important;
+        border: 2px solid #ffffff !important;
     }
     section[data-testid="stSidebar"] .stButton>button:hover {
-        background-color: #E28E66 !important;
-        color: #FAF9F6 !important;
-        border-color: #E28E66 !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        border-color: #ffffff !important;
     }
 
     /* Tabs styling */
     .stTabs [data-baseweb="tab-list"] {
         gap: 12px !important;
-        background-color: #2B2B36 !important;
+        background-color: #000000 !important;
         padding: 8px !important;
-        border-radius: 8px !important;
-        border: 3px solid #2B2B36 !important;
+        border-radius: 6px !important;
+        border: 2px solid #ffffff !important;
         margin-bottom: 24px !important;
     }
     .stTabs [data-baseweb="tab"] {
         height: 44px !important;
         border-radius: 4px !important;
         background-color: transparent !important;
-        color: #a0a0ab !important;
+        color: #888888 !important;
         font-family: 'Playfair Display', serif !important;
         font-weight: 700 !important;
         padding: 0px 16px !important;
@@ -1037,44 +1031,60 @@ st.markdown("""
     }
     .stTabs [data-baseweb="tab"]:hover {
         color: #ffffff !important;
-        background-color: #3e3e4d !important;
+        background-color: #1c1c1c !important;
     }
     .stTabs [aria-selected="true"] {
-        background-color: #E28E66 !important;
-        color: #FAF9F6 !important;
-        box-shadow: 2px 2px 0px 0px #2B2B36 !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        box-shadow: none !important;
     }
 
     /* Scrollbar override */
     ::-webkit-scrollbar {
-        width: 10px;
-        height: 10px;
+        width: 8px;
+        height: 8px;
     }
     ::-webkit-scrollbar-track {
-        background: #F7F2E8;
+        background: #000000;
     }
     ::-webkit-scrollbar-thumb {
-        background: #2B2B36;
-        border-radius: 5px;
-        border: 2px solid #F7F2E8;
+        background: #ffffff;
+        border-radius: 4px;
+        border: 2px solid #000000;
     }
     ::-webkit-scrollbar-thumb:hover {
-        background: #E28E66;
+        background: #cccccc;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # Sidebar
 st.sidebar.markdown("""
-<div style="background-color: #FAF9F6; border: 3px solid #2B2B36; border-radius: 8px; padding: 20px; margin-bottom: 25px; text-align: center; box-shadow: 4px 4px 0px 0px #D95D67;">
-    <div style="font-size: 2.5rem; margin-bottom: 8px;">⚡</div>
-    <h3 style="color: #2B2B36; margin: 0; font-family: 'Playfair Display', serif; font-weight: 900; font-size: 1.3rem; letter-spacing: 0.5px; text-transform: uppercase;">PRATEEQ SYNC</h3>
-    <span style="display: block; color: #5A8EB6; font-size: 0.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; margin-top: 4px;">ORCHESTRATION CLIENT</span>
-    <code style="display: inline-block; background-color: #2B2B36; color: #FAF9F6; border: 1.5px solid #2B2B36; border-radius: 4px; padding: 2px 8px; font-size: 0.7rem; font-weight: bold; margin-top: 10px; font-family: 'JetBrains Mono', monospace;">v1.3.0 // ACTIVE</code>
+<div style="background-color: #000000; border: 2.5px solid #ffffff; border-radius: 8px; padding: 20px; margin-bottom: 25px; text-align: center; box-shadow: 4px 4px 0px 0px #ffffff;">
+    <div style="width: 80px; height: 80px; margin: 0 auto 12px auto; display: flex; align-items: center; justify-content: center;">
+        <svg viewBox="0 0 100 100" style="width: 100%; height: 100%;">
+            <circle cx="50" cy="50" r="38" fill="#5A8EB6" opacity="0.15" />
+            <path d="M 26,45 L 32,50 L 26,55" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+            <line x1="35" y1="55" x2="43" y2="55" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" />
+            <line x1="15" y1="72" x2="85" y2="72" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" />
+            <path d="M 32,72 C 32,46 68,46 68,72" fill="#FAF9F6" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round" />
+            <path d="M 32,48 L 12,38 Q 24,53 36,55" fill="#D95D67" stroke="#ffffff" stroke-width="3" stroke-linejoin="round" />
+            <path d="M 68,48 L 88,38 Q 76,53 64,55" fill="#D95D67" stroke="#ffffff" stroke-width="3" stroke-linejoin="round" />
+            <circle cx="43" cy="58" r="6.5" fill="#2B2B36" />
+            <circle cx="45" cy="55.5" r="2.5" fill="#FAF9F6" />
+            <circle cx="57" cy="58" r="6.5" fill="#2B2B36" />
+            <circle cx="59" cy="55.5" r="2.5" fill="#FAF9F6" />
+            <ellipse cx="37" cy="63" rx="3.5" ry="2" fill="#DF8B98" opacity="0.6" />
+            <ellipse cx="63" cy="63" rx="3.5" ry="2" fill="#DF8B98" opacity="0.6" />
+        </svg>
+    </div>
+    <h3 style="color: #ffffff; margin: 0; font-family: 'Playfair Display', serif; font-weight: 900; font-size: 1.3rem; letter-spacing: 0.5px; text-transform: uppercase;">PRATEEQ SYNC</h3>
+    <span style="display: block; color: #8A8A93; font-size: 0.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; margin-top: 4px;">ORCHESTRATION CLIENT</span>
+    <code style="display: inline-block; background-color: #121212; color: #ffffff; border: 1.5px solid #ffffff; border-radius: 4px; padding: 2px 8px; font-size: 0.7rem; font-weight: bold; margin-top: 10px; font-family: 'JetBrains Mono', monospace;">v1.3.0 // ACTIVE</code>
 </div>
 """, unsafe_allow_html=True)
 
-st.sidebar.markdown("### 🛠️ Control Panel Operations")
+st.sidebar.markdown("### Control Panel Operations")
 st.sidebar.markdown("""
 This local portal lets you:
 *   **Edit Resume details manually**
@@ -1083,12 +1093,12 @@ This local portal lets you:
 """)
 
 if GEMINI_API_KEY:
-    st.sidebar.success("🔑 Gemini API Key loaded from .env.local")
+    st.sidebar.success("Gemini API Key loaded from .env.local")
 else:
-    st.sidebar.error("❌ GEMINI_API_KEY not found in .env.local")
+    st.sidebar.error("GEMINI_API_KEY not found in .env.local")
 
 # Manual button to scan for missing skills
-if st.sidebar.button("🔍 Scan for Missing Skills", use_container_width=True):
+if st.sidebar.button("Scan for Missing Skills", use_container_width=True):
     all_tags = []
     if 'projects' in st.session_state and st.session_state.projects:
         for p in st.session_state.projects:
@@ -1105,7 +1115,7 @@ if st.sidebar.button("🔍 Scan for Missing Skills", use_container_width=True):
 # Pending Skill Approvals Sidebar UI
 if 'pending_skills' in st.session_state and st.session_state.pending_skills:
     st.sidebar.markdown("---")
-    st.sidebar.markdown("### 🆕 Pending Skill Approvals")
+    st.sidebar.markdown("### Pending Skill Approvals")
     st.sidebar.info(f"You have **{len(st.session_state.pending_skills)}** pending skill(s) waiting for approval.")
     
     skill = st.session_state.pending_skills[0]
@@ -1126,7 +1136,7 @@ if 'pending_skills' in st.session_state and st.session_state.pending_skills:
         
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("✅ Approve", key="approve_skill_btn", type="primary"):
+            if st.button("Approve", key="approve_skill_btn", type="primary"):
                 current_skills = parse_skills_file()
                 if any(s.get("name", "").lower() == name.lower() for s in current_skills):
                     st.sidebar.error("Skill already exists!")
@@ -1147,15 +1157,15 @@ if 'pending_skills' in st.session_state and st.session_state.pending_skills:
                     except Exception as e:
                         st.sidebar.error(f"Failed to save: {e}")
         with col2:
-            if st.button("❌ Dismiss", key="dismiss_skill_btn", type="secondary"):
+            if st.button("Dismiss", key="dismiss_skill_btn", type="secondary"):
                 st.session_state.pending_skills.pop(0)
                 st.rerun()
 
 # Custom Title Header
 st.markdown("""
-<div style="text-align: center; padding: 30px 20px; margin-bottom: 35px; background-color: #2B2B36; border-radius: 8px; box-shadow: 6px 6px 0px 0px #E28E66; border: 3px solid #2B2B36;">
-    <h1 style="color: #ffffff; font-family: 'Playfair Display', serif; font-weight: 900; margin: 0; font-size: 2.5rem; letter-spacing: 0.5px; text-transform: uppercase;">🎨 PRATEEQ CONTROL PORTAL</h1>
-    <p style="color: #FAF9F6; margin: 8px 0 0 0; font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 0.85rem; letter-spacing: 0.2px; text-transform: uppercase; opacity: 0.90;">SYSTEM_STATUS: ONLINE  |  LOCAL RESUME & PORTFOLIO ENGINE</p>
+<div style="text-align: center; padding: 30px 20px; margin-bottom: 35px; background-color: #000000; border-radius: 8px; border: 2.5px solid #ffffff;">
+    <h1 style="color: #ffffff; font-family: 'Playfair Display', serif; font-weight: 900; margin: 0; font-size: 2.5rem; letter-spacing: 0.5px; text-transform: uppercase;">PRATEEQ CONTROL PORTAL</h1>
+    <p style="color: #ffffff; margin: 8px 0 0 0; font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 0.85rem; letter-spacing: 0.2px; text-transform: uppercase; opacity: 0.90;">SYSTEM_STATUS: ONLINE  |  LOCAL RESUME & PORTFOLIO ENGINE</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1172,10 +1182,10 @@ if 'pending_skills' not in st.session_state:
 
 # Set up tabs
 tab_edit, tab_project, tab_cert, tab_blog = st.tabs([
-    "✍️ Edit Resume Manually", 
-    "🚀 Sync Projects", 
-    "🎓 Sync Certificates",
-    "✍️ Blog Editor"
+    "Edit Resume Manually", 
+    "Sync Projects", 
+    "Sync Certificates",
+    "Blog Editor"
 ])
 
 # ──────────────────────────────────────────
@@ -1189,7 +1199,7 @@ with tab_edit:
         
         # 1. Profile section
         with st.container(border=True):
-            st.markdown('<div class="section-header">👤 Profile Details</div>', unsafe_allow_html=True)
+            st.markdown('<div class="section-header">Profile Details</div>', unsafe_allow_html=True)
             col1, col2 = st.columns(2)
             with col1:
                 res['name'] = st.text_input("Name", res.get('name', ''))
@@ -1203,7 +1213,7 @@ with tab_edit:
 
         # 2. Summaries section
         with st.container(border=True):
-            st.markdown('<div class="section-header">📝 Persona Summaries</div>', unsafe_allow_html=True)
+            st.markdown('<div class="section-header">Persona Summaries</div>', unsafe_allow_html=True)
             st.info("Write a different bio description tailored for each engineering archetype.")
             summ = res.get('summary', {})
             res['summary']['general'] = st.text_area("General Summary", summ.get('general', ''), height=100)
@@ -1213,10 +1223,10 @@ with tab_edit:
 
         # 3. Work Experience section
         with st.container(border=True):
-            st.markdown('<div class="section-header">💼 Work Experience</div>', unsafe_allow_html=True)
+            st.markdown('<div class="section-header">Work Experience</div>', unsafe_allow_html=True)
             
             # Add new job experience button
-            if st.button("➕ Add Job Experience"):
+            if st.button("Add Job Experience"):
                 new_job = {
                     "id": f"new-job-{datetime.now().strftime('%M%S')}",
                     "company": "Company Name",
@@ -1230,7 +1240,7 @@ with tab_edit:
                 st.rerun()
 
             for exp_idx, exp in enumerate(res.get('experience', [])):
-                with st.expander(f"💼 {exp.get('company')} — {exp.get('role')} ({exp.get('period')})", expanded=False):
+                with st.expander(f"{exp.get('company')} — {exp.get('role')} ({exp.get('period')})", expanded=False):
                     col_c1, col_c2 = st.columns(2)
                     with col_c1:
                         exp['company'] = st.text_input(f"Company Name", exp.get('company'), key=f"comp_{exp_idx}")
@@ -1268,7 +1278,7 @@ with tab_edit:
                             bullet['ai'] = st.text_area("AI/Agent Description", bullet.get('ai', ''), key=f"bul_a_{exp_idx}_{b_idx}", height=75)
                             bullet['creative'] = st.text_area("Creative/Animation Description", bullet.get('creative', ''), key=f"bul_c_{exp_idx}_{b_idx}", height=75)
                         
-                        if st.button(f"🗑️ Remove Bullet #{b_idx+1}", key=f"rem_bul_{exp_idx}_{b_idx}"):
+                        if st.button(f"Remove Bullet #{b_idx+1}", key=f"rem_bul_{exp_idx}_{b_idx}"):
                             bullets_to_remove.append(b_idx)
                             
                     if bullets_to_remove:
@@ -1276,14 +1286,14 @@ with tab_edit:
                             exp['bullets'].pop(idx)
                         st.rerun()
                     
-                    if st.button(f"🗑️ Delete Job Experience Block", key=f"del_exp_{exp_idx}", type="secondary"):
+                    if st.button(f"Delete Job Experience Block", key=f"del_exp_{exp_idx}", type="secondary"):
                         res['experience'].pop(exp_idx)
                         st.rerun()
 
         # 4. Education section
         with st.container(border=True):
-            st.markdown('<div class="section-header">🎓 Education</div>', unsafe_allow_html=True)
-            if st.button("➕ Add Education Block"):
+            st.markdown('<div class="section-header">Education</div>', unsafe_allow_html=True)
+            if st.button("Add Education Block"):
                 new_edu = {
                     "school": "University / School",
                     "degree": "Degree",
@@ -1294,7 +1304,7 @@ with tab_edit:
                 st.rerun()
 
             for edu_idx, edu in enumerate(res.get('education', [])):
-                with st.expander(f"🎓 {edu.get('school')} — {edu.get('degree')}", expanded=False):
+                with st.expander(f"{edu.get('school')} — {edu.get('degree')}", expanded=False):
                     col_e1, col_e2 = st.columns(2)
                     with col_e1:
                         edu['school'] = st.text_input(f"University / School", edu.get('school'), key=f"school_{edu_idx}")
@@ -1303,16 +1313,16 @@ with tab_edit:
                         edu['period'] = st.text_input(f"Period", edu.get('period'), key=f"edu_per_{edu_idx}")
                         edu['location'] = st.text_input(f"Location", edu.get('location'), key=f"edu_loc_{edu_idx}")
                     
-                    if st.button(f"🗑️ Delete Education Block", key=f"del_edu_{edu_idx}", type="secondary"):
+                    if st.button(f"Delete Education Block", key=f"del_edu_{edu_idx}", type="secondary"):
                         res['education'].pop(edu_idx)
                         st.rerun()
 
         # Save Button
         st.markdown("---")
-        if st.button("💾 Save Resume Changes", type="primary", use_container_width=True):
+        if st.button("Save Resume Changes", type="primary", use_container_width=True):
             try:
                 write_resume_file(res)
-                st.success("🎉 Resume updated and saved successfully directly in src/data/resume.ts!")
+                st.success("Resume updated and saved successfully directly in src/data/resume.ts!")
             except Exception as e:
                 st.error(f"Failed to write file: {e}")
 
@@ -1321,7 +1331,7 @@ with tab_edit:
 # ──────────────────────────────────────────
 with tab_project:
     with st.container(border=True):
-        st.markdown('<div class="section-header">🚀 Import & Sync Project Showcase</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-header">Import & Sync Project Showcase</div>', unsafe_allow_html=True)
         st.write("Extract descriptions, tags, and custom resume bullet points from your repos using the Gemini API.")
 
         project_mode = st.radio("Choose Project Input Type:", ["Local Directory", "GitHub Repository"])
@@ -1493,7 +1503,7 @@ with tab_project:
                                 write_resume_file(resume)
                                 st.session_state.resume = resume
                                 
-                            st.success(f"🎉 Saved entry. Added to projects.ts and experience bullets in resume.ts!")
+                            st.success(f"Saved entry. Added to projects.ts and experience bullets in resume.ts!")
                     else:
                         status.update(label="API Sync call failed", state="error")
 
@@ -1502,7 +1512,7 @@ with tab_project:
 # ──────────────────────────────────────────
 with tab_cert:
     with st.container(border=True):
-        st.markdown('<div class="section-header">🎓 Scan & Sync Certificates</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-header">Scan & Sync Certificates</div>', unsafe_allow_html=True)
         st.write("Analyze raw credentials using Gemini Multimodal OCR and add them directly to your verified badges.")
 
         raw_cert_dir = "src/data/certificates/raw"
@@ -1609,15 +1619,15 @@ with tab_cert:
                             write_resume_file(resume)
                             st.session_state.resume = resume
                             
-                        st.success("🎉 Certificates added to certificates.ts and moved to assets!")
+                        st.success("Certificates added to certificates.ts and moved to assets!")
                         st.rerun()
                     else:
                         status.update(label="Scan completed", state="complete")
         else:
             st.info("No raw certificate files found. Drop PDFs or image files into `src/data/certificates/raw/` to parse them.")
 
-    # 📋 Manage Active Certificates Section
-    st.markdown('<div class="section-header" style="margin-top: 2rem;">📋 Manage Active Certificates</div>', unsafe_allow_html=True)
+    # Manage Active Certificates Section
+    st.markdown('<div class="section-header" style="margin-top: 2rem;">Manage Active Certificates</div>', unsafe_allow_html=True)
     
     current_certs = st.session_state.certificates
     if not current_certs:
@@ -1634,7 +1644,7 @@ with tab_cert:
                     if local_img_path and os.path.exists(local_img_path):
                         st.image(local_img_path, use_container_width=True)
                     else:
-                        st.markdown("🖼️ *No Image*")
+                        st.markdown("*No Image*")
                 with col2:
                     st.markdown(f"### {cert.get('title', 'Untitled Certificate')}")
                     st.markdown(f"**Issuer:** {cert.get('issuer', 'Unknown')} | **Date:** {cert.get('date', 'N/A')}")
@@ -1649,7 +1659,7 @@ with tab_cert:
                         st.markdown(" ".join([f"`#{t}`" for t in tags]))
                         
                     # Remove button
-                    if st.button(f"🗑️ Remove Certificate", key=f"del_cert_{cert_id}", type="secondary"):
+                    if st.button(f"Remove Certificate", key=f"del_cert_{cert_id}", type="secondary"):
                         # Removal logic
                         # 1. Delete image
                         if img_path:
@@ -1679,23 +1689,23 @@ with tab_cert:
                             write_resume_file(resume)
                             st.session_state.resume = resume
                             
-                        st.success(f"🎉 Successfully removed certificate: **{cert.get('title')}**")
+                        st.success(f"Successfully removed certificate: **{cert.get('title')}**")
                         st.rerun()
 
 # ──────────────────────────────────────────
 # TAB 4: BLOG EDITOR
 # ──────────────────────────────────────────
 with tab_blog:
-    st.markdown('<div class="section-header">✍️ AI Blog Writer & Publisher</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-header">AI Blog Writer & Publisher</div>', unsafe_allow_html=True)
     st.write("Draft professional developer logs, tutorials, and post updates using the Gemini co-pilot, and publish them directly to your website.")
     
     # AI Assist inputs
-    st.subheader("🤖 AI Ghostwriter Co-Pilot")
+    st.subheader("AI Ghostwriter Co-Pilot")
     raw_notes = st.text_area("1. Paste your raw notes, debug outputs, or code snippets here:", height=150, placeholder="E.g. Fixed resume PDF download using jsPDF to create a vector layout so text remains selectable and ATS-compliant...")
     
     tone = st.selectbox("Choose Tone:", ["Professional & Technical", "Conversational & Casual", "Tutorial / How-To Style"])
     
-    if st.button("🪄 Draft Blog Post with AI", use_container_width=True):
+    if st.button("Draft Blog Post with AI", use_container_width=True):
         if not raw_notes:
             st.error("Please add some raw notes or code first!")
         else:
@@ -1724,17 +1734,17 @@ with tab_blog:
                     st.session_state.blog_draft_title = res.get("title", "")
                     st.session_state.blog_draft_excerpt = res.get("excerpt", "")
                     st.session_state.blog_draft_content = res.get("content", "")
-                    st.success("✅ Draft generated! Review it below.")
+                    st.success("Draft generated! Review it below.")
                     
     # Form details (pre-filled from session state if available)
-    st.subheader("📝 Edit & Publish Post")
+    st.subheader("Edit & Publish Post")
     
     draft_title = st.text_input("Title:", value=st.session_state.get("blog_draft_title", ""))
     draft_excerpt = st.text_area("Excerpt / Summary:", value=st.session_state.get("blog_draft_excerpt", ""))
     draft_tags = st.text_input("Tags (comma separated):", value="Next.js, Python, AI" if not st.session_state.get("blog_draft_content") else "")
     draft_content = st.text_area("Markdown Body Content:", value=st.session_state.get("blog_draft_content", ""), height=350)
     
-    if st.button("🚀 Publish Blog Post", use_container_width=True, type="primary"):
+    if st.button("Publish Blog Post", use_container_width=True, type="primary"):
         if not draft_title or not draft_content:
             st.error("Title and Markdown content are required!")
         else:
@@ -1772,7 +1782,7 @@ coverImage: "/images/blog/default.jpg"
                     write_resume_file(resume)
                     st.session_state.resume = resume
                 
-                st.success(f"🎉 Successfully published blog post! File created at: `{file_path}`")
+                st.success(f"Successfully published blog post! File created at: `{file_path}`")
                 
                 # Clear session state
                 if "blog_draft_title" in st.session_state: del st.session_state.blog_draft_title
@@ -1787,7 +1797,7 @@ coverImage: "/images/blog/default.jpg"
     # Existing / Published Blogs List
     # ──────────────────────────────────────────
     st.markdown("---")
-    st.subheader("📚 Already Published Logs")
+    st.subheader("Already Published Logs")
     
     posts_dir = os.path.join("src", "content", "posts")
     if os.path.exists(posts_dir):
@@ -1831,10 +1841,10 @@ coverImage: "/images/blog/default.jpg"
                     col_info, col_btn = st.columns([5, 1.2])
                     with col_info:
                         st.markdown(f"**{post['title']}**")
-                        st.caption(f"📅 Date: {post['date'] if post['date'] else 'No Date'} | 📁 File: `{post['file_name']}`")
+                        st.caption(f"Date: {post['date'] if post['date'] else 'No Date'} | File: `{post['file_name']}`")
                     with col_btn:
                         btn_key = f"delete_{post['file_name']}"
-                        if st.button("🗑️ Remove", key=btn_key, type="secondary", use_container_width=True):
+                        if st.button("Remove", key=btn_key, type="secondary", use_container_width=True):
                             try:
                                 os.remove(post['file_path'])
                                 st.success(f"Deleted `{post['file_name']}` successfully!")
