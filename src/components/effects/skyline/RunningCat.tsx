@@ -19,6 +19,8 @@ const RunningCat: React.FC<LayerProps> = ({ reducedMotion }) => {
   const velocityRef = useRef(0);
   const { velocity: scrollVelocity } = useLenisScroll();
 
+  const boundingRectRef = useRef<DOMRect | null>(null);
+
   useEffect(() => {
     if (reducedMotion) return;
     const unsub = scrollVelocity.on('change', (v) => {
@@ -29,7 +31,22 @@ const RunningCat: React.FC<LayerProps> = ({ reducedMotion }) => {
 
   useEffect(() => {
     stateRef.current = state;
+    boundingRectRef.current = null; // Invalidate cached rect on state change
   }, [state]);
+
+  // Invalidate cached bounding box on window scroll or resize
+  useEffect(() => {
+    if (reducedMotion) return;
+    const handleScrollOrResize = () => {
+      boundingRectRef.current = null;
+    };
+    window.addEventListener('scroll', handleScrollOrResize, { passive: true });
+    window.addEventListener('resize', handleScrollOrResize, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScrollOrResize);
+      window.removeEventListener('resize', handleScrollOrResize);
+    };
+  }, [reducedMotion]);
 
   // Global mousemove and click detection to bypass browser pointer-event bugs (especially Safari parent pointer-events: none bug)
   useEffect(() => {
@@ -37,7 +54,12 @@ const RunningCat: React.FC<LayerProps> = ({ reducedMotion }) => {
 
     const handleGlobalInteraction = (e: MouseEvent) => {
       if (stateRef.current !== 'sitting') return;
-      const rect = catRef.current?.getBoundingClientRect();
+      if (!catRef.current) return;
+
+      if (!boundingRectRef.current) {
+        boundingRectRef.current = catRef.current.getBoundingClientRect();
+      }
+      const rect = boundingRectRef.current;
       if (!rect) return;
 
       const padding = 15; // px hover boundary padding

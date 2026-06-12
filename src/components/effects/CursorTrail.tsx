@@ -130,6 +130,34 @@ export default function CursorTrail() {
     return unsub;
   }, [scrollVelocity]);
 
+  const smokeTemplateRef = useRef<HTMLCanvasElement | null>(null);
+
+  const getSmokeTemplate = useCallback((): HTMLCanvasElement => {
+    if (smokeTemplateRef.current) return smokeTemplateRef.current;
+
+    const size = 128;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      const center = size / 2;
+      const grad = ctx.createRadialGradient(center, center, 0, center, center, center);
+      grad.addColorStop(0, 'rgba(200, 200, 202, 1.0)');
+      grad.addColorStop(0.3, 'rgba(180, 180, 182, 0.6)');
+      grad.addColorStop(0.7, 'rgba(140, 140, 142, 0.2)');
+      grad.addColorStop(1, 'rgba(140, 140, 142, 0.0)');
+
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(center, center, center, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    smokeTemplateRef.current = canvas;
+    return canvas;
+  }, []);
+
   const cigStateRef = useRef({
     x: -100,
     y: -100,
@@ -239,17 +267,16 @@ export default function CursorTrail() {
           continue;
         }
 
+        const template = getSmokeTemplate();
         ctx.save();
-        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
-        grad.addColorStop(0, `rgba(200, 200, 202, ${p.opacity})`);
-        grad.addColorStop(0.3, `rgba(180, 180, 182, ${p.opacity * 0.6})`);
-        grad.addColorStop(0.7, `rgba(140, 140, 142, ${p.opacity * 0.2})`);
-        grad.addColorStop(1, 'rgba(140, 140, 142, 0)');
-        
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.globalAlpha = p.opacity;
+        ctx.drawImage(
+          template,
+          p.x - p.size,
+          p.y - p.size,
+          p.size * 2,
+          p.size * 2
+        );
         ctx.restore();
       }
 
@@ -386,7 +413,7 @@ export default function CursorTrail() {
     } else {
       isLoopActiveRef.current = false;
     }
-  }, [isNoir, colors]);
+  }, [isNoir, colors, getSmokeTemplate]);
 
   useEffect(() => {
     drawRef.current = draw;
