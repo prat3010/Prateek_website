@@ -6,7 +6,7 @@ export type Theme = 'light' | 'noir';
 
 interface ThemeContextType {
   theme: Theme;
-  toggleTheme: (e?: React.MouseEvent<HTMLButtonElement>) => void;
+  toggleTheme: () => void;
   isNoir: boolean;
   isDetailsHidden: boolean;
   toggleDetailsHidden: () => void;
@@ -14,7 +14,6 @@ interface ThemeContextType {
 
 interface ThemeTransitionContextType {
   isTransitioning: boolean;
-  transitionCoords: { x: number; y: number };
   pendingTheme: Theme | null;
 }
 
@@ -28,7 +27,6 @@ function getInitialTheme(initialTheme?: Theme): Theme {
 export function ThemeProvider({ children, initialTheme }: { children: React.ReactNode; initialTheme?: Theme }) {
   const [theme, setTheme] = useState<Theme>(() => getInitialTheme(initialTheme));
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [transitionCoords, setTransitionCoords] = useState({ x: 50, y: 50 });
   const [pendingTheme, setPendingTheme] = useState<Theme | null>(null);
   const [isDetailsHidden, setIsDetailsHidden] = useState(false);
 
@@ -73,21 +71,12 @@ export function ThemeProvider({ children, initialTheme }: { children: React.Reac
   }, []);
 
   const toggleTheme = useCallback(
-    (e?: React.MouseEvent<HTMLButtonElement>) => {
+    () => {
       if (isTransitioningRef.current) return;
 
       const currentTheme = themeRef.current;
       const nextTheme: Theme = currentTheme === 'light' ? 'noir' : 'light';
-      
-      // Calculate origin coordinates for ink spill (as percentage of screen)
-      let x = 50;
-      let y = 50;
-      if (e) {
-        x = (e.clientX / window.innerWidth) * 100;
-        y = (e.clientY / window.innerHeight) * 100;
-      }
 
-      setTransitionCoords({ x, y });
       setPendingTheme(nextTheme);
       setIsTransitioning(true);
       isTransitioningRef.current = true;
@@ -124,9 +113,8 @@ export function ThemeProvider({ children, initialTheme }: { children: React.Reac
 
   const transitionValue = useMemo(() => ({
     isTransitioning,
-    transitionCoords,
     pendingTheme,
-  }), [isTransitioning, transitionCoords, pendingTheme]);
+  }), [isTransitioning, pendingTheme]);
 
   return (
     <ThemeContext.Provider value={themeValue}>
