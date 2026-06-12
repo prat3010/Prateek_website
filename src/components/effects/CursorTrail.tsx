@@ -7,8 +7,8 @@ import styles from './CursorTrail.module.css';
 
 const POP_COLORS = ['#D95D67', '#5A8EB6', '#F4DC95', '#DF8B98', '#79B48B', '#E28E66'];
 const NOIR_COLORS = ['#FAFAFA', '#E0E0E3', '#C0C0C4', '#8A8A93', '#4A4A50', '#27272A'];
-const TRAIL_LENGTH = 18;
-const BASE_DOT_RADIUS = 8;
+const TRAIL_LENGTH = 10;
+const BASE_DOT_RADIUS = 7;
 
 interface TrailDot {
   x: number;
@@ -296,8 +296,8 @@ export default function CursorTrail() {
         const dot = trail[i];
 
         const progress = dot.age / TRAIL_LENGTH;
-        const radius = (BASE_DOT_RADIUS + scrollPulse) * (1 - progress * 0.7);
-        const opacity = 1 - progress * 0.85;
+        const radius = (BASE_DOT_RADIUS + scrollPulse) * Math.pow(1 - progress, 1.5);
+        const opacity = 1 - progress;
 
         if (opacity <= 0 || radius <= 0) continue;
 

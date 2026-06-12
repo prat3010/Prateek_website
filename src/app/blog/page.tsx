@@ -22,9 +22,9 @@ export default function BlogListing() {
           </div>
         ) : (
           <div className={styles.grid}>
-            {posts.map((post) => (
+            {posts.map((post, index) => (
               <Link key={post.slug} href={`/blog/${post.slug}`} className={styles.cardLink}>
-                <ComicPanel tilt={Math.random() > 0.5 ? 1 : -1} className={styles.postCard}>
+                <ComicPanel tilt={index % 2 === 0 ? 1 : -1} className={styles.postCard}>
                   <div className={styles.postMeta}>
                     <span className={styles.date}>{post.date}</span>
                   </div>
