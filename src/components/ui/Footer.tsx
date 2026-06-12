@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTheme } from '@/context/ThemeContext';
 import styles from './Footer.module.css';
@@ -65,59 +65,319 @@ const defaultSocials: SocialLink[] = [
   { label: 'Phone', href: 'tel:+919050433260', icon: <PhoneIcon /> },
 ];
 
+const navItems = [
+  { label: 'Home', href: '/#home' },
+  { label: 'About', href: '/#about' },
+  { label: 'Skills', href: '/#skills' },
+  { label: 'Projects', href: '/#projects' },
+  { label: 'Resume', href: '/#resume' },
+  { label: 'Playground', href: '/#playground' },
+  { label: 'Contact', href: '/#contact' },
+  { label: 'Blog', href: '/blog' },
+];
+
 export default function Footer({ socials, className }: FooterProps) {
   const socialLinks = socials ?? defaultSocials;
   const [year] = useState(() => new Date().getFullYear());
-  const { isNoir } = useTheme();
+  const { theme } = useTheme();
+  const [timeString, setTimeString] = useState('');
+
+  // Live system clock logic for Noir theme (safely executed on client-side only)
+  useEffect(() => {
+    if (theme !== 'noir') return;
+    const updateTime = () => {
+      const now = new Date();
+      setTimeString(
+        now.toLocaleTimeString('en-US', {
+          hour12: false,
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        })
+      );
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, [theme]);
 
   return (
     <footer className={`${styles.footer} ${className ?? ''}`}>
-      {/* Corner action word decorations */}
-      <span className={`${styles.cornerDecoration} ${styles.topLeft}`} aria-hidden="true">
-        {isNoir ? 'GRIT!' : 'POW!'}
-      </span>
-      <span className={`${styles.cornerDecoration} ${styles.topRight}`} aria-hidden="true">
-        {isNoir ? 'SHADOW!' : 'ZAP!'}
-      </span>
-      <span className={`${styles.cornerDecoration} ${styles.bottomLeft}`} aria-hidden="true">
-        {isNoir ? 'DUSK!' : 'WHAM!'}
-      </span>
-      <span className={`${styles.cornerDecoration} ${styles.bottomRight}`} aria-hidden="true">
-        {isNoir ? 'CASE!' : 'BAM!'}
-      </span>
+      
+      {/* ────────────────────────────────────────────────────────────
+         COMIC BOOK / AZURE THEME VIEW (RENDERED SIDE-BY-SIDE IN DOM)
+         ──────────────────────────────────────────────────────────── */}
+      <div className={styles.comicView}>
+        {/* Decorative corner accents */}
+        <span className={`${styles.cornerDecoration} ${styles.topLeft}`} aria-hidden="true">
+          POW!
+        </span>
+        <span className={`${styles.cornerDecoration} ${styles.topRight}`} aria-hidden="true">
+          ZAP!
+        </span>
+        <span className={`${styles.cornerDecoration} ${styles.bottomLeft}`} aria-hidden="true">
+          WHAM!
+        </span>
+        <span className={`${styles.cornerDecoration} ${styles.bottomRight}`} aria-hidden="true">
+          BAM!
+        </span>
 
-      <div className={styles.content}>
-        {/* Tagline */}
-        <p className={styles.tagline}>
-          Made with <span className={styles.heart}>{isNoir ? '🖤' : '❤️'}</span> and{' '}
-          <span className={styles.pow}>{isNoir ? 'GRIT!' : 'POW!'}</span> by Prateeq Sharma
-        </p>
+        <div className={styles.container}>
+          <div className={styles.panelsGrid}>
+            
+            {/* PANEL 1: MISSION */}
+            <div className={`${styles.panel} ${styles.missionPanel}`} role="region" aria-label="Mission Statement">
+              <div className={styles.comicPanel}>
+                <h3 className={styles.comicPanelTitle}>THE MISSION!</h3>
+                <div className={styles.comicPanelBody}>
+                  <p className={styles.comicText}>
+                    Designing premium web experiences with a punch of color and vector precision. Stand out, make it pop!
+                  </p>
+                  <p className={styles.comicMadeWith}>
+                    Made with <span className={styles.heart}>❤️</span> and <span className={styles.pow}>POW!</span> by Prateeq Sharma
+                  </p>
+                </div>
+              </div>
+            </div>
 
-        {/* Social links */}
-        <div className={styles.socials} role="list" aria-label="Social links">
-          {socialLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className={styles.socialLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={link.label}
-              role="listitem"
-            >
-              {link.icon}
-            </a>
-          ))}
+            {/* PANEL 2: NAVIGATION */}
+            <div className={`${styles.panel} ${styles.navPanel}`} role="navigation" aria-label="Footer navigation">
+              <div className={styles.comicPanel}>
+                <h3 className={styles.comicPanelTitle}>NAVIGATE!</h3>
+                <div className={styles.comicPanelBody}>
+                  <div className={styles.comicNavLinks}>
+                    {navItems.map((item) => (
+                      <Link key={item.href} href={item.href} className={styles.comicNavLink}>
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* PANEL 3: CONNECT */}
+            <div className={`${styles.panel} ${styles.connectPanel}`} role="region" aria-label="Social connections">
+              <div className={styles.comicPanel}>
+                <h3 className={styles.comicPanelTitle}>CONNECT!</h3>
+                <div className={styles.comicPanelBody}>
+                  <div className={styles.comicSocials}>
+                    {socialLinks.map((link) => (
+                      <a
+                        key={link.label}
+                        href={link.href}
+                        className={styles.comicSocialLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={link.label}
+                      >
+                        <span className={styles.halftoneBg} />
+                        <span className={styles.socialIcon}>{link.icon}</span>
+                        <span className={styles.socialTooltip}>{link.label}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Bottom strip */}
+          <div className={styles.bottomBar}>
+            <p className={styles.copyright}>
+              © {year} Prateeq Sharma. All rights reserved.
+            </p>
+            <Link href="/admin/analytics" className={styles.analyticsLink}>
+              📊 Site Analytics
+            </Link>
+          </div>
         </div>
-
-        {/* Copyright */}
-        <p className={styles.copyright}>
-          © {year} Prateeq Sharma. All rights reserved.
-          <Link href="/admin/analytics" className={styles.analyticsLink}>
-            📊 Site Analytics
-          </Link>
-        </p>
       </div>
+
+      {/* ────────────────────────────────────────────────────────────
+         CYBER-NOIR / CYBERPUNK THEME VIEW (RENDERED SIDE-BY-SIDE IN DOM)
+         ──────────────────────────────────────────────────────────── */}
+      <div className={styles.noirView}>
+        {/* CRT scanlines effect */}
+        <div className={styles.crtOverlay} aria-hidden="true" />
+
+        {/* Decorative corner accents */}
+        <span className={`${styles.cornerDecoration} ${styles.topLeft}`} aria-hidden="true">
+          GRIT
+        </span>
+        <span className={`${styles.cornerDecoration} ${styles.topRight}`} aria-hidden="true">
+          SHADOW
+        </span>
+        <span className={`${styles.cornerDecoration} ${styles.bottomLeft}`} aria-hidden="true">
+          DUSK
+        </span>
+        <span className={`${styles.cornerDecoration} ${styles.bottomRight}`} aria-hidden="true">
+          CASE
+        </span>
+
+        <div className={styles.container}>
+          <div className={styles.panelsGrid}>
+            
+            {/* PANEL 1: TERMINAL MISSION */}
+            <div className={`${styles.panel} ${styles.missionPanel}`} role="region" aria-label="Mission Statement">
+              <div className={styles.terminalWindow}>
+                <div className={styles.terminalHeader}>
+                  <span className={`${styles.terminalDot} ${styles.dotRed}`} />
+                  <span className={`${styles.terminalDot} ${styles.dotYellow}`} />
+                  <span className={`${styles.terminalDot} ${styles.dotGreen}`} />
+                  <span className={styles.terminalTitle}>mission.txt</span>
+                </div>
+                <div className={styles.terminalBody}>
+                  <div className={styles.terminalLine}>
+                    <span className={styles.terminalPrompt}>prateek@system:~ $</span> cat mission.txt
+                  </div>
+                  <div className={`${styles.terminalOutput} ${styles.textStdout}`}>
+                    [STATUS: ACTIVE]
+                    <br />
+                    [GOAL: CREATING GORGEOUS & HIGH-PERFORMANCE WEB EXPERIENCES WITH VECTOR PRECISION.]
+                  </div>
+                  <div className={styles.terminalOutput}>
+                    Made with <span className={styles.noirHeart}>🖤</span> and <span className={styles.noirGrit}>GRIT</span> by Prateeq Sharma
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* PANEL 2: TERMINAL NAVIGATION */}
+            <div className={`${styles.panel} ${styles.navPanel}`} role="navigation" aria-label="Footer navigation">
+              <div className={styles.terminalWindow}>
+                <div className={styles.terminalHeader}>
+                  <span className={`${styles.terminalDot} ${styles.dotRed}`} />
+                  <span className={`${styles.terminalDot} ${styles.dotYellow}`} />
+                  <span className={`${styles.terminalDot} ${styles.dotGreen}`} />
+                  <span className={styles.terminalTitle}>navigation</span>
+                </div>
+                <div className={styles.terminalBody}>
+                  <div className={styles.terminalLine}>
+                    <span className={styles.terminalPrompt}>prateek@system:~ $</span> ls -R /nav
+                  </div>
+                  <div className={styles.asciiTree}>
+                    <span className={styles.treeRoot}>/navigation</span>
+                    {navItems.map((item, index) => {
+                      const isLast = index === navItems.length - 1;
+                      return (
+                        <div key={item.href} className={styles.treeItem}>
+                          <span className={styles.treePipe}>{isLast ? '└── ' : '├── '}</span>
+                          <Link href={item.href} className={styles.treeLink}>
+                            {item.label.toLowerCase()}
+                          </Link>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* PANEL 3: TERMINAL CONNECT */}
+            <div className={`${styles.panel} ${styles.connectPanel}`} role="region" aria-label="Social connections">
+              <div className={styles.terminalWindow}>
+                <div className={styles.terminalHeader}>
+                  <span className={`${styles.terminalDot} ${styles.dotRed}`} />
+                  <span className={`${styles.terminalDot} ${styles.dotYellow}`} />
+                  <span className={`${styles.terminalDot} ${styles.dotGreen}`} />
+                  <span className={styles.terminalTitle}>connect.sh</span>
+                </div>
+                <div className={styles.terminalBody}>
+                  <div className={styles.terminalLine}>
+                    <span className={styles.terminalPrompt}>prateek@system:~ $</span> ./connect.sh
+                  </div>
+                  <div className={styles.terminalSocials}>
+                    {socialLinks.map((link) => {
+                      let protocol = 'link://';
+                      const lower = link.label.toLowerCase();
+                      if (lower === 'github') protocol = 'git://';
+                      else if (lower === 'linkedin') protocol = 'lnk://';
+                      else if (lower === 'twitter') protocol = 'x://';
+                      else if (lower === 'instagram') protocol = 'ig://';
+                      else if (lower === 'email') protocol = 'mail://';
+                      else if (lower === 'phone') protocol = 'tel://';
+
+                      let displayVal = link.href
+                        .replace('https://github.com/', '')
+                        .replace('https://linkedin.com/in/', '')
+                        .replace('https://x.com/', '')
+                        .replace('https://instagram.com/', '')
+                        .replace('mailto:', '')
+                        .replace('tel:', '');
+
+                      if (displayVal.length > 20) {
+                        displayVal = displayVal.substring(0, 17) + '...';
+                      }
+
+                      return (
+                        <a
+                          key={link.label}
+                          href={link.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.terminalSocialLink}
+                        >
+                          <span className={styles.protocolPrefix}>{protocol}</span>
+                          <span className={styles.protocolValue}>{displayVal}</span>
+                        </a>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* PANEL 4: TERMINAL TELEMETRY */}
+            <div className={`${styles.panel} ${styles.statsPanel}`} role="region" aria-label="System telemetry">
+              <div className={styles.terminalWindow}>
+                <div className={styles.terminalHeader}>
+                  <span className={`${styles.terminalDot} ${styles.dotRed}`} />
+                  <span className={`${styles.terminalDot} ${styles.dotYellow}`} />
+                  <span className={`${styles.terminalDot} ${styles.dotGreen}`} />
+                  <span className={styles.terminalTitle}>telemetry.log</span>
+                </div>
+                <div className={styles.terminalBody}>
+                  <div className={styles.terminalLine}>
+                    <span className={styles.terminalPrompt}>prateek@system:~ $</span> monitor --live
+                  </div>
+                  <div className={styles.diagnosticsLog}>
+                    <div className={styles.logRow}>
+                      <span className={styles.logLabel}>SYSTEM:</span>
+                      <span className={`${styles.logValue} ${styles.greenGlow}`}>ONLINE</span>
+                    </div>
+                    <div className={styles.logRow}>
+                      <span className={styles.logLabel}>LOCAL TIME:</span>
+                      <span className={`${styles.logValue} ${styles.cyanGlow}`}>{timeString || 'FETCHING...'}</span>
+                    </div>
+                    <div className={styles.logRow}>
+                      <span className={styles.logLabel}>LOCATION:</span>
+                      <span className={styles.logValue}>DELHI, IND</span>
+                    </div>
+                    <div className={styles.logRow}>
+                      <span className={styles.logLabel}>SESSION:</span>
+                      <span className={`${styles.logValue} ${styles.pinkGlow}`}>PORTFOLIO_v2</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Bottom strip */}
+          <div className={styles.bottomBar}>
+            <p className={styles.copyright}>
+              © {year} Prateeq Sharma. All rights reserved.
+            </p>
+            <Link href="/admin/analytics" className={styles.analyticsLink}>
+              📊 Site Analytics
+            </Link>
+          </div>
+        </div>
+      </div>
+
     </footer>
   );
 }

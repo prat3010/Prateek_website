@@ -1,225 +1,736 @@
-/* ============================================
-   Footer Component Styles
-   ============================================ */
+/* ============================================================
+   Redesigned Theme Footer Styles
+   Cohesive, Responsive, Comic & Cyber-Noir Aesthetics
+   ============================================================ */
 
 .footer {
   position: relative;
-  background-color: var(--pop-black);
-  color: var(--pop-white);
-  border-top: 5px solid var(--pop-red);
-  padding: 48px 32px 32px;
+  width: 100%;
+  overflow: hidden;
+  padding: 64px 0 24px;
+  box-sizing: border-box;
+  transition: background-color var(--transition-normal), border-color var(--transition-normal), box-shadow var(--transition-normal);
+  
+  /* Default light theme styles */
+  background-color: var(--pop-cream);
+  color: var(--pop-black);
+  border-top: 5px solid var(--pop-black);
+  /* Cold-press paper + Ben-Day dot pattern background */
+  background-image: 
+    radial-gradient(circle, rgba(43, 43, 54, 0.05) 1.5px, transparent 1.5px);
+  background-size: 16px 16px;
+}
+
+:global([data-theme='noir']) .footer {
+  background-color: #08080a;
+  color: #e0e0e3;
+  border-top: 4px solid var(--neon-pink) !important;
+  box-shadow: 0 -8px 24px rgba(255, 42, 85, 0.18) !important;
+  background-image: none !important;
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+/* ────────────────────────────────────────────────────────────
+   THEME VIEW SWITCHER (RESOLVES HYDRATION MISMATCHES)
+   ──────────────────────────────────────────────────────────── */
+
+.comicView {
+  display: block;
+  width: 100%;
+}
+
+.noirView {
+  display: none;
+  width: 100%;
+}
+
+:global([data-theme='noir']) .comicView {
+  display: none;
+}
+
+:global([data-theme='noir']) .noirView {
+  display: block;
+}
+
+/* ────────────────────────────────────────────────────────────
+   COMIC BOOK / AZURE THEME STYLING
+   ──────────────────────────────────────────────────────────── */
+
+.comicPanel {
+  background-color: var(--pop-white);
+  border: 3.5px solid var(--pop-black);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow-comic);
+  transition: transform 0.3s var(--ease-comic), box-shadow 0.3s var(--ease-comic), background-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 220px;
+  position: relative;
   overflow: hidden;
 }
 
-/* Ben-Day dot pattern */
-.footer::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-  background-size: 10px 10px;
-  pointer-events: none;
-  z-index: 0;
+/* Add slight hand-drawn rotations to comic panels */
+.missionPanel .comicPanel {
+  transform: rotate(-0.6deg);
 }
 
-:global([data-theme='noir']) .footer::before {
-  display: none !important;
+.navPanel .comicPanel {
+  transform: rotate(0.4deg);
 }
 
-.content {
-  position: relative;
-  z-index: 1;
+.connectPanel .comicPanel {
+  transform: rotate(-0.4deg);
+}
+
+/* Lift and straighten panel on hover */
+.comicPanel:hover {
+  transform: translate(-6px, -6px) rotate(0deg);
+  box-shadow: var(--shadow-comic-hover);
+  background-color: #ffffff;
+}
+
+.comicPanelTitle {
+  font-family: var(--font-headline);
+  font-size: 1.35rem;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 2.5px solid var(--pop-black);
+  color: var(--pop-black);
+  text-transform: uppercase;
+}
+
+.comicPanelBody {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
+  flex: 1;
+  gap: 16px;
 }
 
-/* ---- Tagline ---- */
+.comicText {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+  color: var(--color-text);
+}
 
-.tagline {
+.comicMadeWith {
   font-family: var(--font-headline);
-  font-size: 1.5rem;
-  letter-spacing: 1px;
-  text-align: center;
-  line-height: 1.4;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: auto 0 0 0;
 }
 
-.tagline .heart {
-  color: var(--pop-red);
+.heart {
   display: inline-block;
   animation: heartbeat 1.5s ease-in-out infinite;
 }
 
-.tagline .pow {
+.pow {
+  display: inline-block;
   color: var(--pop-yellow);
-  -webkit-text-stroke: 1px var(--pop-black);
+  font-weight: 900;
+  -webkit-text-stroke: 1.2px var(--pop-black);
   paint-order: stroke fill;
+  letter-spacing: 0.5px;
 }
 
 @keyframes heartbeat {
-  0%, 100% {
-    transform: scale(1);
-  }
-  15% {
-    transform: scale(1.2);
-  }
-  30% {
-    transform: scale(1);
-  }
-  45% {
-    transform: scale(1.15);
-  }
+  0%, 100% { transform: scale(1); }
+  15% { transform: scale(1.25); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.18); }
 }
 
-/* ---- Social links ---- */
+/* Comic Navigation Links */
+.comicNavLinks {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
 
-.socials {
+.comicNavLink {
+  display: block;
+  text-align: center;
+  padding: 8px 12px;
+  background-color: var(--pop-cream);
+  color: var(--pop-black);
+  border: 2px solid var(--pop-black);
+  border-radius: 8px;
+  font-family: var(--font-headline);
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: var(--shadow-comic-sm);
+  transition: all 0.2s var(--ease-comic);
+}
+
+.comicNavLink:hover {
+  transform: translate(-3px, -3px) rotate(-1.5deg);
+  box-shadow: var(--shadow-comic);
+  color: var(--pop-black);
+}
+
+/* Alternate sticker colors on hover */
+.comicNavLink:nth-child(4n+1):hover { background-color: var(--pop-yellow); }
+.comicNavLink:nth-child(4n+2):hover { background-color: var(--pop-pink); }
+.comicNavLink:nth-child(4n+3):hover { background-color: var(--pop-blue); }
+.comicNavLink:nth-child(4n+4):hover { background-color: var(--pop-green); }
+
+/* Comic Social Buttons */
+.comicSocials {
   display: flex;
-  gap: 16px;
-  align-items: center;
   flex-wrap: wrap;
-  justify-content: center;
+  gap: 12px;
+  justify-content: flex-start;
+  align-items: center;
 }
 
-.socialLink {
-  display: inline-flex;
+.comicSocialLink {
+  position: relative;
+  display: flex;
   align-items: center;
   justify-content: center;
   width: 44px;
   height: 44px;
-  border: 2px solid var(--pop-white);
-  border-radius: 8px;
-  color: var(--pop-white);
-  font-size: 1.2rem;
-  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease,
-    color 0.2s ease;
-  text-decoration: none;
-}
-
-.socialLink:hover {
-  background-color: var(--pop-yellow);
-  border-color: var(--pop-yellow);
+  background-color: var(--pop-white);
+  border: 2px solid var(--pop-black);
+  border-radius: 50%;
   color: var(--pop-black);
-  transform: scale(1.15) rotate(-3deg);
+  text-decoration: none;
+  box-shadow: var(--shadow-comic-sm);
+  transition: all 0.2s var(--ease-comic);
+  overflow: visible;
 }
 
-.socialLink svg {
+.socialIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.socialIcon svg {
   width: 20px;
   height: 20px;
   fill: currentColor;
+  transition: transform 0.2s ease;
 }
 
-/* ---- Copyright ---- */
-
-.copyright {
-  font-family: var(--font-body);
-  font-size: 0.85rem;
-  opacity: 0.7;
-  text-align: center;
+.halftoneBg {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-image: radial-gradient(circle, var(--pop-black) 1px, transparent 1px);
+  background-size: 4px 4px;
+  opacity: 0;
+  z-index: 1;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
 }
 
-/* ---- Corner decorations ---- */
+/* Custom colors and tilt on hover */
+.comicSocialLink:hover {
+  transform: scale(1.15) translate(-3px, -3px) rotate(-8deg);
+  box-shadow: var(--shadow-comic);
+  color: var(--pop-white);
+  border-color: var(--pop-black);
+}
 
+.comicSocialLink:hover .halftoneBg {
+  opacity: 0.15;
+}
+
+.comicSocialLink:hover .socialIcon svg {
+  transform: scale(1.1);
+}
+
+.comicSocialLink:nth-child(1):hover { background-color: #2b2b36; } /* GitHub */
+.comicSocialLink:nth-child(2):hover { background-color: #0077b5; } /* LinkedIn */
+.comicSocialLink:nth-child(3):hover { background-color: #1da1f2; } /* Twitter */
+.comicSocialLink:nth-child(4):hover { background-color: #e1306c; } /* Instagram */
+.comicSocialLink:nth-child(5):hover { background-color: var(--pop-red); } /* Email */
+.comicSocialLink:nth-child(6):hover { background-color: var(--pop-green); } /* Phone */
+
+/* Speech bubble tooltip for socials */
+.socialTooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  padding: 4px 8px;
+  background-color: var(--pop-yellow);
+  color: var(--pop-black);
+  border: 1.5px solid var(--pop-black);
+  border-radius: 6px;
+  font-family: var(--font-headline);
+  font-size: 0.7rem;
+  font-weight: 900;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s var(--ease-comic);
+  box-shadow: 2px 2px 0px rgba(0,0,0,0.8);
+  z-index: 10;
+}
+
+.comicSocialLink:hover .socialTooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-10px) rotate(-4deg);
+}
+
+
+/* ────────────────────────────────────────────────────────────
+   CYBER-NOIR / CYBERPUNK THEME STYLING
+   ──────────────────────────────────────────────────────────── */
+
+/* CRT Scanlines Overlay */
+.crtOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    rgba(18, 18, 20, 0) 50%,
+    rgba(0, 0, 0, 0.25) 50%
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0.2;
+  animation: scanlinesAnim 16s linear infinite;
+}
+
+@keyframes scanlinesAnim {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 100%; }
+}
+
+.terminalWindow {
+  background-color: #0c0c0e;
+  border: 1.5px solid #2e2e38;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  min-height: 230px;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+/* Dynamic glow effects per panel */
+.missionPanel .terminalWindow:hover {
+  border-color: var(--neon-pink);
+  box-shadow: 0 0 15px rgba(255, 42, 85, 0.22);
+  transform: translateY(-4px);
+}
+
+.navPanel .terminalWindow:hover {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.22);
+  transform: translateY(-4px);
+}
+
+.connectPanel .terminalWindow:hover {
+  border-color: var(--neon-yellow);
+  box-shadow: 0 0 15px rgba(255, 230, 0, 0.22);
+  transform: translateY(-4px);
+}
+
+.statsPanel .terminalWindow:hover {
+  border-color: var(--neon-green);
+  box-shadow: 0 0 15px rgba(57, 255, 20, 0.22);
+  transform: translateY(-4px);
+}
+
+.terminalHeader {
+  background-color: #121216;
+  border-bottom: 1.5px solid #2e2e38;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.terminalDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dotRed { background-color: #ff5f56; }
+.dotYellow { background-color: #ffbd2e; }
+.dotGreen { background-color: #27c93f; }
+
+.terminalTitle {
+  font-size: 0.72rem;
+  color: #8a8a93;
+  font-family: var(--font-code), monospace;
+  margin-left: auto;
+  text-transform: lowercase;
+  letter-spacing: 0.5px;
+}
+
+.terminalBody {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  font-family: var(--font-code), monospace;
+  box-sizing: border-box;
+}
+
+.terminalLine {
+  color: #e0e0e3;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.terminalPrompt {
+  color: var(--neon-pink);
+  font-weight: bold;
+}
+
+.terminalOutput {
+  color: #8a8a93;
+  margin: 0;
+}
+
+.textStdout {
+  color: #fafafa;
+}
+
+.terminalMadeWith {
+  color: #8a8a93;
+  margin-top: auto;
+}
+
+.noirHeart {
+  text-shadow: 0 0 6px #ffffff;
+}
+
+.noirGrit {
+  color: var(--neon-pink);
+  text-shadow: var(--neon-pink-glow);
+  font-weight: bold;
+}
+
+/* ASCII Explorer Directory tree style */
+.asciiTree {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 4px;
+}
+
+.treeRoot {
+  color: var(--neon-cyan);
+  font-weight: bold;
+  text-shadow: 0 0 4px rgba(0, 240, 255, 0.25);
+}
+
+.treeItem {
+  display: flex;
+  align-items: center;
+}
+
+.treePipe {
+  color: #4a4a50;
+  white-space: pre;
+  user-select: none;
+}
+
+.treeLink {
+  color: #a0a0ab;
+  text-decoration: none;
+  transition: color 0.15s ease, text-shadow 0.15s ease;
+}
+
+.treeLink:hover {
+  color: var(--neon-cyan);
+  text-shadow: var(--neon-cyan-glow);
+}
+
+/* Noir Protocols connect.sh links */
+.terminalSocials {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.terminalSocialLink {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  font-family: var(--font-code), monospace;
+  color: #a0a0ab;
+  transition: color 0.2s ease, transform 0.2s ease;
+  line-height: 1.2;
+}
+
+.terminalSocialLink:hover {
+  color: var(--neon-yellow);
+  transform: translateX(6px);
+}
+
+.protocolPrefix {
+  color: var(--neon-yellow);
+  opacity: 0.8;
+  font-weight: 700;
+  margin-right: 4px;
+}
+
+.protocolValue {
+  font-weight: 500;
+}
+
+/* System diagnostics monitor log */
+.diagnosticsLog {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.logRow {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.03);
+  padding-bottom: 4px;
+}
+
+.logRow:last-child {
+  border-bottom: none;
+}
+
+.logLabel {
+  color: #6a6a75;
+}
+
+.logValue {
+  color: #e0e0e3;
+  font-weight: bold;
+}
+
+.greenGlow {
+  color: var(--neon-green);
+  text-shadow: var(--neon-green-glow);
+}
+
+.cyanGlow {
+  color: var(--neon-cyan);
+  text-shadow: var(--neon-cyan-glow);
+}
+
+.pinkGlow {
+  color: var(--neon-pink);
+  text-shadow: var(--neon-pink-glow);
+}
+
+
+/* ────────────────────────────────────────────────────────────
+   LAYOUT GRID & DECORATIONS
+   ──────────────────────────────────────────────────────────── */
+
+.panelsGrid {
+  display: grid;
+  transition: grid-template-columns 0.3s ease;
+}
+
+/* Dynamic grid based on theme column count requirements */
+.comicView .panelsGrid {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.noirView .panelsGrid {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+/* Corner actions */
 .cornerDecoration {
   position: absolute;
   z-index: 1;
-  font-family: var(--font-headline);
-  font-size: 1.2rem;
-  opacity: 0.12;
   user-select: none;
   pointer-events: none;
 }
 
+.comicView .cornerDecoration {
+  font-family: var(--font-headline);
+  font-size: 1.3rem;
+  font-weight: 900;
+  opacity: 0.18;
+}
+
+.comicView .topLeft { color: var(--pop-yellow); }
+.comicView .topRight { color: var(--pop-pink); }
+.comicView .bottomLeft { color: var(--pop-green); }
+.comicView .bottomRight { color: var(--pop-orange); }
+
+.noirView .cornerDecoration {
+  font-family: var(--font-code), monospace;
+  font-size: 0.75rem;
+  color: #2e2e38;
+  opacity: 0.5;
+  letter-spacing: 1px;
+}
+
 .topLeft {
   top: 16px;
-  left: 16px;
-  transform: rotate(-15deg);
-  color: var(--pop-yellow);
+  left: 24px;
+  transform: rotate(-10deg);
 }
 
 .topRight {
   top: 16px;
-  right: 16px;
-  transform: rotate(12deg);
-  color: var(--pop-pink);
+  right: 24px;
+  transform: rotate(8deg);
 }
 
 .bottomLeft {
-  bottom: 16px;
-  left: 16px;
-  transform: rotate(10deg);
-  color: var(--pop-green);
+  bottom: 20px;
+  left: 24px;
+  transform: rotate(6deg);
 }
 
 .bottomRight {
-  bottom: 16px;
-  right: 16px;
-  transform: rotate(-8deg);
-  color: var(--pop-orange);
+  bottom: 20px;
+  right: 24px;
+  transform: rotate(-6deg);
+}
+
+/* ────────────────────────────────────────────────────────────
+   BOTTOM METADATA BAR
+   ──────────────────────────────────────────────────────────── */
+
+.bottomBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-top: 24px;
+}
+
+.comicView .bottomBar {
+  border-top: 3.5px solid var(--pop-black);
+}
+
+.noirView .bottomBar {
+  border-top: 1px dashed #2e2e38;
+}
+
+.copyright {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  margin: 0;
+  opacity: 0.85;
+}
+
+.noirView .copyright {
+  font-family: var(--font-code), monospace;
+  color: #8a8a93;
 }
 
 .analyticsLink {
-  color: var(--pop-yellow);
-  text-decoration: none;
-  margin-left: 12px;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  transition: color 0.2s ease, transform 0.2s ease;
-  font-weight: 600;
+  gap: 6px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: bold;
+  transition: all 0.2s var(--ease-comic);
 }
 
-.analyticsLink:hover {
-  color: var(--pop-pink);
-  text-decoration: underline;
-  transform: scale(1.05) rotate(-1deg);
+.comicView .analyticsLink {
+  color: var(--pop-black);
+  padding: 6px 12px;
+  background-color: var(--pop-white);
+  border: 2px solid var(--pop-black);
+  border-radius: 6px;
+  box-shadow: var(--shadow-comic-sm);
 }
 
-:global([data-theme='noir']) .analyticsLink {
-  color: var(--pop-white);
-  opacity: 0.7;
+.comicView .analyticsLink:hover {
+  background-color: var(--pop-yellow);
+  transform: scale(1.05) rotate(-1.5deg);
+  box-shadow: var(--shadow-comic);
 }
 
-:global([data-theme='noir']) .analyticsLink:hover {
-  color: var(--pop-red);
-  opacity: 1;
+.noirView .analyticsLink {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 3px rgba(0, 240, 255, 0.2);
 }
 
-/* ---- Responsive ---- */
+.noirView .analyticsLink:hover {
+  color: var(--neon-yellow);
+  text-shadow: var(--neon-yellow-glow);
+  transform: translateY(-2px);
+}
 
-@media (max-width: 640px) {
+
+/* ────────────────────────────────────────────────────────────
+   RESPONSIVE DESIGN / MEDIA QUERIES
+   ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 1100px) {
+  .noirView .panelsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .comicView .panelsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .comicPanel {
+    min-height: 200px;
+  }
+}
+
+@media (max-width: 768px) {
   .footer {
-    padding: 32px 16px 24px;
+    padding: 48px 0 24px;
   }
 
-  .tagline {
-    font-size: 1.2rem;
+  .panelsGrid {
+    grid-template-columns: 1fr !important;
+    gap: 24px;
+  }
+
+  .comicView .bottomBar,
+  .noirView .bottomBar {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
   }
 
   .cornerDecoration {
-    font-size: 0.9rem;
+    display: none;
   }
-}
-
-/* ── Neon Noir Footer Overrides ── */
-:global([data-theme='noir']) .footer {
-  border-top: 5px solid var(--neon-pink) !important;
-  box-shadow: 0 -4px 12px rgba(255, 42, 85, 0.25) !important;
-}
-
-:global([data-theme='noir']) .socialLink:hover {
-  background-color: #121214 !important;
-  border-color: var(--neon-pink) !important;
-  color: var(--neon-pink) !important;
-  box-shadow: 0 0 10px var(--neon-pink) !important;
-  transform: scale(1.15) rotate(-3deg) !important;
-}
-
-:global([data-theme='noir']) .analyticsLink:hover {
-  color: var(--neon-yellow) !important;
-  text-shadow: var(--neon-yellow-glow) !important;
-  opacity: 1 !important;
+  
+  .comicPanel {
+    transform: none !important;
+  }
 }
