@@ -61,6 +61,11 @@
   box-shadow: var(--shadow-comic-active);
 }
 
+:global([data-theme='noir']) .printBtn {
+  color: var(--pop-white);
+}
+
+
 /* ---- Agent Log Ticker ---- */
 .agentTicker {
   display: flex;
