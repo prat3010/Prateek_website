@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
-import { m, useMotionValue, useSpring, useReducedMotion, useTransform } from 'framer-motion';
+import { m, useMotionValue, useReducedMotion, useTransform } from 'framer-motion';
 import { useLenisScroll } from '@/context/LenisProvider';
 import styles from './ScrollSection.module.css';
 
@@ -82,79 +82,71 @@ export default function ScrollSection({ children, direction, verticalOffset, cen
     ));
   });
 
-  const smoothProgress = useSpring(rawProgress, { stiffness: 85, damping: 22, mass: 1 });
-
   // Scroll-linked opacity: soft fade-in as it enters, solid in the center, soft fade-out as it exits
   const scrollOpacity = useTransform(() => {
     if (!isMeasured) return 0;
-    const p = smoothProgress.get();
+    const p = rawProgress.get();
     const cO = centerOnlyRef.current;
 
     if (cO) {
       const maxP = metricsRef.current.maxReachable || 1;
-      return Math.min(p / (maxP * 0.4 || 0.4), 1);
+      return Math.min(p / (maxP * 0.3 || 0.3), 1);
     }
 
     if (p < 0.25) {
       return p / 0.25;
-    } else if (p < 0.7) {
+    } else if (p < 0.75) {
       return 1;
     } else {
-      return Math.max(0, 1 - (p - 0.7) / 0.25);
-    }
-  });
-
-  const x = useTransform(() => {
-    const p = smoothProgress.get();
-    resizeTick.get();
-    if (!resizeTick.get()) return 0;
-    const dir = directionRef.current;
-    const vO = verticalOffsetRef.current;
-    const cO = centerOnlyRef.current;
-
-    // Subtle travel distance (180px) instead of viewport-wide flying
-    const travelDistance = 180;
-    const start = dir === 'right' ? travelDistance : -travelDistance;
-
-    if (cO) {
       const maxP = metricsRef.current.maxReachable || 1;
-      return start * (1 - Math.min(p / (maxP || 1), 1));
-    }
-
-    const end = dir === 'right' ? -travelDistance : travelDistance;
-
-    if (vO) {
-      if (p < 0.3) {
-        return start * (1 - p / 0.3);
-      } else if (p < 0.6) {
-        return 0;
-      } else {
-        return end * Math.min((p - 0.6) / 0.3, 1);
-      }
-    }
-
-    // Standard section: Slide in, settle at 0 for reading, then slide out
-    if (p < 0.3) {
-      return start * (1 - p / 0.3);
-    } else if (p < 0.7) {
-      return 0;
-    } else {
-      return end * Math.min((p - 0.7) / 0.3, 1);
+      if (maxP <= 0.75) return 1;
+      const exitRange = maxP - 0.75;
+      return Math.max(0, 1 - (p - 0.75) / exitRange);
     }
   });
 
   const y = useTransform(() => {
     resizeTick.get();
     if (!resizeTick.get()) return 0;
-    const p = smoothProgress.get();
-    const vO = verticalOffsetRef.current;
-    if (!vO) return 0;
-    if (p < 0.3) return 0;
-    if (p < 0.6) {
-      const t = (p - 0.3) / 0.3;
-      return -vO * (1 - Math.pow(1 - t, 2));
+    const p = rawProgress.get();
+    const cO = centerOnlyRef.current;
+    const vO = verticalOffsetRef.current || 0;
+
+    // Subtle vertical offset for entry/exit (35px for a premium feel)
+    const entryOffset = 35;
+
+    if (cO) {
+      const maxP = metricsRef.current.maxReachable || 1;
+      const fadeZone = maxP * 0.3 || 0.3;
+      if (p < fadeZone) {
+        return entryOffset * (1 - p / fadeZone);
+      }
+      return 0;
     }
-    return -vO;
+
+    let currentY = 0;
+    if (p < 0.25) {
+      // Slide up on entry: y goes from entryOffset (35px) to 0
+      currentY = entryOffset * (1 - p / 0.25);
+    } else if (p < 0.75) {
+      // Keep static for reading
+      currentY = 0;
+    } else {
+      // Slide up on exit: y goes from 0 to -entryOffset (-35px)
+      const maxP = metricsRef.current.maxReachable || 1;
+      if (maxP > 0.75) {
+        const exitRange = maxP - 0.75;
+        const t = Math.min((p - 0.75) / exitRange, 1);
+        currentY = -entryOffset * t;
+      }
+    }
+
+    // Add clean, direct vertical parallax if offset is defined
+    if (vO) {
+      currentY += -vO * p;
+    }
+
+    return currentY;
   });
 
   useEffect(() => {
@@ -183,7 +175,7 @@ export default function ScrollSection({ children, direction, verticalOffset, cen
     <div ref={wrapperRef} style={gap ? { marginBottom: gap } : undefined}>
       <m.div 
         className={styles.scrollInner} 
-        style={{ x, y, opacity: scrollOpacity }}
+        style={{ y, opacity: scrollOpacity }}
       >
         {children}
       </m.div>
