@@ -27,7 +27,7 @@
   box-shadow: 0 4px 12px rgba(26, 26, 46, 0.25);
 }
 
-/* ---- Logo ---- */
+/* ---- Logo (Syntax Gremlin) ---- */
 
 .logo {
   position: relative;
@@ -37,49 +37,91 @@
   width: 50px;
   height: 50px;
   flex-shrink: 0;
+  cursor: pointer;
 }
 
-.logoBurst {
-  position: absolute;
-  inset: -6px;
-  background: var(--pop-red);
-  clip-path: polygon(
-    50% 0%,
-    63% 18%,
-    82% 5%,
-    74% 27%,
-    98% 28%,
-    80% 42%,
-    100% 55%,
-    80% 58%,
-    90% 78%,
-    70% 68%,
-    62% 92%,
-    50% 75%,
-    38% 92%,
-    30% 68%,
-    10% 78%,
-    20% 58%,
-    0% 55%,
-    20% 42%,
-    2% 28%,
-    26% 27%,
-    18% 5%,
-    37% 18%
-  );
-  z-index: 0;
+.logoSvg {
+  display: block;
+  overflow: visible;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.3s var(--ease-pop);
 }
 
-.logoText {
-  position: relative;
-  z-index: 1;
-  font-family: var(--font-headline);
-  font-size: 1.5rem;
-  color: var(--pop-white);
-  -webkit-text-stroke: 1px var(--pop-black);
-  paint-order: stroke fill;
-  line-height: 1;
-  letter-spacing: 1px;
+.logo:hover .logoSvg {
+  transform: scale(1.05);
+}
+
+.logoBg {
+  fill: var(--pop-blue);
+  opacity: 0.15;
+  transition: fill 0.3s ease, opacity 0.3s ease;
+}
+
+:global([data-theme='noir']) .logoBg {
+  fill: var(--pop-blue);
+  opacity: 0.08;
+}
+
+.logoLine,
+.logoTerminalPrompt,
+.logoTerminalCursor,
+.logoGremlinBody,
+.logoGremlinEarLeft,
+.logoGremlinEarRight {
+  stroke: var(--pop-black);
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  transition: stroke 0.3s ease, fill 0.3s ease;
+}
+
+.logoGremlinBody {
+  fill: var(--pop-white);
+  transition: transform 0.3s var(--ease-pop), fill 0.3s ease, stroke 0.3s ease;
+}
+
+.logoGremlinEarLeft,
+.logoGremlinEarRight {
+  fill: var(--pop-red);
+  transform-origin: 32px 48px;
+  transition: transform 0.3s var(--ease-pop), fill 0.3s ease, stroke 0.3s ease;
+}
+
+.logoGremlinEarRight {
+  transform-origin: 68px 48px;
+}
+
+.logoEye {
+  fill: var(--pop-black);
+  transition: fill 0.3s ease;
+}
+
+.logoPupil {
+  fill: var(--pop-white);
+  transition: transform 0.3s var(--ease-pop), fill 0.3s ease;
+}
+
+.logoBlush {
+  fill: var(--pop-pink);
+  opacity: 0.55;
+  transition: opacity 0.3s ease, fill 0.3s ease;
+}
+
+/* Hover Animations */
+.logo:hover .logoGremlinBody {
+  transform: translateY(-2px);
+}
+
+.logo:hover .logoGremlinEarLeft {
+  transform: rotate(-12deg) translateY(-2px);
+}
+
+.logo:hover .logoGremlinEarRight {
+  transform: rotate(12deg) translateY(-2px);
+}
+
+.logo:hover .logoPupil {
+  transform: translate(1px, -1px);
 }
 
 /* ---- Desktop nav links ---- */

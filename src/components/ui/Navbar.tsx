@@ -134,8 +134,27 @@ export default function Navbar({ items, className }: NavbarProps) {
         onClick={(e) => handleNavClick(e, '#home')}
         aria-label="Prateeq Sharma — go to home"
       >
-        <span className={styles.logoBurst} />
-        <span className={styles.logoText}>PS</span>
+        <svg
+          className={styles.logoSvg}
+          viewBox="0 0 100 100"
+          width="100%"
+          height="100%"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle cx="50" cy="50" r="38" className={styles.logoBg} />
+          <path d="M 26,45 L 32,50 L 26,55" fill="none" className={styles.logoTerminalPrompt} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+          <line x1="35" y1="55" x2="43" y2="55" className={styles.logoTerminalCursor} strokeWidth="3.5" strokeLinecap="round" />
+          <line x1="15" y1="72" x2="85" y2="72" className={styles.logoLine} strokeWidth="3.5" strokeLinecap="round" />
+          <path d="M 32,72 C 32,46 68,46 68,72" className={styles.logoGremlinBody} strokeWidth="3.5" />
+          <path d="M 32,48 L 12,38 Q 24,53 36,55" className={styles.logoGremlinEarLeft} strokeWidth="3" strokeLinejoin="round" />
+          <path d="M 68,48 L 88,38 Q 76,53 64,55" className={styles.logoGremlinEarRight} strokeWidth="3" strokeLinejoin="round" />
+          <circle cx="43" cy="58" r="6.5" className={styles.logoEye} />
+          <circle cx="45" cy="55.5" r="2.5" className={styles.logoPupil} />
+          <circle cx="57" cy="58" r="6.5" className={styles.logoEye} />
+          <circle cx="59" cy="55.5" r="2.5" className={styles.logoPupil} />
+          <ellipse cx="37" cy="63" rx="3.5" ry="2" className={styles.logoBlush} />
+          <ellipse cx="63" cy="63" rx="3.5" ry="2" className={styles.logoBlush} />
+        </svg>
       </a>
 
       {/* ---- Right Side Controls Group ---- */}
