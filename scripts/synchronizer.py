@@ -95,6 +95,63 @@ def call_gemini(prompt, file_data=None, file_mime=None):
         st.error(f"API Connection Error: {e}")
         return None
 
+# Helper to generate a skill proposal from a technology tag using Gemini
+def generate_skill_from_tag(tag_name):
+    prompt = f"""
+    You are an expert AI orchestrator. Generate a structured JSON object representing a Skill entry for the technology tag "{tag_name}".
+    
+    The JSON structure must match this exact format:
+    {{
+      "name": "Formatted capitalization of the technology (e.g. 'react' -> 'React / Next.js', 'fastapi' -> 'FastAPI', 'excel' -> 'Microsoft Excel', 'supabase' -> 'Supabase', etc.)",
+      "icon": "A lowercase string representing a relevant Lucide icon (e.g. 'atom', 'server', 'database', 'terminal', 'layout', 'paintbrush', 'sparkles', 'brain', 'bot', 'git-branch', 'cloud', 'figma', 'zap', 'image', 'file-text')",
+      "description": "A short 1-sentence description of the skill in an AI-orchestrated tone matching the portfolio brand (e.g., 'Directing AI to synthesize React components...', 'Steering AI to generate responsive structures...', 'Instructing AI to write Python utility scripts...'). Maximum 15 words.",
+      "category": "One of 'frontend', 'backend', 'tools', or 'creative'",
+      "color": "A hex color code suitable for the technology brand"
+    }}
+    
+    Do not return any conversational text, markdown packaging, or backticks. Only return the raw JSON object.
+    """
+    try:
+        res = call_gemini(prompt)
+        if res:
+            return res
+    except Exception as e:
+        st.error(f"Error generating skill for tag '{tag_name}': {e}")
+    return None
+
+# Helper to check a list of tags and generate pending skills for new ones
+def check_and_add_pending_skills(tags_list):
+    current_skills = parse_skills_file()
+    existing_skill_names = {s.get("name", "").lower() for s in current_skills}
+    
+    # Also fetch existing pending list to avoid duplicates
+    if 'pending_skills' not in st.session_state:
+        st.session_state.pending_skills = []
+    pending_names = {s.get("name", "").lower() for s in st.session_state.pending_skills}
+    
+    for tag in tags_list:
+        tag_clean = tag.strip().lower()
+        if not tag_clean:
+            continue
+            
+        # Check if the tag matches any existing or pending skill name
+        is_existing = False
+        for name in existing_skill_names:
+            if tag_clean == name or tag_clean in name or name in tag_clean:
+                is_existing = True
+                break
+        for name in pending_names:
+            if tag_clean == name or tag_clean in name or name in tag_clean:
+                is_existing = True
+                break
+                
+        if not is_existing:
+            st.toast(f"🔍 New skill tag detected: '{tag_clean}'. Generating details...")
+            skill_proposal = generate_skill_from_tag(tag_clean)
+            if skill_proposal:
+                st.session_state.pending_skills.append(skill_proposal)
+                st.toast(f"💡 Generated skill proposal: '{skill_proposal.get('name')}'")
+
 # ==========================================
 # TS Data Parsers (Projects, Resume, Certs)
 # ==========================================
@@ -845,6 +902,55 @@ if GEMINI_API_KEY:
 else:
     st.sidebar.error("❌ GEMINI_API_KEY not found in .env.local")
 
+# Pending Skill Approvals Sidebar UI
+if 'pending_skills' in st.session_state and st.session_state.pending_skills:
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### 🆕 Pending Skill Approvals")
+    st.sidebar.info(f"You have **{len(st.session_state.pending_skills)}** pending skill(s) waiting for approval.")
+    
+    skill = st.session_state.pending_skills[0]
+    
+    with st.sidebar.container(border=True):
+        st.markdown(f"**Suggested Tag:** `{skill.get('name')}`")
+        name = st.text_input("Name", value=skill.get('name'), key="pend_name")
+        icon = st.text_input("Icon (Lucide)", value=skill.get('icon', 'sparkles'), key="pend_icon")
+        desc = st.text_area("Description", value=skill.get('description', ''), key="pend_desc")
+        
+        categories_opts = ['frontend', 'backend', 'tools', 'creative']
+        default_cat = skill.get('category', 'tools')
+        if default_cat not in categories_opts:
+            default_cat = 'tools'
+        category = st.selectbox("Category", options=categories_opts, index=categories_opts.index(default_cat), key="pend_cat")
+        
+        color = st.text_input("Hex Color", value=skill.get('color', '#00E676'), key="pend_color")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("✅ Approve", key="approve_skill_btn", type="primary"):
+                current_skills = parse_skills_file()
+                if any(s.get("name", "").lower() == name.lower() for s in current_skills):
+                    st.sidebar.error("Skill already exists!")
+                else:
+                    new_skill = {
+                        "name": name,
+                        "icon": icon,
+                        "description": desc,
+                        "category": category,
+                        "color": color
+                    }
+                    current_skills.append(new_skill)
+                    try:
+                        write_skills_file(current_skills)
+                        st.sidebar.success(f"Added {name}!")
+                        st.session_state.pending_skills.pop(0)
+                        st.rerun()
+                    except Exception as e:
+                        st.sidebar.error(f"Failed to save: {e}")
+        with col2:
+            if st.button("❌ Dismiss", key="dismiss_skill_btn", type="secondary"):
+                st.session_state.pending_skills.pop(0)
+                st.rerun()
+
 # Custom Title Header
 st.markdown("""
 <div style="text-align: center; padding: 24px 0; margin-bottom: 30px; border-bottom: 4px solid #00E676; background-color: #111827; border-radius: 12px; box-shadow: 4px 4px 0px 0px #000000; border: 2px solid #1f2937;">
@@ -860,6 +966,21 @@ if 'projects' not in st.session_state:
     st.session_state.projects = parse_projects_file()
 if 'certificates' not in st.session_state:
     st.session_state.certificates = parse_certificates_file()
+if 'pending_skills' not in st.session_state:
+    st.session_state.pending_skills = []
+
+# Scan existing tags for any missing skills on startup
+if 'skills_scanned' not in st.session_state:
+    st.session_state.skills_scanned = True
+    all_tags = []
+    if st.session_state.projects:
+        for p in st.session_state.projects:
+            all_tags.extend(p.get("tags", []))
+    if st.session_state.certificates:
+        for c in st.session_state.certificates:
+            all_tags.extend(c.get("tags", []))
+    if all_tags:
+        check_and_add_pending_skills(list(set(all_tags)))
 
 # Set up tabs
 tab_edit, tab_project, tab_cert = st.tabs([
@@ -1158,6 +1279,7 @@ with tab_project:
                             current_projects.append(new_project)
                             write_projects_file(current_projects)
                             st.session_state.projects = current_projects
+                            check_and_add_pending_skills(project_data["tags"])
                             
                             # Append resume bullet
                             resume = parse_resume_file()
@@ -1276,6 +1398,7 @@ with tab_cert:
                                 
                                 current_certs.append(new_cert)
                                 updated = True
+                                check_and_add_pending_skills(cert_data.get("tags", []))
                                 
                             sync_logs.append(f"Parsed certificate: {cert_data['title']}")
                         else:
