@@ -9,10 +9,10 @@ import CaptionBox from '@/components/ui/CaptionBox';
 import styles from './About.module.css';
 
 const funFacts = [
-  '🤖 Co-piloted by state-of-the-art AI systems',
-  '⚡ Prompt-to-app builder at supersonic speed',
-  '🧠 Master of AI orchestration & prototyping',
-  '🌍 Based in India, building future-proof experiences',
+  'SYSTEM // Co-piloted by state-of-the-art AI systems',
+  'VELOCITY // Prompt-to-app builder at supersonic speed',
+  'ENGINE // Master of AI orchestration & prototyping',
+  'LOCATION // Based in India, building future-proof experiences',
 ];
 
 const funFactsNoir = [

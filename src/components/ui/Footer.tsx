@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Heart, BarChart2 } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import styles from './Footer.module.css';
 
@@ -134,7 +135,7 @@ export default function Footer({ socials, className }: FooterProps) {
                     Designing premium web experiences with a punch of color and vector precision. Stand out, make it pop!
                   </p>
                   <p className={styles.comicMadeWith}>
-                    Made with <span className={styles.heart}>❤️</span> and <span className={styles.pow}>POW!</span> by Prateeq Sharma
+                    Made with <span className={styles.heart}><Heart size={14} style={{ display: 'inline', verticalAlign: 'middle', fill: 'var(--pop-red)', stroke: 'var(--pop-black)' }} /></span> and <span className={styles.pow}>POW!</span> by Prateeq Sharma
                   </p>
                 </div>
               </div>
@@ -189,7 +190,8 @@ export default function Footer({ socials, className }: FooterProps) {
               © {year} Prateeq Sharma. All rights reserved.
             </p>
             <Link href="/admin/analytics" className={styles.analyticsLink}>
-              📊 Site Analytics
+              <BarChart2 size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle' }} />
+              Site Analytics
             </Link>
           </div>
         </div>
@@ -238,7 +240,7 @@ export default function Footer({ socials, className }: FooterProps) {
                     [GOAL: CREATING GORGEOUS & HIGH-PERFORMANCE WEB EXPERIENCES WITH VECTOR PRECISION.]
                   </div>
                   <div className={styles.terminalOutput}>
-                    Made with <span className={styles.noirHeart}>🖤</span> and <span className={styles.noirGrit}>GRIT</span> by Prateeq Sharma
+                    Made with <span className={styles.noirHeart}><Heart size={14} style={{ display: 'inline', verticalAlign: 'middle', fill: '#8E8EAF', stroke: '#5A5A72' }} /></span> and <span className={styles.noirGrit}>GRIT</span> by Prateeq Sharma
                   </div>
                 </div>
               </div>
@@ -372,7 +374,8 @@ export default function Footer({ socials, className }: FooterProps) {
               © {year} Prateeq Sharma. All rights reserved.
             </p>
             <Link href="/admin/analytics" className={styles.analyticsLink}>
-              📊 Site Analytics
+              <BarChart2 size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle' }} />
+              Site Analytics
             </Link>
           </div>
         </div>

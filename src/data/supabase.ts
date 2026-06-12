@@ -11,7 +11,7 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 if (!supabaseUrl || !supabaseServiceKey) {
   if (process.env.NODE_ENV !== 'production') {
     console.warn(
-      '⚠️ Supabase environment variables are missing in .env.local.\n' +
+      'WARNING: Supabase environment variables are missing in .env.local.\n' +
       'Please configure NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY to enable analytics.'
     );
   }

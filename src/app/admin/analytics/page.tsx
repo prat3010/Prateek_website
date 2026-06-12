@@ -17,7 +17,12 @@ import {
   HelpCircle,
   Database,
   ArrowLeft,
-  TrendingUp
+  TrendingUp,
+  Calendar,
+  Globe,
+  Lock,
+  EyeOff,
+  Zap
 } from 'lucide-react';
 
 export const revalidate = 300; // Cache dashboard queries for 5 minutes (ISR) to optimize database hits
@@ -92,32 +97,7 @@ const safeDecode = (str: string | null) => {
   }
 };
 
-// Helper to get flag emoji programmatically
-const getFlagEmoji = (countryCode: string | null): string => {
-  if (!countryCode || countryCode === 'Local/Unknown' || countryCode === 'Unknown') return '🌐';
-  if (countryCode.length === 2) {
-    try {
-      const codePoints = countryCode
-        .toUpperCase()
-        .split('')
-        .map(char => 127397 + char.charCodeAt(0));
-      return String.fromCodePoint(...codePoints);
-    } catch {
-      return '🌐';
-    }
-  }
-  // Fallback map for mock data full country names
-  const mockFlags: Record<string, string> = {
-    'United States': '🇺🇸',
-    'India': '🇮🇳',
-    'United Kingdom': '🇬🇧',
-    'Germany': '🇩🇪',
-    'Canada': '🇨🇦',
-    'Singapore': '🇸🇬',
-    'Australia': '🇦🇺',
-  };
-  return mockFlags[countryCode] || '🌐';
-};
+// (Flag emoji helper removed)
 
 // Helper to get full country name using Intl.DisplayNames
 const getCountryName = (countryCode: string | null): string => {
@@ -291,7 +271,6 @@ export default async function AnalyticsPage(props: {
     .map(([code, count]) => ({
       code,
       name: getCountryName(code),
-      flag: getFlagEmoji(code),
       count
     }))
     .sort((a, b) => b.count - a.count)
@@ -337,8 +316,9 @@ export default async function AnalyticsPage(props: {
             <h1 className={`font-headline text-stroke uppercase ${styles.headerTitle}`}>
               Analytics Action Panel!
             </h1>
-            <p className={`font-body ${styles.headerSub}`}>
-              {isDemoMode ? '⚡ SYSTEM IN DEMO MODE (SHOWING SIMULATED METRICS)' : '🔌 LIVE VISITOR DATA LINKED SECURELY'}
+            <p className={`font-body ${styles.headerSub}`} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              {isDemoMode ? <Zap size={14} className={styles.demoIcon} /> : <Database size={14} className={styles.liveIcon} />}
+              <span>{isDemoMode ? 'SYSTEM IN DEMO MODE (SHOWING SIMULATED METRICS)' : 'LIVE VISITOR DATA LINKED SECURELY'}</span>
             </p>
           </div>
           <RefreshButton />
@@ -348,12 +328,13 @@ export default async function AnalyticsPage(props: {
       {/* --- Timeframe Filter Buttons --- */}
       <div className={styles.filterContainer}>
         {[
-          { label: '🕒 Last 24 Hours', value: '24h' },
-          { label: '📅 Last 7 Days', value: '7d' },
-          { label: '📊 Last 30 Days', value: '30d' },
-          { label: '🌐 All Time (2k)', value: 'all' },
+          { label: 'Last 24 Hours', value: '24h', icon: Clock },
+          { label: 'Last 7 Days', value: '7d', icon: Calendar },
+          { label: 'Last 30 Days', value: '30d', icon: TrendingUp },
+          { label: 'All Time (2k)', value: 'all', icon: Globe },
         ].map((btn) => {
           const isActive = range === btn.value;
+          const Icon = btn.icon;
           return (
             <Link
               key={btn.value}
@@ -361,9 +342,10 @@ export default async function AnalyticsPage(props: {
               className={`comic-btn text-xs font-headline ${
                 isActive ? `comic-btn-yellow ${styles.activeFilter}` : 'comic-btn-outline'
               }`}
-              style={{ padding: '6px 12px' }}
+              style={{ padding: '6px 12px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
             >
-              {btn.label}
+              <Icon size={12} />
+              <span>{btn.label}</span>
             </Link>
           );
         })}
@@ -389,8 +371,8 @@ export default async function AnalyticsPage(props: {
               </p>
             )}
             <div className={`font-body ${styles.warningSteps}`}>
-              <span className={styles.stepBlue}>👉 Step 1: Run table SQL in your Supabase Console</span>
-              <span className={styles.stepGreen}>👉 Step 2: Set keys in .env.local to go Live!</span>
+              <span className={styles.stepBlue}>→ Step 1: Run table SQL in your Supabase Console</span>
+              <span className={styles.stepGreen}>→ Step 2: Set keys in .env.local to go Live!</span>
             </div>
           </div>
         </div>
@@ -409,9 +391,18 @@ export default async function AnalyticsPage(props: {
             This analytics panel is public so visitors can inspect our custom-built telemetry and database aggregation logic. To ensure absolute compliance with global privacy regulations and optimize hosting overhead, the following safeguards are implemented:
           </p>
           <div className={styles.privacyDetails}>
-            <span>🔒 <strong>No PII:</strong> IP addresses are salted and hashed locally with a daily rotating salt before saving.</span>
-            <span>🕵️ <strong>Sanitized Referrers:</strong> All traffic source referrers are parsed and stored as domain-only hostnames to prevent private URL/path leakage.</span>
-            <span>⚡ <strong>Cached Queries:</strong> Supabase aggregation queries are cached on the server for 5 minutes (via ISR) to prevent database resource exhaustion.</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <Lock size={14} style={{ flexShrink: 0 }} /> 
+              <span><strong>No PII:</strong> IP addresses are salted and hashed locally with a daily rotating salt before saving.</span>
+            </span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <EyeOff size={14} style={{ flexShrink: 0 }} /> 
+              <span><strong>Sanitized Referrers:</strong> All traffic source referrers are parsed and stored as domain-only hostnames to prevent private URL/path leakage.</span>
+            </span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <Zap size={14} style={{ flexShrink: 0 }} /> 
+              <span><strong>Cached Queries:</strong> Supabase aggregation queries are cached on the server for 5 minutes (via ISR) to prevent database resource exhaustion.</span>
+            </span>
           </div>
         </div>
       </div>
@@ -644,14 +635,20 @@ export default async function AnalyticsPage(props: {
             <MapPin className="mr-2 text-[var(--pop-pink)]" /> TOP VISITOR GEOGRAPHIES
           </h2>
           <div className={styles.rowList}>
-            {topCountries.map((country, idx) => (
-              <div key={idx} className={styles.rowItem}>
-                <span className={styles.countryRow}>{country.flag} {country.name}</span>
-                <span className={`${styles.countBadge} ${styles.pinkBadge}`}>
-                  {country.count} visits
-                </span>
-              </div>
-            ))}
+            {topCountries.map((country, idx) => {
+              const showCode = country.code && country.code.length === 2 && country.code !== 'Local/Unknown' && country.code !== 'Unknown';
+              return (
+                <div key={idx} className={styles.rowItem}>
+                  <span className={styles.countryRow}>
+                    {showCode ? `[${country.code.toUpperCase()}] ` : ''}
+                    {country.name}
+                  </span>
+                  <span className={`${styles.countBadge} ${styles.pinkBadge}`}>
+                    {country.count} visits
+                  </span>
+                </div>
+              );
+            })}
             {topCountries.length === 0 && (
               <p className={styles.panelSubtext}>No geo data recorded yet (available in production).</p>
             )}
@@ -692,10 +689,13 @@ export default async function AnalyticsPage(props: {
                   
                   <span className={styles.timeText}>{getRelativeTime(visit.created_at)}</span>
                   
-                  <span className={styles.geoText}>
-                    {visit.country && visit.country !== 'Local/Unknown' && visit.country !== 'Unknown'
-                      ? `📍 ${getFlagEmoji(visit.country)} ${visit.city ? safeDecode(visit.city) + ', ' : ''}${getCountryName(visit.country)}`
-                      : '📍 Local / Unknown'}
+                  <span className={styles.geoText} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <MapPin size={12} />
+                    <span>
+                      {visit.country && visit.country !== 'Local/Unknown' && visit.country !== 'Unknown'
+                        ? `${visit.city ? safeDecode(visit.city) + ', ' : ''}${getCountryName(visit.country)}`
+                        : 'Local / Unknown'}
+                    </span>
                   </span>
 
                   <span>

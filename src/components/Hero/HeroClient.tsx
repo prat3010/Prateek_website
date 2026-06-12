@@ -95,7 +95,7 @@ function HeroClientContent({ taglines, isNoir }: HeroClientProps & { isNoir: boo
             aria-label="View live edge telemetry analytics"
           >
             <span className={styles.pulseDot} />
-            <span className={styles.ctaText}>📈 Live Telemetry</span>
+            <span className={styles.ctaText}>Live Telemetry</span>
           </Link>
         </div>
       </div>

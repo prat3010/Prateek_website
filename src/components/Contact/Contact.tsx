@@ -115,18 +115,18 @@ export default function Contact() {
               className={styles.submitBtn}
               disabled={status === 'loading'}
             >
-              {status === 'loading' ? 'SENDING... ⚡' : 'SEND IT! 💥'}
+              {status === 'loading' ? 'TRANSMITTING...' : 'SEND IT!'}
             </button>
 
             {status === 'success' && (
               <SpeechBubble direction="top" color="var(--pop-green)">
-                <p className={styles.successText}>Message sent! 🎉 I&apos;ll get back to you soon!</p>
+                <p className={styles.successText}>Message sent! I&apos;ll get back to you soon!</p>
               </SpeechBubble>
             )}
 
             {status === 'error' && (
               <SpeechBubble direction="top" color="var(--pop-red)">
-                <p className={styles.errorText}>💥 {errorMessage}</p>
+                <p className={styles.errorText}>Error: {errorMessage}</p>
               </SpeechBubble>
             )}
           </form>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { Lock, AlertTriangle, Search, Zap } from 'lucide-react';
 import { useLenis } from 'lenis/react';
 import { useTheme } from '@/context/ThemeContext';
 import Pathfinder from './Pathfinder';
@@ -52,19 +53,19 @@ export default function Playground() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const bootLinesNormal = [
-    '⚡ CONNECTING ENGINE TO COORD_GRID...',
-    '⚡ SHIFTING HEURISTICS INDEX MATRIX...',
-    '⚡ BOOTING DIJKSTRA & A-STAR ALGORITHMS...',
-    '⚡ VERIFYING TOUCH SENSOR CAPABILITIES...',
-    '🚀 LAB CORE 100% ONLINE. SIMULATOR READY!'
+    '>> CONNECTING ENGINE TO COORD_GRID...',
+    '>> SHIFTING HEURISTICS INDEX MATRIX...',
+    '>> BOOTING DIJKSTRA & A-STAR ALGORITHMS...',
+    '>> VERIFYING TOUCH SENSOR CAPABILITIES...',
+    'SYSTEM ONLINE // LAB CORE 100% ONLINE. SIMULATOR READY!'
   ];
 
   const bootLinesNoir = [
-    '🕶️ RETRIEVING ARCHIVED CRIME REPORTS...',
-    '🕶️ MAPPING CITY STREETS COORD SECTOR #11...',
-    '🕶️ RESOLVING EVIDENCE FILE BOUNDARIES...',
-    '🕶️ MOUNTING CRIME SCENE BARRICADES...',
-    '📁 DECRYPTION COMPLETE. DESK UNLOCKED.'
+    'CASE // RETRIEVING ARCHIVED CRIME REPORTS...',
+    'CASE // MAPPING CITY STREETS COORD SECTOR #11...',
+    'CASE // RESOLVING EVIDENCE FILE BOUNDARIES...',
+    'CASE // MOUNTING CRIME SCENE BARRICADES...',
+    'RESOLVED // DECRYPTION COMPLETE. DESK UNLOCKED.'
   ];
 
   // Mobile body scroll lock when simulation is launched in fullscreen
@@ -129,7 +130,7 @@ export default function Playground() {
     { timestamp: '--:--:--', message: 'LOG SYSTEM ONLINE. SUB-AGENT ACTIVE.' },
     { timestamp: '--:--:--', message: 'Ready to map crime scenes. Use grid above to draw brick barriers.' }
   ] : [
-    { timestamp: '--:--:--', message: 'THE LAB COMPUTERS BOOTED UP! ⚡' },
+    { timestamp: '--:--:--', message: 'THE LAB COMPUTERS BOOTED UP! ONLINE.' },
     { timestamp: '--:--:--', message: 'Draw laser forcefields on the map and hit run to guide the hero!' }
   ];
 
@@ -298,7 +299,7 @@ export default function Playground() {
             {isNoir ? 'THE DETECTIVE’S DESK' : 'THE ALGORITHM LAB'}
           </h2>
           <div className={styles.mobileWarning} style={{ display: 'flex' }}>
-            <span className={styles.warningIcon}>{isNoir ? '🕶️' : '🛸'}</span>
+            <span className={styles.warningIcon}>{isNoir ? <Lock size={20} /> : <AlertTriangle size={20} />}</span>
             <h3 className={styles.warningHeader}>
               {isNoir ? 'CASE FILE ENCRYPTED' : 'ACCESS RESTRICTED!'}
             </h3>
@@ -326,8 +327,8 @@ export default function Playground() {
             </div>
             <p className={styles.moText}>
               {isNoir
-                ? 'Case files are active. Drag the Detective (🕶️) and the Evidence file (📁) on the grid map. Click and hold to sketch brick wall barricades (obstacles). Select target computation methods below.'
-                : 'Welcome to the lab! Drag our hero (🦸) and the portal (🌀) to set your coordinates. Click and drag on empty cells to paint laser barriers. Hit visualize and watch the search algorithm expand!'}
+                ? 'Case files are active. Drag the Detective (Search icon) and the Evidence (File icon) on the grid map. Click and hold to sketch brick wall barricades (obstacles). Select target computation methods below.'
+                : 'Welcome to the lab! Drag the Start (Zap icon) and Target (Crosshair icon) to set your coordinates. Click and drag on empty cells to paint laser barriers. Hit visualize and watch the search algorithm expand!'}
             </p>
         </div>
 
@@ -336,8 +337,9 @@ export default function Playground() {
             {/* Header only visible in mobile fullscreen mode */}
             {isLaunched && (
               <div className={styles.fullscreenHeader}>
-                <span className={styles.fullscreenTitle}>
-                  {isNoir ? '🕶️ CASE #404 SEARCH' : '⚡ PATHFINDER MOBILE'}
+                <span className={styles.fullscreenTitle} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  {isNoir ? <Search size={14} /> : <Zap size={14} />}
+                  <span>{isNoir ? 'CASE #404 SEARCH' : 'PATHFINDER MOBILE'}</span>
                 </span>
                 <button
                   type="button"
@@ -355,8 +357,9 @@ export default function Playground() {
               <div className={styles.launchOverlay}>
                 <div className={styles.scanline}></div>
                 <div className={styles.crtContent}>
-                  <h3 className={styles.overlayTitle}>
-                    {isNoir ? '🕵️ CASE LEDGER ACCESS' : '⚡ PATH CORE v2.5'}
+                  <h3 className={styles.overlayTitle} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                    {isNoir ? <Search size={18} /> : <Zap size={18} />}
+                    <span>{isNoir ? 'CASE LEDGER ACCESS' : 'PATH CORE v2.5'}</span>
                   </h3>
                   
                   {/* Themed Boot Logs / Diagnostic Specs */}
@@ -396,7 +399,7 @@ export default function Playground() {
             {/* Mobile Launcher Card (Displayed in place when not booted on mobile) */}
             {!isLaunched && !isBooting && (
               <div className={styles.mobileWarning}>
-                <span className={styles.warningIcon}>{isNoir ? '🕶️' : '⚠️'}</span>
+                <span className={styles.warningIcon}>{isNoir ? <Lock size={20} /> : <AlertTriangle size={20} />}</span>
                 <h3 className={styles.warningHeader}>
                   {isNoir ? 'CASE FILE ENCRYPTED' : 'ACCESS RESTRICTED!'}
                 </h3>

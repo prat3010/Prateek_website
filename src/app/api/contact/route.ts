@@ -149,7 +149,7 @@ export async function POST(request: Request) {
           <body>
             <div class="container">
               <div class="header">
-                <h1>Signal Received! 💥</h1>
+                <h1>Signal Received</h1>
               </div>
               <div class="content">
                 <div class="field">

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { Search, Zap, FileText, Target } from 'lucide-react';
 import { GridNode } from './pathfindingAlgorithms';
 import styles from './Playground.module.css';
 
@@ -36,13 +37,13 @@ const Cell = React.memo(function Cell({
   if (isStart) {
     nodeContent = (
       <span className={styles.nodeIcon} aria-label="Start Node">
-        {isNoir ? '🕶️' : '🦸'}
+        {isNoir ? <Search size={16} /> : <Zap size={16} />}
       </span>
     );
   } else if (isEnd) {
     nodeContent = (
       <span className={styles.nodeIcon} aria-label="End Node">
-        {isNoir ? '📁' : '🌀'}
+        {isNoir ? <FileText size={16} /> : <Target size={16} />}
       </span>
     );
   }
