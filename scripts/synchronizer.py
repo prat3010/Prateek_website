@@ -159,6 +159,48 @@ FALLBACK_SKILLS = {
         "description": "Instructing AI to write utility scripts, automation tasks, and backend helper scripts.",
         "category": "backend",
         "color": "#3776AB"
+    },
+    "framer motion": {
+        "name": "Framer Motion",
+        "icon": "sparkles",
+        "description": "Orchestrating fluid React transitions, micro-animations, and viewport-driven scroll effects.",
+        "category": "frontend",
+        "color": "#E10098"
+    },
+    "sqlite": {
+        "name": "SQLite",
+        "icon": "database",
+        "description": "Managing light, relational databases for local automation and offline mobile data storage.",
+        "category": "backend",
+        "color": "#003B57"
+    },
+    "flutter": {
+        "name": "Flutter / Dart",
+        "icon": "smartphone",
+        "description": "Building cross-platform mobile apps, designing reactive layouts, and compiled state systems.",
+        "category": "frontend",
+        "color": "#02569B"
+    },
+    "next.js": {
+        "name": "React / Next.js",
+        "icon": "atom",
+        "description": "Directing AI to synthesize React components, manage application state, and orchestrate client/server code.",
+        "category": "frontend",
+        "color": "#000000"
+    },
+    "git": {
+        "name": "Git & GitHub",
+        "icon": "git-branch",
+        "description": "Managing branch workflows, commit history, and deployment sync.",
+        "category": "tools",
+        "color": "#F05032"
+    },
+    "github": {
+        "name": "Git & GitHub",
+        "icon": "git-branch",
+        "description": "Managing branch workflows, commit history, and deployment sync.",
+        "category": "tools",
+        "color": "#181717"
     }
 }
 
@@ -1011,6 +1053,21 @@ if GEMINI_API_KEY:
 else:
     st.sidebar.error("❌ GEMINI_API_KEY not found in .env.local")
 
+# Manual button to scan for missing skills
+if st.sidebar.button("🔍 Scan for Missing Skills", use_container_width=True):
+    all_tags = []
+    if 'projects' in st.session_state and st.session_state.projects:
+        for p in st.session_state.projects:
+            all_tags.extend(p.get("tags", []))
+    if 'certificates' in st.session_state and st.session_state.certificates:
+        for c in st.session_state.certificates:
+            all_tags.extend(c.get("tags", []))
+    if all_tags:
+        check_and_add_pending_skills(list(set(all_tags)))
+        st.rerun()
+    else:
+        st.sidebar.info("No projects or certificates found to scan.")
+
 # Pending Skill Approvals Sidebar UI
 if 'pending_skills' in st.session_state and st.session_state.pending_skills:
     st.sidebar.markdown("---")
@@ -1078,18 +1135,6 @@ if 'certificates' not in st.session_state:
 if 'pending_skills' not in st.session_state:
     st.session_state.pending_skills = []
 
-# Scan existing tags for any missing skills on startup
-if 'skills_scanned' not in st.session_state:
-    st.session_state.skills_scanned = True
-    all_tags = []
-    if st.session_state.projects:
-        for p in st.session_state.projects:
-            all_tags.extend(p.get("tags", []))
-    if st.session_state.certificates:
-        for c in st.session_state.certificates:
-            all_tags.extend(c.get("tags", []))
-    if all_tags:
-        check_and_add_pending_skills(list(set(all_tags)))
 
 # Set up tabs
 tab_edit, tab_project, tab_cert = st.tabs([
