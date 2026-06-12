@@ -41,7 +41,8 @@ export default function Navbar({ items, className }: NavbarProps) {
   /* ---------- Scroll tracking for background color ---------- */
   useEffect(() => {
     const unsub = scrollY.on('change', (latest) => {
-      setScrolled(latest > 20);
+      const isScrolled = latest > 20;
+      setScrolled((prev) => (prev === isScrolled ? prev : isScrolled));
     });
     return unsub;
   }, [scrollY]);

@@ -35,15 +35,17 @@ function LenisSync({ children }: { children: ReactNode }) {
   );
 }
 
+const LENIS_OPTIONS = {
+  duration: 1.1,
+  easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+  smoothWheel: true,
+};
+
 export function LenisProvider({ children }: { children: ReactNode }) {
   return (
     <ReactLenis
       root
-      options={{
-        duration: 1.2,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        smoothWheel: true,
-      }}
+      options={LENIS_OPTIONS}
     >
       <LenisSync>{children}</LenisSync>
     </ReactLenis>
