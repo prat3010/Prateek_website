@@ -176,6 +176,27 @@
   padding: var(--space-2xl) var(--space-xl);
   font-family: var(--font-body);
   line-height: var(--leading-relaxed);
+
+  /* Force standard color variables inside the resume card (ignores dark/noir overrides) */
+  --pop-red: #D95D67;
+  --pop-blue: #5A8EB6;
+  --pop-yellow: #F4DC95;
+  --pop-pink: #DF8B98;
+  --pop-green: #79B48B;
+  --pop-orange: #E28E66;
+  --pop-black: #2B2B36;
+  --pop-white: #FAF9F6;
+  --pop-cream: #F7F2E8;
+
+  --color-text: var(--pop-black);
+  --color-text-muted: #5d5d6d;
+  --color-border: var(--pop-black);
+  --border-thin: 1px solid var(--color-border);
+  --border-medium: 1.5px solid var(--color-border);
+  --border-thick: 3px solid var(--color-border);
+  
+  --font-headline: var(--font-playfair-display), 'Playfair Display', serif;
+  --font-body: var(--font-lora), 'Lora', serif;
 }
 
 .resumeHeader {
