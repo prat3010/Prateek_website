@@ -95,6 +95,73 @@ def call_gemini(prompt, file_data=None, file_mime=None):
         st.error(f"API Connection Error: {e}")
         return None
 
+# Fallback database of common tech skills to avoid calling Gemini API entirely for standard tags (prevents 429 errors)
+FALLBACK_SKILLS = {
+    "excel": {
+        "name": "Microsoft Excel",
+        "icon": "file-text",
+        "description": "Analyzing data, building spreadsheets, and organizing complex datasets.",
+        "category": "tools",
+        "color": "#107C41"
+    },
+    "spreadsheet": {
+        "name": "Spreadsheets",
+        "icon": "layout",
+        "description": "Structuring tabular data, utilizing formulas, and modeling numeric information.",
+        "category": "tools",
+        "color": "#107C41"
+    },
+    "data analysis": {
+        "name": "Data Analysis",
+        "icon": "bar-chart",
+        "description": "Extracting insights from raw records, cleaning datasets, and visualizing metrics.",
+        "category": "backend",
+        "color": "#00897B"
+    },
+    "microsoft office": {
+        "name": "Microsoft Office",
+        "icon": "briefcase",
+        "description": "Utilizing productivity applications to document workflows and present reports.",
+        "category": "tools",
+        "color": "#D83B01"
+    },
+    "business intelligence": {
+        "name": "Business Intelligence",
+        "icon": "trending-up",
+        "description": "Synthesizing operational data into dashboards and strategic insights.",
+        "category": "backend",
+        "color": "#F2C811"
+    },
+    "supabase": {
+        "name": "Supabase",
+        "icon": "database",
+        "description": "Orchestrating backend authentication, building postgres databases, and managing real-time data flow.",
+        "category": "backend",
+        "color": "#3ECF8E"
+    },
+    "fastapi": {
+        "name": "FastAPI",
+        "icon": "server",
+        "description": "Instructing AI to spin up robust backends, serialize data models, and deploy endpoints.",
+        "category": "backend",
+        "color": "#059669"
+    },
+    "react": {
+        "name": "React / Next.js",
+        "icon": "atom",
+        "description": "Directing AI to synthesize React components, manage application state, and orchestrate client/server code.",
+        "category": "frontend",
+        "color": "#61DAFB"
+    },
+    "python": {
+        "name": "Python",
+        "icon": "terminal",
+        "description": "Instructing AI to write utility scripts, automation tasks, and backend helper scripts.",
+        "category": "backend",
+        "color": "#3776AB"
+    }
+}
+
 # Helper to generate skill proposals from a list of technology tags in a single batch call to avoid 429 rate limits
 def generate_skills_from_tags_batch(tags_list):
     if not tags_list:
@@ -128,7 +195,7 @@ def generate_skills_from_tags_batch(tags_list):
         st.error(f"Error generating skills in batch: {e}")
     return []
 
-# Helper to check a list of tags and generate pending skills for new ones using batch processing
+# Helper to check a list of tags and generate pending skills for new ones using batch processing & local fallbacks
 def check_and_add_pending_skills(tags_list):
     current_skills = parse_skills_file()
     existing_skill_names = {s.get("name", "").lower() for s in current_skills}
@@ -159,17 +226,40 @@ def check_and_add_pending_skills(tags_list):
             new_tags.append(tag_clean)
             
     if new_tags:
-        # Process in batches of 5 to stay well within limits
-        batch_tags = new_tags[:5]
-        st.toast(f"🔍 New tags detected: {', '.join(batch_tags)}. Calling Gemini (Batch)...")
-        proposals = generate_skills_from_tags_batch(batch_tags)
-        if proposals:
-            added_count = 0
-            for prop in proposals:
-                if prop.get("name"):
-                    st.session_state.pending_skills.append(prop)
-                    added_count += 1
-            st.toast(f"💡 Generated {added_count} skill proposals!")
+        # Resolve tags locally using fallback database first (bypasses Gemini completely)
+        tags_needing_gemini = []
+        for tag in new_tags:
+            if tag in FALLBACK_SKILLS:
+                st.session_state.pending_skills.append(FALLBACK_SKILLS[tag])
+                st.toast(f"💡 Resolved new tag '{tag}' locally from database!")
+            else:
+                tags_needing_gemini.append(tag)
+                
+        # If there are still unknown tags needing Gemini, request in batch
+        if tags_needing_gemini:
+            batch_tags = tags_needing_gemini[:5]
+            st.toast(f"🔍 New unknown tags: {', '.join(batch_tags)}. Calling Gemini (Batch)...")
+            proposals = generate_skills_from_tags_batch(batch_tags)
+            
+            if proposals:
+                added_count = 0
+                for prop in proposals:
+                    if prop.get("name"):
+                        st.session_state.pending_skills.append(prop)
+                        added_count += 1
+                st.toast(f"💡 Generated {added_count} skill proposals!")
+            else:
+                # If Gemini fails (rate limits/quota exhausted), populate with a generic fallback template to keep the app working
+                st.warning("⚠️ Gemini API limit reached or key exhausted. Created template proposals for missing tags.")
+                for tag in batch_tags:
+                    fallback_prop = {
+                        "name": tag.capitalize(),
+                        "icon": "sparkles",
+                        "description": f"Applying {tag} capabilities to implement robust project requirements.",
+                        "category": "tools",
+                        "color": "#00E676"
+                    }
+                    st.session_state.pending_skills.append(fallback_prop)
 
 # ==========================================
 # TS Data Parsers (Projects, Resume, Certs)
