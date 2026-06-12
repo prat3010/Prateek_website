@@ -1,0 +1,1371 @@
+#!/usr/bin/env python3
+import os
+import sys
+import re
+import json
+import base64
+import shutil
+import urllib.request
+import urllib.parse
+from datetime import datetime
+
+# Import Streamlit - will fail gracefully if not installed
+try:
+    import streamlit as st
+except ImportError:
+    print("Error: Streamlit is not installed. Run 'pip install streamlit' to run this manager.")
+    sys.exit(1)
+
+st.set_page_config(
+    page_title="Resume & Portfolio Manager",
+    page_icon="💼",
+    layout="wide",
+)
+
+# ==========================================
+# Env Loader & API Helpers
+# ==========================================
+def load_env():
+    env_vars = {}
+    env_path = ".env.local"
+    if os.path.exists(env_path):
+        with open(env_path, "r") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                if "=" in line:
+                    key, val = line.split("=", 1)
+                    env_vars[key.strip()] = val.strip()
+    return env_vars
+
+env = load_env()
+GEMINI_API_KEY = env.get("GEMINI_API_KEY")
+
+# Helper to send API request to Gemini
+def call_gemini(prompt, file_data=None, file_mime=None):
+    if not GEMINI_API_KEY:
+        st.error("Missing GEMINI_API_KEY in .env.local. Please add your key first.")
+        return None
+
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
+    headers = {
+        "Content-Type": "application/json"
+    }
+    
+    parts = [{"text": prompt}]
+    if file_data and file_mime:
+        parts.append({
+            "inlineData": {
+                "mimeType": file_mime,
+                "data": file_data
+            }
+        })
+        
+    payload = {
+        "contents": [{"parts": parts}],
+        "generationConfig": {
+            "responseMimeType": "application/json"
+        }
+    }
+
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers=headers,
+        method="POST"
+    )
+
+    try:
+        with urllib.request.urlopen(req) as res:
+            response_data = json.loads(res.read().decode("utf-8"))
+            candidates = response_data.get("candidates", [])
+            if candidates:
+                text_content = candidates[0]["content"]["parts"][0]["text"]
+                return json.loads(text_content.strip())
+            else:
+                st.error("Error: Empty candidates response from Gemini")
+                return None
+    except urllib.error.HTTPError as e:
+        err_msg = e.read().decode("utf-8", errors="ignore")
+        st.error(f"Gemini API Error {e.code}: {e.reason}")
+        st.code(err_msg, language="json")
+        return None
+    except Exception as e:
+        st.error(f"API Connection Error: {e}")
+        return None
+
+# ==========================================
+# TS Data Parsers (Projects, Resume, Certs)
+# ==========================================
+
+# Parse projects.ts
+def parse_projects_file():
+    path = "src/data/projects.ts"
+    if not os.path.exists(path):
+        return []
+    with open(path, "r") as f:
+        content = f.read()
+    
+    match = re.search(r'export const projects:\s*Project\[\]\s*=\s*\[(.*)\];?', content, re.DOTALL)
+    if not match:
+        return []
+    array_content = match.group(1).strip()
+    
+    blocks = []
+    depth = 0
+    start = -1
+    for i, char in enumerate(array_content):
+        if char == '{':
+            if depth == 0:
+                start = i
+            depth += 1
+        elif char == '}':
+            depth -= 1
+            if depth == 0 and start != -1:
+                blocks.append(array_content[start:i+1])
+                start = -1
+                
+    projects = []
+    for block in blocks:
+        project = {}
+        id_match = re.search(r'id:\s*[\'"]((?:[^\'"\\]|\\.)*)[\'"]', block)
+        title_match = re.search(r'title:\s*[\'"]((?:[^\'"\\]|\\.)*)[\'"]', block)
+        desc_match = re.search(r'description:\s*[\'"]((?:[^\'"\\]|\\.)*)[\'"]', block, re.DOTALL)
+        long_desc_match = re.search(r'longDescription:\s*[\'"]((?:[^\'"\\]|\\.)*)[\'"]', block, re.DOTALL)
+        image_match = re.search(r'image:\s*[\'"]((?:[^\'"\\]|\\.)*)[\'"]', block)
+        live_url_match = re.search(r'liveUrl:\s*[\'"]((?:[^\'"\\]|\\.)*)[\'"]', block)
+        github_url_match = re.search(r'githubUrl:\s*[\'"]((?:[^\'"\\]|\\.)*)[\'"]', block)
+        color_match = re.search(r'color:\s*[\'"]((?:[^\'"\\]|\\.)*)[\'"]', block)
+        is_live_match = re.search(r'isLive:\s*(true|false)', block)
+        tags_match = re.search(r'tags:\s*\[(.*?)\]', block, re.DOTALL)
+        
+        if id_match: project['id'] = id_match.group(1)
+        if title_match: project['title'] = title_match.group(1)
+        if desc_match: project['description'] = desc_match.group(1).replace('\n', ' ').strip()
+        if long_desc_match: project['longDescription'] = long_desc_match.group(1).replace("\\'", "'").replace('\n', ' ').strip()
+        if image_match: project['image'] = image_match.group(1)
+        if live_url_match: project['liveUrl'] = live_url_match.group(1)
+        if github_url_match: project['githubUrl'] = github_url_match.group(1)
+        if color_match: project['color'] = color_match.group(1)
+        if is_live_match: project['isLive'] = is_live_match.group(1) == 'true'
+        
+        if tags_match:
+            tags_str = tags_match.group(1)
+            project['tags'] = re.findall(r'[\'"](.*?)[\'"]', tags_str)
+            
+        projects.append(project)
+    return projects
+
+def write_projects_file(projects):
+    path = "src/data/projects.ts"
+    projects_str = "[\n"
+    for p in projects:
+        escaped_long_desc = p.get('longDescription', '').replace("'", "\\'")
+        escaped_desc = p.get('description', '').replace("'", "\\'")
+        tags_str = ", ".join([f"'{t}'" for t in p.get('tags', [])])
+        
+        projects_str += f"""  {{
+    id: '{p.get('id', '')}',
+    title: '{p.get('title', '').replace("'", "\\'")}',
+    description: '{escaped_desc}',
+    longDescription: '{escaped_long_desc}',
+    image: '{p.get('image', '')}',
+    tags: [{tags_str}],
+    liveUrl: '{p.get('liveUrl', '')}',
+    githubUrl: '{p.get('githubUrl', '')}',
+    color: '{p.get('color', '#00E676')}',
+    isLive: {str(p.get('isLive', False)).lower()},
+  }},\n"""
+    projects_str += "]"
+
+    content = f"""export interface Project {{
+  id: string;
+  title: string;
+  description: string;
+  longDescription: string;
+  image: string;
+  tags: string[];
+  liveUrl: string;
+  githubUrl: string;
+  color: string;
+  isLive: boolean;
+}}
+
+export const projects: Project[] = {projects_str};
+"""
+    with open(path, "w") as f:
+        f.write(content)
+
+# Parse resume.ts
+def extract_literal(content, start_sig):
+    idx = content.find(start_sig)
+    if idx == -1:
+        return None
+    # Find first opening bracket or brace
+    start_char_idx = -1
+    start_char = None
+    for i in range(idx + len(start_sig), len(content)):
+        if content[i] in ['{', '[']:
+            start_char_idx = i
+            start_char = content[i]
+            break
+    if start_char_idx == -1:
+        return None
+    
+    end_char = '}' if start_char == '{' else ']'
+    brace_count = 0
+    in_string = False
+    quote_char = None
+    escaped = False
+    
+    for i in range(start_char_idx, len(content)):
+        char = content[i]
+        if escaped:
+            escaped = False
+            continue
+        if char == '\\':
+            escaped = True
+            continue
+        if in_string:
+            if char == quote_char:
+                in_string = False
+                quote_char = None
+            continue
+        else:
+            if char in ["'", '"', '`']:
+                in_string = True
+                quote_char = char
+                continue
+            elif char == start_char:
+                brace_count += 1
+            elif char == end_char:
+                brace_count -= 1
+                if brace_count == 0:
+                    return content[start_char_idx : i + 1]
+    return None
+
+def parse_js_object(js_str):
+    idx = 0
+    length = len(js_str)
+    
+    def skip_whitespace_and_comments():
+        nonlocal idx
+        while idx < length:
+            if js_str[idx].isspace():
+                idx += 1
+            elif js_str[idx:idx+2] == '//':
+                idx = js_str.find('\n', idx)
+                if idx == -1:
+                    idx = length
+            elif js_str[idx:idx+2] == '/*':
+                end = js_str.find('*/', idx + 2)
+                if end == -1:
+                    idx = length
+                else:
+                    idx = end + 2
+            else:
+                break
+                
+    def parse_value():
+        skip_whitespace_and_comments()
+        if idx >= length:
+            raise ValueError("Unexpected end of input")
+        
+        char = js_str[idx]
+        if char == '{':
+            return parse_object()
+        elif char == '[':
+            return parse_array()
+        elif char in ['"', "'", '`']:
+            return parse_string(char)
+        else:
+            return parse_primitive()
+            
+    def parse_string(quote):
+        nonlocal idx
+        start = idx
+        idx += 1
+        val_chars = []
+        while idx < length:
+            char = js_str[idx]
+            if char == '\\':
+                if idx + 1 < length:
+                    esc_char = js_str[idx+1]
+                    if esc_char == 'n':
+                        val_chars.append('\n')
+                    elif esc_char == 't':
+                        val_chars.append('\t')
+                    elif esc_char == 'r':
+                        val_chars.append('\r')
+                    else:
+                        val_chars.append(esc_char)
+                    idx += 2
+                else:
+                    idx += 1
+            elif char == quote:
+                idx += 1
+                return "".join(val_chars)
+            else:
+                val_chars.append(char)
+                idx += 1
+        raise ValueError(f"Unterminated string starting at {start}")
+        
+    def parse_object():
+        nonlocal idx
+        idx += 1
+        obj = {}
+        while True:
+            skip_whitespace_and_comments()
+            if idx >= length:
+                raise ValueError("Unterminated object")
+            if js_str[idx] == '}':
+                idx += 1
+                return obj
+                
+            key = parse_key()
+            skip_whitespace_and_comments()
+            if idx >= length or js_str[idx] != ':':
+                raise ValueError(f"Expected ':' after key at {idx}")
+            idx += 1
+            
+            val = parse_value()
+            obj[key] = val
+            
+            skip_whitespace_and_comments()
+            if idx >= length:
+                raise ValueError("Unterminated object")
+            if js_str[idx] == ',':
+                idx += 1
+            elif js_str[idx] == '}':
+                idx += 1
+                return obj
+            else:
+                pass
+                
+    def parse_key():
+        nonlocal idx
+        skip_whitespace_and_comments()
+        char = js_str[idx]
+        if char in ['"', "'"]:
+            return parse_string(char)
+        start = idx
+        while idx < length:
+            c = js_str[idx]
+            if c.isalnum() or c in ['_', '$', '-']:
+                idx += 1
+            else:
+                break
+        if start == idx:
+            raise ValueError(f"Expected key at {start}")
+        return js_str[start:idx]
+        
+    def parse_array():
+        nonlocal idx
+        idx += 1
+        arr = []
+        while True:
+            skip_whitespace_and_comments()
+            if idx >= length:
+                raise ValueError("Unterminated array")
+            if js_str[idx] == ']':
+                idx += 1
+                return arr
+            
+            val = parse_value()
+            arr.append(val)
+            
+            skip_whitespace_and_comments()
+            if idx >= length:
+                raise ValueError("Unterminated array")
+            if js_str[idx] == ',':
+                idx += 1
+            elif js_str[idx] == ']':
+                idx += 1
+                return arr
+                
+    def parse_primitive():
+        nonlocal idx
+        start = idx
+        while idx < length:
+            c = js_str[idx]
+            if c.isspace() or c in [',', ']', '}', ':']:
+                break
+            idx += 1
+        val_str = js_str[start:idx].strip()
+        if val_str == 'true':
+            return True
+        elif val_str == 'false':
+            return False
+        elif val_str == 'null':
+            return None
+        try:
+            if '.' in val_str:
+                return float(val_str)
+            return int(val_str)
+        except ValueError:
+            return val_str
+            
+    return parse_value()
+
+# Parse resume.ts
+def parse_resume_file():
+    path = "src/data/resume.ts"
+    if not os.path.exists(path):
+        return None
+    with open(path, "r") as f:
+        content = f.read()
+
+    obj_str = extract_literal(content, "export const resumeData: ResumeData =")
+    if not obj_str:
+        return None
+    try:
+        return parse_js_object(obj_str)
+    except Exception as e:
+        st.error(f"Failed to parse resume.ts: {e}")
+        return None
+
+# Parse skills.ts
+def parse_skills_file():
+    path = "src/data/skills.ts"
+    if not os.path.exists(path):
+        return []
+    with open(path, "r") as f:
+        content = f.read()
+
+    obj_str = extract_literal(content, "export const skills: Skill[] =")
+    if not obj_str:
+        return []
+    try:
+        return parse_js_object(obj_str)
+    except Exception as e:
+        st.error(f"Failed to parse skills.ts: {e}")
+        return []
+
+# Write skills.ts
+def write_skills_file(skills_list):
+    path = "src/data/skills.ts"
+    with open(path, "r") as f:
+        content = f.read()
+
+    def esc(s):
+        if s is None:
+            return ""
+        return str(s).replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
+
+    skills_str = "[\n"
+    for s in skills_list:
+        skills_str += f"""  {{
+    name: "{esc(s.get('name', ''))}",
+    icon: "{esc(s.get('icon', 'sparkles'))}",
+    description: "{esc(s.get('description', ''))}",
+    category: "{esc(s.get('category', 'tools'))}",
+    color: "{esc(s.get('color', '#00E676'))}",
+  }},\n"""
+    skills_str += "]"
+
+    lit_str = extract_literal(content, "export const skills: Skill[] =")
+    if not lit_str:
+        raise ValueError("Skills array literal not found in skills.ts")
+
+    new_content = content.replace(lit_str, skills_str, 1)
+    with open(path, "w") as f:
+        f.write(new_content)
+
+def write_resume_file(resume):
+    path = "src/data/resume.ts"
+    
+    def esc(s):
+        if s is None:
+            return ""
+        return str(s).replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
+
+    experience_str = "[\n"
+    for exp in resume.get('experience', []):
+        bullets_str = "[\n"
+        for b in exp.get('bullets', []):
+            bullets_str += f"""        {{
+          general: "{esc(b.get('general', ''))}",
+          fullstack: "{esc(b.get('fullstack', ''))}",
+          ai: "{esc(b.get('ai', ''))}",
+          creative: "{esc(b.get('creative', ''))}",
+        }},\n"""
+        bullets_str += "      ]"
+        
+        tags_str = ", ".join([f'"{esc(t)}"' for t in exp.get('tags', [])])
+        experience_str += f"""    {{
+      id: "{esc(exp.get('id', ''))}",
+      company: "{esc(exp.get('company', ''))}",
+      role: "{esc(exp.get('role', ''))}",
+      period: "{esc(exp.get('period', ''))}",
+      location: "{esc(exp.get('location', ''))}",
+      bullets: {bullets_str},
+      tags: [{tags_str}]
+    }},\n"""
+    experience_str += "  ]"
+
+    education_str = "[\n"
+    for edu in resume.get('education', []):
+        education_str += f"""    {{
+      school: "{esc(edu.get('school', ''))}",
+      degree: "{esc(edu.get('degree', ''))}",
+      period: "{esc(edu.get('period', ''))}",
+      location: "{esc(edu.get('location', ''))}"
+    }},\n"""
+    education_str += "  ]"
+
+    summary = resume.get('summary', {})
+    last_synced = resume.get('lastSynced', {}) or {}
+
+    content = f"""export interface WorkExperience {{
+  id: string;
+  company: string;
+  role: string;
+  period: string;
+  location: string;
+  bullets: {{
+    general: string;
+    fullstack?: string;
+    ai?: string;
+    creative?: string;
+  }}[];
+  tags: string[];
+}}
+
+export interface Education {{
+  school: string;
+  degree: string;
+  period: string;
+  location: string;
+}}
+
+export interface ResumeData {{
+  name: string;
+  title: string;
+  email: string;
+  phone: string;
+  website: string;
+  github: string;
+  linkedin: string;
+  summary: {{
+    general: string;
+    fullstack: string;
+    ai: string;
+    creative: string;
+  }};
+  experience: WorkExperience[];
+  education: Education[];
+  lastSynced?: {{
+    timestamp: string;
+    status: 'success' | 'failed';
+    summary: string;
+  }};
+}}
+
+export const resumeData: ResumeData = {{
+  name: "{esc(resume.get('name', 'Prateeq Sharma'))}",
+  title: "{esc(resume.get('title', ''))}",
+  email: "{esc(resume.get('email', ''))}",
+  phone: "{esc(resume.get('phone', ''))}",
+  website: "{esc(resume.get('website', ''))}",
+  github: "{esc(resume.get('github', ''))}",
+  linkedin: "{esc(resume.get('linkedin', ''))}",
+  summary: {{
+    general: "{esc(summary.get('general', ''))}",
+    fullstack: "{esc(summary.get('fullstack', ''))}",
+    ai: "{esc(summary.get('ai', ''))}",
+    creative: "{esc(summary.get('creative', ''))}",
+  }},
+  experience: {experience_str},
+  education: {education_str},
+  lastSynced: {{
+    timestamp: "{esc(last_synced.get('timestamp', ''))}",
+    status: "{esc(last_synced.get('status', 'success'))}",
+    summary: "{esc(last_synced.get('summary', ''))}",
+  }}
+}};
+"""
+    with open(path, "w") as f:
+        f.write(content)
+
+# Parse certificates
+def parse_certificates_file():
+    path = "src/data/certificates.ts"
+    if not os.path.exists(path):
+        return []
+    with open(path, "r") as f:
+        content = f.read()
+    
+    match = re.search(r'export const certificates: Certificate\[\] = (\[.*\]);', content, re.DOTALL)
+    if not match:
+        return []
+    try:
+        return json.loads(match.group(1))
+    except:
+        return []
+
+def write_certificates_file(certificates):
+    path = "src/data/certificates.ts"
+    certs_json = json.dumps(certificates, indent=2)
+    content = f"""export interface Certificate {{
+  id: string;
+  title: string;
+  issuer: string;
+  date: string;
+  credentialId?: string;
+  verifyUrl?: string;
+  image?: string;
+  tags: string[];
+}}
+
+export const certificates: Certificate[] = {certs_json};
+"""
+    with open(path, "w") as f:
+        f.write(content)
+
+# Helpers
+def get_mime_type(filename):
+    ext = os.path.splitext(filename)[1].lower()
+    if ext == ".pdf":
+        return "application/pdf"
+    elif ext in [".png", ".webp"]:
+        return f"image/{ext[1:]}"
+    elif ext in [".jpg", ".jpeg"]:
+        return "image/jpeg"
+    return None
+
+# ==========================================
+# Streamlit Interface Layout
+# ==========================================
+
+# Custom CSS for Premium UI Styling
+st.markdown("""
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap');
+    
+    /* Font overrides */
+    html, body, [class*="css"], .stWidgetFormContainer {
+        font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    }
+    
+    code, pre {
+        font-family: 'JetBrains Mono', monospace !important;
+    }
+
+    /* Core Page Styling */
+    .stApp {
+        background-color: #0b0f19 !important;
+        color: #c9d1d9 !important;
+    }
+    
+    /* Section Headers */
+    .section-header {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #ffffff;
+        margin-top: 0.5rem;
+        margin-bottom: 1.2rem;
+        border-bottom: 2px solid #00E676;
+        padding-bottom: 5px;
+        display: inline-block;
+    }
+
+    /* Target bordered containers in Streamlit */
+    div[data-testid="stVerticalBlockBorder"] {
+        background-color: #111827 !important;
+        border: 2px solid #1f2937 !important;
+        border-radius: 12px !important;
+        padding: 24px !important;
+        margin-bottom: 24px !important;
+        box-shadow: 4px 4px 0px 0px #000000 !important;
+        transition: all 0.2s ease !important;
+    }
+    div[data-testid="stVerticalBlockBorder"]:hover {
+        border-color: #374151 !important;
+        box-shadow: 6px 6px 0px 0px #00E676 !important;
+    }
+
+    /* Target expanders */
+    details[data-testid="stExpander"] {
+        background-color: #1f2937 !important;
+        border: 2px solid #374151 !important;
+        border-radius: 8px !important;
+        margin-bottom: 12px !important;
+        box-shadow: 2px 2px 0px 0px #000000 !important;
+        transition: all 0.2s ease !important;
+    }
+    details[data-testid="stExpander"]:hover {
+        border-color: #00E676 !important;
+        box-shadow: 3px 3px 0px 0px #00E676 !important;
+    }
+    summary[data-testid="stExpanderSummary"] {
+        font-weight: 700 !important;
+        color: #ffffff !important;
+    }
+
+    /* Buttons styling */
+    button[data-testid="baseButton-primary"] {
+        background-color: #00E676 !important;
+        color: #000000 !important;
+        font-weight: 800 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+        border: 2px solid #000000 !important;
+        border-radius: 6px !important;
+        box-shadow: 3px 3px 0px 0px #000000 !important;
+        transition: all 0.1s ease !important;
+        padding: 0.5rem 1.5rem !important;
+    }
+    button[data-testid="baseButton-primary"]:hover {
+        background-color: #05FF84 !important;
+        color: #000000 !important;
+        transform: translate(-1px, -1px) !important;
+        box-shadow: 4px 4px 0px 0px #000000 !important;
+    }
+    button[data-testid="baseButton-primary"]:active {
+        transform: translate(1px, 1px) !important;
+        box-shadow: 1px 1px 0px 0px #000000 !important;
+    }
+
+    button[data-testid="baseButton-secondary"] {
+        background-color: #1f2937 !important;
+        color: #e5e7eb !important;
+        font-weight: 700 !important;
+        border: 2px solid #374151 !important;
+        border-radius: 6px !important;
+        box-shadow: 2px 2px 0px 0px #000000 !important;
+        transition: all 0.1s ease !important;
+    }
+    button[data-testid="baseButton-secondary"]:hover {
+        border-color: #2979FF !important;
+        color: #2979FF !important;
+        transform: translate(-1px, -1px) !important;
+        box-shadow: 3px 3px 0px 0px #2979FF !important;
+    }
+    button[data-testid="baseButton-secondary"]:active {
+        transform: translate(1px, 1px) !important;
+        box-shadow: 1px 1px 0px 0px #000000 !important;
+    }
+
+    /* Danger hover styles for delete buttons */
+    button[id^="del_exp_"]:hover, button[id^="del_edu_"]:hover, button[id^="rem_bul_"]:hover {
+        border-color: #FF1744 !important;
+        color: #FF1744 !important;
+        box-shadow: 3px 3px 0px 0px #FF1744 !important;
+    }
+
+    /* Inputs */
+    .stTextInput>div>div>input, .stTextArea>div>div>textarea, .stSelectbox>div>div>div {
+        background-color: #111827 !important;
+        color: #ffffff !important;
+        border: 2px solid #374151 !important;
+        border-radius: 8px !important;
+        transition: border-color 0.2s !important;
+    }
+    .stTextInput>div>div>input:focus, .stTextArea>div>div>textarea:focus {
+        border-color: #00E676 !important;
+        box-shadow: 0 0 0 1px #00E676 !important;
+    }
+
+    /* Sidebar Styling */
+    section[data-testid="stSidebar"] {
+        background-color: #090d16 !important;
+        border-right: 2px solid #1f2937 !important;
+    }
+    section[data-testid="stSidebar"] h1, section[data-testid="stSidebar"] h2 {
+        color: #ffffff !important;
+        font-weight: 800 !important;
+    }
+
+    /* Tabs styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 12px !important;
+        background-color: #111827 !important;
+        padding: 8px !important;
+        border-radius: 12px !important;
+        border: 2px solid #1f2937 !important;
+        margin-bottom: 24px !important;
+    }
+    .stTabs [data-baseweb="tab"] {
+        height: 44px !important;
+        border-radius: 8px !important;
+        background-color: transparent !important;
+        color: #9ca3af !important;
+        font-weight: 700 !important;
+        padding: 0px 16px !important;
+        transition: all 0.2s !important;
+    }
+    .stTabs [data-baseweb="tab"]:hover {
+        color: #ffffff !important;
+        background-color: #1f2937 !important;
+    }
+    .stTabs [aria-selected="true"] {
+        background-color: #00E676 !important;
+        color: #000000 !important;
+        box-shadow: 2px 2px 0px 0px #000000 !important;
+    }
+
+    /* Scrollbar override */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #0b0f19;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #1f2937;
+        border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #00E676;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# Sidebar
+st.sidebar.markdown("""
+<div style="background-color: #111827; border: 2px solid #1f2937; border-radius: 10px; padding: 15px; margin-bottom: 20px; text-align: center; box-shadow: 3px 3px 0px 0px #00E676;">
+    <div style="font-size: 3rem; margin-bottom: 5px;">🤖</div>
+    <h3 style="color: #ffffff; margin: 0; font-weight: 800; font-size: 1.2rem;">Antigravity Sync</h3>
+    <code style="color: #00E676; font-size: 0.8rem; font-weight: bold;">v1.2.0 (Active)</code>
+</div>
+""", unsafe_allow_html=True)
+
+st.sidebar.markdown("### 🛠️ Control Panel Operations")
+st.sidebar.markdown("""
+This local portal lets you:
+*   **Edit Resume details manually**
+*   **Sync Projects** (from local folders or GitHub repositories)
+*   **Sync Certificates** (reads PDFs/Images dropped in certificates raw folder)
+""")
+
+if GEMINI_API_KEY:
+    st.sidebar.success("🔑 Gemini API Key loaded from .env.local")
+else:
+    st.sidebar.error("❌ GEMINI_API_KEY not found in .env.local")
+
+# Custom Title Header
+st.markdown("""
+<div style="text-align: center; padding: 24px 0; margin-bottom: 30px; border-bottom: 4px solid #00E676; background-color: #111827; border-radius: 12px; box-shadow: 4px 4px 0px 0px #000000; border: 2px solid #1f2937;">
+    <h1 style="color: #ffffff; font-weight: 900; margin: 0; font-size: 2.3rem; letter-spacing: -0.5px;">💼 PORTFOLIO MANAGER</h1>
+    <p style="color: #9ca3af; margin: 5px 0 0 0; font-weight: 500; font-size: 1rem;">Local Sync Agent & Profile Orchestration Console</p>
+</div>
+""", unsafe_allow_html=True)
+
+# Load static data in session state so edits aren't lost on rerun
+if 'resume' not in st.session_state:
+    st.session_state.resume = parse_resume_file()
+if 'projects' not in st.session_state:
+    st.session_state.projects = parse_projects_file()
+if 'certificates' not in st.session_state:
+    st.session_state.certificates = parse_certificates_file()
+
+# Set up tabs
+tab_edit, tab_project, tab_cert = st.tabs([
+    "✍️ Edit Resume Manually", 
+    "🚀 Sync Projects", 
+    "🎓 Sync Certificates"
+])
+
+# ──────────────────────────────────────────
+# TAB 1: RESUME EDITOR
+# ──────────────────────────────────────────
+with tab_edit:
+    if st.session_state.resume is None:
+        st.error("Could not load resume.ts. Please verify the file is present.")
+    else:
+        res = st.session_state.resume
+        
+        # 1. Profile section
+        with st.container(border=True):
+            st.markdown('<div class="section-header">👤 Profile Details</div>', unsafe_allow_html=True)
+            col1, col2 = st.columns(2)
+            with col1:
+                res['name'] = st.text_input("Name", res.get('name', ''))
+                res['title'] = st.text_input("Title / Role", res.get('title', ''))
+                res['email'] = st.text_input("Email Address", res.get('email', ''))
+                res['phone'] = st.text_input("Phone Number", res.get('phone', ''))
+            with col2:
+                res['website'] = st.text_input("Website Link", res.get('website', ''))
+                res['github'] = st.text_input("GitHub Profile", res.get('github', ''))
+                res['linkedin'] = st.text_input("LinkedIn Profile", res.get('linkedin', ''))
+
+        # 2. Summaries section
+        with st.container(border=True):
+            st.markdown('<div class="section-header">📝 Persona Summaries</div>', unsafe_allow_html=True)
+            st.info("Write a different bio description tailored for each engineering archetype.")
+            summ = res.get('summary', {})
+            res['summary']['general'] = st.text_area("General Summary", summ.get('general', ''), height=100)
+            res['summary']['fullstack'] = st.text_area("Full-Stack Summary", summ.get('fullstack', ''), height=100)
+            res['summary']['ai'] = st.text_area("AI Orchestration Summary", summ.get('ai', ''), height=100)
+            res['summary']['creative'] = st.text_area("Creative Designer Summary", summ.get('creative', ''), height=100)
+
+        # 3. Work Experience section
+        with st.container(border=True):
+            st.markdown('<div class="section-header">💼 Work Experience</div>', unsafe_allow_html=True)
+            
+            # Add new job experience button
+            if st.button("➕ Add Job Experience"):
+                new_job = {
+                    "id": f"new-job-{datetime.now().strftime('%M%S')}",
+                    "company": "Company Name",
+                    "role": "Software Engineer",
+                    "period": "Start - End",
+                    "location": "City, Country",
+                    "bullets": [{"general": "Key achievement bullet point."}],
+                    "tags": ["React"]
+                }
+                res['experience'].append(new_job)
+                st.rerun()
+
+            for exp_idx, exp in enumerate(res.get('experience', [])):
+                with st.expander(f"💼 {exp.get('company')} — {exp.get('role')} ({exp.get('period')})", expanded=False):
+                    col_c1, col_c2 = st.columns(2)
+                    with col_c1:
+                        exp['company'] = st.text_input(f"Company Name", exp.get('company'), key=f"comp_{exp_idx}")
+                        exp['role'] = st.text_input(f"Role Title", exp.get('role'), key=f"role_{exp_idx}")
+                    with col_c2:
+                        exp['period'] = st.text_input(f"Period (Dates)", exp.get('period'), key=f"per_{exp_idx}")
+                        exp['location'] = st.text_input(f"Location", exp.get('location'), key=f"loc_{exp_idx}")
+                    
+                    # Tags comma-separated
+                    tags_str = ", ".join(exp.get('tags', []))
+                    edited_tags = st.text_input(f"Tags / Skills (comma-separated)", tags_str, key=f"tags_{exp_idx}")
+                    exp['tags'] = [t.strip() for t in edited_tags.split(",") if t.strip()]
+                    
+                    # Bullets sub-section
+                    st.write("**Bullet Points**")
+                    
+                    # Add bullet point
+                    if st.button(f"Add Bullet Point", key=f"add_bullet_btn_{exp_idx}"):
+                        exp['bullets'].append({
+                            "general": "Accomplished [X], measured by [Y], by doing [Z].",
+                            "fullstack": "",
+                            "ai": "",
+                            "creative": ""
+                        })
+                        st.rerun()
+                    
+                    bullets_to_remove = []
+                    for b_idx, bullet in enumerate(exp.get('bullets', [])):
+                        st.markdown(f"**Bullet #{b_idx + 1}**")
+                        col_b1, col_b2 = st.columns(2)
+                        with col_b1:
+                            bullet['general'] = st.text_area("General Description", bullet.get('general', ''), key=f"bul_g_{exp_idx}_{b_idx}", height=75)
+                            bullet['fullstack'] = st.text_area("Full-Stack Description", bullet.get('fullstack', ''), key=f"bul_f_{exp_idx}_{b_idx}", height=75)
+                        with col_b2:
+                            bullet['ai'] = st.text_area("AI/Agent Description", bullet.get('ai', ''), key=f"bul_a_{exp_idx}_{b_idx}", height=75)
+                            bullet['creative'] = st.text_area("Creative/Animation Description", bullet.get('creative', ''), key=f"bul_c_{exp_idx}_{b_idx}", height=75)
+                        
+                        if st.button(f"🗑️ Remove Bullet #{b_idx+1}", key=f"rem_bul_{exp_idx}_{b_idx}"):
+                            bullets_to_remove.append(b_idx)
+                            
+                    if bullets_to_remove:
+                        for idx in sorted(bullets_to_remove, reverse=True):
+                            exp['bullets'].pop(idx)
+                        st.rerun()
+                    
+                    if st.button(f"🗑️ Delete Job Experience Block", key=f"del_exp_{exp_idx}", type="secondary"):
+                        res['experience'].pop(exp_idx)
+                        st.rerun()
+
+        # 4. Education section
+        with st.container(border=True):
+            st.markdown('<div class="section-header">🎓 Education</div>', unsafe_allow_html=True)
+            if st.button("➕ Add Education Block"):
+                new_edu = {
+                    "school": "University / School",
+                    "degree": "Degree",
+                    "period": "Start - End",
+                    "location": "City, Country"
+                }
+                res['education'].append(new_edu)
+                st.rerun()
+
+            for edu_idx, edu in enumerate(res.get('education', [])):
+                with st.expander(f"🎓 {edu.get('school')} — {edu.get('degree')}", expanded=False):
+                    col_e1, col_e2 = st.columns(2)
+                    with col_e1:
+                        edu['school'] = st.text_input(f"University / School", edu.get('school'), key=f"school_{edu_idx}")
+                        edu['degree'] = st.text_input(f"Degree / Program", edu.get('degree'), key=f"deg_{edu_idx}")
+                    with col_e2:
+                        edu['period'] = st.text_input(f"Period", edu.get('period'), key=f"edu_per_{edu_idx}")
+                        edu['location'] = st.text_input(f"Location", edu.get('location'), key=f"edu_loc_{edu_idx}")
+                    
+                    if st.button(f"🗑️ Delete Education Block", key=f"del_edu_{edu_idx}", type="secondary"):
+                        res['education'].pop(edu_idx)
+                        st.rerun()
+
+        # Save Button
+        st.markdown("---")
+        if st.button("💾 Save Resume Changes", type="primary", use_container_width=True):
+            try:
+                write_resume_file(res)
+                st.success("🎉 Resume updated and saved successfully directly in src/data/resume.ts!")
+            except Exception as e:
+                st.error(f"Failed to write file: {e}")
+
+# ──────────────────────────────────────────
+# TAB 2: SYNC PROJECTS
+# ──────────────────────────────────────────
+with tab_project:
+    with st.container(border=True):
+        st.markdown('<div class="section-header">🚀 Import & Sync Project Showcase</div>', unsafe_allow_html=True)
+        st.write("Extract descriptions, tags, and custom resume bullet points from your repos using the Gemini API.")
+
+        project_mode = st.radio("Choose Project Input Type:", ["Local Directory", "GitHub Repository"])
+
+        proj_input = ""
+        if project_mode == "Local Directory":
+            proj_input = st.text_input("Absolute Local Folder Path:", placeholder="/Users/prateeksharma/Developer/my-app")
+        else:
+            proj_input = st.text_input("GitHub Repository URL / Slug:", placeholder="username/repo or just repo-name")
+
+        dry_run_proj = st.checkbox("Dry-Run Mode (Review AI generation without saving)", value=True)
+
+        if st.button("Sync Project Now", type="primary"):
+            if not proj_input:
+                st.error("Please provide a path or repository link.")
+            else:
+                readme_content = ""
+                package_content = ""
+                git_logs = ""
+                
+                with st.status("Gathering repository artifacts...", expanded=True) as status:
+                    if project_mode == "Local Directory":
+                        project_path = os.path.abspath(proj_input)
+                        st.write(f"📂 Scanning local directory: {project_path}")
+                        
+                        if not os.path.isdir(project_path):
+                            st.error(f"Path '{project_path}' is not a valid directory.")
+                            status.update(label="Scanning failed", state="error")
+                        else:
+                            readme_path = os.path.join(project_path, "README.md")
+                            if os.path.exists(readme_path):
+                                with open(readme_path, "r") as f:
+                                    readme_content = f.read()[:6000]
+                                    
+                            package_path = os.path.join(project_path, "package.json")
+                            if os.path.exists(package_path):
+                                with open(package_path, "r") as f:
+                                    package_content = f.read()
+                                    
+                            git_dir = os.path.join(project_path, ".git")
+                            if os.path.exists(git_dir):
+                                import subprocess
+                                try:
+                                    git_logs = subprocess.check_output(
+                                        ["git", "log", "-n", "5", "--oneline"],
+                                        cwd=project_path
+                                    ).decode("utf-8")
+                                except:
+                                    pass
+                    else:
+                        repo = proj_input.strip()
+                        if "/" not in repo:
+                            repo = f"prat3010/{repo}"
+                        
+                        st.write(f"🌐 Querying GitHub REST API for: {repo}")
+                        
+                        def fetch_github(url_path, is_api=False):
+                            url = f"https://api.github.com/repos/{repo}{url_path}" if is_api else f"https://raw.githubusercontent.com/{repo}/{url_path}"
+                            headers = {"User-Agent": "Mozilla/5.0"}
+                            req = urllib.request.Request(url, headers=headers)
+                            try:
+                                with urllib.request.urlopen(req) as res:
+                                    return res.read().decode("utf-8")
+                            except Exception as e:
+                                if not is_api and "main" in url_path:
+                                    fallback_path = url_path.replace("main/", "master/")
+                                    return fetch_github(fallback_path, is_api=False)
+                                return ""
+                                
+                        readme_content = fetch_github("main/README.md")
+                        package_content = fetch_github("main/package.json")
+                        
+                        commits_json = fetch_github("/commits", is_api=True)
+                        if commits_json:
+                            try:
+                                commits = json.loads(commits_json)
+                                git_logs = "\n".join([f"{c['sha'][:7]} {c['commit']['message'].splitlines()[0]}" for c in commits[:5]])
+                            except:
+                                pass
+                    
+                    # Check contents
+                    if not readme_content and not package_content:
+                        st.warning("Empty repository metadata gathered. Will submit minimal details to Gemini.")
+                    
+                    st.write("🤖 Transmitting codebase properties to Gemini API...")
+                    prompt = f"""
+                    Analyze the following project code artifacts (README, package config, and git logs).
+                    Use these details to formulate a showcase entry matching our Next.js Project schema.
+                    
+                    [README CONTENT]
+                    {readme_content}
+                    
+                    [CONFIG CONTENT]
+                    {package_content}
+                    
+                    [GIT COMMITS]
+                    {git_logs}
+                    
+                    Generate and return strictly the following JSON structure:
+                    {{
+                      "title": "Catchy, polished title of the project",
+                      "description": "Short, 1-sentence summary of what the project does",
+                      "longDescription": "Detailed 3-4 sentence paragraph describing the architecture, core algorithms, libraries, databases used, and interesting implementation details. Highlight the technical engineering complexities.",
+                      "tags": ["3 to 6 programming languages, database names, or key frameworks used (capitalize appropriately, e.g. React, Next.js, FastAPI, SQLite)"],
+                      "color": "A neo-brutalist pop-art hex color (e.g. #FF9100, #00E676, #2979FF, #E040FB) that matches this project's visual branding",
+                      "resumeBullet": {{
+                        "general": "A concise, active resume bullet point (Accomplished [X], measured by [Y], by doing [Z]). Make it professional.",
+                        "fullstack": "An alternative version of the bullet point focused strictly on APIs, databases, servers, and backend logic.",
+                        "ai": "An alternative version of the bullet point focused strictly on prompts, LLMs, pipelines, RAG, and AI agents.",
+                        "creative": "An alternative version of the bullet point focused strictly on UI responsiveness, animations, visual layouts, and styling."
+                      }}
+                    }}
+                    Do not return any conversational text, markdown formatting, or backticks. Return only the raw JSON.
+                    """
+                    
+                    project_data = call_gemini(prompt)
+                    if project_data:
+                        status.update(label="Synchronization parsed!", state="complete")
+                        st.success("✅ Success! Gemini generated the entry structure.")
+                        
+                        st.markdown("### AI-Generated Showcase Entry Preview")
+                        st.json(project_data)
+                        
+                        if not dry_run_proj:
+                            project_id = re.sub(r'[^a-zA-Z0-9]', '-', project_data['title'].lower())
+                            current_projects = parse_projects_file()
+                            
+                            # Remove existing project with same ID if any
+                            current_projects = [p for p in current_projects if p['id'] != project_id]
+                            
+                            new_project = {
+                                "id": project_id,
+                                "title": project_data["title"],
+                                "description": project_data["description"],
+                                "longDescription": project_data["longDescription"],
+                                "image": f"/images/project-{project_id}.webp", 
+                                "tags": project_data["tags"],
+                                "liveUrl": "",
+                                "githubUrl": f"https://github.com/{repo}" if project_mode != "Local Directory" else "",
+                                "color": project_data["color"],
+                                "isLive": False
+                            }
+                            
+                            current_projects.append(new_project)
+                            write_projects_file(current_projects)
+                            st.session_state.projects = current_projects
+                            
+                            # Append resume bullet
+                            resume = parse_resume_file()
+                            if resume:
+                                for exp in resume.get('experience', []):
+                                    if exp['id'] == 'freelance-developer':
+                                        exp['bullets'].append({
+                                            "general": project_data['resumeBullet']['general'],
+                                            "fullstack": project_data['resumeBullet'].get('fullstack', ''),
+                                            "ai": project_data['resumeBullet'].get('ai', ''),
+                                            "creative": project_data['resumeBullet'].get('creative', '')
+                                        })
+                                        for tag in project_data['tags']:
+                                            if tag not in exp['tags']:
+                                                exp['tags'].append(tag)
+                                
+                                resume['lastSynced'] = {
+                                    "timestamp": datetime.now().isoformat(),
+                                    "status": "success",
+                                    "summary": f"Synchronized new project: {new_project['title']}."
+                                }
+                                write_resume_file(resume)
+                                st.session_state.resume = resume
+                                
+                            st.success(f"🎉 Saved entry. Added to projects.ts and experience bullets in resume.ts!")
+                    else:
+                        status.update(label="API Sync call failed", state="error")
+
+# ──────────────────────────────────────────
+# TAB 3: SYNC CERTIFICATES
+# ──────────────────────────────────────────
+with tab_cert:
+    with st.container(border=True):
+        st.markdown('<div class="section-header">🎓 Scan & Sync Certificates</div>', unsafe_allow_html=True)
+        st.write("Analyze raw credentials using Gemini Multimodal OCR and add them directly to your verified badges.")
+
+        raw_cert_dir = "src/data/certificates/raw"
+        public_cert_dir = "public/certificates"
+        os.makedirs(raw_cert_dir, exist_ok=True)
+        os.makedirs(public_cert_dir, exist_ok=True)
+
+        raw_certs = [f for f in os.listdir(raw_cert_dir) if get_mime_type(f) is not None]
+
+        st.markdown(f"**Raw folder location:** `src/data/certificates/raw/`")
+        st.markdown(f"📁 Currently **{len(raw_certs)}** raw certificate file(s) waiting in folder.")
+
+        if raw_certs:
+            for c in raw_certs:
+                st.code(f"• {c}", language="text")
+
+            dry_run_cert = st.checkbox("Dry-Run Mode (Examine parsing without saving)", value=True, key="dry_cert")
+
+            if st.button("Sync Certificates Now", type="primary"):
+                current_certs = parse_certificates_file()
+                sync_logs = []
+                updated = False
+                
+                with st.status("Processing certificate uploads...", expanded=True) as status:
+                    for cert_file in raw_certs:
+                        filepath = os.path.join(raw_cert_dir, cert_file)
+                        mime = get_mime_type(cert_file)
+                        
+                        st.write(f"🔍 OCR Parsing certificate: `{cert_file}`")
+                        
+                        with open(filepath, "rb") as f:
+                            b64_data = base64.b64encode(f.read()).decode("utf-8")
+                            
+                        prompt = """
+                        Analyze this certification document. Extract the following information and output it strictly in the following JSON format:
+                        {
+                          "title": "Full name of the certificate/course",
+                          "issuer": "Issuing organization or institution",
+                          "date": "Date of issue in YYYY-MM-DD format (estimate year/month if exact day isn't present, e.g. 2026-06-01)",
+                          "credentialId": "Credential verification ID if present, otherwise empty string",
+                          "verifyUrl": "Verification link/URL if present, otherwise empty string",
+                          "tags": ["3 to 5 lowercase programming languages, tools or framework tags related to this certificate"]
+                        }
+                        Do not return any conversational text, markdown packaging, or backticks. Only return the raw JSON object.
+                        """
+                        
+                        cert_data = call_gemini(prompt, file_data=b64_data, file_mime=mime)
+                        if cert_data:
+                            st.write(f"✅ Extracted: **{cert_data['title']}** from *{cert_data['issuer']}*")
+                            
+                            safe_title = re.sub(r'[^a-zA-Z0-9]', '-', cert_data['title'].lower())
+                            cert_id = f"{safe_title}-{datetime.now().strftime('%M%S')}"
+                            
+                            dest_filename = f"{cert_id}{os.path.splitext(cert_file)[1]}"
+                            dest_filepath = os.path.join(public_cert_dir, dest_filename)
+                            
+                            if not dry_run_cert:
+                                # Move from raw to public
+                                shutil.move(filepath, dest_filepath)
+                                
+                                verify_url = cert_data.get("verifyUrl", "").strip()
+                                if verify_url:
+                                    if not verify_url.startswith(("http://", "https://")):
+                                        verify_url = "https://" + verify_url
+                                    
+                                    # Convert Udemy short link to direct verification URL to avoid redirect 404s
+                                    if "ude.my/" in verify_url:
+                                        uc_match = re.search(r'(UC-[a-zA-Z0-9-]+)', verify_url)
+                                        if uc_match:
+                                            verify_url = f"https://www.udemy.com/certificate/{uc_match.group(1)}/"
+
+                                new_cert = {
+                                    "id": cert_id,
+                                    "title": cert_data["title"],
+                                    "issuer": cert_data["issuer"],
+                                    "date": cert_data["date"],
+                                    "credentialId": cert_data.get("credentialId"),
+                                    "verifyUrl": verify_url,
+                                    "image": f"/certificates/{dest_filename}",
+                                    "tags": cert_data.get("tags", [])
+                                }
+                                
+                                current_certs.append(new_cert)
+                                updated = True
+                                
+                            sync_logs.append(f"Parsed certificate: {cert_data['title']}")
+                        else:
+                            st.error(f"❌ Failed to parse certificate '{cert_file}'")
+                    
+                    if updated:
+                        status.update(label="All raw files processed!", state="complete")
+                        write_certificates_file(current_certs)
+                        st.session_state.certificates = current_certs
+                        
+                        # Update resume log
+                        resume = parse_resume_file()
+                        if resume and sync_logs:
+                            resume['lastSynced'] = {
+                                "timestamp": datetime.now().isoformat(),
+                                "status": "success",
+                                "summary": " & ".join(sync_logs)
+                            }
+                            write_resume_file(resume)
+                            st.session_state.resume = resume
+                            
+                        st.success("🎉 Certificates added to certificates.ts and moved to assets!")
+                        st.rerun()
+                    else:
+                        status.update(label="Scan completed", state="complete")
+        else:
+            st.info("No raw certificate files found. Drop PDFs or image files into `src/data/certificates/raw/` to parse them.")
+
+    # 📋 Manage Active Certificates Section
+    st.markdown('<div class="section-header" style="margin-top: 2rem;">📋 Manage Active Certificates</div>', unsafe_allow_html=True)
+    
+    current_certs = st.session_state.certificates
+    if not current_certs:
+        st.info("No active certificates found in certificates.ts.")
+    else:
+        st.write(f"Currently showing **{len(current_certs)}** active certificate(s):")
+        for idx, cert in enumerate(current_certs):
+            cert_id = cert.get("id", f"cert_{idx}")
+            with st.container(border=True):
+                col1, col2 = st.columns([1, 4])
+                with col1:
+                    img_path = cert.get("image", "")
+                    local_img_path = os.path.join("public", img_path.lstrip("/")) if img_path else ""
+                    if local_img_path and os.path.exists(local_img_path):
+                        st.image(local_img_path, use_container_width=True)
+                    else:
+                        st.markdown("🖼️ *No Image*")
+                with col2:
+                    st.markdown(f"### {cert.get('title', 'Untitled Certificate')}")
+                    st.markdown(f"**Issuer:** {cert.get('issuer', 'Unknown')} | **Date:** {cert.get('date', 'N/A')}")
+                    if cert.get("credentialId"):
+                        st.markdown(f"**Credential ID:** `{cert.get('credentialId')}`")
+                    if cert.get("verifyUrl"):
+                        st.markdown(f"[Verify Link]({cert.get('verifyUrl')})")
+                    
+                    # Tags list
+                    tags = cert.get("tags", [])
+                    if tags:
+                        st.markdown(" ".join([f"`#{t}`" for t in tags]))
+                        
+                    # Remove button
+                    if st.button(f"🗑️ Remove Certificate", key=f"del_cert_{cert_id}", type="secondary"):
+                        # Removal logic
+                        # 1. Delete image
+                        if img_path:
+                            target_img = os.path.join("public", img_path.lstrip("/"))
+                            if os.path.exists(target_img):
+                                try:
+                                    os.remove(target_img)
+                                    st.toast(f"Deleted image file: `{target_img}`")
+                                except Exception as e:
+                                    st.error(f"Failed to delete image: {e}")
+                        
+                        # 2. Filter list
+                        updated_certs = [c for c in current_certs if c.get("id") != cert_id]
+                        
+                        # 3. Write file
+                        write_certificates_file(updated_certs)
+                        st.session_state.certificates = updated_certs
+                        
+                        # 4. Update resume log
+                        resume = parse_resume_file()
+                        if resume:
+                            resume['lastSynced'] = {
+                                "timestamp": datetime.now().isoformat(),
+                                "status": "success",
+                                "summary": f"Removed certificate: {cert.get('title')}"
+                            }
+                            write_resume_file(resume)
+                            st.session_state.resume = resume
+                            
+                        st.success(f"🎉 Successfully removed certificate: **{cert.get('title')}**")
+                        st.rerun()
