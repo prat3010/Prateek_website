@@ -855,11 +855,15 @@ def slugify(text):
 # Custom CSS for Premium UI Styling
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Lora:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:wght@400;700&display=swap');
     
     /* Font overrides */
     html, body, [class*="css"], .stWidgetFormContainer {
-        font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
+        font-family: 'Lora', Georgia, serif !important;
+    }
+    
+    h1, h2, h3, h4, h5, h6, .section-header {
+        font-family: 'Playfair Display', 'Times New Roman', serif !important;
     }
     
     code, pre {
@@ -868,182 +872,205 @@ st.markdown("""
 
     /* Core Page Styling */
     .stApp {
-        background-color: #0b0f19 !important;
-        color: #c9d1d9 !important;
+        background-color: #F7F2E8 !important;
+        color: #2B2B36 !important;
     }
     
     /* Section Headers */
     .section-header {
-        font-size: 1.5rem;
-        font-weight: 800;
-        color: #ffffff;
+        font-size: 1.6rem;
+        font-weight: 900;
+        color: #2B2B36;
         margin-top: 0.5rem;
         margin-bottom: 1.2rem;
-        border-bottom: 2px solid #00E676;
+        border-bottom: 3px solid #2B2B36;
         padding-bottom: 5px;
         display: inline-block;
+        letter-spacing: 0.5px;
     }
 
     /* Target bordered containers in Streamlit */
     div[data-testid="stVerticalBlockBorder"] {
-        background-color: #111827 !important;
-        border: 2px solid #1f2937 !important;
-        border-radius: 12px !important;
+        background-color: #FAF9F6 !important;
+        border: 3px solid #2B2B36 !important;
+        border-radius: 8px !important;
         padding: 24px !important;
         margin-bottom: 24px !important;
-        box-shadow: 4px 4px 0px 0px #000000 !important;
+        box-shadow: 4px 4px 0px 0px #2B2B36 !important;
         transition: all 0.2s ease !important;
     }
     div[data-testid="stVerticalBlockBorder"]:hover {
-        border-color: #374151 !important;
-        box-shadow: 6px 6px 0px 0px #00E676 !important;
+        border-color: #2B2B36 !important;
+        box-shadow: 6px 6px 0px 0px #E28E66 !important;
     }
 
     /* Target expanders */
     details[data-testid="stExpander"] {
-        background-color: #1f2937 !important;
-        border: 2px solid #374151 !important;
-        border-radius: 8px !important;
+        background-color: #FAF9F6 !important;
+        border: 2.5px solid #2B2B36 !important;
+        border-radius: 6px !important;
         margin-bottom: 12px !important;
-        box-shadow: 2px 2px 0px 0px #000000 !important;
+        box-shadow: 3px 3px 0px 0px #2B2B36 !important;
         transition: all 0.2s ease !important;
     }
     details[data-testid="stExpander"]:hover {
-        border-color: #00E676 !important;
-        box-shadow: 3px 3px 0px 0px #00E676 !important;
+        border-color: #2B2B36 !important;
+        box-shadow: 4px 4px 0px 0px #5A8EB6 !important;
     }
     summary[data-testid="stExpanderSummary"] {
         font-weight: 700 !important;
-        color: #ffffff !important;
+        color: #2B2B36 !important;
     }
 
     /* Buttons styling */
     button[data-testid="baseButton-primary"] {
-        background-color: #00E676 !important;
-        color: #000000 !important;
+        background-color: #E28E66 !important; /* Apricot Orange */
+        color: #FAF9F6 !important;
         font-weight: 800 !important;
         text-transform: uppercase !important;
         letter-spacing: 0.5px !important;
-        border: 2px solid #000000 !important;
-        border-radius: 6px !important;
-        box-shadow: 3px 3px 0px 0px #000000 !important;
+        border: 2.5px solid #2B2B36 !important;
+        border-radius: 4px !important;
+        box-shadow: 3px 3px 0px 0px #2B2B36 !important;
         transition: all 0.1s ease !important;
         padding: 0.5rem 1.5rem !important;
     }
     button[data-testid="baseButton-primary"]:hover {
-        background-color: #05FF84 !important;
-        color: #000000 !important;
-        transform: translate(-1px, -1px) !important;
-        box-shadow: 4px 4px 0px 0px #000000 !important;
+        background-color: #f7a072 !important;
+        color: #FAF9F6 !important;
+        transform: translate(-1.5px, -1.5px) !important;
+        box-shadow: 4.5px 4.5px 0px 0px #2B2B36 !important;
     }
     button[data-testid="baseButton-primary"]:active {
         transform: translate(1px, 1px) !important;
-        box-shadow: 1px 1px 0px 0px #000000 !important;
+        box-shadow: 1px 1px 0px 0px #2B2B36 !important;
     }
 
     button[data-testid="baseButton-secondary"] {
-        background-color: #1f2937 !important;
-        color: #e5e7eb !important;
+        background-color: #FAF9F6 !important;
+        color: #2B2B36 !important;
         font-weight: 700 !important;
-        border: 2px solid #374151 !important;
-        border-radius: 6px !important;
-        box-shadow: 2px 2px 0px 0px #000000 !important;
+        border: 2.5px solid #2B2B36 !important;
+        border-radius: 4px !important;
+        box-shadow: 2px 2px 0px 0px #2B2B36 !important;
         transition: all 0.1s ease !important;
     }
     button[data-testid="baseButton-secondary"]:hover {
-        border-color: #2979FF !important;
-        color: #2979FF !important;
-        transform: translate(-1px, -1px) !important;
-        box-shadow: 3px 3px 0px 0px #2979FF !important;
+        border-color: #2B2B36 !important;
+        color: #5A8EB6 !important; /* Slate Blue */
+        transform: translate(-1.5px, -1.5px) !important;
+        box-shadow: 3.5px 3.5px 0px 0px #2B2B36 !important;
     }
     button[data-testid="baseButton-secondary"]:active {
         transform: translate(1px, 1px) !important;
-        box-shadow: 1px 1px 0px 0px #000000 !important;
+        box-shadow: 1px 1px 0px 0px #2B2B36 !important;
     }
 
     /* Danger hover styles for delete buttons */
-    button[id^="del_exp_"]:hover, button[id^="del_edu_"]:hover, button[id^="rem_bul_"]:hover {
-        border-color: #FF1744 !important;
-        color: #FF1744 !important;
-        box-shadow: 3px 3px 0px 0px #FF1744 !important;
+    button[id^="del_exp_"]:hover, button[id^="del_edu_"]:hover, button[id^="rem_bul_"]:hover, button[id^="delete_"]:hover {
+        border-color: #D95D67 !important;
+        color: #D95D67 !important;
+        box-shadow: 3.5px 3.5px 0px 0px #D95D67 !important;
     }
 
     /* Inputs */
     .stTextInput>div>div>input, .stTextArea>div>div>textarea, .stSelectbox>div>div>div {
-        background-color: #111827 !important;
-        color: #ffffff !important;
-        border: 2px solid #374151 !important;
-        border-radius: 8px !important;
+        background-color: #FAF9F6 !important;
+        color: #2B2B36 !important;
+        border: 2.5px solid #2B2B36 !important;
+        border-radius: 6px !important;
         transition: border-color 0.2s !important;
     }
     .stTextInput>div>div>input:focus, .stTextArea>div>div>textarea:focus {
-        border-color: #00E676 !important;
-        box-shadow: 0 0 0 1px #00E676 !important;
+        border-color: #5A8EB6 !important;
+        box-shadow: 0 0 0 1px #5A8EB6 !important;
+    }
+    
+    /* Labels and small text */
+    label[data-testid="stWidgetLabel"] p {
+        color: #2B2B36 !important;
+        font-weight: 700 !important;
     }
 
     /* Sidebar Styling */
     section[data-testid="stSidebar"] {
-        background-color: #090d16 !important;
-        border-right: 2px solid #1f2937 !important;
+        background-color: #2B2B36 !important; /* Charcoal dark theme for sidebar */
+        border-right: 3px solid #2B2B36 !important;
     }
-    section[data-testid="stSidebar"] h1, section[data-testid="stSidebar"] h2 {
+    section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] li, section[data-testid="stSidebar"] span {
+        color: #e0e0e3 !important;
+    }
+    section[data-testid="stSidebar"] h1, section[data-testid="stSidebar"] h2, section[data-testid="stSidebar"] h3 {
         color: #ffffff !important;
+        font-family: 'Playfair Display', serif !important;
         font-weight: 800 !important;
+    }
+    section[data-testid="stSidebar"] .stButton>button {
+        background-color: #FAF9F6 !important;
+        color: #2B2B36 !important;
+        border: 2px solid #FAF9F6 !important;
+    }
+    section[data-testid="stSidebar"] .stButton>button:hover {
+        background-color: #E28E66 !important;
+        color: #FAF9F6 !important;
+        border-color: #E28E66 !important;
     }
 
     /* Tabs styling */
     .stTabs [data-baseweb="tab-list"] {
         gap: 12px !important;
-        background-color: #111827 !important;
+        background-color: #2B2B36 !important;
         padding: 8px !important;
-        border-radius: 12px !important;
-        border: 2px solid #1f2937 !important;
+        border-radius: 8px !important;
+        border: 3px solid #2B2B36 !important;
         margin-bottom: 24px !important;
     }
     .stTabs [data-baseweb="tab"] {
         height: 44px !important;
-        border-radius: 8px !important;
+        border-radius: 4px !important;
         background-color: transparent !important;
-        color: #9ca3af !important;
+        color: #a0a0ab !important;
+        font-family: 'Playfair Display', serif !important;
         font-weight: 700 !important;
         padding: 0px 16px !important;
         transition: all 0.2s !important;
     }
     .stTabs [data-baseweb="tab"]:hover {
         color: #ffffff !important;
-        background-color: #1f2937 !important;
+        background-color: #3e3e4d !important;
     }
     .stTabs [aria-selected="true"] {
-        background-color: #00E676 !important;
-        color: #000000 !important;
-        box-shadow: 2px 2px 0px 0px #000000 !important;
+        background-color: #E28E66 !important;
+        color: #FAF9F6 !important;
+        box-shadow: 2px 2px 0px 0px #2B2B36 !important;
     }
 
     /* Scrollbar override */
     ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
+        width: 10px;
+        height: 10px;
     }
     ::-webkit-scrollbar-track {
-        background: #0b0f19;
+        background: #F7F2E8;
     }
     ::-webkit-scrollbar-thumb {
-        background: #1f2937;
-        border-radius: 4px;
+        background: #2B2B36;
+        border-radius: 5px;
+        border: 2px solid #F7F2E8;
     }
     ::-webkit-scrollbar-thumb:hover {
-        background: #00E676;
+        background: #E28E66;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # Sidebar
 st.sidebar.markdown("""
-<div style="background: linear-gradient(135deg, #1f2937, #111827); border: 2px solid #5A8EB6; border-radius: 12px; padding: 20px; margin-bottom: 25px; text-align: center; box-shadow: 4px 4px 0px 0px #D95D67;">
-    <div style="font-size: 2.8rem; margin-bottom: 8px; filter: drop-shadow(0 0 8px rgba(90, 142, 182, 0.4));">⚡</div>
-    <h3 style="color: #ffffff; margin: 0; font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.3rem; letter-spacing: 0.5px; text-transform: uppercase;">PRATEEQ SYNC</h3>
+<div style="background-color: #FAF9F6; border: 3px solid #2B2B36; border-radius: 8px; padding: 20px; margin-bottom: 25px; text-align: center; box-shadow: 4px 4px 0px 0px #D95D67;">
+    <div style="font-size: 2.5rem; margin-bottom: 8px;">⚡</div>
+    <h3 style="color: #2B2B36; margin: 0; font-family: 'Playfair Display', serif; font-weight: 900; font-size: 1.3rem; letter-spacing: 0.5px; text-transform: uppercase;">PRATEEQ SYNC</h3>
     <span style="display: block; color: #5A8EB6; font-size: 0.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; margin-top: 4px;">ORCHESTRATION CLIENT</span>
-    <code style="display: inline-block; background-color: #1f2937; color: #FAF9F6; border: 1px solid #374151; border-radius: 4px; padding: 2px 8px; font-size: 0.75rem; font-weight: bold; margin-top: 10px; font-family: 'JetBrains Mono', monospace;">v1.3.0 // ACTIVE</code>
+    <code style="display: inline-block; background-color: #2B2B36; color: #FAF9F6; border: 1.5px solid #2B2B36; border-radius: 4px; padding: 2px 8px; font-size: 0.7rem; font-weight: bold; margin-top: 10px; font-family: 'JetBrains Mono', monospace;">v1.3.0 // ACTIVE</code>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1126,9 +1153,9 @@ if 'pending_skills' in st.session_state and st.session_state.pending_skills:
 
 # Custom Title Header
 st.markdown("""
-<div style="text-align: center; padding: 30px 20px; margin-bottom: 35px; background: linear-gradient(135deg, #111827, #0b0f19); border-radius: 16px; box-shadow: 6px 6px 0px 0px #F4DC95; border: 2px solid #374151;">
-    <h1 style="color: #ffffff; font-family: 'Outfit', sans-serif; font-weight: 900; margin: 0; font-size: 2.5rem; letter-spacing: -0.5px; text-transform: uppercase; text-shadow: 2px 2px 0px rgba(0,0,0,0.5);">🎨 PRATEEQ CONTROL PORTAL</h1>
-    <p style="color: #a0aab8; margin: 8px 0 0 0; font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 0.9rem; letter-spacing: 0.2px;">SYSTEM_STATUS: ONLINE  |  LOCAL RESUME & PORTFOLIO ENGINE</p>
+<div style="text-align: center; padding: 30px 20px; margin-bottom: 35px; background-color: #2B2B36; border-radius: 8px; box-shadow: 6px 6px 0px 0px #E28E66; border: 3px solid #2B2B36;">
+    <h1 style="color: #ffffff; font-family: 'Playfair Display', serif; font-weight: 900; margin: 0; font-size: 2.5rem; letter-spacing: 0.5px; text-transform: uppercase;">🎨 PRATEEQ CONTROL PORTAL</h1>
+    <p style="color: #FAF9F6; margin: 8px 0 0 0; font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 0.85rem; letter-spacing: 0.2px; text-transform: uppercase; opacity: 0.90;">SYSTEM_STATUS: ONLINE  |  LOCAL RESUME & PORTFOLIO ENGINE</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1755,4 +1782,66 @@ coverImage: "/images/blog/default.jpg"
                 
             except Exception as e:
                 st.error(f"Failed to publish post: {e}")
+
+    # ──────────────────────────────────────────
+    # Existing / Published Blogs List
+    # ──────────────────────────────────────────
+    st.markdown("---")
+    st.subheader("📚 Already Published Logs")
+    
+    posts_dir = os.path.join("src", "content", "posts")
+    if os.path.exists(posts_dir):
+        post_files = [f for f in os.listdir(posts_dir) if f.endswith(".md")]
+        
+        if not post_files:
+            st.info("No blog posts found on the website.")
+        else:
+            posts_data = []
+            for file_name in post_files:
+                file_path = os.path.join(posts_dir, file_name)
+                title = file_name
+                date = ""
+                try:
+                    with open(file_path, "r", encoding="utf-8") as f:
+                        content = f.read()
+                    if content.startswith("---"):
+                        parts = content.split("---", 2)
+                        if len(parts) >= 3:
+                            frontmatter = parts[1]
+                            for line in frontmatter.split("\n"):
+                                if line.startswith("title:"):
+                                    title = line.split("title:", 1)[1].strip().strip('"').strip("'")
+                                elif line.startswith("date:"):
+                                    date = line.split("date:", 1)[1].strip().strip('"').strip("'")
+                except Exception:
+                    pass
+                
+                posts_data.append({
+                    "file_name": file_name,
+                    "file_path": file_path,
+                    "title": title,
+                    "date": date
+                })
+            
+            # Sort by date (newest first)
+            posts_data.sort(key=lambda x: x["date"] or "0000-00-00", reverse=True)
+            
+            for post in posts_data:
+                with st.container(border=True):
+                    col_info, col_btn = st.columns([5, 1.2])
+                    with col_info:
+                        st.markdown(f"**{post['title']}**")
+                        st.caption(f"📅 Date: {post['date'] if post['date'] else 'No Date'} | 📁 File: `{post['file_name']}`")
+                    with col_btn:
+                        btn_key = f"delete_{post['file_name']}"
+                        if st.button("🗑️ Remove", key=btn_key, type="secondary", use_container_width=True):
+                            try:
+                                os.remove(post['file_path'])
+                                st.success(f"Deleted `{post['file_name']}` successfully!")
+                                st.rerun()
+                            except Exception as e:
+                                st.error(f"Error deleting file: {e}")
+    else:
+        st.info("No blog posts directory found.")
+
 
