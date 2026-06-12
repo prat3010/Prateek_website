@@ -585,37 +585,23 @@
     padding: 0 !important;
   }
 
-  .resumePaper::after {
-    display: none !important;
-    content: none !important;
-  }
-
-  /* Monochrome print stylesheet forcing legible dark colors */
   .resumeContent {
     padding: 0 !important;
     margin: 0 !important;
-    font-size: 10.5pt !important;
-    line-height: 1.35 !important;
+    font-size: 11pt !important;
+    line-height: 1.4 !important;
     background-color: #FFFFFF !important;
     color: #000000 !important;
   }
 
-  /* Force all child texts to print black (prevents white-on-white text in Noir Mode) */
-  .resumeContent * {
-    color: #000000 !important;
-    text-shadow: none !important;
-  }
-
   .name {
-    font-size: 22pt !important;
-    font-weight: 800 !important;
-    margin: 0 0 2pt 0 !important;
+    font-size: 24pt !important;
+    color: #000000 !important;
   }
 
   .title {
-    font-size: 10pt !important;
-    color: #444444 !important;
-    text-transform: uppercase !important;
+    font-size: 11pt !important;
+    color: #555555 !important;
   }
 
   .contactInfo {
@@ -625,49 +611,34 @@
   }
 
   .divider {
-    border-top: 1px solid #666666 !important;
-    margin: 8pt 0 !important;
+    border-top: 1px solid #777777 !important;
+    margin: 10pt 0 !important;
   }
 
   .blockTitle {
     font-size: 10pt !important;
-    border-bottom: 1px dashed #666666 !important;
-    margin-bottom: 6pt !important;
-    padding-bottom: 2pt !important;
+    border-bottom: 1px solid #777777 !important;
+    margin-bottom: 8pt !important;
+    color: #000000 !important;
   }
 
   .blockTitle svg {
     display: none !important;
   }
 
+  .bulletItem {
+    font-size: 10pt !important;
+    margin-bottom: 4pt !important;
+  }
+
   .timelineItem {
     page-break-inside: avoid;
   }
 
-  .roleTitle {
-    font-size: 11pt !important;
-    font-weight: 700 !important;
-  }
-
-  .companyName {
-    font-size: 9pt !important;
-    font-weight: 700 !important;
-  }
-
-  .period,
-  .location {
-    font-size: 8.5pt !important;
-  }
-
-  .bulletItem {
-    font-size: 9.5pt !important;
-    margin-bottom: 3pt !important;
-  }
-
   .skillTag {
     background: none !important;
-    border: 1px solid #777777 !important;
-    font-size: 8.5pt !important;
-    padding: 1px 6px !important;
+    border: 1px solid #555555 !important;
+    color: #000000 !important;
+    font-size: 9pt !important;
   }
 }

@@ -1043,47 +1043,22 @@ table {
 
 /* ── Print Styles ──────────────────────────────────────────── */
 @media print {
-  /* Hide all background effects, widgets, nav, and footer */
-  nav,
-  footer,
-  aside,
-  button,
-  .no-print,
-  [class*="NoirSkyline_"],
-  [class*="CursorTrail_"],
-  [class*="ZenToggle_"],
-  [class*="ThemeToggle_"] {
-    display: none !important;
-  }
-
-  /* Hide all portfolio sections except the resume wrapper */
-  #home,
-  main > div:not(:has(#resume)) {
-    display: none !important;
-  }
-
   body {
-    background: white !important;
-    color: black !important;
+    background: white;
+    color: black;
   }
 
   .speed-lines::before,
   .speed-lines-diagonal::before,
   .speed-lines-radial::before {
-    display: none !important;
+    display: none;
   }
 
   .comic-shadow,
   .comic-shadow-sm,
   .comic-shadow-lg,
   .comic-shadow-xl {
-    box-shadow: none !important;
-  }
-
-  /* Page margins and layout dimensions */
-  @page {
-    size: A4 portrait;
-    margin: 15mm 15mm 15mm 15mm;
+    box-shadow: none;
   }
 }
 
