@@ -27,8 +27,10 @@ export default function Resume() {
   const { isNoir } = useTheme();
   const [activePersona, setActivePersona] = useState<Persona>('general');
 
-  const handlePrint = () => {
-    window.print();
+  const handleDownloadPDF = () => {
+    import('@/utils/pdfGenerator').then(({ generateResumePDF }) => {
+      generateResumePDF(activePersona);
+    });
   };
 
   // Get active summary based on persona
@@ -76,7 +78,7 @@ export default function Resume() {
           
           <div className={styles.actions}>
             <button 
-              onClick={handlePrint} 
+              onClick={handleDownloadPDF} 
               className={styles.printBtn}
               aria-label="Download ATS Resume as PDF"
             >
