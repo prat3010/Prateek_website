@@ -58,16 +58,21 @@ export default function Navbar({ items, className }: NavbarProps) {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          const href = `#${entry.target.id}`;
-          setActiveSection(href);
+          const matchingItem = navItems.find((item) => item.href.endsWith(`#${entry.target.id}`));
+          if (matchingItem) {
+            setActiveSection(matchingItem.href);
+          }
         }
       });
     }, observerOptions);
 
     navItems.forEach((item) => {
-      const id = item.href.replace('#', '');
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
+      const hashIndex = item.href.indexOf('#');
+      if (hashIndex !== -1) {
+        const id = item.href.substring(hashIndex + 1);
+        const el = document.getElementById(id);
+        if (el) observer.observe(el);
+      }
     });
 
     return () => observer.disconnect();
