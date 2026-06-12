@@ -20,13 +20,13 @@ export interface NavbarProps {
 }
 
 const defaultItems: NavItem[] = [
-  { label: 'Home', href: '#home' },
-  { label: 'About', href: '#about' },
-  { label: 'Skills', href: '#skills' },
-  { label: 'Projects', href: '#projects' },
-  { label: 'Resume', href: '#resume' },
-  { label: 'Playground', href: '#playground' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Home', href: '/#home' },
+  { label: 'About', href: '/#about' },
+  { label: 'Skills', href: '/#skills' },
+  { label: 'Projects', href: '/#projects' },
+  { label: 'Resume', href: '/#resume' },
+  { label: 'Playground', href: '/#playground' },
+  { label: 'Contact', href: '/#contact' },
 ];
 
 export default function Navbar({ items, className }: NavbarProps) {
@@ -97,9 +97,16 @@ export default function Navbar({ items, className }: NavbarProps) {
   /* ---------- Smooth scroll handler ---------- */
   const handleNavClick = useCallback(
     (e: MouseEvent<HTMLAnchorElement>, href: string) => {
+      // If we are not on the homepage, let the default href navigation occur (e.g. go to /#about)
+      if (typeof window !== 'undefined' && window.location.pathname !== '/') {
+        setMobileOpen(false);
+        return;
+      }
+
       e.preventDefault();
+      const anchorId = href.substring(href.indexOf('#')); // Extracts '#about' from '/#about'
       if (lenis) {
-        lenis.scrollTo(href, { duration: 1.5, offset: NAVBAR_SCROLL_OFFSET });
+        lenis.scrollTo(anchorId, { duration: 1.5, offset: NAVBAR_SCROLL_OFFSET });
       }
       setActiveSection(href);
       setMobileOpen(false);

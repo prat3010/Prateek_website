@@ -842,6 +842,12 @@ def get_mime_type(filename):
         return "image/jpeg"
     return None
 
+def slugify(text):
+    text = text.lower()
+    text = re.sub(r'[^\w\s-]', '', text)
+    text = re.sub(r'[\s_-]+', '-', text)
+    return text.strip('-')
+
 # ==========================================
 # Streamlit Interface Layout
 # ==========================================
@@ -1138,10 +1144,11 @@ if 'pending_skills' not in st.session_state:
 
 
 # Set up tabs
-tab_edit, tab_project, tab_cert = st.tabs([
+tab_edit, tab_project, tab_cert, tab_blog = st.tabs([
     "✍️ Edit Resume Manually", 
     "🚀 Sync Projects", 
-    "🎓 Sync Certificates"
+    "🎓 Sync Certificates",
+    "✍️ Blog Editor"
 ])
 
 # ──────────────────────────────────────────
@@ -1647,3 +1654,105 @@ with tab_cert:
                             
                         st.success(f"🎉 Successfully removed certificate: **{cert.get('title')}**")
                         st.rerun()
+
+# ──────────────────────────────────────────
+# TAB 4: BLOG EDITOR
+# ──────────────────────────────────────────
+with tab_blog:
+    st.markdown('<div class="section-header">✍️ AI Blog Writer & Publisher</div>', unsafe_allow_html=True)
+    st.write("Draft professional developer logs, tutorials, and post updates using the Gemini co-pilot, and publish them directly to your website.")
+    
+    # AI Assist inputs
+    st.subheader("🤖 AI Ghostwriter Co-Pilot")
+    raw_notes = st.text_area("1. Paste your raw notes, debug outputs, or code snippets here:", height=150, placeholder="E.g. Fixed resume PDF download using jsPDF to create a vector layout so text remains selectable and ATS-compliant...")
+    
+    tone = st.selectbox("Choose Tone:", ["Professional & Technical", "Conversational & Casual", "Tutorial / How-To Style"])
+    
+    if st.button("🪄 Draft Blog Post with AI", use_container_width=True):
+        if not raw_notes:
+            st.error("Please add some raw notes or code first!")
+        else:
+            with st.spinner("🤖 Translating notes into a professional article..."):
+                prompt = f"""
+                You are a senior full-stack developer and technical writer. 
+                Your task is to write a highly engaging, clear, and professional developer blog post based on these raw notes and code:
+                
+                [RAW NOTES / CODE]
+                {raw_notes}
+                
+                [TONE]
+                {tone}
+                
+                Generate and return strictly the following JSON structure:
+                {{
+                  "title": "A catchy, SEO-optimized title for the blog post (e.g. 'How to solve X with Y')",
+                  "excerpt": "A short, 1-2 sentence description summarizing the post's takeaways",
+                  "content": "The full body content of the blog post in standard Markdown format. Use clear headings (e.g. ##, ###), bullets, blockquotes, and code blocks for technical details. Focus on clarity, engineering details, and keep it direct. Avoid standard AI greeting fillers or concluding phrases like 'In conclusion'."
+                }}
+                Do not return any conversational text, markdown formatting wrappers outside the JSON, or backticks. Return only the raw JSON.
+                """
+                
+                res = call_gemini(prompt)
+                if res:
+                    st.session_state.blog_draft_title = res.get("title", "")
+                    st.session_state.blog_draft_excerpt = res.get("excerpt", "")
+                    st.session_state.blog_draft_content = res.get("content", "")
+                    st.success("✅ Draft generated! Review it below.")
+                    
+    # Form details (pre-filled from session state if available)
+    st.subheader("📝 Edit & Publish Post")
+    
+    draft_title = st.text_input("Title:", value=st.session_state.get("blog_draft_title", ""))
+    draft_excerpt = st.text_area("Excerpt / Summary:", value=st.session_state.get("blog_draft_excerpt", ""))
+    draft_tags = st.text_input("Tags (comma separated):", value="Next.js, Python, AI" if not st.session_state.get("blog_draft_content") else "")
+    draft_content = st.text_area("Markdown Body Content:", value=st.session_state.get("blog_draft_content", ""), height=350)
+    
+    if st.button("🚀 Publish Blog Post", use_container_width=True, type="primary"):
+        if not draft_title or not draft_content:
+            st.error("Title and Markdown content are required!")
+        else:
+            slug = slugify(draft_title)
+            tags_list = [t.strip() for t in draft_tags.split(",") if t.strip()]
+            
+            # Format frontmatter
+            file_content = f"""---
+title: "{draft_title}"
+date: "{datetime.now().strftime('%Y-%m-%d')}"
+excerpt: "{draft_excerpt}"
+tags: {json.dumps(tags_list)}
+coverImage: "/images/blog/default.jpg"
+---
+
+{draft_content}
+"""
+            # Write file
+            posts_dir = os.path.join("src", "content", "posts")
+            os.makedirs(posts_dir, exist_ok=True)
+            file_path = os.path.join(posts_dir, f"{slug}.md")
+            
+            try:
+                with open(file_path, "w", encoding="utf-8") as f:
+                    f.write(file_content)
+                
+                # Update resume sync log
+                resume = parse_resume_file()
+                if resume:
+                    resume['lastSynced'] = {
+                        "timestamp": datetime.now().isoformat(),
+                        "status": "success",
+                        "summary": f"Published blog post: {draft_title}"
+                    }
+                    write_resume_file(resume)
+                    st.session_state.resume = resume
+                
+                st.success(f"🎉 Successfully published blog post! File created at: `{file_path}`")
+                
+                # Clear session state
+                if "blog_draft_title" in st.session_state: del st.session_state.blog_draft_title
+                if "blog_draft_excerpt" in st.session_state: del st.session_state.blog_draft_excerpt
+                if "blog_draft_content" in st.session_state: del st.session_state.blog_draft_content
+                st.rerun()
+                
+            except Exception as e:
+                st.error(f"Failed to publish post: {e}")
+

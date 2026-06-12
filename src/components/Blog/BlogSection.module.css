@@ -1,0 +1,126 @@
+.blogSection {
+  padding: var(--space-4xl) 0;
+  background-color: var(--surface-secondary);
+  position: relative;
+  overflow: hidden;
+}
+
+.container {
+  max-width: var(--max-width-narrow);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-xl);
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.sectionTitle {
+  font-family: var(--font-headline);
+  font-size: var(--fs-section-title);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-headline);
+  line-height: var(--leading-tight);
+}
+
+.viewAllBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background-color: var(--pop-white);
+  color: var(--pop-black);
+  border: var(--border-thick);
+  border-radius: var(--border-radius-sm);
+  padding: var(--space-sm) var(--space-md);
+  font-family: var(--font-code);
+  font-weight: 700;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  box-shadow: var(--shadow-comic-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
+}
+
+.viewAllBtn:hover {
+  transform: translate(-1.5px, -1.5px);
+  box-shadow: var(--shadow-comic);
+  background-color: var(--pop-yellow);
+}
+
+.empty {
+  text-align: center;
+  padding: var(--space-2xl) var(--space-md);
+  background-color: var(--surface-primary);
+  border: var(--border-medium);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-comic-sm);
+  font-family: var(--font-body);
+  color: var(--color-text-muted);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-lg);
+}
+
+.cardLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.postCard {
+  height: 100%;
+  padding: var(--space-lg) !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cardMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-family: var(--font-code);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-sm);
+}
+
+.cardTitle {
+  font-family: var(--font-headline);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--pop-black);
+  margin: 0 0 var(--space-sm) 0;
+  line-height: var(--leading-tight);
+}
+
+.cardLink:hover .cardTitle {
+  color: var(--pop-blue);
+}
+
+.excerpt {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  line-height: var(--leading-relaxed);
+  margin: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+@media (max-width: 640px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
