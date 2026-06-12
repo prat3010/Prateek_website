@@ -339,7 +339,8 @@
 .ctaContainer {
   display: flex;
   align-items: center;
-  gap: 20px;
+  column-gap: 20px;
+  row-gap: 28px; /* Extra breathing room for the speech bubble tail when wrapped */
   flex-wrap: wrap;
 }
 

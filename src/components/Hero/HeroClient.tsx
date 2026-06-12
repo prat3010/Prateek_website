@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useLenis } from 'lenis/react';
@@ -19,11 +19,20 @@ interface HeroClientProps {
 
 function HeroClientContent({ taglines, isNoir }: HeroClientProps & { isNoir: boolean }) {
   const lenis = useLenis();
-  const tagline = useMemo(() => {
-    const list = isNoir ? taglines.noir : taglines.standard;
+  const list = isNoir ? taglines.noir : taglines.standard;
+
+  // Generate a stable default tagline for SSR / initial hydration
+  const defaultTagline = useMemo(() => {
     const hash = list.reduce((acc, t) => acc * 31 + t.length, 0);
     return list[Math.abs(hash) % list.length];
-  }, [isNoir, taglines]);
+  }, [list]);
+
+  const [tagline, setTagline] = useState(defaultTagline);
+
+  useEffect(() => {
+    const randomIndex = Math.floor(Math.random() * list.length);
+    setTagline(list[randomIndex]);
+  }, [list]);
 
   const { displayText, isDone } = useTypewriter({
     text: tagline,
