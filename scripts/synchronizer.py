@@ -1033,10 +1033,11 @@ st.markdown("""
 
 # Sidebar
 st.sidebar.markdown("""
-<div style="background-color: #111827; border: 2px solid #1f2937; border-radius: 10px; padding: 15px; margin-bottom: 20px; text-align: center; box-shadow: 3px 3px 0px 0px #00E676;">
-    <div style="font-size: 3rem; margin-bottom: 5px;">🤖</div>
-    <h3 style="color: #ffffff; margin: 0; font-weight: 800; font-size: 1.2rem;">Antigravity Sync</h3>
-    <code style="color: #00E676; font-size: 0.8rem; font-weight: bold;">v1.2.0 (Active)</code>
+<div style="background: linear-gradient(135deg, #1f2937, #111827); border: 2px solid #5A8EB6; border-radius: 12px; padding: 20px; margin-bottom: 25px; text-align: center; box-shadow: 4px 4px 0px 0px #D95D67;">
+    <div style="font-size: 2.8rem; margin-bottom: 8px; filter: drop-shadow(0 0 8px rgba(90, 142, 182, 0.4));">⚡</div>
+    <h3 style="color: #ffffff; margin: 0; font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.3rem; letter-spacing: 0.5px; text-transform: uppercase;">PRATEEQ SYNC</h3>
+    <span style="display: block; color: #5A8EB6; font-size: 0.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; margin-top: 4px;">ORCHESTRATION CLIENT</span>
+    <code style="display: inline-block; background-color: #1f2937; color: #FAF9F6; border: 1px solid #374151; border-radius: 4px; padding: 2px 8px; font-size: 0.75rem; font-weight: bold; margin-top: 10px; font-family: 'JetBrains Mono', monospace;">v1.3.0 // ACTIVE</code>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1119,9 +1120,9 @@ if 'pending_skills' in st.session_state and st.session_state.pending_skills:
 
 # Custom Title Header
 st.markdown("""
-<div style="text-align: center; padding: 24px 0; margin-bottom: 30px; border-bottom: 4px solid #00E676; background-color: #111827; border-radius: 12px; box-shadow: 4px 4px 0px 0px #000000; border: 2px solid #1f2937;">
-    <h1 style="color: #ffffff; font-weight: 900; margin: 0; font-size: 2.3rem; letter-spacing: -0.5px;">💼 PORTFOLIO MANAGER</h1>
-    <p style="color: #9ca3af; margin: 5px 0 0 0; font-weight: 500; font-size: 1rem;">Local Sync Agent & Profile Orchestration Console</p>
+<div style="text-align: center; padding: 30px 20px; margin-bottom: 35px; background: linear-gradient(135deg, #111827, #0b0f19); border-radius: 16px; box-shadow: 6px 6px 0px 0px #F4DC95; border: 2px solid #374151;">
+    <h1 style="color: #ffffff; font-family: 'Outfit', sans-serif; font-weight: 900; margin: 0; font-size: 2.5rem; letter-spacing: -0.5px; text-transform: uppercase; text-shadow: 2px 2px 0px rgba(0,0,0,0.5);">🎨 PRATEEQ CONTROL PORTAL</h1>
+    <p style="color: #a0aab8; margin: 8px 0 0 0; font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 0.9rem; letter-spacing: 0.2px;">SYSTEM_STATUS: ONLINE  |  LOCAL RESUME & PORTFOLIO ENGINE</p>
 </div>
 """, unsafe_allow_html=True)
 
