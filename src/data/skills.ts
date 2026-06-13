@@ -4,6 +4,10 @@ export interface Skill {
   description: string;
   category: 'orchestration' | 'logic' | 'product' | 'dynamic';
   color: string;
+  level?: string;
+  prereq?: string;
+  status?: 'legendary' | 'mastered' | 'quest';
+  projects?: { title: string; id: string }[];
 }
 
 export type SkillCategory = Skill['category'];
@@ -24,18 +28,19 @@ export const skillCategoryColors: Record<SkillCategory, string> = {
 
 export const skills: Skill[] = [
   {
-    name: "AI Agent Orchestration",
-    icon: "bot",
-    description: "Designing and running autonomous multi-agent networks to perform complex development tasks.",
-    category: "orchestration",
-    color: "#9C27B0",
-  },
-  {
-    name: "Structured Prompting",
-    icon: "brain",
-    description: "Writing prompt templates, optimizing context windows, and guiding LLM logical reasoning paths.",
-    category: "orchestration",
-    color: "#FFEB3B",
+    name: "Stack-on-Demand",
+    icon: "zap",
+    description: "Learning and deploying tools as needed. Shipped projects in Next.js, Flutter/Dart, Python, and SQL.",
+    category: "dynamic",
+    color: "#FF9100",
+    level: "Legendary",
+    status: "legendary",
+    projects: [
+      { title: "PaintMix AI", id: "paintmix-ai" },
+      { title: "Earth Evolution Simulator", id: "earth-evolution-simulator" },
+      { title: "ISS Live Location Tracker", id: "iss-tracker" },
+      { title: "MetaWipe", id: "metawipe" }
+    ],
   },
   {
     name: "AI Dev Workflows",
@@ -43,20 +48,32 @@ export const skills: Skill[] = [
     description: "Accelerating building speed using agentic composer environments like Cursor and visual prototypes.",
     category: "orchestration",
     color: "#00E5FF",
+    level: "Level Max",
+    status: "mastered",
+    projects: [
+      { title: "Earth Evolution Simulator", id: "earth-evolution-simulator" },
+      { title: "MetaWipe", id: "metawipe" }
+    ],
   },
   {
-    name: "Algorithmic Translation",
-    icon: "terminal",
-    description: "Translating complex mathematical models, coordinate spaces, and geometry into working logic.",
-    category: "logic",
-    color: "#3776AB",
+    name: "Structured Prompting",
+    icon: "brain",
+    description: "Writing prompt templates, optimizing context windows, and guiding LLM logical reasoning paths.",
+    category: "orchestration",
+    color: "#FFEB3B",
+    level: "Level Max",
+    prereq: "AI Dev Workflows",
+    status: "mastered",
   },
   {
-    name: "Database Engineering",
-    icon: "database",
-    description: "Structuring relational databases and offline data synchronization via SQLite and Supabase.",
-    category: "logic",
-    color: "#3ECF8E",
+    name: "AI Agent Orchestration",
+    icon: "bot",
+    description: "Designing and running autonomous multi-agent networks to perform complex development tasks.",
+    category: "orchestration",
+    color: "#9C27B0",
+    level: "Level Max",
+    prereq: "Structured Prompting",
+    status: "mastered",
   },
   {
     name: "API Architecture",
@@ -64,6 +81,40 @@ export const skills: Skill[] = [
     description: "Building light REST APIs in Python (Flask/FastAPI) and orchestrating data exchange loops.",
     category: "logic",
     color: "#059669",
+    level: "Level Max",
+    status: "mastered",
+    projects: [
+      { title: "ISS Live Location Tracker", id: "iss-tracker" },
+      { title: "Earth Evolution Simulator", id: "earth-evolution-simulator" }
+    ],
+  },
+  {
+    name: "Database Engineering",
+    icon: "database",
+    description: "Structuring relational databases and offline data synchronization via SQLite and Supabase.",
+    category: "logic",
+    color: "#3ECF8E",
+    level: "Level Max",
+    prereq: "API Architecture",
+    status: "mastered",
+    projects: [
+      { title: "PaintMix AI", id: "paintmix-ai" },
+      { title: "Earth Evolution Simulator", id: "earth-evolution-simulator" }
+    ],
+  },
+  {
+    name: "Algorithmic Translation",
+    icon: "terminal",
+    description: "Translating complex mathematical models, coordinate spaces, and geometry into working logic.",
+    category: "logic",
+    color: "#3776AB",
+    level: "Level Max",
+    prereq: "Database Engineering",
+    status: "mastered",
+    projects: [
+      { title: "PaintMix AI", id: "paintmix-ai" },
+      { title: "ISS Live Location Tracker", id: "iss-tracker" }
+    ],
   },
   {
     name: "Data Analysis",
@@ -71,6 +122,9 @@ export const skills: Skill[] = [
     description: "Analyzing raw datasets, Excel modeling, and structuring analytical insights.",
     category: "logic",
     color: "#00897B",
+    level: "Active Quest",
+    prereq: "Database Engineering",
+    status: "quest",
   },
   {
     name: "Product Strategy & UX",
@@ -78,6 +132,12 @@ export const skills: Skill[] = [
     description: "Defining user flows, functional requirements, and shipping MVPs focused on target problems.",
     category: "product",
     color: "#FF1744",
+    level: "Level Max",
+    status: "mastered",
+    projects: [
+      { title: "PaintMix AI", id: "paintmix-ai" },
+      { title: "MetaWipe", id: "metawipe" }
+    ],
   },
   {
     name: "Design to Code",
@@ -85,6 +145,12 @@ export const skills: Skill[] = [
     description: "Converting blueprints into clean, responsive web layouts, custom animations, and UI variables.",
     category: "product",
     color: "#FF4081",
+    level: "Level Max",
+    prereq: "Product Strategy & UX",
+    status: "mastered",
+    projects: [
+      { title: "Earth Evolution Simulator", id: "earth-evolution-simulator" }
+    ],
   },
   {
     name: "Privacy Sandboxing",
@@ -92,13 +158,12 @@ export const skills: Skill[] = [
     description: "Designing offline-first mobile apps that secure data by operating strictly on local device runtime.",
     category: "product",
     color: "#00E676",
-  },
-  {
-    name: "Stack-on-Demand",
-    icon: "zap",
-    description: "Learning and deploying tools as needed. Shipped projects in Next.js, Flutter/Dart, Python, and SQL.",
-    category: "dynamic",
-    color: "#FF9100",
+    level: "Level Max",
+    prereq: "Product Strategy & UX",
+    status: "mastered",
+    projects: [
+      { title: "MetaWipe", id: "metawipe" }
+    ],
   },
 ];
 

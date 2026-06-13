@@ -667,9 +667,19 @@ def write_skills_file(skills_list):
     name: "{esc(s.get('name', ''))}",
     icon: "{esc(s.get('icon', 'sparkles'))}",
     description: "{esc(s.get('description', ''))}",
-    category: "{esc(s.get('category', 'tools'))}",
-    color: "{esc(s.get('color', '#00E676'))}",
-  }},\n"""
+    category: "{esc(s.get('category', 'dynamic'))}",
+    color: "{esc(s.get('color', '#00E676'))}","""
+        if 'level' in s and s['level']:
+            skills_str += f"""\n    level: "{esc(s['level'])}","""
+        if 'prereq' in s and s['prereq']:
+            skills_str += f"""\n    prereq: "{esc(s['prereq'])}","""
+        if 'status' in s and s['status']:
+            skills_str += f"""\n    status: "{esc(s['status'])}","""
+        if 'projects' in s and s['projects']:
+            proj_list = s['projects']
+            proj_str = ", ".join([f'{{ title: "{esc(p.get("title", ""))}", id: "{esc(p.get("id", ""))}" }}' for p in proj_list])
+            skills_str += f"""\n    projects: [{proj_str}],"""
+        skills_str += "\n  },\n"
     skills_str += "]"
 
     lit_str = extract_literal(content, "export const skills: Skill[] =")

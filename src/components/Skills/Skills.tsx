@@ -3,7 +3,7 @@
 import React from 'react';
 import { type Skill } from '@/data/skills';
 import { useTheme } from '@/context/ThemeContext';
-import SkillCard from './SkillCard';
+import SkillTree from './SkillTree';
 import styles from './Skills.module.css';
 
 const MO_TEXT_STANDARD =
@@ -38,11 +38,7 @@ export default function Skills({ skills }: SkillsProps) {
           </p>
         </div>
 
-        <div className={styles.grid}>
-          {skills.map((skill, index) => (
-            <SkillCard key={skill.name} skill={skill} index={index} />
-          ))}
-        </div>
+        <SkillTree />
       </div>
     </section>
   );
