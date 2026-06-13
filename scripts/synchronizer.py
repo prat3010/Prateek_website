@@ -771,7 +771,7 @@ export interface ResumeData {{
 }}
 
 export const resumeData: ResumeData = {{
-  name: "{esc(resume.get('name', 'Prateeq Sharma'))}",
+  name: "{esc(resume.get('name', 'Prateek Sharma'))}",
   title: "{esc(resume.get('title', ''))}",
   email: "{esc(resume.get('email', ''))}",
   phone: "{esc(resume.get('phone', ''))}",
@@ -855,15 +855,15 @@ def slugify(text):
 # Custom CSS for Premium UI Styling
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Lora:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
     
     /* Font overrides */
     html, body, [class*="css"], .stWidgetFormContainer {
-        font-family: 'Lora', Georgia, serif !important;
+        font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif !important;
     }
     
     h1, h2, h3, h4, h5, h6, .section-header {
-        font-family: 'Playfair Display', 'Times New Roman', serif !important;
+        font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif !important;
     }
     
     code, pre {
@@ -1024,7 +1024,7 @@ st.markdown("""
         border-radius: 4px !important;
         background-color: transparent !important;
         color: #888888 !important;
-        font-family: 'Playfair Display', serif !important;
+        font-family: 'Space Grotesk', sans-serif !important;
         font-weight: 700 !important;
         padding: 0px 16px !important;
         transition: all 0.2s !important;
@@ -1078,7 +1078,7 @@ st.sidebar.markdown("""
             <ellipse cx="63" cy="63" rx="3.5" ry="2" fill="#DF8B98" opacity="0.6" />
         </svg>
     </div>
-    <h3 style="color: #ffffff; margin: 0; font-family: 'Playfair Display', serif; font-weight: 900; font-size: 1.3rem; letter-spacing: 0.5px; text-transform: uppercase;">PRATEEQ SYNC</h3>
+    <h3 style="color: #ffffff; margin: 0; font-family: 'Space Grotesk', sans-serif; font-weight: 950; font-size: 1.3rem; letter-spacing: 0.5px; text-transform: uppercase;">PRATEEK SYNC</h3>
     <span style="display: block; color: #8A8A93; font-size: 0.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; margin-top: 4px;">ORCHESTRATION CLIENT</span>
     <code style="display: inline-block; background-color: #121212; color: #ffffff; border: 1.5px solid #ffffff; border-radius: 4px; padding: 2px 8px; font-size: 0.7rem; font-weight: bold; margin-top: 10px; font-family: 'JetBrains Mono', monospace;">v1.3.0 // ACTIVE</code>
 </div>
@@ -1087,9 +1087,10 @@ st.sidebar.markdown("""
 st.sidebar.markdown("### Control Panel Operations")
 st.sidebar.markdown("""
 This local portal lets you:
-*   **Edit Resume details manually**
-*   **Sync Projects** (from local folders or GitHub repositories)
-*   **Sync Certificates** (reads PDFs/Images dropped in certificates raw folder)
+*   **Edit Resume** details manually
+*   **Sync Projects** from local folders or GitHub
+*   **Sync Certificates** from raw scanned files
+*   **Write & Publish Blog Posts** using Gemini co-pilot
 """)
 
 if GEMINI_API_KEY:
@@ -1164,7 +1165,7 @@ if 'pending_skills' in st.session_state and st.session_state.pending_skills:
 # Custom Title Header
 st.markdown("""
 <div style="text-align: center; padding: 30px 20px; margin-bottom: 35px; background-color: #000000; border-radius: 8px; border: 2.5px solid #ffffff;">
-    <h1 style="color: #ffffff; font-family: 'Playfair Display', serif; font-weight: 900; margin: 0; font-size: 2.5rem; letter-spacing: 0.5px; text-transform: uppercase;">PRATEEQ CONTROL PORTAL</h1>
+    <h1 style="color: #ffffff; font-family: 'Space Grotesk', sans-serif; font-weight: 950; margin: 0; font-size: 2.5rem; letter-spacing: 0.5px; text-transform: uppercase;">PRATEEK CONTROL PORTAL</h1>
     <p style="color: #ffffff; margin: 8px 0 0 0; font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 0.85rem; letter-spacing: 0.2px; text-transform: uppercase; opacity: 0.90;">SYSTEM_STATUS: ONLINE  |  LOCAL RESUME & PORTFOLIO ENGINE</p>
 </div>
 """, unsafe_allow_html=True)
