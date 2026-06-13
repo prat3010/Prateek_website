@@ -40,13 +40,13 @@ export default function Resume() {
   const getSkillsHighlight = () => {
     switch (activePersona) {
       case 'fullstack':
-        return ['Next.js', 'FastAPI', 'Supabase', 'PostgreSQL', 'SQLite', 'APIs'];
+        return ['API Architecture', 'Database Engineering', 'Algorithmic Translation', 'Data Analysis', 'Stack-on-Demand'];
       case 'ai':
-        return ['AI Agent Orchestration', 'LLM Prompting', 'Python', 'RAG Pipelines', 'Vercel AI Gateway'];
+        return ['AI Agent Orchestration', 'Structured Prompting', 'AI Dev Workflows', 'API Architecture', 'Python'];
       case 'creative':
-        return ['Figma', 'UI/UX Animations', 'Framer Motion', 'Responsive Design', 'HTML5/CSS3'];
+        return ['Product Strategy & UX', 'Design to Code', 'Privacy Sandboxing', 'Stack-on-Demand'];
       default:
-        return ['React/Next.js', 'Python', 'AI Agent Orchestration', 'Flutter/Dart', 'Supabase', 'Framer Motion'];
+        return ['AI Agent Orchestration', 'Database Engineering', 'Product Strategy & UX', 'Algorithmic Translation', 'Stack-on-Demand'];
     }
   };
 

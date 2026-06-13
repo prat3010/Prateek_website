@@ -101,105 +101,105 @@ FALLBACK_SKILLS = {
         "name": "Microsoft Excel",
         "icon": "file-text",
         "description": "Analyzing data, building spreadsheets, and organizing complex datasets.",
-        "category": "tools",
+        "category": "logic",
         "color": "#107C41"
     },
     "spreadsheet": {
         "name": "Spreadsheets",
         "icon": "layout",
         "description": "Structuring tabular data, utilizing formulas, and modeling numeric information.",
-        "category": "tools",
+        "category": "logic",
         "color": "#107C41"
     },
     "data analysis": {
         "name": "Data Analysis",
         "icon": "bar-chart",
         "description": "Extracting insights from raw records, cleaning datasets, and visualizing metrics.",
-        "category": "backend",
+        "category": "logic",
         "color": "#00897B"
     },
     "microsoft office": {
         "name": "Microsoft Office",
         "icon": "briefcase",
         "description": "Utilizing productivity applications to document workflows and present reports.",
-        "category": "tools",
+        "category": "dynamic",
         "color": "#D83B01"
     },
     "business intelligence": {
         "name": "Business Intelligence",
         "icon": "trending-up",
         "description": "Synthesizing operational data into dashboards and strategic insights.",
-        "category": "backend",
+        "category": "logic",
         "color": "#F2C811"
     },
     "supabase": {
         "name": "Supabase",
         "icon": "database",
         "description": "Orchestrating backend authentication, building postgres databases, and managing real-time data flow.",
-        "category": "backend",
+        "category": "logic",
         "color": "#3ECF8E"
     },
     "fastapi": {
         "name": "FastAPI",
         "icon": "server",
         "description": "Instructing AI to spin up robust backends, serialize data models, and deploy endpoints.",
-        "category": "backend",
+        "category": "logic",
         "color": "#059669"
     },
     "react": {
         "name": "React / Next.js",
         "icon": "atom",
         "description": "Directing AI to synthesize React components, manage application state, and orchestrate client/server code.",
-        "category": "frontend",
+        "category": "dynamic",
         "color": "#61DAFB"
     },
     "python": {
         "name": "Python",
         "icon": "terminal",
         "description": "Instructing AI to write utility scripts, automation tasks, and backend helper scripts.",
-        "category": "backend",
+        "category": "logic",
         "color": "#3776AB"
     },
     "framer motion": {
         "name": "Framer Motion",
         "icon": "sparkles",
         "description": "Orchestrating fluid React transitions, micro-animations, and viewport-driven scroll effects.",
-        "category": "frontend",
+        "category": "product",
         "color": "#E10098"
     },
     "sqlite": {
         "name": "SQLite",
         "icon": "database",
         "description": "Managing light, relational databases for local automation and offline mobile data storage.",
-        "category": "backend",
+        "category": "logic",
         "color": "#003B57"
     },
     "flutter": {
         "name": "Flutter / Dart",
         "icon": "smartphone",
         "description": "Building cross-platform mobile apps, designing reactive layouts, and compiled state systems.",
-        "category": "frontend",
+        "category": "dynamic",
         "color": "#02569B"
     },
     "next.js": {
         "name": "React / Next.js",
         "icon": "atom",
         "description": "Directing AI to synthesize React components, manage application state, and orchestrate client/server code.",
-        "category": "frontend",
+        "category": "dynamic",
         "color": "#000000"
     },
     "git": {
         "name": "Git & GitHub",
         "icon": "git-branch",
         "description": "Managing branch workflows, commit history, and deployment sync.",
-        "category": "tools",
+        "category": "dynamic",
         "color": "#F05032"
     },
     "github": {
         "name": "Git & GitHub",
         "icon": "git-branch",
         "description": "Managing branch workflows, commit history, and deployment sync.",
-        "category": "tools",
+        "category": "dynamic",
         "color": "#181717"
     }
 }
@@ -218,7 +218,7 @@ def generate_skills_from_tags_batch(tags_list):
       "name": "Formatted capitalization of the technology (e.g. 'react' -> 'React / Next.js', 'fastapi' -> 'FastAPI', 'excel' -> 'Microsoft Excel', 'supabase' -> 'Supabase', etc.)",
       "icon": "A lowercase string representing a relevant Lucide icon (e.g. 'atom', 'server', 'database', 'terminal', 'layout', 'paintbrush', 'sparkles', 'brain', 'bot', 'git-branch', 'cloud', 'figma', 'zap', 'image', 'file-text')",
       "description": "A short 1-sentence description of the skill in an AI-orchestrated tone matching the portfolio brand (e.g., 'Directing AI to synthesize React components...', 'Steering AI to generate responsive structures...', 'Instructing AI to write Python utility scripts...'). Maximum 15 words.",
-      "category": "One of 'frontend', 'backend', 'tools', or 'creative'",
+      "category": "One of 'orchestration', 'logic', 'product', or 'dynamic'",
       "color": "A hex color code suitable for the technology brand"
     }}
     
@@ -298,7 +298,7 @@ def check_and_add_pending_skills(tags_list):
                         "name": tag.capitalize(),
                         "icon": "sparkles",
                         "description": f"Applying {tag} capabilities to implement robust project requirements.",
-                        "category": "tools",
+                        "category": "dynamic",
                         "color": "#00E676"
                     }
                     st.session_state.pending_skills.append(fallback_prop)
@@ -1127,10 +1127,10 @@ if 'pending_skills' in st.session_state and st.session_state.pending_skills:
         icon = st.text_input("Icon (Lucide)", value=skill.get('icon', 'sparkles'), key="pend_icon")
         desc = st.text_area("Description", value=skill.get('description', ''), key="pend_desc")
         
-        categories_opts = ['frontend', 'backend', 'tools', 'creative']
-        default_cat = skill.get('category', 'tools')
+        categories_opts = ['orchestration', 'logic', 'product', 'dynamic']
+        default_cat = skill.get('category', 'dynamic')
         if default_cat not in categories_opts:
-            default_cat = 'tools'
+            default_cat = 'dynamic'
         category = st.selectbox("Category", options=categories_opts, index=categories_opts.index(default_cat), key="pend_cat")
         
         color = st.text_input("Hex Color", value=skill.get('color', '#00E676'), key="pend_color")
