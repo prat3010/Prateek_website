@@ -441,355 +441,184 @@
   transform: rotate(0deg) scale(1.05) !important;
 }
 
-/* ===== RPG SKILL TREE ===== */
-.treeWrapper {
+/* ===== CHARACTER DOSSIER ===== */
+.dossierGrid {
   display: grid;
-  grid-template-columns: 1.4fr 1fr;
-  gap: 3rem;
-  align-items: start;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.5rem;
   max-width: 1200px;
   margin: 0 auto;
+  align-items: start;
   padding: 1rem;
 }
 
-.treeContainer {
-  position: relative;
+.dossierColumn {
   background: var(--pop-white);
   border: var(--border-medium);
-  padding: 3rem 1.5rem;
   box-shadow: var(--shadow-comic-lg);
-  overflow: visible;
+  padding: 2rem 1.75rem;
+  transition: transform 0.2s var(--transition-bounce), box-shadow 0.2s ease;
 }
 
-.svgOverlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 0;
-  overflow: visible;
+.dossierColumn:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: var(--shadow-comic-xl);
 }
 
-.svgPath {
-  stroke-linecap: round;
-  fill: none;
+.dossierColHeader {
+  margin-bottom: 2rem;
+  border-bottom: var(--border-medium);
+  padding-bottom: 1rem;
 }
 
-.pathMastered {
-  stroke: var(--pop-black);
-  stroke-width: 4px;
-}
-
-.pathQuest {
-  stroke: #888888;
-  stroke-width: 3px;
-  stroke-dasharray: 6 6;
-}
-
-.treeRow {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  position: relative;
-  z-index: 1;
-  margin-bottom: 4.5rem;
-}
-
-.treeRow:last-child {
-  margin-bottom: 0;
-}
-
-.rowSplit {
-  justify-content: space-between;
-}
-
-.columnLeft, .columnCenter, .columnRight {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 30%;
-  position: relative;
-}
-
-.multiNodesHorizontal {
-  display: flex;
-  flex-direction: row;
-  gap: 1.5rem;
-  justify-content: center;
-}
-
-.multiNodesVertical {
-  display: flex;
-  flex-direction: column;
-  gap: 4.5rem;
-  margin-top: 2rem;
-}
-
-/* Tree Nodes */
-.treeNode {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-  transition: transform 0.2s var(--transition-bounce);
-  z-index: 2;
-  user-select: none;
-}
-
-.treeNode:hover {
-  transform: scale(1.15);
-}
-
-.nodeCircle {
-  width: 58px;
-  height: 58px;
-  border-radius: 50%;
-  background: var(--pop-white);
-  border: var(--border-medium);
-  box-shadow: var(--shadow-comic-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-}
-
-.treeNode:hover .nodeCircle {
-  background-color: var(--node-color);
-  box-shadow: var(--shadow-comic);
-}
-
-.nodeIcon {
-  width: 26px;
-  height: 26px;
-  color: var(--pop-black);
-  transition: color 0.2s ease;
-}
-
-.treeNode:hover .nodeIcon {
+.dossierColBadge {
+  display: inline-block;
   color: var(--pop-white);
-}
-
-/* Specific Node Status Glows */
-.legendary .nodeCircle {
-  border: 3px double var(--node-color);
-  box-shadow: 0 0 10px rgba(255, 145, 0, 0.4);
-}
-
-.selectedNode .nodeCircle {
-  background-color: var(--node-color);
-  box-shadow: var(--shadow-comic-lg);
-  border-width: 3px;
-}
-
-.selectedNode .nodeIcon {
-  color: var(--pop-white);
-}
-
-.quest .nodeCircle {
-  border: 2px dashed var(--node-color);
-  background-color: #f7f7f9;
-}
-
-.quest:hover .nodeCircle {
-  background-color: var(--node-color);
-}
-
-.nodeLabel {
-  margin-top: 0.6rem;
+  border: var(--border-thin);
+  padding: 0.25rem 0.85rem;
   font-family: var(--font-headline);
-  font-size: 0.82rem;
-  text-align: center;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  box-shadow: var(--shadow-comic-sm);
+  transform: rotate(-1.5deg);
+}
+
+.dossierColContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.dossierItem {
+  border-bottom: 1px dashed #e4e4e7;
+  padding-bottom: 1.5rem;
+}
+
+.dossierItem:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.dossierItemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.dossierNameContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dossierItemIcon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.dossierItemName {
+  font-family: var(--font-headline);
+  font-size: 1.15rem;
   color: var(--pop-black);
-  max-width: 120px;
+  margin: 0;
+  line-height: 1.2;
   letter-spacing: 0.02em;
 }
 
-.questBadge {
-  position: absolute;
-  top: -8px;
-  right: -10px;
-  background: var(--pop-red);
-  color: var(--pop-white);
-  border: var(--border-thin);
-  padding: 0.1rem 0.35rem;
+.dossierLevelBadge {
   font-family: var(--font-headline);
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   letter-spacing: 0.05em;
-  box-shadow: var(--shadow-comic-sm);
-}
-
-/* ===== SKILL CODEX PANEL ===== */
-.codexPanel {
-  background: var(--pop-white);
-  border: var(--border-medium);
-  padding: 2rem;
-  box-shadow: var(--shadow-comic-lg);
-  position: sticky;
-  top: 100px;
-  z-index: 5;
-}
-
-.codexHeader {
-  border-bottom: var(--border-medium);
-  padding-bottom: 1.25rem;
-  margin-bottom: 1.5rem;
-  position: relative;
-}
-
-.codexBadge {
-  display: inline-block;
-  background: var(--pop-black);
-  color: var(--pop-white);
-  border: var(--border-thin);
-  padding: 0.15rem 0.6rem;
-  font-family: var(--font-headline);
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  margin-bottom: 0.5rem;
-}
-
-.codexTitle {
-  font-family: var(--font-headline);
-  font-size: 1.85rem;
-  color: var(--pop-black);
-  letter-spacing: 0.03em;
-  margin: 0.25rem 0;
-  line-height: 1.2;
-}
-
-.codexStatus {
-  display: inline-block;
-  margin-top: 0.35rem;
-  font-family: var(--font-headline);
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
   padding: 0.1rem 0.45rem;
   border: var(--border-thin);
-  border-radius: 2px;
+  font-weight: bold;
+  border-radius: 1px;
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
-.status_legendary {
+.level_legendary {
   background: var(--pop-yellow);
   color: var(--pop-black);
 }
 
-.status_mastered {
-  background: var(--pop-blue);
+.level_mastered {
+  background: var(--pop-black);
   color: var(--pop-white);
 }
 
-.status_quest {
+.level_quest {
   background: var(--pop-red);
   color: var(--pop-white);
 }
 
-.codexBody {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.codexDescription {
-  font-family: var(--font-comic-neue), 'Comic Neue', sans-serif;
-  font-size: 1.1rem;
-  line-height: 1.5;
-  color: var(--pop-black);
-  font-weight: 700;
-}
-
-.codexLabel {
-  display: block;
-  font-family: var(--font-headline);
-  font-size: 0.8rem;
-  color: #71717a;
-  letter-spacing: 0.06em;
-  margin-bottom: 0.6rem;
-}
-
-.codexPrereq {
-  background: #f8f8fa;
-  border: var(--border-thin);
-  padding: 0.75rem 1rem;
-}
-
-.prereqItem {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-family: var(--font-headline);
-  font-size: 0.95rem;
-  color: var(--pop-black);
-}
-
-.prereqArrow {
-  width: 16px;
-  height: 16px;
-  color: var(--pop-blue);
-}
-
-.codexProjects {
-  margin-top: 0.5rem;
-}
-
-.projectsList {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-}
-
-.projectLink {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--pop-white);
-  border: var(--border-medium);
-  padding: 0.75rem 1.25rem;
-  font-family: var(--font-headline);
-  font-size: 0.95rem;
-  color: var(--pop-black);
-  text-decoration: none;
-  box-shadow: var(--shadow-comic-sm);
-  transition: transform 0.2s var(--transition-bounce), box-shadow 0.2s ease, background-color 0.2s ease;
-}
-
-.projectLink:hover {
-  transform: translateX(4px);
-  box-shadow: var(--shadow-comic);
-  background-color: var(--pop-yellow);
-}
-
-.projectLinkIcon {
-  color: var(--pop-black);
-}
-
-.questAlert {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  background: #fff8f8;
-  border: 1.5px dashed var(--pop-red);
-  padding: 0.85rem 1.15rem;
-  font-family: var(--font-comic-neue), 'Comic Neue', sans-serif;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--pop-red);
-}
-
-.questAlertIcon {
-  flex-shrink: 0;
-  animation: pulse 2s infinite ease-in-out;
-}
-
-.codexParams {
+.dossierItemDesc {
   font-family: var(--font-comic-neue), 'Comic Neue', sans-serif;
   font-size: 0.95rem;
   line-height: 1.45;
-  color: #52525b;
+  color: #374151;
   font-weight: 550;
+  margin-bottom: 0.75rem;
+}
+
+.dossierForged {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.dossierForgedLabel {
+  font-family: var(--font-headline);
+  font-size: 0.65rem;
+  color: #6b7280;
+  letter-spacing: 0.05em;
+}
+
+.dossierTags {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.dossierTagLink {
+  font-family: var(--font-headline);
+  font-size: 0.72rem;
+  color: var(--pop-black);
+  background: var(--pop-white);
+  border: var(--border-thin);
+  padding: 0.05rem 0.4rem;
+  text-decoration: none;
+  box-shadow: var(--shadow-comic-sm);
+  transition: transform 0.2s var(--transition-bounce), background-color 0.2s ease;
+}
+
+.dossierTagLink:hover {
+  transform: scale(1.05);
+  background-color: var(--pop-yellow);
+}
+
+.dossierQuestAlert {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #fff5f5;
+  border: 1.5px dashed var(--pop-red);
+  padding: 0.4rem 0.75rem;
+  font-family: var(--font-comic-neue), 'Comic Neue', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--pop-red);
+  margin-top: 0.6rem;
+}
+
+.dossierQuestIcon {
+  flex-shrink: 0;
+  animation: pulse 2s infinite ease-in-out;
 }
 
 @keyframes pulse {
@@ -798,218 +627,112 @@
   100% { transform: scale(1); opacity: 1; }
 }
 
-/* ===== NOIR THEME ADAPTATION ===== */
-:global([data-theme='noir']) .treeContainer,
-:global([data-theme='noir']) .codexPanel {
+/* ===== NOIR THEME DOSSIER ===== */
+:global([data-theme='noir']) .dossierColumn {
   background: #121214 !important;
   border: 2px solid var(--neon-cyan) !important;
-  box-shadow: 0 0 15px rgba(0, 240, 255, 0.15) !important;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.1) !important;
+  transform: none !important;
 }
 
-:global([data-theme='noir']) .pathMastered {
-  stroke: var(--neon-cyan) !important;
-  stroke-width: 3px !important;
+:global([data-theme='noir']) .dossierColumn:hover {
+  border-color: var(--neon-cyan) !important;
+  box-shadow: 0 0 20px var(--neon-cyan) !important;
 }
 
-:global([data-theme='noir']) .pathQuest {
-  stroke: var(--neon-pink) !important;
-  stroke-width: 2.5px !important;
-  stroke-dasharray: 6 6 !important;
+:global([data-theme='noir']) .dossierColBadge {
+  border: 1.5px solid currentColor !important;
+  box-shadow: 0 0 10px currentColor !important;
+  text-shadow: 0 0 5px #000 !important;
+  color: #ffffff !important;
+  transform: none !important;
 }
 
-:global([data-theme='noir']) .nodeCircle {
+:global([data-theme='noir']) .dossierItem {
+  border-bottom: 1px dashed #27272a !important;
+}
+
+:global([data-theme='noir']) .dossierItemName {
+  color: #ffffff !important;
+  font-family: monospace, Courier, sans-serif !important;
+}
+
+:global([data-theme='noir']) .dossierItemDesc {
+  color: #a1a1aa !important;
+  font-family: monospace, Courier, sans-serif !important;
+  font-weight: normal !important;
+  font-size: 0.88rem !important;
+}
+
+:global([data-theme='noir']) .dossierForgedLabel {
+  font-family: monospace, Courier, sans-serif !important;
+  color: #52525b !important;
+}
+
+:global([data-theme='noir']) .dossierTagLink {
   background: #000000 !important;
-  border: 2px solid #33333b !important;
+  border: 1px solid #27272a !important;
+  color: #e4e4e7 !important;
+  font-family: monospace, Courier, sans-serif !important;
   box-shadow: none !important;
 }
 
-:global([data-theme='noir']) .nodeIcon {
-  color: #a1a1aa !important;
+:global([data-theme='noir']) .dossierTagLink:hover {
+  border-color: var(--neon-cyan) !important;
+  color: var(--neon-cyan) !important;
+  background: #0c0c0e !important;
+  box-shadow: 0 0 8px var(--neon-cyan) !important;
 }
 
-:global([data-theme='noir']) .nodeLabel {
-  color: #e4e4e7 !important;
+:global([data-theme='noir']) .dossierLevelBadge {
   font-family: monospace, Courier, sans-serif !important;
-  font-size: 0.8rem !important;
-}
-
-:global([data-theme='noir']) .treeNode:hover .nodeCircle {
-  background-color: #0c0c0e !important;
-  border-color: var(--node-color) !important;
-  box-shadow: 0 0 15px var(--node-color) !important;
-}
-
-:global([data-theme='noir']) .treeNode:hover .nodeIcon {
-  color: var(--node-color) !important;
-}
-
-:global([data-theme='noir']) .selectedNode .nodeCircle {
-  background-color: #0c0c0e !important;
-  border-color: var(--node-color) !important;
-  box-shadow: 0 0 20px var(--node-color) !important;
-}
-
-:global([data-theme='noir']) .selectedNode .nodeIcon {
-  color: var(--node-color) !important;
-}
-
-:global([data-theme='noir']) .questBadge {
   background: #000000 !important;
+}
+
+:global([data-theme='noir']) .level_legendary {
+  color: var(--neon-yellow) !important;
+  border: 1px solid var(--neon-yellow) !important;
+  box-shadow: 0 0 8px var(--neon-yellow) !important;
+}
+
+:global([data-theme='noir']) .level_mastered {
+  color: var(--neon-cyan) !important;
+  border: 1px solid var(--neon-cyan) !important;
+  box-shadow: 0 0 8px var(--neon-cyan) !important;
+}
+
+:global([data-theme='noir']) .level_quest {
   color: var(--neon-pink) !important;
   border: 1px solid var(--neon-pink) !important;
   box-shadow: 0 0 8px var(--neon-pink) !important;
 }
 
-/* Codex Noir styling */
-:global([data-theme='noir']) .codexHeader {
-  border-bottom: 1px dashed #3f3f46 !important;
-}
-
-:global([data-theme='noir']) .codexBadge {
-  background: #000000 !important;
-  color: var(--neon-cyan) !important;
-  border: 1.5px solid var(--neon-cyan) !important;
-  box-shadow: 0 0 8px rgba(0, 240, 255, 0.4) !important;
-  font-family: monospace, Courier, sans-serif !important;
-}
-
-:global([data-theme='noir']) .codexTitle {
-  color: #ffffff !important;
-  font-family: monospace, Courier, sans-serif !important;
-  font-weight: bold !important;
-}
-
-:global([data-theme='noir']) .codexStatus {
-  background: #000000 !important;
-  font-family: monospace, Courier, sans-serif !important;
-}
-
-:global([data-theme='noir']) .status_legendary {
-  color: var(--neon-yellow) !important;
-  border-color: var(--neon-yellow) !important;
-  box-shadow: 0 0 8px rgba(255, 230, 0, 0.4) !important;
-}
-
-:global([data-theme='noir']) .status_mastered {
-  color: var(--neon-cyan) !important;
-  border-color: var(--neon-cyan) !important;
-  box-shadow: 0 0 8px rgba(0, 240, 255, 0.4) !important;
-}
-
-:global([data-theme='noir']) .status_quest {
-  color: var(--neon-pink) !important;
-  border-color: var(--neon-pink) !important;
-  box-shadow: 0 0 8px rgba(255, 0, 128, 0.4) !important;
-}
-
-:global([data-theme='noir']) .codexDescription {
-  color: #e4e4e7 !important;
-  font-family: monospace, Courier, sans-serif !important;
-  font-weight: normal !important;
-  font-size: 0.95rem !important;
-}
-
-:global([data-theme='noir']) .codexLabel {
-  font-family: monospace, Courier, sans-serif !important;
-  color: #71717a !important;
-}
-
-:global([data-theme='noir']) .codexPrereq {
-  background: #18181b !important;
-  border: 1px solid #27272a !important;
-}
-
-:global([data-theme='noir']) .prereqItem {
-  color: #e4e4e7 !important;
-  font-family: monospace, Courier, sans-serif !important;
-}
-
-:global([data-theme='noir']) .prereqArrow {
-  color: var(--neon-cyan) !important;
-}
-
-:global([data-theme='noir']) .projectLink {
-  background: #121214 !important;
-  border: 1.5px solid #27272a !important;
-  box-shadow: none !important;
-  color: #e4e4e7 !important;
-  font-family: monospace, Courier, sans-serif !important;
-}
-
-:global([data-theme='noir']) .projectLink:hover {
-  border-color: var(--neon-cyan) !important;
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2) !important;
-  color: var(--neon-cyan) !important;
-  background-color: #18181b !important;
-}
-
-:global([data-theme='noir']) .projectLinkIcon {
-  color: #a1a1aa !important;
-}
-
-:global([data-theme='noir']) .projectLink:hover .projectLinkIcon {
-  color: var(--neon-cyan) !important;
-}
-
-:global([data-theme='noir']) .questAlert {
-  background: #18000c !important;
+:global([data-theme='noir']) .dossierQuestAlert {
+  background: #1a000d !important;
   border: 1.5px dashed var(--neon-pink) !important;
-  box-shadow: 0 0 10px rgba(255, 0, 128, 0.1) !important;
   color: var(--neon-pink) !important;
   font-family: monospace, Courier, sans-serif !important;
 }
 
-:global([data-theme='noir']) .codexParams {
-  font-family: monospace, Courier, sans-serif !important;
-  color: #71717a !important;
-  font-size: 0.85rem !important;
-}
-
-/* ===== RESPONSIVE TREE ===== */
-@media (max-width: 960px) {
-  .treeWrapper {
-    grid-template-columns: 1fr;
+/* ===== RESPONSIVE DOSSIER ===== */
+@media (max-width: 980px) {
+  .dossierGrid {
+    grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
   }
+}
+
+@media (max-width: 680px) {
+  .dossierGrid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
   
-  .codexPanel {
-    position: static;
+  .dossierColumn {
+    padding: 1.5rem 1.25rem;
   }
 }
 
-@media (max-width: 600px) {
-  .treeContainer {
-    padding: 2rem 0.5rem;
-  }
-
-  .nodeCircle {
-    width: 46px;
-    height: 46px;
-  }
-  
-  .nodeIcon {
-    width: 20px;
-    height: 20px;
-  }
-  
-  .nodeLabel {
-    font-size: 0.72rem;
-    max-width: 80px;
-  }
-  
-  .treeRow {
-    margin-bottom: 3rem;
-  }
-  
-  .multiNodesHorizontal {
-    flex-direction: column;
-    gap: 3rem;
-  }
-  
-  .multiNodesVertical {
-    gap: 3rem;
-  }
-}
 
 
 
