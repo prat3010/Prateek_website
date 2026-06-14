@@ -31,6 +31,12 @@ const Layer1_5 = React.memo(function Layer1_5({ reducedMotion }: LayerProps) {
 
           {/* Slab Building */}
           <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 565 1080 L 565 690 L 640 690 L 640 1080 Z" className={styles.bldMidSlab} />
+          {/* Slab Building Satellite Dish */}
+          <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="575" y1="690" x2="577" y2="682" />
+            <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 572 679 A 5 5 0 0 1 582 685" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="577" y1="682" x2="580" y2="679" />
+          </g>
           {/* Double cornice and vertical ribs for Slab Building */}
           <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
             <WobblyLine wobble={wobble} wobbleStrength={strength} x1="562" y1="695" x2="643" y2="695" />
@@ -70,6 +76,13 @@ const Layer1_5 = React.memo(function Layer1_5({ reducedMotion }: LayerProps) {
           <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 830 1080 L 830 720 L 930 720 L 930 1080 Z" className={styles.bldMidWarehouse} />
           {/* Sawtooth roof detail */}
           <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 830 720 L 855 695 L 855 720 L 880 695 L 880 720 L 905 695 L 905 720 L 930 720" fill="var(--skyline-fill-bg)" />
+          {/* Warehouse Ventilation Chimneys */}
+          <g stroke="var(--skyline-stroke-mid)" strokeWidth="1.0" fill="none">
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="865" y1="695" x2="865" y2="685" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="863" y1="685" x2="867" y2="685" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="915" y1="720" x2="915" y2="708" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="913" y1="708" x2="917" y2="708" />
+          </g>
           {/* Internal pillars */}
           <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" opacity="0.8">
             <WobblyLine wobble={wobble} wobbleStrength={strength} x1="855" y1="720" x2="855" y2="1080" />
@@ -102,6 +115,19 @@ const Layer1_5 = React.memo(function Layer1_5({ reducedMotion }: LayerProps) {
 
           {/* Block Tower with setbacks */}
           <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1110 1080 L 1110 650 L 1140 650 L 1140 590 L 1210 590 L 1210 650 L 1240 650 L 1240 1080 Z" className={styles.bldMidSetbacks} />
+          {/* Block Tower Satellite Dish */}
+          <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1230" y1="650" x2="1232" y2="642" />
+            <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1227 639 A 5 5 0 0 1 1237 645" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1232" y1="642" x2="1235" y2="639" />
+          </g>
+          {/* Block Tower Setbacks Window Mullions */}
+          <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.6" fill="none" opacity="0.6">
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1155" y1="590" x2="1155" y2="1080" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1165" y1="590" x2="1165" y2="1080" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1185" y1="590" x2="1185" y2="1080" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1195" y1="590" x2="1195" y2="1080" />
+          </g>
           {/* Double cornices & vertical ribs for Block Tower Setbacks */}
           <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
             <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1107" y1="650" x2="1143" y2="650" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />

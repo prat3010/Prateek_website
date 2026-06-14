@@ -26,8 +26,40 @@ const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
           {/* Far Left block */}
           <WobblyPath wobble={wobble} wobbleStrength={strength} d="M -1000 1080 L -1000 730 L -330 730 L -330 760 L -80 760 L -80 790 L 80 790 L 80 1080 Z" className={styles.bldMidFarLeft} />
 
+          {/* HOTEL Neon Sign on far-left building facade */}
+          <g className={styles.hotelNeonText}>
+            {/* Supporting brackets */}
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="-240" y1="658" x2="-230" y2="658" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="-240" y1="718" x2="-230" y2="718" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none" />
+            {/* Sign board background */}
+            <WobblyRect wobble={wobble} wobbleStrength={strength} x="-243" y="655" width="13" height="68" rx="1" fill="var(--skyline-billboard-bg)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+            {/* Letters */}
+            <text x="-236.5" y="667">H</text>
+            <text x="-236.5" y="679">O</text>
+            <text x="-236.5" y="691">T</text>
+            <text x="-236.5" y="703">E</text>
+            <text x="-236.5" y="715">L</text>
+          </g>
+
           {/* Staggered double-tower (Left) */}
           <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 120 1080 L 120 680 L 190 680 L 190 620 L 260 620 L 260 1080 Z" className={styles.bldMidStaggered} />
+          {/* Staggered double-tower rooftop AC Unit */}
+          <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
+            <WobblyRect wobble={wobble} wobbleStrength={strength} x="140" y="668" width="16" height="12" />
+            <circle cx="148" cy="674" r="4" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="148" y1="670" x2="148" y2="678" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="144" y1="674" x2="152" y2="674" />
+          </g>
+          {/* Staggered tower curved vent pipe */}
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 235 620 L 235 612 Q 235 608 230 608 Q 226 608 226 612" fill="none" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
+          
+          {/* Localized brick textures on staggered tower and flatiron */}
+          <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.6" fill="none" opacity="0.5">
+            {/* Cluster 1: Staggered tower */}
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="130" y1="710" x2="145" y2="710" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="135" y1="715" x2="150" y2="715" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="128" y1="720" x2="140" y2="720" />
+          </g>
           {/* Double cornices & vertical ribs for Staggered Tower */}
           <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
             <WobblyLine wobble={wobble} wobbleStrength={strength} x1="117" y1="680" x2="193" y2="680" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
@@ -105,6 +137,12 @@ const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
             <text x="498.5" y="714" textAnchor="middle">R</text>
           </g>
 
+          {/* Localized brick texture: Flatiron */}
+          <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.6" fill="none" opacity="0.5">
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="520" y1="740" x2="535" y2="740" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="515" y1="745" x2="530" y2="745" />
+          </g>
+
           {/* Citigroup-style Slanted Roof (Center-Right) */}
           <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 680 1080 L 680 690 L 760 610 L 790 610 L 790 1080 Z" className={styles.bldMidCitigroup} />
           {/* Glowing neon trace line along Citigroup roof slope */}
@@ -115,6 +153,25 @@ const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
             <WobblyLine wobble={wobble} wobbleStrength={strength} x1="757" y1="610" x2="793" y2="610" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" />
             <WobblyLine wobble={wobble} wobbleStrength={strength} x1="760" y1="615" x2="790" y2="615" />
             <WobblyLine wobble={wobble} wobbleStrength={strength} x1="730" y1="640" x2="730" y2="1080" />
+          </g>
+          {/* Citigroup shoulder AC Unit */}
+          <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
+            <WobblyRect wobble={wobble} wobbleStrength={strength} x="770" y="598" width="16" height="12" />
+            <circle cx="778" cy="604" r="4" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="778" y1="600" x2="778" y2="608" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="774" y1="604" x2="782" y2="604" />
+          </g>
+          {/* Citigroup internal floor and column depth */}
+          <g opacity="0.15" stroke="var(--skyline-stroke-mid)" strokeWidth="0.6" fill="none">
+            {/* Internal columns */}
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="710" y1="660" x2="710" y2="1080" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="750" y1="620" x2="750" y2="1080" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="775" y1="610" x2="775" y2="1080" />
+            {/* Internal floors */}
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="680" y1="720" x2="790" y2="720" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="680" y1="760" x2="790" y2="760" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="680" y1="800" x2="790" y2="800" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="680" y1="840" x2="790" y2="840" />
           </g>
           {/* Citibank window grids */}
           <g strokeWidth="0.8" fill="none">
@@ -127,12 +184,26 @@ const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="760" y1="635" x2="760" y2="1000" strokeDashoffset="2" />
             </g>
           </g>
+          {/* Citigroup window silhouettes */}
+          <g fill="var(--skyline-stroke-mid)" stroke="none" opacity="0.6">
+            {/* Desk lamp at x=700, y=750 */}
+            <path d="M 698 750 L 702 750 L 701 745 L 703 745 A 2 2 0 0 0 697 745 L 699 745 Z" />
+            {/* Potted plant at x=740, y=730 */}
+            <path d="M 738 730 L 742 730 L 741 726 L 743 724 A 1.5 1.5 0 0 0 737 724 L 739 726 Z" />
+          </g>
 
           {/* Glowing Clock Tower (11:45 PM Detective Time) */}
           <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1250 1080 L 1250 590 L 1300 590 L 1300 1080 Z" className={styles.bldMidClock} />
           {/* Top dome and spire cap */}
           <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1255 590 L 1255 570 Q 1275 550 1295 570 L 1295 590" />
           <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1275" y1="550" x2="1275" y2="530" strokeWidth="1" />
+          {/* Clock tower shoulder TV Yagi Antenna */}
+          <g stroke="var(--skyline-stroke-mid)" strokeWidth="1.0" fill="none">
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1297" y1="590" x2="1297" y2="560" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1292" y1="565" x2="1302" y2="565" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1294" y1="573" x2="1300" y2="573" />
+            <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1295" y1="581" x2="1299" y2="581" />
+          </g>
           {/* Realtime Clock Face */}
           <RealtimeClock wobble={wobble} strength={strength} />
           {/* Clock Face Details (Roman marker lines at 12, 3, 6, 9) */}
@@ -149,6 +220,15 @@ const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
             </g>
             <g className={styles.glowingWindowDim} strokeDasharray="4 8">
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1285" y1="610" x2="1285" y2="1000" strokeDashoffset="4" />
+            </g>
+            {/* Clock window horizontal division panes */}
+            <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.6" opacity="0.6">
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1260" y1="620" x2="1270" y2="620" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1260" y1="640" x2="1270" y2="640" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1260" y1="660" x2="1270" y2="660" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1280" y1="620" x2="1290" y2="620" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1280" y1="640" x2="1290" y2="640" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1280" y1="660" x2="1290" y2="660" />
             </g>
           </g>
 
