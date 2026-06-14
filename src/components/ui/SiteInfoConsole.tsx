@@ -517,7 +517,7 @@ export default function SiteInfoConsole() {
 
           {/* Terminal Console */}
           <div className={styles.terminalContainer} onClick={focusTerminalInput}>
-            <div className={styles.terminalScreen} ref={terminalScreenRef}>
+            <div className={styles.terminalScreen} ref={terminalScreenRef} data-lenis-prevent>
               {terminalHistory.map((line, index) => (
                 <div
                   key={index}
