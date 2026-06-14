@@ -287,6 +287,7 @@ export default function SiteInfoConsole() {
           { text: '  projects   - Index developer project indices & tags', type: 'output' },
           { text: '  system     - Print logical CPU cores, memory & display metrics', type: 'output' },
           { text: '  storage    - Audit client cookies, local & session storage', type: 'output' },
+          { text: '  stack      - List all the technologies used to make this website', type: 'output' },
           { text: '  cheatcode  - Run retro developer override (3D WebGL parade)', type: 'output' },
           { text: '  git-info   - Open the interactive portfolio Git commit inspector', type: 'output' },
           { text: '  clear      - Clear the command interface screen', type: 'output' }
@@ -351,6 +352,23 @@ export default function SiteInfoConsole() {
         ];
         break;
       }
+      case 'stack':
+        response = [
+          { text: '🛠️ WEBSITE TECHNOLOGY STACK:', type: 'success' },
+          { text: '  - Core Framework: Next.js 16.2.6 (React 19.2.4)', type: 'output' },
+          { text: '  - Language: TypeScript 5.x', type: 'output' },
+          { text: '  - Database & Backend: Supabase JS SDK 2.106.2', type: 'output' },
+          { text: '  - Styling & Layout: Vanilla CSS / CSS Modules', type: 'output' },
+          { text: '  - Animations: Framer Motion 12.40.0', type: 'output' },
+          { text: '  - 3D Graphics: Three.js 0.184.0', type: 'output' },
+          { text: '  - Smooth Scrolling: Lenis Scroll 1.3.23', type: 'output' },
+          { text: '  - Document/PDF Engine: jsPDF 4.2.1', type: 'output' },
+          { text: '  - UI Icons: Lucide React 1.16.0', type: 'output' },
+          { text: '  - Markdown Parser: React Markdown 10.1.0', type: 'output' },
+          { text: '  - Email Delivery: Resend SDK 6.12.4', type: 'output' },
+          { text: '  - Performance Audits: Vercel Speed Insights 2.0.0', type: 'output' }
+        ];
+        break;
       case 'cheatcode':
         if (typeof window !== 'undefined') {
           const isActive = document.documentElement.classList.toggle('konami-active');
@@ -520,7 +538,7 @@ export default function SiteInfoConsole() {
           <div className={styles.shortcutsContainer}>
             <span className={styles.shortcutsLabel}>QUICK SHORTCUTS:</span>
             <div className={styles.shortcutsGrid}>
-              {['help', 'projects', 'system', 'storage', 'cheatcode', 'git-info', 'clear'].map(cmd => (
+              {['help', 'projects', 'system', 'storage', 'stack', 'cheatcode', 'git-info', 'clear'].map(cmd => (
                 <button
                   key={cmd}
                   onClick={() => executeCommand(cmd)}
