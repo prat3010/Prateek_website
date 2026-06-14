@@ -9,6 +9,7 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import styles from './SiteInfoConsole.module.css';
+import { projects } from '@/data/projects';
 
 // Command responses for Noir Interactive Console
 interface ConsoleLine {
@@ -341,7 +342,7 @@ export default function SiteInfoConsole() {
       case 'projects':
         response = [
           { text: '📁 PORTFOLIO PROJECTS RECORD:', type: 'success' },
-          { text: '  - Total Projects: 6 Projects', type: 'output' },
+          { text: `  - Total Projects: ${projects.length} Projects`, type: 'output' },
           { text: '  - Primary Stack: React, Next.js App Router, Node, Supabase, Vercel', type: 'output' },
           { text: '  - Core philosophy: AI-native rapid prototyping, prompt-to-app lifecycle', type: 'output' }
         ];
