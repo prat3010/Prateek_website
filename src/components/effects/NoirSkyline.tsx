@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { m, useTransform, useMotionValue, useSpring } from 'framer-motion';
-import { useTheme } from '@/context/ThemeContext';
+import { useTheme, useThemeTransition } from '@/context/ThemeContext';
 import { useLenisScroll } from '@/context/LenisProvider';
 import styles from './NoirSkyline.module.css';
 
@@ -15,8 +15,14 @@ import Layer3 from './skyline/Layer3';
 
 export default function NoirSkyline() {
   const { theme } = useTheme();
+  const { isTransitioning } = useThemeTransition();
   const [mounted] = useState(true);
   const { scrollProgress: scrollYProgress, velocity: scrollVelocity } = useLenisScroll();
+
+  const isTransitioningRef = useRef(isTransitioning);
+  useEffect(() => {
+    isTransitioningRef.current = isTransitioning;
+  }, [isTransitioning]);
 
   // Background (Layer 1): Scales from 1.0 to 1.09, moves down slightly (Y from 0 to 22px)
   const bgScale = useTransform(scrollYProgress, [0, 1], [1, 1.09]);
@@ -104,6 +110,7 @@ export default function NoirSkyline() {
 
     let rafId: number | null = null;
     const handleMouseMove = (e: MouseEvent) => {
+      if (isTransitioningRef.current) return;
       const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
       if (mediaQuery.matches || isMobileDevice) return;
       if (rafId) cancelAnimationFrame(rafId);

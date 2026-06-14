@@ -641,10 +641,11 @@
 }
 
 :global([data-theme='noir']) .dossierColBadge {
-  border: 1.5px solid currentColor !important;
-  box-shadow: 0 0 10px currentColor !important;
-  text-shadow: 0 0 5px #000 !important;
-  color: #ffffff !important;
+  background-color: #121214 !important;
+  border: 1.5px solid var(--neon-accent, var(--neon-cyan)) !important;
+  box-shadow: 0 0 10px var(--neon-accent, var(--neon-cyan)) !important;
+  text-shadow: none !important;
+  color: var(--neon-accent, var(--neon-cyan)) !important;
   transform: none !important;
 }
 

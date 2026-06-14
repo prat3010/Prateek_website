@@ -130,5 +130,5 @@ function HeroClientContent({ taglines, isNoir }: HeroClientProps & { isNoir: boo
 
 export default function HeroClient({ taglines }: HeroClientProps) {
   const { isNoir } = useTheme();
-  return <HeroClientContent key={isNoir ? 'noir' : 'standard'} taglines={taglines} isNoir={isNoir} />;
+  return <HeroClientContent taglines={taglines} isNoir={isNoir} />;
 }

@@ -132,7 +132,13 @@ export default function Skills({}: SkillsProps) {
           {/* Column 1: AI Orchestration */}
           <div className={`${styles.dossierColumn} ${styles.colOrchestration}`}>
             <div className={styles.dossierColHeader}>
-              <span className={styles.dossierColBadge} style={{ backgroundColor: 'var(--pop-pink)' }}>
+              <span 
+                className={styles.dossierColBadge} 
+                style={{ 
+                  backgroundColor: 'var(--pop-pink)',
+                  ['--neon-accent' as any]: 'var(--neon-pink)'
+                }}
+              >
                 I. AI ORCHESTRATION
               </span>
             </div>
@@ -144,7 +150,13 @@ export default function Skills({}: SkillsProps) {
           {/* Column 2: Systems Logic */}
           <div className={`${styles.dossierColumn} ${styles.colLogic}`}>
             <div className={styles.dossierColHeader}>
-              <span className={styles.dossierColBadge} style={{ backgroundColor: 'var(--pop-blue)' }}>
+              <span 
+                className={styles.dossierColBadge} 
+                style={{ 
+                  backgroundColor: 'var(--pop-blue)',
+                  ['--neon-accent' as any]: 'var(--neon-cyan)'
+                }}
+              >
                 II. SYSTEMS & LOGIC
               </span>
             </div>
@@ -157,7 +169,13 @@ export default function Skills({}: SkillsProps) {
           <div className={`${styles.dossierColumn} ${styles.colProduct}`}>
             {/* Subsection 3a: Product & UX */}
             <div className={styles.dossierColHeader}>
-              <span className={styles.dossierColBadge} style={{ backgroundColor: 'var(--pop-red)' }}>
+              <span 
+                className={styles.dossierColBadge} 
+                style={{ 
+                  backgroundColor: 'var(--pop-red)',
+                  ['--neon-accent' as any]: 'var(--neon-yellow)'
+                }}
+              >
                 III. PRODUCT & UX
               </span>
             </div>
@@ -167,7 +185,13 @@ export default function Skills({}: SkillsProps) {
 
             {/* Subsection 3b: Legendary Command */}
             <div className={styles.dossierColHeader}>
-              <span className={styles.dossierColBadge} style={{ backgroundColor: 'var(--pop-orange)' }}>
+              <span 
+                className={styles.dossierColBadge} 
+                style={{ 
+                  backgroundColor: 'var(--pop-orange)',
+                  ['--neon-accent' as any]: 'var(--neon-purple)'
+                }}
+              >
                 IV. DYNAMIC COMMAND
               </span>
             </div>

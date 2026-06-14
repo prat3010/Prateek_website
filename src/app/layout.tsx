@@ -114,6 +114,10 @@ export default async function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        <link rel="preload" href="/images/hero-illustration-wavy.png" as="image" />
+        <link rel="preload" href="/images/hero-noir.webp" as="image" />
+        <link rel="preload" href="/images/profile-comic.webp" as="image" />
+        <link rel="preload" href="/images/profile-noir.webp" as="image" />
       </head>
       <body>
         <ClientLayout initialTheme={initialTheme}>{children}</ClientLayout>

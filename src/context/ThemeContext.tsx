@@ -82,13 +82,13 @@ export function ThemeProvider({ children, initialTheme }: { children: React.Reac
       isTransitioningRef.current = true;
       document.documentElement.classList.add('is-theme-transitioning');
 
-      // Halfway through the 800ms transition, flip the actual theme (when screen is covered)
+      // Halfway through the 1000ms transition, flip the actual theme (when screen is covered)
       setTimeout(() => {
         setTheme(nextTheme);
         document.documentElement.setAttribute('data-theme', nextTheme);
         localStorage.setItem('theme', nextTheme);
         document.cookie = `theme=${nextTheme}; path=/; max-age=31536000; SameSite=Lax`;
-      }, 400);
+      }, 480);
 
       // End transition
       setTimeout(() => {
@@ -96,7 +96,7 @@ export function ThemeProvider({ children, initialTheme }: { children: React.Reac
         isTransitioningRef.current = false;
         setPendingTheme(null);
         document.documentElement.classList.remove('is-theme-transitioning');
-      }, 850);
+      }, 1000);
     },
     []
   );
