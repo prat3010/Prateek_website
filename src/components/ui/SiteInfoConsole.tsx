@@ -288,6 +288,7 @@ export default function SiteInfoConsole() {
           { text: '  system     - Print logical CPU cores, memory & display metrics', type: 'output' },
           { text: '  storage    - Audit client cookies, local & session storage', type: 'output' },
           { text: '  stack      - List all the technologies used to make this website', type: 'output' },
+          { text: '  sync       - Inspect the local database synchronization engine info', type: 'output' },
           { text: '  cheatcode  - Run retro developer override (3D WebGL parade)', type: 'output' },
           { text: '  git-info   - Open the interactive portfolio Git commit inspector', type: 'output' },
           { text: '  clear      - Clear the command interface screen', type: 'output' }
@@ -367,6 +368,18 @@ export default function SiteInfoConsole() {
           { text: '  - Markdown Parser: React Markdown 10.1.0', type: 'output' },
           { text: '  - Email Delivery: Resend SDK 6.12.4', type: 'output' },
           { text: '  - Performance Audits: Vercel Speed Insights 2.0.0', type: 'output' }
+        ];
+        break;
+      case 'sync':
+      case 'synchronizer':
+        response = [
+          { text: '🔄 PORTFOLIO DATABASE SYNCHRONIZER:', type: 'success' },
+          { text: '  - Core Script: scripts/synchronizer.py (Python 3)', type: 'output' },
+          { text: '  - Interface: Streamlit Local Dashboard', type: 'output' },
+          { text: '  - AI Parsing Integration: Gemini 2.5 Flash API (Structured JSON Mode)', type: 'output' },
+          { text: '  - Target Data Sync: src/data/projects.ts, src/data/skills.ts', type: 'output' },
+          { text: '  - Functionality: Parses latest PDF/text CV revisions and dynamically updates site assets.', type: 'output' },
+          { text: '  - Local Command: streamlit run scripts/synchronizer.py', type: 'output' }
         ];
         break;
       case 'cheatcode':
@@ -538,7 +551,7 @@ export default function SiteInfoConsole() {
           <div className={styles.shortcutsContainer}>
             <span className={styles.shortcutsLabel}>QUICK SHORTCUTS:</span>
             <div className={styles.shortcutsGrid}>
-              {['help', 'projects', 'system', 'storage', 'stack', 'cheatcode', 'git-info', 'clear'].map(cmd => (
+              {['help', 'projects', 'system', 'storage', 'stack', 'sync', 'cheatcode', 'git-info', 'clear'].map(cmd => (
                 <button
                   key={cmd}
                   onClick={() => executeCommand(cmd)}
