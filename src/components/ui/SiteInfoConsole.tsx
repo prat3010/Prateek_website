@@ -130,7 +130,8 @@ export default function SiteInfoConsole() {
               });
             }
             lines.push({ text: ' ', type: 'output' });
-            lines.push({ text: `💡 Tip: Type "secret ${data.path === 'root' ? '' : data.path + '/'}subfolder" to browse further.`, type: 'success' });
+            const pathPrefix = data.path === 'root' ? '' : `${data.path}/`;
+            lines.push({ text: `💡 Tip: Type "secret ${pathPrefix}<folder_name>" to browse further (e.g., "secret ${pathPrefix}src").`, type: 'success' });
           } else if (data.type === 'file') {
             lines.push({ text: `📄 prateek-portfolio/${data.name}`, type: 'success' });
             if (data.content) {

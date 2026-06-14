@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
 
+export const dynamic = 'force-dynamic';
+
 // Whitelist of allowed top-level items to prevent arbitrary file reading
 const ALLOWED_ROOT_ITEMS = ['src', 'public', 'package.json', 'readme.md'];
 
