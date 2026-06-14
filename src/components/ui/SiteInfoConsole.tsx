@@ -105,6 +105,10 @@ export default function SiteInfoConsole() {
           { text: '  specs      - Print website core technologies & stack', type: 'output' },
           { text: '  gremlin    - Inspect the embedded Gremlin mascot status', type: 'output' },
           { text: '  stats      - Display live physical footprint data', type: 'output' },
+          { text: '  skyline    - Inspect background canvas & wobbly rendering', type: 'output' },
+          { text: '  gargoyle   - Query status of the interactive spire guardian', type: 'output' },
+          { text: '  cat        - Check path logs for rooftop black cat', type: 'output' },
+          { text: '  pigeon     - Monitor pigeon nesting activity & locations', type: 'output' },
           { text: '  about      - Reveal website backstory & design decisions', type: 'output' },
           { text: '  clear      - Clear the command interface screen', type: 'output' },
           { text: '  secret     - Run system override key', type: 'output' }
@@ -141,6 +145,39 @@ export default function SiteInfoConsole() {
           { text: `  - Client Bundle Size: ${stats.memoryUsed} KB`, type: 'output' },
           { text: `  - Active Listeners: Throttled mouse & scroll events`, type: 'output' },
           { text: `  - System Uptime: ${stats.uptime}`, type: 'output' }
+        ];
+        break;
+      case 'skyline':
+        response = [
+          { text: '🌆 SKYLINE ENGINE SCHEMATICS:', type: 'success' },
+          { text: '  - Architecture: Multi-layered canvas depth parallax.', type: 'output' },
+          { text: '  - Wobble Logic: Custom frame jitter loops redraw path strokes with offset vertices, creating a living sketchy outline.', type: 'output' },
+          { text: '  - Performance: Listeners run via passive observers. Animation loops freeze when off-screen to preserve CPU power.', type: 'output' }
+        ];
+        break;
+      case 'gargoyle':
+        response = [
+          { text: '🗿 GARGOYLE SIMULATION PROTOCOL:', type: 'success' },
+          { text: '  - Entity: Interactive vector gargoyle spire guardian.', type: 'output' },
+          { text: '  - State Machine: Idle -> Preflight -> Leap -> Glide -> Land -> Reperch.', type: 'output' },
+          { text: '  - Mechanics: Calculates gravitational flight parabola vectors on scroll triggers.', type: 'output' },
+          { text: '  - Location: Spire Right Apex (Fixed Canvas Overlay).', type: 'output' }
+        ];
+        break;
+      case 'cat':
+        response = [
+          { text: '🐈 ROOFTOP CAT TELEMETRY:', type: 'success' },
+          { text: '  - Entity: Rooftop feline patrol.', type: 'output' },
+          { text: '  - Animation Loop: Walking frames throttled to 20fps for classic stop-motion aesthetic.', type: 'output' },
+          { text: '  - Brain Loop: Periodic random walker clock cycles shifting between sitting, sleeping, and strolling.', type: 'output' }
+        ];
+        break;
+      case 'pigeon':
+        response = [
+          { text: '🐦 PIGEON FLOCK REGISTER:', type: 'success' },
+          { text: '  - Population: 3 procedural birds.', type: 'output' },
+          { text: '  - Interactive: Jitters and random rotations simulate pecking behaviors.', type: 'output' },
+          { text: '  - Anchors: Nesting on building window spires and fire escapes.', type: 'output' }
         ];
         break;
       case 'about':
@@ -286,7 +323,7 @@ export default function SiteInfoConsole() {
           <div className={styles.shortcutsContainer}>
             <span className={styles.shortcutsLabel}>QUICK SHORTCUTS:</span>
             <div className={styles.shortcutsGrid}>
-              {['help', 'specs', 'gremlin', 'stats', 'about', 'secret', 'clear'].map(cmd => (
+              {['help', 'specs', 'gremlin', 'stats', 'about', 'skyline', 'gargoyle', 'cat', 'pigeon', 'secret', 'clear'].map(cmd => (
                 <button
                   key={cmd}
                   onClick={() => executeCommand(cmd)}
