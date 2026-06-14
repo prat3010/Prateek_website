@@ -47,13 +47,16 @@ export default function SiteInfoConsole() {
     uptime: '00:00:00'
   });
 
-  const terminalEndRef = useRef<HTMLDivElement>(null);
+  const terminalScreenRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-scroll terminal to bottom
+  // Auto-scroll terminal screen to bottom
   useEffect(() => {
-    if (terminalEndRef.current) {
-      terminalEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (terminalScreenRef.current) {
+      terminalScreenRef.current.scrollTo({
+        top: terminalScreenRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
     }
   }, [terminalHistory]);
 
@@ -258,13 +261,12 @@ export default function SiteInfoConsole() {
 
             {/* Terminal Console */}
             <div className={styles.terminalContainer} onClick={focusTerminalInput}>
-              <div className={styles.terminalScreen}>
+              <div className={styles.terminalScreen} ref={terminalScreenRef}>
                 {terminalHistory.map((line, index) => (
                   <div key={index} className={`${styles.terminalLine} ${styles[line.type]}`}>
                     {line.text}
                   </div>
                 ))}
-                <div ref={terminalEndRef} />
               </div>
               <div className={styles.terminalPromptLine}>
                 <span className={styles.promptSymbol}>&gt;</span>
