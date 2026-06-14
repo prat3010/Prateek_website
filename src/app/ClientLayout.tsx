@@ -17,6 +17,7 @@ const NoirSkyline = dynamic(() => import('@/components/effects/NoirSkyline'), {
 });
 const CursorTrail = dynamic(() => import('@/components/effects/CursorTrail'), { ssr: false });
 const ZenToggle = dynamic(() => import('@/components/ui/ZenToggle'), { ssr: false });
+const InfoButton = dynamic(() => import('@/components/ui/InfoButton'), { ssr: false });
 
 export default function ClientLayout({ children, initialTheme }: { children: React.ReactNode; initialTheme?: Theme }) {
   const pathname = usePathname();
@@ -33,6 +34,7 @@ export default function ClientLayout({ children, initialTheme }: { children: Rea
           <main>{children}</main>
           {!isAdminRoute && <Footer />}
           {!isAdminRoute && <ZenToggle />}
+          {!isAdminRoute && <InfoButton />}
         </LenisProvider>
       </LazyMotion>
     </ThemeProvider>

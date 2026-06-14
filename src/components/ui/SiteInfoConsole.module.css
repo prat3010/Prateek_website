@@ -1,0 +1,535 @@
+/* ============================================================
+   SiteInfoConsole CSS Modules
+   ============================================================ */
+
+.wrapper {
+  width: 100%;
+  min-height: calc(100vh - 120px);
+  padding: var(--space-xl) var(--gutter);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  position: relative;
+  z-index: 10;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--max-width-narrow, 960px);
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: var(--space-lg);
+  display: flex;
+  justify-content: flex-start;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-headline);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--pop-black);
+  padding: 6px 12px;
+  background-color: var(--pop-white);
+  border: 2px solid var(--pop-black);
+  box-shadow: var(--shadow-comic-sm);
+  border-radius: var(--border-radius-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.backLink:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-comic);
+  background-color: var(--pop-yellow);
+}
+
+.backLink:active {
+  transform: translate(1px, 1px);
+  box-shadow: var(--shadow-comic-active);
+}
+
+/* ──────────────────────────────────────────────────────────
+   NOIR THEME STYLES (Retro Hacker Console)
+   ────────────────────────────────────────────────────────── */
+
+.noirConsole {
+  background-color: #08080a;
+  border: 3px solid #FAFAFA;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(250, 250, 250, 0.05);
+  border-radius: 6px;
+  padding: 16px;
+  font-family: var(--font-code);
+  color: #e0e0e3;
+  position: relative;
+}
+
+.consoleTitleBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #3F3F4E;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.indicators {
+  display: flex;
+  gap: 6px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.red { background-color: #ff2a55; }
+.yellow { background-color: #ffe600; }
+.green { background-color: #39ff14; }
+
+.titleText {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #8a8a93;
+}
+
+/* Noir Grid Widgets */
+.noirGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 640px) {
+  .noirGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.noirWidget {
+  background-color: #0d0d10;
+  border: 2px solid #2F2F3D;
+  border-radius: 4px;
+  padding: 14px;
+  transition: border-color var(--transition-normal);
+}
+
+.noirWidget:hover {
+  border-color: #3F3F4E;
+}
+
+.widgetTitle {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #FAFAFA;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px dashed #2F2F3D;
+  padding-bottom: 6px;
+}
+
+.widgetIcon {
+  color: var(--neon-cyan, #00f0ff);
+}
+
+.metricsList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.metricsList li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+}
+
+.metricLabel {
+  color: #8a8a93;
+  font-weight: 700;
+}
+
+.metricValue {
+  color: #FAFAFA;
+  align-self: flex-end;
+  margin-top: -18px;
+}
+
+.progressBar {
+  width: 100%;
+  height: 6px;
+  background-color: #1a1a24;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: var(--neon-green, #39ff14);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.specsTerminalList {
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.cyanText {
+  color: var(--neon-cyan, #00f0ff);
+  font-weight: 700;
+}
+
+/* Terminal Screen Area */
+.terminalContainer {
+  background-color: #030304;
+  border: 2px solid #ff2a55; /* Neon Red Border! */
+  border-radius: 4px;
+  padding: 12px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.9);
+  cursor: text;
+  margin-bottom: 16px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* CRT scanline simulation */
+.terminalContainer::after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  z-index: 2;
+  background-size: 100% 3px, 6px 100%;
+  pointer-events: none;
+}
+
+.terminalScreen {
+  height: 240px;
+  overflow-y: auto;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-right: 6px;
+}
+
+/* Custom scrollbar inside terminal screen */
+.terminalScreen::-webkit-scrollbar {
+  width: 6px;
+}
+.terminalScreen::-webkit-scrollbar-track {
+  background: #030304;
+}
+.terminalScreen::-webkit-scrollbar-thumb {
+  background: #2F2F3D;
+  border-radius: 3px;
+}
+
+.terminalLine {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.input { color: #FAFAFA; font-weight: bold; }
+.output { color: #e0e0e3; }
+.success { color: var(--neon-green, #39ff14); text-shadow: 0 0 4px rgba(57, 255, 20, 0.4); }
+.error { color: var(--neon-pink, #ff2a55); text-shadow: 0 0 4px rgba(255, 42, 85, 0.4); }
+
+.terminalPromptLine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-top: 1px solid #1a1a24;
+  padding-top: 8px;
+}
+
+.promptSymbol {
+  color: var(--neon-cyan, #00f0ff);
+  font-weight: bold;
+  font-size: 0.95rem;
+  text-shadow: 0 0 4px rgba(0, 240, 255, 0.4);
+}
+
+.terminalInput {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-family: var(--font-code);
+  font-size: 0.85rem;
+  color: #FAFAFA;
+  caret-color: var(--neon-cyan, #00f0ff);
+}
+
+/* Command Shortcuts */
+.shortcutsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.75rem;
+  border-top: 1px solid #2F2F3D;
+  padding-top: 12px;
+}
+
+.shortcutsLabel {
+  color: #8a8a93;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+}
+
+.shortcutsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.shortcutBtn {
+  background-color: #0c0c0e;
+  border: 1px solid #2F2F3D;
+  border-radius: 3px;
+  color: #8a8a93;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-family: var(--font-code);
+  font-size: 0.75rem;
+  transition: all var(--transition-fast);
+}
+
+.shortcutBtn:hover {
+  border-color: var(--neon-cyan, #00f0ff);
+  color: #FFFFFF;
+  background-color: #121216;
+  text-shadow: 0 0 2px rgba(0, 240, 255, 0.5);
+}
+
+/* ──────────────────────────────────────────────────────────
+   AZURE THEME STYLES (Comic Blueprint Dossier)
+   ────────────────────────────────────────────────────────── */
+
+.comicDossier {
+  background-color: var(--pop-cream);
+  border: 4px solid var(--pop-black);
+  box-shadow: var(--shadow-comic-lg);
+  border-radius: var(--border-radius-lg);
+  padding: var(--space-xl) var(--gutter);
+}
+
+.comicTitlePanel {
+  text-align: center;
+  border-bottom: 4px dashed var(--pop-black);
+  padding-bottom: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.comicTitle {
+  font-family: var(--font-headline);
+  font-size: var(--text-3xl);
+  font-weight: 900;
+  color: var(--pop-black);
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  margin-bottom: var(--space-xs);
+}
+
+.comicSubtitle {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+}
+
+.comicGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+}
+
+@media (max-width: 768px) {
+  .comicGrid {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+}
+
+.comicCard {
+  height: 100%;
+}
+
+.cardHeader {
+  font-family: var(--font-headline);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--pop-black);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 2px solid var(--pop-black);
+  padding-bottom: 6px;
+}
+
+.headerIcon {
+  color: var(--pop-blue);
+}
+
+.cardDesc {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  margin-bottom: 16px;
+}
+
+.techList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.techList li {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  padding-left: 20px;
+  position: relative;
+}
+
+.techList li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--pop-red);
+  font-weight: bold;
+}
+
+/* Gremlin SVG schematic layout */
+.gremlinLayout {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 8px;
+}
+
+@media (max-width: 480px) {
+  .gremlinLayout {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+.gremlinDrawing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background-color: var(--pop-white);
+  border: 2px solid var(--pop-black);
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-comic-sm);
+  flex-shrink: 0;
+}
+
+.blueprintSvg {
+  color: var(--pop-blue);
+}
+
+.blueprintLabel {
+  font-family: var(--font-code);
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+  margin-top: 6px;
+}
+
+.gremlinDetails {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Resource safety layout */
+.thermalStats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.thermalMetric {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border: 2px solid var(--pop-black);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--pop-white);
+  box-shadow: var(--shadow-comic-sm);
+  font-family: var(--font-headline);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-align: center;
+  gap: 6px;
+}
+
+.fireIcon {
+  color: var(--pop-orange);
+}
+
+.clickIcon {
+  color: var(--pop-green);
+}
+
+.cardFooterText {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--color-text-muted);
+  background-color: rgba(43, 43, 54, 0.03);
+  padding: 8px;
+  border-radius: var(--border-radius-sm);
+  border-left: 3px solid var(--pop-blue);
+}
+
+/* ──────────────────────────────────────────────────────────
+   COMMON STYLE OVERRIDES FOR THEMES
+   ────────────────────────────────────────────────────────── */
+
+:global([data-theme='noir']) .backLink {
+  font-family: var(--font-code);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #FAFAFA;
+  background-color: #121214;
+  border: 2px solid #3F3F4E;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+}
+
+:global([data-theme='noir']) .backLink:hover {
+  transform: translate(-1px, -1px);
+  background-color: #1C1C24;
+  border-color: var(--neon-cyan, #00f0ff);
+  box-shadow: var(--neon-cyan-glow, 0 0 12px rgba(0, 240, 255, 0.4));
+  color: #FFFFFF;
+}
+
+:global([data-theme='noir']) .backLink:active {
+  transform: translateY(1px);
+}
