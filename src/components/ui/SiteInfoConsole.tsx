@@ -280,6 +280,44 @@ export default function SiteInfoConsole() {
       }
     }
 
+    if (trimmedCmd === 'analytics') {
+      fetch('/api/analytics-summary')
+        .then(res => {
+          if (!res.ok) throw new Error();
+          return res.json();
+        })
+        .then(data => {
+          const lines: ConsoleLine[] = [
+            { text: '📊 DATABASE TRAFFIC ANALYTICS SUMMARY:', type: 'success' },
+            { text: `  - Operational Mode: ${data.isDemoMode ? 'DEMO (MOCK DATA)' : 'LIVE DATABASE'}`, type: 'output' },
+            { text: `  - Total Page Views: ${data.totalViews} views`, type: 'output' },
+            { text: `  - Unique IP Visitors: ${data.uniqueVisitors} users`, type: 'output' },
+            { text: `  - Top Visited Path: ${data.popularPath}`, type: 'output' },
+            { text: `  - Top Traffic Referral: ${data.topReferrer}`, type: 'output' },
+            { text: `  - Top Visitor Country: ${data.topCountry}`, type: 'output' },
+            { text: ' ', type: 'output' },
+            { text: '🔗 Click here to open full visitor analytics dashboard', type: 'link', command: 'go-analytics' }
+          ];
+          setTerminalHistory(prev => [...prev, ...lines]);
+        })
+        .catch(() => {
+          setTerminalHistory(prev => [
+            ...prev,
+            { text: '⚠️ Failed to retrieve database analytics.', type: 'error' }
+          ]);
+        });
+      setTerminalInput('');
+      return;
+    }
+
+    if (trimmedCmd === 'go-analytics') {
+      if (typeof window !== 'undefined') {
+        window.location.href = '/admin/analytics';
+      }
+      setTerminalInput('');
+      return;
+    }
+
     switch (trimmedCmd) {
       case 'help':
         response = [
@@ -289,6 +327,7 @@ export default function SiteInfoConsole() {
           { text: '  storage    - Audit client cookies, local & session storage', type: 'output' },
           { text: '  stack      - List all the technologies used to make this website', type: 'output' },
           { text: '  sync       - Inspect the local database synchronization engine info', type: 'output' },
+          { text: '  analytics  - Print dynamic database traffic visitor statistics summary', type: 'output' },
           { text: '  cheatcode  - Run retro developer override (3D WebGL parade)', type: 'output' },
           { text: '  git-info   - Open the interactive portfolio Git commit inspector', type: 'output' },
           { text: '  clear      - Clear the command interface screen', type: 'output' }
@@ -420,10 +459,13 @@ export default function SiteInfoConsole() {
     <div className={styles.wrapper}>
       <div className={styles.container}>
         {/* ---- Go Back Header ---- */}
-        <div className={styles.header}>
+        <div className={styles.header} style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           <Link href="/" className={styles.backLink}>
             <ArrowLeft size={18} />
             <span>Return to Base</span>
+          </Link>
+          <Link href="/admin/analytics" className={styles.backLink}>
+            <span>📊 Visitor Analytics</span>
           </Link>
         </div>
 
@@ -552,7 +594,7 @@ export default function SiteInfoConsole() {
           <div className={styles.shortcutsContainer}>
             <span className={styles.shortcutsLabel}>QUICK SHORTCUTS:</span>
             <div className={styles.shortcutsGrid}>
-              {['help', 'projects', 'system', 'storage', 'stack', 'sync', 'cheatcode', 'git-info', 'clear'].map(cmd => (
+              {['help', 'projects', 'system', 'storage', 'stack', 'sync', 'analytics', 'cheatcode', 'git-info', 'clear'].map(cmd => (
                 <button
                   key={cmd}
                   onClick={() => executeCommand(cmd)}

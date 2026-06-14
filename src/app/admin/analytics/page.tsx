@@ -300,12 +300,18 @@ export default async function AnalyticsPage(props: {
   return (
     <div className={styles.dashboardContainer} style={{ paddingTop: '80px', paddingBottom: '80px' }}>
       {/* --- Back to Website Button --- */}
-      <div className={styles.backBtnContainer}>
+      <div className={styles.backBtnContainer} style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
         <Link 
           href="/" 
           className={styles.backBtn}
         >
           <ArrowLeft size={16} /> Return to Portfolio
+        </Link>
+        <Link 
+          href="/info" 
+          className={styles.backBtn}
+        >
+          🖥️ Terminal Diagnostics
         </Link>
       </div>
 
