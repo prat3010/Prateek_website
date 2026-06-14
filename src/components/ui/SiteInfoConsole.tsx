@@ -45,6 +45,7 @@ export default function SiteInfoConsole() {
     domNodes: 0,
     gremlinEnergy: 100,
     isCharging: false,
+    isBatterySupported: false,
     uptime: '00:00:00'
   });
 
@@ -105,30 +106,37 @@ export default function SiteInfoConsole() {
 
     // 2. Battery status API link
     let batteryInstance: BatteryManager | null = null;
+    let usingSimulatedBattery = true;
+
+    const updateBattery = (level: number, charging: boolean, supported: boolean) => {
+      setStats(prev => ({
+        ...prev,
+        gremlinEnergy: Math.round(level * 100),
+        isCharging: charging,
+        isBatterySupported: supported
+      }));
+    };
+
     const onBatteryChange = () => {
       if (batteryInstance) {
-        setStats(prev => ({
-          ...prev,
-          gremlinEnergy: Math.round(batteryInstance!.level * 100),
-          isCharging: batteryInstance!.charging
-        }));
+        updateBattery(batteryInstance.level, batteryInstance.charging, true);
       }
     };
 
     if (typeof navigator !== 'undefined') {
       const nav = navigator as Navigator & { getBattery?: () => Promise<BatteryManager> };
       if (typeof nav.getBattery === 'function') {
-        nav.getBattery().then((battery) => {
-          batteryInstance = battery;
-          // set initial values
-          setStats(prev => ({
-            ...prev,
-            gremlinEnergy: Math.round(battery.level * 100),
-            isCharging: battery.charging
-          }));
-          battery.addEventListener('levelchange', onBatteryChange);
-          battery.addEventListener('chargingchange', onBatteryChange);
-        });
+        nav.getBattery()
+          .then((battery) => {
+            batteryInstance = battery;
+            usingSimulatedBattery = false;
+            updateBattery(battery.level, battery.charging, true);
+            battery.addEventListener('levelchange', onBatteryChange);
+            battery.addEventListener('chargingchange', onBatteryChange);
+          })
+          .catch(() => {
+            usingSimulatedBattery = true;
+          });
       }
     }
 
@@ -142,12 +150,26 @@ export default function SiteInfoConsole() {
       const liveDomNodes = typeof document !== 'undefined' ? document.getElementsByTagName('*').length : 0;
       const liveBundle = calculateBundleSize();
 
-      setStats(prev => ({
-        ...prev,
-        bundleSize: liveBundle,
-        domNodes: liveDomNodes,
-        uptime: `${hours}:${mins}:${secs}`
-      }));
+      setStats(prev => {
+        let nextEnergy = prev.gremlinEnergy;
+        let nextCharging = prev.isCharging;
+
+        if (usingSimulatedBattery) {
+          // Slowly drain 1% every 60 seconds starting from 85%
+          const secondsUptime = Math.floor(diff / 1000);
+          nextEnergy = Math.max(5, 85 - Math.floor(secondsUptime / 60));
+          nextCharging = false;
+        }
+
+        return {
+          ...prev,
+          bundleSize: liveBundle,
+          domNodes: liveDomNodes,
+          gremlinEnergy: nextEnergy,
+          isCharging: nextCharging,
+          uptime: `${hours}:${mins}:${secs}`
+        };
+      });
     }, 1000);
 
     return () => {
@@ -283,7 +305,11 @@ export default function SiteInfoConsole() {
           { text: '  - Core Role: Semicolon Consumer & Bug Generator', type: 'output' },
           { text: '  - Interactive States: Blushes on hover, ears rotate', type: 'output' },
           { text: '  - Current Location: SVG Logo Container (Fixed Nav Anchor)', type: 'output' },
-          { text: `  - Energy Level: ${stats.gremlinEnergy}% (${stats.isCharging ? 'AC Power: Charging Mascot' : 'Battery Level Synced'})`, type: 'output' }
+          { text: `  - Energy Level: ${stats.gremlinEnergy}% (${
+            stats.isBatterySupported 
+              ? (stats.isCharging ? 'AC Power: Charging Mascot' : 'Battery Level Synced')
+              : 'Simulated Uptime Drain: API Unsupported'
+          })`, type: 'output' }
         ];
         break;
       case 'stats':
@@ -476,7 +502,9 @@ export default function SiteInfoConsole() {
                 </li>
                 <li>
                   <span className={styles.metricLabel}>GREMLIN ENERGY:</span>
-                  <span className={styles.metricValue}>{stats.gremlinEnergy}%</span>
+                  <span className={styles.metricValue}>
+                    {stats.gremlinEnergy}% {stats.isBatterySupported ? (stats.isCharging ? '🔌' : '🔋') : '⚙️'}
+                  </span>
                   <div className={styles.progressBar}>
                     <div className={styles.progressFill} style={{ width: `${stats.gremlinEnergy}%`, backgroundColor: 'var(--neon-pink, var(--pop-red))' }} />
                   </div>
