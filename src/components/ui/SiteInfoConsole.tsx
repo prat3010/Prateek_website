@@ -259,13 +259,17 @@ export default function SiteInfoConsole() {
         ];
         break;
       case 'cheatcode':
-        response = [
-          { text: '🎮 KONAMI CODE DECRYPTED:', type: 'success' },
-          { text: '  - Code Sequence: [↑, ↑, ↓, ↓, ←, →, ←, →, B, A]', type: 'success' },
-          { text: '  - Semicolon Insect Repellent: 100% active', type: 'output' },
-          { text: '  - Gremlin Scale Factor: 2.0x (Giant Gremlin activated)', type: 'output' },
-          { text: '  - Wobble Engine Jitter: UNLIMITED Calculations unlocked!', type: 'output' }
-        ];
+        if (typeof window !== 'undefined') {
+          const isActive = document.documentElement.classList.toggle('konami-active');
+          response = [
+            { text: '🎮 KONAMI CODE DECRYPTED:', type: 'success' },
+            { text: '  - Keyboard Sequence: [↑, ↑, ↓, ↓, ←, →, ←, →, B, A]', type: 'success' },
+            { text: `  - Cheat Override Mode: ${isActive ? 'ACTIVE' : 'INACTIVE'}`, type: 'output' },
+            { text: isActive 
+              ? '  - Engage: Cartoon Squigglevision (Azure) / Cyber Neon Jitter (Noir)!' 
+              : '  - Disengage: Resetting animations to normal.', type: 'output' }
+          ];
+        }
         break;
       case 'clear':
         setTerminalHistory([]);

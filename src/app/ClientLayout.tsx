@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Navbar from '@/components/ui/Navbar';
@@ -22,6 +22,41 @@ const InfoButton = dynamic(() => import('@/components/ui/InfoButton'), { ssr: fa
 export default function ClientLayout({ children, initialTheme }: { children: React.ReactNode; initialTheme?: Theme }) {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith('/admin');
+
+  // Konami Code global listener
+  useEffect(() => {
+    const konamiCode = [
+      'ArrowUp', 'ArrowUp',
+      'ArrowDown', 'ArrowDown',
+      'ArrowLeft', 'ArrowRight',
+      'ArrowLeft', 'ArrowRight',
+      'b', 'a'
+    ];
+    let keyBuffer: string[] = [];
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore keypresses if user is typing in form elements
+      if (
+        document.activeElement?.tagName === 'INPUT' ||
+        document.activeElement?.tagName === 'TEXTAREA' ||
+        document.activeElement?.getAttribute('contenteditable') === 'true'
+      ) {
+        return;
+      }
+
+      keyBuffer.push(e.key);
+      keyBuffer = keyBuffer.slice(-10);
+
+      const isMatch = konamiCode.every((key, i) => key.toLowerCase() === keyBuffer[i]?.toLowerCase());
+      if (isMatch) {
+        document.documentElement.classList.toggle('konami-active');
+        keyBuffer = [];
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   return (
     <ThemeProvider initialTheme={initialTheme}>

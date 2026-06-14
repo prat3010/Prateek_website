@@ -1112,3 +1112,71 @@ footer {
   visibility: hidden !important;
 }
 
+/* ============================================================
+   KONAMI CODE OVERRIDES: Neon Jitter & Cartoon Jitter
+   ============================================================ */
+
+/* ── Cartoon Jitter (Konami Code Squigglevision in Azure) ── */
+.konami-active:not([data-theme='noir']) .comic-panel,
+.konami-active:not([data-theme='noir']) .comic-panel-interactive,
+.konami-active:not([data-theme='noir']) .speech-bubble,
+.konami-active:not([data-theme='noir']) .caption-box,
+.konami-active:not([data-theme='noir']) [class*="Panel"],
+.konami-active:not([data-theme='noir']) [class*="Card"],
+.konami-active:not([data-theme='noir']) [class*="Button"],
+.konami-active:not([data-theme='noir']) [class*="Toggle"],
+.konami-active:not([data-theme='noir']) [class*="consoleContainer"],
+.konami-active:not([data-theme='noir']) [class*="consoleWidget"],
+.konami-active:not([data-theme='noir']) [class*="terminalContainer"],
+.konami-active:not([data-theme='noir']) h1,
+.konami-active:not([data-theme='noir']) h2,
+.konami-active:not([data-theme='noir']) h3 {
+  animation: cartoon-jitter 90ms infinite steps(3);
+}
+
+@keyframes cartoon-jitter {
+  0% { transform: translate(1px, 0.5px) rotate(0.1deg); }
+  33% { transform: translate(-0.5px, -1px) rotate(-0.15deg); }
+  66% { transform: translate(0.5px, -0.5px) rotate(0.05deg); }
+  100% { transform: translate(-1px, 1px) rotate(0.1deg); }
+}
+
+/* ── Neon Jitter (Konami Code Cyber Glitch in Noir) ── */
+.konami-active[data-theme='noir'] body {
+  animation: screen-flicker 0.2s infinite;
+}
+
+.konami-active[data-theme='noir'] [class*="consoleContainer"],
+.konami-active[data-theme='noir'] [class*="consoleWidget"],
+.konami-active[data-theme='noir'] [class*="terminalContainer"],
+.konami-active[data-theme='noir'] [class*="Widget"],
+.konami-active[data-theme='noir'] [class*="Card"],
+.konami-active[data-theme='noir'] [class*="Button"],
+.konami-active[data-theme='noir'] [class*="Toggle"],
+.konami-active[data-theme='noir'] h1,
+.konami-active[data-theme='noir'] h2,
+.konami-active[data-theme='noir'] h3 {
+  animation: neon-glitch 200ms infinite steps(2);
+}
+
+@keyframes neon-glitch {
+  0% {
+    transform: translate(0.5px, -0.5px);
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.55), 0 0 4px rgba(255, 42, 85, 0.35);
+  }
+  50% {
+    transform: translate(-0.5px, 0.5px);
+    box-shadow: 0 0 6px rgba(0, 240, 255, 0.18), 0 0 12px rgba(255, 42, 85, 0.65);
+  }
+  100% {
+    transform: translate(1px, 0);
+    box-shadow: 0 0 16px rgba(0, 240, 255, 0.45), 0 0 8px rgba(255, 42, 85, 0.45);
+  }
+}
+
+@keyframes screen-flicker {
+  0% { opacity: 0.995; }
+  50% { opacity: 0.97; }
+  100% { opacity: 0.995; }
+}
+
