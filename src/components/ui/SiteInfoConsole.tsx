@@ -72,7 +72,7 @@ export default function SiteInfoConsole() {
       frameCount++;
       const now = performance.now();
       if (now - lastTime >= 1000) {
-        const currentFps = Math.min(60, Math.round((frameCount * 1000) / (now - lastTime)));
+        const currentFps = Math.round((frameCount * 1000) / (now - lastTime));
         setStats(prev => ({ ...prev, fps: currentFps }));
         frameCount = 0;
         lastTime = now;
@@ -445,7 +445,7 @@ export default function SiteInfoConsole() {
                   <span className={styles.metricLabel}>RENDER FPS:</span>
                   <span className={styles.metricValue}>{stats.fps} FPS</span>
                   <div className={styles.progressBar}>
-                    <div className={styles.progressFill} style={{ width: `${(stats.fps / 60) * 100}%` }} />
+                    <div className={styles.progressFill} style={{ width: `${Math.min(100, (stats.fps / 60) * 100)}%` }} />
                   </div>
                 </li>
                 <li>
