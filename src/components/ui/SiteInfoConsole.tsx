@@ -266,8 +266,8 @@ export default function SiteInfoConsole() {
             { text: '  - Keyboard Sequence: [↑, ↑, ↓, ↓, ←, →, ←, →, B, A]', type: 'success' },
             { text: `  - Cheat Override Mode: ${isActive ? 'ACTIVE' : 'INACTIVE'}`, type: 'output' },
             { text: isActive 
-              ? '  - Engage: Cartoon Squigglevision (Azure) / Cyber Neon Jitter (Noir)!' 
-              : '  - Disengage: Resetting animations to normal.', type: 'output' }
+              ? '  - Engage: 3D WebGL Gremlin Parade (Float & Bouncing Physics Activated)!' 
+              : '  - Disengage: Unmounting WebGL Canvas and releasing GPU memory.', type: 'output' }
           ];
         }
         break;

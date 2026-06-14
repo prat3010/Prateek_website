@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Navbar from '@/components/ui/Navbar';
@@ -18,10 +18,12 @@ const NoirSkyline = dynamic(() => import('@/components/effects/NoirSkyline'), {
 const CursorTrail = dynamic(() => import('@/components/effects/CursorTrail'), { ssr: false });
 const ZenToggle = dynamic(() => import('@/components/ui/ZenToggle'), { ssr: false });
 const InfoButton = dynamic(() => import('@/components/ui/InfoButton'), { ssr: false });
+const ThreeGremlinParade = dynamic(() => import('@/components/effects/ThreeGremlinParade'), { ssr: false });
 
 export default function ClientLayout({ children, initialTheme }: { children: React.ReactNode; initialTheme?: Theme }) {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith('/admin');
+  const [isKonamiActive, setIsKonamiActive] = useState(false);
 
   // Konami Code global listener
   useEffect(() => {
@@ -49,7 +51,8 @@ export default function ClientLayout({ children, initialTheme }: { children: Rea
 
       const isMatch = konamiCode.every((key, i) => key.toLowerCase() === keyBuffer[i]?.toLowerCase());
       if (isMatch) {
-        document.documentElement.classList.toggle('konami-active');
+        const nextState = document.documentElement.classList.toggle('konami-active');
+        setIsKonamiActive(nextState);
         keyBuffer = [];
       }
     };
@@ -65,8 +68,10 @@ export default function ClientLayout({ children, initialTheme }: { children: Rea
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.attributeName === 'class') {
-          const isKonamiActive = document.documentElement.classList.contains('konami-active');
-          if (isKonamiActive) {
+          const isClassActive = document.documentElement.classList.contains('konami-active');
+          setIsKonamiActive(isClassActive);
+          
+          if (isClassActive) {
             // Clear any active timeouts first
             if (timeoutId) clearTimeout(timeoutId);
             
@@ -108,6 +113,7 @@ export default function ClientLayout({ children, initialTheme }: { children: Rea
           {!isAdminRoute && <Footer />}
           {!isAdminRoute && <ZenToggle />}
           {!isAdminRoute && <InfoButton />}
+          {!isAdminRoute && isKonamiActive && <ThreeGremlinParade />}
         </LenisProvider>
       </LazyMotion>
     </ThemeProvider>
