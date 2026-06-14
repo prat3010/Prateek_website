@@ -20,7 +20,8 @@ import styles from './SiteInfoConsole.module.css';
 // Command responses for Noir Interactive Console
 interface ConsoleLine {
   text: string;
-  type: 'input' | 'output' | 'error' | 'success';
+  type: 'input' | 'output' | 'error' | 'success' | 'link';
+  command?: string;
 }
 
 const BOOT_LOGS = [
@@ -100,59 +101,71 @@ export default function SiteInfoConsole() {
 
     if (trimmedCmd.startsWith('secret')) {
       const parts = trimmedCmd.split(/\s+/);
-      let pathArg = parts.slice(1).join(' ').trim();
+      const subCommand = parts[1]?.toLowerCase() || '';
       
-      // Clean path
-      pathArg = pathArg.replace(/\/+$/, '').replace(/\\+/g, '/');
-      if (pathArg === 'root' || pathArg === '/') {
-        pathArg = '';
-      }
-      
-      // Fetch dynamic tree from API
-      fetch(`/api/explorer?path=${encodeURIComponent(pathArg)}`)
-        .then(res => {
-          if (!res.ok) throw new Error();
-          return res.json();
-        })
-        .then(data => {
-          const lines: ConsoleLine[] = [];
-          if (data.type === 'directory') {
-            const currentDir = data.path === 'root' ? 'prateek-portfolio/' : `prateek-portfolio/${data.path}/`;
-            lines.push({ text: `📂 ${currentDir}`, type: 'success' });
-            
-            if (data.contents.length === 0) {
-              lines.push({ text: '  (empty directory)', type: 'output' });
-            } else {
-              data.contents.forEach((item: { name: string; type: string }, idx: number) => {
-                const prefix = idx === data.contents.length - 1 ? '└── ' : '├── ';
-                const icon = item.type === 'directory' ? '📁 ' : '📄 ';
-                lines.push({ text: `${prefix}${icon}${item.name}`, type: 'output' });
-              });
-            }
+      if (subCommand === 'show') {
+        const commitHash = parts[2] || '';
+        
+        fetch(`/api/git-log?commit=${encodeURIComponent(commitHash)}`)
+          .then(res => {
+            if (!res.ok) throw new Error();
+            return res.json();
+          })
+          .then(data => {
+            const lines: ConsoleLine[] = [];
+            lines.push({ text: `📂 GIT INSPECTOR // COMMIT SPECIFICATIONS:`, type: 'success' });
             lines.push({ text: ' ', type: 'output' });
-            const pathPrefix = data.path === 'root' ? '' : `${data.path}/`;
-            lines.push({ text: `💡 Tip: Type "secret ${pathPrefix}<folder_name>" to browse further (e.g., "secret ${pathPrefix}src").`, type: 'success' });
-          } else if (data.type === 'file') {
-            lines.push({ text: `📄 prateek-portfolio/${data.name}`, type: 'success' });
-            if (data.content) {
-              const contentLines = data.content.split('\n');
-              contentLines.forEach((l: string) => {
-                lines.push({ text: `  ${l}`, type: 'output' });
+            
+            const detailLines = data.content.split('\n');
+            detailLines.forEach((l: string) => {
+              lines.push({ text: l, type: 'output' });
+            });
+            lines.push({ text: ' ', type: 'output' });
+            lines.push({
+              text: '⏮️ Click here to return to Commit Journal',
+              type: 'link',
+              command: 'secret'
+            });
+            setTerminalHistory(prev => [...prev, ...lines]);
+          })
+          .catch(() => {
+            setTerminalHistory(prev => [
+              ...prev,
+              { text: `⚠️ Commit details not found or failed to load for hash: '${commitHash}'`, type: 'error' },
+              { text: '⏮️ Click here to return to Commit Journal', type: 'link', command: 'secret' }
+            ]);
+          });
+      } else {
+        // Default: fetch list of commits
+        fetch('/api/git-log')
+          .then(res => {
+            if (!res.ok) throw new Error();
+            return res.json();
+          })
+          .then(data => {
+            const lines: ConsoleLine[] = [];
+            lines.push({ text: '🕵️‍♂️ PORTFOLIO DEVELOPMENT GIT COMMIT JOURNAL:', type: 'success' });
+            lines.push({ text: '  Click on any commit line to inspect code modifications and files changed.', type: 'output' });
+            lines.push({ text: ' ', type: 'output' });
+            
+            data.commits.forEach((c: { hash: string; subject: string; date: string; author: string }) => {
+              lines.push({
+                text: `  [${c.hash}] ${c.subject} (${c.date})`,
+                type: 'link',
+                command: `secret show ${c.hash}`
               });
-            } else {
-              lines.push({ text: `  - File Size: ${data.size} bytes`, type: 'output' });
-              lines.push({ text: `  - Status: ${data.msg}`, type: 'output' });
-            }
-          }
-          setTerminalHistory(prev => [...prev, ...lines]);
-        })
-        .catch(() => {
-          setTerminalHistory(prev => [
-            ...prev,
-            { text: `⚠️ Path not found or restricted: '${pathArg}'`, type: 'error' },
-            { text: '  Type "secret" to view the root directory map.', type: 'output' }
-          ]);
-        });
+            });
+            lines.push({ text: ' ', type: 'output' });
+            lines.push({ text: '💡 Tip: You can also inspect manually by typing "secret show <commit_hash>"', type: 'success' });
+            setTerminalHistory(prev => [...prev, ...lines]);
+          })
+          .catch(() => {
+            setTerminalHistory(prev => [
+              ...prev,
+              { text: '⚠️ Failed to retrieve git logs.', type: 'error' }
+            ]);
+          });
+      }
       
       setTerminalInput('');
       return;
@@ -177,7 +190,7 @@ export default function SiteInfoConsole() {
           { text: '  cheatcode  - Run retro developer override', type: 'output' },
           { text: '  about      - Reveal website backstory & design decisions', type: 'output' },
           { text: '  clear      - Clear the command interface screen', type: 'output' },
-          { text: '  secret     - Explore the repository codebase directory tree', type: 'output' }
+          { text: '  secret     - Open the interactive portfolio Git commit inspector', type: 'output' }
         ];
         break;
       case 'specs':
@@ -426,7 +439,14 @@ export default function SiteInfoConsole() {
           <div className={styles.terminalContainer} onClick={focusTerminalInput}>
             <div className={styles.terminalScreen} ref={terminalScreenRef}>
               {terminalHistory.map((line, index) => (
-                <div key={index} className={`${styles.terminalLine} ${styles[line.type]}`}>
+                <div
+                  key={index}
+                  className={`${styles.terminalLine} ${styles[line.type]} ${line.command ? styles.clickableLine : ''}`}
+                  onClick={line.command ? (e) => {
+                    e.stopPropagation();
+                    executeCommand(line.command!);
+                  } : undefined}
+                >
                   {line.text}
                 </div>
               ))}

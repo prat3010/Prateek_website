@@ -244,6 +244,15 @@
 .output { color: var(--pop-cream); }
 .success { color: var(--pop-green); }
 .error { color: var(--pop-red); }
+.link { color: var(--neon-cyan, var(--pop-blue)); text-decoration: underline; }
+
+.clickableLine {
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+.clickableLine:hover {
+  opacity: 0.85;
+}
 
 .terminalPromptLine {
   display: flex;
