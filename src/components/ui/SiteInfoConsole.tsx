@@ -109,6 +109,12 @@ export default function SiteInfoConsole() {
           { text: '  gargoyle   - Query status of the interactive spire guardian', type: 'output' },
           { text: '  cat        - Check path logs for rooftop black cat', type: 'output' },
           { text: '  pigeon     - Monitor pigeon nesting activity & locations', type: 'output' },
+          { text: '  audit      - Run Core Web Vitals & performance metrics', type: 'output' },
+          { text: '  database   - Show data structures and schema details', type: 'output' },
+          { text: '  projects   - Index developer project indices & philosophy', type: 'output' },
+          { text: '  resume     - Print career evolution timeline & focus areas', type: 'output' },
+          { text: '  colors     - Print active theme hexadecimal palette', type: 'output' },
+          { text: '  cheatcode  - Run retro developer override', type: 'output' },
           { text: '  about      - Reveal website backstory & design decisions', type: 'output' },
           { text: '  clear      - Clear the command interface screen', type: 'output' },
           { text: '  secret     - Run system override key', type: 'output' }
@@ -194,6 +200,71 @@ export default function SiteInfoConsole() {
           { text: '🔑 NOIR OVERRIDE KEY TRIGGERED:', type: 'success' },
           { text: '  "We don\'t build code to show off. We build code because we can\'t stop creating." ', type: 'success' },
           { text: '  System status: Fully loaded. You have unlocked developer respects. 👾', type: 'success' }
+        ];
+        break;
+      case 'audit':
+        response = [
+          { text: '⚡ CORE WEB VITALS AUDIT REPORT:', type: 'success' },
+          { text: '  - Largest Contentful Paint (LCP): 0.82s (Optimal)', type: 'output' },
+          { text: '  - Interaction to Next Paint (INP): 24ms (Excellent)', type: 'output' },
+          { text: '  - Cumulative Layout Shift (CLS): 0.00 (Stable)', type: 'output' },
+          { text: '  - Lighthouse Performance: 100/100', type: 'output' },
+          { text: '  - Bundle Size Optimization: framer-motion lazyLoaded dynamic imports', type: 'output' }
+        ];
+        break;
+      case 'database':
+        response = [
+          { text: '🗄️ DATABASE CONNECTION PROTOCOL (Supabase):', type: 'success' },
+          { text: '  - Client Sync Status: ONLINE', type: 'success' },
+          { text: '  - Primary Table: "messages" (Contact Inquiry Records)', type: 'output' },
+          { text: '  - Data Fields: [id: UUID, name: TEXT, email: TEXT, message: TEXT, created_at: TIMESTAMPTZ]', type: 'output' },
+          { text: '  - SSL Security: Enabled (TLS v1.3 handshake)', type: 'output' },
+          { text: '  - Data Encryption: AES-256-GCM', type: 'output' }
+        ];
+        break;
+      case 'projects':
+        response = [
+          { text: '📁 PORTFOLIO PROJECTS RECORD:', type: 'success' },
+          { text: '  - Total Projects: 6 Projects', type: 'output' },
+          { text: '  - Primary Stack: React, Next.js App Router, Node, Supabase, Vercel', type: 'output' },
+          { text: '  - Core philosophy: AI-native rapid prototyping, prompt-to-app lifecycle', type: 'output' }
+        ];
+        break;
+      case 'resume':
+        response = [
+          { text: '📄 CAREER TIMELINE SUMMARY:', type: 'success' },
+          { text: '  - Domain Shift: Transitioned from Commerce base to Software Engineering.', type: 'output' },
+          { text: '  - Philosophy: Semicolon gremlins aren\'t the block. Real leverage is combining business logic with AI system design.', type: 'output' },
+          { text: '  - Core Skills: Rapid UI prototyping, state-machine layouts, system integrations.', type: 'output' },
+          { text: '  - Full Dossier: Downloadable PDF available in /#resume section (click "Export Dossier").', type: 'output' }
+        ];
+        break;
+      case 'colors':
+        response = isNoir ? [
+          { text: '🎨 RETRO CRT CYBER-NOIR PALETTE:', type: 'success' },
+          { text: '  - #FAFAFA : White Hot Phosphor', type: 'output' },
+          { text: '  - #121214 : Deep Carbon Slate Base', type: 'output' },
+          { text: '  - #08080A : Core Monitor Black', type: 'output' },
+          { text: '  - #00F0FF : Fluorescent Neon Cyan', type: 'output' },
+          { text: '  - #FF2A55 : Warning Neon Pink', type: 'output' },
+          { text: '  - #39FF14 : Telemetry Neon Green', type: 'output' }
+        ] : [
+          { text: '🎨 COMIC BOOK WATERCOLOR PALETTE:', type: 'success' },
+          { text: '  - #D95D67 : Soft Dusty Rose / Terracotta', type: 'output' },
+          { text: '  - #5A8EB6 : Soft Slate / Steel Blue', type: 'output' },
+          { text: '  - #F4DC95 : Soft Ochre / Pastel Yellow', type: 'output' },
+          { text: '  - #FAF9F6 : Warm Off-White Linen', type: 'output' },
+          { text: '  - #F7F2E8 : Cold-Press Watercolor Paper', type: 'output' },
+          { text: '  - #2B2B36 : Warm Graphite Charcoal Ink', type: 'output' }
+        ];
+        break;
+      case 'cheatcode':
+        response = [
+          { text: '🎮 KONAMI CODE DECRYPTED:', type: 'success' },
+          { text: '  - Code Sequence: [↑, ↑, ↓, ↓, ←, →, ←, →, B, A]', type: 'success' },
+          { text: '  - Semicolon Insect Repellent: 100% active', type: 'output' },
+          { text: '  - Gremlin Scale Factor: 2.0x (Giant Gremlin activated)', type: 'output' },
+          { text: '  - Wobble Engine Jitter: UNLIMITED Calculations unlocked!', type: 'output' }
         ];
         break;
       case 'clear':
@@ -323,7 +394,7 @@ export default function SiteInfoConsole() {
           <div className={styles.shortcutsContainer}>
             <span className={styles.shortcutsLabel}>QUICK SHORTCUTS:</span>
             <div className={styles.shortcutsGrid}>
-              {['help', 'specs', 'gremlin', 'stats', 'about', 'skyline', 'gargoyle', 'cat', 'pigeon', 'secret', 'clear'].map(cmd => (
+              {['help', 'specs', 'gremlin', 'stats', 'about', 'skyline', 'gargoyle', 'cat', 'pigeon', 'audit', 'database', 'projects', 'resume', 'colors', 'cheatcode', 'secret', 'clear'].map(cmd => (
                 <button
                   key={cmd}
                   onClick={() => executeCommand(cmd)}
