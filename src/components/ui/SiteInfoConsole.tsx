@@ -10,11 +10,6 @@ import {
 } from 'lucide-react';
 import styles from './SiteInfoConsole.module.css';
 
-interface BatteryManager extends EventTarget {
-  level: number;
-  charging: boolean;
-}
-
 // Command responses for Noir Interactive Console
 interface ConsoleLine {
   text: string;
@@ -44,8 +39,6 @@ export default function SiteInfoConsole() {
     bundleSize: 184,
     domNodes: 0,
     gremlinEnergy: 100,
-    isCharging: false,
-    isBatterySupported: false,
     uptime: '00:00:00'
   });
 
@@ -104,42 +97,7 @@ export default function SiteInfoConsole() {
       return Math.round(totalBytes / 1024) || 245; // fallback to 245 if zero
     };
 
-    // 2. Battery status API link
-    let batteryInstance: BatteryManager | null = null;
-    let usingSimulatedBattery = true;
-
-    const updateBattery = (level: number, charging: boolean, supported: boolean) => {
-      setStats(prev => ({
-        ...prev,
-        gremlinEnergy: Math.round(level * 100),
-        isCharging: charging,
-        isBatterySupported: supported
-      }));
-    };
-
-    const onBatteryChange = () => {
-      if (batteryInstance) {
-        updateBattery(batteryInstance.level, batteryInstance.charging, true);
-      }
-    };
-
-    if (typeof navigator !== 'undefined') {
-      const nav = navigator as Navigator & { getBattery?: () => Promise<BatteryManager> };
-      if (typeof nav.getBattery === 'function') {
-        nav.getBattery()
-          .then((battery) => {
-            batteryInstance = battery;
-            usingSimulatedBattery = false;
-            updateBattery(battery.level, battery.charging, true);
-            battery.addEventListener('levelchange', onBatteryChange);
-            battery.addEventListener('chargingchange', onBatteryChange);
-          })
-          .catch(() => {
-            usingSimulatedBattery = true;
-          });
-      }
-    }
-
+    let lastUptimeSeconds = 0;
     const timer = setInterval(() => {
       // Format uptime
       const diff = Date.now() - startTime;
@@ -149,35 +107,27 @@ export default function SiteInfoConsole() {
       
       const liveDomNodes = typeof document !== 'undefined' ? document.getElementsByTagName('*').length : 0;
       const liveBundle = calculateBundleSize();
+      const uptimeSeconds = Math.floor(diff / 1000);
 
       setStats(prev => {
         let nextEnergy = prev.gremlinEnergy;
-        let nextCharging = prev.isCharging;
-
-        if (usingSimulatedBattery) {
-          // Slowly drain 1% every 60 seconds starting from 85%
-          const secondsUptime = Math.floor(diff / 1000);
-          nextEnergy = Math.max(5, 85 - Math.floor(secondsUptime / 60));
-          nextCharging = false;
+        // Slowly drain energy over time: 1% every 15 seconds
+        if (uptimeSeconds > 0 && uptimeSeconds !== lastUptimeSeconds && uptimeSeconds % 15 === 0) {
+          nextEnergy = Math.max(5, prev.gremlinEnergy - 1);
         }
-
         return {
           ...prev,
           bundleSize: liveBundle,
           domNodes: liveDomNodes,
           gremlinEnergy: nextEnergy,
-          isCharging: nextCharging,
           uptime: `${hours}:${mins}:${secs}`
         };
       });
+      lastUptimeSeconds = uptimeSeconds;
     }, 1000);
 
     return () => {
       clearInterval(timer);
-      if (batteryInstance) {
-        batteryInstance.removeEventListener('levelchange', onBatteryChange);
-        batteryInstance.removeEventListener('chargingchange', onBatteryChange);
-      }
     };
   }, []);
 
@@ -268,6 +218,7 @@ export default function SiteInfoConsole() {
           { text: 'Available commands:', type: 'success' },
           { text: '  specs      - Print website core technologies & stack', type: 'output' },
           { text: '  gremlin    - Inspect the embedded Gremlin mascot status', type: 'output' },
+          { text: '  feed       - Feed semicolons to the Gremlin mascot', type: 'output' },
           { text: '  stats      - Display live physical footprint data', type: 'output' },
           { text: '  skyline    - Inspect background canvas & wobbly rendering', type: 'output' },
           { text: '  gargoyle   - Query status of the interactive spire guardian', type: 'output' },
@@ -305,11 +256,15 @@ export default function SiteInfoConsole() {
           { text: '  - Core Role: Semicolon Consumer & Bug Generator', type: 'output' },
           { text: '  - Interactive States: Blushes on hover, ears rotate', type: 'output' },
           { text: '  - Current Location: SVG Logo Container (Fixed Nav Anchor)', type: 'output' },
-          { text: `  - Energy Level: ${stats.gremlinEnergy}% (${
-            stats.isBatterySupported 
-              ? (stats.isCharging ? 'AC Power: Charging Mascot' : 'Battery Level Synced')
-              : 'Simulated Uptime Drain: API Unsupported'
-          })`, type: 'output' }
+          { text: `  - Energy Level: ${stats.gremlinEnergy}% (Uptime Drain // feed with 'feed')`, type: 'output' }
+        ];
+        break;
+      case 'feed':
+        setStats(prev => ({ ...prev, gremlinEnergy: 100 }));
+        response = [
+          { text: '😋 GREMLIN FEED PROTOCOL ENGAGED:', type: 'success' },
+          { text: '  Consuming semicolons... Nom nom nom! 👾', type: 'success' },
+          { text: '  - Gremlin Energy restored to 100%', type: 'output' }
         ];
         break;
       case 'stats':
@@ -503,7 +458,7 @@ export default function SiteInfoConsole() {
                 <li>
                   <span className={styles.metricLabel}>GREMLIN ENERGY:</span>
                   <span className={styles.metricValue}>
-                    {stats.gremlinEnergy}% {stats.isBatterySupported ? (stats.isCharging ? '🔌' : '🔋') : '⚙️'}
+                    {stats.gremlinEnergy}% 🔋
                   </span>
                   <div className={styles.progressBar}>
                     <div className={styles.progressFill} style={{ width: `${stats.gremlinEnergy}%`, backgroundColor: 'var(--neon-pink, var(--pop-red))' }} />
@@ -568,7 +523,7 @@ export default function SiteInfoConsole() {
           <div className={styles.shortcutsContainer}>
             <span className={styles.shortcutsLabel}>QUICK SHORTCUTS:</span>
             <div className={styles.shortcutsGrid}>
-              {['help', 'specs', 'gremlin', 'stats', 'about', 'skyline', 'gargoyle', 'cat', 'pigeon', 'audit', 'database', 'projects', 'resume', 'colors', 'cheatcode', 'secret', 'clear'].map(cmd => (
+              {['help', 'specs', 'gremlin', 'feed', 'stats', 'about', 'skyline', 'gargoyle', 'cat', 'pigeon', 'audit', 'database', 'projects', 'resume', 'colors', 'cheatcode', 'secret', 'clear'].map(cmd => (
                 <button
                   key={cmd}
                   onClick={() => executeCommand(cmd)}
