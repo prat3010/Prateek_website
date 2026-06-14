@@ -52,4 +52,7 @@ __pycache__/
 .venv/
 venv/
 
+# Generated Git Log
+/src/data/git-log.json
+
 

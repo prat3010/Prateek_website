@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import fs from 'fs';
+import path from 'path';
 
 const execAsync = promisify(exec);
 
@@ -52,6 +54,21 @@ Date:   ${mock.date}
     }
 
     // Default: return recent commit history list
+    // 1. Try to read the pre-built JSON file (written at build time for serverless runtime)
+    try {
+      const jsonPath = path.join(process.cwd(), 'src/data/git-log.json');
+      if (fs.existsSync(jsonPath)) {
+        const fileContent = fs.readFileSync(jsonPath, 'utf8');
+        const commits = JSON.parse(fileContent);
+        if (Array.isArray(commits) && commits.length > 0) {
+          return NextResponse.json({ type: 'list', commits });
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to read pre-built git-log.json:', err);
+    }
+
+    // 2. Try to run git dynamically (works in local dev where .git is present)
     try {
       const { stdout } = await execAsync('git log -n 10 --pretty=format:"%h|%an|%ar|%s"');
       const lines = stdout.trim().split('\n');
@@ -61,7 +78,7 @@ Date:   ${mock.date}
       });
       return NextResponse.json({ type: 'list', commits });
     } catch {
-      // Return whitelisted mock commits as fallback
+      // 3. Fallback to whitelisted mock commits if git runs fail
       return NextResponse.json({ type: 'list', commits: MOCK_COMMITS });
     }
 
