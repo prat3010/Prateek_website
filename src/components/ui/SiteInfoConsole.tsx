@@ -92,8 +92,6 @@ export default function SiteInfoConsole() {
 
   // Hardware sync: script sizes, DOM nodes, and uptime
   useEffect(() => {
-    const startTime = Date.now();
-
     // 1. Calculate actual loaded javascript bundle sizes in KB
     const calculateBundleSize = () => {
       if (typeof performance === 'undefined') return 184;
@@ -113,9 +111,9 @@ export default function SiteInfoConsole() {
       bundleSize: initialBundle
     }));
 
-    // Uptime tick loop - only updates uptime string, leaving other stats untouched
+    // Uptime tick loop - tracks performance.now() (session lifetime since first tab load)
     const timer = setInterval(() => {
-      const diff = Date.now() - startTime;
+      const diff = typeof performance !== 'undefined' ? performance.now() : 0;
       const hours = String(Math.floor(diff / 3600000)).padStart(2, '0');
       const mins = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
       const secs = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
