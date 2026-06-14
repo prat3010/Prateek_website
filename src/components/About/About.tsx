@@ -54,13 +54,13 @@ export default function About() {
                 <p className={styles.bioText}>
                   They stare at screens, praying to a god of syntax and semicolons. I don&apos;t.
                   <br /><br />
-                  My name is <strong>Prateeq Sharma</strong>. I&apos;m a developer and designer, bringing ideas out of the dark and into reality at warp speed. While traditional coders get lost in legacy frameworks, I combine solid software engineering with AI orchestration to build fast, polished web applications.
+                  My name is <strong>Prateeq Sharma</strong>. I transitioned from a background in Commerce to software engineering when I realized that code + AI is the ultimate leverage to solve complex business and technical problems. Now, I bring ideas out of the dark and into reality at warp speed. While traditional coders get lost in legacy frameworks, I combine solid system logic with AI orchestration to build fast, polished applications.
                   <br /><br />
                   In this city, the real superpower isn&apos;t memorizing boilerplate code. It&apos;s having the vision to design, the skill to build, and the tools to make it happen before the rain stops.
                 </p>
               ) : (
                 <p className={styles.bioText}>
-                  Hey there! I&apos;m <strong>Prateeq Sharma</strong> — a full-stack developer and designer who crafts high-performance web applications and digital experiences. By blending creative vision, clean frontend engineering, and modern AI orchestration, I turn complex ideas into functional products at warp speed. Whether it&apos;s building interactive apps or designing premium interfaces, I focus on delivering speed, precision, and high-impact results.
+                  Hey there! I&apos;m <strong>Prateeq Sharma</strong> — a product-minded developer and builder who crafts high-performance web applications and digital experiences. Transitioning from a Commerce background, I realized that combining business logic with software and modern AI orchestration is the fastest way to turn complex requirements into shipped products. I focus on delivering velocity, architectural precision, and high-impact results.
                 </p>
               )}
             </SpeechBubble>
