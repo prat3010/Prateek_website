@@ -326,6 +326,7 @@
   border: 3px solid #FAFAFA;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(250, 250, 250, 0.05);
   border-radius: 6px;
+  color: #e0e0e3;
 }
 
 :global([data-theme='noir']) .consoleTitleBar {
