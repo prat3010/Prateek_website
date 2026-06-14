@@ -58,6 +58,44 @@ export default function ClientLayout({ children, initialTheme }: { children: Rea
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // Konami Code auto-timeout observer (deactivates after 30 seconds)
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout | null = null;
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          const isKonamiActive = document.documentElement.classList.contains('konami-active');
+          if (isKonamiActive) {
+            // Clear any active timeouts first
+            if (timeoutId) clearTimeout(timeoutId);
+            
+            // Set 30-second safety timer
+            timeoutId = setTimeout(() => {
+              document.documentElement.classList.remove('konami-active');
+            }, 30000);
+          } else {
+            // If deactivated manually, clear the timer
+            if (timeoutId) {
+              clearTimeout(timeoutId);
+              timeoutId = null;
+            }
+          }
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+
+    return () => {
+      observer.disconnect();
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, []);
+
   return (
     <ThemeProvider initialTheme={initialTheme}>
       <LazyMotion features={domAnimation}>
