@@ -26,6 +26,16 @@ export function generateResumePDF(activePersona: Persona) {
     y += 5;
   };
 
+  // Helper to check and handle page breaks
+  const checkPageBreak = (neededHeight: number) => {
+    if (y + neededHeight > 280) {
+      doc.addPage();
+      y = 20;
+      return true; // Page was added
+    }
+    return false;
+  };
+
   // Helper to write wrapped body text block
   const drawTextParagraph = (text: string, fontSize = 9.5, isBold = false) => {
     doc.setFont('Helvetica', isBold ? 'Bold' : 'Normal');
@@ -36,11 +46,7 @@ export function generateResumePDF(activePersona: Persona) {
     const lines: string[] = doc.splitTextToSize(text, contentWidth);
     
     lines.forEach((line) => {
-      // Check if page height exceeded
-      if (y > 280) {
-        doc.addPage();
-        y = 20;
-      }
+      checkPageBreak(fontSize * 0.45);
       doc.text(line, leftMargin, y);
       y += fontSize * 0.45; // Line height spacing
     });
@@ -85,6 +91,7 @@ export function generateResumePDF(activePersona: Persona) {
   y += 4;
 
   // ─── 3. CORE CAPABILITIES ───
+  checkPageBreak(15);
   doc.setFont('Helvetica', 'Bold');
   doc.setFontSize(10.5);
   doc.setTextColor(0, 0, 0);
@@ -101,6 +108,7 @@ export function generateResumePDF(activePersona: Persona) {
   y += 9;
 
   // ─── 4. WORK EXPERIENCE ───
+  checkPageBreak(20);
   doc.setFont('Helvetica', 'Bold');
   doc.setFontSize(10.5);
   doc.setTextColor(0, 0, 0);
@@ -109,6 +117,9 @@ export function generateResumePDF(activePersona: Persona) {
   drawDivider();
 
   resumeData.experience.forEach((exp) => {
+    // Check page break before starting a job entry (Role, dates, company, location takes approx 15mm)
+    checkPageBreak(15);
+
     // Role Title & Period Row
     doc.setFont('Helvetica', 'Bold');
     doc.setFontSize(10.5);
@@ -136,6 +147,12 @@ export function generateResumePDF(activePersona: Persona) {
     // Bullet Points
     exp.bullets.forEach((bullet) => {
       const text = bullet[activePersona] || bullet.general;
+      const wrappedBullet: string[] = doc.splitTextToSize(text, contentWidth - 6);
+      const neededHeight = wrappedBullet.length * 4.5 + 2;
+
+      // Check page break before rendering this bullet point to prevent orphan bullet lines
+      checkPageBreak(neededHeight);
+
       // Draw bullet character
       doc.setFont('Helvetica', 'Bold');
       doc.setFontSize(9);
@@ -147,7 +164,6 @@ export function generateResumePDF(activePersona: Persona) {
       doc.setFontSize(9.5);
       doc.setTextColor(40, 40, 40);
       
-      const wrappedBullet: string[] = doc.splitTextToSize(text, contentWidth - 6);
       wrappedBullet.forEach((line) => {
         doc.text(line, leftMargin + 6, y);
         y += 4.5;
@@ -158,6 +174,7 @@ export function generateResumePDF(activePersona: Persona) {
   });
 
   // ─── 5. EDUCATION ───
+  checkPageBreak(20);
   doc.setFont('Helvetica', 'Bold');
   doc.setFontSize(10.5);
   doc.setTextColor(0, 0, 0);
@@ -166,6 +183,9 @@ export function generateResumePDF(activePersona: Persona) {
   drawDivider();
 
   resumeData.education.forEach((edu) => {
+    // Check page break before starting an education entry (Approx 12mm)
+    checkPageBreak(12);
+
     // School Name & Period
     doc.setFont('Helvetica', 'Bold');
     doc.setFontSize(10);
