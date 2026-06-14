@@ -311,7 +311,7 @@ export default async function AnalyticsPage(props: {
           href="/info" 
           className={styles.backBtn}
         >
-          🖥️ Terminal Diagnostics
+          Terminal Diagnostics
         </Link>
       </div>
 

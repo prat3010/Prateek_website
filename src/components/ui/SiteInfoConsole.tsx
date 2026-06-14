@@ -205,7 +205,7 @@ export default function SiteInfoConsole() {
           })
           .then(data => {
             const lines: ConsoleLine[] = [];
-            lines.push({ text: `📂 GIT INSPECTOR // COMMIT SPECIFICATIONS:`, type: 'success' });
+            lines.push({ text: `GIT INSPECTOR // COMMIT SPECIFICATIONS:`, type: 'success' });
             lines.push({ text: ' ', type: 'output' });
             
             const detailLines = data.content.split('\n');
@@ -214,7 +214,7 @@ export default function SiteInfoConsole() {
             });
             lines.push({ text: ' ', type: 'output' });
             lines.push({
-              text: '⏮️ Click here to return to Commit Journal',
+              text: 'Click here to return to Commit Journal',
               type: 'link',
               command: 'git-info'
             });
@@ -223,8 +223,8 @@ export default function SiteInfoConsole() {
           .catch(() => {
             setTerminalHistory(prev => [
               ...prev,
-              { text: `⚠️ Commit details not found or failed to load for hash: '${commitHash}'`, type: 'error' },
-              { text: '⏮️ Click here to return to Commit Journal', type: 'link', command: 'git-info' }
+              { text: `Commit details not found or failed to load for hash: '${commitHash}'`, type: 'error' },
+              { text: 'Click here to return to Commit Journal', type: 'link', command: 'git-info' }
             ]);
           });
       } else {
@@ -236,7 +236,7 @@ export default function SiteInfoConsole() {
           })
           .then(data => {
             const lines: ConsoleLine[] = [];
-            lines.push({ text: '🕵️‍♂️ PORTFOLIO DEVELOPMENT GIT COMMIT JOURNAL:', type: 'success' });
+            lines.push({ text: 'PORTFOLIO DEVELOPMENT GIT COMMIT JOURNAL:', type: 'success' });
             lines.push({ text: '  Click on any commit line to inspect code modifications and files changed.', type: 'output' });
             lines.push({ text: ' ', type: 'output' });
             
@@ -248,13 +248,13 @@ export default function SiteInfoConsole() {
               });
             });
             lines.push({ text: ' ', type: 'output' });
-            lines.push({ text: '💡 Tip: You can also inspect manually by typing "git-info show <commit_hash>"', type: 'success' });
+            lines.push({ text: 'Tip: You can also inspect manually by typing "git-info show <commit_hash>"', type: 'success' });
             setTerminalHistory(prev => [...prev, ...lines]);
           })
           .catch(() => {
             setTerminalHistory(prev => [
               ...prev,
-              { text: '⚠️ Failed to retrieve git logs.', type: 'error' }
+              { text: 'Failed to retrieve git logs.', type: 'error' }
             ]);
           });
       }
@@ -271,7 +271,7 @@ export default function SiteInfoConsole() {
         if (typeof sessionStorage !== 'undefined') sessionStorage.clear();
         setTerminalHistory(prev => [
           ...prev,
-          { text: '🧹 STORAGE INVENTORY WIPED:', type: 'success' },
+          { text: 'STORAGE INVENTORY WIPED:', type: 'success' },
           { text: '  - Cleared all LocalStorage key-value pairs.', type: 'output' },
           { text: '  - Cleared all SessionStorage contexts.', type: 'output' }
         ]);
@@ -288,7 +288,7 @@ export default function SiteInfoConsole() {
         })
         .then(data => {
           const lines: ConsoleLine[] = [
-            { text: '📊 DATABASE TRAFFIC ANALYTICS SUMMARY:', type: 'success' },
+            { text: 'DATABASE TRAFFIC ANALYTICS SUMMARY:', type: 'success' },
             { text: `  - Operational Mode: ${data.isDemoMode ? 'DEMO (MOCK DATA)' : 'LIVE DATABASE'}`, type: 'output' },
             { text: `  - Total Page Views: ${data.totalViews} views`, type: 'output' },
             { text: `  - Unique IP Visitors: ${data.uniqueVisitors} users`, type: 'output' },
@@ -296,14 +296,14 @@ export default function SiteInfoConsole() {
             { text: `  - Top Traffic Referral: ${data.topReferrer}`, type: 'output' },
             { text: `  - Top Visitor Country: ${data.topCountry}`, type: 'output' },
             { text: ' ', type: 'output' },
-            { text: '🔗 Click here to open full visitor analytics dashboard', type: 'link', command: 'go-analytics' }
+            { text: 'Click here to open full visitor analytics dashboard', type: 'link', command: 'go-analytics' }
           ];
           setTerminalHistory(prev => [...prev, ...lines]);
         })
         .catch(() => {
           setTerminalHistory(prev => [
             ...prev,
-            { text: '⚠️ Failed to retrieve database analytics.', type: 'error' }
+            { text: 'Failed to retrieve database analytics.', type: 'error' }
           ]);
         });
       setTerminalInput('');
@@ -335,7 +335,7 @@ export default function SiteInfoConsole() {
         break;
       case 'projects':
         response = [
-          { text: '📁 PORTFOLIO PROJECTS RECORD:', type: 'success' },
+          { text: 'PORTFOLIO PROJECTS RECORD:', type: 'success' },
           { text: `  - Total Active Projects: ${projects.length}`, type: 'output' },
           ...projects.map(p => ({ text: `  • ${p.title} (${p.tags.join(', ')})`, type: 'output' as const })),
           { text: '  - Repository source: github.com/prat3010', type: 'output' }
@@ -358,7 +358,7 @@ export default function SiteInfoConsole() {
         const dpr = typeof window !== 'undefined' ? window.devicePixelRatio : 1;
 
         response = [
-          { text: '🖥️ SYSTEM HARDWARE METRICS:', type: 'success' },
+          { text: 'SYSTEM HARDWARE METRICS:', type: 'success' },
           { text: `  - Operating System: ${os}`, type: 'output' },
           { text: `  - Logical CPU Cores: ${cores} threads`, type: 'output' },
           { text: `  - Estimated Device RAM: ${ram}`, type: 'output' },
@@ -382,19 +382,19 @@ export default function SiteInfoConsole() {
         }
 
         response = [
-          { text: '🗄️ CLIENT-SIDE STORAGE AUDIT:', type: 'success' },
+          { text: 'CLIENT-SIDE STORAGE AUDIT:', type: 'success' },
           { text: `  - LocalStorage footprint: ${localKeys.length} keys (${totalLocalBytes} characters)`, type: 'output' },
           ...localKeys.map(k => ({ text: `    • [Local] ${k}`, type: 'output' as const })),
           { text: `  - SessionStorage footprint: ${sessionKeys.length} keys`, type: 'output' },
           ...sessionKeys.map(k => ({ text: `    • [Session] ${k}`, type: 'output' as const })),
           { text: `  - Cookies count: ${cookieCount} active`, type: 'output' },
-          { text: '💡 Tip: Type "storage clear" to wipe all localStorage and sessionStorage caches.', type: 'success' }
+          { text: 'Tip: Type "storage clear" to wipe all localStorage and sessionStorage caches.', type: 'success' }
         ];
         break;
       }
       case 'stack':
         response = [
-          { text: '🛠️ WEBSITE TECHNOLOGY STACK:', type: 'success' },
+          { text: 'WEBSITE TECHNOLOGY STACK:', type: 'success' },
           { text: '  - Core Framework: Next.js 16.2.6 (React 19.2.4)', type: 'output' },
           { text: '  - Language: TypeScript 5.x', type: 'output' },
           { text: '  - Database & Backend: Supabase JS SDK 2.106.2', type: 'output' },
@@ -412,7 +412,7 @@ export default function SiteInfoConsole() {
       case 'sync':
       case 'synchronizer':
         response = [
-          { text: '🔄 PORTFOLIO DATABASE SYNCHRONIZER:', type: 'success' },
+          { text: 'PORTFOLIO DATABASE SYNCHRONIZER:', type: 'success' },
           { text: '  An AI-powered local manager dashboard that scans codebase folders or GitHub repos, extracts project metadata via Gemini, and synchronizes skills, certificates, resumes, and projects directly into the website code.', type: 'output' },
           { text: ' ', type: 'output' },
           { text: '  - Core Script: scripts/synchronizer.py (Python 3)', type: 'output' },
@@ -426,7 +426,7 @@ export default function SiteInfoConsole() {
         if (typeof window !== 'undefined') {
           const isActive = document.documentElement.classList.toggle('konami-active');
           response = [
-            { text: '🎮 KONAMI CODE DECRYPTED:', type: 'success' },
+            { text: 'KONAMI CODE DECRYPTED:', type: 'success' },
             { text: '  - Keyboard Sequence: [↑, ↑, ↓, ↓, ←, →, ←, →, B, A]', type: 'success' },
             { text: `  - Cheat Override Mode: ${isActive ? 'ACTIVE' : 'INACTIVE'}`, type: 'output' },
             { text: isActive 
@@ -465,7 +465,7 @@ export default function SiteInfoConsole() {
             <span>Return to Base</span>
           </Link>
           <Link href="/admin/analytics" className={styles.backLink}>
-            <span>📊 Visitor Analytics</span>
+            <span>Visitor Analytics</span>
           </Link>
         </div>
 
