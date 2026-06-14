@@ -270,6 +270,7 @@ export default function SiteInfoConsole() {
           { text: '  stats      - Display live physical footprint data', type: 'output' },
           { text: '  audit      - Run live Core Web Vitals performance audit', type: 'output' },
           { text: '  projects   - Index developer project indices & tags', type: 'output' },
+          { text: '  cheatcode  - Run retro developer override (3D WebGL parade)', type: 'output' },
           { text: '  secret     - Open the interactive portfolio Git commit inspector', type: 'output' },
           { text: '  clear      - Clear the command interface screen', type: 'output' }
         ];
@@ -298,6 +299,19 @@ export default function SiteInfoConsole() {
           ...projects.map(p => ({ text: `  • ${p.title} (${p.tags.join(', ')})`, type: 'output' as const })),
           { text: '  - Repository source: github.com/prat3010', type: 'output' }
         ];
+        break;
+      case 'cheatcode':
+        if (typeof window !== 'undefined') {
+          const isActive = document.documentElement.classList.toggle('konami-active');
+          response = [
+            { text: '🎮 KONAMI CODE DECRYPTED:', type: 'success' },
+            { text: '  - Keyboard Sequence: [↑, ↑, ↓, ↓, ←, →, ←, →, B, A]', type: 'success' },
+            { text: `  - Cheat Override Mode: ${isActive ? 'ACTIVE' : 'INACTIVE'}`, type: 'output' },
+            { text: isActive 
+              ? '  - Engage: 3D WebGL Gremlin Parade (Float & Bouncing Physics Activated)!' 
+              : '  - Disengage: Unmounting WebGL Canvas and releasing GPU memory.', type: 'output' }
+          ];
+        }
         break;
       case 'clear':
         setTerminalHistory([]);
@@ -455,7 +469,7 @@ export default function SiteInfoConsole() {
           <div className={styles.shortcutsContainer}>
             <span className={styles.shortcutsLabel}>QUICK SHORTCUTS:</span>
             <div className={styles.shortcutsGrid}>
-              {['help', 'stats', 'audit', 'projects', 'secret', 'clear'].map(cmd => (
+              {['help', 'stats', 'audit', 'projects', 'cheatcode', 'secret', 'clear'].map(cmd => (
                 <button
                   key={cmd}
                   onClick={() => executeCommand(cmd)}
