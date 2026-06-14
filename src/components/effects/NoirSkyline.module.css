@@ -930,28 +930,28 @@
 }
 
 .lightPopart {
-  --pop-cyan: url(#wc-cyan);       /* soft pastel cyan watercolor */
-  --pop-blue: url(#wc-blue);       /* soft pastel blue watercolor */
-  --pop-yellow: url(#wc-yellow);     /* soft pastel yellow watercolor */
-  --pop-pink: url(#wc-pink);       /* soft pastel pink watercolor */
-  --pop-magenta: url(#wc-pink);    /* soft pastel rose watercolor */
-  --pop-orange: url(#wc-orange);     /* soft pastel peach/orange watercolor */
-  --pop-red: url(#wc-red);        /* soft pastel red watercolor */
-  --pop-green: url(#wc-green);      /* soft pastel mint watercolor */
-  --pop-cream: url(#wc-yellow);      /* soft cream background watercolor */
-  --pop-white: url(#wc-yellow);      /* warm off-white watercolor */
+  --pop-cyan: #c4f0f2;       /* soft pastel cyan watercolor color */
+  --pop-blue: #bbdcf2;       /* soft pastel blue watercolor color */
+  --pop-yellow: #fdf2c5;     /* soft pastel yellow watercolor color */
+  --pop-pink: #fbcacf;       /* soft pastel pink watercolor color */
+  --pop-magenta: #fbcacf;    /* soft pastel rose watercolor color */
+  --pop-orange: #fcd5b8;     /* soft pastel peach/orange watercolor color */
+  --pop-red: #fbb3b9;        /* soft pastel red watercolor color */
+  --pop-green: #caf0d5;      /* soft pastel mint watercolor color */
+  --pop-cream: #fbf5df;      /* soft cream background watercolor color */
+  --pop-white: #fdfdfa;      /* warm off-white watercolor color */
   --pop-black: #1A1A2E;
   
   /* Additional pastel tones for structures */
-  --pop-roof-gray: url(#wc-yellow);  /* warm soft yellow/cream for lower roof */
-  --pop-pier-gray: url(#wc-blue);  /* blue watercolor for piers */
-  --pop-bridge-red: url(#wc-red); /* soft red watercolor for bridge tower */
-  --pop-brick-brown: url(#wc-red); /* soft red watercolor for brick brown */
+  --pop-roof-gray: #fbf5df;  /* warm soft yellow/cream for lower roof */
+  --pop-pier-gray: #bbdcf2;  /* blue watercolor for piers */
+  --pop-bridge-red: #fbb3b9; /* soft red watercolor for bridge tower */
+  --pop-brick-brown: #fbb3b9; /* soft red watercolor for brick brown */
 
   --skyline-window-deco-stroke: var(--pop-black);
   --skyline-window-deco-fill: #c8a696;
 
-  --skyline-sky-bg: url(#wc-sky);
+  --skyline-sky-bg: #e5f6fd;
   --skyline-stroke-fg: var(--pop-black);
   --skyline-stroke-mid: var(--pop-black);
   --skyline-stroke-bg: var(--pop-black);
@@ -961,7 +961,7 @@
   
   --skyline-fill-bg: var(--pop-roof-gray);
   --skyline-window-dark-fill: #855447;
-  --skyline-river-fill: url(#wc-river);
+  --skyline-river-fill: #b2e3e2;
   
   --skyline-hatch-bg: url(#hatch-bg-black);
   --skyline-hatch-mid: url(#hatch-mid-black);
@@ -1777,6 +1777,18 @@
 .reducedMotion .drippingDrop {
   animation: none !important;
   opacity: 0 !important;
+}
+
+.watercolorOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4; /* Render on top of layers to blend them under one sheet of paper */
+  background-image: url('/images/textures/watercolor_pastel_yellow.jpg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.14;
+  mix-blend-mode: multiply;
 }
 
 

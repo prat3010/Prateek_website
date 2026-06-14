@@ -139,39 +139,6 @@ export default function NoirSkyline() {
 
   return (
     <div className={`${styles.container} ${styles.active} ${theme === 'light' ? styles.lightPopart : styles.darkNoir} ${reducedMotion ? styles.reducedMotion : ''}`}>
-      {/* ── Global Watercolor Pattern Definitions ── */}
-      <svg style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }} aria-hidden="true">
-        <defs>
-          <pattern id="wc-sky" width="1" height="1" patternContentUnits="objectBoundingBox">
-            <image href="/images/textures/watercolor_sky_blue.jpg" width="1" height="1" preserveAspectRatio="xMidYMid slice" />
-          </pattern>
-          <pattern id="wc-river" width="1" height="1" patternContentUnits="objectBoundingBox">
-            <image href="/images/textures/watercolor_teal_river.jpg" width="1" height="1" preserveAspectRatio="xMidYMid slice" />
-          </pattern>
-          <pattern id="wc-blue" width="256" height="256" patternUnits="userSpaceOnUse">
-            <image href="/images/textures/watercolor_pastel_blue.jpg" width="256" height="256" />
-          </pattern>
-          <pattern id="wc-pink" width="256" height="256" patternUnits="userSpaceOnUse">
-            <image href="/images/textures/watercolor_pastel_pink.jpg" width="256" height="256" />
-          </pattern>
-          <pattern id="wc-yellow" width="256" height="256" patternUnits="userSpaceOnUse">
-            <image href="/images/textures/watercolor_pastel_yellow.jpg" width="256" height="256" />
-          </pattern>
-          <pattern id="wc-orange" width="256" height="256" patternUnits="userSpaceOnUse">
-            <image href="/images/textures/watercolor_pastel_orange.jpg" width="256" height="256" />
-          </pattern>
-          <pattern id="wc-green" width="256" height="256" patternUnits="userSpaceOnUse">
-            <image href="/images/textures/watercolor_pastel_green.jpg" width="256" height="256" />
-          </pattern>
-          <pattern id="wc-cyan" width="256" height="256" patternUnits="userSpaceOnUse">
-            <image href="/images/textures/watercolor_pastel_cyan.jpg" width="256" height="256" />
-          </pattern>
-          <pattern id="wc-red" width="256" height="256" patternUnits="userSpaceOnUse">
-            <image href="/images/textures/watercolor_pastel_red.jpg" width="256" height="256" />
-          </pattern>
-        </defs>
-      </svg>
-
       {/* ── Vignette Overlay ── */}
       <div className={styles.vignette} aria-hidden="true" />
 
@@ -263,6 +230,10 @@ export default function NoirSkyline() {
         </m.div>
       </m.div>
 
+      {/* ── Watercolor Texture Overlay (only in light theme to preserve watercolor paper feel without SVG render overhead) ── */}
+      {theme === 'light' && (
+        <div className={styles.watercolorOverlay} aria-hidden="true" />
+      )}
     </div>
   );
 }
