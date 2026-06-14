@@ -267,29 +267,10 @@ export default function SiteInfoConsole() {
       case 'help':
         response = [
           { text: 'Available commands:', type: 'success' },
-          { text: '  stats      - Display live physical footprint data', type: 'output' },
-          { text: '  audit      - Run live Core Web Vitals performance audit', type: 'output' },
           { text: '  projects   - Index developer project indices & tags', type: 'output' },
           { text: '  cheatcode  - Run retro developer override (3D WebGL parade)', type: 'output' },
           { text: '  secret     - Open the interactive portfolio Git commit inspector', type: 'output' },
           { text: '  clear      - Clear the command interface screen', type: 'output' }
-        ];
-        break;
-      case 'stats':
-        response = [
-          { text: '📊 DIAGNOSTIC TELEMETRY REPORT:', type: 'success' },
-          { text: `  - Render Frame Rate: ${stats.fps} FPS`, type: 'output' },
-          { text: `  - Active Script Weight: ${stats.bundleSize} KB`, type: 'output' },
-          { text: `  - DOM Elements Count: ${stats.domNodes} elements`, type: 'output' },
-          { text: `  - System Uptime: ${stats.uptime}`, type: 'output' }
-        ];
-        break;
-      case 'audit':
-        response = [
-          { text: '⚡ CORE WEB VITALS REPORT (Real-time browser telemetry):', type: 'success' },
-          { text: `  - Largest Contentful Paint (LCP): ${webVitals.lcp > 0 ? `${webVitals.lcp}s` : 'Measuring...'}`, type: 'output' },
-          { text: `  - First Input Delay (FID): ${webVitals.hasInteraction ? `${webVitals.fid}ms` : 'Waiting for user interaction...'}`, type: 'output' },
-          { text: `  - Cumulative Layout Shift (CLS): ${webVitals.cls}`, type: 'output' }
         ];
         break;
       case 'projects':
@@ -325,7 +306,7 @@ export default function SiteInfoConsole() {
 
     setTerminalHistory(prev => [...prev, ...response]);
     setTerminalInput('');
-  }, [stats, webVitals]);
+  }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -469,7 +450,7 @@ export default function SiteInfoConsole() {
           <div className={styles.shortcutsContainer}>
             <span className={styles.shortcutsLabel}>QUICK SHORTCUTS:</span>
             <div className={styles.shortcutsGrid}>
-              {['help', 'stats', 'audit', 'projects', 'cheatcode', 'secret', 'clear'].map(cmd => (
+              {['help', 'projects', 'cheatcode', 'secret', 'clear'].map(cmd => (
                 <button
                   key={cmd}
                   onClick={() => executeCommand(cmd)}
