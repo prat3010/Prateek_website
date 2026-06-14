@@ -3,19 +3,17 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useTheme } from '@/context/ThemeContext';
-import ComicPanel from '@/components/ui/ComicPanel';
 import {
   Cpu,
-  Layers,
-  ShieldCheck,
   Binary,
-  Sparkles,
-  ArrowLeft,
-  Settings,
-  Flame,
-  MousePointerClick
+  ArrowLeft
 } from 'lucide-react';
 import styles from './SiteInfoConsole.module.css';
+
+interface BatteryManager extends EventTarget {
+  level: number;
+  charging: boolean;
+}
 
 // Command responses for Noir Interactive Console
 interface ConsoleLine {
@@ -40,11 +38,13 @@ export default function SiteInfoConsole() {
     BOOT_LOGS.map(log => ({ text: log, type: 'success' }))
   );
   
-  // Simulated stats state
+  // Real telemetry state
   const [stats, setStats] = useState({
-    cpuLoad: 1.2,
-    memoryUsed: 142,
-    gremlinEnergy: 98,
+    fps: 60,
+    bundleSize: 184,
+    domNodes: 0,
+    gremlinEnergy: 100,
+    isCharging: false,
     uptime: '00:00:00'
   });
 
@@ -68,9 +68,70 @@ export default function SiteInfoConsole() {
     }
   };
 
-  // Uptime and load simulation
+  // FPS requestAnimationFrame counter
+  useEffect(() => {
+    let frameCount = 0;
+    let lastTime = performance.now();
+    let animId: number;
+
+    const countFrames = () => {
+      frameCount++;
+      const now = performance.now();
+      if (now - lastTime >= 1000) {
+        const currentFps = Math.min(60, Math.round((frameCount * 1000) / (now - lastTime)));
+        setStats(prev => ({ ...prev, fps: currentFps }));
+        frameCount = 0;
+        lastTime = now;
+      }
+      animId = requestAnimationFrame(countFrames);
+    };
+
+    animId = requestAnimationFrame(countFrames);
+    return () => cancelAnimationFrame(animId);
+  }, []);
+
+  // Hardware sync: Battery status, script sizes, DOM nodes, and uptime
   useEffect(() => {
     const startTime = Date.now();
+
+    // 1. Calculate actual loaded javascript bundle sizes in KB
+    const calculateBundleSize = () => {
+      if (typeof performance === 'undefined') return 184;
+      const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
+      const jsResources = resources.filter(r => r.initiatorType === 'script' || r.name.endsWith('.js'));
+      const totalBytes = jsResources.reduce((acc, r) => acc + (r.transferSize || r.encodedBodySize || r.decodedBodySize || 0), 0);
+      return Math.round(totalBytes / 1024) || 245; // fallback to 245 if zero
+    };
+
+    // 2. Battery status API link
+    let batteryInstance: BatteryManager | null = null;
+    const onBatteryChange = () => {
+      if (batteryInstance) {
+        setStats(prev => ({
+          ...prev,
+          gremlinEnergy: Math.round(batteryInstance!.level * 100),
+          isCharging: batteryInstance!.charging
+        }));
+      }
+    };
+
+    if (typeof navigator !== 'undefined') {
+      const nav = navigator as Navigator & { getBattery?: () => Promise<BatteryManager> };
+      if (typeof nav.getBattery === 'function') {
+        nav.getBattery().then((battery) => {
+          batteryInstance = battery;
+          // set initial values
+          setStats(prev => ({
+            ...prev,
+            gremlinEnergy: Math.round(battery.level * 100),
+            isCharging: battery.charging
+          }));
+          battery.addEventListener('levelchange', onBatteryChange);
+          battery.addEventListener('chargingchange', onBatteryChange);
+        });
+      }
+    }
+
     const timer = setInterval(() => {
       // Format uptime
       const diff = Date.now() - startTime;
@@ -78,16 +139,24 @@ export default function SiteInfoConsole() {
       const mins = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
       const secs = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
       
-      // Muted load fluctuations
+      const liveDomNodes = typeof document !== 'undefined' ? document.getElementsByTagName('*').length : 0;
+      const liveBundle = calculateBundleSize();
+
       setStats(prev => ({
-        cpuLoad: Number((0.8 + Math.random() * 0.9).toFixed(1)),
-        memoryUsed: prev.memoryUsed + (Math.random() > 0.85 ? (Math.random() > 0.5 ? 1 : -1) : 0),
-        gremlinEnergy: Math.max(90, Math.min(100, prev.gremlinEnergy + (Math.random() > 0.9 ? (Math.random() > 0.5 ? 1 : -1) : 0))),
+        ...prev,
+        bundleSize: liveBundle,
+        domNodes: liveDomNodes,
         uptime: `${hours}:${mins}:${secs}`
       }));
     }, 1000);
 
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+      if (batteryInstance) {
+        batteryInstance.removeEventListener('levelchange', onBatteryChange);
+        batteryInstance.removeEventListener('chargingchange', onBatteryChange);
+      }
+    };
   }, []);
 
   const executeCommand = useCallback((cmd: string) => {
@@ -214,15 +283,15 @@ export default function SiteInfoConsole() {
           { text: '  - Core Role: Semicolon Consumer & Bug Generator', type: 'output' },
           { text: '  - Interactive States: Blushes on hover, ears rotate', type: 'output' },
           { text: '  - Current Location: SVG Logo Container (Fixed Nav Anchor)', type: 'output' },
-          { text: `  - Energy Level: ${stats.gremlinEnergy}% (Thriving on console logs)`, type: 'output' }
+          { text: `  - Energy Level: ${stats.gremlinEnergy}% (${stats.isCharging ? 'AC Power: Charging Mascot' : 'Battery Level Synced'})`, type: 'output' }
         ];
         break;
       case 'stats':
         response = [
-          { text: '📊 FOOTPRINT DIAGNOSTICS:', type: 'success' },
-          { text: `  - CPU Usage: ${stats.cpuLoad}% (Optimized wobbly loops)`, type: 'output' },
-          { text: `  - Client Bundle Size: ${stats.memoryUsed} KB`, type: 'output' },
-          { text: `  - Active Listeners: Throttled mouse & scroll events`, type: 'output' },
+          { text: '📊 DIAGNOSTIC TELEMETRY REPORT:', type: 'success' },
+          { text: `  - Render Frame Rate: ${stats.fps} FPS (Target 60FPS)`, type: 'output' },
+          { text: `  - Active Script Weight: ${stats.bundleSize} KB`, type: 'output' },
+          { text: `  - DOM Elements Count: ${stats.domNodes} elements`, type: 'output' },
           { text: `  - System Uptime: ${stats.uptime}`, type: 'output' }
         ];
         break;
@@ -349,7 +418,7 @@ export default function SiteInfoConsole() {
 
     setTerminalHistory(prev => [...prev, ...response]);
     setTerminalInput('');
-  }, [stats]);
+  }, [stats, isNoir]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -392,17 +461,17 @@ export default function SiteInfoConsole() {
               </h3>
               <ul className={styles.metricsList}>
                 <li>
-                  <span className={styles.metricLabel}>CPU THREAD:</span>
-                  <span className={styles.metricValue}>{stats.cpuLoad}%</span>
+                  <span className={styles.metricLabel}>RENDER FPS:</span>
+                  <span className={styles.metricValue}>{stats.fps} FPS</span>
                   <div className={styles.progressBar}>
-                    <div className={styles.progressFill} style={{ width: `${stats.cpuLoad * 10}%` }} />
+                    <div className={styles.progressFill} style={{ width: `${(stats.fps / 60) * 100}%` }} />
                   </div>
                 </li>
                 <li>
-                  <span className={styles.metricLabel}>BUNDLE WEIGHT:</span>
-                  <span className={styles.metricValue}>{stats.memoryUsed} KB</span>
+                  <span className={styles.metricLabel}>SCRIPT BUNDLE:</span>
+                  <span className={styles.metricValue}>{stats.bundleSize} KB</span>
                   <div className={styles.progressBar}>
-                    <div className={styles.progressFill} style={{ width: '30%', backgroundColor: 'var(--neon-cyan, var(--pop-blue))' }} />
+                    <div className={styles.progressFill} style={{ width: `${Math.min(100, (stats.bundleSize / 500) * 100)}%`, backgroundColor: 'var(--neon-cyan, var(--pop-blue))' }} />
                   </div>
                 </li>
                 <li>
