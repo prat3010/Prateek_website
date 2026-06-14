@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { useTheme } from '@/context/ThemeContext';
 import {
   Cpu,
-  Binary,
-  ArrowLeft
+  ArrowLeft,
+  Layers
 } from 'lucide-react';
 import styles from './SiteInfoConsole.module.css';
 import { projects } from '@/data/projects';
@@ -19,12 +19,10 @@ interface ConsoleLine {
 }
 
 const BOOT_LOGS = [
-  'SYSTEM // Initializing Cyber-Noir framework...',
-  'SYSTEM // Connecting neural graphics engine...',
-  'SYSTEM // Spawning interactive cursor trail...',
-  'SYSTEM // Gremlin bio-link active...',
-  'SYSTEM // CPU safety check: 100% stable.',
-  'SYSTEM // Welcome. Type a command or select a shortcut below.'
+  'SYSTEM // Initializing cyber diagnostics console...',
+  'SYSTEM // Loading dynamic route bundles...',
+  'SYSTEM // Listening for performance and frame rate metrics...',
+  'SYSTEM // Diagnostics core online. Welcome.'
 ];
 
 export default function SiteInfoConsole() {
@@ -39,8 +37,15 @@ export default function SiteInfoConsole() {
     fps: 60,
     bundleSize: 184,
     domNodes: 0,
-    gremlinEnergy: 100,
     uptime: '00:00:00'
+  });
+
+  // Real Web Vitals state
+  const [webVitals, setWebVitals] = useState({
+    lcp: 0,
+    fid: 0,
+    cls: 0,
+    hasInteraction: false
   });
 
   const terminalScreenRef = useRef<HTMLDivElement>(null);
@@ -98,7 +103,6 @@ export default function SiteInfoConsole() {
       return Math.round(totalBytes / 1024) || 245; // fallback to 245 if zero
     };
 
-    let lastUptimeSeconds = 0;
     const timer = setInterval(() => {
       // Format uptime
       const diff = Date.now() - startTime;
@@ -108,27 +112,73 @@ export default function SiteInfoConsole() {
       
       const liveDomNodes = typeof document !== 'undefined' ? document.getElementsByTagName('*').length : 0;
       const liveBundle = calculateBundleSize();
-      const uptimeSeconds = Math.floor(diff / 1000);
 
-      setStats(prev => {
-        let nextEnergy = prev.gremlinEnergy;
-        // Slowly drain energy over time: 1% every 15 seconds
-        if (uptimeSeconds > 0 && uptimeSeconds !== lastUptimeSeconds && uptimeSeconds % 15 === 0) {
-          nextEnergy = Math.max(5, prev.gremlinEnergy - 1);
-        }
-        return {
-          ...prev,
-          bundleSize: liveBundle,
-          domNodes: liveDomNodes,
-          gremlinEnergy: nextEnergy,
-          uptime: `${hours}:${mins}:${secs}`
-        };
-      });
-      lastUptimeSeconds = uptimeSeconds;
+      setStats(prev => ({
+        ...prev,
+        bundleSize: liveBundle,
+        domNodes: liveDomNodes,
+        uptime: `${hours}:${mins}:${secs}`
+      }));
     }, 1000);
 
     return () => {
       clearInterval(timer);
+    };
+  }, []);
+
+  // Native Web Vitals Performance Observers
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    let lcpObserver: PerformanceObserver | null = null;
+    let fidObserver: PerformanceObserver | null = null;
+    let clsObserver: PerformanceObserver | null = null;
+
+    try {
+      // 1. Largest Contentful Paint (LCP)
+      lcpObserver = new PerformanceObserver((list) => {
+        const entries = list.getEntries();
+        if (entries.length > 0) {
+          const lastEntry = entries[entries.length - 1];
+          const lcpVal = Number((lastEntry.startTime / 1000).toFixed(2));
+          setWebVitals(prev => ({ ...prev, lcp: lcpVal }));
+        }
+      });
+      lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
+    } catch {}
+
+    try {
+      // 2. First Input Delay (FID)
+      fidObserver = new PerformanceObserver((list) => {
+        const entries = list.getEntries();
+        if (entries.length > 0) {
+          const firstInput = entries[0] as PerformanceEventTiming;
+          const fidVal = Math.round(firstInput.processingStart - firstInput.startTime);
+          setWebVitals(prev => ({ ...prev, fid: fidVal, hasInteraction: true }));
+        }
+      });
+      fidObserver.observe({ type: 'first-input', buffered: true });
+    } catch {}
+
+    try {
+      // 3. Cumulative Layout Shift (CLS)
+      let accumulatedCls = 0;
+      clsObserver = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          const layoutShift = entry as unknown as { hadRecentInput: boolean; value: number };
+          if (!layoutShift.hadRecentInput) {
+            accumulatedCls += layoutShift.value;
+            setWebVitals(prev => ({ ...prev, cls: Number(accumulatedCls.toFixed(3)) }));
+          }
+        }
+      });
+      clsObserver.observe({ type: 'layout-shift', buffered: true });
+    } catch {}
+
+    return () => {
+      lcpObserver?.disconnect();
+      fidObserver?.disconnect();
+      clsObserver?.disconnect();
     };
   }, []);
 
@@ -217,176 +267,37 @@ export default function SiteInfoConsole() {
       case 'help':
         response = [
           { text: 'Available commands:', type: 'success' },
-          { text: '  specs      - Print website core technologies & stack', type: 'output' },
-          { text: '  gremlin    - Inspect the embedded Gremlin mascot status', type: 'output' },
-          { text: '  feed       - Feed semicolons to the Gremlin mascot', type: 'output' },
           { text: '  stats      - Display live physical footprint data', type: 'output' },
-          { text: '  skyline    - Inspect background canvas & wobbly rendering', type: 'output' },
-          { text: '  gargoyle   - Query status of the interactive spire guardian', type: 'output' },
-          { text: '  cat        - Check path logs for rooftop black cat', type: 'output' },
-          { text: '  pigeon     - Monitor pigeon nesting activity & locations', type: 'output' },
-          { text: '  audit      - Run Core Web Vitals & performance metrics', type: 'output' },
-          { text: '  database   - Show data structures and schema details', type: 'output' },
-          { text: '  projects   - Index developer project indices & philosophy', type: 'output' },
-          { text: '  resume     - Print career evolution timeline & focus areas', type: 'output' },
-          { text: '  colors     - Print active theme hexadecimal palette', type: 'output' },
-          { text: '  cheatcode  - Run retro developer override', type: 'output' },
-          { text: '  about      - Reveal website backstory & design decisions', type: 'output' },
-          { text: '  clear      - Clear the command interface screen', type: 'output' },
-          { text: '  secret     - Open the interactive portfolio Git commit inspector', type: 'output' }
-        ];
-        break;
-      case 'specs':
-        response = [
-          { text: '⚡ TECHNICAL SPECIFICATIONS:', type: 'success' },
-          { text: '  - Framework: Next.js v16.2.6 (React 19.2.4)', type: 'output' },
-          { text: '  - Stylesheets: 100% Vanilla CSS Modules', type: 'output' },
-          { text: '  - Inertia Scroll: Lenis React integration', type: 'output' },
-          { text: '  - Motion Engine: Framer Motion v12 (Code-split dynamic imports)', type: 'output' },
-          { text: '  - Database Layer: Supabase (PostgreSQL Schema)', type: 'output' },
-          { text: '  - Hosting Target: Vercel serverless nodes', type: 'output' }
-        ];
-        break;
-      case 'gremlin':
-        response = [
-          { text: '👾 GREMLIN INVENTORY AND STATUS:', type: 'success' },
-          { text: '      (•ㅅ•) ', type: 'success' },
-          { text: '    <   |   >', type: 'success' },
-          { text: '     /     \\', type: 'success' },
-          { text: '  - Code Name: "The Gremlin"', type: 'output' },
-          { text: '  - Core Role: Semicolon Consumer & Bug Generator', type: 'output' },
-          { text: '  - Interactive States: Blushes on hover, ears rotate', type: 'output' },
-          { text: '  - Current Location: SVG Logo Container (Fixed Nav Anchor)', type: 'output' },
-          { text: `  - Energy Level: ${stats.gremlinEnergy}% (Uptime Drain // feed with 'feed')`, type: 'output' }
-        ];
-        break;
-      case 'feed':
-        setStats(prev => ({ ...prev, gremlinEnergy: 100 }));
-        response = [
-          { text: '😋 GREMLIN FEED PROTOCOL ENGAGED:', type: 'success' },
-          { text: '  Consuming semicolons... Nom nom nom! 👾', type: 'success' },
-          { text: '  - Gremlin Energy restored to 100%', type: 'output' }
+          { text: '  audit      - Run live Core Web Vitals performance audit', type: 'output' },
+          { text: '  projects   - Index developer project indices & tags', type: 'output' },
+          { text: '  secret     - Open the interactive portfolio Git commit inspector', type: 'output' },
+          { text: '  clear      - Clear the command interface screen', type: 'output' }
         ];
         break;
       case 'stats':
         response = [
           { text: '📊 DIAGNOSTIC TELEMETRY REPORT:', type: 'success' },
-          { text: `  - Render Frame Rate: ${stats.fps} FPS (Target 60FPS)`, type: 'output' },
+          { text: `  - Render Frame Rate: ${stats.fps} FPS`, type: 'output' },
           { text: `  - Active Script Weight: ${stats.bundleSize} KB`, type: 'output' },
           { text: `  - DOM Elements Count: ${stats.domNodes} elements`, type: 'output' },
           { text: `  - System Uptime: ${stats.uptime}`, type: 'output' }
         ];
         break;
-      case 'skyline':
-        response = [
-          { text: '🌆 SKYLINE ENGINE SCHEMATICS:', type: 'success' },
-          { text: '  - Architecture: Multi-layered canvas depth parallax.', type: 'output' },
-          { text: '  - Wobble Logic: Custom frame jitter loops redraw path strokes with offset vertices, creating a living sketchy outline.', type: 'output' },
-          { text: '  - Performance: Listeners run via passive observers. Animation loops freeze when off-screen to preserve CPU power.', type: 'output' }
-        ];
-        break;
-      case 'gargoyle':
-        response = [
-          { text: '🗿 GARGOYLE SIMULATION PROTOCOL:', type: 'success' },
-          { text: '  - Entity: Interactive vector gargoyle spire guardian.', type: 'output' },
-          { text: '  - State Machine: Idle -> Preflight -> Leap -> Glide -> Land -> Reperch.', type: 'output' },
-          { text: '  - Mechanics: Calculates gravitational flight parabola vectors on scroll triggers.', type: 'output' },
-          { text: '  - Location: Spire Right Apex (Fixed Canvas Overlay).', type: 'output' }
-        ];
-        break;
-      case 'cat':
-        response = [
-          { text: '🐈 ROOFTOP CAT TELEMETRY:', type: 'success' },
-          { text: '  - Entity: Rooftop feline patrol.', type: 'output' },
-          { text: '  - Animation Loop: Walking frames throttled to 20fps for classic stop-motion aesthetic.', type: 'output' },
-          { text: '  - Brain Loop: Periodic random walker clock cycles shifting between sitting, sleeping, and strolling.', type: 'output' }
-        ];
-        break;
-      case 'pigeon':
-        response = [
-          { text: '🐦 PIGEON FLOCK REGISTER:', type: 'success' },
-          { text: '  - Population: 3 procedural birds.', type: 'output' },
-          { text: '  - Interactive: Jitters and random rotations simulate pecking behaviors.', type: 'output' },
-          { text: '  - Anchors: Nesting on building window spires and fire escapes.', type: 'output' }
-        ];
-        break;
-      case 'about':
-        response = [
-          { text: '📖 DESIGN PHILOSOPHY:', type: 'success' },
-          { text: '  This portfolio represents an AI-native workspace. It switches between:', type: 'output' },
-          { text: '  - Azure: A tactile comic storyboard reflecting sketchy ideas, watercolor washes, and serif storytelling.', type: 'output' },
-          { text: '  - Noir: A high-contrast terminal console emphasizing code execution speed, neon styling, and raw layout.', type: 'output' },
-          { text: '  No UI frameworks were used—every single line, wobbly outline, and responsive grid is written in raw custom CSS.', type: 'output' }
-        ];
-        break;
       case 'audit':
         response = [
-          { text: '⚡ CORE WEB VITALS AUDIT REPORT:', type: 'success' },
-          { text: '  - Largest Contentful Paint (LCP): 0.82s (Optimal)', type: 'output' },
-          { text: '  - Interaction to Next Paint (INP): 24ms (Excellent)', type: 'output' },
-          { text: '  - Cumulative Layout Shift (CLS): 0.00 (Stable)', type: 'output' },
-          { text: '  - Lighthouse Performance: 100/100', type: 'output' },
-          { text: '  - Bundle Size Optimization: framer-motion lazyLoaded dynamic imports', type: 'output' }
-        ];
-        break;
-      case 'database':
-        response = [
-          { text: '🗄️ DATABASE CONNECTION PROTOCOL (Supabase):', type: 'success' },
-          { text: '  - Client Sync Status: ONLINE', type: 'success' },
-          { text: '  - Primary Table: "messages" (Contact Inquiry Records)', type: 'output' },
-          { text: '  - Data Fields: [id: UUID, name: TEXT, email: TEXT, message: TEXT, created_at: TIMESTAMPTZ]', type: 'output' },
-          { text: '  - SSL Security: Enabled (TLS v1.3 handshake)', type: 'output' },
-          { text: '  - Data Encryption: AES-256-GCM', type: 'output' }
+          { text: '⚡ CORE WEB VITALS REPORT (Real-time browser telemetry):', type: 'success' },
+          { text: `  - Largest Contentful Paint (LCP): ${webVitals.lcp > 0 ? `${webVitals.lcp}s` : 'Measuring...'}`, type: 'output' },
+          { text: `  - First Input Delay (FID): ${webVitals.hasInteraction ? `${webVitals.fid}ms` : 'Waiting for user interaction...'}`, type: 'output' },
+          { text: `  - Cumulative Layout Shift (CLS): ${webVitals.cls}`, type: 'output' }
         ];
         break;
       case 'projects':
         response = [
           { text: '📁 PORTFOLIO PROJECTS RECORD:', type: 'success' },
-          { text: `  - Total Projects: ${projects.length} Projects`, type: 'output' },
-          { text: '  - Primary Stack: React, Next.js App Router, Node, Supabase, Vercel', type: 'output' },
-          { text: '  - Core philosophy: AI-native rapid prototyping, prompt-to-app lifecycle', type: 'output' }
+          { text: `  - Total Active Projects: ${projects.length}`, type: 'output' },
+          ...projects.map(p => ({ text: `  • ${p.title} (${p.tags.join(', ')})`, type: 'output' as const })),
+          { text: '  - Repository source: github.com/prat3010', type: 'output' }
         ];
-        break;
-      case 'resume':
-        response = [
-          { text: '📄 CAREER TIMELINE SUMMARY:', type: 'success' },
-          { text: '  - Domain Shift: Transitioned from Commerce base to Software Engineering.', type: 'output' },
-          { text: '  - Philosophy: Semicolon gremlins aren\'t the block. Real leverage is combining business logic with AI system design.', type: 'output' },
-          { text: '  - Core Skills: Rapid UI prototyping, state-machine layouts, system integrations.', type: 'output' },
-          { text: '  - Full Dossier: Downloadable PDF available in /#resume section (click "Export Dossier").', type: 'output' }
-        ];
-        break;
-      case 'colors':
-        response = isNoir ? [
-          { text: '🎨 RETRO CRT CYBER-NOIR PALETTE:', type: 'success' },
-          { text: '  - #FAFAFA : White Hot Phosphor', type: 'output' },
-          { text: '  - #121214 : Deep Carbon Slate Base', type: 'output' },
-          { text: '  - #08080A : Core Monitor Black', type: 'output' },
-          { text: '  - #00F0FF : Fluorescent Neon Cyan', type: 'output' },
-          { text: '  - #FF2A55 : Warning Neon Pink', type: 'output' },
-          { text: '  - #39FF14 : Telemetry Neon Green', type: 'output' }
-        ] : [
-          { text: '🎨 COMIC BOOK WATERCOLOR PALETTE:', type: 'success' },
-          { text: '  - #D95D67 : Soft Dusty Rose / Terracotta', type: 'output' },
-          { text: '  - #5A8EB6 : Soft Slate / Steel Blue', type: 'output' },
-          { text: '  - #F4DC95 : Soft Ochre / Pastel Yellow', type: 'output' },
-          { text: '  - #FAF9F6 : Warm Off-White Linen', type: 'output' },
-          { text: '  - #F7F2E8 : Cold-Press Watercolor Paper', type: 'output' },
-          { text: '  - #2B2B36 : Warm Graphite Charcoal Ink', type: 'output' }
-        ];
-        break;
-      case 'cheatcode':
-        if (typeof window !== 'undefined') {
-          const isActive = document.documentElement.classList.toggle('konami-active');
-          response = [
-            { text: '🎮 KONAMI CODE DECRYPTED:', type: 'success' },
-            { text: '  - Keyboard Sequence: [↑, ↑, ↓, ↓, ←, →, ←, →, B, A]', type: 'success' },
-            { text: `  - Cheat Override Mode: ${isActive ? 'ACTIVE' : 'INACTIVE'}`, type: 'output' },
-            { text: isActive 
-              ? '  - Engage: 3D WebGL Gremlin Parade (Float & Bouncing Physics Activated)!' 
-              : '  - Disengage: Unmounting WebGL Canvas and releasing GPU memory.', type: 'output' }
-          ];
-        }
         break;
       case 'clear':
         setTerminalHistory([]);
@@ -400,7 +311,7 @@ export default function SiteInfoConsole() {
 
     setTerminalHistory(prev => [...prev, ...response]);
     setTerminalInput('');
-  }, [stats, isNoir]);
+  }, [stats, webVitals]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -457,12 +368,10 @@ export default function SiteInfoConsole() {
                   </div>
                 </li>
                 <li>
-                  <span className={styles.metricLabel}>GREMLIN ENERGY:</span>
-                  <span className={styles.metricValue}>
-                    {stats.gremlinEnergy}% 🔋
-                  </span>
+                  <span className={styles.metricLabel}>DOM ELEMENTS:</span>
+                  <span className={styles.metricValue}>{stats.domNodes} nodes</span>
                   <div className={styles.progressBar}>
-                    <div className={styles.progressFill} style={{ width: `${stats.gremlinEnergy}%`, backgroundColor: 'var(--neon-pink, var(--pop-red))' }} />
+                    <div className={styles.progressFill} style={{ width: `${Math.min(100, (stats.domNodes / 2000) * 100)}%`, backgroundColor: 'var(--neon-pink, var(--pop-red))' }} />
                   </div>
                 </li>
                 <li>
@@ -472,19 +381,41 @@ export default function SiteInfoConsole() {
               </ul>
             </div>
 
-            {/* Specs Box */}
+            {/* Performance Web Vitals Widget */}
             <div className={styles.consoleWidget}>
               <h3 className={styles.widgetTitle}>
-                <Binary size={14} className={styles.widgetIcon} />
-                FIRMWARE SPEC
+                <Layers size={14} className={styles.widgetIcon} />
+                PERFORMANCE VITALS
               </h3>
-              <div className={styles.specsTerminalList}>
-                <div><span className={styles.cyanText}>OS:</span> Next.js 16.2 (App Router)</div>
-                <div><span className={styles.cyanText}>DOM:</span> React 19.2 (Concurrent)</div>
-                <div><span className={styles.cyanText}>GFX:</span> Framer Motion + Canvas Trails</div>
-                <div><span className={styles.cyanText}>INT:</span> Lenis Smooth Scroll</div>
-                <div><span className={styles.cyanText}>DB:</span> Supabase Rest Endpoint</div>
-              </div>
+              <ul className={styles.metricsList}>
+                <li>
+                  <span className={styles.metricLabel}>LCP (PAINT):</span>
+                  <span className={styles.metricValue}>
+                    {webVitals.lcp > 0 ? `${webVitals.lcp}s` : 'Measuring...'}
+                  </span>
+                  <div className={styles.progressBar}>
+                    <div className={styles.progressFill} style={{ width: `${Math.min(100, (webVitals.lcp / 2.5) * 100)}%`, backgroundColor: 'var(--neon-cyan, var(--pop-blue))' }} />
+                  </div>
+                </li>
+                <li>
+                  <span className={styles.metricLabel}>FID (DELAY):</span>
+                  <span className={styles.metricValue}>
+                    {webVitals.hasInteraction ? `${webVitals.fid}ms` : 'Pending...'}
+                  </span>
+                  <div className={styles.progressBar}>
+                    <div className={styles.progressFill} style={{ width: `${Math.min(100, (webVitals.fid / 100) * 100)}%`, backgroundColor: 'var(--neon-cyan, var(--pop-blue))' }} />
+                  </div>
+                </li>
+                <li>
+                  <span className={styles.metricLabel}>CLS (SHIFT):</span>
+                  <span className={styles.metricValue}>
+                    {webVitals.cls}
+                  </span>
+                  <div className={styles.progressBar}>
+                    <div className={styles.progressFill} style={{ width: `${Math.min(100, (webVitals.cls / 0.1) * 100)}%`, backgroundColor: 'var(--neon-cyan, var(--pop-blue))' }} />
+                  </div>
+                </li>
+              </ul>
             </div>
           </div>
 
@@ -524,7 +455,7 @@ export default function SiteInfoConsole() {
           <div className={styles.shortcutsContainer}>
             <span className={styles.shortcutsLabel}>QUICK SHORTCUTS:</span>
             <div className={styles.shortcutsGrid}>
-              {['help', 'specs', 'gremlin', 'feed', 'stats', 'about', 'skyline', 'gargoyle', 'cat', 'pigeon', 'audit', 'database', 'projects', 'resume', 'colors', 'cheatcode', 'secret', 'clear'].map(cmd => (
+              {['help', 'stats', 'audit', 'projects', 'secret', 'clear'].map(cmd => (
                 <button
                   key={cmd}
                   onClick={() => executeCommand(cmd)}
