@@ -90,7 +90,7 @@ export default function SiteInfoConsole() {
     return () => cancelAnimationFrame(animId);
   }, []);
 
-  // Hardware sync: Battery status, script sizes, DOM nodes, and uptime
+  // Hardware sync: script sizes, DOM nodes, and uptime
   useEffect(() => {
     const startTime = Date.now();
 
@@ -103,23 +103,32 @@ export default function SiteInfoConsole() {
       return Math.round(totalBytes / 1024) || 245; // fallback to 245 if zero
     };
 
+    // Calculate static metrics once on mount to avoid CPU overhead in setInterval loop
+    const initialDomNodes = typeof document !== 'undefined' ? document.getElementsByTagName('*').length : 0;
+    const initialBundle = calculateBundleSize();
+
+    setStats(prev => ({
+      ...prev,
+      domNodes: initialDomNodes,
+      bundleSize: initialBundle
+    }));
+
+    // Uptime tick loop - only updates uptime string, leaving other stats untouched
     const timer = setInterval(() => {
-      // Format uptime
       const diff = Date.now() - startTime;
       const hours = String(Math.floor(diff / 3600000)).padStart(2, '0');
       const mins = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
       const secs = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
-      
-      const liveDomNodes = typeof document !== 'undefined' ? document.getElementsByTagName('*').length : 0;
-      const liveBundle = calculateBundleSize();
+      const uptimeStr = `${hours}:${mins}:${secs}`;
 
-      setStats(prev => ({
-        ...prev,
-        bundleSize: liveBundle,
-        domNodes: liveDomNodes,
-        uptime: `${hours}:${mins}:${secs}`
-      }));
-    }, 1000);
+      setStats(prev => {
+        if (prev.uptime === uptimeStr) return prev;
+        return {
+          ...prev,
+          uptime: uptimeStr
+        };
+      });
+    }, 200);
 
     return () => {
       clearInterval(timer);
