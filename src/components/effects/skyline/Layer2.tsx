@@ -143,12 +143,6 @@ const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
             <WobblyLine wobble={wobble} wobbleStrength={strength} x1="515" y1="745" x2="530" y2="745" />
           </g>
 
-          {/* Sagging power lines between flatiron and Citigroup */}
-          <g stroke="var(--skyline-stroke-mid)" fill="none" strokeWidth="0.6" opacity="0.6">
-            <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 540 670 Q 610 705 680 695" />
-            <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 540 675 Q 610 712 680 701" />
-          </g>
-
           {/* Citigroup-style Slanted Roof (Center-Right) */}
           <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 680 1080 L 680 690 L 760 610 L 790 610 L 790 1080 Z" className={styles.bldMidCitigroup} />
           {/* Glowing neon trace line along Citigroup roof slope */}
