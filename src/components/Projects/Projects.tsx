@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useLenis } from 'lenis/react';
 import Image from 'next/image';
 import { ExternalLink, Code2 } from 'lucide-react';
@@ -18,14 +18,75 @@ export default function Projects({ projects }: ProjectsProps) {
   const { isNoir } = useTheme();
   const lenis = useLenis();
 
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (selectedProject) {
       lenis?.stop();
+      // Store the currently focused element before opening the modal
+      previousFocusRef.current = document.activeElement as HTMLElement;
+      
+      // Move focus into the modal content
+      setTimeout(() => {
+        if (modalRef.current) {
+          const focusable = modalRef.current.querySelectorAll<HTMLElement>(
+            'a[href], button:not([disabled]), [tabindex="0"]'
+          );
+          if (focusable.length > 0) {
+            focusable[0].focus(); // Focus the close button
+          }
+        }
+      }, 50);
     } else {
       lenis?.start();
+      // Restore focus to the element that triggered the modal
+      if (previousFocusRef.current) {
+        previousFocusRef.current.focus();
+        previousFocusRef.current = null;
+      }
     }
     return () => lenis?.start();
   }, [selectedProject, lenis]);
+
+  // Trap focus and handle Escape key to close the modal
+  useEffect(() => {
+    if (!selectedProject) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedProject(null);
+        return;
+      }
+
+      if (e.key === 'Tab' && modalRef.current) {
+        const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex="0"]'
+        );
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          // Shift + Tab: loop focus to last element
+          if (document.activeElement === firstElement) {
+            lastElement.focus();
+            e.preventDefault();
+          }
+        } else {
+          // Tab: loop focus to first element
+          if (document.activeElement === lastElement) {
+            firstElement.focus();
+            e.preventDefault();
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedProject]);
 
   return (
     <section id="projects" className={styles.projects} aria-label="Projects">
@@ -86,9 +147,11 @@ export default function Projects({ projects }: ProjectsProps) {
           className={styles.modal}
           onClick={() => setSelectedProject(null)}
           role="dialog"
+          aria-modal="true"
           aria-label={`${selected.title} details`}
         >
           <div
+            ref={modalRef}
             className={styles.modalContent}
             onClick={(e) => e.stopPropagation()}
             style={{ '--panel-color': selected.color } as React.CSSProperties}
