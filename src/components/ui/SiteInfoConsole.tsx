@@ -98,6 +98,65 @@ export default function SiteInfoConsole() {
 
     let response: ConsoleLine[] = [];
 
+    if (trimmedCmd.startsWith('secret')) {
+      const parts = trimmedCmd.split(/\s+/);
+      let pathArg = parts.slice(1).join(' ').trim();
+      
+      // Clean path
+      pathArg = pathArg.replace(/\/+$/, '').replace(/\\+/g, '/');
+      if (pathArg === 'root' || pathArg === '/') {
+        pathArg = '';
+      }
+      
+      // Fetch dynamic tree from API
+      fetch(`/api/explorer?path=${encodeURIComponent(pathArg)}`)
+        .then(res => {
+          if (!res.ok) throw new Error();
+          return res.json();
+        })
+        .then(data => {
+          const lines: ConsoleLine[] = [];
+          if (data.type === 'directory') {
+            const currentDir = data.path === 'root' ? 'prateek-portfolio/' : `prateek-portfolio/${data.path}/`;
+            lines.push({ text: `📂 ${currentDir}`, type: 'success' });
+            
+            if (data.contents.length === 0) {
+              lines.push({ text: '  (empty directory)', type: 'output' });
+            } else {
+              data.contents.forEach((item: { name: string; type: string }, idx: number) => {
+                const prefix = idx === data.contents.length - 1 ? '└── ' : '├── ';
+                const icon = item.type === 'directory' ? '📁 ' : '📄 ';
+                lines.push({ text: `${prefix}${icon}${item.name}`, type: 'output' });
+              });
+            }
+            lines.push({ text: ' ', type: 'output' });
+            lines.push({ text: `💡 Tip: Type "secret ${data.path === 'root' ? '' : data.path + '/'}subfolder" to browse further.`, type: 'success' });
+          } else if (data.type === 'file') {
+            lines.push({ text: `📄 prateek-portfolio/${data.name}`, type: 'success' });
+            if (data.content) {
+              const contentLines = data.content.split('\n');
+              contentLines.forEach((l: string) => {
+                lines.push({ text: `  ${l}`, type: 'output' });
+              });
+            } else {
+              lines.push({ text: `  - File Size: ${data.size} bytes`, type: 'output' });
+              lines.push({ text: `  - Status: ${data.msg}`, type: 'output' });
+            }
+          }
+          setTerminalHistory(prev => [...prev, ...lines]);
+        })
+        .catch(() => {
+          setTerminalHistory(prev => [
+            ...prev,
+            { text: `⚠️ Path not found or restricted: '${pathArg}'`, type: 'error' },
+            { text: '  Type "secret" to view the root directory map.', type: 'output' }
+          ]);
+        });
+      
+      setTerminalInput('');
+      return;
+    }
+
     switch (trimmedCmd) {
       case 'help':
         response = [
@@ -117,7 +176,7 @@ export default function SiteInfoConsole() {
           { text: '  cheatcode  - Run retro developer override', type: 'output' },
           { text: '  about      - Reveal website backstory & design decisions', type: 'output' },
           { text: '  clear      - Clear the command interface screen', type: 'output' },
-          { text: '  secret     - Run system override key', type: 'output' }
+          { text: '  secret     - Explore the repository codebase directory tree', type: 'output' }
         ];
         break;
       case 'specs':
@@ -193,13 +252,6 @@ export default function SiteInfoConsole() {
           { text: '  - Azure: A tactile comic storyboard reflecting sketchy ideas, watercolor washes, and serif storytelling.', type: 'output' },
           { text: '  - Noir: A high-contrast terminal console emphasizing code execution speed, neon styling, and raw layout.', type: 'output' },
           { text: '  No UI frameworks were used—every single line, wobbly outline, and responsive grid is written in raw custom CSS.', type: 'output' }
-        ];
-        break;
-      case 'secret':
-        response = [
-          { text: '🔑 NOIR OVERRIDE KEY TRIGGERED:', type: 'success' },
-          { text: '  "We don\'t build code to show off. We build code because we can\'t stop creating." ', type: 'success' },
-          { text: '  System status: Fully loaded. You have unlocked developer respects. 👾', type: 'success' }
         ];
         break;
       case 'audit':
