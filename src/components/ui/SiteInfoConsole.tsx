@@ -374,11 +374,12 @@ export default function SiteInfoConsole() {
       case 'synchronizer':
         response = [
           { text: '🔄 PORTFOLIO DATABASE SYNCHRONIZER:', type: 'success' },
+          { text: '  An AI-powered local manager dashboard that scans codebase folders or GitHub repos, extracts project metadata via Gemini, and synchronizes skills, certificates, resumes, and projects directly into the website code.', type: 'output' },
+          { text: ' ', type: 'output' },
           { text: '  - Core Script: scripts/synchronizer.py (Python 3)', type: 'output' },
           { text: '  - Interface: Streamlit Local Dashboard', type: 'output' },
           { text: '  - AI Parsing Integration: Gemini 2.5 Flash API (Structured JSON Mode)', type: 'output' },
           { text: '  - Target Data Sync: src/data/projects.ts, src/data/skills.ts', type: 'output' },
-          { text: '  - Functionality: Parses latest PDF/text CV revisions and dynamically updates site assets.', type: 'output' },
           { text: '  - Local Command: streamlit run scripts/synchronizer.py', type: 'output' }
         ];
         break;
