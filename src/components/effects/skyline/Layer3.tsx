@@ -120,6 +120,25 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="436" y1="796" x2="444" y2="796" />
               </g>
 
+              {/* Laundry line between access shed and Yagi antenna */}
+              <g stroke="var(--skyline-stroke-mid)" fill="none" strokeWidth="0.8">
+                {/* Sagging line */}
+                <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 357 770 Q 398 782 440 770" />
+                {/* Clothes hanging */}
+                {/* Shirt 1 */}
+                <path d="M 373 777 L 377 777 L 379 788 L 371 788 Z" fill="var(--skyline-fill-bg)" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
+                <line x1="374.5" y1="774" x2="374.5" y2="777" />
+                <line x1="375.5" y1="774" x2="375.5" y2="777" />
+                {/* Pants 1 */}
+                <path d="M 389 780 L 397 780 L 397 795 L 394 795 L 393 786 L 392 795 L 389 795 Z" fill="var(--skyline-fill-bg)" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
+                <line x1="390" y1="778" x2="390" y2="780" />
+                <line x1="396" y1="778" x2="396" y2="780" />
+                {/* Shirt 2 */}
+                <path d="M 411 776 L 415 776 L 417 787 L 409 787 Z" fill="var(--skyline-fill-bg)" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
+                <line x1="412.5" y1="773" x2="412.5" y2="776" />
+                <line x1="413.5" y1="773" x2="413.5" y2="776" />
+              </g>
+
               {/* Rooftop Water Puddle on left rooftop */}
               <ellipse cx="150" cy="820" rx="28" ry="2.5" fill="var(--skyline-puddle-fill)" stroke="var(--skyline-puddle-stroke)" strokeWidth="0.8" />
               <ellipse cx="150" cy="820" rx="28" ry="2.5" className={styles.puddleRipple1} fill="none" stroke="var(--skyline-puddle-stroke)" strokeWidth="0.6" />
@@ -412,6 +431,24 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
                     <WobblyRect wobble={wobble} wobbleStrength={strength} x="400" y="850" width="22" height="28" />
                     <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 400 850 A 11 11 0 0 1 422 850" />
                   </g>
+                </g>
+
+                {/* Window curtains */}
+                <g fill="var(--skyline-stroke-mid)" stroke="none" opacity="0.5">
+                  {/* Window 1 curtains */}
+                  <path d="M 50 895 L 56 895 L 50 910 Z" />
+                  <path d="M 68 895 L 62 895 L 68 910 Z" />
+                  {/* Window 3 curtains */}
+                  <path d="M 114 895 L 120 895 L 114 910 Z" />
+                  <path d="M 132 895 L 126 895 L 132 910 Z" />
+                </g>
+
+                {/* Window box plants */}
+                <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
+                  {/* Window 4 plant box */}
+                  <rect x="144" y="917" width="22" height="3" fill="var(--skyline-fill-bg)" />
+                  {/* Leaves */}
+                  <path d="M 146 917 Q 148 912 151 915 Q 153 912 155 916 Q 158 913 160 917" />
                 </g>
 
                 {/* Row 2: Rectangular windows (y=895-920) */}
@@ -838,9 +875,21 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
               {/* Rooftop Pipe Chimneys with Steam path generators */}
               <WobblyRect wobble={wobble} wobbleStrength={strength} x="220" y="780" width="16" height="40" className={styles.bldFgChimney} />
               <WobblyRect wobble={wobble} wobbleStrength={strength} x="215" y="775" width="26" height="6" className={styles.bldFgChimney} />
+              {/* Left chimney steam puffs */}
+              <g fill="none" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8">
+                <circle cx="228" cy="775" r="1.2" className={styles.smokePuff1} />
+                <circle cx="228" cy="775" r="1.2" className={styles.smokePuff2} />
+                <circle cx="228" cy="775" r="1.2" className={styles.smokePuff3} />
+              </g>
 
               <WobblyRect wobble={wobble} wobbleStrength={strength} x="360" y="760" width="22" height="60" className={styles.bldFgChimney} />
               <WobblyRect wobble={wobble} wobbleStrength={strength} x="354" y="754" width="34" height="6" className={styles.bldFgChimney} />
+              {/* Center chimney steam puffs */}
+              <g fill="none" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8">
+                <circle cx="371" cy="750" r="1.5" className={styles.smokePuff1} />
+                <circle cx="371" cy="750" r="1.5" className={styles.smokePuff2} />
+                <circle cx="371" cy="750" r="1.5" className={styles.smokePuff3} />
+              </g>
               {/* Exhaust Fan Housing & backplate */}
               <ellipse cx="371" cy="750" rx="8.5" ry="3.5" fill="none" className={styles.exhaustGlowBackplate} />
               <ellipse cx="371" cy="750" rx="9" ry="4" fill="var(--skyline-fill-bg)" stroke="var(--skyline-stroke-mid)" strokeWidth="1" />
@@ -1306,6 +1355,12 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
               {/* Roof Chimney Duct for Steam */}
               <WobblyRect wobble={wobble} wobbleStrength={strength} x="1860" y="700" width="18" height="60" className={styles.bldFgChimney} />
               <WobblyRect wobble={wobble} wobbleStrength={strength} x="1854" y="694" width="30" height="6" className={styles.bldFgChimney} />
+              {/* Right building chimney steam puffs */}
+              <g fill="none" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8">
+                <circle cx="1869" cy="694" r="1.2" className={styles.smokePuff1} />
+                <circle cx="1869" cy="694" r="1.2" className={styles.smokePuff2} />
+                <circle cx="1869" cy="694" r="1.2" className={styles.smokePuff3} />
+              </g>
 
               {/* Right Rooftop Water Tank */}
               <g>

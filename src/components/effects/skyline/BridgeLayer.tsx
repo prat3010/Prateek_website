@@ -134,6 +134,9 @@ const BridgeLayer = React.memo(function BridgeLayer({ reducedMotion }: LayerProp
               {/* MIDDLE BRIDGE STRUCTURE (Fills the gap between rooftops) */}
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 850 1250 L 850 780 L 870 730 L 890 730 L 910 780 L 910 1250 Z" className={styles.bldFgBridgeTower} />
 
+              {/* Sagging power line from Bridge Tower to left building */}
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 850 785 Q 655 835 460 820" fill="none" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" opacity="0.7" />
+
               {/* Steel Plate Joint Seams on Tower Legs */}
               <WobblyPath 
                 wobble={wobble}
