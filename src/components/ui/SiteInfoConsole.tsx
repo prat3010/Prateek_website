@@ -191,7 +191,7 @@ export default function SiteInfoConsole() {
 
     let response: ConsoleLine[] = [];
 
-    if (trimmedCmd.startsWith('secret')) {
+    if (trimmedCmd.startsWith('git-info')) {
       const parts = trimmedCmd.split(/\s+/);
       const subCommand = parts[1]?.toLowerCase() || '';
       
@@ -216,7 +216,7 @@ export default function SiteInfoConsole() {
             lines.push({
               text: '⏮️ Click here to return to Commit Journal',
               type: 'link',
-              command: 'secret'
+              command: 'git-info'
             });
             setTerminalHistory(prev => [...prev, ...lines]);
           })
@@ -224,7 +224,7 @@ export default function SiteInfoConsole() {
             setTerminalHistory(prev => [
               ...prev,
               { text: `⚠️ Commit details not found or failed to load for hash: '${commitHash}'`, type: 'error' },
-              { text: '⏮️ Click here to return to Commit Journal', type: 'link', command: 'secret' }
+              { text: '⏮️ Click here to return to Commit Journal', type: 'link', command: 'git-info' }
             ]);
           });
       } else {
@@ -244,11 +244,11 @@ export default function SiteInfoConsole() {
               lines.push({
                 text: `  [${c.hash}] ${c.subject} (${c.date})`,
                 type: 'link',
-                command: `secret show ${c.hash}`
+                command: `git-info show ${c.hash}`
               });
             });
             lines.push({ text: ' ', type: 'output' });
-            lines.push({ text: '💡 Tip: You can also inspect manually by typing "secret show <commit_hash>"', type: 'success' });
+            lines.push({ text: '💡 Tip: You can also inspect manually by typing "git-info show <commit_hash>"', type: 'success' });
             setTerminalHistory(prev => [...prev, ...lines]);
           })
           .catch(() => {
@@ -263,13 +263,32 @@ export default function SiteInfoConsole() {
       return;
     }
 
+    if (trimmedCmd.startsWith('storage')) {
+      const parts = trimmedCmd.split(/\s+/);
+      const sub = parts[1]?.toLowerCase() || '';
+      if (sub === 'clear' || sub === 'wipe') {
+        if (typeof localStorage !== 'undefined') localStorage.clear();
+        if (typeof sessionStorage !== 'undefined') sessionStorage.clear();
+        setTerminalHistory(prev => [
+          ...prev,
+          { text: '🧹 STORAGE INVENTORY WIPED:', type: 'success' },
+          { text: '  - Cleared all LocalStorage key-value pairs.', type: 'output' },
+          { text: '  - Cleared all SessionStorage contexts.', type: 'output' }
+        ]);
+        setTerminalInput('');
+        return;
+      }
+    }
+
     switch (trimmedCmd) {
       case 'help':
         response = [
           { text: 'Available commands:', type: 'success' },
           { text: '  projects   - Index developer project indices & tags', type: 'output' },
+          { text: '  system     - Print logical CPU cores, memory & display metrics', type: 'output' },
+          { text: '  storage    - Audit client cookies, local & session storage', type: 'output' },
           { text: '  cheatcode  - Run retro developer override (3D WebGL parade)', type: 'output' },
-          { text: '  secret     - Open the interactive portfolio Git commit inspector', type: 'output' },
+          { text: '  git-info   - Open the interactive portfolio Git commit inspector', type: 'output' },
           { text: '  clear      - Clear the command interface screen', type: 'output' }
         ];
         break;
@@ -281,6 +300,57 @@ export default function SiteInfoConsole() {
           { text: '  - Repository source: github.com/prat3010', type: 'output' }
         ];
         break;
+      case 'system': {
+        const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+        let os = 'Unknown OS';
+        if (userAgent.includes('Macintosh')) os = 'macOS';
+        else if (userAgent.includes('Windows')) os = 'Windows';
+        else if (userAgent.includes('Linux')) os = 'Linux';
+        else if (userAgent.includes('iPhone') || userAgent.includes('iPad')) os = 'iOS';
+        else if (userAgent.includes('Android')) os = 'Android';
+
+        const cores = typeof navigator !== 'undefined' ? navigator.hardwareConcurrency || 'Unavailable' : 'Unavailable';
+        const nav = typeof navigator !== 'undefined' ? navigator as Navigator & { deviceMemory?: number } : null;
+        const ram = nav && nav.deviceMemory ? `${nav.deviceMemory} GB` : 'Protected/Unavailable';
+        const width = typeof window !== 'undefined' ? window.screen.width : 0;
+        const height = typeof window !== 'undefined' ? window.screen.height : 0;
+        const dpr = typeof window !== 'undefined' ? window.devicePixelRatio : 1;
+
+        response = [
+          { text: '🖥️ SYSTEM HARDWARE METRICS:', type: 'success' },
+          { text: `  - Operating System: ${os}`, type: 'output' },
+          { text: `  - Logical CPU Cores: ${cores} threads`, type: 'output' },
+          { text: `  - Estimated Device RAM: ${ram}`, type: 'output' },
+          { text: `  - Display Resolution: ${width}x${height} (@${dpr}x DPR)`, type: 'output' }
+        ];
+        break;
+      }
+      case 'storage': {
+        const localKeys = typeof localStorage !== 'undefined' ? Object.keys(localStorage) : [];
+        const sessionKeys = typeof sessionStorage !== 'undefined' ? Object.keys(sessionStorage) : [];
+        const cookieCount = typeof document !== 'undefined' ? (document.cookie ? document.cookie.split(';').length : 0) : 0;
+
+        let totalLocalBytes = 0;
+        if (typeof localStorage !== 'undefined') {
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key) {
+              totalLocalBytes += (localStorage.getItem(key) || '').length;
+            }
+          }
+        }
+
+        response = [
+          { text: '🗄️ CLIENT-SIDE STORAGE AUDIT:', type: 'success' },
+          { text: `  - LocalStorage footprint: ${localKeys.length} keys (${totalLocalBytes} characters)`, type: 'output' },
+          ...localKeys.map(k => ({ text: `    • [Local] ${k}`, type: 'output' as const })),
+          { text: `  - SessionStorage footprint: ${sessionKeys.length} keys`, type: 'output' },
+          ...sessionKeys.map(k => ({ text: `    • [Session] ${k}`, type: 'output' as const })),
+          { text: `  - Cookies count: ${cookieCount} active`, type: 'output' },
+          { text: '💡 Tip: Type "storage clear" to wipe all localStorage and sessionStorage caches.', type: 'success' }
+        ];
+        break;
+      }
       case 'cheatcode':
         if (typeof window !== 'undefined') {
           const isActive = document.documentElement.classList.toggle('konami-active');
@@ -450,7 +520,7 @@ export default function SiteInfoConsole() {
           <div className={styles.shortcutsContainer}>
             <span className={styles.shortcutsLabel}>QUICK SHORTCUTS:</span>
             <div className={styles.shortcutsGrid}>
-              {['help', 'projects', 'cheatcode', 'secret', 'clear'].map(cmd => (
+              {['help', 'projects', 'system', 'storage', 'cheatcode', 'git-info', 'clear'].map(cmd => (
                 <button
                   key={cmd}
                   onClick={() => executeCommand(cmd)}
