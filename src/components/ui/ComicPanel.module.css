@@ -18,7 +18,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle, var(--pop-black) 1px, transparent 1px);
+  background-image: radial-gradient(circle, var(--pop-black) 1.2px, transparent 1.2px);
   background-size: 6px 6px;
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -27,11 +27,23 @@
 }
 
 .panel:hover::after {
-  opacity: 0.05;
+  opacity: 0.14;
+}
+
+.panel.staticDots::after {
+  opacity: 0.14;
+  mix-blend-mode: multiply;
 }
 
 :global([data-theme='noir']) .panel::after {
   display: none;
+}
+
+:global([data-theme='noir']) .panel.staticDots::after {
+  display: block;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.22) 1.2px, transparent 1.2px);
+  opacity: 0.22;
+  mix-blend-mode: overlay;
 }
 
 .panel:hover {

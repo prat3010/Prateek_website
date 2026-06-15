@@ -110,7 +110,7 @@ function HeroClientContent({ taglines, isNoir }: HeroClientProps & { isNoir: boo
       </div>
 
       <div className={styles.imageSide}>
-        <ComicPanel tilt={2} className={styles.heroPanel}>
+        <ComicPanel tilt={2} className={styles.heroPanel} staticDots>
           <div className={styles.imageWrapper}>
             <Image
               src={isNoir ? '/images/hero-noir.webp' : '/images/hero-illustration-wavy.png'}

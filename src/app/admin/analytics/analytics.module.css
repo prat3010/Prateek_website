@@ -245,8 +245,8 @@
 .chartBarStripes {
   position: absolute;
   inset: 0;
-  opacity: 0.12;
-  background-image: radial-gradient(circle, var(--pop-black) 1px, transparent 1px);
+  opacity: 0.22;
+  background-image: radial-gradient(circle, var(--pop-black) 1.2px, transparent 1.2px);
   background-size: 4px 4px;
   pointer-events: none;
 }

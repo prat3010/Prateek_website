@@ -279,9 +279,9 @@
   content: '';
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle, var(--pop-black) 1px, transparent 1px);
+  background-image: radial-gradient(circle, var(--pop-black) 1.5px, transparent 1.5px);
   background-size: 10px 10px;
-  opacity: 0.04;
+  opacity: 0.10;
   pointer-events: none;
 }
 

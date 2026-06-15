@@ -130,7 +130,7 @@ export default function Resume() {
 
         {/* ---- Main Resume Layout ---- */}
         <div className={styles.resumeCardWrapper}>
-          <ComicPanel tilt={1} className={styles.resumePaper}>
+          <ComicPanel tilt={1} className={styles.resumePaper} staticDots>
             <div className={styles.resumeContent}>
               
               {/* Header Info */}
@@ -240,7 +240,7 @@ export default function Resume() {
             <div className={styles.certsGrid}>
               {certificates.map((cert) => (
                 <div key={cert.id} className={styles.certCard}>
-                  <ComicPanel tilt={-1} className={styles.certPaper}>
+                  <ComicPanel tilt={-1} className={styles.certPaper} staticDots>
                     <div className={styles.certContent}>
                       <div className={styles.certMeta}>
                         <span className={styles.certIssuer}>{cert.issuer}</span>

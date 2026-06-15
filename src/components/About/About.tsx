@@ -34,7 +34,7 @@ export default function About() {
 
         <div className={styles.grid}>
           <div className={styles.imageColumn}>
-            <ComicPanel tilt={-2} className={styles.profilePanel}>
+            <ComicPanel tilt={-2} className={styles.profilePanel} staticDots>
               <div className={styles.imageWrapper}>
                 <Image
                   src={isNoir ? '/images/profile-noir.webp' : '/images/profile-comic.webp'}

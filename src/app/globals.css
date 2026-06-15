@@ -118,12 +118,12 @@
   --z-transition: 999999;
 
   /* ─ Ben-Day Dot Pattern (Soft Sketchbook Dots) ─ */
-  --dot-pattern: radial-gradient(circle, var(--pop-black) 2.2px, transparent 2.2px);
+  --dot-pattern: radial-gradient(circle, var(--pop-black) 2.5px, transparent 2.5px);
   --dot-size: 18px;
-  --dot-pattern-light: radial-gradient(circle, rgba(43, 43, 54, 0.04) 1px, transparent 1px);
-  --dot-pattern-medium: radial-gradient(circle, rgba(43, 43, 54, 0.08) 1.5px, transparent 1.5px);
-  --dot-pattern-heavy: radial-gradient(circle, rgba(43, 43, 54, 0.12) 2px, transparent 2px);
-  --dot-pattern-color: radial-gradient(circle, rgba(217, 93, 103, 0.08) 1.5px, transparent 1.5px);
+  --dot-pattern-light: radial-gradient(circle, rgba(43, 43, 54, 0.10) 1.4px, transparent 1.4px);
+  --dot-pattern-medium: radial-gradient(circle, rgba(43, 43, 54, 0.16) 1.8px, transparent 1.8px);
+  --dot-pattern-heavy: radial-gradient(circle, rgba(43, 43, 54, 0.24) 2.2px, transparent 2.2px);
+  --dot-pattern-color: radial-gradient(circle, rgba(217, 93, 103, 0.18) 1.8px, transparent 1.8px);
 
   /* ─ Transition Tokens ─ */
   --transition-fast: 150ms ease;
@@ -198,11 +198,11 @@
   --shadow-comic-color: 4px 4px 0px var(--pop-black);
 
   /* ─ Halftone Dot Patterns ─ */
-  --dot-pattern: radial-gradient(circle, rgba(255, 255, 255, 0.18) 2.2px, transparent 2.2px);
-  --dot-pattern-light: radial-gradient(circle, rgba(255, 255, 255, 0.08) 1.8px, transparent 1.8px);
-  --dot-pattern-medium: radial-gradient(circle, rgba(255, 255, 255, 0.14) 2.2px, transparent 2.2px);
-  --dot-pattern-heavy: radial-gradient(circle, rgba(255, 255, 255, 0.22) 2.5px, transparent 2.5px);
-  --dot-pattern-color: radial-gradient(circle, rgba(255, 255, 255, 0.14) 2.2px, transparent 2.2px);
+  --dot-pattern: radial-gradient(circle, rgba(255, 255, 255, 0.28) 2.5px, transparent 2.5px);
+  --dot-pattern-light: radial-gradient(circle, rgba(255, 255, 255, 0.16) 2.0px, transparent 2.0px);
+  --dot-pattern-medium: radial-gradient(circle, rgba(255, 255, 255, 0.24) 2.4px, transparent 2.4px);
+  --dot-pattern-heavy: radial-gradient(circle, rgba(255, 255, 255, 0.34) 2.8px, transparent 2.8px);
+  --dot-pattern-color: radial-gradient(circle, rgba(255, 255, 255, 0.24) 2.4px, transparent 2.4px);
 
   /* ─ Neon Design Tokens for Cyber-Noir Mode ─ */
   --neon-pink: #ff2a55;

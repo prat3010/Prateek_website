@@ -14,6 +14,8 @@ export interface ComicPanelProps {
   aspectRatio?: string;
   /** Additional CSS class */
   className?: string;
+  /** Whether the Ben-Day dots should be static (always visible) */
+  staticDots?: boolean;
 }
 
 export default function ComicPanel({
@@ -23,10 +25,11 @@ export default function ComicPanel({
   tilt = 0,
   aspectRatio,
   className,
+  staticDots = false,
 }: ComicPanelProps) {
   return (
     <div
-      className={`${styles.panel} ${className ?? ''}`}
+      className={`${styles.panel} ${staticDots ? styles.staticDots : ''} ${className ?? ''}`}
       style={{
         borderWidth: `${borderWidth}px`,
         backgroundColor,
