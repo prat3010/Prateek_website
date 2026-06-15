@@ -7,7 +7,7 @@ import base64
 import shutil
 import urllib.request
 import urllib.parse
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Import Streamlit - will fail gracefully if not installed
 try:
@@ -1219,7 +1219,9 @@ with st.sidebar.container(border=True):
             # Parse ISO date string
             try:
                 dt = datetime.strptime(updated_at, "%Y-%m-%dT%H:%M:%SZ")
-                formatted_time = dt.strftime("%b %d, %H:%M UTC")
+                # Convert UTC to IST (UTC + 5:30)
+                ist_dt = dt + timedelta(hours=5, minutes=30)
+                formatted_time = ist_dt.strftime("%b %d, %I:%M %p IST")
                 st.markdown(f"<small style='color: #8A8A93;'>Deployed: {formatted_time}</small>", unsafe_allow_html=True)
             except:
                 pass
