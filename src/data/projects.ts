@@ -76,6 +76,6 @@ export const projects: Project[] = [
     githubUrl: '',
     color: '#2979FF',
     isLive: false,
-    status: 'soon',
+    status: 'personal',
   },
 ];
