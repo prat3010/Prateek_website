@@ -308,6 +308,7 @@ body {
 
 body::after {
   content: '';
+  display: block;
   position: fixed;
   inset: 0;
   width: 100vw;
@@ -316,6 +317,8 @@ body::after {
   z-index: var(--z-noise);
   background-image: url("/images/noise.png");
   background-repeat: repeat;
+  opacity: 0.12;
+  mix-blend-mode: multiply;
 }
 
 [data-theme='noir'] body::after {
