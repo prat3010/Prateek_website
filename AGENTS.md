@@ -4,7 +4,7 @@ This is Prateek Sharma's personal portfolio, built with Next.js 16 App Router, R
 
 ## Read First
 
-- This project uses Next.js 16. Do not assume older Next.js behavior. Before changing routing, layouts, metadata, proxy/middleware, server components, or route handlers, read the relevant local docs in `node_modules/next/dist/docs/`.
+- This project uses Next.js 16. Do not assume older Next.js behavior (e.g., middleware has been deprecated/renamed to proxy). Before changing routing, layouts, metadata, proxy/middleware, server components, or route handlers, read the relevant local docs in `node_modules/next/dist/docs/`.
 - Prefer the existing App Router structure under `src/app/`.
 - Keep server-only code server-only. `src/data/supabase.ts` intentionally imports `server-only` and must not be pulled into client components.
 - Do not make broad refactors unless the task explicitly asks for them.
@@ -12,13 +12,39 @@ This is Prateek Sharma's personal portfolio, built with Next.js 16 App Router, R
 ## Project Shape
 
 - `src/app/` contains routes, layouts, metadata, API routes, sitemap, robots, and the app shell.
+- `src/proxy.ts` is the Next.js 16 proxy (formerly middleware) file that intercepts requests for telemetry logging.
 - `src/components/` contains portfolio sections, shared UI, visual effects, and the playground.
 - `src/data/` contains portfolio content: projects, skills, resume, certificates, Supabase client setup, and taglines.
+- `src/data/git-log.json` contains generated commit logs and should not be modified manually.
 - `src/content/posts/` contains markdown blog posts read by `src/lib/markdown.ts`.
 - `src/context/` contains global client providers for theme and Lenis scroll state.
+- `src/hooks/` contains shared client hooks (e.g., typewriter effects).
+- `src/lib/` contains markdown parsers and application constants.
 - `src/utils/pdfGenerator.ts` generates the downloadable resume PDF client-side.
 - `scripts/generate-git-log.js` writes generated commit data before builds.
 - `scripts/synchronizer.py` is a local content-management helper. Treat it as tooling, not runtime app code.
+
+## Telemetry and Analytics
+
+- Analytics are tracked via `src/proxy.ts` using GDPR-compliant daily IP hashing and logged to Supabase `page_visits`.
+- Database structure, policies, and indexes are defined in `supabase_schema.sql`.
+
+## The Synchronizer (Content-Management Helper)
+
+A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfolio, and content updates.
+- **Running locally:** Execute `streamlit run scripts/synchronizer.py`. Requires `pip install streamlit` and `PIL/Pillow`.
+- **AI Integration:** Uses `GEMINI_API_KEY` from `.env.local` to call `gemini-2.5-flash` for scanning missing skills and analyzing certificates.
+- **Core Tabs:**
+  - **Edit Resume Manually:** Modifies `src/data/resume.ts`.
+  - **Sync Projects:** Modifies `src/data/projects.ts` (GitHub syncing & editing).
+  - **Sync Certificates:** Saves files to `public/certificates/` and metadata to `src/data/certificates.ts`.
+  - **Manage Skills:** Updates `src/data/skills.ts` and displays pending auto-scanned tags.
+  - **Update Photos:** Manages profile and project images (azure vs. noir variants) in `public/images/`.
+  - **Blog Editor:** Writes markdown posts directly to `src/content/posts/`.
+- **Sidebar Monitors:**
+  - **CI/CD Deployment Status:** Automatically tracks Vercel build status via GitHub API, displaying status updates in IST (Indian Standard Time).
+  - **Pending Skill Approvals:** Lists queue of AI-extracted skills for immediate addition to `skills.ts`.
+
 
 ## Design And Content Principles
 
