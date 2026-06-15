@@ -73,25 +73,25 @@
 }
 
 :global([data-theme='noir']) .bioBubble {
-  --bubble-bg: #dfdbd2 !important;
-  background-color: #dfdbd2 !important;
-  color: #1c1c1f !important;
-  border-color: #1c1c1f !important;
-  box-shadow: 4px 4px 0px #1c1c1f !important;
+  --bubble-bg: var(--surface-bubble);
+  background-color: var(--surface-bubble);
+  color: var(--surface-secondary);
+  border-color: var(--surface-secondary);
+  box-shadow: 4px 4px 0px var(--surface-secondary);
 }
 
 :global([data-theme='noir']) .bioBubble::after {
-  border-right-color: #1c1c1f !important;
-  border-left-color: #1c1c1f !important;
-  border-bottom-color: #1c1c1f !important;
-  border-top-color: #1c1c1f !important;
+  border-right-color: var(--surface-secondary);
+  border-left-color: var(--surface-secondary);
+  border-bottom-color: var(--surface-secondary);
+  border-top-color: var(--surface-secondary);
 }
 
 :global([data-theme='noir']) .bioBubble::before {
-  border-right-color: #dfdbd2 !important;
-  border-left-color: #dfdbd2 !important;
-  border-bottom-color: #dfdbd2 !important;
-  border-top-color: #dfdbd2 !important;
+  border-right-color: var(--surface-bubble);
+  border-left-color: var(--surface-bubble);
+  border-bottom-color: var(--surface-bubble);
+  border-top-color: var(--surface-bubble);
 }
 
 .bioText {
@@ -101,8 +101,8 @@
 }
 
 :global([data-theme='noir']) .bioText {
-  color: #1c1c1f !important;
-  font-family: var(--font-code) !important;
+  color: var(--surface-secondary);
+  font-family: var(--font-code);
 }
 
 .bioText strong {
@@ -110,10 +110,10 @@
 }
 
 :global([data-theme='noir']) .bioText strong {
-  color: var(--neon-pink) !important;
-  text-shadow: var(--neon-pink-glow) !important;
-  font-family: var(--font-code) !important;
-  font-weight: bold !important;
+  color: var(--neon-pink);
+  text-shadow: var(--neon-pink-glow);
+  font-family: var(--font-code);
+  font-weight: bold;
 }
 
 /* Fun facts scattered */
@@ -123,14 +123,14 @@
   gap: 1.25rem;
 }
 
-.factBox {
-  position: relative !important;
-  top: auto !important;
-  left: auto !important;
-  right: auto !important;
-  bottom: auto !important;
-  transform: none !important;
-  max-width: none !important;
+.factBox.factBox {
+  position: relative;
+  top: auto;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  transform: none;
+  max-width: none;
   width: 100%;
   font-size: var(--fs-small);
   text-align: center;
@@ -175,7 +175,7 @@
   .bioBubble::after {
     top: -20px;
     bottom: auto;
-    left: 50% !important;
+    left: 50%;
     right: auto;
     transform: translateX(-50%);
     border-top: none;
@@ -187,7 +187,7 @@
   .bioBubble::before {
     top: -15px;
     bottom: auto;
-    left: 50% !important;
+    left: 50%;
     right: auto;
     transform: translateX(-50%);
     border-top: none;
@@ -199,27 +199,27 @@
 
 /* ── Neon Noir About Page Overrides ── */
 :global([data-theme='noir']) .sectionTitle {
-  color: var(--neon-pink) !important;
-  text-shadow: var(--neon-pink-glow) !important;
+  color: var(--neon-pink);
+  text-shadow: var(--neon-pink-glow);
 }
 
 :global([data-theme='noir']) .profilePanel:hover {
-  border-color: var(--neon-cyan) !important;
-  box-shadow: 0 0 15px var(--neon-cyan) !important;
-  transform: scale(1.02) rotate(-1.5deg) !important;
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 15px var(--neon-cyan);
+  transform: scale(1.02) rotate(-1.5deg);
 }
 
 :global([data-theme='noir']) .factBox {
-  background-color: #1e1e24 !important;
-  border-color: #555562 !important;
-  color: #e0e0e3 !important;
-  box-shadow: 2px 2px 0px #555562 !important;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease, color 0.25s ease !important;
+  background-color: var(--surface-card);
+  border-color: var(--border-muted);
+  color: var(--color-text);
+  box-shadow: 2px 2px 0px var(--border-muted);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease, color 0.25s ease;
 }
 
 :global([data-theme='noir']) .factBox:hover {
-  border-color: var(--neon-yellow) !important;
-  color: var(--neon-yellow) !important;
-  box-shadow: 0 0 10px var(--neon-yellow) !important;
-  transform: scale(1.04) !important;
+  border-color: var(--neon-yellow);
+  color: var(--neon-yellow);
+  box-shadow: 0 0 10px var(--neon-yellow);
+  transform: scale(1.04);
 }

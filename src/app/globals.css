@@ -32,6 +32,13 @@
   --surface-primary: var(--pop-white);
   --surface-secondary: var(--pop-cream);
   --surface-elevated: #FFFFFF;
+  --surface-card: var(--pop-white);
+  --surface-active: var(--pop-yellow);
+  --surface-bubble: var(--pop-white);
+  --border-muted: rgba(43, 43, 54, 0.4);
+  --border-accent: var(--pop-black);
+  --border-accent-light: var(--pop-black);
+  --color-text-dim: #8a8a93;
 
   /* ─ Shadow Tokens (Soft Sketch Offsets) ─ */
   --shadow-comic: 3px 3px 0px rgba(43, 43, 54, 0.18);
@@ -99,6 +106,7 @@
   /* ─ Z-Index Scale ─ */
   --z-base: 0;
   --z-above: 10;
+  --z-noise: 90;
   --z-dropdown: 100;
   --z-sticky: 200;
   --z-fixed: 300;
@@ -106,6 +114,9 @@
   --z-modal: 500;
   --z-popover: 600;
   --z-toast: 700;
+  --z-canvas-overlay: 1000;
+  --z-cursor: 2000;
+  --z-transition: 999999;
 
   /* ─ Ben-Day Dot Pattern (Soft Sketchbook Dots) ─ */
   --dot-pattern: radial-gradient(circle, var(--pop-black) 2.2px, transparent 2.2px);
@@ -161,10 +172,17 @@
   --color-selection-bg: #FAFAFA;
   --color-selection-text: #08080a;
 
-  /* ─ Surface Colors ─ */
-  --surface-primary: var(--pop-white);
-  --surface-secondary: #0c0c0e;
-  --surface-elevated: #1a1a1f;
+  --surface-primary: #121214;       /* Primary panel background */
+  --surface-secondary: #0c0c0e;     /* Page base background */
+  --surface-elevated: #1a1a1f;      /* Elevated floating elements */
+  --surface-card: #1e1e24;          /* Card background */
+  --surface-active: #1C1C24;        /* Elevated active element */
+  --surface-bubble: #dfdbd2;        /* Speech bubble background */
+  --border-muted: #555562;          /* Dark slate-grey borders */
+  --border-accent: #3F3F4E;         /* Slate borders */
+  --border-accent-light: #5A5A72;   /* Light slate-grey borders */
+  --color-text-muted: #B0B0C4;      /* Muted text color */
+  --color-text-dim: #8a8a93;        /* Dim text color */
 
   /* ─ Border Overrides (Keep original comic thickness in dark mode) ─ */
   --border-thin: 2px solid var(--color-border);
@@ -202,26 +220,26 @@
 
 /* ─ Scrollbar Styling Override in Noir Mode ─ */
 [data-theme='noir'] ::-webkit-scrollbar-thumb {
-  background: #4a4a50 !important;
-  border-color: #08080a !important;
+  background: #4a4a50;
+  border-color: #08080a;
 }
 [data-theme='noir'] ::-webkit-scrollbar-thumb:hover {
-  background: #fafafa !important;
+  background: #fafafa;
 }
 [data-theme='noir'] ::-webkit-scrollbar-track {
-  background: #08080a !important;
-  border-left: 2px solid #fafafa !important;
+  background: #08080a;
+  border-left: 2px solid #fafafa;
 }
 [data-theme='noir'] ::-webkit-scrollbar-corner {
-  background: #08080a !important;
+  background: #08080a;
 }
 [data-theme='noir'] {
-  scrollbar-color: #4a4a50 #08080a !important;
+  scrollbar-color: #4a4a50 #08080a;
 }
 
 /* ─ Hide all dot backgrounds in Noir mode ─ */
 [data-theme='noir'] .dot-bg {
-  display: none !important;
+  display: none;
 }
 
 /* ─ Make sections transparent to reveal the fixed skyline background ─ */
@@ -295,13 +313,13 @@ body::after {
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  z-index: 9999;
+  z-index: var(--z-noise);
   background-image: url("/images/noise.png");
   background-repeat: repeat;
 }
 
 [data-theme='noir'] body::after {
-  display: none !important;
+  display: none;
 }
 
 img,
@@ -1120,7 +1138,7 @@ footer {
   inset: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 10000;
+  z-index: var(--z-canvas-overlay);
   pointer-events: none;
   overflow: hidden;
 }

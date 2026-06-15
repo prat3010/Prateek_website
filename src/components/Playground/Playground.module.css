@@ -38,7 +38,7 @@
 
 :global([data-theme='noir']) .moBanner {
   background: #000000;
-  border-color: #3F3F4E;
+  border-color: var(--border-accent);
   box-shadow: 6px 6px 0 #000000;
   color: #E2E2EC;
 }
@@ -58,8 +58,8 @@
 }
 
 :global([data-theme='noir']) .moBadge {
-  background: #3F3F4E;
-  border-color: #5A5A72;
+  background: var(--border-accent);
+  border-color: var(--border-accent-light);
 }
 
 .moHeader {
@@ -84,7 +84,7 @@
 }
 
 :global([data-theme='noir']) .moText {
-  color: #B0B0C4;
+  color: var(--color-text-muted);
 }
 
 /* ---- Lab Desk Panel ---- */
@@ -102,7 +102,7 @@
 
 :global([data-theme='noir']) .desk {
   background: #000000;
-  border-color: #2F2F3D;
+  border-color: var(--surface-card);
   box-shadow: 10px 10px 0 #000000;
 }
 
@@ -132,7 +132,7 @@
 
 :global([data-theme='noir']) .gridWrapper {
   background: #000000;
-  border-color: #2F2F3D;
+  border-color: var(--surface-card);
   box-shadow: inset 4px 4px 0 #000000;
 }
 
@@ -173,26 +173,26 @@
 
 /* Cell states */
 .cellWall {
-  background: var(--pop-black) !important;
+  background: var(--pop-black);
   border-color: var(--pop-black);
   animation: wallPop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 :global([data-theme='noir']) .cellWall {
-  background: #4E4E62 !important;
-  border-color: #5A5A72 !important;
+  background: var(--border-accent-light);
+  border-color: var(--border-accent-light);
   box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.4);
 }
 
 :global([data-theme='noir']) .cellStart {
-  background: #2E2E3D !important;
-  border: 2px solid #5A5A72 !important;
+  background: var(--surface-card);
+  border: 2px solid var(--border-accent-light);
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.15);
 }
 
 :global([data-theme='noir']) .cellEnd {
-  background: #2E2E3D !important;
-  border: 2px solid #5A5A72 !important;
+  background: var(--surface-card);
+  border: 2px solid var(--border-accent-light);
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.15);
 }
 
@@ -238,14 +238,14 @@
 
 /* Shortest path cells */
 .cellPath {
-  background-color: var(--pop-yellow) !important;
+  background-color: var(--pop-yellow);
   border-color: var(--pop-black);
   animation: pathGlow 0.4s ease forwards;
   z-index: 3;
 }
 
 :global([data-theme='noir']) .cellPath {
-  background-color: #00E5FF !important;
+  background-color: #00E5FF;
   box-shadow: 0 0 10px #00E5FF, 0 0 20px #00D5EC;
   border-color: #00E5FF;
   animation: pathNeon 0.4s ease forwards;
@@ -273,7 +273,7 @@
 }
 
 :global([data-theme='noir']) .label {
-  color: #B0B0C4;
+  color: var(--color-text-muted);
 }
 
 .select {
@@ -290,9 +290,9 @@
 }
 
 :global([data-theme='noir']) .select {
-  background: #1C1C24;
+  background: var(--surface-active);
   color: #FFFFFF;
-  border-color: #3F3F4E;
+  border-color: var(--border-accent);
   box-shadow: 3px 3px 0 #000000;
 }
 
@@ -314,8 +314,8 @@
 }
 
 :global([data-theme='noir']) .slider {
-  background: #1C1C24;
-  border-color: #3F3F4E;
+  background: var(--surface-active);
+  border-color: var(--border-accent);
 }
 
 .slider::-webkit-slider-thumb {
@@ -398,16 +398,16 @@
 }
 
 :global([data-theme='noir']) .btnPrimary {
-  background: #3F3F4E;
-  border-color: #5A5A72;
+  background: var(--border-accent);
+  border-color: var(--border-accent-light);
   color: #FFFFFF;
   box-shadow: 4px 4px 0 #000000;
 }
 
 :global([data-theme='noir']) .btnSecondary {
   background: transparent;
-  border-color: #3F3F4E;
-  color: #B0B0C4;
+  border-color: var(--border-accent);
+  color: var(--color-text-muted);
   box-shadow: 4px 4px 0 #000000;
 }
 
@@ -425,12 +425,12 @@
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  transform: none !important;
-  box-shadow: 2px 2px 0 var(--pop-black) !important;
+  transform: none;
+  box-shadow: 2px 2px 0 var(--pop-black);
 }
 
 :global([data-theme='noir']) .btn:disabled {
-  box-shadow: 2px 2px 0 #000000 !important;
+  box-shadow: 2px 2px 0 #000000;
 }
 
 /* ---- Console Output Panel ---- */
@@ -450,7 +450,7 @@
 :global([data-theme='noir']) .console {
   background: #000000;
   color: #E2E2EC;
-  border-color: #2F2F3D;
+  border-color: var(--surface-card);
   box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.05);
 }
 
@@ -542,7 +542,7 @@
 
 :global([data-theme='noir']) .mobileWarning {
   background: #000000;
-  border-color: #3F3F4E;
+  border-color: var(--border-accent);
   box-shadow: 8px 8px 0 #000000;
   color: #E2E2EC;
 }
@@ -557,7 +557,7 @@
 }
 
 :global([data-theme='noir']) .warningHeader {
-  color: #5A5A72;
+  color: var(--border-accent-light);
   text-shadow: none;
 }
 
@@ -571,7 +571,7 @@
 }
 
 :global([data-theme='noir']) .warningText {
-  color: #B0B0C4;
+  color: var(--color-text-muted);
 }
 
 .warningIcon {
@@ -702,8 +702,8 @@
 
 :global([data-theme='noir']) .sysLogs {
   background: #000000;
-  color: #B0B0C4;
-  border-color: #3F3F4E;
+  color: var(--color-text-muted);
+  border-color: var(--border-accent);
   box-shadow: 4px 4px 0 #000000;
 }
 
@@ -741,8 +741,8 @@
 }
 
 :global([data-theme='noir']) .launchBtn {
-  background: #3F3F4E;
-  border-color: #5A5A72;
+  background: var(--border-accent);
+  border-color: var(--border-accent-light);
   color: #FFFFFF;
   box-shadow: 4px 4px 0 #000000;
   animation: pulseNoirButton 2s infinite ease-in-out;
@@ -785,8 +785,8 @@
 
 :global([data-theme='noir']) .exitBtn {
   background: transparent;
-  border-color: #3F3F4E;
-  color: #B0B0C4;
+  border-color: var(--border-accent);
+  color: var(--color-text-muted);
   box-shadow: 2px 2px 0 #000000;
 }
 
@@ -825,194 +825,194 @@
   }
   
   .desk.fullscreenMobile {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    z-index: 9999 !important;
-    background: var(--pop-white) !important;
-    padding: 0.75rem !important;
-    border: none !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    overflow-y: auto !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 1rem !important;
-    -webkit-overflow-scrolling: touch !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: var(--z-modal);
+    background: var(--pop-white);
+    padding: 0.75rem;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    -webkit-overflow-scrolling: touch;
   }
   
   :global([data-theme='noir']) .desk.fullscreenMobile {
-    background: #000000 !important;
+    background: #000000;
   }
   
   .desk.fullscreenMobile .panelLayout {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 1rem !important;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
   
   .desk.fullscreenMobile .console {
-    display: block !important;
-    height: 120px !important;
+    display: block;
+    height: 120px;
   }
   
   .desk.fullscreenMobile .mobileWarning {
-    display: none !important;
+    display: none;
   }
   
   .desk.fullscreenMobile .fullscreenHeader {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    border-bottom: 3px solid var(--pop-black) !important;
-    padding-bottom: 0.5rem !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid var(--pop-black);
+    padding-bottom: 0.5rem;
   }
   
   :global([data-theme='noir']) .desk.fullscreenMobile .fullscreenHeader {
-    border-bottom-color: #3F3F4E !important;
+    border-bottom-color: var(--border-accent);
   }
 }
 
 /* Global visualizer classes for direct-DOM manipulation (bypasses module hashing) */
 :global(.visualizer-visited) {
-  background-color: rgba(0, 229, 255, 0.7) !important;
+  background-color: rgba(0, 229, 255, 0.7);
   animation: visitShockwave 0.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
 }
 
 :global([data-theme='noir'] .visualizer-visited) {
-  background-color: rgba(100, 110, 140, 0.4) !important;
+  background-color: rgba(100, 110, 140, 0.4);
   animation: visitInkSpill 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 :global(.visualizer-path) {
-  background-color: var(--pop-yellow) !important;
-  border-color: var(--pop-black) !important;
+  background-color: var(--pop-yellow);
+  border-color: var(--pop-black);
   animation: pathGlow 0.4s ease forwards;
   z-index: 3;
 }
 
 :global([data-theme='noir'] .visualizer-path) {
-  background-color: var(--neon-yellow) !important;
-  box-shadow: 0 0 12px var(--neon-yellow), 0 0 25px var(--neon-yellow) !important;
-  border-color: var(--neon-yellow) !important;
+  background-color: var(--neon-yellow);
+  box-shadow: 0 0 12px var(--neon-yellow), 0 0 25px var(--neon-yellow);
+  border-color: var(--neon-yellow);
   animation: pathNeon 0.4s ease forwards;
 }
 
 /* ---- Playground Cyber-Noir Neon Overrides ---- */
 :global([data-theme='noir']) .sectionTitle {
-  color: var(--neon-pink) !important;
-  text-shadow: var(--neon-pink-glow) !important;
+  color: var(--neon-pink);
+  text-shadow: var(--neon-pink-glow);
 }
 
 :global([data-theme='noir']) .moBanner {
-  background: #121214 !important;
-  border-color: var(--neon-cyan) !important;
-  box-shadow: 0 0 15px rgba(0, 240, 255, 0.2) !important;
+  background: var(--surface-primary);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
 }
 
 :global([data-theme='noir']) .moBadge {
-  background: #000000 !important;
-  color: var(--neon-cyan) !important;
-  border-color: var(--neon-cyan) !important;
-  box-shadow: 0 0 8px var(--neon-cyan) !important;
+  background: #000000;
+  color: var(--neon-cyan);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 8px var(--neon-cyan);
 }
 
 :global([data-theme='noir']) .desk {
-  background: #121214 !important;
-  border-color: var(--neon-cyan) !important;
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.25) !important;
+  background: var(--surface-primary);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.25);
 }
 
 :global([data-theme='noir']) .gridWrapper {
-  background: #000000 !important;
-  border-color: var(--neon-cyan) !important;
-  box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.15) !important;
+  background: #000000;
+  border-color: var(--neon-cyan);
+  box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.15);
 }
 
 :global([data-theme='noir']) .cellPath {
-  background-color: var(--neon-yellow) !important;
-  box-shadow: 0 0 12px var(--neon-yellow), 0 0 25px var(--neon-yellow) !important;
-  border-color: var(--neon-yellow) !important;
+  background-color: var(--neon-yellow);
+  box-shadow: 0 0 12px var(--neon-yellow), 0 0 25px var(--neon-yellow);
+  border-color: var(--neon-yellow);
 }
 
 :global([data-theme='noir']) .btnPrimary {
-  background: #1e1e24 !important;
-  border-color: var(--neon-pink) !important;
-  color: var(--neon-pink) !important;
-  box-shadow: 0 0 10px rgba(255, 42, 85, 0.25) !important;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.25s ease, color 0.25s ease !important;
+  background: var(--surface-card);
+  border-color: var(--neon-pink);
+  color: var(--neon-pink);
+  box-shadow: 0 0 10px rgba(255, 42, 85, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.25s ease, color 0.25s ease;
 }
 :global([data-theme='noir']) .btnPrimary:hover:not(:disabled) {
-  background: #1e1e24 !important;
-  border-color: var(--neon-pink) !important;
-  color: #ffffff !important;
-  box-shadow: 0 0 15px var(--neon-pink) !important;
-  transform: translate(-2px, -2px) !important;
+  background: var(--surface-card);
+  border-color: var(--neon-pink);
+  color: #ffffff;
+  box-shadow: 0 0 15px var(--neon-pink);
+  transform: translate(-2px, -2px);
 }
 :global([data-theme='noir']) .btnPrimary:active:not(:disabled) {
-  transform: translate(2px, 2px) !important;
-  box-shadow: 0 0 5px var(--neon-pink) !important;
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 5px var(--neon-pink);
 }
 
 :global([data-theme='noir']) .btnSecondary {
-  background: #121214 !important;
-  border-color: var(--neon-yellow) !important;
-  color: var(--neon-yellow) !important;
-  box-shadow: 0 0 10px rgba(255, 230, 0, 0.2) !important;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.25s ease, color 0.25s ease !important;
+  background: var(--surface-primary);
+  border-color: var(--neon-yellow);
+  color: var(--neon-yellow);
+  box-shadow: 0 0 10px rgba(255, 230, 0, 0.2);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.25s ease, color 0.25s ease;
 }
 :global([data-theme='noir']) .btnSecondary:hover:not(:disabled) {
-  border-color: var(--neon-yellow) !important;
-  color: #ffffff !important;
-  box-shadow: 0 0 15px var(--neon-yellow) !important;
-  transform: translate(-2px, -2px) !important;
+  border-color: var(--neon-yellow);
+  color: #ffffff;
+  box-shadow: 0 0 15px var(--neon-yellow);
+  transform: translate(-2px, -2px);
 }
 :global([data-theme='noir']) .btnSecondary:active:not(:disabled) {
-  transform: translate(2px, 2px) !important;
-  box-shadow: 0 0 5px var(--neon-yellow) !important;
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 5px var(--neon-yellow);
 }
 
 :global([data-theme='noir']) .console {
-  background: #050508 !important;
-  color: var(--neon-cyan) !important;
-  border-color: var(--neon-cyan) !important;
-  box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.15) !important;
+  background: #050508;
+  color: var(--neon-cyan);
+  border-color: var(--neon-cyan);
+  box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.15);
 }
 
 :global([data-theme='noir']) .launchOverlay {
-  background: rgba(8, 8, 10, 0.96) !important;
-  border-color: var(--neon-cyan) !important;
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.25) !important;
+  background: rgba(8, 8, 10, 0.96);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.25);
 }
 :global([data-theme='noir']) .overlayTitle {
-  color: var(--neon-cyan) !important;
-  text-shadow: var(--neon-cyan-glow) !important;
+  color: var(--neon-cyan);
+  text-shadow: var(--neon-cyan-glow);
 }
 :global([data-theme='noir']) .sysLogs {
-  background: #000000 !important;
-  color: var(--neon-green) !important;
-  border-color: var(--neon-green) !important;
-  box-shadow: 0 0 10px rgba(57, 255, 20, 0.2) !important;
+  background: #000000;
+  color: var(--neon-green);
+  border-color: var(--neon-green);
+  box-shadow: 0 0 10px rgba(57, 255, 20, 0.2);
 }
 :global([data-theme='noir']) .launchBtn {
-  background: #121214 !important;
-  border-color: var(--neon-pink) !important;
-  color: var(--neon-pink) !important;
-  box-shadow: 0 0 12px var(--neon-pink) !important;
-  animation: pulseNeonPinkButton 2s infinite ease-in-out !important;
+  background: var(--surface-primary);
+  border-color: var(--neon-pink);
+  color: var(--neon-pink);
+  box-shadow: 0 0 12px var(--neon-pink);
+  animation: pulseNeonPinkButton 2s infinite ease-in-out;
 }
 :global([data-theme='noir']) .launchBtn:hover:not(:disabled) {
-  border-color: var(--neon-pink) !important;
-  color: #ffffff !important;
-  box-shadow: 0 0 20px var(--neon-pink) !important;
+  border-color: var(--neon-pink);
+  color: #ffffff;
+  box-shadow: 0 0 20px var(--neon-pink);
 }
 
 :global([data-theme='noir']) .exitBtn:hover {
-  border-color: var(--neon-pink) !important;
-  color: var(--neon-pink) !important;
-  box-shadow: 0 0 8px var(--neon-pink) !important;
+  border-color: var(--neon-pink);
+  color: var(--neon-pink);
+  box-shadow: 0 0 8px var(--neon-pink);
 }
 
 @keyframes pulseNeonPinkButton {

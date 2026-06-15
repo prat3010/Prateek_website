@@ -24,9 +24,9 @@
 :global([data-theme='noir']) .footer {
   background-color: #08080a;
   color: #e0e0e3;
-  border-top: 4px solid var(--neon-pink) !important;
-  box-shadow: 0 -8px 24px rgba(255, 42, 85, 0.18) !important;
-  background-image: none !important;
+  border-top: 4px solid var(--neon-pink);
+  box-shadow: 0 -8px 24px rgba(255, 42, 85, 0.18);
+  background-image: none;
 }
 
 .container {
@@ -715,7 +715,7 @@
   }
 
   .panelsGrid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: 1fr;
     gap: 24px;
   }
 
@@ -731,6 +731,6 @@
   }
   
   .comicPanel {
-    transform: none !important;
+    transform: none;
   }
 }

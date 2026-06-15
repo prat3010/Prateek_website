@@ -54,7 +54,7 @@
 }
 
 :global([data-theme='noir']) .filterContainer a:hover {
-  color: var(--pop-white) !important;
+  color: var(--pop-white);
 }
 
 /* KPI Cards Grid */
@@ -331,11 +331,11 @@
 }
 
 .analyticsTable tr {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 15%, transparent);
 }
 
 .analyticsTable tr:hover {
-  background-color: rgba(255, 255, 255, 0.02);
+  background-color: color-mix(in srgb, var(--color-border) 5%, transparent);
 }
 
 .pathCell {
@@ -404,7 +404,7 @@
 .devicesPanelFooter {
   padding-top: 16px;
   margin-top: 16px;
-  border-top: 1px dashed rgba(255, 255, 255, 0.15);
+  border-top: 1px dashed color-mix(in srgb, var(--color-border) 20%, transparent);
   font-family: var(--font-body);
   font-size: 12px;
   color: var(--color-text-muted);
@@ -644,18 +644,18 @@
 }
 
 .activeFilter {
-  background-color: var(--pop-yellow) !important;
-  color: var(--pop-black) !important;
+  background-color: var(--pop-yellow);
+  color: var(--pop-black);
   transform: scale(1.03) translateY(-2px);
   box-shadow: var(--shadow-comic);
 }
 
 :global([data-theme='noir']) .activeFilter {
-  color: var(--pop-white) !important;
+  color: var(--pop-white);
 }
 
 .warningAlert {
-  border-color: var(--pop-red) !important;
+  border-color: var(--pop-red);
   background-color: var(--surface-elevated);
   padding: 20px;
   margin-bottom: 32px;
@@ -711,14 +711,8 @@
   padding: 2px 4px;
   border: 1px dashed var(--pop-black);
   border-radius: 4px;
-  background-color: #f1f5f9;
-  color: #0f172a;
-}
-
-:global(.dark) .warningCode {
-  background-color: #27272a;
-  color: #f4f4f5;
-  border-color: var(--pop-white);
+  background-color: var(--surface-secondary);
+  color: var(--color-text);
 }
 
 .warningSteps {
@@ -744,7 +738,7 @@
 }
 
 .privacyAlert {
-  border: 3px solid var(--pop-black) !important;
+  border: 3px solid var(--pop-black);
   background-color: var(--surface-primary);
   padding: 20px;
   margin-bottom: 32px;
@@ -801,4 +795,20 @@
   gap: 8px 16px;
 }
 
+/* RefreshButton */
+.refreshBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-sm);
+  min-width: 150px;
+}
 
+.spinning {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

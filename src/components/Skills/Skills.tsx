@@ -34,11 +34,7 @@ const iconMap: Record<string, React.ComponentType<any>> = {
   shield: Shield
 };
 
-interface SkillsProps {
-  skills?: Skill[]; // kept for backwards compatibility with page.tsx props signature
-}
-
-export default function Skills({}: SkillsProps) {
+export default function Skills() {
   const { isNoir } = useTheme();
 
   // Filter skills by dossier categories

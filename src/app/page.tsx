@@ -3,7 +3,6 @@ import Hero from '@/components/Hero/Hero';
 import ScrollSection from '@/components/ScrollSection/ScrollSection';
 import BlogSection from '@/components/Blog/BlogSection';
 import { projects } from '@/data/projects';
-import { skills } from '@/data/skills';
 import { standardTaglines, noirTaglines } from '@/data/taglines';
 import { getAllPosts } from '@/lib/markdown';
 
@@ -21,7 +20,7 @@ export default function Home() {
     <>
       <Hero taglines={{ standard: standardTaglines, noir: noirTaglines }} />
       <ScrollSection direction="right" gap={80}><About /></ScrollSection>
-      <ScrollSection direction="left" verticalOffset={150} gap={80}><Skills skills={skills} /></ScrollSection>
+      <ScrollSection direction="left" verticalOffset={150} gap={80}><Skills /></ScrollSection>
       <ScrollSection direction="right" verticalOffset={120} gap={80}><Projects projects={projects} /></ScrollSection>
       <ScrollSection direction="left" verticalOffset={120} gap={80}><Resume /></ScrollSection>
       <ScrollSection direction="right" verticalOffset={120} gap={80}><Playground /></ScrollSection>

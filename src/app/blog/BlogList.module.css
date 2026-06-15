@@ -70,12 +70,12 @@
   color: inherit;
 }
 
-.postCard {
+.postCard.postCard {
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: var(--space-xl) !important;
+  padding: var(--space-xl);
 }
 
 .postMeta {

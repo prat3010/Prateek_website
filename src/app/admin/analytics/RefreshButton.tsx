@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { RefreshCw } from 'lucide-react';
+import styles from './analytics.module.css';
 
 export default function RefreshButton() {
   const router = useRouter();
@@ -20,13 +21,13 @@ export default function RefreshButton() {
   return (
     <button
       onClick={handleRefresh}
-      className="comic-btn comic-btn-blue text-sm flex items-center justify-center font-headline"
+      className={`comic-btn comic-btn-blue font-headline ${styles.refreshBtn}`}
       disabled={isRefreshing}
-      style={{ minWidth: '150px' }}
     >
       <RefreshCw
         size={18}
-        className={`mr-2 ${isRefreshing ? 'animate-spin' : ''}`}
+        style={{ marginRight: '8px' }}
+        className={isRefreshing ? styles.spinning : ''}
       />
       {isRefreshing ? 'REFRESHING...' : 'REFRESH PANEL'}
     </button>

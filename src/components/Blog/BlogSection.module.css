@@ -76,9 +76,9 @@
   color: inherit;
 }
 
-.postCard {
+.postCard.postCard {
   height: 100%;
-  padding: var(--space-lg) !important;
+  padding: var(--space-lg);
   display: flex;
   flex-direction: column;
   justify-content: space-between;

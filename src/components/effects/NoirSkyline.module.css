@@ -280,14 +280,14 @@
 
 /* ─ Glowing Window Lights ─ */
 .glowingWindow {
-  stroke: #c5a059 !important;
-  opacity: 0.85 !important;
+  stroke: #c5a059;
+  opacity: 0.85;
   filter: drop-shadow(0 0 2px rgba(197, 160, 89, 0.95)) drop-shadow(0 0 0.5px rgba(197, 160, 89, 0.8));
 }
 
 .glowingWindowDim {
-  stroke: #c5a059 !important;
-  opacity: 0.4 !important;
+  stroke: #c5a059;
+  opacity: 0.4;
 }
 
 
@@ -386,13 +386,13 @@
 }
 
 .darkNoir .tugboatWindow {
-  fill: #fafafa !important;
+  fill: #fafafa;
   filter: drop-shadow(0 0 1.5px rgba(255, 255, 255, 0.95));
   animation: windowFlicker 9s infinite alternate;
 }
 
 .lightPopart .tugboatWindow {
-  fill: var(--pop-yellow) !important;
+  fill: var(--pop-yellow);
 }
 
 .smokePuff1,
@@ -691,32 +691,32 @@
     opacity: 0.25;
   }
   .tugboatWindow {
-    opacity: 0.85 !important;
+    opacity: 0.85;
   }
   .smokePuff1,
   .smokePuff2,
   .smokePuff3 {
-    opacity: 0.3 !important;
+    opacity: 0.3;
   }
   .tugboatWake1,
   .tugboatWake2,
   .sailboatWake,
   .speedboatWake1,
   .speedboatWake2 {
-    opacity: 0.5 !important;
+    opacity: 0.5;
   }
   .windowFlicker1,
   .windowFlicker2,
   .windowFlicker3,
   .windowFlicker4 {
     animation: none !important;
-    opacity: 0.6 !important;
+    opacity: 0.6;
   }
   .beaconRed1,
   .beaconRed2,
   .beaconRed3 {
     animation: none !important;
-    opacity: 0.95 !important;
+    opacity: 0.95;
   }
 }
 
@@ -725,7 +725,7 @@
 .windowFlicker2,
 .windowFlicker3,
 .windowFlicker4 {
-  stroke: #c5a059 !important;
+  stroke: #c5a059;
   filter: drop-shadow(0 0 2px rgba(197, 160, 89, 0.95)) drop-shadow(0 0 0.5px rgba(197, 160, 89, 0.8));
 }
 
@@ -777,7 +777,7 @@
 .darkNoir .beaconRed1,
 .darkNoir .beaconRed2,
 .darkNoir .beaconRed3 {
-  fill: #ff3b30 !important;
+  fill: #ff3b30;
   filter: drop-shadow(0 0 3px rgba(255, 59, 48, 0.95)) drop-shadow(0 0 1px rgba(255, 59, 48, 0.8));
 }
 
@@ -785,8 +785,8 @@
 .lightPopart .beaconRed1,
 .lightPopart .beaconRed2,
 .lightPopart .beaconRed3 {
-  fill: var(--pop-red) !important;
-  filter: none !important;
+  fill: var(--pop-red);
+  filter: none;
 }
 
 .beaconRed1 {
@@ -818,18 +818,18 @@
 
 /* ─ Bridge Highway Traffic (Glowing Dots) ─ */
 .trafficHeadlight {
-  fill: #ffffff !important;
+  fill: #ffffff;
   opacity: 0.95;
   filter: drop-shadow(0 0 1.5px rgba(255, 255, 255, 0.95));
 }
 
 .trafficTaillight {
-  fill: #ffffff !important;
+  fill: #ffffff;
   opacity: 0.35;
 }
 
 .buildingGroup {
-  fill: var(--skyline-fill-bg) !important;
+  fill: var(--skyline-fill-bg);
 }
 
 .brickOverlay {
@@ -842,18 +842,18 @@
 }
 
 .shadowHatchBg {
-  fill: var(--skyline-hatch-bg) !important;
-  stroke: none !important;
+  fill: var(--skyline-hatch-bg);
+  stroke: none;
 }
 
 .shadowHatchMid {
-  fill: var(--skyline-hatch-mid) !important;
-  stroke: none !important;
+  fill: var(--skyline-hatch-mid);
+  stroke: none;
 }
 
 .shadowHatchFg {
-  fill: var(--skyline-hatch-fg) !important;
-  stroke: none !important;
+  fill: var(--skyline-hatch-fg);
+  stroke: none;
 }
 
 /* ── Theme Definitions ── */
@@ -1024,7 +1024,7 @@
 }
 
 .lightPopart .sunburstRays {
-  display: none !important;
+  display: none;
 }
 
 /* Light pop-art specific overrides to hide night details */
@@ -1035,115 +1035,115 @@
 .lightPopart .star3,
 .lightPopart .fog1,
 .lightPopart .fog2 {
-  display: none !important;
+  display: none;
 }
 
 .lightPopart .vignette {
-  background: none !important;
+  background: none;
 }
 
 /* Light pop-art window colors - replace neon yellow glow with retro solid colors and box shapes */
 .lightPopart .glowingWindow {
-  stroke: var(--pop-yellow) !important;
-  stroke-width: 4.5px !important;
-  stroke-dasharray: 4.5px 7px !important;
-  stroke-linecap: butt !important;
-  opacity: 1 !important;
-  filter: none !important;
+  stroke: var(--pop-yellow);
+  stroke-width: 4.5px;
+  stroke-dasharray: 4.5px 7px;
+  stroke-linecap: butt;
+  opacity: 1;
+  filter: none;
 }
 
 .lightPopart .glowingWindowDim {
-  stroke: var(--pop-cyan) !important;
-  stroke-width: 4.5px !important;
-  stroke-dasharray: 4.5px 7px !important;
-  stroke-linecap: butt !important;
-  opacity: 1 !important;
-  filter: none !important;
+  stroke: var(--pop-cyan);
+  stroke-width: 4.5px;
+  stroke-dasharray: 4.5px 7px;
+  stroke-linecap: butt;
+  opacity: 1;
+  filter: none;
 }
 
 .lightPopart .windowFlicker1,
 .lightPopart .windowFlicker2,
 .lightPopart .windowFlicker3,
 .lightPopart .windowFlicker4 {
-  stroke: var(--pop-yellow) !important;
-  stroke-width: 4.5px !important;
-  stroke-linecap: butt !important;
-  opacity: 1 !important;
-  filter: none !important;
+  stroke: var(--pop-yellow);
+  stroke-width: 4.5px;
+  stroke-linecap: butt;
+  opacity: 1;
+  filter: none;
 }
 
 .lightPopart .trafficHeadlight {
-  fill: var(--pop-yellow) !important;
-  filter: drop-shadow(0 0 1.5px var(--pop-yellow)) !important;
-  opacity: 1 !important;
+  fill: var(--pop-yellow);
+  filter: drop-shadow(0 0 1.5px var(--pop-yellow));
+  opacity: 1;
 }
 
 .lightPopart .trafficTaillight {
-  fill: var(--pop-red) !important;
-  opacity: 0.9 !important;
+  fill: var(--pop-red);
+  opacity: 0.9;
 }
 
 /* ── Light Pop-Art Buildings Individual Coloring ── */
 
 /* Layer 1 (Background Buildings) */
-.lightPopart .bldBgSkyscrapers { fill: var(--pop-blue) !important; }
-.lightPopart .bldBgNeedle { fill: var(--pop-cyan) !important; }
-.lightPopart .bldBgChrysler { fill: var(--pop-pink) !important; }
-.lightPopart .bldBgEmpire { fill: var(--pop-cream) !important; }
-.lightPopart .bldBgFlatTop { fill: var(--pop-orange) !important; }
-.lightPopart .bldBgStepped { fill: var(--pop-green) !important; }
-.lightPopart .bldBgArtDecoGap1 { fill: var(--pop-magenta) !important; }
-.lightPopart .bldBgSlimNeedleGap2a { fill: var(--pop-cyan) !important; }
-.lightPopart .bldBgTwinLeft { fill: var(--pop-yellow) !important; }
-.lightPopart .bldBgTwinRight { fill: var(--pop-yellow) !important; }
-.lightPopart .bldBgSetbackGap3a { fill: var(--pop-blue) !important; }
-.lightPopart .bldBgNarrowDecoGap3b { fill: var(--pop-pink) !important; }
-.lightPopart .bldBgBlockGap1b { fill: var(--pop-blue) !important; }
+.lightPopart .bldBgSkyscrapers { fill: var(--pop-blue); }
+.lightPopart .bldBgNeedle { fill: var(--pop-cyan); }
+.lightPopart .bldBgChrysler { fill: var(--pop-pink); }
+.lightPopart .bldBgEmpire { fill: var(--pop-cream); }
+.lightPopart .bldBgFlatTop { fill: var(--pop-orange); }
+.lightPopart .bldBgStepped { fill: var(--pop-green); }
+.lightPopart .bldBgArtDecoGap1 { fill: var(--pop-magenta); }
+.lightPopart .bldBgSlimNeedleGap2a { fill: var(--pop-cyan); }
+.lightPopart .bldBgTwinLeft { fill: var(--pop-yellow); }
+.lightPopart .bldBgTwinRight { fill: var(--pop-yellow); }
+.lightPopart .bldBgSetbackGap3a { fill: var(--pop-blue); }
+.lightPopart .bldBgNarrowDecoGap3b { fill: var(--pop-pink); }
+.lightPopart .bldBgBlockGap1b { fill: var(--pop-blue); }
 
 /* Background Water Tanks (Popart Colors) */
-.lightPopart .bldBgWaterTank1Body { fill: var(--pop-yellow) !important; }
-.lightPopart .bldBgWaterTank1Roof { fill: var(--pop-red) !important; }
-.lightPopart .bldBgWaterTank2Body { fill: var(--pop-green) !important; }
-.lightPopart .bldBgWaterTank2Roof { fill: var(--pop-pink) !important; }
-.lightPopart .bldBgWaterTank3Body { fill: var(--pop-orange) !important; }
-.lightPopart .bldBgWaterTank3Roof { fill: var(--pop-cyan) !important; }
+.lightPopart .bldBgWaterTank1Body { fill: var(--pop-yellow); }
+.lightPopart .bldBgWaterTank1Roof { fill: var(--pop-red); }
+.lightPopart .bldBgWaterTank2Body { fill: var(--pop-green); }
+.lightPopart .bldBgWaterTank2Roof { fill: var(--pop-pink); }
+.lightPopart .bldBgWaterTank3Body { fill: var(--pop-orange); }
+.lightPopart .bldBgWaterTank3Roof { fill: var(--pop-cyan); }
 
 /* Layer 2 (Midground Buildings) */
-.lightPopart .bldMidFarLeft { fill: var(--pop-pink) !important; }
-.lightPopart .bldMidStaggered { fill: var(--pop-green) !important; }
-.lightPopart .bldMidBlockySpire { fill: var(--pop-orange) !important; }
-.lightPopart .bldMidFlatiron { fill: var(--pop-magenta) !important; }
-.lightPopart .bldMidCitigroup { fill: var(--pop-cyan) !important; }
-.lightPopart .bldMidSetbacks { fill: var(--pop-blue) !important; }
-.lightPopart .bldMidClock { fill: var(--pop-cream) !important; }
-.lightPopart .bldMidWaterTower { fill: var(--pop-yellow) !important; }
-.lightPopart .bldMidSlab { fill: var(--pop-pink) !important; }
-.lightPopart .bldMidNarrow { fill: var(--pop-green) !important; }
-.lightPopart .bldMidWarehouse { fill: var(--pop-orange) !important; }
-.lightPopart .bldMidGlass { fill: var(--pop-cyan) !important; }
-.lightPopart .bldMidSlimSpire { fill: var(--pop-magenta) !important; }
-.lightPopart .bldMidFarRight { fill: var(--pop-blue) !important; }
-.lightPopart .bldMidEdge { fill: var(--pop-pink) !important; }
-.lightPopart .bldMidLeftGap { fill: var(--pop-yellow) !important; }
-.lightPopart .bldMidRightGap { fill: var(--pop-green) !important; }
+.lightPopart .bldMidFarLeft { fill: var(--pop-pink); }
+.lightPopart .bldMidStaggered { fill: var(--pop-green); }
+.lightPopart .bldMidBlockySpire { fill: var(--pop-orange); }
+.lightPopart .bldMidFlatiron { fill: var(--pop-magenta); }
+.lightPopart .bldMidCitigroup { fill: var(--pop-cyan); }
+.lightPopart .bldMidSetbacks { fill: var(--pop-blue); }
+.lightPopart .bldMidClock { fill: var(--pop-cream); }
+.lightPopart .bldMidWaterTower { fill: var(--pop-yellow); }
+.lightPopart .bldMidSlab { fill: var(--pop-pink); }
+.lightPopart .bldMidNarrow { fill: var(--pop-green); }
+.lightPopart .bldMidWarehouse { fill: var(--pop-orange); }
+.lightPopart .bldMidGlass { fill: var(--pop-cyan); }
+.lightPopart .bldMidSlimSpire { fill: var(--pop-magenta); }
+.lightPopart .bldMidFarRight { fill: var(--pop-blue); }
+.lightPopart .bldMidEdge { fill: var(--pop-pink); }
+.lightPopart .bldMidLeftGap { fill: var(--pop-yellow); }
+.lightPopart .bldMidRightGap { fill: var(--pop-green); }
 
 
 /* Layer 3 (Foreground Buildings & Structures) */
-.lightPopart .bldFgLeftRoof { fill: var(--pop-brick-brown) !important; }
-.lightPopart .bldFgRightRoof { fill: var(--pop-brick-brown) !important; }
-.lightPopart .bldFgShed { fill: var(--pop-white) !important; }
-.lightPopart .bldFgChimney { fill: var(--pop-orange) !important; }
-.lightPopart .bldFgHvac { fill: var(--pop-blue) !important; }
-.lightPopart .bldFgBlower { fill: var(--pop-green) !important; }
-.lightPopart .bldFgBridgeTower { fill: var(--pop-bridge-red) !important; }
-.lightPopart .bldFgBridgePier { fill: var(--pop-pier-gray) !important; }
-.lightPopart .bldFgDolphinPiles { fill: var(--pop-orange) !important; }
+.lightPopart .bldFgLeftRoof { fill: var(--pop-brick-brown); }
+.lightPopart .bldFgRightRoof { fill: var(--pop-brick-brown); }
+.lightPopart .bldFgShed { fill: var(--pop-white); }
+.lightPopart .bldFgChimney { fill: var(--pop-orange); }
+.lightPopart .bldFgHvac { fill: var(--pop-blue); }
+.lightPopart .bldFgBlower { fill: var(--pop-green); }
+.lightPopart .bldFgBridgeTower { fill: var(--pop-bridge-red); }
+.lightPopart .bldFgBridgePier { fill: var(--pop-pier-gray); }
+.lightPopart .bldFgDolphinPiles { fill: var(--pop-orange); }
 
 /* Foreground Water Tanks (Popart Colors) */
-.lightPopart .bldFgLeftWaterTankBody { fill: var(--pop-orange) !important; }
-.lightPopart .bldFgLeftWaterTankRoof { fill: var(--pop-red) !important; }
-.lightPopart .bldFgRightWaterTankBody { fill: var(--pop-yellow) !important; }
-.lightPopart .bldFgRightWaterTankRoof { fill: var(--pop-blue) !important; }
+.lightPopart .bldFgLeftWaterTankBody { fill: var(--pop-orange); }
+.lightPopart .bldFgLeftWaterTankRoof { fill: var(--pop-red); }
+.lightPopart .bldFgRightWaterTankBody { fill: var(--pop-yellow); }
+.lightPopart .bldFgRightWaterTankRoof { fill: var(--pop-blue); }
 
 /* ── Interactive Gargoyle ── */
 .gargoyleEyes {
@@ -1163,7 +1163,7 @@
 }
 
 .gargoyleEyesAwake {
-  fill: var(--skyline-gargoyle-eyes) !important;
+  fill: var(--skyline-gargoyle-eyes);
   filter: drop-shadow(0 0 3px var(--skyline-gargoyle-eyes)) drop-shadow(0 0 1px var(--skyline-gargoyle-eyes));
 }
 
@@ -1236,14 +1236,14 @@
 }
 
 .darkNoir .hotelNeonText text {
-  fill: #ff2a55 !important;
+  fill: #ff2a55;
   filter: drop-shadow(0 0 3px rgba(255, 42, 85, 0.95)) drop-shadow(0 0 1px rgba(255, 42, 85, 0.8));
   animation: neonSignFlicker 6s infinite;
 }
 
 .lightPopart .hotelNeonText text {
-  fill: var(--pop-black) !important;
-  filter: none !important;
+  fill: var(--pop-black);
+  filter: none;
 }
 
 @keyframes neonSignFlicker {
@@ -1290,7 +1290,7 @@
 }
 
 .lightPopart .rooftopGraffiti {
-  stroke: rgba(26, 26, 46, 0.35) !important;
+  stroke: rgba(26, 26, 46, 0.35);
 }
 
 /* ── Right Wall Graffiti ── */
@@ -1301,7 +1301,7 @@
 }
 
 .lightPopart .rightWallGraffiti {
-  stroke: rgba(26, 26, 46, 0.3) !important;
+  stroke: rgba(26, 26, 46, 0.3);
 }
 
 /* ── Interactive Windows ── */
@@ -1311,17 +1311,17 @@
 }
 
 .interactiveWindow:hover {
-  fill: #c5a059 !important;
-  stroke: #c5a059 !important;
-  opacity: 1 !important;
+  fill: #c5a059;
+  stroke: #c5a059;
+  opacity: 1;
   filter: drop-shadow(0 0 4px rgba(197, 160, 89, 0.95)) drop-shadow(0 0 1px rgba(197, 160, 89, 0.8));
 }
 
 .lightPopart .interactiveWindow:hover {
-  fill: var(--pop-yellow) !important;
-  stroke: var(--pop-yellow) !important;
-  filter: none !important;
-  opacity: 1 !important;
+  fill: var(--pop-yellow);
+  stroke: var(--pop-yellow);
+  filter: none;
+  opacity: 1;
 }
 
 .interactiveWindowGroup {
@@ -1335,18 +1335,18 @@
 
 .interactiveWindowGroup:hover path,
 .interactiveWindowGroup:hover rect {
-  fill: #c5a059 !important;
-  stroke: #c5a059 !important;
-  opacity: 1 !important;
+  fill: #c5a059;
+  stroke: #c5a059;
+  opacity: 1;
   filter: drop-shadow(0 0 4px rgba(197, 160, 89, 0.95)) drop-shadow(0 0 1px rgba(197, 160, 89, 0.8));
 }
 
 .lightPopart .interactiveWindowGroup:hover path,
 .lightPopart .interactiveWindowGroup:hover rect {
-  fill: var(--pop-yellow) !important;
-  stroke: var(--pop-yellow) !important;
-  filter: none !important;
-  opacity: 1 !important;
+  fill: var(--pop-yellow);
+  stroke: var(--pop-yellow);
+  filter: none;
+  opacity: 1;
 }
 
 /* ── Dripping Utility Pipe Droplet ── */
@@ -1381,34 +1381,34 @@
 /* Billboard Neon Sign (Layer 3 Left Rooftop) */
 .billboardNeon path,
 .billboardNeon line {
-  stroke: #ff1493 !important;
+  stroke: #ff1493;
   transition: stroke 0.3s ease;
 }
 
 .billboardNeon text {
-  fill: #ff1493 !important;
-  stroke: none !important;
-  font-family: var(--font-code) !important;
-  font-weight: 800 !important;
+  fill: #ff1493;
+  stroke: none;
+  font-family: var(--font-code);
+  font-weight: 800;
   transition: fill 0.3s ease;
 }
 
 .darkNoir .billboardNeon path,
 .darkNoir .billboardNeon line {
-  stroke: #ff1493 !important;
+  stroke: #ff1493;
   filter: drop-shadow(0 0 3px rgba(255, 20, 147, 0.95)) drop-shadow(0 0 1px rgba(255, 20, 147, 0.8));
   animation: neonSignFlicker 7s infinite 1.5s;
 }
 
 .darkNoir .billboardNeon text {
-  fill: #ff1493 !important;
+  fill: #ff1493;
   filter: drop-shadow(0 0 3px rgba(255, 20, 147, 0.95)) drop-shadow(0 0 1px rgba(255, 20, 147, 0.8));
   animation: neonSignFlicker 7s infinite 1.5s;
 }
 
 /* Hotel Sign Board Rect glow */
 .darkNoir .hotelSignBoard {
-  stroke: #ff2a55 !important;
+  stroke: #ff2a55;
   filter: drop-shadow(0 0 3px rgba(255, 42, 85, 0.8));
   animation: neonSignFlicker 9s infinite 0.5s;
 }
@@ -1424,53 +1424,53 @@
 }
 
 .darkNoir .barNeonSign text {
-  fill: #00f0ff !important;
+  fill: #00f0ff;
   filter: drop-shadow(0 0 3px rgba(0, 240, 255, 0.95)) drop-shadow(0 0 1px rgba(0, 240, 255, 0.8));
   animation: neonSignFlicker 8s infinite 0.2s;
 }
 
 .lightPopart .barNeonSign text {
-  fill: var(--pop-black) !important;
-  filter: none !important;
+  fill: var(--pop-black);
+  filter: none;
 }
 
 /* Colorful glowing windows */
 .glowingWindowPink {
-  stroke: #ff2a55 !important;
-  opacity: 0.85 !important;
+  stroke: #ff2a55;
+  opacity: 0.85;
   filter: drop-shadow(0 0 2.5px rgba(255, 42, 85, 0.95)) drop-shadow(0 0 0.5px rgba(255, 42, 85, 0.8));
 }
 
 .glowingWindowCyan {
-  stroke: #00f0ff !important;
-  opacity: 0.85 !important;
+  stroke: #00f0ff;
+  opacity: 0.85;
   filter: drop-shadow(0 0 2.5px rgba(0, 240, 255, 0.95)) drop-shadow(0 0 0.5px rgba(0, 240, 255, 0.8));
 }
 
 .lightPopart .glowingWindowPink {
-  stroke: var(--pop-pink) !important;
-  stroke-width: 4.5px !important;
-  stroke-dasharray: 4.5px 7px !important;
-  stroke-linecap: butt !important;
-  opacity: 1 !important;
-  filter: none !important;
+  stroke: var(--pop-pink);
+  stroke-width: 4.5px;
+  stroke-dasharray: 4.5px 7px;
+  stroke-linecap: butt;
+  opacity: 1;
+  filter: none;
 }
 
 .lightPopart .glowingWindowCyan {
-  stroke: var(--pop-cyan) !important;
-  stroke-width: 4.5px !important;
-  stroke-dasharray: 4.5px 7px !important;
-  stroke-linecap: butt !important;
-  opacity: 1 !important;
-  filter: none !important;
+  stroke: var(--pop-cyan);
+  stroke-width: 4.5px;
+  stroke-dasharray: 4.5px 7px;
+  stroke-linecap: butt;
+  opacity: 1;
+  filter: none;
 }
 
 /* Neon UV Green wall graffiti (Layer 3 right wall) */
 .darkNoir .rightWallGraffiti {
-  stroke: #39ff14 !important;
+  stroke: #39ff14;
   filter: drop-shadow(0 0 3px rgba(57, 255, 20, 0.9)) drop-shadow(0 0 1px rgba(57, 255, 20, 0.6));
   opacity: 0.9;
-  stroke-width: 2px !important;
+  stroke-width: 2px;
   animation: neonSignFlicker 12s infinite 3s;
 }
 
@@ -1483,14 +1483,14 @@
 }
 
 .darkNoir .waterTankBeacon {
-  fill: var(--neon-pink) !important;
-  filter: drop-shadow(0 0 5px var(--neon-pink)) drop-shadow(0 0 2px var(--neon-pink)) !important;
-  animation: blinkRed1 1.5s step-start infinite !important;
+  fill: var(--neon-pink);
+  filter: drop-shadow(0 0 5px var(--neon-pink)) drop-shadow(0 0 2px var(--neon-pink));
+  animation: blinkRed1 1.5s step-start infinite;
 }
 
 .lightPopart .waterTankBeacon {
-  fill: var(--pop-red) !important;
-  filter: none !important;
+  fill: var(--pop-red);
+  filter: none;
 }
 
 /* Penthouse access door Exit sign */
@@ -1505,25 +1505,25 @@
 }
 
 .darkNoir .exitNeonSign rect {
-  stroke: var(--neon-green) !important;
-  filter: drop-shadow(0 0 3px rgba(57, 255, 20, 0.7)) !important;
+  stroke: var(--neon-green);
+  filter: drop-shadow(0 0 3px rgba(57, 255, 20, 0.7));
   animation: neonSignFlicker 11s infinite 1.0s;
 }
 
 .darkNoir .exitNeonSign text {
-  fill: var(--neon-green) !important;
-  filter: drop-shadow(0 0 3px rgba(57, 255, 20, 0.7)) !important;
+  fill: var(--neon-green);
+  filter: drop-shadow(0 0 3px rgba(57, 255, 20, 0.7));
   animation: neonSignFlicker 11s infinite 1.0s;
 }
 
 .lightPopart .exitNeonSign rect {
-  stroke: var(--pop-black) !important;
-  filter: none !important;
+  stroke: var(--pop-black);
+  filter: none;
 }
 
 .lightPopart .exitNeonSign text {
-  fill: var(--pop-black) !important;
-  filter: none !important;
+  fill: var(--pop-black);
+  filter: none;
 }
 
 /* Glowing fan casing backplates */
@@ -1534,15 +1534,15 @@
 }
 
 .darkNoir .fanGlowBackplate {
-  opacity: 0.8 !important;
-  fill: rgba(0, 240, 255, 0.25) !important;
-  filter: drop-shadow(0 0 4px var(--neon-cyan)) !important;
+  opacity: 0.8;
+  fill: rgba(0, 240, 255, 0.25);
+  filter: drop-shadow(0 0 4px var(--neon-cyan));
 }
 
 .darkNoir .exhaustGlowBackplate {
-  opacity: 0.8 !important;
-  fill: rgba(255, 42, 85, 0.25) !important;
-  filter: drop-shadow(0 0 4px var(--neon-pink)) !important;
+  opacity: 0.8;
+  fill: rgba(255, 42, 85, 0.25);
+  filter: drop-shadow(0 0 4px var(--neon-pink));
 }
 
 /* Citigroup slanted roof trace line */
@@ -1551,9 +1551,9 @@
 }
 
 .darkNoir .citigroupNeonRoofTrace {
-  stroke: var(--neon-cyan) !important;
-  stroke-width: 2.2 !important;
-  filter: drop-shadow(0 0 5px var(--neon-cyan)) drop-shadow(0 0 2px var(--neon-cyan)) !important;
+  stroke: var(--neon-cyan);
+  stroke-width: 2.2;
+  filter: drop-shadow(0 0 5px var(--neon-cyan)) drop-shadow(0 0 2px var(--neon-cyan));
 }
 
 /* Needle Spire trace line */
@@ -1562,9 +1562,9 @@
 }
 
 .darkNoir .neonSpireTrace {
-  stroke: var(--neon-pink) !important;
-  stroke-width: 2.2 !important;
-  filter: drop-shadow(0 0 5px var(--neon-pink)) drop-shadow(0 0 2px var(--neon-pink)) !important;
+  stroke: var(--neon-pink);
+  stroke-width: 2.2;
+  filter: drop-shadow(0 0 5px var(--neon-pink)) drop-shadow(0 0 2px var(--neon-pink));
 }
 
 /* Twin towers skybridge trace line */
@@ -1573,69 +1573,69 @@
 }
 
 .darkNoir .skybridgeNeonTrace {
-  stroke: var(--neon-yellow) !important;
-  stroke-width: 1.5 !important;
-  filter: drop-shadow(0 0 4px var(--neon-yellow)) !important;
+  stroke: var(--neon-yellow);
+  stroke-width: 1.5;
+  filter: drop-shadow(0 0 4px var(--neon-yellow));
 }
 
 /* Bridge warning beacon override */
 .darkNoir .bridgeBeacon {
-  fill: var(--neon-pink) !important;
-  filter: drop-shadow(0 0 5px var(--neon-pink)) drop-shadow(0 0 2px var(--neon-pink)) !important;
+  fill: var(--neon-pink);
+  filter: drop-shadow(0 0 5px var(--neon-pink)) drop-shadow(0 0 2px var(--neon-pink));
 }
 
 /* Bridge moving traffic headlight/taillight glows */
 .darkNoir .trafficHeadlight {
-  fill: var(--neon-cyan) !important;
-  filter: drop-shadow(0 0 3px var(--neon-cyan)) !important;
-  opacity: 0.95 !important;
+  fill: var(--neon-cyan);
+  filter: drop-shadow(0 0 3px var(--neon-cyan));
+  opacity: 0.95;
 }
 
 .darkNoir .trafficTaillight {
-  fill: var(--neon-pink) !important;
-  filter: drop-shadow(0 0 3px var(--neon-pink)) !important;
-  opacity: 0.95 !important;
+  fill: var(--neon-pink);
+  filter: drop-shadow(0 0 3px var(--neon-pink));
+  opacity: 0.95;
 }
 
 /* Glowing Foreground Windows in Noir Mode */
 .glowingForegroundWindowPink,
 .glowingForegroundWindowCyan,
 .glowingForegroundWindowYellow {
-  transition: fill 0.3s ease, stroke 0.3s ease, filter 0.3s ease !important;
+  transition: fill 0.3s ease, stroke 0.3s ease, filter 0.3s ease;
 }
 
 .darkNoir .glowingForegroundWindowPink,
 .darkNoir .glowingForegroundWindowPink rect {
-  fill: var(--neon-pink) !important;
-  stroke: var(--neon-pink) !important;
-  opacity: 0.85 !important;
-  filter: drop-shadow(0 0 3px rgba(255, 42, 85, 0.9)) drop-shadow(0 0 1px rgba(255, 42, 85, 0.6)) !important;
+  fill: var(--neon-pink);
+  stroke: var(--neon-pink);
+  opacity: 0.85;
+  filter: drop-shadow(0 0 3px rgba(255, 42, 85, 0.9)) drop-shadow(0 0 1px rgba(255, 42, 85, 0.6));
 }
 .darkNoir .glowingForegroundWindowPink path {
-  fill: var(--neon-pink) !important;
-  stroke: var(--neon-pink) !important;
-  filter: drop-shadow(0 0 3px rgba(255, 42, 85, 0.9)) drop-shadow(0 0 1px rgba(255, 42, 85, 0.6)) !important;
+  fill: var(--neon-pink);
+  stroke: var(--neon-pink);
+  filter: drop-shadow(0 0 3px rgba(255, 42, 85, 0.9)) drop-shadow(0 0 1px rgba(255, 42, 85, 0.6));
 }
 
 .darkNoir .glowingForegroundWindowCyan,
 .darkNoir .glowingForegroundWindowCyan rect {
-  fill: var(--neon-cyan) !important;
-  stroke: var(--neon-cyan) !important;
-  opacity: 0.85 !important;
-  filter: drop-shadow(0 0 3px rgba(0, 240, 255, 0.9)) drop-shadow(0 0 1px rgba(0, 240, 255, 0.6)) !important;
+  fill: var(--neon-cyan);
+  stroke: var(--neon-cyan);
+  opacity: 0.85;
+  filter: drop-shadow(0 0 3px rgba(0, 240, 255, 0.9)) drop-shadow(0 0 1px rgba(0, 240, 255, 0.6));
 }
 .darkNoir .glowingForegroundWindowCyan path {
-  fill: var(--neon-cyan) !important;
-  stroke: var(--neon-cyan) !important;
-  filter: drop-shadow(0 0 3px rgba(0, 240, 255, 0.9)) drop-shadow(0 0 1px rgba(0, 240, 255, 0.6)) !important;
+  fill: var(--neon-cyan);
+  stroke: var(--neon-cyan);
+  filter: drop-shadow(0 0 3px rgba(0, 240, 255, 0.9)) drop-shadow(0 0 1px rgba(0, 240, 255, 0.6));
 }
 
 .darkNoir .glowingForegroundWindowYellow,
 .darkNoir .glowingForegroundWindowYellow rect {
-  fill: var(--neon-yellow) !important;
-  stroke: var(--neon-yellow) !important;
-  opacity: 0.85 !important;
-  filter: drop-shadow(0 0 3px rgba(255, 230, 0, 0.9)) drop-shadow(0 0 1px rgba(255, 230, 0, 0.6)) !important;
+  fill: var(--neon-yellow);
+  stroke: var(--neon-yellow);
+  opacity: 0.85;
+  filter: drop-shadow(0 0 3px rgba(255, 230, 0, 0.9)) drop-shadow(0 0 1px rgba(255, 230, 0, 0.6));
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1654,12 +1654,12 @@
     animation: none !important;
   }
   .puddleRipple1 {
-    opacity: 0.3 !important;
-    transform: scale(1) !important;
+    opacity: 0.3;
+    transform: scale(1);
   }
   .drippingDrop {
     animation: none !important;
-    opacity: 0 !important;
+    opacity: 0;
   }
 }
 
@@ -1721,32 +1721,32 @@
   opacity: 0.25;
 }
 .reducedMotion .tugboatWindow {
-  opacity: 0.85 !important;
+  opacity: 0.85;
 }
 .reducedMotion .smokePuff1,
 .reducedMotion .smokePuff2,
 .reducedMotion .smokePuff3 {
-  opacity: 0.3 !important;
+  opacity: 0.3;
 }
 .reducedMotion .tugboatWake1,
 .reducedMotion .tugboatWake2,
 .reducedMotion .sailboatWake,
 .reducedMotion .speedboatWake1,
 .reducedMotion .speedboatWake2 {
-  opacity: 0.5 !important;
+  opacity: 0.5;
 }
 .reducedMotion .windowFlicker1,
 .reducedMotion .windowFlicker2,
 .reducedMotion .windowFlicker3,
 .reducedMotion .windowFlicker4 {
   animation: none !important;
-  opacity: 0.6 !important;
+  opacity: 0.6;
 }
 .reducedMotion .beaconRed1,
 .reducedMotion .beaconRed2,
 .reducedMotion .beaconRed3 {
   animation: none !important;
-  opacity: 0.95 !important;
+  opacity: 0.95;
 }
 
 .reducedMotion .gargoyleEyes,
@@ -1771,12 +1771,12 @@
   animation: none !important;
 }
 .reducedMotion .puddleRipple1 {
-  opacity: 0.3 !important;
-  transform: scale(1) !important;
+  opacity: 0.3;
+  transform: scale(1);
 }
 .reducedMotion .drippingDrop {
   animation: none !important;
-  opacity: 0 !important;
+  opacity: 0;
 }
 
 .watercolorOverlay {

@@ -71,20 +71,20 @@
 }
 
 :global([data-theme='noir']) .highlightText {
-  color: var(--neon-pink) !important;
-  text-shadow: var(--neon-pink-glow) !important;
+  color: var(--neon-pink);
+  text-shadow: var(--neon-pink-glow);
 }
 
 :global([data-theme='noir']) .vibeBox {
-  background: #1e1e24 !important;
-  border-color: #fafafa !important;
-  box-shadow: 3px 3px 0px #fafafa !important;
-  transform: rotate(0.5deg) !important;
+  background: var(--surface-card);
+  border-color: var(--color-border);
+  box-shadow: 3px 3px 0px var(--color-border);
+  transform: rotate(0.5deg);
 }
 
 :global([data-theme='noir']) .vibeLabel {
-  color: var(--neon-yellow) !important;
-  text-shadow: var(--neon-yellow-glow) !important;
+  color: var(--neon-yellow);
+  text-shadow: var(--neon-yellow-glow);
 }
 
 .cursor {
@@ -204,9 +204,9 @@
 
 :global([data-theme='noir']) .brandingName:hover {
   transform: none;
-  color: var(--neon-cyan) !important;
-  border-color: var(--neon-cyan) !important;
-  text-shadow: var(--neon-cyan-glow) !important;
+  color: var(--neon-cyan);
+  border-color: var(--neon-cyan);
+  text-shadow: var(--neon-cyan-glow);
 }
 
 :global([data-theme='noir']) .tagBadge {
@@ -215,36 +215,36 @@
   font-weight: 400;
   text-transform: none;
   letter-spacing: normal;
-  color: #e0e0e3;
-  background: #1e1e24;
-  border: 2px solid #555562;
+  color: var(--color-text);
+  background: var(--surface-card);
+  border: 2px solid var(--border-muted);
   border-radius: 0px;
-  box-shadow: 2px 2px 0px #555562;
+  box-shadow: 2px 2px 0px var(--border-muted);
   padding: 0.25rem 0.75rem;
 }
 
 :global([data-theme='noir']) .tagBadge:nth-child(1):hover {
-  background-color: #1e1e24 !important;
-  color: var(--neon-pink) !important;
-  border-color: var(--neon-pink) !important;
-  box-shadow: 0 0 10px var(--neon-pink) !important;
-  transform: translateY(-2px) !important;
+  background-color: var(--surface-card);
+  color: var(--neon-pink);
+  border-color: var(--neon-pink);
+  box-shadow: 0 0 10px var(--neon-pink);
+  transform: translateY(-2px);
 }
 
 :global([data-theme='noir']) .tagBadge:nth-child(2):hover {
-  background-color: #1e1e24 !important;
-  color: var(--neon-cyan) !important;
-  border-color: var(--neon-cyan) !important;
-  box-shadow: 0 0 10px var(--neon-cyan) !important;
-  transform: translateY(-2px) !important;
+  background-color: var(--surface-card);
+  color: var(--neon-cyan);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 10px var(--neon-cyan);
+  transform: translateY(-2px);
 }
 
 :global([data-theme='noir']) .tagBadge:nth-child(3):hover {
-  background-color: #1e1e24 !important;
-  color: var(--neon-yellow) !important;
-  border-color: var(--neon-yellow) !important;
-  box-shadow: 0 0 10px var(--neon-yellow) !important;
-  transform: translateY(-2px) !important;
+  background-color: var(--surface-card);
+  color: var(--neon-yellow);
+  border-color: var(--neon-yellow);
+  box-shadow: 0 0 10px var(--neon-yellow);
+  transform: translateY(-2px);
 }
 
 /* CTA Button — speech bubble style */
@@ -450,48 +450,47 @@
 
 /* Noir Mode overrides for CTA button to look like detective board caption box */
 :global([data-theme='noir']) .ctaButton {
-  background: #c5a059 !important;
-  color: #000000 !important;
-  border: 4px solid #000000 !important;
-  border-radius: 0px !important;
-  box-shadow: 4px 4px 0px #000000 !important;
-  font-family: var(--font-comic-neue), 'Comic Neue', sans-serif !important;
-  font-weight: bold !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.05em !important;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease !important;
+  background: #c5a059;
+  color: #000000;
+  border: 4px solid #000000;
+  border-radius: 0px;
+  box-shadow: 4px 4px 0px #000000;
+  font-family: var(--font-comic-neue), 'Comic Neue', sans-serif;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
 :global([data-theme='noir']) .ctaButton::before,
 :global([data-theme='noir']) .ctaButton::after {
-  display: none !important;
+  display: none;
 }
 
 :global([data-theme='noir']) .ctaButton:hover {
-  transform: translate(-3px, -3px) !important;
-  box-shadow: 5px 5px 0px #000000, 0 0 12px var(--neon-yellow) !important;
-  background: var(--neon-yellow) !important;
+  transform: translate(-3px, -3px);
+  box-shadow: 5px 5px 0px #000000, 0 0 12px var(--neon-yellow);
+  background: var(--neon-yellow);
 }
 
 :global([data-theme='noir']) .ctaButton:active {
-  transform: translate(1px, 1px) !important;
-  box-shadow: 3px 3px 0px #000000 !important;
+  transform: translate(1px, 1px);
+  box-shadow: 3px 3px 0px #000000;
 }
 
 
-/* Noir Mode overrides for telemetry badge */
 :global([data-theme='noir']) .telemetryBadge {
-  background: #121214 !important;
-  color: #FFFFFF !important;
-  border-color: #FFFFFF !important;
-  box-shadow: 3px 3px 0px #FFFFFF !important;
-  border-radius: 0px !important;
+  background: var(--surface-primary);
+  color: var(--pop-pink);
+  border-color: var(--pop-pink);
+  box-shadow: 3px 3px 0px var(--pop-pink);
+  border-radius: 0px;
 }
 
 :global([data-theme='noir']) .telemetryBadge:hover {
-  background: #FFFFFF !important;
-  color: #000000 !important;
-  box-shadow: 5px 5px 0px #FFFFFF !important;
+  background: var(--pop-pink);
+  color: #000000;
+  box-shadow: 5px 5px 0px var(--pop-pink);
 }
 
 :global([data-theme='noir']) .pulseDot {

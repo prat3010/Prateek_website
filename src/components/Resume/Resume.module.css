@@ -556,84 +556,84 @@
   .certsWrapper,
   :global(button),
   .themeToggle {
-    display: none !important;
+    display: none;
   }
 
   :global(body), 
   .resumeSection {
-    background-color: #FFFFFF !important;
-    color: #000000 !important;
-    padding: 0 !important;
-    margin: 0 !important;
+    background-color: #FFFFFF;
+    color: #000000;
+    padding: 0;
+    margin: 0;
   }
 
   .container {
-    max-width: 100% !important;
-    width: 100% !important;
-    padding: 0 !important;
-    margin: 0 !important;
+    max-width: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
   }
 
   /* Flatten pop-art layout, removes borders/tilts/shadows */
   .resumeCardWrapper {
-    margin: 0 !important;
-    box-shadow: none !important;
-    border: none !important;
-    transform: none !important;
+    margin: 0;
+    box-shadow: none;
+    border: none;
+    transform: none;
   }
 
   .resumePaper {
-    border: none !important;
-    box-shadow: none !important;
-    transform: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    border: none;
+    box-shadow: none;
+    transform: none;
+    margin: 0;
+    padding: 0;
   }
 
   .resumeContent {
-    padding: 0 !important;
-    margin: 0 !important;
-    font-size: 11pt !important;
-    line-height: 1.4 !important;
-    background-color: #FFFFFF !important;
-    color: #000000 !important;
+    padding: 0;
+    margin: 0;
+    font-size: 11pt;
+    line-height: 1.4;
+    background-color: #FFFFFF;
+    color: #000000;
   }
 
   .name {
-    font-size: 24pt !important;
-    color: #000000 !important;
+    font-size: 24pt;
+    color: #000000;
   }
 
   .title {
-    font-size: 11pt !important;
-    color: #555555 !important;
+    font-size: 11pt;
+    color: #555555;
   }
 
   .contactInfo {
-    text-align: right !important;
-    font-size: 9pt !important;
-    color: #333333 !important;
+    text-align: right;
+    font-size: 9pt;
+    color: #333333;
   }
 
   .divider {
-    border-top: 1px solid #777777 !important;
-    margin: 10pt 0 !important;
+    border-top: 1px solid #777777;
+    margin: 10pt 0;
   }
 
   .blockTitle {
-    font-size: 10pt !important;
-    border-bottom: 1px solid #777777 !important;
-    margin-bottom: 8pt !important;
-    color: #000000 !important;
+    font-size: 10pt;
+    border-bottom: 1px solid #777777;
+    margin-bottom: 8pt;
+    color: #000000;
   }
 
   .blockTitle svg {
-    display: none !important;
+    display: none;
   }
 
   .bulletItem {
-    font-size: 10pt !important;
-    margin-bottom: 4pt !important;
+    font-size: 10pt;
+    margin-bottom: 4pt;
   }
 
   .timelineItem {
@@ -641,9 +641,9 @@
   }
 
   .skillTag {
-    background: none !important;
-    border: 1px solid #555555 !important;
-    color: #000000 !important;
-    font-size: 9pt !important;
+    background: none;
+    border: 1px solid #555555;
+    color: #000000;
+    font-size: 9pt;
   }
 }

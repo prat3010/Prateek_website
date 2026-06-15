@@ -5,7 +5,7 @@
 .navbar {
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: var(--z-sticky);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -199,7 +199,7 @@
   border-radius: 6px;
   padding: 6px;
   cursor: pointer;
-  z-index: 1001;
+  z-index: calc(var(--z-sticky) + 1);
   transition: background-color 0.2s ease;
 }
 
@@ -234,7 +234,7 @@
   display: none;
   position: fixed;
   inset: 0;
-  z-index: 999;
+  z-index: calc(var(--z-sticky) - 1);
   background-color: var(--pop-cream);
   flex-direction: column;
   align-items: center;
@@ -286,7 +286,7 @@
 }
 
 :global([data-theme='noir']) .mobileOverlay::before {
-  display: none !important;
+  display: none;
 }
 
 @keyframes slideIn {
@@ -362,37 +362,37 @@
 }
 
 :global([data-theme='noir']) .themeToggle {
-  background-color: #121214 !important;
-  color: #FFFFFF !important;
-  border-color: #FFFFFF !important;
-  box-shadow: 3px 3px 0px #FFFFFF !important;
+  background-color: #121214;
+  color: #FFFFFF;
+  border-color: #FFFFFF;
+  box-shadow: 3px 3px 0px #FFFFFF;
 }
 
 :global([data-theme='noir']) .themeToggle:hover {
-  background-color: #121214 !important;
-  color: var(--neon-yellow) !important;
-  border-color: var(--neon-yellow) !important;
-  box-shadow: 0 0 10px var(--neon-yellow) !important;
-  transform: translate(-1px, -1px) !important;
+  background-color: #121214;
+  color: var(--neon-yellow);
+  border-color: var(--neon-yellow);
+  box-shadow: 0 0 10px var(--neon-yellow);
+  transform: translate(-1px, -1px);
 }
 
 :global([data-theme='noir']) .themeToggle:active {
-  box-shadow: 0 0 5px var(--neon-yellow) !important;
-  transform: translate(1px, 1px) !important;
+  box-shadow: 0 0 5px var(--neon-yellow);
+  transform: translate(1px, 1px);
 }
 
 /* ─ Neon navigation links overrides ─ */
 :global([data-theme='noir']) .navLink:hover {
-  color: var(--neon-cyan) !important;
-  text-shadow: var(--neon-cyan-glow) !important;
+  color: var(--neon-cyan);
+  text-shadow: var(--neon-cyan-glow);
 }
 
 :global([data-theme='noir']) .navLink.active::after {
-  background: var(--neon-cyan) !important;
-  box-shadow: 0 0 8px var(--neon-cyan) !important;
+  background: var(--neon-cyan);
+  box-shadow: 0 0 8px var(--neon-cyan);
 }
 
 :global([data-theme='noir']) .mobileNavLink:hover {
-  color: var(--neon-cyan) !important;
-  text-shadow: var(--neon-cyan-glow) !important;
+  color: var(--neon-cyan);
+  text-shadow: var(--neon-cyan-glow);
 }

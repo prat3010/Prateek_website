@@ -3,7 +3,7 @@
   inset: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 999999; /* Higher than everything else */
+  z-index: var(--z-transition); /* Higher than everything else */
   pointer-events: none;
   display: flex;
   flex-direction: column;

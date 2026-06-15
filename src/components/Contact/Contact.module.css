@@ -153,48 +153,48 @@
 /* ---- Cyber-Noir Mode Overrides ---- */
 
 :global([data-theme='noir']) .sectionTitle {
-  color: var(--neon-pink) !important;
-  text-shadow: var(--neon-pink-glow) !important;
+  color: var(--neon-pink);
+  text-shadow: var(--neon-pink-glow);
 }
 
 :global([data-theme='noir']) .form {
-  background: #121214 !important;
-  border-color: #555562 !important;
-  box-shadow: 6px 6px 0px #1c1c1f !important;
+  background: var(--surface-primary);
+  border-color: var(--border-muted);
+  box-shadow: 6px 6px 0px var(--surface-secondary);
 }
 
 :global([data-theme='noir']) .input,
 :global([data-theme='noir']) .textarea {
-  background: #121214 !important;
-  color: #fafafa !important;
-  border-color: #555562 !important;
+  background: var(--surface-primary);
+  color: var(--color-text);
+  border-color: var(--border-muted);
 }
 
 :global([data-theme='noir']) .input:focus,
 :global([data-theme='noir']) .textarea:focus {
-  border-color: var(--neon-cyan) !important;
-  box-shadow: 0 0 10px var(--neon-cyan) !important;
-  background: #121214 !important;
-  color: #fafafa !important;
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 10px var(--neon-cyan);
+  background: var(--surface-primary);
+  color: var(--color-text);
 }
 
 :global([data-theme='noir']) .submitBtn {
-  background: #1e1e24 !important;
-  color: #ffffff !important;
-  border-color: #555562 !important;
-  box-shadow: 4px 4px 0px #1c1c1f !important;
-  transition: transform 0.15s, box-shadow 0.15s, background-color 0.2s, border-color 0.2s, color 0.2s !important;
+  background: var(--surface-card);
+  color: var(--pop-pink);
+  border-color: var(--border-muted);
+  box-shadow: 4px 4px 0px var(--surface-secondary);
+  transition: transform 0.15s, box-shadow 0.15s, background-color 0.2s, border-color 0.2s, color 0.2s;
 }
 
 :global([data-theme='noir']) .submitBtn:hover {
-  background-color: #1e1e24 !important;
-  color: var(--neon-pink) !important;
-  border-color: var(--neon-pink) !important;
-  box-shadow: 0 0 12px var(--neon-pink) !important;
-  transform: translateY(-2px) !important;
+  background-color: var(--surface-card);
+  color: var(--neon-pink);
+  border-color: var(--neon-pink);
+  box-shadow: 0 0 12px var(--neon-pink);
+  transform: translateY(-2px);
 }
 
 :global([data-theme='noir']) .submitBtn:active {
-  transform: translateY(1px) !important;
-  box-shadow: 2px 2px 0px #1c1c1f !important;
+  transform: translateY(1px);
+  box-shadow: 2px 2px 0px var(--surface-secondary);
 }
