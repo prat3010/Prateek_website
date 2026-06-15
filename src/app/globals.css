@@ -315,9 +315,18 @@ body::after {
   height: 100vh;
   pointer-events: none;
   z-index: var(--z-noise);
-  background-image: url("/images/noise.png");
+  background-image: 
+    url("/images/noise.png"),
+    url("/images/noise.png"),
+    url("/images/noise.png"),
+    url("/images/noise.png");
   background-repeat: repeat;
-  opacity: 0.35;
+  background-position: 
+    0 0,
+    32px 32px,
+    64px 64px,
+    96px 96px;
+  opacity: 1.0;
   mix-blend-mode: multiply;
 }
 
