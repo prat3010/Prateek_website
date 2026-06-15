@@ -138,6 +138,12 @@ export function aggregateVisits(visits: PageVisit[]): AggregatedStats {
 
   const totalDeviceVisits = mobileCount + desktopCount + tabletCount || 1;
 
+  const desktopPctRaw = (desktopCount / totalDeviceVisits) * 100;
+  const mobilePctRaw = (mobileCount / totalDeviceVisits) * 100;
+  const desktopPct = Math.round(desktopPctRaw);
+  const mobilePct = Math.round(mobilePctRaw);
+  const tabletPct = 100 - desktopPct - mobilePct;
+
   return {
     totalViews,
     totalBots,
@@ -148,9 +154,9 @@ export function aggregateVisits(visits: PageVisit[]): AggregatedStats {
     desktopCount,
     mobileCount,
     tabletCount,
-    desktopPct: Math.round((desktopCount / totalDeviceVisits) * 100),
-    mobilePct: Math.round((mobileCount / totalDeviceVisits) * 100),
-    tabletPct: Math.round((tabletCount / totalDeviceVisits) * 100),
+    desktopPct,
+    mobilePct,
+    tabletPct,
     dailyViews,
     maxViews: Math.max(...dailyViews.map(d => d.count), 1),
   };

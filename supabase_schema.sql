@@ -45,3 +45,9 @@ CREATE INDEX IF NOT EXISTS idx_page_visits_is_bot
 -- Optimized for path matching aggregate summaries
 CREATE INDEX IF NOT EXISTS idx_page_visits_path 
   ON page_visits (path);
+
+-- Composite partial index for the most common dashboard query pattern:
+--   WHERE is_bot = FALSE AND created_at >= cutoff ORDER BY created_at DESC
+-- Covers both filtering conditions and sort order in one index scan.
+CREATE INDEX IF NOT EXISTS idx_page_visits_dashboard 
+  ON page_visits (created_at DESC) WHERE is_bot = FALSE;

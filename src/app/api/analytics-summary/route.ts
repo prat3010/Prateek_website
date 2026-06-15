@@ -21,9 +21,13 @@ export async function GET() {
       topReferrer = 'GitHub (github.com/prat3010)';
       topCountry = 'United States';
     } else {
+      const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
+
       const { data, error } = await supabase
         .from('page_visits')
-        .select('path, country, referrer, ip_hash, is_bot');
+        .select('path, country, referrer, ip_hash, is_bot')
+        .gte('created_at', ninetyDaysAgo)
+        .limit(5000);
 
       if (error) {
         throw error;
@@ -71,7 +75,7 @@ export async function GET() {
       }
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       isDemoMode,
       totalViews,
@@ -80,6 +84,8 @@ export async function GET() {
       topReferrer,
       topCountry
     });
+    response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
+    return response;
   } catch (error) {
     return NextResponse.json({ success: false, error: error instanceof Error ? error.message : 'Unknown database error' }, { status: 500 });
   }
