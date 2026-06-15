@@ -55,6 +55,8 @@ export default function Projects({ projects }: ProjectsProps) {
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
         setSelectedProject(null);
         return;
       }
