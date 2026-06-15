@@ -16,6 +16,13 @@ except ImportError:
     print("Error: Streamlit is not installed. Run 'pip install streamlit' to run this manager.")
     sys.exit(1)
 
+# Try importing PIL (Pillow) for image conversions
+try:
+    from PIL import Image as PILImage
+    HAS_PIL = True
+except ImportError:
+    HAS_PIL = False
+
 st.set_page_config(
     page_title="Resume & Portfolio Manager",
     page_icon="💼",
@@ -346,6 +353,7 @@ def parse_projects_file():
         github_url_match = re.search(r'githubUrl:\s*[\'"]((?:[^\'"\\]|\\.)*)[\'"]', block)
         color_match = re.search(r'color:\s*[\'"]((?:[^\'"\\]|\\.)*)[\'"]', block)
         is_live_match = re.search(r'isLive:\s*(true|false)', block)
+        status_match = re.search(r'status:\s*[\'"]((?:[^\'"\\]|\\.)*)[\'"]', block)
         tags_match = re.search(r'tags:\s*\[(.*?)\]', block, re.DOTALL)
         
         if id_match: project['id'] = id_match.group(1)
@@ -357,6 +365,9 @@ def parse_projects_file():
         if github_url_match: project['githubUrl'] = github_url_match.group(1)
         if color_match: project['color'] = color_match.group(1)
         if is_live_match: project['isLive'] = is_live_match.group(1) == 'true'
+        if status_match: project['status'] = status_match.group(1)
+        if 'status' not in project:
+            project['status'] = 'live' if project.get('isLive', False) else 'soon'
         
         if tags_match:
             tags_str = tags_match.group(1)
@@ -372,6 +383,7 @@ def write_projects_file(projects):
         escaped_long_desc = p.get('longDescription', '').replace("'", "\\'")
         escaped_desc = p.get('description', '').replace("'", "\\'")
         tags_str = ", ".join([f"'{t}'" for t in p.get('tags', [])])
+        status_val = p.get('status', 'live' if p.get('isLive', False) else 'soon')
         
         projects_str += f"""  {{
     id: '{p.get('id', '')}',
@@ -384,6 +396,7 @@ def write_projects_file(projects):
     githubUrl: '{p.get('githubUrl', '')}',
     color: '{p.get('color', '#00E676')}',
     isLive: {str(p.get('isLive', False)).lower()},
+    status: '{status_val}',
   }},\n"""
     projects_str += "]"
 
@@ -398,6 +411,7 @@ def write_projects_file(projects):
   githubUrl: string;
   color: string;
   isLive: boolean;
+  status: 'live' | 'soon' | 'personal';
 }}
 
 export const projects: Project[] = {projects_str};
@@ -858,6 +872,37 @@ def slugify(text):
     text = re.sub(r'[\s_-]+', '-', text)
     return text.strip('-')
 
+# Image save helper used globally
+def save_uploaded_image(uploaded_file, target_path, target_format):
+    try:
+        # Ensure target directory exists
+        os.makedirs(os.path.dirname(target_path), exist_ok=True)
+        if HAS_PIL:
+            image = PILImage.open(uploaded_file)
+            # Keep RGBA for PNG and WEBP if they have transparency
+            if target_format.upper() == 'WEBP':
+                image.save(target_path, format='WEBP', quality=90)
+            elif target_format.upper() == 'PNG':
+                image.save(target_path, format='PNG')
+            else:
+                if image.mode in ('RGBA', 'LA'):
+                    image = image.convert('RGB')
+                image.save(target_path, format=target_format.upper())
+            return True, f"Successfully converted and saved image to `{target_path}`!"
+        else:
+            file_ext = os.path.splitext(uploaded_file.name)[1].lower()
+            # Treat jpeg and jpg as same
+            clean_ext = file_ext.replace('jpeg', 'jpg')
+            clean_target = f".{target_format.lower()}".replace('jpeg', 'jpg')
+            if clean_ext == clean_target:
+                with open(target_path, "wb") as f:
+                    f.write(uploaded_file.getbuffer())
+                return True, f"Successfully saved raw `{uploaded_file.name}` directly!"
+            else:
+                return False, f"Format mismatch! Uploaded `{file_ext}` but target needs `.{target_format.lower()}`. Install `pillow` or upload a matching file."
+    except Exception as e:
+        return False, f"Failed to save: {e}"
+
 # ==========================================
 # Streamlit Interface Layout
 # ==========================================
@@ -1164,6 +1209,7 @@ if 'pending_skills' in st.session_state and st.session_state.pending_skills:
                         write_skills_file(current_skills)
                         st.sidebar.success(f"Added {name}!")
                         st.session_state.pending_skills.pop(0)
+                        st.session_state.skills = current_skills
                         st.rerun()
                     except Exception as e:
                         st.sidebar.error(f"Failed to save: {e}")
@@ -1185,6 +1231,8 @@ if 'resume' not in st.session_state:
     st.session_state.resume = parse_resume_file()
 if 'projects' not in st.session_state:
     st.session_state.projects = parse_projects_file()
+if 'skills' not in st.session_state:
+    st.session_state.skills = parse_skills_file()
 if 'certificates' not in st.session_state:
     st.session_state.certificates = parse_certificates_file()
 if 'pending_skills' not in st.session_state:
@@ -1192,10 +1240,12 @@ if 'pending_skills' not in st.session_state:
 
 
 # Set up tabs
-tab_edit, tab_project, tab_cert, tab_blog = st.tabs([
+tab_edit, tab_project, tab_cert, tab_skills, tab_photos, tab_blog = st.tabs([
     "Edit Resume Manually", 
     "Sync Projects", 
     "Sync Certificates",
+    "Manage Skills",
+    "Update Photos",
     "Blog Editor"
 ])
 
@@ -1353,7 +1403,7 @@ with tab_project:
         else:
             proj_input = st.text_input("GitHub Repository URL / Slug:", placeholder="username/repo or just repo-name")
 
-        dry_run_proj = st.checkbox("Dry-Run Mode (Review AI generation without saving)", value=True)
+        dry_run_proj = st.checkbox("Dry-Run Mode (Save locally only, do not push to remote)", value=True)
 
         if st.button("Sync Project Now", type="primary"):
             if not proj_input:
@@ -1466,57 +1516,292 @@ with tab_project:
                         st.markdown("### AI-Generated Showcase Entry Preview")
                         st.json(project_data)
                         
-                        if not dry_run_proj:
-                            project_id = re.sub(r'[^a-zA-Z0-9]', '-', project_data['title'].lower())
-                            current_projects = parse_projects_file()
+                        project_id = re.sub(r'[^a-zA-Z0-9]', '-', project_data['title'].lower())
+                        current_projects = parse_projects_file()
+                        
+                        # Remove existing project with same ID if any
+                        current_projects = [p for p in current_projects if p['id'] != project_id]
+                        
+                        new_project = {
+                            "id": project_id,
+                            "title": project_data["title"],
+                            "description": project_data["description"],
+                            "longDescription": project_data["longDescription"],
+                            "image": f"/images/project-{project_id}.webp", 
+                            "tags": project_data["tags"],
+                            "liveUrl": "",
+                            "githubUrl": f"https://github.com/{repo}" if project_mode != "Local Directory" else "",
+                            "color": project_data["color"],
+                            "isLive": False,
+                            "status": "soon"
+                        }
+                        
+                        current_projects.append(new_project)
+                        write_projects_file(current_projects)
+                        st.session_state.projects = current_projects
+                        check_and_add_pending_skills(project_data["tags"])
+                        
+                        # Append resume bullet
+                        resume = parse_resume_file()
+                        if resume:
+                            for exp in resume.get('experience', []):
+                                if exp['id'] == 'freelance-developer':
+                                    exp['bullets'].append({
+                                        "general": project_data['resumeBullet']['general'],
+                                        "fullstack": project_data['resumeBullet'].get('fullstack', ''),
+                                        "ai": project_data['resumeBullet'].get('ai', ''),
+                                        "creative": project_data['resumeBullet'].get('creative', '')
+                                    })
+                                    for tag in project_data['tags']:
+                                        if tag not in exp['tags']:
+                                            exp['tags'].append(tag)
                             
-                            # Remove existing project with same ID if any
-                            current_projects = [p for p in current_projects if p['id'] != project_id]
-                            
-                            new_project = {
-                                "id": project_id,
-                                "title": project_data["title"],
-                                "description": project_data["description"],
-                                "longDescription": project_data["longDescription"],
-                                "image": f"/images/project-{project_id}.webp", 
-                                "tags": project_data["tags"],
-                                "liveUrl": "",
-                                "githubUrl": f"https://github.com/{repo}" if project_mode != "Local Directory" else "",
-                                "color": project_data["color"],
-                                "isLive": False
+                            resume['lastSynced'] = {
+                                "timestamp": datetime.now().isoformat(),
+                                "status": "success",
+                                "summary": f"Synchronized new project: {new_project['title']}."
                             }
+                            write_resume_file(resume)
+                            st.session_state.resume = resume
                             
-                            current_projects.append(new_project)
-                            write_projects_file(current_projects)
-                            st.session_state.projects = current_projects
-                            check_and_add_pending_skills(project_data["tags"])
-                            
-                            # Append resume bullet
-                            resume = parse_resume_file()
-                            if resume:
-                                for exp in resume.get('experience', []):
-                                    if exp['id'] == 'freelance-developer':
-                                        exp['bullets'].append({
-                                            "general": project_data['resumeBullet']['general'],
-                                            "fullstack": project_data['resumeBullet'].get('fullstack', ''),
-                                            "ai": project_data['resumeBullet'].get('ai', ''),
-                                            "creative": project_data['resumeBullet'].get('creative', '')
-                                        })
-                                        for tag in project_data['tags']:
-                                            if tag not in exp['tags']:
-                                                exp['tags'].append(tag)
-                                
-                                resume['lastSynced'] = {
-                                    "timestamp": datetime.now().isoformat(),
-                                    "status": "success",
-                                    "summary": f"Synchronized new project: {new_project['title']}."
-                                }
-                                write_resume_file(resume)
-                                st.session_state.resume = resume
-                                
-                            st.success(f"Saved entry. Added to projects.ts and experience bullets in resume.ts!")
+                        st.success(f"Saved entry locally. Added to projects.ts and experience bullets in resume.ts!")
+                        
+                        if not dry_run_proj:
+                            st.info("🚀 Pushing changes to GitHub...")
+                            import subprocess
+                            try:
+                                status = subprocess.check_output(["git", "status", "--porcelain"], cwd=os.getcwd()).decode("utf-8")
+                                if status:
+                                    subprocess.check_call(["git", "add", "src/data/projects.ts", "src/data/resume.ts"], cwd=os.getcwd())
+                                    if "src/data/skills.ts" in status:
+                                        subprocess.check_call(["git", "add", "src/data/skills.ts"], cwd=os.getcwd())
+                                    commit_msg = f"chore(sync): publish project sync - {new_project['title']}"
+                                    subprocess.check_call(["git", "commit", "-m", commit_msg], cwd=os.getcwd())
+                                    subprocess.check_call(["git", "push", "origin", "main"], cwd=os.getcwd())
+                                    st.success("✅ Pushed successfully to GitHub!")
+                                else:
+                                    st.info("No changes to commit and push.")
+                            except Exception as e:
+                                st.error(f"Failed to push to Git: {e}")
                     else:
                         status.update(label="API Sync call failed", state="error")
+
+    # 2. Manage & Edit Active Projects Section
+    st.markdown('<div class="section-header" style="margin-top: 2rem;">Manage & Edit Active Projects</div>', unsafe_allow_html=True)
+    
+    current_projects = st.session_state.projects or []
+    if not current_projects:
+        st.info("No active projects found in projects.ts.")
+    else:
+        st.write(f"Currently showing **{len(current_projects)}** project(s):")
+        
+        for idx, project in enumerate(current_projects):
+            p_id = project.get("id")
+            p_title = project.get("title", "Untitled Project")
+            
+            with st.expander(f"📁 {p_title} (ID: {p_id})"):
+                col_p1, col_p2 = st.columns([1, 2])
+                
+                with col_p1:
+                    # 1. Azure Mode (Comic/Light) Image
+                    st.markdown("### Azure Mode (Comic)")
+                    img_path = project.get("image", "")
+                    local_img_path = os.path.join("public", img_path.lstrip("/")) if img_path else ""
+                    if local_img_path and os.path.exists(local_img_path):
+                        st.image(local_img_path, caption="Current Azure Image", use_container_width=True)
+                    else:
+                        st.warning("No Azure image currently found at: " + (img_path or "N/A"))
+                        
+                    up_img = st.file_uploader(f"Upload Azure image for {p_title}", type=["png", "jpg", "jpeg", "webp"], key=f"up_img_{p_id}")
+                    if up_img is not None:
+                        if st.button(f"Save Azure Photo", key=f"btn_save_img_{p_id}", type="primary"):
+                            target_img_filename = f"project-{p_id}.webp"
+                            target_img_path = os.path.join("public", "images", target_img_filename)
+                            success, msg = save_uploaded_image(up_img, target_img_path, "WEBP")
+                            if success:
+                                project['image'] = f"/images/{target_img_filename}"
+                                write_projects_file(current_projects)
+                                st.session_state.projects = current_projects
+                                st.success("Updated Azure project image successfully!")
+                                
+                                if not dry_run_proj:
+                                    st.info("🚀 Pushing image and data to GitHub...")
+                                    import subprocess
+                                    try:
+                                        status = subprocess.check_output(["git", "status", "--porcelain"], cwd=os.getcwd()).decode("utf-8")
+                                        if status:
+                                            subprocess.check_call(["git", "add", "src/data/projects.ts", target_img_path], cwd=os.getcwd())
+                                            commit_msg = f"chore(sync): update project photo - {p_title}"
+                                            subprocess.check_call(["git", "commit", "-m", commit_msg], cwd=os.getcwd())
+                                            subprocess.check_call(["git", "push", "origin", "main"], cwd=os.getcwd())
+                                            st.success("✅ Pushed successfully to GitHub!")
+                                    except Exception as e:
+                                        st.error(f"Failed to push to Git: {e}")
+                                st.rerun()
+                            else:
+                                st.error(msg)
+                                
+                    st.markdown("---")
+                    
+                    # 2. Noir Mode (Dark) Image
+                    st.markdown("### Noir Mode (Dark)")
+                    if img_path:
+                        noir_img_path = img_path.replace(".webp", "-noir.webp")
+                        local_noir_img_path = os.path.join("public", noir_img_path.lstrip("/"))
+                    else:
+                        noir_img_path = ""
+                        local_noir_img_path = ""
+                        
+                    if local_noir_img_path and os.path.exists(local_noir_img_path):
+                        st.image(local_noir_img_path, caption="Current Noir Image", use_container_width=True)
+                    else:
+                        st.warning("No Noir image currently found at: " + (noir_img_path or "N/A"))
+                        
+                    up_img_noir = st.file_uploader(f"Upload Noir image for {p_title}", type=["png", "jpg", "jpeg", "webp"], key=f"up_img_noir_{p_id}")
+                    if up_img_noir is not None:
+                        if st.button(f"Save Noir Photo", key=f"btn_save_img_noir_{p_id}", type="primary"):
+                            target_noir_filename = f"project-{p_id}-noir.webp"
+                            target_noir_path = os.path.join("public", "images", target_noir_filename)
+                            success, msg = save_uploaded_image(up_img_noir, target_noir_path, "WEBP")
+                            if success:
+                                if not project.get('image'):
+                                    project['image'] = f"/images/project-{p_id}.webp"
+                                    write_projects_file(current_projects)
+                                    st.session_state.projects = current_projects
+                                st.success("Updated Noir project image successfully!")
+                                
+                                if not dry_run_proj:
+                                    st.info("🚀 Pushing image to GitHub...")
+                                    import subprocess
+                                    try:
+                                        status = subprocess.check_output(["git", "status", "--porcelain"], cwd=os.getcwd()).decode("utf-8")
+                                        if status:
+                                            subprocess.check_call(["git", "add", "src/data/projects.ts", target_noir_path], cwd=os.getcwd())
+                                            commit_msg = f"chore(sync): update project noir photo - {p_title}"
+                                            subprocess.check_call(["git", "commit", "-m", commit_msg], cwd=os.getcwd())
+                                            subprocess.check_call(["git", "push", "origin", "main"], cwd=os.getcwd())
+                                            st.success("✅ Pushed successfully to GitHub!")
+                                    except Exception as e:
+                                        st.error(f"Failed to push to Git: {e}")
+                                st.rerun()
+                            else:
+                                st.error(msg)
+                                
+                with col_p2:
+                    edit_title = st.text_input("Project Title", value=project.get("title", ""), key=f"edit_title_{p_id}")
+                    edit_desc = st.text_input("Short Description", value=project.get("description", ""), key=f"edit_desc_{p_id}")
+                    edit_long_desc = st.text_area("Detailed Description (Markdown-supported)", value=project.get("longDescription", ""), height=150, key=f"edit_long_desc_{p_id}")
+                    
+                    col_p2_1, col_p2_2 = st.columns(2)
+                    with col_p2_1:
+                        edit_color = st.text_input("Hex Color Code", value=project.get("color", "#00E676"), key=f"edit_color_{p_id}")
+                        edit_live_url = st.text_input("Live URL Link", value=project.get("liveUrl", ""), key=f"edit_live_url_{p_id}")
+                    with col_p2_2:
+                        edit_github_url = st.text_input("GitHub Repo Link", value=project.get("githubUrl", ""), key=f"edit_github_url_{p_id}")
+                        # Determine current index for selectbox
+                        status_opts = ["COMING SOON", "LIVE NOW", "PERSONAL"]
+                        curr_status = project.get("status", "live" if project.get("isLive") else "soon")
+                        if curr_status == 'live':
+                            status_idx = 1
+                        elif curr_status == 'personal':
+                            status_idx = 2
+                        else:
+                            status_idx = 0
+                        edit_status = st.selectbox("Project Status", options=status_opts, index=status_idx, key=f"edit_status_{p_id}")
+                    
+                    curr_tags = ", ".join(project.get("tags", []))
+                    edit_tags_str = st.text_input("Tags / Technologies (comma separated)", value=curr_tags, key=f"edit_tags_{p_id}")
+                    edit_tags = [t.strip() for t in edit_tags_str.split(",") if t.strip()]
+                    
+                    col_pb1, col_pb2 = st.columns(2)
+                    
+                    with col_pb1:
+                        if st.button("Save Project Changes", key=f"btn_save_proj_{p_id}", type="primary", use_container_width=True):
+                            if not edit_title.strip():
+                                st.error("Project Title is required!")
+                            else:
+                                project["title"] = edit_title.strip()
+                                project["description"] = edit_desc.strip()
+                                project["longDescription"] = edit_long_desc.strip()
+                                project["color"] = edit_color.strip()
+                                project["liveUrl"] = edit_live_url.strip()
+                                project["githubUrl"] = edit_github_url.strip()
+                                project["isLive"] = edit_status == "LIVE NOW"
+                                if edit_status == "LIVE NOW":
+                                    project["status"] = "live"
+                                elif edit_status == "PERSONAL":
+                                    project["status"] = "personal"
+                                else:
+                                    project["status"] = "soon"
+                                project["tags"] = edit_tags
+                                
+                                try:
+                                    write_projects_file(current_projects)
+                                    st.session_state.projects = current_projects
+                                    st.success(f"Successfully saved project changes locally!")
+                                    
+                                    if not dry_run_proj:
+                                        st.info("🚀 Pushing changes to GitHub...")
+                                        import subprocess
+                                        try:
+                                            status = subprocess.check_output(["git", "status", "--porcelain"], cwd=os.getcwd()).decode("utf-8")
+                                            if status:
+                                                subprocess.check_call(["git", "add", "src/data/projects.ts"], cwd=os.getcwd())
+                                                commit_msg = f"chore(sync): update project - {project['title']}"
+                                                subprocess.check_call(["git", "commit", "-m", commit_msg], cwd=os.getcwd())
+                                                subprocess.check_call(["git", "push", "origin", "main"], cwd=os.getcwd())
+                                                st.success("✅ Pushed successfully to GitHub!")
+                                        except Exception as e:
+                                            st.error(f"Failed to push to Git: {e}")
+                                            
+                                    st.rerun()
+                                except Exception as e:
+                                    st.error(f"Failed to write file: {e}")
+                                    
+                    with col_pb2:
+                        if st.button("Delete Project", key=f"btn_del_proj_{p_id}", type="secondary", use_container_width=True):
+                            if img_path and "project-" in img_path:
+                                target_img = os.path.join("public", img_path.lstrip("/"))
+                                if os.path.exists(target_img):
+                                    try:
+                                        os.remove(target_img)
+                                        st.toast(f"Deleted image file: `{target_img}`")
+                                    except Exception as e:
+                                        st.error(f"Failed to delete image: {e}")
+                                        
+                                # Delete corresponding Noir image if it exists
+                                target_img_noir = target_img.replace(".webp", "-noir.webp")
+                                if os.path.exists(target_img_noir):
+                                    try:
+                                        os.remove(target_img_noir)
+                                        st.toast(f"Deleted Noir image file: `{target_img_noir}`")
+                                    except Exception as e:
+                                        st.error(f"Failed to delete Noir image: {e}")
+                                        
+                            updated_projects = [p for p in current_projects if p.get("id") != p_id]
+                            
+                            try:
+                                write_projects_file(updated_projects)
+                                st.session_state.projects = updated_projects
+                                st.success(f"Successfully deleted project: **{p_title}**!")
+                                
+                                if not dry_run_proj:
+                                    st.info("🚀 Pushing deletion to GitHub...")
+                                    import subprocess
+                                    try:
+                                        status = subprocess.check_output(["git", "status", "--porcelain"], cwd=os.getcwd()).decode("utf-8")
+                                        if status:
+                                            subprocess.check_call(["git", "add", "src/data/projects.ts"], cwd=os.getcwd())
+                                            commit_msg = f"chore(sync): delete project - {p_title}"
+                                            subprocess.check_call(["git", "commit", "-m", commit_msg], cwd=os.getcwd())
+                                            subprocess.check_call(["git", "push", "origin", "main"], cwd=os.getcwd())
+                                            st.success("✅ Pushed successfully to GitHub!")
+                                    except Exception as e:
+                                        st.error(f"Failed to push to Git: {e}")
+                                        
+                                st.rerun()
+                            except Exception as e:
+                                st.error(f"Failed to delete project: {e}")
 
 # ──────────────────────────────────────────
 # TAB 3: SYNC CERTIFICATES
@@ -1540,7 +1825,7 @@ with tab_cert:
             for c in raw_certs:
                 st.code(f"• {c}", language="text")
 
-            dry_run_cert = st.checkbox("Dry-Run Mode (Examine parsing without saving)", value=True, key="dry_cert")
+            dry_run_cert = st.checkbox("Dry-Run Mode (Save locally only, do not push to remote)", value=True, key="dry_cert")
 
             if st.button("Sync Certificates Now", type="primary"):
                 current_certs = parse_certificates_file()
@@ -1572,43 +1857,34 @@ with tab_cert:
                         
                         cert_data = call_gemini(prompt, file_data=b64_data, file_mime=mime)
                         if cert_data:
-                            st.write(f"✅ Extracted: **{cert_data['title']}** from *{cert_data['issuer']}*")
+                                            # Move from raw to public
+                            shutil.move(filepath, dest_filepath)
                             
-                            safe_title = re.sub(r'[^a-zA-Z0-9]', '-', cert_data['title'].lower())
-                            cert_id = f"{safe_title}-{datetime.now().strftime('%M%S')}"
-                            
-                            dest_filename = f"{cert_id}{os.path.splitext(cert_file)[1]}"
-                            dest_filepath = os.path.join(public_cert_dir, dest_filename)
-                            
-                            if not dry_run_cert:
-                                # Move from raw to public
-                                shutil.move(filepath, dest_filepath)
+                            verify_url = cert_data.get("verifyUrl", "").strip()
+                            if verify_url:
+                                if not verify_url.startswith(("http://", "https://")):
+                                    verify_url = "https://" + verify_url
                                 
-                                verify_url = cert_data.get("verifyUrl", "").strip()
-                                if verify_url:
-                                    if not verify_url.startswith(("http://", "https://")):
-                                        verify_url = "https://" + verify_url
-                                    
-                                    # Convert Udemy short link to direct verification URL to avoid redirect 404s
-                                    if "ude.my/" in verify_url:
-                                        uc_match = re.search(r'(UC-[a-zA-Z0-9-]+)', verify_url)
-                                        if uc_match:
-                                            verify_url = f"https://www.udemy.com/certificate/{uc_match.group(1)}/"
+                                # Convert Udemy short link to direct verification URL to avoid redirect 404s
+                                if "ude.my/" in verify_url:
+                                    uc_match = re.search(r'(UC-[a-zA-Z0-9-]+)', verify_url)
+                                    if uc_match:
+                                        verify_url = f"https://www.udemy.com/certificate/{uc_match.group(1)}/"
 
-                                new_cert = {
-                                    "id": cert_id,
-                                    "title": cert_data["title"],
-                                    "issuer": cert_data["issuer"],
-                                    "date": cert_data["date"],
-                                    "credentialId": cert_data.get("credentialId"),
-                                    "verifyUrl": verify_url,
-                                    "image": f"/certificates/{dest_filename}",
-                                    "tags": cert_data.get("tags", [])
-                                }
-                                
-                                current_certs.append(new_cert)
-                                updated = True
-                                check_and_add_pending_skills(cert_data.get("tags", []))
+                            new_cert = {
+                                "id": cert_id,
+                                "title": cert_data["title"],
+                                "issuer": cert_data["issuer"],
+                                "date": cert_data["date"],
+                                "credentialId": cert_data.get("credentialId"),
+                                "verifyUrl": verify_url,
+                                "image": f"/certificates/{dest_filename}",
+                                "tags": cert_data.get("tags", [])
+                            }
+                            
+                            current_certs.append(new_cert)
+                            updated = True
+                            check_and_add_pending_skills(cert_data.get("tags", []))
                                 
                             sync_logs.append(f"Parsed certificate: {cert_data['title']}")
                         else:
@@ -1631,6 +1907,25 @@ with tab_cert:
                             st.session_state.resume = resume
                             
                         st.success("Certificates added to certificates.ts and moved to assets!")
+                        
+                        if not dry_run_cert:
+                            st.info("🚀 Pushing changes to GitHub...")
+                            import subprocess
+                            try:
+                                status = subprocess.check_output(["git", "status", "--porcelain"], cwd=os.getcwd()).decode("utf-8")
+                                if status:
+                                    subprocess.check_call(["git", "add", "src/data/certificates.ts", "src/data/resume.ts", "public/certificates/"], cwd=os.getcwd())
+                                    if "src/data/skills.ts" in status:
+                                        subprocess.check_call(["git", "add", "src/data/skills.ts"], cwd=os.getcwd())
+                                    commit_msg = f"chore(sync): publish certificates sync"
+                                    subprocess.check_call(["git", "commit", "-m", commit_msg], cwd=os.getcwd())
+                                    subprocess.check_call(["git", "push", "origin", "main"], cwd=os.getcwd())
+                                    st.success("✅ Pushed successfully to GitHub!")
+                                else:
+                                    st.info("No changes to commit and push.")
+                            except Exception as e:
+                                st.error(f"Failed to push to Git: {e}")
+                        
                         st.rerun()
                     else:
                         status.update(label="Scan completed", state="complete")
@@ -1704,7 +1999,328 @@ with tab_cert:
                         st.rerun()
 
 # ──────────────────────────────────────────
-# TAB 4: BLOG EDITOR
+# TAB 4: MANAGE SKILLS
+# ──────────────────────────────────────────
+with tab_skills:
+    st.markdown('<div class="section-header">Manage Skills & Project Mapping</div>', unsafe_allow_html=True)
+    st.write("Create, modify, delete, and link skills directly. Changes will update `src/data/skills.ts` immediately.")
+
+    # 1. Create New Skill Section
+    with st.container(border=True):
+        st.markdown('<h3 style="margin-top:0;">Create New Skill</h3>', unsafe_allow_html=True)
+        
+        col_n1, col_n2 = st.columns(2)
+        with col_n1:
+            new_name = st.text_input("Skill Name", placeholder="e.g. Docker, Kubernetes, WebGPU", key="new_skill_name")
+            new_icon = st.text_input("Lucide Icon Name", value="sparkles", key="new_skill_icon")
+            
+            # Category selectbox
+            categories_opts = ['orchestration', 'logic', 'product', 'dynamic']
+            categories_labels = {
+                'orchestration': 'AI Orchestration (orchestration)',
+                'logic': 'Systems Logic (logic)',
+                'product': 'Product & UX (product)',
+                'dynamic': 'On-Demand Stack (dynamic)'
+            }
+            new_cat = st.selectbox("Category", options=categories_opts, format_func=lambda x: categories_labels[x], key="new_skill_cat")
+            
+        with col_n2:
+            new_color = st.text_input("Hex Color Code", value="#00E676", key="new_skill_color")
+            new_level = st.text_input("Skill Level (Optional)", placeholder="e.g. Level Max, Active Quest", key="new_skill_level")
+            
+            # Prerequisite from existing skills
+            existing_skill_names = [s.get('name') for s in st.session_state.skills if s.get('name')]
+            new_prereq = st.selectbox("Prerequisite (Optional)", options=[None] + existing_skill_names, index=0, key="new_skill_prereq")
+            
+        new_status = st.selectbox("Status (Optional)", options=[None, 'legendary', 'mastered', 'quest'], index=0, key="new_skill_status")
+        new_desc = st.text_area("Description / Summary", placeholder="Short 1-sentence description.", key="new_skill_desc")
+        
+        # Link to existing projects
+        project_list = st.session_state.projects or []
+        project_options = {p.get('id'): p.get('title') for p in project_list if p.get('id')}
+        project_ids = list(project_options.keys())
+        
+        selected_projects = st.multiselect(
+            "Link to Projects (Optional)", 
+            options=project_ids, 
+            format_func=lambda x: project_options[x],
+            key="new_skill_projects"
+        )
+        
+        if st.button("Create Skill", type="primary", use_container_width=True):
+            if not new_name.strip():
+                st.error("Skill Name is required!")
+            elif any(s.get("name", "").lower() == new_name.strip().lower() for s in st.session_state.skills):
+                st.error(f"Skill '{new_name}' already exists!")
+            else:
+                # Construct new skill object
+                ns = {
+                    "name": new_name.strip(),
+                    "icon": new_icon.strip() or "sparkles",
+                    "description": new_desc.strip(),
+                    "category": new_cat,
+                    "color": new_color.strip() or "#00E676"
+                }
+                if new_level.strip():
+                    ns["level"] = new_level.strip()
+                if new_prereq:
+                    ns["prereq"] = new_prereq
+                if new_status:
+                    ns["status"] = new_status
+                if selected_projects:
+                    ns["projects"] = [{"title": project_options[pid], "id": pid} for pid in selected_projects]
+                
+                updated_skills = st.session_state.skills + [ns]
+                try:
+                    write_skills_file(updated_skills)
+                    st.session_state.skills = updated_skills
+                    st.success(f"Successfully created skill: **{new_name.strip()}**!")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Failed to save skills: {e}")
+
+    # 2. Manage & Link Existing Skills Section
+    st.markdown('<div class="section-header" style="margin-top: 2rem;">Manage & Link Existing Skills</div>', unsafe_allow_html=True)
+    
+    if not st.session_state.skills:
+        st.info("No skills found in skills.ts.")
+    else:
+        category_groups = {
+            'orchestration': [],
+            'logic': [],
+            'product': [],
+            'dynamic': []
+        }
+        for s in st.session_state.skills:
+            cat = s.get('category', 'dynamic')
+            if cat not in category_groups:
+                cat = 'dynamic'
+            category_groups[cat].append(s)
+            
+        category_display_names = {
+            'orchestration': 'AI Orchestration (orchestration)',
+            'logic': 'Systems Logic (logic)',
+            'product': 'Product & UX (product)',
+            'dynamic': 'On-Demand Stack (dynamic)'
+        }
+        
+        for cat_key in ['orchestration', 'logic', 'product', 'dynamic']:
+            group_skills = category_groups[cat_key]
+            if not group_skills:
+                continue
+                
+            st.markdown(f"### {category_display_names[cat_key].split(' (')[0]}")
+            
+            for s_idx, skill in enumerate(group_skills):
+                s_name = skill.get('name', 'Unnamed Skill')
+                s_id = slugify(s_name)
+                key_prefix = f"edit_skill_{s_id}"
+                
+                with st.expander(f"🔧 {s_name} (Icon: {skill.get('icon', 'sparkles')})"):
+                    col_e1, col_e2 = st.columns(2)
+                    with col_e1:
+                        edit_name = st.text_input("Skill Name", value=s_name, key=f"{key_prefix}_name")
+                        edit_icon = st.text_input("Lucide Icon Name", value=skill.get('icon', 'sparkles'), key=f"{key_prefix}_icon")
+                        
+                        default_cat_idx = categories_opts.index(skill.get('category', 'dynamic'))
+                        edit_cat = st.selectbox(
+                            "Category", 
+                            options=categories_opts, 
+                            index=default_cat_idx,
+                            format_func=lambda x: categories_labels[x],
+                            key=f"{key_prefix}_cat"
+                        )
+                    with col_e2:
+                        edit_color = st.text_input("Hex Color Code", value=skill.get('color', '#00E676'), key=f"{key_prefix}_color")
+                        edit_level = st.text_input("Skill Level (Optional)", value=skill.get('level', ''), key=f"{key_prefix}_level")
+                        
+                        other_skills = [sk.get('name') for sk in st.session_state.skills if sk.get('name') and sk.get('name') != s_name]
+                        curr_prereq = skill.get('prereq')
+                        if curr_prereq not in other_skills:
+                            curr_prereq = None
+                        
+                        prereq_opts = [None] + other_skills
+                        prereq_idx = prereq_opts.index(curr_prereq)
+                        edit_prereq = st.selectbox("Prerequisite (Optional)", options=prereq_opts, index=prereq_idx, key=f"{key_prefix}_prereq")
+                        
+                    curr_status = skill.get('status')
+                    status_opts = [None, 'legendary', 'mastered', 'quest']
+                    if curr_status not in status_opts:
+                        curr_status = None
+                    status_idx = status_opts.index(curr_status)
+                    edit_status = st.selectbox("Status (Optional)", options=status_opts, index=status_idx, key=f"{key_prefix}_status")
+                    
+                    edit_desc = st.text_area("Description / Summary", value=skill.get('description', ''), key=f"{key_prefix}_desc")
+                    
+                    curr_linked_projects = [p.get('id') for p in skill.get('projects', []) if p.get('id')]
+                    curr_linked_projects = [pid for pid in curr_linked_projects if pid in project_options]
+                    
+                    edit_selected_projects = st.multiselect(
+                        "Link to Projects (Optional)", 
+                        options=project_ids, 
+                        default=curr_linked_projects,
+                        format_func=lambda x: project_options[x],
+                        key=f"{key_prefix}_projects"
+                    )
+                    
+                    col_b1, col_b2 = st.columns([1, 1])
+                    with col_b1:
+                        if st.button(f"Save Changes", key=f"{key_prefix}_save_btn", type="primary", use_container_width=True):
+                            if not edit_name.strip():
+                                st.error("Skill Name is required!")
+                            elif edit_name.strip().lower() != s_name.lower() and any(sk.get("name", "").lower() == edit_name.strip().lower() for sk in st.session_state.skills):
+                                st.error(f"Another skill named '{edit_name.strip()}' already exists!")
+                            else:
+                                updated_s = {
+                                    "name": edit_name.strip(),
+                                    "icon": edit_icon.strip(),
+                                    "description": edit_desc.strip(),
+                                    "category": edit_cat,
+                                    "color": edit_color.strip()
+                                }
+                                if edit_level.strip():
+                                    updated_s["level"] = edit_level.strip()
+                                if edit_prereq:
+                                    updated_s["prereq"] = edit_prereq
+                                if edit_status:
+                                    updated_s["status"] = edit_status
+                                if edit_selected_projects:
+                                    updated_s["projects"] = [{"title": project_options[pid], "id": pid} for pid in edit_selected_projects]
+                                    
+                                updated_skills_list = []
+                                for sk in st.session_state.skills:
+                                    if sk.get('name') == s_name:
+                                        updated_skills_list.append(updated_s)
+                                    else:
+                                        if edit_name.strip() != s_name and sk.get('prereq') == s_name:
+                                            sk['prereq'] = edit_name.strip()
+                                        updated_skills_list.append(sk)
+                                        
+                                try:
+                                    write_skills_file(updated_skills_list)
+                                    st.session_state.skills = updated_skills_list
+                                    st.success(f"Successfully updated skill: **{edit_name.strip()}**!")
+                                    st.rerun()
+                                except Exception as e:
+                                    st.error(f"Failed to save skill changes: {e}")
+                                    
+                    with col_b2:
+                        if st.button(f"Delete Skill", key=f"{key_prefix}_del_btn", type="secondary", use_container_width=True):
+                            updated_skills_list = []
+                            for sk in st.session_state.skills:
+                                if sk.get('name') != s_name:
+                                    if sk.get('prereq') == s_name:
+                                        sk.pop('prereq', None)
+                                    updated_skills_list.append(sk)
+                                    
+                            try:
+                                write_skills_file(updated_skills_list)
+                                st.session_state.skills = updated_skills_list
+                                st.success(f"Successfully deleted skill: **{s_name}**!")
+                                st.rerun()
+                            except Exception as e:
+                                st.error(f"Failed to delete skill: {e}")
+
+# ──────────────────────────────────────────
+# TAB 5: UPDATE PHOTOS
+# ──────────────────────────────────────────
+with tab_photos:
+    st.markdown('<div class="section-header">Update Hero & About Photos</div>', unsafe_allow_html=True)
+    st.write("Upload new images to replace the background/profile illustrations on your portfolio site.")
+    
+    if not HAS_PIL:
+        st.info("💡 **Tip**: Install Pillow (`pip install pillow`) in your project environment to automatically convert any uploaded image (PNG, JPG, WebP) to the correct format required by the website.")
+
+    # save_uploaded_image is now defined globally in the helpers section
+
+    # 1. Hero Section Photos
+    st.markdown("## Hero Section Photos")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("Hero - Noir Mode")
+        st.caption("Target: `public/images/hero-noir.webp` (WebP)")
+        hero_noir_path = "public/images/hero-noir.webp"
+        if os.path.exists(hero_noir_path):
+            st.image(hero_noir_path, caption="Current Noir Hero", use_container_width=True)
+        else:
+            st.warning("No image currently found at target path.")
+            
+        up_hero_noir = st.file_uploader("Upload New Noir Hero Image", type=["png", "jpg", "jpeg", "webp"], key="up_hero_noir")
+        if up_hero_noir is not None:
+            if st.button("Replace Noir Hero Image", key="btn_hero_noir", type="primary"):
+                success, msg = save_uploaded_image(up_hero_noir, hero_noir_path, "WEBP")
+                if success:
+                    st.success(msg)
+                    st.rerun()
+                else:
+                    st.error(msg)
+                    
+    with col2:
+        st.subheader("Hero - Comic Mode")
+        st.caption("Target: `public/images/hero-illustration-wavy.png` (PNG)")
+        hero_comic_path = "public/images/hero-illustration-wavy.png"
+        if os.path.exists(hero_comic_path):
+            st.image(hero_comic_path, caption="Current Comic Hero", use_container_width=True)
+        else:
+            st.warning("No image currently found at target path.")
+            
+        up_hero_comic = st.file_uploader("Upload New Comic Hero Image", type=["png", "jpg", "jpeg", "webp"], key="up_hero_comic")
+        if up_hero_comic is not None:
+            if st.button("Replace Comic Hero Image", key="btn_hero_comic", type="primary"):
+                success, msg = save_uploaded_image(up_hero_comic, hero_comic_path, "PNG")
+                if success:
+                    st.success(msg)
+                    st.rerun()
+                else:
+                    st.error(msg)
+
+    st.markdown("---")
+    
+    # 2. About Section Photos
+    st.markdown("## About Section Photos")
+    col3, col4 = st.columns(2)
+    
+    with col3:
+        st.subheader("About Portrait - Noir Mode")
+        st.caption("Target: `public/images/profile-noir.webp` (WebP)")
+        profile_noir_path = "public/images/profile-noir.webp"
+        if os.path.exists(profile_noir_path):
+            st.image(profile_noir_path, caption="Current Noir Profile", use_container_width=True)
+        else:
+            st.warning("No image currently found at target path.")
+            
+        up_profile_noir = st.file_uploader("Upload New Noir Profile Image", type=["png", "jpg", "jpeg", "webp"], key="up_profile_noir")
+        if up_profile_noir is not None:
+            if st.button("Replace Noir Profile Image", key="btn_profile_noir", type="primary"):
+                success, msg = save_uploaded_image(up_profile_noir, profile_noir_path, "WEBP")
+                if success:
+                    st.success(msg)
+                    st.rerun()
+                else:
+                    st.error(msg)
+                    
+    with col4:
+        st.subheader("About Portrait - Comic Mode")
+        st.caption("Target: `public/images/profile-comic.webp` (WebP)")
+        profile_comic_path = "public/images/profile-comic.webp"
+        if os.path.exists(profile_comic_path):
+            st.image(profile_comic_path, caption="Current Comic Profile", use_container_width=True)
+        else:
+            st.warning("No image currently found at target path.")
+            
+        up_profile_comic = st.file_uploader("Upload New Comic Profile Image", type=["png", "jpg", "jpeg", "webp"], key="up_profile_comic")
+        if up_profile_comic is not None:
+            if st.button("Replace Comic Profile Image", key="btn_profile_comic", type="primary"):
+                success, msg = save_uploaded_image(up_profile_comic, profile_comic_path, "WEBP")
+                if success:
+                    st.success(msg)
+                    st.rerun()
+                else:
+                    st.error(msg)
+
+# ──────────────────────────────────────────
+# TAB 6: BLOG EDITOR
 # ──────────────────────────────────────────
 with tab_blog:
     st.markdown('<div class="section-header">AI Blog Writer & Publisher</div>', unsafe_allow_html=True)
@@ -1755,6 +2371,8 @@ with tab_blog:
     draft_tags = st.text_input("Tags (comma separated):", value="Next.js, Python, AI" if not st.session_state.get("blog_draft_content") else "")
     draft_content = st.text_area("Markdown Body Content:", value=st.session_state.get("blog_draft_content", ""), height=350)
     
+    dry_run_blog = st.checkbox("Dry-Run Mode (Save locally only, do not push to remote)", value=True, key="dry_blog")
+    
     if st.button("Publish Blog Post", use_container_width=True, type="primary"):
         if not draft_title or not draft_content:
             st.error("Title and Markdown content are required!")
@@ -1793,7 +2411,23 @@ coverImage: "/images/blog/default.jpg"
                     write_resume_file(resume)
                     st.session_state.resume = resume
                 
-                st.success(f"Successfully published blog post! File created at: `{file_path}`")
+                st.success(f"Successfully published blog post locally! File created at: `{file_path}`")
+                
+                if not dry_run_blog:
+                    st.info("🚀 Pushing changes to GitHub...")
+                    import subprocess
+                    try:
+                        status = subprocess.check_output(["git", "status", "--porcelain"], cwd=os.getcwd()).decode("utf-8")
+                        if status:
+                            subprocess.check_call(["git", "add", file_path, "src/data/resume.ts"], cwd=os.getcwd())
+                            commit_msg = f"chore(blog): publish post - {draft_title}"
+                            subprocess.check_call(["git", "commit", "-m", commit_msg], cwd=os.getcwd())
+                            subprocess.check_call(["git", "push", "origin", "main"], cwd=os.getcwd())
+                            st.success("✅ Pushed successfully to GitHub!")
+                        else:
+                            st.info("No changes to commit and push.")
+                    except Exception as e:
+                        st.error(f"Failed to push to Git: {e}")
                 
                 # Clear session state
                 if "blog_draft_title" in st.session_state: del st.session_state.blog_draft_title

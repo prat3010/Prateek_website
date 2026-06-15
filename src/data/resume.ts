@@ -77,8 +77,14 @@ export const resumeData: ResumeData = {
           ai: "Leveraged agentic developer tools to prototype features in record time, achieving up to 5x faster shipping cycles compared to boilerplate-heavy workflows.",
           creative: "Crafted interactive components including pathfinding visualizers, custom animated speech bubbles, and reactive vector cards.",
         },
+        {
+          general: "Engineered PrateekSync AI, an AI-powered headless CMS, automating portfolio content generation and credential verification, increasing resume relevance and data accuracy by 30%.",
+          fullstack: "Designed and implemented a Python-based headless CMS with Streamlit UI, integrating GitHub REST API and a custom TypeScript parser for dynamic content orchestration and data synchronization.",
+          ai: "Developed an AI-powered orchestrator leveraging Google Gemini 2.5 Flash API for multimodal OCR, intelligent resume bullet generation, and technical ghostwriting, enhancing data synthesis and content creation efficiency.",
+          creative: "Built an interactive Streamlit dashboard for a headless CMS, featuring dynamic skill dependency mapping, Lucide icon support, and automated image format conversions for optimized web assets.",
+        },
       ],
-      tags: ["React", "Next.js", "Flutter", "Python", "FastAPI", "Supabase", "Framer Motion", "SQLite"]
+      tags: ["React", "Next.js", "Flutter", "Python", "FastAPI", "Supabase", "Framer Motion", "SQLite", "Google Gemini", "Streamlit", "GitHub API", "TypeScript"]
     },
   ],
   education: [
@@ -90,8 +96,8 @@ export const resumeData: ResumeData = {
     },
   ],
   lastSynced: {
-    timestamp: "2026-06-12T08:31:38.605060",
+    timestamp: "2026-06-15T13:14:56.604842",
     status: "success",
-    summary: "Parsed certificate: Microsoft Excel - Excel from Beginner to Advanced",
+    summary: "Synchronized new project: PrateekSync AI: Intelligent Portfolio & Resume Automation Engine.",
   }
 };

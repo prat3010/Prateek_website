@@ -12,18 +12,87 @@ interface ProjectsProps {
   projects: Project[];
 }
 
+interface ProjectImageProps {
+  src: string;
+  alt: string;
+  fill?: boolean;
+  width?: number;
+  height?: number;
+  sizes?: string;
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+function ProjectImage({ src, alt, fill, width, height, sizes, className, style }: ProjectImageProps) {
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    setError(false);
+  }, [src]);
+
+  if (error || !src) {
+    return (
+      <div
+        style={{
+          background: 'var(--pop-black)',
+          color: 'var(--pop-white)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '100%',
+          height: fill ? '100%' : (height ? `${height}px` : '300px'),
+          position: fill ? 'absolute' : 'relative',
+          inset: fill ? 0 : undefined,
+          border: '2px dashed rgba(255, 255, 255, 0.15)',
+          borderRadius: '4px',
+        }}
+      >
+        <Code2 size={48} strokeWidth={1.5} style={{ opacity: 0.7 }} />
+      </div>
+    );
+  }
+
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      fill={fill}
+      width={width}
+      height={height}
+      sizes={sizes}
+      className={className}
+      style={style}
+      onError={() => setError(true)}
+    />
+  );
+}
+
 export default function Projects({ projects }: ProjectsProps) {
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const selected = projects.find((p) => p.id === selectedProject);
   const { isNoir } = useTheme();
   const lenis = useLenis();
 
+  const getProjectStatus = (proj: Project) => {
+    if (proj.status) return proj.status;
+    return proj.isLive ? 'live' : 'soon';
+  };
+
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (selectedProject) {
-      lenis?.stop();
+      // Smoothly scroll the background to center projects section
+      lenis?.scrollTo('#projects', {
+        offset: -20,
+        duration: 0.4,
+      });
+
+      const timer = setTimeout(() => {
+        lenis?.stop();
+      }, 450);
+
       // Store the currently focused element before opening the modal
       previousFocusRef.current = document.activeElement as HTMLElement;
       
@@ -38,6 +107,8 @@ export default function Projects({ projects }: ProjectsProps) {
           }
         }
       }, 50);
+
+      return () => clearTimeout(timer);
     } else {
       lenis?.start();
       // Restore focus to the element that triggered the modal
@@ -111,14 +182,22 @@ export default function Projects({ projects }: ProjectsProps) {
                 {/* Status Badge */}
                 <div
                   className={`${styles.statusBadge} ${
-                    project.isLive ? styles.statusLive : styles.statusSoon
+                    getProjectStatus(project) === 'live'
+                      ? styles.statusLive
+                      : getProjectStatus(project) === 'personal'
+                      ? styles.statusPersonal
+                      : styles.statusSoon
                   }`}
                 >
-                  {project.isLive ? 'LIVE NOW' : 'COMING SOON'}
+                  {getProjectStatus(project) === 'live'
+                    ? 'LIVE NOW'
+                    : getProjectStatus(project) === 'personal'
+                    ? 'PERSONAL'
+                    : 'COMING SOON'}
                 </div>
 
                 <div className={styles.panelImageWrapper}>
-                  <Image
+                  <ProjectImage
                     src={isNoir ? project.image.replace(/\.webp$/, '-noir.webp') : project.image}
                     alt={project.title}
                     fill
@@ -151,6 +230,7 @@ export default function Projects({ projects }: ProjectsProps) {
           role="dialog"
           aria-modal="true"
           aria-label={`${selected.title} details`}
+          data-lenis-prevent
         >
           <div
             ref={modalRef}
@@ -171,7 +251,7 @@ export default function Projects({ projects }: ProjectsProps) {
             </div>
 
             <div className={styles.modalImageWrapper}>
-              <Image
+              <ProjectImage
                 src={isNoir ? selected.image.replace(/\.webp$/, '-noir.webp') : selected.image}
                 alt={selected.title}
                 width={600}
@@ -191,7 +271,7 @@ export default function Projects({ projects }: ProjectsProps) {
             </div>
 
             <div className={styles.modalActions}>
-              {selected.isLive ? (
+              {getProjectStatus(selected) === 'live' ? (
                 <>
                   {selected.liveUrl && (
                     <a
@@ -202,6 +282,31 @@ export default function Projects({ projects }: ProjectsProps) {
                       style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
                     >
                       PLAY GAME <ExternalLink size={16} />
+                    </a>
+                  )}
+                  {selected.githubUrl && (
+                    <a
+                      href={selected.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="comic-btn comic-btn-outline"
+                      style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
+                    >
+                      GITHUB <Code2 size={16} />
+                    </a>
+                  )}
+                </>
+              ) : getProjectStatus(selected) === 'personal' ? (
+                <>
+                  {selected.liveUrl && (
+                    <a
+                      href={selected.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="comic-btn comic-btn-blue"
+                      style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
+                    >
+                      LIVE DEMO <ExternalLink size={16} />
                     </a>
                   )}
                   {selected.githubUrl && (
