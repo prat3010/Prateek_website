@@ -142,8 +142,6 @@ export default function NoirSkyline() {
       {/* ── Vignette Overlay ── */}
       <div className={styles.vignette} aria-hidden="true" />
 
-      {/* ── Grain Texture Overlay ── */}
-      <div className={styles.grain} aria-hidden="true" />
 
       {/* ── Layer 0: Sky backdrop, Searchlights, and Rain ── */}
       <div className={styles.layer}>

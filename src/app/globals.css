@@ -106,7 +106,6 @@
   /* ─ Z-Index Scale ─ */
   --z-base: 0;
   --z-above: 10;
-  --z-noise: 90;
   --z-dropdown: 100;
   --z-sticky: 200;
   --z-fixed: 300;
@@ -306,35 +305,7 @@ body {
   overflow-x: hidden;
 }
 
-body::after {
-  content: '';
-  display: block;
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: var(--z-noise);
-  background-image: 
-    url("/images/noise.png"),
-    url("/images/noise.png"),
-    url("/images/noise.png"),
-    url("/images/noise.png");
-  background-repeat: repeat;
-  background-position: 
-    0 0,
-    32px 32px,
-    64px 64px,
-    96px 96px;
-  opacity: 1.0;
-  mix-blend-mode: multiply;
-  filter: contrast(250%) brightness(80%); /* Boost contrast of the grain specks and darken them */
-  transform: translateZ(0); /* Hardware accelerate to render on GPU layer and prevent scroll jank */
-}
 
-[data-theme='noir'] body::after {
-  display: none;
-}
 
 img,
 picture,
