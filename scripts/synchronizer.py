@@ -1138,15 +1138,98 @@ st.sidebar.markdown("""
     <code style="display: inline-block; background-color: #121212; color: #ffffff; border: 1.5px solid #ffffff; border-radius: 4px; padding: 2px 8px; font-size: 0.7rem; font-weight: bold; margin-top: 10px; font-family: 'JetBrains Mono', monospace;">v1.3.0 // ACTIVE</code>
 </div>
 """, unsafe_allow_html=True)
+# CI/CD Deployment & Status Monitor
+st.sidebar.markdown("### CI/CD Deployment Status")
 
-st.sidebar.markdown("### Control Panel Operations")
-st.sidebar.markdown("""
-This local portal lets you:
-*   **Edit Resume** details manually
-*   **Sync Projects** from local folders or GitHub
-*   **Sync Certificates** from raw scanned files
-*   **Write & Publish Blog Posts** using Gemini co-pilot
-""")
+# Helper to fetch GitHub deployment status
+def fetch_deployment_status():
+    url = "https://api.github.com/repos/prat3010/Prateek_website/commits/main/status"
+    headers = {"User-Agent": "Python/Streamlit-Synchronizer"}
+    req = urllib.request.Request(url, headers=headers)
+    try:
+        with urllib.request.urlopen(req) as res:
+            data = json.loads(res.read().decode("utf-8"))
+            state = data.get("state", "unknown")
+            statuses = data.get("statuses", [])
+            vercel_status = None
+            for status in statuses:
+                if status.get("context") == "Vercel":
+                    vercel_status = status
+                    break
+            
+            if vercel_status:
+                return {
+                    "state": vercel_status.get("state", "unknown"),
+                    "description": vercel_status.get("description", "No description"),
+                    "url": vercel_status.get("target_url", ""),
+                    "updated_at": vercel_status.get("updated_at", "")
+                }
+            else:
+                return {
+                    "state": state,
+                    "description": "Latest commit status fetched",
+                    "url": "",
+                    "updated_at": ""
+                }
+    except Exception as e:
+        return {"error": str(e)}
+
+# Session state cache for status to avoid hitting rate limits
+if "deploy_status" not in st.session_state:
+    st.session_state.deploy_status = None
+if "last_checked" not in st.session_state:
+    st.session_state.last_checked = None
+
+# Automatically fetch on first load if not present
+if st.session_state.deploy_status is None:
+    st.session_state.deploy_status = fetch_deployment_status()
+    st.session_state.last_checked = datetime.now().strftime("%H:%M:%S")
+
+status = st.session_state.deploy_status
+last_checked = st.session_state.last_checked
+
+with st.sidebar.container(border=True):
+    if "error" in status:
+        st.error("Offline or API limit reached")
+    else:
+        state = status.get("state", "unknown").lower()
+        desc = status.get("description", "")
+        url = status.get("url", "")
+        updated_at = status.get("updated_at", "")
+        
+        # State styling & display
+        if state == "success":
+            st.markdown("🟢 **STATUS: SUCCESS**")
+            st.success("✅ Vercel Completed")
+        elif state == "pending":
+            st.markdown("🟡 **STATUS: BUILDING**")
+            st.warning("🔄 Build Running...")
+        elif state in ["failure", "error"]:
+            st.markdown("🔴 **STATUS: FAILED**")
+            st.error("❌ Build Failed")
+        else:
+            st.markdown(f"⚪ **STATUS: {state.upper()}**")
+            st.info(desc)
+            
+        st.markdown(f"<small>**Description:** {desc}</small>", unsafe_allow_html=True)
+        if url:
+            st.markdown(f"[🔗 View Vercel logs]({url})")
+            
+        if updated_at:
+            # Parse ISO date string
+            try:
+                dt = datetime.strptime(updated_at, "%Y-%m-%dT%H:%M:%SZ")
+                formatted_time = dt.strftime("%b %d, %H:%M UTC")
+                st.markdown(f"<small style='color: #8A8A93;'>Deployed: {formatted_time}</small>", unsafe_allow_html=True)
+            except:
+                pass
+
+    st.markdown(f"<small style='color: #8A8A93;'>Checked at: {last_checked}</small>", unsafe_allow_html=True)
+    if st.button("Refresh Status", key="btn_refresh_deploy_status", use_container_width=True):
+        st.session_state.deploy_status = fetch_deployment_status()
+        st.session_state.last_checked = datetime.now().strftime("%H:%M:%S")
+        st.rerun()
+
 
 if GEMINI_API_KEY:
     st.sidebar.success("Gemini API Key loaded from .env.local")
