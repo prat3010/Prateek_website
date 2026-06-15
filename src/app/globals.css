@@ -315,10 +315,7 @@ body::after {
   height: 100vh;
   pointer-events: none;
   z-index: var(--z-noise);
-  background-image: url("/images/noise.png");
-  background-repeat: repeat;
-  opacity: 0.12;
-  mix-blend-mode: multiply;
+  background-color: rgba(255, 0, 0, 0.4); /* Diagnostic Red Overlay */
 }
 
 [data-theme='noir'] body::after {
