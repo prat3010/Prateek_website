@@ -328,6 +328,8 @@ body::after {
     96px 96px;
   opacity: 1.0;
   mix-blend-mode: multiply;
+  filter: contrast(250%) brightness(80%); /* Boost contrast of the grain specks and darken them */
+  transform: translateZ(0); /* Hardware accelerate to render on GPU layer and prevent scroll jank */
 }
 
 [data-theme='noir'] body::after {
