@@ -34,11 +34,15 @@ def extract_after(text, marker):
     depth = 0
     in_str = False
     q = None
+    skip_next = False
     end = 0
     for i, c in enumerate(rest):
+        if skip_next:
+            skip_next = False
+            continue
         if in_str:
             if c == '\\':
-                pass  # skip next
+                skip_next = True
             elif c == q:
                 in_str = False
         elif c in '"\'':
@@ -63,8 +67,8 @@ def ts_literal_to_py(text):
         inner = inner.replace("\\'", "'").replace('\\\\', '\\')
         return json.dumps(inner, ensure_ascii=False)
     text = re.sub(r"'((?:[^'\\]|\\.)*)'", fix_sq, text)
-    # 2: unquoted object keys at line start → quoted
-    text = re.sub(r'^\s*(\w+)(\s*:)', r'"\1"\2', text, flags=re.MULTILINE)
+    # 2: unquoted object keys → quoted (handles inline keys like { title: })
+    text = re.sub(r'([{,]\s*)(\w+)(\s*:)', r'\1"\2"\3', text)
     # 3: trailing commas before } or ]
     text = re.sub(r',(\s*[}\]])', r'\1', text)
     return json.loads(text)
