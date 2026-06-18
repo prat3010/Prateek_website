@@ -9,7 +9,6 @@ import {
   Layers
 } from 'lucide-react';
 import styles from './SiteInfoConsole.module.css';
-import { projects } from '@/data/projects';
 
 // Command responses for Noir Interactive Console
 interface ConsoleLine {
@@ -25,7 +24,20 @@ const BOOT_LOGS = [
   'SYSTEM // Diagnostics core online. Welcome.'
 ];
 
+interface ProjectSummary {
+  title: string;
+  tags: string[];
+}
+
 export default function SiteInfoConsole() {
+  const [projects, setProjects] = useState<ProjectSummary[]>([]);
+
+  useEffect(() => {
+    fetch('/api/projects')
+      .then(r => r.json())
+      .then(data => setProjects(data || []))
+      .catch(() => {});
+  }, []);
   const { isNoir } = useTheme();
   const [terminalInput, setTerminalInput] = useState('');
   const [terminalHistory, setTerminalHistory] = useState<ConsoleLine[]>(

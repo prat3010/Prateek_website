@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { resumeData, WorkExperience } from '@/data/resume';
-import { certificates } from '@/data/certificates';
+import type { ResumeData, WorkExperience } from '@/data/resume';
+import type { Certificate } from '@/data/certificates';
 import { useTheme } from '@/context/ThemeContext';
 import ComicPanel from '@/components/ui/ComicPanel';
 import SpeechBubble from '@/components/ui/SpeechBubble';
@@ -23,13 +23,22 @@ import styles from './Resume.module.css';
 
 type Persona = 'general' | 'fullstack' | 'ai' | 'creative';
 
-export default function Resume() {
+interface ResumeProps {
+  resumeData: ResumeData | null;
+  certificates: Certificate[];
+}
+
+export default function Resume({ resumeData, certificates }: ResumeProps) {
   const { isNoir } = useTheme();
   const [activePersona, setActivePersona] = useState<Persona>('general');
 
+  if (!resumeData) {
+    return null;
+  }
+
   const handleDownloadPDF = () => {
     import('@/utils/pdfGenerator').then(({ generateResumePDF }) => {
-      generateResumePDF(activePersona);
+      generateResumePDF(activePersona, resumeData);
     });
   };
 

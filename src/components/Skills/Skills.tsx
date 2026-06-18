@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { type Skill, skills } from '@/data/skills';
+import type { Skill } from '@/data/skills';
 import { useTheme } from '@/context/ThemeContext';
 import { 
   Zap, 
@@ -34,7 +34,11 @@ const iconMap: Record<string, React.ComponentType<any>> = {
   shield: Shield
 };
 
-export default function Skills() {
+interface SkillsProps {
+  skills: Skill[];
+}
+
+export default function Skills({ skills }: SkillsProps) {
   const { isNoir } = useTheme();
 
   // Filter skills by dossier categories

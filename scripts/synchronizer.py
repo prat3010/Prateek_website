@@ -9,6 +9,13 @@ import urllib.request
 import urllib.parse
 from datetime import datetime, timedelta
 
+# Import the Supabase sync helper
+try:
+    from sync_supabase import sync_projects, sync_skills, sync_certificates, sync_resume
+    HAS_SYNC = True
+except ImportError:
+    HAS_SYNC = False
+
 # Import Streamlit - will fail gracefully if not installed
 try:
     import streamlit as st
@@ -418,6 +425,8 @@ export const projects: Project[] = {projects_str};
 """
     with open(path, "w") as f:
         f.write(content)
+    if HAS_SYNC:
+        sync_projects(projects)
 
 # Parse resume.ts
 def extract_literal(content, start_sig):
@@ -703,6 +712,8 @@ def write_skills_file(skills_list):
     new_content = content.replace(lit_str, skills_str, 1)
     with open(path, "w") as f:
         f.write(new_content)
+    if HAS_SYNC:
+        sync_skills(skills_list)
 
 def write_resume_file(resume):
     path = "src/data/resume.ts"
@@ -819,6 +830,8 @@ export const resumeData: ResumeData = {{
 """
     with open(path, "w") as f:
         f.write(content)
+    if HAS_SYNC:
+        sync_resume(resume)
 
 # Parse certificates
 def parse_certificates_file():
@@ -854,6 +867,8 @@ export const certificates: Certificate[] = {certs_json};
 """
     with open(path, "w") as f:
         f.write(content)
+    if HAS_SYNC:
+        sync_certificates(certificates)
 
 # Helpers
 def get_mime_type(filename):
