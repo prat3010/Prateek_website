@@ -76,3 +76,16 @@ npm run build
 ```
 
 This ensures the terminal telemetry console on the portfolio site displays your actual git log.
+
+---
+
+## 🤖 CI/CD Database Sync
+
+The project includes an automated GitHub Actions workflow (`.github/workflows/db_sync.yml`) that triggers on pushes to the `main` branch. 
+
+If any changes are made to the fallback JSON data files (`src/data/*.json`), this workflow will automatically execute `scripts/seed_supabase.py` in the runner to update your live database records on Supabase.
+
+### Required GitHub Secrets:
+To enable this action, make sure to add these Repository Secrets in your GitHub repository configuration (`Settings > Secrets and variables > Actions`):
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`

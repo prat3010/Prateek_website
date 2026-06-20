@@ -13,12 +13,18 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def load_env():
     path = os.path.join(ROOT, '.env.local')
-    with open(path) as f:
-        for line in f:
-            line = line.strip()
-            if line and not line.startswith('#') and '=' in line:
-                k, v = line.split('=', 1)
-                os.environ.setdefault(k, v)
+    if os.path.exists(path):
+        with open(path) as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    k, v = line.split('=', 1)
+                    os.environ.setdefault(k, v)
+    
+    # Check if required environment variables are set
+    if 'NEXT_PUBLIC_SUPABASE_URL' not in os.environ or 'SUPABASE_SERVICE_ROLE_KEY' not in os.environ:
+        print("Error: Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY environment variables.")
+        sys.exit(1)
 
 def read_file(*parts):
     with open(os.path.join(ROOT, *parts)) as f:
@@ -96,7 +102,7 @@ def upsert(table, rows, conflict_col='id'):
     if not rows:
         return []
     key = os.environ['SUPABASE_SERVICE_ROLE_KEY']
-    url = os.environ['NEXT_PUBLIC_SUPABASE_URL'].rstrip('/') + f'/rest/v1/{table}'
+    url = os.environ['NEXT_PUBLIC_SUPABASE_URL'].rstrip('/') + f'/rest/v1/{table}?on_conflict={conflict_col}'
     headers = {
         'apikey': key,
         'Authorization': f'Bearer {key}',

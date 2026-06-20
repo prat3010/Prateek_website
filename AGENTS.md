@@ -20,6 +20,7 @@ This is Prateek Sharma's personal portfolio, built with Next.js 16 App Router, R
 
 ## Project Shape
 
+- `.github/workflows/` contains CI/CD workflows (e.g. `db_sync.yml` to auto-sync JSON content to Supabase on push).
 - `src/app/` contains routes, layouts, metadata, API routes, sitemap, robots, and the app shell.
 - `src/proxy.ts` is the Next.js 16 proxy (formerly middleware) file that intercepts requests for telemetry logging.
 - `src/components/` contains portfolio sections, shared UI, visual effects, and the playground.
