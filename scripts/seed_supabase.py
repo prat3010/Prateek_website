@@ -125,9 +125,13 @@ load_env()
 # ── 1. Projects ──────────────────────────────────────────────────────
 
 print('Projects…')
-content = read_file('src', 'data', 'projects.ts')
-raw = extract_after(content, 'export const projects: Project[]')
-projects_raw = ts_literal_to_py(raw)
+try:
+    with open(os.path.join(ROOT, 'src', 'data', 'projects.json'), 'r') as f:
+        projects_raw = json.load(f)
+except Exception as e:
+    print(f'  Failed to load projects.json: {e}')
+    projects_raw = []
+
 for p in projects_raw:
     p['slug'] = p.pop('id')
     p['isLive'] = p.get('isLive', False)
@@ -140,9 +144,13 @@ print(f'  {len(projects_raw)} projects synced')
 # ── 2. Skills ────────────────────────────────────────────────────────
 
 print('Skills…')
-content = read_file('src', 'data', 'skills.ts')
-raw = extract_after(content, 'export const skills: Skill[]')
-skills_raw = ts_literal_to_py(raw)
+try:
+    with open(os.path.join(ROOT, 'src', 'data', 'skills.json'), 'r') as f:
+        skills_raw = json.load(f)
+except Exception as e:
+    print(f'  Failed to load skills.json: {e}')
+    skills_raw = []
+
 for s in skills_raw:
     s.setdefault('level', '')
     s.setdefault('prereq', '')
@@ -155,9 +163,13 @@ print(f'  {len(skills_raw)} skills synced')
 # ── 3. Certificates ──────────────────────────────────────────────────
 
 print('Certificates…')
-content = read_file('src', 'data', 'certificates.ts')
-raw = extract_after(content, 'export const certificates: Certificate[]')
-certs_raw = json.loads(raw)   # already valid JSON
+try:
+    with open(os.path.join(ROOT, 'src', 'data', 'certificates.json'), 'r') as f:
+        certs_raw = json.load(f)
+except Exception as e:
+    print(f'  Failed to load certificates.json: {e}')
+    certs_raw = []
+
 for c in certs_raw:
     c['slug'] = c.pop('id')
 if certs_raw:
@@ -167,9 +179,13 @@ print(f'  {len(certs_raw)} certificates synced')
 # ── 4. Profile (resume) ──────────────────────────────────────────────
 
 print('Profile…')
-content = read_file('src', 'data', 'resume.ts')
-raw = extract_after(content, 'export const resumeData: ResumeData')
-resume_data = ts_literal_to_py(raw)
+try:
+    with open(os.path.join(ROOT, 'src', 'data', 'resume.json'), 'r') as f:
+        resume_data = json.load(f)
+except Exception as e:
+    print(f'  Failed to load resume.json: {e}')
+    resume_data = None
+
 if resume_data:
     row = {'id': 1, 'data': resume_data}
     upsert('profile', [row], 'id')

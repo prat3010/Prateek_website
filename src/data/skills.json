@@ -1,0 +1,195 @@
+[
+  {
+    "name": "Stack-on-Demand",
+    "icon": "zap",
+    "description": "Learning and deploying tools as needed. Shipped projects in Next.js, Flutter/Dart, Python, and SQL.",
+    "category": "dynamic",
+    "color": "#FF9100",
+    "level": "Legendary",
+    "prereq": "",
+    "status": "legendary",
+    "projects": [
+      {
+        "id": "paintmix-ai",
+        "title": "PaintMix AI"
+      },
+      {
+        "id": "earth-evolution-simulator",
+        "title": "Earth Evolution Simulator"
+      },
+      {
+        "id": "iss-tracker",
+        "title": "ISS Live Location Tracker"
+      },
+      {
+        "id": "metawipe",
+        "title": "MetaWipe"
+      }
+    ]
+  },
+  {
+    "name": "AI Dev Workflows",
+    "icon": "sparkles",
+    "description": "Accelerating building speed using agentic composer environments like Cursor and visual prototypes.",
+    "category": "orchestration",
+    "color": "#00E5FF",
+    "level": "Level Max",
+    "prereq": "",
+    "status": "mastered",
+    "projects": [
+      {
+        "id": "earth-evolution-simulator",
+        "title": "Earth Evolution Simulator"
+      },
+      {
+        "id": "metawipe",
+        "title": "MetaWipe"
+      }
+    ]
+  },
+  {
+    "name": "Structured Prompting",
+    "icon": "brain",
+    "description": "Writing prompt templates, optimizing context windows, and guiding LLM logical reasoning paths.",
+    "category": "orchestration",
+    "color": "#FFEB3B",
+    "level": "Level Max",
+    "prereq": "AI Dev Workflows",
+    "status": "mastered",
+    "projects": []
+  },
+  {
+    "name": "AI Agent Orchestration",
+    "icon": "bot",
+    "description": "Designing and running autonomous multi-agent networks to perform complex development tasks.",
+    "category": "orchestration",
+    "color": "#9C27B0",
+    "level": "Level Max",
+    "prereq": "Structured Prompting",
+    "status": "mastered",
+    "projects": []
+  },
+  {
+    "name": "API Architecture",
+    "icon": "server",
+    "description": "Building light REST APIs in Python (Flask/FastAPI) and orchestrating data exchange loops.",
+    "category": "logic",
+    "color": "#059669",
+    "level": "Level Max",
+    "prereq": "",
+    "status": "mastered",
+    "projects": [
+      {
+        "id": "iss-tracker",
+        "title": "ISS Live Location Tracker"
+      },
+      {
+        "id": "earth-evolution-simulator",
+        "title": "Earth Evolution Simulator"
+      }
+    ]
+  },
+  {
+    "name": "Database Engineering",
+    "icon": "database",
+    "description": "Structuring relational databases and offline data synchronization via SQLite and Supabase.",
+    "category": "logic",
+    "color": "#3ECF8E",
+    "level": "Level Max",
+    "prereq": "API Architecture",
+    "status": "mastered",
+    "projects": [
+      {
+        "id": "paintmix-ai",
+        "title": "PaintMix AI"
+      },
+      {
+        "id": "earth-evolution-simulator",
+        "title": "Earth Evolution Simulator"
+      }
+    ]
+  },
+  {
+    "name": "Algorithmic Translation",
+    "icon": "terminal",
+    "description": "Translating complex mathematical models, coordinate spaces, and geometry into working logic.",
+    "category": "logic",
+    "color": "#3776AB",
+    "level": "Level Max",
+    "prereq": "Database Engineering",
+    "status": "mastered",
+    "projects": [
+      {
+        "id": "paintmix-ai",
+        "title": "PaintMix AI"
+      },
+      {
+        "id": "iss-tracker",
+        "title": "ISS Live Location Tracker"
+      }
+    ]
+  },
+  {
+    "name": "Data Analysis",
+    "icon": "bar-chart",
+    "description": "Analyzing raw datasets, Excel modeling, and structuring analytical insights.",
+    "category": "logic",
+    "color": "#00897B",
+    "level": "Active Quest",
+    "prereq": "Database Engineering",
+    "status": "quest",
+    "projects": []
+  },
+  {
+    "name": "Product Strategy & UX",
+    "icon": "layout",
+    "description": "Defining user flows, functional requirements, and shipping MVPs focused on target problems.",
+    "category": "product",
+    "color": "#FF1744",
+    "level": "Level Max",
+    "prereq": "",
+    "status": "mastered",
+    "projects": [
+      {
+        "id": "paintmix-ai",
+        "title": "PaintMix AI"
+      },
+      {
+        "id": "metawipe",
+        "title": "MetaWipe"
+      }
+    ]
+  },
+  {
+    "name": "Design to Code",
+    "icon": "paintbrush",
+    "description": "Converting blueprints into clean, responsive web layouts, custom animations, and UI variables.",
+    "category": "product",
+    "color": "#FF4081",
+    "level": "Level Max",
+    "prereq": "Product Strategy & UX",
+    "status": "mastered",
+    "projects": [
+      {
+        "id": "earth-evolution-simulator",
+        "title": "Earth Evolution Simulator"
+      }
+    ]
+  },
+  {
+    "name": "Privacy Sandboxing",
+    "icon": "shield",
+    "description": "Designing offline-first mobile apps that secure data by operating strictly on local device runtime.",
+    "category": "product",
+    "color": "#00E676",
+    "level": "Level Max",
+    "prereq": "Product Strategy & UX",
+    "status": "mastered",
+    "projects": [
+      {
+        "id": "metawipe",
+        "title": "MetaWipe"
+      }
+    ]
+  }
+]

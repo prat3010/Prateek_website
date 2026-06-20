@@ -56,6 +56,21 @@ def load_env():
 env = load_env()
 GEMINI_API_KEY = env.get("GEMINI_API_KEY")
 
+def trigger_revalidation():
+    secret = env.get("SYNC_API_KEY")
+    if secret:
+        urls = [
+            f"http://localhost:3000/api/revalidate?secret={secret}",
+            f"https://prateeq.in/api/revalidate?secret={secret}"
+        ]
+        for u in urls:
+            try:
+                req = urllib.request.Request(u, method="POST")
+                with urllib.request.urlopen(req, timeout=3) as resp:
+                    pass
+            except Exception:
+                pass
+
 # Helper to send API request to Gemini
 def call_gemini(prompt, file_data=None, file_mime=None):
     if not GEMINI_API_KEY:
@@ -321,112 +336,41 @@ def check_and_add_pending_skills(tags_list):
 # TS Data Parsers (Projects, Resume, Certs)
 # ==========================================
 
-# Parse projects.ts
+# Parse projects.ts (Now reads projects.json + Supabase)
 def parse_projects_file():
-    path = "src/data/projects.ts"
-    if not os.path.exists(path):
-        return []
-    with open(path, "r") as f:
-        content = f.read()
-    
-    match = re.search(r'export const projects:\s*Project\[\]\s*=\s*\[(.*)\];?', content, re.DOTALL)
-    if not match:
-        return []
-    array_content = match.group(1).strip()
-    
-    blocks = []
-    depth = 0
-    start = -1
-    for i, char in enumerate(array_content):
-        if char == '{':
-            if depth == 0:
-                start = i
-            depth += 1
-        elif char == '}':
-            depth -= 1
-            if depth == 0 and start != -1:
-                blocks.append(array_content[start:i+1])
-                start = -1
-                
-    projects = []
-    for block in blocks:
-        project = {}
-        id_match = re.search(r'id:\s*[\'"]((?:[^\'"\\]|\\.)*)[\'"]', block)
-        title_match = re.search(r'title:\s*[\'"]((?:[^\'"\\]|\\.)*)[\'"]', block)
-        desc_match = re.search(r'description:\s*[\'"]((?:[^\'"\\]|\\.)*)[\'"]', block, re.DOTALL)
-        long_desc_match = re.search(r'longDescription:\s*[\'"]((?:[^\'"\\]|\\.)*)[\'"]', block, re.DOTALL)
-        image_match = re.search(r'image:\s*[\'"]((?:[^\'"\\]|\\.)*)[\'"]', block)
-        live_url_match = re.search(r'liveUrl:\s*[\'"]((?:[^\'"\\]|\\.)*)[\'"]', block)
-        github_url_match = re.search(r'githubUrl:\s*[\'"]((?:[^\'"\\]|\\.)*)[\'"]', block)
-        color_match = re.search(r'color:\s*[\'"]((?:[^\'"\\]|\\.)*)[\'"]', block)
-        is_live_match = re.search(r'isLive:\s*(true|false)', block)
-        status_match = re.search(r'status:\s*[\'"]((?:[^\'"\\]|\\.)*)[\'"]', block)
-        tags_match = re.search(r'tags:\s*\[(.*?)\]', block, re.DOTALL)
-        
-        if id_match: project['id'] = id_match.group(1)
-        if title_match: project['title'] = title_match.group(1)
-        if desc_match: project['description'] = desc_match.group(1).replace('\n', ' ').strip()
-        if long_desc_match: project['longDescription'] = long_desc_match.group(1).replace("\\'", "'").replace('\n', ' ').strip()
-        if image_match: project['image'] = image_match.group(1)
-        if live_url_match: project['liveUrl'] = live_url_match.group(1)
-        if github_url_match: project['githubUrl'] = github_url_match.group(1)
-        if color_match: project['color'] = color_match.group(1)
-        if is_live_match: project['isLive'] = is_live_match.group(1) == 'true'
-        if status_match: project['status'] = status_match.group(1)
-        if 'status' not in project:
-            project['status'] = 'live' if project.get('isLive', False) else 'soon'
-        
-        if tags_match:
-            tags_str = tags_match.group(1)
-            project['tags'] = re.findall(r'[\'"](.*?)[\'"]', tags_str)
-            
-        projects.append(project)
-    return projects
-
-def write_projects_file(projects):
-    path = "src/data/projects.ts"
-    projects_str = "[\n"
-    for p in projects:
-        escaped_long_desc = p.get('longDescription', '').replace("'", "\\'")
-        escaped_desc = p.get('description', '').replace("'", "\\'")
-        tags_str = ", ".join([f"'{t}'" for t in p.get('tags', [])])
-        status_val = p.get('status', 'live' if p.get('isLive', False) else 'soon')
-        
-        projects_str += f"""  {{
-    id: '{p.get('id', '')}',
-    title: '{p.get('title', '').replace("'", "\\'")}',
-    description: '{escaped_desc}',
-    longDescription: '{escaped_long_desc}',
-    image: '{p.get('image', '')}',
-    tags: [{tags_str}],
-    liveUrl: '{p.get('liveUrl', '')}',
-    githubUrl: '{p.get('githubUrl', '')}',
-    color: '{p.get('color', '#00E676')}',
-    isLive: {str(p.get('isLive', False)).lower()},
-    status: '{status_val}',
-  }},\n"""
-    projects_str += "]"
-
-    content = f"""export interface Project {{
-  id: string;
-  title: string;
-  description: string;
-  longDescription: string;
-  image: string;
-  tags: string[];
-  liveUrl: string;
-  githubUrl: string;
-  color: string;
-  isLive: boolean;
-  status: 'live' | 'soon' | 'personal';
-}}
-
-export const projects: Project[] = {projects_str};
-"""
-    with open(path, "w") as f:
-        f.write(content)
     if HAS_SYNC:
-        sync_projects(projects)
+        try:
+            from sync_supabase import fetch_projects
+            data = fetch_projects()
+            if data is not None:
+                return data
+        except Exception as e:
+            print(f"Failed to fetch projects from Supabase: {e}")
+            
+    path = "src/data/projects.json"
+    if os.path.exists(path):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Failed to read local projects.json: {e}")
+    return []
+
+# Write projects.ts (Now writes projects.json + Supabase)
+def write_projects_file(projects):
+    path = "src/data/projects.json"
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(projects, f, indent=2)
+    except Exception as e:
+        print(f"Failed to write projects to local file: {e}")
+        
+    if HAS_SYNC:
+        try:
+            sync_projects(projects)
+            trigger_revalidation()
+        except Exception as e:
+            print(f"Failed to sync projects to Supabase: {e}")
 
 # Parse resume.ts
 def extract_literal(content, start_sig):
@@ -615,260 +559,113 @@ def parse_js_object(js_str):
                 idx += 1
                 return arr
                 
-    def parse_primitive():
-        nonlocal idx
-        start = idx
-        while idx < length:
-            c = js_str[idx]
-            if c.isspace() or c in [',', ']', '}', ':']:
-                break
-            idx += 1
-        val_str = js_str[start:idx].strip()
-        if val_str == 'true':
-            return True
-        elif val_str == 'false':
-            return False
-        elif val_str == 'null':
-            return None
-        try:
-            if '.' in val_str:
-                return float(val_str)
-            return int(val_str)
-        except ValueError:
-            return val_str
-            
-    return parse_value()
-
-# Parse resume.ts
+# Parse resume.json + Supabase
 def parse_resume_file():
-    path = "src/data/resume.ts"
-    if not os.path.exists(path):
-        return None
-    with open(path, "r") as f:
-        content = f.read()
+    if HAS_SYNC:
+        try:
+            from sync_supabase import fetch_resume
+            data = fetch_resume()
+            if data is not None:
+                return data
+        except Exception as e:
+            print(f"Failed to fetch resume from Supabase: {e}")
 
-    obj_str = extract_literal(content, "export const resumeData: ResumeData =")
-    if not obj_str:
-        return None
-    try:
-        return parse_js_object(obj_str)
-    except Exception as e:
-        st.error(f"Failed to parse resume.ts: {e}")
-        return None
+    path = "src/data/resume.json"
+    if os.path.exists(path):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Failed to read local resume.json: {e}")
+    return None
 
-# Parse skills.ts
+# Parse skills.json + Supabase
 def parse_skills_file():
-    path = "src/data/skills.ts"
-    if not os.path.exists(path):
-        return []
-    with open(path, "r") as f:
-        content = f.read()
+    if HAS_SYNC:
+        try:
+            from sync_supabase import fetch_skills
+            data = fetch_skills()
+            if data is not None:
+                return data
+        except Exception as e:
+            print(f"Failed to fetch skills from Supabase: {e}")
 
-    obj_str = extract_literal(content, "export const skills: Skill[] =")
-    if not obj_str:
-        return []
-    try:
-        return parse_js_object(obj_str)
-    except Exception as e:
-        st.error(f"Failed to parse skills.ts: {e}")
-        return []
+    path = "src/data/skills.json"
+    if os.path.exists(path):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Failed to read local skills.json: {e}")
+    return []
 
-# Write skills.ts
+# Write skills.json + Supabase
 def write_skills_file(skills_list):
-    path = "src/data/skills.ts"
-    with open(path, "r") as f:
-        content = f.read()
-
-    def esc(s):
-        if s is None:
-            return ""
-        return str(s).replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
-
-    skills_str = "[\n"
-    for s in skills_list:
-        skills_str += f"""  {{
-    name: "{esc(s.get('name', ''))}",
-    icon: "{esc(s.get('icon', 'sparkles'))}",
-    description: "{esc(s.get('description', ''))}",
-    category: "{esc(s.get('category', 'dynamic'))}",
-    color: "{esc(s.get('color', '#00E676'))}","""
-        if 'level' in s and s['level']:
-            skills_str += f"""\n    level: "{esc(s['level'])}","""
-        if 'prereq' in s and s['prereq']:
-            skills_str += f"""\n    prereq: "{esc(s['prereq'])}","""
-        if 'status' in s and s['status']:
-            skills_str += f"""\n    status: "{esc(s['status'])}","""
-        if 'projects' in s and s['projects']:
-            proj_list = s['projects']
-            proj_str = ", ".join([f'{{ title: "{esc(p.get("title", ""))}", id: "{esc(p.get("id", ""))}" }}' for p in proj_list])
-            skills_str += f"""\n    projects: [{proj_str}],"""
-        skills_str += "\n  },\n"
-    skills_str += "]"
-
-    lit_str = extract_literal(content, "export const skills: Skill[] =")
-    if not lit_str:
-        raise ValueError("Skills array literal not found in skills.ts")
-
-    new_content = content.replace(lit_str, skills_str, 1)
-    with open(path, "w") as f:
-        f.write(new_content)
-    if HAS_SYNC:
-        sync_skills(skills_list)
-
-def write_resume_file(resume):
-    path = "src/data/resume.ts"
-    
-    def esc(s):
-        if s is None:
-            return ""
-        return str(s).replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
-
-    experience_str = "[\n"
-    for exp in resume.get('experience', []):
-        bullets_str = "[\n"
-        for b in exp.get('bullets', []):
-            bullets_str += f"""        {{
-          general: "{esc(b.get('general', ''))}",
-          fullstack: "{esc(b.get('fullstack', ''))}",
-          ai: "{esc(b.get('ai', ''))}",
-          creative: "{esc(b.get('creative', ''))}",
-        }},\n"""
-        bullets_str += "      ]"
-        
-        tags_str = ", ".join([f'"{esc(t)}"' for t in exp.get('tags', [])])
-        experience_str += f"""    {{
-      id: "{esc(exp.get('id', ''))}",
-      company: "{esc(exp.get('company', ''))}",
-      role: "{esc(exp.get('role', ''))}",
-      period: "{esc(exp.get('period', ''))}",
-      location: "{esc(exp.get('location', ''))}",
-      bullets: {bullets_str},
-      tags: [{tags_str}]
-    }},\n"""
-    experience_str += "  ]"
-
-    education_str = "[\n"
-    for edu in resume.get('education', []):
-        education_str += f"""    {{
-      school: "{esc(edu.get('school', ''))}",
-      degree: "{esc(edu.get('degree', ''))}",
-      period: "{esc(edu.get('period', ''))}",
-      location: "{esc(edu.get('location', ''))}"
-    }},\n"""
-    education_str += "  ]"
-
-    summary = resume.get('summary', {})
-    last_synced = resume.get('lastSynced', {}) or {}
-
-    content = f"""export interface WorkExperience {{
-  id: string;
-  company: string;
-  role: string;
-  period: string;
-  location: string;
-  bullets: {{
-    general: string;
-    fullstack?: string;
-    ai?: string;
-    creative?: string;
-  }}[];
-  tags: string[];
-}}
-
-export interface Education {{
-  school: string;
-  degree: string;
-  period: string;
-  location: string;
-}}
-
-export interface ResumeData {{
-  name: string;
-  title: string;
-  email: string;
-  phone: string;
-  website: string;
-  github: string;
-  linkedin: string;
-  summary: {{
-    general: string;
-    fullstack: string;
-    ai: string;
-    creative: string;
-  }};
-  experience: WorkExperience[];
-  education: Education[];
-  lastSynced?: {{
-    timestamp: string;
-    status: 'success' | 'failed';
-    summary: string;
-  }};
-}}
-
-export const resumeData: ResumeData = {{
-  name: "{esc(resume.get('name', 'Prateek Sharma'))}",
-  title: "{esc(resume.get('title', ''))}",
-  email: "{esc(resume.get('email', ''))}",
-  phone: "{esc(resume.get('phone', ''))}",
-  website: "{esc(resume.get('website', ''))}",
-  github: "{esc(resume.get('github', ''))}",
-  linkedin: "{esc(resume.get('linkedin', ''))}",
-  summary: {{
-    general: "{esc(summary.get('general', ''))}",
-    fullstack: "{esc(summary.get('fullstack', ''))}",
-    ai: "{esc(summary.get('ai', ''))}",
-    creative: "{esc(summary.get('creative', ''))}",
-  }},
-  experience: {experience_str},
-  education: {education_str},
-  lastSynced: {{
-    timestamp: "{esc(last_synced.get('timestamp', ''))}",
-    status: "{esc(last_synced.get('status', 'success'))}",
-    summary: "{esc(last_synced.get('summary', ''))}",
-  }}
-}};
-"""
-    with open(path, "w") as f:
-        f.write(content)
-    if HAS_SYNC:
-        sync_resume(resume)
-
-# Parse certificates
-def parse_certificates_file():
-    path = "src/data/certificates.ts"
-    if not os.path.exists(path):
-        return []
-    with open(path, "r") as f:
-        content = f.read()
-    
-    match = re.search(r'export const certificates: Certificate\[\] = (\[.*\]);', content, re.DOTALL)
-    if not match:
-        return []
+    path = "src/data/skills.json"
     try:
-        return json.loads(match.group(1))
-    except:
-        return []
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(skills_list, f, indent=2)
+    except Exception as e:
+        print(f"Failed to write skills to local file: {e}")
 
-def write_certificates_file(certificates):
-    path = "src/data/certificates.ts"
-    certs_json = json.dumps(certificates, indent=2)
-    content = f"""export interface Certificate {{
-  id: string;
-  title: string;
-  issuer: string;
-  date: string;
-  credentialId?: string;
-  verifyUrl?: string;
-  image?: string;
-  tags: string[];
-}}
-
-export const certificates: Certificate[] = {certs_json};
-"""
-    with open(path, "w") as f:
-        f.write(content)
     if HAS_SYNC:
-        sync_certificates(certificates)
+        try:
+            sync_skills(skills_list)
+            trigger_revalidation()
+        except Exception as e:
+            print(f"Failed to sync skills to Supabase: {e}")
+
+# Write resume.json + Supabase
+def write_resume_file(resume):
+    path = "src/data/resume.json"
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(resume, f, indent=2)
+    except Exception as e:
+        print(f"Failed to write resume to local file: {e}")
+
+    if HAS_SYNC:
+        try:
+            sync_resume(resume)
+            trigger_revalidation()
+        except Exception as e:
+            print(f"Failed to sync resume to Supabase: {e}")
+
+# Parse certificates.json + Supabase
+def parse_certificates_file():
+    if HAS_SYNC:
+        try:
+            from sync_supabase import fetch_certificates
+            data = fetch_certificates()
+            if data is not None:
+                return data
+        except Exception as e:
+            print(f"Failed to fetch certificates from Supabase: {e}")
+
+    path = "src/data/certificates.json"
+    if os.path.exists(path):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Failed to read local certificates.json: {e}")
+    return []
+
+# Write certificates.json + Supabase
+def write_certificates_file(certificates):
+    path = "src/data/certificates.json"
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(certificates, f, indent=2)
+    except Exception as e:
+        print(f"Failed to write certificates to local file: {e}")
+
+    if HAS_SYNC:
+        try:
+            sync_certificates(certificates)
+            trigger_revalidation()
+        except Exception as e:
+            print(f"Failed to sync certificates to Supabase: {e}")
 
 # Helpers
 def get_mime_type(filename):

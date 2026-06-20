@@ -165,3 +165,41 @@ def sync_resume(resume):
     except urllib.error.HTTPError as e:
         print(f'  HTTP {e.code}: {e.read().decode()}')
         return None
+
+def fetch_projects():
+    _load_env()
+    if not _URL or not _KEY:
+        return None
+    res = _supabase_rest('projects', method='GET', params=[('order', 'created_at.desc')])
+    if res:
+        for r in res:
+            if 'slug' in r:
+                r['id'] = r.pop('slug')
+    return res
+
+def fetch_skills():
+    _load_env()
+    if not _URL or not _KEY:
+        return None
+    return _supabase_rest('skills', method='GET', params=[('order', 'created_at.asc')])
+
+def fetch_certificates():
+    _load_env()
+    if not _URL or not _KEY:
+        return None
+    res = _supabase_rest('certificates', method='GET', params=[('order', 'created_at.desc')])
+    if res:
+        for r in res:
+            if 'slug' in r:
+                r['id'] = r.pop('slug')
+    return res
+
+def fetch_resume():
+    _load_env()
+    if not _URL or not _KEY:
+        return None
+    res = _supabase_rest('profile', method='GET', params=[('id', 'eq.1')])
+    if res and len(res) > 0:
+        return res[0].get('data')
+    return None
+

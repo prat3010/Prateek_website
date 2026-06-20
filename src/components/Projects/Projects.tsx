@@ -172,6 +172,7 @@ export default function Projects({ projects }: ProjectsProps) {
           {projects.map((project, index) => (
               <button
                 key={project.id}
+                id={project.id}
                 className={`${styles.panel} ${styles[`area${index}`]}`}
                 style={{
                   '--panel-color': project.color,

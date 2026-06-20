@@ -1128,3 +1128,23 @@ footer {
   overflow: hidden;
 }
 
+/* ── Skills Click Highlight Animation ───────────────────────── */
+@keyframes flashHighlightAnim {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: var(--shadow-comic);
+  }
+  50% {
+    transform: scale(1.04) rotate(-1deg);
+    box-shadow: 0 0 25px var(--panel-color, var(--pop-blue)), 0 0 50px var(--panel-color, var(--pop-blue));
+    border-color: var(--panel-color, var(--pop-blue));
+  }
+}
+
+.flash-highlight {
+  animation: flashHighlightAnim 1.6s var(--ease-pop) 1;
+  z-index: 10;
+  position: relative;
+}
+
+
