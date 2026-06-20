@@ -114,6 +114,7 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
 
 - Do not overwrite user changes. Check `git status --short` before editing.
 - Do not commit unless explicitly asked.
+- **Documentation Integrity:** Whenever introducing new features, scripts, database tables, local helpers, CLI commands, or key configuration parameters, the agent **must** update both `README.md` and `AGENTS.md` (specifically sections like Project Shape, setup steps, or verification guides) to reflect the new state of the project.
 - Do not edit generated outputs unless the task is specifically about generation behavior.
 - Avoid touching `package-lock.json` unless dependencies actually changed.
 
