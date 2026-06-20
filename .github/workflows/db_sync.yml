@@ -1,0 +1,32 @@
+name: Sync Database on Push
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/data/projects.json'
+      - 'src/data/skills.json'
+      - 'src/data/certificates.json'
+      - 'src/data/resume.json'
+
+jobs:
+  sync:
+    name: Seed Supabase Database
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Run Database Seeder
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          python3 scripts/seed_supabase.py
