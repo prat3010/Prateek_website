@@ -61,6 +61,7 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
   - **CI/CD Deployment Status:** Automatically tracks Vercel build status via GitHub API, displaying status updates in IST (Indian Standard Time).
   - **Pending Skill Approvals:** Lists queue of AI-extracted skills for immediate addition.
 - **Fallback Synchronization:** The dashboard writes to both the database and the local JSON fallbacks in `src/data/` (e.g., `projects.json`, `skills.json`). If database connections fail, the Next.js app automatically falls back to these files. Future content features must maintain this dual JSON/database fallback contract.
+- **Python / JS Decoupling:** Keep Python tools strictly as local content-management scripts. Do not attempt to invoke Python scripts or require Python dependencies (`streamlit`, `Pillow`) in any runtime web app paths or public API routes.
 
 
 ## Design And Content Principles
@@ -75,8 +76,9 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
 - Treat analytics data as sensitive. Do not publicly expose raw visitor activity, detailed referrers, location, browser, OS, or device data without an explicit product decision.
 - Do not weaken `server-only` protections around Supabase service-role access.
 - Contact form changes must preserve input validation and HTML escaping.
-- Do not introduce runtime shell execution or filesystem writes in public request paths unless there is a strong reason and the behavior is bounded.
+- Do not introduce runtime shell execution or filesystem writes in public request paths unless there is a reason and the behavior is bounded.
 - Be careful with comments that claim compliance. Describe what the code does, not what laws it satisfies.
+- **Degraded Service States:** If third-party integrations (e.g., Resend, Gemini) fail or their environment keys are absent, fallback gracefully to informative debug messages or dummy success states. The core website layout/visitor page must never crash.
 
 ## Performance Expectations
 
@@ -89,6 +91,7 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
 ## Styling
 
 - Use CSS Modules for component styles and `src/app/globals.css` only for global tokens/utilities.
+- **CSS Modularity:** Keep all styling component-specific. Always use CSS Modules (`.module.css`) for new or modified components. Do not append ad-hoc utility classes to `globals.css` or write inline React styles unless dynamically necessary.
 - Reuse existing CSS variables and visual language before adding new palettes or systems.
 - Keep focus states and keyboard access intact.
 - Avoid inline styles unless they are already part of a local pattern or are needed for CSS custom properties.
