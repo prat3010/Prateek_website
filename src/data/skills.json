@@ -1,31 +1,14 @@
 [
   {
-    "name": "Stack-on-Demand",
-    "icon": "zap",
-    "description": "Learning and deploying tools as needed. Shipped projects in Next.js, Flutter/Dart, Python, and SQL.",
-    "category": "dynamic",
-    "color": "#FF9100",
-    "level": "Legendary",
-    "prereq": "",
-    "status": "legendary",
-    "projects": [
-      {
-        "id": "paintmix-ai",
-        "title": "PaintMix AI"
-      },
-      {
-        "id": "earth-evolution-simulator",
-        "title": "Earth Evolution Simulator"
-      },
-      {
-        "id": "iss-tracker",
-        "title": "ISS Live Location Tracker"
-      },
-      {
-        "id": "metawipe",
-        "title": "MetaWipe"
-      }
-    ]
+    "name": "AI Agent Orchestration",
+    "icon": "bot",
+    "description": "Designing and running autonomous multi-agent networks to perform complex development tasks.",
+    "category": "orchestration",
+    "color": "#9C27B0",
+    "level": "Level Max",
+    "prereq": "Structured Prompting",
+    "status": "mastered",
+    "projects": []
   },
   {
     "name": "AI Dev Workflows",
@@ -48,28 +31,6 @@
     ]
   },
   {
-    "name": "Structured Prompting",
-    "icon": "brain",
-    "description": "Writing prompt templates, optimizing context windows, and guiding LLM logical reasoning paths.",
-    "category": "orchestration",
-    "color": "#FFEB3B",
-    "level": "Level Max",
-    "prereq": "AI Dev Workflows",
-    "status": "mastered",
-    "projects": []
-  },
-  {
-    "name": "AI Agent Orchestration",
-    "icon": "bot",
-    "description": "Designing and running autonomous multi-agent networks to perform complex development tasks.",
-    "category": "orchestration",
-    "color": "#9C27B0",
-    "level": "Level Max",
-    "prereq": "Structured Prompting",
-    "status": "mastered",
-    "projects": []
-  },
-  {
     "name": "API Architecture",
     "icon": "server",
     "description": "Building light REST APIs in Python (Flask/FastAPI) and orchestrating data exchange loops.",
@@ -82,26 +43,6 @@
       {
         "id": "iss-tracker",
         "title": "ISS Live Location Tracker"
-      },
-      {
-        "id": "earth-evolution-simulator",
-        "title": "Earth Evolution Simulator"
-      }
-    ]
-  },
-  {
-    "name": "Database Engineering",
-    "icon": "database",
-    "description": "Structuring relational databases and offline data synchronization via SQLite and Supabase.",
-    "category": "logic",
-    "color": "#3ECF8E",
-    "level": "Level Max",
-    "prereq": "API Architecture",
-    "status": "mastered",
-    "projects": [
-      {
-        "id": "paintmix-ai",
-        "title": "PaintMix AI"
       },
       {
         "id": "earth-evolution-simulator",
@@ -141,13 +82,13 @@
     "projects": []
   },
   {
-    "name": "Product Strategy & UX",
-    "icon": "layout",
-    "description": "Defining user flows, functional requirements, and shipping MVPs focused on target problems.",
-    "category": "product",
-    "color": "#FF1744",
+    "name": "Database Engineering",
+    "icon": "database",
+    "description": "Structuring relational databases and offline data synchronization via SQLite and Supabase.",
+    "category": "logic",
+    "color": "#3ECF8E",
     "level": "Level Max",
-    "prereq": "",
+    "prereq": "API Architecture",
     "status": "mastered",
     "projects": [
       {
@@ -155,8 +96,8 @@
         "title": "PaintMix AI"
       },
       {
-        "id": "metawipe",
-        "title": "MetaWipe"
+        "id": "earth-evolution-simulator",
+        "title": "Earth Evolution Simulator"
       }
     ]
   },
@@ -191,5 +132,64 @@
         "title": "MetaWipe"
       }
     ]
+  },
+  {
+    "name": "Product Strategy & UX",
+    "icon": "layout",
+    "description": "Defining user flows, functional requirements, and shipping MVPs focused on target problems.",
+    "category": "product",
+    "color": "#FF1744",
+    "level": "Level Max",
+    "prereq": "",
+    "status": "mastered",
+    "projects": [
+      {
+        "id": "paintmix-ai",
+        "title": "PaintMix AI"
+      },
+      {
+        "id": "metawipe",
+        "title": "MetaWipe"
+      }
+    ]
+  },
+  {
+    "name": "Stack-on-Demand",
+    "icon": "zap",
+    "description": "Learning and deploying tools as needed. Shipped projects in Next.js, Flutter/Dart, Python, and SQL.",
+    "category": "dynamic",
+    "color": "#FF9100",
+    "level": "Legendary",
+    "prereq": "",
+    "status": "legendary",
+    "projects": [
+      {
+        "id": "paintmix-ai",
+        "title": "PaintMix AI"
+      },
+      {
+        "id": "earth-evolution-simulator",
+        "title": "Earth Evolution Simulator"
+      },
+      {
+        "id": "iss-tracker",
+        "title": "ISS Live Location Tracker"
+      },
+      {
+        "id": "metawipe",
+        "title": "MetaWipe"
+      }
+    ]
+  },
+  {
+    "name": "Structured Prompting",
+    "icon": "brain",
+    "description": "Writing prompt templates, optimizing context windows, and guiding LLM logical reasoning paths.",
+    "category": "orchestration",
+    "color": "#FFEB3B",
+    "level": "Level Max",
+    "prereq": "AI Dev Workflows",
+    "status": "mastered",
+    "projects": []
   }
 ]

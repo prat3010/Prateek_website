@@ -20,26 +20,6 @@
     "status": "live"
   },
   {
-    "id": "paintmix-ai",
-    "title": "PaintMix AI",
-    "description": "A camera-based paint mixing assistant that samples colors and calculates precise mixing proportions.",
-    "longDescription": "PaintMix AI is a mobile application that uses a device's camera to sample any real-world target color and automatically calculates the exact paint proportions needed to mix and match that color using the user's existing paint inventory. Under the hood, PaintMix AI converts sampled RGB image data into XYZ and CIELAB color spaces to perform advanced perceptual color-matching calculations using Delta E (CIE76 and CIE94) distance optimization. The custom-built algorithmic engine evaluates and ranks one-color (closest single matches), two-color, and three-color paint combinations by weight ratio partitions from a local inventory managed using Drift and SQLite. Furthermore, it automatically generates color-theory-informed feedback, detailing shifts in lightness, saturation, and hue temperature (warm vs. cool shifts) to guide artists in tuning their mixtures.",
-    "image": "/images/project-paintmix.webp",
-    "tags": [
-      "Flutter",
-      "Dart",
-      "Riverpod",
-      "Drift",
-      "SQLite",
-      "Computer Vision"
-    ],
-    "liveUrl": "https://paintmix-ai.web.app",
-    "githubUrl": "https://github.com/prat3010/paintmix-ai",
-    "color": "#FF9100",
-    "isLive": false,
-    "status": "soon"
-  },
-  {
     "id": "iss-tracker",
     "title": "ISS Live Location Tracker",
     "description": "A real-time International Space Station tracker displaying reverse-geocoded terrestrial location or nearest ocean/landmass.",
@@ -77,6 +57,26 @@
     "liveUrl": "https://play.google.com/store/apps/details?id=com.metawipe",
     "githubUrl": "https://github.com/prat3010/metawipe",
     "color": "#00E676",
+    "isLive": false,
+    "status": "soon"
+  },
+  {
+    "id": "paintmix-ai",
+    "title": "PaintMix AI",
+    "description": "A camera-based paint mixing assistant that samples colors and calculates precise mixing proportions.",
+    "longDescription": "PaintMix AI is a mobile application that uses a device's camera to sample any real-world target color and automatically calculates the exact paint proportions needed to mix and match that color using the user's existing paint inventory. Under the hood, PaintMix AI converts sampled RGB image data into XYZ and CIELAB color spaces to perform advanced perceptual color-matching calculations using Delta E (CIE76 and CIE94) distance optimization. The custom-built algorithmic engine evaluates and ranks one-color (closest single matches), two-color, and three-color paint combinations by weight ratio partitions from a local inventory managed using Drift and SQLite. Furthermore, it automatically generates color-theory-informed feedback, detailing shifts in lightness, saturation, and hue temperature (warm vs. cool shifts) to guide artists in tuning their mixtures.",
+    "image": "/images/project-paintmix.webp",
+    "tags": [
+      "Flutter",
+      "Dart",
+      "Riverpod",
+      "Drift",
+      "SQLite",
+      "Computer Vision"
+    ],
+    "liveUrl": "https://paintmix-ai.web.app",
+    "githubUrl": "https://github.com/prat3010/paintmix-ai",
+    "color": "#FF9100",
     "isLive": false,
     "status": "soon"
   },
