@@ -17,7 +17,7 @@ export default function NoirSkyline() {
   const { theme } = useTheme();
   const { isTransitioning } = useThemeTransition();
   const [mounted] = useState(true);
-  const { scrollProgress: scrollYProgress, velocity: scrollVelocity } = useLenisScroll();
+  const { scrollProgress: scrollYProgress } = useLenisScroll();
 
   const isTransitioningRef = useRef(isTransitioning);
   useEffect(() => {

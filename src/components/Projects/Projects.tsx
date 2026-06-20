@@ -24,11 +24,13 @@ interface ProjectImageProps {
 }
 
 function ProjectImage({ src, alt, fill, width, height, sizes, className, style }: ProjectImageProps) {
+  const [prevSrc, setPrevSrc] = useState(src);
   const [error, setError] = useState(false);
 
-  useEffect(() => {
+  if (src !== prevSrc) {
+    setPrevSrc(src);
     setError(false);
-  }, [src]);
+  }
 
   if (error || !src) {
     return (

@@ -5,8 +5,6 @@ import type { ResumeData, WorkExperience } from '@/data/resume';
 import type { Certificate } from '@/data/certificates';
 import { useTheme } from '@/context/ThemeContext';
 import ComicPanel from '@/components/ui/ComicPanel';
-import SpeechBubble from '@/components/ui/SpeechBubble';
-import CaptionBox from '@/components/ui/CaptionBox';
 import { 
   Download, 
   ExternalLink, 

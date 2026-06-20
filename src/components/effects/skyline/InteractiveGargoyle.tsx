@@ -149,10 +149,12 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
 
     const isMovingState = ['leaping', 'gliding_fg', 'gliding_bg', 'returning', 'landing'].includes(state);
     if (!isMovingState) {
-      setPosX(1426);
-      setPosY(756);
-      setScale(1.0);
-      setOpacity(1.0);
+      requestAnimationFrame(() => {
+        setPosX(1426);
+        setPosY(756);
+        setScale(1.0);
+        setOpacity(1.0);
+      });
       return;
     }
 

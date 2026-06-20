@@ -104,7 +104,7 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
 - **Database Verification:** Run `./scripts/audit_db.py` to compare your live database tables against the local `supabase_schema.sql` file and identify any missing schemas.
 - Run `npx tsc --noEmit` after TypeScript changes.
 - **Troubleshooting stale TypeScript types:** If type checking (`tsc`) fails with stale cache references to deleted or renamed routes (e.g., in `.next/types/...`), clear the cache directory first: `rm -rf .next && npx tsc --noEmit`.
-- Run `npm run lint` when practical, but note that the repository may contain pre-existing lint failures. Report whether failures are new or existing.
+- **Lint Verification:** Ensure the linter (`./scripts/verify.sh` or `npm run lint`) passes cleanly (0 errors and warnings). All lint errors must be resolved before committing code.
 - Be cautious with `npm run build`: it runs `scripts/generate-git-log.js`, which writes generated data under `src/data/`.
 - For visual or interactive changes, run the dev server and inspect desktop and mobile behavior when feasible.
 

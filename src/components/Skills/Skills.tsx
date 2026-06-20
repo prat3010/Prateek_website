@@ -15,12 +15,13 @@ import {
   Layout, 
   Paintbrush, 
   Shield,
-  Target
+  Target,
+  type LucideIcon
 } from 'lucide-react';
 import styles from './Skills.module.css';
 
 // Map icon strings to Lucide components
-const iconMap: Record<string, React.ComponentType<any>> = {
+const iconMap: Record<string, LucideIcon> = {
   zap: Zap,
   sparkles: Sparkles,
   brain: Brain,
@@ -136,8 +137,8 @@ export default function Skills({ skills }: SkillsProps) {
                 className={styles.dossierColBadge} 
                 style={{ 
                   backgroundColor: 'var(--pop-pink)',
-                  ['--neon-accent' as any]: 'var(--neon-pink)'
-                }}
+                  '--neon-accent': 'var(--neon-pink)'
+                } as React.CSSProperties}
               >
                 I. AI ORCHESTRATION
               </span>
@@ -154,8 +155,8 @@ export default function Skills({ skills }: SkillsProps) {
                 className={styles.dossierColBadge} 
                 style={{ 
                   backgroundColor: 'var(--pop-blue)',
-                  ['--neon-accent' as any]: 'var(--neon-cyan)'
-                }}
+                  '--neon-accent': 'var(--neon-cyan)'
+                } as React.CSSProperties}
               >
                 II. SYSTEMS & LOGIC
               </span>
@@ -173,8 +174,8 @@ export default function Skills({ skills }: SkillsProps) {
                 className={styles.dossierColBadge} 
                 style={{ 
                   backgroundColor: 'var(--pop-red)',
-                  ['--neon-accent' as any]: 'var(--neon-yellow)'
-                }}
+                  '--neon-accent': 'var(--neon-yellow)'
+                } as React.CSSProperties}
               >
                 III. PRODUCT & UX
               </span>
@@ -189,8 +190,8 @@ export default function Skills({ skills }: SkillsProps) {
                 className={styles.dossierColBadge} 
                 style={{ 
                   backgroundColor: 'var(--pop-orange)',
-                  ['--neon-accent' as any]: 'var(--neon-purple)'
-                }}
+                  '--neon-accent': 'var(--neon-purple)'
+                } as React.CSSProperties}
               >
                 IV. DYNAMIC COMMAND
               </span>

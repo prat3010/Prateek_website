@@ -117,11 +117,13 @@ export default function SiteInfoConsole() {
     const initialDomNodes = typeof document !== 'undefined' ? document.getElementsByTagName('*').length : 0;
     const initialBundle = calculateBundleSize();
 
-    setStats(prev => ({
-      ...prev,
-      domNodes: initialDomNodes,
-      bundleSize: initialBundle
-    }));
+    requestAnimationFrame(() => {
+      setStats(prev => ({
+        ...prev,
+        domNodes: initialDomNodes,
+        bundleSize: initialBundle
+      }));
+    });
 
     // Uptime tick loop - tracks performance.now() (session lifetime since first tab load)
     const timer = setInterval(() => {
@@ -466,7 +468,7 @@ export default function SiteInfoConsole() {
 
     setTerminalHistory(prev => [...prev, ...response]);
     setTerminalInput('');
-  }, []);
+  }, [projects]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
