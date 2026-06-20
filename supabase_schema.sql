@@ -22,17 +22,33 @@ CREATE TABLE IF NOT EXISTS page_visits (
 -- 2. Configure Row Level Security (RLS)
 ALTER TABLE page_visits ENABLE ROW LEVEL SECURITY;
 
--- Allow anonymous inserts from client middleware/proxy
-CREATE POLICY "Allow public insert access" 
-  ON page_visits 
-  FOR INSERT 
-  WITH CHECK (true);
+-- IMPORTANT SECURITY NOTE:
+-- Public write access is disabled. Proxy logging is handled via server-side
+-- SUPABASE_SERVICE_ROLE_KEY which bypasses RLS policies automatically.
+-- To drop the old policy in your database run:
+-- DROP POLICY IF EXISTS "Allow public insert access" ON page_visits;
 
 -- Allow public read access to the dashboard for telemetry display
 CREATE POLICY "Allow public select access" 
   ON page_visits 
   FOR SELECT 
   USING (true);
+
+-- 90-day log retention / pruning trigger
+-- Deletes page visit logs older than 90 days automatically on new inserts.
+CREATE OR REPLACE FUNCTION purge_old_page_visits()
+RETURNS trigger AS $$
+BEGIN
+  DELETE FROM page_visits WHERE created_at < NOW() - INTERVAL '90 days';
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_purge_old_visits ON page_visits;
+CREATE TRIGGER trg_purge_old_visits
+AFTER INSERT ON page_visits
+FOR EACH STATEMENT
+EXECUTE FUNCTION purge_old_page_visits();
 
 -- 3. Database Indexes for Query Optimization (High Priority)
 -- Optimized for: cutoff date time filters, bot exclusions, and sorting

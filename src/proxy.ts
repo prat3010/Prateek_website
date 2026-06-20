@@ -12,6 +12,18 @@ async function getIpHash(ip: string): Promise<string> {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+// Blocklist of common bot exploit patterns to skip database logging
+const HONEYPOT_PATTERNS = [
+  /\.php$/,
+  /wp-admin/i,
+  /xmlrpc/i,
+  /\.env/,
+  /actuator/i,
+  /setup/i,
+  /config/i,
+  /\.well-known/i
+];
+
 export async function proxy(request: NextRequest, event: NextFetchEvent) {
   // If Supabase is not configured yet, silently pass
   if (!supabase) {
@@ -22,6 +34,12 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
   
   // Skip tracking for the admin dashboard itself to avoid padding your own view stats during debugging
   if (pathname.startsWith('/admin')) {
+    return NextResponse.next();
+  }
+
+  // Bypass database writes for vulnerability scans / honeypot URLs
+  const isHoneypot = HONEYPOT_PATTERNS.some(pattern => pattern.test(pathname));
+  if (isHoneypot) {
     return NextResponse.next();
   }
 
@@ -58,6 +76,11 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
 
   // Parse User Agent via Next.js helper
   const { device, browser, os, isBot } = userAgent(request);
+
+  // Bypass database writes for search engine crawlers and automated bots
+  if (isBot) {
+    return NextResponse.next();
+  }
 
   // Run the logging asynchronously using event.waitUntil
   // This sends the data in the background and does NOT add to the page load latency.

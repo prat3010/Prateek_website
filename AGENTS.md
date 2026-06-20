@@ -9,6 +9,10 @@ This is Prateek Sharma's personal portfolio, built with Next.js 16 App Router, R
 - Keep server-only code server-only. `src/data/supabase.ts` intentionally imports `server-only` and must not be pulled into client components.
 - Do not make broad refactors unless the task explicitly asks for them.
 
+### React 19 & Next.js 16 Best Practices
+- **Synchronous Effects:** Do not call `setState` synchronously within a `useEffect` body (e.g., initializing state from array items or resetting error states on mount). This triggers cascading renders. Instead, calculate initial values lazily during state initialization or use callbacks/event handlers.
+- **Client-Side Data Loading:** Prefer Server Components for static/dynamic database fetching. For interactive client components, prefer passing initial data as props or using React 19 Suspense patterns.
+
 ## Project Shape
 
 - `src/app/` contains routes, layouts, metadata, API routes, sitemap, robots, and the app shell.
@@ -31,6 +35,9 @@ This is Prateek Sharma's personal portfolio, built with Next.js 16 App Router, R
 ## Telemetry and Analytics
 
 - Analytics are tracked via `src/proxy.ts` using GDPR-compliant daily IP hashing and logged to Supabase `page_visits`.
+- **Security Hardening:** Direct public anonymous database inserts to `page_visits` are blocked at the RLS level. Writes are securely processed server-side by the proxy middleware using the `SUPABASE_SERVICE_ROLE_KEY`.
+- **Spam & Bot Filtering:** Automated crawler/bot user-agents and common honeypot scanning patterns (e.g., `.php`, `wp-admin`, `.env`) are discarded at the proxy level before any database write is initiated.
+- **Data Retention:** An automated database function and trigger prunes logs older than 90 days on every new insert to limit database storage growth.
 - Database structure, policies, and indexes are defined in `supabase_schema.sql`.
 
 ## The Synchronizer (Content-Management Helper)
@@ -48,6 +55,7 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
 - **Sidebar Monitors:**
   - **CI/CD Deployment Status:** Automatically tracks Vercel build status via GitHub API, displaying status updates in IST (Indian Standard Time).
   - **Pending Skill Approvals:** Lists queue of AI-extracted skills for immediate addition.
+- **Fallback Synchronization:** The dashboard writes to both the database and the local JSON fallbacks in `src/data/` (e.g., `projects.json`, `skills.json`). If database connections fail, the Next.js app automatically falls back to these files. Future content features must maintain this dual JSON/database fallback contract.
 
 
 ## Design And Content Principles
@@ -83,6 +91,7 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
 ## Testing And Verification
 
 - Run `npx tsc --noEmit` after TypeScript changes.
+- **Troubleshooting stale TypeScript types:** If type checking (`tsc`) fails with stale cache references to deleted or renamed routes (e.g., in `.next/types/...`), clear the cache directory first: `rm -rf .next && npx tsc --noEmit`.
 - Run `npm run lint` when practical, but note that the repository may contain pre-existing lint failures. Report whether failures are new or existing.
 - Be cautious with `npm run build`: it runs `scripts/generate-git-log.js`, which writes generated data under `src/data/`.
 - For visual or interactive changes, run the dev server and inspect desktop and mobile behavior when feasible.
