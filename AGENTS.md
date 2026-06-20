@@ -13,6 +13,11 @@ This is Prateek Sharma's personal portfolio, built with Next.js 16 App Router, R
 - **Synchronous Effects:** Do not call `setState` synchronously within a `useEffect` body (e.g., initializing state from array items or resetting error states on mount). This triggers cascading renders. Instead, calculate initial values lazily during state initialization or use callbacks/event handlers.
 - **Client-Side Data Loading:** Prefer Server Components for static/dynamic database fetching. For interactive client components, prefer passing initial data as props or using React 19 Suspense patterns.
 
+### Agent Behavior & Communication
+- **Explicit Manual Actions:** The agent must explicitly call out any manual configuration tasks (e.g., executing SQL migrations in the Supabase Dashboard, registering environment variables, or clearing deployment caches) directly in the final chat response. Do not hide manual action steps solely inside walkthroughs or implementation plans.
+- **Environment & DB Safety:** Always verify if database schema updates require manual script execution or if they affect local JSON fallback synchronization before applying code changes.
+- **Workspace Hygiene:** Do not make any code modifications or run tests without first checking `git status` to ensure you are not conflicting with uncommitted developer work.
+
 ## Project Shape
 
 - `src/app/` contains routes, layouts, metadata, API routes, sitemap, robots, and the app shell.
