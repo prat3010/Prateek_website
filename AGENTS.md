@@ -36,6 +36,7 @@ This is Prateek Sharma's personal portfolio, built with Next.js 16 App Router, R
 - `scripts/synchronizer.py` is a local content-management helper. Treat it as tooling, not runtime app code.
 - `scripts/seed_supabase.py` populates Supabase tables from the TypeScript data files (one-time bootstrap or re-seed).
 - `scripts/sync_supabase.py` shared REST API module used by the synchronizer to write to Supabase.
+- `scripts/backup_db.py` pulls live database data from Supabase and updates local JSON fallback files.
 - `scripts/verify.sh` runs a single-command test verification (clears cache, checks types, checks linting, runs test build).
 - `scripts/audit_db.py` runs a database schema audit comparing the local schema file against live Supabase tables.
 
@@ -102,6 +103,7 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
 
 - **Workspace Verification:** Run `./scripts/verify.sh` to execute full workspace validation (cleaning caches, checking types, running lints, and test builds).
 - **Database Verification:** Run `./scripts/audit_db.py` to compare your live database tables against the local `supabase_schema.sql` file and identify any missing schemas.
+- **Database Backup:** Run `./scripts/backup_db.py` to pull down live database records and update your local fallback JSON files in `src/data/`.
 - Run `npx tsc --noEmit` after TypeScript changes.
 - **Troubleshooting stale TypeScript types:** If type checking (`tsc`) fails with stale cache references to deleted or renamed routes (e.g., in `.next/types/...`), clear the cache directory first: `rm -rf .next && npx tsc --noEmit`.
 - **Lint Verification:** Ensure the linter (`./scripts/verify.sh` or `npm run lint`) passes cleanly (0 errors and warnings). All lint errors must be resolved before committing code.
