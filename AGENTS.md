@@ -14,15 +14,19 @@ This is Prateek Sharma's personal portfolio, built with Next.js 16 App Router, R
 - `src/app/` contains routes, layouts, metadata, API routes, sitemap, robots, and the app shell.
 - `src/proxy.ts` is the Next.js 16 proxy (formerly middleware) file that intercepts requests for telemetry logging.
 - `src/components/` contains portfolio sections, shared UI, visual effects, and the playground.
-- `src/data/` contains portfolio content: projects, skills, resume, certificates, Supabase client setup, and taglines.
+- `src/data/` contains type definitions, Supabase client setup, and taglines (data values live in Supabase).
+- `src/lib/data.ts` is the server-side data layer that fetches projects, skills, resume, and certificates from Supabase.
 - `src/data/git-log.json` contains generated commit logs and should not be modified manually.
 - `src/content/posts/` contains markdown blog posts read by `src/lib/markdown.ts`.
 - `src/context/` contains global client providers for theme and Lenis scroll state.
 - `src/hooks/` contains shared client hooks (e.g., typewriter effects).
 - `src/lib/` contains markdown parsers and application constants.
+- `src/app/api/` contains REST API routes for reading/writing portfolio data to Supabase.
 - `src/utils/pdfGenerator.ts` generates the downloadable resume PDF client-side.
 - `scripts/generate-git-log.js` writes generated commit data before builds.
 - `scripts/synchronizer.py` is a local content-management helper. Treat it as tooling, not runtime app code.
+- `scripts/seed_supabase.py` populates Supabase tables from the TypeScript data files (one-time bootstrap or re-seed).
+- `scripts/sync_supabase.py` shared REST API module used by the synchronizer to write to Supabase.
 
 ## Telemetry and Analytics
 
@@ -35,15 +39,15 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
 - **Running locally:** Execute `streamlit run scripts/synchronizer.py`. Requires `pip install streamlit` and `PIL/Pillow`.
 - **AI Integration:** Uses `GEMINI_API_KEY` from `.env.local` to call `gemini-2.5-flash` for scanning missing skills and analyzing certificates.
 - **Core Tabs:**
-  - **Edit Resume Manually:** Modifies `src/data/resume.ts`.
-  - **Sync Projects:** Modifies `src/data/projects.ts` (GitHub syncing & editing).
-  - **Sync Certificates:** Saves files to `public/certificates/` and metadata to `src/data/certificates.ts`.
-  - **Manage Skills:** Updates `src/data/skills.ts` and displays pending auto-scanned tags.
+  - **Edit Resume Manually:** Writes resume data to Supabase (plus file fallback).
+  - **Sync Projects:** Syncs GitHub projects to Supabase (plus file fallback).
+  - **Sync Certificates:** Saves files to `public/certificates/` and metadata to Supabase (plus file fallback).
+  - **Manage Skills:** Updates skills in Supabase (plus file fallback) and displays pending auto-scanned tags.
   - **Update Photos:** Manages profile and project images (azure vs. noir variants) in `public/images/`.
   - **Blog Editor:** Writes markdown posts directly to `src/content/posts/`.
 - **Sidebar Monitors:**
   - **CI/CD Deployment Status:** Automatically tracks Vercel build status via GitHub API, displaying status updates in IST (Indian Standard Time).
-  - **Pending Skill Approvals:** Lists queue of AI-extracted skills for immediate addition to `skills.ts`.
+  - **Pending Skill Approvals:** Lists queue of AI-extracted skills for immediate addition.
 
 
 ## Design And Content Principles
@@ -52,7 +56,6 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
 - Preserve the comic/noir visual identity, but do not add decorative effects at the cost of readability, accessibility, or load performance.
 - Portfolio copy must be credible. Avoid inflated claims, unverifiable metrics, or absolute privacy/security/compliance language unless the implementation proves it.
 - Project status, links, and descriptions must stay internally consistent. If a project is marked `soon`, do not present it as live.
-- Keep personal contact/resume data in `src/data/resume.ts` unless a task specifically asks to move it.
 
 ## Privacy And Security
 

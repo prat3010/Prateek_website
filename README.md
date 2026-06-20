@@ -7,7 +7,7 @@ A highly interactive, storyteller-driven personal portfolio website designed wit
 - **Framework:** Next.js 16 (App Router) & React 19
 - **Logic & Types:** TypeScript
 - **Styling:** CSS Modules & global comic theme system (Vanilla CSS variables)
-- **Database / Analytics:** Supabase (custom telemetry logging via Next.js Proxy)
+- **Database / Analytics:** Supabase (portfolio content storage + custom telemetry logging via Next.js Proxy)
 - **Contact Service:** Resend Email API
 - **Animations & Scrolling:** Framer Motion & Lenis smooth scroll
 - **3D & Visual Effects:** Three.js (Gremlin Parade) and SVG filter distortions
@@ -21,7 +21,7 @@ A highly interactive, storyteller-driven personal portfolio website designed wit
 Create a `.env.local` file in the root directory and add the following keys:
 
 ```env
-# Supabase Analytics
+# Supabase (Analytics + Portfolio Data)
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
@@ -31,6 +31,9 @@ CONTACT_EMAIL_TO=your_recipient_email
 
 # Gemini AI (for local Synchronizer engine)
 GEMINI_API_KEY=your_gemini_api_key
+
+# Shared secret for synchronizer / API route writes (any string)
+SYNC_API_KEY=your_sync_api_key
 ```
 
 ### 2. Next.js Web App
@@ -43,6 +46,8 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+> **First time setup:** Run the SQL from `supabase_schema.sql` in your Supabase dashboard SQL Editor, then seed data with `python3 scripts/seed_supabase.py`.
 
 ### 3. Local Synchronizer (Content-Management Helper)
 
