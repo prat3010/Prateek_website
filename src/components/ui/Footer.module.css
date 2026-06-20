@@ -714,7 +714,8 @@
     padding: 48px 0 24px;
   }
 
-  .panelsGrid {
+  .comicView .panelsGrid,
+  .noirView .panelsGrid {
     grid-template-columns: 1fr;
     gap: 24px;
   }
