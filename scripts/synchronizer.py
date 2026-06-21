@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 
 # Import the Supabase sync helper
 try:
-    from sync_supabase import sync_projects, sync_skills, sync_certificates, sync_resume
+    from sync_supabase import sync_projects, sync_skills, sync_certificates, sync_resume, call_rpc, fetch_page_visits
     HAS_SYNC = True
 except ImportError:
     HAS_SYNC = False
@@ -754,6 +754,7 @@ st.markdown("""
         padding-bottom: 5px;
         display: inline-block;
         letter-spacing: 0.5px;
+        text-transform: uppercase;
     }
 
     /* Target bordered containers in Streamlit */
@@ -763,7 +764,7 @@ st.markdown("""
         border-radius: 6px !important;
         padding: 24px !important;
         margin-bottom: 24px !important;
-        box-shadow: none !important;
+        box-shadow: 4px 4px 0px 0px #ffffff !important;
         transition: all 0.2s ease !important;
     }
     div[data-testid="stVerticalBlockBorder"]:hover {
@@ -773,10 +774,10 @@ st.markdown("""
     /* Target expanders */
     details[data-testid="stExpander"] {
         background-color: #000000 !important;
-        border: 1.5px solid #ffffff !important;
+        border: 2px solid #ffffff !important;
         border-radius: 4px !important;
         margin-bottom: 12px !important;
-        box-shadow: none !important;
+        box-shadow: 3px 3px 0px 0px #ffffff !important;
         transition: all 0.2s ease !important;
     }
     details[data-testid="stExpander"]:hover {
@@ -796,7 +797,7 @@ st.markdown("""
         letter-spacing: 0.5px !important;
         border: 2px solid #ffffff !important;
         border-radius: 4px !important;
-        box-shadow: none !important;
+        box-shadow: 3px 3px 0px 0px #888888 !important;
         transition: all 0.1s ease !important;
         padding: 0.5rem 1.5rem !important;
     }
@@ -804,9 +805,11 @@ st.markdown("""
         background-color: #cccccc !important;
         color: #000000 !important;
         border-color: #cccccc !important;
+        box-shadow: 2px 2px 0px 0px #666666 !important;
     }
     button[data-testid="baseButton-primary"]:active {
-        transform: translate(1px, 1px) !important;
+        transform: translate(2px, 2px) !important;
+        box-shadow: 1px 1px 0px 0px #666666 !important;
     }
 
     button[data-testid="baseButton-secondary"] {
@@ -815,7 +818,7 @@ st.markdown("""
         font-weight: 700 !important;
         border: 2px solid #ffffff !important;
         border-radius: 4px !important;
-        box-shadow: none !important;
+        box-shadow: 3px 3px 0px 0px #ffffff !important;
         transition: all 0.1s ease !important;
     }
     button[data-testid="baseButton-secondary"]:hover {
@@ -824,7 +827,8 @@ st.markdown("""
         border-color: #ffffff !important;
     }
     button[data-testid="baseButton-secondary"]:active {
-        transform: translate(1px, 1px) !important;
+        transform: translate(2px, 2px) !important;
+        box-shadow: 1px 1px 0px 0px #ffffff !important;
     }
 
     /* Danger hover styles for delete buttons */
@@ -841,6 +845,8 @@ st.markdown("""
         border: 2px solid #ffffff !important;
         border-radius: 4px !important;
         transition: border-color 0.2s !important;
+        font-family: 'Space Grotesk', sans-serif !important;
+        font-weight: 500 !important;
     }
     .stTextInput>div>div>input:focus, .stTextArea>div>div>textarea:focus {
         border-color: #ffffff !important;
@@ -863,7 +869,7 @@ st.markdown("""
     }
     section[data-testid="stSidebar"] h1, section[data-testid="stSidebar"] h2, section[data-testid="stSidebar"] h3 {
         color: #ffffff !important;
-        font-family: 'Playfair Display', serif !important;
+        font-family: 'Space Grotesk', sans-serif !important;
         font-weight: 800 !important;
     }
     section[data-testid="stSidebar"] .stButton>button {
@@ -885,6 +891,7 @@ st.markdown("""
         border-radius: 6px !important;
         border: 2px solid #ffffff !important;
         margin-bottom: 24px !important;
+        box-shadow: 3px 3px 0px 0px #ffffff !important;
     }
     .stTabs [data-baseweb="tab"] {
         height: 44px !important;
@@ -921,6 +928,108 @@ st.markdown("""
     }
     ::-webkit-scrollbar-thumb:hover {
         background: #cccccc;
+    }
+
+    /* Neo-brutalist Telemetry cards */
+    .telemetry-card {
+        border: 2px solid #ffffff;
+        box-shadow: 4px 4px 0px 0px #ffffff;
+        background-color: #000000;
+        border-radius: 6px;
+        padding: 16px;
+        margin-bottom: 16px;
+        text-align: center;
+    }
+    .telemetry-card-val {
+        font-size: 2.4rem;
+        font-weight: 900;
+        color: #ffffff;
+        font-family: 'JetBrains Mono', monospace !important;
+        margin-bottom: 4px;
+        letter-spacing: -1px;
+    }
+    .telemetry-card-lbl {
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: #8A8A93;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-family: 'Space Grotesk', sans-serif !important;
+    }
+
+    /* Custom progress bar graphs */
+    .bar-container {
+        margin-bottom: 14px;
+    }
+    .bar-label-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 4px;
+        font-size: 0.8rem;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-weight: 700;
+    }
+    .bar-label {
+        color: #ffffff;
+    }
+    .bar-count {
+        color: #8A8A93;
+    }
+    .bar-track {
+        background-color: #111111;
+        border: 1.5px solid #ffffff;
+        height: 14px;
+        border-radius: 2px;
+        overflow: hidden;
+    }
+    .bar-fill {
+        height: 100%;
+        background-color: #ffffff;
+    }
+
+    /* Skill capsules visual preview styling */
+    .skill-capsule-preview {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border: 1.5px solid #ffffff;
+        border-radius: 4px;
+        background-color: #000000;
+        font-family: 'Space Grotesk', sans-serif !important;
+        font-weight: 700;
+        font-size: 0.8rem;
+        box-shadow: 2px 2px 0px 0px #ffffff;
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+    .skill-capsule-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 6px;
+        border: 1px solid #ffffff;
+    }
+
+    /* Status badge */
+    .status-badge {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 0.65rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 700;
+        text-transform: uppercase;
+        border: 1px solid #ffffff;
+    }
+    .status-badge-bot {
+        background-color: #ff3b30;
+        color: #ffffff;
+        border-color: #ff3b30;
+    }
+    .status-badge-user {
+        background-color: #00E676;
+        color: #000000;
+        border-color: #00E676;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -1138,7 +1247,8 @@ if 'pending_skills' not in st.session_state:
 
 
 # Set up tabs
-tab_edit, tab_project, tab_cert, tab_skills, tab_photos, tab_blog = st.tabs([
+tab_analytics, tab_edit, tab_project, tab_cert, tab_skills, tab_photos, tab_blog = st.tabs([
+    "Analytics & Telemetry",
     "Edit Resume Manually", 
     "Sync Projects", 
     "Sync Certificates",
@@ -1146,6 +1256,187 @@ tab_edit, tab_project, tab_cert, tab_skills, tab_photos, tab_blog = st.tabs([
     "Update Photos",
     "Blog Editor"
 ])
+
+# ──────────────────────────────────────────
+# TAB: ANALYTICS & TELEMETRY
+# ──────────────────────────────────────────
+with tab_analytics:
+    st.markdown('<div class="section-header">Live Telemetry & Analytics Dashboard</div>', unsafe_allow_html=True)
+    st.write("Real-time telemetry aggregated directly from Supabase DB `page_visits` logs.")
+
+    if not HAS_SYNC:
+        st.warning("⚠️ Supabase sync configuration not found or database offline. Telemetry is unavailable.")
+    else:
+        # Timeframe selector
+        timeframe_opts = {
+            "Last 24 Hours": timedelta(days=1),
+            "Last 7 Days": timedelta(days=7),
+            "Last 30 Days": timedelta(days=30),
+            "Last 90 Days": timedelta(days=90),
+        }
+        selected_timeframe = st.selectbox("Select Timeframe Filter:", list(timeframe_opts.keys()), index=1)
+        
+        # Calculate cutoff time in ISO format
+        cutoff_dt = datetime.now() - timeframe_opts[selected_timeframe]
+        cutoff_iso = cutoff_dt.isoformat() + "Z"
+        
+        # Fetch summary data via RPC
+        with st.spinner("Fetching analytics summary..."):
+            summary_res = call_rpc("get_analytics_summary", {"cutoff_time": cutoff_iso})
+            
+        if not summary_res:
+            st.error("Could not load analytics summary. Please check database permissions or stored procedures.")
+        else:
+            # Structuring summary details
+            total_views = summary_res.get("total_views", 0)
+            total_bots = summary_res.get("total_bots", 0)
+            unique_visitors = summary_res.get("unique_visitors", 0)
+            desktop_count = summary_res.get("desktop_count", 0)
+            mobile_count = summary_res.get("mobile_count", 0)
+            tablet_count = summary_res.get("tablet_count", 0)
+            
+            # Key stats layout
+            c1, c2, c3, c4 = st.columns(4)
+            with c1:
+                st.markdown(f"""
+                <div class="telemetry-card">
+                    <div class="telemetry-card-val">{total_views}</div>
+                    <div class="telemetry-card-lbl">Page Views</div>
+                </div>
+                """, unsafe_allow_html=True)
+            with c2:
+                st.markdown(f"""
+                <div class="telemetry-card">
+                    <div class="telemetry-card-val">{unique_visitors}</div>
+                    <div class="telemetry-card-lbl">Unique Visitors</div>
+                </div>
+                """, unsafe_allow_html=True)
+            with c3:
+                bot_percent = round((total_bots / (total_views + total_bots) * 100)) if (total_views + total_bots) > 0 else 0
+                st.markdown(f"""
+                <div class="telemetry-card">
+                    <div class="telemetry-card-val">{total_bots} <span style="font-size: 1rem; color: #8A8A93;">({bot_percent}%)</span></div>
+                    <div class="telemetry-card-lbl">Bot Blocks</div>
+                </div>
+                """, unsafe_allow_html=True)
+            with c4:
+                # Desktop/Mobile breakdown
+                total_dev = desktop_count + mobile_count + tablet_count
+                mob_percent = round((mobile_count / total_dev * 100)) if total_dev > 0 else 0
+                st.markdown(f"""
+                <div class="telemetry-card">
+                    <div class="telemetry-card-val">{mob_percent}%</div>
+                    <div class="telemetry-card-lbl">Mobile Visitors</div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+            # Helper function to render visual progress bars
+            def render_bar_chart(items, title, value_suffix=""):
+                st.markdown(f"#### {title}")
+                if not items:
+                    st.info("No records found in timeframe.")
+                    return
+                max_val = max([item.get("count", 1) for item in items])
+                for item in items:
+                    name = item.get("path") or item.get("name") or item.get("country") or item.get("region") or item.get("city") or "Unknown"
+                    count = item.get("count", 0)
+                    fill_percent = (count / max_val * 100) if max_val > 0 else 0
+                    st.markdown(f"""
+                    <div class="bar-container">
+                        <div class="bar-label-row">
+                            <span class="bar-label">{name}</span>
+                            <span class="bar-count">{count}{value_suffix}</span>
+                        </div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: {fill_percent}%;"></div>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+            st.markdown("---")
+            
+            # Split breakdowns in two columns
+            col_left, col_right = st.columns(2)
+            with col_left:
+                popular_pages = summary_res.get("popular_pages", [])
+                render_bar_chart(popular_pages, "Popular Paths / Routes")
+                
+                st.markdown("<br>", unsafe_allow_html=True)
+                top_referrers = summary_res.get("top_referrers", [])
+                # Filter out empty referrers
+                top_referrers = [r for r in top_referrers if r.get("name")]
+                render_bar_chart(top_referrers[:6], "Top Referrers")
+                
+            with col_right:
+                top_countries = summary_res.get("countries", [])
+                render_bar_chart(top_countries[:6], "Geographic - Countries")
+                
+                st.markdown("<br>", unsafe_allow_html=True)
+                top_cities = summary_res.get("cities", [])
+                render_bar_chart(top_cities[:6], "Geographic - Cities")
+                
+        # Recent logs section
+        st.markdown("---")
+        st.markdown("### Recent Page Visits (Last 50)")
+        
+        with st.spinner("Fetching latest visits..."):
+            recent_visits = fetch_page_visits([('order', 'created_at.desc'), ('limit', '50')])
+            
+        if not recent_visits:
+            st.info("No page visits found in log history.")
+        else:
+            # Let's render as a clean retro brutalist monospaced table or custom lines
+            # Columns: Timestamp (IST), Path, Country, OS/Browser, Referrer, Bot?
+            headers_col = st.columns([1.5, 2, 1.2, 1.5, 1.8, 1])
+            with headers_col[0]: st.markdown("**Timestamp (IST)**")
+            with headers_col[1]: st.markdown("**Route**")
+            with headers_col[2]: st.markdown("**Location**")
+            with headers_col[3]: st.markdown("**Platform**")
+            with headers_col[4]: st.markdown("**Referrer**")
+            with headers_col[5]: st.markdown("**Type**")
+            
+            st.markdown("<hr style='margin: 8px 0; border-color: #ffffff; border-width: 1.5px;'>", unsafe_allow_html=True)
+            
+            for visit in recent_visits:
+                # Convert UTC timestamp to IST
+                timestamp_str = visit.get("created_at", "")
+                ist_str = "N/A"
+                if timestamp_str:
+                    try:
+                        # Clean fractional seconds if any
+                        clean_time_str = timestamp_str.split(".")[0].replace("Z", "")
+                        if "+" in clean_time_str:
+                            clean_time_str = clean_time_str.split("+")[0]
+                        dt = datetime.strptime(clean_time_str, "%Y-%m-%dT%H:%M:%S")
+                        ist_dt = dt + timedelta(hours=5, minutes=30)
+                        ist_str = ist_dt.strftime("%b %d, %I:%M:%S %p")
+                    except Exception as ex:
+                        ist_str = timestamp_str[:19]
+                        
+                route = visit.get("path", "/")
+                country = visit.get("country", "")
+                city = visit.get("city", "")
+                location = f"📍 {city}, {country}" if city and country else (country or "Unknown")
+                
+                browser = visit.get("browser", "")
+                os_name = visit.get("os", "")
+                platform = f"{browser} / {os_name}" if browser and os_name else (browser or os_name or "Unknown")
+                
+                ref = visit.get("referrer", "")
+                ref_display = ref if ref else "-"
+                
+                is_bot = visit.get("is_bot", False)
+                type_badge = '<span class="status-badge status-badge-bot">BOT</span>' if is_bot else '<span class="status-badge status-badge-user">USER</span>'
+                
+                row_col = st.columns([1.5, 2, 1.2, 1.5, 1.8, 1])
+                with row_col[0]: st.code(ist_str)
+                with row_col[1]: st.code(route)
+                with row_col[2]: st.markdown(f"<span style='font-size:0.85rem;'>{location}</span>", unsafe_allow_html=True)
+                with row_col[3]: st.markdown(f"<span style='font-size:0.85rem;'>{platform}</span>", unsafe_allow_html=True)
+                with row_col[4]: st.markdown(f"<span style='font-size:0.85rem;'>{ref_display}</span>", unsafe_allow_html=True)
+                with row_col[5]: st.markdown(type_badge, unsafe_allow_html=True)
+                
+                st.markdown("<hr style='margin: 4px 0; opacity: 0.15;'>", unsafe_allow_html=True)
 
 # ──────────────────────────────────────────
 # TAB 1: RESUME EDITOR
@@ -1229,13 +1520,23 @@ with tab_edit:
                     bullets_to_remove = []
                     for b_idx, bullet in enumerate(exp.get('bullets', [])):
                         st.markdown(f"**Bullet #{b_idx + 1}**")
-                        col_b1, col_b2 = st.columns(2)
-                        with col_b1:
-                            bullet['general'] = st.text_area("General Description", bullet.get('general', ''), key=f"bul_g_{exp_idx}_{b_idx}", height=75)
-                            bullet['fullstack'] = st.text_area("Full-Stack Description", bullet.get('fullstack', ''), key=f"bul_f_{exp_idx}_{b_idx}", height=75)
-                        with col_b2:
-                            bullet['ai'] = st.text_area("AI/Agent Description", bullet.get('ai', ''), key=f"bul_a_{exp_idx}_{b_idx}", height=75)
-                            bullet['creative'] = st.text_area("Creative/Animation Description", bullet.get('creative', ''), key=f"bul_c_{exp_idx}_{b_idx}", height=75)
+                        
+                        # Archetype variant selection tabs
+                        tab_g, tab_f, tab_a, tab_c = st.tabs([
+                            "General / Core", 
+                            "Full-Stack / Backend", 
+                            "AI / Agents", 
+                            "Creative / UI"
+                        ])
+                        
+                        with tab_g:
+                            bullet['general'] = st.text_area("General Description", bullet.get('general', ''), key=f"bul_g_{exp_idx}_{b_idx}", height=80)
+                        with tab_f:
+                            bullet['fullstack'] = st.text_area("Full-Stack Description", bullet.get('fullstack', ''), key=f"bul_f_{exp_idx}_{b_idx}", height=80)
+                        with tab_a:
+                            bullet['ai'] = st.text_area("AI/Agent Description", bullet.get('ai', ''), key=f"bul_a_{exp_idx}_{b_idx}", height=80)
+                        with tab_c:
+                            bullet['creative'] = st.text_area("Creative/Animation Description", bullet.get('creative', ''), key=f"bul_c_{exp_idx}_{b_idx}", height=80)
                         
                         if st.button(f"Remove Bullet #{b_idx+1}", key=f"rem_bul_{exp_idx}_{b_idx}"):
                             bullets_to_remove.append(b_idx)
@@ -1276,7 +1577,7 @@ with tab_edit:
                         res['education'].pop(edu_idx)
                         st.rerun()
 
-        # Save Button
+        # Save Button & Live JSON View
         st.markdown("---")
         if st.button("Save Resume Changes", type="primary", use_container_width=True):
             try:
@@ -1284,6 +1585,9 @@ with tab_edit:
                 st.success("Resume updated and saved successfully directly in src/data/resume.ts!")
             except Exception as e:
                 st.error(f"Failed to write file: {e}")
+                
+        with st.expander("🔍 Live JSON Code View (Resume Object)", expanded=False):
+            st.code(json.dumps(res, indent=2), language="json")
 
 # ──────────────────────────────────────────
 # TAB 2: SYNC PROJECTS
@@ -1498,6 +1802,27 @@ with tab_project:
             p_title = project.get("title", "Untitled Project")
             
             with st.expander(f"📁 {p_title} (ID: {p_id})"):
+                # Visual project card preview
+                tags_html = " ".join([f'<span class="skill-capsule-preview" style="box-shadow: 2px 2px 0px 0px {project.get("color", "#00E676")}; border-color: #ffffff; padding: 2px 8px; font-size: 0.7rem; margin-right: 4px; margin-bottom: 4px;"><span class="skill-capsule-dot" style="background-color: {project.get("color", "#00E676")};"></span>{t}</span>' for t in project.get("tags", [])])
+                status_style = {
+                    "live": "background-color: #00E676; color: #000000; border-color: #00E676;",
+                    "soon": "background-color: #FF9100; color: #000000; border-color: #FF9100;",
+                    "personal": "background-color: #2979FF; color: #ffffff; border-color: #2979FF;"
+                }
+                curr_status = project.get("status", "live" if project.get("isLive") else "soon")
+                status_badge_html = f'<span class="status-badge" style="{status_style.get(curr_status, "")}">{curr_status.upper()}</span>'
+                st.markdown(f"""
+                <div style="border: 2px solid #ffffff; box-shadow: 3px 3px 0px 0px {project.get("color", "#00E676")}; border-radius: 6px; padding: 16px; background-color: #050505; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <span style="font-size: 0.75rem; color: #8A8A93; font-weight: 700; text-transform: uppercase;">Card Preview</span>
+                        {status_badge_html}
+                    </div>
+                    <h3 style="margin: 0 0 6px 0; color: #ffffff; font-family: 'Space Grotesk', sans-serif; font-weight: 800;">{p_title}</h3>
+                    <p style="font-size: 0.85rem; color: #D1D1D6; margin: 0 0 12px 0; font-family: 'Space Grotesk', sans-serif;">{project.get("description", "")}</p>
+                    <div style="display: flex; flex-wrap: wrap;">{tags_html}</div>
+                </div>
+                """, unsafe_allow_html=True)
+                
                 col_p1, col_p2 = st.columns([1, 2])
                 
                 with col_p1:
@@ -1860,7 +2185,8 @@ with tab_cert:
                     # Tags list
                     tags = cert.get("tags", [])
                     if tags:
-                        st.markdown(" ".join([f"`#{t}`" for t in tags]))
+                        tags_html = " ".join([f'<span class="skill-capsule-preview" style="box-shadow: 2px 2px 0px 0px #ffffff; border-color: #ffffff; padding: 2px 8px; font-size: 0.7rem; margin-right: 4px; margin-bottom: 4px;"><span class="skill-capsule-dot" style="background-color: #ffffff;"></span>{t}</span>' for t in tags])
+                        st.markdown(f'<div style="display: flex; flex-wrap: wrap; margin-bottom: 12px;">{tags_html}</div>', unsafe_allow_html=True)
                         
                     # Remove button
                     if st.button(f"Remove Certificate", key=f"del_cert_{cert_id}", type="secondary"):
@@ -2009,16 +2335,43 @@ with tab_skills:
                 
             st.markdown(f"### {category_display_names[cat_key].split(' (')[0]}")
             
+            # Display skills in a 2-column grid
+            cols = st.columns(2)
             for s_idx, skill in enumerate(group_skills):
+                col_i = cols[s_idx % 2]
                 s_name = skill.get('name', 'Unnamed Skill')
                 s_id = slugify(s_name)
                 key_prefix = f"edit_skill_{s_id}"
                 
-                with st.expander(f"🔧 {s_name} (Icon: {skill.get('icon', 'sparkles')})"):
-                    col_e1, col_e2 = st.columns(2)
-                    with col_e1:
+                # Retrieve parameters for the tag capsule preview
+                s_color = skill.get('color', '#00E676')
+                s_icon = skill.get('icon', 'sparkles')
+                s_level = skill.get('level', '')
+                s_status = skill.get('status', '')
+                
+                # Label for preview badge
+                badge_label = s_name
+                if s_level:
+                    badge_label += f" ({s_level})"
+                if s_status:
+                    badge_label += f" [{s_status.upper()}]"
+                    
+                with col_i:
+                    expander_label = f"🔧 {s_name}"
+                    with st.expander(expander_label):
+                        # Visual capsule preview
+                        st.markdown(f"""
+                        <div style="margin-bottom: 12px;">
+                            <span style="font-size: 0.75rem; color: #8A8A93; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 4px;">Live Preview:</span>
+                            <div class="skill-capsule-preview" style="box-shadow: 2px 2px 0px 0px {s_color}; border-color: #ffffff;">
+                                <span class="skill-capsule-dot" style="background-color: {s_color};"></span>
+                                <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">{badge_label}</span>
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        
                         edit_name = st.text_input("Skill Name", value=s_name, key=f"{key_prefix}_name")
-                        edit_icon = st.text_input("Lucide Icon Name", value=skill.get('icon', 'sparkles'), key=f"{key_prefix}_icon")
+                        edit_icon = st.text_input("Lucide Icon Name", value=s_icon, key=f"{key_prefix}_icon")
                         
                         default_cat_idx = categories_opts.index(skill.get('category', 'dynamic'))
                         edit_cat = st.selectbox(
@@ -2028,9 +2381,8 @@ with tab_skills:
                             format_func=lambda x: categories_labels[x],
                             key=f"{key_prefix}_cat"
                         )
-                    with col_e2:
-                        edit_color = st.text_input("Hex Color Code", value=skill.get('color', '#00E676'), key=f"{key_prefix}_color")
-                        edit_level = st.text_input("Skill Level (Optional)", value=skill.get('level', ''), key=f"{key_prefix}_level")
+                        edit_color = st.text_input("Hex Color Code", value=s_color, key=f"{key_prefix}_color")
+                        edit_level = st.text_input("Skill Level (Optional)", value=s_level, key=f"{key_prefix}_level")
                         
                         other_skills = [sk.get('name') for sk in st.session_state.skills if sk.get('name') and sk.get('name') != s_name]
                         curr_prereq = skill.get('prereq')
@@ -2041,83 +2393,83 @@ with tab_skills:
                         prereq_idx = prereq_opts.index(curr_prereq)
                         edit_prereq = st.selectbox("Prerequisite (Optional)", options=prereq_opts, index=prereq_idx, key=f"{key_prefix}_prereq")
                         
-                    curr_status = skill.get('status')
-                    status_opts = [None, 'legendary', 'mastered', 'quest']
-                    if curr_status not in status_opts:
-                        curr_status = None
-                    status_idx = status_opts.index(curr_status)
-                    edit_status = st.selectbox("Status (Optional)", options=status_opts, index=status_idx, key=f"{key_prefix}_status")
-                    
-                    edit_desc = st.text_area("Description / Summary", value=skill.get('description', ''), key=f"{key_prefix}_desc")
-                    
-                    curr_linked_projects = [p.get('id') for p in skill.get('projects', []) if p.get('id')]
-                    curr_linked_projects = [pid for pid in curr_linked_projects if pid in project_options]
-                    
-                    edit_selected_projects = st.multiselect(
-                        "Link to Projects (Optional)", 
-                        options=project_ids, 
-                        default=curr_linked_projects,
-                        format_func=lambda x: project_options[x],
-                        key=f"{key_prefix}_projects"
-                    )
-                    
-                    col_b1, col_b2 = st.columns([1, 1])
-                    with col_b1:
-                        if st.button(f"Save Changes", key=f"{key_prefix}_save_btn", type="primary", use_container_width=True):
-                            if not edit_name.strip():
-                                st.error("Skill Name is required!")
-                            elif edit_name.strip().lower() != s_name.lower() and any(sk.get("name", "").lower() == edit_name.strip().lower() for sk in st.session_state.skills):
-                                st.error(f"Another skill named '{edit_name.strip()}' already exists!")
-                            else:
-                                updated_s = {
-                                    "name": edit_name.strip(),
-                                    "icon": edit_icon.strip(),
-                                    "description": edit_desc.strip(),
-                                    "category": edit_cat,
-                                    "color": edit_color.strip()
-                                }
-                                if edit_level.strip():
-                                    updated_s["level"] = edit_level.strip()
-                                if edit_prereq:
-                                    updated_s["prereq"] = edit_prereq
-                                if edit_status:
-                                    updated_s["status"] = edit_status
-                                if edit_selected_projects:
-                                    updated_s["projects"] = [{"title": project_options[pid], "id": pid} for pid in edit_selected_projects]
-                                    
+                        curr_status = skill.get('status')
+                        status_opts = [None, 'legendary', 'mastered', 'quest']
+                        if curr_status not in status_opts:
+                            curr_status = None
+                        status_idx = status_opts.index(curr_status)
+                        edit_status = st.selectbox("Status (Optional)", options=status_opts, index=status_idx, key=f"{key_prefix}_status")
+                        
+                        edit_desc = st.text_area("Description / Summary", value=skill.get('description', ''), key=f"{key_prefix}_desc")
+                        
+                        curr_linked_projects = [p.get('id') for p in skill.get('projects', []) if p.get('id')]
+                        curr_linked_projects = [pid for pid in curr_linked_projects if pid in project_options]
+                        
+                        edit_selected_projects = st.multiselect(
+                            "Link to Projects (Optional)", 
+                            options=project_ids, 
+                            default=curr_linked_projects,
+                            format_func=lambda x: project_options[x],
+                            key=f"{key_prefix}_projects"
+                        )
+                        
+                        col_b1, col_b2 = st.columns([1, 1])
+                        with col_b1:
+                            if st.button(f"Save Changes", key=f"{key_prefix}_save_btn", type="primary", use_container_width=True):
+                                if not edit_name.strip():
+                                    st.error("Skill Name is required!")
+                                elif edit_name.strip().lower() != s_name.lower() and any(sk.get("name", "").lower() == edit_name.strip().lower() for sk in st.session_state.skills):
+                                    st.error(f"Another skill named '{edit_name.strip()}' already exists!")
+                                else:
+                                    updated_s = {
+                                        "name": edit_name.strip(),
+                                        "icon": edit_icon.strip(),
+                                        "description": edit_desc.strip(),
+                                        "category": edit_cat,
+                                        "color": edit_color.strip()
+                                    }
+                                    if edit_level.strip():
+                                        updated_s["level"] = edit_level.strip()
+                                    if edit_prereq:
+                                        updated_s["prereq"] = edit_prereq
+                                    if edit_status:
+                                        updated_s["status"] = edit_status
+                                    if edit_selected_projects:
+                                        updated_s["projects"] = [{"title": project_options[pid], "id": pid} for pid in edit_selected_projects]
+                                        
+                                    updated_skills_list = []
+                                    for sk in st.session_state.skills:
+                                        if sk.get('name') == s_name:
+                                            updated_skills_list.append(updated_s)
+                                        else:
+                                            if edit_name.strip() != s_name and sk.get('prereq') == s_name:
+                                                sk['prereq'] = edit_name.strip()
+                                            updated_skills_list.append(sk)
+                                            
+                                    try:
+                                        write_skills_file(updated_skills_list)
+                                        st.session_state.skills = updated_skills_list
+                                        st.success(f"Successfully updated skill: **{edit_name.strip()}**!")
+                                        st.rerun()
+                                    except Exception as e:
+                                        st.error(f"Failed to save skill changes: {e}")
+                                        
+                        with col_b2:
+                            if st.button(f"Delete Skill", key=f"{key_prefix}_del_btn", type="secondary", use_container_width=True):
                                 updated_skills_list = []
                                 for sk in st.session_state.skills:
-                                    if sk.get('name') == s_name:
-                                        updated_skills_list.append(updated_s)
-                                    else:
-                                        if edit_name.strip() != s_name and sk.get('prereq') == s_name:
-                                            sk['prereq'] = edit_name.strip()
+                                    if sk.get('name') != s_name:
+                                        if sk.get('prereq') == s_name:
+                                            sk.pop('prereq', None)
                                         updated_skills_list.append(sk)
                                         
                                 try:
                                     write_skills_file(updated_skills_list)
                                     st.session_state.skills = updated_skills_list
-                                    st.success(f"Successfully updated skill: **{edit_name.strip()}**!")
+                                    st.success(f"Successfully deleted skill: **{s_name}**!")
                                     st.rerun()
                                 except Exception as e:
-                                    st.error(f"Failed to save skill changes: {e}")
-                                    
-                    with col_b2:
-                        if st.button(f"Delete Skill", key=f"{key_prefix}_del_btn", type="secondary", use_container_width=True):
-                            updated_skills_list = []
-                            for sk in st.session_state.skills:
-                                if sk.get('name') != s_name:
-                                    if sk.get('prereq') == s_name:
-                                        sk.pop('prereq', None)
-                                    updated_skills_list.append(sk)
-                                    
-                            try:
-                                write_skills_file(updated_skills_list)
-                                st.session_state.skills = updated_skills_list
-                                st.success(f"Successfully deleted skill: **{s_name}**!")
-                                st.rerun()
-                            except Exception as e:
-                                st.error(f"Failed to delete skill: {e}")
+                                    st.error(f"Failed to delete skill: {e}")
 
 # ──────────────────────────────────────────
 # TAB 5: UPDATE PHOTOS

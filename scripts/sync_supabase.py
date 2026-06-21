@@ -203,3 +203,29 @@ def fetch_resume():
         return res[0].get('data')
     return None
 
+def call_rpc(func_name, body=None):
+    _load_env()
+    if not _URL or not _KEY:
+        return None
+    url = f'{_URL}/rest/v1/rpc/{func_name}'
+    headers = {
+        'apikey': _KEY,
+        'Authorization': f'Bearer {_KEY}',
+        'Content-Type': 'application/json',
+    }
+    data = json.dumps(body).encode() if body else None
+    req = urllib.request.Request(url, data=data, headers=headers, method='POST')
+    try:
+        with urllib.request.urlopen(req) as resp:
+            return json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        print(f'  HTTP {e.code} calling RPC {func_name}: {e.read().decode()}')
+        return None
+    except Exception as e:
+        print(f'  Error calling RPC {func_name}: {e}')
+        return None
+
+def fetch_page_visits(params=None):
+    return _supabase_rest('page_visits', method='GET', params=params)
+
+
