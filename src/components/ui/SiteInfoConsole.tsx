@@ -439,7 +439,9 @@ export default function SiteInfoConsole() {
           { text: '  - Core Script: scripts/synchronizer.py (Python 3)', type: 'output' },
           { text: '  - Interface: Streamlit Local Dashboard', type: 'output' },
           { text: '  - AI Parsing Integration: Gemini 2.5 Flash API (Structured JSON Mode)', type: 'output' },
-          { text: '  - Target Data Sync: src/data/projects.ts, src/data/skills.ts', type: 'output' },
+          { text: '  - Database Sync: Supabase Live Database', type: 'output' },
+          { text: '  - Codebase Fallbacks: JSON records (projects, skills, certs, resume)', type: 'output' },
+          { text: '  - Blog Output: Markdown files in src/content/posts/', type: 'output' },
           { text: '  - Local Command: streamlit run scripts/synchronizer.py', type: 'output' }
         ];
         break;
