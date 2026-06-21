@@ -160,3 +160,89 @@ ALTER TABLE profile ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow public select profile" ON profile FOR SELECT USING (true);
 CREATE POLICY "Allow service insert profile" ON profile FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow service update profile" ON profile FOR UPDATE USING (true);
+
+-- ============================================================
+-- 8. High-Performance Analytics Aggregation Stored Procedure
+-- ============================================================
+-- Returns aggregated telemetry statistics in a single query pass
+-- to minimize database connection hits and JSON transfer size.
+CREATE OR REPLACE FUNCTION get_analytics_summary(cutoff_time TIMESTAMPTZ)
+RETURNS JSON AS $$
+DECLARE
+  result JSON;
+BEGIN
+  WITH stats AS (
+    SELECT 
+      COUNT(*) FILTER (WHERE is_bot = FALSE) as total_views,
+      COUNT(*) FILTER (WHERE is_bot = TRUE) as total_bots,
+      COUNT(DISTINCT ip_hash) FILTER (WHERE is_bot = FALSE) as unique_visitors,
+      COUNT(*) FILTER (WHERE is_bot = FALSE AND device = 'desktop') as desktop_count,
+      COUNT(*) FILTER (WHERE is_bot = FALSE AND device = 'mobile') as mobile_count,
+      COUNT(*) FILTER (WHERE is_bot = FALSE AND device = 'tablet') as tablet_count
+    FROM page_visits
+    WHERE created_at >= cutoff_time
+  ),
+  pages AS (
+    SELECT COALESCE(json_agg(p), '[]'::json) as popular_pages FROM (
+      SELECT path, COUNT(*) as count
+      FROM page_visits
+      WHERE is_bot = FALSE AND created_at >= cutoff_time
+      GROUP BY path
+      ORDER BY count DESC
+      LIMIT 6
+    ) p
+  ),
+  referrers AS (
+    SELECT COALESCE(json_agg(r), '[]'::json) as top_referrers FROM (
+      SELECT referrer as name, COUNT(*) as count
+      FROM page_visits
+      WHERE is_bot = FALSE AND created_at >= cutoff_time
+      GROUP BY referrer
+      ORDER BY count DESC
+      LIMIT 10
+    ) r
+  ),
+  countries AS (
+    SELECT COALESCE(json_agg(c), '[]'::json) as top_countries FROM (
+      SELECT country as code, COUNT(*) as count
+      FROM page_visits
+      WHERE is_bot = FALSE AND created_at >= cutoff_time
+      GROUP BY country
+      ORDER BY count DESC
+      LIMIT 5
+    ) c
+  ),
+  timeline AS (
+    SELECT COALESCE(json_agg(t), '[]'::json) as daily_views FROM (
+      SELECT 
+        DATE_TRUNC('day', created_at AT TIME ZONE 'UTC')::DATE::TEXT as date_str,
+        COUNT(*) as count
+      FROM page_visits
+      WHERE is_bot = FALSE AND created_at >= (NOW() AT TIME ZONE 'UTC') - INTERVAL '14 days'
+      GROUP BY DATE_TRUNC('day', created_at AT TIME ZONE 'UTC')
+      ORDER BY date_str ASC
+    ) t
+  )
+  SELECT row_to_json(res) INTO result FROM (
+    SELECT 
+      s.total_views,
+      s.total_bots,
+      s.unique_visitors,
+      s.desktop_count,
+      s.mobile_count,
+      s.tablet_count,
+      p.popular_pages,
+      r.top_referrers,
+      c.top_countries,
+      t.daily_views
+    FROM stats s
+    CROSS JOIN pages p
+    CROSS JOIN referrers r
+    CROSS JOIN countries c
+    CROSS JOIN timeline t
+  ) res;
+  
+  RETURN result;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+

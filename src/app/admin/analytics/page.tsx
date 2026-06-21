@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import RefreshButton from './RefreshButton';
-import { fetchVisits, aggregateVisits } from './_lib/analytics';
+import { getAnalyticsData } from './_lib/analytics';
 import { safeDecode, getCountryName, getRelativeTime } from './_lib/utils';
 import type { TimeRange } from './_lib/types';
 import styles from './analytics.module.css';
@@ -36,8 +36,7 @@ export default async function AnalyticsPage(props: {
   const range = (searchParams?.range || '7d') as TimeRange;
 
   // Fetch and aggregate
-  const { visits, error } = await fetchVisits(range);
-  const stats = !error ? aggregateVisits(visits) : null;
+  const { visits, stats, error } = await getAnalyticsData(range);
 
   return (
     <div className={styles.dashboardContainer} style={{ paddingTop: '80px', paddingBottom: '80px' }}>

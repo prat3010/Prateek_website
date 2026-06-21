@@ -47,7 +47,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-> **First time setup:** Run the SQL from `supabase_schema.sql` in your Supabase dashboard SQL Editor, then seed data with `python3 scripts/seed_supabase.py`.
+> **First time setup:** Run the SQL from `supabase_schema.sql` in your Supabase dashboard SQL Editor (this creates all tables, indexes, and stored procedures for analytics aggregation), then seed data with `python3 scripts/seed_supabase.py`.
 > 
 > **Backup/Pull live data:** If you edit data in the Supabase Dashboard directly, pull down live database entries and update local fallback JSON files by running `python3 scripts/backup_db.py`.
 

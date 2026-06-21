@@ -23,8 +23,9 @@ interface FetchResult {
 /**
  * Fetch visits from Supabase. Returns an error message if the database
  * is not configured or the query fails — no mock data fallback.
+ * Uses a limit of QUERY_LIMIT to prevent fetching too many rows.
  */
-export async function fetchVisits(range: TimeRange): Promise<FetchResult> {
+export async function fetchVisits(range: TimeRange, customLimit?: number): Promise<FetchResult> {
   if (!supabase) {
     return {
       visits: [],
@@ -43,10 +44,10 @@ export async function fetchVisits(range: TimeRange): Promise<FetchResult> {
 
     const { data, error } = await query
       .order('created_at', { ascending: false })
-      .limit(QUERY_LIMIT);
+      .limit(customLimit || QUERY_LIMIT);
 
     if (error) throw error;
-    return { visits: data || [], error: null };
+    return { visits: (data || []) as PageVisit[], error: null };
   } catch (e: unknown) {
     const errorMsg = e instanceof Error ? e.message : 'Failed to fetch data';
     return { visits: [], error: errorMsg };
@@ -160,4 +161,134 @@ export function aggregateVisits(visits: PageVisit[]): AggregatedStats {
     dailyViews,
     maxViews: Math.max(...dailyViews.map(d => d.count), 1),
   };
+}
+
+/**
+ * Get unified dashboard analytics.
+ * Attempts to use high-performance DB RPC aggregation, falling back to 
+ * client-side processing if the RPC function does not exist in the database.
+ */
+export async function getAnalyticsData(range: TimeRange): Promise<{
+  visits: PageVisit[];
+  stats: AggregatedStats | null;
+  error: string | null;
+}> {
+  if (!supabase) {
+    return {
+      visits: [],
+      stats: null,
+      error: 'Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in your .env.local file.',
+    };
+  }
+
+  const daysLimit = RANGE_TO_DAYS[range];
+  const cutoffDateStr = new Date(Date.now() - daysLimit * 24 * 60 * 60 * 1000).toISOString();
+
+  // 1. Fast Path: Stored Procedure RPC call
+  try {
+    const { data: rpcData, error: rpcError } = await supabase.rpc('get_analytics_summary', {
+      cutoff_time: cutoffDateStr,
+    });
+
+    if (rpcError) {
+      throw rpcError;
+    }
+
+    if (rpcData) {
+      // Fetch only the latest 50 logs for the feed (highly efficient!)
+      const { data: feedVisits, error: feedError } = await supabase
+        .from('page_visits')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (feedError) throw feedError;
+
+      // Format RPC response into AggregatedStats type
+      const desktopCount = Number(rpcData.desktop_count || 0);
+      const mobileCount = Number(rpcData.mobile_count || 0);
+      const tabletCount = Number(rpcData.tablet_count || 0);
+      const totalDeviceVisits = desktopCount + mobileCount + tabletCount || 1;
+
+      const desktopPct = Math.round((desktopCount / totalDeviceVisits) * 100);
+      const mobilePct = Math.round((mobileCount / totalDeviceVisits) * 100);
+      const tabletPct = 100 - desktopPct - mobilePct;
+
+      // Group and classify referrers
+      const referrerMap: Record<string, number> = {};
+      (rpcData.top_referrers || []).forEach((r: { name: string; count: number }) => {
+        const cleanRef = classifyReferrer(r.name);
+        referrerMap[cleanRef] = (referrerMap[cleanRef] || 0) + Number(r.count);
+      });
+      const topReferrers = Object.entries(referrerMap)
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5);
+
+      // Resolve country names
+      const topCountries = (rpcData.top_countries || []).map((c: { code: string; count: number }) => ({
+        code: c.code,
+        name: getCountryName(c.code),
+        count: Number(c.count),
+      }));
+
+      // Format daily views timeline (independent of selected range filter)
+      const dailyViews: AggregatedStats['dailyViews'] = [];
+      const today = new Date();
+      const dailyViewsMap: Record<string, typeof dailyViews[0]> = {};
+
+      for (let i = TIMELINE_DAYS - 1; i >= 0; i--) {
+        const d = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
+        const dateStr = d.toISOString().split('T')[0];
+        const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const entry = { dateStr, label, count: 0 };
+        dailyViews.push(entry);
+        dailyViewsMap[dateStr] = entry;
+      }
+
+      (rpcData.daily_views || []).forEach((row: { date_str: string; count: number }) => {
+        const entry = dailyViewsMap[row.date_str];
+        if (entry) {
+          entry.count = Number(row.count);
+        }
+      });
+
+      const maxViews = Math.max(...dailyViews.map(d => d.count), 1);
+
+      return {
+        visits: (feedVisits || []) as PageVisit[],
+        stats: {
+          totalViews: Number(rpcData.total_views || 0),
+          totalBots: Number(rpcData.total_bots || 0),
+          uniqueVisitors: Number(rpcData.unique_visitors || 0),
+          popularPages: (rpcData.popular_pages || []).map((p: { path: string; count: number }) => ({
+            path: p.path,
+            count: Number(p.count),
+          })),
+          topReferrers,
+          topCountries,
+          desktopCount,
+          mobileCount,
+          tabletCount,
+          desktopPct,
+          mobilePct,
+          tabletPct,
+          dailyViews,
+          maxViews,
+        },
+        error: null,
+      };
+    }
+  } catch (rpcErr) {
+    // Log warning and fallback to client-side pass
+    console.warn('RPC analytics lookup failed; falling back to client-side aggregation:', rpcErr);
+  }
+
+  // 2. Slow Path: Fallback to client-side fetching and aggregation
+  const { visits, error } = await fetchVisits(range);
+  if (error) {
+    return { visits: [], stats: null, error };
+  }
+  const stats = aggregateVisits(visits);
+  return { visits, stats, error: null };
 }
