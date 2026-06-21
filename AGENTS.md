@@ -24,6 +24,22 @@ This is Prateek Sharma's personal portfolio, built with Next.js 16 App Router, R
 - **Custom Domain:** Mapped to the custom domain `prateeq.in` (purchased via GoDaddy and configured with DNS records pointing to Vercel).
 - **Proxy & Geolocation:** Geolocation detection in `src/proxy.ts` relies on Vercel-specific headers (`x-vercel-ip-country`, `x-vercel-ip-country-region`, `x-vercel-ip-city`). Do not alter or strip these headers.
 
+## Environment Variables
+
+The project uses the following environment variables (stored in `.env.local` locally and configured in Vercel settings for production):
+- `NEXT_PUBLIC_SUPABASE_URL`: The API endpoint URL for the Supabase instance.
+- `SUPABASE_SERVICE_ROLE_KEY`: Secret service-role key for Supabase. **WARNING:** Never expose this key in client-side code; it bypasses Row-Level Security (RLS) to allow proxy telemetry writes and synchronization scripts.
+- `RESEND_API_KEY`: API key for Resend email service, used to send emails from the contact form.
+- `CONTACT_EMAIL_TO`: The email address that receives notifications from the contact form (default is `3010prateeksharma@gmail.com`).
+- `GEMINI_API_KEY`: Google AI Gemini API key (version `gemini-2.5-flash`), used by the local Synchronizer dashboard for certificate analysis and skill scanning.
+- `SYNC_API_KEY`: Shared secret key used to authenticate requests to the Next.js API revalidation endpoint (`/api/revalidate`) and ensure secure cache purging.
+
+## Caching & Cache Revalidation
+
+- **Caching Layer:** Database data fetched via `src/lib/data.ts` (projects, skills, certificates, resume profile) is cached aggressively using Next.js `unstable_cache`.
+- **Cache Tags:** All cache entries share the query tag `portfolio-data`, with specific tags like `projects`, `skills`, `certificates`, and `profile`.
+- **Cache Invalidation:** When database data is modified (either manually in the dashboard, via Streamlit dashboard, or via seeders), the Next.js cache must be revalidated by sending a `POST` or `GET` request to `/api/revalidate?secret=YOUR_SYNC_API_KEY`.
+
 ## Project Shape
 
 - `.github/workflows/` contains CI/CD workflows (e.g. `db_sync.yml` to auto-sync JSON content to Supabase on push).
@@ -85,6 +101,7 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
 
 - Treat analytics data as sensitive. Do not publicly expose raw visitor activity, detailed referrers, location, browser, OS, or device data without an explicit product decision.
 - Do not weaken `server-only` protections around Supabase service-role access.
+- **Row-Level Security (RLS):** All Supabase tables (`page_visits`, `projects`, `skills`, `certificates`, `profile`) must have Row-Level Security enabled. Public write access must remain disabled. Telemetry and content updates should only be performed server-side or via local scripts using the `SUPABASE_SERVICE_ROLE_KEY`. Do not introduce public write policies.
 - Contact form changes must preserve input validation and HTML escaping.
 - Do not introduce runtime shell execution or filesystem writes in public request paths unless there is a reason and the behavior is bounded.
 - Be careful with comments that claim compliance. Describe what the code does, not what laws it satisfies.
