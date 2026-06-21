@@ -18,6 +18,12 @@ This is Prateek Sharma's personal portfolio, built with Next.js 16 App Router, R
 - **Environment & DB Safety:** Always verify if database schema updates require manual script execution or if they affect local JSON fallback synchronization before applying code changes.
 - **Workspace Hygiene:** Do not make any code modifications or run tests without first checking `git status` to ensure you are not conflicting with uncommitted developer work.
 
+## Deployment and Domain
+
+- **Hosting & Platform:** Fully deployed and hosted on Vercel.
+- **Custom Domain:** Mapped to the custom domain `prateeq.in` (purchased via GoDaddy and configured with DNS records pointing to Vercel).
+- **Proxy & Geolocation:** Geolocation detection in `src/proxy.ts` relies on Vercel-specific headers (`x-vercel-ip-country`, `x-vercel-ip-country-region`, `x-vercel-ip-city`). Do not alter or strip these headers.
+
 ## Project Shape
 
 - `.github/workflows/` contains CI/CD workflows (e.g. `db_sync.yml` to auto-sync JSON content to Supabase on push).

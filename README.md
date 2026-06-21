@@ -79,6 +79,15 @@ This ensures the terminal telemetry console on the portfolio site displays your 
 
 ---
 
+## 🌐 Deployment & Hosting
+
+The website is fully deployed and hosted on **Vercel**.
+- **Production Domain:** [https://prateeq.in](https://prateeq.in)
+- **Domain Registry:** GoDaddy (configured with DNS records pointing to Vercel)
+- **Automatic Deploys:** Vercel automatically deploys updates on every push to the `main` branch.
+
+---
+
 ## 🤖 CI/CD Database Sync
 
 The project includes an automated GitHub Actions workflow (`.github/workflows/db_sync.yml`) that triggers on pushes to the `main` branch. 
