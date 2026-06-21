@@ -1072,20 +1072,21 @@ if 'pending_skills' in st.session_state and st.session_state.pending_skills:
     st.sidebar.info(f"You have **{len(st.session_state.pending_skills)}** pending skill(s) waiting for approval.")
     
     skill = st.session_state.pending_skills[0]
+    skill_name_sanitized = skill.get('name', 'default').replace(' ', '_').lower()
     
     with st.sidebar.container(border=True):
         st.markdown(f"**Suggested Tag:** `{skill.get('name')}`")
-        name = st.text_input("Name", value=skill.get('name'), key="pend_name")
-        icon = st.text_input("Icon (Lucide)", value=skill.get('icon', 'sparkles'), key="pend_icon")
-        desc = st.text_area("Description", value=skill.get('description', ''), key="pend_desc")
+        name = st.text_input("Name", value=skill.get('name'), key=f"pend_name_{skill_name_sanitized}")
+        icon = st.text_input("Icon (Lucide)", value=skill.get('icon', 'sparkles'), key=f"pend_icon_{skill_name_sanitized}")
+        desc = st.text_area("Description", value=skill.get('description', ''), key=f"pend_desc_{skill_name_sanitized}")
         
         categories_opts = ['orchestration', 'logic', 'product', 'dynamic']
         default_cat = skill.get('category', 'dynamic')
         if default_cat not in categories_opts:
             default_cat = 'dynamic'
-        category = st.selectbox("Category", options=categories_opts, index=categories_opts.index(default_cat), key="pend_cat")
+        category = st.selectbox("Category", options=categories_opts, index=categories_opts.index(default_cat), key=f"pend_cat_{skill_name_sanitized}")
         
-        color = st.text_input("Hex Color", value=skill.get('color', '#00E676'), key="pend_color")
+        color = st.text_input("Hex Color", value=skill.get('color', '#00E676'), key=f"pend_color_{skill_name_sanitized}")
         
         col1, col2 = st.columns(2)
         with col1:

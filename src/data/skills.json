@@ -1,5 +1,6 @@
 [
   {
+    "id": "bce0ec45-13a1-4ac7-9a16-6921635c835e",
     "name": "AI Agent Orchestration",
     "icon": "bot",
     "description": "Designing and running autonomous multi-agent networks to perform complex development tasks.",
@@ -8,9 +9,12 @@
     "level": "Level Max",
     "prereq": "Structured Prompting",
     "status": "mastered",
-    "projects": []
+    "projects": [],
+    "created_at": "2026-06-18T11:34:23.475732+00:00",
+    "updated_at": "2026-06-18T11:34:23.475732+00:00"
   },
   {
+    "id": "434fa379-dd87-41bb-8fe4-75b102995066",
     "name": "AI Dev Workflows",
     "icon": "sparkles",
     "description": "Accelerating building speed using agentic composer environments like Cursor and visual prototypes.",
@@ -28,9 +32,12 @@
         "id": "metawipe",
         "title": "MetaWipe"
       }
-    ]
+    ],
+    "created_at": "2026-06-18T11:34:23.475732+00:00",
+    "updated_at": "2026-06-18T11:34:23.475732+00:00"
   },
   {
+    "id": "75352032-084b-47cc-ae9e-26e04604d25e",
     "name": "API Architecture",
     "icon": "server",
     "description": "Building light REST APIs in Python (Flask/FastAPI) and orchestrating data exchange loops.",
@@ -48,9 +55,12 @@
         "id": "earth-evolution-simulator",
         "title": "Earth Evolution Simulator"
       }
-    ]
+    ],
+    "created_at": "2026-06-18T11:34:23.475732+00:00",
+    "updated_at": "2026-06-18T11:34:23.475732+00:00"
   },
   {
+    "id": "9dee06f7-89e6-433b-a069-caadb574243b",
     "name": "Algorithmic Translation",
     "icon": "terminal",
     "description": "Translating complex mathematical models, coordinate spaces, and geometry into working logic.",
@@ -68,9 +78,12 @@
         "id": "iss-tracker",
         "title": "ISS Live Location Tracker"
       }
-    ]
+    ],
+    "created_at": "2026-06-18T11:34:23.475732+00:00",
+    "updated_at": "2026-06-18T11:34:23.475732+00:00"
   },
   {
+    "id": "aa511666-5f2b-4571-9fd5-86ee5ed571f8",
     "name": "Data Analysis",
     "icon": "bar-chart",
     "description": "Analyzing raw datasets, Excel modeling, and structuring analytical insights.",
@@ -79,9 +92,12 @@
     "level": "Active Quest",
     "prereq": "Database Engineering",
     "status": "quest",
-    "projects": []
+    "projects": [],
+    "created_at": "2026-06-18T11:34:23.475732+00:00",
+    "updated_at": "2026-06-18T11:34:23.475732+00:00"
   },
   {
+    "id": "9aa1e04a-bb87-416f-8608-ee1f0f62ee31",
     "name": "Database Engineering",
     "icon": "database",
     "description": "Structuring relational databases and offline data synchronization via SQLite and Supabase.",
@@ -99,9 +115,12 @@
         "id": "earth-evolution-simulator",
         "title": "Earth Evolution Simulator"
       }
-    ]
+    ],
+    "created_at": "2026-06-18T11:34:23.475732+00:00",
+    "updated_at": "2026-06-18T11:34:23.475732+00:00"
   },
   {
+    "id": "79e86250-86cd-4cef-bc1a-46b470281868",
     "name": "Design to Code",
     "icon": "paintbrush",
     "description": "Converting blueprints into clean, responsive web layouts, custom animations, and UI variables.",
@@ -115,9 +134,12 @@
         "id": "earth-evolution-simulator",
         "title": "Earth Evolution Simulator"
       }
-    ]
+    ],
+    "created_at": "2026-06-18T11:34:23.475732+00:00",
+    "updated_at": "2026-06-18T11:34:23.475732+00:00"
   },
   {
+    "id": "8b997d08-77a7-44e9-8b34-a4a3a8c71e90",
     "name": "Privacy Sandboxing",
     "icon": "shield",
     "description": "Designing offline-first mobile apps that secure data by operating strictly on local device runtime.",
@@ -131,9 +153,12 @@
         "id": "metawipe",
         "title": "MetaWipe"
       }
-    ]
+    ],
+    "created_at": "2026-06-18T11:34:23.475732+00:00",
+    "updated_at": "2026-06-18T11:34:23.475732+00:00"
   },
   {
+    "id": "a12b11d0-b981-481b-8a7a-6486e6e30f5f",
     "name": "Product Strategy & UX",
     "icon": "layout",
     "description": "Defining user flows, functional requirements, and shipping MVPs focused on target problems.",
@@ -151,9 +176,12 @@
         "id": "metawipe",
         "title": "MetaWipe"
       }
-    ]
+    ],
+    "created_at": "2026-06-18T11:34:23.475732+00:00",
+    "updated_at": "2026-06-18T11:34:23.475732+00:00"
   },
   {
+    "id": "3c1e7709-ee55-40aa-8805-2db2b77aa626",
     "name": "Stack-on-Demand",
     "icon": "zap",
     "description": "Learning and deploying tools as needed. Shipped projects in Next.js, Flutter/Dart, Python, and SQL.",
@@ -179,9 +207,12 @@
         "id": "metawipe",
         "title": "MetaWipe"
       }
-    ]
+    ],
+    "created_at": "2026-06-18T11:34:23.475732+00:00",
+    "updated_at": "2026-06-18T11:34:23.475732+00:00"
   },
   {
+    "id": "e7e1e33a-2814-4950-a207-c382e93c6e83",
     "name": "Structured Prompting",
     "icon": "brain",
     "description": "Writing prompt templates, optimizing context windows, and guiding LLM logical reasoning paths.",
@@ -190,6 +221,15 @@
     "level": "Level Max",
     "prereq": "AI Dev Workflows",
     "status": "mastered",
-    "projects": []
+    "projects": [],
+    "created_at": "2026-06-18T11:34:23.475732+00:00",
+    "updated_at": "2026-06-18T11:34:23.475732+00:00"
+  },
+  {
+    "name": "Python",
+    "icon": "terminal",
+    "description": "Instructing AI to write utility scripts, automation tasks, and backend helper scripts.",
+    "category": "logic",
+    "color": "#3776AB"
   }
 ]
