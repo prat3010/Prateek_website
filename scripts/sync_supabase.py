@@ -65,7 +65,7 @@ def sync_projects(projects):
         })
     # Upsert via POST with merge-duplicates
     _load_env()
-    url = f'{_URL}/rest/v1/projects'
+    url = f'{_URL}/rest/v1/projects?on_conflict=slug'
     headers = {
         'apikey': _KEY,
         'Authorization': f'Bearer {_KEY}',
@@ -99,7 +99,7 @@ def sync_skills(skills_list):
         }
         rows.append(row)
     _load_env()
-    url = f'{_URL}/rest/v1/skills'
+    url = f'{_URL}/rest/v1/skills?on_conflict=name'
     headers = {
         'apikey': _KEY,
         'Authorization': f'Bearer {_KEY}',
@@ -131,7 +131,7 @@ def sync_certificates(certs):
             'tags': c.get('tags', []),
         })
     _load_env()
-    url = f'{_URL}/rest/v1/certificates'
+    url = f'{_URL}/rest/v1/certificates?on_conflict=slug'
     headers = {
         'apikey': _KEY,
         'Authorization': f'Bearer {_KEY}',
