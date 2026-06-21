@@ -143,7 +143,7 @@ export default function Resume({ resumeData, certificates }: ResumeProps) {
               {/* Header Info */}
               <div className={styles.resumeHeader}>
                 <div className={styles.mainInfo}>
-                  <h1 className={styles.name}>{resumeData.name}</h1>
+                  <h2 className={styles.name}>{resumeData.name}</h2>
                   <p className={styles.title}>{resumeData.title}</p>
                 </div>
                 <div className={styles.contactInfo}>

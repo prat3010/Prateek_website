@@ -1,8 +1,28 @@
 import React from 'react';
+import { Metadata } from 'next';
 import Link from 'next/link';
 import { getAllPosts } from '@/lib/markdown';
 import ComicPanel from '@/components/ui/ComicPanel';
 import styles from './BlogList.module.css';
+
+export const metadata: Metadata = {
+  title: 'Log Entries | Prateeq Sharma',
+  description: 'Engineering notes, design diaries, and tutorials by Prateeq Sharma.',
+  alternates: {
+    canonical: '/blog',
+  },
+  openGraph: {
+    title: 'Log Entries | Prateeq Sharma',
+    description: 'Engineering notes, design diaries, and tutorials by Prateeq Sharma.',
+    type: 'website',
+    url: 'https://prateeq.in/blog',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Log Entries | Prateeq Sharma',
+    description: 'Engineering notes, design diaries, and tutorials by Prateeq Sharma.',
+  },
+};
 
 export default function BlogListing() {
   const posts = getAllPosts();
