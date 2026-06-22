@@ -1843,7 +1843,7 @@ with tab_project:
                         <span style="font-size: 0.75rem; color: #a1a1aa; font-weight: 700; text-transform: uppercase; font-family: 'Space Grotesk', sans-serif;">Card Preview</span>
                         {status_badge_html}
                     </div>
-                    <h3 style="margin: 0 0 8px 0; color: #ffffff; font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 1.4rem;">{p_title}</h3>
+                    <h3 style="margin: 0 0 8px 0; color: #ffffff; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 1.45rem; letter-spacing: 0.2px;">{p_title}</h3>
                     <p style="font-size: 0.85rem; color: #D1D1D6; margin: 0 0 16px 0; font-family: 'Space Grotesk', sans-serif; line-height: 1.4;">{project.get("description", "")}</p>
                     <div style="display: flex; flex-wrap: wrap;">{tags_html}</div>
                 </div>
@@ -2211,7 +2211,7 @@ with tab_cert:
                     # Tags list
                     tags = cert.get("tags", [])
                     if tags:
-                        tags_html = " ".join([f'<span class="skill-capsule-preview" style="box-shadow: 2px 2px 0px 0px #ffffff; border-color: #ffffff; padding: 2px 8px; font-size: 0.7rem; margin-right: 4px; margin-bottom: 4px;"><span class="skill-capsule-dot" style="background-color: #ffffff;"></span>{t}</span>' for t in tags])
+                        tags_html = " ".join([f'<span class="skill-capsule-preview" style="box-shadow: 0 4px 10px rgba(0,0,0,0.15); border-color: rgba(255,255,255,0.08); padding: 2px 10px; font-size: 0.7rem; margin-right: 4px; margin-bottom: 4px;"><span class="skill-capsule-dot" style="background-color: #2979ff;"></span>{t}</span>' for t in tags])
                         st.markdown(f'<div style="display: flex; flex-wrap: wrap; margin-bottom: 12px;">{tags_html}</div>', unsafe_allow_html=True)
                         
                     # Remove button
@@ -2389,9 +2389,9 @@ with tab_skills:
                         st.markdown(f"""
                         <div style="margin-bottom: 12px;">
                             <span style="font-size: 0.75rem; color: #8A8A93; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 4px;">Live Preview:</span>
-                            <div class="skill-capsule-preview" style="box-shadow: 2px 2px 0px 0px {s_color}; border-color: #ffffff;">
+                            <div class="skill-capsule-preview" style="box-shadow: 0 4px 10px rgba(0,0,0,0.15); border-color: rgba(255,255,255,0.08);">
                                 <span class="skill-capsule-dot" style="background-color: {s_color};"></span>
-                                <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">{badge_label}</span>
+                                <span style="font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem;">{badge_label}</span>
                             </div>
                         </div>
                         """, unsafe_allow_html=True)
