@@ -722,7 +722,7 @@ def save_uploaded_image(uploaded_file, target_path, target_format):
 # Custom CSS for Premium UI Styling
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
     
     /* Font overrides */
     html, body, [class*="css"], .stWidgetFormContainer {
@@ -730,139 +730,150 @@ st.markdown("""
     }
     
     h1, h2, h3, h4, h5, h6, .section-header {
-        font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif !important;
+        font-family: 'Playfair Display', Georgia, serif !important;
     }
     
     code, pre {
         font-family: 'JetBrains Mono', monospace !important;
     }
 
-    /* Core Page Styling */
+    /* Core Page Styling with ambient radial glows */
     .stApp {
-        background-color: #000000 !important;
+        background-color: #030303 !important;
+        background-image: 
+            radial-gradient(at 10% 10%, rgba(225, 0, 152, 0.10) 0px, transparent 50%),
+            radial-gradient(at 90% 20%, rgba(0, 230, 118, 0.08) 0px, transparent 50%),
+            radial-gradient(at 50% 80%, rgba(41, 121, 255, 0.10) 0px, transparent 50%) !important;
+        background-attachment: fixed !important;
         color: #ffffff !important;
     }
     
     /* Section Headers */
     .section-header {
         font-size: 1.6rem;
-        font-weight: 900;
+        font-weight: 800;
         color: #ffffff;
         margin-top: 0.5rem;
-        margin-bottom: 1.2rem;
-        border-bottom: 2px solid #ffffff;
-        padding-bottom: 5px;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        padding-bottom: 8px;
         display: inline-block;
         letter-spacing: 0.5px;
         text-transform: uppercase;
     }
 
-    /* Target bordered containers in Streamlit */
+    /* Glassmorphic bordered containers in Streamlit */
     div[data-testid="stVerticalBlockBorder"] {
-        background-color: #000000 !important;
-        border: 2px solid #ffffff !important;
-        border-radius: 6px !important;
+        background: rgba(18, 18, 18, 0.55) !important;
+        backdrop-filter: blur(12px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 12px !important;
         padding: 24px !important;
         margin-bottom: 24px !important;
-        box-shadow: 4px 4px 0px 0px #ffffff !important;
-        transition: all 0.2s ease !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
     div[data-testid="stVerticalBlockBorder"]:hover {
-        border-color: #ffffff !important;
+        border-color: rgba(255, 255, 255, 0.2) !important;
+        box-shadow: 0 8px 32px 0 rgba(225, 0, 152, 0.08) !important;
+        transform: translateY(-2px) !important;
     }
 
-    /* Target expanders */
+    /* Target expanders with glassmorphism */
     details[data-testid="stExpander"] {
-        background-color: #000000 !important;
-        border: 2px solid #ffffff !important;
-        border-radius: 4px !important;
+        background: rgba(255, 255, 255, 0.03) !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 8px !important;
         margin-bottom: 12px !important;
-        box-shadow: 3px 3px 0px 0px #ffffff !important;
+        box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.2) !important;
         transition: all 0.2s ease !important;
     }
     details[data-testid="stExpander"]:hover {
-        border-color: #ffffff !important;
+        border-color: rgba(255, 255, 255, 0.18) !important;
+        background: rgba(255, 255, 255, 0.05) !important;
     }
     summary[data-testid="stExpanderSummary"] {
         font-weight: 700 !important;
         color: #ffffff !important;
     }
 
-    /* Buttons styling */
+    /* Premium gradient buttons */
     button[data-testid="baseButton-primary"] {
-        background-color: #ffffff !important;
-        color: #000000 !important;
-        font-weight: 800 !important;
+        background: linear-gradient(135deg, #e10098 0%, #2979ff 100%) !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
         text-transform: uppercase !important;
         letter-spacing: 0.5px !important;
-        border: 2px solid #ffffff !important;
-        border-radius: 4px !important;
-        box-shadow: 3px 3px 0px 0px #888888 !important;
-        transition: all 0.1s ease !important;
+        border: none !important;
+        border-radius: 6px !important;
+        box-shadow: 0 4px 15px 0 rgba(225, 0, 152, 0.35) !important;
+        transition: all 0.2s ease !important;
         padding: 0.5rem 1.5rem !important;
     }
     button[data-testid="baseButton-primary"]:hover {
-        background-color: #cccccc !important;
-        color: #000000 !important;
-        border-color: #cccccc !important;
-        box-shadow: 2px 2px 0px 0px #666666 !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 6px 20px 0 rgba(225, 0, 152, 0.5) !important;
+        opacity: 0.95 !important;
     }
     button[data-testid="baseButton-primary"]:active {
-        transform: translate(2px, 2px) !important;
-        box-shadow: 1px 1px 0px 0px #666666 !important;
+        transform: translateY(1px) !important;
     }
 
     button[data-testid="baseButton-secondary"] {
-        background-color: #000000 !important;
+        background: rgba(255, 255, 255, 0.05) !important;
         color: #ffffff !important;
-        font-weight: 700 !important;
-        border: 2px solid #ffffff !important;
-        border-radius: 4px !important;
-        box-shadow: 3px 3px 0px 0px #ffffff !important;
-        transition: all 0.1s ease !important;
+        font-weight: 600 !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-radius: 6px !important;
+        box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.15) !important;
+        transition: all 0.2s ease !important;
     }
     button[data-testid="baseButton-secondary"]:hover {
-        background-color: #ffffff !important;
-        color: #000000 !important;
-        border-color: #ffffff !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        border-color: rgba(255, 255, 255, 0.3) !important;
     }
     button[data-testid="baseButton-secondary"]:active {
-        transform: translate(2px, 2px) !important;
-        box-shadow: 1px 1px 0px 0px #ffffff !important;
+        transform: translateY(1px) !important;
     }
 
-    /* Danger hover styles for delete buttons */
+    /* Danger delete buttons */
     button[id^="del_exp_"]:hover, button[id^="del_edu_"]:hover, button[id^="rem_bul_"]:hover, button[id^="delete_"]:hover {
-        border-color: #ff3b30 !important;
+        border-color: rgba(255, 59, 48, 0.5) !important;
         color: #ff3b30 !important;
-        background-color: #000000 !important;
+        background-color: rgba(255, 59, 48, 0.05) !important;
     }
 
-    /* Inputs */
+    /* Glassmorphic inputs */
     .stTextInput>div>div>input, .stTextArea>div>div>textarea, .stSelectbox>div>div>div {
-        background-color: #000000 !important;
+        background-color: rgba(255, 255, 255, 0.03) !important;
         color: #ffffff !important;
-        border: 2px solid #ffffff !important;
-        border-radius: 4px !important;
-        transition: border-color 0.2s !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-radius: 6px !important;
+        transition: all 0.2s !important;
         font-family: 'Space Grotesk', sans-serif !important;
         font-weight: 500 !important;
     }
     .stTextInput>div>div>input:focus, .stTextArea>div>div>textarea:focus {
-        border-color: #ffffff !important;
-        box-shadow: 0 0 0 1px #ffffff !important;
+        border-color: rgba(255, 255, 255, 0.4) !important;
+        box-shadow: 0 0 10px 0 rgba(255, 255, 255, 0.1) !important;
+        background-color: rgba(255, 255, 255, 0.05) !important;
     }
     
-    /* Labels and small text */
+    /* Labels */
     label[data-testid="stWidgetLabel"] p {
-        color: #ffffff !important;
-        font-weight: 700 !important;
+        color: #e4e4e7 !important;
+        font-weight: 600 !important;
     }
 
-    /* Sidebar Styling */
+    /* Sidebar Glassmorphic Styling */
     section[data-testid="stSidebar"] {
-        background-color: #000000 !important;
-        border-right: 2px solid #ffffff !important;
+        background-color: rgba(10, 10, 10, 0.6) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
     }
     section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] li, section[data-testid="stSidebar"] span {
         color: #ffffff !important;
@@ -873,76 +884,84 @@ st.markdown("""
         font-weight: 800 !important;
     }
     section[data-testid="stSidebar"] .stButton>button {
-        background-color: #000000 !important;
+        background: rgba(255, 255, 255, 0.05) !important;
         color: #ffffff !important;
-        border: 2px solid #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
     }
     section[data-testid="stSidebar"] .stButton>button:hover {
-        background-color: #ffffff !important;
-        color: #000000 !important;
-        border-color: #ffffff !important;
+        background: rgba(255, 255, 255, 0.12) !important;
+        border-color: rgba(255, 255, 255, 0.3) !important;
     }
 
-    /* Tabs styling */
+    /* Floating Glass Tabs list */
     .stTabs [data-baseweb="tab-list"] {
         gap: 12px !important;
-        background-color: #000000 !important;
+        background: rgba(255, 255, 255, 0.03) !important;
+        backdrop-filter: blur(10px) !important;
         padding: 8px !important;
-        border-radius: 6px !important;
-        border: 2px solid #ffffff !important;
+        border-radius: 8px !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
         margin-bottom: 24px !important;
-        box-shadow: 3px 3px 0px 0px #ffffff !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.24) !important;
     }
     .stTabs [data-baseweb="tab"] {
-        height: 44px !important;
-        border-radius: 4px !important;
+        height: 40px !important;
+        border-radius: 6px !important;
         background-color: transparent !important;
-        color: #888888 !important;
+        color: #a1a1aa !important;
         font-family: 'Space Grotesk', sans-serif !important;
-        font-weight: 700 !important;
-        padding: 0px 16px !important;
+        font-weight: 600 !important;
+        padding: 0px 18px !important;
         transition: all 0.2s !important;
     }
     .stTabs [data-baseweb="tab"]:hover {
         color: #ffffff !important;
-        background-color: #1c1c1c !important;
+        background-color: rgba(255, 255, 255, 0.05) !important;
     }
     .stTabs [aria-selected="true"] {
-        background-color: #ffffff !important;
-        color: #000000 !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
         box-shadow: none !important;
     }
 
-    /* Scrollbar override */
+    /* Custom scrollbars */
     ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
     }
     ::-webkit-scrollbar-track {
-        background: #000000;
+        background: #030303;
     }
     ::-webkit-scrollbar-thumb {
-        background: #ffffff;
-        border-radius: 4px;
-        border: 2px solid #000000;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 10px;
+        border: 2px solid #030303;
     }
     ::-webkit-scrollbar-thumb:hover {
-        background: #cccccc;
+        background: rgba(255, 255, 255, 0.3);
     }
 
-    /* Neo-brutalist Telemetry cards */
+    /* Glassmorphic Telemetry cards */
     .telemetry-card {
-        border: 2px solid #ffffff;
-        box-shadow: 4px 4px 0px 0px #ffffff;
-        background-color: #000000;
-        border-radius: 6px;
-        padding: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.24);
+        background: rgba(255, 255, 255, 0.02);
+        backdrop-filter: blur(6px);
+        border-radius: 10px;
+        padding: 18px;
         margin-bottom: 16px;
         text-align: center;
+        transition: all 0.3s ease;
+    }
+    .telemetry-card:hover {
+        border-color: rgba(255, 255, 255, 0.18);
+        background: rgba(255, 255, 255, 0.04);
+        transform: translateY(-2px);
     }
     .telemetry-card-val {
         font-size: 2.4rem;
-        font-weight: 900;
+        font-weight: 800;
         color: #ffffff;
         font-family: 'JetBrains Mono', monospace !important;
         margin-bottom: 4px;
@@ -950,21 +969,21 @@ st.markdown("""
     }
     .telemetry-card-lbl {
         font-size: 0.75rem;
-        font-weight: 800;
-        color: #8A8A93;
+        font-weight: 700;
+        color: #a1a1aa;
         text-transform: uppercase;
         letter-spacing: 1px;
         font-family: 'Space Grotesk', sans-serif !important;
     }
 
-    /* Custom progress bar graphs */
+    /* Custom progress bar graphs with gradients */
     .bar-container {
         margin-bottom: 14px;
     }
     .bar-label-row {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 4px;
+        margin-bottom: 6px;
         font-size: 0.8rem;
         font-family: 'JetBrains Mono', monospace !important;
         font-weight: 700;
@@ -973,70 +992,77 @@ st.markdown("""
         color: #ffffff;
     }
     .bar-count {
-        color: #8A8A93;
+        color: #a1a1aa;
     }
     .bar-track {
-        background-color: #111111;
-        border: 1.5px solid #ffffff;
-        height: 14px;
-        border-radius: 2px;
+        background-color: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        height: 12px;
+        border-radius: 4px;
         overflow: hidden;
     }
     .bar-fill {
         height: 100%;
         background-color: #ffffff;
+        border-radius: 4px;
     }
 
     /* Skill capsules visual preview styling */
     .skill-capsule-preview {
         display: inline-flex;
         align-items: center;
-        padding: 4px 10px;
-        border: 1.5px solid #ffffff;
-        border-radius: 4px;
-        background-color: #000000;
+        padding: 4px 12px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(5px);
         font-family: 'Space Grotesk', sans-serif !important;
         font-weight: 700;
         font-size: 0.8rem;
-        box-shadow: 2px 2px 0px 0px #ffffff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         margin-right: 8px;
         margin-bottom: 8px;
+        transition: all 0.2s ease;
+    }
+    .skill-capsule-preview:hover {
+        border-color: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.06);
     }
     .skill-capsule-dot {
         width: 8px;
         height: 8px;
         border-radius: 50%;
-        margin-right: 6px;
-        border: 1px solid #ffffff;
+        margin-right: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
     }
 
     /* Status badge */
     .status-badge {
         display: inline-block;
-        padding: 2px 6px;
-        border-radius: 3px;
+        padding: 3px 8px;
+        border-radius: 4px;
         font-size: 0.65rem;
         font-family: 'JetBrains Mono', monospace;
         font-weight: 700;
         text-transform: uppercase;
-        border: 1px solid #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
     .status-badge-bot {
-        background-color: #ff3b30;
-        color: #ffffff;
-        border-color: #ff3b30;
+        background-color: rgba(239, 68, 68, 0.15) !important;
+        color: #f87171 !important;
+        border-color: rgba(239, 68, 68, 0.3) !important;
     }
     .status-badge-user {
-        background-color: #00E676;
-        color: #000000;
-        border-color: #00E676;
+        background-color: rgba(16, 185, 129, 0.15) !important;
+        color: #34d399 !important;
+        border-color: rgba(16, 185, 129, 0.3) !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # Sidebar
 st.sidebar.markdown("""
-<div style="background-color: #000000; border: 2.5px solid #ffffff; border-radius: 8px; padding: 20px; margin-bottom: 25px; text-align: center; box-shadow: 4px 4px 0px 0px #ffffff;">
+<div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 20px; margin-bottom: 25px; text-align: center; backdrop-filter: blur(10px); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);">
     <div style="width: 80px; height: 80px; margin: 0 auto 12px auto; display: flex; align-items: center; justify-content: center;">
         <svg viewBox="0 0 100 100" style="width: 100%; height: 100%;">
             <circle cx="50" cy="50" r="38" fill="#5A8EB6" opacity="0.15" />
@@ -1054,9 +1080,9 @@ st.sidebar.markdown("""
             <ellipse cx="63" cy="63" rx="3.5" ry="2" fill="#DF8B98" opacity="0.6" />
         </svg>
     </div>
-    <h3 style="color: #ffffff; margin: 0; font-family: 'Space Grotesk', sans-serif; font-weight: 950; font-size: 1.3rem; letter-spacing: 0.5px; text-transform: uppercase;">PRATEEK SYNC</h3>
-    <span style="display: block; color: #8A8A93; font-size: 0.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; margin-top: 4px;">ORCHESTRATION CLIENT</span>
-    <code style="display: inline-block; background-color: #121212; color: #ffffff; border: 1.5px solid #ffffff; border-radius: 4px; padding: 2px 8px; font-size: 0.7rem; font-weight: bold; margin-top: 10px; font-family: 'JetBrains Mono', monospace;">v1.3.0 // ACTIVE</code>
+    <h3 style="color: #ffffff; margin: 0; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 1.35rem; letter-spacing: 0.5px; text-transform: uppercase;">PRATEEK SYNC</h3>
+    <span style="display: block; color: #a1a1aa; font-size: 0.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; margin-top: 4px;">ORCHESTRATION CLIENT</span>
+    <code style="display: inline-block; background-color: rgba(255, 255, 255, 0.05); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px; padding: 2px 8px; font-size: 0.7rem; font-weight: bold; margin-top: 10px; font-family: 'JetBrains Mono', monospace;">v1.3.0 // ACTIVE</code>
 </div>
 """, unsafe_allow_html=True)
 # CI/CD Deployment & Status Monitor
@@ -1227,9 +1253,9 @@ if 'pending_skills' in st.session_state and st.session_state.pending_skills:
 
 # Custom Title Header
 st.markdown("""
-<div style="text-align: center; padding: 30px 20px; margin-bottom: 35px; background-color: #000000; border-radius: 8px; border: 2.5px solid #ffffff;">
-    <h1 style="color: #ffffff; font-family: 'Space Grotesk', sans-serif; font-weight: 950; margin: 0; font-size: 2.5rem; letter-spacing: 0.5px; text-transform: uppercase;">PRATEEK CONTROL PORTAL</h1>
-    <p style="color: #ffffff; margin: 8px 0 0 0; font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 0.85rem; letter-spacing: 0.2px; text-transform: uppercase; opacity: 0.90;">SYSTEM_STATUS: ONLINE  |  LOCAL RESUME & PORTFOLIO ENGINE</p>
+<div style="text-align: center; padding: 30px 20px; margin-bottom: 35px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01)); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);">
+    <h1 style="color: #ffffff; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; margin: 0; font-size: 2.5rem; letter-spacing: 0.5px; text-transform: uppercase;">PRATEEK CONTROL PORTAL</h1>
+    <p style="color: #a1a1aa; margin: 8px 0 0 0; font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 0.85rem; letter-spacing: 0.2px; text-transform: uppercase; opacity: 0.90;">SYSTEM_STATUS: ONLINE  |  LOCAL RESUME & PORTFOLIO ENGINE</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1330,8 +1356,8 @@ with tab_analytics:
                 </div>
                 """, unsafe_allow_html=True)
                 
-            # Helper function to render visual progress bars
-            def render_bar_chart(items, title, value_suffix=""):
+            # Helper function to render visual progress bars with gradients
+            def render_bar_chart(items, title, value_suffix="", color_gradient="linear-gradient(90deg, #e10098 0%, #2979ff 100%)"):
                 st.markdown(f"#### {title}")
                 if not items:
                     st.info("No records found in timeframe.")
@@ -1348,7 +1374,7 @@ with tab_analytics:
                             <span class="bar-count">{count}{value_suffix}</span>
                         </div>
                         <div class="bar-track">
-                            <div class="bar-fill" style="width: {fill_percent}%;"></div>
+                            <div class="bar-fill" style="width: {fill_percent}%; background: {color_gradient} !important;"></div>
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
@@ -1359,21 +1385,21 @@ with tab_analytics:
             col_left, col_right = st.columns(2)
             with col_left:
                 popular_pages = summary_res.get("popular_pages", [])
-                render_bar_chart(popular_pages, "Popular Paths / Routes")
+                render_bar_chart(popular_pages, "Popular Paths / Routes", color_gradient="linear-gradient(90deg, #e10098 0%, #2979ff 100%)")
                 
                 st.markdown("<br>", unsafe_allow_html=True)
                 top_referrers = summary_res.get("top_referrers", [])
                 # Filter out empty referrers
                 top_referrers = [r for r in top_referrers if r.get("name")]
-                render_bar_chart(top_referrers[:6], "Top Referrers")
+                render_bar_chart(top_referrers[:6], "Top Referrers", color_gradient="linear-gradient(90deg, #e10098 0%, #2979ff 100%)")
                 
             with col_right:
                 top_countries = summary_res.get("countries", [])
-                render_bar_chart(top_countries[:6], "Geographic - Countries")
+                render_bar_chart(top_countries[:6], "Geographic - Countries", color_gradient="linear-gradient(90deg, #2979ff 0%, #00e676 100%)")
                 
                 st.markdown("<br>", unsafe_allow_html=True)
                 top_cities = summary_res.get("cities", [])
-                render_bar_chart(top_cities[:6], "Geographic - Cities")
+                render_bar_chart(top_cities[:6], "Geographic - Cities", color_gradient="linear-gradient(90deg, #2979ff 0%, #00e676 100%)")
                 
         # Recent logs section
         st.markdown("---")
@@ -1803,22 +1829,22 @@ with tab_project:
             
             with st.expander(f"📁 {p_title} (ID: {p_id})"):
                 # Visual project card preview
-                tags_html = " ".join([f'<span class="skill-capsule-preview" style="box-shadow: 2px 2px 0px 0px {project.get("color", "#00E676")}; border-color: #ffffff; padding: 2px 8px; font-size: 0.7rem; margin-right: 4px; margin-bottom: 4px;"><span class="skill-capsule-dot" style="background-color: {project.get("color", "#00E676")};"></span>{t}</span>' for t in project.get("tags", [])])
+                tags_html = " ".join([f'<span class="skill-capsule-preview" style="box-shadow: 0 4px 10px rgba(0,0,0,0.15); border-color: rgba(255,255,255,0.08); padding: 2px 10px; font-size: 0.7rem; margin-right: 4px; margin-bottom: 4px;"><span class="skill-capsule-dot" style="background-color: {project.get("color", "#00E676")};"></span>{t}</span>' for t in project.get("tags", [])])
                 status_style = {
-                    "live": "background-color: #00E676; color: #000000; border-color: #00E676;",
-                    "soon": "background-color: #FF9100; color: #000000; border-color: #FF9100;",
-                    "personal": "background-color: #2979FF; color: #ffffff; border-color: #2979FF;"
+                    "live": "background-color: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; border-color: rgba(16, 185, 129, 0.3) !important;",
+                    "soon": "background-color: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; border-color: rgba(245, 158, 11, 0.3) !important;",
+                    "personal": "background-color: rgba(59, 130, 246, 0.15) !important; color: #60a5fa !important; border-color: rgba(59, 130, 246, 0.3) !important;"
                 }
                 curr_status = project.get("status", "live" if project.get("isLive") else "soon")
                 status_badge_html = f'<span class="status-badge" style="{status_style.get(curr_status, "")}">{curr_status.upper()}</span>'
                 st.markdown(f"""
-                <div style="border: 2px solid #ffffff; box-shadow: 3px 3px 0px 0px {project.get("color", "#00E676")}; border-radius: 6px; padding: 16px; background-color: #050505; margin-bottom: 20px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <span style="font-size: 0.75rem; color: #8A8A93; font-weight: 700; text-transform: uppercase;">Card Preview</span>
+                <div style="border: 1px solid rgba(255, 255, 255, 0.1); border-left: 4px solid {project.get("color", "#00E676")}; border-radius: 12px; padding: 20px; background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); margin-bottom: 25px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 0.75rem; color: #a1a1aa; font-weight: 700; text-transform: uppercase; font-family: 'Space Grotesk', sans-serif;">Card Preview</span>
                         {status_badge_html}
                     </div>
-                    <h3 style="margin: 0 0 6px 0; color: #ffffff; font-family: 'Space Grotesk', sans-serif; font-weight: 800;">{p_title}</h3>
-                    <p style="font-size: 0.85rem; color: #D1D1D6; margin: 0 0 12px 0; font-family: 'Space Grotesk', sans-serif;">{project.get("description", "")}</p>
+                    <h3 style="margin: 0 0 8px 0; color: #ffffff; font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 1.4rem;">{p_title}</h3>
+                    <p style="font-size: 0.85rem; color: #D1D1D6; margin: 0 0 16px 0; font-family: 'Space Grotesk', sans-serif; line-height: 1.4;">{project.get("description", "")}</p>
                     <div style="display: flex; flex-wrap: wrap;">{tags_html}</div>
                 </div>
                 """, unsafe_allow_html=True)
