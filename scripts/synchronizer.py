@@ -2367,17 +2367,51 @@ with tab_cert:
 
             dry_run_cert = st.checkbox("Dry-Run Mode (Save locally only, do not push to remote)", value=True, key="dry_cert")
 
-            if st.button("Sync Certificates Now", type="primary"):
-                current_certs = parse_certificates_file()
-                sync_logs = []
-                updated = False
+            # Check task states
+            cert_status = st.session_state.get("cert_sync_task_status", "idle")
+            
+            if cert_status == "success":
+                res = st.session_state.get("cert_sync_task_result")
+                if res:
+                    st.success("✅ Success! Processed and synced certificates successfully.")
+                    if res["sync_logs"]:
+                        for log in res["sync_logs"]:
+                            st.info(f"• {log}")
+                    if res["git_logs_output"]:
+                        st.info(res["git_logs_output"])
+                st.session_state.cert_sync_task_status = "idle"
+                st.rerun()
                 
-                with st.status("Processing certificate uploads...", expanded=True) as status:
-                    for cert_file in raw_certs:
+            elif cert_status == "error":
+                err_msg = st.session_state.get("cert_sync_task_error", "Unknown error")
+                st.error(f"❌ Certificate Sync failed: {err_msg}")
+                st.session_state.cert_sync_task_status = "idle"
+                
+            if cert_status == "running":
+                st.info("🔄 Processing certificate uploads in the background...")
+                st.markdown(
+                    '<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">'
+                    '<div class="spinner-border text-primary" role="status" style="width: 1.5rem; height: 1.5rem; border: 0.25em solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spinner-border .75s linear infinite;"></div>'
+                    '<span>Performing Gemini OCR on raw certificates, moving files to public assets, and updating databases. You can switch tabs or edit other fields!</span>'
+                    '</div>'
+                    '<style>@keyframes spinner-border { to { transform: rotate(360deg); } }</style>',
+                    unsafe_allow_html=True
+                )
+
+            btn_disabled = (cert_status == "running")
+            if st.button("Sync Certificates Now", type="primary", disabled=btn_disabled, key="btn_sync_certs"):
+                def run_cert_sync():
+                    current_certs = parse_certificates_file()
+                    updated = False
+                    sync_logs = []
+                    
+                    certs_to_process = list(raw_certs)
+                    
+                    for cert_file in certs_to_process:
                         filepath = os.path.join(raw_cert_dir, cert_file)
+                        if not os.path.exists(filepath):
+                            continue
                         mime = get_mime_type(cert_file)
-                        
-                        st.write(f"🔍 OCR Parsing certificate: `{cert_file}`")
                         
                         with open(filepath, "rb") as f:
                             b64_data = base64.b64encode(f.read()).decode("utf-8")
@@ -2396,66 +2430,65 @@ with tab_cert:
                         """
                         
                         cert_data = call_gemini(prompt, file_data=b64_data, file_mime=mime)
-                        if cert_data:
-                                            # Move from raw to public
-                            shutil.move(filepath, dest_filepath)
-                            
-                            verify_url = cert_data.get("verifyUrl", "").strip()
-                            if verify_url:
-                                if not verify_url.startswith(("http://", "https://")):
-                                    verify_url = "https://" + verify_url
-                                
-                                # Convert Udemy short link to direct verification URL to avoid redirect 404s
-                                if "ude.my/" in verify_url:
-                                    uc_match = re.search(r'(UC-[a-zA-Z0-9-]+)', verify_url)
-                                    if uc_match:
-                                        verify_url = f"https://www.udemy.com/certificate/{uc_match.group(1)}/"
-
-                            new_cert = {
-                                "id": cert_id,
-                                "title": cert_data["title"],
-                                "issuer": cert_data["issuer"],
-                                "date": cert_data["date"],
-                                "credentialId": cert_data.get("credentialId"),
-                                "verifyUrl": verify_url,
-                                "image": f"/certificates/{dest_filename}",
-                                "tags": cert_data.get("tags", [])
-                            }
-                            
-                            current_certs.append(new_cert)
-                            updated = True
-                            check_and_add_pending_skills(cert_data.get("tags", []))
-                                
-                            sync_logs.append(f"Parsed certificate: {cert_data['title']}")
-                        else:
-                            st.error(f"❌ Failed to parse certificate '{cert_file}'")
-                    
-                    if updated:
-                        status.update(label="All raw files processed!", state="complete")
-                        try:
-                            write_certificates_file(current_certs)
-                            st.session_state.certificates = current_certs
-                            
-                            # Update resume log
-                            resume = parse_resume_file()
-                            if resume and sync_logs:
-                                resume['lastSynced'] = {
-                                    "timestamp": datetime.now().isoformat(),
-                                    "status": "success",
-                                    "summary": " & ".join(sync_logs)
-                                }
-                                write_resume_file(resume)
-                                st.session_state.resume = resume
-                                
-                            st.success("Certificates added to certificates.json and moved to assets!")
-                        except Exception as e:
-                            st.error(f"Failed to save certificates: {e}")
+                        if not cert_data:
+                            raise ValueError(f"Failed to parse certificate '{cert_file}' via Gemini OCR.")
                         
+                        cert_id = slugify(cert_data["title"])
+                        file_ext = os.path.splitext(cert_file)[1].lower()
+                        dest_filename = f"{cert_id}{file_ext}"
+                        dest_filepath = os.path.join(public_cert_dir, dest_filename)
+                        
+                        # Move from raw to public
+                        shutil.move(filepath, dest_filepath)
+                        
+                        verify_url = cert_data.get("verifyUrl", "").strip()
+                        if verify_url:
+                            if not verify_url.startswith(("http://", "https://")):
+                                verify_url = "https://" + verify_url
+                            
+                            # Convert Udemy short link to direct verification URL to avoid redirect 404s
+                            if "ude.my/" in verify_url:
+                                uc_match = re.search(r'(UC-[a-zA-Z0-9-]+)', verify_url)
+                                if uc_match:
+                                    verify_url = f"https://www.udemy.com/certificate/{uc_match.group(1)}/"
+
+                        new_cert = {
+                            "id": cert_id,
+                            "title": cert_data["title"],
+                            "issuer": cert_data["issuer"],
+                            "date": cert_data["date"],
+                            "credentialId": cert_data.get("credentialId"),
+                            "verifyUrl": verify_url,
+                            "image": f"/certificates/{dest_filename}",
+                            "tags": cert_data.get("tags", [])
+                        }
+                        
+                        current_certs = [c for c in current_certs if c.get("id") != cert_id]
+                        current_certs.append(new_cert)
+                        updated = True
+                        check_and_add_pending_skills(cert_data.get("tags", []))
+                        sync_logs.append(f"Parsed certificate: {cert_data['title']}")
+                    
+                    git_logs_output = ""
+                    if updated:
+                        write_certificates_file(current_certs)
+                        st.session_state.certificates = current_certs
+                        
+                        # Update resume log
+                        resume = parse_resume_file()
+                        if resume and sync_logs:
+                            resume['lastSynced'] = {
+                                "timestamp": datetime.now().isoformat(),
+                                "status": "success",
+                                "summary": " & ".join(sync_logs)
+                            }
+                            write_resume_file(resume)
+                            st.session_state.resume = resume
+                            
                         if not dry_run_cert:
-                            st.info("🚀 Pushing changes to GitHub...")
                             success, status_out = run_safe_git_command(["git", "status", "--porcelain"], cwd=os.getcwd())
                             if not success:
-                                st.error(f"Git status failed: {status_out}")
+                                raise ValueError(f"Git status failed: {status_out}")
                             elif status_out.strip():
                                 success, err_msg = run_safe_git_command(
                                     ["git", "add", "src/data/certificates.json", "src/data/resume.json", "public/certificates/"],
@@ -2468,7 +2501,7 @@ with tab_cert:
                                     )
                                 
                                 if not success:
-                                    st.error(f"Git add failed: {err_msg}")
+                                    raise ValueError(f"Git add failed: {err_msg}")
                                 else:
                                     commit_msg = f"chore(sync): publish certificates sync"
                                     success, err_msg = run_safe_git_command(
@@ -2476,22 +2509,26 @@ with tab_cert:
                                         cwd=os.getcwd()
                                     )
                                     if not success:
-                                        st.error(f"Git commit failed: {err_msg}")
+                                        raise ValueError(f"Git commit failed: {err_msg}")
                                     else:
                                         success, push_out = run_safe_git_command(
                                             ["git", "push", "origin", "main"],
                                             cwd=os.getcwd()
                                         )
                                         if not success:
-                                            st.error(f"Git push failed: {push_out}")
+                                            raise ValueError(f"Git push failed: {push_out}")
                                         else:
-                                            st.success("✅ Pushed successfully to GitHub!")
+                                            git_logs_output = "✅ Pushed successfully to GitHub!"
                             else:
-                                st.info("No changes to commit and push.")
-                        
-                        st.rerun()
-                    else:
-                        status.update(label="Scan completed", state="complete")
+                                git_logs_output = "No changes to commit and push."
+                                
+                    return {
+                        "sync_logs": sync_logs,
+                        "git_logs_output": git_logs_output
+                    }
+                
+                run_async_task(run_cert_sync, "cert_sync_task")
+                st.rerun()
         else:
             st.info("No raw certificate files found. Drop PDFs or image files into `src/data/certificates/raw/` to parse them.")
 
