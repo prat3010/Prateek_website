@@ -333,6 +333,77 @@ def check_and_add_pending_skills(tags_list):
                     st.session_state.pending_skills.append(fallback_prop)
 
 # ==========================================
+# Safe Subprocess & Input Sanitization Helpers
+# ==========================================
+def run_safe_git_command(args, cwd=None):
+    """
+    Safely execute a git subprocess command.
+    Returns (success, output_text_or_error_msg)
+    """
+    import subprocess
+    if not args or args[0] != "git":
+        return False, "Invalid command program: only 'git' is allowed."
+    
+    if cwd:
+        cwd = os.path.realpath(cwd)
+        if not os.path.isdir(cwd):
+            return False, f"Directory does not exist: {cwd}"
+            
+    try:
+        output = subprocess.check_output(
+            args,
+            cwd=cwd,
+            stderr=subprocess.STDOUT
+        ).decode("utf-8")
+        return True, output
+    except subprocess.CalledProcessError as e:
+        err_msg = e.output.decode("utf-8", errors="ignore") if e.output else str(e)
+        return False, f"Git command failed: {err_msg.strip()}"
+    except FileNotFoundError:
+        return False, "System executable 'git' not found in PATH."
+    except Exception as e:
+        return False, f"Process execution error: {str(e)}"
+
+def sanitize_local_path(path_input):
+    """
+    Sanitize and validate a local directory path.
+    Returns (is_safe, resolved_path, error_message)
+    """
+    import os
+    if not path_input:
+        return False, None, "Path cannot be empty."
+        
+    path_input = path_input.strip()
+    
+    # Prevent flag injection
+    if path_input.startswith("-"):
+        return False, None, "Path cannot start with '-' to prevent CLI flag injection."
+        
+    # Check for invalid characters (null byte, control characters, newlines)
+    if "\x00" in path_input or "\n" in path_input or "\r" in path_input:
+        return False, None, "Path contains invalid control characters."
+        
+    # Resolve real path (expands relative elements like . and .. and symlinks)
+    try:
+        resolved = os.path.realpath(path_input)
+    except Exception as e:
+        return False, None, f"Failed to resolve path: {str(e)}"
+        
+    # Ensure it exists and is a directory
+    if not os.path.exists(resolved):
+        return False, None, "Directory does not exist."
+    if not os.path.isdir(resolved):
+        return False, None, "Path is not a valid directory."
+        
+    # Check if a .git directory exists inside it
+    git_dir = os.path.join(resolved, ".git")
+    if not os.path.exists(git_dir) or not os.path.isdir(git_dir):
+        return False, None, "Path is not a Git repository (missing '.git' folder)."
+        
+    # All checks passed
+    return True, resolved, None
+
+# ==========================================
 # TS Data Parsers (Projects, Resume, Certs)
 # ==========================================
 
@@ -1643,33 +1714,28 @@ with tab_project:
                 
                 with st.status("Gathering repository artifacts...", expanded=True) as status:
                     if project_mode == "Local Directory":
-                        project_path = os.path.abspath(proj_input)
-                        st.write(f"📂 Scanning local directory: {project_path}")
-                        
-                        if not os.path.isdir(project_path):
-                            st.error(f"Path '{project_path}' is not a valid directory.")
+                        is_safe, project_path, err_msg = sanitize_local_path(proj_input)
+                        if not is_safe:
+                            st.error(err_msg)
                             status.update(label="Scanning failed", state="error")
                         else:
+                            st.write(f"📂 Scanning local directory: {project_path}")
                             readme_path = os.path.join(project_path, "README.md")
                             if os.path.exists(readme_path):
-                                with open(readme_path, "r") as f:
+                                with open(readme_path, "r", encoding="utf-8") as f:
                                     readme_content = f.read()[:6000]
                                     
                             package_path = os.path.join(project_path, "package.json")
                             if os.path.exists(package_path):
-                                with open(package_path, "r") as f:
+                                with open(package_path, "r", encoding="utf-8") as f:
                                     package_content = f.read()
                                     
-                            git_dir = os.path.join(project_path, ".git")
-                            if os.path.exists(git_dir):
-                                import subprocess
-                                try:
-                                    git_logs = subprocess.check_output(
-                                        ["git", "log", "-n", "5", "--oneline"],
-                                        cwd=project_path
-                                    ).decode("utf-8")
-                                except:
-                                    pass
+                            success, logs_or_err = run_safe_git_command(
+                                ["git", "log", "-n", "5", "--oneline"],
+                                cwd=project_path
+                            )
+                            if success:
+                                git_logs = logs_or_err
                     else:
                         repo = proj_input.strip()
                         if "/" not in repo:
@@ -1796,21 +1862,41 @@ with tab_project:
                         
                         if not dry_run_proj:
                             st.info("🚀 Pushing changes to GitHub...")
-                            import subprocess
-                            try:
-                                status = subprocess.check_output(["git", "status", "--porcelain"], cwd=os.getcwd()).decode("utf-8")
-                                if status:
-                                    subprocess.check_call(["git", "add", "src/data/projects.ts", "src/data/resume.ts"], cwd=os.getcwd())
-                                    if "src/data/skills.ts" in status:
-                                        subprocess.check_call(["git", "add", "src/data/skills.ts"], cwd=os.getcwd())
-                                    commit_msg = f"chore(sync): publish project sync - {new_project['title']}"
-                                    subprocess.check_call(["git", "commit", "-m", commit_msg], cwd=os.getcwd())
-                                    subprocess.check_call(["git", "push", "origin", "main"], cwd=os.getcwd())
-                                    st.success("✅ Pushed successfully to GitHub!")
+                            success, status_out = run_safe_git_command(["git", "status", "--porcelain"], cwd=os.getcwd())
+                            if not success:
+                                st.error(f"Git status failed: {status_out}")
+                            elif status_out.strip():
+                                success, err_msg = run_safe_git_command(
+                                    ["git", "add", "src/data/projects.json", "src/data/resume.json"],
+                                    cwd=os.getcwd()
+                                )
+                                if success and "src/data/skills.json" in status_out:
+                                    success, err_msg = run_safe_git_command(
+                                        ["git", "add", "src/data/skills.json"],
+                                        cwd=os.getcwd()
+                                    )
+                                
+                                if not success:
+                                    st.error(f"Git add failed: {err_msg}")
                                 else:
-                                    st.info("No changes to commit and push.")
-                            except Exception as e:
-                                st.error(f"Failed to push to Git: {e}")
+                                    commit_msg = f"chore(sync): publish project sync - {new_project['title']}"
+                                    success, err_msg = run_safe_git_command(
+                                        ["git", "commit", "-m", commit_msg],
+                                        cwd=os.getcwd()
+                                    )
+                                    if not success:
+                                        st.error(f"Git commit failed: {err_msg}")
+                                    else:
+                                        success, push_out = run_safe_git_command(
+                                            ["git", "push", "origin", "main"],
+                                            cwd=os.getcwd()
+                                        )
+                                        if not success:
+                                            st.error(f"Git push failed: {push_out}")
+                                        else:
+                                            st.success("✅ Pushed successfully to GitHub!")
+                            else:
+                                st.info("No changes to commit and push.")
                     else:
                         status.update(label="API Sync call failed", state="error")
 
@@ -1875,17 +1961,33 @@ with tab_project:
                                 
                                 if not dry_run_proj:
                                     st.info("🚀 Pushing image and data to GitHub...")
-                                    import subprocess
-                                    try:
-                                        status = subprocess.check_output(["git", "status", "--porcelain"], cwd=os.getcwd()).decode("utf-8")
-                                        if status:
-                                            subprocess.check_call(["git", "add", "src/data/projects.ts", target_img_path], cwd=os.getcwd())
+                                    success, status_out = run_safe_git_command(["git", "status", "--porcelain"], cwd=os.getcwd())
+                                    if not success:
+                                        st.error(f"Git status failed: {status_out}")
+                                    elif status_out.strip():
+                                        success, err_msg = run_safe_git_command(
+                                            ["git", "add", "src/data/projects.json", target_img_path],
+                                            cwd=os.getcwd()
+                                        )
+                                        if not success:
+                                            st.error(f"Git add failed: {err_msg}")
+                                        else:
                                             commit_msg = f"chore(sync): update project photo - {p_title}"
-                                            subprocess.check_call(["git", "commit", "-m", commit_msg], cwd=os.getcwd())
-                                            subprocess.check_call(["git", "push", "origin", "main"], cwd=os.getcwd())
-                                            st.success("✅ Pushed successfully to GitHub!")
-                                    except Exception as e:
-                                        st.error(f"Failed to push to Git: {e}")
+                                            success, err_msg = run_safe_git_command(
+                                                ["git", "commit", "-m", commit_msg],
+                                                cwd=os.getcwd()
+                                            )
+                                            if not success:
+                                                st.error(f"Git commit failed: {err_msg}")
+                                            else:
+                                                success, push_out = run_safe_git_command(
+                                                    ["git", "push", "origin", "main"],
+                                                    cwd=os.getcwd()
+                                                )
+                                                if not success:
+                                                    st.error(f"Git push failed: {push_out}")
+                                                else:
+                                                    st.success("✅ Pushed successfully to GitHub!")
                                 st.rerun()
                             else:
                                 st.error(msg)
@@ -1921,17 +2023,33 @@ with tab_project:
                                 
                                 if not dry_run_proj:
                                     st.info("🚀 Pushing image to GitHub...")
-                                    import subprocess
-                                    try:
-                                        status = subprocess.check_output(["git", "status", "--porcelain"], cwd=os.getcwd()).decode("utf-8")
-                                        if status:
-                                            subprocess.check_call(["git", "add", "src/data/projects.ts", target_noir_path], cwd=os.getcwd())
+                                    success, status_out = run_safe_git_command(["git", "status", "--porcelain"], cwd=os.getcwd())
+                                    if not success:
+                                        st.error(f"Git status failed: {status_out}")
+                                    elif status_out.strip():
+                                        success, err_msg = run_safe_git_command(
+                                            ["git", "add", "src/data/projects.json", target_noir_path],
+                                            cwd=os.getcwd()
+                                        )
+                                        if not success:
+                                            st.error(f"Git add failed: {err_msg}")
+                                        else:
                                             commit_msg = f"chore(sync): update project noir photo - {p_title}"
-                                            subprocess.check_call(["git", "commit", "-m", commit_msg], cwd=os.getcwd())
-                                            subprocess.check_call(["git", "push", "origin", "main"], cwd=os.getcwd())
-                                            st.success("✅ Pushed successfully to GitHub!")
-                                    except Exception as e:
-                                        st.error(f"Failed to push to Git: {e}")
+                                            success, err_msg = run_safe_git_command(
+                                                ["git", "commit", "-m", commit_msg],
+                                                cwd=os.getcwd()
+                                            )
+                                            if not success:
+                                                st.error(f"Git commit failed: {err_msg}")
+                                            else:
+                                                success, push_out = run_safe_git_command(
+                                                    ["git", "push", "origin", "main"],
+                                                    cwd=os.getcwd()
+                                                )
+                                                if not success:
+                                                    st.error(f"Git push failed: {push_out}")
+                                                else:
+                                                    st.success("✅ Pushed successfully to GitHub!")
                                 st.rerun()
                             else:
                                 st.error(msg)
@@ -1991,17 +2109,18 @@ with tab_project:
                                     
                                     if not dry_run_proj:
                                         st.info("🚀 Pushing changes to GitHub...")
-                                        import subprocess
-                                        try:
-                                            status = subprocess.check_output(["git", "status", "--porcelain"], cwd=os.getcwd()).decode("utf-8")
-                                            if status:
-                                                subprocess.check_call(["git", "add", "src/data/projects.ts"], cwd=os.getcwd())
+                                        success, status_out = run_safe_git_command(["git", "status", "--porcelain"], cwd=os.getcwd())
+                                        if not success:
+                                            st.error(f"Git status failed: {status_out}")
+                                        elif status_out.strip():
+                                            success, err_msg = run_safe_git_command(
+                                                ["git", "add", "src/data/projects.json"],
+                                                cwd=os.getcwd()
+                                            )
+                                            if not success:
+                                                st.error(f"Git add failed: {err_msg}")
+                                            else:
                                                 commit_msg = f"chore(sync): update project - {project['title']}"
-                                                subprocess.check_call(["git", "commit", "-m", commit_msg], cwd=os.getcwd())
-                                                subprocess.check_call(["git", "push", "origin", "main"], cwd=os.getcwd())
-                                                st.success("✅ Pushed successfully to GitHub!")
-                                        except Exception as e:
-                                            st.error(f"Failed to push to Git: {e}")
                                             
                                     st.rerun()
                                 except Exception as e:
@@ -2036,17 +2155,33 @@ with tab_project:
                                 
                                 if not dry_run_proj:
                                     st.info("🚀 Pushing deletion to GitHub...")
-                                    import subprocess
-                                    try:
-                                        status = subprocess.check_output(["git", "status", "--porcelain"], cwd=os.getcwd()).decode("utf-8")
-                                        if status:
-                                            subprocess.check_call(["git", "add", "src/data/projects.ts"], cwd=os.getcwd())
+                                    success, status_out = run_safe_git_command(["git", "status", "--porcelain"], cwd=os.getcwd())
+                                    if not success:
+                                        st.error(f"Git status failed: {status_out}")
+                                    elif status_out.strip():
+                                        success, err_msg = run_safe_git_command(
+                                            ["git", "add", "src/data/projects.json"],
+                                            cwd=os.getcwd()
+                                        )
+                                        if not success:
+                                            st.error(f"Git add failed: {err_msg}")
+                                        else:
                                             commit_msg = f"chore(sync): delete project - {p_title}"
-                                            subprocess.check_call(["git", "commit", "-m", commit_msg], cwd=os.getcwd())
-                                            subprocess.check_call(["git", "push", "origin", "main"], cwd=os.getcwd())
-                                            st.success("✅ Pushed successfully to GitHub!")
-                                    except Exception as e:
-                                        st.error(f"Failed to push to Git: {e}")
+                                            success, err_msg = run_safe_git_command(
+                                                ["git", "commit", "-m", commit_msg],
+                                                cwd=os.getcwd()
+                                            )
+                                            if not success:
+                                                st.error(f"Git commit failed: {err_msg}")
+                                            else:
+                                                success, push_out = run_safe_git_command(
+                                                    ["git", "push", "origin", "main"],
+                                                    cwd=os.getcwd()
+                                                )
+                                                if not success:
+                                                    st.error(f"Git push failed: {push_out}")
+                                                else:
+                                                    st.success("✅ Pushed successfully to GitHub!")
                                         
                                 st.rerun()
                             except Exception as e:
@@ -2159,21 +2294,41 @@ with tab_cert:
                         
                         if not dry_run_cert:
                             st.info("🚀 Pushing changes to GitHub...")
-                            import subprocess
-                            try:
-                                status = subprocess.check_output(["git", "status", "--porcelain"], cwd=os.getcwd()).decode("utf-8")
-                                if status:
-                                    subprocess.check_call(["git", "add", "src/data/certificates.ts", "src/data/resume.ts", "public/certificates/"], cwd=os.getcwd())
-                                    if "src/data/skills.ts" in status:
-                                        subprocess.check_call(["git", "add", "src/data/skills.ts"], cwd=os.getcwd())
-                                    commit_msg = f"chore(sync): publish certificates sync"
-                                    subprocess.check_call(["git", "commit", "-m", commit_msg], cwd=os.getcwd())
-                                    subprocess.check_call(["git", "push", "origin", "main"], cwd=os.getcwd())
-                                    st.success("✅ Pushed successfully to GitHub!")
+                            success, status_out = run_safe_git_command(["git", "status", "--porcelain"], cwd=os.getcwd())
+                            if not success:
+                                st.error(f"Git status failed: {status_out}")
+                            elif status_out.strip():
+                                success, err_msg = run_safe_git_command(
+                                    ["git", "add", "src/data/certificates.json", "src/data/resume.json", "public/certificates/"],
+                                    cwd=os.getcwd()
+                                )
+                                if success and "src/data/skills.json" in status_out:
+                                    success, err_msg = run_safe_git_command(
+                                        ["git", "add", "src/data/skills.json"],
+                                        cwd=os.getcwd()
+                                    )
+                                
+                                if not success:
+                                    st.error(f"Git add failed: {err_msg}")
                                 else:
-                                    st.info("No changes to commit and push.")
-                            except Exception as e:
-                                st.error(f"Failed to push to Git: {e}")
+                                    commit_msg = f"chore(sync): publish certificates sync"
+                                    success, err_msg = run_safe_git_command(
+                                        ["git", "commit", "-m", commit_msg],
+                                        cwd=os.getcwd()
+                                    )
+                                    if not success:
+                                        st.error(f"Git commit failed: {err_msg}")
+                                    else:
+                                        success, push_out = run_safe_git_command(
+                                            ["git", "push", "origin", "main"],
+                                            cwd=os.getcwd()
+                                        )
+                                        if not success:
+                                            st.error(f"Git push failed: {push_out}")
+                                        else:
+                                            st.success("✅ Pushed successfully to GitHub!")
+                            else:
+                                st.info("No changes to commit and push.")
                         
                         st.rerun()
                     else:
@@ -2691,19 +2846,35 @@ coverImage: "/images/blog/default.jpg"
                 
                 if not dry_run_blog:
                     st.info("🚀 Pushing changes to GitHub...")
-                    import subprocess
-                    try:
-                        status = subprocess.check_output(["git", "status", "--porcelain"], cwd=os.getcwd()).decode("utf-8")
-                        if status:
-                            subprocess.check_call(["git", "add", file_path, "src/data/resume.ts"], cwd=os.getcwd())
-                            commit_msg = f"chore(blog): publish post - {draft_title}"
-                            subprocess.check_call(["git", "commit", "-m", commit_msg], cwd=os.getcwd())
-                            subprocess.check_call(["git", "push", "origin", "main"], cwd=os.getcwd())
-                            st.success("✅ Pushed successfully to GitHub!")
+                    success, status_out = run_safe_git_command(["git", "status", "--porcelain"], cwd=os.getcwd())
+                    if not success:
+                        st.error(f"Git status failed: {status_out}")
+                    elif status_out.strip():
+                        success, err_msg = run_safe_git_command(
+                            ["git", "add", file_path, "src/data/resume.json"],
+                            cwd=os.getcwd()
+                        )
+                        if not success:
+                            st.error(f"Git add failed: {err_msg}")
                         else:
-                            st.info("No changes to commit and push.")
-                    except Exception as e:
-                        st.error(f"Failed to push to Git: {e}")
+                            commit_msg = f"chore(blog): publish post - {draft_title}"
+                            success, err_msg = run_safe_git_command(
+                                ["git", "commit", "-m", commit_msg],
+                                cwd=os.getcwd()
+                            )
+                            if not success:
+                                st.error(f"Git commit failed: {err_msg}")
+                            else:
+                                success, push_out = run_safe_git_command(
+                                    ["git", "push", "origin", "main"],
+                                    cwd=os.getcwd()
+                                )
+                                if not success:
+                                    st.error(f"Git push failed: {push_out}")
+                                else:
+                                    st.success("✅ Pushed successfully to GitHub!")
+                    else:
+                        st.info("No changes to commit and push.")
                 
                 # Clear session state
                 if "blog_draft_title" in st.session_state: del st.session_state.blog_draft_title

@@ -1,19 +1,5 @@
 [
   {
-    "id": "bce0ec45-13a1-4ac7-9a16-6921635c835e",
-    "name": "AI Agent Orchestration",
-    "icon": "bot",
-    "description": "Designing and running autonomous multi-agent networks to perform complex development tasks.",
-    "category": "orchestration",
-    "color": "#E10098",
-    "level": "Level Max",
-    "prereq": "Structured Prompting",
-    "status": "mastered",
-    "projects": [],
-    "created_at": "2026-06-18T11:34:23.475732+00:00",
-    "updated_at": "2026-06-18T11:34:23.475732+00:00"
-  },
-  {
     "id": "434fa379-dd87-41bb-8fe4-75b102995066",
     "name": "AI Dev Workflows",
     "icon": "sparkles",
@@ -220,6 +206,20 @@
     "color": "#FFEB3B",
     "level": "Level Max",
     "prereq": "AI Dev Workflows",
+    "status": "mastered",
+    "projects": [],
+    "created_at": "2026-06-18T11:34:23.475732+00:00",
+    "updated_at": "2026-06-18T11:34:23.475732+00:00"
+  },
+  {
+    "id": "bce0ec45-13a1-4ac7-9a16-6921635c835e",
+    "name": "AI Agent Orchestration",
+    "icon": "bot",
+    "description": "Designing and running autonomous multi-agent networks to perform complex development tasks.",
+    "category": "orchestration",
+    "color": "#E10098",
+    "level": "Level Max",
+    "prereq": "Structured Prompting",
     "status": "mastered",
     "projects": [],
     "created_at": "2026-06-18T11:34:23.475732+00:00",
@@ -464,10 +464,80 @@
     "updated_at": "2026-06-21T08:14:07.99043+00:00"
   },
   {
+    "id": "ed1aeb8a-1a4b-47f7-9c8e-d23784ff674c",
     "name": "Jinja2",
     "icon": "file-text",
     "description": "Empowering AI to generate dynamic content and structured text outputs through templating.",
     "category": "dynamic",
-    "color": "#9A5012"
+    "color": "#9A5012",
+    "level": "",
+    "prereq": "",
+    "status": "",
+    "projects": [],
+    "created_at": "2026-06-21T08:14:14.10769+00:00",
+    "updated_at": "2026-06-21T08:14:14.10769+00:00"
+  },
+  {
+    "id": "a2ffd794-e2c5-4b9a-9b7a-1e3177330f8c",
+    "name": "Flask",
+    "icon": "flask",
+    "description": "Directing AI to build lightweight web applications and REST APIs using Flask.",
+    "category": "orchestration",
+    "color": "#000000",
+    "level": "",
+    "prereq": "",
+    "status": "",
+    "projects": [],
+    "created_at": "2026-06-22T08:59:05.487292+00:00",
+    "updated_at": "2026-06-22T08:59:05.487292+00:00"
+  },
+  {
+    "id": "2c94de0b-fa7a-4997-919e-2edb6be20451",
+    "name": "GoRouter",
+    "icon": "route",
+    "description": "Orchestrating AI to configure robust routing for microservices with GoRouter.",
+    "category": "orchestration",
+    "color": "#00ADD8",
+    "level": "",
+    "prereq": "",
+    "status": "",
+    "projects": [],
+    "created_at": "2026-06-22T08:59:42.072937+00:00",
+    "updated_at": "2026-06-22T08:59:42.072937+00:00"
+  },
+  {
+    "id": "32742626-79b6-420d-b1f8-abfd0c5a7ef9",
+    "name": "APIs (Application Programming Interfaces)",
+    "icon": "plug",
+    "description": "Steering AI to design, consume, and secure diverse Application Programming Interfaces efficiently.",
+    "category": "logic",
+    "color": "#336699",
+    "level": "",
+    "prereq": "",
+    "status": "",
+    "projects": [],
+    "created_at": "2026-06-22T08:59:50.613457+00:00",
+    "updated_at": "2026-06-22T08:59:50.613457+00:00"
+  },
+  {
+    "id": "5da5f372-5efc-4d03-968d-f3ea0b50a5bc",
+    "name": "SciPy",
+    "icon": "atom",
+    "description": "Instructing AI to leverage SciPy for advanced scientific computing and data analysis tasks.",
+    "category": "logic",
+    "color": "#8CAAE6",
+    "level": "",
+    "prereq": "",
+    "status": "",
+    "projects": [],
+    "created_at": "2026-06-22T08:59:59.307181+00:00",
+    "updated_at": "2026-06-22T08:59:59.307181+00:00"
+  },
+  {
+    "name": "Drift Detection",
+    "icon": "alert-triangle",
+    "description": "Directing AI to monitor and mitigate model performance drift in production systems dynamically.",
+    "category": "dynamic",
+    "color": "#FF5733"
   }
 ]
