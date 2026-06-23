@@ -390,11 +390,32 @@ def run_safe_git_command(args, cwd=None):
     import subprocess
     if not args or args[0] != "git":
         return False, "Invalid command program: only 'git' is allowed."
+        
+    # Hardened check: Ensure git subcommand is strictly whitelisted and no root options are passed
+    if len(args) < 2:
+        return False, "Git command is missing subcommand."
+        
+    allowed_subcommands = {"log", "status", "add", "commit", "push"}
+    subcommand = args[1]
+    if subcommand not in allowed_subcommands:
+        return False, f"Access denied: Git subcommand '{subcommand}' is not whitelisted."
+        
+    # Prevent flag/config injection flags anywhere in command arguments (e.g. --config, --exec-path)
+    banned_substrings = {"--config", "--exec-path", "--upload-pack", "--receive-pack"}
+    for arg in args[2:]:
+        for banned in banned_substrings:
+            if banned in arg:
+                return False, f"Access denied: Dangerous parameter '{banned}' detected in command arguments."
     
     if cwd:
         cwd = os.path.realpath(cwd)
         if not os.path.isdir(cwd):
             return False, f"Directory does not exist: {cwd}"
+            
+        # For safety, ensure cwd is inside the user's home directory or project directory
+        home_dir = os.path.expanduser("~")
+        if not cwd.startswith(home_dir) and not cwd.startswith(os.getcwd()):
+            return False, "Access denied: Working directory must be inside home directory or project directory."
             
     try:
         output = subprocess.check_output(
@@ -441,6 +462,11 @@ def sanitize_local_path(path_input):
         return False, None, "Directory does not exist."
     if not os.path.isdir(resolved):
         return False, None, "Path is not a valid directory."
+        
+    # Check if path is within home directory or project directory
+    home_dir = os.path.expanduser("~")
+    if not resolved.startswith(home_dir) and not resolved.startswith(os.getcwd()):
+        return False, None, "Access denied: Path must be inside home directory or project directory."
         
     # Check if a .git directory exists inside it
     git_dir = os.path.join(resolved, ".git")
@@ -1814,6 +1840,9 @@ with tab_project:
                 st.success("✅ Success! Gemini generated the entry structure and updated local files.")
                 st.markdown("### AI-Generated Showcase Entry Preview")
                 st.json(res["project_data"])
+                if res.get("warnings"):
+                    for warning in res["warnings"]:
+                        st.warning(warning)
                 if res["git_logs_output"]:
                     st.info(res["git_logs_output"])
             st.session_state.project_sync_task_status = "idle"
@@ -1952,9 +1981,12 @@ with tab_project:
                     check_and_add_pending_skills(project_data["tags"])
                     
                     resume = parse_resume_file()
+                    warnings = []
                     if resume:
+                        found_experience = False
                         for exp in resume.get('experience', []):
                             if exp['id'] == 'freelance-developer':
+                                found_experience = True
                                 exp['bullets'].append({
                                     "general": project_data['resumeBullet']['general'],
                                     "fullstack": project_data['resumeBullet'].get('fullstack', ''),
@@ -1964,6 +1996,9 @@ with tab_project:
                                 for tag in project_data['tags']:
                                     if tag not in exp['tags']:
                                         exp['tags'].append(tag)
+                        
+                        if not found_experience:
+                            warnings.append("⚠️ Resume experience entry with ID 'freelance-developer' was not found. Bullet points and tags were not added to the resume.")
                         
                         resume['lastSynced'] = {
                             "timestamp": datetime.now().isoformat(),
@@ -2014,7 +2049,8 @@ with tab_project:
                     return {
                         "project_data": project_data,
                         "new_project": new_project,
-                        "git_logs_output": git_logs_output
+                        "git_logs_output": git_logs_output,
+                        "warnings": warnings
                     }
                 
                 run_async_task(run_project_sync, "project_sync_task")
