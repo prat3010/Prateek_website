@@ -429,19 +429,28 @@ def parse_projects_file():
 
 # Write projects.ts (Now writes projects.json + Supabase)
 def write_projects_file(projects):
+    is_offline = st.session_state.get("offline_mode", False)
+    
+    if HAS_SYNC and not is_offline:
+        try:
+            res = sync_projects(projects)
+            if res is None:
+                raise Exception("Supabase REST API returned a failure response (None).")
+        except Exception as e:
+            raise Exception(f"Database sync failed: {str(e)}. Changes were NOT saved.")
+            
     path = "src/data/projects.json"
     try:
         with open(path, "w", encoding="utf-8") as f:
             json.dump(projects, f, indent=2)
     except Exception as e:
-        print(f"Failed to write projects to local file: {e}")
+        raise Exception(f"Failed to write projects to local file: {str(e)}")
         
-    if HAS_SYNC:
+    if HAS_SYNC and not is_offline:
         try:
-            sync_projects(projects)
             trigger_revalidation()
-        except Exception as e:
-            print(f"Failed to sync projects to Supabase: {e}")
+        except Exception:
+            pass
 
 # Parse resume.ts
 def extract_literal(content, start_sig):
@@ -672,35 +681,53 @@ def parse_skills_file():
 
 # Write skills.json + Supabase
 def write_skills_file(skills_list):
+    is_offline = st.session_state.get("offline_mode", False)
+    
+    if HAS_SYNC and not is_offline:
+        try:
+            res = sync_skills(skills_list)
+            if res is None:
+                raise Exception("Supabase REST API returned a failure response (None).")
+        except Exception as e:
+            raise Exception(f"Database sync failed: {str(e)}. Changes were NOT saved.")
+            
     path = "src/data/skills.json"
     try:
         with open(path, "w", encoding="utf-8") as f:
             json.dump(skills_list, f, indent=2)
     except Exception as e:
-        print(f"Failed to write skills to local file: {e}")
+        raise Exception(f"Failed to write skills to local file: {str(e)}")
 
-    if HAS_SYNC:
+    if HAS_SYNC and not is_offline:
         try:
-            sync_skills(skills_list)
             trigger_revalidation()
-        except Exception as e:
-            print(f"Failed to sync skills to Supabase: {e}")
+        except Exception:
+            pass
 
 # Write resume.json + Supabase
 def write_resume_file(resume):
+    is_offline = st.session_state.get("offline_mode", False)
+    
+    if HAS_SYNC and not is_offline:
+        try:
+            res = sync_resume(resume)
+            if res is None:
+                raise Exception("Supabase REST API returned a failure response (None).")
+        except Exception as e:
+            raise Exception(f"Database sync failed: {str(e)}. Changes were NOT saved.")
+            
     path = "src/data/resume.json"
     try:
         with open(path, "w", encoding="utf-8") as f:
             json.dump(resume, f, indent=2)
     except Exception as e:
-        print(f"Failed to write resume to local file: {e}")
+        raise Exception(f"Failed to write resume to local file: {str(e)}")
 
-    if HAS_SYNC:
+    if HAS_SYNC and not is_offline:
         try:
-            sync_resume(resume)
             trigger_revalidation()
-        except Exception as e:
-            print(f"Failed to sync resume to Supabase: {e}")
+        except Exception:
+            pass
 
 # Parse certificates.json + Supabase
 def parse_certificates_file():
@@ -724,19 +751,28 @@ def parse_certificates_file():
 
 # Write certificates.json + Supabase
 def write_certificates_file(certificates):
+    is_offline = st.session_state.get("offline_mode", False)
+    
+    if HAS_SYNC and not is_offline:
+        try:
+            res = sync_certificates(certificates)
+            if res is None:
+                raise Exception("Supabase REST API returned a failure response (None).")
+        except Exception as e:
+            raise Exception(f"Database sync failed: {str(e)}. Changes were NOT saved.")
+            
     path = "src/data/certificates.json"
     try:
         with open(path, "w", encoding="utf-8") as f:
             json.dump(certificates, f, indent=2)
     except Exception as e:
-        print(f"Failed to write certificates to local file: {e}")
+        raise Exception(f"Failed to write certificates to local file: {str(e)}")
 
-    if HAS_SYNC:
+    if HAS_SYNC and not is_offline:
         try:
-            sync_certificates(certificates)
             trigger_revalidation()
-        except Exception as e:
-            print(f"Failed to sync certificates to Supabase: {e}")
+        except Exception:
+            pass
 
 # Helpers
 def get_mime_type(filename):
@@ -1255,6 +1291,9 @@ if GEMINI_API_KEY:
     st.sidebar.success("Gemini API Key loaded from .env.local")
 else:
     st.sidebar.error("GEMINI_API_KEY not found in .env.local")
+
+# Offline Mode Switcher
+st.sidebar.checkbox("Offline Mode (Local JSON Only)", value=not HAS_SYNC, key="offline_mode")
 
 # Manual button to scan for missing skills
 if st.sidebar.button("Scan for Missing Skills", use_container_width=True):
@@ -2276,21 +2315,24 @@ with tab_cert:
                     
                     if updated:
                         status.update(label="All raw files processed!", state="complete")
-                        write_certificates_file(current_certs)
-                        st.session_state.certificates = current_certs
-                        
-                        # Update resume log
-                        resume = parse_resume_file()
-                        if resume and sync_logs:
-                            resume['lastSynced'] = {
-                                "timestamp": datetime.now().isoformat(),
-                                "status": "success",
-                                "summary": " & ".join(sync_logs)
-                            }
-                            write_resume_file(resume)
-                            st.session_state.resume = resume
+                        try:
+                            write_certificates_file(current_certs)
+                            st.session_state.certificates = current_certs
                             
-                        st.success("Certificates added to certificates.ts and moved to assets!")
+                            # Update resume log
+                            resume = parse_resume_file()
+                            if resume and sync_logs:
+                                resume['lastSynced'] = {
+                                    "timestamp": datetime.now().isoformat(),
+                                    "status": "success",
+                                    "summary": " & ".join(sync_logs)
+                                }
+                                write_resume_file(resume)
+                                st.session_state.resume = resume
+                                
+                            st.success("Certificates added to certificates.json and moved to assets!")
+                        except Exception as e:
+                            st.error(f"Failed to save certificates: {e}")
                         
                         if not dry_run_cert:
                             st.info("🚀 Pushing changes to GitHub...")
@@ -2386,22 +2428,25 @@ with tab_cert:
                         updated_certs = [c for c in current_certs if c.get("id") != cert_id]
                         
                         # 3. Write file
-                        write_certificates_file(updated_certs)
-                        st.session_state.certificates = updated_certs
-                        
-                        # 4. Update resume log
-                        resume = parse_resume_file()
-                        if resume:
-                            resume['lastSynced'] = {
-                                "timestamp": datetime.now().isoformat(),
-                                "status": "success",
-                                "summary": f"Removed certificate: {cert.get('title')}"
-                            }
-                            write_resume_file(resume)
-                            st.session_state.resume = resume
+                        try:
+                            write_certificates_file(updated_certs)
+                            st.session_state.certificates = updated_certs
                             
-                        st.success(f"Successfully removed certificate: **{cert.get('title')}**")
-                        st.rerun()
+                            # 4. Update resume log
+                            resume = parse_resume_file()
+                            if resume:
+                                resume['lastSynced'] = {
+                                    "timestamp": datetime.now().isoformat(),
+                                    "status": "success",
+                                    "summary": f"Removed certificate: {cert.get('title')}"
+                                }
+                                write_resume_file(resume)
+                                st.session_state.resume = resume
+                                
+                            st.success(f"Successfully removed certificate: **{cert.get('title')}**")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Failed to delete certificate: {e}")
 
 # ──────────────────────────────────────────
 # TAB 4: MANAGE SKILLS

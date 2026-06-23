@@ -88,7 +88,7 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
 - **Sidebar Monitors:**
   - **CI/CD Deployment Status:** Automatically tracks Vercel build status via GitHub API, displaying status updates in IST (Indian Standard Time).
   - **Pending Skill Approvals:** Lists queue of AI-extracted skills for immediate addition.
-- **Fallback Synchronization:** The dashboard writes to both the database and the local JSON fallbacks in `src/data/` (e.g., `projects.json`, `skills.json`). If database connections fail, the Next.js app automatically falls back to these files. Future content features must maintain this dual JSON/database fallback contract.
+- **Fallback Synchronization & Offline Mode:** The dashboard writes to both the database and the local JSON fallbacks in `src/data/` (e.g., `projects.json`, `skills.json`). To ensure consistency, the dashboard commits to the database *first* and rolls back the local file write on failure. Check the **Offline Mode (Local JSON Only)** toggle in the Streamlit sidebar to disable database synchronization and force local-only modifications. If database connections fail at runtime in Next.js, the web app automatically falls back to reading these local JSON files. Future content features must maintain this dual JSON/database fallback contract.
 - **Python / JS Decoupling:** Keep Python tools strictly as local content-management scripts. Do not attempt to invoke Python scripts or require Python dependencies (`streamlit`, `Pillow`) in any runtime web app paths or public API routes.
 
 

@@ -55,6 +55,8 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 The project includes a Streamlit-based local dashboard to manage resume details, upload certificates, sync GitHub repositories, update project photos, and write blog posts with Gemini AI assistance.
 
+> 💡 **Offline Mode:** By default, saving changes commits to the Supabase database first and updates local JSON files only on success. If you are developing offline or without a database connection, check the **Offline Mode (Local JSON Only)** toggle in the sidebar to bypass database writes and modify local files directly.
+
 #### Run the Synchronizer:
 
 ```bash
