@@ -335,6 +335,53 @@ def check_and_add_pending_skills(tags_list):
 # ==========================================
 # Safe Subprocess & Input Sanitization Helpers
 # ==========================================
+def run_async_task(task_func, key_prefix):
+    """
+    Executes a task function in a background thread.
+    Maintains status in session state:
+      - st.session_state[f'{key_prefix}_status']: "idle", "running", "success", "error"
+      - st.session_state[f'{key_prefix}_result']: Return value on success
+      - st.session_state[f'{key_prefix}_error']: Error message on failure
+    """
+    import threading
+    try:
+        from streamlit.runtime.scriptrunner import add_script_run_ctx
+    except ImportError:
+        try:
+            from streamlit.scriptrunner import add_script_run_ctx
+        except ImportError:
+            add_script_run_ctx = None
+
+    status_key = f"{key_prefix}_status"
+    result_key = f"{key_prefix}_result"
+    error_key = f"{key_prefix}_error"
+    
+    if status_key not in st.session_state:
+        st.session_state[status_key] = "idle"
+        
+    if st.session_state[status_key] == "running":
+        return
+
+    st.session_state[status_key] = "running"
+    st.session_state[error_key] = None
+
+    def worker():
+        try:
+            res = task_func()
+            st.session_state[result_key] = res
+            st.session_state[status_key] = "success"
+        except Exception as e:
+            st.session_state[error_key] = str(e)
+            st.session_state[status_key] = "error"
+        finally:
+            # Trigger Streamlit to rerun the script to update the UI
+            st.rerun()
+
+    thread = threading.Thread(target=worker)
+    thread.daemon = True
+    if add_script_run_ctx:
+        add_script_run_ctx(thread)
+    thread.start()
 def run_safe_git_command(args, cwd=None):
     """
     Safely execute a git subprocess command.
@@ -1234,13 +1281,28 @@ if "deploy_status" not in st.session_state:
 if "last_checked" not in st.session_state:
     st.session_state.last_checked = None
 
-# Automatically fetch on first load if not present
-if st.session_state.deploy_status is None:
-    st.session_state.deploy_status = fetch_deployment_status()
-    st.session_state.last_checked = datetime.now().strftime("%H:%M:%S")
+task_status = st.session_state.get("deploy_status_task_status", "idle")
 
-status = st.session_state.deploy_status
-last_checked = st.session_state.last_checked
+if st.session_state.deploy_status is None or task_status == "running":
+    if task_status == "idle":
+        run_async_task(fetch_deployment_status, "deploy_status_task")
+        status = {"state": "pending", "description": "Fetching latest status in background..."}
+        last_checked = "Fetching..."
+    elif task_status == "running":
+        status = {"state": "pending", "description": "Fetching latest status in background..."}
+        last_checked = "Fetching..."
+    elif task_status == "error":
+        status = {"error": st.session_state.get("deploy_status_task_error", "Failed to fetch")}
+        last_checked = "Error"
+else:
+    status = st.session_state.deploy_status
+    last_checked = st.session_state.last_checked
+
+if st.session_state.get("deploy_status_task_status") == "success":
+    st.session_state.deploy_status = st.session_state.deploy_status_task_result
+    st.session_state.last_checked = datetime.now().strftime("%H:%M:%S")
+    st.session_state.deploy_status_task_status = "idle"
+    st.rerun()
 
 with st.sidebar.container(border=True):
     if "error" in status:
@@ -1282,8 +1344,8 @@ with st.sidebar.container(border=True):
 
     st.markdown(f"<small style='color: #8A8A93;'>Checked at: {last_checked}</small>", unsafe_allow_html=True)
     if st.button("Refresh Status", key="btn_refresh_deploy_status", use_container_width=True):
-        st.session_state.deploy_status = fetch_deployment_status()
-        st.session_state.last_checked = datetime.now().strftime("%H:%M:%S")
+        st.session_state.deploy_status = None
+        st.session_state.deploy_status_task_status = "idle"
         st.rerun()
 
 
@@ -1743,44 +1805,70 @@ with tab_project:
 
         dry_run_proj = st.checkbox("Dry-Run Mode (Save locally only, do not push to remote)", value=True)
 
-        if st.button("Sync Project Now", type="primary"):
+        # Check task states
+        proj_status = st.session_state.get("project_sync_task_status", "idle")
+        
+        if proj_status == "success":
+            res = st.session_state.get("project_sync_task_result")
+            if res:
+                st.success("✅ Success! Gemini generated the entry structure and updated local files.")
+                st.markdown("### AI-Generated Showcase Entry Preview")
+                st.json(res["project_data"])
+                if res["git_logs_output"]:
+                    st.info(res["git_logs_output"])
+            st.session_state.project_sync_task_status = "idle"
+            
+        elif proj_status == "error":
+            err_msg = st.session_state.get("project_sync_task_error", "Unknown error")
+            st.error(f"❌ Synchronization failed: {err_msg}")
+            st.session_state.project_sync_task_status = "idle"
+            
+        if proj_status == "running":
+            st.info("🔄 Syncing project showcase in the background...")
+            st.markdown(
+                '<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">'
+                '<div class="spinner-border text-primary" role="status" style="width: 1.5rem; height: 1.5rem; border: 0.25em solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spinner-border .75s linear infinite;"></div>'
+                '<span>Extracting repository info, generating tags, and updating showcase database with Gemini. You can switch tabs or edit other fields!</span>'
+                '</div>'
+                '<style>@keyframes spinner-border { to { transform: rotate(360deg); } }</style>',
+                unsafe_allow_html=True
+            )
+
+        btn_disabled = (proj_status == "running")
+        if st.button("Sync Project Now", type="primary", disabled=btn_disabled, key="btn_sync_project"):
             if not proj_input:
                 st.error("Please provide a path or repository link.")
             else:
-                readme_content = ""
-                package_content = ""
-                git_logs = ""
-                
-                with st.status("Gathering repository artifacts...", expanded=True) as status:
+                def run_project_sync():
+                    readme_content = ""
+                    package_content = ""
+                    git_logs = ""
+                    
                     if project_mode == "Local Directory":
                         is_safe, project_path, err_msg = sanitize_local_path(proj_input)
                         if not is_safe:
-                            st.error(err_msg)
-                            status.update(label="Scanning failed", state="error")
-                        else:
-                            st.write(f"📂 Scanning local directory: {project_path}")
-                            readme_path = os.path.join(project_path, "README.md")
-                            if os.path.exists(readme_path):
-                                with open(readme_path, "r", encoding="utf-8") as f:
-                                    readme_content = f.read()[:6000]
-                                    
-                            package_path = os.path.join(project_path, "package.json")
-                            if os.path.exists(package_path):
-                                with open(package_path, "r", encoding="utf-8") as f:
-                                    package_content = f.read()
-                                    
-                            success, logs_or_err = run_safe_git_command(
-                                ["git", "log", "-n", "5", "--oneline"],
-                                cwd=project_path
-                            )
-                            if success:
-                                git_logs = logs_or_err
+                            raise ValueError(err_msg)
+                        
+                        readme_path = os.path.join(project_path, "README.md")
+                        if os.path.exists(readme_path):
+                            with open(readme_path, "r", encoding="utf-8") as f:
+                                readme_content = f.read()[:6000]
+                                
+                        package_path = os.path.join(project_path, "package.json")
+                        if os.path.exists(package_path):
+                            with open(package_path, "r", encoding="utf-8") as f:
+                                package_content = f.read()
+                                
+                        success, logs_or_err = run_safe_git_command(
+                            ["git", "log", "-n", "5", "--oneline"],
+                            cwd=project_path
+                        )
+                        if success:
+                            git_logs = logs_or_err
                     else:
                         repo = proj_input.strip()
                         if "/" not in repo:
                             repo = f"prat3010/{repo}"
-                        
-                        st.write(f"🌐 Querying GitHub REST API for: {repo}")
                         
                         def fetch_github(url_path, is_api=False):
                             url = f"https://api.github.com/repos/{repo}{url_path}" if is_api else f"https://raw.githubusercontent.com/{repo}/{url_path}"
@@ -1806,11 +1894,6 @@ with tab_project:
                             except:
                                 pass
                     
-                    # Check contents
-                    if not readme_content and not package_content:
-                        st.warning("Empty repository metadata gathered. Will submit minimal details to Gemini.")
-                    
-                    st.write("🤖 Transmitting codebase properties to Gemini API...")
                     prompt = f"""
                     Analyze the following project code artifacts (README, package config, and git logs).
                     Use these details to formulate a showcase entry matching our Next.js Project schema.
@@ -1842,102 +1925,100 @@ with tab_project:
                     """
                     
                     project_data = call_gemini(prompt)
-                    if project_data:
-                        status.update(label="Synchronization parsed!", state="complete")
-                        st.success("✅ Success! Gemini generated the entry structure.")
+                    if not project_data:
+                        raise ValueError("Gemini failed to generate project data. Verify API key, logs, or format.")
+                    
+                    project_id = re.sub(r'[^a-zA-Z0-9]', '-', project_data['title'].lower())
+                    current_projects = parse_projects_file()
+                    current_projects = [p for p in current_projects if p['id'] != project_id]
+                    
+                    new_project = {
+                        "id": project_id,
+                        "title": project_data["title"],
+                        "description": project_data["description"],
+                        "longDescription": project_data["longDescription"],
+                        "image": f"/images/project-{project_id}.webp", 
+                        "tags": project_data["tags"],
+                        "liveUrl": "",
+                        "githubUrl": f"https://github.com/{repo}" if project_mode != "Local Directory" else "",
+                        "color": project_data["color"],
+                        "isLive": False,
+                        "status": "soon"
+                    }
+                    
+                    current_projects.append(new_project)
+                    write_projects_file(current_projects)
+                    st.session_state.projects = current_projects
+                    check_and_add_pending_skills(project_data["tags"])
+                    
+                    resume = parse_resume_file()
+                    if resume:
+                        for exp in resume.get('experience', []):
+                            if exp['id'] == 'freelance-developer':
+                                exp['bullets'].append({
+                                    "general": project_data['resumeBullet']['general'],
+                                    "fullstack": project_data['resumeBullet'].get('fullstack', ''),
+                                    "ai": project_data['resumeBullet'].get('ai', ''),
+                                    "creative": project_data['resumeBullet'].get('creative', '')
+                                })
+                                for tag in project_data['tags']:
+                                    if tag not in exp['tags']:
+                                        exp['tags'].append(tag)
                         
-                        st.markdown("### AI-Generated Showcase Entry Preview")
-                        st.json(project_data)
-                        
-                        project_id = re.sub(r'[^a-zA-Z0-9]', '-', project_data['title'].lower())
-                        current_projects = parse_projects_file()
-                        
-                        # Remove existing project with same ID if any
-                        current_projects = [p for p in current_projects if p['id'] != project_id]
-                        
-                        new_project = {
-                            "id": project_id,
-                            "title": project_data["title"],
-                            "description": project_data["description"],
-                            "longDescription": project_data["longDescription"],
-                            "image": f"/images/project-{project_id}.webp", 
-                            "tags": project_data["tags"],
-                            "liveUrl": "",
-                            "githubUrl": f"https://github.com/{repo}" if project_mode != "Local Directory" else "",
-                            "color": project_data["color"],
-                            "isLive": False,
-                            "status": "soon"
+                        resume['lastSynced'] = {
+                            "timestamp": datetime.now().isoformat(),
+                            "status": "success",
+                            "summary": f"Synchronized new project: {new_project['title']}."
                         }
-                        
-                        current_projects.append(new_project)
-                        write_projects_file(current_projects)
-                        st.session_state.projects = current_projects
-                        check_and_add_pending_skills(project_data["tags"])
-                        
-                        # Append resume bullet
-                        resume = parse_resume_file()
-                        if resume:
-                            for exp in resume.get('experience', []):
-                                if exp['id'] == 'freelance-developer':
-                                    exp['bullets'].append({
-                                        "general": project_data['resumeBullet']['general'],
-                                        "fullstack": project_data['resumeBullet'].get('fullstack', ''),
-                                        "ai": project_data['resumeBullet'].get('ai', ''),
-                                        "creative": project_data['resumeBullet'].get('creative', '')
-                                    })
-                                    for tag in project_data['tags']:
-                                        if tag not in exp['tags']:
-                                            exp['tags'].append(tag)
-                            
-                            resume['lastSynced'] = {
-                                "timestamp": datetime.now().isoformat(),
-                                "status": "success",
-                                "summary": f"Synchronized new project: {new_project['title']}."
-                            }
-                            write_resume_file(resume)
-                            st.session_state.resume = resume
-                            
-                        st.success(f"Saved entry locally. Added to projects.ts and experience bullets in resume.ts!")
-                        
-                        if not dry_run_proj:
-                            st.info("🚀 Pushing changes to GitHub...")
-                            success, status_out = run_safe_git_command(["git", "status", "--porcelain"], cwd=os.getcwd())
-                            if not success:
-                                st.error(f"Git status failed: {status_out}")
-                            elif status_out.strip():
+                        write_resume_file(resume)
+                        st.session_state.resume = resume
+                    
+                    git_logs_output = ""
+                    if not dry_run_proj:
+                        success, status_out = run_safe_git_command(["git", "status", "--porcelain"], cwd=os.getcwd())
+                        if not success:
+                            raise ValueError(f"Git status failed: {status_out}")
+                        elif status_out.strip():
+                            success, err_msg = run_safe_git_command(
+                                ["git", "add", "src/data/projects.json", "src/data/resume.json"],
+                                cwd=os.getcwd()
+                            )
+                            if success and "src/data/skills.json" in status_out:
                                 success, err_msg = run_safe_git_command(
-                                    ["git", "add", "src/data/projects.json", "src/data/resume.json"],
+                                    ["git", "add", "src/data/skills.json"],
                                     cwd=os.getcwd()
                                 )
-                                if success and "src/data/skills.json" in status_out:
-                                    success, err_msg = run_safe_git_command(
-                                        ["git", "add", "src/data/skills.json"],
-                                        cwd=os.getcwd()
-                                    )
-                                
+                            
+                            if not success:
+                                raise ValueError(f"Git add failed: {err_msg}")
+                            else:
+                                commit_msg = f"chore(sync): publish project sync - {new_project['title']}"
+                                success, err_msg = run_safe_git_command(
+                                    ["git", "commit", "-m", commit_msg],
+                                    cwd=os.getcwd()
+                                )
                                 if not success:
-                                    st.error(f"Git add failed: {err_msg}")
+                                    raise ValueError(f"Git commit failed: {err_msg}")
                                 else:
-                                    commit_msg = f"chore(sync): publish project sync - {new_project['title']}"
-                                    success, err_msg = run_safe_git_command(
-                                        ["git", "commit", "-m", commit_msg],
+                                    success, push_out = run_safe_git_command(
+                                        ["git", "push", "origin", "main"],
                                         cwd=os.getcwd()
                                     )
                                     if not success:
-                                        st.error(f"Git commit failed: {err_msg}")
+                                        raise ValueError(f"Git push failed: {push_out}")
                                     else:
-                                        success, push_out = run_safe_git_command(
-                                            ["git", "push", "origin", "main"],
-                                            cwd=os.getcwd()
-                                        )
-                                        if not success:
-                                            st.error(f"Git push failed: {push_out}")
-                                        else:
-                                            st.success("✅ Pushed successfully to GitHub!")
-                            else:
-                                st.info("No changes to commit and push.")
-                    else:
-                        status.update(label="API Sync call failed", state="error")
+                                        git_logs_output = "✅ Pushed successfully to GitHub!"
+                        else:
+                            git_logs_output = "No changes to commit and push."
+                            
+                    return {
+                        "project_data": project_data,
+                        "new_project": new_project,
+                        "git_logs_output": git_logs_output
+                    }
+                
+                run_async_task(run_project_sync, "project_sync_task")
+                st.rerun()
 
     # 2. Manage & Edit Active Projects Section
     st.markdown('<div class="section-header" style="margin-top: 2rem;">Manage & Edit Active Projects</div>', unsafe_allow_html=True)
@@ -2808,36 +2889,64 @@ with tab_blog:
     
     tone = st.selectbox("Choose Tone:", ["Professional & Technical", "Conversational & Casual", "Tutorial / How-To Style"])
     
-    if st.button("Draft Blog Post with AI", use_container_width=True):
+    blog_status = st.session_state.get("blog_draft_task_status", "idle")
+    
+    if blog_status == "success":
+        res = st.session_state.get("blog_draft_task_result")
+        if res:
+            st.session_state.blog_draft_title = res.get("title", "")
+            st.session_state.blog_draft_excerpt = res.get("excerpt", "")
+            st.session_state.blog_draft_content = res.get("content", "")
+            st.success("Draft generated! Review it below.")
+        st.session_state.blog_draft_task_status = "idle"
+    elif blog_status == "error":
+        err_msg = st.session_state.get("blog_draft_task_error", "Unknown error")
+        st.error(f"Error generating draft: {err_msg}")
+        st.session_state.blog_draft_task_status = "idle"
+        
+    if blog_status == "running":
+        st.info("🤖 Translating notes into a professional article in the background...")
+        st.markdown(
+            '<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">'
+            '<div class="spinner-border text-primary" role="status" style="width: 1.5rem; height: 1.5rem; border: 0.25em solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spinner-border .75s linear infinite;"></div>'
+            '<span>Gemini is generating your draft. Feel free to edit other parts or switch tabs!</span>'
+            '</div>'
+            '<style>@keyframes spinner-border { to { transform: rotate(360deg); } }</style>',
+            unsafe_allow_html=True
+        )
+
+    btn_disabled = (blog_status == "running")
+    if st.button("Draft Blog Post with AI", use_container_width=True, disabled=btn_disabled, key="btn_draft_blog"):
         if not raw_notes:
             st.error("Please add some raw notes or code first!")
         else:
-            with st.spinner("🤖 Translating notes into a professional article..."):
-                prompt = f"""
-                You are a senior full-stack developer and technical writer. 
-                Your task is to write a highly engaging, clear, and professional developer blog post based on these raw notes and code:
-                
-                [RAW NOTES / CODE]
-                {raw_notes}
-                
-                [TONE]
-                {tone}
-                
-                Generate and return strictly the following JSON structure:
-                {{
-                  "title": "A catchy, SEO-optimized title for the blog post (e.g. 'How to solve X with Y')",
-                  "excerpt": "A short, 1-2 sentence description summarizing the post's takeaways",
-                  "content": "The full body content of the blog post in standard Markdown format. Use clear headings (e.g. ##, ###), bullets, blockquotes, and code blocks for technical details. Focus on clarity, engineering details, and keep it direct. Avoid standard AI greeting fillers or concluding phrases like 'In conclusion'."
-                }}
-                Do not return any conversational text, markdown formatting wrappers outside the JSON, or backticks. Return only the raw JSON.
-                """
-                
+            prompt = f"""
+            You are a senior full-stack developer and technical writer. 
+            Your task is to write a highly engaging, clear, and professional developer blog post based on these raw notes and code:
+            
+            [RAW NOTES / CODE]
+            {raw_notes}
+            
+            [TONE]
+            {tone}
+            
+            Generate and return strictly the following JSON structure:
+            {{
+              "title": "A catchy, SEO-optimized title for the blog post (e.g. 'How to solve X with Y')",
+              "excerpt": "A short, 1-2 sentence description summarizing the post's takeaways",
+              "content": "The full body content of the blog post in standard Markdown format. Use clear headings (e.g. ##, ###), bullets, blockquotes, and code blocks for technical details. Focus on clarity, engineering details, and keep it direct. Avoid standard AI greeting fillers or concluding phrases like 'In conclusion'."
+            }}
+            Do not return any conversational text, markdown formatting wrappers outside the JSON, or backticks. Return only the raw JSON.
+            """
+            
+            def run_blog_generation():
                 res = call_gemini(prompt)
-                if res:
-                    st.session_state.blog_draft_title = res.get("title", "")
-                    st.session_state.blog_draft_excerpt = res.get("excerpt", "")
-                    st.session_state.blog_draft_content = res.get("content", "")
-                    st.success("Draft generated! Review it below.")
+                if res is None:
+                    raise ValueError("Failed to generate blog post from Gemini. Please verify API key, logs, or network.")
+                return res
+                
+            run_async_task(run_blog_generation, "blog_draft_task")
+            st.rerun()
                     
     # Form details (pre-filled from session state if available)
     st.subheader("Edit & Publish Post")
