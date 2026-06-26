@@ -49,18 +49,6 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
 
   // Get geolocation headers (populated automatically by Vercel in production)
   const country = request.headers.get('x-vercel-ip-country') || 'Local/Unknown';
-  const rawRegion = request.headers.get('x-vercel-ip-country-region') || '';
-  const rawCity = request.headers.get('x-vercel-ip-city') || '';
-
-  // Vercel sends geolocation headers URL-encoded (e.g., "Amb%C4%81la" for "Ambāla")
-  let region = rawRegion;
-  let city = rawCity;
-  try {
-    if (rawRegion) region = decodeURIComponent(rawRegion);
-    if (rawCity) city = decodeURIComponent(rawCity);
-  } catch (e) {
-    console.error('Failed to decode geolocation headers:', e);
-  }
 
   // Get Referrer & Sanitize to Domain to protect privacy and prevent spam
   let referrer = request.headers.get('referer') || '';
@@ -92,8 +80,8 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
         await supabase.from('page_visits').insert({
           path: pathname || '/',
           country,
-          region,
-          city,
+          region: null,
+          city: null,
           browser: browser.name || 'Unknown',
           os: os.name || 'Unknown',
           device: device.type || 'desktop', // fallback to desktop if type is undefined

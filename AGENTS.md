@@ -22,7 +22,7 @@ This is Prateek Sharma's personal portfolio, built with Next.js 16 App Router, R
 
 - **Hosting & Platform:** Fully deployed and hosted on Vercel.
 - **Custom Domain:** Mapped to the custom domain `prateeq.in` (purchased via GoDaddy and configured with DNS records pointing to Vercel).
-- **Proxy & Geolocation:** Geolocation detection in `src/proxy.ts` relies on Vercel-specific headers (`x-vercel-ip-country`, `x-vercel-ip-country-region`, `x-vercel-ip-city`). Do not alter or strip these headers.
+- **Proxy & Geolocation:** Geolocation detection in `src/proxy.ts` relies on Vercel-specific country header (`x-vercel-ip-country`). Region and city tracking headers (`x-vercel-ip-country-region`, `x-vercel-ip-city`) are intentionally ignored and logged as `null` to avoid inaccurate city geolocating from ISP routing. Do not alter or strip the `x-vercel-ip-country` header.
 
 ## Environment Variables
 
