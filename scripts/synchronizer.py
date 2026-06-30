@@ -1684,6 +1684,8 @@ with tab_edit:
                 res['website'] = st.text_input("Website Link", res.get('website', ''))
                 res['github'] = st.text_input("GitHub Profile", res.get('github', ''))
                 res['linkedin'] = st.text_input("LinkedIn Profile", res.get('linkedin', ''))
+                res['twitter'] = st.text_input("Twitter / X Profile", res.get('twitter', ''))
+                res['instagram'] = st.text_input("Instagram Profile", res.get('instagram', ''))
 
         # 2. Summaries section
         with st.container(border=True):

@@ -30,11 +30,11 @@ function HeroClientContent({ taglines, isNoir }: HeroClientProps & { isNoir: boo
   const [tagline, setTagline] = useState(defaultTagline);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
+    const timer = setTimeout(() => {
       const randomIndex = Math.floor(Math.random() * list.length);
       setTagline(list[randomIndex]);
     }, 0);
-    return () => clearTimeout(timeout);
+    return () => clearTimeout(timer);
   }, [list]);
 
   const { displayText, isDone } = useTypewriter({

@@ -431,6 +431,19 @@
     max-width: 280px;
   }
 
+  .subtitleContainer {
+    align-items: center;
+  }
+
+  .taglineBadges {
+    justify-content: center;
+  }
+
+  .vibeBox {
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: center;
+  }
 
   .ctaButton {
     display: inline-block;

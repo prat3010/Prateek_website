@@ -28,6 +28,8 @@ export interface ResumeData {
   website: string;
   github: string;
   linkedin: string;
+  twitter?: string;
+  instagram?: string;
   summary: {
     general: string;
     fullstack: string;

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Metadata } from 'next';
 import Link from 'next/link';
 import RefreshButton from './RefreshButton';
 import { getAnalyticsData } from './_lib/analytics';
@@ -26,6 +27,14 @@ import {
   EyeOff,
   Zap
 } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Visitor Analytics | Prateeq Sharma',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export const revalidate = 300; // Cache dashboard queries for 5 minutes (ISR) to optimize database hits
 

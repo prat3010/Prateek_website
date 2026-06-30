@@ -6,6 +6,7 @@ import "./globals.css";
 import ClientLayout from "./ClientLayout";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Theme } from "@/context/ThemeContext";
+import { getProfile, getSkills } from "@/lib/data";
 
 const playfairDisplay = Playfair_Display({
   variable: "--font-playfair-display",
@@ -63,34 +64,6 @@ export const metadata: Metadata = {
     images: ["/opengraph-image.png"],
   },
 };
-
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  "name": "Prateeq Sharma",
-  "jobTitle": "Full Stack Developer & Designer",
-  "url": "https://prateeq.in",
-  "description": "Portfolio of Prateeq Sharma — developer, designer, and storyteller crafting high-performance web applications and interactive experiences.",
-  "sameAs": [
-    "https://github.com/prat3010",
-    "https://linkedin.com/in/freshlimevodka",
-    "https://x.com/3010prateek",
-    "https://instagram.com/freshlimevodka"
-  ],
-  "knowsAbout": [
-    "React",
-    "Next.js",
-    "Flutter",
-    "Dart",
-    "Python",
-    "FastAPI",
-    "Flask",
-    "UI/UX Design",
-    "AI Prototyping",
-    "AI Agent Orchestration"
-  ]
-};
-
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -99,6 +72,58 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   const themeCookie = cookieStore.get('theme')?.value;
   const initialTheme: Theme = themeCookie === 'noir' || themeCookie === 'light' ? themeCookie : 'light';
+
+  // Fetch dynamic profile and skills details for structured SEO data (JSON-LD)
+  const [profile, skills] = await Promise.all([
+    getProfile(),
+    getSkills()
+  ]);
+
+  const sameAs: string[] = [];
+  if (profile) {
+    if (profile.github) sameAs.push(profile.github);
+    if (profile.linkedin) sameAs.push(profile.linkedin);
+    if (profile.twitter) sameAs.push(profile.twitter);
+    if (profile.instagram) sameAs.push(profile.instagram);
+  }
+
+  const defaultSameAs = [
+    "https://github.com/prat3010",
+    "https://linkedin.com/in/freshlimevodka",
+    "https://x.com/3010prateek",
+    "https://instagram.com/freshlimevodka"
+  ];
+  defaultSameAs.forEach(link => {
+    if (!sameAs.includes(link)) {
+      sameAs.push(link);
+    }
+  });
+
+  const knowsAbout = skills && skills.length > 0
+    ? skills.map(s => s.name)
+    : [
+        "React",
+        "Next.js",
+        "Flutter",
+        "Dart",
+        "Python",
+        "FastAPI",
+        "Flask",
+        "UI/UX Design",
+        "AI Prototyping",
+        "AI Agent Orchestration"
+      ];
+
+  const dynamicJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": profile?.name || "Prateek Sharma",
+    "jobTitle": profile?.title || "Full Stack Developer & Designer",
+    "url": "https://prateeq.in",
+    "description": profile?.summary?.general || "Portfolio of Prateek Sharma — developer, designer, and storyteller crafting high-performance web applications and interactive experiences.",
+    "sameAs": sameAs,
+    "knowsAbout": knowsAbout
+  };
 
   return (
     <html
@@ -129,12 +154,9 @@ export default async function RootLayout({
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(dynamicJsonLd) }}
         />
-        <link rel="preload" href="/images/hero-illustration-wavy.png" as="image" />
-        <link rel="preload" href="/images/hero-noir.webp" as="image" />
-        <link rel="preload" href="/images/profile-comic.webp" as="image" />
-        <link rel="preload" href="/images/profile-noir.webp" as="image" />
+
       </head>
       <body>
         <ClientLayout initialTheme={initialTheme}>{children}</ClientLayout>

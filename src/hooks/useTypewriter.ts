@@ -17,23 +17,24 @@ export function useTypewriter({
 }: UseTypewriterOptions) {
   const [displayText, setDisplayText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [prevText, setPrevText] = useState(text);
+
+  if (text !== prevText) {
+    setPrevText(text);
+    setDisplayText('');
+    setIsTyping(false);
+  }
 
   const isDone = !loop && !isTyping && text !== '' && displayText === text;
 
   useEffect(() => {
-    const resetTimer = setTimeout(() => {
-      setDisplayText('');
-      setIsTyping(false);
-    }, 0);
-
-    if (!text) return () => clearTimeout(resetTimer);
+    if (!text) return;
 
     const delayTimer = setTimeout(() => {
       setIsTyping(true);
     }, delay);
 
     return () => {
-      clearTimeout(resetTimer);
       clearTimeout(delayTimer);
     };
   }, [text, delay]);
