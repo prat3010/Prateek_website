@@ -667,7 +667,7 @@
 
 :global([data-theme='noir']) .dossierForgedLabel {
   font-family: monospace, Courier, sans-serif;
-  color: #52525b;
+  color: #a0a0ab;
 }
 
 :global([data-theme='noir']) .dossierTagLink {
@@ -764,12 +764,12 @@
 .dossierTab:hover {
   transform: translateY(-2px);
   background: var(--tab-color);
-  color: var(--pop-white);
+  color: var(--pop-black);
 }
 
 .dossierTabActive {
   background: var(--tab-color);
-  color: var(--pop-white);
+  color: var(--pop-black);
   z-index: 3;
   transform: scale(1.02) translateY(0);
   box-shadow: 4px -2px 0px var(--pop-black);
@@ -800,7 +800,7 @@
 /* ===== NOIR THEME DOSSIER TABS & FOLDER ===== */
 :global([data-theme='noir']) .dossierTab {
   background: var(--surface-primary);
-  color: #71717a;
+  color: #a0a0ab;
   border: 2px solid var(--border-muted);
   border-bottom: none;
   box-shadow: none;

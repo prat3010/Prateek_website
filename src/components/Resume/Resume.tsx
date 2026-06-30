@@ -87,7 +87,7 @@ export default function Resume({ resumeData, certificates }: ResumeProps) {
             <button 
               onClick={handleDownloadPDF} 
               className={styles.printBtn}
-              aria-label="Download ATS Resume as PDF"
+              aria-label={isNoir ? 'EXPORT DOSSIER - Download ATS Resume as PDF' : 'DOWNLOAD PDF - Download ATS Resume as PDF'}
             >
               <Download size={18} />
               <span>{isNoir ? 'EXPORT DOSSIER' : 'DOWNLOAD PDF'}</span>
@@ -103,7 +103,7 @@ export default function Resume({ resumeData, certificates }: ResumeProps) {
               <span>SYNC_AGENT</span>
             </div>
             <div className={styles.tickerText}>
-              <span>STATUS: ACTIVE | LAST SYNCED: {new Date(resumeData.lastSynced.timestamp).toLocaleDateString()} | CHANGE: {resumeData.lastSynced.summary}</span>
+              <span>STATUS: ACTIVE | LAST SYNCED: {new Date(resumeData.lastSynced.timestamp).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })} | CHANGE: {resumeData.lastSynced.summary}</span>
             </div>
           </div>
         )}

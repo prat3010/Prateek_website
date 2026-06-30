@@ -500,9 +500,9 @@ export default function SiteInfoConsole() {
               <span className={`${styles.dot} ${styles.yellow}`} />
               <span className={`${styles.dot} ${styles.green}`} />
             </div>
-            <h1 className={styles.titleText}>
+            <h2 className={styles.titleText}>
               {isNoir ? 'SYSTEM DIAGNOSTICS & LOGS (v2.5)' : 'COBALT TERMINAL CORE // SITE SCHEMATICS'}
-            </h1>
+            </h2>
           </div>
 
           {/* Dashboard widgets Grid */}

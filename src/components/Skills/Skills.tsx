@@ -60,7 +60,7 @@ export default function Skills({ skills }: SkillsProps) {
               className={styles.dossierItemIcon} 
               style={{ color: skill.color }} 
             />
-            <h4 className={styles.dossierItemName}>{skill.name}</h4>
+            <h3 className={styles.dossierItemName}>{skill.name}</h3>
           </div>
           <span 
             className={`${styles.dossierLevelBadge} ${styles['level_' + (skill.status || 'mastered')]}`}

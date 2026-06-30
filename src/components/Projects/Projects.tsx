@@ -180,7 +180,6 @@ export default function Projects({ projects }: ProjectsProps) {
                   '--panel-color': project.color,
                 } as React.CSSProperties}
                 onClick={() => setSelectedProject(project.id)}
-                aria-label={`View ${project.title} project details`}
               >
                 {/* Status Badge */}
                 <div
@@ -220,6 +219,7 @@ export default function Projects({ projects }: ProjectsProps) {
                     ))}
                   </div>
                 </div>
+                <span className="sr-only"> - View project details</span>
               </button>
           ))}
         </div>

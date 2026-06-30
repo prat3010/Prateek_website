@@ -104,7 +104,7 @@ function HeroClientContent({ taglines, isNoir }: HeroClientProps & { isNoir: boo
           <Link
             href="/admin/analytics"
             className={styles.telemetryBadge}
-            aria-label="View live edge telemetry analytics"
+            aria-label="Live Telemetry - View live edge analytics"
           >
             <span className={styles.pulseDot} />
             <span className={styles.ctaText}>Live Telemetry</span>

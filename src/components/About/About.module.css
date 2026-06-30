@@ -106,12 +106,11 @@
 }
 
 .bioText strong {
-  color: var(--pop-red);
+  color: #B8434F; /* Compliant deeper red for contrast (5.04:1) on linen */
 }
 
 :global([data-theme='noir']) .bioText strong {
-  color: var(--neon-pink);
-  text-shadow: var(--neon-pink-glow);
+  color: #901a3e; /* Compliant deep magenta rose for contrast (6.33:1) on cream background */
   font-family: var(--font-code);
   font-weight: bold;
 }

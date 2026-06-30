@@ -464,6 +464,7 @@
   color: #a0a0ab;
   text-decoration: none;
   transition: color 0.15s ease, text-shadow 0.15s ease;
+  padding-block: 4px; /* Easing touch target sizes */
 }
 
 .treeLink:hover {
@@ -486,6 +487,7 @@
   color: #a0a0ab;
   transition: color 0.2s ease, transform 0.2s ease;
   line-height: 1.2;
+  padding-block: 6px; /* Easing touch target sizes */
 }
 
 .terminalSocialLink:hover {
