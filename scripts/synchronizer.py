@@ -2622,9 +2622,9 @@ with tab_skills:
             categories_opts = ['orchestration', 'logic', 'product', 'dynamic']
             categories_labels = {
                 'orchestration': 'AI Orchestration (orchestration)',
-                'logic': 'Systems Logic (logic)',
+                'logic': 'Systems & Logic (logic)',
                 'product': 'Product & UX (product)',
-                'dynamic': 'On-Demand Stack (dynamic)'
+                'dynamic': 'Dynamic Command (dynamic)'
             }
             new_cat = st.selectbox("Category", options=categories_opts, format_func=lambda x: categories_labels[x], key="new_skill_cat")
             
@@ -2703,9 +2703,9 @@ with tab_skills:
             
         category_display_names = {
             'orchestration': 'AI Orchestration (orchestration)',
-            'logic': 'Systems Logic (logic)',
+            'logic': 'Systems & Logic (logic)',
             'product': 'Product & UX (product)',
-            'dynamic': 'On-Demand Stack (dynamic)'
+            'dynamic': 'Dynamic Command (dynamic)'
         }
         
         for cat_key in ['orchestration', 'logic', 'product', 'dynamic']:
