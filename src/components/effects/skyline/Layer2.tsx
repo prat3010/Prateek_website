@@ -12,7 +12,7 @@ const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
   return (
     <>
       {/* Static Layer */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
+      <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
         <defs>
           <pattern id="hatch-mid" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
             <line x1="0" y1="0" x2="0" y2="8" stroke="rgba(250, 250, 250, 0.15)" strokeWidth="1.0" />
@@ -517,74 +517,6 @@ const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
 
           {/* River water body under the bridge */}
           <WobblyRect wobble={wobble} wobbleStrength={strength} x="-1000" y="950" width="3920" height="500" fill="var(--skyline-river-fill)" stroke="none" />
-
-          {/* Chugging Tugboat (Moving behind buildings) */}
-          <g className={styles.tugboatTransit}>
-            <g className={styles.tugboatBobbing}>
-              <g className={styles.bldFgTugboat}>
-                {/* Tugboat hull */}
-                <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1030 950 L 1070 950 L 1065 941 L 1035 941 Z" fill="var(--skyline-tugboat-hull)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-                {/* Cabin */}
-                <WobblyRect wobble={wobble} wobbleStrength={strength} x="1040" y="933" width="16" height="8" fill="var(--skyline-tugboat-cabin)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-                {/* Cabin window */}
-                <WobblyRect
-                  wobble={wobble}
-                  wobbleStrength={strength}
-                  x="1043"
-                  y="935"
-                  width="4"
-                  height="4"
-                  className={styles.tugboatWindow}
-                  fill="var(--skyline-bulb-glow)"
-                  stroke="none"
-                />
-                {/* Smokestack */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1052" y1="933" x2="1052" y2="926" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
-                {/* Smoke puffs */}
-                <circle cx="1052" cy="924" r="1.5" className={styles.smokePuff1} fill="none" stroke="var(--skyline-tugboat-smoke)" strokeWidth="0.8" />
-                <circle cx="1052" cy="924" r="1.5" className={styles.smokePuff2} fill="none" stroke="var(--skyline-tugboat-smoke)" strokeWidth="0.8" />
-                <circle cx="1052" cy="924" r="1.5" className={styles.smokePuff3} fill="none" stroke="var(--skyline-tugboat-smoke)" strokeWidth="0.8" />
-                {/* Propeller wake wave ripples */}
-                <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1026 947 Q 1010 945 995 948" className={styles.tugboatWake1} fill="none" stroke="var(--skyline-stroke-fine)" strokeWidth="0.8" />
-                <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1020 951 Q 1005 950 988 953" className={styles.tugboatWake2} fill="none" stroke="var(--skyline-stroke-fine)" strokeWidth="0.8" />
-              </g>
-            </g>
-          </g>
-
-          {/* Slower Sailboat (Drifting in background) */}
-          <g className={styles.sailboatTransit}>
-            <g className={styles.sailboatBobbing}>
-              <g>
-                {/* Sailboat hull */}
-                <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1030 950 L 1070 950 L 1075 943 L 1025 943 Z" fill="var(--skyline-sailboat-hull)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-                {/* Mast */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1050" y1="943" x2="1050" y2="905" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
-                {/* Main Sail */}
-                <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1050 908 L 1050 940 L 1032 940 Z" fill="var(--skyline-sailboat-sail)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-                {/* Jib Sail */}
-                <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1052 914 L 1052 940 L 1064 940 Z" fill="var(--skyline-sailboat-sail)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-                {/* Wake */}
-                <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1076 948 Q 1090 947 1100 950" className={styles.sailboatWake} fill="none" stroke="var(--skyline-stroke-fine)" strokeWidth="0.8" />
-              </g>
-            </g>
-          </g>
-
-          {/* Speedy Speedboat (Foreground, fast transit) */}
-          <g className={styles.speedboatTransit}>
-            <g className={styles.speedboatBobbing}>
-              <g>
-                {/* Speedboat hull */}
-                <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1032 950 L 1068 950 L 1073 944 L 1045 944 Z" fill="var(--skyline-speedboat-hull)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-                {/* Windshield */}
-                <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1047 944 L 1052 939 L 1060 939 L 1059 944 Z" fill="var(--skyline-speedboat-windshield)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-                {/* Antenna mast */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1058" y1="939" x2="1058" y2="932" stroke="var(--skyline-stroke-fg)" strokeWidth="0.8" />
-                {/* Speedboat wakes */}
-                <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1030 948 Q 1010 944 985 949" className={styles.speedboatWake1} fill="none" stroke="var(--skyline-stroke-fine)" strokeWidth="1" />
-                <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1028 951 Q 1005 948 975 955" className={styles.speedboatWake2} fill="none" stroke="var(--skyline-stroke-fine)" strokeWidth="1" />
-              </g>
-            </g>
-          </g>
         </g>
 
         {/* HOTEL Neon Sign (Blade Sign hanging off the left edge of Hotel building x=1490) */}
@@ -609,6 +541,74 @@ const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
 
       {/* Animated Layer (Unfiltered) */}
       <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+        {/* Chugging Tugboat (Moving behind buildings) */}
+        <g className={styles.tugboatTransit}>
+          <g className={styles.tugboatBobbing}>
+            <g className={styles.bldFgTugboat}>
+              {/* Tugboat hull */}
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1030 950 L 1070 950 L 1065 941 L 1035 941 Z" fill="var(--skyline-tugboat-hull)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+              {/* Cabin */}
+              <WobblyRect wobble={wobble} wobbleStrength={strength} x="1040" y="933" width="16" height="8" fill="var(--skyline-tugboat-cabin)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+              {/* Cabin window */}
+              <WobblyRect
+                wobble={wobble}
+                wobbleStrength={strength}
+                x="1043"
+                y="935"
+                width="4"
+                height="4"
+                className={styles.tugboatWindow}
+                fill="var(--skyline-bulb-glow)"
+                stroke="none"
+              />
+              {/* Smokestack */}
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1052" y1="933" x2="1052" y2="926" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
+              {/* Smoke puffs */}
+              <circle cx="1052" cy="924" r="1.5" className={styles.smokePuff1} fill="none" stroke="var(--skyline-tugboat-smoke)" strokeWidth="0.8" />
+              <circle cx="1052" cy="924" r="1.5" className={styles.smokePuff2} fill="none" stroke="var(--skyline-tugboat-smoke)" strokeWidth="0.8" />
+              <circle cx="1052" cy="924" r="1.5" className={styles.smokePuff3} fill="none" stroke="var(--skyline-tugboat-smoke)" strokeWidth="0.8" />
+              {/* Propeller wake wave ripples */}
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1026 947 Q 1010 945 995 948" className={styles.tugboatWake1} fill="none" stroke="var(--skyline-stroke-fine)" strokeWidth="0.8" />
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1020 951 Q 1005 950 988 953" className={styles.tugboatWake2} fill="none" stroke="var(--skyline-stroke-fine)" strokeWidth="0.8" />
+            </g>
+          </g>
+        </g>
+
+        {/* Slower Sailboat (Drifting in background) */}
+        <g className={styles.sailboatTransit}>
+          <g className={styles.sailboatBobbing}>
+            <g>
+              {/* Sailboat hull */}
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1030 950 L 1070 950 L 1075 943 L 1025 943 Z" fill="var(--skyline-sailboat-hull)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+              {/* Mast */}
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1050" y1="943" x2="1050" y2="905" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
+              {/* Main Sail */}
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1050 908 L 1050 940 L 1032 940 Z" fill="var(--skyline-sailboat-sail)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+              {/* Jib Sail */}
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1052 914 L 1052 940 L 1064 940 Z" fill="var(--skyline-sailboat-sail)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+              {/* Wake */}
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1076 948 Q 1090 947 1100 950" className={styles.sailboatWake} fill="none" stroke="var(--skyline-stroke-fine)" strokeWidth="0.8" />
+            </g>
+          </g>
+        </g>
+
+        {/* Speedy Speedboat (Foreground, fast transit) */}
+        <g className={styles.speedboatTransit}>
+          <g className={styles.speedboatBobbing}>
+            <g>
+              {/* Speedboat hull */}
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1032 950 L 1068 950 L 1073 944 L 1045 944 Z" fill="var(--skyline-speedboat-hull)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+              {/* Windshield */}
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1047 944 L 1052 939 L 1060 939 L 1059 944 Z" fill="var(--skyline-speedboat-windshield)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+              {/* Antenna mast */}
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1058" y1="939" x2="1058" y2="932" stroke="var(--skyline-stroke-fg)" strokeWidth="0.8" />
+              {/* Speedboat wakes */}
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1030 948 Q 1010 944 985 949" className={styles.speedboatWake1} fill="none" stroke="var(--skyline-stroke-fine)" strokeWidth="1" />
+              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1028 951 Q 1005 948 975 955" className={styles.speedboatWake2} fill="none" stroke="var(--skyline-stroke-fine)" strokeWidth="1" />
+            </g>
+          </g>
+        </g>
+
         {/* Asynchronous Flickering Window Cells (Layer 2 - Unfiltered for performance) */}
         <g strokeWidth="1.0" fill="none">
           {/* Staggered double-tower (Left) */}
