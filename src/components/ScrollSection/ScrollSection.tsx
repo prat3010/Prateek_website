@@ -153,17 +153,20 @@ export default function ScrollSection({ children, direction, verticalOffset, cen
     const el = wrapperRef.current;
     if (!el) return;
 
-    metricsRef.current = measure(el);
-    setIsMeasured(true);
-    resizeTick.set(resizeTick.get() + 1);
-
-    const ro = new ResizeObserver(() => {
+    const runMeasure = () => {
       metricsRef.current = measure(el);
       setIsMeasured(true);
       resizeTick.set(resizeTick.get() + 1);
-    });
+    };
 
+    runMeasure();
+
+    const ro = new ResizeObserver(runMeasure);
     ro.observe(el);
+    if (document.body) {
+      ro.observe(document.body);
+    }
+
     return () => ro.disconnect();
   }, [resizeTick]);
 
