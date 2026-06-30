@@ -111,6 +111,9 @@ export default function Navbar({ items, className }: NavbarProps) {
       e.preventDefault();
       const anchorId = href.substring(href.indexOf('#')); // Extracts '#about' from '/#about'
       if (lenis) {
+        // Resume Lenis immediately so the scroll animation can execute.
+        // If we don't call start() here, the scrollTo call is ignored because Lenis was stopped when the mobile menu opened.
+        lenis.start();
         lenis.scrollTo(anchorId, { duration: 1.5, offset: NAVBAR_SCROLL_OFFSET });
       }
       setActiveSection(href);
