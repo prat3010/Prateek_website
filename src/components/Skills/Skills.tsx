@@ -42,7 +42,7 @@ interface SkillsProps {
 
 export default function Skills({ skills }: SkillsProps) {
   const { isNoir } = useTheme();
-  const [activeTab, setActiveTab] = React.useState<'orchestration' | 'logic' | 'product' | 'dynamic'>('orchestration');
+  const [activeTab, setActiveTab] = React.useState<'orchestration' | 'logic' | 'product' | 'dynamic'>('logic');
 
   // Filter skills by dossier categories
   const orchestrationSkills = skills.filter(s => s.category === 'orchestration');
@@ -125,8 +125,8 @@ export default function Skills({ skills }: SkillsProps) {
           </div>
           <p className={styles.moText}>
             {isNoir 
-              ? 'Subject operates through AI orchestration. Directs autonomous agents and advanced models to synthesize code. Zero manual syntax writing; absolute focus on system architecture, product design, and debugging.' 
-              : 'I don’t write syntax line-by-line by hand—I command powerful AI systems (like Cursor, Gemini, and v0) to manifest my ideas. I focus 100% of my energy on high-level system architecture, product design, UX, and orchestration.'}
+              ? 'Subject leverages AI-augmented development to accelerate delivery. Demonstrates full-stack comprehension across architecture, product design, and debugging. AI is the accelerant, not the substitute.' 
+              : 'I use AI tools like Cursor and Gemini to move fast — but I understand every layer of the stack. My energy goes into system architecture, product design, UX, and shipping real products.'}
           </p>
         </div>
 

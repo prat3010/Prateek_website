@@ -171,21 +171,21 @@ FALLBACK_SKILLS = {
     "fastapi": {
         "name": "FastAPI",
         "icon": "server",
-        "description": "Instructing AI to spin up robust backends, serialize data models, and deploy endpoints.",
+        "description": "Building async REST APIs with data serialization and endpoint design.",
         "category": "logic",
         "color": "#059669"
     },
     "react": {
         "name": "React / Next.js",
         "icon": "atom",
-        "description": "Directing AI to synthesize React components, manage application state, and orchestrate client/server code.",
+        "description": "Building component-driven web apps with server/client architecture.",
         "category": "dynamic",
         "color": "#61DAFB"
     },
     "python": {
         "name": "Python",
         "icon": "terminal",
-        "description": "Instructing AI to write utility scripts, automation tasks, and backend helper scripts.",
+        "description": "Writing utility scripts, automation pipelines, and backend services.",
         "category": "logic",
         "color": "#3776AB"
     },
@@ -213,7 +213,7 @@ FALLBACK_SKILLS = {
     "next.js": {
         "name": "React / Next.js",
         "icon": "atom",
-        "description": "Directing AI to synthesize React components, manage application state, and orchestrate client/server code.",
+        "description": "Building full-stack web apps with React and Next.js App Router.",
         "category": "dynamic",
         "color": "#000000"
     },
@@ -239,14 +239,14 @@ def generate_skills_from_tags_batch(tags_list):
         return []
     tags_str = ", ".join([f'"{t}"' for t in tags_list])
     prompt = f"""
-    You are an expert AI orchestrator. Generate a list of structured Skill entries for the following technology tags: {tags_str}.
+    You are a technical portfolio writer. Generate a list of structured Skill entries for the following technology tags: {tags_str}.
     
     For each tag, output a structured JSON object. The response must be a JSON array of objects, where each object matches this format:
     {{
       "tag": "the original lowercase tag name that was passed",
       "name": "Formatted capitalization of the technology (e.g. 'react' -> 'React / Next.js', 'fastapi' -> 'FastAPI', 'excel' -> 'Microsoft Excel', 'supabase' -> 'Supabase', etc.)",
       "icon": "A lowercase string representing a relevant Lucide icon (e.g. 'atom', 'server', 'database', 'terminal', 'layout', 'paintbrush', 'sparkles', 'brain', 'bot', 'git-branch', 'cloud', 'figma', 'zap', 'image', 'file-text')",
-      "description": "A short 1-sentence description of the skill in an AI-orchestrated tone matching the portfolio brand (e.g., 'Directing AI to synthesize React components...', 'Steering AI to generate responsive structures...', 'Instructing AI to write Python utility scripts...'). Maximum 15 words.",
+      "description": "A short 1-sentence description of the skill focusing on what it enables the developer to build or accomplish (e.g., 'Building component-driven web apps with server/client architecture.', 'Writing utility scripts and automation pipelines.', 'Crafting responsive layouts and design systems.'). Maximum 15 words.",
       "category": "One of 'orchestration', 'logic', 'product', or 'dynamic'",
       "color": "A hex color code suitable for the technology brand"
     }}
@@ -326,7 +326,7 @@ def check_and_add_pending_skills(tags_list):
                     fallback_prop = {
                         "name": tag.capitalize(),
                         "icon": "sparkles",
-                        "description": f"Applying {tag} capabilities to implement robust project requirements.",
+                        "description": f"Building with {tag} for project development and implementation.",
                         "category": "dynamic",
                         "color": "#00E676"
                     }
