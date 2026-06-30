@@ -895,6 +895,41 @@ def save_uploaded_image(uploaded_file, target_path, target_format):
     except Exception as e:
         return False, f"Failed to save: {e}"
 
+def git_commit_push_file(file_path, commit_message):
+    try:
+        success, status_out = run_safe_git_command(["git", "status", "--porcelain"], cwd=os.getcwd())
+        if not success:
+            return False, f"Git status failed: {status_out}"
+        if status_out.strip():
+            file_path_clean = file_path.replace("\\", "/")
+            lines = [line.strip() for line in status_out.splitlines() if line.strip()]
+            has_file_change = False
+            for line in lines:
+                if file_path_clean in line:
+                    has_file_change = True
+                    break
+            
+            if has_file_change:
+                success, err_msg = run_safe_git_command(["git", "add", file_path_clean], cwd=os.getcwd())
+                if not success:
+                    return False, f"Git add failed: {err_msg}"
+                
+                success, err_msg = run_safe_git_command(["git", "commit", "-m", commit_message], cwd=os.getcwd())
+                if not success:
+                    return False, f"Git commit failed: {err_msg}"
+                
+                success, push_out = run_safe_git_command(["git", "push", "origin", "main"], cwd=os.getcwd())
+                if not success:
+                    return False, f"Git push failed: {push_out}"
+                
+                return True, "Successfully committed and pushed to GitHub!"
+            else:
+                return True, "No changes to commit for this file."
+        else:
+            return True, "No changes detected by git."
+    except Exception as e:
+        return False, f"Git operations failed: {str(e)}"
+
 # ==========================================
 # Streamlit Interface Layout
 # ==========================================
@@ -2860,6 +2895,8 @@ with tab_photos:
     st.markdown('<div class="section-header">Update Hero & About Photos</div>', unsafe_allow_html=True)
     st.write("Upload new images to replace the background/profile illustrations on your portfolio site.")
     
+    dry_run_photo = st.checkbox("Dry-Run Mode (Save locally only, do not push to remote)", value=True, key="dry_photo")
+    
     if not HAS_PIL:
         st.info("💡 **Tip**: Install Pillow (`pip install pillow`) in your project environment to automatically convert any uploaded image (PNG, JPG, WebP) to the correct format required by the website.")
 
@@ -2883,7 +2920,14 @@ with tab_photos:
             if st.button("Replace Noir Hero Image", key="btn_hero_noir", type="primary"):
                 success, msg = save_uploaded_image(up_hero_noir, hero_noir_path, "WEBP")
                 if success:
-                    st.success(msg)
+                    if not dry_run_photo:
+                        git_ok, git_msg = git_commit_push_file(hero_noir_path, "chore(photos): update hero noir image")
+                        if git_ok:
+                            st.toast(f"🖼️ {msg}\n\n{git_msg}")
+                        else:
+                            st.toast(f"⚠️ {msg} but Git failed: {git_msg}")
+                    else:
+                        st.toast(f"🖼️ {msg}")
                     st.rerun()
                 else:
                     st.error(msg)
@@ -2902,7 +2946,14 @@ with tab_photos:
             if st.button("Replace Comic Hero Image", key="btn_hero_comic", type="primary"):
                 success, msg = save_uploaded_image(up_hero_comic, hero_comic_path, "PNG")
                 if success:
-                    st.success(msg)
+                    if not dry_run_photo:
+                        git_ok, git_msg = git_commit_push_file(hero_comic_path, "chore(photos): update hero comic image")
+                        if git_ok:
+                            st.toast(f"🖼️ {msg}\n\n{git_msg}")
+                        else:
+                            st.toast(f"⚠️ {msg} but Git failed: {git_msg}")
+                    else:
+                        st.toast(f"🖼️ {msg}")
                     st.rerun()
                 else:
                     st.error(msg)
@@ -2927,7 +2978,14 @@ with tab_photos:
             if st.button("Replace Noir Profile Image", key="btn_profile_noir", type="primary"):
                 success, msg = save_uploaded_image(up_profile_noir, profile_noir_path, "WEBP")
                 if success:
-                    st.success(msg)
+                    if not dry_run_photo:
+                        git_ok, git_msg = git_commit_push_file(profile_noir_path, "chore(photos): update profile noir image")
+                        if git_ok:
+                            st.toast(f"🖼️ {msg}\n\n{git_msg}")
+                        else:
+                            st.toast(f"⚠️ {msg} but Git failed: {git_msg}")
+                    else:
+                        st.toast(f"🖼️ {msg}")
                     st.rerun()
                 else:
                     st.error(msg)
@@ -2946,7 +3004,14 @@ with tab_photos:
             if st.button("Replace Comic Profile Image", key="btn_profile_comic", type="primary"):
                 success, msg = save_uploaded_image(up_profile_comic, profile_comic_path, "WEBP")
                 if success:
-                    st.success(msg)
+                    if not dry_run_photo:
+                        git_ok, git_msg = git_commit_push_file(profile_comic_path, "chore(photos): update profile comic image")
+                        if git_ok:
+                            st.toast(f"🖼️ {msg}\n\n{git_msg}")
+                        else:
+                            st.toast(f"⚠️ {msg} but Git failed: {git_msg}")
+                    else:
+                        st.toast(f"🖼️ {msg}")
                     st.rerun()
                 else:
                     st.error(msg)
