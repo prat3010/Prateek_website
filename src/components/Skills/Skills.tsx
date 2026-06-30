@@ -19,6 +19,7 @@ import {
   type LucideIcon
 } from 'lucide-react';
 import styles from './Skills.module.css';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Map icon strings to Lucide components
 const iconMap: Record<string, LucideIcon> = {
@@ -41,6 +42,7 @@ interface SkillsProps {
 
 export default function Skills({ skills }: SkillsProps) {
   const { isNoir } = useTheme();
+  const [activeTab, setActiveTab] = React.useState<'orchestration' | 'logic' | 'product' | 'dynamic'>('orchestration');
 
   // Filter skills by dossier categories
   const orchestrationSkills = skills.filter(s => s.category === 'orchestration');
@@ -128,78 +130,94 @@ export default function Skills({ skills }: SkillsProps) {
           </p>
         </div>
 
-        {/* Dossier Columns */}
-        <div className={styles.dossierGrid}>
-          {/* Column 1: AI Orchestration */}
-          <div className={`${styles.dossierColumn} ${styles.colOrchestration}`}>
-            <div className={styles.dossierColHeader}>
-              <span 
-                className={styles.dossierColBadge} 
-                style={{ 
-                  backgroundColor: 'var(--pop-pink)',
-                  '--neon-accent': 'var(--neon-pink)'
-                } as React.CSSProperties}
-              >
-                I. AI ORCHESTRATION
-              </span>
-            </div>
-            <div className={styles.dossierColContent}>
-              {orchestrationSkills.map(renderSkillRow)}
-            </div>
-          </div>
+        {/* Dossier Tabs */}
+        <div className={styles.dossierTabs} role="tablist" aria-label="Profile Dossier Sections">
+          <button 
+            role="tab"
+            aria-selected={activeTab === 'orchestration'}
+            aria-controls="panel-orchestration"
+            id="tab-orchestration"
+            className={`${styles.dossierTab} ${activeTab === 'orchestration' ? styles.dossierTabActive : ''}`}
+            onClick={() => setActiveTab('orchestration')}
+            style={{ 
+              '--tab-color': 'var(--pop-pink)',
+              '--tab-neon': 'var(--neon-pink)'
+            } as React.CSSProperties}
+          >
+            I. AI ORCHESTRATION
+          </button>
+          <button 
+            role="tab"
+            aria-selected={activeTab === 'logic'}
+            aria-controls="panel-logic"
+            id="tab-logic"
+            className={`${styles.dossierTab} ${activeTab === 'logic' ? styles.dossierTabActive : ''}`}
+            onClick={() => setActiveTab('logic')}
+            style={{ 
+              '--tab-color': 'var(--pop-blue)',
+              '--tab-neon': 'var(--neon-cyan)'
+            } as React.CSSProperties}
+          >
+            II. SYSTEMS & LOGIC
+          </button>
+          <button 
+            role="tab"
+            aria-selected={activeTab === 'product'}
+            aria-controls="panel-product"
+            id="tab-product"
+            className={`${styles.dossierTab} ${activeTab === 'product' ? styles.dossierTabActive : ''}`}
+            onClick={() => setActiveTab('product')}
+            style={{ 
+              '--tab-color': 'var(--pop-red)',
+              '--tab-neon': 'var(--neon-yellow)'
+            } as React.CSSProperties}
+          >
+            III. PRODUCT & UX
+          </button>
+          <button 
+            role="tab"
+            aria-selected={activeTab === 'dynamic'}
+            aria-controls="panel-dynamic"
+            id="tab-dynamic"
+            className={`${styles.dossierTab} ${activeTab === 'dynamic' ? styles.dossierTabActive : ''}`}
+            onClick={() => setActiveTab('dynamic')}
+            style={{ 
+              '--tab-color': 'var(--pop-orange)',
+              '--tab-neon': 'var(--neon-purple)'
+            } as React.CSSProperties}
+          >
+            IV. DYNAMIC COMMAND
+          </button>
+        </div>
 
-          {/* Column 2: Systems Logic */}
-          <div className={`${styles.dossierColumn} ${styles.colLogic}`}>
-            <div className={styles.dossierColHeader}>
-              <span 
-                className={styles.dossierColBadge} 
-                style={{ 
-                  backgroundColor: 'var(--pop-blue)',
-                  '--neon-accent': 'var(--neon-cyan)'
-                } as React.CSSProperties}
-              >
-                II. SYSTEMS & LOGIC
-              </span>
-            </div>
-            <div className={styles.dossierColContent}>
-              {logicSkills.map(renderSkillRow)}
-            </div>
-          </div>
-
-          {/* Column 3: Product UX & Legendary Ability */}
-          <div className={`${styles.dossierColumn} ${styles.colProduct}`}>
-            {/* Subsection 3a: Product & UX */}
-            <div className={styles.dossierColHeader}>
-              <span 
-                className={styles.dossierColBadge} 
-                style={{ 
-                  backgroundColor: 'var(--pop-red)',
-                  '--neon-accent': 'var(--neon-yellow)'
-                } as React.CSSProperties}
-              >
-                III. PRODUCT & UX
-              </span>
-            </div>
-            <div className={styles.dossierColContent} style={{ marginBottom: '2rem' }}>
-              {productSkills.map(renderSkillRow)}
-            </div>
-
-            {/* Subsection 3b: Legendary Command */}
-            <div className={styles.dossierColHeader}>
-              <span 
-                className={styles.dossierColBadge} 
-                style={{ 
-                  backgroundColor: 'var(--pop-orange)',
-                  '--neon-accent': 'var(--neon-purple)'
-                } as React.CSSProperties}
-              >
-                IV. DYNAMIC COMMAND
-              </span>
-            </div>
-            <div className={styles.dossierColContent}>
-              {dynamicSkills.map(renderSkillRow)}
-            </div>
-          </div>
+        {/* Dossier Folder Content */}
+        <div 
+          className={styles.dossierFolder}
+          style={{
+            '--folder-color': activeTab === 'orchestration' ? 'var(--pop-pink)' : activeTab === 'logic' ? 'var(--pop-blue)' : activeTab === 'product' ? 'var(--pop-red)' : 'var(--pop-orange)',
+            '--folder-neon': activeTab === 'orchestration' ? 'var(--neon-pink)' : activeTab === 'logic' ? 'var(--neon-cyan)' : activeTab === 'product' ? 'var(--neon-yellow)' : 'var(--neon-purple)'
+          } as React.CSSProperties}
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              id={`panel-${activeTab}`}
+              role="tabpanel"
+              aria-labelledby={`tab-${activeTab}`}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              className={styles.dossierFolderContent}
+            >
+              <div className={styles.dossierGridInner}>
+                {activeTab === 'orchestration' && orchestrationSkills.map(renderSkillRow)}
+                {activeTab === 'logic' && logicSkills.map(renderSkillRow)}
+                {activeTab === 'product' && productSkills.map(renderSkillRow)}
+                {activeTab === 'dynamic' && dynamicSkills.map(renderSkillRow)}
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </section>

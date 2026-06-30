@@ -733,8 +733,149 @@
     padding: 1.5rem 1.25rem;
   }
 }
+/* ===== DOSSIER TABS & FOLDER (ACCORDION CABINET) ===== */
+.dossierTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: -3px; /* Overlap the folder border */
+  position: relative;
+  z-index: 2;
+  padding-left: 1rem;
+}
 
+.dossierTab {
+  font-family: var(--font-headline);
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+  padding: 0.85rem 1.75rem 0.6rem 1.75rem;
+  border: var(--border-medium);
+  border-bottom: none;
+  background: var(--pop-white);
+  color: var(--pop-black);
+  cursor: pointer;
+  position: relative;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  transition: transform 0.2s var(--transition-bounce), background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+  box-shadow: 4px -4px 0px var(--pop-black);
+}
 
+.dossierTab:hover {
+  transform: translateY(-2px);
+  background: var(--tab-color);
+  color: var(--pop-white);
+}
 
+.dossierTabActive {
+  background: var(--tab-color);
+  color: var(--pop-white);
+  z-index: 3;
+  transform: scale(1.02) translateY(0);
+  box-shadow: 4px -2px 0px var(--pop-black);
+}
 
+.dossierFolder {
+  background: var(--pop-white);
+  border: var(--border-medium);
+  border-color: var(--pop-black);
+  box-shadow: var(--shadow-comic-lg);
+  padding: 2.75rem 2.5rem;
+  position: relative;
+  z-index: 1;
+  border-radius: 8px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
 
+.dossierFolderContent {
+  width: 100%;
+}
+
+.dossierGridInner {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem 3.5rem;
+}
+
+/* ===== NOIR THEME DOSSIER TABS & FOLDER ===== */
+:global([data-theme='noir']) .dossierTab {
+  background: var(--surface-primary);
+  color: #71717a;
+  border: 2px solid var(--border-muted);
+  border-bottom: none;
+  box-shadow: none;
+  border-radius: 4px 4px 0 0;
+  transition: all 0.3s ease;
+  font-family: monospace, Courier, sans-serif;
+  font-size: 0.82rem;
+  font-weight: bold;
+}
+
+:global([data-theme='noir']) .dossierTab:hover {
+  color: var(--tab-neon);
+  border-color: var(--tab-neon);
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.4), 0 0 8px var(--tab-neon);
+  transform: translateY(-2px);
+}
+
+:global([data-theme='noir']) .dossierTabActive {
+  background: var(--surface-primary);
+  color: var(--tab-neon);
+  border-color: var(--tab-neon);
+  box-shadow: 0 -2px 12px var(--tab-neon);
+  z-index: 3;
+  transform: scale(1.02);
+}
+
+:global([data-theme='noir']) .dossierFolder {
+  background: var(--surface-primary);
+  border: 2px solid var(--folder-neon);
+  box-shadow: 0 0 20px var(--folder-neon);
+  border-radius: 4px;
+}
+
+/* ===== RESPONSIVE TABS ===== */
+@media (max-width: 900px) {
+  .dossierGridInner {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .dossierTabs {
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 0;
+    padding-left: 0;
+  }
+
+  .dossierTab {
+    border-bottom: var(--border-medium) !important;
+    border-radius: 8px;
+    box-shadow: var(--shadow-comic-sm);
+    text-align: left;
+    padding-block: 0.6rem;
+  }
+
+  .dossierTabActive {
+    transform: scale(1.01);
+    box-shadow: var(--shadow-comic);
+  }
+
+  .dossierFolder {
+    border-top-left-radius: 8px;
+    margin-top: 1rem;
+    padding: 1.75rem 1.5rem;
+  }
+
+  :global([data-theme='noir']) .dossierTab {
+    border-bottom: 2px solid var(--border-muted) !important;
+    border-radius: 4px;
+  }
+
+  :global([data-theme='noir']) .dossierTabActive {
+    border-color: var(--tab-neon);
+    transform: none;
+  }
+}
