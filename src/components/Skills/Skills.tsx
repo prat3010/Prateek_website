@@ -43,11 +43,6 @@ interface SkillsProps {
 export default function Skills({ skills }: SkillsProps) {
   const { isNoir } = useTheme();
   const [activeTab, setActiveTab] = React.useState<'orchestration' | 'logic' | 'product' | 'dynamic'>('logic');
-  const [selectedSkill, setSelectedSkill] = React.useState<Skill | null>(() => {
-    const defaultCategory = 'logic';
-    const categorySkills = skills.filter(s => s.category === defaultCategory);
-    return categorySkills.length > 0 ? categorySkills[0] : null;
-  });
 
   // Filter skills by dossier categories
   const orchestrationSkills = skills.filter(s => s.category === 'orchestration');
@@ -55,105 +50,61 @@ export default function Skills({ skills }: SkillsProps) {
   const productSkills = skills.filter(s => s.category === 'product');
   const dynamicSkills = skills.filter(s => s.category === 'dynamic');
 
-  const handleTabChange = (tab: 'orchestration' | 'logic' | 'product' | 'dynamic') => {
-    setActiveTab(tab);
-    const categorySkills = skills.filter(s => s.category === tab);
-    if (categorySkills.length > 0) {
-      setSelectedSkill(categorySkills[0]);
-    } else {
-      setSelectedSkill(null);
-    }
-  };
-
-  const renderSkillChip = (skill: Skill) => {
+  const renderSkillRow = (skill: Skill) => {
     const Icon = iconMap[skill.icon] || Sparkles;
-    const isSelected = selectedSkill?.name === skill.name;
     return (
-      <button
-        key={skill.name}
-        className={`${styles.skillChip} ${isSelected ? styles.skillChipActive : ''}`}
-        style={{ '--chip-color': skill.color } as React.CSSProperties}
-        onMouseEnter={() => setSelectedSkill(skill)}
-        onClick={() => setSelectedSkill(skill)}
-        role="tab"
-        aria-selected={isSelected}
-      >
-        <Icon 
-          className={styles.chipIcon} 
-          style={{ color: skill.color }} 
-        />
-        <span className={styles.chipName}>{skill.name}</span>
-      </button>
-    );
-  };
-
-  const renderInspector = () => {
-    if (!selectedSkill) return null;
-    const Icon = iconMap[selectedSkill.icon] || Sparkles;
-    return (
-      <div className={styles.dossierInspector}>
-        <AnimatePresence mode="wait">
-          <m.div
-            key={selectedSkill.name}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
-            className={styles.inspectorContent}
+      <div key={skill.name} className={styles.dossierItem}>
+        <div className={styles.dossierItemHeader}>
+          <div className={styles.dossierNameContainer}>
+            <Icon 
+              className={styles.dossierItemIcon} 
+              style={{ color: skill.color }} 
+            />
+            <h3 className={styles.dossierItemName}>{skill.name}</h3>
+          </div>
+          <span 
+            className={`${styles.dossierLevelBadge} ${styles['level_' + (skill.status || 'mastered')]}`}
           >
-            <div className={styles.inspectorHeader}>
-              <div className={styles.inspectorTitleContainer}>
-                <Icon 
-                  className={styles.inspectorIcon} 
-                  style={{ color: selectedSkill.color }} 
-                />
-                <h3 className={styles.inspectorName}>{selectedSkill.name}</h3>
-              </div>
-              <span 
-                className={`${styles.dossierLevelBadge} ${styles['level_' + (selectedSkill.status || 'mastered')]}`}
-              >
-                {selectedSkill.level || 'Mastered'}
-              </span>
+            {skill.level}
+          </span>
+        </div>
+        
+        <p className={styles.dossierItemDesc}>{skill.description}</p>
+        
+        {skill.projects && skill.projects.length > 0 && (
+          <div className={styles.dossierForged}>
+            <span className={styles.dossierForgedLabel}>FORGED IN:</span>
+            <div className={styles.dossierTags}>
+              {skill.projects.map(proj => (
+                <a 
+                  key={proj.id}
+                  href={`/#projects`}
+                  className={styles.dossierTagLink}
+                  onClick={(e) => {
+                    const el = document.getElementById(proj.id);
+                    if (el) {
+                      e.preventDefault();
+                      el.scrollIntoView({ behavior: 'smooth' });
+                      el.classList.add('flash-highlight');
+                      setTimeout(() => {
+                        el.classList.remove('flash-highlight');
+                      }, 2000);
+                    }
+                  }}
+                >
+                  {proj.title}
+                </a>
+              ))}
             </div>
-            
-            <p className={styles.inspectorDesc}>{selectedSkill.description}</p>
-            
-            {selectedSkill.projects && selectedSkill.projects.length > 0 && (
-              <div className={styles.dossierForged}>
-                <span className={styles.dossierForgedLabel}>FORGED IN:</span>
-                <div className={styles.dossierTags}>
-                  {selectedSkill.projects.map(proj => (
-                    <a 
-                      key={proj.id}
-                      href={`/#projects`}
-                      className={styles.dossierTagLink}
-                      onClick={(e) => {
-                        const el = document.getElementById(proj.id);
-                        if (el) {
-                          e.preventDefault();
-                          el.scrollIntoView({ behavior: 'smooth' });
-                          el.classList.add('flash-highlight');
-                          setTimeout(() => {
-                            el.classList.remove('flash-highlight');
-                          }, 2000);
-                        }
-                      }}
-                    >
-                      {proj.title}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )}
+          </div>
+        )}
 
-            {selectedSkill.status === 'quest' && (
-              <div className={styles.dossierQuestAlert}>
-                <Target size={12} className={styles.dossierQuestIcon} />
-                <span>Active Quest: Deploying analytical data science pipelines.</span>
-              </div>
-            )}
-          </m.div>
-        </AnimatePresence>
+        {skill.status === 'quest' && (
+          <div className={styles.dossierQuestAlert}>
+            <Target size={12} className={styles.dossierQuestIcon} />
+            <span>Active Quest: Deploying analytical data science pipelines.</span>
+          </div>
+        )}
       </div>
     );
   };
@@ -187,7 +138,7 @@ export default function Skills({ skills }: SkillsProps) {
             aria-controls="panel-orchestration"
             id="tab-orchestration"
             className={`${styles.dossierTab} ${activeTab === 'orchestration' ? styles.dossierTabActive : ''}`}
-            onClick={() => handleTabChange('orchestration')}
+            onClick={() => setActiveTab('orchestration')}
             style={{ 
               '--tab-color': 'var(--pop-pink)',
               '--tab-neon': 'var(--neon-pink)'
@@ -201,7 +152,7 @@ export default function Skills({ skills }: SkillsProps) {
             aria-controls="panel-logic"
             id="tab-logic"
             className={`${styles.dossierTab} ${activeTab === 'logic' ? styles.dossierTabActive : ''}`}
-            onClick={() => handleTabChange('logic')}
+            onClick={() => setActiveTab('logic')}
             style={{ 
               '--tab-color': 'var(--pop-blue)',
               '--tab-neon': 'var(--neon-cyan)'
@@ -215,7 +166,7 @@ export default function Skills({ skills }: SkillsProps) {
             aria-controls="panel-product"
             id="tab-product"
             className={`${styles.dossierTab} ${activeTab === 'product' ? styles.dossierTabActive : ''}`}
-            onClick={() => handleTabChange('product')}
+            onClick={() => setActiveTab('product')}
             style={{ 
               '--tab-color': 'var(--pop-red)',
               '--tab-neon': 'var(--neon-yellow)'
@@ -229,7 +180,7 @@ export default function Skills({ skills }: SkillsProps) {
             aria-controls="panel-dynamic"
             id="tab-dynamic"
             className={`${styles.dossierTab} ${activeTab === 'dynamic' ? styles.dossierTabActive : ''}`}
-            onClick={() => handleTabChange('dynamic')}
+            onClick={() => setActiveTab('dynamic')}
             style={{ 
               '--tab-color': 'var(--pop-orange)',
               '--tab-neon': 'var(--neon-purple)'
@@ -259,14 +210,11 @@ export default function Skills({ skills }: SkillsProps) {
               transition={{ duration: 0.25, ease: 'easeInOut' }}
               className={styles.dossierFolderContent}
             >
-              <div className={styles.dossierGridSplit}>
-                <div className={`${styles.dossierGridChips} ${styles['chips_' + activeTab]}`}>
-                  {activeTab === 'orchestration' && orchestrationSkills.map(renderSkillChip)}
-                  {activeTab === 'logic' && logicSkills.map(renderSkillChip)}
-                  {activeTab === 'product' && productSkills.map(renderSkillChip)}
-                  {activeTab === 'dynamic' && dynamicSkills.map(renderSkillChip)}
-                </div>
-                {renderInspector()}
+              <div className={styles.dossierGridInner}>
+                {activeTab === 'orchestration' && orchestrationSkills.map(renderSkillRow)}
+                {activeTab === 'logic' && logicSkills.map(renderSkillRow)}
+                {activeTab === 'product' && productSkills.map(renderSkillRow)}
+                {activeTab === 'dynamic' && dynamicSkills.map(renderSkillRow)}
               </div>
             </m.div>
           </AnimatePresence>

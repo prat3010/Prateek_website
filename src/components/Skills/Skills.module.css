@@ -791,153 +791,10 @@
   width: 100%;
 }
 
-/* ===== COMPACT SPLIT PANEL LAYOUT ===== */
-.dossierGridSplit {
+.dossierGridInner {
   display: grid;
-  grid-template-columns: 1.25fr 0.75fr; /* Left is chips, right is inspector */
-  gap: 2rem;
-  align-items: stretch;
-  min-height: 420px;
-}
-
-.dossierGridChips {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.75rem;
-  align-content: start;
-}
-
-/* Adjust columns dynamically based on category sizes */
-.chips_orchestration,
-.chips_product {
   grid-template-columns: repeat(2, 1fr);
-}
-
-.chips_logic,
-.chips_dynamic {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-/* ===== COMPACT SKILL CHIP ===== */
-.skillChip {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  padding: 0.65rem 0.85rem;
-  background: var(--pop-white);
-  border: var(--border-medium);
-  border-radius: 4px;
-  cursor: pointer;
-  box-shadow: var(--shadow-comic-sm);
-  transition: transform 0.2s var(--transition-bounce), background-color 0.2s ease, box-shadow 0.2s ease;
-  text-align: left;
-  width: 100%;
-}
-
-.skillChip:hover {
-  transform: translateY(-2px);
-  background-color: var(--chip-color);
-  color: var(--pop-black);
-  box-shadow: var(--shadow-comic);
-}
-
-.skillChipActive {
-  background-color: var(--chip-color);
-  color: var(--pop-black);
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: var(--shadow-comic-lg);
-}
-
-.chipIcon {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-}
-
-.chipName {
-  font-family: var(--font-headline);
-  font-size: 0.82rem;
-  color: var(--pop-black);
-  line-height: 1.2;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* ===== CASE FILE INSPECTOR PANEL ===== */
-.dossierInspector {
-  display: flex;
-  flex-direction: column;
-  background: var(--pop-white);
-  border: var(--border-medium);
-  border-radius: 4px;
-  padding: 2.25rem 1.75rem 1.75rem 1.75rem;
-  box-shadow: var(--shadow-comic);
-  position: relative;
-  overflow: hidden;
-}
-
-/* Simulated folder sheet top border stamp */
-.dossierInspector::before {
-  content: "CASE DETAILED REPORT";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: var(--pop-black);
-  color: var(--pop-white);
-  font-family: var(--font-headline);
-  font-size: 0.6rem;
-  letter-spacing: 0.1em;
-  padding: 0.2rem 1rem;
-  text-align: center;
-}
-
-.inspectorContent {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.inspectorHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.75rem;
-  border-bottom: 2px dashed var(--pop-black);
-  padding-bottom: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-.inspectorTitleContainer {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.inspectorIcon {
-  width: 22px;
-  height: 22px;
-  flex-shrink: 0;
-}
-
-.inspectorName {
-  font-family: var(--font-headline);
-  font-size: 1.25rem;
-  color: var(--pop-black);
-  margin: 0;
-  line-height: 1.1;
-  letter-spacing: 0.02em;
-}
-
-.inspectorDesc {
-  font-family: var(--font-comic-neue), 'Comic Neue', sans-serif;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  color: #374151;
-  font-weight: 550;
-  margin-bottom: auto; /* Push projects and alerts to the bottom */
+  gap: 2rem 3.5rem;
 }
 
 /* ===== NOIR THEME DOSSIER TABS & FOLDER ===== */
@@ -977,71 +834,11 @@
   border-radius: 4px;
 }
 
-:global([data-theme='noir']) .skillChip {
-  background: var(--surface-secondary);
-  color: #d4d4d8;
-  border: 1px solid var(--border-muted);
-  box-shadow: none;
-}
-
-:global([data-theme='noir']) .skillChip:hover {
-  background: var(--surface-primary);
-  color: var(--chip-color);
-  border-color: var(--chip-color);
-  box-shadow: 0 0 10px var(--chip-color);
-}
-
-:global([data-theme='noir']) .skillChipActive {
-  background: var(--surface-primary);
-  color: var(--chip-color);
-  border-color: var(--chip-color);
-  box-shadow: 0 0 12px var(--chip-color);
-}
-
-:global([data-theme='noir']) .skillChipActive .chipName {
-  color: var(--chip-color);
-}
-
-:global([data-theme='noir']) .chipName {
-  color: #d4d4d8;
-  font-family: monospace, Courier, sans-serif;
-  font-weight: bold;
-}
-
-:global([data-theme='noir']) .dossierInspector {
-  background: var(--surface-secondary);
-  border: 2px solid var(--folder-neon);
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
-}
-
-:global([data-theme='noir']) .dossierInspector::before {
-  background: var(--folder-neon);
-  color: #000000;
-  font-family: monospace, Courier, sans-serif;
-  font-weight: bold;
-}
-
-:global([data-theme='noir']) .inspectorHeader {
-  border-color: var(--border-muted);
-}
-
-:global([data-theme='noir']) .inspectorName {
-  color: var(--color-text);
-  font-family: monospace, Courier, sans-serif;
-}
-
-:global([data-theme='noir']) .inspectorDesc {
-  color: #a1a1aa;
-  font-family: monospace, Courier, sans-serif;
-  font-weight: normal;
-}
-
-/* ===== RESPONSIVE TABS & GRID ===== */
-@media (max-width: 980px) {
-  .dossierGridSplit {
+/* ===== RESPONSIVE TABS ===== */
+@media (max-width: 900px) {
+  .dossierGridInner {
     grid-template-columns: 1fr;
-    gap: 2rem;
-    min-height: auto;
+    gap: 1.5rem;
   }
 }
 
@@ -1080,11 +877,5 @@
   :global([data-theme='noir']) .dossierTabActive {
     border-color: var(--tab-neon);
     transform: none;
-  }
-}
-
-@media (max-width: 600px) {
-  .dossierGridChips {
-    grid-template-columns: 1fr !important;
   }
 }
