@@ -39,7 +39,10 @@ CREATE POLICY "Allow public select access"
 CREATE OR REPLACE FUNCTION purge_old_page_visits()
 RETURNS trigger AS $$
 BEGIN
-  DELETE FROM page_visits WHERE created_at < NOW() - INTERVAL '90 days';
+  -- Only execute the purge delete query on ~1% of inserts to reduce CPU & lock overhead
+  IF random() < 0.01 THEN
+    DELETE FROM page_visits WHERE created_at < NOW() - INTERVAL '90 days';
+  END IF;
   RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
