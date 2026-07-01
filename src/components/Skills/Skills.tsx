@@ -19,7 +19,7 @@ import {
   type LucideIcon
 } from 'lucide-react';
 import styles from './Skills.module.css';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 
 // Map icon strings to Lucide components
 const iconMap: Record<string, LucideIcon> = {
@@ -199,7 +199,7 @@ export default function Skills({ skills }: SkillsProps) {
           } as React.CSSProperties}
         >
           <AnimatePresence mode="wait">
-            <motion.div
+            <m.div
               key={activeTab}
               id={`panel-${activeTab}`}
               role="tabpanel"
@@ -216,7 +216,7 @@ export default function Skills({ skills }: SkillsProps) {
                 {activeTab === 'product' && productSkills.map(renderSkillRow)}
                 {activeTab === 'dynamic' && dynamicSkills.map(renderSkillRow)}
               </div>
-            </motion.div>
+            </m.div>
           </AnimatePresence>
         </div>
       </div>
