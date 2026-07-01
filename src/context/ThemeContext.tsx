@@ -58,15 +58,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // Sync theme from localStorage after hydration; the <head> blocking script
   // already sets data-theme, so this reconciles React state to match.
   useEffect(() => {
-    const timer = setTimeout(() => {
-      const savedTheme = localStorage.getItem('theme') as Theme | null;
-      const resolved: Theme = savedTheme === 'noir' || savedTheme === 'light'
-        ? savedTheme
-        : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'noir' : 'light';
+    const savedTheme = localStorage.getItem('theme') as Theme | null;
+    const resolved: Theme = savedTheme === 'noir' || savedTheme === 'light'
+      ? savedTheme
+      : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'noir' : 'light';
+    
+    const frameId = requestAnimationFrame(() => {
       setTheme(resolved);
       document.documentElement.setAttribute('data-theme', resolved);
-    }, 0);
-    return () => clearTimeout(timer);
+    });
+    
+    return () => cancelAnimationFrame(frameId);
   }, []);
 
   const toggleTheme = useCallback(
