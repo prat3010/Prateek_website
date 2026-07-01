@@ -17,7 +17,7 @@ const NoirSkyline = dynamic(() => import('@/components/effects/NoirSkyline'), {
 });
 const CursorTrail = dynamic(() => import('@/components/effects/CursorTrail'), { ssr: false });
 const ZenToggle = dynamic(() => import('@/components/ui/ZenToggle'), { ssr: false });
-const InfoButton = dynamic(() => import('@/components/ui/InfoButton'), { ssr: false });
+const TerminalButton = dynamic(() => import('@/components/ui/TerminalButton'), { ssr: false });
 const ThreeGremlinParade = dynamic(() => import('@/components/effects/ThreeGremlinParade'), { ssr: false });
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
@@ -112,7 +112,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           <main>{children}</main>
           {!isAdminRoute && <Footer />}
           {!isAdminRoute && <ZenToggle />}
-          {!isAdminRoute && <InfoButton />}
+          {!isAdminRoute && <TerminalButton />}
           {!isAdminRoute && isKonamiActive && <ThreeGremlinParade />}
         </LenisProvider>
       </LazyMotion>

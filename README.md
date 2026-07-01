@@ -77,7 +77,7 @@ When compiling the web app for deployment, the build process automatically execu
 npm run build
 ```
 
-This ensures the terminal telemetry console on the portfolio site (accessible at `/info`) displays your actual git log. The interactive terminal console also supports a `qrcode` command to render a payment/donation QR code inline.
+This ensures the terminal telemetry console on the portfolio site (accessible at `/terminal`) displays your actual git log. The interactive terminal console also supports a `qrcode` command to render a payment/donation QR code inline.
 
 ---
 

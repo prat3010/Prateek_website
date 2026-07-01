@@ -16,7 +16,7 @@
   visibility: hidden !important;
 }
 
-.infoButton {
+.terminalButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -42,14 +42,14 @@
     color var(--transition-normal);
 }
 
-.infoButton:hover {
+.terminalButton:hover {
   transform: translate(3px, -3px);
   box-shadow: -3px 3px 0px rgba(43, 43, 54, 0.18); /* custom reverse comic shadow since it floats on right */
   background-color: var(--pop-orange);
   color: var(--pop-white);
 }
 
-.infoButton:active {
+.terminalButton:active {
   transform: translate(-1px, 1px);
   box-shadow: -1px 1px 0px rgba(43, 43, 54, 0.18);
 }
@@ -65,7 +65,7 @@
   transition: transform var(--transition-fast);
 }
 
-.infoButton:hover .icon {
+.terminalButton:hover .icon {
   transform: scale(1.1) rotate(10deg);
 }
 
@@ -75,7 +75,7 @@
 }
 
 /* ── Noir Theme Overrides ──────────────────────────────────── */
-:global([data-theme='noir']) .infoButton {
+:global([data-theme='noir']) .terminalButton {
   font-family: var(--font-code);
   font-size: 0.85rem;
   font-weight: 700;
@@ -87,7 +87,7 @@
   border-radius: 4px;
 }
 
-:global([data-theme='noir']) .infoButton:hover {
+:global([data-theme='noir']) .terminalButton:hover {
   transform: translate(1px, -1px);
   background-color: #1C1C24;
   border-color: var(--neon-cyan, #00f0ff);
@@ -95,7 +95,7 @@
   color: #FFFFFF;
 }
 
-:global([data-theme='noir']) .infoButton:active {
+:global([data-theme='noir']) .terminalButton:active {
   transform: translateY(1px);
 }
 
@@ -113,7 +113,7 @@
     right: 15px;
   }
   
-  .infoButton {
+  .terminalButton {
     padding: 10px;
     border-radius: var(--border-radius-round);
     gap: 0;

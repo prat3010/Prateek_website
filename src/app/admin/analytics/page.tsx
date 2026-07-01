@@ -54,7 +54,7 @@ export default async function AnalyticsPage(props: {
         <Link href="/" className={styles.backBtn}>
           <ArrowLeft size={16} /> Return to Portfolio
         </Link>
-        <Link href="/info" className={styles.backBtn}>
+        <Link href="/terminal" className={styles.backBtn}>
           Terminal Diagnostics
         </Link>
       </div>
