@@ -480,7 +480,7 @@ def sanitize_local_path(path_input):
 # TS Data Parsers (Projects, Resume, Certs)
 # ==========================================
 
-# Parse projects.ts (Now reads projects.json + Supabase)
+# Parse projects.json (Now reads projects.json + Supabase)
 def parse_projects_file():
     if HAS_SYNC:
         try:
@@ -500,7 +500,7 @@ def parse_projects_file():
             print(f"Failed to read local projects.json: {e}")
     return []
 
-# Write projects.ts (Now writes projects.json + Supabase)
+# Write projects.json (Now writes projects.json + Supabase)
 def write_projects_file(projects):
     is_offline = st.session_state.get("offline_mode", False)
     
@@ -525,7 +525,7 @@ def write_projects_file(projects):
         except Exception:
             pass
 
-# Parse resume.ts
+# Parse resume.json
 def extract_literal(content, start_sig):
     idx = content.find(start_sig)
     if idx == -1:
@@ -967,6 +967,40 @@ st.markdown("""
         color: #e2dff0 !important;
     }
     
+    /* Hide the Streamlit Deploy button specifically */
+    .stAppDeployButton,
+    [data-testid="stAppDeployButton"],
+    .stDeployButton,
+    [data-testid="stHeaderDeployButton"],
+    header button[class*="deploy"],
+    header a[href*="share.streamlit.io"],
+    header [class*="AppDeployButton"] {
+        display: none !important;
+    }
+
+    /* Make the header bar background transparent with default height and prevent cropping */
+    header[data-testid="stHeader"],
+    header[data-testid="stHeader"] > div,
+    header[data-testid="stHeader"] [class*="st-emotion-cache"] {
+        background-color: transparent !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Style the header toggle and settings menu icons to fit the Candy Theme */
+    header[data-testid="stHeader"] button,
+    header[data-testid="stHeader"] button svg,
+    header[data-testid="stHeader"] button svg * {
+        color: #ff7597 !important;
+        fill: #ff7597 !important;
+    }
+
+    /* Maintain comfortable top padding for content */
+    .block-container {
+        padding-top: 3.5rem !important;
+    }
+    
     /* Section Headers */
     .section-header {
         font-size: 1.5rem;
@@ -1307,6 +1341,9 @@ st.sidebar.markdown("### CI/CD Deployment Status")
 def fetch_deployment_status():
     url = "https://api.github.com/repos/prat3010/Prateek_website/commits/main/status"
     headers = {"User-Agent": "Python/Streamlit-Synchronizer"}
+    gh_token = env.get("GITHUB_TOKEN") or env.get("GITHUB_PAT") or env.get("GH_TOKEN")
+    if gh_token:
+        headers["Authorization"] = f"token {gh_token}"
     req = urllib.request.Request(url, headers=headers)
     try:
         with urllib.request.urlopen(req) as res:
@@ -1705,7 +1742,7 @@ with tab_analytics:
 # ──────────────────────────────────────────
 with tab_edit:
     if st.session_state.resume is None:
-        st.error("Could not load resume.ts. Please verify the file is present.")
+        st.error("Could not load resume.json. Please verify the file is present.")
     else:
         res = st.session_state.resume
         
@@ -1843,10 +1880,18 @@ with tab_edit:
 
         # Save Button & Live JSON View
         st.markdown("---")
+        dry_run_resume = st.checkbox("Dry-Run Mode (Save locally only, do not push to remote)", value=True, key="dry_resume")
         if st.button("Save Resume Changes", type="primary", use_container_width=True):
             try:
                 write_resume_file(res)
-                st.success("Resume updated and saved successfully directly in src/data/resume.ts!")
+                st.success("Resume updated and saved successfully directly in src/data/resume.json!")
+                if not dry_run_resume:
+                    st.info("🚀 Pushing changes to GitHub...")
+                    git_ok, git_msg = git_commit_push_file("src/data/resume.json", "chore(resume): manual resume update")
+                    if git_ok:
+                        st.toast(f"📝 Resume saved and {git_msg}")
+                    else:
+                        st.error(f"❌ Git failed: {git_msg}")
             except Exception as e:
                 st.error(f"Failed to write file: {e}")
                 
@@ -2101,7 +2146,7 @@ with tab_project:
     
     current_projects = st.session_state.projects or []
     if not current_projects:
-        st.info("No active projects found in projects.ts.")
+        st.info("No active projects found in projects.json.")
     else:
         st.write(f"Currently showing **{len(current_projects)}** project(s):")
         
@@ -2317,6 +2362,21 @@ with tab_project:
                                                 st.error(f"Git add failed: {err_msg}")
                                             else:
                                                 commit_msg = f"chore(sync): update project - {project['title']}"
+                                                success, err_msg = run_safe_git_command(
+                                                    ["git", "commit", "-m", commit_msg],
+                                                    cwd=os.getcwd()
+                                                )
+                                                if not success:
+                                                    st.error(f"Git commit failed: {err_msg}")
+                                                else:
+                                                    success, push_out = run_safe_git_command(
+                                                        ["git", "push", "origin", "main"],
+                                                        cwd=os.getcwd()
+                                                    )
+                                                    if not success:
+                                                        st.error(f"Git push failed: {push_out}")
+                                                    else:
+                                                        st.success("✅ Pushed successfully to GitHub!")
                                             
                                     st.rerun()
                                 except Exception as e:
@@ -2577,7 +2637,7 @@ with tab_cert:
     
     current_certs = st.session_state.certificates
     if not current_certs:
-        st.info("No active certificates found in certificates.ts.")
+        st.info("No active certificates found in certificates.json.")
     else:
         st.write(f"Currently showing **{len(current_certs)}** active certificate(s):")
         for idx, cert in enumerate(current_certs):
@@ -2647,7 +2707,8 @@ with tab_cert:
 # ──────────────────────────────────────────
 with tab_skills:
     st.markdown('<div class="section-header">Manage Skills & Project Mapping</div>', unsafe_allow_html=True)
-    st.write("Create, modify, delete, and link skills directly. Changes will update `src/data/skills.ts` immediately.")
+    st.write("Create, modify, delete, and link skills directly. Changes will update `src/data/skills.json` immediately.")
+    dry_run_skills = st.checkbox("Dry-Run Mode (Save locally only, do not push to remote)", value=True, key="dry_skills")
 
     # 1. Create New Skill Section
     with st.container(border=True):
@@ -2719,6 +2780,13 @@ with tab_skills:
                     write_skills_file(updated_skills)
                     st.session_state.skills = updated_skills
                     st.success(f"Successfully created skill: **{new_name.strip()}**!")
+                    if not dry_run_skills:
+                        st.info("🚀 Pushing changes to GitHub...")
+                        git_ok, git_msg = git_commit_push_file("src/data/skills.json", f"chore(skills): create skill - {new_name.strip()}")
+                        if git_ok:
+                            st.toast(f"💡 Skill created and {git_msg}")
+                        else:
+                            st.error(f"❌ Git failed: {git_msg}")
                     st.rerun()
                 except Exception as e:
                     st.error(f"Failed to save skills: {e}")
@@ -2727,7 +2795,7 @@ with tab_skills:
     st.markdown('<div class="section-header" style="margin-top: 2rem;">Manage & Link Existing Skills</div>', unsafe_allow_html=True)
     
     if not st.session_state.skills:
-        st.info("No skills found in skills.ts.")
+        st.info("No skills found in skills.json.")
     else:
         category_groups = {
             'orchestration': [],
@@ -2870,6 +2938,13 @@ with tab_skills:
                                         write_skills_file(updated_skills_list)
                                         st.session_state.skills = updated_skills_list
                                         st.success(f"Successfully updated skill: **{edit_name.strip()}**!")
+                                        if not dry_run_skills:
+                                            st.info("🚀 Pushing changes to GitHub...")
+                                            git_ok, git_msg = git_commit_push_file("src/data/skills.json", f"chore(skills): update skill - {edit_name.strip()}")
+                                            if git_ok:
+                                                st.toast(f"💡 Skill updated and {git_msg}")
+                                            else:
+                                                st.error(f"❌ Git failed: {git_msg}")
                                         st.rerun()
                                     except Exception as e:
                                         st.error(f"Failed to save skill changes: {e}")
@@ -2887,6 +2962,13 @@ with tab_skills:
                                     write_skills_file(updated_skills_list)
                                     st.session_state.skills = updated_skills_list
                                     st.success(f"Successfully deleted skill: **{s_name}**!")
+                                    if not dry_run_skills:
+                                        st.info("🚀 Pushing changes to GitHub...")
+                                        git_ok, git_msg = git_commit_push_file("src/data/skills.json", f"chore(skills): delete skill - {s_name}")
+                                        if git_ok:
+                                            st.toast(f"💡 Skill deleted and {git_msg}")
+                                        else:
+                                            st.error(f"❌ Git failed: {git_msg}")
                                     st.rerun()
                                 except Exception as e:
                                     st.error(f"Failed to delete skill: {e}")
