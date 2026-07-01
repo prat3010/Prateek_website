@@ -518,7 +518,10 @@ const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
           {/* River water body under the bridge */}
           <WobblyRect wobble={wobble} wobbleStrength={strength} x="-1000" y="950" width="3920" height="500" fill="var(--skyline-river-fill)" stroke="none" />
         </g>
+      </svg>
 
+      {/* Animated Layer (Unfiltered) */}
+      <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0, pointerEvents: 'none' }}>
         {/* HOTEL Neon Sign (Blade Sign hanging off the left edge of Hotel building x=1490) */}
         <g stroke="none" fill="none">
           {/* Supporting brackets */}
@@ -537,10 +540,7 @@ const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
             <text x="1480" y="746" textAnchor="middle">L</text>
           </g>
         </g>
-      </svg>
 
-      {/* Animated Layer (Unfiltered) */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0, pointerEvents: 'none' }}>
         {/* Chugging Tugboat (Moving behind buildings) */}
         <g className={styles.tugboatTransit}>
           <g className={styles.tugboatBobbing}>
