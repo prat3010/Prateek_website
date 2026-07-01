@@ -482,3 +482,39 @@
 :global([data-theme='noir']) .backLink:active {
   transform: translateY(1px);
 }
+
+/* ──────────────────────────────────────────────────────────
+   TERMINAL INLINE IMAGE STYLES
+   ────────────────────────────────────────────────────────── */
+
+.terminalImageContainer {
+  display: flex;
+  justify-content: flex-start;
+  padding: 8px 0 8px 12px;
+}
+
+.terminalImage {
+  max-width: 220px;
+  width: 100%;
+  height: auto;
+  border: 3px solid var(--pop-black);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--pop-white);
+  box-shadow: var(--shadow-comic-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.terminalImage:hover {
+  transform: scale(1.03);
+  box-shadow: var(--shadow-comic);
+}
+
+:global([data-theme='noir']) .terminalImage {
+  border-color: #2F2F3D;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+:global([data-theme='noir']) .terminalImage:hover {
+  border-color: var(--neon-pink, #ff2a55);
+  box-shadow: 0 0 15px rgba(255, 42, 85, 0.5);
+}

@@ -45,7 +45,7 @@ The project uses the following environment variables (stored in `.env.local` loc
 - `.github/workflows/` contains CI/CD workflows (e.g. `db_sync.yml` to auto-sync JSON content to Supabase on push).
 - `src/app/` contains routes, layouts, metadata, API routes, sitemap, robots, and the app shell.
 - `src/proxy.ts` is the Next.js 16 proxy (formerly middleware) file that intercepts requests for telemetry logging.
-- `src/components/` contains portfolio sections, shared UI, visual effects, and the playground.
+- `src/components/` contains portfolio sections, shared UI (like the interactive diagnostics terminal console at `/info` which supports commands such as `git-info` and `qrcode`), visual effects, and the playground.
 - `src/data/` contains type definitions, Supabase client setup, and taglines (data values live in Supabase).
 - `src/lib/data.ts` is the server-side data layer that fetches projects, skills, resume, and certificates from Supabase.
 - `src/data/git-log.json` contains generated commit logs and should not be modified manually.

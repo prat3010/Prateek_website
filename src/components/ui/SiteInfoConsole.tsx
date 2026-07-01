@@ -13,8 +13,9 @@ import styles from './SiteInfoConsole.module.css';
 // Command responses for Noir Interactive Console
 interface ConsoleLine {
   text: string;
-  type: 'input' | 'output' | 'error' | 'success' | 'link';
+  type: 'input' | 'output' | 'error' | 'success' | 'link' | 'image';
   command?: string;
+  imageUrl?: string;
 }
 
 const BOOT_LOGS = [
@@ -351,7 +352,15 @@ export default function SiteInfoConsole() {
           { text: '  analytics  - Print dynamic database traffic visitor statistics summary', type: 'output' },
           { text: '  cheatcode  - Run retro developer override (3D WebGL parade)', type: 'output' },
           { text: '  git-info   - Open the interactive portfolio Git commit inspector', type: 'output' },
+          { text: '  qrcode     - Scan PhonePe QR code to pay or donate directly', type: 'output' },
           { text: '  clear      - Clear the command interface screen', type: 'output' }
+        ];
+        break;
+      case 'qrcode':
+        response = [
+          { text: 'PHONEPE UPI PAYMENT PORTAL:', type: 'success' },
+          { text: '  Scan the QR code below using any UPI app (PhonePe, GPay, Paytm, BHIM) to pay or donate.', type: 'output' },
+          { text: '', type: 'image', imageUrl: '/phonepe_qr.svg' }
         ];
         break;
       case 'projects':
@@ -584,18 +593,27 @@ export default function SiteInfoConsole() {
           {/* Terminal Console */}
           <div className={styles.terminalContainer} onClick={focusTerminalInput}>
             <div className={styles.terminalScreen} ref={terminalScreenRef} data-lenis-prevent>
-              {terminalHistory.map((line, index) => (
-                <div
-                  key={index}
-                  className={`${styles.terminalLine} ${styles[line.type]} ${line.command ? styles.clickableLine : ''}`}
-                  onClick={line.command ? (e) => {
-                    e.stopPropagation();
-                    executeCommand(line.command!);
-                  } : undefined}
-                >
-                  {line.text}
-                </div>
-              ))}
+              {terminalHistory.map((line, index) => {
+                if (line.type === 'image' && line.imageUrl) {
+                  return (
+                    <div key={index} className={styles.terminalImageContainer}>
+                      <img src={line.imageUrl} alt="PhonePe QR Code" className={styles.terminalImage} />
+                    </div>
+                  );
+                }
+                return (
+                  <div
+                    key={index}
+                    className={`${styles.terminalLine} ${styles[line.type]} ${line.command ? styles.clickableLine : ''}`}
+                    onClick={line.command ? (e) => {
+                      e.stopPropagation();
+                      executeCommand(line.command!);
+                    } : undefined}
+                  >
+                    {line.text}
+                  </div>
+                );
+              })}
             </div>
             <div className={styles.terminalPromptLine}>
               <span className={styles.promptSymbol}>&gt;</span>
@@ -617,7 +635,7 @@ export default function SiteInfoConsole() {
           <div className={styles.shortcutsContainer}>
             <span className={styles.shortcutsLabel}>QUICK SHORTCUTS:</span>
             <div className={styles.shortcutsGrid}>
-              {['help', 'projects', 'system', 'storage', 'stack', 'sync', 'analytics', 'cheatcode', 'git-info', 'clear'].map(cmd => (
+              {['help', 'projects', 'system', 'storage', 'stack', 'sync', 'analytics', 'cheatcode', 'git-info', 'qrcode', 'clear'].map(cmd => (
                 <button
                   key={cmd}
                   onClick={() => executeCommand(cmd)}

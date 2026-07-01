@@ -937,261 +937,264 @@ def git_commit_push_file(file_path, commit_message):
 # Custom CSS for Premium UI Styling
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=JetBrains+Mono:wght@400;700&family=Quicksand:wght@300..700&display=swap');
     
     /* Font overrides */
     html, body, [class*="css"], .stWidgetFormContainer {
-        font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif !important;
+        font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
     }
     
     h1, h2, h3, h4, h5, h6, .section-header {
-        font-family: 'Playfair Display', Georgia, serif !important;
+        font-family: 'Fredoka', sans-serif !important;
+        font-weight: 700 !important;
     }
     
     code, pre {
         font-family: 'JetBrains Mono', monospace !important;
     }
 
-    /* Core Page Styling with ambient radial glows */
+    /* Core Page Styling with sweet gradients, candy violet background, and sugar grid texture */
     .stApp {
-        background-color: #030303 !important;
+        background-color: #1a162b !important;
         background-image: 
-            radial-gradient(at 10% 10%, rgba(225, 0, 152, 0.10) 0px, transparent 50%),
-            radial-gradient(at 90% 20%, rgba(0, 230, 118, 0.08) 0px, transparent 50%),
-            radial-gradient(at 50% 80%, rgba(41, 121, 255, 0.10) 0px, transparent 50%) !important;
+            linear-gradient(rgba(255, 117, 151, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 117, 151, 0.03) 1px, transparent 1px),
+            radial-gradient(at 10% 10%, rgba(255, 117, 151, 0.18) 0px, transparent 50%),
+            radial-gradient(at 90% 20%, rgba(90, 214, 255, 0.16) 0px, transparent 50%),
+            radial-gradient(at 50% 80%, rgba(220, 181, 255, 0.18) 0px, transparent 50%) !important;
+        background-size: 32px 32px, 32px 32px, auto, auto, auto !important;
         background-attachment: fixed !important;
-        color: #ffffff !important;
+        color: #e2dff0 !important;
     }
     
     /* Section Headers */
     .section-header {
-        font-size: 1.6rem;
-        font-weight: 800;
-        color: #ffffff;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #ff7597; /* Cotton candy pink */
         margin-top: 0.5rem;
         margin-bottom: 1.5rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        border-bottom: 2px dashed rgba(255, 117, 151, 0.25);
         padding-bottom: 8px;
         display: inline-block;
         letter-spacing: 0.5px;
         text-transform: uppercase;
+        font-family: 'Fredoka', sans-serif !important;
     }
 
-    /* Glassmorphic bordered containers in Streamlit */
+    /* Rounded Bouncy Containers */
     div[data-testid="stVerticalBlockBorder"] {
-        background: rgba(18, 18, 18, 0.55) !important;
-        backdrop-filter: blur(12px) saturate(180%) !important;
-        -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        border-radius: 12px !important;
+        background: rgba(38, 32, 69, 0.6) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border: 1px solid rgba(255, 117, 151, 0.15) !important;
+        border-radius: 16px !important;
         padding: 24px !important;
         margin-bottom: 24px !important;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25) !important;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
     }
     div[data-testid="stVerticalBlockBorder"]:hover {
-        border-color: rgba(255, 255, 255, 0.2) !important;
-        box-shadow: 0 8px 32px 0 rgba(225, 0, 152, 0.08) !important;
-        transform: translateY(-2px) !important;
+        border-color: rgba(255, 117, 151, 0.35) !important;
+        box-shadow: 0 8px 32px 0 rgba(255, 117, 151, 0.12) !important;
+        transform: translateY(-2px) scale(1.005) !important;
     }
 
-    /* Target expanders with glassmorphism */
+    /* Sweet Expanders */
     details[data-testid="stExpander"] {
-        background: rgba(255, 255, 255, 0.03) !important;
+        background: rgba(38, 32, 69, 0.4) !important;
         backdrop-filter: blur(8px) !important;
         -webkit-backdrop-filter: blur(8px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        border-radius: 8px !important;
+        border: 1px solid rgba(255, 117, 151, 0.12) !important;
+        border-radius: 12px !important;
         margin-bottom: 12px !important;
-        box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.2) !important;
-        transition: all 0.2s ease !important;
+        box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.15) !important;
+        transition: all 0.25s ease !important;
     }
     details[data-testid="stExpander"]:hover {
-        border-color: rgba(255, 255, 255, 0.18) !important;
-        background: rgba(255, 255, 255, 0.05) !important;
+        border-color: rgba(255, 117, 151, 0.25) !important;
+        background: rgba(38, 32, 69, 0.6) !important;
     }
     summary[data-testid="stExpanderSummary"] {
         font-weight: 700 !important;
         color: #ffffff !important;
+        font-family: 'Fredoka', sans-serif !important;
     }
 
-    /* Premium gradient buttons */
+    /* Glossy Bouncy buttons */
     button[data-testid="baseButton-primary"] {
-        background: linear-gradient(135deg, #e10098 0%, #2979ff 100%) !important;
-        color: #ffffff !important;
+        background: linear-gradient(135deg, #ff7597 0%, #dcb5ff 100%) !important; /* Sweet bubblegum gradient */
+        color: #100a21 !important;
         font-weight: 700 !important;
+        font-family: 'Fredoka', sans-serif !important;
         text-transform: uppercase !important;
         letter-spacing: 0.5px !important;
         border: none !important;
-        border-radius: 6px !important;
-        box-shadow: 0 4px 15px 0 rgba(225, 0, 152, 0.35) !important;
-        transition: all 0.2s ease !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 15px 0 rgba(255, 117, 151, 0.3) !important;
+        transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
         padding: 0.5rem 1.5rem !important;
     }
     button[data-testid="baseButton-primary"]:hover {
-        transform: translateY(-1px) !important;
-        box-shadow: 0 6px 20px 0 rgba(225, 0, 152, 0.5) !important;
-        opacity: 0.95 !important;
+        transform: translateY(-2px) scale(1.03) !important;
+        box-shadow: 0 6px 20px 0 rgba(255, 117, 151, 0.45) !important;
     }
     button[data-testid="baseButton-primary"]:active {
-        transform: translateY(1px) !important;
+        transform: translateY(1px) scale(0.98) !important;
     }
 
     button[data-testid="baseButton-secondary"] {
-        background: rgba(255, 255, 255, 0.05) !important;
-        color: #ffffff !important;
+        background: rgba(255, 255, 255, 0.04) !important;
+        color: #e2dff0 !important;
         font-weight: 600 !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        border-radius: 6px !important;
-        box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.15) !important;
+        font-family: 'Quicksand', sans-serif !important;
+        border: 1px solid rgba(255, 117, 151, 0.2) !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.1) !important;
         transition: all 0.2s ease !important;
     }
     button[data-testid="baseButton-secondary"]:hover {
-        background: rgba(255, 255, 255, 0.1) !important;
-        border-color: rgba(255, 255, 255, 0.3) !important;
-    }
-    button[data-testid="baseButton-secondary"]:active {
-        transform: translateY(1px) !important;
+        background: rgba(255, 117, 151, 0.08) !important;
+        border-color: rgba(255, 117, 151, 0.4) !important;
+        color: #ffffff !important;
+        transform: translateY(-1px) !important;
     }
 
     /* Danger delete buttons */
     button[id^="del_exp_"]:hover, button[id^="del_edu_"]:hover, button[id^="rem_bul_"]:hover, button[id^="delete_"]:hover {
-        border-color: rgba(255, 59, 48, 0.5) !important;
-        color: #ff3b30 !important;
-        background-color: rgba(255, 59, 48, 0.05) !important;
+        border-color: rgba(255, 90, 95, 0.6) !important;
+        color: #ff5a5f !important;
+        background-color: rgba(255, 90, 95, 0.08) !important;
     }
 
     /* Glassmorphic inputs */
     .stTextInput>div>div>input, .stTextArea>div>div>textarea, .stSelectbox>div>div>div {
-        background-color: rgba(255, 255, 255, 0.03) !important;
+        background-color: rgba(28, 22, 52, 0.8) !important;
         color: #ffffff !important;
-        border: 1px solid rgba(255, 255, 255, 0.12) !important;
-        border-radius: 6px !important;
-        transition: all 0.2s !important;
-        font-family: 'Space Grotesk', sans-serif !important;
+        border: 1px solid rgba(255, 117, 151, 0.15) !important;
+        border-radius: 10px !important;
+        transition: all 0.25s !important;
+        font-family: 'Quicksand', sans-serif !important;
         font-weight: 500 !important;
     }
     .stTextInput>div>div>input:focus, .stTextArea>div>div>textarea:focus {
-        border-color: rgba(255, 255, 255, 0.4) !important;
-        box-shadow: 0 0 10px 0 rgba(255, 255, 255, 0.1) !important;
-        background-color: rgba(255, 255, 255, 0.05) !important;
+        border-color: #5ad6ff !important;
+        box-shadow: 0 0 10px 0 rgba(90, 214, 255, 0.3) !important;
+        background-color: rgba(34, 26, 62, 0.8) !important;
     }
     
     /* Labels */
     label[data-testid="stWidgetLabel"] p {
-        color: #e4e4e7 !important;
+        color: #ffb7c5 !important;
         font-weight: 600 !important;
+        font-family: 'Fredoka', sans-serif !important;
     }
 
-    /* Sidebar Glassmorphic Styling */
+    /* Sidebar Glassmorphic Candy Styling */
     section[data-testid="stSidebar"] {
-        background-color: rgba(10, 10, 10, 0.6) !important;
-        backdrop-filter: blur(20px) !important;
-        -webkit-backdrop-filter: blur(20px) !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+        background-color: #120e20 !important;
+        border-right: 1px solid rgba(255, 117, 151, 0.1) !important;
     }
     section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] li, section[data-testid="stSidebar"] span {
-        color: #ffffff !important;
+        color: #e2dff0 !important;
     }
     section[data-testid="stSidebar"] h1, section[data-testid="stSidebar"] h2, section[data-testid="stSidebar"] h3 {
         color: #ffffff !important;
-        font-family: 'Space Grotesk', sans-serif !important;
-        font-weight: 800 !important;
+        font-family: 'Fredoka', sans-serif !important;
+        font-weight: 700 !important;
     }
     section[data-testid="stSidebar"] .stButton>button {
-        background: rgba(255, 255, 255, 0.05) !important;
-        color: #ffffff !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        background: rgba(255, 117, 151, 0.05) !important;
+        color: #ffb7c5 !important;
+        border: 1px solid rgba(255, 117, 151, 0.2) !important;
     }
     section[data-testid="stSidebar"] .stButton>button:hover {
-        background: rgba(255, 255, 255, 0.12) !important;
-        border-color: rgba(255, 255, 255, 0.3) !important;
+        background: rgba(255, 117, 151, 0.12) !important;
+        border-color: rgba(255, 117, 151, 0.4) !important;
     }
 
-    /* Floating Glass Tabs list */
+    /* Floating Candy Tabs list */
     .stTabs [data-baseweb="tab-list"] {
         gap: 12px !important;
-        background: rgba(255, 255, 255, 0.03) !important;
-        backdrop-filter: blur(10px) !important;
+        background: rgba(38, 32, 69, 0.8) !important;
         padding: 8px !important;
-        border-radius: 8px !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 16px !important;
+        border: 1px solid rgba(255, 117, 151, 0.15) !important;
         margin-bottom: 24px !important;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.24) !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2) !important;
     }
     .stTabs [data-baseweb="tab"] {
         height: 40px !important;
-        border-radius: 6px !important;
+        border-radius: 12px !important;
         background-color: transparent !important;
-        color: #a1a1aa !important;
-        font-family: 'Space Grotesk', sans-serif !important;
+        color: #ffb7c5 !important;
+        font-family: 'Fredoka', sans-serif !important;
         font-weight: 600 !important;
         padding: 0px 18px !important;
-        transition: all 0.2s !important;
+        transition: all 0.25s !important;
     }
     .stTabs [data-baseweb="tab"]:hover {
         color: #ffffff !important;
-        background-color: rgba(255, 255, 255, 0.05) !important;
+        background-color: rgba(255, 117, 151, 0.08) !important;
     }
     .stTabs [aria-selected="true"] {
-        background: rgba(255, 255, 255, 0.1) !important;
-        color: #ffffff !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        box-shadow: none !important;
+        background: linear-gradient(135deg, #ff7597 0%, #dcb5ff 100%) !important;
+        color: #100a21 !important;
+        box-shadow: 0 4px 12px 0 rgba(255, 117, 151, 0.3) !important;
     }
 
     /* Custom scrollbars */
     ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
+        width: 10px;
+        height: 10px;
     }
     ::-webkit-scrollbar-track {
-        background: #030303;
+        background: #1a162b;
     }
     ::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.15);
+        background: rgba(255, 117, 151, 0.25);
         border-radius: 10px;
-        border: 2px solid #030303;
+        border: 3px solid #1a162b;
     }
     ::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 117, 151, 0.45);
     }
 
-    /* Glassmorphic Telemetry cards */
+    /* Telemetry cards */
     .telemetry-card {
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.24);
-        background: rgba(255, 255, 255, 0.02);
-        backdrop-filter: blur(6px);
-        border-radius: 10px;
+        border: 1px solid rgba(255, 117, 151, 0.15);
+        box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.25);
+        background: rgba(38, 32, 69, 0.6);
+        border-radius: 16px;
         padding: 18px;
         margin-bottom: 16px;
         text-align: center;
         transition: all 0.3s ease;
     }
     .telemetry-card:hover {
-        border-color: rgba(255, 255, 255, 0.18);
-        background: rgba(255, 255, 255, 0.04);
+        border-color: rgba(255, 117, 151, 0.35);
+        background: rgba(38, 32, 69, 0.8);
         transform: translateY(-2px);
+        box-shadow: 0 12px 28px 0 rgba(255, 117, 151, 0.15);
     }
     .telemetry-card-val {
         font-size: 2.4rem;
-        font-weight: 800;
-        color: #ffffff;
-        font-family: 'JetBrains Mono', monospace !important;
+        font-weight: 700;
+        color: #5ad6ff;
+        font-family: 'Fredoka', sans-serif !important;
         margin-bottom: 4px;
-        letter-spacing: -1px;
+        letter-spacing: -0.5px;
     }
     .telemetry-card-lbl {
         font-size: 0.75rem;
         font-weight: 700;
-        color: #a1a1aa;
+        color: #ffb7c5;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        font-family: 'Space Grotesk', sans-serif !important;
+        letter-spacing: 0.5px;
+        font-family: 'Quicksand', sans-serif !important;
     }
 
-    /* Custom progress bar graphs with gradients */
+    /* Custom progress bar graphs */
     .bar-container {
         margin-bottom: 14px;
     }
@@ -1199,27 +1202,26 @@ st.markdown("""
         display: flex;
         justify-content: space-between;
         margin-bottom: 6px;
-        font-size: 0.8rem;
-        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 0.85rem;
+        font-family: 'Quicksand', sans-serif !important;
         font-weight: 700;
     }
     .bar-label {
-        color: #ffffff;
+        color: #e2dff0;
     }
     .bar-count {
-        color: #a1a1aa;
+        color: #ffb7c5;
     }
     .bar-track {
         background-color: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 117, 151, 0.12);
         height: 12px;
-        border-radius: 4px;
+        border-radius: 6px;
         overflow: hidden;
     }
     .bar-fill {
         height: 100%;
-        background-color: #ffffff;
-        border-radius: 4px;
+        border-radius: 6px;
     }
 
     /* Skill capsules visual preview styling */
@@ -1227,21 +1229,19 @@ st.markdown("""
         display: inline-flex;
         align-items: center;
         padding: 4px 12px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 117, 151, 0.15);
         border-radius: 20px;
-        background: rgba(255, 255, 255, 0.03);
-        backdrop-filter: blur(5px);
-        font-family: 'Space Grotesk', sans-serif !important;
+        background: rgba(38, 32, 69, 0.6);
+        font-family: 'Quicksand', sans-serif !important;
         font-weight: 700;
         font-size: 0.8rem;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         margin-right: 8px;
         margin-bottom: 8px;
         transition: all 0.2s ease;
     }
     .skill-capsule-preview:hover {
-        border-color: rgba(255, 255, 255, 0.2);
-        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 117, 151, 0.35);
+        background: rgba(38, 32, 69, 0.8);
     }
     .skill-capsule-dot {
         width: 8px;
@@ -1255,30 +1255,30 @@ st.markdown("""
     .status-badge {
         display: inline-block;
         padding: 3px 8px;
-        border-radius: 4px;
-        font-size: 0.65rem;
-        font-family: 'JetBrains Mono', monospace;
+        border-radius: 6px;
+        font-size: 0.7rem;
+        font-family: 'Fredoka', sans-serif;
         font-weight: 700;
         text-transform: uppercase;
         border: 1px solid rgba(255, 255, 255, 0.1);
     }
     .status-badge-bot {
-        background-color: rgba(239, 68, 68, 0.15) !important;
-        color: #f87171 !important;
-        border-color: rgba(239, 68, 68, 0.3) !important;
+        background-color: rgba(255, 90, 95, 0.12) !important;
+        color: #ff767a !important;
+        border-color: rgba(255, 90, 95, 0.25) !important;
     }
     .status-badge-user {
-        background-color: rgba(16, 185, 129, 0.15) !important;
-        color: #34d399 !important;
-        border-color: rgba(16, 185, 129, 0.3) !important;
+        background-color: rgba(90, 214, 255, 0.12) !important;
+        color: #5ad6ff !important;
+        border-color: rgba(90, 214, 255, 0.25) !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # Sidebar
 st.sidebar.markdown("""
-<div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 20px; margin-bottom: 25px; text-align: center; backdrop-filter: blur(10px); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);">
-    <div style="width: 80px; height: 80px; margin: 0 auto 12px auto; display: flex; align-items: center; justify-content: center;">
+<div style="background: rgba(38, 32, 69, 0.8); border: 1px solid rgba(255, 117, 151, 0.15); border-radius: 16px; padding: 20px; margin-bottom: 25px; text-align: center; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);">
+    <div style="width: 76px; height: 76px; margin: 0 auto 12px auto; display: flex; align-items: center; justify-content: center; background: rgba(255, 117, 151, 0.08); border: 1px solid rgba(255, 117, 151, 0.2); border-radius: 50%; padding: 10px;">
         <svg viewBox="0 0 100 100" style="width: 100%; height: 100%;">
             <circle cx="50" cy="50" r="38" fill="#5A8EB6" opacity="0.15" />
             <path d="M 26,45 L 32,50 L 26,55" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
@@ -1295,9 +1295,9 @@ st.sidebar.markdown("""
             <ellipse cx="63" cy="63" rx="3.5" ry="2" fill="#DF8B98" opacity="0.6" />
         </svg>
     </div>
-    <h3 style="color: #ffffff; margin: 0; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 1.35rem; letter-spacing: 0.5px; text-transform: uppercase;">PRATEEK SYNC</h3>
-    <span style="display: block; color: #a1a1aa; font-size: 0.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; margin-top: 4px;">ORCHESTRATION CLIENT</span>
-    <code style="display: inline-block; background-color: rgba(255, 255, 255, 0.05); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px; padding: 2px 8px; font-size: 0.7rem; font-weight: bold; margin-top: 10px; font-family: 'JetBrains Mono', monospace;">v1.3.0 // ACTIVE</code>
+    <h3 style="color: #ffffff; margin: 0; font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 1.35rem; letter-spacing: 0.5px; text-transform: uppercase;">SWEET SYNC</h3>
+    <span style="display: block; color: #ffb7c5; font-size: 0.75rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; margin-top: 4px;">LOLLIPOP ENGINE</span>
+    <code style="display: inline-block; background-color: rgba(255, 117, 151, 0.08); color: #ffffff; border: 1px solid rgba(255, 117, 151, 0.25); border-radius: 4px; padding: 2px 8px; font-size: 0.7rem; font-weight: bold; margin-top: 10px; font-family: 'JetBrains Mono', monospace;">v1.3.0 // ACTIVE</code>
 </div>
 """, unsafe_allow_html=True)
 # CI/CD Deployment & Status Monitor
@@ -1486,9 +1486,12 @@ if 'pending_skills' in st.session_state and st.session_state.pending_skills:
 
 # Custom Title Header
 st.markdown("""
-<div style="text-align: center; padding: 30px 20px; margin-bottom: 35px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01)); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);">
-    <h1 style="color: #ffffff; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; margin: 0; font-size: 2.5rem; letter-spacing: 0.5px; text-transform: uppercase;">PRATEEK CONTROL PORTAL</h1>
-    <p style="color: #a1a1aa; margin: 8px 0 0 0; font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 0.85rem; letter-spacing: 0.2px; text-transform: uppercase; opacity: 0.90;">SYSTEM_STATUS: ONLINE  |  LOCAL RESUME & PORTFOLIO ENGINE</p>
+<div style="text-align: center; padding: 32px 24px; margin-bottom: 32px; background: rgba(38, 32, 69, 0.8); border-radius: 16px; border: 1px solid rgba(255, 117, 151, 0.15); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);">
+    <h1 style="color: #ffffff; font-family: 'Fredoka', sans-serif; font-weight: 700; margin: 0; font-size: 2.4rem; letter-spacing: -0.5px; text-transform: uppercase;">🍬 CANDY SYNC STUDIO 🍬</h1>
+    <p style="color: #ffb7c5; margin: 8px 0 0 0; font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 0.8rem; letter-spacing: 0.5px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <span style="display: inline-block; width: 8px; height: 8px; background-color: #34d399; border-radius: 50%; box-shadow: 0 0 8px #34d399;"></span>
+        ENGINE STATUS: SWEET & ACTIVE  //  LOCAL RESUME & CONTENT ORCHESTRATOR
+    </p>
 </div>
 """, unsafe_allow_html=True)
 
