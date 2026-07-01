@@ -68,7 +68,7 @@ The project uses the following environment variables (stored in `.env.local` loc
 - Analytics are tracked via `src/proxy.ts` using GDPR-compliant daily IP hashing and logged to Supabase `page_visits`.
 - **Security Hardening:** Direct public anonymous database inserts to `page_visits` are blocked at the RLS level. Writes are securely processed server-side by the proxy middleware using the `SUPABASE_SERVICE_ROLE_KEY`.
 - **Spam & Bot Filtering:** Automated crawler/bot user-agents and common honeypot scanning patterns (e.g., `.php`, `wp-admin`, `.env`) are discarded at the proxy level before any database write is initiated.
-- **Data Retention:** An automated database function and trigger prunes logs older than 90 days on every new insert to limit database storage growth.
+- **Data Retention:** An automated database function and trigger prunes logs older than 90 days probabilistically (on average ~1% of inserts to reduce CPU & locking write overhead) to limit database storage growth.
 - **Aggregations & RPC Fast-Path**: The dashboard uses a custom SQL database function `get_analytics_summary(cutoff_time)` defined in `supabase_schema.sql`. This runs the aggregation on the database side in a single query pass.
 - **Backwards-Compatible Fallback**: If the `get_analytics_summary` function is missing (e.g., before database migrations are run), the application automatically catches the database error and falls back to client-side aggregation (fetching up to 2,000 records).
 - Database structure, policies, indexes, and stored procedures are defined in `supabase_schema.sql`.
