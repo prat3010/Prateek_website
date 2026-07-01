@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 
 # Import the Supabase sync helper
 try:
-    from sync_supabase import sync_projects, sync_skills, sync_certificates, sync_resume, call_rpc, fetch_page_visits
+    from sync_supabase import sync_projects, sync_skills, sync_certificates, sync_resume, call_rpc, fetch_page_visits, sync_blog_post, delete_blog_post
     HAS_SYNC = True
 except ImportError:
     HAS_SYNC = False
@@ -3093,10 +3093,10 @@ with tab_blog:
     
     draft_title = st.text_input("Title:", value=st.session_state.get("blog_draft_title", ""))
     draft_excerpt = st.text_area("Excerpt / Summary:", value=st.session_state.get("blog_draft_excerpt", ""))
-    draft_tags = st.text_input("Tags (comma separated):", value="Next.js, Python, AI" if not st.session_state.get("blog_draft_content") else "")
+    draft_tags = st.text_input("Tags (comma separated):", value=st.session_state.get("blog_draft_tags", "Next.js, Python, AI" if not st.session_state.get("blog_draft_content") else ""))
     draft_content = st.text_area("Markdown Body Content:", value=st.session_state.get("blog_draft_content", ""), height=350)
     
-    dry_run_blog = st.checkbox("Dry-Run Mode (Save locally only, do not push to remote)", value=True, key="dry_blog")
+    dry_run_blog = st.checkbox("Dry-Run Mode (Save to Supabase/locally, skip Git remote push)", value=True, key="dry_blog")
     
     if st.button("Publish Blog Post", use_container_width=True, type="primary"):
         if not draft_title or not draft_content:
@@ -3104,11 +3104,12 @@ with tab_blog:
         else:
             slug = slugify(draft_title)
             tags_list = [t.strip() for t in draft_tags.split(",") if t.strip()]
+            date_str = st.session_state.get("blog_draft_date", datetime.now().strftime('%Y-%m-%d'))
             
             # Format frontmatter
             file_content = f"""---
 title: "{draft_title}"
-date: "{datetime.now().strftime('%Y-%m-%d')}"
+date: "{date_str}"
 excerpt: "{draft_excerpt}"
 tags: {json.dumps(tags_list)}
 coverImage: "/images/blog/default.jpg"
@@ -3116,68 +3117,94 @@ coverImage: "/images/blog/default.jpg"
 
 {draft_content}
 """
-            # Write file
-            posts_dir = os.path.join("src", "content", "posts")
-            os.makedirs(posts_dir, exist_ok=True)
-            file_path = os.path.join(posts_dir, f"{slug}.md")
+            is_offline = st.session_state.get("offline_mode", False)
+            supabase_success = True
             
-            try:
-                with open(file_path, "w", encoding="utf-8") as f:
-                    f.write(file_content)
-                
-                # Update resume sync log
-                resume = parse_resume_file()
-                if resume:
-                    resume['lastSynced'] = {
-                        "timestamp": datetime.now().isoformat(),
-                        "status": "success",
-                        "summary": f"Published blog post: {draft_title}"
-                    }
-                    write_resume_file(resume)
-                    st.session_state.resume = resume
-                
-                st.success(f"Successfully published blog post locally! File created at: `{file_path}`")
-                
-                if not dry_run_blog:
-                    st.info("🚀 Pushing changes to GitHub...")
-                    success, status_out = run_safe_git_command(["git", "status", "--porcelain"], cwd=os.getcwd())
-                    if not success:
-                        st.error(f"Git status failed: {status_out}")
-                    elif status_out.strip():
-                        success, err_msg = run_safe_git_command(
-                            ["git", "add", file_path, "src/data/resume.json"],
-                            cwd=os.getcwd()
-                        )
+            if HAS_SYNC and not is_offline:
+                st.info("Syncing blog post to Supabase...")
+                post_data = {
+                    'slug': slug,
+                    'title': draft_title,
+                    'date': date_str,
+                    'excerpt': draft_excerpt,
+                    'tags': tags_list,
+                    'coverImage': '/images/blog/default.jpg',
+                    'content': draft_content
+                }
+                res = sync_blog_post(post_data)
+                if res is None:
+                    supabase_success = False
+                    st.error("Failed to sync blog post to Supabase.")
+            
+            if supabase_success:
+                try:
+                    # Write file
+                    posts_dir = os.path.join("src", "content", "posts")
+                    os.makedirs(posts_dir, exist_ok=True)
+                    file_path = os.path.join(posts_dir, f"{slug}.md")
+                    with open(file_path, "w", encoding="utf-8") as f:
+                        f.write(file_content)
+                    
+                    # Update resume sync log
+                    resume = parse_resume_file()
+                    if resume:
+                        resume['lastSynced'] = {
+                            "timestamp": datetime.now().isoformat(),
+                            "status": "success",
+                            "summary": f"Published blog post: {draft_title}"
+                        }
+                        write_resume_file(resume)
+                        st.session_state.resume = resume
+                    
+                    st.success(f"Successfully published blog post locally! File created at: `{file_path}`")
+                    
+                    if HAS_SYNC and not is_offline:
+                        st.info("Purging website cache...")
+                        trigger_revalidation()
+                        st.success("Website cache revalidated successfully!")
+                    
+                    if not dry_run_blog:
+                        st.info("🚀 Pushing changes to GitHub...")
+                        success, status_out = run_safe_git_command(["git", "status", "--porcelain"], cwd=os.getcwd())
                         if not success:
-                            st.error(f"Git add failed: {err_msg}")
-                        else:
-                            commit_msg = f"chore(blog): publish post - {draft_title}"
+                            st.error(f"Git status failed: {status_out}")
+                        elif status_out.strip():
                             success, err_msg = run_safe_git_command(
-                                ["git", "commit", "-m", commit_msg],
+                                ["git", "add", file_path, "src/data/resume.json"],
                                 cwd=os.getcwd()
                             )
                             if not success:
-                                st.error(f"Git commit failed: {err_msg}")
+                                st.error(f"Git add failed: {err_msg}")
                             else:
-                                success, push_out = run_safe_git_command(
-                                    ["git", "push", "origin", "main"],
+                                commit_msg = f"chore(blog): publish post - {draft_title}"
+                                success, err_msg = run_safe_git_command(
+                                    ["git", "commit", "-m", commit_msg],
                                     cwd=os.getcwd()
                                 )
                                 if not success:
-                                    st.error(f"Git push failed: {push_out}")
+                                    st.error(f"Git commit failed: {err_msg}")
                                 else:
-                                    st.success("✅ Pushed successfully to GitHub!")
-                    else:
-                        st.info("No changes to commit and push.")
-                
-                # Clear session state
-                if "blog_draft_title" in st.session_state: del st.session_state.blog_draft_title
-                if "blog_draft_excerpt" in st.session_state: del st.session_state.blog_draft_excerpt
-                if "blog_draft_content" in st.session_state: del st.session_state.blog_draft_content
-                st.rerun()
-                
-            except Exception as e:
-                st.error(f"Failed to publish post: {e}")
+                                    success, push_out = run_safe_git_command(
+                                        ["git", "push", "origin", "main"],
+                                        cwd=os.getcwd()
+                                    )
+                                    if not success:
+                                        st.error(f"Git push failed: {push_out}")
+                                    else:
+                                        st.success("✅ Pushed successfully to GitHub!")
+                        else:
+                            st.info("No changes to commit and push.")
+                    
+                    # Clear session state
+                    if "blog_draft_title" in st.session_state: del st.session_state.blog_draft_title
+                    if "blog_draft_excerpt" in st.session_state: del st.session_state.blog_draft_excerpt
+                    if "blog_draft_content" in st.session_state: del st.session_state.blog_draft_content
+                    if "blog_draft_tags" in st.session_state: del st.session_state.blog_draft_tags
+                    if "blog_draft_date" in st.session_state: del st.session_state.blog_draft_date
+                    st.rerun()
+                    
+                except Exception as e:
+                    st.error(f"Failed to publish post: {e}")
 
     # ──────────────────────────────────────────
     # Existing / Published Blogs List
@@ -3195,28 +3222,46 @@ coverImage: "/images/blog/default.jpg"
             posts_data = []
             for file_name in post_files:
                 file_path = os.path.join(posts_dir, file_name)
-                title = file_name
-                date = ""
+                post_title = file_name
+                post_date = ""
+                post_excerpt = ""
+                post_tags_list = []
+                post_body = ""
                 try:
                     with open(file_path, "r", encoding="utf-8") as f:
-                        content = f.read()
-                    if content.startswith("---"):
-                        parts = content.split("---", 2)
+                        file_content = f.read()
+                    post_body = file_content
+                    if file_content.startswith("---"):
+                        parts = file_content.split("---", 2)
                         if len(parts) >= 3:
                             frontmatter = parts[1]
+                            post_body = parts[2].strip()
                             for line in frontmatter.split("\n"):
+                                line = line.strip()
                                 if line.startswith("title:"):
-                                    title = line.split("title:", 1)[1].strip().strip('"').strip("'")
+                                    post_title = line.split("title:", 1)[1].strip().strip('"').strip("'")
                                 elif line.startswith("date:"):
-                                    date = line.split("date:", 1)[1].strip().strip('"').strip("'")
+                                    post_date = line.split("date:", 1)[1].strip().strip('"').strip("'")
+                                elif line.startswith("excerpt:"):
+                                    post_excerpt = line.split("excerpt:", 1)[1].strip().strip('"').strip("'")
+                                elif line.startswith("tags:"):
+                                    tags_str = line.split("tags:", 1)[1].strip()
+                                    try:
+                                        post_tags_list = json.loads(tags_str)
+                                    except Exception:
+                                        tags_clean = tags_str.replace("[", "").replace("]", "").replace('"', '').replace("'", "")
+                                        post_tags_list = [t.strip() for t in tags_clean.split(",") if t.strip()]
                 except Exception:
                     pass
                 
                 posts_data.append({
                     "file_name": file_name,
                     "file_path": file_path,
-                    "title": title,
-                    "date": date
+                    "title": post_title,
+                    "date": post_date,
+                    "excerpt": post_excerpt,
+                    "tags": post_tags_list,
+                    "body": post_body
                 })
             
             # Sort by date (newest first)
@@ -3224,20 +3269,37 @@ coverImage: "/images/blog/default.jpg"
             
             for post in posts_data:
                 with st.container(border=True):
-                    col_info, col_btn = st.columns([5, 1.2])
+                    col_info, col_edit, col_del = st.columns([5, 1, 1.2])
                     with col_info:
                         st.markdown(f"**{post['title']}**")
                         st.caption(f"Date: {post['date'] if post['date'] else 'No Date'} | File: `{post['file_name']}`")
-                    with col_btn:
+                    with col_edit:
+                        edit_key = f"edit_{post['file_name']}"
+                        if st.button("Edit", key=edit_key, type="secondary", use_container_width=True):
+                            st.session_state.blog_draft_title = post['title']
+                            st.session_state.blog_draft_excerpt = post['excerpt']
+                            st.session_state.blog_draft_tags = ", ".join(post['tags'])
+                            st.session_state.blog_draft_content = post['body']
+                            st.session_state.blog_draft_date = post['date']
+                            st.rerun()
+                    with col_del:
                         btn_key = f"delete_{post['file_name']}"
                         if st.button("Remove", key=btn_key, type="secondary", use_container_width=True):
                             try:
                                 os.remove(post['file_path'])
-                                st.success(f"Deleted `{post['file_name']}` successfully!")
-                                st.rerun()
                             except Exception as e:
                                 st.error(f"Error deleting file: {e}")
+                            
+                            is_offline = st.session_state.get("offline_mode", False)
+                            if HAS_SYNC and not is_offline:
+                                slug = post['file_name'].replace(".md", "")
+                                delete_blog_post(slug)
+                                trigger_revalidation()
+                            
+                            st.success(f"Deleted `{post['file_name']}` successfully!")
+                            st.rerun()
     else:
         st.info("No blog posts directory found.")
+
 
 

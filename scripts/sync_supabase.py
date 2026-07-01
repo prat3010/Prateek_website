@@ -228,4 +228,53 @@ def call_rpc(func_name, body=None):
 def fetch_page_visits(params=None):
     return _supabase_rest('page_visits', method='GET', params=params)
 
+def sync_blog_post(post):
+    _load_env()
+    url = f'{_URL}/rest/v1/posts?on_conflict=slug'
+    headers = {
+        'apikey': _KEY,
+        'Authorization': f'Bearer {_KEY}',
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates,return=representation',
+    }
+    row = {
+        'slug': post.get('slug', ''),
+        'title': post.get('title', ''),
+        'date': post.get('date', ''),
+        'excerpt': post.get('excerpt', ''),
+        'tags': post.get('tags', []),
+        'coverImage': post.get('coverImage', ''),
+        'content': post.get('content', ''),
+    }
+    data = json.dumps([row]).encode()
+    req = urllib.request.Request(url, data=data, headers=headers, method='POST')
+    try:
+        with urllib.request.urlopen(req) as resp:
+            return json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        print(f'  HTTP {e.code} syncing blog post {post.get("slug")}: {e.read().decode()}')
+        return None
+
+def delete_blog_post(slug):
+    _load_env()
+    url = f'{_URL}/rest/v1/posts?slug=eq.{slug}'
+    headers = {
+        'apikey': _KEY,
+        'Authorization': f'Bearer {_KEY}',
+    }
+    req = urllib.request.Request(url, headers=headers, method='DELETE')
+    try:
+        with urllib.request.urlopen(req) as resp:
+            return True
+    except urllib.error.HTTPError as e:
+        print(f'  HTTP {e.code} deleting blog post {slug}: {e.read().decode()}')
+        return False
+
+def fetch_blog_posts():
+    _load_env()
+    if not _URL or not _KEY:
+        return None
+    return _supabase_rest('posts', method='GET', params=[('order', 'date.desc')])
+
+
 

@@ -246,3 +246,29 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+
+-- ============================================================
+-- 9. Blog Posts
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS posts (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  slug TEXT UNIQUE NOT NULL,
+  title TEXT NOT NULL,
+  date TEXT NOT NULL,
+  excerpt TEXT NOT NULL DEFAULT '',
+  tags JSONB NOT NULL DEFAULT '[]',
+  "coverImage" TEXT NOT NULL DEFAULT '',
+  content TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public select posts" ON posts FOR SELECT USING (true);
+CREATE POLICY "Allow service insert posts" ON posts FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow service update posts" ON posts FOR UPDATE USING (true);
+CREATE POLICY "Allow service delete posts" ON posts FOR DELETE USING (true);
+
+CREATE INDEX IF NOT EXISTS idx_posts_slug ON posts (slug);
+CREATE INDEX IF NOT EXISTS idx_posts_date ON posts (date DESC);

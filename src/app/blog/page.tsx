@@ -24,8 +24,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function BlogListing() {
-  const posts = getAllPosts();
+export default async function BlogListing() {
+  const posts = await getAllPosts();
 
   return (
     <div className={styles.blogPage}>

@@ -132,9 +132,61 @@ def main():
     else:
         print(f"  [{RED}✗{RESET}] Failed to fetch resume profile.")
 
-    print(f"\n{GREEN}{BOLD}Sync complete!{RESET} All local JSON fallback backups have been updated to match Supabase.\n")
+    # 5. Pull Blog Posts
+    print("Pulling Blog Posts…")
+    posts_db = supabase_get('posts')
+    if posts_db is not None:
+        posts_dir = os.path.join(ROOT, 'src', 'content', 'posts')
+        os.makedirs(posts_dir, exist_ok=True)
+        
+        # Track slugs fetched to prune local files that were deleted in database
+        fetched_slugs = set()
+        for p in posts_db:
+            slug = p.get('slug')
+            if not slug:
+                continue
+            fetched_slugs.add(f"{slug}.md")
+            
+            # Format frontmatter and markdown body
+            tags = p.get('tags', [])
+            if isinstance(tags, str):
+                try:
+                    tags = json.loads(tags)
+                except Exception:
+                    tags = []
+            
+            file_content = f"""---
+title: "{p.get('title', '')}"
+date: "{p.get('date', '')}"
+excerpt: "{p.get('excerpt', '')}"
+tags: {json.dumps(tags)}
+coverImage: "{p.get('coverImage', '/images/blog/default.jpg')}"
+---
+
+{p.get('content', '')}
+"""
+            file_path = os.path.join(posts_dir, f"{slug}.md")
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(file_content)
+        
+        # Prune local markdown files that are not in the database
+        if os.path.exists(posts_dir):
+            for file_name in os.listdir(posts_dir):
+                if file_name.endswith('.md') and file_name not in fetched_slugs:
+                    try:
+                        os.remove(os.path.join(posts_dir, file_name))
+                        print(f"  [Pruned] Removed local post `{file_name}` because it was deleted in Supabase.")
+                    except Exception:
+                        pass
+        
+        print(f"  [{GREEN}✓{RESET}] Backed up {len(posts_db)} blog posts to src/content/posts/")
+    else:
+        print(f"  [{RED}✗{RESET}] Failed to fetch blog posts.")
+
+    print(f"\n{GREEN}{BOLD}Sync complete!{RESET} All local backups have been updated to match Supabase.\n")
     return 0
 
 if __name__ == "__main__":
     import sys
     sys.exit(main())
+

@@ -10,6 +10,7 @@
     "creative": "UI/UX focused developer dedicated to creating stunning interactive visual interfaces, micro-animations, and responsive layouts that deliver premium user experiences.",
     "fullstack": "Engineered web architectures focusing on robust server backends, database schema optimizations, and seamless client-server integration using Next.js, Flask, FastAPI, and Supabase."
   },
+  "twitter": "https://x.com/3010prateek",
   "website": "https://prateeq.in",
   "linkedin": "https://linkedin.com/in/freshlimevodka",
   "education": [
@@ -20,6 +21,7 @@
       "location": "New Delhi, India"
     }
   ],
+  "instagram": "https://www.instagram.com/freshlimevodka",
   "experience": [
     {
       "id": "freelance-developer",
@@ -67,7 +69,5 @@
     "status": "success",
     "summary": "Synchronized new project: PrateekSync AI: Intelligent Portfolio & Resume Automation Engine.",
     "timestamp": "2026-06-15T13:14:56.604842"
-  },
-  "twitter": "https://x.com/3010prateek",
-  "instagram": "https://www.instagram.com/freshlimevodka"
+  }
 }

@@ -197,5 +197,63 @@ if resume_data:
     upsert('profile', [row], 'id')
 print('  resume profile synced')
 
+# ── 5. Blog Posts ────────────────────────────────────────────────────
+
+print('Blog Posts…')
+posts_dir = os.path.join(ROOT, 'src', 'content', 'posts')
+posts_to_sync = []
+if os.path.exists(posts_dir):
+    for file_name in os.listdir(posts_dir):
+        if file_name.endswith('.md'):
+            slug = file_name[:-3]
+            file_path = os.path.join(posts_dir, file_name)
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    file_content = f.read()
+                
+                title = slug
+                date = ""
+                excerpt = ""
+                tags = []
+                content_body = file_content
+                
+                if file_content.startswith("---"):
+                    parts = file_content.split("---", 2)
+                    if len(parts) >= 3:
+                        frontmatter = parts[1]
+                        content_body = parts[2].strip()
+                        for line in frontmatter.split("\n"):
+                            line = line.strip()
+                            if line.startswith("title:"):
+                                title = line.split("title:", 1)[1].strip().strip('"').strip("'")
+                            elif line.startswith("date:"):
+                                date = line.split("date:", 1)[1].strip().strip('"').strip("'")
+                            elif line.startswith("excerpt:"):
+                                excerpt = line.split("excerpt:", 1)[1].strip().strip('"').strip("'")
+                            elif line.startswith("tags:"):
+                                tags_str = line.split("tags:", 1)[1].strip()
+                                try:
+                                    tags = json.loads(tags_str)
+                                except Exception:
+                                    tags_clean = tags_str.replace("[", "").replace("]", "").replace('%', '').replace('"', '').replace("'", "")
+                                    tags = [t.strip() for t in tags_clean.split(",") if t.strip()]
+                
+                posts_to_sync.append({
+                    'slug': slug,
+                    'title': title,
+                    'date': date,
+                    'excerpt': excerpt,
+                    'tags': tags,
+                    'coverImage': '/images/blog/default.jpg',
+                    'content': content_body
+                })
+            except Exception as e:
+                print(f'  Failed to parse {file_name}: {e}')
+
+if posts_to_sync:
+    upsert('posts', posts_to_sync, 'slug')
+print(f'  {len(posts_to_sync)} blog posts synced')
+
 print('')
 print('Done!')
+

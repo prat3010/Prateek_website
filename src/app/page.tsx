@@ -14,8 +14,8 @@ const Playground = dynamic(() => import('@/components/Playground/Playground'));
 const Contact = dynamic(() => import('@/components/Contact/Contact'));
 
 export default async function Home() {
-  const posts = getAllPosts();
-  const [projects, skills, resume, certificates] = await Promise.all([
+  const [posts, projects, skills, resume, certificates] = await Promise.all([
+    getAllPosts(),
     getProjects(),
     getSkills(),
     getProfile(),
