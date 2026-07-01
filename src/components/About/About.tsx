@@ -39,8 +39,9 @@ export default function About() {
                 <Image
                   src={isNoir ? '/images/profile-noir.webp' : '/images/profile-comic.webp'}
                   alt="Prateeq Sharma portrait"
-                  width={400}
-                  height={480}
+                  width={360}
+                  height={432}
+                  sizes="(max-width: 768px) 260px, 360px"
                   className={styles.profileImage}
                   priority={false}
                 />

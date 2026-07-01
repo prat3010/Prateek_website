@@ -116,12 +116,23 @@ function HeroClientContent({ taglines, isNoir }: HeroClientProps & { isNoir: boo
         <ComicPanel tilt={2} className={styles.heroPanel} staticDots>
           <div className={styles.imageWrapper}>
             <Image
-              src={isNoir ? '/images/hero-noir.webp' : '/images/hero-illustration-wavy.png'}
+              src="/images/hero-noir.webp"
               alt="Prateeq Sharma hero illustration"
               fill
               priority
+              fetchPriority="high"
               sizes="(max-width: 768px) 280px, 420px"
-              className={styles.heroImage}
+              className={`${styles.heroImage} ${styles.darkOnly}`}
+              style={{ objectFit: 'cover', objectPosition: 'center' }}
+            />
+            <Image
+              src="/images/hero-illustration-wavy.png"
+              alt="Prateeq Sharma hero illustration"
+              fill
+              priority
+              fetchPriority="high"
+              sizes="(max-width: 768px) 280px, 420px"
+              className={`${styles.heroImage} ${styles.lightOnly}`}
               style={{ objectFit: 'cover', objectPosition: 'center' }}
             />
           </div>

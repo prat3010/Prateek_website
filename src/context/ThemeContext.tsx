@@ -20,12 +20,12 @@ interface ThemeTransitionContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 const ThemeTransitionContext = createContext<ThemeTransitionContextType | undefined>(undefined);
 
-function getInitialTheme(initialTheme?: Theme): Theme {
-  return initialTheme || 'light';
+function getInitialTheme(): Theme {
+  return 'light';
 }
 
-export function ThemeProvider({ children, initialTheme }: { children: React.ReactNode; initialTheme?: Theme }) {
-  const [theme, setTheme] = useState<Theme>(() => getInitialTheme(initialTheme));
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setTheme] = useState<Theme>(() => getInitialTheme());
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [pendingTheme, setPendingTheme] = useState<Theme | null>(null);
   const [isDetailsHidden, setIsDetailsHidden] = useState(false);
@@ -65,7 +65,6 @@ export function ThemeProvider({ children, initialTheme }: { children: React.Reac
         : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'noir' : 'light';
       setTheme(resolved);
       document.documentElement.setAttribute('data-theme', resolved);
-      document.cookie = `theme=${resolved}; path=/; max-age=31536000; SameSite=Lax`;
     }, 0);
     return () => clearTimeout(timer);
   }, []);

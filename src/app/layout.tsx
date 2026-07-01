@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { cookies } from "next/headers";
 import { Playfair_Display, Lora, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import ClientLayout from "./ClientLayout";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Theme } from "@/context/ThemeContext";
 import { getProfile, getSkills } from "@/lib/data";
 
 const playfairDisplay = Playfair_Display({
@@ -69,10 +67,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieStore = await cookies();
-  const themeCookie = cookieStore.get('theme')?.value;
-  const initialTheme: Theme = themeCookie === 'noir' || themeCookie === 'light' ? themeCookie : 'light';
-
   // Fetch dynamic profile and skills details for structured SEO data (JSON-LD)
   const [profile, skills] = await Promise.all([
     getProfile(),
@@ -128,7 +122,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      data-theme={initialTheme}
+      data-theme="light"
       className={`${playfairDisplay.variable} ${lora.variable} ${jetbrainsMono.variable}`}
       suppressHydrationWarning
     >
@@ -159,7 +153,7 @@ export default async function RootLayout({
 
       </head>
       <body>
-        <ClientLayout initialTheme={initialTheme}>{children}</ClientLayout>
+        <ClientLayout>{children}</ClientLayout>
         <SpeedInsights />
       </body>
     </html>

@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Navbar from '@/components/ui/Navbar';
 import Footer from '@/components/ui/Footer';
-import { ThemeProvider, Theme } from '@/context/ThemeContext';
+import { ThemeProvider } from '@/context/ThemeContext';
 import { LenisProvider } from '@/context/LenisProvider';
 import ThemeTransition from '@/components/effects/ThemeTransition';
 import { LazyMotion, domAnimation } from 'framer-motion';
@@ -20,7 +20,7 @@ const ZenToggle = dynamic(() => import('@/components/ui/ZenToggle'), { ssr: fals
 const InfoButton = dynamic(() => import('@/components/ui/InfoButton'), { ssr: false });
 const ThreeGremlinParade = dynamic(() => import('@/components/effects/ThreeGremlinParade'), { ssr: false });
 
-export default function ClientLayout({ children, initialTheme }: { children: React.ReactNode; initialTheme?: Theme }) {
+export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith('/admin');
   const [isKonamiActive, setIsKonamiActive] = useState(false);
@@ -102,7 +102,7 @@ export default function ClientLayout({ children, initialTheme }: { children: Rea
   }, []);
 
   return (
-    <ThemeProvider initialTheme={initialTheme}>
+    <ThemeProvider>
       <LazyMotion features={domAnimation}>
         <LenisProvider>
           <ThemeTransition />
