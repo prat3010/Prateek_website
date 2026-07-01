@@ -34,6 +34,9 @@ GEMINI_API_KEY=your_gemini_api_key
 
 # Shared secret for synchronizer / API route writes (any string)
 SYNC_API_KEY=your_sync_api_key
+
+# Optional GitHub Token (to avoid anonymous rate limit on status tracker)
+GITHUB_TOKEN=your_github_token
 ```
 
 ### 2. Next.js Web App

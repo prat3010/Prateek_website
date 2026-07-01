@@ -33,6 +33,7 @@ The project uses the following environment variables (stored in `.env.local` loc
 - `CONTACT_EMAIL_TO`: The email address that receives notifications from the contact form (default is `3010prateeksharma@gmail.com`).
 - `GEMINI_API_KEY`: Google AI Gemini API key (version `gemini-2.5-flash`), used by the local Synchronizer dashboard for certificate analysis and skill scanning.
 - `SYNC_API_KEY`: Shared secret key used to authenticate requests to the Next.js API revalidation endpoint (`/api/revalidate`) and ensure secure cache purging.
+- `GITHUB_TOKEN` (or `GITHUB_PAT` / `GH_TOKEN`): Optional GitHub personal access token, used by the local Synchronizer dashboard to raise the rate limit on deployment status checks.
 
 ## Caching & Cache Revalidation
 
