@@ -198,7 +198,7 @@ function HeroClientContent({ taglines }: HeroClientProps) {
               style={{ objectFit: 'cover', objectPosition: 'center' }}
             />
             <Image
-              src="/images/hero-illustration-wavy.png"
+              src="/images/hero-illustration-wavy.webp"
               alt="Prateeq Sharma hero illustration"
               fill
               priority

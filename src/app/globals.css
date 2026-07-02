@@ -242,33 +242,38 @@
 }
 
 /* ─ Make sections transparent to reveal the fixed skyline background ─ */
-section {
-  background: transparent !important;
-  background-color: transparent !important;
-  background-image: none !important;
+main section {
+  background: transparent;
+  background-color: transparent;
+  background-image: none;
 }
 
 
-/* ─ Theme Transition Classes ─ */
-body,
-section,
-nav,
-footer,
-.comic-panel,
-.comic-panel-interactive,
-.speech-bubble {
+/* ─ Theme Transition Classes (gated by .theme-transition to avoid per-frame style recalc) ─ */
+.theme-transition,
+.theme-transition section,
+.theme-transition nav,
+.theme-transition footer,
+.theme-transition .comic-panel,
+.theme-transition .comic-panel-interactive,
+.theme-transition .speech-bubble {
   transition: 
     background-color var(--transition-normal),
     border-color var(--transition-normal),
     box-shadow var(--transition-normal);
 }
 
-h1, h2, h3, h4, p, a {
+.theme-transition h1,
+.theme-transition h2,
+.theme-transition h3,
+.theme-transition h4,
+.theme-transition p,
+.theme-transition a {
   transition: color var(--transition-normal);
 }
 
-button,
-.comic-btn {
+.theme-transition button,
+.theme-transition .comic-btn {
   transition: 
     background-color var(--transition-normal),
     border-color var(--transition-normal),
@@ -1096,9 +1101,9 @@ html.is-theme-transitioning * {
 }
 
 /* ── Zen Mode (Hide UI Details) Styles ─────────────────────── */
-main,
-nav,
-footer {
+.theme-transition main,
+.theme-transition nav,
+.theme-transition footer {
   transition: 
     opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
     visibility 0.6s,

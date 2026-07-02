@@ -3182,7 +3182,7 @@ with tab_photos:
                     
     with col2:
         st.subheader("Hero - Comic Mode")
-        st.caption("Target: `public/images/hero-illustration-wavy.png` (PNG)")
+        st.caption("Target: `public/images/hero-illustration-wavy.png` (source); app also expects `.webp` sibling for production")
         hero_comic_path = "public/images/hero-illustration-wavy.png"
         if os.path.exists(hero_comic_path):
             st.image(hero_comic_path, caption="Current Comic Hero", use_container_width=True)

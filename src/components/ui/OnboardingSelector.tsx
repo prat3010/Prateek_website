@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useTheme } from '@/context/ThemeContext';
 import { Code, Briefcase, Sparkles, Building2 } from 'lucide-react';
 import ComicPanel from './ComicPanel';
@@ -45,13 +45,13 @@ export default function OnboardingSelector() {
         <div className={`${styles.blob} ${styles.blob2}`} />
       </div>}
 
-      <motion.div 
+      <m.div 
         variants={containerVariants}
         initial="hidden"
         animate="show"
         className={styles.container}
       >
-        <motion.div variants={itemVariants} className={styles.header}>
+        <m.div variants={itemVariants} className={styles.header}>
           <h1 className={styles.title}>
             {isNoir ? 'IDENTIFY_YOURSELF:' : 'Who are you here as?'}
           </h1>
@@ -60,11 +60,11 @@ export default function OnboardingSelector() {
               ? 'SELECT ARCHETYPE TO DECRYPT CORRESPONDING RECORDS' 
               : 'Choose a perspective to customize your experience.'}
           </p>
-        </motion.div>
+        </m.div>
 
         <div className={styles.grid}>
           {/* Card 1: Hiring a Developer */}
-          <motion.div 
+          <m.div 
             variants={itemVariants} 
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -89,10 +89,10 @@ export default function OnboardingSelector() {
                 </button>
               </div>
             </ComicPanel>
-          </motion.div>
+          </m.div>
 
           {/* Card 2: Need a Website */}
-          <motion.div 
+          <m.div 
             variants={itemVariants}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -117,9 +117,9 @@ export default function OnboardingSelector() {
                 </button>
               </div>
             </ComicPanel>
-          </motion.div>
+          </m.div>
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

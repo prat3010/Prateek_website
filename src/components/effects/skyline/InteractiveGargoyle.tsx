@@ -73,6 +73,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
   const velocityRef = useRef(0);
   const { velocity: scrollVelocity } = useLenisScroll();
 
+  const isVisibleRef = useRef(true);
   const stateStartTimeRef = useRef<number>(0);
   const rafRef = useRef<number | null>(null);
   const boundingRectRef = useRef<DOMRect | null>(null);
@@ -84,6 +85,12 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
     });
     return unsub;
   }, [reducedMotion, scrollVelocity]);
+
+  useEffect(() => {
+    const handler = () => { isVisibleRef.current = !document.hidden; };
+    document.addEventListener('visibilitychange', handler);
+    return () => document.removeEventListener('visibilitychange', handler);
+  }, []);
 
   useEffect(() => {
     stateRef.current = state;
@@ -159,6 +166,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
     }
 
     const tick = () => {
+      if (!isVisibleRef.current) { rafRef.current = requestAnimationFrame(tick); return; }
       const currentState = stateRef.current;
       const elapsed = performance.now() - stateStartTimeRef.current;
 
@@ -219,6 +227,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
     if (reducedMotion) return;
 
     const interval = setInterval(() => {
+      if (!isVisibleRef.current) return;
       const currentState = stateRef.current;
       ticksRef.current++;
       const ticks = ticksRef.current;

@@ -8,7 +8,7 @@ import SpeechBubble from '@/components/ui/SpeechBubble';
 import ConfettiBurst, { type ConfettiBurstHandle } from '@/components/effects/ConfettiBurst';
 import styles from './Contact.module.css';
 
-export default function Contact() {
+function Contact() {
   const confettiRef = useRef<ConfettiBurstHandle>(null);
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
@@ -204,4 +204,6 @@ export default function Contact() {
       </div>
     </section>
   );
-}
+};
+
+export default React.memo(Contact);

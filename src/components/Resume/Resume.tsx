@@ -26,7 +26,7 @@ interface ResumeProps {
   certificates: Certificate[];
 }
 
-export default function Resume({ resumeData, certificates }: ResumeProps) {
+function Resume({ resumeData, certificates }: ResumeProps) {
   const { isNoir, audience } = useTheme();
   const [activePersona, setActivePersona] = useState<Persona>('general');
 
@@ -391,4 +391,6 @@ export default function Resume({ resumeData, certificates }: ResumeProps) {
       </div>
     </section>
   );
-}
+};
+
+export default React.memo(Resume);

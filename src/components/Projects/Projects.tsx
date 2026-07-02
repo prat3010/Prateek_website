@@ -69,7 +69,7 @@ function ProjectImage({ src, alt, fill, width, height, sizes, className, style }
   );
 }
 
-export default function Projects({ projects }: ProjectsProps) {
+function Projects({ projects }: ProjectsProps) {
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const selected = projects.find((p) => p.id === selectedProject);
   const { isNoir, audience } = useTheme();
@@ -358,4 +358,6 @@ export default function Projects({ projects }: ProjectsProps) {
       )}
     </section>
   );
-}
+};
+
+export default React.memo(Projects);

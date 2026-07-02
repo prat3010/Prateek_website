@@ -109,7 +109,7 @@ export function ThemeProvider({
       setPendingTheme(nextTheme);
       setIsTransitioning(true);
       isTransitioningRef.current = true;
-      document.documentElement.classList.add('is-theme-transitioning');
+      document.documentElement.classList.add('theme-transition');
 
       // Halfway through the 1000ms transition, flip the actual theme (when screen is covered)
       setTimeout(() => {
@@ -124,7 +124,7 @@ export function ThemeProvider({
         setIsTransitioning(false);
         isTransitioningRef.current = false;
         setPendingTheme(null);
-        document.documentElement.classList.remove('is-theme-transitioning');
+        document.documentElement.classList.remove('theme-transition');
       }, 1000);
     },
     []

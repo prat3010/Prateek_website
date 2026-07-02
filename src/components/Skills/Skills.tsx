@@ -107,7 +107,7 @@ const SKILLS_COPY: Record<'developer' | 'business', Record<'light' | 'noir', Ski
   }
 };
 
-export default function Skills({ skills }: SkillsProps) {
+function Skills({ skills }: SkillsProps) {
   const { isNoir, audience } = useTheme();
   const [activeTab, setActiveTab] = React.useState<'orchestration' | 'logic' | 'product' | 'dynamic'>('logic');
 
@@ -307,4 +307,6 @@ export default function Skills({ skills }: SkillsProps) {
       </div>
     </section>
   );
-}
+};
+
+export default React.memo(Skills);

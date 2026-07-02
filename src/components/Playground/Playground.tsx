@@ -17,7 +17,7 @@ interface LogEntry {
   message: string;
 }
 
-export default function Playground() {
+function Playground() {
   const { isNoir } = useTheme();
   const lenis = useLenis();
   const [isMobile, setIsMobile] = useState(false);
@@ -547,4 +547,6 @@ export default function Playground() {
       </div>
     </section>
   );
-}
+};
+
+export default React.memo(Playground);

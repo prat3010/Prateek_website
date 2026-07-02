@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, type MouseEvent } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef, type MouseEvent } from 'react';
 import { useLenis } from 'lenis/react';
 import { useTheme } from '@/context/ThemeContext';
 import { useLenisScroll } from '@/context/LenisProvider';
@@ -36,6 +36,8 @@ export default function Navbar({ items, className }: NavbarProps) {
   }, [items, audience]);
 
   const [scrolled, setScrolled] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const scrollTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>(() => {
     if (items && items.length > 0) return items[0].href;
@@ -48,11 +50,14 @@ export default function Navbar({ items, className }: NavbarProps) {
   const { scrollY } = useLenisScroll();
   const lenis = useLenis();
 
-  /* ---------- Scroll tracking for background color ---------- */
+  /* ---------- Scroll tracking for background & blur ---------- */
   useEffect(() => {
     const unsub = scrollY.on('change', (latest) => {
       const isScrolled = latest > 20;
       setScrolled((prev) => (prev === isScrolled ? prev : isScrolled));
+      setIsScrolling(true);
+      clearTimeout(scrollTimerRef.current);
+      scrollTimerRef.current = setTimeout(() => setIsScrolling(false), 150);
     });
     return unsub;
   }, [scrollY]);
@@ -135,8 +140,8 @@ export default function Navbar({ items, className }: NavbarProps) {
   return (
     <nav
       className={`${styles.navbar} ${scrolled ? styles.scrolled : ''} ${
-        mobileOpen ? styles.menuOpen : ''
-      } ${className ?? ''}`}
+        isScrolling ? styles.scrollActive : ''
+      } ${mobileOpen ? styles.menuOpen : ''} ${className ?? ''}`}
       role="navigation"
       aria-label="Main navigation"
     >

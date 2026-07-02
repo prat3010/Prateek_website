@@ -42,7 +42,7 @@ const BLOG_COPY: Record<'developer' | 'business', Record<'light' | 'noir', BlogC
   }
 };
 
-export default function BlogSection({ posts }: { posts: SimpleBlogPost[] }) {
+function BlogSection({ posts }: { posts: SimpleBlogPost[] }) {
   const { isNoir, audience } = useTheme();
   
   const activeAudience = audience || 'developer';
@@ -85,4 +85,6 @@ export default function BlogSection({ posts }: { posts: SimpleBlogPost[] }) {
       </div>
     </section>
   );
-}
+};
+
+export default React.memo(BlogSection);

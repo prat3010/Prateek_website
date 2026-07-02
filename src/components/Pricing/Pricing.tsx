@@ -13,7 +13,7 @@ interface PricingProps {
   resumeData: ResumeData | null;
 }
 
-export default function Pricing({ resumeData }: PricingProps) {
+function Pricing({ resumeData }: PricingProps) {
   const { isNoir, audience } = useTheme();
   const lenis = useLenis();
 
@@ -157,4 +157,6 @@ export default function Pricing({ resumeData }: PricingProps) {
       </div>
     </section>
   );
-}
+};
+
+export default React.memo(Pricing);

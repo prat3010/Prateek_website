@@ -60,6 +60,17 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-};
+}
 
-export default nextConfig;
+export default ((): NextConfig => {
+  if (process.env.ANALYZE === "true") {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const withBundleAnalyzer: (opts: { enabled: boolean }) => (config?: NextConfig) => NextConfig = require("@next/bundle-analyzer");
+      return withBundleAnalyzer({ enabled: true })(nextConfig);
+    } catch {
+      console.warn("[bundle-analyzer] failed to load, skipping");
+    }
+  }
+  return nextConfig;
+})();

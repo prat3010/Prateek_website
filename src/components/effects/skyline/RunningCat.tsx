@@ -19,6 +19,7 @@ const RunningCat: React.FC<LayerProps> = ({ reducedMotion }) => {
   const velocityRef = useRef(0);
   const { velocity: scrollVelocity } = useLenisScroll();
 
+  const isVisibleRef = useRef(true);
   const boundingRectRef = useRef<DOMRect | null>(null);
 
   useEffect(() => {
@@ -28,6 +29,12 @@ const RunningCat: React.FC<LayerProps> = ({ reducedMotion }) => {
     });
     return unsub;
   }, [reducedMotion, scrollVelocity]);
+
+  useEffect(() => {
+    const handler = () => { isVisibleRef.current = !document.hidden; };
+    document.addEventListener('visibilitychange', handler);
+    return () => document.removeEventListener('visibilitychange', handler);
+  }, []);
 
   useEffect(() => {
     stateRef.current = state;
@@ -90,6 +97,7 @@ const RunningCat: React.FC<LayerProps> = ({ reducedMotion }) => {
     if (reducedMotion) return;
 
     const interval = setInterval(() => {
+      if (!isVisibleRef.current) return;
       const currentState = stateRef.current;
 
       if (currentState === 'sitting') {

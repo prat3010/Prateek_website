@@ -63,6 +63,7 @@ export default function SiteInfoConsole() {
 
   const terminalScreenRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isVisibleRef = useRef(true);
 
   // Auto-scroll terminal screen to bottom
   useEffect(() => {
@@ -80,6 +81,13 @@ export default function SiteInfoConsole() {
       inputRef.current.focus();
     }
   };
+
+  // Pause intervals/RAF loops when tab is hidden
+  useEffect(() => {
+    const handler = () => { isVisibleRef.current = !document.hidden; };
+    document.addEventListener('visibilitychange', handler);
+    return () => document.removeEventListener('visibilitychange', handler);
+  }, []);
 
   // FPS requestAnimationFrame counter
   useEffect(() => {
@@ -128,6 +136,7 @@ export default function SiteInfoConsole() {
 
     // Uptime tick loop - tracks performance.now() (session lifetime since first tab load)
     const timer = setInterval(() => {
+      if (!isVisibleRef.current) return;
       const diff = typeof performance !== 'undefined' ? performance.now() : 0;
       const hours = String(Math.floor(diff / 3600000)).padStart(2, '0');
       const mins = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');

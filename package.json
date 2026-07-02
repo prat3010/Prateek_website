@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "node scripts/generate-git-log.js && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "analyze": "ANALYZE=true next build"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.106.2",
@@ -25,6 +26,7 @@
     "three": "^0.184.0"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.2.10",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

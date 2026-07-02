@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styles from '../NoirSkyline.module.css';
 import { WobblyLine } from '../WobblySVG';
 
@@ -11,9 +11,17 @@ interface RealtimeClockProps {
 
 function RealtimeClock({ wobble, strength }: RealtimeClockProps) {
   const [time, setTime] = useState<Date>(() => new Date());
+  const isVisibleRef = useRef(true);
+
+  useEffect(() => {
+    const handler = () => { isVisibleRef.current = !document.hidden; };
+    document.addEventListener('visibilitychange', handler);
+    return () => document.removeEventListener('visibilitychange', handler);
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
+      if (!isVisibleRef.current) return;
       setTime(new Date());
     }, 1000);
     return () => clearInterval(interval);

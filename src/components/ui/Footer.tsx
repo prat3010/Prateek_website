@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { Heart, BarChart2 } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
@@ -67,7 +67,7 @@ const defaultSocials: SocialLink[] = [
 ];
 
 export default function Footer({ socials, className }: FooterProps) {
-  const { theme, audience } = useTheme();
+  const { theme, audience, isNoir } = useTheme();
 
   const navItems = useMemo(() => [
     { label: 'Home', href: '/#home' },
@@ -80,6 +80,14 @@ export default function Footer({ socials, className }: FooterProps) {
     { label: 'Blog', href: '/blog' },
   ], [audience]);
 
+  const isVisibleRef = useRef(true);
+
+  useEffect(() => {
+    const handler = () => { isVisibleRef.current = !document.hidden; };
+    document.addEventListener('visibilitychange', handler);
+    return () => document.removeEventListener('visibilitychange', handler);
+  }, []);
+
   const socialLinks = socials ?? defaultSocials;
   const [year] = useState(() => new Date().getFullYear());
   const [timeString, setTimeString] = useState('');
@@ -88,6 +96,7 @@ export default function Footer({ socials, className }: FooterProps) {
   useEffect(() => {
     if (theme !== 'noir') return;
     const updateTime = () => {
+      if (!isVisibleRef.current) return;
       const now = new Date();
       setTimeString(
         now.toLocaleTimeString('en-US', {
@@ -107,9 +116,9 @@ export default function Footer({ socials, className }: FooterProps) {
     <footer className={`${styles.footer} ${className ?? ''}`}>
       
       {/* ────────────────────────────────────────────────────────────
-         COMIC BOOK / AZURE THEME VIEW (RENDERED SIDE-BY-SIDE IN DOM)
+         COMIC BOOK / AZURE THEME VIEW (RENDERED ONLY WHEN ACTIVE)
          ──────────────────────────────────────────────────────────── */}
-      <div className={styles.comicView}>
+      {!isNoir && <div className={styles.comicView}>
         {/* Decorative corner accents */}
         <span className={`${styles.cornerDecoration} ${styles.topLeft}`} aria-hidden="true">
           POW!
@@ -196,12 +205,12 @@ export default function Footer({ socials, className }: FooterProps) {
             </Link>
           </div>
         </div>
-      </div>
+      </div>}
 
       {/* ────────────────────────────────────────────────────────────
-         CYBER-NOIR / CYBERPUNK THEME VIEW (RENDERED SIDE-BY-SIDE IN DOM)
+         CYBER-NOIR / CYBERPUNK THEME VIEW (RENDERED ONLY WHEN ACTIVE)
          ──────────────────────────────────────────────────────────── */}
-      <div className={styles.noirView}>
+      {isNoir && <div className={styles.noirView}>
         {/* CRT scanlines effect */}
         <div className={styles.crtOverlay} aria-hidden="true" />
 
@@ -380,7 +389,7 @@ export default function Footer({ socials, className }: FooterProps) {
             </Link>
           </div>
         </div>
-      </div>
+      </div>}
 
     </footer>
   );

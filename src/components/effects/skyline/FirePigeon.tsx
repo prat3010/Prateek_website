@@ -15,6 +15,7 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
   const fireRef = useRef<SVGGElement>(null);
   const { velocity: scrollVelocity } = useLenisScroll();
 
+  const isVisibleRef = useRef(true);
   const boundingRectRef = useRef<DOMRect | null>(null);
 
   useEffect(() => {
@@ -22,6 +23,12 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
     const unsub = scrollVelocity.on('change', (v) => { velocityRef.current = Math.abs(v); });
     return unsub;
   }, [reducedMotion, scrollVelocity]);
+
+  useEffect(() => {
+    const handler = () => { isVisibleRef.current = !document.hidden; };
+    document.addEventListener('visibilitychange', handler);
+    return () => document.removeEventListener('visibilitychange', handler);
+  }, []);
 
   useEffect(() => {
     stateRef.current = state;
@@ -52,6 +59,7 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
       let rafId: number | null = null;
 
       const animateDown = (timestamp: number) => {
+        if (!isVisibleRef.current) { rafId = requestAnimationFrame(animateDown); return; }
         if (!startTime) startTime = timestamp;
         const elapsed = timestamp - startTime;
         const progress = Math.min(elapsed / duration, 1);
@@ -75,6 +83,7 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
       let rafId: number | null = null;
 
       const animateUp = (timestamp: number) => {
+        if (!isVisibleRef.current) { rafId = requestAnimationFrame(animateUp); return; }
         if (!startTime) startTime = timestamp;
         const elapsed = timestamp - startTime;
         const progress = Math.min(elapsed / duration, 1);
@@ -121,6 +130,7 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
   useEffect(() => {
     if (reducedMotion) return;
     const interval = setInterval(() => {
+      if (!isVisibleRef.current) return;
       const currentState = stateRef.current;
       if (currentState === 'idle') {
         ticksRef.current = 0;

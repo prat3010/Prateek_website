@@ -13,7 +13,7 @@ interface AboutProps {
   resumeData: ResumeData | null;
 }
 
-export default function About({ resumeData }: AboutProps) {
+function About({ resumeData }: AboutProps) {
   const { isNoir, audience } = useTheme();
 
   const activeAudience = audience || 'developer';
@@ -131,4 +131,6 @@ export default function About({ resumeData }: AboutProps) {
       </div>
     </section>
   );
-}
+};
+
+export default React.memo(About);

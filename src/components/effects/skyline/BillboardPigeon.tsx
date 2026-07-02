@@ -22,8 +22,15 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
   const { velocity: scrollVelocity } = useLenisScroll();
   const velocityRef = useRef(0);
 
+  const isVisibleRef = useRef(true);
   const sideRef = useRef(side);
   const boundingRectRef = useRef<DOMRect | null>(null);
+
+  useEffect(() => {
+    const handler = () => { isVisibleRef.current = !document.hidden; };
+    document.addEventListener('visibilitychange', handler);
+    return () => document.removeEventListener('visibilitychange', handler);
+  }, []);
 
   useEffect(() => {
     sideRef.current = side;
@@ -71,6 +78,7 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
       let startTime: number | null = null;
 
       const animate = (timestamp: number) => {
+        if (!isVisibleRef.current) { rafRef.current = requestAnimationFrame(animate); return; }
         if (!startTime) startTime = timestamp;
         const elapsed = timestamp - startTime;
         const progress = Math.min(elapsed / duration, 1);
@@ -124,6 +132,7 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
   useEffect(() => {
     if (reducedMotion) return;
     const interval = setInterval(() => {
+      if (!isVisibleRef.current) return;
       const vel = velocityRef.current;
       if (vel > 60 && !alertRef.current && !scurryingRef.current) setAlert(true);
       else if (vel <= 60 && alertRef.current && !scurryingRef.current) setAlert(false);
