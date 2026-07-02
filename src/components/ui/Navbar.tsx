@@ -34,7 +34,11 @@ export default function Navbar({ items, className }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>(navItems[0]?.href ?? '');
-  const { isNoir, toggleTheme } = useTheme();
+  const { isNoir, toggleTheme, audience, setAudience } = useTheme();
+
+  const toggleAudience = useCallback(() => {
+    setAudience(audience === 'business' ? 'developer' : 'business');
+  }, [audience, setAudience]);
   const { scrollY } = useLenisScroll();
   const lenis = useLenis();
 
@@ -176,6 +180,19 @@ export default function Navbar({ items, className }: NavbarProps) {
             </li>
           ))}
         </ul>
+
+        {/* ---- Communication Identity Toggle ---- */}
+        {audience && (
+          <button
+            onClick={toggleAudience}
+            className={styles.audienceToggle}
+            aria-label={audience === 'developer' ? 'Switch to Business perspective' : 'Switch to Developer perspective'}
+          >
+            {isNoir 
+              ? (audience === 'developer' ? '[BIZ]' : '[DEV]') 
+              : (audience === 'developer' ? 'BIZ_MODE' : 'DEV_MODE')}
+          </button>
+        )}
 
         {/* ---- Theme Toggle Switch ---- */}
         <button

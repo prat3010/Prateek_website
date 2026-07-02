@@ -5,6 +5,8 @@ import "./globals.css";
 import ClientLayout from "./ClientLayout";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { getProfile, getSkills } from "@/lib/data";
+import { headers } from "next/headers";
+import type { Theme, Audience } from "@/context/ThemeContext";
 
 const playfairDisplay = Playfair_Display({
   variable: "--font-playfair-display",
@@ -67,6 +69,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersList = await headers();
+  const theme = (headersList.get("x-theme") || "light") as Theme;
+  const audience = headersList.get("x-audience") as Audience | null;
+
   // Fetch dynamic profile and skills details for structured SEO data (JSON-LD)
   const [profile, skills] = await Promise.all([
     getProfile(),
@@ -153,7 +159,9 @@ export default async function RootLayout({
 
       </head>
       <body>
-        <ClientLayout>{children}</ClientLayout>
+        <ClientLayout initialTheme={theme} initialAudience={audience}>
+          {children}
+        </ClientLayout>
         <SpeedInsights />
       </body>
     </html>

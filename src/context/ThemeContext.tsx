@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 export type Theme = 'light' | 'noir';
+export type Audience = 'developer' | 'business';
 
 interface ThemeContextType {
   theme: Theme;
@@ -10,6 +11,8 @@ interface ThemeContextType {
   isNoir: boolean;
   isDetailsHidden: boolean;
   toggleDetailsHidden: () => void;
+  audience: Audience | null;
+  setAudience: (audience: Audience) => void;
 }
 
 interface ThemeTransitionContextType {
@@ -20,12 +23,17 @@ interface ThemeTransitionContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 const ThemeTransitionContext = createContext<ThemeTransitionContextType | undefined>(undefined);
 
-function getInitialTheme(): Theme {
-  return 'light';
-}
-
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => getInitialTheme());
+export function ThemeProvider({ 
+  children,
+  initialTheme = 'light',
+  initialAudience = null
+}: { 
+  children: React.ReactNode;
+  initialTheme?: Theme;
+  initialAudience?: Audience | null;
+}) {
+  const [theme, setTheme] = useState<Theme>(() => initialTheme);
+  const [audience, setAudienceState] = useState<Audience | null>(() => initialAudience);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [pendingTheme, setPendingTheme] = useState<Theme | null>(null);
   const [isDetailsHidden, setIsDetailsHidden] = useState(false);
@@ -71,6 +79,26 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return () => cancelAnimationFrame(frameId);
   }, []);
 
+  // Sync audience from localStorage if cookies are missing or out of sync
+  useEffect(() => {
+    const savedAudience = localStorage.getItem('audience') as Audience | null;
+    if (savedAudience && (savedAudience === 'developer' || savedAudience === 'business')) {
+      if (audience !== savedAudience) {
+        const frameId = requestAnimationFrame(() => {
+          setAudienceState(savedAudience);
+          document.cookie = `audience=${savedAudience}; path=/; max-age=31536000; SameSite=Lax`;
+        });
+        return () => cancelAnimationFrame(frameId);
+      }
+    }
+  }, [audience]);
+
+  const setAudience = useCallback((newAudience: Audience) => {
+    setAudienceState(newAudience);
+    localStorage.setItem('audience', newAudience);
+    document.cookie = `audience=${newAudience}; path=/; max-age=31536000; SameSite=Lax`;
+  }, []);
+
   const toggleTheme = useCallback(
     () => {
       if (isTransitioningRef.current) return;
@@ -110,7 +138,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     isNoir,
     isDetailsHidden,
     toggleDetailsHidden,
-  }), [theme, toggleTheme, isNoir, isDetailsHidden, toggleDetailsHidden]);
+    audience,
+    setAudience
+  }), [theme, toggleTheme, isNoir, isDetailsHidden, toggleDetailsHidden, audience, setAudience]);
 
   const transitionValue = useMemo(() => ({
     isTransitioning,

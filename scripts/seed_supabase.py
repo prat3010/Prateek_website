@@ -143,6 +143,8 @@ for p in projects_raw:
     p['isLive'] = p.get('isLive', False)
     p['status'] = p.get('status', 'soon')
     p.setdefault('longDescription', p.get('longDescription', ''))
+    p.setdefault('description_business', '')
+    p.setdefault('longDescription_business', '')
 if projects_raw:
     upsert('projects', projects_raw, 'slug')
 print(f'  {len(projects_raw)} projects synced')
@@ -158,10 +160,14 @@ except Exception as e:
     skills_raw = []
 
 for s in skills_raw:
+    s.pop('id', None)
+    s.pop('created_at', None)
+    s.pop('updated_at', None)
     s.setdefault('level', '')
     s.setdefault('prereq', '')
     s.setdefault('status', '')
     s.setdefault('projects', [])
+    s.setdefault('description_business', '')
 if skills_raw:
     upsert('skills', skills_raw, 'name')
 print(f'  {len(skills_raw)} skills synced')

@@ -1772,6 +1772,60 @@ with tab_edit:
             res['summary']['ai'] = st.text_area("AI Orchestration Summary", summ.get('ai', ''), height=100)
             res['summary']['creative'] = st.text_area("Creative Designer Summary", summ.get('creative', ''), height=100)
 
+        # 2b. Biography Details (Origin Story / About Section)
+        with st.container(border=True):
+            st.markdown('<div class="section-header">Origin Story Biography & Facts</div>', unsafe_allow_html=True)
+            about_data = res.get('about', {})
+            
+            # Sub-tabs for Developer and Business
+            tab_about_dev, tab_about_biz = st.tabs(["Developer Mode Copy", "Business Mode Copy"])
+            
+            with tab_about_dev:
+                dev_copy = about_data.get('developer', {})
+                st.markdown("##### Biography Narrative")
+                dev_light = st.text_area("Developer Bio (Light / Azure)", value=dev_copy.get('light', ''), height=80, key="about_dev_light")
+                dev_noir = st.text_area("Developer Bio (Dark / Noir)", value=dev_copy.get('noir', ''), height=80, key="about_dev_noir")
+                
+                st.markdown("##### Fun Facts (One per line)")
+                dev_facts_str = "\n".join(dev_copy.get('facts', []))
+                dev_facts_edit = st.text_area("Developer Facts (Light / Azure)", value=dev_facts_str, height=80, key="about_dev_facts")
+                dev_facts_list = [f.strip() for f in dev_facts_edit.split("\n") if f.strip()]
+                
+                dev_facts_noir_str = "\n".join(dev_copy.get('factsNoir', []))
+                dev_facts_noir_edit = st.text_area("Developer Facts (Dark / Noir)", value=dev_facts_noir_str, height=80, key="about_dev_facts_noir")
+                dev_facts_noir_list = [f.strip() for f in dev_facts_noir_edit.split("\n") if f.strip()]
+                
+                about_data['developer'] = {
+                    "light": dev_light.strip(),
+                    "noir": dev_noir.strip(),
+                    "facts": dev_facts_list,
+                    "factsNoir": dev_facts_noir_list
+                }
+                
+            with tab_about_biz:
+                biz_copy = about_data.get('business', {})
+                st.markdown("##### Biography Narrative")
+                biz_light = st.text_area("Business Bio (Light / Azure)", value=biz_copy.get('light', ''), height=80, key="about_biz_light")
+                biz_noir = st.text_area("Business Bio (Dark / Noir)", value=biz_copy.get('noir', ''), height=80, key="about_biz_noir")
+                
+                st.markdown("##### Service Facts (One per line)")
+                biz_facts_str = "\n".join(biz_copy.get('facts', []))
+                biz_facts_edit = st.text_area("Business Facts (Light / Azure)", value=biz_facts_str, height=80, key="about_biz_facts")
+                biz_facts_list = [f.strip() for f in biz_facts_edit.split("\n") if f.strip()]
+                
+                biz_facts_noir_str = "\n".join(biz_copy.get('factsNoir', []))
+                biz_facts_noir_edit = st.text_area("Business Facts (Dark / Noir)", value=biz_facts_noir_str, height=80, key="about_biz_facts_noir")
+                biz_facts_noir_list = [f.strip() for f in biz_facts_noir_edit.split("\n") if f.strip()]
+                
+                about_data['business'] = {
+                    "light": biz_light.strip(),
+                    "noir": biz_noir.strip(),
+                    "facts": biz_facts_list,
+                    "factsNoir": biz_facts_noir_list
+                }
+            
+            res['about'] = about_data
+
         # 3. Work Experience section
         with st.container(border=True):
             st.markdown('<div class="section-header">Work Experience</div>', unsafe_allow_html=True)
@@ -1877,6 +1931,99 @@ with tab_edit:
                     if st.button(f"Delete Education Block", key=f"del_edu_{edu_idx}", type="secondary"):
                         res['education'].pop(edu_idx)
                         st.rerun()
+
+        # 4b. Freelance Quotation Details
+        with st.container(border=True):
+            st.markdown('<div class="section-header">Freelance Quotation Rate Sheet</div>', unsafe_allow_html=True)
+            quote_data = res.get('quotation', {})
+            
+            col_q1, col_q2 = st.columns(2)
+            with col_q1:
+                q_hourly = st.text_input("Estimated Hourly Rate", value=quote_data.get('hourlyRate', ''), placeholder="e.g. $50", key="quote_hourly")
+                q_day = st.text_input("Standard Day Rate (8 hours)", value=quote_data.get('dayRate', ''), placeholder="e.g. $350", key="quote_day")
+            with col_q2:
+                q_terms = st.text_area("Standard Payment Terms", value=quote_data.get('paymentTerms', ''), key="quote_terms", height=70)
+                
+            q_deliv_str = "\n".join(quote_data.get('deliverables', []))
+            q_deliv_edit = st.text_area("Service Deliverables Checklist (One per line)", value=q_deliv_str, height=100, key="quote_deliv")
+            q_deliv_list = [d.strip() for d in q_deliv_edit.split("\n") if d.strip()]
+            
+            res['quotation'] = {
+                "hourlyRate": q_hourly.strip(),
+                "dayRate": q_day.strip(),
+                "paymentTerms": q_terms.strip(),
+                "deliverables": q_deliv_list
+            }
+
+        # 4c. Pricing Plans & Packages
+        with st.container(border=True):
+            st.markdown('<div class="section-header">Pricing Plans & Packages Grid</div>', unsafe_allow_html=True)
+            pricing_data = res.get('pricing', {})
+            
+            tab_price_dev, tab_price_biz = st.tabs(["Developer (Mentorship/Audits) Tiers", "Business (Website/Support) Tiers"])
+            
+            with tab_price_dev:
+                dev_tiers = pricing_data.get('developer', [])
+                # Ensure we have exactly 3 tiers for layout consistency
+                while len(dev_tiers) < 3:
+                    dev_tiers.append({"title": "", "price": "", "description": "", "features": [], "cta": ""})
+                
+                updated_dev_tiers = []
+                for t_idx in range(3):
+                    tier = dev_tiers[t_idx]
+                    st.markdown(f"**Tier #{t_idx + 1}**")
+                    col_t1, col_t2 = st.columns(2)
+                    with col_t1:
+                        t_title = st.text_input("Tier Title", value=tier.get('title', ''), key=f"p_dev_title_{t_idx}")
+                        t_price = st.text_input("Price / Rate Label", value=tier.get('price', ''), key=f"p_dev_price_{t_idx}")
+                    with col_t2:
+                        t_cta = st.text_input("CTA Code (pre-populates dropdown value)", value=tier.get('cta', ''), key=f"p_dev_cta_{t_idx}")
+                        t_desc = st.text_input("Short Tier Description", value=tier.get('description', ''), key=f"p_dev_desc_{t_idx}")
+                        
+                    t_feat_str = "\n".join(tier.get('features', []))
+                    t_feat_edit = st.text_area("Features (One per line)", value=t_feat_str, height=70, key=f"p_dev_feat_{t_idx}")
+                    t_feat_list = [f.strip() for f in t_feat_edit.split("\n") if f.strip()]
+                    
+                    updated_dev_tiers.append({
+                        "title": t_title.strip(),
+                        "price": t_price.strip(),
+                        "description": t_desc.strip(),
+                        "features": t_feat_list,
+                        "cta": t_cta.strip()
+                    })
+                pricing_data['developer'] = updated_dev_tiers
+                
+            with tab_price_biz:
+                biz_tiers = pricing_data.get('business', [])
+                while len(biz_tiers) < 3:
+                    biz_tiers.append({"title": "", "price": "", "description": "", "features": [], "cta": ""})
+                
+                updated_biz_tiers = []
+                for t_idx in range(3):
+                    tier = biz_tiers[t_idx]
+                    st.markdown(f"**Tier #{t_idx + 1}**")
+                    col_tb1, col_tb2 = st.columns(2)
+                    with col_tb1:
+                        t_title = st.text_input("Tier Title", value=tier.get('title', ''), key=f"p_biz_title_{t_idx}")
+                        t_price = st.text_input("Price Range / Rate Label", value=tier.get('price', ''), key=f"p_biz_price_{t_idx}")
+                    with col_tb2:
+                        t_cta = st.text_input("CTA Code (pre-populates dropdown value)", value=tier.get('cta', ''), key=f"p_biz_cta_{t_idx}")
+                        t_desc = st.text_input("Short Tier Description", value=tier.get('description', ''), key=f"p_biz_desc_{t_idx}")
+                        
+                    t_feat_str = "\n".join(tier.get('features', []))
+                    t_feat_edit = st.text_area("Features (One per line)", value=t_feat_str, height=70, key=f"p_biz_feat_{t_idx}")
+                    t_feat_list = [f.strip() for f in t_feat_edit.split("\n") if f.strip()]
+                    
+                    updated_biz_tiers.append({
+                        "title": t_title.strip(),
+                        "price": t_price.strip(),
+                        "description": t_desc.strip(),
+                        "features": t_feat_list,
+                        "cta": t_cta.strip()
+                    })
+                pricing_data['business'] = updated_biz_tiers
+                
+            res['pricing'] = pricing_data
 
         # Save Button & Live JSON View
         st.markdown("---")
@@ -2297,8 +2444,14 @@ with tab_project:
                                 
                 with col_p2:
                     edit_title = st.text_input("Project Title", value=project.get("title", ""), key=f"edit_title_{p_id}")
-                    edit_desc = st.text_input("Short Description", value=project.get("description", ""), key=f"edit_desc_{p_id}")
-                    edit_long_desc = st.text_area("Detailed Description (Markdown-supported)", value=project.get("longDescription", ""), height=150, key=f"edit_long_desc_{p_id}")
+                    
+                    st.markdown("#### Developer Mode Copy")
+                    edit_desc = st.text_input("Short Description (Dev)", value=project.get("description", ""), key=f"edit_desc_{p_id}")
+                    edit_long_desc = st.text_area("Detailed Description (Dev) (Markdown-supported)", value=project.get("longDescription", ""), height=100, key=f"edit_long_desc_{p_id}")
+                    
+                    st.markdown("#### Business Mode Copy")
+                    edit_desc_biz = st.text_input("Short Description (Biz)", value=project.get("description_business", ""), key=f"edit_desc_biz_{p_id}")
+                    edit_long_desc_biz = st.text_area("Detailed Description (Biz) (Markdown-supported)", value=project.get("longDescription_business", ""), height=100, key=f"edit_long_desc_biz_{p_id}")
                     
                     col_p2_1, col_p2_2 = st.columns(2)
                     with col_p2_1:
@@ -2331,6 +2484,8 @@ with tab_project:
                                 project["title"] = edit_title.strip()
                                 project["description"] = edit_desc.strip()
                                 project["longDescription"] = edit_long_desc.strip()
+                                project["description_business"] = edit_desc_biz.strip()
+                                project["longDescription_business"] = edit_long_desc_biz.strip()
                                 project["color"] = edit_color.strip()
                                 project["liveUrl"] = edit_live_url.strip()
                                 project["githubUrl"] = edit_github_url.strip()
@@ -2738,7 +2893,8 @@ with tab_skills:
             new_prereq = st.selectbox("Prerequisite (Optional)", options=[None] + existing_skill_names, index=0, key="new_skill_prereq")
             
         new_status = st.selectbox("Status (Optional)", options=[None, 'legendary', 'mastered', 'quest'], index=0, key="new_skill_status")
-        new_desc = st.text_area("Description / Summary", placeholder="Short 1-sentence description.", key="new_skill_desc")
+        new_desc = st.text_area("Description / Summary (Dev Mode)", placeholder="Short 1-sentence description.", key="new_skill_desc")
+        new_desc_biz = st.text_area("Description / Summary (Biz Mode)", placeholder="Outcome value proposition for clients.", key="new_skill_desc_biz")
         
         # Link to existing projects
         project_list = st.session_state.projects or []
@@ -2763,6 +2919,7 @@ with tab_skills:
                     "name": new_name.strip(),
                     "icon": new_icon.strip() or "sparkles",
                     "description": new_desc.strip(),
+                    "description_business": new_desc_biz.strip(),
                     "category": new_cat,
                     "color": new_color.strip() or "#00E676"
                 }
@@ -2888,7 +3045,8 @@ with tab_skills:
                         status_idx = status_opts.index(curr_status)
                         edit_status = st.selectbox("Status (Optional)", options=status_opts, index=status_idx, key=f"{key_prefix}_status")
                         
-                        edit_desc = st.text_area("Description / Summary", value=skill.get('description', ''), key=f"{key_prefix}_desc")
+                        edit_desc = st.text_area("Description / Summary (Dev Mode)", value=skill.get('description', ''), key=f"{key_prefix}_desc")
+                        edit_desc_biz = st.text_area("Description / Summary (Biz Mode)", value=skill.get('description_business', ''), key=f"{key_prefix}_desc_biz")
                         
                         curr_linked_projects = [p.get('id') for p in skill.get('projects', []) if p.get('id')]
                         curr_linked_projects = [pid for pid in curr_linked_projects if pid in project_options]
@@ -2913,6 +3071,7 @@ with tab_skills:
                                         "name": edit_name.strip(),
                                         "icon": edit_icon.strip(),
                                         "description": edit_desc.strip(),
+                                        "description_business": edit_desc_biz.strip(),
                                         "category": edit_cat,
                                         "color": edit_color.strip()
                                     }

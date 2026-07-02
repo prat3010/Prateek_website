@@ -203,3 +203,25 @@ export const noirTaglines = [
   "Shadow artist by day, syntax gremlin by night.",
   "Tracing digital shadows, one frame at a time.",
 ];
+
+export const businessStandardTaglines = [
+  "Crafting high-conversion websites tailored to your brand identity.",
+  "Building custom web applications with clean code and intuitive UX.",
+  "Optimizing performance to increase user engagement and search rankings.",
+  "Translating complex requirements into scalable digital systems.",
+  "Your creative technology partner for software engineering and automation.",
+  "Designing interfaces that turn visitors into customers.",
+  "Automating operations with custom AI agent workflows and integrations.",
+  "Clean web performance, built to scale as your business grows."
+];
+
+export const businessNoirTaglines = [
+  "Elegance in design. Precision in logic. Clarity in execution.",
+  "Digital solutions built with absolute focus and premium craftsmanship.",
+  "Optimizing web metrics because loading delays cost conversions.",
+  "Transparent project updates, structured timelines, and clear terms.",
+  "Building custom database systems that run reliably day and night.",
+  "Translating complex business needs into clean, maintainable software.",
+  "Streamlining workflows through custom AI automations and pipelines.",
+  "Zero unnecessary fluff. Just robust, production-grade applications."
+];

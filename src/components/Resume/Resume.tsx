@@ -27,17 +27,25 @@ interface ResumeProps {
 }
 
 export default function Resume({ resumeData, certificates }: ResumeProps) {
-  const { isNoir } = useTheme();
+  const { isNoir, audience } = useTheme();
   const [activePersona, setActivePersona] = useState<Persona>('general');
+
+  const activeAudience = audience || 'developer';
 
   if (!resumeData) {
     return null;
   }
 
   const handleDownloadPDF = () => {
-    import('@/utils/pdfGenerator').then(({ generateResumePDF }) => {
-      generateResumePDF(activePersona, resumeData);
-    });
+    if (activeAudience === 'business') {
+      import('@/utils/pdfGenerator').then(({ generateQuotationPDF }) => {
+        generateQuotationPDF(resumeData);
+      });
+    } else {
+      import('@/utils/pdfGenerator').then(({ generateResumePDF }) => {
+        generateResumePDF(activePersona, resumeData);
+      });
+    }
   };
 
   // Get active summary based on persona
@@ -80,17 +88,27 @@ export default function Resume({ resumeData, certificates }: ResumeProps) {
         {/* ---- Header & Action Bar ---- */}
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>
-            {isNoir ? 'SERVICE RECORD' : 'PROFESSIONAL DOSSIER'}
+            {activeAudience === 'business'
+              ? (isNoir ? 'RATE CARD & TERMS' : 'FREELANCE SERVICE QUOTATION')
+              : (isNoir ? 'SERVICE RECORD' : 'PROFESSIONAL DOSSIER')}
           </h2>
           
           <div className={styles.actions}>
             <button 
               onClick={handleDownloadPDF} 
               className={styles.printBtn}
-              aria-label={isNoir ? 'EXPORT DOSSIER - Download ATS Resume as PDF' : 'DOWNLOAD PDF - Download ATS Resume as PDF'}
+              aria-label={
+                activeAudience === 'business'
+                  ? (isNoir ? 'EXPORT QUOTATION - Download Quotation Rate Card PDF' : 'DOWNLOAD RATE CARD - Download Quotation Rate Card PDF')
+                  : (isNoir ? 'EXPORT DOSSIER - Download ATS Resume as PDF' : 'DOWNLOAD PDF - Download ATS Resume as PDF')
+              }
             >
               <Download size={18} />
-              <span>{isNoir ? 'EXPORT DOSSIER' : 'DOWNLOAD PDF'}</span>
+              <span>
+                {activeAudience === 'business'
+                  ? (isNoir ? 'EXPORT QUOTATION' : 'DOWNLOAD RATE CARD')
+                  : (isNoir ? 'EXPORT DOSSIER' : 'DOWNLOAD PDF')}
+              </span>
             </button>
           </div>
         </div>
@@ -108,132 +126,218 @@ export default function Resume({ resumeData, certificates }: ResumeProps) {
           </div>
         )}
 
-        {/* ---- Interactive Persona Switcher ---- */}
-        <div className={styles.personaBar}>
-          <div className={styles.personaLabel}>
-            <span>{isNoir ? 'SELECT FILTER:' : 'VIEW PERSONA:'}</span>
+        {/* ---- Interactive Persona Switcher (Hidden in Business Mode) ---- */}
+        {activeAudience !== 'business' && (
+          <div className={styles.personaBar}>
+            <div className={styles.personaLabel}>
+              <span>{isNoir ? 'SELECT FILTER:' : 'VIEW PERSONA:'}</span>
+            </div>
+            <div className={styles.personaButtons}>
+              {(['general', 'fullstack', 'ai', 'creative'] as Persona[]).map((persona) => (
+                <button
+                  key={persona}
+                  onClick={() => setActivePersona(persona)}
+                  className={`${styles.personaBtn} ${activePersona === persona ? styles.active : ''}`}
+                >
+                  {persona === 'general' && <User size={14} />}
+                  {persona === 'fullstack' && <Cpu size={14} />}
+                  {persona === 'ai' && <Terminal size={14} />}
+                  {persona === 'creative' && <Paintbrush size={14} />}
+                  <span>
+                    {persona === 'general' && 'General'}
+                    {persona === 'fullstack' && 'Fullstack Dev'}
+                    {persona === 'ai' && 'AI Orchestration'}
+                    {persona === 'creative' && 'Creative'}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
-          <div className={styles.personaButtons}>
-            {(['general', 'fullstack', 'ai', 'creative'] as Persona[]).map((persona) => (
-              <button
-                key={persona}
-                onClick={() => setActivePersona(persona)}
-                className={`${styles.personaBtn} ${activePersona === persona ? styles.active : ''}`}
-              >
-                {persona === 'general' && <User size={14} />}
-                {persona === 'fullstack' && <Cpu size={14} />}
-                {persona === 'ai' && <Terminal size={14} />}
-                {persona === 'creative' && <Paintbrush size={14} />}
-                <span>
-                  {persona === 'general' && 'General'}
-                  {persona === 'fullstack' && 'Fullstack Dev'}
-                  {persona === 'ai' && 'AI Orchestration'}
-                  {persona === 'creative' && 'Creative'}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
+        )}
 
-        {/* ---- Main Resume Layout ---- */}
+        {/* ---- Main Resume / Quotation Layout ---- */}
         <div className={styles.resumeCardWrapper}>
           <ComicPanel tilt={1} className={styles.resumePaper} staticDots>
-            <div className={styles.resumeContent}>
-              
-              {/* Header Info */}
-              <div className={styles.resumeHeader}>
-                <div className={styles.mainInfo}>
-                  <h2 className={styles.name}>{resumeData.name}</h2>
-                  <p className={styles.title}>{resumeData.title}</p>
-                </div>
-                <div className={styles.contactInfo}>
-                  <span>{resumeData.email}</span>
-                  <span>{resumeData.phone}</span>
-                  <span>
-                    <a href={resumeData.website} target="_blank" rel="noopener noreferrer" className={styles.link}>
-                      {resumeData.website.replace('https://', '')} <ExternalLink size={12} />
-                    </a>
-                  </span>
-                </div>
-              </div>
-
-              <hr className={styles.divider} />
-
-              {/* Summary Section */}
-              <div className={styles.resumeSectionBlock}>
-                <h3 className={styles.blockTitle}>
-                  <FileText size={16} />
-                  <span>PROFESSIONAL SUMMARY</span>
-                </h3>
-                <p className={styles.summaryText}>{activeSummary}</p>
-              </div>
-
-              {/* Dynamic Skills Highlights */}
-              <div className={styles.resumeSectionBlock}>
-                <h3 className={styles.blockTitle}>
-                  <Terminal size={16} />
-                  <span>CORE CAPABILITIES</span>
-                </h3>
-                <div className={styles.skillsList}>
-                  {getSkillsHighlight().map((skill) => (
-                    <span key={skill} className={styles.skillTag}>
-                      {skill}
+            {activeAudience === 'business' ? (
+              /* ---- Freelance Quotation Layout ---- */
+              <div className={styles.resumeContent}>
+                
+                {/* Header Info */}
+                <div className={styles.resumeHeader}>
+                  <div className={styles.mainInfo}>
+                    <h2 className={styles.name}>{resumeData.name}</h2>
+                    <p className={styles.title}>Freelance Services & Rate Card</p>
+                  </div>
+                  <div className={styles.contactInfo}>
+                    <span>{resumeData.email}</span>
+                    <span>{resumeData.phone}</span>
+                    <span>
+                      <a href={resumeData.website} target="_blank" rel="noopener noreferrer" className={styles.link}>
+                        {resumeData.website.replace('https://', '')} <ExternalLink size={12} />
+                      </a>
                     </span>
-                  ))}
+                  </div>
                 </div>
-              </div>
 
-              {/* Experience Section */}
-              <div className={styles.resumeSectionBlock}>
-                <h3 className={styles.blockTitle}>
-                  <Briefcase size={16} />
-                  <span>WORK EXPERIENCE</span>
-                </h3>
-                <div className={styles.timeline}>
-                  {resumeData.experience.map((exp) => (
-                    <div key={exp.id} className={styles.timelineItem}>
-                      <div className={styles.timelineHeader}>
-                        <div>
-                          <h4 className={styles.roleTitle}>{exp.role}</h4>
-                          <span className={styles.companyName}>{exp.company}</span>
+                <hr className={styles.divider} />
+
+                {/* Rate Card Grid */}
+                <div className={styles.quoteGrid}>
+                  <div className={styles.quoteCard}>
+                    <h4 className={styles.quoteCardLabel}>ESTIMATED HOURLY RATE</h4>
+                    <span className={styles.rateValue}>{resumeData.quotation?.hourlyRate || "$50"}</span>
+                    <span className={styles.rateUnit}>per hour</span>
+                  </div>
+
+                  <div className={styles.quoteCard}>
+                    <h4 className={styles.quoteCardLabel}>STANDARD DAY RATE (8H)</h4>
+                    <span className={styles.rateValue}>{resumeData.quotation?.dayRate || "$350"}</span>
+                    <span className={styles.rateUnit}>per day</span>
+                  </div>
+                </div>
+
+                {/* Terms and Deliverables */}
+                <div className={styles.resumeSectionBlock}>
+                  <h3 className={styles.blockTitle}>
+                    <FileText size={16} />
+                    <span>STANDARD ENGAGEMENT TERMS</span>
+                  </h3>
+                  <p className={styles.summaryText}>{resumeData.quotation?.paymentTerms || "50% upfront, 30% after design/milestone 1, 20% on final delivery."}</p>
+                </div>
+
+                <div className={styles.resumeSectionBlock}>
+                  <h3 className={styles.blockTitle}>
+                    <Terminal size={16} />
+                    <span>SERVICE DELIVERABLES</span>
+                  </h3>
+                  <ul className={styles.bulletsList}>
+                    {(resumeData.quotation?.deliverables || [
+                      "Custom UI Design & Prototype",
+                      "Production-ready Next.js / React application",
+                      "Supabase backend integration & security setup",
+                      "SEO audit & optimization",
+                      "3 months of support & maintenance"
+                    ]).map((item, idx) => (
+                      <li key={idx} className={styles.bulletItem}>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Call to action scrolling to Contact form */}
+                <div className={styles.quoteActionWrapper}>
+                  <button
+                    onClick={() => {
+                      const el = document.getElementById('contact');
+                      el?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className={styles.quoteActionBtn}
+                  >
+                    <span>REQUEST CUSTOM QUOTE</span>
+                  </button>
+                </div>
+
+              </div>
+            ) : (
+              /* ---- Standard Work Experience Timeline ---- */
+              <div className={styles.resumeContent}>
+                
+                {/* Header Info */}
+                <div className={styles.resumeHeader}>
+                  <div className={styles.mainInfo}>
+                    <h2 className={styles.name}>{resumeData.name}</h2>
+                    <p className={styles.title}>{resumeData.title}</p>
+                  </div>
+                  <div className={styles.contactInfo}>
+                    <span>{resumeData.email}</span>
+                    <span>{resumeData.phone}</span>
+                    <span>
+                      <a href={resumeData.website} target="_blank" rel="noopener noreferrer" className={styles.link}>
+                        {resumeData.website.replace('https://', '')} <ExternalLink size={12} />
+                      </a>
+                    </span>
+                  </div>
+                </div>
+
+                <hr className={styles.divider} />
+
+                {/* Summary Section */}
+                <div className={styles.resumeSectionBlock}>
+                  <h3 className={styles.blockTitle}>
+                    <FileText size={16} />
+                    <span>PROFESSIONAL SUMMARY</span>
+                  </h3>
+                  <p className={styles.summaryText}>{activeSummary}</p>
+                </div>
+
+                {/* Dynamic Skills Highlights */}
+                <div className={styles.resumeSectionBlock}>
+                  <h3 className={styles.blockTitle}>
+                    <Terminal size={16} />
+                    <span>CORE CAPABILITIES</span>
+                  </h3>
+                  <div className={styles.skillsList}>
+                    {getSkillsHighlight().map((skill) => (
+                      <span key={skill} className={styles.skillTag}>
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Experience Section */}
+                <div className={styles.resumeSectionBlock}>
+                  <h3 className={styles.blockTitle}>
+                    <Briefcase size={16} />
+                    <span>WORK EXPERIENCE</span>
+                  </h3>
+                  <div className={styles.timeline}>
+                    {resumeData.experience.map((exp) => (
+                      <div key={exp.id} className={styles.timelineItem}>
+                        <div className={styles.timelineHeader}>
+                          <div>
+                            <h4 className={styles.roleTitle}>{exp.role}</h4>
+                            <span className={styles.companyName}>{exp.company}</span>
+                          </div>
+                          <div className={styles.meta}>
+                            <span className={styles.period}>{exp.period}</span>
+                            <span className={styles.location}>{exp.location}</span>
+                          </div>
                         </div>
-                        <div className={styles.meta}>
-                          <span className={styles.period}>{exp.period}</span>
-                          <span className={styles.location}>{exp.location}</span>
+                        <ul className={styles.bulletsList}>
+                          {exp.bullets.map((bullet, idx) => (
+                            <li key={idx} className={styles.bulletItem}>
+                              {renderBullet(bullet)}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Education Section */}
+                <div className={styles.resumeSectionBlock}>
+                  <h3 className={styles.blockTitle}>
+                    <GraduationCap size={16} />
+                    <span>EDUCATION</span>
+                  </h3>
+                  <div className={styles.educationGrid}>
+                    {resumeData.education.map((edu, idx) => (
+                      <div key={idx} className={styles.educationItem}>
+                        <div className={styles.eduHeader}>
+                          <h4 className={styles.schoolName}>{edu.school}</h4>
+                          <span className={styles.eduPeriod}>{edu.period}</span>
                         </div>
+                        <p className={styles.degree}>{edu.degree} &mdash; <span className={styles.eduLoc}>{edu.location}</span></p>
                       </div>
-                      <ul className={styles.bulletsList}>
-                        {exp.bullets.map((bullet, idx) => (
-                          <li key={idx} className={styles.bulletItem}>
-                            {renderBullet(bullet)}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              {/* Education Section */}
-              <div className={styles.resumeSectionBlock}>
-                <h3 className={styles.blockTitle}>
-                  <GraduationCap size={16} />
-                  <span>EDUCATION</span>
-                </h3>
-                <div className={styles.educationGrid}>
-                  {resumeData.education.map((edu, idx) => (
-                    <div key={idx} className={styles.educationItem}>
-                      <div className={styles.eduHeader}>
-                        <h4 className={styles.schoolName}>{edu.school}</h4>
-                        <span className={styles.eduPeriod}>{edu.period}</span>
-                      </div>
-                      <p className={styles.degree}>{edu.degree} &mdash; <span className={styles.eduLoc}>{edu.location}</span></p>
-                    </div>
-                  ))}
-                </div>
               </div>
-
-            </div>
+            )}
           </ComicPanel>
         </div>
 

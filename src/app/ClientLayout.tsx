@@ -5,10 +5,12 @@ import { usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Navbar from '@/components/ui/Navbar';
 import Footer from '@/components/ui/Footer';
-import { ThemeProvider } from '@/context/ThemeContext';
+import type { Theme, Audience } from '@/context/ThemeContext';
+import { ThemeProvider, useTheme } from '@/context/ThemeContext';
 import { LenisProvider } from '@/context/LenisProvider';
 import ThemeTransition from '@/components/effects/ThemeTransition';
 import { LazyMotion, domAnimation } from 'framer-motion';
+import OnboardingSelector from '@/components/ui/OnboardingSelector';
 
 // Lazy load heavy client side animations
 const NoirSkyline = dynamic(() => import('@/components/effects/NoirSkyline'), { 
@@ -20,7 +22,49 @@ const ZenToggle = dynamic(() => import('@/components/ui/ZenToggle'), { ssr: fals
 const TerminalButton = dynamic(() => import('@/components/ui/TerminalButton'), { ssr: false });
 const ThreeGremlinParade = dynamic(() => import('@/components/effects/ThreeGremlinParade'), { ssr: false });
 
-export default function ClientLayout({ children }: { children: React.ReactNode }) {
+interface ClientLayoutProps {
+  children: React.ReactNode;
+  initialTheme: Theme;
+  initialAudience: Audience | null;
+}
+
+function ClientLayoutContent({ 
+  children, 
+  isAdminRoute, 
+  isKonamiActive 
+}: { 
+  children: React.ReactNode; 
+  isAdminRoute: boolean; 
+  isKonamiActive: boolean; 
+}) {
+  const { audience } = useTheme();
+
+  return (
+    <LenisProvider>
+      <ThemeTransition />
+      {!isAdminRoute && <NoirSkyline />}
+      {!isAdminRoute && <CursorTrail />}
+      {!isAdminRoute && <Navbar />}
+      
+      {audience === null ? (
+        <OnboardingSelector />
+      ) : (
+        <main>{children}</main>
+      )}
+
+      {!isAdminRoute && <Footer />}
+      {!isAdminRoute && <ZenToggle />}
+      {!isAdminRoute && <TerminalButton />}
+      {!isAdminRoute && isKonamiActive && <ThreeGremlinParade />}
+    </LenisProvider>
+  );
+}
+
+export default function ClientLayout({ 
+  children,
+  initialTheme,
+  initialAudience
+}: ClientLayoutProps) {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith('/admin');
   const [isKonamiActive, setIsKonamiActive] = useState(false);
@@ -102,19 +146,11 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   }, []);
 
   return (
-    <ThemeProvider>
+    <ThemeProvider initialTheme={initialTheme} initialAudience={initialAudience}>
       <LazyMotion features={domAnimation}>
-        <LenisProvider>
-          <ThemeTransition />
-          {!isAdminRoute && <NoirSkyline />}
-          {!isAdminRoute && <CursorTrail />}
-          {!isAdminRoute && <Navbar />}
-          <main>{children}</main>
-          {!isAdminRoute && <Footer />}
-          {!isAdminRoute && <ZenToggle />}
-          {!isAdminRoute && <TerminalButton />}
-          {!isAdminRoute && isKonamiActive && <ThreeGremlinParade />}
-        </LenisProvider>
+        <ClientLayoutContent isAdminRoute={isAdminRoute} isKonamiActive={isKonamiActive}>
+          {children}
+        </ClientLayoutContent>
       </LazyMotion>
     </ThemeProvider>
   );

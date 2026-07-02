@@ -72,7 +72,8 @@ function ProjectImage({ src, alt, fill, width, height, sizes, className, style }
 export default function Projects({ projects }: ProjectsProps) {
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const selected = projects.find((p) => p.id === selectedProject);
-  const { isNoir } = useTheme();
+  const { isNoir, audience } = useTheme();
+  const activeAudience = audience || 'developer';
   const lenis = useLenis();
 
   const getProjectStatus = (proj: Project) => {
@@ -167,7 +168,7 @@ export default function Projects({ projects }: ProjectsProps) {
     <section id="projects" className={styles.projects} aria-label="Projects">
       <div className={styles.container}>
         <h2 className={styles.sectionTitle}>
-          EPIC ADVENTURES
+          {activeAudience === 'business' ? 'SELECTED WORK' : 'EPIC ADVENTURES'}
         </h2>
 
         <div className={styles.grid}>
@@ -210,7 +211,11 @@ export default function Projects({ projects }: ProjectsProps) {
                 </div>
                 <div className={styles.panelOverlay}>
                   <h3 className={styles.panelTitle}>{project.title}</h3>
-                  <p className={styles.panelDesc}>{project.description}</p>
+                  <p className={styles.panelDesc}>
+                    {activeAudience === 'business' && project.description_business
+                      ? project.description_business
+                      : project.description}
+                  </p>
                   <div className={styles.panelTags}>
                     {project.tags.slice(0, 3).map((tag) => (
                       <span key={tag} className={styles.tag}>
@@ -263,7 +268,11 @@ export default function Projects({ projects }: ProjectsProps) {
               />
             </div>
 
-            <p className={styles.modalDescription}>{selected.longDescription}</p>
+            <p className={styles.modalDescription}>
+              {activeAudience === 'business' && selected.longDescription_business
+                ? selected.longDescription_business
+                : selected.longDescription}
+            </p>
 
             <div className={styles.modalTags}>
               {selected.tags.map((tag) => (

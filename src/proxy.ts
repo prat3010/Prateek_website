@@ -25,22 +25,44 @@ const HONEYPOT_PATTERNS = [
 ];
 
 export async function proxy(request: NextRequest, event: NextFetchEvent) {
+  // Extract theme and audience cookies
+  const themeCookie = request.cookies.get('theme')?.value || 'light';
+  const audienceCookie = request.cookies.get('audience')?.value || null;
+  
+  // Parse User Agent via Next.js helper
+  const { device, browser, os, isBot } = userAgent(request);
+
+  // Set request headers for layouts
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-theme', themeCookie);
+  if (isBot) {
+    requestHeaders.set('x-audience', 'developer');
+  } else if (audienceCookie) {
+    requestHeaders.set('x-audience', audienceCookie);
+  }
+
+  const nextResponse = () => NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    }
+  });
+
   // If Supabase is not configured yet, silently pass
   if (!supabase) {
-    return NextResponse.next();
+    return nextResponse();
   }
 
   const { pathname } = request.nextUrl;
   
   // Skip tracking for the admin dashboard itself to avoid padding your own view stats during debugging
   if (pathname.startsWith('/admin')) {
-    return NextResponse.next();
+    return nextResponse();
   }
 
   // Bypass database writes for vulnerability scans / honeypot URLs
   const isHoneypot = HONEYPOT_PATTERNS.some(pattern => pattern.test(pathname));
   if (isHoneypot) {
-    return NextResponse.next();
+    return nextResponse();
   }
 
   // Retrieve IP address from headers
@@ -62,12 +84,9 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
     }
   }
 
-  // Parse User Agent via Next.js helper
-  const { device, browser, os, isBot } = userAgent(request);
-
   // Bypass database writes for search engine crawlers and automated bots
   if (isBot) {
-    return NextResponse.next();
+    return nextResponse();
   }
 
   // Run the logging asynchronously using event.waitUntil
@@ -95,7 +114,7 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
     })()
   );
 
-  return NextResponse.next();
+  return nextResponse();
 }
 
 // Next.js middleware configuration matcher

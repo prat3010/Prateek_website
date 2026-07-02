@@ -3,7 +3,7 @@
     "id": "earth-evolution-simulator",
     "title": "Earth Evolution Simulator",
     "description": "A scenario-driven simulation game where players guide a planet through ten evolutionary eras by making high-stakes decisions.",
-    "longDescription": "Earth Evolution Simulator is a scenario-driven simulation game where players guide a planet through ten distinct evolutionary eras. By resolving high-stakes ecological and geological decisions, players navigate random events and path-dependent consequences to steer the planet toward one of four cosmic endings. The Python Flask backend maintains game state in-session and records player run telemetry into a local SQLite database, while a custom game engine models planetary habitability by tracking dynamic variables and applying a deferred trigger system (",
+    "longDescription": "Earth Evolution Simulator is a scenario-driven simulation game where players guide a planet through ten distinct evolutionary eras. By resolving high-stakes ecological and geological decisions, players navigate random events and path-dependent consequences to steer the planet toward one of four cosmic endings. The Python Flask backend maintains game state in-session and records player run telemetry into a local SQLite database, while a custom game engine models planetary habitability by tracking dynamic variables and applying a deferred trigger system.",
     "image": "/images/project-earth-simulator.webp",
     "tags": [
       "Python",
@@ -17,7 +17,9 @@
     "githubUrl": "https://github.com/prat3010/earth-evolution-simulator",
     "color": "#00E676",
     "isLive": true,
-    "status": "live"
+    "status": "live",
+    "description_business": "An interactive scenario-driven simulation platform demonstrating path-dependent decision modeling and complex system tracking.",
+    "longDescription_business": "Earth Evolution Simulator translates complex planetary ecology and resource allocation dynamics into a highly engaging, interactive simulation. Designed to showcase advanced state management, dynamic telemetry logging, and user choice tracking, the application models complex workflows and decision-making chains. The product is built on a high-availability architecture, utilizing SQLite for run histories and structured feedback loops to deliver educational value and an immersive user experience."
   },
   {
     "id": "iss-tracker",
@@ -38,7 +40,9 @@
     "githubUrl": "https://github.com/prat3010/iss-tracker",
     "color": "#2979FF",
     "isLive": false,
-    "status": "soon"
+    "status": "soon",
+    "description_business": "A real-time tracking application displaying geographical details and celestial data via reverse-geocoding APIs.",
+    "longDescription_business": "The ISS Live Location Tracker showcases high-frequency API polling, third-party integration pipelines, and geographic data processing. Utilizing geopy for reverse-geocoding coordinates and KD-trees for local offline geolocation lookups, the platform provides immediate feedback on ISS positions. The application caches daily NASA space assets to ensure fast page loads, demonstrating how geolocation telemetry can be resolved and displayed dynamically for public-facing dashboards."
   },
   {
     "id": "metawipe",
@@ -58,7 +62,9 @@
     "githubUrl": "https://github.com/prat3010/metawipe",
     "color": "#00E676",
     "isLive": false,
-    "status": "soon"
+    "status": "soon",
+    "description_business": "A privacy-focused mobile application that strips metadata from images locally for secure, worry-free media sharing.",
+    "longDescription_business": "MetaWipe is a lightweight mobile utility that guarantees photo privacy by stripping identifying EXIF metadata locally. The app decodes images into raw pixels in isolated background threads (Dart isolates) and recreates containers without GPS, device signatures, or thumbnail data. Operating entirely offline and requiring no network permissions, MetaWipe establishes user trust through secure, client-side container sanitization."
   },
   {
     "id": "paintmix-ai",
@@ -78,12 +84,14 @@
     "githubUrl": "https://github.com/prat3010/paintmix-ai",
     "color": "#FF9100",
     "isLive": false,
-    "status": "soon"
+    "status": "soon",
+    "description_business": "A camera-based color mixing assistant that detects real-world colors and calculates exact color matching ratios.",
+    "longDescription_business": "PaintMix AI is a helper tool for artists and designers that uses the device camera to identify target colors and calculate mixing proportions from inventory. By converting RGB inputs to XYZ and CIELAB spaces, the app runs Delta E distance optimization to find the best color combinations. Inventory management runs offline using SQLite, demonstrating custom color-space algorithms, responsive camera feeds, and detailed visual instructions."
   },
   {
     "id": "prateeksync-ai--intelligent-portfolio---resume-automation-engine",
     "title": "PrateekSync AI: Intelligent Portfolio & Resume Automation Engine",
-    "description": "An AI-powered local orchestrator and headless CMS that automates portfolio metadata, verifies scanned credentials via multimodal OCR, and dynamically syncs archetype-tailored resume metrics.",
+    "description": "An AI-powered local orchestrator and headless CMS that automates portfolio metadata, verifies scanned credentials via multimodal OCR, and dynamically syncs archetype-tailored resume bullets.",
     "longDescription": "PrateekSync AI is engineered as a robust headless CMS, leveraging Python 3.x and Streamlit for its interactive dashboard, to intelligently manage and synchronize professional portfolio and resume data. It features a custom Python state machine parser for safe, direct manipulation of TypeScript data files without AST corruption, ensuring integrity for dynamic content generation. Core functionalities include a Google Gemini 2.5 Flash API-driven repository analyzer that synthesizes GitHub commit data into tailored resume bullets, alongside a multimodal OCR system for verifying credentials from image or PDF scans. The architecture integrates robust file system operations for asset management and supports diverse content generation tasks, from technical blogs to interactive skill dependency mapping, offering a comprehensive, AI-enhanced content automation solution.",
     "image": "/images/project-prateeksync-ai--intelligent-portfolio---resume-automation-engine.webp",
     "tags": [
@@ -98,6 +106,8 @@
     "githubUrl": "",
     "color": "#2979FF",
     "isLive": false,
-    "status": "personal"
+    "status": "personal",
+    "description_business": "An AI-powered automation engine and headless CMS that optimizes resume metadata, parses credentials via OCR, and synchronizes content.",
+    "longDescription_business": "PrateekSync AI simplifies content updates and credential validation through a streamlined developer control panel. The system automates portfolio synchronization with GitHub APIs, checks certificate validity via Gemini-powered OCR, and compiles TypeScript data stores dynamically. This ensures consistent data updates across web profiles, lowering management overhead while retaining local fallbacks."
   }
 ]

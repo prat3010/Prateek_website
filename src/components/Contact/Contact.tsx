@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, type FormEvent } from 'react';
+import React, { useRef, useState, useEffect, type FormEvent } from 'react';
 import { useLenis } from 'lenis/react';
 import { useTheme } from '@/context/ThemeContext';
 import { NAVBAR_SCROLL_OFFSET } from '@/lib/constants';
@@ -12,8 +12,23 @@ export default function Contact() {
   const confettiRef = useRef<ConfettiBurstHandle>(null);
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
-  const { isNoir } = useTheme();
+  const { isNoir, audience } = useTheme();
   const lenis = useLenis();
+
+  const activeAudience = audience || 'developer';
+  const [selectedIntent, setSelectedIntent] = useState('general');
+
+  // Pre-populate intent when chosen from pricing table
+  useEffect(() => {
+    const handleSelectPackage = (e: Event) => {
+      const customEvent = e as CustomEvent<{ package: string }>;
+      if (customEvent.detail && customEvent.detail.package) {
+        setSelectedIntent(customEvent.detail.package);
+      }
+    };
+    window.addEventListener('select-package', handleSelectPackage);
+    return () => window.removeEventListener('select-package', handleSelectPackage);
+  }, []);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -25,6 +40,27 @@ export default function Contact() {
     const name = formData.get('name') as string;
     const email = formData.get('email') as string;
     const message = formData.get('message') as string;
+    const intent = formData.get('intent') as string;
+
+    // Resolve human-readable package labels
+    const intentLabel = activeAudience === 'business'
+      ? ({
+          general: 'General Freelance Inquiry',
+          'landing-page': 'Landing Page Package ($400 - $700)',
+          'web-application': 'Custom Web Application ($1,200 - $2,500)',
+          'monthly-support': 'Monthly Support & SEO ($150/mo)',
+          'custom-quote': 'Other / Custom Website Quote'
+        }[intent] || intent)
+      : ({
+          general: 'General Collaboration / Inquiry',
+          hiring: 'Hiring / Employment Opportunity',
+          mentorship: 'Hourly Mentorship / Consulting ($50/hr)',
+          architecture: 'Architecture Review ($250/session)',
+          security: 'Codebase Security Audit ($450/audit)',
+          'open-source': 'Open-Source Collaboration'
+        }[intent] || intent);
+
+    const fullMessage = `[Intent: ${intentLabel}]\n\n${message}`;
 
     try {
       const response = await fetch('/api/contact', {
@@ -32,7 +68,7 @@ export default function Contact() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, email, message }),
+        body: JSON.stringify({ name, email, message: fullMessage }),
       });
 
       const data = await response.json();
@@ -41,6 +77,7 @@ export default function Contact() {
         setStatus('success');
         confettiRef.current?.triggerConfetti();
         form.reset();
+        setSelectedIntent('general');
         lenis?.scrollTo('#contact', { duration: 1.0, offset: NAVBAR_SCROLL_OFFSET });
         setTimeout(() => setStatus('idle'), 5000);
       } else {
@@ -90,6 +127,39 @@ export default function Contact() {
                 className={styles.input}
                 placeholder={isNoir ? 'spade@privateeye.com' : 'spidey@dailybugle.com'}
               />
+            </div>
+
+            {/* Communication Intent Dropdown */}
+            <div className={styles.field}>
+              <label htmlFor="contact-intent" className={styles.label}>
+                Communication Intent
+              </label>
+              <select
+                id="contact-intent"
+                name="intent"
+                value={selectedIntent}
+                onChange={(e) => setSelectedIntent(e.target.value)}
+                className={styles.select}
+              >
+                {activeAudience === 'business' ? (
+                  <>
+                    <option value="general">General Freelance Inquiry</option>
+                    <option value="landing-page">Landing Page Package ($400 - $700)</option>
+                    <option value="web-application">Custom Web Application ($1,200 - $2,500)</option>
+                    <option value="monthly-support">Monthly Support & SEO ($150/mo)</option>
+                    <option value="custom-quote">Other / Custom Website Quote</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="general">General Collaboration / Inquiry</option>
+                    <option value="hiring">Hiring / Employment Opportunity</option>
+                    <option value="mentorship">Hourly Mentorship / Consulting ($50/hr)</option>
+                    <option value="architecture">Architecture Review ($250/session)</option>
+                    <option value="security">Codebase Security Audit ($450/audit)</option>
+                    <option value="open-source">Open-Source Collaboration</option>
+                  </>
+                )}
+              </select>
             </div>
 
             <div className={styles.field}>

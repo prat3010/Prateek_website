@@ -3,6 +3,8 @@ export interface Project {
   title: string;
   description: string;
   longDescription: string;
+  description_business?: string;
+  longDescription_business?: string;
   image: string;
   tags: string[];
   liveUrl: string;

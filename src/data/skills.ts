@@ -2,6 +2,7 @@ export interface Skill {
   name: string;
   icon: string;
   description: string;
+  description_business?: string;
   category: 'orchestration' | 'logic' | 'product' | 'dynamic';
   color: string;
   level?: string;

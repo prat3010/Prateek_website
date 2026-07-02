@@ -22,6 +22,130 @@
     }
   ],
   "instagram": "https://www.instagram.com/freshlimevodka",
+  "quotation": {
+    "dayRate": "$350",
+    "hourlyRate": "$50",
+    "deliverables": [
+      "Custom UI Design & Prototype",
+      "Production-ready Next.js / React application",
+      "Supabase backend integration & security setup",
+      "SEO audit & optimization",
+      "3 months of support & maintenance"
+    ],
+    "paymentTerms": "50% upfront, 30% after design/milestone 1, 20% on final delivery."
+  },
+  "about": {
+    "developer": {
+      "light": "Hey there! I'm Prateeq Sharma — a product-minded developer and builder who crafts high-performance web applications and digital experiences. Transitioning from a Commerce background, I realized that combining business logic with software and modern AI orchestration is the fastest way to turn complex requirements into shipped products. I focus on delivering velocity, architectural precision, and high-impact results.",
+      "noir": "They stare at screens, praying to a god of syntax and semicolons. I don't. My name is Prateeq Sharma. I transitioned from a background in Commerce to software engineering when I realized that code + AI is the ultimate leverage to solve complex business and technical problems. Now, I bring ideas out of the dark and into reality at warp speed. While traditional coders get lost in legacy frameworks, I combine solid system logic with AI orchestration to build fast, polished applications. In this city, the real superpower isn't memorizing boilerplate code. It's having the vision to design, the skill to build, and the tools to make it happen before the rain stops.",
+      "facts": [
+        "SYSTEM // Co-piloted by state-of-the-art AI systems",
+        "VELOCITY // Prompt-to-app builder at supersonic speed",
+        "ENGINE // Master of AI orchestration & prototyping",
+        "LOCATION // Based in India, building future-proof experiences"
+      ],
+      "factsNoir": [
+        "Co-piloted by neural shadows and synthetic ghosts.",
+        "Raising apps out of the ether before the ink dries.",
+        "Orchestrating virtual puppets and raw prototype grids.",
+        "Based in India, forging code to survive the digital decay."
+      ]
+    },
+    "business": {
+      "light": "Hey there! I'm Prateeq Sharma — a freelance developer and technology partner who builds clean, high-performance websites and custom tools. Coming from a Commerce background, I don't just write code; I design systems that solve actual business problems, optimize load speeds for better search rankings, and integrate AI automations to save your team hours of manual work. Let's collaborate to build something your customers will love.",
+      "noir": "They talk about design and code like separate puzzles. I don't. My name is Prateeq Sharma. I'm a technology partner who turns business concepts into high-end, responsive web platforms. With a background in Commerce and expert software engineering skills, I design custom admin portals, optimize performance, and integrate secure payment setups to maximize your bottom line. We build with precision and zero overhead, delivering results that actually matter.",
+      "facts": [
+        "SERVICE // 1-on-1 direct freelance partnership",
+        "SPEED // High-velocity feature shipping",
+        "VALUE // ROI-focused, search-optimized pages",
+        "LOCATION // Operating globally, based in India"
+      ],
+      "factsNoir": [
+        "Tailored custom websites with zero middleware bloat.",
+        "Delivering working products directly into your hands.",
+        "Search rankings optimized. Loading speeds accelerated.",
+        "Serving clients worldwide from code-locked chambers."
+      ]
+    }
+  },
+  "pricing": {
+    "developer": [
+      {
+        "title": "Hourly Consulting",
+        "price": "$50 / hr",
+        "description": "General 1-on-1 development, debugging, and systems engineering support.",
+        "features": [
+          "React 19 / Next.js 16 debugging",
+          "AI development workflow optimization",
+          "Supabase / PostgreSQL setup",
+          "Code review and refactoring sessions"
+        ],
+        "cta": "mentorship"
+      },
+      {
+        "title": "Architecture Review",
+        "price": "$250 / session",
+        "description": "Deep technical audit of project structure, database schemas, and caching layers.",
+        "features": [
+          "Database query analysis & index optimization",
+          "Page visit & server action profiling",
+          "Detailed performance report",
+          "30-min call to discuss recommendations"
+        ],
+        "cta": "architecture"
+      },
+      {
+        "title": "Codebase Security Audit",
+        "price": "$450 / audit",
+        "description": "Comprehensive security and privacy vulnerability assessment of system architecture.",
+        "features": [
+          "Row-level security (RLS) policies verification",
+          "API keys & server secret exposures sweep",
+          "Bot/crawler spam protection check",
+          "Remediation guidelines and code fixes"
+        ],
+        "cta": "security"
+      }
+    ],
+    "business": [
+      {
+        "title": "Landing Page Package",
+        "price": "$400 - $700",
+        "description": "A high-conversion single page website with premium visual assets and modern animations.",
+        "features": [
+          "Custom UI design mockup",
+          "Vibrant aesthetics & responsive layout",
+          "SEO meta tags & fast loading speeds",
+          "Resend contact email integration"
+        ],
+        "cta": "landing-page"
+      },
+      {
+        "title": "Custom Web Application",
+        "price": "$1,200 - $2,500",
+        "description": "A robust multi-page application with full database integration, admin dashboard, and secure user auth.",
+        "features": [
+          "Next.js App Router & TypeScript build",
+          "Supabase backend database setup",
+          "Client-accessible analytics portal",
+          "Custom billing or forms flow"
+        ],
+        "cta": "web-application"
+      },
+      {
+        "title": "Monthly Support & SEO",
+        "price": "$150 / mo",
+        "description": "Ongoing technical support, SEO audits, speed optimizations, and monthly analytics review.",
+        "features": [
+          "2 hours of development time included",
+          "Core Web Vitals monitoring & tuning",
+          "Monthly page-visit reporting",
+          "Security patches and package updates"
+        ],
+        "cta": "monthly-support"
+      }
+    ]
+  },
   "experience": [
     {
       "id": "freelance-developer",

@@ -14,18 +14,50 @@ interface SimpleBlogPost {
   excerpt: string;
 }
 
+interface BlogCopy {
+  sectionTitle: string;
+  viewAllText: string;
+}
+
+const BLOG_COPY: Record<'developer' | 'business', Record<'light' | 'noir', BlogCopy>> = {
+  developer: {
+    light: {
+      sectionTitle: "LATEST WRITINGS",
+      viewAllText: "VIEW ALL"
+    },
+    noir: {
+      sectionTitle: "LOG_ENTRIES",
+      viewAllText: "ALL_LOGS"
+    }
+  },
+  business: {
+    light: {
+      sectionTitle: "INSIGHTS & CASE STUDIES",
+      viewAllText: "READ ALL"
+    },
+    noir: {
+      sectionTitle: "CASE STUDIES & METRICS",
+      viewAllText: "ALL_INSIGHTS"
+    }
+  }
+};
+
 export default function BlogSection({ posts }: { posts: SimpleBlogPost[] }) {
-  const { isNoir } = useTheme();
+  const { isNoir, audience } = useTheme();
+  
+  const activeAudience = audience || 'developer';
+  const activeTheme = isNoir ? 'noir' : 'light';
+  const copy = BLOG_COPY[activeAudience][activeTheme];
 
   return (
     <section id="blog" className={styles.blogSection} aria-label="Writings">
       <div className={styles.container}>
         <div className={styles.header}>
           <h2 className={styles.sectionTitle}>
-            {isNoir ? 'LOG_ENTRIES' : 'LATEST WRITINGS'}
+            {copy.sectionTitle}
           </h2>
           <Link href="/blog" className={styles.viewAllBtn}>
-            <span>{isNoir ? 'ALL_LOGS' : 'VIEW ALL'}</span>
+            <span>{copy.viewAllText}</span>
             <ArrowRight size={16} />
           </Link>
         </div>

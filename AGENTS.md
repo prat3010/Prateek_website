@@ -80,10 +80,10 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
 - **Running locally:** Execute `streamlit run scripts/synchronizer.py`. Requires `pip install streamlit` and `PIL/Pillow`.
 - **AI Integration:** Uses `GEMINI_API_KEY` from `.env.local` to call `gemini-2.5-flash` for scanning missing skills and analyzing certificates.
 - **Core Tabs:**
-  - **Edit Resume Manually:** Writes resume data to Supabase (plus file fallback).
-  - **Sync Projects:** Syncs GitHub projects to Supabase (plus file fallback).
+  - **Edit Resume Manually:** Writes resume data to Supabase (plus file fallback). Includes biography details, freelance quotation rates, and pricing packages editing for both Developer and Business modes.
+  - **Sync Projects:** Syncs GitHub projects to Supabase (plus file fallback) and supports side-by-side editing of Developer and Business project copy.
   - **Sync Certificates:** Saves files to `public/certificates/` and metadata to Supabase (plus file fallback).
-  - **Manage Skills:** Updates skills in Supabase (plus file fallback) and displays pending auto-scanned tags.
+  - **Manage Skills:** Updates skills in Supabase (plus file fallback, including business outcome narratives) and displays pending auto-scanned tags.
   - **Update Photos:** Manages profile and project images (azure vs. noir variants) in `public/images/`. Includes Git integration to automatically stage, commit, and push updated images to GitHub when Dry-Run Mode is disabled.
   - **Blog Editor:** Writes markdown posts directly to `src/content/posts/`.
 - **Sidebar Monitors:**

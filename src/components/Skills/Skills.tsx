@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { Skill } from '@/data/skills';
 import { useTheme } from '@/context/ThemeContext';
 import { 
@@ -21,7 +21,6 @@ import {
 import styles from './Skills.module.css';
 import { m, AnimatePresence } from 'framer-motion';
 
-// Map icon strings to Lucide components
 const iconMap: Record<string, LucideIcon> = {
   zap: Zap,
   sparkles: Sparkles,
@@ -40,9 +39,84 @@ interface SkillsProps {
   skills: Skill[];
 }
 
+interface SkillsCopy {
+  sectionTitle: string;
+  moBadge: string;
+  moHeader: string;
+  moText: string;
+  tabs: {
+    orchestration: string;
+    logic: string;
+    product: string;
+    dynamic: string;
+  };
+}
+
+const SKILLS_COPY: Record<'developer' | 'business', Record<'light' | 'noir', SkillsCopy>> = {
+  developer: {
+    light: {
+      sectionTitle: "PROFILE DOSSIER",
+      moBadge: "MY M.O.",
+      moHeader: "METHOD OF OPERATION",
+      moText: "I use AI tools like Cursor and Gemini to move fast — but I understand every layer of the stack. My energy goes into system architecture, product design, UX, and shipping real products.",
+      tabs: {
+        orchestration: "I. AI ORCHESTRATION",
+        logic: "II. SYSTEMS & LOGIC",
+        product: "III. PRODUCT & UX",
+        dynamic: "IV. DYNAMIC COMMAND"
+      }
+    },
+    noir: {
+      sectionTitle: "PROFILE DOSSIER",
+      moBadge: "CASE FILE",
+      moHeader: "DEVELOPMENT METHODOLOGY",
+      moText: "Subject leverages AI-augmented development to accelerate delivery. Demonstrates full-stack comprehension across architecture, product design, and debugging. AI is the accelerant, not the substitute.",
+      tabs: {
+        orchestration: "I. AI ORCHESTRATION",
+        logic: "II. SYSTEMS & LOGIC",
+        product: "III. PRODUCT & UX",
+        dynamic: "IV. DYNAMIC COMMAND"
+      }
+    }
+  },
+  business: {
+    light: {
+      sectionTitle: "SERVICES & CAPABILITIES",
+      moBadge: "ENGAGEMENT",
+      moHeader: "HOW WE WORK",
+      moText: "I partner directly with businesses to build high-performance products. No layers of communication, no agency overhead. I run custom design prototypes, develop responsive applications, and deploy automated backend structures.",
+      tabs: {
+        orchestration: "I. AI INTEGRATION",
+        logic: "II. WEB APPLICATIONS",
+        product: "III. DESIGN & UX",
+        dynamic: "IV. DYNAMIC CONSULTING"
+      }
+    },
+    noir: {
+      sectionTitle: "SERVICES & CAPABILITIES",
+      moBadge: "PROTOCOL",
+      moHeader: "ENGAGEMENT MODEL",
+      moText: "Subject operates as an independent contractor, removing agency middlemen. Delivers functional design prototypes, fast frontend builds, and secure database setups directly to clients under clear, contracted deliverables.",
+      tabs: {
+        orchestration: "I. AI INTEGRATION",
+        logic: "II. WEB APPLICATIONS",
+        product: "III. DESIGN & UX",
+        dynamic: "IV. DYNAMIC CONSULTING"
+      }
+    }
+  }
+};
+
 export default function Skills({ skills }: SkillsProps) {
-  const { isNoir } = useTheme();
+  const { isNoir, audience } = useTheme();
   const [activeTab, setActiveTab] = React.useState<'orchestration' | 'logic' | 'product' | 'dynamic'>('logic');
+
+  const activeAudience = audience || 'developer';
+  const activeTheme = isNoir ? 'noir' : 'light';
+
+  const copy = useMemo(() => {
+    return SKILLS_COPY[activeAudience][activeTheme];
+  }, [activeAudience, activeTheme]);
 
   // Filter skills by dossier categories
   const orchestrationSkills = skills.filter(s => s.category === 'orchestration');
@@ -52,6 +126,14 @@ export default function Skills({ skills }: SkillsProps) {
 
   const renderSkillRow = (skill: Skill) => {
     const Icon = iconMap[skill.icon] || Sparkles;
+    
+    // Choose appropriate description copy
+    const description = (activeAudience === 'business' && skill.description_business)
+      ? skill.description_business
+      : skill.description;
+
+    const forgedLabel = activeAudience === 'business' ? 'APPLIED IN:' : 'FORGED IN:';
+
     return (
       <div key={skill.name} className={styles.dossierItem}>
         <div className={styles.dossierItemHeader}>
@@ -69,11 +151,11 @@ export default function Skills({ skills }: SkillsProps) {
           </span>
         </div>
         
-        <p className={styles.dossierItemDesc}>{skill.description}</p>
+        <p className={styles.dossierItemDesc}>{description}</p>
         
         {skill.projects && skill.projects.length > 0 && (
           <div className={styles.dossierForged}>
-            <span className={styles.dossierForgedLabel}>FORGED IN:</span>
+            <span className={styles.dossierForgedLabel}>{forgedLabel}</span>
             <div className={styles.dossierTags}>
               {skill.projects.map(proj => (
                 <a 
@@ -113,20 +195,18 @@ export default function Skills({ skills }: SkillsProps) {
     <section id="skills" className={styles.skills} aria-label="Skills">
       <div className={styles.container}>
         <h2 className={styles.sectionTitle}>
-          PROFILE DOSSIER
+          {copy.sectionTitle}
         </h2>
 
         <div className={styles.moBanner}>
           <div className={styles.moBadge}>
-            {isNoir ? 'CASE FILE' : 'MY M.O.'}
+            {copy.moBadge}
           </div>
           <div className={styles.moHeader}>
-            {isNoir ? 'DEVELOPMENT METHODOLOGY' : 'METHOD OF OPERATION'}
+            {copy.moHeader}
           </div>
           <p className={styles.moText}>
-            {isNoir 
-              ? 'Subject leverages AI-augmented development to accelerate delivery. Demonstrates full-stack comprehension across architecture, product design, and debugging. AI is the accelerant, not the substitute.' 
-              : 'I use AI tools like Cursor and Gemini to move fast — but I understand every layer of the stack. My energy goes into system architecture, product design, UX, and shipping real products.'}
+            {copy.moText}
           </p>
         </div>
 
@@ -144,7 +224,7 @@ export default function Skills({ skills }: SkillsProps) {
               '--tab-neon': 'var(--neon-pink)'
             } as React.CSSProperties}
           >
-            I. AI ORCHESTRATION
+            {copy.tabs.orchestration}
           </button>
           <button 
             role="tab"
@@ -158,7 +238,7 @@ export default function Skills({ skills }: SkillsProps) {
               '--tab-neon': 'var(--neon-cyan)'
             } as React.CSSProperties}
           >
-            II. SYSTEMS & LOGIC
+            {copy.tabs.logic}
           </button>
           <button 
             role="tab"
@@ -172,7 +252,7 @@ export default function Skills({ skills }: SkillsProps) {
               '--tab-neon': 'var(--neon-yellow)'
             } as React.CSSProperties}
           >
-            III. PRODUCT & UX
+            {copy.tabs.product}
           </button>
           <button 
             role="tab"
@@ -186,7 +266,7 @@ export default function Skills({ skills }: SkillsProps) {
               '--tab-neon': 'var(--neon-purple)'
             } as React.CSSProperties}
           >
-            IV. DYNAMIC COMMAND
+            {copy.tabs.dynamic}
           </button>
         </div>
 

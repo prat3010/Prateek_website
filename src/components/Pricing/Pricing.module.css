@@ -1,0 +1,208 @@
+.pricingSection {
+  padding: 80px 0;
+  background-color: var(--pop-cream);
+  border-top: 4px solid var(--pop-black);
+}
+
+:global([data-theme='noir']) .pricingSection {
+  background-color: #0b0b0c;
+  border-color: #ffffff;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 16px;
+  }
+}
+
+.sectionTitle {
+  font-family: var(--font-headline);
+  font-size: var(--text-2xl);
+  font-weight: 900;
+  margin: 0 0 40px 0;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--pop-black);
+}
+
+:global([data-theme='noir']) .sectionTitle {
+  color: #ffffff;
+  font-family: var(--font-mono);
+}
+
+/* ---- Cards Grid ---- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  align-items: stretch;
+}
+
+@media (max-width: 992px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+.cardContainer {
+  height: 100%;
+}
+
+.pricingCard {
+  height: 100%;
+  background-color: var(--pop-white) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+:global([data-theme='noir']) .pricingCard {
+  background-color: #121214 !important;
+  border-color: #ffffff !important;
+  box-shadow: 4px 4px 0px #ffffff !important;
+}
+
+.cardContent {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.cardTitle {
+  font-family: var(--font-headline);
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin: 0 0 16px 0;
+  color: var(--pop-black);
+  text-transform: uppercase;
+}
+
+:global([data-theme='noir']) .cardTitle {
+  color: #ffffff;
+  font-family: var(--font-mono);
+}
+
+.priceContainer {
+  margin-bottom: 20px;
+}
+
+.priceValue {
+  font-family: var(--font-headline);
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: var(--pop-red);
+}
+
+:global([data-theme='noir']) .priceValue {
+  color: var(--neon-yellow);
+  font-family: var(--font-mono);
+  text-shadow: 0 0 8px rgba(255, 235, 59, 0.2);
+}
+
+.cardDesc {
+  font-size: 0.95rem;
+  color: #444444;
+  line-height: 1.5;
+  margin: 0 0 24px 0;
+  flex-grow: 1;
+}
+
+:global([data-theme='noir']) .cardDesc {
+  color: #b3b3b7;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.featuresList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px 0;
+  width: 100%;
+}
+
+.featureItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: #333333;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+:global([data-theme='noir']) .featureItem {
+  color: #d1d1d6;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.checkIcon {
+  color: var(--pop-green);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+:global([data-theme='noir']) .checkIcon {
+  color: var(--neon-cyan);
+}
+
+/* ---- Action Button ---- */
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px;
+  font-family: var(--font-headline);
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background-color: var(--pop-blue);
+  color: var(--pop-white);
+  border: 3px solid var(--pop-black);
+  box-shadow: 3px 3px 0px var(--pop-black);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: transform 0.1s var(--transition-bounce), box-shadow 0.1s ease, background-color 0.2s ease;
+}
+
+.actionBtn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0px var(--pop-black);
+  background-color: var(--pop-green);
+  color: var(--pop-black);
+}
+
+.actionBtn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px var(--pop-black);
+}
+
+:global([data-theme='noir']) .actionBtn {
+  background-color: #121214;
+  color: #ffffff;
+  border-color: #ffffff;
+  box-shadow: 3px 3px 0px #ffffff;
+  font-family: var(--font-mono);
+}
+
+:global([data-theme='noir']) .actionBtn:hover {
+  background-color: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+  box-shadow: 3px 3px 0px var(--neon-cyan);
+}
