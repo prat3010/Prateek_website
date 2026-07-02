@@ -111,6 +111,7 @@ CREATE INDEX IF NOT EXISTS idx_projects_created_at ON projects (created_at DESC)
 CREATE TABLE IF NOT EXISTS skills (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT UNIQUE NOT NULL,
+  name_business TEXT DEFAULT '',
   icon TEXT NOT NULL DEFAULT 'sparkles',
   description TEXT NOT NULL DEFAULT '',
   description_business TEXT DEFAULT '',

@@ -1,5 +1,6 @@
 export interface Skill {
   name: string;
+  name_business?: string;
   icon: string;
   description: string;
   description_business?: string;

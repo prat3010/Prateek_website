@@ -55,7 +55,7 @@ interface SkillsCopy {
 const SKILLS_COPY: Record<'developer' | 'business', Record<'light' | 'noir', SkillsCopy>> = {
   developer: {
     light: {
-      sectionTitle: "PROFILE DOSSIER",
+      sectionTitle: "CAPABILITIES",
       moBadge: "MY M.O.",
       moHeader: "METHOD OF OPERATION",
       moText: "I use AI tools like Cursor and Gemini to move fast — but I understand every layer of the stack. My energy goes into system architecture, product design, UX, and shipping real products.",
@@ -67,7 +67,7 @@ const SKILLS_COPY: Record<'developer' | 'business', Record<'light' | 'noir', Ski
       }
     },
     noir: {
-      sectionTitle: "PROFILE DOSSIER",
+      sectionTitle: "CAPABILITIES",
       moBadge: "CASE FILE",
       moHeader: "DEVELOPMENT METHODOLOGY",
       moText: "Subject leverages AI-augmented development to accelerate delivery. Demonstrates full-stack comprehension across architecture, product design, and debugging. AI is the accelerant, not the substitute.",
@@ -132,6 +132,11 @@ export default function Skills({ skills }: SkillsProps) {
       ? skill.description_business
       : skill.description;
 
+    // Choose appropriate name copy
+    const displayName = (activeAudience === 'business' && skill.name_business)
+      ? skill.name_business
+      : skill.name;
+
     const forgedLabel = activeAudience === 'business' ? 'APPLIED IN:' : 'FORGED IN:';
 
     return (
@@ -142,7 +147,7 @@ export default function Skills({ skills }: SkillsProps) {
               className={styles.dossierItemIcon} 
               style={{ color: skill.color }} 
             />
-            <h3 className={styles.dossierItemName}>{skill.name}</h3>
+            <h3 className={styles.dossierItemName}>{displayName}</h3>
           </div>
           <span 
             className={`${styles.dossierLevelBadge} ${styles['level_' + (skill.status || 'mastered')]}`}
@@ -180,7 +185,7 @@ export default function Skills({ skills }: SkillsProps) {
             </div>
           </div>
         )}
-
+ 
         {skill.status === 'quest' && (
           <div className={styles.dossierQuestAlert}>
             <Target size={12} className={styles.dossierQuestIcon} />
@@ -192,7 +197,7 @@ export default function Skills({ skills }: SkillsProps) {
   };
 
   return (
-    <section id="skills" className={styles.skills} aria-label="Skills">
+    <section id="capabilities" className={styles.skills} aria-label="Capabilities">
       <div className={styles.container}>
         <h2 className={styles.sectionTitle}>
           {copy.sectionTitle}

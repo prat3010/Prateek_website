@@ -2872,6 +2872,7 @@ with tab_skills:
         col_n1, col_n2 = st.columns(2)
         with col_n1:
             new_name = st.text_input("Skill Name", placeholder="e.g. Docker, Kubernetes, WebGPU", key="new_skill_name")
+            new_name_biz = st.text_input("Skill Name (Business Mode)", placeholder="e.g. Containerized Deployments, Accelerated Graphics", key="new_skill_name_biz")
             new_icon = st.text_input("Lucide Icon Name", value="sparkles", key="new_skill_icon")
             
             # Category selectbox
@@ -2917,6 +2918,7 @@ with tab_skills:
                 # Construct new skill object
                 ns = {
                     "name": new_name.strip(),
+                    "name_business": new_name_biz.strip() or new_name.strip(),
                     "icon": new_icon.strip() or "sparkles",
                     "description": new_desc.strip(),
                     "description_business": new_desc_biz.strip(),
@@ -3016,6 +3018,7 @@ with tab_skills:
                         """, unsafe_allow_html=True)
                         
                         edit_name = st.text_input("Skill Name", value=s_name, key=f"{key_prefix}_name")
+                        edit_name_biz = st.text_input("Skill Name (Business Mode)", value=skill.get('name_business', ''), key=f"{key_prefix}_name_biz")
                         edit_icon = st.text_input("Lucide Icon Name", value=s_icon, key=f"{key_prefix}_icon")
                         
                         default_cat_idx = categories_opts.index(skill.get('category', 'dynamic'))
@@ -3069,6 +3072,7 @@ with tab_skills:
                                 else:
                                     updated_s = {
                                         "name": edit_name.strip(),
+                                        "name_business": edit_name_biz.strip(),
                                         "icon": edit_icon.strip(),
                                         "description": edit_desc.strip(),
                                         "description_business": edit_desc_biz.strip(),

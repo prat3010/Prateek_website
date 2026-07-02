@@ -168,6 +168,7 @@ for s in skills_raw:
     s.setdefault('status', '')
     s.setdefault('projects', [])
     s.setdefault('description_business', '')
+    s.setdefault('name_business', '')
 if skills_raw:
     upsert('skills', skills_raw, 'name')
 print(f'  {len(skills_raw)} skills synced')

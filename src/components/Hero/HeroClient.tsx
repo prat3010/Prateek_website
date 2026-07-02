@@ -63,7 +63,7 @@ const HERO_COPY: Record<'developer' | 'business', Record<'light' | 'noir', HeroC
       ),
       taglineBadges: ["Tech Partner", "Product Builder", "Consultant"],
       ctaText: "View Services →",
-      ctaLink: "#skills",
+      ctaLink: "#capabilities",
       vibeLabel: "SUMMARY:"
     },
     noir: {
@@ -75,7 +75,7 @@ const HERO_COPY: Record<'developer' | 'business', Record<'light' | 'noir', HeroC
       ),
       taglineBadges: ["Tech Partner", "Product Builder", "Consultant"],
       ctaText: "View Services →",
-      ctaLink: "#skills",
+      ctaLink: "#capabilities",
       vibeLabel: "OBJECTIVE:"
     }
   }

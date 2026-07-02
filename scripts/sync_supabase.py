@@ -88,6 +88,7 @@ def sync_skills(skills_list):
     for s in skills_list:
         row = {
             'name': s.get('name', ''),
+            'name_business': s.get('name_business', ''),
             'icon': s.get('icon', 'sparkles'),
             'description': s.get('description', ''),
             'category': s.get('category', 'dynamic'),
