@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { Heart, BarChart2 } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
@@ -66,21 +66,22 @@ const defaultSocials: SocialLink[] = [
   { label: 'Phone', href: 'tel:+919050433260', icon: <PhoneIcon /> },
 ];
 
-const navItems = [
-  { label: 'Home', href: '/#home' },
-  { label: 'About', href: '/#about' },
-  { label: 'Capabilities', href: '/#capabilities' },
-  { label: 'Projects', href: '/#projects' },
-  { label: 'Resume', href: '/#resume' },
-  { label: 'Playground', href: '/#playground' },
-  { label: 'Contact', href: '/#contact' },
-  { label: 'Blog', href: '/blog' },
-];
-
 export default function Footer({ socials, className }: FooterProps) {
+  const { theme, audience } = useTheme();
+
+  const navItems = useMemo(() => [
+    { label: 'Home', href: '/#home' },
+    { label: 'About', href: '/#about' },
+    { label: 'Capabilities', href: '/#capabilities' },
+    { label: 'Projects', href: '/#projects' },
+    { label: audience === 'business' ? 'Quotation' : 'Resume', href: '/#resume' },
+    { label: 'Playground', href: '/#playground' },
+    { label: 'Contact', href: '/#contact' },
+    { label: 'Blog', href: '/blog' },
+  ], [audience]);
+
   const socialLinks = socials ?? defaultSocials;
   const [year] = useState(() => new Date().getFullYear());
-  const { theme } = useTheme();
   const [timeString, setTimeString] = useState('');
 
   // Live system clock logic for Noir theme (safely executed on client-side only)

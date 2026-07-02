@@ -19,22 +19,28 @@ export interface NavbarProps {
   className?: string;
 }
 
-const defaultItems: NavItem[] = [
-  { label: 'Home', href: '/#home' },
-  { label: 'About', href: '/#about' },
-  { label: 'Capabilities', href: '/#capabilities' },
-  { label: 'Projects', href: '/#projects' },
-  { label: 'Resume', href: '/#resume' },
-  { label: 'Playground', href: '/#playground' },
-  { label: 'Contact', href: '/#contact' },
-];
-
 export default function Navbar({ items, className }: NavbarProps) {
-  const navItems = useMemo(() => items ?? defaultItems, [items]);
+  const { isNoir, toggleTheme, audience, setAudience } = useTheme();
+
+  const navItems = useMemo(() => {
+    if (items) return items;
+    return [
+      { label: 'Home', href: '/#home' },
+      { label: 'About', href: '/#about' },
+      { label: 'Capabilities', href: '/#capabilities' },
+      { label: 'Projects', href: '/#projects' },
+      { label: audience === 'business' ? 'Quotation' : 'Resume', href: '/#resume' },
+      { label: 'Playground', href: '/#playground' },
+      { label: 'Contact', href: '/#contact' },
+    ];
+  }, [items, audience]);
+
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState<string>(navItems[0]?.href ?? '');
-  const { isNoir, toggleTheme, audience, setAudience } = useTheme();
+  const [activeSection, setActiveSection] = useState<string>(() => {
+    if (items && items.length > 0) return items[0].href;
+    return '/#home';
+  });
 
   const toggleAudience = useCallback(() => {
     setAudience(audience === 'business' ? 'developer' : 'business');
