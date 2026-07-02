@@ -1,12 +1,10 @@
 .pricingSection {
   padding: 80px 0;
   background-color: var(--pop-cream);
-  border-top: 4px solid var(--pop-black);
 }
 
 :global([data-theme='noir']) .pricingSection {
   background-color: #0b0b0c;
-  border-color: #ffffff;
 }
 
 .container {
@@ -23,12 +21,19 @@
 
 .sectionTitle {
   font-family: var(--font-headline);
-  font-size: var(--text-2xl);
+  font-size: var(--fs-section-title);
   font-weight: 900;
-  margin: 0 0 40px 0;
   text-transform: uppercase;
   text-align: center;
   color: var(--pop-black);
+  margin-bottom: 2.5rem;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  justify-content: center;
+  letter-spacing: 0.04em;
 }
 
 :global([data-theme='noir']) .sectionTitle {
