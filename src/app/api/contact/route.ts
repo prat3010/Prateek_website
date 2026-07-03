@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { contactSchema } from '@/data/api-schemas';
 
 function escapeHtml(str: string): string {
   return str
@@ -13,41 +14,15 @@ function escapeHtml(str: string): string {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { name, email, message } = body;
-
-    // Validate existence
-    if (!name || !email || !message) {
+    const parsed = contactSchema.safeParse(await request.json());
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Name, email, and message are required fields.' },
+        { error: parsed.error.issues.map((e: { message: string }) => e.message).join(', ') },
         { status: 400 }
       );
     }
 
-    // Validate type
-    if (typeof name !== 'string' || typeof email !== 'string' || typeof message !== 'string') {
-      return NextResponse.json(
-        { error: 'Name, email, and message must be strings.' },
-        { status: 400 }
-      );
-    }
-
-    // Validate length constraints
-    if (name.length > 100 || email.length > 254 || message.length > 5000) {
-      return NextResponse.json(
-        { error: 'Input size limits exceeded.' },
-        { status: 400 }
-      );
-    }
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Invalid email address format.' },
-        { status: 400 }
-      );
-    }
+    const { name, email, message } = parsed.data;
 
     if (!process.env.RESEND_API_KEY) {
       console.error('RESEND_API_KEY is not set in environment variables.');

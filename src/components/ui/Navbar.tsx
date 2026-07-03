@@ -6,7 +6,7 @@ import { useTheme, useAudience } from '@/context/ThemeContext';
 import { useLenisScroll } from '@/context/LenisProvider';
 import Scrambler from '@/components/ui/Scrambler';
 import type { ScramblerProps } from '@/components/ui/Scrambler';
-import { NAVBAR_SCROLL_OFFSET } from '@/lib/constants';
+import { NAVBAR_SCROLL_OFFSET, BREAKPOINTS } from '@/lib/constants';
 import styles from './Navbar.module.css';
 
 const NAV_LABEL_TEXTS: ScramblerProps['texts'] = {
@@ -126,7 +126,7 @@ export default function Navbar({ items, className }: NavbarProps) {
   /* ---------- Close mobile menu on desktop resize ---------- */
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth > 768) {
+      if (window.innerWidth > BREAKPOINTS.MD) {
         setMobileOpen(false);
       }
     };

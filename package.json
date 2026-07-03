@@ -23,14 +23,13 @@
     "react-markdown": "^10.1.0",
     "resend": "^6.12.4",
     "server-only": "^0.0.1",
-    "three": "^0.184.0"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^16.2.10",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/three": "^0.184.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "typescript": "^5"

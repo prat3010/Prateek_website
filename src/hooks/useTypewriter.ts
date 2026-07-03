@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface UseTypewriterOptions {
   text: string;
@@ -15,28 +15,25 @@ export function useTypewriter({
   delay = 500,
   loop = false,
 }: UseTypewriterOptions) {
-  const [state, setState] = useState({
-    displayText: '',
-    isTyping: false,
-    prevText: text,
-  });
+  const [displayText, setDisplayText] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const prevTextRef = useRef(text);
 
-  if (text !== state.prevText) {
-    setState({
-      displayText: '',
-      isTyping: false,
-      prevText: text,
-    });
-  }
+  useEffect(() => {
+    if (text !== prevTextRef.current) {
+      prevTextRef.current = text;
+      setDisplayText('');
+      setIsTyping(false);
+    }
+  }, [text]);
 
-  const { displayText, isTyping } = state;
   const isDone = !loop && !isTyping && text !== '' && displayText === text;
 
   useEffect(() => {
     if (!text) return;
 
     const delayTimer = setTimeout(() => {
-      setState(prev => ({ ...prev, isTyping: true }));
+      setIsTyping(true);
     }, delay);
 
     return () => {
@@ -49,23 +46,19 @@ export function useTypewriter({
 
     if (displayText.length < text.length) {
       const timeout = setTimeout(() => {
-        setState(prev => ({
-          ...prev,
-          displayText: text.slice(0, prev.displayText.length + 1)
-        }));
+        setDisplayText(text.slice(0, displayText.length + 1));
       }, speed);
       return () => clearTimeout(timeout);
     }
 
     if (!loop) {
-      const doneTimer = setTimeout(() => {
-        setState(prev => ({ ...prev, isTyping: false }));
-      }, 0);
-      return () => clearTimeout(doneTimer);
+      queueMicrotask(() => setIsTyping(false));
+      return;
     }
 
     const loopTimer = setTimeout(() => {
-      setState(prev => ({ ...prev, displayText: '', isTyping: true }));
+      setDisplayText('');
+      setIsTyping(true);
     }, 2000);
     return () => clearTimeout(loopTimer);
   }, [displayText, isTyping, text, speed, loop]);

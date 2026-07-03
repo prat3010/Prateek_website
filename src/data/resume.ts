@@ -1,3 +1,5 @@
+export type Persona = 'general' | 'fullstack' | 'ai' | 'creative';
+
 export interface WorkExperience {
   id: string;
   company: string;

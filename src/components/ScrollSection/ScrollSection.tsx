@@ -3,6 +3,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { m, useMotionValue, useReducedMotion } from 'framer-motion';
 import { useLenisScroll } from '@/context/LenisProvider';
+import { useIsMobile } from '@/hooks/useMediaQuery';
 import styles from './ScrollSection.module.css';
 
 interface Props {
@@ -43,19 +44,10 @@ export default function ScrollSection({ children, verticalOffset, centerOnly, ga
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useLenisScroll();
   const prefersReducedMotion = useReducedMotion();
-  const [isMobile, setIsMobile] = useState(false);
+  const isMobile = useIsMobile();
 
   const scrollOpacity = useMotionValue(0);
   const y = useMotionValue(0);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   const metricsRef = useRef<SectionMetrics>({
     sectionStart: 0, sectionHeight: 0, windowH: 0, totalScrollable: 0, maxReachable: 1,

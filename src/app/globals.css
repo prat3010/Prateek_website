@@ -1120,19 +1120,6 @@ html.is-theme-transitioning * {
   visibility: hidden !important;
 }
 
-/* ============================================================
-   3D GREMLIN PARADE WEBGL CANVAS OVERLAY
-   ============================================================ */
-.gremlin-canvas-container {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: var(--z-canvas-overlay);
-  pointer-events: none;
-  overflow: hidden;
-}
-
 /* ── Skills Click Highlight Animation ───────────────────────── */
 @keyframes flashHighlightAnim {
   0%, 100% {

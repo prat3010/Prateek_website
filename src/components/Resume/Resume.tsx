@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import type { ResumeData, WorkExperience } from '@/data/resume';
+import type { ResumeData, WorkExperience, Persona } from '@/data/resume';
 import type { Certificate } from '@/data/certificates';
 import { useTheme, useAudience } from '@/context/ThemeContext';
 import Scrambler from '@/components/ui/Scrambler';
@@ -20,8 +20,6 @@ import {
   FileText 
 } from 'lucide-react';
 import styles from './Resume.module.css';
-
-type Persona = 'general' | 'fullstack' | 'ai' | 'creative';
 
 interface ResumeProps {
   resumeData: ResumeData | null;

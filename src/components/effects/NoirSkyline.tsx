@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { m, useTransform, useMotionValue, useSpring } from 'framer-motion';
 import { useTheme, useThemeTransition } from '@/context/ThemeContext';
 import { useLenisScroll } from '@/context/LenisProvider';
+import { BREAKPOINTS } from '@/lib/constants';
 import styles from './NoirSkyline.module.css';
 
 import Layer0 from './skyline/Layer0';
@@ -87,7 +88,7 @@ export default function NoirSkyline() {
     if (typeof window === 'undefined') return false;
     const cores = navigator.hardwareConcurrency ?? 4;
     const lowEnd = cores < 4;
-    const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
+    const isMobileDevice = window.innerWidth <= BREAKPOINTS.MD || window.matchMedia('(pointer: coarse)').matches;
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches || lowEnd || isMobileDevice;
   });
 
@@ -98,12 +99,12 @@ export default function NoirSkyline() {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     const checkReducedMotion = () => {
-      const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
+      const isMobileDevice = window.innerWidth <= BREAKPOINTS.MD || window.matchMedia('(pointer: coarse)').matches;
       setReducedMotion(mediaQuery.matches || lowEnd || isMobileDevice);
     };
 
     const mediaListener = (e: MediaQueryListEvent) => {
-      const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
+      const isMobileDevice = window.innerWidth <= BREAKPOINTS.MD || window.matchMedia('(pointer: coarse)').matches;
       setReducedMotion(e.matches || lowEnd || isMobileDevice);
     };
     mediaQuery.addEventListener('change', mediaListener);
@@ -112,7 +113,7 @@ export default function NoirSkyline() {
     let rafId: number | null = null;
     const handleMouseMove = (e: MouseEvent) => {
       if (isTransitioningRef.current) return;
-      const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
+      const isMobileDevice = window.innerWidth <= BREAKPOINTS.MD || window.matchMedia('(pointer: coarse)').matches;
       if (mediaQuery.matches || isMobileDevice) return;
       if (rafId) cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
@@ -123,7 +124,7 @@ export default function NoirSkyline() {
       });
     };
 
-    const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
+    const isMobileDevice = window.innerWidth <= BREAKPOINTS.MD || window.matchMedia('(pointer: coarse)').matches;
     if (!isMobileDevice && !mediaQuery.matches && !lowEnd) {
       window.addEventListener('mousemove', handleMouseMove);
     }
