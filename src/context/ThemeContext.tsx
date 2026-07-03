@@ -13,6 +13,8 @@ interface ThemeContextType {
   toggleDetailsHidden: () => void;
   audience: Audience | null;
   setAudience: (audience: Audience) => void;
+  prevAudience: Audience | null;
+  modeTransitionSeed: number;
 }
 
 interface ThemeTransitionContextType {
@@ -34,6 +36,8 @@ export function ThemeProvider({
 }) {
   const [theme, setTheme] = useState<Theme>(() => initialTheme);
   const [audience, setAudienceState] = useState<Audience | null>(() => initialAudience);
+  const [prevAudience, setPrevAudience] = useState<Audience | null>(null);
+  const [modeTransitionSeed, setModeTransitionSeed] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [pendingTheme, setPendingTheme] = useState<Theme | null>(null);
   const [isDetailsHidden, setIsDetailsHidden] = useState(false);
@@ -94,10 +98,12 @@ export function ThemeProvider({
   }, [audience]);
 
   const setAudience = useCallback((newAudience: Audience) => {
+    setPrevAudience(audience);
+    setModeTransitionSeed((s) => s + 1);
     setAudienceState(newAudience);
     localStorage.setItem('audience', newAudience);
     document.cookie = `audience=${newAudience}; path=/; max-age=31536000; SameSite=Lax`;
-  }, []);
+  }, [audience]);
 
   const toggleTheme = useCallback(
     () => {
@@ -139,8 +145,10 @@ export function ThemeProvider({
     isDetailsHidden,
     toggleDetailsHidden,
     audience,
-    setAudience
-  }), [theme, toggleTheme, isNoir, isDetailsHidden, toggleDetailsHidden, audience, setAudience]);
+    setAudience,
+    prevAudience,
+    modeTransitionSeed,
+  }), [theme, toggleTheme, isNoir, isDetailsHidden, toggleDetailsHidden, audience, setAudience, prevAudience, modeTransitionSeed]);
 
   const transitionValue = useMemo(() => ({
     isTransitioning,

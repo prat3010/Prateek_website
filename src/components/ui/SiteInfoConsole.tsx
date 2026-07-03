@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useTheme } from '@/context/ThemeContext';
 import {
@@ -606,7 +607,7 @@ export default function SiteInfoConsole() {
                 if (line.type === 'image' && line.imageUrl) {
                   return (
                     <div key={index} className={styles.terminalImageContainer}>
-                      <img src={line.imageUrl} alt="PhonePe QR Code" className={styles.terminalImage} />
+                      <Image src={line.imageUrl} alt="PhonePe QR Code" className={styles.terminalImage} width={200} height={200} unoptimized />
                     </div>
                   );
                 }

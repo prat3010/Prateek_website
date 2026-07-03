@@ -8,6 +8,8 @@ import { useTypewriter } from '@/hooks/useTypewriter';
 import { NAVBAR_SCROLL_OFFSET } from '@/lib/constants';
 import { useTheme } from '@/context/ThemeContext';
 import ComicPanel from '@/components/ui/ComicPanel';
+import Scrambler from '@/components/ui/Scrambler';
+import type { ScramblerProps } from '@/components/ui/Scrambler';
 import { businessStandardTaglines, businessNoirTaglines } from '@/data/taglines';
 import styles from './Hero.module.css';
 
@@ -25,6 +27,36 @@ interface HeroCopy {
   ctaLink: string;
   vibeLabel: string;
 }
+
+const HEADLINE_TEXTS: ScramblerProps['texts'] = {
+  developer: { light: 'CRAFTING DIGITAL WORLDS.', noir: 'SHADOWS & SYNTAX.' },
+  business:  { light: 'BUILDING DIGITAL PRODUCTS.', noir: 'LOGIC & OUTCOMES.' },
+};
+
+const BADGE_TEXTS: ScramblerProps['texts'][] = [
+  {
+    developer: { light: 'Developer', noir: 'Developer' },
+    business:  { light: 'Tech Partner',   noir: 'Tech Partner' },
+  },
+  {
+    developer: { light: 'Designer', noir: 'Designer' },
+    business:  { light: 'Product Builder', noir: 'Product Builder' },
+  },
+  {
+    developer: { light: 'Storyteller', noir: 'Storyteller' },
+    business:  { light: 'Consultant',      noir: 'Consultant' },
+  },
+];
+
+const VIBE_TEXTS: ScramblerProps['texts'] = {
+  developer: { light: 'NARRATOR:',    noir: 'CONFESSIONAL:' },
+  business:  { light: 'SUMMARY:',     noir: 'OBJECTIVE:' },
+};
+
+const CTA_TEXTS: ScramblerProps['texts'] = {
+  developer: { light: 'View My Work →',    noir: 'View My Work →' },
+  business:  { light: 'View Services →',   noir: 'View Services →' },
+};
 
 const HERO_COPY: Record<'developer' | 'business', Record<'light' | 'noir', HeroCopy>> = {
   developer: {
@@ -134,25 +166,41 @@ function HeroClientContent({ taglines }: HeroClientProps) {
   return (
     <div className={styles.content}>
       <div className={styles.textSide}>
-        <h1 className={styles.headline}>
+        <Scrambler
+          texts={HEADLINE_TEXTS}
+          variant="headline"
+          as="h1"
+          className={styles.headline}
+        >
           {copy.headline}
-        </h1>
+        </Scrambler>
 
         <div className={styles.subtitleContainer}>
           <span className={styles.brandingName}>PRATEEQ</span>
           <div className={styles.taglineBadges}>
-            {copy.taglineBadges.map((badge) => (
-              <span key={badge} className={styles.tagBadge}>
+            {copy.taglineBadges.map((badge, i) => (
+              <Scrambler
+                key={badge}
+                texts={BADGE_TEXTS[i]}
+                variant="badge"
+                as="span"
+                className={styles.tagBadge}
+              >
                 {badge}
-              </span>
+              </Scrambler>
             ))}
           </div>
         </div>
 
         <div className={styles.vibeBox} aria-live="polite">
-          <span className={styles.vibeLabel}>
+          <Scrambler
+            texts={VIBE_TEXTS}
+            variant="badge"
+            as="span"
+            className={styles.vibeLabel}
+          >
             {copy.vibeLabel}
-          </span>{' '}
+          </Scrambler>{' '}
           <span className={styles.typedText}>
             <span className="sr-only">{tagline}</span>
             <span aria-hidden="true">
@@ -170,7 +218,14 @@ function HeroClientContent({ taglines }: HeroClientProps) {
             className={styles.ctaButton}
             onClick={handleScrollToCTA}
           >
-            <span className={styles.ctaText}>{copy.ctaText}</span>
+            <Scrambler
+              texts={CTA_TEXTS}
+              variant="nav-label"
+              as="span"
+              className={styles.ctaText}
+            >
+              {copy.ctaText}
+            </Scrambler>
           </a>
 
           <Link

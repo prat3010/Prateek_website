@@ -1,0 +1,11 @@
+.scrambler {
+  white-space: pre-wrap;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-code), 'JetBrains Mono', monospace;
+}
+
+.char {
+  display: inline-block;
+  width: 1ch;
+  text-align: center;
+}

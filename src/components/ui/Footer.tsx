@@ -4,7 +4,14 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { Heart, BarChart2 } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
+import Scrambler from '@/components/ui/Scrambler';
+import type { ScramblerProps } from '@/components/ui/Scrambler';
 import styles from './Footer.module.css';
+
+const NAV_LABEL_TEXTS: ScramblerProps['texts'] = {
+  developer: { light: 'Resume',    noir: 'Resume' },
+  business:  { light: 'Quotation', noir: 'Quotation' },
+};
 
 export interface SocialLink {
   label: string;
@@ -159,7 +166,13 @@ export default function Footer({ socials, className }: FooterProps) {
                   <div className={styles.comicNavLinks}>
                     {navItems.map((item) => (
                       <Link key={item.href} href={item.href} className={styles.comicNavLink}>
-                        {item.label}
+                        {item.href === '/#resume' ? (
+                          <Scrambler texts={NAV_LABEL_TEXTS} variant="nav-label" as="span">
+                            {item.label}
+                          </Scrambler>
+                        ) : (
+                          item.label
+                        )}
                       </Link>
                     ))}
                   </div>
@@ -277,7 +290,13 @@ export default function Footer({ socials, className }: FooterProps) {
                         <div key={item.href} className={styles.treeItem}>
                           <span className={styles.treePipe}>{isLast ? '└── ' : '├── '}</span>
                           <Link href={item.href} className={styles.treeLink}>
-                            {item.label.toLowerCase()}
+                            {item.href === '/#resume' ? (
+                              <Scrambler texts={NAV_LABEL_TEXTS} variant="nav-label" as="span">
+                                {item.label.toLowerCase()}
+                              </Scrambler>
+                            ) : (
+                              item.label.toLowerCase()
+                            )}
                           </Link>
                         </div>
                       );

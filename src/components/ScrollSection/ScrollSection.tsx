@@ -7,7 +7,6 @@ import styles from './ScrollSection.module.css';
 
 interface Props {
   children: React.ReactNode;
-  direction: 'left' | 'right';
   verticalOffset?: number;
   centerOnly?: boolean;
   gap?: number;
@@ -40,7 +39,7 @@ function measure(el: HTMLElement): SectionMetrics {
   };
 }
 
-export default function ScrollSection({ children, direction, verticalOffset, centerOnly, gap = 0 }: Props) {
+export default function ScrollSection({ children, verticalOffset, centerOnly, gap = 0 }: Props) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useLenisScroll();
   const prefersReducedMotion = useReducedMotion();

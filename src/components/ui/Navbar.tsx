@@ -4,8 +4,15 @@ import { useState, useEffect, useCallback, useMemo, useRef, type MouseEvent } fr
 import { useLenis } from 'lenis/react';
 import { useTheme } from '@/context/ThemeContext';
 import { useLenisScroll } from '@/context/LenisProvider';
+import Scrambler from '@/components/ui/Scrambler';
+import type { ScramblerProps } from '@/components/ui/Scrambler';
 import { NAVBAR_SCROLL_OFFSET } from '@/lib/constants';
 import styles from './Navbar.module.css';
+
+const NAV_LABEL_TEXTS: ScramblerProps['texts'] = {
+  developer: { light: 'Resume',    noir: 'Resume' },
+  business:  { light: 'Quotation', noir: 'Quotation' },
+};
 
 export interface NavItem {
   label: string;
@@ -186,7 +193,13 @@ export default function Navbar({ items, className }: NavbarProps) {
                 className={`${styles.navLink} ${activeSection === item.href ? styles.active : ''}`}
                 onClick={(e) => handleNavClick(e, item.href)}
               >
-                {item.label}
+                {item.href === '/#resume' ? (
+                  <Scrambler texts={NAV_LABEL_TEXTS} variant="nav-label" as="span">
+                    {item.label}
+                  </Scrambler>
+                ) : (
+                  item.label
+                )}
               </a>
             </li>
           ))}
@@ -239,7 +252,13 @@ export default function Navbar({ items, className }: NavbarProps) {
             className={`${styles.mobileNavLink} ${activeSection === item.href ? styles.active : ''}`}
             onClick={(e) => handleNavClick(e, item.href)}
           >
-            {item.label}
+            {item.href === '/#resume' ? (
+              <Scrambler texts={NAV_LABEL_TEXTS} variant="nav-label" as="span">
+                {item.label}
+              </Scrambler>
+            ) : (
+              item.label
+            )}
           </a>
         ))}
       </div>

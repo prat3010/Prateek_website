@@ -4,8 +4,20 @@ import React from 'react';
 import Link from 'next/link';
 import ComicPanel from '@/components/ui/ComicPanel';
 import { useTheme } from '@/context/ThemeContext';
+import Scrambler from '@/components/ui/Scrambler';
+import type { ScramblerProps } from '@/components/ui/Scrambler';
 import { BookOpen, ArrowRight } from 'lucide-react';
 import styles from './BlogSection.module.css';
+
+const BLOG_SECTION_TITLE_TEXTS: ScramblerProps['texts'] = {
+  developer: { light: 'LATEST WRITINGS',         noir: 'LOG_ENTRIES' },
+  business:  { light: 'INSIGHTS & CASE STUDIES',  noir: 'CASE STUDIES & METRICS' },
+};
+
+const BLOG_VIEW_ALL_TEXTS: ScramblerProps['texts'] = {
+  developer: { light: 'VIEW ALL',     noir: 'ALL_LOGS' },
+  business:  { light: 'READ ALL',     noir: 'ALL_INSIGHTS' },
+};
 
 interface SimpleBlogPost {
   slug: string;
@@ -53,11 +65,22 @@ function BlogSection({ posts }: { posts: SimpleBlogPost[] }) {
     <section id="blog" className={styles.blogSection} aria-label="Writings">
       <div className={styles.container}>
         <div className={styles.header}>
-          <h2 className={styles.sectionTitle}>
+          <Scrambler
+            texts={BLOG_SECTION_TITLE_TEXTS}
+            variant="section-title"
+            as="h2"
+            className={styles.sectionTitle}
+          >
             {copy.sectionTitle}
-          </h2>
+          </Scrambler>
           <Link href="/blog" className={styles.viewAllBtn}>
-            <span>{copy.viewAllText}</span>
+            <Scrambler
+              texts={BLOG_VIEW_ALL_TEXTS}
+              variant="nav-label"
+              as="span"
+            >
+              {copy.viewAllText}
+            </Scrambler>
             <ArrowRight size={16} />
           </Link>
         </div>

@@ -2,6 +2,7 @@
 
 import React, { useMemo } from 'react';
 import Image from 'next/image';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useTheme } from '@/context/ThemeContext';
 import type { ResumeData } from '@/data/resume';
 import ComicPanel from '@/components/ui/ComicPanel';
@@ -114,18 +115,36 @@ function About({ resumeData }: AboutProps) {
 
           <div className={styles.textColumn}>
             <SpeechBubble direction="left" className={styles.bioBubble}>
-              <p className={styles.bioText}>
-                {parsedBio}
-              </p>
+              <AnimatePresence mode="wait">
+                <motion.p
+                  key={activeAudience + '-' + (isNoir ? 'noir' : 'light')}
+                  className={styles.bioText}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {parsedBio}
+                </motion.p>
+              </AnimatePresence>
             </SpeechBubble>
 
-            <div className={styles.funFacts}>
-              {factsList.map((fact) => (
-                <CaptionBox key={fact} className={styles.factBox}>
-                  {fact}
-                </CaptionBox>
-              ))}
-            </div>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeAudience + '-' + (isNoir ? 'noir' : 'light')}
+                className={styles.funFacts}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {factsList.map((fact) => (
+                  <CaptionBox key={fact} className={styles.factBox}>
+                    {fact}
+                  </CaptionBox>
+                ))}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
       </div>

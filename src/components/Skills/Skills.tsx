@@ -3,6 +3,8 @@
 import React, { useMemo } from 'react';
 import type { Skill } from '@/data/skills';
 import { useTheme } from '@/context/ThemeContext';
+import Scrambler from '@/components/ui/Scrambler';
+import type { ScramblerProps } from '@/components/ui/Scrambler';
 import { 
   Zap, 
   Sparkles, 
@@ -107,6 +109,45 @@ const SKILLS_COPY: Record<'developer' | 'business', Record<'light' | 'noir', Ski
   }
 };
 
+const SKILL_SECTION_TITLE_TEXTS: ScramblerProps['texts'] = {
+  developer: { light: 'CAPABILITIES',              noir: 'CAPABILITIES' },
+  business:  { light: 'SERVICES & CAPABILITIES',    noir: 'SERVICES & CAPABILITIES' },
+};
+
+const SKILL_MO_BADGE_TEXTS: ScramblerProps['texts'] = {
+  developer: { light: 'MY M.O.',     noir: 'CASE FILE' },
+  business:  { light: 'ENGAGEMENT',  noir: 'PROTOCOL' },
+};
+
+const SKILL_MO_HEADER_TEXTS: ScramblerProps['texts'] = {
+  developer: { light: 'METHOD OF OPERATION',      noir: 'DEVELOPMENT METHODOLOGY' },
+  business:  { light: 'HOW WE WORK',               noir: 'ENGAGEMENT MODEL' },
+};
+
+const SKILL_TAB_TEXTS: ScramblerProps['texts'][] = [
+  {
+    developer: { light: 'I. AI ORCHESTRATION',  noir: 'I. AI ORCHESTRATION' },
+    business:  { light: 'I. AI INTEGRATION',     noir: 'I. AI INTEGRATION' },
+  },
+  {
+    developer: { light: 'II. SYSTEMS & LOGIC',  noir: 'II. SYSTEMS & LOGIC' },
+    business:  { light: 'II. WEB APPLICATIONS',  noir: 'II. WEB APPLICATIONS' },
+  },
+  {
+    developer: { light: 'III. PRODUCT & UX',    noir: 'III. PRODUCT & UX' },
+    business:  { light: 'III. DESIGN & UX',      noir: 'III. DESIGN & UX' },
+  },
+  {
+    developer: { light: 'IV. DYNAMIC COMMAND',  noir: 'IV. DYNAMIC COMMAND' },
+    business:  { light: 'IV. DYNAMIC CONSULTING', noir: 'IV. DYNAMIC CONSULTING' },
+  },
+];
+
+const SKILL_FORGED_LABEL_TEXTS: ScramblerProps['texts'] = {
+  developer: { light: 'FORGED IN:',  noir: 'FORGED IN:' },
+  business:  { light: 'APPLIED IN:', noir: 'APPLIED IN:' },
+};
+
 function Skills({ skills }: SkillsProps) {
   const { isNoir, audience } = useTheme();
   const [activeTab, setActiveTab] = React.useState<'orchestration' | 'logic' | 'product' | 'dynamic'>('logic');
@@ -160,7 +201,14 @@ function Skills({ skills }: SkillsProps) {
         
         {skill.projects && skill.projects.length > 0 && (
           <div className={styles.dossierForged}>
-            <span className={styles.dossierForgedLabel}>{forgedLabel}</span>
+            <Scrambler
+              texts={SKILL_FORGED_LABEL_TEXTS}
+              variant="nav-label"
+              as="span"
+              className={styles.dossierForgedLabel}
+            >
+              {forgedLabel}
+            </Scrambler>
             <div className={styles.dossierTags}>
               {skill.projects.map(proj => (
                 <a 
@@ -199,17 +247,32 @@ function Skills({ skills }: SkillsProps) {
   return (
     <section id="capabilities" className={styles.skills} aria-label="Capabilities">
       <div className={styles.container}>
-        <h2 className={styles.sectionTitle}>
+        <Scrambler
+          texts={SKILL_SECTION_TITLE_TEXTS}
+          variant="section-title"
+          as="h2"
+          className={styles.sectionTitle}
+        >
           {copy.sectionTitle}
-        </h2>
+        </Scrambler>
 
         <div className={styles.moBanner}>
-          <div className={styles.moBadge}>
+          <Scrambler
+            texts={SKILL_MO_BADGE_TEXTS}
+            variant="badge"
+            as="div"
+            className={styles.moBadge}
+          >
             {copy.moBadge}
-          </div>
-          <div className={styles.moHeader}>
+          </Scrambler>
+          <Scrambler
+            texts={SKILL_MO_HEADER_TEXTS}
+            variant="section-title"
+            as="div"
+            className={styles.moHeader}
+          >
             {copy.moHeader}
-          </div>
+          </Scrambler>
           <p className={styles.moText}>
             {copy.moText}
           </p>
@@ -229,7 +292,13 @@ function Skills({ skills }: SkillsProps) {
               '--tab-neon': 'var(--neon-pink)'
             } as React.CSSProperties}
           >
-            {copy.tabs.orchestration}
+            <Scrambler
+              texts={SKILL_TAB_TEXTS[0]}
+              variant="nav-label"
+              as="span"
+            >
+              {copy.tabs.orchestration}
+            </Scrambler>
           </button>
           <button 
             role="tab"
@@ -243,7 +312,13 @@ function Skills({ skills }: SkillsProps) {
               '--tab-neon': 'var(--neon-cyan)'
             } as React.CSSProperties}
           >
-            {copy.tabs.logic}
+            <Scrambler
+              texts={SKILL_TAB_TEXTS[1]}
+              variant="nav-label"
+              as="span"
+            >
+              {copy.tabs.logic}
+            </Scrambler>
           </button>
           <button 
             role="tab"
@@ -257,7 +332,13 @@ function Skills({ skills }: SkillsProps) {
               '--tab-neon': 'var(--neon-yellow)'
             } as React.CSSProperties}
           >
-            {copy.tabs.product}
+            <Scrambler
+              texts={SKILL_TAB_TEXTS[2]}
+              variant="nav-label"
+              as="span"
+            >
+              {copy.tabs.product}
+            </Scrambler>
           </button>
           <button 
             role="tab"
@@ -271,7 +352,13 @@ function Skills({ skills }: SkillsProps) {
               '--tab-neon': 'var(--neon-purple)'
             } as React.CSSProperties}
           >
-            {copy.tabs.dynamic}
+            <Scrambler
+              texts={SKILL_TAB_TEXTS[3]}
+              variant="nav-label"
+              as="span"
+            >
+              {copy.tabs.dynamic}
+            </Scrambler>
           </button>
         </div>
 

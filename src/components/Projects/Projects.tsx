@@ -6,7 +6,14 @@ import Image from 'next/image';
 import { ExternalLink, Code2 } from 'lucide-react';
 import { type Project } from '@/data/projects';
 import { useTheme } from '@/context/ThemeContext';
+import Scrambler from '@/components/ui/Scrambler';
+import type { ScramblerProps } from '@/components/ui/Scrambler';
 import styles from './Projects.module.css';
+
+const PROJECT_SECTION_TITLE_TEXTS: ScramblerProps['texts'] = {
+  developer: { light: 'EPIC ADVENTURES', noir: 'EPIC ADVENTURES' },
+  business:  { light: 'SELECTED WORK',   noir: 'SELECTED WORK' },
+};
 
 interface ProjectsProps {
   projects: Project[];
@@ -167,9 +174,14 @@ function Projects({ projects }: ProjectsProps) {
   return (
     <section id="projects" className={styles.projects} aria-label="Projects">
       <div className={styles.container}>
-        <h2 className={styles.sectionTitle}>
+        <Scrambler
+          texts={PROJECT_SECTION_TITLE_TEXTS}
+          variant="section-title"
+          as="h2"
+          className={styles.sectionTitle}
+        >
           {activeAudience === 'business' ? 'SELECTED WORK' : 'EPIC ADVENTURES'}
-        </h2>
+        </Scrambler>
 
         <div className={styles.grid}>
           {projects.map((project, index) => (

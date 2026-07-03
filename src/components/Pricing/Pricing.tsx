@@ -2,6 +2,8 @@
 
 import React, { useMemo } from 'react';
 import { useTheme } from '@/context/ThemeContext';
+import Scrambler from '@/components/ui/Scrambler';
+import type { ScramblerProps } from '@/components/ui/Scrambler';
 import { useLenis } from 'lenis/react';
 import type { ResumeData, PricingPlan } from '@/data/resume';
 import { NAVBAR_SCROLL_OFFSET } from '@/lib/constants';
@@ -12,6 +14,11 @@ import styles from './Pricing.module.css';
 interface PricingProps {
   resumeData: ResumeData | null;
 }
+
+const PRICING_SECTION_TITLE_TEXTS: ScramblerProps['texts'] = {
+  developer: { light: 'CONSULTING RATES', noir: 'CONSULTING RATES' },
+  business:  { light: 'SERVICE PACKAGES', noir: 'SERVICE PACKAGES' },
+};
 
 function Pricing({ resumeData }: PricingProps) {
   const { isNoir, audience } = useTheme();
@@ -119,9 +126,14 @@ function Pricing({ resumeData }: PricingProps) {
   return (
     <section id="pricing" className={styles.pricingSection} aria-label="Pricing Packages">
       <div className={styles.container}>
-        <h2 className={styles.sectionTitle}>
+        <Scrambler
+          texts={PRICING_SECTION_TITLE_TEXTS}
+          variant="section-title"
+          as="h2"
+          className={styles.sectionTitle}
+        >
           {activeAudience === 'business' ? 'SERVICE PACKAGES' : 'CONSULTING RATES'}
-        </h2>
+        </Scrambler>
 
         <div className={styles.grid}>
           {plans.map((plan, index) => (
