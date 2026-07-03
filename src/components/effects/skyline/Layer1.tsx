@@ -6,7 +6,7 @@ import { WobblyPath, WobblyLine, WobblyRect, WobblyPolygon } from '../WobblySVG'
 import { LayerProps } from './types';
 
 const Layer1 = React.memo(function Layer1({ reducedMotion }: LayerProps) {
-  const wobble = !reducedMotion;
+  const wobble = !reducedMotion; // Enable background wobble with pathCache protection
   const strength = 2.0; // Subtle background wobble
   return (
     <>

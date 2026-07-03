@@ -85,6 +85,7 @@ export interface UseScrambledTextOptions {
   staggerPerChar: number;
   triggerSeed: number;
   onDone?: () => void;
+  enabled?: boolean;
 }
 
 function maxLen(a: string, b: string): number {
@@ -98,6 +99,7 @@ export function useScrambledText({
   staggerPerChar,
   triggerSeed,
   onDone,
+  enabled = true,
 }: UseScrambledTextOptions) {
   const [chars, setChars] = useState<ScrambledCharData[]>(() =>
     buildChars(targetText),
@@ -110,7 +112,7 @@ export function useScrambledText({
   }, [onDone]);
 
   useEffect(() => {
-    if (triggerSeed === 0) return;
+    if (triggerSeed === 0 || !enabled) return;
 
     const len = maxLen(sourceText, targetText);
     const totalDuration = duration + staggerPerChar * len;
@@ -178,7 +180,7 @@ export function useScrambledText({
     };
     /* Values captured by closure — intentionally stable per trigger */
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [triggerSeed]);
+  }, [triggerSeed, enabled]);
 
   return { chars };
 }

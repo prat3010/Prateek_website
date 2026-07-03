@@ -69,8 +69,25 @@ export default function ScrollSection({ children, verticalOffset, centerOnly, ga
     centerOnlyRef.current = centerOnly;
   });
 
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    if (prefersReducedMotion || isMobile) return;
+    const el = wrapperRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(([entry]) => {
+      setInView(entry.isIntersecting);
+    }, {
+      rootMargin: '200px 0px 200px 0px'
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [prefersReducedMotion, isMobile]);
+
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
+    if (prefersReducedMotion || isMobile || !inView) return;
     const el = wrapperRef.current;
     if (!el) return;
 
@@ -157,7 +174,7 @@ export default function ScrollSection({ children, verticalOffset, centerOnly, ga
       ro.disconnect();
       unsub();
     };
-  }, [scrollY]);
+  }, [scrollY, inView, isMobile, prefersReducedMotion]);
   /* eslint-enable react-hooks/exhaustive-deps */
 
   if (prefersReducedMotion || isMobile) {

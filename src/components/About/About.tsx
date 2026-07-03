@@ -3,7 +3,7 @@
 import React, { useMemo } from 'react';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useTheme } from '@/context/ThemeContext';
+import { useTheme, useAudience } from '@/context/ThemeContext';
 import type { ResumeData } from '@/data/resume';
 import ComicPanel from '@/components/ui/ComicPanel';
 import SpeechBubble from '@/components/ui/SpeechBubble';
@@ -15,7 +15,8 @@ interface AboutProps {
 }
 
 function About({ resumeData }: AboutProps) {
-  const { isNoir, audience } = useTheme();
+  const { isNoir } = useTheme();
+  const { audience } = useAudience();
 
   const activeAudience = audience || 'developer';
   const bioContent = resumeData?.about?.[activeAudience];

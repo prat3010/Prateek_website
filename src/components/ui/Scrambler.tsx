@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import type { Audience, Theme } from '@/context/ThemeContext';
-import { useTheme } from '@/context/ThemeContext';
+import { useTheme, useAudience } from '@/context/ThemeContext';
 import { useScrambledText, type ScrambledCharData } from '@/hooks/useScrambledText';
 import styles from './Scrambler.module.css';
 
@@ -41,16 +41,32 @@ export default function Scrambler({
   id,
   children,
 }: ScramblerProps) {
-  const { audience, prevAudience, isNoir, modeTransitionSeed } = useTheme();
+  const { isNoir } = useTheme();
+  const { audience, prevAudience, modeTransitionSeed } = useAudience();
+
+  const containerRef = useRef<HTMLSpanElement & HTMLHeadingElement & HTMLParagraphElement & HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  const [showScramble, setShowScramble] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || reducedMotion) return;
+
+    const observer = new IntersectionObserver(([entry]) => {
+      setInView(entry.isIntersecting);
+    }, {
+      rootMargin: '100px 0px 100px 0px'
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [reducedMotion]);
 
   const activeAudience: Audience = audience ?? 'developer';
   const previousAudience: Audience = prevAudience ?? 'developer';
 
   const sourceText = texts[previousAudience][isNoir ? 'noir' : 'light'];
   const targetText = texts[activeAudience][isNoir ? 'noir' : 'light'];
-
-  const [showScramble, setShowScramble] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -70,6 +86,7 @@ export default function Scrambler({
     staggerPerChar: VARIANT_CONFIG[variant].stagger,
     triggerSeed: modeTransitionSeed,
     onDone: () => setShowScramble(false),
+    enabled: inView,
   });
 
   const prevSeed = useRef(modeTransitionSeed);
@@ -77,15 +94,16 @@ export default function Scrambler({
   useEffect(() => {
     if (modeTransitionSeed > 0 && modeTransitionSeed !== prevSeed.current) {
       prevSeed.current = modeTransitionSeed;
-      if (reducedMotion) return;
+      if (reducedMotion || !inView) return;
       const id = requestAnimationFrame(() => setShowScramble(true));
       return () => cancelAnimationFrame(id);
     }
-  }, [modeTransitionSeed, reducedMotion]);
+  }, [modeTransitionSeed, reducedMotion, inView]);
 
   if (!reducedMotion && showScramble) {
     return (
       <Tag
+        ref={containerRef}
         id={id}
         className={`${className ?? ''} ${styles.scrambler}`}
         aria-label={ariaLabel ?? targetText}
@@ -106,7 +124,7 @@ export default function Scrambler({
   }
 
   return (
-    <Tag id={id} className={className} aria-label={ariaLabel} aria-live="polite">
+    <Tag ref={containerRef} id={id} className={className} aria-label={ariaLabel} aria-live="polite">
       {children ?? targetText}
     </Tag>
   );

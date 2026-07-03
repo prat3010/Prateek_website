@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import Navbar from '@/components/ui/Navbar';
 import Footer from '@/components/ui/Footer';
 import type { Theme, Audience } from '@/context/ThemeContext';
-import { ThemeProvider, useTheme } from '@/context/ThemeContext';
+import { ThemeProvider, useAudience } from '@/context/ThemeContext';
 import { LenisProvider } from '@/context/LenisProvider';
 import ThemeTransition from '@/components/effects/ThemeTransition';
 import { LazyMotion, domAnimation } from 'framer-motion';
@@ -37,13 +37,37 @@ function ClientLayoutContent({
   isAdminRoute: boolean; 
   isKonamiActive: boolean; 
 }) {
-  const { audience } = useTheme();
+  const { audience } = useAudience();
+  const [shouldRenderCursor, setShouldRenderCursor] = useState(false);
+
+  useEffect(() => {
+    if (isAdminRoute) return;
+
+    if (typeof window !== 'undefined') {
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const lowCores = (navigator.hardwareConcurrency ?? 4) < 4;
+      const connection = (navigator as unknown as { connection?: { saveData?: boolean } }).connection;
+      const saveData = connection?.saveData;
+
+      if (prefersReduced || lowCores || saveData) {
+        return; // Skip rendering CursorTrail for low-spec/reduced-motion devices
+      }
+    }
+
+    const handleFirstMove = () => {
+      setShouldRenderCursor(true);
+      window.removeEventListener('mousemove', handleFirstMove);
+    };
+
+    window.addEventListener('mousemove', handleFirstMove, { passive: true });
+    return () => window.removeEventListener('mousemove', handleFirstMove);
+  }, [isAdminRoute]);
 
   return (
     <LenisProvider>
       <ThemeTransition />
       {!isAdminRoute && <NoirSkyline />}
-      {!isAdminRoute && <CursorTrail />}
+      {!isAdminRoute && shouldRenderCursor && <CursorTrail />}
       {!isAdminRoute && <Navbar />}
       
       {audience === null ? (

@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import type { Skill } from '@/data/skills';
-import { useTheme } from '@/context/ThemeContext';
+import { useTheme, useAudience } from '@/context/ThemeContext';
 import Scrambler from '@/components/ui/Scrambler';
 import type { ScramblerProps } from '@/components/ui/Scrambler';
 import { 
@@ -149,7 +149,8 @@ const SKILL_FORGED_LABEL_TEXTS: ScramblerProps['texts'] = {
 };
 
 function Skills({ skills }: SkillsProps) {
-  const { isNoir, audience } = useTheme();
+  const { isNoir } = useTheme();
+  const { audience } = useAudience();
   const [activeTab, setActiveTab] = React.useState<'orchestration' | 'logic' | 'product' | 'dynamic'>('logic');
 
   const activeAudience = audience || 'developer';

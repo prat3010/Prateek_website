@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useLenis } from 'lenis/react';
 import { useTypewriter } from '@/hooks/useTypewriter';
 import { NAVBAR_SCROLL_OFFSET } from '@/lib/constants';
-import { useTheme } from '@/context/ThemeContext';
+import { useTheme, useAudience } from '@/context/ThemeContext';
 import ComicPanel from '@/components/ui/ComicPanel';
 import Scrambler from '@/components/ui/Scrambler';
 import type { ScramblerProps } from '@/components/ui/Scrambler';
@@ -114,7 +114,8 @@ const HERO_COPY: Record<'developer' | 'business', Record<'light' | 'noir', HeroC
 };
 
 function HeroClientContent({ taglines }: HeroClientProps) {
-  const { isNoir, audience } = useTheme();
+  const { isNoir } = useTheme();
+  const { audience } = useAudience();
   const lenis = useLenis();
 
   // Resolve dynamic tags list based on active audience and theme
@@ -242,26 +243,29 @@ function HeroClientContent({ taglines }: HeroClientProps) {
       <div className={styles.imageSide}>
         <ComicPanel tilt={2} className={styles.heroPanel} staticDots>
           <div className={styles.imageWrapper}>
-            <Image
-              src="/images/hero-noir.webp"
-              alt="Prateeq Sharma hero illustration"
-              fill
-              priority
-              fetchPriority="high"
-              sizes="(max-width: 768px) 280px, 420px"
-              className={`${styles.heroImage} ${styles.darkOnly}`}
-              style={{ objectFit: 'cover', objectPosition: 'center' }}
-            />
-            <Image
-              src="/images/hero-illustration-wavy.webp"
-              alt="Prateeq Sharma hero illustration"
-              fill
-              priority
-              fetchPriority="high"
-              sizes="(max-width: 768px) 280px, 420px"
-              className={`${styles.heroImage} ${styles.lightOnly}`}
-              style={{ objectFit: 'cover', objectPosition: 'center' }}
-            />
+            {isNoir ? (
+              <Image
+                src="/images/hero-noir.webp"
+                alt="Prateeq Sharma hero illustration"
+                fill
+                priority
+                fetchPriority="high"
+                sizes="(max-width: 768px) 280px, 420px"
+                className={`${styles.heroImage} ${styles.darkOnly}`}
+                style={{ objectFit: 'cover', objectPosition: 'center' }}
+              />
+            ) : (
+              <Image
+                src="/images/hero-illustration-wavy.webp"
+                alt="Prateeq Sharma hero illustration"
+                fill
+                priority
+                fetchPriority="high"
+                sizes="(max-width: 768px) 280px, 420px"
+                className={`${styles.heroImage} ${styles.lightOnly}`}
+                style={{ objectFit: 'cover', objectPosition: 'center' }}
+              />
+            )}
           </div>
         </ComicPanel>
       </div>

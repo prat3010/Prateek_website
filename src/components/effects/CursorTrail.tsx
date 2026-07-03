@@ -224,7 +224,7 @@ export default function CursorTrail() {
         const tipX = cig.x + Math.cos(cig.angle) * (activeL - ashLength);
         const tipY = cig.y + Math.sin(cig.angle) * (activeL - ashLength);
 
-        if (Math.random() < 0.5 * fade) {
+        if (Math.random() < 0.3 * fade) {
           smokeRef.current.push({
             x: tipX,
             y: tipY,
@@ -243,7 +243,7 @@ export default function CursorTrail() {
 
       const smoke = smokeRef.current;
       
-      while (smoke.length > 80) {
+      while (smoke.length > 35) {
         smoke.shift();
       }
 
@@ -433,7 +433,7 @@ export default function CursorTrail() {
     if (!canvas) return;
 
     const handleResize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
       canvas.style.width = `${window.innerWidth}px`;
@@ -464,9 +464,6 @@ export default function CursorTrail() {
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     document.addEventListener('mouseleave', handleMouseLeave);
     document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    isLoopActiveRef.current = true;
-    frameRef.current = requestAnimationFrame(() => drawRef.current?.());
 
     return () => {
       window.removeEventListener('resize', handleResize);

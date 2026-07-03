@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import type { ResumeData, WorkExperience } from '@/data/resume';
 import type { Certificate } from '@/data/certificates';
-import { useTheme } from '@/context/ThemeContext';
+import { useTheme, useAudience } from '@/context/ThemeContext';
 import Scrambler from '@/components/ui/Scrambler';
 import type { ScramblerProps } from '@/components/ui/Scrambler';
 import ComicPanel from '@/components/ui/ComicPanel';
@@ -39,7 +39,8 @@ const RESUME_BUTTON_TEXTS: ScramblerProps['texts'] = {
 };
 
 function Resume({ resumeData, certificates }: ResumeProps) {
-  const { isNoir, audience } = useTheme();
+  const { isNoir } = useTheme();
+  const { audience } = useAudience();
   const [activePersona, setActivePersona] = useState<Persona>('general');
 
   const activeAudience = audience || 'developer';

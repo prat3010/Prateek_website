@@ -15,23 +15,28 @@ export function useTypewriter({
   delay = 500,
   loop = false,
 }: UseTypewriterOptions) {
-  const [displayText, setDisplayText] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [prevText, setPrevText] = useState(text);
+  const [state, setState] = useState({
+    displayText: '',
+    isTyping: false,
+    prevText: text,
+  });
 
-  if (text !== prevText) {
-    setPrevText(text);
-    setDisplayText('');
-    setIsTyping(false);
+  if (text !== state.prevText) {
+    setState({
+      displayText: '',
+      isTyping: false,
+      prevText: text,
+    });
   }
 
+  const { displayText, isTyping } = state;
   const isDone = !loop && !isTyping && text !== '' && displayText === text;
 
   useEffect(() => {
     if (!text) return;
 
     const delayTimer = setTimeout(() => {
-      setIsTyping(true);
+      setState(prev => ({ ...prev, isTyping: true }));
     }, delay);
 
     return () => {
@@ -44,21 +49,23 @@ export function useTypewriter({
 
     if (displayText.length < text.length) {
       const timeout = setTimeout(() => {
-        setDisplayText(text.slice(0, displayText.length + 1));
+        setState(prev => ({
+          ...prev,
+          displayText: text.slice(0, prev.displayText.length + 1)
+        }));
       }, speed);
       return () => clearTimeout(timeout);
     }
 
     if (!loop) {
       const doneTimer = setTimeout(() => {
-        setIsTyping(false);
+        setState(prev => ({ ...prev, isTyping: false }));
       }, 0);
       return () => clearTimeout(doneTimer);
     }
 
     const loopTimer = setTimeout(() => {
-      setDisplayText('');
-      setIsTyping(true);
+      setState(prev => ({ ...prev, displayText: '', isTyping: true }));
     }, 2000);
     return () => clearTimeout(loopTimer);
   }, [displayText, isTyping, text, speed, loop]);

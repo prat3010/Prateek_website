@@ -3,13 +3,13 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useTheme } from '@/context/ThemeContext';
+import { useDetailsVisibility } from '@/context/ThemeContext';
 import { Terminal } from 'lucide-react';
 import styles from './TerminalButton.module.css';
 
 export default function TerminalButton() {
   const pathname = usePathname();
-  const { isDetailsHidden } = useTheme();
+  const { isDetailsHidden } = useDetailsVisibility();
 
   // Don't show the terminal button on the terminal page itself
   if (pathname === '/terminal') return null;

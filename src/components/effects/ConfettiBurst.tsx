@@ -36,7 +36,11 @@ export interface ConfettiBurstHandle {
   triggerConfetti: (originX?: number, originY?: number) => void;
 }
 
-const ConfettiBurst = forwardRef<ConfettiBurstHandle>(function ConfettiBurst(_, ref) {
+export interface ConfettiBurstProps {
+  autoTrigger?: boolean;
+}
+
+const ConfettiBurst = forwardRef<ConfettiBurstHandle, ConfettiBurstProps>(function ConfettiBurst({ autoTrigger = false }, ref) {
   const { isNoir } = useTheme();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<Particle[]>([]);
@@ -219,6 +223,10 @@ const ConfettiBurst = forwardRef<ConfettiBurstHandle>(function ConfettiBurst(_, 
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas, { passive: true });
 
+    if (autoTrigger) {
+      triggerConfetti(window.innerWidth / 2, window.innerHeight * 0.7);
+    }
+
     const handleVisibilityChange = () => {
       if (document.hidden) {
         isActiveRef.current = false;
@@ -240,7 +248,7 @@ const ConfettiBurst = forwardRef<ConfettiBurstHandle>(function ConfettiBurst(_, 
       cancelAnimationFrame(frameRef.current);
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [resizeCanvas]);
+  }, [resizeCanvas, autoTrigger, triggerConfetti]);
 
   return (
     <canvas

@@ -12,8 +12,6 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
   const [side, setSide] = useState<'left' | 'right'>('left');
   const [alert, setAlert] = useState(false);
   const [scurrying, setScurrying] = useState(false);
-  const [posX, setPosX] = useState(BILLBOARD_SIDES.left);
-  const [posY, setPosY] = useState(BILLBOARD_Y);
 
   const scurryingRef = useRef(false);
   const alertRef = useRef(alert);
@@ -63,8 +61,18 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
     };
   }, [reducedMotion]);
 
+  // Smooth position interpolation during scurrying states directly on the DOM ref
   useEffect(() => {
     if (reducedMotion) return;
+
+    let active = true;
+    let localVisibilityHandler: (() => void) | null = null;
+
+    const updateDOM = (x: number, y: number) => {
+      if (pigeonRef.current) {
+        pigeonRef.current.setAttribute('transform', `translate(${x.toFixed(1)}, ${y.toFixed(1)})`);
+      }
+    };
 
     const startScurry = (nextSide: 'left' | 'right') => {
       if (scurryingRef.current) return;
@@ -78,7 +86,8 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
       let startTime: number | null = null;
 
       const animate = (timestamp: number) => {
-        if (!isVisibleRef.current) { rafRef.current = requestAnimationFrame(animate); return; }
+        if (!active) return;
+        if (document.hidden) return;
         if (!startTime) startTime = timestamp;
         const elapsed = timestamp - startTime;
         const progress = Math.min(elapsed / duration, 1);
@@ -87,24 +96,39 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
         const t = progress;
         const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
 
-        setPosX(startX + eased * (endX - startX));
-        setPosY(BILLBOARD_Y - ARC_PEAK * Math.sin(Math.PI * progress));
+        const currentX = startX + eased * (endX - startX);
+        const currentY = BILLBOARD_Y - ARC_PEAK * Math.sin(Math.PI * progress);
+        updateDOM(currentX, currentY);
         boundingRectRef.current = null; // Invalidate during movement
 
         if (progress < 1) {
           rafRef.current = requestAnimationFrame(animate);
         } else {
-          setPosX(endX);
-          setPosY(BILLBOARD_Y);
+          updateDOM(endX, BILLBOARD_Y);
           setSide(nextSide);
           setScurrying(false);
           scurryingRef.current = false;
           boundingRectRef.current = null;
+          if (localVisibilityHandler) {
+            document.removeEventListener('visibilitychange', localVisibilityHandler);
+            localVisibilityHandler = null;
+          }
         }
       };
 
+      localVisibilityHandler = () => {
+        if (!document.hidden && active) {
+          if (rafRef.current) cancelAnimationFrame(rafRef.current);
+          rafRef.current = requestAnimationFrame(animate);
+        }
+      };
+      document.addEventListener('visibilitychange', localVisibilityHandler);
+
       rafRef.current = requestAnimationFrame(animate);
     };
+
+    // Initialize position on mount/side change
+    updateDOM(BILLBOARD_SIDES[sideRef.current], BILLBOARD_Y);
 
     const handleInteraction = (e: MouseEvent) => {
       if (scurryingRef.current) return;
@@ -126,7 +150,13 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
     };
 
     window.addEventListener('mousemove', handleInteraction, { capture: true, passive: true });
-    return () => window.removeEventListener('mousemove', handleInteraction, { capture: true });
+    return () => {
+      active = false;
+      window.removeEventListener('mousemove', handleInteraction, { capture: true });
+      if (localVisibilityHandler) {
+        document.removeEventListener('visibilitychange', localVisibilityHandler);
+      }
+    };
   }, [reducedMotion]);
 
   useEffect(() => {
@@ -167,7 +197,7 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
   }
 
   return (
-    <g ref={pigeonRef} transform={`translate(${posX}, ${posY})`}>
+    <g ref={pigeonRef} transform={`translate(${BILLBOARD_SIDES.left}, ${BILLBOARD_Y})`}>
       <g transform={`scale(${scaleX}, 1.5)`}>
         <g className={alert ? styles.pigeonHeadBob : styles.pigeonBob}>
           <ellipse cx="0" cy="-3" rx="3" ry="2.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.6" />

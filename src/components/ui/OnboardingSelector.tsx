@@ -2,13 +2,14 @@
 
 import React from 'react';
 import { m } from 'framer-motion';
-import { useTheme } from '@/context/ThemeContext';
+import { useTheme, useAudience } from '@/context/ThemeContext';
 import { Code, Briefcase, Sparkles, Building2 } from 'lucide-react';
 import ComicPanel from './ComicPanel';
 import styles from './OnboardingSelector.module.css';
 
 export default function OnboardingSelector() {
-  const { isNoir, setAudience } = useTheme();
+  const { isNoir } = useTheme();
+  const { setAudience } = useAudience();
 
   const handleSelect = (choice: 'developer' | 'business') => {
     setAudience(choice);

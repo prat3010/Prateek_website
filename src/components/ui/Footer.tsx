@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { Heart, BarChart2 } from 'lucide-react';
-import { useTheme } from '@/context/ThemeContext';
+import { useTheme, useAudience } from '@/context/ThemeContext';
 import Scrambler from '@/components/ui/Scrambler';
 import type { ScramblerProps } from '@/components/ui/Scrambler';
 import styles from './Footer.module.css';
@@ -74,7 +74,8 @@ const defaultSocials: SocialLink[] = [
 ];
 
 export default function Footer({ socials, className }: FooterProps) {
-  const { theme, audience, isNoir } = useTheme();
+  const { theme, isNoir } = useTheme();
+  const { audience } = useAudience();
 
   const navItems = useMemo(() => [
     { label: 'Home', href: '/#home' },

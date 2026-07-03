@@ -17,7 +17,8 @@ export default function NoirSkyline() {
   const { theme } = useTheme();
   const { isTransitioning } = useThemeTransition();
   const [mounted] = useState(true);
-  const { scrollProgress: scrollYProgress } = useLenisScroll();
+  const { scrollProgress: scrollYProgress, velocity } = useLenisScroll();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const isTransitioningRef = useRef(isTransitioning);
   useEffect(() => {
@@ -135,10 +136,29 @@ export default function NoirSkyline() {
     };
   }, [mouseX, mouseY]);
 
+  useEffect(() => {
+    if (reducedMotion) return;
+    const unsub = velocity.on('change', (v) => {
+      if (containerRef.current) {
+        if (Math.abs(v) > 0.1) {
+          containerRef.current.classList.add(styles.scrolling);
+        } else {
+          containerRef.current.classList.remove(styles.scrolling);
+        }
+      }
+    });
+    return () => {
+      unsub();
+      if (containerRef.current) {
+        containerRef.current.classList.remove(styles.scrolling);
+      }
+    };
+  }, [velocity, reducedMotion]);
+
   if (!mounted) return null;
 
   return (
-    <div className={`${styles.container} ${styles.active} ${theme === 'light' ? styles.lightPopart : styles.darkNoir} ${reducedMotion ? styles.reducedMotion : ''}`}>
+    <div ref={containerRef} className={`${styles.container} ${styles.active} ${theme === 'light' ? styles.lightPopart : styles.darkNoir} ${reducedMotion ? styles.reducedMotion : ''}`}>
       {/* ── Vignette Overlay ── */}
       <div className={styles.vignette} aria-hidden="true" />
 

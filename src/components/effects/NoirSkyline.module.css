@@ -9,6 +9,10 @@
   transition: opacity var(--transition-slow);
 }
 
+.container.scrolling * {
+  animation-play-state: paused !important;
+}
+
 .active {
   opacity: 1;
 }
