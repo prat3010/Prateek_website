@@ -1502,6 +1502,7 @@ if 'pending_skills' in st.session_state and st.session_state.pending_skills:
                 else:
                     new_skill = {
                         "name": name,
+                        "name_business": name,
                         "icon": icon,
                         "description": desc,
                         "category": category,
@@ -3182,8 +3183,8 @@ with tab_photos:
                     
     with col2:
         st.subheader("Hero - Comic Mode")
-        st.caption("Target: `public/images/hero-illustration-wavy.png` (source); app also expects `.webp` sibling for production")
-        hero_comic_path = "public/images/hero-illustration-wavy.png"
+        st.caption("Target: `public/images/hero-illustration-wavy.webp` (WebP)")
+        hero_comic_path = "public/images/hero-illustration-wavy.webp"
         if os.path.exists(hero_comic_path):
             st.image(hero_comic_path, caption="Current Comic Hero", use_container_width=True)
         else:
@@ -3192,7 +3193,7 @@ with tab_photos:
         up_hero_comic = st.file_uploader("Upload New Comic Hero Image", type=["png", "jpg", "jpeg", "webp"], key="up_hero_comic")
         if up_hero_comic is not None:
             if st.button("Replace Comic Hero Image", key="btn_hero_comic", type="primary"):
-                success, msg = save_uploaded_image(up_hero_comic, hero_comic_path, "PNG")
+                success, msg = save_uploaded_image(up_hero_comic, hero_comic_path, "WEBP")
                 if success:
                     if not dry_run_photo:
                         git_ok, git_msg = git_commit_push_file(hero_comic_path, "chore(photos): update hero comic image")
