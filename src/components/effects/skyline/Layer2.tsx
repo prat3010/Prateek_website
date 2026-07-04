@@ -2,9 +2,37 @@
 
 import React from 'react';
 import styles from '../NoirSkyline.module.css';
-import { WobblyPath, WobblyLine, WobblyRect, WobblyPolygon } from '../WobblySVG';
+import { WobblyPath, WobblyLine, WobblyRect, WobblyPolygon, WobblyLineGroup, WobblyPathGroup, type WobblyLineSegment } from '../WobblySVG';
 import { LayerProps } from './types';
 import RealtimeClock from './RealtimeClock';
+
+const SEAWALL_SEAMS: WobblyLineSegment[] = Array.from({ length: 160 })
+  .map((_, i) => -1000 + i * 25)
+  .filter((x) => x > -1000 && x < 2920)
+  .map((x) => ({ x1: x, y1: 938, x2: x, y2: 950 }));
+
+const DOCK_LIGHT_XS = [485, 755, 985, 1225];
+const DOCK_LIGHT_POSTS: WobblyLineSegment[] = DOCK_LIGHT_XS.map((x) => ({
+  x1: x,
+  y1: 938,
+  x2: x,
+  y2: 918,
+}));
+const DOCK_LIGHT_ARMS = DOCK_LIGHT_XS.map((x) => `M ${x} 918 Q ${x} 914 ${x + 3} 914`);
+
+const BOLLARD_XS = [510, 590, 710, 790, 955, 1035, 1115, 1195, 1320];
+const BOLLARD_TOPS: WobblyLineSegment[] = BOLLARD_XS.map((x) => ({
+  x1: x - 2,
+  y1: 934,
+  x2: x + 2,
+  y2: 934,
+}));
+const BOLLARD_POSTS: WobblyLineSegment[] = BOLLARD_XS.map((x) => ({
+  x1: x,
+  y1: 934,
+  x2: x,
+  y2: 938,
+}));
 
 const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
   const wobble = !reducedMotion;
@@ -425,30 +453,30 @@ const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
             <WobblyLine wobble={wobble} wobbleStrength={strength} x1="-1000" y1="944" x2="2920" y2="944" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
 
             {/* Vertical concrete block joint lines */}
-            {Array.from({ length: 160 }).map((_, i) => {
-              const x = -1000 + i * 25;
-              return x > -1000 && x < 2920 ? (
-                <WobblyLine key={`seawall-seam-${i}`} wobble={wobble} wobbleStrength={strength} x1={x} y1="938" x2={x} y2="950" stroke="var(--skyline-stroke-mid)" strokeWidth="0.6" />
-              ) : null;
-            })}
+            <WobblyLineGroup
+              lines={SEAWALL_SEAMS}
+              wobble={wobble}
+              wobbleStrength={strength}
+              stroke="var(--skyline-stroke-mid)"
+              strokeWidth="0.6"
+              fill="none"
+            />
 
             {/* Miniature dock streetlights */}
             {/* Spaced along the promenade: x = 485, 755, 985, 1225 */}
-            {[485, 755, 985, 1225].map((x, i) => (
-              <g key={`dock-light-${i}`} stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1={x} y1="938" x2={x} y2="918" />
-                <WobblyPath wobble={wobble} wobbleStrength={strength} d={`M ${x} 918 Q ${x} 914 ${x + 3} 914`} />
-                <circle cx={x + 3} cy={915} r="1" fill="var(--skyline-bulb-glow)" stroke="none" />
-              </g>
+            <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
+              <WobblyLineGroup lines={DOCK_LIGHT_POSTS} wobble={wobble} wobbleStrength={strength} fill="none" />
+              <WobblyPathGroup paths={DOCK_LIGHT_ARMS} wobble={wobble} wobbleStrength={strength} />
+            </g>
+            {DOCK_LIGHT_XS.map((x) => (
+              <circle key={`dock-light-bulb-${x}`} cx={x + 3} cy={915} r="1" fill="var(--skyline-bulb-glow)" stroke="none" />
             ))}
 
             {/* Mooring Bollards spaced along the edge of the seawall */}
-            {[510, 590, 710, 790, 955, 1035, 1115, 1195, 1320].map((x, i) => (
-              <g key={`bollard-${i}`} stroke="var(--skyline-stroke-fg)" strokeWidth="0.8">
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1={x - 2} y1="934" x2={x + 2} y2="934" strokeWidth="1.0" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1={x} y1="934" x2={x} y2="938" strokeWidth="1.4" />
-              </g>
-            ))}
+            <g stroke="var(--skyline-stroke-fg)">
+              <WobblyLineGroup lines={BOLLARD_TOPS} wobble={wobble} wobbleStrength={strength} strokeWidth="1.0" fill="none" />
+              <WobblyLineGroup lines={BOLLARD_POSTS} wobble={wobble} wobbleStrength={strength} strokeWidth="1.4" fill="none" />
+            </g>
 
             {/* Stacked Cargo Crates on the docks */}
             {/* Left crates (near Warehouse 1) */}

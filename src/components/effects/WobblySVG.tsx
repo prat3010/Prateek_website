@@ -50,6 +50,18 @@ export interface WobblyRectProps extends React.SVGProps<SVGPathElement>, WobblyP
 export interface WobblyPolygonProps extends React.SVGProps<SVGPathElement>, WobblyProps {
   points: string;
 }
+export interface WobblyLineSegment {
+  x1: string | number;
+  y1: string | number;
+  x2: string | number;
+  y2: string | number;
+}
+export interface WobblyLineGroupProps extends React.SVGProps<SVGPathElement>, WobblyProps {
+  lines: WobblyLineSegment[];
+}
+export interface WobblyPathGroupProps extends React.SVGProps<SVGPathElement>, WobblyProps {
+  paths: string[];
+}
 
 // Deterministic integer hash function returning [0, 1)
 function hash(x: number, y: number): number {
@@ -423,6 +435,22 @@ function getWobbledPath(
     wobblePath(d, segmentLength, wobbleStrength, baseFreq, octaves);
 }
 
+function getGroupedWobbledPath(
+  paths: string[],
+  wobble: boolean,
+  segmentLength: number | undefined,
+  wobbleStrength: number,
+  baseFreq: number | undefined,
+  octaves: number | undefined
+): string {
+  return paths
+    .map((d) => {
+      if (!wobble) return d;
+      return getWobbledPath(d, segmentLength, wobbleStrength, baseFreq, octaves);
+    })
+    .join(' ');
+}
+
 export const WobblyPath = React.memo(function WobblyPath({
   d,
   wobble = true,
@@ -467,6 +495,41 @@ export const WobblyLine = React.memo(function WobblyLine({
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return <path d={wobbledD} {...(props as any)} />;
+});
+
+export const WobblyLineGroup = React.memo(function WobblyLineGroup({
+  lines,
+  wobble = true,
+  wobbleStrength = 1.0,
+  segmentLength,
+  baseFreq,
+  octaves,
+  ...props
+}: WobblyLineGroupProps) {
+  const groupedD = useMemo(() => {
+    const paths = lines.map(({ x1, y1, x2, y2 }) => (
+      `M ${Number(x1)} ${Number(y1)} L ${Number(x2)} ${Number(y2)}`
+    ));
+    return getGroupedWobbledPath(paths, wobble, segmentLength, wobbleStrength, baseFreq, octaves);
+  }, [lines, wobble, wobbleStrength, segmentLength, baseFreq, octaves]);
+
+  return <path d={groupedD} {...props} />;
+});
+
+export const WobblyPathGroup = React.memo(function WobblyPathGroup({
+  paths,
+  wobble = true,
+  wobbleStrength = 1.0,
+  segmentLength,
+  baseFreq,
+  octaves,
+  ...props
+}: WobblyPathGroupProps) {
+  const groupedD = useMemo(() => (
+    getGroupedWobbledPath(paths, wobble, segmentLength, wobbleStrength, baseFreq, octaves)
+  ), [paths, wobble, wobbleStrength, segmentLength, baseFreq, octaves]);
+
+  return <path d={groupedD} {...props} />;
 });
 
 export const WobblyRect = React.memo(function WobblyRect({

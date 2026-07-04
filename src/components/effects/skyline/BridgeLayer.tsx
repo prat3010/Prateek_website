@@ -2,7 +2,7 @@
 
 import React from 'react';
 import styles from '../NoirSkyline.module.css';
-import { WobblyPath, WobblyLine, WobblyRect, WobblyPolygon } from '../WobblySVG';
+import { WobblyPath, WobblyLine, WobblyRect, WobblyPolygon, WobblyLineGroup, WobblyPathGroup, type WobblyLineSegment } from '../WobblySVG';
 import { LayerProps } from './types';
 
 const BridgeLayer = React.memo(function BridgeLayer({ reducedMotion }: LayerProps) {
@@ -31,70 +31,49 @@ const BridgeLayer = React.memo(function BridgeLayer({ reducedMotion }: LayerProp
 
   // Generate dynamic suspender lines
   const suspenders = React.useMemo(() => {
-    const lines: React.ReactNode[] = [];
+    const lines: WobblyLineSegment[] = [];
     // Left side suspenders (from x=415 to x=835 at 15px intervals)
     for (let x = 415; x <= 835; x += 15) {
       const y1 = getCableY(x);
       const y2 = getDeckY(x);
-      lines.push(
-        <WobblyLine
-          key={`susp-l-${x}`}
-          wobble={wobble}
-          wobbleStrength={strength}
-          x1={x}
-          y1={y1}
-          x2={x}
-          y2={y2}
-          stroke="var(--skyline-stroke-fine)"
-          strokeWidth="0.7"
-          fill="none"
-        />
-      );
+      lines.push({ x1: x, y1, x2: x, y2 });
     }
     // Right side suspenders (from x=925 to x=1465 at 15px intervals)
     for (let x = 925; x <= 1465; x += 15) {
       const y1 = getCableY(x);
       const y2 = getDeckY(x);
-      lines.push(
-        <WobblyLine
-          key={`susp-r-${x}`}
-          wobble={wobble}
-          wobbleStrength={strength}
-          x1={x}
-          y1={y1}
-          x2={x}
-          y2={y2}
-          stroke="var(--skyline-stroke-fine)"
-          strokeWidth="0.7"
-          fill="none"
-        />
-      );
+      lines.push({ x1: x, y1, x2: x, y2 });
     }
-    return lines;
+    return (
+      <WobblyLineGroup
+        lines={lines}
+        wobble={wobble}
+        wobbleStrength={strength}
+        stroke="var(--skyline-stroke-fine)"
+        strokeWidth="0.7"
+        fill="none"
+      />
+    );
   }, [wobble, strength]);
 
   // Generate handrail stanchions
   const stanchions = React.useMemo(() => {
-    const posts: React.ReactNode[] = [];
+    const posts: WobblyLineSegment[] = [];
     for (let x = 405; x <= 1475; x += 15) {
       if (x >= 845 && x <= 915) continue; // Skip the tower area
       const y = getDeckY(x);
-      posts.push(
-        <WobblyLine
-          key={`stanchion-${x}`}
-          wobble={wobble}
-          wobbleStrength={strength}
-          x1={x}
-          y1={y}
-          x2={x}
-          y2={y - 4.5}
-          stroke="var(--skyline-stroke-mid)"
-          strokeWidth="0.6"
-          fill="none"
-        />
-      );
+      posts.push({ x1: x, y1: y, x2: x, y2: y - 4.5 });
     }
-    return posts;
+    return (
+      <WobblyLineGroup
+        lines={posts}
+        wobble={wobble}
+        wobbleStrength={strength}
+        stroke="var(--skyline-stroke-mid)"
+        strokeWidth="0.6"
+        fill="none"
+      />
+    );
   }, [wobble, strength]);
 
   // Streetlight glow cones
@@ -110,20 +89,19 @@ const BridgeLayer = React.memo(function BridgeLayer({ reducedMotion }: LayerProp
       { cx: 1254, cy: 827.9 },
       { cx: 1354, cy: 832.3 }
     ];
-    return streetlights.map((light, idx) => {
+    const paths = streetlights.map((light) => {
       const roadY = getDeckY(light.cx);
-      const points = `${light.cx},${light.cy} ${light.cx - 9},${roadY} ${light.cx + 9},${roadY}`;
-      return (
-        <WobblyPolygon
-          key={`light-cone-${idx}`}
-          wobble={wobble}
-          wobbleStrength={1.5}
-          points={points}
-          fill="var(--skyline-light-ray)"
-          stroke="none"
-        />
-      );
+      return `M ${light.cx} ${light.cy} L ${light.cx - 9} ${roadY} L ${light.cx + 9} ${roadY} Z`;
     });
+    return (
+      <WobblyPathGroup
+        paths={paths}
+        wobble={wobble}
+        wobbleStrength={1.5}
+        fill="var(--skyline-light-ray)"
+        stroke="none"
+      />
+    );
   }, [wobble]);
 
   return (
