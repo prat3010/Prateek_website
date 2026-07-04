@@ -241,8 +241,9 @@
   display: none;
 }
 
-/* ─ Make sections transparent to reveal the fixed skyline background ─ */
-main section {
+/* ─ Make sections and footer transparent to reveal the fixed skyline background ─ */
+main section,
+footer {
   background: transparent !important;
   background-color: transparent !important;
   background-image: none !important;

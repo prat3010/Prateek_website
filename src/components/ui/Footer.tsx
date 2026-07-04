@@ -126,20 +126,6 @@ export default function Footer({ socials, className }: FooterProps) {
          COMIC BOOK / AZURE THEME VIEW (RENDERED ONLY WHEN ACTIVE)
          ──────────────────────────────────────────────────────────── */}
       {!isNoir && <div className={styles.comicView}>
-        {/* Decorative corner accents */}
-        <span className={`${styles.cornerDecoration} ${styles.topLeft}`} aria-hidden="true">
-          POW!
-        </span>
-        <span className={`${styles.cornerDecoration} ${styles.topRight}`} aria-hidden="true">
-          ZAP!
-        </span>
-        <span className={`${styles.cornerDecoration} ${styles.bottomLeft}`} aria-hidden="true">
-          WHAM!
-        </span>
-        <span className={`${styles.cornerDecoration} ${styles.bottomRight}`} aria-hidden="true">
-          BAM!
-        </span>
-
         <div className={styles.container}>
           <div className={styles.panelsGrid}>
             
@@ -224,23 +210,6 @@ export default function Footer({ socials, className }: FooterProps) {
          CYBER-NOIR / CYBERPUNK THEME VIEW (RENDERED ONLY WHEN ACTIVE)
          ──────────────────────────────────────────────────────────── */}
       {isNoir && <div className={styles.noirView}>
-        {/* CRT scanlines effect */}
-        <div className={styles.crtOverlay} aria-hidden="true" />
-
-        {/* Decorative corner accents */}
-        <span className={`${styles.cornerDecoration} ${styles.topLeft}`} aria-hidden="true">
-          GRIT
-        </span>
-        <span className={`${styles.cornerDecoration} ${styles.topRight}`} aria-hidden="true">
-          SHADOW
-        </span>
-        <span className={`${styles.cornerDecoration} ${styles.bottomLeft}`} aria-hidden="true">
-          DUSK
-        </span>
-        <span className={`${styles.cornerDecoration} ${styles.bottomRight}`} aria-hidden="true">
-          CASE
-        </span>
-
         <div className={styles.container}>
           <div className={styles.panelsGrid}>
             
