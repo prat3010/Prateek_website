@@ -5,22 +5,16 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 export type Theme = 'light' | 'noir';
 export type Audience = 'developer' | 'business';
 
-export interface ThemeContextType {
+interface ThemeContextType {
   theme: Theme;
   toggleTheme: () => void;
   isNoir: boolean;
-}
-
-export interface AudienceContextType {
+  isDetailsHidden: boolean;
+  toggleDetailsHidden: () => void;
   audience: Audience | null;
   setAudience: (audience: Audience) => void;
   prevAudience: Audience | null;
   modeTransitionSeed: number;
-}
-
-export interface DetailsVisibilityContextType {
-  isDetailsHidden: boolean;
-  toggleDetailsHidden: () => void;
 }
 
 interface ThemeTransitionContextType {
@@ -29,8 +23,6 @@ interface ThemeTransitionContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-const AudienceContext = createContext<AudienceContextType | undefined>(undefined);
-const DetailsVisibilityContext = createContext<DetailsVisibilityContextType | undefined>(undefined);
 const ThemeTransitionContext = createContext<ThemeTransitionContextType | undefined>(undefined);
 
 export function ThemeProvider({ 
@@ -150,19 +142,13 @@ export function ThemeProvider({
     theme,
     toggleTheme,
     isNoir,
-  }), [theme, toggleTheme, isNoir]);
-
-  const audienceValue = useMemo(() => ({
+    isDetailsHidden,
+    toggleDetailsHidden,
     audience,
     setAudience,
     prevAudience,
     modeTransitionSeed,
-  }), [audience, setAudience, prevAudience, modeTransitionSeed]);
-
-  const detailsValue = useMemo(() => ({
-    isDetailsHidden,
-    toggleDetailsHidden,
-  }), [isDetailsHidden, toggleDetailsHidden]);
+  }), [theme, toggleTheme, isNoir, isDetailsHidden, toggleDetailsHidden, audience, setAudience, prevAudience, modeTransitionSeed]);
 
   const transitionValue = useMemo(() => ({
     isTransitioning,
@@ -171,13 +157,9 @@ export function ThemeProvider({
 
   return (
     <ThemeContext.Provider value={themeValue}>
-      <AudienceContext.Provider value={audienceValue}>
-        <DetailsVisibilityContext.Provider value={detailsValue}>
-          <ThemeTransitionContext.Provider value={transitionValue}>
-            {children}
-          </ThemeTransitionContext.Provider>
-        </DetailsVisibilityContext.Provider>
-      </AudienceContext.Provider>
+      <ThemeTransitionContext.Provider value={transitionValue}>
+        {children}
+      </ThemeTransitionContext.Provider>
     </ThemeContext.Provider>
   );
 }
@@ -186,22 +168,6 @@ export function useTheme() {
   const context = useContext(ThemeContext);
   if (context === undefined) {
     throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return context;
-}
-
-export function useAudience() {
-  const context = useContext(AudienceContext);
-  if (context === undefined) {
-    throw new Error('useAudience must be used within a ThemeProvider');
-  }
-  return context;
-}
-
-export function useDetailsVisibility() {
-  const context = useContext(DetailsVisibilityContext);
-  if (context === undefined) {
-    throw new Error('useDetailsVisibility must be used within a ThemeProvider');
   }
   return context;
 }

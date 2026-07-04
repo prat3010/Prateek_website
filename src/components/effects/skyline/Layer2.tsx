@@ -7,7 +7,7 @@ import { LayerProps } from './types';
 import RealtimeClock from './RealtimeClock';
 
 const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
-  const wobble = !reducedMotion; // Enable midground wobble with pathCache protection
+  const wobble = !reducedMotion;
   const strength = 3.0; // Medium midground wobble
   return (
     <>

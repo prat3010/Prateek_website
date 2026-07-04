@@ -5,7 +5,7 @@ import { useLenis } from 'lenis/react';
 import Image from 'next/image';
 import { ExternalLink, Code2 } from 'lucide-react';
 import { type Project } from '@/data/projects';
-import { useTheme, useAudience } from '@/context/ThemeContext';
+import { useTheme } from '@/context/ThemeContext';
 import Scrambler from '@/components/ui/Scrambler';
 import type { ScramblerProps } from '@/components/ui/Scrambler';
 import styles from './Projects.module.css';
@@ -79,8 +79,7 @@ function ProjectImage({ src, alt, fill, width, height, sizes, className, style }
 function Projects({ projects }: ProjectsProps) {
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const selected = projects.find((p) => p.id === selectedProject);
-  const { isNoir } = useTheme();
-  const { audience } = useAudience();
+  const { isNoir, audience } = useTheme();
   const activeAudience = audience || 'developer';
   const lenis = useLenis();
 

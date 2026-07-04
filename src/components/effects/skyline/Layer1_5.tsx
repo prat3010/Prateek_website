@@ -6,7 +6,7 @@ import { WobblyPath, WobblyLine } from '../WobblySVG';
 import { LayerProps } from './types';
 
 const Layer1_5 = React.memo(function Layer1_5({ reducedMotion }: LayerProps) {
-  const wobble = !reducedMotion; // Enable far midground wobble with pathCache protection
+  const wobble = !reducedMotion;
   const strength = 2.5; // Far midground wobble (between Layer 1 and Layer 2)
   return (
     <>

@@ -89,11 +89,6 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
     return nextResponse();
   }
 
-  // Bypass database writes in development mode
-  if (process.env.NODE_ENV === 'development') {
-    return nextResponse();
-  }
-
   // Run the logging asynchronously using event.waitUntil
   // This sends the data in the background and does NOT add to the page load latency.
   event.waitUntil(

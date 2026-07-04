@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
-import { profileSchema } from '@/data/api-schemas';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,14 +26,11 @@ export async function PUT(request: Request) {
   if (!supabase) {
     return NextResponse.json({ error: 'Supabase not configured' }, { status: 500 });
   }
-  const parsed = profileSchema.safeParse(await request.json());
-  if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
-  }
+  const body = await request.json();
   const { data, error } = await supabase
     .from('profile')
     .upsert(
-      { id: 1, data: parsed.data, updated_at: new Date().toISOString() },
+      { id: 1, data: body, updated_at: new Date().toISOString() },
       { onConflict: 'id' }
     )
     .select('data')

@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import ComicPanel from '@/components/ui/ComicPanel';
-import { useTheme, useAudience } from '@/context/ThemeContext';
+import { useTheme } from '@/context/ThemeContext';
 import Scrambler from '@/components/ui/Scrambler';
 import type { ScramblerProps } from '@/components/ui/Scrambler';
 import { BookOpen, ArrowRight } from 'lucide-react';
@@ -55,8 +55,7 @@ const BLOG_COPY: Record<'developer' | 'business', Record<'light' | 'noir', BlogC
 };
 
 function BlogSection({ posts }: { posts: SimpleBlogPost[] }) {
-  const { isNoir } = useTheme();
-  const { audience } = useAudience();
+  const { isNoir, audience } = useTheme();
   
   const activeAudience = audience || 'developer';
   const activeTheme = isNoir ? 'noir' : 'light';

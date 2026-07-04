@@ -123,8 +123,6 @@ function wobbleLine(
   }
 }
 
-const pathCache = new Map<string, string>();
-
 export function wobblePath(
   d: string,
   segmentLength?: number,
@@ -157,13 +155,6 @@ export function wobblePath(
 
   if (finalSegmentLength === undefined || finalSegmentLength === 15) {
     finalSegmentLength = 4;
-  }
-
-  // Construct cache key
-  const cacheKey = `${d}_${finalSegmentLength}_${wobbleStrength}_${finalBaseFreq}_${finalOctaves}`;
-  const cached = pathCache.get(cacheKey);
-  if (cached !== undefined) {
-    return cached;
   }
 
   // Fallback values for type safety
@@ -387,9 +378,7 @@ export function wobblePath(
     }
   }
 
-  const finalResult = result.join(' ');
-  pathCache.set(cacheKey, finalResult);
-  return finalResult;
+  return result.join(' ');
 }
 
 export const WobblyPath = React.memo(function WobblyPath({

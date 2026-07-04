@@ -61,8 +61,10 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
   const [state, setState] = useState<
     'sitting' | 'blinking' | 'awakening' | 'leaping' | 'gliding_fg' | 'gliding_bg' | 'returning' | 'landing'
   >('sitting');
-  const [isDistant, setIsDistant] = useState(false);
-  const isDistantRef = useRef(false);
+  const [posX, setPosX] = useState(1426);
+  const [posY, setPosY] = useState(756);
+  const [scale, setScale] = useState(1.0);
+  const [opacity, setOpacity] = useState(1.0);
   const [frameIndex, setFrameIndex] = useState(0);
 
   const ticksRef = useRef(0);
@@ -73,6 +75,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
 
   const isVisibleRef = useRef(true);
   const stateStartTimeRef = useRef<number>(0);
+  const rafRef = useRef<number | null>(null);
   const boundingRectRef = useRef<DOMRect | null>(null);
 
   useEffect(() => {
@@ -147,108 +150,75 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
     };
   }, [reducedMotion]);
 
-  // Smooth position updates using requestAnimationFrame directly on the DOM ref
+  // Smooth position updates using requestAnimationFrame
   useEffect(() => {
     if (reducedMotion) return;
 
-    let active = true;
     const isMovingState = ['leaping', 'gliding_fg', 'gliding_bg', 'returning', 'landing'].includes(state);
-
-    const updateDOM = (x: number, y: number, s: number, o: number) => {
-      if (gargoyleRef.current) {
-        gargoyleRef.current.setAttribute('transform', `translate(${x.toFixed(1)}, ${y.toFixed(1)})`);
-        gargoyleRef.current.style.opacity = `${o.toFixed(2)}`;
-        const inner = gargoyleRef.current.querySelector('[data-gargoyle-inner]');
-        if (inner) {
-          let transformStr = `scale(${s.toFixed(2)})`;
-          if (stateRef.current === 'gliding_bg') transformStr += ' scale(-1, 1)';
-          inner.setAttribute('transform', transformStr);
-        }
-      }
-    };
-
     if (!isMovingState) {
-      updateDOM(1426, 756, 1.0, 1.0);
+      requestAnimationFrame(() => {
+        setPosX(1426);
+        setPosY(756);
+        setScale(1.0);
+        setOpacity(1.0);
+      });
       return;
     }
 
-    let rafId: number | null = null;
     const tick = () => {
-      if (!active) return;
-      if (document.hidden) {
-        // Stop animating when tab is hidden; visibilitychange handles restart
-        return;
-      }
-
+      if (!isVisibleRef.current) { rafRef.current = requestAnimationFrame(tick); return; }
       const currentState = stateRef.current;
       const elapsed = performance.now() - stateStartTimeRef.current;
-      let x = 1426, y = 756, s = 1.0, o = 1.0;
 
       if (currentState === 'leaping') {
         const progress = Math.min(elapsed / 640, 1); // 8 ticks * 80ms = 640ms
-        x = 1426 - progress * 66;
-        y = (756 - progress * 76) - 35 * Math.sin(Math.PI * progress);
-        s = 1.0;
-        o = 1.0;
+        setPosX(1426 - progress * 66);
+        setPosY((756 - progress * 76) - 35 * Math.sin(Math.PI * progress));
+        setScale(1.0);
+        setOpacity(1.0);
       } else if (currentState === 'gliding_fg') {
         const speedX = -0.25; // -20px per 80ms = -0.25px/ms
-        x = Math.max(-80, 1360 + speedX * elapsed);
+        const x = Math.max(-80, 1360 + speedX * elapsed);
+        setPosX(x);
         if (x > 200) {
-          s = 1.0;
-          o = 1.0;
-          y = 680 + Math.sin((1360 - x) * 0.0038) * 250;
+          setScale(1.0);
+          setOpacity(1.0);
+          setPosY(680 + Math.sin((1360 - x) * 0.0038) * 250);
         } else {
           const ratio = Math.max(0, Math.min(1, (x - (-80)) / (200 - (-80))));
-          s = 0.35 + ratio * 0.65;
-          o = 0.55 + ratio * 0.45;
-          y = 420 + ratio * (400 - 420);
+          setScale(0.35 + ratio * 0.65);
+          setOpacity(0.55 + ratio * 0.45);
+          setPosY(420 + ratio * (400 - 420));
         }
       } else if (currentState === 'gliding_bg') {
         const speedX = 0.125; // 10px per 80ms = 0.125px/ms
-        x = Math.min(2000, -80 + speedX * elapsed);
-        y = 420 + Math.sin((elapsed / 80) * 0.15) * 15;
-        s = 0.35;
-        o = 0.55;
+        const x = Math.min(2000, -80 + speedX * elapsed);
+        setPosX(x);
+        setPosY(420 + Math.sin((elapsed / 80) * 0.15) * 15);
+        setScale(0.35);
+        setOpacity(0.55);
       } else if (currentState === 'returning') {
         const speedX = -0.25; // -20px per 80ms = -0.25px/ms
-        x = Math.max(1488, 2000 + speedX * elapsed);
+        const x = Math.max(1488, 2000 + speedX * elapsed);
+        setPosX(x);
         const ratio = Math.max(0, Math.min(1, (x - 1488) / (2000 - 1488)));
-        s = 1.0 - ratio * 0.65;
-        o = 1.0 - ratio * 0.45;
-        y = 710 - ratio * (710 - 420);
+        setScale(1.0 - ratio * 0.65);
+        setOpacity(1.0 - ratio * 0.45);
+        setPosY(710 - ratio * (710 - 420));
       } else if (currentState === 'landing') {
         const progress = Math.min(elapsed / 480, 1); // 6 ticks * 80ms = 480ms
-        x = 1488 - progress * 62;
-        y = 710 - progress * (710 - 756);
-        s = 1.0;
-        o = 1.0;
+        setPosX(1488 - progress * 62);
+        setPosY(710 - progress * (710 - 756));
+        setScale(1.0);
+        setOpacity(1.0);
       }
 
-      updateDOM(x, y, s, o);
-
-      // Low-frequency visual changes (distant colors) update here
-      const nextIsDistant = currentState === 'gliding_bg' || (currentState === 'gliding_fg' && s < 0.6) || (currentState === 'returning' && s < 0.6);
-      if (nextIsDistant !== isDistantRef.current) {
-        isDistantRef.current = nextIsDistant;
-        setIsDistant(nextIsDistant);
-      }
-
-      rafId = requestAnimationFrame(tick);
+      rafRef.current = requestAnimationFrame(tick);
     };
 
-    const handleVisibility = () => {
-      if (!document.hidden && active) {
-        if (rafId) cancelAnimationFrame(rafId);
-        rafId = requestAnimationFrame(tick);
-      }
-    };
-    document.addEventListener('visibilitychange', handleVisibility);
-
-    rafId = requestAnimationFrame(tick);
+    rafRef.current = requestAnimationFrame(tick);
     return () => {
-      active = false;
-      document.removeEventListener('visibilitychange', handleVisibility);
-      if (rafId) cancelAnimationFrame(rafId);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, [state, reducedMotion]);
 
@@ -366,7 +336,8 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
     const strokeColor = 'var(--skyline-stroke-fg)';
     const eyeColor = 'var(--skyline-gargoyle-eyes)';
 
-    // Distant background scale down and color blend (tracked via state)
+    // Distant background scale down and color blend
+    const isDistant = state === 'gliding_bg' || (state === 'gliding_fg' && scale < 0.6) || (state === 'returning' && scale < 0.6);
     const fillValue = isDistant ? 'var(--skyline-stroke-mid)' : gargoyleFill;
     const strokeValue = isDistant ? 'var(--skyline-stroke-bg)' : strokeColor;
 
@@ -551,13 +522,13 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
     const element = getElement();
     if (!element) return null;
 
-    let transformStr = 'scale(1.0)';
+    let transformStr = `scale(${scale})`;
     if (isFacingRight) {
       transformStr += ' scale(-1, 1)';
     }
 
     return (
-      <g data-gargoyle-inner transform={transformStr}>
+      <g transform={transformStr}>
         {element}
       </g>
     );
@@ -628,13 +599,13 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
     <>
       <g
         ref={gargoyleRef}
-        transform="translate(1426, 756)"
+        transform={`translate(${posX}, ${posY})`}
         onMouseEnter={handleMouseEnter}
         onClick={handleMouseEnter}
         style={{
           cursor: (state === 'sitting' || state === 'blinking') ? 'pointer' : 'default',
           pointerEvents: 'auto',
-          opacity: 1.0
+          opacity
         }}
       >
         <rect x="-35" y="-35" width="70" height="45" fill="black" opacity="0" style={{ pointerEvents: 'all' }} />

@@ -8,6 +8,7 @@ const PLATFORMS = [952, 997];
 
 const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) => {
   const [state, setState] = useState<'idle' | 'alert' | 'hopping_down' | 'waiting' | 'hopping_up'>('idle');
+  const [posY, setPosY] = useState(PLATFORMS[0]);
   const ticksRef = useRef(0);
   const stateRef = useRef(state);
   const velocityRef = useRef(0);
@@ -48,93 +49,58 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
     };
   }, [reducedMotion]);
 
-  // Smooth position interpolation during hopping states directly on the DOM ref
+  // Smooth position interpolation during hopping states
   useEffect(() => {
     if (reducedMotion) return;
-
-    let active = true;
-    let rafId: number | null = null;
-
-    const updateDOM = (y: number) => {
-      if (fireRef.current) {
-        fireRef.current.setAttribute('transform', `translate(1675, ${y.toFixed(1)})`);
-      }
-    };
 
     if (state === 'hopping_down') {
       let startTime: number | null = null;
       const duration = 480; // ms (equivalent to 6 ticks * 80ms)
+      let rafId: number | null = null;
 
       const animateDown = (timestamp: number) => {
-        if (!active) return;
-        if (document.hidden) return;
+        if (!isVisibleRef.current) { rafId = requestAnimationFrame(animateDown); return; }
         if (!startTime) startTime = timestamp;
         const elapsed = timestamp - startTime;
         const progress = Math.min(elapsed / duration, 1);
 
         // Smooth quadratic ease-in-out curve
         const eased = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-        updateDOM(PLATFORMS[0] + eased * (PLATFORMS[1] - PLATFORMS[0]));
+        setPosY(PLATFORMS[0] + eased * (PLATFORMS[1] - PLATFORMS[0]));
         boundingRectRef.current = null;
 
         if (progress < 1) {
           rafId = requestAnimationFrame(animateDown);
         }
       };
-
-      const handleVisibility = () => {
-        if (!document.hidden && active) {
-          if (rafId) cancelAnimationFrame(rafId);
-          rafId = requestAnimationFrame(animateDown);
-        }
-      };
-      document.addEventListener('visibilitychange', handleVisibility);
-
       rafId = requestAnimationFrame(animateDown);
       return () => {
-        active = false;
-        document.removeEventListener('visibilitychange', handleVisibility);
         if (rafId) cancelAnimationFrame(rafId);
       };
     } else if (state === 'hopping_up') {
       let startTime: number | null = null;
       const duration = 480; // ms
+      let rafId: number | null = null;
 
       const animateUp = (timestamp: number) => {
-        if (!active) return;
-        if (document.hidden) return;
+        if (!isVisibleRef.current) { rafId = requestAnimationFrame(animateUp); return; }
         if (!startTime) startTime = timestamp;
         const elapsed = timestamp - startTime;
         const progress = Math.min(elapsed / duration, 1);
 
         // Smooth quadratic ease-in-out curve
         const eased = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-        updateDOM(PLATFORMS[1] - eased * (PLATFORMS[1] - PLATFORMS[0]));
+        setPosY(PLATFORMS[1] - eased * (PLATFORMS[1] - PLATFORMS[0]));
         boundingRectRef.current = null;
 
         if (progress < 1) {
           rafId = requestAnimationFrame(animateUp);
         }
       };
-
-      const handleVisibility = () => {
-        if (!document.hidden && active) {
-          if (rafId) cancelAnimationFrame(rafId);
-          rafId = requestAnimationFrame(animateUp);
-        }
-      };
-      document.addEventListener('visibilitychange', handleVisibility);
-
       rafId = requestAnimationFrame(animateUp);
       return () => {
-        active = false;
-        document.removeEventListener('visibilitychange', handleVisibility);
         if (rafId) cancelAnimationFrame(rafId);
       };
-    } else if (state === 'idle' || state === 'alert') {
-      updateDOM(PLATFORMS[0]);
-    } else if (state === 'waiting') {
-      updateDOM(PLATFORMS[1]);
     }
   }, [state, reducedMotion]);
 
@@ -184,6 +150,7 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
         // Position is handled by requestAnimationFrame, interval handles duration timer
         if (ticks >= 6) {
           ticksRef.current = 0;
+          setPosY(PLATFORMS[1]);
           setState('waiting');
         }
       } else if (currentState === 'waiting') {
@@ -195,6 +162,7 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
         // Position is handled by requestAnimationFrame, interval handles duration timer
         if (ticks >= 6) {
           ticksRef.current = 0;
+          setPosY(PLATFORMS[0]);
           setState('idle');
         }
       }
@@ -203,7 +171,7 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
   }, [reducedMotion]);
 
   return (
-    <g ref={fireRef} transform={`translate(1675, ${PLATFORMS[0]})`}>
+    <g ref={fireRef} transform={`translate(1675, ${posY})`}>
       <g transform="scale(1.5)">
         <g className={state === 'alert' ? styles.pigeonHeadBob : styles.pigeonBob}>
           <ellipse cx="0" cy="-3" rx="3" ry="2.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.6" />

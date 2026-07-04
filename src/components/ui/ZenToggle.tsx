@@ -1,12 +1,12 @@
 'use client';
 
 import React from 'react';
-import { useDetailsVisibility } from '@/context/ThemeContext';
+import { useTheme } from '@/context/ThemeContext';
 import { Eye, EyeOff } from 'lucide-react';
 import styles from './ZenToggle.module.css';
 
 export default function ZenToggle() {
-  const { isDetailsHidden, toggleDetailsHidden } = useDetailsVisibility();
+  const { isDetailsHidden, toggleDetailsHidden } = useTheme();
 
   return (
     <div className={styles.container}>

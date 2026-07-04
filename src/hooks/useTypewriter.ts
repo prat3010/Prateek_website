@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
 interface UseTypewriterOptions {
   text: string;
@@ -17,15 +17,13 @@ export function useTypewriter({
 }: UseTypewriterOptions) {
   const [displayText, setDisplayText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const prevTextRef = useRef(text);
+  const [prevText, setPrevText] = useState(text);
 
-  useEffect(() => {
-    if (text !== prevTextRef.current) {
-      prevTextRef.current = text;
-      setDisplayText('');
-      setIsTyping(false);
-    }
-  }, [text]);
+  if (text !== prevText) {
+    setPrevText(text);
+    setDisplayText('');
+    setIsTyping(false);
+  }
 
   const isDone = !loop && !isTyping && text !== '' && displayText === text;
 
@@ -52,8 +50,10 @@ export function useTypewriter({
     }
 
     if (!loop) {
-      queueMicrotask(() => setIsTyping(false));
-      return;
+      const doneTimer = setTimeout(() => {
+        setIsTyping(false);
+      }, 0);
+      return () => clearTimeout(doneTimer);
     }
 
     const loopTimer = setTimeout(() => {

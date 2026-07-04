@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef, type MouseEvent } from 'react';
 import { useLenis } from 'lenis/react';
-import { useTheme, useAudience } from '@/context/ThemeContext';
+import { useTheme } from '@/context/ThemeContext';
 import { useLenisScroll } from '@/context/LenisProvider';
 import Scrambler from '@/components/ui/Scrambler';
 import type { ScramblerProps } from '@/components/ui/Scrambler';
-import { NAVBAR_SCROLL_OFFSET, BREAKPOINTS } from '@/lib/constants';
+import { NAVBAR_SCROLL_OFFSET } from '@/lib/constants';
 import styles from './Navbar.module.css';
 
 const NAV_LABEL_TEXTS: ScramblerProps['texts'] = {
@@ -27,8 +27,7 @@ export interface NavbarProps {
 }
 
 export default function Navbar({ items, className }: NavbarProps) {
-  const { isNoir, toggleTheme } = useTheme();
-  const { audience, setAudience } = useAudience();
+  const { isNoir, toggleTheme, audience, setAudience } = useTheme();
 
   const navItems = useMemo(() => {
     if (items) return items;
@@ -43,7 +42,8 @@ export default function Navbar({ items, className }: NavbarProps) {
     ];
   }, [items, audience]);
 
-  const navRef = useRef<HTMLElement>(null);
+  const [scrolled, setScrolled] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(false);
   const scrollTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>(() => {
@@ -59,35 +59,12 @@ export default function Navbar({ items, className }: NavbarProps) {
 
   /* ---------- Scroll tracking for background & blur ---------- */
   useEffect(() => {
-    let prevScrolled = false;
-    let prevScrolling = false;
-
     const unsub = scrollY.on('change', (latest) => {
       const isScrolled = latest > 20;
-      
-      if (navRef.current) {
-        if (isScrolled !== prevScrolled) {
-          prevScrolled = isScrolled;
-          if (isScrolled) {
-            navRef.current.classList.add(styles.scrolled);
-          } else {
-            navRef.current.classList.remove(styles.scrolled);
-          }
-        }
-
-        if (!prevScrolling) {
-          prevScrolling = true;
-          navRef.current.classList.add(styles.scrollActive);
-        }
-
-        clearTimeout(scrollTimerRef.current);
-        scrollTimerRef.current = setTimeout(() => {
-          prevScrolling = false;
-          if (navRef.current) {
-            navRef.current.classList.remove(styles.scrollActive);
-          }
-        }, 150);
-      }
+      setScrolled((prev) => (prev === isScrolled ? prev : isScrolled));
+      setIsScrolling(true);
+      clearTimeout(scrollTimerRef.current);
+      scrollTimerRef.current = setTimeout(() => setIsScrolling(false), 150);
     });
     return unsub;
   }, [scrollY]);
@@ -126,7 +103,7 @@ export default function Navbar({ items, className }: NavbarProps) {
   /* ---------- Close mobile menu on desktop resize ---------- */
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth > BREAKPOINTS.MD) {
+      if (window.innerWidth > 768) {
         setMobileOpen(false);
       }
     };
@@ -169,8 +146,9 @@ export default function Navbar({ items, className }: NavbarProps) {
 
   return (
     <nav
-      ref={navRef}
-      className={`${styles.navbar} ${mobileOpen ? styles.menuOpen : ''} ${className ?? ''}`}
+      className={`${styles.navbar} ${scrolled ? styles.scrolled : ''} ${
+        isScrolling ? styles.scrollActive : ''
+      } ${mobileOpen ? styles.menuOpen : ''} ${className ?? ''}`}
       role="navigation"
       aria-label="Main navigation"
     >

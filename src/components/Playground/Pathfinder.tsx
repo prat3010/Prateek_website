@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { Search, Zap, FileText, Target } from 'lucide-react';
 import { GridNode } from './pathfindingAlgorithms';
 import styles from './Playground.module.css';
@@ -94,26 +94,17 @@ export default function Pathfinder({
   isNoir,
   isRunning,
 }: PathfinderProps) {
-  const interactionModeRef = useRef<InteractionMode>('idle');
-  const localWallsRef = useRef<Set<string>>(new Set(walls));
+  const [interactionMode, setInteractionMode] = useState<InteractionMode>('idle');
   const gridRef = useRef<HTMLDivElement>(null);
 
-  // Sync prop changes back to our local ref
-  useEffect(() => {
-    localWallsRef.current = new Set(walls);
-  }, [walls]);
-
-  // Global mouse up to clear interaction mode and batch-commit walls to React state
+  // Global mouse up to clear interaction mode
   useEffect(() => {
     const handleMouseUp = () => {
-      if (interactionModeRef.current === 'draw-walls' || interactionModeRef.current === 'erase-walls') {
-        setWalls(new Set(localWallsRef.current));
-      }
-      interactionModeRef.current = 'idle';
+      setInteractionMode('idle');
     };
     window.addEventListener('mouseup', handleMouseUp);
     return () => window.removeEventListener('mouseup', handleMouseUp);
-  }, [setWalls]);
+  }, []);
 
   const handleGridMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (isRunning) return;
@@ -132,24 +123,30 @@ export default function Pathfinder({
     const isEnd = col === endNode.col && row === endNode.row;
 
     if (isStart) {
-      interactionModeRef.current = 'drag-start';
+      setInteractionMode('drag-start');
     } else if (isEnd) {
-      interactionModeRef.current = 'drag-end';
+      setInteractionMode('drag-end');
     } else {
-      if (localWallsRef.current.has(key)) {
-        interactionModeRef.current = 'erase-walls';
-        localWallsRef.current.delete(key);
-        cellElement.classList.remove(styles.cellWall);
+      if (walls.has(key)) {
+        setInteractionMode('erase-walls');
+        setWalls((prev) => {
+          const newWalls = new Set(prev);
+          newWalls.delete(key);
+          return newWalls;
+        });
       } else {
-        interactionModeRef.current = 'draw-walls';
-        localWallsRef.current.add(key);
-        cellElement.classList.add(styles.cellWall);
+        setInteractionMode('draw-walls');
+        setWalls((prev) => {
+          const newWalls = new Set(prev);
+          newWalls.add(key);
+          return newWalls;
+        });
       }
     }
-  }, [isRunning, startNode.col, startNode.row, endNode.col, endNode.row]);
+  }, [isRunning, startNode.col, startNode.row, endNode.col, endNode.row, walls, setWalls]);
 
   const handleGridMouseOver = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (isRunning || interactionModeRef.current === 'idle') return;
+    if (isRunning || interactionMode === 'idle') return;
     const target = e.target as HTMLElement;
     const cellElement = target.closest('[data-col]');
     if (!cellElement) return;
@@ -162,26 +159,32 @@ export default function Pathfinder({
     const isStart = col === startNode.col && row === startNode.row;
     const isEnd = col === endNode.col && row === endNode.row;
 
-    if (interactionModeRef.current === 'drag-start') {
-      if (!isEnd && !localWallsRef.current.has(key)) {
+    if (interactionMode === 'drag-start') {
+      if (!isEnd && !walls.has(key)) {
         setStartNode({ col, row });
       }
-    } else if (interactionModeRef.current === 'drag-end') {
-      if (!isStart && !localWallsRef.current.has(key)) {
+    } else if (interactionMode === 'drag-end') {
+      if (!isStart && !walls.has(key)) {
         setEndNode({ col, row });
       }
-    } else if (interactionModeRef.current === 'draw-walls') {
-      if (!isStart && !isEnd && !localWallsRef.current.has(key)) {
-        localWallsRef.current.add(key);
-        cellElement.classList.add(styles.cellWall);
+    } else if (interactionMode === 'draw-walls') {
+      if (!isStart && !isEnd && !walls.has(key)) {
+        setWalls((prev) => {
+          const newWalls = new Set(prev);
+          newWalls.add(key);
+          return newWalls;
+        });
       }
-    } else if (interactionModeRef.current === 'erase-walls') {
-      if (localWallsRef.current.has(key)) {
-        localWallsRef.current.delete(key);
-        cellElement.classList.remove(styles.cellWall);
+    } else if (interactionMode === 'erase-walls') {
+      if (walls.has(key)) {
+        setWalls((prev) => {
+          const newWalls = new Set(prev);
+          newWalls.delete(key);
+          return newWalls;
+        });
       }
     }
-  }, [isRunning, startNode.col, startNode.row, endNode.col, endNode.row, setStartNode, setEndNode]);
+  }, [isRunning, interactionMode, startNode.col, startNode.row, endNode.col, endNode.row, walls, setStartNode, setEndNode, setWalls]);
 
   const gridInnerRef = useRef<HTMLDivElement>(null);
 
@@ -209,24 +212,30 @@ export default function Pathfinder({
       const isEnd = col === endNode.col && row === endNode.row;
 
       if (isStart) {
-        interactionModeRef.current = 'drag-start';
+        setInteractionMode('drag-start');
       } else if (isEnd) {
-        interactionModeRef.current = 'drag-end';
+        setInteractionMode('drag-end');
       } else {
-        if (localWallsRef.current.has(key)) {
-          interactionModeRef.current = 'erase-walls';
-          localWallsRef.current.delete(key);
-          cellElement.classList.remove(styles.cellWall);
+        if (walls.has(key)) {
+          setInteractionMode('erase-walls');
+          setWalls((prev) => {
+            const newWalls = new Set(prev);
+            newWalls.delete(key);
+            return newWalls;
+          });
         } else {
-          interactionModeRef.current = 'draw-walls';
-          localWallsRef.current.add(key);
-          cellElement.classList.add(styles.cellWall);
+          setInteractionMode('draw-walls');
+          setWalls((prev) => {
+            const newWalls = new Set(prev);
+            newWalls.add(key);
+            return newWalls;
+          });
         }
       }
     };
 
     const onTouchMove = (e: TouchEvent) => {
-      if (isRunning || interactionModeRef.current === 'idle') return;
+      if (isRunning || interactionMode === 'idle') return;
 
       // Prevent scrolling while drawing on the grid
       if (e.cancelable) {
@@ -248,32 +257,35 @@ export default function Pathfinder({
       const isStart = col === startNode.col && row === startNode.row;
       const isEnd = col === endNode.col && row === endNode.row;
 
-      if (interactionModeRef.current === 'drag-start') {
-        if (!isEnd && !localWallsRef.current.has(key)) {
+      if (interactionMode === 'drag-start') {
+        if (!isEnd && !walls.has(key)) {
           setStartNode({ col, row });
         }
-      } else if (interactionModeRef.current === 'drag-end') {
-        if (!isStart && !localWallsRef.current.has(key)) {
+      } else if (interactionMode === 'drag-end') {
+        if (!isStart && !walls.has(key)) {
           setEndNode({ col, row });
         }
-      } else if (interactionModeRef.current === 'draw-walls') {
-        if (!isStart && !isEnd && !localWallsRef.current.has(key)) {
-          localWallsRef.current.add(key);
-          cellElement.classList.add(styles.cellWall);
+      } else if (interactionMode === 'draw-walls') {
+        if (!isStart && !isEnd && !walls.has(key)) {
+          setWalls((prev) => {
+            const newWalls = new Set(prev);
+            newWalls.add(key);
+            return newWalls;
+          });
         }
-      } else if (interactionModeRef.current === 'erase-walls') {
-        if (localWallsRef.current.has(key)) {
-          localWallsRef.current.delete(key);
-          cellElement.classList.remove(styles.cellWall);
+      } else if (interactionMode === 'erase-walls') {
+        if (walls.has(key)) {
+          setWalls((prev) => {
+            const newWalls = new Set(prev);
+            newWalls.delete(key);
+            return newWalls;
+          });
         }
       }
     };
 
     const onTouchEnd = () => {
-      if (interactionModeRef.current === 'draw-walls' || interactionModeRef.current === 'erase-walls') {
-        setWalls(new Set(localWallsRef.current));
-      }
-      interactionModeRef.current = 'idle';
+      setInteractionMode('idle');
     };
 
     gridEl.addEventListener('touchstart', onTouchStart, { passive: false });
@@ -285,7 +297,7 @@ export default function Pathfinder({
       gridEl.removeEventListener('touchmove', onTouchMove);
       gridEl.removeEventListener('touchend', onTouchEnd);
     };
-  }, [isRunning, startNode, endNode, setStartNode, setEndNode, setWalls]);
+  }, [isRunning, interactionMode, startNode, endNode, walls, setStartNode, setEndNode, setWalls]);
 
   // Render grid cells grouped by rows
   const gridRows: React.ReactNode[] = [];

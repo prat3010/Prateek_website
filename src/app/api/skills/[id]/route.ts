@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
-import { skillSchema } from '@/data/api-schemas';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,13 +15,10 @@ export async function PUT(
     return NextResponse.json({ error: 'Supabase not configured' }, { status: 500 });
   }
   const { id } = await params;
-  const parsed = skillSchema.partial().safeParse(await request.json());
-  if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
-  }
+  const body = await request.json();
   const { data, error } = await supabase
     .from('skills')
-    .update({ ...parsed.data, updated_at: new Date().toISOString() })
+    .update({ ...body, updated_at: new Date().toISOString() })
     .eq('id', id)
     .select()
     .single();

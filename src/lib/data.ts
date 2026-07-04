@@ -40,7 +40,7 @@ export const getSkills = unstable_cache(
   async (): Promise<Skill[]> => {
     if (!supabase) {
       console.log('Supabase not configured, using skills fallback');
-      return skillsFallback as Skill[];
+      return skillsFallback as unknown as Skill[];
     }
     try {
       const { data, error } = await supabase
@@ -48,10 +48,10 @@ export const getSkills = unstable_cache(
         .select('*')
         .order('created_at', { ascending: true });
       if (error || !data) throw error || new Error('No data');
-      return data as Skill[];
+      return data as unknown as Skill[];
     } catch (err) {
       console.error('Failed to fetch skills from Supabase, falling back to local data:', err);
-      return skillsFallback as Skill[];
+      return skillsFallback as unknown as Skill[];
     }
   },
   ['skills-list'],

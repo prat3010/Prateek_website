@@ -1,5 +1,7 @@
 import { jsPDF } from 'jspdf';
-import type { ResumeData, Persona } from '../data/resume';
+import type { ResumeData } from '../data/resume';
+
+type Persona = 'general' | 'fullstack' | 'ai' | 'creative';
 
 export function generateResumePDF(activePersona: Persona, resumeData: ResumeData) {
   // 1. Initialize A4 Document (210mm x 297mm)

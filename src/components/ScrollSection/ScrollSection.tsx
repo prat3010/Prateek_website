@@ -3,7 +3,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { m, useMotionValue, useReducedMotion } from 'framer-motion';
 import { useLenisScroll } from '@/context/LenisProvider';
-import { useIsMobile } from '@/hooks/useMediaQuery';
 import styles from './ScrollSection.module.css';
 
 interface Props {
@@ -44,10 +43,19 @@ export default function ScrollSection({ children, verticalOffset, centerOnly, ga
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useLenisScroll();
   const prefersReducedMotion = useReducedMotion();
-  const isMobile = useIsMobile();
+  const [isMobile, setIsMobile] = useState(false);
 
   const scrollOpacity = useMotionValue(0);
   const y = useMotionValue(0);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const metricsRef = useRef<SectionMetrics>({
     sectionStart: 0, sectionHeight: 0, windowH: 0, totalScrollable: 0, maxReachable: 1,
@@ -61,25 +69,8 @@ export default function ScrollSection({ children, verticalOffset, centerOnly, ga
     centerOnlyRef.current = centerOnly;
   });
 
-  const [inView, setInView] = useState(false);
-
-  useEffect(() => {
-    if (prefersReducedMotion || isMobile) return;
-    const el = wrapperRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(([entry]) => {
-      setInView(entry.isIntersecting);
-    }, {
-      rootMargin: '200px 0px 200px 0px'
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [prefersReducedMotion, isMobile]);
-
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
-    if (prefersReducedMotion || isMobile || !inView) return;
     const el = wrapperRef.current;
     if (!el) return;
 
@@ -166,7 +157,7 @@ export default function ScrollSection({ children, verticalOffset, centerOnly, ga
       ro.disconnect();
       unsub();
     };
-  }, [scrollY, inView, isMobile, prefersReducedMotion]);
+  }, [scrollY]);
   /* eslint-enable react-hooks/exhaustive-deps */
 
   if (prefersReducedMotion || isMobile) {

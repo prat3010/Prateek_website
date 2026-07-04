@@ -1,19 +1,18 @@
 'use client';
 
-import React, { useState, useEffect, type FormEvent } from 'react';
+import React, { useRef, useState, useEffect, type FormEvent } from 'react';
 import { useLenis } from 'lenis/react';
-import { useTheme, useAudience } from '@/context/ThemeContext';
+import { useTheme } from '@/context/ThemeContext';
 import { NAVBAR_SCROLL_OFFSET } from '@/lib/constants';
 import SpeechBubble from '@/components/ui/SpeechBubble';
-import ConfettiBurst from '@/components/effects/ConfettiBurst';
+import ConfettiBurst, { type ConfettiBurstHandle } from '@/components/effects/ConfettiBurst';
 import styles from './Contact.module.css';
 
 function Contact() {
-  const [showConfetti, setShowConfetti] = useState(false);
+  const confettiRef = useRef<ConfettiBurstHandle>(null);
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
-  const { isNoir } = useTheme();
-  const { audience } = useAudience();
+  const { isNoir, audience } = useTheme();
   const lenis = useLenis();
 
   const activeAudience = audience || 'developer';
@@ -76,14 +75,11 @@ function Contact() {
 
       if (response.ok) {
         setStatus('success');
-        setShowConfetti(true);
+        confettiRef.current?.triggerConfetti();
         form.reset();
         setSelectedIntent('general');
         lenis?.scrollTo('#contact', { duration: 1.0, offset: NAVBAR_SCROLL_OFFSET });
-        setTimeout(() => {
-          setStatus('idle');
-          setShowConfetti(false);
-        }, 5000);
+        setTimeout(() => setStatus('idle'), 5000);
       } else {
         setStatus('error');
         setErrorMessage(data.error || 'Something went wrong. Please try again!');
@@ -96,7 +92,7 @@ function Contact() {
 
   return (
     <section id="contact" className={styles.contact} aria-label="Contact">
-      {showConfetti && <ConfettiBurst autoTrigger />}
+      <ConfettiBurst ref={confettiRef} />
 
       <div className={styles.container}>
         <h2 className={styles.sectionTitle}>

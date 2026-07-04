@@ -4,7 +4,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import { m, useTransform, useMotionValue, useSpring } from 'framer-motion';
 import { useTheme, useThemeTransition } from '@/context/ThemeContext';
 import { useLenisScroll } from '@/context/LenisProvider';
-import { BREAKPOINTS } from '@/lib/constants';
 import styles from './NoirSkyline.module.css';
 
 import Layer0 from './skyline/Layer0';
@@ -18,8 +17,7 @@ export default function NoirSkyline() {
   const { theme } = useTheme();
   const { isTransitioning } = useThemeTransition();
   const [mounted] = useState(true);
-  const { scrollProgress: scrollYProgress, velocity } = useLenisScroll();
-  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollProgress: scrollYProgress } = useLenisScroll();
 
   const isTransitioningRef = useRef(isTransitioning);
   useEffect(() => {
@@ -88,7 +86,7 @@ export default function NoirSkyline() {
     if (typeof window === 'undefined') return false;
     const cores = navigator.hardwareConcurrency ?? 4;
     const lowEnd = cores < 4;
-    const isMobileDevice = window.innerWidth <= BREAKPOINTS.MD || window.matchMedia('(pointer: coarse)').matches;
+    const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches || lowEnd || isMobileDevice;
   });
 
@@ -99,12 +97,12 @@ export default function NoirSkyline() {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     const checkReducedMotion = () => {
-      const isMobileDevice = window.innerWidth <= BREAKPOINTS.MD || window.matchMedia('(pointer: coarse)').matches;
+      const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
       setReducedMotion(mediaQuery.matches || lowEnd || isMobileDevice);
     };
 
     const mediaListener = (e: MediaQueryListEvent) => {
-      const isMobileDevice = window.innerWidth <= BREAKPOINTS.MD || window.matchMedia('(pointer: coarse)').matches;
+      const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
       setReducedMotion(e.matches || lowEnd || isMobileDevice);
     };
     mediaQuery.addEventListener('change', mediaListener);
@@ -113,7 +111,7 @@ export default function NoirSkyline() {
     let rafId: number | null = null;
     const handleMouseMove = (e: MouseEvent) => {
       if (isTransitioningRef.current) return;
-      const isMobileDevice = window.innerWidth <= BREAKPOINTS.MD || window.matchMedia('(pointer: coarse)').matches;
+      const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
       if (mediaQuery.matches || isMobileDevice) return;
       if (rafId) cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
@@ -124,7 +122,7 @@ export default function NoirSkyline() {
       });
     };
 
-    const isMobileDevice = window.innerWidth <= BREAKPOINTS.MD || window.matchMedia('(pointer: coarse)').matches;
+    const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
     if (!isMobileDevice && !mediaQuery.matches && !lowEnd) {
       window.addEventListener('mousemove', handleMouseMove);
     }
@@ -137,29 +135,10 @@ export default function NoirSkyline() {
     };
   }, [mouseX, mouseY]);
 
-  useEffect(() => {
-    if (reducedMotion) return;
-    const unsub = velocity.on('change', (v) => {
-      if (containerRef.current) {
-        if (Math.abs(v) > 0.1) {
-          containerRef.current.classList.add(styles.scrolling);
-        } else {
-          containerRef.current.classList.remove(styles.scrolling);
-        }
-      }
-    });
-    return () => {
-      unsub();
-      if (containerRef.current) {
-        containerRef.current.classList.remove(styles.scrolling);
-      }
-    };
-  }, [velocity, reducedMotion]);
-
   if (!mounted) return null;
 
   return (
-    <div ref={containerRef} className={`${styles.container} ${styles.active} ${theme === 'light' ? styles.lightPopart : styles.darkNoir} ${reducedMotion ? styles.reducedMotion : ''}`}>
+    <div className={`${styles.container} ${styles.active} ${theme === 'light' ? styles.lightPopart : styles.darkNoir} ${reducedMotion ? styles.reducedMotion : ''}`}>
       {/* ── Vignette Overlay ── */}
       <div className={styles.vignette} aria-hidden="true" />
 

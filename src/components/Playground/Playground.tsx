@@ -4,7 +4,6 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Lock, AlertTriangle, Search, Zap } from 'lucide-react';
 import { useLenis } from 'lenis/react';
 import { useTheme } from '@/context/ThemeContext';
-import { useIsMobile, useIsTablet } from '@/hooks/useMediaQuery';
 import Pathfinder from './Pathfinder';
 import { GridNode, runDijkstra, runAStar, runBFS, runDFS, runGreedyBestFirst, runBidirectionalBFS, PathfindingStep } from './pathfindingAlgorithms';
 import styles from './Playground.module.css';
@@ -21,22 +20,16 @@ interface LogEntry {
 function Playground() {
   const { isNoir } = useTheme();
   const lenis = useLenis();
-  const isMobile = useIsMobile();
-  const sectionRef = useRef<HTMLElement>(null);
-  const [sectionInView, setSectionInView] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const el = sectionRef.current;
-    if (!el || isMobile) return;
-
-    const observer = new IntersectionObserver(([entry]) => {
-      setSectionInView(entry.isIntersecting);
-    }, {
-      rootMargin: '100px 0px 100px 0px'
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [isMobile]);
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Grid coordinates state
   const [startNode, setStartNode] = useState<GridNode>({ col: 3, row: 7 });
@@ -75,17 +68,23 @@ function Playground() {
     'RESOLVED // DECRYPTION COMPLETE. DESK UNLOCKED.'
   ];
 
-  const isTablet = useIsTablet();
-
   // Mobile body scroll lock when simulation is launched in fullscreen
   useEffect(() => {
-    if (isLaunched && isTablet) {
-      lenis?.stop();
-    } else {
+    const handleResize = () => {
+      if (isLaunched && window.innerWidth <= 992) {
+        lenis?.stop();
+      } else {
+        lenis?.start();
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
       lenis?.start();
-    }
-    return () => { lenis?.start(); };
-  }, [isLaunched, isTablet, lenis]);
+    };
+  }, [isLaunched, lenis]);
 
   // Launch boot sequence orchestrator
   const handleLaunch = () => {
@@ -140,6 +139,7 @@ function Playground() {
   // Clear path and visited marks
   const clearPath = useCallback(() => {
     if (isRunning) return;
+    // Remove custom visualizer classes from DOM directly
     document.querySelectorAll('.visualizer-visited').forEach(el => el.classList.remove('visualizer-visited'));
     document.querySelectorAll('.visualizer-path').forEach(el => el.classList.remove('visualizer-path'));
     setVisitedNodes(new Set<string>());
@@ -157,6 +157,7 @@ function Playground() {
   // Full reset
   const resetGrid = useCallback(() => {
     if (isRunning) return;
+    // Remove custom visualizer classes from DOM directly
     document.querySelectorAll('.visualizer-visited').forEach(el => el.classList.remove('visualizer-visited'));
     document.querySelectorAll('.visualizer-path').forEach(el => el.classList.remove('visualizer-path'));
     setStartNode({ col: 3, row: 7 });
@@ -172,6 +173,7 @@ function Playground() {
   const visualize = useCallback(() => {
     if (isRunning) return;
 
+    // Reset markers before starting
     document.querySelectorAll('.visualizer-visited').forEach(el => el.classList.remove('visualizer-visited'));
     document.querySelectorAll('.visualizer-path').forEach(el => el.classList.remove('visualizer-path'));
     setVisitedNodes(new Set<string>());
@@ -191,6 +193,7 @@ function Playground() {
       : `ZAP! Launching ${algoName}... tracking target path!`
     );
 
+    // Instantiate selected algorithm generator
     let generator;
     if (algorithm === 'dijkstra') {
       generator = runDijkstra(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
@@ -222,14 +225,17 @@ function Playground() {
         const key = `${val.col},${val.row}`;
         localVisited.add(key);
         
+        // Directly inject visualizer-visited class into DOM cell to avoid React re-renders during active search loop
         const el = document.querySelector(`[data-col="${val.col}"][data-row="${val.row}"]`);
         if (el) {
           el.classList.add('visualizer-visited');
         }
         
+        // Schedule next iteration
         timerRef.current = setTimeout(step, SPEED_DELAYS[speed - 1]);
       } 
       else if (val.type === 'path' && val.path) {
+        // Direct DOM update for path styling
         val.path.forEach((node) => {
           const el = document.querySelector(`[data-col="${node.col}"][data-row="${node.row}"]`);
           if (el) {
@@ -237,6 +243,7 @@ function Playground() {
           }
         });
 
+        // Sync final visited & path sets to React state in a single batch render at the end
         setVisitedNodes(new Set(localVisited));
 
         const newPath = new Set<string>();
@@ -252,6 +259,7 @@ function Playground() {
         );
       } 
       else if (val.type === 'no-path') {
+        // Sync final visited set to React state in a single batch render at the end
         setVisitedNodes(new Set(localVisited));
 
         setIsRunning(false);
@@ -288,7 +296,7 @@ function Playground() {
       <section id="playground" className={styles.playground} aria-label="Playground">
         <div className={styles.container}>
           <h2 className={styles.sectionTitle}>
-            {isNoir ? 'THE DETECTIVE\u2019S DESK' : 'THE ALGORITHM LAB'}
+            {isNoir ? 'THE DETECTIVE’S DESK' : 'THE ALGORITHM LAB'}
           </h2>
           <div className={styles.mobileWarning} style={{ display: 'flex' }}>
             <span className={styles.warningIcon}>{isNoir ? <Lock size={20} /> : <AlertTriangle size={20} />}</span>
@@ -307,10 +315,10 @@ function Playground() {
   }
 
   return (
-    <section ref={sectionRef} id="playground" className={styles.playground} aria-label="Playground">
+    <section id="playground" className={styles.playground} aria-label="Playground">
       <div className={styles.container}>
         <h2 className={styles.sectionTitle}>
-          {isNoir ? 'THE DETECTIVE\u2019S DESK' : 'THE ALGORITHM LAB'}
+          {isNoir ? 'THE DETECTIVE’S DESK' : 'THE ALGORITHM LAB'}
         </h2>
 
         <div className={styles.moBanner}>
@@ -326,6 +334,7 @@ function Playground() {
 
         <div className={`${styles.desk} ${isLaunched ? styles.fullscreenMobile : ''}`}>
             
+            {/* Header only visible in mobile fullscreen mode */}
             {isLaunched && (
               <div className={styles.fullscreenHeader}>
                 <span className={styles.fullscreenTitle} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
@@ -343,15 +352,17 @@ function Playground() {
               </div>
             )}
 
+            {/* Launch Overlay (Desktop & Boot Sequence Overlay) */}
             {(!isLaunched || isBooting) && (
               <div className={styles.launchOverlay}>
-                {sectionInView && <div className={styles.scanline}></div>}
+                <div className={styles.scanline}></div>
                 <div className={styles.crtContent}>
                   <h3 className={styles.overlayTitle} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                     {isNoir ? <Search size={18} /> : <Zap size={18} />}
                     <span>{isNoir ? 'CASE LEDGER ACCESS' : 'PATH CORE v2.5'}</span>
                   </h3>
                   
+                  {/* Themed Boot Logs / Diagnostic Specs */}
                   <div className={styles.sysLogs}>
                     {isBooting ? (
                       bootLogs.map((log, index) => (
@@ -385,6 +396,7 @@ function Playground() {
               </div>
             )}
 
+            {/* Mobile Launcher Card (Displayed in place when not booted on mobile) */}
             {!isLaunched && !isBooting && (
               <div className={styles.mobileWarning}>
                 <span className={styles.warningIcon}>{isNoir ? <Lock size={20} /> : <AlertTriangle size={20} />}</span>
@@ -407,128 +419,130 @@ function Playground() {
               </div>
             )}
 
-            {isLaunched && !isBooting && (
-              <>
-                <div className={styles.panelLayout}>
-                  <Pathfinder
-                    cols={GRID_COLS}
-                    rows={GRID_ROWS}
-                    startNode={startNode}
-                    setStartNode={setStartNode}
-                    endNode={endNode}
-                    setEndNode={setEndNode}
-                    walls={walls}
-                    setWalls={setWalls}
-                    visitedNodes={visitedNodes}
-                    pathNodes={pathNodes}
-                    isNoir={isNoir}
-                    isRunning={isRunning}
-                  />
+            <div className={styles.panelLayout}>
+              {/* Interactive Pathfinder Grid */}
+              <Pathfinder
+                cols={GRID_COLS}
+                rows={GRID_ROWS}
+                startNode={startNode}
+                setStartNode={setStartNode}
+                endNode={endNode}
+                setEndNode={setEndNode}
+                walls={walls}
+                setWalls={setWalls}
+                visitedNodes={visitedNodes}
+                pathNodes={pathNodes}
+                isNoir={isNoir}
+                isRunning={isRunning}
+              />
 
-                  <div className={styles.controls}>
-                    <div className={styles.controlGroup}>
-                      <label className={styles.label}>
-                        {isNoir ? 'Case Ledger Method' : 'Algorithm Engine'}
-                      </label>
-                      <select
-                        className={styles.select}
-                        value={algorithm}
-                        onChange={(e) => setAlgorithm(e.target.value as 'dijkstra' | 'astar' | 'bfs' | 'dfs' | 'greedy' | 'bidirectional')}
-                        disabled={isRunning}
-                      >
-                        <option value="dijkstra">
-                          {isNoir ? 'Dijkstra (Complete Sweep)' : "Dijkstra's (Full Grid Wave)"}
-                        </option>
-                        <option value="astar">
-                          {isNoir ? 'A* Search (Heuristic Scan)' : 'A* Search (Guided Manhattan)'}
-                        </option>
-                        <option value="greedy">
-                          {isNoir ? 'Greedy Scan (Tunnel Vision)' : 'Greedy Best-First (Heuristic Scan)'}
-                        </option>
-                        <option value="bfs">
-                          {isNoir ? 'BFS (Spread Search)' : 'BFS (Unweighted Wave)'}
-                        </option>
-                        <option value="bidirectional">
-                          {isNoir ? 'Bidirectional Sweep (Dual Encircling)' : 'Bidirectional BFS (Dual Search)'}
-                        </option>
-                        <option value="dfs">
-                          {isNoir ? 'DFS (Winding Probe)' : 'DFS (Backtracking Path)'}
-                        </option>
-                      </select>
-                    </div>
+              {/* Controls Console */}
+              <div className={styles.controls}>
+                {/* Algorithm Selector */}
+                <div className={styles.controlGroup}>
+                  <label className={styles.label}>
+                    {isNoir ? 'Case Ledger Method' : 'Algorithm Engine'}
+                  </label>
+                  <select
+                    className={styles.select}
+                    value={algorithm}
+                    onChange={(e) => setAlgorithm(e.target.value as 'dijkstra' | 'astar' | 'bfs' | 'dfs' | 'greedy' | 'bidirectional')}
+                    disabled={isRunning}
+                  >
+                    <option value="dijkstra">
+                      {isNoir ? 'Dijkstra (Complete Sweep)' : "Dijkstra's (Full Grid Wave)"}
+                    </option>
+                    <option value="astar">
+                      {isNoir ? 'A* Search (Heuristic Scan)' : 'A* Search (Guided Manhattan)'}
+                    </option>
+                    <option value="greedy">
+                      {isNoir ? 'Greedy Scan (Tunnel Vision)' : 'Greedy Best-First (Heuristic Scan)'}
+                    </option>
+                    <option value="bfs">
+                      {isNoir ? 'BFS (Spread Search)' : 'BFS (Unweighted Wave)'}
+                    </option>
+                    <option value="bidirectional">
+                      {isNoir ? 'Bidirectional Sweep (Dual Encircling)' : 'Bidirectional BFS (Dual Search)'}
+                    </option>
+                    <option value="dfs">
+                      {isNoir ? 'DFS (Winding Probe)' : 'DFS (Backtracking Path)'}
+                    </option>
+                  </select>
+                </div>
 
-                    <div className={styles.controlGroup}>
-                      <label className={styles.label}>
-                        {isNoir ? 'Search Intensity' : 'Visualizer Speed'}
-                      </label>
-                      <div className={styles.sliderContainer}>
-                        <input
-                          type="range"
-                          min="1"
-                          max="5"
-                          className={styles.slider}
-                          value={speed}
-                          onChange={(e) => setSpeed(Number(e.target.value))}
-                          disabled={isRunning}
-                        />
-                        <span className={styles.speedText}>
-                          {getSpeedLabel(speed)}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className={styles.buttonRow}>
-                      <button
-                        type="button"
-                        className={`${styles.btn} ${styles.btnPrimary}`}
-                        onClick={visualize}
-                        disabled={isRunning}
-                      >
-                        {isNoir ? 'Investigate' : 'Visualize!'}
-                      </button>
-                      <button
-                        type="button"
-                        className={`${styles.btn} ${styles.btnSecondary}`}
-                        onClick={clearPath}
-                        disabled={isRunning}
-                      >
-                        {isNoir ? 'Clear Ledger' : 'Clear Path'}
-                      </button>
-                    </div>
-
-                    <div className={`${styles.buttonRow} ${styles.buttonRowFull}`}>
-                      <button
-                        type="button"
-                        className={`${styles.btn} ${styles.btnSecondary}`}
-                        onClick={clearWalls}
-                        disabled={isRunning}
-                        style={{ width: '100%', marginBottom: '0.75rem' }}
-                      >
-                        {isNoir ? 'Clear Barriers' : 'Clear Walls'}
-                      </button>
-                      <button
-                        type="button"
-                        className={`${styles.btn} ${styles.btnSecondary}`}
-                        onClick={resetGrid}
-                        disabled={isRunning}
-                        style={{ width: '100%' }}
-                      >
-                        {isNoir ? 'Reset Desk' : 'Reset Grid'}
-                      </button>
-                    </div>
+                {/* Speed Slider */}
+                <div className={styles.controlGroup}>
+                  <label className={styles.label}>
+                    {isNoir ? 'Search Intensity' : 'Visualizer Speed'}
+                  </label>
+                  <div className={styles.sliderContainer}>
+                    <input
+                      type="range"
+                      min="1"
+                      max="5"
+                      className={styles.slider}
+                      value={speed}
+                      onChange={(e) => setSpeed(Number(e.target.value))}
+                      disabled={isRunning}
+                    />
+                    <span className={styles.speedText}>
+                      {getSpeedLabel(speed)}
+                    </span>
                   </div>
                 </div>
 
-                <div className={styles.console} ref={consoleRef} role="log" aria-label="Visualizer terminal output">
-                  {displayLogs.map((log, index) => (
-                    <p key={index} className={styles.consoleLine}>
-                      <span className={styles.consoleTimestamp}>[{log.timestamp}]</span>
-                      {log.message}
-                    </p>
-                  ))}
+                {/* Action Buttons */}
+                <div className={styles.buttonRow}>
+                  <button
+                    type="button"
+                    className={`${styles.btn} ${styles.btnPrimary}`}
+                    onClick={visualize}
+                    disabled={isRunning}
+                  >
+                    {isNoir ? 'Investigate' : 'Visualize!'}
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.btn} ${styles.btnSecondary}`}
+                    onClick={clearPath}
+                    disabled={isRunning}
+                  >
+                    {isNoir ? 'Clear Ledger' : 'Clear Path'}
+                  </button>
                 </div>
-              </>
-            )}
+
+                <div className={`${styles.buttonRow} ${styles.buttonRowFull}`}>
+                  <button
+                    type="button"
+                    className={`${styles.btn} ${styles.btnSecondary}`}
+                    onClick={clearWalls}
+                    disabled={isRunning}
+                    style={{ width: '100%', marginBottom: '0.75rem' }}
+                  >
+                    {isNoir ? 'Clear Barriers' : 'Clear Walls'}
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.btn} ${styles.btnSecondary}`}
+                    onClick={resetGrid}
+                    disabled={isRunning}
+                    style={{ width: '100%' }}
+                  >
+                    {isNoir ? 'Reset Desk' : 'Reset Grid'}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Retro Logs Terminal Output */}
+            <div className={styles.console} ref={consoleRef} role="log" aria-label="Visualizer terminal output">
+              {displayLogs.map((log, index) => (
+                <p key={index} className={styles.consoleLine}>
+                  <span className={styles.consoleTimestamp}>[{log.timestamp}]</span>
+                  {log.message}
+                </p>
+              ))}
+            </div>
         </div>
       </div>
     </section>

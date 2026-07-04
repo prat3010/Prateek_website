@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { useTheme, useAudience } from '@/context/ThemeContext';
+import { useTheme } from '@/context/ThemeContext';
 import Scrambler from '@/components/ui/Scrambler';
 import type { ScramblerProps } from '@/components/ui/Scrambler';
 import { useLenis } from 'lenis/react';
@@ -21,8 +21,7 @@ const PRICING_SECTION_TITLE_TEXTS: ScramblerProps['texts'] = {
 };
 
 function Pricing({ resumeData }: PricingProps) {
-  const { isNoir } = useTheme();
-  const { audience } = useAudience();
+  const { isNoir, audience } = useTheme();
   const lenis = useLenis();
 
   const activeAudience = audience || 'developer';
