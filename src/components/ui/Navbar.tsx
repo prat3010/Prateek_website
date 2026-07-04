@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef, type MouseEvent } from 'react';
+import { usePathname } from 'next/navigation';
 import { useLenis } from 'lenis/react';
 import { useTheme } from '@/context/ThemeContext';
 import { useLenisScroll } from '@/context/LenisProvider';
@@ -27,6 +28,7 @@ export interface NavbarProps {
 }
 
 export default function Navbar({ items, className }: NavbarProps) {
+  const pathname = usePathname();
   const { isNoir, toggleTheme, audience, setAudience } = useTheme();
 
   const navItems = useMemo(() => {
@@ -98,7 +100,7 @@ export default function Navbar({ items, className }: NavbarProps) {
     });
 
     return () => observer.disconnect();
-  }, [navItems]);
+  }, [navItems, pathname]);
 
   /* ---------- Close mobile menu on desktop resize ---------- */
   useEffect(() => {
