@@ -135,7 +135,7 @@ export default function Footer({ socials, className }: FooterProps) {
                 <h3 className={styles.comicPanelTitle}>THE MISSION!</h3>
                 <div className={styles.comicPanelBody}>
                   <p className={styles.comicText}>
-                    Designing premium web experiences with a punch of color and vector precision. Stand out, make it pop!
+                    Building clear, usable web experiences with careful motion and a focused visual identity.
                   </p>
                   <p className={styles.comicMadeWith}>
                     Made with <span className={styles.heart}><Heart size={14} style={{ display: 'inline', verticalAlign: 'middle', fill: 'var(--pop-red)', stroke: 'var(--pop-black)' }} /></span> and <span className={styles.pow}>POW!</span> by Prateeq Sharma

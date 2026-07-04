@@ -354,14 +354,14 @@ export default function SiteInfoConsole() {
       case 'help':
         response = [
           { text: 'Available commands:', type: 'success' },
-          { text: '  projects   - Index developer project indices & tags', type: 'output' },
-          { text: '  system     - Print logical CPU cores, memory & display metrics', type: 'output' },
-          { text: '  storage    - Audit client cookies, local & session storage', type: 'output' },
-          { text: '  stack      - List all the technologies used to make this website', type: 'output' },
-          { text: '  sync       - Inspect the local database synchronization engine info', type: 'output' },
-          { text: '  analytics  - Print dynamic database traffic visitor statistics summary', type: 'output' },
+          { text: '  projects   - List portfolio projects and tags', type: 'output' },
+          { text: '  system     - Show CPU, memory, and display metrics', type: 'output' },
+          { text: '  storage    - Inspect local and session storage', type: 'output' },
+          { text: '  stack      - List the website technologies', type: 'output' },
+          { text: '  sync       - Show the local content sync workflow', type: 'output' },
+          { text: '  analytics  - Show visitor statistics summary', type: 'output' },
           { text: '  cheatcode  - Run retro developer override (3D WebGL parade)', type: 'output' },
-          { text: '  git-info   - Open the interactive portfolio Git commit inspector', type: 'output' },
+          { text: '  git-info   - Open the generated portfolio commit log', type: 'output' },
           { text: '  qrcode     - Scan PhonePe QR code to pay or donate directly', type: 'output' },
           { text: '  clear      - Clear the command interface screen', type: 'output' }
         ];
@@ -453,13 +453,13 @@ export default function SiteInfoConsole() {
       case 'synchronizer':
         response = [
           { text: 'PORTFOLIO DATABASE SYNCHRONIZER:', type: 'success' },
-          { text: '  An AI-powered local manager dashboard that scans codebase folders or GitHub repos, extracts project metadata via Gemini, and synchronizes skills, certificates, resumes, and projects directly into the website code.', type: 'output' },
+          { text: '  A local manager dashboard for updating projects, skills, certificates, and resume content.', type: 'output' },
           { text: ' ', type: 'output' },
           { text: '  - Core Script: scripts/synchronizer.py (Python 3)', type: 'output' },
           { text: '  - Interface: Streamlit Local Dashboard', type: 'output' },
-          { text: '  - AI Parsing Integration: Gemini 2.5 Flash API (Structured JSON Mode)', type: 'output' },
-          { text: '  - Database Sync: Supabase Live Database', type: 'output' },
-          { text: '  - Codebase Fallbacks: JSON records (projects, skills, certs, resume)', type: 'output' },
+          { text: '  - AI Parsing Integration: Gemini 2.5 Flash API', type: 'output' },
+          { text: '  - Database Sync: Supabase', type: 'output' },
+          { text: '  - Codebase Fallbacks: JSON records for projects, skills, certificates, and resume', type: 'output' },
           { text: '  - Blog Output: Markdown files in src/content/posts/', type: 'output' },
           { text: '  - Local Command: streamlit run scripts/synchronizer.py', type: 'output' }
         ];

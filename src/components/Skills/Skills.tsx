@@ -60,7 +60,7 @@ const SKILLS_COPY: Record<'developer' | 'business', Record<'light' | 'noir', Ski
       sectionTitle: "CAPABILITIES",
       moBadge: "MY M.O.",
       moHeader: "METHOD OF OPERATION",
-      moText: "I use AI tools like Cursor and Gemini to move fast — but I understand every layer of the stack. My energy goes into system architecture, product design, UX, and shipping real products.",
+      moText: "I use AI tools to move faster, but I keep the stack understandable. The focus stays on architecture, product design, UX, and shipping work that can be maintained.",
       tabs: {
         orchestration: "I. AI ORCHESTRATION",
         logic: "II. SYSTEMS & LOGIC",
@@ -72,7 +72,7 @@ const SKILLS_COPY: Record<'developer' | 'business', Record<'light' | 'noir', Ski
       sectionTitle: "CAPABILITIES",
       moBadge: "CASE FILE",
       moHeader: "DEVELOPMENT METHODOLOGY",
-      moText: "Subject leverages AI-augmented development to accelerate delivery. Demonstrates full-stack comprehension across architecture, product design, and debugging. AI is the accelerant, not the substitute.",
+      moText: "AI helps accelerate delivery, but the stack still needs to be clear. The work stays centered on architecture, product design, debugging, and maintenance.",
       tabs: {
         orchestration: "I. AI ORCHESTRATION",
         logic: "II. SYSTEMS & LOGIC",
@@ -86,7 +86,7 @@ const SKILLS_COPY: Record<'developer' | 'business', Record<'light' | 'noir', Ski
       sectionTitle: "SERVICES & CAPABILITIES",
       moBadge: "ENGAGEMENT",
       moHeader: "HOW WE WORK",
-      moText: "I partner directly with businesses to build high-performance products. No layers of communication, no agency overhead. I run custom design prototypes, develop responsive applications, and deploy automated backend structures.",
+      moText: "I work directly with businesses on websites, custom tools, and practical workflows. The process stays simple, with clear communication and maintainable delivery.",
       tabs: {
         orchestration: "I. AI INTEGRATION",
         logic: "II. WEB APPLICATIONS",
@@ -98,7 +98,7 @@ const SKILLS_COPY: Record<'developer' | 'business', Record<'light' | 'noir', Ski
       sectionTitle: "SERVICES & CAPABILITIES",
       moBadge: "PROTOCOL",
       moHeader: "ENGAGEMENT MODEL",
-      moText: "Subject operates as an independent contractor, removing agency middlemen. Delivers functional design prototypes, fast frontend builds, and secure database setups directly to clients under clear, contracted deliverables.",
+      moText: "Independent delivery keeps communication direct and the scope clear. The work covers prototypes, frontend builds, and data setup without extra layers.",
       tabs: {
         orchestration: "I. AI INTEGRATION",
         logic: "II. WEB APPLICATIONS",

@@ -134,23 +134,23 @@ export default async function AnalyticsPage(props: {
         </div>
         <div>
           <h3 className={styles.privacyTitle}>
-            Privacy & Performance Protection Active!
+            Privacy & Performance Notes
           </h3>
           <p className={styles.privacyDesc}>
-            This analytics panel is public so visitors can inspect our custom-built telemetry and database aggregation logic. To ensure absolute compliance with global privacy regulations and optimize hosting overhead, the following safeguards are implemented:
+            This analytics panel is public so visitors can inspect the telemetry and aggregation setup. The dashboard keeps the data model narrow and avoids exposing raw visitor details:
           </p>
           <div className={styles.privacyDetails}>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
               <Lock size={14} style={{ flexShrink: 0 }} />
-              <span><strong>No PII:</strong> IP addresses are salted and hashed locally with a daily rotating salt before saving.</span>
+              <span><strong>No PII:</strong> IP addresses are salted and hashed locally before saving.</span>
             </span>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
               <EyeOff size={14} style={{ flexShrink: 0 }} />
-              <span><strong>Sanitized Referrers:</strong> All traffic source referrers are parsed and stored as domain-only hostnames to prevent private URL/path leakage.</span>
+              <span><strong>Sanitized Referrers:</strong> Traffic source referrers are stored as domain-only hostnames.</span>
             </span>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
               <Zap size={14} style={{ flexShrink: 0 }} />
-              <span><strong>Cached Queries:</strong> Supabase aggregation queries are cached on the server for 5 minutes (via ISR) to prevent database resource exhaustion.</span>
+              <span><strong>Cached Queries:</strong> Supabase aggregation queries are cached on the server for 5 minutes.</span>
             </span>
           </div>
         </div>

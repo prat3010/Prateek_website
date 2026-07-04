@@ -78,7 +78,7 @@ export default function OnboardingSelector() {
                 </div>
                 <h2 className={styles.cardTitle}>Hiring a Developer</h2>
                 <p className={styles.cardDesc}>
-                  Inspect coding competencies, system architectures, detailed technical case reviews, and export my software engineering resume.
+                  Review engineering experience, system work, and resume details for recruiting or hiring decisions.
                 </p>
                 <div className={styles.cardMeta}>
                   <span>Targeted for recruiters, engineering managers, & CTOs</span>
@@ -106,7 +106,7 @@ export default function OnboardingSelector() {
                 </div>
                 <h2 className={styles.cardTitle}>Need a Website</h2>
                 <p className={styles.cardDesc}>
-                  Explore freelance services, outcomes, custom web applications, design optimization rates, and generate service quotations.
+                  Review freelance services, web application options, and pricing so you can start a project or request a quote.
                 </p>
                 <div className={styles.cardMeta}>
                   <span>Targeted for business owners, startups, & creators</span>

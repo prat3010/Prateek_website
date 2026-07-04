@@ -25,15 +25,14 @@ function About({ resumeData }: AboutProps) {
     if (bioContent) {
       return isNoir ? bioContent.noir : bioContent.light;
     }
-    // Hardcoded static fallbacks
     if (activeAudience === 'business') {
-      return isNoir 
-        ? "They talk about design and code like separate puzzles. I don't. My name is Prateeq Sharma. I'm a technology partner who turns business concepts into high-end, responsive web platforms. With a background in Commerce and expert software engineering skills, I design custom admin portals, optimize performance, and integrate secure payment setups to maximize your bottom line. We build with precision and zero overhead, delivering results that actually matter."
-        : "Hey there! I'm Prateeq Sharma — a freelance developer and technology partner who builds clean, high-performance websites and custom tools. Coming from a Commerce background, I don't just write code; I design systems that solve actual business problems, optimize load speeds for better search rankings, and integrate AI automations to save your team hours of manual work. Let's collaborate to build something your customers will love.";
+      return isNoir
+        ? "I'm Prateeq Sharma, a freelance developer focused on practical websites, clear handoff, and maintainable client work."
+        : "I'm Prateeq Sharma, a freelance developer who builds practical websites, custom tools, and straightforward client workflows.";
     }
     return isNoir
-      ? "They stare at screens, praying to a god of syntax and semicolons. I don't. My name is Prateeq Sharma. I transitioned from a background in Commerce to software engineering when I realized that code + AI is the ultimate leverage to solve complex business and technical problems. Now, I bring ideas out of the dark and into reality at warp speed. While traditional coders get lost in legacy frameworks, I combine solid system logic with AI orchestration to build fast, polished applications. In this city, the real superpower isn't memorizing boilerplate code. It's having the vision to design, the skill to build, and the tools to make it happen before the rain stops."
-      : "Hey there! I'm Prateeq Sharma — a product-minded developer and builder who crafts high-performance web applications and digital experiences. Transitioning from a Commerce background, I realized that combining business logic with software and modern AI orchestration is the fastest way to turn complex requirements into shipped products. I focus on delivering velocity, architectural precision, and high-impact results.";
+      ? "I'm Prateeq Sharma, a developer focused on clear structure, practical AI-assisted workflows, and dependable delivery."
+      : "I'm Prateeq Sharma, a developer focused on web applications, interface quality, and practical AI-assisted workflows.";
   }, [bioContent, isNoir, activeAudience]);
 
   // Format biography text to bold the name dynamically
