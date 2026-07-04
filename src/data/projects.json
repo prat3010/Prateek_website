@@ -2,8 +2,8 @@
   {
     "id": "earth-evolution-simulator",
     "title": "Earth Evolution Simulator",
-    "description": "A scenario-driven simulation game where players guide a planet through ten evolutionary eras by making high-stakes decisions.",
-    "longDescription": "Earth Evolution Simulator is a scenario-driven simulation game where players guide a planet through ten distinct evolutionary eras. By resolving high-stakes ecological and geological decisions, players navigate random events and path-dependent consequences to steer the planet toward one of four cosmic endings. The Python Flask backend maintains game state in-session and records player run telemetry into a local SQLite database, while a custom game engine models planetary habitability by tracking dynamic variables and applying a deferred trigger system.",
+    "description": "A scenario-driven simulation game where players guide a planet through evolutionary eras by making tradeoffs over time.",
+    "longDescription": "Earth Evolution Simulator is a scenario-driven simulation game where players guide a planet through distinct evolutionary eras. The experience uses stateful decision-making, random events, and path-dependent consequences to steer the planet toward different outcomes. A Python Flask backend maintains game state in session and records run data in SQLite, while the custom engine tracks planetary variables and deferred triggers.",
     "image": "/images/project-earth-simulator.webp",
     "tags": [
       "Python",
@@ -18,14 +18,14 @@
     "color": "#00E676",
     "isLive": true,
     "status": "live",
-    "description_business": "An interactive scenario-driven simulation platform demonstrating path-dependent decision modeling and complex system tracking.",
-    "longDescription_business": "Earth Evolution Simulator translates complex planetary ecology and resource allocation dynamics into a highly engaging, interactive simulation. Designed to showcase advanced state management, dynamic telemetry logging, and user choice tracking, the application models complex workflows and decision-making chains. The product is built on a high-availability architecture, utilizing SQLite for run histories and structured feedback loops to deliver educational value and an immersive user experience."
+    "description_business": "An interactive simulation platform built around path-dependent decision-making and state tracking.",
+    "longDescription_business": "Earth Evolution Simulator turns planetary ecology and resource allocation into an interactive simulation. The application uses stateful gameplay, dynamic events, and simple telemetry to model decision-making over time. It runs on a Python Flask backend with SQLite for run history and persistence."
   },
   {
     "id": "iss-tracker",
     "title": "ISS Live Location Tracker",
-    "description": "A real-time International Space Station tracker displaying reverse-geocoded terrestrial location or nearest ocean/landmass.",
-    "longDescription": "Built on the FastAPI framework, this application continuously polls the Open-Notify API to retrieve the current latitude and longitude of the ISS. If the ISS is over land, the server utilizes geopy to reverse-geocode coordinates via the Nominatim API and fetch a precise address, state, and country. If the ISS is over water, the system runs an offline-capable KD-tree lookup via reverse_geocoder to find the nearest landmass, computes the geodesic distance using the oblate spheroid model, maps the coordinates to custom ocean bounding boxes, and pulls NASA's APOD API to serve a cached daily celestial background.",
+    "description": "A real-time International Space Station tracker that shows the station position with location context.",
+    "longDescription": "Built on the FastAPI framework, this application polls a public API for the current latitude and longitude of the ISS. When the station is over land, it uses geopy and Nominatim to reverse-geocode a readable location. When it is over water, it falls back to an offline KD-tree lookup for the nearest landmass and uses cached NASA imagery for the daily background.",
     "image": "/images/project-iss-tracker.webp",
     "tags": [
       "Python",
@@ -41,14 +41,14 @@
     "color": "#2979FF",
     "isLive": false,
     "status": "soon",
-    "description_business": "A real-time tracking application displaying geographical details and celestial data via reverse-geocoding APIs.",
-    "longDescription_business": "The ISS Live Location Tracker showcases high-frequency API polling, third-party integration pipelines, and geographic data processing. Utilizing geopy for reverse-geocoding coordinates and KD-trees for local offline geolocation lookups, the platform provides immediate feedback on ISS positions. The application caches daily NASA space assets to ensure fast page loads, demonstrating how geolocation telemetry can be resolved and displayed dynamically for public-facing dashboards."
+    "description_business": "A real-time tracking application for showing the ISS position with location context.",
+    "longDescription_business": "The ISS Live Location Tracker polls a public API for the station position and resolves location details when the ISS is over land. It uses geopy for reverse geocoding and an offline KD-tree lookup for broader location context when needed. NASA imagery is cached for the daily background so the page stays responsive."
   },
   {
     "id": "metawipe",
     "title": "MetaWipe",
-    "description": "A privacy-first mobile app that strips metadata (EXIF, GPS, device data) from photos locally before sharing.",
-    "longDescription": "MetaWipe achieves absolute metadata sanitization by decoding selected images into raw pixel grids within secure, isolated background threads (using Dart isolates) and discarding the original container file entirely. Once the raw pixel data is reconstructed, it is re-encoded into a fresh JPEG or PNG container, ensuring no residual manufacturer notes or hidden thumbnail trackers survive. Operating completely offline, the app does not declare the android.permission.INTERNET permission, making it architecturally impossible to leak files or telemetry data to remote servers.",
+    "description": "A privacy-first mobile app that removes metadata from photos locally before sharing.",
+    "longDescription": "MetaWipe removes EXIF metadata from images locally by decoding selected files in Dart isolates and rebuilding them into a fresh JPEG or PNG container. The app runs offline, does not require network permission, and keeps the workflow on device from start to finish.",
     "image": "/images/project-metawipe.webp",
     "tags": [
       "Flutter",
@@ -63,14 +63,14 @@
     "color": "#00E676",
     "isLive": false,
     "status": "soon",
-    "description_business": "A privacy-focused mobile application that strips metadata from images locally for secure, worry-free media sharing.",
-    "longDescription_business": "MetaWipe is a lightweight mobile utility that guarantees photo privacy by stripping identifying EXIF metadata locally. The app decodes images into raw pixels in isolated background threads (Dart isolates) and recreates containers without GPS, device signatures, or thumbnail data. Operating entirely offline and requiring no network permissions, MetaWipe establishes user trust through secure, client-side container sanitization."
+    "description_business": "A privacy-focused mobile application that removes metadata from images locally before sharing.",
+    "longDescription_business": "MetaWipe is a lightweight mobile utility that strips EXIF metadata from images on-device. The app decodes images into raw pixels in Dart isolates and rebuilds them into a fresh container without hidden metadata. It runs offline and does not require network access."
   },
   {
     "id": "paintmix-ai",
     "title": "PaintMix AI",
-    "description": "A camera-based paint mixing assistant that samples colors and calculates precise mixing proportions.",
-    "longDescription": "PaintMix AI is a mobile application that uses a device's camera to sample any real-world target color and automatically calculates the exact paint proportions needed to mix and match that color using the user's existing paint inventory. Under the hood, PaintMix AI converts sampled RGB image data into XYZ and CIELAB color spaces to perform advanced perceptual color-matching calculations using Delta E (CIE76 and CIE94) distance optimization. The custom-built algorithmic engine evaluates and ranks one-color (closest single matches), two-color, and three-color paint combinations by weight ratio partitions from a local inventory managed using Drift and SQLite. Furthermore, it automatically generates color-theory-informed feedback, detailing shifts in lightness, saturation, and hue temperature (warm vs. cool shifts) to guide artists in tuning their mixtures.",
+    "description": "A camera-based paint mixing assistant that estimates matching paint proportions.",
+    "longDescription": "PaintMix AI uses a device camera to sample a target color and estimate paint proportions from inventory. It converts RGB inputs into XYZ and CIELAB spaces and uses Delta E distance checks to compare possible mixes. Inventory data is stored locally with SQLite so the workflow stays fast and offline-friendly.",
     "image": "/images/project-paintmix.webp",
     "tags": [
       "Flutter",
@@ -85,14 +85,14 @@
     "color": "#FF9100",
     "isLive": false,
     "status": "soon",
-    "description_business": "A camera-based color mixing assistant that detects real-world colors and calculates exact color matching ratios.",
-    "longDescription_business": "PaintMix AI is a helper tool for artists and designers that uses the device camera to identify target colors and calculate mixing proportions from inventory. By converting RGB inputs to XYZ and CIELAB spaces, the app runs Delta E distance optimization to find the best color combinations. Inventory management runs offline using SQLite, demonstrating custom color-space algorithms, responsive camera feeds, and detailed visual instructions."
+    "description_business": "A camera-based color mixing assistant that helps estimate matching paint ratios.",
+    "longDescription_business": "PaintMix AI uses the device camera to sample a target color and estimate paint proportions from inventory. It converts RGB inputs to XYZ and CIELAB spaces and uses Delta E distance checks to compare possible mixes. Inventory data is stored locally with SQLite so the workflow stays fast and offline-friendly."
   },
   {
     "id": "prateeksync-ai--intelligent-portfolio---resume-automation-engine",
     "title": "PrateekSync AI: Intelligent Portfolio & Resume Automation Engine",
-    "description": "An AI-powered local orchestrator and headless CMS that automates portfolio metadata, verifies scanned credentials via multimodal OCR, and dynamically syncs archetype-tailored resume bullets.",
-    "longDescription": "PrateekSync AI is engineered as a robust headless CMS, leveraging Python 3.x and Streamlit for its interactive dashboard, to intelligently manage and synchronize professional portfolio and resume data. It features a custom Python state machine parser for safe, direct manipulation of TypeScript data files without AST corruption, ensuring integrity for dynamic content generation. Core functionalities include a Google Gemini 2.5 Flash API-driven repository analyzer that synthesizes GitHub commit data into tailored resume bullets, alongside a multimodal OCR system for verifying credentials from image or PDF scans. The architecture integrates robust file system operations for asset management and supports diverse content generation tasks, from technical blogs to interactive skill dependency mapping, offering a comprehensive, AI-enhanced content automation solution.",
+    "description": "A local content manager for portfolio metadata, credential review, and generated resume copy.",
+    "longDescription": "PrateekSync AI is a Streamlit-based content manager for portfolio data, certificates, and blog posts. It syncs to Supabase, keeps local JSON fallbacks in step, and uses Gemini for OCR and content assistance where needed. The workflow is built for local editing, review, and controlled publishing.",
     "image": "/images/project-prateeksync-ai--intelligent-portfolio---resume-automation-engine.webp",
     "tags": [
       "Python",
@@ -107,7 +107,7 @@
     "color": "#2979FF",
     "isLive": false,
     "status": "personal",
-    "description_business": "An AI-powered automation engine and headless CMS that optimizes resume metadata, parses credentials via OCR, and synchronizes content.",
-    "longDescription_business": "PrateekSync AI simplifies content updates and credential validation through a streamlined developer control panel. The system automates portfolio synchronization with GitHub APIs, checks certificate validity via Gemini-powered OCR, and compiles TypeScript data stores dynamically. This ensures consistent data updates across web profiles, lowering management overhead while retaining local fallbacks."
+    "description_business": "A local content manager for updating portfolio data, certificates, and blog posts.",
+    "longDescription_business": "PrateekSync AI is a Streamlit-based content manager for portfolio data, certificates, and blog posts. It syncs to Supabase, keeps local JSON fallbacks in step, and uses Gemini for OCR and content assistance where needed. The workflow is built for local editing, review, and controlled publishing."
   }
 ]

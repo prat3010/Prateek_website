@@ -5,10 +5,10 @@
   "title": "Full-Stack Developer & AI Orchestration Engineer",
   "github": "https://github.com/prat3010",
   "summary": {
-    "ai": "Specialist in AI agent orchestration and Prompt Engineering, building and automating LLM-backed pipelines (retrieval-augmented generation, agents, multimodal processing) to solve complex workflows.",
-    "general": "Versatile software engineer specializing in building high-performance web applications and interactive interfaces. Expert in combining clean backend APIs with modern frontend frameworks, while utilizing state-of-the-art AI systems for rapid prototyping and deployment.",
-    "creative": "UI/UX focused developer dedicated to creating stunning interactive visual interfaces, micro-animations, and responsive layouts that deliver premium user experiences.",
-    "fullstack": "Engineered web architectures focusing on robust server backends, database schema optimizations, and seamless client-server integration using Next.js, Flask, FastAPI, and Supabase."
+    "ai": "Builds AI-assisted workflows, content pipelines, and automation tools that make recurring tasks easier to run and review.",
+    "general": "Builds web applications and interactive interfaces with attention to clear structure, performance, and maintainability.",
+    "creative": "Designs responsive interfaces with careful motion, layout, and visual hierarchy.",
+    "fullstack": "Builds full-stack web systems with Next.js, Flask, FastAPI, and Supabase, with attention to data flow and reliability."
   },
   "twitter": "https://x.com/3010prateek",
   "website": "https://prateeq.in",
@@ -36,35 +36,35 @@
   },
   "about": {
     "developer": {
-      "light": "Hey there! I'm Prateeq Sharma — a product-minded developer and builder who crafts high-performance web applications and digital experiences. Transitioning from a Commerce background, I realized that combining business logic with software and modern AI orchestration is the fastest way to turn complex requirements into shipped products. I focus on delivering velocity, architectural precision, and high-impact results.",
-      "noir": "They stare at screens, praying to a god of syntax and semicolons. I don't. My name is Prateeq Sharma. I transitioned from a background in Commerce to software engineering when I realized that code + AI is the ultimate leverage to solve complex business and technical problems. Now, I bring ideas out of the dark and into reality at warp speed. While traditional coders get lost in legacy frameworks, I combine solid system logic with AI orchestration to build fast, polished applications. In this city, the real superpower isn't memorizing boilerplate code. It's having the vision to design, the skill to build, and the tools to make it happen before the rain stops.",
+      "light": "I'm Prateek Sharma, a developer focused on web applications, interface quality, and practical AI-assisted workflows. I like solving real problems with simple structure and dependable delivery.",
+      "noir": "I'm Prateek Sharma, a developer focused on web applications, interface quality, and practical AI-assisted workflows. I prefer clear structure, dependable delivery, and systems that are easy to maintain.",
       "facts": [
-        "SYSTEM // Co-piloted by state-of-the-art AI systems",
-        "VELOCITY // Prompt-to-app builder at supersonic speed",
-        "ENGINE // Master of AI orchestration & prototyping",
-        "LOCATION // Based in India, building future-proof experiences"
+        "SYSTEM // Web apps built with clear structure",
+        "VELOCITY // Fast prototypes and dependable delivery",
+        "ENGINE // AI-assisted workflows and tooling",
+        "LOCATION // Based in India, working remotely"
       ],
       "factsNoir": [
-        "Co-piloted by neural shadows and synthetic ghosts.",
-        "Raising apps out of the ether before the ink dries.",
-        "Orchestrating virtual puppets and raw prototype grids.",
-        "Based in India, forging code to survive the digital decay."
+        "Working with clear structure and a small technical footprint.",
+        "Turning rough ideas into working interfaces.",
+        "Keeping maintainability in view from the start.",
+        "Based in India, working remotely."
       ]
     },
     "business": {
-      "light": "Hey there! I'm Prateeq Sharma — a freelance developer and technology partner who builds clean, high-performance websites and custom tools. Coming from a Commerce background, I don't just write code; I design systems that solve actual business problems, optimize load speeds for better search rankings, and integrate AI automations to save your team hours of manual work. Let's collaborate to build something your customers will love.",
-      "noir": "They talk about design and code like separate puzzles. I don't. My name is Prateeq Sharma. I'm a technology partner who turns business concepts into high-end, responsive web platforms. With a background in Commerce and expert software engineering skills, I design custom admin portals, optimize performance, and integrate secure payment setups to maximize your bottom line. We build with precision and zero overhead, delivering results that actually matter.",
+      "light": "I'm Prateek Sharma, a freelance developer who builds websites, custom tools, and simple admin flows for businesses that want something practical and maintainable.",
+      "noir": "I'm Prateek Sharma, a freelance developer who builds websites, custom tools, and admin flows for businesses that want something practical and maintainable.",
       "facts": [
-        "SERVICE // 1-on-1 direct freelance partnership",
-        "SPEED // High-velocity feature shipping",
-        "VALUE // ROI-focused, search-optimized pages",
-        "LOCATION // Operating globally, based in India"
+        "SERVICE // Direct freelance partnership",
+        "SPEED // Clear delivery and iteration",
+        "VALUE // Practical, maintainable builds",
+        "LOCATION // Based in India, working remotely"
       ],
       "factsNoir": [
-        "Tailored custom websites with zero middleware bloat.",
-        "Delivering working products directly into your hands.",
-        "Search rankings optimized. Loading speeds accelerated.",
-        "Serving clients worldwide from code-locked chambers."
+        "Custom websites with a low-friction handoff.",
+        "Delivering working products directly to clients.",
+        "Performance and usability kept in focus.",
+        "Working remotely with clients worldwide."
       ]
     }
   },
@@ -73,10 +73,10 @@
       {
         "title": "Hourly Consulting",
         "price": "$50 / hr",
-        "description": "General 1-on-1 development, debugging, and systems engineering support.",
+        "description": "One-on-one development, debugging, and architecture support.",
         "features": [
           "React 19 / Next.js 16 debugging",
-          "AI development workflow optimization",
+          "Development workflow review",
           "Supabase / PostgreSQL setup",
           "Code review and refactoring sessions"
         ],
@@ -85,24 +85,24 @@
       {
         "title": "Architecture Review",
         "price": "$250 / session",
-        "description": "Deep technical audit of project structure, database schemas, and caching layers.",
+        "description": "A technical review of structure, data flow, and caching behavior.",
         "features": [
-          "Database query analysis & index optimization",
-          "Page visit & server action profiling",
-          "Detailed performance report",
-          "30-min call to discuss recommendations"
+          "Database query review",
+          "Caching and rendering review",
+          "Performance notes and priorities",
+          "Follow-up call to discuss findings"
         ],
         "cta": "architecture"
       },
       {
         "title": "Codebase Security Audit",
         "price": "$450 / audit",
-        "description": "Comprehensive security and privacy vulnerability assessment of system architecture.",
+        "description": "A practical review of secrets, access control, and common exposure points.",
         "features": [
-          "Row-level security (RLS) policies verification",
-          "API keys & server secret exposures sweep",
-          "Bot/crawler spam protection check",
-          "Remediation guidelines and code fixes"
+          "RLS policy review",
+          "Secret exposure sweep",
+          "Abuse and spam checks",
+          "Remediation notes"
         ],
         "cta": "security"
       }
@@ -111,11 +111,11 @@
       {
         "title": "Landing Page Package",
         "price": "$400 - $700",
-        "description": "A high-conversion single page website with premium visual assets and modern animations.",
+        "description": "A focused single-page website with a clear message, responsive layout, and contact flow.",
         "features": [
-          "Custom UI design mockup",
-          "Vibrant aesthetics & responsive layout",
-          "SEO meta tags & fast loading speeds",
+          "Custom UI mockup",
+          "Responsive layout and spacing",
+          "Basic SEO metadata",
           "Resend contact email integration"
         ],
         "cta": "landing-page"
@@ -123,24 +123,24 @@
       {
         "title": "Custom Web Application",
         "price": "$1,200 - $2,500",
-        "description": "A robust multi-page application with full database integration, admin dashboard, and secure user auth.",
+        "description": "A multi-page application with Supabase-backed data, admin tools, and project-specific workflows.",
         "features": [
-          "Next.js App Router & TypeScript build",
-          "Supabase backend database setup",
-          "Client-accessible analytics portal",
-          "Custom billing or forms flow"
+          "Next.js App Router & TypeScript",
+          "Supabase data layer setup",
+          "Admin or analytics views",
+          "Custom forms or billing flow"
         ],
         "cta": "web-application"
       },
       {
         "title": "Monthly Support & SEO",
         "price": "$150 / mo",
-        "description": "Ongoing technical support, SEO audits, speed optimizations, and monthly analytics review.",
+        "description": "Ongoing maintenance, content updates, and periodic performance checks.",
         "features": [
-          "2 hours of development time included",
-          "Core Web Vitals monitoring & tuning",
-          "Monthly page-visit reporting",
-          "Security patches and package updates"
+          "Included development hours",
+          "Performance and usability checks",
+          "Monthly page-visit review",
+          "Security and package updates"
         ],
         "cta": "monthly-support"
       }
@@ -167,22 +167,22 @@
       "period": "2023 - Present",
       "bullets": [
         {
-          "ai": "Implemented custom LLM prompt pipelines, automated content generators, and local script runners leveraging Gemini and OpenAI models via API wrappers.",
-          "general": "Designed and built custom web platforms, simulation systems, and mobile utility tools using React, Next.js, Flutter, and Python.",
-          "creative": "Translated visual layouts into clean responsive code using pop-art, neo-brutalist, and modern dark-mode aesthetics with Framer Motion and custom CSS.",
-          "fullstack": "Constructed high-speed API layers in Flask and FastAPI, and integrated robust PostgreSQL/Supabase database schemas with row-level security (RLS)."
+          "ai": "Built LLM-assisted workflows for content drafting, OCR, and project analysis using Gemini-based tooling.",
+          "general": "Designed and shipped web platforms, simulation tools, and mobile utilities using React, Next.js, Flutter, and Python.",
+          "creative": "Translated visual layouts into responsive interfaces with motion and custom CSS.",
+          "fullstack": "Built API layers in Flask and FastAPI and connected them to PostgreSQL and Supabase data models."
         },
         {
-          "ai": "Leveraged agentic developer tools to prototype features in record time, achieving up to 5x faster shipping cycles compared to boilerplate-heavy workflows.",
-          "general": "Optimized website performance and SEO compliance, securing fast page loads and smooth client navigation via Lenis smooth scrolling and viewport-linked parallax.",
-          "creative": "Crafted interactive components including pathfinding visualizers, custom animated speech bubbles, and reactive vector cards.",
-          "fullstack": "Programmed offline-capable data layers with Drift and SQLite to keep mobile apps fully functional without network coverage."
+          "ai": "Used AI-assisted tools to prototype features quickly and keep repetitive work low.",
+          "general": "Improved website performance and navigation with Lenis scrolling and viewport-linked motion.",
+          "creative": "Translated visual layouts into responsive interfaces with motion and custom CSS.",
+          "fullstack": "Programmed offline-capable data layers with Drift and SQLite for mobile apps that keep working without network coverage."
         },
         {
-          "ai": "Developed an AI-powered orchestrator leveraging Google Gemini 2.5 Flash API for multimodal OCR, intelligent resume bullet generation, and technical ghostwriting, enhancing data synthesis and content creation efficiency.",
-          "general": "Engineered PrateekSync AI, an AI-powered headless CMS, automating portfolio content generation and credential verification, increasing resume relevance and data accuracy by 30%.",
-          "creative": "Built an interactive Streamlit dashboard for a headless CMS, featuring dynamic skill dependency mapping, Lucide icon support, and automated image format conversions for optimized web assets.",
-          "fullstack": "Designed and implemented a Python-based headless CMS with Streamlit UI, integrating GitHub REST API and a custom TypeScript parser for dynamic content orchestration and data synchronization."
+          "ai": "Built a Gemini-assisted tool for OCR, draft generation, and repo analysis.",
+          "general": "Built PrateekSync AI, a local content manager for portfolio updates, credential review, and generated drafts.",
+          "creative": "Built an interactive Streamlit dashboard for managing skills, certificates, and media assets.",
+          "fullstack": "Built a Python-based content manager with Streamlit, GitHub API integration, and TypeScript file sync."
         }
       ],
       "company": "Independent Consultant / Freelance Developer",

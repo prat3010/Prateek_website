@@ -99,10 +99,13 @@ CREATE TABLE IF NOT EXISTS projects (
 );
 
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow public select projects" ON projects;
+DROP POLICY IF EXISTS "Allow service insert projects" ON projects;
+DROP POLICY IF EXISTS "Allow service update projects" ON projects;
+DROP POLICY IF EXISTS "Allow service delete projects" ON projects;
 CREATE POLICY "Allow public select projects" ON projects FOR SELECT USING (true);
-CREATE POLICY "Allow service insert projects" ON projects FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow service update projects" ON projects FOR UPDATE USING (true);
-CREATE POLICY "Allow service delete projects" ON projects FOR DELETE USING (true);
+-- Server-side and local tooling writes use SUPABASE_SERVICE_ROLE_KEY, which bypasses RLS.
+-- Do not add public write policies for portfolio content tables.
 
 CREATE INDEX IF NOT EXISTS idx_projects_slug ON projects (slug);
 CREATE INDEX IF NOT EXISTS idx_projects_created_at ON projects (created_at DESC);
@@ -126,10 +129,12 @@ CREATE TABLE IF NOT EXISTS skills (
 );
 
 ALTER TABLE skills ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow public select skills" ON skills;
+DROP POLICY IF EXISTS "Allow service insert skills" ON skills;
+DROP POLICY IF EXISTS "Allow service update skills" ON skills;
+DROP POLICY IF EXISTS "Allow service delete skills" ON skills;
 CREATE POLICY "Allow public select skills" ON skills FOR SELECT USING (true);
-CREATE POLICY "Allow service insert skills" ON skills FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow service update skills" ON skills FOR UPDATE USING (true);
-CREATE POLICY "Allow service delete skills" ON skills FOR DELETE USING (true);
+-- Writes must remain service-role only.
 
 CREATE INDEX IF NOT EXISTS idx_skills_name ON skills (name);
 CREATE INDEX IF NOT EXISTS idx_skills_category ON skills (category);
@@ -149,10 +154,12 @@ CREATE TABLE IF NOT EXISTS certificates (
 );
 
 ALTER TABLE certificates ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow public select certificates" ON certificates;
+DROP POLICY IF EXISTS "Allow service insert certificates" ON certificates;
+DROP POLICY IF EXISTS "Allow service update certificates" ON certificates;
+DROP POLICY IF EXISTS "Allow service delete certificates" ON certificates;
 CREATE POLICY "Allow public select certificates" ON certificates FOR SELECT USING (true);
-CREATE POLICY "Allow service insert certificates" ON certificates FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow service update certificates" ON certificates FOR UPDATE USING (true);
-CREATE POLICY "Allow service delete certificates" ON certificates FOR DELETE USING (true);
+-- Writes must remain service-role only.
 
 CREATE INDEX IF NOT EXISTS idx_certificates_slug ON certificates (slug);
 
@@ -164,9 +171,11 @@ CREATE TABLE IF NOT EXISTS profile (
 );
 
 ALTER TABLE profile ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow public select profile" ON profile;
+DROP POLICY IF EXISTS "Allow service insert profile" ON profile;
+DROP POLICY IF EXISTS "Allow service update profile" ON profile;
 CREATE POLICY "Allow public select profile" ON profile FOR SELECT USING (true);
-CREATE POLICY "Allow service insert profile" ON profile FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow service update profile" ON profile FOR UPDATE USING (true);
+-- Writes must remain service-role only.
 
 -- ============================================================
 -- 8. High-Performance Analytics Aggregation Stored Procedure
@@ -272,10 +281,12 @@ CREATE TABLE IF NOT EXISTS posts (
 );
 
 ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow public select posts" ON posts;
+DROP POLICY IF EXISTS "Allow service insert posts" ON posts;
+DROP POLICY IF EXISTS "Allow service update posts" ON posts;
+DROP POLICY IF EXISTS "Allow service delete posts" ON posts;
 CREATE POLICY "Allow public select posts" ON posts FOR SELECT USING (true);
-CREATE POLICY "Allow service insert posts" ON posts FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow service update posts" ON posts FOR UPDATE USING (true);
-CREATE POLICY "Allow service delete posts" ON posts FOR DELETE USING (true);
+-- Writes must remain service-role only.
 
 CREATE INDEX IF NOT EXISTS idx_posts_slug ON posts (slug);
 CREATE INDEX IF NOT EXISTS idx_posts_date ON posts (date DESC);

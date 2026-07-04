@@ -269,7 +269,7 @@ export default function SiteInfoConsole() {
           .then(data => {
             const lines: ConsoleLine[] = [];
             lines.push({ text: 'PORTFOLIO DEVELOPMENT GIT COMMIT JOURNAL:', type: 'success' });
-            lines.push({ text: '  Click on any commit line to inspect code modifications and files changed.', type: 'output' });
+            lines.push({ text: '  Click on any commit line to inspect the generated build-time commit record.', type: 'output' });
             lines.push({ text: ' ', type: 'output' });
             
             data.commits.forEach((c: { hash: string; subject: string; date: string; author: string }) => {
@@ -280,7 +280,7 @@ export default function SiteInfoConsole() {
               });
             });
             lines.push({ text: ' ', type: 'output' });
-            lines.push({ text: 'Tip: You can also inspect manually by typing "git-info show <commit_hash>"', type: 'success' });
+            lines.push({ text: 'Tip: Type "git-info show <commit_hash>" to open a generated commit record.', type: 'success' });
             setTerminalHistory(prev => [...prev, ...lines]);
           })
           .catch(() => {

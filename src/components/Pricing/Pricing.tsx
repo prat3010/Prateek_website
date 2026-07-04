@@ -33,11 +33,11 @@ function Pricing({ resumeData }: PricingProps) {
         {
           title: "Landing Page Package",
           price: "$400 - $700",
-          description: "A high-conversion single page website with premium visual assets and modern animations.",
+          description: "A focused single-page website with a clear message, responsive layout, and contact flow.",
           features: [
-            "Custom UI design mockup",
-            "Vibrant aesthetics & responsive layout",
-            "SEO meta tags & fast loading speeds",
+            "Custom UI mockup",
+            "Responsive layout and spacing",
+            "Basic SEO metadata",
             "Resend contact email integration"
           ],
           cta: "landing-page"
@@ -45,24 +45,24 @@ function Pricing({ resumeData }: PricingProps) {
         {
           title: "Custom Web Application",
           price: "$1,200 - $2,500",
-          description: "A robust multi-page application with full database integration, admin dashboard, and secure user auth.",
+          description: "A multi-page application with Supabase-backed data, admin tools, and project-specific workflows.",
           features: [
-            "Next.js App Router & TypeScript build",
-            "Supabase backend database setup",
-            "Client-accessible analytics portal",
-            "Custom billing or forms flow"
+            "Next.js App Router & TypeScript",
+            "Supabase data layer setup",
+            "Admin or analytics views",
+            "Custom forms or billing flow"
           ],
           cta: "web-application"
         },
         {
           title: "Monthly Support & SEO",
           price: "$150 / mo",
-          description: "Ongoing technical support, SEO audits, speed optimizations, and monthly analytics review.",
+          description: "Ongoing maintenance, content updates, and periodic performance checks.",
           features: [
-            "2 hours of development time included",
-            "Core Web Vitals monitoring & tuning",
-            "Monthly page-visit reporting",
-            "Security patches and package updates"
+            "Included development hours",
+            "Performance and usability checks",
+            "Monthly page-visit review",
+            "Security and package updates"
           ],
           cta: "monthly-support"
         }
@@ -72,10 +72,10 @@ function Pricing({ resumeData }: PricingProps) {
       {
         title: "Hourly Consulting",
         price: "$50 / hr",
-        description: "General 1-on-1 development, debugging, and systems engineering support.",
+        description: "One-on-one development, debugging, and architecture support.",
         features: [
           "React 19 / Next.js 16 debugging",
-          "AI development workflow optimization",
+          "Development workflow review",
           "Supabase / PostgreSQL setup",
           "Code review and refactoring sessions"
         ],
@@ -84,24 +84,24 @@ function Pricing({ resumeData }: PricingProps) {
       {
         title: "Architecture Review",
         price: "$250 / session",
-        description: "Deep technical audit of project structure, database schemas, and caching layers.",
+        description: "A technical review of structure, data flow, and caching behavior.",
         features: [
-          "Database query analysis & index optimization",
-          "Page visit & server action profiling",
-          "Detailed performance report",
-          "30-min call to discuss recommendations"
+          "Database query review",
+          "Caching and rendering review",
+          "Performance notes and priorities",
+          "Follow-up call to discuss findings"
         ],
         cta: "architecture"
       },
       {
         title: "Codebase Security Audit",
         price: "$450 / audit",
-        description: "Comprehensive security and privacy vulnerability assessment of system architecture.",
+        description: "A practical review of secrets, access control, and common exposure points.",
         features: [
-          "Row-level security (RLS) policies verification",
-          "API keys & server secret exposures sweep",
-          "Bot/crawler spam protection check",
-          "Remediation guidelines and code fixes"
+          "RLS policy review",
+          "Secret exposure sweep",
+          "Abuse and spam checks",
+          "Remediation notes"
         ],
         cta: "security"
       }

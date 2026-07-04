@@ -60,32 +60,32 @@ function About({ resumeData }: AboutProps) {
       return isNoir ? bioContent.factsNoir : bioContent.facts;
     }
     if (activeAudience === 'business') {
-      return isNoir 
+      return isNoir
         ? [
-            "Tailored custom websites with zero middleware bloat.",
-            "Delivering working products directly into your hands.",
-            "Search rankings optimized. Loading speeds accelerated.",
-            "Serving clients worldwide from code-locked chambers."
+            "Custom websites built for clear delivery and easy handoff.",
+            "Fast interfaces with practical structure behind them.",
+            "Maintainable systems that stay usable after launch.",
+            "Working directly with clients from brief to deployment."
           ]
         : [
-            "SERVICE // 1-on-1 direct freelance partnership",
-            "SPEED // High-velocity feature shipping",
-            "VALUE // ROI-focused, search-optimized pages",
-            "LOCATION // Operating globally, based in India"
+            "SERVICE // Direct freelance partnership",
+            "SPEED // Focused feature delivery",
+            "VALUE // Practical, maintainable web work",
+            "LOCATION // Based in India, working remotely"
           ];
     }
     return isNoir
       ? [
-          'Co-piloted by neural shadows and synthetic ghosts.',
-          'Raising apps out of the ether before the ink dries.',
-          'Orchestrating virtual puppets and raw prototype grids.',
-          'Based in India, forging code to survive the digital decay.'
+          'Building web systems with a clean technical footprint.',
+          'Turning ideas into working interfaces with minimal friction.',
+          'Keeping structure, speed, and maintenance in view.',
+          'Based in India and working remotely.'
         ]
       : [
-          'SYSTEM // Co-piloted by state-of-the-art AI systems',
-          'VELOCITY // Prompt-to-app builder at supersonic speed',
-          'ENGINE // Master of AI orchestration & prototyping',
-          'LOCATION // Based in India, building future-proof experiences',
+          'SYSTEM // Web applications with clear structure',
+          'VELOCITY // Fast prototyping and practical delivery',
+          'ENGINE // AI-assisted development workflows',
+          'LOCATION // Based in India, building remotely',
         ];
   }, [bioContent, isNoir, activeAudience]);
 

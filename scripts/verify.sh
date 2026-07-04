@@ -75,7 +75,7 @@ echo -e "  ESLint Check:    $LINT_STATUS"
 echo -e "  Prod Build:      $BUILD_STATUS"
 echo -e "${BOLD}=========================================${NC}"
 
-if [ $TSC_EXIT -eq 0 ] && [ $BUILD_EXIT -eq 0 ]; then
+if [ $TSC_EXIT -eq 0 ] && [ $LINT_EXIT -eq 0 ] && [ $BUILD_EXIT -eq 0 ]; then
   echo -e "\n${GREEN}${BOLD}🎉 Verification Passed! Your changes are safe and ready to push.${NC}\n"
   exit 0
 else

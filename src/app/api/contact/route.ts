@@ -58,6 +58,7 @@ export async function POST(request: Request) {
     }
 
     const resend = new Resend(process.env.RESEND_API_KEY);
+    const contactEmailTo = process.env.CONTACT_EMAIL_TO?.trim() || '3010prateeksharma@gmail.com';
 
     // Escape HTML special characters for HTML email context
     const escapedName = escapeHtml(name);
@@ -71,7 +72,7 @@ export async function POST(request: Request) {
     // onboarding@resend.dev is the default unverified domain sender
     const { data, error } = await resend.emails.send({
       from: 'Portfolio Contact Form <onboarding@resend.dev>',
-      to: '3010prateeksharma@gmail.com',
+      to: contactEmailTo,
       replyTo: email,
       subject: `New Portfolio Signal from ${cleanSubjectName}`,
       html: `

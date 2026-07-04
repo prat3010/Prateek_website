@@ -39,7 +39,8 @@ The project uses the following environment variables (stored in `.env.local` loc
 
 - **Caching Layer:** Database data fetched via `src/lib/data.ts` (projects, skills, certificates, resume profile) is cached aggressively using Next.js `unstable_cache`.
 - **Cache Tags:** All cache entries share the query tag `portfolio-data`, with specific tags like `projects`, `skills`, `certificates`, and `profile`.
-- **Cache Invalidation:** When database data is modified (either manually in the dashboard, via Streamlit dashboard, or via seeders), the Next.js cache must be revalidated by sending a `POST` or `GET` request to `/api/revalidate?secret=YOUR_SYNC_API_KEY`.
+- **Cache Invalidation:** Content write API routes revalidate relevant Next.js cache tags after successful mutations. When database data is modified outside those routes (for example directly in Supabase Dashboard or via one-off SQL), revalidate by sending a `POST` or `GET` request to `/api/revalidate?secret=YOUR_SYNC_API_KEY`.
+- **Content Write Security:** Public content tables are public-read only. Writes are performed by server routes or local tooling with `SUPABASE_SERVICE_ROLE_KEY`, which bypasses RLS. Do not add anonymous insert/update/delete policies for portfolio content tables.
 
 ## Project Shape
 
@@ -104,7 +105,7 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
 
 - Treat analytics data as sensitive. Do not publicly expose raw visitor activity, detailed referrers, location, browser, OS, or device data without an explicit product decision.
 - Do not weaken `server-only` protections around Supabase service-role access.
-- **Row-Level Security (RLS):** All Supabase tables (`page_visits`, `projects`, `skills`, `certificates`, `profile`) must have Row-Level Security enabled. Public write access must remain disabled. Telemetry and content updates should only be performed server-side or via local scripts using the `SUPABASE_SERVICE_ROLE_KEY`. Do not introduce public write policies.
+- **Row-Level Security (RLS):** All Supabase tables (`page_visits`, `projects`, `skills`, `certificates`, `profile`, `posts`) must have Row-Level Security enabled. Public write access must remain disabled. Telemetry and content updates should only be performed server-side or via local scripts using the `SUPABASE_SERVICE_ROLE_KEY`. Do not introduce public write policies.
 - Contact form changes must preserve input validation and HTML escaping.
 - Do not introduce runtime shell execution or filesystem writes in public request paths unless there is a reason and the behavior is bounded.
 - Be careful with comments that claim compliance. Describe what the code does, not what laws it satisfies.

@@ -1,10 +1,6 @@
 import { NextResponse } from 'next/server';
-import { exec } from 'child_process';
-import { promisify } from 'util';
 import fs from 'fs';
 import path from 'path';
-
-const execAsync = promisify(exec);
 
 export const dynamic = 'force-dynamic';
 
@@ -20,6 +16,38 @@ const MOCK_COMMITS = [
   { hash: 'a127021', author: 'Prateek Sharma', date: '1 week ago', subject: 'init: bootstrap portfolio website in Next.js v16.2 and custom CSS Modules' }
 ];
 
+interface GitCommit {
+  hash: string;
+  author: string;
+  date: string;
+  subject: string;
+}
+
+function readGeneratedCommits(): GitCommit[] {
+  try {
+    const jsonPath = path.join(process.cwd(), 'src/data/git-log.json');
+    if (!fs.existsSync(jsonPath)) {
+      return [];
+    }
+
+    const fileContent = fs.readFileSync(jsonPath, 'utf8');
+    const commits = JSON.parse(fileContent);
+    if (!Array.isArray(commits)) {
+      return [];
+    }
+
+    return commits.filter((commit): commit is GitCommit => (
+      typeof commit?.hash === 'string' &&
+      typeof commit?.author === 'string' &&
+      typeof commit?.date === 'string' &&
+      typeof commit?.subject === 'string'
+    ));
+  } catch (err) {
+    console.warn('Failed to read pre-built git-log.json:', err);
+    return [];
+  }
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -32,56 +60,33 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: 'Invalid commit hash format' }, { status: 400 });
       }
 
-      try {
-        const { stdout } = await execAsync(`git show --stat --oneline ${commitHash}`);
-        return NextResponse.json({ type: 'detail', content: stdout });
-      } catch {
-        // Fallback if git is not installed or git show fails
-        const mock = MOCK_COMMITS.find(c => c.hash === commitHash.slice(0, 7));
-        if (mock) {
-          const mockDetail = `commit ${commitHash}e84fbf76329a1b5c1a84f3e8b0a9dfd10a6b14
-Author: ${mock.author} <prateek@dev.com>
-Date:   ${mock.date}
-
-    ${mock.subject}
-
- src/components/effects/ThreeGremlinParade.tsx | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)`;
-          return NextResponse.json({ type: 'detail', content: mockDetail });
-        }
+      const commits = readGeneratedCommits();
+      const match = commits.find(c => c.hash === commitHash || commitHash.startsWith(c.hash));
+      if (!match) {
         return NextResponse.json({ error: 'Commit not found' }, { status: 404 });
       }
+
+      const detail = [
+        `commit ${match.hash}`,
+        `Author: ${match.author}`,
+        `Date:   ${match.date}`,
+        '',
+        `    ${match.subject}`,
+        '',
+        'Detailed file stats are not available from the public runtime route.',
+        'Regenerate src/data/git-log.json at build time to refresh this commit journal.'
+      ].join('\n');
+
+      return NextResponse.json({ type: 'detail', content: detail });
     }
 
     // Default: return recent commit history list
-    // 1. Try to read the pre-built JSON file (written at build time for serverless runtime)
-    try {
-      const jsonPath = path.join(process.cwd(), 'src/data/git-log.json');
-      if (fs.existsSync(jsonPath)) {
-        const fileContent = fs.readFileSync(jsonPath, 'utf8');
-        const commits = JSON.parse(fileContent);
-        if (Array.isArray(commits) && commits.length > 0) {
-          return NextResponse.json({ type: 'list', commits });
-        }
-      }
-    } catch (err) {
-      console.warn('Failed to read pre-built git-log.json:', err);
-    }
-
-    // 2. Try to run git dynamically (works in local dev where .git is present)
-    try {
-      const { stdout } = await execAsync('git log -n 10 --pretty=format:"%h|%an|%ar|%s"');
-      const lines = stdout.trim().split('\n');
-      const commits = lines.map(line => {
-        const [hash, author, date, subject] = line.split('|');
-        return { hash, author, date, subject };
-      });
+    const commits = readGeneratedCommits();
+    if (commits.length > 0) {
       return NextResponse.json({ type: 'list', commits });
-    } catch {
-      // 3. Fallback to whitelisted mock commits if git runs fail
-      return NextResponse.json({ type: 'list', commits: MOCK_COMMITS });
     }
 
+    return NextResponse.json({ type: 'list', commits: MOCK_COMMITS });
   } catch {
     return NextResponse.json({ error: 'Failed to retrieve git log' }, { status: 500 });
   }

@@ -9,7 +9,7 @@
     "prereq": "Structured Prompting",
     "status": "mastered",
     "projects": [],
-    "description_business": "Designing automated agent networks to streamline operational workflows and reduce manual labor.",
+    "description_business": "Designing agent workflows that reduce repetitive manual work.",
     "name_business": "Workflow Automations & AI Agents"
   },
   {
@@ -31,7 +31,7 @@
         "title": "MetaWipe"
       }
     ],
-    "description_business": "Streamlining processes with automated agent workflows, LLM pipelines, and cloud systems.",
+    "description_business": "Building practical automation flows for repeatable work.",
     "name_business": "Rapid Software Delivery"
   },
   {
@@ -53,7 +53,7 @@
         "title": "Earth Evolution Simulator"
       }
     ],
-    "description_business": "Building high-performance integrations and data pipelines to connect your services.",
+    "description_business": "Building integrations and data pipelines between services.",
     "name_business": "Integrations & Data Pipelines"
   },
   {
@@ -66,7 +66,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Developing robust database layers, API architectures, and scalable application logic.",
+    "description_business": "Building reliable APIs and data layers for web apps.",
     "name_business": "System Integration Services"
   },
   {
@@ -88,7 +88,7 @@
         "title": "ISS Live Location Tracker"
       }
     ],
-    "description_business": "Developing robust database layers, API architectures, and scalable application logic.",
+    "description_business": "Building reliable APIs and data layers for web apps.",
     "name_business": "Mathematical Logic & Rules Engines"
   },
   {
@@ -101,7 +101,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Building interactive client features, diagnostic dashboards, and custom command tools.",
+    "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
     "name_business": "Polished & Responsive Styling"
   },
   {
@@ -114,7 +114,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Developing robust database layers, API architectures, and scalable application logic.",
+    "description_business": "Building reliable APIs and data layers for web apps.",
     "name_business": "Visual Image Processing"
   },
   {
@@ -127,7 +127,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Optimizing user experience, frontend performance metrics, and responsive design systems.",
+    "description_business": "Improving user experience, frontend performance, and responsive layout systems.",
     "name_business": "Self-Managed Admin Portals"
   },
   {
@@ -140,7 +140,7 @@
     "prereq": "Database Engineering",
     "status": "quest",
     "projects": [],
-    "description_business": "Converting raw business metrics and data structures into actionable operational insights.",
+    "description_business": "Turning raw data into practical operational insight.",
     "name_business": "Business Intelligence & Insights"
   },
   {
@@ -162,7 +162,7 @@
         "title": "Earth Evolution Simulator"
       }
     ],
-    "description_business": "Structuring secure databases and offline sync layers for uninterrupted business operations.",
+    "description_business": "Building secure databases and offline sync layers for reliable apps.",
     "name_business": "Secure Backend & Data Storage"
   },
   {
@@ -180,7 +180,7 @@
         "title": "Earth Evolution Simulator"
       }
     ],
-    "description_business": "Translating design prototypes into high-fidelity, responsive, and cross-platform layouts.",
+    "description_business": "Translating prototypes into responsive layouts across devices.",
     "name_business": "Interactive Frontend Development"
   },
   {
@@ -193,7 +193,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Building interactive client features, diagnostic dashboards, and custom command tools.",
+    "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
     "name_business": "Performance & Quality Monitoring"
   },
   {
@@ -206,7 +206,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Developing robust database layers, API architectures, and scalable application logic.",
+    "description_business": "Building reliable APIs and data layers for web apps.",
     "name_business": "Media Metadata Sanitization"
   },
   {
@@ -219,7 +219,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Developing robust database layers, API architectures, and scalable application logic.",
+    "description_business": "Building reliable APIs and data layers for web apps.",
     "name_business": "High-Speed Server APIs"
   },
   {
@@ -232,7 +232,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Developing robust database layers, API architectures, and scalable application logic.",
+    "description_business": "Building reliable APIs and data layers for web apps.",
     "name_business": "Lightweight Web Services"
   },
   {
@@ -245,7 +245,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Building interactive client features, diagnostic dashboards, and custom command tools.",
+    "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
     "name_business": "Cross-Platform Mobile Apps"
   },
   {
@@ -258,7 +258,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Developing robust database layers, API architectures, and scalable application logic.",
+    "description_business": "Building reliable APIs and data layers for web apps.",
     "name_business": "Geospatial & Location Services"
   },
   {
@@ -271,7 +271,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Developing robust database layers, API architectures, and scalable application logic.",
+    "description_business": "Building reliable APIs and data layers for web apps.",
     "name_business": "Release & Deployment Automation"
   },
   {
@@ -284,7 +284,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Building interactive client features, diagnostic dashboards, and custom command tools.",
+    "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
     "name_business": "Mobile App Navigation"
   },
   {
@@ -297,7 +297,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Streamlining processes with automated agent workflows, LLM pipelines, and cloud systems.",
+    "description_business": "Building practical automation flows for repeatable work.",
     "name_business": "AI & Language Model Integrations"
   },
   {
@@ -310,7 +310,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Building interactive client features, diagnostic dashboards, and custom command tools.",
+    "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
     "name_business": "Interactive Client Features"
   },
   {
@@ -323,7 +323,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Building interactive client features, diagnostic dashboards, and custom command tools.",
+    "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
     "name_business": "Dynamic Document Generation"
   },
   {
@@ -336,7 +336,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Developing robust database layers, API architectures, and scalable application logic.",
+    "description_business": "Building reliable APIs and data layers for web apps.",
     "name_business": "Advanced Spreadsheet Modeling"
   },
   {
@@ -349,7 +349,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Building interactive client features, diagnostic dashboards, and custom command tools.",
+    "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
     "name_business": "Client Deliverable Formatting"
   },
   {
@@ -362,7 +362,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Developing robust database layers, API architectures, and scalable application logic.",
+    "description_business": "Building reliable APIs and data layers for web apps.",
     "name_business": "Array Calculations & Analysis"
   },
   {
@@ -380,7 +380,7 @@
         "title": "MetaWipe"
       }
     ],
-    "description_business": "Implementing local and offline-first processing to ensure absolute security and user data privacy.",
+    "description_business": "Using offline-first processing to keep sensitive data local.",
     "name_business": "Local Privacy Sandboxing"
   },
   {
@@ -402,7 +402,7 @@
         "title": "MetaWipe"
       }
     ],
-    "description_business": "Crafting customer-centric user flows and product logic that drive engagement and conversion.",
+    "description_business": "Designing product flows that reduce friction and support conversion.",
     "name_business": "Customer Journey & Experience Design"
   },
   {
@@ -415,7 +415,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Developing robust automation scripts, background workers, and machine learning utilities.",
+    "description_business": "Building automation scripts, background workers, and ML utilities.",
     "name_business": "AI & Workflow Automation"
   },
   {
@@ -428,7 +428,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Building interactive client features, diagnostic dashboards, and custom command tools.",
+    "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
     "name_business": "High-Performance Web Applications"
   },
   {
@@ -441,7 +441,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Building interactive client features, diagnostic dashboards, and custom command tools.",
+    "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
     "name_business": "Mobile State & Logic Flow"
   },
   {
@@ -454,7 +454,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Developing robust database layers, API architectures, and scalable application logic.",
+    "description_business": "Building reliable APIs and data layers for web apps.",
     "name_business": "Local Database Management"
   },
   {
@@ -467,7 +467,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Developing robust database layers, API architectures, and scalable application logic.",
+    "description_business": "Building reliable APIs and data layers for web apps.",
     "name_business": "Complex Numerical Modeling"
   },
   {
@@ -480,7 +480,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Developing robust database layers, API architectures, and scalable application logic.",
+    "description_business": "Building reliable APIs and data layers for web apps.",
     "name_business": "Data Management & Structuring"
   },
   {
@@ -510,7 +510,7 @@
         "title": "MetaWipe"
       }
     ],
-    "description_business": "Building interactive client features, diagnostic dashboards, and custom command tools.",
+    "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
     "name_business": "Adaptive Technical Consultation"
   },
   {
@@ -523,7 +523,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Building interactive client features, diagnostic dashboards, and custom command tools.",
+    "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
     "name_business": "Custom Internal Dashboards"
   },
   {
@@ -536,7 +536,7 @@
     "prereq": "AI Dev Workflows",
     "status": "mastered",
     "projects": [],
-    "description_business": "Streamlining processes with automated agent workflows, LLM pipelines, and cloud systems.",
+    "description_business": "Building practical automation flows for repeatable work.",
     "name_business": "AI Prompt Design & Tuning"
   },
   {
@@ -549,7 +549,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Creating modern, type-safe web logic to prevent software crashes and runtime bugs.",
+    "description_business": "Writing type-safe web logic that is easier to maintain.",
     "name_business": "Reliable & Maintainable Applications"
   },
   {
@@ -562,7 +562,7 @@
     "prereq": "",
     "status": "",
     "projects": [],
-    "description_business": "Building interactive client features, diagnostic dashboards, and custom command tools.",
+    "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
     "name_business": "Production Web Infrastructure"
   }
 ]

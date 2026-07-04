@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidateTag } from 'next/cache';
 import { supabase } from '@/data/supabase';
 
 export const dynamic = 'force-dynamic';
@@ -30,5 +31,7 @@ export async function POST(request: Request) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+  revalidateTag('portfolio-data', 'max');
+  revalidateTag('certificates', 'max');
   return NextResponse.json(data, { status: 201 });
 }

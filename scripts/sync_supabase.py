@@ -55,6 +55,8 @@ def sync_projects(projects):
             'title': p.get('title', ''),
             'description': p.get('description', ''),
             'longDescription': p.get('longDescription', ''),
+            'description_business': p.get('description_business', ''),
+            'longDescription_business': p.get('longDescription_business', ''),
             'image': p.get('image', ''),
             'tags': p.get('tags', []),
             'liveUrl': p.get('liveUrl', ''),
@@ -91,6 +93,7 @@ def sync_skills(skills_list):
             'name_business': s.get('name_business', ''),
             'icon': s.get('icon', 'sparkles'),
             'description': s.get('description', ''),
+            'description_business': s.get('description_business', ''),
             'category': s.get('category', 'dynamic'),
             'color': s.get('color', '#00E676'),
             'level': s.get('level', ''),
@@ -276,6 +279,5 @@ def fetch_blog_posts():
     if not _URL or not _KEY:
         return None
     return _supabase_rest('posts', method='GET', params=[('order', 'date.desc')])
-
 
 

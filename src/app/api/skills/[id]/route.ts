@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidateTag } from 'next/cache';
 import { supabase } from '@/data/supabase';
 
 export const dynamic = 'force-dynamic';
@@ -25,6 +26,8 @@ export async function PUT(
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+  revalidateTag('portfolio-data', 'max');
+  revalidateTag('skills', 'max');
   return NextResponse.json(data);
 }
 
@@ -44,5 +47,7 @@ export async function DELETE(
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+  revalidateTag('portfolio-data', 'max');
+  revalidateTag('skills', 'max');
   return NextResponse.json({ success: true });
 }
