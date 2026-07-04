@@ -3,7 +3,7 @@ Supabase sync helper for the synchronizer.
 Uses the Supabase REST API with the service role key from .env.local.
 """
 
-import os, json, urllib.request, urllib.error
+import os, json, urllib.parse, urllib.request, urllib.error
 
 _URL = None
 _KEY = None
@@ -13,18 +13,26 @@ def _load_env():
     if _URL and _KEY:
         return
     env_path = os.path.join(os.path.dirname(__file__), '..', '.env.local')
-    with open(env_path) as f:
-        for line in f:
-            line = line.strip()
-            if line and not line.startswith('#') and '=' in line:
-                k, v = line.split('=', 1)
-                if k == 'NEXT_PUBLIC_SUPABASE_URL':
-                    _URL = v.rstrip('/')
-                elif k == 'SUPABASE_SERVICE_ROLE_KEY':
-                    _KEY = v
+    try:
+        with open(env_path) as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    k, v = line.split('=', 1)
+                    if k == 'NEXT_PUBLIC_SUPABASE_URL':
+                        _URL = v.rstrip('/')
+                    elif k == 'SUPABASE_SERVICE_ROLE_KEY':
+                        _KEY = v
+    except FileNotFoundError:
+        return
+
+def _has_config():
+    _load_env()
+    return bool(_URL and _KEY)
 
 def _supabase_rest(table, method='GET', body=None, params=None):
-    _load_env()
+    if not _has_config():
+        return None
     url = f'{_URL}/rest/v1/{table}'
     if params:
         url += '?' + '&'.join(f'{k}={urllib.request.quote(str(v))}' for k, v in params)
@@ -47,7 +55,7 @@ def _supabase_rest(table, method='GET', body=None, params=None):
 
 def sync_projects(projects):
     if not projects:
-        return
+        return []
     rows = []
     for p in projects:
         rows.append({
@@ -66,7 +74,8 @@ def sync_projects(projects):
             'status': p.get('status', 'soon'),
         })
     # Upsert via POST with merge-duplicates
-    _load_env()
+    if not _has_config():
+        return None
     url = f'{_URL}/rest/v1/projects?on_conflict=slug'
     headers = {
         'apikey': _KEY,
@@ -85,7 +94,7 @@ def sync_projects(projects):
 
 def sync_skills(skills_list):
     if not skills_list:
-        return
+        return []
     rows = []
     for s in skills_list:
         row = {
@@ -102,7 +111,8 @@ def sync_skills(skills_list):
             'projects': s.get('projects', []),
         }
         rows.append(row)
-    _load_env()
+    if not _has_config():
+        return None
     url = f'{_URL}/rest/v1/skills?on_conflict=name'
     headers = {
         'apikey': _KEY,
@@ -121,7 +131,7 @@ def sync_skills(skills_list):
 
 def sync_certificates(certs):
     if not certs:
-        return
+        return []
     rows = []
     for c in certs:
         rows.append({
@@ -134,7 +144,8 @@ def sync_certificates(certs):
             'image': c.get('image', ''),
             'tags': c.get('tags', []),
         })
-    _load_env()
+    if not _has_config():
+        return None
     url = f'{_URL}/rest/v1/certificates?on_conflict=slug'
     headers = {
         'apikey': _KEY,
@@ -152,7 +163,8 @@ def sync_certificates(certs):
         return None
 
 def sync_resume(resume):
-    _load_env()
+    if not _has_config():
+        return None
     url = f'{_URL}/rest/v1/profile'
     headers = {
         'apikey': _KEY,
@@ -171,8 +183,7 @@ def sync_resume(resume):
         return None
 
 def fetch_projects():
-    _load_env()
-    if not _URL or not _KEY:
+    if not _has_config():
         return None
     res = _supabase_rest('projects', method='GET', params=[('order', 'created_at.desc')])
     if res:
@@ -182,14 +193,12 @@ def fetch_projects():
     return res
 
 def fetch_skills():
-    _load_env()
-    if not _URL or not _KEY:
+    if not _has_config():
         return None
     return _supabase_rest('skills', method='GET', params=[('order', 'created_at.asc')])
 
 def fetch_certificates():
-    _load_env()
-    if not _URL or not _KEY:
+    if not _has_config():
         return None
     res = _supabase_rest('certificates', method='GET', params=[('order', 'created_at.desc')])
     if res:
@@ -199,8 +208,7 @@ def fetch_certificates():
     return res
 
 def fetch_resume():
-    _load_env()
-    if not _URL or not _KEY:
+    if not _has_config():
         return None
     res = _supabase_rest('profile', method='GET', params=[('id', 'eq.1')])
     if res and len(res) > 0:
@@ -208,8 +216,7 @@ def fetch_resume():
     return None
 
 def call_rpc(func_name, body=None):
-    _load_env()
-    if not _URL or not _KEY:
+    if not _has_config():
         return None
     url = f'{_URL}/rest/v1/rpc/{func_name}'
     headers = {
@@ -233,7 +240,8 @@ def fetch_page_visits(params=None):
     return _supabase_rest('page_visits', method='GET', params=params)
 
 def sync_blog_post(post):
-    _load_env()
+    if not _has_config():
+        return None
     url = f'{_URL}/rest/v1/posts?on_conflict=slug'
     headers = {
         'apikey': _KEY,
@@ -260,8 +268,9 @@ def sync_blog_post(post):
         return None
 
 def delete_blog_post(slug):
-    _load_env()
-    url = f'{_URL}/rest/v1/posts?slug=eq.{slug}'
+    if not _has_config():
+        return False
+    url = f'{_URL}/rest/v1/posts?slug=eq.{urllib.parse.quote(str(slug), safe="")}'
     headers = {
         'apikey': _KEY,
         'Authorization': f'Bearer {_KEY}',
@@ -274,10 +283,34 @@ def delete_blog_post(slug):
         print(f'  HTTP {e.code} deleting blog post {slug}: {e.read().decode()}')
         return False
 
+def _delete_by_filter(table, column, value):
+    if not _has_config():
+        return False
+    encoded_value = urllib.parse.quote(str(value), safe='')
+    url = f'{_URL}/rest/v1/{table}?{column}=eq.{encoded_value}'
+    headers = {
+        'apikey': _KEY,
+        'Authorization': f'Bearer {_KEY}',
+    }
+    req = urllib.request.Request(url, headers=headers, method='DELETE')
+    try:
+        with urllib.request.urlopen(req):
+            return True
+    except urllib.error.HTTPError as e:
+        print(f'  HTTP {e.code} deleting {table}.{column}={value}: {e.read().decode()}')
+        return False
+
+def delete_project(slug):
+    return _delete_by_filter('projects', 'slug', slug)
+
+def delete_skill(name):
+    return _delete_by_filter('skills', 'name', name)
+
+def delete_certificate(slug):
+    return _delete_by_filter('certificates', 'slug', slug)
+
 def fetch_blog_posts():
-    _load_env()
-    if not _URL or not _KEY:
+    if not _has_config():
         return None
     return _supabase_rest('posts', method='GET', params=[('order', 'date.desc')])
-
 

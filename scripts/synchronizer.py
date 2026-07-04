@@ -4,17 +4,37 @@ import sys
 import re
 import json
 import base64
-import shutil
 import urllib.request
 import urllib.parse
 from datetime import datetime, timedelta
 
 # Import the Supabase sync helper
 try:
-    from sync_supabase import sync_projects, sync_skills, sync_certificates, sync_resume, call_rpc, fetch_page_visits, sync_blog_post, delete_blog_post
+    from sync_supabase import (
+        sync_projects,
+        sync_skills,
+        sync_certificates,
+        sync_resume,
+        call_rpc,
+        fetch_page_visits,
+        sync_blog_post,
+        delete_blog_post,
+        delete_project,
+        delete_skill,
+        delete_certificate,
+    )
     HAS_SYNC = True
 except ImportError:
     HAS_SYNC = False
+
+from sync_assets import cleanup_staged_file, copy_to_staged_file, delete_existing_files, finalize_staged_file
+from sync_git import commit_and_push_paths
+from sync_json import atomic_write_json, atomic_write_text
+from sync_validation import (
+    validate_blog_fields,
+    validate_certificate_response,
+    validate_project_response,
+)
 
 # Import Streamlit - will fail gracefully if not installed
 try:
@@ -395,7 +415,7 @@ def run_safe_git_command(args, cwd=None):
     if len(args) < 2:
         return False, "Git command is missing subcommand."
         
-    allowed_subcommands = {"log", "status", "add", "commit", "push"}
+    allowed_subcommands = {"log", "status", "add", "commit", "push", "diff"}
     subcommand = args[1]
     if subcommand not in allowed_subcommands:
         return False, f"Access denied: Git subcommand '{subcommand}' is not whitelisted."
@@ -514,8 +534,7 @@ def write_projects_file(projects):
             
     path = "src/data/projects.json"
     try:
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump(projects, f, indent=2)
+        atomic_write_json(path, projects)
     except Exception as e:
         raise Exception(f"Failed to write projects to local file: {str(e)}")
         
@@ -766,8 +785,7 @@ def write_skills_file(skills_list):
             
     path = "src/data/skills.json"
     try:
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump(skills_list, f, indent=2)
+        atomic_write_json(path, skills_list)
     except Exception as e:
         raise Exception(f"Failed to write skills to local file: {str(e)}")
 
@@ -791,8 +809,7 @@ def write_resume_file(resume):
             
     path = "src/data/resume.json"
     try:
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump(resume, f, indent=2)
+        atomic_write_json(path, resume)
     except Exception as e:
         raise Exception(f"Failed to write resume to local file: {str(e)}")
 
@@ -836,8 +853,7 @@ def write_certificates_file(certificates):
             
     path = "src/data/certificates.json"
     try:
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump(certificates, f, indent=2)
+        atomic_write_json(path, certificates)
     except Exception as e:
         raise Exception(f"Failed to write certificates to local file: {str(e)}")
 
@@ -897,36 +913,7 @@ def save_uploaded_image(uploaded_file, target_path, target_format):
 
 def git_commit_push_file(file_path, commit_message):
     try:
-        success, status_out = run_safe_git_command(["git", "status", "--porcelain"], cwd=os.getcwd())
-        if not success:
-            return False, f"Git status failed: {status_out}"
-        if status_out.strip():
-            file_path_clean = file_path.replace("\\", "/")
-            lines = [line.strip() for line in status_out.splitlines() if line.strip()]
-            has_file_change = False
-            for line in lines:
-                if file_path_clean in line:
-                    has_file_change = True
-                    break
-            
-            if has_file_change:
-                success, err_msg = run_safe_git_command(["git", "add", file_path_clean], cwd=os.getcwd())
-                if not success:
-                    return False, f"Git add failed: {err_msg}"
-                
-                success, err_msg = run_safe_git_command(["git", "commit", "-m", commit_message], cwd=os.getcwd())
-                if not success:
-                    return False, f"Git commit failed: {err_msg}"
-                
-                success, push_out = run_safe_git_command(["git", "push", "origin", "main"], cwd=os.getcwd())
-                if not success:
-                    return False, f"Git push failed: {push_out}"
-                
-                return True, "Successfully committed and pushed to GitHub!"
-            else:
-                return True, "No changes to commit for this file."
-        else:
-            return True, "No changes detected by git."
+        return commit_and_push_paths(run_safe_git_command, [file_path], commit_message, cwd=os.getcwd())
     except Exception as e:
         return False, f"Git operations failed: {str(e)}"
 
@@ -2189,6 +2176,7 @@ with tab_project:
                     project_data = call_gemini(prompt)
                     if not project_data:
                         raise ValueError("Gemini failed to generate project data. Verify API key, logs, or format.")
+                    project_data = validate_project_response(project_data)
                     
                     project_id = re.sub(r'[^a-zA-Z0-9]', '-', project_data['title'].lower())
                     current_projects = parse_projects_file()
@@ -2243,41 +2231,16 @@ with tab_project:
                     
                     git_logs_output = ""
                     if not dry_run_proj:
-                        success, status_out = run_safe_git_command(["git", "status", "--porcelain"], cwd=os.getcwd())
+                        commit_msg = f"chore(sync): publish project sync - {new_project['title']}"
+                        success, git_msg = commit_and_push_paths(
+                            run_safe_git_command,
+                            ["src/data/projects.json", "src/data/resume.json", "src/data/skills.json"],
+                            commit_msg,
+                            cwd=os.getcwd(),
+                        )
                         if not success:
-                            raise ValueError(f"Git status failed: {status_out}")
-                        elif status_out.strip():
-                            success, err_msg = run_safe_git_command(
-                                ["git", "add", "src/data/projects.json", "src/data/resume.json"],
-                                cwd=os.getcwd()
-                            )
-                            if success and "src/data/skills.json" in status_out:
-                                success, err_msg = run_safe_git_command(
-                                    ["git", "add", "src/data/skills.json"],
-                                    cwd=os.getcwd()
-                                )
-                            
-                            if not success:
-                                raise ValueError(f"Git add failed: {err_msg}")
-                            else:
-                                commit_msg = f"chore(sync): publish project sync - {new_project['title']}"
-                                success, err_msg = run_safe_git_command(
-                                    ["git", "commit", "-m", commit_msg],
-                                    cwd=os.getcwd()
-                                )
-                                if not success:
-                                    raise ValueError(f"Git commit failed: {err_msg}")
-                                else:
-                                    success, push_out = run_safe_git_command(
-                                        ["git", "push", "origin", "main"],
-                                        cwd=os.getcwd()
-                                    )
-                                    if not success:
-                                        raise ValueError(f"Git push failed: {push_out}")
-                                    else:
-                                        git_logs_output = "✅ Pushed successfully to GitHub!"
-                        else:
-                            git_logs_output = "No changes to commit and push."
+                            raise ValueError(git_msg)
+                        git_logs_output = git_msg
                             
                     return {
                         "project_data": project_data,
@@ -2350,33 +2313,16 @@ with tab_project:
                                 
                                 if not dry_run_proj:
                                     st.info("🚀 Pushing image and data to GitHub...")
-                                    success, status_out = run_safe_git_command(["git", "status", "--porcelain"], cwd=os.getcwd())
-                                    if not success:
-                                        st.error(f"Git status failed: {status_out}")
-                                    elif status_out.strip():
-                                        success, err_msg = run_safe_git_command(
-                                            ["git", "add", "src/data/projects.json", target_img_path],
-                                            cwd=os.getcwd()
-                                        )
-                                        if not success:
-                                            st.error(f"Git add failed: {err_msg}")
-                                        else:
-                                            commit_msg = f"chore(sync): update project photo - {p_title}"
-                                            success, err_msg = run_safe_git_command(
-                                                ["git", "commit", "-m", commit_msg],
-                                                cwd=os.getcwd()
-                                            )
-                                            if not success:
-                                                st.error(f"Git commit failed: {err_msg}")
-                                            else:
-                                                success, push_out = run_safe_git_command(
-                                                    ["git", "push", "origin", "main"],
-                                                    cwd=os.getcwd()
-                                                )
-                                                if not success:
-                                                    st.error(f"Git push failed: {push_out}")
-                                                else:
-                                                    st.success("✅ Pushed successfully to GitHub!")
+                                    git_ok, git_msg = commit_and_push_paths(
+                                        run_safe_git_command,
+                                        ["src/data/projects.json", target_img_path],
+                                        f"chore(sync): update project photo - {p_title}",
+                                        cwd=os.getcwd(),
+                                    )
+                                    if git_ok:
+                                        st.success(git_msg)
+                                    else:
+                                        st.error(f"Git failed: {git_msg}")
                                 st.rerun()
                             else:
                                 st.error(msg)
@@ -2412,33 +2358,16 @@ with tab_project:
                                 
                                 if not dry_run_proj:
                                     st.info("🚀 Pushing image to GitHub...")
-                                    success, status_out = run_safe_git_command(["git", "status", "--porcelain"], cwd=os.getcwd())
-                                    if not success:
-                                        st.error(f"Git status failed: {status_out}")
-                                    elif status_out.strip():
-                                        success, err_msg = run_safe_git_command(
-                                            ["git", "add", "src/data/projects.json", target_noir_path],
-                                            cwd=os.getcwd()
-                                        )
-                                        if not success:
-                                            st.error(f"Git add failed: {err_msg}")
-                                        else:
-                                            commit_msg = f"chore(sync): update project noir photo - {p_title}"
-                                            success, err_msg = run_safe_git_command(
-                                                ["git", "commit", "-m", commit_msg],
-                                                cwd=os.getcwd()
-                                            )
-                                            if not success:
-                                                st.error(f"Git commit failed: {err_msg}")
-                                            else:
-                                                success, push_out = run_safe_git_command(
-                                                    ["git", "push", "origin", "main"],
-                                                    cwd=os.getcwd()
-                                                )
-                                                if not success:
-                                                    st.error(f"Git push failed: {push_out}")
-                                                else:
-                                                    st.success("✅ Pushed successfully to GitHub!")
+                                    git_ok, git_msg = commit_and_push_paths(
+                                        run_safe_git_command,
+                                        ["src/data/projects.json", target_noir_path],
+                                        f"chore(sync): update project noir photo - {p_title}",
+                                        cwd=os.getcwd(),
+                                    )
+                                    if git_ok:
+                                        st.success(git_msg)
+                                    else:
+                                        st.error(f"Git failed: {git_msg}")
                                 st.rerun()
                             else:
                                 st.error(msg)
@@ -2506,33 +2435,16 @@ with tab_project:
                                     
                                     if not dry_run_proj:
                                         st.info("🚀 Pushing changes to GitHub...")
-                                        success, status_out = run_safe_git_command(["git", "status", "--porcelain"], cwd=os.getcwd())
-                                        if not success:
-                                            st.error(f"Git status failed: {status_out}")
-                                        elif status_out.strip():
-                                            success, err_msg = run_safe_git_command(
-                                                ["git", "add", "src/data/projects.json"],
-                                                cwd=os.getcwd()
-                                            )
-                                            if not success:
-                                                st.error(f"Git add failed: {err_msg}")
-                                            else:
-                                                commit_msg = f"chore(sync): update project - {project['title']}"
-                                                success, err_msg = run_safe_git_command(
-                                                    ["git", "commit", "-m", commit_msg],
-                                                    cwd=os.getcwd()
-                                                )
-                                                if not success:
-                                                    st.error(f"Git commit failed: {err_msg}")
-                                                else:
-                                                    success, push_out = run_safe_git_command(
-                                                        ["git", "push", "origin", "main"],
-                                                        cwd=os.getcwd()
-                                                    )
-                                                    if not success:
-                                                        st.error(f"Git push failed: {push_out}")
-                                                    else:
-                                                        st.success("✅ Pushed successfully to GitHub!")
+                                        git_ok, git_msg = commit_and_push_paths(
+                                            run_safe_git_command,
+                                            ["src/data/projects.json"],
+                                            f"chore(sync): update project - {project['title']}",
+                                            cwd=os.getcwd(),
+                                        )
+                                        if git_ok:
+                                            st.success(git_msg)
+                                        else:
+                                            st.error(f"Git failed: {git_msg}")
                                             
                                     st.rerun()
                                 except Exception as e:
@@ -2540,60 +2452,35 @@ with tab_project:
                                     
                     with col_pb2:
                         if st.button("Delete Project", key=f"btn_del_proj_{p_id}", type="secondary", use_container_width=True):
-                            if img_path and "project-" in img_path:
-                                target_img = os.path.join("public", img_path.lstrip("/"))
-                                if os.path.exists(target_img):
-                                    try:
-                                        os.remove(target_img)
-                                        st.toast(f"Deleted image file: `{target_img}`")
-                                    except Exception as e:
-                                        st.error(f"Failed to delete image: {e}")
-                                        
-                                # Delete corresponding Noir image if it exists
-                                target_img_noir = target_img.replace(".webp", "-noir.webp")
-                                if os.path.exists(target_img_noir):
-                                    try:
-                                        os.remove(target_img_noir)
-                                        st.toast(f"Deleted Noir image file: `{target_img_noir}`")
-                                    except Exception as e:
-                                        st.error(f"Failed to delete Noir image: {e}")
-                                        
                             updated_projects = [p for p in current_projects if p.get("id") != p_id]
                             
                             try:
+                                is_offline = st.session_state.get("offline_mode", False)
+                                if HAS_SYNC and not is_offline and not delete_project(p_id):
+                                    raise Exception("Database delete failed. Local files were not changed.")
                                 write_projects_file(updated_projects)
+                                deleted_assets = []
+                                if img_path and "project-" in img_path:
+                                    target_img = os.path.join("public", img_path.lstrip("/"))
+                                    target_img_noir = target_img.replace(".webp", "-noir.webp")
+                                    deleted_assets = delete_existing_files([target_img, target_img_noir])
+                                    for deleted_asset in deleted_assets:
+                                        st.toast(f"Deleted image file: `{deleted_asset}`")
                                 st.session_state.projects = updated_projects
                                 st.success(f"Successfully deleted project: **{p_title}**!")
                                 
                                 if not dry_run_proj:
                                     st.info("🚀 Pushing deletion to GitHub...")
-                                    success, status_out = run_safe_git_command(["git", "status", "--porcelain"], cwd=os.getcwd())
-                                    if not success:
-                                        st.error(f"Git status failed: {status_out}")
-                                    elif status_out.strip():
-                                        success, err_msg = run_safe_git_command(
-                                            ["git", "add", "src/data/projects.json"],
-                                            cwd=os.getcwd()
-                                        )
-                                        if not success:
-                                            st.error(f"Git add failed: {err_msg}")
-                                        else:
-                                            commit_msg = f"chore(sync): delete project - {p_title}"
-                                            success, err_msg = run_safe_git_command(
-                                                ["git", "commit", "-m", commit_msg],
-                                                cwd=os.getcwd()
-                                            )
-                                            if not success:
-                                                st.error(f"Git commit failed: {err_msg}")
-                                            else:
-                                                success, push_out = run_safe_git_command(
-                                                    ["git", "push", "origin", "main"],
-                                                    cwd=os.getcwd()
-                                                )
-                                                if not success:
-                                                    st.error(f"Git push failed: {push_out}")
-                                                else:
-                                                    st.success("✅ Pushed successfully to GitHub!")
+                                    git_ok, git_msg = commit_and_push_paths(
+                                        run_safe_git_command,
+                                        ["src/data/projects.json", *deleted_assets],
+                                        f"chore(sync): delete project - {p_title}",
+                                        cwd=os.getcwd(),
+                                    )
+                                    if git_ok:
+                                        st.success(git_msg)
+                                    else:
+                                        st.error(f"Git failed: {git_msg}")
                                         
                                 st.rerun()
                             except Exception as e:
@@ -2660,6 +2547,7 @@ with tab_cert:
                     current_certs = parse_certificates_file()
                     updated = False
                     sync_logs = []
+                    staged_uploads = []
                     
                     certs_to_process = list(raw_certs)
                     
@@ -2688,14 +2576,14 @@ with tab_cert:
                         cert_data = call_gemini(prompt, file_data=b64_data, file_mime=mime)
                         if not cert_data:
                             raise ValueError(f"Failed to parse certificate '{cert_file}' via Gemini OCR.")
+                        cert_data = validate_certificate_response(cert_data)
                         
                         cert_id = slugify(cert_data["title"])
                         file_ext = os.path.splitext(cert_file)[1].lower()
                         dest_filename = f"{cert_id}{file_ext}"
                         dest_filepath = os.path.join(public_cert_dir, dest_filename)
-                        
-                        # Move from raw to public
-                        shutil.move(filepath, dest_filepath)
+                        staged_filepath = copy_to_staged_file(filepath, dest_filepath)
+                        staged_uploads.append(staged_filepath)
                         
                         verify_url = cert_data.get("verifyUrl", "").strip()
                         if verify_url:
@@ -2722,12 +2610,41 @@ with tab_cert:
                         current_certs = [c for c in current_certs if c.get("id") != cert_id]
                         current_certs.append(new_cert)
                         updated = True
+                        new_cert["_staged_path"] = staged_filepath
+                        new_cert["_raw_path"] = filepath
                         check_and_add_pending_skills(cert_data.get("tags", []))
                         sync_logs.append(f"Parsed certificate: {cert_data['title']}")
                     
                     git_logs_output = ""
                     if updated:
-                        write_certificates_file(current_certs)
+                        staged_pairs = []
+                        raw_paths = []
+                        public_certs = []
+                        try:
+                            for cert in current_certs:
+                                cert_copy = dict(cert)
+                                staged_path = cert_copy.pop("_staged_path", None)
+                                raw_path = cert_copy.pop("_raw_path", None)
+                                if staged_path:
+                                    staged_pairs.append((staged_path, os.path.join("public", cert_copy["image"].lstrip("/"))))
+                                if raw_path:
+                                    raw_paths.append(raw_path)
+                                public_certs.append(cert_copy)
+
+                            write_certificates_file(public_certs)
+                            for staged_path, final_path in staged_pairs:
+                                finalize_staged_file(staged_path, final_path)
+                                if staged_path in staged_uploads:
+                                    staged_uploads.remove(staged_path)
+                            for raw_path in raw_paths:
+                                if os.path.exists(raw_path):
+                                    os.remove(raw_path)
+                        except Exception:
+                            for staged_path, _ in staged_pairs:
+                                cleanup_staged_file(staged_path)
+                            raise
+
+                        current_certs = public_certs
                         st.session_state.certificates = current_certs
                         
                         # Update resume log
@@ -2742,41 +2659,18 @@ with tab_cert:
                             st.session_state.resume = resume
                             
                         if not dry_run_cert:
-                            success, status_out = run_safe_git_command(["git", "status", "--porcelain"], cwd=os.getcwd())
+                            success, git_msg = commit_and_push_paths(
+                                run_safe_git_command,
+                                ["src/data/certificates.json", "src/data/resume.json", "src/data/skills.json", "public/certificates/"],
+                                "chore(sync): publish certificates sync",
+                                cwd=os.getcwd(),
+                            )
                             if not success:
-                                raise ValueError(f"Git status failed: {status_out}")
-                            elif status_out.strip():
-                                success, err_msg = run_safe_git_command(
-                                    ["git", "add", "src/data/certificates.json", "src/data/resume.json", "public/certificates/"],
-                                    cwd=os.getcwd()
-                                )
-                                if success and "src/data/skills.json" in status_out:
-                                    success, err_msg = run_safe_git_command(
-                                        ["git", "add", "src/data/skills.json"],
-                                        cwd=os.getcwd()
-                                    )
-                                
-                                if not success:
-                                    raise ValueError(f"Git add failed: {err_msg}")
-                                else:
-                                    commit_msg = f"chore(sync): publish certificates sync"
-                                    success, err_msg = run_safe_git_command(
-                                        ["git", "commit", "-m", commit_msg],
-                                        cwd=os.getcwd()
-                                    )
-                                    if not success:
-                                        raise ValueError(f"Git commit failed: {err_msg}")
-                                    else:
-                                        success, push_out = run_safe_git_command(
-                                            ["git", "push", "origin", "main"],
-                                            cwd=os.getcwd()
-                                        )
-                                        if not success:
-                                            raise ValueError(f"Git push failed: {push_out}")
-                                        else:
-                                            git_logs_output = "✅ Pushed successfully to GitHub!"
-                            else:
-                                git_logs_output = "No changes to commit and push."
+                                raise ValueError(git_msg)
+                            git_logs_output = git_msg
+
+                    for staged_path in staged_uploads:
+                        cleanup_staged_file(staged_path)
                                 
                     return {
                         "sync_logs": sync_logs,
@@ -2823,23 +2717,19 @@ with tab_cert:
                         
                     # Remove button
                     if st.button(f"Remove Certificate", key=f"del_cert_{cert_id}", type="secondary"):
-                        # Removal logic
-                        # 1. Delete image
-                        if img_path:
-                            target_img = os.path.join("public", img_path.lstrip("/"))
-                            if os.path.exists(target_img):
-                                try:
-                                    os.remove(target_img)
-                                    st.toast(f"Deleted image file: `{target_img}`")
-                                except Exception as e:
-                                    st.error(f"Failed to delete image: {e}")
-                        
-                        # 2. Filter list
                         updated_certs = [c for c in current_certs if c.get("id") != cert_id]
                         
-                        # 3. Write file
                         try:
+                            is_offline = st.session_state.get("offline_mode", False)
+                            if HAS_SYNC and not is_offline and not delete_certificate(cert_id):
+                                raise Exception("Database delete failed. Local files were not changed.")
                             write_certificates_file(updated_certs)
+                            deleted_assets = []
+                            if img_path:
+                                target_img = os.path.join("public", img_path.lstrip("/"))
+                                deleted_assets = delete_existing_files([target_img])
+                                for deleted_asset in deleted_assets:
+                                    st.toast(f"Deleted image file: `{deleted_asset}`")
                             st.session_state.certificates = updated_certs
                             
                             # 4. Update resume log
@@ -3099,6 +2989,9 @@ with tab_skills:
                                             updated_skills_list.append(sk)
                                             
                                     try:
+                                        is_offline = st.session_state.get("offline_mode", False)
+                                        if HAS_SYNC and not is_offline and edit_name.strip() != s_name and not delete_skill(s_name):
+                                            raise Exception("Database delete for the old skill name failed. Local files were not changed.")
                                         write_skills_file(updated_skills_list)
                                         st.session_state.skills = updated_skills_list
                                         st.success(f"Successfully updated skill: **{edit_name.strip()}**!")
@@ -3123,6 +3016,9 @@ with tab_skills:
                                         updated_skills_list.append(sk)
                                         
                                 try:
+                                    is_offline = st.session_state.get("offline_mode", False)
+                                    if HAS_SYNC and not is_offline and not delete_skill(s_name):
+                                        raise Exception("Database delete failed. Local files were not changed.")
                                     write_skills_file(updated_skills_list)
                                     st.session_state.skills = updated_skills_list
                                     st.success(f"Successfully deleted skill: **{s_name}**!")
@@ -3348,18 +3244,21 @@ with tab_blog:
     dry_run_blog = st.checkbox("Dry-Run Mode (Save to Supabase/locally, skip Git remote push)", value=True, key="dry_blog")
     
     if st.button("Publish Blog Post", use_container_width=True, type="primary"):
-        if not draft_title or not draft_content:
-            st.error("Title and Markdown content are required!")
-        else:
+        try:
+            draft_title, draft_excerpt, tags_list, draft_content = validate_blog_fields(
+                draft_title,
+                draft_excerpt,
+                [t.strip() for t in draft_tags.split(",") if t.strip()],
+                draft_content,
+            )
             slug = slugify(draft_title)
-            tags_list = [t.strip() for t in draft_tags.split(",") if t.strip()]
             date_str = st.session_state.get("blog_draft_date", datetime.now().strftime('%Y-%m-%d'))
             
             # Format frontmatter
             file_content = f"""---
-title: "{draft_title}"
-date: "{date_str}"
-excerpt: "{draft_excerpt}"
+title: {json.dumps(draft_title)}
+date: {json.dumps(date_str)}
+excerpt: {json.dumps(draft_excerpt)}
 tags: {json.dumps(tags_list)}
 coverImage: "/images/blog/default.jpg"
 ---
@@ -3391,8 +3290,7 @@ coverImage: "/images/blog/default.jpg"
                     posts_dir = os.path.join("src", "content", "posts")
                     os.makedirs(posts_dir, exist_ok=True)
                     file_path = os.path.join(posts_dir, f"{slug}.md")
-                    with open(file_path, "w", encoding="utf-8") as f:
-                        f.write(file_content)
+                    atomic_write_text(file_path, file_content)
                     
                     # Update resume sync log
                     resume = parse_resume_file()
@@ -3414,35 +3312,16 @@ coverImage: "/images/blog/default.jpg"
                     
                     if not dry_run_blog:
                         st.info("🚀 Pushing changes to GitHub...")
-                        success, status_out = run_safe_git_command(["git", "status", "--porcelain"], cwd=os.getcwd())
-                        if not success:
-                            st.error(f"Git status failed: {status_out}")
-                        elif status_out.strip():
-                            success, err_msg = run_safe_git_command(
-                                ["git", "add", file_path, "src/data/resume.json"],
-                                cwd=os.getcwd()
-                            )
-                            if not success:
-                                st.error(f"Git add failed: {err_msg}")
-                            else:
-                                commit_msg = f"chore(blog): publish post - {draft_title}"
-                                success, err_msg = run_safe_git_command(
-                                    ["git", "commit", "-m", commit_msg],
-                                    cwd=os.getcwd()
-                                )
-                                if not success:
-                                    st.error(f"Git commit failed: {err_msg}")
-                                else:
-                                    success, push_out = run_safe_git_command(
-                                        ["git", "push", "origin", "main"],
-                                        cwd=os.getcwd()
-                                    )
-                                    if not success:
-                                        st.error(f"Git push failed: {push_out}")
-                                    else:
-                                        st.success("✅ Pushed successfully to GitHub!")
+                        git_ok, git_msg = commit_and_push_paths(
+                            run_safe_git_command,
+                            [file_path, "src/data/resume.json"],
+                            f"chore(blog): publish post - {draft_title}",
+                            cwd=os.getcwd(),
+                        )
+                        if git_ok:
+                            st.success(git_msg)
                         else:
-                            st.info("No changes to commit and push.")
+                            st.error(f"Git failed: {git_msg}")
                     
                     # Clear session state
                     if "blog_draft_title" in st.session_state: del st.session_state.blog_draft_title
@@ -3454,6 +3333,8 @@ coverImage: "/images/blog/default.jpg"
                     
                 except Exception as e:
                     st.error(f"Failed to publish post: {e}")
+        except Exception as e:
+            st.error(str(e))
 
     # ──────────────────────────────────────────
     # Existing / Published Blogs List
@@ -3542,13 +3423,12 @@ coverImage: "/images/blog/default.jpg"
                             is_offline = st.session_state.get("offline_mode", False)
                             if HAS_SYNC and not is_offline:
                                 slug = post['file_name'].replace(".md", "")
-                                delete_blog_post(slug)
-                                trigger_revalidation()
+                                if delete_blog_post(slug):
+                                    trigger_revalidation()
+                                else:
+                                    st.error("Deleted local blog file, but Supabase delete failed.")
                             
                             st.success(f"Deleted `{post['file_name']}` successfully!")
                             st.rerun()
     else:
         st.info("No blog posts directory found.")
-
-
-

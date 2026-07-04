@@ -60,7 +60,11 @@ The project uses the following environment variables (stored in `.env.local` loc
 - `scripts/generate-git-log.js` writes generated commit data before builds.
 - `scripts/synchronizer.py` is a local content-management helper. Treat it as tooling, not runtime app code.
 - `scripts/seed_supabase.py` populates Supabase tables from the TypeScript data files (one-time bootstrap or re-seed).
-- `scripts/sync_supabase.py` shared REST API module used by the synchronizer to write to Supabase.
+- `scripts/sync_supabase.py` shared REST API module used by the synchronizer to read, upsert, and explicitly delete Supabase records.
+- `scripts/sync_json.py` provides atomic local JSON/text fallback writes for the synchronizer.
+- `scripts/sync_validation.py` validates Gemini-generated project, certificate, and blog payloads before persistence.
+- `scripts/sync_assets.py` stages synchronizer asset moves/deletes so public files are not mutated before data writes succeed.
+- `scripts/sync_git.py` scopes synchronizer Git commits to intended paths and rejects unrelated staged changes.
 - `scripts/backup_db.py` pulls live database data from Supabase and updates local JSON fallback files.
 - `scripts/verify.sh` runs a single-command test verification (clears cache, checks types, checks linting, runs test build).
 - `scripts/audit_db.py` runs a database schema audit comparing the local schema file against live Supabase tables.
@@ -90,7 +94,7 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
 - **Sidebar Monitors:**
   - **CI/CD Deployment Status:** Automatically tracks Vercel build status via GitHub API, displaying status updates in IST (Indian Standard Time).
   - **Pending Skill Approvals:** Lists queue of AI-extracted skills for immediate addition.
-- **Fallback Synchronization & Offline Mode:** The dashboard writes to both the database and the local JSON fallbacks in `src/data/` (e.g., `projects.json`, `skills.json`). To ensure consistency, the dashboard commits to the database *first* and rolls back the local file write on failure. Check the **Offline Mode (Local JSON Only)** toggle in the Streamlit sidebar to disable database synchronization and force local-only modifications. If database connections fail at runtime in Next.js, the web app automatically falls back to reading these local JSON files. Future content features must maintain this dual JSON/database fallback contract.
+- **Fallback Synchronization & Offline Mode:** The dashboard writes to both the database and the local JSON fallbacks in `src/data/` (e.g., `projects.json`, `skills.json`). To ensure consistency, the dashboard commits to the database *first* and uses atomic local writes after database success. Deletes must call explicit Supabase delete helpers before local fallback files are changed. AI-generated content must pass `scripts/sync_validation.py` validation before persistence. Asset imports should stage files before finalizing public paths, and Git publishing must use `scripts/sync_git.py` so unrelated staged changes are rejected. Check the **Offline Mode (Local JSON Only)** toggle in the Streamlit sidebar to disable database synchronization and force local-only modifications. If database connections fail at runtime in Next.js, the web app automatically falls back to reading these local JSON files. Future content features must maintain this dual JSON/database fallback contract.
 - **Python / JS Decoupling:** Keep Python tools strictly as local content-management scripts. Do not attempt to invoke Python scripts or require Python dependencies (`streamlit`, `Pillow`) in any runtime web app paths or public API routes.
 
 
