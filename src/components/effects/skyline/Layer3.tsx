@@ -192,14 +192,6 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="396" y1="726" x2="396" y2="718" strokeWidth="1.2" />
                 <circle cx="396" cy="718" r="1.2" fill="var(--skyline-stroke-fg)" stroke="none" />
 
-                {/* Perched Pigeons */}
-                <g fill="var(--skyline-stroke-fg)" stroke="none">
-                  {/* Pigeon on water tank roof peak */}
-                  <path d="M 395 726 C 395 724 396 723 398 723 C 399 723 400 724 400 726 C 400 727 398 728 397 728 Z M 399 725 L 401 727 L 399 728 Z" />
-                  {/* Pigeon on access shed roof */}
-                  <path d="M 329 750 C 329 748 330 747 332 747 C 333 747 334 748 334 750 C 334 751 332 752 331 752 Z M 333 749 L 335 751 L 333 752 Z" />
-                </g>
-
                 {/* Left rooftop satellite dish */}
                 <g stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" fill="none">
                   <WobblyLine wobble={wobble} wobbleStrength={strength} x1="270" y1="820" x2="273" y2="806" />
