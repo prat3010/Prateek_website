@@ -316,35 +316,6 @@
   50% { opacity: 1; }
 }
 
-/* ─ Rolling River Fog ─ */
-.fog1 {
-  animation: fogDriftLeft 35s ease-in-out infinite alternate;
-  transform-origin: center;
-}
-
-.fog2 {
-  animation: fogDriftRight 42s ease-in-out infinite alternate;
-  transform-origin: center;
-}
-
-@keyframes fogDriftLeft {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-150px);
-  }
-}
-
-@keyframes fogDriftRight {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(120px);
-  }
-}
-
 /* ─ Chugging Tugboat (Option 1) ─ */
 .tugboatTransit {
   transform-origin: 1050px 941px;
@@ -635,9 +606,6 @@
   .blimpSpotlight,
   .blimpBeacon,
   .bridgeBeacon,
-  .fog1,
-  .fog2,
-
   .tugboatTransit,
   .tugboatBobbing,
   .tugboatWindow,
@@ -1007,9 +975,7 @@
 .lightPopart .moonGlow,
 .lightPopart .star1,
 .lightPopart .star2,
-.lightPopart .star3,
-.lightPopart .fog1,
-.lightPopart .fog2 {
+.lightPopart .star3 {
   display: none;
 }
 
@@ -1665,9 +1631,6 @@
 .reducedMotion .blimpSpotlight,
 .reducedMotion .blimpBeacon,
 .reducedMotion .bridgeBeacon,
-.reducedMotion .fog1,
-.reducedMotion .fog2,
-
 .reducedMotion .tugboatTransit,
 .reducedMotion .tugboatBobbing,
 .reducedMotion .tugboatWindow,
@@ -1772,8 +1735,6 @@
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
 }
-
-
 
 
 

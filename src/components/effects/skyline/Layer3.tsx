@@ -17,13 +17,6 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
       {/* Static Layer */}
       <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
             <defs>
-              {/* Fog Mist Vertical Linear Gradient */}
-              <linearGradient id="fogGradient" x1="0" y1="1" x2="0" y2="0">
-                <stop offset="0%" stopColor="rgba(250, 250, 250, 0.15)" />
-                <stop offset="50%" stopColor="rgba(250, 250, 250, 0.06)" />
-                <stop offset="100%" stopColor="rgba(250, 250, 250, 0)" />
-              </linearGradient>
-
               {/* Downward Light Bulb Gradient */}
               <linearGradient id="downwardLightGrad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="rgba(255, 255, 255, 0.55)" />
@@ -1436,13 +1429,6 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
       {/* Animated Layer (Unfiltered) */}
       <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0, pointerEvents: 'none' }}>
             <defs>
-              {/* Fog Mist Vertical Linear Gradient */}
-              <linearGradient id="fogGradient" x1="0" y1="1" x2="0" y2="0">
-                <stop offset="0%" stopColor="rgba(250, 250, 250, 0.15)" />
-                <stop offset="50%" stopColor="rgba(250, 250, 250, 0.06)" />
-                <stop offset="100%" stopColor="rgba(250, 250, 250, 0)" />
-              </linearGradient>
-
               {/* Billboard Spotlight Gradient */}
               <linearGradient id="leftLightGrad" x1="0" y1="1" x2="0" y2="0">
                 <stop offset="0%" stopColor="rgba(250, 250, 250, 0.15)" />
@@ -1559,22 +1545,6 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
 
               {/* Steam from Industrial Blower */}
               <path d="M 1598 710 C 1606 685, 1594 660, 1602 635 C 1608 615, 1600 595, 1606 575" className={styles.steamDelayed} />
-            </g>
-
-            {/* Rolling River Fog/Mist Layers */}
-            <g fill="url(#fogGradient)" stroke="none">
-              {/* Fog Layer 1 */}
-              <path 
-                d="M -1000 920 C 100 890, 400 890, 800 915 C 1200 895, 1600 895, 2920 920 L 2920 1250 L -1000 1250 Z" 
-                opacity="0.3" 
-                className={styles.fog1} 
-              />
-              {/* Fog Layer 2 */}
-              <path 
-                d="M -1000 935 C 200 915, 700 905, 1100 930 C 1500 910, 1800 920, 2920 935 L 2920 1250 L -1000 1250 Z" 
-                opacity="0.2" 
-                className={styles.fog2} 
-              />
             </g>
       </svg>
     </>

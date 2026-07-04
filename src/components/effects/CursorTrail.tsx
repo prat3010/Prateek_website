@@ -15,9 +15,6 @@ interface TrailDot {
   y: number;
   age: number;
   colorIndex: number;
-  shape: 'circle' | 'star' | 'crosshair';
-  angle: number;
-  angleSpeed: number;
 }
 
 interface SmokeParticle {
@@ -295,7 +292,6 @@ export default function CursorTrail() {
         .map(dot => ({
           ...dot,
           age: dot.age + 1,
-          angle: dot.angle + dot.angleSpeed,
         }))
         .filter(dot => dot.age < TRAIL_LENGTH);
 
@@ -307,9 +303,6 @@ export default function CursorTrail() {
           y,
           age: 0,
           colorIndex: colorIndexRef.current,
-          shape: 'circle',
-          angle: Math.random() * Math.PI * 2,
-          angleSpeed: (Math.random() - 0.5) * 0.05,
         });
         colorIndexRef.current = (colorIndexRef.current + 1) % colors.length;
       }
@@ -328,73 +321,16 @@ export default function CursorTrail() {
 
         if (opacity <= 0 || radius <= 0) continue;
 
-        if (dot.shape === 'star') {
-          ctx.save();
-          ctx.translate(dot.x, dot.y);
-          ctx.rotate(dot.angle);
+        ctx.beginPath();
+        ctx.arc(dot.x, dot.y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = colors[dot.colorIndex % colors.length];
+        ctx.globalAlpha = opacity;
+        ctx.fill();
 
-          ctx.beginPath();
-          const spikes = 4;
-          const outerRadius = radius * 1.35;
-          const innerRadius = radius * 0.45;
-          let rot = (Math.PI / 2) * 3;
-          const step = Math.PI / spikes;
-
-          ctx.moveTo(0, -outerRadius);
-          for (let j = 0; j < spikes; j++) {
-            let sx = Math.cos(rot) * outerRadius;
-            let sy = Math.sin(rot) * outerRadius;
-            ctx.lineTo(sx, sy);
-            rot += step;
-
-            sx = Math.cos(rot) * innerRadius;
-            sy = Math.sin(rot) * innerRadius;
-            ctx.lineTo(sx, sy);
-            rot += step;
-          }
-          ctx.lineTo(0, -outerRadius);
-          ctx.closePath();
-
-          ctx.fillStyle = colors[dot.colorIndex % colors.length];
-          ctx.globalAlpha = opacity;
-          ctx.fill();
-
-          ctx.strokeStyle = '#1A1A2E';
-          ctx.lineWidth = 1.5;
-          ctx.globalAlpha = opacity * 0.8;
-          ctx.stroke();
-
-          ctx.restore();
-        } else if (dot.shape === 'crosshair') {
-          ctx.save();
-          ctx.translate(dot.x, dot.y);
-          ctx.rotate(dot.angle);
-
-          ctx.beginPath();
-          ctx.arc(0, 0, radius * 0.45, 0, Math.PI * 2);
-          ctx.moveTo(-radius * 1.2, 0);
-          ctx.lineTo(radius * 1.2, 0);
-          ctx.moveTo(0, -radius * 1.2);
-          ctx.lineTo(0, radius * 1.2);
-
-          ctx.strokeStyle = colors[dot.colorIndex % colors.length];
-          ctx.lineWidth = 1.5;
-          ctx.globalAlpha = opacity;
-          ctx.stroke();
-
-          ctx.restore();
-        } else {
-          ctx.beginPath();
-          ctx.arc(dot.x, dot.y, radius, 0, Math.PI * 2);
-          ctx.fillStyle = colors[dot.colorIndex % colors.length];
-          ctx.globalAlpha = opacity;
-          ctx.fill();
-
-          ctx.strokeStyle = '#1A1A2E';
-          ctx.lineWidth = 1.5;
-          ctx.globalAlpha = opacity * 0.8;
-          ctx.stroke();
-        }
+        ctx.strokeStyle = '#1A1A2E';
+        ctx.lineWidth = 1.5;
+        ctx.globalAlpha = opacity * 0.8;
+        ctx.stroke();
       }
     }
 
