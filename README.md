@@ -86,6 +86,16 @@ This ensures the terminal telemetry console on the portfolio site (accessible at
 
 The public `/api/git-log` route reads only the generated `src/data/git-log.json` artifact and does not execute `git` commands at request time.
 
+### Skyline Wobbly Path Cache
+
+The noir skyline keeps its hand-drawn SVG detail lines by prebaking the expensive wobble displacement math into `src/components/effects/wobblyPaths.generated.ts`. After changing any `WobblyPath`, `WobblyLine`, `WobblyRect`, or `WobblyPolygon` usage under `src/components/effects/skyline/`, refresh the generated cache:
+
+```bash
+npm run generate:wobbly-paths
+```
+
+Runtime rendering uses the generated cache first and falls back to live wobble generation only for uncached dynamic paths.
+
 ---
 
 ## 🌐 Deployment & Hosting

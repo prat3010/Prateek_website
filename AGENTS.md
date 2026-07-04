@@ -48,6 +48,7 @@ The project uses the following environment variables (stored in `.env.local` loc
 - `src/app/` contains routes, layouts, metadata, API routes, sitemap, robots, and the app shell.
 - `src/proxy.ts` is the Next.js 16 proxy (formerly middleware) file that intercepts requests for telemetry logging.
 - `src/components/` contains portfolio sections, shared UI (like the interactive diagnostics terminal console at `/terminal` which supports commands such as `git-info` and `qrcode`), visual effects, and the playground.
+- `src/components/effects/wobblyPaths.generated.ts` contains generated skyline path data for prebaked hand-drawn SVG wobble. Do not edit it by hand; regenerate it with `npm run generate:wobbly-paths` after changing skyline `Wobbly*` elements.
 - `src/data/` contains type definitions, Supabase client setup, and taglines (data values live in Supabase).
 - `src/lib/data.ts` is the server-side data layer that fetches projects, skills, resume, and certificates from Supabase.
 - `src/data/git-log.json` contains generated commit logs and should not be modified manually.
@@ -58,6 +59,7 @@ The project uses the following environment variables (stored in `.env.local` loc
 - `src/app/api/` contains REST API routes for reading/writing portfolio data to Supabase.
 - `src/utils/pdfGenerator.ts` generates the downloadable resume PDF client-side.
 - `scripts/generate-git-log.js` writes generated commit data before builds.
+- `scripts/generate-wobbly-paths.mjs` prebakes deterministic skyline wobble paths so the browser does not run the full displacement algorithm for normal skyline rendering.
 - `scripts/synchronizer.py` is a local content-management helper. Treat it as tooling, not runtime app code.
 - `scripts/seed_supabase.py` populates Supabase tables from the TypeScript data files (one-time bootstrap or re-seed).
 - `scripts/sync_supabase.py` shared REST API module used by the synchronizer to read, upsert, and explicitly delete Supabase records.
@@ -118,6 +120,7 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
 ## Performance Expectations
 
 - The app already has a heavy visual layer. Avoid adding default client-side work to the global shell unless necessary.
+- Skyline hand-drawn lines should use the generated `wobblyPaths.generated.ts` cache. If skyline `Wobbly*` geometry changes, run `npm run generate:wobbly-paths` and commit the generated update with the source change.
 - Prefer server components for static content and client components only where interactivity/theme state requires them.
 - Dynamic import heavyweight effects or optional widgets.
 - Respect `prefers-reduced-motion` and keep animation work off the main user path when possible.

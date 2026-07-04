@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { WOBBLY_PATH_CACHE } from './wobblyPaths.generated';
 
 interface WobblyProps {
   wobble?: boolean;
@@ -6,6 +7,36 @@ interface WobblyProps {
   segmentLength?: number;
   baseFreq?: number;
   octaves?: number;
+}
+
+function normalizeOptionalNumber(value: number | undefined): string {
+  return value === undefined ? '' : String(Number(value));
+}
+
+function makePathKey(
+  d: string,
+  wobbleStrength: number,
+  segmentLength?: number,
+  baseFreq?: number,
+  octaves?: number
+): string {
+  return [
+    d,
+    String(Number(wobbleStrength)),
+    normalizeOptionalNumber(segmentLength),
+    normalizeOptionalNumber(baseFreq),
+    normalizeOptionalNumber(octaves),
+  ].join('|');
+}
+
+function getPrebakedPath(
+  d: string,
+  wobbleStrength: number,
+  segmentLength?: number,
+  baseFreq?: number,
+  octaves?: number
+): string | undefined {
+  return WOBBLY_PATH_CACHE[makePathKey(d, wobbleStrength, segmentLength, baseFreq, octaves)];
 }
 
 export interface WobblyPathProps extends React.SVGProps<SVGPathElement>, WobblyProps {}
@@ -381,6 +412,17 @@ export function wobblePath(
   return result.join(' ');
 }
 
+function getWobbledPath(
+  d: string,
+  segmentLength: number | undefined,
+  wobbleStrength: number,
+  baseFreq: number | undefined,
+  octaves: number | undefined
+): string {
+  return getPrebakedPath(d, wobbleStrength, segmentLength, baseFreq, octaves) ??
+    wobblePath(d, segmentLength, wobbleStrength, baseFreq, octaves);
+}
+
 export const WobblyPath = React.memo(function WobblyPath({
   d,
   wobble = true,
@@ -392,7 +434,7 @@ export const WobblyPath = React.memo(function WobblyPath({
 }: WobblyPathProps) {
   const wobbledD = useMemo(() => {
     if (!wobble || !d) return d;
-    return wobblePath(d, segmentLength, wobbleStrength, baseFreq, octaves);
+    return getWobbledPath(d, segmentLength, wobbleStrength, baseFreq, octaves);
   }, [d, wobble, wobbleStrength, segmentLength, baseFreq, octaves]);
 
   return <path d={wobbledD} {...props} />;
@@ -417,7 +459,7 @@ export const WobblyLine = React.memo(function WobblyLine({
     const ny2 = Number(y2);
     const d = `M ${nx1} ${ny1} L ${nx2} ${ny2}`;
     if (!wobble) return d;
-    return wobblePath(d, segmentLength, wobbleStrength, baseFreq, octaves);
+    return getWobbledPath(d, segmentLength, wobbleStrength, baseFreq, octaves);
   }, [x1, y1, x2, y2, wobble, wobbleStrength, segmentLength, baseFreq, octaves]);
 
   if (!wobble) {
@@ -446,7 +488,7 @@ export const WobblyRect = React.memo(function WobblyRect({
     const nh = Number(height);
     const d = `M ${nx} ${ny} L ${nx + nw} ${ny} L ${nx + nw} ${ny + nh} L ${nx} ${ny + nh} Z`;
     if (!wobble) return d;
-    return wobblePath(d, segmentLength, wobbleStrength, baseFreq, octaves);
+    return getWobbledPath(d, segmentLength, wobbleStrength, baseFreq, octaves);
   }, [x, y, width, height, wobble, wobbleStrength, segmentLength, baseFreq, octaves]);
 
   if (!wobble) {
@@ -475,7 +517,7 @@ export const WobblyPolygon = React.memo(function WobblyPolygon({
     }
     d += ' Z';
     if (!wobble) return d;
-    return wobblePath(d, segmentLength, wobbleStrength, baseFreq, octaves);
+    return getWobbledPath(d, segmentLength, wobbleStrength, baseFreq, octaves);
   }, [points, wobble, wobbleStrength, segmentLength, baseFreq, octaves]);
 
   if (!wobble) {
