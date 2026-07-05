@@ -240,7 +240,7 @@ export default function CursorTrail() {
 
       const smoke = smokeRef.current;
       
-      while (smoke.length > 80) {
+      while (smoke.length > 40) {
         smoke.shift();
       }
 
@@ -400,9 +400,6 @@ export default function CursorTrail() {
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     document.addEventListener('mouseleave', handleMouseLeave);
     document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    isLoopActiveRef.current = true;
-    frameRef.current = requestAnimationFrame(() => drawRef.current?.());
 
     return () => {
       window.removeEventListener('resize', handleResize);

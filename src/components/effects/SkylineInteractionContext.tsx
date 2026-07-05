@@ -28,10 +28,17 @@ export function SkylineInteractionProvider({ children }: { children: ReactNode }
   }, []);
 
   useEffect(() => {
-    window.addEventListener('scroll', invalidateGeometry, { passive: true });
+    let lastScrollCall = 0;
+    const handleScroll = () => {
+      const now = performance.now();
+      if (now - lastScrollCall < 100) return;
+      lastScrollCall = now;
+      invalidateGeometry();
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', invalidateGeometry, { passive: true });
     return () => {
-      window.removeEventListener('scroll', invalidateGeometry);
+      window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', invalidateGeometry);
     };
   }, [invalidateGeometry]);

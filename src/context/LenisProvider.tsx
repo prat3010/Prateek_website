@@ -20,7 +20,12 @@ function LenisSync({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!lenis) return;
+    let lastCall = 0;
+    const THROTTLE_MS = 33;
     const unsub = lenis.on('scroll', () => {
+      const now = performance.now();
+      if (now - lastCall < THROTTLE_MS) return;
+      lastCall = now;
       scrollY.set(lenis.scroll);
       scrollProgress.set(lenis.progress);
       velocity.set(lenis.velocity);

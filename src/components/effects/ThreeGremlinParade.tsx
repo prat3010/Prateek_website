@@ -30,6 +30,7 @@ export default function ThreeGremlinParade() {
     if (!containerRef.current) return;
 
     let active = true;
+    let isTabVisible = true;
     let animationFrameId: number;
     let renderer: WebGLRenderer;
     let scene: Scene;
@@ -79,7 +80,7 @@ export default function ThreeGremlinParade() {
       // 3. Create WebGL Renderer with Alpha transparent background
       renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
       renderer.setSize(width, height);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
       container.appendChild(renderer.domElement);
 
       // 4. Lights
@@ -871,10 +872,11 @@ export default function ThreeGremlinParade() {
         });
       }
 
-      // 7. Resize Event Handler
+      // 7a. Resize & Mouse Event Handlers
       window.addEventListener('resize', handleResize);
       window.addEventListener('mousemove', handleMouseMove);
       window.addEventListener('mouseleave', handleMouseLeave);
+
 
 
 
@@ -884,6 +886,7 @@ export default function ThreeGremlinParade() {
       const animate = () => {
         if (!active) return;
         animationFrameId = requestAnimationFrame(animate);
+        if (!isTabVisible) return;
 
         const currentTime = performance.now();
         const dt = Math.min((currentTime - lastTime) / 1000, 0.1); // cap dt
@@ -1048,15 +1051,21 @@ export default function ThreeGremlinParade() {
 
     init();
 
+    const handleVisibility = () => {
+      isTabVisible = !document.hidden;
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
     // 9. CLEANUP / LIFECYCLE DISPOSAL
     return () => {
       active = false;
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
 
-      // Clean up window resize and mouse listeners
+      // Clean up window resize, mouse, and visibility listeners
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseleave', handleMouseLeave);
+      document.removeEventListener('visibilitychange', handleVisibility);
 
 
 
