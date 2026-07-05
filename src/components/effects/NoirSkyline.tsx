@@ -19,8 +19,6 @@ function SkylineInner() {
   const { isTransitioning } = useThemeTransition();
   const [mounted] = useState(true);
   const { scrollProgress: scrollYProgress } = useLenisScroll();
-  const { isIdle } = useSkylineInteraction();
-
   const isTransitioningRef = useRef(isTransitioning);
   useEffect(() => {
     isTransitioningRef.current = isTransitioning;
@@ -140,7 +138,7 @@ function SkylineInner() {
   if (!mounted) return null;
 
   return (
-    <div className={`${styles.container} ${styles.active} ${theme === 'light' ? styles.lightPopart : styles.darkNoir} ${reducedMotion ? styles.reducedMotion : ''} ${isIdle ? styles.idle : ''}`}>
+    <div className={`${styles.container} ${styles.active} ${theme === 'light' ? styles.lightPopart : styles.darkNoir} ${reducedMotion ? styles.reducedMotion : ''}`}>
       {/* ── Vignette Overlay ── */}
       <div className={styles.vignette} aria-hidden="true" />
 
