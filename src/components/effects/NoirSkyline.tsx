@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { m, useTransform, useMotionValue, useSpring } from 'framer-motion';
 import { useTheme, useThemeTransition } from '@/context/ThemeContext';
 import { useLenisScroll } from '@/context/LenisProvider';
+import { SkylineInteractionProvider } from './SkylineInteractionContext';
 import styles from './NoirSkyline.module.css';
 
 import Layer0 from './skyline/Layer0';
@@ -138,6 +139,7 @@ export default function NoirSkyline() {
   if (!mounted) return null;
 
   return (
+    <SkylineInteractionProvider>
     <div className={`${styles.container} ${styles.active} ${theme === 'light' ? styles.lightPopart : styles.darkNoir} ${reducedMotion ? styles.reducedMotion : ''}`}>
       {/* ── Vignette Overlay ── */}
       <div className={styles.vignette} aria-hidden="true" />
@@ -233,5 +235,6 @@ export default function NoirSkyline() {
         <div className={styles.watercolorOverlay} aria-hidden="true" />
       )}
     </div>
+    </SkylineInteractionProvider>
   );
 }

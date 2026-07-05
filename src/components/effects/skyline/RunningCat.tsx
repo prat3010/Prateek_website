@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useLenisScroll } from '@/context/LenisProvider';
+import { useSkylineInteraction } from '../SkylineInteractionContext';
 import styles from '../NoirSkyline.module.css';
 import { LayerProps } from './types';
 
@@ -19,8 +20,10 @@ const RunningCat: React.FC<LayerProps> = ({ reducedMotion }) => {
   const velocityRef = useRef(0);
   const { velocity: scrollVelocity } = useLenisScroll();
 
-  const isVisibleRef = useRef(true);
   const boundingRectRef = useRef<DOMRect | null>(null);
+  const { isTabVisible, geometryVersion } = useSkylineInteraction();
+  const isVisibleRef = useRef(isTabVisible);
+  isVisibleRef.current = isTabVisible;
 
   useEffect(() => {
     if (reducedMotion) return;
@@ -31,29 +34,14 @@ const RunningCat: React.FC<LayerProps> = ({ reducedMotion }) => {
   }, [reducedMotion, scrollVelocity]);
 
   useEffect(() => {
-    const handler = () => { isVisibleRef.current = !document.hidden; };
-    document.addEventListener('visibilitychange', handler);
-    return () => document.removeEventListener('visibilitychange', handler);
-  }, []);
-
-  useEffect(() => {
     stateRef.current = state;
-    boundingRectRef.current = null; // Invalidate cached rect on state change
+    boundingRectRef.current = null;
   }, [state]);
 
-  // Invalidate cached bounding box on window scroll or resize
+  // Invalidate cached bounding box on scroll/resize (shared context)
   useEffect(() => {
-    if (reducedMotion) return;
-    const handleScrollOrResize = () => {
-      boundingRectRef.current = null;
-    };
-    window.addEventListener('scroll', handleScrollOrResize, { passive: true });
-    window.addEventListener('resize', handleScrollOrResize, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScrollOrResize);
-      window.removeEventListener('resize', handleScrollOrResize);
-    };
-  }, [reducedMotion]);
+    boundingRectRef.current = null;
+  }, [geometryVersion]);
 
   // Global mousemove and click detection to bypass browser pointer-event bugs (especially Safari parent pointer-events: none bug)
   useEffect(() => {

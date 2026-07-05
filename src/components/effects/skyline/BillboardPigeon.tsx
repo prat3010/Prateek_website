@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useLenisScroll } from '@/context/LenisProvider';
+import { useSkylineInteraction } from '../SkylineInteractionContext';
 import styles from '../NoirSkyline.module.css';
 
 const BILLBOARD_SIDES = { left: 95, right: 165 };
@@ -22,19 +23,15 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
   const { velocity: scrollVelocity } = useLenisScroll();
   const velocityRef = useRef(0);
 
-  const isVisibleRef = useRef(true);
   const sideRef = useRef(side);
   const boundingRectRef = useRef<DOMRect | null>(null);
-
-  useEffect(() => {
-    const handler = () => { isVisibleRef.current = !document.hidden; };
-    document.addEventListener('visibilitychange', handler);
-    return () => document.removeEventListener('visibilitychange', handler);
-  }, []);
+  const { isTabVisible, geometryVersion } = useSkylineInteraction();
+  const isVisibleRef = useRef(isTabVisible);
+  isVisibleRef.current = isTabVisible;
 
   useEffect(() => {
     sideRef.current = side;
-    boundingRectRef.current = null; // Invalidate box when side updates
+    boundingRectRef.current = null;
   }, [side]);
 
   useEffect(() => {
@@ -49,19 +46,9 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
     return unsub;
   }, [reducedMotion, scrollVelocity]);
 
-  // Invalidate cached bounding box on window scroll or resize
   useEffect(() => {
-    if (reducedMotion) return;
-    const handleScrollOrResize = () => {
-      boundingRectRef.current = null;
-    };
-    window.addEventListener('scroll', handleScrollOrResize, { passive: true });
-    window.addEventListener('resize', handleScrollOrResize, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScrollOrResize);
-      window.removeEventListener('resize', handleScrollOrResize);
-    };
-  }, [reducedMotion]);
+    boundingRectRef.current = null;
+  }, [geometryVersion]);
 
   useEffect(() => {
     if (reducedMotion) return;
