@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useTheme } from '@/context/ThemeContext';
 import Scrambler from '@/components/ui/Scrambler';
 import type { ScramblerProps } from '@/components/ui/Scrambler';
@@ -135,37 +136,46 @@ function Pricing({ resumeData }: PricingProps) {
           {activeAudience === 'business' ? 'SERVICE PACKAGES' : 'CONSULTING RATES'}
         </Scrambler>
 
-        <div className={styles.grid}>
-          {plans.map((plan, index) => (
-            <div key={plan.title} className={styles.cardContainer}>
-              <ComicPanel tilt={index % 2 === 0 ? 0.8 : -0.8} className={styles.pricingCard} staticDots>
-                <div className={styles.cardContent}>
-                  <h3 className={styles.cardTitle}>{plan.title}</h3>
-                  <div className={styles.priceContainer}>
-                    <span className={styles.priceValue}>{plan.price}</span>
-                  </div>
-                  <p className={styles.cardDesc}>{plan.description}</p>
-                  
-                  <ul className={styles.featuresList}>
-                    {plan.features.map((feature, idx) => (
-                      <li key={idx} className={styles.featureItem}>
-                        <Check size={16} className={styles.checkIcon} />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeAudience}
+            className={styles.grid}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {plans.map((plan, index) => (
+              <div key={plan.title} className={styles.cardContainer}>
+                <ComicPanel tilt={index % 2 === 0 ? 0.8 : -0.8} className={styles.pricingCard} staticDots>
+                  <div className={styles.cardContent}>
+                    <h3 className={styles.cardTitle}>{plan.title}</h3>
+                    <div className={styles.priceContainer}>
+                      <span className={styles.priceValue}>{plan.price}</span>
+                    </div>
+                    <p className={styles.cardDesc}>{plan.description}</p>
+                    
+                    <ul className={styles.featuresList}>
+                      {plan.features.map((feature, idx) => (
+                        <li key={idx} className={styles.featureItem}>
+                          <Check size={16} className={styles.checkIcon} />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
 
-                  <button
-                    onClick={() => handleSelectPackage(plan.cta)}
-                    className={styles.actionBtn}
-                  >
-                    <span>{isNoir ? 'SELECT_PLAN' : 'Choose Package'}</span>
-                  </button>
-                </div>
-              </ComicPanel>
-            </div>
-          ))}
-        </div>
+                    <button
+                      onClick={() => handleSelectPackage(plan.cta)}
+                      className={styles.actionBtn}
+                    >
+                      <span>{isNoir ? 'SELECT_PLAN' : 'Choose Package'}</span>
+                    </button>
+                  </div>
+                </ComicPanel>
+              </div>
+            ))}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </section>
   );

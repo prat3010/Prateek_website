@@ -14,7 +14,10 @@ function RealtimeClock({ wobble, strength }: RealtimeClockProps) {
   const [time, setTime] = useState<Date>(() => new Date());
   const { isTabVisible } = useSkylineInteraction();
   const isVisibleRef = useRef(isTabVisible);
-  isVisibleRef.current = isTabVisible;
+
+  useEffect(() => {
+    isVisibleRef.current = isTabVisible;
+  }, [isTabVisible]);
 
   useEffect(() => {
     const interval = setInterval(() => {

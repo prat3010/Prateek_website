@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useLenis } from 'lenis/react';
 import Image from 'next/image';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ExternalLink, Code2 } from 'lucide-react';
 import { type Project } from '@/data/projects';
 import { useTheme } from '@/context/ThemeContext';
@@ -183,63 +184,72 @@ function Projects({ projects }: ProjectsProps) {
           {activeAudience === 'business' ? 'SELECTED WORK' : 'EPIC ADVENTURES'}
         </Scrambler>
 
-        <div className={styles.grid}>
-          {projects.map((project, index) => (
-              <button
-                key={project.id}
-                id={project.id}
-                className={`${styles.panel} ${styles[`area${index}`]}`}
-                style={{
-                  '--panel-color': project.color,
-                } as React.CSSProperties}
-                onClick={() => setSelectedProject(project.id)}
-              >
-                {/* Status Badge */}
-                <div
-                  className={`${styles.statusBadge} ${
-                    getProjectStatus(project) === 'live'
-                      ? styles.statusLive
-                      : getProjectStatus(project) === 'personal'
-                      ? styles.statusPersonal
-                      : styles.statusSoon
-                  }`}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeAudience}
+            className={styles.grid}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {projects.map((project, index) => (
+                <button
+                  key={project.id}
+                  id={project.id}
+                  className={`${styles.panel} ${styles[`area${index}`]}`}
+                  style={{
+                    '--panel-color': project.color,
+                  } as React.CSSProperties}
+                  onClick={() => setSelectedProject(project.id)}
                 >
-                  {getProjectStatus(project) === 'live'
-                    ? 'LIVE NOW'
-                    : getProjectStatus(project) === 'personal'
-                    ? 'PERSONAL'
-                    : 'COMING SOON'}
-                </div>
-
-                <div className={styles.panelImageWrapper}>
-                  <ProjectImage
-                    src={isNoir ? project.image.replace(/\.webp$/, '-noir.webp') : project.image}
-                    alt={project.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className={styles.panelImage}
-                    style={{ objectFit: 'cover' }}
-                  />
-                </div>
-                <div className={styles.panelOverlay}>
-                  <h3 className={styles.panelTitle}>{project.title}</h3>
-                  <p className={styles.panelDesc}>
-                    {activeAudience === 'business' && project.description_business
-                      ? project.description_business
-                      : project.description}
-                  </p>
-                  <div className={styles.panelTags}>
-                    {project.tags.slice(0, 3).map((tag) => (
-                      <span key={tag} className={styles.tag}>
-                        {tag}
-                      </span>
-                    ))}
+                  {/* Status Badge */}
+                  <div
+                    className={`${styles.statusBadge} ${
+                      getProjectStatus(project) === 'live'
+                        ? styles.statusLive
+                        : getProjectStatus(project) === 'personal'
+                        ? styles.statusPersonal
+                        : styles.statusSoon
+                    }`}
+                  >
+                    {getProjectStatus(project) === 'live'
+                      ? 'LIVE NOW'
+                      : getProjectStatus(project) === 'personal'
+                      ? 'PERSONAL'
+                      : 'COMING SOON'}
                   </div>
-                </div>
-                <span className="sr-only"> - View project details</span>
-              </button>
-          ))}
-        </div>
+
+                  <div className={styles.panelImageWrapper}>
+                    <ProjectImage
+                      src={isNoir ? project.image.replace(/\.webp$/, '-noir.webp') : project.image}
+                      alt={project.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className={styles.panelImage}
+                      style={{ objectFit: 'cover' }}
+                    />
+                  </div>
+                  <div className={styles.panelOverlay}>
+                    <h3 className={styles.panelTitle}>{project.title}</h3>
+                    <p className={styles.panelDesc}>
+                      {activeAudience === 'business' && project.description_business
+                        ? project.description_business
+                        : project.description}
+                    </p>
+                    <div className={styles.panelTags}>
+                      {project.tags.slice(0, 3).map((tag) => (
+                        <span key={tag} className={styles.tag}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <span className="sr-only"> - View project details</span>
+                </button>
+            ))}
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       {/* Project Detail Modal */}

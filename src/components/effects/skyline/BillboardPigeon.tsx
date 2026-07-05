@@ -27,7 +27,10 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
   const boundingRectRef = useRef<DOMRect | null>(null);
   const { isTabVisible, geometryVersion } = useSkylineInteraction();
   const isVisibleRef = useRef(isTabVisible);
-  isVisibleRef.current = isTabVisible;
+
+  useEffect(() => {
+    isVisibleRef.current = isTabVisible;
+  }, [isTabVisible]);
 
   useEffect(() => {
     sideRef.current = side;
