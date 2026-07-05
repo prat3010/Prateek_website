@@ -1468,15 +1468,80 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
               {/* Falling water droplet from copper pipe */}
               <circle cx="150" cy="805" r="1.5" className={styles.drippingDrop} stroke="none" />
 
-              {/* Cat Silhouette sitting on penthouse roof */}
-              <RunningCat reducedMotion={reducedMotion} />
+              {/* Cat Silhouette sitting on penthouse roof - static fallback */}
+              <g transform="translate(320, 750)">
+                <path d="M -6 0 C -6 -12, 6 -12, 6 0 Z" fill="var(--skyline-cat-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                <circle cx="0" cy="-22" r="5" fill="var(--skyline-cat-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                <polygon points="-4,-25 -7,-32 -2,-29" fill="var(--skyline-cat-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                <polygon points="4,-25 7,-32 2,-29" fill="var(--skyline-cat-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                <path d="M 5 -4 Q 12 -7 9 -15 T 13 -25" fill="none" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" className={styles.catTail} />
+                <g className={styles.catEyes} fill="var(--skyline-cat-eyes)" stroke="none">
+                  <circle cx="-1.5" cy="-22.5" r="0.8" />
+                  <circle cx="1.5" cy="-22.5" r="0.8" />
+                </g>
+              </g>
+              {!reducedMotion && <RunningCat reducedMotion={reducedMotion} />}
 
-              {/* Interactive wobbly Gargoyle sitting on right building roof peak */}
-              <InteractiveGargoyle reducedMotion={reducedMotion} />
+              {/* Interactive wobbly Gargoyle sitting on right building roof peak - static fallback */}
+              <g transform="translate(1426, 756)">
+                <path d="M -10 0 L 10 0 L 8 3 L -8 3 Z" fill="var(--skyline-gargoyle-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                <path d="M 5 -4 C 16 -1, 14 -12, 18 -18" fill="none" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                <path d="M 18 -18 L 14 -19 L 17 -15 Z" fill="var(--skyline-gargoyle-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.8" />
+                <path d="M -4 -11 C -8 -17, -18 -17, -22 -4 C -18 -1, -12 -3, -5 -4 Z" fill="var(--skyline-gargoyle-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                <path d="M 4 -11 C 8 -17, 18 -17, 22 -4 C 18 -1, 12 -3, 5 -4 Z" fill="var(--skyline-gargoyle-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                <path d="M -4 -11 C -10 -9, -18 -6, -22 -4" fill="none" stroke="var(--skyline-stroke-fg)" strokeWidth="0.8" />
+                <path d="M 4 -11 C 10 -9, 18 -6, 22 -4" fill="none" stroke="var(--skyline-stroke-fg)" strokeWidth="0.8" />
+                <path d="M -6 0 C -9 -5, -8 -13, 0 -14 C 8 -13, 9 -5, 6 0 Z" fill="var(--skyline-gargoyle-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                <path d="M -6 0 C -14 -2, -13 -8, -5 -6" fill="var(--skyline-gargoyle-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                <path d="M 6 0 C 14 -2, 13 -8, 5 -6" fill="var(--skyline-gargoyle-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                <path d="M -4 -8 C -7 -9, -7 -14, -3 -12" fill="none" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                <path d="M 4 -8 C 7 -9, 7 -14, 3 -12" fill="none" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                <path d="M -5 -1 Q -8 -4 -4 -2" fill="none" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
+                <path d="M 6 -1 Q 8 -4 4 -2" fill="none" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
+                <path d="M -8 0 L -11 3 L -9 4 L -7 2" fill="none" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
+                <path d="M 8 0 L 11 3 L 9 4 L 7 2" fill="none" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
+                <path d="M -4 -13 C -6 -18, -4 -20, 0 -21 C 4 -20, 6 -18, 4 -13 Z" fill="var(--skyline-gargoyle-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                <path d="M -1.8 -15 L 0 -13.5 L 1.8 -15" fill="none" stroke="var(--skyline-stroke-fg)" strokeWidth="0.8" />
+                <path d="M -2.5 -18 L -6 -22 L -4 -18 Z" fill="var(--skyline-gargoyle-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                <path d="M 2.5 -18 L 6 -22 L 4 -18 Z" fill="var(--skyline-gargoyle-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                <path d="M -1.5 -19 C -5 -21, -8 -17, -6 -14 C -5 -13, -3 -15, -1.8 -18 Z" fill="var(--skyline-gargoyle-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                <path d="M 1.5 -19 C 5 -21, 8 -17, 6 -14 C 5 -13, 3 -15, 1.8 -18 Z" fill="var(--skyline-gargoyle-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
+                <g fill="var(--skyline-gargoyle-eyes)" opacity="0.6" stroke="none">
+                  <circle cx="-1.5" cy="-16.5" r="0.8" />
+                  <circle cx="1.5" cy="-16.5" r="0.8" />
+                </g>
+              </g>
+              {!reducedMotion && <InteractiveGargoyle reducedMotion={reducedMotion} />}
 
-              {/* Pigeons */}
-              <BillboardPigeon reducedMotion={reducedMotion} />
-              <FirePigeon reducedMotion={reducedMotion} />
+              {/* Billboard pigeon - static fallback */}
+              <g transform="translate(95, 698)">
+                <g transform="scale(1.5)">
+                  <g className={styles.pigeonBob}>
+                    <ellipse cx="0" cy="-3" rx="3" ry="2.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.6" />
+                    <circle cx="3" cy="-5.5" r="1.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.6" />
+                    <path d="M 4 -5.5 L 5.5 -5 L 4 -4.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.6" />
+                    <path d="M -3 -2 L -5 -1 L -3 -0.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
+                    <line x1="-1" y1="0" x2="-1.5" y2="1.5" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
+                    <line x1="1" y1="0" x2="1.5" y2="1.5" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
+                  </g>
+                </g>
+              </g>
+              {!reducedMotion && <BillboardPigeon reducedMotion={reducedMotion} />}
+
+              {/* Fire escape pigeon - static fallback */}
+              <g transform="translate(1675, 952)">
+                <g transform="scale(1.5)">
+                  <g className={styles.pigeonBob}>
+                    <ellipse cx="0" cy="-3" rx="3" ry="2.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.6" />
+                    <circle cx="3" cy="-5.5" r="1.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.6" />
+                    <path d="M 4 -5.5 L 5.5 -5 L 4 -4.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
+                    <path d="M -3 -2 L -5 -1 L -3 -0.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
+                    <line x1="-1" y1="0" x2="-1.5" y2="1.5" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
+                    <line x1="1" y1="0" x2="1.5" y2="1.5" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
+                  </g>
+                </g>
+              </g>
+              {!reducedMotion && <FirePigeon reducedMotion={reducedMotion} />}
 
               {/* Spinning Fan Blades (Animating) */}
               <g className={styles.fanBlade}>

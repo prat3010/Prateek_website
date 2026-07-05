@@ -437,21 +437,7 @@ const RunningCat: React.FC<LayerProps> = ({ reducedMotion }) => {
     return element;
   };
 
-  if (reducedMotion) {
-    return (
-      <g transform="translate(320, 750)">
-        <path d="M -6 0 C -6 -12, 6 -12, 6 0 Z" fill="var(--skyline-cat-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-        <circle cx="0" cy="-22" r="5" fill="var(--skyline-cat-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-        <polygon points="-4,-25 -7,-32 -2,-29" fill="var(--skyline-cat-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-        <polygon points="4,-25 7,-32 2,-29" fill="var(--skyline-cat-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-        <path d="M 5 -4 Q 12 -7 9 -15 T 13 -25" fill="none" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" className={styles.catTail} />
-        <g className={styles.catEyes} fill="var(--skyline-cat-eyes)" stroke="none">
-          <circle cx="-1.5" cy="-22.5" r="0.8" />
-          <circle cx="1.5" cy="-22.5" r="0.8" />
-        </g>
-      </g>
-    );
-  }
+  if (reducedMotion) return null;
 
   return (
     <g

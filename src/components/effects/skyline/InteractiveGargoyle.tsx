@@ -521,66 +521,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
     );
   };
 
-  if (reducedMotion) {
-    // Renders static stone gargoyle state
-    return (
-      <g transform="translate(1426, 756)">
-        {/* Pedestal */}
-        <path d="M -10 0 L 10 0 L 8 3 L -8 3 Z" fill="var(--skyline-gargoyle-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-        
-        {/* S-curve tail rising prominently to the side with spade tip */}
-        <path d="M 5 -4 C 16 -1, 14 -12, 18 -18" fill="none" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-        <path d="M 18 -18 L 14 -19 L 17 -15 Z" fill="var(--skyline-gargoyle-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.8" />
-
-        {/* Arching bat wings pointing down and out */}
-        <path d="M -4 -11 C -8 -17, -18 -17, -22 -4 C -18 -1, -12 -3, -5 -4 Z" fill="var(--skyline-gargoyle-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-        <path d="M 4 -11 C 8 -17, 18 -17, 22 -4 C 18 -1, 12 -3, 5 -4 Z" fill="var(--skyline-gargoyle-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-        
-        {/* Wings Inner Rib Lines */}
-        <path d="M -4 -11 C -10 -9, -18 -6, -22 -4" fill="none" stroke="var(--skyline-stroke-fg)" strokeWidth="0.8" />
-        <path d="M 4 -11 C 10 -9, 18 -6, 22 -4" fill="none" stroke="var(--skyline-stroke-fg)" strokeWidth="0.8" />
-        
-        {/* Crouched Body & low hunched chest */}
-        <path d="M -6 0 C -9 -5, -8 -13, 0 -14 C 8 -13, 9 -5, 6 0 Z" fill="var(--skyline-gargoyle-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-        
-        {/* Knees pulled up wide */}
-        <path d="M -6 0 C -14 -2, -13 -8, -5 -6" fill="var(--skyline-gargoyle-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-        <path d="M 6 0 C 14 -2, 13 -8, 5 -6" fill="var(--skyline-gargoyle-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-        
-        {/* Muscle lines/shoulders */}
-        <path d="M -4 -8 C -7 -9, -7 -14, -3 -12" fill="none" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-        <path d="M 4 -8 C 7 -9, 7 -14, 3 -12" fill="none" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-        
-        {/* Legs details */}
-        <path d="M -5 -1 Q -8 -4 -4 -2" fill="none" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
-        <path d="M 6 -1 Q 8 -4 4 -2" fill="none" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
-        
-        {/* Claws clutching pedestal outer corners */}
-        <path d="M -8 0 L -11 3 L -9 4 L -7 2" fill="none" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
-        <path d="M 8 0 L 11 3 L 9 4 L 7 2" fill="none" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
-
-        {/* Head nestled between shoulders (squat) */}
-        <path d="M -4 -13 C -6 -18, -4 -20, 0 -21 C 4 -20, 6 -18, 4 -13 Z" fill="var(--skyline-gargoyle-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-        
-        {/* Snout/fangs details */}
-        <path d="M -1.8 -15 L 0 -13.5 L 1.8 -15" fill="none" stroke="var(--skyline-stroke-fg)" strokeWidth="0.8" />
-
-        {/* Pointed ears sticking out */}
-        <path d="M -2.5 -18 L -6 -22 L -4 -18 Z" fill="var(--skyline-gargoyle-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-        <path d="M 2.5 -18 L 6 -22 L 4 -18 Z" fill="var(--skyline-gargoyle-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-        
-        {/* Coiled ram horns wrapping around ears */}
-        <path d="M -1.5 -19 C -5 -21, -8 -17, -6 -14 C -5 -13, -3 -15, -1.8 -18 Z" fill="var(--skyline-gargoyle-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-        <path d="M 1.5 -19 C 5 -21, 8 -17, 6 -14 C 5 -13, 3 -15, 1.8 -18 Z" fill="var(--skyline-gargoyle-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1" />
-
-        {/* Eyes */}
-        <g fill="var(--skyline-gargoyle-eyes)" opacity="0.6" stroke="none">
-          <circle cx="-1.5" cy="-16.5" r="0.8" />
-          <circle cx="1.5" cy="-16.5" r="0.8" />
-        </g>
-      </g>
-    );
-  }
+  if (reducedMotion) return null;
 
   return (
     <>

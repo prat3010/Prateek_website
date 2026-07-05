@@ -157,6 +157,8 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
     return () => clearInterval(interval);
   }, [reducedMotion]);
 
+  if (reducedMotion) return null;
+
   return (
     <g ref={fireRef} transform={`translate(1675, ${posY})`}>
       <g transform="scale(1.5)">

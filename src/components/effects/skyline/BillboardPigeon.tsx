@@ -136,22 +136,7 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
   const facingLeft = side === 'right';
   const scaleX = facingLeft ? -1.5 : 1.5;
 
-  if (reducedMotion) {
-    return (
-      <g ref={pigeonRef} transform={`translate(${BILLBOARD_SIDES.left}, ${BILLBOARD_Y})`}>
-        <g transform="scale(1.5)">
-          <g className={styles.pigeonBob}>
-            <ellipse cx="0" cy="-3" rx="3" ry="2.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.6" />
-            <circle cx="3" cy="-5.5" r="1.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.6" />
-            <path d="M 4 -5.5 L 5.5 -5 L 4 -4.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.6" />
-            <path d="M -3 -2 L -5 -1 L -3 -0.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
-            <line x1="-1" y1="0" x2="-1.5" y2="1.5" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
-            <line x1="1" y1="0" x2="1.5" y2="1.5" stroke="var(--skyline-stroke-fg)" strokeWidth="0.4" />
-          </g>
-        </g>
-      </g>
-    );
-  }
+  if (reducedMotion) return null;
 
   return (
     <g ref={pigeonRef} transform={`translate(${posX}, ${posY})`}>
