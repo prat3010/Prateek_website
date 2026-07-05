@@ -159,21 +159,18 @@ function Skills({ skills }: SkillsProps) {
     return SKILLS_COPY[activeAudience][activeTheme];
   }, [activeAudience, activeTheme]);
 
-  // Filter skills by dossier categories
   const orchestrationSkills = skills.filter(s => s.category === 'orchestration');
   const logicSkills = skills.filter(s => s.category === 'logic');
   const productSkills = skills.filter(s => s.category === 'product');
   const dynamicSkills = skills.filter(s => s.category === 'dynamic');
 
-  const renderSkillRow = (skill: Skill) => {
+  const renderSkillCard = (skill: Skill) => {
     const Icon = iconMap[skill.icon] || Sparkles;
     
-    // Choose appropriate description copy
     const description = (activeAudience === 'business' && skill.description_business)
       ? skill.description_business
       : skill.description;
 
-    // Choose appropriate name copy
     const displayName = (activeAudience === 'business' && skill.name_business)
       ? skill.name_business
       : skill.name;
@@ -181,40 +178,44 @@ function Skills({ skills }: SkillsProps) {
     const forgedLabel = activeAudience === 'business' ? 'APPLIED IN:' : 'FORGED IN:';
 
     return (
-      <div key={skill.name} className={styles.dossierItem}>
-        <div className={styles.dossierItemHeader}>
-          <div className={styles.dossierNameContainer}>
-            <Icon 
-              className={styles.dossierItemIcon} 
-              style={{ color: skill.color }} 
-            />
-            <h3 className={styles.dossierItemName}>{displayName}</h3>
+      <div
+        key={skill.name}
+        className={styles.skillCard}
+        style={{ '--card-accent': skill.color } as React.CSSProperties}
+      >
+        <div className={styles.skillCardTop}>
+          <div className={styles.skillCardIconWrap}>
+            <Icon className={styles.skillCardIcon} style={{ color: skill.color }} />
           </div>
-          <span 
-            className={`${styles.dossierLevelBadge} ${styles['level_' + (skill.status || 'mastered')]}`}
-          >
-            {skill.level}
-          </span>
+          <div className={styles.skillCardMeta}>
+            <div className={styles.skillCardNameRow}>
+              <h3 className={styles.skillCardName}>{displayName}</h3>
+              <span
+                className={`${styles.skillCardBadge} ${styles['level_' + (skill.status || 'mastered')]}`}
+              >
+                {skill.level}
+              </span>
+            </div>
+            <p className={styles.skillCardDesc}>{description}</p>
+          </div>
         </div>
-        
-        <p className={styles.dossierItemDesc}>{description}</p>
-        
+
         {skill.projects && skill.projects.length > 0 && (
-          <div className={styles.dossierForged}>
+          <div className={styles.skillCardFooter}>
             <Scrambler
               texts={SKILL_FORGED_LABEL_TEXTS}
               variant="nav-label"
               as="span"
-              className={styles.dossierForgedLabel}
+              className={styles.skillCardForgedLabel}
             >
               {forgedLabel}
             </Scrambler>
-            <div className={styles.dossierTags}>
+            <div className={styles.skillCardTags}>
               {skill.projects.map(proj => (
-                <a 
+                <a
                   key={proj.id}
                   href={`/#projects`}
-                  className={styles.dossierTagLink}
+                  className={styles.skillCardTag}
                   onClick={(e) => {
                     const el = document.getElementById(proj.id);
                     if (el) {
@@ -233,10 +234,10 @@ function Skills({ skills }: SkillsProps) {
             </div>
           </div>
         )}
- 
+
         {skill.status === 'quest' && (
-          <div className={styles.dossierQuestAlert}>
-            <Target size={12} className={styles.dossierQuestIcon} />
+          <div className={styles.skillCardQuest}>
+            <Target size={12} className={styles.skillCardQuestIcon} />
             <span>Active Quest: Deploying analytical data science pipelines.</span>
           </div>
         )}
@@ -244,153 +245,95 @@ function Skills({ skills }: SkillsProps) {
     );
   };
 
+  const TAB_CONFIG = [
+    { id: 'orchestration' as const, color: 'var(--pop-pink)', neon: 'var(--neon-pink)' },
+    { id: 'logic' as const, color: 'var(--pop-blue)', neon: 'var(--neon-cyan)' },
+    { id: 'product' as const, color: 'var(--pop-red)', neon: 'var(--neon-yellow)' },
+    { id: 'dynamic' as const, color: 'var(--pop-orange)', neon: 'var(--neon-purple)' },
+  ];
+
   return (
     <section id="capabilities" className={styles.skills} aria-label="Capabilities">
       <div className={styles.container}>
-        <Scrambler
-          texts={SKILL_SECTION_TITLE_TEXTS}
-          variant="section-title"
-          as="h2"
-          className={styles.sectionTitle}
-        >
-          {copy.sectionTitle}
-        </Scrambler>
-
-        <div className={styles.moBanner}>
+        <header className={styles.sectionHeader}>
           <Scrambler
             texts={SKILL_MO_BADGE_TEXTS}
             variant="badge"
             as="div"
-            className={styles.moBadge}
+            className={styles.sectionTag}
           >
             {copy.moBadge}
           </Scrambler>
+
+          <Scrambler
+            texts={SKILL_SECTION_TITLE_TEXTS}
+            variant="section-title"
+            as="h2"
+            className={styles.sectionTitle}
+          >
+            {copy.sectionTitle}
+          </Scrambler>
+
           <Scrambler
             texts={SKILL_MO_HEADER_TEXTS}
             variant="section-title"
             as="div"
-            className={styles.moHeader}
+            className={styles.sectionSubtitle}
           >
             {copy.moHeader}
           </Scrambler>
-          <p className={styles.moText}>
+
+          <p className={styles.sectionLede}>
             {copy.moText}
           </p>
+        </header>
+
+        <div className={styles.tabs} role="tablist" aria-label="Profile Dossier Sections">
+          {TAB_CONFIG.map((tab, i) => (
+            <button
+              key={tab.id}
+              role="tab"
+              aria-selected={activeTab === tab.id}
+              aria-controls={`panel-${tab.id}`}
+              id={`tab-${tab.id}`}
+              className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
+              onClick={() => setActiveTab(tab.id)}
+              style={{
+                '--tab-color': tab.color,
+                '--tab-neon': tab.neon,
+              } as React.CSSProperties}
+            >
+              <Scrambler
+                texts={SKILL_TAB_TEXTS[i]}
+                variant="nav-label"
+                as="span"
+              >
+                {copy.tabs[tab.id]}
+              </Scrambler>
+            </button>
+          ))}
         </div>
 
-        {/* Dossier Tabs */}
-        <div className={styles.dossierTabs} role="tablist" aria-label="Profile Dossier Sections">
-          <button 
-            role="tab"
-            aria-selected={activeTab === 'orchestration'}
-            aria-controls="panel-orchestration"
-            id="tab-orchestration"
-            className={`${styles.dossierTab} ${activeTab === 'orchestration' ? styles.dossierTabActive : ''}`}
-            onClick={() => setActiveTab('orchestration')}
-            style={{ 
-              '--tab-color': 'var(--pop-pink)',
-              '--tab-neon': 'var(--neon-pink)'
-            } as React.CSSProperties}
+        <AnimatePresence mode="wait">
+          <m.div
+            key={activeTab}
+            id={`panel-${activeTab}`}
+            role="tabpanel"
+            aria-labelledby={`tab-${activeTab}`}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            className={styles.panel}
           >
-            <Scrambler
-              texts={SKILL_TAB_TEXTS[0]}
-              variant="nav-label"
-              as="span"
-            >
-              {copy.tabs.orchestration}
-            </Scrambler>
-          </button>
-          <button 
-            role="tab"
-            aria-selected={activeTab === 'logic'}
-            aria-controls="panel-logic"
-            id="tab-logic"
-            className={`${styles.dossierTab} ${activeTab === 'logic' ? styles.dossierTabActive : ''}`}
-            onClick={() => setActiveTab('logic')}
-            style={{ 
-              '--tab-color': 'var(--pop-blue)',
-              '--tab-neon': 'var(--neon-cyan)'
-            } as React.CSSProperties}
-          >
-            <Scrambler
-              texts={SKILL_TAB_TEXTS[1]}
-              variant="nav-label"
-              as="span"
-            >
-              {copy.tabs.logic}
-            </Scrambler>
-          </button>
-          <button 
-            role="tab"
-            aria-selected={activeTab === 'product'}
-            aria-controls="panel-product"
-            id="tab-product"
-            className={`${styles.dossierTab} ${activeTab === 'product' ? styles.dossierTabActive : ''}`}
-            onClick={() => setActiveTab('product')}
-            style={{ 
-              '--tab-color': 'var(--pop-red)',
-              '--tab-neon': 'var(--neon-yellow)'
-            } as React.CSSProperties}
-          >
-            <Scrambler
-              texts={SKILL_TAB_TEXTS[2]}
-              variant="nav-label"
-              as="span"
-            >
-              {copy.tabs.product}
-            </Scrambler>
-          </button>
-          <button 
-            role="tab"
-            aria-selected={activeTab === 'dynamic'}
-            aria-controls="panel-dynamic"
-            id="tab-dynamic"
-            className={`${styles.dossierTab} ${activeTab === 'dynamic' ? styles.dossierTabActive : ''}`}
-            onClick={() => setActiveTab('dynamic')}
-            style={{ 
-              '--tab-color': 'var(--pop-orange)',
-              '--tab-neon': 'var(--neon-purple)'
-            } as React.CSSProperties}
-          >
-            <Scrambler
-              texts={SKILL_TAB_TEXTS[3]}
-              variant="nav-label"
-              as="span"
-            >
-              {copy.tabs.dynamic}
-            </Scrambler>
-          </button>
-        </div>
-
-        {/* Dossier Folder Content */}
-        <div 
-          className={styles.dossierFolder}
-          style={{
-            '--folder-color': activeTab === 'orchestration' ? 'var(--pop-pink)' : activeTab === 'logic' ? 'var(--pop-blue)' : activeTab === 'product' ? 'var(--pop-red)' : 'var(--pop-orange)',
-            '--folder-neon': activeTab === 'orchestration' ? 'var(--neon-pink)' : activeTab === 'logic' ? 'var(--neon-cyan)' : activeTab === 'product' ? 'var(--neon-yellow)' : 'var(--neon-purple)'
-          } as React.CSSProperties}
-        >
-          <AnimatePresence mode="wait">
-            <m.div
-              key={activeTab}
-              id={`panel-${activeTab}`}
-              role="tabpanel"
-              aria-labelledby={`tab-${activeTab}`}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.25, ease: 'easeInOut' }}
-              className={styles.dossierFolderContent}
-            >
-              <div className={styles.dossierGridInner}>
-                {activeTab === 'orchestration' && orchestrationSkills.map(renderSkillRow)}
-                {activeTab === 'logic' && logicSkills.map(renderSkillRow)}
-                {activeTab === 'product' && productSkills.map(renderSkillRow)}
-                {activeTab === 'dynamic' && dynamicSkills.map(renderSkillRow)}
-              </div>
-            </m.div>
-          </AnimatePresence>
-        </div>
+            <div className={styles.cardsGrid}>
+              {activeTab === 'orchestration' && orchestrationSkills.map(renderSkillCard)}
+              {activeTab === 'logic' && logicSkills.map(renderSkillCard)}
+              {activeTab === 'product' && productSkills.map(renderSkillCard)}
+              {activeTab === 'dynamic' && dynamicSkills.map(renderSkillCard)}
+            </div>
+          </m.div>
+        </AnimatePresence>
       </div>
     </section>
   );

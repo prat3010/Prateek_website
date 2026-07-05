@@ -1,4 +1,4 @@
-/* ===== SKILLS SECTION ===== */
+/* ===== CAPABILITIES SECTION ===== */
 .skills {
   position: relative;
   background: var(--pop-white);
@@ -6,538 +6,206 @@
   overflow: hidden;
 }
 
-
 .container {
-  position: relative;
-  z-index: 1;
   max-width: 1100px;
   margin: 0 auto;
+  padding: 0 var(--gutter);
 }
 
-/* Title */
+/* ===== SECTION HEADER ===== */
+.sectionHeader {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 3.5rem;
+}
+
+.sectionTag {
+  display: inline-flex;
+  font-family: var(--font-headline);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--pop-red);
+  margin-bottom: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border: var(--border-thin);
+  border-color: var(--pop-red);
+  transition: transform 0.2s var(--transition-bounce);
+}
+
+.sectionTag:hover {
+  transform: scale(1.05);
+}
+
 .sectionTitle {
   font-family: var(--font-headline);
   font-size: var(--fs-section-title);
-  text-align: center;
   color: var(--pop-black);
-  margin-bottom: 2rem;
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  width: 100%;
-  justify-content: center;
-  letter-spacing: 0.04em;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
 }
 
-/* ===== CATEGORY TABS ===== */
+.sectionSubtitle {
+  font-family: var(--font-headline);
+  font-size: clamp(1rem, 2.5vw, 1.35rem);
+  color: var(--pop-black);
+  opacity: 0.75;
+  margin-bottom: 0.75rem;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+}
+
+.sectionLede {
+  font-family: var(--font-comic-neue), 'Comic Neue', sans-serif;
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+  line-height: var(--leading-relaxed);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ===== TABS (Segmented Control) ===== */
 .tabs {
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 0.25rem;
   margin-bottom: 2.5rem;
+  padding: 0.3rem;
+  background: var(--pop-cream);
+  border-radius: 12px;
+  border: var(--border-thin);
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  flex-wrap: wrap;
 }
 
 .tab {
   font-family: var(--font-headline);
-  font-size: clamp(0.9rem, 1.5vw, 1.15rem);
-  letter-spacing: 0.06em;
-  padding: 0.5rem 1.25rem;
-  border: var(--border-medium);
-  background: var(--pop-white);
-  color: var(--pop-black);
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
+  padding: 0.5rem 1.2rem;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
   cursor: pointer;
-  transition: all 0.2s var(--transition-bounce);
-  box-shadow: var(--shadow-comic-sm);
-  transform: rotate(-1deg);
+  border-radius: 9px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  position: relative;
 }
 
-.tab:nth-child(2) { transform: rotate(0.5deg); }
-.tab:nth-child(3) { transform: rotate(-0.5deg); }
-.tab:nth-child(4) { transform: rotate(1deg); }
-.tab:nth-child(5) { transform: rotate(-1.5deg); }
-
 .tab:hover {
-  transform: rotate(0deg) scale(1.05);
-  box-shadow: var(--shadow-comic-lg);
-  background: var(--pop-yellow);
+  color: var(--pop-black);
+  background: color-mix(in srgb, var(--pop-black) 6%, transparent);
 }
 
 .tabActive {
-  background: var(--pop-red);
+  background: var(--tab-color);
   color: var(--pop-white);
-  transform: rotate(0deg) scale(1.05);
-  box-shadow: var(--shadow-comic-lg);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-/* ===== SKILLS GRID ===== */
-.grid {
+.tabActive:hover {
+  background: var(--tab-color);
+  color: var(--pop-white);
+}
+
+/* ===== CARDS GRID ===== */
+.panel {
+  width: 100%;
+}
+
+.cardsGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
 }
 
 /* ===== SKILL CARD ===== */
-.card {
-  position: relative;
-  background: var(--card-bg, var(--pop-white));
-  border: var(--border-medium);
-  padding: 1.25rem;
-  box-shadow: var(--shadow-comic);
-  transition: transform 0.3s var(--transition-bounce),
-    box-shadow 0.3s ease;
-  overflow: hidden;
+.skillCard {
+  background: var(--pop-white);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
-}
-
-.card:hover {
-  transform: scale(1.08) rotate(0deg);
-  box-shadow: var(--shadow-comic-xl);
-  z-index: 10;
-}
-
-/* Card inner layout */
-.cardHeader {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 0.75rem;
-}
-
-.skillDot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: var(--border-thin);
-  background-color: var(--skill-color);
-  flex-shrink: 0;
-}
-
-.skillName {
-  font-family: var(--font-headline);
-  font-size: var(--fs-card-title);
-  letter-spacing: 0.03em;
-  color: var(--pop-black);
-  line-height: 1.2;
-}
-
-/* ===== M.O. BANNER ===== */
-.moBanner {
+  gap: 0.75rem;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   position: relative;
-  max-width: 850px;
-  margin: 0 auto 3rem auto;
-  background: var(--pop-yellow);
-  border: var(--border-medium);
-  padding: 1.75rem 2rem 1.5rem 2rem;
-  box-shadow: var(--shadow-comic-lg);
-  transform: rotate(-0.5deg);
-  transition: transform 0.3s var(--transition-bounce), box-shadow 0.3s ease;
 }
 
-.moBanner:hover {
-  transform: scale(1.01) rotate(0.2deg);
-  box-shadow: var(--shadow-comic-xl);
+.skillCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+  border-color: var(--card-accent);
 }
 
-.moBadge {
-  position: absolute;
-  top: -16px;
-  left: 20px;
-  background: var(--pop-red);
-  color: var(--pop-white);
-  border: var(--border-thin);
-  padding: 0.2rem 0.8rem;
-  font-family: var(--font-headline);
-  font-size: 1.15rem;
-  letter-spacing: 0.05em;
-  box-shadow: var(--shadow-comic-sm);
-  transform: rotate(-2deg);
+.skillCardTop {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
 }
 
-.moHeader {
-  font-family: var(--font-headline);
-  font-size: 1.75rem;
-  color: var(--pop-black);
-  margin-bottom: 0.5rem;
-  margin-top: 0.25rem;
-  letter-spacing: 0.04em;
-}
-
-.moText {
-  font-family: var(--font-comic-neue), 'Comic Neue', sans-serif;
-  font-size: 1.05rem;
-  line-height: 1.5;
-  color: var(--pop-black);
-  font-weight: 700;
-}
-
-/* ===== SKILL DESCRIPTION ===== */
-.skillDescription {
-  flex-grow: 1;
-  font-family: var(--font-comic-neue), 'Comic Neue', sans-serif;
-  font-size: 0.95rem;
-  line-height: 1.45;
-  color: var(--pop-black);
-  margin-bottom: 1.25rem;
-  font-weight: 550;
-  opacity: 0.95;
-}
-
-.categoryBadge {
-  align-self: flex-start;
-  display: inline-block;
-  font-family: var(--font-headline);
-  font-size: 0.7rem;
-  letter-spacing: 0.1em;
-  padding: 0.15rem 0.5rem;
-  background: var(--pop-black);
-  color: var(--pop-white);
-  border: var(--border-thin);
-}
-
-
-:global([data-theme='noir']) .moBanner {
-  background: var(--surface-primary);
-  border: 2px solid var(--neon-yellow);
-  box-shadow: 0 0 15px rgba(255, 230, 0, 0.2);
-  transform: none;
-  padding: 1.5rem 1.75rem;
-  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-:global([data-theme='noir']) .moBanner:hover {
-  transform: scale(1.01);
-  border-color: var(--neon-yellow);
-  box-shadow: 0 0 20px var(--neon-yellow);
-}
-
-:global([data-theme='noir']) .moBadge {
-  background: #000000;
-  color: var(--neon-yellow);
-  border: 2px solid var(--neon-yellow);
-  box-shadow: 0 0 8px var(--neon-yellow);
-  top: -14px;
-  left: 15px;
-  transform: none;
-  font-family: var(--font-comic-neue), 'Comic Neue', sans-serif;
-  font-weight: bold;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-}
-
-:global([data-theme='noir']) .moHeader {
-  color: #ffffff;
-  font-family: monospace, Courier, sans-serif;
-  font-size: 1.35rem;
-  font-weight: bold;
-  border-bottom: 1px dashed var(--neon-yellow);
-  padding-bottom: 0.35rem;
-  margin-bottom: 0.75rem;
-}
-
-:global([data-theme='noir']) .moText {
-  color: var(--color-text);
-  font-family: monospace, Courier, sans-serif;
-  font-size: 0.92rem;
-  font-weight: normal;
-  line-height: 1.5;
-}
-
-:global([data-theme='noir']) .skillDescription {
-  color: var(--color-text-dim);
-  font-family: monospace, Courier, sans-serif;
-  font-size: 0.85rem;
-  font-weight: normal;
-  line-height: 1.4;
-}
-
-:global([data-theme='noir']) .categoryBadge {
-  display: none;
-}
-
-:global([data-theme='noir']) .card {
-  background-color: var(--surface-primary);
-  color: var(--color-border);
-  border: 2px solid var(--border-muted);
-  border-top-left-radius: 0px;
-  border-top-right-radius: 4px;
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 4px;
-  box-shadow: 4px 4px 0px var(--surface-secondary);
-  margin-top: 1.5rem;
-  overflow: visible;
-  transition: transform 0.3s var(--transition-bounce), border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-:global([data-theme='noir']) .card::before {
-  content: attr(data-category);
-  position: absolute;
-  top: -20px;
-  left: -2px;
-  height: 20px;
-  padding: 0 10px;
-  background: var(--surface-primary);
-  border-top: 2px solid var(--border-muted);
-  border-left: 2px solid var(--border-muted);
-  border-right: 2px solid var(--border-muted);
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-  color: #ffffff;
-  font-family: monospace, Courier, sans-serif;
-  font-size: 0.65rem;
-  font-weight: bold;
-  text-transform: uppercase;
+.skillCardIconWrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  letter-spacing: 0.08em;
-  z-index: 2;
-  transition: border-color 0.3s ease, color 0.3s ease;
+  background: var(--pop-cream);
+  flex-shrink: 0;
+  transition: background 0.25s ease;
 }
 
-/* Category-specific card hover glows & top tabs */
-/* Card: Frontend - Neon Pink */
-:global([data-theme='noir']) .card[data-category='frontend']:hover {
-  transform: scale(1.04) rotate(0deg);
-  border-color: var(--neon-pink);
-  box-shadow: 0 0 15px var(--neon-pink);
-  z-index: 10;
-}
-:global([data-theme='noir']) .card[data-category='frontend']:hover::before {
-  border-top-color: var(--neon-pink);
-  border-left-color: var(--neon-pink);
-  border-right-color: var(--neon-pink);
-  color: var(--neon-pink);
-}
-:global([data-theme='noir']) .card[data-category='frontend'] .skillDot {
-  background-color: var(--neon-pink);
-  box-shadow: 0 0 8px var(--neon-pink);
+.skillCard:hover .skillCardIconWrap {
+  background: color-mix(in srgb, var(--card-accent) 15%, var(--pop-cream));
 }
 
-/* Card: Backend - Neon Cyan */
-:global([data-theme='noir']) .card[data-category='backend']:hover {
-  transform: scale(1.04) rotate(0deg);
-  border-color: var(--neon-cyan);
-  box-shadow: 0 0 15px var(--neon-cyan);
-  z-index: 10;
-}
-:global([data-theme='noir']) .card[data-category='backend']:hover::before {
-  border-top-color: var(--neon-cyan);
-  border-left-color: var(--neon-cyan);
-  border-right-color: var(--neon-cyan);
-  color: var(--neon-cyan);
-}
-:global([data-theme='noir']) .card[data-category='backend'] .skillDot {
-  background-color: var(--neon-cyan);
-  box-shadow: 0 0 8px var(--neon-cyan);
+.skillCardIcon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
 }
 
-/* Card: Tools - Neon Yellow */
-:global([data-theme='noir']) .card[data-category='tools']:hover {
-  transform: scale(1.04) rotate(0deg);
-  border-color: var(--neon-yellow);
-  box-shadow: 0 0 15px var(--neon-yellow);
-  z-index: 10;
-}
-:global([data-theme='noir']) .card[data-category='tools']:hover::before {
-  border-top-color: var(--neon-yellow);
-  border-left-color: var(--neon-yellow);
-  border-right-color: var(--neon-yellow);
-  color: var(--neon-yellow);
-}
-:global([data-theme='noir']) .card[data-category='tools'] .skillDot {
-  background-color: var(--neon-yellow);
-  box-shadow: 0 0 8px var(--neon-yellow);
-}
-
-/* Card: Creative - Neon Purple */
-:global([data-theme='noir']) .card[data-category='creative']:hover {
-  transform: scale(1.04) rotate(0deg);
-  border-color: var(--neon-purple);
-  box-shadow: 0 0 15px var(--neon-purple);
-  z-index: 10;
-}
-:global([data-theme='noir']) .card[data-category='creative']:hover::before {
-  border-top-color: var(--neon-purple);
-  border-left-color: var(--neon-purple);
-  border-right-color: var(--neon-purple);
-  color: var(--neon-purple);
-}
-:global([data-theme='noir']) .card[data-category='creative'] .skillDot {
-  background-color: var(--neon-purple);
-  box-shadow: 0 0 8px var(--neon-purple);
-}
-
-:global([data-theme='noir']) .card::after {
-  content: "FILE // NO_" attr(data-index);
-  position: absolute;
-  top: 8px;
-  right: 12px;
-  font-family: monospace, Courier, sans-serif;
-  font-size: 0.6rem;
-  color: #71717a;
-  letter-spacing: 0.05em;
-  z-index: 2;
-}
-
-:global([data-theme='noir']) .cardHeader {
-  padding-right: 4.5rem;
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 900px) {
-  .grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 640px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-  }
-
-  .card {
-    padding: 1rem;
-  }
-}
-
-@media (max-width: 400px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Category Tabs Styling */
-:global([data-theme='noir']) .tab {
-  background: var(--surface-primary);
-  color: #ffffff;
-  border: 3px solid var(--border-muted);
-  border-radius: 0px;
-  box-shadow: 3px 3px 0px var(--surface-secondary);
-  font-family: var(--font-comic-neue), 'Comic Neue', sans-serif;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-}
-
-:global([data-theme='noir']) .tab:hover {
-  background: var(--surface-primary);
-  color: var(--neon-cyan);
-  border-color: var(--neon-cyan);
-  transform: scale(1.05);
-  box-shadow: 0 0 12px var(--neon-cyan);
-}
-
-:global([data-theme='noir']) .tabActive {
-  background: var(--surface-primary);
-  color: var(--neon-pink);
-  border: 3px solid var(--neon-pink);
-  border-radius: 0px;
-  box-shadow: 0 0 12px var(--neon-pink);
-  transform: rotate(0deg) scale(1.05);
-}
-
-/* ===== CHARACTER DOSSIER ===== */
-.dossierGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2.5rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  align-items: start;
-  padding: 1rem;
-}
-
-.dossierColumn {
-  background: var(--pop-white);
-  border: var(--border-medium);
-  box-shadow: var(--shadow-comic-lg);
-  padding: 2rem 1.75rem;
-  transition: transform 0.2s var(--transition-bounce), box-shadow 0.2s ease;
-}
-
-.dossierColumn:hover {
-  transform: translateY(-4px) scale(1.01);
-  box-shadow: var(--shadow-comic-xl);
-}
-
-.dossierColHeader {
-  margin-bottom: 2rem;
-  border-bottom: var(--border-medium);
-  padding-bottom: 1rem;
-}
-
-.dossierColBadge {
-  display: inline-block;
-  color: var(--pop-white);
-  border: var(--border-thin);
-  padding: 0.25rem 0.85rem;
-  font-family: var(--font-headline);
-  font-size: 0.95rem;
-  letter-spacing: 0.06em;
-  box-shadow: var(--shadow-comic-sm);
-  transform: rotate(-1.5deg);
-}
-
-.dossierColContent {
+.skillCardMeta {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
+  gap: 0.3rem;
+  min-width: 0;
 }
 
-.dossierItem {
-  border-bottom: 1px dashed var(--color-text);
-  padding-bottom: 1.5rem;
-}
-
-.dossierItem:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.dossierItemHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 0.5rem;
-  margin-bottom: 0.6rem;
-}
-
-.dossierNameContainer {
+.skillCardNameRow {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
-.dossierItemIcon {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-}
-
-.dossierItemName {
+.skillCardName {
   font-family: var(--font-headline);
-  font-size: 1.15rem;
+  font-size: 1rem;
   color: var(--pop-black);
   margin: 0;
-  line-height: 1.2;
-  letter-spacing: 0.02em;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
 }
 
-.dossierLevelBadge {
-  font-family: var(--font-headline);
-  font-size: 0.62rem;
-  letter-spacing: 0.05em;
+.skillCardBadge {
+  font-size: 0.55rem;
+  letter-spacing: 0.08em;
   padding: 0.1rem 0.45rem;
+  border-radius: 4px;
+  font-weight: 600;
+  font-family: var(--font-headline);
   border: var(--border-thin);
-  font-weight: bold;
-  border-radius: 1px;
-  flex-shrink: 0;
-  margin-top: 2px;
+  line-height: 1.4;
+  white-space: nowrap;
 }
 
 .level_legendary {
@@ -555,68 +223,78 @@
   color: var(--pop-white);
 }
 
-.dossierItemDesc {
+.skillCardDesc {
   font-family: var(--font-comic-neue), 'Comic Neue', sans-serif;
-  font-size: 0.95rem;
-  line-height: 1.45;
-  color: #374151;
-  font-weight: 550;
-  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  margin: 0;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.dossierForged {
+.skillCardFooter {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.skillCardForgedLabel {
+  font-family: var(--font-headline);
+  font-size: 0.58rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.skillCardTags {
+  display: flex;
+  gap: 0.3rem;
   flex-wrap: wrap;
 }
 
-.dossierForgedLabel {
+.skillCardTag {
   font-family: var(--font-headline);
   font-size: 0.65rem;
-  color: #6b7280;
-  letter-spacing: 0.05em;
-}
-
-.dossierTags {
-  display: flex;
-  gap: 0.35rem;
-  flex-wrap: wrap;
-}
-
-.dossierTagLink {
-  font-family: var(--font-headline);
-  font-size: 0.72rem;
-  color: var(--pop-black);
-  background: var(--pop-white);
+  padding: 0.1rem 0.4rem;
   border: var(--border-thin);
-  padding: 0.05rem 0.4rem;
+  border-radius: 4px;
+  color: var(--pop-black);
   text-decoration: none;
-  box-shadow: var(--shadow-comic-sm);
-  transition: transform 0.2s var(--transition-bounce), background-color 0.2s ease;
+  transition: background 0.15s ease, color 0.15s ease;
+  line-height: 1.4;
+  cursor: pointer;
 }
 
-.dossierTagLink:hover {
-  transform: scale(1.05);
-  background-color: var(--pop-yellow);
+.skillCardTag:hover {
+  background: var(--pop-yellow);
+  color: var(--pop-black);
 }
 
-.dossierQuestAlert {
+.skillCardQuest {
   display: flex;
   align-items: center;
   gap: 0.4rem;
   background: #fff5f5;
-  border: 1.5px dashed var(--pop-red);
-  padding: 0.4rem 0.75rem;
+  border: 1px dashed var(--pop-red);
+  border-radius: 6px;
+  padding: 0.35rem 0.65rem;
   font-family: var(--font-comic-neue), 'Comic Neue', sans-serif;
-  font-size: 0.78rem;
-  font-weight: 700;
+  font-size: 0.7rem;
   color: var(--pop-red);
-  margin-top: 0.6rem;
+  font-weight: 700;
+  margin-top: 0.25rem;
 }
 
-.dossierQuestIcon {
+.skillCardQuestIcon {
   flex-shrink: 0;
   animation: pulse 2s infinite ease-in-out;
 }
@@ -627,255 +305,212 @@
   100% { transform: scale(1); opacity: 1; }
 }
 
-/* ===== NOIR THEME DOSSIER ===== */
-:global([data-theme='noir']) .dossierColumn {
+/* ===== NOIR THEME OVERRIDES ===== */
+
+:global([data-theme='noir']) .sectionTag {
+  color: var(--neon-yellow);
+  border-color: var(--neon-yellow);
+  font-family: monospace, Courier, sans-serif;
+  font-weight: bold;
+  text-shadow: 0 0 6px var(--neon-yellow);
+  box-shadow: 0 0 8px rgba(255, 230, 0, 0.15);
+}
+
+:global([data-theme='noir']) .sectionTitle {
+  color: #ffffff;
+}
+
+:global([data-theme='noir']) .sectionSubtitle {
+  color: #ffffff;
+  opacity: 0.7;
+  font-style: normal;
+  font-family: monospace, Courier, sans-serif;
+  font-weight: bold;
+  border-bottom: 1px dashed var(--border-muted);
+  padding-bottom: 0.5rem;
+}
+
+:global([data-theme='noir']) .sectionLede {
+  color: var(--color-text-dim);
+  font-family: monospace, Courier, sans-serif;
+  font-weight: normal;
+  font-size: 0.9rem;
+}
+
+:global([data-theme='noir']) .tabs {
+  background: var(--surface-secondary);
+  border-color: var(--border-muted);
+  border-radius: 8px;
+}
+
+:global([data-theme='noir']) .tab {
+  color: var(--color-text-dim);
+  font-family: monospace, Courier, sans-serif;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-radius: 7px;
+}
+
+:global([data-theme='noir']) .tab:hover {
+  color: #ffffff;
   background: var(--surface-primary);
-  border: 2px solid var(--neon-cyan);
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.1);
-  transform: none;
 }
 
-:global([data-theme='noir']) .dossierColumn:hover {
-  border-color: var(--neon-cyan);
-  box-shadow: 0 0 20px var(--neon-cyan);
+:global([data-theme='noir']) .tabActive {
+  background: var(--surface-primary);
+  color: var(--tab-neon);
+  box-shadow: 0 0 12px var(--tab-neon), inset 0 0 4px var(--tab-neon);
 }
 
-:global([data-theme='noir']) .dossierColBadge {
-  background-color: var(--surface-primary);
-  border: 1.5px solid var(--neon-accent, var(--neon-cyan));
-  box-shadow: 0 0 10px var(--neon-accent, var(--neon-cyan));
-  text-shadow: none;
-  color: var(--neon-accent, var(--neon-cyan));
-  transform: none;
+:global([data-theme='noir']) .tabActive:hover {
+  background: var(--surface-primary);
+  color: var(--tab-neon);
 }
 
-:global([data-theme='noir']) .dossierItem {
-  border-bottom: 1px dashed #27272a;
+:global([data-theme='noir']) .skillCard {
+  background: var(--surface-primary);
+  border: 1px solid var(--border-muted);
+  border-radius: 8px;
+  box-shadow: none;
 }
 
-:global([data-theme='noir']) .dossierItemName {
+:global([data-theme='noir']) .skillCard:hover {
+  border-color: var(--card-accent);
+  box-shadow: 0 0 20px var(--card-accent), inset 0 0 4px var(--card-accent);
+  transform: translateY(-2px);
+}
+
+:global([data-theme='noir']) .skillCardIconWrap {
+  background: transparent;
+  border: 1px solid var(--border-muted);
+  border-radius: 8px;
+}
+
+:global([data-theme='noir']) .skillCard:hover .skillCardIconWrap {
+  background: color-mix(in srgb, var(--card-accent) 12%, transparent);
+  border-color: var(--card-accent);
+}
+
+:global([data-theme='noir']) .skillCardName {
   color: #ffffff;
   font-family: monospace, Courier, sans-serif;
 }
 
-:global([data-theme='noir']) .dossierItemDesc {
-  color: var(--color-text-dim);
+:global([data-theme='noir']) .skillCardBadge {
   font-family: monospace, Courier, sans-serif;
-  font-weight: normal;
-  font-size: 0.88rem;
-}
-
-:global([data-theme='noir']) .dossierForgedLabel {
-  font-family: monospace, Courier, sans-serif;
-  color: #a0a0ab;
-}
-
-:global([data-theme='noir']) .dossierTagLink {
-  background: #000000;
-  border: 1px solid #27272a;
-  color: var(--color-text);
-  font-family: monospace, Courier, sans-serif;
-  box-shadow: none;
-}
-
-:global([data-theme='noir']) .dossierTagLink:hover {
-  border-color: var(--neon-cyan);
-  color: var(--neon-cyan);
-  background: var(--surface-secondary);
-  box-shadow: 0 0 8px var(--neon-cyan);
-}
-
-:global([data-theme='noir']) .dossierLevelBadge {
-  font-family: monospace, Courier, sans-serif;
+  font-weight: bold;
   background: #000000;
 }
 
 :global([data-theme='noir']) .level_legendary {
   color: var(--neon-yellow);
-  border: 1px solid var(--neon-yellow);
-  box-shadow: 0 0 8px var(--neon-yellow);
+  border-color: var(--neon-yellow);
+  box-shadow: 0 0 6px var(--neon-yellow);
 }
 
 :global([data-theme='noir']) .level_mastered {
   color: var(--neon-cyan);
-  border: 1px solid var(--neon-cyan);
-  box-shadow: 0 0 8px var(--neon-cyan);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 6px var(--neon-cyan);
 }
 
 :global([data-theme='noir']) .level_quest {
   color: var(--neon-pink);
-  border: 1px solid var(--neon-pink);
-  box-shadow: 0 0 8px var(--neon-pink);
+  border-color: var(--neon-pink);
+  box-shadow: 0 0 6px var(--neon-pink);
 }
 
-:global([data-theme='noir']) .dossierQuestAlert {
+:global([data-theme='noir']) .skillCardDesc {
+  color: var(--color-text-dim);
+  font-family: monospace, Courier, sans-serif;
+  font-weight: normal;
+  font-size: 0.8rem;
+}
+
+:global([data-theme='noir']) .skillCardFooter {
+  border-top-color: var(--border-muted);
+}
+
+:global([data-theme='noir']) .skillCardForgedLabel {
+  font-family: monospace, Courier, sans-serif;
+  color: var(--color-text-dim);
+}
+
+:global([data-theme='noir']) .skillCardTag {
+  background: #000000;
+  border-color: var(--border-muted);
+  color: var(--color-text);
+  font-family: monospace, Courier, sans-serif;
+}
+
+:global([data-theme='noir']) .skillCardTag:hover {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  background: var(--surface-secondary);
+  box-shadow: 0 0 6px var(--neon-cyan);
+}
+
+:global([data-theme='noir']) .skillCardQuest {
   background: #1a000d;
-  border: 1.5px dashed var(--neon-pink);
+  border-color: var(--neon-pink);
   color: var(--neon-pink);
   font-family: monospace, Courier, sans-serif;
 }
 
-/* ===== RESPONSIVE DOSSIER ===== */
+/* ===== RESPONSIVE ===== */
+
 @media (max-width: 980px) {
-  .dossierGrid {
+  .cardsGrid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
-  }
-}
-
-@media (max-width: 680px) {
-  .dossierGrid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-  
-  .dossierColumn {
-    padding: 1.5rem 1.25rem;
-  }
-}
-/* ===== DOSSIER TABS & FOLDER (ACCORDION CABINET) ===== */
-.dossierTabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: -3px; /* Overlap the folder border */
-  position: relative;
-  z-index: 2;
-  padding-left: 1rem;
-}
-
-.dossierTab {
-  font-family: var(--font-headline);
-  font-size: 0.95rem;
-  letter-spacing: 0.05em;
-  padding: 0.85rem 1.75rem 0.6rem 1.75rem;
-  border: var(--border-medium);
-  border-bottom: none;
-  background: var(--pop-white);
-  color: var(--pop-black);
-  cursor: pointer;
-  position: relative;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  transition: transform 0.2s var(--transition-bounce), background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
-  box-shadow: 4px -4px 0px var(--pop-black);
-}
-
-.dossierTab:hover {
-  transform: translateY(-2px);
-  background: var(--tab-color);
-  color: var(--pop-black);
-}
-
-.dossierTabActive {
-  background: var(--tab-color);
-  color: var(--pop-black);
-  z-index: 3;
-  transform: scale(1.02) translateY(0);
-  box-shadow: 4px -2px 0px var(--pop-black);
-}
-
-.dossierFolder {
-  background: var(--pop-white);
-  border: var(--border-medium);
-  border-color: var(--pop-black);
-  box-shadow: var(--shadow-comic-lg);
-  padding: 2.75rem 2.5rem;
-  position: relative;
-  z-index: 1;
-  border-radius: 8px;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.dossierFolderContent {
-  width: 100%;
-}
-
-.dossierGridInner {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 2rem 3.5rem;
-}
-
-/* ===== NOIR THEME DOSSIER TABS & FOLDER ===== */
-:global([data-theme='noir']) .dossierTab {
-  background: var(--surface-primary);
-  color: #a0a0ab;
-  border: 2px solid var(--border-muted);
-  border-bottom: none;
-  box-shadow: none;
-  border-radius: 4px 4px 0 0;
-  transition: all 0.3s ease;
-  font-family: monospace, Courier, sans-serif;
-  font-size: 0.82rem;
-  font-weight: bold;
-}
-
-:global([data-theme='noir']) .dossierTab:hover {
-  color: var(--tab-neon);
-  border-color: var(--tab-neon);
-  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.4), 0 0 8px var(--tab-neon);
-  transform: translateY(-2px);
-}
-
-:global([data-theme='noir']) .dossierTabActive {
-  background: var(--surface-primary);
-  color: var(--tab-neon);
-  border-color: var(--tab-neon);
-  box-shadow: 0 -2px 12px var(--tab-neon);
-  z-index: 3;
-  transform: scale(1.02);
-}
-
-:global([data-theme='noir']) .dossierFolder {
-  background: var(--surface-primary);
-  border: 2px solid var(--folder-neon);
-  box-shadow: 0 0 20px var(--folder-neon);
-  border-radius: 4px;
-}
-
-/* ===== RESPONSIVE TABS ===== */
-@media (max-width: 900px) {
-  .dossierGridInner {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+    gap: 1rem;
   }
 }
 
 @media (max-width: 768px) {
-  .dossierTabs {
-    flex-direction: column;
-    gap: 0.25rem;
-    margin-bottom: 0;
-    padding-left: 0;
+  .sectionHeader {
+    margin-bottom: 2.5rem;
   }
 
-  .dossierTab {
-    border-bottom: var(--border-medium) !important;
-    border-radius: 8px;
-    box-shadow: var(--shadow-comic-sm);
-    text-align: left;
-    padding-block: 0.6rem;
+  .tabs {
+    padding: 0.25rem;
+    gap: 0.15rem;
+    border-radius: 10px;
+    width: 100%;
   }
 
-  .dossierTabActive {
-    transform: scale(1.01);
-    box-shadow: var(--shadow-comic);
+  .tab {
+    font-size: 0.75rem;
+    padding: 0.45rem 0.9rem;
+    flex: 1;
+    text-align: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .cardsGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
-  .dossierFolder {
-    border-top-left-radius: 8px;
-    margin-top: 1rem;
-    padding: 1.75rem 1.5rem;
+  .skillCard {
+    padding: 1.25rem;
   }
 
-  :global([data-theme='noir']) .dossierTab {
-    border-bottom: 2px solid var(--border-muted) !important;
-    border-radius: 4px;
+  .sectionTitle {
+    margin-bottom: 0.5rem;
   }
 
-  :global([data-theme='noir']) .dossierTabActive {
-    border-color: var(--tab-neon);
-    transform: none;
+  .sectionTag {
+    font-size: 0.6rem;
+    padding: 0.2rem 0.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tab {
+    font-size: 0.7rem;
+    padding: 0.4rem 0.7rem;
   }
 }
