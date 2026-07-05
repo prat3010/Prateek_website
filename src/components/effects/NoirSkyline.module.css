@@ -1631,6 +1631,11 @@
   opacity: 0;
 }
 
+/* ─ Pause all CSS animations while idle (no user interaction for 30s) ─ */
+.idle * {
+  animation-play-state: paused !important;
+}
+
 .watercolorOverlay {
   position: absolute;
   inset: 0;

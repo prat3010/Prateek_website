@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { m, useTransform, useMotionValue, useSpring } from 'framer-motion';
 import { useTheme, useThemeTransition } from '@/context/ThemeContext';
 import { useLenisScroll } from '@/context/LenisProvider';
-import { SkylineInteractionProvider } from './SkylineInteractionContext';
+import { SkylineInteractionProvider, useSkylineInteraction } from './SkylineInteractionContext';
 import styles from './NoirSkyline.module.css';
 
 import Layer0 from './skyline/Layer0';
@@ -14,11 +14,12 @@ import Layer2 from './skyline/Layer2';
 import BridgeLayer from './skyline/BridgeLayer';
 import Layer3 from './skyline/Layer3';
 
-export default function NoirSkyline() {
+function SkylineInner() {
   const { theme } = useTheme();
   const { isTransitioning } = useThemeTransition();
   const [mounted] = useState(true);
   const { scrollProgress: scrollYProgress } = useLenisScroll();
+  const { isIdle } = useSkylineInteraction();
 
   const isTransitioningRef = useRef(isTransitioning);
   useEffect(() => {
@@ -139,8 +140,7 @@ export default function NoirSkyline() {
   if (!mounted) return null;
 
   return (
-    <SkylineInteractionProvider>
-    <div className={`${styles.container} ${styles.active} ${theme === 'light' ? styles.lightPopart : styles.darkNoir} ${reducedMotion ? styles.reducedMotion : ''}`}>
+    <div className={`${styles.container} ${styles.active} ${theme === 'light' ? styles.lightPopart : styles.darkNoir} ${reducedMotion ? styles.reducedMotion : ''} ${isIdle ? styles.idle : ''}`}>
       {/* ── Vignette Overlay ── */}
       <div className={styles.vignette} aria-hidden="true" />
 
@@ -235,6 +235,13 @@ export default function NoirSkyline() {
         <div className={styles.watercolorOverlay} aria-hidden="true" />
       )}
     </div>
+  );
+}
+
+export default function NoirSkyline() {
+  return (
+    <SkylineInteractionProvider>
+      <SkylineInner />
     </SkylineInteractionProvider>
   );
 }

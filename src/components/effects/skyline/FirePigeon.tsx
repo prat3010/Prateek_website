@@ -17,12 +17,17 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
   const { velocity: scrollVelocity } = useLenisScroll();
 
   const boundingRectRef = useRef<DOMRect | null>(null);
-  const { isTabVisible, geometryVersion } = useSkylineInteraction();
+  const { isTabVisible, isIdle, geometryVersion } = useSkylineInteraction();
   const isVisibleRef = useRef(isTabVisible);
+  const isIdleRef = useRef(isIdle);
 
   useEffect(() => {
     isVisibleRef.current = isTabVisible;
   }, [isTabVisible]);
+
+  useEffect(() => {
+    isIdleRef.current = isIdle;
+  }, [isIdle]);
 
   useEffect(() => {
     if (reducedMotion) return;
@@ -49,7 +54,7 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
       let rafId: number | null = null;
 
       const animateDown = (timestamp: number) => {
-        if (!isVisibleRef.current) { rafId = requestAnimationFrame(animateDown); return; }
+        if (!isVisibleRef.current || isIdleRef.current) { rafId = requestAnimationFrame(animateDown); return; }
         if (!startTime) startTime = timestamp;
         const elapsed = timestamp - startTime;
         const progress = Math.min(elapsed / duration, 1);
@@ -73,7 +78,7 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
       let rafId: number | null = null;
 
       const animateUp = (timestamp: number) => {
-        if (!isVisibleRef.current) { rafId = requestAnimationFrame(animateUp); return; }
+        if (!isVisibleRef.current || isIdleRef.current) { rafId = requestAnimationFrame(animateUp); return; }
         if (!startTime) startTime = timestamp;
         const elapsed = timestamp - startTime;
         const progress = Math.min(elapsed / duration, 1);
@@ -120,7 +125,7 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
   useEffect(() => {
     if (reducedMotion) return;
     const interval = setInterval(() => {
-      if (!isVisibleRef.current) return;
+      if (!isVisibleRef.current || isIdleRef.current) return;
       const currentState = stateRef.current;
       if (currentState === 'idle') {
         ticksRef.current = 0;

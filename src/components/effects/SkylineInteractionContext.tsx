@@ -4,15 +4,46 @@ import React, { createContext, useContext, useEffect, useRef, useState, useCallb
 
 interface SkylineInteractionValue {
   isTabVisible: boolean;
+  isIdle: boolean;
   geometryVersion: number;
 }
 
 const SkylineInteractionContext = createContext<SkylineInteractionValue | null>(null);
 
+const IDLE_TIMEOUT_MS = 30_000;
+
+const ACTIVITY_EVENTS = ['mousemove', 'wheel', 'click', 'keydown', 'touchstart'] as const;
+
 export function SkylineInteractionProvider({ children }: { children: ReactNode }) {
   const [isTabVisible, setIsTabVisible] = useState(true);
+  const [isIdle, setIsIdle] = useState(false);
   const geometryVersionRef = useRef(0);
   const [geometryVersion, setGeometryVersion] = useState(0);
+  const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isIdleRef = useRef(false);
+
+  const clearIdleTimer = useCallback(() => {
+    if (idleTimerRef.current !== null) {
+      clearTimeout(idleTimerRef.current);
+      idleTimerRef.current = null;
+    }
+  }, []);
+
+  const startIdleTimer = useCallback(() => {
+    clearIdleTimer();
+    idleTimerRef.current = setTimeout(() => {
+      isIdleRef.current = true;
+      setIsIdle(true);
+    }, IDLE_TIMEOUT_MS);
+  }, [clearIdleTimer]);
+
+  const resetIdle = useCallback(() => {
+    if (isIdleRef.current) {
+      isIdleRef.current = false;
+      setIsIdle(false);
+    }
+    startIdleTimer();
+  }, [startIdleTimer]);
 
   useEffect(() => {
     const handleVisibility = () => {
@@ -21,6 +52,19 @@ export function SkylineInteractionProvider({ children }: { children: ReactNode }
     document.addEventListener('visibilitychange', handleVisibility);
     return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, []);
+
+  useEffect(() => {
+    startIdleTimer();
+    for (const event of ACTIVITY_EVENTS) {
+      window.addEventListener(event, resetIdle, { passive: true });
+    }
+    return () => {
+      clearIdleTimer();
+      for (const event of ACTIVITY_EVENTS) {
+        window.removeEventListener(event, resetIdle);
+      }
+    };
+  }, [startIdleTimer, clearIdleTimer, resetIdle]);
 
   const invalidateGeometry = useCallback(() => {
     geometryVersionRef.current += 1;
@@ -44,7 +88,7 @@ export function SkylineInteractionProvider({ children }: { children: ReactNode }
   }, [invalidateGeometry]);
 
   return (
-    <SkylineInteractionContext.Provider value={{ isTabVisible, geometryVersion }}>
+    <SkylineInteractionContext.Provider value={{ isTabVisible, isIdle, geometryVersion }}>
       {children}
     </SkylineInteractionContext.Provider>
   );

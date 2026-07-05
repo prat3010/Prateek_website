@@ -21,12 +21,17 @@ const RunningCat: React.FC<LayerProps> = ({ reducedMotion }) => {
   const { velocity: scrollVelocity } = useLenisScroll();
 
   const boundingRectRef = useRef<DOMRect | null>(null);
-  const { isTabVisible, geometryVersion } = useSkylineInteraction();
+  const { isTabVisible, isIdle, geometryVersion } = useSkylineInteraction();
   const isVisibleRef = useRef(isTabVisible);
+  const isIdleRef = useRef(isIdle);
 
   useEffect(() => {
     isVisibleRef.current = isTabVisible;
   }, [isTabVisible]);
+
+  useEffect(() => {
+    isIdleRef.current = isIdle;
+  }, [isIdle]);
 
   useEffect(() => {
     if (reducedMotion) return;
@@ -88,7 +93,7 @@ const RunningCat: React.FC<LayerProps> = ({ reducedMotion }) => {
     if (reducedMotion) return;
 
     const interval = setInterval(() => {
-      if (!isVisibleRef.current) return;
+      if (!isVisibleRef.current || isIdleRef.current) return;
       const currentState = stateRef.current;
 
       if (currentState === 'sitting') {

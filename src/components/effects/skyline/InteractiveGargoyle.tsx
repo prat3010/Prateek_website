@@ -77,12 +77,17 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
   const stateStartTimeRef = useRef<number>(0);
   const rafRef = useRef<number | null>(null);
   const boundingRectRef = useRef<DOMRect | null>(null);
-  const { isTabVisible, geometryVersion } = useSkylineInteraction();
+  const { isTabVisible, isIdle, geometryVersion } = useSkylineInteraction();
   const isVisibleRef = useRef(isTabVisible);
+  const isIdleRef = useRef(isIdle);
 
   useEffect(() => {
     isVisibleRef.current = isTabVisible;
   }, [isTabVisible]);
+
+  useEffect(() => {
+    isIdleRef.current = isIdle;
+  }, [isIdle]);
 
   useEffect(() => {
     if (reducedMotion) return;
@@ -156,7 +161,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
     }
 
     const tick = () => {
-      if (!isVisibleRef.current) { rafRef.current = requestAnimationFrame(tick); return; }
+      if (!isVisibleRef.current || isIdleRef.current) { rafRef.current = requestAnimationFrame(tick); return; }
       const currentState = stateRef.current;
       const elapsed = performance.now() - stateStartTimeRef.current;
 
@@ -217,7 +222,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
     if (reducedMotion) return;
 
     const interval = setInterval(() => {
-      if (!isVisibleRef.current) return;
+      if (!isVisibleRef.current || isIdleRef.current) return;
       const currentState = stateRef.current;
       ticksRef.current++;
       const ticks = ticksRef.current;

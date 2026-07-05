@@ -25,12 +25,17 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
 
   const sideRef = useRef(side);
   const boundingRectRef = useRef<DOMRect | null>(null);
-  const { isTabVisible, geometryVersion } = useSkylineInteraction();
+  const { isTabVisible, isIdle, geometryVersion } = useSkylineInteraction();
   const isVisibleRef = useRef(isTabVisible);
+  const isIdleRef = useRef(isIdle);
 
   useEffect(() => {
     isVisibleRef.current = isTabVisible;
   }, [isTabVisible]);
+
+  useEffect(() => {
+    isIdleRef.current = isIdle;
+  }, [isIdle]);
 
   useEffect(() => {
     sideRef.current = side;
@@ -68,7 +73,7 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
       let startTime: number | null = null;
 
       const animate = (timestamp: number) => {
-        if (!isVisibleRef.current) { rafRef.current = requestAnimationFrame(animate); return; }
+        if (!isVisibleRef.current || isIdleRef.current) { rafRef.current = requestAnimationFrame(animate); return; }
         if (!startTime) startTime = timestamp;
         const elapsed = timestamp - startTime;
         const progress = Math.min(elapsed / duration, 1);
@@ -122,7 +127,7 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
   useEffect(() => {
     if (reducedMotion) return;
     const interval = setInterval(() => {
-      if (!isVisibleRef.current) return;
+      if (!isVisibleRef.current || isIdleRef.current) return;
       const vel = velocityRef.current;
       if (vel > 60 && !alertRef.current && !scurryingRef.current) setAlert(true);
       else if (vel <= 60 && alertRef.current && !scurryingRef.current) setAlert(false);
