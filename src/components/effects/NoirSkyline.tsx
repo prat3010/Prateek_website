@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { m, useTransform, useMotionValue, useSpring } from 'framer-motion';
 import { useTheme, useThemeTransition } from '@/context/ThemeContext';
 import { useLenisScroll } from '@/context/LenisProvider';
-import { SkylineInteractionProvider, useSkylineInteraction } from './SkylineInteractionContext';
+import { SkylineInteractionProvider } from './SkylineInteractionContext';
 import styles from './NoirSkyline.module.css';
 
 import Layer0 from './skyline/Layer0';

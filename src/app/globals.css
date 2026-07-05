@@ -1063,12 +1063,35 @@ table {
 }
 
 /* Loading & Skeleton Styles */
-.skyline-skeleton {
+.skyline-placeholder-svg {
   position: fixed;
   inset: 0;
   z-index: -2;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
-  background: #0f0f15;
+}
+
+[data-theme="noir"] {
+  --skyline-bg-top: #0a0a12;
+  --skyline-bg-bottom: #14141e;
+  --skyline-fog-bottom: rgba(20, 20, 30, 0);
+  --skyline-fog-top: rgba(20, 20, 30, 0.6);
+  --skyline-layer-far: #191925;
+  --skyline-layer-mid: #222233;
+  --skyline-layer-fg: #0d0d18;
+  --skyline-window: rgba(255, 200, 100, 0.15);
+}
+
+[data-theme="azure"] {
+  --skyline-bg-top: #1a1a2e;
+  --skyline-bg-bottom: #2a2a4e;
+  --skyline-fog-bottom: rgba(30, 30, 50, 0);
+  --skyline-fog-top: rgba(30, 30, 50, 0.5);
+  --skyline-layer-far: #2a2a45;
+  --skyline-layer-mid: #35355a;
+  --skyline-layer-fg: #1e1e35;
+  --skyline-window: rgba(255, 220, 140, 0.2);
 }
 
 .section-skeleton {
