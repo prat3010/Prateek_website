@@ -6,11 +6,6 @@ import { WobblyPath, WobblyLine, WobblyRect, WobblyPolygon, WobblyLineGroup, Wob
 import { LayerProps } from './types';
 import RealtimeClock from './RealtimeClock';
 
-const SEAWALL_SEAMS: WobblyLineSegment[] = Array.from({ length: 160 })
-  .map((_, i) => -1000 + i * 25)
-  .filter((x) => x > -1000 && x < 2920)
-  .map((x) => ({ x1: x, y1: 938, x2: x, y2: 950 }));
-
 const DOCK_LIGHT_XS = [485, 755, 985, 1225];
 const DOCK_LIGHT_POSTS: WobblyLineSegment[] = DOCK_LIGHT_XS.map((x) => ({
   x1: x,
@@ -451,16 +446,6 @@ const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
 
             {/* Coping stone horizontal accent line */}
             <WobblyLine wobble={wobble} wobbleStrength={strength} x1="-1000" y1="944" x2="2920" y2="944" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
-
-            {/* Vertical concrete block joint lines */}
-            <WobblyLineGroup
-              lines={SEAWALL_SEAMS}
-              wobble={wobble}
-              wobbleStrength={strength}
-              stroke="var(--skyline-stroke-mid)"
-              strokeWidth="0.6"
-              fill="none"
-            />
 
             {/* Miniature dock streetlights */}
             {/* Spaced along the promenade: x = 485, 755, 985, 1225 */}
