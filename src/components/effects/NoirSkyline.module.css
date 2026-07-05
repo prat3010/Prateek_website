@@ -759,6 +759,34 @@
   50% { opacity: 1; }
 }
 
+/* ─ Bridge Traffic Dots (CSS Keyframes replacing SVG animateMotion) ─ */
+@keyframes trafficHeadlight {
+  0%   { transform: translate(400px, 852px); }
+  10%  { transform: translate(497px, 847px); }
+  20%  { transform: translate(597px, 842px); }
+  30%  { transform: translate(699px, 839px); }
+  40%  { transform: translate(803px, 838px); }
+  50%  { transform: translate(910px, 837px); }
+  60%  { transform: translate(1019px, 838px); }
+  70%  { transform: translate(1131px, 839px); }
+  80%  { transform: translate(1245px, 842px); }
+  90%  { transform: translate(1361px, 847px); }
+  100% { transform: translate(1480px, 852px); }
+}
+@keyframes trafficTaillight {
+  0%   { transform: translate(1480px, 854px); }
+  10%  { transform: translate(1361px, 848px); }
+  20%  { transform: translate(1244px, 843px); }
+  30%  { transform: translate(1131px, 839px); }
+  40%  { transform: translate(1021px, 838px); }
+  50%  { transform: translate(910px, 837px); }
+  60%  { transform: translate(803px, 838px); }
+  70%  { transform: translate(699px, 839px); }
+  80%  { transform: translate(597px, 843px); }
+  90%  { transform: translate(497px, 848px); }
+  100% { transform: translate(400px, 854px); }
+}
+
 /* ─ Bridge Highway Traffic (Glowing Dots) ─ */
 .trafficHeadlight {
   fill: #ffffff;
@@ -770,6 +798,13 @@
   fill: #ffffff;
   opacity: 0.35;
 }
+
+.trafficHL14 { animation: trafficHeadlight 14s linear infinite; }
+.trafficHL10 { animation: trafficHeadlight 10s linear infinite; }
+.trafficHL20 { animation: trafficHeadlight 20s linear infinite; }
+.trafficTL16 { animation: trafficTaillight 16s linear infinite; }
+.trafficTL12 { animation: trafficTaillight 12s linear infinite; }
+.trafficTL22 { animation: trafficTaillight 22s linear infinite; }
 
 .buildingGroup {
   fill: var(--skyline-fill-bg);
