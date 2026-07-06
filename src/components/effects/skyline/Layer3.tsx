@@ -857,7 +857,6 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
                 <circle cx="371" cy="750" r="1.5" className={styles.smokePuff3} />
               </g>
               {/* Exhaust Fan Housing & backplate */}
-              <ellipse cx="371" cy="750" rx="8.5" ry="3.5" fill="none" className={styles.exhaustGlowBackplate} />
               <ellipse cx="371" cy="750" rx="9" ry="4" fill="var(--skyline-fill-bg)" stroke="var(--skyline-stroke-mid)" strokeWidth="1" />
 
               {/* Gothic Corbel/Pedestal for Gargoyle at the corner of the right building */}
@@ -1299,7 +1298,6 @@ const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
               <g className={styles.bldFgBlower} stroke="var(--skyline-stroke-fg)" strokeWidth="1.2">
                 <WobblyRect wobble={wobble} wobbleStrength={strength} x="1587" y="725" width="22" height="35" rx="1" />
                 {/* Fan casing circle & backplate */}
-                <circle cx="1598" cy="742" r="7.5" fill="none" className={styles.fanGlowBackplate} />
                 <circle cx="1598" cy="742" r="8" />
 
                 {/* Exhaust Pipe Stack */}

@@ -150,6 +150,7 @@ function SkylineInner() {
       <div className={styles.vignette} aria-hidden="true" />
 
 
+
       {/* ── Layer 0: Sky backdrop, Searchlights, and Rain ── */}
       <div className={styles.layer}>
         <Layer0 />

@@ -32,6 +32,7 @@
   height: 100%;
   transform-origin: 50% 100%; /* Scale up from bottom center */
   will-change: transform;
+  contain: layout style;
 }
 
 /* Searchlights */
@@ -244,7 +245,7 @@
 .glowingWindow {
   stroke: #c5a059;
   opacity: 0.85;
-  filter: drop-shadow(0 0 2px rgba(197, 160, 89, 0.95)) drop-shadow(0 0 0.5px rgba(197, 160, 89, 0.8));
+
 }
 
 .glowingWindowDim {
@@ -256,6 +257,7 @@
 /* ─ Slow-Gliding Retro Blimp ─ */
 .blimpGroup {
   animation: blimpFlight 115s linear infinite;
+  will-change: transform;
 }
 
 @keyframes blimpFlight {
@@ -307,11 +309,13 @@
 .tugboatTransit {
   transform-origin: 1050px 941px;
   animation: tugboatTransitAnim 75s linear infinite;
+  will-change: transform;
 }
 
 .tugboatBobbing {
   transform-origin: 1050px 941px;
   animation: tugboatBobbingAnim 4s ease-in-out infinite alternate;
+  will-change: transform;
 }
 
 .tugboatWindow {
@@ -320,7 +324,7 @@
 
 .darkNoir .tugboatWindow {
   fill: #fafafa;
-  filter: drop-shadow(0 0 1.5px rgba(255, 255, 255, 0.95));
+
   animation: windowFlicker 9s infinite alternate;
 }
 
@@ -366,11 +370,13 @@
 .sailboatTransit {
   transform-origin: 1050px 941px;
   animation: sailboatTransitAnim 130s linear infinite;
+  will-change: transform;
 }
 
 .sailboatBobbing {
   transform-origin: 1050px 941px;
   animation: sailboatBobbingAnim 5s ease-in-out infinite alternate;
+  will-change: transform;
 }
 
 .sailboatWake {
@@ -383,11 +389,13 @@
 .speedboatTransit {
   transform-origin: 1050px 941px;
   animation: speedboatTransitAnim 25s linear infinite;
+  will-change: transform;
 }
 
 .speedboatBobbing {
   transform-origin: 1050px 941px;
   animation: speedboatBobbingAnim 2s ease-in-out infinite alternate;
+  will-change: transform;
 }
 
 .speedboatWake1,
@@ -582,7 +590,7 @@
 .windowFlicker3,
 .windowFlicker4 {
   stroke: #c5a059;
-  filter: drop-shadow(0 0 2px rgba(197, 160, 89, 0.95)) drop-shadow(0 0 0.5px rgba(197, 160, 89, 0.8));
+
 }
 
 .windowFlicker1 {
@@ -634,7 +642,7 @@
 .darkNoir .beaconRed2,
 .darkNoir .beaconRed3 {
   fill: #ff3b30;
-  filter: drop-shadow(0 0 3px rgba(255, 59, 48, 0.95)) drop-shadow(0 0 1px rgba(255, 59, 48, 0.8));
+
 }
 
 /* Pop-Art Mode - Flat solid red with no glow */
@@ -642,7 +650,7 @@
 .lightPopart .beaconRed2,
 .lightPopart .beaconRed3 {
   fill: var(--pop-red);
-  filter: none;
+
 }
 
 .beaconRed1 {
@@ -704,7 +712,7 @@
 .trafficHeadlight {
   fill: #ffffff;
   opacity: 0.95;
-  filter: drop-shadow(0 0 1.5px rgba(255, 255, 255, 0.95));
+
 }
 
 .trafficTaillight {
@@ -712,12 +720,12 @@
   opacity: 0.35;
 }
 
-.trafficHL14 { animation: trafficHeadlight 14s linear infinite; }
-.trafficHL10 { animation: trafficHeadlight 10s linear infinite; }
-.trafficHL20 { animation: trafficHeadlight 20s linear infinite; }
-.trafficTL16 { animation: trafficTaillight 16s linear infinite; }
-.trafficTL12 { animation: trafficTaillight 12s linear infinite; }
-.trafficTL22 { animation: trafficTaillight 22s linear infinite; }
+.trafficHL14 { animation: trafficHeadlight 14s linear infinite; will-change: transform; }
+.trafficHL10 { animation: trafficHeadlight 10s linear infinite; will-change: transform; }
+.trafficHL20 { animation: trafficHeadlight 20s linear infinite; will-change: transform; }
+.trafficTL16 { animation: trafficTaillight 16s linear infinite; will-change: transform; }
+.trafficTL12 { animation: trafficTaillight 12s linear infinite; will-change: transform; }
+.trafficTL22 { animation: trafficTaillight 22s linear infinite; will-change: transform; }
 
 .buildingGroup {
   fill: var(--skyline-fill-bg);
@@ -938,7 +946,7 @@
   stroke-dasharray: 4.5px 7px;
   stroke-linecap: butt;
   opacity: 1;
-  filter: none;
+
 }
 
 .lightPopart .glowingWindowDim {
@@ -947,7 +955,7 @@
   stroke-dasharray: 4.5px 7px;
   stroke-linecap: butt;
   opacity: 1;
-  filter: none;
+
 }
 
 .lightPopart .windowFlicker1,
@@ -958,12 +966,12 @@
   stroke-width: 4.5px;
   stroke-linecap: butt;
   opacity: 1;
-  filter: none;
+
 }
 
 .lightPopart .trafficHeadlight {
   fill: var(--pop-yellow);
-  filter: drop-shadow(0 0 1.5px var(--pop-yellow));
+
   opacity: 1;
 }
 
@@ -1053,7 +1061,7 @@
 
 .gargoyleEyesAwake {
   fill: var(--skyline-gargoyle-eyes);
-  filter: drop-shadow(0 0 3px var(--skyline-gargoyle-eyes)) drop-shadow(0 0 1px var(--skyline-gargoyle-eyes));
+
 }
 
 /* ── Pigeon Animations ── */
@@ -1094,7 +1102,7 @@
 }
 
 .darkNoir .clockFace {
-  filter: drop-shadow(0 0 3px rgba(255, 243, 168, 0.8)) drop-shadow(0 0 1px rgba(255, 243, 168, 0.5));
+
 }
 
 .clockSeconds {
@@ -1102,7 +1110,7 @@
 }
 
 .darkNoir .clockSeconds {
-  filter: drop-shadow(0 0 1px rgba(255, 69, 58, 0.6));
+
 }
 
 /* ── Hotel Neon Sign ── */
@@ -1117,13 +1125,13 @@
 
 .darkNoir .hotelNeonText text {
   fill: #ff2a55;
-  filter: drop-shadow(0 0 3px rgba(255, 42, 85, 0.95)) drop-shadow(0 0 1px rgba(255, 42, 85, 0.8));
+
   animation: neonSignFlicker 6s infinite;
 }
 
 .lightPopart .hotelNeonText text {
   fill: var(--pop-black);
-  filter: none;
+
 }
 
 @keyframes neonSignFlicker {
@@ -1186,7 +1194,7 @@
 
 /* ── Interactive Windows ── */
 .interactiveWindow {
-  transition: fill 0.3s ease, stroke 0.3s ease, filter 0.3s ease, opacity 0.3s ease;
+  transition: fill 0.3s ease, stroke 0.3s ease, opacity 0.3s ease;
   cursor: pointer;
 }
 
@@ -1194,13 +1202,13 @@
   fill: #c5a059;
   stroke: #c5a059;
   opacity: 1;
-  filter: drop-shadow(0 0 4px rgba(197, 160, 89, 0.95)) drop-shadow(0 0 1px rgba(197, 160, 89, 0.8));
+
 }
 
 .lightPopart .interactiveWindow:hover {
   fill: var(--pop-yellow);
   stroke: var(--pop-yellow);
-  filter: none;
+
   opacity: 1;
 }
 
@@ -1210,7 +1218,7 @@
 
 .interactiveWindowGroup path,
 .interactiveWindowGroup rect {
-  transition: fill 0.3s ease, stroke 0.3s ease, filter 0.3s ease, opacity 0.3s ease;
+  transition: fill 0.3s ease, stroke 0.3s ease, opacity 0.3s ease;
 }
 
 .interactiveWindowGroup:hover path,
@@ -1218,14 +1226,14 @@
   fill: #c5a059;
   stroke: #c5a059;
   opacity: 1;
-  filter: drop-shadow(0 0 4px rgba(197, 160, 89, 0.95)) drop-shadow(0 0 1px rgba(197, 160, 89, 0.8));
+
 }
 
 .lightPopart .interactiveWindowGroup:hover path,
 .lightPopart .interactiveWindowGroup:hover rect {
   fill: var(--pop-yellow);
   stroke: var(--pop-yellow);
-  filter: none;
+
   opacity: 1;
 }
 
@@ -1276,20 +1284,20 @@
 .darkNoir .billboardNeon path,
 .darkNoir .billboardNeon line {
   stroke: #ff1493;
-  filter: drop-shadow(0 0 3px rgba(255, 20, 147, 0.95)) drop-shadow(0 0 1px rgba(255, 20, 147, 0.8));
+
   animation: neonSignFlicker 7s infinite 1.5s;
 }
 
 .darkNoir .billboardNeon text {
   fill: #ff1493;
-  filter: drop-shadow(0 0 3px rgba(255, 20, 147, 0.95)) drop-shadow(0 0 1px rgba(255, 20, 147, 0.8));
+
   animation: neonSignFlicker 7s infinite 1.5s;
 }
 
 /* Hotel Sign Board Rect glow */
 .darkNoir .hotelSignBoard {
   stroke: #ff2a55;
-  filter: drop-shadow(0 0 3px rgba(255, 42, 85, 0.8));
+
   animation: neonSignFlicker 9s infinite 0.5s;
 }
 
@@ -1305,26 +1313,26 @@
 
 .darkNoir .barNeonSign text {
   fill: #00f0ff;
-  filter: drop-shadow(0 0 3px rgba(0, 240, 255, 0.95)) drop-shadow(0 0 1px rgba(0, 240, 255, 0.8));
+
   animation: neonSignFlicker 8s infinite 0.2s;
 }
 
 .lightPopart .barNeonSign text {
   fill: var(--pop-black);
-  filter: none;
+
 }
 
 /* Colorful glowing windows */
 .glowingWindowPink {
   stroke: #ff2a55;
   opacity: 0.85;
-  filter: drop-shadow(0 0 2.5px rgba(255, 42, 85, 0.95)) drop-shadow(0 0 0.5px rgba(255, 42, 85, 0.8));
+
 }
 
 .glowingWindowCyan {
   stroke: #00f0ff;
   opacity: 0.85;
-  filter: drop-shadow(0 0 2.5px rgba(0, 240, 255, 0.95)) drop-shadow(0 0 0.5px rgba(0, 240, 255, 0.8));
+
 }
 
 .lightPopart .glowingWindowPink {
@@ -1333,7 +1341,7 @@
   stroke-dasharray: 4.5px 7px;
   stroke-linecap: butt;
   opacity: 1;
-  filter: none;
+
 }
 
 .lightPopart .glowingWindowCyan {
@@ -1342,13 +1350,13 @@
   stroke-dasharray: 4.5px 7px;
   stroke-linecap: butt;
   opacity: 1;
-  filter: none;
+
 }
 
 /* Neon UV Green wall graffiti (Layer 3 right wall) */
 .darkNoir .rightWallGraffiti {
   stroke: #39ff14;
-  filter: drop-shadow(0 0 3px rgba(57, 255, 20, 0.9)) drop-shadow(0 0 1px rgba(57, 255, 20, 0.6));
+
   opacity: 0.9;
   stroke-width: 2px;
   animation: neonSignFlicker 12s infinite 3s;
@@ -1364,13 +1372,13 @@
 
 .darkNoir .waterTankBeacon {
   fill: var(--neon-pink);
-  filter: drop-shadow(0 0 5px var(--neon-pink)) drop-shadow(0 0 2px var(--neon-pink));
+
   animation: blinkRed1 1.5s step-start infinite;
 }
 
 .lightPopart .waterTankBeacon {
   fill: var(--pop-red);
-  filter: none;
+
 }
 
 /* Penthouse access door Exit sign */
@@ -1386,44 +1394,32 @@
 
 .darkNoir .exitNeonSign rect {
   stroke: var(--neon-green);
-  filter: drop-shadow(0 0 3px rgba(57, 255, 20, 0.7));
+
   animation: neonSignFlicker 11s infinite 1.0s;
 }
 
 .darkNoir .exitNeonSign text {
   fill: var(--neon-green);
-  filter: drop-shadow(0 0 3px rgba(57, 255, 20, 0.7));
+
   animation: neonSignFlicker 11s infinite 1.0s;
 }
 
 .lightPopart .exitNeonSign rect {
   stroke: var(--pop-black);
-  filter: none;
+
 }
 
 .lightPopart .exitNeonSign text {
   fill: var(--pop-black);
-  filter: none;
+
 }
 
 /* Glowing fan casing backplates */
-.fanGlowBackplate,
-.exhaustGlowBackplate {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
 
-.darkNoir .fanGlowBackplate {
-  opacity: 0.8;
-  fill: rgba(0, 240, 255, 0.25);
-  filter: drop-shadow(0 0 4px var(--neon-cyan));
-}
 
-.darkNoir .exhaustGlowBackplate {
-  opacity: 0.8;
-  fill: rgba(255, 42, 85, 0.25);
-  filter: drop-shadow(0 0 4px var(--neon-pink));
-}
+
+
+
 
 /* Citigroup slanted roof trace line */
 .citigroupNeonRoofTrace {
@@ -1433,7 +1429,7 @@
 .darkNoir .citigroupNeonRoofTrace {
   stroke: var(--neon-cyan);
   stroke-width: 2.2;
-  filter: drop-shadow(0 0 5px var(--neon-cyan)) drop-shadow(0 0 2px var(--neon-cyan));
+
 }
 
 /* Needle Spire trace line */
@@ -1444,7 +1440,7 @@
 .darkNoir .neonSpireTrace {
   stroke: var(--neon-pink);
   stroke-width: 2.2;
-  filter: drop-shadow(0 0 5px var(--neon-pink)) drop-shadow(0 0 2px var(--neon-pink));
+
 }
 
 /* Twin towers skybridge trace line */
@@ -1455,25 +1451,25 @@
 .darkNoir .skybridgeNeonTrace {
   stroke: var(--neon-yellow);
   stroke-width: 1.5;
-  filter: drop-shadow(0 0 4px var(--neon-yellow));
+
 }
 
 /* Bridge warning beacon override */
 .darkNoir .bridgeBeacon {
   fill: var(--neon-pink);
-  filter: drop-shadow(0 0 5px var(--neon-pink)) drop-shadow(0 0 2px var(--neon-pink));
+
 }
 
 /* Bridge moving traffic headlight/taillight glows */
 .darkNoir .trafficHeadlight {
   fill: var(--neon-cyan);
-  filter: drop-shadow(0 0 3px var(--neon-cyan));
+
   opacity: 0.95;
 }
 
 .darkNoir .trafficTaillight {
   fill: var(--neon-pink);
-  filter: drop-shadow(0 0 3px var(--neon-pink));
+
   opacity: 0.95;
 }
 
@@ -1481,7 +1477,7 @@
 .glowingForegroundWindowPink,
 .glowingForegroundWindowCyan,
 .glowingForegroundWindowYellow {
-  transition: fill 0.3s ease, stroke 0.3s ease, filter 0.3s ease;
+  transition: fill 0.3s ease, stroke 0.3s ease;
 }
 
 .darkNoir .glowingForegroundWindowPink,
@@ -1489,12 +1485,12 @@
   fill: var(--neon-pink);
   stroke: var(--neon-pink);
   opacity: 0.85;
-  filter: drop-shadow(0 0 3px rgba(255, 42, 85, 0.9)) drop-shadow(0 0 1px rgba(255, 42, 85, 0.6));
+
 }
 .darkNoir .glowingForegroundWindowPink path {
   fill: var(--neon-pink);
   stroke: var(--neon-pink);
-  filter: drop-shadow(0 0 3px rgba(255, 42, 85, 0.9)) drop-shadow(0 0 1px rgba(255, 42, 85, 0.6));
+
 }
 
 .darkNoir .glowingForegroundWindowCyan,
@@ -1502,12 +1498,12 @@
   fill: var(--neon-cyan);
   stroke: var(--neon-cyan);
   opacity: 0.85;
-  filter: drop-shadow(0 0 3px rgba(0, 240, 255, 0.9)) drop-shadow(0 0 1px rgba(0, 240, 255, 0.6));
+
 }
 .darkNoir .glowingForegroundWindowCyan path {
   fill: var(--neon-cyan);
   stroke: var(--neon-cyan);
-  filter: drop-shadow(0 0 3px rgba(0, 240, 255, 0.9)) drop-shadow(0 0 1px rgba(0, 240, 255, 0.6));
+
 }
 
 .darkNoir .glowingForegroundWindowYellow,
@@ -1515,7 +1511,7 @@
   fill: var(--neon-yellow);
   stroke: var(--neon-yellow);
   opacity: 0.85;
-  filter: drop-shadow(0 0 3px rgba(255, 230, 0, 0.9)) drop-shadow(0 0 1px rgba(255, 230, 0, 0.6));
+
 }
 
 /* ─ Disable all backdrop CSS animations under reducedMotion class ─ */
@@ -1648,6 +1644,7 @@
   will-change: transform;
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
+  contain: layout style paint;
 }
 
 
