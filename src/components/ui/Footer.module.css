@@ -316,10 +316,18 @@
   transform: translateY(-4px);
 }
 
+.connectPanel .terminalWindow {
+  min-height: unset;
+}
+
 .connectPanel .terminalWindow:hover {
   border-color: var(--neon-yellow);
   box-shadow: 0 0 15px rgba(255, 230, 0, 0.22);
   transform: translateY(-4px);
+}
+
+.connectPanel .terminalBody {
+  padding-bottom: 8px;
 }
 
 .statsPanel .terminalWindow:hover {
@@ -409,7 +417,6 @@
 .asciiTree {
   display: flex;
   flex-direction: column;
-  gap: 3px;
   margin-top: 4px;
 }
 
@@ -434,7 +441,6 @@
   color: #a0a0ab;
   text-decoration: none;
   transition: color 0.15s ease, text-shadow 0.15s ease;
-  padding-block: 4px; /* Easing touch target sizes */
 }
 
 .treeLink:hover {
@@ -446,7 +452,6 @@
 .terminalSocials {
   display: flex;
   flex-direction: column;
-  gap: 8px;
 }
 
 .terminalSocialLink {
@@ -457,7 +462,6 @@
   color: #a0a0ab;
   transition: color 0.2s ease, transform 0.2s ease;
   line-height: 1.2;
-  padding-block: 6px; /* Easing touch target sizes */
 }
 
 .terminalSocialLink:hover {
