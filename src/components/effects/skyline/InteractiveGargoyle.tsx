@@ -166,7 +166,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
       const elapsed = performance.now() - stateStartTimeRef.current;
 
       if (currentState === 'leaping') {
-        const progress = Math.min(elapsed / 640, 1); // 8 ticks * 80ms = 640ms
+        const progress = Math.min(elapsed / 640, 1); // 4 ticks * 160ms = 640ms
         setPosX(1426 - progress * 66);
         setPosY((756 - progress * 76) - 35 * Math.sin(Math.PI * progress));
         setScale(1.0);
@@ -201,7 +201,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
         setOpacity(1.0 - ratio * 0.45);
         setPosY(710 - ratio * (710 - 420));
       } else if (currentState === 'landing') {
-        const progress = Math.min(elapsed / 480, 1); // 6 ticks * 80ms = 480ms
+        const progress = Math.min(elapsed / 480, 1); // 3 ticks * 160ms = 480ms
         setPosX(1488 - progress * 62);
         setPosY(710 - progress * (710 - 756));
         setScale(1.0);
@@ -217,7 +217,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
     };
   }, [state, reducedMotion]);
 
-  // Shared tick drives state machine (single 80ms interval from SkylineInteractionContext)
+  // Shared tick drives state machine (single 160ms interval from SkylineInteractionContext)
   useEffect(() => {
     if (reducedMotion) return;
     const currentState = stateRef.current;
@@ -236,7 +236,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
       if (velocityRef.current > 200) {
         ticksRef.current = 0;
         setState('awakening');
-      } else if (ticks >= 80) { // every 6.4 seconds, blink eyes
+      } else if (ticks >= 40) { // every 6.4 seconds, blink eyes
         ticksRef.current = 0;
         setState('blinking');
       }
@@ -245,37 +245,37 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
       if (velocityRef.current > 200) {
         ticksRef.current = 0;
         setState('awakening');
-      } else if (ticks >= 6) { // blink duration
+      } else if (ticks >= 3) { // blink duration
         ticksRef.current = 0;
         setState('sitting');
       }
     } else if (currentState === 'awakening') {
-      if (ticks >= 6) {
+      if (ticks >= 3) {
         ticksRef.current = 0;
         setState('leaping');
       }
     } else if (currentState === 'leaping') {
-      if (ticks >= 8) {
+      if (ticks >= 4) {
         ticksRef.current = 0;
         setState('gliding_fg');
       }
     } else if (currentState === 'gliding_fg') {
-      if (ticks >= 72) {
+      if (ticks >= 36) {
         ticksRef.current = 0;
         setState('gliding_bg');
       }
     } else if (currentState === 'gliding_bg') {
-      if (ticks >= 208) {
+      if (ticks >= 104) {
         ticksRef.current = 0;
         setState('returning');
       }
     } else if (currentState === 'returning') {
-      if (ticks >= 26) {
+      if (ticks >= 13) {
         ticksRef.current = 0;
         setState('landing');
       }
     } else if (currentState === 'landing') {
-      if (ticks >= 6) {
+      if (ticks >= 3) {
         ticksRef.current = 0;
         setState('sitting');
       }

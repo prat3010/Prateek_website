@@ -133,25 +133,25 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
     ticksRef.current++;
     const ticks = ticksRef.current;
     if (currentState === 'alert') {
-      if (ticks >= 4) {
+      if (ticks >= 2) {
         ticksRef.current = 0;
         setState(velocityRef.current > 60 ? 'hopping_down' : 'idle');
       }
       return;
     }
     if (currentState === 'hopping_down') {
-      if (ticks >= 6) {
+      if (ticks >= 3) {
         ticksRef.current = 0;
         setPosY(PLATFORMS[1]);
         setState('waiting');
       }
     } else if (currentState === 'waiting') {
-      if (ticks >= 36) {
+      if (ticks >= 18) {
         ticksRef.current = 0;
         setState('hopping_up');
       }
     } else if (currentState === 'hopping_up') {
-      if (ticks >= 6) {
+      if (ticks >= 3) {
         ticksRef.current = 0;
         setPosY(PLATFORMS[0]);
         setState('idle');

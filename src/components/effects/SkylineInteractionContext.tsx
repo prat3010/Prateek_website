@@ -71,13 +71,13 @@ export function SkylineInteractionProvider({ children }: { children: ReactNode }
     };
   }, [startIdleTimer, clearIdleTimer, resetIdle]);
 
-  // Single shared 80ms tick for all skyline animated characters
+  // Single shared 160ms tick for all skyline animated characters
   useEffect(() => {
     const id = setInterval(() => {
       if (isTabVisibleRef.current && !isIdleRef.current) {
         setTick(t => t + 1);
       }
-    }, 80);
+    }, 160);
     return () => clearInterval(id);
   }, []);
 

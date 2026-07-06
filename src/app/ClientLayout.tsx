@@ -13,13 +13,8 @@ import ThemeTransition from '@/components/effects/ThemeTransition';
 import { LazyMotion, domAnimation } from 'framer-motion';
 import OnboardingSelector from '@/components/ui/OnboardingSelector';
 
-import SkylinePlaceholder from '@/components/effects/SkylinePlaceholder';
-
 // Lazy load heavy client side animations
-const NoirSkyline = dynamic(() => import('@/components/effects/NoirSkyline'), { 
-  ssr: false,
-  loading: () => <SkylinePlaceholder />
-});
+const NoirSkyline = dynamic(() => import('@/components/effects/NoirSkyline'), { ssr: false });
 const CursorTrail = dynamic(() => import('@/components/effects/CursorTrail'), { ssr: false });
 const ZenToggle = dynamic(() => import('@/components/ui/ZenToggle'), { ssr: false });
 const TerminalButton = dynamic(() => import('@/components/ui/TerminalButton'), { ssr: false });

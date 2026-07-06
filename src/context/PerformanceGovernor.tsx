@@ -26,8 +26,12 @@ export function PerformanceGovernorProvider({ children }: { children: React.Reac
   const samplesRef = useRef<number[]>([]);
   const lastTimeRef = useRef<number>(0);
   const tierRef = useRef<PerformanceTier>('high');
+  const stableSinceRef = useRef(0);
+  const throttledRef = useRef(false);
 
   useEffect(() => {
+    stableSinceRef.current = performance.now();
+
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         samplesRef.current = [];
@@ -36,7 +40,17 @@ export function PerformanceGovernorProvider({ children }: { children: React.Reac
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
+    const resumeHighFreq = () => {
+      stableSinceRef.current = performance.now();
+      throttledRef.current = false;
+    };
+    const resumeEvents = ['mousemove', 'scroll', 'keydown', 'touchstart'] as const;
+    for (const ev of resumeEvents) {
+      window.addEventListener(ev, resumeHighFreq, { passive: true });
+    }
+
     let rafId: number;
+    let throttleTimer: ReturnType<typeof setTimeout> | null = null;
 
     const tick = (time: number) => {
       if (lastTimeRef.current !== 0) {
@@ -75,6 +89,15 @@ export function PerformanceGovernorProvider({ children }: { children: React.Reac
         if (next !== current) {
           tierRef.current = next;
           setPerformanceTier(next);
+          stableSinceRef.current = performance.now();
+          throttledRef.current = false;
+        } else if (performance.now() - stableSinceRef.current > 5000 && !throttledRef.current) {
+          throttledRef.current = true;
+          throttleTimer = setTimeout(() => {
+            throttledRef.current = false;
+            rafId = requestAnimationFrame(tick);
+          }, 1000);
+          return;
         }
       }
 
@@ -85,6 +108,10 @@ export function PerformanceGovernorProvider({ children }: { children: React.Reac
     return () => {
       cancelAnimationFrame(rafId);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      for (const ev of resumeEvents) {
+        window.removeEventListener(ev, resumeHighFreq);
+      }
+      if (throttleTimer) clearTimeout(throttleTimer);
     };
   }, []);
 

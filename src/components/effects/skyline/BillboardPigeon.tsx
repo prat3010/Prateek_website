@@ -69,7 +69,7 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
 
       const startX = BILLBOARD_SIDES[sideRef.current];
       const endX = BILLBOARD_SIDES[nextSide];
-      const duration = 480; // ms (equivalent to 6 * 80ms)
+      const duration = 480; // ms (equivalent to 3 * 160ms)
       let startTime: number | null = null;
 
       const animate = (timestamp: number) => {
@@ -124,7 +124,7 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
     return () => window.removeEventListener('mousemove', handleInteraction, { capture: true });
   }, [reducedMotion]);
 
-  // Shared tick drives velocity-based alert state (80ms tick from SkylineInteractionContext replaces former 200ms interval)
+  // Shared tick drives velocity-based alert state (160ms tick from SkylineInteractionContext)
   useEffect(() => {
     if (reducedMotion) return;
     const vel = velocityRef.current;
