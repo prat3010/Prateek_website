@@ -117,8 +117,10 @@ function SkylineInner() {
       rafId = requestAnimationFrame(() => {
         const x = (e.clientX / window.innerWidth) - 0.5;
         const y = (e.clientY / window.innerHeight) - 0.5;
-        mouseX.set(x);
-        mouseY.set(y);
+        if (Math.abs(x - mouseX.get()) > 0.005 || Math.abs(y - mouseY.get()) > 0.005) {
+          mouseX.set(x);
+          mouseY.set(y);
+        }
       });
     };
 
