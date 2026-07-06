@@ -3,10 +3,12 @@
 import { useState, useEffect, useCallback, useMemo, useRef, type MouseEvent } from 'react';
 import { usePathname } from 'next/navigation';
 import { useLenis } from 'lenis/react';
-import { useTheme } from '@/context/ThemeContext';
+import { Sun, Moon, Code2, Briefcase } from 'lucide-react';
+import { useTheme, type Audience } from '@/context/ThemeContext';
 import { useLenisScroll } from '@/context/LenisProvider';
 import Scrambler from '@/components/ui/Scrambler';
 import type { ScramblerProps } from '@/components/ui/Scrambler';
+import SegmentedToggle, { type SegmentedOption } from '@/components/ui/SegmentedToggle';
 import { NAVBAR_SCROLL_OFFSET } from '@/lib/constants';
 import styles from './Navbar.module.css';
 
@@ -29,7 +31,25 @@ export interface NavbarProps {
 
 export default function Navbar({ items, className }: NavbarProps) {
   const pathname = usePathname();
-  const { isNoir, toggleTheme, audience, setAudience } = useTheme();
+  const { theme, toggleTheme, audience, setAudience } = useTheme();
+
+  const handleAudienceChange = useCallback((value: string) => {
+    setAudience(value as Audience);
+  }, [setAudience]);
+
+  const handleThemeChange = useCallback(() => {
+    toggleTheme();
+  }, [toggleTheme]);
+
+  const audienceOptions = useMemo(() => [
+    { value: 'developer', label: 'DEV', icon: <Code2 size={14} strokeWidth={2.5} /> },
+    { value: 'business', label: 'BIZ', icon: <Briefcase size={14} strokeWidth={2.5} /> },
+  ] as [SegmentedOption, SegmentedOption], []);
+
+  const themeOptions = useMemo(() => [
+    { value: 'light', label: 'AZURE', icon: <Sun size={14} strokeWidth={2.5} /> },
+    { value: 'noir', label: 'NOIR', icon: <Moon size={14} strokeWidth={2.5} /> },
+  ] as [SegmentedOption, SegmentedOption], []);
 
   const navItems = useMemo(() => {
     if (items) return items;
@@ -53,9 +73,6 @@ export default function Navbar({ items, className }: NavbarProps) {
     return '/#home';
   });
 
-  const toggleAudience = useCallback(() => {
-    setAudience(audience === 'business' ? 'developer' : 'business');
-  }, [audience, setAudience]);
   const { scrollY } = useLenisScroll();
   const lenis = useLenis();
 
@@ -209,25 +226,23 @@ export default function Navbar({ items, className }: NavbarProps) {
 
         {/* ---- Communication Identity Toggle ---- */}
         {audience && (
-          <button
-            onClick={toggleAudience}
-            className={styles.audienceToggle}
-            aria-label={audience === 'developer' ? 'Switch to Business perspective' : 'Switch to Developer perspective'}
-          >
-            {isNoir 
-              ? (audience === 'developer' ? '[BIZ]' : '[DEV]') 
-              : (audience === 'developer' ? 'BIZ_MODE' : 'DEV_MODE')}
-          </button>
+          <SegmentedToggle
+            options={audienceOptions}
+            activeValue={audience}
+            onChange={handleAudienceChange}
+            className={styles.audienceSegmented}
+            ariaLabel={audience === 'developer' ? 'Switch to Business perspective' : 'Switch to Developer perspective'}
+          />
         )}
 
         {/* ---- Theme Toggle Switch ---- */}
-        <button
-          onClick={toggleTheme}
-          className={styles.themeToggle}
-          aria-label={isNoir ? 'Switch to Azure mode' : 'Switch to Noir mode'}
-        >
-          {isNoir ? 'AZURE' : 'NOIR'}
-        </button>
+        <SegmentedToggle
+          options={themeOptions}
+          activeValue={theme}
+          onChange={handleThemeChange}
+          className={styles.themeSegmented}
+          ariaLabel={theme === 'light' ? 'Switch to Noir mode' : 'Switch to Azure mode'}
+        />
 
         {/* ---- Hamburger ---- */}
         <button

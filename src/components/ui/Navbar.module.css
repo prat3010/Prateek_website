@@ -322,71 +322,45 @@
   }
 }
 
-/* ---- Controls Group & Theme Toggle Switch ---- */
+/* ---- Controls Group ---- */
 .rightGroup {
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
-.themeToggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 6px 14px;
-  font-family: var(--font-headline);
-  font-size: 1.1rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  background-color: var(--pop-yellow);
-  color: var(--pop-black);
-  border: 3px solid var(--pop-black);
-  box-shadow: 3px 3px 0px var(--pop-black);
-  cursor: pointer;
-  transition: 
-    transform 0.15s var(--transition-bounce), 
-    box-shadow 0.15s ease,
-    background-color 0.4s ease,
-    border-color 0.4s ease,
-    color 0.4s ease;
-  user-select: none;
-  border-radius: 4px;
+/* ── Segmented Control Variants ── */
+
+/* Theme Toggle */
+.themeSegmented {
+  --st-active-bg: var(--pop-yellow);
+  --st-active-color: var(--pop-black);
+  --st-hover-bg: var(--pop-pink);
+  --st-hover-color: var(--pop-white);
 }
 
-.themeToggle:hover {
-  transform: translate(-1px, -1px);
-  box-shadow: 4px 4px 0px var(--pop-black);
-  background-color: var(--pop-pink);
-  color: var(--pop-white);
+:global([data-theme='noir']) .themeSegmented {
+  --st-active-bg: #E8E8E8;
+  --st-active-color: #121214;
+  --st-hover-color: var(--neon-yellow);
+  --st-hover-bg: rgba(255, 234, 0, 0.08);
 }
 
-.themeToggle:active {
-  transform: translate(1px, 1px);
-  box-shadow: 1px 1px 0px var(--pop-black);
+/* Audience Toggle */
+.audienceSegmented {
+  --st-active-bg: var(--pop-blue);
+  --st-active-color: var(--pop-white);
+  --st-hover-bg: var(--pop-green);
+  --st-hover-color: var(--pop-black);
 }
 
-:global([data-theme='noir']) .themeToggle {
-  background-color: #121214;
-  color: #FFFFFF;
-  border-color: #FFFFFF;
-  box-shadow: 3px 3px 0px #FFFFFF;
+:global([data-theme='noir']) .audienceSegmented {
+  --st-active-color: var(--neon-cyan);
+  --st-hover-color: var(--neon-cyan);
+  --st-hover-bg: rgba(0, 240, 255, 0.08);
 }
 
-:global([data-theme='noir']) .themeToggle:hover {
-  background-color: #121214;
-  color: var(--neon-yellow);
-  border-color: var(--neon-yellow);
-  box-shadow: 0 0 10px var(--neon-yellow);
-  transform: translate(-1px, -1px);
-}
-
-:global([data-theme='noir']) .themeToggle:active {
-  box-shadow: 0 0 5px var(--neon-yellow);
-  transform: translate(1px, 1px);
-}
-
-/* ─ Neon navigation links overrides ─ */
+/* ── Nav link overrides ── */
 :global([data-theme='noir']) .navLink:hover {
   color: var(--neon-cyan);
   text-shadow: var(--neon-cyan-glow);
@@ -400,63 +374,4 @@
 :global([data-theme='noir']) .mobileNavLink:hover {
   color: var(--neon-cyan);
   text-shadow: var(--neon-cyan-glow);
-}
-
-/* ---- Audience Toggle Switch ---- */
-.audienceToggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 14px;
-  font-family: var(--font-headline);
-  font-size: 1.1rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  background-color: var(--pop-blue);
-  color: var(--pop-white);
-  border: 3px solid var(--pop-black);
-  box-shadow: 3px 3px 0px var(--pop-black);
-  cursor: pointer;
-  transition: 
-    transform 0.15s var(--transition-bounce), 
-    box-shadow 0.15s ease,
-    background-color 0.4s ease,
-    border-color 0.4s ease,
-    color 0.4s ease;
-  user-select: none;
-  border-radius: 4px;
-}
-
-.audienceToggle:hover {
-  transform: translate(-1px, -1px);
-  box-shadow: 4px 4px 0px var(--pop-black);
-  background-color: var(--pop-green);
-  color: var(--pop-black);
-}
-
-.audienceToggle:active {
-  transform: translate(1px, 1px);
-  box-shadow: 1px 1px 0px var(--pop-black);
-}
-
-:global([data-theme='noir']) .audienceToggle {
-  background-color: #121214;
-  color: #FFFFFF;
-  border-color: #FFFFFF;
-  box-shadow: 3px 3px 0px #FFFFFF;
-  font-family: var(--font-mono);
-  letter-spacing: 0px;
-}
-
-:global([data-theme='noir']) .audienceToggle:hover {
-  background-color: #121214;
-  color: var(--neon-cyan);
-  border-color: var(--neon-cyan);
-  box-shadow: 0 0 10px var(--neon-cyan);
-  transform: translate(-1px, -1px);
-}
-
-:global([data-theme='noir']) .audienceToggle:active {
-  box-shadow: 0 0 5px var(--neon-cyan);
-  transform: translate(1px, 1px);
 }

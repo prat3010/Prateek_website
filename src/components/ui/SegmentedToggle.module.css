@@ -1,0 +1,83 @@
+.container {
+  display: inline-flex;
+  align-items: center;
+  border: 3px solid var(--st-border, var(--pop-black));
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.segment {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-family: var(--font-headline);
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: var(--st-inactive-color, var(--pop-black));
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.segment:focus-visible {
+  outline: 2px solid var(--pop-blue);
+  outline-offset: -2px;
+}
+
+.active {
+  background-color: var(--st-active-bg, var(--pop-yellow));
+  color: var(--st-active-color, var(--pop-black));
+  cursor: default;
+}
+
+.inactive {
+  opacity: 0.5;
+}
+
+.inactive:hover {
+  opacity: 1;
+  background-color: var(--st-hover-bg, rgba(0, 0, 0, 0.06));
+  color: var(--st-hover-color, var(--pop-black));
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+}
+
+/* ── Noir Theme Overrides ── */
+:global([data-theme='noir']) .container {
+  border-color: var(--st-border, #3f3f4e);
+}
+
+:global([data-theme='noir']) .segment {
+  font-family: var(--font-code);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--st-inactive-color, #666);
+}
+
+:global([data-theme='noir']) .active {
+  background-color: var(--st-active-bg, #2a2a35);
+  color: var(--st-active-color, #fafafa);
+  opacity: 1;
+}
+
+:global([data-theme='noir']) .inactive {
+  opacity: 0.65;
+}
+
+:global([data-theme='noir']) .inactive:hover {
+  background-color: var(--st-hover-bg, rgba(255, 255, 255, 0.05));
+  color: var(--st-hover-color, #fafafa);
+}
