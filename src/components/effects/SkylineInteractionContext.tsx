@@ -1,12 +1,16 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useRef, useState, useCallback, ReactNode } from 'react';
+import { useLenisScroll } from '@/context/LenisProvider';
 
 interface SkylineInteractionValue {
   isTabVisible: boolean;
   isIdle: boolean;
   tick: number;
   geometryVersion: number;
+  scrollVelocityRef: React.RefObject<number>;
+  mousePosRef: React.RefObject<{ x: number; y: number }>;
+  lastClickRef: React.RefObject<{ x: number; y: number; time: number } | null>;
 }
 
 const SkylineInteractionContext = createContext<SkylineInteractionValue | null>(null);
@@ -24,6 +28,33 @@ export function SkylineInteractionProvider({ children }: { children: ReactNode }
   const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isIdleRef = useRef(false);
   const isTabVisibleRef = useRef(true);
+
+  const { velocity: scrollVelocity } = useLenisScroll();
+  const scrollVelocityRef = useRef(0);
+  const mousePosRef = useRef({ x: -100, y: -100 });
+  const lastClickRef = useRef<{ x: number; y: number; time: number } | null>(null);
+
+  useEffect(() => {
+    const unsub = scrollVelocity.on('change', (v) => {
+      scrollVelocityRef.current = Math.abs(v);
+    });
+    return unsub;
+  }, [scrollVelocity]);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      mousePosRef.current = { x: e.clientX, y: e.clientY };
+    };
+    const handleClick = (e: MouseEvent) => {
+      lastClickRef.current = { x: e.clientX, y: e.clientY, time: performance.now() };
+    };
+    window.addEventListener('mousemove', handleMouseMove, { capture: true, passive: true });
+    window.addEventListener('click', handleClick, { capture: true, passive: true });
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove, { capture: true });
+      window.removeEventListener('click', handleClick, { capture: true });
+    };
+  }, []);
 
   const clearIdleTimer = useCallback(() => {
     if (idleTimerRef.current !== null) {
@@ -103,7 +134,7 @@ export function SkylineInteractionProvider({ children }: { children: ReactNode }
   }, [invalidateGeometry]);
 
   return (
-    <SkylineInteractionContext.Provider value={{ isTabVisible, isIdle, tick, geometryVersion }}>
+    <SkylineInteractionContext.Provider value={{ isTabVisible, isIdle, tick, geometryVersion, scrollVelocityRef, mousePosRef, lastClickRef }}>
       {children}
     </SkylineInteractionContext.Provider>
   );

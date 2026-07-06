@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { useLenisScroll } from '@/context/LenisProvider';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useSkylineInteraction } from '../SkylineInteractionContext';
 import styles from '../NoirSkyline.module.css';
 import { LayerProps } from './types';
@@ -71,13 +70,11 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
   const ticksRef = useRef(0);
   const stateRef = useRef(state);
   const gargoyleRef = useRef<SVGGElement>(null);
-  const velocityRef = useRef(0);
-  const { velocity: scrollVelocity } = useLenisScroll();
 
   const stateStartTimeRef = useRef<number>(0);
   const rafRef = useRef<number | null>(null);
   const boundingRectRef = useRef<DOMRect | null>(null);
-  const { tick, isTabVisible, isIdle, geometryVersion } = useSkylineInteraction();
+  const { tick, isTabVisible, isIdle, geometryVersion, scrollVelocityRef, mousePosRef, lastClickRef } = useSkylineInteraction();
   const isVisibleRef = useRef(isTabVisible);
   const isIdleRef = useRef(isIdle);
 
@@ -90,14 +87,6 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
   }, [isIdle]);
 
   useEffect(() => {
-    if (reducedMotion) return;
-    const unsub = scrollVelocity.on('change', (v) => {
-      velocityRef.current = Math.abs(v);
-    });
-    return unsub;
-  }, [reducedMotion, scrollVelocity]);
-
-  useEffect(() => {
     stateRef.current = state;
     stateStartTimeRef.current = performance.now();
     boundingRectRef.current = null;
@@ -106,44 +95,6 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
   useEffect(() => {
     boundingRectRef.current = null;
   }, [geometryVersion]);
-
-  // Global mousemove and click detection with cached bounding box
-  useEffect(() => {
-    if (reducedMotion) return;
-
-    const handleGlobalInteraction = (e: MouseEvent) => {
-      if (stateRef.current !== 'sitting' && stateRef.current !== 'blinking') return;
-      if (!gargoyleRef.current) return;
-
-      if (!boundingRectRef.current) {
-        boundingRectRef.current = gargoyleRef.current.getBoundingClientRect();
-      }
-      const rect = boundingRectRef.current;
-      if (!rect) return;
-
-      const padding = 15; // px hover boundary padding
-      const mouseX = e.clientX;
-      const mouseY = e.clientY;
-
-      const isOver = 
-        mouseX >= rect.left - padding &&
-        mouseX <= rect.right + padding &&
-        mouseY >= rect.top - padding &&
-        mouseY <= rect.bottom + padding;
-
-      if (isOver) {
-        setState('awakening');
-      }
-    };
-
-    window.addEventListener('mousemove', handleGlobalInteraction, { capture: true, passive: true });
-    window.addEventListener('click', handleGlobalInteraction, { capture: true, passive: true });
-
-    return () => {
-      window.removeEventListener('mousemove', handleGlobalInteraction, { capture: true });
-      window.removeEventListener('click', handleGlobalInteraction, { capture: true });
-    };
-  }, [reducedMotion]);
 
   // Smooth position updates using requestAnimationFrame
   useEffect(() => {
@@ -161,7 +112,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
     }
 
     const tick = () => {
-      if (!isVisibleRef.current || isIdleRef.current) { rafRef.current = requestAnimationFrame(tick); return; }
+      if (!isVisibleRef.current || isIdleRef.current) { rafRef.current = null; return; }
       const currentState = stateRef.current;
       const elapsed = performance.now() - stateStartTimeRef.current;
 
@@ -221,6 +172,38 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
   useEffect(() => {
     if (reducedMotion) return;
     const currentState = stateRef.current;
+
+    // Mouse/click hit detection (replaces per-creature capture listeners)
+    if ((currentState === 'sitting' || currentState === 'blinking') && gargoyleRef.current) {
+      if (!boundingRectRef.current) {
+        boundingRectRef.current = gargoyleRef.current.getBoundingClientRect();
+      }
+      const rect = boundingRectRef.current;
+      if (rect) {
+        const padding = 15;
+        const mouse = mousePosRef.current;
+        const isOver =
+          mouse.x >= rect.left - padding &&
+          mouse.x <= rect.right + padding &&
+          mouse.y >= rect.top - padding &&
+          mouse.y <= rect.bottom + padding;
+
+        const click = lastClickRef.current;
+        const isClick = click && click.time > performance.now() - 200 &&
+          click.x >= rect.left - padding &&
+          click.x <= rect.right + padding &&
+          click.y >= rect.top - padding &&
+          click.y <= rect.bottom + padding;
+
+        if (isOver || isClick) {
+          lastClickRef.current = null;
+          ticksRef.current = 0;
+          setState('awakening');
+          return;
+        }
+      }
+    }
+
     ticksRef.current++;
     const ticks = ticksRef.current;
 
@@ -233,7 +216,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
 
     if (currentState === 'sitting') {
       // High scroll velocity awakens the gargoyle
-      if (velocityRef.current > 200) {
+      if (scrollVelocityRef.current > 200) {
         ticksRef.current = 0;
         setState('awakening');
       } else if (ticks >= 40) { // every 6.4 seconds, blink eyes
@@ -242,7 +225,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
       }
     } else if (currentState === 'blinking') {
       // Can be startled mid-blink by fast scroll
-      if (velocityRef.current > 200) {
+      if (scrollVelocityRef.current > 200) {
         ticksRef.current = 0;
         setState('awakening');
       } else if (ticks >= 3) { // blink duration
@@ -317,7 +300,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
     });
   };
 
-  const renderFrame = () => {
+  const renderedFrame = useMemo(() => {
     const gargoyleFill = 'var(--skyline-gargoyle-fill)';
     const strokeColor = 'var(--skyline-stroke-fg)';
     const eyeColor = 'var(--skyline-gargoyle-eyes)';
@@ -518,7 +501,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
         {element}
       </g>
     );
-  };
+  }, [state, frameIndex, scale, opacity]);
 
   if (reducedMotion) return null;
 
@@ -536,7 +519,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
         }}
       >
         <rect x="-35" y="-35" width="70" height="45" fill="black" opacity="0" style={{ pointerEvents: 'all' }} />
-        {renderFrame()}
+        {renderedFrame}
       </g>
 
       {/* Pigeon on the same pedestal */}

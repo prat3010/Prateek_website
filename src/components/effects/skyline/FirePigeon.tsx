@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useLenisScroll } from '@/context/LenisProvider';
 import { useSkylineInteraction } from '../SkylineInteractionContext';
 import styles from '../NoirSkyline.module.css';
 
@@ -12,12 +11,11 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
   const [posY, setPosY] = useState(PLATFORMS[0]);
   const ticksRef = useRef(0);
   const stateRef = useRef(state);
-  const velocityRef = useRef(0);
   const fireRef = useRef<SVGGElement>(null);
-  const { velocity: scrollVelocity } = useLenisScroll();
+  const rafRef = useRef<number | null>(null);
 
   const boundingRectRef = useRef<DOMRect | null>(null);
-  const { tick, isTabVisible, isIdle, geometryVersion } = useSkylineInteraction();
+  const { tick, isTabVisible, isIdle, geometryVersion, scrollVelocityRef, mousePosRef } = useSkylineInteraction();
   const isVisibleRef = useRef(isTabVisible);
   const isIdleRef = useRef(isIdle);
 
@@ -28,12 +26,6 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
   useEffect(() => {
     isIdleRef.current = isIdle;
   }, [isIdle]);
-
-  useEffect(() => {
-    if (reducedMotion) return;
-    const unsub = scrollVelocity.on('change', (v) => { velocityRef.current = Math.abs(v); });
-    return unsub;
-  }, [reducedMotion, scrollVelocity]);
 
   useEffect(() => {
     stateRef.current = state;
@@ -47,87 +39,59 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
   // Smooth position interpolation during hopping states
   useEffect(() => {
     if (reducedMotion) return;
+    if (state !== 'hopping_down' && state !== 'hopping_up') return;
 
-    if (state === 'hopping_down') {
-      let startTime: number | null = null;
-      const duration = 480; // ms (equivalent to 6 ticks * 80ms)
-      let rafId: number | null = null;
+    const isDown = state === 'hopping_down';
+    const startY = isDown ? PLATFORMS[0] : PLATFORMS[1];
+    const endY = isDown ? PLATFORMS[1] : PLATFORMS[0];
+    const duration = 480;
+    let startTime: number | null = null;
 
-      const animateDown = (timestamp: number) => {
-        if (!isVisibleRef.current || isIdleRef.current) { rafId = requestAnimationFrame(animateDown); return; }
-        if (!startTime) startTime = timestamp;
-        const elapsed = timestamp - startTime;
-        const progress = Math.min(elapsed / duration, 1);
+    const animate = (timestamp: number) => {
+      if (!isVisibleRef.current || isIdleRef.current) { rafRef.current = null; return; }
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+      setPosY(startY + eased * (endY - startY));
+      boundingRectRef.current = null;
+      if (progress < 1) {
+        rafRef.current = requestAnimationFrame(animate);
+      }
+    };
 
-        // Smooth quadratic ease-in-out curve
-        const eased = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-        setPosY(PLATFORMS[0] + eased * (PLATFORMS[1] - PLATFORMS[0]));
-        boundingRectRef.current = null;
-
-        if (progress < 1) {
-          rafId = requestAnimationFrame(animateDown);
-        }
-      };
-      rafId = requestAnimationFrame(animateDown);
-      return () => {
-        if (rafId) cancelAnimationFrame(rafId);
-      };
-    } else if (state === 'hopping_up') {
-      let startTime: number | null = null;
-      const duration = 480; // ms
-      let rafId: number | null = null;
-
-      const animateUp = (timestamp: number) => {
-        if (!isVisibleRef.current || isIdleRef.current) { rafId = requestAnimationFrame(animateUp); return; }
-        if (!startTime) startTime = timestamp;
-        const elapsed = timestamp - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-
-        // Smooth quadratic ease-in-out curve
-        const eased = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-        setPosY(PLATFORMS[1] - eased * (PLATFORMS[1] - PLATFORMS[0]));
-        boundingRectRef.current = null;
-
-        if (progress < 1) {
-          rafId = requestAnimationFrame(animateUp);
-        }
-      };
-      rafId = requestAnimationFrame(animateUp);
-      return () => {
-        if (rafId) cancelAnimationFrame(rafId);
-      };
-    }
+    rafRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
   }, [state, reducedMotion]);
 
   useEffect(() => {
     if (reducedMotion) return;
-    const handleGlobalInteraction = (e: MouseEvent) => {
-      if (stateRef.current !== 'idle' && stateRef.current !== 'alert') return;
-      if (!fireRef.current) return;
+    const currentState = stateRef.current;
 
+    // Mouse hit detection (replaces per-creature capture listener)
+    if ((currentState === 'idle' || currentState === 'alert') && fireRef.current) {
       if (!boundingRectRef.current) {
         boundingRectRef.current = fireRef.current.getBoundingClientRect();
       }
       const rect = boundingRectRef.current;
-      if (!rect) return;
-
-      const padding = 20;
-      const isOver = e.clientX >= rect.left - padding && e.clientX <= rect.right + padding &&
-                     e.clientY >= rect.top - padding && e.clientY <= rect.bottom + padding;
-      if (isOver && stateRef.current === 'idle') {
-        setState('alert');
+      if (rect) {
+        const padding = 20;
+        const mouse = mousePosRef.current;
+        const isOver =
+          mouse.x >= rect.left - padding && mouse.x <= rect.right + padding &&
+          mouse.y >= rect.top - padding && mouse.y <= rect.bottom + padding;
+        if (isOver && currentState === 'idle') {
+          setState('alert');
+          return;
+        }
       }
-    };
-    window.addEventListener('mousemove', handleGlobalInteraction, { capture: true, passive: true });
-    return () => window.removeEventListener('mousemove', handleGlobalInteraction, { capture: true });
-  }, [reducedMotion]);
+    }
 
-  useEffect(() => {
-    if (reducedMotion) return;
-    const currentState = stateRef.current;
     if (currentState === 'idle') {
       ticksRef.current = 0;
-      if (velocityRef.current > 60) setState('alert');
+      if (scrollVelocityRef.current > 60) setState('alert');
       return;
     }
     ticksRef.current++;
@@ -135,7 +99,7 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
     if (currentState === 'alert') {
       if (ticks >= 2) {
         ticksRef.current = 0;
-        setState(velocityRef.current > 60 ? 'hopping_down' : 'idle');
+        setState(scrollVelocityRef.current > 60 ? 'hopping_down' : 'idle');
       }
       return;
     }

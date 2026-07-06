@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useLenisScroll } from '@/context/LenisProvider';
 import { useSkylineInteraction } from '../SkylineInteractionContext';
 import styles from '../NoirSkyline.module.css';
 
@@ -20,12 +19,10 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
   const alertRef = useRef(alert);
   const rafRef = useRef<number | null>(null);
   const pigeonRef = useRef<SVGGElement>(null);
-  const { velocity: scrollVelocity } = useLenisScroll();
-  const velocityRef = useRef(0);
 
   const sideRef = useRef(side);
   const boundingRectRef = useRef<DOMRect | null>(null);
-  const { tick, isTabVisible, isIdle, geometryVersion } = useSkylineInteraction();
+  const { tick, isTabVisible, isIdle, geometryVersion, scrollVelocityRef, mousePosRef } = useSkylineInteraction();
   const isVisibleRef = useRef(isTabVisible);
   const isIdleRef = useRef(isIdle);
 
@@ -47,14 +44,6 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
   }, [alert]);
 
   useEffect(() => {
-    if (reducedMotion) return;
-    const unsub = scrollVelocity.on('change', (v) => {
-      velocityRef.current = Math.abs(v);
-    });
-    return unsub;
-  }, [reducedMotion, scrollVelocity]);
-
-  useEffect(() => {
     boundingRectRef.current = null;
   }, [geometryVersion]);
 
@@ -65,26 +54,24 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
       if (scurryingRef.current) return;
       scurryingRef.current = true;
       setScurrying(true);
-      boundingRectRef.current = null; // Clear cached position on scurry start
+      boundingRectRef.current = null;
 
       const startX = BILLBOARD_SIDES[sideRef.current];
       const endX = BILLBOARD_SIDES[nextSide];
-      const duration = 480; // ms (equivalent to 3 * 160ms)
+      const duration = 480;
       let startTime: number | null = null;
 
       const animate = (timestamp: number) => {
-        if (!isVisibleRef.current || isIdleRef.current) { rafRef.current = requestAnimationFrame(animate); return; }
+        if (!isVisibleRef.current || isIdleRef.current) { rafRef.current = null; return; }
         if (!startTime) startTime = timestamp;
         const elapsed = timestamp - startTime;
         const progress = Math.min(elapsed / duration, 1);
-
-        // Smooth quadratic ease-in-out curve
         const t = progress;
         const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
 
         setPosX(startX + eased * (endX - startX));
         setPosY(BILLBOARD_Y - ARC_PEAK * Math.sin(Math.PI * progress));
-        boundingRectRef.current = null; // Invalidate during movement
+        boundingRectRef.current = null;
 
         if (progress < 1) {
           rafRef.current = requestAnimationFrame(animate);
@@ -101,33 +88,38 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
       rafRef.current = requestAnimationFrame(animate);
     };
 
-    const handleInteraction = (e: MouseEvent) => {
-      if (scurryingRef.current) return;
-      if (!pigeonRef.current) return;
-
-      if (!boundingRectRef.current) {
-        boundingRectRef.current = pigeonRef.current.getBoundingClientRect();
-      }
-      const rect = boundingRectRef.current;
-      if (!rect) return;
-
-      const padding = 25;
-      const isOver = e.clientX >= rect.left - padding && e.clientX <= rect.right + padding &&
-                     e.clientY >= rect.top - padding && e.clientY <= rect.bottom + padding;
-      if (!isOver) return;
-
-      const nextSide = sideRef.current === 'left' ? 'right' : 'left';
-      startScurry(nextSide);
-    };
-
-    window.addEventListener('mousemove', handleInteraction, { capture: true, passive: true });
-    return () => window.removeEventListener('mousemove', handleInteraction, { capture: true });
+    // Store startScurry in a ref so the tick handler can access it
+    startScurryRef.current = startScurry;
   }, [reducedMotion]);
+
+  const startScurryRef = useRef<((nextSide: 'left' | 'right') => void) | null>(null);
+
+  // Mouse hit detection via shared context (replaces per-creature capture listener)
+  useEffect(() => {
+    if (reducedMotion) return;
+    if (scurryingRef.current || !pigeonRef.current) return;
+
+    if (!boundingRectRef.current) {
+      boundingRectRef.current = pigeonRef.current.getBoundingClientRect();
+    }
+    const rect = boundingRectRef.current;
+    if (!rect) return;
+
+    const padding = 25;
+    const mouse = mousePosRef.current;
+    const isOver =
+      mouse.x >= rect.left - padding && mouse.x <= rect.right + padding &&
+      mouse.y >= rect.top - padding && mouse.y <= rect.bottom + padding;
+    if (isOver && startScurryRef.current) {
+      const nextSide = sideRef.current === 'left' ? 'right' : 'left';
+      startScurryRef.current(nextSide);
+    }
+  }, [tick, reducedMotion]);
 
   // Shared tick drives velocity-based alert state (160ms tick from SkylineInteractionContext)
   useEffect(() => {
     if (reducedMotion) return;
-    const vel = velocityRef.current;
+    const vel = scrollVelocityRef.current;
     if (vel > 60 && !alertRef.current && !scurryingRef.current) setAlert(true);
     else if (vel <= 60 && alertRef.current && !scurryingRef.current) setAlert(false);
   }, [tick, reducedMotion]);

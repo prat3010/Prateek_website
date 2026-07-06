@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { useLenisScroll } from '@/context/LenisProvider';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useSkylineInteraction } from '../SkylineInteractionContext';
 import styles from '../NoirSkyline.module.css';
 import { LayerProps } from './types';
@@ -17,76 +16,60 @@ const RunningCat: React.FC<LayerProps> = ({ reducedMotion }) => {
   const ticksRef = useRef(0);
   const stateRef = useRef(state);
   const catRef = useRef<SVGGElement>(null);
-  const velocityRef = useRef(0);
-  const { velocity: scrollVelocity } = useLenisScroll();
+  const rafRef = useRef<number | null>(null);
 
   const boundingRectRef = useRef<DOMRect | null>(null);
-  const { tick, geometryVersion } = useSkylineInteraction();
+  const { tick, isTabVisible, isIdle, geometryVersion, scrollVelocityRef, mousePosRef } = useSkylineInteraction();
+  const isVisibleRef = useRef(isTabVisible);
+  const isIdleRef = useRef(isIdle);
 
   useEffect(() => {
-    if (reducedMotion) return;
-    const unsub = scrollVelocity.on('change', (v) => {
-      velocityRef.current = Math.abs(v);
-    });
-    return unsub;
-  }, [reducedMotion, scrollVelocity]);
+    isVisibleRef.current = isTabVisible;
+  }, [isTabVisible]);
+
+  useEffect(() => {
+    isIdleRef.current = isIdle;
+  }, [isIdle]);
 
   useEffect(() => {
     stateRef.current = state;
     boundingRectRef.current = null;
   }, [state]);
 
-  // Invalidate cached bounding box on scroll/resize (shared context)
   useEffect(() => {
     boundingRectRef.current = null;
   }, [geometryVersion]);
-
-  // Global mousemove and click detection to bypass browser pointer-event bugs (especially Safari parent pointer-events: none bug)
-  useEffect(() => {
-    if (reducedMotion) return;
-
-    const handleGlobalInteraction = (e: MouseEvent) => {
-      if (stateRef.current !== 'sitting') return;
-      if (!catRef.current) return;
-
-      if (!boundingRectRef.current) {
-        boundingRectRef.current = catRef.current.getBoundingClientRect();
-      }
-      const rect = boundingRectRef.current;
-      if (!rect) return;
-
-      const padding = 15;
-      const mouseX = e.clientX;
-      const mouseY = e.clientY;
-
-      const isOver = 
-        mouseX >= rect.left - padding &&
-        mouseX <= rect.right + padding &&
-        mouseY >= rect.top - padding &&
-        mouseY <= rect.bottom + padding;
-
-      if (isOver) {
-        setState('standing');
-      }
-    };
-
-    window.addEventListener('mousemove', handleGlobalInteraction, { capture: true, passive: true });
-    window.addEventListener('click', handleGlobalInteraction, { capture: true, passive: true });
-
-    return () => {
-      window.removeEventListener('mousemove', handleGlobalInteraction, { capture: true });
-      window.removeEventListener('click', handleGlobalInteraction, { capture: true });
-    };
-  }, [reducedMotion]);
 
     // Shared tick drives state machine (single 160ms interval from SkylineInteractionContext)
     useEffect(() => {
       if (reducedMotion) return;
       const currentState = stateRef.current;
 
+      // Mouse/click hit detection (replaces per-creature capture listeners)
+      if (currentState === 'sitting' && catRef.current) {
+        if (!boundingRectRef.current) {
+          boundingRectRef.current = catRef.current.getBoundingClientRect();
+        }
+        const rect = boundingRectRef.current;
+        if (rect) {
+          const padding = 15;
+          const mouse = mousePosRef.current;
+          const isOver =
+            mouse.x >= rect.left - padding &&
+            mouse.x <= rect.right + padding &&
+            mouse.y >= rect.top - padding &&
+            mouse.y <= rect.bottom + padding;
+          if (isOver) {
+            ticksRef.current = 0;
+            setState('standing');
+            return;
+          }
+        }
+      }
+
       if (currentState === 'sitting') {
         ticksRef.current = 0;
-        if (velocityRef.current > 120) {
+        if (scrollVelocityRef.current > 120) {
           setState('alert');
         }
         return;
@@ -98,7 +81,7 @@ const RunningCat: React.FC<LayerProps> = ({ reducedMotion }) => {
       if (currentState === 'alert') {
         if (ticks >= 4) {
           ticksRef.current = 0;
-          if (velocityRef.current > 60) {
+          if (scrollVelocityRef.current > 60) {
             setState('standing');
           } else {
             setState('sitting');
@@ -120,18 +103,8 @@ const RunningCat: React.FC<LayerProps> = ({ reducedMotion }) => {
           setState('jumping');
         }
       } else if (currentState === 'jumping') {
-        const t = ticks;
-        const tMax = 4;
-
-        const nextX = 290 - (t / tMax) * 30;
-        const yLinear = 750 + (t / tMax) * 70;
-        const yArc = 20 * Math.sin(Math.PI * (t / tMax));
-        const nextY = yLinear - yArc;
-
-        setPosX(nextX);
-        setPosY(nextY);
-
-        if (t >= tMax) {
+        // Position driven by RAF effect, only handle state transition here
+        if (ticks >= 4) {
           ticksRef.current = 0;
           setPosX(260);
           setPosY(820);
@@ -168,18 +141,8 @@ const RunningCat: React.FC<LayerProps> = ({ reducedMotion }) => {
           setState('jumping_up');
         }
       } else if (currentState === 'jumping_up') {
-        const t = ticks;
-        const tMax = 4;
-
-        const nextX = 260 + (t / tMax) * 30;
-        const yLinear = 820 - (t / tMax) * 70;
-        const yArc = 20 * Math.sin(Math.PI * (t / tMax));
-        const nextY = yLinear - yArc;
-
-        setPosX(nextX);
-        setPosY(nextY);
-
-        if (t >= tMax) {
+        // Position driven by RAF effect, only handle state transition here
+        if (ticks >= 4) {
           ticksRef.current = 0;
           setPosX(290);
           setPosY(750);
@@ -208,6 +171,40 @@ const RunningCat: React.FC<LayerProps> = ({ reducedMotion }) => {
       }
     }, [tick, reducedMotion]);
 
+  // Smooth position interpolation for jumping states (replaces stepped tick-based positions)
+  useEffect(() => {
+    if (reducedMotion) return;
+    if (state !== 'jumping' && state !== 'jumping_up') return;
+
+    const isJumpingDown = state === 'jumping';
+    const startX = isJumpingDown ? 290 : 260;
+    const endX = isJumpingDown ? 260 : 290;
+    const startY = isJumpingDown ? 750 : 820;
+    const endY = isJumpingDown ? 820 : 750;
+    const duration = 640;
+    let startTime: number | null = null;
+
+    const animate = (timestamp: number) => {
+      if (!isVisibleRef.current || isIdleRef.current) { rafRef.current = null; return; }
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const x = startX + (endX - startX) * progress;
+      const yLinear = startY + (endY - startY) * progress;
+      const yArc = 20 * Math.sin(Math.PI * progress);
+      setPosX(x);
+      setPosY(yLinear - yArc);
+      if (progress < 1) {
+        rafRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    rafRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [state, reducedMotion]);
+
   const handleMouseEnter = () => {
     setState((s) => {
       if (s === 'sitting' || s === 'alert') {
@@ -217,7 +214,7 @@ const RunningCat: React.FC<LayerProps> = ({ reducedMotion }) => {
     });
   };
 
-  const renderFrame = () => {
+  const renderedFrame = useMemo(() => {
     const catFill = 'var(--skyline-cat-fill)';
     const strokeColor = 'var(--skyline-stroke-fg)';
     const eyeColor = 'var(--skyline-cat-eyes)';
@@ -428,7 +425,7 @@ const RunningCat: React.FC<LayerProps> = ({ reducedMotion }) => {
       );
     }
     return element;
-  };
+  }, [state, frameIndex]);
 
   if (reducedMotion) return null;
 
@@ -444,7 +441,7 @@ const RunningCat: React.FC<LayerProps> = ({ reducedMotion }) => {
       }}
     >
       <rect x="-20" y="-35" width="40" height="40" fill="black" opacity="0" style={{ pointerEvents: 'all' }} />
-      {renderFrame()}
+      {renderedFrame}
     </g>
   );
 };

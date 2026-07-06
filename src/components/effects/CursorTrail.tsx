@@ -259,8 +259,8 @@ export default function CursorTrail() {
       const smoke = smokeRef.current;
       
       const smokeCap = perfTierRef.current === 'high' ? 40 : 20;
-      while (smoke.length > smokeCap) {
-        smoke.shift();
+      if (smoke.length > smokeCap) {
+        smoke.splice(0, smoke.length - smokeCap);
       }
 
       for (let i = smoke.length - 1; i >= 0; i--) {
@@ -314,14 +314,15 @@ export default function CursorTrail() {
       smokeRef.current = [];
       cigStateRef.current.initialized = false;
 
-      trailRef.current = trailRef.current
-        .map(dot => ({
-          ...dot,
-          age: dot.age + 1,
-        }))
-        .filter(dot => dot.age < TRAIL_LENGTH);
-
       const trail = trailRef.current;
+      let write = 0;
+      for (let i = 0; i < trail.length; i++) {
+        trail[i].age++;
+        if (trail[i].age < TRAIL_LENGTH) {
+          trail[write++] = trail[i];
+        }
+      }
+      trail.length = write;
 
       if (isMouseActive && idleDuration < 150) {
         trail.unshift({
