@@ -2,7 +2,7 @@
 
 import { ReactLenis, useLenis } from 'lenis/react';
 import { createContext, useContext, useEffect, ReactNode } from 'react';
-import { MotionValue, useMotionValue } from 'framer-motion';
+import { MotionValue, useMotionValue, useReducedMotion } from 'framer-motion';
 
 interface LenisContextValue {
   scrollY: MotionValue<number>;
@@ -14,12 +14,16 @@ const LenisContext = createContext<LenisContextValue | null>(null);
 
 function LenisSync({ children }: { children: ReactNode }) {
   const lenis = useLenis();
+  const prefersReducedMotion = useReducedMotion();
   const scrollY = useMotionValue(0);
   const scrollProgress = useMotionValue(0);
   const velocity = useMotionValue(0);
 
   useEffect(() => {
     if (!lenis) return;
+
+    if (prefersReducedMotion) return;
+
     let lastCall = 0;
     const THROTTLE_MS = 33;
     const unsub = lenis.on('scroll', () => {
@@ -31,7 +35,7 @@ function LenisSync({ children }: { children: ReactNode }) {
       velocity.set(lenis.velocity);
     });
     return unsub;
-  }, [lenis, scrollY, scrollProgress, velocity]);
+  }, [lenis, scrollY, scrollProgress, velocity, prefersReducedMotion]);
 
   return (
     <LenisContext.Provider value={{ scrollY, scrollProgress, velocity }}>

@@ -298,6 +298,8 @@ html {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   hanging-punctuation: first last;
+  overscroll-behavior: none;
+  scroll-behavior: auto;
 }
 
 body {

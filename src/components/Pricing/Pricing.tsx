@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useTheme } from '@/context/ThemeContext';
 import Scrambler from '@/components/ui/Scrambler';
 import type { ScramblerProps } from '@/components/ui/Scrambler';
@@ -24,6 +24,7 @@ const PRICING_SECTION_TITLE_TEXTS: ScramblerProps['texts'] = {
 function Pricing({ resumeData }: PricingProps) {
   const { isNoir, audience } = useTheme();
   const lenis = useLenis();
+  const prefersReducedMotion = useReducedMotion();
 
   const activeAudience = audience || 'developer';
 
@@ -118,7 +119,7 @@ function Pricing({ resumeData }: PricingProps) {
 
     // Scroll to contact form
     if (lenis) {
-      lenis.scrollTo('#contact', { duration: 1.5, offset: NAVBAR_SCROLL_OFFSET });
+      lenis.scrollTo('#contact', { duration: prefersReducedMotion ? 0 : 1.5, offset: NAVBAR_SCROLL_OFFSET });
     } else {
       document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
     }

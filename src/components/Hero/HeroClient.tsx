@@ -4,6 +4,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useLenis } from 'lenis/react';
+import { useReducedMotion } from 'framer-motion';
 import { useTypewriter } from '@/hooks/useTypewriter';
 import { NAVBAR_SCROLL_OFFSET } from '@/lib/constants';
 import { useTheme } from '@/context/ThemeContext';
@@ -116,6 +117,7 @@ const HERO_COPY: Record<'developer' | 'business', Record<'light' | 'noir', HeroC
 function HeroClientContent({ taglines }: HeroClientProps) {
   const { isNoir, audience } = useTheme();
   const lenis = useLenis();
+  const prefersReducedMotion = useReducedMotion();
 
   // Resolve dynamic tags list based on active audience and theme
   const list = useMemo(() => {
@@ -159,7 +161,7 @@ function HeroClientContent({ taglines }: HeroClientProps) {
   const handleScrollToCTA = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     if (lenis) {
-      lenis.scrollTo(copy.ctaLink, { duration: 1.5, offset: NAVBAR_SCROLL_OFFSET });
+      lenis.scrollTo(copy.ctaLink, { duration: prefersReducedMotion ? 0 : 1.5, offset: NAVBAR_SCROLL_OFFSET });
     }
   };
 

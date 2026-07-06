@@ -71,6 +71,8 @@ export default function ScrollSection({ children, verticalOffset, centerOnly, ga
 
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
+    if (prefersReducedMotion || isMobile) return;
+
     const el = wrapperRef.current;
     if (!el) return;
 
@@ -157,7 +159,7 @@ export default function ScrollSection({ children, verticalOffset, centerOnly, ga
       ro.disconnect();
       unsub();
     };
-  }, [scrollY]);
+  }, [scrollY, prefersReducedMotion, isMobile]);
   /* eslint-enable react-hooks/exhaustive-deps */
 
   if (prefersReducedMotion || isMobile) {

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef, type MouseEvent } from 'react';
 import { usePathname } from 'next/navigation';
 import { useLenis } from 'lenis/react';
+import { useReducedMotion } from 'framer-motion';
 import { Sun, Moon, Code2, Briefcase } from 'lucide-react';
 import { useTheme, type Audience } from '@/context/ThemeContext';
 import { useLenisScroll } from '@/context/LenisProvider';
@@ -75,6 +76,7 @@ export default function Navbar({ items, className }: NavbarProps) {
 
   const { scrollY } = useLenisScroll();
   const lenis = useLenis();
+  const prefersReducedMotion = useReducedMotion();
 
   /* ---------- Scroll tracking for background & blur ---------- */
   useEffect(() => {
@@ -155,7 +157,7 @@ export default function Navbar({ items, className }: NavbarProps) {
         // Resume Lenis immediately so the scroll animation can execute.
         // If we don't call start() here, the scrollTo call is ignored because Lenis was stopped when the mobile menu opened.
         lenis.start();
-        lenis.scrollTo(anchorId, { duration: 1.5, offset: NAVBAR_SCROLL_OFFSET });
+        lenis.scrollTo(anchorId, { duration: prefersReducedMotion ? 0 : 1.5, offset: NAVBAR_SCROLL_OFFSET });
       }
       setActiveSection(href);
       setMobileOpen(false);
