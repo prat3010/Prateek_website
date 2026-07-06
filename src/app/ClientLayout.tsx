@@ -8,6 +8,7 @@ import Footer from '@/components/ui/Footer';
 import type { Theme, Audience } from '@/context/ThemeContext';
 import { ThemeProvider, useTheme } from '@/context/ThemeContext';
 import { LenisProvider } from '@/context/LenisProvider';
+import { PerformanceGovernorProvider } from '@/context/PerformanceGovernor';
 import ThemeTransition from '@/components/effects/ThemeTransition';
 import { LazyMotion, domAnimation } from 'framer-motion';
 import OnboardingSelector from '@/components/ui/OnboardingSelector';
@@ -42,23 +43,25 @@ function ClientLayoutContent({
   const { audience } = useTheme();
 
   return (
-    <LenisProvider>
-      <ThemeTransition />
-      {!isAdminRoute && <NoirSkyline />}
-      {!isAdminRoute && <CursorTrail />}
-      {!isAdminRoute && <Navbar />}
-      
-      {audience === null ? (
-        <OnboardingSelector />
-      ) : (
-        <main>{children}</main>
-      )}
+    <PerformanceGovernorProvider>
+      <LenisProvider>
+        <ThemeTransition />
+        {!isAdminRoute && <NoirSkyline />}
+        {!isAdminRoute && <CursorTrail />}
+        {!isAdminRoute && <Navbar />}
+        
+        {audience === null ? (
+          <OnboardingSelector />
+        ) : (
+          <main>{children}</main>
+        )}
 
-      {!isAdminRoute && <Footer />}
-      {!isAdminRoute && <ZenToggle />}
-      {!isAdminRoute && <TerminalButton />}
-      {!isAdminRoute && isKonamiActive && <ThreeGremlinParade />}
-    </LenisProvider>
+        {!isAdminRoute && <Footer />}
+        {!isAdminRoute && <ZenToggle />}
+        {!isAdminRoute && <TerminalButton />}
+        {!isAdminRoute && isKonamiActive && <ThreeGremlinParade />}
+      </LenisProvider>
+    </PerformanceGovernorProvider>
   );
 }
 

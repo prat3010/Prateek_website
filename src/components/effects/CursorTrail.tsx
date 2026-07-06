@@ -3,6 +3,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { useTheme } from '@/context/ThemeContext';
 import { useLenisScroll } from '@/context/LenisProvider';
+import { usePerformanceGovernor } from '@/context/PerformanceGovernor';
 import styles from './CursorTrail.module.css';
 
 const POP_COLORS = ['#D95D67', '#5A8EB6', '#F4DC95', '#DF8B98', '#79B48B', '#E28E66'];
@@ -126,9 +127,12 @@ const drawCigarette = (ctx: CanvasRenderingContext2D, x: number, y: number, angl
 
 export default function CursorTrail() {
   const { isNoir } = useTheme();
+  const { performanceTier } = usePerformanceGovernor();
   const [isTouch] = useState(
     () => typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
   );
+  const perfTierRef = useRef(performanceTier);
+  useEffect(() => { perfTierRef.current = performanceTier; }, [performanceTier]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const trailRef = useRef<TrailDot[]>([]);
   const smokeRef = useRef<SmokeParticle[]>([]);
@@ -254,7 +258,8 @@ export default function CursorTrail() {
 
       const smoke = smokeRef.current;
       
-      while (smoke.length > 40) {
+      const smokeCap = perfTierRef.current === 'high' ? 40 : 20;
+      while (smoke.length > smokeCap) {
         smoke.shift();
       }
 
@@ -390,7 +395,7 @@ export default function CursorTrail() {
     if (!canvas) return;
 
     const handleResize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      const dpr = Math.min(window.devicePixelRatio || 1, perfTierRef.current === 'high' ? 1.5 : 1.0);
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
       canvas.style.width = `${window.innerWidth}px`;
@@ -431,7 +436,7 @@ export default function CursorTrail() {
     };
   }, [isTouch, wakeLoop]);
 
-  if (isTouch) {
+  if (isTouch || performanceTier === 'low') {
     return null;
   }
 

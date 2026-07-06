@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { m, useTransform, useMotionValue, useSpring } from 'framer-motion';
 import { useTheme, useThemeTransition } from '@/context/ThemeContext';
 import { useLenisScroll } from '@/context/LenisProvider';
+import { usePerformanceGovernor } from '@/context/PerformanceGovernor';
 import { SkylineInteractionProvider } from './SkylineInteractionContext';
 import styles from './NoirSkyline.module.css';
 
@@ -17,6 +18,9 @@ import Layer3 from './skyline/Layer3';
 function SkylineInner() {
   const { theme } = useTheme();
   const { isTransitioning } = useThemeTransition();
+  const { performanceTier } = usePerformanceGovernor();
+  const perfTierRef = useRef(performanceTier);
+  useEffect(() => { perfTierRef.current = performanceTier; }, [performanceTier]);
   const [mounted] = useState(true);
   const { scrollProgress: scrollYProgress } = useLenisScroll();
   const isTransitioningRef = useRef(isTransitioning);
@@ -111,6 +115,7 @@ function SkylineInner() {
     let rafId: number | null = null;
     const handleMouseMove = (e: MouseEvent) => {
       if (isTransitioningRef.current) return;
+      if (perfTierRef.current === 'low') return;
       const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
       if (mediaQuery.matches || isMobileDevice) return;
       if (rafId) cancelAnimationFrame(rafId);
