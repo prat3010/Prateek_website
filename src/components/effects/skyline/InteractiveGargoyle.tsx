@@ -77,7 +77,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
   const stateStartTimeRef = useRef<number>(0);
   const rafRef = useRef<number | null>(null);
   const boundingRectRef = useRef<DOMRect | null>(null);
-  const { isTabVisible, isIdle, geometryVersion } = useSkylineInteraction();
+  const { tick, isTabVisible, isIdle, geometryVersion } = useSkylineInteraction();
   const isVisibleRef = useRef(isTabVisible);
   const isIdleRef = useRef(isIdle);
 
@@ -217,79 +217,70 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
     };
   }, [state, reducedMotion]);
 
-  // State flow interval timer (80ms ticks)
+  // Shared tick drives state machine (single 80ms interval from SkylineInteractionContext)
   useEffect(() => {
     if (reducedMotion) return;
+    const currentState = stateRef.current;
+    ticksRef.current++;
+    const ticks = ticksRef.current;
 
-    const interval = setInterval(() => {
-      if (!isVisibleRef.current || isIdleRef.current) return;
-      const currentState = stateRef.current;
-      ticksRef.current++;
-      const ticks = ticksRef.current;
+    const isFlying = ['leaping', 'gliding_fg', 'gliding_bg', 'returning', 'landing'].includes(currentState);
+    if (isFlying) {
+      setFrameIndex((f) => (f + 1) % 6);
+    } else {
+      setFrameIndex(0);
+    }
 
-      const isFlying = ['leaping', 'gliding_fg', 'gliding_bg', 'returning', 'landing'].includes(currentState);
-      if (isFlying) {
-        setFrameIndex((f) => (f + 1) % 6);
-      } else {
-        setFrameIndex(0);
+    if (currentState === 'sitting') {
+      // High scroll velocity awakens the gargoyle
+      if (velocityRef.current > 200) {
+        ticksRef.current = 0;
+        setState('awakening');
+      } else if (ticks >= 80) { // every 6.4 seconds, blink eyes
+        ticksRef.current = 0;
+        setState('blinking');
       }
-
-      if (currentState === 'sitting') {
-        // High scroll velocity awakens the gargoyle
-        if (velocityRef.current > 200) {
-          ticksRef.current = 0;
-          setState('awakening');
-        } else if (ticks >= 80) { // every 6.4 seconds, blink eyes
-          ticksRef.current = 0;
-          setState('blinking');
-        }
-      } else if (currentState === 'blinking') {
-        // Can be startled mid-blink by fast scroll
-        if (velocityRef.current > 200) {
-          ticksRef.current = 0;
-          setState('awakening');
-        } else if (ticks >= 6) { // blink duration
-          ticksRef.current = 0;
-          setState('sitting');
-        }
-      } else if (currentState === 'awakening') {
-        if (ticks >= 6) {
-          ticksRef.current = 0;
-          setState('leaping');
-        }
-      } else if (currentState === 'leaping') {
-        if (ticks >= 8) {
-          ticksRef.current = 0;
-          setState('gliding_fg');
-        }
-      } else if (currentState === 'gliding_fg') {
-        // Total distance is 1440px. At 20px/tick, that's exactly 72 ticks
-        if (ticks >= 72) {
-          ticksRef.current = 0;
-          setState('gliding_bg');
-        }
-      } else if (currentState === 'gliding_bg') {
-        // Total distance is 2080px. At 10px/tick, that's exactly 208 ticks
-        if (ticks >= 208) {
-          ticksRef.current = 0;
-          setState('returning');
-        }
-      } else if (currentState === 'returning') {
-        // Total distance is 512px. At 20px/tick, that's exactly 26 ticks
-        if (ticks >= 26) {
-          ticksRef.current = 0;
-          setState('landing');
-        }
-      } else if (currentState === 'landing') {
-        if (ticks >= 6) {
-          ticksRef.current = 0;
-          setState('sitting');
-        }
+    } else if (currentState === 'blinking') {
+      // Can be startled mid-blink by fast scroll
+      if (velocityRef.current > 200) {
+        ticksRef.current = 0;
+        setState('awakening');
+      } else if (ticks >= 6) { // blink duration
+        ticksRef.current = 0;
+        setState('sitting');
       }
-    }, 80);
-
-    return () => clearInterval(interval);
-  }, [reducedMotion]);
+    } else if (currentState === 'awakening') {
+      if (ticks >= 6) {
+        ticksRef.current = 0;
+        setState('leaping');
+      }
+    } else if (currentState === 'leaping') {
+      if (ticks >= 8) {
+        ticksRef.current = 0;
+        setState('gliding_fg');
+      }
+    } else if (currentState === 'gliding_fg') {
+      if (ticks >= 72) {
+        ticksRef.current = 0;
+        setState('gliding_bg');
+      }
+    } else if (currentState === 'gliding_bg') {
+      if (ticks >= 208) {
+        ticksRef.current = 0;
+        setState('returning');
+      }
+    } else if (currentState === 'returning') {
+      if (ticks >= 26) {
+        ticksRef.current = 0;
+        setState('landing');
+      }
+    } else if (currentState === 'landing') {
+      if (ticks >= 6) {
+        ticksRef.current = 0;
+        setState('sitting');
+      }
+    }
+  }, [tick, reducedMotion]);
 
   // ── Pigeon on the same pedestal ──
   const [pigeonOffsetX, setPigeonOffsetX] = useState(0);

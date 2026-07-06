@@ -25,7 +25,7 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
 
   const sideRef = useRef(side);
   const boundingRectRef = useRef<DOMRect | null>(null);
-  const { isTabVisible, isIdle, geometryVersion } = useSkylineInteraction();
+  const { tick, isTabVisible, isIdle, geometryVersion } = useSkylineInteraction();
   const isVisibleRef = useRef(isTabVisible);
   const isIdleRef = useRef(isIdle);
 
@@ -124,16 +124,13 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
     return () => window.removeEventListener('mousemove', handleInteraction, { capture: true });
   }, [reducedMotion]);
 
+  // Shared tick drives velocity-based alert state (80ms tick from SkylineInteractionContext replaces former 200ms interval)
   useEffect(() => {
     if (reducedMotion) return;
-    const interval = setInterval(() => {
-      if (!isVisibleRef.current || isIdleRef.current) return;
-      const vel = velocityRef.current;
-      if (vel > 60 && !alertRef.current && !scurryingRef.current) setAlert(true);
-      else if (vel <= 60 && alertRef.current && !scurryingRef.current) setAlert(false);
-    }, 200);
-    return () => clearInterval(interval);
-  }, [reducedMotion]);
+    const vel = velocityRef.current;
+    if (vel > 60 && !alertRef.current && !scurryingRef.current) setAlert(true);
+    else if (vel <= 60 && alertRef.current && !scurryingRef.current) setAlert(false);
+  }, [tick, reducedMotion]);
 
   useEffect(() => {
     return () => {

@@ -29,7 +29,9 @@ interface SmokeParticle {
   maxLifetime: number;
 }
 
-const drawCigarette = (ctx: CanvasRenderingContext2D, x: number, y: number, angle: number, fade: number = 1.0) => {
+let prevMousePos = { x: -100, y: -100 };
+
+const drawCigarette = (ctx: CanvasRenderingContext2D, x: number, y: number, angle: number, fade: number = 1.0, moving: boolean = false) => {
   const L = 35;
   const W = 6;
   
@@ -84,22 +86,34 @@ const drawCigarette = (ctx: CanvasRenderingContext2D, x: number, y: number, angl
   
   // 4. Glowing Ember (lit tip) at the active tip
   if (ashLength > 0) {
-    ctx.save();
-    ctx.shadowColor = '#FF3C00';
-    ctx.shadowBlur = 8;
-    ctx.fillStyle = '#FF5500';
-    ctx.beginPath();
-    ctx.arc(ashStart, 0, W / 2, -Math.PI / 2, Math.PI / 2);
-    ctx.fill();
-    
-    // Inner white-hot core
-    ctx.shadowColor = '#FFFFCC';
-    ctx.shadowBlur = 4;
-    ctx.fillStyle = '#FFFFE0';
-    ctx.beginPath();
-    ctx.arc(ashStart, 0, W / 3, -Math.PI / 2, Math.PI / 2);
-    ctx.fill();
-    ctx.restore();
+    // Skip expensive shadowBlur when mouse is moving rapidly
+    if (moving) {
+      ctx.fillStyle = '#FF5500';
+      ctx.beginPath();
+      ctx.arc(ashStart, 0, W / 2, -Math.PI / 2, Math.PI / 2);
+      ctx.fill();
+      ctx.fillStyle = '#FFFFE0';
+      ctx.beginPath();
+      ctx.arc(ashStart, 0, W / 3, -Math.PI / 2, Math.PI / 2);
+      ctx.fill();
+    } else {
+      ctx.save();
+      ctx.shadowColor = '#FF3C00';
+      ctx.shadowBlur = 8;
+      ctx.fillStyle = '#FF5500';
+      ctx.beginPath();
+      ctx.arc(ashStart, 0, W / 2, -Math.PI / 2, Math.PI / 2);
+      ctx.fill();
+
+      // Inner white-hot core
+      ctx.shadowColor = '#FFFFCC';
+      ctx.shadowBlur = 4;
+      ctx.fillStyle = '#FFFFE0';
+      ctx.beginPath();
+      ctx.arc(ashStart, 0, W / 3, -Math.PI / 2, Math.PI / 2);
+      ctx.fill();
+      ctx.restore();
+    }
   }
   
   // 5. Outline of the remaining cigarette
@@ -264,6 +278,11 @@ export default function CursorTrail() {
           continue;
         }
 
+        if (p.opacity < 0.02) {
+          smoke.splice(i, 1);
+          continue;
+        }
+
         const template = getSmokeTemplate();
         ctx.save();
         ctx.globalAlpha = p.opacity;
@@ -278,9 +297,11 @@ export default function CursorTrail() {
       }
 
       if (isMouseActive && fade > 0) {
+        const moving = Math.hypot(x - prevMousePos.x, y - prevMousePos.y) > 2;
+        prevMousePos = { x, y };
         ctx.save();
         ctx.globalAlpha = fade;
-        drawCigarette(ctx, cig.x, cig.y, cig.angle, fade);
+        drawCigarette(ctx, cig.x, cig.y, cig.angle, fade, moving);
         ctx.restore();
       }
 
@@ -369,7 +390,7 @@ export default function CursorTrail() {
     if (!canvas) return;
 
     const handleResize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
       canvas.style.width = `${window.innerWidth}px`;

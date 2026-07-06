@@ -21,17 +21,7 @@ const RunningCat: React.FC<LayerProps> = ({ reducedMotion }) => {
   const { velocity: scrollVelocity } = useLenisScroll();
 
   const boundingRectRef = useRef<DOMRect | null>(null);
-  const { isTabVisible, isIdle, geometryVersion } = useSkylineInteraction();
-  const isVisibleRef = useRef(isTabVisible);
-  const isIdleRef = useRef(isIdle);
-
-  useEffect(() => {
-    isVisibleRef.current = isTabVisible;
-  }, [isTabVisible]);
-
-  useEffect(() => {
-    isIdleRef.current = isIdle;
-  }, [isIdle]);
+  const { tick, geometryVersion } = useSkylineInteraction();
 
   useEffect(() => {
     if (reducedMotion) return;
@@ -65,7 +55,7 @@ const RunningCat: React.FC<LayerProps> = ({ reducedMotion }) => {
       const rect = boundingRectRef.current;
       if (!rect) return;
 
-      const padding = 15; // px hover boundary padding
+      const padding = 15;
       const mouseX = e.clientX;
       const mouseY = e.clientY;
 
@@ -89,139 +79,134 @@ const RunningCat: React.FC<LayerProps> = ({ reducedMotion }) => {
     };
   }, [reducedMotion]);
 
+  // Shared tick drives state machine (single 80ms interval from SkylineInteractionContext)
   useEffect(() => {
     if (reducedMotion) return;
+    const currentState = stateRef.current;
 
-    const interval = setInterval(() => {
-      if (!isVisibleRef.current || isIdleRef.current) return;
-      const currentState = stateRef.current;
+    if (currentState === 'sitting') {
+      ticksRef.current = 0;
+      if (velocityRef.current > 120) {
+        setState('alert');
+      }
+      return;
+    }
 
-      if (currentState === 'sitting') {
+    ticksRef.current++;
+    const ticks = ticksRef.current;
+
+    if (currentState === 'alert') {
+      if (ticks >= 8) {
         ticksRef.current = 0;
-        if (velocityRef.current > 120) {
-          setState('alert');
-        }
-        return;
-      }
-
-      ticksRef.current++;
-      const ticks = ticksRef.current;
-
-      if (currentState === 'alert') {
-        if (ticks >= 8) {
-          ticksRef.current = 0;
-          if (velocityRef.current > 60) {
-            setState('standing');
-          } else {
-            setState('sitting');
-          }
-        }
-        return;
-      }
-
-      if (currentState === 'standing') {
-        if (ticks >= 10) {
-          ticksRef.current = 0;
-          setState('walking');
-        }
-      } else if (currentState === 'walking') {
-        setPosX((x) => x - 3);
-        setFrameIndex((f) => (f + 1) % 2);
-        if (ticks >= 10) {
-          ticksRef.current = 0;
-          setState('jumping');
-        }
-      } else if (currentState === 'jumping') {
-        const t = ticks;
-        const tMax = 8;
-
-        const nextX = 290 - (t / tMax) * 30;
-        const yLinear = 750 + (t / tMax) * 70;
-        const yArc = 20 * Math.sin(Math.PI * (t / tMax));
-        const nextY = yLinear - yArc;
-
-        setPosX(nextX);
-        setPosY(nextY);
-
-        if (t >= tMax) {
-          ticksRef.current = 0;
-          setPosX(260);
-          setPosY(820);
-          setState('landing');
-        }
-      } else if (currentState === 'landing') {
-        if (ticks >= 4) {
-          ticksRef.current = 0;
-          setState('running');
-        }
-      } else if (currentState === 'running') {
-        setPosX((x) => Math.max(-50, x - 12));
-        setFrameIndex((f) => (f + 1) % 4);
-
-        if (ticks >= 26) {
-          ticksRef.current = 0;
-          setState('hidden');
-        }
-      } else if (currentState === 'hidden') {
-        if (ticks >= 40) { // 3.2 seconds delay hidden off-screen
-          ticksRef.current = 0;
-          setPosX(-50);
-          setPosY(820);
-          setState('returning');
-        }
-      } else if (currentState === 'returning') {
-        setPosX((x) => Math.min(260, x + 3));
-        setFrameIndex((f) => (f + 1) % 2);
-
-        if (ticks >= 103) { // 310px / 3 = 103 ticks
-          ticksRef.current = 0;
-          setPosX(260);
-          setPosY(820);
-          setState('jumping_up');
-        }
-      } else if (currentState === 'jumping_up') {
-        const t = ticks;
-        const tMax = 8;
-
-        const nextX = 260 + (t / tMax) * 30;
-        const yLinear = 820 - (t / tMax) * 70;
-        const yArc = 20 * Math.sin(Math.PI * (t / tMax));
-        const nextY = yLinear - yArc;
-
-        setPosX(nextX);
-        setPosY(nextY);
-
-        if (t >= tMax) {
-          ticksRef.current = 0;
-          setPosX(290);
-          setPosY(750);
-          setState('landing_up');
-        }
-      } else if (currentState === 'landing_up') {
-        if (ticks >= 4) {
-          ticksRef.current = 0;
-          setState('walking_back');
-        }
-      } else if (currentState === 'walking_back') {
-        setPosX((x) => Math.min(320, x + 3));
-        setFrameIndex((f) => (f + 1) % 2);
-
-        if (ticks >= 10) {
-          ticksRef.current = 0;
-          setPosX(320);
-          setPosY(750);
-          setState('sitting_down');
-        }
-      } else if (currentState === 'sitting_down') {
-        if (ticks >= 4) {
-          ticksRef.current = 0;
+        if (velocityRef.current > 60) {
+          setState('standing');
+        } else {
           setState('sitting');
         }
       }
-    }, 80);
+      return;
+    }
 
-    return () => clearInterval(interval);
-  }, [reducedMotion]);
+    if (currentState === 'standing') {
+      if (ticks >= 10) {
+        ticksRef.current = 0;
+        setState('walking');
+      }
+    } else if (currentState === 'walking') {
+      setPosX((x) => x - 3);
+      setFrameIndex((f) => (f + 1) % 2);
+      if (ticks >= 10) {
+        ticksRef.current = 0;
+        setState('jumping');
+      }
+    } else if (currentState === 'jumping') {
+      const t = ticks;
+      const tMax = 8;
+
+      const nextX = 290 - (t / tMax) * 30;
+      const yLinear = 750 + (t / tMax) * 70;
+      const yArc = 20 * Math.sin(Math.PI * (t / tMax));
+      const nextY = yLinear - yArc;
+
+      setPosX(nextX);
+      setPosY(nextY);
+
+      if (t >= tMax) {
+        ticksRef.current = 0;
+        setPosX(260);
+        setPosY(820);
+        setState('landing');
+      }
+    } else if (currentState === 'landing') {
+      if (ticks >= 4) {
+        ticksRef.current = 0;
+        setState('running');
+      }
+    } else if (currentState === 'running') {
+      setPosX((x) => Math.max(-50, x - 12));
+      setFrameIndex((f) => (f + 1) % 4);
+
+      if (ticks >= 26) {
+        ticksRef.current = 0;
+        setState('hidden');
+      }
+    } else if (currentState === 'hidden') {
+      if (ticks >= 40) {
+        ticksRef.current = 0;
+        setPosX(-50);
+        setPosY(820);
+        setState('returning');
+      }
+    } else if (currentState === 'returning') {
+      setPosX((x) => Math.min(260, x + 3));
+      setFrameIndex((f) => (f + 1) % 2);
+
+      if (ticks >= 103) {
+        ticksRef.current = 0;
+        setPosX(260);
+        setPosY(820);
+        setState('jumping_up');
+      }
+    } else if (currentState === 'jumping_up') {
+      const t = ticks;
+      const tMax = 8;
+
+      const nextX = 260 + (t / tMax) * 30;
+      const yLinear = 820 - (t / tMax) * 70;
+      const yArc = 20 * Math.sin(Math.PI * (t / tMax));
+      const nextY = yLinear - yArc;
+
+      setPosX(nextX);
+      setPosY(nextY);
+
+      if (t >= tMax) {
+        ticksRef.current = 0;
+        setPosX(290);
+        setPosY(750);
+        setState('landing_up');
+      }
+    } else if (currentState === 'landing_up') {
+      if (ticks >= 4) {
+        ticksRef.current = 0;
+        setState('walking_back');
+      }
+    } else if (currentState === 'walking_back') {
+      setPosX((x) => Math.min(320, x + 3));
+      setFrameIndex((f) => (f + 1) % 2);
+
+      if (ticks >= 10) {
+        ticksRef.current = 0;
+        setPosX(320);
+        setPosY(750);
+        setState('sitting_down');
+      }
+    } else if (currentState === 'sitting_down') {
+      if (ticks >= 4) {
+        ticksRef.current = 0;
+        setState('sitting');
+      }
+    }
+  }, [tick, reducedMotion]);
 
   const handleMouseEnter = () => {
     setState((s) => {

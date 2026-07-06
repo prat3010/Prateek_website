@@ -5,6 +5,7 @@ import React, { createContext, useContext, useEffect, useRef, useState, useCallb
 interface SkylineInteractionValue {
   isTabVisible: boolean;
   isIdle: boolean;
+  tick: number;
   geometryVersion: number;
 }
 
@@ -17,10 +18,12 @@ const ACTIVITY_EVENTS = ['mousemove', 'wheel', 'click', 'keydown', 'touchstart']
 export function SkylineInteractionProvider({ children }: { children: ReactNode }) {
   const [isTabVisible, setIsTabVisible] = useState(true);
   const [isIdle, setIsIdle] = useState(false);
+  const [tick, setTick] = useState(0);
   const geometryVersionRef = useRef(0);
   const [geometryVersion, setGeometryVersion] = useState(0);
   const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isIdleRef = useRef(false);
+  const isTabVisibleRef = useRef(true);
 
   const clearIdleTimer = useCallback(() => {
     if (idleTimerRef.current !== null) {
@@ -47,7 +50,9 @@ export function SkylineInteractionProvider({ children }: { children: ReactNode }
 
   useEffect(() => {
     const handleVisibility = () => {
-      setIsTabVisible(!document.hidden);
+      const visible = !document.hidden;
+      setIsTabVisible(visible);
+      isTabVisibleRef.current = visible;
     };
     document.addEventListener('visibilitychange', handleVisibility);
     return () => document.removeEventListener('visibilitychange', handleVisibility);
@@ -65,6 +70,16 @@ export function SkylineInteractionProvider({ children }: { children: ReactNode }
       }
     };
   }, [startIdleTimer, clearIdleTimer, resetIdle]);
+
+  // Single shared 80ms tick for all skyline animated characters
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (isTabVisibleRef.current && !isIdleRef.current) {
+        setTick(t => t + 1);
+      }
+    }, 80);
+    return () => clearInterval(id);
+  }, []);
 
   const invalidateGeometry = useCallback(() => {
     geometryVersionRef.current += 1;
@@ -88,7 +103,7 @@ export function SkylineInteractionProvider({ children }: { children: ReactNode }
   }, [invalidateGeometry]);
 
   return (
-    <SkylineInteractionContext.Provider value={{ isTabVisible, isIdle, geometryVersion }}>
+    <SkylineInteractionContext.Provider value={{ isTabVisible, isIdle, tick, geometryVersion }}>
       {children}
     </SkylineInteractionContext.Provider>
   );

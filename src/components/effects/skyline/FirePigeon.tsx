@@ -17,7 +17,7 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
   const { velocity: scrollVelocity } = useLenisScroll();
 
   const boundingRectRef = useRef<DOMRect | null>(null);
-  const { isTabVisible, isIdle, geometryVersion } = useSkylineInteraction();
+  const { tick, isTabVisible, isIdle, geometryVersion } = useSkylineInteraction();
   const isVisibleRef = useRef(isTabVisible);
   const isIdleRef = useRef(isIdle);
 
@@ -124,46 +124,40 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
 
   useEffect(() => {
     if (reducedMotion) return;
-    const interval = setInterval(() => {
-      if (!isVisibleRef.current || isIdleRef.current) return;
-      const currentState = stateRef.current;
-      if (currentState === 'idle') {
+    const currentState = stateRef.current;
+    if (currentState === 'idle') {
+      ticksRef.current = 0;
+      if (velocityRef.current > 60) setState('alert');
+      return;
+    }
+    ticksRef.current++;
+    const ticks = ticksRef.current;
+    if (currentState === 'alert') {
+      if (ticks >= 4) {
         ticksRef.current = 0;
-        if (velocityRef.current > 60) setState('alert');
-        return;
+        setState(velocityRef.current > 60 ? 'hopping_down' : 'idle');
       }
-      ticksRef.current++;
-      const ticks = ticksRef.current;
-      if (currentState === 'alert') {
-        if (ticks >= 4) {
-          ticksRef.current = 0;
-          setState(velocityRef.current > 60 ? 'hopping_down' : 'idle');
-        }
-        return;
+      return;
+    }
+    if (currentState === 'hopping_down') {
+      if (ticks >= 6) {
+        ticksRef.current = 0;
+        setPosY(PLATFORMS[1]);
+        setState('waiting');
       }
-      if (currentState === 'hopping_down') {
-        // Position is handled by requestAnimationFrame, interval handles duration timer
-        if (ticks >= 6) {
-          ticksRef.current = 0;
-          setPosY(PLATFORMS[1]);
-          setState('waiting');
-        }
-      } else if (currentState === 'waiting') {
-        if (ticks >= 36) {
-          ticksRef.current = 0;
-          setState('hopping_up');
-        }
-      } else if (currentState === 'hopping_up') {
-        // Position is handled by requestAnimationFrame, interval handles duration timer
-        if (ticks >= 6) {
-          ticksRef.current = 0;
-          setPosY(PLATFORMS[0]);
-          setState('idle');
-        }
+    } else if (currentState === 'waiting') {
+      if (ticks >= 36) {
+        ticksRef.current = 0;
+        setState('hopping_up');
       }
-    }, 80);
-    return () => clearInterval(interval);
-  }, [reducedMotion]);
+    } else if (currentState === 'hopping_up') {
+      if (ticks >= 6) {
+        ticksRef.current = 0;
+        setPosY(PLATFORMS[0]);
+        setState('idle');
+      }
+    }
+  }, [tick, reducedMotion]);
 
   if (reducedMotion) return null;
 
