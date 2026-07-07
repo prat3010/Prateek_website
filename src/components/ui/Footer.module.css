@@ -57,11 +57,11 @@
 
 .comicPanel {
   background-color: var(--pop-white);
-  border: 3.5px solid var(--pop-black);
+  border: 1px solid var(--color-border);
   border-radius: 16px;
   padding: 24px;
-  box-shadow: var(--shadow-comic);
-  transition: transform 0.3s var(--ease-comic), box-shadow 0.3s var(--ease-comic), background-color 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: transform 0.3s var(--ease-comic), box-shadow 0.25s ease, background-color 0.2s ease, border-color 0.25s ease;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -85,8 +85,8 @@
 
 /* Lift and straighten panel on hover */
 .comicPanel:hover {
-  transform: translate(-6px, -6px) rotate(0deg);
-  box-shadow: var(--shadow-comic-hover);
+  transform: translateY(-2px) rotate(0deg);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   background-color: #ffffff;
 }
 
@@ -158,20 +158,20 @@
   padding: 8px 12px;
   background-color: var(--pop-cream);
   color: var(--pop-black);
-  border: 2px solid var(--pop-black);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   font-family: var(--font-headline);
   font-size: 0.85rem;
   font-weight: 800;
   text-transform: uppercase;
   text-decoration: none;
-  box-shadow: var(--shadow-comic-sm);
-  transition: all 0.2s var(--ease-comic);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease, box-shadow 0.25s ease;
 }
 
 .comicNavLink:hover {
-  transform: translate(-3px, -3px) rotate(-1.5deg);
-  box-shadow: var(--shadow-comic);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   color: var(--pop-black);
 }
 
@@ -198,12 +198,12 @@
   width: 44px;
   height: 44px;
   background-color: var(--pop-white);
-  border: 2px solid var(--pop-black);
+  border: 1px solid var(--color-border);
   border-radius: 50%;
   color: var(--pop-black);
   text-decoration: none;
-  box-shadow: var(--shadow-comic-sm);
-  transition: all 0.2s var(--ease-comic);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease, box-shadow 0.25s ease;
   overflow: visible;
 }
 
@@ -236,8 +236,8 @@
 
 /* Custom colors and tilt on hover */
 .comicSocialLink:hover {
-  transform: scale(1.15) translate(-3px, -3px) rotate(-8deg);
-  box-shadow: var(--shadow-comic);
+  transform: scale(1.15) translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   color: var(--pop-white);
   border-color: var(--pop-black);
 }
@@ -266,7 +266,7 @@
   padding: 4px 8px;
   background-color: var(--pop-yellow);
   color: var(--pop-black);
-  border: 1.5px solid var(--pop-black);
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   font-family: var(--font-headline);
   font-size: 0.7rem;
@@ -274,8 +274,8 @@
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
-  transition: all 0.2s var(--ease-comic);
-  box-shadow: 2px 2px 0px rgba(0,0,0,0.8);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   z-index: 10;
 }
 
@@ -577,15 +577,15 @@
   color: var(--pop-black);
   padding: 6px 12px;
   background-color: var(--pop-white);
-  border: 2px solid var(--pop-black);
-  border-radius: 6px;
-  box-shadow: var(--shadow-comic-sm);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .comicView .analyticsLink:hover {
   background-color: var(--pop-yellow);
-  transform: scale(1.05) rotate(-1.5deg);
-  box-shadow: var(--shadow-comic);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .noirView .analyticsLink {

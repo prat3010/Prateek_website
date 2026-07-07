@@ -8,21 +8,22 @@
   display: inline-block;
   padding: 10px 16px;
   background-color: var(--pop-yellow);
-  border: 2px solid var(--pop-black);
+  border: 1px solid var(--color-border);
   font-family: var(--font-body);
   font-style: italic;
   font-size: 0.9rem;
   line-height: 1.4;
   color: var(--pop-black);
   max-width: 260px;
-  box-shadow: var(--shadow-pop-sm);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border-radius: 8px;
 }
 
 :global([data-theme='noir']) .caption {
   background-color: #121214;
   color: #ffffff;
-  border-color: #ffffff;
-  box-shadow: 2px 2px 0px #ffffff;
+  border-color: var(--border-muted);
+  box-shadow: none;
 }
 
 /* ---- Positions ---- */

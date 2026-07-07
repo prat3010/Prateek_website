@@ -35,21 +35,21 @@
   color: var(--pop-black);
   padding: 6px 12px;
   background-color: var(--pop-white);
-  border: 2px solid var(--pop-black);
-  box-shadow: var(--shadow-comic-sm);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   border-radius: var(--border-radius-sm);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  transition: transform 0.2s ease, box-shadow 0.25s ease;
 }
 
 .backLink:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: var(--shadow-comic);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   background-color: var(--pop-yellow);
 }
 
 .backLink:active {
-  transform: translate(1px, 1px);
-  box-shadow: var(--shadow-comic-active);
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 /* ──────────────────────────────────────────────────────────
@@ -57,9 +57,9 @@
    ────────────────────────────────────────────────────────── */
 
 .consoleContainer {
-  background-color: #24242B; /* Dark graphite ink background */
-  border: 4px solid var(--pop-black);
-  box-shadow: var(--shadow-comic-lg);
+  background-color: #24242B;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   border-radius: var(--border-radius-md);
   padding: 20px;
   font-family: var(--font-code);
@@ -122,15 +122,16 @@
 
 .consoleWidget {
   background-color: #1c1c21;
-  border: 3px solid var(--pop-black);
+  border: 1px solid var(--color-border);
   border-radius: var(--border-radius-sm);
   padding: 14px;
-  box-shadow: var(--shadow-comic-sm);
-  transition: transform var(--transition-fast);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.25s ease;
 }
 
 .consoleWidget:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .widgetTitle {
@@ -191,7 +192,7 @@
 /* Terminal Screen Area */
 .terminalContainer {
   background-color: #121215;
-  border: 3px solid var(--pop-black);
+  border: 1px solid var(--color-border);
   border-radius: var(--border-radius-sm);
   padding: 12px;
   box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
@@ -295,7 +296,7 @@
 
 .shortcutBtn {
   background-color: var(--pop-white);
-  border: 2px solid var(--pop-black);
+  border: 1px solid var(--color-border);
   border-radius: var(--border-radius-sm);
   color: var(--pop-black);
   padding: 6px 10px;
@@ -303,19 +304,19 @@
   font-family: var(--font-code);
   font-size: 0.75rem;
   font-weight: bold;
-  box-shadow: var(--shadow-comic-sm);
-  transition: all var(--transition-fast);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease, box-shadow 0.25s ease;
 }
 
 .shortcutBtn:hover {
-  transform: translate(-1px, -1px);
-  box-shadow: var(--shadow-comic);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   background-color: var(--pop-yellow);
 }
 
 .shortcutBtn:active {
-  transform: translate(1px, 1px);
-  box-shadow: var(--shadow-comic-active);
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 /* ──────────────────────────────────────────────────────────
@@ -324,8 +325,8 @@
 
 :global([data-theme='noir']) .consoleContainer {
   background-color: #08080a;
-  border: 3px solid #FAFAFA;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(250, 250, 250, 0.05);
+  border: 1px solid #FAFAFA;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
   border-radius: 6px;
   color: #e0e0e3;
 }
@@ -340,7 +341,7 @@
 
 :global([data-theme='noir']) .consoleWidget {
   background-color: #0d0d10;
-  border: 2px solid #2F2F3D;
+  border: 1px solid #2F2F3D;
   box-shadow: none;
   border-radius: 4px;
 }
@@ -373,7 +374,7 @@
 
 :global([data-theme='noir']) .terminalContainer {
   background-color: #030304;
-  border: 2px solid #ff2a55; /* Neon Red Border */
+  border: 1px solid #ff2a55;
   border-radius: 4px;
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.9);
 }
@@ -453,21 +454,21 @@
   font-weight: 700;
   color: #FAFAFA;
   background-color: #121214;
-  border: 2px solid #3F3F4E;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  border: 1px solid #3F3F4E;
+  box-shadow: none;
   border-radius: 4px;
 }
 
 :global([data-theme='noir']) .backLink:hover {
-  transform: translate(-1px, -1px);
+  transform: translateY(-2px);
   background-color: #1C1C24;
   border-color: var(--neon-cyan, #00f0ff);
-  box-shadow: var(--neon-cyan-glow, 0 0 12px rgba(0, 240, 255, 0.4));
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
   color: #FFFFFF;
 }
 
 :global([data-theme='noir']) .backLink:active {
-  transform: translateY(1px);
+  transform: translateY(0);
 }
 
 /* ──────────────────────────────────────────────────────────
@@ -484,21 +485,21 @@
   max-width: 220px;
   width: 100%;
   height: auto;
-  border: 3px solid var(--pop-black);
+  border: 1px solid var(--color-border);
   border-radius: var(--border-radius-sm);
   background-color: var(--pop-white);
-  box-shadow: var(--shadow-comic-sm);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .terminalImage:hover {
-  transform: scale(1.03);
-  box-shadow: var(--shadow-comic);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 :global([data-theme='noir']) .terminalImage {
   border-color: #2F2F3D;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: none;
 }
 
 :global([data-theme='noir']) .terminalImage:hover {

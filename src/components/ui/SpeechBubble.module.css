@@ -6,7 +6,7 @@
   position: relative;
   display: inline-block;
   padding: 16px 24px;
-  border: 3px solid var(--pop-black);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-bubble);
   font-family: var(--font-body);
   font-size: 1rem;
@@ -31,7 +31,7 @@
   transform: translateY(-50%);
   border-top: 10px solid transparent;
   border-bottom: 10px solid transparent;
-  border-right: 20px solid var(--pop-black);
+  border-right: 20px solid var(--color-border);
 }
 
 .left::before {
@@ -52,7 +52,7 @@
   transform: translateY(-50%);
   border-top: 10px solid transparent;
   border-bottom: 10px solid transparent;
-  border-left: 20px solid var(--pop-black);
+  border-left: 20px solid var(--color-border);
 }
 
 .right::before {
@@ -73,7 +73,7 @@
   transform: translateX(-50%);
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
-  border-bottom: 20px solid var(--pop-black);
+  border-bottom: 20px solid var(--color-border);
 }
 
 .top::before {
@@ -94,7 +94,7 @@
   transform: translateX(-50%);
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
-  border-top: 20px solid var(--pop-black);
+  border-top: 20px solid var(--color-border);
 }
 
 .bottom::before {
@@ -114,17 +114,7 @@
 .thought {
   border-radius: 30px;
   padding: 20px 28px;
-  border: 3px solid var(--pop-black);
-  /* Cloud-like bumpy border via outline + box-shadow trick */
-  box-shadow:
-    -8px -8px 0 -3px var(--bubble-bg, var(--pop-yellow)),
-    -8px -8px 0 0px var(--pop-black),
-    8px -6px 0 -3px var(--bubble-bg, var(--pop-yellow)),
-    8px -6px 0 0px var(--pop-black),
-    -6px 8px 0 -3px var(--bubble-bg, var(--pop-yellow)),
-    -6px 8px 0 0px var(--pop-black),
-    10px 6px 0 -3px var(--bubble-bg, var(--pop-yellow)),
-    10px 6px 0 0px var(--pop-black);
+  border: 1px solid var(--color-border);
 }
 
 /* Thought bubble uses small circles instead of a pointer tail */
@@ -135,7 +125,7 @@
   height: 12px;
   border-radius: 50%;
   background: var(--bubble-bg, var(--pop-yellow));
-  border: 2px solid var(--pop-black);
+  border: 1px solid var(--color-border);
 }
 
 .thought::before {
@@ -145,7 +135,7 @@
   height: 8px;
   border-radius: 50%;
   background: var(--bubble-bg, var(--pop-yellow));
-  border: 2px solid var(--pop-black);
+  border: 1px solid var(--color-border);
 }
 
 .thought.left::after {
@@ -158,7 +148,7 @@
   border-bottom: none;
   border-right: none;
   border-left: none;
-  border: 2px solid var(--pop-black);
+  border: 1px solid var(--color-border);
 }
 
 .thought.left::before {
@@ -171,7 +161,7 @@
   border-bottom: none;
   border-right: none;
   border-left: none;
-  border: 2px solid var(--pop-black);
+  border: 1px solid var(--color-border);
 }
 
 .thought.right::after {
@@ -184,7 +174,7 @@
   border-bottom: none;
   border-right: none;
   border-left: none;
-  border: 2px solid var(--pop-black);
+  border: 1px solid var(--color-border);
 }
 
 .thought.right::before {
@@ -197,7 +187,7 @@
   border-bottom: none;
   border-right: none;
   border-left: none;
-  border: 2px solid var(--pop-black);
+  border: 1px solid var(--color-border);
 }
 
 .thought.top::after {
@@ -205,7 +195,7 @@
   left: 50%;
   bottom: auto;
   transform: translateX(-50%);
-  border: 2px solid var(--pop-black);
+  border: 1px solid var(--color-border);
 }
 
 .thought.top::before {
@@ -213,7 +203,7 @@
   left: 50%;
   bottom: auto;
   transform: translateX(-50%);
-  border: 2px solid var(--pop-black);
+  border: 1px solid var(--color-border);
 }
 
 .thought.bottom::after {
@@ -221,7 +211,7 @@
   left: 50%;
   top: auto;
   transform: translateX(-50%);
-  border: 2px solid var(--pop-black);
+  border: 1px solid var(--color-border);
 }
 
 .thought.bottom::before {
@@ -229,7 +219,7 @@
   left: 50%;
   top: auto;
   transform: translateX(-50%);
-  border: 2px solid var(--pop-black);
+  border: 1px solid var(--color-border);
 }
 
 /* ---- Responsive ---- */

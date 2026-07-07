@@ -43,13 +43,13 @@
 
 .panel {
   position: relative;
-  border: 4px solid var(--pop-black);
-  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
   background: var(--pop-white);
-  box-shadow: 5px 5px 0 var(--pop-black);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
   display: block;
   width: 100%;
   height: 100%;
@@ -60,8 +60,8 @@
 }
 
 .panel:hover {
-  transform: translate(-3px, -3px);
-  box-shadow: 8px 8px 0 var(--pop-black);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .panel:hover .panelOverlay {
@@ -129,8 +129,8 @@
   letter-spacing: 0.5px;
   background: var(--pop-yellow);
   color: var(--pop-black);
-  border: 2px solid var(--pop-black);
-  border-radius: 2px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
   font-family: var(--font-body);
 }
 
@@ -152,9 +152,9 @@
 
 .modalContent {
   background: var(--pop-white);
-  border: 5px solid var(--pop-black);
-  border-radius: 8px;
-  box-shadow: 10px 10px 0 var(--pop-black);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
   max-width: 700px;
   width: 100%;
   padding: 2rem;
@@ -168,7 +168,7 @@
   right: 1rem;
   background: var(--pop-red);
   color: white;
-  border: 3px solid var(--pop-black);
+  border: 1px solid var(--color-border);
   width: 40px;
   height: 40px;
   font-size: 1.2rem;
@@ -178,7 +178,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.25s ease;
   z-index: 1;
 }
 
@@ -200,11 +200,11 @@
 }
 
 .modalImageWrapper {
-  border: 3px solid var(--pop-black);
-  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
   overflow: hidden;
   margin-bottom: 1.5rem;
-  box-shadow: 4px 4px 0 var(--pop-black);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .modalImage {
@@ -288,8 +288,8 @@
   .modalContent {
     max-height: 95vh;
     padding: 1.25rem 1rem;
-    border-width: 3px;
-    box-shadow: 5px 5px 0 var(--pop-black);
+    border-width: 1px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
   }
 
   .modalHeader {
@@ -365,9 +365,9 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  border: 3px solid var(--pop-black);
-  border-radius: 4px;
-  box-shadow: 2px 2px 0 var(--pop-black);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   transform: rotate(-3deg);
   transition: transform 0.25s ease;
   pointer-events: none;
@@ -398,13 +398,13 @@
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
-  box-shadow: var(--shadow-comic-sm);
-  pointer-events: none; /* Disables click and interaction entirely */
+  box-shadow: none;
+  pointer-events: none;
 }
 
 .disabledBtn:hover {
   transform: none;
-  box-shadow: var(--shadow-comic-sm);
+  box-shadow: none;
 }
 
 /* Noir overrides for accessibility contrast */
@@ -430,7 +430,7 @@
   border-color: #4a4a50;
   color: #4a4a50;
   background: transparent;
-  box-shadow: 2px 2px 0 #4a4a50;
+  box-shadow: none;
 }
 
 :global([data-theme='noir']) .modalClose {
@@ -455,7 +455,7 @@
 :global([data-theme='noir']) .panel {
   background-color: var(--surface-primary);
   border-color: var(--border-muted);
-  box-shadow: 4px 4px 0px var(--surface-secondary);
+  box-shadow: none;
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
@@ -531,7 +531,7 @@
 /* Modal Neon Glows */
 :global([data-theme='noir']) .modalContent {
   background: var(--surface-primary);
-  border: 4px solid var(--neon-pink);
+  border: 1px solid var(--neon-pink);
   box-shadow: 0 0 25px var(--neon-pink);
 }
 :global([data-theme='noir']) .modalTitle {

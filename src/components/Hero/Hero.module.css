@@ -52,13 +52,19 @@
   align-items: flex-start;
   gap: 0.5rem;
   background: var(--pop-yellow);
-  border: 3px solid var(--pop-black);
+  border: 1px solid var(--color-border);
   padding: 0.75rem 1.25rem;
   margin-bottom: 2rem;
-  box-shadow: var(--shadow-comic-sm);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border-radius: 12px;
   transform: rotate(-1deg);
   max-width: 500px;
   width: 100%;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.vibeBox:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .vibeLabel {
@@ -77,8 +83,7 @@
 
 :global([data-theme='noir']) .vibeBox {
   background: var(--surface-card);
-  border-color: var(--color-border);
-  box-shadow: 3px 3px 0px var(--color-border);
+  border-color: var(--border-muted);
   transform: rotate(0.5deg);
 }
 
@@ -157,31 +162,34 @@
   color: var(--pop-black);
   background: var(--pop-white);
   padding: 0.4rem 1rem;
-  border: 3px solid var(--pop-black);
+  border: 1px solid var(--color-border);
   border-radius: 20px;
-  box-shadow: 3px 3px 0px var(--pop-black);
-  transition: transform 0.25s var(--transition-bounce), box-shadow 0.25s ease, background-color 0.2s ease, color 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: transform 0.25s var(--transition-bounce), box-shadow 0.25s ease, background-color 0.2s ease, color 0.2s ease, border-color 0.25s ease;
   cursor: default;
 }
 
 .tagBadge:nth-child(1):hover {
   background-color: var(--pop-red);
   color: var(--pop-white);
-  transform: translateY(-3px) rotate(-2deg);
-  box-shadow: 5px 5px 0px var(--pop-black);
+  transform: translateY(-2px);
+  border-color: var(--pop-red);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .tagBadge:nth-child(2):hover {
   background-color: var(--pop-yellow);
-  transform: translateY(-3px) rotate(3deg);
-  box-shadow: 5px 5px 0px var(--pop-black);
+  transform: translateY(-2px);
+  border-color: var(--pop-yellow);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .tagBadge:nth-child(3):hover {
   background-color: var(--pop-blue);
   color: var(--pop-white);
-  transform: translateY(-3px) rotate(-1deg);
-  box-shadow: 5px 5px 0px var(--pop-black);
+  transform: translateY(-2px);
+  border-color: var(--pop-blue);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 /* Noir Theme Overrides for Branding Name and Badges */
@@ -217,9 +225,8 @@
   letter-spacing: normal;
   color: var(--color-text);
   background: var(--surface-card);
-  border: 2px solid var(--border-muted);
-  border-radius: 0px;
-  box-shadow: 2px 2px 0px var(--border-muted);
+  border: 1px solid var(--border-muted);
+  border-radius: 12px;
   padding: 0.25rem 0.75rem;
 }
 
@@ -247,7 +254,7 @@
   transform: translateY(-2px);
 }
 
-/* CTA Button — speech bubble style */
+/* CTA Button — card style */
 .ctaButton {
   display: inline-block;
   position: relative;
@@ -257,50 +264,22 @@
   font-size: clamp(1.1rem, 2vw, 1.5rem);
   letter-spacing: 0.05em;
   padding: 0.9rem 2.2rem;
-  border: 4px solid var(--pop-black);
-  border-radius: 30px;
-  box-shadow: var(--shadow-comic);
-  transition: transform 0.25s var(--transition-bounce),
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease,
     box-shadow 0.25s ease,
-    background 0.2s ease;
+    background 0.2s ease,
+    border-color 0.25s ease;
   cursor: pointer;
   text-decoration: none;
 }
 
-.ctaButton::after {
-  content: '';
-  position: absolute;
-  left: 24px;
-  bottom: -14px;
-  width: 0;
-  height: 0;
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-  border-top: 14px solid var(--pop-black);
-}
-
-.ctaButton::before {
-  content: '';
-  position: absolute;
-  left: 27px;
-  bottom: -8px;
-  width: 0;
-  height: 0;
-  border-left: 7px solid transparent;
-  border-right: 7px solid transparent;
-  border-top: 10px solid var(--pop-red);
-  z-index: 1;
-  transition: border-top-color 0.2s ease;
-}
-
 .ctaButton:hover {
-  transform: scale(1.06) translateY(-2px);
-  box-shadow: var(--shadow-comic-lg);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   background: var(--pop-pink);
-}
-
-.ctaButton:hover::before {
-  border-top-color: var(--pop-pink);
+  border-color: var(--pop-pink);
 }
 
 .ctaText {
@@ -359,21 +338,22 @@
   gap: 8px;
   background: var(--pop-white);
   color: var(--pop-black);
-  border: 3px solid var(--pop-black);
+  border: 1px solid var(--color-border);
   padding: 0.6rem 1.2rem;
   border-radius: 20px;
   font-family: var(--font-headline);
   font-size: 1.1rem;
   text-decoration: none;
-  box-shadow: 3px 3px 0px var(--pop-black);
-  transition: transform 0.25s var(--transition-bounce), box-shadow 0.25s ease, background-color 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.25s ease, background-color 0.2s ease, border-color 0.25s ease;
   cursor: pointer;
 }
 
 .telemetryBadge:hover {
-  transform: scale(1.04) translateY(-1px);
-  box-shadow: 5px 5px 0px var(--pop-black);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   background-color: var(--pop-yellow);
+  border-color: var(--pop-yellow);
 }
 
 .pulseDot {
@@ -470,34 +450,29 @@
 
 }
 
-/* Noir Mode overrides for CTA button to look like detective board caption box */
+/* Noir Mode overrides for CTA button */
 :global([data-theme='noir']) .ctaButton {
   background: #c5a059;
   color: #000000;
-  border: 4px solid #000000;
-  border-radius: 0px;
-  box-shadow: 4px 4px 0px #000000;
+  border: 1px solid var(--border-muted);
+  border-radius: 12px;
   font-family: var(--font-comic-neue), 'Comic Neue', sans-serif;
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-}
-
-:global([data-theme='noir']) .ctaButton::before,
-:global([data-theme='noir']) .ctaButton::after {
-  display: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 }
 
 :global([data-theme='noir']) .ctaButton:hover {
-  transform: translate(-3px, -3px);
-  box-shadow: 5px 5px 0px #000000, 0 0 12px var(--neon-yellow);
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px var(--neon-yellow);
   background: var(--neon-yellow);
+  border-color: var(--neon-yellow);
 }
 
 :global([data-theme='noir']) .ctaButton:active {
-  transform: translate(1px, 1px);
-  box-shadow: 3px 3px 0px #000000;
+  transform: translateY(0);
+  box-shadow: none;
 }
 
 
@@ -505,14 +480,14 @@
   background: var(--surface-primary);
   color: var(--pop-pink);
   border-color: var(--pop-pink);
-  box-shadow: 3px 3px 0px var(--pop-pink);
-  border-radius: 0px;
+  border-radius: 12px;
 }
 
 :global([data-theme='noir']) .telemetryBadge:hover {
   background: var(--pop-pink);
   color: #000000;
-  box-shadow: 5px 5px 0px var(--pop-pink);
+  border-color: var(--pop-pink);
+  box-shadow: 0 0 15px var(--pop-pink);
 }
 
 :global([data-theme='noir']) .pulseDot {

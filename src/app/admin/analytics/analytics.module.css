@@ -19,12 +19,12 @@
   font-size: 14px;
   text-transform: uppercase;
   padding: 8px 16px;
-  border: 2px solid var(--pop-black);
+  border: 1px solid var(--color-border);
   background-color: var(--surface-primary);
   color: var(--color-text);
-  box-shadow: var(--shadow-comic-sm);
-  transition: transform 0.15s, box-shadow 0.15s, background-color 0.15s;
-  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: transform 0.15s, box-shadow 0.25s, background-color 0.15s;
+  border-radius: 8px;
   transform: rotate(-0.5deg);
   cursor: pointer;
 }
@@ -32,8 +32,8 @@
 .backBtn:hover {
   background-color: var(--pop-yellow);
   color: var(--pop-black);
-  transform: translate(-2px, -2px) rotate(-0.5deg);
-  box-shadow: var(--shadow-comic);
+  transform: translateY(-2px) rotate(-0.5deg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 :global([data-theme='noir']) .backBtn:hover {
@@ -41,8 +41,8 @@
 }
 
 .backBtn:active {
-  transform: translate(1px, 1px) rotate(-0.5deg);
-  box-shadow: var(--shadow-comic-active);
+  transform: translateY(0) rotate(-0.5deg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 /* Timeframe Filters */
@@ -67,15 +67,15 @@
 
 .kpiCard {
   background-color: var(--surface-primary);
-  border: 3px solid var(--pop-black);
-  box-shadow: var(--shadow-comic);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   padding: 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   position: relative;
   overflow: hidden;
-  border-radius: 4px;
+  border-radius: 12px;
 }
 
 .kpiCardIconBg {
@@ -120,9 +120,9 @@
 
 .kpiCardBadge {
   padding: 16px;
-  border: 3px solid var(--pop-black);
+  border: 1px solid var(--color-border);
   border-radius: 50%;
-  box-shadow: var(--shadow-comic-sm);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -172,11 +172,11 @@
 /* Timeline Chart */
 .timelineSection {
   background-color: var(--surface-primary);
-  border: 3px solid var(--pop-black);
-  box-shadow: var(--shadow-comic);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   padding: 24px;
   margin-bottom: 32px;
-  border-radius: 4px;
+  border-radius: 12px;
 }
 
 .timelineHeader {
@@ -224,9 +224,9 @@
   font-family: var(--font-body);
   font-weight: 700;
   padding: 4px 8px;
-  border: 2px solid var(--pop-black);
-  border-radius: 4px;
-  box-shadow: var(--shadow-comic-sm);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   white-space: nowrap;
   z-index: 10;
   transition: opacity 0.15s ease, transform 0.15s ease;
@@ -241,18 +241,19 @@
 .chartBar {
   width: 100%;
   background-color: var(--pop-yellow);
-  border: 2px solid var(--pop-black);
-  box-shadow: var(--shadow-comic-sm);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   position: relative;
   min-height: 4px;
-  transition: transform 0.15s, background-color 0.15s, box-shadow 0.15s;
+  transition: transform 0.15s, background-color 0.15s, box-shadow 0.25s;
   cursor: pointer;
 }
 
 .chartBar:hover {
   background-color: var(--pop-red);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-comic);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .chartBarStripes {
@@ -297,10 +298,10 @@
 
 .panel {
   background-color: var(--surface-primary);
-  border: 3px solid var(--pop-black);
-  box-shadow: var(--shadow-comic);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   padding: 24px;
-  border-radius: 4px;
+  border-radius: 12px;
 }
 
 .panelHeader {
@@ -403,14 +404,14 @@
   width: 100%;
   height: 24px;
   background-color: var(--surface-secondary);
-  border: 2px solid var(--pop-black);
-  box-shadow: var(--shadow-comic-sm);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
   overflow: hidden;
 }
 
 .deviceFill {
   height: 100%;
-  border-right: 2px solid var(--pop-black);
+  border-right: 1px solid var(--color-border);
   transition: width 0.3s ease;
 }
 
@@ -459,10 +460,10 @@
 
 .pinkBadge {
   background-color: var(--pop-pink);
-  border: 2px solid var(--pop-black);
+  border: 1px solid var(--color-border);
   color: var(--pop-white);
-  border-radius: 4px;
-  box-shadow: var(--shadow-comic-sm);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .panelSubtext {
@@ -474,11 +475,11 @@
 /* Live Activity Feed */
 .feedSection {
   background-color: var(--surface-primary);
-  border: 3px solid var(--pop-black);
-  box-shadow: var(--shadow-comic);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   padding: 24px;
   margin-bottom: 32px;
-  border-radius: 4px;
+  border-radius: 12px;
 }
 
 .feedList {
@@ -492,9 +493,9 @@
 
 .feedItem {
   padding: 12px;
-  border: 2px solid var(--pop-black);
-  border-radius: 6px;
-  box-shadow: var(--shadow-comic-sm);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -660,7 +661,7 @@
   background-color: var(--pop-yellow);
   color: var(--pop-black);
   transform: scale(1.03) translateY(-2px);
-  box-shadow: var(--shadow-comic);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 :global([data-theme='noir']) .activeFilter {
@@ -688,9 +689,9 @@
   padding: 12px;
   background-color: var(--pop-red);
   color: #ffffff;
-  border: 2px solid var(--pop-black);
-  box-shadow: 2px 2px 0px 0px var(--pop-black);
-  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -742,7 +743,7 @@
 }
 
 .privacyAlert {
-  border: 3px solid var(--pop-black);
+  border: 1px solid var(--color-border);
   background-color: var(--surface-primary);
   padding: 20px;
   margin-bottom: 32px;
@@ -750,8 +751,8 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 16px;
-  border-radius: 4px;
-  box-shadow: var(--shadow-comic);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 @media (min-width: 768px) {
@@ -764,9 +765,9 @@
   padding: 12px;
   background-color: var(--pop-green);
   color: var(--pop-black);
-  border: 2px solid var(--pop-black);
-  box-shadow: 2px 2px 0px 0px var(--pop-black);
-  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;

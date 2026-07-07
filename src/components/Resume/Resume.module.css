@@ -40,25 +40,25 @@
   gap: var(--space-sm);
   background-color: var(--pop-yellow);
   color: var(--pop-black);
-  border: var(--border-thick);
-  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
   padding: var(--space-sm) var(--space-md);
   font-family: var(--font-code);
   font-weight: 700;
   font-size: var(--text-sm);
   cursor: pointer;
-  box-shadow: var(--shadow-comic-sm);
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.25s ease;
 }
 
 .printBtn:hover {
-  transform: translate(-1px, -1px);
-  box-shadow: var(--shadow-comic);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .printBtn:active {
-  transform: translate(1.5px, 1.5px);
-  box-shadow: var(--shadow-comic-active);
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 :global([data-theme='noir']) .printBtn {
@@ -72,7 +72,7 @@
   align-items: center;
   background-color: var(--pop-black);
   color: var(--pop-white);
-  border: var(--border-medium);
+  border: 1px solid var(--color-border);
   border-radius: var(--border-radius-sm);
   overflow: hidden;
   margin-bottom: var(--space-xl);
@@ -89,7 +89,7 @@
   align-items: center;
   gap: var(--space-xs);
   flex-shrink: 0;
-  border-right: var(--border-medium);
+  border-right: 1px solid var(--color-border);
 }
 
 .tickerText {
@@ -115,13 +115,18 @@
   display: flex;
   align-items: center;
   background-color: var(--pop-white);
-  border: var(--border-thick);
-  border-radius: var(--border-radius-md);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
   padding: var(--space-sm);
   margin-bottom: var(--space-xl);
   gap: var(--space-md);
   flex-wrap: wrap;
-  box-shadow: var(--shadow-comic);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.25s ease;
+}
+
+.personaBar:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .personaLabel {
@@ -146,8 +151,8 @@
   gap: var(--space-xs);
   background: transparent;
   color: var(--color-text);
-  border: var(--border-medium);
-  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
   padding: var(--space-sm) var(--space-md);
   font-family: var(--font-code);
   font-weight: 700;
@@ -265,7 +270,7 @@
 
 .divider {
   border: 0;
-  border-top: var(--border-medium);
+  border-top: 1px solid var(--color-border);
   margin: var(--space-lg) 0;
 }
 
@@ -286,7 +291,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  border-bottom: var(--border-medium);
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: var(--space-xs);
 }
 
@@ -312,7 +317,7 @@
   font-size: var(--text-xs);
   font-weight: 700;
   background-color: var(--pop-cream);
-  border: var(--border-thin);
+  border: 1px solid var(--color-border);
   border-radius: var(--border-radius-sm);
   padding: 2px 8px;
   color: var(--pop-black);
@@ -669,17 +674,17 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
-  border: 3px solid var(--pop-black);
+  border: 1px solid var(--color-border);
   background-color: var(--pop-cream);
-  box-shadow: 4px 4px 0px var(--pop-black);
-  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border-radius: 12px;
   text-align: center;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.2s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .quoteCard:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px var(--pop-black);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .quoteCardLabel {
@@ -723,33 +728,35 @@
   letter-spacing: 1px;
   background-color: var(--pop-yellow);
   color: var(--pop-black);
-  border: 3px solid var(--pop-black);
-  box-shadow: 4px 4px 0px var(--pop-black);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   cursor: pointer;
-  border-radius: 4px;
-  transition: transform 0.1s var(--transition-bounce), box-shadow 0.1s ease, background-color 0.2s ease;
+  border-radius: 12px;
+  transition: transform 0.2s ease, box-shadow 0.25s ease, background-color 0.2s ease, border-color 0.25s ease;
 }
 
 .quoteActionBtn:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px var(--pop-black);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   background-color: var(--pop-green);
+  border-color: var(--pop-green);
 }
 
 .quoteActionBtn:active {
-  transform: translate(1px, 1px);
-  box-shadow: 1px 1px 0px var(--pop-black);
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 /* Noir Overrides */
 :global([data-theme='noir']) .quoteCard {
-  border-color: #ffffff;
+  border-color: var(--border-muted);
   background-color: #121214;
-  box-shadow: 4px 4px 0px #ffffff;
+  box-shadow: none;
 }
 
 :global([data-theme='noir']) .quoteCard:hover {
-  box-shadow: 6px 6px 0px var(--neon-cyan);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 15px var(--neon-cyan);
 }
 
 :global([data-theme='noir']) .quoteCardLabel {
@@ -770,14 +777,14 @@
 :global([data-theme='noir']) .quoteActionBtn {
   background-color: #121214;
   color: #ffffff;
-  border-color: #ffffff;
-  box-shadow: 4px 4px 0px #ffffff;
+  border-color: var(--border-muted);
+  box-shadow: none;
   font-family: var(--font-mono);
 }
 
 :global([data-theme='noir']) .quoteActionBtn:hover {
   background-color: #ffffff;
   color: #000000;
-  border-color: #ffffff;
-  box-shadow: 4px 4px 0px var(--neon-cyan);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 15px var(--neon-cyan);
 }
