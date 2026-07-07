@@ -24,7 +24,7 @@ The Footer should not be cluttered. It should serve as a clean directory, helpin
 * **Communication Identity**:
   * Audience adaptation is limited to a single label toggle: the Resume link displays as "Resume" in Developer Mode and "Quotation" in Business Mode. The rest of the footer content (social links, navigation structure, copyright) remains the same regardless of audience.
 * **Visual Theme (Azure/Noir)**:
-  * Azure: Creative comic-book layout with animated vector accents and bright hover shifts.
+  * Azure: Creative card-style layout with animated vector accents and bright hover shifts.
   * Noir: Precise black-and-white grid layout with flat icons and simple text underlines.
   * The theme adaptation is the primary visual differentiation — the footer renders two distinct visual layouts based on the active theme.
 

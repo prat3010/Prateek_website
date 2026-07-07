@@ -52,7 +52,7 @@ Local static data files (`projects.json`, `skills.json`, etc.) that Next.js read
 
 # **N**
 ### **Noir**
-A visual theme featuring monochrome styling, clean layouts, and a refined comic-noir aesthetic.
+A visual theme featuring monochrome styling, clean layouts, and a refined cyber-noir / console aesthetic.
 
 ---
 

@@ -44,7 +44,7 @@ Rather than simply listing buzzwords, this section demonstrates structured compe
 
 * **Visual Identity (Azure/Noir)**:
   * Azure: Uses creative tag descriptions, colorful borders, and hover micro-animations.
-  * Noir: Uses precise, refined monospaced text layouts and grayscale comic styling.
+  * Noir: Uses precise, refined monospaced text layouts and grayscale outline styling.
 
 ---
 

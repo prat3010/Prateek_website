@@ -39,8 +39,8 @@ Writing reflects thinking. The blog should provide a clean, distraction-free rea
 * **Storytelling Variants**:
   * If a post declares audience tags, the blog list filters or highlights entries matching the visitor's active Communication Identity (e.g. prioritizing engineering topics in Developer Mode).
 * **Card Rendering (Azure/Noir)**:
-  * Azure: Uses rounded comic cards, micro hover scale effects, and accent colored borders.
-  * Noir: Renders cards using ComicPanels with alternating skew angles (`tilt={index % 2 === 0 ? 0.5 : -0.5}`).
+  * Azure: Uses rounded premium cards, micro hover scale effects, and accent colored borders.
+  * Noir: Renders cards using card panels with alternating subtle skew angles (`tilt={index % 2 === 0 ? 0.5 : -0.5}`).
 
 ---
 

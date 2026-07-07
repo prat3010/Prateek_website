@@ -60,7 +60,7 @@ For offline edits or manual codebase changes where the developer modifies `src/d
 # **Asset Pipeline & Git Integration**
 
 The **Update Photos** tab supports direct integration with Git:
-* **Asset Location**: Image files are saved under `public/images/` (Azure variants are styled/colored; Noir variants are grayscale/comic).
+* **Asset Location**: Image files are saved under `public/images/` (Azure variants are styled/colored; Noir variants are grayscale/monochrome).
 * **Git Commit Path**: When a change to photos is finalized and **Dry-Run Mode** is disabled in the sidebar, the Python script executes git commands to:
   1. Stage the added/updated assets (`git add public/images/...`).
   2. Commit changes with a descriptive message (`git commit -m "chore: update portfolio image assets"`).

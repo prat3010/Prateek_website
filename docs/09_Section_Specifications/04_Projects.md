@@ -38,7 +38,7 @@ Projects prove capability. Rather than telling visitors I can build software, th
   * Displays layout screenshots and links to the live website.
 * **Visual Identity (Azure/Noir)**:
   * Azure: Projects feature bright color gradients, interactive tag overlays, and smooth hover scales.
-  * Noir: Projects are styled as comic-noir panels with thick borders and high-contrast lines.
+  * Noir: Projects are styled as high-contrast card panels with subtle outline glows.
 
 ---
 

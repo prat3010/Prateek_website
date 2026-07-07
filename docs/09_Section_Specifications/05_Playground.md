@@ -31,9 +31,9 @@ Playground is a place for exploration. It proves that technical execution can al
 * **Azure Theme (Vibrant Interaction)**:
   * Uses active 3D particle fields, colorful canvas models, and fluid animations.
   * Colors shift dynamically matching coordinate mouse coordinates.
-* **Noir Theme (Monochrome Comic Retro)**:
+* **Noir Theme (Monochrome High-Contrast Console)**:
   * Displays high-contrast halftone effects, vector drawing pads, or CRT monitor filters.
-  * Animations are stylized to mimic traditional comic line drawings.
+  * Animations are stylized to mimic clean outline blueprint sketch drawings.
 * **Accessibility Fallback**: If the visitor has "Reduced Motion" enabled, animations pause, rendering a clean static layout instead.
 
 ---

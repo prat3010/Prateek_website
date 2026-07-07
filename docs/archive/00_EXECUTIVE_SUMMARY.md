@@ -24,7 +24,7 @@ Adaptive Portfolio solves this by defining **composable identity states** across
 
 1. **Visual Identity**:
    * **Azure**: A modern, vibrant theme representing creativity, curiosity, and forward-looking exploration.
-   * **Noir**: A precise, refined comic-noir aesthetic representing premium restraint, focus, and craftsmanship.
+   * **Noir**: A precise, refined cyber-noir aesthetic representing premium restraint, focus, and craftsmanship.
 2. **Communication Identity**:
    * **Hiring a Developer (Developer Mode)**: Focuses on engineering mindsets, technical challenges, custom hook design, and code patterns.
    * **Need a Website (Business Mode)**: Focuses on business problem solving, design-to-delivery workflows, transparent packages, and project outcomes.
