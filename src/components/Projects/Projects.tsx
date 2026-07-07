@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useLenis } from 'lenis/react';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -92,44 +93,40 @@ function Projects({ projects }: ProjectsProps) {
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
+  // Lock background scroll while the modal is open
+  useEffect(() => {
+    if (!selectedProject) return;
+
+    const scrollY = window.scrollY;
+    document.body.style.overflow = 'hidden';
+    lenis?.stop();
+
+    return () => {
+      document.body.style.overflow = '';
+      lenis?.start();
+      window.scrollTo({ top: scrollY, behavior: 'instant' });
+    };
+  }, [selectedProject, lenis]);
+
+  // Focus management
   useEffect(() => {
     if (selectedProject) {
-      // Smoothly scroll the background to center projects section
-      lenis?.scrollTo('#projects', {
-        offset: -20,
-        duration: 0.4,
-      });
-
-      const timer = setTimeout(() => {
-        lenis?.stop();
-      }, 450);
-
-      // Store the currently focused element before opening the modal
       previousFocusRef.current = document.activeElement as HTMLElement;
-      
-      // Move focus into the modal content
       setTimeout(() => {
         if (modalRef.current) {
           const focusable = modalRef.current.querySelectorAll<HTMLElement>(
             'a[href], button:not([disabled]), [tabindex="0"]'
           );
           if (focusable.length > 0) {
-            focusable[0].focus(); // Focus the close button
+            focusable[0].focus();
           }
         }
       }, 50);
-
-      return () => clearTimeout(timer);
-    } else {
-      lenis?.start();
-      // Restore focus to the element that triggered the modal
-      if (previousFocusRef.current) {
-        previousFocusRef.current.focus();
-        previousFocusRef.current = null;
-      }
+    } else if (previousFocusRef.current) {
+      previousFocusRef.current.focus();
+      previousFocusRef.current = null;
     }
-    return () => lenis?.start();
-  }, [selectedProject, lenis]);
+  }, [selectedProject]);
 
   // Trap focus and handle Escape key to close the modal
   useEffect(() => {
@@ -253,7 +250,7 @@ function Projects({ projects }: ProjectsProps) {
       </div>
 
       {/* Project Detail Modal */}
-      {selected && (
+      {selected && createPortal(
         <div
           className={styles.modal}
           onClick={() => setSelectedProject(null)}
@@ -376,7 +373,8 @@ function Projects({ projects }: ProjectsProps) {
             </div>
 
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );
