@@ -645,7 +645,7 @@
 
 @media (max-width: 480px) {
   .comicSocials {
-    gap: 8px;
+    gap: 10px;
   }
 
   .comicSocialLink {
