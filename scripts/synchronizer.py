@@ -126,7 +126,7 @@ def call_gemini(prompt, file_data=None, file_mime=None):
     )
 
     try:
-        with urllib.request.urlopen(req) as res:
+        with urllib.request.urlopen(req, timeout=15) as res:
             response_data = json.loads(res.read().decode("utf-8"))
             candidates = response_data.get("candidates", [])
             if candidates:
