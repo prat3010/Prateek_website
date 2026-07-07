@@ -134,7 +134,7 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
 ## Design And Content Principles
 
 - This site is a portfolio first. Changes should improve trust, clarity, performance, or the quality of the showcased work.
-- Preserve the comic/noir visual identity, but do not add decorative effects at the cost of readability, accessibility, or load performance.
+- Preserve the premium card/cyber-noir visual identity (thin borders, rounded corners, soft shadows, neon glows), but do not add decorative effects at the cost of readability, accessibility, or load performance.
 - Portfolio copy must be credible. Avoid inflated claims, unverifiable metrics, or absolute privacy/security/compliance language unless the implementation proves it.
 - Project status, links, and descriptions must stay internally consistent. If a project is marked `soon`, do not present it as live.
 

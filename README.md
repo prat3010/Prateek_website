@@ -1,12 +1,12 @@
 # Prateek Sharma's Portfolio
 
-A highly interactive, storyteller-driven personal portfolio website designed with a custom **comic-book / noir visual aesthetic**. Features include responsive layouts, dynamic paper texture overlays, smooth scrolling, custom cursor trails, and a live 3D skyline theme transition.
+A highly interactive, storyteller-driven personal portfolio website designed with a custom **premium card / cyber-noir visual aesthetic**. Features include responsive layouts, dynamic paper texture overlays, smooth scrolling, custom cursor trails, and a live 3D skyline theme transition.
 
 ## 🚀 Tech Stack
 
 - **Framework:** Next.js 16 (App Router) & React 19
 - **Logic & Types:** TypeScript
-- **Styling:** CSS Modules & global comic theme system (Vanilla CSS variables)
+- **Styling:** CSS Modules & global unified card theme system (with fallback variables)
 - **Database / Analytics:** Supabase (portfolio content storage + custom telemetry logging via Next.js Proxy)
 - **Contact Service:** Resend Email API
 - **Animations & Scrolling:** Framer Motion & Lenis smooth scroll

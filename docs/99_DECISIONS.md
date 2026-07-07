@@ -13,6 +13,7 @@ This document serves as the registry of critical architectural design decisions 
 * [ADR 03: GDPR Telemetry via Daily IP Hashing](#adr-03-gdpr-telemetry-via-daily-ip-hashing)
 * [ADR 04: Dual-Write Content Platform with JSON Fallbacks](#adr-04-dual-write-content-platform-with-json-fallbacks)
 * [ADR 05: Portal Modals to Escape ScrollSection Containing Block](#adr-05-portal-modals-to-escape-scrollsection-containing-block)
+* [ADR 06: Visual Redesign from Comic-Book to Card Aesthetic](#adr-06-visual-redesign-from-comic-book-to-card-aesthetic)
 
 ---
 
@@ -68,6 +69,21 @@ This document serves as the registry of critical architectural design decisions 
 * **Consequences**:
   * **Pros**: Modals work correctly with viewport-relative positioning and native overflow scroll; no need to modify `ScrollSection` or Framer Motion scroll animations.
   * **Cons**: Modals are detached from their React tree (focus management, event bubbling must be handled explicitly). Any new fullscreen overlays in the codebase must also use portals.
+
+
+# **ADR 06: Visual Redesign from Comic-Book to Card Aesthetic**
+
+* **Status**: Approved
+* **Context**: The original vintage comic-book style (thick borders, hard block shadows, offset translations on active click) was highly distinctive but introduced visual clutter on pages with data (analytics dashboard, Visualizer stats) and projected an overly informal tone for professional recruiters or business clients.
+* **Decision**: We migrated the entire UI across all components and administrative sections (Playground, SiteInfoConsole, OnboardingSelector) to a unified card aesthetic:
+  * Replaced thick borders (3px-5px) with thin borders (`1px solid var(--color-border)`).
+  * Replaced hard block shadows with soft, modern drop shadows (`box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04)`).
+  * Rounded corners globally using `border-radius: 12px` (or `8px` for compact controls).
+  * Standardized hover effects to use subtle vertical translations (`transform: translateY(-2px)` + soft elevated shadows) and active states to lay flat (`transform: translateY(0)`).
+  * Preserved the signature comic-noir contrast in Cyber-Noir mode by substituting flat shadows with vibrant glowing neon accents (`box-shadow: 0 0 15px <accent-color>`).
+* **Consequences**:
+  * **Pros**: Visually clean, premium layout; excellent scanability and readability in dashboards; consistent state transitions across all buttons/toggles.
+  * **Cons**: Marginally less visual eccentricity compared to the original raw comic-strip styling.
 
 ---
 
