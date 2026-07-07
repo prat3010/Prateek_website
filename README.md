@@ -102,6 +102,24 @@ streamlit run scripts/synchronizer.py
 
 ---
 
+## 🧪 Running Tests
+
+The project uses [Vitest](https://vitest.dev/) with React Testing Library for unit and integration testing.
+
+```bash
+npm test              # Single run
+npm run test:watch    # Watch mode
+npm run test:coverage # With coverage report
+```
+
+Full workspace validation (types, lint, tests, build):
+
+```bash
+./scripts/verify.sh
+```
+
+---
+
 ## 📦 Production Builds
 
 When compiling the web app for deployment, the build process automatically executes a script to generate your commit history and writes it to `src/data/git-log.json`:

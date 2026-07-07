@@ -164,7 +164,10 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
 
 ## Testing And Verification
 
-- **Workspace Verification:** Run `./scripts/verify.sh` to execute full workspace validation (cleaning caches, checking types, running lints, and test builds).
+- **Unit & Integration Tests:** Run `npm test` (Vitest) to execute all 120 tests across 15 test files. Uses `pool: 'forks'` for proper `process.env` isolation between test files.
+- **Watch Mode:** Run `npm run test:watch` during development for instant feedback.
+- **Coverage:** Run `npm run test:coverage` to generate a V8 coverage report.
+- **Workspace Verification:** Run `./scripts/verify.sh` to execute full workspace validation (cleaning caches, checking types, running lints, unit tests, and test builds).
 - **Database Verification:** Run `./scripts/audit_db.py` to compare your live database tables against the local `supabase_schema.sql` file and identify any missing schemas.
 - **Database Backup:** Run `./scripts/backup_db.py` to pull down live database records and update your local fallback JSON files in `src/data/`.
 - Run `npx tsc --noEmit` after TypeScript changes.
@@ -172,6 +175,13 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
 - **Lint Verification:** Ensure the linter (`./scripts/verify.sh` or `npm run lint`) passes cleanly (0 errors and warnings). All lint errors must be resolved before committing code.
 - Be cautious with `npm run build`: it runs `scripts/generate-git-log.js`, which writes generated data under `src/data/`.
 - For visual or interactive changes, run the dev server and inspect desktop and mobile behavior when feasible.
+
+### Test File Locations
+- `src/utils/__tests__/` — Pure utility functions (`escapeHtml`)
+- `src/lib/__tests__/` — Data layer, skill helpers, security primitives
+- `src/app/api/__tests__/` — API route handlers (skills, projects, certificates, profile, contact, revalidate, git-log, analytics-summary)
+- `src/hooks/__tests__/` — Client hooks (`useTypewriter`, `useScrambledText`)
+- `src/app/admin/analytics/__tests__/` — Analytics dashboard utilities
 
 ## Git And Generated Files
 
