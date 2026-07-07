@@ -360,7 +360,7 @@ export default function SiteInfoConsole() {
           { text: '  stack      - List the website technologies', type: 'output' },
           { text: '  sync       - Show the local content sync workflow', type: 'output' },
           { text: '  analytics  - Show visitor statistics summary', type: 'output' },
-          { text: '  cheatcode  - Run retro developer override (3D WebGL parade)', type: 'output' },
+          { text: '  cheatcode  - Run retro developer override (3D WebGL pizza rat)', type: 'output' },
           { text: '  git-info   - Open the generated portfolio commit log', type: 'output' },
           { text: '  qrcode     - Scan PhonePe QR code to pay or donate directly', type: 'output' },
           { text: '  clear      - Clear the command interface screen', type: 'output' }
@@ -471,8 +471,8 @@ export default function SiteInfoConsole() {
             { text: 'KONAMI CODE DECRYPTED:', type: 'success' },
             { text: '  - Keyboard Sequence: [↑, ↑, ↓, ↓, ←, →, ←, →, B, A]', type: 'success' },
             { text: `  - Cheat Override Mode: ${isActive ? 'ACTIVE' : 'INACTIVE'}`, type: 'output' },
-            { text: isActive 
-              ? '  - Engage: 3D WebGL Gremlin Parade (Float & Bouncing Physics Activated)!' 
+            { text: isActive
+              ? '  - Engage: NYC Pizza Rat (Bounce & Tail Sway Physics Activated)!'
               : '  - Disengage: Unmounting WebGL Canvas and releasing GPU memory.', type: 'output' }
           ];
         }

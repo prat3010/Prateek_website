@@ -30,7 +30,7 @@ The terminal parses input strings dynamically. Available commands include:
 * `stack`: Lists the website technologies.
 * `sync`: Shows the local content sync workflow.
 * `analytics`: Shows visitor statistics summary. Links to the full analytics dashboard at `/admin/analytics`.
-* `cheatcode`: Runs retro developer override (activates the Three.js WebGL gremlin parade easter egg).
+* `cheatcode`: Runs retro developer override (activates the Three.js WebGL pizza rat easter egg).
 * `qrcode`: Renders a PhonePe UPI QR code for payment or donation.
 * `clear`: Clears the terminal screen memory history.
 

@@ -316,7 +316,7 @@ Apart from the Visual and Communication identities, the client layout listens to
    - When active, it appends the `ui-details-hidden` class to `document.documentElement` to globally fade out and hide navigation, footer, and main content structures via CSS rules, leaving the background scenery completely exposed.
 2. **Easter Egg Override (Konami Code state)**:
    - Evaluated globally in the layout middleware loop. Typing the Konami code sequence appends `konami-active` class to `document.documentElement`.
-   - It mounts the `ThreeGremlinParade` canvas overlay. A safety timeout automatically cleans up the class and unmounts the canvas after 30 seconds.
+   - It mounts the `ThreePizzaRat` canvas overlay. A safety timeout automatically cleans up the class and unmounts the canvas after 30 seconds.
 
 ---
 

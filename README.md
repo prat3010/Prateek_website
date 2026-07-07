@@ -10,7 +10,7 @@ A highly interactive, storyteller-driven personal portfolio website designed wit
 - **Database / Analytics:** Supabase (portfolio content storage + custom telemetry logging via Next.js Proxy)
 - **Contact Service:** Resend Email API
 - **Animations & Scrolling:** Framer Motion & Lenis smooth scroll
-- **3D & Visual Effects:** Three.js (Gremlin Parade) and SVG filter distortions
+- **3D & Visual Effects:** Three.js (Pizza Rat) and SVG filter distortions
 
 ---
 

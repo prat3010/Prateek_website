@@ -18,7 +18,7 @@ const NoirSkyline = dynamic(() => import('@/components/effects/NoirSkyline'), { 
 const CursorTrail = dynamic(() => import('@/components/effects/CursorTrail'), { ssr: false });
 const ZenToggle = dynamic(() => import('@/components/ui/ZenToggle'), { ssr: false });
 const TerminalButton = dynamic(() => import('@/components/ui/TerminalButton'), { ssr: false });
-const ThreeGremlinParade = dynamic(() => import('@/components/effects/ThreeGremlinParade'), { ssr: false });
+const ThreePizzaRat = dynamic(() => import('@/components/effects/ThreePizzaRat'), { ssr: false });
 
 interface ClientLayoutProps {
   children: React.ReactNode;
@@ -54,7 +54,7 @@ function ClientLayoutContent({
         {!isAdminRoute && <Footer />}
         {!isAdminRoute && <ZenToggle />}
         {!isAdminRoute && <TerminalButton />}
-        {!isAdminRoute && isKonamiActive && <ThreeGremlinParade />}
+        {!isAdminRoute && isKonamiActive && <ThreePizzaRat />}
       </LenisProvider>
     </PerformanceGovernorProvider>
   );

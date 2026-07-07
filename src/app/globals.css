@@ -1147,9 +1147,9 @@ html.is-theme-transitioning * {
 }
 
 /* ============================================================
-   3D GREMLIN PARADE WEBGL CANVAS OVERLAY
+   3D PIZZA RAT WEBGL CANVAS OVERLAY
    ============================================================ */
-.gremlin-canvas-container {
+.pizza-rat-canvas-container {
   position: fixed;
   inset: 0;
   width: 100vw;

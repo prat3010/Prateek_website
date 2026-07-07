@@ -7,8 +7,8 @@ export const dynamic = 'force-dynamic';
 const MOCK_COMMITS = [
   { hash: '7865db1', author: 'Prateek Sharma', date: '3 hours ago', subject: 'fix: force dynamic route rendering to disable cache, and improve navigation tips' },
   { hash: 'f8e84fb', author: 'Prateek Sharma', date: '4 hours ago', subject: 'feat: implement live API-driven ASCII File Explorer under the secret command' },
-  { hash: '69abbe9', author: 'Prateek Sharma', date: '1 day ago', subject: 'feat: simplify 3D Gremlins control to mouse-driven tilt and velocity damping' },
-  { hash: '408403d', author: 'Prateek Sharma', date: '2 days ago', subject: 'feat: convert Gremlins to bouncing rounded-cubes with squash-and-stretch' },
+  { hash: '69abbe9', author: 'Prateek Sharma', date: '1 day ago', subject: 'feat: add tail sway and head bob animations to Pizza Rat' },
+  { hash: '408403d', author: 'Prateek Sharma', date: '2 days ago', subject: 'feat: replace gremlins with detailed Pizza Rat easter egg' },
   { hash: '8798bfd', author: 'Prateek Sharma', date: '3 days ago', subject: 'feat: wake up interactive gargoyle on scroll and apply kinematic flight path' },
   { hash: '561ba08', author: 'Prateek Sharma', date: '4 days ago', subject: 'feat: implement rooftop black cat stroll and Markov-chain behavior' },
   { hash: '3e490fc', author: 'Prateek Sharma', date: '5 days ago', subject: 'feat: add wobbly hand-drawn outline displacement using 2D FBM noise' },

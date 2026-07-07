@@ -248,7 +248,7 @@ Delight should emerge from thoughtful execution, but can also incorporate playfu
 
 * **Cursor Trail**: A dynamic cursor tracking effect (`CursorTrail`) that follows user cursor paths.
 * **Zen Mode (Hide Details)**: An interactive user toggle (`ZenToggle` component) that flips the global UI state `isDetailsHidden`. When active, it hides the navigation, main sections, and footer layout completely (via CSS opacity: 0 and visibility: hidden overrides), leaving only the background vector skyline graphics visible for a calm, aesthetic review.
-* **Konami Code Easter Egg (Gremlin Parade)**: Entering the sequence (`ArrowUp`, `ArrowUp`, `ArrowDown`, `ArrowDown`, `ArrowLeft`, `ArrowRight`, `ArrowLeft`, `ArrowRight`, `b`, `a`) activates a 3D WebGL Gremlin Parade overlay (`ThreeGremlinParade` canvas) across the screen. It automatically shuts down and deactivates after a 30-second safety timeout.
+* **Konami Code Easter Egg (Pizza Rat)**: Entering the sequence (`ArrowUp`, `ArrowUp`, `ArrowDown`, `ArrowDown`, `ArrowLeft`, `ArrowRight`, `ArrowLeft`, `ArrowRight`, `b`, `a`) activates a 3D WebGL Pizza Rat overlay (`ThreePizzaRat` canvas) across the screen. It automatically shuts down and deactivates after a 30-second safety timeout.
 
 ---
 
