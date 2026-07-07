@@ -50,7 +50,7 @@ Craftsmanship requires standard semantic architecture:
 ### **2. Keyboard Navigation & Logical Focus**
 * All interactive items (links, selectors, contact form fields, buttons) must support focus highlights via custom high-contrast focus rings (`:focus-visible`).
 * Avoid manual overriding of focus behaviors unless managing modal or terminal inputs. Keyboard trap risks are strictly avoided.
-* Support skip links if long repetitive listings are introduced.
+* **Skip Links**: A skip-to-content link (`<a href="#main-content" className="skip-link">`) is rendered in `layout.tsx` with `id="main-content"` on the `<main>` element in `ClientLayout.tsx`, allowing keyboard and screen reader users to bypass navigation.
 
 ### **3. Screen Reader Optimization**
 * Interactive icons or decorative SVG graphics must declare `aria-hidden="true"`.
