@@ -38,7 +38,7 @@ Documents represent the final stage of professional verification. Resumes confir
 
 Both PDF outputs are generated client-side:
 * **Generator Utility**: Located under `src/utils/pdfGenerator.ts`.
-  * *Note: The current build supports `generateResumePDF()` with active personas. The `generateQuotationPDF()` pipeline is a key V2 implementation target.*
+  * Both `generateResumePDF()` and `generateQuotationPDF()` are implemented and exported. The shared `Persona` type and `getSkillsHighlight` helper are imported from `src/lib/skills.ts`.
 * **Dynamic Data Source**: Data is fetched from the Supabase singleton `profile` table fallback. Changes saved in the CMS reflect in the PDFs without code changes.
 * **PDF Output Design**:
   * Resume: ATS-friendly, clean single-column structure.

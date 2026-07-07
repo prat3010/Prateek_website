@@ -21,15 +21,12 @@ The Footer should not be cluttered. It should serve as a clean directory, helpin
 
 ## **Adaptive Behavior**
 
-* **Developer Mode**:
-  * Prioritizes links to: GitHub profile, developer utilities, and commit log listings.
-  * Displays the build hash of the latest Git deploy.
-* **Business Mode**:
-  * Prioritizes links to: LinkedIn profile, standard email address, freelance terms of service, and pricing guides.
-  * Displays quick contact shortcuts.
+* **Communication Identity**:
+  * Audience adaptation is limited to a single label toggle: the Resume link displays as "Resume" in Developer Mode and "Quotation" in Business Mode. The rest of the footer content (social links, navigation structure, copyright) remains the same regardless of audience.
 * **Visual Theme (Azure/Noir)**:
-  * Azure: Uses creative animations, animated vector accents, and bright hover shifts.
-  * Noir: Uses precise black-and-white grids, flat icons, and simple text underlines.
+  * Azure: Creative comic-book layout with animated vector accents and bright hover shifts.
+  * Noir: Precise black-and-white grid layout with flat icons and simple text underlines.
+  * The theme adaptation is the primary visual differentiation — the footer renders two distinct visual layouts based on the active theme.
 
 ---
 
@@ -44,6 +41,6 @@ The layout uses a three-column CSS Grid:
 
 ## **Acceptance Criteria**
 - Footer is responsive across all screen widths.
-- Navigation links change based on the active Communication Identity.
+- The Resume/Quotation label toggles based on the active Communication Identity.
 - Social links point to active, correct URLs.
-- Developer Mode exposes build commits.
+- Theme-specific layouts render correctly for both Azure and Noir modes.

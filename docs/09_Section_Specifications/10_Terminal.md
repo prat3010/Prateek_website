@@ -14,21 +14,25 @@ A site built for developers should speak their language. The terminal demonstrat
 
 ## **User Goals**
 
-* **Developer Audience**: Query git commit details, analyze network status, view dynamic ASCII art qr codes, trigger system self-tests, and browse help files.
+* **Developer Audience**: Query git commit details, analyze system status, view dynamic QR codes, trigger system self-tests, and browse help files.
 
 ---
 
 ## **Interactive CLI Command Registry**
 
-The terminal parses input strings dynamically. Enforced commands include:
+The terminal parses input strings dynamically. Available commands include:
 
 * `help`: Displays a list of all available commands and descriptions.
-* `git-info` / `git-log`: Parses `src/data/git-log.json` to display recent commit hash, author, commit date, and message.
-* `system-status` / `status`: Queries DB connections and displays memory/build statistics.
-* `qrcode`: Renders a custom, readable ASCII representation of a dynamic QR code pointing to `https://prateeq.in`.
+* `git-info`: Opens the generated portfolio commit log. Subcommand `git-info show <commit_hash>` opens a specific commit record.
+* `projects`: Lists portfolio projects and tags.
+* `system`: Shows CPU, memory, and display metrics.
+* `storage`: Inspects local and session storage. Subcommand `storage clear` or `storage wipe` clears all storage.
+* `stack`: Lists the website technologies.
+* `sync`: Shows the local content sync workflow.
+* `analytics`: Shows visitor statistics summary. Links to the full analytics dashboard at `/admin/analytics`.
+* `cheatcode`: Runs retro developer override (activates the Three.js WebGL gremlin parade easter egg).
+* `qrcode`: Renders a PhonePe UPI QR code for payment or donation.
 * `clear`: Clears the terminal screen memory history.
-* `theme`: Switches visual themes directly via the command line (e.g. `theme light` or `theme noir`).
-* `audience`: Switches communication identities directly (e.g. `audience developer` or `audience business`).
 
 ---
 
@@ -51,5 +55,5 @@ The terminal parses input strings dynamically. Enforced commands include:
 ## **Acceptance Criteria**
 - Command input field parses the registry commands correctly.
 - CLI commands execute and display responses immediately.
-- `git-log` reads and displays current commit records.
+- `git-info` reads and displays current commit records.
 - Input focus behavior is reliable on both desktop and mobile keyboards.

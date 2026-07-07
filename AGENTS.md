@@ -9,6 +9,26 @@ This is Prateek Sharma's personal portfolio, built with Next.js 16 App Router, R
 - Keep server-only code server-only. `src/data/supabase.ts` intentionally imports `server-only` and must not be pulled into client components.
 - Do not make broad refactors unless the task explicitly asks for them.
 
+### Identity State Propagation
+The selected audience profile and visual theme are propagated through server-side cookie checks and React context:
+```text
+       [Root Layout (Server)]  ← Parses Cookies (theme, audience)
+             │
+             ▼
+     ┌────────────────┐
+     │  ThemeProvider │  ── Tracks: Visual Theme (Azure/Noir), Communication Identity (Dev/Business)
+     └───────┬────────┘
+             ▼
+     ┌────────────────┐
+     │  LenisProvider │  ── Initializes client-side smooth scroll container
+     └───────┬────────┘
+             ▼
+       [Page Content]
+```
+- **Server-First Preference:** Theme and audience state are extracted from HTTP cookies on the server to prevent layout jumps or flashing (CLS).
+- **Lazy Client Sync:** Initialize state in ThemeProvider using server-propagated cookie values. Synchronize `localStorage` values client-side on mount.
+- **Independent States:** Setting the theme must not alter the active communication identity, and vice versa.
+
 ### React 19 & Next.js 16 Best Practices
 - **Synchronous Effects:** Do not call `setState` synchronously within a `useEffect` body (e.g., initializing state from array items or resetting error states on mount). This triggers cascading renders. Instead, calculate initial values lazily during state initialization or use callbacks/event handlers.
 - **Client-Side Data Loading:** Prefer Server Components for static/dynamic database fetching. For interactive client components, prefer passing initial data as props or using React 19 Suspense patterns.
@@ -17,6 +37,8 @@ This is Prateek Sharma's personal portfolio, built with Next.js 16 App Router, R
 - **Explicit Manual Actions:** The agent must explicitly call out any manual configuration tasks (e.g., executing SQL migrations in the Supabase Dashboard, registering environment variables, or clearing deployment caches) directly in the final chat response. Do not hide manual action steps solely inside walkthroughs or implementation plans.
 - **Environment & DB Safety:** Always verify if database schema updates require manual script execution or if they affect local JSON fallback synchronization before applying code changes.
 - **Workspace Hygiene:** Do not make any code modifications or run tests without first checking `git status` to ensure you are not conflicting with uncommitted developer work.
+- **Selective Replacements:** Use targeted line replacements. Avoid full file overwrites unless creating brand new files.
+- **No Lock File Tampering:** Do not edit `package-lock.json` directly unless dependencies have been added or removed via npm.
 
 ## Deployment and Domain
 
@@ -52,7 +74,7 @@ The project uses the following environment variables (stored in `.env.local` loc
   - `/blog` and `/blog/[slug]` — blog listing and individual post pages.
 - `src/app/api/` contains REST API routes for reading/writing portfolio data to Supabase: `skills`, `projects`, `certificates`, `profile`, `git-log`, `analytics-summary`, `contact`, and `revalidate`.
 - `src/proxy.ts` is the Next.js 16 proxy (formerly middleware) file that intercepts requests for telemetry logging.
-- `src/components/` contains portfolio sections, shared UI (like the interactive diagnostics terminal console at `/terminal` which supports commands such as `git-info` and `qrcode`), visual effects, and the playground.
+- `src/components/` contains portfolio sections, shared UI (like the interactive diagnostics terminal console at `/terminal` which supports commands such as `git-info` and `qrcode`), visual effects, and the playground. Components follow the pattern `src/components/{ComponentName}/{ComponentName}.tsx` with co-located CSS modules.
 - `src/components/effects/wobblyPaths.generated.ts` contains generated skyline path data for prebaked hand-drawn SVG wobble. Do not edit it by hand; regenerate it with `npm run generate:wobbly-paths` after changing skyline `Wobbly*` elements.
 - `src/data/` contains type definitions, Supabase client setup, taglines, and JSON fallback files (data values live in Supabase).
 - `src/lib/data.ts` is the server-side data layer that fetches projects, skills, resume, and certificates from Supabase.
@@ -155,7 +177,7 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
 
 - Do not overwrite user changes. Check `git status --short` before editing.
 - Do not commit unless explicitly asked.
-- **Documentation Integrity:** Whenever introducing new features, scripts, database tables, local helpers, CLI commands, or key configuration parameters, the agent **must** update both `README.md` and `AGENTS.md` (specifically sections like Project Shape, setup steps, or verification guides) to reflect the new state of the project.
+- **Documentation Integrity:** Whenever introducing new features, scripts, database tables, local helpers, CLI commands, or key configuration parameters, the agent **must** update both `README.md` and `AGENTS.md` (specifically sections like Project Shape, setup steps, or verification guides) to reflect the new state of the project. Update `docs/99_DECISIONS.md` if key architectural changes were introduced.
 - Do not edit generated outputs unless the task is specifically about generation behavior.
 - Avoid touching `package-lock.json` unless dependencies actually changed.
 
