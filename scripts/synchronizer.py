@@ -93,8 +93,20 @@ def trigger_revalidation():
 
 # Helper to send API request to Gemini
 def call_gemini(prompt, file_data=None, file_mime=None):
+    def show_api_error(msg, detail=None):
+        print(f"[Gemini API Error] {msg}")
+        if detail:
+            print(f"Details: {detail}")
+        import threading
+        if threading.current_thread() is threading.main_thread():
+            st.error(msg)
+            if detail:
+                st.code(detail, language="json")
+        else:
+            raise ValueError(f"{msg} | {detail}" if detail else msg)
+
     if not GEMINI_API_KEY:
-        st.error("Missing GEMINI_API_KEY in .env.local. Please add your key first.")
+        show_api_error("Missing GEMINI_API_KEY in .env.local. Please add your key first.")
         return None
 
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
@@ -133,15 +145,14 @@ def call_gemini(prompt, file_data=None, file_mime=None):
                 text_content = candidates[0]["content"]["parts"][0]["text"]
                 return json.loads(text_content.strip())
             else:
-                st.error("Error: Empty candidates response from Gemini")
+                show_api_error("Error: Empty candidates response from Gemini")
                 return None
     except urllib.error.HTTPError as e:
         err_msg = e.read().decode("utf-8", errors="ignore")
-        st.error(f"Gemini API Error {e.code}: {e.reason}")
-        st.code(err_msg, language="json")
+        show_api_error(f"Gemini API Error {e.code}: {e.reason}", err_msg)
         return None
     except Exception as e:
-        st.error(f"API Connection Error: {e}")
+        show_api_error(f"API Connection Error: {e}")
         return None
 
 # Fallback database of common tech skills to avoid calling Gemini API entirely for standard tags (prevents 429 errors)
@@ -3390,6 +3401,10 @@ with tab_blog:
         if st.button("Clear Ideas", use_container_width=True, key="btn_clear_ideas"):
             if "blog_brainstormed_ideas" in st.session_state:
                 del st.session_state.blog_brainstormed_ideas
+            if "blog_ideas_task_status" in st.session_state:
+                st.session_state.blog_ideas_task_status = "idle"
+            if "blog_ideas_task_error" in st.session_state:
+                st.session_state.blog_ideas_task_error = None
             st.rerun()
 
     # Display brainstormed ideas
