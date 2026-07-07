@@ -452,6 +452,62 @@ def run_safe_git_command(args, cwd=None):
     except Exception as e:
         return False, f"Process execution error: {str(e)}"
 
+def fetch_github_repo_metadata(github_url):
+    """
+    Fetches README and recent commits from a given GitHub repository URL.
+    Returns a dictionary of context data or None.
+    """
+    if not github_url or "github.com" not in github_url:
+        return None
+    
+    parts = github_url.split("github.com/")
+    if len(parts) < 2:
+        return None
+    slug = parts[1].strip().strip("/")
+    if len(slug.split("/")) < 2:
+        return None
+        
+    def fetch_file(url_path):
+        url = f"https://raw.githubusercontent.com/{slug}/{url_path}"
+        headers = {"User-Agent": "Mozilla/5.0"}
+        token = env.get("GITHUB_TOKEN") or env.get("GITHUB_PAT") or env.get("GH_TOKEN")
+        if token:
+            headers["Authorization"] = f"token {token}"
+        req = urllib.request.Request(url, headers=headers)
+        try:
+            with urllib.request.urlopen(req, timeout=5) as res:
+                return res.read().decode("utf-8")
+        except Exception:
+            if "main" in url_path:
+                fallback_path = url_path.replace("main/", "master/")
+                return fetch_file(fallback_path)
+            return ""
+
+    # Fetch commits from API
+    commits_text = ""
+    commits_url = f"https://api.github.com/repos/{slug}/commits"
+    headers = {"User-Agent": "Mozilla/5.0"}
+    token = env.get("GITHUB_TOKEN") or env.get("GITHUB_PAT") or env.get("GH_TOKEN")
+    if token:
+        headers["Authorization"] = f"token {token}"
+    req = urllib.request.Request(commits_url, headers=headers)
+    try:
+        with urllib.request.urlopen(req, timeout=5) as res:
+            commits = json.loads(res.read().decode("utf-8"))
+            commits_text = "\n".join([f"- {c['sha'][:7]} {c['commit']['message'].splitlines()[0]}" for c in commits[:3]])
+    except Exception:
+        pass
+
+    readme = fetch_file("main/README.md")
+    if readme:
+        readme = readme[:1500]  # Limit to avoid huge prompt sizes
+
+    return {
+        "slug": slug,
+        "readme": readme if readme else "No README found.",
+        "recent_commits": commits_text if commits_text else "No recent commits fetched."
+    }
+
 def sanitize_local_path(path_input):
     """
     Sanitize and validate a local directory path.
@@ -3168,9 +3224,199 @@ with tab_blog:
     st.markdown('<div class="section-header">AI Blog Writer & Publisher</div>', unsafe_allow_html=True)
     st.write("Draft professional developer logs, tutorials, and post updates using the Gemini co-pilot, and publish them directly to your website.")
     
+    # 💡 Brainstorm Ideas from Codebase
+    st.subheader("💡 Brainstorm Ideas from Codebase")
+    st.write("Let Gemini analyze your projects, skills, package dependencies, and recent git commits to propose engineering blog topics.")
+
+    ideas_status = st.session_state.get("blog_ideas_task_status", "idle")
+
+    if ideas_status == "success":
+        ideas_res = st.session_state.get("blog_ideas_task_result")
+        if ideas_res:
+            st.session_state.blog_brainstormed_ideas = ideas_res.get("ideas", [])
+        st.session_state.blog_ideas_task_status = "idle"
+        st.success("Successfully generated blog ideas!")
+    elif ideas_status == "error":
+        ideas_err = st.session_state.get("blog_ideas_task_error", "Unknown error")
+        st.error(f"Error brainstorming ideas: {ideas_err}")
+        st.session_state.blog_ideas_task_status = "idle"
+
+    if ideas_status == "running":
+        st.info("🧠 Analyzing codebase metadata and brainstorming technical articles...")
+        st.markdown(
+            '<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">'
+            '<div class="spinner-border text-primary" role="status" style="width: 1.5rem; height: 1.5rem; border: 0.25em solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spinner-border .75s linear infinite;"></div>'
+            '<span>Brainstorming ideas. Feel free to browse other tabs!</span>'
+            '</div>'
+            '<style>@keyframes spinner-border { to { transform: rotate(360deg); } }</style>',
+            unsafe_allow_html=True
+        )
+
+    # Fetch projects for multi-select
+    projects_list = []
+    try:
+        projects_list = parse_projects_file()
+    except Exception:
+        pass
+
+    projects_with_github = ["Current Website Codebase (Prateek_website)"]
+    if projects_list:
+        projects_with_github.extend([
+            p.get("title") for p in projects_list 
+            if p.get("title") and p.get("githubUrl")
+        ])
+
+    selected_github_projects = st.multiselect(
+        "Select projects to fetch GitHub repository details for deeper analysis:",
+        options=projects_with_github,
+        default=["Current Website Codebase (Prateek_website)"],
+        help="For selected projects, the brainstormer will fetch their README and recent commits directly from GitHub (or locally for the website) to build highly specific blog topics."
+    )
+
+    col_brainstorm, col_clear = st.columns([3, 1])
+    with col_brainstorm:
+        btn_ideas_disabled = (ideas_status == "running")
+        if st.button("Brainstorm 5 Blog Ideas", use_container_width=True, disabled=btn_ideas_disabled, key="btn_brainstorm_blog"):
+            # Resolve selected project github URLs at click time
+            github_urls_to_fetch = {}
+            include_current_website_codebase = False
+            for proj_title in selected_github_projects:
+                if proj_title == "Current Website Codebase (Prateek_website)":
+                    include_current_website_codebase = True
+                    continue
+                for p in projects_list:
+                    if p.get("title") == proj_title and p.get("githubUrl"):
+                        github_urls_to_fetch[proj_title] = p.get("githubUrl")
+                        break
+
+            def run_brainstorm():
+                # Gather context
+                context = {}
+                # 1. Projects (regular metadata)
+                try:
+                    context['projects'] = [
+                        {
+                            'title': p.get('title'),
+                            'description': p.get('description'),
+                            'tech': p.get('tech', [])
+                        }
+                        for p in projects_list
+                    ][:6]
+                except Exception:
+                    pass
+                # 2. Skills
+                try:
+                    skills = parse_skills_file()
+                    if skills:
+                        context['skills'] = [s.get('name') for s in skills if s.get('name')][:15]
+                except Exception:
+                    pass
+                # 3. Git log
+                try:
+                    success, logs = run_safe_git_command(["git", "log", "-n", "8", "--oneline"], cwd=os.getcwd())
+                    if success:
+                        context['recent_commits'] = logs.strip().split('\n')
+                except Exception:
+                    pass
+                # 4. Package.json
+                try:
+                    if os.path.exists("package.json"):
+                        with open("package.json", "r") as f:
+                            pkg = json.load(f)
+                            context['dependencies'] = list(pkg.get('dependencies', {}).keys())
+                except Exception:
+                    pass
+
+                # 5. Fetch remote GitHub repository details for chosen projects
+                if github_urls_to_fetch or include_current_website_codebase:
+                    context['github_repositories'] = {}
+                    
+                    if include_current_website_codebase:
+                        # Read the local README.md of the website codebase
+                        website_readme = "No README found."
+                        try:
+                            if os.path.exists("README.md"):
+                                with open("README.md", "r", encoding="utf-8") as f:
+                                    website_readme = f.read()[:1500]
+                        except Exception:
+                            pass
+                        
+                        context['github_repositories']["Current Website Codebase (Prateek_website)"] = {
+                            "slug": "prat3010/Prateek_website",
+                            "readme": website_readme,
+                            "recent_commits": "\n".join(context.get('recent_commits', []))
+                        }
+
+                    for title, url in github_urls_to_fetch.items():
+                        repo_meta = fetch_github_repo_metadata(url)
+                        if repo_meta:
+                            context['github_repositories'][title] = repo_meta
+
+                prompt = f"""
+                You are a senior full-stack developer and technical blogger. 
+                Analyze the following codebase metadata (projects, skills, package dependencies, and recent git commits), including detailed fetched repository files/commits:
+                
+                [CODEBASE CONTEXT]
+                {json.dumps(context, indent=2)}
+                
+                Generate a list of 5 creative, highly technical, and engaging blog post ideas that would fit perfectly on this developer's portfolio.
+                For each idea, return:
+                1. A catchy, SEO-optimized title.
+                2. A short paragraph describing the technical details, challenges, or architectural decisions that could be discussed in the post.
+                3. A ready-to-use structured prompt/notes block (150-300 words) explaining the technical details, background, and solution of the topic so that a blog generator can write it.
+                
+                Generate and return strictly the following JSON structure:
+                {{
+                  "ideas": [
+                    {{
+                      "title": "A catchy, SEO-optimized title",
+                      "description": "Short paragraph describing what the post will cover.",
+                      "notes": "A detailed, raw notes block (150-300 words) explaining the technical details, background, and solution of the topic so that a blog generator can write it."
+                    }}
+                  ]
+                }}
+                Do not return any conversational text, markdown formatting wrappers outside the JSON, or backticks. Return only the raw JSON.
+                """
+
+                res = call_gemini(prompt)
+                if res is None:
+                    raise ValueError("Failed to generate blog ideas from Gemini.")
+                return res
+
+            run_async_task(run_brainstorm, "blog_ideas_task")
+            st.rerun()
+
+    with col_clear:
+        if st.button("Clear Ideas", use_container_width=True, key="btn_clear_ideas"):
+            if "blog_brainstormed_ideas" in st.session_state:
+                del st.session_state.blog_brainstormed_ideas
+            st.rerun()
+
+    # Display brainstormed ideas
+    brainstormed_ideas = st.session_state.get("blog_brainstormed_ideas", [])
+    if brainstormed_ideas:
+        st.write("### Proposed Blog Ideas:")
+        for idx, idea in enumerate(brainstormed_ideas):
+            with st.expander(f"💡 {idea.get('title', 'Idea ' + str(idx+1))}"):
+                st.write(idea.get('description', ''))
+                st.markdown("**Structured raw notes for generator:**")
+                st.code(idea.get('notes', ''), language="markdown")
+                if st.button(f"👉 Use this Idea", key=f"btn_use_idea_{idx}"):
+                    st.session_state.blog_draft_title = idea.get('title', '')
+                    st.session_state.blog_draft_raw_notes = idea.get('notes', '')
+                    st.toast(f"Selected: {idea.get('title')}")
+                    st.rerun()
+
+    st.write("---")
+
     # AI Assist inputs
     st.subheader("AI Ghostwriter Co-Pilot")
-    raw_notes = st.text_area("1. Paste your raw notes, debug outputs, or code snippets here:", height=150, placeholder="E.g. Fixed resume PDF download using jsPDF to create a vector layout so text remains selectable and ATS-compliant...")
+    raw_notes = st.text_area(
+        "1. Paste your raw notes, debug outputs, or code snippets here:",
+        value=st.session_state.get("blog_draft_raw_notes", ""),
+        height=150,
+        placeholder="E.g. Fixed resume PDF download using jsPDF to create a vector layout so text remains selectable and ATS-compliant..."
+    )
     
     tone = st.selectbox("Choose Tone:", ["Professional & Technical", "Conversational & Casual", "Tutorial / How-To Style"])
     

@@ -123,7 +123,7 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
   - **Sync Certificates:** Saves files to `public/certificates/` and metadata to Supabase (plus file fallback).
   - **Manage Skills:** Updates skills in Supabase (plus file fallback, including business outcome narratives) and displays pending auto-scanned tags.
   - **Update Photos:** Manages profile and project images (azure vs. noir variants) in `public/images/`. Includes Git integration to automatically stage, commit, and push updated images to GitHub when Dry-Run Mode is disabled.
-  - **Blog Editor:** Writes markdown posts directly to `src/content/posts/`.
+  - **Blog Editor:** Writes markdown posts directly to `src/content/posts/` and features a codebase-aware brainstorming utility that parses local projects, skills, package dependencies, and recent git history to suggest relevant technical article ideas.
 - **Sidebar Monitors:**
   - **CI/CD Deployment Status:** Automatically tracks Vercel build status via GitHub API, displaying status updates in IST (Indian Standard Time).
   - **Pending Skill Approvals:** Lists queue of AI-extracted skills for immediate addition.
