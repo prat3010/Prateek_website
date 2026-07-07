@@ -16,7 +16,7 @@
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.15fr 0.85fr;
   gap: clamp(2rem, 4vw, 4rem);
   align-items: center;
   max-width: 1200px;
@@ -37,10 +37,12 @@
   margin-bottom: 1rem;
   text-shadow: 3px 3px 0 rgba(255, 23, 68, 0.15);
   letter-spacing: 0.02em;
+  text-wrap: balance;
 }
 
 .typedText {
   display: inline;
+  text-wrap: pretty;
 }
 
 .highlightText {
@@ -60,6 +62,7 @@
   transform: rotate(-1deg);
   max-width: 500px;
   width: 100%;
+  min-height: 4.75rem; /* Prevents vertical layout shift (CLS) during typing */
   transition: box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
@@ -275,6 +278,11 @@
   text-decoration: none;
 }
 
+.ctaButton:focus-visible {
+  outline: 2px solid var(--pop-blue);
+  outline-offset: 4px;
+}
+
 .ctaButton:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
@@ -347,6 +355,11 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   transition: transform 0.2s ease, box-shadow 0.25s ease, background-color 0.2s ease, border-color 0.25s ease;
   cursor: pointer;
+}
+
+.telemetryBadge:focus-visible {
+  outline: 2px solid var(--pop-blue);
+  outline-offset: 4px;
 }
 
 .telemetryBadge:hover {
@@ -432,6 +445,7 @@
     margin-left: auto;
     margin-right: auto;
     justify-content: center;
+    min-height: 5.5rem; /* Prevent layout shifts on narrow mobile screens */
   }
 
   .ctaButton {
@@ -494,4 +508,36 @@
   background-color: #FF1744;
   box-shadow: 0 0 0 0 rgba(255, 23, 68, 0.7);
   animation: pulseNoir 1.6s infinite;
+}
+
+:global([data-theme='noir']) .ctaButton:focus-visible {
+  outline: 2px solid var(--neon-yellow);
+}
+
+:global([data-theme='noir']) .telemetryBadge:focus-visible {
+  outline: 2px solid var(--pop-pink);
+}
+
+/* Tablet / Mid-sized Breakpoint (769px to 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .hero {
+    padding: 4rem clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .content {
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 2rem;
+  }
+
+  .headline {
+    font-size: clamp(2.2rem, 4vw, 3rem);
+  }
+
+  .brandingName {
+    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  }
+
+  .vibeBox {
+    min-height: 5.25rem; /* Accommodate wrapping without shifting page layout */
+  }
 }
