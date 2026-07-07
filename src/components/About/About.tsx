@@ -2,13 +2,19 @@
 
 import React, { useMemo } from 'react';
 import Image from 'next/image';
-import { AnimatePresence, motion } from 'framer-motion';
-import { useTheme } from '@/context/ThemeContext';
+import { useTheme, type Audience, type Theme } from '@/context/ThemeContext';
 import type { ResumeData } from '@/data/resume';
 import ComicPanel from '@/components/ui/ComicPanel';
 import SpeechBubble from '@/components/ui/SpeechBubble';
 import CaptionBox from '@/components/ui/CaptionBox';
+import Scrambler from '@/components/ui/Scrambler';
+import type { ScramblerProps } from '@/components/ui/Scrambler';
 import styles from './About.module.css';
+
+const ABOUT_SECTION_TITLE_TEXTS: ScramblerProps['texts'] = {
+  developer: { light: 'ORIGIN STORY', noir: 'ORIGIN STORY' },
+  business: { light: 'ORIGIN STORY', noir: 'ORIGIN STORY' },
+};
 
 interface AboutProps {
   resumeData: ResumeData | null;
@@ -88,12 +94,84 @@ function About({ resumeData }: AboutProps) {
         ];
   }, [bioContent, isNoir, activeAudience]);
 
+  // Build the TextMap array for the biography text
+  const bioTexts = useMemo<ScramblerProps['texts']>(() => {
+    const devLight = resumeData?.about?.developer?.light || "I'm Prateeq Sharma, a developer focused on web applications, interface quality, and practical AI-assisted workflows.";
+    const devNoir = resumeData?.about?.developer?.noir || "I'm Prateeq Sharma, a developer focused on clear structure, practical AI-assisted workflows, and dependable delivery.";
+    const bizLight = resumeData?.about?.business?.light || "I'm Prateeq Sharma, a freelance developer who builds practical websites, custom tools, and straightforward client workflows.";
+    const bizNoir = resumeData?.about?.business?.noir || "I'm Prateeq Sharma, a freelance developer focused on practical websites, clear handoff, and maintainable client work.";
+
+    return {
+      developer: {
+        light: devLight,
+        noir: devNoir,
+      },
+      business: {
+        light: bizLight,
+        noir: bizNoir,
+      },
+    };
+  }, [resumeData]);
+
+  // Build the TextMap array for the fun facts cards
+  const factsTextsList = useMemo<ScramblerProps['texts'][]>(() => {
+    const devFactsLight = resumeData?.about?.developer?.facts || [
+      'SYSTEM // Web applications with clear structure',
+      'VELOCITY // Fast prototyping and practical delivery',
+      'ENGINE // AI-assisted development workflows',
+      'LOCATION // Based in India, building remotely',
+    ];
+    const devFactsNoir = resumeData?.about?.developer?.factsNoir || [
+      'Building web systems with a clean technical footprint.',
+      'Turning ideas into working interfaces with minimal friction.',
+      'Keeping structure, speed, and maintenance in view.',
+      'Based in India and working remotely.',
+    ];
+    const bizFactsLight = resumeData?.about?.business?.facts || [
+      "SERVICE // Direct freelance partnership",
+      "SPEED // Focused feature delivery",
+      "VALUE // Practical, maintainable web work",
+      "LOCATION // Based in India, working remotely"
+    ];
+    const bizFactsNoir = resumeData?.about?.business?.factsNoir || [
+      "Custom websites built for clear delivery and easy handoff.",
+      "Fast interfaces with practical structure behind them.",
+      "Maintainable systems that stay usable after launch.",
+      "Working directly with clients from brief to deployment."
+    ];
+
+    const maxLen = Math.max(
+      devFactsLight.length,
+      devFactsNoir.length,
+      bizFactsLight.length,
+      bizFactsNoir.length
+    );
+
+    const list: ScramblerProps['texts'][] = [];
+    for (let i = 0; i < maxLen; i++) {
+      list.push({
+        developer: {
+          light: devFactsLight[i] || '',
+          noir: devFactsNoir[i] || '',
+        },
+        business: {
+          light: bizFactsLight[i] || '',
+          noir: bizFactsNoir[i] || '',
+        },
+      });
+    }
+    return list;
+  }, [resumeData]);
+
   return (
     <section id="about" className={styles.about} aria-label="About me">
       <div className={styles.container}>
-        <h2 className={styles.sectionTitle}>
-          ORIGIN STORY
-        </h2>
+        <Scrambler
+          texts={ABOUT_SECTION_TITLE_TEXTS}
+          variant="section-title"
+          as="h2"
+          className={styles.sectionTitle}
+        />
 
         <div className={styles.grid}>
           <div className={styles.imageColumn}>
@@ -114,41 +192,36 @@ function About({ resumeData }: AboutProps) {
 
           <div className={styles.textColumn}>
             <SpeechBubble direction="left" className={styles.bioBubble}>
-              <AnimatePresence mode="wait">
-                <motion.p
-                  key={activeAudience + '-' + (isNoir ? 'noir' : 'light')}
-                  className={styles.bioText}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {parsedBio}
-                </motion.p>
-              </AnimatePresence>
+              <Scrambler
+                texts={bioTexts}
+                variant="headline"
+                as="p"
+                className={styles.bioText}
+                duration={800}
+                staggerPerChar={5}
+              >
+                {parsedBio}
+              </Scrambler>
             </SpeechBubble>
 
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeAudience + '-' + (isNoir ? 'noir' : 'light')}
-                className={styles.funFacts}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                {factsList.map((fact) => (
-                  <CaptionBox key={fact} className={styles.factBox}>
-                    {fact}
-                  </CaptionBox>
-                ))}
-              </motion.div>
-            </AnimatePresence>
+            <div className={styles.funFacts}>
+              {factsTextsList.map((factTexts, index) => (
+                <CaptionBox key={index} className={styles.factBox}>
+                  <Scrambler
+                    texts={factTexts}
+                    variant="badge"
+                    as="span"
+                  >
+                    {factsList[index] || ''}
+                  </Scrambler>
+                </CaptionBox>
+              ))}
+            </div>
           </div>
         </div>
       </div>
     </section>
   );
-};
+}
 
 export default React.memo(About);

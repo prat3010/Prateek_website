@@ -30,6 +30,8 @@ export interface ScramblerProps {
   'aria-label'?: string;
   id?: string;
   children?: React.ReactNode;
+  duration?: number;
+  staggerPerChar?: number;
 }
 
 export default function Scrambler({
@@ -40,6 +42,8 @@ export default function Scrambler({
   'aria-label': ariaLabel,
   id,
   children,
+  duration,
+  staggerPerChar,
 }: ScramblerProps) {
   const { audience, prevAudience, isNoir, modeTransitionSeed } = useTheme();
 
@@ -66,8 +70,8 @@ export default function Scrambler({
   const { chars } = useScrambledText({
     sourceText,
     targetText,
-    duration: VARIANT_CONFIG[variant].duration,
-    staggerPerChar: VARIANT_CONFIG[variant].stagger,
+    duration: duration ?? VARIANT_CONFIG[variant].duration,
+    staggerPerChar: staggerPerChar ?? VARIANT_CONFIG[variant].stagger,
     triggerSeed: modeTransitionSeed,
     onDone: () => setShowScramble(false),
   });
