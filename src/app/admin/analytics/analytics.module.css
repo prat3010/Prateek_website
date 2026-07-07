@@ -144,6 +144,11 @@
   color: var(--pop-black);
 }
 
+.bgYellow {
+  background-color: var(--pop-yellow);
+  color: var(--pop-black);
+}
+
 .textRed {
   color: var(--pop-red);
 }
@@ -153,6 +158,14 @@
 }
 
 .textGreen {
+  color: var(--pop-green);
+}
+
+.demoIcon {
+  color: var(--pop-red);
+}
+
+.liveIcon {
   color: var(--pop-green);
 }
 
@@ -704,15 +717,6 @@
   color: var(--color-text-muted);
   margin-bottom: 8px;
   font-weight: 700;
-}
-
-.warningCode {
-  font-size: 12px;
-  padding: 2px 4px;
-  border: 1px dashed var(--pop-black);
-  border-radius: 4px;
-  background-color: var(--surface-secondary);
-  color: var(--color-text);
 }
 
 .warningSteps {

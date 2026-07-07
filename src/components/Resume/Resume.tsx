@@ -20,9 +20,8 @@ import {
   User, 
   FileText 
 } from 'lucide-react';
+import { getSkillsHighlight, type Persona } from '@/lib/skills';
 import styles from './Resume.module.css';
-
-type Persona = 'general' | 'fullstack' | 'ai' | 'creative';
 
 interface ResumeProps {
   resumeData: ResumeData | null;
@@ -63,20 +62,6 @@ function Resume({ resumeData, certificates }: ResumeProps) {
 
   // Get active summary based on persona
   const activeSummary = resumeData.summary[activePersona] || resumeData.summary.general;
-
-  // Filter skills based on persona category
-  const getSkillsHighlight = () => {
-    switch (activePersona) {
-      case 'fullstack':
-        return ['API Architecture', 'Database Engineering', 'Algorithmic Translation', 'Data Analysis', 'Stack-on-Demand'];
-      case 'ai':
-        return ['AI Agent Orchestration', 'Structured Prompting', 'AI Dev Workflows', 'API Architecture', 'Python'];
-      case 'creative':
-        return ['Product Strategy & UX', 'Design to Code', 'Privacy Sandboxing', 'Stack-on-Demand'];
-      default:
-        return ['AI Agent Orchestration', 'Database Engineering', 'Product Strategy & UX', 'Algorithmic Translation', 'Stack-on-Demand'];
-    }
-  };
 
   // Helper to render bullet points based on the active persona
   const renderBullet = (bullet: WorkExperience['bullets'][number]) => {
@@ -309,7 +294,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                         <span>CORE CAPABILITIES</span>
                       </h3>
                       <div className={styles.skillsList}>
-                        {getSkillsHighlight().map((skill) => (
+                        {getSkillsHighlight(activePersona).map((skill) => (
                           <span key={skill} className={styles.skillTag}>
                             {skill}
                           </span>

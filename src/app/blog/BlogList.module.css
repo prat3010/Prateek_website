@@ -87,6 +87,13 @@
   color: var(--color-text-muted);
 }
 
+.date {
+  font-family: var(--font-code);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
 .postTitle {
   font-family: var(--font-headline);
   font-size: var(--text-2xl);

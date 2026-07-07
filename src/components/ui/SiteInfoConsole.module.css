@@ -188,16 +188,6 @@
   transition: width 0.4s ease;
 }
 
-.specsTerminalList {
-  font-size: 0.8rem;
-  line-height: 1.6;
-}
-
-.cyanText {
-  color: var(--pop-blue);
-  font-weight: 700;
-}
-
 /* Terminal Screen Area */
 .terminalContainer {
   background-color: #121215;
@@ -379,10 +369,6 @@
 
 :global([data-theme='noir']) .progressFill {
   background-color: var(--neon-green, #39ff14);
-}
-
-:global([data-theme='noir']) .cyanText {
-  color: var(--neon-cyan, #00f0ff);
 }
 
 :global([data-theme='noir']) .terminalContainer {

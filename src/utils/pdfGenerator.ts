@@ -1,7 +1,6 @@
 import { jsPDF } from 'jspdf';
 import type { ResumeData } from '../data/resume';
-
-type Persona = 'general' | 'fullstack' | 'ai' | 'creative';
+import { getSkillsHighlight, type Persona } from '../lib/skills';
 
 export function generateResumePDF(activePersona: Persona, resumeData: ResumeData) {
   // 1. Initialize A4 Document (210mm x 297mm)
@@ -208,19 +207,6 @@ export function generateResumePDF(activePersona: Persona, resumeData: ResumeData
 
   // 6. Trigger Direct File Download
   doc.save(`Prateek_Sharma_Resume_${activePersona}.pdf`);
-}
-
-function getSkillsHighlight(activePersona: Persona): string[] {
-  switch (activePersona) {
-    case 'fullstack':
-      return ['API Architecture', 'Database Engineering', 'Algorithmic Translation', 'Data Analysis', 'Stack-on-Demand'];
-    case 'ai':
-      return ['AI Agent Orchestration', 'Structured Prompting', 'AI Dev Workflows', 'API Architecture', 'Python'];
-    case 'creative':
-      return ['Product Strategy & UX', 'Design to Code', 'Privacy Sandboxing', 'Stack-on-Demand'];
-    default:
-      return ['AI Agent Orchestration', 'Database Engineering', 'Product Strategy & UX', 'Algorithmic Translation', 'Stack-on-Demand'];
-  }
 }
 
 export function generateQuotationPDF(resumeData: ResumeData) {

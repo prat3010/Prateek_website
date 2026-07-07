@@ -14,6 +14,34 @@ A highly interactive, storyteller-driven personal portfolio website designed wit
 
 ---
 
+## 🌐 Application Routes
+
+| Route | Description |
+|-------|-------------|
+| `/` | Home page — all portfolio sections (hero, about, skills, projects, resume, pricing, playground, blog, contact) |
+| `/terminal` | Interactive diagnostics terminal console (supports commands like `git-info`, `qrcode`, `projects`, `system`, `analytics`) |
+| `/admin/analytics` | Visitor analytics dashboard |
+| `/blog` | Blog listing page |
+| `/blog/[slug]` | Individual blog post page |
+
+### API Routes
+
+| Endpoint | Methods | Description |
+|----------|---------|-------------|
+| `/api/skills` | GET | List all skills |
+| `/api/skills/[id]` | GET, PUT, DELETE | Manage a single skill |
+| `/api/projects` | GET | List all projects |
+| `/api/projects/[slug]` | GET, PUT, DELETE | Manage a single project |
+| `/api/certificates` | GET | List all certificates |
+| `/api/certificates/[id]` | GET, PUT, DELETE | Manage a single certificate |
+| `/api/profile` | GET | Get resume profile |
+| `/api/git-log` | GET | Read generated commit log |
+| `/api/analytics-summary` | GET | Aggregated visitor stats |
+| `/api/contact` | POST | Send contact form email |
+| `/api/revalidate` | POST, GET | Purge Next.js cache (requires `SYNC_API_KEY`) |
+
+---
+
 ## 🛠️ Getting Started
 
 ### 1. Environment Setup
