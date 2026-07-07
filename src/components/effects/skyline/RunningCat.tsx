@@ -169,7 +169,7 @@ const RunningCat: React.FC<LayerProps> = ({ reducedMotion }) => {
           setState('sitting');
         }
       }
-    }, [tick, reducedMotion]);
+    }, [tick, reducedMotion, mousePosRef, scrollVelocityRef]);
 
   // Smooth position interpolation for jumping states (replaces stepped tick-based positions)
   useEffect(() => {

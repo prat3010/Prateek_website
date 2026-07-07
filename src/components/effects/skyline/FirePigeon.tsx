@@ -121,7 +121,7 @@ const FirePigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion }) =>
         setState('idle');
       }
     }
-  }, [tick, reducedMotion]);
+  }, [tick, reducedMotion, mousePosRef, scrollVelocityRef]);
 
   if (reducedMotion) return null;
 

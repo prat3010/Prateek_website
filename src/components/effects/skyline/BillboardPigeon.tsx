@@ -114,7 +114,7 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
       const nextSide = sideRef.current === 'left' ? 'right' : 'left';
       startScurryRef.current(nextSide);
     }
-  }, [tick, reducedMotion]);
+  }, [tick, reducedMotion, mousePosRef, startScurryRef]);
 
   // Shared tick drives velocity-based alert state (160ms tick from SkylineInteractionContext)
   useEffect(() => {
@@ -122,7 +122,7 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
     const vel = scrollVelocityRef.current;
     if (vel > 60 && !alertRef.current && !scurryingRef.current) setAlert(true);
     else if (vel <= 60 && alertRef.current && !scurryingRef.current) setAlert(false);
-  }, [tick, reducedMotion]);
+  }, [tick, reducedMotion, scrollVelocityRef]);
 
   useEffect(() => {
     return () => {

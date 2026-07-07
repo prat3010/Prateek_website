@@ -162,7 +162,7 @@ export default function Navbar({ items, className }: NavbarProps) {
       setActiveSection(href);
       setMobileOpen(false);
     },
-    [lenis],
+    [lenis, prefersReducedMotion],
   );
 
   return (

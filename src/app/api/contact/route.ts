@@ -1,15 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
-
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;')
-    .replace(/\//g, '&#x2F;');
-}
+import { escapeHtml } from '@/utils/sanitize';
 
 export async function POST(request: Request) {
   try {

@@ -263,7 +263,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
         setState('sitting');
       }
     }
-  }, [tick, reducedMotion]);
+  }, [tick, reducedMotion, lastClickRef, mousePosRef, scrollVelocityRef]);
 
   // ── Pigeon on the same pedestal ──
   const [pigeonOffsetX, setPigeonOffsetX] = useState(0);
@@ -501,7 +501,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
         {element}
       </g>
     );
-  }, [state, frameIndex, scale, opacity]);
+  }, [state, frameIndex, scale]);
 
   if (reducedMotion) return null;
 
