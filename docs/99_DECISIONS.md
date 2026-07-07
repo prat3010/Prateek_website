@@ -12,6 +12,7 @@ This document serves as the registry of critical architectural design decisions 
 * [ADR 02: On-Demand Cache Revalidation](#adr-02-on-demand-cache-revalidation)
 * [ADR 03: GDPR Telemetry via Daily IP Hashing](#adr-03-gdpr-telemetry-via-daily-ip-hashing)
 * [ADR 04: Dual-Write Content Platform with JSON Fallbacks](#adr-04-dual-write-content-platform-with-json-fallbacks)
+* [ADR 05: Portal Modals to Escape ScrollSection Containing Block](#adr-05-portal-modals-to-escape-scrollsection-containing-block)
 
 ---
 
@@ -56,6 +57,17 @@ This document serves as the registry of critical architectural design decisions 
 * **Consequences**:
   * **Pros**: High resilience; the site works offline; local code fallbacks act as a backup.
   * **Cons**: Local repository files must be staged and committed to keep git and database schemas in sync.
+
+---
+
+# **ADR 05: Portal Modals to Escape ScrollSection Containing Block**
+
+* **Status**: Approved
+* **Context**: `ScrollSection` wraps every page section in an `m.div` with `will-change: transform` (CSS) and a dynamic Framer Motion `transform: translateY(...)`. Per the CSS spec, both properties establish a new containing block for all `position: fixed` descendants. Any modal rendered inside a `ScrollSection` (e.g., the project detail modal) has its `position: fixed; inset: 0` resolved relative to the `m.div`, not the viewport. Combined with `.projects { overflow: hidden }`, the modal gets clipped to the section boundaries and cannot scroll.
+* **Decision**: Use `createPortal(modal, document.body)` to render modals at the document body level, escaping the `ScrollSection` DOM hierarchy. The modal's `position: fixed` now correctly targets the viewport. Background scroll is locked via `body.style.overflow = 'hidden'` + `lenis.stop()`.
+* **Consequences**:
+  * **Pros**: Modals work correctly with viewport-relative positioning and native overflow scroll; no need to modify `ScrollSection` or Framer Motion scroll animations.
+  * **Cons**: Modals are detached from their React tree (focus management, event bubbling must be handled explicitly). Any new fullscreen overlays in the codebase must also use portals.
 
 ---
 
