@@ -344,6 +344,7 @@
   --st-active-color: #121214;
   --st-hover-color: var(--neon-yellow);
   --st-hover-bg: rgba(255, 234, 0, 0.08);
+  --st-accent: var(--neon-yellow);
 }
 
 /* Audience Toggle */
@@ -358,6 +359,7 @@
   --st-active-color: var(--neon-cyan);
   --st-hover-color: var(--neon-cyan);
   --st-hover-bg: rgba(0, 240, 255, 0.08);
+  --st-accent: var(--neon-cyan);
 }
 
 /* ── Nav link overrides ── */
