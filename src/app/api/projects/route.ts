@@ -19,19 +19,25 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const apiKey = request.headers.get('x-api-key');
-  if (!apiKey || apiKey !== process.env.SYNC_API_KEY) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const apiKey = request.headers.get('x-api-key');
+    if (!apiKey || apiKey !== process.env.SYNC_API_KEY) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (!supabase) {
+      return NextResponse.json({ error: 'Supabase not configured' }, { status: 500 });
+    }
+    const body = await request.json();
+    const { data, error } = await supabase.from('projects').insert(body).select().single();
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    revalidateTag('portfolio-data', 'max');
+    revalidateTag('projects', 'max');
+    return NextResponse.json(data, { status: 201 });
+  } catch (e: unknown) {
+    console.error('Projects POST error:', e);
+    const message = e instanceof Error ? e.message : 'Internal server error';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
-  if (!supabase) {
-    return NextResponse.json({ error: 'Supabase not configured' }, { status: 500 });
-  }
-  const body = await request.json();
-  const { data, error } = await supabase.from('projects').insert(body).select().single();
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-  revalidateTag('portfolio-data', 'max');
-  revalidateTag('projects', 'max');
-  return NextResponse.json(data, { status: 201 });
 }

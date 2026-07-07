@@ -3,7 +3,6 @@ title: "Direct Vector PDF Downloads in Next.js"
 date: "2026-06-12"
 excerpt: "How we bypassed the print dialog entirely to generate high-fidelity, ATS-friendly vector resumes using jsPDF."
 tags: ["Next.js", "jsPDF", "Frontend"]
-coverImage: "/images/blog/default.jpg"
 ---
 
 Writing a developer resume is all about making it parseable. While a simple browser print layout works, triggering a direct file download on click provides a much cleaner user experience.

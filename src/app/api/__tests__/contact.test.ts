@@ -9,10 +9,16 @@ vi.mock('resend', () => ({
   },
 }));
 
+let testCounter = 0;
 function makeRequest(body: unknown, headers: Record<string, string> = {}) {
+  testCounter++;
   return new Request('http://localhost/api/contact', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...headers },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-forwarded-for': `1.0.0.${testCounter}`,
+      ...headers,
+    },
     body: JSON.stringify(body),
   });
 }
@@ -71,5 +77,14 @@ describe('POST /api/contact', () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.success).toBe(true);
+  });
+
+  it('returns 429 when rate limit exceeded', async () => {
+    const ip = '10.0.0.99';
+    for (let i = 0; i < 5; i++) {
+      await POST(makeRequest({ name: 'Test', email: 'a@b.com', message: 'hi' }, { 'x-forwarded-for': ip }));
+    }
+    const res = await POST(makeRequest({ name: 'Test', email: 'a@b.com', message: 'hi' }, { 'x-forwarded-for': ip }));
+    expect(res.status).toBe(429);
   });
 });

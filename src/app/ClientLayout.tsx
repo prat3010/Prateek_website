@@ -48,7 +48,7 @@ function ClientLayoutContent({
         {audience === null ? (
           <OnboardingSelector />
         ) : (
-          <main>{children}</main>
+          <main id="main-content">{children}</main>
         )}
 
         {!isAdminRoute && <Footer />}
