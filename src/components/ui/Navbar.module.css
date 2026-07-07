@@ -314,12 +314,33 @@
     height: 64px;
   }
 
+  .logo {
+    width: 40px;
+    height: 40px;
+  }
+
+  .rightGroup {
+    gap: 8px;
+  }
+
   .navLinks {
     display: none;
   }
 
   .hamburger {
     display: flex;
+  }
+
+  .mobileOverlay {
+    gap: 16px;
+    padding: 88px 16px 32px;
+    justify-content: flex-start;
+    overflow-y: auto;
+  }
+
+  .mobileNavLink {
+    font-size: 1.5rem;
+    padding: 8px 16px;
   }
 }
 

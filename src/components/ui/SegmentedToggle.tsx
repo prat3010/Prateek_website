@@ -44,7 +44,7 @@ export default function SegmentedToggle({
             tabIndex={isActive ? -1 : 0}
           >
             {opt.icon && <span className={styles.icon}>{opt.icon}</span>}
-            <span>{opt.label}</span>
+            <span className={styles.labelText}>{opt.label}</span>
           </button>
         );
       })}

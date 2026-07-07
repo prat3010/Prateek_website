@@ -101,3 +101,23 @@
   color: var(--st-hover-color, #fafafa);
   box-shadow: 0 0 10px var(--st-accent, rgba(255, 255, 255, 0.08));
 }
+
+/* ── Responsive Mobile Overrides ── */
+@media (max-width: 768px) {
+  .segment {
+    padding: 6px 8px;
+    gap: 0;
+  }
+
+  .labelText {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+}
