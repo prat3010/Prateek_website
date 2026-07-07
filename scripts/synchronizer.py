@@ -1495,7 +1495,7 @@ with st.sidebar.container(border=True):
                 pass
 
     st.markdown(f"<small style='color: #8A8A93;'>Checked at: {last_checked}</small>", unsafe_allow_html=True)
-    if st.button("Refresh Status", key="btn_refresh_deploy_status", use_container_width=True):
+    if st.button("Refresh Status", key="btn_refresh_deploy_status", width="stretch"):
         st.session_state.deploy_status = None
         st.session_state.deploy_status_task_status = "idle"
         st.rerun()
@@ -1510,7 +1510,7 @@ else:
 st.sidebar.checkbox("Offline Mode (Local JSON Only)", value=not HAS_SYNC, key="offline_mode")
 
 # Manual button to scan for missing skills
-if st.sidebar.button("Scan for Missing Skills", use_container_width=True):
+if st.sidebar.button("Scan for Missing Skills", width="stretch"):
     all_tags = []
     if 'projects' in st.session_state and st.session_state.projects:
         for p in st.session_state.projects:
@@ -2083,7 +2083,7 @@ with tab_edit:
         # Save Button & Live JSON View
         st.markdown("---")
         dry_run_resume = st.checkbox("Dry-Run Mode (Save locally only, do not push to remote)", value=True, key="dry_resume")
-        if st.button("Save Resume Changes", type="primary", use_container_width=True):
+        if st.button("Save Resume Changes", type="primary", width="stretch"):
             try:
                 write_resume_file(res)
                 st.success("Resume updated and saved successfully directly in src/data/resume.json!")
@@ -2362,7 +2362,7 @@ with tab_project:
                     img_path = project.get("image", "")
                     local_img_path = os.path.join("public", img_path.lstrip("/")) if img_path else ""
                     if local_img_path and os.path.exists(local_img_path):
-                        st.image(local_img_path, caption="Current Azure Image", use_container_width=True)
+                        st.image(local_img_path, caption="Current Azure Image", width="stretch")
                     else:
                         st.warning("No Azure image currently found at: " + (img_path or "N/A"))
                         
@@ -2406,7 +2406,7 @@ with tab_project:
                         local_noir_img_path = ""
                         
                     if local_noir_img_path and os.path.exists(local_noir_img_path):
-                        st.image(local_noir_img_path, caption="Current Noir Image", use_container_width=True)
+                        st.image(local_noir_img_path, caption="Current Noir Image", width="stretch")
                     else:
                         st.warning("No Noir image currently found at: " + (noir_img_path or "N/A"))
                         
@@ -2474,7 +2474,7 @@ with tab_project:
                     col_pb1, col_pb2 = st.columns(2)
                     
                     with col_pb1:
-                        if st.button("Save Project Changes", key=f"btn_save_proj_{p_id}", type="primary", use_container_width=True):
+                        if st.button("Save Project Changes", key=f"btn_save_proj_{p_id}", type="primary", width="stretch"):
                             if not edit_title.strip():
                                 st.error("Project Title is required!")
                             else:
@@ -2518,7 +2518,7 @@ with tab_project:
                                     st.error(f"Failed to write file: {e}")
                                     
                     with col_pb2:
-                        if st.button("Delete Project", key=f"btn_del_proj_{p_id}", type="secondary", use_container_width=True):
+                        if st.button("Delete Project", key=f"btn_del_proj_{p_id}", type="secondary", width="stretch"):
                             updated_projects = [p for p in current_projects if p.get("id") != p_id]
                             
                             try:
@@ -2765,7 +2765,7 @@ with tab_cert:
                     img_path = cert.get("image", "")
                     local_img_path = os.path.join("public", img_path.lstrip("/")) if img_path else ""
                     if local_img_path and os.path.exists(local_img_path):
-                        st.image(local_img_path, use_container_width=True)
+                        st.image(local_img_path, width="stretch")
                     else:
                         st.markdown("*No Image*")
                 with col2:
@@ -2867,7 +2867,7 @@ with tab_skills:
             key="new_skill_projects"
         )
         
-        if st.button("Create Skill", type="primary", use_container_width=True):
+        if st.button("Create Skill", type="primary", width="stretch"):
             if not new_name.strip():
                 st.error("Skill Name is required!")
             elif any(s.get("name", "").lower() == new_name.strip().lower() for s in st.session_state.skills):
@@ -3022,7 +3022,7 @@ with tab_skills:
                         
                         col_b1, col_b2 = st.columns([1, 1])
                         with col_b1:
-                            if st.button(f"Save Changes", key=f"{key_prefix}_save_btn", type="primary", use_container_width=True):
+                            if st.button(f"Save Changes", key=f"{key_prefix}_save_btn", type="primary", width="stretch"):
                                 if not edit_name.strip():
                                     st.error("Skill Name is required!")
                                 elif edit_name.strip().lower() != s_name.lower() and any(sk.get("name", "").lower() == edit_name.strip().lower() for sk in st.session_state.skills):
@@ -3074,7 +3074,7 @@ with tab_skills:
                                         st.error(f"Failed to save skill changes: {e}")
                                         
                         with col_b2:
-                            if st.button(f"Delete Skill", key=f"{key_prefix}_del_btn", type="secondary", use_container_width=True):
+                            if st.button(f"Delete Skill", key=f"{key_prefix}_del_btn", type="secondary", width="stretch"):
                                 updated_skills_list = []
                                 for sk in st.session_state.skills:
                                     if sk.get('name') != s_name:
@@ -3123,7 +3123,7 @@ with tab_photos:
         st.caption("Target: `public/images/hero-noir.webp` (WebP)")
         hero_noir_path = "public/images/hero-noir.webp"
         if os.path.exists(hero_noir_path):
-            st.image(hero_noir_path, caption="Current Noir Hero", use_container_width=True)
+            st.image(hero_noir_path, caption="Current Noir Hero", width="stretch")
         else:
             st.warning("No image currently found at target path.")
             
@@ -3149,7 +3149,7 @@ with tab_photos:
         st.caption("Target: `public/images/hero-illustration-wavy.webp` (WebP)")
         hero_comic_path = "public/images/hero-illustration-wavy.webp"
         if os.path.exists(hero_comic_path):
-            st.image(hero_comic_path, caption="Current Comic Hero", use_container_width=True)
+            st.image(hero_comic_path, caption="Current Comic Hero", width="stretch")
         else:
             st.warning("No image currently found at target path.")
             
@@ -3181,7 +3181,7 @@ with tab_photos:
         st.caption("Target: `public/images/profile-noir.webp` (WebP)")
         profile_noir_path = "public/images/profile-noir.webp"
         if os.path.exists(profile_noir_path):
-            st.image(profile_noir_path, caption="Current Noir Profile", use_container_width=True)
+            st.image(profile_noir_path, caption="Current Noir Profile", width="stretch")
         else:
             st.warning("No image currently found at target path.")
             
@@ -3207,7 +3207,7 @@ with tab_photos:
         st.caption("Target: `public/images/profile-comic.webp` (WebP)")
         profile_comic_path = "public/images/profile-comic.webp"
         if os.path.exists(profile_comic_path):
-            st.image(profile_comic_path, caption="Current Comic Profile", use_container_width=True)
+            st.image(profile_comic_path, caption="Current Comic Profile", width="stretch")
         else:
             st.warning("No image currently found at target path.")
             
@@ -3287,7 +3287,7 @@ with tab_blog:
     col_brainstorm, col_clear = st.columns([3, 1])
     with col_brainstorm:
         btn_ideas_disabled = (ideas_status == "running")
-        if st.button("Brainstorm 5 Blog Ideas", use_container_width=True, disabled=btn_ideas_disabled, key="btn_brainstorm_blog"):
+        if st.button("Brainstorm 5 Blog Ideas", width="stretch", disabled=btn_ideas_disabled, key="btn_brainstorm_blog"):
             # Resolve selected project github URLs at click time
             github_urls_to_fetch = {}
             include_current_website_codebase = False
@@ -3398,7 +3398,7 @@ with tab_blog:
             st.rerun()
 
     with col_clear:
-        if st.button("Clear Ideas", use_container_width=True, key="btn_clear_ideas"):
+        if st.button("Clear Ideas", width="stretch", key="btn_clear_ideas"):
             if "blog_brainstormed_ideas" in st.session_state:
                 del st.session_state.blog_brainstormed_ideas
             if "blog_ideas_task_status" in st.session_state:
@@ -3462,7 +3462,7 @@ with tab_blog:
         )
 
     btn_disabled = (blog_status == "running")
-    if st.button("Draft Blog Post with AI", use_container_width=True, disabled=btn_disabled, key="btn_draft_blog"):
+    if st.button("Draft Blog Post with AI", width="stretch", disabled=btn_disabled, key="btn_draft_blog"):
         if not raw_notes:
             st.error("Please add some raw notes or code first!")
         else:
@@ -3504,7 +3504,7 @@ with tab_blog:
     
     dry_run_blog = st.checkbox("Dry-Run Mode (Save to Supabase/locally, skip Git remote push)", value=True, key="dry_blog")
     
-    if st.button("Publish Blog Post", use_container_width=True, type="primary"):
+    if st.button("Publish Blog Post", width="stretch", type="primary"):
         try:
             draft_title, draft_excerpt, tags_list, draft_content = validate_blog_fields(
                 draft_title,
@@ -3666,7 +3666,7 @@ coverImage: "/images/blog/default.jpg"
                         st.caption(f"Date: {post['date'] if post['date'] else 'No Date'} | File: `{post['file_name']}`")
                     with col_edit:
                         edit_key = f"edit_{post['file_name']}"
-                        if st.button("Edit", key=edit_key, type="secondary", use_container_width=True):
+                        if st.button("Edit", key=edit_key, type="secondary", width="stretch"):
                             st.session_state.blog_draft_title = post['title']
                             st.session_state.blog_draft_excerpt = post['excerpt']
                             st.session_state.blog_draft_tags = ", ".join(post['tags'])
@@ -3675,7 +3675,7 @@ coverImage: "/images/blog/default.jpg"
                             st.rerun()
                     with col_del:
                         btn_key = f"delete_{post['file_name']}"
-                        if st.button("Remove", key=btn_key, type="secondary", use_container_width=True):
+                        if st.button("Remove", key=btn_key, type="secondary", width="stretch"):
                             try:
                                 os.remove(post['file_path'])
                             except Exception as e:
