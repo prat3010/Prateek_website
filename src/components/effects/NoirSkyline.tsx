@@ -94,6 +94,11 @@ function SkylineInner() {
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches || lowEnd || isMobileDevice;
   });
 
+  const [wobble, setWobble] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  });
+
   // Track mouse coordinates for subtle parallax offset & update reducedMotion on resize
   useEffect(() => {
     const cores = navigator.hardwareConcurrency ?? 4;
@@ -103,11 +108,13 @@ function SkylineInner() {
     const checkReducedMotion = () => {
       const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
       setReducedMotion(mediaQuery.matches || lowEnd || isMobileDevice);
+      setWobble(!mediaQuery.matches);
     };
 
     const mediaListener = (e: MediaQueryListEvent) => {
       const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
       setReducedMotion(e.matches || lowEnd || isMobileDevice);
+      setWobble(!e.matches);
     };
     mediaQuery.addEventListener('change', mediaListener);
     window.addEventListener('resize', checkReducedMotion);
@@ -168,7 +175,7 @@ function SkylineInner() {
             ? { width: '100%', height: '100%' }
             : { x: layer1X, y: layer1Y, width: '100%', height: '100%', willChange: 'transform' }}
         >
-          <Layer1 reducedMotion={reducedMotion} />
+          <Layer1 reducedMotion={reducedMotion} wobble={wobble} />
         </m.div>
       </m.div>
 
@@ -184,7 +191,7 @@ function SkylineInner() {
             ? { width: '100%', height: '100%' }
             : { x: layer1_5X, y: layer1_5Y, width: '100%', height: '100%', willChange: 'transform' }}
         >
-          <Layer1_5 reducedMotion={reducedMotion} />
+          <Layer1_5 reducedMotion={reducedMotion} wobble={wobble} />
         </m.div>
       </m.div>
 
@@ -200,7 +207,7 @@ function SkylineInner() {
             ? { width: '100%', height: '100%' }
             : { x: layer2X, y: layer2Y, width: '100%', height: '100%', willChange: 'transform' }}
         >
-          <Layer2 reducedMotion={reducedMotion} />
+          <Layer2 reducedMotion={reducedMotion} wobble={wobble} />
         </m.div>
       </m.div>
 
@@ -216,7 +223,7 @@ function SkylineInner() {
             ? { width: '100%', height: '100%' }
             : { x: bridgeLayerX, y: bridgeLayerY, width: '100%', height: '100%', willChange: 'transform' }}
         >
-          <BridgeLayer reducedMotion={reducedMotion} />
+          <BridgeLayer reducedMotion={reducedMotion} wobble={wobble} />
         </m.div>
       </m.div>
 
@@ -232,7 +239,7 @@ function SkylineInner() {
             ? { width: '100%', height: '100%' }
             : { x: layer3X, y: layer3Y, width: '100%', height: '100%', willChange: 'transform' }}
         >
-          <Layer3 reducedMotion={reducedMotion} />
+          <Layer3 reducedMotion={reducedMotion} wobble={wobble} />
         </m.div>
       </m.div>
 

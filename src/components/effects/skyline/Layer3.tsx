@@ -9,8 +9,8 @@ import InteractiveGargoyle from './InteractiveGargoyle';
 import BillboardPigeon from './BillboardPigeon';
 import FirePigeon from './FirePigeon';
 
-const Layer3 = React.memo(function Layer3({ reducedMotion }: LayerProps) {
-  const wobble = !reducedMotion;
+const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble }: LayerProps) {
+  const wobble = propWobble ?? !reducedMotion;
   const strength = 4.0; // Heavy foreground wobbly brush style
   return (
     <>

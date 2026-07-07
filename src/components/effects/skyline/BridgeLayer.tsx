@@ -5,8 +5,8 @@ import styles from '../NoirSkyline.module.css';
 import { WobblyPath, WobblyLine, WobblyRect, WobblyPolygon, WobblyLineGroup, WobblyPathGroup, type WobblyLineSegment } from '../WobblySVG';
 import { LayerProps } from './types';
 
-const BridgeLayer = React.memo(function BridgeLayer({ reducedMotion }: LayerProps) {
-  const wobble = !reducedMotion;
+const BridgeLayer = React.memo(function BridgeLayer({ reducedMotion, wobble: propWobble }: LayerProps) {
+  const wobble = propWobble ?? !reducedMotion;
   const strength = 3.5;
 
   // Main Cable Y equation

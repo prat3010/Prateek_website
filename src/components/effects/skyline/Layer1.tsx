@@ -5,8 +5,8 @@ import styles from '../NoirSkyline.module.css';
 import { WobblyPath, WobblyLine, WobblyRect, WobblyPolygon } from '../WobblySVG';
 import { LayerProps } from './types';
 
-const Layer1 = React.memo(function Layer1({ reducedMotion }: LayerProps) {
-  const wobble = !reducedMotion;
+const Layer1 = React.memo(function Layer1({ reducedMotion, wobble: propWobble }: LayerProps) {
+  const wobble = propWobble ?? !reducedMotion;
   const strength = 2.0; // Subtle background wobble
   return (
     <>

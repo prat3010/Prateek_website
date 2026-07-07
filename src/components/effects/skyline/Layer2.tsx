@@ -29,8 +29,8 @@ const BOLLARD_POSTS: WobblyLineSegment[] = BOLLARD_XS.map((x) => ({
   y2: 938,
 }));
 
-const Layer2 = React.memo(function Layer2({ reducedMotion }: LayerProps) {
-  const wobble = !reducedMotion;
+const Layer2 = React.memo(function Layer2({ reducedMotion, wobble: propWobble }: LayerProps) {
+  const wobble = propWobble ?? !reducedMotion;
   const strength = 3.0; // Medium midground wobble
   return (
     <>
