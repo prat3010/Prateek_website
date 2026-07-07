@@ -1647,6 +1647,33 @@
   contain: layout style paint;
 }
 
+/* ── Theme Transition Flicker Animation for Skyline Layers ── */
+:global(.theme-transition) .layer {
+  animation: lightbulb-flicker 1.0s ease-in-out forwards !important;
+  will-change: opacity;
+  transition: none !important;
+}
+
+:global(.theme-transition) .layer:nth-child(1) {
+  animation-delay: 0ms;
+}
+:global(.theme-transition) .layer:nth-child(2) {
+  animation-delay: 20ms;
+}
+:global(.theme-transition) .layer:nth-child(3) {
+  animation-delay: 40ms;
+}
+:global(.theme-transition) .layer:nth-child(4) {
+  animation-delay: 60ms;
+}
+:global(.theme-transition) .layer:nth-child(5) {
+  animation-delay: 80ms;
+}
+:global(.theme-transition) .layer:nth-child(6) {
+  animation-delay: 100ms;
+}
+
+
 
 
 
