@@ -642,3 +642,19 @@
     transform: none;
   }
 }
+
+@media (max-width: 480px) {
+  .comicSocials {
+    gap: 8px;
+  }
+
+  .comicSocialLink {
+    width: 36px;
+    height: 36px;
+  }
+
+  .socialIcon svg {
+    width: 16px;
+    height: 16px;
+  }
+}
