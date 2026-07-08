@@ -65,13 +65,15 @@ def sync_background_tasks():
     for k in list(_task_store.keys()):
         if k.endswith("_status"):
             prefix = k[:-7]
-            state_status = st.session_state.get(k, "idle")
             store_status = _task_store.get(k, "idle")
-            # If state is running, but worker has completed or failed, synchronize the states
-            if state_status == "running" and store_status in ("success", "error"):
+            if store_status in ("success", "error"):
                 st.session_state[k] = store_status
                 st.session_state[f"{prefix}_result"] = _task_store.get(f"{prefix}_result")
                 st.session_state[f"{prefix}_error"] = _task_store.get(f"{prefix}_error")
+                # Consume immediately in global store to prevent repeat triggers
+                _task_store[k] = "idle"
+            elif store_status == "running":
+                st.session_state[k] = "running"
 
 sync_background_tasks()
 
@@ -443,7 +445,7 @@ def run_async_task(task_func, key_prefix):
     result_key = f"{key_prefix}_result"
     error_key = f"{key_prefix}_error"
     
-    if st.session_state.get(status_key) == "running":
+    if st.session_state.get(status_key) == "running" or _task_store.get(status_key) == "running":
         return
 
     # Update state in global store and session state
@@ -1781,6 +1783,7 @@ with st.sidebar.container(border=True):
     if st.button("Refresh Status", key="btn_refresh_deploy_status", width="stretch"):
         st.session_state.deploy_status = None
         st.session_state.deploy_status_task_status = "idle"
+        _task_store["deploy_status_task_status"] = "idle"
         st.rerun()
 
     st.markdown("---")
