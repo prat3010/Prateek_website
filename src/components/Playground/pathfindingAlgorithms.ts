@@ -454,3 +454,343 @@ const keyToNode = (key: string): GridNode => {
   const [col, row] = key.split(',').map(Number);
   return { col, row };
 };
+
+/**
+ * 4-Directional Jump Point Search (JPS) Helper
+ */
+function jump(
+  current: GridNode,
+  parent: GridNode,
+  end: GridNode,
+  cols: number,
+  rows: number,
+  walls: Set<string>
+): GridNode | null {
+  if (current.col < 0 || current.col >= cols || current.row < 0 || current.row >= rows) return null;
+  const key = nodeToKey(current);
+  if (walls.has(key)) return null;
+  if (isSameNode(current, end)) return current;
+
+  const dx = current.col - parent.col;
+  const dy = current.row - parent.row;
+
+  if (dx !== 0) {
+    // Horizontal movement: Check for forced neighbors above and below
+    const aboveCurrent = `${current.col},${current.row - 1}`;
+    const aboveParent = `${parent.col},${parent.row - 1}`;
+    if (current.row > 0 && !walls.has(aboveCurrent) && walls.has(aboveParent)) {
+      return current;
+    }
+    const belowCurrent = `${current.col},${current.row + 1}`;
+    const belowParent = `${parent.col},${parent.row + 1}`;
+    if (current.row < rows - 1 && !walls.has(belowCurrent) && walls.has(belowParent)) {
+      return current;
+    }
+
+    // Check vertical branches recursively
+    const upNode = { col: current.col, row: current.row - 1 };
+    const downNode = { col: current.col, row: current.row + 1 };
+    if (
+      jump(upNode, current, end, cols, rows, walls) ||
+      jump(downNode, current, end, cols, rows, walls)
+    ) {
+      return current;
+    }
+  } else if (dy !== 0) {
+    // Vertical movement: Check for forced neighbors to the left and right
+    const leftCurrent = `${current.col - 1},${current.row}`;
+    const leftParent = `${parent.col - 1},${parent.row}`;
+    if (current.col > 0 && !walls.has(leftCurrent) && walls.has(leftParent)) {
+      return current;
+    }
+    const rightCurrent = `${current.col + 1},${current.row}`;
+    const rightParent = `${parent.col + 1},${parent.row}`;
+    if (current.col < cols - 1 && !walls.has(rightCurrent) && walls.has(rightParent)) {
+      return current;
+    }
+  }
+
+  // Keep jumping in the same direction
+  const nextNode = { col: current.col + dx, row: current.row + dy };
+  return jump(nextNode, current, end, cols, rows, walls);
+}
+
+/**
+ * Jump Point Search (JPS) Algorithm Generator
+ */
+export function* runJPS(
+  start: GridNode,
+  end: GridNode,
+  cols: number,
+  rows: number,
+  walls: Set<string>
+): Generator<PathfindingStep, void, unknown> {
+  const gScore: Record<string, number> = {};
+  const fScore: Record<string, number> = {};
+  const prev: Record<string, GridNode | null> = {};
+
+  const openSet: GridNode[] = [start];
+  const openSetKeys = new Set<string>([nodeToKey(start)]);
+  const closedSetKeys = new Set<string>();
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const key = `${c},${r}`;
+      gScore[key] = Infinity;
+      fScore[key] = Infinity;
+      prev[key] = null;
+    }
+  }
+
+  const startKey = nodeToKey(start);
+  gScore[startKey] = 0;
+  fScore[startKey] = getManhattanDistance(start, end);
+
+  while (openSet.length > 0) {
+    openSet.sort((a, b) => fScore[nodeToKey(a)] - fScore[nodeToKey(b)]);
+    const current = openSet.shift()!;
+    const currentKey = nodeToKey(current);
+    openSetKeys.delete(currentKey);
+
+    if (isSameNode(current, end)) {
+      const path: GridNode[] = [];
+      let temp: GridNode | null = current;
+      while (temp) {
+        path.unshift(temp);
+        temp = prev[nodeToKey(temp)] || null;
+      }
+      yield { type: 'path', path };
+      return;
+    }
+
+    closedSetKeys.add(currentKey);
+
+    if (!isSameNode(current, start) && !isSameNode(current, end)) {
+      yield { type: 'visit', col: current.col, row: current.row };
+    }
+
+    const neighbors = getNeighbors(current, cols, rows);
+    for (const neighbor of neighbors) {
+      if (walls.has(nodeToKey(neighbor)) || closedSetKeys.has(nodeToKey(neighbor))) continue;
+
+      const jumpPoint = jump(neighbor, current, end, cols, rows, walls);
+      if (jumpPoint) {
+        const jumpPointKey = nodeToKey(jumpPoint);
+        if (closedSetKeys.has(jumpPointKey)) continue;
+
+        const d = getManhattanDistance(current, jumpPoint);
+        const tentativeGScore = gScore[currentKey] + d;
+
+        if (tentativeGScore < gScore[jumpPointKey]) {
+          prev[jumpPointKey] = current;
+          gScore[jumpPointKey] = tentativeGScore;
+          fScore[jumpPointKey] = tentativeGScore + getManhattanDistance(jumpPoint, end);
+
+          // Animate intermediary cells between current node and jumpPoint to visualize the leap
+          let animNode = neighbor;
+          const dx = Math.sign(jumpPoint.col - current.col);
+          const dy = Math.sign(jumpPoint.row - current.row);
+          while (!isSameNode(animNode, jumpPoint)) {
+            if (!isSameNode(animNode, start) && !isSameNode(animNode, end)) {
+              yield { type: 'visit', col: animNode.col, row: animNode.row };
+            }
+            animNode = { col: animNode.col + dx, row: animNode.row + dy };
+          }
+
+          if (!openSetKeys.has(jumpPointKey)) {
+            openSet.push(jumpPoint);
+            openSetKeys.add(jumpPointKey);
+          }
+        }
+      }
+    }
+  }
+
+  yield { type: 'no-path' };
+}
+
+/**
+ * Iterative Deepening DFS (IDDFS) Algorithm Generator
+ */
+export function* runIDDFS(
+  start: GridNode,
+  end: GridNode,
+  cols: number,
+  rows: number,
+  walls: Set<string>
+): Generator<PathfindingStep, void, unknown> {
+  const maxDepth = cols * rows;
+  for (let depthLimit = 1; depthLimit <= maxDepth; depthLimit++) {
+    const visited = new Set<string>();
+    const path: GridNode[] = [];
+    const found = yield* dls(start, end, depthLimit, visited, path, cols, rows, walls, start);
+    if (found) {
+      yield { type: 'path', path };
+      return;
+    }
+  }
+  yield { type: 'no-path' };
+}
+
+/**
+ * Depth-Limited Search Helper for IDDFS
+ */
+function* dls(
+  current: GridNode,
+  end: GridNode,
+  limit: number,
+  visited: Set<string>,
+  path: GridNode[],
+  cols: number,
+  rows: number,
+  walls: Set<string>,
+  start: GridNode
+): Generator<PathfindingStep, boolean, unknown> {
+  path.push(current);
+  const currentKey = nodeToKey(current);
+  visited.add(currentKey);
+
+  if (isSameNode(current, end)) {
+    return true;
+  }
+
+  if (limit <= 0) {
+    path.pop();
+    return false;
+  }
+
+  if (!isSameNode(current, start) && !isSameNode(current, end)) {
+    yield { type: 'visit', col: current.col, row: current.row };
+  }
+
+  const neighbors = getNeighbors(current, cols, rows);
+  for (const neighbor of neighbors) {
+    const neighborKey = nodeToKey(neighbor);
+    if (walls.has(neighborKey) || visited.has(neighborKey)) continue;
+
+    const found = yield* dls(neighbor, end, limit - 1, visited, path, cols, rows, walls, start);
+    if (found) return true;
+  }
+
+  path.pop();
+  return false;
+}
+
+/**
+ * Random Walk (Stochastic Search) Algorithm Generator
+ */
+export function* runRandomWalk(
+  start: GridNode,
+  end: GridNode,
+  cols: number,
+  rows: number,
+  walls: Set<string>
+): Generator<PathfindingStep, void, unknown> {
+  let current = start;
+  const maxSteps = 3000;
+  let steps = 0;
+  const prev: Record<string, GridNode | null> = {};
+
+  while (!isSameNode(current, end) && steps < maxSteps) {
+    const neighbors = getNeighbors(current, cols, rows).filter((n) => !walls.has(nodeToKey(n)));
+    if (neighbors.length === 0) {
+      yield { type: 'no-path' };
+      return;
+    }
+    const nextNode = neighbors[Math.floor(Math.random() * neighbors.length)];
+    const nextKey = nodeToKey(nextNode);
+
+    prev[nextKey] = current;
+    current = nextNode;
+    steps++;
+
+    if (!isSameNode(current, start) && !isSameNode(current, end)) {
+      yield { type: 'visit', col: current.col, row: current.row };
+    }
+  }
+
+  if (isSameNode(current, end)) {
+    const path: GridNode[] = [];
+    let temp: GridNode | null = current;
+    while (temp) {
+      path.unshift(temp);
+      temp = prev[nodeToKey(temp)] || null;
+    }
+    yield { type: 'path', path };
+  } else {
+    yield { type: 'no-path' };
+  }
+}
+
+/**
+ * Wall Follower (Left-Hand Rule) Algorithm Generator
+ */
+export function* runWallFollower(
+  start: GridNode,
+  end: GridNode,
+  cols: number,
+  rows: number,
+  walls: Set<string>
+): Generator<PathfindingStep, void, unknown> {
+  let current = start;
+  let dir = 0; // 0=Up, 1=Right, 2=Down, 3=Left
+  const maxSteps = 1000;
+  let steps = 0;
+  const prev: Record<string, GridNode | null> = {};
+
+  const dx = [0, 1, 0, -1];
+  const dy = [-1, 0, 1, 0];
+
+  while (!isSameNode(current, end) && steps < maxSteps) {
+    steps++;
+
+    const directionsToCheck = [
+      (dir + 3) % 4, // Left
+      dir,           // Straight
+      (dir + 1) % 4, // Right
+      (dir + 2) % 4  // Back
+    ];
+
+    let moved = false;
+    for (const nextDir of directionsToCheck) {
+      const nextNode = { col: current.col + dx[nextDir], row: current.row + dy[nextDir] };
+      const nextKey = nodeToKey(nextNode);
+
+      if (
+        nextNode.col >= 0 &&
+        nextNode.col < cols &&
+        nextNode.row >= 0 &&
+        nextNode.row < rows &&
+        !walls.has(nextKey)
+      ) {
+        prev[nextKey] = current;
+        current = nextNode;
+        dir = nextDir;
+        moved = true;
+        break;
+      }
+    }
+
+    if (!moved) {
+      yield { type: 'no-path' };
+      return;
+    }
+
+    if (!isSameNode(current, start) && !isSameNode(current, end)) {
+      yield { type: 'visit', col: current.col, row: current.row };
+    }
+  }
+
+  if (isSameNode(current, end)) {
+    const path: GridNode[] = [];
+    let temp: GridNode | null = current;
+    while (temp) {
+      path.unshift(temp);
+      temp = prev[nodeToKey(temp)] || null;
+    }
+    yield { type: 'path', path };
+  } else {
+    yield { type: 'no-path' };
+  }
+}
+

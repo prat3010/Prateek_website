@@ -5,7 +5,7 @@ import { Lock, AlertTriangle, Search, Zap } from 'lucide-react';
 import { useLenis } from 'lenis/react';
 import { useTheme } from '@/context/ThemeContext';
 import Pathfinder from './Pathfinder';
-import { GridNode, runDijkstra, runAStar, runBFS, runDFS, runGreedyBestFirst, runBidirectionalBFS, PathfindingStep } from './pathfindingAlgorithms';
+import { GridNode, runDijkstra, runAStar, runBFS, runDFS, runGreedyBestFirst, runBidirectionalBFS, runJPS, runIDDFS, runRandomWalk, runWallFollower, PathfindingStep } from './pathfindingAlgorithms';
 import styles from './Playground.module.css';
 
 const GRID_COLS = 20;
@@ -41,7 +41,7 @@ function Playground() {
   // Controls state
   const [isRunning, setIsRunning] = useState(false);
   const [speed, setSpeed] = useState(3); // 1 = Slowest, 5 = Fastest
-  const [algorithm, setAlgorithm] = useState<'dijkstra' | 'astar' | 'bfs' | 'dfs' | 'greedy' | 'bidirectional'>('dijkstra');
+  const [algorithm, setAlgorithm] = useState<'dijkstra' | 'astar' | 'bfs' | 'dfs' | 'greedy' | 'bidirectional' | 'jps' | 'iddfs' | 'random' | 'wall'>('dijkstra');
   const [logs, setLogs] = useState<LogEntry[]>([]);
 
   // Launch overlay state
@@ -187,6 +187,10 @@ function Playground() {
     else if (algorithm === 'dfs') algoName = "Depth-First Search";
     else if (algorithm === 'greedy') algoName = "Greedy Best-First Search";
     else if (algorithm === 'bidirectional') algoName = "Bidirectional BFS";
+    else if (algorithm === 'jps') algoName = "Jump Point Search";
+    else if (algorithm === 'iddfs') algoName = "Iterative Deepening DFS";
+    else if (algorithm === 'random') algoName = "Random Walk Search";
+    else if (algorithm === 'wall') algoName = "Wall Follower Route";
 
     addLog(isNoir 
       ? `Initializing ${algoName}. Calculating optimal vectors...`
@@ -205,6 +209,14 @@ function Playground() {
       generator = runGreedyBestFirst(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
     } else if (algorithm === 'bidirectional') {
       generator = runBidirectionalBFS(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
+    } else if (algorithm === 'jps') {
+      generator = runJPS(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
+    } else if (algorithm === 'iddfs') {
+      generator = runIDDFS(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
+    } else if (algorithm === 'random') {
+      generator = runRandomWalk(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
+    } else if (algorithm === 'wall') {
+      generator = runWallFollower(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
     } else {
       generator = runDFS(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
     }
@@ -446,7 +458,7 @@ function Playground() {
                   <select
                     className={styles.select}
                     value={algorithm}
-                    onChange={(e) => setAlgorithm(e.target.value as 'dijkstra' | 'astar' | 'bfs' | 'dfs' | 'greedy' | 'bidirectional')}
+                    onChange={(e) => setAlgorithm(e.target.value as 'dijkstra' | 'astar' | 'bfs' | 'dfs' | 'greedy' | 'bidirectional' | 'jps' | 'iddfs' | 'random' | 'wall')}
                     disabled={isRunning}
                   >
                     <option value="dijkstra">
@@ -466,6 +478,18 @@ function Playground() {
                     </option>
                     <option value="dfs">
                       {isNoir ? 'DFS (Winding Probe)' : 'DFS (Backtracking Path)'}
+                    </option>
+                    <option value="jps">
+                      {isNoir ? 'JPS (Grid Jump-Cut)' : 'JPS (Quantum Leap)'}
+                    </option>
+                    <option value="iddfs">
+                      {isNoir ? 'IDDFS (Interrogative Probe)' : 'IDDFS (Pulsing Probe)'}
+                    </option>
+                    <option value="random">
+                      {isNoir ? "Random Walk (Drunkard's Crawl)" : 'Stochastic (Brownian Drift)'}
+                    </option>
+                    <option value="wall">
+                      {isNoir ? 'Wall Follower (Barricade Cordon)' : 'Pledge Algorithm (Contour Hugger)'}
                     </option>
                   </select>
                 </div>
