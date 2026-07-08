@@ -8,6 +8,8 @@ import Scrambler from '@/components/ui/Scrambler';
 import type { ScramblerProps } from '@/components/ui/Scrambler';
 import styles from './Footer.module.css';
 
+import type { ResumeData } from '@/data/resume';
+
 const NAV_LABEL_TEXTS: ScramblerProps['texts'] = {
   developer: { light: 'Resume',    noir: 'Resume' },
   business:  { light: 'Quotation', noir: 'Quotation' },
@@ -22,6 +24,8 @@ export interface SocialLink {
 export interface FooterProps {
   /** Override default social links */
   socials?: SocialLink[];
+  /** Dynamic profile data for social links */
+  profile?: ResumeData | null;
   /** Additional CSS class */
   className?: string;
 }
@@ -73,7 +77,7 @@ const defaultSocials: SocialLink[] = [
   { label: 'Phone', href: 'tel:+919050433260', icon: <PhoneIcon /> },
 ];
 
-export default function Footer({ socials, className }: FooterProps) {
+export default function Footer({ socials, profile, className }: FooterProps) {
   const { theme, audience, isNoir } = useTheme();
 
   const navItems = useMemo(() => [
@@ -95,7 +99,18 @@ export default function Footer({ socials, className }: FooterProps) {
     return () => document.removeEventListener('visibilitychange', handler);
   }, []);
 
-  const socialLinks = socials ?? defaultSocials;
+  const socialLinks = useMemo(() => {
+    if (socials) return socials;
+    if (!profile) return defaultSocials;
+    return [
+      { label: 'GitHub', href: profile.github || 'https://github.com/prat3010', icon: <GitHubIcon /> },
+      { label: 'LinkedIn', href: profile.linkedin || 'https://linkedin.com/in/freshlimevodka', icon: <LinkedInIcon /> },
+      { label: 'Twitter', href: profile.twitter || 'https://x.com/3010prateek', icon: <TwitterIcon /> },
+      { label: 'Instagram', href: profile.instagram || 'https://instagram.com/freshlimevodka', icon: <InstagramIcon /> },
+      { label: 'Email', href: profile.email ? `mailto:${profile.email}` : 'mailto:3010prateeksharma@gmail.com', icon: <EmailIcon /> },
+      { label: 'Phone', href: profile.phone ? `tel:${profile.phone}` : 'tel:+919050433260', icon: <PhoneIcon /> },
+    ];
+  }, [socials, profile]);
   const [year] = useState(() => new Date().getFullYear());
   const [timeString, setTimeString] = useState('');
 

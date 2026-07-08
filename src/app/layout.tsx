@@ -160,7 +160,7 @@ export default async function RootLayout({
       </head>
       <body>
         <a href="#main-content" className="skip-link">Skip to main content</a>
-        <ClientLayout initialTheme={theme} initialAudience={audience}>
+        <ClientLayout initialTheme={theme} initialAudience={audience} profile={profile}>
           {children}
         </ClientLayout>
         <SpeedInsights />

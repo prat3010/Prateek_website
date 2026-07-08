@@ -12,6 +12,7 @@ import { PerformanceGovernorProvider } from '@/context/PerformanceGovernor';
 import ThemeTransition from '@/components/effects/ThemeTransition';
 import { LazyMotion, domAnimation } from 'framer-motion';
 import OnboardingSelector from '@/components/ui/OnboardingSelector';
+import type { ResumeData } from '@/data/resume';
 
 // Lazy load heavy client side animations
 const NoirSkyline = dynamic(() => import('@/components/effects/NoirSkyline'), { ssr: false });
@@ -24,16 +25,19 @@ interface ClientLayoutProps {
   children: React.ReactNode;
   initialTheme: Theme;
   initialAudience: Audience | null;
+  profile?: ResumeData | null;
 }
 
 function ClientLayoutContent({ 
   children, 
   isAdminRoute, 
-  isKonamiActive 
+  isKonamiActive,
+  profile
 }: { 
   children: React.ReactNode; 
   isAdminRoute: boolean; 
   isKonamiActive: boolean; 
+  profile?: ResumeData | null;
 }) {
   const { audience } = useTheme();
 
@@ -51,7 +55,7 @@ function ClientLayoutContent({
           <main id="main-content">{children}</main>
         )}
 
-        {!isAdminRoute && <Footer />}
+        {!isAdminRoute && <Footer profile={profile} />}
         {!isAdminRoute && <ZenToggle />}
         {!isAdminRoute && <TerminalButton />}
         {!isAdminRoute && isKonamiActive && <ThreePizzaRat />}
@@ -63,7 +67,8 @@ function ClientLayoutContent({
 export default function ClientLayout({ 
   children,
   initialTheme,
-  initialAudience
+  initialAudience,
+  profile
 }: ClientLayoutProps) {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith('/admin');
@@ -148,7 +153,7 @@ export default function ClientLayout({
   return (
     <ThemeProvider initialTheme={initialTheme} initialAudience={initialAudience}>
       <LazyMotion features={domAnimation}>
-        <ClientLayoutContent isAdminRoute={isAdminRoute} isKonamiActive={isKonamiActive}>
+        <ClientLayoutContent isAdminRoute={isAdminRoute} isKonamiActive={isKonamiActive} profile={profile}>
           {children}
         </ClientLayoutContent>
       </LazyMotion>
