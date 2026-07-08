@@ -5,7 +5,7 @@ import { Lock, AlertTriangle, Search, Zap } from 'lucide-react';
 import { useLenis } from 'lenis/react';
 import { useTheme } from '@/context/ThemeContext';
 import Pathfinder from './Pathfinder';
-import { GridNode, runDijkstra, runAStar, runBFS, runDFS, runGreedyBestFirst, runBidirectionalBFS, runJPS, runIDDFS, runRandomWalk, runWallFollower, PathfindingStep } from './pathfindingAlgorithms';
+import { GridNode, runDijkstra, runAStar, runBFS, runDFS, runGreedyBestFirst, runBidirectionalBFS, runJPS, runIDDFS, runRandomWalk, runWallFollower, runTremaux, runThetaStar, runIDAStar, PathfindingStep } from './pathfindingAlgorithms';
 import styles from './Playground.module.css';
 
 const GRID_COLS = 20;
@@ -110,6 +110,30 @@ const ALGORITHM_INFO_MAP: Record<string, AlgorithmInfo> = {
     useCase: "Robotic vacuum cleaners, maze-traversal devices.",
     tip: "⚠️ Requires walls to guide it! On an empty grid, it loops in a 2x2 circle forever.",
     isWarningTip: true
+  },
+  tremaux: {
+    name: "Trémaux's Algorithm (Contour Tracker)",
+    nameNoir: "Trémaux's Algorithm (Footprint Tracing)",
+    works: "Places visual markers on traversed cells. Prefers unvisited junctions, backtracks by laying a second mark when stuck, and avoids double-marked routes.",
+    property: "Guarantees escape from any solvable 2D maze. Non-shortest path.",
+    useCase: "Robotics exploratory mapping, legacy maze solving.",
+    tip: "Hugs passages and marks backtrack steps in real-time. Extremely fun to watch in dense mazes!"
+  },
+  thetastar: {
+    name: "Theta* Search (Any-Angle Planner)",
+    nameNoir: "Theta* Search (Direct Line-of-Sight)",
+    works: "An A* variation that checks for a clear line of sight (Bresenham's check) back to parent nodes, bypassing intermediate grid lines.",
+    property: "Guaranteed shortest path. Optimal any-angle vectors.",
+    useCase: "Autonomous drone navigation, video game AI character movement.",
+    tip: "Unlike standard A*, it produces perfectly smooth diagonal straight-line paths!"
+  },
+  idastar: {
+    name: "Iterative Deepening A* (Elliptical Probe)",
+    nameNoir: "Iterative Deepening A* (Elliptical Sweep)",
+    works: "Performs DFS depth probes, setting the cost limit to the heuristic A* estimate f(n). Increases the threshold iteratively based on minimum cost overflow.",
+    property: "Guaranteed shortest path. Extremely memory efficient.",
+    useCase: "AI heuristic planners, game engines solving large state spaces (e.g., Rubik's cubes).",
+    tip: "Creates a beautiful ellipse-shaped search pattern that expands and points towards the target node."
   }
 };
 
@@ -137,7 +161,7 @@ function Playground() {
   // Controls state
   const [isRunning, setIsRunning] = useState(false);
   const [speed, setSpeed] = useState(3); // 1 = Slowest, 5 = Fastest
-  const [algorithm, setAlgorithm] = useState<'dijkstra' | 'astar' | 'bfs' | 'dfs' | 'greedy' | 'bidirectional' | 'jps' | 'iddfs' | 'random' | 'wall'>('dijkstra');
+  const [algorithm, setAlgorithm] = useState<'dijkstra' | 'astar' | 'bfs' | 'dfs' | 'greedy' | 'bidirectional' | 'jps' | 'iddfs' | 'random' | 'wall' | 'tremaux' | 'thetastar' | 'idastar'>('dijkstra');
   const [logs, setLogs] = useState<LogEntry[]>([]);
 
   // Launch overlay state
@@ -327,6 +351,12 @@ function Playground() {
       generator = runRandomWalk(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
     } else if (algorithm === 'wall') {
       generator = runWallFollower(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
+    } else if (algorithm === 'tremaux') {
+      generator = runTremaux(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
+    } else if (algorithm === 'thetastar') {
+      generator = runThetaStar(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
+    } else if (algorithm === 'idastar') {
+      generator = runIDAStar(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
     } else {
       generator = runDFS(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
     }
@@ -580,7 +610,7 @@ function Playground() {
                     <select
                       className={styles.select}
                       value={algorithm}
-                      onChange={(e) => setAlgorithm(e.target.value as 'dijkstra' | 'astar' | 'bfs' | 'dfs' | 'greedy' | 'bidirectional' | 'jps' | 'iddfs' | 'random' | 'wall')}
+                      onChange={(e) => setAlgorithm(e.target.value as 'dijkstra' | 'astar' | 'bfs' | 'dfs' | 'greedy' | 'bidirectional' | 'jps' | 'iddfs' | 'random' | 'wall' | 'tremaux' | 'thetastar' | 'idastar')}
                       disabled={isRunning}
                     >
                       <option value="dijkstra">
@@ -612,6 +642,15 @@ function Playground() {
                       </option>
                       <option value="wall">
                         {isNoir ? "Pledge Algorithm (Barricade Cordon)" : "Pledge Algorithm (Contour Hugger)"}
+                      </option>
+                      <option value="tremaux">
+                        {isNoir ? "Trémaux's Algorithm (Footprint Tracing)" : "Trémaux's Algorithm (Contour Tracker)"}
+                      </option>
+                      <option value="thetastar">
+                        {isNoir ? "Theta* Search (Direct Line-of-Sight)" : "Theta* Search (Any-Angle Planner)"}
+                      </option>
+                      <option value="idastar">
+                        {isNoir ? "Iterative Deepening A* (Elliptical Sweep)" : "Iterative Deepening A* (Elliptical Probe)"}
                       </option>
                     </select>
                   </div>

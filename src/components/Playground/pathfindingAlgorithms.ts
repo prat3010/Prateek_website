@@ -794,3 +794,271 @@ export function* runWallFollower(
   }
 }
 
+/**
+ * Trémaux's Maze-Solving Algorithm Generator
+ */
+export function* runTremaux(
+  start: GridNode,
+  end: GridNode,
+  cols: number,
+  rows: number,
+  walls: Set<string>
+): Generator<PathfindingStep, void, unknown> {
+  const marks: Record<string, number> = {};
+  const prev: Record<string, GridNode | null> = {};
+  const stack: GridNode[] = [];
+
+  let current = start;
+  prev[nodeToKey(start)] = null;
+
+  while (!isSameNode(current, end)) {
+    const currentKey = nodeToKey(current);
+    marks[currentKey] = (marks[currentKey] || 0) + 1;
+
+    if (!isSameNode(current, start) && !isSameNode(current, end)) {
+      yield { type: 'visit', col: current.col, row: current.row };
+    }
+
+    const neighbors = getNeighbors(current, cols, rows).filter(
+      (n) => !walls.has(nodeToKey(n))
+    );
+
+    const zeroMarkNeighbors = neighbors.filter((n) => !marks[nodeToKey(n)]);
+    const oneMarkNeighbors = neighbors.filter((n) => marks[nodeToKey(n)] === 1);
+
+    if (zeroMarkNeighbors.length > 0) {
+      const nextNode = zeroMarkNeighbors[0];
+      prev[nodeToKey(nextNode)] = current;
+      stack.push(current);
+      current = nextNode;
+    } else if (oneMarkNeighbors.length > 0 && stack.length > 0) {
+      const nextNode = stack.pop()!;
+      marks[currentKey] = 2;
+      current = nextNode;
+    } else {
+      yield { type: 'no-path' };
+      return;
+    }
+  }
+
+  const path: GridNode[] = [];
+  let temp: GridNode | null = current;
+  while (temp) {
+    path.unshift(temp);
+    temp = prev[nodeToKey(temp)] || null;
+  }
+  yield { type: 'path', path };
+}
+
+/**
+ * Bresenham's Line Algorithm to check line of sight between two grid nodes.
+ */
+export const hasLineOfSight = (a: GridNode, b: GridNode, walls: Set<string>): boolean => {
+  let x0 = a.col;
+  let y0 = a.row;
+  const x1 = b.col;
+  const y1 = b.row;
+
+  const dx = Math.abs(x1 - x0);
+  const dy = Math.abs(y1 - y0);
+  const sx = x0 < x1 ? 1 : -1;
+  const sy = y0 < y1 ? 1 : -1;
+  let err = dx - dy;
+
+  while (true) {
+    if (x0 === x1 && y0 === y1) break;
+
+    if ((x0 !== a.col || y0 !== a.row) && walls.has(`${x0},${y0}`)) {
+      return false;
+    }
+
+    const e2 = 2 * err;
+    if (e2 > -dy) {
+      err -= dy;
+      x0 += sx;
+    }
+    if (e2 < dx) {
+      err += dx;
+      y0 += sy;
+    }
+  }
+  return true;
+};
+
+/**
+ * Theta* Pathfinding Algorithm Generator (Any-Angle Pathfinding)
+ */
+export function* runThetaStar(
+  start: GridNode,
+  end: GridNode,
+  cols: number,
+  rows: number,
+  walls: Set<string>
+): Generator<PathfindingStep, void, unknown> {
+  const gScore: Record<string, number> = {};
+  const fScore: Record<string, number> = {};
+  const prev: Record<string, GridNode | null> = {};
+
+  const openSet: GridNode[] = [start];
+  const openSetKeys = new Set<string>([nodeToKey(start)]);
+  const closedSetKeys = new Set<string>();
+
+  const getEuclideanDistance = (a: GridNode, b: GridNode): number => {
+    return Math.sqrt((a.col - b.col) ** 2 + (a.row - b.row) ** 2);
+  };
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const key = `${c},${r}`;
+      gScore[key] = Infinity;
+      fScore[key] = Infinity;
+      prev[key] = null;
+    }
+  }
+
+  const startKey = nodeToKey(start);
+  gScore[startKey] = 0;
+  fScore[startKey] = getEuclideanDistance(start, end);
+
+  while (openSet.length > 0) {
+    openSet.sort((a, b) => fScore[nodeToKey(a)] - fScore[nodeToKey(b)]);
+    const current = openSet.shift()!;
+    const currentKey = nodeToKey(current);
+    openSetKeys.delete(currentKey);
+
+    if (isSameNode(current, end)) {
+      const path: GridNode[] = [];
+      let temp: GridNode | null = current;
+      while (temp) {
+        path.unshift(temp);
+        temp = prev[nodeToKey(temp)] || null;
+      }
+      yield { type: 'path', path };
+      return;
+    }
+
+    closedSetKeys.add(currentKey);
+
+    if (!isSameNode(current, start) && !isSameNode(current, end)) {
+      yield { type: 'visit', col: current.col, row: current.row };
+    }
+
+    const neighbors = getNeighbors(current, cols, rows);
+    for (const neighbor of neighbors) {
+      const neighborKey = nodeToKey(neighbor);
+      if (walls.has(neighborKey) || closedSetKeys.has(neighborKey)) continue;
+
+      const parentNode = prev[currentKey] || start;
+      const parentKey = nodeToKey(parentNode);
+
+      let tentativeGScore = 0;
+      let pathParent = current;
+
+      if (hasLineOfSight(parentNode, neighbor, walls)) {
+        tentativeGScore = gScore[parentKey] + getEuclideanDistance(parentNode, neighbor);
+        pathParent = parentNode;
+      } else {
+        tentativeGScore = gScore[currentKey] + getEuclideanDistance(current, neighbor);
+        pathParent = current;
+      }
+
+      if (tentativeGScore < gScore[neighborKey]) {
+        prev[neighborKey] = pathParent;
+        gScore[neighborKey] = tentativeGScore;
+        fScore[neighborKey] = tentativeGScore + getEuclideanDistance(neighbor, end);
+
+        if (!openSetKeys.has(neighborKey)) {
+          openSet.push(neighbor);
+          openSetKeys.add(neighborKey);
+        }
+      }
+    }
+  }
+
+  yield { type: 'no-path' };
+}
+
+/**
+ * Iterative Deepening A* (IDA*) Pathfinding Generator
+ */
+export function* runIDAStar(
+  start: GridNode,
+  end: GridNode,
+  cols: number,
+  rows: number,
+  walls: Set<string>
+): Generator<PathfindingStep, void, unknown> {
+  let threshold = getManhattanDistance(start, end);
+
+  function* search(
+    node: GridNode,
+    g: number,
+    threshold: number,
+    pathKeys: Set<string>,
+    path: GridNode[]
+  ): Generator<PathfindingStep, { minExceeded: number; foundPath: GridNode[] | null }, unknown> {
+    const f = g + getManhattanDistance(node, end);
+
+    if (f > threshold) {
+      return { minExceeded: f, foundPath: null };
+    }
+    if (isSameNode(node, end)) {
+      return { minExceeded: Infinity, foundPath: [...path, node] };
+    }
+
+    if (!isSameNode(node, start) && !isSameNode(node, end)) {
+      yield { type: 'visit', col: node.col, row: node.row };
+    }
+
+    let min = Infinity;
+    const neighbors = getNeighbors(node, cols, rows);
+
+    neighbors.sort((a, b) => {
+      const fA = (g + 1) + getManhattanDistance(a, end);
+      const fB = (g + 1) + getManhattanDistance(b, end);
+      return fA - fB;
+    });
+
+    for (const neighbor of neighbors) {
+      const neighborKey = nodeToKey(neighbor);
+      if (walls.has(neighborKey) || pathKeys.has(neighborKey)) continue;
+
+      pathKeys.add(neighborKey);
+      path.push(neighbor);
+
+      const result = yield* search(neighbor, g + 1, threshold, pathKeys, path);
+
+      if (result.foundPath) {
+        return result;
+      }
+      if (result.minExceeded < min) {
+        min = result.minExceeded;
+      }
+
+      path.pop();
+      pathKeys.delete(neighborKey);
+    }
+
+    return { minExceeded: min, foundPath: null };
+  }
+
+  while (threshold !== Infinity) {
+    const pathKeys = new Set<string>([nodeToKey(start)]);
+    const path: GridNode[] = [start];
+
+    const result = yield* search(start, 0, threshold, pathKeys, path);
+
+    if (result.foundPath) {
+      yield { type: 'path', path: result.foundPath };
+      return;
+    }
+    if (result.minExceeded === Infinity) {
+      break;
+    }
+    threshold = result.minExceeded;
+  }
+
+  yield { type: 'no-path' };
+}
+
+
