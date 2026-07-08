@@ -102,14 +102,15 @@ export default function Footer({ socials, profile, className }: FooterProps) {
   const socialLinks = useMemo(() => {
     if (socials) return socials;
     if (!profile) return defaultSocials;
-    return [
-      { label: 'GitHub', href: profile.github || 'https://github.com/prat3010', icon: <GitHubIcon /> },
-      { label: 'LinkedIn', href: profile.linkedin || 'https://linkedin.com/in/freshlimevodka', icon: <LinkedInIcon /> },
-      { label: 'Twitter', href: profile.twitter || 'https://x.com/3010prateek', icon: <TwitterIcon /> },
-      { label: 'Instagram', href: profile.instagram || 'https://instagram.com/freshlimevodka', icon: <InstagramIcon /> },
-      { label: 'Email', href: profile.email ? `mailto:${profile.email}` : 'mailto:3010prateeksharma@gmail.com', icon: <EmailIcon /> },
-      { label: 'Phone', href: profile.phone ? `tel:${profile.phone}` : 'tel:+919050433260', icon: <PhoneIcon /> },
-    ];
+    
+    const list = [];
+    if (profile.github) list.push({ label: 'GitHub', href: profile.github, icon: <GitHubIcon /> });
+    if (profile.linkedin) list.push({ label: 'LinkedIn', href: profile.linkedin, icon: <LinkedInIcon /> });
+    if (profile.twitter) list.push({ label: 'Twitter', href: profile.twitter, icon: <TwitterIcon /> });
+    if (profile.instagram) list.push({ label: 'Instagram', href: profile.instagram, icon: <InstagramIcon /> });
+    if (profile.email) list.push({ label: 'Email', href: `mailto:${profile.email}`, icon: <EmailIcon /> });
+    if (profile.phone) list.push({ label: 'Phone', href: `tel:${profile.phone}`, icon: <PhoneIcon /> });
+    return list;
   }, [socials, profile]);
   const [year] = useState(() => new Date().getFullYear());
   const [timeString, setTimeString] = useState('');
