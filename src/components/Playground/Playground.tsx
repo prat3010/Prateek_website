@@ -540,171 +540,173 @@ function Playground() {
             )}
 
             <div className={styles.panelLayout}>
-              {/* Interactive Pathfinder Grid */}
-              <Pathfinder
-                cols={GRID_COLS}
-                rows={GRID_ROWS}
-                startNode={startNode}
-                setStartNode={setStartNode}
-                endNode={endNode}
-                setEndNode={setEndNode}
-                walls={walls}
-                setWalls={setWalls}
-                visitedNodes={visitedNodes}
-                pathNodes={pathNodes}
-                isNoir={isNoir}
-                isRunning={isRunning}
-              />
+              {/* Left Column: Grid & Terminal Console */}
+              <div className={styles.leftColumn}>
+                {/* Interactive Pathfinder Grid */}
+                <Pathfinder
+                  cols={GRID_COLS}
+                  rows={GRID_ROWS}
+                  startNode={startNode}
+                  setStartNode={setStartNode}
+                  endNode={endNode}
+                  setEndNode={setEndNode}
+                  walls={walls}
+                  setWalls={setWalls}
+                  visitedNodes={visitedNodes}
+                  pathNodes={pathNodes}
+                  isNoir={isNoir}
+                  isRunning={isRunning}
+                />
 
-              {/* Controls Console */}
-              <div className={styles.controls}>
-                {/* Algorithm Selector */}
-                <div className={styles.controlGroup}>
-                  <label className={styles.label}>
-                    {isNoir ? 'Case Ledger Method' : 'Algorithm Engine'}
-                  </label>
-                  <select
-                    className={styles.select}
-                    value={algorithm}
-                    onChange={(e) => setAlgorithm(e.target.value as 'dijkstra' | 'astar' | 'bfs' | 'dfs' | 'greedy' | 'bidirectional' | 'jps' | 'iddfs' | 'random' | 'wall')}
-                    disabled={isRunning}
-                  >
-                    <option value="dijkstra">
-                      {isNoir ? 'Dijkstra (Complete Sweep)' : "Dijkstra's (Full Grid Wave)"}
-                    </option>
-                    <option value="astar">
-                      {isNoir ? 'A* Search (Heuristic Scan)' : 'A* Search (Guided Manhattan)'}
-                    </option>
-                    <option value="greedy">
-                      {isNoir ? 'Greedy Scan (Tunnel Vision)' : 'Greedy Best-First (Heuristic Scan)'}
-                    </option>
-                    <option value="bfs">
-                      {isNoir ? 'BFS (Spread Search)' : 'BFS (Unweighted Wave)'}
-                    </option>
-                    <option value="bidirectional">
-                      {isNoir ? 'Bidirectional Sweep (Dual Encircling)' : 'Bidirectional BFS (Dual Search)'}
-                    </option>
-                    <option value="dfs">
-                      {isNoir ? 'DFS (Winding Probe)' : 'DFS (Backtracking Path)'}
-                    </option>
-                    <option value="jps">
-                      {isNoir ? 'JPS (Grid Jump-Cut)' : 'JPS (Quantum Leap)'}
-                    </option>
-                    <option value="iddfs">
-                      {isNoir ? 'IDDFS (Interrogative Probe)' : 'IDDFS (Pulsing Probe)'}
-                    </option>
-                    <option value="random">
-                      {isNoir ? "Random Walk (Drunkard's Crawl)" : 'Stochastic (Brownian Drift)'}
-                    </option>
-                    <option value="wall">
-                      {isNoir ? 'Wall Follower (Barricade Cordon)' : 'Pledge Algorithm (Contour Hugger)'}
-                    </option>
-                  </select>
+                {/* Retro Logs Terminal Output */}
+                <div className={styles.console} ref={consoleRef} role="log" aria-label="Visualizer terminal output">
+                  {displayLogs.map((log, index) => (
+                    <p key={index} className={styles.consoleLine}>
+                      <span className={styles.consoleTimestamp}>[{log.timestamp}]</span>
+                      {log.message}
+                    </p>
+                  ))}
                 </div>
+              </div>
 
-                {/* Speed Slider */}
-                <div className={styles.controlGroup}>
-                  <label className={styles.label}>
-                    {isNoir ? 'Search Intensity' : 'Visualizer Speed'}
-                  </label>
-                  <div className={styles.sliderContainer}>
-                    <input
-                      type="range"
-                      min="1"
-                      max="5"
-                      className={styles.slider}
-                      value={speed}
-                      onChange={(e) => setSpeed(Number(e.target.value))}
+              {/* Right Column: Controls & Info Card */}
+              <div className={styles.rightColumn}>
+                <div className={styles.controls}>
+                  {/* Algorithm Selector */}
+                  <div className={styles.controlGroup}>
+                    <label className={styles.label}>
+                      {isNoir ? 'Case Ledger Method' : 'Algorithm Engine'}
+                    </label>
+                    <select
+                      className={styles.select}
+                      value={algorithm}
+                      onChange={(e) => setAlgorithm(e.target.value as 'dijkstra' | 'astar' | 'bfs' | 'dfs' | 'greedy' | 'bidirectional' | 'jps' | 'iddfs' | 'random' | 'wall')}
                       disabled={isRunning}
-                    />
-                    <span className={styles.speedText}>
-                      {getSpeedLabel(speed)}
-                    </span>
+                    >
+                      <option value="dijkstra">
+                        {isNoir ? 'Dijkstra (Complete Sweep)' : "Dijkstra's (Full Grid Wave)"}
+                      </option>
+                      <option value="astar">
+                        {isNoir ? 'A* Search (Heuristic Scan)' : 'A* Search (Guided Manhattan)'}
+                      </option>
+                      <option value="greedy">
+                        {isNoir ? 'Greedy Scan (Tunnel Vision)' : 'Greedy Best-First (Heuristic Scan)'}
+                      </option>
+                      <option value="bfs">
+                        {isNoir ? 'BFS (Spread Search)' : 'BFS (Unweighted Wave)'}
+                      </option>
+                      <option value="bidirectional">
+                        {isNoir ? 'Bidirectional Sweep (Dual Encircling)' : 'Bidirectional BFS (Dual Search)'}
+                      </option>
+                      <option value="dfs">
+                        {isNoir ? 'DFS (Winding Probe)' : 'DFS (Backtracking Path)'}
+                      </option>
+                      <option value="jps">
+                        {isNoir ? 'JPS (Grid Jump-Cut)' : 'JPS (Quantum Leap)'}
+                      </option>
+                      <option value="iddfs">
+                        {isNoir ? 'IDDFS (Interrogative Probe)' : 'IDDFS (Pulsing Probe)'}
+                      </option>
+                      <option value="random">
+                        {isNoir ? "Random Walk (Drunkard's Crawl)" : 'Stochastic (Brownian Drift)'}
+                      </option>
+                      <option value="wall">
+                        {isNoir ? 'Wall Follower (Barricade Cordon)' : 'Pledge Algorithm (Contour Hugger)'}
+                      </option>
+                    </select>
+                  </div>
+
+                  {/* Speed Slider */}
+                  <div className={styles.controlGroup}>
+                    <label className={styles.label}>
+                      {isNoir ? 'Search Intensity' : 'Visualizer Speed'}
+                    </label>
+                    <div className={styles.sliderContainer}>
+                      <input
+                        type="range"
+                        min="1"
+                        max="5"
+                        className={styles.slider}
+                        value={speed}
+                        onChange={(e) => setSpeed(Number(e.target.value))}
+                        disabled={isRunning}
+                      />
+                      <span className={styles.speedText}>
+                        {getSpeedLabel(speed)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className={styles.buttonRow}>
+                    <button
+                      type="button"
+                      className={`${styles.btn} ${styles.btnPrimary}`}
+                      onClick={isRunning ? stopSimulation : visualize}
+                    >
+                      {isRunning 
+                        ? (isNoir ? 'Halt Search' : 'Stop!') 
+                        : (isNoir ? 'Investigate' : 'Visualize!')}
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.btn} ${styles.btnSecondary}`}
+                      onClick={clearPath}
+                      disabled={isRunning}
+                    >
+                      {isNoir ? 'Clear Ledger' : 'Clear Path'}
+                    </button>
+                  </div>
+
+                  <div className={`${styles.buttonRow} ${styles.buttonRowFull}`}>
+                    <button
+                      type="button"
+                      className={`${styles.btn} ${styles.btnSecondary}`}
+                      onClick={clearWalls}
+                      disabled={isRunning}
+                      style={{ width: '100%', marginBottom: '0.75rem' }}
+                    >
+                      {isNoir ? 'Clear Barriers' : 'Clear Walls'}
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.btn} ${styles.btnSecondary}`}
+                      onClick={resetGrid}
+                      disabled={isRunning}
+                      style={{ width: '100%' }}
+                    >
+                      {isNoir ? 'Reset Desk' : 'Reset Grid'}
+                    </button>
                   </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className={styles.buttonRow}>
-                  <button
-                    type="button"
-                    className={`${styles.btn} ${styles.btnPrimary}`}
-                    onClick={isRunning ? stopSimulation : visualize}
-                  >
-                    {isRunning 
-                      ? (isNoir ? 'Halt Search' : 'Stop!') 
-                      : (isNoir ? 'Investigate' : 'Visualize!')}
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.btn} ${styles.btnSecondary}`}
-                    onClick={clearPath}
-                    disabled={isRunning}
-                  >
-                    {isNoir ? 'Clear Ledger' : 'Clear Path'}
-                  </button>
-                </div>
-
-                <div className={`${styles.buttonRow} ${styles.buttonRowFull}`}>
-                  <button
-                    type="button"
-                    className={`${styles.btn} ${styles.btnSecondary}`}
-                    onClick={clearWalls}
-                    disabled={isRunning}
-                    style={{ width: '100%', marginBottom: '0.75rem' }}
-                  >
-                    {isNoir ? 'Clear Barriers' : 'Clear Walls'}
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.btn} ${styles.btnSecondary}`}
-                    onClick={resetGrid}
-                    disabled={isRunning}
-                    style={{ width: '100%' }}
-                  >
-                    {isNoir ? 'Reset Desk' : 'Reset Grid'}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Layout: Console & Info Card */}
-            <div className={styles.bottomLayout}>
-              {/* Retro Logs Terminal Output */}
-              <div className={styles.console} ref={consoleRef} role="log" aria-label="Visualizer terminal output">
-                {displayLogs.map((log, index) => (
-                  <p key={index} className={styles.consoleLine}>
-                    <span className={styles.consoleTimestamp}>[{log.timestamp}]</span>
-                    {log.message}
-                  </p>
-                ))}
-              </div>
-
-              {/* Dynamic Algorithm Dossier / Specs Card */}
-              {ALGORITHM_INFO_MAP[algorithm] && (
-                <div className={styles.infoCard}>
-                  <h3 className={styles.infoTitle}>
-                    {isNoir 
-                      ? ALGORITHM_INFO_MAP[algorithm].nameNoir 
-                      : ALGORITHM_INFO_MAP[algorithm].name}
-                  </h3>
-                  <p className={styles.infoItem}>
-                    <span className={styles.infoLabel}>{isNoir ? 'Modus Operandi' : 'How it works'}</span>
-                    {ALGORITHM_INFO_MAP[algorithm].works}
-                  </p>
-                  <p className={styles.infoItem}>
-                    <span className={styles.infoLabel}>{isNoir ? 'Case Properties' : 'Properties'}</span>
-                    {ALGORITHM_INFO_MAP[algorithm].property}
-                  </p>
-                  <p className={styles.infoItem}>
-                    <span className={styles.infoLabel}>{isNoir ? 'Field Application' : 'Real-World Use'}</span>
-                    {ALGORITHM_INFO_MAP[algorithm].useCase}
-                  </p>
-                  <div className={`${styles.infoTip} ${ALGORITHM_INFO_MAP[algorithm].isWarningTip ? styles.infoTipWarning : ''}`}>
-                    <span className={styles.infoLabel}>{isNoir ? 'Agent Intel' : 'Tip & Diagnostics'}</span>
-                    {ALGORITHM_INFO_MAP[algorithm].tip}
+                {/* Dynamic Algorithm Dossier / Specs Card */}
+                {ALGORITHM_INFO_MAP[algorithm] && (
+                  <div className={styles.infoCard}>
+                    <h3 className={styles.infoTitle}>
+                      {isNoir 
+                        ? ALGORITHM_INFO_MAP[algorithm].nameNoir 
+                        : ALGORITHM_INFO_MAP[algorithm].name}
+                    </h3>
+                    <p className={styles.infoItem}>
+                      <span className={styles.infoLabel}>{isNoir ? 'Modus Operandi' : 'How it works'}</span>
+                      {ALGORITHM_INFO_MAP[algorithm].works}
+                    </p>
+                    <p className={styles.infoItem}>
+                      <span className={styles.infoLabel}>{isNoir ? 'Case Properties' : 'Properties'}</span>
+                      {ALGORITHM_INFO_MAP[algorithm].property}
+                    </p>
+                    <p className={styles.infoItem}>
+                      <span className={styles.infoLabel}>{isNoir ? 'Field Application' : 'Real-World Use'}</span>
+                      {ALGORITHM_INFO_MAP[algorithm].useCase}
+                    </p>
+                    <div className={`${styles.infoTip} ${ALGORITHM_INFO_MAP[algorithm].isWarningTip ? styles.infoTipWarning : ''}`}>
+                      <span className={styles.infoLabel}>{isNoir ? 'Agent Intel' : 'Tip & Diagnostics'}</span>
+                      {ALGORITHM_INFO_MAP[algorithm].tip}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
         </div>
       </div>
