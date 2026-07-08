@@ -56,3 +56,5 @@ venv/
 # Generated Git Log
 /src/data/git-log.json
 
+# Local agent config/plans
+.opencode/

@@ -190,11 +190,13 @@ function Skills({ skills }: SkillsProps) {
           <div className={styles.skillCardMeta}>
             <div className={styles.skillCardNameRow}>
               <h3 className={styles.skillCardName}>{displayName}</h3>
-              <span
-                className={`${styles.skillCardBadge} ${styles['level_' + (skill.status || 'mastered')]}`}
-              >
-                {skill.level}
-              </span>
+              {skill.level && (
+                <span
+                  className={`${styles.skillCardBadge} ${styles['level_' + (skill.status || 'mastered')]}`}
+                >
+                  {skill.level}
+                </span>
+              )}
             </div>
             <p className={styles.skillCardDesc}>{description}</p>
           </div>
