@@ -4,6 +4,7 @@ import { Playfair_Display, Lora, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import ClientLayout from "./ClientLayout";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/react";
 import { getProfile, getSkills } from "@/lib/data";
 import { headers } from "next/headers";
 import type { Theme, Audience } from "@/context/ThemeContext";
@@ -164,6 +165,7 @@ export default async function RootLayout({
           {children}
         </ClientLayout>
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );

@@ -111,6 +111,7 @@ The project uses the following environment variables (stored in `.env.local` loc
 - **Aggregations & RPC Fast-Path**: The dashboard uses a custom SQL database function `get_analytics_summary(cutoff_time)` defined in `supabase_schema.sql`. This runs the aggregation on the database side in a single query pass.
 - **Backwards-Compatible Fallback**: If the `get_analytics_summary` function is missing (e.g., before database migrations are run), the application automatically catches the database error and falls back to client-side aggregation (fetching up to 2,000 records).
 - Database structure, policies, indexes, and stored procedures are defined in `supabase_schema.sql`.
+- **Vercel Web Analytics & Speed Insights:** Integrated into `src/app/layout.tsx` to collect privacy-friendly visitor traffic and performance telemetry at the hosting level.
 
 ## The Synchronizer (Content-Management Helper)
 

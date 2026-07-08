@@ -7,7 +7,7 @@ A highly interactive, storyteller-driven personal portfolio website designed wit
 - **Framework:** Next.js 16 (App Router) & React 19
 - **Logic & Types:** TypeScript
 - **Styling:** CSS Modules & global unified card theme system (with fallback variables)
-- **Database / Analytics:** Supabase (portfolio content storage + custom telemetry logging via Next.js Proxy)
+- **Database / Analytics:** Supabase (portfolio content storage + custom telemetry logging via Next.js Proxy) & Vercel Web Analytics / Speed Insights
 - **Contact Service:** Resend Email API
 - **Animations & Scrolling:** Framer Motion & Lenis smooth scroll
 - **3D & Visual Effects:** Three.js (Pizza Rat) and SVG filter distortions
