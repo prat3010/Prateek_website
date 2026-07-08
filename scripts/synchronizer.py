@@ -56,6 +56,25 @@ st.set_page_config(
     layout="wide",
 )
 
+# Thread-safe global store for background tasks
+if "_GLOBAL_TASK_STORE" not in globals():
+    globals()["_GLOBAL_TASK_STORE"] = {}
+_task_store = globals()["_GLOBAL_TASK_STORE"]
+
+def sync_background_tasks():
+    for k in list(_task_store.keys()):
+        if k.endswith("_status"):
+            prefix = k[:-7]
+            state_status = st.session_state.get(k, "idle")
+            store_status = _task_store.get(k, "idle")
+            # If state is running, but worker has completed or failed, synchronize the states
+            if state_status == "running" and store_status in ("success", "error"):
+                st.session_state[k] = store_status
+                st.session_state[f"{prefix}_result"] = _task_store.get(f"{prefix}_result")
+                st.session_state[f"{prefix}_error"] = _task_store.get(f"{prefix}_error")
+
+sync_background_tasks()
+
 # ==========================================
 # Env Loader & API Helpers
 # ==========================================
@@ -405,10 +424,10 @@ def check_and_add_pending_skills(tags_list):
 def run_async_task(task_func, key_prefix):
     """
     Executes a task function in a background thread.
-    Maintains status in session state:
-      - st.session_state[f'{key_prefix}_status']: "idle", "running", "success", "error"
-      - st.session_state[f'{key_prefix}_result']: Return value on success
-      - st.session_state[f'{key_prefix}_error']: Error message on failure
+    Maintains status in global task store, which is synchronized to st.session_state:
+      - status: "idle", "running", "success", "error"
+      - result: Return value on success
+      - error: Error message on failure
     """
     import threading
     try:
@@ -424,12 +443,12 @@ def run_async_task(task_func, key_prefix):
     result_key = f"{key_prefix}_result"
     error_key = f"{key_prefix}_error"
     
-    if status_key not in st.session_state:
-        st.session_state[status_key] = "idle"
-        
-    if st.session_state[status_key] == "running":
+    if st.session_state.get(status_key) == "running":
         return
 
+    # Update state in global store and session state
+    _task_store[status_key] = "running"
+    _task_store[error_key] = None
     st.session_state[status_key] = "running"
     st.session_state[error_key] = None
 
@@ -446,11 +465,13 @@ def run_async_task(task_func, key_prefix):
     def worker():
         try:
             res = task_func()
-            st.session_state[result_key] = res
-            st.session_state[status_key] = "success"
+            _task_store[result_key] = res
+            _task_store[status_key] = "success"
         except Exception as e:
-            st.session_state[error_key] = str(e)
-            st.session_state[status_key] = "error"
+            import traceback
+            traceback.print_exc()
+            _task_store[error_key] = str(e)
+            _task_store[status_key] = "error"
         finally:
             # Trigger Streamlit to rerun the script to update the UI
             try:
@@ -460,20 +481,14 @@ def run_async_task(task_func, key_prefix):
                     session_info = runtime._session_mgr.get_active_session_info(session_id)
                     if session_info:
                         session_info.session.request_rerun(None)
-                    else:
-                        st.rerun()
-                else:
-                    st.rerun()
             except BaseException:
-                try:
-                    st.rerun()
-                except BaseException:
-                    pass
+                pass
 
     thread = threading.Thread(target=worker)
     thread.daemon = True
     if add_script_run_ctx:
         add_script_run_ctx(thread)
+    thread.start()
 def is_port_active(port):
     import socket
     try:
