@@ -584,31 +584,31 @@ function Playground() {
                       disabled={isRunning}
                     >
                       <option value="dijkstra">
-                        {isNoir ? "Dijkstra's (Complete Sweep)" : "Dijkstra's (Full Grid Wave)"}
+                        {isNoir ? "Dijkstra's Algorithm (Complete Sweep)" : "Dijkstra's Algorithm (Full Grid Wave)"}
                       </option>
                       <option value="astar">
-                        {isNoir ? "A* Search (Heuristic Scan)" : "A* Search (Guided Manhattan)"}
+                        {isNoir ? "A* Heuristic Search (Heuristic Scan)" : "A* Heuristic Search (Guided Manhattan)"}
                       </option>
                       <option value="greedy">
-                        {isNoir ? "Greedy Best-First (Tunnel Vision)" : "Greedy Best-First (Heuristic Scan)"}
+                        {isNoir ? "Greedy Best-First Search (Tunnel Vision)" : "Greedy Best-First Search (Heuristic Scan)"}
                       </option>
                       <option value="bfs">
-                        {isNoir ? "BFS (Spread Search)" : "BFS (Unweighted Wave)"}
+                        {isNoir ? "Breadth-First Search (Spread Search)" : "Breadth-First Search (Unweighted Wave)"}
                       </option>
                       <option value="bidirectional">
                         {isNoir ? "Bidirectional BFS (Dual Encircling)" : "Bidirectional BFS (Dual Search)"}
                       </option>
                       <option value="dfs">
-                        {isNoir ? "DFS (Winding Probe)" : "DFS (Backtracking Path)"}
+                        {isNoir ? "Depth-First Search (Winding Probe)" : "Depth-First Search (Backtracking Path)"}
                       </option>
                       <option value="jps">
-                        {isNoir ? "JPS (Grid Jump-Cut)" : "JPS (Quantum Leap)"}
+                        {isNoir ? "Jump Point Search (Grid Jump-Cut)" : "Jump Point Search (Quantum Leap)"}
                       </option>
                       <option value="iddfs">
-                        {isNoir ? "IDDFS (Interrogative Probe)" : "IDDFS (Pulsing Probe)"}
+                        {isNoir ? "Iterative Deepening DFS (Interrogative Probe)" : "Iterative Deepening DFS (Pulsing Probe)"}
                       </option>
                       <option value="random">
-                        {isNoir ? "Random Walk (Drunkard's Crawl)" : "Random Walk (Brownian Drift)"}
+                        {isNoir ? "Random Walk Search (Drunkard's Crawl)" : "Random Walk Search (Brownian Drift)"}
                       </option>
                       <option value="wall">
                         {isNoir ? "Pledge Algorithm (Barricade Cordon)" : "Pledge Algorithm (Contour Hugger)"}
