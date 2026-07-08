@@ -474,7 +474,24 @@ def run_async_task(task_func, key_prefix):
     thread.daemon = True
     if add_script_run_ctx:
         add_script_run_ctx(thread)
-    thread.start()
+def is_port_active(port):
+    import socket
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(0.5)
+            return s.connect_ex(('127.0.0.1', port)) == 0
+    except Exception:
+        return False
+
+def trigger_rebuild_commit():
+    success, out = run_safe_git_command(["git", "commit", "--allow-empty", "-m", "chore(deploy): force vercel rebuild"])
+    if not success:
+        raise Exception(f"Failed to create empty commit: {out}")
+    success, out = run_safe_git_command(["git", "push"])
+    if not success:
+        raise Exception(f"Failed to push empty commit: {out}")
+    return "Triggered Vercel rebuild successfully via empty commit!"
+
 def run_safe_git_command(args, cwd=None):
     """
     Safely execute a git subprocess command.
@@ -1172,35 +1189,62 @@ def slugify(text):
     return text.strip('-')
 
 # Image save helper used globally
-def save_uploaded_image(uploaded_file, target_path, target_format):
+def save_uploaded_image(uploaded_file, target_path, target_format, max_width=None, quality=80):
     try:
         # Ensure target directory exists
         os.makedirs(os.path.dirname(target_path), exist_ok=True)
+        
+        # Get original uploaded size
+        uploaded_file.seek(0, 2)
+        original_size = uploaded_file.tell()
+        uploaded_file.seek(0)
+        
         if HAS_PIL:
             image = PILImage.open(uploaded_file)
+            
+            # Optional Resizing (maintaining aspect ratio)
+            if max_width and image.size[0] > max_width:
+                aspect_ratio = image.size[1] / image.size[0]
+                new_height = int(max_width * aspect_ratio)
+                image = image.resize((max_width, new_height), PILImage.Resampling.LANCZOS)
+                
             # Keep RGBA for PNG and WEBP if they have transparency
             if target_format.upper() == 'WEBP':
-                image.save(target_path, format='WEBP', quality=90)
+                image.save(target_path, format='WEBP', quality=quality)
             elif target_format.upper() == 'PNG':
                 image.save(target_path, format='PNG')
             else:
                 if image.mode in ('RGBA', 'LA'):
                     image = image.convert('RGB')
                 image.save(target_path, format=target_format.upper())
-            return True, f"Successfully converted and saved image to `{target_path}`!"
+                
+            optimized_size = os.path.getsize(target_path)
+            reduction_pct = ((original_size - optimized_size) / original_size) * 100 if original_size > 0 else 0
+            
+            metrics = {
+                "original_size": original_size,
+                "optimized_size": optimized_size,
+                "reduction_pct": max(0.0, reduction_pct)
+            }
+            return True, f"Successfully converted and saved image to `{target_path}`!", metrics
         else:
             file_ext = os.path.splitext(uploaded_file.name)[1].lower()
-            # Treat jpeg and jpg as same
             clean_ext = file_ext.replace('jpeg', 'jpg')
             clean_target = f".{target_format.lower()}".replace('jpeg', 'jpg')
             if clean_ext == clean_target:
                 with open(target_path, "wb") as f:
                     f.write(uploaded_file.getbuffer())
-                return True, f"Successfully saved raw `{uploaded_file.name}` directly!"
+                optimized_size = os.path.getsize(target_path)
+                metrics = {
+                    "original_size": original_size,
+                    "optimized_size": optimized_size,
+                    "reduction_pct": 0.0
+                }
+                return True, f"Successfully saved raw `{uploaded_file.name}` directly!", metrics
             else:
-                return False, f"Format mismatch! Uploaded `{file_ext}` but target needs `.{target_format.lower()}`. Install `pillow` or upload a matching file."
+                return False, f"Format mismatch! Uploaded `{file_ext}` but target needs `.{target_format.lower()}`. Install `pillow` or upload a matching file.", None
     except Exception as e:
-        return False, f"Failed to save: {e}"
+        return False, f"Failed to save: {e}", None
 
 def git_commit_push_file(file_path, commit_message):
     try:
@@ -1724,6 +1768,48 @@ with st.sidebar.container(border=True):
         st.session_state.deploy_status_task_status = "idle"
         st.rerun()
 
+    st.markdown("---")
+    st.markdown("<div style='font-family: \"Fredoka\", sans-serif; font-weight: bold; font-size: 1rem; color: #ffffff; text-transform: uppercase;'>Control Room</div>", unsafe_allow_html=True)
+
+    # 1. Local Dev Server Status & Control
+    is_dev_running = is_port_active(3000)
+    dev_status_color = "🟢" if is_dev_running else "🔴"
+    dev_status_txt = "Active (Port 3000)" if is_dev_running else "Stopped"
+    
+    st.markdown(f"<small>**Local Dev Server:** {dev_status_color} {dev_status_txt}</small>", unsafe_allow_html=True)
+    
+    if not is_dev_running:
+        if st.button("🚀 Start Dev Server", key="btn_start_dev", width="stretch"):
+            import subprocess
+            try:
+                subprocess.Popen(["npm", "run", "dev"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                st.toast("🚀 Launched dev server in background!")
+                st.rerun()
+            except Exception as e:
+                st.error(f"Failed to start dev server: {e}")
+    
+    # 2. Rebuild Live Site (via empty commit)
+    rebuild_status = st.session_state.get("vercel_rebuild_status", "idle")
+    rebuild_disabled = (rebuild_status == "running")
+    
+    if rebuild_status == "success":
+        st.toast("⚡ Vercel rebuild triggered successfully!")
+        st.session_state.vercel_rebuild_status = "idle"
+    elif rebuild_status == "error":
+        err = st.session_state.get("vercel_rebuild_error", "Unknown error")
+        st.error(f"Rebuild trigger failed: {err}")
+        st.session_state.vercel_rebuild_status = "idle"
+        
+    if st.button("⚡ Force Vercel Rebuild", key="btn_force_rebuild", disabled=rebuild_disabled, width="stretch", help="Pushes an empty commit to GitHub to force Vercel to rebuild and redeploy the site."):
+        run_async_task(trigger_rebuild_commit, "vercel_rebuild")
+        st.rerun()
+        
+    # 3. Purge Cache (API Revalidation)
+    if st.button("🧹 Purge Live Cache", key="btn_purge_cache", width="stretch", help="Sends a cache revalidation request to the Next.js API revalidate endpoint on the live website."):
+        with st.spinner("Purging cache..."):
+            trigger_revalidation()
+            st.toast("🧹 Purged Next.js cache!")
+
 
 if GEMINI_API_KEY:
     st.sidebar.success("Gemini API Key loaded from .env.local")
@@ -1836,6 +1922,8 @@ if 'blog_brainstorm_focus' not in st.session_state:
     st.session_state.blog_brainstorm_focus = ""
 if 'blog_draft_local_path' not in st.session_state:
     st.session_state.blog_draft_local_path = ""
+if 'blog_focus_keyword' not in st.session_state:
+    st.session_state.blog_focus_keyword = ""
 
 
 # Set up tabs
@@ -2609,7 +2697,7 @@ with tab_project:
                         if st.button(f"Save Azure Photo", key=f"btn_save_img_{p_id}", type="primary"):
                             target_img_filename = f"project-{p_id}.webp"
                             target_img_path = os.path.join("public", "images", target_img_filename)
-                            success, msg = save_uploaded_image(up_img, target_img_path, "WEBP")
+                            success, msg, _ = save_uploaded_image(up_img, target_img_path, "WEBP")
                             if success:
                                 project['image'] = f"/images/{target_img_filename}"
                                 write_projects_file(current_projects)
@@ -2653,7 +2741,7 @@ with tab_project:
                         if st.button(f"Save Noir Photo", key=f"btn_save_img_noir_{p_id}", type="primary"):
                             target_noir_filename = f"project-{p_id}-noir.webp"
                             target_noir_path = os.path.join("public", "images", target_noir_filename)
-                            success, msg = save_uploaded_image(up_img_noir, target_noir_path, "WEBP")
+                            success, msg, _ = save_uploaded_image(up_img_noir, target_noir_path, "WEBP")
                             if success:
                                 if not project.get('image'):
                                     project['image'] = f"/images/project-{p_id}.webp"
@@ -3350,7 +3438,22 @@ with tab_photos:
     if not HAS_PIL:
         st.info("💡 **Tip**: Install Pillow (`pip install pillow`) in your project environment to automatically convert any uploaded image (PNG, JPG, WebP) to the correct format required by the website.")
 
-    # save_uploaded_image is now defined globally in the helpers section
+    # 🖼️ WebP Optimization Settings
+    opt_quality = 80
+    max_width = None
+    if HAS_PIL:
+        with st.expander("🖼️ WebP Optimization Settings", expanded=True):
+            opt_quality = st.slider("WebP Compression Quality", 50, 100, 80, help="Lower value decreases file size but reduces quality. 80 is the recommended default.")
+            resize_mode = st.selectbox(
+                "Resize Width Constraint:", 
+                ["No Resize", "Responsive Hero (1600px)", "Responsive Portrait (800px)"], 
+                index=0,
+                help="Reduces image dimensions if the uploaded image exceeds this width, saving massive bandwidth."
+            )
+            if resize_mode == "Responsive Hero (1600px)":
+                max_width = 1600
+            elif resize_mode == "Responsive Portrait (800px)":
+                max_width = 800
 
     # 1. Hero Section Photos
     st.markdown("## Hero Section Photos")
@@ -3368,16 +3471,22 @@ with tab_photos:
         up_hero_noir = st.file_uploader("Upload New Noir Hero Image", type=["png", "jpg", "jpeg", "webp"], key="up_hero_noir")
         if up_hero_noir is not None:
             if st.button("Replace Noir Hero Image", key="btn_hero_noir", type="primary"):
-                success, msg = save_uploaded_image(up_hero_noir, hero_noir_path, "WEBP")
+                success, msg, metrics = save_uploaded_image(up_hero_noir, hero_noir_path, "WEBP", max_width=max_width, quality=opt_quality)
                 if success:
+                    report = ""
+                    if metrics:
+                        orig = metrics["original_size"] / 1024
+                        opt = metrics["optimized_size"] / 1024
+                        red = metrics["reduction_pct"]
+                        report = f"\n\n📊 **Size Optimization Report:**\n* Original: {orig:.1f} KB\n* Optimized: {opt:.1f} KB\n* Reduced: **{red:.1f}% smaller!**"
                     if not dry_run_photo:
                         git_ok, git_msg = git_commit_push_file(hero_noir_path, "chore(photos): update hero noir image")
                         if git_ok:
-                            st.toast(f"🖼️ {msg}\n\n{git_msg}")
+                            st.success(f"🖼️ {msg}{report}\n\n{git_msg}")
                         else:
-                            st.toast(f"⚠️ {msg} but Git failed: {git_msg}")
+                            st.success(f"🖼️ {msg}{report}\n\n⚠️ Git failed: {git_msg}")
                     else:
-                        st.toast(f"🖼️ {msg}")
+                        st.success(f"🖼️ {msg}{report}")
                     st.rerun()
                 else:
                     st.error(msg)
@@ -3394,16 +3503,22 @@ with tab_photos:
         up_hero_comic = st.file_uploader("Upload New Comic Hero Image", type=["png", "jpg", "jpeg", "webp"], key="up_hero_comic")
         if up_hero_comic is not None:
             if st.button("Replace Comic Hero Image", key="btn_hero_comic", type="primary"):
-                success, msg = save_uploaded_image(up_hero_comic, hero_comic_path, "WEBP")
+                success, msg, metrics = save_uploaded_image(up_hero_comic, hero_comic_path, "WEBP", max_width=max_width, quality=opt_quality)
                 if success:
+                    report = ""
+                    if metrics:
+                        orig = metrics["original_size"] / 1024
+                        opt = metrics["optimized_size"] / 1024
+                        red = metrics["reduction_pct"]
+                        report = f"\n\n📊 **Size Optimization Report:**\n* Original: {orig:.1f} KB\n* Optimized: {opt:.1f} KB\n* Reduced: **{red:.1f}% smaller!**"
                     if not dry_run_photo:
                         git_ok, git_msg = git_commit_push_file(hero_comic_path, "chore(photos): update hero comic image")
                         if git_ok:
-                            st.toast(f"🖼️ {msg}\n\n{git_msg}")
+                            st.success(f"🖼️ {msg}{report}\n\n{git_msg}")
                         else:
-                            st.toast(f"⚠️ {msg} but Git failed: {git_msg}")
+                            st.success(f"🖼️ {msg}{report}\n\n⚠️ Git failed: {git_msg}")
                     else:
-                        st.toast(f"🖼️ {msg}")
+                        st.success(f"🖼️ {msg}{report}")
                     st.rerun()
                 else:
                     st.error(msg)
@@ -3426,16 +3541,22 @@ with tab_photos:
         up_profile_noir = st.file_uploader("Upload New Noir Profile Image", type=["png", "jpg", "jpeg", "webp"], key="up_profile_noir")
         if up_profile_noir is not None:
             if st.button("Replace Noir Profile Image", key="btn_profile_noir", type="primary"):
-                success, msg = save_uploaded_image(up_profile_noir, profile_noir_path, "WEBP")
+                success, msg, metrics = save_uploaded_image(up_profile_noir, profile_noir_path, "WEBP", max_width=max_width, quality=opt_quality)
                 if success:
+                    report = ""
+                    if metrics:
+                        orig = metrics["original_size"] / 1024
+                        opt = metrics["optimized_size"] / 1024
+                        red = metrics["reduction_pct"]
+                        report = f"\n\n📊 **Size Optimization Report:**\n* Original: {orig:.1f} KB\n* Optimized: {opt:.1f} KB\n* Reduced: **{red:.1f}% smaller!**"
                     if not dry_run_photo:
                         git_ok, git_msg = git_commit_push_file(profile_noir_path, "chore(photos): update profile noir image")
                         if git_ok:
-                            st.toast(f"🖼️ {msg}\n\n{git_msg}")
+                            st.success(f"🖼️ {msg}{report}\n\n{git_msg}")
                         else:
-                            st.toast(f"⚠️ {msg} but Git failed: {git_msg}")
+                            st.success(f"🖼️ {msg}{report}\n\n⚠️ Git failed: {git_msg}")
                     else:
-                        st.toast(f"🖼️ {msg}")
+                        st.success(f"🖼️ {msg}{report}")
                     st.rerun()
                 else:
                     st.error(msg)
@@ -3452,16 +3573,22 @@ with tab_photos:
         up_profile_comic = st.file_uploader("Upload New Comic Profile Image", type=["png", "jpg", "jpeg", "webp"], key="up_profile_comic")
         if up_profile_comic is not None:
             if st.button("Replace Comic Profile Image", key="btn_profile_comic", type="primary"):
-                success, msg = save_uploaded_image(up_profile_comic, profile_comic_path, "WEBP")
+                success, msg, metrics = save_uploaded_image(up_profile_comic, profile_comic_path, "WEBP", max_width=max_width, quality=opt_quality)
                 if success:
+                    report = ""
+                    if metrics:
+                        orig = metrics["original_size"] / 1024
+                        opt = metrics["optimized_size"] / 1024
+                        red = metrics["reduction_pct"]
+                        report = f"\n\n📊 **Size Optimization Report:**\n* Original: {orig:.1f} KB\n* Optimized: {opt:.1f} KB\n* Reduced: **{red:.1f}% smaller!**"
                     if not dry_run_photo:
                         git_ok, git_msg = git_commit_push_file(profile_comic_path, "chore(photos): update profile comic image")
                         if git_ok:
-                            st.toast(f"🖼️ {msg}\n\n{git_msg}")
+                            st.success(f"🖼️ {msg}{report}\n\n{git_msg}")
                         else:
-                            st.toast(f"⚠️ {msg} but Git failed: {git_msg}")
+                            st.success(f"🖼️ {msg}{report}\n\n⚠️ Git failed: {git_msg}")
                     else:
-                        st.toast(f"🖼️ {msg}")
+                        st.success(f"🖼️ {msg}{report}")
                     st.rerun()
                 else:
                     st.error(msg)
@@ -3786,6 +3913,151 @@ with tab_blog:
     draft_tags = st.text_input("Tags (comma separated):", key="blog_draft_tags")
     draft_content = st.text_area("Markdown Body Content:", height=350, key="blog_draft_content")
     
+    # 🔍 SEO & Keyword Analysis Section
+    with st.expander("🔍 SEO & Keyword Analysis", expanded=True):
+        col_seo_input, col_seo_results = st.columns([1, 1])
+        with col_seo_input:
+            focus_keyword = st.text_input(
+                "Focus Keyword (for audit):", 
+                key="blog_focus_keyword",
+                placeholder="e.g. Next.js, API, python"
+            )
+            
+            # Button for Gemini SEO review
+            seo_task_status = st.session_state.get("blog_seo_review_task_status", "idle")
+            seo_btn_disabled = (seo_task_status == "running")
+            
+            if st.button("Ask Gemini for SEO Review", key="btn_gemini_seo", disabled=seo_btn_disabled, width="stretch"):
+                if not draft_title or not draft_content:
+                    st.error("Please fill in Title and Markdown Content first!")
+                else:
+                    seo_prompt = f"""
+                    You are an expert SEO auditor and copywriter.
+                    Analyze the following blog post details and focus keyword, and provide a clean audit report:
+                    
+                    Title: {draft_title}
+                    Excerpt: {draft_excerpt}
+                    Focus Keyword: {focus_keyword}
+                    
+                    Content:
+                    {draft_content}
+                    
+                    Generate and return strictly the following JSON structure:
+                    {{
+                      "readability_grade": "e.g. 8th Grade (Easy to read)",
+                      "suggested_titles": [
+                        "Title alternative 1",
+                        "Title alternative 2",
+                        "Title alternative 3"
+                      ],
+                      "meta_description": "Suggested optimized 150-char meta description",
+                      "seo_recommendations": [
+                        "Recommendation 1",
+                        "Recommendation 2",
+                        "Recommendation 3"
+                      ]
+                    }}
+                    Do not return any conversational text, markdown formatting wrappers outside the JSON, or backticks. Return only the raw JSON.
+                    """
+                    
+                    def run_seo_review():
+                        res = call_gemini(seo_prompt)
+                        if res is None:
+                            raise ValueError("Failed to get SEO review from Gemini.")
+                        return res
+                        
+                    run_async_task(run_seo_review, "blog_seo_review_task")
+                    st.rerun()
+
+        with col_seo_results:
+            # 1. Title Length check
+            title_len = len(draft_title)
+            if 40 <= title_len <= 60:
+                st.markdown("🟢 **Title Length:** Good (40-60 chars)")
+            elif title_len == 0:
+                st.markdown("🔴 **Title Length:** Empty (Target: 40-60)")
+            else:
+                st.markdown(f"🔴 **Title Length:** {title_len} chars (Target: 40-60)")
+                
+            # 2. Excerpt Length check
+            excerpt_len = len(draft_excerpt)
+            if 120 <= excerpt_len <= 160:
+                st.markdown("🟢 **Excerpt Length:** Good (120-160 chars)")
+            elif excerpt_len == 0:
+                st.markdown("🔴 **Excerpt Length:** Empty (Target: 120-160)")
+            else:
+                st.markdown(f"🟡 **Excerpt Length:** {excerpt_len} chars (Target: 120-160)")
+                
+            # 3. Keyword Checks
+            if focus_keyword:
+                kw = focus_keyword.lower().strip()
+                # Keyword in Title
+                if kw in draft_title.lower():
+                    st.markdown("🟢 **Keyword in Title:** Yes")
+                else:
+                    st.markdown("🔴 **Keyword in Title:** No")
+                    
+                # Keyword in Excerpt
+                if kw in draft_excerpt.lower():
+                    st.markdown("🟢 **Keyword in Excerpt:** Yes")
+                else:
+                    st.markdown("🔴 **Keyword in Excerpt:** No")
+                    
+                # Keyword Density
+                body_lower = draft_content.lower()
+                kw_count = body_lower.count(kw)
+                words = [w for w in body_lower.split() if w.strip()]
+                word_count = len(words)
+                density = (kw_count / word_count * 100) if word_count > 0 else 0
+                
+                if 1.0 <= density <= 2.5:
+                    st.markdown(f"🟢 **Keyword Density:** {density:.2f}% (Good, count: {kw_count})")
+                elif density < 1.0:
+                    st.markdown(f"🟡 **Keyword Density:** {density:.2f}% (Too low, target: 1-2.5%, count: {kw_count})")
+                else:
+                    st.markdown(f"🔴 **Keyword Density:** {density:.2f}% (Stuffing detected! target: 1-2.5%, count: {kw_count})")
+                    
+                # Keyword in headings
+                has_in_headings = False
+                for line in body_lower.split('\n'):
+                    if line.startswith('##') and kw in line:
+                        has_in_headings = True
+                        break
+                if has_in_headings:
+                    st.markdown("🟢 **Keyword in Headings (H2/H3):** Yes")
+                else:
+                    st.markdown("🟡 **Keyword in Headings (H2/H3):** No")
+            else:
+                st.info("Enter a focus keyword to run keyword density audits.")
+
+        # Display Gemini SEO Audit results
+        if seo_task_status == "success":
+            seo_res = st.session_state.get("blog_seo_review_task_result")
+            if seo_res:
+                st.markdown("---")
+                st.markdown("### 🤖 Gemini SEO Review:")
+                st.markdown(f"**Readability:** {seo_res.get('readability_grade', 'N/A')}")
+                st.markdown(f"**Meta Description Proposal:** `{seo_res.get('meta_description', '')}`")
+                
+                col_titles, col_recs = st.columns(2)
+                with col_titles:
+                    st.markdown("**Suggested Headline Variations:**")
+                    for t_opt in seo_res.get("suggested_titles", []):
+                        st.markdown(f"- {t_opt}")
+                with col_recs:
+                    st.markdown("**SEO Recommendations:**")
+                    for rec in seo_res.get("seo_recommendations", []):
+                        st.markdown(f"- {rec}")
+                        
+            st.session_state.blog_seo_review_task_status = "idle"
+        elif seo_task_status == "error":
+            err = st.session_state.get("blog_seo_review_task_error", "Unknown error")
+            st.error(f"SEO Review failed: {err}")
+            st.session_state.blog_seo_review_task_status = "idle"
+            
+        if seo_task_status == "running":
+            st.info("🤖 Gemini is auditing your content and generating SEO guidelines...")
+
     dry_run_blog = st.checkbox("Dry-Run Mode (Save to Supabase/locally, skip Git remote push)", value=True, key="dry_blog")
     
     if st.button("Publish Blog Post", width="stretch", type="primary"):
