@@ -56,27 +56,6 @@ st.set_page_config(
     layout="wide",
 )
 
-# Thread-safe global store for background tasks
-if "_GLOBAL_TASK_STORE" not in globals():
-    globals()["_GLOBAL_TASK_STORE"] = {}
-_task_store = globals()["_GLOBAL_TASK_STORE"]
-
-def sync_background_tasks():
-    for k in list(_task_store.keys()):
-        if k.endswith("_status"):
-            prefix = k[:-7]
-            store_status = _task_store.get(k, "idle")
-            if store_status in ("success", "error"):
-                st.session_state[k] = store_status
-                st.session_state[f"{prefix}_result"] = _task_store.get(f"{prefix}_result")
-                st.session_state[f"{prefix}_error"] = _task_store.get(f"{prefix}_error")
-                # Consume immediately in global store to prevent repeat triggers
-                _task_store[k] = "idle"
-            elif store_status == "running":
-                st.session_state[k] = "running"
-
-sync_background_tasks()
-
 # ==========================================
 # Env Loader & API Helpers
 # ==========================================
@@ -426,10 +405,10 @@ def check_and_add_pending_skills(tags_list):
 def run_async_task(task_func, key_prefix):
     """
     Executes a task function in a background thread.
-    Maintains status in global task store, which is synchronized to st.session_state:
-      - status: "idle", "running", "success", "error"
-      - result: Return value on success
-      - error: Error message on failure
+    Maintains status in session state:
+      - st.session_state[f'{key_prefix}_status']: "idle", "running", "success", "error"
+      - st.session_state[f'{key_prefix}_result']: Return value on success
+      - st.session_state[f'{key_prefix}_error']: Error message on failure
     """
     import threading
     try:
@@ -445,12 +424,12 @@ def run_async_task(task_func, key_prefix):
     result_key = f"{key_prefix}_result"
     error_key = f"{key_prefix}_error"
     
-    if st.session_state.get(status_key) == "running" or _task_store.get(status_key) == "running":
+    if status_key not in st.session_state:
+        st.session_state[status_key] = "idle"
+        
+    if st.session_state[status_key] == "running":
         return
 
-    # Update state in global store and session state
-    _task_store[status_key] = "running"
-    _task_store[error_key] = None
     st.session_state[status_key] = "running"
     st.session_state[error_key] = None
 
@@ -467,13 +446,11 @@ def run_async_task(task_func, key_prefix):
     def worker():
         try:
             res = task_func()
-            _task_store[result_key] = res
-            _task_store[status_key] = "success"
+            st.session_state[result_key] = res
+            st.session_state[status_key] = "success"
         except Exception as e:
-            import traceback
-            traceback.print_exc()
-            _task_store[error_key] = str(e)
-            _task_store[status_key] = "error"
+            st.session_state[error_key] = str(e)
+            st.session_state[status_key] = "error"
         finally:
             # Trigger Streamlit to rerun the script to update the UI
             try:
@@ -483,8 +460,15 @@ def run_async_task(task_func, key_prefix):
                     session_info = runtime._session_mgr.get_active_session_info(session_id)
                     if session_info:
                         session_info.session.request_rerun(None)
+                    else:
+                        st.rerun()
+                else:
+                    st.rerun()
             except BaseException:
-                pass
+                try:
+                    st.rerun()
+                except BaseException:
+                    pass
 
     thread = threading.Thread(target=worker)
     thread.daemon = True
@@ -1783,7 +1767,6 @@ with st.sidebar.container(border=True):
     if st.button("Refresh Status", key="btn_refresh_deploy_status", width="stretch"):
         st.session_state.deploy_status = None
         st.session_state.deploy_status_task_status = "idle"
-        _task_store["deploy_status_task_status"] = "idle"
         st.rerun()
 
     st.markdown("---")
