@@ -17,6 +17,102 @@ interface LogEntry {
   message: string;
 }
 
+interface AlgorithmInfo {
+  name: string;
+  nameNoir: string;
+  works: string;
+  property: string;
+  useCase: string;
+  tip: string;
+  isWarningTip?: boolean;
+}
+
+const ALGORITHM_INFO_MAP: Record<string, AlgorithmInfo> = {
+  dijkstra: {
+    name: "Dijkstra's Algorithm",
+    nameNoir: "Dijkstra (Complete Sweep)",
+    works: "Explores nodes uniformly in all directions, evaluating total cumulative cost from the starting node.",
+    property: "Guaranteed shortest path. Supports unweighted and weighted graphs.",
+    useCase: "GPS routing engines, network routing protocols (like OSPF).",
+    tip: "Perfect for finding the absolute shortest path, but checks a large number of cells."
+  },
+  astar: {
+    name: "A* Heuristic Search",
+    nameNoir: "A* Search (Heuristic Scan)",
+    works: "Uses Manhattan distance estimations to prioritize grid cells closer to the destination.",
+    property: "Guaranteed shortest path. Highly optimal.",
+    useCase: "Video game pathfinding, robotic path planning.",
+    tip: "The most efficient general-purpose algorithm for grid layouts. Highly recommended."
+  },
+  greedy: {
+    name: "Greedy Best-First Search",
+    nameNoir: "Greedy Scan (Tunnel Vision)",
+    works: "Moves directly towards the target based solely on remaining distance estimation.",
+    property: "No shortest path guarantee. Fast but can get trapped easily.",
+    useCase: "Quick mapping estimation heuristics.",
+    tip: "Easily gets stuck behind walls. Watch it run blindly into barriers!",
+    isWarningTip: true
+  },
+  bfs: {
+    name: "Breadth-First Search (BFS)",
+    nameNoir: "BFS (Spread Search)",
+    works: "Explores grid cells uniformly outward in radial layers (level-by-level).",
+    property: "Guaranteed shortest path on unweighted grids.",
+    useCase: "Social networks (degrees of connection), peer-to-peer network routing.",
+    tip: "Excellent for unweighted maps, but does not support variable movement weights."
+  },
+  bidirectional: {
+    name: "Bidirectional BFS",
+    nameNoir: "Bidirectional Sweep (Dual Encircling)",
+    works: "Launches two simultaneous BFS searches (from Start and End) that meet in the middle.",
+    property: "Guaranteed shortest path on unweighted grids.",
+    useCase: "Large-scale social networks, word ladders, database graph pathing.",
+    tip: "Highly efficient! Reaches the target with a fraction of BFS's visited nodes."
+  },
+  dfs: {
+    name: "Depth-First Search (DFS)",
+    nameNoir: "DFS (Winding Probe)",
+    works: "Probes as deep as possible along a single branch before backtracking.",
+    property: "No shortest path guarantee. Highly winding paths.",
+    useCase: "Maze generation, graph cycle checks, nested structures parsing.",
+    tip: "Produces long, highly sub-optimal paths. Good for finding any valid solution."
+  },
+  jps: {
+    name: "Jump Point Search (JPS)",
+    nameNoir: "JPS (Grid Jump-Cut)",
+    works: "Optimized A* variation that skips straight grid paths to jump directly to obstacle corners.",
+    property: "Guaranteed shortest path. Highly optimal.",
+    useCase: "Real-time strategy game pathfinding on large open maps.",
+    tip: "Blazing fast in open fields, but behaves like normal A* if walls are dense."
+  },
+  iddfs: {
+    name: "Iterative Deepening DFS",
+    nameNoir: "IDDFS (Interrogative Probe)",
+    works: "Repeatedly runs depth-limited DFS, increasing the depth limit by 1 each iteration loop.",
+    property: "Guaranteed shortest path on unweighted grids. Low memory usage.",
+    useCase: "Chess engines, artificial intelligence game decision trees.",
+    tip: "Creates pulsating search waves. Re-visits cells, but uses very little RAM."
+  },
+  random: {
+    name: "Random Walk Search",
+    nameNoir: "Random Walk (Drunkard's Crawl)",
+    works: "Wanders randomly in adjacent cells until it happens to touch the target.",
+    property: "No shortest path guarantee. Stochastic search.",
+    useCase: "Brownian motion modeling, economic simulation mocks.",
+    tip: "⚠️ High step counts! Might take a very long time if start and end are far apart.",
+    isWarningTip: true
+  },
+  wall: {
+    name: "Wall Follower (Left-Hand Rule)",
+    nameNoir: "Wall Follower (Barricade Cordon)",
+    works: "Hugs the left side of obstacles by always trying to turn left relative to its heading.",
+    property: "No shortest path guarantee. Maze-solving rule.",
+    useCase: "Robotic vacuum cleaners, maze-traversal devices.",
+    tip: "⚠️ Requires walls to guide it! On an empty grid, it loops in a 2x2 circle forever.",
+    isWarningTip: true
+  }
+};
+
 function Playground() {
   const { isNoir } = useTheme();
   const lenis = useLenis();
@@ -571,14 +667,44 @@ function Playground() {
               </div>
             </div>
 
-            {/* Retro Logs Terminal Output */}
-            <div className={styles.console} ref={consoleRef} role="log" aria-label="Visualizer terminal output">
-              {displayLogs.map((log, index) => (
-                <p key={index} className={styles.consoleLine}>
-                  <span className={styles.consoleTimestamp}>[{log.timestamp}]</span>
-                  {log.message}
-                </p>
-              ))}
+            {/* Bottom Layout: Console & Info Card */}
+            <div className={styles.bottomLayout}>
+              {/* Retro Logs Terminal Output */}
+              <div className={styles.console} ref={consoleRef} role="log" aria-label="Visualizer terminal output">
+                {displayLogs.map((log, index) => (
+                  <p key={index} className={styles.consoleLine}>
+                    <span className={styles.consoleTimestamp}>[{log.timestamp}]</span>
+                    {log.message}
+                  </p>
+                ))}
+              </div>
+
+              {/* Dynamic Algorithm Dossier / Specs Card */}
+              {ALGORITHM_INFO_MAP[algorithm] && (
+                <div className={styles.infoCard}>
+                  <h3 className={styles.infoTitle}>
+                    {isNoir 
+                      ? ALGORITHM_INFO_MAP[algorithm].nameNoir 
+                      : ALGORITHM_INFO_MAP[algorithm].name}
+                  </h3>
+                  <p className={styles.infoItem}>
+                    <span className={styles.infoLabel}>{isNoir ? 'Modus Operandi' : 'How it works'}</span>
+                    {ALGORITHM_INFO_MAP[algorithm].works}
+                  </p>
+                  <p className={styles.infoItem}>
+                    <span className={styles.infoLabel}>{isNoir ? 'Case Properties' : 'Properties'}</span>
+                    {ALGORITHM_INFO_MAP[algorithm].property}
+                  </p>
+                  <p className={styles.infoItem}>
+                    <span className={styles.infoLabel}>{isNoir ? 'Field Application' : 'Real-World Use'}</span>
+                    {ALGORITHM_INFO_MAP[algorithm].useCase}
+                  </p>
+                  <div className={`${styles.infoTip} ${ALGORITHM_INFO_MAP[algorithm].isWarningTip ? styles.infoTipWarning : ''}`}>
+                    <span className={styles.infoLabel}>{isNoir ? 'Agent Intel' : 'Tip & Diagnostics'}</span>
+                    {ALGORITHM_INFO_MAP[algorithm].tip}
+                  </div>
+                </div>
+              )}
             </div>
         </div>
       </div>

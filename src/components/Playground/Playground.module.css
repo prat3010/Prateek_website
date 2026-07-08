@@ -964,3 +964,99 @@
   100% { transform: scale(1); box-shadow: 0 0 12px var(--neon-pink); }
 }
 
+/* ---- Bottom Split Layout ---- */
+.bottomLayout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 992px) {
+  .bottomLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.infoCard {
+  background: var(--pop-white);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  font-family: var(--font-body);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+:global([data-theme='noir']) .infoCard {
+  background: var(--surface-primary);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+  color: #E2E2EC;
+}
+
+.infoTitle {
+  font-family: var(--font-headline);
+  font-size: 1.15rem;
+  color: var(--pop-black);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.5rem;
+}
+
+:global([data-theme='noir']) .infoTitle {
+  color: var(--neon-pink);
+  border-bottom-color: var(--border-accent);
+}
+
+.infoItem {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.infoLabel {
+  font-weight: 700;
+  color: var(--pop-black);
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 0.15rem;
+}
+
+:global([data-theme='noir']) .infoLabel {
+  color: var(--neon-cyan);
+}
+
+.infoTip {
+  background: rgba(255, 235, 59, 0.1);
+  border-left: 3px solid var(--pop-yellow);
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+:global([data-theme='noir']) .infoTip {
+  background: rgba(255, 240, 0, 0.05);
+  border-left-color: var(--neon-yellow);
+  color: #E2E2EC;
+}
+
+.infoTipWarning {
+  background: rgba(255, 23, 68, 0.05);
+  border-left: 3px solid var(--pop-red);
+}
+
+:global([data-theme='noir']) .infoTipWarning {
+  background: rgba(255, 0, 100, 0.05);
+  border-left-color: var(--neon-pink);
+}
+
+
