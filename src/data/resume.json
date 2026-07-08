@@ -1,9 +1,121 @@
 {
   "name": "Prateek Sharma",
+  "about": {
+    "business": {
+      "noir": "I'm Prateek Sharma, a freelance developer who builds websites, custom tools, and admin flows for businesses that want something practical and maintainable.",
+      "facts": [
+        "SERVICE // Direct freelance partnership",
+        "SPEED // Clear delivery and iteration",
+        "VALUE // Practical, maintainable builds",
+        "LOCATION // Based in India, working remotely"
+      ],
+      "light": "I'm Prateek Sharma, a freelance developer who builds websites, custom tools, and simple admin flows for businesses that want something practical and maintainable.",
+      "factsNoir": [
+        "Custom websites with a low-friction handoff.",
+        "Delivering working products directly to clients.",
+        "Performance and usability kept in focus.",
+        "Working remotely with clients worldwide."
+      ]
+    },
+    "developer": {
+      "noir": "I'm Prateek Sharma, a developer focused on web applications, interface quality, and practical AI-assisted workflows. I prefer clear structure, dependable delivery, and systems that are easy to maintain.",
+      "facts": [
+        "SYSTEM // Web apps built with clear structure",
+        "VELOCITY // Fast prototypes and dependable delivery",
+        "ENGINE // AI-assisted workflows and tooling",
+        "LOCATION // Based in India, working remotely"
+      ],
+      "light": "I'm Prateek Sharma, a developer focused on web applications, interface quality, and practical AI-assisted workflows. I like solving real problems with simple structure and dependable delivery.",
+      "factsNoir": [
+        "Working with clear structure and a small technical footprint.",
+        "Turning rough ideas into working interfaces.",
+        "Keeping maintainability in view from the start.",
+        "Based in India, working remotely."
+      ]
+    }
+  },
   "email": "3010prateeksharma@gmail.com",
   "phone": "+91 9050433260",
   "title": "Full-Stack Developer & AI Orchestration Engineer",
   "github": "https://github.com/prat3010",
+  "pricing": {
+    "business": [
+      {
+        "cta": "landing-page",
+        "price": "$400 - $700",
+        "title": "Landing Page Package",
+        "features": [
+          "Custom UI mockup",
+          "Responsive layout and spacing",
+          "Basic SEO metadata",
+          "Resend contact email integration"
+        ],
+        "description": "A focused single-page website with a clear message, responsive layout, and contact flow."
+      },
+      {
+        "cta": "web-application",
+        "price": "$1,200 - $2,500",
+        "title": "Custom Web Application",
+        "features": [
+          "Next.js App Router & TypeScript",
+          "Supabase data layer setup",
+          "Admin or analytics views",
+          "Custom forms or billing flow"
+        ],
+        "description": "A multi-page application with Supabase-backed data, admin tools, and project-specific workflows."
+      },
+      {
+        "cta": "monthly-support",
+        "price": "$150 / mo",
+        "title": "Monthly Support & SEO",
+        "features": [
+          "Included development hours",
+          "Performance and usability checks",
+          "Monthly page-visit review",
+          "Security and package updates"
+        ],
+        "description": "Ongoing maintenance, content updates, and periodic performance checks."
+      }
+    ],
+    "developer": [
+      {
+        "cta": "mentorship",
+        "price": "$50 / hr",
+        "title": "Hourly Consulting",
+        "features": [
+          "React 19 / Next.js 16 debugging",
+          "Development workflow review",
+          "Supabase / PostgreSQL setup",
+          "Code review and refactoring sessions"
+        ],
+        "description": "One-on-one development, debugging, and architecture support."
+      },
+      {
+        "cta": "architecture",
+        "price": "$250 / session",
+        "title": "Architecture Review",
+        "features": [
+          "Database query review",
+          "Caching and rendering review",
+          "Performance notes and priorities",
+          "Follow-up call to discuss findings"
+        ],
+        "description": "A technical review of structure, data flow, and caching behavior."
+      },
+      {
+        "cta": "security",
+        "price": "$450 / audit",
+        "title": "Codebase Security Audit",
+        "features": [
+          "RLS policy review",
+          "Secret exposure sweep",
+          "Abuse and spam checks",
+          "Remediation notes"
+        ],
+        "description": "A practical review of secrets, access control, and common exposure points."
+      }
+    ]
+  },
   "summary": {
     "ai": "Builds AI-assisted workflows, content pipelines, and automation tools that make recurring tasks easier to run and review.",
     "general": "Builds web applications and interactive interfaces with attention to clear structure, performance, and maintainability.",
@@ -33,118 +145,6 @@
       "3 months of support & maintenance"
     ],
     "paymentTerms": "50% upfront, 30% after design/milestone 1, 20% on final delivery."
-  },
-  "about": {
-    "developer": {
-      "light": "I'm Prateek Sharma, a developer focused on web applications, interface quality, and practical AI-assisted workflows. I like solving real problems with simple structure and dependable delivery.",
-      "noir": "I'm Prateek Sharma, a developer focused on web applications, interface quality, and practical AI-assisted workflows. I prefer clear structure, dependable delivery, and systems that are easy to maintain.",
-      "facts": [
-        "SYSTEM // Web apps built with clear structure",
-        "VELOCITY // Fast prototypes and dependable delivery",
-        "ENGINE // AI-assisted workflows and tooling",
-        "LOCATION // Based in India, working remotely"
-      ],
-      "factsNoir": [
-        "Working with clear structure and a small technical footprint.",
-        "Turning rough ideas into working interfaces.",
-        "Keeping maintainability in view from the start.",
-        "Based in India, working remotely."
-      ]
-    },
-    "business": {
-      "light": "I'm Prateek Sharma, a freelance developer who builds websites, custom tools, and simple admin flows for businesses that want something practical and maintainable.",
-      "noir": "I'm Prateek Sharma, a freelance developer who builds websites, custom tools, and admin flows for businesses that want something practical and maintainable.",
-      "facts": [
-        "SERVICE // Direct freelance partnership",
-        "SPEED // Clear delivery and iteration",
-        "VALUE // Practical, maintainable builds",
-        "LOCATION // Based in India, working remotely"
-      ],
-      "factsNoir": [
-        "Custom websites with a low-friction handoff.",
-        "Delivering working products directly to clients.",
-        "Performance and usability kept in focus.",
-        "Working remotely with clients worldwide."
-      ]
-    }
-  },
-  "pricing": {
-    "developer": [
-      {
-        "title": "Hourly Consulting",
-        "price": "$50 / hr",
-        "description": "One-on-one development, debugging, and architecture support.",
-        "features": [
-          "React 19 / Next.js 16 debugging",
-          "Development workflow review",
-          "Supabase / PostgreSQL setup",
-          "Code review and refactoring sessions"
-        ],
-        "cta": "mentorship"
-      },
-      {
-        "title": "Architecture Review",
-        "price": "$250 / session",
-        "description": "A technical review of structure, data flow, and caching behavior.",
-        "features": [
-          "Database query review",
-          "Caching and rendering review",
-          "Performance notes and priorities",
-          "Follow-up call to discuss findings"
-        ],
-        "cta": "architecture"
-      },
-      {
-        "title": "Codebase Security Audit",
-        "price": "$450 / audit",
-        "description": "A practical review of secrets, access control, and common exposure points.",
-        "features": [
-          "RLS policy review",
-          "Secret exposure sweep",
-          "Abuse and spam checks",
-          "Remediation notes"
-        ],
-        "cta": "security"
-      }
-    ],
-    "business": [
-      {
-        "title": "Landing Page Package",
-        "price": "$400 - $700",
-        "description": "A focused single-page website with a clear message, responsive layout, and contact flow.",
-        "features": [
-          "Custom UI mockup",
-          "Responsive layout and spacing",
-          "Basic SEO metadata",
-          "Resend contact email integration"
-        ],
-        "cta": "landing-page"
-      },
-      {
-        "title": "Custom Web Application",
-        "price": "$1,200 - $2,500",
-        "description": "A multi-page application with Supabase-backed data, admin tools, and project-specific workflows.",
-        "features": [
-          "Next.js App Router & TypeScript",
-          "Supabase data layer setup",
-          "Admin or analytics views",
-          "Custom forms or billing flow"
-        ],
-        "cta": "web-application"
-      },
-      {
-        "title": "Monthly Support & SEO",
-        "price": "$150 / mo",
-        "description": "Ongoing maintenance, content updates, and periodic performance checks.",
-        "features": [
-          "Included development hours",
-          "Performance and usability checks",
-          "Monthly page-visit review",
-          "Security and package updates"
-        ],
-        "cta": "monthly-support"
-      }
-    ]
   },
   "experience": [
     {
@@ -190,8 +190,8 @@
     }
   ],
   "lastSynced": {
+    "timestamp": "2026-07-08T18:07:23.723321",
     "status": "success",
-    "summary": "Synchronized new project: PrateekSync AI: Intelligent Portfolio & Resume Automation Engine.",
-    "timestamp": "2026-06-15T13:14:56.604842"
+    "summary": "Published blog post: Unlock Your Career: AI-Powered Portfolio & Resume Automation with Structured Prompting"
   }
 }
