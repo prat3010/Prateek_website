@@ -29,24 +29,24 @@ interface AlgorithmInfo {
 
 const ALGORITHM_INFO_MAP: Record<string, AlgorithmInfo> = {
   dijkstra: {
-    name: "Dijkstra's Algorithm",
-    nameNoir: "Dijkstra (Complete Sweep)",
+    name: "Dijkstra's Algorithm (Full Grid Wave)",
+    nameNoir: "Dijkstra's Algorithm (Complete Sweep)",
     works: "Explores nodes uniformly in all directions, evaluating total cumulative cost from the starting node.",
     property: "Guaranteed shortest path. Supports unweighted and weighted graphs.",
     useCase: "GPS routing engines, network routing protocols (like OSPF).",
     tip: "Perfect for finding the absolute shortest path, but checks a large number of cells."
   },
   astar: {
-    name: "A* Heuristic Search",
-    nameNoir: "A* Search (Heuristic Scan)",
+    name: "A* Heuristic Search (Guided Manhattan)",
+    nameNoir: "A* Heuristic Search (Heuristic Scan)",
     works: "Uses Manhattan distance estimations to prioritize grid cells closer to the destination.",
     property: "Guaranteed shortest path. Highly optimal.",
     useCase: "Video game pathfinding, robotic path planning.",
     tip: "The most efficient general-purpose algorithm for grid layouts. Highly recommended."
   },
   greedy: {
-    name: "Greedy Best-First Search",
-    nameNoir: "Greedy Scan (Tunnel Vision)",
+    name: "Greedy Best-First Search (Heuristic Scan)",
+    nameNoir: "Greedy Best-First Search (Tunnel Vision)",
     works: "Moves directly towards the target based solely on remaining distance estimation.",
     property: "No shortest path guarantee. Fast but can get trapped easily.",
     useCase: "Quick mapping estimation heuristics.",
@@ -54,48 +54,48 @@ const ALGORITHM_INFO_MAP: Record<string, AlgorithmInfo> = {
     isWarningTip: true
   },
   bfs: {
-    name: "Breadth-First Search (BFS)",
-    nameNoir: "BFS (Spread Search)",
+    name: "Breadth-First Search (Unweighted Wave)",
+    nameNoir: "Breadth-First Search (Spread Search)",
     works: "Explores grid cells uniformly outward in radial layers (level-by-level).",
     property: "Guaranteed shortest path on unweighted grids.",
     useCase: "Social networks (degrees of connection), peer-to-peer network routing.",
     tip: "Excellent for unweighted maps, but does not support variable movement weights."
   },
   bidirectional: {
-    name: "Bidirectional BFS",
-    nameNoir: "Bidirectional Sweep (Dual Encircling)",
+    name: "Bidirectional BFS (Dual Search)",
+    nameNoir: "Bidirectional BFS (Dual Encircling)",
     works: "Launches two simultaneous BFS searches (from Start and End) that meet in the middle.",
     property: "Guaranteed shortest path on unweighted grids.",
     useCase: "Large-scale social networks, word ladders, database graph pathing.",
     tip: "Highly efficient! Reaches the target with a fraction of BFS's visited nodes."
   },
   dfs: {
-    name: "Depth-First Search (DFS)",
-    nameNoir: "DFS (Winding Probe)",
+    name: "Depth-First Search (Backtracking Path)",
+    nameNoir: "Depth-First Search (Winding Probe)",
     works: "Probes as deep as possible along a single branch before backtracking.",
     property: "No shortest path guarantee. Highly winding paths.",
     useCase: "Maze generation, graph cycle checks, nested structures parsing.",
     tip: "Produces long, highly sub-optimal paths. Good for finding any valid solution."
   },
   jps: {
-    name: "Jump Point Search (JPS)",
-    nameNoir: "JPS (Grid Jump-Cut)",
+    name: "Jump Point Search (Quantum Leap)",
+    nameNoir: "Jump Point Search (Grid Jump-Cut)",
     works: "Optimized A* variation that skips straight grid paths to jump directly to obstacle corners.",
     property: "Guaranteed shortest path. Highly optimal.",
     useCase: "Real-time strategy game pathfinding on large open maps.",
     tip: "Blazing fast in open fields, but behaves like normal A* if walls are dense."
   },
   iddfs: {
-    name: "Iterative Deepening DFS",
-    nameNoir: "IDDFS (Interrogative Probe)",
+    name: "Iterative Deepening DFS (Pulsing Probe)",
+    nameNoir: "Iterative Deepening DFS (Interrogative Probe)",
     works: "Repeatedly runs depth-limited DFS, increasing the depth limit by 1 each iteration loop.",
     property: "Guaranteed shortest path on unweighted grids. Low memory usage.",
     useCase: "Chess engines, artificial intelligence game decision trees.",
     tip: "Creates pulsating search waves. Re-visits cells, but uses very little RAM."
   },
   random: {
-    name: "Random Walk Search",
-    nameNoir: "Random Walk (Drunkard's Crawl)",
+    name: "Random Walk Search (Brownian Drift)",
+    nameNoir: "Random Walk Search (Drunkard's Crawl)",
     works: "Wanders randomly in adjacent cells until it happens to touch the target.",
     property: "No shortest path guarantee. Stochastic search.",
     useCase: "Brownian motion modeling, economic simulation mocks.",
@@ -103,8 +103,8 @@ const ALGORITHM_INFO_MAP: Record<string, AlgorithmInfo> = {
     isWarningTip: true
   },
   wall: {
-    name: "Wall Follower (Left-Hand Rule)",
-    nameNoir: "Wall Follower (Barricade Cordon)",
+    name: "Pledge Algorithm (Contour Hugger)",
+    nameNoir: "Pledge Algorithm (Barricade Cordon)",
     works: "Hugs the left side of obstacles by always trying to turn left relative to its heading.",
     property: "No shortest path guarantee. Maze-solving rule.",
     useCase: "Robotic vacuum cleaners, maze-traversal devices.",
@@ -584,34 +584,34 @@ function Playground() {
                       disabled={isRunning}
                     >
                       <option value="dijkstra">
-                        {isNoir ? 'Dijkstra (Complete Sweep)' : "Dijkstra's (Full Grid Wave)"}
+                        {isNoir ? "Dijkstra's (Complete Sweep)" : "Dijkstra's (Full Grid Wave)"}
                       </option>
                       <option value="astar">
-                        {isNoir ? 'A* Search (Heuristic Scan)' : 'A* Search (Guided Manhattan)'}
+                        {isNoir ? "A* Search (Heuristic Scan)" : "A* Search (Guided Manhattan)"}
                       </option>
                       <option value="greedy">
-                        {isNoir ? 'Greedy Scan (Tunnel Vision)' : 'Greedy Best-First (Heuristic Scan)'}
+                        {isNoir ? "Greedy Best-First (Tunnel Vision)" : "Greedy Best-First (Heuristic Scan)"}
                       </option>
                       <option value="bfs">
-                        {isNoir ? 'BFS (Spread Search)' : 'BFS (Unweighted Wave)'}
+                        {isNoir ? "BFS (Spread Search)" : "BFS (Unweighted Wave)"}
                       </option>
                       <option value="bidirectional">
-                        {isNoir ? 'Bidirectional Sweep (Dual Encircling)' : 'Bidirectional BFS (Dual Search)'}
+                        {isNoir ? "Bidirectional BFS (Dual Encircling)" : "Bidirectional BFS (Dual Search)"}
                       </option>
                       <option value="dfs">
-                        {isNoir ? 'DFS (Winding Probe)' : 'DFS (Backtracking Path)'}
+                        {isNoir ? "DFS (Winding Probe)" : "DFS (Backtracking Path)"}
                       </option>
                       <option value="jps">
-                        {isNoir ? 'JPS (Grid Jump-Cut)' : 'JPS (Quantum Leap)'}
+                        {isNoir ? "JPS (Grid Jump-Cut)" : "JPS (Quantum Leap)"}
                       </option>
                       <option value="iddfs">
-                        {isNoir ? 'IDDFS (Interrogative Probe)' : 'IDDFS (Pulsing Probe)'}
+                        {isNoir ? "IDDFS (Interrogative Probe)" : "IDDFS (Pulsing Probe)"}
                       </option>
                       <option value="random">
-                        {isNoir ? "Random Walk (Drunkard's Crawl)" : 'Stochastic (Brownian Drift)'}
+                        {isNoir ? "Random Walk (Drunkard's Crawl)" : "Random Walk (Brownian Drift)"}
                       </option>
                       <option value="wall">
-                        {isNoir ? 'Wall Follower (Barricade Cordon)' : 'Pledge Algorithm (Contour Hugger)'}
+                        {isNoir ? "Pledge Algorithm (Barricade Cordon)" : "Pledge Algorithm (Contour Hugger)"}
                       </option>
                     </select>
                   </div>
