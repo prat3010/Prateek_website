@@ -522,8 +522,74 @@ def run_safe_git_command(args, cwd=None):
         return False, f"Git command failed: {err_msg.strip()}"
     except FileNotFoundError:
         return False, "System executable 'git' not found in PATH."
-    except Exception as e:
-        return False, f"Process execution error: {str(e)}"
+def read_local_path_context(path_str):
+    """
+    Safely resolves, validates, and reads local files or directories from the workspace.
+    Returns (success, content_or_error_msg)
+    """
+    if not path_str:
+        return False, "Path is empty."
+    
+    # Resolve absolute path
+    abs_path = os.path.abspath(path_str)
+    if not os.path.isabs(path_str):
+        # Try relative to project root
+        abs_path = os.path.abspath(os.path.join(os.getcwd(), path_str))
+        
+    # Security check: must reside inside project root or home directory Developer path
+    home_dir = os.path.expanduser("~")
+    if not abs_path.startswith(home_dir) and not abs_path.startswith(os.getcwd()):
+        return False, "Access denied: Path must be inside project or user directories."
+        
+    if not os.path.exists(abs_path):
+        return False, f"Path does not exist: `{path_str}`"
+        
+    if os.path.isfile(abs_path):
+        try:
+            # Check file size (e.g. max 500KB)
+            if os.path.getsize(abs_path) > 500 * 1024:
+                return False, "File is too large (max 500KB)."
+            with open(abs_path, "r", encoding="utf-8", errors="ignore") as f:
+                content = f.read()
+            return True, f"=== FILE: {os.path.basename(abs_path)} ===\n{content}"
+        except Exception as e:
+            return False, f"Error reading file: {e}"
+            
+    elif os.path.isdir(abs_path):
+        try:
+            allowed_exts = {'.ts', '.tsx', '.js', '.jsx', '.py', '.json', '.css', '.md', '.sql', '.yaml', '.yml', '.mjs'}
+            gathered = []
+            file_count = 0
+            size_count = 0
+            for root, dirs, files in os.walk(abs_path):
+                # Exclude node_modules, .git, .next, etc.
+                dirs[:] = [d for d in dirs if d not in {'.git', 'node_modules', '.next', '__pycache__', 'dist', 'build'}]
+                for file in files:
+                    ext = os.path.splitext(file)[1].lower()
+                    if ext in allowed_exts:
+                        f_path = os.path.join(root, file)
+                        f_size = os.path.getsize(f_path)
+                        if f_size > 100 * 1024:  # Skip files > 100KB inside directory scan
+                            continue
+                        size_count += f_size
+                        if size_count > 250 * 1024:  # Cap total size at 250KB
+                            break
+                        file_count += 1
+                        if file_count > 15:  # Cap at 15 files
+                            break
+                        with open(f_path, "r", encoding="utf-8", errors="ignore") as f:
+                            content = f.read()
+                        rel_path = os.path.relpath(f_path, abs_path)
+                        gathered.append(f"=== FILE: {rel_path} ===\n{content}")
+                if file_count > 15 or size_count > 250 * 1024:
+                    break
+            if not gathered:
+                return False, "No readable source files found in the directory."
+            return True, "\n\n".join(gathered)
+        except Exception as e:
+            return False, f"Error reading directory: {e}"
+            
+    return False, "Unknown path type."
 
 def fetch_github_repo_metadata(github_url):
     """
@@ -1766,6 +1832,10 @@ if 'blog_draft_tags' not in st.session_state:
     st.session_state.blog_draft_tags = "Next.js, Python, AI"
 if 'blog_draft_content' not in st.session_state:
     st.session_state.blog_draft_content = ""
+if 'blog_brainstorm_focus' not in st.session_state:
+    st.session_state.blog_brainstorm_focus = ""
+if 'blog_draft_local_path' not in st.session_state:
+    st.session_state.blog_draft_local_path = ""
 
 
 # Set up tabs
@@ -3458,6 +3528,13 @@ with tab_blog:
         help="For selected projects, the brainstormer will fetch their README and recent commits directly from GitHub (or locally for the website) to build highly specific blog topics."
     )
 
+    st.text_input(
+        "Brainstorm Focus / Technical Angle (optional):",
+        placeholder="e.g. Focus on Delta-E color math, state tracking with isolates, or microservices migration...",
+        key="blog_brainstorm_focus",
+        help="Direct the AI to focus on specific topics, files, or technical concepts when brainstorming ideas."
+    )
+
     col_brainstorm, col_clear = st.columns([3, 1])
     with col_brainstorm:
         btn_ideas_disabled = (ideas_status == "running")
@@ -3544,13 +3621,18 @@ with tab_blog:
                         if repo_meta:
                             context['github_repositories'][title] = repo_meta
 
+                focus_guidance = st.session_state.get("blog_brainstorm_focus", "").strip()
+                focus_clause = ""
+                if focus_guidance:
+                    focus_clause = f"\n[FOCUS INSTRUCTION / TECHNICAL ANGLE]\nThe user wants you to focus on: {focus_guidance}\nEnsure your generated blog ideas specifically highlight, center around, or touch upon this technical focus or feature.\n"
+
                 prompt = f"""
                 You are a senior full-stack developer and technical blogger. 
                 Analyze the following codebase metadata (projects, skills, package dependencies, and recent git commits), including detailed fetched repository files/commits:
                 
                 [CODEBASE CONTEXT]
                 {json.dumps(context, indent=2)}
-                
+                {focus_clause}
                 Generate a list of 5 creative, highly technical, and engaging blog post ideas that would fit perfectly on this developer's portfolio.
                 For each idea, return:
                 1. A catchy, SEO-optimized title.
@@ -3614,6 +3696,13 @@ with tab_blog:
         key="blog_draft_raw_notes"
     )
     
+    local_path = st.text_input(
+        "2. Or reference a local file or directory path relative to project root (optional):",
+        placeholder="e.g. src/components/Terminal/Terminal.tsx or src/utils/pdfGenerator.ts",
+        key="blog_draft_local_path",
+        help="Reads files or directory contents and includes them as source code context for the generator."
+    )
+    
     tone = st.selectbox("Choose Tone:", ["Professional & Technical", "Conversational & Casual", "Tutorial / How-To Style"], key="blog_draft_tone")
     
     blog_status = st.session_state.get("blog_draft_task_status", "idle")
@@ -3644,15 +3733,29 @@ with tab_blog:
 
     btn_disabled = (blog_status == "running")
     if st.button("Draft Blog Post with AI", width="stretch", disabled=btn_disabled, key="btn_draft_blog"):
-        if not raw_notes:
-            st.error("Please add some raw notes or code first!")
+        local_path_val = st.session_state.get("blog_draft_local_path", "").strip()
+        if not raw_notes and not local_path_val:
+            st.error("Please add some raw notes/code OR reference a local path first!")
         else:
+            path_context = ""
+            if local_path_val:
+                ok, res_context = read_local_path_context(local_path_val)
+                if not ok:
+                    st.error(res_context)
+                    st.stop()
+                path_context = res_context
+
+            context_blocks = []
+            if raw_notes:
+                context_blocks.append(f"[RAW NOTES / CODE]\n{raw_notes}")
+            if path_context:
+                context_blocks.append(f"[SOURCE CODE CONTEXT]\n{path_context}")
+
             prompt = f"""
             You are a senior full-stack developer and technical writer. 
-            Your task is to write a highly engaging, clear, and professional developer blog post based on these raw notes and code:
+            Your task is to write a highly engaging, clear, and professional developer blog post based on these source code files and notes:
             
-            [RAW NOTES / CODE]
-            {raw_notes}
+            {"\n\n".join(context_blocks)}
             
             [TONE]
             {tone}
