@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import Image from 'next/image';
-import { useTheme, type Audience, type Theme } from '@/context/ThemeContext';
+import { useTheme } from '@/context/ThemeContext';
 import type { ResumeData } from '@/data/resume';
 import ComicPanel from '@/components/ui/ComicPanel';
 import SpeechBubble from '@/components/ui/SpeechBubble';
