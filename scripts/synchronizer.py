@@ -60,7 +60,7 @@ st.set_page_config(
 # Env Loader & API Helpers
 # ==========================================
 def load_env():
-    env_vars = {}
+    env_vars = dict(os.environ)
     env_path = ".env.local"
     if os.path.exists(env_path):
         with open(env_path, "r") as f:
@@ -138,12 +138,33 @@ def call_gemini(prompt, file_data=None, file_mime=None):
     )
 
     try:
-        with urllib.request.urlopen(req, timeout=15) as res:
+        with urllib.request.urlopen(req, timeout=90) as res:
             response_data = json.loads(res.read().decode("utf-8"))
             candidates = response_data.get("candidates", [])
             if candidates:
                 text_content = candidates[0]["content"]["parts"][0]["text"]
-                return json.loads(text_content.strip())
+                text = text_content.strip()
+                try:
+                    return json.loads(text)
+                except json.JSONDecodeError:
+                    # 1. Attempt to extract JSON from markdown block
+                    pattern = r"```(?:json)?\s*(.*?)\s*```"
+                    match = re.search(pattern, text, re.DOTALL)
+                    if match:
+                        try:
+                            return json.loads(match.group(1).strip())
+                        except json.JSONDecodeError:
+                            pass
+                    
+                    # 2. Attempt brace-matching fallback for raw JSON inside conversational text
+                    first_brace = text.find('{')
+                    last_brace = text.rfind('}')
+                    if first_brace != -1 and last_brace != -1:
+                        try:
+                            return json.loads(text[first_brace:last_brace+1])
+                        except json.JSONDecodeError:
+                            pass
+                    raise
             else:
                 show_api_error("Error: Empty candidates response from Gemini")
                 return None
@@ -154,6 +175,21 @@ def call_gemini(prompt, file_data=None, file_mime=None):
     except Exception as e:
         show_api_error(f"API Connection Error: {e}")
         return None
+
+# Helper to safely render local images from filesystem without triggering Streamlit MediaFileStorage KeyError bugs
+def st_image_safe(image_path_or_bytes, **kwargs):
+    if isinstance(image_path_or_bytes, str):
+        if os.path.exists(image_path_or_bytes):
+            try:
+                with open(image_path_or_bytes, "rb") as f:
+                    data = f.read()
+                st.image(data, **kwargs)
+            except Exception as e:
+                st.error(f"Error loading image {image_path_or_bytes}: {e}")
+        else:
+            st.warning(f"No image currently found at path: {image_path_or_bytes}")
+    else:
+        st.image(image_path_or_bytes, **kwargs)
 
 # Fallback database of common tech skills to avoid calling Gemini API entirely for standard tags (prevents 429 errors)
 FALLBACK_SKILLS = {
@@ -376,12 +412,13 @@ def run_async_task(task_func, key_prefix):
     """
     import threading
     try:
-        from streamlit.runtime.scriptrunner import add_script_run_ctx
+        from streamlit.runtime.scriptrunner import add_script_run_ctx, get_script_run_ctx
     except ImportError:
         try:
-            from streamlit.scriptrunner import add_script_run_ctx
+            from streamlit.scriptrunner import add_script_run_ctx, get_script_run_ctx
         except ImportError:
             add_script_run_ctx = None
+            get_script_run_ctx = None
 
     status_key = f"{key_prefix}_status"
     result_key = f"{key_prefix}_result"
@@ -396,6 +433,16 @@ def run_async_task(task_func, key_prefix):
     st.session_state[status_key] = "running"
     st.session_state[error_key] = None
 
+    # Capture session ID from main thread context to trigger a server-side rerun
+    session_id = None
+    if get_script_run_ctx:
+        try:
+            ctx = get_script_run_ctx()
+            if ctx:
+                session_id = ctx.session_id
+        except Exception:
+            pass
+
     def worker():
         try:
             res = task_func()
@@ -406,7 +453,22 @@ def run_async_task(task_func, key_prefix):
             st.session_state[status_key] = "error"
         finally:
             # Trigger Streamlit to rerun the script to update the UI
-            st.rerun()
+            try:
+                if session_id:
+                    from streamlit.runtime import Runtime
+                    runtime = Runtime.instance()
+                    session_info = runtime._session_mgr.get_active_session_info(session_id)
+                    if session_info:
+                        session_info.session.request_rerun(None)
+                    else:
+                        st.rerun()
+                else:
+                    st.rerun()
+            except BaseException:
+                try:
+                    st.rerun()
+                except BaseException:
+                    pass
 
     thread = threading.Thread(target=worker)
     thread.daemon = True
@@ -475,11 +537,75 @@ def fetch_github_repo_metadata(github_url):
     if len(parts) < 2:
         return None
     slug = parts[1].strip().strip("/")
-    if len(slug.split("/")) < 2:
+    if slug.endswith(".git"):
+        slug = slug[:-4]
+    slug_parts = slug.split("/")
+    if len(slug_parts) < 2:
         return None
         
-    def fetch_file(url_path):
-        url = f"https://raw.githubusercontent.com/{slug}/{url_path}"
+    owner, repo = slug_parts[0], slug_parts[1]
+    
+    # 1. Look for local checkout fallback first (sister directories in Developer directory)
+    parent_dir = os.path.dirname(os.path.abspath(os.getcwd()))
+    local_dir = None
+    
+    candidates = [
+        repo,
+        repo.replace("-", "_"),
+        repo + "_Antigravity",
+        repo.replace("-", "_") + "_Antigravity"
+    ]
+    for candidate in candidates:
+        path = os.path.join(parent_dir, candidate)
+        if os.path.isdir(path):
+            local_dir = path
+            break
+            
+    if not local_dir and os.path.isdir(parent_dir):
+        try:
+            norm_repo = repo.lower().replace("-", "").replace("_", "")
+            for entry in os.listdir(parent_dir):
+                entry_path = os.path.join(parent_dir, entry)
+                if os.path.isdir(entry_path):
+                    norm_entry = entry.lower().replace("-", "").replace("_", "")
+                    if norm_entry == norm_repo or norm_entry == norm_repo + "antigravity":
+                        local_dir = entry_path
+                        break
+        except Exception:
+            pass
+
+    if local_dir:
+        # Fetch README locally
+        readme = ""
+        for filename in ["README.md", "readme.md", "README.markdown", "README.txt"]:
+            readme_path = os.path.join(local_dir, filename)
+            if os.path.isfile(readme_path):
+                try:
+                    with open(readme_path, "r", encoding="utf-8") as f:
+                        readme = f.read(1500)
+                    break
+                except Exception:
+                    pass
+                    
+        # Fetch recent commits locally using run_safe_git_command
+        commits_text = ""
+        try:
+            success, logs = run_safe_git_command(["git", "log", "-n", "3", "--oneline"], cwd=local_dir)
+            if success:
+                commits_text = logs.strip()
+        except Exception:
+            pass
+            
+        return {
+            "slug": f"{owner}/{repo} (Local fallback)",
+            "readme": readme if readme else "No README found.",
+            "recent_commits": commits_text if commits_text else "No recent commits fetched."
+        }
+
+    
+    # Helper to fetch file from raw content
+    def fetch_file_content(resolved_repo, url_path):
+        url = f"https://raw.githubusercontent.com/{owner}/{resolved_repo}/{url_path}"
         headers = {"User-Agent": "Mozilla/5.0"}
         token = env.get("GITHUB_TOKEN") or env.get("GITHUB_PAT") or env.get("GH_TOKEN")
         if token:
@@ -489,18 +615,41 @@ def fetch_github_repo_metadata(github_url):
             with urllib.request.urlopen(req, timeout=5) as res:
                 return res.read().decode("utf-8")
         except Exception:
-            if "main" in url_path:
-                fallback_path = url_path.replace("main/", "master/")
-                return fetch_file(fallback_path)
             return ""
 
-    # Fetch commits from API
-    commits_text = ""
-    commits_url = f"https://api.github.com/repos/{slug}/commits"
+    # Check case-insensitive match for the repo
+    resolved_repo = repo
+    commits_url = f"https://api.github.com/repos/{owner}/{resolved_repo}/commits"
     headers = {"User-Agent": "Mozilla/5.0"}
     token = env.get("GITHUB_TOKEN") or env.get("GITHUB_PAT") or env.get("GH_TOKEN")
     if token:
         headers["Authorization"] = f"token {token}"
+        
+    req = urllib.request.Request(commits_url, headers=headers)
+    try:
+        # Check if the repo name resolves directly
+        with urllib.request.urlopen(req, timeout=5) as res:
+            pass
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            # Query user repositories to resolve naming discrepancies (casing, underscores, hyphens)
+            repos_url = f"https://api.github.com/users/{owner}/repos"
+            req_repos = urllib.request.Request(repos_url, headers=headers)
+            try:
+                with urllib.request.urlopen(req_repos, timeout=5) as res:
+                    repos_list = json.loads(res.read().decode("utf-8"))
+                    for r in repos_list:
+                        clean_r_name = r["name"].lower().replace("-", "").replace("_", "")
+                        clean_repo_name = repo.lower().replace("-", "").replace("_", "")
+                        if clean_r_name == clean_repo_name:
+                            resolved_repo = r["name"]
+                            break
+            except Exception:
+                pass
+
+    # Fetch commits with resolved repo name
+    commits_text = ""
+    commits_url = f"https://api.github.com/repos/{owner}/{resolved_repo}/commits"
     req = urllib.request.Request(commits_url, headers=headers)
     try:
         with urllib.request.urlopen(req, timeout=5) as res:
@@ -509,12 +658,21 @@ def fetch_github_repo_metadata(github_url):
     except Exception:
         pass
 
-    readme = fetch_file("main/README.md")
+    # Fetch README with resolved repo name and multiple fallbacks
+    readme = ""
+    for branch in ["main", "master", "dev", "develop"]:
+        for filename in ["README.md", "readme.md", "README.markdown", "README.txt"]:
+            readme = fetch_file_content(resolved_repo, f"{branch}/{filename}")
+            if readme:
+                break
+        if readme:
+            break
+
     if readme:
         readme = readme[:1500]  # Limit to avoid huge prompt sizes
 
     return {
-        "slug": slug,
+        "slug": f"{owner}/{resolved_repo}",
         "readme": readme if readme else "No README found.",
         "recent_commits": commits_text if commits_text else "No recent commits fetched."
     }
@@ -1598,6 +1756,16 @@ if 'certificates' not in st.session_state:
     st.session_state.certificates = parse_certificates_file()
 if 'pending_skills' not in st.session_state:
     st.session_state.pending_skills = []
+if 'blog_draft_raw_notes' not in st.session_state:
+    st.session_state.blog_draft_raw_notes = ""
+if 'blog_draft_title' not in st.session_state:
+    st.session_state.blog_draft_title = ""
+if 'blog_draft_excerpt' not in st.session_state:
+    st.session_state.blog_draft_excerpt = ""
+if 'blog_draft_tags' not in st.session_state:
+    st.session_state.blog_draft_tags = "Next.js, Python, AI"
+if 'blog_draft_content' not in st.session_state:
+    st.session_state.blog_draft_content = ""
 
 
 # Set up tabs
@@ -2362,7 +2530,7 @@ with tab_project:
                     img_path = project.get("image", "")
                     local_img_path = os.path.join("public", img_path.lstrip("/")) if img_path else ""
                     if local_img_path and os.path.exists(local_img_path):
-                        st.image(local_img_path, caption="Current Azure Image", width="stretch")
+                        st_image_safe(local_img_path, caption="Current Azure Image", width="stretch")
                     else:
                         st.warning("No Azure image currently found at: " + (img_path or "N/A"))
                         
@@ -2406,7 +2574,7 @@ with tab_project:
                         local_noir_img_path = ""
                         
                     if local_noir_img_path and os.path.exists(local_noir_img_path):
-                        st.image(local_noir_img_path, caption="Current Noir Image", width="stretch")
+                        st_image_safe(local_noir_img_path, caption="Current Noir Image", width="stretch")
                     else:
                         st.warning("No Noir image currently found at: " + (noir_img_path or "N/A"))
                         
@@ -2765,7 +2933,7 @@ with tab_cert:
                     img_path = cert.get("image", "")
                     local_img_path = os.path.join("public", img_path.lstrip("/")) if img_path else ""
                     if local_img_path and os.path.exists(local_img_path):
-                        st.image(local_img_path, width="stretch")
+                        st_image_safe(local_img_path, width="stretch")
                     else:
                         st.markdown("*No Image*")
                 with col2:
@@ -3123,7 +3291,7 @@ with tab_photos:
         st.caption("Target: `public/images/hero-noir.webp` (WebP)")
         hero_noir_path = "public/images/hero-noir.webp"
         if os.path.exists(hero_noir_path):
-            st.image(hero_noir_path, caption="Current Noir Hero", width="stretch")
+            st_image_safe(hero_noir_path, caption="Current Noir Hero", width="stretch")
         else:
             st.warning("No image currently found at target path.")
             
@@ -3149,7 +3317,7 @@ with tab_photos:
         st.caption("Target: `public/images/hero-illustration-wavy.webp` (WebP)")
         hero_comic_path = "public/images/hero-illustration-wavy.webp"
         if os.path.exists(hero_comic_path):
-            st.image(hero_comic_path, caption="Current Comic Hero", width="stretch")
+            st_image_safe(hero_comic_path, caption="Current Comic Hero", width="stretch")
         else:
             st.warning("No image currently found at target path.")
             
@@ -3181,7 +3349,7 @@ with tab_photos:
         st.caption("Target: `public/images/profile-noir.webp` (WebP)")
         profile_noir_path = "public/images/profile-noir.webp"
         if os.path.exists(profile_noir_path):
-            st.image(profile_noir_path, caption="Current Noir Profile", width="stretch")
+            st_image_safe(profile_noir_path, caption="Current Noir Profile", width="stretch")
         else:
             st.warning("No image currently found at target path.")
             
@@ -3207,7 +3375,7 @@ with tab_photos:
         st.caption("Target: `public/images/profile-comic.webp` (WebP)")
         profile_comic_path = "public/images/profile-comic.webp"
         if os.path.exists(profile_comic_path):
-            st.image(profile_comic_path, caption="Current Comic Profile", width="stretch")
+            st_image_safe(profile_comic_path, caption="Current Comic Profile", width="stretch")
         else:
             st.warning("No image currently found at target path.")
             
@@ -3244,9 +3412,15 @@ with tab_blog:
     if ideas_status == "success":
         ideas_res = st.session_state.get("blog_ideas_task_result")
         if ideas_res:
-            st.session_state.blog_brainstormed_ideas = ideas_res.get("ideas", [])
+            ideas_list = ideas_res.get("ideas", [])
+            st.session_state.blog_brainstormed_ideas = ideas_list
+            if ideas_list:
+                st.success("Successfully generated blog ideas!")
+            else:
+                st.warning("⚠️ No ideas were returned by Gemini. Please try again or check your codebase metadata.")
+        else:
+            st.warning("⚠️ Brainstorm task completed, but returned empty results.")
         st.session_state.blog_ideas_task_status = "idle"
-        st.success("Successfully generated blog ideas!")
     elif ideas_status == "error":
         ideas_err = st.session_state.get("blog_ideas_task_error", "Unknown error")
         st.error(f"Error brainstorming ideas: {ideas_err}")
@@ -3303,7 +3477,7 @@ with tab_blog:
             def run_brainstorm():
                 # Gather context
                 context = {}
-                # 1. Projects (regular metadata)
+                # 1. Projects (filtered by user selection)
                 try:
                     context['projects'] = [
                         {
@@ -3312,7 +3486,14 @@ with tab_blog:
                             'tech': p.get('tech', [])
                         }
                         for p in projects_list
-                    ][:6]
+                        if p.get('title') in selected_github_projects
+                    ]
+                    if "Current Website Codebase (Prateek_website)" in selected_github_projects:
+                        context['projects'].append({
+                            'title': "Current Website Codebase (Prateek_website)",
+                            'description': "This Next.js portfolio website codebase.",
+                            'tech': ["Next.js 16", "React 19", "TypeScript", "TailwindCSS", "Supabase", "Framer Motion"]
+                        })
                 except Exception:
                     pass
                 # 2. Skills
@@ -3428,12 +3609,12 @@ with tab_blog:
     st.subheader("AI Ghostwriter Co-Pilot")
     raw_notes = st.text_area(
         "1. Paste your raw notes, debug outputs, or code snippets here:",
-        value=st.session_state.get("blog_draft_raw_notes", ""),
         height=150,
-        placeholder="E.g. Fixed resume PDF download using jsPDF to create a vector layout so text remains selectable and ATS-compliant..."
+        placeholder="E.g. Fixed resume PDF download using jsPDF to create a vector layout so text remains selectable and ATS-compliant...",
+        key="blog_draft_raw_notes"
     )
     
-    tone = st.selectbox("Choose Tone:", ["Professional & Technical", "Conversational & Casual", "Tutorial / How-To Style"])
+    tone = st.selectbox("Choose Tone:", ["Professional & Technical", "Conversational & Casual", "Tutorial / How-To Style"], key="blog_draft_tone")
     
     blog_status = st.session_state.get("blog_draft_task_status", "idle")
     
@@ -3497,10 +3678,10 @@ with tab_blog:
     # Form details (pre-filled from session state if available)
     st.subheader("Edit & Publish Post")
     
-    draft_title = st.text_input("Title:", value=st.session_state.get("blog_draft_title", ""))
-    draft_excerpt = st.text_area("Excerpt / Summary:", value=st.session_state.get("blog_draft_excerpt", ""))
-    draft_tags = st.text_input("Tags (comma separated):", value=st.session_state.get("blog_draft_tags", "Next.js, Python, AI" if not st.session_state.get("blog_draft_content") else ""))
-    draft_content = st.text_area("Markdown Body Content:", value=st.session_state.get("blog_draft_content", ""), height=350)
+    draft_title = st.text_input("Title:", key="blog_draft_title")
+    draft_excerpt = st.text_area("Excerpt / Summary:", key="blog_draft_excerpt")
+    draft_tags = st.text_input("Tags (comma separated):", key="blog_draft_tags")
+    draft_content = st.text_area("Markdown Body Content:", height=350, key="blog_draft_content")
     
     dry_run_blog = st.checkbox("Dry-Run Mode (Save to Supabase/locally, skip Git remote push)", value=True, key="dry_blog")
     
