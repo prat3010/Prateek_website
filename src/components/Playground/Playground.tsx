@@ -51,6 +51,7 @@ function Playground() {
 
   const consoleRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const activeVisitedRef = useRef<Set<string>>(new Set());
 
   const bootLinesNormal = [
     '>> CONNECTING ENGINE TO COORD_GRID...',
@@ -126,6 +127,18 @@ function Playground() {
     setLogs((prev) => [...prev, { timestamp, message }]);
   }, []);
 
+  // Stop / halt active pathfinding simulation
+  const stopSimulation = useCallback(() => {
+    if (!isRunning) return;
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    setVisitedNodes(new Set(activeVisitedRef.current));
+    setIsRunning(false);
+    addLog(isNoir ? 'Investigation aborted by inspector.' : 'Simulation halted by operator!');
+  }, [isRunning, isNoir, addLog]);
+
   const systemInitLogs = isNoir ? [
     { timestamp: '--:--:--', message: 'LOG SYSTEM ONLINE. SUB-AGENT ACTIVE.' },
     { timestamp: '--:--:--', message: 'Ready to map crime scenes. Use grid above to draw brick barriers.' }
@@ -178,6 +191,7 @@ function Playground() {
     document.querySelectorAll('.visualizer-path').forEach(el => el.classList.remove('visualizer-path'));
     setVisitedNodes(new Set<string>());
     setPathNodes(new Set<string>());
+    activeVisitedRef.current = new Set<string>();
     setIsRunning(true);
 
     let algoName = '';
@@ -221,8 +235,6 @@ function Playground() {
       generator = runDFS(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
     }
 
-    const localVisited = new Set<string>();
-
     const step = () => {
       const result = generator.next();
 
@@ -235,7 +247,7 @@ function Playground() {
 
       if (val.type === 'visit' && val.col !== undefined && val.row !== undefined) {
         const key = `${val.col},${val.row}`;
-        localVisited.add(key);
+        activeVisitedRef.current.add(key);
         
         // Directly inject visualizer-visited class into DOM cell to avoid React re-renders during active search loop
         const el = document.querySelector(`[data-col="${val.col}"][data-row="${val.row}"]`);
@@ -256,7 +268,7 @@ function Playground() {
         });
 
         // Sync final visited & path sets to React state in a single batch render at the end
-        setVisitedNodes(new Set(localVisited));
+        setVisitedNodes(new Set(activeVisitedRef.current));
 
         const newPath = new Set<string>();
         val.path.forEach((node) => {
@@ -272,7 +284,7 @@ function Playground() {
       } 
       else if (val.type === 'no-path') {
         // Sync final visited set to React state in a single batch render at the end
-        setVisitedNodes(new Set(localVisited));
+        setVisitedNodes(new Set(activeVisitedRef.current));
 
         setIsRunning(false);
         addLog(isNoir 
@@ -520,10 +532,11 @@ function Playground() {
                   <button
                     type="button"
                     className={`${styles.btn} ${styles.btnPrimary}`}
-                    onClick={visualize}
-                    disabled={isRunning}
+                    onClick={isRunning ? stopSimulation : visualize}
                   >
-                    {isNoir ? 'Investigate' : 'Visualize!'}
+                    {isRunning 
+                      ? (isNoir ? 'Halt Search' : 'Stop!') 
+                      : (isNoir ? 'Investigate' : 'Visualize!')}
                   </button>
                   <button
                     type="button"
