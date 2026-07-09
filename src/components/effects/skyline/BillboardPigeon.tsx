@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSkylineInteraction } from '../SkylineInteractionContext';
 import styles from '../NoirSkyline.module.css';
 
@@ -47,52 +47,43 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
     boundingRectRef.current = null;
   }, [geometryVersion]);
 
-  useEffect(() => {
-    if (reducedMotion) return;
+  const startScurry = useCallback((nextSide: 'left' | 'right') => {
+    if (reducedMotion || scurryingRef.current) return;
+    scurryingRef.current = true;
+    setScurrying(true);
+    boundingRectRef.current = null;
 
-    const startScurry = (nextSide: 'left' | 'right') => {
-      if (scurryingRef.current) return;
-      scurryingRef.current = true;
-      setScurrying(true);
+    const startX = BILLBOARD_SIDES[sideRef.current];
+    const endX = BILLBOARD_SIDES[nextSide];
+    const duration = 480;
+    let startTime: number | null = null;
+
+    const animate = (timestamp: number) => {
+      if (!isVisibleRef.current || isIdleRef.current) { rafRef.current = null; return; }
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const t = progress;
+      const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+
+      setPosX(startX + eased * (endX - startX));
+      setPosY(BILLBOARD_Y - ARC_PEAK * Math.sin(Math.PI * progress));
       boundingRectRef.current = null;
 
-      const startX = BILLBOARD_SIDES[sideRef.current];
-      const endX = BILLBOARD_SIDES[nextSide];
-      const duration = 480;
-      let startTime: number | null = null;
-
-      const animate = (timestamp: number) => {
-        if (!isVisibleRef.current || isIdleRef.current) { rafRef.current = null; return; }
-        if (!startTime) startTime = timestamp;
-        const elapsed = timestamp - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const t = progress;
-        const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-
-        setPosX(startX + eased * (endX - startX));
-        setPosY(BILLBOARD_Y - ARC_PEAK * Math.sin(Math.PI * progress));
+      if (progress < 1) {
+        rafRef.current = requestAnimationFrame(animate);
+      } else {
+        setPosX(endX);
+        setPosY(BILLBOARD_Y);
+        setSide(nextSide);
+        setScurrying(false);
+        scurryingRef.current = false;
         boundingRectRef.current = null;
-
-        if (progress < 1) {
-          rafRef.current = requestAnimationFrame(animate);
-        } else {
-          setPosX(endX);
-          setPosY(BILLBOARD_Y);
-          setSide(nextSide);
-          setScurrying(false);
-          scurryingRef.current = false;
-          boundingRectRef.current = null;
-        }
-      };
-
-      rafRef.current = requestAnimationFrame(animate);
+      }
     };
 
-    // Store startScurry in a ref so the tick handler can access it
-    startScurryRef.current = startScurry;
+    rafRef.current = requestAnimationFrame(animate);
   }, [reducedMotion]);
-
-  const startScurryRef = useRef<((nextSide: 'left' | 'right') => void) | null>(null);
 
   // Mouse hit detection via shared context (replaces per-creature capture listener)
   useEffect(() => {
@@ -110,11 +101,11 @@ const BillboardPigeon: React.FC<{ reducedMotion?: boolean }> = ({ reducedMotion 
     const isOver =
       mouse.x >= rect.left - padding && mouse.x <= rect.right + padding &&
       mouse.y >= rect.top - padding && mouse.y <= rect.bottom + padding;
-    if (isOver && startScurryRef.current) {
+    if (isOver) {
       const nextSide = sideRef.current === 'left' ? 'right' : 'left';
-      startScurryRef.current(nextSide);
+      startScurry(nextSide);
     }
-  }, [tick, reducedMotion, mousePosRef, startScurryRef]);
+  }, [tick, reducedMotion, mousePosRef, startScurry]);
 
   // Shared tick drives velocity-based alert state (160ms tick from SkylineInteractionContext)
   useEffect(() => {
