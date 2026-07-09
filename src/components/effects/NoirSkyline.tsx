@@ -21,7 +21,6 @@ function SkylineInner() {
   const { performanceTier } = usePerformanceGovernor();
   const perfTierRef = useRef(performanceTier);
   useEffect(() => { perfTierRef.current = performanceTier; }, [performanceTier]);
-  const [mounted] = useState(true);
   const { scrollProgress: scrollYProgress } = useLenisScroll();
   const isTransitioningRef = useRef(isTransitioning);
   useEffect(() => {
@@ -148,8 +147,6 @@ function SkylineInner() {
       if (rafId) cancelAnimationFrame(rafId);
     };
   }, [mouseX, mouseY]);
-
-  if (!mounted) return null;
 
   return (
     <div className={`${styles.container} ${styles.active} ${theme === 'light' ? styles.lightPopart : styles.darkNoir} ${reducedMotion ? styles.reducedMotion : ''}`}>

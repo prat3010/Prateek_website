@@ -9,7 +9,6 @@ import type { Theme, Audience } from '@/context/ThemeContext';
 import { ThemeProvider, useTheme } from '@/context/ThemeContext';
 import { LenisProvider } from '@/context/LenisProvider';
 import { PerformanceGovernorProvider } from '@/context/PerformanceGovernor';
-import ThemeTransition from '@/components/effects/ThemeTransition';
 import { LazyMotion, domAnimation } from 'framer-motion';
 import OnboardingSelector from '@/components/ui/OnboardingSelector';
 import type { ResumeData } from '@/data/resume';
@@ -44,7 +43,6 @@ function ClientLayoutContent({
   return (
     <PerformanceGovernorProvider>
       <LenisProvider>
-        <ThemeTransition />
         {!isAdminRoute && <NoirSkyline />}
         {!isAdminRoute && <CursorTrail />}
         {!isAdminRoute && <Navbar />}

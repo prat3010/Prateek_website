@@ -27,17 +27,7 @@ function RealtimeClock({ wobble, strength }: RealtimeClockProps) {
     return () => clearInterval(interval);
   }, []);
 
-  if (!time) {
-    return (
-      <g>
-        {/* Clock Face Circle */}
-        <circle cx="1275" cy="580" r="10" fill="var(--skyline-clock-face)" stroke="var(--skyline-clock-border)" strokeWidth="1.2" className={styles.clockFace} />
-        {/* Clock hands pointing at 11:45 */}
-        <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1275" y1="580" x2="1275" y2="572" stroke="var(--skyline-clock-details)" strokeWidth="1" /> {/* Minute hand */}
-        <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1275" y1="580" x2="1268" y2="583" stroke="var(--skyline-clock-details)" strokeWidth="1.2" /> {/* Hour hand */}
-      </g>
-    );
-  }
+
 
   const hours = time.getHours();
   const minutes = time.getMinutes();

@@ -144,6 +144,15 @@ Runtime rendering uses the generated cache first and falls back to live wobble g
 
 ---
 
+## 🤖 Agent Customizations & Skills
+
+This project includes workspace-scoped agent customization tools located in the `.agents/` directory:
+
+- **Ponytail Mode (`.agents/skills/ponytail/`)**: Guides the AI coding assistant to act like a "lazy senior developer" to minimize code bloat, leverage standard libraries, and prefer native platform features (YAGNI). Triggered dynamically by mentioning `"ponytail"`, `"yagni"`, or `"be lazy"`.
+- **Ponytail Review (`.agents/skills/ponytail-review/`)**: A specialized code review tool focusing exclusively on detecting and purging over-engineering. Triggered via `"review for over-engineering"` or `"/ponytail-review"`.
+
+---
+
 ## 🌐 Deployment & Hosting
 
 The website is fully deployed and hosted on **Vercel**.
