@@ -5,7 +5,7 @@ Reads .env.local for credentials. Uses Supabase REST API directly.
 Usage: python3 scripts/seed_supabase.py
 """
 
-import os, re, json, sys, urllib.request, urllib.error
+import os, json, sys, urllib.request, urllib.error
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -25,59 +25,6 @@ def load_env():
     if 'NEXT_PUBLIC_SUPABASE_URL' not in os.environ or 'SUPABASE_SERVICE_ROLE_KEY' not in os.environ:
         print("Error: Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY environment variables.")
         sys.exit(1)
-
-def read_file(*parts):
-    with open(os.path.join(ROOT, *parts)) as f:
-        return f.read()
-
-def extract_after(text, marker):
-    """Return everything after *marker* up to the final semicolon."""
-    idx = text.index(marker) + len(marker)
-    rest = text[idx:].strip()
-    if rest.startswith('='):
-        rest = rest[1:].strip()
-    # find the outer value — bracket/brace depth
-    depth = 0
-    in_str = False
-    q = None
-    skip_next = False
-    end = 0
-    for i, c in enumerate(rest):
-        if skip_next:
-            skip_next = False
-            continue
-        if in_str:
-            if c == '\\':
-                skip_next = True
-            elif c == q:
-                in_str = False
-        elif c in '"\'':
-            in_str = True
-            q = c
-        elif c in '[{':
-            depth += 1
-        elif c in ']}':
-            depth -= 1
-            if depth == 0:
-                end = i + 1
-                break
-    if end == 0:
-        raise ValueError(f'Could not find end of value after "{marker}"')
-    return rest[:end]
-
-def ts_literal_to_py(text):
-    """Convert a TypeScript literal value (object/array) to a Python object."""
-    # 1: single-quoted strings → JSON-safe double-quoted (handle escapes)
-    def fix_sq(m):
-        inner = m.group(1)
-        inner = inner.replace("\\'", "'").replace('\\\\', '\\')
-        return json.dumps(inner, ensure_ascii=False)
-    text = re.sub(r"'((?:[^'\\]|\\.)*)'", fix_sq, text)
-    # 2: unquoted object keys → quoted (handles inline keys like { title: })
-    text = re.sub(r'([{,]\s*)(\w+)(\s*:)', r'\1"\2"\3', text)
-    # 3: trailing commas before } or ]
-    text = re.sub(r',(\s*[}\]])', r'\1', text)
-    return json.loads(text)
 
 def supabase_rest(method, table, body=None):
     url = os.environ['NEXT_PUBLIC_SUPABASE_URL'].rstrip('/') + f'/rest/v1/{table}'
