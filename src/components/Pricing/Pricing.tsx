@@ -22,7 +22,7 @@ const PRICING_SECTION_TITLE_TEXTS: ScramblerProps['texts'] = {
 };
 
 function Pricing({ resumeData }: PricingProps) {
-  const { isNoir, audience } = useTheme();
+  const { isNoir, audience, region } = useTheme();
   const lenis = useLenis();
   const prefersReducedMotion = useReducedMotion();
 
@@ -30,11 +30,12 @@ function Pricing({ resumeData }: PricingProps) {
 
   // Fallback plans if not present in DB
   const fallbackPlans: PricingPlan[] = useMemo(() => {
+    const isIndia = region === 'india';
     if (activeAudience === 'business') {
       return [
         {
           title: "Landing Page Package",
-          price: "$400 - $700",
+          price: isIndia ? "₹25,000 - ₹50,000" : "$400 - $700",
           description: "A focused single-page website with a clear message, responsive layout, and contact flow.",
           features: [
             "Custom UI mockup",
@@ -46,7 +47,7 @@ function Pricing({ resumeData }: PricingProps) {
         },
         {
           title: "Custom Web Application",
-          price: "$1,200 - $2,500",
+          price: isIndia ? "₹90,000 - ₹1,80,000" : "$1,200 - $2,500",
           description: "A multi-page application with Supabase-backed data, admin tools, and project-specific workflows.",
           features: [
             "Next.js App Router & TypeScript",
@@ -58,7 +59,7 @@ function Pricing({ resumeData }: PricingProps) {
         },
         {
           title: "Monthly Support & SEO",
-          price: "$150 / mo",
+          price: isIndia ? "₹10,000 / mo" : "$150 / mo",
           description: "Ongoing maintenance, content updates, and periodic performance checks.",
           features: [
             "Included development hours",
@@ -73,7 +74,7 @@ function Pricing({ resumeData }: PricingProps) {
     return [
       {
         title: "Hourly Consulting",
-        price: "$50 / hr",
+        price: isIndia ? "₹3,500 / hr" : "$50 / hr",
         description: "One-on-one development, debugging, and architecture support.",
         features: [
           "React 19 / Next.js 16 debugging",
@@ -85,7 +86,7 @@ function Pricing({ resumeData }: PricingProps) {
       },
       {
         title: "Architecture Review",
-        price: "$250 / session",
+        price: isIndia ? "₹15,000 / session" : "$250 / session",
         description: "A technical review of structure, data flow, and caching behavior.",
         features: [
           "Database query review",
@@ -97,7 +98,7 @@ function Pricing({ resumeData }: PricingProps) {
       },
       {
         title: "Codebase Security Audit",
-        price: "$450 / audit",
+        price: isIndia ? "₹30,000 / audit" : "$450 / audit",
         description: "A practical review of secrets, access control, and common exposure points.",
         features: [
           "RLS policy review",
@@ -108,9 +109,14 @@ function Pricing({ resumeData }: PricingProps) {
         cta: "security"
       }
     ];
-  }, [activeAudience]);
+  }, [activeAudience, region]);
 
-  const plans = resumeData?.pricing?.[activeAudience] || fallbackPlans;
+  const plans = useMemo(() => {
+    if (region === 'india' && resumeData?.pricing_india?.[activeAudience]) {
+      return resumeData.pricing_india[activeAudience];
+    }
+    return resumeData?.pricing?.[activeAudience] || fallbackPlans;
+  }, [resumeData, activeAudience, region, fallbackPlans]);
 
   const handleSelectPackage = (ctaCode: string) => {
     // Dispatch custom event to pre-populate form

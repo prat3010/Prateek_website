@@ -7,6 +7,13 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
   // Extract theme and audience cookies
   const themeCookie = request.cookies.get('theme')?.value || 'light';
   const audienceCookie = request.cookies.get('audience')?.value || null;
+  let regionCookie = request.cookies.get('region')?.value || null;
+
+  // Retrieve country header (populated automatically by Vercel in production)
+  const country = request.headers.get('x-vercel-ip-country') || 'Local/Unknown';
+  if (!regionCookie) {
+    regionCookie = country === 'IN' ? 'india' : 'global';
+  }
   
   // Parse User Agent via Next.js helper
   const { device, browser, os, isBot } = userAgent(request);
@@ -14,17 +21,24 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
   // Set request headers for layouts
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-theme', themeCookie);
+  requestHeaders.set('x-region', regionCookie);
   if (isBot) {
     requestHeaders.set('x-audience', 'developer');
   } else if (audienceCookie) {
     requestHeaders.set('x-audience', audienceCookie);
   }
 
-  const nextResponse = () => NextResponse.next({
-    request: {
-      headers: requestHeaders,
+  const nextResponse = () => {
+    const res = NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      }
+    });
+    if (request.cookies.get('region')?.value !== regionCookie) {
+      res.cookies.set('region', regionCookie || 'global', { path: '/', maxAge: 31536000, sameSite: 'lax' });
     }
-  });
+    return res;
+  };
 
   // If Supabase is not configured yet, silently pass
   if (!supabase) {
@@ -49,7 +63,7 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
   const ip = forwardedFor ? forwardedFor.split(',')[0] : '127.0.0.1';
 
   // Get geolocation headers (populated automatically by Vercel in production)
-  const country = request.headers.get('x-vercel-ip-country') || 'Local/Unknown';
+  // (using outer country variable)
 
   // Get Referrer & Sanitize to Domain to protect privacy and prevent spam
   let referrer = request.headers.get('referer') || '';

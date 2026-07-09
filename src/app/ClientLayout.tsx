@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Navbar from '@/components/ui/Navbar';
 import Footer from '@/components/ui/Footer';
-import type { Theme, Audience } from '@/context/ThemeContext';
+import type { Theme, Audience, Region } from '@/context/ThemeContext';
 import { ThemeProvider, useTheme } from '@/context/ThemeContext';
 import { LenisProvider } from '@/context/LenisProvider';
 import { PerformanceGovernorProvider } from '@/context/PerformanceGovernor';
@@ -24,6 +24,7 @@ interface ClientLayoutProps {
   children: React.ReactNode;
   initialTheme: Theme;
   initialAudience: Audience | null;
+  initialRegion: Region;
   profile?: ResumeData | null;
 }
 
@@ -66,6 +67,7 @@ export default function ClientLayout({
   children,
   initialTheme,
   initialAudience,
+  initialRegion,
   profile
 }: ClientLayoutProps) {
   const pathname = usePathname();
@@ -149,7 +151,7 @@ export default function ClientLayout({
   }, []);
 
   return (
-    <ThemeProvider initialTheme={initialTheme} initialAudience={initialAudience}>
+    <ThemeProvider initialTheme={initialTheme} initialAudience={initialAudience} initialRegion={initialRegion}>
       <LazyMotion features={domAnimation}>
         <ClientLayoutContent isAdminRoute={isAdminRoute} isKonamiActive={isKonamiActive} profile={profile}>
           {children}

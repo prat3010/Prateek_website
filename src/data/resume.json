@@ -116,6 +116,84 @@
       }
     ]
   },
+  "pricing_india": {
+    "business": [
+      {
+        "cta": "landing-page",
+        "price": "₹25,000 - ₹50,000",
+        "title": "Landing Page Package",
+        "features": [
+          "Custom UI mockup",
+          "Responsive layout and spacing",
+          "Basic SEO metadata",
+          "Resend contact email integration"
+        ],
+        "description": "A focused single-page website with a clear message, responsive layout, and contact flow."
+      },
+      {
+        "cta": "web-application",
+        "price": "₹90,000 - ₹1,80,000",
+        "title": "Custom Web Application",
+        "features": [
+          "Next.js App Router & TypeScript",
+          "Supabase data layer setup",
+          "Admin or analytics views",
+          "Custom forms or billing flow"
+        ],
+        "description": "A multi-page application with Supabase-backed data, admin tools, and project-specific workflows."
+      },
+      {
+        "cta": "monthly-support",
+        "price": "₹10,000 / mo",
+        "title": "Monthly Support & SEO",
+        "features": [
+          "Included development hours",
+          "Performance and usability checks",
+          "Monthly page-visit review",
+          "Security and package updates"
+        ],
+        "description": "Ongoing maintenance, content updates, and periodic performance checks."
+      }
+    ],
+    "developer": [
+      {
+        "cta": "mentorship",
+        "price": "₹3,500 / hr",
+        "title": "Hourly Consulting",
+        "features": [
+          "React 19 / Next.js 16 debugging",
+          "Development workflow review",
+          "Supabase / PostgreSQL setup",
+          "Code review and refactoring sessions"
+        ],
+        "description": "One-on-one development, debugging, and architecture support."
+      },
+      {
+        "cta": "architecture",
+        "price": "₹15,000 / session",
+        "title": "Architecture Review",
+        "features": [
+          "Database query review",
+          "Caching and rendering review",
+          "Performance notes and priorities",
+          "Follow-up call to discuss findings"
+        ],
+        "description": "A technical review of structure, data flow, and caching behavior."
+      },
+      {
+        "cta": "security",
+        "price": "₹30,000 / audit",
+        "title": "Codebase Security Audit",
+        "features": [
+          "RLS policy review",
+          "Secret exposure sweep",
+          "Abuse and spam checks",
+          "Remediation notes"
+        ],
+        "description": "A practical review of secrets, access control, and common exposure points."
+      }
+    ]
+  },
   "summary": {
     "ai": "Builds AI-assisted workflows, content pipelines, and automation tools that make recurring tasks easier to run and review.",
     "general": "Builds web applications and interactive interfaces with attention to clear structure, performance, and maintainability.",
@@ -137,6 +215,18 @@
   "quotation": {
     "dayRate": "$350",
     "hourlyRate": "$50",
+    "deliverables": [
+      "Custom UI Design & Prototype",
+      "Production-ready Next.js / React application",
+      "Supabase backend integration & security setup",
+      "SEO audit & optimization",
+      "3 months of support & maintenance"
+    ],
+    "paymentTerms": "50% upfront, 30% after design/milestone 1, 20% on final delivery."
+  },
+  "quotation_india": {
+    "dayRate": "₹25,000",
+    "hourlyRate": "₹3,500",
     "deliverables": [
       "Custom UI Design & Prototype",
       "Production-ready Next.js / React application",

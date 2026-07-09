@@ -67,8 +67,18 @@ export interface ResumeData {
     paymentTerms: string;
     deliverables: string[];
   };
+  quotation_india?: {
+    hourlyRate: string;
+    dayRate: string;
+    paymentTerms: string;
+    deliverables: string[];
+  };
   about?: AboutData;
   pricing?: {
+    developer: PricingPlan[];
+    business: PricingPlan[];
+  };
+  pricing_india?: {
     developer: PricingPlan[];
     business: PricingPlan[];
   };

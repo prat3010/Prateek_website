@@ -39,10 +39,18 @@ const RESUME_BUTTON_TEXTS: ScramblerProps['texts'] = {
 };
 
 function Resume({ resumeData, certificates }: ResumeProps) {
-  const { isNoir, audience } = useTheme();
+  const { isNoir, audience, region } = useTheme();
   const [activePersona, setActivePersona] = useState<Persona>('general');
 
   const activeAudience = audience || 'developer';
+
+  const activeQuotation = React.useMemo(() => {
+    if (!resumeData) return undefined;
+    if (region === 'india' && resumeData.quotation_india) {
+      return resumeData.quotation_india;
+    }
+    return resumeData.quotation;
+  }, [resumeData, region]);
 
   if (!resumeData) {
     return null;
@@ -51,7 +59,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
   const handleDownloadPDF = () => {
     if (activeAudience === 'business') {
       import('@/utils/pdfGenerator').then(({ generateQuotationPDF }) => {
-        generateQuotationPDF(resumeData);
+        generateQuotationPDF(resumeData, region);
       });
     } else {
       import('@/utils/pdfGenerator').then(({ generateResumePDF }) => {
@@ -201,13 +209,13 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                     <div className={styles.quoteGrid}>
                       <div className={styles.quoteCard}>
                         <h4 className={styles.quoteCardLabel}>ESTIMATED HOURLY RATE</h4>
-                        <span className={styles.rateValue}>{resumeData.quotation?.hourlyRate || "$50"}</span>
+                        <span className={styles.rateValue}>{activeQuotation?.hourlyRate || (region === 'india' ? "₹3,500" : "$50")}</span>
                         <span className={styles.rateUnit}>per hour</span>
                       </div>
 
                       <div className={styles.quoteCard}>
                         <h4 className={styles.quoteCardLabel}>STANDARD DAY RATE (8H)</h4>
-                        <span className={styles.rateValue}>{resumeData.quotation?.dayRate || "$350"}</span>
+                        <span className={styles.rateValue}>{activeQuotation?.dayRate || (region === 'india' ? "₹25,000" : "$350")}</span>
                         <span className={styles.rateUnit}>per day</span>
                       </div>
                     </div>
@@ -218,7 +226,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                         <FileText size={16} />
                         <span>STANDARD ENGAGEMENT TERMS</span>
                       </h3>
-                      <p className={styles.summaryText}>{resumeData.quotation?.paymentTerms || "50% upfront, 30% after design/milestone 1, 20% on final delivery."}</p>
+                      <p className={styles.summaryText}>{activeQuotation?.paymentTerms || "50% upfront, 30% after design/milestone 1, 20% on final delivery."}</p>
                     </div>
 
                     <div className={styles.resumeSectionBlock}>
@@ -227,7 +235,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                         <span>SERVICE DELIVERABLES</span>
                       </h3>
                       <ul className={styles.bulletsList}>
-                        {(resumeData.quotation?.deliverables || [
+                        {(activeQuotation?.deliverables || [
                           "Custom UI Design & Prototype",
                           "Production-ready Next.js / React application",
                           "Supabase backend integration & security setup",

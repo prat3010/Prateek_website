@@ -209,7 +209,7 @@ export function generateResumePDF(activePersona: Persona, resumeData: ResumeData
   doc.save(`Prateek_Sharma_Resume_${activePersona}.pdf`);
 }
 
-export function generateQuotationPDF(resumeData: ResumeData) {
+export function generateQuotationPDF(resumeData: ResumeData, region: 'india' | 'global' = 'global') {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
@@ -285,9 +285,10 @@ export function generateQuotationPDF(resumeData: ResumeData) {
   y += 2;
   drawDivider();
 
-  const hourly = resumeData.quotation?.hourlyRate || "$50";
-  const day = resumeData.quotation?.dayRate || "$350";
-  const terms = resumeData.quotation?.paymentTerms || "50% upfront, 30% after design/milestone 1, 20% on final delivery.";
+  const quoteSource = (region === 'india' && resumeData.quotation_india) ? resumeData.quotation_india : resumeData.quotation;
+  const hourly = quoteSource?.hourlyRate || (region === 'india' ? "₹3,500" : "$50");
+  const day = quoteSource?.dayRate || (region === 'india' ? "₹25,000" : "$350");
+  const terms = quoteSource?.paymentTerms || "50% upfront, 30% after design/milestone 1, 20% on final delivery.";
 
   doc.setFont('Helvetica', 'Bold');
   doc.setFontSize(10.5);
@@ -313,7 +314,7 @@ export function generateQuotationPDF(resumeData: ResumeData) {
   y += 2;
   drawDivider();
 
-  const deliverables = resumeData.quotation?.deliverables || [
+  const deliverables = quoteSource?.deliverables || [
     "Custom UI Design & Prototype",
     "Production-ready Next.js / React application",
     "Supabase backend integration & security setup",
