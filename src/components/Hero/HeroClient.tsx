@@ -244,26 +244,29 @@ function HeroClientContent({ taglines }: HeroClientProps) {
       <div className={styles.imageSide}>
         <ComicPanel tilt={2} className={styles.heroPanel} staticDots>
           <div className={styles.imageWrapper}>
-            <Image
-              src="/images/hero-noir.webp"
-              alt="Prateeq Sharma hero illustration"
-              fill
-              priority
-              fetchPriority="high"
-              sizes="(max-width: 768px) 280px, 420px"
-              className={`${styles.heroImage} ${styles.darkOnly}`}
-              style={{ objectFit: 'cover', objectPosition: 'center' }}
-            />
-            <Image
-              src="/images/hero-illustration-wavy.webp"
-              alt="Prateeq Sharma hero illustration"
-              fill
-              priority
-              fetchPriority="high"
-              sizes="(max-width: 768px) 280px, 420px"
-              className={`${styles.heroImage} ${styles.lightOnly}`}
-              style={{ objectFit: 'cover', objectPosition: 'center' }}
-            />
+            {isNoir ? (
+              <Image
+                src="/images/hero-noir.webp"
+                alt="Prateeq Sharma hero illustration"
+                fill
+                priority
+                fetchPriority="high"
+                sizes="(max-width: 768px) 280px, 420px"
+                className={styles.heroImage}
+                style={{ objectFit: 'cover', objectPosition: 'center' }}
+              />
+            ) : (
+              <Image
+                src="/images/hero-illustration-wavy.webp"
+                alt="Prateeq Sharma hero illustration"
+                fill
+                priority
+                fetchPriority="high"
+                sizes="(max-width: 768px) 280px, 420px"
+                className={styles.heroImage}
+                style={{ objectFit: 'cover', objectPosition: 'center' }}
+              />
+            )}
           </div>
         </ComicPanel>
       </div>
