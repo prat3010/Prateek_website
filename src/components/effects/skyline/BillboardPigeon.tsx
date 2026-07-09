@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSkylineInteraction } from '../SkylineInteractionContext';
 import styles from '../NoirSkyline.module.css';
 
-const BILLBOARD_SIDES = { left: 95, right: 165 };
+const BILLBOARD_SIDES = { left: 135, right: 205 };
 const BILLBOARD_Y = 698;
 const ARC_PEAK = 10;
 

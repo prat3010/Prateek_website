@@ -230,16 +230,16 @@ const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble }:
               {/* Detective Billboard Support Frame & Sign (Static) */}
               <g>
                 {/* Scaffold support frame */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="90" y1="820" x2="98" y2="760" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="170" y1="820" x2="162" y2="760" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="98" y1="760" x2="162" y2="760" stroke="var(--skyline-stroke-mid)" strokeWidth="1" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="98" y1="760" x2="170" y2="820" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" opacity="0.5" />
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="162" y1="760" x2="90" y2="820" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" opacity="0.5" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="130" y1="820" x2="138" y2="760" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="210" y1="820" x2="202" y2="760" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="138" y1="760" x2="202" y2="760" stroke="var(--skyline-stroke-mid)" strokeWidth="1" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="138" y1="760" x2="210" y2="820" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" opacity="0.5" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="202" y1="760" x2="130" y2="820" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" opacity="0.5" />
 
                 {/* Sign Board */}
-                <WobblyRect wobble={wobble} wobbleStrength={strength} x="80" y="700" width="100" height="60" rx="3" fill="var(--skyline-billboard-bg)" stroke="var(--skyline-stroke-fg)" strokeWidth="1.8" />
+                <WobblyRect wobble={wobble} wobbleStrength={strength} x="120" y="700" width="100" height="60" rx="3" fill="var(--skyline-billboard-bg)" stroke="var(--skyline-stroke-fg)" strokeWidth="1.8" />
                 {/* Border line */}
-                <WobblyRect wobble={wobble} wobbleStrength={strength} x="84" y="704" width="92" height="52" fill="none" strokeWidth="0.8" stroke="var(--skyline-stroke-mid)" />
+                <WobblyRect wobble={wobble} wobbleStrength={strength} x="124" y="704" width="92" height="52" fill="none" strokeWidth="0.8" stroke="var(--skyline-stroke-mid)" />
               </g>
 
               {/* Rooftop Penthouse Brick Access Shed (Static part) */}
@@ -1447,12 +1447,12 @@ const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble }:
 
               {/* Cocktail Glass Logo & Neon Text */}
               <g className={styles.billboardNeon}>
-                <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 104 718 L 124 718 L 114 734 Z" fill="none" stroke="#ff1493" strokeWidth="1.2" /> {/* Glass Bowl */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="114" y1="734" x2="114" y2="746" stroke="#ff1493" strokeWidth="1.5" /> {/* Stem */}
-                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="107" y1="746" x2="121" y2="746" stroke="#ff1493" strokeWidth="1.5" /> {/* Base */}
+                <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 144 718 L 164 718 L 154 734 Z" fill="none" stroke="#ff1493" strokeWidth="1.2" /> {/* Glass Bowl */}
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="154" y1="734" x2="154" y2="746" stroke="#ff1493" strokeWidth="1.5" /> {/* Stem */}
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="147" y1="746" x2="161" y2="746" stroke="#ff1493" strokeWidth="1.5" /> {/* Base */}
                 
-                <text x="154" y="728" textAnchor="middle" fontFamily="var(--font-code)" fontWeight="bold" fontSize="7.8" fill="#ff1493" stroke="none">NOIR</text>
-                <text x="154" y="740" textAnchor="middle" fontFamily="var(--font-code)" fontWeight="bold" fontSize="7.8" fill="#ff1493" stroke="none">GIN</text>
+                <text x="194" y="728" textAnchor="middle" fontFamily="var(--font-code)" fontWeight="bold" fontSize="7.8" fill="#ff1493" stroke="none">NOIR</text>
+                <text x="194" y="740" textAnchor="middle" fontFamily="var(--font-code)" fontWeight="bold" fontSize="7.8" fill="#ff1493" stroke="none">GIN</text>
               </g>
 
               {/* Neon EXIT Sign above the door */}
@@ -1461,7 +1461,7 @@ const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble }:
                 <text x="316" y="763" textAnchor="middle" fontFamily="var(--font-code)" fontWeight="bold" fontSize="4.8" fill="#39ff14" stroke="none">EXIT</text>
               </g>
               {/* Animated Billboard Spotlight */}
-              <polygon points="130,820 80,695 180,695" fill="var(--skyline-left-light-grad)" stroke="none" className={styles.billboardLight} />
+              <polygon points="170,820 120,695 220,695" fill="var(--skyline-left-light-grad)" stroke="none" className={styles.billboardLight} />
 
               {/* Falling water droplet from copper pipe */}
               <circle cx="150" cy="805" r="1.5" className={styles.drippingDrop} stroke="none" />
@@ -1517,7 +1517,7 @@ const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble }:
 
               {/* Billboard pigeon - static fallback */}
               {reducedMotion && (
-                <g transform="translate(95, 698)">
+                <g transform="translate(135, 698)">
                   <g transform="scale(1.5)">
                     <g className={styles.pigeonBob}>
                       <ellipse cx="0" cy="-3" rx="3" ry="2.5" fill="var(--skyline-pigeon-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="0.6" />
