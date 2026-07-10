@@ -139,11 +139,11 @@
     "dayRate": "$300",
     "paymentTerms": "50% upfront deposit to initiate development, 50% upon final project delivery.",
     "deliverables": [
-      "Custom UI Design & Prototype",
-      "Production-ready Next.js / React application",
-      "Supabase backend integration & security setup",
-      "SEO audit & optimization",
-      "3 months of support & maintenance"
+      "Custom UI Design & Interactive Prototypes",
+      "Production-ready React & Next.js web applications",
+      "Supabase database engineering & security setups",
+      "Search Engine Optimization (SEO) & Web Telemetry setup",
+      "30 days of post-launch launch support & handoff documentation"
     ]
   },
   "experience": [
