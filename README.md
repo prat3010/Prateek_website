@@ -88,7 +88,7 @@ The project includes a Streamlit-based local dashboard to manage resume details,
 
 > 💡 **Offline Mode:** By default, saving changes commits to the Supabase database first and updates local JSON files only on success. Deletes are propagated to Supabase explicitly, generated AI payloads are validated before writes, local JSON/Markdown writes are atomic, certificate files are staged before being moved into public assets, and Git publishing only commits intended synchronizer paths. If you are developing offline or without a database connection, check the **Offline Mode (Local JSON Only)** toggle in the sidebar to bypass database writes and modify local files directly.
 
-The synchronizer entry point is `scripts/synchronizer.py`. Shared safety helpers live in `scripts/sync_supabase.py`, `scripts/sync_json.py`, `scripts/sync_validation.py`, `scripts/sync_assets.py`, and `scripts/sync_git.py`.
+The synchronizer entry point is `scripts/synchronizer.py`. Tab-specific views and helper functions reside under `scripts/sync_tabs/`. Shared safety helpers live in `scripts/sync_supabase.py`, `scripts/sync_json.py`, `scripts/sync_validation.py`, `scripts/sync_assets.py`, and `scripts/sync_git.py`.
 
 #### Run the Synchronizer:
 

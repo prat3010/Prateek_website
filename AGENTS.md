@@ -93,6 +93,7 @@ The project uses the following environment variables (stored in `.env.local` loc
 - `scripts/generate-git-log.js` writes generated commit data before builds.
 - `scripts/generate-wobbly-paths.mjs` prebakes deterministic skyline wobble paths so the browser does not run the full displacement algorithm for normal skyline rendering.
 - `scripts/synchronizer.py` is a local content-management helper. Treat it as tooling, not runtime app code.
+- `scripts/sync_tabs/` contains tab-specific view modules for the Streamlit dashboard (`analytics.py`, `resume.py`, `projects.py`, `certificates.py`, `skills.py`, `photos.py`, `blog.py`, and `shared.py` common parsing/utilities).
 - `scripts/seed_supabase.py` populates Supabase tables from the TypeScript data files (one-time bootstrap or re-seed).
 - `scripts/sync_supabase.py` shared REST API module used by the synchronizer to read, upsert, and explicitly delete Supabase records.
 - `scripts/sync_json.py` provides atomic local JSON/text fallback writes for the synchronizer.
