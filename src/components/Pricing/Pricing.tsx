@@ -35,7 +35,7 @@ function Pricing({ resumeData }: PricingProps) {
       return [
         {
           title: "Landing Page Package",
-          price: isIndia ? "₹25,000 - ₹50,000" : "$400 - $700",
+          price: isIndia ? "₹20,000 - " + "₹40,000" : "$300 - $550",
           description: "A focused single-page website with a clear message, responsive layout, and contact flow.",
           features: [
             "Custom UI mockup",
@@ -47,7 +47,7 @@ function Pricing({ resumeData }: PricingProps) {
         },
         {
           title: "Custom Web Application",
-          price: isIndia ? "₹90,000 - ₹1,80,000" : "$1,200 - $2,500",
+          price: isIndia ? "₹75,000 - " + "₹1,35,000" : "$1,000 - $1,800",
           description: "A multi-page application with Supabase-backed data, admin tools, and project-specific workflows.",
           features: [
             "Next.js App Router & TypeScript",
@@ -59,7 +59,7 @@ function Pricing({ resumeData }: PricingProps) {
         },
         {
           title: "Monthly Support & SEO",
-          price: isIndia ? "₹10,000 / mo" : "$150 / mo",
+          price: isIndia ? "₹7,500 / mo" : "$100 / mo",
           description: "Ongoing maintenance, content updates, and periodic performance checks.",
           features: [
             "Included development hours",
@@ -74,7 +74,7 @@ function Pricing({ resumeData }: PricingProps) {
     return [
       {
         title: "Hourly Consulting",
-        price: isIndia ? "₹3,500 / hr" : "$50 / hr",
+        price: isIndia ? "₹3,000 / hr" : "$40 / hr",
         description: "One-on-one development, debugging, and architecture support.",
         features: [
           "React 19 / Next.js 16 debugging",
@@ -86,7 +86,7 @@ function Pricing({ resumeData }: PricingProps) {
       },
       {
         title: "Architecture Review",
-        price: isIndia ? "₹15,000 / session" : "$250 / session",
+        price: isIndia ? "₹15,000 / session" : "$200 / session",
         description: "A technical review of structure, data flow, and caching behavior.",
         features: [
           "Database query review",
@@ -98,7 +98,7 @@ function Pricing({ resumeData }: PricingProps) {
       },
       {
         title: "Codebase Security Audit",
-        price: isIndia ? "₹30,000 / audit" : "$450 / audit",
+        price: isIndia ? "₹25,000 / audit" : "$350 / audit",
         description: "A practical review of secrets, access control, and common exposure points.",
         features: [
           "RLS policy review",
@@ -134,14 +134,21 @@ function Pricing({ resumeData }: PricingProps) {
   return (
     <section id="pricing" className={styles.pricingSection} aria-label="Pricing Packages">
       <div className={styles.container}>
-        <Scrambler
-          texts={PRICING_SECTION_TITLE_TEXTS}
-          variant="section-title"
-          as="h2"
-          className={styles.sectionTitle}
-        >
-          {activeAudience === 'business' ? 'SERVICE PACKAGES' : 'CONSULTING RATES'}
-        </Scrambler>
+        <div className={styles.titleContainer}>
+          <Scrambler
+            texts={PRICING_SECTION_TITLE_TEXTS}
+            variant="section-title"
+            as="h2"
+            className={styles.sectionTitle}
+          >
+            {activeAudience === 'business' ? 'SERVICE PACKAGES' : 'CONSULTING RATES'}
+          </Scrambler>
+          {activeAudience === 'business' && (
+            <p className={styles.sectionSubtitle}>
+              Choose a fixed-scope package below for standard projects with a predictable budget.
+            </p>
+          )}
+        </div>
 
         <AnimatePresence mode="wait">
           <motion.div

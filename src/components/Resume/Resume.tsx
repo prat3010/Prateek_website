@@ -93,16 +93,23 @@ function Resume({ resumeData, certificates }: ResumeProps) {
         
         {/* ---- Header & Action Bar ---- */}
         <div className={styles.sectionHeader}>
-          <Scrambler
-            texts={RESUME_SECTION_TITLE_TEXTS}
-            variant="section-title"
-            as="h2"
-            className={styles.sectionTitle}
-          >
-            {activeAudience === 'business'
-              ? (isNoir ? 'RATE CARD & TERMS' : 'FREELANCE SERVICE QUOTATION')
-              : (isNoir ? 'SERVICE RECORD' : 'PROFESSIONAL DOSSIER')}
-          </Scrambler>
+          <div className={styles.titleContainer}>
+            <Scrambler
+              texts={RESUME_SECTION_TITLE_TEXTS}
+              variant="section-title"
+              as="h2"
+              className={styles.sectionTitle}
+            >
+              {activeAudience === 'business'
+                ? (isNoir ? 'RATE CARD & TERMS' : 'FREELANCE SERVICE QUOTATION')
+                : (isNoir ? 'SERVICE RECORD' : 'PROFESSIONAL DOSSIER')}
+            </Scrambler>
+            {activeAudience === 'business' && (
+              <p className={styles.sectionSubtitle}>
+                For custom feature development, ongoing consulting, or bespoke technical partnership.
+              </p>
+            )}
+          </div>
           
           <div className={styles.actions}>
             <button 
