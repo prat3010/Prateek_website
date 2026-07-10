@@ -983,8 +983,9 @@ def git_commit_push_file(file_path, commit_message):
 def inject_global_styles():
     st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=JetBrains+Mono:wght@400;700&family=Quicksand:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=JetBrains+Mono:wght@400;700&family=Quicksand:wght@300..700&display=swap');
     
+    /* Font overrides */
     html, body, [class*="css"], .stWidgetFormContainer {
         font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
     }
@@ -998,6 +999,7 @@ def inject_global_styles():
         font-family: 'JetBrains Mono', monospace !important;
     }
 
+    /* Core Page Styling with sweet gradients, candy violet background, and sugar grid texture */
     .stApp {
         background-color: #1a162b !important;
         background-image: 
@@ -1005,177 +1007,304 @@ def inject_global_styles():
             linear-gradient(90deg, rgba(255, 117, 151, 0.03) 1px, transparent 1px),
             radial-gradient(at 10% 10%, rgba(255, 117, 151, 0.18) 0px, transparent 50%),
             radial-gradient(at 90% 20%, rgba(90, 214, 255, 0.16) 0px, transparent 50%),
-            radial-gradient(at 50% 80%, rgba(244, 220, 149, 0.12) 0px, transparent 50%);
-        background-size: 32px 32px, 32px 32px, 100% 100%, 100% 100%, 100% 100%;
-        background-attachment: fixed;
+            radial-gradient(at 50% 80%, rgba(220, 181, 255, 0.18) 0px, transparent 50%) !important;
+        background-size: 32px 32px, 32px 32px, auto, auto, auto !important;
+        background-attachment: fixed !important;
+        color: #e2dff0 !important;
     }
     
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-        background-color: rgba(38, 32, 69, 0.5);
-        padding: 8px 12px;
-        border-radius: 12px;
-        border: 1px solid rgba(255, 117, 151, 0.12);
-        margin-bottom: 24px;
-    }
-    
-    .stTabs [data-baseweb="tab"] {
-        height: auto;
-        padding: 8px 16px !important;
-        background-color: transparent !important;
-        border-radius: 8px !important;
-        border: 1px solid transparent !important;
-        color: #B0B0C4 !important;
-        font-weight: 700 !important;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    .stTabs [data-baseweb="tab"]:hover {
-        color: #ffb7c5 !important;
-        border-color: rgba(255, 117, 151, 0.2) !important;
-        background-color: rgba(255, 117, 151, 0.04) !important;
-    }
-    
-    .stTabs [aria-selected="true"] {
-        background-color: rgba(255, 117, 151, 0.1) !important;
-        color: #ffffff !important;
-        border-color: rgba(255, 117, 151, 0.4) !important;
-        box-shadow: 0 4px 12px rgba(255, 117, 151, 0.15);
-    }
-    
-    .stTabs [data-baseweb="tab-highlight-container"] {
+    /* Hide the Streamlit Deploy button specifically */
+    .stAppDeployButton,
+    [data-testid="stAppDeployButton"],
+    .stDeployButton,
+    [data-testid="stHeaderDeployButton"],
+    header button[class*="deploy"],
+    header a[href*="share.streamlit.io"],
+    header [class*="AppDeployButton"] {
         display: none !important;
     }
+
+    /* Make the header bar background transparent with default height and prevent cropping */
+    header[data-testid="stHeader"],
+    header[data-testid="stHeader"] > div,
+    header[data-testid="stHeader"] [class*="st-emotion-cache"] {
+        background-color: transparent !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Style the header toggle and settings menu icons to fit the Candy Theme */
+    header[data-testid="stHeader"] button,
+    header[data-testid="stHeader"] button svg,
+    header[data-testid="stHeader"] button svg * {
+        color: #ff7597 !important;
+        fill: #ff7597 !important;
+    }
+
+    /* Maintain comfortable top padding for content */
+    .block-container {
+        padding-top: 3.5rem !important;
+    }
     
-    div[data-testid="stForm"] {
-        background-color: rgba(38, 32, 69, 0.5) !important;
+    /* Section Headers */
+    .section-header {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #ff7597; /* Cotton candy pink */
+        margin-top: 0.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px dashed rgba(255, 117, 151, 0.25);
+        padding-bottom: 8px;
+        display: inline-block;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        font-family: 'Fredoka', sans-serif !important;
+    }
+
+    /* Rounded Bouncy Containers */
+    div[data-testid="stVerticalBlockBorder"] {
+        background: rgba(38, 32, 69, 0.6) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
         border: 1px solid rgba(255, 117, 151, 0.15) !important;
         border-radius: 16px !important;
         padding: 24px !important;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+        margin-bottom: 24px !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25) !important;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
     }
-    
-    .section-header {
-        color: #ffffff;
-        font-size: 1.4rem;
-        font-weight: 700;
-        margin-top: 8px;
-        margin-bottom: 20px;
-        padding-bottom: 8px;
-        border-bottom: 1.5px solid rgba(255, 117, 151, 0.2);
-        display: flex;
-        align-items: center;
-        gap: 10px;
+    div[data-testid="stVerticalBlockBorder"]:hover {
+        border-color: rgba(255, 117, 151, 0.35) !important;
+        box-shadow: 0 8px 32px 0 rgba(255, 117, 151, 0.12) !important;
+        transform: translateY(-2px) scale(1.005) !important;
     }
-    
-    .stButton>button {
-        background-color: rgba(255, 117, 151, 0.1) !important;
+
+    /* Sweet Expanders */
+    details[data-testid="stExpander"] {
+        background: rgba(38, 32, 69, 0.4) !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+        border: 1px solid rgba(255, 117, 151, 0.12) !important;
+        border-radius: 12px !important;
+        margin-bottom: 12px !important;
+        box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.15) !important;
+        transition: all 0.25s ease !important;
+    }
+    details[data-testid="stExpander"]:hover {
+        border-color: rgba(255, 117, 151, 0.25) !important;
+        background: rgba(38, 32, 69, 0.6) !important;
+    }
+    summary[data-testid="stExpanderSummary"] {
+        font-weight: 700 !important;
         color: #ffffff !important;
-        border: 1px solid rgba(255, 117, 151, 0.35) !important;
-        border-radius: 8px !important;
-        padding: 8px 20px !important;
+        font-family: 'Fredoka', sans-serif !important;
+    }
+
+    /* Glossy Bouncy buttons */
+    button[data-testid="baseButton-primary"] {
+        background: linear-gradient(135deg, #ff7597 0%, #dcb5ff 100%) !important; /* Sweet bubblegum gradient */
+        color: #100a21 !important;
         font-weight: 700 !important;
         font-family: 'Fredoka', sans-serif !important;
         text-transform: uppercase !important;
         letter-spacing: 0.5px !important;
-        transition: all 0.2s ease !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border: none !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 15px 0 rgba(255, 117, 151, 0.3) !important;
+        transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+        padding: 0.5rem 1.5rem !important;
     }
-    
-    .stButton>button:hover {
-        background-color: rgba(255, 117, 151, 0.2) !important;
-        border-color: #ffb7c5 !important;
-        box-shadow: 0 4px 16px rgba(255, 117, 151, 0.25) !important;
-        transform: translateY(-1px);
+    button[data-testid="baseButton-primary"]:hover {
+        transform: translateY(-2px) scale(1.03) !important;
+        box-shadow: 0 6px 20px 0 rgba(255, 117, 151, 0.45) !important;
     }
-    
-    .stButton>button:active {
-        transform: translateY(1px);
-    }
-    
-    .stTextInput>div>div>input, .stTextArea>div>div>textarea, .stSelectbox>div>div {
-        background-color: rgba(26, 22, 43, 0.6) !important;
-        color: #ffffff !important;
-        border: 1px solid rgba(255, 117, 151, 0.15) !important;
-        border-radius: 8px !important;
-        padding: 8px 12px !important;
-        transition: all 0.2s ease !important;
-    }
-    
-    .stTextInput>div>div>input:focus, .stTextArea>div>div>textarea:focus {
-        border-color: rgba(255, 117, 151, 0.5) !important;
-        box-shadow: 0 0 0 3px rgba(255, 117, 151, 0.15) !important;
+    button[data-testid="baseButton-primary"]:active {
+        transform: translateY(1px) scale(0.98) !important;
     }
 
-    div[data-testid="stExpander"] {
-        background-color: rgba(38, 32, 69, 0.4) !important;
-        border: 1px solid rgba(255, 117, 151, 0.15) !important;
+    button[data-testid="baseButton-secondary"] {
+        background: rgba(255, 255, 255, 0.04) !important;
+        color: #e2dff0 !important;
+        font-weight: 600 !important;
+        font-family: 'Quicksand', sans-serif !important;
+        border: 1px solid rgba(255, 117, 151, 0.2) !important;
         border-radius: 12px !important;
-        margin-bottom: 12px !important;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.08) !important;
+        box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.1) !important;
+        transition: all 0.2s ease !important;
+    }
+    button[data-testid="baseButton-secondary"]:hover {
+        background: rgba(255, 117, 151, 0.08) !important;
+        border-color: rgba(255, 117, 151, 0.4) !important;
+        color: #ffffff !important;
+        transform: translateY(-1px) !important;
+    }
+
+    /* Danger delete buttons */
+    button[id^="del_exp_"]:hover, button[id^="del_edu_"]:hover, button[id^="rem_bul_"]:hover, button[id^="delete_"]:hover {
+        border-color: rgba(255, 90, 95, 0.6) !important;
+        color: #ff5a5f !important;
+        background-color: rgba(255, 90, 95, 0.08) !important;
+    }
+
+    /* Glassmorphic inputs */
+    .stTextInput>div>div>input, .stTextArea>div>div>textarea, .stSelectbox>div>div>div {
+        background-color: rgba(28, 22, 52, 0.8) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 117, 151, 0.15) !important;
+        border-radius: 10px !important;
+        transition: all 0.25s !important;
+        font-family: 'Quicksand', sans-serif !important;
+        font-weight: 500 !important;
+    }
+    .stTextInput>div>div>input:focus, .stTextArea>div>div>textarea:focus {
+        border-color: #5ad6ff !important;
+        box-shadow: 0 0 10px 0 rgba(90, 214, 255, 0.3) !important;
+        background-color: rgba(34, 26, 62, 0.8) !important;
     }
     
+    /* Labels */
+    label[data-testid="stWidgetLabel"] p {
+        color: #ffb7c5 !important;
+        font-weight: 600 !important;
+        font-family: 'Fredoka', sans-serif !important;
+    }
+
+    /* Sidebar Glassmorphic Candy Styling */
+    section[data-testid="stSidebar"] {
+        background-color: #120e20 !important;
+        border-right: 1px solid rgba(255, 117, 151, 0.1) !important;
+    }
+    section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] li, section[data-testid="stSidebar"] span {
+        color: #e2dff0 !important;
+    }
+    section[data-testid="stSidebar"] h1, section[data-testid="stSidebar"] h2, section[data-testid="stSidebar"] h3 {
+        color: #ffffff !important;
+        font-family: 'Fredoka', sans-serif !important;
+        font-weight: 700 !important;
+    }
+    section[data-testid="stSidebar"] .stButton>button {
+        background: rgba(255, 117, 151, 0.05) !important;
+        color: #ffb7c5 !important;
+        border: 1px solid rgba(255, 117, 151, 0.2) !important;
+    }
+    section[data-testid="stSidebar"] .stButton>button:hover {
+        background: rgba(255, 117, 151, 0.12) !important;
+        border-color: rgba(255, 117, 151, 0.4) !important;
+    }
+
+    /* Floating Candy Tabs list */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 12px !important;
+        background: rgba(38, 32, 69, 0.8) !important;
+        padding: 8px !important;
+        border-radius: 16px !important;
+        border: 1px solid rgba(255, 117, 151, 0.15) !important;
+        margin-bottom: 24px !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2) !important;
+    }
+    .stTabs [data-baseweb="tab"] {
+        height: 40px !important;
+        border-radius: 12px !important;
+        background-color: transparent !important;
+        color: #ffb7c5 !important;
+        font-family: 'Fredoka', sans-serif !important;
+        font-weight: 600 !important;
+        padding: 0px 18px !important;
+        transition: all 0.25s !important;
+    }
+    .stTabs [data-baseweb="tab"]:hover {
+        color: #ffffff !important;
+        background-color: rgba(255, 117, 151, 0.08) !important;
+    }
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(135deg, #ff7597 0%, #dcb5ff 100%) !important;
+        color: #100a21 !important;
+        box-shadow: 0 4px 12px 0 rgba(255, 117, 151, 0.3) !important;
+    }
+
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #1a162b;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: rgba(255, 117, 151, 0.25);
+        border-radius: 10px;
+        border: 3px solid #1a162b;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 117, 151, 0.45);
+    }
+
+    /* Telemetry cards */
     .telemetry-card {
-        background: rgba(38, 32, 69, 0.6);
         border: 1px solid rgba(255, 117, 151, 0.15);
-        border-radius: 12px;
-        padding: 16px 20px;
+        box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.25);
+        background: rgba(38, 32, 69, 0.6);
+        border-radius: 16px;
+        padding: 18px;
+        margin-bottom: 16px;
         text-align: center;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
     }
     .telemetry-card:hover {
         border-color: rgba(255, 117, 151, 0.35);
+        background: rgba(38, 32, 69, 0.8);
         transform: translateY(-2px);
+        box-shadow: 0 12px 28px 0 rgba(255, 117, 151, 0.15);
     }
     .telemetry-card-val {
-        font-family: 'Fredoka', sans-serif;
-        font-size: 2.2rem;
+        font-size: 2.4rem;
         font-weight: 700;
-        color: #ffffff;
-        line-height: 1.1;
+        color: #5ad6ff;
+        font-family: 'Fredoka', sans-serif !important;
+        margin-bottom: 4px;
+        letter-spacing: -0.5px;
     }
     .telemetry-card-lbl {
-        font-family: 'Quicksand', sans-serif;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         font-weight: 700;
         color: #ffb7c5;
         text-transform: uppercase;
-        margin-top: 6px;
         letter-spacing: 0.5px;
+        font-family: 'Quicksand', sans-serif !important;
     }
-    
+
+    /* Custom progress bar graphs */
     .bar-container {
-        margin-bottom: 12px;
+        margin-bottom: 14px;
     }
     .bar-label-row {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 4px;
+        margin-bottom: 6px;
         font-size: 0.85rem;
+        font-family: 'Quicksand', sans-serif !important;
+        font-weight: 700;
     }
     .bar-label {
-        font-family: 'JetBrains Mono', monospace;
-        font-weight: 500;
-        color: #e0e0e3;
+        color: #e2dff0;
     }
     .bar-count {
-        font-family: 'Fredoka', sans-serif;
-        font-weight: 700;
-        color: #ffffff;
+        color: #ffb7c5;
     }
     .bar-track {
-        height: 8px;
-        background-color: rgba(255, 255, 255, 0.05);
-        border-radius: 4px;
+        background-color: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 117, 151, 0.12);
+        height: 12px;
+        border-radius: 6px;
         overflow: hidden;
     }
     .bar-fill {
         height: 100%;
-        border-radius: 4px;
-        transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 6px;
     }
 
+    /* Skill capsules visual preview styling */
     .skill-capsule-preview {
         display: inline-flex;
         align-items: center;
@@ -1202,6 +1331,7 @@ def inject_global_styles():
         border: 1px solid rgba(255, 255, 255, 0.15);
     }
 
+    /* Status badge */
     .status-badge {
         display: inline-block;
         padding: 3px 8px;
