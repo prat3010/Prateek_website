@@ -172,12 +172,12 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
 - **Unit & Integration Tests:** Run `npm test` (Vitest) to execute all 121 tests across 15 test files. Uses `pool: 'forks'` for proper `process.env` isolation between test files.
 - **Watch Mode:** Run `npm run test:watch` during development for instant feedback.
 - **Coverage:** Run `npm run test:coverage` to generate a V8 coverage report.
-- **Workspace Verification:** Run `./scripts/verify.sh` to execute full workspace validation (cleaning caches, checking types, running lints, unit tests, and test builds).
-- **Database Verification:** Run `./scripts/audit_db.py` to compare your live database tables against the local `supabase_schema.sql` file and identify any missing schemas.
-- **Database Backup:** Run `./scripts/backup_db.py` to pull down live database records and update your local fallback JSON files in `src/data/`.
+- **Workspace Verification:** Run `npm run verify` (or `./scripts/verify.sh`) to execute full workspace validation (cleaning caches, checking types, running lints, unit tests, and test builds).
+- **Database Verification:** Run `npm run db:audit` (wrapper for `scripts/audit_db.py`) to compare your live database tables against the local `supabase_schema.sql` file and identify any missing schemas.
+- **Database Backup:** Run `npm run db:backup` (wrapper for `scripts/backup_db.py`) to pull down live database records and update your local fallback JSON files in `src/data/`.
 - Run `npx tsc --noEmit` after TypeScript changes.
 - **Troubleshooting stale TypeScript types:** If type checking (`tsc`) fails with stale cache references to deleted or renamed routes (e.g., in `.next/types/...`), clear the cache directory first: `rm -rf .next && npx tsc --noEmit`.
-- **Lint Verification:** Ensure the linter (`./scripts/verify.sh` or `npm run lint`) passes cleanly (0 errors and warnings). All lint errors must be resolved before committing code.
+- **Lint Verification:** Ensure the linter (`npm run verify` or `npm run lint`) passes cleanly (0 errors and warnings). All lint errors must be resolved before committing code.
 - Be cautious with `npm run build`: it runs `scripts/generate-git-log.js`, which writes generated data under `src/data/`.
 - For visual or interactive changes, run the dev server and inspect desktop and mobile behavior when feasible.
 

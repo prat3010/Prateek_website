@@ -11,7 +11,12 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "analyze": "ANALYZE=true next build"
+    "analyze": "ANALYZE=true next build",
+    "db:seed": "python3 scripts/seed_supabase.py",
+    "db:backup": "python3 scripts/backup_db.py",
+    "db:audit": "python3 scripts/audit_db.py",
+    "cms": "streamlit run scripts/synchronizer.py",
+    "verify": "./scripts/verify.sh"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.106.2",
