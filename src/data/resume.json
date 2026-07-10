@@ -137,7 +137,7 @@
   "quotation": {
     "hourlyRate": "$40",
     "dayRate": "$300",
-    "paymentTerms": "50% upfront, 30% after design/milestone 1, 20% on final delivery.",
+    "paymentTerms": "50% upfront deposit to initiate development, 50% upon final project delivery.",
     "deliverables": [
       "Custom UI Design & Prototype",
       "Production-ready Next.js / React application",
@@ -275,7 +275,7 @@
   "quotation_india": {
     "hourlyRate": "\u20b93,000",
     "dayRate": "\u20b920,000",
-    "paymentTerms": "50% upfront, 30% after design/milestone 1, 20% on final delivery.",
+    "paymentTerms": "50% upfront deposit to initiate development, 50% upon final project delivery.",
     "deliverables": [
       "Custom UI Design & Prototype",
       "Production-ready Next.js / React application",
