@@ -175,7 +175,7 @@ function Pricing({ resumeData }: PricingProps) {
                       onClick={() => handleSelectPackage(plan.cta)}
                       className={styles.actionBtn}
                     >
-                      <span>{isNoir ? 'SELECT_PLAN' : 'Choose Package'}</span>
+                      <span>{isNoir ? (activeAudience === 'business' ? 'SELECT PACKAGE' : 'SELECT_PLAN') : 'Choose Package'}</span>
                     </button>
                   </div>
                 </ComicPanel>

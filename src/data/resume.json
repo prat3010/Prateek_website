@@ -1,15 +1,15 @@
 {
-  "name": "Prateek Sharma",
+  "name": "Prateeq Sharma",
   "about": {
     "business": {
-      "noir": "I'm Prateek Sharma, a freelance developer who builds websites, custom tools, and admin flows for businesses that want something practical and maintainable.",
+      "noir": "I'm Prateeq Sharma, a freelance developer who builds websites, custom tools, and admin flows for businesses that want something practical and maintainable.",
       "facts": [
         "SERVICE // Direct freelance partnership",
         "SPEED // Clear delivery and iteration",
         "VALUE // Practical, maintainable builds",
         "LOCATION // Based in India, working remotely"
       ],
-      "light": "I'm Prateek Sharma, a freelance developer who builds websites, custom tools, and simple admin flows for businesses that want something practical and maintainable.",
+      "light": "I'm Prateeq Sharma, a freelance developer who builds websites, custom tools, and simple admin flows for businesses that want something practical and maintainable.",
       "factsNoir": [
         "Custom websites with a low-friction handoff.",
         "Delivering working products directly to clients.",
@@ -18,14 +18,14 @@
       ]
     },
     "developer": {
-      "noir": "I'm Prateek Sharma, a developer focused on web applications, interface quality, and practical AI-assisted workflows. I prefer clear structure, dependable delivery, and systems that are easy to maintain.",
+      "noir": "I'm Prateeq Sharma, a developer focused on web applications, interface quality, and practical AI-assisted workflows. I prefer clear structure, dependable delivery, and systems that are easy to maintain.",
       "facts": [
         "SYSTEM // Web apps built with clear structure",
         "VELOCITY // Fast prototypes and dependable delivery",
         "ENGINE // AI-assisted workflows and tooling",
         "LOCATION // Based in India, working remotely"
       ],
-      "light": "I'm Prateek Sharma, a developer focused on web applications, interface quality, and practical AI-assisted workflows. I like solving real problems with simple structure and dependable delivery.",
+      "light": "I'm Prateeq Sharma, a developer focused on web applications, interface quality, and practical AI-assisted workflows. I like solving real problems with simple structure and dependable delivery.",
       "factsNoir": [
         "Working with clear structure and a small technical footprint.",
         "Turning rough ideas into working interfaces.",
@@ -265,12 +265,12 @@
         {
           "ai": "Used AI-assisted tools to prototype features quickly and keep repetitive work low.",
           "general": "Improved website performance and navigation with Lenis scrolling and viewport-linked motion.",
-          "creative": "Translated visual layouts into responsive interfaces with motion and custom CSS.",
+          "creative": "Designed custom interactive layouts and responsive visual frameworks with precise control.",
           "fullstack": "Programmed offline-capable data layers with Drift and SQLite for mobile apps that keep working without network coverage."
         },
         {
           "ai": "Built a Gemini-assisted tool for OCR, draft generation, and repo analysis.",
-          "general": "Built PrateekSync AI, a local content manager for portfolio updates, credential review, and generated drafts.",
+          "general": "Built PrateeqSync AI, a local content manager for portfolio updates, credential review, and generated drafts.",
           "creative": "Built an interactive Streamlit dashboard for managing skills, certificates, and media assets.",
           "fullstack": "Built a Python-based content manager with Streamlit, GitHub API integration, and TypeScript file sync."
         }

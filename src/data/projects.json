@@ -42,7 +42,7 @@
     "isLive": false,
     "status": "soon",
     "description_business": "A real-time tracking application for showing the ISS position with location context.",
-    "longDescription_business": "The ISS Live Location Tracker polls a public API for the station position and resolves location details when the ISS is over land. It uses geopy for reverse geocoding and an offline KD-tree lookup for broader location context when needed. NASA imagery is cached for the daily background so the page stays responsive."
+    "longDescription_business": "The ISS Live Location Tracker polls a public API for the station position and resolves location details when the ISS is over land. It uses geopy for reverse geocoding and an offline fallback database for broader location context when needed. NASA imagery is cached for the daily background so the page stays responsive."
   },
   {
     "id": "metawipe",
@@ -90,9 +90,9 @@
   },
   {
     "id": "prateeksync-ai--intelligent-portfolio---resume-automation-engine",
-    "title": "PrateekSync AI: Intelligent Portfolio & Resume Automation Engine",
+    "title": "PrateeqSync AI: Intelligent Portfolio & Resume Automation Engine",
     "description": "A local content manager for portfolio metadata, credential review, and generated resume copy.",
-    "longDescription": "PrateekSync AI is a Streamlit-based content manager for portfolio data, certificates, and blog posts. It syncs to Supabase, keeps local JSON fallbacks in step, and uses Gemini for OCR and content assistance where needed. The workflow is built for local editing, review, and controlled publishing.",
+    "longDescription": "PrateeqSync AI is a Streamlit-based content manager for portfolio data, certificates, and blog posts. It syncs to Supabase, keeps local JSON fallbacks in step, and uses Gemini for OCR and content assistance where needed. The workflow is built for local editing, review, and controlled publishing.",
     "image": "/images/project-prateeksync-ai--intelligent-portfolio---resume-automation-engine.webp",
     "tags": [
       "Python",
@@ -108,6 +108,6 @@
     "isLive": false,
     "status": "personal",
     "description_business": "A local content manager for updating portfolio data, certificates, and blog posts.",
-    "longDescription_business": "PrateekSync AI is a Streamlit-based content manager for portfolio data, certificates, and blog posts. It syncs to Supabase, keeps local JSON fallbacks in step, and uses Gemini for OCR and content assistance where needed. The workflow is built for local editing, review, and controlled publishing."
+    "longDescription_business": "PrateeqSync AI is a Streamlit-based content manager for portfolio data, certificates, and blog posts. It syncs to Supabase, keeps local JSON fallbacks in step, and uses Gemini for OCR and content assistance where needed. The workflow is built for local editing, review, and controlled publishing."
   }
 ]

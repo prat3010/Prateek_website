@@ -119,10 +119,10 @@ export default async function RootLayout({
   const dynamicJsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
-    "name": profile?.name || "Prateek Sharma",
+    "name": profile?.name || "Prateeq Sharma",
     "jobTitle": profile?.title || "Full Stack Developer & Designer",
     "url": "https://prateeq.in",
-    "description": profile?.summary?.general || "Portfolio of Prateek Sharma focused on web applications, interface quality, and practical AI-assisted workflows.",
+    "description": profile?.summary?.general || "Portfolio of Prateeq Sharma focused on web applications, interface quality, and practical AI-assisted workflows.",
     "sameAs": sameAs,
     "knowsAbout": knowsAbout
   };

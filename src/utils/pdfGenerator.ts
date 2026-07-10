@@ -57,7 +57,9 @@ export function generateResumePDF(activePersona: Persona, resumeData: ResumeData
   doc.setFont('Helvetica', 'Bold');
   doc.setFontSize(22);
   doc.setTextColor(0, 0, 0);
-  doc.text(resumeData.name, leftMargin, y);
+  // Use a hybrid legal/stage name for job applications to prevent background-check confusion
+  const displayNameForResume = resumeData.name === "Prateeq Sharma" ? "Prateek 'Prateeq' Sharma" : resumeData.name;
+  doc.text(displayNameForResume, leftMargin, y);
   y += 7;
 
   // Title
