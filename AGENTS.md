@@ -78,7 +78,7 @@ The project uses the following environment variables (stored in `.env.local` loc
   - `/blog` and `/blog/[slug]` — blog listing and individual post pages.
 - `src/app/api/` contains REST API routes for reading/writing portfolio data to Supabase: `skills`, `projects`, `certificates`, `profile`, `git-log`, `analytics-summary`, `contact`, and `revalidate`.
 - `src/proxy.ts` is the Next.js 16 proxy (formerly middleware) file that intercepts requests for telemetry logging.
-- `src/components/` contains portfolio sections, shared UI (like the interactive diagnostics terminal console at `/terminal` which supports commands such as `git-info` and `qrcode`), visual effects, and the playground. Components follow the pattern `src/components/{ComponentName}/{ComponentName}.tsx` with co-located CSS modules.
+- `src/components/` contains portfolio sections, shared UI (like the interactive diagnostics terminal console at `/terminal` which supports commands such as `git-info` and `qrcode`, and the `GestureScroll` floating gesture scroll controller), visual effects, and the playground. Components follow the pattern `src/components/{ComponentName}/{ComponentName}.tsx` with co-located CSS modules.
 - `src/components/effects/wobblyPaths.generated.ts` contains generated skyline path data for prebaked hand-drawn SVG wobble. Do not edit it by hand; regenerate it with `npm run generate:wobbly-paths` after changing skyline `Wobbly*` elements.
 - `src/data/` contains type definitions, Supabase client setup, taglines, and JSON fallback files (data values live in Supabase).
 - `src/lib/data.ts` is the server-side data layer that fetches projects, skills, resume, and certificates from Supabase.

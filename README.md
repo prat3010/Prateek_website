@@ -1,6 +1,6 @@
 # Prateek Sharma's Portfolio
 
-A highly interactive, storyteller-driven personal portfolio website designed with a custom **premium card / cyber-noir visual aesthetic**. Features include responsive layouts, dynamic paper texture overlays, smooth scrolling, custom cursor trails, and a live 3D skyline theme transition.
+A highly interactive, storyteller-driven personal portfolio website designed with a custom **premium card / cyber-noir visual aesthetic**. Features include responsive layouts, dynamic paper texture overlays, smooth scrolling, custom cursor trails, a live 3D skyline theme transition, and hands-free hand gesture scrolling.
 
 ## 🚀 Tech Stack
 
@@ -9,7 +9,7 @@ A highly interactive, storyteller-driven personal portfolio website designed wit
 - **Styling:** CSS Modules & global unified card theme system (with fallback variables)
 - **Database / Analytics:** Supabase (portfolio content storage + custom telemetry logging via Next.js Proxy) & Vercel Web Analytics / Speed Insights
 - **Contact Service:** Resend Email API
-- **Animations & Scrolling:** Framer Motion & Lenis smooth scroll
+- **Animations & Scrolling:** Framer Motion, Lenis smooth scroll, and MediaPipe Hands API (loaded dynamically)
 - **3D & Visual Effects:** Three.js (Pizza Rat) and SVG filter distortions
 
 ---

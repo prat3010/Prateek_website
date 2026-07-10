@@ -14,13 +14,14 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: [
           {
-            key: "Content-Security-Policy",
+                        key: "Content-Security-Policy",
             value:
               "default-src 'self'; " +
-              `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://va.vercel-scripts.com; ` +
+              `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://va.vercel-scripts.com https://cdn.jsdelivr.net; ` +
               "style-src 'self' 'unsafe-inline'; " +
               "img-src 'self' data: blob:; " +
-              `connect-src 'self'${isDev ? " ws: wss:" : ""} https://va.vercel-scripts.com; ` +
+              `connect-src 'self'${isDev ? " ws: wss:" : ""} https://va.vercel-scripts.com https://cdn.jsdelivr.net; ` +
+              "worker-src 'self' blob:; " +
               "font-src 'self'; " +
               "object-src 'none'; " +
               "base-uri 'self'; " +
@@ -41,7 +42,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=()",
+            value: "camera=(self), microphone=(), geolocation=()",
           },
           {
             key: "Strict-Transport-Security",

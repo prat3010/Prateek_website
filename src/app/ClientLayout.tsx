@@ -18,6 +18,7 @@ const NoirSkyline = dynamic(() => import('@/components/effects/NoirSkyline'), { 
 const CursorTrail = dynamic(() => import('@/components/effects/CursorTrail'), { ssr: false });
 const ZenToggle = dynamic(() => import('@/components/ui/ZenToggle'), { ssr: false });
 const TerminalButton = dynamic(() => import('@/components/ui/TerminalButton'), { ssr: false });
+const GestureScroll = dynamic(() => import('@/components/ui/GestureScroll/GestureScroll'), { ssr: false });
 const ThreePizzaRat = dynamic(() => import('@/components/effects/ThreePizzaRat'), { ssr: false });
 
 interface ClientLayoutProps {
@@ -57,6 +58,7 @@ function ClientLayoutContent({
         {!isAdminRoute && <Footer profile={profile} />}
         {!isAdminRoute && <ZenToggle />}
         {!isAdminRoute && <TerminalButton />}
+        {!isAdminRoute && <GestureScroll />}
         {!isAdminRoute && isKonamiActive && <ThreePizzaRat />}
       </LenisProvider>
     </PerformanceGovernorProvider>
