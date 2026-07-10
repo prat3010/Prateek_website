@@ -9,6 +9,7 @@ import type { ScramblerProps } from '@/components/ui/Scrambler';
 import styles from './Footer.module.css';
 
 import type { ResumeData } from '@/data/resume';
+import resumeFallback from '@/data/resume.json';
 
 const NAV_LABEL_TEXTS: ScramblerProps['texts'] = {
   developer: { light: 'Resume',    noir: 'Resume' },
@@ -69,12 +70,12 @@ const PhoneIcon = () => (
 );
 
 const defaultSocials: SocialLink[] = [
-  { label: 'GitHub', href: 'https://github.com/prat3010', icon: <GitHubIcon /> },
-  { label: 'LinkedIn', href: 'https://linkedin.com/in/freshlimevodka', icon: <LinkedInIcon /> },
-  { label: 'Twitter', href: 'https://x.com/3010prateek', icon: <TwitterIcon /> },
-  { label: 'Instagram', href: 'https://instagram.com/freshlimevodka', icon: <InstagramIcon /> },
-  { label: 'Email', href: 'mailto:3010prateeksharma@gmail.com', icon: <EmailIcon /> },
-  { label: 'Phone', href: 'tel:+919050433260', icon: <PhoneIcon /> },
+  { label: 'GitHub', href: resumeFallback.github, icon: <GitHubIcon /> },
+  { label: 'LinkedIn', href: resumeFallback.linkedin, icon: <LinkedInIcon /> },
+  { label: 'Twitter', href: resumeFallback.twitter, icon: <TwitterIcon /> },
+  { label: 'Instagram', href: resumeFallback.instagram, icon: <InstagramIcon /> },
+  { label: 'Email', href: `mailto:${resumeFallback.email}`, icon: <EmailIcon /> },
+  { label: 'Phone', href: `tel:${resumeFallback.phone}`, icon: <PhoneIcon /> },
 ];
 
 export default function Footer({ socials, profile, className }: FooterProps) {
