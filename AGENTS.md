@@ -10,7 +10,7 @@ This is Prateek Sharma's personal portfolio, built with Next.js 16 App Router, R
 - Do not make broad refactors unless the task explicitly asks for them.
 
 ### ScrollSection Containing Block
-`ScrollSection` wraps every page section in an `m.div` with `will-change: transform` and a Framer Motion `translateY`. Both properties create a CSS containing block that traps `position: fixed` descendants. Any modal, overlay, or fullscreen element rendered inside a `ScrollSection` **must** use `createPortal(element, document.body)` to escape this containing block. See `docs/99_DECISIONS.md` ADR 05.
+`ScrollSection` wraps every page section in an `m.div` with `will-change: transform` and a Framer Motion `translateY`. Both properties create a CSS containing block that traps `position: fixed` descendants. Any modal, overlay, or fullscreen element rendered inside a `ScrollSection` **must** use the `<Portal>` component (`src/components/ui/Portal.tsx`) to escape this containing block. See `docs/99_DECISIONS.md` ADR 05.
 
 ### Identity State Propagation
 The selected audience profile and visual theme are propagated through server-side cookie checks and React context:

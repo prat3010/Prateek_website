@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
-import { createPortal } from 'react-dom';
+import Portal from '@/components/ui/Portal';
 import { useLenis } from 'lenis/react';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -250,131 +250,132 @@ function Projects({ projects }: ProjectsProps) {
       </div>
 
       {/* Project Detail Modal */}
-      {selected && createPortal(
-        <div
-          className={styles.modal}
-          onClick={() => setSelectedProject(null)}
-          role="dialog"
-          aria-modal="true"
-          aria-label={`${selected.title} details`}
-          data-lenis-prevent
-        >
+      {selected && (
+        <Portal>
           <div
-            ref={modalRef}
-            className={styles.modalContent}
-            onClick={(e) => e.stopPropagation()}
-            style={{ '--panel-color': selected.color } as React.CSSProperties}
+            className={styles.modal}
+            onClick={() => setSelectedProject(null)}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${selected.title} details`}
+            data-lenis-prevent
           >
-            <button
-              className={styles.modalClose}
-              onClick={() => setSelectedProject(null)}
-              aria-label="Close project details"
+            <div
+              ref={modalRef}
+              className={styles.modalContent}
+              onClick={(e) => e.stopPropagation()}
+              style={{ '--panel-color': selected.color } as React.CSSProperties}
             >
-              ✕
-            </button>
+              <button
+                className={styles.modalClose}
+                onClick={() => setSelectedProject(null)}
+                aria-label="Close project details"
+              >
+                ✕
+              </button>
 
-            <div className={styles.modalHeader}>
-              <h3 className={styles.modalTitle}>{selected.title}</h3>
-            </div>
+              <div className={styles.modalHeader}>
+                <h3 className={styles.modalTitle}>{selected.title}</h3>
+              </div>
 
-            <div className={styles.modalImageWrapper}>
-              <ProjectImage
-                src={isNoir ? selected.image.replace(/\.webp$/, '-noir.webp') : selected.image}
-                alt={selected.title}
-                width={600}
-                height={400}
-                className={styles.modalImage}
-              />
-            </div>
+              <div className={styles.modalImageWrapper}>
+                <ProjectImage
+                  src={isNoir ? selected.image.replace(/\.webp$/, '-noir.webp') : selected.image}
+                  alt={selected.title}
+                  width={600}
+                  height={400}
+                  className={styles.modalImage}
+                />
+              </div>
 
-            <p className={styles.modalDescription}>
-              {activeAudience === 'business' && selected.longDescription_business
-                ? selected.longDescription_business
-                : selected.longDescription}
-            </p>
+              <p className={styles.modalDescription}>
+                {activeAudience === 'business' && selected.longDescription_business
+                  ? selected.longDescription_business
+                  : selected.longDescription}
+              </p>
 
-            <div className={styles.modalTags}>
-              {selected.tags.map((tag) => (
-                <span key={tag} className={styles.tag}>
-                  {tag}
-                </span>
-              ))}
-            </div>
+              <div className={styles.modalTags}>
+                {selected.tags.map((tag) => (
+                  <span key={tag} className={styles.tag}>
+                    {tag}
+                  </span>
+                ))}
+              </div>
 
-            <div className={styles.modalActions}>
-              {getProjectStatus(selected) === 'live' ? (
-                <>
-                  {selected.liveUrl && (
-                    <a
-                      href={selected.liveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="comic-btn comic-btn-blue"
+              <div className={styles.modalActions}>
+                {getProjectStatus(selected) === 'live' ? (
+                  <>
+                    {selected.liveUrl && (
+                      <a
+                        href={selected.liveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="comic-btn comic-btn-blue"
+                        style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
+                      >
+                        PLAY GAME <ExternalLink size={16} />
+                      </a>
+                    )}
+                    {selected.githubUrl && (
+                      <a
+                        href={selected.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="comic-btn comic-btn-outline"
+                        style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
+                      >
+                        GITHUB <Code2 size={16} />
+                      </a>
+                    )}
+                  </>
+                ) : getProjectStatus(selected) === 'personal' ? (
+                  <>
+                    {selected.liveUrl && (
+                      <a
+                        href={selected.liveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="comic-btn comic-btn-blue"
+                        style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
+                      >
+                        LIVE DEMO <ExternalLink size={16} />
+                      </a>
+                    )}
+                    {selected.githubUrl && (
+                      <a
+                        href={selected.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="comic-btn comic-btn-outline"
+                        style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
+                      >
+                        GITHUB <Code2 size={16} />
+                      </a>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <button
+                      disabled
+                      className={`${styles.disabledBtn} comic-btn`}
                       style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
                     >
-                      PLAY GAME <ExternalLink size={16} />
-                    </a>
-                  )}
-                  {selected.githubUrl && (
-                    <a
-                      href={selected.githubUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="comic-btn comic-btn-outline"
+                      COMING SOON <ExternalLink size={16} />
+                    </button>
+                    <button
+                      disabled
+                      className={`${styles.disabledBtn} comic-btn comic-btn-outline`}
                       style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
                     >
-                      GITHUB <Code2 size={16} />
-                    </a>
-                  )}
-                </>
-              ) : getProjectStatus(selected) === 'personal' ? (
-                <>
-                  {selected.liveUrl && (
-                    <a
-                      href={selected.liveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="comic-btn comic-btn-blue"
-                      style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
-                    >
-                      LIVE DEMO <ExternalLink size={16} />
-                    </a>
-                  )}
-                  {selected.githubUrl && (
-                    <a
-                      href={selected.githubUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="comic-btn comic-btn-outline"
-                      style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
-                    >
-                      GITHUB <Code2 size={16} />
-                    </a>
-                  )}
-                </>
-              ) : (
-                <>
-                  <button
-                    disabled
-                    className={`${styles.disabledBtn} comic-btn`}
-                    style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
-                  >
-                    COMING SOON <ExternalLink size={16} />
-                  </button>
-                  <button
-                    disabled
-                    className={`${styles.disabledBtn} comic-btn comic-btn-outline`}
-                    style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
-                  >
-                    CODE UNDER DEV <Code2 size={16} />
-                  </button>
-                </>
-              )}
-            </div>
+                      CODE UNDER DEV <Code2 size={16} />
+                    </button>
+                  </>
+                )}
+              </div>
 
+            </div>
           </div>
-        </div>,
-        document.body
+        </Portal>
       )}
     </section>
   );
