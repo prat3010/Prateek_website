@@ -150,7 +150,7 @@ const SKILL_FORGED_LABEL_TEXTS: ScramblerProps['texts'] = {
 
 function Skills({ skills }: SkillsProps) {
   const { isNoir, audience } = useTheme();
-  const [activeTab, setActiveTab] = React.useState<'orchestration' | 'logic' | 'product' | 'dynamic'>('logic');
+  const [activeTab, setActiveTab] = React.useState<'orchestration' | 'logic' | 'product' | 'dynamic' | null>(null);
 
   const activeAudience = audience || 'developer';
   const activeTheme = isNoir ? 'noir' : 'light';
@@ -299,7 +299,7 @@ function Skills({ skills }: SkillsProps) {
               aria-controls={`panel-${tab.id}`}
               id={`tab-${tab.id}`}
               className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => setActiveTab(prev => prev === tab.id ? null : tab.id)}
               style={{
                 '--tab-color': tab.color,
                 '--tab-neon': tab.neon,
@@ -316,26 +316,34 @@ function Skills({ skills }: SkillsProps) {
           ))}
         </div>
 
-        <AnimatePresence mode="wait">
-          <m.div
-            key={activeTab}
-            id={`panel-${activeTab}`}
-            role="tabpanel"
-            aria-labelledby={`tab-${activeTab}`}
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -15 }}
-            transition={{ duration: 0.25, ease: 'easeInOut' }}
-            className={styles.panel}
-          >
-            <div className={styles.cardsGrid}>
-              {activeTab === 'orchestration' && orchestrationSkills.map(renderSkillCard)}
-              {activeTab === 'logic' && logicSkills.map(renderSkillCard)}
-              {activeTab === 'product' && productSkills.map(renderSkillCard)}
-              {activeTab === 'dynamic' && dynamicSkills.map(renderSkillCard)}
-            </div>
-          </m.div>
-        </AnimatePresence>
+        <m.div
+          animate={{ height: activeTab ? 'auto' : 0 }}
+          transition={{ duration: 0.25, ease: 'easeInOut' }}
+          style={{ overflow: 'hidden' }}
+        >
+          <AnimatePresence mode="wait">
+            {activeTab && (
+              <m.div
+                key={activeTab}
+                id={`panel-${activeTab}`}
+                role="tabpanel"
+                aria-labelledby={`tab-${activeTab}`}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.25, ease: 'easeInOut' }}
+                className={styles.panel}
+              >
+                <div className={styles.cardsGrid}>
+                  {activeTab === 'orchestration' && orchestrationSkills.map(renderSkillCard)}
+                  {activeTab === 'logic' && logicSkills.map(renderSkillCard)}
+                  {activeTab === 'product' && productSkills.map(renderSkillCard)}
+                  {activeTab === 'dynamic' && dynamicSkills.map(renderSkillCard)}
+                </div>
+              </m.div>
+            )}
+          </AnimatePresence>
+        </m.div>
       </div>
     </section>
   );

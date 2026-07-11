@@ -34,7 +34,7 @@ function Contact() {
   // Inject reCAPTCHA v3 script once on mount
   useEffect(() => {
     if (!SITE_KEY || document.getElementById('recaptcha-script')) {
-      setRecaptchaReady(true);
+      setTimeout(() => setRecaptchaReady(true), 0);
       return;
     }
     const script = document.createElement('script');
