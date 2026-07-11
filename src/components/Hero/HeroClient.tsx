@@ -30,8 +30,8 @@ interface HeroCopy {
 }
 
 const HEADLINE_TEXTS: ScramblerProps['texts'] = {
-  developer: { light: 'CRAFTING DIGITAL WORLDS.', noir: 'SHADOWS & SYNTAX.' },
-  business:  { light: 'BUILDING DIGITAL PRODUCTS.', noir: 'LOGIC & OUTCOMES.' },
+  developer: { light: 'CRAFT & CLARITY.',          noir: 'SHADOWS & SYNTAX.' },
+  business:  { light: 'BUILDING DIGITAL PRODUCTS.', noir: 'THE BRIEF. THE BUILD.' },
 };
 
 const BADGE_TEXTS: ScramblerProps['texts'][] = [
@@ -44,19 +44,24 @@ const BADGE_TEXTS: ScramblerProps['texts'][] = [
     business:  { light: 'Product Builder', noir: 'Product Builder' },
   },
   {
-    developer: { light: 'Storyteller', noir: 'Storyteller' },
-    business:  { light: 'Consultant',      noir: 'Consultant' },
+    developer: { light: 'Engineer',   noir: 'Engineer' },
+    business:  { light: 'Consultant', noir: 'Consultant' },
   },
 ];
 
 const VIBE_TEXTS: ScramblerProps['texts'] = {
-  developer: { light: 'NARRATOR:',    noir: 'CONFESSIONAL:' },
-  business:  { light: 'SUMMARY:',     noir: 'OBJECTIVE:' },
+  developer: { light: 'METHOD:',    noir: 'CONFESSIONAL:' },
+  business:  { light: 'APPROACH:',  noir: 'OBJECTIVE:' },
 };
 
 const CTA_TEXTS: ScramblerProps['texts'] = {
-  developer: { light: 'View My Work →',    noir: 'View My Work →' },
-  business:  { light: 'View Services →',   noir: 'View Services →' },
+  developer: { light: 'View My Work →',  noir: 'View My Work →' },
+  business:  { light: 'View Services →', noir: 'View Services →' },
+};
+
+const TELEMETRY_TEXTS: ScramblerProps['texts'] = {
+  developer: { light: 'Live Telemetry', noir: 'Live Telemetry' },
+  business:  { light: 'View Analytics', noir: 'View Analytics' },
 };
 
 const HERO_COPY: Record<'developer' | 'business', Record<'light' | 'noir', HeroCopy>> = {
@@ -64,14 +69,14 @@ const HERO_COPY: Record<'developer' | 'business', Record<'light' | 'noir', HeroC
     light: {
       headline: (
         <>
-          CRAFTING DIGITAL<br />
-          <span className={styles.highlightText}>WORLDS.</span>
+          CRAFT &<br />
+          <span className={styles.highlightText}>CLARITY.</span>
         </>
       ),
-      taglineBadges: ["Developer", "Designer", "Storyteller"],
+      taglineBadges: ["Developer", "Designer", "Engineer"],
       ctaText: "View My Work →",
       ctaLink: "#projects",
-      vibeLabel: "NARRATOR:"
+      vibeLabel: "METHOD:"
     },
     noir: {
       headline: (
@@ -80,7 +85,7 @@ const HERO_COPY: Record<'developer' | 'business', Record<'light' | 'noir', HeroC
           <span className={styles.highlightText}>SYNTAX.</span>
         </>
       ),
-      taglineBadges: ["Developer", "Designer", "Storyteller"],
+      taglineBadges: ["Developer", "Designer", "Engineer"],
       ctaText: "View My Work →",
       ctaLink: "#projects",
       vibeLabel: "CONFESSIONAL:"
@@ -102,8 +107,8 @@ const HERO_COPY: Record<'developer' | 'business', Record<'light' | 'noir', HeroC
     noir: {
       headline: (
         <>
-          LOGIC &<br />
-          <span className={styles.highlightText}>OUTCOMES.</span>
+          THE BRIEF.<br />
+          <span className={styles.highlightText}>THE BUILD.</span>
         </>
       ),
       taglineBadges: ["Tech Partner", "Product Builder", "Consultant"],
@@ -233,10 +238,17 @@ function HeroClientContent({ taglines }: HeroClientProps) {
           <Link
             href="/admin/analytics"
             className={styles.telemetryBadge}
-            aria-label="Live Telemetry - View live edge analytics"
+            aria-label="Live analytics dashboard"
           >
             <span className={styles.pulseDot} />
-            <span className={styles.ctaText}>Live Telemetry</span>
+            <Scrambler
+              texts={TELEMETRY_TEXTS}
+              variant="nav-label"
+              as="span"
+              className={styles.ctaText}
+            >
+              {audience === 'business' ? 'View Analytics' : 'Live Telemetry'}
+            </Scrambler>
           </Link>
         </div>
       </div>
