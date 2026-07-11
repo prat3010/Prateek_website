@@ -24,9 +24,7 @@ interface HeroClientProps {
 interface HeroCopy {
   headline: React.ReactNode;
   taglineBadges: string[];
-  ctaText: string;
   ctaLink: string;
-  vibeLabel: string;
 }
 
 const HEADLINE_TEXTS: ScramblerProps['texts'] = {
@@ -74,9 +72,7 @@ const HERO_COPY: Record<'developer' | 'business', Record<'light' | 'noir', HeroC
         </>
       ),
       taglineBadges: ["Developer", "Designer", "Engineer"],
-      ctaText: "View My Work →",
       ctaLink: "#projects",
-      vibeLabel: "METHOD:"
     },
     noir: {
       headline: (
@@ -86,9 +82,7 @@ const HERO_COPY: Record<'developer' | 'business', Record<'light' | 'noir', HeroC
         </>
       ),
       taglineBadges: ["Developer", "Designer", "Engineer"],
-      ctaText: "View My Work →",
       ctaLink: "#projects",
-      vibeLabel: "CONFESSIONAL:"
     }
   },
   business: {
@@ -100,9 +94,7 @@ const HERO_COPY: Record<'developer' | 'business', Record<'light' | 'noir', HeroC
         </>
       ),
       taglineBadges: ["Tech Partner", "Product Builder", "Consultant"],
-      ctaText: "View Services →",
       ctaLink: "#capabilities",
-      vibeLabel: "SUMMARY:"
     },
     noir: {
       headline: (
@@ -112,9 +104,7 @@ const HERO_COPY: Record<'developer' | 'business', Record<'light' | 'noir', HeroC
         </>
       ),
       taglineBadges: ["Tech Partner", "Product Builder", "Consultant"],
-      ctaText: "View Services →",
       ctaLink: "#capabilities",
-      vibeLabel: "OBJECTIVE:"
     }
   }
 };
@@ -228,9 +218,7 @@ function HeroClientContent({ taglines }: HeroClientProps) {
               variant="nav-label"
               as="span"
               className={styles.ctaText}
-            >
-              {copy.ctaText}
-            </Scrambler>
+            />
           </a>
 
           <Link
@@ -244,9 +232,7 @@ function HeroClientContent({ taglines }: HeroClientProps) {
               variant="nav-label"
               as="span"
               className={styles.ctaText}
-            >
-              {audience === 'business' ? 'View Analytics' : 'Live Telemetry'}
-            </Scrambler>
+            />
           </Link>
         </div>
       </div>
