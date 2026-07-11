@@ -56,6 +56,8 @@ The project uses the following environment variables (stored in `.env.local` loc
 - `SUPABASE_SERVICE_ROLE_KEY`: Secret service-role key for Supabase. **WARNING:** Never expose this key in client-side code; it bypasses Row-Level Security (RLS) to allow proxy telemetry writes and synchronization scripts.
 - `RESEND_API_KEY`: API key for Resend email service, used to send emails from the contact form.
 - `CONTACT_EMAIL_TO`: The email address that receives notifications from the contact form (default is `3010prateeksharma@gmail.com`).
+- `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`: Google reCAPTCHA v3 site key (public). Loaded client-side by the contact form to obtain an invisible score-based challenge token.
+- `RECAPTCHA_SECRET_KEY`: Google reCAPTCHA v3 secret key (server-only). Used by `/api/contact` to verify tokens via Google's `siteverify` endpoint. If absent, verification is skipped with a warning (dev/CI mode).
 - `GEMINI_API_KEY`: Google AI Gemini API key (version `gemini-2.5-flash`), used by the local Synchronizer dashboard for certificate analysis and skill scanning.
 - `SYNC_API_KEY`: Shared secret key used to authenticate requests to the Next.js API revalidation endpoint (`/api/revalidate`) and ensure secure cache purging.
 - `GITHUB_TOKEN` (or `GITHUB_PAT` / `GH_TOKEN`): Optional GitHub personal access token, used by the local Synchronizer dashboard to raise the rate limit on deployment status checks.

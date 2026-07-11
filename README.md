@@ -57,6 +57,10 @@ SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 RESEND_API_KEY=your_resend_api_key
 CONTACT_EMAIL_TO=your_recipient_email
 
+# Google reCAPTCHA v3 (spam protection on contact form)
+NEXT_PUBLIC_RECAPTCHA_SITE_KEY=your_recaptcha_site_key
+RECAPTCHA_SECRET_KEY=your_recaptcha_secret_key
+
 # Gemini AI (for local Synchronizer engine)
 GEMINI_API_KEY=your_gemini_api_key
 

@@ -26,7 +26,30 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name, email, message } = body;
+    const { name, email, message, recaptchaToken } = body;
+
+    // Verify reCAPTCHA v3 token if secret key is configured
+    if (process.env.RECAPTCHA_SECRET_KEY) {
+      if (!recaptchaToken || typeof recaptchaToken !== 'string') {
+        return NextResponse.json({ error: 'reCAPTCHA verification required.' }, { status: 400 });
+      }
+      const verifyRes = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          secret: process.env.RECAPTCHA_SECRET_KEY,
+          response: recaptchaToken,
+          remoteip: ip,
+        }),
+      });
+      const verifyData = await verifyRes.json() as { success: boolean; score: number; 'error-codes'?: string[] };
+      if (!verifyData.success || verifyData.score < 0.5) {
+        console.warn('reCAPTCHA failed:', verifyData['error-codes'], 'score:', verifyData.score);
+        return NextResponse.json({ error: 'Automated submission detected. Please try again.' }, { status: 400 });
+      }
+    } else {
+      console.warn('RECAPTCHA_SECRET_KEY not set — skipping verification (dev mode).');
+    }
 
     // Validate existence
     if (!name || !email || !message) {

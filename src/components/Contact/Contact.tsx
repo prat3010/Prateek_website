@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, useEffect, type FormEvent } from 'react';
+import React, { useRef, useState, useEffect, useCallback, type FormEvent } from 'react';
 import { useLenis } from 'lenis/react';
 import { useTheme } from '@/context/ThemeContext';
 import { NAVBAR_SCROLL_OFFSET } from '@/lib/constants';
@@ -8,15 +8,42 @@ import SpeechBubble from '@/components/ui/SpeechBubble';
 import ConfettiBurst, { type ConfettiBurstHandle } from '@/components/effects/ConfettiBurst';
 import styles from './Contact.module.css';
 
+const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+
+// Extend window to include grecaptcha
+declare global {
+  interface Window {
+    grecaptcha?: {
+      ready: (cb: () => void) => void;
+      execute: (siteKey: string, options: { action: string }) => Promise<string>;
+    };
+  }
+}
+
 function Contact() {
   const confettiRef = useRef<ConfettiBurstHandle>(null);
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [recaptchaReady, setRecaptchaReady] = useState(!SITE_KEY); // skip gate if no key
   const { isNoir, audience } = useTheme();
   const lenis = useLenis();
 
   const activeAudience = audience || 'developer';
   const [selectedIntent, setSelectedIntent] = useState('general');
+
+  // Inject reCAPTCHA v3 script once on mount
+  useEffect(() => {
+    if (!SITE_KEY || document.getElementById('recaptcha-script')) {
+      setRecaptchaReady(true);
+      return;
+    }
+    const script = document.createElement('script');
+    script.id = 'recaptcha-script';
+    script.src = `https://www.google.com/recaptcha/api.js?render=${SITE_KEY}`;
+    script.async = true;
+    script.onload = () => window.grecaptcha?.ready(() => setRecaptchaReady(true));
+    document.head.appendChild(script);
+  }, []);
 
   // Pre-populate intent when chosen from pricing table
   useEffect(() => {
@@ -30,7 +57,7 @@ function Contact() {
     return () => window.removeEventListener('select-package', handleSelectPackage);
   }, []);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = useCallback(async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus('loading');
     setErrorMessage('');
@@ -62,13 +89,25 @@ function Contact() {
 
     const fullMessage = `[Intent: ${intentLabel}]\n\n${message}`;
 
+    // Obtain reCAPTCHA v3 token (invisible, score-based)
+    let recaptchaToken: string | undefined;
+    if (SITE_KEY && window.grecaptcha) {
+      try {
+        recaptchaToken = await window.grecaptcha.execute(SITE_KEY, { action: 'contact_submit' });
+      } catch {
+        setStatus('error');
+        setErrorMessage('reCAPTCHA check failed. Please refresh and try again.');
+        return;
+      }
+    }
+
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, email, message: fullMessage }),
+        body: JSON.stringify({ name, email, message: fullMessage, recaptchaToken }),
       });
 
       const data = await response.json();
@@ -88,7 +127,7 @@ function Contact() {
       setStatus('error');
       setErrorMessage('Network error. Please check your connection and try again.');
     }
-  };
+  }, [activeAudience, lenis]);
 
   return (
     <section id="contact" className={styles.contact} aria-label="Contact">
@@ -183,7 +222,7 @@ function Contact() {
             <button 
               type="submit" 
               className={styles.submitBtn}
-              disabled={status === 'loading'}
+              disabled={status === 'loading' || !recaptchaReady}
             >
               {status === 'loading' ? 'TRANSMITTING...' : 'SEND IT!'}
             </button>
