@@ -205,9 +205,7 @@ function HeroClientContent({ taglines }: HeroClientProps) {
             variant="badge"
             as="span"
             className={styles.vibeLabel}
-          >
-            {copy.vibeLabel}
-          </Scrambler>{' '}
+          />{' '}
           <span className={styles.typedText}>
             <span className="sr-only">{tagline}</span>
             <span aria-hidden="true">
