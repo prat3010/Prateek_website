@@ -21,30 +21,26 @@ interface HeroClientProps {
   };
 }
 
-interface HeroCopy {
-  headline: React.ReactNode;
-  taglineBadges: string[];
-  ctaLink: string;
-}
+/** Shorthand for Scrambler texts where light and noir are identical */
+const bothThemes = (s: string) => ({ light: s, noir: s });
 
 const HEADLINE_TEXTS: ScramblerProps['texts'] = {
   developer: { light: 'CRAFT & CLARITY.',          noir: 'SHADOWS & SYNTAX.' },
   business:  { light: 'BUILDING DIGITAL PRODUCTS.', noir: 'THE BRIEF. THE BUILD.' },
 };
 
+/** [top line, highlighted bottom line] per audience/theme — drives the styled headline render */
+const HEADLINE_PARTS = {
+  developer: { light: ['CRAFT &', 'CLARITY.'], noir: ['SHADOWS &', 'SYNTAX.'] },
+  business:  { light: ['BUILDING DIGITAL', 'PRODUCTS.'], noir: ['THE BRIEF.', 'THE BUILD.'] },
+} as const;
+
+const CTA_LINKS = { developer: '#projects', business: '#capabilities' } as const;
+
 const BADGE_TEXTS: ScramblerProps['texts'][] = [
-  {
-    developer: { light: 'Developer', noir: 'Developer' },
-    business:  { light: 'Tech Partner',   noir: 'Tech Partner' },
-  },
-  {
-    developer: { light: 'Designer', noir: 'Designer' },
-    business:  { light: 'Product Builder', noir: 'Product Builder' },
-  },
-  {
-    developer: { light: 'Engineer',   noir: 'Engineer' },
-    business:  { light: 'Consultant', noir: 'Consultant' },
-  },
+  { developer: bothThemes('Developer'),      business: bothThemes('Tech Partner') },
+  { developer: bothThemes('Designer'),       business: bothThemes('Product Builder') },
+  { developer: bothThemes('Engineer'),       business: bothThemes('Consultant') },
 ];
 
 const VIBE_TEXTS: ScramblerProps['texts'] = {
@@ -53,86 +49,36 @@ const VIBE_TEXTS: ScramblerProps['texts'] = {
 };
 
 const CTA_TEXTS: ScramblerProps['texts'] = {
-  developer: { light: 'View My Work →',  noir: 'View My Work →' },
-  business:  { light: 'View Services →', noir: 'View Services →' },
+  developer: bothThemes('View My Work →'),
+  business:  bothThemes('View Services →'),
 };
 
 const TELEMETRY_TEXTS: ScramblerProps['texts'] = {
-  developer: { light: 'Live Telemetry', noir: 'Live Telemetry' },
-  business:  { light: 'View Analytics', noir: 'View Analytics' },
+  developer: bothThemes('Live Telemetry'),
+  business:  bothThemes('View Analytics'),
 };
 
-const HERO_COPY: Record<'developer' | 'business', Record<'light' | 'noir', HeroCopy>> = {
-  developer: {
-    light: {
-      headline: (
-        <>
-          CRAFT &<br />
-          <span className={styles.highlightText}>CLARITY.</span>
-        </>
-      ),
-      taglineBadges: ["Developer", "Designer", "Engineer"],
-      ctaLink: "#projects",
-    },
-    noir: {
-      headline: (
-        <>
-          SHADOWS &<br />
-          <span className={styles.highlightText}>SYNTAX.</span>
-        </>
-      ),
-      taglineBadges: ["Developer", "Designer", "Engineer"],
-      ctaLink: "#projects",
-    }
-  },
-  business: {
-    light: {
-      headline: (
-        <>
-          BUILDING DIGITAL<br />
-          <span className={styles.highlightText}>PRODUCTS.</span>
-        </>
-      ),
-      taglineBadges: ["Tech Partner", "Product Builder", "Consultant"],
-      ctaLink: "#capabilities",
-    },
-    noir: {
-      headline: (
-        <>
-          THE BRIEF.<br />
-          <span className={styles.highlightText}>THE BUILD.</span>
-        </>
-      ),
-      taglineBadges: ["Tech Partner", "Product Builder", "Consultant"],
-      ctaLink: "#capabilities",
-    }
-  }
-};
-
-function HeroClientContent({ taglines }: HeroClientProps) {
+export default function HeroClient({ taglines }: HeroClientProps) {
   const { isNoir, audience } = useTheme();
   const lenis = useLenis();
   const prefersReducedMotion = useReducedMotion();
 
-  // Resolve dynamic tags list based on active audience and theme
+  const activeAudience = audience || 'developer';
+  const activeTheme = isNoir ? 'noir' : 'light';
+  const [headlineTop, headlineBottom] = HEADLINE_PARTS[activeAudience][activeTheme];
+  const ctaLink = CTA_LINKS[activeAudience];
+
+  // Resolve dynamic tagline list based on active audience and theme
   const list = useMemo(() => {
-    const activeAudience = audience || 'developer';
     if (activeAudience === 'business') {
       return isNoir ? businessNoirTaglines : businessStandardTaglines;
     }
     return isNoir ? taglines.noir : taglines.standard;
-  }, [audience, isNoir, taglines]);
-
-  // Resolve structural UI copy mapping
-  const copy = useMemo(() => {
-    const activeAudience = audience || 'developer';
-    const activeTheme = isNoir ? 'noir' : 'light';
-    return HERO_COPY[activeAudience][activeTheme];
-  }, [audience, isNoir]);
+  }, [activeAudience, isNoir, taglines]);
 
   // Generate a stable default tagline for SSR / initial hydration
   const defaultTagline = useMemo(() => {
-    const hash = list.reduce((acc, t) => acc * 31 + t.length, 0);
+    const hash = list.reduce((acc, s) => acc * 31 + s.length, 0);
     return list[Math.abs(hash) % list.length];
   }, [list]);
 
@@ -156,7 +102,7 @@ function HeroClientContent({ taglines }: HeroClientProps) {
   const handleScrollToCTA = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     if (lenis) {
-      lenis.scrollTo(copy.ctaLink, { duration: prefersReducedMotion ? 0 : 1.5, offset: NAVBAR_SCROLL_OFFSET });
+      lenis.scrollTo(ctaLink, { duration: prefersReducedMotion ? 0 : 1.5, offset: NAVBAR_SCROLL_OFFSET });
     }
   };
 
@@ -169,22 +115,21 @@ function HeroClientContent({ taglines }: HeroClientProps) {
           as="h1"
           className={styles.headline}
         >
-          {copy.headline}
+          {headlineTop}<br />
+          <span className={styles.highlightText}>{headlineBottom}</span>
         </Scrambler>
 
         <div className={styles.subtitleContainer}>
           <span className={styles.brandingName}>PRATEEQ</span>
           <div className={styles.taglineBadges}>
-            {copy.taglineBadges.map((badge, i) => (
+            {BADGE_TEXTS.map((texts, i) => (
               <Scrambler
-                key={badge}
-                texts={BADGE_TEXTS[i]}
+                key={i}
+                texts={texts}
                 variant="badge"
                 as="span"
                 className={styles.tagBadge}
-              >
-                {badge}
-              </Scrambler>
+              />
             ))}
           </div>
         </div>
@@ -209,7 +154,7 @@ function HeroClientContent({ taglines }: HeroClientProps) {
 
         <div className={styles.ctaContainer}>
           <a
-            href={copy.ctaLink}
+            href={ctaLink}
             className={styles.ctaButton}
             onClick={handleScrollToCTA}
           >
@@ -248,7 +193,6 @@ function HeroClientContent({ taglines }: HeroClientProps) {
                 priority
                 fetchPriority="high"
                 sizes="(max-width: 768px) 280px, 420px"
-                className={styles.heroImage}
                 style={{ objectFit: 'cover', objectPosition: 'center' }}
               />
             ) : (
@@ -259,7 +203,6 @@ function HeroClientContent({ taglines }: HeroClientProps) {
                 priority
                 fetchPriority="high"
                 sizes="(max-width: 768px) 280px, 420px"
-                className={styles.heroImage}
                 style={{ objectFit: 'cover', objectPosition: 'center' }}
               />
             )}
@@ -268,8 +211,4 @@ function HeroClientContent({ taglines }: HeroClientProps) {
       </div>
     </div>
   );
-}
-
-export default function HeroClient({ taglines }: HeroClientProps) {
-  return <HeroClientContent taglines={taglines} />;
 }

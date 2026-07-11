@@ -309,19 +309,7 @@
   border-radius: 12px;
 }
 
-.heroImage {
-  display: block;
-  /* sizing and objectFit handled by next/image */
-}
 
-/* Theme-specific visibility overrides */
-:global(html[data-theme="light"]) .darkOnly {
-  display: none !important;
-}
-
-:global(html[data-theme="noir"]) .lightOnly {
-  display: none !important;
-}
 
 .imageWrapper {
   position: relative;
@@ -456,11 +444,6 @@
     justify-content: center;
   }
 
-  .ctaButton::after,
-  .ctaButton::before {
-    left: 50%;
-    transform: translateX(-50%);
-  }
 
 }
 
