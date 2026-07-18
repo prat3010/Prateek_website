@@ -89,6 +89,30 @@
     "longDescription_business": "PaintMix AI uses the device camera to sample a target color and estimate paint proportions from inventory. It converts RGB inputs to XYZ and CIELAB spaces and uses Delta E distance checks to compare possible mixes. Inventory data is stored locally with SQLite so the workflow stays fast and offline-friendly."
   },
   {
+    "id": "rag-lab",
+    "title": "RAG Lab",
+    "description": "Interactive document search and chat powered by a custom RAG engine. Upload PDFs, search semantically, and get grounded answers with citations.",
+    "longDescription": "RAG Lab is a full-stack Retrieval-Augmented Generation platform built from scratch. Documents are uploaded, parsed, and chunked, then indexed via pgvector for hybrid search (semantic + keyword). A self-hosted Ollama instance generates embeddings locally, and the platform supports pluggable LLM providers (OpenAI, Gemini, Anthropic) for grounded chat responses. Built with FastAPI, Next.js, Supabase, and PostgreSQL RLS for multi-tenant isolation.",
+    "image": "/images/project-rag-lab.webp",
+    "tags": [
+      "Next.js",
+      "FastAPI",
+      "Python",
+      "Supabase",
+      "pgvector",
+      "Ollama",
+      "RAG",
+      "AI"
+    ],
+    "liveUrl": "/rag",
+    "githubUrl": "https://github.com/prat3010/retriever",
+    "color": "#5A8EB6",
+    "isLive": true,
+    "status": "live",
+    "description_business": "A production-ready RAG engine that lets teams upload documents and ask natural-language questions with citation-grounded answers.",
+    "longDescription_business": "RAG Lab is a Retrieval-Augmented Generation platform. It ingests documents (PDF, Markdown, text), chunks them intelligently, and indexes them with both semantic vectors and keyword search. Users can search across their indexed documents or chat with them via streaming LLM responses. The platform supports multi-tenant isolation, custom prompt templates, per-tenant LLM key management, and encrypted credential storage."
+  },
+  {
     "id": "prateeksync-ai--intelligent-portfolio---resume-automation-engine",
     "title": "PrateeqSync AI: Intelligent Portfolio & Resume Automation Engine",
     "description": "A local content manager for portfolio metadata, credential review, and generated resume copy.",

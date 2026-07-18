@@ -6,6 +6,7 @@ import { useLenis } from 'lenis/react';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ExternalLink, Code2 } from 'lucide-react';
+import Link from 'next/link';
 import { type Project } from '@/data/projects';
 import { useTheme } from '@/context/ThemeContext';
 import Scrambler from '@/components/ui/Scrambler';
@@ -305,7 +306,15 @@ function Projects({ projects }: ProjectsProps) {
               <div className={styles.modalActions}>
                 {getProjectStatus(selected) === 'live' ? (
                   <>
-                    {selected.liveUrl && (
+                    {selected.liveUrl && selected.liveUrl.startsWith('/') ? (
+                      <Link
+                        href={selected.liveUrl}
+                        className="comic-btn comic-btn-blue"
+                        style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
+                      >
+                        PLAY GAME <ExternalLink size={16} />
+                      </Link>
+                    ) : selected.liveUrl ? (
                       <a
                         href={selected.liveUrl}
                         target="_blank"
@@ -315,7 +324,7 @@ function Projects({ projects }: ProjectsProps) {
                       >
                         PLAY GAME <ExternalLink size={16} />
                       </a>
-                    )}
+                    ) : null}
                     {selected.githubUrl && (
                       <a
                         href={selected.githubUrl}
@@ -330,7 +339,15 @@ function Projects({ projects }: ProjectsProps) {
                   </>
                 ) : getProjectStatus(selected) === 'personal' ? (
                   <>
-                    {selected.liveUrl && (
+                    {selected.liveUrl && selected.liveUrl.startsWith('/') ? (
+                      <Link
+                        href={selected.liveUrl}
+                        className="comic-btn comic-btn-blue"
+                        style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
+                      >
+                        LIVE DEMO <ExternalLink size={16} />
+                      </Link>
+                    ) : selected.liveUrl ? (
                       <a
                         href={selected.liveUrl}
                         target="_blank"
@@ -340,7 +357,7 @@ function Projects({ projects }: ProjectsProps) {
                       >
                         LIVE DEMO <ExternalLink size={16} />
                       </a>
-                    )}
+                    ) : null}
                     {selected.githubUrl && (
                       <a
                         href={selected.githubUrl}
