@@ -12,6 +12,17 @@ export const metadata: Metadata = {
 export default function RagPage() {
   return (
     <section style={{ padding: '2rem 0' }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+        <a
+          href="https://admin.rag.prateeq.in"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="comic-btn comic-btn-outline"
+          style={{ fontSize: '0.8125rem', padding: '0.375rem 0.75rem', textDecoration: 'none' }}
+        >
+          Admin
+        </a>
+      </div>
       <RagInterface />
     </section>
   );
