@@ -145,7 +145,7 @@ The first tab displayed on load. Lets the user enter connection details for the 
 | User ID | `text` | `a8b819bb-61bb-450b-9662-62bd06b188d3` | UUID passed as `X-User-ID` header |
 | API Key | `password` | — | Bearer token sent as `Authorization: Bearer sk_...` |
 | LLM Key | `password` | — | Optional — per-request LLM API key override (sent as `X-LLM-Key`) |
-| LLM Provider | `dropdown` | `Tenant default` | Override: Tenant default / OpenAI / Gemini / Anthropic |
+| LLM Provider | `dropdown` | `Tenant default` | Override: Tenant default / OpenAI / Gemini / OpenRouter / Anthropic / DeepSeek / Groq / Mistral / xAI / Together / Fireworks / Perplexity |
 
 **Flow:**
 1. User fills in fields and clicks **Save & Connect**
@@ -261,7 +261,7 @@ All endpoints the frontend interacts with. The backend exposes a much larger sur
 ]
 ```
 
-**Upload Document:** Multipart form with field name `file`. Returns `202 Accepted` with document metadata. Processing happens asynchronously via Celery (or inline if no broker is configured).
+**Upload Document:** Multipart form with field name `file`. Returns document metadata with status `PENDING`. Uploads are save-only — processing is triggered on-demand via the admin dashboard Embed button (`POST /v1/admin/tenants/{tenantId}/documents/{documentId}/process`).
 
 **Chat Session Creation:**
 ```json
@@ -287,14 +287,14 @@ Response is an SSE stream (see [Chat Tab](#chat-tab) for format).
 ### Write Path (Ingestion)
 
 ```
-Upload → SHA-256 dedup → Save to /data/ (local FS or S3)
+Upload → SHA-256 dedup → Save to /data/ (local FS)
   → DB record (status=PENDING)
-  → Async worker (Celery or inline):
+  → On-demand via admin Embed button:
       ├── 1. Parse binary → extracted text
       │     (PDF · DOCX · HTML · Markdown · plaintext · Images via vision LLM)
       ├── 2. Chunk text
       │     (strategy per tenant config: semantic / recursive / sliding window)
-      ├── 3. Generate embeddings via Ollama (nomic-embed-text)
+      ├── 3. Generate embeddings in batches of 20 via Ollama (nomic-embed-text)
       ├── 4. Upsert vectors to pgvector
       └── 5. Update document status=INDEXED
 ```
@@ -478,10 +478,13 @@ The RAG Lab UI is served by Next.js dev server. Point it at the production backe
 ### Backend
 
 ```bash
-# From retriever root
+# From retriever root — uses dev-local.sh for Ollama + API + dashboard
+scripts/dev-local.sh
+
+# Or manually:
 cd apps/api
 python -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
+uv sync
 
 # .env setup (see .env.example)
 echo "
@@ -489,6 +492,8 @@ DATABASE_URL=postgresql+asyncpg://...
 OLLAMA_BASE_URL=http://localhost:11434
 ENCRYPTION_KEY=dev-mode-insecure-key-change-in-prod
 ADMIN_MASTER_KEY=dev-master-key-change-in-prod
+REMOTE_STORAGE_FALLBACK_URL=https://rag.prateeq.in
+INTERNAL_API_KEY=dev-internal-key
 "> .env
 
 uvicorn main:app --reload --port 8000
@@ -532,6 +537,8 @@ Key: `rag_config`
 | `OLLAMA_BASE_URL` | Yes | `http://localhost:11434` |
 | `ENCRYPTION_KEY` | Yes | 32-byte key for AES-256-GCM |
 | `ADMIN_MASTER_KEY` | Yes | Secret admin API key |
+| `INTERNAL_API_KEY` | No | Shared secret for remote storage fallback |
+| `REMOTE_STORAGE_FALLBACK_URL` | No | Remote API URL to fetch files from when missing locally |
 | `OPENAI_API_KEY` | No | Fallback LLM provider |
 | `ANTHROPIC_API_KEY` | No | Fallback LLM provider |
 | `GOOGLE_API_KEY` | No | Gemini provider |
@@ -550,8 +557,9 @@ Stored in the `configurations` table per tenant. Key fields editable via `PUT /v
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `llm_provider` | string | `openai`, `anthropic`, `gemini` |
+| `llm_provider` | string | `openai`, `anthropic`, `gemini`, `openrouter`, `deepseek`, `groq`, `mistral`, `xai`, `together`, `fireworks`, `perplexity` |
 | `llm_api_key` | string | Encrypted at rest (AES-256-GCM) |
+| `base_url` | string | Optional — overrides the default API base URL for the selected provider |
 | `chunk_strategy` | string | `semantic`, `recursive`, `sliding_window` |
 | `chunk_size` | integer | Target chunk size in tokens |
 | `chunk_overlap` | integer | Overlap between chunks |
