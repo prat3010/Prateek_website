@@ -12,5 +12,6 @@ export interface Project {
   color: string;
   isLive: boolean;
   status: 'live' | 'soon' | 'personal';
+  ctaLabel?: string;
 }
 

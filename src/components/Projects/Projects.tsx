@@ -79,6 +79,8 @@ function ProjectImage({ src, alt, fill, width, height, sizes, className, style }
   );
 }
 
+const CTA_LABELS: Record<string, string> = { 'rag-lab': 'OPEN APP' };
+
 function Projects({ projects }: ProjectsProps) {
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const selected = projects.find((p) => p.id === selectedProject);
@@ -304,7 +306,7 @@ function Projects({ projects }: ProjectsProps) {
               </div>
 
               <div className={styles.modalActions}>
-                {getProjectStatus(selected) === 'live' ? (
+                 {getProjectStatus(selected) === 'live' ? (
                   <>
                     {selected.liveUrl && selected.liveUrl.startsWith('/') ? (
                       <Link
@@ -312,7 +314,7 @@ function Projects({ projects }: ProjectsProps) {
                         className="comic-btn comic-btn-blue"
                         style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
                       >
-                        PLAY GAME <ExternalLink size={16} />
+                        {CTA_LABELS[selected.id] || selected.ctaLabel || 'PLAY GAME'} <ExternalLink size={16} />
                       </Link>
                     ) : selected.liveUrl ? (
                       <a
@@ -322,7 +324,7 @@ function Projects({ projects }: ProjectsProps) {
                         className="comic-btn comic-btn-blue"
                         style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
                       >
-                        PLAY GAME <ExternalLink size={16} />
+                        {CTA_LABELS[selected.id] || selected.ctaLabel || 'PLAY GAME'} <ExternalLink size={16} />
                       </a>
                     ) : null}
                     {selected.githubUrl && (
@@ -345,7 +347,7 @@ function Projects({ projects }: ProjectsProps) {
                         className="comic-btn comic-btn-blue"
                         style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
                       >
-                        LIVE DEMO <ExternalLink size={16} />
+                        {CTA_LABELS[selected.id] || selected.ctaLabel || 'LIVE DEMO'} <ExternalLink size={16} />
                       </Link>
                     ) : selected.liveUrl ? (
                       <a
@@ -355,7 +357,7 @@ function Projects({ projects }: ProjectsProps) {
                         className="comic-btn comic-btn-blue"
                         style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
                       >
-                        LIVE DEMO <ExternalLink size={16} />
+                        {CTA_LABELS[selected.id] || selected.ctaLabel || 'LIVE DEMO'} <ExternalLink size={16} />
                       </a>
                     ) : null}
                     {selected.githubUrl && (
@@ -377,7 +379,7 @@ function Projects({ projects }: ProjectsProps) {
                       className={`${styles.disabledBtn} comic-btn`}
                       style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
                     >
-                      COMING SOON <ExternalLink size={16} />
+                      {CTA_LABELS[selected.id] || selected.ctaLabel || 'COMING SOON'} <ExternalLink size={16} />
                     </button>
                     <button
                       disabled

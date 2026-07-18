@@ -109,6 +109,7 @@
     "color": "#5A8EB6",
     "isLive": true,
     "status": "live",
+    "ctaLabel": "OPEN APP",
     "description_business": "A production-ready RAG engine that lets teams upload documents and ask natural-language questions with citation-grounded answers.",
     "longDescription_business": "RAG Lab is a Retrieval-Augmented Generation platform. It ingests documents (PDF, Markdown, text), chunks them intelligently, and indexes them with both semantic vectors and keyword search. Users can search across their indexed documents or chat with them via streaming LLM responses. The platform supports multi-tenant isolation, custom prompt templates, per-tenant LLM key management, and encrypted credential storage."
   },

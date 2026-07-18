@@ -92,6 +92,7 @@ for p in projects_raw:
     p.setdefault('longDescription', p.get('longDescription', ''))
     p.setdefault('description_business', '')
     p.setdefault('longDescription_business', '')
+    p.pop('ctaLabel', None)
 if projects_raw:
     upsert('projects', projects_raw, 'slug')
 print(f'  {len(projects_raw)} projects synced')
