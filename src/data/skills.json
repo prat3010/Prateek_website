@@ -17,6 +17,10 @@
       {
         "id": "earth-evolution-simulator",
         "title": "Earth Evolution Simulator"
+      },
+      {
+        "id": "rag-lab",
+        "title": "RAG Lab"
       }
     ],
     "created_at": "2026-06-18T11:34:23.475732+00:00",
@@ -83,6 +87,10 @@
       {
         "id": "earth-evolution-simulator",
         "title": "Earth Evolution Simulator"
+      },
+      {
+        "id": "rag-lab",
+        "title": "RAG Lab"
       }
     ],
     "created_at": "2026-06-18T11:34:23.475732+00:00",
@@ -175,6 +183,10 @@
       {
         "id": "metawipe",
         "title": "MetaWipe"
+      },
+      {
+        "id": "rag-lab",
+        "title": "RAG Lab"
       }
     ],
     "created_at": "2026-06-18T11:34:23.475732+00:00",
@@ -192,7 +204,12 @@
     "level": "Level Max",
     "prereq": "Structured Prompting",
     "status": "mastered",
-    "projects": [],
+    "projects": [
+      {
+        "id": "rag-lab",
+        "title": "RAG Lab"
+      }
+    ],
     "created_at": "2026-06-18T11:34:23.475732+00:00",
     "updated_at": "2026-06-18T11:34:23.475732+00:00",
     "description_business": "Designing agent workflows that reduce repetitive manual work.",
@@ -208,7 +225,12 @@
     "level": "Level Max",
     "prereq": "AI Dev Workflows",
     "status": "mastered",
-    "projects": [],
+    "projects": [
+      {
+        "id": "rag-lab",
+        "title": "RAG Lab"
+      }
+    ],
     "created_at": "2026-06-18T11:34:23.475732+00:00",
     "updated_at": "2026-06-18T11:34:23.475732+00:00",
     "description_business": "Building practical automation flows for repeatable work.",
@@ -240,6 +262,10 @@
       {
         "id": "metawipe",
         "title": "MetaWipe"
+      },
+      {
+        "id": "rag-lab",
+        "title": "RAG Lab"
       }
     ],
     "created_at": "2026-06-18T11:34:23.475732+00:00",
@@ -251,13 +277,18 @@
     "id": "b5fe7681-7136-4d5f-ac18-fea7f8249bbd",
     "name": "React / Next.js",
     "icon": "atom",
-    "description": "Building component-driven web apps with React and Next.js \u2014 server/client architecture, state management, and App Router patterns.",
+    "description": "Building component-driven web apps with React and Next.js — server/client architecture, state management, and App Router patterns.",
     "category": "dynamic",
     "color": "#000000",
     "level": "",
     "prereq": "",
     "status": "",
-    "projects": [],
+    "projects": [
+      {
+        "id": "rag-lab",
+        "title": "RAG Lab"
+      }
+    ],
     "created_at": "2026-06-21T07:51:02.55422+00:00",
     "updated_at": "2026-06-21T07:51:02.55422+00:00",
     "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
@@ -321,7 +352,12 @@
     "level": "",
     "prereq": "",
     "status": "",
-    "projects": [],
+    "projects": [
+      {
+        "id": "rag-lab",
+        "title": "RAG Lab"
+      }
+    ],
     "created_at": "2026-06-21T07:51:36.509165+00:00",
     "updated_at": "2026-06-21T07:51:36.509165+00:00",
     "description_business": "Building automation scripts, background workers, and ML utilities.",
@@ -331,13 +367,18 @@
     "id": "0c7f571f-bd46-4ee4-accd-bfab2e5f55b2",
     "name": "FastAPI",
     "icon": "server",
-    "description": "Building async REST APIs with FastAPI \u2014 data serialization, endpoint design, and deployment.",
+    "description": "Building async REST APIs with FastAPI — data serialization, endpoint design, and deployment.",
     "category": "logic",
     "color": "#059669",
     "level": "",
     "prereq": "",
     "status": "",
-    "projects": [],
+    "projects": [
+      {
+        "id": "rag-lab",
+        "title": "RAG Lab"
+      }
+    ],
     "created_at": "2026-06-21T07:51:47.477376+00:00",
     "updated_at": "2026-06-21T07:51:47.477376+00:00",
     "description_business": "Building reliable APIs and data layers for web apps.",
@@ -388,6 +429,10 @@
       {
         "title": "PrateeqSync AI: Intelligent Portfolio & Resume Automation Engine",
         "id": "prateeksync-ai--intelligent-portfolio---resume-automation-engine"
+      },
+      {
+        "title": "RAG Lab",
+        "id": "rag-lab"
       }
     ]
   },
@@ -417,7 +462,12 @@
     "level": "",
     "prereq": "",
     "status": "",
-    "projects": [],
+    "projects": [
+      {
+        "id": "rag-lab",
+        "title": "RAG Lab"
+      }
+    ],
     "created_at": "2026-06-21T07:52:08.427029+00:00",
     "updated_at": "2026-06-21T07:52:08.427029+00:00",
     "description_business": "Building reliable APIs and data layers for web apps.",
@@ -433,7 +483,12 @@
     "level": "",
     "prereq": "",
     "status": "",
-    "projects": [],
+    "projects": [
+      {
+        "id": "rag-lab",
+        "title": "RAG Lab"
+      }
+    ],
     "created_at": "2026-06-21T07:52:11.199541+00:00",
     "updated_at": "2026-06-21T07:52:11.199541+00:00",
     "description_business": "Writing type-safe web logic that is easier to maintain.",
@@ -625,7 +680,12 @@
     "level": "",
     "prereq": "",
     "status": "",
-    "projects": [],
+    "projects": [
+      {
+        "id": "rag-lab",
+        "title": "RAG Lab"
+      }
+    ],
     "created_at": "2026-06-30T23:18:50.677442+00:00",
     "updated_at": "2026-06-30T23:18:50.677442+00:00",
     "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
@@ -678,5 +738,85 @@
     "updated_at": "2026-07-01T19:12:40.504946+00:00",
     "description_business": "Building reliable APIs and data layers for web apps.",
     "name_business": "Visual Image Processing"
+  },
+  {
+    "name": "Supabase",
+    "name_business": "Backend-as-a-Service & PostgreSQL Hosting",
+    "icon": "database",
+    "description": "Building full-stack apps with Supabase — PostgreSQL, pgvector, Row-Level Security, real-time subscriptions, and connection pooling.",
+    "description_business": "Building secure backends with PostgreSQL, managed auth, and real-time data sync.",
+    "category": "logic",
+    "color": "#3ECF8E",
+    "level": "",
+    "projects": [
+      {
+        "title": "RAG Lab",
+        "id": "rag-lab"
+      }
+    ]
+  },
+  {
+    "name": "pgvector",
+    "name_business": "Vector Search Infrastructure",
+    "icon": "database",
+    "description": "Implementing semantic vector similarity search with pgvector extension — HNSW indexes, cosine distance, and hybrid search pipelines.",
+    "description_business": "Building semantic search capabilities into PostgreSQL for AI-powered retrieval features.",
+    "category": "logic",
+    "color": "#336791",
+    "level": "",
+    "projects": [
+      {
+        "title": "RAG Lab",
+        "id": "rag-lab"
+      }
+    ]
+  },
+  {
+    "name": "Ollama",
+    "name_business": "Self-Hosted AI Serving",
+    "icon": "server",
+    "description": "Deploying and managing local LLM and embedding models with Ollama — nomic-embed-text for embeddings, CPU-only inference on free-tier VPS.",
+    "description_business": "Running AI models on cost-effective infrastructure without third-party API dependencies.",
+    "category": "orchestration",
+    "color": "#000000",
+    "level": "",
+    "projects": [
+      {
+        "title": "RAG Lab",
+        "id": "rag-lab"
+      }
+    ]
+  },
+  {
+    "name": "RAG / LLM Orchestration",
+    "name_business": "Retrieval-Augmented Generation Architecture",
+    "icon": "brain",
+    "description": "Designing full RAG pipelines — document chunking, embedding indexing, hybrid search, context window packing, citation validation, and streaming LLM inference.",
+    "description_business": "Building AI-powered document search and chat systems with citation-grounded answers.",
+    "category": "orchestration",
+    "color": "#E10098",
+    "level": "",
+    "projects": [
+      {
+        "title": "RAG Lab",
+        "id": "rag-lab"
+      }
+    ]
+  },
+  {
+    "name": "Server-Sent Events (SSE)",
+    "name_business": "Real-Time Data Streaming",
+    "icon": "zap",
+    "description": "Implementing real-time server-sent event streams for token-by-token LLM response delivery in web applications.",
+    "description_business": "Building real-time data streaming for live-updating web interfaces.",
+    "category": "dynamic",
+    "color": "#FF6B35",
+    "level": "",
+    "projects": [
+      {
+        "title": "RAG Lab",
+        "id": "rag-lab"
+      }
+    ]
   }
 ]

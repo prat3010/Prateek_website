@@ -183,6 +183,12 @@
           "general": "Built PrateeqSync AI, a local content manager for portfolio updates, credential review, and generated drafts.",
           "creative": "Built an interactive Streamlit dashboard for managing skills, certificates, and media assets.",
           "fullstack": "Built a Python-based content manager with Streamlit, GitHub API integration, and TypeScript file sync."
+        },
+        {
+          "ai": "Built a full-stack RAG platform with hybrid search, streaming LLM chat, and multi-tenant isolation.",
+          "general": "Designed and deployed Retriever, a production RAG engine with document ingestion, semantic search, and grounded chat.",
+          "creative": "Built an interactive RAG Lab UI with real-time SSE streaming and dual-theme design system.",
+          "fullstack": "Architected a FastAPI backend with pgvector, self-hosted Ollama embeddings, Supabase RLS, and Nginx reverse proxy on Oracle Cloud."
         }
       ],
       "company": "Independent Consultant / Freelance Developer",
