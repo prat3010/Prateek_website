@@ -2,7 +2,7 @@
 
 **Interactive document search and chat powered by a custom RAG engine.**
 
-RAG Lab is a full-stack Retrieval-Augmented Generation platform. Upload PDFs, search semantically, and get grounded answers with citations. The frontend lives in this portfolio at `/rag` and talks to a FastAPI backend running on an Oracle Cloud VPS.
+RAG Lab is a full-stack Retrieval-Augmented Generation platform. Upload PDFs, search semantically, and get grounded answers with citations. The frontend lives in this portfolio at `/rag` and talks to a FastAPI backend running on an Oracle Cloud VPS. An admin dashboard is available at [`admin.rag.prateeq.in`](https://admin.rag.prateeq.in) for tenant and platform management.
 
 ---
 
@@ -33,15 +33,29 @@ RAG Lab is a full-stack Retrieval-Augmented Generation platform. Upload PDFs, se
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  Browser                                                         │
-│  prateeq.in/rag                                                  │
-└──────────────────┬──────────────────────────────────────────────┘
-                   │
-                   ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  Vercel (Edge + Serverless)                                      │
+│  prateeq.in/rag   admin.rag.prateeq.in                          │
+└──────┬──────────────────────────┬───────────────────────────────┘
+       │                          │
+       ▼                          ▼
+┌──────────────────────┐ ┌──────────────────────────────────────┐
+│  Vercel (Portfolio)  │ │  Vercel (Admin Dashboard)            │
+│  prateeq.in/rag      │ │  admin.rag.prateeq.in                │
+│  Next.js             │ │  Next.js · shadcn/ui · React Query   │
+│  RagInterface        │ │  Login → tenants/docs/users/keys/…   │
+└──────────┬───────────┘ └────────────┬─────────────────────────┘
+           │                          │
+           │      HTTPS · X-Admin-Master-Key
+           │                          │
+           ▼                          ▼
 │  ┌─────────────────────────────────────────────────────────────┐ │
-│  │  Next.js App Router                                          │ │
+│  │  Portfolio (prateeq.in/rag)                                  │ │
 │  │  page.tsx → <RagInterface />                                 │ │
+│  │                                                               │ │
+│  │  Admin Dashboard (admin.rag.prateeq.in)                      │ │
+│  │  Next.js app from apps/web/ in retriever repo                │ │
+│  │  Login, tenants, documents, users, API keys, prompts,        │ │
+│  │  config, audit logs, playground                              │ │
+│  └─────────────────────────────────────────────────────────────┘ │
 │  │  ├── ConfigPanel  (localStorage persistence)                 │ │
 │  │  ├── ChatPanel    (SSE streaming reader)                    │ │
 │  │  ├── SearchPanel  (one-shot hybrid search)                  │ │
@@ -77,16 +91,30 @@ RAG Lab is a full-stack Retrieval-Augmented Generation platform. Upload PDFs, se
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### Frontend
-
-Three source files in the portfolio repo:
+### Frontend (Portfolio)
 
 | File | Purpose |
 |------|---------|
-| `src/app/rag/page.tsx` | Route entry — renders `<RagInterface />` |
+| `src/app/rag/page.tsx` | Route entry — renders `<RagInterface />` + Admin button |
 | `src/components/rag/RagInterface.tsx` | Main client component — tabs, state, all panels |
 | `src/components/rag/rag.module.css` | CSS Modules — 30 class names, uses theme custom properties |
 | `src/lib/rag-client.ts` | API client class, config localStorage helpers, TypeScript types |
+
+### Admin Dashboard
+
+A separate Next.js app deployed on Vercel from the `apps/web/` directory of the [retriever repo](https://github.com/prat3010/retriever). Available at `admin.rag.prateeq.in`. Provides a full browser UI for:
+
+- Tenant CRUD (create, view, suspend)
+- User management (create, list)
+- API key management (create, revoke)
+- Document management (upload, delete per tenant)
+- Prompt template editor with preview
+- Tenant configuration editor
+- RAG playground for testing
+- Audit log viewer
+- Platform-wide stats and system reset
+
+**Auth:** Admin Master Key entered on the login page, stored in `sessionStorage`, sent as `X-Admin-Master-Key` header on every API call.
 
 ### Backend
 
@@ -349,12 +377,21 @@ LLM API keys stored in the tenant `configurations` table are encrypted at rest u
 
 ### Frontend (Vercel)
 
+**RAG Lab UI**
 - **Repo:** `github.com/prat3010/Prateek_website`
 - **Branch:** `main` — auto-deploys on push
 - **Route:** `prateeq.in/rag`
 - **Framework:** Next.js App Router (`src/app/rag/page.tsx`)
 - **Client component:** `RagInterface` — rendered on the client after initial page load
 - **Config:** No API keys are hardcoded; all credentials entered by the user and stored in `localStorage`
+
+**Admin Dashboard**
+- **Repo:** `github.com/prat3010/retriever` (subdirectory `apps/web/`)
+- **URL:** `admin.rag.prateeq.in`
+- **Deployment:** Manual or auto-deploy on push via Vercel (root directory: `apps/web`)
+- **Env:** `NEXT_PUBLIC_API_URL=https://rag.prateeq.in`
+- **Framework:** Next.js App Router (shadcn/ui, Tailwind, React Query, Zustand)
+- **Auth:** Admin Master Key login form
 
 ### Backend (Oracle VPS)
 
