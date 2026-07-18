@@ -227,8 +227,131 @@
 
 .fileItem:last-child { border-bottom: none; }
 
+.fileInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.fileName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fileActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
 .fileStatus {
   font-size: 0.75rem;
   color: var(--color-text);
   opacity: 0.5;
+}
+
+.deleteBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text);
+  opacity: 0.4;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0.25rem;
+  transition: opacity 0.15s;
+}
+
+.deleteBtn:hover {
+  opacity: 1;
+  color: var(--pop-red, #ef4444);
+}
+
+.progressBar {
+  height: 4px;
+  background: var(--color-border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.progressBar::after {
+  content: '';
+  display: block;
+  width: 30%;
+  height: 100%;
+  background: var(--color-link, var(--pop-blue));
+  border-radius: 2px;
+  animation: progressIndeterminate 1.5s ease-in-out infinite;
+}
+
+@keyframes progressIndeterminate {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
+
+.uploadLabel {
+  font-size: 0.8125rem;
+  color: var(--color-text);
+  opacity: 0.6;
+  margin-top: 0.25rem;
+}
+
+.connectStatus {
+  font-size: 0.8125rem;
+  margin-top: 0.5rem;
+}
+
+.connectOk {
+  color: var(--pop-green, #22c55e);
+}
+
+.connectFail {
+  color: var(--pop-red, #ef4444);
+}
+
+.searchDoc {
+  font-size: 0.75rem;
+  color: var(--color-text);
+  opacity: 0.6;
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+@media (max-width: 640px) {
+  .wrapper {
+    padding: 0 1rem;
+  }
+
+  .row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .tabs {
+    overflow-x: auto;
+    gap: 0;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tab {
+    white-space: nowrap;
+  }
+
+  .chatMsg {
+    max-width: 95%;
+  }
+
+  .panel {
+    padding: 1rem;
+  }
+
+  .chatMessages {
+    max-height: 300px;
+  }
 }

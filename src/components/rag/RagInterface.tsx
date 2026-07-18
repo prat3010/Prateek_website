@@ -4,7 +4,24 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { getConfig, saveConfig, clearConfig, RetrieverClient, type RetrieverConfig } from "@/lib/rag-client";
 import styles from "./rag.module.css";
 
+// :deferred:
+// - Toast notification system — inline error/success is sufficient for current use
+// - Markdown rendering in chat messages — pre-wrap handles plain text fine
+// - Chat session history list — requires new API call + UI panel, speculative
+// - Search-to-chat flow integration — adds cross-panel complexity
+// - Stop generation button — only matters after live streaming (Phase 1.1 done)
+// - Keyboard shortcuts (/, Cmd+Enter) — nice polish, not foundational
+// - Document preview / multi-file upload — low usage currently
+
 type Tab = "config" | "chat" | "search" | "documents";
+
+function isValidUrl(s: string) {
+  try { return !!new URL(s); } catch { return false; }
+}
+
+function isUuid(s: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
+}
 
 export default function RagInterface() {
   const [tab, setTab] = useState<Tab>("config");
@@ -19,6 +36,7 @@ export default function RagInterface() {
     saveConfig(c);
     setConfig(c);
     setClient(new RetrieverClient(c));
+    setTab("chat");
   }
 
   function handleClear() {
@@ -71,27 +89,52 @@ function ConfigPanel({
   const [form, setForm] = useState<RetrieverConfig>(
     config ?? { apiUrl: "https://rag.prateeq.in", tenantId: "00000000-0000-0000-0000-000000000000", apiKey: "", userId: "a8b819bb-61bb-450b-9662-62bd06b188d3" },
   );
+  const [connecting, setConnecting] = useState(false);
+  const [connectResult, setConnectResult] = useState<{ ok: boolean; msg: string } | null>(null);
 
   if (hidden) return null;
+
+  const valid = isValidUrl(form.apiUrl) && isUuid(form.tenantId) && isUuid(form.userId) && form.apiKey.length > 0;
+
+  async function handleSave() {
+    if (!valid) return;
+    setConnecting(true);
+    setConnectResult(null);
+    try {
+      const res = await fetch(`${form.apiUrl.replace(/\/$/, "")}/health/liveness`, {
+        headers: { Authorization: `Bearer ${form.apiKey}` },
+      });
+      if (!res.ok) throw new Error(`Backend returned ${res.status}`);
+      setConnectResult({ ok: true, msg: "Connected" });
+      onSave(form);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Connection failed";
+      setConnectResult({ ok: false, msg });
+    } finally {
+      setConnecting(false);
+    }
+  }
 
   return (
     <div className={styles.panel}>
       <h2 className={styles.panelTitle}>Configuration</h2>
-      <p className={styles.panelDesc}>Connect to your Retriever API instance.</p>
+      <p className={styles.panelDesc}>
+        Connect to your Retriever instance to search documents, upload new content, and chat with your data.
+      </p>
       <label className={styles.label}>API Base URL</label>
-      <input className={styles.input} value={form.apiUrl} onChange={(e) => setForm({ ...form, apiUrl: e.target.value })} />
+      <input className={styles.input} value={form.apiUrl} onChange={(e) => setForm({ ...form, apiUrl: e.target.value })} placeholder="https://rag.prateeq.in" />
       <div className={styles.row}>
         <div>
           <label className={styles.label}>Tenant ID</label>
-          <input className={styles.input} value={form.tenantId} onChange={(e) => setForm({ ...form, tenantId: e.target.value })} />
+          <input className={styles.input} value={form.tenantId} onChange={(e) => setForm({ ...form, tenantId: e.target.value })} placeholder="00000000-0000-0000-0000-000000000000" />
         </div>
         <div>
           <label className={styles.label}>User ID</label>
-          <input className={styles.input} value={form.userId} onChange={(e) => setForm({ ...form, userId: e.target.value })} />
+          <input className={styles.input} value={form.userId} onChange={(e) => setForm({ ...form, userId: e.target.value })} placeholder="a8b819bb-61bb-450b-9662-62bd06b188d3" />
         </div>
       </div>
       <label className={styles.label}>API Key</label>
-      <input className={styles.input} value={form.apiKey} onChange={(e) => setForm({ ...form, apiKey: e.target.value })} type="password" />
+      <input className={styles.input} value={form.apiKey} onChange={(e) => setForm({ ...form, apiKey: e.target.value })} type="password" placeholder="sk_live_..." />
       <div className={styles.row}>
         <div>
           <label className={styles.label}>LLM Key (optional)</label>
@@ -108,9 +151,16 @@ function ConfigPanel({
         </div>
       </div>
       <div className={styles.actions}>
-        <button className="comic-btn comic-btn-blue" onClick={() => onSave(form)}>Save & Connect</button>
+        <button className="comic-btn comic-btn-blue" onClick={handleSave} disabled={!valid || connecting}>
+          {connecting ? "Connecting…" : "Save & Connect"}
+        </button>
         {config && <button className="comic-btn comic-btn-outline" onClick={onClear}>Disconnect</button>}
       </div>
+      {connectResult && (
+        <p className={`${styles.connectStatus} ${connectResult.ok ? styles.connectOk : styles.connectFail}`}>
+          {connectResult.ok ? "✓" : "✗"} {connectResult.msg}
+        </p>
+      )}
     </div>
   );
 }
@@ -134,9 +184,8 @@ function ChatPanel({ client, hidden }: { client: RetrieverClient | null; hidden:
       const res = await client.createSession();
       setSessionId(res.sessionId);
       setMessages([{ role: "assistant", content: `Session started. Send your first message.` }]);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to start session");
     }
   }
 
@@ -149,7 +198,6 @@ function ChatPanel({ client, hidden }: { client: RetrieverClient | null; hidden:
     setLoading(true);
     try {
       const body = await client.chat(sessionId, msg);
-      let full = "";
       if (body) {
         const reader = body.getReader();
         const decoder = new TextDecoder();
@@ -163,16 +211,28 @@ function ChatPanel({ client, hidden }: { client: RetrieverClient | null; hidden:
               try {
                 const parsed = JSON.parse(data);
                 if (parsed.event === "done") break;
-                full += parsed.content ?? parsed.delta ?? "";
+                const delta = parsed.content ?? parsed.delta ?? "";
+                if (delta) {
+                  setMessages((prev) => {
+                    const last = prev[prev.length - 1];
+                    if (last?.role === "assistant") {
+                      return [...prev.slice(0, -1), { ...last, content: last.content + delta }];
+                    }
+                    return [...prev, { role: "assistant", content: delta }];
+                  });
+                }
               } catch {}
             }
           }
         }
       }
-      setMessages((prev) => [...prev, { role: "assistant", content: full || "(empty response)" }]);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (e: any) {
-      setError(e.message);
+      setMessages((prev) => {
+        const last = prev[prev.length - 1];
+        if (last?.role === "assistant") return prev;
+        return [...prev, { role: "assistant", content: "(empty response)" }];
+      });
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Chat failed");
     } finally {
       setLoading(false);
     }
@@ -182,6 +242,10 @@ function ChatPanel({ client, hidden }: { client: RetrieverClient | null; hidden:
     <div className={styles.panel}>
       <h2 className={styles.panelTitle}>Chat</h2>
       <p className={styles.panelDesc}>Streaming RAG chat with your documents.</p>
+
+      {!sessionId && messages.length === 0 && (
+        <p className={styles.empty}>Start a session to begin chatting with your documents.</p>
+      )}
 
       <div className={styles.chatControls}>
         {!sessionId ? (
@@ -194,14 +258,18 @@ function ChatPanel({ client, hidden }: { client: RetrieverClient | null; hidden:
         )}
       </div>
 
-      <div className={styles.chatMessages}>
-        {messages.map((m, i) => (
-          <div key={i} className={`${styles.chatMsg} ${m.role === "user" ? styles.chatUser : styles.chatAssistant}`}>
-            {m.content}
-          </div>
-        ))}
-        <div ref={chatEnd} />
-      </div>
+      {messages.length > 0 && (
+        <div className={styles.chatMessages}>
+          {messages.map((m, i) => (
+            <div key={i} className={`${styles.chatMsg} ${m.role === "user" ? styles.chatUser : styles.chatAssistant}`} style={{ whiteSpace: "pre-wrap" }}>
+              {(i === messages.length - 1 && m.role === "assistant" && loading)
+                ? m.content + " ▌"
+                : m.content}
+            </div>
+          ))}
+          <div ref={chatEnd} />
+        </div>
+      )}
 
       {sessionId && (
         <div className={styles.chatInput}>
@@ -209,7 +277,7 @@ function ChatPanel({ client, hidden }: { client: RetrieverClient | null; hidden:
             className={styles.input}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+            onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
             placeholder="Type a message..."
             disabled={loading}
           />
@@ -233,6 +301,19 @@ function SearchPanel({ client, hidden }: { client: RetrieverClient | null; hidde
 
   if (hidden) return null;
 
+  function escapeRegex(s: string) {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  function highlightText(text: string, q: string): (string | React.ReactNode)[] {
+    if (!q.trim()) return [text];
+    const escaped = escapeRegex(q);
+    const parts = text.split(new RegExp(`(${escaped})`, "gi"));
+    return parts.map((p, i) =>
+      p.toLowerCase() === q.toLowerCase() ? <strong key={i}>{p}</strong> : p
+    );
+  }
+
   async function handleSearch() {
     if (!client || !query.trim()) return;
     setLoading(true);
@@ -240,9 +321,8 @@ function SearchPanel({ client, hidden }: { client: RetrieverClient | null; hidde
     try {
       const res = await client.search(query);
       setResults(res);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Search failed");
     } finally {
       setLoading(false);
     }
@@ -266,20 +346,29 @@ function SearchPanel({ client, hidden }: { client: RetrieverClient | null; hidde
         </button>
       </div>
 
+      {!results && !loading && (
+        <p className={styles.empty}>Enter a query above to search your indexed documents.</p>
+      )}
+
       {results && (
         <div style={{ marginTop: "1.5rem" }}>
           <p className={styles.resultMeta}>
-            Found {results.results.length} results
+            Found {results.results.length} result{results.results.length !== 1 ? "s" : ""}
             {results.searchMeta?.durationMs && ` in ${results.searchMeta.durationMs}ms`}
           </p>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           {results.results.map((r: any, i: number) => (
-            <div key={r.chunkId} className={styles.resultItem}>
+            <div key={r.chunkId ?? i} className={styles.resultItem}>
               <div className={styles.resultHeader}>
                 <span className={styles.resultRank}>#{i + 1}</span>
-                <span className={styles.resultScore}>Score: {r.score.toFixed(4)}</span>
+                <span className={styles.resultScore}>{(r.score * 100).toFixed(1)}%</span>
               </div>
-              <p className={styles.resultContent}>{r.content}</p>
+              <p className={styles.resultContent}>{highlightText(r.content, query)}</p>
+              {(r.metadata?.filename || r.metadata?.document_id) && (
+                <p className={styles.searchDoc}>
+                  📄 {r.metadata?.filename ?? r.metadata?.document_id?.slice(0, 8) ?? ""}
+                </p>
+              )}
             </div>
           ))}
         </div>
@@ -295,6 +384,7 @@ function DocumentsPanel({ client, hidden }: { client: RetrieverClient | null; hi
   const [docs, setDocs] = useState<any[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadName, setUploadName] = useState("");
   const [error, setError] = useState("");
 
   const fetchDocs = useCallback(async () => {
@@ -305,9 +395,8 @@ function DocumentsPanel({ client, hidden }: { client: RetrieverClient | null; hi
       const res = await client.listDocuments();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setDocs(res as any[]);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to load documents");
     } finally {
       setLoading(false);
     }
@@ -319,15 +408,28 @@ function DocumentsPanel({ client, hidden }: { client: RetrieverClient | null; hi
     const file = e.target.files?.[0];
     if (!file || !client) return;
     setUploading(true);
+    setUploadName(file.name);
     setError("");
     try {
       await client.uploadDocument(file);
       await fetchDocs();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Upload failed");
     } finally {
       setUploading(false);
+      setUploadName("");
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async function handleDelete(doc: any) {
+    if (!client) return;
+    if (!confirm(`Delete "${doc.filename}"?`)) return;
+    try {
+      await client.deleteDocument(doc.documentId);
+      setDocs((prev) => prev ? prev.filter((d) => d.documentId !== doc.documentId) : null);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Delete failed");
     }
   }
 
@@ -340,21 +442,34 @@ function DocumentsPanel({ client, hidden }: { client: RetrieverClient | null; hi
         <button className="comic-btn comic-btn-blue" onClick={fetchDocs} disabled={loading}>
           {loading ? "Loading…" : "Refresh"}
         </button>
-        <label className="comic-btn comic-btn-outline" style={{ cursor: "pointer" }}>
-          {uploading ? "Uploading…" : "Upload PDF"}
+        <label className="comic-btn comic-btn-outline" style={{ cursor: uploading ? "wait" : "pointer" }}>
+          {uploading ? `Uploading ${uploadName}…` : "Upload PDF"}
           <input type="file" accept=".pdf,.txt,.md,.docx" style={{ display: "none" }} onChange={handleUpload} disabled={uploading} />
         </label>
       </div>
 
-      {docs && docs.length === 0 && <p className={styles.empty}>No documents yet.</p>}
+      {uploading && <div className={styles.progressBar} />}
+
+      {docs === null && !loading && (
+        <p className={styles.empty}>Connect and refresh to see your documents.</p>
+      )}
+
+      {docs && docs.length === 0 && (
+        <p className={styles.empty}>No documents yet. Upload a PDF, TXT, Markdown, or DOCX file to get started.</p>
+      )}
 
       {docs && docs.length > 0 && (
         <ul className={styles.fileList}>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           {docs.map((doc: any) => (
             <li key={doc.documentId} className={styles.fileItem}>
-              <span>{doc.filename}</span>
-              <span className={styles.fileStatus}>{doc.status}</span>
+              <div className={styles.fileInfo}>
+                <span className={styles.fileName}>{doc.filename}</span>
+              </div>
+              <div className={styles.fileActions}>
+                <span className={styles.fileStatus}>{doc.status}</span>
+                <button className={styles.deleteBtn} onClick={() => handleDelete(doc)} title="Delete document">✕</button>
+              </div>
             </li>
           ))}
         </ul>

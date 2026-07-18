@@ -97,4 +97,17 @@ export class RetrieverClient {
     if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
     return res.json();
   }
+
+  async deleteDocument(documentId: string) {
+    const url = `${this.config.apiUrl.replace(/\/$/, "")}/v1/tenants/${this.config.tenantId}/documents/${documentId}`;
+    const res = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${this.config.apiKey}`,
+        "X-User-ID": this.config.userId,
+      },
+    });
+    if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
+    return res.json();
+  }
 }
