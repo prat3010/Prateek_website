@@ -65,6 +65,7 @@ The project uses the following environment variables (stored in `.env.local` loc
 ## Caching & Cache Revalidation
 
 - **Caching Layer:** Database data fetched via `src/lib/data.ts` (projects, skills, certificates, resume profile) is cached aggressively using Next.js `unstable_cache`.
+- `src/lib/rag-client.ts` — API client for the Retriever RAG engine. Handles auth, SSE streaming, search, document upload/listing, and chat session management.
 - **Cache Tags:** All cache entries share the query tag `portfolio-data`, with specific tags like `projects`, `skills`, `certificates`, and `profile`.
 - **Cache Invalidation:** Content write API routes revalidate relevant Next.js cache tags after successful mutations. When database data is modified outside those routes (for example directly in Supabase Dashboard or via one-off SQL), revalidate by sending a `POST` or `GET` request to `/api/revalidate?secret=YOUR_SYNC_API_KEY`.
 - **Content Write Security:** Public content tables are public-read only. Writes are performed by server routes or local tooling with `SUPABASE_SERVICE_ROLE_KEY`, which bypasses RLS. Do not add anonymous insert/update/delete policies for portfolio content tables.
@@ -78,9 +79,11 @@ The project uses the following environment variables (stored in `.env.local` loc
   - `/terminal` — interactive diagnostics terminal console.
   - `/admin/analytics` — visitor analytics dashboard.
   - `/blog` and `/blog/[slug]` — blog listing and individual post pages.
+  - `/rag` — interactive RAG Lab UI for searching and chatting with documents via the Retriever API (`rag.prateeq.in`). See `src/components/rag/` and `src/lib/rag-client.ts`.
 - `src/app/api/` contains REST API routes for reading/writing portfolio data to Supabase: `skills`, `projects`, `certificates`, `profile`, `git-log`, `analytics-summary`, `contact`, and `revalidate`.
 - `src/proxy.ts` is the Next.js 16 proxy (formerly middleware) file that intercepts requests for telemetry logging.
 - `src/components/` contains portfolio sections, shared UI (like the interactive diagnostics terminal console at `/terminal` which supports commands such as `git-info` and `qrcode`, and the `GestureScroll` floating gesture scroll controller), visual effects, and the playground. Components follow the pattern `src/components/{ComponentName}/{ComponentName}.tsx` with co-located CSS modules.
+- `src/components/rag/` — RAG Lab UI components (RagInterface + rag.module.css). Connects to the Retriever API at `rag.prateeq.in`.
 - `src/components/effects/wobblyPaths.generated.ts` contains generated skyline path data for prebaked hand-drawn SVG wobble. Do not edit it by hand; regenerate it with `npm run generate:wobbly-paths` after changing skyline `Wobbly*` elements.
 - `src/data/` contains type definitions, Supabase client setup, taglines, and JSON fallback files (data values live in Supabase).
 - `src/lib/data.ts` is the server-side data layer that fetches projects, skills, resume, and certificates from Supabase.

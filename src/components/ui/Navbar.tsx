@@ -62,6 +62,7 @@ export default function Navbar({ items, className }: NavbarProps) {
       { label: audience === 'business' ? 'Quotation' : 'Resume', href: '/#resume' },
       { label: 'Playground', href: '/#playground' },
       { label: 'Contact', href: '/#contact' },
+      { label: 'RAG Lab', href: '/rag' },
     ];
   }, [items, audience]);
 
