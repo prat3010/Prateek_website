@@ -20,7 +20,8 @@ function isValidUrl(s: string) {
 }
 
 function isUuid(s: string) {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s)
+    || /^(tn_|usr_)[a-zA-Z0-9]{6,12}$/.test(s);
 }
 
 export default function RagInterface() {
@@ -87,14 +88,15 @@ function ConfigPanel({
   hidden: boolean;
 }) {
   const [form, setForm] = useState<RetrieverConfig>(
-    config ?? { apiUrl: "https://rag.prateeq.in", tenantId: "00000000-0000-0000-0000-000000000000", apiKey: "", userId: "a8b819bb-61bb-450b-9662-62bd06b188d3" },
+    config ?? { apiUrl: "https://rag.prateeq.in", tenantId: "", apiKey: "", userId: "" },
   );
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [connecting, setConnecting] = useState(false);
   const [connectResult, setConnectResult] = useState<{ ok: boolean; msg: string } | null>(null);
 
   if (hidden) return null;
 
-  const valid = isValidUrl(form.apiUrl) && isUuid(form.tenantId) && isUuid(form.userId) && form.apiKey.length > 0;
+  const valid = isValidUrl(form.apiUrl) && form.tenantId.length > 0 && form.userId.length > 0 && form.apiKey.length > 0;
 
   async function handleSave() {
     if (!valid) return;
@@ -121,20 +123,27 @@ function ConfigPanel({
       <p className={styles.panelDesc}>
         Connect to your Retriever instance to search documents, upload new content, and chat with your data.
       </p>
-      <label className={styles.label}>API Base URL</label>
-      <input className={styles.input} value={form.apiUrl} onChange={(e) => setForm({ ...form, apiUrl: e.target.value })} placeholder="https://rag.prateeq.in" />
+      {showAdvanced && (
+        <div>
+          <label className={styles.label}>API Base URL</label>
+          <input className={styles.input} value={form.apiUrl} onChange={(e) => setForm({ ...form, apiUrl: e.target.value })} placeholder="https://rag.prateeq.in" />
+        </div>
+      )}
       <div className={styles.row}>
         <div>
           <label className={styles.label}>Tenant ID</label>
-          <input className={styles.input} value={form.tenantId} onChange={(e) => setForm({ ...form, tenantId: e.target.value })} placeholder="00000000-0000-0000-0000-000000000000" />
+          <input className={styles.input} value={form.tenantId} onChange={(e) => setForm({ ...form, tenantId: e.target.value })} placeholder="tn_..." />
         </div>
         <div>
           <label className={styles.label}>User ID</label>
-          <input className={styles.input} value={form.userId} onChange={(e) => setForm({ ...form, userId: e.target.value })} placeholder="a8b819bb-61bb-450b-9662-62bd06b188d3" />
+          <input className={styles.input} value={form.userId} onChange={(e) => setForm({ ...form, userId: e.target.value })} placeholder="usr_..." />
         </div>
       </div>
       <label className={styles.label}>API Key</label>
-      <input className={styles.input} value={form.apiKey} onChange={(e) => setForm({ ...form, apiKey: e.target.value })} type="password" placeholder="sk_live_..." />
+      <input className={styles.input} value={form.apiKey} onChange={(e) => setForm({ ...form, apiKey: e.target.value })} type="password" placeholder="ret_live_..." />
+      <button className="comic-btn comic-btn-outline" style={{ fontSize: "0.75rem", marginBottom: "0.75rem" }} onClick={() => setShowAdvanced(!showAdvanced)}>
+        {showAdvanced ? "Hide" : "Show"} Advanced
+      </button>
       <div className={styles.row}>
         <div>
           <label className={styles.label}>LLM Key (optional)</label>

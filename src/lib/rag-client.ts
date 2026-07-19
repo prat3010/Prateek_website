@@ -85,29 +85,15 @@ export class RetrieverClient {
   async uploadDocument(file: File) {
     const formData = new FormData();
     formData.append("file", file);
-    const url = `${this.config.apiUrl.replace(/\/$/, "")}/v1/tenants/${this.config.tenantId}/documents`;
-    const res = await fetch(url, {
+    return this.request(`/v1/tenants/${this.config.tenantId}/documents`, {
       method: "POST",
-      headers: {
-        "Authorization": `Bearer ${this.config.apiKey}`,
-        "X-User-ID": this.config.userId,
-      },
       body: formData,
     });
-    if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
-    return res.json();
   }
 
   async deleteDocument(documentId: string) {
-    const url = `${this.config.apiUrl.replace(/\/$/, "")}/v1/tenants/${this.config.tenantId}/documents/${documentId}`;
-    const res = await fetch(url, {
+    return this.request(`/v1/tenants/${this.config.tenantId}/documents/${documentId}`, {
       method: "DELETE",
-      headers: {
-        "Authorization": `Bearer ${this.config.apiKey}`,
-        "X-User-ID": this.config.userId,
-      },
     });
-    if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
-    return res.json();
   }
 }
