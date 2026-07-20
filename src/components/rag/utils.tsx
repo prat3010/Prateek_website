@@ -3,8 +3,7 @@ export function isValidUrl(s: string) {
 }
 
 export function isUuid(s: string) {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s)
-    || /^(tn_|usr_)[a-zA-Z0-9]{6,12}$/.test(s);
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
 }
 
 export function escapeRegex(s: string) {

@@ -62,11 +62,11 @@ export function ConfigPanel({
       <div className={styles.row}>
         <div>
           <label className={styles.label}>Tenant ID</label>
-          <input className={styles.input} value={form.tenantId} onChange={(e) => setForm({ ...form, tenantId: e.target.value })} placeholder="tn_..." />
+          <input className={styles.input} value={form.tenantId} onChange={(e) => setForm({ ...form, tenantId: e.target.value })} placeholder="Tenant UUID" />
         </div>
         <div>
           <label className={styles.label}>User ID</label>
-          <input className={styles.input} value={form.userId} onChange={(e) => setForm({ ...form, userId: e.target.value })} placeholder="usr_..." />
+          <input className={styles.input} value={form.userId} onChange={(e) => setForm({ ...form, userId: e.target.value })} placeholder="User UUID" />
         </div>
       </div>
       <label className={styles.label}>API Key</label>
@@ -83,6 +83,7 @@ export function ConfigPanel({
           <label className={styles.label}>LLM Provider</label>
           <select className={styles.input} value={form.llmProvider ?? ""} onChange={(e) => setForm({ ...form, llmProvider: e.target.value || undefined })}>
             <option value="">Tenant default</option>
+            <option value="openrouter">OpenRouter</option>
             <option value="openai">OpenAI</option>
             <option value="gemini">Gemini</option>
             <option value="anthropic">Anthropic</option>
