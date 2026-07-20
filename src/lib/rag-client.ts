@@ -23,6 +23,29 @@ export function clearConfig() {
   localStorage.removeItem(STORAGE_KEY);
 }
 
+const REQUEST_TIMEOUT = 30_000;
+const MAX_RETRIES = 2;
+
+async function fetchWithRetry(url: string, options: RequestInit, retries = MAX_RETRIES): Promise<Response> {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(url, options);
+      if (!res.ok && res.status >= 500 && attempt < retries) {
+        await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, attempt)));
+        continue;
+      }
+      return res;
+    } catch (err) {
+      if (attempt < retries) {
+        await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, attempt)));
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw new Error("Request failed after retries");
+}
+
 export class RetrieverClient {
   private config: RetrieverConfig;
 
@@ -39,35 +62,44 @@ export class RetrieverClient {
     if (!(options.body instanceof FormData)) {
       headers["Content-Type"] = "application/json";
     }
-    const res = await fetch(url, {
-      ...options,
-      headers: { ...headers, ...(options.headers as Record<string, string>) },
-    });
-    if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
-    return res.json();
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+
+    try {
+      const res = await fetchWithRetry(url, {
+        ...options,
+        headers: { ...headers, ...(options.headers as Record<string, string>) },
+        signal: options.signal ?? controller.signal,
+      });
+      clearTimeout(timeoutId);
+      if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
+      return res.json();
+    } catch (err) {
+      clearTimeout(timeoutId);
+      throw err;
+    }
   }
 
   async search(query: string, limit = 5) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.request<any>(`/v1/tenants/${this.config.tenantId}/search`, {
+    return this.request<import("./rag-types").SearchResponse>(`/v1/tenants/${this.config.tenantId}/search`, {
       method: "POST",
       body: JSON.stringify({ query, top_k: limit }),
     });
   }
 
   async listDocuments() {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.request<any[]>(`/v1/tenants/${this.config.tenantId}/documents`);
+    return this.request<import("./rag-types").DocumentMeta[]>(`/v1/tenants/${this.config.tenantId}/documents`);
   }
 
   async createSession() {
-    return this.request<{ sessionId: string }>(
+    return this.request<{ sessionId: string; createdAt: string }>(
       `/v1/tenants/${this.config.tenantId}/chat/sessions`,
       { method: "POST", body: JSON.stringify({ user_id: this.config.userId }) },
     );
   }
 
-  async chat(sessionId: string, message: string): Promise<ReadableStream<Uint8Array> | null> {
+  async chat(sessionId: string, message: string, signal?: AbortSignal): Promise<ReadableStream<Uint8Array> | null> {
     const url = `${this.config.apiUrl.replace(/\/$/, "")}/v1/tenants/${this.config.tenantId}/chat/sessions/${sessionId}/messages`;
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
@@ -77,9 +109,27 @@ export class RetrieverClient {
     };
     if (this.config.llmKey) headers["X-LLM-Key"] = this.config.llmKey;
     if (this.config.llmProvider) headers["X-LLM-Provider"] = this.config.llmProvider;
-    const res = await fetch(url, { method: "POST", headers, body: JSON.stringify({ query: message }) });
-    if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
-    return res.body;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+    const combinedSignal = signal
+      ? combineAbortSignals(signal, controller.signal)
+      : controller.signal;
+
+    try {
+      const res = await fetchWithRetry(url, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ query: message, stream: true }),
+        signal: combinedSignal,
+      });
+      clearTimeout(timeoutId);
+      if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
+      return res.body;
+    } catch (err) {
+      clearTimeout(timeoutId);
+      throw err;
+    }
   }
 
   async uploadDocument(file: File) {
@@ -96,4 +146,16 @@ export class RetrieverClient {
       method: "DELETE",
     });
   }
+}
+
+function combineAbortSignals(...signals: AbortSignal[]): AbortSignal {
+  const controller = new AbortController();
+  for (const signal of signals) {
+    if (signal.aborted) {
+      controller.abort(signal.reason);
+      return controller.signal;
+    }
+    signal.addEventListener("abort", () => controller.abort(signal.reason), { once: true });
+  }
+  return controller.signal;
 }

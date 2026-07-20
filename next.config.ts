@@ -20,7 +20,7 @@ const nextConfig: NextConfig = {
               `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://va.vercel-scripts.com https://cdn.jsdelivr.net; ` +
               "style-src 'self' 'unsafe-inline'; " +
               "img-src 'self' data: blob:; " +
-               `connect-src 'self'${isDev ? " ws: wss:" : ""} https://va.vercel-scripts.com https://cdn.jsdelivr.net https://rag.prateeq.in; ` +
+               `connect-src 'self'${isDev ? " ws: wss: http://localhost:8000" : ""} https://va.vercel-scripts.com https://cdn.jsdelivr.net https://rag.prateeq.in; ` +
               "worker-src 'self' blob:; " +
               "font-src 'self'; " +
               "object-src 'none'; " +
