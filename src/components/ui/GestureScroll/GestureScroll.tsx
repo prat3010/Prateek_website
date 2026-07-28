@@ -28,6 +28,38 @@ const CONNECTIONS = [
   [0, 17] // Palm base
 ];
 
+// Module-level script loader cache to avoid race conditions when loading MediaPipe CDN scripts
+const scriptPromises = new Map<string, Promise<void>>();
+
+const loadScript = (src: string): Promise<void> => {
+  if (scriptPromises.has(src)) {
+    return scriptPromises.get(src)!;
+  }
+  const promise = new Promise<void>((resolve, reject) => {
+    const existingScript = document.querySelector<HTMLScriptElement>(`script[src="${src}"]`);
+    if (existingScript) {
+      if (existingScript.dataset.loaded === 'true') {
+        resolve();
+        return;
+      }
+      existingScript.addEventListener('load', () => resolve());
+      existingScript.addEventListener('error', () => reject(new Error(`Failed to load script: ${src}`)));
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = src;
+    script.crossOrigin = 'anonymous';
+    script.onload = () => {
+      script.dataset.loaded = 'true';
+      resolve();
+    };
+    script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
+    document.head.appendChild(script);
+  });
+  scriptPromises.set(src, promise);
+  return promise;
+};
+
 export default function GestureScroll() {
   const lenis = useLenis();
   const { isDetailsHidden, isNoir } = useTheme();
@@ -50,7 +82,18 @@ export default function GestureScroll() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handsRef = useRef<any>(null);
 
-  // Scroll Tracking State Ref (avoid trigger re-renders on micro-updates)
+  // Dynamic values stored in refs for callback stability
+  const lenisRef = useRef(lenis);
+  useEffect(() => {
+    lenisRef.current = lenis;
+  }, [lenis]);
+
+  const isNoirRef = useRef(isNoir);
+  useEffect(() => {
+    isNoirRef.current = isNoir;
+  }, [isNoir]);
+
+  // Scroll Tracking State Ref
   const scrollState = useRef({
     isPinched: false,
     startY: 0,
@@ -59,23 +102,7 @@ export default function GestureScroll() {
     targetScrollY: 0,
   });
 
-  // Dynamic script helper
-  const loadScript = (src: string): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      if (document.querySelector(`script[src="${src}"]`)) {
-        resolve();
-        return;
-      }
-      const script = document.createElement('script');
-      script.src = src;
-      script.crossOrigin = 'anonymous';
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
-      document.head.appendChild(script);
-    });
-  };
-
-  // Callback to process tracked hands (memoized with useCallback)
+  // Callback to process tracked hands
   const onResults = useCallback((results: HandsResults) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -97,19 +124,19 @@ export default function GestureScroll() {
       const indexTip = landmarks[8];
       const middleMcp = landmarks[9];
 
-      // Hand Size Calculation (Wrist to Middle Finger MCP)
-      const dxHand = wrist.x - middleMcp.x;
-      const dyHand = wrist.y - middleMcp.y;
+      // Hand Size Calculation (Wrist to Middle Finger MCP in canvas pixels)
+      const dxHand = (wrist.x - middleMcp.x) * canvas.width;
+      const dyHand = (wrist.y - middleMcp.y) * canvas.height;
       const handSize = Math.sqrt(dxHand * dxHand + dyHand * dyHand);
 
-      // Pinch Distance Calculation (Thumb tip to Index tip)
-      const dxPinch = thumbTip.x - indexTip.x;
-      const dyPinch = thumbTip.y - indexTip.y;
+      // Pinch Distance Calculation (Thumb tip to Index tip in canvas pixels)
+      const dxPinch = (thumbTip.x - indexTip.x) * canvas.width;
+      const dyPinch = (thumbTip.y - indexTip.y) * canvas.height;
       const pinchDist = Math.sqrt(dxPinch * dxPinch + dyPinch * dyPinch);
 
-      // Scale-invariant ratio
-      const ratio = handSize > 0 ? pinchDist / handSize : pinchDist / 0.15;
-      const isPinching = ratio < 0.23;
+      // Scale-invariant ratio with hysteresis to prevent flickering
+      const ratio = handSize > 0 ? pinchDist / handSize : 0.5;
+      const isPinching = scrollState.current.isPinched ? ratio < 0.32 : ratio < 0.25;
 
       // Handle dragging action transitions
       if (isPinching) {
@@ -118,7 +145,7 @@ export default function GestureScroll() {
           // Start a new scroll drag session
           scrollState.current.isPinched = true;
           scrollState.current.startY = pinchY;
-          scrollState.current.startScrollY = lenis ? lenis.scroll : window.scrollY;
+          scrollState.current.startScrollY = lenisRef.current ? lenisRef.current.scroll : window.scrollY;
           scrollState.current.currentScrollY = scrollState.current.startScrollY;
           scrollState.current.targetScrollY = scrollState.current.startScrollY;
           setScrollActiveState(true);
@@ -138,12 +165,14 @@ export default function GestureScroll() {
 
       setHasHandDetected(true);
 
+      const noirActive = isNoirRef.current;
+
       // Draw skeleton lines
       ctx.lineWidth = 3;
       ctx.lineCap = 'round';
       ctx.strokeStyle = isPinching
-        ? (isNoir ? '#00e676' : '#79B48B')  // Neon/sage green
-        : (isNoir ? '#00f0ff' : '#5A8EB6'); // Cyan/steel blue
+        ? (noirActive ? '#00e676' : '#79B48B')  // Neon/sage green
+        : (noirActive ? '#00f0ff' : '#5A8EB6'); // Cyan/steel blue
 
       CONNECTIONS.forEach(([start, end]) => {
         const pt1 = landmarks[start];
@@ -163,7 +192,7 @@ export default function GestureScroll() {
           ctx.fillStyle = isPinching ? '#ff1744' : '#ffd600'; // red when pinched, yellow otherwise
         } else {
           ctx.arc(pt.x * canvas.width, pt.y * canvas.height, 3.5, 0, 2 * Math.PI);
-          ctx.fillStyle = isNoir ? '#ffffff' : '#2B2B36';
+          ctx.fillStyle = noirActive ? '#ffffff' : '#2B2B36';
         }
         ctx.fill();
       });
@@ -191,36 +220,54 @@ export default function GestureScroll() {
         setScrollActiveState(false);
       }
     }
-  }, [lenis, isNoir]);
+  }, []);
 
-  // Synchronize scroll coordinate state from Lenis updates when not pinching
+  // Use a ref to hold onResults callback so hands model callback never gets stale
+  const onResultsRef = useRef(onResults);
   useEffect(() => {
-    if (!lenis || !isActive) return;
+    onResultsRef.current = onResults;
+  }, [onResults]);
+
+  // Synchronize scroll coordinate state from scroll events when not pinching
+  useEffect(() => {
+    if (!isActive) return;
 
     const handleScroll = () => {
       if (!scrollState.current.isPinched) {
-        scrollState.current.currentScrollY = lenis.scroll;
-        scrollState.current.targetScrollY = lenis.scroll;
+        const currentY = lenis ? lenis.scroll : window.scrollY;
+        scrollState.current.currentScrollY = currentY;
+        scrollState.current.targetScrollY = currentY;
       }
     };
 
-    lenis.on('scroll', handleScroll);
+    if (lenis) {
+      lenis.on('scroll', handleScroll);
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
     return () => {
-      lenis.off('scroll', handleScroll);
+      if (lenis) {
+        lenis.off('scroll', handleScroll);
+      }
+      window.removeEventListener('scroll', handleScroll);
     };
   }, [lenis, isActive]);
 
   // Smoothly interpolate (lerp) the scroll position in an animation loop
   useEffect(() => {
-    if (!isActive || !lenis) return;
+    if (!isActive) return;
 
     let frameId: number;
     const updateScroll = () => {
-      if (scrollState.current.isPinched) {
-        const diff = scrollState.current.targetScrollY - scrollState.current.currentScrollY;
-        if (Math.abs(diff) > 0.5) {
-          scrollState.current.currentScrollY += diff * 0.15; // Smooth linear interpolation
-          lenis.scrollTo(scrollState.current.currentScrollY, { immediate: true });
+      // Perform smooth lerp whenever currentScrollY hasn't caught up with targetScrollY
+      const diff = scrollState.current.targetScrollY - scrollState.current.currentScrollY;
+      if (Math.abs(diff) > 0.1) {
+        scrollState.current.currentScrollY += diff * 0.2; // Smooth linear interpolation
+        const currentLenis = lenisRef.current;
+        if (currentLenis) {
+          currentLenis.scrollTo(scrollState.current.currentScrollY, { immediate: true });
+        } else {
+          window.scrollTo({ top: scrollState.current.currentScrollY, behavior: 'instant' });
         }
       }
       frameId = requestAnimationFrame(updateScroll);
@@ -228,7 +275,7 @@ export default function GestureScroll() {
 
     frameId = requestAnimationFrame(updateScroll);
     return () => cancelAnimationFrame(frameId);
-  }, [isActive, lenis]);
+  }, [isActive]);
 
   // Shut down camera and cleanup tracks safely
   const shutdownCamera = useCallback(() => {
@@ -239,6 +286,15 @@ export default function GestureScroll() {
         console.warn('Error stopping camera utility:', err);
       }
       cameraRef.current = null;
+    }
+
+    if (handsRef.current) {
+      try {
+        handsRef.current.close();
+      } catch (err) {
+        console.warn('Error closing MediaPipe hands:', err);
+      }
+      handsRef.current = null;
     }
 
     if (videoRef.current && videoRef.current.srcObject) {
@@ -256,6 +312,7 @@ export default function GestureScroll() {
     scrollState.current.isPinched = false;
     setScrollActiveState(false);
     setHasHandDetected(false);
+    setIsModelLoaded(false);
   }, []);
 
   // Toggle Hand Gesture mode active state
@@ -277,7 +334,7 @@ export default function GestureScroll() {
 
     const initMediaPipe = async () => {
       try {
-        // Load scripts from CDN
+        // Load scripts from CDN safely without race conditions
         await Promise.all([
           loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js'),
           loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js')
@@ -291,7 +348,7 @@ export default function GestureScroll() {
           throw new Error('MediaPipe libraries did not load correctly.');
         }
 
-        // Initialize Hands Model
+        // Initialize Hands Model cleanly
         if (!handsRef.current) {
           const hands = new win.Hands({
             locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
@@ -304,11 +361,18 @@ export default function GestureScroll() {
             minTrackingConfidence: 0.5
           });
 
-          hands.onResults(onResults);
+          hands.onResults((results: HandsResults) => {
+            if (onResultsRef.current) {
+              onResultsRef.current(results);
+            }
+          });
+
           handsRef.current = hands;
         }
 
-        setIsModelLoaded(true);
+        if (!isCancelled) {
+          setIsModelLoaded(true);
+        }
 
         // Start camera stream via MediaPipe helper
         if (videoRef.current && canvasRef.current) {
@@ -318,7 +382,7 @@ export default function GestureScroll() {
 
           const camera = new win.Camera(videoRef.current, {
             onFrame: async () => {
-              if (videoRef.current && handsRef.current) {
+              if (videoRef.current && videoRef.current.readyState >= 2 && handsRef.current) {
                 await handsRef.current.send({ image: videoRef.current });
               }
             },
@@ -335,7 +399,6 @@ export default function GestureScroll() {
         console.error('Hand tracking initialization failed:', error);
         if (!isCancelled) {
           setLoadError(error.message || 'Webcam permission denied or not found.');
-          setIsActive(false);
         }
       }
     };
@@ -346,12 +409,14 @@ export default function GestureScroll() {
       isCancelled = true;
       shutdownCamera();
     };
-  }, [isActive, onResults, shutdownCamera]);
+  }, [isActive, shutdownCamera]);
 
   // Determine indicator state
   let statusText = 'No hand detected';
   let indicatorClass = '';
-  if (hasHandDetected) {
+  if (loadError) {
+    statusText = 'Error loading camera';
+  } else if (hasHandDetected) {
     if (scrollActiveState) {
       statusText = 'Scrolling';
       indicatorClass = styles.scrolling;
@@ -360,13 +425,6 @@ export default function GestureScroll() {
       indicatorClass = styles.active;
     }
   }
-
-  // Handle errors
-  useEffect(() => {
-    if (loadError) {
-      alert(`Gesture Scroll Error: ${loadError}`);
-    }
-  }, [loadError]);
 
   return (
     <div className={`${styles.container} ${isDetailsHidden ? styles.hidden : ''}`}>
@@ -418,10 +476,16 @@ export default function GestureScroll() {
             />
             <canvas ref={canvasRef} className={styles.overlayCanvas} />
             
-            {!isModelLoaded && (
+            {!isModelLoaded && !loadError && (
               <div className={styles.loadingSpinner}>
                 <Loader2 className="animate-spin" size={24} />
                 <span>STARTING...</span>
+              </div>
+            )}
+
+            {loadError && (
+              <div className={styles.loadingSpinner} style={{ color: '#ff1744' }}>
+                <span>CAMERA ERROR</span>
               </div>
             )}
           </div>
@@ -431,7 +495,13 @@ export default function GestureScroll() {
             <span>{statusText}</span>
           </div>
 
-          {showHelp && (
+          {loadError && (
+            <p className={styles.instructions} style={{ color: '#ff1744' }}>
+              {loadError}
+            </p>
+          )}
+
+          {showHelp && !loadError && (
             <p className={styles.instructions}>
               Pinch your <strong>Thumb & Index</strong> fingers together to grab the screen, then drag <strong>Up or Down</strong> to scroll. Release the pinch to stop.
             </p>
@@ -441,3 +511,4 @@ export default function GestureScroll() {
     </div>
   );
 }
+
