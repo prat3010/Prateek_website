@@ -332,11 +332,18 @@ export default function GestureScroll() {
 
     const initMediaPipe = async () => {
       try {
-        // Load scripts locally from /mediapipe/ public route
-        await Promise.all([
-          loadScript('/mediapipe/camera_utils.js'),
-          loadScript('/mediapipe/hands.js')
-        ]);
+        // Load scripts locally from /mediapipe/ public route with CDN fallback
+        try {
+          await Promise.all([
+            loadScript('/mediapipe/camera_utils.js'),
+            loadScript('/mediapipe/hands.js')
+          ]);
+        } catch {
+          await Promise.all([
+            loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js'),
+            loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js')
+          ]);
+        }
 
         if (isCancelled) return;
 
@@ -346,10 +353,10 @@ export default function GestureScroll() {
           throw new Error('MediaPipe libraries did not load correctly.');
         }
 
-        // Initialize Hands Model cleanly using local asset path with CDN fallback
+        // Initialize Hands Model cleanly using locateFile CDN path for WASM & TFLite models
         if (!handsRef.current) {
           const hands = new win.Hands({
-            locateFile: (file: string) => `/mediapipe/${file}`
+            locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
           });
 
           hands.setOptions({
@@ -391,10 +398,12 @@ export default function GestureScroll() {
 
           const camera = new win.Camera(videoRef.current, {
             onFrame: async () => {
-              if (videoRef.current && handsRef.current && procCtx) {
+              const video = videoRef.current;
+              const hands = handsRef.current;
+              if (video && hands && video.readyState >= 2 && video.videoWidth > 0 && procCtx) {
                 try {
-                  procCtx.drawImage(videoRef.current, 0, 0, 320, 240);
-                  await handsRef.current.send({ image: procCanvas });
+                  procCtx.drawImage(video, 0, 0, 320, 240);
+                  await hands.send({ image: procCanvas });
                 } catch (sendErr) {
                   console.warn('MediaPipe send frame error:', sendErr);
                 }
