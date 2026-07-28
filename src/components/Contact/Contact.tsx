@@ -73,17 +73,19 @@ function Contact() {
     const intentLabel = activeAudience === 'business'
       ? ({
           general: 'General Freelance Inquiry',
-          'landing-page': 'Landing Page Package ($400 - $700)',
-          'web-application': 'Custom Web Application ($1,200 - $2,500)',
-          'monthly-support': 'Monthly Support & SEO ($150/mo)',
+          'landing-page': 'Landing Page Package ($300 - $550)',
+          'web-application': 'Custom Web Application ($1,000 - $1,800)',
+          'monthly-support': 'Monthly Support & SEO ($100/mo)',
+          'ai-knowledge-base': 'Private AI Knowledge Base & Assistant ($1,500 - $3,000)',
           'custom-quote': 'Other / Custom Website Quote'
         }[intent] || intent)
       : ({
           general: 'General Collaboration / Inquiry',
           hiring: 'Hiring / Employment Opportunity',
-          mentorship: 'Hourly Mentorship / Consulting ($50/hr)',
-          architecture: 'Architecture Review ($250/session)',
-          security: 'Codebase Security Audit ($450/audit)',
+          mentorship: 'Hourly Mentorship / Consulting ($40/hr)',
+          architecture: 'Architecture Review ($200/session)',
+          security: 'Codebase Security Audit ($350/audit)',
+          'enterprise-rag': 'Enterprise RAG Engine & Pipeline ($2,000 - $3,800)',
           'open-source': 'Open-Source Collaboration'
         }[intent] || intent);
 
@@ -183,18 +185,20 @@ function Contact() {
                 {activeAudience === 'business' ? (
                   <>
                     <option value="general">General Freelance Inquiry</option>
-                    <option value="landing-page">Landing Page Package ($400 - $700)</option>
-                    <option value="web-application">Custom Web Application ($1,200 - $2,500)</option>
-                    <option value="monthly-support">Monthly Support & SEO ($150/mo)</option>
+                    <option value="landing-page">Landing Page Package ($300 - $550)</option>
+                    <option value="web-application">Custom Web Application ($1,000 - $1,800)</option>
+                    <option value="monthly-support">Monthly Support & SEO ($100/mo)</option>
+                    <option value="ai-knowledge-base">Private AI Knowledge Base & Assistant ($1,500 - $3,000)</option>
                     <option value="custom-quote">Other / Custom Website Quote</option>
                   </>
                 ) : (
                   <>
                     <option value="general">General Collaboration / Inquiry</option>
                     <option value="hiring">Hiring / Employment Opportunity</option>
-                    <option value="mentorship">Hourly Mentorship / Consulting ($50/hr)</option>
-                    <option value="architecture">Architecture Review ($250/session)</option>
-                    <option value="security">Codebase Security Audit ($450/audit)</option>
+                    <option value="mentorship">Hourly Mentorship / Consulting ($40/hr)</option>
+                    <option value="architecture">Architecture Review ($200/session)</option>
+                    <option value="security">Codebase Security Audit ($350/audit)</option>
+                    <option value="enterprise-rag">Enterprise RAG Engine & Pipeline ($2,000 - $3,800)</option>
                     <option value="open-source">Open-Source Collaboration</option>
                   </>
                 )}
