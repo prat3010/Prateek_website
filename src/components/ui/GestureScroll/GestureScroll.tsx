@@ -336,8 +336,8 @@ export default function GestureScroll() {
       try {
         // Load scripts from CDN safely without race conditions
         await Promise.all([
-          loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js'),
-          loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js')
+          loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.4/camera_utils.js'),
+          loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/hands.js')
         ]);
 
         if (isCancelled) return;
@@ -351,7 +351,7 @@ export default function GestureScroll() {
         // Initialize Hands Model cleanly
         if (!handsRef.current) {
           const hands = new win.Hands({
-            locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+            locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/${file}`
           });
 
           hands.setOptions({
