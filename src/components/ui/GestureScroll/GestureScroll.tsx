@@ -326,6 +326,9 @@ export default function GestureScroll() {
     }
   };
 
+  // Offscreen canvas ref for snapshotting video frames into clean 2D pixel memory
+  const processingCanvasRef = useRef<HTMLCanvasElement | null>(null);
+
   // Initialize MediaPipe scripts and Camera feed
   useEffect(() => {
     if (!isActive) return;
@@ -335,9 +338,9 @@ export default function GestureScroll() {
 
     const initMediaPipe = async () => {
       try {
-        // Load MediaPipe Hands script safely with CDN fallbacks
+        // Load MediaPipe Hands script safely with pinned CDN fallbacks
         try {
-          await loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js');
+          await loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js');
         } catch {
           await loadScript('https://unpkg.com/@mediapipe/hands/hands.js');
         }
@@ -353,12 +356,12 @@ export default function GestureScroll() {
         // Initialize Hands Model cleanly
         if (!handsRef.current) {
           const hands = new win.Hands({
-            locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+            locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/${file}`
           });
 
           hands.setOptions({
             maxNumHands: 1,
-            modelComplexity: 0,
+            modelComplexity: 1,
             minDetectionConfidence: 0.3,
             minTrackingConfidence: 0.3
           });
@@ -372,7 +375,7 @@ export default function GestureScroll() {
           try {
             await hands.initialize();
           } catch (initErr) {
-            console.warn('MediaPipe hands.initialize failed, proceeding with lazy init:', initErr);
+            console.warn('MediaPipe hands.initialize deferred:', initErr);
           }
 
           handsRef.current = hands;
@@ -410,7 +413,17 @@ export default function GestureScroll() {
           canvasRef.current.height = 240;
         }
 
-        // Start processing frames with concurrency locking
+        if (!processingCanvasRef.current) {
+          const pCanvas = document.createElement('canvas');
+          pCanvas.width = 320;
+          pCanvas.height = 240;
+          processingCanvasRef.current = pCanvas;
+        }
+
+        const procCanvas = processingCanvasRef.current;
+        const procCtx = procCanvas.getContext('2d', { willReadFrequently: true });
+
+        // Start processing frames with processing canvas snapshots
         let isProcessingFrame = false;
         const processFrame = async () => {
           if (
@@ -422,9 +435,12 @@ export default function GestureScroll() {
           ) {
             isProcessingFrame = true;
             try {
-              await handsRef.current.send({ image: videoRef.current });
+              if (procCtx && videoRef.current) {
+                procCtx.drawImage(videoRef.current, 0, 0, procCanvas.width, procCanvas.height);
+                await handsRef.current.send({ image: procCanvas });
+              }
             } catch (err) {
-              console.warn('Frame processing dropped:', err);
+              console.warn('[GestureScroll] Frame processing error:', err);
             } finally {
               isProcessingFrame = false;
             }
