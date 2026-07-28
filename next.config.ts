@@ -17,10 +17,10 @@ const nextConfig: NextConfig = {
                         key: "Content-Security-Policy",
             value:
               "default-src 'self'; " +
-              `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://va.vercel-scripts.com https://cdn.jsdelivr.net; ` +
+              `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'${isDev ? " 'unsafe-eval'" : ""} https://va.vercel-scripts.com https://cdn.jsdelivr.net; ` +
               "style-src 'self' 'unsafe-inline'; " +
               "img-src 'self' data: blob:; " +
-               `connect-src 'self'${isDev ? " ws: wss: http://localhost:8000" : ""} https://va.vercel-scripts.com https://cdn.jsdelivr.net https://rag.prateeq.in; ` +
+              `connect-src 'self'${isDev ? " ws: wss: http://localhost:8000" : ""} https://va.vercel-scripts.com https://cdn.jsdelivr.net https://rag.prateeq.in https://storage.googleapis.com; ` +
               "worker-src 'self' blob:; " +
               "font-src 'self'; " +
               "object-src 'none'; " +
