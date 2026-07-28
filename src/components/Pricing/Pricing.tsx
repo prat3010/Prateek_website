@@ -68,6 +68,18 @@ function Pricing({ resumeData }: PricingProps) {
             "Security and package updates"
           ],
           cta: "monthly-support"
+        },
+        {
+          title: "Private AI Knowledge Base & Assistant",
+          price: isIndia ? "₹1,20,000 - ₹2,40,000" : "$1,500 - $3,000",
+          description: "Turn your company's PDFs, SOPs, and internal data into a 100% private, secure AI search assistant.",
+          features: [
+            "Custom RAG document ingestion pipeline",
+            "100% Data Privacy (No public LLM training)",
+            "Embedded Chat Interface for Web or Team",
+            "Admin Dashboard & Role Access Control"
+          ],
+          cta: "ai-knowledge-base"
         }
       ];
     }
@@ -107,6 +119,18 @@ function Pricing({ resumeData }: PricingProps) {
           "Remediation notes"
         ],
         cta: "security"
+      },
+      {
+        title: "Enterprise RAG Engine & Pipeline",
+        price: isIndia ? "₹1,50,000 - ₹3,00,000" : "$2,000 - $3,800",
+        description: "Production-grade headless RAG infrastructure with PostgreSQL pgvector, hybrid search, RLS multi-tenancy, and self-hosted embeddings.",
+        features: [
+          "Multi-Tenant RLS Database Schema & Isolation",
+          "Hybrid Search (HNSW Dense + GIN BM25) + RRF Reranking",
+          "Local Ollama / Custom Embedding Pipeline",
+          "FastAPI Async REST Gateway with SSE Streaming"
+        ],
+        cta: "enterprise-rag"
       }
     ];
   }, [activeAudience, region]);
