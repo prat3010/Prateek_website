@@ -124,19 +124,19 @@ export default function GestureScroll() {
       const indexTip = landmarks[8];
       const middleMcp = landmarks[9];
 
-      // Hand Size Calculation (Wrist to Middle Finger MCP in canvas pixels)
-      const dxHand = (wrist.x - middleMcp.x) * canvas.width;
-      const dyHand = (wrist.y - middleMcp.y) * canvas.height;
+      // Hand Size Calculation (Wrist to Middle Finger MCP)
+      const dxHand = wrist.x - middleMcp.x;
+      const dyHand = wrist.y - middleMcp.y;
       const handSize = Math.sqrt(dxHand * dxHand + dyHand * dyHand);
 
-      // Pinch Distance Calculation (Thumb tip to Index tip in canvas pixels)
-      const dxPinch = (thumbTip.x - indexTip.x) * canvas.width;
-      const dyPinch = (thumbTip.y - indexTip.y) * canvas.height;
+      // Pinch Distance Calculation (Thumb tip to Index tip)
+      const dxPinch = thumbTip.x - indexTip.x;
+      const dyPinch = thumbTip.y - indexTip.y;
       const pinchDist = Math.sqrt(dxPinch * dxPinch + dyPinch * dyPinch);
 
-      // Scale-invariant ratio with hysteresis to prevent flickering
-      const ratio = handSize > 0 ? pinchDist / handSize : 0.5;
-      const isPinching = scrollState.current.isPinched ? ratio < 0.32 : ratio < 0.25;
+      // Scale-invariant ratio
+      const ratio = handSize > 0 ? pinchDist / handSize : pinchDist / 0.15;
+      const isPinching = ratio < 0.23;
 
       // Handle dragging action transitions
       if (isPinching) {
@@ -222,7 +222,7 @@ export default function GestureScroll() {
     }
   }, []);
 
-  // Use a ref to hold onResults callback so hands model callback never gets stale
+  // Use a ref to hold onResults callback so MediaPipe callback reference never gets stale
   const onResultsRef = useRef(onResults);
   useEffect(() => {
     onResultsRef.current = onResults;
@@ -259,7 +259,6 @@ export default function GestureScroll() {
 
     let frameId: number;
     const updateScroll = () => {
-      // Perform smooth lerp whenever currentScrollY hasn't caught up with targetScrollY
       const diff = scrollState.current.targetScrollY - scrollState.current.currentScrollY;
       if (Math.abs(diff) > 0.1) {
         scrollState.current.currentScrollY += diff * 0.2; // Smooth linear interpolation
@@ -297,18 +296,6 @@ export default function GestureScroll() {
       handsRef.current = null;
     }
 
-    if (videoRef.current && videoRef.current.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream;
-      stream.getTracks().forEach(track => {
-        try {
-          track.stop();
-        } catch (e) {
-          console.error('Failed to stop video track:', e);
-        }
-      });
-      videoRef.current.srcObject = null;
-    }
-
     scrollState.current.isPinched = false;
     setScrollActiveState(false);
     setHasHandDetected(false);
@@ -326,44 +313,39 @@ export default function GestureScroll() {
     }
   };
 
-  // Offscreen canvas ref for snapshotting video frames into clean 2D pixel memory
-  const processingCanvasRef = useRef<HTMLCanvasElement | null>(null);
-
   // Initialize MediaPipe scripts and Camera feed
   useEffect(() => {
     if (!isActive) return;
 
     let isCancelled = false;
-    let animFrameId: number;
 
     const initMediaPipe = async () => {
       try {
-        // Load MediaPipe Hands script safely with pinned CDN fallbacks
-        try {
-          await loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js');
-        } catch {
-          await loadScript('https://unpkg.com/@mediapipe/hands/hands.js');
-        }
+        // Load scripts from CDN
+        await Promise.all([
+          loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js'),
+          loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js')
+        ]);
 
         if (isCancelled) return;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const win = window as any;
-        if (!win.Hands) {
-          throw new Error('MediaPipe Hands library failed to initialize.');
+        if (!win.Hands || !win.Camera) {
+          throw new Error('MediaPipe libraries did not load correctly.');
         }
 
         // Initialize Hands Model cleanly
         if (!handsRef.current) {
           const hands = new win.Hands({
-            locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/${file}`
+            locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
           });
 
           hands.setOptions({
             maxNumHands: 1,
             modelComplexity: 1,
-            minDetectionConfidence: 0.3,
-            minTrackingConfidence: 0.3
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
           });
 
           hands.onResults((results: HandsResults) => {
@@ -372,12 +354,6 @@ export default function GestureScroll() {
             }
           });
 
-          try {
-            await hands.initialize();
-          } catch (initErr) {
-            console.warn('MediaPipe hands.initialize deferred:', initErr);
-          }
-
           handsRef.current = hands;
         }
 
@@ -385,72 +361,24 @@ export default function GestureScroll() {
           setIsModelLoaded(true);
         }
 
-        // Request native webcam stream
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-          throw new Error('Webcam API is not supported in this browser.');
-        }
-
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            width: { ideal: 320 },
-            height: { ideal: 240 },
-            facingMode: 'user'
-          }
-        });
-
-        if (isCancelled) {
-          stream.getTracks().forEach(track => track.stop());
-          return;
-        }
-
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          await videoRef.current.play().catch(e => console.warn('Video play deferred:', e));
-        }
-
-        if (canvasRef.current) {
+        // Start camera stream via MediaPipe helper
+        if (videoRef.current && canvasRef.current) {
           canvasRef.current.width = 320;
           canvasRef.current.height = 240;
-        }
 
-        if (!processingCanvasRef.current) {
-          const pCanvas = document.createElement('canvas');
-          pCanvas.width = 320;
-          pCanvas.height = 240;
-          processingCanvasRef.current = pCanvas;
-        }
-
-        const procCanvas = processingCanvasRef.current;
-        const procCtx = procCanvas.getContext('2d', { willReadFrequently: true });
-
-        // Start processing frames with processing canvas snapshots
-        let isProcessingFrame = false;
-        const processFrame = async () => {
-          if (
-            !isCancelled && 
-            videoRef.current && 
-            videoRef.current.readyState >= 2 && 
-            handsRef.current &&
-            !isProcessingFrame
-          ) {
-            isProcessingFrame = true;
-            try {
-              if (procCtx && videoRef.current) {
-                procCtx.drawImage(videoRef.current, 0, 0, procCanvas.width, procCanvas.height);
-                await handsRef.current.send({ image: procCanvas });
+          const camera = new win.Camera(videoRef.current, {
+            onFrame: async () => {
+              if (videoRef.current && handsRef.current) {
+                await handsRef.current.send({ image: videoRef.current });
               }
-            } catch (err) {
-              console.warn('[GestureScroll] Frame processing error:', err);
-            } finally {
-              isProcessingFrame = false;
-            }
-          }
-          if (!isCancelled) {
-            animFrameId = requestAnimationFrame(processFrame);
-          }
-        };
+            },
+            width: 320,
+            height: 240
+          });
 
-        animFrameId = requestAnimationFrame(processFrame);
+          cameraRef.current = camera;
+          await camera.start();
+        }
 
       } catch (err) {
         const error = err as Error;
@@ -465,9 +393,6 @@ export default function GestureScroll() {
 
     return () => {
       isCancelled = true;
-      if (animFrameId) {
-        cancelAnimationFrame(animFrameId);
-      }
       shutdownCamera();
     };
   }, [isActive, shutdownCamera]);
