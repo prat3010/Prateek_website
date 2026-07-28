@@ -23,7 +23,7 @@ export function clearConfig() {
   localStorage.removeItem(STORAGE_KEY);
 }
 
-const REQUEST_TIMEOUT = 30_000;
+const REQUEST_TIMEOUT = 90_000;
 const MAX_RETRIES = 2;
 
 async function fetchWithRetry(url: string, options: RequestInit, retries = MAX_RETRIES): Promise<Response> {
