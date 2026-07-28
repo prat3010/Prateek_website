@@ -358,9 +358,9 @@ export default function GestureScroll() {
 
           hands.setOptions({
             maxNumHands: 1,
-            modelComplexity: 1,
-            minDetectionConfidence: 0.5,
-            minTrackingConfidence: 0.5
+            modelComplexity: 0,
+            minDetectionConfidence: 0.3,
+            minTrackingConfidence: 0.3
           });
 
           hands.onResults((results: HandsResults) => {
@@ -368,6 +368,12 @@ export default function GestureScroll() {
               onResultsRef.current(results);
             }
           });
+
+          try {
+            await hands.initialize();
+          } catch (initErr) {
+            console.warn('MediaPipe hands.initialize failed, proceeding with lazy init:', initErr);
+          }
 
           handsRef.current = hands;
         }
@@ -404,13 +410,23 @@ export default function GestureScroll() {
           canvasRef.current.height = 240;
         }
 
-        // Start processing frames with requestAnimationFrame
+        // Start processing frames with concurrency locking
+        let isProcessingFrame = false;
         const processFrame = async () => {
-          if (!isCancelled && videoRef.current && videoRef.current.readyState >= 2 && handsRef.current) {
+          if (
+            !isCancelled && 
+            videoRef.current && 
+            videoRef.current.readyState >= 2 && 
+            handsRef.current &&
+            !isProcessingFrame
+          ) {
+            isProcessingFrame = true;
             try {
               await handsRef.current.send({ image: videoRef.current });
             } catch (err) {
-              console.warn('Frame processing frame dropped:', err);
+              console.warn('Frame processing dropped:', err);
+            } finally {
+              isProcessingFrame = false;
             }
           }
           if (!isCancelled) {
