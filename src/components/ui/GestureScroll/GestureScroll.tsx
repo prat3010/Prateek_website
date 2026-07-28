@@ -360,10 +360,11 @@ export default function GestureScroll() {
           });
 
           hands.setOptions({
+            selfieMode: true,
             maxNumHands: 1,
             modelComplexity: 1,
-            minDetectionConfidence: 0.5,
-            minTrackingConfidence: 0.5
+            minDetectionConfidence: 0.4,
+            minTrackingConfidence: 0.4
           });
 
           hands.onResults((results: HandsResults) => {
