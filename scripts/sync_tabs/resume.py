@@ -263,11 +263,12 @@ def render_resume_tab():
                 
                 with tab_price_dev:
                     dev_tiers = pricing_data.get('developer', []) or []
-                    while len(dev_tiers) < 3:
+                    num_dev = max(3, len(dev_tiers))
+                    while len(dev_tiers) < num_dev:
                         dev_tiers.append({"title": "", "price": "", "description": "", "features": [], "cta": ""})
                     
                     updated_dev_tiers = []
-                    for t_idx in range(3):
+                    for t_idx in range(len(dev_tiers)):
                         tier = dev_tiers[t_idx]
                         st.markdown(f"**Tier #{t_idx + 1}**")
                         col_t1, col_t2 = st.columns(2)
@@ -293,11 +294,12 @@ def render_resume_tab():
                     
                 with tab_price_biz:
                     biz_tiers = pricing_data.get('business', []) or []
-                    while len(biz_tiers) < 3:
+                    num_biz = max(3, len(biz_tiers))
+                    while len(biz_tiers) < num_biz:
                         biz_tiers.append({"title": "", "price": "", "description": "", "features": [], "cta": ""})
                     
                     updated_biz_tiers = []
-                    for t_idx in range(3):
+                    for t_idx in range(len(biz_tiers)):
                         tier = biz_tiers[t_idx]
                         st.markdown(f"**Tier #{t_idx + 1}**")
                         col_tb1, col_tb2 = st.columns(2)
@@ -330,11 +332,12 @@ def render_resume_tab():
                 
                 with tab_price_dev_in:
                     dev_tiers_in = pricing_data_in.get('developer', []) or []
-                    while len(dev_tiers_in) < 3:
+                    num_dev_in = max(3, len(dev_tiers_in))
+                    while len(dev_tiers_in) < num_dev_in:
                         dev_tiers_in.append({"title": "", "price": "", "description": "", "features": [], "cta": ""})
                     
                     updated_dev_tiers_in = []
-                    for t_idx in range(3):
+                    for t_idx in range(len(dev_tiers_in)):
                         tier = dev_tiers_in[t_idx]
                         st.markdown(f"**Tier #{t_idx + 1}**")
                         col_t1, col_t2 = st.columns(2)
@@ -360,11 +363,12 @@ def render_resume_tab():
                     
                 with tab_price_biz_in:
                     biz_tiers_in = pricing_data_in.get('business', []) or []
-                    while len(biz_tiers_in) < 3:
+                    num_biz_in = max(3, len(biz_tiers_in))
+                    while len(biz_tiers_in) < num_biz_in:
                         biz_tiers_in.append({"title": "", "price": "", "description": "", "features": [], "cta": ""})
                     
                     updated_biz_tiers_in = []
-                    for t_idx in range(3):
+                    for t_idx in range(len(biz_tiers_in)):
                         tier = biz_tiers_in[t_idx]
                         st.markdown(f"**Tier #{t_idx + 1}**")
                         col_tb1, col_tb2 = st.columns(2)

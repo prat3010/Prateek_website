@@ -75,6 +75,18 @@
           "Security and package updates"
         ],
         "cta": "monthly-support"
+      },
+      {
+        "title": "Private AI Knowledge Base & Assistant",
+        "price": "$1,500 - $3,000",
+        "description": "Turn your company's PDFs, SOPs, and internal data into a 100% private, secure AI search assistant.",
+        "features": [
+          "Custom RAG document ingestion pipeline",
+          "100% Data Privacy (No public LLM training)",
+          "Embedded Chat Interface for Web or Team",
+          "Admin Dashboard & Role Access Control"
+        ],
+        "cta": "ai-knowledge-base"
       }
     ],
     "developer": [
@@ -113,6 +125,18 @@
           "Remediation notes"
         ],
         "cta": "security"
+      },
+      {
+        "title": "Enterprise RAG Engine & Pipeline",
+        "price": "$2,000 - $3,800",
+        "description": "Production-grade headless RAG infrastructure with PostgreSQL pgvector, hybrid search, RLS multi-tenancy, and self-hosted embeddings.",
+        "features": [
+          "Multi-Tenant RLS Database Schema & Isolation",
+          "Hybrid Search (HNSW Dense + GIN BM25) + RRF Reranking",
+          "Local Ollama / Custom Embedding Pipeline",
+          "FastAPI Async REST Gateway with SSE Streaming"
+        ],
+        "cta": "enterprise-rag"
       }
     ]
   },
@@ -143,7 +167,7 @@
       "Production-ready React & Next.js web applications",
       "Supabase database engineering & security setups",
       "Search Engine Optimization (SEO) & Web Telemetry setup",
-      "30 days of post-launch launch support & handoff documentation"
+      "30 days of post-launch support & handoff documentation"
     ]
   },
   "experience": [
@@ -237,6 +261,18 @@
           "Security and package updates"
         ],
         "description": "Ongoing maintenance, content updates, and periodic performance checks."
+      },
+      {
+        "cta": "ai-knowledge-base",
+        "price": "\u20b91,20,000 - \u20b92,40,000",
+        "title": "Private AI Knowledge Base & Assistant",
+        "features": [
+          "Custom RAG document ingestion pipeline",
+          "100% Data Privacy (No public LLM training)",
+          "Embedded Chat Interface for Web or Team",
+          "Admin Dashboard & Role Access Control"
+        ],
+        "description": "Turn your company's PDFs, SOPs, and internal data into a 100% private, secure AI search assistant."
       }
     ],
     "developer": [
@@ -275,6 +311,18 @@
           "Remediation notes"
         ],
         "description": "A practical review of secrets, access control, and common exposure points."
+      },
+      {
+        "cta": "enterprise-rag",
+        "price": "\u20b91,50,000 - \u20b93,00,000",
+        "title": "Enterprise RAG Engine & Pipeline",
+        "features": [
+          "Multi-Tenant RLS Database Schema & Isolation",
+          "Hybrid Search (HNSW Dense + GIN BM25) + RRF Reranking",
+          "Local Ollama / Custom Embedding Pipeline",
+          "FastAPI Async REST Gateway with SSE Streaming"
+        ],
+        "description": "Production-grade headless RAG infrastructure with PostgreSQL pgvector, hybrid search, RLS multi-tenancy, and self-hosted embeddings."
       }
     ]
   },
@@ -287,7 +335,7 @@
       "Production-ready React & Next.js web applications",
       "Supabase database engineering & security setups",
       "Search Engine Optimization (SEO) & Web Telemetry setup",
-      "30 days of post-launch launch support & handoff documentation"
+      "30 days of post-launch support & handoff documentation"
     ]
   }
 }
