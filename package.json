@@ -19,6 +19,8 @@
     "verify": "./scripts/verify.sh"
   },
   "dependencies": {
+    "@mediapipe/camera_utils": "^0.3.1675466862",
+    "@mediapipe/hands": "^0.4.1675469240",
     "@supabase/supabase-js": "^2.106.2",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
