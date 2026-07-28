@@ -331,27 +331,29 @@ export default function GestureScroll() {
     if (!isActive) return;
 
     let isCancelled = false;
+    let animFrameId: number;
 
     const initMediaPipe = async () => {
       try {
-        // Load scripts from CDN safely without race conditions
-        await Promise.all([
-          loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.4/camera_utils.js'),
-          loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/hands.js')
-        ]);
+        // Load MediaPipe Hands script safely with CDN fallbacks
+        try {
+          await loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js');
+        } catch {
+          await loadScript('https://unpkg.com/@mediapipe/hands/hands.js');
+        }
 
         if (isCancelled) return;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const win = window as any;
-        if (!win.Hands || !win.Camera) {
-          throw new Error('MediaPipe libraries did not load correctly.');
+        if (!win.Hands) {
+          throw new Error('MediaPipe Hands library failed to initialize.');
         }
 
         // Initialize Hands Model cleanly
         if (!handsRef.current) {
           const hands = new win.Hands({
-            locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/${file}`
+            locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
           });
 
           hands.setOptions({
@@ -374,25 +376,49 @@ export default function GestureScroll() {
           setIsModelLoaded(true);
         }
 
-        // Start camera stream via MediaPipe helper
-        if (videoRef.current && canvasRef.current) {
-          // Adjust canvas display sizes
+        // Request native webcam stream
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          throw new Error('Webcam API is not supported in this browser.');
+        }
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            width: { ideal: 320 },
+            height: { ideal: 240 },
+            facingMode: 'user'
+          }
+        });
+
+        if (isCancelled) {
+          stream.getTracks().forEach(track => track.stop());
+          return;
+        }
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          await videoRef.current.play().catch(e => console.warn('Video play deferred:', e));
+        }
+
+        if (canvasRef.current) {
           canvasRef.current.width = 320;
           canvasRef.current.height = 240;
-
-          const camera = new win.Camera(videoRef.current, {
-            onFrame: async () => {
-              if (videoRef.current && videoRef.current.readyState >= 2 && handsRef.current) {
-                await handsRef.current.send({ image: videoRef.current });
-              }
-            },
-            width: 320,
-            height: 240
-          });
-
-          cameraRef.current = camera;
-          await camera.start();
         }
+
+        // Start processing frames with requestAnimationFrame
+        const processFrame = async () => {
+          if (!isCancelled && videoRef.current && videoRef.current.readyState >= 2 && handsRef.current) {
+            try {
+              await handsRef.current.send({ image: videoRef.current });
+            } catch (err) {
+              console.warn('Frame processing frame dropped:', err);
+            }
+          }
+          if (!isCancelled) {
+            animFrameId = requestAnimationFrame(processFrame);
+          }
+        };
+
+        animFrameId = requestAnimationFrame(processFrame);
 
       } catch (err) {
         const error = err as Error;
@@ -407,6 +433,9 @@ export default function GestureScroll() {
 
     return () => {
       isCancelled = true;
+      if (animFrameId) {
+        cancelAnimationFrame(animFrameId);
+      }
       shutdownCamera();
     };
   }, [isActive, shutdownCamera]);
