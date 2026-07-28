@@ -110,9 +110,8 @@ export default function GestureScroll() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Clear and paint camera image to canvas (acting as mirror background)
+    // Clear transparent canvas per frame (live video renders underneath in .mirrorVideo)
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
 
     const hasHand = results.multiHandLandmarks && results.multiHandLandmarks.length > 0;
 

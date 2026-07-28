@@ -155,7 +155,7 @@
   height: 100%;
   object-fit: cover;
   transform: scaleX(-1); /* Mirror effect */
-  opacity: 0; /* Hidden but playing, we paint it to canvas */
+  opacity: 1;
   pointer-events: none;
 }
 
@@ -167,6 +167,7 @@
   height: 100%;
   transform: scaleX(-1); /* Mirror effect to match user hand */
   object-fit: cover;
+  pointer-events: none;
 }
 
 .visualizerStatus {
