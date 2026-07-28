@@ -1,24 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLenis } from 'lenis/react';
 import { useTheme } from '@/context/ThemeContext';
 import { Hand, X, HelpCircle, Loader2 } from 'lucide-react';
+import { HandLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 import styles from './GestureScroll.module.css';
 
-// Types for MediaPipe Hands API
-interface Landmark {
-  x: number;
-  y: number;
-  z: number;
-}
-
-interface HandsResults {
-  image: HTMLVideoElement;
-  multiHandLandmarks?: Landmark[][];
-}
-
-// Hand connections index structure
+// Hand landmark connections index structure
 const CONNECTIONS = [
   [0, 1], [1, 2], [2, 3], [3, 4], // Thumb
   [0, 5], [5, 6], [6, 7], [7, 8], // Index
@@ -28,42 +17,10 @@ const CONNECTIONS = [
   [0, 17] // Palm base
 ];
 
-// Module-level script loader cache to avoid race conditions when loading local MediaPipe scripts
-const scriptPromises = new Map<string, Promise<void>>();
-
-const loadScript = (src: string): Promise<void> => {
-  if (scriptPromises.has(src)) {
-    return scriptPromises.get(src)!;
-  }
-  const promise = new Promise<void>((resolve, reject) => {
-    const existingScript = document.querySelector<HTMLScriptElement>(`script[src="${src}"]`);
-    if (existingScript) {
-      if (existingScript.dataset.loaded === 'true') {
-        resolve();
-        return;
-      }
-      existingScript.addEventListener('load', () => resolve());
-      existingScript.addEventListener('error', () => reject(new Error(`Failed to load script: ${src}`)));
-      return;
-    }
-    const script = document.createElement('script');
-    script.src = src;
-    script.crossOrigin = 'anonymous';
-    script.onload = () => {
-      script.dataset.loaded = 'true';
-      resolve();
-    };
-    script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
-    document.head.appendChild(script);
-  });
-  scriptPromises.set(src, promise);
-  return promise;
-};
-
 export default function GestureScroll() {
   const lenis = useLenis();
   const { isDetailsHidden, isNoir } = useTheme();
-  
+
   // Component States
   const [isActive, setIsActive] = useState(false);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
@@ -72,17 +29,15 @@ export default function GestureScroll() {
   const [showHelp, setShowHelp] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  // HTML Element Refs
+  // Element Refs
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // Library/Instance Refs
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const cameraRef = useRef<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handsRef = useRef<any>(null);
+  // Instance Refs
+  const landmarkerRef = useRef<HandLandmarker | null>(null);
+  const animFrameIdRef = useRef<number | null>(null);
 
-  // Dynamic values stored in refs for callback stability
+  // Refs for state callbacks
   const lenisRef = useRef(lenis);
   useEffect(() => {
     lenisRef.current = lenis;
@@ -93,7 +48,7 @@ export default function GestureScroll() {
     isNoirRef.current = isNoir;
   }, [isNoir]);
 
-  // Scroll Tracking State Ref
+  // Scroll Tracking State
   const scrollState = useRef({
     isPinched: false,
     startY: 0,
@@ -102,132 +57,17 @@ export default function GestureScroll() {
     targetScrollY: 0,
   });
 
-  // Callback to process tracked hands
-  const onResults = useCallback((results: HandsResults) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    // Clear transparent canvas per frame (live video renders underneath in .mirrorVideo)
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    const hasHand = results.multiHandLandmarks && results.multiHandLandmarks.length > 0;
-
-    if (hasHand && results.multiHandLandmarks) {
-      const landmarks = results.multiHandLandmarks[0];
-      
-      const wrist = landmarks[0];
-      const thumbTip = landmarks[4];
-      const indexTip = landmarks[8];
-      const middleMcp = landmarks[9];
-
-      // Hand Size Calculation (Wrist to Middle Finger MCP)
-      const dxHand = wrist.x - middleMcp.x;
-      const dyHand = wrist.y - middleMcp.y;
-      const handSize = Math.sqrt(dxHand * dxHand + dyHand * dyHand);
-
-      // Pinch Distance Calculation (Thumb tip to Index tip)
-      const dxPinch = thumbTip.x - indexTip.x;
-      const dyPinch = thumbTip.y - indexTip.y;
-      const pinchDist = Math.sqrt(dxPinch * dxPinch + dyPinch * dyPinch);
-
-      // Scale-invariant ratio
-      const ratio = handSize > 0 ? pinchDist / handSize : pinchDist / 0.15;
-      const isPinching = ratio < 0.23;
-
-      // Handle dragging action transitions
-      if (isPinching) {
-        const pinchY = (thumbTip.y + indexTip.y) / 2;
-        if (!scrollState.current.isPinched) {
-          // Start a new scroll drag session
-          scrollState.current.isPinched = true;
-          scrollState.current.startY = pinchY;
-          scrollState.current.startScrollY = lenisRef.current ? lenisRef.current.scroll : window.scrollY;
-          scrollState.current.currentScrollY = scrollState.current.startScrollY;
-          scrollState.current.targetScrollY = scrollState.current.startScrollY;
-          setScrollActiveState(true);
-        } else {
-          // Active scroll drag session
-          const sensitivity = 2.8;
-          const deltaY = -(pinchY - scrollState.current.startY) * window.innerHeight * sensitivity;
-          const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-          scrollState.current.targetScrollY = Math.max(0, Math.min(scrollState.current.startScrollY + deltaY, maxScroll));
-        }
-      } else {
-        if (scrollState.current.isPinched) {
-          scrollState.current.isPinched = false;
-          setScrollActiveState(false);
-        }
-      }
-
-      setHasHandDetected(true);
-
-      const noirActive = isNoirRef.current;
-
-      // Draw skeleton lines
-      ctx.lineWidth = 3;
-      ctx.lineCap = 'round';
-      ctx.strokeStyle = isPinching
-        ? (noirActive ? '#00e676' : '#79B48B')  // Neon/sage green
-        : (noirActive ? '#00f0ff' : '#5A8EB6'); // Cyan/steel blue
-
-      CONNECTIONS.forEach(([start, end]) => {
-        const pt1 = landmarks[start];
-        const pt2 = landmarks[end];
-        ctx.beginPath();
-        ctx.moveTo(pt1.x * canvas.width, pt1.y * canvas.height);
-        ctx.lineTo(pt2.x * canvas.width, pt2.y * canvas.height);
-        ctx.stroke();
-      });
-
-      // Draw landmark dots
-      landmarks.forEach((pt: Landmark, idx: number) => {
-        ctx.beginPath();
-        if (idx === 4 || idx === 8) {
-          // Make thumb and index tip prominent
-          ctx.arc(pt.x * canvas.width, pt.y * canvas.height, 6, 0, 2 * Math.PI);
-          ctx.fillStyle = isPinching ? '#ff1744' : '#ffd600'; // red when pinched, yellow otherwise
-        } else {
-          ctx.arc(pt.x * canvas.width, pt.y * canvas.height, 3.5, 0, 2 * Math.PI);
-          ctx.fillStyle = noirActive ? '#ffffff' : '#2B2B36';
-        }
-        ctx.fill();
-      });
-
-      // Draw visual ring connecting pinched points
-      if (isPinching) {
-        const pX = ((thumbTip.x + indexTip.x) / 2) * canvas.width;
-        const pY = ((thumbTip.y + indexTip.y) / 2) * canvas.height;
-        
-        ctx.beginPath();
-        ctx.arc(pX, pY, 12, 0, 2 * Math.PI);
-        ctx.strokeStyle = '#ff1744';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.arc(pX, pY, 5, 0, 2 * Math.PI);
-        ctx.fillStyle = '#ff1744';
-        ctx.fill();
-      }
+  // Toggle Hand Gesture Mode
+  const handleToggle = () => {
+    if (isActive) {
+      setIsActive(false);
     } else {
-      setHasHandDetected(false);
-      if (scrollState.current.isPinched) {
-        scrollState.current.isPinched = false;
-        setScrollActiveState(false);
-      }
+      setIsActive(true);
+      setLoadError(null);
     }
-  }, []);
+  };
 
-  // Use a ref to hold onResults callback so MediaPipe callback reference never gets stale
-  const onResultsRef = useRef(onResults);
-  useEffect(() => {
-    onResultsRef.current = onResults;
-  }, [onResults]);
-
-  // Synchronize scroll coordinate state from scroll events when not pinching
+  // Scroll Event listener sync
   useEffect(() => {
     if (!isActive) return;
 
@@ -252,7 +92,7 @@ export default function GestureScroll() {
     };
   }, [lenis, isActive]);
 
-  // Smoothly interpolate (lerp) the scroll position in an animation loop
+  // Smooth lerp scroll loop
   useEffect(() => {
     if (!isActive) return;
 
@@ -260,7 +100,7 @@ export default function GestureScroll() {
     const updateScroll = () => {
       const diff = scrollState.current.targetScrollY - scrollState.current.currentScrollY;
       if (Math.abs(diff) > 0.1) {
-        scrollState.current.currentScrollY += diff * 0.2; // Smooth linear interpolation
+        scrollState.current.currentScrollY += diff * 0.2;
         const currentLenis = lenisRef.current;
         if (currentLenis) {
           currentLenis.scrollTo(scrollState.current.currentScrollY, { immediate: true });
@@ -275,160 +115,249 @@ export default function GestureScroll() {
     return () => cancelAnimationFrame(frameId);
   }, [isActive]);
 
-  // Shut down camera and cleanup tracks safely
-  const shutdownCamera = useCallback(() => {
-    if (cameraRef.current) {
-      try {
-        cameraRef.current.stop();
-      } catch (err) {
-        console.warn('Error stopping camera utility:', err);
-      }
-      cameraRef.current = null;
-    }
-
-    if (handsRef.current) {
-      try {
-        handsRef.current.close();
-      } catch (err) {
-        console.warn('Error closing MediaPipe hands:', err);
-      }
-      handsRef.current = null;
-    }
-
-    if (videoRef.current && videoRef.current.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream;
-      stream.getTracks().forEach(track => {
-        try {
-          track.stop();
-        } catch (e) {
-          console.error('Failed to stop video track:', e);
-        }
-      });
-      videoRef.current.srcObject = null;
-    }
-
-    scrollState.current.isPinched = false;
-    setScrollActiveState(false);
-    setHasHandDetected(false);
-    setIsModelLoaded(false);
-  }, []);
-
-  // Toggle Hand Gesture mode active state
-  const handleToggle = () => {
-    if (isActive) {
-      shutdownCamera();
-      setIsActive(false);
-    } else {
-      setIsActive(true);
-      setLoadError(null);
-    }
-  };
-
-  // Initialize MediaPipe scripts and Camera feed
+  // Main Hand Detection & Camera Loop using modern @mediapipe/tasks-vision
   useEffect(() => {
     if (!isActive) return;
 
     let isCancelled = false;
+    let localStream: MediaStream | null = null;
 
-    const initMediaPipe = async () => {
+    const initVision = async () => {
       try {
-        // Load scripts locally from /mediapipe/ public route with CDN fallback
-        try {
-          await Promise.all([
-            loadScript('/mediapipe/camera_utils.js'),
-            loadScript('/mediapipe/hands.js')
-          ]);
-        } catch {
-          await Promise.all([
-            loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js'),
-            loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js')
-          ]);
-        }
+        // Load WASM fileset for Tasks Vision
+        const vision = await FilesetResolver.forVisionTasks(
+          'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm'
+        );
 
         if (isCancelled) return;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const win = window as any;
-        if (!win.Hands || !win.Camera) {
-          throw new Error('MediaPipe libraries did not load correctly.');
+        // Initialize HandLandmarker
+        const landmarker = await HandLandmarker.createFromOptions(vision, {
+          baseOptions: {
+            modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
+            delegate: 'GPU'
+          },
+          runningMode: 'VIDEO',
+          numHands: 1
+        });
+
+        if (isCancelled) {
+          landmarker.close();
+          return;
         }
 
-        // Initialize Hands Model cleanly using pinned locateFile CDN path for WASM & TFLite models
-        if (!handsRef.current) {
-          const hands = new win.Hands({
-            locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/${file}`
-          });
+        landmarkerRef.current = landmarker;
+        setIsModelLoaded(true);
 
-          hands.setOptions({
-            selfieMode: true,
-            maxNumHands: 1,
-            modelComplexity: 1,
-            minDetectionConfidence: 0.4,
-            minTrackingConfidence: 0.4
-          });
+        // Request camera access
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          throw new Error('Webcam API is not supported in this browser.');
+        }
 
-          hands.onResults((results: HandsResults) => {
-            if (onResultsRef.current) {
-              onResultsRef.current(results);
-            }
-          });
-
-          try {
-            await hands.initialize();
-          } catch (initErr) {
-            console.warn('MediaPipe hands.initialize deferred:', initErr);
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            width: { ideal: 640 },
+            height: { ideal: 480 },
+            facingMode: 'user'
           }
+        });
 
-          handsRef.current = hands;
+        if (isCancelled) {
+          stream.getTracks().forEach(t => t.stop());
+          landmarker.close();
+          return;
         }
 
-        if (!isCancelled) {
-          setIsModelLoaded(true);
+        localStream = stream;
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          await videoRef.current.play().catch(err => console.warn('Video play deferred:', err));
         }
 
-        // Start camera stream via MediaPipe helper
-        if (videoRef.current && canvasRef.current) {
+        if (canvasRef.current) {
           canvasRef.current.width = 320;
           canvasRef.current.height = 240;
+        }
 
-          const camera = new win.Camera(videoRef.current, {
-            onFrame: async () => {
-              const video = videoRef.current;
-              const hands = handsRef.current;
-              if (video && hands && video.readyState >= 2 && video.videoWidth > 0) {
-                try {
-                  await hands.send({ image: video });
-                } catch (sendErr) {
-                  console.warn('MediaPipe send frame error:', sendErr);
+        // Render loop processing video frames
+        let lastVideoTime = -1;
+
+        const processVideoFrame = () => {
+          if (isCancelled) return;
+
+          const video = videoRef.current;
+          const canvas = canvasRef.current;
+          const currentLandmarker = landmarkerRef.current;
+
+          if (video && canvas && currentLandmarker && video.readyState >= 2) {
+            if (video.currentTime !== lastVideoTime) {
+              lastVideoTime = video.currentTime;
+
+              const startTimeMs = performance.now();
+              const results = currentLandmarker.detectForVideo(video, startTimeMs);
+
+              const ctx = canvas.getContext('2d');
+              if (ctx) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                const hasHand = results.landmarks && results.landmarks.length > 0;
+
+                if (hasHand && results.landmarks) {
+                  const landmarks = results.landmarks[0];
+
+                  const wrist = landmarks[0];
+                  const thumbTip = landmarks[4];
+                  const indexTip = landmarks[8];
+                  const middleMcp = landmarks[9];
+
+                  // Scale-invariant pinch calculation
+                  const dxHand = wrist.x - middleMcp.x;
+                  const dyHand = wrist.y - middleMcp.y;
+                  const handSize = Math.sqrt(dxHand * dxHand + dyHand * dyHand);
+
+                  const dxPinch = thumbTip.x - indexTip.x;
+                  const dyPinch = thumbTip.y - indexTip.y;
+                  const pinchDist = Math.sqrt(dxPinch * dxPinch + dyPinch * dyPinch);
+
+                  const ratio = handSize > 0 ? pinchDist / handSize : pinchDist / 0.15;
+                  const isPinching = ratio < 0.23;
+
+                  // Drag action transition
+                  if (isPinching) {
+                    const pinchY = (thumbTip.y + indexTip.y) / 2;
+                    if (!scrollState.current.isPinched) {
+                      scrollState.current.isPinched = true;
+                      scrollState.current.startY = pinchY;
+                      scrollState.current.startScrollY = lenisRef.current ? lenisRef.current.scroll : window.scrollY;
+                      scrollState.current.currentScrollY = scrollState.current.startScrollY;
+                      scrollState.current.targetScrollY = scrollState.current.startScrollY;
+                      setScrollActiveState(true);
+                    } else {
+                      const sensitivity = 2.8;
+                      const deltaY = -(pinchY - scrollState.current.startY) * window.innerHeight * sensitivity;
+                      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+                      scrollState.current.targetScrollY = Math.max(0, Math.min(scrollState.current.startScrollY + deltaY, maxScroll));
+                    }
+                  } else {
+                    if (scrollState.current.isPinched) {
+                      scrollState.current.isPinched = false;
+                      setScrollActiveState(false);
+                    }
+                  }
+
+                  setHasHandDetected(true);
+                  const noirActive = isNoirRef.current;
+
+                  // Draw skeleton lines
+                  ctx.lineWidth = 3;
+                  ctx.lineCap = 'round';
+                  ctx.strokeStyle = isPinching
+                    ? (noirActive ? '#00e676' : '#79B48B')
+                    : (noirActive ? '#00f0ff' : '#5A8EB6');
+
+                  CONNECTIONS.forEach(([start, end]) => {
+                    const pt1 = landmarks[start];
+                    const pt2 = landmarks[end];
+                    ctx.beginPath();
+                    ctx.moveTo(pt1.x * canvas.width, pt1.y * canvas.height);
+                    ctx.lineTo(pt2.x * canvas.width, pt2.y * canvas.height);
+                    ctx.stroke();
+                  });
+
+                  // Draw landmark points
+                  landmarks.forEach((pt, idx) => {
+                    ctx.beginPath();
+                    if (idx === 4 || idx === 8) {
+                      ctx.arc(pt.x * canvas.width, pt.y * canvas.height, 6, 0, 2 * Math.PI);
+                      ctx.fillStyle = isPinching ? '#ff1744' : '#ffd600';
+                    } else {
+                      ctx.arc(pt.x * canvas.width, pt.y * canvas.height, 3.5, 0, 2 * Math.PI);
+                      ctx.fillStyle = noirActive ? '#ffffff' : '#2B2B36';
+                    }
+                    ctx.fill();
+                  });
+
+                  // Draw pinch ring indicator
+                  if (isPinching) {
+                    const pX = ((thumbTip.x + indexTip.x) / 2) * canvas.width;
+                    const pY = ((thumbTip.y + indexTip.y) / 2) * canvas.height;
+                    
+                    ctx.beginPath();
+                    ctx.arc(pX, pY, 12, 0, 2 * Math.PI);
+                    ctx.strokeStyle = '#ff1744';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.arc(pX, pY, 5, 0, 2 * Math.PI);
+                    ctx.fillStyle = '#ff1744';
+                    ctx.fill();
+                  }
+                } else {
+                  setHasHandDetected(false);
+                  if (scrollState.current.isPinched) {
+                    scrollState.current.isPinched = false;
+                    setScrollActiveState(false);
+                  }
                 }
               }
-            },
-            width: 320,
-            height: 240
-          });
+            }
+          }
 
-          cameraRef.current = camera;
-          await camera.start();
-        }
+          if (!isCancelled) {
+            animFrameIdRef.current = requestAnimationFrame(processVideoFrame);
+          }
+        };
+
+        animFrameIdRef.current = requestAnimationFrame(processVideoFrame);
 
       } catch (err) {
         const error = err as Error;
-        console.error('Hand tracking initialization failed:', error);
+        console.error('Vision hand tracking initialization failed:', error);
         if (!isCancelled) {
           setLoadError(error.message || 'Webcam permission denied or not found.');
         }
       }
     };
 
-    initMediaPipe();
+    initVision();
 
     return () => {
       isCancelled = true;
-      shutdownCamera();
-    };
-  }, [isActive, shutdownCamera]);
 
-  // Determine indicator state
+      if (animFrameIdRef.current) {
+        cancelAnimationFrame(animFrameIdRef.current);
+        animFrameIdRef.current = null;
+      }
+
+      if (landmarkerRef.current) {
+        try {
+          landmarkerRef.current.close();
+        } catch (e) {
+          console.warn('Error closing landmarker:', e);
+        }
+        landmarkerRef.current = null;
+      }
+
+      if (localStream) {
+        localStream.getTracks().forEach(t => t.stop());
+      }
+
+      if (videoRef.current && videoRef.current.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(t => t.stop());
+        videoRef.current.srcObject = null;
+      }
+
+      scrollState.current.isPinched = false;
+      setScrollActiveState(false);
+      setHasHandDetected(false);
+      setIsModelLoaded(false);
+    };
+  }, [isActive]);
+
+  // Indicator text state
   let statusText = 'No hand detected';
   let indicatorClass = '';
   if (loadError) {
@@ -528,4 +457,3 @@ export default function GestureScroll() {
     </div>
   );
 }
-
