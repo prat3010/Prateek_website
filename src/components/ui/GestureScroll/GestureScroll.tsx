@@ -4,15 +4,18 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLenis } from 'lenis/react';
 import { useTheme } from '@/context/ThemeContext';
 import { Hand, X, HelpCircle, Loader2 } from 'lucide-react';
-import { Hands, Results as HandsResults } from '@mediapipe/hands';
-import { Camera } from '@mediapipe/camera_utils';
 import styles from './GestureScroll.module.css';
 
-// Types for MediaPipe Landmarks
+// Types for MediaPipe Hands API
 interface Landmark {
   x: number;
   y: number;
   z: number;
+}
+
+interface HandsResults {
+  image: HTMLVideoElement;
+  multiHandLandmarks?: Landmark[][];
 }
 
 // Hand connections index structure
@@ -24,6 +27,38 @@ const CONNECTIONS = [
   [13, 17], [17, 18], [18, 19], [19, 20], // Pinky
   [0, 17] // Palm base
 ];
+
+// Module-level script loader cache to avoid race conditions when loading local MediaPipe scripts
+const scriptPromises = new Map<string, Promise<void>>();
+
+const loadScript = (src: string): Promise<void> => {
+  if (scriptPromises.has(src)) {
+    return scriptPromises.get(src)!;
+  }
+  const promise = new Promise<void>((resolve, reject) => {
+    const existingScript = document.querySelector<HTMLScriptElement>(`script[src="${src}"]`);
+    if (existingScript) {
+      if (existingScript.dataset.loaded === 'true') {
+        resolve();
+        return;
+      }
+      existingScript.addEventListener('load', () => resolve());
+      existingScript.addEventListener('error', () => reject(new Error(`Failed to load script: ${src}`)));
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = src;
+    script.crossOrigin = 'anonymous';
+    script.onload = () => {
+      script.dataset.loaded = 'true';
+      resolve();
+    };
+    script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
+    document.head.appendChild(script);
+  });
+  scriptPromises.set(src, promise);
+  return promise;
+};
 
 export default function GestureScroll() {
   const lenis = useLenis();
@@ -42,8 +77,10 @@ export default function GestureScroll() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   // Library/Instance Refs
-  const cameraRef = useRef<Camera | null>(null);
-  const handsRef = useRef<Hands | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const cameraRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handsRef = useRef<any>(null);
 
   // Dynamic values stored in refs for callback stability
   const lenisRef = useRef(lenis);
@@ -288,7 +325,7 @@ export default function GestureScroll() {
     }
   };
 
-  // Initialize MediaPipe packages and Camera feed
+  // Initialize MediaPipe scripts and Camera feed
   useEffect(() => {
     if (!isActive) return;
 
@@ -296,9 +333,24 @@ export default function GestureScroll() {
 
     const initMediaPipe = async () => {
       try {
+        // Load scripts locally from /mediapipe/ public route
+        await Promise.all([
+          loadScript('/mediapipe/camera_utils.js'),
+          loadScript('/mediapipe/hands.js')
+        ]);
+
+        if (isCancelled) return;
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const win = window as any;
+        if (!win.Hands || !win.Camera) {
+          throw new Error('MediaPipe libraries did not load correctly.');
+        }
+
+        // Initialize Hands Model cleanly using local asset path
         if (!handsRef.current) {
-          const hands = new Hands({
-            locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+          const hands = new win.Hands({
+            locateFile: (file: string) => `/mediapipe/${file}`
           });
 
           hands.setOptions({
@@ -317,16 +369,16 @@ export default function GestureScroll() {
           handsRef.current = hands;
         }
 
-        if (isCancelled) return;
-
-        setIsModelLoaded(true);
+        if (!isCancelled) {
+          setIsModelLoaded(true);
+        }
 
         // Start camera stream via MediaPipe helper
         if (videoRef.current && canvasRef.current) {
           canvasRef.current.width = 320;
           canvasRef.current.height = 240;
 
-          const camera = new Camera(videoRef.current, {
+          const camera = new win.Camera(videoRef.current, {
             onFrame: async () => {
               if (videoRef.current && handsRef.current) {
                 await handsRef.current.send({ image: videoRef.current });
