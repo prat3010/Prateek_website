@@ -40,6 +40,18 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
     }
   }, [messages]);
 
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const handleWheel = (e: WheelEvent) => {
+      e.stopPropagation();
+    };
+    el.addEventListener("wheel", handleWheel, { passive: true });
+    return () => {
+      el.removeEventListener("wheel", handleWheel);
+    };
+  }, [messages.length]);
+
   const startSession = useCallback(async () => {
     if (!client) return;
     setError("");
@@ -191,7 +203,14 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
 
       {messages.length > 0 && (
         <div className={styles.chatContainer}>
-          <div className={styles.chatMessages} ref={containerRef} onScroll={handleScroll}>
+          <div
+            className={styles.chatMessages}
+            ref={containerRef}
+            onScroll={handleScroll}
+            data-lenis-prevent
+            data-lenis-prevent-touch
+            data-lenis-prevent-wheel
+          >
             {messages.map((m, index) => {
               const isLast = index === messages.length - 1;
               const isStreamingAssistant = m.role === "assistant" && isLast && loading;
