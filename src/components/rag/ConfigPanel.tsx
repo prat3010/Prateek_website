@@ -80,18 +80,10 @@ export function ConfigPanel({
         Connect to your Retriever instance to search documents, upload new content, and chat with your data.
       </p>
 
-      <div style={{ marginBottom: "1.25rem", padding: "0.85rem", background: "var(--color-surface-hover, #1e293b)", borderRadius: "8px", border: "1px dashed #3b82f6" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div>
-            <strong style={{ fontSize: "0.9rem", color: "#60a5fa" }}>⚡ Quick Guest Access</strong>
-            <p style={{ fontSize: "0.75rem", margin: "0.2rem 0 0 0", opacity: 0.8 }}>
-              Try the live Meta-RAG system with indexed codebase documents (Read-Only).
-            </p>
-          </div>
-          <button className="comic-btn comic-btn-blue" style={{ fontSize: "0.8rem", padding: "0.4rem 0.8rem" }} onClick={handleGuestLogin} disabled={connecting}>
-            {connecting ? "Connecting…" : "Login as Guest"}
-          </button>
-        </div>
+      <div style={{ marginBottom: "1.25rem" }}>
+        <button className="comic-btn comic-btn-blue" onClick={handleGuestLogin} disabled={connecting}>
+          {connecting ? "Connecting…" : "⚡ Login as Guest"}
+        </button>
       </div>
       {showAdvanced && (
         <div>
