@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { RetrieverClient } from "@/lib/rag-client";
 import styles from "./rag.module.css";
 
@@ -11,10 +11,32 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [abortController, setAbortController] = useState<AbortController | null>(null);
-  const chatEnd = useRef<HTMLDivElement>(null);
+  const [showJumpBottom, setShowJumpBottom] = useState(false);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+  const isUserScrolledUp = useRef(false);
   const msgIdCounter = useRef(0);
 
-  useEffect(() => { chatEnd.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+  const handleScroll = useCallback(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const isAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+    isUserScrolledUp.current = !isAtBottom;
+    setShowJumpBottom(!isAtBottom);
+  }, []);
+
+  const scrollToBottom = useCallback(() => {
+    isUserScrolledUp.current = false;
+    setShowJumpBottom(false);
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
+
+  useEffect(() => {
+    if (!isUserScrolledUp.current) {
+      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   if (hidden) return null;
 
@@ -25,6 +47,8 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
       const res = await client.createSession();
       setSessionId(res.sessionId);
       setMessages([{ id: ++msgIdCounter.current, role: "assistant", content: "Session started. Send your first message." }]);
+      isUserScrolledUp.current = false;
+      setShowJumpBottom(false);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to start session");
     }
@@ -43,6 +67,8 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
     const userMsgId = ++msgIdCounter.current;
     setMessages((prev) => [...prev, { id: userMsgId, role: "user", content: msg }]);
     setLoading(true);
+    isUserScrolledUp.current = false;
+    setShowJumpBottom(false);
 
     const controller = new AbortController();
     setAbortController(controller);
@@ -126,15 +152,38 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
       </div>
 
       {messages.length > 0 && (
-        <div className={styles.chatMessages}>
-          {messages.map((m) => (
-            <div key={m.id} className={`${styles.chatMsg} ${m.role === "user" ? styles.chatUser : styles.chatAssistant}`} style={{ whiteSpace: "pre-wrap" }}>
-              {(m.role === "assistant" && m === messages[messages.length - 1] && loading)
-                ? m.content + " ▌"
-                : m.content}
-            </div>
-          ))}
-          <div ref={chatEnd} />
+        <div className={styles.chatContainer}>
+          <div className={styles.chatMessages} ref={containerRef} onScroll={handleScroll}>
+            {messages.map((m, index) => {
+              const isLast = index === messages.length - 1;
+              const isStreamingAssistant = m.role === "assistant" && isLast && loading;
+              const isWaitingFirstToken = isStreamingAssistant && !m.content;
+
+              return (
+                <div key={m.id} className={`${styles.chatMsg} ${m.role === "user" ? styles.chatUser : styles.chatAssistant}`} style={{ whiteSpace: "pre-wrap" }}>
+                  {isWaitingFirstToken ? (
+                    <div className={styles.typingIndicator}>
+                      <span className={styles.typingDot} />
+                      <span className={styles.typingDot} />
+                      <span className={styles.typingDot} />
+                    </div>
+                  ) : (
+                    <>
+                      {m.content}
+                      {isStreamingAssistant && <span className={styles.cursor}>▌</span>}
+                    </>
+                  )}
+                </div>
+              );
+            })}
+            <div ref={chatEndRef} />
+          </div>
+
+          {showJumpBottom && (
+            <button className={styles.jumpBottomBtn} onClick={scrollToBottom}>
+              ↓ Jump to latest
+            </button>
+          )}
         </div>
       )}
 

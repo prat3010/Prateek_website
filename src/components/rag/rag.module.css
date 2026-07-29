@@ -122,14 +122,107 @@
   opacity: 0.7;
 }
 
+.chatContainer {
+  position: relative;
+}
+
 .chatMessages {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  max-height: min(60vh, 600px);
+  max-height: min(60vh, 520px);
   overflow-y: auto;
   margin-bottom: 1rem;
-  padding: 0.5rem;
+  padding: 0.75rem;
+  scroll-behavior: smooth;
+}
+
+.chatMessages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chatMessages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chatMessages::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 4px;
+}
+
+.chatMessages::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.65);
+}
+
+.jumpBottomBtn {
+  position: absolute;
+  bottom: 1rem;
+  right: 1.5rem;
+  background: var(--surface-card, #0f172a);
+  color: var(--color-link, #60a5fa);
+  border: 1px solid var(--color-border, #334155);
+  border-radius: 20px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.jumpBottomBtn:hover {
+  transform: translateY(-2px);
+  background: var(--color-surface-hover, #1e293b);
+}
+
+.typingIndicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.25rem 0.4rem;
+}
+
+.typingDot {
+  width: 7px;
+  height: 7px;
+  background-color: var(--color-link, #60a5fa);
+  border-radius: 50%;
+  animation: typingWave 1.4s infinite ease-in-out both;
+}
+
+.typingDot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.typingDot:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes typingWave {
+  0%, 80%, 100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+.cursor {
+  display: inline-block;
+  color: var(--color-link, #60a5fa);
+  margin-left: 3px;
+  animation: blinkCursor 0.8s infinite;
+  font-weight: bold;
+}
+
+@keyframes blinkCursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 .chatMsg {
