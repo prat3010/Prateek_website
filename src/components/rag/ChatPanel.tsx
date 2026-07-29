@@ -56,9 +56,17 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
   }, [client]);
 
   useEffect(() => {
+    let active = true;
     if (client && !sessionId && !loading && !hidden && messages.length === 0) {
-      startSession();
+      Promise.resolve().then(() => {
+        if (active) {
+          startSession();
+        }
+      });
     }
+    return () => {
+      active = false;
+    };
   }, [client, sessionId, loading, hidden, messages.length, startSession]);
 
   function stopGeneration() {

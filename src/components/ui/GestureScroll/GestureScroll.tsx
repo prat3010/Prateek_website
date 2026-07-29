@@ -121,6 +121,8 @@ export default function GestureScroll() {
 
     let isCancelled = false;
     let localStream: MediaStream | null = null;
+    const videoElement = videoRef.current;
+    const currentScrollState = scrollState.current;
 
     const initVision = async () => {
       try {
@@ -344,13 +346,15 @@ export default function GestureScroll() {
         localStream.getTracks().forEach(t => t.stop());
       }
 
-      if (videoRef.current && videoRef.current.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
+      if (videoElement && videoElement.srcObject) {
+        const stream = videoElement.srcObject as MediaStream;
         stream.getTracks().forEach(t => t.stop());
-        videoRef.current.srcObject = null;
+        videoElement.srcObject = null;
       }
 
-      scrollState.current.isPinched = false;
+      if (currentScrollState) {
+        currentScrollState.isPinched = false;
+      }
       setScrollActiveState(false);
       setHasHandDetected(false);
       setIsModelLoaded(false);
