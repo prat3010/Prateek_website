@@ -14,14 +14,14 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
   const [showJumpBottom, setShowJumpBottom] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const chatEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const isUserScrolledUp = useRef(false);
   const msgIdCounter = useRef(0);
 
   const handleScroll = useCallback(() => {
     const el = containerRef.current;
     if (!el) return;
-    const isAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+    const isAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 50;
     isUserScrolledUp.current = !isAtBottom;
     setShowJumpBottom(!isAtBottom);
   }, []);
@@ -29,18 +29,18 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
   const scrollToBottom = useCallback(() => {
     isUserScrolledUp.current = false;
     setShowJumpBottom(false);
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    }
   }, []);
 
   useEffect(() => {
-    if (!isUserScrolledUp.current) {
-      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (!isUserScrolledUp.current && containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
   }, [messages]);
 
-  if (hidden) return null;
-
-  async function startSession() {
+  const startSession = useCallback(async () => {
     if (!client) return;
     setError("");
     try {
@@ -49,10 +49,17 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
       setMessages([{ id: ++msgIdCounter.current, role: "assistant", content: "Session started. Send your first message." }]);
       isUserScrolledUp.current = false;
       setShowJumpBottom(false);
+      setTimeout(() => inputRef.current?.focus(), 100);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to start session");
     }
-  }
+  }, [client]);
+
+  useEffect(() => {
+    if (client && !sessionId && !loading && !hidden && messages.length === 0) {
+      startSession();
+    }
+  }, [client, sessionId, loading, hidden, messages.length, startSession]);
 
   function stopGeneration() {
     abortController?.abort();
@@ -176,7 +183,6 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
                 </div>
               );
             })}
-            <div ref={chatEndRef} />
           </div>
 
           {showJumpBottom && (
@@ -190,6 +196,7 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
       {sessionId && (
         <div className={styles.chatInput}>
           <input
+            ref={inputRef}
             className={styles.input}
             value={input}
             onChange={(e) => setInput(e.target.value)}

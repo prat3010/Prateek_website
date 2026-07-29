@@ -130,11 +130,13 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  height: 480px;
   max-height: min(60vh, 520px);
   overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
   margin-bottom: 1rem;
   padding: 0.75rem;
-  scroll-behavior: smooth;
 }
 
 .chatMessages::-webkit-scrollbar {
