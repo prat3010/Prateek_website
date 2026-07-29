@@ -138,6 +138,8 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
     }
   }
 
+  if (hidden) return null;
+
   return (
     <div className={styles.panel}>
       <h2 className={styles.panelTitle}>Chat</h2>
