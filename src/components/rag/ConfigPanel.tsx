@@ -5,6 +5,13 @@ import { type RetrieverConfig } from "@/lib/rag-client";
 import { isValidUrl } from "./utils";
 import styles from "./rag.module.css";
 
+export const DEMO_GUEST_CONFIG: RetrieverConfig = {
+  apiUrl: "https://rag.prateeq.in",
+  tenantId: "00000000-0000-0000-0000-000000000000",
+  apiKey: "ret_live_GuestAccessKey2026.ReadOnlyChat",
+  userId: "c9b00431-74d1-43fa-ac72-d4382cfd584f",
+};
+
 export function ConfigPanel({
   config, onSave, onClear, hidden,
 }: {
@@ -14,7 +21,7 @@ export function ConfigPanel({
   hidden: boolean;
 }) {
   const [form, setForm] = useState<RetrieverConfig>(
-    config ?? { apiUrl: "https://rag.prateeq.in", tenantId: "", apiKey: "", userId: "" },
+    config ?? DEMO_GUEST_CONFIG,
   );
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [connecting, setConnecting] = useState(false);
@@ -23,6 +30,25 @@ export function ConfigPanel({
   if (hidden) return null;
 
   const valid = isValidUrl(form.apiUrl) && form.tenantId.length > 0 && form.userId.length > 0 && form.apiKey.length > 0;
+
+  async function handleGuestLogin() {
+    setConnecting(true);
+    setConnectResult(null);
+    setForm(DEMO_GUEST_CONFIG);
+    try {
+      const res = await fetch(`${DEMO_GUEST_CONFIG.apiUrl}/health/liveness`, {
+        headers: { Authorization: `Bearer ${DEMO_GUEST_CONFIG.apiKey}` },
+      });
+      if (!res.ok) throw new Error(`Backend returned ${res.status}`);
+      setConnectResult({ ok: true, msg: "Connected as Guest (Read-Only)" });
+      onSave(DEMO_GUEST_CONFIG);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Guest connection failed";
+      setConnectResult({ ok: false, msg });
+    } finally {
+      setConnecting(false);
+    }
+  }
 
   async function handleSave() {
     if (!valid) return;
@@ -53,6 +79,20 @@ export function ConfigPanel({
       <p className={styles.panelDesc}>
         Connect to your Retriever instance to search documents, upload new content, and chat with your data.
       </p>
+
+      <div style={{ marginBottom: "1.25rem", padding: "0.85rem", background: "var(--color-surface-hover, #1e293b)", borderRadius: "8px", border: "1px dashed #3b82f6" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div>
+            <strong style={{ fontSize: "0.9rem", color: "#60a5fa" }}>⚡ Quick Guest Access</strong>
+            <p style={{ fontSize: "0.75rem", margin: "0.2rem 0 0 0", opacity: 0.8 }}>
+              Try the live Meta-RAG system with indexed codebase documents (Read-Only).
+            </p>
+          </div>
+          <button className="comic-btn comic-btn-blue" style={{ fontSize: "0.8rem", padding: "0.4rem 0.8rem" }} onClick={handleGuestLogin} disabled={connecting}>
+            {connecting ? "Connecting…" : "Login as Guest"}
+          </button>
+        </div>
+      </div>
       {showAdvanced && (
         <div>
           <label className={styles.label}>API Base URL</label>

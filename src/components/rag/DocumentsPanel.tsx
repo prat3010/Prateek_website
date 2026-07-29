@@ -66,7 +66,12 @@ export function DocumentsPanel({ client, hidden }: { client: RetrieverClient | n
       await client.deleteDocument(doc.documentId);
       setDocs((prev) => prev ? prev.filter((d) => d.documentId !== doc.documentId) : null);
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Delete failed");
+      const msg = e instanceof Error ? e.message : "";
+      if (msg.includes("403") || msg.includes("scope") || msg.includes("Forbidden")) {
+        setError("Guest mode is read-only. File deletion is restricted to tenant administrators.");
+      } else {
+        setError(msg || "Delete failed");
+      }
     }
   }
 
