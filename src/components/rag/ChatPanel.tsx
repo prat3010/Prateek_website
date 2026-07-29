@@ -102,16 +102,26 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
       const assistantId = ++msgIdCounter.current;
       setMessages((prev) => [...prev, { id: assistantId, role: "assistant", content: "" }]);
 
-      while (true) {
+      let sseBuffer = "";
+      let isDone = false;
+
+      while (!isDone) {
         const { done, value } = await reader.read();
         if (done) break;
-        const text = decoder.decode(value, { stream: true });
-        for (const line of text.split("\n")) {
-          if (line.startsWith("data: ")) {
-            const data = line.slice(6);
+        sseBuffer += decoder.decode(value, { stream: true });
+        const lines = sseBuffer.split("\n");
+        sseBuffer = lines.pop() ?? "";
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (trimmed.startsWith("data: ")) {
+            const data = trimmed.slice(6);
             try {
               const parsed = JSON.parse(data);
-              if (parsed.event === "done") break;
+              if (parsed.event === "done") {
+                isDone = true;
+                break;
+              }
               const delta = parsed.content ?? parsed.delta ?? "";
               if (delta) {
                 setMessages((prev) => {
@@ -131,10 +141,21 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
 
       setMessages((prev) => {
         const last = prev[prev.length - 1];
-        if (last?.role === "assistant") return prev;
-        return [...prev, { id: ++msgIdCounter.current, role: "assistant", content: "(empty response)" }];
+        if (last?.role === "assistant" && last.id === assistantId) {
+          if (!last.content.trim()) {
+            return [...prev.slice(0, -1), { ...last, content: "No response received. Please try again." }];
+          }
+        }
+        return prev;
       });
     } catch (e: unknown) {
+      setMessages((prev) => {
+        const last = prev[prev.length - 1];
+        if (last?.role === "assistant" && !last.content.trim()) {
+          return prev.slice(0, -1);
+        }
+        return prev;
+      });
       if (e instanceof DOMException && e.name === "AbortError") {
         setMessages((prev) => [...prev, { id: ++msgIdCounter.current, role: "assistant", content: "(stopped)" }]);
       } else {
