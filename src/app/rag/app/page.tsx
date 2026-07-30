@@ -17,6 +17,8 @@ export default function RagAppStudioPage() {
   const [activeTab, setActiveTab] = useState<"chat" | "upload" | "search" | "config">("chat");
 
   const [tenantId, setTenantId] = useState<string>("");
+  const [apiKey, setApiKey] = useState<string>("");
+  const [userId, setUserId] = useState<string>("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [client, setClient] = useState<RetrieverClient | null>(null);
 
@@ -29,6 +31,8 @@ export default function RagAppStudioPage() {
       const key = localStorage.getItem("retriever_api_key") || GUEST_KEY;
 
       setTenantId(tId);
+      setApiKey(key);
+      setUserId(uId);
       setIsAdmin(key.includes("admin") || key === "dev-admin-master-key-change-in-production");
 
       const cli = new RetrieverClient({
@@ -115,8 +119,8 @@ export default function RagAppStudioPage() {
               ? {
                   apiUrl: "https://rag.prateeq.in",
                   tenantId,
-                  apiKey: localStorage.getItem("retriever_api_key") || "",
-                  userId: localStorage.getItem("retriever_user_id") || "",
+                  apiKey,
+                  userId,
                 }
               : null
           }

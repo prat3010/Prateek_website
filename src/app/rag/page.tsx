@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
+import { useLenis } from "lenis/react";
 import ScrollSection from "@/components/ScrollSection/ScrollSection";
 import { ChatPanel } from "@/components/rag/ChatPanel";
 import { PricingSection } from "@/components/rag/PricingSection";
 import { RetrieverClient } from "@/lib/rag-client";
+import { NAVBAR_SCROLL_OFFSET } from "@/lib/constants";
 import styles from "@/components/rag/rag.module.css";
 
 const GUEST_CONFIG = {
@@ -17,7 +19,9 @@ const GUEST_CONFIG = {
 
 export default function RagLandingPage() {
   const [copied, setCopied] = useState(false);
-  const guestClient = new RetrieverClient(GUEST_CONFIG);
+  const lenis = useLenis();
+
+  const guestClient = useMemo(() => new RetrieverClient(GUEST_CONFIG), []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -29,6 +33,16 @@ export default function RagLandingPage() {
     );
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const scrollToDemo = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (lenis) {
+      lenis.scrollTo("#demo", { duration: 1.2, offset: NAVBAR_SCROLL_OFFSET });
+    } else {
+      const el = document.getElementById("demo");
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   return (
@@ -52,7 +66,7 @@ export default function RagLandingPage() {
             <Link href="/rag/login" className="comic-btn comic-btn-blue">
               🚀 Get Started Free
             </Link>
-            <a href="#demo" className="comic-btn comic-btn-outline">
+            <a href="#demo" onClick={scrollToDemo} className="comic-btn comic-btn-outline">
               💬 Try Live Demo Below
             </a>
           </div>

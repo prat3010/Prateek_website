@@ -232,8 +232,8 @@ export function PricingSection() {
 
             <a
               href={plan.stripeUrl || "/rag/login"}
-              target="_blank"
-              rel="noopener noreferrer"
+              target={plan.stripeUrl?.startsWith("http") ? "_blank" : undefined}
+              rel={plan.stripeUrl?.startsWith("http") ? "noopener noreferrer" : undefined}
               className={`comic-btn ${plan.popular ? "comic-btn-blue" : "comic-btn-outline"} ${styles.planCta}`}
             >
               {plan.cta}
