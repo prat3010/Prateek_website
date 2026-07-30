@@ -45,6 +45,7 @@ from sync_tabs.certificates import render_certificates_tab
 from sync_tabs.skills import render_skills_tab
 from sync_tabs.photos import render_photos_tab
 from sync_tabs.blog import render_blog_tab
+from sync_tabs.rag_pricing import render_rag_pricing_tab
 
 st.set_page_config(
     page_title="Resume & Portfolio Manager",
@@ -343,14 +344,15 @@ if 'blog_focus_keyword' not in st.session_state:
     st.session_state.blog_focus_keyword = ""
 
 # Set up tabs
-tab_analytics, tab_edit, tab_project, tab_cert, tab_skills, tab_photos, tab_blog = st.tabs([
+tab_analytics, tab_edit, tab_project, tab_cert, tab_skills, tab_photos, tab_blog, tab_rag_pricing = st.tabs([
     "Analytics & Telemetry",
     "Edit Resume Manually", 
     "Sync Projects", 
     "Sync Certificates",
     "Manage Skills",
     "Update Photos",
-    "Blog Editor"
+    "Blog Editor",
+    "RAG SaaS Pricing"
 ])
 
 with tab_analytics:
@@ -373,3 +375,6 @@ with tab_photos:
 
 with tab_blog:
     render_blog_tab()
+
+with tab_rag_pricing:
+    render_rag_pricing_tab()
