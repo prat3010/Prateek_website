@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ChatPanel } from "@/components/rag/ChatPanel";
 import { PricingSection } from "@/components/rag/PricingSection";
@@ -17,6 +17,10 @@ const GUEST_CONFIG = {
 export default function RagLandingPage() {
   const [copied, setCopied] = useState(false);
   const guestClient = new RetrieverClient(GUEST_CONFIG);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const copySnippet = () => {
     navigator.clipboard.writeText(

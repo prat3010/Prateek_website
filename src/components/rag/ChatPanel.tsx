@@ -77,7 +77,7 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
       setMessages([{ id: ++msgIdCounter.current, role: "assistant", content: "Session started. Send your first message." }]);
       isUserScrolledUp.current = false;
       setShowJumpBottom(false);
-      setTimeout(() => inputRef.current?.focus(), 100);
+      setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 100);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to start session");
     }
