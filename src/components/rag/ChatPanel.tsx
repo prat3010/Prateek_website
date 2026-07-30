@@ -1,17 +1,33 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, ReactNode } from "react";
 import { RetrieverClient } from "@/lib/rag-client";
+import Portal from "@/components/ui/Portal";
 import styles from "./rag.module.css";
+
+interface ChatMessageItem {
+  id: number;
+  role: string;
+  content: string;
+  backendMessageId?: string;
+  cached?: boolean;
+  latencyMs?: number;
+  feedback?: "up" | "down";
+}
 
 export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; hidden: boolean }) {
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<Array<{ id: number; role: string; content: string }>>([]);
+  const [messages, setMessages] = useState<Array<ChatMessageItem>>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [abortController, setAbortController] = useState<AbortController | null>(null);
   const [showJumpBottom, setShowJumpBottom] = useState(false);
+
+  // Feedback modal state
+  const [feedbackModalMsg, setFeedbackModalMsg] = useState<{ msgId: number; backendMessageId?: string } | null>(null);
+  const [feedbackText, setFeedbackText] = useState("");
+  const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -86,6 +102,60 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
     setAbortController(null);
   }
 
+  const handleFeedback = useCallback(
+    async (msgId: number, backendMessageId: string | undefined, rating: "up" | "down") => {
+      setMessages((prev) =>
+        prev.map((m) => (m.id === msgId ? { ...m, feedback: rating } : m))
+      );
+
+      if (rating === "down") {
+        setFeedbackModalMsg({ msgId, backendMessageId });
+        setFeedbackText("");
+      } else if (client && sessionId) {
+        try {
+          const targetId = backendMessageId || String(msgId);
+          await client.submitFeedback(sessionId, targetId, rating);
+        } catch (err) {
+          console.warn("[Feedback] Failed to submit positive feedback:", err);
+        }
+      }
+    },
+    [client, sessionId]
+  );
+
+  const submitModalFeedback = async () => {
+    if (!feedbackModalMsg) return;
+    setFeedbackSubmitting(true);
+    try {
+      if (client && sessionId) {
+        const targetId = feedbackModalMsg.backendMessageId || String(feedbackModalMsg.msgId);
+        await client.submitFeedback(sessionId, targetId, "down", feedbackText);
+      }
+    } catch (err) {
+      console.warn("[Feedback] Failed to submit negative feedback text:", err);
+    } finally {
+      setFeedbackSubmitting(false);
+      setFeedbackModalMsg(null);
+      setFeedbackText("");
+    }
+  };
+
+  const handleCitationDownload = useCallback(
+    async (docIdOrName: string) => {
+      if (!client) return;
+      try {
+        const res = await client.getDownloadUrl(docIdOrName);
+        if (res?.downloadUrl) {
+          window.open(res.downloadUrl, "_blank");
+        }
+      } catch (err) {
+        console.warn("[Download] Failed to get presigned URL:", err);
+        setError(err instanceof Error ? err.message : "Download failed");
+      }
+    },
+    [client]
+  );
+
   async function sendMessage() {
     if (!client || !sessionId || !input.trim() || loading) return;
     const msg = input;
@@ -134,6 +204,26 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
                 isDone = true;
                 break;
               }
+
+              // Update metadata if present
+              if (parsed.message_id || parsed.cached !== undefined || parsed.latency_ms) {
+                setMessages((prev) => {
+                  const last = prev[prev.length - 1];
+                  if (last?.role === "assistant" && last.id === assistantId) {
+                    return [
+                      ...prev.slice(0, -1),
+                      {
+                        ...last,
+                        backendMessageId: parsed.message_id || last.backendMessageId,
+                        cached: parsed.cached ?? last.cached,
+                        latencyMs: parsed.latency_ms ?? last.latencyMs,
+                      },
+                    ];
+                  }
+                  return prev;
+                });
+              }
+
               const delta = parsed.content ?? parsed.delta ?? "";
               if (delta) {
                 setMessages((prev) => {
@@ -179,6 +269,49 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
     }
   }
 
+  function renderFormattedContent(
+    content: string,
+    onDownloadCitation: (docId: string) => void
+  ): ReactNode {
+    const citationRegex = /\[(Doc|Source):\s*([^\]]+)\]/g;
+    const parts: ReactNode[] = [];
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+
+    while ((match = citationRegex.exec(content)) !== null) {
+      const fullMatch = match[0];
+      const docIdentifier = match[2];
+      const matchIndex = match.index;
+
+      if (matchIndex > lastIndex) {
+        parts.push(content.substring(lastIndex, matchIndex));
+      }
+
+      const docName = docIdentifier.trim();
+      parts.push(
+        <button
+          key={`citation-${matchIndex}`}
+          className={styles.citationBadge}
+          onClick={(e) => {
+            e.preventDefault();
+            onDownloadCitation(docName);
+          }}
+          title={`Download source document: ${docName}`}
+        >
+          📥 {docName}
+        </button>
+      );
+
+      lastIndex = matchIndex + fullMatch.length;
+    }
+
+    if (lastIndex < content.length) {
+      parts.push(content.substring(lastIndex));
+    }
+
+    return parts.length > 0 ? parts : content;
+  }
+
   if (hidden) return null;
 
   return (
@@ -217,7 +350,7 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
               const isWaitingFirstToken = isStreamingAssistant && !m.content;
 
               return (
-                <div key={m.id} className={`${styles.chatMsg} ${m.role === "user" ? styles.chatUser : styles.chatAssistant}`} style={{ whiteSpace: "pre-wrap" }}>
+                <div key={m.id} className={`${styles.chatMsg} ${m.role === "user" ? styles.chatUser : styles.chatAssistant}`}>
                   {isWaitingFirstToken ? (
                     <div className={styles.typingIndicator}>
                       <span className={styles.typingDot} />
@@ -226,8 +359,44 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
                     </div>
                   ) : (
                     <>
-                      {m.content}
-                      {isStreamingAssistant && <span className={styles.cursor}>▌</span>}
+                      {m.role === "assistant" && (m.cached || m.latencyMs) && (
+                        <div style={{ marginBottom: "0.35rem" }}>
+                          {m.cached ? (
+                            <span className={styles.telemetryBadge}>⚡ Cached</span>
+                          ) : m.latencyMs ? (
+                            <span className={styles.telemetryBadge}>⏱️ {(m.latencyMs / 1000).toFixed(2)}s</span>
+                          ) : null}
+                        </div>
+                      )}
+
+                      <div style={{ whiteSpace: "pre-wrap" }}>
+                        {m.role === "assistant"
+                          ? renderFormattedContent(m.content, handleCitationDownload)
+                          : m.content}
+                        {isStreamingAssistant && <span className={styles.cursor}>▌</span>}
+                      </div>
+
+                      {m.role === "assistant" && !isStreamingAssistant && (
+                        <div className={styles.msgFooter}>
+                          <span style={{ opacity: 0.6, fontSize: "0.685rem" }}>RAG Grounded</span>
+                          <div className={styles.feedbackActions}>
+                            <button
+                              className={`${styles.feedbackBtn} ${m.feedback === "up" ? styles.feedbackActiveUp : ""}`}
+                              onClick={() => handleFeedback(m.id, m.backendMessageId, "up")}
+                              title="Helpful response"
+                            >
+                              👍
+                            </button>
+                            <button
+                              className={`${styles.feedbackBtn} ${m.feedback === "down" ? styles.feedbackActiveDown : ""}`}
+                              onClick={() => handleFeedback(m.id, m.backendMessageId, "down")}
+                              title="Unhelpful response"
+                            >
+                              👎
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </>
                   )}
                 </div>
@@ -267,6 +436,33 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
       )}
 
       {error && <p className={styles.error}>{error}</p>}
+
+      {feedbackModalMsg && (
+        <Portal>
+          <div className={styles.feedbackBackdrop} onClick={() => setFeedbackModalMsg(null)}>
+            <div className={styles.feedbackModal} onClick={(e) => e.stopPropagation()}>
+              <h3 className={styles.feedbackTitle}>Provide Response Feedback</h3>
+              <p style={{ fontSize: "0.85rem", opacity: 0.7, margin: 0 }}>
+                Help us improve responses by sharing details:
+              </p>
+              <textarea
+                className={styles.feedbackTextarea}
+                placeholder="Optional: What was incorrect, missing, or unhelpful?"
+                value={feedbackText}
+                onChange={(e) => setFeedbackText(e.target.value)}
+              />
+              <div className={styles.modalButtons}>
+                <button className="comic-btn comic-btn-outline" onClick={() => setFeedbackModalMsg(null)}>
+                  Cancel
+                </button>
+                <button className="comic-btn comic-btn-blue" disabled={feedbackSubmitting} onClick={submitModalFeedback}>
+                  {feedbackSubmitting ? "Submitting..." : "Submit Feedback"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </Portal>
+      )}
     </div>
   );
 }

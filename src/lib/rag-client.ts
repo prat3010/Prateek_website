@@ -146,6 +146,22 @@ export class RetrieverClient {
       method: "DELETE",
     });
   }
+
+  async submitFeedback(sessionId: string, messageId: string, rating: "up" | "down", feedbackText?: string) {
+    return this.request(
+      `/v1/tenants/${this.config.tenantId}/chat/sessions/${sessionId}/messages/${messageId}/feedback`,
+      {
+        method: "POST",
+        body: JSON.stringify({ rating, feedback_text: feedbackText || "" }),
+      }
+    );
+  }
+
+  async getDownloadUrl(documentId: string): Promise<{ downloadUrl: string }> {
+    return this.request<{ downloadUrl: string }>(
+      `/v1/tenants/${this.config.tenantId}/documents/${documentId}/download-url`
+    );
+  }
 }
 
 function combineAbortSignals(...signals: AbortSignal[]): AbortSignal {
