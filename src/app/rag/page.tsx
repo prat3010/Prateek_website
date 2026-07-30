@@ -45,11 +45,17 @@ export default function RagLandingPage() {
     }
   };
 
+  const [heroTab, setHeroTab] = useState<"embed" | "response" | "engine">("embed");
+
   return (
     <div className={styles.landingWrapper}>
       {/* 1. Hero & Product Overview Section */}
       <ScrollSection gap={80}>
         <section className={styles.heroSection} id="home">
+          <div className={styles.heroBadge}>
+            ✨ Enterprise Hybrid RAG Engine • Powered by Meta Llama 3.3 70B
+          </div>
+
           <h1 className={styles.heroTitle}>
             Turn Your Documents & Website into an AI Assistant in 60 Seconds
           </h1>
@@ -67,38 +73,89 @@ export default function RagLandingPage() {
             </a>
           </div>
 
-          {/* Product Overview Feature Highlights Grid */}
-          <div className={styles.heroHighlightsGrid}>
-            <div className={styles.heroHighlightCard}>
-              <span className={styles.heroHighlightIcon}>⚡</span>
-              <div>
-                <h4 className={styles.heroHighlightTitle}>Instant Setup</h4>
-                <p className={styles.heroHighlightDesc}>Paste 1 script line to launch your AI assistant immediately.</p>
+          {/* Interactive Hero Showcase Window */}
+          <div className={styles.heroShowcaseWindow}>
+            <div className={styles.heroWindowHeader}>
+              <div className={styles.heroWindowDots}>
+                <span style={{ background: "#ff5f56" }} />
+                <span style={{ background: "#ffbd2e" }} />
+                <span style={{ background: "#27c93f" }} />
+              </div>
+
+              <div className={styles.heroWindowTabs}>
+                <button
+                  className={`${styles.heroWindowTab} ${heroTab === "embed" ? styles.heroWindowTabActive : ""}`}
+                  onClick={() => setHeroTab("embed")}
+                >
+                  ⚡ 1-Line Script
+                </button>
+                <button
+                  className={`${styles.heroWindowTab} ${heroTab === "response" ? styles.heroWindowTabActive : ""}`}
+                  onClick={() => setHeroTab("response")}
+                >
+                  🎯 Verified PDF Response
+                </button>
+                <button
+                  className={`${styles.heroWindowTab} ${heroTab === "engine" ? styles.heroWindowTabActive : ""}`}
+                  onClick={() => setHeroTab("engine")}
+                >
+                  🛡️ Self-Aware Engine
+                </button>
               </div>
             </div>
 
-            <div className={styles.heroHighlightCard}>
-              <span className={styles.heroHighlightIcon}>🛡️</span>
-              <div>
-                <h4 className={styles.heroHighlightTitle}>Self-Aware CRAG</h4>
-                <p className={styles.heroHighlightDesc}>Rejects low-confidence queries to prevent fake answers.</p>
-              </div>
-            </div>
+            <div className={styles.heroWindowBody}>
+              {heroTab === "embed" && (
+                <div className={styles.heroShowcaseContent}>
+                  <div className={styles.codeSnippetHeader}>
+                    <span>embed-widget.html</span>
+                    <button className={`comic-btn ${styles.copyBtn}`} onClick={copySnippet}>
+                      {copied ? "✓ Copied!" : "Copy Snippet"}
+                    </button>
+                  </div>
+                  <pre className={styles.heroCodeBlock}>
+                    <code>
+                      {"<script\n  src=\"https://rag.prateeq.in/widget.js\"\n  data-tenant=\"YOUR_TENANT_ID\"\n  data-key=\"YOUR_API_KEY\">\n</script>"}
+                    </code>
+                  </pre>
+                </div>
+              )}
 
-            <div className={styles.heroHighlightCard}>
-              <span className={styles.heroHighlightIcon}>📄</span>
-              <div>
-                <h4 className={styles.heroHighlightTitle}>PDF Citations</h4>
-                <p className={styles.heroHighlightDesc}>Answers include 1-click downloadable source files.</p>
-              </div>
-            </div>
+              {heroTab === "response" && (
+                <div className={styles.heroShowcaseContent}>
+                  <div className={styles.mockChatBox}>
+                    <div className={styles.mockUserMsg}>
+                      <span>User:</span> How does retriever AI guarantee zero hallucinations?
+                    </div>
+                    <div className={styles.mockBotMsg}>
+                      <span>Retriever AI:</span> Retriever AI uses a hybrid HNSW vector + BM25 keyword pipeline. Responses are strictly grounded in verified source documents.
+                      <div className={styles.mockBadgeRow}>
+                        <span className={styles.mockBadgeCache}>⚡ Cached (14ms)</span>
+                        <span className={styles.mockBadgeCitation}>📄 Download Source: architecture_v2.pdf</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
-            <div className={styles.heroHighlightCard}>
-              <span className={styles.heroHighlightIcon}>🌐</span>
-              <div>
-                <h4 className={styles.heroHighlightTitle}>Geo-IP Pricing</h4>
-                <p className={styles.heroHighlightDesc}>Fair, localized INR and USD self-serve subscriptions.</p>
-              </div>
+              {heroTab === "engine" && (
+                <div className={styles.heroShowcaseContent}>
+                  <div className={styles.mockEngineBox}>
+                    <div className={styles.engineMetricRow}>
+                      <span>Query Relevance Score:</span>
+                      <strong style={{ color: "#22c55e" }}>0.98 / 1.0 (High Confidence)</strong>
+                    </div>
+                    <div className={styles.engineMetricRow}>
+                      <span>Retrieval Pipeline:</span>
+                      <strong>pgvector HNSW (Semantic) + BM25 (Keyword) + Cohere Rerank</strong>
+                    </div>
+                    <div className={styles.engineMetricRow}>
+                      <span>Corrective Guardrail:</span>
+                      <strong style={{ color: "#3b82f6" }}>ACTIVE — Rejects Unbacked Prompts</strong>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </section>
