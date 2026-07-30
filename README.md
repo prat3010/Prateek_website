@@ -21,7 +21,7 @@ A highly interactive, storyteller-driven personal portfolio website designed wit
 | `/` | Home page — all portfolio sections (hero, about, skills, projects, resume, pricing, playground, blog, contact) |
 | `/terminal` | Interactive diagnostics terminal console (supports commands like `git-info`, `qrcode`, `projects`, `system`, `analytics`) |
 | `/admin/analytics` | Visitor analytics dashboard |
-| `/rag` | RAG Lab — interactive document search and chat via the Retriever engine (`rag.prateeq.in`). [Full docs →](docs/rag-lab.md) |
+| `/rag` | RAG Lab — interactive document search and chat via the Retriever engine (`rag.prateeq.in`). Features 👍/👎 message feedback, presigned citation downloads, and cache telemetry. |
 | `/blog` | Blog listing page |
 | `/blog/[slug]` | Individual blog post page |
 
