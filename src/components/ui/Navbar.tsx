@@ -56,12 +56,10 @@ export default function Navbar({ items, className }: NavbarProps) {
     if (items) return items;
     if (pathname?.startsWith('/rag')) {
       return [
-        { label: 'Overview', href: '/rag' },
+        { label: 'Overview', href: '/rag#home' },
         { label: 'Features', href: '/rag#features' },
         { label: 'Live Demo', href: '/rag#demo' },
         { label: 'Pricing', href: '/rag#pricing' },
-        { label: 'Log In', href: '/rag/login' },
-        { label: 'App Studio', href: '/rag/app' },
       ];
     }
     return [
@@ -79,23 +77,31 @@ export default function Navbar({ items, className }: NavbarProps) {
   const [isScrolling, setIsScrolling] = useState(false);
   const scrollTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState<string>(() => {
+  const [activeSection, setActiveSection] = useState<string>('');
+
+  const effectiveActiveSection = useMemo(() => {
+    if (activeSection) return activeSection;
     if (items && items.length > 0) return items[0].href;
+    if (pathname?.startsWith('/rag')) return '/rag#home';
     return '/#home';
-  });
+  }, [activeSection, items, pathname]);
 
   const { scrollY } = useLenisScroll();
   const lenis = useLenis();
   const prefersReducedMotion = useReducedMotion();
 
-  /* ---------- Scroll tracking for background & blur ---------- */
+  /* ---------- Scroll direction / scrolled threshold listener ---------- */
   useEffect(() => {
-    const unsub = scrollY.on('change', (latest) => {
-      const isScrolled = latest > 20;
-      setScrolled((prev) => (prev === isScrolled ? prev : isScrolled));
-      setIsScrolling(true);
-      clearTimeout(scrollTimerRef.current);
-      scrollTimerRef.current = setTimeout(() => setIsScrolling(false), 150);
+    let lastY = 0;
+    const unsub = scrollY.on('change', (y) => {
+      setScrolled(y > 50);
+      const diff = Math.abs(y - lastY);
+      if (diff > 2) {
+        setIsScrolling(true);
+        if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+        scrollTimerRef.current = setTimeout(() => setIsScrolling(false), 800);
+      }
+      lastY = y;
     });
     return unsub;
   }, [scrollY]);
@@ -155,21 +161,33 @@ export default function Navbar({ items, className }: NavbarProps) {
   /* ---------- Smooth scroll handler ---------- */
   const handleNavClick = useCallback(
     (e: MouseEvent<HTMLAnchorElement>, href: string) => {
-      // If we are not on the homepage, let the default href navigation occur (e.g. go to /#about)
-      if (typeof window !== 'undefined' && window.location.pathname !== '/') {
+      if (typeof window === 'undefined') return;
+
+      const hashIndex = href.indexOf('#');
+      const targetPath = hashIndex !== -1 ? href.substring(0, hashIndex) : href;
+      const anchorId = hashIndex !== -1 ? href.substring(hashIndex) : '';
+      
+      const currentPath = window.location.pathname;
+      const isCurrentPage =
+        targetPath === '' ||
+        targetPath === '/' ||
+        targetPath === currentPath ||
+        (targetPath === '/rag' && currentPath === '/rag');
+
+      if (isCurrentPage && anchorId) {
+        e.preventDefault();
+        if (lenis) {
+          lenis.start();
+          lenis.scrollTo(anchorId, { duration: prefersReducedMotion ? 0 : 1.2, offset: NAVBAR_SCROLL_OFFSET });
+        } else {
+          const el = document.querySelector(anchorId);
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+        setActiveSection(href);
         setMobileOpen(false);
         return;
       }
 
-      e.preventDefault();
-      const anchorId = href.substring(href.indexOf('#')); // Extracts '#about' from '/#about'
-      if (lenis) {
-        // Resume Lenis immediately so the scroll animation can execute.
-        // If we don't call start() here, the scrollTo call is ignored because Lenis was stopped when the mobile menu opened.
-        lenis.start();
-        lenis.scrollTo(anchorId, { duration: prefersReducedMotion ? 0 : 1.5, offset: NAVBAR_SCROLL_OFFSET });
-      }
-      setActiveSection(href);
       setMobileOpen(false);
     },
     [lenis, prefersReducedMotion],
@@ -221,7 +239,7 @@ export default function Navbar({ items, className }: NavbarProps) {
             <li key={item.href}>
               <a
                 href={item.href}
-                className={`${styles.navLink} ${activeSection === item.href ? styles.active : ''}`}
+                className={`${styles.navLink} ${effectiveActiveSection === item.href ? styles.active : ''}`}
                 onClick={(e) => handleNavClick(e, item.href)}
               >
                 {item.href === '/#resume' ? (
@@ -235,6 +253,17 @@ export default function Navbar({ items, className }: NavbarProps) {
             </li>
           ))}
         </ul>
+
+        {/* ---- RAG Context Action Button ---- */}
+        {pathname?.startsWith('/rag') && (
+          <a
+            href="/rag/app"
+            className="comic-btn comic-btn-blue"
+            style={{ padding: '0.35rem 0.85rem', fontSize: '0.8rem', whiteSpace: 'nowrap' }}
+          >
+            🚀 Launch App
+          </a>
+        )}
 
         {/* ---- Communication Identity Toggle ---- */}
         {audience && (
