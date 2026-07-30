@@ -58,8 +58,9 @@ export default function Navbar({ items, className }: NavbarProps) {
       return [
         { label: 'Overview', href: '/rag#home' },
         { label: 'Features', href: '/rag#features' },
-        { label: 'Live Demo', href: '/rag#demo' },
+        { label: '1-Line Embed', href: '/rag#embed' },
         { label: 'Pricing', href: '/rag#pricing' },
+        { label: 'Live Demo', href: '/rag#demo' },
       ];
     }
     return [

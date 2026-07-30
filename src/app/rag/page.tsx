@@ -47,13 +47,9 @@ export default function RagLandingPage() {
 
   return (
     <div className={styles.landingWrapper}>
-      {/* Hero & Sandbox Section */}
+      {/* 1. Hero & Product Overview Section */}
       <ScrollSection gap={80}>
         <section className={styles.heroSection} id="home">
-          <div className={styles.heroBadge}>
-            <span>✨</span> Powered by Meta Llama 3.3 70B & Local Hybrid RAG Engine
-          </div>
-
           <h1 className={styles.heroTitle}>
             Turn Your Documents & Website into an AI Assistant in 60 Seconds
           </h1>
@@ -71,14 +67,44 @@ export default function RagLandingPage() {
             </a>
           </div>
 
-          {/* Embedded Interactive Live Demo Sandbox */}
-          <div className={styles.heroDemoSandbox} id="demo">
-            <ChatPanel client={guestClient} hidden={false} />
+          {/* Product Overview Feature Highlights Grid */}
+          <div className={styles.heroHighlightsGrid}>
+            <div className={styles.heroHighlightCard}>
+              <span className={styles.heroHighlightIcon}>⚡</span>
+              <div>
+                <h4 className={styles.heroHighlightTitle}>Instant Setup</h4>
+                <p className={styles.heroHighlightDesc}>Paste 1 script line to launch your AI assistant immediately.</p>
+              </div>
+            </div>
+
+            <div className={styles.heroHighlightCard}>
+              <span className={styles.heroHighlightIcon}>🛡️</span>
+              <div>
+                <h4 className={styles.heroHighlightTitle}>Self-Aware CRAG</h4>
+                <p className={styles.heroHighlightDesc}>Rejects low-confidence queries to prevent fake answers.</p>
+              </div>
+            </div>
+
+            <div className={styles.heroHighlightCard}>
+              <span className={styles.heroHighlightIcon}>📄</span>
+              <div>
+                <h4 className={styles.heroHighlightTitle}>PDF Citations</h4>
+                <p className={styles.heroHighlightDesc}>Answers include 1-click downloadable source files.</p>
+              </div>
+            </div>
+
+            <div className={styles.heroHighlightCard}>
+              <span className={styles.heroHighlightIcon}>🌐</span>
+              <div>
+                <h4 className={styles.heroHighlightTitle}>Geo-IP Pricing</h4>
+                <p className={styles.heroHighlightDesc}>Fair, localized INR and USD self-serve subscriptions.</p>
+              </div>
+            </div>
           </div>
         </section>
       </ScrollSection>
 
-      {/* Feature Grid Section */}
+      {/* 2. Feature Grid Section */}
       <ScrollSection verticalOffset={120} gap={80}>
         <section className={styles.featureGridSection} id="features">
           <h2 className={styles.featureGridTitle}>Engineered for Zero-Hallucination Precision</h2>
@@ -122,9 +148,9 @@ export default function RagLandingPage() {
         </section>
       </ScrollSection>
 
-      {/* 1-Line Embed Script Box */}
+      {/* 3. 1-Line Embed Script Box */}
       <ScrollSection verticalOffset={120} gap={80}>
-        <section className={styles.embedBoxSection}>
+        <section className={styles.embedBoxSection} id="embed">
           <div>
             <h2 className={styles.embedTitle}>Embed on Any Website in 10 Seconds</h2>
             <p className={styles.embedDesc}>
@@ -151,9 +177,23 @@ export default function RagLandingPage() {
         </section>
       </ScrollSection>
 
-      {/* Dynamic Geo-IP Pricing Section */}
+      {/* 4. Dynamic Geo-IP Pricing Section */}
       <ScrollSection verticalOffset={120} gap={80}>
         <PricingSection />
+      </ScrollSection>
+
+      {/* 5. Live Interactive Sandbox Demo (Shifted to End) */}
+      <ScrollSection verticalOffset={120} gap={80}>
+        <section className={styles.demoSection} id="demo">
+          <h2 className={styles.demoSectionTitle}>Experience retriever AI Live</h2>
+          <p className={styles.demoSectionSub}>
+            Ask questions, test semantic caching, and download presigned citations in real time.
+          </p>
+
+          <div className={styles.heroDemoSandbox}>
+            <ChatPanel client={guestClient} hidden={false} />
+          </div>
+        </section>
       </ScrollSection>
     </div>
   );
