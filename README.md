@@ -21,7 +21,9 @@ A highly interactive, storyteller-driven personal portfolio website designed wit
 | `/` | Home page — all portfolio sections (hero, about, skills, projects, resume, pricing, playground, blog, contact) |
 | `/terminal` | Interactive diagnostics terminal console (supports commands like `git-info`, `qrcode`, `projects`, `system`, `analytics`) |
 | `/admin/analytics` | Visitor analytics dashboard |
-| `/rag` | RAG Lab — interactive document search and chat via the Retriever engine (`rag.prateeq.in`). Features 👍/👎 message feedback, presigned citation downloads, and cache telemetry. |
+| `/rag` | Retriever AI SaaS Product Landing Page — Hero, live mini-RAG sandbox, feature grid, 1-line embed snippet, and dynamic Geo-IP pricing (INR vs. USD). |
+| `/rag/login` | Auth & Guest Access Portal — 1-click Google OAuth + instant Guest Demo button. |
+| `/rag/app` | SaaS App Studio Workspace — Chat Studio, Document Library, Search Inspector, Embed Configurator, and role-gated admin link. |
 | `/blog` | Blog listing page |
 | `/blog/[slug]` | Individual blog post page |
 

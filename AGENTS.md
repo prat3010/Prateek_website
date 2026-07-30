@@ -77,10 +77,13 @@ The project uses the following environment variables (stored in `.env.local` loc
   - `/` — home page (all portfolio sections).
   - `/terminal` — interactive diagnostics terminal console.
   - `/admin/analytics` — visitor analytics dashboard.
+  - `/rag` — Retriever AI SaaS Product Landing Page (Hero, live mini-RAG sandbox, feature grid, 1-line embed snippet, Geo-IP pricing).
+  - `/rag/login` — Auth & Guest Access Portal (1-click Google OAuth + instant Guest Demo).
+  - `/rag/app` — SaaS App Studio Workspace (Chat Studio, Document Library, Search Inspector, Embed Configurator, role-gated admin link).
   - `/blog` and `/blog/[slug]` — blog listing and individual post pages.
 - `src/app/api/` contains REST API routes for reading/writing portfolio data to Supabase: `skills`, `projects`, `certificates`, `profile`, `git-log`, `analytics-summary`, `contact`, and `revalidate`.
 - `src/proxy.ts` is the Next.js 16 proxy (formerly middleware) file that intercepts requests for telemetry logging.
-- `src/components/rag/` contains the interactive RAG Lab playground (`ChatPanel.tsx`, `UploadPanel.tsx`, `SearchPanel.tsx`, `ConfigPanel.tsx`) connected to the `retriever` backend via `src/lib/rag-client.ts`. Features include 👍/👎 message feedback (`submitFeedback`), clickable presigned citation downloads (`getDownloadUrl`), semantic cache badges (`⚡ Cached`), and Lenis smooth scroll isolation (`data-lenis-prevent`).
+- `src/components/rag/` contains the interactive RAG Lab playground (`ChatPanel.tsx`, `UploadPanel.tsx`, `SearchPanel.tsx`, `ConfigPanel.tsx`, `PricingSection.tsx`) connected to the `retriever` backend via `src/lib/rag-client.ts`. Features include 👍/👎 message feedback (`submitFeedback`), clickable presigned citation downloads (`getDownloadUrl`), semantic cache badges (`⚡ Cached`), Geo-IP pricing (INR/USD), and Lenis smooth scroll isolation (`data-lenis-prevent`).
 - `src/components/` contains portfolio sections, shared UI (like the interactive diagnostics terminal console at `/terminal` which supports commands such as `git-info` and `qrcode`, and the `GestureScroll` floating gesture scroll controller), visual effects, and the playground. Components follow the pattern `src/components/{ComponentName}/{ComponentName}.tsx` with co-located CSS modules.
 - `src/components/effects/wobblyPaths.generated.ts` contains generated skyline path data for prebaked hand-drawn SVG wobble. Do not edit it by hand; regenerate it with `npm run generate:wobbly-paths` after changing skyline `Wobbly*` elements.
 - `src/data/` contains type definitions, Supabase client setup, taglines, and JSON fallback files (data values live in Supabase).
@@ -96,7 +99,7 @@ The project uses the following environment variables (stored in `.env.local` loc
 - `scripts/generate-git-log.js` writes generated commit data before builds.
 - `scripts/generate-wobbly-paths.mjs` prebakes deterministic skyline wobble paths so the browser does not run the full displacement algorithm for normal skyline rendering.
 - `scripts/synchronizer.py` is a local content-management helper. Treat it as tooling, not runtime app code.
-- `scripts/sync_tabs/` contains tab-specific view modules for the Streamlit dashboard (`analytics.py`, `resume.py`, `projects.py`, `certificates.py`, `skills.py`, `photos.py`, `blog.py`, and `shared.py` common parsing/utilities).
+- `scripts/sync_tabs/` contains tab-specific view modules for the Streamlit dashboard (`analytics.py`, `resume.py`, `projects.py`, `certificates.py`, `skills.py`, `photos.py`, `blog.py`, `rag_pricing.py`, and `shared.py` common parsing/utilities).
 - `scripts/seed_supabase.py` populates Supabase tables from the TypeScript data files (one-time bootstrap or re-seed).
 - `scripts/sync_supabase.py` shared REST API module used by the synchronizer to read, upsert, and explicitly delete Supabase records.
 - `scripts/sync_json.py` provides atomic local JSON/text fallback writes for the synchronizer.
