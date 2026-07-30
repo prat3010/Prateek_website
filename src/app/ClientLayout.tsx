@@ -31,12 +31,12 @@ interface ClientLayoutProps {
 
 function ClientLayoutContent({ 
   children, 
-  isAdminRoute, 
+  isStandaloneAppRoute,
   isKonamiActive,
   profile
 }: { 
   children: React.ReactNode; 
-  isAdminRoute: boolean; 
+  isStandaloneAppRoute: boolean;
   isKonamiActive: boolean; 
   profile?: ResumeData | null;
 }) {
@@ -45,9 +45,9 @@ function ClientLayoutContent({
   return (
     <PerformanceGovernorProvider>
       <LenisProvider>
-        {!isAdminRoute && <NoirSkyline />}
-        {!isAdminRoute && <CursorTrail />}
-        {!isAdminRoute && <Navbar />}
+        {!isStandaloneAppRoute && <NoirSkyline />}
+        {!isStandaloneAppRoute && <CursorTrail />}
+        <Navbar />
         
         {audience === null ? (
           <OnboardingSelector />
@@ -55,11 +55,11 @@ function ClientLayoutContent({
           <main id="main-content">{children}</main>
         )}
 
-        {!isAdminRoute && <Footer profile={profile} />}
-        {!isAdminRoute && <ZenToggle />}
-        {!isAdminRoute && <TerminalButton />}
-        {!isAdminRoute && <GestureScroll />}
-        {!isAdminRoute && isKonamiActive && <ThreePizzaRat />}
+        {!isStandaloneAppRoute && <Footer profile={profile} />}
+        {!isStandaloneAppRoute && <ZenToggle />}
+        {!isStandaloneAppRoute && <TerminalButton />}
+        {!isStandaloneAppRoute && <GestureScroll />}
+        {!isStandaloneAppRoute && isKonamiActive && <ThreePizzaRat />}
       </LenisProvider>
     </PerformanceGovernorProvider>
   );
@@ -74,6 +74,7 @@ export default function ClientLayout({
 }: ClientLayoutProps) {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith('/admin');
+  const isStandaloneAppRoute = isAdminRoute || pathname === '/rag/login' || pathname === '/rag/app';
   const [isKonamiActive, setIsKonamiActive] = useState(false);
 
   // Konami Code global listener
@@ -155,7 +156,7 @@ export default function ClientLayout({
   return (
     <ThemeProvider initialTheme={initialTheme} initialAudience={initialAudience} initialRegion={initialRegion}>
       <LazyMotion features={domAnimation}>
-        <ClientLayoutContent isAdminRoute={isAdminRoute} isKonamiActive={isKonamiActive} profile={profile}>
+        <ClientLayoutContent isStandaloneAppRoute={isStandaloneAppRoute} isKonamiActive={isKonamiActive} profile={profile}>
           {children}
         </ClientLayoutContent>
       </LazyMotion>
