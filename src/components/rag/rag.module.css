@@ -674,7 +674,8 @@
   color: var(--color-text-muted);
   max-width: 680px;
   line-height: 1.6;
-  margin-bottom: 2rem;
+  margin: 0 auto 2rem;
+  text-align: center;
 }
 
 .heroCtas {
@@ -859,15 +860,19 @@
 
 .pricingTitle {
   font-family: var(--font-headline);
-  font-size: var(--text-3xl);
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
   color: var(--color-text);
   margin: 0.5rem 0;
+  text-align: center;
 }
 
 .pricingDesc {
   color: var(--color-text-muted);
-  font-size: var(--text-base);
-  margin-bottom: 1.5rem;
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+  max-width: 620px;
+  margin: 0.5rem auto 1.75rem;
+  line-height: 1.6;
+  text-align: center;
 }
 
 .currencyToggle {
