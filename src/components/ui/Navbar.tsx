@@ -54,6 +54,16 @@ export default function Navbar({ items, className }: NavbarProps) {
 
   const navItems = useMemo(() => {
     if (items) return items;
+    if (pathname?.startsWith('/rag')) {
+      return [
+        { label: 'Overview', href: '/rag' },
+        { label: 'Features', href: '/rag#features' },
+        { label: 'Live Demo', href: '/rag#demo' },
+        { label: 'Pricing', href: '/rag#pricing' },
+        { label: 'Log In', href: '/rag/login' },
+        { label: 'App Studio', href: '/rag/app' },
+      ];
+    }
     return [
       { label: 'Home', href: '/#home' },
       { label: 'About', href: '/#about' },
@@ -63,7 +73,7 @@ export default function Navbar({ items, className }: NavbarProps) {
       { label: 'Playground', href: '/#playground' },
       { label: 'Contact', href: '/#contact' },
     ];
-  }, [items, audience]);
+  }, [items, pathname, audience]);
 
   const [scrolled, setScrolled] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);

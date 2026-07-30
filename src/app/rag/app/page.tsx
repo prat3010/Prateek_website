@@ -54,17 +54,16 @@ export default function RagAppStudioPage() {
 
   return (
     <div className={styles.landingWrapper}>
-      {/* App Header Navigation */}
-      <header className={styles.ragNav}>
-        <Link href="/rag" className={styles.navBrand}>
-          <span style={{ fontSize: "1.5rem" }}>⚡</span> Retriever Workspace
-        </Link>
+      {/* Workspace Sub-Header */}
+      <div className={styles.workspaceHeader}>
+        <div className={styles.workspaceTitleGroup}>
+          <h1 className={styles.workspaceTitle}>SaaS Studio Workspace</h1>
+          <span className={styles.heroBadge} style={{ margin: 0 }}>
+            Tenant ID: {tenantId.slice(0, 8)}…
+          </span>
+        </div>
 
         <div className={styles.navLinks}>
-          <span className={styles.heroBadge} style={{ margin: 0 }}>
-            Tenant: {tenantId.slice(0, 8)}…
-          </span>
-
           {isAdmin && (
             <Link href="/admin/analytics" className="comic-btn comic-btn-blue">
               🛠️ Admin Dashboard
@@ -75,7 +74,7 @@ export default function RagAppStudioPage() {
             Log Out
           </button>
         </div>
-      </header>
+      </div>
 
       {/* Main Studio Tabs */}
       <div className={styles.tabs} style={{ marginBottom: "1.5rem" }}>

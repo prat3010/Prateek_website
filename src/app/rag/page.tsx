@@ -32,31 +32,6 @@ export default function RagLandingPage() {
 
   return (
     <div className={styles.landingWrapper}>
-      {/* Product Header Navigation */}
-      <header className={styles.ragNav}>
-        <Link href="/rag" className={styles.navBrand}>
-          <span style={{ fontSize: "1.5rem" }}>⚡</span> Retriever AI
-        </Link>
-
-        <nav className={styles.navLinks}>
-          <a href="#features" className={styles.navLink}>
-            Features
-          </a>
-          <a href="#demo" className={styles.navLink}>
-            Live Demo
-          </a>
-          <a href="#pricing" className={styles.navLink}>
-            Pricing
-          </a>
-          <Link href="/rag/login" className={styles.navLink}>
-            Log In
-          </Link>
-          <Link href="/rag/login" className="comic-btn comic-btn-blue">
-            Start Free Trial
-          </Link>
-        </nav>
-      </header>
-
       {/* Hero Section */}
       <section className={styles.heroSection}>
         <div className={styles.heroBadge}>

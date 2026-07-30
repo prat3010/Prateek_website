@@ -698,6 +698,32 @@
   text-align: left;
 }
 
+/* Workspace Header */
+.workspaceHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: var(--surface-card, #121214);
+  border: var(--border-medium);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-comic);
+  margin-bottom: 2rem;
+}
+
+.workspaceTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.workspaceTitle {
+  font-family: var(--font-headline);
+  font-size: 1.4rem;
+  color: var(--color-text);
+  margin: 0;
+}
+
 /* Feature Grid */
 .featureGridSection {
   padding: 3rem 0;
@@ -706,15 +732,18 @@
 
 .featureGridTitle {
   font-family: var(--font-headline);
-  font-size: var(--text-3xl);
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
   color: var(--color-text);
   margin-bottom: 0.5rem;
 }
 
 .featureGridSub {
   color: var(--color-text-muted);
-  font-size: var(--text-base);
-  margin-bottom: 2.5rem;
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+  max-width: 680px;
+  margin: 0.5rem auto 3rem;
+  line-height: 1.6;
+  text-align: center;
 }
 
 .featureGrid {
@@ -724,12 +753,14 @@
 }
 
 .featureCard {
-  background: var(--surface-card);
+  background: var(--surface-card, #1e1e24);
   border: var(--border-medium);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-comic);
   padding: 1.75rem 1.25rem;
   text-align: left;
+  position: relative;
+  z-index: 2;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -758,7 +789,7 @@
 
 /* Embed Script Showcase Box */
 .embedBoxSection {
-  background: var(--surface-card);
+  background: var(--surface-card, #1e1e24);
   border: var(--border-medium);
   border-radius: var(--border-radius-xl);
   box-shadow: var(--shadow-comic-lg);
@@ -768,6 +799,8 @@
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
   align-items: center;
+  position: relative;
+  z-index: 5;
 }
 
 .embedTitle {
@@ -784,24 +817,27 @@
 }
 
 .codeSnippetCard {
-  background: #08080a;
-  border: 1.5px solid var(--border-muted);
+  background: #08080a !important;
+  border: 1.5px solid var(--border-muted, #555562);
   border-radius: 8px;
-  padding: 1rem;
+  padding: 1.25rem 1rem 1rem;
   font-family: var(--font-code);
-  font-size: 0.8rem;
+  font-size: 0.825rem;
   color: #e0e0e3;
   position: relative;
+  z-index: 6;
   overflow-x: auto;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 .copyBtn {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  padding: 0.2rem 0.5rem;
-  font-size: 0.7rem;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.725rem;
   border-radius: 4px;
+  z-index: 10;
 }
 
 /* Pricing Section */
