@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { RetrieverClient } from "@/lib/rag-client";
 import { ChatPanel } from "@/components/rag/ChatPanel";
-import { UploadPanel } from "@/components/rag/UploadPanel";
+import { DocumentsPanel } from "@/components/rag/DocumentsPanel";
 import { SearchPanel } from "@/components/rag/SearchPanel";
 import { ConfigPanel } from "@/components/rag/ConfigPanel";
 import styles from "@/components/rag/rag.module.css";
@@ -108,9 +108,33 @@ export default function RagAppStudioPage() {
       {/* Tab Panels */}
       <div className={styles.panelContainer}>
         <ChatPanel client={client} hidden={activeTab !== "chat"} />
-        <UploadPanel client={client} hidden={activeTab !== "upload"} />
+        <DocumentsPanel client={client} hidden={activeTab !== "upload"} />
         <SearchPanel client={client} hidden={activeTab !== "search"} />
-        <ConfigPanel hidden={activeTab !== "config"} />
+        <ConfigPanel
+          config={
+            client
+              ? {
+                  apiUrl: "https://rag.prateeq.in",
+                  tenantId,
+                  apiKey: localStorage.getItem("retriever_api_key") || "",
+                  userId: localStorage.getItem("retriever_user_id") || "",
+                }
+              : null
+          }
+          onSave={(cfg) => {
+            localStorage.setItem("retriever_tenant_id", cfg.tenantId);
+            localStorage.setItem("retriever_api_key", cfg.apiKey);
+            localStorage.setItem("retriever_user_id", cfg.userId);
+            window.location.reload();
+          }}
+          onClear={() => {
+            localStorage.removeItem("retriever_tenant_id");
+            localStorage.removeItem("retriever_api_key");
+            localStorage.removeItem("retriever_user_id");
+            window.location.reload();
+          }}
+          hidden={activeTab !== "config"}
+        />
       </div>
     </div>
   );
