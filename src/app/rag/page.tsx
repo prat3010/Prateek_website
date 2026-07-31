@@ -205,36 +205,7 @@ export default function RagLandingPage() {
         </section>
       </ScrollSection>
 
-      {/* 3. 1-Line Embed Script Box */}
-      <ScrollSection verticalOffset={120} gap={80}>
-        <section className={styles.embedBoxSection} id="embed">
-          <div>
-            <h2 className={styles.embedTitle}>Embed on Any Website in 10 Seconds</h2>
-            <p className={styles.embedDesc}>
-              Works seamlessly with WordPress, Shopify, Webflow, Framer, React, and custom HTML sites. Simply copy-paste the snippet into your site header.
-            </p>
-          </div>
-
-          <div className={styles.codeSnippetCard}>
-            <button className={`comic-btn ${styles.copyBtn}`} onClick={copySnippet}>
-              {copied ? "✓ Copied!" : "Copy Snippet"}
-            </button>
-            <code>
-              {"<script"}
-              <br />
-              &nbsp;&nbsp;{"src=\"https://rag.prateeq.in/widget.js\""}
-              <br />
-              &nbsp;&nbsp;{"data-tenant=\"YOUR_TENANT_ID\""}
-              <br />
-              &nbsp;&nbsp;{"data-key=\"YOUR_API_KEY\">"}
-              <br />
-              {"</script>"}
-            </code>
-          </div>
-        </section>
-      </ScrollSection>
-
-      {/* 4. Dynamic Geo-IP Pricing Section */}
+      {/* 3. Dynamic Geo-IP Pricing Section */}
       <ScrollSection verticalOffset={120} gap={80}>
         <PricingSection />
       </ScrollSection>
