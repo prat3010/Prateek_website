@@ -46,6 +46,14 @@ async function fetchWithRetry(url: string, options: RequestInit, retries = MAX_R
   throw new Error("Request failed after retries");
 }
 
+const UUID_REGEX = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+const DEFAULT_GUEST_USER_ID = "00000000-0000-0000-0000-000000000001";
+
+function sanitizeUserId(userId?: string): string {
+  if (userId && UUID_REGEX.test(userId)) return userId;
+  return DEFAULT_GUEST_USER_ID;
+}
+
 export class RetrieverClient {
   private config: RetrieverConfig;
 
@@ -55,9 +63,11 @@ export class RetrieverClient {
 
   private async request<T>(path: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.config.apiUrl.replace(/\/$/, "")}${path}`;
+    const validUserId = sanitizeUserId(this.config.userId);
     const headers: Record<string, string> = {
       "Authorization": `Bearer ${this.config.apiKey}`,
-      "X-User-ID": this.config.userId,
+      "X-User-ID": validUserId,
+      "X-Tenant-ID": this.config.tenantId,
     };
     if (!(options.body instanceof FormData)) {
       headers["Content-Type"] = "application/json";
@@ -93,18 +103,20 @@ export class RetrieverClient {
   }
 
   async createSession() {
+    const validUserId = sanitizeUserId(this.config.userId);
     return this.request<{ sessionId: string; createdAt: string }>(
       `/v1/tenants/${this.config.tenantId}/chat/sessions`,
-      { method: "POST", body: JSON.stringify({ user_id: this.config.userId }) },
+      { method: "POST", body: JSON.stringify({ user_id: validUserId }) },
     );
   }
 
   async chat(sessionId: string, message: string, signal?: AbortSignal): Promise<ReadableStream<Uint8Array> | null> {
     const url = `${this.config.apiUrl.replace(/\/$/, "")}/v1/tenants/${this.config.tenantId}/chat/sessions/${sessionId}/messages`;
+    const validUserId = sanitizeUserId(this.config.userId);
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${this.config.apiKey}`,
-      "X-User-ID": this.config.userId,
+      "X-User-ID": validUserId,
       Accept: "text/event-stream",
     };
     if (this.config.llmKey) headers["X-LLM-Key"] = this.config.llmKey;

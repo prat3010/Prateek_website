@@ -14,7 +14,7 @@ const GUEST_CONFIG = {
   apiUrl: "https://rag.prateeq.in",
   tenantId: "00000000-0000-0000-0000-000000000000",
   apiKey: "ret_live_GuestAccessKey2026.ReadOnlyChat",
-  userId: "guest_visitor_user",
+  userId: "00000000-0000-0000-0000-000000000001",
 };
 
 export default function RagLandingPage() {

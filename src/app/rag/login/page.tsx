@@ -49,7 +49,7 @@ export default function RagLoginPage() {
 
   const handleGuestDemo = () => {
     localStorage.setItem("retriever_tenant_id", "00000000-0000-0000-0000-000000000000");
-    localStorage.setItem("retriever_user_id", "guest_visitor_user");
+    localStorage.setItem("retriever_user_id", "00000000-0000-0000-0000-000000000001");
     localStorage.setItem("retriever_api_key", "ret_live_GuestAccessKey2026.ReadOnlyChat");
     router.push("/rag/app");
   };

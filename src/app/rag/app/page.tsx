@@ -27,7 +27,7 @@ export default function RagAppStudioPage() {
     Promise.resolve().then(() => {
       if (!active) return;
       const tId = localStorage.getItem("retriever_tenant_id") || "00000000-0000-0000-0000-000000000000";
-      const uId = localStorage.getItem("retriever_user_id") || "guest_visitor_user";
+      const uId = localStorage.getItem("retriever_user_id") || "00000000-0000-0000-0000-000000000001";
       const key = localStorage.getItem("retriever_api_key") || GUEST_KEY;
 
       setTenantId(tId);
