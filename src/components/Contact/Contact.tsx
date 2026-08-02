@@ -176,7 +176,7 @@ function Contact() {
         <div className={styles.telemetryBar}>
           <div className={styles.telemetryItem}>
             <Clock size={13} className={styles.telemetryIcon} />
-            <span>SLA: &lt; 12 Hours</span>
+            <span>SLA: &lt; 24 Hours</span>
           </div>
           <div className={styles.telemetryDivider}>•</div>
           <div className={styles.telemetryItem}>
@@ -331,7 +331,7 @@ function Contact() {
 
               {status === 'success' && (
                 <SpeechBubble direction="top" color="var(--pop-green)">
-                  <p className={styles.successText}>Signal received! I&apos;ll get back to you within 12 hours.</p>
+                  <p className={styles.successText}>Signal received! I&apos;ll get back to you within 24 hours.</p>
                 </SpeechBubble>
               )}
 
