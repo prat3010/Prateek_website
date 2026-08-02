@@ -10,7 +10,8 @@ import {
   Building2,
   SlidersHorizontal,
   Palette,
-  ShieldCheck
+  ShieldCheck,
+  Layers
 } from 'lucide-react';
 import { generateQuestionnairePDF } from '@/utils/pdfGenerator';
 import type { ResumeData } from '@/data/resume';
@@ -19,6 +20,21 @@ import styles from './IntakeForm.module.css';
 interface IntakeFormProps {
   resumeData?: ResumeData | null;
 }
+
+export interface BaseEngineItem {
+  id: string;
+  title: string;
+  tier: string;
+  priceINR: number;
+  priceUSD: number;
+  description: string;
+}
+
+export const BASE_ENGINES: BaseEngineItem[] = [
+  { id: 'landing', title: 'Landing Page Core Engine', tier: 'Tier 1', priceINR: 25000, priceUSD: 300, description: 'Next.js 16 App Router, Responsive Motion UI, Contact Form, ReCAPTCHA, Telemetry, SEO' },
+  { id: 'multipage', title: 'Multi-Page Web App Core Engine', tier: 'Tier 2', priceINR: 45000, priceUSD: 550, description: 'Multi-page routing (3–6 pages), Page Transitions, Shared Shell, Dynamic Layouts' },
+  { id: 'saas', title: 'Full-Stack SaaS MVP Core Engine', tier: 'Tier 3', priceINR: 75000, priceUSD: 950, description: 'Complete Web App Shell, Supabase PostgreSQL Architecture, Server Caching (unstable_cache)' }
+];
 
 export interface FeatureItem {
   id: string;
@@ -130,9 +146,10 @@ export default function IntakeForm({ resumeData }: IntakeFormProps) {
     contactPhone: '',
     projectGoal: 'Lead Generation & Direct Sales',
     targetAudience: '',
-    selectedFeatures: [FEATURE_MODULES[0].label, FEATURE_MODULES[1].label],
+    selectedBaseEngineId: BASE_ENGINES[0].id,
+    selectedFeatures: [FEATURE_MODULES[0].label],
     selectedBrandAssetId: BRAND_ASSET_OPTIONS[0].id,
-    selectedMaintenanceId: 'standard', // Dynamic override or auto-selected
+    selectedMaintenanceId: '', // Default empty, computed dynamically
     inspirationLinks: '',
     timeline: timelineOptions[1] || timelineOptions[0],
     additionalNotes: ''
@@ -148,19 +165,9 @@ export default function IntakeForm({ resumeData }: IntakeFormProps) {
     });
   };
 
-  // Smart Engine Calculation
-  const engineCalculation = useMemo(() => {
-    const hasAI = formData.selectedFeatures.some(f => f.includes('RAG') || f.includes('AI'));
-    const hasComplex = formData.selectedFeatures.some(f => f.includes('Auth') || f.includes('Payment') || f.includes('CMS') || f.includes('Admin'));
-
-    if (hasAI) {
-      return { title: 'Full-Stack SaaS MVP Core Engine', priceINR: 75000, priceUSD: 950, tier: 'Tier 3' };
-    }
-    if (hasComplex) {
-      return { title: 'Multi-Page Web App Core Engine', priceINR: 45000, priceUSD: 550, tier: 'Tier 2' };
-    }
-    return { title: 'Landing Page Core Engine', priceINR: 25000, priceUSD: 300, tier: 'Tier 1' };
-  }, [formData.selectedFeatures]);
+  const selectedEngine = useMemo(() => {
+    return BASE_ENGINES.find(e => e.id === formData.selectedBaseEngineId) || BASE_ENGINES[0];
+  }, [formData.selectedBaseEngineId]);
 
   // Smart Maintenance Auto-Selection
   const autoMaintenancePlanId = useMemo(() => {
@@ -172,28 +179,33 @@ export default function IntakeForm({ resumeData }: IntakeFormProps) {
     return 'basic';
   }, [formData.selectedFeatures]);
 
-  // Total Build Cost Calculation
+  // Pure Additive Cost Calculation
   const totalCost = useMemo(() => {
-    const base = engineCalculation;
-    
-    // Add-on Features
+    // 1. Base Engine
+    const baseINR = selectedEngine.priceINR;
+    const baseUSD = selectedEngine.priceUSD;
+
+    // 2. Feature Add-ons
     let featuresINR = 0;
     let featuresUSD = 0;
+    const itemizedList: string[] = [];
+
     FEATURE_MODULES.forEach(m => {
       if (formData.selectedFeatures.includes(m.label)) {
         featuresINR += m.priceINR;
         featuresUSD += m.priceUSD;
+        itemizedList.push(`${m.label} (+₹${m.priceINR.toLocaleString()})`);
       }
     });
 
-    // Brand Asset Add-on
+    // 3. Brand Kit Add-on
     const brandOpt = BRAND_ASSET_OPTIONS.find(b => b.id === formData.selectedBrandAssetId) || BRAND_ASSET_OPTIONS[0];
 
-    const totalINR = base.priceINR + featuresINR + brandOpt.priceINR;
-    const totalUSD = base.priceUSD + featuresUSD + brandOpt.priceUSD;
+    const totalINR = baseINR + featuresINR + brandOpt.priceINR;
+    const totalUSD = baseUSD + featuresUSD + brandOpt.priceUSD;
 
-    return { totalINR, totalUSD, brandOpt };
-  }, [engineCalculation, formData.selectedFeatures, formData.selectedBrandAssetId]);
+    return { totalINR, totalUSD, baseINR, baseUSD, featuresINR, featuresUSD, brandOpt, itemizedList };
+  }, [selectedEngine, formData.selectedFeatures, formData.selectedBrandAssetId]);
 
   const activeMaintenancePlan = useMemo(() => {
     const targetId = formData.selectedMaintenanceId || autoMaintenancePlanId;
@@ -207,12 +219,12 @@ export default function IntakeForm({ resumeData }: IntakeFormProps) {
       contactPhone: formData.contactPhone,
       projectGoal: formData.projectGoal,
       targetAudience: formData.targetAudience,
-      projectCategory: engineCalculation.title,
+      projectCategory: selectedEngine.title,
       features: formData.selectedFeatures,
       assetsStatus: totalCost.brandOpt.label,
       inspirationLinks: formData.inspirationLinks,
       timeline: formData.timeline,
-      budgetRange: `${engineCalculation.tier}: ₹${totalCost.totalINR.toLocaleString()} ($${totalCost.totalUSD.toLocaleString()})`,
+      budgetRange: `${selectedEngine.tier}: ₹${totalCost.totalINR.toLocaleString()} ($${totalCost.totalUSD.toLocaleString()})`,
       maintenancePlan: activeMaintenancePlan.name,
       maintenanceCostINR: activeMaintenancePlan.priceINR,
       maintenanceCostUSD: activeMaintenancePlan.priceUSD,
@@ -238,15 +250,15 @@ export default function IntakeForm({ resumeData }: IntakeFormProps) {
         body: JSON.stringify({
           name: formData.companyName,
           email: formData.contactEmail,
-          subject: `[SCOPING INTAKE] ${formData.companyName} (${engineCalculation.tier})`,
+          subject: `[SCOPING INTAKE] ${formData.companyName} (${selectedEngine.tier})`,
           message: `
 Client: ${formData.companyName} (${formData.contactEmail}, Phone: ${formData.contactPhone})
 Goal: ${formData.projectGoal}
 Audience: ${formData.targetAudience}
 
-Engine: ${engineCalculation.title} (${engineCalculation.tier})
-Features: ${formData.selectedFeatures.join(', ')}
-Brand Readiness: ${totalCost.brandOpt.label}
+Base Engine: ${selectedEngine.title} (₹${selectedEngine.priceINR.toLocaleString()})
+Checked Add-ons: ${formData.selectedFeatures.join(', ')} (₹${totalCost.featuresINR.toLocaleString()})
+Brand Readiness: ${totalCost.brandOpt.label} (₹${totalCost.brandOpt.priceINR.toLocaleString()})
 Maintenance Plan: ${activeMaintenancePlan.name} (₹${activeMaintenancePlan.priceINR}/mo)
 
 Total Build Investment: ₹${totalCost.totalINR.toLocaleString()} / $${totalCost.totalUSD.toLocaleString()}
@@ -410,8 +422,44 @@ Notes: ${formData.additionalNotes}
                     <span>STEP 2: TECHNICAL ARCHITECTURE & FEATURE MATRIX</span>
                   </div>
 
+                  {/* Base Engine Selector */}
+                  <div className={styles.field} style={{ marginBottom: '16px' }}>
+                    <label className={styles.label}>
+                      <Layers size={14} style={{ display: 'inline', marginRight: '4px' }} />
+                      Select Base Platform Foundation Engine
+                    </label>
+                    <div className={styles.checkboxGrid}>
+                      {BASE_ENGINES.map(e => {
+                        const isSelected = formData.selectedBaseEngineId === e.id;
+                        return (
+                          <div
+                            key={e.id}
+                            className={`${styles.checkboxCard}`}
+                            onClick={() => setFormData({ ...formData, selectedBaseEngineId: e.id })}
+                            style={{ cursor: 'pointer', borderLeft: isSelected ? '3px solid #0284c7' : 'none', background: isSelected ? '#f0f9ff' : '#ffffff' }}
+                          >
+                            <input
+                              type="radio"
+                              name="baseEngine"
+                              checked={isSelected}
+                              onChange={() => setFormData({ ...formData, selectedBaseEngineId: e.id })}
+                            />
+                            <div style={{ flex: 1 }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span style={{ fontWeight: 700, color: '#0f172a' }}>{`${e.title} (${e.tier})`}</span>
+                                <span className={styles.priceBadge}>{`₹${e.priceINR.toLocaleString()} ($${e.priceUSD})`}</span>
+                              </div>
+                              <p style={{ margin: '2px 0 0 0', fontSize: '11px', color: '#64748b' }}>{e.description}</p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Feature Checkboxes */}
                   <div className={styles.field}>
-                    <label className={styles.label}>Select Architecture Modules (Check All That Apply)</label>
+                    <label className={styles.label}>Select Architecture Add-on Modules (Pure Additive Pricing)</label>
                     <div className={styles.checkboxGrid}>
                       {FEATURE_MODULES.map(m => {
                         const isChecked = formData.selectedFeatures.includes(m.label);
@@ -435,11 +483,13 @@ Notes: ${formData.additionalNotes}
                     </div>
                   </div>
 
-                  {/* Sticky Calculator Preview inside step 2 */}
+                  {/* Live Transparent Arithmetic Bar */}
                   <div className={styles.stickyBar}>
                     <div className={styles.stickyLeft}>
-                      <span className={styles.stickyTitle}>⚡ Live Calculated Base Engine</span>
-                      <span className={styles.stickyBreakdown}>{`${engineCalculation.title} (${engineCalculation.tier})`}</span>
+                      <span className={styles.stickyTitle}>⚡ Live Pure Additive Arithmetic Formula</span>
+                      <span className={styles.stickyBreakdown}>
+                        {`Base (${selectedEngine.title}: ₹${selectedEngine.priceINR.toLocaleString()}) + Add-ons (₹${totalCost.featuresINR.toLocaleString()})`}
+                      </span>
                     </div>
                     <div className={styles.stickyTotal}>
                       {`Estimated Total: ₹${totalCost.totalINR.toLocaleString()} ($${totalCost.totalUSD.toLocaleString()})`}
@@ -477,7 +527,7 @@ Notes: ${formData.additionalNotes}
                             <div style={{ flex: 1 }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <span style={{ fontWeight: 700 }}>{b.label}</span>
-                                <span className={styles.priceBadge}>{b.priceINR > 0 ? `+₹${b.priceINR.toLocaleString()}` : 'Included'}</span>
+                                <span className={styles.priceBadge}>{b.priceINR > 0 ? `+₹${b.priceINR.toLocaleString()}` : 'Included (+₹0)'}</span>
                               </div>
                               <p style={{ margin: '2px 0 0 0', fontSize: '11px', color: '#64748b' }}>{b.description}</p>
                             </div>
@@ -512,7 +562,11 @@ Notes: ${formData.additionalNotes}
                   <div style={{ background: '#0f172a', borderRadius: '8px', padding: '14px 18px', color: '#ffffff', marginBottom: '16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #334155', paddingBottom: '8px', marginBottom: '8px' }}>
                       <span style={{ fontFamily: 'var(--font-code)', fontSize: '12px', color: '#94a3b8' }}>SELECTED BASE ENGINE</span>
-                      <span style={{ fontWeight: 700, color: '#38bdf8' }}>{`${engineCalculation.title} (₹${engineCalculation.priceINR.toLocaleString()})`}</span>
+                      <span style={{ fontWeight: 700, color: '#38bdf8' }}>{`${selectedEngine.title} (₹${selectedEngine.priceINR.toLocaleString()})`}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #334155', paddingBottom: '8px', marginBottom: '8px' }}>
+                      <span style={{ fontFamily: 'var(--font-code)', fontSize: '12px', color: '#94a3b8' }}>SELECTED ADD-ON MODULES</span>
+                      <span style={{ fontWeight: 700, color: '#e2e8f0' }}>{`+₹${totalCost.featuresINR.toLocaleString()} (${formData.selectedFeatures.length} Modules)`}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #334155', paddingBottom: '8px', marginBottom: '8px' }}>
                       <span style={{ fontFamily: 'var(--font-code)', fontSize: '12px', color: '#94a3b8' }}>BRAND KIT ADD-ON</span>
