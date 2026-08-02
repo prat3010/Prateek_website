@@ -72,7 +72,8 @@ export function SkylineImageHeader({
   return (
     <View style={[styles.container, { backgroundColor: isAzure ? '#F7F2E8' : '#0F172A' }]}>
       {/* EXACT HAND-DRAWN SKYLINE ARTWORK IMAGE */}
-      <Image src={imagePath} style={styles.skylineImage} alt="Hand-drawn skyline artwork" />
+      {/* eslint-disable-next-line jsx-a11y/alt-text */}
+      <Image src={imagePath} style={styles.skylineImage} />
 
       {/* CONTRAST OVERLAY FOR HIGH READABILITY */}
       <View style={styles.darkOverlay} />
