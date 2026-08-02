@@ -10,6 +10,8 @@ import {
   Layers
 } from 'lucide-react';
 import styles from './SiteInfoConsole.module.css';
+import type { ResumeData, MiddlemanAgreementConfig } from '@/data/resume';
+import resumeFallback from '@/data/resume.json';
 
 // Command responses for Noir Interactive Console
 interface ConsoleLine {
@@ -34,11 +36,19 @@ interface ProjectSummary {
 
 export default function SiteInfoConsole() {
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
+  const [profileData, setProfileData] = useState<ResumeData>(resumeFallback as unknown as ResumeData);
 
   useEffect(() => {
     fetch('/api/projects')
       .then(r => r.json())
       .then(data => setProjects(data || []))
+      .catch(() => {});
+
+    fetch('/api/profile')
+      .then(r => r.json())
+      .then(data => {
+        if (data && data.intake) setProfileData(data);
+      })
       .catch(() => {});
   }, []);
   const { isNoir } = useTheme();
@@ -352,15 +362,36 @@ export default function SiteInfoConsole() {
     }
 
     if (['partner', 'middleman', 'agreement', 'middleman-agreement'].includes(trimmedCmd)) {
-      setTerminalHistory(prev => [
-        ...prev,
+      const mm: Partial<MiddlemanAgreementConfig> = profileData?.intake?.middlemanAgreement || {};
+      const partnerName = mm.partnerName || '[Partner Name]';
+      const effectiveDate = mm.effectiveDate || 'August 2, 2026';
+      const devName = mm.developerName || 'Prateeq Sharma';
+      const devEmail = mm.developerEmail || '3010prateeksharma@gmail.com';
+      const tier1Cut = mm.tier1Commission || '10%';
+      const tier2Cut = mm.tier2Commission || '12%';
+      const tier3Cut = mm.tier3Commission || '15%';
+      const recurringCut = mm.recurringCommission || '10%';
+
+      const disbursement = mm.disbursementRules || [
+        "Rule 3.1: No out-of-pocket payouts prior to cleared client funds.",
+        "Rule 3.2: Proportional payout (50% on deposit, 50% on final balance).",
+        "Rule 3.3: Net fee calculation on retained funds in case of cancellations."
+      ];
+
+      const confidentiality = mm.confidentialityRules || [
+        "Rule 4.1: Non-Circumvention — Partner agrees not to bypass Developer.",
+        "Rule 4.2: Codebase & IP remain Developer property until fully paid.",
+        "Rule 4.3: Strict confidentiality on quotes, client contacts & terms."
+      ];
+
+      const lines: ConsoleLine[] = [
         { text: '===========================================================', type: 'success' },
         { text: '   FREELANCE SALES & BUSINESS BROKER AGREEMENT', type: 'success' },
         { text: '===========================================================', type: 'success' },
-        { text: 'EFFECTIVE DATE : August 2, 2026', type: 'output' },
-        { text: 'DEVELOPER      : Prateeq Sharma (prateeq.in)', type: 'output' },
-        { text: 'SALES PARTNER  : Independent Sales Representative / Partner', type: 'output' },
-        { text: 'CONTACT EMAIL  : 3010prateeksharma@gmail.com', type: 'output' },
+        { text: `EFFECTIVE DATE : ${effectiveDate}`, type: 'output' },
+        { text: `DEVELOPER      : ${devName} (prateeq.in)`, type: 'output' },
+        { text: `SALES PARTNER  : ${partnerName}`, type: 'output' },
+        { text: `CONTACT EMAIL  : ${devEmail}`, type: 'output' },
         { text: ' ', type: 'output' },
         { text: '1. PURPOSE & ROLES OF ENGAGEMENT', type: 'success' },
         { text: '  This Agreement outlines commercial terms, commission structures, and rules', type: 'output' },
@@ -369,30 +400,28 @@ export default function SiteInfoConsole() {
         { text: '  - Developer Roles: Fixed-Price Scoping, Building, Staging Hosting, QA & Support.', type: 'output' },
         { text: ' ', type: 'output' },
         { text: '2. COMMISSION & COMPENSATION STRUCTURE', type: 'success' },
-        { text: '  - Tier 1 (Landing Page ₹25k-45k / $300-550): 10% Cut (Payout: ₹2,500 – ₹4,500)', type: 'output' },
-        { text: '  - Tier 2 (Multi-Page Web ₹45k-90k / $550-1.1k): 12% Cut (Payout: ₹5,400 – ₹10,800)', type: 'output' },
-        { text: '  - Tier 3/4 (Full-Stack & RAG ₹90k-2.5L+ / $1.1k-3k+): 15% Cut (Payout: ₹13,500 – ₹37,500+)', type: 'output' },
-        { text: '  - Recurring Care Plan: 10% monthly cut (₹1,000/mo) for active retainers.', type: 'output' },
+        { text: `  - Tier 1 (Landing Page ₹25k-45k / $300-550): ${tier1Cut} Cut`, type: 'output' },
+        { text: `  - Tier 2 (Multi-Page Web ₹45k-90k / $550-1.1k): ${tier2Cut} Cut`, type: 'output' },
+        { text: `  - Tier 3/4 (Full-Stack & RAG ₹90k-2.5L+ / $1.1k-3k+): ${tier3Cut} Cut`, type: 'output' },
+        { text: `  - Recurring Care Plan: ${recurringCut} monthly cut for active retainers.`, type: 'output' },
         { text: ' ', type: 'output' },
         { text: '3. PAYMENT DISBURSEMENT RULES', type: 'success' },
-        { text: '  - Rule 3.1: No out-of-pocket payouts prior to cleared client funds.', type: 'output' },
-        { text: '  - Rule 3.2: 50% payout on deposit receipt; 50% payout on final balance.', type: 'output' },
-        { text: '  - Rule 3.3: Commission calculated strictly on net funds retained.', type: 'output' },
+        ...disbursement.map(r => ({ text: `  - ${r}`, type: 'output' as const })),
         { text: ' ', type: 'output' },
         { text: '4. NON-CIRCUMVENTION & CONFIDENTIALITY', type: 'success' },
-        { text: '  - Rule 4.1: Non-Circumvention — Partner agrees not to bypass Developer.', type: 'output' },
-        { text: '  - Rule 4.2: Codebase & IP remain Developer property until fully paid.', type: 'output' },
-        { text: '  - Rule 4.3: Strict confidentiality on quotes and client contacts.', type: 'output' },
+        ...confidentiality.map(r => ({ text: `  - ${r}`, type: 'output' as const })),
         { text: ' ', type: 'output' },
         { text: '5. SIGNATURE & ACCEPTANCE BLOCK', type: 'success' },
-        { text: '  - DEVELOPER: Prateeq Sharma (Principal Engineer & Lead Architect)', type: 'output' },
-        { text: '  - PARTNER  : Independent Sales Representative / Business Broker', type: 'output' },
+        { text: `  - DEVELOPER: ${devName} (Principal Engineer & Lead Architect)`, type: 'output' },
+        { text: `  - PARTNER  : ${partnerName}`, type: 'output' },
         { text: ' ', type: 'output' },
         { text: '📄 VIEW / DOWNLOAD PDF AGREEMENTS:', type: 'success' },
         { text: '  🔗 Open Azure PDF Agreement (Middleman_Partnership_Agreement.pdf)', type: 'link', href: '/Middleman_Partnership_Agreement.pdf' },
         { text: '  🔗 Open Noir PDF Agreement (Middleman_Partnership_Agreement_Noir.pdf)', type: 'link', href: '/Middleman_Partnership_Agreement_Noir.pdf' },
         { text: '===========================================================', type: 'success' }
-      ]);
+      ];
+
+      setTerminalHistory(prev => [...prev, ...lines]);
       setTerminalInput('');
       return;
     }
@@ -537,7 +566,7 @@ export default function SiteInfoConsole() {
 
     setTerminalHistory(prev => [...prev, ...response]);
     setTerminalInput('');
-  }, [projects]);
+  }, [projects, profileData]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
