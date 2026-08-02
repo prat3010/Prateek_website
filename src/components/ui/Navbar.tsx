@@ -15,7 +15,7 @@ import styles from './Navbar.module.css';
 
 const NAV_LABEL_TEXTS: ScramblerProps['texts'] = {
   developer: { light: 'Resume',    noir: 'Resume' },
-  business:  { light: 'Quotation', noir: 'Quotation' },
+  business:  { light: 'Services & Guarantees', noir: 'Services & Guarantees' },
 };
 
 export interface NavItem {
@@ -67,7 +67,7 @@ export default function Navbar({ items, className }: NavbarProps) {
       { label: 'About', href: '/#about' },
       { label: 'Capabilities', href: '/#capabilities' },
       { label: 'Projects', href: '/#projects' },
-      { label: audience === 'business' ? 'Quotation' : 'Resume', href: '/#resume' },
+      { label: audience === 'business' ? 'Services & Guarantees' : 'Resume', href: '/#resume' },
       { label: 'Playground', href: '/#playground' },
       { label: 'Contact', href: '/#contact' },
     ];

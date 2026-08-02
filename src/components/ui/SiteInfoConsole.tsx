@@ -9,6 +9,7 @@ import {
   ArrowLeft,
   Layers
 } from 'lucide-react';
+import MiddlemanAgreementModal from '@/components/Middleman/MiddlemanAgreementModal';
 import styles from './SiteInfoConsole.module.css';
 
 // Command responses for Noir Interactive Console
@@ -41,6 +42,7 @@ export default function SiteInfoConsole() {
       .catch(() => {});
   }, []);
   const { isNoir } = useTheme();
+  const [isPartnerModalOpen, setIsPartnerModalOpen] = useState(false);
   const [terminalInput, setTerminalInput] = useState('');
   const [terminalHistory, setTerminalHistory] = useState<ConsoleLine[]>(
     BOOT_LOGS.map(log => ({ text: log, type: 'success' }))
@@ -350,11 +352,24 @@ export default function SiteInfoConsole() {
       return;
     }
 
+    if (['partner', 'middleman', 'agreement', 'middleman-agreement'].includes(trimmedCmd)) {
+      setIsPartnerModalOpen(true);
+      setTerminalHistory(prev => [
+        ...prev,
+        { text: 'SALES PARTNER & BUSINESS BROKER AGREEMENT:', type: 'success' },
+        { text: '  - Opening Freelance Sales & Business Broker Agreement Modal...', type: 'output' },
+        { text: '  - Direct PDF URL: https://prateeq.in/Middleman_Partnership_Agreement.pdf', type: 'output' }
+      ]);
+      setTerminalInput('');
+      return;
+    }
+
     switch (trimmedCmd) {
       case 'help':
         response = [
           { text: 'Available commands:', type: 'success' },
           { text: '  projects   - List portfolio projects and tags', type: 'output' },
+          { text: '  partner    - Open Sales Partner & Middleman Partnership Agreement', type: 'output' },
           { text: '  system     - Show CPU, memory, and display metrics', type: 'output' },
           { text: '  storage    - Inspect local and session storage', type: 'output' },
           { text: '  stack      - List the website technologies', type: 'output' },
@@ -645,7 +660,7 @@ export default function SiteInfoConsole() {
           <div className={styles.shortcutsContainer}>
             <span className={styles.shortcutsLabel}>QUICK SHORTCUTS:</span>
             <div className={styles.shortcutsGrid}>
-              {['help', 'projects', 'system', 'storage', 'stack', 'sync', 'analytics', 'cheatcode', 'git-info', 'qrcode', 'clear'].map(cmd => (
+              {['help', 'projects', 'partner', 'system', 'storage', 'stack', 'sync', 'analytics', 'cheatcode', 'git-info', 'qrcode', 'clear'].map(cmd => (
                 <button
                   key={cmd}
                   onClick={() => executeCommand(cmd)}
@@ -658,6 +673,11 @@ export default function SiteInfoConsole() {
           </div>
         </div>
       </div>
+
+      <MiddlemanAgreementModal
+        isOpen={isPartnerModalOpen}
+        onClose={() => setIsPartnerModalOpen(false)}
+      />
     </div>
   );
 }

@@ -19,11 +19,10 @@ import {
   Paintbrush, 
   User, 
   FileText,
-  Shield
+  Rocket
 } from 'lucide-react';
 import { getSkillsHighlight, type Persona } from '@/lib/skills';
-import IntakeForm from '@/components/Intake/IntakeForm';
-import MiddlemanAgreementModal from '@/components/Middleman/MiddlemanAgreementModal';
+import ScopingBriefModal from '@/components/Intake/ScopingBriefModal';
 import styles from './Resume.module.css';
 
 interface ResumeProps {
@@ -32,19 +31,19 @@ interface ResumeProps {
 }
 
 const RESUME_SECTION_TITLE_TEXTS: ScramblerProps['texts'] = {
-  developer: { light: 'PROFESSIONAL DOSSIER',       noir: 'SERVICE RECORD' },
-  business:  { light: 'FREELANCE SERVICE QUOTATION', noir: 'RATE CARD & TERMS' },
+  developer: { light: 'PROFESSIONAL DOSSIER', noir: 'SERVICE RECORD' },
+  business:  { light: 'SERVICES & GUARANTEES', noir: 'SERVICES & GUARANTEES' },
 };
 
 const RESUME_BUTTON_TEXTS: ScramblerProps['texts'] = {
   developer: { light: 'DOWNLOAD PDF',       noir: 'EXPORT DOSSIER' },
-  business:  { light: 'DOWNLOAD RATE CARD', noir: 'EXPORT QUOTATION' },
+  business:  { light: 'DOWNLOAD SCOPING BRIEF', noir: 'EXPORT BRIEF' },
 };
 
 function Resume({ resumeData, certificates }: ResumeProps) {
   const { isNoir, audience, region } = useTheme();
   const [activePersona, setActivePersona] = useState<Persona>('general');
-  const [isAgreementModalOpen, setIsAgreementModalOpen] = useState(false);
+  const [isScopingModalOpen, setIsScopingModalOpen] = useState(false);
 
   const activeAudience = audience || 'developer';
 
@@ -62,8 +61,8 @@ function Resume({ resumeData, certificates }: ResumeProps) {
 
   const handleDownloadPDF = () => {
     if (activeAudience === 'business') {
-      import('@/utils/pdfGenerator').then(({ generateQuotationPDF }) => {
-        generateQuotationPDF(resumeData, region);
+      import('@/utils/pdfGenerator').then(({ generateQuestionnairePDF }) => {
+        generateQuestionnairePDF(resumeData);
       });
     } else {
       import('@/utils/pdfGenerator').then(({ generateResumePDF }) => {
@@ -266,36 +265,42 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                       </ul>
                     </div>
 
-                    {/* Embedded Project Scoping & Intake Brief Form */}
-                    <IntakeForm resumeData={resumeData} />
-
-                    <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                    {/* Project Scoping CTA Card */}
+                    <div style={{ marginTop: '28px', padding: '20px', borderRadius: '12px', border: '1px dashed #CBD5E1', backgroundColor: '#F8FAFC', textAlign: 'center' }}>
+                      <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#E0F2FE', color: '#0284C7', marginBottom: '12px' }}>
+                        <Rocket size={20} />
+                      </div>
+                      <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', margin: '0 0 6px 0' }}>Ready to Scope Your Next Project?</h4>
+                      <p style={{ fontSize: '12px', color: '#64748B', margin: '0 0 16px 0', maxWidth: '480px', marginLeft: 'auto', marginRight: 'auto' }}>
+                        Launch our interactive 4-step Scoping Brief Wizard to define your features, budget, and timeline in under 2 minutes.
+                      </p>
                       <button
                         type="button"
-                        onClick={() => setIsAgreementModalOpen(true)}
+                        onClick={() => setIsScopingModalOpen(true)}
                         style={{
-                          background: '#FFFFFF',
-                          border: '1.5px solid #2B2B36',
+                          background: '#0F172A',
+                          color: '#FFFFFF',
+                          border: 'none',
                           borderRadius: '8px',
-                          padding: '10px 18px',
-                          fontSize: '12px',
+                          padding: '12px 24px',
+                          fontSize: '13px',
                           fontWeight: 700,
-                          color: '#2B2B36',
                           cursor: 'pointer',
                           display: 'inline-flex',
                           alignItems: 'center',
-                          gap: '6px',
+                          gap: '8px',
+                          boxShadow: '0 4px 12px rgba(15, 23, 42, 0.15)',
                           transition: 'all 0.2s ease'
                         }}
                       >
-                        <Shield size={14} />
-                        <span>View Sales Partner &amp; Middleman Agreement Brief</span>
+                        <Rocket size={16} />
+                        <span>🚀 Launch Project Scoping Wizard</span>
                       </button>
                     </div>
 
-                    <MiddlemanAgreementModal
-                      isOpen={isAgreementModalOpen}
-                      onClose={() => setIsAgreementModalOpen(false)}
+                    <ScopingBriefModal
+                      isOpen={isScopingModalOpen}
+                      onClose={() => setIsScopingModalOpen(false)}
                       resumeData={resumeData}
                     />
 
