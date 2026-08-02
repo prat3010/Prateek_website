@@ -2,6 +2,20 @@ import { jsPDF } from 'jspdf';
 import type { ResumeData, MiddlemanAgreementConfig } from '../data/resume';
 import { getSkillsHighlight, type Persona } from '../lib/skills';
 
+function outputPDF(doc: jsPDF, fileName: string) {
+  try {
+    const pdfArrayBuffer = doc.output('arraybuffer');
+    const blob = new Blob([pdfArrayBuffer], { type: 'application/pdf' });
+    const blobUrl = URL.createObjectURL(blob);
+    const newWindow = window.open(blobUrl, '_blank');
+    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+      doc.save(fileName);
+    }
+  } catch {
+    doc.save(fileName);
+  }
+}
+
 export function generateResumePDF(activePersona: Persona, resumeData: ResumeData) {
   // 1. Initialize A4 Document (210mm x 297mm)
   const doc = new jsPDF({
@@ -207,8 +221,8 @@ export function generateResumePDF(activePersona: Persona, resumeData: ResumeData
     y += 6;
   });
 
-  // 6. Trigger Direct File Download
-  doc.save(`Prateek_Sharma_Resume_${activePersona}.pdf`);
+  // 6. Open PDF preview in new tab (with download fallback)
+  outputPDF(doc, `Prateek_Sharma_Resume_${activePersona}.pdf`);
 }
 
 export function generateQuotationPDF(resumeData: ResumeData, region: 'india' | 'global' = 'global') {
@@ -352,7 +366,7 @@ export function generateQuotationPDF(resumeData: ResumeData, region: 'india' | '
     y += 6.5;
   });
 
-  doc.save(`${resumeData.name.replace(/\s+/g, '_')}_Service_Quotation.pdf`);
+  outputPDF(doc, `${resumeData.name.replace(/\s+/g, '_')}_Service_Quotation.pdf`);
 }
 
 export interface QuestionnaireData {
@@ -671,7 +685,7 @@ export function generateQuestionnairePDF(resumeData?: ResumeData | null, data?: 
 
   drawFooterMicroLine();
 
-  doc.save(`${(data?.companyName || 'Client').replace(/\s+/g, '_')}_Scoping_Brief_Agreement.pdf`);
+  outputPDF(doc, `${(data?.companyName || 'Client').replace(/\s+/g, '_')}_Scoping_Brief_Agreement.pdf`);
 }
 
 export function generateMiddlemanAgreementPDF(theme: 'azure' | 'noir' = 'azure', resumeData?: ResumeData | null) {
@@ -884,5 +898,5 @@ export function generateMiddlemanAgreementPDF(theme: 'azure' | 'noir' = 'azure',
   doc.text('TITLE: Sales Representative & Partner', leftMargin + 94, y + 18);
   doc.text('DATE: _______________', leftMargin + 94, y + 23);
 
-  doc.save(`${partnerName.replace(/\s+/g, '_')}_Sales_Partner_Agreement_${isAzure ? 'Azure' : 'Noir'}.pdf`);
+  outputPDF(doc, `${partnerName.replace(/\s+/g, '_')}_Sales_Partner_Agreement_${isAzure ? 'Azure' : 'Noir'}.pdf`);
 }
