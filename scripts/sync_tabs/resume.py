@@ -449,18 +449,27 @@ def render_resume_tab():
                 t3_comm = st.text_input("Tier 3/4 Commission (%)", value=mm_data.get('tier3Commission', '15%'), key="mm_t3_comm")
                 rec_comm = st.text_input("Recurring Care Plan Commission (%)", value=mm_data.get('recurringCommission', '10%'), key="mm_rec_comm")
                 
-            st.markdown("##### Agreement Rules & Clauses (One per line)")
-            default_rules = [
+            default_disburse = [
                 "Rule 3.1 (No Out-of-Pocket Liability): Developer will never pay commissions out-of-pocket prior to client funds clearing bank accounts.",
                 "Rule 3.2 (Proportional Payout Schedule): 50% of Commission disbursed within 24 hours of receiving Client's 50% Upfront Deposit. 50% disbursed upon receiving Client's Final 50% Balance.",
-                "Rule 3.3 (Cancellations & Defaults): In the event of a client default or partial scope cancellation, commission is calculated strictly on net funds actually collected and retained.",
-                "Rule 4.1 (Non-Circumvention): Partner agrees not to bypass Developer or refer introduced clients to alternative software developers without express written consent.",
-                "Rule 4.2 (Codebase & IP Ownership): All codebase assets, databases, and intellectual property remain the property of Developer until 100% of project contract fees are paid by Client."
+                "Rule 3.3 (Cancellations & Defaults): In the event of a client default or partial scope cancellation, commission is calculated strictly on net funds actually collected and retained."
             ]
-            rules_val = mm_data.get('rules') if mm_data.get('rules') and len(mm_data.get('rules')) > 0 else default_rules
-            rules_str = "\n".join(rules_val)
-            rules_edit = st.text_area("Middleman Agreement Rules", value=rules_str, height=140, key="mm_rules")
-            rules_list = [r.strip() for r in rules_edit.split("\n") if r.strip()]
+            default_confid = [
+                "Rule 4.1 (Non-Circumvention): Partner agrees not to bypass Developer or refer introduced clients to alternative software developers without express written consent.",
+                "Rule 4.2 (Codebase & IP Ownership): All codebase assets, databases, and intellectual property remain the property of Developer until 100% of project contract fees are paid by Client.",
+                "Rule 4.3 (Confidentiality & Non-Disclosure): Both parties agree to keep project quotes, client contact information, and internal commercial terms strictly confidential."
+            ]
+
+            disburse_val = mm_data.get('disbursementRules') if mm_data.get('disbursementRules') else default_disburse
+            confid_val = mm_data.get('confidentialityRules') if mm_data.get('confidentialityRules') else default_confid
+
+            st.markdown("##### Section 3: Payment Disbursement Rules (One per line)")
+            disburse_edit = st.text_area("Disbursement Rules", value="\n".join(disburse_val), height=90, key="mm_disburse_rules")
+            disburse_list = [r.strip() for r in disburse_edit.split("\n") if r.strip()]
+
+            st.markdown("##### Section 4: Non-Circumvention & Confidentiality Rules (One per line)")
+            confid_edit = st.text_area("Confidentiality Rules", value="\n".join(confid_val), height=90, key="mm_confid_rules")
+            confid_list = [r.strip() for r in confid_edit.split("\n") if r.strip()]
             
             res['intake']['middlemanAgreement'] = {
                 "partnerName": partner_name.strip(),
@@ -471,7 +480,8 @@ def render_resume_tab():
                 "tier2Commission": t2_comm.strip(),
                 "tier3Commission": t3_comm.strip(),
                 "recurringCommission": rec_comm.strip(),
-                "rules": rules_list
+                "disbursementRules": disburse_list,
+                "confidentialityRules": confid_list
             }
             
             col_b1, col_b2 = st.columns([1, 1])

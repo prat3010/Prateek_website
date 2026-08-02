@@ -20,7 +20,18 @@ function generateMiddlemanAgreementPDF() {
   const tier2Cut = mm.tier2Commission || '12%';
   const tier3Cut = mm.tier3Commission || '15%';
   const recurringCut = mm.recurringCommission || '10%';
-  const customRules = mm.rules;
+  
+  const disbursementRules = mm.disbursementRules || [
+    "Rule 3.1 (No Out-of-Pocket Liability): Developer will never pay commissions out-of-pocket prior to client funds clearing bank accounts.",
+    "Rule 3.2 (Proportional Payout Schedule): 50% of Commission disbursed within 24 hours of receiving Client's 50% Upfront Deposit. 50% disbursed upon receiving Client's Final 50% Balance.",
+    "Rule 3.3 (Cancellations & Defaults): In the event of a client default or partial scope cancellation, commission is calculated strictly on net funds actually collected and retained."
+  ];
+
+  const confidentialityRules = mm.confidentialityRules || [
+    "Rule 4.1 (Non-Circumvention): Partner agrees not to bypass Developer or refer introduced clients to alternative software developers without express written consent.",
+    "Rule 4.2 (Codebase & IP Ownership): All codebase assets, databases, and intellectual property remain the property of Developer until 100% of project contract fees are paid by Client.",
+    "Rule 4.3 (Confidentiality & Non-Disclosure): Both parties agree to keep project quotes, client contact information, and internal commercial terms strictly confidential."
+  ];
 
   const doc = new jsPDF({
     orientation: 'portrait',
@@ -177,23 +188,12 @@ function generateMiddlemanAgreementPDF() {
 
   // Section 3
   addSectionTitle('3. PAYMENT DISBURSEMENT & TIMELINE RULES');
-  
-  if (customRules && customRules.length > 0) {
-    customRules.forEach(r => addParagraph(r));
-  } else {
-    addParagraph('Rule 3.1 (No Out-of-Pocket Liability): Developer will never pay commissions out-of-pocket prior to client funds clearing bank accounts.');
-    addParagraph('Rule 3.2 (Proportional Payout Schedule):');
-    addParagraph('   - 50% of Commission: Disbursed within 24 hours of Developer receiving the Client\'s 50% Upfront Deposit.');
-    addParagraph('   - 50% of Commission: Disbursed within 24 hours of Developer receiving the Client\'s Final 50% Balance prior to launch.');
-    addParagraph('Rule 3.3 (Cancellations & Defaults): In the event of a client default or partial scope cancellation, commission is calculated strictly on net funds actually collected and retained by Developer.');
-  }
+  disbursementRules.forEach(r => addParagraph(r));
 
   y += 2;
   // Section 4
   addSectionTitle('4. NON-CIRCUMVENTION & CONFIDENTIALITY');
-  addParagraph('Rule 4.1 (Non-Circumvention): Partner agrees not to bypass Developer or refer introduced clients to alternative software developers without Developer\'s express written consent.');
-  addParagraph('Rule 4.2 (Codebase & IP Ownership): All codebase assets, databases, and intellectual property remain the property of Developer until 100% of project contract fees are paid by Client.');
-  addParagraph('Rule 4.3 (Confidentiality): Both parties agree to keep project quotes, client contact information, and internal commercial terms strictly confidential.');
+  confidentialityRules.forEach(r => addParagraph(r));
 
   y += 4;
   addSectionTitle('5. SIGNATURE & AGREEMENT ACCEPTANCE');

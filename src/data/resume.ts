@@ -52,7 +52,8 @@ export interface MiddlemanAgreementConfig {
   tier2Commission: string;
   tier3Commission: string;
   recurringCommission: string;
-  rules: string[];
+  disbursementRules: string[];
+  confidentialityRules: string[];
 }
 
 export interface IntakeConfig {
