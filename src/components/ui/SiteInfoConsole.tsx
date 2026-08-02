@@ -9,7 +9,6 @@ import {
   ArrowLeft,
   Layers
 } from 'lucide-react';
-import MiddlemanAgreementModal from '@/components/Middleman/MiddlemanAgreementModal';
 import styles from './SiteInfoConsole.module.css';
 
 // Command responses for Noir Interactive Console
@@ -18,6 +17,7 @@ interface ConsoleLine {
   type: 'input' | 'output' | 'error' | 'success' | 'link' | 'image';
   command?: string;
   imageUrl?: string;
+  href?: string;
 }
 
 const BOOT_LOGS = [
@@ -42,7 +42,6 @@ export default function SiteInfoConsole() {
       .catch(() => {});
   }, []);
   const { isNoir } = useTheme();
-  const [isPartnerModalOpen, setIsPartnerModalOpen] = useState(false);
   const [terminalInput, setTerminalInput] = useState('');
   const [terminalHistory, setTerminalHistory] = useState<ConsoleLine[]>(
     BOOT_LOGS.map(log => ({ text: log, type: 'success' }))
@@ -353,12 +352,46 @@ export default function SiteInfoConsole() {
     }
 
     if (['partner', 'middleman', 'agreement', 'middleman-agreement'].includes(trimmedCmd)) {
-      setIsPartnerModalOpen(true);
       setTerminalHistory(prev => [
         ...prev,
-        { text: 'SALES PARTNER & BUSINESS BROKER AGREEMENT:', type: 'success' },
-        { text: '  - Opening Freelance Sales & Business Broker Agreement Modal...', type: 'output' },
-        { text: '  - Direct PDF URL: https://prateeq.in/Middleman_Partnership_Agreement.pdf', type: 'output' }
+        { text: '===========================================================', type: 'success' },
+        { text: '   FREELANCE SALES & BUSINESS BROKER AGREEMENT', type: 'success' },
+        { text: '===========================================================', type: 'success' },
+        { text: 'EFFECTIVE DATE : August 2, 2026', type: 'output' },
+        { text: 'DEVELOPER      : Prateeq Sharma (prateeq.in)', type: 'output' },
+        { text: 'SALES PARTNER  : Independent Sales Representative / Partner', type: 'output' },
+        { text: 'CONTACT EMAIL  : 3010prateeksharma@gmail.com', type: 'output' },
+        { text: ' ', type: 'output' },
+        { text: '1. PURPOSE & ROLES OF ENGAGEMENT', type: 'success' },
+        { text: '  This Agreement outlines commercial terms, commission structures, and rules', type: 'output' },
+        { text: '  for bringing client web dev, software, and AI projects to Developer.', type: 'output' },
+        { text: '  - Partner Roles  : Lead Generation, Client Outreach & Securing Signed Brief.', type: 'output' },
+        { text: '  - Developer Roles: Fixed-Price Scoping, Building, Staging Hosting, QA & Support.', type: 'output' },
+        { text: ' ', type: 'output' },
+        { text: '2. COMMISSION & COMPENSATION STRUCTURE', type: 'success' },
+        { text: '  - Tier 1 (Landing Page ₹25k-45k / $300-550): 10% Cut (Payout: ₹2,500 – ₹4,500)', type: 'output' },
+        { text: '  - Tier 2 (Multi-Page Web ₹45k-90k / $550-1.1k): 12% Cut (Payout: ₹5,400 – ₹10,800)', type: 'output' },
+        { text: '  - Tier 3/4 (Full-Stack & RAG ₹90k-2.5L+ / $1.1k-3k+): 15% Cut (Payout: ₹13,500 – ₹37,500+)', type: 'output' },
+        { text: '  - Recurring Care Plan: 10% monthly cut (₹1,000/mo) for active retainers.', type: 'output' },
+        { text: ' ', type: 'output' },
+        { text: '3. PAYMENT DISBURSEMENT RULES', type: 'success' },
+        { text: '  - Rule 3.1: No out-of-pocket payouts prior to cleared client funds.', type: 'output' },
+        { text: '  - Rule 3.2: 50% payout on deposit receipt; 50% payout on final balance.', type: 'output' },
+        { text: '  - Rule 3.3: Commission calculated strictly on net funds retained.', type: 'output' },
+        { text: ' ', type: 'output' },
+        { text: '4. NON-CIRCUMVENTION & CONFIDENTIALITY', type: 'success' },
+        { text: '  - Rule 4.1: Non-Circumvention — Partner agrees not to bypass Developer.', type: 'output' },
+        { text: '  - Rule 4.2: Codebase & IP remain Developer property until fully paid.', type: 'output' },
+        { text: '  - Rule 4.3: Strict confidentiality on quotes and client contacts.', type: 'output' },
+        { text: ' ', type: 'output' },
+        { text: '5. SIGNATURE & ACCEPTANCE BLOCK', type: 'success' },
+        { text: '  - DEVELOPER: Prateeq Sharma (Principal Engineer & Lead Architect)', type: 'output' },
+        { text: '  - PARTNER  : Independent Sales Representative / Business Broker', type: 'output' },
+        { text: ' ', type: 'output' },
+        { text: '📄 VIEW / DOWNLOAD PDF AGREEMENTS:', type: 'success' },
+        { text: '  🔗 Open Azure PDF Agreement (Middleman_Partnership_Agreement.pdf)', type: 'link', href: '/Middleman_Partnership_Agreement.pdf' },
+        { text: '  🔗 Open Noir PDF Agreement (Middleman_Partnership_Agreement_Noir.pdf)', type: 'link', href: '/Middleman_Partnership_Agreement_Noir.pdf' },
+        { text: '===========================================================', type: 'success' }
       ]);
       setTerminalInput('');
       return;
@@ -369,7 +402,7 @@ export default function SiteInfoConsole() {
         response = [
           { text: 'Available commands:', type: 'success' },
           { text: '  projects   - List portfolio projects and tags', type: 'output' },
-          { text: '  partner    - Open Sales Partner & Middleman Partnership Agreement', type: 'output' },
+          { text: '  partner    - Print Sales Partner & Broker Agreement with PDF links', type: 'output' },
           { text: '  system     - Show CPU, memory, and display metrics', type: 'output' },
           { text: '  storage    - Inspect local and session storage', type: 'output' },
           { text: '  stack      - List the website technologies', type: 'output' },
@@ -626,6 +659,21 @@ export default function SiteInfoConsole() {
                     </div>
                   );
                 }
+                if (line.href) {
+                  return (
+                    <div key={index} className={`${styles.terminalLine} ${styles.link}`}>
+                      <a
+                        href={line.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.link}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {line.text}
+                      </a>
+                    </div>
+                  );
+                }
                 return (
                   <div
                     key={index}
@@ -673,11 +721,6 @@ export default function SiteInfoConsole() {
           </div>
         </div>
       </div>
-
-      <MiddlemanAgreementModal
-        isOpen={isPartnerModalOpen}
-        onClose={() => setIsPartnerModalOpen(false)}
-      />
     </div>
   );
 }
