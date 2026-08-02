@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Download, 
   Send, 
@@ -17,6 +17,18 @@ import {
 import { generateQuestionnairePDF } from '@/utils/pdfGenerator';
 import type { ResumeData } from '@/data/resume';
 import styles from './IntakeForm.module.css';
+
+const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+
+// Extend window to include grecaptcha
+declare global {
+  interface Window {
+    grecaptcha?: {
+      ready: (cb: () => void) => void;
+      execute: (siteKey: string, options: { action: string }) => Promise<string>;
+    };
+  }
+}
 
 interface IntakeFormProps {
   resumeData?: ResumeData | null;
@@ -447,6 +459,18 @@ export default function IntakeForm({ resumeData }: IntakeFormProps) {
     });
   };
 
+  // Load Google reCAPTCHA v3 script dynamically if configured
+  useEffect(() => {
+    if (!SITE_KEY || document.getElementById('recaptcha-script')) {
+      return;
+    }
+    const script = document.createElement('script');
+    script.id = 'recaptcha-script';
+    script.src = `https://www.google.com/recaptcha/api.js?render=${SITE_KEY}`;
+    script.async = true;
+    document.head.appendChild(script);
+  }, []);
+
   const handleSubmitOnline = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.companyName.trim() || !formData.contactEmail.trim()) {
@@ -457,12 +481,23 @@ export default function IntakeForm({ resumeData }: IntakeFormProps) {
     setSubmitting(true);
 
     try {
+      // Obtain reCAPTCHA v3 token (invisible, score-based)
+      let recaptchaToken: string | undefined;
+      if (SITE_KEY && window.grecaptcha) {
+        try {
+          recaptchaToken = await window.grecaptcha.execute(SITE_KEY, { action: 'intake_submit' });
+        } catch (recaptchaErr) {
+          console.warn('reCAPTCHA execution error:', recaptchaErr);
+        }
+      }
+
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: formData.companyName,
           email: formData.contactEmail,
+          recaptchaToken,
           subject: `[SCOPING INTAKE] ${formData.companyName} (${selectedEngine.tier})`,
           message: `
 Client: ${formData.companyName} (${formData.contactEmail}, Phone: ${formData.contactPhone})
