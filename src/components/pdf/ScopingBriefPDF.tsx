@@ -6,43 +6,45 @@ import { DEFAULT_PDF_THEME } from './pdfTheme';
 
 const styles = StyleSheet.create({
   page: {
-    padding: 28,
+    paddingTop: 24,
+    paddingBottom: 32,
+    paddingLeft: 28,
+    paddingRight: 28,
     fontFamily: 'Helvetica',
     backgroundColor: DEFAULT_PDF_THEME.pageBg,
-    fontSize: 9,
+    fontSize: 8.5,
     color: DEFAULT_PDF_THEME.textPrimary,
   },
   skylineHeader: {
-    height: 52,
+    height: 48,
     backgroundColor: DEFAULT_PDF_THEME.headerBg,
     borderRadius: 4,
-    marginBottom: 14,
+    marginBottom: 12,
     padding: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   brandTitle: {
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: 'Helvetica-Bold',
     color: DEFAULT_PDF_THEME.headerTitle,
     letterSpacing: 0.8,
   },
   brandSub: {
-    fontSize: 7.5,
+    fontSize: 7,
     color: DEFAULT_PDF_THEME.headerSub,
-    marginTop: 3,
+    marginTop: 2,
     letterSpacing: 0.5,
   },
   docHeader: {
     borderBottomWidth: 1,
     borderBottomColor: '#CBD5E1',
-    borderBottomStyle: 'solid',
-    paddingBottom: 6,
-    marginBottom: 12,
+    paddingBottom: 5,
+    marginBottom: 10,
   },
   docTitle: {
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: 'Helvetica-Bold',
     color: '#0F172A',
     textTransform: 'uppercase',
@@ -50,72 +52,68 @@ const styles = StyleSheet.create({
   docMeta: {
     fontSize: 7.5,
     color: '#64748B',
-    marginTop: 3,
+    marginTop: 2,
   },
   metadataCard: {
     backgroundColor: '#F8FAFC',
     borderColor: '#E2E8F0',
     borderWidth: 1,
-    borderStyle: 'solid',
     borderRadius: 4,
-    padding: 10,
-    marginBottom: 14,
+    padding: 8,
+    marginBottom: 12,
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
   metaCol: {
     width: '50%',
-    marginBottom: 4,
+    marginBottom: 3,
   },
   metaLabel: {
     fontFamily: 'Helvetica-Bold',
     color: '#475569',
-    fontSize: 8,
+    fontSize: 7.5,
   },
   metaVal: {
     color: '#0F172A',
-    fontSize: 8.5,
+    fontSize: 8,
   },
   sectionHeader: {
-    fontSize: 9.5,
+    fontSize: 9,
     fontFamily: 'Helvetica-Bold',
     color: '#1E3A8A',
     backgroundColor: '#EFF6FF',
-    padding: '4 8',
+    padding: '3 6',
     borderRadius: 3,
-    marginBottom: 8,
+    marginBottom: 6,
+    marginTop: 4,
     borderLeftWidth: 3,
     borderLeftColor: '#2563EB',
-    borderLeftStyle: 'solid',
   },
   table: {
     width: '100%',
     borderColor: '#CBD5E1',
     borderWidth: 1,
-    borderStyle: 'solid',
     borderRadius: 4,
     overflow: 'hidden',
-    marginBottom: 14,
+    marginBottom: 10,
   },
   tableHeader: {
     flexDirection: 'row',
     backgroundColor: '#F1F5F9',
     borderBottomWidth: 1,
     borderBottomColor: '#CBD5E1',
-    borderBottomStyle: 'solid',
-    padding: 6,
+    padding: 5,
   },
   tableHeaderCell: {
     fontFamily: 'Helvetica-Bold',
-    fontSize: 8,
+    fontSize: 7.5,
     color: '#1E293B',
   },
   tableRow: {
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: '#F1F5F9',
-    borderBottomStyle: 'solid',
-    padding: 6,
+    padding: 5,
     alignItems: 'center',
   },
   tableRowHighlight: {
@@ -124,7 +122,7 @@ const styles = StyleSheet.create({
   tableTotalRow: {
     flexDirection: 'row',
     backgroundColor: '#0F172A',
-    padding: 7,
+    padding: 6,
     alignItems: 'center',
   },
   colModule: {
@@ -136,85 +134,84 @@ const styles = StyleSheet.create({
   },
   moduleTitle: {
     fontFamily: 'Helvetica-Bold',
-    fontSize: 8.5,
+    fontSize: 8,
     color: '#0F172A',
   },
   moduleDesc: {
-    fontSize: 7.5,
+    fontSize: 7,
     color: '#64748B',
     marginTop: 1,
   },
   priceVal: {
     fontFamily: 'Helvetica-Bold',
-    fontSize: 8.5,
+    fontSize: 8,
     color: '#0284C7',
   },
   totalTitle: {
     fontFamily: 'Helvetica-Bold',
-    fontSize: 9,
+    fontSize: 8.5,
     color: '#FFFFFF',
   },
   totalVal: {
     fontFamily: 'Helvetica-Bold',
-    fontSize: 10,
+    fontSize: 9.5,
     color: '#38BDF8',
     textAlign: 'right',
   },
   fieldRow: {
-    marginBottom: 6,
+    marginBottom: 5,
     flexDirection: 'row',
   },
   fieldLabel: {
     fontFamily: 'Helvetica-Bold',
-    width: '32%',
+    width: '30%',
     color: '#334155',
-    fontSize: 8.5,
+    fontSize: 8,
   },
   fieldVal: {
-    width: '68%',
+    width: '70%',
     color: '#0F172A',
-    fontSize: 8.5,
+    fontSize: 8,
+    lineHeight: 1.3,
   },
   termItem: {
-    marginBottom: 6,
-    fontSize: 8,
+    marginBottom: 5,
+    fontSize: 7.5,
     color: '#334155',
-    lineHeight: 1.4,
+    lineHeight: 1.35,
   },
   sigContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 14,
+    marginTop: 10,
   },
   sigBox: {
     width: '48%',
     borderColor: '#CBD5E1',
     borderWidth: 1,
-    borderStyle: 'solid',
     borderRadius: 4,
-    padding: 8,
-    height: 58,
+    padding: 7,
+    height: 52,
   },
   sigTitle: {
     fontFamily: 'Helvetica-Bold',
-    fontSize: 7.5,
+    fontSize: 7,
     color: '#64748B',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   sigText: {
-    fontSize: 8,
+    fontSize: 7.5,
     color: '#0F172A',
-    marginTop: 2,
+    marginTop: 1,
   },
   footer: {
     position: 'absolute',
-    bottom: 18,
+    bottom: 14,
     left: 28,
     right: 28,
     borderTopWidth: 1,
     borderTopColor: '#E2E8F0',
-    borderTopStyle: 'solid',
-    paddingTop: 6,
+    paddingTop: 4,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
@@ -247,10 +244,13 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
     "7. Maintenance Retainer & SLA: Selected Care Plan is billed monthly post-launch. Includes defined SLA response times, automated backups, and dedicated monthly development hours."
   ];
 
-  const renderFooter = (pageNum: number) => (
+  const renderFooter = () => (
     <View style={styles.footer} fixed>
       <Text style={styles.footerText}>CONFIDENTIAL SCOPING BRIEF & QUOTATION // GENERATED BY PRATEEQ.IN SCOPING LAB</Text>
-      <Text style={styles.footerText}>Page {pageNum} of 3 | https://prateeq.in</Text>
+      <Text
+        style={styles.footerText}
+        render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages} | https://prateeq.in`}
+      />
     </View>
   );
 
@@ -263,24 +263,17 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
             <Text style={styles.brandTitle}>PRATEEQ.IN</Text>
             <Text style={styles.brandSub}>FULL-STACK & AI ARCHITECTURE // SCOPING & QUOTATION</Text>
           </View>
-          <Svg height="30" width="120">
-            <Line x1="0" y1="30" x2="120" y2="30" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="10" y1="30" x2="10" y2="18" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="10" y1="18" x2="22" y2="18" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="22" y1="18" x2="22" y2="30" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="30" y1="30" x2="30" y2="10" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="30" y1="10" x2="45" y2="10" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="37.5" y1="10" x2="37.5" y2="4" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="45" y1="10" x2="45" y2="30" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="55" y1="30" x2="55" y2="15" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="55" y1="15" x2="70" y2="15" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="70" y1="15" x2="70" y2="30" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="80" y1="30" x2="80" y2="8" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="80" y1="8" x2="95" y2="8" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="95" y1="8" x2="95" y2="30" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="102" y1="30" x2="102" y2="20" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="102" y1="20" x2="114" y2="20" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="114" y1="20" x2="114" y2="30" stroke="#38BDF8" strokeWidth="1" />
+          <Svg height="26" width="100">
+            <Line x1="0" y1="26" x2="100" y2="26" stroke="#38BDF8" strokeWidth="1" />
+            <Line x1="15" y1="26" x2="15" y2="10" stroke="#38BDF8" strokeWidth="1" />
+            <Line x1="15" y1="10" x2="35" y2="10" stroke="#38BDF8" strokeWidth="1" />
+            <Line x1="35" y1="10" x2="35" y2="26" stroke="#38BDF8" strokeWidth="1" />
+            <Line x1="45" y1="26" x2="45" y2="4" stroke="#38BDF8" strokeWidth="1" />
+            <Line x1="45" y1="4" x2="65" y2="4" stroke="#38BDF8" strokeWidth="1" />
+            <Line x1="65" y1="4" x2="65" y2="26" stroke="#38BDF8" strokeWidth="1" />
+            <Line x1="75" y1="26" x2="75" y2="14" stroke="#38BDF8" strokeWidth="1" />
+            <Line x1="75" y1="14" x2="90" y2="14" stroke="#38BDF8" strokeWidth="1" />
+            <Line x1="90" y1="14" x2="90" y2="26" stroke="#38BDF8" strokeWidth="1" />
           </Svg>
         </View>
 
@@ -329,7 +322,7 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
             <Text style={[styles.tableHeaderCell, styles.colPrice]}>COMMERCIAL VALUE</Text>
           </View>
 
-          <View style={[styles.tableRow, styles.tableRowHighlight]}>
+          <View style={[styles.tableRow, styles.tableRowHighlight]} wrap={false}>
             <View style={styles.colModule}>
               <Text style={styles.moduleTitle}>Base Architecture Engine ({data?.projectCategory || 'Multi-Page Web App Engine'})</Text>
               <Text style={styles.moduleDesc}>Next.js 16 App Router, Responsive Motion UI, Telemetry, SEO Schema, Vercel Setup</Text>
@@ -340,7 +333,7 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
           </View>
 
           {data?.features?.map((feat, idx) => (
-            <View key={idx} style={styles.tableRow}>
+            <View key={idx} style={styles.tableRow} wrap={false}>
               <View style={styles.colModule}>
                 <Text style={styles.moduleTitle}>{feat}</Text>
                 <Text style={styles.moduleDesc}>Production-grade module integration & automated testing</Text>
@@ -351,7 +344,7 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
             </View>
           ))}
 
-          <View style={styles.tableRow}>
+          <View style={styles.tableRow} wrap={false}>
             <View style={styles.colModule}>
               <Text style={styles.moduleTitle}>Brand Identity & Copywriting Readiness</Text>
               <Text style={styles.moduleDesc}>{data?.assetsStatus || 'All Brand Assets Ready'}</Text>
@@ -361,7 +354,7 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
             </View>
           </View>
 
-          <View style={styles.tableTotalRow}>
+          <View style={styles.tableTotalRow} wrap={false}>
             <View style={styles.colModule}>
               <Text style={styles.totalTitle}>ESTIMATED TOTAL BUILD INVESTMENT</Text>
             </View>
@@ -371,14 +364,14 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
           </View>
         </View>
 
-        {renderFooter(1)}
+        {renderFooter()}
       </Page>
 
       {/* ================= PAGE 2 ================= */}
       <Page size="A4" style={styles.page}>
         <View style={styles.docHeader}>
           <Text style={styles.docTitle}>MONTHLY MAINTENANCE & INFRASTRUCTURE CARE</Text>
-          <Text style={styles.docMeta}>Prateeq Sharma | Engineering & Custom Web Builds | Page 2 of 3</Text>
+          <Text style={styles.docMeta}>Prateeq Sharma | Engineering & Custom Web Builds | Section 3 & 4</Text>
         </View>
 
         <Text style={styles.sectionHeader}>3. MONTHLY MAINTENANCE RETAINER & SLA PLAN</Text>
@@ -387,7 +380,7 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
             <Text style={[styles.tableHeaderCell, { width: '60%' }]}>SELECTED CARE PLAN & SCOPE</Text>
             <Text style={[styles.tableHeaderCell, { width: '40%', textAlign: 'right' }]}>MONTHLY RETAINER</Text>
           </View>
-          <View style={[styles.tableRow, styles.tableRowHighlight]}>
+          <View style={[styles.tableRow, styles.tableRowHighlight]} wrap={false}>
             <View style={{ width: '60%' }}>
               <Text style={styles.moduleTitle}>{data?.maintenancePlan || 'Standard Care Plan'}</Text>
               <Text style={styles.moduleDesc}>Hosting support, daily DB backups, security updates, 2-4h monthly dev time</Text>
@@ -412,14 +405,14 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
           <Text style={styles.fieldVal}>{data?.additionalNotes || 'None specified'}</Text>
         </View>
 
-        {renderFooter(2)}
+        {renderFooter()}
       </Page>
 
       {/* ================= PAGE 3 ================= */}
       <Page size="A4" style={styles.page}>
         <View style={styles.docHeader}>
           <Text style={styles.docTitle}>STANDARD ENGAGEMENT TERMS & SIGN-OFF</Text>
-          <Text style={styles.docMeta}>Prateeq Sharma | Engineering & Custom Web Builds | Page 3 of 3</Text>
+          <Text style={styles.docMeta}>Prateeq Sharma | Engineering & Custom Web Builds | Section 5 & 6</Text>
         </View>
 
         <Text style={styles.sectionHeader}>5. STANDARD COMMERCIAL TERMS & CONDITIONS (T&C)</Text>
@@ -444,7 +437,7 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
           </View>
         </View>
 
-        {renderFooter(3)}
+        {renderFooter()}
       </Page>
     </Document>
   );

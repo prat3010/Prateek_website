@@ -12,7 +12,8 @@ import {
   Palette,
   ShieldCheck,
   Layers,
-  X
+  X,
+  Lock
 } from 'lucide-react';
 import { generateQuestionnairePDF } from '@/utils/pdfGenerator';
 import type { ResumeData } from '@/data/resume';
@@ -350,8 +351,15 @@ export default function IntakeForm({ resumeData }: IntakeFormProps) {
     selectedMaintenanceId: '',
     inspirationLinks: '',
     timeline: timelineOptions[1] || timelineOptions[0],
-    additionalNotes: ''
+    additionalNotes: '',
+    agreedToTerms: false
   });
+
+  const isFormValid = useMemo(() => {
+    const hasCompany = formData.companyName.trim().length > 0;
+    const hasEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.contactEmail.trim());
+    return hasCompany && hasEmail && formData.agreedToTerms;
+  }, [formData.companyName, formData.contactEmail, formData.agreedToTerms]);
 
   const currentArchetype = useMemo(() => {
     return GOAL_ARCHETYPES.find(g => g.label === formData.projectGoal) || GOAL_ARCHETYPES[0];
@@ -474,7 +482,11 @@ export default function IntakeForm({ resumeData }: IntakeFormProps) {
   const handleSubmitOnline = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.companyName.trim() || !formData.contactEmail.trim()) {
-      setErrorMsg('Please enter your Company Name and Email.');
+      setErrorMsg('Please enter your Company Name and Email in Step 4.');
+      return;
+    }
+    if (!formData.agreedToTerms) {
+      setErrorMsg('Please accept the standard commercial terms before submitting.');
       return;
     }
     setErrorMsg('');
@@ -999,6 +1011,21 @@ Notes: ${formData.additionalNotes}
                       ))}
                     </div>
                   </div>
+
+                  {/* Mandated Pre-submission Agreement Checkbox */}
+                  <div className={styles.termsCheckboxBox}>
+                    <label className={styles.checkboxLabel}>
+                      <input
+                        type="checkbox"
+                        className={styles.checkboxInput}
+                        checked={formData.agreedToTerms}
+                        onChange={(e) => setFormData(prev => ({ ...prev, agreedToTerms: e.target.checked }))}
+                      />
+                      <span>
+                        <strong>I agree to the Standard Commercial Terms</strong> (50% upfront deposit to initiate development, 50% upon final delivery prior to source code transfer & deployment handoff).
+                      </span>
+                    </label>
+                  </div>
                 </div>
               )}
 
@@ -1012,11 +1039,16 @@ Notes: ${formData.additionalNotes}
                   <button
                     type="button"
                     onClick={handleDownloadPDF}
-                    className={`${styles.btn} ${styles.btnSecondary}`}
-                    title="Open Canva-grade PDF proposal preview in new tab"
+                    disabled={!isFormValid}
+                    className={`${styles.btn} ${styles.btnSecondary} ${!isFormValid ? styles.btnDisabled : ''}`}
+                    title={
+                      isFormValid
+                        ? 'Open Canva-grade PDF proposal preview'
+                        : 'Please fill in your Company Name, Email, and accept Commercial Terms in Step 4 to unlock Proposal PDF'
+                    }
                   >
-                    <Download size={16} />
-                    <span>OPEN PROPOSAL PDF</span>
+                    {isFormValid ? <Download size={16} /> : <Lock size={16} />}
+                    <span>{isFormValid ? 'OPEN PROPOSAL PDF' : '🔒 OPEN PROPOSAL PDF'}</span>
                   </button>
 
                   {currentStep > 1 && (
@@ -1044,8 +1076,9 @@ Notes: ${formData.additionalNotes}
                   ) : (
                     <button
                       type="submit"
-                      disabled={submitting}
-                      className={`${styles.btn} ${styles.btnPrimary}`}
+                      disabled={submitting || !formData.agreedToTerms}
+                      className={`${styles.btn} ${styles.btnPrimary} ${!formData.agreedToTerms ? styles.btnDisabled : ''}`}
+                      title={!formData.agreedToTerms ? 'Accept commercial terms to submit' : 'Submit scoping brief'}
                     >
                       {submitting ? 'SUBMITTING...' : 'SUBMIT SCOPING BRIEF'}
                       <Send size={16} />
