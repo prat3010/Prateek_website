@@ -123,40 +123,52 @@ function generateMiddlemanAgreementPDF() {
   addSectionTitle('2. COMMISSION & COMPENSATION STRUCTURE');
   addParagraph('Commission is calculated as a percentage of net contract value (excluding third-party domain/hosting costs):');
 
-  // Commission Table Box
-  doc.setFillColor(255, 255, 255);
-  doc.setDrawColor(203, 213, 225);
-  doc.rect(leftMargin, y, contentWidth, 32);
-
+  // Commission Table Box Setup
+  const tableStartY = y;
+  const col1X = leftMargin + 4;     // 22mm
+  const col2X = leftMargin + 104;   // 122mm
+  const col3X = leftMargin + 130;   // 148mm
+  
+  // Table Header Background
   doc.setFillColor(241, 245, 249);
   doc.rect(leftMargin, y, contentWidth, 7, 'F');
+  
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8);
   doc.setTextColor(30, 41, 59);
-  doc.text('PROJECT TIER & VALUE RANGE', leftMargin + 4, y + 5);
-  doc.text('COMMISSION (%)', leftMargin + 85, y + 5);
-  doc.text('ESTIMATED PAYOUT', leftMargin + 130, y + 5);
+  doc.text('PROJECT TIER & VALUE RANGE', col1X, y + 5);
+  doc.text('COMMISSION', col2X, y + 5);
+  doc.text('ESTIMATED PAYOUT', col3X, y + 5);
   y += 7;
 
   const rows = [
-    ['Tier 1: High-Converting Landing Page (₹25k - ₹45k / $300 - $550)', tier1Cut, '₹2,500 – ₹4,500 ($30 - $55)'],
-    ['Tier 2: Custom Multi-Page Website (₹45k - ₹90k / $550 - $1,100)', tier2Cut, '₹5,400 – ₹10,800 ($66 - $132)'],
-    ['Tier 3/4: Full-Stack Web App / AI RAG (₹90k - ₹2.5L+ / $1,100 - $3k+)', tier3Cut, '₹13,500 – ₹37,500+ ($165 - $450+)'],
+    ['Tier 1: Landing Page (INR 25k - 45k / $300 - $550)', tier1Cut, 'INR 2,500 - 4,500 ($30 - $55)'],
+    ['Tier 2: Custom Multi-Page Website (INR 45k - 90k / $550 - $1,100)', tier2Cut, 'INR 5,400 - 10,800 ($66 - $132)'],
+    ['Tier 3/4: Full-Stack Web App / AI RAG (INR 90k - 2.5L+ / $1.1k - $3k+)', tier3Cut, 'INR 13,500 - 37,500+ ($165 - $450+)'],
   ];
 
   rows.forEach((row) => {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(51, 65, 85);
-    doc.text(row[0], leftMargin + 4, y + 5);
+    
+    const col1Lines = doc.splitTextToSize(row[0], 96);
+    doc.text(col1Lines, col1X, y + 4.5);
+    
     doc.setFont('helvetica', 'bold');
-    doc.text(row[1], leftMargin + 85, y + 5);
-    doc.text(row[2], leftMargin + 130, y + 5);
-    y += 8;
+    doc.text(row[1], col2X, y + 4.5);
+    doc.text(row[2], col3X, y + 4.5);
+    
+    y += Math.max(col1Lines.length * 4.5, 7);
   });
 
-  y += 4;
-  addParagraph(`Recurring Monthly Maintenance Cut: For any client subscribing to a Monthly Care Plan (₹10,000/mo or $150/mo), Partner receives a ${recurringCut} recurring monthly commission (₹1,000/mo) for as long as the retainer remains active.`);
+  const tableEndY = y + 2;
+  // Draw outer bounding box border
+  doc.setDrawColor(203, 213, 225);
+  doc.rect(leftMargin, tableStartY, contentWidth, tableEndY - tableStartY);
+  y = tableEndY + 4;
+
+  addParagraph(`Recurring Monthly Maintenance Cut: For any client subscribing to a Monthly Care Plan (INR 10,000/mo or $150/mo), Partner receives a ${recurringCut} recurring monthly commission (INR 1,000/mo) for as long as the retainer remains active.`);
 
   // ================= PAGE 2 =================
   doc.addPage();
