@@ -226,6 +226,35 @@
   accent-color: var(--pop-blue);
 }
 
+.lockedBadge {
+  font-family: var(--font-code);
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--pop-blue);
+  background: rgba(90, 142, 182, 0.15);
+  border: 1px solid var(--pop-blue);
+  border-radius: 4px;
+  padding: 1px 6px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+:global([data-theme='noir']) .lockedBadge {
+  color: var(--neon-cyan, #00f0ff);
+  background: rgba(0, 240, 255, 0.15);
+  border-color: var(--neon-cyan, #00f0ff);
+}
+
+.lockedCard {
+  opacity: 0.95;
+  cursor: not-allowed;
+}
+
+.lockedCard:hover {
+  transform: none;
+}
+
 /* ── Action Bar ── */
 
 .actions {

@@ -122,6 +122,112 @@ export const FEATURE_MODULES: FeatureItem[] = [
   }
 ];
 
+export interface GoalArchetype {
+  id: string;
+  label: string;
+  shortLabel: string;
+  description: string;
+  recommendedEngineId: string;
+  compulsoryFeatureLabels: string[];
+}
+
+export const GOAL_ARCHETYPES: GoalArchetype[] = [
+  {
+    id: 'landing_page',
+    label: '⚡ High-Converting Landing Page',
+    shortLabel: 'Landing Page',
+    description: 'Single-page lead generation or product launch page',
+    recommendedEngineId: 'landing',
+    compulsoryFeatureLabels: ['Automated Email Workflows (Resend Transactional)'],
+  },
+  {
+    id: 'business_multipage',
+    label: '🏢 Multi-Page Business Website',
+    shortLabel: 'Business Web',
+    description: 'Corporate profile with services, showcase, and blog',
+    recommendedEngineId: 'multipage',
+    compulsoryFeatureLabels: ['Automated Email Workflows (Resend Transactional)'],
+  },
+  {
+    id: 'ecommerce',
+    label: '🛒 E-commerce & Digital Store',
+    shortLabel: 'E-commerce',
+    description: 'Product catalog, shopping cart, and online payments',
+    recommendedEngineId: 'multipage',
+    compulsoryFeatureLabels: [
+      'Payment Gateway Integration (Stripe/Razorpay)',
+      'User Auth & Client Portal (Google/Magic Link)',
+      'Automated Email Workflows (Resend Transactional)'
+    ],
+  },
+  {
+    id: 'booking_appointments',
+    label: '📅 Booking & Appointment Platform',
+    shortLabel: 'Booking Platform',
+    description: 'Reservation scheduling, calendar sync, and upfront deposits',
+    recommendedEngineId: 'multipage',
+    compulsoryFeatureLabels: [
+      'Payment Gateway Integration (Stripe/Razorpay)',
+      'Automated Email Workflows (Resend Transactional)'
+    ],
+  },
+  {
+    id: 'saas_app',
+    label: '🚀 Full-Stack SaaS Web Application',
+    shortLabel: 'SaaS MVP',
+    description: 'User accounts, interactive dashboards, and subscriptions',
+    recommendedEngineId: 'saas',
+    compulsoryFeatureLabels: [
+      'User Auth & Client Portal (Google/Magic Link)',
+      'Payment Gateway Integration (Stripe/Razorpay)',
+      'Admin Dashboard & Role Access Control (RBAC)'
+    ],
+  },
+  {
+    id: 'lms_portal',
+    label: '🎓 LMS & Online Course Portal',
+    shortLabel: 'LMS Portal',
+    description: 'Student accounts, course player, and subscription billing',
+    recommendedEngineId: 'saas',
+    compulsoryFeatureLabels: [
+      'User Auth & Client Portal (Google/Magic Link)',
+      'Payment Gateway Integration (Stripe/Razorpay)',
+      'Headless Blog & CMS Content Management'
+    ],
+  },
+  {
+    id: 'crm_admin',
+    label: '📊 Internal CRM / Admin Control Center',
+    shortLabel: 'Admin CRM',
+    description: 'Private business dashboard, data management, and staff roles',
+    recommendedEngineId: 'saas',
+    compulsoryFeatureLabels: [
+      'User Auth & Client Portal (Google/Magic Link)',
+      'Admin Dashboard & Role Access Control (RBAC)'
+    ],
+  },
+  {
+    id: 'ai_rag_app',
+    label: '🤖 Custom AI & Vector RAG Platform',
+    shortLabel: 'AI RAG Platform',
+    description: 'Private document knowledge base, AI search, and assistant',
+    recommendedEngineId: 'saas',
+    compulsoryFeatureLabels: [
+      'Private AI Knowledge Base / Vector Search (RAG)',
+      'User Auth & Client Portal (Google/Magic Link)',
+      'Admin Dashboard & Role Access Control (RBAC)'
+    ],
+  },
+  {
+    id: 'custom',
+    label: '⚙️ Custom Web Application (Bespoke Scope)',
+    shortLabel: 'Custom Scope',
+    description: 'Tailored requirements with flexible component picking',
+    recommendedEngineId: 'landing',
+    compulsoryFeatureLabels: [],
+  },
+];
+
 export interface BrandAssetOption {
   id: string;
   label: string;
@@ -224,10 +330,10 @@ export default function IntakeForm({ resumeData }: IntakeFormProps) {
     companyName: '',
     contactEmail: '',
     contactPhone: '',
-    projectGoal: 'Lead Generation & Direct Sales',
+    projectGoal: GOAL_ARCHETYPES[0].label,
     targetAudience: '',
-    selectedBaseEngineId: BASE_ENGINES[0].id,
-    selectedFeatures: [FEATURE_MODULES[0].label],
+    selectedBaseEngineId: GOAL_ARCHETYPES[0].recommendedEngineId,
+    selectedFeatures: [...GOAL_ARCHETYPES[0].compulsoryFeatureLabels],
     selectedBrandAssetId: BRAND_ASSET_OPTIONS[0].id,
     selectedMaintenanceId: '',
     inspirationLinks: '',
@@ -235,7 +341,32 @@ export default function IntakeForm({ resumeData }: IntakeFormProps) {
     additionalNotes: ''
   });
 
+  const currentArchetype = useMemo(() => {
+    return GOAL_ARCHETYPES.find(g => g.label === formData.projectGoal) || GOAL_ARCHETYPES[0];
+  }, [formData.projectGoal]);
+
+  const handleGoalChange = (newGoalLabel: string) => {
+    const archetype = GOAL_ARCHETYPES.find(g => g.label === newGoalLabel) || GOAL_ARCHETYPES[0];
+    const newEngineId = archetype.recommendedEngineId;
+    
+    // Auto-merge compulsory features
+    const mergedFeatures = Array.from(new Set([
+      ...formData.selectedFeatures,
+      ...archetype.compulsoryFeatureLabels
+    ]));
+
+    setFormData(prev => ({
+      ...prev,
+      projectGoal: newGoalLabel,
+      selectedBaseEngineId: newEngineId,
+      selectedFeatures: mergedFeatures
+    }));
+  };
+
   const handleFeatureToggle = (label: string) => {
+    // If feature is compulsory for current goal archetype, prevent toggling off
+    if (currentArchetype.compulsoryFeatureLabels.includes(label)) return;
+
     setFormData(prev => {
       const exists = prev.selectedFeatures.includes(label);
       const updated = exists 
@@ -469,16 +600,17 @@ Notes: ${formData.additionalNotes}
                     </div>
 
                     <div className={styles.field}>
-                      <label className={styles.label}>Primary Business Goal</label>
+                      <label className={styles.label}>Primary Business Goal *</label>
                       <select
                         className={styles.select}
                         value={formData.projectGoal}
-                        onChange={e => setFormData({ ...formData, projectGoal: e.target.value })}
+                        onChange={e => handleGoalChange(e.target.value)}
                       >
-                        <option value="Lead Generation & Direct Sales">Lead Generation & Direct Sales</option>
-                        <option value="Brand Showcase & Credibility">Brand Showcase & Credibility</option>
-                        <option value="Custom Web App / Internal Tool">Custom Web App / Internal Admin Tool</option>
-                        <option value="Private AI Knowledge Base & Assistant">Private AI Assistant / Knowledge Base</option>
+                        {GOAL_ARCHETYPES.map(g => (
+                          <option key={g.id} value={g.label}>
+                            {g.label} — {g.description}
+                          </option>
+                        ))}
                       </select>
                     </div>
                   </div>
@@ -565,19 +697,30 @@ Notes: ${formData.additionalNotes}
                     <label className={styles.label}>Select Architecture Add-on Modules (Pure Additive Pricing)</label>
                     <div className={styles.checkboxGrid}>
                       {FEATURE_MODULES.map(m => {
-                        const isChecked = formData.selectedFeatures.includes(m.label);
+                        const isCompulsory = currentArchetype.compulsoryFeatureLabels.includes(m.label);
+                        const isChecked = isCompulsory || formData.selectedFeatures.includes(m.label);
                         const isPopoverOpen = activePopoverId === m.id;
                         return (
-                          <label key={m.id} className={styles.checkboxCard} style={{ position: 'relative', borderLeft: isChecked ? '3px solid currentColor' : 'none' }}>
+                          <label
+                            key={m.id}
+                            className={`${styles.checkboxCard} ${isCompulsory ? styles.lockedCard : ''}`}
+                            style={{ position: 'relative', borderLeft: isChecked ? '3px solid currentColor' : 'none' }}
+                          >
                             <input
                               type="checkbox"
                               checked={isChecked}
+                              disabled={isCompulsory}
                               onChange={() => handleFeatureToggle(m.label)}
                             />
                             <div style={{ flex: 1 }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
                                   <span style={{ fontWeight: 700 }}>{m.label}</span>
+                                  {isCompulsory && (
+                                    <span className={styles.lockedBadge} title={`Required component for ${currentArchetype.shortLabel}`}>
+                                      🔒 REQUIRED
+                                    </span>
+                                  )}
                                   <button
                                     type="button"
                                     onClick={(ev) => togglePopover(ev, m.id)}
