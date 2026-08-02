@@ -408,7 +408,7 @@ Notes: ${formData.additionalNotes}
                 <CheckCircle2 size={36} />
               </div>
               <h4>Scoping Brief Received!</h4>
-              <p style={{ color: '#475569', fontSize: '14px', margin: '8px 0 16px 0' }}>
+              <p style={{ opacity: 0.7, fontSize: '14px', margin: '8px 0 16px 0' }}>
                 Thank you, <strong>{formData.companyName}</strong>. Your itemized quote proposal has been generated. You can also download your formal PDF brief below.
               </p>
               <button
@@ -519,7 +519,7 @@ Notes: ${formData.additionalNotes}
                             key={e.id}
                             className={`${styles.checkboxCard}`}
                             onClick={() => setFormData({ ...formData, selectedBaseEngineId: e.id })}
-                            style={{ cursor: 'pointer', position: 'relative', borderLeft: isSelected ? '3px solid #0284c7' : 'none', background: isSelected ? '#f0f9ff' : '#ffffff' }}
+                            style={{ cursor: 'pointer', position: 'relative', borderLeft: isSelected ? '3px solid currentColor' : 'none' }}
                           >
                             <input
                               type="radio"
@@ -530,7 +530,7 @@ Notes: ${formData.additionalNotes}
                             <div style={{ flex: 1 }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                                  <span style={{ fontWeight: 700, color: '#0f172a' }}>{`${e.title} (${e.tier})`}</span>
+                                  <span style={{ fontWeight: 700 }}>{`${e.title} (${e.tier})`}</span>
                                   <button
                                     type="button"
                                     onClick={(ev) => togglePopover(ev, e.id)}
@@ -542,7 +542,7 @@ Notes: ${formData.additionalNotes}
                                 </div>
                                 <span className={styles.priceBadge}>{`₹${e.priceINR.toLocaleString()} ($${e.priceUSD})`}</span>
                               </div>
-                              <p style={{ margin: '3px 0 0 0', fontSize: '11px', color: '#475569', lineHeight: 1.4 }}>{e.laymanDescription}</p>
+                              <p style={{ margin: '3px 0 0 0', fontSize: '11px', opacity: 0.7, lineHeight: 1.4 }}>{e.laymanDescription}</p>
 
                               {isPopoverOpen && (
                                 <div className={styles.popoverBox} onClick={ev => ev.stopPropagation()}>
@@ -568,7 +568,7 @@ Notes: ${formData.additionalNotes}
                         const isChecked = formData.selectedFeatures.includes(m.label);
                         const isPopoverOpen = activePopoverId === m.id;
                         return (
-                          <label key={m.id} className={styles.checkboxCard} style={{ position: 'relative', borderLeft: isChecked ? '3px solid #0284c7' : 'none' }}>
+                          <label key={m.id} className={styles.checkboxCard} style={{ position: 'relative', borderLeft: isChecked ? '3px solid currentColor' : 'none' }}>
                             <input
                               type="checkbox"
                               checked={isChecked}
@@ -577,7 +577,7 @@ Notes: ${formData.additionalNotes}
                             <div style={{ flex: 1 }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                                  <span style={{ fontWeight: 700, color: '#0f172a' }}>{m.label}</span>
+                                  <span style={{ fontWeight: 700 }}>{m.label}</span>
                                   <button
                                     type="button"
                                     onClick={(ev) => togglePopover(ev, m.id)}
@@ -589,7 +589,7 @@ Notes: ${formData.additionalNotes}
                                 </div>
                                 <span className={styles.priceBadge}>{`+₹${m.priceINR.toLocaleString()}`}</span>
                               </div>
-                              <p style={{ margin: '3px 0 0 0', fontSize: '11px', color: '#475569', lineHeight: 1.4 }}>{m.laymanDescription}</p>
+                              <p style={{ margin: '3px 0 0 0', fontSize: '11px', opacity: 0.7, lineHeight: 1.4 }}>{m.laymanDescription}</p>
 
                               {isPopoverOpen && (
                                 <div className={styles.popoverBox} onClick={ev => ev.stopPropagation()}>
@@ -640,7 +640,7 @@ Notes: ${formData.additionalNotes}
                             key={b.id}
                             className={styles.checkboxCard}
                             onClick={() => setFormData({ ...formData, selectedBrandAssetId: b.id })}
-                            style={{ cursor: 'pointer', borderLeft: isSelected ? '3px solid #0284c7' : 'none', background: isSelected ? '#f0f9ff' : '#ffffff' }}
+                            style={{ cursor: 'pointer', borderLeft: isSelected ? '3px solid currentColor' : 'none' }}
                           >
                             <input
                               type="radio"
@@ -653,7 +653,7 @@ Notes: ${formData.additionalNotes}
                                 <span style={{ fontWeight: 700 }}>{b.label}</span>
                                 <span className={styles.priceBadge}>{b.priceINR > 0 ? `+₹${b.priceINR.toLocaleString()}` : 'Included (+₹0)'}</span>
                               </div>
-                              <p style={{ margin: '2px 0 0 0', fontSize: '11px', color: '#64748b' }}>{b.description}</p>
+                              <p style={{ margin: '2px 0 0 0', fontSize: '11px', opacity: 0.7 }}>{b.description}</p>
                             </div>
                           </label>
                         );
@@ -739,7 +739,7 @@ Notes: ${formData.additionalNotes}
                             <div className={styles.careCardPrice}>
                               {p.priceINR > 0 ? `₹${p.priceINR.toLocaleString()}${p.period} ($${p.priceUSD}/mo)` : 'Included (30-Day Warranty)'}
                             </div>
-                            <p style={{ margin: '0 0 8px 0', fontSize: '11px', color: '#475569', lineHeight: 1.4 }}>{p.laymanDescription}</p>
+                            <p style={{ margin: '0 0 8px 0', fontSize: '11px', opacity: 0.7, lineHeight: 1.4 }}>{p.laymanDescription}</p>
 
                             <ul className={styles.careCardList}>
                               {p.includes.map((inc, iIdx) => (
