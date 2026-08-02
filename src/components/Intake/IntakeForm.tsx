@@ -11,7 +11,8 @@ import {
   SlidersHorizontal,
   Palette,
   ShieldCheck,
-  Layers
+  Layers,
+  X
 } from 'lucide-react';
 import { generateQuestionnairePDF } from '@/utils/pdfGenerator';
 import type { ResumeData } from '@/data/resume';
@@ -27,13 +28,38 @@ export interface BaseEngineItem {
   tier: string;
   priceINR: number;
   priceUSD: number;
-  description: string;
+  laymanDescription: string;
+  techSpecs: string;
 }
 
 export const BASE_ENGINES: BaseEngineItem[] = [
-  { id: 'landing', title: 'Landing Page Core Engine', tier: 'Tier 1', priceINR: 25000, priceUSD: 300, description: 'Next.js 16 App Router, Responsive Motion UI, Contact Form, ReCAPTCHA, Telemetry, SEO' },
-  { id: 'multipage', title: 'Multi-Page Web App Core Engine', tier: 'Tier 2', priceINR: 45000, priceUSD: 550, description: 'Multi-page routing (3–6 pages), Page Transitions, Shared Shell, Dynamic Layouts' },
-  { id: 'saas', title: 'Full-Stack SaaS MVP Core Engine', tier: 'Tier 3', priceINR: 75000, priceUSD: 950, description: 'Complete Web App Shell, Supabase PostgreSQL Architecture, Server Caching (unstable_cache)' }
+  { 
+    id: 'landing', 
+    title: 'Landing Page Core Engine', 
+    tier: 'Tier 1', 
+    priceINR: 25000, 
+    priceUSD: 300, 
+    laymanDescription: 'A single, ultra-fast, high-converting webpage built to capture leads, showcase your brand, and turn visitors into clients.',
+    techSpecs: 'Next.js 16 App Router, Responsive Motion UI, Tailwind/CSS Modules, ReCAPTCHA v3, Telemetry, SEO Schema'
+  },
+  { 
+    id: 'multipage', 
+    title: 'Multi-Page Web App Core Engine', 
+    tier: 'Tier 2', 
+    priceINR: 45000, 
+    priceUSD: 550, 
+    laymanDescription: 'A complete multi-page business website (Home, About, Services, Case Studies, Contact) with smooth page transitions and consistent branding.',
+    techSpecs: 'Multi-page routing (3–6 pages), Framer Motion Page Transitions, Shared Layout Shell, Dynamic Routes'
+  },
+  { 
+    id: 'saas', 
+    title: 'Full-Stack SaaS MVP Core Engine', 
+    tier: 'Tier 3', 
+    priceINR: 75000, 
+    priceUSD: 950, 
+    laymanDescription: 'A production software foundation connected to a cloud database for web apps where users create accounts, manage data, and run software workflows.',
+    techSpecs: 'Full Web App Shell, Supabase PostgreSQL Architecture, Server Caching (unstable_cache), Production Vercel Wiring'
+  }
 ];
 
 export interface FeatureItem {
@@ -41,16 +67,59 @@ export interface FeatureItem {
   label: string;
   priceINR: number;
   priceUSD: number;
-  description: string;
+  laymanDescription: string;
+  techSpecs: string;
 }
 
 export const FEATURE_MODULES: FeatureItem[] = [
-  { id: 'auth', label: 'User Auth & Client Portal (Google/Magic Link)', priceINR: 20000, priceUSD: 240, description: 'Google OAuth, Magic Link, Supabase RLS, Profile Dashboard' },
-  { id: 'payments', label: 'Payment Gateway Integration (Stripe/Razorpay)', priceINR: 25000, priceUSD: 300, description: 'Webhook Listeners, 1-Click Checkout, Subscriptions, PCI Compliance' },
-  { id: 'cms', label: 'Headless Blog & CMS Content Management', priceINR: 18000, priceUSD: 220, description: 'Markdown parser, Supabase DB tables, On-Demand Cache Revalidation' },
-  { id: 'ai_rag', label: 'Private AI Knowledge Base / Vector Search (RAG)', priceINR: 35000, priceUSD: 420, description: 'Vector Embeddings (pgvector), Chunking Pipeline, Citation Downloads' },
-  { id: 'admin', label: 'Admin Dashboard & Role Access Control (RBAC)', priceINR: 30000, priceUSD: 360, description: 'Single-Pass SQL RPC, Visitor Analytics Charts, Admin Security Guards' },
-  { id: 'email', label: 'Automated Email Workflows (Resend Transactional)', priceINR: 12000, priceUSD: 140, description: 'Custom HTML Templates, Transactional Delivery, SMTP/API setup' }
+  { 
+    id: 'auth', 
+    label: 'User Auth & Client Portal (Google/Magic Link)', 
+    priceINR: 20000, 
+    priceUSD: 240, 
+    laymanDescription: 'Allows your customers to securely sign in using Google or Email links and access their private personal dashboard.',
+    techSpecs: 'Google OAuth 2.0, Passwordless Magic Links, Supabase Row-Level Security (RLS), Encrypted Session Tokens'
+  },
+  { 
+    id: 'payments', 
+    label: 'Payment Gateway Integration (Stripe/Razorpay)', 
+    priceINR: 25000, 
+    priceUSD: 300, 
+    laymanDescription: 'Enables your website to collect payments via Credit Cards, Apple Pay, UPI, or subscriptions with automatic digital invoicing.',
+    techSpecs: 'Stripe & Razorpay Webhook Listeners, 1-Click Checkout, Recurring Billing, PCI DSS Compliance setup'
+  },
+  { 
+    id: 'cms', 
+    label: 'Headless Blog & CMS Content Management', 
+    priceINR: 18000, 
+    priceUSD: 220, 
+    laymanDescription: 'Gives you an easy backend manager to publish blog posts, news, or case studies anytime without touching code, boosting your Google ranking.',
+    techSpecs: 'Markdown Parser, Supabase DB Content Tables, On-Demand Cache Revalidation (/api/revalidate), OpenGraph SEO'
+  },
+  { 
+    id: 'ai_rag', 
+    label: 'Private AI Knowledge Base / Vector Search (RAG)', 
+    priceINR: 35000, 
+    priceUSD: 420, 
+    laymanDescription: 'An intelligent AI assistant trained exclusively on your business documents, FAQs, and PDFs that answers customer questions 24/7 with source citations.',
+    techSpecs: 'pgvector Vector Embeddings, Document Chunking Pipeline, Semantic Search, Presigned Citation Downloads, Feedback Telemetry'
+  },
+  { 
+    id: 'admin', 
+    label: 'Admin Dashboard & Role Access Control (RBAC)', 
+    priceINR: 30000, 
+    priceUSD: 360, 
+    laymanDescription: 'A private internal command center for you and your team to view real-time traffic, manage customer data, and assign staff permissions.',
+    techSpecs: 'Single-Pass SQL RPC Aggregations (get_analytics_summary), Visitor Analytics Charts, Content Forms, Admin Security Guards'
+  },
+  { 
+    id: 'email', 
+    label: 'Automated Email Workflows (Resend Transactional)', 
+    priceINR: 12000, 
+    priceUSD: 140, 
+    laymanDescription: 'Sends instant, professionally branded email receipts, welcome sequences, or contact notifications directly to your clients whenever they take action.',
+    techSpecs: 'Resend Transactional API, Custom HTML Templates, SMTP Fallbacks, Delivery Failure Telemetry'
+  }
 ];
 
 export interface BrandAssetOption {
@@ -74,6 +143,8 @@ export interface MaintenancePlanOption {
   priceUSD: number;
   period: string;
   badge: string;
+  laymanDescription: string;
+  techSpecs: string;
   includes: string[];
 }
 
@@ -85,6 +156,8 @@ export const MAINTENANCE_PLANS: MaintenancePlanOption[] = [
     priceUSD: 30,
     period: '/ month',
     badge: '💡 Recommended for Landing Pages',
+    laymanDescription: 'Keeps your server healthy, creates daily automated database backups, installs security patches, and ensures your site stays online 24/7.',
+    techSpecs: 'Vercel/Supabase Uptime Monitoring, Daily PostgreSQL Backups, SSL Renewals, Security Dependency Updates',
     includes: ['Hosting support & SSL management', 'Daily automated database backups', 'Dependency & security patching', 'Minor bug fixes & uptime monitoring']
   },
   {
@@ -94,6 +167,8 @@ export const MAINTENANCE_PLANS: MaintenancePlanOption[] = [
     priceUSD: 80,
     period: '/ month',
     badge: '💡 Recommended for Auth/Payments/CMS',
+    laymanDescription: 'Includes everything in Basic plus up to 4 hours of monthly developer support to edit text, swap images, update pages, or tweak designs whenever you need.',
+    techSpecs: 'Everything in Basic + 2-4 Hours Monthly Dev Allocation, Core Web Vitals Performance Tuning, Content Schema Updates',
     includes: ['Everything in Basic Care', 'Monthly text & media content updates', '2–4 hours of dedicated dev time/month', 'Performance & page speed tuning']
   },
   {
@@ -103,6 +178,8 @@ export const MAINTENANCE_PLANS: MaintenancePlanOption[] = [
     priceUSD: 180,
     period: '/ month',
     badge: '💡 Recommended for AI Chatbot & RAG Engines',
+    laymanDescription: 'For critical business apps and AI engines. Includes a guaranteed 24-hour emergency response time, AI model accuracy tuning, SEO reports, and dedicated dev hours.',
+    techSpecs: '24-Hour Priority SLA, AI Vector Index Tuning & Latency Monitoring, SEO Analytics Reports, Dedicated Feature Engineering',
     includes: ['Priority 24-hour SLA response', 'AI Vector DB & LLM latency monitoring', 'Dedicated feature development hours', 'Analytics & SEO health reports']
   },
   {
@@ -112,6 +189,8 @@ export const MAINTENANCE_PLANS: MaintenancePlanOption[] = [
     priceUSD: 0,
     period: '',
     badge: '30-Day Warranty Included',
+    laymanDescription: 'Includes 30 days of complimentary technical support post-launch. Client manages cloud hosting and database updates afterwards.',
+    techSpecs: '30-Day Post-Launch Bug Warranty, Developer Handover Documentation',
     includes: ['30 days complimentary post-launch support', 'Client manages cloud hosting & patches afterwards']
   }
 ];
@@ -139,6 +218,7 @@ export default function IntakeForm({ resumeData }: IntakeFormProps) {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [activePopoverId, setActivePopoverId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     companyName: '',
@@ -149,7 +229,7 @@ export default function IntakeForm({ resumeData }: IntakeFormProps) {
     selectedBaseEngineId: BASE_ENGINES[0].id,
     selectedFeatures: [FEATURE_MODULES[0].label],
     selectedBrandAssetId: BRAND_ASSET_OPTIONS[0].id,
-    selectedMaintenanceId: '', // Default empty, computed dynamically
+    selectedMaintenanceId: '',
     inspirationLinks: '',
     timeline: timelineOptions[1] || timelineOptions[0],
     additionalNotes: ''
@@ -163,6 +243,11 @@ export default function IntakeForm({ resumeData }: IntakeFormProps) {
         : [...prev.selectedFeatures, label];
       return { ...prev, selectedFeatures: updated };
     });
+  };
+
+  const togglePopover = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    setActivePopoverId(prev => (prev === id ? null : id));
   };
 
   const selectedEngine = useMemo(() => {
@@ -181,11 +266,9 @@ export default function IntakeForm({ resumeData }: IntakeFormProps) {
 
   // Pure Additive Cost Calculation
   const totalCost = useMemo(() => {
-    // 1. Base Engine
     const baseINR = selectedEngine.priceINR;
     const baseUSD = selectedEngine.priceUSD;
 
-    // 2. Feature Add-ons
     let featuresINR = 0;
     let featuresUSD = 0;
     const itemizedList: string[] = [];
@@ -198,7 +281,6 @@ export default function IntakeForm({ resumeData }: IntakeFormProps) {
       }
     });
 
-    // 3. Brand Kit Add-on
     const brandOpt = BRAND_ASSET_OPTIONS.find(b => b.id === formData.selectedBrandAssetId) || BRAND_ASSET_OPTIONS[0];
 
     const totalINR = baseINR + featuresINR + brandOpt.priceINR;
@@ -286,7 +368,7 @@ Notes: ${formData.additionalNotes}
   ];
 
   return (
-    <section className={styles.intakeSection} id="scoping-form">
+    <section className={styles.intakeSection} id="scoping-form" onClick={() => setActivePopoverId(null)}>
       <div className={styles.container}>
         <div className={styles.card}>
           <div className={styles.header}>
@@ -431,12 +513,13 @@ Notes: ${formData.additionalNotes}
                     <div className={styles.checkboxGrid}>
                       {BASE_ENGINES.map(e => {
                         const isSelected = formData.selectedBaseEngineId === e.id;
+                        const isPopoverOpen = activePopoverId === e.id;
                         return (
                           <div
                             key={e.id}
                             className={`${styles.checkboxCard}`}
                             onClick={() => setFormData({ ...formData, selectedBaseEngineId: e.id })}
-                            style={{ cursor: 'pointer', borderLeft: isSelected ? '3px solid #0284c7' : 'none', background: isSelected ? '#f0f9ff' : '#ffffff' }}
+                            style={{ cursor: 'pointer', position: 'relative', borderLeft: isSelected ? '3px solid #0284c7' : 'none', background: isSelected ? '#f0f9ff' : '#ffffff' }}
                           >
                             <input
                               type="radio"
@@ -446,10 +529,30 @@ Notes: ${formData.additionalNotes}
                             />
                             <div style={{ flex: 1 }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <span style={{ fontWeight: 700, color: '#0f172a' }}>{`${e.title} (${e.tier})`}</span>
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                  <span style={{ fontWeight: 700, color: '#0f172a' }}>{`${e.title} (${e.tier})`}</span>
+                                  <button
+                                    type="button"
+                                    onClick={(ev) => togglePopover(ev, e.id)}
+                                    className={`${styles.infoBtn} ${isPopoverOpen ? styles.infoBtnActive : ''}`}
+                                    title="Click to view Technical Engineering Specs"
+                                  >
+                                    ℹ
+                                  </button>
+                                </div>
                                 <span className={styles.priceBadge}>{`₹${e.priceINR.toLocaleString()} ($${e.priceUSD})`}</span>
                               </div>
-                              <p style={{ margin: '2px 0 0 0', fontSize: '11px', color: '#64748b' }}>{e.description}</p>
+                              <p style={{ margin: '3px 0 0 0', fontSize: '11px', color: '#475569', lineHeight: 1.4 }}>{e.laymanDescription}</p>
+
+                              {isPopoverOpen && (
+                                <div className={styles.popoverBox} onClick={ev => ev.stopPropagation()}>
+                                  <div className={styles.popoverHeader}>
+                                    <span>🛠️ TECHNICAL ARCHITECTURE SPECS</span>
+                                    <X size={12} style={{ cursor: 'pointer' }} onClick={() => setActivePopoverId(null)} />
+                                  </div>
+                                  <p className={styles.popoverTechText}>{e.techSpecs}</p>
+                                </div>
+                              )}
                             </div>
                           </div>
                         );
@@ -463,8 +566,9 @@ Notes: ${formData.additionalNotes}
                     <div className={styles.checkboxGrid}>
                       {FEATURE_MODULES.map(m => {
                         const isChecked = formData.selectedFeatures.includes(m.label);
+                        const isPopoverOpen = activePopoverId === m.id;
                         return (
-                          <label key={m.id} className={styles.checkboxCard} style={{ borderLeft: isChecked ? '3px solid #0284c7' : 'none' }}>
+                          <label key={m.id} className={styles.checkboxCard} style={{ position: 'relative', borderLeft: isChecked ? '3px solid #0284c7' : 'none' }}>
                             <input
                               type="checkbox"
                               checked={isChecked}
@@ -472,10 +576,30 @@ Notes: ${formData.additionalNotes}
                             />
                             <div style={{ flex: 1 }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <span style={{ fontWeight: 700 }}>{m.label}</span>
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                  <span style={{ fontWeight: 700, color: '#0f172a' }}>{m.label}</span>
+                                  <button
+                                    type="button"
+                                    onClick={(ev) => togglePopover(ev, m.id)}
+                                    className={`${styles.infoBtn} ${isPopoverOpen ? styles.infoBtnActive : ''}`}
+                                    title="Click to view Technical Engineering Specs"
+                                  >
+                                    ℹ
+                                  </button>
+                                </div>
                                 <span className={styles.priceBadge}>{`+₹${m.priceINR.toLocaleString()}`}</span>
                               </div>
-                              <p style={{ margin: '2px 0 0 0', fontSize: '11px', color: '#64748b' }}>{m.description}</p>
+                              <p style={{ margin: '3px 0 0 0', fontSize: '11px', color: '#475569', lineHeight: 1.4 }}>{m.laymanDescription}</p>
+
+                              {isPopoverOpen && (
+                                <div className={styles.popoverBox} onClick={ev => ev.stopPropagation()}>
+                                  <div className={styles.popoverHeader}>
+                                    <span>🛠️ TECHNICAL ARCHITECTURE SPECS</span>
+                                    <X size={12} style={{ cursor: 'pointer' }} onClick={() => setActivePopoverId(null)} />
+                                  </div>
+                                  <p className={styles.popoverTechText}>{m.techSpecs}</p>
+                                </div>
+                              )}
                             </div>
                           </label>
                         );
@@ -585,24 +709,53 @@ Notes: ${formData.additionalNotes}
                       {MAINTENANCE_PLANS.map(p => {
                         const isSelected = (formData.selectedMaintenanceId || autoMaintenancePlanId) === p.id;
                         const isAutoRecommended = autoMaintenancePlanId === p.id;
+                        const isPopoverOpen = activePopoverId === p.id;
                         return (
                           <div
                             key={p.id}
                             className={`${styles.careCard} ${isSelected ? styles.careCardSelected : ''}`}
                             onClick={() => setFormData({ ...formData, selectedMaintenanceId: p.id })}
+                            style={{ position: 'relative' }}
                           >
-                            {isAutoRecommended && (
-                              <div className={styles.careCardBadge}>{p.badge}</div>
-                            )}
-                            <div className={styles.careCardTitle}>{p.name}</div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                              <div>
+                                {isAutoRecommended && (
+                                  <div className={styles.careCardBadge}>{p.badge}</div>
+                                )}
+                                <div className={styles.careCardTitle}>
+                                  {p.name}
+                                  <button
+                                    type="button"
+                                    onClick={(ev) => togglePopover(ev, p.id)}
+                                    className={`${styles.infoBtn} ${isPopoverOpen ? styles.infoBtnActive : ''}`}
+                                    title="Click to view Technical SLA Specs"
+                                  >
+                                    ℹ
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+
                             <div className={styles.careCardPrice}>
                               {p.priceINR > 0 ? `₹${p.priceINR.toLocaleString()}${p.period} ($${p.priceUSD}/mo)` : 'Included (30-Day Warranty)'}
                             </div>
+                            <p style={{ margin: '0 0 8px 0', fontSize: '11px', color: '#475569', lineHeight: 1.4 }}>{p.laymanDescription}</p>
+
                             <ul className={styles.careCardList}>
                               {p.includes.map((inc, iIdx) => (
                                 <li key={iIdx}>{inc}</li>
                               ))}
                             </ul>
+
+                            {isPopoverOpen && (
+                              <div className={styles.popoverBox} onClick={ev => ev.stopPropagation()}>
+                                <div className={styles.popoverHeader}>
+                                  <span>🛠️ TECHNICAL SLA SPECS</span>
+                                  <X size={12} style={{ cursor: 'pointer' }} onClick={() => setActivePopoverId(null)} />
+                                </div>
+                                <p className={styles.popoverTechText}>{p.techSpecs}</p>
+                              </div>
+                            )}
                           </div>
                         );
                       })}
