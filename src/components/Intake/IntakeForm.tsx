@@ -203,21 +203,22 @@ Additional Notes: ${formData.additionalNotes || 'None'}
               </div>
 
               <form onSubmit={handleSubmitOnline}>
-                {/* STEP 1: BUSINESS IDENTITY */}
+                {/* STEP 1: CLIENT METADATA & INVESTMENT TIER */}
                 {currentStep === 1 && (
                   <div className={styles.formStep}>
                     <div className={styles.groupTitle}>
                       <Building2 size={18} />
-                      <span>STEP 1: BUSINESS IDENTITY & GOALS</span>
+                      <span>STEP 1: CLIENT METADATA & INVESTMENT TIER</span>
                     </div>
 
                     <div className={styles.fieldGrid}>
                       <div className={styles.field}>
-                        <label className={styles.label}>Company / Brand Name</label>
+                        <label className={styles.label}>Company / Client Name *</label>
                         <input
                           type="text"
+                          required
                           className={styles.input}
-                          placeholder="e.g. Nexus Tech Solutions"
+                          placeholder="e.g., Acme Solutions / John Doe"
                           value={formData.companyName}
                           onChange={e => setFormData({ ...formData, companyName: e.target.value })}
                         />
@@ -229,7 +230,7 @@ Additional Notes: ${formData.additionalNotes || 'None'}
                           type="email"
                           required
                           className={styles.input}
-                          placeholder="client@company.com"
+                          placeholder="john@example.com"
                           value={formData.contactEmail}
                           onChange={e => setFormData({ ...formData, contactEmail: e.target.value })}
                         />
@@ -240,16 +241,31 @@ Additional Notes: ${formData.additionalNotes || 'None'}
                       <div className={styles.field}>
                         <label className={styles.label}>Phone / WhatsApp (Optional)</label>
                         <input
-                          type="text"
+                          type="tel"
                           className={styles.input}
-                          placeholder="+91 98765 43210"
+                          placeholder="+1 (555) 019-2834"
                           value={formData.contactPhone}
                           onChange={e => setFormData({ ...formData, contactPhone: e.target.value })}
                         />
                       </div>
 
                       <div className={styles.field}>
-                        <label className={styles.label}>Primary Project Goal</label>
+                        <label className={styles.label}>Select Target Commercial Tier *</label>
+                        <select
+                          className={styles.select}
+                          value={formData.budgetRange}
+                          onChange={e => setFormData({ ...formData, budgetRange: e.target.value })}
+                        >
+                          {budgetTierOptions.map(bt => (
+                            <option key={bt} value={bt}>{bt}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className={styles.fieldGrid}>
+                      <div className={styles.field}>
+                        <label className={styles.label}>Primary Business Goal</label>
                         <select
                           className={styles.select}
                           value={formData.projectGoal}
@@ -261,31 +277,31 @@ Additional Notes: ${formData.additionalNotes || 'None'}
                           <option value="Private AI Knowledge Base & Assistant">Private AI Assistant / Knowledge Base</option>
                         </select>
                       </div>
-                    </div>
 
-                    <div className={styles.field}>
-                      <label className={styles.label}>Target Audience Summary</label>
-                      <input
-                        type="text"
-                        className={styles.input}
-                        placeholder="e.g., Tech Founders, SMB Owners, B2B Clients"
-                        value={formData.targetAudience}
-                        onChange={e => setFormData({ ...formData, targetAudience: e.target.value })}
-                      />
+                      <div className={styles.field}>
+                        <label className={styles.label}>Target Audience Persona</label>
+                        <input
+                          type="text"
+                          className={styles.input}
+                          placeholder="e.g., Tech Founders, SMB Owners, B2B Clients"
+                          value={formData.targetAudience}
+                          onChange={e => setFormData({ ...formData, targetAudience: e.target.value })}
+                        />
+                      </div>
                     </div>
                   </div>
                 )}
 
-                {/* STEP 2: SCOPE & FEATURES */}
+                {/* STEP 2: TECHNICAL SCOPE & FEATURE CHECKLIST */}
                 {currentStep === 2 && (
                   <div className={styles.formStep}>
                     <div className={styles.groupTitle}>
                       <SlidersHorizontal size={18} />
-                      <span>STEP 2: PROJECT CATEGORY & FEATURES</span>
+                      <span>STEP 2: TECHNICAL ARCHITECTURE & FEATURE MATRIX</span>
                     </div>
 
                     <div className={styles.field}>
-                      <label className={styles.label}>Project Category</label>
+                      <label className={styles.label}>Target Scope Category</label>
                       <select
                         className={styles.select}
                         value={formData.projectCategory}
@@ -298,7 +314,7 @@ Additional Notes: ${formData.additionalNotes || 'None'}
                     </div>
 
                     <div className={styles.field}>
-                      <label className={styles.label}>Required Key Features</label>
+                      <label className={styles.label}>Required Key Features (Check All That Apply)</label>
                       <div className={styles.checkboxGrid}>
                         {featureOptions.map(feat => (
                           <label key={feat} className={styles.checkboxCard}>
@@ -315,7 +331,7 @@ Additional Notes: ${formData.additionalNotes || 'None'}
                   </div>
                 )}
 
-                {/* STEP 3: DESIGN & ASSETS */}
+                {/* STEP 3: BRAND ASSETS & VISUAL INSPICRATION */}
                 {currentStep === 3 && (
                   <div className={styles.formStep}>
                     <div className={styles.groupTitle}>
@@ -349,50 +365,35 @@ Additional Notes: ${formData.additionalNotes || 'None'}
                   </div>
                 )}
 
-                {/* STEP 4: TIMELINE & BUDGET */}
+                {/* STEP 4: TIMELINE, TERMS & SIGN-OFF */}
                 {currentStep === 4 && (
                   <div className={styles.formStep}>
                     <div className={styles.groupTitle}>
                       <Clock size={18} />
-                      <span>STEP 4: TIMELINE, BUDGET & TERMS</span>
-                    </div>
-
-                    <div className={styles.fieldGrid}>
-                      <div className={styles.field}>
-                        <label className={styles.label}>Target Launch Timeline</label>
-                        <select
-                          className={styles.select}
-                          value={formData.timeline}
-                          onChange={e => setFormData({ ...formData, timeline: e.target.value })}
-                        >
-                          {timelineOptions.map(tl => (
-                            <option key={tl} value={tl}>{tl}</option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div className={styles.field}>
-                        <label className={styles.label}>Investment Budget Tier</label>
-                        <select
-                          className={styles.select}
-                          value={formData.budgetRange}
-                          onChange={e => setFormData({ ...formData, budgetRange: e.target.value })}
-                        >
-                          {budgetTierOptions.map(bt => (
-                            <option key={bt} value={bt}>{bt}</option>
-                          ))}
-                        </select>
-                      </div>
+                      <span>STEP 4: TIMELINE, TERMS & SIGN-OFF</span>
                     </div>
 
                     <div className={styles.field}>
-                      <label className={styles.label}>Standard Terms & Conditions Summary</label>
+                      <label className={styles.label}>Target Launch Timeline</label>
+                      <select
+                        className={styles.select}
+                        value={formData.timeline}
+                        onChange={e => setFormData({ ...formData, timeline: e.target.value })}
+                      >
+                        {timelineOptions.map(tl => (
+                          <option key={tl} value={tl}>{tl}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className={styles.field}>
+                      <label className={styles.label}>Standard Commercial Terms (T&Cs) Summary</label>
                       <div style={{
                         background: '#FFFFFF',
                         border: '1.5px solid #2B2B36',
                         borderRadius: '8px',
                         padding: '12px 16px',
-                        maxHeight: '140px',
+                        maxHeight: '130px',
                         overflowY: 'auto',
                         fontSize: '12px',
                         color: '#475569',
@@ -405,7 +406,7 @@ Additional Notes: ${formData.additionalNotes || 'None'}
                     </div>
 
                     <div className={styles.field}>
-                      <label className={styles.label}>Additional Project Notes (Optional)</label>
+                      <label className={styles.label}>Additional Scope Notes (Optional)</label>
                       <textarea
                         rows={3}
                         className={styles.textarea}
