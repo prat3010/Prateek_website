@@ -2,7 +2,7 @@ import { jsPDF } from 'jspdf';
 import fs from 'fs';
 import path from 'path';
 
-function generateMiddlemanAgreementPDF() {
+function generateMiddlemanAgreementPDF(selectedTheme = 'azure') {
   const resumeJsonPath = path.join(process.cwd(), 'src', 'data', 'resume.json');
   let resumeData = {};
   try {
@@ -33,6 +33,11 @@ function generateMiddlemanAgreementPDF() {
     "Rule 4.3 (Confidentiality & Non-Disclosure): Both parties agree to keep project quotes, client contact information, and internal commercial terms strictly confidential."
   ];
 
+  const isAzure = selectedTheme === 'azure';
+  const titleColor = isAzure ? [2, 132, 199] : [180, 83, 9];
+  const headerBgColor = isAzure ? [240, 249, 255] : [254, 243, 199];
+  const tableHeaderBgColor = isAzure ? [224, 242, 254] : [253, 230, 138];
+
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
@@ -48,14 +53,14 @@ function generateMiddlemanAgreementPDF() {
   const drawHeader = (title, pageNum) => {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(15);
-    doc.setTextColor(15, 23, 42); // Slate 900
+    doc.setTextColor(titleColor[0], titleColor[1], titleColor[2]);
     doc.text(title, leftMargin, y);
     y += 5;
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8.5);
     doc.setTextColor(100, 116, 139); // Slate 500
-    doc.text(`${devName} | Business Broker & Sales Partner Agreement | Page ${pageNum} of 2`, leftMargin, y);
+    doc.text(`${devName} | Sales Partner Agreement (${isAzure ? 'Cyber-Noir Azure' : 'Vintage Paper'}) | Page ${pageNum} of 2`, leftMargin, y);
     y += 4;
 
     doc.setDrawColor(203, 213, 225); // Slate 300
@@ -67,7 +72,7 @@ function generateMiddlemanAgreementPDF() {
   const addSectionTitle = (title) => {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10.5);
-    doc.setTextColor(30, 58, 138); // Blue 900
+    doc.setTextColor(titleColor[0], titleColor[1], titleColor[2]);
     doc.text(title, leftMargin, y);
     y += 4;
     doc.setDrawColor(226, 232, 240);
@@ -92,7 +97,7 @@ function generateMiddlemanAgreementPDF() {
   drawHeader('FREELANCE SALES & BUSINESS BROKER AGREEMENT', 1);
 
   // Metadata Box
-  doc.setFillColor(248, 250, 252);
+  doc.setFillColor(headerBgColor[0], headerBgColor[1], headerBgColor[2]);
   doc.setDrawColor(226, 232, 240);
   doc.rect(leftMargin, y, contentWidth, 20, 'FD');
 
@@ -113,7 +118,7 @@ function generateMiddlemanAgreementPDF() {
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
-  doc.setTextColor(15, 23, 42);
+  doc.setTextColor(titleColor[0], titleColor[1], titleColor[2]);
   doc.text('Partner Responsibilities:', leftMargin, y);
   y += 4.5;
   addParagraph('- Lead Generation & Prospecting: Identifying potential businesses needing custom web or AI builds.');
@@ -122,7 +127,7 @@ function generateMiddlemanAgreementPDF() {
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
-  doc.setTextColor(15, 23, 42);
+  doc.setTextColor(titleColor[0], titleColor[1], titleColor[2]);
   doc.text('Developer Responsibilities:', leftMargin, y);
   y += 4.5;
   addParagraph('- Fixed-Price Scoping: Reviewing briefs and providing accurate fixed-price proposals within 24 hours.');
@@ -141,7 +146,7 @@ function generateMiddlemanAgreementPDF() {
   const col3X = leftMargin + 130;   // 148mm
   
   // Table Header Background
-  doc.setFillColor(241, 245, 249);
+  doc.setFillColor(tableHeaderBgColor[0], tableHeaderBgColor[1], tableHeaderBgColor[2]);
   doc.rect(leftMargin, y, contentWidth, 7, 'F');
   
   doc.setFont('helvetica', 'bold');
@@ -208,19 +213,21 @@ function generateMiddlemanAgreementPDF() {
   doc.setFontSize(8);
   doc.setTextColor(100, 116, 139);
   doc.text('DEVELOPER SIGNATURE', leftMargin + 4, y + 5);
-  doc.text('NAME: Prateeq Sharma', leftMargin + 4, y + 13);
+  doc.text(`NAME: ${devName}`, leftMargin + 4, y + 13);
   doc.text('TITLE: Principal Engineer & Lead Architect', leftMargin + 4, y + 18);
-  doc.text('DATE: August 2, 2026', leftMargin + 4, y + 23);
+  doc.text(`DATE: ${effectiveDate}`, leftMargin + 4, y + 23);
 
   doc.text('PARTNER / SALES REP SIGNATURE', leftMargin + 94, y + 5);
-  doc.text('NAME: __________________________', leftMargin + 94, y + 13);
+  doc.text(`NAME: ${partnerName}`, leftMargin + 94, y + 13);
   doc.text('TITLE: Sales Representative & Partner', leftMargin + 94, y + 18);
   doc.text('DATE: _______________', leftMargin + 94, y + 23);
 
-  const outputPath = path.join(process.cwd(), 'public', 'Middleman_Partnership_Agreement.pdf');
+  const fileName = selectedTheme === 'noir' ? 'Middleman_Partnership_Agreement_Noir.pdf' : 'Middleman_Partnership_Agreement.pdf';
+  const outputPath = path.join(process.cwd(), 'public', fileName);
   const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
   fs.writeFileSync(outputPath, pdfBuffer);
-  console.log(`Successfully generated PDF at: ${outputPath}`);
+  console.log(`Successfully generated PDF (${selectedTheme}): ${outputPath}`);
 }
 
-generateMiddlemanAgreementPDF();
+generateMiddlemanAgreementPDF('azure');
+generateMiddlemanAgreementPDF('noir');

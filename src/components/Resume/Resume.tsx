@@ -18,10 +18,12 @@ import {
   Cpu, 
   Paintbrush, 
   User, 
-  FileText 
+  FileText,
+  Shield
 } from 'lucide-react';
 import { getSkillsHighlight, type Persona } from '@/lib/skills';
 import IntakeForm from '@/components/Intake/IntakeForm';
+import MiddlemanAgreementModal from '@/components/Middleman/MiddlemanAgreementModal';
 import styles from './Resume.module.css';
 
 interface ResumeProps {
@@ -42,6 +44,7 @@ const RESUME_BUTTON_TEXTS: ScramblerProps['texts'] = {
 function Resume({ resumeData, certificates }: ResumeProps) {
   const { isNoir, audience, region } = useTheme();
   const [activePersona, setActivePersona] = useState<Persona>('general');
+  const [isAgreementModalOpen, setIsAgreementModalOpen] = useState(false);
 
   const activeAudience = audience || 'developer';
 
@@ -265,6 +268,36 @@ function Resume({ resumeData, certificates }: ResumeProps) {
 
                     {/* Embedded Project Scoping & Intake Brief Form */}
                     <IntakeForm resumeData={resumeData} />
+
+                    <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                      <button
+                        type="button"
+                        onClick={() => setIsAgreementModalOpen(true)}
+                        style={{
+                          background: '#FFFFFF',
+                          border: '1.5px solid #2B2B36',
+                          borderRadius: '8px',
+                          padding: '10px 18px',
+                          fontSize: '12px',
+                          fontWeight: 700,
+                          color: '#2B2B36',
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        <Shield size={14} />
+                        <span>View Sales Partner &amp; Middleman Agreement Brief</span>
+                      </button>
+                    </div>
+
+                    <MiddlemanAgreementModal
+                      isOpen={isAgreementModalOpen}
+                      onClose={() => setIsAgreementModalOpen(false)}
+                      resumeData={resumeData}
+                    />
 
                   </>
                 ) : (

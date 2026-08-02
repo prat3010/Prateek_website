@@ -484,27 +484,30 @@ def render_resume_tab():
                 "confidentialityRules": confid_list
             }
             
+            pdf_theme = st.radio("PDF Export Visual Theme", options=["Cyber-Noir (Azure)", "Vintage Paper (Noir)"], horizontal=True, key="mm_pdf_theme")
+            target_pdf = "Middleman_Partnership_Agreement_Noir.pdf" if "Vintage Paper" in pdf_theme else "Middleman_Partnership_Agreement.pdf"
+
             col_b1, col_b2 = st.columns([1, 1])
             with col_b1:
-                if st.button("📄 Rebuild Middleman PDF Agreement Now", key="btn_rebuild_mm_pdf"):
+                if st.button("📄 Rebuild Middleman PDF Agreements", key="btn_rebuild_mm_pdf"):
                     try:
                         write_resume_file(res)
                         import subprocess
                         proc = subprocess.run(['node', 'scripts/generate-middleman-pdf.mjs'], capture_output=True, text=True)
                         if proc.returncode == 0:
-                            st.success("📄 Middleman_Partnership_Agreement.pdf generated successfully!")
+                            st.success("📄 Both Azure & Noir PDFs generated successfully!")
                         else:
                             st.error(f"Failed to generate PDF: {proc.stderr}")
                     except Exception as e:
                         st.error(f"Error generating PDF: {e}")
             with col_b2:
-                pdf_path = os.path.join(os.getcwd(), 'public', 'Middleman_Partnership_Agreement.pdf')
+                pdf_path = os.path.join(os.getcwd(), 'public', target_pdf)
                 if os.path.exists(pdf_path):
                     with open(pdf_path, 'rb') as f:
                         st.download_button(
-                            label="📥 Download PDF Agreement",
+                            label=f"📥 Download {pdf_theme} PDF",
                             data=f.read(),
-                            file_name="Middleman_Partnership_Agreement.pdf",
+                            file_name=target_pdf,
                             mime="application/pdf",
                             key="btn_download_mm_pdf"
                         )

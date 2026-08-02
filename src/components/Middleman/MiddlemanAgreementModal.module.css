@@ -1,0 +1,294 @@
+/* Middleman Agreement Modal CSS Module */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background-color: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modalContainer {
+  position: relative;
+  width: 100%;
+  max-width: 860px;
+  max-height: 90vh;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  border: 1px solid var(--modal-border, rgba(56, 189, 248, 0.25));
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Azure Theme Styling */
+.modalContainer[data-theme='azure'] {
+  --modal-bg: #0F172A;
+  --modal-card-bg: rgba(30, 41, 59, 0.7);
+  --modal-border: rgba(56, 189, 248, 0.3);
+  --modal-text: #F8FAFC;
+  --modal-muted: #94A3B8;
+  --modal-accent: #38BDF8;
+  --modal-accent-bg: rgba(56, 189, 248, 0.1);
+  --grid-line: rgba(56, 189, 248, 0.07);
+  background-color: var(--modal-bg);
+  background-image: 
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Noir / Paper Theme Styling */
+.modalContainer[data-theme='noir'] {
+  --modal-bg: #F7F2E8;
+  --modal-card-bg: #FFFFFF;
+  --modal-border: #2B2B36;
+  --modal-text: #1E293B;
+  --modal-muted: #64748B;
+  --modal-accent: #D97706;
+  --modal-accent-bg: #FEF3C7;
+  --grid-line: rgba(43, 43, 54, 0.06);
+  background-color: var(--modal-bg);
+  background-image: 
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Header Bar */
+.modalHeader {
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--modal-border);
+  background-color: var(--modal-card-bg);
+  backdrop-filter: blur(12px);
+}
+
+.brandBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--modal-border);
+  background-color: var(--modal-accent-bg);
+  font-family: var(--font-headline, sans-serif);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--modal-accent);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.themeToggleGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background-color: var(--modal-bg);
+  padding: 4px;
+  border-radius: 24px;
+  border: 1px solid var(--modal-border);
+}
+
+.themeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 18px;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--modal-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.themeBtnActive {
+  background-color: var(--modal-accent);
+  color: #0F172A;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.closeBtn {
+  background: transparent;
+  border: none;
+  color: var(--modal-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.closeBtn:hover {
+  color: var(--modal-text);
+}
+
+/* Scrollable Content Body */
+.modalBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  color: var(--modal-text);
+}
+
+.docTitle {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0 0 4px 0;
+  color: var(--modal-text);
+  letter-spacing: -0.02em;
+}
+
+.docSubtitle {
+  font-size: 12px;
+  color: var(--modal-muted);
+  margin-bottom: 20px;
+}
+
+.metaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--modal-border);
+  background-color: var(--modal-card-bg);
+  margin-bottom: 24px;
+  font-size: 12px;
+}
+
+.metaItem span {
+  color: var(--modal-muted);
+  font-weight: 600;
+}
+
+.metaItem strong {
+  color: var(--modal-text);
+  margin-left: 6px;
+}
+
+.sectionBlock {
+  margin-bottom: 24px;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--modal-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 12px 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--modal-border);
+}
+
+.paragraph {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--modal-text);
+  margin-bottom: 10px;
+}
+
+/* Table Styling */
+.tableContainer {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--modal-border);
+  font-size: 12px;
+}
+
+.tableContainer th {
+  background-color: var(--modal-accent-bg);
+  color: var(--modal-accent);
+  font-weight: 700;
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--modal-border);
+}
+
+.tableContainer td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--modal-border);
+  background-color: var(--modal-card-bg);
+}
+
+.tableContainer tr:last-child td {
+  border-bottom: none;
+}
+
+/* Signature Box Grid */
+.sigGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.sigBox {
+  border: 1px solid var(--modal-border);
+  background-color: var(--modal-card-bg);
+  border-radius: 10px;
+  padding: 16px;
+  font-size: 12px;
+}
+
+.sigRole {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--modal-accent);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+/* Footer Action Bar */
+.modalFooter {
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--modal-border);
+  background-color: var(--modal-card-bg);
+  backdrop-filter: blur(12px);
+}
+
+.downloadBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1.5px solid var(--modal-accent);
+  background-color: var(--modal-accent);
+  color: #0F172A;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+
+.downloadBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.3);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
