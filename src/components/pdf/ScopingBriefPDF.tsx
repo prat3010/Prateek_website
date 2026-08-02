@@ -4,6 +4,20 @@ import type { ResumeData } from '@/data/resume';
 import type { QuestionnaireData } from '@/utils/pdfGenerator';
 import { DEFAULT_PDF_THEME } from './pdfTheme';
 
+/**
+ * Sanitizes strings for React-PDF's built-in Helvetica font:
+ * 1. Replaces non-Latin Rupee symbol (₹) with 'INR '
+ * 2. Strips unicode emoji glyphs that render as broken boxes
+ */
+function cleanPDFText(text?: string | null): string {
+  if (!text) return '';
+  return text
+    .replace(/₹/g, 'INR ')
+    .replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]/gu, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 const styles = StyleSheet.create({
   page: {
     paddingTop: 24,
@@ -126,10 +140,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   colModule: {
-    width: '65%',
+    width: '62%',
   },
   colPrice: {
-    width: '35%',
+    width: '38%',
     textAlign: 'right',
   },
   moduleTitle: {
@@ -254,8 +268,14 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
     </View>
   );
 
+  const companyName = cleanPDFText(data?.companyName) || 'Client Company';
+  const projectGoal = cleanPDFText(data?.projectGoal) || 'Lead Generation & Direct Sales';
+  const targetAudience = cleanPDFText(data?.targetAudience) || 'Tech Founders, SMB Owners, B2B Clients';
+  const projectCategory = cleanPDFText(data?.projectCategory) || 'Multi-Page Web App Engine';
+  const assetsStatus = cleanPDFText(data?.assetsStatus) || 'All Brand Assets Ready';
+
   return (
-    <Document title={`${data?.companyName || 'Client'}_Itemized_Scoping_Proposal`}>
+    <Document title={`${companyName.replace(/\s+/g, '_')}_Itemized_Scoping_Proposal`}>
       {/* ================= PAGE 1 ================= */}
       <Page size="A4" style={styles.page}>
         <View style={styles.skylineHeader}>
@@ -289,30 +309,30 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
           </View>
           <View style={styles.metaCol}>
             <Text style={styles.metaLabel}>CLIENT / COMPANY</Text>
-            <Text style={styles.metaVal}>{data?.companyName || '___________________________'}</Text>
+            <Text style={styles.metaVal}>{companyName}</Text>
           </View>
           <View style={styles.metaCol}>
             <Text style={styles.metaLabel}>CONTACT EMAIL</Text>
-            <Text style={styles.metaVal}>{data?.contactEmail || '___________________________'}</Text>
+            <Text style={styles.metaVal}>{cleanPDFText(data?.contactEmail) || '___________________________'}</Text>
           </View>
           <View style={styles.metaCol}>
             <Text style={styles.metaLabel}>PHONE / WHATSAPP</Text>
-            <Text style={styles.metaVal}>{data?.contactPhone || '___________________________'}</Text>
+            <Text style={styles.metaVal}>{cleanPDFText(data?.contactPhone) || '___________________________'}</Text>
           </View>
           <View style={styles.metaCol}>
             <Text style={styles.metaLabel}>TARGET LAUNCH SPRINT</Text>
-            <Text style={styles.metaVal}>{data?.timeline || 'Standard Turnaround (2–4 Weeks)'}</Text>
+            <Text style={styles.metaVal}>{cleanPDFText(data?.timeline) || 'Standard Turnaround (2–4 Weeks)'}</Text>
           </View>
         </View>
 
         <Text style={styles.sectionHeader}>1. BUSINESS OBJECTIVES & AUDIENCE PERSONA</Text>
         <View style={styles.fieldRow}>
           <Text style={styles.fieldLabel}>Primary Business Goal:</Text>
-          <Text style={styles.fieldVal}>{data?.projectGoal || 'Lead Generation & Direct Sales'}</Text>
+          <Text style={styles.fieldVal}>{projectGoal}</Text>
         </View>
         <View style={styles.fieldRow}>
           <Text style={styles.fieldLabel}>Target Audience Persona:</Text>
-          <Text style={styles.fieldVal}>{data?.targetAudience || 'Tech Founders, SMB Owners, B2B Clients'}</Text>
+          <Text style={styles.fieldVal}>{targetAudience}</Text>
         </View>
 
         <Text style={styles.sectionHeader}>2. ITEMIZED COMMERCIAL INVESTMENT SUMMARY</Text>
@@ -324,7 +344,7 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
 
           <View style={[styles.tableRow, styles.tableRowHighlight]} wrap={false}>
             <View style={styles.colModule}>
-              <Text style={styles.moduleTitle}>Base Architecture Engine ({data?.projectCategory || 'Multi-Page Web App Engine'})</Text>
+              <Text style={styles.moduleTitle}>Base Architecture Engine ({projectCategory})</Text>
               <Text style={styles.moduleDesc}>Next.js 16 App Router, Responsive Motion UI, Telemetry, SEO Schema, Vercel Setup</Text>
             </View>
             <View style={styles.colPrice}>
@@ -335,7 +355,7 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
           {data?.features?.map((feat, idx) => (
             <View key={idx} style={styles.tableRow} wrap={false}>
               <View style={styles.colModule}>
-                <Text style={styles.moduleTitle}>{feat}</Text>
+                <Text style={styles.moduleTitle}>{cleanPDFText(feat)}</Text>
                 <Text style={styles.moduleDesc}>Production-grade module integration & automated testing</Text>
               </View>
               <View style={styles.colPrice}>
@@ -347,7 +367,7 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
           <View style={styles.tableRow} wrap={false}>
             <View style={styles.colModule}>
               <Text style={styles.moduleTitle}>Brand Identity & Copywriting Readiness</Text>
-              <Text style={styles.moduleDesc}>{data?.assetsStatus || 'All Brand Assets Ready'}</Text>
+              <Text style={styles.moduleDesc}>{assetsStatus}</Text>
             </View>
             <View style={styles.colPrice}>
               <Text style={styles.priceVal}>Included</Text>
@@ -359,7 +379,7 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
               <Text style={styles.totalTitle}>ESTIMATED TOTAL BUILD INVESTMENT</Text>
             </View>
             <View style={styles.colPrice}>
-              <Text style={styles.totalVal}>{`₹${totalINR.toLocaleString()} / $${totalUSD.toLocaleString()}`}</Text>
+              <Text style={styles.totalVal}>{`INR ${totalINR.toLocaleString()} / $${totalUSD.toLocaleString()}`}</Text>
             </View>
           </View>
         </View>
@@ -382,11 +402,11 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
           </View>
           <View style={[styles.tableRow, styles.tableRowHighlight]} wrap={false}>
             <View style={{ width: '60%' }}>
-              <Text style={styles.moduleTitle}>{data?.maintenancePlan || 'Standard Care Plan'}</Text>
+              <Text style={styles.moduleTitle}>{cleanPDFText(data?.maintenancePlan) || 'Standard Care Plan'}</Text>
               <Text style={styles.moduleDesc}>Hosting support, daily DB backups, security updates, 2-4h monthly dev time</Text>
             </View>
             <View style={{ width: '40%', textAlign: 'right' }}>
-              <Text style={styles.priceVal}>{maintenanceINR > 0 ? `₹${maintenanceINR.toLocaleString()}/mo ($${maintenanceUSD}/mo)` : 'Complimentary 30-Day Warranty'}</Text>
+              <Text style={styles.priceVal}>{maintenanceINR > 0 ? `INR ${maintenanceINR.toLocaleString()}/mo ($${maintenanceUSD}/mo)` : 'Complimentary 30-Day Warranty'}</Text>
             </View>
           </View>
         </View>
@@ -394,15 +414,15 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
         <Text style={styles.sectionHeader}>4. BRAND ASSET & CONTENT INVENTORY</Text>
         <View style={styles.fieldRow}>
           <Text style={styles.fieldLabel}>Brand Assets Status:</Text>
-          <Text style={styles.fieldVal}>{data?.assetsStatus || 'All Brand Assets Ready'}</Text>
+          <Text style={styles.fieldVal}>{assetsStatus}</Text>
         </View>
         <View style={styles.fieldRow}>
           <Text style={styles.fieldLabel}>Visual & Competitor Inspo:</Text>
-          <Text style={styles.fieldVal}>{data?.inspirationLinks || 'Stripe.com, Vercel.com'}</Text>
+          <Text style={styles.fieldVal}>{cleanPDFText(data?.inspirationLinks) || 'None provided'}</Text>
         </View>
         <View style={styles.fieldRow}>
           <Text style={styles.fieldLabel}>Additional Scope Notes:</Text>
-          <Text style={styles.fieldVal}>{data?.additionalNotes || 'None specified'}</Text>
+          <Text style={styles.fieldVal}>{cleanPDFText(data?.additionalNotes) || 'None specified'}</Text>
         </View>
 
         {renderFooter()}
@@ -418,7 +438,7 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
         <Text style={styles.sectionHeader}>5. STANDARD COMMERCIAL TERMS & CONDITIONS (T&C)</Text>
         <View style={{ marginBottom: 10 }}>
           {terms.map((term, idx) => (
-            <Text key={idx} style={styles.termItem}>{term}</Text>
+            <Text key={idx} style={styles.termItem}>{cleanPDFText(term)}</Text>
           ))}
         </View>
 
@@ -426,7 +446,7 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
         <View style={styles.sigContainer}>
           <View style={styles.sigBox}>
             <Text style={styles.sigTitle}>CLIENT AUTHORIZED SIGNATURE</Text>
-            <Text style={styles.sigText}>NAME: {data?.companyName || '______________________'}</Text>
+            <Text style={styles.sigText}>NAME: {companyName}</Text>
             <Text style={styles.sigText}>DATE: _______________</Text>
           </View>
           <View style={styles.sigBox}>

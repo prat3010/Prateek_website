@@ -234,17 +234,17 @@ async function generateMiddlemanAgreementPDF() {
           h(Text, { style: [styles.tableCellBold, { width: '30%' }] }, 'PAYOUT TIMELINE')
         ),
         h(View, { style: styles.tableRow },
-          h(Text, { style: [styles.tableCell, { width: '40%' }] }, 'Tier 1: Landing Page (₹25k–₹45k / $300–$550)'),
+          h(Text, { style: [styles.tableCell, { width: '40%' }] }, 'Tier 1: Landing Page (INR 25k–45k / $300–$550)'),
           h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }] }, tier1Cut),
           h(Text, { style: [styles.tableCell, { width: '30%' }] }, 'Within 48h of Client 50% Deposit')
         ),
         h(View, { style: styles.tableRow },
-          h(Text, { style: [styles.tableCell, { width: '40%' }] }, 'Tier 2: Multi-Page Web App (₹45k–₹90k / $550–$1.1k)'),
+          h(Text, { style: [styles.tableCell, { width: '40%' }] }, 'Tier 2: Multi-Page Web App (INR 45k–90k / $550–$1.1k)'),
           h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }] }, tier2Cut),
           h(Text, { style: [styles.tableCell, { width: '30%' }] }, 'Within 48h of Client 50% Deposit')
         ),
         h(View, { style: styles.tableRow },
-          h(Text, { style: [styles.tableCell, { width: '40%' }] }, 'Tier 3: SaaS / AI RAG Engine (₹90k–₹1.5L+ / $1.1k+)'),
+          h(Text, { style: [styles.tableCell, { width: '40%' }] }, 'Tier 3: SaaS / AI RAG Engine (INR 90k–1.5L+ / $1.1k+)'),
           h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }] }, tier3Cut),
           h(Text, { style: [styles.tableCell, { width: '30%' }] }, 'Within 48h of Client 50% Deposit')
         )
