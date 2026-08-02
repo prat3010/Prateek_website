@@ -1,5 +1,6 @@
 import streamlit as st
 import json
+import os
 from datetime import datetime
 from sync_tabs.shared import write_resume_file, git_commit_push_file
 
@@ -449,7 +450,15 @@ def render_resume_tab():
                 rec_comm = st.text_input("Recurring Care Plan Commission (%)", value=mm_data.get('recurringCommission', '10%'), key="mm_rec_comm")
                 
             st.markdown("##### Agreement Rules & Clauses (One per line)")
-            rules_str = "\n".join(mm_data.get('rules', []))
+            default_rules = [
+                "Rule 3.1 (No Out-of-Pocket Liability): Developer will never pay commissions out-of-pocket prior to client funds clearing bank accounts.",
+                "Rule 3.2 (Proportional Payout Schedule): 50% of Commission disbursed within 24 hours of receiving Client's 50% Upfront Deposit. 50% disbursed upon receiving Client's Final 50% Balance.",
+                "Rule 3.3 (Cancellations & Defaults): In the event of a client default or partial scope cancellation, commission is calculated strictly on net funds actually collected and retained.",
+                "Rule 4.1 (Non-Circumvention): Partner agrees not to bypass Developer or refer introduced clients to alternative software developers without express written consent.",
+                "Rule 4.2 (Codebase & IP Ownership): All codebase assets, databases, and intellectual property remain the property of Developer until 100% of project contract fees are paid by Client."
+            ]
+            rules_val = mm_data.get('rules') if mm_data.get('rules') and len(mm_data.get('rules')) > 0 else default_rules
+            rules_str = "\n".join(rules_val)
             rules_edit = st.text_area("Middleman Agreement Rules", value=rules_str, height=140, key="mm_rules")
             rules_list = [r.strip() for r in rules_edit.split("\n") if r.strip()]
             
@@ -465,17 +474,30 @@ def render_resume_tab():
                 "rules": rules_list
             }
             
-            if st.button("Rebuild Middleman PDF Agreement Now", key="btn_rebuild_mm_pdf"):
-                try:
-                    write_resume_file(res)
-                    import subprocess
-                    proc = subprocess.run(['node', 'scripts/generate-middleman-pdf.mjs'], capture_output=True, text=True)
-                    if proc.returncode == 0:
-                        st.success("📄 Middleman_Partnership_Agreement.pdf generated and updated successfully!")
-                    else:
-                        st.error(f"Failed to generate PDF: {proc.stderr}")
-                except Exception as e:
-                    st.error(f"Error generating PDF: {e}")
+            col_b1, col_b2 = st.columns([1, 1])
+            with col_b1:
+                if st.button("📄 Rebuild Middleman PDF Agreement Now", key="btn_rebuild_mm_pdf"):
+                    try:
+                        write_resume_file(res)
+                        import subprocess
+                        proc = subprocess.run(['node', 'scripts/generate-middleman-pdf.mjs'], capture_output=True, text=True)
+                        if proc.returncode == 0:
+                            st.success("📄 Middleman_Partnership_Agreement.pdf generated successfully!")
+                        else:
+                            st.error(f"Failed to generate PDF: {proc.stderr}")
+                    except Exception as e:
+                        st.error(f"Error generating PDF: {e}")
+            with col_b2:
+                pdf_path = os.path.join(os.getcwd(), 'public', 'Middleman_Partnership_Agreement.pdf')
+                if os.path.exists(pdf_path):
+                    with open(pdf_path, 'rb') as f:
+                        st.download_button(
+                            label="📥 Download PDF Agreement",
+                            data=f.read(),
+                            file_name="Middleman_Partnership_Agreement.pdf",
+                            mime="application/pdf",
+                            key="btn_download_mm_pdf"
+                        )
 
         # Save Button & Live JSON View
         st.markdown("---")
