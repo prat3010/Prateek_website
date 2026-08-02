@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+vi.mock('server-only', () => ({}));
+vi.mock('@/data/supabase', () => ({
+  supabase: null,
+}));
+
 vi.mock('resend', () => ({
   Resend: class MockResend {
     constructor() {}

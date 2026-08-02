@@ -314,3 +314,35 @@ def fetch_blog_posts():
         return None
     return _supabase_rest('posts', method='GET', params=[('order', 'date.desc')])
 
+
+def fetch_intake_leads():
+    if not _has_config():
+        return None
+    return _supabase_rest('intake_leads', method='GET', params=[('order', 'created_at.desc')])
+
+
+def update_intake_lead(lead_id, updates):
+    if not _has_config():
+        return None
+    encoded_id = urllib.parse.quote(str(lead_id), safe='')
+    url = f'{_URL}/rest/v1/intake_leads?id=eq.{encoded_id}'
+    headers = {
+        'apikey': _KEY,
+        'Authorization': f'Bearer {_KEY}',
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation',
+    }
+    data = json.dumps(updates).encode()
+    req = urllib.request.Request(url, data=data, headers=headers, method='PATCH')
+    try:
+        with urllib.request.urlopen(req) as resp:
+            return json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        print(f'  HTTP {e.code} updating intake lead {lead_id}: {e.read().decode()}')
+        return None
+
+
+def delete_intake_lead(lead_id):
+    return _delete_by_filter('intake_leads', 'id', lead_id)
+
+

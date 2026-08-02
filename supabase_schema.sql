@@ -290,3 +290,37 @@ CREATE POLICY "Allow public select posts" ON posts FOR SELECT USING (true);
 
 CREATE INDEX IF NOT EXISTS idx_posts_slug ON posts (slug);
 CREATE INDEX IF NOT EXISTS idx_posts_date ON posts (date DESC);
+
+-- ============================================================
+-- 10. Scoping Intake Leads
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS intake_leads (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  company_name TEXT NOT NULL,
+  contact_email TEXT NOT NULL,
+  contact_phone TEXT,
+  project_goal TEXT,
+  target_audience TEXT,
+  base_engine_id TEXT NOT NULL,
+  base_engine_title TEXT NOT NULL,
+  selected_features JSONB DEFAULT '[]'::jsonb,
+  brand_asset_option TEXT,
+  maintenance_plan TEXT,
+  total_cost_inr NUMERIC NOT NULL DEFAULT 0,
+  total_cost_usd NUMERIC NOT NULL DEFAULT 0,
+  timeline TEXT,
+  inspiration_links TEXT,
+  additional_notes TEXT,
+  status TEXT DEFAULT 'new' NOT NULL,
+  notes_internal TEXT DEFAULT ''
+);
+
+ALTER TABLE intake_leads ENABLE ROW LEVEL SECURITY;
+-- Direct public reads/writes are disabled; all interactions go through service-role API routes.
+
+CREATE INDEX IF NOT EXISTS idx_intake_leads_email ON intake_leads (contact_email);
+CREATE INDEX IF NOT EXISTS idx_intake_leads_status ON intake_leads (status);
+CREATE INDEX IF NOT EXISTS idx_intake_leads_created_at ON intake_leads (created_at DESC);
+

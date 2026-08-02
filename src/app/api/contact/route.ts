@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { escapeHtml } from '@/utils/sanitize';
+import { supabase } from '@/data/supabase';
 
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT_WINDOW = 60_000;
@@ -213,6 +214,37 @@ export async function POST(request: Request) {
     if (error) {
       console.error('Resend API Error:', error);
       return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    // Persist structured intake brief to Supabase intake_leads table if provided
+    if (supabase && body.intakeDetails) {
+      try {
+        const details = body.intakeDetails;
+        const { error: dbErr } = await supabase.from('intake_leads').insert({
+          company_name: name,
+          contact_email: email,
+          contact_phone: details.contactPhone || null,
+          project_goal: details.projectGoal || null,
+          target_audience: details.targetAudience || null,
+          base_engine_id: details.baseEngineId || 'landing',
+          base_engine_title: details.baseEngineTitle || 'Landing Page Engine',
+          selected_features: details.selectedFeatures || [],
+          brand_asset_option: details.brandAssetOption || null,
+          maintenance_plan: details.maintenancePlan || null,
+          total_cost_inr: details.totalCostINR || 0,
+          total_cost_usd: details.totalCostUSD || 0,
+          timeline: details.timeline || null,
+          inspiration_links: details.inspirationLinks || null,
+          additional_notes: details.additionalNotes || null,
+          status: 'new',
+          notes_internal: ''
+        });
+        if (dbErr) {
+          console.error('Supabase intake_leads insert error:', dbErr.message);
+        }
+      } catch (dbErr) {
+        console.error('Failed to persist intake lead to Supabase:', dbErr);
+      }
     }
 
     return NextResponse.json({ success: true, data }, { status: 200 });

@@ -512,7 +512,22 @@ Maintenance Plan: ${activeMaintenancePlan.name} (₹${activeMaintenancePlan.pric
 Total Build Investment: ₹${totalCost.totalINR.toLocaleString()} / $${totalCost.totalUSD.toLocaleString()}
 Timeline: ${formData.timeline}
 Notes: ${formData.additionalNotes}
-          `.trim()
+          `.trim(),
+          intakeDetails: {
+            contactPhone: formData.contactPhone,
+            projectGoal: formData.projectGoal,
+            targetAudience: formData.targetAudience,
+            baseEngineId: selectedEngine.id,
+            baseEngineTitle: selectedEngine.title,
+            selectedFeatures: formData.selectedFeatures,
+            brandAssetOption: totalCost.brandOpt.label,
+            maintenancePlan: activeMaintenancePlan.name,
+            totalCostINR: totalCost.totalINR,
+            totalCostUSD: totalCost.totalUSD,
+            timeline: formData.timeline,
+            inspirationLinks: formData.inspirationLinks,
+            additionalNotes: formData.additionalNotes
+          }
         })
       });
 
