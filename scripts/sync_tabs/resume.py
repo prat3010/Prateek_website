@@ -491,6 +491,13 @@ def render_resume_tab():
                         st.error(f"Error generating PDF: {e}")
             with col_b2:
                 pdf_path = os.path.join(os.getcwd(), 'public', target_pdf)
+                if not os.path.exists(pdf_path):
+                    try:
+                        import subprocess
+                        subprocess.run(['node', 'scripts/generate-middleman-pdf.mjs'], capture_output=True, text=True)
+                    except Exception:
+                        pass
+                
                 if os.path.exists(pdf_path):
                     with open(pdf_path, 'rb') as f:
                         st.download_button(
@@ -500,6 +507,8 @@ def render_resume_tab():
                             mime="application/pdf",
                             key="btn_download_mm_pdf"
                         )
+                else:
+                    st.info("📄 Click 'Rebuild Partnership Agreement PDF' to generate download preview.")
 
         # Project Intake & Questionnaire Config
         with st.container(border=True):
