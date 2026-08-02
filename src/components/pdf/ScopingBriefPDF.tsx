@@ -2,18 +2,19 @@ import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Svg, Line } from '@react-pdf/renderer';
 import type { ResumeData } from '@/data/resume';
 import type { QuestionnaireData } from '@/utils/pdfGenerator';
+import { DEFAULT_PDF_THEME } from './pdfTheme';
 
 const styles = StyleSheet.create({
   page: {
     padding: 28,
     fontFamily: 'Helvetica',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: DEFAULT_PDF_THEME.pageBg,
     fontSize: 9,
-    color: '#0F172A',
+    color: DEFAULT_PDF_THEME.textPrimary,
   },
   skylineHeader: {
     height: 52,
-    backgroundColor: '#0F172A',
+    backgroundColor: DEFAULT_PDF_THEME.headerBg,
     borderRadius: 4,
     marginBottom: 14,
     padding: 10,
@@ -24,12 +25,12 @@ const styles = StyleSheet.create({
   brandTitle: {
     fontSize: 13,
     fontFamily: 'Helvetica-Bold',
-    color: '#FFFFFF',
+    color: DEFAULT_PDF_THEME.headerTitle,
     letterSpacing: 0.8,
   },
   brandSub: {
     fontSize: 7.5,
-    color: '#94A3B8',
+    color: DEFAULT_PDF_THEME.headerSub,
     marginTop: 3,
     letterSpacing: 0.5,
   },

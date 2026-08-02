@@ -65,11 +65,11 @@ export async function generateQuestionnairePDF(resumeData?: ResumeData | null, d
   await renderAndOpenPDF(element, fileName);
 }
 
-export async function generateMiddlemanAgreementPDF(theme: 'azure' | 'noir' = 'azure', resumeData?: ResumeData | null) {
+export async function generateMiddlemanAgreementPDF(resumeData?: ResumeData | null) {
   const mm = resumeData?.intake?.middlemanAgreement;
   const partnerName = mm?.partnerName || 'Partner';
-  const fileName = `${partnerName.replace(/\s+/g, '_')}_Sales_Partner_Agreement_${theme === 'azure' ? 'Azure' : 'Noir'}.pdf`;
-  const element = React.createElement(MiddlemanAgreementPDF, { theme, resumeData }) as unknown as React.ReactElement<DocumentProps>;
+  const fileName = `${partnerName.replace(/\s+/g, '_')}_Sales_Partner_Agreement.pdf`;
+  const element = React.createElement(MiddlemanAgreementPDF, { resumeData }) as unknown as React.ReactElement<DocumentProps>;
   await renderAndOpenPDF(element, fileName);
 }
 

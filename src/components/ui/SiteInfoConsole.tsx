@@ -364,7 +364,7 @@ export default function SiteInfoConsole() {
     if (['partner', 'middleman', 'agreement', 'middleman-agreement'].includes(trimmedCmd)) {
       const mm: Partial<MiddlemanAgreementConfig> = profileData?.intake?.middlemanAgreement || {};
       const partnerName = mm.partnerName || '[Partner Name]';
-      const effectiveDate = mm.effectiveDate || 'August 2, 2026';
+      const effectiveDate = (mm.effectiveDate && mm.effectiveDate.trim()) ? mm.effectiveDate : new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
       const devName = mm.developerName || 'Prateeq Sharma';
       const devEmail = mm.developerEmail || '3010prateeksharma@gmail.com';
       const tier1Cut = mm.tier1Commission || '10%';
@@ -386,26 +386,23 @@ export default function SiteInfoConsole() {
 
       const lines: ConsoleLine[] = [
         { text: '===========================================================', type: 'success' },
-        { text: '   FREELANCE SALES & BUSINESS BROKER AGREEMENT', type: 'success' },
+        { text: '      FREELANCE SALES & BUSINESS BROKER AGREEMENT          ', type: 'success' },
         { text: '===========================================================', type: 'success' },
         { text: `EFFECTIVE DATE : ${effectiveDate}`, type: 'output' },
-        { text: `DEVELOPER      : ${devName} (prateeq.in)`, type: 'output' },
+        { text: `DEVELOPER      : ${devName} (${devEmail})`, type: 'output' },
         { text: `SALES PARTNER  : ${partnerName}`, type: 'output' },
-        { text: `CONTACT EMAIL  : ${devEmail}`, type: 'output' },
         { text: ' ', type: 'output' },
-        { text: '1. PURPOSE & ROLES OF ENGAGEMENT', type: 'success' },
-        { text: '  This Agreement outlines commercial terms, commission structures, and rules', type: 'output' },
-        { text: '  for bringing client web dev, software, and AI projects to Developer.', type: 'output' },
-        { text: '  - Partner Roles  : Lead Generation, Client Outreach & Securing Signed Brief.', type: 'output' },
-        { text: '  - Developer Roles: Fixed-Price Scoping, Building, Staging Hosting, QA & Support.', type: 'output' },
+        { text: '1. PURPOSE & ROLES', type: 'success' },
+        { text: `  - Independent Sales Partner Agreement between ${devName} and ${partnerName}.`, type: 'output' },
+        { text: '  - Partner introduces qualified leads for web app & AI integration projects.', type: 'output' },
         { text: ' ', type: 'output' },
-        { text: '2. COMMISSION & COMPENSATION STRUCTURE', type: 'success' },
-        { text: `  - Tier 1 (Landing Page ₹25k-45k / $300-550): ${tier1Cut} Cut`, type: 'output' },
-        { text: `  - Tier 2 (Multi-Page Web ₹45k-90k / $550-1.1k): ${tier2Cut} Cut`, type: 'output' },
-        { text: `  - Tier 3/4 (Full-Stack & RAG ₹90k-2.5L+ / $1.1k-3k+): ${tier3Cut} Cut`, type: 'output' },
-        { text: `  - Recurring Care Plan: ${recurringCut} monthly cut for active retainers.`, type: 'output' },
+        { text: '2. COMMISSION TIER SCHEDULE', type: 'success' },
+        { text: `  - Tier 1 Deals (up to ₹50k / $600)  : ${tier1Cut} Commission`, type: 'output' },
+        { text: `  - Tier 2 Deals (₹50k-1.5L / $600-1.8k): ${tier2Cut} Commission`, type: 'output' },
+        { text: `  - Tier 3 Deals (₹1.5L+ / $1.8k+)     : ${tier3Cut} Commission`, type: 'output' },
+        { text: `  - Recurring Care Plans               : ${recurringCut} Monthly Commission (up to 6 months)`, type: 'output' },
         { text: ' ', type: 'output' },
-        { text: '3. PAYMENT DISBURSEMENT RULES', type: 'success' },
+        { text: '3. DISBURSEMENT & QUALIFICATION RULES', type: 'success' },
         ...disbursement.map(r => ({ text: `  - ${r}`, type: 'output' as const })),
         { text: ' ', type: 'output' },
         { text: '4. NON-CIRCUMVENTION & CONFIDENTIALITY', type: 'success' },
@@ -415,9 +412,8 @@ export default function SiteInfoConsole() {
         { text: `  - DEVELOPER: ${devName} (Principal Engineer & Lead Architect)`, type: 'output' },
         { text: `  - PARTNER  : ${partnerName}`, type: 'output' },
         { text: ' ', type: 'output' },
-        { text: '📄 VIEW / DOWNLOAD PDF AGREEMENTS:', type: 'success' },
-        { text: '  🔗 Open Azure PDF Agreement (Middleman_Partnership_Agreement.pdf)', type: 'link', href: '/Middleman_Partnership_Agreement.pdf' },
-        { text: '  🔗 Open Noir PDF Agreement (Middleman_Partnership_Agreement_Noir.pdf)', type: 'link', href: '/Middleman_Partnership_Agreement_Noir.pdf' },
+        { text: '📄 VIEW / DOWNLOAD AGREEMENT PDF:', type: 'success' },
+        { text: '  🔗 Open Sales Partner Agreement PDF (/Middleman_Partnership_Agreement.pdf)', type: 'link', href: '/Middleman_Partnership_Agreement.pdf' },
         { text: '===========================================================', type: 'success' }
       ];
 

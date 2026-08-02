@@ -6,7 +6,7 @@ import path from 'path';
 const { Document, Page, Text, View, StyleSheet, Svg, Line } = ReactPDF;
 const h = React.createElement;
 
-async function generateMiddlemanAgreementPDF(selectedTheme = 'azure') {
+async function generateMiddlemanAgreementPDF() {
   const resumeJsonPath = path.join(process.cwd(), 'src', 'data', 'resume.json');
   let resumeData = {};
   try {
@@ -17,26 +17,25 @@ async function generateMiddlemanAgreementPDF(selectedTheme = 'azure') {
 
   const mm = resumeData?.intake?.middlemanAgreement || {};
   const partnerName = mm.partnerName || '[Partner Name]';
-  const effectiveDate = mm.effectiveDate || 'August 2, 2026';
+  const presentDateStr = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  const effectiveDate = mm.effectiveDate && mm.effectiveDate.trim() ? mm.effectiveDate : presentDateStr;
   const devName = mm.developerName || 'Prateeq Sharma';
   const devEmail = mm.developerEmail || '3010prateeksharma@gmail.com';
   const tier1Cut = mm.tier1Commission || '10%';
   const tier2Cut = mm.tier2Commission || '12%';
   const tier3Cut = mm.tier3Commission || '15%';
 
-  const isNoir = selectedTheme === 'noir';
-
   const styles = StyleSheet.create({
     page: {
       padding: 28,
       fontFamily: 'Helvetica',
-      backgroundColor: isNoir ? '#090D16' : '#FFFFFF',
+      backgroundColor: '#FFFFFF',
       fontSize: 8.5,
-      color: isNoir ? '#F1F5F9' : '#0F172A',
+      color: '#0F172A',
     },
     headerBanner: {
       height: 50,
-      backgroundColor: isNoir ? '#020617' : '#0F172A',
+      backgroundColor: '#0F172A',
       borderRadius: 4,
       padding: 10,
       marginBottom: 12,
@@ -47,32 +46,32 @@ async function generateMiddlemanAgreementPDF(selectedTheme = 'azure') {
     brandTitle: {
       fontSize: 12,
       fontFamily: 'Helvetica-Bold',
-      color: isNoir ? '#38BDF8' : '#FFFFFF',
+      color: '#FFFFFF',
     },
     brandSub: {
       fontSize: 7.5,
-      color: isNoir ? '#94A3B8' : '#CBD5E1',
+      color: '#CBD5E1',
       marginTop: 2,
     },
     docHeader: {
       borderBottomWidth: 1,
-      borderBottomColor: isNoir ? '#1E293B' : '#CBD5E1',
+      borderBottomColor: '#CBD5E1',
       paddingBottom: 6,
       marginBottom: 10,
     },
     docTitle: {
       fontSize: 13,
       fontFamily: 'Helvetica-Bold',
-      color: isNoir ? '#F8FAFC' : '#0F172A',
+      color: '#0F172A',
     },
     docMeta: {
       fontSize: 7.5,
-      color: isNoir ? '#94A3B8' : '#64748B',
+      color: '#64748B',
       marginTop: 2,
     },
     metaCard: {
-      backgroundColor: isNoir ? '#0F172A' : '#F8FAFC',
-      borderColor: isNoir ? '#1E293B' : '#E2E8F0',
+      backgroundColor: '#F8FAFC',
+      borderColor: '#E2E8F0',
       borderWidth: 1,
       borderRadius: 4,
       padding: 8,
@@ -87,17 +86,17 @@ async function generateMiddlemanAgreementPDF(selectedTheme = 'azure') {
     metaLabel: {
       fontFamily: 'Helvetica-Bold',
       fontSize: 7.5,
-      color: isNoir ? '#38BDF8' : '#475569',
+      color: '#475569',
     },
     metaVal: {
       fontSize: 8,
-      color: isNoir ? '#F1F5F9' : '#0F172A',
+      color: '#0F172A',
     },
     sectionTitle: {
       fontFamily: 'Helvetica-Bold',
       fontSize: 9,
-      color: isNoir ? '#38BDF8' : '#1E3A8A',
-      backgroundColor: isNoir ? '#0F172A' : '#EFF6FF',
+      color: '#0284C7',
+      backgroundColor: '#E0F2FE',
       padding: '3 6',
       borderRadius: 3,
       marginBottom: 6,
@@ -106,11 +105,11 @@ async function generateMiddlemanAgreementPDF(selectedTheme = 'azure') {
     paragraph: {
       fontSize: 8,
       lineHeight: 1.4,
-      color: isNoir ? '#CBD5E1' : '#334155',
+      color: '#334155',
       marginBottom: 6,
     },
     table: {
-      borderColor: isNoir ? '#1E293B' : '#CBD5E1',
+      borderColor: '#CBD5E1',
       borderWidth: 1,
       borderRadius: 4,
       overflow: 'hidden',
@@ -118,25 +117,25 @@ async function generateMiddlemanAgreementPDF(selectedTheme = 'azure') {
     },
     tableHeader: {
       flexDirection: 'row',
-      backgroundColor: isNoir ? '#0F172A' : '#F1F5F9',
+      backgroundColor: '#F1F5F9',
       padding: 5,
       borderBottomWidth: 1,
-      borderBottomColor: isNoir ? '#1E293B' : '#CBD5E1',
+      borderBottomColor: '#CBD5E1',
     },
     tableCellBold: {
       fontFamily: 'Helvetica-Bold',
       fontSize: 7.5,
-      color: isNoir ? '#38BDF8' : '#1E293B',
+      color: '#1E293B',
     },
     tableRow: {
       flexDirection: 'row',
       padding: 5,
       borderBottomWidth: 1,
-      borderBottomColor: isNoir ? '#0F172A' : '#F8FAFC',
+      borderBottomColor: '#F8FAFC',
     },
     tableCell: {
       fontSize: 7.5,
-      color: isNoir ? '#CBD5E1' : '#334155',
+      color: '#334155',
     },
     sigContainer: {
       flexDirection: 'row',
@@ -145,7 +144,7 @@ async function generateMiddlemanAgreementPDF(selectedTheme = 'azure') {
     },
     sigBox: {
       width: '48%',
-      borderColor: isNoir ? '#1E293B' : '#CBD5E1',
+      borderColor: '#CBD5E1',
       borderWidth: 1,
       borderRadius: 4,
       padding: 8,
@@ -154,7 +153,7 @@ async function generateMiddlemanAgreementPDF(selectedTheme = 'azure') {
     sigTitle: {
       fontFamily: 'Helvetica-Bold',
       fontSize: 7,
-      color: isNoir ? '#94A3B8' : '#64748B',
+      color: '#64748B',
       marginBottom: 10,
     },
     footer: {
@@ -163,14 +162,14 @@ async function generateMiddlemanAgreementPDF(selectedTheme = 'azure') {
       left: 28,
       right: 28,
       borderTopWidth: 1,
-      borderTopColor: isNoir ? '#1E293B' : '#E2E8F0',
+      borderTopColor: '#E2E8F0',
       paddingTop: 5,
       flexDirection: 'row',
       justifyContent: 'space-between',
     },
     footerText: {
       fontSize: 7,
-      color: isNoir ? '#64748B' : '#94A3B8',
+      color: '#94A3B8',
     },
   });
 
@@ -180,7 +179,7 @@ async function generateMiddlemanAgreementPDF(selectedTheme = 'azure') {
       h(Text, { style: styles.footerText }, `Page ${pageNum} of 2 | https://prateeq.in`)
     );
 
-  const docElement = h(Document, { title: `${partnerName.replace(/\s+/g, '_')}_Sales_Partner_Agreement_${isNoir ? 'Noir' : 'Azure'}` },
+  const docElement = h(Document, { title: `${partnerName.replace(/\s+/g, '_')}_Sales_Partner_Agreement` },
     // PAGE 1
     h(Page, { size: 'A4', style: styles.page },
       h(View, { style: styles.headerBanner },
@@ -284,15 +283,13 @@ async function generateMiddlemanAgreementPDF(selectedTheme = 'azure') {
     )
   );
 
-  const fileName = selectedTheme === 'noir' ? 'Middleman_Partnership_Agreement_Noir.pdf' : 'Middleman_Partnership_Agreement.pdf';
-  const outputPath = path.join(process.cwd(), 'public', fileName);
+  const outputPath = path.join(process.cwd(), 'public', 'Middleman_Partnership_Agreement.pdf');
   await ReactPDF.renderToFile(docElement, outputPath);
-  console.log(`Successfully generated PDF (${selectedTheme}): ${outputPath}`);
+  console.log(`Successfully generated PDF: ${outputPath}`);
 }
 
 async function run() {
-  await generateMiddlemanAgreementPDF('azure');
-  await generateMiddlemanAgreementPDF('noir');
+  await generateMiddlemanAgreementPDF();
 }
 
 run();
