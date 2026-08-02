@@ -1,8 +1,12 @@
-import { jsPDF } from 'jspdf';
+import ReactPDF from '@react-pdf/renderer';
+import React from 'react';
 import fs from 'fs';
 import path from 'path';
 
-function generateMiddlemanAgreementPDF(selectedTheme = 'azure') {
+const { Document, Page, Text, View, StyleSheet, Svg, Line } = ReactPDF;
+const h = React.createElement;
+
+async function generateMiddlemanAgreementPDF(selectedTheme = 'azure') {
   const resumeJsonPath = path.join(process.cwd(), 'src', 'data', 'resume.json');
   let resumeData = {};
   try {
@@ -19,215 +23,276 @@ function generateMiddlemanAgreementPDF(selectedTheme = 'azure') {
   const tier1Cut = mm.tier1Commission || '10%';
   const tier2Cut = mm.tier2Commission || '12%';
   const tier3Cut = mm.tier3Commission || '15%';
-  const recurringCut = mm.recurringCommission || '10%';
-  
-  const disbursementRules = mm.disbursementRules || [
-    "Rule 3.1 (No Out-of-Pocket Liability): Developer will never pay commissions out-of-pocket prior to client funds clearing bank accounts.",
-    "Rule 3.2 (Proportional Payout Schedule): 50% of Commission disbursed within 24 hours of receiving Client's 50% Upfront Deposit. 50% disbursed upon receiving Client's Final 50% Balance.",
-    "Rule 3.3 (Cancellations & Defaults): In the event of a client default or partial scope cancellation, commission is calculated strictly on net funds actually collected and retained."
-  ];
 
-  const confidentialityRules = mm.confidentialityRules || [
-    "Rule 4.1 (Non-Circumvention): Partner agrees not to bypass Developer or refer introduced clients to alternative software developers without express written consent.",
-    "Rule 4.2 (Codebase & IP Ownership): All codebase assets, databases, and intellectual property remain the property of Developer until 100% of project contract fees are paid by Client.",
-    "Rule 4.3 (Confidentiality & Non-Disclosure): Both parties agree to keep project quotes, client contact information, and internal commercial terms strictly confidential."
-  ];
+  const isNoir = selectedTheme === 'noir';
 
-  const isAzure = selectedTheme === 'azure';
-  const titleColor = isAzure ? [2, 132, 199] : [180, 83, 9];
-  const headerBgColor = isAzure ? [240, 249, 255] : [254, 243, 199];
-  const tableHeaderBgColor = isAzure ? [224, 242, 254] : [253, 230, 138];
-
-  const doc = new jsPDF({
-    orientation: 'portrait',
-    unit: 'mm',
-    format: 'a4',
+  const styles = StyleSheet.create({
+    page: {
+      padding: 28,
+      fontFamily: 'Helvetica',
+      backgroundColor: isNoir ? '#090D16' : '#FFFFFF',
+      fontSize: 8.5,
+      color: isNoir ? '#F1F5F9' : '#0F172A',
+    },
+    headerBanner: {
+      height: 50,
+      backgroundColor: isNoir ? '#020617' : '#0F172A',
+      borderRadius: 4,
+      padding: 10,
+      marginBottom: 12,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    brandTitle: {
+      fontSize: 12,
+      fontFamily: 'Helvetica-Bold',
+      color: isNoir ? '#38BDF8' : '#FFFFFF',
+    },
+    brandSub: {
+      fontSize: 7.5,
+      color: isNoir ? '#94A3B8' : '#CBD5E1',
+      marginTop: 2,
+    },
+    docHeader: {
+      borderBottomWidth: 1,
+      borderBottomColor: isNoir ? '#1E293B' : '#CBD5E1',
+      paddingBottom: 6,
+      marginBottom: 10,
+    },
+    docTitle: {
+      fontSize: 13,
+      fontFamily: 'Helvetica-Bold',
+      color: isNoir ? '#F8FAFC' : '#0F172A',
+    },
+    docMeta: {
+      fontSize: 7.5,
+      color: isNoir ? '#94A3B8' : '#64748B',
+      marginTop: 2,
+    },
+    metaCard: {
+      backgroundColor: isNoir ? '#0F172A' : '#F8FAFC',
+      borderColor: isNoir ? '#1E293B' : '#E2E8F0',
+      borderWidth: 1,
+      borderRadius: 4,
+      padding: 8,
+      marginBottom: 10,
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+    },
+    metaCol: {
+      width: '50%',
+      marginBottom: 3,
+    },
+    metaLabel: {
+      fontFamily: 'Helvetica-Bold',
+      fontSize: 7.5,
+      color: isNoir ? '#38BDF8' : '#475569',
+    },
+    metaVal: {
+      fontSize: 8,
+      color: isNoir ? '#F1F5F9' : '#0F172A',
+    },
+    sectionTitle: {
+      fontFamily: 'Helvetica-Bold',
+      fontSize: 9,
+      color: isNoir ? '#38BDF8' : '#1E3A8A',
+      backgroundColor: isNoir ? '#0F172A' : '#EFF6FF',
+      padding: '3 6',
+      borderRadius: 3,
+      marginBottom: 6,
+      marginTop: 4,
+    },
+    paragraph: {
+      fontSize: 8,
+      lineHeight: 1.4,
+      color: isNoir ? '#CBD5E1' : '#334155',
+      marginBottom: 6,
+    },
+    table: {
+      borderColor: isNoir ? '#1E293B' : '#CBD5E1',
+      borderWidth: 1,
+      borderRadius: 4,
+      overflow: 'hidden',
+      marginBottom: 10,
+    },
+    tableHeader: {
+      flexDirection: 'row',
+      backgroundColor: isNoir ? '#0F172A' : '#F1F5F9',
+      padding: 5,
+      borderBottomWidth: 1,
+      borderBottomColor: isNoir ? '#1E293B' : '#CBD5E1',
+    },
+    tableCellBold: {
+      fontFamily: 'Helvetica-Bold',
+      fontSize: 7.5,
+      color: isNoir ? '#38BDF8' : '#1E293B',
+    },
+    tableRow: {
+      flexDirection: 'row',
+      padding: 5,
+      borderBottomWidth: 1,
+      borderBottomColor: isNoir ? '#0F172A' : '#F8FAFC',
+    },
+    tableCell: {
+      fontSize: 7.5,
+      color: isNoir ? '#CBD5E1' : '#334155',
+    },
+    sigContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginTop: 10,
+    },
+    sigBox: {
+      width: '48%',
+      borderColor: isNoir ? '#1E293B' : '#CBD5E1',
+      borderWidth: 1,
+      borderRadius: 4,
+      padding: 8,
+      height: 54,
+    },
+    sigTitle: {
+      fontFamily: 'Helvetica-Bold',
+      fontSize: 7,
+      color: isNoir ? '#94A3B8' : '#64748B',
+      marginBottom: 10,
+    },
+    footer: {
+      position: 'absolute',
+      bottom: 18,
+      left: 28,
+      right: 28,
+      borderTopWidth: 1,
+      borderTopColor: isNoir ? '#1E293B' : '#E2E8F0',
+      paddingTop: 5,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    footerText: {
+      fontSize: 7,
+      color: isNoir ? '#64748B' : '#94A3B8',
+    },
   });
 
-  const pageWidth = 210;
-  const leftMargin = 18;
-  const rightMargin = 18;
-  const contentWidth = pageWidth - leftMargin - rightMargin; // 174mm
-  let y = 18;
+  const renderFooter = (pageNum) =>
+    h(View, { style: styles.footer, fixed: true },
+      h(Text, { style: styles.footerText }, 'SALES PARTNER & MIDDLEMAN AGREEMENT // CONFIDENTIAL'),
+      h(Text, { style: styles.footerText }, `Page ${pageNum} of 2 | https://prateeq.in`)
+    );
 
-  const drawHeader = (title, pageNum) => {
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(15);
-    doc.setTextColor(titleColor[0], titleColor[1], titleColor[2]);
-    doc.text(title, leftMargin, y);
-    y += 5;
+  const docElement = h(Document, { title: `${partnerName.replace(/\s+/g, '_')}_Sales_Partner_Agreement_${isNoir ? 'Noir' : 'Azure'}` },
+    // PAGE 1
+    h(Page, { size: 'A4', style: styles.page },
+      h(View, { style: styles.headerBanner },
+        h(View, null,
+          h(Text, { style: styles.brandTitle }, 'PRATEEQ.IN'),
+          h(Text, { style: styles.brandSub }, 'FULL-STACK & AI ARCHITECTURE // PARTNER FRAMEWORK')
+        ),
+        h(Svg, { height: '26', width: '100' },
+          h(Line, { x1: '0', y1: '26', x2: '100', y2: '26', stroke: '#38BDF8', strokeWidth: '1' }),
+          h(Line, { x1: '15', y1: '26', x2: '15', y2: '10', stroke: '#38BDF8', strokeWidth: '1' }),
+          h(Line, { x1: '15', y1: '10', x2: '35', y2: '10', stroke: '#38BDF8', strokeWidth: '1' }),
+          h(Line, { x1: '35', y1: '10', x2: '35', y2: '26', stroke: '#38BDF8', strokeWidth: '1' }),
+          h(Line, { x1: '45', y1: '26', x2: '45', y2: '4', stroke: '#38BDF8', strokeWidth: '1' }),
+          h(Line, { x1: '45', y1: '4', x2: '65', y2: '4', stroke: '#38BDF8', strokeWidth: '1' }),
+          h(Line, { x1: '65', y1: '4', x2: '65', y2: '26', stroke: '#38BDF8', strokeWidth: '1' }),
+          h(Line, { x1: '75', y1: '26', x2: '75', y2: '14', stroke: '#38BDF8', strokeWidth: '1' }),
+          h(Line, { x1: '75', y1: '14', x2: '90', y2: '14', stroke: '#38BDF8', strokeWidth: '1' }),
+          h(Line, { x1: '90', y1: '14', x2: '90', y2: '26', stroke: '#38BDF8', strokeWidth: '1' })
+        )
+      ),
+      h(View, { style: styles.docHeader },
+        h(Text, { style: styles.docTitle }, 'SALES PARTNER & MIDDLEMAN PARTNERSHIP AGREEMENT'),
+        h(Text, { style: styles.docMeta }, 'Prateeq Sharma | Engineering & Custom Web Builds | REF: PRTQ-PARTNER-2026')
+      ),
+      h(View, { style: styles.metaCard },
+        h(View, { style: styles.metaCol },
+          h(Text, { style: styles.metaLabel }, 'EFFECTIVE DATE'),
+          h(Text, { style: styles.metaVal }, effectiveDate)
+        ),
+        h(View, { style: styles.metaCol },
+          h(Text, { style: styles.metaLabel }, 'DEVELOPER'),
+          h(Text, { style: styles.metaVal }, `${devName} (prateeq.in)`)
+        ),
+        h(View, { style: styles.metaCol },
+          h(Text, { style: styles.metaLabel }, 'PARTNER / SALES REP'),
+          h(Text, { style: styles.metaVal }, partnerName)
+        ),
+        h(View, { style: styles.metaCol },
+          h(Text, { style: styles.metaLabel }, 'CONTACT EMAIL'),
+          h(Text, { style: styles.metaVal }, devEmail)
+        )
+      ),
+      h(Text, { style: styles.sectionTitle }, '1. PURPOSE & ROLES OF ENGAGEMENT'),
+      h(Text, { style: styles.paragraph },
+        `This Agreement outlines the commercial terms, commission structure, payment schedules, and operational rules between ${devName} ("Developer") and ${partnerName} ("Sales Representative / Partner") for bringing client web development, custom software, and AI integration projects to the Developer.`
+      ),
+      h(Text, { style: styles.sectionTitle }, '2. COMMISSION TIER STRUCTURE & PAYOUT RATES'),
+      h(View, { style: styles.table },
+        h(View, { style: styles.tableHeader },
+          h(Text, { style: [styles.tableCellBold, { width: '40%' }] }, 'PROJECT TIER & BUDGET RANGE'),
+          h(Text, { style: [styles.tableCellBold, { width: '30%' }] }, 'PARTNER COMMISSION'),
+          h(Text, { style: [styles.tableCellBold, { width: '30%' }] }, 'PAYOUT TIMELINE')
+        ),
+        h(View, { style: styles.tableRow },
+          h(Text, { style: [styles.tableCell, { width: '40%' }] }, 'Tier 1: Landing Page (₹25k–₹45k / $300–$550)'),
+          h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }] }, tier1Cut),
+          h(Text, { style: [styles.tableCell, { width: '30%' }] }, 'Within 48h of Client 50% Deposit')
+        ),
+        h(View, { style: styles.tableRow },
+          h(Text, { style: [styles.tableCell, { width: '40%' }] }, 'Tier 2: Multi-Page Web App (₹45k–₹90k / $550–$1.1k)'),
+          h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }] }, tier2Cut),
+          h(Text, { style: [styles.tableCell, { width: '30%' }] }, 'Within 48h of Client 50% Deposit')
+        ),
+        h(View, { style: styles.tableRow },
+          h(Text, { style: [styles.tableCell, { width: '40%' }] }, 'Tier 3: SaaS / AI RAG Engine (₹90k–₹1.5L+ / $1.1k+)'),
+          h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }] }, tier3Cut),
+          h(Text, { style: [styles.tableCell, { width: '30%' }] }, 'Within 48h of Client 50% Deposit')
+        )
+      ),
+      renderFooter(1)
+    ),
 
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.5);
-    doc.setTextColor(100, 116, 139); // Slate 500
-    doc.text(`${devName} | Sales Partner Agreement (${isAzure ? 'Cyber-Noir Azure' : 'Vintage Paper'}) | Page ${pageNum} of 2`, leftMargin, y);
-    y += 4;
-
-    doc.setDrawColor(203, 213, 225); // Slate 300
-    doc.setLineWidth(0.3);
-    doc.line(leftMargin, y, pageWidth - rightMargin, y);
-    y += 6;
-  };
-
-  const addSectionTitle = (title) => {
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10.5);
-    doc.setTextColor(titleColor[0], titleColor[1], titleColor[2]);
-    doc.text(title, leftMargin, y);
-    y += 4;
-    doc.setDrawColor(226, 232, 240);
-    doc.setLineWidth(0.2);
-    doc.line(leftMargin, y, pageWidth - rightMargin, y);
-    y += 5;
-  };
-
-  const addParagraph = (text, fontSize = 8.5) => {
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(fontSize);
-    doc.setTextColor(51, 65, 85);
-    const lines = doc.splitTextToSize(text, contentWidth);
-    lines.forEach((line) => {
-      doc.text(line, leftMargin, y);
-      y += 4.2;
-    });
-    y += 2.5;
-  };
-
-  // ================= PAGE 1 =================
-  drawHeader('FREELANCE SALES & BUSINESS BROKER AGREEMENT', 1);
-
-  // Metadata Box
-  doc.setFillColor(headerBgColor[0], headerBgColor[1], headerBgColor[2]);
-  doc.setDrawColor(226, 232, 240);
-  doc.rect(leftMargin, y, contentWidth, 20, 'FD');
-
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8.5);
-  doc.setTextColor(71, 85, 105);
-  doc.text(`EFFECTIVE DATE: ${effectiveDate}`, leftMargin + 4, y + 6);
-  doc.text(`DEVELOPER: ${devName} (prateeq.in)`, leftMargin + 85, y + 6);
-  doc.text(`PARTNER / SALES REP: ${partnerName}`, leftMargin + 4, y + 13);
-  doc.text(`CONTACT EMAIL: ${devEmail}`, leftMargin + 85, y + 13);
-  y += 24;
-
-  // Section 1
-  addSectionTitle('1. PURPOSE & ROLES OF ENGAGEMENT');
-  addParagraph(
-    `This Agreement outlines the commercial terms, commission structure, payment schedules, and operational rules between ${devName} ("Developer") and ${partnerName} ("Sales Representative / Partner") for bringing client web development, custom software, and AI integration projects to the Developer.`
+    // PAGE 2
+    h(Page, { size: 'A4', style: styles.page },
+      h(View, { style: styles.docHeader },
+        h(Text, { style: styles.docTitle }, 'OPERATIONAL RULES & SIGN-OFF'),
+        h(Text, { style: styles.docMeta }, 'Prateeq Sharma | Engineering & Custom Web Builds | Page 2 of 2')
+      ),
+      h(Text, { style: styles.sectionTitle }, '3. CLIENT HANDOFF & PROJECT QUALIFICATION'),
+      h(Text, { style: styles.paragraph },
+        'The Partner introduces leads via warm email introduction or the Intake Scoping Form. Once a client signs the Scoping Specification and pays the 50% upfront deposit, the project is officially qualified and the Partner\'s commission is released within 48 business hours.'
+      ),
+      h(Text, { style: styles.sectionTitle }, '4. NON-CIRCUMVENTION & CONFIDENTIALITY'),
+      h(Text, { style: styles.paragraph },
+        'Developer agrees not to solicit or bypass Partner\'s direct clients without Partner\'s written consent. Partner agrees to keep Developer\'s rates, codebases, and technical architecture confidential.'
+      ),
+      h(Text, { style: styles.sectionTitle }, '5. SIGNATURE & AGREEMENT ACCEPTANCE'),
+      h(View, { style: styles.sigContainer },
+        h(View, { style: styles.sigBox },
+          h(Text, { style: styles.sigTitle }, 'DEVELOPER SIGNATURE'),
+          h(Text, { style: styles.paragraph }, `NAME: ${devName}`),
+          h(Text, { style: styles.paragraph }, `DATE: ${effectiveDate}`)
+        ),
+        h(View, { style: styles.sigBox },
+          h(Text, { style: styles.sigTitle }, 'PARTNER SIGNATURE'),
+          h(Text, { style: styles.paragraph }, `NAME: ${partnerName}`),
+          h(Text, { style: styles.paragraph }, 'DATE: _______________')
+        )
+      ),
+      renderFooter(2)
+    )
   );
-
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
-  doc.setTextColor(titleColor[0], titleColor[1], titleColor[2]);
-  doc.text('Partner Responsibilities:', leftMargin, y);
-  y += 4.5;
-  addParagraph('- Lead Generation & Prospecting: Identifying potential businesses needing custom web or AI builds.');
-  addParagraph('- Discovery Brief Distribution: Sharing the official prateeq.in Business Scoping Brief (Web Form or PDF Brief) with prospective clients.');
-  addParagraph('- Proposal Delivery & Closing: Delivering quotes prepared by Developer and securing signed brief & initial deposit.');
-
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
-  doc.setTextColor(titleColor[0], titleColor[1], titleColor[2]);
-  doc.text('Developer Responsibilities:', leftMargin, y);
-  y += 4.5;
-  addParagraph('- Fixed-Price Scoping: Reviewing briefs and providing accurate fixed-price proposals within 24 hours.');
-  addParagraph('- Full-Stack & AI Engineering: Architecting, developing, testing, and deploying production Next.js, Supabase, and RAG platforms.');
-  addParagraph('- Technical Alignment Support: Joining 15-minute technical discovery calls alongside Partner to address complex questions.');
-
-  y += 2;
-  // Section 2
-  addSectionTitle('2. COMMISSION & COMPENSATION STRUCTURE');
-  addParagraph('Commission is calculated as a percentage of net contract value (excluding third-party domain/hosting costs):');
-
-  // Commission Table Box Setup
-  const tableStartY = y;
-  const col1X = leftMargin + 4;     // 22mm
-  const col2X = leftMargin + 104;   // 122mm
-  const col3X = leftMargin + 130;   // 148mm
-  
-  // Table Header Background
-  doc.setFillColor(tableHeaderBgColor[0], tableHeaderBgColor[1], tableHeaderBgColor[2]);
-  doc.rect(leftMargin, y, contentWidth, 7, 'F');
-  
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8);
-  doc.setTextColor(30, 41, 59);
-  doc.text('PROJECT TIER & VALUE RANGE', col1X, y + 5);
-  doc.text('COMMISSION', col2X, y + 5);
-  doc.text('ESTIMATED PAYOUT', col3X, y + 5);
-  y += 7;
-
-  const rows = [
-    ['Tier 1: Landing Page (INR 25k - 45k / $300 - $550)', tier1Cut, 'INR 2,500 - 4,500 ($30 - $55)'],
-    ['Tier 2: Custom Multi-Page Website (INR 45k - 90k / $550 - $1,100)', tier2Cut, 'INR 5,400 - 10,800 ($66 - $132)'],
-    ['Tier 3/4: Full-Stack Web App / AI RAG (INR 90k - 2.5L+ / $1.1k - $3k+)', tier3Cut, 'INR 13,500 - 37,500+ ($165 - $450+)'],
-  ];
-
-  rows.forEach((row) => {
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    doc.setTextColor(51, 65, 85);
-    
-    const col1Lines = doc.splitTextToSize(row[0], 96);
-    doc.text(col1Lines, col1X, y + 4.5);
-    
-    doc.setFont('helvetica', 'bold');
-    doc.text(row[1], col2X, y + 4.5);
-    doc.text(row[2], col3X, y + 4.5);
-    
-    y += Math.max(col1Lines.length * 4.5, 7);
-  });
-
-  const tableEndY = y + 2;
-  // Draw outer bounding box border
-  doc.setDrawColor(203, 213, 225);
-  doc.rect(leftMargin, tableStartY, contentWidth, tableEndY - tableStartY);
-  y = tableEndY + 4;
-
-  addParagraph(`Recurring Monthly Maintenance Cut: For any client subscribing to a Monthly Care Plan (INR 10,000/mo or $150/mo), Partner receives a ${recurringCut} recurring monthly commission (INR 1,000/mo) for as long as the retainer remains active.`);
-
-  // ================= PAGE 2 =================
-  doc.addPage();
-  y = 18;
-  drawHeader('PAYMENT DISBURSEMENT RULES & SIGN-OFF', 2);
-
-  // Section 3
-  addSectionTitle('3. PAYMENT DISBURSEMENT & TIMELINE RULES');
-  disbursementRules.forEach(r => addParagraph(r));
-
-  y += 2;
-  // Section 4
-  addSectionTitle('4. NON-CIRCUMVENTION & CONFIDENTIALITY');
-  confidentialityRules.forEach(r => addParagraph(r));
-
-  y += 4;
-  addSectionTitle('5. SIGNATURE & AGREEMENT ACCEPTANCE');
-  y += 3;
-
-  // Signature Boxes
-  doc.setDrawColor(203, 213, 225);
-  doc.rect(leftMargin, y, 80, 26);
-  doc.rect(leftMargin + 90, y, 84, 26);
-
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8);
-  doc.setTextColor(100, 116, 139);
-  doc.text('DEVELOPER SIGNATURE', leftMargin + 4, y + 5);
-  doc.text(`NAME: ${devName}`, leftMargin + 4, y + 13);
-  doc.text('TITLE: Principal Engineer & Lead Architect', leftMargin + 4, y + 18);
-  doc.text(`DATE: ${effectiveDate}`, leftMargin + 4, y + 23);
-
-  doc.text('PARTNER / SALES REP SIGNATURE', leftMargin + 94, y + 5);
-  doc.text(`NAME: ${partnerName}`, leftMargin + 94, y + 13);
-  doc.text('TITLE: Sales Representative & Partner', leftMargin + 94, y + 18);
-  doc.text('DATE: _______________', leftMargin + 94, y + 23);
 
   const fileName = selectedTheme === 'noir' ? 'Middleman_Partnership_Agreement_Noir.pdf' : 'Middleman_Partnership_Agreement.pdf';
   const outputPath = path.join(process.cwd(), 'public', fileName);
-  const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
-  fs.writeFileSync(outputPath, pdfBuffer);
+  await ReactPDF.renderToFile(docElement, outputPath);
   console.log(`Successfully generated PDF (${selectedTheme}): ${outputPath}`);
 }
 
-generateMiddlemanAgreementPDF('azure');
-generateMiddlemanAgreementPDF('noir');
+async function run() {
+  await generateMiddlemanAgreementPDF('azure');
+  await generateMiddlemanAgreementPDF('noir');
+}
+
+run();
