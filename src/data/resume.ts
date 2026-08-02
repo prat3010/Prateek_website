@@ -43,6 +43,18 @@ export interface PricingPlan {
   cta: string;
 }
 
+export interface MiddlemanAgreementConfig {
+  partnerName: string;
+  effectiveDate: string;
+  developerName: string;
+  developerEmail: string;
+  tier1Commission: string;
+  tier2Commission: string;
+  tier3Commission: string;
+  recurringCommission: string;
+  rules: string[];
+}
+
 export interface IntakeConfig {
   title: string;
   subtitle: string;
@@ -52,6 +64,7 @@ export interface IntakeConfig {
   timelineOptions: string[];
   assetOptions: string[];
   termsAndConditions: string[];
+  middlemanAgreement?: MiddlemanAgreementConfig;
 }
 
 export interface ResumeData {

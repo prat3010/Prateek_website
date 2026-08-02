@@ -431,6 +431,52 @@ def render_resume_tab():
                 "termsAndConditions": tc_list
             }
 
+        # 4e. Middleman Partnership Terms & PDF Agreement Manager
+        with st.container(border=True):
+            st.markdown('<div class="section-header">Middleman Partnership Agreement & PDF Config</div>', unsafe_allow_html=True)
+            mm_data = intake_data.get('middlemanAgreement', {}) or {}
+            
+            col_mm1, col_mm2 = st.columns(2)
+            with col_mm1:
+                partner_name = st.text_input("Partner / Sales Rep Name", value=mm_data.get('partnerName', '[Partner Name]'), key="mm_partner_name")
+                eff_date = st.text_input("Effective Date", value=mm_data.get('effectiveDate', 'August 2, 2026'), key="mm_eff_date")
+                dev_name = st.text_input("Developer Name", value=mm_data.get('developerName', 'Prateeq Sharma'), key="mm_dev_name")
+                dev_email = st.text_input("Developer Email", value=mm_data.get('developerEmail', '3010prateeksharma@gmail.com'), key="mm_dev_email")
+            with col_mm2:
+                t1_comm = st.text_input("Tier 1 Commission (%)", value=mm_data.get('tier1Commission', '10%'), key="mm_t1_comm")
+                t2_comm = st.text_input("Tier 2 Commission (%)", value=mm_data.get('tier2Commission', '12%'), key="mm_t2_comm")
+                t3_comm = st.text_input("Tier 3/4 Commission (%)", value=mm_data.get('tier3Commission', '15%'), key="mm_t3_comm")
+                rec_comm = st.text_input("Recurring Care Plan Commission (%)", value=mm_data.get('recurringCommission', '10%'), key="mm_rec_comm")
+                
+            st.markdown("##### Agreement Rules & Clauses (One per line)")
+            rules_str = "\n".join(mm_data.get('rules', []))
+            rules_edit = st.text_area("Middleman Agreement Rules", value=rules_str, height=140, key="mm_rules")
+            rules_list = [r.strip() for r in rules_edit.split("\n") if r.strip()]
+            
+            res['intake']['middlemanAgreement'] = {
+                "partnerName": partner_name.strip(),
+                "effectiveDate": eff_date.strip(),
+                "developerName": dev_name.strip(),
+                "developerEmail": dev_email.strip(),
+                "tier1Commission": t1_comm.strip(),
+                "tier2Commission": t2_comm.strip(),
+                "tier3Commission": t3_comm.strip(),
+                "recurringCommission": rec_comm.strip(),
+                "rules": rules_list
+            }
+            
+            if st.button("Rebuild Middleman PDF Agreement Now", key="btn_rebuild_mm_pdf"):
+                try:
+                    write_resume_file(res)
+                    import subprocess
+                    proc = subprocess.run(['node', 'scripts/generate-middleman-pdf.mjs'], capture_output=True, text=True)
+                    if proc.returncode == 0:
+                        st.success("📄 Middleman_Partnership_Agreement.pdf generated and updated successfully!")
+                    else:
+                        st.error(f"Failed to generate PDF: {proc.stderr}")
+                except Exception as e:
+                    st.error(f"Error generating PDF: {e}")
+
         # Save Button & Live JSON View
         st.markdown("---")
         dry_run_resume = st.checkbox("Dry-Run Mode (Save locally only, do not push to remote)", value=True, key="dry_resume")

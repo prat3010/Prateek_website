@@ -387,6 +387,23 @@
       "5. Intellectual Property (IP) Ownership: 100% Intellectual Property and code ownership transfer to Client upon receipt of final payment.",
       "6. Infrastructure & Third-Party Billing: Hosting (Vercel), Database (Supabase), Domain Registration, and API costs (OpenAI/Resend) are billed directly to client-owned accounts. Developer is not liable for third-party service outages.",
       "7. Post-Launch Warranty: Includes 30 days of complimentary technical support & bug fixes post-launch. Continued support is available under a Monthly Care Plan."
-    ]
+    ],
+    "middlemanAgreement": {
+      "partnerName": "[Partner Name]",
+      "effectiveDate": "August 2, 2026",
+      "developerName": "Prateeq Sharma",
+      "developerEmail": "3010prateeksharma@gmail.com",
+      "tier1Commission": "10%",
+      "tier2Commission": "12%",
+      "tier3Commission": "15%",
+      "recurringCommission": "10%",
+      "rules": [
+        "Rule 3.1 (No Out-of-Pocket Liability): Developer will never pay commissions out-of-pocket prior to client funds clearing bank accounts.",
+        "Rule 3.2 (Proportional Payout Schedule): 50% of Commission disbursed within 24 hours of receiving Client's 50% Upfront Deposit. 50% disbursed upon receiving Client's Final 50% Balance.",
+        "Rule 3.3 (Cancellations & Defaults): In the event of a client default or partial scope cancellation, commission is calculated strictly on net funds actually collected and retained.",
+        "Rule 4.1 (Non-Circumvention): Partner agrees not to bypass Developer or refer introduced clients to alternative software developers without express written consent.",
+        "Rule 4.2 (Codebase & IP Ownership): All codebase assets, databases, and intellectual property remain the property of Developer until 100% of project contract fees are paid by Client."
+      ]
+    }
   }
 }

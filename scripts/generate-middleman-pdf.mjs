@@ -3,6 +3,25 @@ import fs from 'fs';
 import path from 'path';
 
 function generateMiddlemanAgreementPDF() {
+  const resumeJsonPath = path.join(process.cwd(), 'src', 'data', 'resume.json');
+  let resumeData = {};
+  try {
+    resumeData = JSON.parse(fs.readFileSync(resumeJsonPath, 'utf8'));
+  } catch (e) {
+    console.warn('Could not load resume.json, using defaults:', e);
+  }
+
+  const mm = resumeData?.intake?.middlemanAgreement || {};
+  const partnerName = mm.partnerName || '[Partner Name]';
+  const effectiveDate = mm.effectiveDate || 'August 2, 2026';
+  const devName = mm.developerName || 'Prateeq Sharma';
+  const devEmail = mm.developerEmail || '3010prateeksharma@gmail.com';
+  const tier1Cut = mm.tier1Commission || '10%';
+  const tier2Cut = mm.tier2Commission || '12%';
+  const tier3Cut = mm.tier3Commission || '15%';
+  const recurringCut = mm.recurringCommission || '10%';
+  const customRules = mm.rules;
+
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
@@ -25,7 +44,7 @@ function generateMiddlemanAgreementPDF() {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8.5);
     doc.setTextColor(100, 116, 139); // Slate 500
-    doc.text(`Prateeq Sharma | Business Broker & Sales Partner Agreement | Page ${pageNum} of 2`, leftMargin, y);
+    doc.text(`${devName} | Business Broker & Sales Partner Agreement | Page ${pageNum} of 2`, leftMargin, y);
     y += 4;
 
     doc.setDrawColor(203, 213, 225); // Slate 300
@@ -69,16 +88,16 @@ function generateMiddlemanAgreementPDF() {
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.5);
   doc.setTextColor(71, 85, 105);
-  doc.text(`EFFECTIVE DATE: August 2, 2026`, leftMargin + 4, y + 6);
-  doc.text(`DEVELOPER: Prateeq Sharma (prateeq.in)`, leftMargin + 85, y + 6);
-  doc.text(`PARTNER / SALES REP: [Partner Name]`, leftMargin + 4, y + 13);
-  doc.text(`CONTACT EMAIL: 3010prateeksharma@gmail.com`, leftMargin + 85, y + 13);
+  doc.text(`EFFECTIVE DATE: ${effectiveDate}`, leftMargin + 4, y + 6);
+  doc.text(`DEVELOPER: ${devName} (prateeq.in)`, leftMargin + 85, y + 6);
+  doc.text(`PARTNER / SALES REP: ${partnerName}`, leftMargin + 4, y + 13);
+  doc.text(`CONTACT EMAIL: ${devEmail}`, leftMargin + 85, y + 13);
   y += 24;
 
   // Section 1
   addSectionTitle('1. PURPOSE & ROLES OF ENGAGEMENT');
   addParagraph(
-    'This Agreement outlines the commercial terms, commission structure, payment schedules, and operational rules between Prateeq Sharma ("Developer") and [Partner Name] ("Sales Representative / Partner") for bringing client web development, custom software, and AI integration projects to the Developer.'
+    `This Agreement outlines the commercial terms, commission structure, payment schedules, and operational rules between ${devName} ("Developer") and ${partnerName} ("Sales Representative / Partner") for bringing client web development, custom software, and AI integration projects to the Developer.`
   );
 
   doc.setFont('helvetica', 'bold');
@@ -120,9 +139,9 @@ function generateMiddlemanAgreementPDF() {
   y += 7;
 
   const rows = [
-    ['Tier 1: High-Converting Landing Page (₹25k - ₹45k / $300 - $550)', '10%', '₹2,500 – ₹4,500 ($30 - $55)'],
-    ['Tier 2: Custom Multi-Page Website (₹45k - ₹90k / $550 - $1,100)', '12%', '₹5,400 – ₹10,800 ($66 - $132)'],
-    ['Tier 3/4: Full-Stack Web App / AI RAG (₹90k - ₹2.5L+ / $1,100 - $3k+)', '15%', '₹13,500 – ₹37,500+ ($165 - $450+)'],
+    ['Tier 1: High-Converting Landing Page (₹25k - ₹45k / $300 - $550)', tier1Cut, '₹2,500 – ₹4,500 ($30 - $55)'],
+    ['Tier 2: Custom Multi-Page Website (₹45k - ₹90k / $550 - $1,100)', tier2Cut, '₹5,400 – ₹10,800 ($66 - $132)'],
+    ['Tier 3/4: Full-Stack Web App / AI RAG (₹90k - ₹2.5L+ / $1,100 - $3k+)', tier3Cut, '₹13,500 – ₹37,500+ ($165 - $450+)'],
   ];
 
   rows.forEach((row) => {
@@ -137,7 +156,7 @@ function generateMiddlemanAgreementPDF() {
   });
 
   y += 4;
-  addParagraph('Recurring Monthly Maintenance Cut: For any client subscribing to a Monthly Care Plan (₹10,000/mo or $150/mo), Partner receives a 10% recurring monthly commission (₹1,000/mo) for as long as the retainer remains active.');
+  addParagraph(`Recurring Monthly Maintenance Cut: For any client subscribing to a Monthly Care Plan (₹10,000/mo or $150/mo), Partner receives a ${recurringCut} recurring monthly commission (₹1,000/mo) for as long as the retainer remains active.`);
 
   // ================= PAGE 2 =================
   doc.addPage();
@@ -146,11 +165,16 @@ function generateMiddlemanAgreementPDF() {
 
   // Section 3
   addSectionTitle('3. PAYMENT DISBURSEMENT & TIMELINE RULES');
-  addParagraph('Rule 3.1 (No Out-of-Pocket Liability): Developer will never pay commissions out-of-pocket prior to client funds clearing bank accounts.');
-  addParagraph('Rule 3.2 (Proportional Payout Schedule):');
-  addParagraph('   - 50% of Commission: Disbursed within 24 hours of Developer receiving the Client\'s 50% Upfront Deposit.');
-  addParagraph('   - 50% of Commission: Disbursed within 24 hours of Developer receiving the Client\'s Final 50% Balance prior to launch.');
-  addParagraph('Rule 3.3 (Cancellations & Defaults): In the event of a client default or partial scope cancellation, commission is calculated strictly on net funds actually collected and retained by Developer.');
+  
+  if (customRules && customRules.length > 0) {
+    customRules.forEach(r => addParagraph(r));
+  } else {
+    addParagraph('Rule 3.1 (No Out-of-Pocket Liability): Developer will never pay commissions out-of-pocket prior to client funds clearing bank accounts.');
+    addParagraph('Rule 3.2 (Proportional Payout Schedule):');
+    addParagraph('   - 50% of Commission: Disbursed within 24 hours of Developer receiving the Client\'s 50% Upfront Deposit.');
+    addParagraph('   - 50% of Commission: Disbursed within 24 hours of Developer receiving the Client\'s Final 50% Balance prior to launch.');
+    addParagraph('Rule 3.3 (Cancellations & Defaults): In the event of a client default or partial scope cancellation, commission is calculated strictly on net funds actually collected and retained by Developer.');
+  }
 
   y += 2;
   // Section 4
