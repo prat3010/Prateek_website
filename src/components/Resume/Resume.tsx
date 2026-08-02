@@ -36,8 +36,8 @@ const RESUME_SECTION_TITLE_TEXTS: ScramblerProps['texts'] = {
 };
 
 const RESUME_BUTTON_TEXTS: ScramblerProps['texts'] = {
-  developer: { light: 'DOWNLOAD PDF',       noir: 'EXPORT DOSSIER' },
-  business:  { light: 'DOWNLOAD SCOPING BRIEF', noir: 'EXPORT BRIEF' },
+  developer: { light: 'DOWNLOAD PDF',             noir: 'EXPORT DOSSIER' },
+  business:  { light: 'DOWNLOAD QUESTIONNAIRE PDF', noir: 'EXPORT QUESTIONNAIRE PDF' },
 };
 
 function Resume({ resumeData, certificates }: ResumeProps) {
@@ -104,7 +104,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
               className={styles.sectionTitle}
             >
               {activeAudience === 'business'
-                ? (isNoir ? 'RATE CARD & TERMS' : 'FREELANCE SERVICE QUOTATION')
+                ? 'SERVICES & GUARANTEES'
                 : (isNoir ? 'SERVICE RECORD' : 'PROFESSIONAL DOSSIER')}
             </Scrambler>
             {activeAudience === 'business' && (
@@ -120,7 +120,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
               className={styles.printBtn}
               aria-label={
                 activeAudience === 'business'
-                  ? (isNoir ? 'EXPORT QUOTATION - Download Quotation Rate Card PDF' : 'DOWNLOAD RATE CARD - Download Quotation Rate Card PDF')
+                  ? (isNoir ? 'EXPORT QUESTIONNAIRE PDF - Download Client Discovery Brief PDF' : 'DOWNLOAD QUESTIONNAIRE PDF - Download Client Discovery Brief PDF')
                   : (isNoir ? 'EXPORT DOSSIER - Download ATS Resume as PDF' : 'DOWNLOAD PDF - Download ATS Resume as PDF')
               }
             >
@@ -131,7 +131,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                 as="span"
               >
                 {activeAudience === 'business'
-                  ? (isNoir ? 'EXPORT QUOTATION' : 'DOWNLOAD RATE CARD')
+                  ? (isNoir ? 'EXPORT QUESTIONNAIRE PDF' : 'DOWNLOAD QUESTIONNAIRE PDF')
                   : (isNoir ? 'EXPORT DOSSIER' : 'DOWNLOAD PDF')}
               </Scrambler>
             </button>
