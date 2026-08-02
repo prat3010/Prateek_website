@@ -26,9 +26,18 @@ export default function RagAppStudioPage() {
     let active = true;
     Promise.resolve().then(() => {
       if (!active) return;
-      const tId = localStorage.getItem("retriever_tenant_id") || "00000000-0000-0000-0000-000000000000";
-      const uId = localStorage.getItem("retriever_user_id") || "00000000-0000-0000-0000-000000000001";
-      const key = localStorage.getItem("retriever_api_key") || GUEST_KEY;
+      const storedTenant = localStorage.getItem("retriever_tenant_id");
+      const storedUser = localStorage.getItem("retriever_user_id");
+      const storedKey = localStorage.getItem("retriever_api_key");
+
+      if (!storedTenant || !storedUser || !storedKey) {
+        router.push("/rag/login");
+        return;
+      }
+
+      const tId = storedTenant;
+      const uId = storedUser;
+      const key = storedKey;
 
       setTenantId(tId);
       setApiKey(key);
@@ -36,7 +45,7 @@ export default function RagAppStudioPage() {
       setIsAdmin(key.includes("admin") || key === "dev-admin-master-key-change-in-production");
 
       const cli = new RetrieverClient({
-        apiUrl: "https://rag.prateeq.in",
+        apiUrl: process.env.NEXT_PUBLIC_RETRIEVER_API_URL || "https://rag.prateeq.in",
         tenantId: tId,
         apiKey: key,
         userId: uId,

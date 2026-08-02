@@ -13,6 +13,7 @@ const Projects = dynamic(() => import('@/components/Projects/Projects'));
 const Resume = dynamic(() => import('@/components/Resume/Resume'));
 const Pricing = dynamic(() => import('@/components/Pricing/Pricing'));
 const Playground = dynamic(() => import('@/components/Playground/Playground'));
+const IntakeForm = dynamic(() => import('@/components/Intake/IntakeForm'));
 const Contact = dynamic(() => import('@/components/Contact/Contact'));
 
 function SectionSkeleton({ height }: { height: string }) {
@@ -92,6 +93,10 @@ export default function Home() {
           <PricingSection />
         </ScrollSection>
       </Suspense>
+
+      <ScrollSection verticalOffset={120} gap={80}>
+        <IntakeForm />
+      </ScrollSection>
 
       <ScrollSection verticalOffset={120} gap={80}>
         <Playground />

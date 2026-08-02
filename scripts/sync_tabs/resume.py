@@ -206,26 +206,30 @@ def render_resume_tab():
 
         # 4b. Freelance Quotation Details
         with st.container(border=True):
-            st.markdown('<div class="section-header">Freelance Quotation Rate Sheet</div>', unsafe_allow_html=True)
+            st.markdown('<div class="section-header">Freelance Quotation & Engagement Terms</div>', unsafe_allow_html=True)
             
-            tab_q_global, tab_q_india = st.tabs(["Global Rates (USD)", "India Rates (INR)"])
+            tab_q_global, tab_q_india = st.tabs(["Global Terms (USD)", "India Terms (INR)"])
             
             with tab_q_global:
                 quote_data = res.get('quotation', {}) or {}
                 col_q1, col_q2 = st.columns(2)
                 with col_q1:
-                    q_hourly = st.text_input("Estimated Hourly Rate (USD)", value=quote_data.get('hourlyRate', ''), placeholder="e.g. $50", key="quote_hourly")
-                    q_day = st.text_input("Standard Day Rate (8 hours - USD)", value=quote_data.get('dayRate', ''), placeholder="e.g. $350", key="quote_day")
+                    q_scope = st.text_input("Fixed Scope Guarantee", value=quote_data.get('scopeModel', 'Fixed-Price Milestones (No hidden hourly charges)'), key="quote_scope")
+                    q_sprint = st.text_input("Delivery Sprint Speed", value=quote_data.get('deliverySprint', '1 to 3 Weeks Turnaround Sprint'), key="quote_sprint")
+                    q_warranty = st.text_input("Post-Launch Warranty", value=quote_data.get('warrantyModel', 'Included 30-Day Post-Launch Support & Warranty'), key="quote_warranty")
                 with col_q2:
-                    q_terms = st.text_area("Standard Payment Terms (USD)", value=quote_data.get('paymentTerms', ''), key="quote_terms", height=70)
+                    q_terms = st.text_area("Standard Payment Terms (USD)", value=quote_data.get('paymentTerms', ''), key="quote_terms", height=100)
                     
                 q_deliv_str = "\n".join(quote_data.get('deliverables', []))
                 q_deliv_edit = st.text_area("Service Deliverables Checklist (USD - One per line)", value=q_deliv_str, height=100, key="quote_deliv")
                 q_deliv_list = [d.strip() for d in q_deliv_edit.split("\n") if d.strip()]
                 
                 res['quotation'] = {
-                    "hourlyRate": q_hourly.strip(),
-                    "dayRate": q_day.strip(),
+                    "scopeModel": q_scope.strip(),
+                    "deliverySprint": q_sprint.strip(),
+                    "warrantyModel": q_warranty.strip(),
+                    "hourlyRate": quote_data.get('hourlyRate', '$40'),
+                    "dayRate": quote_data.get('dayRate', '$300'),
                     "paymentTerms": q_terms.strip(),
                     "deliverables": q_deliv_list
                 }
@@ -234,18 +238,22 @@ def render_resume_tab():
                 quote_data_in = res.get('quotation_india', {}) or {}
                 col_qi1, col_qi2 = st.columns(2)
                 with col_qi1:
-                    qi_hourly = st.text_input("Estimated Hourly Rate (INR)", value=quote_data_in.get('hourlyRate', ''), placeholder="e.g. ₹3,500", key="quote_hourly_in")
-                    qi_day = st.text_input("Standard Day Rate (8 hours - INR)", value=quote_data_in.get('dayRate', ''), placeholder="e.g. ₹25,000", key="quote_day_in")
+                    qi_scope = st.text_input("Fixed Scope Guarantee [INR]", value=quote_data_in.get('scopeModel', 'Fixed-Price Milestones (No hidden hourly charges)'), key="quote_scope_in")
+                    qi_sprint = st.text_input("Delivery Sprint Speed [INR]", value=quote_data_in.get('deliverySprint', '1 to 3 Weeks Turnaround Sprint'), key="quote_sprint_in")
+                    qi_warranty = st.text_input("Post-Launch Warranty [INR]", value=quote_data_in.get('warrantyModel', 'Included 30-Day Post-Launch Support & Warranty'), key="quote_warranty_in")
                 with col_qi2:
-                    qi_terms = st.text_area("Standard Payment Terms (INR)", value=quote_data_in.get('paymentTerms', ''), key="quote_terms_in", height=70)
+                    qi_terms = st.text_area("Standard Payment Terms (INR)", value=quote_data_in.get('paymentTerms', ''), key="quote_terms_in", height=100)
                     
                 qi_deliv_str = "\n".join(quote_data_in.get('deliverables', []))
                 qi_deliv_edit = st.text_area("Service Deliverables Checklist (INR - One per line)", value=qi_deliv_str, height=100, key="quote_deliv_in")
                 qi_deliv_list = [d.strip() for d in qi_deliv_edit.split("\n") if d.strip()]
                 
                 res['quotation_india'] = {
-                    "hourlyRate": qi_hourly.strip(),
-                    "dayRate": qi_day.strip(),
+                    "scopeModel": qi_scope.strip(),
+                    "deliverySprint": qi_sprint.strip(),
+                    "warrantyModel": qi_warranty.strip(),
+                    "hourlyRate": quote_data_in.get('hourlyRate', '₹3,000'),
+                    "dayRate": quote_data_in.get('dayRate', '₹20,000'),
                     "paymentTerms": qi_terms.strip(),
                     "deliverables": qi_deliv_list
                 }

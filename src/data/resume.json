@@ -159,6 +159,9 @@
   ],
   "instagram": "https://www.instagram.com/freshlimevodka",
   "quotation": {
+    "scopeModel": "Fixed-Price Milestones (No hidden hourly charges)",
+    "deliverySprint": "1 to 3 Weeks Turnaround Sprint",
+    "warrantyModel": "Included 30-Day Post-Launch Support & Warranty",
     "hourlyRate": "$40",
     "dayRate": "$300",
     "paymentTerms": "50% upfront deposit to initiate development, 50% upon final project delivery.",
@@ -327,6 +330,9 @@
     ]
   },
   "quotation_india": {
+    "scopeModel": "Fixed-Price Milestones (No hidden hourly charges)",
+    "deliverySprint": "1 to 3 Weeks Turnaround Sprint",
+    "warrantyModel": "Included 30-Day Post-Launch Support & Warranty",
     "hourlyRate": "\u20b93,000",
     "dayRate": "\u20b920,000",
     "paymentTerms": "50% upfront deposit to initiate development, 50% upon final project delivery.",

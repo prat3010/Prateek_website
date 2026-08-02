@@ -279,25 +279,39 @@ export function generateQuotationPDF(resumeData: ResumeData, region: 'india' | '
   drawTextParagraph(briefText, 10);
   y += 5;
 
-  // Rate Card
+  // Rate Card & High-Trust Guarantees
   doc.setFont('Helvetica', 'Bold');
   doc.setFontSize(11);
   doc.setTextColor(0, 0, 0);
-  doc.text('RATE STRUCTURE & PRICING', leftMargin, y);
+  doc.text('ENGAGEMENT MODEL & VALUE GUARANTEES', leftMargin, y);
   y += 2;
   drawDivider();
 
   const quoteSource = (region === 'india' && resumeData.quotation_india) ? resumeData.quotation_india : resumeData.quotation;
-  const hourly = quoteSource?.hourlyRate || (region === 'india' ? "₹3,500" : "$50");
-  const day = quoteSource?.dayRate || (region === 'india' ? "₹25,000" : "$350");
-  const terms = quoteSource?.paymentTerms || "50% upfront, 30% after design/milestone 1, 20% on final delivery.";
+  const scopeModel = quoteSource?.scopeModel || "Fixed-Price Milestones (No hidden hourly charges)";
+  const deliverySprint = quoteSource?.deliverySprint || "1 to 3 Weeks Turnaround Sprint";
+  const warrantyModel = quoteSource?.warrantyModel || "Included 30-Day Post-Launch Support & Warranty";
+  const terms = quoteSource?.paymentTerms || "50% upfront deposit to initiate development, 50% upon final project delivery.";
 
   doc.setFont('Helvetica', 'Bold');
-  doc.setFontSize(10.5);
-  doc.setTextColor(40, 40, 40);
-  doc.text(`Estimated Hourly Rate: ${hourly} / hour`, leftMargin, y);
+  doc.setFontSize(9.5);
+  doc.setTextColor(0, 0, 0);
+
+  doc.text(`* Fixed Scope Guarantee: `, leftMargin, y);
+  doc.setFont('Helvetica', 'Normal');
+  doc.text(scopeModel, leftMargin + 45, y);
   y += 5.5;
-  doc.text(`Standard Day Rate (8 hours): ${day} / day`, leftMargin, y);
+
+  doc.setFont('Helvetica', 'Bold');
+  doc.text(`* Fast Delivery Sprint: `, leftMargin, y);
+  doc.setFont('Helvetica', 'Normal');
+  doc.text(deliverySprint, leftMargin + 45, y);
+  y += 5.5;
+
+  doc.setFont('Helvetica', 'Bold');
+  doc.text(`* Post-Launch Warranty: `, leftMargin, y);
+  doc.setFont('Helvetica', 'Normal');
+  doc.text(warrantyModel, leftMargin + 45, y);
   y += 7.5;
 
   doc.setFont('Helvetica', 'Bold');
@@ -317,11 +331,11 @@ export function generateQuotationPDF(resumeData: ResumeData, region: 'india' | '
   drawDivider();
 
   const deliverables = quoteSource?.deliverables || [
-    "Custom UI Design & Prototype",
+    "Custom UI Design & Interactive Prototype",
     "Production-ready Next.js / React application",
-    "Supabase backend integration & security setup",
-    "SEO audit & optimization",
-    "3 months of support & maintenance"
+    "Supabase database engineering & security setups",
+    "Search Engine Optimization (SEO) & Web Telemetry setup",
+    "30 days of post-launch support & handoff documentation"
   ];
 
   deliverables.forEach((item) => {
@@ -329,7 +343,6 @@ export function generateQuotationPDF(resumeData: ResumeData, region: 'india' | '
       doc.addPage();
       y = 20;
     }
-    // Render checkmark icon
     doc.setFont('Helvetica', 'Bold');
     doc.setFontSize(10);
     doc.text('[x]', leftMargin, y);
@@ -340,4 +353,104 @@ export function generateQuotationPDF(resumeData: ResumeData, region: 'india' | '
   });
 
   doc.save(`${resumeData.name.replace(/\s+/g, '_')}_Service_Quotation.pdf`);
+}
+
+export interface QuestionnaireData {
+  companyName?: string;
+  contactEmail?: string;
+  projectGoal?: string;
+  projectCategory?: string;
+  features?: string[];
+  assetsStatus?: string;
+  inspirationLinks?: string;
+  timeline?: string;
+  budgetRange?: string;
+}
+
+export function generateQuestionnairePDF(data?: QuestionnaireData) {
+  const doc = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4',
+  });
+
+  const leftMargin = 20;
+  const rightMargin = 20;
+  const contentWidth = 210 - leftMargin - rightMargin;
+  let y = 20;
+
+  const drawDivider = () => {
+    doc.setDrawColor(180, 180, 180);
+    doc.setLineWidth(0.25);
+    doc.line(leftMargin, y, 210 - rightMargin, y);
+    y += 5;
+  };
+
+  // Header
+  doc.setFont('Helvetica', 'Bold');
+  doc.setFontSize(18);
+  doc.setTextColor(0, 0, 0);
+  doc.text('CLIENT DISCOVERY & SCOPING BRIEF', leftMargin, y);
+  y += 6;
+
+  doc.setFont('Helvetica', 'Normal');
+  doc.setFontSize(9);
+  doc.setTextColor(80, 80, 80);
+  doc.text('Prateeq Sharma | Full-Stack Engineering & Custom Web Builds | prateeq.in', leftMargin, y);
+  y += 5;
+  drawDivider();
+
+  const addSectionHeader = (title: string) => {
+    doc.setFont('Helvetica', 'Bold');
+    doc.setFontSize(11);
+    doc.setTextColor(0, 51, 102);
+    doc.text(title, leftMargin, y);
+    y += 2;
+    drawDivider();
+  };
+
+  const addFieldRow = (label: string, value?: string) => {
+    doc.setFont('Helvetica', 'Bold');
+    doc.setFontSize(9.5);
+    doc.setTextColor(40, 40, 40);
+    doc.text(`${label}:`, leftMargin, y);
+    doc.setFont('Helvetica', 'Normal');
+    const valText = value || '_____________________________________________';
+    const lines: string[] = doc.splitTextToSize(valText, contentWidth - 45);
+    doc.text(lines[0] || '', leftMargin + 45, y);
+    y += 6;
+  };
+
+  // Section 1
+  addSectionHeader('1. BUSINESS IDENTITY & GOALS');
+  addFieldRow('Company / Client Name', data?.companyName);
+  addFieldRow('Contact Email', data?.contactEmail);
+  addFieldRow('Primary Goal', data?.projectGoal);
+  y += 3;
+
+  // Section 2
+  addSectionHeader('2. SCOPE & TECHNICAL REQUIREMENTS');
+  addFieldRow('Project Category', data?.projectCategory);
+  addFieldRow('Key Required Features', data?.features?.join(', ') || 'Lead Form, Auth, Custom DB, Payment');
+  y += 3;
+
+  // Section 3
+  addSectionHeader('3. BRAND ASSETS & INSPIRATION');
+  addFieldRow('Brand Assets Status', data?.assetsStatus);
+  addFieldRow('Inspiration Links', data?.inspirationLinks);
+  y += 3;
+
+  // Section 4
+  addSectionHeader('4. TIMELINE & INVESTMENT BUDGET');
+  addFieldRow('Target Launch Deadline', data?.timeline);
+  addFieldRow('Target Budget Tier', data?.budgetRange);
+  y += 5;
+
+  drawDivider();
+  doc.setFont('Helvetica', 'Italic');
+  doc.setFontSize(8.5);
+  doc.setTextColor(100, 100, 100);
+  doc.text('Return completed brief to 3010prateeksharma@gmail.com to receive an instant fixed-price proposal.', leftMargin, y);
+
+  doc.save('Client_Discovery_Scoping_Brief.pdf');
 }

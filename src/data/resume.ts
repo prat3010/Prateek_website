@@ -62,14 +62,20 @@ export interface ResumeData {
   experience: WorkExperience[];
   education: Education[];
   quotation?: {
-    hourlyRate: string;
-    dayRate: string;
+    scopeModel?: string;
+    deliverySprint?: string;
+    warrantyModel?: string;
+    hourlyRate?: string;
+    dayRate?: string;
     paymentTerms: string;
     deliverables: string[];
   };
   quotation_india?: {
-    hourlyRate: string;
-    dayRate: string;
+    scopeModel?: string;
+    deliverySprint?: string;
+    warrantyModel?: string;
+    hourlyRate?: string;
+    dayRate?: string;
     paymentTerms: string;
     deliverables: string[];
   };

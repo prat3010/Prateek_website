@@ -215,15 +215,21 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                     {/* Rate Card Grid */}
                     <div className={styles.quoteGrid}>
                       <div className={styles.quoteCard}>
-                        <h4 className={styles.quoteCardLabel}>ESTIMATED HOURLY RATE</h4>
-                        <span className={styles.rateValue}>{activeQuotation?.hourlyRate || (region === 'india' ? "₹3,500" : "$50")}</span>
-                        <span className={styles.rateUnit}>per hour</span>
+                        <h4 className={styles.quoteCardLabel}>FIXED SCOPE GUARANTEE</h4>
+                        <span className={styles.rateValue}>{activeQuotation?.scopeModel || "Fixed Milestones"}</span>
+                        <span className={styles.rateUnit}>No hidden hourly charges</span>
                       </div>
 
                       <div className={styles.quoteCard}>
-                        <h4 className={styles.quoteCardLabel}>STANDARD DAY RATE (8H)</h4>
-                        <span className={styles.rateValue}>{activeQuotation?.dayRate || (region === 'india' ? "₹25,000" : "$350")}</span>
-                        <span className={styles.rateUnit}>per day</span>
+                        <h4 className={styles.quoteCardLabel}>FAST DELIVERY SPRINT</h4>
+                        <span className={styles.rateValue}>{activeQuotation?.deliverySprint || "1–3 Weeks"}</span>
+                        <span className={styles.rateUnit}>Rapid AI-Driven Turnaround</span>
+                      </div>
+
+                      <div className={styles.quoteCard}>
+                        <h4 className={styles.quoteCardLabel}>POST-LAUNCH WARRANTY</h4>
+                        <span className={styles.rateValue}>{activeQuotation?.warrantyModel || "30 Days Included"}</span>
+                        <span className={styles.rateUnit}>Maintenance & Handoff</span>
                       </div>
                     </div>
 

@@ -174,6 +174,86 @@ export class RetrieverClient {
       `/v1/tenants/${this.config.tenantId}/documents/${documentId}/download-url`
     );
   }
+
+  async listTenants(): Promise<{ tenantId: string; name: string; status: string }[]> {
+    const res = await this.request<any>("/v1/admin/tenants");
+    if (Array.isArray(res)) return res;
+    if (res && Array.isArray(res.items)) return res.items;
+    return [];
+  }
+
+  async getGraphCapabilities(): Promise<GraphCapabilitiesResponse> {
+    return this.request<GraphCapabilitiesResponse>(
+      `/v1/admin/tenants/${this.config.tenantId}/graph/capabilities`
+    );
+  }
+
+  async switchGraphEngine(engine: "postgres" | "neo4j") {
+    return this.request(
+      `/v1/admin/tenants/${this.config.tenantId}/graph/engine`,
+      {
+        method: "POST",
+        body: JSON.stringify({ engine }),
+      }
+    );
+  }
+
+  async getGraphSummary(): Promise<GraphSummaryResponse> {
+    return this.request<GraphSummaryResponse>(
+      `/v1/admin/tenants/${this.config.tenantId}/graph`
+    );
+  }
+
+  async queryGraph(entity: string, maxHops = 2): Promise<GraphQueryResponse> {
+    return this.request<GraphQueryResponse>(
+      `/v1/admin/tenants/${this.config.tenantId}/graph/query`,
+      {
+        method: "POST",
+        body: JSON.stringify({ entity, max_hops: maxHops }),
+      }
+    );
+  }
+
+  async deleteTriple(tripleId: string) {
+    return this.request(
+      `/v1/admin/tenants/${this.config.tenantId}/graph/triples/${tripleId}`,
+      {
+        method: "DELETE",
+      }
+    );
+  }
+}
+
+export interface GraphCapabilitiesResponse {
+  machine_profile: string;
+  supported_engines: string[];
+  active_engine: string;
+  neo4j_status: string;
+  message: string;
+}
+
+export interface GraphSummaryResponse {
+  tenant_id: string;
+  total_triples: number;
+  unique_entities: number;
+  storage_engine: string;
+  neo4j_status?: string;
+}
+
+export interface EntityTripleItem {
+  triple_id?: string;
+  subject: string;
+  predicate: string;
+  object: string;
+  chunk_id?: string;
+  confidence?: number;
+}
+
+export interface GraphQueryResponse {
+  root_entity: string;
+  max_hops: number;
+  triples: EntityTripleItem[];
+  connected_entities: string[];
 }
 
 function combineAbortSignals(...signals: AbortSignal[]): AbortSignal {

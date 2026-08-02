@@ -2,6 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import RefreshButton from './RefreshButton';
+import { GraphControl } from '@/components/admin/GraphControl';
 import { getAnalyticsData } from './_lib/analytics';
 import { safeDecode, getCountryName, getRelativeTime } from './_lib/utils';
 import type { TimeRange } from './_lib/types';
@@ -56,6 +57,9 @@ export default async function AnalyticsPage(props: {
         </Link>
         <Link href="/terminal" className={styles.backBtn}>
           Terminal Diagnostics
+        </Link>
+        <Link href="/rag/app" className={styles.backBtn} style={{ background: "rgba(0, 242, 254, 0.15)", border: "1px solid #00f2fe", color: "#00f2fe", fontWeight: 600 }}>
+          Launch SaaS Studio Playground 🚀
         </Link>
       </div>
 
@@ -412,6 +416,9 @@ export default async function AnalyticsPage(props: {
         </div>
       </div>
       </>)}
+
+      {/* --- GraphRAG Knowledge Graph Admin Controls --- */}
+      <GraphControl />
     </div>
   );
 }
