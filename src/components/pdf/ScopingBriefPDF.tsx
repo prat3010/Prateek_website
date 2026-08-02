@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   docTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontFamily: 'Helvetica-Bold',
     color: '#0F172A',
     textTransform: 'uppercase',
@@ -117,62 +117,47 @@ const styles = StyleSheet.create({
     padding: 6,
     alignItems: 'center',
   },
-  tableRowSelected: {
+  tableRowHighlight: {
     backgroundColor: '#F0F9FF',
   },
-  colCheck: {
-    width: '10%',
+  tableTotalRow: {
+    flexDirection: 'row',
+    backgroundColor: '#0F172A',
+    padding: 7,
+    alignItems: 'center',
   },
-  colTier: {
-    width: '45%',
-    paddingRight: 6,
+  colModule: {
+    width: '65%',
   },
-  colScope: {
-    width: '45%',
+  colPrice: {
+    width: '35%',
+    textAlign: 'right',
   },
-  checkBadge: {
-    fontFamily: 'Helvetica-Bold',
-    fontSize: 8,
-    color: '#0284C7',
-  },
-  tierName: {
+  moduleTitle: {
     fontFamily: 'Helvetica-Bold',
     fontSize: 8.5,
     color: '#0F172A',
   },
-  tierScope: {
-    fontSize: 8,
-    color: '#475569',
-  },
-  featRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
-    borderBottomStyle: 'solid',
-  },
-  featName: {
-    fontSize: 8,
-    color: '#1E293B',
-    width: '65%',
-  },
-  badgeIncluded: {
-    fontFamily: 'Helvetica-Bold',
+  moduleDesc: {
     fontSize: 7.5,
-    color: '#0369A1',
-    backgroundColor: '#E0F2FE',
-    padding: '2 6',
-    borderRadius: 3,
+    color: '#64748B',
+    marginTop: 1,
   },
-  badgeExcluded: {
+  priceVal: {
     fontFamily: 'Helvetica-Bold',
-    fontSize: 7.5,
-    color: '#94A3B8',
-    backgroundColor: '#F1F5F9',
-    padding: '2 6',
-    borderRadius: 3,
+    fontSize: 8.5,
+    color: '#0284C7',
+  },
+  totalTitle: {
+    fontFamily: 'Helvetica-Bold',
+    fontSize: 9,
+    color: '#FFFFFF',
+  },
+  totalVal: {
+    fontFamily: 'Helvetica-Bold',
+    fontSize: 10,
+    color: '#38BDF8',
+    textAlign: 'right',
   },
   fieldRow: {
     marginBottom: 6,
@@ -198,7 +183,7 @@ const styles = StyleSheet.create({
   sigContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 16,
+    marginTop: 14,
   },
   sigBox: {
     width: '48%',
@@ -246,23 +231,10 @@ interface ScopingBriefPDFProps {
 export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
   const intakeConfig = resumeData?.intake;
 
-  const budgetTiers = [
-    { title: "Tier 1: High-Converting Landing Page", price: "₹25,000 – ₹45,000 ($300 – $550)", scope: "Responsive Motion UI, SEO Engine, Lead Contact Form, ReCAPTCHA Protection" },
-    { title: "Tier 2: Custom Multi-Page Web App", price: "₹45,000 – ₹90,000 ($550 – $1,100)", scope: "Multi-page App, Supabase Auth, Client Portal, Headless Blog CMS" },
-    { title: "Tier 3: Full-Stack Web App / AI RAG", price: "₹90,000 – ₹1.5L+ ($1,100 – $2,000+)", scope: "Full-Stack SaaS MVP, Private AI RAG Search Engine, Admin Dashboard" },
-    { title: "Custom Scope / Infrastructure", price: "Enterprise Quote", scope: "Bespoke Microservices, Custom AI Pipelines, Enterprise SLA" }
-  ];
-
-  const featureOptions = intakeConfig?.featureOptions || [
-    "Contact Form / Lead Capture (ReCAPTCHA Protected)",
-    "Payment Gateway (Stripe/Razorpay)",
-    "User Auth & Client Portal (Google/Magic Link)",
-    "Headless Blog / CMS Content Management",
-    "Private AI Knowledge Base / Vector Search (RAG)",
-    "Admin Dashboard & Role Access Control",
-    "Automated Email Workflows (Resend Transactional)",
-    "Privacy-Compliant Analytics & Visitor Telemetry"
-  ];
+  const totalINR = data?.totalBuildCostINR || 143000;
+  const totalUSD = data?.totalBuildCostUSD || 1710;
+  const maintenanceINR = data?.maintenanceCostINR ?? 6500;
+  const maintenanceUSD = data?.maintenanceCostUSD ?? 80;
 
   const terms = intakeConfig?.termsAndConditions || [
     "1. Payment Milestone Structure: 50% Upfront Deposit required to initiate design mockups & architecture setup. 30% Milestone Payment upon design approval & core build. 20% Final Payment prior to domain mapping & production deployment.",
@@ -271,24 +243,24 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
     "4. Client Dependencies: Timeline countdown begins ONLY after receiving all required client assets (text, logo, media, API credentials). Client delays in asset delivery will extend final delivery date accordingly.",
     "5. Intellectual Property (IP) Ownership: 100% Intellectual Property and code ownership transfer to Client upon receipt of final payment.",
     "6. Infrastructure & Hosting: Hosting (Vercel), Database (Supabase), Domain Registration, and API costs (OpenAI/Resend) are billed directly to client-owned accounts. Developer is not liable for third-party outages.",
-    "7. Post-Launch Warranty: Includes 30 days of complimentary technical support & bug fixes post-launch. Continued support is available under a Monthly Care Plan."
+    "7. Maintenance Retainer & SLA: Selected Care Plan is billed monthly post-launch. Includes defined SLA response times, automated backups, and dedicated monthly development hours."
   ];
 
   const renderFooter = (pageNum: number) => (
     <View style={styles.footer} fixed>
-      <Text style={styles.footerText}>CONFIDENTIAL SCOPING BRIEF // GENERATED BY PRATEEQ.IN SCOPING LAB</Text>
+      <Text style={styles.footerText}>CONFIDENTIAL SCOPING BRIEF & QUOTATION // GENERATED BY PRATEEQ.IN SCOPING LAB</Text>
       <Text style={styles.footerText}>Page {pageNum} of 3 | https://prateeq.in</Text>
     </View>
   );
 
   return (
-    <Document title={`${data?.companyName || 'Client'}_Scoping_Brief_Agreement`}>
+    <Document title={`${data?.companyName || 'Client'}_Itemized_Scoping_Proposal`}>
       {/* ================= PAGE 1 ================= */}
       <Page size="A4" style={styles.page}>
         <View style={styles.skylineHeader}>
           <View>
             <Text style={styles.brandTitle}>PRATEEQ.IN</Text>
-            <Text style={styles.brandSub}>FULL-STACK & AI ARCHITECTURE // SCOPING SPECIFICATION</Text>
+            <Text style={styles.brandSub}>FULL-STACK & AI ARCHITECTURE // SCOPING & QUOTATION</Text>
           </View>
           <Svg height="30" width="120">
             <Line x1="0" y1="30" x2="120" y2="30" stroke="#38BDF8" strokeWidth="1" />
@@ -312,13 +284,13 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
         </View>
 
         <View style={styles.docHeader}>
-          <Text style={styles.docTitle}>CLIENT DISCOVERY & SCOPING SPECIFICATION</Text>
-          <Text style={styles.docMeta}>Prateeq Sharma | Engineering & Custom Web Builds | REF: PRTQ-SCOPE-2026</Text>
+          <Text style={styles.docTitle}>EXECUTIVE COMMERCIAL PROPOSAL & SCOPING SPECIFICATION</Text>
+          <Text style={styles.docMeta}>Prateeq Sharma | Engineering & Custom Web Builds | REF: PRTQ-QUOTE-2026</Text>
         </View>
 
         <View style={styles.metadataCard}>
           <View style={styles.metaCol}>
-            <Text style={styles.metaLabel}>DATE</Text>
+            <Text style={styles.metaLabel}>PROPOSAL DATE</Text>
             <Text style={styles.metaVal}>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</Text>
           </View>
           <View style={styles.metaCol}>
@@ -334,46 +306,67 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
             <Text style={styles.metaVal}>{data?.contactPhone || '___________________________'}</Text>
           </View>
           <View style={styles.metaCol}>
-            <Text style={styles.metaLabel}>TARGET LAUNCH DEADLINE</Text>
+            <Text style={styles.metaLabel}>TARGET LAUNCH SPRINT</Text>
             <Text style={styles.metaVal}>{data?.timeline || 'Standard Turnaround (2–4 Weeks)'}</Text>
           </View>
         </View>
 
-        <Text style={styles.sectionHeader}>1. BUSINESS OBJECTIVES & TARGET PERSONA</Text>
+        <Text style={styles.sectionHeader}>1. BUSINESS OBJECTIVES & AUDIENCE PERSONA</Text>
         <View style={styles.fieldRow}>
           <Text style={styles.fieldLabel}>Primary Business Goal:</Text>
           <Text style={styles.fieldVal}>{data?.projectGoal || 'Lead Generation & Direct Sales'}</Text>
         </View>
         <View style={styles.fieldRow}>
-          <Text style={styles.fieldLabel}>Target Audience / Persona:</Text>
+          <Text style={styles.fieldLabel}>Target Audience Persona:</Text>
           <Text style={styles.fieldVal}>{data?.targetAudience || 'Tech Founders, SMB Owners, B2B Clients'}</Text>
         </View>
 
-        <View style={{ marginTop: 8 }}>
-          <Text style={styles.sectionHeader}>2. COMMERCIAL INVESTMENT TIERS (SELECT TARGET TIER)</Text>
-          <View style={styles.table}>
-            <View style={styles.tableHeader}>
-              <Text style={[styles.tableHeaderCell, styles.colCheck]}>SELECT</Text>
-              <Text style={[styles.tableHeaderCell, styles.colTier]}>TIER & COMMERCIAL VALUE</Text>
-              <Text style={[styles.tableHeaderCell, styles.colScope]}>INCLUDED ARCHITECTURE SCOPE</Text>
+        <Text style={styles.sectionHeader}>2. ITEMIZED COMMERCIAL INVESTMENT SUMMARY</Text>
+        <View style={styles.table}>
+          <View style={styles.tableHeader}>
+            <Text style={[styles.tableHeaderCell, styles.colModule]}>ARCHITECTURE ENGINE & MODULE LINE ITEMS</Text>
+            <Text style={[styles.tableHeaderCell, styles.colPrice]}>COMMERCIAL VALUE</Text>
+          </View>
+
+          <View style={[styles.tableRow, styles.tableRowHighlight]}>
+            <View style={styles.colModule}>
+              <Text style={styles.moduleTitle}>Base Architecture Engine ({data?.projectCategory || 'Multi-Page Web App Engine'})</Text>
+              <Text style={styles.moduleDesc}>Next.js 16 App Router, Responsive Motion UI, Telemetry, SEO Schema, Vercel Setup</Text>
             </View>
-            {budgetTiers.map((tier, idx) => {
-              const isSelected = data?.budgetRange?.includes(tier.title) || data?.budgetRange?.includes(tier.price) || (idx === 1 && !data?.budgetRange);
-              return (
-                <View key={idx} style={[styles.tableRow, isSelected ? styles.tableRowSelected : {}]}>
-                  <View style={styles.colCheck}>
-                    <Text style={styles.checkBadge}>{isSelected ? '[ ✓ ]' : '[   ]'}</Text>
-                  </View>
-                  <View style={styles.colTier}>
-                    <Text style={styles.tierName}>{tier.title}</Text>
-                    <Text style={{ fontSize: 7.5, color: '#0284C7', marginTop: 1 }}>{tier.price}</Text>
-                  </View>
-                  <View style={styles.colScope}>
-                    <Text style={styles.tierScope}>{tier.scope}</Text>
-                  </View>
-                </View>
-              );
-            })}
+            <View style={styles.colPrice}>
+              <Text style={styles.priceVal}>Base Included</Text>
+            </View>
+          </View>
+
+          {data?.features?.map((feat, idx) => (
+            <View key={idx} style={styles.tableRow}>
+              <View style={styles.colModule}>
+                <Text style={styles.moduleTitle}>{feat}</Text>
+                <Text style={styles.moduleDesc}>Production-grade module integration & automated testing</Text>
+              </View>
+              <View style={styles.colPrice}>
+                <Text style={styles.priceVal}>Included in Scope</Text>
+              </View>
+            </View>
+          ))}
+
+          <View style={styles.tableRow}>
+            <View style={styles.colModule}>
+              <Text style={styles.moduleTitle}>Brand Identity & Copywriting Readiness</Text>
+              <Text style={styles.moduleDesc}>{data?.assetsStatus || 'All Brand Assets Ready'}</Text>
+            </View>
+            <View style={styles.colPrice}>
+              <Text style={styles.priceVal}>Included</Text>
+            </View>
+          </View>
+
+          <View style={styles.tableTotalRow}>
+            <View style={styles.colModule}>
+              <Text style={styles.totalTitle}>ESTIMATED TOTAL BUILD INVESTMENT</Text>
+            </View>
+            <View style={styles.colPrice}>
+              <Text style={styles.totalVal}>{`₹${totalINR.toLocaleString()} / $${totalUSD.toLocaleString()}`}</Text>
+            </View>
           </View>
         </View>
 
@@ -383,33 +376,31 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
       {/* ================= PAGE 2 ================= */}
       <Page size="A4" style={styles.page}>
         <View style={styles.docHeader}>
-          <Text style={styles.docTitle}>TECHNICAL ARCHITECTURE MATRIX & BRAND INVENTORY</Text>
+          <Text style={styles.docTitle}>MONTHLY MAINTENANCE & INFRASTRUCTURE CARE</Text>
           <Text style={styles.docMeta}>Prateeq Sharma | Engineering & Custom Web Builds | Page 2 of 3</Text>
         </View>
 
-        <Text style={styles.sectionHeader}>3. TECHNICAL SCOPE MATRIX & FEATURE CHECKLIST</Text>
+        <Text style={styles.sectionHeader}>3. MONTHLY MAINTENANCE RETAINER & SLA PLAN</Text>
         <View style={styles.table}>
           <View style={styles.tableHeader}>
-            <Text style={[styles.tableHeaderCell, { width: '70%' }]}>FUNCTIONAL MODULE / FEATURE</Text>
-            <Text style={[styles.tableHeaderCell, { width: '30%', textAlign: 'right' }]}>SCOPE STATUS</Text>
+            <Text style={[styles.tableHeaderCell, { width: '60%' }]}>SELECTED CARE PLAN & SCOPE</Text>
+            <Text style={[styles.tableHeaderCell, { width: '40%', textAlign: 'right' }]}>MONTHLY RETAINER</Text>
           </View>
-          {featureOptions.map((feat, idx) => {
-            const isSelected = data?.features?.includes(feat) || data?.features?.some(f => feat.toLowerCase().includes(f.toLowerCase())) || idx < 3;
-            return (
-              <View key={idx} style={styles.featRow}>
-                <Text style={styles.featName}>{feat}</Text>
-                <Text style={isSelected ? styles.badgeIncluded : styles.badgeExcluded}>
-                  {isSelected ? '✓ INCLUDED IN SCOPE' : 'OUT OF SCOPE'}
-                </Text>
-              </View>
-            );
-          })}
+          <View style={[styles.tableRow, styles.tableRowHighlight]}>
+            <View style={{ width: '60%' }}>
+              <Text style={styles.moduleTitle}>{data?.maintenancePlan || 'Standard Care Plan'}</Text>
+              <Text style={styles.moduleDesc}>Hosting support, daily DB backups, security updates, 2-4h monthly dev time</Text>
+            </View>
+            <View style={{ width: '40%', textAlign: 'right' }}>
+              <Text style={styles.priceVal}>{maintenanceINR > 0 ? `₹${maintenanceINR.toLocaleString()}/mo ($${maintenanceUSD}/mo)` : 'Complimentary 30-Day Warranty'}</Text>
+            </View>
+          </View>
         </View>
 
         <Text style={styles.sectionHeader}>4. BRAND ASSET & CONTENT INVENTORY</Text>
         <View style={styles.fieldRow}>
           <Text style={styles.fieldLabel}>Brand Assets Status:</Text>
-          <Text style={styles.fieldVal}>{data?.assetsStatus || 'All Brand Assets Ready (Logo SVG, Copywriting, Media)'}</Text>
+          <Text style={styles.fieldVal}>{data?.assetsStatus || 'All Brand Assets Ready'}</Text>
         </View>
         <View style={styles.fieldRow}>
           <Text style={styles.fieldLabel}>Visual & Competitor Inspo:</Text>
@@ -431,7 +422,7 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
         </View>
 
         <Text style={styles.sectionHeader}>5. STANDARD COMMERCIAL TERMS & CONDITIONS (T&C)</Text>
-        <View style={{ marginBottom: 12 }}>
+        <View style={{ marginBottom: 10 }}>
           {terms.map((term, idx) => (
             <Text key={idx} style={styles.termItem}>{term}</Text>
           ))}

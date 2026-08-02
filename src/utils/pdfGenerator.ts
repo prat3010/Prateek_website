@@ -18,6 +18,11 @@ export interface QuestionnaireData {
   inspirationLinks?: string;
   timeline?: string;
   budgetRange?: string;
+  maintenancePlan?: string;
+  maintenanceCostINR?: number;
+  maintenanceCostUSD?: number;
+  totalBuildCostINR?: number;
+  totalBuildCostUSD?: number;
   additionalNotes?: string;
 }
 
