@@ -22,11 +22,17 @@ export interface QuestionnaireData {
 }
 
 async function renderAndOpenPDF(element: React.ReactElement<DocumentProps>, fileName: string) {
+  // Synchronously open a new blank tab during the user gesture to avoid popup blockers
+  const newWindow = typeof window !== 'undefined' ? window.open('about:blank', '_blank') : null;
+
   try {
     const blob = await pdf(element).toBlob();
     const blobUrl = URL.createObjectURL(blob);
-    const newWindow = window.open(blobUrl, '_blank');
-    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+
+    if (newWindow && !newWindow.closed) {
+      newWindow.location.href = blobUrl;
+    } else {
+      // Fallback if popup blocker prevented synchronous opening
       const link = document.createElement('a');
       link.href = blobUrl;
       link.download = fileName;
@@ -35,6 +41,9 @@ async function renderAndOpenPDF(element: React.ReactElement<DocumentProps>, file
       document.body.removeChild(link);
     }
   } catch (err) {
+    if (newWindow && !newWindow.closed) {
+      newWindow.close();
+    }
     console.error('Failed to open React-PDF preview:', err);
   }
 }
