@@ -2,7 +2,7 @@ import React from 'react';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import type { ResumeData } from '@/data/resume';
 import { getSkillsHighlight, type Persona } from '@/lib/skills';
-import { SkylineVectorHeader } from './SkylineVectorHeader';
+import { SkylineImageHeader } from './SkylineImageHeader';
 
 interface DeveloperResumePDFProps {
   activePersona: Persona;
@@ -114,7 +114,7 @@ export function DeveloperResumePDF({ activePersona, resumeData }: DeveloperResum
   return (
     <Document title={`${resumeData.name}_Resume_${activePersona}`}>
       <Page size="A4" style={styles.page}>
-        <SkylineVectorHeader
+        <SkylineImageHeader
           title={resumeData.name.toUpperCase()}
           sub={`FULL-STACK SOFTWARE ENGINEER // ${activePersona.toUpperCase()} PROFILE`}
           theme="noir"

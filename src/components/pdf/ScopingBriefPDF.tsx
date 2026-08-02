@@ -2,7 +2,7 @@ import React from 'react';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import type { ResumeData } from '@/data/resume';
 import type { QuestionnaireData } from '@/utils/pdfGenerator';
-import { SkylineVectorHeader } from './SkylineVectorHeader';
+import { SkylineImageHeader } from './SkylineImageHeader';
 
 const styles = StyleSheet.create({
   page: {
@@ -236,7 +236,7 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
     <Document title={`${data?.companyName || 'Client'}_Itemized_Scoping_Proposal`}>
       {/* ================= PAGE 1 ================= */}
       <Page size="A4" style={styles.page}>
-        <SkylineVectorHeader
+        <SkylineImageHeader
           title="PRATEEQ.IN"
           sub="FULL-STACK & AI ARCHITECTURE // SCOPING & QUOTATION"
           theme="noir"

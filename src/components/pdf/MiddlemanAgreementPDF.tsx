@@ -1,7 +1,7 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import type { ResumeData, MiddlemanAgreementConfig } from '@/data/resume';
-import { SkylineVectorHeader } from './SkylineVectorHeader';
+import { SkylineImageHeader } from './SkylineImageHeader';
 
 interface MiddlemanAgreementPDFProps {
   theme?: 'azure' | 'noir';
@@ -169,7 +169,7 @@ export function MiddlemanAgreementPDF({ theme = 'azure', resumeData }: Middleman
     <Document title={`${partnerName.replace(/\s+/g, '_')}_Sales_Partner_Agreement_${isNoir ? 'Noir' : 'Azure'}`}>
       {/* PAGE 1 */}
       <Page size="A4" style={styles.page}>
-        <SkylineVectorHeader
+        <SkylineImageHeader
           title="PRATEEQ.IN"
           sub="FULL-STACK & AI ARCHITECTURE // PARTNER FRAMEWORK"
           theme={theme}
