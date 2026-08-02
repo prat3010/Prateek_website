@@ -374,7 +374,7 @@ export default function SiteInfoConsole() {
 
       const disbursement = mm.disbursementRules || [
         "Rule 3.1: No out-of-pocket payouts prior to cleared client funds.",
-        "Rule 3.2: Proportional payout (50% on deposit, 50% on final balance).",
+        "Rule 3.2: Proportional payout within 48h of cleared client funds (50% on deposit, 50% on final balance).",
         "Rule 3.3: Net fee calculation on retained funds in case of cancellations."
       ];
 

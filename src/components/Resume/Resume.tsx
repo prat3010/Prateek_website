@@ -242,7 +242,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                         <FileText size={16} />
                         <span>STANDARD ENGAGEMENT TERMS</span>
                       </h3>
-                      <p className={styles.summaryText}>{activeQuotation?.paymentTerms || "50% upfront, 30% after design/milestone 1, 20% on final delivery."}</p>
+                      <p className={styles.summaryText}>{activeQuotation?.paymentTerms || "50% upfront deposit to initiate development, 50% upon final project delivery."}</p>
                     </div>
 
                     <div className={styles.resumeSectionBlock}>
