@@ -36,8 +36,8 @@ const RESUME_SECTION_TITLE_TEXTS: ScramblerProps['texts'] = {
 };
 
 const RESUME_BUTTON_TEXTS: ScramblerProps['texts'] = {
-  developer: { light: 'DOWNLOAD PDF',             noir: 'EXPORT DOSSIER' },
-  business:  { light: 'DOWNLOAD QUESTIONNAIRE PDF', noir: 'EXPORT QUESTIONNAIRE PDF' },
+  developer: { light: 'DOWNLOAD PDF',                    noir: 'EXPORT DOSSIER' },
+  business:  { light: 'DOWNLOAD SERVICES & PRICING GUIDE', noir: 'EXPORT SERVICES & PRICING GUIDE' },
 };
 
 function Resume({ resumeData, certificates }: ResumeProps) {
@@ -61,8 +61,8 @@ function Resume({ resumeData, certificates }: ResumeProps) {
 
   const handleDownloadPDF = () => {
     if (activeAudience === 'business') {
-      import('@/utils/pdfGenerator').then(({ generateQuestionnairePDF }) => {
-        generateQuestionnairePDF(resumeData);
+      import('@/utils/pdfGenerator').then(({ generateServicesAndPricingPDF }) => {
+        generateServicesAndPricingPDF(resumeData);
       });
     } else {
       import('@/utils/pdfGenerator').then(({ generateResumePDF }) => {
@@ -120,7 +120,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
               className={styles.printBtn}
               aria-label={
                 activeAudience === 'business'
-                  ? (isNoir ? 'EXPORT QUESTIONNAIRE PDF - Download Client Discovery Brief PDF' : 'DOWNLOAD QUESTIONNAIRE PDF - Download Client Discovery Brief PDF')
+                  ? (isNoir ? 'EXPORT SERVICES & PRICING GUIDE - Download Commercial Services & Rate Card PDF' : 'DOWNLOAD SERVICES & PRICING GUIDE - Download Commercial Services & Rate Card PDF')
                   : (isNoir ? 'EXPORT DOSSIER - Download ATS Resume as PDF' : 'DOWNLOAD PDF - Download ATS Resume as PDF')
               }
             >
@@ -131,7 +131,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                 as="span"
               >
                 {activeAudience === 'business'
-                  ? (isNoir ? 'EXPORT QUESTIONNAIRE PDF' : 'DOWNLOAD QUESTIONNAIRE PDF')
+                  ? (isNoir ? 'EXPORT SERVICES & PRICING GUIDE' : 'DOWNLOAD SERVICES & PRICING GUIDE')
                   : (isNoir ? 'EXPORT DOSSIER' : 'DOWNLOAD PDF')}
               </Scrambler>
             </button>
