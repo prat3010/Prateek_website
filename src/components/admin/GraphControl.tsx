@@ -31,19 +31,18 @@ interface TenantItem {
 export function GraphControl() {
   // Resolve API URL & Admin Credentials dynamically from session config / env vars
   const sessionConfig = typeof window !== "undefined" ? getConfig() : null;
-  const initialApiUrl =
+  const apiUrl = (
     process.env.NEXT_PUBLIC_RETRIEVER_API_URL ||
     sessionConfig?.apiUrl ||
-    "http://127.0.0.1:8000";
-  const initialAdminKey =
+    "http://127.0.0.1:8000"
+  ).replace(/\/$/, "");
+  const adminApiKey =
     process.env.NEXT_PUBLIC_ADMIN_API_KEY ||
     sessionConfig?.apiKey ||
     "test_admin_key";
   const initialTenantId =
     sessionConfig?.tenantId || "00000000-0000-0000-0000-000000000001";
 
-  const [apiUrl, setApiUrl] = useState(initialApiUrl.replace(/\/$/, ""));
-  const [adminApiKey, setAdminApiKey] = useState(initialAdminKey);
   const [selectedTenantId, setSelectedTenantId] = useState(initialTenantId);
   const [tenantList, setTenantList] = useState<TenantItem[]>([]);
 
@@ -60,22 +59,29 @@ export function GraphControl() {
   const [querying, setQuerying] = useState(false);
 
   // Fetch available onboarded tenants for tenant selector dropdown
-  const fetchTenantList = async () => {
-    try {
-      const headers = { "X-Admin-API-Key": adminApiKey, "Content-Type": "application/json" };
-      const res = await fetch(`${apiUrl}/v1/admin/tenants`, { headers });
-      if (res.ok) {
-        const data = await res.json();
-        const items = Array.isArray(data) ? data : data.items || [];
-        setTenantList(items);
-        if (items.length > 0 && !items.some((t: TenantItem) => t.tenantId === selectedTenantId)) {
-          setSelectedTenantId(items[0].tenantId);
+  useEffect(() => {
+    let active = true;
+    const fetchTenants = async () => {
+      try {
+        const headers = { "X-Admin-API-Key": adminApiKey, "Content-Type": "application/json" };
+        const res = await fetch(`${apiUrl}/v1/admin/tenants`, { headers });
+        if (res.ok && active) {
+          const data = await res.json();
+          const items = Array.isArray(data) ? data : data.items || [];
+          setTenantList(items);
+          if (items.length > 0 && !items.some((t: TenantItem) => t.tenantId === selectedTenantId)) {
+            setSelectedTenantId(items[0].tenantId);
+          }
         }
+      } catch {
+        // Ignore background tenant listing failure
       }
-    } catch {
-      // Ignore background tenant listing failure
-    }
-  };
+    };
+    fetchTenants();
+    return () => {
+      active = false;
+    };
+  }, [apiUrl, adminApiKey, selectedTenantId]);
 
   const fetchStatus = async () => {
     if (!selectedTenantId) return;
@@ -94,19 +100,48 @@ export function GraphControl() {
         const sumData = await sumRes.json();
         setSummary(sumData);
       }
-    } catch (err: any) {
-      setError(err?.message || "Failed to connect to Retriever API backend.");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to connect to Retriever API backend.";
+      setError(msg);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchTenantList();
-  }, [apiUrl, adminApiKey]);
+    let active = true;
+    if (!selectedTenantId) return;
+    const loadStatus = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const headers = { "X-Admin-API-Key": adminApiKey, "Content-Type": "application/json" };
+        const capRes = await fetch(`${apiUrl}/v1/admin/tenants/${selectedTenantId}/graph/capabilities`, { headers });
+        if (capRes.ok && active) {
+          const capData = await capRes.json();
+          setCapabilities(capData);
+        }
 
-  useEffect(() => {
-    fetchStatus();
+        const sumRes = await fetch(`${apiUrl}/v1/admin/tenants/${selectedTenantId}/graph`, { headers });
+        if (sumRes.ok && active) {
+          const sumData = await sumRes.json();
+          setSummary(sumData);
+        }
+      } catch (err: unknown) {
+        if (active) {
+          const msg = err instanceof Error ? err.message : "Failed to connect to Retriever API backend.";
+          setError(msg);
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    };
+    loadStatus();
+    return () => {
+      active = false;
+    };
   }, [apiUrl, selectedTenantId, adminApiKey]);
 
   const handleEngineSwitch = async (targetEngine: "postgres" | "neo4j") => {
@@ -126,8 +161,9 @@ export function GraphControl() {
         throw new Error(errData.detail || "Engine switch failed");
       }
       await fetchStatus();
-    } catch (err: any) {
-      setError(err?.message || "Failed to switch engine");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to switch engine";
+      setError(msg);
     } finally {
       setSwitching(false);
     }
@@ -148,8 +184,9 @@ export function GraphControl() {
         const data = await res.json();
         setQueryResult(data);
       }
-    } catch (err: any) {
-      setError(err?.message || "Failed to query knowledge graph");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to query knowledge graph";
+      setError(msg);
     } finally {
       setQuerying(false);
     }

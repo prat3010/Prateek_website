@@ -176,9 +176,11 @@ export class RetrieverClient {
   }
 
   async listTenants(): Promise<{ tenantId: string; name: string; status: string }[]> {
-    const res = await this.request<any>("/v1/admin/tenants");
-    if (Array.isArray(res)) return res;
-    if (res && Array.isArray(res.items)) return res.items;
+    const res = await this.request<unknown>("/v1/admin/tenants");
+    if (Array.isArray(res)) return res as { tenantId: string; name: string; status: string }[];
+    if (res && typeof res === "object" && "items" in res && Array.isArray((res as { items: unknown[] }).items)) {
+      return (res as { items: { tenantId: string; name: string; status: string }[] }).items;
+    }
     return [];
   }
 

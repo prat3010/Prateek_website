@@ -10,8 +10,6 @@ import { SearchPanel } from "@/components/rag/SearchPanel";
 import { ConfigPanel } from "@/components/rag/ConfigPanel";
 import styles from "@/components/rag/rag.module.css";
 
-const GUEST_KEY = "ret_live_GuestAccessKey2026.ReadOnlyChat";
-
 export default function RagAppStudioPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"chat" | "upload" | "search" | "config">("chat");
@@ -55,7 +53,7 @@ export default function RagAppStudioPage() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [router]);
 
   const handleLogout = () => {
     localStorage.removeItem("retriever_tenant_id");

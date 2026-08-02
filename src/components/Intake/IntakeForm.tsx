@@ -2,11 +2,9 @@
 
 import React, { useState } from 'react';
 import { 
-  FileText, 
   Download, 
   Send, 
   CheckCircle2, 
-  Sparkles, 
   ArrowRight, 
   ArrowLeft,
   Building2,
