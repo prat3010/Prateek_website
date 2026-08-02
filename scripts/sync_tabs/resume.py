@@ -402,6 +402,35 @@ def render_resume_tab():
                     
                 res['pricing_india'] = pricing_data_in
 
+        # 4d. Project Intake & Questionnaire Config
+        with st.container(border=True):
+            st.markdown('<div class="section-header">Project Scoping Brief & T&C Config</div>', unsafe_allow_html=True)
+            intake_data = res.get('intake', {}) or {}
+            
+            in_title = st.text_input("Form & PDF Title", value=intake_data.get('title', 'PROJECT DISCOVERY & SCOPING BRIEF'), key="intake_title")
+            in_sub = st.text_area("Form Subtitle Description", value=intake_data.get('subtitle', ''), height=60, key="intake_sub")
+            
+            st.markdown("##### Feature Modules Options (One per line)")
+            feat_opts_str = "\n".join(intake_data.get('featureOptions', []))
+            feat_opts_edit = st.text_area("Feature Options", value=feat_opts_str, height=100, key="intake_feats")
+            feat_opts_list = [f.strip() for f in feat_opts_edit.split("\n") if f.strip()]
+            
+            st.markdown("##### Standard Terms & Conditions (One per line)")
+            tc_str = "\n".join(intake_data.get('termsAndConditions', []))
+            tc_edit = st.text_area("Terms & Conditions List", value=tc_str, height=160, key="intake_tc")
+            tc_list = [t.strip() for t in tc_edit.split("\n") if t.strip()]
+            
+            res['intake'] = {
+                "title": in_title.strip(),
+                "subtitle": in_sub.strip(),
+                "categories": intake_data.get('categories', []),
+                "featureOptions": feat_opts_list,
+                "budgetTiers": intake_data.get('budgetTiers', []),
+                "timelineOptions": intake_data.get('timelineOptions', []),
+                "assetOptions": intake_data.get('assetOptions', []),
+                "termsAndConditions": tc_list
+            }
+
         # Save Button & Live JSON View
         st.markdown("---")
         dry_run_resume = st.checkbox("Dry-Run Mode (Save locally only, do not push to remote)", value=True, key="dry_resume")

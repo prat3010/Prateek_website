@@ -264,7 +264,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                     </div>
 
                     {/* Embedded Project Scoping & Intake Brief Form */}
-                    <IntakeForm />
+                    <IntakeForm resumeData={resumeData} />
 
                   </>
                 ) : (

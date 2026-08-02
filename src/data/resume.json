@@ -343,5 +343,50 @@
       "Search Engine Optimization (SEO) & Web Telemetry setup",
       "30 days of post-launch support & handoff documentation"
     ]
+  },
+  "intake": {
+    "title": "PROJECT DISCOVERY & SCOPING BRIEF",
+    "subtitle": "Fill out this brief or download the printable PDF version for your team/client. Receive a fixed-price proposal within 24 hours.",
+    "categories": [
+      "Tier 1: High-Converting Landing Page (Single Page)",
+      "Tier 2: Custom Multi-Page Website (3–6 Pages)",
+      "Tier 3: Full-Stack Web Application + Admin Dashboard",
+      "Tier 4: Private AI Assistant / RAG Integration"
+    ],
+    "featureOptions": [
+      "Contact Form / Lead Capture (ReCAPTCHA Protected)",
+      "Payment Gateway (Stripe/Razorpay)",
+      "User Auth & Client Portal (Google/Magic Link)",
+      "Headless Blog / CMS Content Management",
+      "Private AI Knowledge Base / Vector Search (RAG)",
+      "Admin Dashboard & Role Access Control",
+      "Automated Email Workflows (Resend Transactional)",
+      "Privacy-Compliant Analytics & Visitor Telemetry"
+    ],
+    "budgetTiers": [
+      "Tier 1: \u20b925,000 \u2013 \u20b945,000 ($300 \u2013 $550)",
+      "Tier 2: \u20b945,000 \u2013 \u20b990,000 ($550 \u2013 $1,100)",
+      "Tier 3: \u20b990,000 \u2013 \u20b91.5L+ ($1,100 \u2013 $2,000+)",
+      "Custom / Enterprise Infrastructure Scope"
+    ],
+    "timelineOptions": [
+      "Express Delivery Sprint (7\u201310 Days - Rush Fee Applies)",
+      "Standard Turnaround (2\u20134 Weeks)",
+      "Flexible Timeline"
+    ],
+    "assetOptions": [
+      "All Brand Assets Ready (Logo SVG, Copywriting, Media)",
+      "Logo & Colors Ready (Need Copywriting & Formatting)",
+      "Starting from Scratch (Need Logo & Brand Kit)"
+    ],
+    "termsAndConditions": [
+      "1. Payment Milestone Structure: 50% Upfront Deposit required to initiate design mockups & architecture setup. 30% Milestone Payment upon design approval & core build. 20% Final Payment prior to domain mapping & production deployment.",
+      "2. Scope Creep & Change Orders: Any feature, page, or integration requested after signing that is not listed in Section 2 will be classified as a 'Change Order' and quoted separately under a Phase 2 add-on contract.",
+      "3. Revision Policy: Includes up to 2 rounds of comprehensive design/layout revisions. Revision requests must be provided in writing within 5 business days of draft delivery.",
+      "4. Client Dependencies: Timeline countdown begins ONLY after receiving all required client assets (text, logo, media, API credentials). Client delays in asset delivery will extend the final delivery date accordingly.",
+      "5. Intellectual Property (IP) Ownership: 100% Intellectual Property and code ownership transfer to Client upon receipt of final payment.",
+      "6. Infrastructure & Third-Party Billing: Hosting (Vercel), Database (Supabase), Domain Registration, and API costs (OpenAI/Resend) are billed directly to client-owned accounts. Developer is not liable for third-party service outages.",
+      "7. Post-Launch Warranty: Includes 30 days of complimentary technical support & bug fixes post-launch. Continued support is available under a Monthly Care Plan."
+    ]
   }
 }

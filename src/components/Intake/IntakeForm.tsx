@@ -13,9 +13,63 @@ import {
   Clock
 } from 'lucide-react';
 import { generateQuestionnairePDF } from '@/utils/pdfGenerator';
+import type { ResumeData } from '@/data/resume';
 import styles from './IntakeForm.module.css';
 
-export default function IntakeForm() {
+interface IntakeFormProps {
+  resumeData?: ResumeData | null;
+}
+
+export default function IntakeForm({ resumeData }: IntakeFormProps) {
+  const intakeConfig = resumeData?.intake;
+
+  const categoryOptions = intakeConfig?.categories || [
+    'Tier 1: High-Converting Landing Page (Single Page)',
+    'Tier 2: Custom Multi-Page Website (3–6 Pages)',
+    'Tier 3: Full-Stack Web Application + Admin Dashboard',
+    'Tier 4: Private AI Assistant / RAG Integration'
+  ];
+
+  const featureOptions = intakeConfig?.featureOptions || [
+    'Contact Form / Lead Capture (ReCAPTCHA Protected)',
+    'Payment Gateway (Stripe/Razorpay)',
+    'User Auth & Client Portal (Google/Magic Link)',
+    'Headless Blog / CMS Content Management',
+    'Private AI Knowledge Base / Vector Search (RAG)',
+    'Admin Dashboard & Role Access Control',
+    'Automated Email Workflows (Resend Transactional)',
+    'Privacy-Compliant Analytics & Visitor Telemetry'
+  ];
+
+  const budgetTierOptions = intakeConfig?.budgetTiers || [
+    'Tier 1: ₹25,000 – ₹45,000 ($300 – $550)',
+    'Tier 2: ₹45,000 – ₹90,000 ($550 – $1,100)',
+    'Tier 3: ₹90,000 – ₹1.5L+ ($1,100 – $2,000+)',
+    'Custom / Enterprise Infrastructure Scope'
+  ];
+
+  const timelineOptions = intakeConfig?.timelineOptions || [
+    'Express Delivery Sprint (7–10 Days - Rush Fee Applies)',
+    'Standard Turnaround (2–4 Weeks)',
+    'Flexible Timeline'
+  ];
+
+  const assetOptions = intakeConfig?.assetOptions || [
+    'All Brand Assets Ready (Logo SVG, Copywriting, Media)',
+    'Logo & Colors Ready (Need Copywriting & Formatting)',
+    'Starting from Scratch (Need Logo & Brand Kit)'
+  ];
+
+  const termsList = intakeConfig?.termsAndConditions || [
+    "1. Payment Milestone Structure: 50% Upfront Deposit required to initiate design mockups & architecture setup. 30% Milestone Payment upon design approval & core build. 20% Final Payment prior to domain mapping & production deployment.",
+    "2. Scope Creep Policy: Features requested after signing that are not listed in Section 2 will be quoted separately under a Phase 2 add-on contract.",
+    "3. Revision Policy: Includes up to 2 rounds of comprehensive design/layout revisions.",
+    "4. Client Dependencies: Timeline countdown begins ONLY after receiving all required client assets.",
+    "5. Intellectual Property: 100% IP and code ownership transfer to Client upon receipt of final payment.",
+    "6. Infrastructure & Hosting: Hosting, Database, and API costs are billed directly to client-owned accounts.",
+    "7. Post-Launch Warranty: Includes 30 days of complimentary technical support & bug fixes post-launch."
+  ];
+
   const [currentStep, setCurrentStep] = useState(1);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -25,27 +79,16 @@ export default function IntakeForm() {
     companyName: '',
     contactEmail: '',
     contactPhone: '',
-    projectGoal: 'Lead Generation & Sales',
+    projectGoal: 'Lead Generation & Direct Sales',
     targetAudience: '',
-    projectCategory: 'Full Custom Website (3–6 Pages)',
-    features: ['Contact Form / Lead Capture', 'Responsive Design'],
-    assetsStatus: 'Logo & Colors Ready (Need Copywriting)',
+    projectCategory: categoryOptions[0],
+    features: [featureOptions[0], featureOptions[1]],
+    assetsStatus: assetOptions[0],
     inspirationLinks: '',
-    timeline: 'Standard (2–4 weeks)',
-    budgetRange: 'Tier 2: ₹45,000 – ₹90,000 ($550 – $1,100)',
+    timeline: timelineOptions[1] || timelineOptions[0],
+    budgetRange: budgetTierOptions[1] || budgetTierOptions[0],
     additionalNotes: ''
   });
-
-  const featureOptions = [
-    'Contact Form / Lead Capture',
-    'Payment Gateway (Stripe/Razorpay)',
-    'User Auth & Client Portal',
-    'Blog / CMS Content Management',
-    'Custom Private AI Chatbot / RAG',
-    'Admin Dashboard & Analytics',
-    'SEO & Performance Tuning',
-    'Resend Automated Emails'
-  ];
 
   const handleFeatureToggle = (feature: string) => {
     setFormData(prev => {
@@ -58,16 +101,19 @@ export default function IntakeForm() {
   };
 
   const handleDownloadPDF = () => {
-    generateQuestionnairePDF({
+    generateQuestionnairePDF(resumeData, {
       companyName: formData.companyName,
       contactEmail: formData.contactEmail,
+      contactPhone: formData.contactPhone,
       projectGoal: formData.projectGoal,
+      targetAudience: formData.targetAudience,
       projectCategory: formData.projectCategory,
       features: formData.features,
       assetsStatus: formData.assetsStatus,
       inspirationLinks: formData.inspirationLinks,
       timeline: formData.timeline,
-      budgetRange: formData.budgetRange
+      budgetRange: formData.budgetRange,
+      additionalNotes: formData.additionalNotes
     });
   };
 
@@ -245,10 +291,9 @@ Additional Notes: ${formData.additionalNotes || 'None'}
                         value={formData.projectCategory}
                         onChange={e => setFormData({ ...formData, projectCategory: e.target.value })}
                       >
-                        <option value="High-Converting Landing Page (Single Page)">High-Converting Landing Page (Single Page)</option>
-                        <option value="Full Custom Website (3–6 Pages)">Full Custom Website (3–6 Pages)</option>
-                        <option value="Full-Stack Web App + Admin Dashboard">Full-Stack Web App + Admin Dashboard</option>
-                        <option value="Private AI Assistant / RAG Integration">Private AI Assistant / RAG Integration</option>
+                        {categoryOptions.map(cat => (
+                          <option key={cat} value={cat}>{cat}</option>
+                        ))}
                       </select>
                     </div>
 
@@ -285,9 +330,9 @@ Additional Notes: ${formData.additionalNotes || 'None'}
                         value={formData.assetsStatus}
                         onChange={e => setFormData({ ...formData, assetsStatus: e.target.value })}
                       >
-                        <option value="All Assets Ready (Logo, Copywriting, Images)">All Assets Ready (Logo, Copywriting, Images)</option>
-                        <option value="Logo & Colors Ready (Need Copywriting)">Logo & Colors Ready (Need Copywriting help)</option>
-                        <option value="Starting from Scratch (Need Branding & Copy)">Starting from Scratch (Need Branding & Copy)</option>
+                        {assetOptions.map(ast => (
+                          <option key={ast} value={ast}>{ast}</option>
+                        ))}
                       </select>
                     </div>
 
@@ -309,7 +354,7 @@ Additional Notes: ${formData.additionalNotes || 'None'}
                   <div className={styles.formStep}>
                     <div className={styles.groupTitle}>
                       <Clock size={18} />
-                      <span>STEP 4: TIMELINE & BUDGET TIER</span>
+                      <span>STEP 4: TIMELINE, BUDGET & TERMS</span>
                     </div>
 
                     <div className={styles.fieldGrid}>
@@ -320,9 +365,9 @@ Additional Notes: ${formData.additionalNotes || 'None'}
                           value={formData.timeline}
                           onChange={e => setFormData({ ...formData, timeline: e.target.value })}
                         >
-                          <option value="Urgent (7–10 days turnaround)">Urgent (7–10 days turnaround)</option>
-                          <option value="Standard (2–4 weeks)">Standard (2–4 weeks)</option>
-                          <option value="Flexible Timeline">Flexible Timeline</option>
+                          {timelineOptions.map(tl => (
+                            <option key={tl} value={tl}>{tl}</option>
+                          ))}
                         </select>
                       </div>
 
@@ -333,11 +378,29 @@ Additional Notes: ${formData.additionalNotes || 'None'}
                           value={formData.budgetRange}
                           onChange={e => setFormData({ ...formData, budgetRange: e.target.value })}
                         >
-                          <option value="Tier 1: ₹25,000 – ₹45,000 ($300 – $550)">Tier 1: ₹25,000 – ₹45,000 ($300 – $550)</option>
-                          <option value="Tier 2: ₹45,000 – ₹90,000 ($550 – $1,100)">Tier 2: ₹45,000 – ₹90,000 ($550 – $1,100)</option>
-                          <option value="Tier 3: ₹90,000 – ₹1.5L+ ($1,100 – $2,000+)">Tier 3: ₹90,000 – ₹1.5L+ ($1,100 – $2,000+)</option>
-                          <option value="Custom / Enterprise Scope">Custom / Enterprise Scope</option>
+                          {budgetTierOptions.map(bt => (
+                            <option key={bt} value={bt}>{bt}</option>
+                          ))}
                         </select>
+                      </div>
+                    </div>
+
+                    <div className={styles.field}>
+                      <label className={styles.label}>Standard Terms & Conditions Summary</label>
+                      <div style={{
+                        background: '#FFFFFF',
+                        border: '1.5px solid #2B2B36',
+                        borderRadius: '8px',
+                        padding: '12px 16px',
+                        maxHeight: '140px',
+                        overflowY: 'auto',
+                        fontSize: '12px',
+                        color: '#475569',
+                        lineHeight: '1.5'
+                      }}>
+                        {termsList.map((t, idx) => (
+                          <p key={idx} style={{ marginBottom: '6px' }}>{t}</p>
+                        ))}
                       </div>
                     </div>
 

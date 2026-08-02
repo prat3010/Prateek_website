@@ -43,6 +43,17 @@ export interface PricingPlan {
   cta: string;
 }
 
+export interface IntakeConfig {
+  title: string;
+  subtitle: string;
+  categories: string[];
+  featureOptions: string[];
+  budgetTiers: string[];
+  timelineOptions: string[];
+  assetOptions: string[];
+  termsAndConditions: string[];
+}
+
 export interface ResumeData {
   name: string;
   title: string;
@@ -88,6 +99,7 @@ export interface ResumeData {
     developer: PricingPlan[];
     business: PricingPlan[];
   };
+  intake?: IntakeConfig;
   lastSynced?: {
     timestamp: string;
     status: 'success' | 'failed';

@@ -358,99 +358,224 @@ export function generateQuotationPDF(resumeData: ResumeData, region: 'india' | '
 export interface QuestionnaireData {
   companyName?: string;
   contactEmail?: string;
+  contactPhone?: string;
   projectGoal?: string;
+  targetAudience?: string;
   projectCategory?: string;
   features?: string[];
   assetsStatus?: string;
   inspirationLinks?: string;
   timeline?: string;
   budgetRange?: string;
+  additionalNotes?: string;
 }
 
-export function generateQuestionnairePDF(data?: QuestionnaireData) {
+export function generateQuestionnairePDF(resumeData?: ResumeData | null, data?: QuestionnaireData) {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
     format: 'a4',
   });
 
-  const leftMargin = 20;
-  const rightMargin = 20;
-  const contentWidth = 210 - leftMargin - rightMargin;
-  let y = 20;
+  const pageWidth = 210;
+  const leftMargin = 18;
+  const rightMargin = 18;
+  const contentWidth = pageWidth - leftMargin - rightMargin; // 174mm
+  let y = 18;
 
-  const drawDivider = () => {
-    doc.setDrawColor(180, 180, 180);
-    doc.setLineWidth(0.25);
-    doc.line(leftMargin, y, 210 - rightMargin, y);
-    y += 5;
-  };
+  const intakeConfig = resumeData?.intake;
 
-  // Header
-  doc.setFont('Helvetica', 'Bold');
-  doc.setFontSize(18);
-  doc.setTextColor(0, 0, 0);
-  doc.text('CLIENT DISCOVERY & SCOPING BRIEF', leftMargin, y);
-  y += 6;
-
-  doc.setFont('Helvetica', 'Normal');
-  doc.setFontSize(9);
-  doc.setTextColor(80, 80, 80);
-  doc.text('Prateeq Sharma | Full-Stack Engineering & Custom Web Builds | prateeq.in', leftMargin, y);
-  y += 5;
-  drawDivider();
-
-  const addSectionHeader = (title: string) => {
+  const drawHeader = (title: string, pageNum: number) => {
     doc.setFont('Helvetica', 'Bold');
-    doc.setFontSize(11);
-    doc.setTextColor(0, 51, 102);
+    doc.setFontSize(16);
+    doc.setTextColor(15, 23, 42); // Slate 900
     doc.text(title, leftMargin, y);
-    y += 2;
-    drawDivider();
-  };
+    y += 5;
 
-  const addFieldRow = (label: string, value?: string) => {
-    doc.setFont('Helvetica', 'Bold');
-    doc.setFontSize(9.5);
-    doc.setTextColor(40, 40, 40);
-    doc.text(`${label}:`, leftMargin, y);
     doc.setFont('Helvetica', 'Normal');
-    const valText = value || '_____________________________________________';
-    const lines: string[] = doc.splitTextToSize(valText, contentWidth - 45);
-    doc.text(lines[0] || '', leftMargin + 45, y);
+    doc.setFontSize(8.5);
+    doc.setTextColor(100, 116, 139); // Slate 500
+    doc.text(`Prateeq Sharma | Engineering & Custom Web Builds | Page ${pageNum} of 3`, leftMargin, y);
+    y += 4;
+
+    doc.setDrawColor(203, 213, 225); // Slate 300
+    doc.setLineWidth(0.3);
+    doc.line(leftMargin, y, pageWidth - rightMargin, y);
     y += 6;
   };
 
+  const addSectionTitle = (title: string) => {
+    doc.setFont('Helvetica', 'Bold');
+    doc.setFontSize(10.5);
+    doc.setTextColor(30, 58, 138); // Blue 900
+    doc.text(title, leftMargin, y);
+    y += 4;
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineWidth(0.2);
+    doc.line(leftMargin, y, pageWidth - rightMargin, y);
+    y += 5;
+  };
+
+  const addFieldRow = (label: string, value?: string, defaultLine = '_____________________________________________') => {
+    doc.setFont('Helvetica', 'Bold');
+    doc.setFontSize(9);
+    doc.setTextColor(51, 65, 85);
+    doc.text(`${label}:`, leftMargin, y);
+    
+    doc.setFont('Helvetica', 'Normal');
+    doc.setTextColor(15, 23, 42);
+    const textVal = value && value.trim() ? value.trim() : defaultLine;
+    const lines: string[] = doc.splitTextToSize(textVal, contentWidth - 50);
+    doc.text(lines[0] || defaultLine, leftMargin + 50, y);
+    y += 5.5;
+  };
+
+  // ================= PAGE 1 =================
+  drawHeader('CLIENT DISCOVERY & SCOPING BRIEF', 1);
+
+  // Metadata Box
+  doc.setFillColor(248, 250, 252); // Slate 50
+  doc.setDrawColor(226, 232, 240);
+  doc.rect(leftMargin, y, contentWidth, 22, 'FD');
+  
+  doc.setFont('Helvetica', 'Bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(71, 85, 105);
+  doc.text(`DATE: ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`, leftMargin + 4, y + 6);
+  doc.text(`CLIENT / COMPANY: ${data?.companyName || '___________________________'}`, leftMargin + 60, y + 6);
+  doc.text(`EMAIL: ${data?.contactEmail || '___________________________'}`, leftMargin + 4, y + 13);
+  doc.text(`PHONE: ${data?.contactPhone || '___________________________'}`, leftMargin + 60, y + 13);
+  y += 26;
+
   // Section 1
-  addSectionHeader('1. BUSINESS IDENTITY & GOALS');
-  addFieldRow('Company / Client Name', data?.companyName);
-  addFieldRow('Contact Email', data?.contactEmail);
+  addSectionTitle('SECTION 1: BUSINESS IDENTITY & GOALS');
   addFieldRow('Primary Goal', data?.projectGoal);
+  addFieldRow('Target Audience', data?.targetAudience);
   y += 3;
 
   // Section 2
-  addSectionHeader('2. SCOPE & TECHNICAL REQUIREMENTS');
-  addFieldRow('Project Category', data?.projectCategory);
-  addFieldRow('Key Required Features', data?.features?.join(', ') || 'Lead Form, Auth, Custom DB, Payment');
-  y += 3;
+  addSectionTitle('SECTION 2: TECHNICAL SCOPE & FEATURE CHECKLIST');
+  addFieldRow('Target Scope Category', data?.projectCategory);
+  y += 2;
+
+  doc.setFont('Helvetica', 'Bold');
+  doc.setFontSize(9);
+  doc.setTextColor(51, 65, 85);
+  doc.text('Required Functional Modules:', leftMargin, y);
+  y += 5;
+
+  const featureOptions = intakeConfig?.featureOptions || [
+    "Contact Form / Lead Capture (ReCAPTCHA Protected)",
+    "Payment Gateway (Stripe/Razorpay)",
+    "User Auth & Client Portal (Google/Magic Link)",
+    "Headless Blog / CMS Content Management",
+    "Private AI Knowledge Base / Vector Search (RAG)",
+    "Admin Dashboard & Role Access Control",
+    "Automated Email Workflows (Resend Transactional)",
+    "Privacy-Compliant Analytics & Visitor Telemetry"
+  ];
+
+  featureOptions.forEach((feat) => {
+    const isSelected = data?.features?.includes(feat) || data?.features?.some(f => feat.toLowerCase().includes(f.toLowerCase()));
+    doc.setFont('Helvetica', 'Bold');
+    doc.setFontSize(9);
+    doc.setTextColor(isSelected ? 37 : 100, isSelected ? 99 : 116, isSelected ? 235 : 139);
+    doc.text(isSelected ? '[X]' : '[  ]', leftMargin + 4, y);
+    
+    doc.setFont('Helvetica', isSelected ? 'Bold' : 'Normal');
+    doc.setTextColor(15, 23, 42);
+    doc.text(feat, leftMargin + 12, y);
+    y += 5.5;
+  });
+
+  // ================= PAGE 2 =================
+  doc.addPage();
+  y = 18;
+  drawHeader('BRAND ASSETS & INVESTMENT TIER', 2);
 
   // Section 3
-  addSectionHeader('3. BRAND ASSETS & INSPIRATION');
+  addSectionTitle('SECTION 3: BRAND ASSET & CONTENT READINESS');
   addFieldRow('Brand Assets Status', data?.assetsStatus);
-  addFieldRow('Inspiration Links', data?.inspirationLinks);
+  addFieldRow('Visual & Competitor Inspo', data?.inspirationLinks);
   y += 3;
 
   // Section 4
-  addSectionHeader('4. TIMELINE & INVESTMENT BUDGET');
+  addSectionTitle('SECTION 4: TIMELINE & INVESTMENT BUDGET');
   addFieldRow('Target Launch Deadline', data?.timeline);
-  addFieldRow('Target Budget Tier', data?.budgetRange);
+  addFieldRow('Investment Budget Allocation', data?.budgetRange);
+  addFieldRow('Additional Notes / Constraints', data?.additionalNotes, 'None specified');
   y += 5;
 
-  drawDivider();
-  doc.setFont('Helvetica', 'Italic');
-  doc.setFontSize(8.5);
-  doc.setTextColor(100, 100, 100);
-  doc.text('Return completed brief to 3010prateeksharma@gmail.com to receive an instant fixed-price proposal.', leftMargin, y);
+  doc.setFont('Helvetica', 'Bold');
+  doc.setFontSize(9);
+  doc.setTextColor(51, 65, 85);
+  doc.text('Budget Tiers Reference:', leftMargin, y);
+  y += 5;
 
-  doc.save('Client_Discovery_Scoping_Brief.pdf');
+  const budgetTiers = intakeConfig?.budgetTiers || [
+    "Tier 1: ₹25,000 – ₹45,000 ($300 – $550)",
+    "Tier 2: ₹45,000 – ₹90,000 ($550 – $1,100)",
+    "Tier 3: ₹90,000 – ₹1.5L+ ($1,100 – $2,000+)",
+    "Custom / Enterprise Infrastructure Scope"
+  ];
+
+  budgetTiers.forEach((tier) => {
+    const isSelected = data?.budgetRange?.includes(tier) || tier === data?.budgetRange;
+    doc.setFont('Helvetica', 'Bold');
+    doc.text(isSelected ? '[X]' : '[  ]', leftMargin + 4, y);
+    doc.setFont('Helvetica', isSelected ? 'Bold' : 'Normal');
+    doc.text(tier, leftMargin + 12, y);
+    y += 5.5;
+  });
+
+  // ================= PAGE 3 =================
+  doc.addPage();
+  y = 18;
+  drawHeader('STANDARD ENGAGEMENT TERMS & SIGN-OFF', 3);
+
+  addSectionTitle('SECTION 5: TERMS & CONDITIONS (T&C)');
+
+  const terms = intakeConfig?.termsAndConditions || [
+    "1. Payment Milestone Structure: 50% Upfront Deposit required to initiate design mockups & architecture setup. 30% Milestone Payment upon design approval & core build. 20% Final Payment prior to domain mapping & production deployment.",
+    "2. Scope Creep & Change Orders: Any feature, page, or integration requested after signing that is not listed in Section 2 will be classified as a 'Change Order' and quoted separately under a Phase 2 add-on contract.",
+    "3. Revision Policy: Includes up to 2 rounds of comprehensive design/layout revisions. Revision requests must be provided in writing within 5 business days of draft delivery.",
+    "4. Client Dependencies: Timeline countdown begins ONLY after receiving all required client assets (text, logo, media, API credentials). Client delays in asset delivery will extend final delivery date accordingly.",
+    "5. Intellectual Property (IP) Ownership: 100% Intellectual Property and code ownership transfer to Client upon receipt of final payment.",
+    "6. Infrastructure & Hosting: Hosting (Vercel), Database (Supabase), Domain Registration, and API costs (OpenAI/Resend) are billed directly to client-owned accounts. Developer is not liable for third-party outages.",
+    "7. Post-Launch Warranty: Includes 30 days of complimentary technical support & bug fixes post-launch. Continued support is available under a Monthly Care Plan."
+  ];
+
+  terms.forEach((term) => {
+    doc.setFont('Helvetica', 'Normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(51, 65, 85);
+    const lines: string[] = doc.splitTextToSize(term, contentWidth);
+    lines.forEach((line: string) => {
+      doc.text(line, leftMargin, y);
+      y += 4.2;
+    });
+    y += 2.5;
+  });
+
+  y += 4;
+  addSectionTitle('SIGNATURE & ACCEPTANCE BLOCK');
+  y += 2;
+
+  // Signature Boxes
+  doc.setDrawColor(203, 213, 225);
+  doc.rect(leftMargin, y, 80, 24);
+  doc.rect(leftMargin + 90, y, 84, 24);
+
+  doc.setFont('Helvetica', 'Bold');
+  doc.setFontSize(8);
+  doc.setTextColor(100, 116, 139);
+  doc.text('CLIENT AUTHORIZED SIGNATURE', leftMargin + 4, y + 5);
+  doc.text(`NAME: ${data?.companyName || '______________________'}`, leftMargin + 4, y + 14);
+  doc.text('DATE: _______________', leftMargin + 4, y + 20);
+
+  doc.text('DEVELOPER SIGNATURE', leftMargin + 94, y + 5);
+  doc.text('NAME: Prateeq Sharma', leftMargin + 94, y + 14);
+  doc.text(`DATE: ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`, leftMargin + 94, y + 20);
+
+  doc.save(`${(data?.companyName || 'Client').replace(/\s+/g, '_')}_Scoping_Brief_Agreement.pdf`);
 }
