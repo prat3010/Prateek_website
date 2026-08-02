@@ -89,7 +89,12 @@ export default function MiddlemanAgreementModal({
           </div>
 
           {/* Body Content */}
-          <div className={styles.modalBody}>
+          <div 
+            className={styles.modalBody}
+            data-lenis-prevent
+            data-lenis-prevent-touch
+            data-lenis-prevent-wheel
+          >
             <h2 className={styles.docTitle}>FREELANCE SALES & BUSINESS BROKER AGREEMENT</h2>
             <div className={styles.docSubtitle}>
               Official commercial terms, commission structure, and non-circumvention rules for business partners.
