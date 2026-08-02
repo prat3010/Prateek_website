@@ -2,7 +2,6 @@ import React from 'react';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import type { ResumeData } from '@/data/resume';
 import { getSkillsHighlight, type Persona } from '@/lib/skills';
-import { SkylineImageHeader } from './SkylineImageHeader';
 
 interface DeveloperResumePDFProps {
   activePersona: Persona;
@@ -17,7 +16,7 @@ export function DeveloperResumePDF({ activePersona, resumeData }: DeveloperResum
 
   const styles = StyleSheet.create({
     page: {
-      padding: 28,
+      padding: 32,
       fontFamily: 'Helvetica',
       backgroundColor: '#FFFFFF',
       fontSize: 9,
@@ -31,42 +30,41 @@ export function DeveloperResumePDF({ activePersona, resumeData }: DeveloperResum
       marginBottom: 12,
     },
     name: {
-      fontSize: 18,
+      fontSize: 20,
       fontFamily: 'Helvetica-Bold',
       color: '#0F172A',
       letterSpacing: 0.5,
     },
     contactLine: {
-      fontSize: 8,
+      fontSize: 8.5,
       color: '#475569',
-      marginTop: 2,
+      marginTop: 4,
     },
     sectionTitle: {
-      fontSize: 9,
+      fontSize: 10,
       fontFamily: 'Helvetica-Bold',
-      color: '#1E3A8A',
-      backgroundColor: '#EFF6FF',
-      padding: 3,
-      borderRadius: 3,
-      marginTop: 8,
-      marginBottom: 4,
-      borderLeftWidth: 3,
-      borderLeftColor: '#2563EB',
+      color: '#0F172A',
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+      borderBottomWidth: 0.75,
+      borderBottomColor: '#CBD5E1',
+      paddingBottom: 2,
+      marginTop: 10,
+      marginBottom: 6,
     },
     summary: {
       fontSize: 8.5,
       color: '#334155',
-      marginBottom: 8,
+      marginBottom: 6,
       lineHeight: 1.4,
     },
     skillsText: {
-      fontSize: 8,
-      color: '#0284C7',
-      fontFamily: 'Helvetica-Bold',
-      marginBottom: 8,
+      fontSize: 8.5,
+      color: '#1E293B',
+      marginBottom: 6,
     },
     expItem: {
-      marginBottom: 6,
+      marginBottom: 8,
     },
     expHeader: {
       flexDirection: 'row',
@@ -74,28 +72,25 @@ export function DeveloperResumePDF({ activePersona, resumeData }: DeveloperResum
       marginBottom: 2,
     },
     expRole: {
-      fontSize: 8.5,
+      fontSize: 9,
       fontFamily: 'Helvetica-Bold',
       color: '#0F172A',
     },
-    expCompany: {
-      fontSize: 8,
-      color: '#475569',
-    },
     expPeriod: {
-      fontSize: 7.5,
+      fontSize: 8,
       color: '#64748B',
     },
-    expDesc: {
-      fontSize: 8,
-      color: '#334155',
-      marginBottom: 2,
+    expCompany: {
+      fontSize: 8.5,
+      fontFamily: 'Helvetica-Oblique',
+      color: '#475569',
+      marginBottom: 3,
     },
     bullet: {
-      fontSize: 7.5,
-      color: '#475569',
-      paddingLeft: 6,
-      marginBottom: 1.5,
+      fontSize: 8,
+      color: '#334155',
+      marginLeft: 6,
+      marginBottom: 2,
     },
     eduItem: {
       marginBottom: 4,
@@ -114,14 +109,9 @@ export function DeveloperResumePDF({ activePersona, resumeData }: DeveloperResum
   return (
     <Document title={`${resumeData.name}_Resume_${activePersona}`}>
       <Page size="A4" style={styles.page}>
-        <SkylineImageHeader
-          title={resumeData.name.toUpperCase()}
-          sub={`FULL-STACK SOFTWARE ENGINEER // ${activePersona.toUpperCase()} PROFILE`}
-          theme="noir"
-        />
-
-        {/* Contact Line */}
+        {/* Header */}
         <View style={styles.header}>
+          <Text style={styles.name}>{resumeData.name}</Text>
           <Text style={styles.contactLine}>
             {resumeData.email}  |  {resumeData.website}  |  GitHub: {resumeData.github}  |  LinkedIn: {resumeData.linkedin}
           </Text>
