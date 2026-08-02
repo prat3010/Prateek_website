@@ -21,6 +21,7 @@ import {
   FileText 
 } from 'lucide-react';
 import { getSkillsHighlight, type Persona } from '@/lib/skills';
+import IntakeForm from '@/components/Intake/IntakeForm';
 import styles from './Resume.module.css';
 
 interface ResumeProps {
@@ -262,18 +263,8 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                       </ul>
                     </div>
 
-                    {/* Call to action scrolling to Contact form */}
-                    <div className={styles.quoteActionWrapper}>
-                      <button
-                        onClick={() => {
-                          const el = document.getElementById('contact');
-                          el?.scrollIntoView({ behavior: 'smooth' });
-                        }}
-                        className={styles.quoteActionBtn}
-                      >
-                        <span>REQUEST CUSTOM QUOTE</span>
-                      </button>
-                    </div>
+                    {/* Embedded Project Scoping & Intake Brief Form */}
+                    <IntakeForm />
 
                   </>
                 ) : (
