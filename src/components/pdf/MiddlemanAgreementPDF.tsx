@@ -1,6 +1,7 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet, Svg, Line } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import type { ResumeData, MiddlemanAgreementConfig } from '@/data/resume';
+import { SkylineVectorHeader } from './SkylineVectorHeader';
 
 interface MiddlemanAgreementPDFProps {
   theme?: 'azure' | 'noir';
@@ -26,28 +27,6 @@ export function MiddlemanAgreementPDF({ theme = 'azure', resumeData }: Middleman
       fontSize: 8.5,
       color: isNoir ? '#F1F5F9' : '#0F172A',
     },
-    headerBanner: {
-      height: 50,
-      backgroundColor: isNoir ? '#020617' : '#0F172A',
-      borderRadius: 4,
-      padding: 10,
-      marginBottom: 12,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      borderWidth: 1,
-      borderColor: isNoir ? '#1E293B' : '#334155',
-    },
-    brandTitle: {
-      fontSize: 12,
-      fontFamily: 'Helvetica-Bold',
-      color: isNoir ? '#38BDF8' : '#FFFFFF',
-    },
-    brandSub: {
-      fontSize: 7.5,
-      color: isNoir ? '#94A3B8' : '#CBD5E1',
-      marginTop: 2,
-    },
     docHeader: {
       borderBottomWidth: 1,
       borderBottomColor: isNoir ? '#1E293B' : '#CBD5E1',
@@ -55,9 +34,10 @@ export function MiddlemanAgreementPDF({ theme = 'azure', resumeData }: Middleman
       marginBottom: 10,
     },
     docTitle: {
-      fontSize: 13,
+      fontSize: 12,
       fontFamily: 'Helvetica-Bold',
       color: isNoir ? '#F8FAFC' : '#0F172A',
+      textTransform: 'uppercase',
     },
     docMeta: {
       fontSize: 7.5,
@@ -88,31 +68,41 @@ export function MiddlemanAgreementPDF({ theme = 'azure', resumeData }: Middleman
       color: isNoir ? '#F1F5F9' : '#0F172A',
     },
     sectionTitle: {
-      fontFamily: 'Helvetica-Bold',
       fontSize: 9,
+      fontFamily: 'Helvetica-Bold',
       color: isNoir ? '#38BDF8' : '#1E3A8A',
       backgroundColor: isNoir ? '#0F172A' : '#EFF6FF',
       padding: '3 6',
       borderRadius: 3,
+      marginTop: 8,
       marginBottom: 6,
-      marginTop: 4,
     },
     paragraph: {
-      fontSize: 8,
-      lineHeight: 1.4,
+      marginBottom: 5,
+      lineHeight: 1.35,
       color: isNoir ? '#CBD5E1' : '#334155',
-      marginBottom: 6,
+    },
+    bullet: {
+      marginBottom: 3,
+      paddingLeft: 8,
+      lineHeight: 1.3,
+      color: isNoir ? '#94A3B8' : '#475569',
+    },
+    bold: {
+      fontFamily: 'Helvetica-Bold',
+      color: isNoir ? '#F8FAFC' : '#0F172A',
     },
     table: {
-      borderColor: isNoir ? '#1E293B' : '#CBD5E1',
+      marginTop: 6,
+      marginBottom: 8,
       borderWidth: 1,
+      borderColor: isNoir ? '#1E293B' : '#CBD5E1',
       borderRadius: 4,
       overflow: 'hidden',
-      marginBottom: 10,
     },
     tableHeader: {
       flexDirection: 'row',
-      backgroundColor: isNoir ? '#0F172A' : '#F1F5F9',
+      backgroundColor: isNoir ? '#020617' : '#F1F5F9',
       padding: 5,
       borderBottomWidth: 1,
       borderBottomColor: isNoir ? '#1E293B' : '#CBD5E1',
@@ -158,7 +148,7 @@ export function MiddlemanAgreementPDF({ theme = 'azure', resumeData }: Middleman
       right: 28,
       borderTopWidth: 1,
       borderTopColor: isNoir ? '#1E293B' : '#E2E8F0',
-      paddingTop: 5,
+      paddingTop: 4,
       flexDirection: 'row',
       justifyContent: 'space-between',
     },
@@ -179,24 +169,11 @@ export function MiddlemanAgreementPDF({ theme = 'azure', resumeData }: Middleman
     <Document title={`${partnerName.replace(/\s+/g, '_')}_Sales_Partner_Agreement_${isNoir ? 'Noir' : 'Azure'}`}>
       {/* PAGE 1 */}
       <Page size="A4" style={styles.page}>
-        <View style={styles.headerBanner}>
-          <View>
-            <Text style={styles.brandTitle}>PRATEEQ.IN</Text>
-            <Text style={styles.brandSub}>FULL-STACK & AI ARCHITECTURE // PARTNER FRAMEWORK</Text>
-          </View>
-          <Svg height="26" width="100">
-            <Line x1="0" y1="26" x2="100" y2="26" stroke={isNoir ? '#38BDF8' : '#38BDF8'} strokeWidth="1" />
-            <Line x1="15" y1="26" x2="15" y2="10" stroke={isNoir ? '#38BDF8' : '#38BDF8'} strokeWidth="1" />
-            <Line x1="15" y1="10" x2="35" y2="10" stroke={isNoir ? '#38BDF8' : '#38BDF8'} strokeWidth="1" />
-            <Line x1="35" y1="10" x2="35" y2="26" stroke={isNoir ? '#38BDF8' : '#38BDF8'} strokeWidth="1" />
-            <Line x1="45" y1="26" x2="45" y2="4" stroke={isNoir ? '#38BDF8' : '#38BDF8'} strokeWidth="1" />
-            <Line x1="45" y1="4" x2="65" y2="4" stroke={isNoir ? '#38BDF8' : '#38BDF8'} strokeWidth="1" />
-            <Line x1="65" y1="4" x2="65" y2="26" stroke={isNoir ? '#38BDF8' : '#38BDF8'} strokeWidth="1" />
-            <Line x1="75" y1="26" x2="75" y2="14" stroke={isNoir ? '#38BDF8' : '#38BDF8'} strokeWidth="1" />
-            <Line x1="75" y1="14" x2="90" y2="14" stroke={isNoir ? '#38BDF8' : '#38BDF8'} strokeWidth="1" />
-            <Line x1="90" y1="14" x2="90" y2="26" stroke={isNoir ? '#38BDF8' : '#38BDF8'} strokeWidth="1" />
-          </Svg>
-        </View>
+        <SkylineVectorHeader
+          title="PRATEEQ.IN"
+          sub="FULL-STACK & AI ARCHITECTURE // PARTNER FRAMEWORK"
+          theme={theme}
+        />
 
         <View style={styles.docHeader}>
           <Text style={styles.docTitle}>SALES PARTNER & MIDDLEMAN PARTNERSHIP AGREEMENT</Text>

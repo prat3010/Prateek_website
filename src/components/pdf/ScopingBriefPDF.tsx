@@ -1,7 +1,8 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet, Svg, Line } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import type { ResumeData } from '@/data/resume';
 import type { QuestionnaireData } from '@/utils/pdfGenerator';
+import { SkylineVectorHeader } from './SkylineVectorHeader';
 
 const styles = StyleSheet.create({
   page: {
@@ -10,28 +11,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     fontSize: 9,
     color: '#0F172A',
-  },
-  skylineHeader: {
-    height: 52,
-    backgroundColor: '#0F172A',
-    borderRadius: 4,
-    marginBottom: 14,
-    padding: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  brandTitle: {
-    fontSize: 13,
-    fontFamily: 'Helvetica-Bold',
-    color: '#FFFFFF',
-    letterSpacing: 0.8,
-  },
-  brandSub: {
-    fontSize: 7.5,
-    color: '#94A3B8',
-    marginTop: 3,
-    letterSpacing: 0.5,
   },
   docHeader: {
     borderBottomWidth: 1,
@@ -257,31 +236,11 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
     <Document title={`${data?.companyName || 'Client'}_Itemized_Scoping_Proposal`}>
       {/* ================= PAGE 1 ================= */}
       <Page size="A4" style={styles.page}>
-        <View style={styles.skylineHeader}>
-          <View>
-            <Text style={styles.brandTitle}>PRATEEQ.IN</Text>
-            <Text style={styles.brandSub}>FULL-STACK & AI ARCHITECTURE // SCOPING & QUOTATION</Text>
-          </View>
-          <Svg height="30" width="120">
-            <Line x1="0" y1="30" x2="120" y2="30" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="10" y1="30" x2="10" y2="18" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="10" y1="18" x2="22" y2="18" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="22" y1="18" x2="22" y2="30" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="30" y1="30" x2="30" y2="10" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="30" y1="10" x2="45" y2="10" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="37.5" y1="10" x2="37.5" y2="4" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="45" y1="10" x2="45" y2="30" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="55" y1="30" x2="55" y2="15" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="55" y1="15" x2="70" y2="15" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="70" y1="15" x2="70" y2="30" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="80" y1="30" x2="80" y2="8" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="80" y1="8" x2="95" y2="8" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="95" y1="8" x2="95" y2="30" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="102" y1="30" x2="102" y2="20" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="102" y1="20" x2="114" y2="20" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="114" y1="20" x2="114" y2="30" stroke="#38BDF8" strokeWidth="1" />
-          </Svg>
-        </View>
+        <SkylineVectorHeader
+          title="PRATEEQ.IN"
+          sub="FULL-STACK & AI ARCHITECTURE // SCOPING & QUOTATION"
+          theme="noir"
+        />
 
         <View style={styles.docHeader}>
           <Text style={styles.docTitle}>EXECUTIVE COMMERCIAL PROPOSAL & SCOPING SPECIFICATION</Text>
