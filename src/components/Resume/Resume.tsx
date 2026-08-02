@@ -294,7 +294,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                         }}
                       >
                         <Rocket size={16} />
-                        <span>🚀 Launch Project Scoping Wizard</span>
+                        <span>Launch Project Scoping Wizard</span>
                       </button>
                     </div>
 

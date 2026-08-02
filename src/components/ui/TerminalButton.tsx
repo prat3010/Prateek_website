@@ -32,7 +32,7 @@ export default function TerminalButton() {
             <span className={styles.iconWrapper}>
               <Rocket className={styles.icon} size={18} strokeWidth={2.5} />
             </span>
-            <span className={styles.buttonText}>🚀 GET INSTANT QUOTE</span>
+            <span className={styles.buttonText}>GET INSTANT QUOTE</span>
           </button>
         ) : (
           <Link
