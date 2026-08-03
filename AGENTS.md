@@ -76,6 +76,7 @@ The project uses the following environment variables (stored in `.env.local` loc
 - `src/app/` contains routes, layouts, metadata, API routes, sitemap, robots, and the app shell.
   - `/` — home page (all portfolio sections).
   - `/terminal` — interactive diagnostics terminal console.
+  - `/scoping` — Project Scoping Lab & Instant Quote wizard page (deep-linkable via `?engine=landing|multipage|saas` or `?goal=<goal archetype id>`).
   - `/admin/analytics` — visitor analytics dashboard.
   - `/rag` — Retriever AI SaaS Product Landing Page (Hero, live mini-RAG sandbox, feature grid, 1-line embed snippet, Geo-IP pricing).
   - `/rag/login` — Auth & Guest Access Portal (1-click Google OAuth + instant Guest Demo).

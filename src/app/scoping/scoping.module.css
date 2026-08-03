@@ -1,0 +1,95 @@
+/* ============================================================
+   Project Scoping Lab Page — Azure Comic-Ink Aesthetic
+   ============================================================ */
+
+.wrapper {
+  width: 100%;
+  min-height: calc(100vh - 120px);
+  padding: var(--space-xl) var(--gutter);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  position: relative;
+  z-index: 10;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--max-width-narrow, 960px);
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: var(--space-lg);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-headline);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--pop-black);
+  padding: 6px 12px;
+  background-color: var(--pop-white);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border-radius: var(--border-radius-sm);
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.25s ease;
+}
+
+.backLink:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  background-color: var(--pop-yellow);
+}
+
+.backLink:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.brandBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-border);
+  background-color: var(--pop-white);
+  font-family: var(--font-code);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--pop-blue);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ── Noir Theme Overrides: CRT Cyber-Glow ── */
+
+:global([data-theme='noir']) .backLink {
+  background-color: #121214;
+  border-color: #3F3F4E;
+  color: #e0e0e3;
+  box-shadow: none;
+}
+
+:global([data-theme='noir']) .backLink:hover {
+  border-color: var(--neon-cyan, #00f0ff);
+  color: #ffffff;
+  background-color: #121216;
+  text-shadow: 0 0 2px rgba(0, 240, 255, 0.5);
+  transform: translate(0, 0);
+}
+
+:global([data-theme='noir']) .brandBadge {
+  background-color: #121214;
+  border-color: #2F2F3D;
+  color: #8a8a93;
+}

@@ -8,7 +8,6 @@ import { NAVBAR_SCROLL_OFFSET } from '@/lib/constants';
 import { Rocket, Copy, Check, Terminal as TerminalIcon, Mail, Clock, Globe } from 'lucide-react';
 import SpeechBubble from '@/components/ui/SpeechBubble';
 import ConfettiBurst, { type ConfettiBurstHandle } from '@/components/effects/ConfettiBurst';
-import ScopingBriefModal from '@/components/Intake/ScopingBriefModal';
 import styles from './Contact.module.css';
 
 const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
@@ -60,7 +59,6 @@ function Contact() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [recaptchaReady, setRecaptchaReady] = useState(!SITE_KEY);
-  const [isScopingModalOpen, setIsScopingModalOpen] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const { isNoir, audience } = useTheme();
   const lenis = useLenis();
@@ -186,14 +184,10 @@ function Contact() {
               <h3>Need an Itemized Scope & Budget Estimate?</h3>
               <p>Skip the back-and-forth email wait. Configure your architecture, add-ons, and care plan in our 60-second interactive Scoping Lab.</p>
             </div>
-            <button
-              type="button"
-              className={styles.scopingBtn}
-              onClick={() => setIsScopingModalOpen(true)}
-            >
+            <Link href="/scoping" className={styles.scopingBtn}>
               <Rocket size={16} />
               <span>LAUNCH INSTANT SCOPING LAB</span>
-            </button>
+            </Link>
           </div>
         )}
 
@@ -331,12 +325,6 @@ function Contact() {
           </div>
         </div>
       </div>
-
-      {/* Scoping Brief Modal Integration */}
-      <ScopingBriefModal
-        isOpen={isScopingModalOpen}
-        onClose={() => setIsScopingModalOpen(false)}
-      />
     </section>
   );
 }

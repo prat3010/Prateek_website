@@ -20,6 +20,7 @@ A highly interactive, storyteller-driven personal portfolio website designed wit
 |-------|-------------|
 | `/` | Home page — all portfolio sections (hero, about, skills, projects, resume, playground, blog, contact) |
 | `/terminal` | Interactive diagnostics terminal console (supports commands like `git-info`, `qrcode`, `projects`, `system`, `analytics`) |
+| `/scoping` | Project Scoping Lab & Instant Quote wizard page (deep-linkable via `?engine=landing\|multipage\|saas` or `?goal=<archetype id>`) |
 | `/admin/analytics` | Visitor analytics dashboard |
 | `/rag` | Retriever AI SaaS Product Landing Page — Hero, live mini-RAG sandbox, feature grid, 1-line embed snippet, and dynamic Geo-IP pricing (INR vs. USD). |
 | `/rag/login` | Auth & Guest Access Portal — 1-click Google OAuth + instant Guest Demo button. |

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { ResumeData, WorkExperience } from '@/data/resume';
 import type { Certificate } from '@/data/certificates';
@@ -24,7 +25,6 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { getSkillsHighlight, type Persona } from '@/lib/skills';
-import ScopingBriefModal from '@/components/Intake/ScopingBriefModal';
 import styles from './Resume.module.css';
 
 interface ResumeProps {
@@ -45,7 +45,6 @@ const RESUME_BUTTON_TEXTS: ScramblerProps['texts'] = {
 function Resume({ resumeData, certificates }: ResumeProps) {
   const { isNoir, audience, region } = useTheme();
   const [activePersona, setActivePersona] = useState<Persona>('general');
-  const [isScopingModalOpen, setIsScopingModalOpen] = useState(false);
 
   const activeAudience = audience || 'developer';
 
@@ -253,10 +252,10 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                             <div className={styles.packagePrice}>INR 25k–45k / $300–$550</div>
                             <p className={styles.packageDesc}>High-converting showcase with Framer Motion, lead capture form, mobile responsive layout & SEO schema.</p>
                           </div>
-                          <button type="button" onClick={() => setIsScopingModalOpen(true)} className={styles.packageBtn}>
+                          <Link href="/scoping?engine=landing" className={styles.packageBtn}>
                             <span>SCOPE TIER 1</span>
                             <ArrowRight size={12} />
-                          </button>
+                          </Link>
                         </div>
 
                         <div className={styles.packageCard}>
@@ -266,10 +265,10 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                             <div className={styles.packagePrice}>INR 45k–90k / $550–$1.1k</div>
                             <p className={styles.packageDesc}>Next.js 16 App Router, 3–6 pages, headless CMS integration, analytics telemetry & custom visual effects.</p>
                           </div>
-                          <button type="button" onClick={() => setIsScopingModalOpen(true)} className={styles.packageBtn}>
+                          <Link href="/scoping?engine=multipage" className={styles.packageBtn}>
                             <span>SCOPE TIER 2</span>
                             <ArrowRight size={12} />
-                          </button>
+                          </Link>
                         </div>
 
                         <div className={styles.packageCard}>
@@ -279,10 +278,10 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                             <div className={styles.packagePrice}>INR 90k–1.5L+ / $1.1k+</div>
                             <p className={styles.packageDesc}>Supabase Auth & Database, Stripe/Razorpay payments, role-gated admin portal & REST API integrations.</p>
                           </div>
-                          <button type="button" onClick={() => setIsScopingModalOpen(true)} className={styles.packageBtn}>
+                          <Link href="/scoping?engine=saas" className={styles.packageBtn}>
                             <span>SCOPE TIER 3</span>
                             <ArrowRight size={12} />
-                          </button>
+                          </Link>
                         </div>
 
                         <div className={styles.packageCard}>
@@ -292,10 +291,10 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                             <div className={styles.packagePrice}>INR 1.5L+ / $1.8k+</div>
                             <p className={styles.packageDesc}>Retriever RAG Core, vector search, grounded LLM assistant, clickable citations & team access controls.</p>
                           </div>
-                          <button type="button" onClick={() => setIsScopingModalOpen(true)} className={styles.packageBtn}>
+                          <Link href="/scoping?goal=ai_rag_app" className={styles.packageBtn}>
                             <span>SCOPE TIER 4</span>
                             <ArrowRight size={12} />
-                          </button>
+                          </Link>
                         </div>
                       </div>
                     </div>
@@ -363,21 +362,11 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                       <p className={styles.scopingCtaText}>
                         Launch our interactive 4-step Scoping Brief Wizard to define your features, budget, and timeline in under 2 minutes.
                       </p>
-                      <button
-                        type="button"
-                        onClick={() => setIsScopingModalOpen(true)}
-                        className={styles.scopingCtaBtn}
-                      >
+                      <Link href="/scoping" className={styles.scopingCtaBtn}>
                         <Rocket size={16} />
                         <span>Launch Project Scoping Wizard</span>
-                      </button>
+                      </Link>
                     </div>
-
-                    <ScopingBriefModal
-                      isOpen={isScopingModalOpen}
-                      onClose={() => setIsScopingModalOpen(false)}
-                      resumeData={resumeData}
-                    />
 
                   </>
                 ) : (

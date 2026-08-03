@@ -31,8 +31,14 @@ declare global {
   }
 }
 
+export interface IntakePreset {
+  goalId?: string;
+  engineId?: string;
+}
+
 interface IntakeFormProps {
   resumeData?: ResumeData | null;
+  initialPreset?: IntakePreset | null;
 }
 
 export interface BaseEngineItem {
@@ -314,7 +320,7 @@ export const MAINTENANCE_PLANS: MaintenancePlanOption[] = [
   }
 ];
 
-export default function IntakeForm({ resumeData }: IntakeFormProps) {
+export default function IntakeForm({ resumeData, initialPreset = null }: IntakeFormProps) {
   const intakeConfig = resumeData?.intake;
 
   const timelineOptions = intakeConfig?.timelineOptions || [
@@ -339,14 +345,25 @@ export default function IntakeForm({ resumeData }: IntakeFormProps) {
   const [errorMsg, setErrorMsg] = useState('');
   const [activePopoverId, setActivePopoverId] = useState<string | null>(null);
 
+  // Resolve deep-link preset (engine or goal archetype) to the wizard's initial selections
+  const initialArchetype = useMemo(() => {
+    if (initialPreset?.goalId) {
+      return GOAL_ARCHETYPES.find(g => g.id === initialPreset.goalId) || GOAL_ARCHETYPES[0];
+    }
+    if (initialPreset?.engineId) {
+      return GOAL_ARCHETYPES.find(g => g.recommendedEngineId === initialPreset.engineId) || GOAL_ARCHETYPES[0];
+    }
+    return GOAL_ARCHETYPES[0];
+  }, [initialPreset]);
+
   const [formData, setFormData] = useState({
     companyName: '',
     contactEmail: '',
     contactPhone: '',
-    projectGoal: GOAL_ARCHETYPES[0].label,
+    projectGoal: initialArchetype.label,
     targetAudience: '',
-    selectedBaseEngineId: GOAL_ARCHETYPES[0].recommendedEngineId,
-    selectedFeatures: [...GOAL_ARCHETYPES[0].compulsoryFeatureLabels],
+    selectedBaseEngineId: initialArchetype.recommendedEngineId,
+    selectedFeatures: [...initialArchetype.compulsoryFeatureLabels],
     selectedBrandAssetId: BRAND_ASSET_OPTIONS[0].id,
     selectedMaintenanceId: '',
     inspirationLinks: '',
@@ -888,22 +905,22 @@ Notes: ${formData.additionalNotes}
                   </div>
 
                   {/* Summary Box */}
-                  <div style={{ background: '#0f172a', borderRadius: '8px', padding: '14px 18px', color: '#ffffff', marginBottom: '16px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #334155', paddingBottom: '8px', marginBottom: '8px' }}>
-                      <span style={{ fontFamily: 'var(--font-code)', fontSize: '12px', color: '#94a3b8' }}>SELECTED BASE ENGINE</span>
-                      <span style={{ fontWeight: 700, color: '#38bdf8' }}>{`${selectedEngine.title} (₹${selectedEngine.priceINR.toLocaleString()})`}</span>
+                  <div style={{ background: 'var(--intake-summary-bg)', borderRadius: '8px', padding: '14px 18px', color: 'var(--intake-summary-text)', marginBottom: '16px', border: '1px solid var(--intake-summary-border)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--intake-summary-border)', paddingBottom: '8px', marginBottom: '8px' }}>
+                      <span style={{ fontFamily: 'var(--font-code)', fontSize: '12px', color: 'var(--intake-summary-label)' }}>SELECTED BASE ENGINE</span>
+                      <span style={{ fontWeight: 700, color: 'var(--intake-summary-accent)' }}>{`${selectedEngine.title} (₹${selectedEngine.priceINR.toLocaleString()})`}</span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #334155', paddingBottom: '8px', marginBottom: '8px' }}>
-                      <span style={{ fontFamily: 'var(--font-code)', fontSize: '12px', color: '#94a3b8' }}>SELECTED ADD-ON MODULES</span>
-                      <span style={{ fontWeight: 700, color: '#e2e8f0' }}>{`+₹${totalCost.featuresINR.toLocaleString()} (${formData.selectedFeatures.length} Modules)`}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--intake-summary-border)', paddingBottom: '8px', marginBottom: '8px' }}>
+                      <span style={{ fontFamily: 'var(--font-code)', fontSize: '12px', color: 'var(--intake-summary-label)' }}>SELECTED ADD-ON MODULES</span>
+                      <span style={{ fontWeight: 700, color: 'var(--intake-summary-value)' }}>{`+₹${totalCost.featuresINR.toLocaleString()} (${formData.selectedFeatures.length} Modules)`}</span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #334155', paddingBottom: '8px', marginBottom: '8px' }}>
-                      <span style={{ fontFamily: 'var(--font-code)', fontSize: '12px', color: '#94a3b8' }}>BRAND KIT ADD-ON</span>
-                      <span style={{ fontWeight: 700, color: '#e2e8f0' }}>{totalCost.brandOpt.priceINR > 0 ? `+₹${totalCost.brandOpt.priceINR.toLocaleString()}` : 'Included (+₹0)'}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--intake-summary-border)', paddingBottom: '8px', marginBottom: '8px' }}>
+                      <span style={{ fontFamily: 'var(--font-code)', fontSize: '12px', color: 'var(--intake-summary-label)' }}>BRAND KIT ADD-ON</span>
+                      <span style={{ fontWeight: 700, color: 'var(--intake-summary-value)' }}>{totalCost.brandOpt.priceINR > 0 ? `+₹${totalCost.brandOpt.priceINR.toLocaleString()}` : 'Included (+₹0)'}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '4px' }}>
-                      <span style={{ fontFamily: 'var(--font-code)', fontSize: '13px', fontWeight: 800, color: '#ffffff' }}>TOTAL BUILD INVESTMENT</span>
-                      <span style={{ fontFamily: 'var(--font-code)', fontSize: '18px', fontWeight: 800, color: '#38bdf8' }}>{`₹${totalCost.totalINR.toLocaleString()} ($${totalCost.totalUSD.toLocaleString()})`}</span>
+                      <span style={{ fontFamily: 'var(--font-code)', fontSize: '13px', fontWeight: 800, color: 'var(--intake-summary-text)' }}>TOTAL BUILD INVESTMENT</span>
+                      <span style={{ fontFamily: 'var(--font-code)', fontSize: '18px', fontWeight: 800, color: 'var(--intake-summary-accent)' }}>{`₹${totalCost.totalINR.toLocaleString()} ($${totalCost.totalUSD.toLocaleString()})`}</span>
                     </div>
                   </div>
 
@@ -1030,7 +1047,7 @@ Notes: ${formData.additionalNotes}
               )}
 
               {errorMsg && (
-                <p style={{ color: '#ef4444', fontSize: '13px', marginTop: '12px' }}>{errorMsg}</p>
+                <p style={{ color: '#dc2626', fontSize: '13px', marginTop: '12px' }}>{errorMsg}</p>
               )}
 
               {/* Actions Footer */}

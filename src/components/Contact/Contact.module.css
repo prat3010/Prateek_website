@@ -152,6 +152,7 @@
   letter-spacing: 0.05em;
   cursor: pointer;
   white-space: nowrap;
+  text-decoration: none;
   transition: all 0.2s ease;
 
 }
