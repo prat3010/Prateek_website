@@ -384,22 +384,10 @@ def render_resume_tab():
                 "sections": expanded_sections
             }
 
-            target_pdf = "Middleman_Partnership_Agreement.pdf"
+            target_pdf = "Sales_Partner_Agreement.pdf"
 
             col_b1, col_b2 = st.columns([1, 1])
             with col_b1:
-                if st.button("📄 Rebuild Partnership Agreement PDF", key="btn_rebuild_mm_pdf"):
-                    try:
-                        write_resume_file(res)
-                        import subprocess
-                        proc = subprocess.run(['node', 'scripts/generate-middleman-pdf.mjs'], capture_output=True, text=True)
-                        if proc.returncode == 0:
-                            st.success("📄 Partnership Agreement PDF generated successfully!")
-                        else:
-                            st.error(f"Failed to generate PDF: {proc.stderr}")
-                    except Exception as e:
-                        st.error(f"Error generating PDF: {e}")
-            with col_b2:
                 import re as _re, tempfile, json as _json, subprocess
                 safe_partner = _re.sub(r'[^A-Za-z0-9]+', '_', partner_name.strip()).strip('_') or 'Partner'
                 if st.button("📄 Build Current Agreement PDF", key="btn_build_mm_pdf"):

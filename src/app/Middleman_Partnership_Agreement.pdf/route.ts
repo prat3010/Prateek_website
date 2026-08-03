@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import ReactPDF, { type DocumentProps } from '@react-pdf/renderer';
+import { renderToBuffer, type DocumentProps } from '@react-pdf/renderer';
 import React from 'react';
 import { MiddlemanAgreementPDF } from '@/components/pdf/MiddlemanAgreementPDF';
 import { getProfile } from '@/lib/data';
@@ -10,7 +10,7 @@ export async function GET() {
   try {
     const profileData = await getProfile();
     const element = React.createElement(MiddlemanAgreementPDF, { resumeData: profileData }) as unknown as React.ReactElement<DocumentProps>;
-    const buffer = await ReactPDF.renderToBuffer(element);
+    const buffer = await renderToBuffer(element);
 
     return new NextResponse(new Uint8Array(buffer), {
       status: 200,
