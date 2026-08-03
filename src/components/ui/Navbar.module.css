@@ -260,6 +260,7 @@
   letter-spacing: 2px;
   color: var(--pop-black);
   text-transform: uppercase;
+  text-align: center;
   padding: 12px 24px;
   text-decoration: none;
   transition: color 0.2s ease, transform 0.2s ease;
