@@ -19,7 +19,9 @@ import {
   Paintbrush, 
   User, 
   FileText,
-  Rocket
+  Rocket,
+  ArrowRight,
+  ShieldCheck
 } from 'lucide-react';
 import { getSkillsHighlight, type Persona } from '@/lib/skills';
 import ScopingBriefModal from '@/components/Intake/ScopingBriefModal';
@@ -237,6 +239,93 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                     </div>
 
                     {/* Terms and Deliverables */}
+                    {/* Build Engines & Pricing Tiers Grid */}
+                    <div className={styles.resumeSectionBlock}>
+                      <h3 className={styles.blockTitle}>
+                        <Cpu size={16} />
+                        <span>COMMERCIAL BUILD ENGINES & TIERS</span>
+                      </h3>
+                      <div className={styles.packageGrid}>
+                        <div className={styles.packageCard}>
+                          <div>
+                            <span className={styles.packageBadge}>Tier 1 • Single Page</span>
+                            <h4 className={styles.packageTitle}>Landing Page Engine</h4>
+                            <div className={styles.packagePrice}>INR 25k–45k / $300–$550</div>
+                            <p className={styles.packageDesc}>High-converting showcase with Framer Motion, lead capture form, mobile responsive layout & SEO schema.</p>
+                          </div>
+                          <button type="button" onClick={() => setIsScopingModalOpen(true)} className={styles.packageBtn}>
+                            <span>SCOPE TIER 1</span>
+                            <ArrowRight size={12} />
+                          </button>
+                        </div>
+
+                        <div className={styles.packageCard}>
+                          <div>
+                            <span className={styles.packageBadge}>Tier 2 • Multi-Page</span>
+                            <h4 className={styles.packageTitle}>Multi-Page Web App</h4>
+                            <div className={styles.packagePrice}>INR 45k–90k / $550–$1.1k</div>
+                            <p className={styles.packageDesc}>Next.js 16 App Router, 3–6 pages, headless CMS integration, analytics telemetry & custom visual effects.</p>
+                          </div>
+                          <button type="button" onClick={() => setIsScopingModalOpen(true)} className={styles.packageBtn}>
+                            <span>SCOPE TIER 2</span>
+                            <ArrowRight size={12} />
+                          </button>
+                        </div>
+
+                        <div className={styles.packageCard}>
+                          <div>
+                            <span className={styles.packageBadge}>Tier 3 • Full-Stack</span>
+                            <h4 className={styles.packageTitle}>SaaS MVP & App Portal</h4>
+                            <div className={styles.packagePrice}>INR 90k–1.5L+ / $1.1k+</div>
+                            <p className={styles.packageDesc}>Supabase Auth & Database, Stripe/Razorpay payments, role-gated admin portal & REST API integrations.</p>
+                          </div>
+                          <button type="button" onClick={() => setIsScopingModalOpen(true)} className={styles.packageBtn}>
+                            <span>SCOPE TIER 3</span>
+                            <ArrowRight size={12} />
+                          </button>
+                        </div>
+
+                        <div className={styles.packageCard}>
+                          <div>
+                            <span className={styles.packageBadge}>Tier 4 • AI Vector</span>
+                            <h4 className={styles.packageTitle}>Enterprise AI RAG Engine</h4>
+                            <div className={styles.packagePrice}>INR 1.5L+ / $1.8k+</div>
+                            <p className={styles.packageDesc}>Retriever RAG Core, vector search, grounded LLM assistant, clickable citations & team access controls.</p>
+                          </div>
+                          <button type="button" onClick={() => setIsScopingModalOpen(true)} className={styles.packageBtn}>
+                            <span>SCOPE TIER 4</span>
+                            <ArrowRight size={12} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Monthly SLA Care Plans Grid */}
+                    <div className={styles.resumeSectionBlock}>
+                      <h3 className={styles.blockTitle}>
+                        <ShieldCheck size={16} />
+                        <span>MONTHLY INFRASTRUCTURE & SLA CARE PLANS</span>
+                      </h3>
+                      <div className={styles.careGrid}>
+                        <div className={styles.careCard}>
+                          <h4 className={styles.careTitle}>Basic Care Plan</h4>
+                          <div className={styles.carePrice}>INR 2,500/mo ($30/mo)</div>
+                          <p className={styles.careDesc}>Hosting support, daily automated DB backups, security updates & 24/7 uptime monitoring.</p>
+                        </div>
+                        <div className={styles.careCard}>
+                          <h4 className={styles.careTitle}>Standard Care Plan</h4>
+                          <div className={styles.carePrice}>INR 6,500/mo ($80/mo)</div>
+                          <p className={styles.careDesc}>Includes Basic Care + 2–4 hours monthly developer allocation for text/image updates & page tuning.</p>
+                        </div>
+                        <div className={styles.careCard}>
+                          <h4 className={styles.careTitle}>Premium AI SLA Plan</h4>
+                          <div className={styles.carePrice}>INR 15,000/mo ($180/mo)</div>
+                          <p className={styles.careDesc}>Priority 24h SLA, AI vector index tuning, latency monitoring & dedicated feature engineering hours.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Terms and Deliverables */}
                     <div className={styles.resumeSectionBlock}>
                       <h3 className={styles.blockTitle}>
                         <FileText size={16} />
@@ -256,7 +345,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                           "Production-ready Next.js / React application",
                           "Supabase backend integration & security setup",
                           "SEO audit & optimization",
-                          "3 months of support & maintenance"
+                          "30 days of post-launch bug warranty & handoff documentation"
                         ]).map((item, idx) => (
                           <li key={idx} className={styles.bulletItem}>
                             {item}
@@ -266,32 +355,18 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                     </div>
 
                     {/* Project Scoping CTA Card */}
-                    <div style={{ marginTop: '28px', padding: '20px', borderRadius: '12px', border: '1px dashed #CBD5E1', backgroundColor: '#F8FAFC', textAlign: 'center' }}>
-                      <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#E0F2FE', color: '#0284C7', marginBottom: '12px' }}>
+                    <div className={styles.scopingCtaCard}>
+                      <div className={styles.scopingCtaIcon}>
                         <Rocket size={20} />
                       </div>
-                      <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', margin: '0 0 6px 0' }}>Ready to Scope Your Next Project?</h4>
-                      <p style={{ fontSize: '12px', color: '#64748B', margin: '0 0 16px 0', maxWidth: '480px', marginLeft: 'auto', marginRight: 'auto' }}>
+                      <h4 className={styles.scopingCtaTitle}>Ready to Scope Your Next Project?</h4>
+                      <p className={styles.scopingCtaText}>
                         Launch our interactive 4-step Scoping Brief Wizard to define your features, budget, and timeline in under 2 minutes.
                       </p>
                       <button
                         type="button"
                         onClick={() => setIsScopingModalOpen(true)}
-                        style={{
-                          background: '#0F172A',
-                          color: '#FFFFFF',
-                          border: 'none',
-                          borderRadius: '8px',
-                          padding: '12px 24px',
-                          fontSize: '13px',
-                          fontWeight: 700,
-                          cursor: 'pointer',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          boxShadow: '0 4px 12px rgba(15, 23, 42, 0.15)',
-                          transition: 'all 0.2s ease'
-                        }}
+                        className={styles.scopingCtaBtn}
                       >
                         <Rocket size={16} />
                         <span>Launch Project Scoping Wizard</span>
