@@ -118,3 +118,104 @@ def validate_blog_fields(title, excerpt, tags, content):
     if len(clean_title) > 180:
         raise ValueError("Blog title is too long.")
     return clean_title, clean_excerpt[:500], validate_tags(tags, max_items=12), clean_content
+
+
+def validate_questionnaire(engines, features, goals, brand_assets, maintenance_plans):
+    """Validate scoping questionnaire config. Returns a list of error strings (empty = valid)."""
+    errors = []
+
+    def unique_ids(items, section, key="id"):
+        ids = [item.get(key) for item in items if isinstance(item, dict)]
+        seen = set()
+        for item_id in ids:
+            if not item_id or not isinstance(item_id, str) or not item_id.strip():
+                errors.append(f"{section} contains an item with a missing/blank '{key}'.")
+            elif item_id in seen:
+                errors.append(f"{section} contains a duplicate '{key}': {item_id}.")
+            else:
+                seen.add(item_id)
+
+    def check_prices(items, section):
+        for item in items:
+            for price_key in ("priceINR", "priceUSD"):
+                price = item.get(price_key)
+                if not isinstance(price, (int, float)) or isinstance(price, bool) or price < 0:
+                    errors.append(
+                        f"{section} '{item.get('id', item.get('name', '?'))}' has an invalid "
+                        f"'{price_key}' (must be a non-negative number)."
+                    )
+
+    if not isinstance(engines, list) or not engines:
+        errors.append("At least one base engine is required.")
+    else:
+        for engine in engines:
+            for field in ("id", "title", "tier", "laymanDescription", "techSpecs"):
+                if not isinstance(engine.get(field), str) or not engine.get(field).strip():
+                    errors.append(f"Engine '{engine.get('id', '?')}' is missing required field '{field}'.")
+        unique_ids(engines, "Engines")
+        check_prices(engines, "Engine")
+
+    if not isinstance(features, list):
+        errors.append("Features must be a list.")
+    else:
+        for feature in features:
+            for field in ("id", "label", "laymanDescription", "techSpecs"):
+                if not isinstance(feature.get(field), str) or not feature.get(field).strip():
+                    errors.append(f"Feature '{feature.get('id', '?')}' is missing required field '{field}'.")
+        unique_ids(features, "Features")
+        check_prices(features, "Feature")
+
+    engine_ids = {e.get("id") for e in engines if isinstance(e, dict)}
+    feature_labels = {f.get("label") for f in features if isinstance(f, dict)}
+
+    if not isinstance(goals, list) or not goals:
+        errors.append("At least one goal archetype is required.")
+    else:
+        for goal in goals:
+            for field in ("id", "label", "shortLabel", "description", "recommendedEngineId"):
+                if not isinstance(goal.get(field), str) or not goal.get(field).strip():
+                    errors.append(f"Goal '{goal.get('id', '?')}' is missing required field '{field}'.")
+            if goal.get("recommendedEngineId") not in engine_ids:
+                errors.append(
+                    f"Goal '{goal.get('id', '?')}' recommends unknown engine "
+                    f"'{goal.get('recommendedEngineId')}'."
+                )
+            compulsory = goal.get("compulsoryFeatureLabels", [])
+            if not isinstance(compulsory, list):
+                errors.append(f"Goal '{goal.get('id', '?')}' compulsoryFeatureLabels must be a list.")
+            else:
+                for label in compulsory:
+                    if label not in feature_labels:
+                        errors.append(
+                            f"Goal '{goal.get('id', '?')}' references unknown feature label '{label}'."
+                        )
+        unique_ids(goals, "Goals")
+
+    if not isinstance(brand_assets, list) or not brand_assets:
+        errors.append("At least one brand asset option is required.")
+    else:
+        for asset in brand_assets:
+            for field in ("id", "label", "description"):
+                if not isinstance(asset.get(field), str) or not asset.get(field).strip():
+                    errors.append(f"Brand asset '{asset.get('id', '?')}' is missing required field '{field}'.")
+        unique_ids(brand_assets, "Brand assets")
+        check_prices(brand_assets, "Brand asset")
+
+    if not isinstance(maintenance_plans, list) or not maintenance_plans:
+        errors.append("At least one maintenance plan is required.")
+    else:
+        for plan in maintenance_plans:
+            for field in ("id", "name", "badge", "laymanDescription", "techSpecs"):
+                if not isinstance(plan.get(field), str) or not plan.get(field).strip():
+                    errors.append(f"Care plan '{plan.get('id', '?')}' is missing required field '{field}'.")
+            if "period" in plan and not isinstance(plan.get("period"), str):
+                errors.append(f"Care plan '{plan.get('id', '?')}' 'period' must be a string.")
+            includes = plan.get("includes", [])
+            if not isinstance(includes, list) or not includes:
+                errors.append(f"Care plan '{plan.get('id', '?')}' must include at least one 'includes' item.")
+            elif not all(isinstance(i, str) and i.strip() for i in includes):
+                errors.append(f"Care plan '{plan.get('id', '?')}' 'includes' must be a list of strings.")
+        unique_ids(maintenance_plans, "Care plans")
+        check_prices(maintenance_plans, "Care plan")
+
+    return errors

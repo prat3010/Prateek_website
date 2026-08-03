@@ -55,6 +55,54 @@ export interface MiddlemanAgreementConfig {
   }[];
 }
 
+export interface BaseEngineItem {
+  id: string;
+  title: string;
+  tier: string;
+  priceINR: number;
+  priceUSD: number;
+  laymanDescription: string;
+  techSpecs: string;
+}
+
+export interface FeatureItem {
+  id: string;
+  label: string;
+  priceINR: number;
+  priceUSD: number;
+  laymanDescription: string;
+  techSpecs: string;
+}
+
+export interface GoalArchetype {
+  id: string;
+  label: string;
+  shortLabel: string;
+  description: string;
+  recommendedEngineId: string;
+  compulsoryFeatureLabels: string[];
+}
+
+export interface BrandAssetOption {
+  id: string;
+  label: string;
+  priceINR: number;
+  priceUSD: number;
+  description: string;
+}
+
+export interface MaintenancePlanOption {
+  id: string;
+  name: string;
+  priceINR: number;
+  priceUSD: number;
+  period: string;
+  badge: string;
+  laymanDescription: string;
+  techSpecs: string;
+  includes: string[];
+}
+
 export interface IntakeConfig {
   title: string;
   subtitle: string;
@@ -65,6 +113,11 @@ export interface IntakeConfig {
   assetOptions: string[];
   termsAndConditions: string[];
   middlemanAgreement?: MiddlemanAgreementConfig;
+  engines?: BaseEngineItem[];
+  features?: FeatureItem[];
+  goals?: GoalArchetype[];
+  brandAssets?: BrandAssetOption[];
+  maintenancePlans?: MaintenancePlanOption[];
 }
 
 export interface ResumeData {

@@ -32,7 +32,7 @@
         "The purpose of this Agreement is to set out the commercial terms, commission structure, payout schedule, and operating rules under which the Partner introduces prospective Clients to the Developer for web development, custom software, and AI integration projects.",
         "- The Partner acts as an independent introducer only, and not as an employee, agent, or legal representative of the Developer.",
         "- The Partner has no authority to bind the Developer to any contract, price, or undertaking, whether verbally or in writing.",
-        "- The Partner will introduce Clients, encourage completion of the Developer's Intake Scoping Form, and support a warm handoff to the Developer.",
+        "- The Partner will introduce Clients, encourage completion of the Developer's Project Scoping Lab & Instant Quote questionnaire, and support a warm handoff to the Developer.",
         "- The Developer is responsible for scoping, pricing, delivery, and all client-facing terms after qualification."
       ]
     },
@@ -58,7 +58,7 @@
       "key": "qualification",
       "heading": "5. CLIENT HANDOFF & PROJECT QUALIFICATION",
       "lines": [
-        "The Partner introduces the referred Client via a warm email introduction or the Intake Scoping Form published on prateeq.in. A project is considered Qualified, and the Partner's Commission becomes committed, when the Client signs the relevant Scoping Specification and pays the 50% upfront deposit.",
+        "The Partner introduces the referred Client via a warm email introduction or the Project Scoping Lab & Instant Quote wizard at https://prateeq.in/scoping. A project is considered Qualified, and the Partner's Commission becomes committed, when the Client signs the relevant Scoping Specification and pays the 50% upfront deposit.",
         "The Developer retains sole authority to accept or reject any referred Client, scope, budget, or project for any reason, including technical feasibility. A rejection does not create any obligation to pay Commission."
       ]
     },

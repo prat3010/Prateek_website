@@ -1,6 +1,7 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Svg, Line } from '@react-pdf/renderer';
-import type { ResumeData } from '@/data/resume';
+import type { BaseEngineItem, MaintenancePlanOption, ResumeData } from '@/data/resume';
+import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
 import { DEFAULT_PDF_THEME } from './pdfTheme';
 
 function cleanPDFText(text?: string | null): string {
@@ -10,6 +11,11 @@ function cleanPDFText(text?: string | null): string {
     .replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]/gu, '')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+function formatPrice(inr: number, usd: number): string {
+  if (inr === 0 && usd === 0) return 'INCLUDED';
+  return `INR ${inr.toLocaleString('en-IN')} / $${usd}`;
 }
 
 const styles = StyleSheet.create({
@@ -217,6 +223,13 @@ interface ServicesAndPricingPDFProps {
 export function ServicesAndPricingPDF({ resumeData }: ServicesAndPricingPDFProps) {
   const intakeConfig = resumeData?.intake;
 
+  const engines: BaseEngineItem[] = intakeConfig?.engines?.length
+    ? intakeConfig.engines
+    : questionnaireDefaults.engines;
+  const maintenancePlans: MaintenancePlanOption[] = intakeConfig?.maintenancePlans?.length
+    ? intakeConfig.maintenancePlans
+    : questionnaireDefaults.maintenancePlans;
+
   const terms = intakeConfig?.termsAndConditions || [
     "1. Payment Milestone Structure: 50% Upfront Deposit required to initiate development & architecture setup. 50% Final Balance prior to domain mapping & production handover.",
     "2. Scope Creep & Change Orders: Features requested after contract sign-off not in original specification will be quoted separately under a Phase 2 add-on contract.",
@@ -292,44 +305,20 @@ export function ServicesAndPricingPDF({ resumeData }: ServicesAndPricingPDFProps
             <Text style={[styles.tableHeaderCell, styles.colPrice]}>COMMERCIAL VALUE</Text>
           </View>
 
-          <View style={styles.tableRow} wrap={false}>
-            <View style={styles.colEngine}>
-              <Text style={styles.moduleTitle}>Tier 1: High-Converting Landing Page</Text>
-              <Text style={styles.moduleDesc}>Single-page responsive showcase for products or services</Text>
+          {engines.map((engine, idx) => (
+            <View style={idx % 2 === 1 ? [styles.tableRow, styles.tableRowHighlight] : styles.tableRow} wrap={false} key={engine.id}>
+              <View style={styles.colEngine}>
+                <Text style={styles.moduleTitle}>{engine.tier}: {engine.title}</Text>
+                <Text style={styles.moduleDesc}>{engine.laymanDescription}</Text>
+              </View>
+              <View style={styles.colScope}>
+                <Text style={styles.moduleDesc}>{engine.techSpecs}</Text>
+              </View>
+              <View style={styles.colPrice}>
+                <Text style={styles.priceVal}>{formatPrice(engine.priceINR, engine.priceUSD)}</Text>
+              </View>
             </View>
-            <View style={styles.colScope}>
-              <Text style={styles.moduleDesc}>Custom Framer Motion, Lead Intake Form, Mobile Responsive, SEO Schema</Text>
-            </View>
-            <View style={styles.colPrice}>
-              <Text style={styles.priceVal}>INR 25k–45k / $300–$550</Text>
-            </View>
-          </View>
-
-          <View style={[styles.tableRow, styles.tableRowHighlight]} wrap={false}>
-            <View style={styles.colEngine}>
-              <Text style={styles.moduleTitle}>Tier 2: Multi-Page Web App Engine</Text>
-              <Text style={styles.moduleDesc}>Full corporate profile, services, and dynamic content pages</Text>
-            </View>
-            <View style={styles.colScope}>
-              <Text style={styles.moduleDesc}>Next.js 16 App Router, Multi-Page Routing, CMS Integration, Telemetry</Text>
-            </View>
-            <View style={styles.colPrice}>
-              <Text style={styles.priceVal}>INR 45k–90k / $550–$1.1k</Text>
-            </View>
-          </View>
-
-          <View style={styles.tableRow} wrap={false}>
-            <View style={styles.colEngine}>
-              <Text style={styles.moduleTitle}>Tier 3: SaaS MVP & Custom Web Application</Text>
-              <Text style={styles.moduleDesc}>Interactive web application with auth & database backend</Text>
-            </View>
-            <View style={styles.colScope}>
-              <Text style={styles.moduleDesc}>Supabase Database & Auth, Payment Gateway (Stripe/Razorpay), Admin Dashboard</Text>
-            </View>
-            <View style={styles.colPrice}>
-              <Text style={styles.priceVal}>INR 90k–1.5L+ / $1.1k+</Text>
-            </View>
-          </View>
+          ))}
 
           <View style={[styles.tableRow, styles.tableRowHighlight]} wrap={false}>
             <View style={styles.colEngine}>
@@ -340,7 +329,7 @@ export function ServicesAndPricingPDF({ resumeData }: ServicesAndPricingPDFProps
               <Text style={styles.moduleDesc}>Retriever RAG Core, Vector Database, Hybrid Search, Citations, Admin Analytics</Text>
             </View>
             <View style={styles.colPrice}>
-              <Text style={styles.priceVal}>INR 1.5L+ / $1.8k+</Text>
+              <Text style={styles.priceVal}>From INR 1.5L+ / $1.8k+ · Bespoke Quote</Text>
             </View>
           </View>
         </View>
@@ -352,42 +341,20 @@ export function ServicesAndPricingPDF({ resumeData }: ServicesAndPricingPDFProps
             <Text style={[styles.tableHeaderCell, { width: '45%' }]}>INCLUDED SERVICES</Text>
             <Text style={[styles.tableHeaderCell, { width: '20%', textAlign: 'right' }]}>MONTHLY</Text>
           </View>
-          <View style={styles.tableRow} wrap={false}>
-            <View style={{ width: '35%' }}>
-              <Text style={styles.moduleTitle}>Basic Care Plan</Text>
-              <Text style={styles.moduleDesc}>Recommended for Landing Pages</Text>
+          {maintenancePlans.map((plan, idx) => (
+            <View style={idx % 2 === 1 ? [styles.tableRow, styles.tableRowHighlight] : styles.tableRow} wrap={false} key={plan.id}>
+              <View style={{ width: '35%' }}>
+                <Text style={styles.moduleTitle}>{plan.name}</Text>
+                <Text style={styles.moduleDesc}>{cleanPDFText(plan.badge)}</Text>
+              </View>
+              <View style={{ width: '45%' }}>
+                <Text style={styles.moduleDesc}>{plan.laymanDescription}</Text>
+              </View>
+              <View style={{ width: '20%', textAlign: 'right' }}>
+                <Text style={styles.priceVal}>{formatPrice(plan.priceINR, plan.priceUSD)}</Text>
+              </View>
             </View>
-            <View style={{ width: '45%' }}>
-              <Text style={styles.moduleDesc}>Hosting support, daily DB backups, security patches, uptime monitoring</Text>
-            </View>
-            <View style={{ width: '20%', textAlign: 'right' }}>
-              <Text style={styles.priceVal}>INR 2,500 / $30</Text>
-            </View>
-          </View>
-          <View style={[styles.tableRow, styles.tableRowHighlight]} wrap={false}>
-            <View style={{ width: '35%' }}>
-              <Text style={styles.moduleTitle}>Standard Care Plan</Text>
-              <Text style={styles.moduleDesc}>Recommended for Web Apps & CMS</Text>
-            </View>
-            <View style={{ width: '45%' }}>
-              <Text style={styles.moduleDesc}>Everything in Basic + 2-4h monthly dev time for content/layout updates</Text>
-            </View>
-            <View style={{ width: '20%', textAlign: 'right' }}>
-              <Text style={styles.priceVal}>INR 6,500 / $80</Text>
-            </View>
-          </View>
-          <View style={styles.tableRow} wrap={false}>
-            <View style={{ width: '35%' }}>
-              <Text style={styles.moduleTitle}>Premium AI & Dev SLA</Text>
-              <Text style={styles.moduleDesc}>Recommended for SaaS & RAG Engines</Text>
-            </View>
-            <View style={{ width: '45%' }}>
-              <Text style={styles.moduleDesc}>Priority 24h SLA, AI index tuning, dedicated monthly feature dev hours</Text>
-            </View>
-            <View style={{ width: '20%', textAlign: 'right' }}>
-              <Text style={styles.priceVal}>INR 15,000 / $180</Text>
-            </View>
-          </View>
+          ))}
         </View>
 
         {renderFooter()}
@@ -415,7 +382,7 @@ export function ServicesAndPricingPDF({ resumeData }: ServicesAndPricingPDFProps
         <View style={styles.contactBox}>
           <Text style={styles.contactTitle}>READY TO SCOPE YOUR PROJECT?</Text>
           <Text style={styles.contactText}>
-            Launch our interactive Scoping Brief Wizard at https://prateeq.in to configure your build tier, select custom add-on modules, and generate your customized line-item quotation in under 2 minutes.
+            Launch our interactive Project Scoping Lab & Instant Quote wizard at https://prateeq.in/scoping to configure your build tier, select custom add-on modules, and generate your customized line-item quotation in under 2 minutes.
           </Text>
           <Text style={[styles.contactText, { marginTop: 4, fontFamily: 'Helvetica-Bold' }]}>
             Direct Engineering Email: 3010prateeksharma@gmail.com | Web: https://prateeq.in

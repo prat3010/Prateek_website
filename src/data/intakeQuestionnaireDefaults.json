@@ -1,0 +1,228 @@
+{
+  "engines": [
+    {
+      "id": "landing",
+      "title": "Landing Page Core Engine",
+      "tier": "Tier 1",
+      "priceINR": 25000,
+      "priceUSD": 300,
+      "laymanDescription": "A single, ultra-fast, high-converting webpage built to capture leads, showcase your brand, and turn visitors into clients.",
+      "techSpecs": "Next.js 16 App Router, Responsive Motion UI, Tailwind/CSS Modules, ReCAPTCHA v3, Telemetry, SEO Schema"
+    },
+    {
+      "id": "multipage",
+      "title": "Multi-Page Web App Core Engine",
+      "tier": "Tier 2",
+      "priceINR": 45000,
+      "priceUSD": 550,
+      "laymanDescription": "A complete multi-page business website (Home, About, Services, Case Studies, Contact) with smooth page transitions and consistent branding.",
+      "techSpecs": "Multi-page routing (3–6 pages), Framer Motion Page Transitions, Shared Layout Shell, Dynamic Routes"
+    },
+    {
+      "id": "saas",
+      "title": "Full-Stack SaaS MVP Core Engine",
+      "tier": "Tier 3",
+      "priceINR": 75000,
+      "priceUSD": 950,
+      "laymanDescription": "A production software foundation connected to a cloud database for web apps where users create accounts, manage data, and run software workflows.",
+      "techSpecs": "Full Web App Shell, Supabase PostgreSQL Architecture, Server Caching (unstable_cache), Production Vercel Wiring"
+    }
+  ],
+  "features": [
+    {
+      "id": "auth",
+      "label": "User Auth & Client Portal (Google/Magic Link)",
+      "priceINR": 20000,
+      "priceUSD": 240,
+      "laymanDescription": "Allows your customers to securely sign in using Google or Email links and access their private personal dashboard.",
+      "techSpecs": "Google OAuth 2.0, Passwordless Magic Links, Supabase Row-Level Security (RLS), Encrypted Session Tokens"
+    },
+    {
+      "id": "payments",
+      "label": "Payment Gateway Integration (Stripe/Razorpay)",
+      "priceINR": 25000,
+      "priceUSD": 300,
+      "laymanDescription": "Enables your website to collect payments via Credit Cards, Apple Pay, UPI, or subscriptions with automatic digital invoicing.",
+      "techSpecs": "Stripe & Razorpay Webhook Listeners, 1-Click Checkout, Recurring Billing, PCI DSS Compliance setup"
+    },
+    {
+      "id": "cms",
+      "label": "Headless Blog & CMS Content Management",
+      "priceINR": 18000,
+      "priceUSD": 220,
+      "laymanDescription": "Gives you an easy backend manager to publish blog posts, news, or case studies anytime without touching code, boosting your Google ranking.",
+      "techSpecs": "Markdown Parser, Supabase DB Content Tables, On-Demand Cache Revalidation (/api/revalidate), OpenGraph SEO"
+    },
+    {
+      "id": "ai_rag",
+      "label": "Private AI Knowledge Base / Vector Search (RAG)",
+      "priceINR": 35000,
+      "priceUSD": 420,
+      "laymanDescription": "An intelligent AI assistant trained exclusively on your business documents, FAQs, and PDFs that answers customer questions 24/7 with source citations.",
+      "techSpecs": "pgvector Vector Embeddings, Document Chunking Pipeline, Semantic Search, Presigned Citation Downloads, Feedback Telemetry"
+    },
+    {
+      "id": "admin",
+      "label": "Admin Dashboard & Role Access Control (RBAC)",
+      "priceINR": 30000,
+      "priceUSD": 360,
+      "laymanDescription": "A private internal command center for you and your team to view real-time traffic, manage customer data, and assign staff permissions.",
+      "techSpecs": "Single-Pass SQL RPC Aggregations (get_analytics_summary), Visitor Analytics Charts, Content Forms, Admin Security Guards"
+    },
+    {
+      "id": "email",
+      "label": "Automated Email Workflows (Resend Transactional)",
+      "priceINR": 12000,
+      "priceUSD": 140,
+      "laymanDescription": "Sends instant, professionally branded email receipts, welcome sequences, or contact notifications directly to your clients whenever they take action.",
+      "techSpecs": "Resend Transactional API, Custom HTML Templates, SMTP Fallbacks, Delivery Failure Telemetry"
+    }
+  ],
+  "goals": [
+    {
+      "id": "landing_page",
+      "label": "⚡ High-Converting Landing Page",
+      "shortLabel": "Landing Page",
+      "description": "Single-page lead generation or product launch page",
+      "recommendedEngineId": "landing",
+      "compulsoryFeatureLabels": ["Automated Email Workflows (Resend Transactional)"]
+    },
+    {
+      "id": "business_multipage",
+      "label": "🏢 Multi-Page Business Website",
+      "shortLabel": "Business Web",
+      "description": "Corporate profile with services, showcase, and blog",
+      "recommendedEngineId": "multipage",
+      "compulsoryFeatureLabels": ["Automated Email Workflows (Resend Transactional)"]
+    },
+    {
+      "id": "ecommerce",
+      "label": "🛒 E-commerce & Digital Store",
+      "shortLabel": "E-commerce",
+      "description": "Product catalog, shopping cart, and online payments",
+      "recommendedEngineId": "multipage",
+      "compulsoryFeatureLabels": [
+        "Payment Gateway Integration (Stripe/Razorpay)",
+        "User Auth & Client Portal (Google/Magic Link)",
+        "Automated Email Workflows (Resend Transactional)"
+      ]
+    },
+    {
+      "id": "booking_appointments",
+      "label": "📅 Booking & Appointment Platform",
+      "shortLabel": "Booking Platform",
+      "description": "Reservation scheduling, calendar sync, and upfront deposits",
+      "recommendedEngineId": "multipage",
+      "compulsoryFeatureLabels": [
+        "Payment Gateway Integration (Stripe/Razorpay)",
+        "Automated Email Workflows (Resend Transactional)"
+      ]
+    },
+    {
+      "id": "saas_app",
+      "label": "🚀 Full-Stack SaaS Web Application",
+      "shortLabel": "SaaS MVP",
+      "description": "User accounts, interactive dashboards, and subscriptions",
+      "recommendedEngineId": "saas",
+      "compulsoryFeatureLabels": [
+        "User Auth & Client Portal (Google/Magic Link)",
+        "Payment Gateway Integration (Stripe/Razorpay)",
+        "Admin Dashboard & Role Access Control (RBAC)"
+      ]
+    },
+    {
+      "id": "lms_portal",
+      "label": "🎓 LMS & Online Course Portal",
+      "shortLabel": "LMS Portal",
+      "description": "Student accounts, course player, and subscription billing",
+      "recommendedEngineId": "saas",
+      "compulsoryFeatureLabels": [
+        "User Auth & Client Portal (Google/Magic Link)",
+        "Payment Gateway Integration (Stripe/Razorpay)",
+        "Headless Blog & CMS Content Management"
+      ]
+    },
+    {
+      "id": "crm_admin",
+      "label": "📊 Internal CRM / Admin Control Center",
+      "shortLabel": "Admin CRM",
+      "description": "Private business dashboard, data management, and staff roles",
+      "recommendedEngineId": "saas",
+      "compulsoryFeatureLabels": [
+        "User Auth & Client Portal (Google/Magic Link)",
+        "Admin Dashboard & Role Access Control (RBAC)"
+      ]
+    },
+    {
+      "id": "ai_rag_app",
+      "label": "🤖 Custom AI & Vector RAG Platform",
+      "shortLabel": "AI RAG Platform",
+      "description": "Private document knowledge base, AI search, and assistant",
+      "recommendedEngineId": "saas",
+      "compulsoryFeatureLabels": [
+        "Private AI Knowledge Base / Vector Search (RAG)",
+        "User Auth & Client Portal (Google/Magic Link)",
+        "Admin Dashboard & Role Access Control (RBAC)"
+      ]
+    },
+    {
+      "id": "custom",
+      "label": "⚙️ Custom Web Application (Bespoke Scope)",
+      "shortLabel": "Custom Scope",
+      "description": "Tailored requirements with flexible component picking",
+      "recommendedEngineId": "landing",
+      "compulsoryFeatureLabels": []
+    }
+  ],
+  "brandAssets": [
+    { "id": "ready", "label": "All Brand Assets Ready (Logo SVG & Copywriting)", "priceINR": 0, "priceUSD": 0, "description": "Client supplies vector logo, color kit, and text content." },
+    { "id": "copy", "label": "Need Technical Copywriting & Section Formatting", "priceINR": 10000, "priceUSD": 120, "description": "Professional tech copywriting, tagline crafting, and bullet formatting." },
+    { "id": "scratch", "label": "Starting from Scratch (Full Brand Kit & Copy)", "priceINR": 18000, "priceUSD": 220, "description": "Vector logo design, color palette, typography pairing, and copywriting." }
+  ],
+  "maintenancePlans": [
+    {
+      "id": "basic",
+      "name": "Basic Care Plan",
+      "priceINR": 2500,
+      "priceUSD": 30,
+      "period": "/ month",
+      "badge": "💡 Recommended for Landing Pages",
+      "laymanDescription": "Keeps your server healthy, creates daily automated database backups, installs security patches, and ensures your site stays online 24/7.",
+      "techSpecs": "Vercel/Supabase Uptime Monitoring, Daily PostgreSQL Backups, SSL Renewals, Security Dependency Updates",
+      "includes": ["Hosting support & SSL management", "Daily automated database backups", "Dependency & security patching", "Minor bug fixes & uptime monitoring"]
+    },
+    {
+      "id": "standard",
+      "name": "Standard Care Plan",
+      "priceINR": 6500,
+      "priceUSD": 80,
+      "period": "/ month",
+      "badge": "💡 Recommended for Auth/Payments/CMS",
+      "laymanDescription": "Includes everything in Basic plus up to 4 hours of monthly developer support to edit text, swap images, update pages, or tweak designs whenever you need.",
+      "techSpecs": "Everything in Basic + 2-4 Hours Monthly Dev Allocation, Core Web Vitals Performance Tuning, Content Schema Updates",
+      "includes": ["Everything in Basic Care", "Monthly text & media content updates", "2–4 hours of dedicated dev time/month", "Performance & page speed tuning"]
+    },
+    {
+      "id": "premium",
+      "name": "Premium AI & Dev SLA Care Plan",
+      "priceINR": 15000,
+      "priceUSD": 180,
+      "period": "/ month",
+      "badge": "💡 Recommended for AI Chatbot & RAG Engines",
+      "laymanDescription": "For critical business apps and AI engines. Includes a guaranteed 24-hour emergency response time, AI model accuracy tuning, SEO reports, and dedicated dev hours.",
+      "techSpecs": "24-Hour Priority SLA, AI Vector Index Tuning & Latency Monitoring, SEO Analytics Reports, Dedicated Feature Engineering",
+      "includes": ["Priority 24-hour SLA response", "AI Vector DB & LLM latency monitoring", "Dedicated feature development hours", "Analytics & SEO health reports"]
+    },
+    {
+      "id": "self",
+      "name": "Self-Managed (Complimentary 30-Day Warranty)",
+      "priceINR": 0,
+      "priceUSD": 0,
+      "period": "",
+      "badge": "30-Day Warranty Included",
+      "laymanDescription": "Includes 30 days of complimentary technical support post-launch. Client manages cloud hosting and database updates afterwards.",
+      "techSpecs": "30-Day Post-Launch Bug Warranty, Developer Handover Documentation",
+      "includes": ["30 days complimentary post-launch support", "Client manages cloud hosting & patches afterwards"]
+    }
+  ]
+}

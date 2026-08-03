@@ -14,6 +14,8 @@ This document serves as the registry of critical architectural design decisions 
 * [ADR 04: Dual-Write Content Platform with JSON Fallbacks](#adr-04-dual-write-content-platform-with-json-fallbacks)
 * [ADR 05: Portal Modals to Escape ScrollSection Containing Block](#adr-05-portal-modals-to-escape-scrollsection-containing-block)
 * [ADR 06: Visual Redesign from Legacy Zine to Modern Card Aesthetic](#adr-06-visual-redesign-from-legacy-zine-to-modern-card-aesthetic)
+* [ADR 07: Config-Driven Sales Partner Agreement with Single Prose Source](#adr-07-config-driven-sales-partner-agreement-with-single-prose-source)
+* [ADR 08: Config-Driven Scoping Questionnaire with Shared Defaults JSON](#adr-08-config-driven-scoping-questionnaire-with-shared-defaults-json)
 
 ---
 
@@ -99,6 +101,23 @@ This document serves as the registry of critical architectural design decisions 
 * **Consequences**:
   * **Pros**: Whole agreement editable from the CMS without code changes; commission/recurring rows and signature block stay consistent; prose lives in one canonical JSON.
   * **Cons**: The two renderers (TSX + mjs) must remain manually in sync (a header comment enforces this); legal text is not versioned per-partner beyond the profile JSON.
+
+---
+
+# **ADR 08: Config-Driven Scoping Questionnaire with Shared Defaults JSON**
+
+* **Status**: Approved
+* **Context**: The Project Scoping Lab wizard (`IntakeForm.tsx`) hard-coded its pricing config (base engines, feature modules, goal archetypes, brand asset tiers, care plans) as five exported TypeScript constant arrays, and the scoping page renders the wizard with profile data (`intake.*`). Editing prices or archetypes required code changes; the synchronizer had no way to adjust the questionnaire.
+* **Decision**: The wizard config became data-driven with a three-tier fallback:
+  * `src/data/intakeQuestionnaireDefaults.json` is the single source of default config, shared by `IntakeForm.tsx`, the synchronizer's **🧾 Scoping Questionnaire** tab, and `seed_supabase.py` (which merges defaults into freshly seeded `profile.data.intake`).
+  * The wizard resolves each section in this order: `intake.<section>` from profile data (Supabase, with local fallback) → JSON defaults → nothing. No TS-side duplication of the config.
+  * The five item interfaces moved to `src/data/resume.ts` and `IntakeConfig` gained optional `engines/features/goals/brandAssets/maintenancePlans` arrays (no schema migration needed — optional keys).
+  * `IntakeForm.tsx` keeps compatibility re-exports (`BASE_ENGINES`, `FEATURE_MODULES`, `GOAL_ARCHETYPES`, `BRAND_ASSET_OPTIONS`, `MAINTENANCE_PLANS`) backed by the defaults JSON.
+  * The synchronizer tab edits all five sections plus timeline options via `st.data_editor` grids (nested list fields comma-encoded), runs `validate_questionnaire()` in `scripts/sync_validation.py` before persisting (duplicate IDs, unknown engine references, unknown feature labels, non-negative prices), saves through the standard `write_resume_file()` pipeline (Supabase → `src/data/resume.json` → revalidation), and offers a "Reset to Defaults" button.
+  * The Services & Pricing Guide PDF (`ServicesAndPricingPDF.tsx`) renders its base-engine and care-plan tables from the same `intake.engines` / `intake.maintenancePlans` config (exact prices), so synchronizer price edits propagate to the downloaded guide; the guide keeps a static "Tier 4: Enterprise AI RAG" bespoke-quote row that has no engine-pricing source.
+* **Consequences**:
+  * **Pros**: Pricing tiers and archetype mapping editable from the CMS without code changes; single canonical JSON keeps site, synchronizer, and seed script in sync; validation catches broken references before they reach production.
+  * **Cons**: Deep-link presets (`?engine=…`, `?goal=…`) silently fall back to `goals[0]` if an edited config removes a referenced id; the defaults JSON must be kept in sync with any future TS consumers.
 
 ---
 

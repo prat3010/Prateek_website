@@ -360,7 +360,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                       </div>
                       <h4 className={styles.scopingCtaTitle}>Ready to Scope Your Next Project?</h4>
                       <p className={styles.scopingCtaText}>
-                        Launch our interactive 4-step Scoping Brief Wizard to define your features, budget, and timeline in under 2 minutes.
+                        Launch the Project Scoping Lab & Instant Quote wizard to configure your build tier, add-ons, and care plan in under 2 minutes.
                       </p>
                       <Link href="/scoping" className={styles.scopingCtaBtn}>
                         <Rocket size={16} />

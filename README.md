@@ -98,6 +98,8 @@ The project includes a Streamlit-based local dashboard to manage resume details,
 
 The synchronizer entry point is `scripts/synchronizer.py`. Tab-specific views and helper functions reside under `scripts/sync_tabs/`. Shared safety helpers live in `scripts/sync_supabase.py`, `scripts/sync_json.py`, `scripts/sync_validation.py`, `scripts/sync_assets.py`, and `scripts/sync_git.py`.
 
+The **🧾 Scoping Questionnaire** tab edits the `/scoping` wizard's config (base engine tiers, feature modules, goal archetypes, brand asset tiers, care plans, timeline options) via editable grids, with validation before persistence and a reset-to-defaults button backed by `src/data/intakeQuestionnaireDefaults.json`.
+
 #### Run the Synchronizer:
 
 ```bash

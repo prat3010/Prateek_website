@@ -16,7 +16,15 @@ import {
   Lock
 } from 'lucide-react';
 import { generateQuestionnairePDF } from '@/utils/pdfGenerator';
-import type { ResumeData } from '@/data/resume';
+import type {
+  BaseEngineItem,
+  BrandAssetOption,
+  FeatureItem,
+  GoalArchetype,
+  MaintenancePlanOption,
+  ResumeData
+} from '@/data/resume';
+import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
 import styles from './IntakeForm.module.css';
 
 const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
@@ -41,288 +49,44 @@ interface IntakeFormProps {
   initialPreset?: IntakePreset | null;
 }
 
-export interface BaseEngineItem {
-  id: string;
-  title: string;
-  tier: string;
-  priceINR: number;
-  priceUSD: number;
-  laymanDescription: string;
-  techSpecs: string;
-}
+export type {
+  BaseEngineItem,
+  BrandAssetOption,
+  FeatureItem,
+  GoalArchetype,
+  MaintenancePlanOption,
+};
 
-export const BASE_ENGINES: BaseEngineItem[] = [
-  { 
-    id: 'landing', 
-    title: 'Landing Page Core Engine', 
-    tier: 'Tier 1', 
-    priceINR: 25000, 
-    priceUSD: 300, 
-    laymanDescription: 'A single, ultra-fast, high-converting webpage built to capture leads, showcase your brand, and turn visitors into clients.',
-    techSpecs: 'Next.js 16 App Router, Responsive Motion UI, Tailwind/CSS Modules, ReCAPTCHA v3, Telemetry, SEO Schema'
-  },
-  { 
-    id: 'multipage', 
-    title: 'Multi-Page Web App Core Engine', 
-    tier: 'Tier 2', 
-    priceINR: 45000, 
-    priceUSD: 550, 
-    laymanDescription: 'A complete multi-page business website (Home, About, Services, Case Studies, Contact) with smooth page transitions and consistent branding.',
-    techSpecs: 'Multi-page routing (3–6 pages), Framer Motion Page Transitions, Shared Layout Shell, Dynamic Routes'
-  },
-  { 
-    id: 'saas', 
-    title: 'Full-Stack SaaS MVP Core Engine', 
-    tier: 'Tier 3', 
-    priceINR: 75000, 
-    priceUSD: 950, 
-    laymanDescription: 'A production software foundation connected to a cloud database for web apps where users create accounts, manage data, and run software workflows.',
-    techSpecs: 'Full Web App Shell, Supabase PostgreSQL Architecture, Server Caching (unstable_cache), Production Vercel Wiring'
-  }
-];
-
-export interface FeatureItem {
-  id: string;
-  label: string;
-  priceINR: number;
-  priceUSD: number;
-  laymanDescription: string;
-  techSpecs: string;
-}
-
-export const FEATURE_MODULES: FeatureItem[] = [
-  { 
-    id: 'auth', 
-    label: 'User Auth & Client Portal (Google/Magic Link)', 
-    priceINR: 20000, 
-    priceUSD: 240, 
-    laymanDescription: 'Allows your customers to securely sign in using Google or Email links and access their private personal dashboard.',
-    techSpecs: 'Google OAuth 2.0, Passwordless Magic Links, Supabase Row-Level Security (RLS), Encrypted Session Tokens'
-  },
-  { 
-    id: 'payments', 
-    label: 'Payment Gateway Integration (Stripe/Razorpay)', 
-    priceINR: 25000, 
-    priceUSD: 300, 
-    laymanDescription: 'Enables your website to collect payments via Credit Cards, Apple Pay, UPI, or subscriptions with automatic digital invoicing.',
-    techSpecs: 'Stripe & Razorpay Webhook Listeners, 1-Click Checkout, Recurring Billing, PCI DSS Compliance setup'
-  },
-  { 
-    id: 'cms', 
-    label: 'Headless Blog & CMS Content Management', 
-    priceINR: 18000, 
-    priceUSD: 220, 
-    laymanDescription: 'Gives you an easy backend manager to publish blog posts, news, or case studies anytime without touching code, boosting your Google ranking.',
-    techSpecs: 'Markdown Parser, Supabase DB Content Tables, On-Demand Cache Revalidation (/api/revalidate), OpenGraph SEO'
-  },
-  { 
-    id: 'ai_rag', 
-    label: 'Private AI Knowledge Base / Vector Search (RAG)', 
-    priceINR: 35000, 
-    priceUSD: 420, 
-    laymanDescription: 'An intelligent AI assistant trained exclusively on your business documents, FAQs, and PDFs that answers customer questions 24/7 with source citations.',
-    techSpecs: 'pgvector Vector Embeddings, Document Chunking Pipeline, Semantic Search, Presigned Citation Downloads, Feedback Telemetry'
-  },
-  { 
-    id: 'admin', 
-    label: 'Admin Dashboard & Role Access Control (RBAC)', 
-    priceINR: 30000, 
-    priceUSD: 360, 
-    laymanDescription: 'A private internal command center for you and your team to view real-time traffic, manage customer data, and assign staff permissions.',
-    techSpecs: 'Single-Pass SQL RPC Aggregations (get_analytics_summary), Visitor Analytics Charts, Content Forms, Admin Security Guards'
-  },
-  { 
-    id: 'email', 
-    label: 'Automated Email Workflows (Resend Transactional)', 
-    priceINR: 12000, 
-    priceUSD: 140, 
-    laymanDescription: 'Sends instant, professionally branded email receipts, welcome sequences, or contact notifications directly to your clients whenever they take action.',
-    techSpecs: 'Resend Transactional API, Custom HTML Templates, SMTP Fallbacks, Delivery Failure Telemetry'
-  }
-];
-
-export interface GoalArchetype {
-  id: string;
-  label: string;
-  shortLabel: string;
-  description: string;
-  recommendedEngineId: string;
-  compulsoryFeatureLabels: string[];
-}
-
-export const GOAL_ARCHETYPES: GoalArchetype[] = [
-  {
-    id: 'landing_page',
-    label: '⚡ High-Converting Landing Page',
-    shortLabel: 'Landing Page',
-    description: 'Single-page lead generation or product launch page',
-    recommendedEngineId: 'landing',
-    compulsoryFeatureLabels: ['Automated Email Workflows (Resend Transactional)'],
-  },
-  {
-    id: 'business_multipage',
-    label: '🏢 Multi-Page Business Website',
-    shortLabel: 'Business Web',
-    description: 'Corporate profile with services, showcase, and blog',
-    recommendedEngineId: 'multipage',
-    compulsoryFeatureLabels: ['Automated Email Workflows (Resend Transactional)'],
-  },
-  {
-    id: 'ecommerce',
-    label: '🛒 E-commerce & Digital Store',
-    shortLabel: 'E-commerce',
-    description: 'Product catalog, shopping cart, and online payments',
-    recommendedEngineId: 'multipage',
-    compulsoryFeatureLabels: [
-      'Payment Gateway Integration (Stripe/Razorpay)',
-      'User Auth & Client Portal (Google/Magic Link)',
-      'Automated Email Workflows (Resend Transactional)'
-    ],
-  },
-  {
-    id: 'booking_appointments',
-    label: '📅 Booking & Appointment Platform',
-    shortLabel: 'Booking Platform',
-    description: 'Reservation scheduling, calendar sync, and upfront deposits',
-    recommendedEngineId: 'multipage',
-    compulsoryFeatureLabels: [
-      'Payment Gateway Integration (Stripe/Razorpay)',
-      'Automated Email Workflows (Resend Transactional)'
-    ],
-  },
-  {
-    id: 'saas_app',
-    label: '🚀 Full-Stack SaaS Web Application',
-    shortLabel: 'SaaS MVP',
-    description: 'User accounts, interactive dashboards, and subscriptions',
-    recommendedEngineId: 'saas',
-    compulsoryFeatureLabels: [
-      'User Auth & Client Portal (Google/Magic Link)',
-      'Payment Gateway Integration (Stripe/Razorpay)',
-      'Admin Dashboard & Role Access Control (RBAC)'
-    ],
-  },
-  {
-    id: 'lms_portal',
-    label: '🎓 LMS & Online Course Portal',
-    shortLabel: 'LMS Portal',
-    description: 'Student accounts, course player, and subscription billing',
-    recommendedEngineId: 'saas',
-    compulsoryFeatureLabels: [
-      'User Auth & Client Portal (Google/Magic Link)',
-      'Payment Gateway Integration (Stripe/Razorpay)',
-      'Headless Blog & CMS Content Management'
-    ],
-  },
-  {
-    id: 'crm_admin',
-    label: '📊 Internal CRM / Admin Control Center',
-    shortLabel: 'Admin CRM',
-    description: 'Private business dashboard, data management, and staff roles',
-    recommendedEngineId: 'saas',
-    compulsoryFeatureLabels: [
-      'User Auth & Client Portal (Google/Magic Link)',
-      'Admin Dashboard & Role Access Control (RBAC)'
-    ],
-  },
-  {
-    id: 'ai_rag_app',
-    label: '🤖 Custom AI & Vector RAG Platform',
-    shortLabel: 'AI RAG Platform',
-    description: 'Private document knowledge base, AI search, and assistant',
-    recommendedEngineId: 'saas',
-    compulsoryFeatureLabels: [
-      'Private AI Knowledge Base / Vector Search (RAG)',
-      'User Auth & Client Portal (Google/Magic Link)',
-      'Admin Dashboard & Role Access Control (RBAC)'
-    ],
-  },
-  {
-    id: 'custom',
-    label: '⚙️ Custom Web Application (Bespoke Scope)',
-    shortLabel: 'Custom Scope',
-    description: 'Tailored requirements with flexible component picking',
-    recommendedEngineId: 'landing',
-    compulsoryFeatureLabels: [],
-  },
-];
-
-export interface BrandAssetOption {
-  id: string;
-  label: string;
-  priceINR: number;
-  priceUSD: number;
-  description: string;
-}
-
-export const BRAND_ASSET_OPTIONS: BrandAssetOption[] = [
-  { id: 'ready', label: 'All Brand Assets Ready (Logo SVG & Copywriting)', priceINR: 0, priceUSD: 0, description: 'Client supplies vector logo, color kit, and text content.' },
-  { id: 'copy', label: 'Need Technical Copywriting & Section Formatting', priceINR: 10000, priceUSD: 120, description: 'Professional tech copywriting, tagline crafting, and bullet formatting.' },
-  { id: 'scratch', label: 'Starting from Scratch (Full Brand Kit & Copy)', priceINR: 18000, priceUSD: 220, description: 'Vector logo design, color palette, typography pairing, and copywriting.' }
-];
-
-export interface MaintenancePlanOption {
-  id: string;
-  name: string;
-  priceINR: number;
-  priceUSD: number;
-  period: string;
-  badge: string;
-  laymanDescription: string;
-  techSpecs: string;
-  includes: string[];
-}
-
-export const MAINTENANCE_PLANS: MaintenancePlanOption[] = [
-  {
-    id: 'basic',
-    name: 'Basic Care Plan',
-    priceINR: 2500,
-    priceUSD: 30,
-    period: '/ month',
-    badge: '💡 Recommended for Landing Pages',
-    laymanDescription: 'Keeps your server healthy, creates daily automated database backups, installs security patches, and ensures your site stays online 24/7.',
-    techSpecs: 'Vercel/Supabase Uptime Monitoring, Daily PostgreSQL Backups, SSL Renewals, Security Dependency Updates',
-    includes: ['Hosting support & SSL management', 'Daily automated database backups', 'Dependency & security patching', 'Minor bug fixes & uptime monitoring']
-  },
-  {
-    id: 'standard',
-    name: 'Standard Care Plan',
-    priceINR: 6500,
-    priceUSD: 80,
-    period: '/ month',
-    badge: '💡 Recommended for Auth/Payments/CMS',
-    laymanDescription: 'Includes everything in Basic plus up to 4 hours of monthly developer support to edit text, swap images, update pages, or tweak designs whenever you need.',
-    techSpecs: 'Everything in Basic + 2-4 Hours Monthly Dev Allocation, Core Web Vitals Performance Tuning, Content Schema Updates',
-    includes: ['Everything in Basic Care', 'Monthly text & media content updates', '2–4 hours of dedicated dev time/month', 'Performance & page speed tuning']
-  },
-  {
-    id: 'premium',
-    name: 'Premium AI & Dev SLA Care Plan',
-    priceINR: 15000,
-    priceUSD: 180,
-    period: '/ month',
-    badge: '💡 Recommended for AI Chatbot & RAG Engines',
-    laymanDescription: 'For critical business apps and AI engines. Includes a guaranteed 24-hour emergency response time, AI model accuracy tuning, SEO reports, and dedicated dev hours.',
-    techSpecs: '24-Hour Priority SLA, AI Vector Index Tuning & Latency Monitoring, SEO Analytics Reports, Dedicated Feature Engineering',
-    includes: ['Priority 24-hour SLA response', 'AI Vector DB & LLM latency monitoring', 'Dedicated feature development hours', 'Analytics & SEO health reports']
-  },
-  {
-    id: 'self',
-    name: 'Self-Managed (Complimentary 30-Day Warranty)',
-    priceINR: 0,
-    priceUSD: 0,
-    period: '',
-    badge: '30-Day Warranty Included',
-    laymanDescription: 'Includes 30 days of complimentary technical support post-launch. Client manages cloud hosting and database updates afterwards.',
-    techSpecs: '30-Day Post-Launch Bug Warranty, Developer Handover Documentation',
-    includes: ['30 days complimentary post-launch support', 'Client manages cloud hosting & patches afterwards']
-  }
-];
+export const BASE_ENGINES: BaseEngineItem[] = questionnaireDefaults.engines;
+export const FEATURE_MODULES: FeatureItem[] = questionnaireDefaults.features;
+export const GOAL_ARCHETYPES: GoalArchetype[] = questionnaireDefaults.goals;
+export const BRAND_ASSET_OPTIONS: BrandAssetOption[] = questionnaireDefaults.brandAssets;
+export const MAINTENANCE_PLANS: MaintenancePlanOption[] = questionnaireDefaults.maintenancePlans;
 
 export default function IntakeForm({ resumeData, initialPreset = null }: IntakeFormProps) {
   const intakeConfig = resumeData?.intake;
 
+  const engines = useMemo(
+    () => (intakeConfig?.engines?.length ? intakeConfig.engines : BASE_ENGINES),
+    [intakeConfig]
+  );
+  const features = useMemo(
+    () => (intakeConfig?.features?.length ? intakeConfig.features : FEATURE_MODULES),
+    [intakeConfig]
+  );
+  const goals = useMemo(
+    () => (intakeConfig?.goals?.length ? intakeConfig.goals : GOAL_ARCHETYPES),
+    [intakeConfig]
+  );
+  const brandAssets = useMemo(
+    () => (intakeConfig?.brandAssets?.length ? intakeConfig.brandAssets : BRAND_ASSET_OPTIONS),
+    [intakeConfig]
+  );
+  const maintenancePlans = useMemo(
+    () =>
+      intakeConfig?.maintenancePlans?.length ? intakeConfig.maintenancePlans : MAINTENANCE_PLANS,
+    [intakeConfig]
+  );
   const timelineOptions = intakeConfig?.timelineOptions || [
     'Express Delivery Sprint (7–10 Days - Rush Fee Applies)',
     'Standard Turnaround (2–4 Weeks)',
@@ -348,13 +112,13 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   // Resolve deep-link preset (engine or goal archetype) to the wizard's initial selections
   const initialArchetype = useMemo(() => {
     if (initialPreset?.goalId) {
-      return GOAL_ARCHETYPES.find(g => g.id === initialPreset.goalId) || GOAL_ARCHETYPES[0];
+      return goals.find(g => g.id === initialPreset.goalId) || goals[0];
     }
     if (initialPreset?.engineId) {
-      return GOAL_ARCHETYPES.find(g => g.recommendedEngineId === initialPreset.engineId) || GOAL_ARCHETYPES[0];
+      return goals.find(g => g.recommendedEngineId === initialPreset.engineId) || goals[0];
     }
-    return GOAL_ARCHETYPES[0];
-  }, [initialPreset]);
+    return goals[0];
+  }, [initialPreset, goals]);
 
   const [formData, setFormData] = useState({
     companyName: '',
@@ -364,7 +128,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     targetAudience: '',
     selectedBaseEngineId: initialArchetype.recommendedEngineId,
     selectedFeatures: [...initialArchetype.compulsoryFeatureLabels],
-    selectedBrandAssetId: BRAND_ASSET_OPTIONS[0].id,
+    selectedBrandAssetId: brandAssets[0]?.id || '',
     selectedMaintenanceId: '',
     inspirationLinks: '',
     timeline: timelineOptions[1] || timelineOptions[0],
@@ -379,11 +143,11 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   }, [formData.companyName, formData.contactEmail, formData.agreedToTerms]);
 
   const currentArchetype = useMemo(() => {
-    return GOAL_ARCHETYPES.find(g => g.label === formData.projectGoal) || GOAL_ARCHETYPES[0];
-  }, [formData.projectGoal]);
+    return goals.find(g => g.label === formData.projectGoal) || goals[0];
+  }, [formData.projectGoal, goals]);
 
   const handleGoalChange = (newGoalLabel: string) => {
-    const archetype = GOAL_ARCHETYPES.find(g => g.label === newGoalLabel) || GOAL_ARCHETYPES[0];
+    const archetype = goals.find(g => g.label === newGoalLabel) || goals[0];
     const newEngineId = archetype.recommendedEngineId;
     
     // Auto-merge compulsory features
@@ -419,8 +183,8 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   };
 
   const selectedEngine = useMemo(() => {
-    return BASE_ENGINES.find(e => e.id === formData.selectedBaseEngineId) || BASE_ENGINES[0];
-  }, [formData.selectedBaseEngineId]);
+    return engines.find(e => e.id === formData.selectedBaseEngineId) || engines[0];
+  }, [formData.selectedBaseEngineId, engines]);
 
   // Smart Maintenance Auto-Selection
   const autoMaintenancePlanId = useMemo(() => {
@@ -441,7 +205,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     let featuresUSD = 0;
     const itemizedList: string[] = [];
 
-    FEATURE_MODULES.forEach(m => {
+    features.forEach(m => {
       if (formData.selectedFeatures.includes(m.label)) {
         featuresINR += m.priceINR;
         featuresUSD += m.priceUSD;
@@ -449,18 +213,18 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
       }
     });
 
-    const brandOpt = BRAND_ASSET_OPTIONS.find(b => b.id === formData.selectedBrandAssetId) || BRAND_ASSET_OPTIONS[0];
+    const brandOpt = brandAssets.find(b => b.id === formData.selectedBrandAssetId) || brandAssets[0];
 
     const totalINR = baseINR + featuresINR + brandOpt.priceINR;
     const totalUSD = baseUSD + featuresUSD + brandOpt.priceUSD;
 
     return { totalINR, totalUSD, baseINR, baseUSD, featuresINR, featuresUSD, brandOpt, itemizedList };
-  }, [selectedEngine, formData.selectedFeatures, formData.selectedBrandAssetId]);
+  }, [selectedEngine, features, brandAssets, formData.selectedFeatures, formData.selectedBrandAssetId]);
 
   const activeMaintenancePlan = useMemo(() => {
     const targetId = formData.selectedMaintenanceId || autoMaintenancePlanId;
-    return MAINTENANCE_PLANS.find(p => p.id === targetId) || MAINTENANCE_PLANS[1];
-  }, [formData.selectedMaintenanceId, autoMaintenancePlanId]);
+    return maintenancePlans.find(p => p.id === targetId) || maintenancePlans[1];
+  }, [formData.selectedMaintenanceId, autoMaintenancePlanId, maintenancePlans]);
 
   const handleDownloadPDF = () => {
     generateQuestionnairePDF(resumeData, {
@@ -685,7 +449,7 @@ Notes: ${formData.additionalNotes}
                         value={formData.projectGoal}
                         onChange={e => handleGoalChange(e.target.value)}
                       >
-                        {GOAL_ARCHETYPES.map(g => (
+                        {goals.map(g => (
                           <option key={g.id} value={g.label}>
                             {g.label} — {g.description}
                           </option>
@@ -722,7 +486,7 @@ Notes: ${formData.additionalNotes}
                       Select Base Platform Foundation Engine
                     </label>
                     <div className={styles.checkboxGrid}>
-                      {BASE_ENGINES.map(e => {
+                      {engines.map(e => {
                         const isSelected = formData.selectedBaseEngineId === e.id;
                         const isPopoverOpen = activePopoverId === e.id;
                         return (
@@ -775,7 +539,7 @@ Notes: ${formData.additionalNotes}
                   <div className={styles.field}>
                     <label className={styles.label}>Select Architecture Add-on Modules (Pure Additive Pricing)</label>
                     <div className={styles.checkboxGrid}>
-                      {FEATURE_MODULES.map(m => {
+                      {features.map(m => {
                         const isCompulsory = currentArchetype.compulsoryFeatureLabels.includes(m.label);
                         const isChecked = isCompulsory || formData.selectedFeatures.includes(m.label);
                         const isPopoverOpen = activePopoverId === m.id;
@@ -855,7 +619,7 @@ Notes: ${formData.additionalNotes}
                   <div className={styles.field}>
                     <label className={styles.label}>Brand Readiness & Copywriting Add-on</label>
                     <div className={styles.checkboxGrid}>
-                      {BRAND_ASSET_OPTIONS.map(b => {
+                      {brandAssets.map(b => {
                         const isSelected = formData.selectedBrandAssetId === b.id;
                         return (
                           <label
@@ -928,7 +692,7 @@ Notes: ${formData.additionalNotes}
                   <div className={styles.field}>
                     <label className={styles.label}>Select Monthly Maintenance & SLA Care Plan</label>
                     <div className={styles.careGrid}>
-                      {MAINTENANCE_PLANS.map(p => {
+                      {maintenancePlans.map(p => {
                         const isSelected = (formData.selectedMaintenanceId || autoMaintenancePlanId) === p.id;
                         const isAutoRecommended = autoMaintenancePlanId === p.id;
                         const isPopoverOpen = activePopoverId === p.id;

@@ -148,6 +148,16 @@ except Exception as e:
     resume_data = None
 
 if resume_data:
+    intake = resume_data.setdefault('intake', {})
+    try:
+        with open(os.path.join(ROOT, 'src', 'data', 'intakeQuestionnaireDefaults.json'), 'r') as f:
+            questionnaire_defaults = json.load(f)
+    except Exception as e:
+        print(f'  Failed to load intakeQuestionnaireDefaults.json: {e}')
+        questionnaire_defaults = {}
+    for key, fallback in questionnaire_defaults.items():
+        if not isinstance(intake.get(key), list) or not intake.get(key):
+            intake[key] = fallback
     row = {'id': 1, 'data': resume_data}
     upsert('profile', [row], 'id')
 print('  resume profile synced')
