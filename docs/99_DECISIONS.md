@@ -87,6 +87,21 @@ This document serves as the registry of critical architectural design decisions 
 
 ---
 
+# **ADR 07: Config-Driven Sales Partner Agreement with Single Prose Source**
+
+* **Status**: Approved
+* **Context**: The Middleman Partnership Agreement was hard-coded as a fixed 2-page document duplicated across `src/components/pdf/MiddlemanAgreementPDF.tsx`, `scripts/generate-middleman-pdf.mjs`, and `SiteInfoConsole`, with editable rule arrays (`disbursementRules`/`confidentialityRules`) that the PDF renderers ignored. Editing prose required code changes in three places.
+* **Decision**: The agreement became a flowing, fully config-driven document:
+  * `src/data/middlemanAgreementDefaults.json` is the single source of default prose (13 numbered sections + signature + "Agreed Electronically" clause), with `{{token}}` placeholders (`partnerName`, `developerName`, etc.) substituted at render time.
+  * `middlemanAgreement.sections` in the profile data (Supabase + local fallback) overrides defaults per partner; both PDF renderers fall back to the defaults JSON when sections are absent (no schema migration).
+  * Both renderers now use a single flowing `<Page>` with live `Page N of Y` footers via `@react-pdf/renderer` v4 `Text.render` (index.d.ts:241-248), removing the hard-coded 2-page assumption.
+  * The synchronizer's Partner & Scoping tab exposes per-section heading/line editors and a "Reset Agreement Prose to Defaults" button.
+* **Consequences**:
+  * **Pros**: Whole agreement editable from the CMS without code changes; commission/recurring rows and signature block stay consistent; prose lives in one canonical JSON.
+  * **Cons**: The two renderers (TSX + mjs) must remain manually in sync (a header comment enforces this); legal text is not versioned per-partner beyond the profile JSON.
+
+---
+
 # **Acceptance Criteria**
 - Registry records cover the core v2 architectural choices.
 - Format follows standard ADR structures (Context, Decision, Consequences).

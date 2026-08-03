@@ -2,28 +2,67 @@ import ReactPDF from '@react-pdf/renderer';
 import React from 'react';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+// NOTE: This script must stay in sync with src/components/pdf/MiddlemanAgreementPDF.tsx
+// (the site's canonical renderer). Both consume the same defaults JSON and config shape.
 
 const { Document, Page, Text, View, StyleSheet, Svg, Line } = ReactPDF;
 const h = React.createElement;
 
-async function generateMiddlemanAgreementPDF() {
-  const resumeJsonPath = path.join(process.cwd(), 'src', 'data', 'resume.json');
+function fillTokens(text, tokens) {
+  return text.replace(/\{\{(\w+)\}\}/g, (match, key) => tokens[key] ?? match);
+}
+
+async function generateMiddlemanAgreementPDF({ configPath, outputPath }) {
   let resumeData = {};
-  try {
-    resumeData = JSON.parse(fs.readFileSync(resumeJsonPath, 'utf8'));
-  } catch (e) {
-    console.warn('Could not load resume.json, using defaults:', e);
+  if (configPath) {
+    try {
+      resumeData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    } catch (e) {
+      console.warn('Could not load --config JSON, falling back to resume.json:', e);
+    }
+  }
+  if (!resumeData?.intake?.middlemanAgreement) {
+    const resumeJsonPath = path.join(process.cwd(), 'src', 'data', 'resume.json');
+    try {
+      resumeData = JSON.parse(fs.readFileSync(resumeJsonPath, 'utf8'));
+    } catch (e) {
+      console.warn('Could not load resume.json, using defaults:', e);
+    }
   }
 
+  const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+  const defaultsPath = path.join(scriptDir, '..', 'src', 'data', 'middlemanAgreementDefaults.json');
+  const defaults = JSON.parse(fs.readFileSync(defaultsPath, 'utf8'));
+  const scalars = defaults.scalars;
+
   const mm = resumeData?.intake?.middlemanAgreement || {};
-  const partnerName = mm.partnerName || '[Partner Name]';
+  const partnerName = mm.partnerName || scalars.partnerName || '[Partner Name]';
+  const partnerEmail = mm.partnerEmail || scalars.partnerEmail || '';
   const presentDateStr = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
   const effectiveDate = mm.effectiveDate && mm.effectiveDate.trim() ? mm.effectiveDate : presentDateStr;
-  const devName = mm.developerName || 'Prateeq Sharma';
-  const devEmail = mm.developerEmail || '3010prateeksharma@gmail.com';
-  const tier1Cut = mm.tier1Commission || '10%';
-  const tier2Cut = mm.tier2Commission || '12%';
-  const tier3Cut = mm.tier3Commission || '15%';
+  const devName = mm.developerName || scalars.developerName || 'Prateeq Sharma';
+  const devEmail = mm.developerEmail || scalars.developerEmail || '3010prateeksharma@gmail.com';
+  const tier1Cut = mm.tier1Commission || scalars.tier1Commission || '10%';
+  const tier2Cut = mm.tier2Commission || scalars.tier2Commission || '12%';
+  const tier3Cut = mm.tier3Commission || scalars.tier3Commission || '15%';
+  const recurringCut = mm.recurringCommission || scalars.recurringCommission || '10%';
+  const agreedElectronically = mm.agreedElectronically || scalars.agreedElectronically || '';
+
+  const tokens = {
+    developerName: devName,
+    partnerName,
+    partnerEmail,
+    developerEmail: devEmail,
+    effectiveDate,
+  };
+
+  const sections = (mm.sections && mm.sections.length ? mm.sections : defaults.sections).map((s) => ({
+    key: s.key,
+    heading: fillTokens(s.heading, tokens),
+    lines: s.lines.map((line) => fillTokens(line, tokens)),
+  }));
 
   const styles = StyleSheet.create({
     page: {
@@ -42,6 +81,8 @@ async function generateMiddlemanAgreementPDF() {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
+      borderWidth: 1,
+      borderColor: '#334155',
     },
     brandTitle: {
       fontSize: 12,
@@ -50,7 +91,7 @@ async function generateMiddlemanAgreementPDF() {
     },
     brandSub: {
       fontSize: 7.5,
-      color: '#CBD5E1',
+      color: '#94A3B8',
       marginTop: 2,
     },
     docHeader: {
@@ -100,13 +141,29 @@ async function generateMiddlemanAgreementPDF() {
       padding: '3 6',
       borderRadius: 3,
       marginBottom: 6,
-      marginTop: 4,
+      marginTop: 8,
     },
     paragraph: {
       fontSize: 8,
       lineHeight: 1.4,
-      color: '#334155',
+      color: '#475569',
       marginBottom: 6,
+    },
+    bulletRow: {
+      flexDirection: 'row',
+      marginBottom: 3,
+    },
+    bulletDot: {
+      width: 10,
+      fontSize: 8,
+      lineHeight: 1.4,
+      color: '#0284C7',
+    },
+    bulletText: {
+      flex: 1,
+      fontSize: 8,
+      lineHeight: 1.4,
+      color: '#475569',
     },
     table: {
       borderColor: '#CBD5E1',
@@ -117,7 +174,7 @@ async function generateMiddlemanAgreementPDF() {
     },
     tableHeader: {
       flexDirection: 'row',
-      backgroundColor: '#F1F5F9',
+      backgroundColor: '#F8FAFC',
       padding: 5,
       borderBottomWidth: 1,
       borderBottomColor: '#CBD5E1',
@@ -135,26 +192,7 @@ async function generateMiddlemanAgreementPDF() {
     },
     tableCell: {
       fontSize: 7.5,
-      color: '#334155',
-    },
-    sigContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginTop: 10,
-    },
-    sigBox: {
-      width: '48%',
-      borderColor: '#CBD5E1',
-      borderWidth: 1,
-      borderRadius: 4,
-      padding: 8,
-      height: 54,
-    },
-    sigTitle: {
-      fontFamily: 'Helvetica-Bold',
-      fontSize: 7,
-      color: '#64748B',
-      marginBottom: 10,
+      color: '#475569',
     },
     footer: {
       position: 'absolute',
@@ -171,16 +209,130 @@ async function generateMiddlemanAgreementPDF() {
       fontSize: 7,
       color: '#94A3B8',
     },
+    signatureGrid: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginTop: 4,
+    },
+    signatureBox: {
+      width: '48%',
+    },
+    signatureTitle: {
+      fontFamily: 'Helvetica-Bold',
+      fontSize: 8,
+      color: '#0F172A',
+      marginBottom: 8,
+      borderBottomWidth: 1,
+      borderBottomColor: '#E2E8F0',
+      paddingBottom: 4,
+    },
+    signatureLine: {
+      fontSize: 8.5,
+      color: '#475569',
+      marginBottom: 6,
+    },
+    agreedBox: {
+      marginTop: 8,
+      backgroundColor: '#F8FAFC',
+      borderColor: '#E2E8F0',
+      borderWidth: 1,
+      borderRadius: 4,
+      padding: 8,
+    },
+    agreedTitle: {
+      fontFamily: 'Helvetica-Bold',
+      fontSize: 7.5,
+      color: '#0284C7',
+      marginBottom: 3,
+    },
+    agreedText: {
+      fontSize: 7.5,
+      lineHeight: 1.4,
+      color: '#475569',
+    },
   });
 
-  const renderFooter = (pageNum) =>
-    h(View, { style: styles.footer, fixed: true },
-      h(Text, { style: styles.footerText }, 'SALES PARTNER & MIDDLEMAN AGREEMENT // CONFIDENTIAL'),
-      h(Text, { style: styles.footerText }, `Page ${pageNum} of 2 | https://prateeq.in`)
-    );
+  const renderSection = (section, index) => {
+    const isCommission = section.key === 'commission';
+    const isSignature = section.key === 'signature';
+
+    const children = [
+      h(Text, { key: 'title', style: styles.sectionTitle }, section.heading),
+      ...section.lines.map((line, lineIdx) => {
+        const isBullet = line.startsWith('- ');
+        return isBullet
+          ? h(View, { key: `line_${lineIdx}`, style: styles.bulletRow },
+              h(Text, { style: styles.bulletDot }, '\u2022'),
+              h(Text, { style: styles.bulletText }, line.slice(2))
+            )
+          : h(Text, { key: `line_${lineIdx}`, style: styles.paragraph }, line);
+      }),
+    ];
+
+    if (isCommission) {
+      children.push(
+        h(View, { key: 'commission_table', style: styles.table },
+          h(View, { style: styles.tableHeader },
+            h(Text, { style: [styles.tableCellBold, { width: '40%' }] }, 'PROJECT TIER & BUDGET RANGE'),
+            h(Text, { style: [styles.tableCellBold, { width: '30%' }] }, 'PARTNER COMMISSION'),
+            h(Text, { style: [styles.tableCellBold, { width: '30%' }] }, 'PAYOUT TIMELINE')
+          ),
+          h(View, { style: styles.tableRow },
+            h(Text, { style: [styles.tableCell, { width: '40%' }] }, 'Tier 1: Landing Page (INR 25k–45k / $300–$550)'),
+            h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }] }, tier1Cut),
+            h(Text, { style: [styles.tableCell, { width: '30%' }] }, 'Within 48h of Client 50% Deposit')
+          ),
+          h(View, { style: styles.tableRow },
+            h(Text, { style: [styles.tableCell, { width: '40%' }] }, 'Tier 2: Multi-Page Web App (INR 45k–90k / $550–$1.1k)'),
+            h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }] }, tier2Cut),
+            h(Text, { style: [styles.tableCell, { width: '30%' }] }, 'Within 48h of Client 50% Deposit')
+          ),
+          h(View, { style: styles.tableRow },
+            h(Text, { style: [styles.tableCell, { width: '40%' }] }, 'Tier 3: SaaS / AI RAG Engine (INR 90k–1.5L+ / $1.1k+)'),
+            h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }] }, tier3Cut),
+            h(Text, { style: [styles.tableCell, { width: '30%' }] }, 'Within 48h of Client 50% Deposit')
+          ),
+          h(View, { style: [styles.tableRow, { borderBottomWidth: 0 }] },
+            h(Text, { style: [styles.tableCell, { width: '40%' }] }, 'Recurring Care Plan (ongoing)'),
+            h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }] }, recurringCut),
+            h(Text, { style: [styles.tableCell, { width: '30%' }] }, 'Monthly on cleared Net Funds')
+          )
+        )
+      );
+    }
+
+    if (isSignature) {
+      children.push(
+        h(View, { key: 'signature_block', style: null },
+          h(View, { style: styles.signatureGrid },
+            h(View, { style: styles.signatureBox },
+              h(Text, { style: styles.signatureTitle }, 'DEVELOPER SIGNATURE'),
+              h(Text, { style: styles.signatureLine }, `NAME: ${devName}`),
+              h(Text, { style: styles.signatureLine }, `DATE: ${effectiveDate}`),
+              h(Text, { style: styles.signatureLine }, 'SIGN: _______________')
+            ),
+            h(View, { style: styles.signatureBox },
+              h(Text, { style: styles.signatureTitle }, 'PARTNER / SALES REP SIGNATURE'),
+              h(Text, { style: styles.signatureLine }, `NAME: ${partnerName}`),
+              h(Text, { style: styles.signatureLine }, `EMAIL: ${partnerEmail}`),
+              h(Text, { style: styles.signatureLine }, 'DATE: _______________'),
+              h(Text, { style: styles.signatureLine }, 'SIGN: _______________')
+            )
+          ),
+          agreedElectronically
+            ? h(View, { key: 'agreed_electronically', style: styles.agreedBox },
+                h(Text, { style: styles.agreedTitle }, 'AGREED ELECTRONICALLY'),
+                h(Text, { style: styles.agreedText }, agreedElectronically)
+              )
+            : null
+        )
+      );
+    }
+
+    return h(View, { key: section.key || index }, children);
+  };
 
   const docElement = h(Document, { title: `${partnerName.replace(/\s+/g, '_')}_Sales_Partner_Agreement` },
-    // PAGE 1
     h(Page, { size: 'A4', style: styles.page },
       h(View, { style: styles.headerBanner },
         h(View, null,
@@ -219,77 +371,34 @@ async function generateMiddlemanAgreementPDF() {
         ),
         h(View, { style: styles.metaCol },
           h(Text, { style: styles.metaLabel }, 'CONTACT EMAIL'),
-          h(Text, { style: styles.metaVal }, devEmail)
+          h(Text, { style: styles.metaVal }, `${devEmail}${partnerEmail ? ` / ${partnerEmail}` : ''}`)
         )
       ),
-      h(Text, { style: styles.sectionTitle }, '1. PURPOSE & ROLES OF ENGAGEMENT'),
-      h(Text, { style: styles.paragraph },
-        `This Agreement outlines the commercial terms, commission structure, payment schedules, and operational rules between ${devName} ("Developer") and ${partnerName} ("Sales Representative / Partner") for bringing client web development, custom software, and AI integration projects to the Developer.`
-      ),
-      h(Text, { style: styles.sectionTitle }, '2. COMMISSION TIER STRUCTURE & PAYOUT RATES'),
-      h(View, { style: styles.table },
-        h(View, { style: styles.tableHeader },
-          h(Text, { style: [styles.tableCellBold, { width: '40%' }] }, 'PROJECT TIER & BUDGET RANGE'),
-          h(Text, { style: [styles.tableCellBold, { width: '30%' }] }, 'PARTNER COMMISSION'),
-          h(Text, { style: [styles.tableCellBold, { width: '30%' }] }, 'PAYOUT TIMELINE')
-        ),
-        h(View, { style: styles.tableRow },
-          h(Text, { style: [styles.tableCell, { width: '40%' }] }, 'Tier 1: Landing Page (INR 25k–45k / $300–$550)'),
-          h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }] }, tier1Cut),
-          h(Text, { style: [styles.tableCell, { width: '30%' }] }, 'Within 48h of Client 50% Deposit')
-        ),
-        h(View, { style: styles.tableRow },
-          h(Text, { style: [styles.tableCell, { width: '40%' }] }, 'Tier 2: Multi-Page Web App (INR 45k–90k / $550–$1.1k)'),
-          h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }] }, tier2Cut),
-          h(Text, { style: [styles.tableCell, { width: '30%' }] }, 'Within 48h of Client 50% Deposit')
-        ),
-        h(View, { style: styles.tableRow },
-          h(Text, { style: [styles.tableCell, { width: '40%' }] }, 'Tier 3: SaaS / AI RAG Engine (INR 90k–1.5L+ / $1.1k+)'),
-          h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }] }, tier3Cut),
-          h(Text, { style: [styles.tableCell, { width: '30%' }] }, 'Within 48h of Client 50% Deposit')
-        )
-      ),
-      renderFooter(1)
-    ),
-
-    // PAGE 2
-    h(Page, { size: 'A4', style: styles.page },
-      h(View, { style: styles.docHeader },
-        h(Text, { style: styles.docTitle }, 'OPERATIONAL RULES & SIGN-OFF'),
-        h(Text, { style: styles.docMeta }, 'Prateeq Sharma | Engineering & Custom Web Builds | Page 2 of 2')
-      ),
-      h(Text, { style: styles.sectionTitle }, '3. CLIENT HANDOFF & PROJECT QUALIFICATION'),
-      h(Text, { style: styles.paragraph },
-        'The Partner introduces leads via warm email introduction or the Intake Scoping Form. Once a client signs the Scoping Specification and pays the 50% upfront deposit, the project is officially qualified and the Partner\'s commission is released within 48 business hours.'
-      ),
-      h(Text, { style: styles.sectionTitle }, '4. NON-CIRCUMVENTION & CONFIDENTIALITY'),
-      h(Text, { style: styles.paragraph },
-        'Developer agrees not to solicit or bypass Partner\'s direct clients without Partner\'s written consent. Partner agrees to keep Developer\'s rates, codebases, and technical architecture confidential.'
-      ),
-      h(Text, { style: styles.sectionTitle }, '5. SIGNATURE & AGREEMENT ACCEPTANCE'),
-      h(View, { style: styles.sigContainer },
-        h(View, { style: styles.sigBox },
-          h(Text, { style: styles.sigTitle }, 'DEVELOPER SIGNATURE'),
-          h(Text, { style: styles.paragraph }, `NAME: ${devName}`),
-          h(Text, { style: styles.paragraph }, `DATE: ${effectiveDate}`)
-        ),
-        h(View, { style: styles.sigBox },
-          h(Text, { style: styles.sigTitle }, 'PARTNER SIGNATURE'),
-          h(Text, { style: styles.paragraph }, `NAME: ${partnerName}`),
-          h(Text, { style: styles.paragraph }, 'DATE: _______________')
-        )
-      ),
-      renderFooter(2)
+      ...sections.map(renderSection),
+      h(View, { style: styles.footer, fixed: true },
+        h(Text, { style: styles.footerText }, 'SALES PARTNER & MIDDLEMAN AGREEMENT // CONFIDENTIAL'),
+        h(Text, { style: styles.footerText, render: ({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages} | https://prateeq.in` })
+      )
     )
   );
 
-  const outputPath = path.join(process.cwd(), 'public', 'Middleman_Partnership_Agreement.pdf');
-  await ReactPDF.renderToFile(docElement, outputPath);
-  console.log(`Successfully generated PDF: ${outputPath}`);
+  const outputPathResolved = outputPath || path.join(process.cwd(), 'public', 'Middleman_Partnership_Agreement.pdf');
+  await ReactPDF.renderToFile(docElement, outputPathResolved);
+  console.log(`Successfully generated PDF: ${outputPathResolved}`);
+}
+
+function parseArgs(argv) {
+  const args = { configPath: null, outputPath: null };
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i] === '--config' && argv[i + 1]) args.configPath = argv[i + 1];
+    if (argv[i] === '--out' && argv[i + 1]) args.outputPath = argv[i + 1];
+  }
+  return args;
 }
 
 async function run() {
-  await generateMiddlemanAgreementPDF();
+  const { configPath, outputPath } = parseArgs(process.argv.slice(2));
+  await generateMiddlemanAgreementPDF({ configPath, outputPath });
 }
 
 run();

@@ -37,6 +37,7 @@ export interface AboutData {
 
 export interface MiddlemanAgreementConfig {
   partnerName: string;
+  partnerEmail?: string;
   effectiveDate: string;
   developerName: string;
   developerEmail: string;
@@ -44,8 +45,14 @@ export interface MiddlemanAgreementConfig {
   tier2Commission: string;
   tier3Commission: string;
   recurringCommission: string;
+  agreedElectronically?: string;
   disbursementRules: string[];
   confidentialityRules: string[];
+  sections?: {
+    key: string;
+    heading: string;
+    lines: string[];
+  }[];
 }
 
 export interface IntakeConfig {

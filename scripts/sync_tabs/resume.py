@@ -283,6 +283,7 @@ def render_resume_tab():
             col_mm1, col_mm2 = st.columns(2)
             with col_mm1:
                 partner_name = st.text_input("Partner / Sales Rep Name", value=mm_data.get('partnerName', '[Partner Name]'), key="mm_partner_name")
+                partner_email = st.text_input("Partner Email", value=mm_data.get('partnerEmail', ''), key="mm_partner_email")
                 eff_date = st.text_input("Effective Date", value=mm_data.get('effectiveDate', 'August 2, 2026'), key="mm_eff_date")
                 dev_name = st.text_input("Developer Name", value=mm_data.get('developerName', 'Prateeq Sharma'), key="mm_dev_name")
                 dev_email = st.text_input("Developer Email", value=mm_data.get('developerEmail', '3010prateeksharma@gmail.com'), key="mm_dev_email")
@@ -314,11 +315,62 @@ def render_resume_tab():
             confid_edit = st.text_area("Confidentiality Rules", value="\n".join(confid_val), height=90, key="mm_confid_rules")
             confid_list = [r.strip() for r in confid_edit.split("\n") if r.strip()]
 
+            agreed_edit = st.text_area(
+                "Agreed Electronically Clause",
+                value=mm_data.get('agreedElectronically', 'The parties acknowledge that this Agreement may be accepted and signed electronically, and an electronic signature or a documented email acceptance of these terms shall have the same force and effect as a manually executed signature.'),
+                height=70,
+                key="mm_agreed_e"
+            )
+
+            st.markdown("##### Editable Agreement Prose (Sections below render inside the PDF in order)")
+            st.caption("Each section shows its heading and one line per paragraph/bullet. Prefix a line with '- ' to render it as a bullet. Use {{partnerName}}, {{developerName}}, {{developerEmail}}, {{partnerEmail}}, {{effectiveDate}} placeholders.")
+            defaults_path = os.path.join(os.path.dirname(__file__), '..', '..', 'src', 'data', 'middlemanAgreementDefaults.json')
+            if not getattr(st.session_state, '_mm_defaults_loaded', False):
+                try:
+                    with open(defaults_path, 'r', encoding='utf-8') as df:
+                        st.session_state['_mm_defaults'] = json.load(df)
+                except Exception:
+                    st.session_state['_mm_defaults'] = {'sections': []}
+                st.session_state['_mm_defaults_loaded'] = True
+            _mm_defaults = st.session_state.get('_mm_defaults', {'sections': []})
+            existing_sections = mm_data.get('sections') or []
+            section_by_key = {s.get('key'): s for s in existing_sections if isinstance(s, dict) and s.get('key')}
+            default_sections = _mm_defaults.get('sections', [])
+
+            if st.button("↺ Reset Agreement Prose to Defaults", key="mm_reset_prose"):
+                section_by_key = {}
+                existing_sections = []
+                st.session_state['_mm_prose_rev'] = st.session_state.get('_mm_prose_rev', 0) + 1
+            prose_rev = st.session_state.get('_mm_prose_rev', 0)
+
+            expanded_sections = []
+            for idx, def_sec in enumerate(default_sections):
+                sec_key = def_sec.get('key', f'sec_{idx}')
+                cur = section_by_key.get(sec_key, {})
+                heading_val = cur.get('heading', def_sec.get('heading', ''))
+                lines_val = cur.get('lines') or def_sec.get('lines', [])
+                col_h, col_t = st.columns([1, 4])
+                with col_h:
+                    heading_edit = st.text_input("Heading", value=heading_val, key=f"mm_sec_{sec_key}_head_{prose_rev}")
+                with col_t:
+                    lines_edit = st.text_area(
+                        def_sec.get('heading', sec_key),
+                        value="\n".join(lines_val),
+                        height=max(70, len(lines_val) * 16),
+                        key=f"mm_sec_{sec_key}_lines_{prose_rev}"
+                    )
+                expanded_sections.append({
+                    "key": sec_key,
+                    "heading": heading_edit.strip(),
+                    "lines": [l.strip() for l in lines_edit.split("\n") if l.strip()]
+                })
+
             if 'intake' not in res:
                 res['intake'] = {}
 
             res['intake']['middlemanAgreement'] = {
                 "partnerName": partner_name.strip(),
+                "partnerEmail": partner_email.strip(),
                 "effectiveDate": eff_date.strip(),
                 "developerName": dev_name.strip(),
                 "developerEmail": dev_email.strip(),
@@ -326,8 +378,10 @@ def render_resume_tab():
                 "tier2Commission": t2_comm.strip(),
                 "tier3Commission": t3_comm.strip(),
                 "recurringCommission": rec_comm.strip(),
+                "agreedElectronically": agreed_edit.strip(),
                 "disbursementRules": disburse_list,
-                "confidentialityRules": confid_list
+                "confidentialityRules": confid_list,
+                "sections": expanded_sections
             }
 
             target_pdf = "Middleman_Partnership_Agreement.pdf"
@@ -346,25 +400,45 @@ def render_resume_tab():
                     except Exception as e:
                         st.error(f"Error generating PDF: {e}")
             with col_b2:
-                pdf_path = os.path.join(os.getcwd(), 'public', target_pdf)
-                if not os.path.exists(pdf_path):
+                import re as _re, tempfile, json as _json, subprocess
+                safe_partner = _re.sub(r'[^A-Za-z0-9]+', '_', partner_name.strip()).strip('_') or 'Partner'
+                if st.button("📄 Build Current Agreement PDF", key="btn_build_mm_pdf"):
                     try:
-                        import subprocess
-                        subprocess.run(['node', 'scripts/generate-middleman-pdf.mjs'], capture_output=True, text=True)
-                    except Exception:
-                        pass
-                
-                if os.path.exists(pdf_path):
-                    with open(pdf_path, 'rb') as f:
-                        st.download_button(
-                            label="📥 Download Partnership Agreement PDF",
-                            data=f.read(),
-                            file_name=target_pdf,
-                            mime="application/pdf",
-                            key="btn_download_mm_pdf"
+                        gen_pdf = None
+                        with tempfile.NamedTemporaryFile('w', suffix='.json', delete=False) as tmp_cfg:
+                            _json.dump({'intake': {'middlemanAgreement': res['intake']['middlemanAgreement']}}, tmp_cfg)
+                            cfg_path = tmp_cfg.name
+                        with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as tmp_pdf:
+                            pdf_path = tmp_pdf.name
+                        proc = subprocess.run(
+                            ['node', 'scripts/generate-middleman-pdf.mjs', '--config', cfg_path, '--out', pdf_path],
+                            capture_output=True,
+                            text=True
                         )
+                        os.unlink(cfg_path)
+                        if proc.returncode == 0 and os.path.exists(pdf_path):
+                            with open(pdf_path, 'rb') as f:
+                                gen_pdf = f.read()
+                            os.unlink(pdf_path)
+                            st.session_state['mm_pdf_bytes'] = gen_pdf
+                            st.session_state['mm_pdf_name'] = f"{safe_partner}_Sales_Partner_Agreement.pdf"
+                            st.success("📄 Agreement built from current form values!")
+                        else:
+                            st.session_state.pop('mm_pdf_bytes', None)
+                            st.error(f"Failed to generate PDF: {proc.stderr}")
+                    except Exception as e:
+                        st.error(f"Error generating PDF: {e}")
+
+                if st.session_state.get('mm_pdf_bytes'):
+                    st.download_button(
+                        label="📥 Download Partnership Agreement PDF",
+                        data=st.session_state['mm_pdf_bytes'],
+                        file_name=st.session_state.get('mm_pdf_name', target_pdf),
+                        mime="application/pdf",
+                        key="btn_download_mm_pdf"
+                    )
                 else:
-                    st.info("📄 Click 'Rebuild Partnership Agreement PDF' to generate download preview.")
+                    st.info("📄 Click 'Build Current Agreement PDF' to generate the download.")
 
         # Project Intake & Questionnaire Config
         with st.container(border=True):

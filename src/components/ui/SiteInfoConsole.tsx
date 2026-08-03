@@ -364,6 +364,7 @@ export default function SiteInfoConsole() {
     if (['partner', 'middleman', 'agreement', 'middleman-agreement'].includes(trimmedCmd)) {
       const mm: Partial<MiddlemanAgreementConfig> = profileData?.intake?.middlemanAgreement || {};
       const partnerName = mm.partnerName || '[Partner Name]';
+      const partnerEmail = mm.partnerEmail || '';
       const effectiveDate = (mm.effectiveDate && mm.effectiveDate.trim()) ? mm.effectiveDate : new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
       const devName = mm.developerName || 'Prateeq Sharma';
       const devEmail = mm.developerEmail || '3010prateeksharma@gmail.com';
@@ -390,7 +391,7 @@ export default function SiteInfoConsole() {
         { text: '===========================================================', type: 'success' },
         { text: `EFFECTIVE DATE : ${effectiveDate}`, type: 'output' },
         { text: `DEVELOPER      : ${devName} (${devEmail})`, type: 'output' },
-        { text: `SALES PARTNER  : ${partnerName}`, type: 'output' },
+        { text: `SALES PARTNER  : ${partnerName}${partnerEmail ? ` (${partnerEmail})` : ''}`, type: 'output' },
         { text: ' ', type: 'output' },
         { text: '1. PURPOSE & ROLES', type: 'success' },
         { text: `  - Independent Sales Partner Agreement between ${devName} and ${partnerName}.`, type: 'output' },

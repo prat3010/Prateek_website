@@ -129,8 +129,8 @@
     "scopeModel": "Fixed-Price Milestones (No hidden hourly charges)",
     "deliverySprint": "1 to 3 Weeks Turnaround Sprint",
     "warrantyModel": "Included 30-Day Post-Launch Support & Warranty",
-    "hourlyRate": "\u20b93,000",
-    "dayRate": "\u20b920,000",
+    "hourlyRate": "₹3,000",
+    "dayRate": "₹20,000",
     "paymentTerms": "50% upfront deposit to initiate development, 50% upon final project delivery.",
     "deliverables": [
       "Custom UI Design & Interactive Prototypes",
@@ -160,14 +160,14 @@
       "Privacy-Compliant Analytics & Visitor Telemetry"
     ],
     "budgetTiers": [
-      "Tier 1: \u20b925,000 \u2013 \u20b945,000 ($300 \u2013 $550)",
-      "Tier 2: \u20b945,000 \u2013 \u20b990,000 ($550 \u2013 $1,100)",
-      "Tier 3: \u20b990,000 \u2013 \u20b91.5L+ ($1,100 \u2013 $2,000+)",
+      "Tier 1: ₹25,000 – ₹45,000 ($300 – $550)",
+      "Tier 2: ₹45,000 – ₹90,000 ($550 – $1,100)",
+      "Tier 3: ₹90,000 – ₹1.5L+ ($1,100 – $2,000+)",
       "Custom / Enterprise Infrastructure Scope"
     ],
     "timelineOptions": [
-      "Express Delivery Sprint (7\u201310 Days - Rush Fee Applies)",
-      "Standard Turnaround (2\u20134 Weeks)",
+      "Express Delivery Sprint (7–10 Days - Rush Fee Applies)",
+      "Standard Turnaround (2–4 Weeks)",
       "Flexible Timeline"
     ],
     "assetOptions": [
@@ -202,6 +202,145 @@
         "Rule 4.1 (Non-Circumvention): Partner agrees not to bypass Developer or refer introduced clients to alternative software developers without express written consent.",
         "Rule 4.2 (Codebase & IP Ownership): All codebase assets, databases, and intellectual property remain the property of Developer until 100% of project contract fees are paid by Client.",
         "Rule 4.3 (Confidentiality & Non-Disclosure): Both parties agree to keep project quotes, client contact information, and internal commercial terms strictly confidential."
+      ],
+      "partnerEmail": "",
+      "agreedElectronically": "The parties acknowledge that this Agreement may be accepted and signed electronically, and an electronic signature or a documented email acceptance of these terms shall have the same force and effect as a manually executed signature.",
+      "sections": [
+        {
+          "key": "parties",
+          "heading": "1. PARTIES & DEFINITIONS",
+          "lines": [
+            "This Agreement is entered into between {{developerName}} (\"Developer\"), a freelance software engineer operating through prateeq.in, and {{partnerName}} (\"Partner\", \"Sales Representative\", or \"Sales Rep\"), in respect of the referral and closing of software development projects.",
+            "- \"Client\" means any person, company, or entity introduced by the Partner to the Developer and who agrees to purchase the Developer's services.",
+            "- \"Qualified Client\" means a Client who has signed the Developer's Project Scoping Specification and paid the 50% upfront deposit.",
+            "- \"Net Funds\" means amounts actually cleared and retained in the Developer's bank accounts in respect of a project, net of refunds, chargebacks, and applicable tax deductions.",
+            "- \"Recurring Care Plan\" means the Developer's paid monthly maintenance, hosting, and support retainer billed to a Client after project launch.",
+            "- \"Commission\" means the compensation payable to the Partner under Section 3, calculated as a percentage of Net Funds.",
+            "- \"Intellectual Property\" means the Developer's source code, designs, database schemas, architecture, documentation, and all other digital assets produced in connection with any project."
+          ]
+        },
+        {
+          "key": "purpose",
+          "heading": "2. PURPOSE & ROLES OF ENGAGEMENT",
+          "lines": [
+            "The purpose of this Agreement is to set out the commercial terms, commission structure, payout schedule, and operating rules under which the Partner introduces prospective Clients to the Developer for web development, custom software, and AI integration projects.",
+            "- The Partner acts as an independent introducer only, and not as an employee, agent, or legal representative of the Developer.",
+            "- The Partner has no authority to bind the Developer to any contract, price, or undertaking, whether verbally or in writing.",
+            "- The Partner will introduce Clients, encourage completion of the Developer's Intake Scoping Form, and support a warm handoff to the Developer.",
+            "- The Developer is responsible for scoping, pricing, delivery, and all client-facing terms after qualification."
+          ]
+        },
+        {
+          "key": "commission",
+          "heading": "3. COMMISSION TIER STRUCTURE & PAYOUT RATES",
+          "lines": [
+            "For every Qualified Client, the Partner earns the tiered Commission set out in the table below, computed as a percentage of Net Funds.",
+            "The tier is selected by the signed contract value of the project. The Developer may adjust commission percentages only by a written note signed at the time such Client is introduced; any such adjustment applies only to that specific Client."
+          ]
+        },
+        {
+          "key": "payment",
+          "heading": "4. PAYMENT & DISBURSEMENT RULES",
+          "lines": [
+            "- Rule 1 (No Out-of-Pocket Liability): The Developer will never pay Commission out of operating funds before Client funds clear the Developer's bank accounts. A Commission obligation arises only once Net Funds have been realized.",
+            "- Rule 2 (Proportional Schedule): 50% of the Commission is paid within 48 business hours of receiving the Qualified Client's 50% upfront deposit; the remaining 50% is paid within 48 business hours of receiving the Qualified Client's final 50% balance.",
+            "- Rule 3 (Cancellations & Defaults): If a Client defaults or partially cancels the project, the Commission is recalculated strictly against the Net Funds actually collected and retained. No Commission is payable on refunded, chargebacked, or disputed sums.",
+            "- Recurring Care: For Clients who subscribe to a Recurring Care Plan, the Partner is paid the recurring Commission rate each month, on cleared Net Funds, for as long as the care plan remains active."
+          ]
+        },
+        {
+          "key": "qualification",
+          "heading": "5. CLIENT HANDOFF & PROJECT QUALIFICATION",
+          "lines": [
+            "The Partner introduces the referred Client via a warm email introduction or the Intake Scoping Form published on prateeq.in. A project is considered Qualified, and the Partner's Commission becomes committed, when the Client signs the relevant Scoping Specification and pays the 50% upfront deposit.",
+            "The Developer retains sole authority to accept or reject any referred Client, scope, budget, or project for any reason, including technical feasibility. A rejection does not create any obligation to pay Commission."
+          ]
+        },
+        {
+          "key": "attribution",
+          "heading": "6. LEAD ATTRIBUTION & TRAILING COMMISSIONS",
+          "lines": [
+            "- Attribution: A Client is attributed to the Partner only if the introduction was made through the Partner's intake link or a warm email that names the Partner. If more than one introducer claims the same Client, the earlier timestamped introduction (per the intake form or email records) prevails. The Developer's good-faith determination of the first reference, following a written explanation, is final.",
+            "- Trailing Commission: For as long as this Agreement is in effect, and for twelve (12) months after termination, the Partner continues to earn Commission on additional projects or Recurring Care Plans purchased by a Qualified Client whom the Partner originally introduced, provided the Client was Qualified while the contract was in force.",
+            "- Expiry: If a referred Client does not become qualified within twelve months of the original introduction, the Partner's right to Commission in respect of that Client lapses unless both parties agree otherwise in writing."
+          ]
+        },
+        {
+          "key": "confidentiality",
+          "heading": "7. NON-CIRCUMVENTION & CONFIDENTIALITY",
+          "lines": [
+            "- Non-Circumvention: The Partner agrees not to bypass the Developer or to refer Introduced Clients to alternative software developers without the Developer's prior written consent.",
+            "- Codebase & IP Ownership: All code, data, and other deliverables created for a project are the Developer's property until 100% of the applicable project contract fees are paid by the Client.",
+            "- Confidentiality: Both parties undertake to keep project quotations, Client contact details, commercial terms, and the contents of this Agreement strictly confidential."
+          ]
+        },
+        {
+          "key": "ip",
+          "heading": "8. INTELLECTUAL PROPERTY & CODEBASE OWNERSHIP",
+          "lines": [
+            "Until the applicable project's contract fees are paid in full, all code, architecture, design, and deliverables remain the Developer's exclusive property. Ownership transfers to the Client only upon full payment and subject to the Developer's own project agreement with that Client.",
+            "The Partner acquires no rights in the Developer's methodology, libraries, or reusable components, many of which are licensed and not assigned."
+          ]
+        },
+        {
+          "key": "termination",
+          "heading": "9. TERM & TERMINATION",
+          "lines": [
+            "- This Agreement takes effect on the Effective Date and continues indefinitely until terminated.",
+            "- Either party may terminate this Agreement at any time with 30 days' prior written notice.",
+            "- Either party may also terminate with immediate effect on written notice if the other party materially defaults under this Agreement and fails to remedy within 7 days of written notice.",
+            "- Commissions accrued and payable for Qualified, will-funded work at the date of termination remain due and are paid under Section 4.",
+            "- The obligations under Sections 6 (Trailing Commissions), 7 (Confidentiality), and 8 (Intellectual Property) survive termination."
+          ]
+        },
+        {
+          "key": "liability",
+          "heading": "10. REPRESENTATIONS, WARRANTIES & LIMITATION OF LIABILITY",
+          "lines": [
+            "- Each party represents that it has the full right and authority to enter into and perform its obligations under this Agreement.",
+            "- The Developer warrants that project services will be provided with reasonable skill and care, but makes no guarantee of specific project outcomes or profitability.",
+            "- Subject to applicable law, the Developer's total liability under or in connection with this Agreement shall not exceed the total Commission paid or accrued to the Partner in the twelve months preceding the event giving rise to the claim.",
+            "- Neither party shall be liable to the other for any indirect, incidental, consequential, or loss-of-profit damages."
+          ]
+        },
+        {
+          "key": "taxes",
+          "heading": "11. TAXES & COMPLIANCE",
+          "lines": [
+            "- Each party is responsible for filing and paying its own tax obligations on amounts received under this Agreement.",
+            "- Where applicable law requires tax to be deducted or withheld (for example, Indian TDS), the Developer may deduct such amount before paying Commission and will furnish the corresponding certificate to the Partner.",
+            "- Commission is paid to the Partner's bank or payout details on file, unless updated by the Partner in writing under Section 13.",
+            "- Neither party will offer bribes, gifts, or unlawful inducements to any Client or counterparty in connection with this Agreement."
+          ]
+        },
+        {
+          "key": "governance",
+          "heading": "12. GOVERNING LAW & DISPUTE RESOLUTION",
+          "lines": [
+            "This Agreement is governed by and construed in accordance with the laws of India, without regard to its conflict-of-laws principles.",
+            "The parties shall first seek to resolve any dispute amicably through written notice and a good-faith mediation video call within 30 days.",
+            "If the dispute is not resolved within 60 days, it shall be referred to a sole arbitrator appointed by mutual agreement, the seat and venue of arbitration being a neutral location in India, conducted in English, whose decision shall be final and binding in accordance with the law in force on arbitration in India. Each party bears its own costs.",
+            "For any matter not subject to arbitration, the courts of India shall have jurisdiction, and any claims are subject to the limitations in Section 10."
+          ]
+        },
+        {
+          "key": "entire",
+          "heading": "13. ENTIRE AGREEMENT & GENERAL PROVISIONS",
+          "lines": [
+            "- Entire Agreement: This Agreement, together with any documents expressly referred to in it, constitutes the entire agreement between the parties and supersedes all prior discussions and understandings.",
+            "- Amendments: No amendment, waiver, or adjustment is binding unless made in writing and signed by both parties.",
+            "- Severability: If any provision is held unenforceable, that provision is limited or severed, and the remainder of the Agreement continues in full force.",
+            "- Force Majeure: Neither party is liable for delays or failures caused by events beyond its reasonable control.",
+            "- Notices: Notices under this Agreement are delivered to the contact email on file for each party, unless changed in a signed written notice."
+          ]
+        },
+        {
+          "key": "signature",
+          "heading": "SIGNATURE & AGREEMENT ACCEPTANCE",
+          "lines": [
+            "By signing below (or by providing an electronic signature or documented written acceptance), the parties confirm that they have read and understood the entire Agreement, including the Commission Structure in Section 3 and the Payment & Disbursement Rules in Section 4, and agree to be bound by its terms."
+          ]
+        }
       ]
     }
   }

@@ -24,6 +24,7 @@ export default function MiddlemanAgreementModal({
 
   const mm: Partial<MiddlemanAgreementConfig> = resumeData?.intake?.middlemanAgreement || {};
   const partnerName = mm.partnerName || '[Partner Name]';
+  const partnerEmail = mm.partnerEmail || '';
   const effectiveDate = mm.effectiveDate || 'August 2, 2026';
   const devName = mm.developerName || 'Prateeq Sharma';
   const devEmail = mm.developerEmail || '3010prateeksharma@gmail.com';
@@ -113,6 +114,7 @@ export default function MiddlemanAgreementModal({
               <div className={styles.metaItem}>
                 <span>SALES REP / PARTNER:</span>
                 <strong>{partnerName}</strong>
+                {partnerEmail && <strong style={{ display: 'block', fontSize: '12px', fontWeight: 400 }}>{partnerEmail}</strong>}
               </div>
               <div className={styles.metaItem}>
                 <span>CONTACT EMAIL:</span>

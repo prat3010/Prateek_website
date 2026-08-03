@@ -2,21 +2,55 @@ import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Svg, Line } from '@react-pdf/renderer';
 import type { ResumeData, MiddlemanAgreementConfig } from '@/data/resume';
 import { DEFAULT_PDF_THEME } from './pdfTheme';
+import middlemanAgreementDefaults from '@/data/middlemanAgreementDefaults.json';
 
 interface MiddlemanAgreementPDFProps {
   resumeData?: ResumeData | null;
 }
 
+interface MiddlemanSection {
+  key: string;
+  heading: string;
+  lines: string[];
+}
+
+function fillTokens(text: string, tokens: Record<string, string>): string {
+  return text.replace(/\{\{(\w+)\}\}/g, (match, key: string) => tokens[key] ?? match);
+}
+
 export function MiddlemanAgreementPDF({ resumeData }: MiddlemanAgreementPDFProps) {
   const mm: Partial<MiddlemanAgreementConfig> = resumeData?.intake?.middlemanAgreement || {};
-  const partnerName = mm.partnerName || '[Partner Name]';
+  const defaults = middlemanAgreementDefaults as {
+    scalars: Record<string, string>;
+    sections: MiddlemanSection[];
+  };
+  const scalars = defaults.scalars;
+
+  const partnerName = mm.partnerName || scalars.partnerName || '[Partner Name]';
+  const partnerEmail = mm.partnerEmail || scalars.partnerEmail || '';
   const presentDateStr = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
   const effectiveDate = mm.effectiveDate && mm.effectiveDate.trim() ? mm.effectiveDate : presentDateStr;
-  const devName = mm.developerName || 'Prateeq Sharma';
-  const devEmail = mm.developerEmail || '3010prateeksharma@gmail.com';
-  const tier1Cut = mm.tier1Commission || '10%';
-  const tier2Cut = mm.tier2Commission || '12%';
-  const tier3Cut = mm.tier3Commission || '15%';
+  const devName = mm.developerName || scalars.developerName || 'Prateeq Sharma';
+  const devEmail = mm.developerEmail || scalars.developerEmail || '3010prateeksharma@gmail.com';
+  const tier1Cut = mm.tier1Commission || scalars.tier1Commission || '10%';
+  const tier2Cut = mm.tier2Commission || scalars.tier2Commission || '12%';
+  const tier3Cut = mm.tier3Commission || scalars.tier3Commission || '15%';
+  const recurringCut = mm.recurringCommission || scalars.recurringCommission || '10%';
+  const agreedElectronically = mm.agreedElectronically || scalars.agreedElectronically || '';
+
+  const tokens: Record<string, string> = {
+    developerName: devName,
+    partnerName,
+    partnerEmail,
+    developerEmail: devEmail,
+    effectiveDate,
+  };
+
+  const sections: MiddlemanSection[] = (mm.sections && mm.sections.length ? mm.sections : defaults.sections).map((s) => ({
+    key: s.key,
+    heading: fillTokens(s.heading, tokens),
+    lines: s.lines.map((line) => fillTokens(line, tokens)),
+  }));
 
   const styles = StyleSheet.create({
     page: {
@@ -103,6 +137,22 @@ export function MiddlemanAgreementPDF({ resumeData }: MiddlemanAgreementPDFProps
       color: DEFAULT_PDF_THEME.textSecondary,
       marginBottom: 6,
     },
+    bulletRow: {
+      flexDirection: 'row',
+      marginBottom: 3,
+    },
+    bulletDot: {
+      width: 10,
+      fontSize: 8,
+      lineHeight: 1.4,
+      color: DEFAULT_PDF_THEME.accentColor,
+    },
+    bulletText: {
+      flex: 1,
+      fontSize: 8,
+      lineHeight: 1.4,
+      color: DEFAULT_PDF_THEME.textSecondary,
+    },
     table: {
       borderColor: DEFAULT_PDF_THEME.cardBorder,
       borderWidth: 1,
@@ -132,25 +182,6 @@ export function MiddlemanAgreementPDF({ resumeData }: MiddlemanAgreementPDFProps
       fontSize: 7.5,
       color: DEFAULT_PDF_THEME.textSecondary,
     },
-    sigContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginTop: 10,
-    },
-    sigBox: {
-      width: '48%',
-      borderColor: DEFAULT_PDF_THEME.cardBorder,
-      borderWidth: 1,
-      borderRadius: 4,
-      padding: 8,
-      height: 54,
-    },
-    sigTitle: {
-      fontFamily: 'Helvetica-Bold',
-      fontSize: 7,
-      color: DEFAULT_PDF_THEME.textSecondary,
-      marginBottom: 10,
-    },
     footer: {
       position: 'absolute',
       bottom: 18,
@@ -166,18 +197,132 @@ export function MiddlemanAgreementPDF({ resumeData }: MiddlemanAgreementPDFProps
       fontSize: 7,
       color: DEFAULT_PDF_THEME.textSecondary,
     },
+    signatureSection: {
+      marginTop: 8,
+    },
+    signatureGrid: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginTop: 4,
+    },
+    signatureBox: {
+      width: '48%',
+    },
+    signatureTitle: {
+      fontFamily: 'Helvetica-Bold',
+      fontSize: 8,
+      color: DEFAULT_PDF_THEME.textPrimary,
+      marginBottom: 8,
+      borderBottomWidth: 1,
+      borderBottomColor: DEFAULT_PDF_THEME.cardBorder,
+      paddingBottom: 4,
+    },
+    signatureLine: {
+      fontSize: 8.5,
+      color: DEFAULT_PDF_THEME.textSecondary,
+      marginBottom: 6,
+    },
+    agreedBox: {
+      marginTop: 8,
+      backgroundColor: DEFAULT_PDF_THEME.cardBg,
+      borderColor: DEFAULT_PDF_THEME.cardBorder,
+      borderWidth: 1,
+      borderRadius: 4,
+      padding: 8,
+    },
+    agreedTitle: {
+      fontFamily: 'Helvetica-Bold',
+      fontSize: 7.5,
+      color: DEFAULT_PDF_THEME.accentColor,
+      marginBottom: 3,
+    },
+    agreedText: {
+      fontSize: 7.5,
+      lineHeight: 1.4,
+      color: DEFAULT_PDF_THEME.textSecondary,
+    },
   });
 
-  const renderFooter = (pageNum: number) => (
-    <View style={styles.footer} fixed>
-      <Text style={styles.footerText}>SALES PARTNER & MIDDLEMAN AGREEMENT // CONFIDENTIAL</Text>
-      <Text style={styles.footerText}>{`Page ${pageNum} of 2 | https://prateeq.in`}</Text>
-    </View>
-  );
+const renderSection = (section: MiddlemanSection, index: number) => {
+    const isCommission = section.key === 'commission';
+    const isSignature = section.key === 'signature';
+
+    return (
+      <View key={section.key || index}>
+        <Text style={styles.sectionTitle}>{section.heading}</Text>
+        {section.lines.map((line, lineIdx) => {
+          const isBullet = line.startsWith('- ');
+          return isBullet ? (
+            <View key={lineIdx} style={styles.bulletRow}>
+              <Text style={styles.bulletDot}>{'\u2022'}</Text>
+              <Text style={styles.bulletText}>{line.slice(2)}</Text>
+            </View>
+          ) : (
+            <Text key={lineIdx} style={styles.paragraph}>{line}</Text>
+          );
+        })}
+
+        {isCommission && (
+          <View style={styles.table}>
+            <View style={styles.tableHeader}>
+              <Text style={[styles.tableCellBold, { width: '40%' }]}>PROJECT TIER & BUDGET RANGE</Text>
+              <Text style={[styles.tableCellBold, { width: '30%' }]}>PARTNER COMMISSION</Text>
+              <Text style={[styles.tableCellBold, { width: '30%' }]}>PAYOUT TIMELINE</Text>
+            </View>
+            <View style={styles.tableRow}>
+              <Text style={[styles.tableCell, { width: '40%' }]}>Tier 1: Landing Page (INR 25k–45k / $300–$550)</Text>
+              <Text style={[styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }]}>{tier1Cut}</Text>
+              <Text style={[styles.tableCell, { width: '30%' }]}>Within 48h of Client 50% Deposit</Text>
+            </View>
+            <View style={styles.tableRow}>
+              <Text style={[styles.tableCell, { width: '40%' }]}>Tier 2: Multi-Page Web App (INR 45k–90k / $550–$1.1k)</Text>
+              <Text style={[styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }]}>{tier2Cut}</Text>
+              <Text style={[styles.tableCell, { width: '30%' }]}>Within 48h of Client 50% Deposit</Text>
+            </View>
+            <View style={styles.tableRow}>
+              <Text style={[styles.tableCell, { width: '40%' }]}>Tier 3: SaaS / AI RAG Engine (INR 90k–1.5L+ / $1.1k+)</Text>
+              <Text style={[styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }]}>{tier3Cut}</Text>
+              <Text style={[styles.tableCell, { width: '30%' }]}>Within 48h of Client 50% Deposit</Text>
+            </View>
+            <View style={[styles.tableRow, { borderBottomWidth: 0 }]}>
+              <Text style={[styles.tableCell, { width: '40%' }]}>Recurring Care Plan (ongoing)</Text>
+              <Text style={[styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }]}>{recurringCut}</Text>
+              <Text style={[styles.tableCell, { width: '30%' }]}>Monthly on cleared Net Funds</Text>
+            </View>
+          </View>
+        )}
+
+        {isSignature && (
+          <View>
+            <View style={styles.signatureGrid}>
+              <View style={styles.signatureBox}>
+                <Text style={styles.signatureTitle}>DEVELOPER SIGNATURE</Text>
+                <Text style={styles.signatureLine}>{`NAME: ${devName}`}</Text>
+                <Text style={styles.signatureLine}>{`DATE: ${effectiveDate}`}</Text>
+                <Text style={styles.signatureLine}>SIGN: _______________</Text>
+              </View>
+              <View style={styles.signatureBox}>
+                <Text style={styles.signatureTitle}>PARTNER / SALES REP SIGNATURE</Text>
+                <Text style={styles.signatureLine}>{`NAME: ${partnerName}`}</Text>
+                <Text style={styles.signatureLine}>{`EMAIL: ${partnerEmail}`}</Text>
+                <Text style={styles.signatureLine}>DATE: _______________</Text>
+                <Text style={styles.signatureLine}>SIGN: _______________</Text>
+              </View>
+            </View>
+            {agreedElectronically && (
+              <View style={styles.agreedBox}>
+                <Text style={styles.agreedTitle}>AGREED ELECTRONICALLY</Text>
+                <Text style={styles.agreedText}>{agreedElectronically}</Text>
+              </View>
+            )}
+          </View>
+        )}
+      </View>
+    );
+  };
 
   return (
     <Document title={`${partnerName.replace(/\s+/g, '_')}_Sales_Partner_Agreement`}>
-      {/* PAGE 1 */}
       <Page size="A4" style={styles.page}>
         <View style={styles.headerBanner}>
           <View>
@@ -218,74 +363,21 @@ export function MiddlemanAgreementPDF({ resumeData }: MiddlemanAgreementPDFProps
           </View>
           <View style={styles.metaCol}>
             <Text style={styles.metaLabel}>CONTACT EMAIL</Text>
-            <Text style={styles.metaVal}>{devEmail}</Text>
+            <Text style={styles.metaVal}>{`${devEmail}${partnerEmail ? ` / ${partnerEmail}` : ''}`}</Text>
           </View>
         </View>
 
-        <Text style={styles.sectionTitle}>1. PURPOSE & ROLES OF ENGAGEMENT</Text>
-        <Text style={styles.paragraph}>
-          {`This Agreement outlines the commercial terms, commission structure, payment schedules, and operational rules between ${devName} ("Developer") and ${partnerName} ("Sales Representative / Partner") for bringing client web development, custom software, and AI integration projects to the Developer.`}
-        </Text>
+        {sections.map(renderSection)}
 
-        <Text style={styles.sectionTitle}>2. COMMISSION TIER STRUCTURE & PAYOUT RATES</Text>
-        <View style={styles.table}>
-          <View style={styles.tableHeader}>
-            <Text style={[styles.tableCellBold, { width: '40%' }]}>PROJECT TIER & BUDGET RANGE</Text>
-            <Text style={[styles.tableCellBold, { width: '30%' }]}>PARTNER COMMISSION</Text>
-            <Text style={[styles.tableCellBold, { width: '30%' }]}>PAYOUT TIMELINE</Text>
-          </View>
-          <View style={styles.tableRow}>
-            <Text style={[styles.tableCell, { width: '40%' }]}>Tier 1: Landing Page (INR 25k–45k / $300–$550)</Text>
-            <Text style={[styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }]}>{tier1Cut}</Text>
-            <Text style={[styles.tableCell, { width: '30%' }]}>Within 48h of Client 50% Deposit</Text>
-          </View>
-          <View style={styles.tableRow}>
-            <Text style={[styles.tableCell, { width: '40%' }]}>Tier 2: Multi-Page Web App (INR 45k–90k / $550–$1.1k)</Text>
-            <Text style={[styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }]}>{tier2Cut}</Text>
-            <Text style={[styles.tableCell, { width: '30%' }]}>Within 48h of Client 50% Deposit</Text>
-          </View>
-          <View style={styles.tableRow}>
-            <Text style={[styles.tableCell, { width: '40%' }]}>Tier 3: SaaS / AI RAG Engine (INR 90k–1.5L+ / $1.1k+)</Text>
-            <Text style={[styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }]}>{tier3Cut}</Text>
-            <Text style={[styles.tableCell, { width: '30%' }]}>Within 48h of Client 50% Deposit</Text>
-          </View>
+        <View style={styles.footer} fixed>
+          <Text style={styles.footerText}>SALES PARTNER & MIDDLEMAN AGREEMENT // CONFIDENTIAL</Text>
+          <Text
+            style={styles.footerText}
+            render={({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) =>
+              `Page ${pageNumber} of ${totalPages} | https://prateeq.in`
+            }
+          />
         </View>
-
-        {renderFooter(1)}
-      </Page>
-
-      {/* PAGE 2 */}
-      <Page size="A4" style={styles.page}>
-        <View style={styles.docHeader}>
-          <Text style={styles.docTitle}>OPERATIONAL RULES & SIGN-OFF</Text>
-          <Text style={styles.docMeta}>Prateeq Sharma | Engineering & Custom Web Builds | Page 2 of 2</Text>
-        </View>
-
-        <Text style={styles.sectionTitle}>3. CLIENT HANDOFF & PROJECT QUALIFICATION</Text>
-        <Text style={styles.paragraph}>
-          {`The Partner introduces leads via warm email introduction or the Intake Scoping Form. Once a client signs the Scoping Specification and pays the 50% upfront deposit, the project is officially qualified and the Partner's commission is released within 48 business hours.`}
-        </Text>
-
-        <Text style={styles.sectionTitle}>4. NON-CIRCUMVENTION & CONFIDENTIALITY</Text>
-        <Text style={styles.paragraph}>
-          {`Developer agrees not to solicit or bypass Partner's direct clients without Partner's written consent. Partner agrees to keep Developer's rates, codebases, and technical architecture confidential.`}
-        </Text>
-
-        <Text style={styles.sectionTitle}>5. SIGNATURE & AGREEMENT ACCEPTANCE</Text>
-        <View style={styles.sigContainer}>
-          <View style={styles.sigBox}>
-            <Text style={styles.sigTitle}>DEVELOPER SIGNATURE</Text>
-            <Text style={styles.paragraph}>{`NAME: ${devName}`}</Text>
-            <Text style={styles.paragraph}>{`DATE: ${effectiveDate}`}</Text>
-          </View>
-          <View style={styles.sigBox}>
-            <Text style={styles.sigTitle}>PARTNER SIGNATURE</Text>
-            <Text style={styles.paragraph}>{`NAME: ${partnerName}`}</Text>
-            <Text style={styles.paragraph}>DATE: _______________</Text>
-          </View>
-        </View>
-
-        {renderFooter(2)}
       </Page>
     </Document>
   );
