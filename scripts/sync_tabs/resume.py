@@ -15,7 +15,7 @@ def render_resume_tab():
     tab_res_profile, tab_res_career, tab_res_pricing, tab_res_partner = st.tabs([
         "👤 Profile & Bio",
         "💼 Career & Education",
-        "💰 Commercial Pricing",
+        "💰 Quotation & Engagement Terms",
         "🤝 Partner & Scoping"
     ])
 
@@ -212,7 +212,7 @@ def render_resume_tab():
                         st.rerun()
 
     # ──────────────────────────────────────────────────────────
-    # SUB-TAB 3: 💰 Commercial Pricing
+    # SUB-TAB 3: 💰 Quotation & Engagement Terms
     # ──────────────────────────────────────────────────────────
     with tab_res_pricing:
         # Freelance Quotation Details
@@ -268,150 +268,6 @@ def render_resume_tab():
                     "paymentTerms": qi_terms.strip(),
                     "deliverables": qi_deliv_list
                 }
-
-        # Pricing Plans & Packages Grid
-        with st.container(border=True):
-            st.markdown('<div class="section-header">Pricing Plans & Packages Grid</div>', unsafe_allow_html=True)
-
-            pricing_region = st.selectbox("Select Pricing Region to Edit:", ["Global (USD)", "India (INR)"], key="pricing_region_select")
-
-            if pricing_region == "Global (USD)":
-                pricing_data = res.get('pricing', {}) or {}
-
-                tab_price_dev, tab_price_biz = st.tabs(["Developer (Mentorship/Audits) Tiers", "Business (Website/Support) Tiers"])
-
-                with tab_price_dev:
-                    dev_tiers = pricing_data.get('developer', []) or []
-                    num_dev = max(3, len(dev_tiers))
-                    while len(dev_tiers) < num_dev:
-                        dev_tiers.append({"title": "", "price": "", "description": "", "features": [], "cta": ""})
-
-                    updated_dev_tiers = []
-                    for t_idx in range(len(dev_tiers)):
-                        tier = dev_tiers[t_idx]
-                        st.markdown(f"**Tier #{t_idx + 1}**")
-                        col_t1, col_t2 = st.columns(2)
-                        with col_t1:
-                            t_title = st.text_input("Tier Title", value=tier.get('title', ''), key=f"p_dev_title_{t_idx}")
-                            t_price = st.text_input("Price / Rate Label", value=tier.get('price', ''), key=f"p_dev_price_{t_idx}")
-                        with col_t2:
-                            t_cta = st.text_input("CTA Code (pre-populates dropdown value)", value=tier.get('cta', ''), key=f"p_dev_cta_{t_idx}")
-                            t_desc = st.text_input("Short Tier Description", value=tier.get('description', ''), key=f"p_dev_desc_{t_idx}")
-
-                        t_feat_str = "\n".join(tier.get('features', []))
-                        t_feat_edit = st.text_area("Features (One per line)", value=t_feat_str, height=70, key=f"p_dev_feat_{t_idx}")
-                        t_feat_list = [f.strip() for f in t_feat_edit.split("\n") if f.strip()]
-
-                        updated_dev_tiers.append({
-                            "title": t_title.strip(),
-                            "price": t_price.strip(),
-                            "description": t_desc.strip(),
-                            "features": t_feat_list,
-                            "cta": t_cta.strip()
-                        })
-                    pricing_data['developer'] = updated_dev_tiers
-
-                with tab_price_biz:
-                    biz_tiers = pricing_data.get('business', []) or []
-                    num_biz = max(3, len(biz_tiers))
-                    while len(biz_tiers) < num_biz:
-                        biz_tiers.append({"title": "", "price": "", "description": "", "features": [], "cta": ""})
-
-                    updated_biz_tiers = []
-                    for t_idx in range(len(biz_tiers)):
-                        tier = biz_tiers[t_idx]
-                        st.markdown(f"**Tier #{t_idx + 1}**")
-                        col_tb1, col_tb2 = st.columns(2)
-                        with col_tb1:
-                            t_title = st.text_input("Tier Title", value=tier.get('title', ''), key=f"p_biz_title_{t_idx}")
-                            t_price = st.text_input("Price Range / Rate Label", value=tier.get('price', ''), key=f"p_biz_price_{t_idx}")
-                        with col_tb2:
-                            t_cta = st.text_input("CTA Code (pre-populates dropdown value)", value=tier.get('cta', ''), key=f"p_biz_cta_{t_idx}")
-                            t_desc = st.text_input("Short Tier Description", value=tier.get('description', ''), key=f"p_biz_desc_{t_idx}")
-
-                        t_feat_str = "\n".join(tier.get('features', []))
-                        t_feat_edit = st.text_area("Features (One per line)", value=t_feat_str, height=70, key=f"p_biz_feat_{t_idx}")
-                        t_feat_list = [f.strip() for f in t_feat_edit.split("\n") if f.strip()]
-
-                        updated_biz_tiers.append({
-                            "title": t_title.strip(),
-                            "price": t_price.strip(),
-                            "description": t_desc.strip(),
-                            "features": t_feat_list,
-                            "cta": t_cta.strip()
-                        })
-                    pricing_data['business'] = updated_biz_tiers
-
-                res['pricing'] = pricing_data
-
-            else:
-                pricing_data_in = res.get('pricing_india', {}) or {}
-
-                tab_price_dev_in, tab_price_biz_in = st.tabs(["Developer (Mentorship/Audits) Tiers [INR]", "Business (Website/Support) Tiers [INR]"])
-
-                with tab_price_dev_in:
-                    dev_tiers_in = pricing_data_in.get('developer', []) or []
-                    num_dev_in = max(3, len(dev_tiers_in))
-                    while len(dev_tiers_in) < num_dev_in:
-                        dev_tiers_in.append({"title": "", "price": "", "description": "", "features": [], "cta": ""})
-
-                    updated_dev_tiers_in = []
-                    for t_idx in range(len(dev_tiers_in)):
-                        tier = dev_tiers_in[t_idx]
-                        st.markdown(f"**Tier #{t_idx + 1}**")
-                        col_t1, col_t2 = st.columns(2)
-                        with col_t1:
-                            t_title = st.text_input("Tier Title", value=tier.get('title', ''), key=f"p_dev_title_in_{t_idx}")
-                            t_price = st.text_input("Price / Rate Label", value=tier.get('price', ''), key=f"p_dev_price_in_{t_idx}")
-                        with col_t2:
-                            t_cta = st.text_input("CTA Code (pre-populates dropdown value)", value=tier.get('cta', ''), key=f"p_dev_cta_in_{t_idx}")
-                            t_desc = st.text_input("Short Tier Description", value=tier.get('description', ''), key=f"p_dev_desc_in_{t_idx}")
-
-                        t_feat_str = "\n".join(tier.get('features', []))
-                        t_feat_edit = st.text_area("Features (One per line)", value=t_feat_str, height=70, key=f"p_dev_feat_in_{t_idx}")
-                        t_feat_list = [f.strip() for f in t_feat_edit.split("\n") if f.strip()]
-
-                        updated_dev_tiers_in.append({
-                            "title": t_title.strip(),
-                            "price": t_price.strip(),
-                            "description": t_desc.strip(),
-                            "features": t_feat_list,
-                            "cta": t_cta.strip()
-                        })
-                    pricing_data_in['developer'] = updated_dev_tiers_in
-
-                with tab_price_biz_in:
-                    biz_tiers_in = pricing_data_in.get('business', []) or []
-                    num_biz_in = max(3, len(biz_tiers_in))
-                    while len(biz_tiers_in) < num_biz_in:
-                        biz_tiers_in.append({"title": "", "price": "", "description": "", "features": [], "cta": ""})
-
-                    updated_biz_tiers_in = []
-                    for t_idx in range(len(biz_tiers_in)):
-                        tier = biz_tiers_in[t_idx]
-                        st.markdown(f"**Tier #{t_idx + 1}**")
-                        col_tb1, col_tb2 = st.columns(2)
-                        with col_tb1:
-                            t_title = st.text_input("Tier Title", value=tier.get('title', ''), key=f"p_biz_title_in_{t_idx}")
-                            t_price = st.text_input("Price Range / Rate Label", value=tier.get('price', ''), key=f"p_biz_price_in_{t_idx}")
-                        with col_tb2:
-                            t_cta = st.text_input("CTA Code (pre-populates dropdown value)", value=tier.get('cta', ''), key=f"p_biz_cta_in_{t_idx}")
-                            t_desc = st.text_input("Short Tier Description", value=tier.get('description', ''), key=f"p_biz_desc_in_{t_idx}")
-
-                        t_feat_str = "\n".join(tier.get('features', []))
-                        t_feat_edit = st.text_area("Features (One per line)", value=t_feat_str, height=70, key=f"p_biz_feat_in_{t_idx}")
-                        t_feat_list = [f.strip() for f in t_feat_edit.split("\n") if f.strip()]
-
-                        updated_biz_tiers_in.append({
-                            "title": t_title.strip(),
-                            "price": t_price.strip(),
-                            "description": t_desc.strip(),
-                            "features": t_feat_list,
-                            "cta": t_cta.strip()
-                        })
-                    pricing_data_in['business'] = updated_biz_tiers_in
-
-                res['pricing_india'] = pricing_data_in
 
     # ──────────────────────────────────────────────────────────
     # SUB-TAB 4: 🤝 Partner & Scoping

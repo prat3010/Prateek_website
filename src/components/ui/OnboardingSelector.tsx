@@ -106,7 +106,7 @@ export default function OnboardingSelector() {
                 </div>
                 <h2 className={styles.cardTitle}>Need a Website</h2>
                 <p className={styles.cardDesc}>
-                  Review freelance services, web application options, and pricing so you can start a project or request a quote.
+                  Review freelance services, web application options, and the project scoping wizard so you can start a project or request a quote.
                 </p>
                 <div className={styles.cardMeta}>
                   <span>Targeted for business owners, startups, & creators</span>

@@ -1,6 +1,12 @@
-# **Pricing Section**
+# **Pricing Section — REMOVED (2026-08)**
 
-## **Purpose**
+> **Status: Removed.** The standalone `#pricing` section (Consulting Rates in Developer Mode,
+> Service Packages in Business Mode) was deleted because the static package cards duplicated the
+> pricing built into the interactive Project Scoping wizard (`IntakeForm`), and the consulting-rate
+> offers were not ones the owner wanted to fulfil. The scoping questionnaire is now the only pricing path.
+> This document is retained for historical reference only.
+
+## **Original Purpose**
 
 The Pricing section provides clear pricing guidelines for freelance engagements. It establishes trust by replacing "pricing mystery" with structured rates and clear project deliverables.
 

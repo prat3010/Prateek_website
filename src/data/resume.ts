@@ -35,14 +35,6 @@ export interface AboutData {
   };
 }
 
-export interface PricingPlan {
-  title: string;
-  price: string;
-  description: string;
-  features: string[];
-  cta: string;
-}
-
 export interface MiddlemanAgreementConfig {
   partnerName: string;
   effectiveDate: string;
@@ -105,14 +97,6 @@ export interface ResumeData {
     deliverables: string[];
   };
   about?: AboutData;
-  pricing?: {
-    developer: PricingPlan[];
-    business: PricingPlan[];
-  };
-  pricing_india?: {
-    developer: PricingPlan[];
-    business: PricingPlan[];
-  };
   intake?: IntakeConfig;
   lastSynced?: {
     timestamp: string;

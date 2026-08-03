@@ -50,10 +50,9 @@ const BIZ_INTENTS: IntentOption[] = [
 
 const DEV_INTENTS: IntentOption[] = [
   { id: 'hiring', label: '💼 Full-Time / Contract Role' },
-  { id: 'architecture', label: '🏗️ Architecture Review' },
   { id: 'rag-ai', label: '🤖 AI & RAG Engineering' },
   { id: 'open-source', label: '⭐ Open Source / Collab' },
-  { id: 'general', label: '☕ Tech Chat & Mentorship' },
+  { id: 'general', label: '💬 General Tech Chat' },
 ];
 
 function Contact() {
@@ -84,18 +83,6 @@ function Contact() {
     script.async = true;
     script.onload = () => window.grecaptcha?.ready(() => setRecaptchaReady(true));
     document.head.appendChild(script);
-  }, []);
-
-  // Pre-populate intent when chosen from pricing table
-  useEffect(() => {
-    const handleSelectPackage = (e: Event) => {
-      const customEvent = e as CustomEvent<{ package: string }>;
-      if (customEvent.detail && customEvent.detail.package) {
-        setSelectedIntent(customEvent.detail.package);
-      }
-    };
-    window.addEventListener('select-package', handleSelectPackage);
-    return () => window.removeEventListener('select-package', handleSelectPackage);
   }, []);
 
   const handleCopyEmail = useCallback(() => {

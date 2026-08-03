@@ -11,7 +11,6 @@ const About = dynamic(() => import('@/components/About/About'));
 const Skills = dynamic(() => import('@/components/Skills/Skills'));
 const Projects = dynamic(() => import('@/components/Projects/Projects'));
 const Resume = dynamic(() => import('@/components/Resume/Resume'));
-const Pricing = dynamic(() => import('@/components/Pricing/Pricing'));
 const Playground = dynamic(() => import('@/components/Playground/Playground'));
 const Contact = dynamic(() => import('@/components/Contact/Contact'));
 
@@ -48,11 +47,6 @@ async function ResumeSection() {
   return <Resume resumeData={resume} certificates={certificates} />;
 }
 
-async function PricingSection() {
-  const resume = await getProfile();
-  return <Pricing resumeData={resume} />;
-}
-
 async function BlogSectionWrapper() {
   const posts = await getAllPosts();
   return <BlogSection posts={posts} />;
@@ -84,12 +78,6 @@ export default function Home() {
       <Suspense fallback={<SectionSkeleton height="700px" />}>
         <ScrollSection verticalOffset={120} gap={80}>
           <ResumeSection />
-        </ScrollSection>
-      </Suspense>
-
-      <Suspense fallback={<SectionSkeleton height="450px" />}>
-        <ScrollSection verticalOffset={120} gap={80}>
-          <PricingSection />
         </ScrollSection>
       </Suspense>
 

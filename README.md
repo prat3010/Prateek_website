@@ -18,7 +18,7 @@ A highly interactive, storyteller-driven personal portfolio website designed wit
 
 | Route | Description |
 |-------|-------------|
-| `/` | Home page — all portfolio sections (hero, about, skills, projects, resume, pricing, playground, blog, contact) |
+| `/` | Home page — all portfolio sections (hero, about, skills, projects, resume, playground, blog, contact) |
 | `/terminal` | Interactive diagnostics terminal console (supports commands like `git-info`, `qrcode`, `projects`, `system`, `analytics`) |
 | `/admin/analytics` | Visitor analytics dashboard |
 | `/rag` | Retriever AI SaaS Product Landing Page — Hero, live mini-RAG sandbox, feature grid, 1-line embed snippet, and dynamic Geo-IP pricing (INR vs. USD). |

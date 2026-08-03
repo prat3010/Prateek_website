@@ -484,8 +484,8 @@ function Resume({ resumeData, certificates }: ResumeProps) {
           </ComicPanel>
         </div>
 
-        {/* ---- Credentials Section ---- */}
-        {certificates.length > 0 && (
+        {/* ---- Credentials Section (Dev Mode Only) ---- */}
+        {activeAudience !== 'business' && certificates.length > 0 && (
           <div className={styles.certsWrapper}>
             <h3 className={styles.certsTitle}>
               <Award size={22} />
