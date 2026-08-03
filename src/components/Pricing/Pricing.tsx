@@ -10,6 +10,7 @@ import type { ResumeData, PricingPlan } from '@/data/resume';
 import { NAVBAR_SCROLL_OFFSET } from '@/lib/constants';
 import ComicPanel from '@/components/ui/ComicPanel';
 import { Check } from 'lucide-react';
+import ScopingBriefModal from '@/components/Intake/ScopingBriefModal';
 import styles from './Pricing.module.css';
 
 interface PricingProps {
@@ -25,6 +26,7 @@ function Pricing({ resumeData }: PricingProps) {
   const { isNoir, audience, region } = useTheme();
   const lenis = useLenis();
   const prefersReducedMotion = useReducedMotion();
+  const [isScopingModalOpen, setIsScopingModalOpen] = React.useState(false);
 
   const activeAudience = audience || 'developer';
 
@@ -34,50 +36,50 @@ function Pricing({ resumeData }: PricingProps) {
     if (activeAudience === 'business') {
       return [
         {
-          title: "Landing Page Package",
-          price: isIndia ? "₹20,000 - " + "₹40,000" : "$300 - $550",
-          description: "A focused single-page website with a clear message, responsive layout, and contact flow.",
+          title: "Landing Page Engine",
+          price: isIndia ? "₹25,000 - ₹45,000" : "$300 - $550",
+          description: "High-converting single-page showcase for products, services, or SaaS waitlists.",
           features: [
-            "Custom UI mockup",
-            "Responsive layout and spacing",
-            "Basic SEO metadata",
-            "Resend contact email integration"
+            "Custom UI mockup & Framer Motion",
+            "Responsive mobile & desktop layout",
+            "Basic SEO schema & metadata",
+            "Resend transactional email integration"
           ],
           cta: "landing-page"
         },
         {
-          title: "Custom Web Application",
-          price: isIndia ? "₹75,000 - " + "₹1,35,000" : "$1,000 - $1,800",
-          description: "A multi-page application with Supabase-backed data, admin tools, and project-specific workflows.",
+          title: "Multi-Page Web App",
+          price: isIndia ? "₹45,000 - ₹90,000" : "$550 - $1,100",
+          description: "Multi-page corporate website or application with CMS and telemetry.",
           features: [
-            "Next.js App Router & TypeScript",
-            "Supabase data layer setup",
-            "Admin or analytics views",
-            "Custom forms or billing flow"
+            "Next.js 16 App Router & TypeScript",
+            "3 to 6 custom content pages",
+            "Headless CMS integration",
+            "Privacy-focused analytics telemetry"
           ],
           cta: "web-application"
         },
         {
-          title: "Monthly Support & SEO",
-          price: isIndia ? "₹7,500 / mo" : "$100 / mo",
-          description: "Ongoing maintenance, content updates, and periodic performance checks.",
+          title: "SaaS MVP & App Portal",
+          price: isIndia ? "₹90,000 - ₹1,50,000+" : "$1,100 - $2,000+",
+          description: "Full-stack web application with Supabase authentication, database & payments.",
           features: [
-            "Included development hours",
-            "Performance and usability checks",
-            "Monthly page-visit review",
-            "Security and package updates"
+            "Supabase Auth & Database setup",
+            "Stripe or Razorpay payment gateway",
+            "Role-gated admin portal",
+            "Custom REST / Server Actions API"
           ],
-          cta: "monthly-support"
+          cta: "saas-mvp"
         },
         {
-          title: "Private AI Knowledge Base & Assistant",
-          price: isIndia ? "₹1,20,000 - ₹2,40,000" : "$1,500 - $3,000",
-          description: "Turn your company's PDFs, SOPs, and internal data into a 100% private, secure AI search assistant.",
+          title: "Enterprise AI RAG Engine",
+          price: isIndia ? "₹1,50,000+" : "$1,800+",
+          description: "Custom AI assistant, document ingestion pipeline, and vector search knowledge base.",
           features: [
-            "Custom RAG document ingestion pipeline",
-            "100% Data Privacy (No public LLM training)",
-            "Embedded Chat Interface for Web or Team",
-            "Admin Dashboard & Role Access Control"
+            "Retriever RAG Core & Vector DB",
+            "Hybrid Search (Dense + BM25) + Rerank",
+            "Embedded chat interface with citations",
+            "100% private data isolation & RLS"
           ],
           cta: "ai-knowledge-base"
         }
@@ -143,6 +145,11 @@ function Pricing({ resumeData }: PricingProps) {
   }, [resumeData, activeAudience, region, fallbackPlans]);
 
   const handleSelectPackage = (ctaCode: string) => {
+    if (activeAudience === 'business') {
+      setIsScopingModalOpen(true);
+      return;
+    }
+
     // Dispatch custom event to pre-populate form
     const selectEvent = new CustomEvent('select-package', { detail: { package: ctaCode } });
     window.dispatchEvent(selectEvent);
@@ -215,6 +222,12 @@ function Pricing({ resumeData }: PricingProps) {
           </motion.div>
         </AnimatePresence>
       </div>
+
+      <ScopingBriefModal
+        isOpen={isScopingModalOpen}
+        onClose={() => setIsScopingModalOpen(false)}
+        resumeData={resumeData}
+      />
     </section>
   );
 };

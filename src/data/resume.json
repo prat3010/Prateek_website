@@ -41,50 +41,50 @@
   "pricing": {
     "business": [
       {
-        "title": "Landing Page Package",
+        "title": "Landing Page Engine",
         "price": "$300 - $550",
-        "description": "A focused single-page website with a clear message, responsive layout, and contact flow.",
+        "description": "High-converting single-page showcase for products, services, or SaaS waitlists.",
         "features": [
-          "Custom UI mockup",
-          "Responsive layout and spacing",
-          "Basic SEO metadata",
-          "Resend contact email integration"
+          "Custom UI mockup & Framer Motion",
+          "Responsive mobile & desktop layout",
+          "Basic SEO schema & metadata",
+          "Resend transactional email integration"
         ],
         "cta": "landing-page"
       },
       {
-        "title": "Custom Web Application",
-        "price": "$1,000 - $1,800",
-        "description": "A multi-page application with Supabase-backed data, admin tools, and project-specific workflows.",
+        "title": "Multi-Page Web App",
+        "price": "$550 - $1,100",
+        "description": "Multi-page corporate website or application with CMS and telemetry.",
         "features": [
-          "Next.js App Router & TypeScript",
-          "Supabase data layer setup",
-          "Admin or analytics views",
-          "Custom forms or billing flow"
+          "Next.js 16 App Router & TypeScript",
+          "3 to 6 custom content pages",
+          "Headless CMS integration",
+          "Privacy-focused analytics telemetry"
         ],
         "cta": "web-application"
       },
       {
-        "title": "Monthly Support & SEO",
-        "price": "$100 / mo",
-        "description": "Ongoing maintenance, content updates, and periodic performance checks.",
+        "title": "SaaS MVP & App Portal",
+        "price": "$1,100 - $2,000+",
+        "description": "Full-stack web application with Supabase authentication, database & payments.",
         "features": [
-          "Included development hours",
-          "Performance and usability checks",
-          "Monthly page-visit review",
-          "Security and package updates"
+          "Supabase Auth & Database setup",
+          "Stripe or Razorpay payment gateway",
+          "Role-gated admin portal",
+          "Custom REST / Server Actions API"
         ],
-        "cta": "monthly-support"
+        "cta": "saas-mvp"
       },
       {
-        "title": "Private AI Knowledge Base & Assistant",
-        "price": "$1,500 - $3,000",
-        "description": "Turn your company's PDFs, SOPs, and internal data into a 100% private, secure AI search assistant.",
+        "title": "Enterprise AI RAG Engine",
+        "price": "$1,800+",
+        "description": "Custom AI assistant, document ingestion pipeline, and vector search knowledge base.",
         "features": [
-          "Custom RAG document ingestion pipeline",
-          "100% Data Privacy (No public LLM training)",
-          "Embedded Chat Interface for Web or Team",
-          "Admin Dashboard & Role Access Control"
+          "Retriever RAG Core & Vector DB",
+          "Hybrid Search (Dense + BM25) + Rerank",
+          "Embedded chat interface with citations",
+          "100% private data isolation & RLS"
         ],
         "cta": "ai-knowledge-base"
       }
@@ -231,51 +231,51 @@
     "business": [
       {
         "cta": "landing-page",
-        "price": "\u20b920,000 - \u20b940,000",
-        "title": "Landing Page Package",
+        "price": "\u20b925,000 - \u20b945,000",
+        "title": "Landing Page Engine",
         "features": [
-          "Custom UI mockup",
-          "Responsive layout and spacing",
-          "Basic SEO metadata",
-          "Resend contact email integration"
+          "Custom UI mockup & Framer Motion",
+          "Responsive mobile & desktop layout",
+          "Basic SEO schema & metadata",
+          "Resend transactional email integration"
         ],
-        "description": "A focused single-page website with a clear message, responsive layout, and contact flow."
+        "description": "High-converting single-page showcase for products, services, or SaaS waitlists."
       },
       {
         "cta": "web-application",
-        "price": "\u20b975,000 - \u20b91,35,000",
-        "title": "Custom Web Application",
+        "price": "\u20b945,000 - \u20b990,000",
+        "title": "Multi-Page Web App",
         "features": [
-          "Next.js App Router & TypeScript",
-          "Supabase data layer setup",
-          "Admin or analytics views",
-          "Custom forms or billing flow"
+          "Next.js 16 App Router & TypeScript",
+          "3 to 6 custom content pages",
+          "Headless CMS integration",
+          "Privacy-focused analytics telemetry"
         ],
-        "description": "A multi-page application with Supabase-backed data, admin tools, and project-specific workflows."
+        "description": "Multi-page corporate website or application with CMS and telemetry."
       },
       {
-        "cta": "monthly-support",
-        "price": "\u20b97,500 / mo",
-        "title": "Monthly Support & SEO",
+        "cta": "saas-mvp",
+        "price": "\u20b990,000 - \u20b91,50,000+",
+        "title": "SaaS MVP & App Portal",
         "features": [
-          "Included development hours",
-          "Performance and usability checks",
-          "Monthly page-visit review",
-          "Security and package updates"
+          "Supabase Auth & Database setup",
+          "Stripe or Razorpay payment gateway",
+          "Role-gated admin portal",
+          "Custom REST / Server Actions API"
         ],
-        "description": "Ongoing maintenance, content updates, and periodic performance checks."
+        "description": "Full-stack web application with Supabase authentication, database & payments."
       },
       {
         "cta": "ai-knowledge-base",
-        "price": "\u20b91,20,000 - \u20b92,40,000",
-        "title": "Private AI Knowledge Base & Assistant",
+        "price": "\u20b91,50,000+",
+        "title": "Enterprise AI RAG Engine",
         "features": [
-          "Custom RAG document ingestion pipeline",
-          "100% Data Privacy (No public LLM training)",
-          "Embedded Chat Interface for Web or Team",
-          "Admin Dashboard & Role Access Control"
+          "Retriever RAG Core & Vector DB",
+          "Hybrid Search (Dense + BM25) + Rerank",
+          "Embedded chat interface with citations",
+          "100% private data isolation & RLS"
         ],
-        "description": "Turn your company's PDFs, SOPs, and internal data into a 100% private, secure AI search assistant."
+        "description": "Custom AI assistant, document ingestion pipeline, and vector search knowledge base."
       }
     ],
     "developer": [
