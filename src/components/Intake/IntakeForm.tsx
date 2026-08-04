@@ -112,6 +112,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   const [errorMsg, setErrorMsg] = useState('');
   const [activePopoverId, setActivePopoverId] = useState<string | null>(null);
   const [popoverAnchor, setPopoverAnchor] = useState<{ x: number; y: number } | null>(null);
+  const [recaptchaReady, setRecaptchaReady] = useState(!SITE_KEY);
 
   // Resolve deep-link preset (engine or goal archetype) to the wizard's initial selections
   const initialArchetype = useMemo(() => {
@@ -261,13 +262,18 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
 
   // Load Google reCAPTCHA v3 script dynamically if configured
   useEffect(() => {
-    if (!SITE_KEY || document.getElementById('recaptcha-script')) {
+    if (!SITE_KEY) return;
+    if (document.getElementById('recaptcha-script')) {
+      if (window.grecaptcha) {
+        window.grecaptcha.ready(() => setRecaptchaReady(true));
+      }
       return;
     }
     const script = document.createElement('script');
     script.id = 'recaptcha-script';
     script.src = `https://www.google.com/recaptcha/api.js?render=${SITE_KEY}`;
     script.async = true;
+    script.onload = () => window.grecaptcha?.ready(() => setRecaptchaReady(true));
     document.head.appendChild(script);
   }, []);
 
@@ -289,13 +295,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
       let recaptchaToken: string | undefined;
       if (SITE_KEY && window.grecaptcha) {
         try {
-          recaptchaToken = await new Promise<string>((resolve, reject) => {
-            window.grecaptcha!.ready(() => {
-              window.grecaptcha!.execute(SITE_KEY, { action: 'intake_submit' })
-                .then(resolve)
-                .catch(reject);
-            });
-          });
+          recaptchaToken = await window.grecaptcha.execute(SITE_KEY, { action: 'intake_submit' });
         } catch (recaptchaErr) {
           console.warn('reCAPTCHA execution error:', recaptchaErr);
         }
@@ -900,8 +900,8 @@ Notes: ${formData.additionalNotes}
                   ) : (
                     <button
                       type="submit"
-                      disabled={submitting || !formData.agreedToTerms}
-                      className={`${styles.btn} ${styles.btnPrimary} ${!formData.agreedToTerms ? styles.btnDisabled : ''}`}
+                      disabled={submitting || !formData.agreedToTerms || !recaptchaReady}
+                      className={`${styles.btn} ${styles.btnPrimary} ${(!formData.agreedToTerms || !recaptchaReady) ? styles.btnDisabled : ''}`}
                       title={!formData.agreedToTerms ? 'Accept commercial terms to submit' : 'Submit scoping brief'}
                     >
                       {submitting ? 'SUBMITTING...' : 'SUBMIT SCOPING BRIEF'}
