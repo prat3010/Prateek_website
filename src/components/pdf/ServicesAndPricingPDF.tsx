@@ -300,7 +300,7 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
               <Text style={styles.moduleDesc}>Retriever RAG Core, Vector Database, Hybrid Search, Citations, Admin Analytics</Text>
             </View>
             <View style={styles.colPrice}>
-              <Text style={styles.priceVal}>From INR 1.5L+ / $1.8k+ · Bespoke Quote</Text>
+              <Text style={styles.priceVal}>From INR 2.5L+ / $3k+ · Bespoke Quote</Text>
             </View>
           </View>
         </View>

@@ -366,8 +366,8 @@
         "id": "saas",
         "title": "Full-Stack SaaS MVP Core Engine",
         "tier": "Tier 3",
-        "priceINR": 75000,
-        "priceUSD": 950,
+        "priceINR": 120000,
+        "priceUSD": 1500,
         "laymanDescription": "A production software foundation connected to a cloud database for web apps where users create accounts, manage data, and run software workflows.",
         "techSpecs": "Full Web App Shell, Supabase PostgreSQL Architecture, Server Caching (unstable_cache), Production Vercel Wiring"
       }
@@ -384,8 +384,8 @@
       {
         "id": "payments",
         "label": "Payment Gateway Integration (Stripe/Razorpay)",
-        "priceINR": 25000,
-        "priceUSD": 300,
+        "priceINR": 35000,
+        "priceUSD": 450,
         "laymanDescription": "Enables your website to collect payments via Credit Cards, Apple Pay, UPI, or subscriptions with automatic digital invoicing.",
         "techSpecs": "Stripe & Razorpay Webhook Listeners, 1-Click Checkout, Recurring Billing, PCI DSS Compliance setup"
       },
@@ -400,16 +400,16 @@
       {
         "id": "ai_rag",
         "label": "Private AI Knowledge Base / Vector Search (RAG)",
-        "priceINR": 35000,
-        "priceUSD": 420,
+        "priceINR": 60000,
+        "priceUSD": 750,
         "laymanDescription": "An intelligent AI assistant trained exclusively on your business documents, FAQs, and PDFs that answers customer questions 24/7 with source citations.",
         "techSpecs": "pgvector Vector Embeddings, Document Chunking Pipeline, Semantic Search, Presigned Citation Downloads, Feedback Telemetry"
       },
       {
         "id": "admin",
         "label": "Admin Dashboard & Role Access Control (RBAC)",
-        "priceINR": 30000,
-        "priceUSD": 360,
+        "priceINR": 40000,
+        "priceUSD": 500,
         "laymanDescription": "A private internal command center for you and your team to view real-time traffic, manage customer data, and assign staff permissions.",
         "techSpecs": "Single-Pass SQL RPC Aggregations (get_analytics_summary), Visitor Analytics Charts, Content Forms, Admin Security Guards"
       },
@@ -540,8 +540,8 @@
       {
         "id": "scratch",
         "label": "Starting from Scratch (Full Brand Kit & Copy)",
-        "priceINR": 18000,
-        "priceUSD": 220,
+        "priceINR": 25000,
+        "priceUSD": 300,
         "description": "Vector logo design, color palette, typography pairing, and copywriting."
       }
     ],
@@ -549,8 +549,8 @@
       {
         "id": "basic",
         "name": "Basic Care Plan",
-        "priceINR": 2500,
-        "priceUSD": 30,
+        "priceINR": 4000,
+        "priceUSD": 50,
         "period": "/ month",
         "badge": "\ud83d\udca1 Recommended for Landing Pages",
         "laymanDescription": "Keeps your server healthy, creates daily automated database backups, installs security patches, and ensures your site stays online 24/7.",
@@ -565,8 +565,8 @@
       {
         "id": "standard",
         "name": "Standard Care Plan",
-        "priceINR": 6500,
-        "priceUSD": 80,
+        "priceINR": 8500,
+        "priceUSD": 100,
         "period": "/ month",
         "badge": "\ud83d\udca1 Recommended for Auth/Payments/CMS",
         "laymanDescription": "Includes everything in Basic plus up to 4 hours of monthly developer support to edit text, swap images, update pages, or tweak designs whenever you need.",
@@ -581,8 +581,8 @@
       {
         "id": "premium",
         "name": "Premium AI & Dev SLA Care Plan",
-        "priceINR": 15000,
-        "priceUSD": 180,
+        "priceINR": 25000,
+        "priceUSD": 300,
         "period": "/ month",
         "badge": "\ud83d\udca1 Recommended for AI Chatbot & RAG Engines",
         "laymanDescription": "For critical business apps and AI engines. Includes a guaranteed 24-hour emergency response time, AI model accuracy tuning, SEO reports, and dedicated dev hours.",

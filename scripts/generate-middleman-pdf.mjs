@@ -482,29 +482,29 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath, theme }) 
       children.push(
         h(View, { key: 'commission_table', style: styles.table },
           h(View, { style: styles.tableHeader },
-            h(Text, { style: [styles.tableCellBold, { width: '40%' }] }, 'PROJECT TIER & BUDGET RANGE'),
-            h(Text, { style: [styles.tableCellBold, { width: '30%' }] }, 'PARTNER COMMISSION'),
-            h(Text, { style: [styles.tableCellBold, { width: '30%' }] }, 'PAYOUT TIMELINE')
+            h(Text, { style: [styles.tableCellBold, { width: '40%', borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingRight: 6 }] }, 'PROJECT TIER & BUDGET RANGE'),
+            h(Text, { style: [styles.tableCellBold, { width: '30%', borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingLeft: 6, paddingRight: 6 }] }, 'PARTNER COMMISSION'),
+            h(Text, { style: [styles.tableCellBold, { width: '30%', paddingLeft: 6 }] }, 'PAYOUT TIMELINE')
           ),
           h(View, { style: styles.tableRow },
-            h(Text, { style: [styles.tableCell, { width: '40%' }] }, 'Tier 1: Landing Page (INR 25k–45k / $300–$550)'),
-            h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: themeConfig.labelBoldFont }] }, tier1Cut),
-            h(Text, { style: [styles.tableCell, { width: '30%' }] }, 'Within 48h of Client 50% Deposit')
+            h(Text, { style: [styles.tableCell, { width: '40%', borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingRight: 6 }] }, 'Tier 1: Landing Page (INR 25k–45k / $300–$550)'),
+            h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: themeConfig.labelBoldFont, borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingLeft: 6, paddingRight: 6 }] }, tier1Cut),
+            h(Text, { style: [styles.tableCell, { width: '30%', paddingLeft: 6 }] }, 'Within 48h of Client 50% Deposit')
           ),
           h(View, { style: styles.tableRow },
-            h(Text, { style: [styles.tableCell, { width: '40%' }] }, 'Tier 2: Multi-Page Web App (INR 45k–90k / $550–$1.1k)'),
-            h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: themeConfig.labelBoldFont }] }, tier2Cut),
-            h(Text, { style: [styles.tableCell, { width: '30%' }] }, 'Within 48h of Client 50% Deposit')
+            h(Text, { style: [styles.tableCell, { width: '40%', borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingRight: 6 }] }, 'Tier 2: Multi-Page Web App (INR 45k–1.2L / $550–$1.5k)'),
+            h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: themeConfig.labelBoldFont, borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingLeft: 6, paddingRight: 6 }] }, tier2Cut),
+            h(Text, { style: [styles.tableCell, { width: '30%', paddingLeft: 6 }] }, 'Within 48h of Client 50% Deposit')
           ),
           h(View, { style: styles.tableRow },
-            h(Text, { style: [styles.tableCell, { width: '40%' }] }, 'Tier 3: SaaS / AI RAG Engine (INR 90k–1.5L+ / $1.1k+)'),
-            h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: themeConfig.labelBoldFont }] }, tier3Cut),
-            h(Text, { style: [styles.tableCell, { width: '30%' }] }, 'Within 48h of Client 50% Deposit')
+            h(Text, { style: [styles.tableCell, { width: '40%', borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingRight: 6 }] }, 'Tier 3: SaaS / AI RAG Engine (INR 1.2L–2.5L+ / $1.5k+)'),
+            h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: themeConfig.labelBoldFont, borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingLeft: 6, paddingRight: 6 }] }, tier3Cut),
+            h(Text, { style: [styles.tableCell, { width: '30%', paddingLeft: 6 }] }, 'Within 48h of Client 50% Deposit')
           ),
           h(View, { style: [styles.tableRow, { borderBottomWidth: 0 }] },
-            h(Text, { style: [styles.tableCell, { width: '40%' }] }, 'Recurring Care Plan (ongoing)'),
-            h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: themeConfig.labelBoldFont }] }, recurringCut),
-            h(Text, { style: [styles.tableCell, { width: '30%' }] }, 'Monthly on cleared Net Funds')
+            h(Text, { style: [styles.tableCell, { width: '40%', borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingRight: 6 }] }, 'Recurring Care Plan (ongoing)'),
+            h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: themeConfig.labelBoldFont, borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingLeft: 6, paddingRight: 6 }] }, recurringCut),
+            h(Text, { style: [styles.tableCell, { width: '30%', paddingLeft: 6 }] }, 'Monthly on cleared Net Funds')
           )
         )
       );
