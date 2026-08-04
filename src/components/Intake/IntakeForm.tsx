@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { generateQuestionnairePDF } from '@/utils/pdfGenerator';
 import { useTheme } from '@/context/ThemeContext';
+import Portal from '@/components/ui/Portal';
 import type {
   BaseEngineItem,
   BrandAssetOption,
@@ -110,6 +111,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [activePopoverId, setActivePopoverId] = useState<string | null>(null);
+  const [popoverAnchor, setPopoverAnchor] = useState<{ x: number; y: number } | null>(null);
 
   // Resolve deep-link preset (engine or goal archetype) to the wizard's initial selections
   const initialArchetype = useMemo(() => {
@@ -181,7 +183,14 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
 
   const togglePopover = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    setActivePopoverId(prev => (prev === id ? null : id));
+    if (activePopoverId === id) {
+      setActivePopoverId(null);
+      setPopoverAnchor(null);
+    } else {
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      setActivePopoverId(id);
+      setPopoverAnchor({ x: rect.left, y: rect.bottom + 6 });
+    }
   };
 
   const selectedEngine = useMemo(() => {
@@ -344,7 +353,7 @@ Notes: ${formData.additionalNotes}
   ];
 
   return (
-    <section className={styles.intakeSection} id="scoping-form" onClick={() => setActivePopoverId(null)}>
+    <section className={styles.intakeSection} id="scoping-form" onClick={() => { setActivePopoverId(null); setPopoverAnchor(null); }}>
       <div className={styles.container}>
         <div className={styles.card}>
           <div className={styles.header}>
@@ -494,9 +503,9 @@ Notes: ${formData.additionalNotes}
                         return (
                           <div
                             key={e.id}
-                            className={`${styles.checkboxCard}`}
+                            className={`${styles.checkboxCard} ${isSelected ? styles.checkboxCardSelected : ''}`}
                             onClick={() => setFormData({ ...formData, selectedBaseEngineId: e.id })}
-                            style={{ cursor: 'pointer', position: 'relative', borderLeft: isSelected ? '3px solid currentColor' : 'none' }}
+                            style={{ cursor: 'pointer' }}
                           >
                             <input
                               type="radio"
@@ -521,14 +530,25 @@ Notes: ${formData.additionalNotes}
                               </div>
                               <p style={{ margin: '3px 0 0 0', fontSize: '11px', opacity: 0.7, lineHeight: 1.4 }}>{e.laymanDescription}</p>
 
-                              {isPopoverOpen && (
-                                <div className={styles.popoverBox} onClick={ev => ev.stopPropagation()}>
-                                  <div className={styles.popoverHeader}>
-                                    <span>🛠️ TECHNICAL ARCHITECTURE SPECS</span>
-                                    <X size={12} style={{ cursor: 'pointer' }} onClick={() => setActivePopoverId(null)} />
-                                  </div>
-                                  <p className={styles.popoverTechText}>{e.techSpecs}</p>
-                                </div>
+                              {isPopoverOpen && popoverAnchor && (
+                                <Portal>
+                                  <>
+                                    <div className={styles.popoverOverlay} onClick={() => { setActivePopoverId(null); setPopoverAnchor(null); }} />
+                                    <div
+                                      className={styles.popoverPortal}
+                                      style={{ left: popoverAnchor.x, top: popoverAnchor.y }}
+                                      onClick={ev => ev.stopPropagation()}
+                                    >
+                                      <div className={styles.popoverBox} style={{ position: 'static', left: 'auto', right: 'auto' }}>
+                                        <div className={styles.popoverHeader}>
+                                          <span>🛠️ TECHNICAL ARCHITECTURE SPECS</span>
+                                          <X size={12} style={{ cursor: 'pointer' }} onClick={() => { setActivePopoverId(null); setPopoverAnchor(null); }} />
+                                        </div>
+                                        <p className={styles.popoverTechText}>{e.techSpecs}</p>
+                                      </div>
+                                    </div>
+                                  </>
+                                </Portal>
                               )}
                             </div>
                           </div>
@@ -548,8 +568,8 @@ Notes: ${formData.additionalNotes}
                         return (
                           <label
                             key={m.id}
-                            className={`${styles.checkboxCard} ${isCompulsory ? styles.lockedCard : ''}`}
-                            style={{ position: 'relative', borderLeft: isChecked ? '3px solid currentColor' : 'none' }}
+                            className={`${styles.checkboxCard} ${isCompulsory ? styles.lockedCard : ''} ${isChecked ? styles.checkboxCardSelected : ''}`}
+                            style={{ cursor: isCompulsory ? 'not-allowed' : 'pointer' }}
                           >
                             <input
                               type="checkbox"
@@ -579,14 +599,25 @@ Notes: ${formData.additionalNotes}
                               </div>
                               <p style={{ margin: '3px 0 0 0', fontSize: '11px', opacity: 0.7, lineHeight: 1.4 }}>{m.laymanDescription}</p>
 
-                              {isPopoverOpen && (
-                                <div className={styles.popoverBox} onClick={ev => ev.stopPropagation()}>
-                                  <div className={styles.popoverHeader}>
-                                    <span>🛠️ TECHNICAL ARCHITECTURE SPECS</span>
-                                    <X size={12} style={{ cursor: 'pointer' }} onClick={() => setActivePopoverId(null)} />
-                                  </div>
-                                  <p className={styles.popoverTechText}>{m.techSpecs}</p>
-                                </div>
+                              {isPopoverOpen && popoverAnchor && (
+                                <Portal>
+                                  <>
+                                    <div className={styles.popoverOverlay} onClick={() => { setActivePopoverId(null); setPopoverAnchor(null); }} />
+                                    <div
+                                      className={styles.popoverPortal}
+                                      style={{ left: popoverAnchor.x, top: popoverAnchor.y }}
+                                      onClick={ev => ev.stopPropagation()}
+                                    >
+                                      <div className={styles.popoverBox} style={{ position: 'static', left: 'auto', right: 'auto' }}>
+                                        <div className={styles.popoverHeader}>
+                                          <span>🛠️ TECHNICAL ARCHITECTURE SPECS</span>
+                                          <X size={12} style={{ cursor: 'pointer' }} onClick={() => { setActivePopoverId(null); setPopoverAnchor(null); }} />
+                                        </div>
+                                        <p className={styles.popoverTechText}>{m.techSpecs}</p>
+                                      </div>
+                                    </div>
+                                  </>
+                                </Portal>
                               )}
                             </div>
                           </label>
@@ -626,9 +657,9 @@ Notes: ${formData.additionalNotes}
                         return (
                           <label
                             key={b.id}
-                            className={styles.checkboxCard}
+                            className={`${styles.checkboxCard} ${isSelected ? styles.checkboxCardSelected : ''}`}
                             onClick={() => setFormData({ ...formData, selectedBrandAssetId: b.id })}
-                            style={{ cursor: 'pointer', borderLeft: isSelected ? '3px solid currentColor' : 'none' }}
+                            style={{ cursor: 'pointer' }}
                           >
                             <input
                               type="radio"
@@ -735,14 +766,25 @@ Notes: ${formData.additionalNotes}
                               ))}
                             </ul>
 
-                            {isPopoverOpen && (
-                              <div className={styles.popoverBox} onClick={ev => ev.stopPropagation()}>
-                                <div className={styles.popoverHeader}>
-                                  <span>🛠️ TECHNICAL SLA SPECS</span>
-                                  <X size={12} style={{ cursor: 'pointer' }} onClick={() => setActivePopoverId(null)} />
-                                </div>
-                                <p className={styles.popoverTechText}>{p.techSpecs}</p>
-                              </div>
+                            {isPopoverOpen && popoverAnchor && (
+                              <Portal>
+                                <>
+                                  <div className={styles.popoverOverlay} onClick={() => { setActivePopoverId(null); setPopoverAnchor(null); }} />
+                                  <div
+                                    className={styles.popoverPortal}
+                                    style={{ left: popoverAnchor.x, top: popoverAnchor.y }}
+                                    onClick={ev => ev.stopPropagation()}
+                                  >
+                                    <div className={styles.popoverBox} style={{ position: 'static', left: 'auto', right: 'auto' }}>
+                                      <div className={styles.popoverHeader}>
+                                        <span>🛠️ TECHNICAL SLA SPECS</span>
+                                        <X size={12} style={{ cursor: 'pointer' }} onClick={() => { setActivePopoverId(null); setPopoverAnchor(null); }} />
+                                      </div>
+                                      <p className={styles.popoverTechText}>{p.techSpecs}</p>
+                                    </div>
+                                  </div>
+                                </>
+                              </Portal>
                             )}
                           </div>
                         );
