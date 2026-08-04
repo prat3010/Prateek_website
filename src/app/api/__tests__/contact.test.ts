@@ -61,8 +61,8 @@ describe('POST /api/contact', () => {
     expect(res.status).toBe(400);
   });
 
-  it('returns 400 when message exceeds 5000 chars', async () => {
-    const res = await POST(makeRequest({ name: 'Test', email: 'a@b.com', message: 'x'.repeat(5001) }));
+  it('returns 400 when message exceeds 10000 chars', async () => {
+    const res = await POST(makeRequest({ name: 'Test', email: 'a@b.com', message: 'x'.repeat(10001) }));
     expect(res.status).toBe(400);
   });
 

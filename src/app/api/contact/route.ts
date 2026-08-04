@@ -44,7 +44,7 @@ export async function POST(request: Request) {
         }),
       });
       const verifyData = await verifyRes.json() as { success: boolean; score: number; 'error-codes'?: string[] };
-      if (!verifyData.success || verifyData.score < 0.5) {
+      if (!verifyData.success || verifyData.score < 0.3) {
         console.warn('reCAPTCHA failed:', verifyData['error-codes'], 'score:', verifyData.score);
         return NextResponse.json({ error: 'Automated submission detected. Please try again.' }, { status: 400 });
       }
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
     }
 
     // Validate length constraints
-    if (name.length > 100 || email.length > 254 || message.length > 5000) {
+    if (name.length > 100 || email.length > 254 || message.length > 10000) {
       return NextResponse.json(
         { error: 'Input size limits exceeded.' },
         { status: 400 }

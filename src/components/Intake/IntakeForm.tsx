@@ -274,7 +274,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   const handleSubmitOnline = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.companyName.trim() || !formData.contactEmail.trim()) {
-      setErrorMsg('Please enter your Company Name and Email in Step 4.');
+      setErrorMsg('Please enter your Company Name and Email in Step 1.');
       return;
     }
     if (!formData.agreedToTerms) {
@@ -335,7 +335,10 @@ Notes: ${formData.additionalNotes}
         })
       });
 
-      if (!res.ok) throw new Error('Failed to submit intake scoping brief.');
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.error || 'Failed to submit intake scoping brief.');
+      }
 
       setSubmitted(true);
     } catch (err: unknown) {
@@ -820,19 +823,9 @@ Notes: ${formData.additionalNotes}
 
                   <div className={styles.field}>
                     <label className={styles.label}>Standard Commercial Terms (T&Cs) Summary</label>
-                    <div style={{
-                      background: '#FFFFFF',
-                      border: '1.5px solid #2B2B36',
-                      borderRadius: '8px',
-                      padding: '12px 16px',
-                      maxHeight: '120px',
-                      overflowY: 'auto',
-                      fontSize: '12px',
-                      color: '#475569',
-                      lineHeight: '1.5'
-                    }}>
+                    <div className={styles.termsContentBox}>
                       {termsList.map((t, idx) => (
-                        <p key={idx} style={{ marginBottom: '6px' }}>{t}</p>
+                        <p key={idx}>{t}</p>
                       ))}
                     </div>
                   </div>
