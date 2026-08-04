@@ -17,15 +17,16 @@ const nextConfig: NextConfig = {
                         key: "Content-Security-Policy",
             value:
               "default-src 'self'; " +
-              `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'${isDev ? " 'unsafe-eval'" : ""} https://va.vercel-scripts.com https://cdn.jsdelivr.net; ` +
-              "style-src 'self' 'unsafe-inline'; " +
-              "img-src 'self' data: blob:; " +
-              `connect-src 'self'${isDev ? " ws: wss: http://localhost:8000" : ""} https://va.vercel-scripts.com https://cdn.jsdelivr.net https://rag.prateeq.in https://storage.googleapis.com; ` +
+              `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'${isDev ? " 'unsafe-eval'" : ""} https://va.vercel-scripts.com https://cdn.jsdelivr.net https://www.google.com https://www.gstatic.com; ` +
+              "style-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com; " +
+              "img-src 'self' data: blob: https://www.google.com https://www.gstatic.com; " +
+              `connect-src 'self'${isDev ? " ws: wss: http://localhost:8000" : ""} https://va.vercel-scripts.com https://cdn.jsdelivr.net https://rag.prateeq.in https://storage.googleapis.com https://www.google.com; ` +
               "worker-src 'self' blob:; " +
-              "font-src 'self'; " +
+              "font-src 'self' https://www.gstatic.com; " +
               "object-src 'none'; " +
               "base-uri 'self'; " +
               "form-action 'self'; " +
+              "frame-src 'self' https://www.google.com https://www.gstatic.com; " +
               "frame-ancestors 'none';",
           },
           {

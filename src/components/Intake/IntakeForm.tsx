@@ -956,9 +956,9 @@ Notes: ${formData.additionalNotes}
                   )}
                   {recaptchaUnavailable && (
                     <p className={styles.recaptchaWarning}>
-                      reCAPTCHA could not be initialized on this origin. Register this domain
-                      in the Google reCAPTCHA admin console (or unset RECAPTCHA_SECRET_KEY in
-                      local .env.local to test the email flow without spam protection).
+                      reCAPTCHA could not be initialized on this origin — this usually means a
+                      browser extension is blocking it, or this origin is not registered in the
+                      Google reCAPTCHA admin console.
                     </p>
                   )}
                 </div>
