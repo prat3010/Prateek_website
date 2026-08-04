@@ -29,7 +29,7 @@ A highly interactive, storyteller-driven personal portfolio website designed wit
 | `/blog/[slug]` | Individual blog post page |
 | `/Middleman_Partnership_Agreement.pdf` | Server-rendered Sales Partner Agreement PDF (follows the visitor's active azure/noir theme) |
 
-The client-side commercial PDFs (Scoping Brief, Services & Pricing Guide, Sales Partner Agreement) are brand-themed: they follow the visitor's azure/noir theme and embed the site's brand fonts (Playfair Display / Lora / JetBrains Mono in `public/fonts/`) plus the gremlin logo mark via `src/components/pdf/` (`pdfTheme.ts`, `PdfBrandHeader.tsx`, `PdfGremlinLogo.tsx`, `PdfFooter.tsx`).
+The client-side commercial PDFs (Scoping Brief, Services & Pricing Guide, Sales Partner Agreement) are brand-themed: they follow the visitor's azure/noir theme and embed the site's brand fonts (Playfair Display / Lora / JetBrains Mono in `public/fonts/`) plus the gremlin logo mark via `src/components/pdf/` (`pdfTheme.ts`, `PdfBrandHeader.tsx`, `PdfGremlinLogo.tsx`, `PdfFooter.tsx`). The `/scoping` intake submission renders the same branded Scoping Brief client-side and attaches it as a PDF to the `/api/contact` notification email via `generateQuestionnairePDFBase64()` in `src/utils/pdfGenerator.ts`.
 
 ### API Routes
 

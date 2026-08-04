@@ -5,11 +5,16 @@ vi.mock('@/data/supabase', () => ({
   supabase: null,
 }));
 
+let lastSendPayload: Record<string, unknown> | null = null;
+
 vi.mock('resend', () => ({
   Resend: class MockResend {
     constructor() {}
     emails = {
-      send: vi.fn().mockResolvedValue({ data: { id: 'test-id' }, error: null }),
+      send: vi.fn((payload: Record<string, unknown>) => {
+        lastSendPayload = payload;
+        return Promise.resolve({ data: { id: 'test-id' }, error: null });
+      }),
     };
   },
 }));
@@ -34,6 +39,7 @@ describe('POST /api/contact', () => {
   beforeEach(() => {
     vi.stubEnv('RESEND_API_KEY', 'test-key');
     vi.stubEnv('CONTACT_EMAIL_TO', 'test@example.com');
+    lastSendPayload = null;
   });
 
   it('returns 400 when name is missing', async () => {
@@ -91,5 +97,54 @@ describe('POST /api/contact', () => {
     }
     const res = await POST(makeRequest({ name: 'Test', email: 'a@b.com', message: 'hi' }, { 'x-forwarded-for': ip }));
     expect(res.status).toBe(429);
+  });
+
+  it('attaches the proposal PDF to the email', async () => {
+    const pdfAttachment = { content: 'JVBERi0xLjQgLS1mYWtl', filename: 'Acme_Scoping_Brief_Agreement.pdf' };
+    const res = await POST(makeRequest({ name: 'Test', email: 'a@b.com', message: 'hi', pdfAttachment }));
+    expect(res.status).toBe(200);
+    expect(lastSendPayload?.attachments).toEqual([
+      {
+        content: 'JVBERi0xLjQgLS1mYWtl',
+        filename: 'Acme_Scoping_Brief_Agreement.pdf',
+        content_type: 'application/pdf',
+      },
+    ]);
+  });
+
+  it('sends email without attachments when none provided', async () => {
+    const res = await POST(makeRequest({ name: 'Test', email: 'a@b.com', message: 'hi' }));
+    expect(res.status).toBe(200);
+    expect(lastSendPayload?.attachments).toEqual([]);
+  });
+
+  it('returns 400 when attachment content is not a string', async () => {
+    const res = await POST(makeRequest({
+      name: 'Test',
+      email: 'a@b.com',
+      message: 'hi',
+      pdfAttachment: { content: 123, filename: 'x.pdf' },
+    }));
+    expect(res.status).toBe(400);
+  });
+
+  it('returns 400 when attachment filename is not a PDF', async () => {
+    const res = await POST(makeRequest({
+      name: 'Test',
+      email: 'a@b.com',
+      message: 'hi',
+      pdfAttachment: { content: 'base64', filename: 'notes.txt' },
+    }));
+    expect(res.status).toBe(400);
+  });
+
+  it('returns 400 when attachment exceeds size limit', async () => {
+    const res = await POST(makeRequest({
+      name: 'Test',
+      email: 'a@b.com',
+      message: 'hi',
+      pdfAttachment: { content: 'x'.repeat(7_000_001), filename: 'big.pdf' },
+    }));
+    expect(res.status).toBe(400);
   });
 });

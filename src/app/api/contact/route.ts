@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name, email, message, recaptchaToken } = body;
+    const { name, email, message, recaptchaToken, pdfAttachment } = body;
 
     // Verify reCAPTCHA v3 token if secret key is configured
     if (process.env.RECAPTCHA_SECRET_KEY) {
@@ -85,6 +85,35 @@ export async function POST(request: Request) {
       );
     }
 
+    // Validate optional PDF attachment
+    let attachments: { content: string; filename: string }[] = [];
+    if (pdfAttachment) {
+      if (
+        typeof pdfAttachment !== 'object' ||
+        pdfAttachment === null ||
+        typeof (pdfAttachment as { content?: unknown }).content !== 'string' ||
+        typeof (pdfAttachment as { filename?: unknown }).filename !== 'string'
+      ) {
+        return NextResponse.json(
+          { error: 'Invalid PDF attachment format.' },
+          { status: 400 }
+        );
+      }
+      if ((pdfAttachment.content as string).length > 7_000_000) {
+        return NextResponse.json(
+          { error: 'PDF attachment is too large.' },
+          { status: 400 }
+        );
+      }
+      if (!/\.pdf$/i.test(pdfAttachment.filename)) {
+        return NextResponse.json(
+          { error: 'Attachment must be a PDF file.' },
+          { status: 400 }
+        );
+      }
+      attachments = [{ content: pdfAttachment.content, filename: pdfAttachment.filename }];
+    }
+
     if (!process.env.RESEND_API_KEY) {
       console.error('RESEND_API_KEY is not set in environment variables.');
       return NextResponse.json(
@@ -111,6 +140,7 @@ export async function POST(request: Request) {
       to: contactEmailTo,
       replyTo: email,
       subject: `New Portfolio Signal from ${cleanSubjectName}`,
+      attachments: attachments.map(a => ({ content: a.content, filename: a.filename, content_type: 'application/pdf' })),
       html: `
         <!DOCTYPE html>
         <html>

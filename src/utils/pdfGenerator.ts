@@ -64,6 +64,32 @@ async function renderAndOpenPDF(element: React.ReactElement<DocumentProps>, file
   }
 }
 
+function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      // Strip the `data:<mime>;base64,` prefix, keep only the base64 payload
+      resolve(result.includes(',') ? result.split(',')[1] : result);
+    };
+    reader.onerror = () => reject(new Error('Failed to read PDF blob.'));
+    reader.readAsDataURL(blob);
+  });
+}
+
+export async function generateQuestionnairePDFBase64(
+  resumeData?: ResumeData | null,
+  data?: QuestionnaireData,
+  isNoir = false
+): Promise<{ fileName: string; base64: string }> {
+  ensurePdfFonts();
+  const fileName = `${(data?.companyName || 'Client').replace(/\s+/g, '_')}_Scoping_Brief_Agreement.pdf`;
+  const element = React.createElement(ScopingBriefPDF, { resumeData, data, isNoir }) as unknown as React.ReactElement<DocumentProps>;
+  const blob = await pdf(element).toBlob();
+  const base64 = await blobToBase64(blob);
+  return { fileName, base64 };
+}
+
 export async function generateResumePDF(activePersona: Persona, resumeData: ResumeData) {
   const fileName = `Prateek_Sharma_Resume_${activePersona}.pdf`;
   const element = React.createElement(DeveloperResumePDF, { activePersona, resumeData }) as unknown as React.ReactElement<DocumentProps>;

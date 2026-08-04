@@ -15,7 +15,7 @@ import {
   X,
   Lock
 } from 'lucide-react';
-import { generateQuestionnairePDF } from '@/utils/pdfGenerator';
+import { generateQuestionnairePDF, generateQuestionnairePDFBase64 } from '@/utils/pdfGenerator';
 import { useTheme } from '@/context/ThemeContext';
 import Portal from '@/components/ui/Portal';
 import type {
@@ -238,26 +238,28 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     return maintenancePlans.find(p => p.id === targetId) || maintenancePlans[1];
   }, [formData.selectedMaintenanceId, autoMaintenancePlanId, maintenancePlans]);
 
+  const buildQuestionnaireData = () => ({
+    companyName: formData.companyName,
+    contactEmail: formData.contactEmail,
+    contactPhone: formData.contactPhone,
+    projectGoal: formData.projectGoal,
+    targetAudience: formData.targetAudience,
+    projectCategory: selectedEngine.title,
+    features: formData.selectedFeatures,
+    assetsStatus: totalCost.brandOpt.label,
+    inspirationLinks: formData.inspirationLinks,
+    timeline: formData.timeline,
+    budgetRange: `${selectedEngine.tier}: ₹${totalCost.totalINR.toLocaleString()} ($${totalCost.totalUSD.toLocaleString()})`,
+    maintenancePlan: activeMaintenancePlan.name,
+    maintenanceCostINR: activeMaintenancePlan.priceINR,
+    maintenanceCostUSD: activeMaintenancePlan.priceUSD,
+    totalBuildCostINR: totalCost.totalINR,
+    totalBuildCostUSD: totalCost.totalUSD,
+    additionalNotes: formData.additionalNotes
+  });
+
   const handleDownloadPDF = () => {
-    generateQuestionnairePDF(resumeData, {
-      companyName: formData.companyName,
-      contactEmail: formData.contactEmail,
-      contactPhone: formData.contactPhone,
-      projectGoal: formData.projectGoal,
-      targetAudience: formData.targetAudience,
-      projectCategory: selectedEngine.title,
-      features: formData.selectedFeatures,
-      assetsStatus: totalCost.brandOpt.label,
-      inspirationLinks: formData.inspirationLinks,
-      timeline: formData.timeline,
-      budgetRange: `${selectedEngine.tier}: ₹${totalCost.totalINR.toLocaleString()} ($${totalCost.totalUSD.toLocaleString()})`,
-      maintenancePlan: activeMaintenancePlan.name,
-      maintenanceCostINR: activeMaintenancePlan.priceINR,
-      maintenanceCostUSD: activeMaintenancePlan.priceUSD,
-      totalBuildCostINR: totalCost.totalINR,
-      totalBuildCostUSD: totalCost.totalUSD,
-      additionalNotes: formData.additionalNotes
-    }, isNoir);
+    generateQuestionnairePDF(resumeData, buildQuestionnaireData(), isNoir);
   };
 
   // Load Google reCAPTCHA v3 script dynamically if configured
@@ -301,6 +303,15 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
         }
       }
 
+      // Render the branded proposal PDF for the email attachment (best-effort)
+      let pdfAttachment: { content: string; filename: string } | null = null;
+      try {
+        const { fileName, base64 } = await generateQuestionnairePDFBase64(resumeData, buildQuestionnaireData(), isNoir);
+        pdfAttachment = { content: base64, filename: fileName };
+      } catch (pdfErr) {
+        console.warn('Failed to generate PDF attachment:', pdfErr);
+      }
+
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -308,6 +319,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
           name: formData.companyName,
           email: formData.contactEmail,
           recaptchaToken,
+          pdfAttachment,
           subject: `[SCOPING INTAKE] ${formData.companyName} (${selectedEngine.tier})`,
           message: `
 Client: ${formData.companyName} (${formData.contactEmail}, Phone: ${formData.contactPhone})
