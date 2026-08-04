@@ -286,7 +286,7 @@ def render_resume_tab():
                 partner_email = st.text_input("Partner Email", value=mm_data.get('partnerEmail', ''), key="mm_partner_email")
                 eff_date = st.text_input("Effective Date", value=mm_data.get('effectiveDate', 'August 2, 2026'), key="mm_eff_date")
                 dev_name = st.text_input("Developer Name", value=mm_data.get('developerName', 'Prateeq Sharma'), key="mm_dev_name")
-                dev_email = st.text_input("Developer Email", value=mm_data.get('developerEmail', '3010prateeksharma@gmail.com'), key="mm_dev_email")
+                dev_email = st.text_input("Developer Email", value=mm_data.get('developerEmail', 'prateeqsharma@gmail.com'), key="mm_dev_email")
             with col_mm2:
                 t1_comm = st.text_input("Tier 1 Commission (%)", value=mm_data.get('tier1Commission', '10%'), key="mm_t1_comm")
                 t2_comm = st.text_input("Tier 2 Commission (%)", value=mm_data.get('tier2Commission', '12%'), key="mm_t2_comm")

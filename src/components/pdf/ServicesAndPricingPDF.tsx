@@ -245,7 +245,7 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
           </View>
           <View style={styles.metaCol}>
             <Text style={styles.metaLabel}>ENGINEERING DIRECT</Text>
-            <Text style={styles.metaVal}>3010prateeksharma@gmail.com</Text>
+            <Text style={styles.metaVal}>prateeqsharma@gmail.com</Text>
           </View>
           <View style={styles.metaCol}>
             <Text style={styles.metaLabel}>PORTFOLIO WEBSITE</Text>
@@ -345,7 +345,7 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
             Launch our interactive Project Scoping Lab & Instant Quote wizard at https://prateeq.in/scoping to configure your build tier, select custom add-on modules, and generate your customized line-item quotation in under 2 minutes.
           </Text>
           <Text style={[styles.contactText, { marginTop: 4, fontFamily: theme.labelBoldFont }]}>
-            Direct Engineering Email: 3010prateeksharma@gmail.com | Web: https://prateeq.in
+            Direct Engineering Email: prateeqsharma@gmail.com | Web: https://prateeq.in
           </Text>
         </View>
 

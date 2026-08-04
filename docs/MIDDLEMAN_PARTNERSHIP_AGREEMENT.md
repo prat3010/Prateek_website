@@ -4,7 +4,7 @@
 > **Note:** The live agreement is rendered from `src/data/middlemanAgreementDefaults.json` (editable in the synchronizer's **Edit Resume Manually → 🤝 Partner & Scoping** tab). This file is a legacy static reference and may lag behind the canonical document.
 
 **Effective Date:** August 2, 2026  
-**Developer / Lead Architect:** Prateeq Sharma (`prateeq.in` | `3010prateeksharma@gmail.com`)  
+**Developer / Lead Architect:** Prateeq Sharma (`prateeq.in` | `prateeqsharma@gmail.com`)  
 **Sales Representative / Partner:** [Partner Name]  
 
 ---

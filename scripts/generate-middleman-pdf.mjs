@@ -43,7 +43,7 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath }) {
   const presentDateStr = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
   const effectiveDate = mm.effectiveDate && mm.effectiveDate.trim() ? mm.effectiveDate : presentDateStr;
   const devName = mm.developerName || scalars.developerName || 'Prateeq Sharma';
-  const devEmail = mm.developerEmail || scalars.developerEmail || '3010prateeksharma@gmail.com';
+  const devEmail = mm.developerEmail || scalars.developerEmail || 'prateeqsharma@gmail.com';
   const tier1Cut = mm.tier1Commission || scalars.tier1Commission || '10%';
   const tier2Cut = mm.tier2Commission || scalars.tier2Commission || '12%';
   const tier3Cut = mm.tier3Commission || scalars.tier3Commission || '15%';

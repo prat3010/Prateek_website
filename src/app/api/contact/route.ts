@@ -94,7 +94,7 @@ export async function POST(request: Request) {
     }
 
     const resend = new Resend(process.env.RESEND_API_KEY);
-    const contactEmailTo = process.env.CONTACT_EMAIL_TO?.trim() || '3010prateeksharma@gmail.com';
+    const contactEmailTo = process.env.CONTACT_EMAIL_TO?.trim() || 'prateeqsharma@gmail.com';
 
     // Escape HTML special characters for HTML email context
     const escapedName = escapeHtml(name);

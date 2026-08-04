@@ -11,7 +11,7 @@ import ConfettiBurst, { type ConfettiBurstHandle } from '@/components/effects/Co
 import styles from './Contact.module.css';
 
 const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
-const CONTACT_EMAIL = '3010prateeksharma@gmail.com';
+const CONTACT_EMAIL = 'prateeqsharma@gmail.com';
 
 // Extend window to include grecaptcha
 declare global {
