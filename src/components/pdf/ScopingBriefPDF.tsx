@@ -130,10 +130,14 @@ function createStyles(theme: PDFThemeConfig) {
     },
     colModule: {
       width: '62%',
+      borderRightWidth: 1,
+      borderRightColor: theme.cardBorder,
+      paddingRight: 6,
     },
     colPrice: {
       width: '38%',
       textAlign: 'right',
+      paddingLeft: 6,
     },
     moduleTitle: {
       fontFamily: theme.labelBoldFont,
@@ -359,15 +363,15 @@ export function ScopingBriefPDF({ resumeData, data, isNoir }: ScopingBriefPDFPro
         <Text style={styles.sectionHeader}>3. MONTHLY MAINTENANCE RETAINER & SLA PLAN</Text>
         <View style={styles.table}>
           <View style={styles.tableHeader}>
-            <Text style={[styles.tableHeaderCell, { width: '60%' }]}>SELECTED CARE PLAN & SCOPE</Text>
-            <Text style={[styles.tableHeaderCell, { width: '40%', textAlign: 'right' }]}>MONTHLY RETAINER</Text>
+            <Text style={[styles.tableHeaderCell, { width: '60%', borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingRight: 6 }]}>SELECTED CARE PLAN & SCOPE</Text>
+            <Text style={[styles.tableHeaderCell, { width: '40%', textAlign: 'right', paddingLeft: 6 }]}>MONTHLY RETAINER</Text>
           </View>
           <View style={[styles.tableRow, styles.tableRowHighlight]} wrap={false}>
-            <View style={{ width: '60%' }}>
+            <View style={{ width: '60%', borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingRight: 6 }}>
               <Text style={styles.moduleTitle}>{cleanPDFText(data?.maintenancePlan) || 'Standard Care Plan'}</Text>
               <Text style={styles.moduleDesc}>Hosting support, daily DB backups, security updates, 2-4h monthly dev time</Text>
             </View>
-            <View style={{ width: '40%', textAlign: 'right' }}>
+            <View style={{ width: '40%', textAlign: 'right', paddingLeft: 6 }}>
               <Text style={styles.priceVal}>{maintenanceINR > 0 ? `INR ${maintenanceINR.toLocaleString()}/mo ($${maintenanceUSD}/mo)` : 'Complimentary 30-Day Warranty'}</Text>
             </View>
           </View>

@@ -256,29 +256,29 @@ export function MiddlemanAgreementPDF({ resumeData, isNoir }: MiddlemanAgreement
         {isCommission && (
           <View style={styles.table}>
             <View style={styles.tableHeader}>
-              <Text style={[styles.tableCellBold, { width: '40%' }]}>PROJECT TIER & BUDGET RANGE</Text>
-              <Text style={[styles.tableCellBold, { width: '30%' }]}>PARTNER COMMISSION</Text>
-              <Text style={[styles.tableCellBold, { width: '30%' }]}>PAYOUT TIMELINE</Text>
+              <Text style={[styles.tableCellBold, { width: '40%', borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingRight: 6 }]}>PROJECT TIER & BUDGET RANGE</Text>
+              <Text style={[styles.tableCellBold, { width: '30%', borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingLeft: 6, paddingRight: 6 }]}>PARTNER COMMISSION</Text>
+              <Text style={[styles.tableCellBold, { width: '30%', paddingLeft: 6 }]}>PAYOUT TIMELINE</Text>
             </View>
             <View style={styles.tableRow}>
-              <Text style={[styles.tableCell, { width: '40%' }]}>Tier 1: Landing Page (INR 25k–45k / $300–$550)</Text>
-              <Text style={[styles.tableCell, { width: '30%', fontFamily: theme.labelBoldFont }]}>{tier1Cut}</Text>
-              <Text style={[styles.tableCell, { width: '30%' }]}>Within 48h of Client 50% Deposit</Text>
+              <Text style={[styles.tableCell, { width: '40%', borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingRight: 6 }]}>Tier 1: Landing Page (INR 25k–45k / $300–$550)</Text>
+              <Text style={[styles.tableCell, { width: '30%', fontFamily: theme.labelBoldFont, borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingLeft: 6, paddingRight: 6 }]}>{tier1Cut}</Text>
+              <Text style={[styles.tableCell, { width: '30%', paddingLeft: 6 }]}>Within 48h of Client 50% Deposit</Text>
             </View>
             <View style={styles.tableRow}>
-              <Text style={[styles.tableCell, { width: '40%' }]}>Tier 2: Multi-Page Web App (INR 45k–90k / $550–$1.1k)</Text>
-              <Text style={[styles.tableCell, { width: '30%', fontFamily: theme.labelBoldFont }]}>{tier2Cut}</Text>
-              <Text style={[styles.tableCell, { width: '30%' }]}>Within 48h of Client 50% Deposit</Text>
+              <Text style={[styles.tableCell, { width: '40%', borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingRight: 6 }]}>Tier 2: Multi-Page Web App (INR 45k–90k / $550–$1.1k)</Text>
+              <Text style={[styles.tableCell, { width: '30%', fontFamily: theme.labelBoldFont, borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingLeft: 6, paddingRight: 6 }]}>{tier2Cut}</Text>
+              <Text style={[styles.tableCell, { width: '30%', paddingLeft: 6 }]}>Within 48h of Client 50% Deposit</Text>
             </View>
             <View style={styles.tableRow}>
-              <Text style={[styles.tableCell, { width: '40%' }]}>Tier 3: SaaS / AI RAG Engine (INR 90k–1.5L+ / $1.1k+)</Text>
-              <Text style={[styles.tableCell, { width: '30%', fontFamily: theme.labelBoldFont }]}>{tier3Cut}</Text>
-              <Text style={[styles.tableCell, { width: '30%' }]}>Within 48h of Client 50% Deposit</Text>
+              <Text style={[styles.tableCell, { width: '40%', borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingRight: 6 }]}>Tier 3: SaaS / AI RAG Engine (INR 90k–1.5L+ / $1.1k+)</Text>
+              <Text style={[styles.tableCell, { width: '30%', fontFamily: theme.labelBoldFont, borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingLeft: 6, paddingRight: 6 }]}>{tier3Cut}</Text>
+              <Text style={[styles.tableCell, { width: '30%', paddingLeft: 6 }]}>Within 48h of Client 50% Deposit</Text>
             </View>
             <View style={[styles.tableRow, { borderBottomWidth: 0 }]}>
-              <Text style={[styles.tableCell, { width: '40%' }]}>Recurring Care Plan (ongoing)</Text>
-              <Text style={[styles.tableCell, { width: '30%', fontFamily: theme.labelBoldFont }]}>{recurringCut}</Text>
-              <Text style={[styles.tableCell, { width: '30%' }]}>Monthly on cleared Net Funds</Text>
+              <Text style={[styles.tableCell, { width: '40%', borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingRight: 6 }]}>Recurring Care Plan (ongoing)</Text>
+              <Text style={[styles.tableCell, { width: '30%', fontFamily: theme.labelBoldFont, borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingLeft: 6, paddingRight: 6 }]}>{recurringCut}</Text>
+              <Text style={[styles.tableCell, { width: '30%', paddingLeft: 6 }]}>Monthly on cleared Net Funds</Text>
             </View>
           </View>
         )}

@@ -130,13 +130,21 @@ function createStyles(theme: PDFThemeConfig) {
     },
     colEngine: {
       width: '40%',
+      borderRightWidth: 1,
+      borderRightColor: theme.cardBorder,
+      paddingRight: 6,
     },
     colScope: {
       width: '35%',
+      borderRightWidth: 1,
+      borderRightColor: theme.cardBorder,
+      paddingLeft: 6,
+      paddingRight: 6,
     },
     colPrice: {
       width: '25%',
       textAlign: 'right',
+      paddingLeft: 6,
     },
     itemTitle: {
       fontFamily: theme.labelBoldFont,
@@ -300,20 +308,20 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
         <Text style={styles.sectionHeader}>2. MONTHLY INFRASTRUCTURE & SLA CARE PLANS</Text>
         <View style={styles.table}>
           <View style={styles.tableHeader}>
-            <Text style={[styles.tableHeaderCell, { width: '35%' }]}>CARE PLAN</Text>
-            <Text style={[styles.tableHeaderCell, { width: '45%' }]}>INCLUDED SERVICES</Text>
-            <Text style={[styles.tableHeaderCell, { width: '20%', textAlign: 'right' }]}>MONTHLY</Text>
+            <Text style={[styles.tableHeaderCell, { width: '35%', borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingRight: 6 }]}>CARE PLAN</Text>
+            <Text style={[styles.tableHeaderCell, { width: '45%', borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingLeft: 6, paddingRight: 6 }]}>INCLUDED SERVICES</Text>
+            <Text style={[styles.tableHeaderCell, { width: '20%', textAlign: 'right', paddingLeft: 6 }]}>MONTHLY</Text>
           </View>
           {maintenancePlans.map((plan, idx) => (
             <View style={idx % 2 === 1 ? [styles.tableRow, styles.tableRowHighlight] : styles.tableRow} wrap={false} key={plan.id}>
-              <View style={{ width: '35%' }}>
+              <View style={{ width: '35%', borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingRight: 6 }}>
                 <Text style={styles.moduleTitle}>{plan.name}</Text>
                 <Text style={styles.moduleDesc}>{cleanPDFText(plan.badge)}</Text>
               </View>
-              <View style={{ width: '45%' }}>
+              <View style={{ width: '45%', borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingLeft: 6, paddingRight: 6 }}>
                 <Text style={styles.moduleDesc}>{plan.laymanDescription}</Text>
               </View>
-              <View style={{ width: '20%', textAlign: 'right' }}>
+              <View style={{ width: '20%', textAlign: 'right', paddingLeft: 6 }}>
                 <Text style={styles.priceVal}>{formatPrice(plan.priceINR, plan.priceUSD)}</Text>
               </View>
             </View>
