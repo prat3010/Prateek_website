@@ -85,8 +85,8 @@ function createStyles(theme: PDFThemeConfig) {
       borderWidth: 1,
       padding: '3 6',
       borderRadius: 3,
-      marginBottom: 6,
-      marginTop: 4,
+      marginBottom: 8,
+      marginTop: 8,
       borderLeftWidth: 3,
       borderLeftColor: theme.accentColor,
       letterSpacing: 0.05,
@@ -97,14 +97,14 @@ function createStyles(theme: PDFThemeConfig) {
       borderWidth: 1,
       borderRadius: 4,
       overflow: 'hidden',
-      marginBottom: 10,
+      marginBottom: 12,
     },
     tableHeader: {
       flexDirection: 'row',
       backgroundColor: theme.tableRowAlt,
       borderBottomWidth: 1,
       borderBottomColor: theme.cardBorder,
-      padding: 5,
+      padding: '6 5',
     },
     tableHeaderCell: {
       fontFamily: theme.labelBoldFont,
@@ -116,7 +116,7 @@ function createStyles(theme: PDFThemeConfig) {
       flexDirection: 'row',
       borderBottomWidth: 1,
       borderBottomColor: theme.tableRowAlt,
-      padding: 5,
+      padding: '7 5',
       alignItems: 'center',
     },
     tableRowHighlight: {
@@ -125,7 +125,7 @@ function createStyles(theme: PDFThemeConfig) {
     tableTotalRow: {
       flexDirection: 'row',
       backgroundColor: theme.headerBg,
-      padding: 6,
+      padding: '7 6',
       alignItems: 'center',
     },
     colModule: {
@@ -140,11 +140,13 @@ function createStyles(theme: PDFThemeConfig) {
       fontSize: 7,
       color: theme.textPrimary,
       letterSpacing: 0.02,
+      marginBottom: 2,
     },
     moduleDesc: {
       fontSize: 7,
       color: theme.textSecondary,
-      marginTop: 1,
+      marginTop: 3,
+      lineHeight: 1.5,
     },
     priceVal: {
       fontFamily: theme.labelBoldFont,
@@ -178,13 +180,13 @@ function createStyles(theme: PDFThemeConfig) {
       width: '70%',
       color: theme.textPrimary,
       fontSize: 8,
-      lineHeight: 1.3,
+      lineHeight: 1.5,
     },
     termItem: {
-      marginBottom: 5,
+      marginBottom: 8,
       fontSize: 7.5,
       color: theme.textSecondary,
-      lineHeight: 1.35,
+      lineHeight: 1.5,
     },
     sigContainer: {
       flexDirection: 'row',
@@ -204,13 +206,13 @@ function createStyles(theme: PDFThemeConfig) {
       fontFamily: theme.labelBoldFont,
       fontSize: 6.5,
       color: theme.textSecondary,
-      marginBottom: 8,
+      marginBottom: 10,
       letterSpacing: 0.05,
     },
     sigText: {
       fontSize: 7.5,
       color: theme.textPrimary,
-      marginTop: 1,
+      marginTop: 2,
     },
   });
 }
