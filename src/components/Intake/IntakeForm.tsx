@@ -289,7 +289,13 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
       let recaptchaToken: string | undefined;
       if (SITE_KEY && window.grecaptcha) {
         try {
-          recaptchaToken = await window.grecaptcha.execute(SITE_KEY, { action: 'intake_submit' });
+          recaptchaToken = await new Promise<string>((resolve, reject) => {
+            window.grecaptcha!.ready(() => {
+              window.grecaptcha!.execute(SITE_KEY, { action: 'intake_submit' })
+                .then(resolve)
+                .catch(reject);
+            });
+          });
         } catch (recaptchaErr) {
           console.warn('reCAPTCHA execution error:', recaptchaErr);
         }
