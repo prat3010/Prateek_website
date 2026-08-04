@@ -113,6 +113,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   const [activePopoverId, setActivePopoverId] = useState<string | null>(null);
   const [popoverAnchor, setPopoverAnchor] = useState<{ x: number; y: number } | null>(null);
   const [recaptchaReady, setRecaptchaReady] = useState(!SITE_KEY);
+  const [recaptchaUnavailable, setRecaptchaUnavailable] = useState(false);
 
   // Resolve deep-link preset (engine or goal archetype) to the wizard's initial selections
   const initialArchetype = useMemo(() => {
@@ -265,18 +266,51 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   // Load Google reCAPTCHA v3 script dynamically if configured
   useEffect(() => {
     if (!SITE_KEY) return;
-    if (document.getElementById('recaptcha-script')) {
+    let cancelled = false;
+
+    const onReady = () => {
+      if (!cancelled) setRecaptchaReady(true);
+    };
+
+    const checkGrecaptcha = () => {
       if (window.grecaptcha) {
-        window.grecaptcha.ready(() => setRecaptchaReady(true));
+        window.grecaptcha.ready(onReady);
+        return true;
       }
-      return;
+      return false;
+    };
+
+    if (!document.getElementById('recaptcha-script')) {
+      const script = document.createElement('script');
+      script.id = 'recaptcha-script';
+      script.src = `https://www.google.com/recaptcha/api.js?render=${SITE_KEY}`;
+      script.async = true;
+      script.onerror = () => {
+        if (!cancelled) setRecaptchaUnavailable(true);
+      };
+      document.head.appendChild(script);
     }
-    const script = document.createElement('script');
-    script.id = 'recaptcha-script';
-    script.src = `https://www.google.com/recaptcha/api.js?render=${SITE_KEY}`;
-    script.async = true;
-    script.onload = () => window.grecaptcha?.ready(() => setRecaptchaReady(true));
-    document.head.appendChild(script);
+
+    // reCAPTCHA may already be loaded (Contact form) or not yet initialized at
+    // onload, so poll for it. Unlock the submit button after a timeout so the
+    // form is never permanently dead; the server still enforces verification.
+    if (checkGrecaptcha()) return undefined;
+    const startedAt = Date.now();
+    const timer = window.setInterval(() => {
+      if (cancelled) return;
+      if (checkGrecaptcha()) {
+        window.clearInterval(timer);
+      } else if (Date.now() - startedAt > 6000) {
+        window.clearInterval(timer);
+        if (!cancelled) setRecaptchaUnavailable(true);
+        onReady();
+      }
+    }, 250);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
   }, []);
 
   const handleSubmitOnline = async (e: React.FormEvent) => {
@@ -919,6 +953,13 @@ Notes: ${formData.additionalNotes}
                       {submitting ? 'SUBMITTING...' : 'SUBMIT SCOPING BRIEF'}
                       <Send size={16} />
                     </button>
+                  )}
+                  {recaptchaUnavailable && (
+                    <p className={styles.recaptchaWarning}>
+                      reCAPTCHA could not be initialized on this origin. Register this domain
+                      in the Google reCAPTCHA admin console (or unset RECAPTCHA_SECRET_KEY in
+                      local .env.local to test the email flow without spam protection).
+                    </p>
                   )}
                 </div>
               </div>

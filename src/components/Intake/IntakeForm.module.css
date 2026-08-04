@@ -877,3 +877,20 @@
   color: #94a3b8;
 }
 
+.recaptchaWarning {
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #b45309;
+  background: #fffbeb;
+  border: 1.5px solid #f59e0b;
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+:global([data-theme='noir']) .recaptchaWarning {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
