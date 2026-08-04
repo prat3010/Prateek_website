@@ -515,8 +515,8 @@ Notes: ${formData.additionalNotes}
                             />
                             <div style={{ flex: 1 }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <div style={{ display: 'flex', alignItems: 'center' }}>
-                                  <span style={{ fontWeight: 700 }}>{`${e.title} (${e.tier})`}</span>
+                                <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                                   <span style={{ fontWeight: 700 }}>{`${e.title} (${e.tier})`}</span>
                                   <button
                                     type="button"
                                     onClick={(ev) => togglePopover(ev, e.id)}
