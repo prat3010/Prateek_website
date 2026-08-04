@@ -5,7 +5,7 @@ import styles from '../NoirSkyline.module.css';
 import { WobblyPath, WobblyLine, WobblyRect, WobblyPolygon, WobblyLineGroup, WobblyPathGroup, type WobblyLineSegment } from '../WobblySVG';
 import { LayerProps } from './types';
 
-const BridgeLayer = React.memo(function BridgeLayer({ reducedMotion, wobble: propWobble }: LayerProps) {
+const BridgeLayer = React.memo(function BridgeLayer({ reducedMotion, wobble: propWobble , isMobile }: LayerProps) {
   const wobble = propWobble ?? !reducedMotion;
   const strength = 3.5;
 
@@ -107,7 +107,7 @@ const BridgeLayer = React.memo(function BridgeLayer({ reducedMotion, wobble: pro
   return (
     <>
       {/* Static Layer */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
+      <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
             <g className={styles.buildingGroup} stroke="var(--skyline-stroke-fg)" strokeWidth="1.8">
               {/* MIDDLE BRIDGE STRUCTURE (Fills the gap between rooftops) */}
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 850 1250 L 850 780 L 870 730 L 890 730 L 910 780 L 910 1250 Z" className={styles.bldFgBridgeTower} />
@@ -340,7 +340,7 @@ const BridgeLayer = React.memo(function BridgeLayer({ reducedMotion, wobble: pro
       </svg>
 
       {/* Animated Layer (Unfiltered) */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+      <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0, pointerEvents: 'none' }}>
             <g fill="var(--skyline-fill-bg)" stroke="var(--skyline-stroke-fg)" strokeWidth="1.8" className={styles.buildingGroup}>
               {/* Warning Beacon at Tower Peak */}
               <circle cx="880" cy="670" r="2.2" className={styles.bridgeBeacon} />

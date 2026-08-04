@@ -17,6 +17,7 @@ This document serves as the registry of critical architectural design decisions 
 * [ADR 07: Config-Driven Sales Partner Agreement with Single Prose Source](#adr-07-config-driven-sales-partner-agreement-with-single-prose-source)
 * [ADR 08: Config-Driven Scoping Questionnaire with Shared Defaults JSON](#adr-08-config-driven-scoping-questionnaire-with-shared-defaults-json)
 * [ADR 09: Brand-Themed PDFs with Embedded Site Fonts](#adr-09-brand-themed-pdfs-with-embedded-site-fonts)
+* [ADR 10: Full-Panorama Mobile Skyline with Desktop-Parity Parallax](#adr-10-full-panorama-mobile-skyline-with-desktop-parity-parallax)
 
 ---
 
@@ -134,6 +135,25 @@ This document serves as the registry of critical architectural design decisions 
 * **Consequences**:
   * **Pros**: Downloaded docs match the visitor's active theme; brand fonts and gremlin mark create consistent identity; single shared header/footer/theme modules removed triple-duplicated header code.
   * **Cons**: ~755 KB of TTFs added to `public/`; react-pdf v4's font loading quirks require the split client/server registration (documented in code); dev servers that ran older registration code must be restarted once (react-pdf's `FontStore` is a process-wide singleton that only appends sources). The synchronizer's local `generate-middleman-pdf.mjs` renderer mirrors the same theme tokens and embedded fonts (with an azure/noir `--theme` flag and dashboard radio) so the dashboard-built agreement matches the site's brand design.
+
+---
+
+# **ADR 10: Full-Panorama Mobile Skyline with Desktop-Parity Parallax**
+
+* **Status**: Approved
+* **Context**: The skyline backdrop renders six 1920×1080 SVG layers (sky, background, far-midground, midground, bridge, foreground) fixed behind all sections, with per-layer scroll parallax (scale up to 1.4, y down to 75px) and mouse-parallax springs. Originally `reducedMotion` was forced `true` on every phone (`width ≤ 768 || coarse pointer`), freezing all parallax and CSS animations and unmounting every character, leaving a static center-cropped `slice` of the panorama (scene x≈[719,1201] on a 390px phone) — the fun perimeter (billboard pigeon x≈135, cat x≈325, clock x≈1275, gargoyle x≈1426, fire pigeon x≈1675) was permanently cropped out.
+* **Decision**: Give mobile a full-panorama composition with desktop-parity motion instead of a cropped slice, and no horizontal panning:
+  * **State split**: `isMobile` (width ≤ 768 or coarse pointer) is tracked separately from `reducedMotion` (OS `prefers-reduced-motion` or `hardwareConcurrency < 4`). Phones regain the desktop scroll parallax, CSS animations, and characters; OS-level reduced motion still freezes everything.
+  * **Whole-scene composition**: on mobile every layer switches its SVG `preserveAspectRatio` from `xMidYMax slice` to `xMidYMax meet` — the entire 1920-wide scene is letterboxed and bottom-anchored in the tall portrait viewport. Desktop keeps `slice` (byte-identical behavior).
+  * **Sky extension**: the area above the letterboxed band is painted by `.mobileSkyline { background: var(--skyline-sky-bg); }` — `#e5f6fd` in popart, `transparent` in noir (page bg shows through) — so the extension is seamless with the band's own flat sky fill. No extra decorative layers.
+  * **Parallax parity**: the layer stack uses the exact desktop scroll transforms (scale/y per layer); only the mouse-parallax springs remain desktop-only (no mouse on phones). No panning — the parallax zoom (bottom-anchored, scale ~1.4 at page bottom) is the only motion.
+  * **Characters & animations**: all characters (cat, gargoyle, billboard/fire pigeon, realtime clock) and CSS animations render on mobile whenever `reducedMotion` is false — the full panorama means everything is always on screen, matching desktop.
+* **Consequences**:
+  * **Pros**: The whole panorama (billboard, cat, clock, gargoyle, laundry) is visible at once on phones; mobile motion is exactly desktop-parity; the sky extension is a one-line theme-var background, seamless in both themes; zero horizontal-crop weirdness.
+  * **Cons**: On narrow portrait phones the 16:9 scene renders as a ~250px band (≈90px of buildings) at the bottom — small; full desktop life means ~40 CSS animations plus 5 character tick loops run on phone CPUs (the old mobile path skipped all of it); character positions now depend on the whole scene being visible.
+  * **Implementation gotchas (found via mobile-simulator QA)**:
+    1. **Reduced-motion decoupling**: `reducedMotion` must NOT include the mobile check — the previous design folded `isMobileDevice` into it, which silently froze everything on phones.
+    2. **Preserve-aspect-ratio flip**: the `meet`/`slice` switch must be applied to both SVGs in each layer file (the main scene SVG and the pointer-events-none flicker/neon overlay SVG), or the animated overlay desyncs from the buildings.
 
 ---
 

@@ -85,12 +85,19 @@ function SkylineInner() {
   const layer3X = useTransform(springX3, (x) => x * -42);
   const layer3Y = useTransform(springY3, (y) => y * -28);
 
+  // Mobile composition (full panorama, sky extended above) is decoupled from
+  // reducedMotion: phones render the whole 1920-wide scene and keep the same
+  // scroll parallax as desktop, while OS reduced-motion still freezes life.
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
+  });
+
   const [reducedMotion, setReducedMotion] = useState(() => {
     if (typeof window === 'undefined') return false;
     const cores = navigator.hardwareConcurrency ?? 4;
     const lowEnd = cores < 4;
-    const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches || lowEnd || isMobileDevice;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches || lowEnd;
   });
 
   const [wobble, setWobble] = useState(() => {
@@ -98,25 +105,27 @@ function SkylineInner() {
     return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   });
 
-  // Track mouse coordinates for subtle parallax offset & update reducedMotion on resize
+  // Track mouse coordinates for subtle parallax offset & update device/motion state
   useEffect(() => {
     const cores = navigator.hardwareConcurrency ?? 4;
     const lowEnd = cores < 4;
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-    const checkReducedMotion = () => {
+    const checkMotionState = () => {
       const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
-      setReducedMotion(mediaQuery.matches || lowEnd || isMobileDevice);
+      setIsMobile(isMobileDevice);
+      setReducedMotion(mediaQuery.matches || lowEnd);
       setWobble(!mediaQuery.matches);
     };
 
     const mediaListener = (e: MediaQueryListEvent) => {
       const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
-      setReducedMotion(e.matches || lowEnd || isMobileDevice);
+      setIsMobile(isMobileDevice);
+      setReducedMotion(e.matches || lowEnd);
       setWobble(!e.matches);
     };
     mediaQuery.addEventListener('change', mediaListener);
-    window.addEventListener('resize', checkReducedMotion);
+    window.addEventListener('resize', checkMotionState);
 
     let rafId: number | null = null;
     const handleMouseMove = (e: MouseEvent) => {
@@ -142,14 +151,14 @@ function SkylineInner() {
 
     return () => {
       mediaQuery.removeEventListener('change', mediaListener);
-      window.removeEventListener('resize', checkReducedMotion);
+      window.removeEventListener('resize', checkMotionState);
       window.removeEventListener('mousemove', handleMouseMove);
       if (rafId) cancelAnimationFrame(rafId);
     };
   }, [mouseX, mouseY]);
 
   return (
-    <div className={`${styles.container} ${styles.active} ${theme === 'light' ? styles.lightPopart : styles.darkNoir} ${reducedMotion ? styles.reducedMotion : ''}`}>
+    <div className={`${styles.container} ${styles.active} ${theme === 'light' ? styles.lightPopart : styles.darkNoir} ${reducedMotion ? styles.reducedMotion : ''} ${isMobile ? styles.mobileSkyline : ''}`}>
       {/* ── Vignette Overlay ── */}
       <div className={styles.vignette} aria-hidden="true" />
 
@@ -157,7 +166,7 @@ function SkylineInner() {
 
       {/* ── Layer 0: Sky backdrop, Searchlights, and Rain ── */}
       <div className={styles.layer}>
-        <Layer0 />
+        <Layer0 isMobile={isMobile} />
       </div>
 
       {/* ── Layer 1: Background Buildings (Parallax Scale 1.12) ── */}
@@ -172,7 +181,7 @@ function SkylineInner() {
             ? { width: '100%', height: '100%' }
             : { x: layer1X, y: layer1Y, width: '100%', height: '100%', willChange: 'transform' }}
         >
-          <Layer1 reducedMotion={reducedMotion} wobble={wobble} />
+          <Layer1 reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} />
         </m.div>
       </m.div>
 
@@ -188,7 +197,7 @@ function SkylineInner() {
             ? { width: '100%', height: '100%' }
             : { x: layer1_5X, y: layer1_5Y, width: '100%', height: '100%', willChange: 'transform' }}
         >
-          <Layer1_5 reducedMotion={reducedMotion} wobble={wobble} />
+          <Layer1_5 reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} />
         </m.div>
       </m.div>
 
@@ -204,7 +213,7 @@ function SkylineInner() {
             ? { width: '100%', height: '100%' }
             : { x: layer2X, y: layer2Y, width: '100%', height: '100%', willChange: 'transform' }}
         >
-          <Layer2 reducedMotion={reducedMotion} wobble={wobble} />
+          <Layer2 reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} />
         </m.div>
       </m.div>
 
@@ -220,7 +229,7 @@ function SkylineInner() {
             ? { width: '100%', height: '100%' }
             : { x: bridgeLayerX, y: bridgeLayerY, width: '100%', height: '100%', willChange: 'transform' }}
         >
-          <BridgeLayer reducedMotion={reducedMotion} wobble={wobble} />
+          <BridgeLayer reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} />
         </m.div>
       </m.div>
 
@@ -236,7 +245,7 @@ function SkylineInner() {
             ? { width: '100%', height: '100%' }
             : { x: layer3X, y: layer3Y, width: '100%', height: '100%', willChange: 'transform' }}
         >
-          <Layer3 reducedMotion={reducedMotion} wobble={wobble} />
+          <Layer3 reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} />
         </m.div>
       </m.div>
 

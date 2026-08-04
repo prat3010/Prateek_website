@@ -5,13 +5,13 @@ import styles from '../NoirSkyline.module.css';
 import { WobblyPath, WobblyLine } from '../WobblySVG';
 import { LayerProps } from './types';
 
-const Layer1_5 = React.memo(function Layer1_5({ reducedMotion, wobble: propWobble }: LayerProps) {
+const Layer1_5 = React.memo(function Layer1_5({ reducedMotion, wobble: propWobble , isMobile }: LayerProps) {
   const wobble = propWobble ?? !reducedMotion;
   const strength = 2.5; // Far midground wobble (between Layer 1 and Layer 2)
   return (
     <>
       {/* Static Layer */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
+      <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
         <g className={styles.buildingGroup} stroke="var(--skyline-stroke-mid)" strokeWidth="1.2">
           {/* Blocky Spire (Center-Left) */}
           <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 330 1080 L 330 710 L 370 710 L 370 540 L 373 540 L 373 450 L 377 450 L 377 540 L 380 540 L 380 710 L 420 710 L 420 1080 Z" className={styles.bldMidBlockySpire} />
@@ -156,7 +156,7 @@ const Layer1_5 = React.memo(function Layer1_5({ reducedMotion, wobble: propWobbl
       </svg>
 
       {/* Animated Layer */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+      <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0, pointerEvents: 'none' }}>
         {/* Aviation Warning Beacons */}
         <g stroke="none">
           <circle cx="375" cy="450" r="2.0" className={styles.beaconRed2} fill="#ff3b30" stroke="none" />

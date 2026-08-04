@@ -2,8 +2,9 @@
 
 import React from 'react';
 import styles from '../NoirSkyline.module.css';
+import type { LayerProps } from './types';
 
-const Layer0 = React.memo(function Layer0() {
+const Layer0 = React.memo(function Layer0({ isMobile }: LayerProps) {
   // Generate 24 conic rays radiating from the center of the horizon (960, 450)
   const raysCount = 24;
   const raysPath = Array.from({ length: raysCount }).map((_, i) => {
@@ -23,7 +24,7 @@ const Layer0 = React.memo(function Layer0() {
     <>
 
       {/* Static backdrop SVG */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
+      <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
         <defs>
           {/* Left Searchlight Gradient */}
           <linearGradient id="leftLightGrad" x1="0" y1="1" x2="0" y2="0">
@@ -124,7 +125,7 @@ const Layer0 = React.memo(function Layer0() {
       </svg>
 
       {/* Dynamic / Animating Sky Overlay SVG */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+      <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0, pointerEvents: 'none' }}>
         {/* Twinkling Starfield */}
         <g fill="#fafafa" stroke="none">
           <circle cx="120" cy="80" r="0.8" className={styles.star1} />

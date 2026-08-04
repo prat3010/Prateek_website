@@ -9,13 +9,13 @@ import InteractiveGargoyle from './InteractiveGargoyle';
 import BillboardPigeon from './BillboardPigeon';
 import FirePigeon from './FirePigeon';
 
-const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble }: LayerProps) {
+const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble , isMobile }: LayerProps) {
   const wobble = propWobble ?? !reducedMotion;
   const strength = 4.0; // Heavy foreground wobbly brush style
   return (
     <>
       {/* Static Layer */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
+      <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
             <defs>
               {/* Downward Light Bulb Gradient */}
               <linearGradient id="downwardLightGrad" x1="0" y1="0" x2="0" y2="1">
@@ -1417,7 +1417,7 @@ const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble }:
       </svg>
 
       {/* Animated Layer (Unfiltered) */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice" style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+      <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0, pointerEvents: 'none' }}>
             <defs>
               {/* Billboard Spotlight Gradient */}
               <linearGradient id="leftLightGrad" x1="0" y1="1" x2="0" y2="0">
