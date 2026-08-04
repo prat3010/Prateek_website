@@ -16,6 +16,7 @@ This document serves as the registry of critical architectural design decisions 
 * [ADR 06: Visual Redesign from Legacy Zine to Modern Card Aesthetic](#adr-06-visual-redesign-from-legacy-zine-to-modern-card-aesthetic)
 * [ADR 07: Config-Driven Sales Partner Agreement with Single Prose Source](#adr-07-config-driven-sales-partner-agreement-with-single-prose-source)
 * [ADR 08: Config-Driven Scoping Questionnaire with Shared Defaults JSON](#adr-08-config-driven-scoping-questionnaire-with-shared-defaults-json)
+* [ADR 09: Brand-Themed PDFs with Embedded Site Fonts](#adr-09-brand-themed-pdfs-with-embedded-site-fonts)
 
 ---
 
@@ -118,6 +119,21 @@ This document serves as the registry of critical architectural design decisions 
 * **Consequences**:
   * **Pros**: Pricing tiers and archetype mapping editable from the CMS without code changes; single canonical JSON keeps site, synchronizer, and seed script in sync; validation catches broken references before they reach production.
   * **Cons**: Deep-link presets (`?engine=…`, `?goal=…`) silently fall back to `goals[0]` if an edited config removes a referenced id; the defaults JSON must be kept in sync with any future TS consumers.
+
+---
+
+# **ADR 09: Brand-Themed PDFs with Embedded Site Fonts**
+
+* **Status**: Approved
+* **Context**: The commercial PDF trio (Scoping Brief, Services & Pricing Guide, Middleman Agreement) rendered in plain Helvetica with a generic blue line-art "skyline" header, sharing a flat single-palette `pdfTheme.ts`. They looked detached from the website's azure/noir identity (hero "PRATEEQ" in Playfair Display / JetBrains Mono, gremlin logo, pop-art palette).
+* **Decision**: Give the commercial trio the website's visual identity while keeping a restrained, print-friendly execution:
+  * **Brand fonts**: Static TTFs (Playfair Display 400/700, Lora 400, JetBrains Mono 400/700) live in `public/fonts/`, instantiated from the Google variable fonts via `fonttools varLib.instancer` (a one-off offline operation — never re-run on the site). `src/components/pdf/pdfFonts.ts` holds family constants; registration is split by environment because react-pdf v4's `FontSource` only accepts: absolute URLs (browser, `is-url` rejects relative paths) or `data:font/ttf;base64,…` strings (Node, where a raw Buffer hits `isDataUrl` and crashes on `substring`). `pdfFontsClient.ts` registers absolute `/fonts/…` URLs; `pdfFontsServer.ts` registers base64 data URLs read from disk once per process.
+  * **Theme tokens**: `pdfTheme.ts` now exports `PDF_THEMES.azure` (warm cream paper, ink text, pop-red accent, ochre chips, Playfair Display headlines, Lora body, mono labels) and `PDF_THEMES.noir` (near-black paper, neon pink accent, neon yellow chips, all-JetBrains Mono), selected via `getPdfTheme(isNoir)`.
+  * **Shared brand header**: `PdfBrandHeader.tsx` renders "PRATEEQ.IN" in the hero brand font with wide tracking and a slight `rotate(-1.5deg)` on a dark banner, closing with `PdfGremlinLogo.tsx` — the navbar gremlin SVG ported to react-pdf `<Svg>` primitives with theme-aware colors. Replaces the skyline line-art in all three docs. `PdfFooter.tsx` adds the gremlin mark beside live page numbers.
+  * **Theme propagation**: `isNoir` flows from the calling context — `useTheme()` in `Resume.tsx`/`IntakeForm.tsx`, the modal's own azure/noir preview toggle in `MiddlemanAgreementModal.tsx` — through `pdfGenerator.ts` into each PDF component. The server-rendered agreement route (`/Middleman_Partnership_Agreement.pdf`) defaults to azure.
+* **Consequences**:
+  * **Pros**: Downloaded docs match the visitor's active theme; brand fonts and gremlin mark create consistent identity; single shared header/footer/theme modules removed triple-duplicated header code.
+  * **Cons**: ~755 KB of TTFs added to `public/`; react-pdf v4's font loading quirks require the split client/server registration (documented in code); dev servers that ran older registration code must be restarted once (react-pdf's `FontStore` is a process-wide singleton that only appends sources). The synchronizer's local `generate-middleman-pdf.mjs` renderer is intentionally untouched — only the site renderers were themed.
 
 ---
 

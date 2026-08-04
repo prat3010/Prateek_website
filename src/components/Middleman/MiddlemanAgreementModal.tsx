@@ -46,7 +46,7 @@ export default function MiddlemanAgreementModal({
   ];
 
   const handleDownloadPDF = () => {
-    generateMiddlemanAgreementPDF(resumeData);
+    generateMiddlemanAgreementPDF(resumeData, activeTheme === 'noir');
   };
 
   return (

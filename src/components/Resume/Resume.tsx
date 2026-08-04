@@ -63,7 +63,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
   const handleDownloadPDF = () => {
     if (activeAudience === 'business') {
       import('@/utils/pdfGenerator').then(({ generateServicesAndPricingPDF }) => {
-        generateServicesAndPricingPDF(resumeData);
+        generateServicesAndPricingPDF(resumeData, isNoir);
       });
     } else {
       import('@/utils/pdfGenerator').then(({ generateResumePDF }) => {

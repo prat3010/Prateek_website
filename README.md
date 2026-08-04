@@ -27,6 +27,9 @@ A highly interactive, storyteller-driven personal portfolio website designed wit
 | `/rag/app` | SaaS App Studio Workspace — Chat Studio, Document Library, Search Inspector, Embed Configurator, and role-gated admin link. |
 | `/blog` | Blog listing page |
 | `/blog/[slug]` | Individual blog post page |
+| `/Middleman_Partnership_Agreement.pdf` | Server-rendered Sales Partner Agreement PDF (azure brand theme) |
+
+The client-side commercial PDFs (Scoping Brief, Services & Pricing Guide, Sales Partner Agreement) are brand-themed: they follow the visitor's azure/noir theme and embed the site's brand fonts (Playfair Display / Lora / JetBrains Mono in `public/fonts/`) plus the gremlin logo mark via `src/components/pdf/` (`pdfTheme.ts`, `PdfBrandHeader.tsx`, `PdfGremlinLogo.tsx`, `PdfFooter.tsx`).
 
 ### API Routes
 

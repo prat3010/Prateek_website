@@ -1,11 +1,13 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet, Svg, Line } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import type { ResumeData } from '@/data/resume';
 import type { QuestionnaireData } from '@/utils/pdfGenerator';
-import { DEFAULT_PDF_THEME } from './pdfTheme';
+import { getPdfTheme, type PDFThemeConfig } from './pdfTheme';
+import { PdfBrandHeader } from './PdfBrandHeader';
+import { PdfFooter } from './PdfFooter';
 
 /**
- * Sanitizes strings for React-PDF's built-in Helvetica font:
+ * Sanitizes strings for React-PDF fonts:
  * 1. Replaces non-Latin Rupee symbol (₹) with 'INR '
  * 2. Strips unicode emoji glyphs that render as broken boxes
  */
@@ -18,229 +20,210 @@ function cleanPDFText(text?: string | null): string {
     .trim();
 }
 
-const styles = StyleSheet.create({
-  page: {
-    paddingTop: 24,
-    paddingBottom: 32,
-    paddingLeft: 28,
-    paddingRight: 28,
-    fontFamily: 'Helvetica',
-    backgroundColor: DEFAULT_PDF_THEME.pageBg,
-    fontSize: 8.5,
-    color: DEFAULT_PDF_THEME.textPrimary,
-  },
-  skylineHeader: {
-    height: 48,
-    backgroundColor: DEFAULT_PDF_THEME.headerBg,
-    borderRadius: 4,
-    marginBottom: 12,
-    padding: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  brandTitle: {
-    fontSize: 12,
-    fontFamily: 'Helvetica-Bold',
-    color: DEFAULT_PDF_THEME.headerTitle,
-    letterSpacing: 0.8,
-  },
-  brandSub: {
-    fontSize: 7,
-    color: DEFAULT_PDF_THEME.headerSub,
-    marginTop: 2,
-    letterSpacing: 0.5,
-  },
-  docHeader: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#CBD5E1',
-    paddingBottom: 5,
-    marginBottom: 10,
-  },
-  docTitle: {
-    fontSize: 12,
-    fontFamily: 'Helvetica-Bold',
-    color: '#0F172A',
-    textTransform: 'uppercase',
-  },
-  docMeta: {
-    fontSize: 7.5,
-    color: '#64748B',
-    marginTop: 2,
-  },
-  metadataCard: {
-    backgroundColor: '#F8FAFC',
-    borderColor: '#E2E8F0',
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 8,
-    marginBottom: 12,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  metaCol: {
-    width: '50%',
-    marginBottom: 3,
-  },
-  metaLabel: {
-    fontFamily: 'Helvetica-Bold',
-    color: '#475569',
-    fontSize: 7.5,
-  },
-  metaVal: {
-    color: '#0F172A',
-    fontSize: 8,
-  },
-  sectionHeader: {
-    fontSize: 9,
-    fontFamily: 'Helvetica-Bold',
-    color: '#1E3A8A',
-    backgroundColor: '#EFF6FF',
-    padding: '3 6',
-    borderRadius: 3,
-    marginBottom: 6,
-    marginTop: 4,
-    borderLeftWidth: 3,
-    borderLeftColor: '#2563EB',
-  },
-  table: {
-    width: '100%',
-    borderColor: '#CBD5E1',
-    borderWidth: 1,
-    borderRadius: 4,
-    overflow: 'hidden',
-    marginBottom: 10,
-  },
-  tableHeader: {
-    flexDirection: 'row',
-    backgroundColor: '#F1F5F9',
-    borderBottomWidth: 1,
-    borderBottomColor: '#CBD5E1',
-    padding: 5,
-  },
-  tableHeaderCell: {
-    fontFamily: 'Helvetica-Bold',
-    fontSize: 7.5,
-    color: '#1E293B',
-  },
-  tableRow: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
-    padding: 5,
-    alignItems: 'center',
-  },
-  tableRowHighlight: {
-    backgroundColor: '#F0F9FF',
-  },
-  tableTotalRow: {
-    flexDirection: 'row',
-    backgroundColor: '#0F172A',
-    padding: 6,
-    alignItems: 'center',
-  },
-  colModule: {
-    width: '62%',
-  },
-  colPrice: {
-    width: '38%',
-    textAlign: 'right',
-  },
-  moduleTitle: {
-    fontFamily: 'Helvetica-Bold',
-    fontSize: 8,
-    color: '#0F172A',
-  },
-  moduleDesc: {
-    fontSize: 7,
-    color: '#64748B',
-    marginTop: 1,
-  },
-  priceVal: {
-    fontFamily: 'Helvetica-Bold',
-    fontSize: 8,
-    color: '#0284C7',
-  },
-  totalTitle: {
-    fontFamily: 'Helvetica-Bold',
-    fontSize: 8.5,
-    color: '#FFFFFF',
-  },
-  totalVal: {
-    fontFamily: 'Helvetica-Bold',
-    fontSize: 9.5,
-    color: '#38BDF8',
-    textAlign: 'right',
-  },
-  fieldRow: {
-    marginBottom: 5,
-    flexDirection: 'row',
-  },
-  fieldLabel: {
-    fontFamily: 'Helvetica-Bold',
-    width: '30%',
-    color: '#334155',
-    fontSize: 8,
-  },
-  fieldVal: {
-    width: '70%',
-    color: '#0F172A',
-    fontSize: 8,
-    lineHeight: 1.3,
-  },
-  termItem: {
-    marginBottom: 5,
-    fontSize: 7.5,
-    color: '#334155',
-    lineHeight: 1.35,
-  },
-  sigContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
-  },
-  sigBox: {
-    width: '48%',
-    borderColor: '#CBD5E1',
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 7,
-    height: 52,
-  },
-  sigTitle: {
-    fontFamily: 'Helvetica-Bold',
-    fontSize: 7,
-    color: '#64748B',
-    marginBottom: 8,
-  },
-  sigText: {
-    fontSize: 7.5,
-    color: '#0F172A',
-    marginTop: 1,
-  },
-  footer: {
-    position: 'absolute',
-    bottom: 14,
-    left: 28,
-    right: 28,
-    borderTopWidth: 1,
-    borderTopColor: '#E2E8F0',
-    paddingTop: 4,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  footerText: {
-    fontSize: 7,
-    color: '#94A3B8',
-  },
-});
+function createStyles(theme: PDFThemeConfig) {
+  return StyleSheet.create({
+    page: {
+      paddingTop: 24,
+      paddingBottom: 32,
+      paddingLeft: 28,
+      paddingRight: 28,
+      fontFamily: theme.bodyFont,
+      backgroundColor: theme.pageBg,
+      fontSize: 8.5,
+      color: theme.textPrimary,
+    },
+    docHeader: {
+      borderBottomWidth: 1,
+      borderBottomColor: theme.cardBorder,
+      paddingBottom: 5,
+      marginBottom: 10,
+    },
+    docTitle: {
+      fontSize: 11,
+      fontFamily: theme.headlineBoldFont,
+      color: theme.textPrimary,
+      textTransform: 'uppercase',
+      letterSpacing: 0.04,
+    },
+    docMeta: {
+      fontSize: 7,
+      fontFamily: theme.labelFont,
+      color: theme.textSecondary,
+      marginTop: 2,
+      letterSpacing: 0.05,
+    },
+    metadataCard: {
+      backgroundColor: theme.cardBg,
+      borderColor: theme.cardBorder,
+      borderWidth: 1,
+      borderRadius: 4,
+      padding: 8,
+      marginBottom: 12,
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+    },
+    metaCol: {
+      width: '50%',
+      marginBottom: 3,
+    },
+    metaLabel: {
+      fontFamily: theme.labelBoldFont,
+      color: theme.textSecondary,
+      fontSize: 6.5,
+      letterSpacing: 0.05,
+    },
+    metaVal: {
+      color: theme.textPrimary,
+      fontSize: 8,
+    },
+    sectionHeader: {
+      fontSize: 8,
+      fontFamily: theme.labelBoldFont,
+      color: theme.chipText,
+      backgroundColor: theme.chipBg,
+      borderColor: theme.chipBorder,
+      borderWidth: 1,
+      padding: '3 6',
+      borderRadius: 3,
+      marginBottom: 6,
+      marginTop: 4,
+      borderLeftWidth: 3,
+      borderLeftColor: theme.accentColor,
+      letterSpacing: 0.05,
+    },
+    table: {
+      width: '100%',
+      borderColor: theme.cardBorder,
+      borderWidth: 1,
+      borderRadius: 4,
+      overflow: 'hidden',
+      marginBottom: 10,
+    },
+    tableHeader: {
+      flexDirection: 'row',
+      backgroundColor: theme.tableRowAlt,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.cardBorder,
+      padding: 5,
+    },
+    tableHeaderCell: {
+      fontFamily: theme.labelBoldFont,
+      fontSize: 6.5,
+      color: theme.textPrimary,
+      letterSpacing: 0.05,
+    },
+    tableRow: {
+      flexDirection: 'row',
+      borderBottomWidth: 1,
+      borderBottomColor: theme.tableRowAlt,
+      padding: 5,
+      alignItems: 'center',
+    },
+    tableRowHighlight: {
+      backgroundColor: theme.tableRowAlt,
+    },
+    tableTotalRow: {
+      flexDirection: 'row',
+      backgroundColor: theme.headerBg,
+      padding: 6,
+      alignItems: 'center',
+    },
+    colModule: {
+      width: '62%',
+    },
+    colPrice: {
+      width: '38%',
+      textAlign: 'right',
+    },
+    moduleTitle: {
+      fontFamily: theme.labelBoldFont,
+      fontSize: 7,
+      color: theme.textPrimary,
+      letterSpacing: 0.02,
+    },
+    moduleDesc: {
+      fontSize: 7,
+      color: theme.textSecondary,
+      marginTop: 1,
+    },
+    priceVal: {
+      fontFamily: theme.labelBoldFont,
+      fontSize: 7.5,
+      color: theme.accentColor,
+    },
+    totalTitle: {
+      fontFamily: theme.labelBoldFont,
+      fontSize: 7.5,
+      color: theme.headerTitle,
+      letterSpacing: 0.04,
+    },
+    totalVal: {
+      fontFamily: theme.labelBoldFont,
+      fontSize: 9,
+      color: theme.accentColor,
+      textAlign: 'right',
+    },
+    fieldRow: {
+      marginBottom: 5,
+      flexDirection: 'row',
+    },
+    fieldLabel: {
+      fontFamily: theme.labelBoldFont,
+      width: '30%',
+      color: theme.textSecondary,
+      fontSize: 7,
+      letterSpacing: 0.03,
+    },
+    fieldVal: {
+      width: '70%',
+      color: theme.textPrimary,
+      fontSize: 8,
+      lineHeight: 1.3,
+    },
+    termItem: {
+      marginBottom: 5,
+      fontSize: 7.5,
+      color: theme.textSecondary,
+      lineHeight: 1.35,
+    },
+    sigContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginTop: 10,
+    },
+    sigBox: {
+      width: '48%',
+      borderColor: theme.cardBorder,
+      borderWidth: 1,
+      borderRadius: 4,
+      padding: 7,
+      height: 52,
+      backgroundColor: theme.cardBg,
+    },
+    sigTitle: {
+      fontFamily: theme.labelBoldFont,
+      fontSize: 6.5,
+      color: theme.textSecondary,
+      marginBottom: 8,
+      letterSpacing: 0.05,
+    },
+    sigText: {
+      fontSize: 7.5,
+      color: theme.textPrimary,
+      marginTop: 1,
+    },
+  });
+}
 
 interface ScopingBriefPDFProps {
   resumeData?: ResumeData | null;
   data?: QuestionnaireData;
+  isNoir?: boolean;
 }
 
-export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
+export function ScopingBriefPDF({ resumeData, data, isNoir }: ScopingBriefPDFProps) {
+  const theme = getPdfTheme(!!isNoir);
+  const styles = createStyles(theme);
   const intakeConfig = resumeData?.intake;
 
   const totalINR = data?.totalBuildCostINR || 143000;
@@ -258,16 +241,6 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
     "7. Maintenance Retainer & SLA: Selected Care Plan is billed monthly post-launch. Includes defined SLA response times, automated backups, and dedicated monthly development hours."
   ];
 
-  const renderFooter = () => (
-    <View style={styles.footer} fixed>
-      <Text style={styles.footerText}>CONFIDENTIAL SCOPING BRIEF & QUOTATION // GENERATED BY PRATEEQ.IN SCOPING LAB</Text>
-      <Text
-        style={styles.footerText}
-        render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages} | https://prateeq.in`}
-      />
-    </View>
-  );
-
   const companyName = cleanPDFText(data?.companyName) || 'Client Company';
   const projectGoal = cleanPDFText(data?.projectGoal) || 'Lead Generation & Direct Sales';
   const targetAudience = cleanPDFText(data?.targetAudience) || 'Tech Founders, SMB Owners, B2B Clients';
@@ -278,24 +251,11 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
     <Document title={`${companyName.replace(/\s+/g, '_')}_Itemized_Scoping_Proposal`}>
       {/* ================= PAGE 1 ================= */}
       <Page size="A4" style={styles.page}>
-        <View style={styles.skylineHeader}>
-          <View>
-            <Text style={styles.brandTitle}>PRATEEQ.IN</Text>
-            <Text style={styles.brandSub}>FULL-STACK & AI ARCHITECTURE // SCOPING & QUOTATION</Text>
-          </View>
-          <Svg height="26" width="100">
-            <Line x1="0" y1="26" x2="100" y2="26" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="15" y1="26" x2="15" y2="10" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="15" y1="10" x2="35" y2="10" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="35" y1="10" x2="35" y2="26" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="45" y1="26" x2="45" y2="4" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="45" y1="4" x2="65" y2="4" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="65" y1="4" x2="65" y2="26" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="75" y1="26" x2="75" y2="14" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="75" y1="14" x2="90" y2="14" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="90" y1="14" x2="90" y2="26" stroke="#38BDF8" strokeWidth="1" />
-          </Svg>
-        </View>
+        <PdfBrandHeader
+          theme={theme}
+          title="PRATEEQ.IN"
+          subtitle="FULL-STACK & AI ARCHITECTURE // SCOPING & QUOTATION"
+        />
 
         <View style={styles.docHeader}>
           <Text style={styles.docTitle}>EXECUTIVE COMMERCIAL PROPOSAL & SCOPING SPECIFICATION</Text>
@@ -384,7 +344,7 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
           </View>
         </View>
 
-        {renderFooter()}
+        <PdfFooter theme={theme} leftText="CONFIDENTIAL SCOPING BRIEF & QUOTATION // GENERATED BY PRATEEQ.IN SCOPING LAB" />
       </Page>
 
       {/* ================= PAGE 2 ================= */}
@@ -425,7 +385,7 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
           <Text style={styles.fieldVal}>{cleanPDFText(data?.additionalNotes) || 'None specified'}</Text>
         </View>
 
-        {renderFooter()}
+        <PdfFooter theme={theme} leftText="CONFIDENTIAL SCOPING BRIEF & QUOTATION // GENERATED BY PRATEEQ.IN SCOPING LAB" />
       </Page>
 
       {/* ================= PAGE 3 ================= */}
@@ -457,7 +417,7 @@ export function ScopingBriefPDF({ resumeData, data }: ScopingBriefPDFProps) {
           </View>
         </View>
 
-        {renderFooter()}
+        <PdfFooter theme={theme} leftText="CONFIDENTIAL SCOPING BRIEF & QUOTATION // GENERATED BY PRATEEQ.IN SCOPING LAB" />
       </Page>
     </Document>
   );

@@ -2,12 +2,14 @@ import { NextResponse } from 'next/server';
 import { renderToBuffer, type DocumentProps } from '@react-pdf/renderer';
 import React from 'react';
 import { MiddlemanAgreementPDF } from '@/components/pdf/MiddlemanAgreementPDF';
+import { registerPdfFontsServer } from '@/components/pdf/pdfFontsServer';
 import { getProfile } from '@/lib/data';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
+    registerPdfFontsServer();
     const profileData = await getProfile();
     const element = React.createElement(MiddlemanAgreementPDF, { resumeData: profileData }) as unknown as React.ReactElement<DocumentProps>;
     const buffer = await renderToBuffer(element);

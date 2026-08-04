@@ -1,11 +1,14 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet, Svg, Line } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import type { ResumeData, MiddlemanAgreementConfig } from '@/data/resume';
-import { DEFAULT_PDF_THEME } from './pdfTheme';
+import { getPdfTheme, type PDFThemeConfig } from './pdfTheme';
+import { PdfBrandHeader } from './PdfBrandHeader';
+import { PdfFooter } from './PdfFooter';
 import middlemanAgreementDefaults from '@/data/middlemanAgreementDefaults.json';
 
 interface MiddlemanAgreementPDFProps {
   resumeData?: ResumeData | null;
+  isNoir?: boolean;
 }
 
 interface MiddlemanSection {
@@ -18,7 +21,186 @@ function fillTokens(text: string, tokens: Record<string, string>): string {
   return text.replace(/\{\{(\w+)\}\}/g, (match, key: string) => tokens[key] ?? match);
 }
 
-export function MiddlemanAgreementPDF({ resumeData }: MiddlemanAgreementPDFProps) {
+function createStyles(theme: PDFThemeConfig) {
+  return StyleSheet.create({
+    page: {
+      paddingTop: 24,
+      paddingBottom: 32,
+      paddingLeft: 28,
+      paddingRight: 28,
+      fontFamily: theme.bodyFont,
+      backgroundColor: theme.pageBg,
+      fontSize: 8.5,
+      color: theme.textPrimary,
+    },
+    docHeader: {
+      borderBottomWidth: 1,
+      borderBottomColor: theme.cardBorder,
+      paddingBottom: 5,
+      marginBottom: 10,
+    },
+    docTitle: {
+      fontSize: 11,
+      fontFamily: theme.headlineBoldFont,
+      color: theme.textPrimary,
+      textTransform: 'uppercase',
+      letterSpacing: 0.04,
+    },
+    docMeta: {
+      fontSize: 7,
+      fontFamily: theme.labelFont,
+      color: theme.textSecondary,
+      marginTop: 2,
+      letterSpacing: 0.05,
+    },
+    metaCard: {
+      backgroundColor: theme.cardBg,
+      borderColor: theme.cardBorder,
+      borderWidth: 1,
+      borderRadius: 4,
+      padding: 8,
+      marginBottom: 12,
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+    },
+    metaCol: {
+      width: '50%',
+      marginBottom: 3,
+    },
+    metaLabel: {
+      fontFamily: theme.labelBoldFont,
+      color: theme.textSecondary,
+      fontSize: 6.5,
+      letterSpacing: 0.05,
+    },
+    metaVal: {
+      fontSize: 8,
+      color: theme.textPrimary,
+    },
+    sectionTitle: {
+      fontFamily: theme.labelBoldFont,
+      fontSize: 8,
+      color: theme.chipText,
+      backgroundColor: theme.chipBg,
+      borderColor: theme.chipBorder,
+      borderWidth: 1,
+      padding: '3 6',
+      borderRadius: 3,
+      marginBottom: 6,
+      marginTop: 4,
+      borderLeftWidth: 3,
+      borderLeftColor: theme.accentColor,
+      letterSpacing: 0.05,
+    },
+    paragraph: {
+      fontSize: 8,
+      lineHeight: 1.4,
+      color: theme.textSecondary,
+      marginBottom: 8,
+    },
+    bulletRow: {
+      flexDirection: 'row',
+      marginBottom: 3,
+    },
+    bulletDot: {
+      width: 10,
+      fontSize: 8,
+      lineHeight: 1.4,
+      color: theme.accentColor,
+    },
+    bulletText: {
+      flex: 1,
+      fontSize: 8,
+      lineHeight: 1.4,
+      color: theme.textSecondary,
+    },
+    table: {
+      width: '100%',
+      borderColor: theme.cardBorder,
+      borderWidth: 1,
+      borderRadius: 4,
+      overflow: 'hidden',
+      marginBottom: 10,
+    },
+    tableHeader: {
+      flexDirection: 'row',
+      backgroundColor: theme.tableRowAlt,
+      padding: 5,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.cardBorder,
+    },
+    tableCellBold: {
+      fontFamily: theme.labelBoldFont,
+      fontSize: 6.5,
+      color: theme.textPrimary,
+      letterSpacing: 0.04,
+    },
+    tableRow: {
+      flexDirection: 'row',
+      padding: 5,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.tableRowAlt,
+    },
+    tableCell: {
+      fontSize: 7.5,
+      color: theme.textSecondary,
+    },
+    signatureSection: {
+      marginTop: 10,
+    },
+    signatureGrid: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginTop: 4,
+    },
+    signatureBox: {
+      width: '48%',
+      borderColor: theme.cardBorder,
+      borderWidth: 1,
+      borderRadius: 4,
+      padding: 7,
+      backgroundColor: theme.cardBg,
+    },
+    signatureTitle: {
+      fontFamily: theme.labelBoldFont,
+      fontSize: 6.5,
+      color: theme.textSecondary,
+      marginBottom: 8,
+      letterSpacing: 0.05,
+    },
+    signatureLine: {
+      fontSize: 7.5,
+      color: theme.textPrimary,
+      marginTop: 1,
+    },
+    agreedBox: {
+      marginTop: 8,
+      backgroundColor: theme.cardBg,
+      borderColor: theme.cardBorder,
+      borderLeftWidth: 3,
+      borderLeftColor: theme.accentColor,
+      borderWidth: 1,
+      borderRadius: 4,
+      padding: 8,
+    },
+    agreedTitle: {
+      fontFamily: theme.labelBoldFont,
+      fontSize: 7,
+      color: theme.accentColor,
+      marginBottom: 3,
+      letterSpacing: 0.05,
+    },
+    agreedText: {
+      fontSize: 7.5,
+      lineHeight: 1.4,
+      color: theme.textSecondary,
+    },
+  });
+}
+
+export function MiddlemanAgreementPDF({ resumeData, isNoir }: MiddlemanAgreementPDFProps) {
+  const theme = getPdfTheme(!!isNoir);
+  const styles = createStyles(theme);
   const mm: Partial<MiddlemanAgreementConfig> = resumeData?.intake?.middlemanAgreement || {};
   const defaults = middlemanAgreementDefaults as {
     scalars: Record<string, string>;
@@ -52,206 +234,7 @@ export function MiddlemanAgreementPDF({ resumeData }: MiddlemanAgreementPDFProps
     lines: s.lines.map((line) => fillTokens(line, tokens)),
   }));
 
-  const styles = StyleSheet.create({
-    page: {
-      paddingTop: 24,
-      paddingBottom: 32,
-      paddingLeft: 28,
-      paddingRight: 28,
-      fontFamily: 'Helvetica',
-      backgroundColor: DEFAULT_PDF_THEME.pageBg,
-      fontSize: 8.5,
-      color: DEFAULT_PDF_THEME.textPrimary,
-    },
-    headerBanner: {
-      height: 48,
-      backgroundColor: DEFAULT_PDF_THEME.headerBg,
-      borderRadius: 4,
-      padding: 10,
-      marginBottom: 12,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    },
-    brandTitle: {
-      fontSize: 12,
-      fontFamily: 'Helvetica-Bold',
-      color: DEFAULT_PDF_THEME.headerTitle,
-      letterSpacing: 0.8,
-    },
-    brandSub: {
-      fontSize: 7,
-      color: DEFAULT_PDF_THEME.headerSub,
-      marginTop: 2,
-      letterSpacing: 0.5,
-    },
-    docHeader: {
-      borderBottomWidth: 1,
-      borderBottomColor: '#CBD5E1',
-      paddingBottom: 5,
-      marginBottom: 10,
-    },
-    docTitle: {
-      fontSize: 12,
-      fontFamily: 'Helvetica-Bold',
-      color: '#0F172A',
-      textTransform: 'uppercase',
-    },
-    docMeta: {
-      fontSize: 7.5,
-      color: '#64748B',
-      marginTop: 2,
-    },
-    metaCard: {
-      backgroundColor: '#F8FAFC',
-      borderColor: '#E2E8F0',
-      borderWidth: 1,
-      borderRadius: 4,
-      padding: 8,
-      marginBottom: 12,
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-    },
-    metaCol: {
-      width: '50%',
-      marginBottom: 3,
-    },
-    metaLabel: {
-      fontFamily: 'Helvetica-Bold',
-      fontSize: 7.5,
-      color: '#475569',
-    },
-    metaVal: {
-      fontSize: 8,
-      color: '#0F172A',
-    },
-    sectionTitle: {
-      fontFamily: 'Helvetica-Bold',
-      fontSize: 9,
-      color: '#1E3A8A',
-      backgroundColor: '#EFF6FF',
-      padding: '3 6',
-      borderRadius: 3,
-      marginBottom: 6,
-      marginTop: 4,
-      borderLeftWidth: 3,
-      borderLeftColor: '#2563EB',
-    },
-    paragraph: {
-      fontSize: 8,
-      lineHeight: 1.4,
-      color: '#334155',
-      marginBottom: 8,
-    },
-    bulletRow: {
-      flexDirection: 'row',
-      marginBottom: 3,
-    },
-    bulletDot: {
-      width: 10,
-      fontSize: 8,
-      lineHeight: 1.4,
-      color: '#2563EB',
-    },
-    bulletText: {
-      flex: 1,
-      fontSize: 8,
-      lineHeight: 1.4,
-      color: '#334155',
-    },
-    table: {
-      width: '100%',
-      borderColor: '#CBD5E1',
-      borderWidth: 1,
-      borderRadius: 4,
-      overflow: 'hidden',
-      marginBottom: 10,
-    },
-    tableHeader: {
-      flexDirection: 'row',
-      backgroundColor: '#F1F5F9',
-      padding: 5,
-      borderBottomWidth: 1,
-      borderBottomColor: '#CBD5E1',
-    },
-    tableCellBold: {
-      fontFamily: 'Helvetica-Bold',
-      fontSize: 7.5,
-      color: '#1E293B',
-    },
-    tableRow: {
-      flexDirection: 'row',
-      padding: 5,
-      borderBottomWidth: 1,
-      borderBottomColor: '#F1F5F9',
-    },
-    tableCell: {
-      fontSize: 7.5,
-      color: '#334155',
-    },
-    footer: {
-      position: 'absolute',
-      bottom: 14,
-      left: 28,
-      right: 28,
-      borderTopWidth: 1,
-      borderTopColor: '#E2E8F0',
-      paddingTop: 4,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-    },
-    footerText: {
-      fontSize: 7,
-      color: '#94A3B8',
-    },
-    signatureSection: {
-      marginTop: 10,
-    },
-    signatureGrid: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginTop: 4,
-    },
-    signatureBox: {
-      width: '48%',
-      borderColor: '#CBD5E1',
-      borderWidth: 1,
-      borderRadius: 4,
-      padding: 7,
-    },
-    signatureTitle: {
-      fontFamily: 'Helvetica-Bold',
-      fontSize: 7,
-      color: '#64748B',
-      marginBottom: 8,
-    },
-    signatureLine: {
-      fontSize: 7.5,
-      color: '#0F172A',
-      marginTop: 1,
-    },
-    agreedBox: {
-      marginTop: 8,
-      backgroundColor: '#F8FAFC',
-      borderColor: '#CBD5E1',
-      borderWidth: 1,
-      borderRadius: 4,
-      padding: 8,
-    },
-    agreedTitle: {
-      fontFamily: 'Helvetica-Bold',
-      fontSize: 7.5,
-      color: '#0284C7',
-      marginBottom: 3,
-    },
-    agreedText: {
-      fontSize: 7.5,
-      lineHeight: 1.4,
-      color: '#475569',
-    },
-  });
-
-const renderSection = (section: MiddlemanSection, index: number) => {
+  const renderSection = (section: MiddlemanSection, index: number) => {
     const isCommission = section.key === 'commission';
     const isSignature = section.key === 'signature';
 
@@ -279,22 +262,22 @@ const renderSection = (section: MiddlemanSection, index: number) => {
             </View>
             <View style={styles.tableRow}>
               <Text style={[styles.tableCell, { width: '40%' }]}>Tier 1: Landing Page (INR 25k–45k / $300–$550)</Text>
-              <Text style={[styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }]}>{tier1Cut}</Text>
+              <Text style={[styles.tableCell, { width: '30%', fontFamily: theme.labelBoldFont }]}>{tier1Cut}</Text>
               <Text style={[styles.tableCell, { width: '30%' }]}>Within 48h of Client 50% Deposit</Text>
             </View>
             <View style={styles.tableRow}>
               <Text style={[styles.tableCell, { width: '40%' }]}>Tier 2: Multi-Page Web App (INR 45k–90k / $550–$1.1k)</Text>
-              <Text style={[styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }]}>{tier2Cut}</Text>
+              <Text style={[styles.tableCell, { width: '30%', fontFamily: theme.labelBoldFont }]}>{tier2Cut}</Text>
               <Text style={[styles.tableCell, { width: '30%' }]}>Within 48h of Client 50% Deposit</Text>
             </View>
             <View style={styles.tableRow}>
               <Text style={[styles.tableCell, { width: '40%' }]}>Tier 3: SaaS / AI RAG Engine (INR 90k–1.5L+ / $1.1k+)</Text>
-              <Text style={[styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }]}>{tier3Cut}</Text>
+              <Text style={[styles.tableCell, { width: '30%', fontFamily: theme.labelBoldFont }]}>{tier3Cut}</Text>
               <Text style={[styles.tableCell, { width: '30%' }]}>Within 48h of Client 50% Deposit</Text>
             </View>
             <View style={[styles.tableRow, { borderBottomWidth: 0 }]}>
               <Text style={[styles.tableCell, { width: '40%' }]}>Recurring Care Plan (ongoing)</Text>
-              <Text style={[styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }]}>{recurringCut}</Text>
+              <Text style={[styles.tableCell, { width: '30%', fontFamily: theme.labelBoldFont }]}>{recurringCut}</Text>
               <Text style={[styles.tableCell, { width: '30%' }]}>Monthly on cleared Net Funds</Text>
             </View>
           </View>
@@ -332,24 +315,11 @@ const renderSection = (section: MiddlemanSection, index: number) => {
   return (
     <Document title={`${partnerName.replace(/\s+/g, '_')}_Sales_Partner_Agreement`}>
       <Page size="A4" style={styles.page}>
-        <View style={styles.headerBanner}>
-          <View>
-            <Text style={styles.brandTitle}>PRATEEQ.IN</Text>
-            <Text style={styles.brandSub}>FULL-STACK & AI ARCHITECTURE // PARTNER FRAMEWORK</Text>
-          </View>
-          <Svg height="26" width="100">
-            <Line x1="0" y1="26" x2="100" y2="26" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="15" y1="26" x2="15" y2="10" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="15" y1="10" x2="35" y2="10" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="35" y1="10" x2="35" y2="26" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="45" y1="26" x2="45" y2="4" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="45" y1="4" x2="65" y2="4" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="65" y1="4" x2="65" y2="26" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="75" y1="26" x2="75" y2="14" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="75" y1="14" x2="90" y2="14" stroke="#38BDF8" strokeWidth="1" />
-            <Line x1="90" y1="14" x2="90" y2="26" stroke="#38BDF8" strokeWidth="1" />
-          </Svg>
-        </View>
+        <PdfBrandHeader
+          theme={theme}
+          title="PRATEEQ.IN"
+          subtitle="FULL-STACK & AI ARCHITECTURE // PARTNER FRAMEWORK"
+        />
 
         <View style={styles.docHeader}>
           <Text style={styles.docTitle}>SALES PARTNER & MIDDLEMAN PARTNERSHIP AGREEMENT</Text>
@@ -377,15 +347,7 @@ const renderSection = (section: MiddlemanSection, index: number) => {
 
         {sections.map(renderSection)}
 
-        <View style={styles.footer} fixed>
-          <Text style={styles.footerText}>SALES PARTNER & MIDDLEMAN AGREEMENT // CONFIDENTIAL</Text>
-          <Text
-            style={styles.footerText}
-            render={({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) =>
-              `Page ${pageNumber} of ${totalPages} | https://prateeq.in`
-            }
-          />
-        </View>
+        <PdfFooter theme={theme} leftText="SALES PARTNER & MIDDLEMAN AGREEMENT // CONFIDENTIAL" />
       </Page>
     </Document>
   );

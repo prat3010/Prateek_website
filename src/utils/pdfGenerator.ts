@@ -6,6 +6,16 @@ import { ScopingBriefPDF } from '@/components/pdf/ScopingBriefPDF';
 import { MiddlemanAgreementPDF } from '@/components/pdf/MiddlemanAgreementPDF';
 import { DeveloperResumePDF } from '@/components/pdf/DeveloperResumePDF';
 import { ServicesAndPricingPDF } from '@/components/pdf/ServicesAndPricingPDF';
+import { registerPdfFontsClient } from '@/components/pdf/pdfFontsClient';
+
+let fontsRegistered = false;
+
+function ensurePdfFonts() {
+  if (!fontsRegistered) {
+    registerPdfFontsClient();
+    fontsRegistered = true;
+  }
+}
 
 export interface QuestionnaireData {
   companyName?: string;
@@ -60,28 +70,32 @@ export async function generateResumePDF(activePersona: Persona, resumeData: Resu
   await renderAndOpenPDF(element, fileName);
 }
 
-export async function generateQuestionnairePDF(resumeData?: ResumeData | null, data?: QuestionnaireData) {
+export async function generateQuestionnairePDF(resumeData?: ResumeData | null, data?: QuestionnaireData, isNoir = false) {
+  ensurePdfFonts();
   const fileName = `${(data?.companyName || 'Client').replace(/\s+/g, '_')}_Scoping_Brief_Agreement.pdf`;
-  const element = React.createElement(ScopingBriefPDF, { resumeData, data }) as unknown as React.ReactElement<DocumentProps>;
+  const element = React.createElement(ScopingBriefPDF, { resumeData, data, isNoir }) as unknown as React.ReactElement<DocumentProps>;
   await renderAndOpenPDF(element, fileName);
 }
 
-export async function generateMiddlemanAgreementPDF(resumeData?: ResumeData | null) {
+export async function generateMiddlemanAgreementPDF(resumeData?: ResumeData | null, isNoir = false) {
+  ensurePdfFonts();
   const mm = resumeData?.intake?.middlemanAgreement;
   const partnerName = mm?.partnerName || 'Partner';
   const fileName = `${partnerName.replace(/\s+/g, '_')}_Sales_Partner_Agreement.pdf`;
-  const element = React.createElement(MiddlemanAgreementPDF, { resumeData }) as unknown as React.ReactElement<DocumentProps>;
+  const element = React.createElement(MiddlemanAgreementPDF, { resumeData, isNoir }) as unknown as React.ReactElement<DocumentProps>;
   await renderAndOpenPDF(element, fileName);
 }
 
-export async function generateQuotationPDF(resumeData: ResumeData) {
+export async function generateQuotationPDF(resumeData: ResumeData, isNoir = false) {
+  ensurePdfFonts();
   const fileName = `${resumeData.name.replace(/\s+/g, '_')}_Service_Quotation.pdf`;
-  const element = React.createElement(ScopingBriefPDF, { resumeData }) as unknown as React.ReactElement<DocumentProps>;
+  const element = React.createElement(ScopingBriefPDF, { resumeData, isNoir }) as unknown as React.ReactElement<DocumentProps>;
   await renderAndOpenPDF(element, fileName);
 }
 
-export async function generateServicesAndPricingPDF(resumeData: ResumeData) {
+export async function generateServicesAndPricingPDF(resumeData: ResumeData, isNoir = false) {
+  ensurePdfFonts();
   const fileName = `Prateeq_Sharma_Services_And_Pricing_Guide.pdf`;
-  const element = React.createElement(ServicesAndPricingPDF, { resumeData }) as unknown as React.ReactElement<DocumentProps>;
+  const element = React.createElement(ServicesAndPricingPDF, { resumeData, isNoir }) as unknown as React.ReactElement<DocumentProps>;
   await renderAndOpenPDF(element, fileName);
 }

@@ -16,6 +16,7 @@ import {
   Lock
 } from 'lucide-react';
 import { generateQuestionnairePDF } from '@/utils/pdfGenerator';
+import { useTheme } from '@/context/ThemeContext';
 import type {
   BaseEngineItem,
   BrandAssetOption,
@@ -64,6 +65,7 @@ export const BRAND_ASSET_OPTIONS: BrandAssetOption[] = questionnaireDefaults.bra
 export const MAINTENANCE_PLANS: MaintenancePlanOption[] = questionnaireDefaults.maintenancePlans;
 
 export default function IntakeForm({ resumeData, initialPreset = null }: IntakeFormProps) {
+  const { isNoir } = useTheme();
   const intakeConfig = resumeData?.intake;
 
   const engines = useMemo(
@@ -245,7 +247,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
       totalBuildCostINR: totalCost.totalINR,
       totalBuildCostUSD: totalCost.totalUSD,
       additionalNotes: formData.additionalNotes
-    });
+    }, isNoir);
   };
 
   // Load Google reCAPTCHA v3 script dynamically if configured
