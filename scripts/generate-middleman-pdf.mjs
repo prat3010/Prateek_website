@@ -6,15 +6,234 @@ import { fileURLToPath } from 'url';
 
 // NOTE: This script must stay in sync with src/components/pdf/MiddlemanAgreementPDF.tsx
 // (the site's canonical renderer). Both consume the same defaults JSON and config shape.
+// The script carries the azure/noir brand theme (tokens mirrored from
+// src/components/pdf/pdfTheme.ts, fonts registered from public/fonts/) — pass
+// `--theme azure|noir` to pick the palette.
 
-const { Document, Page, Text, View, StyleSheet, Svg, Line } = ReactPDF;
+const { Document, Page, Text, View, StyleSheet, Svg, Line, Circle, Ellipse, Path } = ReactPDF;
 const h = React.createElement;
+
+// ── Brand font registry (mirrors src/components/pdf/pdfFonts.ts + pdfFontsServer.ts) ──
+const PDF_FONT = {
+  headlineLight: 'PlayfairDisplay',
+  headlineLightBold: 'PlayfairDisplay-Bold',
+  bodyLight: 'Lora',
+  code: 'JetBrainsMono',
+  codeBold: 'JetBrainsMono-Bold',
+};
+
+const PDF_FONT_FILES = {
+  [PDF_FONT.headlineLight]: 'PlayfairDisplay-Regular.ttf',
+  [PDF_FONT.headlineLightBold]: 'PlayfairDisplay-Bold.ttf',
+  [PDF_FONT.bodyLight]: 'Lora-Regular.ttf',
+  [PDF_FONT.code]: 'JetBrainsMono-Regular.ttf',
+  [PDF_FONT.codeBold]: 'JetBrainsMono-Bold.ttf',
+};
+
+const PDF_FONT_WEIGHTS = {
+  [PDF_FONT.headlineLight]: 400,
+  [PDF_FONT.headlineLightBold]: 700,
+  [PDF_FONT.bodyLight]: 400,
+  [PDF_FONT.code]: 400,
+  [PDF_FONT.codeBold]: 700,
+};
+
+// ── Theme tokens (mirrors src/components/pdf/pdfTheme.ts) ──
+const PDF_THEMES = {
+  azure: {
+    isNoir: false,
+    pageBg: '#F7F2E8',
+    textPrimary: '#2B2B36',
+    textSecondary: '#55555F',
+    headerBg: '#2B2B36',
+    headerTitle: '#FAF9F6',
+    headerSub: '#B9B3A4',
+    cardBg: '#FAF9F6',
+    cardBorder: '#DDD6C8',
+    tableRowAlt: '#F3EDE1',
+    accentColor: '#D95D67',
+    accentBg: '#F9E3E2',
+    chipBg: '#F4DC95',
+    chipBorder: '#2B2B36',
+    chipText: '#2B2B36',
+    logoBg: '#5A8EB6',
+    logoStroke: '#2B2B36',
+    logoBody: '#FAF9F6',
+    logoEar: '#D95D67',
+    logoEye: '#2B2B36',
+    logoPupil: '#FAF9F6',
+    logoBlush: '#DF8B98',
+    footerText: '#8A8474',
+    footerRule: '#DDD6C8',
+    headlineFont: PDF_FONT.headlineLight,
+    headlineBoldFont: PDF_FONT.headlineLightBold,
+    bodyFont: PDF_FONT.bodyLight,
+    labelFont: PDF_FONT.code,
+    labelBoldFont: PDF_FONT.codeBold,
+  },
+  noir: {
+    isNoir: true,
+    pageBg: '#08080A',
+    textPrimary: '#FAFAFA',
+    textSecondary: '#9A9AA6',
+    headerBg: '#101014',
+    headerTitle: '#FAFAFA',
+    headerSub: '#8A8A93',
+    cardBg: '#1E1E24',
+    cardBorder: '#555562',
+    tableRowAlt: '#17171C',
+    accentColor: '#FF2A55',
+    accentBg: '#2A1219',
+    chipBg: '#1E1E24',
+    chipBorder: '#FFE600',
+    chipText: '#FAFAFA',
+    logoBg: '#8A8A93',
+    logoStroke: '#FAFAFA',
+    logoBody: '#121214',
+    logoEar: '#FAFAFA',
+    logoEye: '#FAFAFA',
+    logoPupil: '#121214',
+    logoBlush: '#FFFFFF',
+    footerText: '#5A5A66',
+    footerRule: '#33333C',
+    headlineFont: PDF_FONT.code,
+    headlineBoldFont: PDF_FONT.codeBold,
+    bodyFont: PDF_FONT.code,
+    labelFont: PDF_FONT.code,
+    labelBoldFont: PDF_FONT.codeBold,
+  },
+};
+
+function getPdfTheme(isNoir) {
+  return isNoir ? PDF_THEMES.noir : PDF_THEMES.azure;
+}
+
+let fontsRegistered = false;
+function registerPdfFonts() {
+  if (fontsRegistered) return;
+  const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+  Object.entries(PDF_FONT_FILES).forEach(([family, file]) => {
+    const ttf = fs.readFileSync(path.join(scriptDir, '..', 'public', 'fonts', file));
+    ReactPDF.Font.register({
+      family,
+      fonts: [
+        {
+          src: `data:font/ttf;base64,${ttf.toString('base64')}`,
+          fontWeight: PDF_FONT_WEIGHTS[family],
+        },
+      ],
+    });
+  });
+  fontsRegistered = true;
+}
 
 function fillTokens(text, tokens) {
   return text.replace(/\{\{(\w+)\}\}/g, (match, key) => tokens[key] ?? match);
 }
 
-async function generateMiddlemanAgreementPDF({ configPath, outputPath }) {
+// ── Brand header + footer (mirrors PdfBrandHeader.tsx / PdfFooter.tsx / PdfGremlinLogo.tsx) ──
+function gremlinLogo(theme, size) {
+  return h(Svg, { viewBox: '0 0 100 100', width: size, height: size },
+    h(Circle, { cx: '50', cy: '50', r: '38', fill: theme.logoBg }),
+    h(Path, { d: 'M 26,45 L 32,50 L 26,55', fill: 'none', stroke: theme.logoStroke, strokeWidth: 3.5, strokeLinecap: 'round', strokeLinejoin: 'round' }),
+    h(Line, { x1: '35', y1: '55', x2: '43', y2: '55', stroke: theme.logoStroke, strokeWidth: 3.5, strokeLinecap: 'round' }),
+    h(Line, { x1: '15', y1: '72', x2: '85', y2: '72', stroke: theme.logoStroke, strokeWidth: 3.5, strokeLinecap: 'round' }),
+    h(Path, { d: 'M 32,72 C 32,46 68,46 68,72', fill: theme.logoBody, stroke: theme.logoStroke, strokeWidth: 3.5, strokeLinecap: 'round' }),
+    h(Path, { d: 'M 32,48 L 12,38 Q 24,53 36,55', fill: theme.logoEar, stroke: theme.logoStroke, strokeWidth: 3, strokeLinejoin: 'round' }),
+    h(Path, { d: 'M 68,48 L 88,38 Q 76,53 64,55', fill: theme.logoEar, stroke: theme.logoStroke, strokeWidth: 3, strokeLinejoin: 'round' }),
+    h(Circle, { cx: '43', cy: '58', r: '6.5', fill: theme.logoEye }),
+    h(Circle, { cx: '45', cy: '55.5', r: '2.5', fill: theme.logoPupil }),
+    h(Circle, { cx: '57', cy: '58', r: '6.5', fill: theme.logoEye }),
+    h(Circle, { cx: '59', cy: '55.5', r: '2.5', fill: theme.logoPupil }),
+    h(Ellipse, { cx: '37', cy: '63', rx: '3.5', ry: '2', fill: theme.logoBlush }),
+    h(Ellipse, { cx: '63', cy: '63', rx: '3.5', ry: '2', fill: theme.logoBlush })
+  );
+}
+
+function brandHeader(theme, title, subtitle) {
+  const headerStyles = StyleSheet.create({
+    banner: {
+      height: 52,
+      backgroundColor: theme.headerBg,
+      borderRadius: 4,
+      marginBottom: 12,
+      paddingHorizontal: 12,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    brand: {
+      transform: 'rotate(-1.5deg)',
+    },
+    brandTitle: {
+      fontSize: 14,
+      fontFamily: theme.headlineBoldFont,
+      color: theme.headerTitle,
+      letterSpacing: 0.06,
+      textTransform: 'uppercase',
+    },
+    brandAccent: {
+      width: 30,
+      height: 2,
+      backgroundColor: theme.accentColor,
+      marginTop: 3,
+    },
+    brandSub: {
+      fontSize: 6.5,
+      fontFamily: theme.labelFont,
+      color: theme.headerSub,
+      marginTop: 4,
+      letterSpacing: 0.08,
+      textTransform: 'uppercase',
+    },
+  });
+
+  return h(View, { style: headerStyles.banner },
+    h(View, { style: headerStyles.brand },
+      h(Text, { style: headerStyles.brandTitle }, title),
+      h(View, { style: headerStyles.brandAccent }),
+      h(Text, { style: headerStyles.brandSub }, subtitle)
+    ),
+    gremlinLogo(theme, 34)
+  );
+}
+
+function pdfFooter(theme, leftText) {
+  const footerStyles = StyleSheet.create({
+    footer: {
+      position: 'absolute',
+      bottom: 14,
+      left: 28,
+      right: 28,
+      borderTopWidth: 1,
+      borderTopColor: theme.footerRule,
+      paddingTop: 4,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    footerText: {
+      fontSize: 6.5,
+      fontFamily: theme.labelFont,
+      letterSpacing: 0.05,
+      color: theme.footerText,
+    },
+    footerRight: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+  });
+
+  return h(View, { style: footerStyles.footer, fixed: true },
+    h(Text, { style: footerStyles.footerText }, leftText),
+    h(View, { style: footerStyles.footerRight },
+      gremlinLogo(theme, 10),
+      h(Text, { style: [footerStyles.footerText, { marginLeft: 5 }], render: ({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages} | https://prateeq.in` })
+    )
+  );
+}
+
+async function generateMiddlemanAgreementPDF({ configPath, outputPath, theme }) {
   let resumeData = {};
   if (configPath) {
     try {
@@ -31,6 +250,9 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath }) {
       console.warn('Could not load resume.json, using defaults:', e);
     }
   }
+
+  registerPdfFonts();
+  const themeConfig = getPdfTheme(theme === 'noir');
 
   const scriptDir = path.dirname(fileURLToPath(import.meta.url));
   const defaultsPath = path.join(scriptDir, '..', 'src', 'data', 'middlemanAgreementDefaults.json');
@@ -70,53 +292,34 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath }) {
       paddingBottom: 32,
       paddingLeft: 28,
       paddingRight: 28,
-      fontFamily: 'Helvetica',
-      backgroundColor: '#FFFFFF',
+      fontFamily: themeConfig.bodyFont,
+      backgroundColor: themeConfig.pageBg,
       fontSize: 8.5,
-      color: '#0F172A',
-    },
-    headerBanner: {
-      height: 48,
-      backgroundColor: '#0F172A',
-      borderRadius: 4,
-      padding: 10,
-      marginBottom: 12,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    },
-    brandTitle: {
-      fontSize: 12,
-      fontFamily: 'Helvetica-Bold',
-      color: '#FFFFFF',
-      letterSpacing: 0.8,
-    },
-    brandSub: {
-      fontSize: 7,
-      color: '#94A3B8',
-      marginTop: 2,
-      letterSpacing: 0.5,
+      color: themeConfig.textPrimary,
     },
     docHeader: {
       borderBottomWidth: 1,
-      borderBottomColor: '#CBD5E1',
+      borderBottomColor: themeConfig.cardBorder,
       paddingBottom: 5,
       marginBottom: 10,
     },
     docTitle: {
-      fontSize: 12,
-      fontFamily: 'Helvetica-Bold',
-      color: '#0F172A',
+      fontSize: 11,
+      fontFamily: themeConfig.headlineBoldFont,
+      color: themeConfig.textPrimary,
       textTransform: 'uppercase',
+      letterSpacing: 0.04,
     },
     docMeta: {
-      fontSize: 7.5,
-      color: '#64748B',
+      fontSize: 7,
+      fontFamily: themeConfig.labelFont,
+      color: themeConfig.textSecondary,
       marginTop: 2,
+      letterSpacing: 0.05,
     },
     metaCard: {
-      backgroundColor: '#F8FAFC',
-      borderColor: '#E2E8F0',
+      backgroundColor: themeConfig.cardBg,
+      borderColor: themeConfig.cardBorder,
       borderWidth: 1,
       borderRadius: 4,
       padding: 8,
@@ -129,30 +332,34 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath }) {
       marginBottom: 3,
     },
     metaLabel: {
-      fontFamily: 'Helvetica-Bold',
-      fontSize: 7.5,
-      color: '#475569',
+      fontFamily: themeConfig.labelBoldFont,
+      color: themeConfig.textSecondary,
+      fontSize: 6.5,
+      letterSpacing: 0.05,
     },
     metaVal: {
       fontSize: 8,
-      color: '#0F172A',
+      color: themeConfig.textPrimary,
     },
     sectionTitle: {
-      fontFamily: 'Helvetica-Bold',
-      fontSize: 9,
-      color: '#1E3A8A',
-      backgroundColor: '#EFF6FF',
+      fontFamily: themeConfig.labelBoldFont,
+      fontSize: 8,
+      color: themeConfig.chipText,
+      backgroundColor: themeConfig.chipBg,
+      borderColor: themeConfig.chipBorder,
+      borderWidth: 1,
       padding: '3 6',
       borderRadius: 3,
       marginBottom: 6,
       marginTop: 4,
       borderLeftWidth: 3,
-      borderLeftColor: '#2563EB',
+      borderLeftColor: themeConfig.accentColor,
+      letterSpacing: 0.05,
     },
     paragraph: {
       fontSize: 8,
       lineHeight: 1.4,
-      color: '#334155',
+      color: themeConfig.textSecondary,
       marginBottom: 8,
     },
     bulletRow: {
@@ -163,17 +370,17 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath }) {
       width: 10,
       fontSize: 8,
       lineHeight: 1.4,
-      color: '#2563EB',
+      color: themeConfig.accentColor,
     },
     bulletText: {
       flex: 1,
       fontSize: 8,
       lineHeight: 1.4,
-      color: '#334155',
+      color: themeConfig.textSecondary,
     },
     table: {
       width: '100%',
-      borderColor: '#CBD5E1',
+      borderColor: themeConfig.cardBorder,
       borderWidth: 1,
       borderRadius: 4,
       overflow: 'hidden',
@@ -181,40 +388,26 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath }) {
     },
     tableHeader: {
       flexDirection: 'row',
-      backgroundColor: '#F1F5F9',
+      backgroundColor: themeConfig.tableRowAlt,
       padding: 5,
       borderBottomWidth: 1,
-      borderBottomColor: '#CBD5E1',
+      borderBottomColor: themeConfig.cardBorder,
     },
     tableCellBold: {
-      fontFamily: 'Helvetica-Bold',
-      fontSize: 7.5,
-      color: '#1E293B',
+      fontFamily: themeConfig.labelBoldFont,
+      fontSize: 6.5,
+      color: themeConfig.textPrimary,
+      letterSpacing: 0.04,
     },
     tableRow: {
       flexDirection: 'row',
       padding: 5,
       borderBottomWidth: 1,
-      borderBottomColor: '#F1F5F9',
+      borderBottomColor: themeConfig.tableRowAlt,
     },
     tableCell: {
       fontSize: 7.5,
-      color: '#334155',
-    },
-    footer: {
-      position: 'absolute',
-      bottom: 14,
-      left: 28,
-      right: 28,
-      borderTopWidth: 1,
-      borderTopColor: '#E2E8F0',
-      paddingTop: 4,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-    },
-    footerText: {
-      fontSize: 7,
-      color: '#94A3B8',
+      color: themeConfig.textSecondary,
     },
     signatureSection: {
       marginTop: 10,
@@ -226,40 +419,45 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath }) {
     },
     signatureBox: {
       width: '48%',
-      borderColor: '#CBD5E1',
+      borderColor: themeConfig.cardBorder,
       borderWidth: 1,
       borderRadius: 4,
       padding: 7,
+      backgroundColor: themeConfig.cardBg,
     },
     signatureTitle: {
-      fontFamily: 'Helvetica-Bold',
-      fontSize: 7,
-      color: '#64748B',
+      fontFamily: themeConfig.labelBoldFont,
+      fontSize: 6.5,
+      color: themeConfig.textSecondary,
       marginBottom: 8,
+      letterSpacing: 0.05,
     },
     signatureLine: {
       fontSize: 7.5,
-      color: '#0F172A',
+      color: themeConfig.textPrimary,
       marginTop: 1,
     },
     agreedBox: {
       marginTop: 8,
-      backgroundColor: '#F8FAFC',
-      borderColor: '#CBD5E1',
+      backgroundColor: themeConfig.cardBg,
+      borderColor: themeConfig.cardBorder,
+      borderLeftWidth: 3,
+      borderLeftColor: themeConfig.accentColor,
       borderWidth: 1,
       borderRadius: 4,
       padding: 8,
     },
     agreedTitle: {
-      fontFamily: 'Helvetica-Bold',
-      fontSize: 7.5,
-      color: '#0284C7',
+      fontFamily: themeConfig.labelBoldFont,
+      fontSize: 7,
+      color: themeConfig.accentColor,
       marginBottom: 3,
+      letterSpacing: 0.05,
     },
     agreedText: {
       fontSize: 7.5,
       lineHeight: 1.4,
-      color: '#475569',
+      color: themeConfig.textSecondary,
     },
   });
 
@@ -290,22 +488,22 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath }) {
           ),
           h(View, { style: styles.tableRow },
             h(Text, { style: [styles.tableCell, { width: '40%' }] }, 'Tier 1: Landing Page (INR 25k–45k / $300–$550)'),
-            h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }] }, tier1Cut),
+            h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: themeConfig.labelBoldFont }] }, tier1Cut),
             h(Text, { style: [styles.tableCell, { width: '30%' }] }, 'Within 48h of Client 50% Deposit')
           ),
           h(View, { style: styles.tableRow },
             h(Text, { style: [styles.tableCell, { width: '40%' }] }, 'Tier 2: Multi-Page Web App (INR 45k–90k / $550–$1.1k)'),
-            h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }] }, tier2Cut),
+            h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: themeConfig.labelBoldFont }] }, tier2Cut),
             h(Text, { style: [styles.tableCell, { width: '30%' }] }, 'Within 48h of Client 50% Deposit')
           ),
           h(View, { style: styles.tableRow },
             h(Text, { style: [styles.tableCell, { width: '40%' }] }, 'Tier 3: SaaS / AI RAG Engine (INR 90k–1.5L+ / $1.1k+)'),
-            h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }] }, tier3Cut),
+            h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: themeConfig.labelBoldFont }] }, tier3Cut),
             h(Text, { style: [styles.tableCell, { width: '30%' }] }, 'Within 48h of Client 50% Deposit')
           ),
           h(View, { style: [styles.tableRow, { borderBottomWidth: 0 }] },
             h(Text, { style: [styles.tableCell, { width: '40%' }] }, 'Recurring Care Plan (ongoing)'),
-            h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: 'Helvetica-Bold' }] }, recurringCut),
+            h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: themeConfig.labelBoldFont }] }, recurringCut),
             h(Text, { style: [styles.tableCell, { width: '30%' }] }, 'Monthly on cleared Net Funds')
           )
         )
@@ -345,24 +543,7 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath }) {
 
   const docElement = h(Document, { title: `${partnerName.replace(/\s+/g, '_')}_Sales_Partner_Agreement` },
     h(Page, { size: 'A4', style: styles.page },
-      h(View, { style: styles.headerBanner },
-        h(View, null,
-          h(Text, { style: styles.brandTitle }, 'PRATEEQ.IN'),
-          h(Text, { style: styles.brandSub }, 'FULL-STACK & AI ARCHITECTURE // PARTNER FRAMEWORK')
-        ),
-        h(Svg, { height: '26', width: '100' },
-          h(Line, { x1: '0', y1: '26', x2: '100', y2: '26', stroke: '#38BDF8', strokeWidth: '1' }),
-          h(Line, { x1: '15', y1: '26', x2: '15', y2: '10', stroke: '#38BDF8', strokeWidth: '1' }),
-          h(Line, { x1: '15', y1: '10', x2: '35', y2: '10', stroke: '#38BDF8', strokeWidth: '1' }),
-          h(Line, { x1: '35', y1: '10', x2: '35', y2: '26', stroke: '#38BDF8', strokeWidth: '1' }),
-          h(Line, { x1: '45', y1: '26', x2: '45', y2: '4', stroke: '#38BDF8', strokeWidth: '1' }),
-          h(Line, { x1: '45', y1: '4', x2: '65', y2: '4', stroke: '#38BDF8', strokeWidth: '1' }),
-          h(Line, { x1: '65', y1: '4', x2: '65', y2: '26', stroke: '#38BDF8', strokeWidth: '1' }),
-          h(Line, { x1: '75', y1: '26', x2: '75', y2: '14', stroke: '#38BDF8', strokeWidth: '1' }),
-          h(Line, { x1: '75', y1: '14', x2: '90', y2: '14', stroke: '#38BDF8', strokeWidth: '1' }),
-          h(Line, { x1: '90', y1: '14', x2: '90', y2: '26', stroke: '#38BDF8', strokeWidth: '1' })
-        )
-      ),
+      brandHeader(themeConfig, 'PRATEEQ.IN', 'FULL-STACK & AI ARCHITECTURE // PARTNER FRAMEWORK'),
       h(View, { style: styles.docHeader },
         h(Text, { style: styles.docTitle }, 'SALES PARTNER & MIDDLEMAN PARTNERSHIP AGREEMENT'),
         h(Text, { style: styles.docMeta }, 'Prateeq Sharma | Engineering & Custom Web Builds | REF: PRTQ-PARTNER-2026')
@@ -386,30 +567,28 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath }) {
         )
       ),
       ...sections.map(renderSection),
-      h(View, { style: styles.footer, fixed: true },
-        h(Text, { style: styles.footerText }, 'SALES PARTNER & MIDDLEMAN AGREEMENT // CONFIDENTIAL'),
-        h(Text, { style: styles.footerText, render: ({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages} | https://prateeq.in` })
-      )
+      pdfFooter(themeConfig, 'SALES PARTNER & MIDDLEMAN AGREEMENT // CONFIDENTIAL')
     )
   );
 
   const outputPathResolved = outputPath || path.join(process.cwd(), 'public', 'Middleman_Partnership_Agreement.pdf');
   await ReactPDF.renderToFile(docElement, outputPathResolved);
-  console.log(`Successfully generated PDF: ${outputPathResolved}`);
+  console.log(`Successfully generated PDF (${themeConfig.isNoir ? 'noir' : 'azure'}): ${outputPathResolved}`);
 }
 
 function parseArgs(argv) {
-  const args = { configPath: null, outputPath: null };
+  const args = { configPath: null, outputPath: null, theme: 'azure' };
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--config' && argv[i + 1]) args.configPath = argv[i + 1];
     if (argv[i] === '--out' && argv[i + 1]) args.outputPath = argv[i + 1];
+    if (argv[i] === '--theme' && argv[i + 1]) args.theme = argv[i + 1];
   }
   return args;
 }
 
 async function run() {
-  const { configPath, outputPath } = parseArgs(process.argv.slice(2));
-  await generateMiddlemanAgreementPDF({ configPath, outputPath });
+  const { configPath, outputPath, theme } = parseArgs(process.argv.slice(2));
+  await generateMiddlemanAgreementPDF({ configPath, outputPath, theme });
 }
 
 run();

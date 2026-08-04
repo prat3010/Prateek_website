@@ -386,6 +386,15 @@ def render_resume_tab():
 
             target_pdf = "Sales_Partner_Agreement.pdf"
 
+            pdf_theme = st.radio(
+                "Agreement PDF Theme",
+                options=["azure", "noir"],
+                index=0,
+                horizontal=True,
+                key="mm_pdf_theme",
+                help="Visual palette used when building the agreement PDF (azure = pop-art cream, noir = cyber-noir)."
+            )
+
             col_b1, col_b2 = st.columns([1, 1])
             with col_b1:
                 import re as _re, tempfile, json as _json, subprocess
@@ -399,7 +408,7 @@ def render_resume_tab():
                         with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as tmp_pdf:
                             pdf_path = tmp_pdf.name
                         proc = subprocess.run(
-                            ['node', 'scripts/generate-middleman-pdf.mjs', '--config', cfg_path, '--out', pdf_path],
+                            ['node', 'scripts/generate-middleman-pdf.mjs', '--config', cfg_path, '--out', pdf_path, '--theme', pdf_theme],
                             capture_output=True,
                             text=True
                         )
