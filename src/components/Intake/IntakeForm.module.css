@@ -481,6 +481,10 @@
   font-size: 14px;
   font-weight: 700;
   color: var(--pop-black);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 
 .careCardPrice {

@@ -27,6 +27,10 @@ describe('formatting helpers', () => {
     expect(formatPricePair(30000, 400, 'USD')).toBe('$400 / ₹30,000');
   });
 
+  it('formatPricePair groups USD with thousands separators', () => {
+    expect(formatPricePair(320000, 4350, 'INR')).toBe('₹3,20,000 / $4,350');
+  });
+
   it('resolveDefaultCurrency maps geo region to currency', () => {
     expect(resolveDefaultCurrency('india')).toBe('INR');
     expect(resolveDefaultCurrency('global')).toBe('USD');
@@ -64,6 +68,17 @@ describe('engine and feature prices', () => {
     expect(commerce.priceINR).toBe(75000);
     expect(commerce.priceUSD).toBe(1000);
     expect(commerce.dependsOn).toEqual(['payments', 'auth']);
+  });
+
+  it.each([
+    ['pwa', 35000, 450],
+    ['i18n', 30000, 400],
+    ['integrations', 40000, 550],
+    ['video', 65000, 850],
+  ] as const)('%s add-on is priced at ₹%i / $%i', (id, inr, usd) => {
+    const mod = features.find((f) => f.id === id) as FeatureItem;
+    expect(mod.priceINR).toBe(inr);
+    expect(mod.priceUSD).toBe(usd);
   });
 });
 
@@ -142,7 +157,7 @@ describe('goal archetype package totals', () => {
     landing_page: { inr: 45000, usd: 600 },
     business_multipage: { inr: 70000, usd: 950 },
     ecommerce: { inr: 215000, usd: 2900 },
-    booking_appointments: { inr: 165000, usd: 2250 },
+    booking_appointments: { inr: 190000, usd: 2600 },
     saas_app: { inr: 320000, usd: 4350 },
     lms_portal: { inr: 360000, usd: 4900 },
     crm_admin: { inr: 335000, usd: 4550 },
@@ -162,6 +177,12 @@ describe('goal archetype package totals', () => {
     const totals = packageTotals(goals, engines, features, 'INR');
     expect(totals).toHaveLength(goals.length);
     expect(new Set(totals.map((t) => t.goalId)).size).toBe(goals.length);
+  });
+
+  it('booking package total auto-includes the auth dependency of booking module', () => {
+    const booking = goals.find((g) => g.id === 'booking_appointments')!;
+    // multipage + booking + payments + email are compulsory; auth arrives via dependsOn.
+    expect(packageTotalForArchetype(booking, engines, features, 'INR')).toBe(190000);
   });
 
   it('custom reference archetype stays engine-only', () => {

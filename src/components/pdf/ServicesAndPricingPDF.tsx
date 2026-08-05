@@ -9,7 +9,7 @@ import type {
   ResumeData,
 } from '@/data/resume';
 import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
-import { ESTIMATE_DISCLAIMER } from '@/lib/pricing';
+import { ESTIMATE_DISCLAIMER, resolveFeatureDependencies } from '@/lib/pricing';
 import { getPdfTheme, scaleBodyFont, type PDFThemeConfig } from './pdfTheme';
 import { PdfBrandHeader } from './PdfBrandHeader';
 import { PdfFooter } from './PdfFooter';
@@ -23,7 +23,8 @@ function cleanPDFText(text?: string | null): string {
     .trim();
 }
 
-function formatPrice(inr: number, usd: number): string {
+function formatPrice(inr: number, usd: number, zeroLabel = 'INCLUDED'): string {
+  if (inr === 0 && usd === 0) return zeroLabel;
   return `INR ${inr.toLocaleString('en-IN')} / $${usd.toLocaleString('en-US')}`;
 }
 
@@ -165,13 +166,13 @@ function createStyles(theme: PDFThemeConfig) {
       paddingLeft: 6,
     },
     colFeatureLabel: {
-      width: '27%',
+      width: '25%',
       borderRightWidth: 1,
       borderRightColor: theme.cardBorder,
       paddingRight: 6,
     },
     colFeatureDesc: {
-      width: '33%',
+      width: '30%',
       borderRightWidth: 1,
       borderRightColor: theme.cardBorder,
       paddingLeft: 6,
@@ -185,7 +186,7 @@ function createStyles(theme: PDFThemeConfig) {
       paddingRight: 6,
     },
     colFeaturePrice: {
-      width: '15%',
+      width: '20%',
       textAlign: 'right',
       paddingLeft: 6,
     },
@@ -407,6 +408,19 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
     return labels.length ? `Requires: ${labels.join(' + ')}` : '';
   }
 
+  // Compulsory add-ons plus any transitive dependsOn modules, so the printed
+  // configuration always matches what the /scoping wizard would auto-select.
+  function goalAddons(goal: GoalArchetype): string[] {
+    if (goal.compulsoryFeatureLabels.length === 0) return [];
+    const labels = new Set<string>(goal.compulsoryFeatureLabels);
+    const ids = features.filter((f) => labels.has(f.label)).map((f) => f.id);
+    resolveFeatureDependencies(ids, features).forEach((id) => {
+      const label = features.find((f) => f.id === id)?.label;
+      if (label) labels.add(label);
+    });
+    return Array.from(labels);
+  }
+
   return (
     <Document title="Prateeq_Sharma_Services_And_Pricing_Guide">
 
@@ -523,7 +537,13 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
           ))}
         </View>
 
-        <Text style={styles.sectionHeader}>3. BRAND & CONTENT SERVICES</Text>
+        <PdfFooter theme={theme} leftText={FOOTER_TEXT} />
+      </Page>
+
+      {/* PAGE 3 — Brand & Content Services */}
+      <Page size="A4" style={styles.page}>
+
+        <Text style={[styles.sectionHeader, { marginTop: 0 }]}>3. BRAND & CONTENT SERVICES</Text>
         <View style={styles.table}>
           <View style={styles.tableHeader}>
             <Text style={[styles.tableHeaderCell, styles.colBrandLabel]}>SERVICE TIER</Text>
@@ -549,10 +569,19 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
           ))}
         </View>
 
+        <View style={styles.contactBox}>
+          <Text style={styles.contactTitle}>UNSURE WHAT YOU NEED?</Text>
+          <Text style={styles.contactText}>
+            Skip the guesswork — launch the interactive Project Scoping Lab at
+            https://prateeq.in/scoping, pick your goal, and the wizard recommends the
+            exact engine, add-on modules, and care plan for your scope.
+          </Text>
+        </View>
+
         <PdfFooter theme={theme} leftText={FOOTER_TEXT} />
       </Page>
 
-      {/* PAGE 3 — Project Goal Archetypes */}
+      {/* PAGE 4 — Project Goal Archetypes */}
       <Page size="A4" style={styles.page}>
 
         <Text style={[styles.sectionHeader, { marginTop: 0 }]}>4. PROJECT GOAL ARCHETYPES & RECOMMENDED CONFIGURATIONS</Text>
@@ -580,7 +609,7 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
               </View>
               <View style={styles.colGoalAddons}>
                 {goal.compulsoryFeatureLabels.length > 0
-                  ? goal.compulsoryFeatureLabels.map((label, i) => (
+                  ? goalAddons(goal).map((label, i) => (
                       <Text key={i} style={styles.bullet}>• {label}</Text>
                     ))
                   : (
@@ -597,7 +626,7 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
         <PdfFooter theme={theme} leftText={FOOTER_TEXT} />
       </Page>
 
-      {/* PAGE 4 — Care Plans + T&C + Quality Guarantee + CTA */}
+      {/* PAGE 5 — Care Plans + T&C + Quality Guarantee + CTA */}
       <Page size="A4" style={styles.page}>
 
         <Text style={[styles.sectionHeader, { marginTop: 0 }]}>5. MONTHLY INFRASTRUCTURE & SLA CARE PLANS</Text>
@@ -622,7 +651,7 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
                 {plan.includes.map((item, i) => (
                   <Text key={i} style={styles.bullet}>• {item}</Text>
                 ))}
-                <Text style={styles.slaLine}>{`SLA: ${plan.responseTime} · ${plan.includedHours}`}</Text>
+                <Text style={styles.slaLine}>{`SLA: ${plan.responseTime ?? 'Standard response SLA'} · ${plan.includedHours ?? 'Dedicated monthly support hours'}`}</Text>
                 {plan.overageRules ? (
                   <Text style={styles.slaOverage}>{plan.overageRules}</Text>
                 ) : null}
@@ -631,8 +660,14 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
                 <Text style={styles.moduleDesc}>{plan.techSpecs}</Text>
               </View>
               <View style={styles.colCarePrice}>
-                <Text style={styles.priceVal}>{formatPrice(plan.priceINR, plan.priceUSD)}</Text>
-                {plan.period ? <Text style={styles.pricePeriod}>{plan.period}</Text> : null}
+                {plan.priceINR === 0 && plan.priceUSD === 0 ? (
+                  <Text style={styles.priceVal}>Complimentary</Text>
+                ) : (
+                  <>
+                    <Text style={styles.priceVal}>{formatPrice(plan.priceINR, plan.priceUSD)}</Text>
+                    {plan.period ? <Text style={styles.pricePeriod}>{plan.period}</Text> : null}
+                  </>
+                )}
               </View>
             </View>
           ))}

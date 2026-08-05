@@ -26,7 +26,7 @@ export function formatMoney(amount: number, currency: Currency): string {
 /** Full dual-currency display (primary currency first). */
 export function formatPricePair(inr: number, usd: number, currency: Currency): string {
   const inrStr = `₹${inr.toLocaleString('en-IN')}`;
-  const usdStr = `$${usd}`;
+  const usdStr = `$${usd.toLocaleString('en-US')}`;
   return currency === 'INR' ? `${inrStr} / ${usdStr}` : `${usdStr} / ${inrStr}`;
 }
 
@@ -161,8 +161,15 @@ export function packageTotalForArchetype(
   const engine = engines.find((e) => e.id === goal.recommendedEngineId);
   const priceKey = currency === 'INR' ? 'priceINR' : 'priceUSD';
   const enginePrice = engine?.[priceKey] ?? 0;
-  const featuresPrice = features
+
+  // Compulsory labels plus any transitive dependsOn modules they require, so the
+  // package total always matches what the Scoping wizard would actually quote.
+  const labelIds = features
     .filter((f) => goal.compulsoryFeatureLabels.includes(f.label))
+    .map((f) => f.id);
+  const requiredIds = new Set([...labelIds, ...resolveFeatureDependencies(labelIds, features)]);
+  const featuresPrice = features
+    .filter((f) => requiredIds.has(f.id))
     .reduce((sum, f) => sum + f[priceKey], 0);
   return enginePrice + featuresPrice;
 }

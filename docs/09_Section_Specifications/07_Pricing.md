@@ -13,6 +13,11 @@
 > commercial PDFs (`ServicesAndPricingPDF`, `ScopingBriefPDF`). Commission bands for the Middleman
 > agreement live separately in `src/data/commissionConfig.json` / `src/lib/commission.ts`. All prices
 > are region-aware (INR vs USD) via the geo-IP `region` cookie.
+>
+> **2026-08 later update:** The add-on roster grew to 14 modules (`pwa`, `i18n`, `integrations`,
+> `video` added as optional modules), goal-package totals resolve `dependsOn` dependencies so cards
+> match the wizard quote, and the Services & Pricing guide is a 5-page document (feature table +
+> standalone brand section; see ADR 11/12).
 
 ## **Original Purpose**
 

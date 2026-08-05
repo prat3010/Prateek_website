@@ -112,6 +112,38 @@
       "laymanDescription": "A private pipeline to track leads, customers, deals, and team activity with custom fields and exports.",
       "techSpecs": "Deal Pipeline & Kanban, Custom Fields, Activity Timeline, Team Permissions, Export Tools",
       "dependsOn": ["auth"]
+    },
+    {
+      "id": "pwa",
+      "label": "Progressive Web App (PWA) & Offline Module",
+      "priceINR": 35000,
+      "priceUSD": 450,
+      "laymanDescription": "Turns your web app into an installable app-like experience with offline support, push notifications, and home-screen launch.",
+      "techSpecs": "Service Worker Caching, Web App Manifest, Install Prompts, Push Notifications, Offline Fallback Shell"
+    },
+    {
+      "id": "i18n",
+      "label": "Multilingual & i18n Localization Module",
+      "priceINR": 30000,
+      "priceUSD": 400,
+      "laymanDescription": "Renders your site or app in multiple languages with automatic browser detection, currency-aware pricing, and SEO language tags.",
+      "techSpecs": "i18n Routing & Dictionaries, Locale Auto-Detection, hreflang SEO Tags, Date/Currency Localization"
+    },
+    {
+      "id": "integrations",
+      "label": "Third-Party Integrations (Slack/Zapier/Webhooks)",
+      "priceINR": 40000,
+      "priceUSD": 550,
+      "laymanDescription": "Connects your app to the tools you already use — Slack alerts, Zapier automations, and outbound webhooks to third-party services.",
+      "techSpecs": "Slack Notifications, Zapier/Webhook Connectors, Outbound Event Hooks, Retry & Delivery Logging"
+    },
+    {
+      "id": "video",
+      "label": "Video Hosting & Streaming Module",
+      "priceINR": 65000,
+      "priceUSD": 850,
+      "laymanDescription": "Uploads, transcodes, and streams video courses or marketing content inside your app with secure playback and progress tracking.",
+      "techSpecs": "Transcoding Pipeline, Adaptive Bitrate Player, Secure Signed Playback, Upload Dashboards, Watch Progress"
     }
   ],
   "goals": [

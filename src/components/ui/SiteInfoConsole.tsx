@@ -11,13 +11,17 @@ import {
 } from 'lucide-react';
 import styles from './SiteInfoConsole.module.css';
 import type { ResumeData, MiddlemanAgreementConfig } from '@/data/resume';
-import { COMMISSION_BANDS, COMMISSION_DISBURSEMENT_WINDOW, type CommissionBand } from '@/lib/commission';
+import { COMMISSION_BANDS, COMMISSION_DISBURSEMENT_WINDOW, RECURRING_COMMISSION_RATE, type CommissionBand } from '@/lib/commission';
 import resumeFallback from '@/data/resume.json';
 
 function consoleBandRange(band: CommissionBand): string {
-  if (band.minINR == null) return `up to ₹${band.maxINR?.toLocaleString('en-IN')} / $${band.maxUSD}`;
-  if (band.maxINR == null) return `₹${band.minINR.toLocaleString('en-IN')}+ / $${band.minUSD}+`;
-  return `₹${band.minINR.toLocaleString('en-IN')}-${band.maxINR.toLocaleString('en-IN')} / $${band.minUSD}-${band.maxUSD}`;
+  if (band.minINR == null) return `up to ₹${band.maxINR?.toLocaleString('en-IN')} / $${band.maxUSD?.toLocaleString('en-US')}`;
+  if (band.maxINR == null) return `₹${band.minINR.toLocaleString('en-IN')}+ / $${band.minUSD?.toLocaleString('en-US')}+`;
+  return `₹${band.minINR.toLocaleString('en-IN')}-${band.maxINR.toLocaleString('en-IN')} / $${band.minUSD?.toLocaleString('en-US')}-${band.maxUSD?.toLocaleString('en-US')}`;
+}
+
+function consoleCutFor(band: CommissionBand): string {
+  return `${band.rate}%`;
 }
 
 // Command responses for Noir Interactive Console
@@ -375,10 +379,10 @@ export default function SiteInfoConsole() {
       const effectiveDate = (mm.effectiveDate && mm.effectiveDate.trim()) ? mm.effectiveDate : new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
       const devName = mm.developerName || 'Prateeq Sharma';
       const devEmail = mm.developerEmail || 'prateeqsharma@gmail.com';
-      const tier1Cut = mm.tier1Commission || '10%';
-      const tier2Cut = mm.tier2Commission || '12%';
-      const tier3Cut = mm.tier3Commission || '15%';
-      const recurringCut = mm.recurringCommission || '10%';
+      const tier1Cut = mm.tier1Commission || consoleCutFor(COMMISSION_BANDS[0]);
+      const tier2Cut = mm.tier2Commission || consoleCutFor(COMMISSION_BANDS[1] || COMMISSION_BANDS[0]);
+      const tier3Cut = mm.tier3Commission || consoleCutFor(COMMISSION_BANDS[2] || COMMISSION_BANDS[0]);
+      const recurringCut = mm.recurringCommission || `${RECURRING_COMMISSION_RATE}%`;
 
       const disbursement = mm.disbursementRules || [
         "Rule 3.1: No out-of-pocket payouts prior to cleared client funds.",

@@ -24,12 +24,12 @@ describe('commercial PDF render smoke tests', () => {
   it.each([
     ['azure', false],
     ['noir', true],
-  ] as const)('ServicesAndPricingPDF renders a valid 4-page PDF in %s theme', async (_theme, isNoir) => {
+  ] as const)('ServicesAndPricingPDF renders a valid 5-page PDF in %s theme', async (_theme, isNoir) => {
     const pdf = await renderToPdf(
       React.createElement(ServicesAndPricingPDF, { isNoir }) as React.ReactElement<DocumentProps>,
     );
     expect(pdf.subarray(0, 5).toString()).toBe('%PDF-');
-    expect(pageCount(pdf)).toBe(4);
+    expect(pageCount(pdf)).toBe(5);
 
     const tmp = path.join(os.tmpdir(), `pricing_${isNoir ? 'noir' : 'azure'}_${Date.now()}.pdf`);
     fs.writeFileSync(tmp, pdf);

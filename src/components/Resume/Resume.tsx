@@ -92,6 +92,14 @@ function Resume({ resumeData, certificates }: ResumeProps) {
     return engine ? formatPricePair(engine.priceINR, engine.priceUSD, currency) : '';
   };
 
+  const tierPrice = (engineId: string): string => {
+    const goal = goals.find((g) => g.recommendedEngineId === engineId);
+    if (!goal) return enginePrice(engineId);
+    const totalINR = packageTotalForArchetype(goal, engines, features, 'INR');
+    const totalUSD = packageTotalForArchetype(goal, engines, features, 'USD');
+    return totalINR ? formatPricePair(totalINR, totalUSD, currency) : enginePrice(engineId);
+  };
+
   const ragGoal = goals.find((g) => g.id === 'ai_rag_app');
   const ragTotalINR = ragGoal ? packageTotalForArchetype(ragGoal, engines, features, 'INR') : 0;
   const ragTotalUSD = ragGoal ? packageTotalForArchetype(ragGoal, engines, features, 'USD') : 0;
@@ -290,7 +298,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                           <div>
                             <span className={styles.packageBadge}>Tier 1 • Single Page</span>
                             <h4 className={styles.packageTitle}>Landing Page Engine</h4>
-                            <div className={styles.packagePrice}>{enginePrice('landing')}</div>
+                            <div className={styles.packagePrice}>{tierPrice('landing')}</div>
                             <p className={styles.packageDesc}>High-converting showcase with Framer Motion, lead capture form, mobile responsive layout & SEO schema.</p>
                           </div>
                           <Link href="/scoping?engine=landing" className={styles.packageBtn}>
@@ -303,7 +311,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                           <div>
                             <span className={styles.packageBadge}>Tier 2 • Multi-Page</span>
                             <h4 className={styles.packageTitle}>Multi-Page Web App</h4>
-                            <div className={styles.packagePrice}>{enginePrice('multipage')}</div>
+                            <div className={styles.packagePrice}>{tierPrice('multipage')}</div>
                             <p className={styles.packageDesc}>Next.js 16 App Router, 3–6 pages, headless CMS integration, analytics telemetry & custom visual effects.</p>
                           </div>
                           <Link href="/scoping?engine=multipage" className={styles.packageBtn}>
@@ -316,7 +324,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                           <div>
                             <span className={styles.packageBadge}>Tier 3 • Full-Stack</span>
                             <h4 className={styles.packageTitle}>SaaS MVP & App Portal</h4>
-                            <div className={styles.packagePrice}>{enginePrice('saas')}</div>
+                            <div className={styles.packagePrice}>{tierPrice('saas')}</div>
                             <p className={styles.packageDesc}>Supabase Auth & Database, Stripe/Razorpay payments, role-gated admin portal & REST API integrations.</p>
                           </div>
                           <Link href="/scoping?engine=saas" className={styles.packageBtn}>

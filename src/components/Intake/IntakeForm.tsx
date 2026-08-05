@@ -136,6 +136,18 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     return goals[0];
   }, [initialPreset, goals]);
 
+  // Compulsory goal features plus any transitive dependsOn modules, so a deep-linked
+  // archetype (e.g. booking → auth) starts with a complete, consistent selection.
+  const initialSelectedFeatures = useMemo(() => {
+    const labels = new Set<string>(initialArchetype.compulsoryFeatureLabels);
+    const baseIds = features.filter(f => labels.has(f.label)).map(f => f.id);
+    resolveFeatureDependencies(baseIds, features).forEach(id => {
+      const label = features.find(f => f.id === id)?.label;
+      if (label) labels.add(label);
+    });
+    return Array.from(labels);
+  }, [initialArchetype, features]);
+
   const [formData, setFormData] = useState({
     companyName: '',
     contactEmail: '',
@@ -143,7 +155,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     projectGoal: initialArchetype.label,
     targetAudience: '',
     selectedBaseEngineId: initialArchetype.recommendedEngineId,
-    selectedFeatures: [...initialArchetype.compulsoryFeatureLabels],
+    selectedFeatures: initialSelectedFeatures,
     selectedBrandAssetId: brandAssets[0]?.id || '',
     selectedMaintenanceId: '',
     inspirationLinks: '',
@@ -163,6 +175,9 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   }, [formData.projectGoal, goals]);
 
   const labelOfFeature = (id: string) => features.find(f => f.id === id)?.label;
+
+  // Single-currency rendering of an INR/USD price pair, honoring the active toggle.
+  const priceInCurrency = (inr: number, usd: number) => formatMoney(currency === 'INR' ? inr : usd, currency);
 
   const handleGoalChange = (newGoalLabel: string) => {
     const archetype = goals.find(g => g.label === newGoalLabel) || goals[0];
@@ -264,7 +279,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
       baseUSD: quote.enginePriceUSD,
       featuresINR: quote.featuresPriceINR,
       featuresUSD: quote.featuresPriceUSD,
-      itemizedList: quote.itemized.map(i => `${i.label} (+${formatMoney(i.priceINR, 'INR')})`),
+      itemizedList: quote.itemized.map(i => `${i.label} (+${formatMoney(currency === 'INR' ? i.priceINR : i.priceUSD, currency)})`),
     };
   }, [selectedEngine, engines, features, brandAssets, maintenancePlans, formData.selectedFeatures, formData.selectedBrandAssetId, formData.selectedMaintenanceId, autoMaintenancePlanId, currency]);
 
@@ -394,12 +409,12 @@ Client: ${formData.companyName} (${formData.contactEmail}, Phone: ${formData.con
 Goal: ${formData.projectGoal}
 Audience: ${formData.targetAudience}
 
-Base Engine: ${selectedEngine.title} (₹${selectedEngine.priceINR.toLocaleString()})
-Checked Add-ons: ${formData.selectedFeatures.join(', ')} (₹${totalCost.featuresINR.toLocaleString()})
-Brand Readiness: ${totalCost.brandOpt.label} (₹${totalCost.brandOpt.priceINR.toLocaleString()})
-Maintenance Plan: ${activeMaintenancePlan.name} (₹${activeMaintenancePlan.priceINR}/mo)
+Base Engine: ${selectedEngine.title} (${priceInCurrency(selectedEngine.priceINR, selectedEngine.priceUSD)})
+Checked Add-ons: ${formData.selectedFeatures.join(', ')} (${priceInCurrency(totalCost.featuresINR, totalCost.featuresUSD)})
+Brand Readiness: ${totalCost.brandOpt.label} (${priceInCurrency(totalCost.brandOpt.priceINR, totalCost.brandOpt.priceUSD)})
+Maintenance Plan: ${activeMaintenancePlan.name} (${priceInCurrency(activeMaintenancePlan.priceINR, activeMaintenancePlan.priceUSD)}/month)
 
-Total Build Investment: ₹${totalCost.totalINR.toLocaleString()} / $${totalCost.totalUSD.toLocaleString()}
+Total Build Investment: ${formatPricePair(totalCost.totalINR, totalCost.totalUSD, currency)}
 Timeline: ${formData.timeline}
 Notes: ${formData.additionalNotes}
           `.trim(),
@@ -675,6 +690,21 @@ Notes: ${formData.additionalNotes}
                           .filter(f => formData.selectedFeatures.includes(f.label) && f.id !== m.id)
                           .map(f => f.id);
                         const isRequiredDependency = new Set(resolveFeatureDependencies(otherSelectedIds, features)).has(m.id);
+                        const dependencyTitle = isRequiredDependency
+                          ? (() => {
+                              const dependents = features
+                                .filter((f) => f.id !== m.id && f.dependsOn?.includes(m.id))
+                                .map((f) => f.label)
+                                .filter(
+                                  (label) =>
+                                    formData.selectedFeatures.includes(label) ||
+                                    currentArchetype.compulsoryFeatureLabels.includes(label),
+                                );
+                              return dependents.length
+                                ? `Required by selected module${dependents.length > 1 ? 's' : ''}: ${dependents.join(', ')}`
+                                : 'This module is required by another selected module';
+                            })()
+                          : '';
                         const isLocked = isCompulsory || isRequiredDependency;
                         const isPopoverOpen = activePopoverId === m.id;
                         return (
@@ -693,16 +723,15 @@ Notes: ${formData.additionalNotes}
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
                                   <span style={{ fontWeight: 700 }}>{m.label}</span>
-                                  {isCompulsory && (
+                                  {isCompulsory ? (
                                     <span className={styles.lockedBadge} title={`Required component for ${currentArchetype.shortLabel}`}>
                                       🔒 REQUIRED
                                     </span>
-                                  )}
-                                  {isRequiredDependency && (
-                                    <span className={styles.lockedBadge} title="This module is required by another selected module">
+                                  ) : isRequiredDependency ? (
+                                    <span className={styles.lockedBadge} title={dependencyTitle}>
                                       🔗 REQUIRED BY SELECTED MODULE
                                     </span>
-                                  )}
+                                  ) : null}
                                   <button
                                     type="button"
                                     onClick={(ev) => togglePopover(ev, m.id)}
@@ -712,7 +741,7 @@ Notes: ${formData.additionalNotes}
                                     ℹ
                                   </button>
                                 </div>
-                                <span className={styles.priceBadge}>{`+${formatMoney(m.priceINR, currency)}`}</span>
+                                <span className={styles.priceBadge}>{`+${priceInCurrency(m.priceINR, m.priceUSD)}`}</span>
                               </div>
                               <p style={{ margin: '3px 0 0 0', fontSize: '11px', opacity: 0.7, lineHeight: 1.4 }}>{m.laymanDescription}</p>
 
@@ -748,7 +777,7 @@ Notes: ${formData.additionalNotes}
                     <div className={styles.stickyLeft}>
                       <span className={styles.stickyTitle}>⚡ Live Pure Additive Arithmetic Formula</span>
                       <span className={styles.stickyBreakdown}>
-                        {`Base (${selectedEngine.title}: ${formatMoney(selectedEngine.priceINR, currency)}) + Add-ons (${formatMoney(totalCost.featuresINR, currency)})`}
+                        {`Base (${selectedEngine.title}: ${priceInCurrency(selectedEngine.priceINR, selectedEngine.priceUSD)}) + Add-ons (${priceInCurrency(totalCost.featuresINR, totalCost.featuresUSD)})`}
                       </span>
                     </div>
                     <div className={styles.stickyTotal}>
@@ -787,7 +816,7 @@ Notes: ${formData.additionalNotes}
                             <div style={{ flex: 1 }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <span style={{ fontWeight: 700 }}>{b.label}</span>
-                                <span className={styles.priceBadge}>{b.priceINR > 0 ? `+${formatMoney(b.priceINR, currency)}` : 'Included'}</span>
+                                <span className={styles.priceBadge}>{b.priceINR > 0 ? `+${priceInCurrency(b.priceINR, b.priceUSD)}` : 'Included'}</span>
                               </div>
                               <p style={{ margin: '2px 0 0 0', fontSize: '11px', opacity: 0.7 }}>{b.description}</p>
                             </div>
@@ -822,15 +851,15 @@ Notes: ${formData.additionalNotes}
                   <div style={{ background: 'var(--intake-summary-bg)', borderRadius: '8px', padding: '14px 18px', color: 'var(--intake-summary-text)', marginBottom: '16px', border: '1px solid var(--intake-summary-border)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--intake-summary-border)', paddingBottom: '8px', marginBottom: '8px' }}>
                       <span style={{ fontFamily: 'var(--font-code)', fontSize: '12px', color: 'var(--intake-summary-label)' }}>SELECTED BASE ENGINE</span>
-                      <span style={{ fontWeight: 700, color: 'var(--intake-summary-accent)' }}>{`${selectedEngine.title} (${formatMoney(selectedEngine.priceINR, currency)})`}</span>
+                      <span style={{ fontWeight: 700, color: 'var(--intake-summary-accent)' }}>{`${selectedEngine.title} (${priceInCurrency(selectedEngine.priceINR, selectedEngine.priceUSD)})`}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--intake-summary-border)', paddingBottom: '8px', marginBottom: '8px' }}>
                       <span style={{ fontFamily: 'var(--font-code)', fontSize: '12px', color: 'var(--intake-summary-label)' }}>SELECTED ADD-ON MODULES</span>
-                      <span style={{ fontWeight: 700, color: 'var(--intake-summary-value)' }}>{`+${formatMoney(totalCost.featuresINR, currency)} (${formData.selectedFeatures.length} Modules)`}</span>
+                      <span style={{ fontWeight: 700, color: 'var(--intake-summary-value)' }}>{`+${priceInCurrency(totalCost.featuresINR, totalCost.featuresUSD)} (${formData.selectedFeatures.length} Modules incl. required deps)`}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--intake-summary-border)', paddingBottom: '8px', marginBottom: '8px' }}>
                       <span style={{ fontFamily: 'var(--font-code)', fontSize: '12px', color: 'var(--intake-summary-label)' }}>BRAND KIT ADD-ON</span>
-                      <span style={{ fontWeight: 700, color: 'var(--intake-summary-value)' }}>{totalCost.brandOpt.priceINR > 0 ? `+${formatMoney(totalCost.brandOpt.priceINR, currency)}` : 'Included'}</span>
+                      <span style={{ fontWeight: 700, color: 'var(--intake-summary-value)' }}>{totalCost.brandOpt.priceINR > 0 ? `+${priceInCurrency(totalCost.brandOpt.priceINR, totalCost.brandOpt.priceUSD)}` : 'Included'}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '4px' }}>
                       <span style={{ fontFamily: 'var(--font-code)', fontSize: '13px', fontWeight: 800, color: 'var(--intake-summary-text)' }}>TOTAL BUILD INVESTMENT (ESTIMATE)</span>
@@ -878,9 +907,7 @@ Notes: ${formData.additionalNotes}
 
                             <div className={styles.careCardPrice}>
                               {p.priceINR > 0
-                                ? currency === 'INR'
-                                  ? `${formatMoney(p.priceINR, currency)}${p.period}`
-                                  : `${formatMoney(p.priceUSD, currency)}/mo`
+                                ? `${priceInCurrency(p.priceINR, p.priceUSD)}${p.period}`
                                 : 'Included (30-Day Warranty)'}
                             </div>
                             <p style={{ margin: '0 0 8px 0', fontSize: '11px', opacity: 0.7, lineHeight: 1.4 }}>{p.laymanDescription}</p>

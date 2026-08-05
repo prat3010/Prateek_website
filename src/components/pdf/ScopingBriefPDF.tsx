@@ -296,6 +296,16 @@ export function ScopingBriefPDF({ resumeData, data, isNoir, currency = 'INR' }: 
   const maintenanceINR = data?.maintenanceCostINR ?? defaultQuote.maintenancePriceINR;
   const maintenanceUSD = data?.maintenanceCostUSD ?? defaultQuote.maintenancePriceUSD;
 
+  // Resolve the quoted care plan from the same config so the printed scope/SLA
+  // never drifts from the live rate card (fallback: standard paid plan).
+  const activeMaintenancePlan =
+    maintenancePlans.find((p) => p.name === data?.maintenancePlan) ??
+    maintenancePlans.find((p) => p.id === 'standard') ??
+    maintenancePlans.find((p) => p.priceINR > 0);
+  const maintenanceScope = activeMaintenancePlan
+    ? `SLA: ${activeMaintenancePlan.responseTime ?? 'Standard response SLA'} · ${activeMaintenancePlan.includedHours ?? 'Dedicated monthly support hours'}`
+    : 'Hosting support, daily DB backups, security updates, and monthly developer hours.';
+
   const terms = intakeConfig?.termsAndConditions || [
     "1. Payment Milestone Structure: 50% Upfront Deposit required to initiate development & architecture setup. 50% Final Balance prior to domain mapping & production handover.",
     "2. Scope Creep & Change Orders: Any feature, page, or integration requested after signing that is not listed in Section 2 will be classified as a 'Change Order' and quoted separately under a Phase 2 add-on contract.",
@@ -440,7 +450,7 @@ export function ScopingBriefPDF({ resumeData, data, isNoir, currency = 'INR' }: 
           <View style={[styles.tableRow, styles.tableRowHighlight]} wrap={false}>
             <View style={{ width: '60%', borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingRight: 6 }}>
               <Text style={styles.moduleTitle}>{cleanPDFText(data?.maintenancePlan) || 'Standard Care Plan'}</Text>
-              <Text style={styles.moduleDesc}>Hosting support, daily DB backups, security updates, 2-4h monthly dev time</Text>
+              <Text style={styles.moduleDesc}>{cleanPDFText(maintenanceScope)}</Text>
             </View>
             <View style={{ width: '40%', textAlign: 'right', paddingLeft: 6 }}>
               <Text style={styles.priceVal}>{maintenanceINR > 0 ? `${cleanPDFText(formatPricePair(maintenanceINR, maintenanceUSD, currency))}/mo` : 'Complimentary 30-Day Warranty'}</Text>
