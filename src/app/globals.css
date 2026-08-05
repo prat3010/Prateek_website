@@ -1229,8 +1229,11 @@ footer {
 
 
 /* ── reCAPTCHA v3 Badge ─────────────────────────────────────── */
-/* Google injects a floating "Protected by reCAPTCHA" chip at runtime.
-   The invisible score check still runs; only the visual badge is hidden. */
+/* Google injects a floating "Protected by reCAPTCHA" chip at runtime on
+   every page where the reCAPTCHA script loads (Contact form, scoping
+   wizard). The invisible score check still runs; only the visual badge
+   is hidden. `!important` wins over Google's inline positioning styles. */
 .grecaptcha-badge {
-  display: none;
+  display: none !important;
+  visibility: hidden !important;
 }
