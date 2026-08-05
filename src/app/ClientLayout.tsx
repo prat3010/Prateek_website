@@ -16,9 +16,7 @@ import type { ResumeData } from '@/data/resume';
 // Lazy load heavy client side animations
 const NoirSkyline = dynamic(() => import('@/components/effects/NoirSkyline'), { ssr: false });
 const CursorTrail = dynamic(() => import('@/components/effects/CursorTrail'), { ssr: false });
-const ZenToggle = dynamic(() => import('@/components/ui/ZenToggle'), { ssr: false });
-const TerminalButton = dynamic(() => import('@/components/ui/TerminalButton'), { ssr: false });
-const GestureScroll = dynamic(() => import('@/components/ui/GestureScroll/GestureScroll'), { ssr: false });
+const FloatingUtilityBar = dynamic(() => import('@/components/ui/FloatingUtilityBar'), { ssr: false });
 const ThreePizzaRat = dynamic(() => import('@/components/effects/ThreePizzaRat'), { ssr: false });
 
 interface ClientLayoutProps {
@@ -56,9 +54,7 @@ function ClientLayoutContent({
         )}
 
         {!isStandaloneAppRoute && <Footer profile={profile} />}
-        {!isStandaloneAppRoute && <ZenToggle />}
-        {!isStandaloneAppRoute && <TerminalButton />}
-        {!isStandaloneAppRoute && <GestureScroll />}
+        {!isStandaloneAppRoute && <FloatingUtilityBar />}
         {!isStandaloneAppRoute && isKonamiActive && <ThreePizzaRat />}
       </LenisProvider>
     </PerformanceGovernorProvider>

@@ -1,8 +1,5 @@
 .container {
-  position: fixed;
-  bottom: 95px;
-  right: 30px;
-  z-index: var(--z-fixed);
+  position: relative;
   pointer-events: auto;
   transition: 
     opacity var(--transition-normal),
@@ -89,7 +86,7 @@
 /* Floating Mirror Visualizer Panel */
 .visualizerPanel {
   position: fixed;
-  bottom: 155px;
+  bottom: 85px;
   right: 30px;
   width: 220px;
   z-index: var(--z-overlay);

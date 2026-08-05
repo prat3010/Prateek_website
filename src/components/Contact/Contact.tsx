@@ -176,21 +176,6 @@ function Contact() {
           </button>
         </div>
 
-        {/* Commercial Scoping Lab Hero Banner (Business Mode) */}
-        {isBusiness && (
-          <div className={styles.scopingBanner}>
-            <div className={styles.scopingBannerText}>
-              <span className={styles.scopingBadge}>⚡ INSTANT ESTIMATE & PDF PROPOSAL</span>
-              <h3>Need an Itemized Scope & Budget Estimate?</h3>
-              <p>Skip the back-and-forth email wait. Configure your architecture, add-ons, and care plan in our 60-second interactive Scoping Lab.</p>
-            </div>
-            <Link href="/scoping" className={styles.scopingBtn}>
-              <Rocket size={16} />
-              <span>LAUNCH INSTANT SCOPING LAB</span>
-            </Link>
-          </div>
-        )}
-
         {/* Form Container */}
         <div className={styles.formWrapper}>
           <div className={styles.formCard}>

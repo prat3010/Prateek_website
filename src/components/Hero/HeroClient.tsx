@@ -3,10 +3,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useLenis } from 'lenis/react';
-import { useReducedMotion } from 'framer-motion';
 import { useTypewriter } from '@/hooks/useTypewriter';
-import { NAVBAR_SCROLL_OFFSET } from '@/lib/constants';
 import { useTheme } from '@/context/ThemeContext';
 import ComicPanel from '@/components/ui/ComicPanel';
 import Scrambler from '@/components/ui/Scrambler';
@@ -35,7 +32,8 @@ const HEADLINE_PARTS = {
   business:  { light: ['BUILDING DIGITAL', 'PRODUCTS.'], noir: ['THE BRIEF.', 'THE BUILD.'] },
 } as const;
 
-const CTA_LINKS = { developer: '#projects', business: '#capabilities' } as const;
+const PRIMARY_HREFS = { developer: '/terminal', business: '/scoping' } as const;
+const SECONDARY_HREFS = { developer: '/admin/analytics', business: '/rag' } as const;
 
 const BADGE_TEXTS: ScramblerProps['texts'][] = [
   { developer: bothThemes('Developer'),      business: bothThemes('Tech Partner') },
@@ -48,25 +46,22 @@ const VIBE_TEXTS: ScramblerProps['texts'] = {
   business:  { light: 'APPROACH:',  noir: 'OBJECTIVE:' },
 };
 
-const CTA_TEXTS: ScramblerProps['texts'] = {
-  developer: bothThemes('View My Work →'),
-  business:  bothThemes('View Services →'),
+const PRIMARY_TEXTS: ScramblerProps['texts'] = {
+  developer: bothThemes('Terminal Console 💻'),
+  business:  bothThemes('Launch Scoping Lab 🚀'),
 };
 
-const TELEMETRY_TEXTS: ScramblerProps['texts'] = {
+const SECONDARY_TEXTS: ScramblerProps['texts'] = {
   developer: bothThemes('Live Telemetry'),
-  business:  bothThemes('View Analytics'),
+  business:  bothThemes('Retriever AI Engine 🤖'),
 };
 
 export default function HeroClient({ taglines }: HeroClientProps) {
   const { isNoir, audience } = useTheme();
-  const lenis = useLenis();
-  const prefersReducedMotion = useReducedMotion();
 
   const activeAudience = audience || 'developer';
   const activeTheme = isNoir ? 'noir' : 'light';
   const [headlineTop, headlineBottom] = HEADLINE_PARTS[activeAudience][activeTheme];
-  const ctaLink = CTA_LINKS[activeAudience];
 
   // Resolve dynamic tagline list based on active audience and theme
   const list = useMemo(() => {
@@ -98,13 +93,6 @@ export default function HeroClient({ taglines }: HeroClientProps) {
     speed: 55,
     delay: 600,
   });
-
-  const handleScrollToCTA = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    if (lenis) {
-      lenis.scrollTo(ctaLink, { duration: prefersReducedMotion ? 0 : 1.5, offset: NAVBAR_SCROLL_OFFSET });
-    }
-  };
 
   return (
     <div className={styles.content}>
@@ -153,27 +141,27 @@ export default function HeroClient({ taglines }: HeroClientProps) {
         </div>
 
         <div className={styles.ctaContainer}>
-          <a
-            href={ctaLink}
+          <Link
+            href={PRIMARY_HREFS[activeAudience]}
             className={styles.ctaButton}
-            onClick={handleScrollToCTA}
+            aria-label={activeAudience === 'business' ? 'Launch Project Scoping Wizard' : 'View Terminal Diagnostics Console'}
           >
             <Scrambler
-              texts={CTA_TEXTS}
+              texts={PRIMARY_TEXTS}
               variant="nav-label"
               as="span"
               className={styles.ctaText}
             />
-          </a>
+          </Link>
 
           <Link
-            href="/admin/analytics"
+            href={SECONDARY_HREFS[activeAudience]}
             className={styles.telemetryBadge}
-            aria-label="Live analytics dashboard"
+            aria-label={activeAudience === 'business' ? 'View Retriever AI SaaS Product' : 'Live analytics dashboard'}
           >
             <span className={styles.pulseDot} />
             <Scrambler
-              texts={TELEMETRY_TEXTS}
+              texts={SECONDARY_TEXTS}
               variant="nav-label"
               as="span"
               className={styles.ctaText}

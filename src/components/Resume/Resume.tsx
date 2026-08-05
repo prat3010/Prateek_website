@@ -402,21 +402,6 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                       </ul>
                     </div>
 
-                    {/* Project Scoping CTA Card */}
-                    <div className={styles.scopingCtaCard}>
-                      <div className={styles.scopingCtaIcon}>
-                        <Rocket size={20} />
-                      </div>
-                      <h4 className={styles.scopingCtaTitle}>Ready to Scope Your Next Project?</h4>
-                      <p className={styles.scopingCtaText}>
-                        Launch the Project Scoping Lab & Instant Quote wizard to configure your build tier, add-ons, and care plan in under 2 minutes.
-                      </p>
-                      <Link href="/scoping" className={styles.scopingCtaBtn}>
-                        <Rocket size={16} />
-                        <span>Launch Project Scoping Wizard</span>
-                      </Link>
-                    </div>
-
                   </>
                 ) : (
                   /* ---- Standard Work Experience Timeline ---- */
