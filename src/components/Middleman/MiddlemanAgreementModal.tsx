@@ -4,8 +4,32 @@ import React, { useState } from 'react';
 import { X, Download, Moon, Sun, Shield, Sparkles } from 'lucide-react';
 import Portal from '@/components/ui/Portal';
 import { generateMiddlemanAgreementPDF } from '@/utils/pdfGenerator';
+import {
+  COMMISSION_BANDS,
+  COMMISSION_DISBURSEMENT_WINDOW,
+  type CommissionBand,
+} from '@/lib/commission';
 import type { ResumeData, MiddlemanAgreementConfig } from '@/data/resume';
 import styles from './MiddlemanAgreementModal.module.css';
+
+function parsePct(value: string): number {
+  return parseInt(value.replace('%', '').trim(), 10) / 100;
+}
+
+function bandRange(band: CommissionBand): string {
+  if (band.minINR == null) return `Up to ₹${band.maxINR?.toLocaleString('en-IN')} / $${band.maxUSD}`;
+  if (band.maxINR == null) return `₹${band.minINR.toLocaleString('en-IN')}+ / $${band.minUSD}+`;
+  return `₹${band.minINR.toLocaleString('en-IN')} – ₹${band.maxINR.toLocaleString('en-IN')} / $${band.minUSD} – $${band.maxUSD}`;
+}
+
+function bandPayout(band: CommissionBand, rate: string): string {
+  const pct = parsePct(rate);
+  const inr = (v: number) => `₹${Math.round(v * pct).toLocaleString('en-IN')}`;
+  const usd = (v: number) => `$${Math.round(v * pct)}`;
+  if (band.maxINR == null) return `${inr(band.minINR as number)}+ / ${usd(band.minUSD as number)}+`;
+  if (band.minINR == null) return `Up to ${inr(band.maxINR as number)} / ${usd(band.maxUSD as number)}`;
+  return `${inr(band.minINR)}–${inr(band.maxINR)} / ${usd(band.minUSD as number)}–${usd(band.maxUSD as number)}`;
+}
 
 interface MiddlemanAgreementModalProps {
   isOpen: boolean;
@@ -35,7 +59,7 @@ export default function MiddlemanAgreementModal({
 
   const disbursementRules = mm.disbursementRules || [
     "Rule 3.1 (No Out-of-Pocket Liability): Developer will never pay commissions out-of-pocket prior to client funds clearing bank accounts.",
-    "Rule 3.2 (Proportional Payout Schedule): 50% of Commission disbursed within 48 business hours of receiving Client's 50% Upfront Deposit. 50% disbursed upon receiving Client's Final 50% Balance.",
+    `Rule 3.2 (Proportional Payout Schedule): 50% of Commission disbursed within ${COMMISSION_DISBURSEMENT_WINDOW} of receiving Client's 50% Upfront Deposit. 50% disbursed upon receiving Client's Final 50% Balance.`,
     "Rule 3.3 (Cancellations & Defaults): In the event of a client default or partial scope cancellation, commission is calculated strictly on net funds actually collected and retained."
   ];
 
@@ -151,25 +175,17 @@ export default function MiddlemanAgreementModal({
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>Tier 1: High-Converting Landing Page (₹25,000 – ₹45,000 / $300 – $550)</td>
-                    <td><strong>{tier1Cut}</strong></td>
-                    <td>₹2,500 – ₹4,500 ($30 – $55)</td>
-                  </tr>
-                  <tr>
-                    <td>Tier 2: Custom Multi-Page Website (₹45,000 – ₹90,000 / $550 – $1,100)</td>
-                    <td><strong>{tier2Cut}</strong></td>
-                    <td>₹5,400 – ₹10,800 ($66 – $132)</td>
-                  </tr>
-                  <tr>
-                    <td>Tier 3/4: Full-Stack Web App / AI RAG (₹90,000 – ₹2.5L+ / $1,100 – $3,000+)</td>
-                    <td><strong>{tier3Cut}</strong></td>
-                    <td>₹13,500 – ₹37,500+ ($165 – $450+)</td>
-                  </tr>
+                  {COMMISSION_BANDS.map((band) => (
+                    <tr key={band.id}>
+                      <td>{`${band.label}: ${bandRange(band)}`}</td>
+                      <td><strong>{band.id === 'A' ? tier1Cut : band.id === 'B' ? tier2Cut : tier3Cut}</strong></td>
+                      <td>{bandPayout(band, band.id === 'A' ? tier1Cut : band.id === 'B' ? tier2Cut : tier3Cut)}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
               <p className={styles.paragraph}>
-                <strong>Recurring Monthly Care Cut:</strong> For any client subscribing to a Monthly Tech Care Plan (₹10,000/mo or $150/mo), Partner receives a <strong>{recurringCut} recurring monthly commission</strong> (₹1,000/mo) for as long as the retainer remains active.
+                <strong>Recurring Monthly Care Cut:</strong> For any client subscribing to a Monthly Tech Care Plan, Partner receives a <strong>{recurringCut} recurring monthly commission</strong> on the net monthly retainer for as long as the plan remains active.
               </p>
             </div>
 

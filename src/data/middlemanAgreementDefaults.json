@@ -1,7 +1,7 @@
 {
   "scalars": {
     "partnerName": "[Partner Name]",
-    "partnerEmail": "[Partner Email]",
+    "partnerEmail": "",
     "effectiveDate": "",
     "developerName": "Prateeq Sharma",
     "developerEmail": "prateeqsharma@gmail.com",
@@ -95,7 +95,7 @@
         "- This Agreement takes effect on the Effective Date and continues indefinitely until terminated.",
         "- Either party may terminate this Agreement at any time with 30 days' prior written notice.",
         "- Either party may also terminate with immediate effect on written notice if the other party materially defaults under this Agreement and fails to remedy within 7 days of written notice.",
-        "- Commissions accrued and payable for Qualified, will-funded work at the date of termination remain due and are paid under Section 4.",
+        "- Commissions accrued and payable for Qualified, validly contracted and funded work at the date of termination remain due and are paid under Section 4.",
         "- The obligations under Sections 6 (Trailing Commissions), 7 (Confidentiality), and 8 (Intellectual Property) survive termination."
       ]
     },
@@ -126,7 +126,7 @@
         "This Agreement is governed by and construed in accordance with the laws of India, without regard to its conflict-of-laws principles.",
         "The parties shall first seek to resolve any dispute amicably through written notice and a good-faith mediation video call within 30 days.",
         "If the dispute is not resolved within 60 days, it shall be referred to a sole arbitrator appointed by mutual agreement, the seat and venue of arbitration being a neutral location in India, conducted in English, whose decision shall be final and binding in accordance with the law in force on arbitration in India. Each party bears its own costs.",
-        "For any matter not subject to arbitration, the courts of India shall have jurisdiction, and any claims are subject to the limitations in Section 10."
+        "For any matter not subject to arbitration, the courts having territorial jurisdiction over the Developer's principal place of business in India shall have exclusive jurisdiction, and any claims are subject to the limitations in Section 10."
       ]
     },
     {

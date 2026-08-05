@@ -17,6 +17,15 @@ import {
 } from 'lucide-react';
 import { generateQuestionnairePDF, generateQuestionnairePDFBase64 } from '@/utils/pdfGenerator';
 import { useTheme } from '@/context/ThemeContext';
+import {
+  calcQuote,
+  ESTIMATE_DISCLAIMER,
+  formatMoney,
+  formatPricePair,
+  resolveDefaultCurrency,
+  resolveFeatureDependencies,
+  type Currency,
+} from '@/lib/pricing';
 import Portal from '@/components/ui/Portal';
 import type {
   BaseEngineItem,
@@ -66,7 +75,8 @@ export const BRAND_ASSET_OPTIONS: BrandAssetOption[] = questionnaireDefaults.bra
 export const MAINTENANCE_PLANS: MaintenancePlanOption[] = questionnaireDefaults.maintenancePlans;
 
 export default function IntakeForm({ resumeData, initialPreset = null }: IntakeFormProps) {
-  const { isNoir } = useTheme();
+  const { isNoir, region } = useTheme();
+  const [currency, setCurrency] = useState<Currency>(() => resolveDefaultCurrency(region));
   const intakeConfig = resumeData?.intake;
 
   const engines = useMemo(
@@ -152,21 +162,26 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     return goals.find(g => g.label === formData.projectGoal) || goals[0];
   }, [formData.projectGoal, goals]);
 
+  const labelOfFeature = (id: string) => features.find(f => f.id === id)?.label;
+
   const handleGoalChange = (newGoalLabel: string) => {
     const archetype = goals.find(g => g.label === newGoalLabel) || goals[0];
     const newEngineId = archetype.recommendedEngineId;
-    
-    // Auto-merge compulsory features
-    const mergedFeatures = Array.from(new Set([
-      ...formData.selectedFeatures,
-      ...archetype.compulsoryFeatureLabels
-    ]));
+
+    // Auto-merge compulsory features plus any dependencies they require
+    const mergedLabels = new Set([...formData.selectedFeatures, ...archetype.compulsoryFeatureLabels]);
+    const baseIds = features.filter(f => mergedLabels.has(f.label)).map(f => f.id);
+    const extraIds = resolveFeatureDependencies(baseIds, features);
+    extraIds.forEach(id => {
+      const label = labelOfFeature(id);
+      if (label) mergedLabels.add(label);
+    });
 
     setFormData(prev => ({
       ...prev,
       projectGoal: newGoalLabel,
       selectedBaseEngineId: newEngineId,
-      selectedFeatures: mergedFeatures
+      selectedFeatures: Array.from(mergedLabels)
     }));
   };
 
@@ -176,10 +191,27 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
 
     setFormData(prev => {
       const exists = prev.selectedFeatures.includes(label);
-      const updated = exists 
-        ? prev.selectedFeatures.filter(f => f !== label)
-        : [...prev.selectedFeatures, label];
-      return { ...prev, selectedFeatures: updated };
+      const feature = features.find(f => f.label === label);
+
+      if (exists) {
+        // Block removing a module that another selected module depends on
+        const remaining = prev.selectedFeatures.filter(f => f !== label);
+        const remainingIds = features.filter(f => remaining.includes(f.label)).map(f => f.id);
+        const requiredIds = new Set(resolveFeatureDependencies(remainingIds, features));
+        if (feature && requiredIds.has(feature.id)) return prev;
+        return { ...prev, selectedFeatures: remaining };
+      }
+
+      // When enabling, auto-add any transitive dependencies
+      const updated = [...prev.selectedFeatures, label];
+      const ids = features.filter(f => updated.includes(f.label)).map(f => f.id);
+      const extraLabels = resolveFeatureDependencies(ids, features)
+        .map(id => labelOfFeature(id))
+        .filter((l): l is string => Boolean(l));
+      return {
+        ...prev,
+        selectedFeatures: Array.from(new Set([...updated, ...extraLabels]))
+      };
     });
   };
 
@@ -209,30 +241,32 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     return 'basic';
   }, [formData.selectedFeatures]);
 
-  // Pure Additive Cost Calculation
+  // Quote computed from the centralized pricing module (pure additive)
   const totalCost = useMemo(() => {
-    const baseINR = selectedEngine.priceINR;
-    const baseUSD = selectedEngine.priceUSD;
-
-    let featuresINR = 0;
-    let featuresUSD = 0;
-    const itemizedList: string[] = [];
-
-    features.forEach(m => {
-      if (formData.selectedFeatures.includes(m.label)) {
-        featuresINR += m.priceINR;
-        featuresUSD += m.priceUSD;
-        itemizedList.push(`${m.label} (+₹${m.priceINR.toLocaleString()})`);
-      }
-    });
-
     const brandOpt = brandAssets.find(b => b.id === formData.selectedBrandAssetId) || brandAssets[0];
-
-    const totalINR = baseINR + featuresINR + brandOpt.priceINR;
-    const totalUSD = baseUSD + featuresUSD + brandOpt.priceUSD;
-
-    return { totalINR, totalUSD, baseINR, baseUSD, featuresINR, featuresUSD, brandOpt, itemizedList };
-  }, [selectedEngine, features, brandAssets, formData.selectedFeatures, formData.selectedBrandAssetId]);
+    const quote = calcQuote(
+      engines,
+      features,
+      brandAssets,
+      maintenancePlans,
+      {
+        engineId: selectedEngine.id,
+        featureIds: features.filter(f => formData.selectedFeatures.includes(f.label)).map(f => f.id),
+        brandAssetId: brandOpt.id,
+        maintenancePlanId: formData.selectedMaintenanceId || autoMaintenancePlanId,
+      },
+      currency,
+    );
+    return {
+      ...quote,
+      brandOpt,
+      baseINR: quote.enginePriceINR,
+      baseUSD: quote.enginePriceUSD,
+      featuresINR: quote.featuresPriceINR,
+      featuresUSD: quote.featuresPriceUSD,
+      itemizedList: quote.itemized.map(i => `${i.label} (+${formatMoney(i.priceINR, 'INR')})`),
+    };
+  }, [selectedEngine, engines, features, brandAssets, maintenancePlans, formData.selectedFeatures, formData.selectedBrandAssetId, formData.selectedMaintenanceId, autoMaintenancePlanId, currency]);
 
   const activeMaintenancePlan = useMemo(() => {
     const targetId = formData.selectedMaintenanceId || autoMaintenancePlanId;
@@ -250,7 +284,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     assetsStatus: totalCost.brandOpt.label,
     inspirationLinks: formData.inspirationLinks,
     timeline: formData.timeline,
-    budgetRange: `${selectedEngine.tier}: ₹${totalCost.totalINR.toLocaleString()} ($${totalCost.totalUSD.toLocaleString()})`,
+    budgetRange: `Estimated ${selectedEngine.tier}: ${formatPricePair(totalCost.totalINR, totalCost.totalUSD, currency)}`,
     maintenancePlan: activeMaintenancePlan.name,
     maintenanceCostINR: activeMaintenancePlan.priceINR,
     maintenanceCostUSD: activeMaintenancePlan.priceUSD,
@@ -260,7 +294,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   });
 
   const handleDownloadPDF = () => {
-    generateQuestionnairePDF(resumeData, buildQuestionnaireData(), isNoir);
+    generateQuestionnairePDF(resumeData, buildQuestionnaireData(), isNoir, currency);
   };
 
   // Load Google reCAPTCHA v3 script dynamically if configured
@@ -340,7 +374,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
       // Render the branded proposal PDF for the email attachment (best-effort)
       let pdfAttachment: { content: string; filename: string } | null = null;
       try {
-        const { fileName, base64 } = await generateQuestionnairePDFBase64(resumeData, buildQuestionnaireData(), isNoir);
+        const { fileName, base64 } = await generateQuestionnairePDFBase64(resumeData, buildQuestionnaireData(), isNoir, currency);
         pdfAttachment = { content: base64, filename: fileName };
       } catch (pdfErr) {
         console.warn('Failed to generate PDF attachment:', pdfErr);
@@ -416,6 +450,24 @@ Notes: ${formData.additionalNotes}
             <p className={styles.subtitle}>
               Configure your web architecture, itemized modules, brand assets, and maintenance care plan for an instant quotation.
             </p>
+            <div className={styles.currencyToggle}>
+              <button
+                type="button"
+                className={`${styles.currencyBtn} ${currency === 'INR' ? styles.currencyActive : ''}`}
+                onClick={() => setCurrency('INR')}
+                title="Show all prices in Indian Rupees"
+              >
+                ₹ INR Rates
+              </button>
+              <button
+                type="button"
+                className={`${styles.currencyBtn} ${currency === 'USD' ? styles.currencyActive : ''}`}
+                onClick={() => setCurrency('USD')}
+                title="Show all prices in US Dollars"
+              >
+                $ USD Rates
+              </button>
+            </div>
           </div>
 
           {/* STEP INDICATOR */}
@@ -581,7 +633,7 @@ Notes: ${formData.additionalNotes}
                                     ℹ
                                   </button>
                                 </div>
-                                <span className={styles.priceBadge}>{`₹${e.priceINR.toLocaleString()} ($${e.priceUSD})`}</span>
+                                <span className={styles.priceBadge}>{formatPricePair(e.priceINR, e.priceUSD, currency)}</span>
                               </div>
                               <p style={{ margin: '3px 0 0 0', fontSize: '11px', opacity: 0.7, lineHeight: 1.4 }}>{e.laymanDescription}</p>
 
@@ -619,17 +671,22 @@ Notes: ${formData.additionalNotes}
                       {features.map(m => {
                         const isCompulsory = currentArchetype.compulsoryFeatureLabels.includes(m.label);
                         const isChecked = isCompulsory || formData.selectedFeatures.includes(m.label);
+                        const otherSelectedIds = features
+                          .filter(f => formData.selectedFeatures.includes(f.label) && f.id !== m.id)
+                          .map(f => f.id);
+                        const isRequiredDependency = new Set(resolveFeatureDependencies(otherSelectedIds, features)).has(m.id);
+                        const isLocked = isCompulsory || isRequiredDependency;
                         const isPopoverOpen = activePopoverId === m.id;
                         return (
                           <label
                             key={m.id}
-                            className={`${styles.checkboxCard} ${isCompulsory ? styles.lockedCard : ''} ${isChecked ? styles.checkboxCardSelected : ''}`}
-                            style={{ cursor: isCompulsory ? 'not-allowed' : 'pointer' }}
+                            className={`${styles.checkboxCard} ${isLocked ? styles.lockedCard : ''} ${isChecked ? styles.checkboxCardSelected : ''}`}
+                            style={{ cursor: isLocked ? 'not-allowed' : 'pointer' }}
                           >
                             <input
                               type="checkbox"
                               checked={isChecked}
-                              disabled={isCompulsory}
+                              disabled={isLocked}
                               onChange={() => handleFeatureToggle(m.label)}
                             />
                             <div style={{ flex: 1 }}>
@@ -641,6 +698,11 @@ Notes: ${formData.additionalNotes}
                                       🔒 REQUIRED
                                     </span>
                                   )}
+                                  {isRequiredDependency && (
+                                    <span className={styles.lockedBadge} title="This module is required by another selected module">
+                                      🔗 REQUIRED BY SELECTED MODULE
+                                    </span>
+                                  )}
                                   <button
                                     type="button"
                                     onClick={(ev) => togglePopover(ev, m.id)}
@@ -650,7 +712,7 @@ Notes: ${formData.additionalNotes}
                                     ℹ
                                   </button>
                                 </div>
-                                <span className={styles.priceBadge}>{`+₹${m.priceINR.toLocaleString()}`}</span>
+                                <span className={styles.priceBadge}>{`+${formatMoney(m.priceINR, currency)}`}</span>
                               </div>
                               <p style={{ margin: '3px 0 0 0', fontSize: '11px', opacity: 0.7, lineHeight: 1.4 }}>{m.laymanDescription}</p>
 
@@ -686,11 +748,11 @@ Notes: ${formData.additionalNotes}
                     <div className={styles.stickyLeft}>
                       <span className={styles.stickyTitle}>⚡ Live Pure Additive Arithmetic Formula</span>
                       <span className={styles.stickyBreakdown}>
-                        {`Base (${selectedEngine.title}: ₹${selectedEngine.priceINR.toLocaleString()}) + Add-ons (₹${totalCost.featuresINR.toLocaleString()})`}
+                        {`Base (${selectedEngine.title}: ${formatMoney(selectedEngine.priceINR, currency)}) + Add-ons (${formatMoney(totalCost.featuresINR, currency)})`}
                       </span>
                     </div>
                     <div className={styles.stickyTotal}>
-                      {`Estimated Total: ₹${totalCost.totalINR.toLocaleString()} ($${totalCost.totalUSD.toLocaleString()})`}
+                      {`Estimated Total: ${formatPricePair(totalCost.totalINR, totalCost.totalUSD, currency)}`}
                     </div>
                   </div>
                 </div>
@@ -725,7 +787,7 @@ Notes: ${formData.additionalNotes}
                             <div style={{ flex: 1 }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <span style={{ fontWeight: 700 }}>{b.label}</span>
-                                <span className={styles.priceBadge}>{b.priceINR > 0 ? `+₹${b.priceINR.toLocaleString()}` : 'Included (+₹0)'}</span>
+                                <span className={styles.priceBadge}>{b.priceINR > 0 ? `+${formatMoney(b.priceINR, currency)}` : 'Included'}</span>
                               </div>
                               <p style={{ margin: '2px 0 0 0', fontSize: '11px', opacity: 0.7 }}>{b.description}</p>
                             </div>
@@ -760,21 +822,25 @@ Notes: ${formData.additionalNotes}
                   <div style={{ background: 'var(--intake-summary-bg)', borderRadius: '8px', padding: '14px 18px', color: 'var(--intake-summary-text)', marginBottom: '16px', border: '1px solid var(--intake-summary-border)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--intake-summary-border)', paddingBottom: '8px', marginBottom: '8px' }}>
                       <span style={{ fontFamily: 'var(--font-code)', fontSize: '12px', color: 'var(--intake-summary-label)' }}>SELECTED BASE ENGINE</span>
-                      <span style={{ fontWeight: 700, color: 'var(--intake-summary-accent)' }}>{`${selectedEngine.title} (₹${selectedEngine.priceINR.toLocaleString()})`}</span>
+                      <span style={{ fontWeight: 700, color: 'var(--intake-summary-accent)' }}>{`${selectedEngine.title} (${formatMoney(selectedEngine.priceINR, currency)})`}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--intake-summary-border)', paddingBottom: '8px', marginBottom: '8px' }}>
                       <span style={{ fontFamily: 'var(--font-code)', fontSize: '12px', color: 'var(--intake-summary-label)' }}>SELECTED ADD-ON MODULES</span>
-                      <span style={{ fontWeight: 700, color: 'var(--intake-summary-value)' }}>{`+₹${totalCost.featuresINR.toLocaleString()} (${formData.selectedFeatures.length} Modules)`}</span>
+                      <span style={{ fontWeight: 700, color: 'var(--intake-summary-value)' }}>{`+${formatMoney(totalCost.featuresINR, currency)} (${formData.selectedFeatures.length} Modules)`}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--intake-summary-border)', paddingBottom: '8px', marginBottom: '8px' }}>
                       <span style={{ fontFamily: 'var(--font-code)', fontSize: '12px', color: 'var(--intake-summary-label)' }}>BRAND KIT ADD-ON</span>
-                      <span style={{ fontWeight: 700, color: 'var(--intake-summary-value)' }}>{totalCost.brandOpt.priceINR > 0 ? `+₹${totalCost.brandOpt.priceINR.toLocaleString()}` : 'Included (+₹0)'}</span>
+                      <span style={{ fontWeight: 700, color: 'var(--intake-summary-value)' }}>{totalCost.brandOpt.priceINR > 0 ? `+${formatMoney(totalCost.brandOpt.priceINR, currency)}` : 'Included'}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '4px' }}>
-                      <span style={{ fontFamily: 'var(--font-code)', fontSize: '13px', fontWeight: 800, color: 'var(--intake-summary-text)' }}>TOTAL BUILD INVESTMENT</span>
-                      <span style={{ fontFamily: 'var(--font-code)', fontSize: '18px', fontWeight: 800, color: 'var(--intake-summary-accent)' }}>{`₹${totalCost.totalINR.toLocaleString()} ($${totalCost.totalUSD.toLocaleString()})`}</span>
+                      <span style={{ fontFamily: 'var(--font-code)', fontSize: '13px', fontWeight: 800, color: 'var(--intake-summary-text)' }}>TOTAL BUILD INVESTMENT (ESTIMATE)</span>
+                      <span style={{ fontFamily: 'var(--font-code)', fontSize: '18px', fontWeight: 800, color: 'var(--intake-summary-accent)' }}>{formatPricePair(totalCost.totalINR, totalCost.totalUSD, currency)}</span>
                     </div>
                   </div>
+
+                  <p style={{ fontSize: '11px', opacity: 0.72, lineHeight: 1.55, margin: '0 0 16px 0', color: 'var(--intake-summary-text)' }}>
+                    {ESTIMATE_DISCLAIMER}
+                  </p>
 
                   {/* Maintenance Selector */}
                   <div className={styles.field}>
@@ -811,7 +877,11 @@ Notes: ${formData.additionalNotes}
                             </div>
 
                             <div className={styles.careCardPrice}>
-                              {p.priceINR > 0 ? `₹${p.priceINR.toLocaleString()}${p.period} ($${p.priceUSD}/mo)` : 'Included (30-Day Warranty)'}
+                              {p.priceINR > 0
+                                ? currency === 'INR'
+                                  ? `${formatMoney(p.priceINR, currency)}${p.period}`
+                                  : `${formatMoney(p.priceUSD, currency)}/mo`
+                                : 'Included (30-Day Warranty)'}
                             </div>
                             <p style={{ margin: '0 0 8px 0', fontSize: '11px', opacity: 0.7, lineHeight: 1.4 }}>{p.laymanDescription}</p>
 

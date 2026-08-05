@@ -4,17 +4,17 @@
       "id": "landing",
       "title": "Landing Page Core Engine",
       "tier": "Tier 1",
-      "priceINR": 25000,
-      "priceUSD": 300,
+      "priceINR": 30000,
+      "priceUSD": 400,
       "laymanDescription": "A single, ultra-fast, high-converting webpage built to capture leads, showcase your brand, and turn visitors into clients.",
-      "techSpecs": "Next.js 16 App Router, Responsive Motion UI, Tailwind/CSS Modules, ReCAPTCHA v3, Telemetry, SEO Schema"
+      "techSpecs": "Next.js 16 App Router, Responsive Motion UI, CSS Modules, ReCAPTCHA v3, Telemetry, SEO Schema"
     },
     {
       "id": "multipage",
       "title": "Multi-Page Web App Core Engine",
       "tier": "Tier 2",
-      "priceINR": 45000,
-      "priceUSD": 550,
+      "priceINR": 55000,
+      "priceUSD": 750,
       "laymanDescription": "A complete multi-page business website (Home, About, Services, Case Studies, Contact) with smooth page transitions and consistent branding.",
       "techSpecs": "Multi-page routing (3–6 pages), Framer Motion Page Transitions, Shared Layout Shell, Dynamic Routes"
     },
@@ -22,8 +22,8 @@
       "id": "saas",
       "title": "Full-Stack SaaS MVP Core Engine",
       "tier": "Tier 3",
-      "priceINR": 120000,
-      "priceUSD": 1500,
+      "priceINR": 175000,
+      "priceUSD": 2400,
       "laymanDescription": "A production software foundation connected to a cloud database for web apps where users create accounts, manage data, and run software workflows.",
       "techSpecs": "Full Web App Shell, Supabase PostgreSQL Architecture, Server Caching (unstable_cache), Production Vercel Wiring"
     }
@@ -32,50 +32,86 @@
     {
       "id": "auth",
       "label": "User Auth & Client Portal (Google/Magic Link)",
-      "priceINR": 20000,
-      "priceUSD": 240,
+      "priceINR": 25000,
+      "priceUSD": 350,
       "laymanDescription": "Allows your customers to securely sign in using Google or Email links and access their private personal dashboard.",
       "techSpecs": "Google OAuth 2.0, Passwordless Magic Links, Supabase Row-Level Security (RLS), Encrypted Session Tokens"
     },
     {
       "id": "payments",
       "label": "Payment Gateway Integration (Stripe/Razorpay)",
-      "priceINR": 35000,
-      "priceUSD": 450,
+      "priceINR": 45000,
+      "priceUSD": 600,
       "laymanDescription": "Enables your website to collect payments via Credit Cards, Apple Pay, UPI, or subscriptions with automatic digital invoicing.",
-      "techSpecs": "Stripe & Razorpay Webhook Listeners, 1-Click Checkout, Recurring Billing, PCI DSS Compliance setup"
+      "techSpecs": "Stripe & Razorpay Webhook Listeners, 1-Click Checkout, Recurring Billing, PCI-compliant hosted checkout configuration with sensitive card data handled by the payment provider"
     },
     {
       "id": "cms",
       "label": "Headless Blog & CMS Content Management",
-      "priceINR": 18000,
-      "priceUSD": 220,
+      "priceINR": 30000,
+      "priceUSD": 400,
       "laymanDescription": "Gives you an easy backend manager to publish blog posts, news, or case studies anytime without touching code, boosting your Google ranking.",
       "techSpecs": "Markdown Parser, Supabase DB Content Tables, On-Demand Cache Revalidation (/api/revalidate), OpenGraph SEO"
     },
     {
       "id": "ai_rag",
       "label": "Private AI Knowledge Base / Vector Search (RAG)",
-      "priceINR": 60000,
-      "priceUSD": 750,
+      "priceINR": 125000,
+      "priceUSD": 1700,
       "laymanDescription": "An intelligent AI assistant trained exclusively on your business documents, FAQs, and PDFs that answers customer questions 24/7 with source citations.",
       "techSpecs": "pgvector Vector Embeddings, Document Chunking Pipeline, Semantic Search, Presigned Citation Downloads, Feedback Telemetry"
     },
     {
       "id": "admin",
       "label": "Admin Dashboard & Role Access Control (RBAC)",
-      "priceINR": 40000,
-      "priceUSD": 500,
+      "priceINR": 75000,
+      "priceUSD": 1000,
       "laymanDescription": "A private internal command center for you and your team to view real-time traffic, manage customer data, and assign staff permissions.",
       "techSpecs": "Single-Pass SQL RPC Aggregations (get_analytics_summary), Visitor Analytics Charts, Content Forms, Admin Security Guards"
     },
     {
       "id": "email",
       "label": "Automated Email Workflows (Resend Transactional)",
-      "priceINR": 12000,
-      "priceUSD": 140,
+      "priceINR": 15000,
+      "priceUSD": 200,
       "laymanDescription": "Sends instant, professionally branded email receipts, welcome sequences, or contact notifications directly to your clients whenever they take action.",
       "techSpecs": "Resend Transactional API, Custom HTML Templates, SMTP Fallbacks, Delivery Failure Telemetry"
+    },
+    {
+      "id": "booking",
+      "label": "Booking & Appointments Module",
+      "priceINR": 50000,
+      "priceUSD": 700,
+      "laymanDescription": "Lets customers book services, reserve time slots, and pay deposits online with calendar syncing and automatic reminders.",
+      "techSpecs": "Availability Calendar, Time-Slot Scheduling, Calendar Sync (Google/iCal), Deposit Holds, Booking Reminders",
+      "dependsOn": ["payments", "auth"]
+    },
+    {
+      "id": "commerce",
+      "label": "E-Commerce Storefront & Cart Module",
+      "priceINR": 75000,
+      "priceUSD": 1000,
+      "laymanDescription": "A complete online store with product catalog, shopping cart, secure checkout, and order management.",
+      "techSpecs": "Product Catalog, Cart & Checkout Flow, Inventory Management, Order Confirmation Emails",
+      "dependsOn": ["payments", "auth"]
+    },
+    {
+      "id": "lms",
+      "label": "LMS & Online Course Portal Module",
+      "priceINR": 85000,
+      "priceUSD": 1150,
+      "laymanDescription": "Student enrollment, a course player with progress tracking, and gated lesson content for online training.",
+      "techSpecs": "Course Builder, Video/Text Lesson Player, Progress Tracking, Enrollment & Certificates",
+      "dependsOn": ["payments", "auth"]
+    },
+    {
+      "id": "crm",
+      "label": "CRM & Lead Management Module",
+      "priceINR": 60000,
+      "priceUSD": 800,
+      "laymanDescription": "A private pipeline to track leads, customers, deals, and team activity with custom fields and exports.",
+      "techSpecs": "Deal Pipeline & Kanban, Custom Fields, Activity Timeline, Team Permissions, Export Tools",
+      "dependsOn": ["auth"]
     }
   ],
   "goals": [
@@ -102,6 +138,7 @@
       "description": "Product catalog, shopping cart, and online payments",
       "recommendedEngineId": "multipage",
       "compulsoryFeatureLabels": [
+        "E-Commerce Storefront & Cart Module",
         "Payment Gateway Integration (Stripe/Razorpay)",
         "User Auth & Client Portal (Google/Magic Link)",
         "Automated Email Workflows (Resend Transactional)"
@@ -114,6 +151,7 @@
       "description": "Reservation scheduling, calendar sync, and upfront deposits",
       "recommendedEngineId": "multipage",
       "compulsoryFeatureLabels": [
+        "Booking & Appointments Module",
         "Payment Gateway Integration (Stripe/Razorpay)",
         "Automated Email Workflows (Resend Transactional)"
       ]
@@ -137,6 +175,7 @@
       "description": "Student accounts, course player, and subscription billing",
       "recommendedEngineId": "saas",
       "compulsoryFeatureLabels": [
+        "LMS & Online Course Portal Module",
         "User Auth & Client Portal (Google/Magic Link)",
         "Payment Gateway Integration (Stripe/Razorpay)",
         "Headless Blog & CMS Content Management"
@@ -149,6 +188,7 @@
       "description": "Private business dashboard, data management, and staff roles",
       "recommendedEngineId": "saas",
       "compulsoryFeatureLabels": [
+        "CRM & Lead Management Module",
         "User Auth & Client Portal (Google/Magic Link)",
         "Admin Dashboard & Role Access Control (RBAC)"
       ]
@@ -175,43 +215,70 @@
     }
   ],
   "brandAssets": [
-    { "id": "ready", "label": "All Brand Assets Ready (Logo SVG & Copywriting)", "priceINR": 0, "priceUSD": 0, "description": "Client supplies vector logo, color kit, and text content." },
-    { "id": "copy", "label": "Need Technical Copywriting & Section Formatting", "priceINR": 10000, "priceUSD": 120, "description": "Professional tech copywriting, tagline crafting, and bullet formatting." },
-    { "id": "scratch", "label": "Starting from Scratch (Full Brand Kit & Copy)", "priceINR": 25000, "priceUSD": 300, "description": "Vector logo design, color palette, typography pairing, and copywriting." }
+    {
+      "id": "ready",
+      "label": "All Brand Assets Ready (Logo SVG & Copywriting)",
+      "priceINR": 0,
+      "priceUSD": 0,
+      "description": "Client supplies vector logo, color kit, and text content."
+    },
+    {
+      "id": "copy",
+      "label": "Need Technical Copywriting & Section Formatting",
+      "priceINR": 15000,
+      "priceUSD": 200,
+      "description": "Professional tech copywriting, tagline crafting, and bullet formatting. Includes up to 5 pages of copy with 1 revision round."
+    },
+    {
+      "id": "scratch",
+      "label": "Starting from Scratch (Starter Brand Kit & Copy)",
+      "priceINR": 45000,
+      "priceUSD": 600,
+      "description": "Starter Brand Kit: custom logo concepts, color palette, typography pairing, and copywriting. Includes up to 3 logo concepts and 2 revision rounds; final brand files delivered as vectors."
+    }
   ],
   "maintenancePlans": [
     {
       "id": "basic",
       "name": "Basic Care Plan",
-      "priceINR": 4000,
-      "priceUSD": 50,
+      "priceINR": 5000,
+      "priceUSD": 70,
       "period": "/ month",
       "badge": "💡 Recommended for Landing Pages",
       "laymanDescription": "Keeps your server healthy, creates daily automated database backups, installs security patches, and ensures your site stays online 24/7.",
       "techSpecs": "Vercel/Supabase Uptime Monitoring, Daily PostgreSQL Backups, SSL Renewals, Security Dependency Updates",
-      "includes": ["Hosting support & SSL management", "Daily automated database backups", "Dependency & security patching", "Minor bug fixes & uptime monitoring"]
+      "includes": ["Hosting support & SSL management", "Daily automated database backups", "Dependency & security patching", "Minor bug fixes & uptime monitoring"],
+      "responseTime": "Within 2 business days",
+      "includedHours": "Up to 1 hour of developer time/month",
+      "overageRules": "Overage beyond the included hours requires written approval and is billed separately. Unused hours do not roll over."
     },
     {
       "id": "standard",
       "name": "Standard Care Plan",
-      "priceINR": 8500,
-      "priceUSD": 100,
+      "priceINR": 10000,
+      "priceUSD": 140,
       "period": "/ month",
       "badge": "💡 Recommended for Auth/Payments/CMS",
       "laymanDescription": "Includes everything in Basic plus up to 4 hours of monthly developer support to edit text, swap images, update pages, or tweak designs whenever you need.",
-      "techSpecs": "Everything in Basic + 2-4 Hours Monthly Dev Allocation, Core Web Vitals Performance Tuning, Content Schema Updates",
-      "includes": ["Everything in Basic Care", "Monthly text & media content updates", "2–4 hours of dedicated dev time/month", "Performance & page speed tuning"]
+      "techSpecs": "Everything in Basic + 3–4 Hours Monthly Dev Allocation, Core Web Vitals Performance Tuning, Content Schema Updates",
+      "includes": ["Everything in Basic Care", "Monthly text & media content updates", "3–4 hours of dedicated dev time/month", "Performance & page speed tuning"],
+      "responseTime": "Within 1 business day",
+      "includedHours": "3–4 hours of developer time/month",
+      "overageRules": "Overage beyond the included hours requires written approval and is billed separately. Unused hours do not roll over."
     },
     {
       "id": "premium",
       "name": "Premium AI & Dev SLA Care Plan",
-      "priceINR": 25000,
-      "priceUSD": 300,
+      "priceINR": 35000,
+      "priceUSD": 475,
       "period": "/ month",
       "badge": "💡 Recommended for AI Chatbot & RAG Engines",
-      "laymanDescription": "For critical business apps and AI engines. Includes a guaranteed 24-hour emergency response time, AI model accuracy tuning, SEO reports, and dedicated dev hours.",
+      "laymanDescription": "For critical business apps and AI engines. Includes a guaranteed priority response SLA, AI model accuracy tuning, SEO reports, and dedicated dev hours.",
       "techSpecs": "24-Hour Priority SLA, AI Vector Index Tuning & Latency Monitoring, SEO Analytics Reports, Dedicated Feature Engineering",
-      "includes": ["Priority 24-hour SLA response", "AI Vector DB & LLM latency monitoring", "Dedicated feature development hours", "Analytics & SEO health reports"]
+      "includes": ["Priority 24-hour SLA response", "AI Vector DB & LLM latency monitoring", "Dedicated feature development hours", "Analytics & SEO health reports"],
+      "responseTime": "Within 24 hours (response-not-resolution commitment)",
+      "includedHours": "Up to 8 hours of developer time/month",
+      "overageRules": "Overage beyond the included hours requires written approval and is billed separately. Unused hours do not roll over. Third-party service billing is excluded and billed directly to the client."
     },
     {
       "id": "self",
@@ -222,7 +289,10 @@
       "badge": "30-Day Warranty Included",
       "laymanDescription": "Includes 30 days of complimentary technical support post-launch. Client manages cloud hosting and database updates afterwards.",
       "techSpecs": "30-Day Post-Launch Bug Warranty, Developer Handover Documentation",
-      "includes": ["30 days complimentary post-launch support", "Client manages cloud hosting & patches afterwards"]
+      "includes": ["30 days complimentary post-launch support", "Client manages cloud hosting & patches afterwards"],
+      "responseTime": "Within 2 business days (warranty period)",
+      "includedHours": "Complimentary warranty support only",
+      "overageRules": "Post-warranty work is billed separately under a paid care plan."
     }
   ]
 }

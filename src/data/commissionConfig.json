@@ -1,0 +1,42 @@
+{
+  "bands": [
+    {
+      "id": "A",
+      "label": "Band A",
+      "rate": 10,
+      "minINR": null,
+      "maxINR": 75000,
+      "minUSD": null,
+      "maxUSD": 1000
+    },
+    {
+      "id": "B",
+      "label": "Band B",
+      "rate": 12,
+      "minINR": 75001,
+      "maxINR": 249999,
+      "minUSD": 1001,
+      "maxUSD": 3299
+    },
+    {
+      "id": "C",
+      "label": "Band C",
+      "rate": 15,
+      "minINR": 250000,
+      "maxINR": null,
+      "minUSD": 3300,
+      "maxUSD": null
+    }
+  ],
+  "recurringRate": 10,
+  "depositSplit": 0.5,
+  "disbursementWindow": "48 business hours",
+  "example": {
+    "contractValueINR": 320000,
+    "rate": 15,
+    "deposit": 160000,
+    "totalCommission": 48000,
+    "splitAmount": 24000,
+    "tier": "C"
+  }
+}

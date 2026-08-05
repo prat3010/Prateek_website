@@ -165,6 +165,20 @@ def validate_questionnaire(engines, features, goals, brand_assets, maintenance_p
         unique_ids(features, "Features")
         check_prices(features, "Feature")
 
+    feature_ids = {f.get("id") for f in features if isinstance(f, dict)}
+    for feature in features:
+        depends_on = feature.get("dependsOn", [])
+        if not isinstance(depends_on, list):
+            errors.append(f"Feature '{feature.get('id', '?')}' 'dependsOn' must be a list.")
+            continue
+        for dep_id in depends_on:
+            if not isinstance(dep_id, str) or not dep_id.strip():
+                errors.append(f"Feature '{feature.get('id', '?')}' has a blank 'dependsOn' entry.")
+            elif dep_id not in feature_ids:
+                errors.append(
+                    f"Feature '{feature.get('id', '?')}' dependsOn unknown feature ID '{dep_id}'."
+                )
+
     engine_ids = {e.get("id") for e in engines if isinstance(e, dict)}
     feature_labels = {f.get("label") for f in features if isinstance(f, dict)}
 
@@ -215,6 +229,9 @@ def validate_questionnaire(engines, features, goals, brand_assets, maintenance_p
                 errors.append(f"Care plan '{plan.get('id', '?')}' must include at least one 'includes' item.")
             elif not all(isinstance(i, str) and i.strip() for i in includes):
                 errors.append(f"Care plan '{plan.get('id', '?')}' 'includes' must be a list of strings.")
+            for sla_field in ("responseTime", "includedHours", "overageRules"):
+                if sla_field in plan and not isinstance(plan.get(sla_field), str):
+                    errors.append(f"Care plan '{plan.get('id', '?')}' '{sla_field}' must be a string.")
         unique_ids(maintenance_plans, "Care plans")
         check_prices(maintenance_plans, "Care plan")
 

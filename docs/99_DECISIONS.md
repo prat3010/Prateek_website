@@ -157,6 +157,31 @@ This document serves as the registry of critical architectural design decisions 
 
 ---
 
+# **ADR 11: Single-Source Pricing & Commission Modules**
+
+* **Status**: Approved
+* **Context**: Engine, add-on feature, brand asset, care plan, and goal-archetype prices were edited in three parallel places (the Scoping wizard's TS constant arrays, `resume.json` `intake.*`, and the commercial PDFs), while the Middleman agreement's commission tiers were a hard-coded 3-row table with hand-written band ranges and cut percentages in two renderers plus `SiteInfoConsole` and the agreement modal. Every price retune required hunting down duplicated numbers, and the rates drifted (e.g. stale ₹25k–45k tiers after the 2026-08 price revision).
+* **Decision**: Centralize all commercial pricing into two read-only source-of-truth modules consumed by the wizard, resume cards, PDFs, modal, and console:
+  * `src/lib/pricing.ts` — `Currency` (`'INR' | 'USD'`), `ESTIMATE_DISCLAIMER`, `CARE_OVERAGE_DEFAULT`, `formatMoney`/`formatPricePair`/`resolveDefaultCurrency` (geo-IP `region` cookie `'india'` → INR, otherwise USD), `calcQuote` (engine + features + brand + care with per-line INR/USD totals), `resolveFeatureDependencies` (transitive `dependsOn` resolution), and `packageTotalForArchetype`/`packageTotals` (recommended engine + compulsory feature labels → verified package totals). Prices themselves live in `src/data/intakeQuestionnaireDefaults.json` (engines/features/goals/brandAssets/maintenancePlans), never in TS.
+  * `src/data/commissionConfig.json` + `src/lib/commission.ts` — non-overlapping bands A/B/C (₹1–75,000/$1–1,000 → 10%; ₹75,001–2,49,999/$1,001–3,299 → 12%; ₹2,50,000+/$3,300+ → 15%), `recurringRate` 10%, `depositSplit` 0.5, `disbursementWindow` "48 business hours", and the illustrative SaaS example (₹3,20,000 → Band C → ₹48,000 → ₹24,000 per half). `getCommissionBand` and `calculateCommission` resolve a contract value to its band and payout.
+  * Consumers: `IntakeForm` (wizard + currency toggle), `Resume.tsx` package/care cards, `ScopingBriefPDF` (config-derived fallback totals), `ServicesAndPricingPDF`, `MiddlemanAgreementPDF` + `scripts/generate-middleman-pdf.mjs` (band-derived table, worked example, config window), `MiddlemanAgreementModal`, and `SiteInfoConsole`. The Synchronizer's middleman form now shows the band schedule read-only instead of free-text tier percentages, and the Scoping Questionnaire tab edits `dependsOn` and care-plan SLA fields.
+* **Consequences**:
+  * **Pros**: One price edit in the defaults JSON (or `commissionConfig.json`) propagates everywhere; both renderers now derive the cut percentages from the config bands instead of hard-coded `'10%'`/`'12%'`/`'15%'` strings; boundary behavior (₹75,000 vs ₹75,001, $1,000 vs $1,001, $3,299 vs $3,300) is unit-tested in `src/lib/__tests__/pricing.test.ts` and `commission.test.ts`; all 8 goal archetypes assert their approved totals.
+  * **Cons**: The legacy `tier1Commission`/`tier2Commission`/`tier3Commission`/`recurringCommission` fields remain in profile data as deprecated fallbacks (the PDFs still honour them when set, preferring the config); anyone editing band thresholds must edit `commissionConfig.json` directly; `intakeQuestionnaireDefaults.json` must stay in sync with `resume.json` `intake.*` and the Synchronizer's defaults.
+
+---
+
+# **ADR 12: Theme-Density Font Scaling for Fixed-Page-Count Commercial PDFs**
+
+* **Status**: Approved
+* **Context**: The commercial PDF trio uses two theme fonts — azure renders body copy in Lora (proportional) while noir uses JetBrains Mono (monospace, visibly wider). For identical content and font sizes the noir render of `ServicesAndPricingPDF` spilled from 4 to 6 pages and `MiddlemanAgreementPDF` from 3 to 4, pushing orphan pages (a lone brand-asset row, the CTA box, or a split signature heading).
+* **Decision**: Add `pdfFontScale(theme)` / `scaleBodyFont(theme, size)` to `src/components/pdf/pdfTheme.ts`. Noir scales body font sizes to 88% of azure so both themes produce identical page counts (pricing 4, scoping 3, middleman 3) while keeping the noir brand lockup (header/title sizes) untouched. `MiddlemanAgreementPDF` keeps its `wrap={false}` signature grid so the signature block never splits across pages.
+* **Consequences**:
+  * **Pros**: Noir PDFs fit the same fixed page counts as azure with no orphan pages; body text remains readable (only ~12% smaller); a single multiplier controls density.
+  * **Cons**: Noir body text is slightly smaller than azure by design; if the defaults JSON adds content the fixed page counts must be re-verified (the pdf-smoke tests assert the exact counts in both themes).
+
+---
+
 # **Acceptance Criteria**
 - Registry records cover the core v2 architectural choices.
 - Format follows standard ADR structures (Context, Decision, Consequences).

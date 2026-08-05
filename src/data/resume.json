@@ -129,8 +129,8 @@
     "scopeModel": "Fixed-Price Milestones (No hidden hourly charges)",
     "deliverySprint": "1 to 3 Weeks Turnaround Sprint",
     "warrantyModel": "Included 30-Day Post-Launch Support & Warranty",
-    "hourlyRate": "\u20b93,000",
-    "dayRate": "\u20b920,000",
+    "hourlyRate": "₹3,000",
+    "dayRate": "₹20,000",
     "paymentTerms": "50% upfront deposit to initiate development, 50% upon final project delivery.",
     "deliverables": [
       "Custom UI Design & Interactive Prototypes",
@@ -145,7 +145,7 @@
     "subtitle": "Fill out this brief or download the printable PDF version for your team/client. Receive a fixed-price proposal within 24 hours.",
     "categories": [
       "Tier 1: High-Converting Landing Page (Single Page)",
-      "Tier 2: Custom Multi-Page Website (3\u20136 Pages)",
+      "Tier 2: Custom Multi-Page Website (3–6 Pages)",
       "Tier 3: Full-Stack Web Application + Admin Dashboard",
       "Tier 4: Private AI Assistant / RAG Integration"
     ],
@@ -159,15 +159,9 @@
       "Automated Email Workflows (Resend Transactional)",
       "Privacy-Compliant Analytics & Visitor Telemetry"
     ],
-    "budgetTiers": [
-      "Tier 1: \u20b925,000 \u2013 \u20b945,000 ($300 \u2013 $550)",
-      "Tier 2: \u20b945,000 \u2013 \u20b990,000 ($550 \u2013 $1,100)",
-      "Tier 3: \u20b990,000 \u2013 \u20b91.5L+ ($1,100 \u2013 $2,000+)",
-      "Custom / Enterprise Infrastructure Scope"
-    ],
     "timelineOptions": [
-      "Express Delivery Sprint (7\u201310 Days - Rush Fee Applies)",
-      "Standard Turnaround (2\u20134 Weeks)",
+      "Express Delivery Sprint (7–10 Days - Rush Fee Applies)",
+      "Standard Turnaround (2–4 Weeks)",
       "Flexible Timeline"
     ],
     "assetOptions": [
@@ -289,7 +283,7 @@
             "- This Agreement takes effect on the Effective Date and continues indefinitely until terminated.",
             "- Either party may terminate this Agreement at any time with 30 days' prior written notice.",
             "- Either party may also terminate with immediate effect on written notice if the other party materially defaults under this Agreement and fails to remedy within 7 days of written notice.",
-            "- Commissions accrued and payable for Qualified, will-funded work at the date of termination remain due and are paid under Section 4.",
+            "- Commissions accrued and payable for Qualified, validly contracted and funded work at the date of termination remain due and are paid under Section 4.",
             "- The obligations under Sections 6 (Trailing Commissions), 7 (Confidentiality), and 8 (Intellectual Property) survive termination."
           ]
         },
@@ -320,7 +314,7 @@
             "This Agreement is governed by and construed in accordance with the laws of India, without regard to its conflict-of-laws principles.",
             "The parties shall first seek to resolve any dispute amicably through written notice and a good-faith mediation video call within 30 days.",
             "If the dispute is not resolved within 60 days, it shall be referred to a sole arbitrator appointed by mutual agreement, the seat and venue of arbitration being a neutral location in India, conducted in English, whose decision shall be final and binding in accordance with the law in force on arbitration in India. Each party bears its own costs.",
-            "For any matter not subject to arbitration, the courts of India shall have jurisdiction, and any claims are subject to the limitations in Section 10."
+            "For any matter not subject to arbitration, the courts having territorial jurisdiction over the Developer's principal place of business in India shall have exclusive jurisdiction, and any claims are subject to the limitations in Section 10."
           ]
         },
         {
@@ -348,26 +342,26 @@
         "id": "landing",
         "title": "Landing Page Core Engine",
         "tier": "Tier 1",
-        "priceINR": 25000,
-        "priceUSD": 300,
+        "priceINR": 30000,
+        "priceUSD": 400,
         "laymanDescription": "A single, ultra-fast, high-converting webpage built to capture leads, showcase your brand, and turn visitors into clients.",
-        "techSpecs": "Next.js 16 App Router, Responsive Motion UI, Tailwind/CSS Modules, ReCAPTCHA v3, Telemetry, SEO Schema"
+        "techSpecs": "Next.js 16 App Router, Responsive Motion UI, CSS Modules, ReCAPTCHA v3, Telemetry, SEO Schema"
       },
       {
         "id": "multipage",
         "title": "Multi-Page Web App Core Engine",
         "tier": "Tier 2",
-        "priceINR": 45000,
-        "priceUSD": 550,
+        "priceINR": 55000,
+        "priceUSD": 750,
         "laymanDescription": "A complete multi-page business website (Home, About, Services, Case Studies, Contact) with smooth page transitions and consistent branding.",
-        "techSpecs": "Multi-page routing (3\u20136 pages), Framer Motion Page Transitions, Shared Layout Shell, Dynamic Routes"
+        "techSpecs": "Multi-page routing (3–6 pages), Framer Motion Page Transitions, Shared Layout Shell, Dynamic Routes"
       },
       {
         "id": "saas",
         "title": "Full-Stack SaaS MVP Core Engine",
         "tier": "Tier 3",
-        "priceINR": 120000,
-        "priceUSD": 1500,
+        "priceINR": 175000,
+        "priceUSD": 2400,
         "laymanDescription": "A production software foundation connected to a cloud database for web apps where users create accounts, manage data, and run software workflows.",
         "techSpecs": "Full Web App Shell, Supabase PostgreSQL Architecture, Server Caching (unstable_cache), Production Vercel Wiring"
       }
@@ -376,56 +370,103 @@
       {
         "id": "auth",
         "label": "User Auth & Client Portal (Google/Magic Link)",
-        "priceINR": 20000,
-        "priceUSD": 240,
+        "priceINR": 25000,
+        "priceUSD": 350,
         "laymanDescription": "Allows your customers to securely sign in using Google or Email links and access their private personal dashboard.",
         "techSpecs": "Google OAuth 2.0, Passwordless Magic Links, Supabase Row-Level Security (RLS), Encrypted Session Tokens"
       },
       {
         "id": "payments",
         "label": "Payment Gateway Integration (Stripe/Razorpay)",
-        "priceINR": 35000,
-        "priceUSD": 450,
+        "priceINR": 45000,
+        "priceUSD": 600,
         "laymanDescription": "Enables your website to collect payments via Credit Cards, Apple Pay, UPI, or subscriptions with automatic digital invoicing.",
-        "techSpecs": "Stripe & Razorpay Webhook Listeners, 1-Click Checkout, Recurring Billing, PCI DSS Compliance setup"
+        "techSpecs": "Stripe & Razorpay Webhook Listeners, 1-Click Checkout, Recurring Billing, PCI-compliant hosted checkout configuration with sensitive card data handled by the payment provider"
       },
       {
         "id": "cms",
         "label": "Headless Blog & CMS Content Management",
-        "priceINR": 18000,
-        "priceUSD": 220,
+        "priceINR": 30000,
+        "priceUSD": 400,
         "laymanDescription": "Gives you an easy backend manager to publish blog posts, news, or case studies anytime without touching code, boosting your Google ranking.",
         "techSpecs": "Markdown Parser, Supabase DB Content Tables, On-Demand Cache Revalidation (/api/revalidate), OpenGraph SEO"
       },
       {
         "id": "ai_rag",
         "label": "Private AI Knowledge Base / Vector Search (RAG)",
-        "priceINR": 60000,
-        "priceUSD": 750,
+        "priceINR": 125000,
+        "priceUSD": 1700,
         "laymanDescription": "An intelligent AI assistant trained exclusively on your business documents, FAQs, and PDFs that answers customer questions 24/7 with source citations.",
         "techSpecs": "pgvector Vector Embeddings, Document Chunking Pipeline, Semantic Search, Presigned Citation Downloads, Feedback Telemetry"
       },
       {
         "id": "admin",
         "label": "Admin Dashboard & Role Access Control (RBAC)",
-        "priceINR": 40000,
-        "priceUSD": 500,
+        "priceINR": 75000,
+        "priceUSD": 1000,
         "laymanDescription": "A private internal command center for you and your team to view real-time traffic, manage customer data, and assign staff permissions.",
         "techSpecs": "Single-Pass SQL RPC Aggregations (get_analytics_summary), Visitor Analytics Charts, Content Forms, Admin Security Guards"
       },
       {
         "id": "email",
         "label": "Automated Email Workflows (Resend Transactional)",
-        "priceINR": 12000,
-        "priceUSD": 140,
+        "priceINR": 15000,
+        "priceUSD": 200,
         "laymanDescription": "Sends instant, professionally branded email receipts, welcome sequences, or contact notifications directly to your clients whenever they take action.",
         "techSpecs": "Resend Transactional API, Custom HTML Templates, SMTP Fallbacks, Delivery Failure Telemetry"
+      },
+      {
+        "id": "booking",
+        "label": "Booking & Appointments Module",
+        "priceINR": 50000,
+        "priceUSD": 700,
+        "laymanDescription": "Lets customers book services, reserve time slots, and pay deposits online with calendar syncing and automatic reminders.",
+        "techSpecs": "Availability Calendar, Time-Slot Scheduling, Calendar Sync (Google/iCal), Deposit Holds, Booking Reminders",
+        "dependsOn": [
+          "payments",
+          "auth"
+        ]
+      },
+      {
+        "id": "commerce",
+        "label": "E-Commerce Storefront & Cart Module",
+        "priceINR": 75000,
+        "priceUSD": 1000,
+        "laymanDescription": "A complete online store with product catalog, shopping cart, secure checkout, and order management.",
+        "techSpecs": "Product Catalog, Cart & Checkout Flow, Inventory Management, Order Confirmation Emails",
+        "dependsOn": [
+          "payments",
+          "auth"
+        ]
+      },
+      {
+        "id": "lms",
+        "label": "LMS & Online Course Portal Module",
+        "priceINR": 85000,
+        "priceUSD": 1150,
+        "laymanDescription": "Student enrollment, a course player with progress tracking, and gated lesson content for online training.",
+        "techSpecs": "Course Builder, Video/Text Lesson Player, Progress Tracking, Enrollment & Certificates",
+        "dependsOn": [
+          "payments",
+          "auth"
+        ]
+      },
+      {
+        "id": "crm",
+        "label": "CRM & Lead Management Module",
+        "priceINR": 60000,
+        "priceUSD": 800,
+        "laymanDescription": "A private pipeline to track leads, customers, deals, and team activity with custom fields and exports.",
+        "techSpecs": "Deal Pipeline & Kanban, Custom Fields, Activity Timeline, Team Permissions, Export Tools",
+        "dependsOn": [
+          "auth"
+        ]
       }
     ],
     "goals": [
       {
         "id": "landing_page",
-        "label": "\u26a1 High-Converting Landing Page",
+        "label": "⚡ High-Converting Landing Page",
         "shortLabel": "Landing Page",
         "description": "Single-page lead generation or product launch page",
         "recommendedEngineId": "landing",
@@ -435,7 +476,7 @@
       },
       {
         "id": "business_multipage",
-        "label": "\ud83c\udfe2 Multi-Page Business Website",
+        "label": "🏢 Multi-Page Business Website",
         "shortLabel": "Business Web",
         "description": "Corporate profile with services, showcase, and blog",
         "recommendedEngineId": "multipage",
@@ -445,11 +486,12 @@
       },
       {
         "id": "ecommerce",
-        "label": "\ud83d\uded2 E-commerce & Digital Store",
+        "label": "🛒 E-commerce & Digital Store",
         "shortLabel": "E-commerce",
         "description": "Product catalog, shopping cart, and online payments",
         "recommendedEngineId": "multipage",
         "compulsoryFeatureLabels": [
+          "E-Commerce Storefront & Cart Module",
           "Payment Gateway Integration (Stripe/Razorpay)",
           "User Auth & Client Portal (Google/Magic Link)",
           "Automated Email Workflows (Resend Transactional)"
@@ -457,18 +499,19 @@
       },
       {
         "id": "booking_appointments",
-        "label": "\ud83d\udcc5 Booking & Appointment Platform",
+        "label": "📅 Booking & Appointment Platform",
         "shortLabel": "Booking Platform",
         "description": "Reservation scheduling, calendar sync, and upfront deposits",
         "recommendedEngineId": "multipage",
         "compulsoryFeatureLabels": [
+          "Booking & Appointments Module",
           "Payment Gateway Integration (Stripe/Razorpay)",
           "Automated Email Workflows (Resend Transactional)"
         ]
       },
       {
         "id": "saas_app",
-        "label": "\ud83d\ude80 Full-Stack SaaS Web Application",
+        "label": "🚀 Full-Stack SaaS Web Application",
         "shortLabel": "SaaS MVP",
         "description": "User accounts, interactive dashboards, and subscriptions",
         "recommendedEngineId": "saas",
@@ -480,11 +523,12 @@
       },
       {
         "id": "lms_portal",
-        "label": "\ud83c\udf93 LMS & Online Course Portal",
+        "label": "🎓 LMS & Online Course Portal",
         "shortLabel": "LMS Portal",
         "description": "Student accounts, course player, and subscription billing",
         "recommendedEngineId": "saas",
         "compulsoryFeatureLabels": [
+          "LMS & Online Course Portal Module",
           "User Auth & Client Portal (Google/Magic Link)",
           "Payment Gateway Integration (Stripe/Razorpay)",
           "Headless Blog & CMS Content Management"
@@ -492,18 +536,19 @@
       },
       {
         "id": "crm_admin",
-        "label": "\ud83d\udcca Internal CRM / Admin Control Center",
+        "label": "📊 Internal CRM / Admin Control Center",
         "shortLabel": "Admin CRM",
         "description": "Private business dashboard, data management, and staff roles",
         "recommendedEngineId": "saas",
         "compulsoryFeatureLabels": [
+          "CRM & Lead Management Module",
           "User Auth & Client Portal (Google/Magic Link)",
           "Admin Dashboard & Role Access Control (RBAC)"
         ]
       },
       {
         "id": "ai_rag_app",
-        "label": "\ud83e\udd16 Custom AI & Vector RAG Platform",
+        "label": "🤖 Custom AI & Vector RAG Platform",
         "shortLabel": "AI RAG Platform",
         "description": "Private document knowledge base, AI search, and assistant",
         "recommendedEngineId": "saas",
@@ -515,7 +560,7 @@
       },
       {
         "id": "custom",
-        "label": "\u2699\ufe0f Custom Web Application (Bespoke Scope)",
+        "label": "⚙️ Custom Web Application (Bespoke Scope)",
         "shortLabel": "Custom Scope",
         "description": "Tailored requirements with flexible component picking",
         "recommendedEngineId": "landing",
@@ -533,26 +578,26 @@
       {
         "id": "copy",
         "label": "Need Technical Copywriting & Section Formatting",
-        "priceINR": 10000,
-        "priceUSD": 120,
-        "description": "Professional tech copywriting, tagline crafting, and bullet formatting."
+        "priceINR": 15000,
+        "priceUSD": 200,
+        "description": "Professional tech copywriting, tagline crafting, and bullet formatting. Includes up to 5 pages of copy with 1 revision round."
       },
       {
         "id": "scratch",
-        "label": "Starting from Scratch (Full Brand Kit & Copy)",
-        "priceINR": 25000,
-        "priceUSD": 300,
-        "description": "Vector logo design, color palette, typography pairing, and copywriting."
+        "label": "Starting from Scratch (Starter Brand Kit & Copy)",
+        "priceINR": 45000,
+        "priceUSD": 600,
+        "description": "Starter Brand Kit: custom logo concepts, color palette, typography pairing, and copywriting. Includes up to 3 logo concepts and 2 revision rounds; final brand files delivered as vectors."
       }
     ],
     "maintenancePlans": [
       {
         "id": "basic",
         "name": "Basic Care Plan",
-        "priceINR": 4000,
-        "priceUSD": 50,
+        "priceINR": 5000,
+        "priceUSD": 70,
         "period": "/ month",
-        "badge": "\ud83d\udca1 Recommended for Landing Pages",
+        "badge": "💡 Recommended for Landing Pages",
         "laymanDescription": "Keeps your server healthy, creates daily automated database backups, installs security patches, and ensures your site stays online 24/7.",
         "techSpecs": "Vercel/Supabase Uptime Monitoring, Daily PostgreSQL Backups, SSL Renewals, Security Dependency Updates",
         "includes": [
@@ -560,39 +605,48 @@
           "Daily automated database backups",
           "Dependency & security patching",
           "Minor bug fixes & uptime monitoring"
-        ]
+        ],
+        "responseTime": "Within 2 business days",
+        "includedHours": "Up to 1 hour of developer time/month",
+        "overageRules": "Overage beyond the included hours requires written approval and is billed separately. Unused hours do not roll over."
       },
       {
         "id": "standard",
         "name": "Standard Care Plan",
-        "priceINR": 8500,
-        "priceUSD": 100,
+        "priceINR": 10000,
+        "priceUSD": 140,
         "period": "/ month",
-        "badge": "\ud83d\udca1 Recommended for Auth/Payments/CMS",
+        "badge": "💡 Recommended for Auth/Payments/CMS",
         "laymanDescription": "Includes everything in Basic plus up to 4 hours of monthly developer support to edit text, swap images, update pages, or tweak designs whenever you need.",
-        "techSpecs": "Everything in Basic + 2-4 Hours Monthly Dev Allocation, Core Web Vitals Performance Tuning, Content Schema Updates",
+        "techSpecs": "Everything in Basic + 3–4 Hours Monthly Dev Allocation, Core Web Vitals Performance Tuning, Content Schema Updates",
         "includes": [
           "Everything in Basic Care",
           "Monthly text & media content updates",
-          "2\u20134 hours of dedicated dev time/month",
+          "3–4 hours of dedicated dev time/month",
           "Performance & page speed tuning"
-        ]
+        ],
+        "responseTime": "Within 1 business day",
+        "includedHours": "3–4 hours of developer time/month",
+        "overageRules": "Overage beyond the included hours requires written approval and is billed separately. Unused hours do not roll over."
       },
       {
         "id": "premium",
         "name": "Premium AI & Dev SLA Care Plan",
-        "priceINR": 25000,
-        "priceUSD": 300,
+        "priceINR": 35000,
+        "priceUSD": 475,
         "period": "/ month",
-        "badge": "\ud83d\udca1 Recommended for AI Chatbot & RAG Engines",
-        "laymanDescription": "For critical business apps and AI engines. Includes a guaranteed 24-hour emergency response time, AI model accuracy tuning, SEO reports, and dedicated dev hours.",
+        "badge": "💡 Recommended for AI Chatbot & RAG Engines",
+        "laymanDescription": "For critical business apps and AI engines. Includes a guaranteed priority response SLA, AI model accuracy tuning, SEO reports, and dedicated dev hours.",
         "techSpecs": "24-Hour Priority SLA, AI Vector Index Tuning & Latency Monitoring, SEO Analytics Reports, Dedicated Feature Engineering",
         "includes": [
           "Priority 24-hour SLA response",
           "AI Vector DB & LLM latency monitoring",
           "Dedicated feature development hours",
           "Analytics & SEO health reports"
-        ]
+        ],
+        "responseTime": "Within 24 hours (response-not-resolution commitment)",
+        "includedHours": "Up to 8 hours of developer time/month",
+        "overageRules": "Overage beyond the included hours requires written approval and is billed separately. Unused hours do not roll over. Third-party service billing is excluded and billed directly to the client."
       },
       {
         "id": "self",
@@ -606,7 +660,10 @@
         "includes": [
           "30 days complimentary post-launch support",
           "Client manages cloud hosting & patches afterwards"
-        ]
+        ],
+        "responseTime": "Within 2 business days (warranty period)",
+        "includedHours": "Complimentary warranty support only",
+        "overageRules": "Post-warranty work is billed separately under a paid care plan."
       }
     ]
   }

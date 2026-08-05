@@ -110,3 +110,19 @@ export const PDF_THEMES: Record<'azure' | 'noir', PDFThemeConfig> = {
 export function getPdfTheme(isNoir: boolean): PDFThemeConfig {
   return isNoir ? PDF_THEMES.noir : PDF_THEMES.azure;
 }
+
+/**
+ * Font-size density multiplier used to keep fixed-page-count commercial PDFs
+ * fitting on the same number of pages in both themes. Noir uses JetBrains Mono
+ * (monospace, visibly wider than Lora/Playfair), so its body copy is scaled
+ * down slightly to match the azure layout's page height. Header/title sizes are
+ * intentionally left untouched so the brand lockup stays prominent.
+ */
+export function pdfFontScale(theme: PDFThemeConfig): number {
+  return theme.isNoir ? 0.88 : 1;
+}
+
+/** Scales a body font size by the theme density multiplier. */
+export function scaleBodyFont(theme: PDFThemeConfig, size: number): number {
+  return Math.round(size * pdfFontScale(theme) * 10) / 10;
+}

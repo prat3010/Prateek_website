@@ -72,6 +72,8 @@ export interface FeatureItem {
   priceUSD: number;
   laymanDescription: string;
   techSpecs: string;
+  /** Feature ids that must be selected whenever this module is selected. */
+  dependsOn?: string[];
 }
 
 export interface GoalArchetype {
@@ -101,6 +103,12 @@ export interface MaintenancePlanOption {
   laymanDescription: string;
   techSpecs: string;
   includes: string[];
+  /** Response-time SLA commitment (e.g. "within 2 business days"). */
+  responseTime?: string;
+  /** Included monthly developer hours allocation. */
+  includedHours?: string;
+  /** Overage, rollover, and third-party billing rules. */
+  overageRules?: string;
 }
 
 export interface IntakeConfig {
@@ -108,7 +116,6 @@ export interface IntakeConfig {
   subtitle: string;
   categories: string[];
   featureOptions: string[];
-  budgetTiers: string[];
   timelineOptions: string[];
   assetOptions: string[];
   termsAndConditions: string[];

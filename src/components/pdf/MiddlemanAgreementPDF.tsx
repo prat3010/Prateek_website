@@ -1,9 +1,16 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import type { ResumeData, MiddlemanAgreementConfig } from '@/data/resume';
-import { getPdfTheme, type PDFThemeConfig } from './pdfTheme';
+import { getPdfTheme, scaleBodyFont, type PDFThemeConfig } from './pdfTheme';
 import { PdfBrandHeader } from './PdfBrandHeader';
 import { PdfFooter } from './PdfFooter';
+import {
+  COMMISSION_BANDS,
+  COMMISSION_DISBURSEMENT_WINDOW,
+  COMMISSION_EXAMPLE,
+  RECURRING_COMMISSION_RATE,
+  type CommissionBand,
+} from '@/lib/commission';
 import middlemanAgreementDefaults from '@/data/middlemanAgreementDefaults.json';
 
 interface MiddlemanAgreementPDFProps {
@@ -21,6 +28,29 @@ function fillTokens(text: string, tokens: Record<string, string>): string {
   return text.replace(/\{\{(\w+)\}\}/g, (match, key: string) => tokens[key] ?? match);
 }
 
+function fmtINR(n: number): string {
+  return `INR ${n.toLocaleString('en-IN')}`;
+}
+
+function fmtUSD(n: number): string {
+  return `$${n.toLocaleString('en-US')}`;
+}
+
+function bandRange(band: CommissionBand): string {
+  if (band.minINR == null) return `Up to ${fmtINR(band.maxINR ?? 0)} / ${fmtUSD(band.maxUSD ?? 0)}`;
+  if (band.maxINR == null) return `${fmtINR(band.minINR)}+ / ${fmtUSD(band.minUSD ?? 0)}+`;
+  return `${fmtINR(band.minINR)}–${fmtINR(band.maxINR)} / ${fmtUSD(band.minUSD ?? 0)}–${fmtUSD(band.maxUSD ?? 0)}`;
+}
+
+function parsePct(value: string): number {
+  return parseInt(value.replace('%', '').trim(), 10) || 0;
+}
+
+function cutFor(bandId: string): string | undefined {
+  const band = COMMISSION_BANDS.find((b) => b.id === bandId);
+  return band ? `${band.rate}%` : undefined;
+}
+
 function createStyles(theme: PDFThemeConfig) {
   return StyleSheet.create({
     page: {
@@ -30,7 +60,7 @@ function createStyles(theme: PDFThemeConfig) {
       paddingRight: 28,
       fontFamily: theme.bodyFont,
       backgroundColor: theme.pageBg,
-      fontSize: 8.5,
+      fontSize: scaleBodyFont(theme, 8.5),
       color: theme.textPrimary,
     },
     docHeader: {
@@ -74,12 +104,12 @@ function createStyles(theme: PDFThemeConfig) {
       letterSpacing: 0.05,
     },
     metaVal: {
-      fontSize: 8,
+      fontSize: scaleBodyFont(theme, 8),
       color: theme.textPrimary,
     },
     sectionTitle: {
       fontFamily: theme.labelBoldFont,
-      fontSize: 8,
+      fontSize: scaleBodyFont(theme, 8),
       color: theme.chipText,
       backgroundColor: theme.chipBg,
       borderColor: theme.chipBorder,
@@ -93,7 +123,7 @@ function createStyles(theme: PDFThemeConfig) {
       letterSpacing: 0.05,
     },
     paragraph: {
-      fontSize: 8,
+      fontSize: scaleBodyFont(theme, 8),
       lineHeight: 1.5,
       color: theme.textSecondary,
       marginBottom: 8,
@@ -104,13 +134,13 @@ function createStyles(theme: PDFThemeConfig) {
     },
     bulletDot: {
       width: 10,
-      fontSize: 8,
+      fontSize: scaleBodyFont(theme, 8),
       lineHeight: 1.5,
       color: theme.accentColor,
     },
     bulletText: {
       flex: 1,
-      fontSize: 8,
+      fontSize: scaleBodyFont(theme, 8),
       lineHeight: 1.5,
       color: theme.textSecondary,
     },
@@ -131,7 +161,7 @@ function createStyles(theme: PDFThemeConfig) {
     },
     tableCellBold: {
       fontFamily: theme.labelBoldFont,
-      fontSize: 6.5,
+      fontSize: scaleBodyFont(theme, 6.5),
       color: theme.textPrimary,
       letterSpacing: 0.04,
     },
@@ -142,7 +172,7 @@ function createStyles(theme: PDFThemeConfig) {
       borderBottomColor: theme.tableRowAlt,
     },
     tableCell: {
-      fontSize: 7.5,
+      fontSize: scaleBodyFont(theme, 7.5),
       color: theme.textSecondary,
     },
     signatureSection: {
@@ -163,13 +193,13 @@ function createStyles(theme: PDFThemeConfig) {
     },
     signatureTitle: {
       fontFamily: theme.labelBoldFont,
-      fontSize: 6.5,
+      fontSize: scaleBodyFont(theme, 6.5),
       color: theme.textSecondary,
       marginBottom: 10,
       letterSpacing: 0.05,
     },
     signatureLine: {
-      fontSize: 7.5,
+      fontSize: scaleBodyFont(theme, 7.5),
       color: theme.textPrimary,
       marginTop: 2,
     },
@@ -185,13 +215,13 @@ function createStyles(theme: PDFThemeConfig) {
     },
     agreedTitle: {
       fontFamily: theme.labelBoldFont,
-      fontSize: 7,
+      fontSize: scaleBodyFont(theme, 7),
       color: theme.accentColor,
       marginBottom: 3,
       letterSpacing: 0.05,
     },
     agreedText: {
-      fontSize: 7.5,
+      fontSize: scaleBodyFont(theme, 7.5),
       lineHeight: 1.5,
       color: theme.textSecondary,
     },
@@ -214,10 +244,10 @@ export function MiddlemanAgreementPDF({ resumeData, isNoir }: MiddlemanAgreement
   const effectiveDate = mm.effectiveDate && mm.effectiveDate.trim() ? mm.effectiveDate : presentDateStr;
   const devName = mm.developerName || scalars.developerName || 'Prateeq Sharma';
   const devEmail = mm.developerEmail || scalars.developerEmail || 'prateeqsharma@gmail.com';
-  const tier1Cut = mm.tier1Commission || scalars.tier1Commission || '10%';
-  const tier2Cut = mm.tier2Commission || scalars.tier2Commission || '12%';
-  const tier3Cut = mm.tier3Commission || scalars.tier3Commission || '15%';
-  const recurringCut = mm.recurringCommission || scalars.recurringCommission || '10%';
+  const tier1Cut = mm.tier1Commission || scalars.tier1Commission || cutFor('A') || '10%';
+  const tier2Cut = mm.tier2Commission || scalars.tier2Commission || cutFor('B') || '12%';
+  const tier3Cut = mm.tier3Commission || scalars.tier3Commission || cutFor('C') || '15%';
+  const recurringCut = mm.recurringCommission || scalars.recurringCommission || `${RECURRING_COMMISSION_RATE}%`;
   const agreedElectronically = mm.agreedElectronically || scalars.agreedElectronically || '';
 
   const tokens: Record<string, string> = {
@@ -254,37 +284,39 @@ export function MiddlemanAgreementPDF({ resumeData, isNoir }: MiddlemanAgreement
         })}
 
         {isCommission && (
-          <View style={styles.table}>
-            <View style={styles.tableHeader}>
-              <Text style={[styles.tableCellBold, { width: '40%', borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingRight: 6 }]}>PROJECT TIER & BUDGET RANGE</Text>
-              <Text style={[styles.tableCellBold, { width: '30%', borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingLeft: 6, paddingRight: 6 }]}>PARTNER COMMISSION</Text>
-              <Text style={[styles.tableCellBold, { width: '30%', paddingLeft: 6 }]}>PAYOUT TIMELINE</Text>
+          <View>
+            <View style={styles.table}>
+              <View style={styles.tableHeader}>
+                <Text style={[styles.tableCellBold, { width: '40%', borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingRight: 6 }]}>PROJECT TIER & BUDGET RANGE</Text>
+                <Text style={[styles.tableCellBold, { width: '30%', borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingLeft: 6, paddingRight: 6 }]}>PARTNER COMMISSION</Text>
+                <Text style={[styles.tableCellBold, { width: '30%', paddingLeft: 6 }]}>PAYOUT TIMELINE</Text>
+              </View>
+              {COMMISSION_BANDS.map((band) => (
+                <View key={band.id} style={[styles.tableRow, band.id === 'C' ? { borderBottomWidth: 0 } : {}]}>
+                  <Text style={[styles.tableCell, { width: '40%', borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingRight: 6 }]}>{`Tier ${band.id}: ${band.label} (${bandRange(band)})`}</Text>
+                  <Text style={[styles.tableCell, { width: '30%', fontFamily: theme.labelBoldFont, borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingLeft: 6, paddingRight: 6 }]}>
+                    {band.id === 'A' ? tier1Cut : band.id === 'B' ? tier2Cut : tier3Cut}
+                  </Text>
+                  <Text style={[styles.tableCell, { width: '30%', paddingLeft: 6 }]}>{`Within ${COMMISSION_DISBURSEMENT_WINDOW} of Client 50% Deposit`}</Text>
+                </View>
+              ))}
+              <View style={[styles.tableRow, { borderBottomWidth: 0 }]}>
+                <Text style={[styles.tableCell, { width: '40%', borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingRight: 6 }]}>Recurring Care Plan (ongoing)</Text>
+                <Text style={[styles.tableCell, { width: '30%', fontFamily: theme.labelBoldFont, borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingLeft: 6, paddingRight: 6 }]}>{recurringCut}</Text>
+                <Text style={[styles.tableCell, { width: '30%', paddingLeft: 6 }]}>Monthly on cleared Net Funds</Text>
+              </View>
             </View>
-            <View style={styles.tableRow}>
-              <Text style={[styles.tableCell, { width: '40%', borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingRight: 6 }]}>Tier 1: Landing Page (INR 25k–45k / $300–$550)</Text>
-              <Text style={[styles.tableCell, { width: '30%', fontFamily: theme.labelBoldFont, borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingLeft: 6, paddingRight: 6 }]}>{tier1Cut}</Text>
-              <Text style={[styles.tableCell, { width: '30%', paddingLeft: 6 }]}>Within 48h of Client 50% Deposit</Text>
-            </View>
-            <View style={styles.tableRow}>
-              <Text style={[styles.tableCell, { width: '40%', borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingRight: 6 }]}>Tier 2: Multi-Page Web App (INR 45k–90k / $550–$1.1k)</Text>
-              <Text style={[styles.tableCell, { width: '30%', fontFamily: theme.labelBoldFont, borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingLeft: 6, paddingRight: 6 }]}>{tier2Cut}</Text>
-              <Text style={[styles.tableCell, { width: '30%', paddingLeft: 6 }]}>Within 48h of Client 50% Deposit</Text>
-            </View>
-            <View style={styles.tableRow}>
-              <Text style={[styles.tableCell, { width: '40%', borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingRight: 6 }]}>Tier 3: SaaS / AI RAG Engine (INR 90k–1.5L+ / $1.1k+)</Text>
-              <Text style={[styles.tableCell, { width: '30%', fontFamily: theme.labelBoldFont, borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingLeft: 6, paddingRight: 6 }]}>{tier3Cut}</Text>
-              <Text style={[styles.tableCell, { width: '30%', paddingLeft: 6 }]}>Within 48h of Client 50% Deposit</Text>
-            </View>
-            <View style={[styles.tableRow, { borderBottomWidth: 0 }]}>
-              <Text style={[styles.tableCell, { width: '40%', borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingRight: 6 }]}>Recurring Care Plan (ongoing)</Text>
-              <Text style={[styles.tableCell, { width: '30%', fontFamily: theme.labelBoldFont, borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingLeft: 6, paddingRight: 6 }]}>{recurringCut}</Text>
-              <Text style={[styles.tableCell, { width: '30%', paddingLeft: 6 }]}>Monthly on cleared Net Funds</Text>
+            <View style={styles.agreedBox}>
+              <Text style={styles.agreedTitle}>WORKED COMMISSION EXAMPLE</Text>
+              <Text style={styles.agreedText}>
+                {`Illustrative only: a SaaS contract signed at ${fmtINR(COMMISSION_EXAMPLE.contractValueINR)} falls in Tier ${COMMISSION_EXAMPLE.tier} (${tier3Cut}). Total commission is ${tier3Cut} × ${fmtINR(COMMISSION_EXAMPLE.contractValueINR)} = ${fmtINR(Math.round(COMMISSION_EXAMPLE.contractValueINR * parsePct(tier3Cut) / 100))}. It is paid 50% (${fmtINR(Math.round(Math.round(COMMISSION_EXAMPLE.contractValueINR * parsePct(tier3Cut) / 100) / 2))}) within ${COMMISSION_DISBURSEMENT_WINDOW} after the client's 50% deposit (${fmtINR(Math.round(COMMISSION_EXAMPLE.contractValueINR / 2))}) clears, and 50% (${fmtINR(Math.round(Math.round(COMMISSION_EXAMPLE.contractValueINR * parsePct(tier3Cut) / 100) / 2))}) after the final balance clears.`}
+              </Text>
             </View>
           </View>
         )}
 
         {isSignature && (
-          <View>
+          <View wrap={false}>
             <View style={styles.signatureGrid}>
               <View style={styles.signatureBox}>
                 <Text style={styles.signatureTitle}>DEVELOPER SIGNATURE</Text>
@@ -295,7 +327,7 @@ export function MiddlemanAgreementPDF({ resumeData, isNoir }: MiddlemanAgreement
               <View style={styles.signatureBox}>
                 <Text style={styles.signatureTitle}>PARTNER / SALES REP SIGNATURE</Text>
                 <Text style={styles.signatureLine}>{`NAME: ${partnerName}`}</Text>
-                <Text style={styles.signatureLine}>{`EMAIL: ${partnerEmail}`}</Text>
+                <Text style={styles.signatureLine}>{`EMAIL: ${partnerEmail || '_______________'}`}</Text>
                 <Text style={styles.signatureLine}>DATE: _______________</Text>
                 <Text style={styles.signatureLine}>SIGN: _______________</Text>
               </View>

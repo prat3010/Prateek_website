@@ -97,11 +97,16 @@ def render_questionnaire_tab():
     # 2. Feature Modules
     with st.container(border=True):
         st.markdown("##### 2. Add-On Feature Modules")
-        intake["features"] = _editor_or_empty(st.data_editor(
-            intake["features"],
+        st.caption("List 'dependsOn' feature IDs separated by commas (empty = no dependencies).")
+        feature_rows = [
+            {**feature, "dependsOn": ", ".join(feature.get("dependsOn", []))}
+            for feature in intake["features"]
+        ]
+        edited_features = st.data_editor(
+            feature_rows,
             key="qe_features",
             num_rows="dynamic",
-            height=260,
+            height=280,
             column_config={
                 "id": TextColumn("ID", required=True),
                 "label": TextColumn("Label", required=True),
@@ -109,8 +114,12 @@ def render_questionnaire_tab():
                 "priceUSD": NumberColumn("Price USD", min_value=0, step=50, format="%d", required=True),
                 "laymanDescription": TextColumn("Plain Description", required=True),
                 "techSpecs": TextColumn("Tech Specs", required=True),
+                "dependsOn": TextColumn("Requires (feature IDs)", required=False),
             },
-        ))
+        )
+        intake["features"] = _editor_or_empty(edited_features)
+        for feature in intake["features"]:
+            feature["dependsOn"] = _split_list_field(feature.get("dependsOn"))
 
     # 3. Goal Archetypes
     with st.container(border=True):
@@ -179,7 +188,7 @@ def render_questionnaire_tab():
             plan_rows,
             key="qe_maintenance_plans",
             num_rows="dynamic",
-            height=280,
+            height=300,
             column_config={
                 "id": TextColumn("ID", required=True),
                 "name": TextColumn("Plan Name", required=True),
@@ -190,12 +199,15 @@ def render_questionnaire_tab():
                 "laymanDescription": TextColumn("Plain Description", required=True),
                 "techSpecs": TextColumn("Tech Specs", required=True),
                 "includes": TextColumn("Includes", required=True),
+                "responseTime": TextColumn("Response SLA", required=False),
+                "includedHours": TextColumn("Included Hours", required=False),
+                "overageRules": TextColumn("Overage Rules", required=False),
             },
         )
         intake["maintenancePlans"] = [
             _keep_fields(
                 row,
-                ("id", "name", "priceINR", "priceUSD", "period", "badge", "laymanDescription", "techSpecs", "includes"),
+                ("id", "name", "priceINR", "priceUSD", "period", "badge", "laymanDescription", "techSpecs", "includes", "responseTime", "includedHours", "overageRules"),
             )
             for row in _editor_or_empty(edited_plans)
         ]

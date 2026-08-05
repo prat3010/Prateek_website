@@ -25,6 +25,18 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { getSkillsHighlight, type Persona } from '@/lib/skills';
+import {
+  formatPricePair,
+  packageTotalForArchetype,
+  resolveDefaultCurrency,
+} from '@/lib/pricing';
+import type {
+  BaseEngineItem,
+  FeatureItem,
+  GoalArchetype,
+  MaintenancePlanOption,
+} from '@/data/resume';
+import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
 import styles from './Resume.module.css';
 
 interface ResumeProps {
@@ -59,6 +71,35 @@ function Resume({ resumeData, certificates }: ResumeProps) {
   if (!resumeData) {
     return null;
   }
+
+  const currency = resolveDefaultCurrency(region);
+  const intake = resumeData.intake;
+  const engines: BaseEngineItem[] = intake?.engines?.length
+    ? intake.engines
+    : (questionnaireDefaults.engines as BaseEngineItem[]);
+  const features: FeatureItem[] = intake?.features?.length
+    ? intake.features
+    : (questionnaireDefaults.features as FeatureItem[]);
+  const goals: GoalArchetype[] = intake?.goals?.length
+    ? intake.goals
+    : (questionnaireDefaults.goals as GoalArchetype[]);
+  const maintenancePlans: MaintenancePlanOption[] = intake?.maintenancePlans?.length
+    ? intake.maintenancePlans
+    : (questionnaireDefaults.maintenancePlans as MaintenancePlanOption[]);
+
+  const enginePrice = (engineId: string): string => {
+    const engine = engines.find((e) => e.id === engineId);
+    return engine ? formatPricePair(engine.priceINR, engine.priceUSD, currency) : '';
+  };
+
+  const ragGoal = goals.find((g) => g.id === 'ai_rag_app');
+  const ragTotalINR = ragGoal ? packageTotalForArchetype(ragGoal, engines, features, 'INR') : 0;
+  const ragTotalUSD = ragGoal ? packageTotalForArchetype(ragGoal, engines, features, 'USD') : 0;
+
+  const carePrice = (planId: string): string => {
+    const plan = maintenancePlans.find((p) => p.id === planId);
+    return plan ? `${formatPricePair(plan.priceINR, plan.priceUSD, currency)}/mo` : '';
+  };
 
   const handleDownloadPDF = () => {
     if (activeAudience === 'business') {
@@ -249,7 +290,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                           <div>
                             <span className={styles.packageBadge}>Tier 1 • Single Page</span>
                             <h4 className={styles.packageTitle}>Landing Page Engine</h4>
-                            <div className={styles.packagePrice}>INR 25k–45k / $300–$550</div>
+                            <div className={styles.packagePrice}>{enginePrice('landing')}</div>
                             <p className={styles.packageDesc}>High-converting showcase with Framer Motion, lead capture form, mobile responsive layout & SEO schema.</p>
                           </div>
                           <Link href="/scoping?engine=landing" className={styles.packageBtn}>
@@ -262,7 +303,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                           <div>
                             <span className={styles.packageBadge}>Tier 2 • Multi-Page</span>
                             <h4 className={styles.packageTitle}>Multi-Page Web App</h4>
-                            <div className={styles.packagePrice}>INR 45k–90k / $550–$1.1k</div>
+                            <div className={styles.packagePrice}>{enginePrice('multipage')}</div>
                             <p className={styles.packageDesc}>Next.js 16 App Router, 3–6 pages, headless CMS integration, analytics telemetry & custom visual effects.</p>
                           </div>
                           <Link href="/scoping?engine=multipage" className={styles.packageBtn}>
@@ -275,7 +316,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                           <div>
                             <span className={styles.packageBadge}>Tier 3 • Full-Stack</span>
                             <h4 className={styles.packageTitle}>SaaS MVP & App Portal</h4>
-                            <div className={styles.packagePrice}>INR 90k–1.5L+ / $1.1k+</div>
+                            <div className={styles.packagePrice}>{enginePrice('saas')}</div>
                             <p className={styles.packageDesc}>Supabase Auth & Database, Stripe/Razorpay payments, role-gated admin portal & REST API integrations.</p>
                           </div>
                           <Link href="/scoping?engine=saas" className={styles.packageBtn}>
@@ -288,7 +329,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                           <div>
                             <span className={styles.packageBadge}>Tier 4 • AI Vector</span>
                             <h4 className={styles.packageTitle}>Enterprise AI RAG Engine</h4>
-                            <div className={styles.packagePrice}>INR 1.5L+ / $1.8k+</div>
+                            <div className={styles.packagePrice}>{ragTotalINR ? formatPricePair(ragTotalINR, ragTotalUSD, currency) : ''}</div>
                             <p className={styles.packageDesc}>Retriever RAG Core, vector search, grounded LLM assistant, clickable citations & team access controls.</p>
                           </div>
                           <Link href="/scoping?goal=ai_rag_app" className={styles.packageBtn}>
@@ -308,17 +349,17 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                       <div className={styles.careGrid}>
                         <div className={styles.careCard}>
                           <h4 className={styles.careTitle}>Basic Care Plan</h4>
-                          <div className={styles.carePrice}>INR 2,500/mo ($30/mo)</div>
+                          <div className={styles.carePrice}>{carePrice('basic')}</div>
                           <p className={styles.careDesc}>Hosting support, daily automated DB backups, security updates & 24/7 uptime monitoring.</p>
                         </div>
                         <div className={styles.careCard}>
                           <h4 className={styles.careTitle}>Standard Care Plan</h4>
-                          <div className={styles.carePrice}>INR 6,500/mo ($80/mo)</div>
+                          <div className={styles.carePrice}>{carePrice('standard')}</div>
                           <p className={styles.careDesc}>Includes Basic Care + 2–4 hours monthly developer allocation for text/image updates & page tuning.</p>
                         </div>
                         <div className={styles.careCard}>
                           <h4 className={styles.careTitle}>Premium AI SLA Plan</h4>
-                          <div className={styles.carePrice}>INR 15,000/mo ($180/mo)</div>
+                          <div className={styles.carePrice}>{carePrice('premium')}</div>
                           <p className={styles.careDesc}>Priority 24h SLA, AI vector index tuning, latency monitoring & dedicated feature engineering hours.</p>
                         </div>
                       </div>

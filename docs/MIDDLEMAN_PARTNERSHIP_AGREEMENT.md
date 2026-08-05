@@ -1,7 +1,7 @@
 # FREELANCE SALES & BUSINESS BROKER AGREEMENT
 *(Independent Sales Representative & Business Partner Terms)*
 
-> **Note:** The live agreement is rendered from `src/data/middlemanAgreementDefaults.json` (editable in the synchronizer's **Edit Resume Manually → 🤝 Partner & Scoping** tab). This file is a legacy static reference and may lag behind the canonical document.
+> **Note:** The live agreement is rendered from `src/data/middlemanAgreementDefaults.json` (editable in the synchronizer's **Edit Resume Manually → 🤝 Partner & Scoping** tab). Commission bands and the payout window are the single source of truth in `src/data/commissionConfig.json` and render into the PDF from `src/lib/commission.ts`. This file is a legacy static reference and may lag behind the canonical document.
 
 **Effective Date:** August 2, 2026  
 **Developer / Lead Architect:** Prateeq Sharma (`prateeq.in` | `prateeqsharma@gmail.com`)  
@@ -31,16 +31,16 @@ This Agreement outlines the commercial terms, commission structure, payment sche
 
 ## 3. COMMISSION & COMPENSATION STRUCTURE
 
-Commission is calculated as a percentage of the net contract value (excluding third-party infrastructure fees such as domain registration or direct client cloud costs):
+Commission is calculated as a percentage of the net contract value (excluding third-party infrastructure fees such as domain registration or direct client cloud costs). The selected band is set by the signed contract value of the project:
 
-| Project Tier & Value Range | Commission Cut (%) | Example Payout |
-| :--- | :--- | :--- |
-| **Tier 1: High-Converting Landing Page** <br> *(₹25,000 – ₹45,000 / $300 – $550)* | **10%** | ₹2,500 – ₹4,500 ($30 – $55) |
-| **Tier 2: Custom Multi-Page Website** <br> *(₹45,000 – ₹90,000 / $550 – $1,100)* | **12%** | ₹5,400 – ₹10,800 ($66 – $132) |
-| **Tier 3/4: Full-Stack Web App / AI RAG** <br> *(₹90,000 – ₹2.5 Lakhs+ / $1,100 – $3,000+)* | **15%** | ₹13,500 – ₹37,500+ ($165 – $450+) |
+| Project Tier & Value Range | Commission Cut (%) |
+| :--- | :--- |
+| **Tier A** <br> *(₹1 – ₹75,000 / $1 – $1,000)* | **10%** |
+| **Tier B** <br> *(₹75,001 – ₹2,49,999 / $1,001 – $3,299)* | **12%** |
+| **Tier C** <br> *(₹2,50,000+ / $3,300+)* | **15%** |
 
 ### **Recurring Monthly Maintenance Commission:**
-- For any client who subscribes to a **Monthly Tech Care Plan** (e.g., ₹10,000/month or $150/month), Partner receives a **10% recurring monthly commission** (e.g., ₹1,000/month) for as long as the client retainer remains active.
+- For any client who subscribes to a **Monthly Care Plan** (e.g., ₹5,000/month or $70/month), Partner receives a **10% recurring monthly commission** for as long as the client retainer remains active.
 
 ---
 
@@ -48,9 +48,9 @@ Commission is calculated as a percentage of the net contract value (excluding th
 
 1. **No Out-of-Pocket Liability:** Developer will never pay commissions out-of-pocket prior to client funds clearing bank accounts.
 2. **Proportional Disbursement Schedule:**
-   - **50% of Total Commission:** Disbursed within 24 hours of Developer receiving the Client's 50% Upfront Deposit.
-   - **50% of Total Commission:** Disbursed within 24 hours of Developer receiving the Client's Final 50% Balance prior to production launch.
-3. **Cancellations & Refunds:** In the event of a client default, scope cancellation, or partial payment, commission will be calculated strictly on funds actually collected and retained by Developer.
+   - **50% of Total Commission:** Disbursed within 48 business hours of Developer receiving the Client's 50% Upfront Deposit.
+   - **50% of Total Commission:** Disbursed after the Client's Final 50% Balance clears.
+3. **Cancellations & Refunds:** In the event of a client default, scope cancellation, or partial payment, commission will be calculated strictly on net funds actually collected and retained by Developer.
 
 ---
 

@@ -131,6 +131,24 @@ function fillTokens(text, tokens) {
   return text.replace(/\{\{(\w+)\}\}/g, (match, key) => tokens[key] ?? match);
 }
 
+function fmtINR(n) {
+  return `INR ${Number(n).toLocaleString('en-IN')}`;
+}
+
+function fmtUSD(n) {
+  return `$${Number(n).toLocaleString('en-US')}`;
+}
+
+function bandRange(band) {
+  if (band.minINR == null) return `Up to ${fmtINR(band.maxINR ?? 0)} / ${fmtUSD(band.maxUSD ?? 0)}`;
+  if (band.maxINR == null) return `${fmtINR(band.minINR)}+ / ${fmtUSD(band.minUSD ?? 0)}+`;
+  return `${fmtINR(band.minINR)}\u2013${fmtINR(band.maxINR)} / ${fmtUSD(band.minUSD ?? 0)}\u2013${fmtUSD(band.maxUSD ?? 0)}`;
+}
+
+function parsePct(value) {
+  return parseInt(String(value).replace('%', '').trim(), 10) || 0;
+}
+
 // ── Brand header + footer (mirrors PdfBrandHeader.tsx / PdfFooter.tsx / PdfGremlinLogo.tsx) ──
 function gremlinLogo(theme, size) {
   return h(Svg, { viewBox: '0 0 100 100', width: size, height: size },
@@ -259,17 +277,27 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath, theme }) 
   const defaults = JSON.parse(fs.readFileSync(defaultsPath, 'utf8'));
   const scalars = defaults.scalars;
 
+  const commissionPath = path.join(scriptDir, '..', 'src', 'data', 'commissionConfig.json');
+  const commissionConfig = JSON.parse(fs.readFileSync(commissionPath, 'utf8'));
+  const commissionBands = commissionConfig.bands;
+  const disbursementWindow = commissionConfig.disbursementWindow;
+  const commissionExample = commissionConfig.example;
+
   const mm = resumeData?.intake?.middlemanAgreement || {};
+  const cutFor = (bandId) => {
+    const band = commissionBands.find((b) => b.id === bandId);
+    return band ? `${band.rate}%` : undefined;
+  };
   const partnerName = mm.partnerName || scalars.partnerName || '[Partner Name]';
-  const partnerEmail = mm.partnerEmail || scalars.partnerEmail || '';
+  const partnerEmail = (mm.partnerEmail || scalars.partnerEmail || '').trim();
   const presentDateStr = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
   const effectiveDate = mm.effectiveDate && mm.effectiveDate.trim() ? mm.effectiveDate : presentDateStr;
   const devName = mm.developerName || scalars.developerName || 'Prateeq Sharma';
   const devEmail = mm.developerEmail || scalars.developerEmail || 'prateeqsharma@gmail.com';
-  const tier1Cut = mm.tier1Commission || scalars.tier1Commission || '10%';
-  const tier2Cut = mm.tier2Commission || scalars.tier2Commission || '12%';
-  const tier3Cut = mm.tier3Commission || scalars.tier3Commission || '15%';
-  const recurringCut = mm.recurringCommission || scalars.recurringCommission || '10%';
+  const tier1Cut = mm.tier1Commission || scalars.tier1Commission || cutFor('A') || '10%';
+  const tier2Cut = mm.tier2Commission || scalars.tier2Commission || cutFor('B') || '12%';
+  const tier3Cut = mm.tier3Commission || scalars.tier3Commission || cutFor('C') || '15%';
+  const recurringCut = mm.recurringCommission || scalars.recurringCommission || `${commissionConfig.recurringRate}%`;
   const agreedElectronically = mm.agreedElectronically || scalars.agreedElectronically || '';
 
   const tokens = {
@@ -479,32 +507,38 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath, theme }) 
     ];
 
     if (isCommission) {
+      const commissionRows = commissionBands.map((band) =>
+        h(View, { key: `band_${band.id}`, style: [styles.tableRow, band.id === 'C' ? { borderBottomWidth: 0 } : {}] },
+          h(Text, { style: [styles.tableCell, { width: '40%', borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingRight: 6 }] }, `Tier ${band.id}: ${band.label} (${bandRange(band)})`),
+          h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: themeConfig.labelBoldFont, borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingLeft: 6, paddingRight: 6 }] },
+            band.id === 'A' ? tier1Cut : band.id === 'B' ? tier2Cut : tier3Cut),
+          h(Text, { style: [styles.tableCell, { width: '30%', paddingLeft: 6 }] }, `Within ${disbursementWindow} of Client 50% Deposit`)
+        )
+      );
+      const exampleTotal = Math.round(commissionExample.contractValueINR * parsePct(tier3Cut) / 100);
+      const exampleSplit = Math.round(exampleTotal / 2);
+      const exampleDeposit = Math.round(commissionExample.contractValueINR / 2);
+
       children.push(
-        h(View, { key: 'commission_table', style: styles.table },
-          h(View, { style: styles.tableHeader },
-            h(Text, { style: [styles.tableCellBold, { width: '40%', borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingRight: 6 }] }, 'PROJECT TIER & BUDGET RANGE'),
-            h(Text, { style: [styles.tableCellBold, { width: '30%', borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingLeft: 6, paddingRight: 6 }] }, 'PARTNER COMMISSION'),
-            h(Text, { style: [styles.tableCellBold, { width: '30%', paddingLeft: 6 }] }, 'PAYOUT TIMELINE')
+        h(View, { key: 'commission_block' },
+          h(View, { style: styles.table },
+            h(View, { style: styles.tableHeader },
+              h(Text, { style: [styles.tableCellBold, { width: '40%', borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingRight: 6 }] }, 'PROJECT TIER & BUDGET RANGE'),
+              h(Text, { style: [styles.tableCellBold, { width: '30%', borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingLeft: 6, paddingRight: 6 }] }, 'PARTNER COMMISSION'),
+              h(Text, { style: [styles.tableCellBold, { width: '30%', paddingLeft: 6 }] }, 'PAYOUT TIMELINE')
+            ),
+            ...commissionRows,
+            h(View, { key: 'recurring', style: [styles.tableRow, { borderBottomWidth: 0 }] },
+              h(Text, { style: [styles.tableCell, { width: '40%', borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingRight: 6 }] }, 'Recurring Care Plan (ongoing)'),
+              h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: themeConfig.labelBoldFont, borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingLeft: 6, paddingRight: 6 }] }, recurringCut),
+              h(Text, { style: [styles.tableCell, { width: '30%', paddingLeft: 6 }] }, 'Monthly on cleared Net Funds')
+            )
           ),
-          h(View, { style: styles.tableRow },
-            h(Text, { style: [styles.tableCell, { width: '40%', borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingRight: 6 }] }, 'Tier 1: Landing Page (INR 25k–45k / $300–$550)'),
-            h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: themeConfig.labelBoldFont, borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingLeft: 6, paddingRight: 6 }] }, tier1Cut),
-            h(Text, { style: [styles.tableCell, { width: '30%', paddingLeft: 6 }] }, 'Within 48h of Client 50% Deposit')
-          ),
-          h(View, { style: styles.tableRow },
-            h(Text, { style: [styles.tableCell, { width: '40%', borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingRight: 6 }] }, 'Tier 2: Multi-Page Web App (INR 45k–1.2L / $550–$1.5k)'),
-            h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: themeConfig.labelBoldFont, borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingLeft: 6, paddingRight: 6 }] }, tier2Cut),
-            h(Text, { style: [styles.tableCell, { width: '30%', paddingLeft: 6 }] }, 'Within 48h of Client 50% Deposit')
-          ),
-          h(View, { style: styles.tableRow },
-            h(Text, { style: [styles.tableCell, { width: '40%', borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingRight: 6 }] }, 'Tier 3: SaaS / AI RAG Engine (INR 1.2L–2.5L+ / $1.5k+)'),
-            h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: themeConfig.labelBoldFont, borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingLeft: 6, paddingRight: 6 }] }, tier3Cut),
-            h(Text, { style: [styles.tableCell, { width: '30%', paddingLeft: 6 }] }, 'Within 48h of Client 50% Deposit')
-          ),
-          h(View, { style: [styles.tableRow, { borderBottomWidth: 0 }] },
-            h(Text, { style: [styles.tableCell, { width: '40%', borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingRight: 6 }] }, 'Recurring Care Plan (ongoing)'),
-            h(Text, { style: [styles.tableCell, { width: '30%', fontFamily: themeConfig.labelBoldFont, borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingLeft: 6, paddingRight: 6 }] }, recurringCut),
-            h(Text, { style: [styles.tableCell, { width: '30%', paddingLeft: 6 }] }, 'Monthly on cleared Net Funds')
+          h(View, { style: styles.agreedBox },
+            h(Text, { style: styles.agreedTitle }, 'WORKED COMMISSION EXAMPLE'),
+            h(Text, { style: styles.agreedText },
+              `Illustrative only: a SaaS contract signed at ${fmtINR(commissionExample.contractValueINR)} falls in Tier ${commissionExample.tier} (${tier3Cut}). Total commission is ${tier3Cut} × ${fmtINR(commissionExample.contractValueINR)} = ${fmtINR(exampleTotal)}. It is paid 50% (${fmtINR(exampleSplit)}) within ${disbursementWindow} after the client's 50% deposit (${fmtINR(exampleDeposit)}) clears, and 50% (${fmtINR(exampleSplit)}) after the final balance clears.`
+            )
           )
         )
       );
@@ -512,7 +546,7 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath, theme }) 
 
     if (isSignature) {
       children.push(
-        h(View, { key: 'signature_block', style: styles.signatureSection },
+        h(View, { key: 'signature_block', style: [styles.signatureSection, { wrap: false }] },
           h(View, { style: styles.signatureGrid },
             h(View, { style: styles.signatureBox },
               h(Text, { style: styles.signatureTitle }, 'DEVELOPER SIGNATURE'),
@@ -523,7 +557,7 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath, theme }) 
             h(View, { style: styles.signatureBox },
               h(Text, { style: styles.signatureTitle }, 'PARTNER / SALES REP SIGNATURE'),
               h(Text, { style: styles.signatureLine }, `NAME: ${partnerName}`),
-              h(Text, { style: styles.signatureLine }, `EMAIL: ${partnerEmail}`),
+              h(Text, { style: styles.signatureLine }, `EMAIL: ${partnerEmail || '_______________'}`),
               h(Text, { style: styles.signatureLine }, 'DATE: _______________'),
               h(Text, { style: styles.signatureLine }, 'SIGN: _______________')
             )

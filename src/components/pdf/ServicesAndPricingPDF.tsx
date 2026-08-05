@@ -9,7 +9,8 @@ import type {
   ResumeData,
 } from '@/data/resume';
 import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
-import { getPdfTheme, type PDFThemeConfig } from './pdfTheme';
+import { ESTIMATE_DISCLAIMER } from '@/lib/pricing';
+import { getPdfTheme, scaleBodyFont, type PDFThemeConfig } from './pdfTheme';
 import { PdfBrandHeader } from './PdfBrandHeader';
 import { PdfFooter } from './PdfFooter';
 
@@ -23,8 +24,7 @@ function cleanPDFText(text?: string | null): string {
 }
 
 function formatPrice(inr: number, usd: number): string {
-  if (inr === 0 && usd === 0) return 'INCLUDED';
-  return `INR ${inr.toLocaleString('en-IN')} / $${usd}`;
+  return `INR ${inr.toLocaleString('en-IN')} / $${usd.toLocaleString('en-US')}`;
 }
 
 function createStyles(theme: PDFThemeConfig) {
@@ -36,7 +36,7 @@ function createStyles(theme: PDFThemeConfig) {
       paddingRight: 28,
       fontFamily: theme.bodyFont,
       backgroundColor: theme.pageBg,
-      fontSize: 8.5,
+      fontSize: scaleBodyFont(theme, 8.5),
       color: theme.textPrimary,
     },
     docHeader: {
@@ -81,10 +81,10 @@ function createStyles(theme: PDFThemeConfig) {
     },
     metaVal: {
       color: theme.textPrimary,
-      fontSize: 8,
+      fontSize: scaleBodyFont(theme, 8),
     },
     sectionHeader: {
-      fontSize: 8,
+      fontSize: scaleBodyFont(theme, 8),
       fontFamily: theme.labelBoldFont,
       color: theme.chipText,
       backgroundColor: theme.chipBg,
@@ -92,14 +92,14 @@ function createStyles(theme: PDFThemeConfig) {
       borderWidth: 1,
       padding: '3 6',
       borderRadius: 3,
-      marginBottom: 8,
-      marginTop: 8,
+      marginBottom: 6,
+      marginTop: 6,
       borderLeftWidth: 3,
       borderLeftColor: theme.accentColor,
       letterSpacing: 0.05,
     },
     paragraph: {
-      fontSize: 8,
+      fontSize: scaleBodyFont(theme, 8),
       lineHeight: 1.5,
       color: theme.textSecondary,
       marginBottom: 8,
@@ -111,7 +111,7 @@ function createStyles(theme: PDFThemeConfig) {
       marginBottom: 12,
     },
     valueBlurbText: {
-      fontSize: 8,
+      fontSize: scaleBodyFont(theme, 8),
       lineHeight: 1.65,
       color: theme.textSecondary,
     },
@@ -132,7 +132,7 @@ function createStyles(theme: PDFThemeConfig) {
     },
     tableHeaderCell: {
       fontFamily: theme.labelBoldFont,
-      fontSize: 6.5,
+      fontSize: scaleBodyFont(theme, 6.5),
       color: theme.textPrimary,
       letterSpacing: 0.05,
     },
@@ -140,7 +140,7 @@ function createStyles(theme: PDFThemeConfig) {
       flexDirection: 'row',
       borderBottomWidth: 1,
       borderBottomColor: theme.tableRowAlt,
-      padding: '7 5',
+      padding: '5 5',
       alignItems: 'flex-start',
     },
     tableRowHighlight: {
@@ -258,34 +258,34 @@ function createStyles(theme: PDFThemeConfig) {
     },
     moduleTitle: {
       fontFamily: theme.labelBoldFont,
-      fontSize: 7,
+      fontSize: scaleBodyFont(theme, 7),
       color: theme.textPrimary,
       letterSpacing: 0.02,
       marginBottom: 2,
     },
     moduleDesc: {
-      fontSize: 7,
+      fontSize: scaleBodyFont(theme, 6.5),
       color: theme.textSecondary,
       lineHeight: 1.5,
     },
     bullet: {
-      fontSize: 6.5,
+      fontSize: scaleBodyFont(theme, 6),
       color: theme.textSecondary,
-      lineHeight: 1.6,
+      lineHeight: 1.55,
     },
     priceVal: {
       fontFamily: theme.labelBoldFont,
-      fontSize: 7.5,
+      fontSize: scaleBodyFont(theme, 7.5),
       color: theme.accentColor,
     },
     pricePeriod: {
-      fontSize: 6.5,
+      fontSize: scaleBodyFont(theme, 6.5),
       color: theme.textSecondary,
       marginTop: 2,
     },
     termItem: {
-      marginBottom: 8,
-      fontSize: 7.5,
+      marginBottom: 6,
+      fontSize: scaleBodyFont(theme, 7.5),
       color: theme.textSecondary,
       lineHeight: 1.5,
     },
@@ -301,15 +301,49 @@ function createStyles(theme: PDFThemeConfig) {
     },
     contactTitle: {
       fontFamily: theme.labelBoldFont,
-      fontSize: 7.5,
+      fontSize: scaleBodyFont(theme, 7.5),
       color: theme.accentColor,
       marginBottom: 3,
       letterSpacing: 0.05,
     },
     contactText: {
-      fontSize: 7.5,
+      fontSize: scaleBodyFont(theme, 7.5),
       color: theme.textSecondary,
       lineHeight: 1.35,
+    },
+    disclaimerBox: {
+      borderColor: theme.cardBorder,
+      borderWidth: 1,
+      borderRadius: 4,
+      backgroundColor: theme.cardBg,
+      borderLeftWidth: 3,
+      borderLeftColor: theme.accentColor,
+      padding: 8,
+      marginBottom: 12,
+    },
+    disclaimerTitle: {
+      fontFamily: theme.labelBoldFont,
+      fontSize: scaleBodyFont(theme, 7.5),
+      color: theme.accentColor,
+      marginBottom: 3,
+      letterSpacing: 0.05,
+    },
+    disclaimerText: {
+      fontSize: scaleBodyFont(theme, 7.5),
+      color: theme.textSecondary,
+      lineHeight: 1.45,
+    },
+    slaLine: {
+      fontSize: scaleBodyFont(theme, 6.5),
+      color: theme.textPrimary,
+      lineHeight: 1.55,
+      marginTop: 3,
+    },
+    slaOverage: {
+      fontSize: scaleBodyFont(theme, 6),
+      color: theme.textSecondary,
+      lineHeight: 1.45,
+      marginTop: 2,
     },
   });
 }
@@ -365,6 +399,14 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
     return engine ? `${engine.tier}: ${engine.title}` : engineId;
   }
 
+  function featureRequires(feature: FeatureItem): string {
+    if (!feature.dependsOn?.length) return '';
+    const labels = feature.dependsOn
+      .map((id) => features.find((f) => f.id === id)?.label)
+      .filter(Boolean);
+    return labels.length ? `Requires: ${labels.join(' + ')}` : '';
+  }
+
   return (
     <Document title="Prateeq_Sharma_Services_And_Pricing_Guide">
 
@@ -408,6 +450,11 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
           <Text style={styles.valueBlurbText}>
             Every service in this rate card is built from scratch — production-grade TypeScript on Next.js 16, deployed to Vercel, backed by a real PostgreSQL database on Supabase. No page builders. No WordPress themes. No drag-and-drop subscriptions you cannot migrate off. What you commission is a software asset your business owns outright, built to the same architectural standard as funded startups — at a fraction of agency rates.
           </Text>
+        </View>
+
+        <View style={styles.disclaimerBox}>
+          <Text style={styles.disclaimerTitle}>PRICING ESTIMATE NOTICE</Text>
+          <Text style={styles.disclaimerText}>{cleanPDFText(ESTIMATE_DISCLAIMER)}</Text>
         </View>
 
         <Text style={styles.sectionHeader}>1. BASE ARCHITECTURE ENGINES & BUILD TIERS</Text>
@@ -459,6 +506,9 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
             >
               <View style={styles.colFeatureLabel}>
                 <Text style={styles.moduleTitle}>{feature.label}</Text>
+                {featureRequires(feature) ? (
+                  <Text style={[styles.moduleDesc, { marginTop: 1 }]}>{featureRequires(feature)}</Text>
+                ) : null}
               </View>
               <View style={styles.colFeatureDesc}>
                 <Text style={styles.moduleDesc}>{feature.laymanDescription}</Text>
@@ -502,7 +552,7 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
         <PdfFooter theme={theme} leftText={FOOTER_TEXT} />
       </Page>
 
-      {/* PAGE 3 — Goal Archetypes + Care Plans */}
+      {/* PAGE 3 — Project Goal Archetypes */}
       <Page size="A4" style={styles.page}>
 
         <Text style={[styles.sectionHeader, { marginTop: 0 }]}>4. PROJECT GOAL ARCHETYPES & RECOMMENDED CONFIGURATIONS</Text>
@@ -572,6 +622,10 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
                 {plan.includes.map((item, i) => (
                   <Text key={i} style={styles.bullet}>• {item}</Text>
                 ))}
+                <Text style={styles.slaLine}>{`SLA: ${plan.responseTime} · ${plan.includedHours}`}</Text>
+                {plan.overageRules ? (
+                  <Text style={styles.slaOverage}>{plan.overageRules}</Text>
+                ) : null}
               </View>
               <View style={styles.colCareTech}>
                 <Text style={styles.moduleDesc}>{plan.techSpecs}</Text>
@@ -582,13 +636,6 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
               </View>
             </View>
           ))}
-        </View>
-
-        <View style={styles.docHeader}>
-          <Text style={styles.docTitle}>STANDARD COMMERCIAL TERMS & CONDITIONS</Text>
-          <Text style={styles.docMeta}>
-            Prateeq Sharma | Engineering & Custom Web Builds | REF: PRTQ-RATES-2026
-          </Text>
         </View>
 
         <Text style={styles.sectionHeader}>6. ENGAGEMENT TERMS & CODEBASE HANDOVER POLICY</Text>

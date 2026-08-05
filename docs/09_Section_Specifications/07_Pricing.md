@@ -5,6 +5,14 @@
 > pricing built into the interactive Project Scoping wizard (`IntakeForm`), and the consulting-rate
 > offers were not ones the owner wanted to fulfil. The scoping questionnaire is now the only pricing path.
 > This document is retained for historical reference only.
+>
+> **2026-08 Update:** Package/care pricing is now a single source of truth in
+> `src/data/intakeQuestionnaireDefaults.json` (engines, add-on feature modules, goal archetypes with
+> compulsory features, brand asset tiers, care plans), consumed by the Project Scoping wizard at
+> `/scoping`, the config-derived package cards in `src/components/Resume/Resume.tsx`, and the
+> commercial PDFs (`ServicesAndPricingPDF`, `ScopingBriefPDF`). Commission bands for the Middleman
+> agreement live separately in `src/data/commissionConfig.json` / `src/lib/commission.ts`. All prices
+> are region-aware (INR vs USD) via the geo-IP `region` cookie.
 
 ## **Original Purpose**
 

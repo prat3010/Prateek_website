@@ -288,10 +288,17 @@ def render_resume_tab():
                 dev_name = st.text_input("Developer Name", value=mm_data.get('developerName', 'Prateeq Sharma'), key="mm_dev_name")
                 dev_email = st.text_input("Developer Email", value=mm_data.get('developerEmail', 'prateeqsharma@gmail.com'), key="mm_dev_email")
             with col_mm2:
-                t1_comm = st.text_input("Tier 1 Commission (%)", value=mm_data.get('tier1Commission', '10%'), key="mm_t1_comm")
-                t2_comm = st.text_input("Tier 2 Commission (%)", value=mm_data.get('tier2Commission', '12%'), key="mm_t2_comm")
-                t3_comm = st.text_input("Tier 3/4 Commission (%)", value=mm_data.get('tier3Commission', '15%'), key="mm_t3_comm")
-                rec_comm = st.text_input("Recurring Care Plan Commission (%)", value=mm_data.get('recurringCommission', '10%'), key="mm_rec_comm")
+                st.markdown("**Commission Band Schedule** *(read-only — single source of truth is `src/data/commissionConfig.json`)*")
+                try:
+                    commission_path = os.path.join(os.path.dirname(__file__), '..', '..', 'src', 'data', 'commissionConfig.json')
+                    with open(commission_path, 'r', encoding='utf-8') as cf:
+                        commission_cfg = json.load(cf)
+                except Exception:
+                    commission_cfg = {}
+                for band in commission_cfg.get('bands', []):
+                    band_range = f"{band.get('minINR') or 'up to'}–{band.get('maxINR') or 'no cap'} INR"
+                    st.caption(f"**Band {band.get('id')}**: {band.get('rate')}% · {band_range}")
+                st.caption(f"Recurring care: {commission_cfg.get('recurringRate')}% · Window: {commission_cfg.get('disbursementWindow')}")
 
             default_disburse = [
                 "Rule 3.1 (No Out-of-Pocket Liability): Developer will never pay commissions out-of-pocket prior to client funds clearing bank accounts.",
@@ -374,10 +381,6 @@ def render_resume_tab():
                 "effectiveDate": eff_date.strip(),
                 "developerName": dev_name.strip(),
                 "developerEmail": dev_email.strip(),
-                "tier1Commission": t1_comm.strip(),
-                "tier2Commission": t2_comm.strip(),
-                "tier3Commission": t3_comm.strip(),
-                "recurringCommission": rec_comm.strip(),
                 "agreedElectronically": agreed_edit.strip(),
                 "disbursementRules": disburse_list,
                 "confidentialityRules": confid_list,

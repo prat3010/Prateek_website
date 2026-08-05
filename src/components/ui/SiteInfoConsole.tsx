@@ -11,7 +11,14 @@ import {
 } from 'lucide-react';
 import styles from './SiteInfoConsole.module.css';
 import type { ResumeData, MiddlemanAgreementConfig } from '@/data/resume';
+import { COMMISSION_BANDS, COMMISSION_DISBURSEMENT_WINDOW, type CommissionBand } from '@/lib/commission';
 import resumeFallback from '@/data/resume.json';
+
+function consoleBandRange(band: CommissionBand): string {
+  if (band.minINR == null) return `up to ₹${band.maxINR?.toLocaleString('en-IN')} / $${band.maxUSD}`;
+  if (band.maxINR == null) return `₹${band.minINR.toLocaleString('en-IN')}+ / $${band.minUSD}+`;
+  return `₹${band.minINR.toLocaleString('en-IN')}-${band.maxINR.toLocaleString('en-IN')} / $${band.minUSD}-${band.maxUSD}`;
+}
 
 // Command responses for Noir Interactive Console
 interface ConsoleLine {
@@ -375,7 +382,7 @@ export default function SiteInfoConsole() {
 
       const disbursement = mm.disbursementRules || [
         "Rule 3.1: No out-of-pocket payouts prior to cleared client funds.",
-        "Rule 3.2: Proportional payout within 48h of cleared client funds (50% on deposit, 50% on final balance).",
+        `Rule 3.2: Proportional payout within ${COMMISSION_DISBURSEMENT_WINDOW} of cleared client funds (50% on deposit, 50% on final balance).`,
         "Rule 3.3: Net fee calculation on retained funds in case of cancellations."
       ];
 
@@ -398,10 +405,11 @@ export default function SiteInfoConsole() {
         { text: '  - Partner introduces qualified leads for web app & AI integration projects.', type: 'output' },
         { text: ' ', type: 'output' },
         { text: '2. COMMISSION TIER SCHEDULE', type: 'success' },
-        { text: `  - Tier 1 Deals (up to ₹50k / $600)  : ${tier1Cut} Commission`, type: 'output' },
-        { text: `  - Tier 2 Deals (₹50k-1.5L / $600-1.8k): ${tier2Cut} Commission`, type: 'output' },
-        { text: `  - Tier 3 Deals (₹1.5L+ / $1.8k+)     : ${tier3Cut} Commission`, type: 'output' },
-        { text: `  - Recurring Care Plans               : ${recurringCut} Monthly Commission (up to 6 months)`, type: 'output' },
+        ...COMMISSION_BANDS.map(band => ({
+          text: `  - ${band.label} Deals (${consoleBandRange(band)}) : ${band.id === 'A' ? tier1Cut : band.id === 'B' ? tier2Cut : tier3Cut} Commission`,
+          type: 'output' as const
+        })),
+        { text: `  - Recurring Care Plans               : ${recurringCut} Monthly Commission on net retainer`, type: 'output' },
         { text: ' ', type: 'output' },
         { text: '3. DISBURSEMENT & QUALIFICATION RULES', type: 'success' },
         ...disbursement.map(r => ({ text: `  - ${r}`, type: 'output' as const })),
