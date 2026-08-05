@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
-import { Heart, BarChart2 } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import Scrambler from '@/components/ui/Scrambler';
 import type { ScramblerProps } from '@/components/ui/Scrambler';
@@ -215,10 +215,6 @@ export default function Footer({ socials, profile, className }: FooterProps) {
             <p className={styles.copyright}>
               © {year} Prateeq Sharma. All rights reserved.
             </p>
-            <Link href="/admin/analytics" className={styles.analyticsLink}>
-              <BarChart2 size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle' }} />
-              Site Analytics
-            </Link>
           </div>
         </div>
       </div>}
@@ -388,10 +384,6 @@ export default function Footer({ socials, profile, className }: FooterProps) {
             <p className={styles.copyright}>
               © {year} Prateeq Sharma. All rights reserved.
             </p>
-            <Link href="/admin/analytics" className={styles.analyticsLink}>
-              <BarChart2 size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle' }} />
-              Site Analytics
-            </Link>
           </div>
         </div>
       </div>}
