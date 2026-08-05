@@ -1227,3 +1227,10 @@ footer {
 }
 
 
+
+/* ── reCAPTCHA v3 Badge ─────────────────────────────────────── */
+/* Google injects a floating "Protected by reCAPTCHA" chip at runtime.
+   The invisible score check still runs; only the visual badge is hidden. */
+.grecaptcha-badge {
+  display: none;
+}
