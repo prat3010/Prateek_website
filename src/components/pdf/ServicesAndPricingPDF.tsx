@@ -527,7 +527,13 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
           ))}
         </View>
 
-        <Text style={styles.sectionHeader}>5. MONTHLY INFRASTRUCTURE & SLA CARE PLANS</Text>
+        <PdfFooter theme={theme} leftText={FOOTER_TEXT} />
+      </Page>
+
+      {/* PAGE 4 — Care Plans + T&C + Quality Guarantee + CTA */}
+      <Page size="A4" style={styles.page}>
+
+        <Text style={[styles.sectionHeader, { marginTop: 0 }]}>5. MONTHLY INFRASTRUCTURE & SLA CARE PLANS</Text>
         <View style={styles.table}>
           <View style={styles.tableHeader}>
             <Text style={[styles.tableHeaderCell, styles.colCare]}>CARE PLAN</Text>
@@ -561,11 +567,6 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
           ))}
         </View>
 
-        <PdfFooter theme={theme} leftText={FOOTER_TEXT} />
-      </Page>
-
-      {/* PAGE 4 — T&C + Quality Guarantee + CTA */}
-      <Page size="A4" style={styles.page}>
         <View style={styles.docHeader}>
           <Text style={styles.docTitle}>STANDARD COMMERCIAL TERMS & CONDITIONS</Text>
           <Text style={styles.docMeta}>
