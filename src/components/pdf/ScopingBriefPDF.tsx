@@ -119,7 +119,7 @@ function createStyles(theme: PDFThemeConfig) {
       backgroundColor: theme.tableRowAlt,
       borderBottomWidth: 1,
       borderBottomColor: theme.cardBorder,
-      padding: '6 5',
+      padding: '6 6',
     },
     tableHeaderCell: {
       fontFamily: theme.labelBoldFont,
@@ -131,7 +131,7 @@ function createStyles(theme: PDFThemeConfig) {
       flexDirection: 'row',
       borderBottomWidth: 1,
       borderBottomColor: theme.tableRowAlt,
-      padding: '7 5',
+      padding: '6 6',
       alignItems: 'center',
     },
     tableRowHighlight: {
@@ -228,8 +228,7 @@ function createStyles(theme: PDFThemeConfig) {
       borderColor: theme.cardBorder,
       borderWidth: 1,
       borderRadius: 4,
-      padding: 7,
-      height: 52,
+      padding: 8,
       backgroundColor: theme.cardBg,
     },
     sigTitle: {

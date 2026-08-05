@@ -129,7 +129,7 @@ function createStyles(theme: PDFThemeConfig) {
       backgroundColor: theme.tableRowAlt,
       borderBottomWidth: 1,
       borderBottomColor: theme.cardBorder,
-      padding: '6 5',
+      padding: '6 6',
     },
     tableHeaderCell: {
       fontFamily: theme.labelBoldFont,
@@ -141,7 +141,7 @@ function createStyles(theme: PDFThemeConfig) {
       flexDirection: 'row',
       borderBottomWidth: 1,
       borderBottomColor: theme.tableRowAlt,
-      padding: '5 5',
+      padding: '6 6',
       alignItems: 'flex-start',
     },
     tableRowHighlight: {
@@ -270,7 +270,7 @@ function createStyles(theme: PDFThemeConfig) {
       lineHeight: 1.5,
     },
     bullet: {
-      fontSize: scaleBodyFont(theme, 6),
+      fontSize: scaleBodyFont(theme, 6.5),
       color: theme.textSecondary,
       lineHeight: 1.55,
     },

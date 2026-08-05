@@ -19,6 +19,8 @@ export function PdfBrandHeader({ theme, title, subtitle }: PdfBrandHeaderProps) 
     banner: {
       height: 52,
       backgroundColor: theme.headerBg,
+      borderColor: theme.cardBorder,
+      borderWidth: 1,
       borderRadius: 4,
       marginBottom: 12,
       paddingHorizontal: 12,
@@ -40,6 +42,7 @@ export function PdfBrandHeader({ theme, title, subtitle }: PdfBrandHeaderProps) 
       width: 30,
       height: 2,
       backgroundColor: theme.accentColor,
+      borderRadius: 1,
       marginTop: 3,
     },
     brandSub: {

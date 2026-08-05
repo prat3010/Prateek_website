@@ -21,7 +21,7 @@ export function PdfFooter({ theme, leftText }: PdfFooterProps) {
       right: 28,
       borderTopWidth: 1,
       borderTopColor: theme.footerRule,
-      paddingTop: 4,
+      paddingTop: 5,
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',

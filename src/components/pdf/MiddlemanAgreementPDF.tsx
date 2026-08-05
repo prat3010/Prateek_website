@@ -155,7 +155,7 @@ function createStyles(theme: PDFThemeConfig) {
     tableHeader: {
       flexDirection: 'row',
       backgroundColor: theme.tableRowAlt,
-      padding: '6 5',
+      padding: '6 6',
       borderBottomWidth: 1,
       borderBottomColor: theme.cardBorder,
     },
@@ -167,9 +167,9 @@ function createStyles(theme: PDFThemeConfig) {
     },
     tableRow: {
       flexDirection: 'row',
-      padding: '7 5',
+      padding: '6 6',
       borderBottomWidth: 1,
-      borderBottomColor: theme.tableRowAlt,
+      borderBottomColor: theme.cardBorder,
     },
     tableCell: {
       fontSize: scaleBodyFont(theme, 7.5),
@@ -188,7 +188,7 @@ function createStyles(theme: PDFThemeConfig) {
       borderColor: theme.cardBorder,
       borderWidth: 1,
       borderRadius: 4,
-      padding: 7,
+      padding: 8,
       backgroundColor: theme.cardBg,
     },
     signatureTitle: {
