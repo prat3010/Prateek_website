@@ -72,7 +72,7 @@ The project uses the following environment variables (stored in `.env.local` loc
 ## Project Shape
 
 - `.agents/` contains workspace custom skills and configuration rules (e.g., `skills/ponytail` and `skills/ponytail-review` for enforcing minimal code solutions).
-- `.github/workflows/` contains CI/CD workflows (e.g. `db_sync.yml` to auto-sync JSON content to Supabase on push).
+- `.github/workflows/` contains CI/CD workflows (e.g. `db_sync.yml` to auto-sync JSON content to Supabase on push; also triggerable manually via the "Run workflow" button / `gh workflow run`).
 - `src/app/` contains routes, layouts, metadata, API routes, sitemap, robots, and the app shell.
   - `/` — home page (all portfolio sections).
   - `/terminal` — interactive diagnostics terminal console.

@@ -12,6 +12,7 @@ on:
       - 'src/**/*.tsx'
       - 'src/**/*.ts'
       - 'public/images/**'
+  workflow_dispatch:
 
 jobs:
   verify:
@@ -40,15 +41,10 @@ jobs:
     name: Seed Supabase Database
     runs-on: ubuntu-latest
     needs: verify
-    if: |
-      contains(join(github.event.commits.*.modified, ' '), 'src/data/projects.json') ||
-      contains(join(github.event.commits.*.modified, ' '), 'src/data/skills.json') ||
-      contains(join(github.event.commits.*.modified, ' '), 'src/data/certificates.json') ||
-      contains(join(github.event.commits.*.modified, ' '), 'src/data/resume.json') ||
-      contains(join(github.event.commits.*.added, ' '), 'src/data/projects.json') ||
-      contains(join(github.event.commits.*.added, ' '), 'src/data/skills.json') ||
-      contains(join(github.event.commits.*.added, ' '), 'src/data/certificates.json') ||
-      contains(join(github.event.commits.*.added, ' '), 'src/data/resume.json')
+    # No extra `if` here: the workflow-level `paths` filter already scopes
+    # triggering to data/code/image changes, and seed_supabase.py is
+    # idempotent (upserts only). A job-level condition based on
+    # github.event.commits silently evaluated false and skipped seeding.
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
