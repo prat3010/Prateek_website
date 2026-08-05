@@ -104,6 +104,17 @@ function createStyles(theme: PDFThemeConfig) {
       color: theme.textSecondary,
       marginBottom: 8,
     },
+    valueBlurb: {
+      borderLeftWidth: 3,
+      borderLeftColor: theme.accentColor,
+      paddingLeft: 8,
+      marginBottom: 12,
+    },
+    valueBlurbText: {
+      fontSize: 8,
+      lineHeight: 1.65,
+      color: theme.textSecondary,
+    },
     table: {
       width: '100%',
       borderColor: theme.cardBorder,
@@ -391,6 +402,12 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
             <Text style={styles.metaLabel}>COMMERCIAL TERMS</Text>
             <Text style={styles.metaVal}>50% Upfront Deposit / 50% Delivery</Text>
           </View>
+        </View>
+
+        <View style={styles.valueBlurb}>
+          <Text style={styles.valueBlurbText}>
+            Every service in this rate card is built from scratch — production-grade TypeScript on Next.js 16, deployed to Vercel, backed by a real PostgreSQL database on Supabase. No page builders. No WordPress themes. No drag-and-drop subscriptions you cannot migrate off. What you commission is a software asset your business owns outright, built to the same architectural standard as funded startups — at a fraction of agency rates.
+          </Text>
         </View>
 
         <Text style={styles.sectionHeader}>1. BASE ARCHITECTURE ENGINES & BUILD TIERS</Text>

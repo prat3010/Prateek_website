@@ -192,6 +192,17 @@ function createStyles(theme: PDFThemeConfig) {
       color: theme.textSecondary,
       lineHeight: 1.5,
     },
+    valueBlurb: {
+      borderLeftWidth: 3,
+      borderLeftColor: theme.accentColor,
+      paddingLeft: 8,
+      marginBottom: 12,
+    },
+    valueBlurbText: {
+      fontSize: 8,
+      lineHeight: 1.65,
+      color: theme.textSecondary,
+    },
     sigContainer: {
       flexDirection: 'row',
       justifyContent: 'space-between',
@@ -289,6 +300,14 @@ export function ScopingBriefPDF({ resumeData, data, isNoir }: ScopingBriefPDFPro
             <Text style={styles.metaLabel}>TARGET LAUNCH SPRINT</Text>
             <Text style={styles.metaVal}>{cleanPDFText(data?.timeline) || 'Standard Turnaround (2–4 Weeks)'}</Text>
           </View>
+        </View>
+
+        <View style={styles.valueBlurb}>
+          <Text style={styles.valueBlurbText}>
+            {'This proposal has been prepared exclusively for '}
+            <Text style={{ fontFamily: theme.labelBoldFont, color: theme.textPrimary }}>{companyName}</Text>
+            {'. Every line item below reflects a handcrafted engineering engagement — not a template, not a page builder, not a tool with a monthly lock-in. You receive full codebase ownership, live production infrastructure, and direct engineering access throughout the build. The same quality of work that powers prateeq.in, built specifically for your business.'}
+          </Text>
         </View>
 
         <Text style={styles.sectionHeader}>1. BUSINESS OBJECTIVES & AUDIENCE PERSONA</Text>
