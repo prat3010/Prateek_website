@@ -443,7 +443,8 @@ interface IntakeFormData {
       };
 
       if (typeof window !== 'undefined') {
-        localStorage.setItem('prateeq_pending_scope', JSON.stringify(scopePayload));
+        try { localStorage.setItem('prateeq_pending_scope', JSON.stringify(scopePayload)); } catch {}
+        document.cookie = `prateeq_pending_scope=${encodeURIComponent(JSON.stringify(scopePayload))}; path=/; max-age=86400; SameSite=Lax;`;
       }
 
       // 2. Dispatch background email notification to Resend

@@ -55,11 +55,26 @@ export default function ClientDashboardPage() {
   const [companyInputs, setCompanyInputs] = useState<Record<string, string>>({});
   const [phoneInputs, setPhoneInputs] = useState<Record<string, string>>({});
 
+  // Storage & Cookie Fallback Reader for Safari ITP protection
+  const getPendingScopeFromStorage = (): string | null => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const fromLocal = localStorage.getItem('prateeq_pending_scope');
+      if (fromLocal) return fromLocal;
+    } catch {}
+    const match = document.cookie.match(new RegExp('(?:^|; )' + encodeURIComponent('prateeq_pending_scope') + '=([^;]*)'));
+    return match ? decodeURIComponent(match[1]) : null;
+  };
+
+  const clearPendingScopeFromStorage = (): void => {
+    if (typeof window === 'undefined') return;
+    try { localStorage.removeItem('prateeq_pending_scope'); } catch {}
+    document.cookie = 'prateeq_pending_scope=; path=/; max-age=0; SameSite=Lax;';
+  };
+
   // Lazy state initialization for local pending scopes
   const [scopes, setScopes] = useState<ClientScope[]>(() => {
-    if (typeof window === 'undefined') return [];
-
-    const pendingScopeRaw = localStorage.getItem('prateeq_pending_scope');
+    const pendingScopeRaw = getPendingScopeFromStorage();
     if (!pendingScopeRaw) return [];
 
     try {
@@ -83,13 +98,38 @@ export default function ClientDashboardPage() {
         created_at: new Date().toISOString(),
       };
 
-      localStorage.removeItem('prateeq_pending_scope');
       return [importedScope];
     } catch (err) {
       console.warn('Failed to parse pending scope:', err);
       return [];
     }
   });
+
+  const saveScopeToDatabase = React.useCallback(
+    (updatedScope: ClientScope, emailOverride?: string) => {
+      const targetEmail = emailOverride || user?.email;
+      if (!targetEmail) return;
+      fetch('/api/client/save-scope', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientEmail: targetEmail,
+          scopeCode: updatedScope.scope_code,
+          companyName: updatedScope.company_name || 'My Custom Project',
+          contactPhone: updatedScope.client_phone || '',
+          baseEngineTitle: updatedScope.base_engine,
+          selectedFeatures: updatedScope.features,
+          brandAssetOption: updatedScope.brand_asset,
+          maintenancePlan: updatedScope.maintenance_plan,
+          totalCostINR: updatedScope.total_cost_inr,
+          totalCostUSD: updatedScope.total_cost_usd,
+          currency: updatedScope.currency,
+          timeline: updatedScope.timeline,
+        }),
+      }).catch((err) => console.warn('Save scope DB warning:', err));
+    },
+    [user?.email]
+  );
 
   // Fetch client's persisted scopes from Supabase multi-device DB
   React.useEffect(() => {
@@ -142,6 +182,13 @@ export default function ClientDashboardPage() {
           // Merge db scopes with any local pending scope not yet in DB
           const existingCodes = new Set(dbScopes.map((s) => s.scope_code));
           const unpersistedLocal = prev.filter((s) => !existingCodes.has(s.scope_code));
+
+          // Auto-persist imported/pending scopes to Supabase DB now that user is logged in
+          unpersistedLocal.forEach((scopeToPersist) => {
+            saveScopeToDatabase(scopeToPersist, user.email);
+          });
+          clearPendingScopeFromStorage();
+
           return [...unpersistedLocal, ...dbScopes];
         });
       })
@@ -150,29 +197,7 @@ export default function ClientDashboardPage() {
     return () => {
       mounted = false;
     };
-  }, [user?.email]);
-
-  const saveScopeToDatabase = (updatedScope: ClientScope) => {
-    if (!user?.email) return;
-    fetch('/api/client/save-scope', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        clientEmail: user.email,
-        scopeCode: updatedScope.scope_code,
-        companyName: updatedScope.company_name || 'My Custom Project',
-        contactPhone: updatedScope.client_phone || '',
-        baseEngineTitle: updatedScope.base_engine,
-        selectedFeatures: updatedScope.features,
-        brandAssetOption: updatedScope.brand_asset,
-        maintenancePlan: updatedScope.maintenance_plan,
-        totalCostINR: updatedScope.total_cost_inr,
-        totalCostUSD: updatedScope.total_cost_usd,
-        currency: updatedScope.currency,
-        timeline: updatedScope.timeline,
-      }),
-    }).catch((err) => console.warn('Save scope DB warning:', err));
-  };
+  }, [user?.email, saveScopeToDatabase]);
 
   const handleSaveProfile = (scopeId: string) => {
     const compName = companyInputs[scopeId]?.trim() || user?.user_metadata?.full_name || 'My Custom Project';
