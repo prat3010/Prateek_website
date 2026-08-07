@@ -55,7 +55,7 @@ export default function ClientDashboardPage() {
   const [companyInputs, setCompanyInputs] = useState<Record<string, string>>({});
   const [phoneInputs, setPhoneInputs] = useState<Record<string, string>>({});
 
-  // Lazy state initialization for scopes without cascading renders in useEffect
+  // Lazy state initialization for local pending scopes
   const [scopes, setScopes] = useState<ClientScope[]>(() => {
     if (typeof window === 'undefined') return [];
 
@@ -91,6 +91,71 @@ export default function ClientDashboardPage() {
     }
   });
 
+  // Fetch client's persisted scopes from Supabase multi-device DB
+  React.useEffect(() => {
+    if (!user?.email) return;
+
+    let mounted = true;
+    fetch(`/api/client/get-scopes?email=${encodeURIComponent(user.email)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!mounted || !data.scopes) return;
+
+        const dbScopes: ClientScope[] = data.scopes.map((item: any) => ({
+          id: item.id || `scope-${item.scope_code}`,
+          scope_code: item.scope_code,
+          company_name: item.company_name,
+          client_phone: item.client_phone,
+          base_engine: item.base_engine,
+          features: Array.isArray(item.features) ? item.features : [],
+          brand_asset: item.brand_asset,
+          maintenance_plan: item.maintenance_plan,
+          total_cost_inr: Number(item.total_cost_inr) || 0,
+          total_cost_usd: Number(item.total_cost_usd) || 0,
+          currency: item.currency || 'INR',
+          timeline: item.timeline || 'Standard Turnaround',
+          status: item.status || 'Draft Proposal',
+          delivery_stage: item.delivery_stage || 'architecture',
+          deposit_paid: Boolean(item.deposit_paid),
+          created_at: item.created_at || new Date().toISOString(),
+        }));
+
+        setScopes((prev) => {
+          // Merge db scopes with any local pending scope not yet in DB
+          const existingCodes = new Set(dbScopes.map((s) => s.scope_code));
+          const unpersistedLocal = prev.filter((s) => !existingCodes.has(s.scope_code));
+          return [...unpersistedLocal, ...dbScopes];
+        });
+      })
+      .catch((err) => console.warn('Failed to fetch client scopes from Supabase:', err));
+
+    return () => {
+      mounted = false;
+    };
+  }, [user?.email]);
+
+  const saveScopeToDatabase = (updatedScope: ClientScope) => {
+    if (!user?.email) return;
+    fetch('/api/client/save-scope', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        clientEmail: user.email,
+        scopeCode: updatedScope.scope_code,
+        companyName: updatedScope.company_name || 'My Custom Project',
+        contactPhone: updatedScope.client_phone || '',
+        baseEngineTitle: updatedScope.base_engine,
+        selectedFeatures: updatedScope.features,
+        brandAssetOption: updatedScope.brand_asset,
+        maintenancePlan: updatedScope.maintenance_plan,
+        totalCostINR: updatedScope.total_cost_inr,
+        totalCostUSD: updatedScope.total_cost_usd,
+        currency: updatedScope.currency,
+        timeline: updatedScope.timeline,
+      }),
+    }).catch((err) => console.warn('Save scope DB warning:', err));
+  };
+
   const handleSaveProfile = (scopeId: string) => {
     const compName = companyInputs[scopeId]?.trim() || user?.user_metadata?.full_name || 'My Custom Project';
     const phone = phoneInputs[scopeId]?.trim() || '';
@@ -99,28 +164,7 @@ export default function ClientDashboardPage() {
       prev.map((s) => {
         if (s.id !== scopeId) return s;
         const updated = { ...s, company_name: compName, client_phone: phone };
-
-        if (user?.email) {
-          fetch('/api/client/save-scope', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              clientEmail: user.email,
-              scopeCode: s.scope_code,
-              companyName: compName,
-              contactPhone: phone,
-              baseEngineTitle: s.base_engine,
-              selectedFeatures: s.features,
-              brandAssetOption: s.brand_asset,
-              maintenancePlan: s.maintenance_plan,
-              totalCostINR: s.total_cost_inr,
-              totalCostUSD: s.total_cost_usd,
-              currency: s.currency,
-              timeline: s.timeline,
-            }),
-          }).catch((err) => console.warn('Save scope profile warning:', err));
-        }
-
+        saveScopeToDatabase(updated);
         return updated;
       })
     );
@@ -135,8 +179,8 @@ export default function ClientDashboardPage() {
         {
           companyName: scope.company_name || user?.user_metadata?.full_name || 'Client Scope',
           contactEmail: user?.email || '',
-          projectGoal: 'Web Architecture',
-          targetAudience: 'Global',
+          projectGoal: `${scope.base_engine} Custom Architecture`,
+          targetAudience: 'Global / Enterprise',
           projectCategory: scope.base_engine,
           features: scope.features,
           assetsStatus: scope.brand_asset,
@@ -159,7 +203,9 @@ export default function ClientDashboardPage() {
     setScopes((prev) =>
       prev.map((s) => {
         if (s.id !== scopeId) return s;
-        return { ...s, features: [...s.features, newFeatureInput.trim()] };
+        const updated = { ...s, features: [...s.features, newFeatureInput.trim()] };
+        saveScopeToDatabase(updated);
+        return updated;
       })
     );
     setNewFeatureInput('');
@@ -169,8 +215,10 @@ export default function ClientDashboardPage() {
     setScopes((prev) =>
       prev.map((s) => {
         if (s.id !== scopeId) return s;
-        const updated = s.features.filter((_, idx) => idx !== featureIndex);
-        return { ...s, features: updated };
+        const updatedFeatures = s.features.filter((_, idx) => idx !== featureIndex);
+        const updated = { ...s, features: updatedFeatures };
+        saveScopeToDatabase(updated);
+        return updated;
       })
     );
   };
@@ -342,31 +390,43 @@ export default function ClientDashboardPage() {
                       </div>
                     )}
 
-                    {/* Milestone Progress Bar */}
-                    <div className={styles.milestoneSection}>
-                      <div className={styles.milestoneHeader}>
-                        <Compass size={16} />
-                        <span>Development Milestone Tracker</span>
-                      </div>
-                      <div className={styles.milestoneSteps}>
-                        <div className={`${styles.milestoneStep} ${styles.stepActive}`}>
-                          <span className={styles.stepDot}>1</span>
-                          <span>Architecture & Specs</span>
+                    {/* Dynamic Milestone Progress Bar */}
+                    {(() => {
+                      const stageLevels: Record<string, number> = {
+                        architecture: 1,
+                        engineering: 2,
+                        staging: 3,
+                        live: 4,
+                      };
+                      const currentLevel = stageLevels[s.delivery_stage || 'architecture'] || (s.deposit_paid ? 2 : 1);
+
+                      return (
+                        <div className={styles.milestoneSection}>
+                          <div className={styles.milestoneHeader}>
+                            <Compass size={16} />
+                            <span>Development Milestone Tracker</span>
+                          </div>
+                          <div className={styles.milestoneSteps}>
+                            <div className={`${styles.milestoneStep} ${currentLevel >= 1 ? styles.stepActive : ''}`}>
+                              <span className={styles.stepDot}>1</span>
+                              <span>Architecture & Specs</span>
+                            </div>
+                            <div className={`${styles.milestoneStep} ${currentLevel >= 2 ? styles.stepActive : ''}`}>
+                              <span className={styles.stepDot}>2</span>
+                              <span>Core Engineering</span>
+                            </div>
+                            <div className={`${styles.milestoneStep} ${currentLevel >= 3 ? styles.stepActive : ''}`}>
+                              <span className={styles.stepDot}>3</span>
+                              <span>Staging & QA</span>
+                            </div>
+                            <div className={`${styles.milestoneStep} ${currentLevel >= 4 ? styles.stepActive : ''}`}>
+                              <span className={styles.stepDot}>4</span>
+                              <span>Production Launch</span>
+                            </div>
+                          </div>
                         </div>
-                        <div className={`${styles.milestoneStep} ${s.deposit_paid ? styles.stepActive : ''}`}>
-                          <span className={styles.stepDot}>2</span>
-                          <span>Core Engineering</span>
-                        </div>
-                        <div className={styles.milestoneStep}>
-                          <span className={styles.stepDot}>3</span>
-                          <span>Staging & QA</span>
-                        </div>
-                        <div className={styles.milestoneStep}>
-                          <span className={styles.stepDot}>4</span>
-                          <span>Production Launch</span>
-                        </div>
-                      </div>
-                    </div>
+                      );
+                    })()}
 
                     <div className={styles.orderDetails}>
                       <p className={styles.engineName}>

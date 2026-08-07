@@ -152,21 +152,73 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     return Array.from(labels);
   }, [initialArchetype, features]);
 
-  const [formData, setFormData] = useState({
-    companyName: '',
-    contactEmail: '',
-    contactPhone: '',
-    projectGoal: initialArchetype.label,
-    targetAudience: '',
-    selectedBaseEngineId: initialArchetype.recommendedEngineId,
-    selectedFeatures: initialSelectedFeatures,
-    selectedBrandAssetId: brandAssets[0]?.id || '',
-    selectedMaintenanceId: '',
-    inspirationLinks: '',
-    timeline: timelineOptions[1] || timelineOptions[0],
-    additionalNotes: '',
-    agreedToTerms: false
+  const [formData, setFormData] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const savedDraft = localStorage.getItem('prateeq_scoping_draft');
+        if (savedDraft) {
+          const parsed = JSON.parse(savedDraft);
+          return {
+            companyName: parsed.companyName || '',
+            contactEmail: parsed.contactEmail || '',
+            contactPhone: parsed.contactPhone || '',
+            projectGoal: parsed.projectGoal || initialArchetype.label,
+            targetAudience: parsed.targetAudience || '',
+            selectedBaseEngineId: parsed.selectedBaseEngineId || initialArchetype.recommendedEngineId,
+            selectedFeatures: parsed.selectedFeatures || initialSelectedFeatures,
+            selectedBrandAssetId: parsed.selectedBrandAssetId || (brandAssets[0]?.id || ''),
+            selectedMaintenanceId: parsed.selectedMaintenanceId || '',
+            inspirationLinks: parsed.inspirationLinks || '',
+            timeline: parsed.timeline || (timelineOptions[1] || timelineOptions[0]),
+            additionalNotes: parsed.additionalNotes || '',
+            agreedToTerms: Boolean(parsed.agreedToTerms),
+          };
+        }
+      } catch {}
+    }
+
+    return {
+      companyName: '',
+      contactEmail: '',
+      contactPhone: '',
+      projectGoal: initialArchetype.label,
+      targetAudience: '',
+      selectedBaseEngineId: initialArchetype.recommendedEngineId,
+      selectedFeatures: initialSelectedFeatures,
+      selectedBrandAssetId: brandAssets[0]?.id || '',
+      selectedMaintenanceId: '',
+      inspirationLinks: '',
+      timeline: timelineOptions[1] || timelineOptions[0],
+      additionalNotes: '',
+      agreedToTerms: false
+    };
   });
+
+  // Pre-fill authenticated user credentials if inputs are currently blank
+  useEffect(() => {
+    if (!user) return;
+    setFormData((prev) => {
+      let updated = false;
+      const next = { ...prev };
+      if (!next.contactEmail && user.email) {
+        next.contactEmail = user.email;
+        updated = true;
+      }
+      if (!next.companyName && user.user_metadata?.full_name) {
+        next.companyName = user.user_metadata.full_name;
+        updated = true;
+      }
+      return updated ? next : prev;
+    });
+  }, [user]);
+
+  // Auto-save scoping questionnaire progress to local storage
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem('prateeq_scoping_draft', JSON.stringify(formData));
+    } catch {}
+  }, [formData]);
 
   const isFormValid = useMemo(() => {
     return formData.agreedToTerms;
@@ -430,10 +482,16 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
         } catch (saveErr) {
           console.warn('Save scope API warning:', saveErr);
         }
+        if (typeof window !== 'undefined') {
+          try { localStorage.removeItem('prateeq_scoping_draft'); } catch {}
+        }
         window.location.href = '/dashboard?imported=true';
         return;
       }
 
+      if (typeof window !== 'undefined') {
+        try { localStorage.removeItem('prateeq_scoping_draft'); } catch {}
+      }
       // 4. If unauthenticated, trigger Google OAuth sign-in with redirect target to /dashboard
       await loginWithGoogle('/dashboard?imported=true');
     } catch (err: unknown) {
