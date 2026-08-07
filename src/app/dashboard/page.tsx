@@ -21,7 +21,6 @@ import {
   Compass,
   FileCheck
 } from 'lucide-react';
-import RazorpayCheckoutButton from '@/components/checkout/RazorpayCheckoutButton';
 import { generateQuestionnairePDF } from '@/utils/pdfGenerator';
 import resumeData from '@/data/resume.json';
 import type { ResumeData } from '@/data/resume';
@@ -456,23 +455,13 @@ export default function ClientDashboardPage() {
                         </div>
                       ) : (
                         <div className={styles.paymentContainer}>
-                          <RazorpayCheckoutButton
-                            amount={depositAmount}
-                            currency={s.currency === 'USD' ? 'USD' : 'INR'}
-                            scopeCode={s.scope_code}
-                            companyName={s.company_name || user.user_metadata?.full_name || 'Client Project'}
-                            baseEngineTitle={s.base_engine}
-                            selectedFeatures={s.features}
-                            totalCost={totalAmount}
-                            userEmail={user.email || ''}
-                            userName={user.user_metadata?.full_name || s.company_name}
-                            buttonText={`Pay 50% Deposit (${s.currency === 'INR' ? `₹${depositAmount.toLocaleString('en-IN')}` : `$${depositAmount}`})`}
-                            onSuccess={() => {
-                              setScopes((prev) =>
-                                prev.map((item) => (item.id === s.id ? { ...item, deposit_paid: true } : item))
-                              );
-                            }}
-                          />
+                          <a
+                            href={`mailto:prateeqsharma@gmail.com?subject=Confirming Scope ${s.scope_code}&body=Hi Prateek, I have finalized my scope ${s.scope_code} for ${s.company_name || 'my project'}. Total: ${s.currency === 'INR' ? `₹${totalAmount.toLocaleString('en-IN')}` : `$${totalAmount}`}. Let us proceed!`}
+                            className="comic-btn comic-btn-blue"
+                            style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
+                          >
+                            <Zap size={15} style={{ marginRight: '0.4rem' }} /> Confirm Scope & Start Build
+                          </a>
                         </div>
                       )}
                     </div>
@@ -505,7 +494,7 @@ export default function ClientDashboardPage() {
                     <tr key={s.id}>
                       <td>{new Date(s.created_at).toLocaleDateString()}</td>
                       <td><code>{s.scope_code}</code></td>
-                      <td><span className={styles.gatewayBadge}>RAZORPAY</span></td>
+                      <td><span className={styles.gatewayBadge}>DIRECT / WIRE</span></td>
                       <td><strong>{s.currency === 'INR' ? `₹${Math.round(s.total_cost_inr * 0.5).toLocaleString('en-IN')}` : `$${Math.round(s.total_cost_usd * 0.5)}`}</strong></td>
                       <td>
                         <span className={s.deposit_paid ? styles.paidBadge : styles.pendingBadge}>
