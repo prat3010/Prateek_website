@@ -43,34 +43,77 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let mounted = true;
 
-    // 1. Check for URL OAuth errors (e.g. redirect_uri_mismatch or disabled provider)
-    if (typeof window !== 'undefined') {
-      const searchParams = new URLSearchParams(window.location.search);
-      const hashParams = new URLSearchParams(window.location.hash.substring(1));
-      const errorDesc = searchParams.get('error_description') || hashParams.get('error_description') || searchParams.get('error') || hashParams.get('error');
-      if (errorDesc) {
-        console.error('Supabase OAuth Redirect Error:', errorDesc);
-        alert(`Google Sign-In Notice: ${decodeURIComponent(errorDesc).replace(/\+/g, ' ')}`);
-      }
-    }
+    const initAuth = async () => {
+      if (typeof window !== 'undefined') {
+        const searchParams = new URLSearchParams(window.location.search);
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
 
-    // 2. Read initial Supabase session
-    supabaseAuth.auth.getSession().then(({ data: { session } }) => {
-      if (!mounted) return;
-      if (session?.user) {
-        setSession(session);
-        setUser(session.user);
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('prateeq_active_user', JSON.stringify(session.user));
+        // 1. Capture OAuth Error Parameters
+        const errorDesc = searchParams.get('error_description') || hashParams.get('error_description') || searchParams.get('error') || hashParams.get('error');
+        if (errorDesc) {
+          console.error('Supabase OAuth Error:', errorDesc);
+          alert(`Google Sign-In Error: ${decodeURIComponent(errorDesc).replace(/\+/g, ' ')}`);
+        }
+
+        // 2. PKCE Code Exchange Fallback
+        const code = searchParams.get('code');
+        if (code) {
+          try {
+            const { data, error } = await supabaseAuth.auth.exchangeCodeForSession(code);
+            if (!error && data.session?.user && mounted) {
+              setSession(data.session);
+              setUser(data.session.user);
+              localStorage.setItem('prateeq_active_user', JSON.stringify(data.session.user));
+              setLoading(false);
+              return;
+            }
+          } catch (codeErr) {
+            console.warn('Code exchange warning:', codeErr);
+          }
+        }
+
+        // 3. Implicit Hash Token Fallback
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+        if (accessToken) {
+          try {
+            const { data, error } = await supabaseAuth.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken || '',
+            });
+            if (!error && data.session?.user && mounted) {
+              setSession(data.session);
+              setUser(data.session.user);
+              localStorage.setItem('prateeq_active_user', JSON.stringify(data.session.user));
+              setLoading(false);
+              return;
+            }
+          } catch (hashErr) {
+            console.warn('Hash setSession warning:', hashErr);
+          }
         }
       }
-      setLoading(false);
-    }).catch((err) => {
-      console.warn('Get session warning:', err);
-      if (mounted) setLoading(false);
-    });
 
-    // 3. Listen for auth state changes (handles PKCE & OAuth Hash redirects)
+      // 4. Read initial Supabase session
+      try {
+        const { data: { session } } = await supabaseAuth.auth.getSession();
+        if (mounted && session?.user) {
+          setSession(session);
+          setUser(session.user);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('prateeq_active_user', JSON.stringify(session.user));
+          }
+        }
+      } catch (err) {
+        console.warn('Get session warning:', err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    initAuth();
+
+    // 5. Listen for Auth State Changes
     const { data: { subscription } } = supabaseAuth.auth.onAuthStateChange((_event, session) => {
       if (!mounted) return;
       if (session?.user) {
@@ -89,10 +132,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     });
 
-    // 4. Safety fallback timeout so loading spinner never hangs
     const safetyTimer = setTimeout(() => {
       if (mounted) setLoading(false);
-    }, 2500);
+    }, 3000);
 
     return () => {
       mounted = false;

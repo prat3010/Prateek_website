@@ -34,7 +34,10 @@ export async function signInWithGoogle(redirectTo?: string) {
     },
   });
 
-  if (error) throw error;
+  if (error) {
+    console.error('Google OAuth Trigger Error:', error);
+    throw error;
+  }
   return data;
 }
 
