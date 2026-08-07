@@ -38,11 +38,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   });
   const [session, setSession] = useState<Session | null>(null);
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Read initial Supabase session asynchronously
+    let mounted = true;
+
+    // 1. Check for URL OAuth errors (e.g. redirect_uri_mismatch or disabled provider)
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const errorDesc = searchParams.get('error_description') || hashParams.get('error_description') || searchParams.get('error') || hashParams.get('error');
+      if (errorDesc) {
+        console.error('Supabase OAuth Redirect Error:', errorDesc);
+        alert(`Google Sign-In Notice: ${decodeURIComponent(errorDesc).replace(/\+/g, ' ')}`);
+      }
+    }
+
+    // 2. Read initial Supabase session
     supabaseAuth.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
       if (session?.user) {
         setSession(session);
         setUser(session.user);
@@ -50,12 +64,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           localStorage.setItem('prateeq_active_user', JSON.stringify(session.user));
         }
       }
+      setLoading(false);
     }).catch((err) => {
       console.warn('Get session warning:', err);
+      if (mounted) setLoading(false);
     });
 
-    // Listen for auth state changes
+    // 3. Listen for auth state changes (handles PKCE & OAuth Hash redirects)
     const { data: { subscription } } = supabaseAuth.auth.onAuthStateChange((_event, session) => {
+      if (!mounted) return;
       if (session?.user) {
         setSession(session);
         setUser(session.user);
@@ -69,15 +86,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           localStorage.removeItem('prateeq_active_user');
         }
       }
+      setLoading(false);
     });
 
+    // 4. Safety fallback timeout so loading spinner never hangs
+    const safetyTimer = setTimeout(() => {
+      if (mounted) setLoading(false);
+    }, 2500);
+
     return () => {
+      mounted = false;
+      clearTimeout(safetyTimer);
       subscription.unsubscribe();
     };
   }, []);
 
   const handleLoginWithGoogle = async (redirectTo?: string) => {
-    await signInWithGoogle(redirectTo);
+    setLoading(true);
+    await signInWithGoogle(redirectTo).catch((err) => {
+      setLoading(false);
+      throw err;
+    });
   };
 
   const handleLogout = async () => {
