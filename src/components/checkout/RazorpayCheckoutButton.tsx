@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Script from 'next/script';
 import { CreditCard, Loader2 } from 'lucide-react';
 
 declare global {
@@ -35,6 +36,7 @@ export default function RazorpayCheckoutButton({
   onSuccess,
 }: RazorpayCheckoutProps) {
   const [loading, setLoading] = useState(false);
+  const [scriptReady, setScriptReady] = useState(false);
 
   const loadRazorpayScript = (): Promise<boolean> => {
     return new Promise((resolve) => {
@@ -42,11 +44,25 @@ export default function RazorpayCheckoutButton({
         resolve(true);
         return;
       }
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      document.body.appendChild(script);
+
+      // Poll window.Razorpay up to 20 times (2 seconds max)
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        if (typeof window !== 'undefined' && window.Razorpay) {
+          clearInterval(interval);
+          resolve(true);
+        } else if (attempts >= 20) {
+          clearInterval(interval);
+          // Fallback to manual script insertion
+          const script = document.createElement('script');
+          script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+          script.async = true;
+          script.onload = () => resolve(true);
+          script.onerror = () => resolve(false);
+          document.body.appendChild(script);
+        }
+      }, 100);
     });
   };
 
@@ -55,7 +71,7 @@ export default function RazorpayCheckoutButton({
     try {
       const isLoaded = await loadRazorpayScript();
       if (!isLoaded) {
-        alert('Razorpay SDK failed to load. Please check your network connection.');
+        alert('Razorpay Gateway SDK is loading or blocked by a browser extension. Please disable any strict adblockers for checkout.');
         setLoading(false);
         return;
       }
@@ -123,6 +139,9 @@ export default function RazorpayCheckoutButton({
       };
 
       const paymentObject = new window.Razorpay(options);
+      paymentObject.on('payment.failed', function (response: { error: { description: string } }) {
+        alert(`Payment failed: ${response.error?.description || 'Transaction declined.'}`);
+      });
       paymentObject.open();
     } catch (err: unknown) {
       console.error('Razorpay Checkout error:', err);
@@ -133,22 +152,29 @@ export default function RazorpayCheckoutButton({
   };
 
   return (
-    <button
-      type="button"
-      className="comic-btn comic-btn-blue"
-      onClick={handleCheckout}
-      disabled={loading}
-    >
-      {loading ? (
-        <>
-          <Loader2 size={16} className="animate-spin" style={{ marginRight: '0.4rem' }} /> Opening Gateway...
-        </>
-      ) : (
-        <>
-          <CreditCard size={16} style={{ marginRight: '0.4rem' }} />
-          {buttonText || `Pay 50% Deposit (${currency === 'INR' ? `₹${amount.toLocaleString('en-IN')}` : `$${amount}`})`}
-        </>
-      )}
-    </button>
+    <>
+      <Script
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        strategy="lazyOnload"
+        onLoad={() => setScriptReady(true)}
+      />
+      <button
+        type="button"
+        className="comic-btn comic-btn-blue"
+        onClick={handleCheckout}
+        disabled={loading}
+      >
+        {loading ? (
+          <>
+            <Loader2 size={16} className="animate-spin" style={{ marginRight: '0.4rem' }} /> Opening Gateway...
+          </>
+        ) : (
+          <>
+            <CreditCard size={16} style={{ marginRight: '0.4rem' }} />
+            {buttonText || `Pay 50% Deposit (${currency === 'INR' ? `₹${amount.toLocaleString('en-IN')}` : `$${amount}`})`}
+          </>
+        )}
+      </button>
+    </>
   );
 }
