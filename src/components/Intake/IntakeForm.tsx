@@ -250,19 +250,19 @@ interface IntakeFormData {
   const priceInCurrency = (inr: number, usd: number) => formatMoney(currency === 'INR' ? inr : usd, currency);
 
   const handleGoalChange = (newGoalLabel: string) => {
-    const archetype = goals.find(g => g.label === newGoalLabel) || goals[0];
+    const archetype = goals.find((g) => g.label === newGoalLabel) || goals[0];
     const newEngineId = archetype.recommendedEngineId;
 
     // Auto-merge compulsory features plus any dependencies they require
     const mergedLabels = new Set([...formData.selectedFeatures, ...archetype.compulsoryFeatureLabels]);
-    const baseIds = features.filter(f => mergedLabels.has(f.label)).map(f => f.id);
+    const baseIds = features.filter((f: FeatureItem) => mergedLabels.has(f.label)).map((f: FeatureItem) => f.id);
     const extraIds = resolveFeatureDependencies(baseIds, features);
-    extraIds.forEach(id => {
+    extraIds.forEach((id: string) => {
       const label = labelOfFeature(id);
       if (label) mergedLabels.add(label);
     });
 
-    setFormData(prev => ({
+    setFormData((prev: IntakeFormData) => ({
       ...prev,
       projectGoal: newGoalLabel,
       selectedBaseEngineId: newEngineId,
@@ -274,14 +274,14 @@ interface IntakeFormData {
     // If feature is compulsory for current goal archetype, prevent toggling off
     if (currentArchetype.compulsoryFeatureLabels.includes(label)) return;
 
-    setFormData(prev => {
+    setFormData((prev: IntakeFormData) => {
       const exists = prev.selectedFeatures.includes(label);
-      const feature = features.find(f => f.label === label);
+      const feature = features.find((f: FeatureItem) => f.label === label);
 
       if (exists) {
         // Block removing a module that another selected module depends on
-        const remaining = prev.selectedFeatures.filter(f => f !== label);
-        const remainingIds = features.filter(f => remaining.includes(f.label)).map(f => f.id);
+        const remaining = prev.selectedFeatures.filter((f: string) => f !== label);
+        const remainingIds = features.filter((f: FeatureItem) => remaining.includes(f.label)).map((f: FeatureItem) => f.id);
         const requiredIds = new Set(resolveFeatureDependencies(remainingIds, features));
         if (feature && requiredIds.has(feature.id)) return prev;
         return { ...prev, selectedFeatures: remaining };
@@ -289,10 +289,10 @@ interface IntakeFormData {
 
       // When enabling, auto-add any transitive dependencies
       const updated = [...prev.selectedFeatures, label];
-      const ids = features.filter(f => updated.includes(f.label)).map(f => f.id);
+      const ids = features.filter((f: FeatureItem) => updated.includes(f.label)).map((f: FeatureItem) => f.id);
       const extraLabels = resolveFeatureDependencies(ids, features)
-        .map(id => labelOfFeature(id))
-        .filter((l): l is string => Boolean(l));
+        .map((id: string) => labelOfFeature(id))
+        .filter((l: string | undefined): l is string => Boolean(l));
       return {
         ...prev,
         selectedFeatures: Array.from(new Set([...updated, ...extraLabels]))
@@ -451,7 +451,7 @@ interface IntakeFormData {
         projectGoal: formData.projectGoal,
         targetAudience: formData.targetAudience,
         baseEngineTitle: selectedEngine.title,
-        selectedFeatures: formData.selectedFeatures.map((id) => labelOfFeature(id) || id),
+        selectedFeatures: formData.selectedFeatures.map((id: string) => labelOfFeature(id) || id),
         brandAssetOption: totalCost.brandOpt.label,
         maintenancePlan: activeMaintenancePlan.name,
         totalCostINR: totalCost.totalINR,
