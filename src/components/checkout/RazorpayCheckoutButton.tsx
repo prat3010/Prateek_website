@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Script from 'next/script';
 import { CreditCard, Loader2 } from 'lucide-react';
 
 declare global {
@@ -36,7 +35,6 @@ export default function RazorpayCheckoutButton({
   onSuccess,
 }: RazorpayCheckoutProps) {
   const [loading, setLoading] = useState(false);
-  const [scriptReady, setScriptReady] = useState(false);
 
   const loadRazorpayScript = (): Promise<boolean> => {
     return new Promise((resolve) => {
@@ -45,24 +43,38 @@ export default function RazorpayCheckoutButton({
         return;
       }
 
-      // Poll window.Razorpay up to 20 times (2 seconds max)
-      let attempts = 0;
-      const interval = setInterval(() => {
-        attempts++;
+      // Check if script element already exists in DOM
+      let script = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]') as HTMLScriptElement | null;
+      if (script) {
         if (typeof window !== 'undefined' && window.Razorpay) {
-          clearInterval(interval);
           resolve(true);
-        } else if (attempts >= 20) {
-          clearInterval(interval);
-          // Fallback to manual script insertion
-          const script = document.createElement('script');
-          script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-          script.async = true;
-          script.onload = () => resolve(true);
-          script.onerror = () => resolve(false);
-          document.body.appendChild(script);
+          return;
         }
-      }, 100);
+        script.addEventListener('load', () => resolve(true), { once: true });
+        script.addEventListener('error', () => resolve(false), { once: true });
+        
+        // Wait up to 5s if already present
+        let count = 0;
+        const interval = setInterval(() => {
+          count++;
+          if (typeof window !== 'undefined' && window.Razorpay) {
+            clearInterval(interval);
+            resolve(true);
+          } else if (count >= 50) {
+            clearInterval(interval);
+            resolve(false);
+          }
+        }, 100);
+        return;
+      }
+
+      // Append script dynamically
+      script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.async = true;
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
     });
   };
 
@@ -71,7 +83,7 @@ export default function RazorpayCheckoutButton({
     try {
       const isLoaded = await loadRazorpayScript();
       if (!isLoaded) {
-        alert('Razorpay Gateway SDK is loading or blocked by a browser extension. Please disable any strict adblockers for checkout.');
+        alert('Could not initialize Razorpay payment gateway. Please refresh the page and try again.');
         setLoading(false);
         return;
       }
@@ -152,29 +164,22 @@ export default function RazorpayCheckoutButton({
   };
 
   return (
-    <>
-      <Script
-        src="https://checkout.razorpay.com/v1/checkout.js"
-        strategy="lazyOnload"
-        onLoad={() => setScriptReady(true)}
-      />
-      <button
-        type="button"
-        className="comic-btn comic-btn-blue"
-        onClick={handleCheckout}
-        disabled={loading}
-      >
-        {loading ? (
-          <>
-            <Loader2 size={16} className="animate-spin" style={{ marginRight: '0.4rem' }} /> Opening Gateway...
-          </>
-        ) : (
-          <>
-            <CreditCard size={16} style={{ marginRight: '0.4rem' }} />
-            {buttonText || `Pay 50% Deposit (${currency === 'INR' ? `₹${amount.toLocaleString('en-IN')}` : `$${amount}`})`}
-          </>
-        )}
-      </button>
-    </>
+    <button
+      type="button"
+      className="comic-btn comic-btn-blue"
+      onClick={handleCheckout}
+      disabled={loading}
+    >
+      {loading ? (
+        <>
+          <Loader2 size={16} className="animate-spin" style={{ marginRight: '0.4rem' }} /> Opening Gateway...
+        </>
+      ) : (
+        <>
+          <CreditCard size={16} style={{ marginRight: '0.4rem' }} />
+          {buttonText || `Pay 50% Deposit (${currency === 'INR' ? `₹${amount.toLocaleString('en-IN')}` : `$${amount}`})`}
+        </>
+      )}
+    </button>
   );
 }
