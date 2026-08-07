@@ -42,14 +42,12 @@ export const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
 });
 
 /**
- * Initiates Google OAuth Sign-In flow with Supabase Auth
+ * Initiates Google OAuth Sign-In flow with Supabase Auth.
+ * Redirects to window.location.origin to match Supabase Auth Site URL settings perfectly.
  */
 export async function signInWithGoogle(redirectTo?: string) {
   const origin = typeof window !== 'undefined' ? window.location.origin : 'https://prateeq.in';
-  let targetRedirect = redirectTo || `${origin}/dashboard`;
-  if (targetRedirect.startsWith('/')) {
-    targetRedirect = `${origin}${targetRedirect}`;
-  }
+  const targetRedirect = redirectTo && !redirectTo.startsWith('/') ? redirectTo : `${origin}${redirectTo || '/dashboard'}`;
 
   const { data, error } = await supabaseAuth.auth.signInWithOAuth({
     provider: 'google',
@@ -57,7 +55,7 @@ export async function signInWithGoogle(redirectTo?: string) {
       redirectTo: targetRedirect,
       queryParams: {
         access_type: 'offline',
-        prompt: 'consent',
+        prompt: 'select_account',
       },
     },
   });
