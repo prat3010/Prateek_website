@@ -67,23 +67,48 @@ def render_clients_tab():
                 st.markdown(f"**Brand Kit:** {order.get('brand_asset', 'Standard')}")
                 st.markdown(f"**Care Plan:** {order.get('maintenance_plan', 'Standard')}")
 
-            st.markdown("#### Live Delivery Stage Control")
-            new_stage = st.selectbox(
-                f"Update Live Milestone for {scope_code}",
-                options=["architecture", "engineering", "staging", "live"],
-                format_func=lambda x: {
-                    "architecture": "Phase 1: Architecture & Specs",
-                    "engineering": "Phase 2: Core Engineering",
-                    "staging": "Phase 3: Staging & QA",
-                    "live": "Phase 4: Production Launch"
-                }[x],
-                index=["architecture", "engineering", "staging", "live"].index(delivery_stage) if delivery_stage in ["architecture", "engineering", "staging", "live"] else 0,
-                key=f"stage_select_{scope_code}"
-            )
+            # Itemized Selected Features
+            features_raw = order.get("features", [])
+            if isinstance(features_raw, str):
+                try:
+                    features_raw = json.loads(features_raw)
+                except Exception:
+                    features_raw = [features_raw]
 
-            if st.button(f"Save Live Delivery Milestone for {scope_code}", key=f"btn_save_{scope_code}"):
+            if features_raw:
+                st.markdown("**Selected Scope Modules & Customized Features:**")
+                st.markdown(" ".join([f"`{f}`" for f in features_raw]))
+
+            st.markdown("---")
+            st.markdown("#### Live Delivery Stage & Payment Control")
+            
+            c_milestone, c_payment = st.columns(2)
+            with c_milestone:
+                new_stage = st.selectbox(
+                    f"Update Live Milestone for {scope_code}",
+                    options=["architecture", "engineering", "staging", "live"],
+                    format_func=lambda x: {
+                        "architecture": "Phase 1: Architecture & Specs",
+                        "engineering": "Phase 2: Core Engineering",
+                        "staging": "Phase 3: Staging & QA",
+                        "live": "Phase 4: Production Launch"
+                    }[x],
+                    index=["architecture", "engineering", "staging", "live"].index(delivery_stage) if delivery_stage in ["architecture", "engineering", "staging", "live"] else 0,
+                    key=f"stage_select_{scope_code}"
+                )
+            
+            with c_payment:
+                new_paid = st.checkbox(
+                    f"50% Scope Deposit Locked & Paid",
+                    value=deposit_paid,
+                    key=f"paid_check_{scope_code}"
+                )
+
+            if st.button(f"Save Client Scope & Delivery Status for {scope_code}", key=f"btn_save_{scope_code}"):
                 if HAS_SYNC:
                     order["delivery_stage"] = new_stage
+                    order["deposit_paid"] = new_paid
+                    order["status"] = "Deposit Paid — In Development" if new_paid else "Draft Proposal"
                     order["updated_at"] = datetime.utcnow().isoformat()
                     upsert_record("client_orders", order, key_col="scope_code")
-                    st.success(f"Updated milestone for {scope_code} to '{new_stage}'! Changes live on prateeq.in/dashboard.")
+                    st.success(f"Updated {scope_code}! Stage set to '{new_stage}', Deposit Paid = {new_paid}. Live on prateeq.in/dashboard.")
