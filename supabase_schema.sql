@@ -177,6 +177,37 @@ DROP POLICY IF EXISTS "Allow service update profile" ON profile;
 CREATE POLICY "Allow public select profile" ON profile FOR SELECT USING (true);
 -- Writes must remain service-role only.
 
+-- 8. Client Orders & Commercial Scopes
+CREATE TABLE IF NOT EXISTS client_orders (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  scope_code TEXT UNIQUE NOT NULL,
+  company_name TEXT NOT NULL,
+  client_email TEXT NOT NULL,
+  client_phone TEXT DEFAULT '',
+  base_engine TEXT DEFAULT 'Full-Stack Web Engine',
+  features JSONB NOT NULL DEFAULT '[]',
+  brand_asset TEXT DEFAULT 'Standard',
+  maintenance_plan TEXT DEFAULT 'Self-Managed (30-Day Warranty)',
+  total_cost_inr NUMERIC DEFAULT 0,
+  total_cost_usd NUMERIC DEFAULT 0,
+  currency TEXT DEFAULT 'INR',
+  timeline TEXT DEFAULT 'Standard Turnaround',
+  status TEXT DEFAULT 'Draft Proposal',
+  delivery_stage TEXT DEFAULT 'architecture',
+  deposit_paid BOOLEAN DEFAULT false,
+  razorpay_payment_id TEXT,
+  razorpay_order_id TEXT,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE client_orders ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow public select client_orders" ON client_orders;
+CREATE POLICY "Allow public select client_orders" ON client_orders FOR SELECT USING (true);
+
+CREATE INDEX IF NOT EXISTS idx_client_orders_email ON client_orders (client_email);
+CREATE INDEX IF NOT EXISTS idx_client_orders_scope ON client_orders (scope_code);
+
 -- ============================================================
 -- 8. High-Performance Analytics Aggregation Stored Procedure
 -- ============================================================

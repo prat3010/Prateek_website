@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { generateQuestionnairePDF, generateQuestionnairePDFBase64 } from '@/utils/pdfGenerator';
 import { useTheme } from '@/context/ThemeContext';
+import { useAuth } from '@/context/AuthContext';
 import {
   calcQuote,
   ESTIMATE_DISCLAIMER,
@@ -116,6 +117,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     "7. Post-Launch Warranty: Includes 30 days of complimentary technical support & bug fixes post-launch."
   ];
 
+  const { user, loginWithGoogle } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -124,6 +126,8 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   const [popoverAnchor, setPopoverAnchor] = useState<{ x: number; y: number } | null>(null);
   const [recaptchaReady, setRecaptchaReady] = useState(!SITE_KEY);
   const [recaptchaUnavailable, setRecaptchaUnavailable] = useState(false);
+
+  const generatedScopeCode = useMemo(() => `SCOPE-${Math.floor(10000 + Math.random() * 90000)}`, []);
 
   // Resolve deep-link preset (engine or goal archetype) to the wizard's initial selections
   const initialArchetype = useMemo(() => {
@@ -165,10 +169,8 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   });
 
   const isFormValid = useMemo(() => {
-    const hasCompany = formData.companyName.trim().length > 0;
-    const hasEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.contactEmail.trim());
-    return hasCompany && hasEmail && formData.agreedToTerms;
-  }, [formData.companyName, formData.contactEmail, formData.agreedToTerms]);
+    return formData.agreedToTerms;
+  }, [formData.agreedToTerms]);
 
   const currentArchetype = useMemo(() => {
     return goals.find(g => g.label === formData.projectGoal) || goals[0];
@@ -364,10 +366,6 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
 
   const handleSubmitOnline = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.companyName.trim() || !formData.contactEmail.trim()) {
-      setErrorMsg('Please enter your Company Name and Email in Step 1.');
-      return;
-    }
     if (!formData.agreedToTerms) {
       setErrorMsg('Please accept the standard commercial terms before submitting.');
       return;
@@ -376,74 +374,71 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     setSubmitting(true);
 
     try {
-      // Obtain reCAPTCHA v3 token (invisible, score-based)
-      let recaptchaToken: string | undefined;
-      if (SITE_KEY && window.grecaptcha) {
-        try {
-          recaptchaToken = await window.grecaptcha.execute(SITE_KEY, { action: 'intake_submit' });
-        } catch (recaptchaErr) {
-          console.warn('reCAPTCHA execution error:', recaptchaErr);
-        }
+      // 1. Package current scoping selections into a persistent draft payload
+      const scopePayload = {
+        scopeCode: generatedScopeCode,
+        companyName: formData.companyName,
+        contactEmail: formData.contactEmail,
+        contactPhone: formData.contactPhone,
+        projectGoal: formData.projectGoal,
+        targetAudience: formData.targetAudience,
+        baseEngineTitle: selectedEngine.title,
+        selectedFeatures: formData.selectedFeatures.map((id) => labelOfFeature(id) || id),
+        brandAssetOption: totalCost.brandOpt.label,
+        maintenancePlan: activeMaintenancePlan.name,
+        totalCostINR: totalCost.totalINR,
+        totalCostUSD: totalCost.totalUSD,
+        currency,
+        timeline: formData.timeline,
+      };
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('prateeq_pending_scope', JSON.stringify(scopePayload));
       }
 
-      // Render the branded proposal PDF for the email attachment (best-effort)
-      let pdfAttachment: { content: string; filename: string } | null = null;
-      try {
-        const { fileName, base64 } = await generateQuestionnairePDFBase64(resumeData, buildQuestionnaireData(), isNoir, currency);
-        pdfAttachment = { content: base64, filename: fileName };
-      } catch (pdfErr) {
-        console.warn('Failed to generate PDF attachment:', pdfErr);
-      }
+      // 2. Dispatch background email notification to Resend
+      const pdfBase64 = await generateQuestionnairePDFBase64(
+        resumeData,
+        buildQuestionnaireData(),
+        isNoir,
+        currency
+      ).then((res) => res.base64).catch(() => undefined);
 
-      const res = await fetch('/api/contact', {
+      fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: formData.companyName,
-          email: formData.contactEmail,
-          recaptchaToken,
-          pdfAttachment,
-          subject: `[SCOPING INTAKE] ${formData.companyName} (${selectedEngine.tier})`,
-          message: `
-Client: ${formData.companyName} (${formData.contactEmail}, Phone: ${formData.contactPhone})
-Goal: ${formData.projectGoal}
-Audience: ${formData.targetAudience}
+          name: formData.companyName || user?.user_metadata?.full_name || 'Client',
+          email: user?.email || formData.contactEmail || 'client@example.com',
+          message: `[Interactive Scoping Brief Created — ${generatedScopeCode}]`,
+          attachmentBase64: pdfBase64,
+          attachmentFileName: `${generatedScopeCode}-Scoping-Brief.pdf`,
+        }),
+      }).catch((err) => console.warn('Background contact notify warning:', err));
 
-Base Engine: ${selectedEngine.title} (${priceInCurrency(selectedEngine.priceINR, selectedEngine.priceUSD)})
-Checked Add-ons: ${formData.selectedFeatures.join(', ')} (${priceInCurrency(totalCost.featuresINR, totalCost.featuresUSD)})
-Brand Readiness: ${totalCost.brandOpt.label} (${priceInCurrency(totalCost.brandOpt.priceINR, totalCost.brandOpt.priceUSD)})
-Maintenance Plan: ${activeMaintenancePlan.name} (${priceInCurrency(activeMaintenancePlan.priceINR, activeMaintenancePlan.priceUSD)}/month)
-
-Total Build Investment: ${formatPricePair(totalCost.totalINR, totalCost.totalUSD, currency)}
-Timeline: ${formData.timeline}
-Notes: ${formData.additionalNotes}
-          `.trim(),
-          intakeDetails: {
-            contactPhone: formData.contactPhone,
-            projectGoal: formData.projectGoal,
-            targetAudience: formData.targetAudience,
-            baseEngineId: selectedEngine.id,
-            baseEngineTitle: selectedEngine.title,
-            selectedFeatures: formData.selectedFeatures,
-            brandAssetOption: totalCost.brandOpt.label,
-            maintenancePlan: activeMaintenancePlan.name,
-            totalCostINR: totalCost.totalINR,
-            totalCostUSD: totalCost.totalUSD,
-            timeline: formData.timeline,
-            inspirationLinks: formData.inspirationLinks,
-            additionalNotes: formData.additionalNotes
-          }
-        })
-      });
-
-      if (!res.ok) {
-        const body = await res.json().catch(() => null);
-        throw new Error(body?.error || 'Failed to submit intake scoping brief.');
+      // 3. If user is authenticated, save scope & navigate to dashboard
+      if (user?.email) {
+        try {
+          await fetch('/api/client/save-scope', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              clientEmail: user.email,
+              ...scopePayload,
+            }),
+          });
+        } catch (saveErr) {
+          console.warn('Save scope API warning:', saveErr);
+        }
+        window.location.href = '/dashboard?imported=true';
+        return;
       }
 
-      setSubmitted(true);
+      // 4. If unauthenticated, trigger Google OAuth sign-in with redirect target to /dashboard
+      await loginWithGoogle('/dashboard?imported=true');
     } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : 'Submission failed. Please try again.');
+      console.error('Intake form submission error:', err);
+      window.location.href = '/dashboard?imported=true';
     } finally {
       setSubmitting(false);
     }
@@ -529,52 +524,15 @@ Notes: ${formData.additionalNotes}
             </div>
           ) : (
             <form onSubmit={handleSubmitOnline}>
-              {/* STEP 1: CLIENT & BUSINESS IDENTITY */}
+              {/* STEP 1: PROJECT GOAL & TARGET AUDIENCE */}
               {currentStep === 1 && (
                 <div className={styles.formStep}>
                   <div className={styles.groupTitle}>
                     <Building2 size={18} />
-                    <span>STEP 1: CLIENT & BUSINESS IDENTITY</span>
+                    <span>STEP 1: PROJECT GOAL & TARGET AUDIENCE</span>
                   </div>
 
                   <div className={styles.fieldGrid}>
-                    <div className={styles.field}>
-                      <label className={styles.label}>Company / Client Name *</label>
-                      <input
-                        type="text"
-                        required
-                        className={styles.input}
-                        placeholder="e.g., Acme Solutions / John Doe"
-                        value={formData.companyName}
-                        onChange={e => setFormData({ ...formData, companyName: e.target.value })}
-                      />
-                    </div>
-
-                    <div className={styles.field}>
-                      <label className={styles.label}>Contact Email *</label>
-                      <input
-                        type="email"
-                        required
-                        className={styles.input}
-                        placeholder="john@example.com"
-                        value={formData.contactEmail}
-                        onChange={e => setFormData({ ...formData, contactEmail: e.target.value })}
-                      />
-                    </div>
-                  </div>
-
-                  <div className={styles.fieldGrid}>
-                    <div className={styles.field}>
-                      <label className={styles.label}>Phone / WhatsApp (Optional)</label>
-                      <input
-                        type="tel"
-                        className={styles.input}
-                        placeholder="+1 (555) 019-2834"
-                        value={formData.contactPhone}
-                        onChange={e => setFormData({ ...formData, contactPhone: e.target.value })}
-                      />
-                    </div>
-
                     <div className={styles.field}>
                       <label className={styles.label}>Primary Business Goal *</label>
                       <select
@@ -589,14 +547,25 @@ Notes: ${formData.additionalNotes}
                         ))}
                       </select>
                     </div>
+
+                    <div className={styles.field}>
+                      <label className={styles.label}>Project / Company Name (Optional)</label>
+                      <input
+                        type="text"
+                        className={styles.input}
+                        placeholder="e.g., Acme SaaS Engine / Stealth Startup"
+                        value={formData.companyName}
+                        onChange={e => setFormData({ ...formData, companyName: e.target.value })}
+                      />
+                    </div>
                   </div>
 
                   <div className={styles.field}>
-                    <label className={styles.label}>Target Audience Persona</label>
+                    <label className={styles.label}>Target Audience Persona & Industry</label>
                     <input
                       type="text"
                       className={styles.input}
-                      placeholder="e.g., Tech Founders, SMB Owners, B2B Clients"
+                      placeholder="e.g., B2B Tech Founders, Healthcare SMBs, E-Commerce Buyers"
                       value={formData.targetAudience}
                       onChange={e => setFormData({ ...formData, targetAudience: e.target.value })}
                     />
@@ -1043,11 +1012,11 @@ Notes: ${formData.additionalNotes}
                   ) : (
                     <button
                       type="submit"
-                      disabled={submitting || !formData.agreedToTerms || !recaptchaReady}
-                      className={`${styles.btn} ${styles.btnPrimary} ${(!formData.agreedToTerms || !recaptchaReady) ? styles.btnDisabled : ''}`}
-                      title={!formData.agreedToTerms ? 'Accept commercial terms to submit' : 'Submit scoping brief'}
+                      disabled={submitting || !formData.agreedToTerms}
+                      className={`${styles.btn} ${styles.btnPrimary} ${!formData.agreedToTerms ? styles.btnDisabled : ''}`}
+                      title={!formData.agreedToTerms ? 'Accept commercial terms to submit' : 'Save scope & continue in client dashboard'}
                     >
-                      {submitting ? 'SUBMITTING...' : 'SUBMIT SCOPING BRIEF'}
+                      {submitting ? 'SAVING SCOPE...' : '🚀 SAVE SCOPE & CONTINUE IN DASHBOARD'}
                       <Send size={16} />
                     </button>
                   )}

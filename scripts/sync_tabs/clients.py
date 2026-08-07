@@ -1,197 +1,89 @@
-"""
-Clients & Scoping Leads Tab Handler for Streamlit Synchronizer.
-Provides lead triage, pipeline metrics, status updating, internal notes, and email response generation.
-"""
-
-import urllib.parse
 import streamlit as st
-from sync_supabase import fetch_intake_leads, update_intake_lead, delete_intake_lead
-
-
-STATUS_OPTIONS = [
-    ("new", "🆕 New Lead"),
-    ("contacted", "💬 Contacted"),
-    ("proposal_sent", "📄 Proposal Sent"),
-    ("won", "🏆 Won / Signed"),
-    ("in_progress", "🚀 In Progress"),
-    ("completed", "✅ Completed"),
-    ("lost", "❌ Lost / Archived"),
-]
-
-STATUS_MAP = dict(STATUS_OPTIONS)
-
+import json
+from datetime import datetime
+from sync_tabs.shared import (
+    HAS_SYNC,
+    fetch_records,
+    upsert_record,
+)
 
 def render_clients_tab():
-    st.header("👥 Clients & Scoping Leads")
-    st.caption("Track incoming scoping questionnaire briefs, manage sales pipeline status, and log internal CRM notes.")
+    st.header("🏢 Client Orders & Delivery Command Center")
+    st.markdown("Manage incoming scope submissions, track 50% deposit payments, and update live client delivery milestones.")
 
-    leads = fetch_intake_leads()
+    # 1. Commercial Overview Metrics Cards
+    orders = []
+    if HAS_SYNC:
+        try:
+            orders = fetch_records("client_orders") or []
+        except Exception as e:
+            st.warning(f"Could not fetch orders from Supabase: {e}")
 
-    if leads is None:
-        st.warning("⚠️ Could not connect to Supabase or `intake_leads` table is empty/missing. Run database schema migrations if needed.")
-        leads = []
+    total_orders = len(orders)
+    paid_orders = [o for o in orders if o.get("deposit_paid")]
+    total_paid_inr = sum(float(o.get("total_cost_inr", 0)) * 0.5 for o in paid_orders)
+    total_paid_usd = sum(float(o.get("total_cost_usd", 0)) * 0.5 for o in paid_orders)
 
-    # 1. Pipeline Metrics Summary Bar
-    total_leads = len(leads)
-    new_leads = sum(1 for l in leads if l.get("status") == "new")
-    won_leads = sum(1 for l in leads if l.get("status") in ["won", "in_progress", "completed"])
-    total_value_inr = sum(float(l.get("total_cost_inr", 0) or 0) for l in leads)
-    total_value_usd = sum(float(l.get("total_cost_usd", 0) or 0) for l in leads)
-
-    m1, m2, m3, m4 = st.columns(4)
-    m1.metric("Total Briefs", f"{total_leads}")
-    m2.metric("New Uncontacted", f"{new_leads}", delta=f"{new_leads} Action Required" if new_leads > 0 else "All Caught Up")
-    m3.metric("Won / Active", f"{won_leads}")
-    m4.metric("Pipeline Value", f"₹{int(total_value_inr):,} / ${int(total_value_usd):,}")
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("Total Scopes Received", total_orders)
+    with col2:
+        st.metric("Paid Scope Deposits", len(paid_orders))
+    with col3:
+        st.metric("Total Paid (INR)", f"₹{total_paid_inr:,.0f}")
+    with col4:
+        st.metric("Total Paid (USD)", f"${total_paid_usd:,.0f}")
 
     st.markdown("---")
 
-    if not leads:
-        st.info("No client scoping briefs submitted yet. Once a client fills out the questionnaire on your site, their full brief will appear here.")
+    # 2. Orders Data Table & Milestone Manager
+    if not orders:
+        st.info("No client orders recorded in Supabase yet. Incoming submissions from /scoping will appear here automatically.")
         return
 
-    # 2. Filters & Search Controls
-    col_filter, col_search = st.columns([1, 2])
-    with col_filter:
-        selected_status_filter = st.selectbox(
-            "Filter by Status",
-            options=["all"] + [opt[0] for opt in STATUS_OPTIONS],
-            format_func=lambda x: "🌐 All Statuses" if x == "all" else STATUS_MAP.get(x, x),
-        )
+    st.subheader("Client Orders & Live Delivery Manager")
 
-    with col_search:
-        search_query = st.text_input("🔍 Search Leads", placeholder="Search by company name, email, or goal...")
+    for order in orders:
+        scope_code = order.get("scope_code", "UNKNOWN")
+        company = order.get("company_name", "Untitled Client")
+        email = order.get("client_email", "")
+        deposit_paid = order.get("deposit_paid", False)
+        status = order.get("status", "Draft Proposal")
+        delivery_stage = order.get("delivery_stage", "architecture")
+        razorpay_id = order.get("razorpay_payment_id", "N/A")
 
-    # Filter Leads
-    filtered_leads = leads
-    if selected_status_filter != "all":
-        filtered_leads = [l for l in filtered_leads if l.get("status") == selected_status_filter]
+        with st.expander(f"📦 {scope_code} — {company} ({'✅ 50% DEPOSIT PAID' if deposit_paid else '⏳ DRAFT PROPOSAL'})", expanded=True):
+            c1, c2 = st.columns(2)
+            with c1:
+                st.markdown(f"**Client Email:** `{email}`")
+                st.markdown(f"**Contact Phone:** {order.get('client_phone', 'N/A')}")
+                st.markdown(f"**Base Engine:** {order.get('base_engine', 'Web Engine')}")
+                st.markdown(f"**Timeline:** {order.get('timeline', 'Standard')}")
+                st.markdown(f"**Total Build Investment:** {order.get('currency', 'INR')} {order.get('total_cost_inr' if order.get('currency') == 'INR' else 'total_cost_usd', 0):,}")
+            
+            with c2:
+                st.markdown(f"**Deposit Status:** {'✅ PAID' if deposit_paid else '⏳ PENDING'}")
+                st.markdown(f"**Razorpay Payment ID:** `{razorpay_id}`")
+                st.markdown(f"**Brand Kit:** {order.get('brand_asset', 'Standard')}")
+                st.markdown(f"**Care Plan:** {order.get('maintenance_plan', 'Standard')}")
 
-    if search_query.strip():
-        q = search_query.lower().strip()
-        filtered_leads = [
-            l for l in filtered_leads
-            if q in l.get("company_name", "").lower()
-            or q in l.get("contact_email", "").lower()
-            or q in l.get("project_goal", "").lower()
-        ]
+            st.markdown("#### Live Delivery Stage Control")
+            new_stage = st.selectbox(
+                f"Update Live Milestone for {scope_code}",
+                options=["architecture", "engineering", "staging", "live"],
+                format_func=lambda x: {
+                    "architecture": "Phase 1: Architecture & Specs",
+                    "engineering": "Phase 2: Core Engineering",
+                    "staging": "Phase 3: Staging & QA",
+                    "live": "Phase 4: Production Launch"
+                }[x],
+                index=["architecture", "engineering", "staging", "live"].index(delivery_stage) if delivery_stage in ["architecture", "engineering", "staging", "live"] else 0,
+                key=f"stage_select_{scope_code}"
+            )
 
-    st.write(f"Showing **{len(filtered_leads)}** of {total_leads} leads:")
-
-    # 3. Lead List & Deep Inspector Cards
-    for lead in filtered_leads:
-        lead_id = lead.get("id")
-        company_name = lead.get("company_name", "Unknown Company")
-        contact_email = lead.get("contact_email", "")
-        contact_phone = lead.get("contact_phone", "")
-        status = lead.get("status", "new")
-        cost_inr = int(lead.get("total_cost_inr", 0) or 0)
-        cost_usd = int(lead.get("total_cost_usd", 0) or 0)
-        created_at = lead.get("created_at", "")[:10]
-        status_label = STATUS_MAP.get(status, status)
-
-        expander_title = f"{status_label} | {company_name} ({contact_email}) — ₹{cost_inr:,} / ${cost_usd:,} [{created_at}]"
-
-        with st.expander(expander_title, expanded=(status == "new")):
-            c_left, c_right = st.columns(2)
-
-            with c_left:
-                st.subheader("👤 Client Info")
-                st.write(f"**Company / Client:** {company_name}")
-                st.write(f"**Email:** [{contact_email}](mailto:{contact_email})")
-                if contact_phone:
-                    clean_phone = "".join(filter(str.isdigit, contact_phone))
-                    wa_url = f"https://wa.me/{clean_phone}"
-                    st.write(f"**Phone / WhatsApp:** {contact_phone} ([📱 Open WhatsApp]({wa_url}))")
-                else:
-                    st.write("**Phone:** *Not provided*")
-
-                st.write(f"**Primary Goal:** {lead.get('project_goal', 'N/A')}")
-                st.write(f"**Target Audience:** {lead.get('target_audience', 'N/A')}")
-                st.write(f"**Target Timeline:** {lead.get('timeline', 'N/A')}")
-
-            with c_right:
-                st.subheader("🛠️ Technical Scope & Quote")
-                st.write(f"**Base Engine:** {lead.get('base_engine_title', 'Landing Core')}")
-                
-                features = lead.get("selected_features", [])
-                if isinstance(features, list) and features:
-                    st.write("**Add-on Modules:**")
-                    for feat in features:
-                        st.markdown(f"- `{feat}`")
-                else:
-                    st.write("**Add-on Modules:** None (Base Engine Only)")
-
-                st.write(f"**Brand Option:** {lead.get('brand_asset_option', 'N/A')}")
-                st.write(f"**Maintenance Care Plan:** {lead.get('maintenance_plan', 'N/A')}")
-                st.write(f"**Total Build Investment:** **₹{cost_inr:,} / ${cost_usd:,}**")
-
-            if lead.get("inspiration_links"):
-                st.info(f"🔗 **Inspiration Links:** {lead.get('inspiration_links')}")
-
-            if lead.get("additional_notes"):
-                st.info(f"📝 **Client Notes:** {lead.get('additional_notes')}")
-
-            st.markdown("---")
-
-            # CRM Status & Internal Notes Controls
-            st.subheader("✏️ CRM Pipeline Manager")
-            crm_col1, crm_col2 = st.columns([1, 2])
-
-            with crm_col1:
-                new_status = st.selectbox(
-                    "Update Lead Status",
-                    options=[opt[0] for opt in STATUS_OPTIONS],
-                    format_func=lambda x: STATUS_MAP.get(x, x),
-                    index=[opt[0] for opt in STATUS_OPTIONS].index(status) if status in [opt[0] for opt in STATUS_OPTIONS] else 0,
-                    key=f"status_select_{lead_id}"
-                )
-
-            with crm_col2:
-                internal_notes = st.text_area(
-                    "Internal CRM Notes",
-                    value=lead.get("notes_internal", ""),
-                    placeholder="Log call notes, agreed payment terms, deposit received date...",
-                    key=f"notes_area_{lead_id}",
-                    height=90
-                )
-
-            if st.button("💾 Save Lead Updates", key=f"save_lead_{lead_id}"):
-                res = update_intake_lead(lead_id, {"status": new_status, "notes_internal": internal_notes})
-                if res:
-                    st.success("✅ Lead status and CRM notes updated successfully!")
-                    st.rerun()
-                else:
-                    st.error("Failed to update lead in Supabase.")
-
-            # Quick Utilities: Email Response Generator & Delete
-            st.markdown("---")
-            util1, util2 = st.columns(2)
-
-            with util1:
-                with st.expander("📧 Generate Email Response Template"):
-                    email_template = f"""Hi {company_name.split()[0] if company_name else 'there'},
-
-Thank you for submitting your scoping brief on prateeq.in for {company_name}.
-
-I have reviewed your requirements for the {lead.get('base_engine_title', 'Web App')} build (Goal: {lead.get('project_goal', 'Custom App')}). The estimated investment is ₹{cost_inr:,} (${cost_usd:,}) based on your selected technical scope.
-
-Let's schedule a brief 15-minute alignment call to confirm your launch date and walk through the initial milestone plan:
-👉 https://prateeq.in/terminal (or reply with your preferred time slot)
-
-Looking forward to collaborating!
-
-Best regards,
-Prateek Sharma
-Full-Stack AI & Web Engineer | prateeq.in
-"""
-                    st.code(email_template, language="text")
-
-            with util2:
-                confirm_del = st.checkbox("Confirm deletion", key=f"confirm_del_{lead_id}")
-                if st.button("🗑️ Delete Lead", key=f"del_lead_{lead_id}", disabled=not confirm_del):
-                    if delete_intake_lead(lead_id):
-                        st.success("Lead deleted successfully.")
-                        st.rerun()
-                    else:
-                        st.error("Failed to delete lead.")
+            if st.button(f"Save Live Delivery Milestone for {scope_code}", key=f"btn_save_{scope_code}"):
+                if HAS_SYNC:
+                    order["delivery_stage"] = new_stage
+                    order["updated_at"] = datetime.utcnow().isoformat()
+                    upsert_record("client_orders", order, key_col="scope_code")
+                    st.success(f"Updated milestone for {scope_code} to '{new_stage}'! Changes live on prateeq.in/dashboard.")

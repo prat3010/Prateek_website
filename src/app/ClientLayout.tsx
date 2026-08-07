@@ -11,6 +11,7 @@ import { LenisProvider } from '@/context/LenisProvider';
 import { PerformanceGovernorProvider } from '@/context/PerformanceGovernor';
 import { LazyMotion, domAnimation } from 'framer-motion';
 import OnboardingSelector from '@/components/ui/OnboardingSelector';
+import { AuthProvider } from '@/context/AuthContext';
 import type { ResumeData } from '@/data/resume';
 
 // Lazy load heavy client side animations
@@ -150,12 +151,14 @@ export default function ClientLayout({
   }, []);
 
   return (
-    <ThemeProvider initialTheme={initialTheme} initialAudience={initialAudience} initialRegion={initialRegion}>
-      <LazyMotion features={domAnimation}>
-        <ClientLayoutContent isStandaloneAppRoute={isStandaloneAppRoute} isKonamiActive={isKonamiActive} profile={profile}>
-          {children}
-        </ClientLayoutContent>
-      </LazyMotion>
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider initialTheme={initialTheme} initialAudience={initialAudience} initialRegion={initialRegion}>
+        <LazyMotion features={domAnimation}>
+          <ClientLayoutContent isStandaloneAppRoute={isStandaloneAppRoute} isKonamiActive={isKonamiActive} profile={profile}>
+            {children}
+          </ClientLayoutContent>
+        </LazyMotion>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }

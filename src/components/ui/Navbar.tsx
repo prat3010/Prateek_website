@@ -6,6 +6,7 @@ import { useLenis } from 'lenis/react';
 import { useReducedMotion } from 'framer-motion';
 import { Sun, Moon, Code2, Briefcase } from 'lucide-react';
 import { useTheme, type Audience } from '@/context/ThemeContext';
+import { useAuth } from '@/context/AuthContext';
 import { useLenisScroll } from '@/context/LenisProvider';
 import Scrambler from '@/components/ui/Scrambler';
 import type { ScramblerProps } from '@/components/ui/Scrambler';
@@ -33,6 +34,7 @@ export interface NavbarProps {
 export default function Navbar({ items, className }: NavbarProps) {
   const pathname = usePathname();
   const { theme, toggleTheme, audience, setAudience } = useTheme();
+  const { user } = useAuth();
 
   const handleAudienceChange = useCallback((value: string) => {
     setAudience(value as Audience);
@@ -284,6 +286,15 @@ export default function Navbar({ items, className }: NavbarProps) {
           className={styles.themeSegmented}
           ariaLabel={theme === 'light' ? 'Switch to Noir mode' : 'Switch to Azure mode'}
         />
+
+        {/* ---- Client Dashboard Link ---- */}
+        <a
+          href="/dashboard"
+          className="comic-btn comic-btn-outline"
+          style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem', whiteSpace: 'nowrap' }}
+        >
+          {user ? '👤 DASHBOARD' : 'CLIENT LOGIN'}
+        </a>
 
         {/* ---- Hamburger ---- */}
         <button
