@@ -43,31 +43,35 @@ export default function RazorpayCheckoutButton({
         return;
       }
 
-      const existingScript = document.getElementById('razorpay-sdk-script') as HTMLScriptElement | null;
-      if (existingScript) {
-        existingScript.onload = () => resolve(true);
-        existingScript.onerror = () => resolve(false);
-        // Polling check in case onload already fired
-        const interval = setInterval(() => {
-          if (typeof window !== 'undefined' && window.Razorpay) {
-            clearInterval(interval);
-            resolve(true);
-          }
-        }, 100);
-        setTimeout(() => {
-          clearInterval(interval);
-          resolve(typeof window !== 'undefined' && Boolean(window.Razorpay));
-        }, 3000);
-        return;
+      // Try appending checkout.js script if not present
+      if (!document.getElementById('razorpay-checkout-script')) {
+        const script = document.createElement('script');
+        script.id = 'razorpay-checkout-script';
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.async = true;
+        script.onerror = () => {
+          // Fallback script if primary CDN fails
+          const fallback = document.createElement('script');
+          fallback.id = 'razorpay-fallback-script';
+          fallback.src = 'https://checkout.razorpay.com/v1/razorpay.js';
+          fallback.async = true;
+          document.body.appendChild(fallback);
+        };
+        document.body.appendChild(script);
       }
 
-      const script = document.createElement('script');
-      script.id = 'razorpay-sdk-script';
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.async = true;
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      document.body.appendChild(script);
+      // Resilient 10-second polling for window.Razorpay binding
+      let elapsedMs = 0;
+      const interval = setInterval(() => {
+        elapsedMs += 50;
+        if (typeof window !== 'undefined' && window.Razorpay) {
+          clearInterval(interval);
+          resolve(true);
+        } else if (elapsedMs >= 10000) {
+          clearInterval(interval);
+          resolve(false);
+        }
+      }, 50);
     });
   };
 
@@ -79,7 +83,7 @@ export default function RazorpayCheckoutButton({
       // 1. Ensure Razorpay SDK script is loaded
       const isLoaded = await loadRazorpaySDK();
       if (!isLoaded || typeof window === 'undefined' || !window.Razorpay) {
-        alert('Could not load Razorpay Gateway SDK. Please check network connection.');
+        alert('Razorpay Gateway SDK timed out during network load. Please check your internet connection.');
         setLoading(false);
         return;
       }
@@ -168,22 +172,25 @@ export default function RazorpayCheckoutButton({
   };
 
   return (
-    <button
-      type="button"
-      className="comic-btn comic-btn-blue"
-      onClick={handleCheckout}
-      disabled={loading}
-    >
-      {loading ? (
-        <>
-          <Loader2 size={16} className="animate-spin" style={{ marginRight: '0.4rem' }} /> Opening Gateway...
-        </>
-      ) : (
-        <>
-          <CreditCard size={16} style={{ marginRight: '0.4rem' }} />
-          {buttonText || `Pay 50% Deposit (${currency === 'INR' ? `₹${amount.toLocaleString('en-IN')}` : `$${amount}`})`}
-        </>
-      )}
-    </button>
+    <>
+      <script src="https://checkout.razorpay.com/v1/checkout.js" async />
+      <button
+        type="button"
+        className="comic-btn comic-btn-blue"
+        onClick={handleCheckout}
+        disabled={loading}
+      >
+        {loading ? (
+          <>
+            <Loader2 size={16} className="animate-spin" style={{ marginRight: '0.4rem' }} /> Opening Gateway...
+          </>
+        ) : (
+          <>
+            <CreditCard size={16} style={{ marginRight: '0.4rem' }} />
+            {buttonText || `Pay 50% Deposit (${currency === 'INR' ? `₹${amount.toLocaleString('en-IN')}` : `$${amount}`})`}
+          </>
+        )}
+      </button>
+    </>
   );
 }
