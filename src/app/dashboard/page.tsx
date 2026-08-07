@@ -433,7 +433,7 @@ export default function ClientDashboardPage() {
                       </div>
                     )}
 
-                    {/* Dynamic Milestone Progress Bar */}
+                    {/* Dynamic Connected Milestone Progress Bar */}
                     {(() => {
                       const stageLevels: Record<string, number> = {
                         architecture: 1,
@@ -442,29 +442,46 @@ export default function ClientDashboardPage() {
                         live: 4,
                       };
                       const currentLevel = stageLevels[s.delivery_stage || 'architecture'] || (s.deposit_paid ? 2 : 1);
+                      const progressPercentage = ((currentLevel - 1) / 3) * 100;
 
                       return (
                         <div className={styles.milestoneSection}>
                           <div className={styles.milestoneHeader}>
-                            <Compass size={16} />
-                            <span>Development Milestone Tracker</span>
+                            <div className={styles.milestoneHeaderLeft}>
+                              <Compass size={16} />
+                              <span>Development Milestone Tracker</span>
+                            </div>
+                            <span className={styles.phaseBadge}>
+                              {s.delivery_stage === 'live' ? '🚀 PHASE 4: PRODUCTION LAUNCH' :
+                               s.delivery_stage === 'staging' ? '🧪 PHASE 3: STAGING & QA' :
+                               s.delivery_stage === 'engineering' ? '⚡ PHASE 2: CORE ENGINEERING' :
+                               '📐 PHASE 1: ARCHITECTURE & SPECS'}
+                            </span>
                           </div>
-                          <div className={styles.milestoneSteps}>
-                            <div className={`${styles.milestoneStep} ${currentLevel >= 1 ? styles.stepActive : ''}`}>
-                              <span className={styles.stepDot}>1</span>
-                              <span>Architecture & Specs</span>
-                            </div>
-                            <div className={`${styles.milestoneStep} ${currentLevel >= 2 ? styles.stepActive : ''}`}>
-                              <span className={styles.stepDot}>2</span>
-                              <span>Core Engineering</span>
-                            </div>
-                            <div className={`${styles.milestoneStep} ${currentLevel >= 3 ? styles.stepActive : ''}`}>
-                              <span className={styles.stepDot}>3</span>
-                              <span>Staging & QA</span>
-                            </div>
-                            <div className={`${styles.milestoneStep} ${currentLevel >= 4 ? styles.stepActive : ''}`}>
-                              <span className={styles.stepDot}>4</span>
-                              <span>Production Launch</span>
+
+                          <div className={styles.milestonePipeline}>
+                            <div className={styles.pipelineTrackBackdrop} />
+                            <div
+                              className={styles.pipelineTrackProgress}
+                              style={{ width: `${progressPercentage}%` }}
+                            />
+                            <div className={styles.milestoneSteps}>
+                              <div className={`${styles.milestoneStep} ${currentLevel >= 1 ? styles.stepActive : ''}`}>
+                                <span className={styles.stepDot}>1</span>
+                                <span>Architecture & Specs</span>
+                              </div>
+                              <div className={`${styles.milestoneStep} ${currentLevel >= 2 ? styles.stepActive : ''}`}>
+                                <span className={styles.stepDot}>2</span>
+                                <span>Core Engineering</span>
+                              </div>
+                              <div className={`${styles.milestoneStep} ${currentLevel >= 3 ? styles.stepActive : ''}`}>
+                                <span className={styles.stepDot}>3</span>
+                                <span>Staging & QA</span>
+                              </div>
+                              <div className={`${styles.milestoneStep} ${currentLevel >= 4 ? styles.stepActive : ''}`}>
+                                <span className={styles.stepDot}>4</span>
+                                <span>Production Launch</span>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -524,11 +541,14 @@ export default function ClientDashboardPage() {
                             </div>
                           </div>
                         ) : (
-                          <ul className={styles.featuresList}>
+                          <div className={styles.featureBadgeGrid}>
                             {s.features.map((f, i) => (
-                              <li key={i}>{f}</li>
+                              <span key={i} className={styles.featureBadgeTag}>
+                                <CheckCircle2 size={13} className={styles.featureBadgeIcon} />
+                                {f}
+                              </span>
                             ))}
-                          </ul>
+                          </div>
                         )}
                       </div>
 
