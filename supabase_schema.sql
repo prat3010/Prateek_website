@@ -195,8 +195,8 @@ CREATE TABLE IF NOT EXISTS client_orders (
   status TEXT DEFAULT 'Draft Proposal',
   delivery_stage TEXT DEFAULT 'architecture',
   deposit_paid BOOLEAN DEFAULT false,
-  razorpay_payment_id TEXT,
-  razorpay_order_id TEXT,
+  payment_id TEXT,
+  gateway_order_id TEXT,
   created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
