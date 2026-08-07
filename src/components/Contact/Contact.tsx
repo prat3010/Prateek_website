@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useLenis } from 'lenis/react';
 import { useTheme } from '@/context/ThemeContext';
 import { NAVBAR_SCROLL_OFFSET } from '@/lib/constants';
-import { Rocket, Copy, Check, Terminal as TerminalIcon, Mail, Clock, Globe } from 'lucide-react';
+import { Copy, Check, Terminal as TerminalIcon, Mail, Clock, Globe } from 'lucide-react';
 import SpeechBubble from '@/components/ui/SpeechBubble';
 import ConfettiBurst, { type ConfettiBurstHandle } from '@/components/effects/ConfettiBurst';
 import styles from './Contact.module.css';

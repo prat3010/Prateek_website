@@ -100,8 +100,26 @@ export default function ClientDashboardPage() {
       .then((res) => res.json())
       .then((data) => {
         if (!mounted || !data.scopes) return;
+        interface ScopeDbRecord {
+          id?: string;
+          scope_code: string;
+          company_name: string;
+          client_phone?: string;
+          base_engine: string;
+          features?: string[] | unknown;
+          brand_asset: string;
+          maintenance_plan: string;
+          total_cost_inr?: number | string;
+          total_cost_usd?: number | string;
+          currency?: string;
+          timeline?: string;
+          status?: string;
+          delivery_stage?: 'architecture' | 'engineering' | 'staging' | 'live';
+          deposit_paid?: boolean;
+          created_at?: string;
+        }
 
-        const dbScopes: ClientScope[] = data.scopes.map((item: any) => ({
+        const dbScopes: ClientScope[] = data.scopes.map((item: ScopeDbRecord) => ({
           id: item.id || `scope-${item.scope_code}`,
           scope_code: item.scope_code,
           company_name: item.company_name,

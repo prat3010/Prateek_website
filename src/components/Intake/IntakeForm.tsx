@@ -119,15 +119,15 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
 
   const { user, loginWithGoogle } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [activePopoverId, setActivePopoverId] = useState<string | null>(null);
   const [popoverAnchor, setPopoverAnchor] = useState<{ x: number; y: number } | null>(null);
-  const [recaptchaReady, setRecaptchaReady] = useState(!SITE_KEY);
+  const [, setRecaptchaReady] = useState(!SITE_KEY);
   const [recaptchaUnavailable, setRecaptchaUnavailable] = useState(false);
 
-  const generatedScopeCode = useMemo(() => `SCOPE-${Math.floor(10000 + Math.random() * 90000)}`, []);
+  const [generatedScopeCode] = useState(() => `SCOPE-${Math.floor(10000 + Math.random() * 90000)}`);
 
   // Resolve deep-link preset (engine or goal archetype) to the wizard's initial selections
   const initialArchetype = useMemo(() => {
@@ -209,24 +209,6 @@ interface IntakeFormData {
       agreedToTerms: false
     };
   });
-
-  // Pre-fill authenticated user credentials if inputs are currently blank
-  useEffect(() => {
-    if (!user) return;
-    setFormData((prev) => {
-      let updated = false;
-      const next = { ...prev };
-      if (!next.contactEmail && user.email) {
-        next.contactEmail = user.email;
-        updated = true;
-      }
-      if (!next.companyName && user.user_metadata?.full_name) {
-        next.companyName = user.user_metadata.full_name;
-        updated = true;
-      }
-      return updated ? next : prev;
-    });
-  }, [user]);
 
   // Auto-save scoping questionnaire progress to local storage
   useEffect(() => {

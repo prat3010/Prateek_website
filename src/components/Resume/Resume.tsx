@@ -20,7 +20,6 @@ import {
   Paintbrush, 
   User, 
   FileText,
-  Rocket,
   ArrowRight,
   ShieldCheck
 } from 'lucide-react';
