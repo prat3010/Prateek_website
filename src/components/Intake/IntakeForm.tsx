@@ -152,7 +152,23 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     return Array.from(labels);
   }, [initialArchetype, features]);
 
-  const [formData, setFormData] = useState(() => {
+interface IntakeFormData {
+  companyName: string;
+  contactEmail: string;
+  contactPhone: string;
+  projectGoal: string;
+  targetAudience: string;
+  selectedBaseEngineId: string;
+  selectedFeatures: string[];
+  selectedBrandAssetId: string;
+  selectedMaintenanceId: string;
+  inspirationLinks: string;
+  timeline: string;
+  additionalNotes: string;
+  agreedToTerms: boolean;
+}
+
+  const [formData, setFormData] = useState<IntakeFormData>(() => {
     if (typeof window !== 'undefined') {
       try {
         const savedDraft = localStorage.getItem('prateeq_scoping_draft');
@@ -165,7 +181,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
             projectGoal: parsed.projectGoal || initialArchetype.label,
             targetAudience: parsed.targetAudience || '',
             selectedBaseEngineId: parsed.selectedBaseEngineId || initialArchetype.recommendedEngineId,
-            selectedFeatures: parsed.selectedFeatures || initialSelectedFeatures,
+            selectedFeatures: Array.isArray(parsed.selectedFeatures) ? (parsed.selectedFeatures as string[]) : initialSelectedFeatures,
             selectedBrandAssetId: parsed.selectedBrandAssetId || (brandAssets[0]?.id || ''),
             selectedMaintenanceId: parsed.selectedMaintenanceId || '',
             inspirationLinks: parsed.inspirationLinks || '',
