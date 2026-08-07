@@ -9,6 +9,7 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   loginWithGoogle: (redirectTo?: string) => Promise<void>;
+  loginAsGuestClient: (email?: string, name?: string) => void;
   logout: () => Promise<void>;
 }
 
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContextType>({
   session: null,
   loading: true,
   loginWithGoogle: async () => {},
+  loginAsGuestClient: () => {},
   logout: async () => {},
 });
 
@@ -151,6 +153,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const handleLoginAsGuestClient = (email?: string, name?: string) => {
+    const guestUser: User = {
+      id: `guest-${Date.now()}`,
+      app_metadata: { provider: 'guest' },
+      user_metadata: { full_name: name || 'Guest Client Account' },
+      aud: 'authenticated',
+      created_at: new Date().toISOString(),
+      email: email || 'client.demo@prateeq.in',
+      phone: '',
+      role: 'authenticated',
+      updated_at: new Date().toISOString(),
+    };
+    setUser(guestUser);
+    setSession({
+      access_token: 'guest-demo-token',
+      token_type: 'bearer',
+      expires_in: 3600,
+      refresh_token: 'guest-refresh-token',
+      user: guestUser,
+    });
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('prateeq_active_user', JSON.stringify(guestUser));
+    }
+  };
+
   const handleLogout = async () => {
     await signOut().catch(() => {});
     if (typeof window !== 'undefined') {
@@ -167,6 +194,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         session,
         loading,
         loginWithGoogle: handleLoginWithGoogle,
+        loginAsGuestClient: handleLoginAsGuestClient,
         logout: handleLogout,
       }}
     >

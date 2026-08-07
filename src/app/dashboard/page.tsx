@@ -47,7 +47,7 @@ interface ClientScope {
 }
 
 export default function ClientDashboardPage() {
-  const { user, loading, logout, loginWithGoogle } = useAuth();
+  const { user, loading, logout, loginWithGoogle, loginAsGuestClient } = useAuth();
   const [activeTab, setActiveTab] = useState<'scopes' | 'invoices' | 'rag'>('scopes');
   const [editingScopeId, setEditingScopeId] = useState<string | null>(null);
   const [newFeatureInput, setNewFeatureInput] = useState('');
@@ -191,10 +191,15 @@ export default function ClientDashboardPage() {
         <div className={styles.authCard}>
           <ShieldCheck size={48} className={styles.authIcon} />
           <h1>Client Portal Workspace</h1>
-          <p>Sign in with Google to access your active project scopes, PDF briefs, payment portal, and managed AI services.</p>
-          <button className="comic-btn comic-btn-blue" onClick={() => loginWithGoogle('/dashboard')}>
-            Sign In with Google
-          </button>
+          <p>Access your active project scopes, PDF briefs, payment portal, and managed AI services.</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%', marginTop: '0.5rem' }}>
+            <button className="comic-btn comic-btn-blue" onClick={() => loginWithGoogle('/dashboard')}>
+              Sign In with Google
+            </button>
+            <button className="comic-btn comic-btn-outline" onClick={() => loginAsGuestClient()}>
+              🚀 Instant Client Access (Demo Mode)
+            </button>
+          </div>
         </div>
       </div>
     );
