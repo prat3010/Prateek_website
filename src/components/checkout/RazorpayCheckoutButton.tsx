@@ -36,58 +36,61 @@ export default function RazorpayCheckoutButton({
 }: RazorpayCheckoutProps) {
   const [loading, setLoading] = useState(false);
 
-  const loadRazorpayScript = (): Promise<boolean> => {
-    return new Promise((resolve) => {
-      if (typeof window !== 'undefined' && window.Razorpay) {
-        resolve(true);
-        return;
-      }
+  const openRazorpayModal = (orderData: { id: string; amount: number; currency: string }) => {
+    const options = {
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_TMyS4YM83bVpqF',
+      amount: orderData.amount,
+      currency: orderData.currency,
+      name: 'Prateek Sharma | Web Architecture',
+      description: `50% Scope Deposit for ${scopeCode}`,
+      image: 'https://prateeq.in/images/hero-character-noir.png',
+      order_id: orderData.id,
+      handler: async function (response: {
+        razorpay_payment_id: string;
+        razorpay_order_id: string;
+        razorpay_signature: string;
+      }) {
+        const verifyRes = await fetch('/api/razorpay/verify-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+            scopeCode,
+            companyName,
+            userEmail,
+            amount,
+            currency,
+          }),
+        });
 
-      // Check if script element already exists in DOM
-      let script = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]') as HTMLScriptElement | null;
-      if (script) {
-        if (typeof window !== 'undefined' && window.Razorpay) {
-          resolve(true);
-          return;
+        const verifyData = await verifyRes.json();
+        if (verifyRes.ok && verifyData.success) {
+          if (onSuccess) onSuccess(response.razorpay_payment_id);
+        } else {
+          alert(`Payment verification failed: ${verifyData.error}`);
         }
-        script.addEventListener('load', () => resolve(true), { once: true });
-        script.addEventListener('error', () => resolve(false), { once: true });
-        
-        // Wait up to 5s if already present
-        let count = 0;
-        const interval = setInterval(() => {
-          count++;
-          if (typeof window !== 'undefined' && window.Razorpay) {
-            clearInterval(interval);
-            resolve(true);
-          } else if (count >= 50) {
-            clearInterval(interval);
-            resolve(false);
-          }
-        }, 100);
-        return;
-      }
+      },
+      prefill: {
+        name: userName || companyName,
+        email: userEmail,
+      },
+      theme: {
+        color: '#3b82f6',
+      },
+    };
 
-      // Append script dynamically
-      script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.async = true;
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      document.body.appendChild(script);
+    const paymentObject = new window.Razorpay(options);
+    paymentObject.on('payment.failed', function (response: { error: { description: string } }) {
+      alert(`Payment failed: ${response.error?.description || 'Transaction declined.'}`);
     });
+    paymentObject.open();
   };
 
   const handleCheckout = async () => {
     setLoading(true);
     try {
-      const isLoaded = await loadRazorpayScript();
-      if (!isLoaded) {
-        alert('Could not initialize Razorpay payment gateway. Please refresh the page and try again.');
-        setLoading(false);
-        return;
-      }
-
       // 1. Create order on backend
       const res = await fetch('/api/razorpay/create-order', {
         method: 'POST',
@@ -104,57 +107,34 @@ export default function RazorpayCheckoutButton({
         throw new Error(orderData.error || 'Order creation failed.');
       }
 
-      // 2. Configure Razorpay Modal Options
-      const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_TMyS4YM83bVpqF',
-        amount: orderData.amount,
-        currency: orderData.currency,
-        name: 'Prateek Sharma | Web Architecture',
-        description: `50% Scope Deposit for ${scopeCode}`,
-        image: 'https://prateeq.in/images/hero-character-noir.png',
-        order_id: orderData.id,
-        handler: async function (response: {
-          razorpay_payment_id: string;
-          razorpay_order_id: string;
-          razorpay_signature: string;
-        }) {
-          // 3. Verify Payment Signature on backend
-          const verifyRes = await fetch('/api/razorpay/verify-payment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_signature: response.razorpay_signature,
-              scopeCode,
-              companyName,
-              userEmail,
-              amount,
-              currency,
-            }),
-          });
+      // 2. If window.Razorpay is ready, open modal directly
+      if (typeof window !== 'undefined' && window.Razorpay) {
+        openRazorpayModal(orderData);
+        return;
+      }
 
-          const verifyData = await verifyRes.json();
-          if (verifyRes.ok && verifyData.success) {
-            if (onSuccess) onSuccess(response.razorpay_payment_id);
-          } else {
-            alert(`Payment verification failed: ${verifyData.error}`);
+      // 3. Otherwise, dynamically inject script and open modal inside onload callback
+      const existingScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]') as HTMLScriptElement | null;
+      if (existingScript) {
+        existingScript.addEventListener('load', () => openRazorpayModal(orderData), { once: true });
+        // Polling fallback
+        const interval = setInterval(() => {
+          if (typeof window !== 'undefined' && window.Razorpay) {
+            clearInterval(interval);
+            openRazorpayModal(orderData);
           }
-        },
-        prefill: {
-          name: userName || companyName,
-          email: userEmail,
-        },
-        theme: {
-          color: '#3b82f6',
-        },
-      };
+        }, 100);
+        return;
+      }
 
-      const paymentObject = new window.Razorpay(options);
-      paymentObject.on('payment.failed', function (response: { error: { description: string } }) {
-        alert(`Payment failed: ${response.error?.description || 'Transaction declined.'}`);
-      });
-      paymentObject.open();
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.async = true;
+      script.onload = () => openRazorpayModal(orderData);
+      script.onerror = () => {
+        alert('Could not load Razorpay SDK. Please check your internet connection.');
+      };
+      document.body.appendChild(script);
     } catch (err: unknown) {
       console.error('Razorpay Checkout error:', err);
       alert(err instanceof Error ? err.message : 'Checkout failed. Please try again.');

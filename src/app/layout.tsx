@@ -167,7 +167,7 @@ export default async function RootLayout({
         </ClientLayout>
         <Script
           src="https://checkout.razorpay.com/v1/checkout.js"
-          strategy="afterInteractive"
+          strategy="beforeInteractive"
         />
         <SpeedInsights />
         <Analytics />
