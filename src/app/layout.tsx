@@ -165,10 +165,6 @@ export default async function RootLayout({
         <ClientLayout initialTheme={theme} initialAudience={audience} initialRegion={region} profile={profile}>
           {children}
         </ClientLayout>
-        <Script
-          src="https://checkout.razorpay.com/v1/checkout.js"
-          strategy="beforeInteractive"
-        />
         <SpeedInsights />
         <Analytics />
       </body>

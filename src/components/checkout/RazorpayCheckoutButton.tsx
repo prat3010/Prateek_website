@@ -36,29 +36,33 @@ export default function RazorpayCheckoutButton({
 }: RazorpayCheckoutProps) {
   const [loading, setLoading] = useState(false);
 
-  const loadScript = (): Promise<boolean> => {
+  const loadRazorpaySDK = (): Promise<boolean> => {
     return new Promise((resolve) => {
       if (typeof window !== 'undefined' && window.Razorpay) {
         resolve(true);
         return;
       }
 
-      const existing = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]') as HTMLScriptElement | null;
-      if (existing) {
-        if (typeof window !== 'undefined' && window.Razorpay) {
-          resolve(true);
-          return;
-        }
-        existing.addEventListener('load', () => resolve(true), { once: true });
-        existing.addEventListener('error', () => resolve(false), { once: true });
-        // Failsafe check
+      const existingScript = document.getElementById('razorpay-sdk-script') as HTMLScriptElement | null;
+      if (existingScript) {
+        existingScript.onload = () => resolve(true);
+        existingScript.onerror = () => resolve(false);
+        // Polling check in case onload already fired
+        const interval = setInterval(() => {
+          if (typeof window !== 'undefined' && window.Razorpay) {
+            clearInterval(interval);
+            resolve(true);
+          }
+        }, 100);
         setTimeout(() => {
+          clearInterval(interval);
           resolve(typeof window !== 'undefined' && Boolean(window.Razorpay));
-        }, 1500);
+        }, 3000);
         return;
       }
 
       const script = document.createElement('script');
+      script.id = 'razorpay-sdk-script';
       script.src = 'https://checkout.razorpay.com/v1/checkout.js';
       script.async = true;
       script.onload = () => resolve(true);
@@ -72,13 +76,15 @@ export default function RazorpayCheckoutButton({
     setLoading(true);
 
     try {
-      // 1. Ensure Razorpay SDK is present
-      const loaded = await loadScript();
-      if (!loaded || typeof window === 'undefined' || !window.Razorpay) {
-        throw new Error('Razorpay SDK could not be loaded into browser window.');
+      // 1. Ensure Razorpay SDK script is loaded
+      const isLoaded = await loadRazorpaySDK();
+      if (!isLoaded || typeof window === 'undefined' || !window.Razorpay) {
+        alert('Could not load Razorpay Gateway SDK. Please check network connection.');
+        setLoading(false);
+        return;
       }
 
-      // 2. Create Order on Backend
+      // 2. Create Order on Backend API
       const res = await fetch('/api/razorpay/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -91,10 +97,12 @@ export default function RazorpayCheckoutButton({
 
       const orderData = await res.json();
       if (!res.ok) {
-        throw new Error(orderData.error || 'Failed to create payment order on server.');
+        alert(`Order creation failed: ${orderData.error || 'Server error'}`);
+        setLoading(false);
+        return;
       }
 
-      // 3. Construct Options and Open Modal Synchronously in Main Thread
+      // 3. Configure Razorpay Payment Options
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_TMyS4YM83bVpqF',
         amount: orderData.amount,
@@ -126,14 +134,14 @@ export default function RazorpayCheckoutButton({
 
             const verifyData = await verifyRes.json();
             if (verifyRes.ok && verifyData.success) {
-              alert(`🎉 Payment Successful! Deposit confirmed. Payment ID: ${response.razorpay_payment_id}`);
+              alert(`🎉 Payment Successful! Payment ID: ${response.razorpay_payment_id}`);
               if (onSuccess) onSuccess(response.razorpay_payment_id);
             } else {
               alert(`Payment verification failed: ${verifyData.error || 'Invalid signature'}`);
             }
           } catch (vErr) {
-            console.error('Payment verification request error:', vErr);
-            alert('Payment completed, but verification endpoint returned an error.');
+            console.error('Payment verification error:', vErr);
+            alert('Payment completed, but verification server route encountered an error.');
           }
         },
         prefill: {
@@ -145,14 +153,15 @@ export default function RazorpayCheckoutButton({
         },
       };
 
-      const razorpayInstance = new window.Razorpay(options);
-      razorpayInstance.on('payment.failed', function (resp: { error?: { description?: string } }) {
+      // 4. Open Payment Gateway Modal
+      const rzpInstance = new window.Razorpay(options);
+      rzpInstance.on('payment.failed', function (resp: { error?: { description?: string } }) {
         alert(`Payment Failed: ${resp.error?.description || 'Transaction declined.'}`);
       });
-      razorpayInstance.open();
+      rzpInstance.open();
     } catch (err: unknown) {
-      console.error('Checkout execution error:', err);
-      alert(err instanceof Error ? err.message : 'Checkout encountered an unexpected error.');
+      console.error('Checkout error:', err);
+      alert(err instanceof Error ? err.message : 'Checkout failed.');
     } finally {
       setLoading(false);
     }
