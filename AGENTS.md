@@ -77,12 +77,14 @@ The project uses the following environment variables (stored in `.env.local` loc
   - `/` — home page (all portfolio sections).
   - `/terminal` — interactive diagnostics terminal console.
   - `/scoping` — Project Scoping Lab & Instant Quote wizard page (deep-linkable via `?engine=landing|multipage|saas` or `?goal=<goal archetype id>`).
+  - `/dashboard` — Client Workspace Dashboard (Google OAuth profile confirmation, active project scopes, interactive feature customizer, milestone progress tracker, invoice ledger, RAG app studio link, PDF proposal exporter, and direct scope confirmation CTA).
   - `/admin/analytics` — visitor analytics dashboard.
   - `/rag` — Retriever AI SaaS Product Landing Page (Hero, live mini-RAG sandbox, feature grid, 1-line embed snippet, Geo-IP pricing).
   - `/rag/login` — Auth & Guest Access Portal (1-click Google OAuth + instant Guest Demo).
   - `/rag/app` — SaaS App Studio Workspace (Chat Studio, Document Library, Search Inspector, Embed Configurator, role-gated admin link).
   - `/blog` and `/blog/[slug]` — blog listing and individual post pages.
-- `src/app/api/` contains REST API routes for reading/writing portfolio data to Supabase: `skills`, `projects`, `certificates`, `profile`, `git-log`, `analytics-summary`, `contact`, and `revalidate`.
+- `src/app/api/` contains REST API routes for reading/writing portfolio & client data to Supabase: `skills`, `projects`, `certificates`, `profile`, `git-log`, `analytics-summary`, `contact`, `client/save-scope`, and `revalidate`.
+- `src/lib/auth.ts` and `src/context/AuthContext.tsx` — Universal Supabase Auth layer with dual cookie + localStorage persistence adapter and direct JWT hash fragment parser for robust session restoration across Safari ITP & OAuth redirects.
 - `src/proxy.ts` is the Next.js 16 proxy (formerly middleware) file that intercepts requests for telemetry logging.
 - `src/components/rag/` contains the interactive RAG Lab playground (`ChatPanel.tsx`, `UploadPanel.tsx`, `SearchPanel.tsx`, `ConfigPanel.tsx`, `PricingSection.tsx`) connected to the `retriever` backend via `src/lib/rag-client.ts`. Features include 👍/👎 message feedback (`submitFeedback`), clickable presigned citation downloads (`getDownloadUrl`), semantic cache badges (`⚡ Cached`), Geo-IP pricing (INR/USD), and Lenis smooth scroll isolation (`data-lenis-prevent`).
 - `src/components/` contains portfolio sections, shared UI (like the interactive diagnostics terminal console at `/terminal` which supports commands such as `git-info` and `qrcode`, the `GestureScroll` floating gesture scroll controller, and the `IntakeForm` client discovery scoping questionnaire with instant PDF export), visual effects, and the playground. Components follow the pattern `src/components/{ComponentName}/{ComponentName}.tsx` with co-located CSS modules.
@@ -104,7 +106,7 @@ The project uses the following environment variables (stored in `.env.local` loc
 - `scripts/generate-git-log.js` writes generated commit data before builds.
 - `scripts/generate-wobbly-paths.mjs` prebakes deterministic skyline wobble paths so the browser does not run the full displacement algorithm for normal skyline rendering.
 - `scripts/synchronizer.py` is a local content-management helper. Treat it as tooling, not runtime app code.
-- `scripts/sync_tabs/` contains tab-specific view modules for the Streamlit dashboard (`analytics.py`, `resume.py`, `projects.py`, `certificates.py`, `skills.py`, `photos.py`, `blog.py`, `rag_pricing.py`, and `shared.py` common parsing/utilities).
+- `scripts/sync_tabs/` contains tab-specific view modules for the Streamlit dashboard (`analytics.py`, `resume.py`, `projects.py`, `certificates.py`, `skills.py`, `photos.py`, `blog.py`, `clients.py`, `rag_pricing.py`, and `shared.py` common parsing/utilities).
 - `scripts/seed_supabase.py` populates Supabase tables from the TypeScript data files (one-time bootstrap or re-seed).
 - `scripts/sync_supabase.py` shared REST API module used by the synchronizer to read, upsert, and explicitly delete Supabase records.
 - `scripts/sync_json.py` provides atomic local JSON/text fallback writes for the synchronizer.

@@ -183,6 +183,25 @@ This document serves as the registry of critical architectural design decisions 
 
 ---
 
+
+---
+
+# **ADR 13: Client Workspace Dashboard & Safari-Compliant Universal Auth Architecture**
+
+* **Status**: Approved
+* **Context**: Clients generating commercial quotes on `prateeq.in/scoping` needed a workspace dashboard (`/dashboard`) to review active project scopes, customize features live, export PDF proposal briefs, track development milestone stages (`Architecture` → `Engineering` → `Staging` → `Production`), and access managed RAG services. Authentication required seamless Google OAuth integration with Supabase Auth, but Safari's Intelligent Tracking Prevention (ITP) blocked cross-site `localStorage` writes during OAuth redirects, causing sessions to drop on return.
+* **Decision**:
+  1. **Client Workspace Dashboard (`/dashboard`)**: Built `src/app/dashboard/page.tsx` with Google profile confirmation, interactive feature customizer, commercial PDF exporter, milestone delivery tracker, invoice ledger, and Retriever AI studio workspace links.
+  2. **Universal Dual-Storage Adapter**: Configured `@supabase/supabase-js` with a custom storage adapter (`src/lib/auth.ts`) that writes authentication tokens to both `SameSite=Lax` HTTP cookies (`prateeq_active_user`) and `localStorage`. If Safari clears `localStorage` during an external redirect, the cookie fallback preserves the token 100%.
+  3. **Direct JWT Hash Parser**: Created a direct JWT parser inside `AuthProvider` (`src/context/AuthContext.tsx`) that reads `#access_token=...` from `window.location.hash` upon returning from Supabase Auth. It decodes the authentic JWT payload (`email`, `user_metadata`), sets state synchronously, saves the session, and cleans up the address bar via `window.history.replaceState`.
+  4. **Backend & Tooling Integration**: Created `/api/client/save-scope` REST route and Supabase `client_orders` table definition (`supabase_schema.sql`). Added a dedicated Client & Delivery Command Center tab in the Streamlit Synchronizer (`scripts/sync_tabs/clients.py`) for live milestone management.
+* **Consequences**:
+  - **Pros**: 100% session persistence on Safari across macOS and iOS; zero page layout shifts or state flashes; clean address bar URLs.
+  - **Cons**: Requires `https://prateeq.in/dashboard` and `https://prateeq.in/**` to be explicitly added to Supabase Auth's Redirect URLs whitelist.
+
+---
+
 # **Acceptance Criteria**
 - Registry records cover the core v2 architectural choices.
 - Format follows standard ADR structures (Context, Decision, Consequences).
+
