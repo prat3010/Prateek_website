@@ -20,6 +20,40 @@ const AuthContext = createContext<AuthContextType>({
   logout: async () => {},
 });
 
+/**
+ * Decodes authentic JWT access token payload returned by Supabase Auth in URL hash
+ */
+function parseJwtUser(accessToken: string): User | null {
+  try {
+    const base64Url = accessToken.split('.')[1];
+    if (!base64Url) return null;
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    const payload = JSON.parse(jsonPayload);
+    if (!payload.sub || !payload.email) return null;
+
+    return {
+      id: payload.sub,
+      app_metadata: payload.app_metadata || { provider: 'google' },
+      user_metadata: payload.user_metadata || {},
+      aud: payload.aud || 'authenticated',
+      created_at: new Date().toISOString(),
+      email: payload.email,
+      phone: payload.phone || '',
+      role: payload.role || 'authenticated',
+      updated_at: new Date().toISOString(),
+    };
+  } catch (err) {
+    console.warn('Failed to decode JWT user from hash:', err);
+    return null;
+  }
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(() => {
     if (typeof window === 'undefined') return null;
@@ -46,7 +80,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const initAuth = async () => {
       if (typeof window !== 'undefined') {
         const searchParams = new URLSearchParams(window.location.search);
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const hashStr = window.location.hash.substring(1);
+        const hashParams = new URLSearchParams(hashStr);
 
         // 1. Capture OAuth Error Parameters
         const errorDesc = searchParams.get('error_description') || hashParams.get('error_description') || searchParams.get('error') || hashParams.get('error');
@@ -55,7 +90,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           alert(`Google Sign-In Error: ${decodeURIComponent(errorDesc).replace(/\+/g, ' ')}`);
         }
 
-        // 2. PKCE Code Exchange Fallback
+        // 2. Direct Extraction from URL Hash Fragment (#access_token=...)
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+
+        if (accessToken) {
+          const userFromJwt = parseJwtUser(accessToken);
+          if (userFromJwt && mounted) {
+            setUser(userFromJwt);
+            localStorage.setItem('prateeq_active_user', JSON.stringify(userFromJwt));
+            document.cookie = `prateeq_active_user=${encodeURIComponent(JSON.stringify(userFromJwt))}; path=/; max-age=2592000; SameSite=Lax;`;
+
+            // Clear hash fragment from address bar cleanly
+            try {
+              window.history.replaceState(null, '', window.location.pathname + window.location.search);
+            } catch {}
+
+            // Sync session in background with Supabase JS client
+            supabaseAuth.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken || '',
+            }).then(({ data }) => {
+              if (data.session && mounted) {
+                setSession(data.session);
+                if (data.session.user) {
+                  setUser(data.session.user);
+                  localStorage.setItem('prateeq_active_user', JSON.stringify(data.session.user));
+                }
+              }
+            }).catch((err) => console.warn('Background setSession warning:', err));
+
+            setLoading(false);
+            return;
+          }
+        }
+
+        // 3. PKCE Code Exchange Fallback
         const code = searchParams.get('code');
         if (code) {
           try {
@@ -69,27 +139,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
           } catch (codeErr) {
             console.warn('Code exchange warning:', codeErr);
-          }
-        }
-
-        // 3. Implicit Hash Token Fallback
-        const accessToken = hashParams.get('access_token');
-        const refreshToken = hashParams.get('refresh_token');
-        if (accessToken) {
-          try {
-            const { data, error } = await supabaseAuth.auth.setSession({
-              access_token: accessToken,
-              refresh_token: refreshToken || '',
-            });
-            if (!error && data.session?.user && mounted) {
-              setSession(data.session);
-              setUser(data.session.user);
-              localStorage.setItem('prateeq_active_user', JSON.stringify(data.session.user));
-              setLoading(false);
-              return;
-            }
-          } catch (hashErr) {
-            console.warn('Hash setSession warning:', hashErr);
           }
         }
       }
@@ -127,6 +176,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(null);
         if (typeof window !== 'undefined') {
           localStorage.removeItem('prateeq_active_user');
+          document.cookie = 'prateeq_active_user=; path=/; max-age=0;';
         }
       }
       setLoading(false);
@@ -155,6 +205,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await signOut().catch(() => {});
     if (typeof window !== 'undefined') {
       localStorage.removeItem('prateeq_active_user');
+      document.cookie = 'prateeq_active_user=; path=/; max-age=0;';
     }
     setUser(null);
     setSession(null);
