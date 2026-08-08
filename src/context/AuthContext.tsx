@@ -10,6 +10,7 @@ interface AuthContextType {
   loading: boolean;
   loginWithGoogle: (redirectTo?: string) => Promise<void>;
   logout: () => Promise<void>;
+  getAccessToken: () => Promise<string | null>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -18,7 +19,30 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   loginWithGoogle: async () => {},
   logout: async () => {},
+  getAccessToken: async () => null,
 });
+
+/**
+ * Checks whether a JWT access token's `exp` claim has already passed.
+ * Malformed tokens are treated as expired so they get refreshed.
+ */
+export function isJwtExpired(token: string): boolean {
+  try {
+    const payload = token.split('.')[1];
+    if (!payload) return true;
+    const json = JSON.parse(
+      decodeURIComponent(
+        atob(payload.replace(/-/g, '+').replace(/_/g, '/'))
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      )
+    );
+    return !json.exp || json.exp * 1000 <= Date.now();
+  } catch {
+    return true;
+  }
+}
 
 /**
  * Decodes authentic JWT access token payload returned by Supabase Auth in URL hash
@@ -211,6 +235,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSession(null);
   };
 
+  // Resolves a fresh access token at call time, refreshing the session when
+  // the stored token is expired or missing so callers never send stale JWTs.
+  const getAccessToken = React.useCallback(async (): Promise<string | null> => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const { data: { session: activeSession } } = await supabaseAuth.auth.getSession();
+      if (activeSession?.access_token && !isJwtExpired(activeSession.access_token)) {
+        return activeSession.access_token;
+      }
+      if (activeSession?.refresh_token) {
+        const { data: refreshed, error } = await supabaseAuth.auth.refreshSession({
+          refresh_token: activeSession.refresh_token,
+        });
+        if (!error && refreshed.session?.access_token) {
+          return refreshed.session.access_token;
+        }
+      }
+      return null;
+    } catch (err) {
+      console.warn('Access token resolution failed:', err);
+      return null;
+    }
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -219,6 +267,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading,
         loginWithGoogle: handleLoginWithGoogle,
         logout: handleLogout,
+        getAccessToken,
       }}
     >
       {children}

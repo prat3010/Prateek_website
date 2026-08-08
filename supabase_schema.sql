@@ -195,15 +195,17 @@ CREATE TABLE IF NOT EXISTS client_orders (
   status TEXT DEFAULT 'Draft Proposal',
   delivery_stage TEXT DEFAULT 'architecture',
   deposit_paid BOOLEAN DEFAULT false,
-  payment_id TEXT,
-  gateway_order_id TEXT,
   created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
 ALTER TABLE client_orders ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow public select client_orders" ON client_orders;
-CREATE POLICY "Allow public select client_orders" ON client_orders FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Clients can select own scopes" ON client_orders;
+-- Reads via the anon/user key are restricted to the session's own orders;
+-- writes remain service-role only (server routes + local tooling).
+CREATE POLICY "Clients can select own scopes" ON client_orders FOR SELECT
+  USING (auth.jwt() ->> 'email' = client_email);
 
 CREATE INDEX IF NOT EXISTS idx_client_orders_email ON client_orders (client_email);
 CREATE INDEX IF NOT EXISTS idx_client_orders_scope ON client_orders (scope_code);

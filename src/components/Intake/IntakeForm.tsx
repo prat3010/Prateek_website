@@ -117,7 +117,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     "7. Post-Launch Warranty: Includes 30 days of complimentary technical support & bug fixes post-launch."
   ];
 
-  const { user, loginWithGoogle } = useAuth();
+  const { user, loginWithGoogle, getAccessToken } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [submitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -470,9 +470,13 @@ interface IntakeFormData {
       // 3. If user is authenticated, save scope & navigate to dashboard
       if (user?.email) {
         try {
+          const accessToken = await getAccessToken();
           await fetch('/api/client/save-scope', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json',
+              ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+            },
             body: JSON.stringify({
               clientEmail: user.email,
               ...scopePayload,

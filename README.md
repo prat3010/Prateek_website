@@ -45,6 +45,8 @@ The client-side commercial PDFs (Scoping Brief, Services & Pricing Guide, Sales 
 | `/api/git-log` | GET | Read generated commit log |
 | `/api/analytics-summary` | GET | Aggregated visitor stats |
 | `/api/contact` | POST | Send contact form email |
+| `/api/client/save-scope` | POST | Upsert client scope (requires Supabase `Bearer` session token; client-editable fields only) |
+| `/api/client/get-scopes` | GET | List scopes for the verified session email (requires Supabase `Bearer` session token) |
 | `/api/revalidate` | POST, GET | Purge Next.js cache (requires `SYNC_API_KEY`) |
 
 ---

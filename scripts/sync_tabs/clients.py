@@ -50,7 +50,6 @@ def render_clients_tab():
         deposit_paid = order.get("deposit_paid", False)
         status = order.get("status", "Draft Proposal")
         delivery_stage = order.get("delivery_stage", "architecture")
-        payment_id = order.get("payment_id", "N/A")
 
         with st.expander(f"📦 {scope_code} — {company} ({'✅ 50% DEPOSIT PAID' if deposit_paid else '⏳ DRAFT PROPOSAL'})", expanded=True):
             c1, c2 = st.columns(2)
@@ -63,7 +62,6 @@ def render_clients_tab():
             
             with c2:
                 st.markdown(f"**Deposit Status:** {'✅ PAID' if deposit_paid else '⏳ PENDING'}")
-                st.markdown(f"**Payment Ref ID:** `{payment_id}`")
                 st.markdown(f"**Brand Kit:** {order.get('brand_asset', 'Standard')}")
                 st.markdown(f"**Care Plan:** {order.get('maintenance_plan', 'Standard')}")
 

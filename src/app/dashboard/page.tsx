@@ -7,7 +7,6 @@ import {
   LogOut, 
   ShieldCheck, 
   Download, 
-  ExternalLink, 
   Zap, 
   Layers, 
   CreditCard, 
@@ -22,34 +21,17 @@ import {
   FileCheck
 } from 'lucide-react';
 import { generateQuestionnairePDF } from '@/utils/pdfGenerator';
+import { dbToClientScope, type ClientScope } from '@/lib/clientOrder';
 import resumeData from '@/data/resume.json';
 import type { ResumeData } from '@/data/resume';
 import styles from './dashboard.module.css';
 
-interface ClientScope {
-  id: string;
-  scope_code: string;
-  company_name: string;
-  client_phone?: string;
-  base_engine: string;
-  features: string[];
-  brand_asset: string;
-  maintenance_plan: string;
-  total_cost_inr: number;
-  total_cost_usd: number;
-  currency: string;
-  timeline: string;
-  status: string;
-  delivery_stage?: 'architecture' | 'engineering' | 'staging' | 'live';
-  deposit_paid: boolean;
-  created_at: string;
-}
-
 export default function ClientDashboardPage() {
-  const { user, loading, logout, loginWithGoogle } = useAuth();
-  const [activeTab, setActiveTab] = useState<'scopes' | 'invoices' | 'rag'>('scopes');
+  const { user, loading, logout, loginWithGoogle, getAccessToken } = useAuth();
+  const [activeTab, setActiveTab] = useState<'scopes' | 'invoices'>('scopes');
   const [editingScopeId, setEditingScopeId] = useState<string | null>(null);
   const [newFeatureInput, setNewFeatureInput] = useState('');
+  const [authGateError, setAuthGateError] = useState(false);
 
   // Profile setup state for pre-fetched Google details
   const [companyInputs, setCompanyInputs] = useState<Record<string, string>>({});
@@ -106,14 +88,20 @@ export default function ClientDashboardPage() {
   });
 
   const saveScopeToDatabase = React.useCallback(
-    (updatedScope: ClientScope, emailOverride?: string) => {
-      const targetEmail = emailOverride || user?.email;
-      if (!targetEmail) return;
+    async (updatedScope: ClientScope) => {
+      if (!user?.email) return;
+      const accessToken = await getAccessToken();
+      if (!accessToken) {
+        setAuthGateError(true);
+        return;
+      }
       fetch('/api/client/save-scope', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
         body: JSON.stringify({
-          clientEmail: targetEmail,
           scopeCode: updatedScope.scope_code,
           companyName: updatedScope.company_name || 'My Custom Project',
           contactPhone: updatedScope.client_phone || '',
@@ -126,9 +114,13 @@ export default function ClientDashboardPage() {
           currency: updatedScope.currency,
           timeline: updatedScope.timeline,
         }),
-      }).catch((err) => console.warn('Save scope DB warning:', err));
+      })
+        .then((res) => {
+          if (res.status === 401) setAuthGateError(true);
+        })
+        .catch((err) => console.warn('Save scope DB warning:', err));
     },
-    [user?.email]
+    [user?.email, getAccessToken]
   );
 
   // Fetch client's persisted scopes from Supabase multi-device DB
@@ -136,68 +128,53 @@ export default function ClientDashboardPage() {
     if (!user?.email) return;
 
     let mounted = true;
-    fetch(`/api/client/get-scopes?email=${encodeURIComponent(user.email)}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (!mounted || !data.scopes) return;
-        interface ScopeDbRecord {
-          id?: string;
-          scope_code: string;
-          company_name: string;
-          client_phone?: string;
-          base_engine: string;
-          features?: string[] | unknown;
-          brand_asset: string;
-          maintenance_plan: string;
-          total_cost_inr?: number | string;
-          total_cost_usd?: number | string;
-          currency?: string;
-          timeline?: string;
-          status?: string;
-          delivery_stage?: 'architecture' | 'engineering' | 'staging' | 'live';
-          deposit_paid?: boolean;
-          created_at?: string;
-        }
 
-        const dbScopes: ClientScope[] = data.scopes.map((item: ScopeDbRecord) => ({
-          id: item.id || `scope-${item.scope_code}`,
-          scope_code: item.scope_code,
-          company_name: item.company_name,
-          client_phone: item.client_phone,
-          base_engine: item.base_engine,
-          features: Array.isArray(item.features) ? item.features : [],
-          brand_asset: item.brand_asset,
-          maintenance_plan: item.maintenance_plan,
-          total_cost_inr: Number(item.total_cost_inr) || 0,
-          total_cost_usd: Number(item.total_cost_usd) || 0,
-          currency: item.currency || 'INR',
-          timeline: item.timeline || 'Standard Turnaround',
-          status: item.status || 'Draft Proposal',
-          delivery_stage: item.delivery_stage || 'architecture',
-          deposit_paid: Boolean(item.deposit_paid),
-          created_at: item.created_at || new Date().toISOString(),
-        }));
+    const loadScopes = async () => {
+      const accessToken = await getAccessToken();
+      if (!mounted) return;
+      if (!accessToken) {
+        setAuthGateError(true);
+        return;
+      }
 
-        setScopes((prev) => {
-          // Merge db scopes with any local pending scope not yet in DB
-          const existingCodes = new Set(dbScopes.map((s) => s.scope_code));
-          const unpersistedLocal = prev.filter((s) => !existingCodes.has(s.scope_code));
-
-          // Auto-persist imported/pending scopes to Supabase DB now that user is logged in
-          unpersistedLocal.forEach((scopeToPersist) => {
-            saveScopeToDatabase(scopeToPersist, user.email);
-          });
-          clearPendingScopeFromStorage();
-
-          return [...unpersistedLocal, ...dbScopes];
-        });
+      fetch('/api/client/get-scopes', {
+        headers: { Authorization: `Bearer ${accessToken}` },
       })
-      .catch((err) => console.warn('Failed to fetch client scopes from Supabase:', err));
+        .then(async (res) => {
+          if (res.status === 401) {
+            if (mounted) setAuthGateError(true);
+            return null;
+          }
+          return res.json();
+        })
+        .then((data) => {
+          if (!mounted || !data?.scopes) return;
+
+          const dbScopes: ClientScope[] = data.scopes.map(dbToClientScope);
+
+          setScopes((prev) => {
+            // Merge db scopes with any local pending scope not yet in DB
+            const existingCodes = new Set(dbScopes.map((s) => s.scope_code));
+            const unpersistedLocal = prev.filter((s) => !existingCodes.has(s.scope_code));
+
+            // Auto-persist imported/pending scopes to Supabase DB now that user is logged in
+            unpersistedLocal.forEach((scopeToPersist) => {
+              saveScopeToDatabase(scopeToPersist);
+            });
+            clearPendingScopeFromStorage();
+
+            return [...unpersistedLocal, ...dbScopes];
+          });
+        })
+        .catch((err) => console.warn('Failed to fetch client scopes from Supabase:', err));
+    };
+
+    loadScopes();
 
     return () => {
       mounted = false;
     };
-  }, [user?.email, saveScopeToDatabase]);
+  }, [user?.email, getAccessToken, saveScopeToDatabase]);
 
   const handleSaveProfile = (scopeId: string) => {
     const compName = companyInputs[scopeId]?.trim() || user?.user_metadata?.full_name || 'My Custom Project';
@@ -292,6 +269,16 @@ export default function ClientDashboardPage() {
 
   return (
     <div className={styles.dashboardShell}>
+      {authGateError && (
+        <div className={styles.authGateBanner}>
+          <ShieldCheck size={16} />
+          <span>Your session could not be verified. Please sign in again to sync your scopes.</span>
+          <button type="button" className="comic-btn comic-btn-blue" onClick={() => loginWithGoogle('/dashboard')}>
+            Sign In Again
+          </button>
+        </div>
+      )}
+
       {/* Workspace Header */}
       <header className={styles.header}>
         <div className={styles.userInfo}>
@@ -332,12 +319,6 @@ export default function ClientDashboardPage() {
           onClick={() => setActiveTab('invoices')}
         >
           <CreditCard size={16} /> Invoices & Receipts
-        </button>
-        <button
-          className={`${styles.tabBtn} ${activeTab === 'rag' ? styles.activeTab : ''}`}
-          onClick={() => setActiveTab('rag')}
-        >
-          <Zap size={16} /> Managed RAG Services
         </button>
       </div>
 
@@ -607,7 +588,6 @@ export default function ClientDashboardPage() {
                   <tr>
                     <th>Date</th>
                     <th>Scope Ref</th>
-                    <th>Gateway</th>
                     <th>Deposit Amount</th>
                     <th>Status</th>
                   </tr>
@@ -617,7 +597,6 @@ export default function ClientDashboardPage() {
                     <tr key={s.id}>
                       <td>{new Date(s.created_at).toLocaleDateString()}</td>
                       <td><code>{s.scope_code}</code></td>
-                      <td><span className={styles.gatewayBadge}>DIRECT / WIRE</span></td>
                       <td><strong>{s.currency === 'INR' ? `₹${Math.round(s.total_cost_inr * 0.5).toLocaleString('en-IN')}` : `$${Math.round(s.total_cost_usd * 0.5)}`}</strong></td>
                       <td>
                         <span className={s.deposit_paid ? styles.paidBadge : styles.pendingBadge}>
@@ -628,28 +607,6 @@ export default function ClientDashboardPage() {
                   ))}
                 </tbody>
               </table>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'rag' && (
-          <div className={styles.sectionGrid}>
-            <div className={styles.ragCard}>
-              <div className={styles.ragHeader}>
-                <div>
-                  <h3 className={styles.ragTitle}>Retriever AI SaaS Workspace</h3>
-                  <span className={styles.planBadge}>Managed RAG Studio</span>
-                </div>
-                <a href="/rag/app" className="comic-btn comic-btn-blue">
-                  🚀 Launch RAG App <ExternalLink size={14} />
-                </a>
-              </div>
-
-              <div className={styles.ragMeta}>
-                <p><strong>Tenant Email:</strong> <code>{user.email}</code></p>
-                <p><strong>Status:</strong> <span className={styles.activeStatus}>● ACTIVE</span></p>
-                <p><strong>RAG Features:</strong> Hybrid Search (BM25 + Dense Vectors), Semantic Caching, Citations</p>
-              </div>
             </div>
           </div>
         )}

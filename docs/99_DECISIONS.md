@@ -201,6 +201,36 @@ This document serves as the registry of critical architectural design decisions 
 
 ---
 
+# **ADR 14: Client Scope API Session Gating & Client-Editable Field Isolation**
+
+* **Status**: Approved
+* **Context**: The client scope endpoints (`/api/client/get-scopes`, `/api/client/save-scope`) accepted any caller-supplied email, so anyone could read another client's quote details or upsert arbitrary scopes. Additionally, the save endpoint's unconditional `upsert` always rewrote `status: 'Draft Proposal'`, clobbering synchronizer-managed delivery state whenever a client edited features or profile details. Dead Razorpay-era columns (`payment_id`, `gateway_order_id`) were still declared in the schema and surfaced as a hardcoded `DIRECT / WIRE` gateway badge in the invoice ledger.
+* **Decision**:
+  1. **Server-Side Session Verification**: New `src/lib/sessionVerify.ts` (server-only) extracts the `Authorization: Bearer <access_token>` header and resolves the verified session email via `supabase.auth.getUser(token)`. Both client scope routes derive the canonical `client_email` exclusively from that verified email and ignore email params/bodies. Requests without a valid token get `401`.
+  2. **Field Isolation on Save**: `save-scope` now checks for an existing `scope_code`; existing orders are updated with client-editable columns only (`company_name`, `client_phone`, `base_engine`, `features`, `brand_asset`, `maintenance_plan`, totals, `currency`, `timeline`, `updated_at`) so server-managed fields (`status`, `delivery_stage`, `deposit_paid`) set by `scripts/sync_tabs/clients.py` survive client edits.
+  3. **Dashboard Re-Auth UX**: The dashboard sends the session token on both scope calls and surfaces an inline "Sign In Again" banner on `401`.
+  4. **Dead-Column Cleanup**: Removed `payment_id`/`gateway_order_id` from `supabase_schema.sql` and dropped the invoice ledger's Gateway column plus the synchronizer's Payment Ref display.
+  5. **Degraded Mode Preserved**: When Supabase env vars are absent (dev/CI), both routes keep the legacy no-op behavior (empty scopes / acknowledged save) without enforcement.
+* **Consequences**:
+  - **Pros**: No client can read or write another client's scopes; server-managed delivery state is never clobbered by client edits.
+  - **Cons**: The live Supabase `client_orders` table had the dropped columns applied at deployment time (the columns no longer exist on the live table, matching `supabase_schema.sql`; no migration drift). Restored sessions without a refreshable access token hit the 401 banner until re-login.
+
+---
+
+# **ADR 15: Client Dashboard Hardening — RLS Scoping, Fresh-Token Resolution, and RAG Tab Removal**
+
+* **Status**: Approved
+* **Context**: Three follow-ups from the ADR 14 hardening pass: (1) `client_orders` still carried a public-read RLS policy, leaving a hole if any future code path touched Supabase directly from the client; (2) the dashboard sent `session.access_token` captured in React state, which could go stale on long-lived tabs and trigger avoidable `401` banners after token expiry; (3) the dashboard's "Managed RAG Services" tab claimed an active retriever tenant and linked to `/rag/app`, but the retriever backend (external repo, `apps/api/src/routers/auth.py`) still expects its own auth/tenant flow — cross-site SSO (retriever ROADMAP M51) is still planned, so the tab made unverified claims about a product that is not yet integrated.
+* **Decision**:
+  1. **Session-Scoped RLS**: Replaced the `Allow public select client_orders` policy in `supabase_schema.sql` with `Clients can select own scopes` (`auth.jwt() ->> 'email' = client_email`). Writes remain service-role only; API routes and synchronizer tooling are unaffected.
+  2. **Fresh-Token Resolution**: Added `getAccessToken()` to `AuthContext` — it reads the current session via `supabaseAuth.auth.getSession()`, returns the token when unexpired (JWT `exp` check), otherwise refreshes via `auth.refreshSession(refresh_token)`. Dashboard fetches (`save-scope`, `get-scopes`) and the IntakeForm save path now resolve the token at call time instead of borrowing the stale React-state token; `null` triggers the existing re-auth banner. The `401`-then-banner path remains the final fallback.
+  3. **RAG Tab Removal**: Deleted the "Managed RAG Services" tab (state union, tab button, content block) and its CSS from the Client Workspace Dashboard. Reintroduce only when the retriever SSO/tenant integration is completed.
+* **Consequences**:
+  - **Pros**: Defense-in-depth on `client_orders` reads even with a client-side key; scope calls always carry a live JWT (fewer spurious 401s); dashboard no longer claims a RAG tenant that does not exist.
+  - **Cons**: The new RLS policy requires a manual SQL apply on the live Supabase instance (same workflow as ADR 14). `getAccessToken()` consumers are async, so any future dashboard action must await it before fetching. **Live-DB drift discovered**: the live `client_orders` table was still the legacy Razorpay-era shape (`user_email`, `selected_features`, `total_cost`, `base_engine_id/title`, `gateway`, `payment_status`, `development_status`, `receipt_url`, `pdf_brief_key`) because `CREATE TABLE IF NOT EXISTS` in `supabase_schema.sql` silently skips existing tables — the ADR-13 definition was never applied live (table was empty, so drop+recreate was the clean fix). `client_subscriptions` is a similarly orphaned legacy table not referenced in the portfolio codebase.
+
+---
+
 # **Acceptance Criteria**
 - Registry records cover the core v2 architectural choices.
 - Format follows standard ADR structures (Context, Decision, Consequences).

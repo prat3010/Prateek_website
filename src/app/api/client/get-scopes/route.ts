@@ -1,23 +1,25 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
+import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
 
 export async function GET(req: Request) {
   try {
-    const { searchParams } = new URL(req.url);
-    const email = searchParams.get('email');
-
-    if (!email) {
-      return NextResponse.json({ error: 'Missing email query parameter' }, { status: 400 });
-    }
-
+    // Degraded dev/CI mode: no Supabase environment, no persistence to read.
     if (!supabase) {
       return NextResponse.json({ scopes: [] });
+    }
+
+    // The client-supplied email is ignored; scopes are scoped to the
+    // verified session email from the Bearer access token.
+    const clientEmail = await getVerifiedSessionEmail(req);
+    if (!clientEmail) {
+      return NextResponse.json({ error: 'Unauthorized: valid session required.' }, { status: 401 });
     }
 
     const { data, error } = await supabase
       .from('client_orders')
       .select('*')
-      .eq('client_email', email)
+      .eq('client_email', clientEmail)
       .order('created_at', { ascending: false });
 
     if (error) {

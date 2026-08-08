@@ -682,20 +682,6 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.gatewayBadge {
-  background: rgba(37, 99, 235, 0.12);
-  color: #2563eb;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-:global([data-theme='noir']) .gatewayBadge {
-  background: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
-}
-
 .paidBadge {
   color: #059669;
   font-weight: 700;
@@ -714,62 +700,90 @@
   color: #eab308;
 }
 
-.ragCard {
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  backdrop-filter: blur(16px);
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.06);
-  border-radius: 16px;
-  padding: 2rem;
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(37, 99, 235, 0.2);
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: dashboardSpin 0.8s linear infinite;
+  margin-bottom: 1rem;
 }
 
-:global([data-theme='noir']) .ragCard {
-  background: rgba(18, 20, 26, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+@keyframes dashboardSpin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.ragHeader {
+:global([data-theme='noir']) .spinner {
+  border: 3px solid rgba(56, 189, 248, 0.2);
+  border-top-color: #38bdf8;
+}
+
+.contentBody {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1.5rem;
+  flex-direction: column;
+  gap: 1.75rem;
 }
 
-.ragTitle {
-  font-size: 1.4rem;
+.emptyCard {
+  background: rgba(0, 0, 0, 0.02);
+  border: 1.5px dashed rgba(0, 0, 0, 0.18);
+  border-radius: 16px;
+  padding: 3rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #475569;
+}
+
+:global([data-theme='noir']) .emptyCard {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1.5px dashed rgba(255, 255, 255, 0.25);
+  color: #94a3b8;
+}
+
+.orderDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.engineName {
   margin: 0;
+  font-size: 0.95rem;
   color: #0f172a;
 }
 
-:global([data-theme='noir']) .ragTitle {
-  color: #f8fafc;
+:global([data-theme='noir']) .engineName {
+  color: #f1f5f9;
 }
 
-.planBadge {
-  font-size: 0.75rem;
-  color: #2563eb;
-  background: rgba(37, 99, 235, 0.12);
-  padding: 0.2rem 0.6rem;
-  border-radius: 4px;
-  font-weight: 600;
+.paymentContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
-:global([data-theme='noir']) .planBadge {
-  color: #3b82f6;
-  background: rgba(59, 130, 246, 0.15);
-}
-
-.ragMeta p {
-  margin: 0.5rem 0;
+.authGateBanner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  color: #b91c1c;
+  border-radius: 12px;
+  padding: 0.85rem 1.25rem;
   font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
 }
 
-.activeStatus {
-  color: #059669;
-  font-weight: 700;
-}
-
-:global([data-theme='noir']) .activeStatus {
-  color: #10b981;
+:global([data-theme='noir']) .authGateBanner {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #f87171;
 }

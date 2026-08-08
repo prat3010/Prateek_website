@@ -77,13 +77,13 @@ The project uses the following environment variables (stored in `.env.local` loc
   - `/` — home page (all portfolio sections).
   - `/terminal` — interactive diagnostics terminal console.
   - `/scoping` — Project Scoping Lab & Instant Quote wizard page (deep-linkable via `?engine=landing|multipage|saas` or `?goal=<goal archetype id>`).
-  - `/dashboard` — Client Workspace Dashboard (Google OAuth profile confirmation, active project scopes, interactive feature customizer, milestone progress tracker, invoice ledger, RAG app studio link, PDF proposal exporter, and direct scope confirmation CTA).
+  - `/dashboard` — Client Workspace Dashboard (Google OAuth profile confirmation, active project scopes, interactive feature customizer, milestone progress tracker, invoice ledger, PDF proposal exporter, and direct scope confirmation CTA).
   - `/admin/analytics` — visitor analytics dashboard.
   - `/rag` — Retriever AI SaaS Product Landing Page (Hero, live mini-RAG sandbox, feature grid, 1-line embed snippet, Geo-IP pricing).
   - `/rag/login` — Auth & Guest Access Portal (1-click Google OAuth + instant Guest Demo).
   - `/rag/app` — SaaS App Studio Workspace (Chat Studio, Document Library, Search Inspector, Embed Configurator, role-gated admin link).
   - `/blog` and `/blog/[slug]` — blog listing and individual post pages.
-- `src/app/api/` contains REST API routes for reading/writing portfolio & client data to Supabase: `skills`, `projects`, `certificates`, `profile`, `git-log`, `analytics-summary`, `contact`, `client/save-scope`, and `revalidate`.
+- `src/app/api/` contains REST API routes for reading/writing portfolio & client data to Supabase: `skills`, `projects`, `certificates`, `profile`, `git-log`, `analytics-summary`, `contact`, `client/save-scope`, `client/get-scopes`, and `revalidate`. The client scope routes (`/api/client/*`) are session-gated: callers must pass `Authorization: Bearer <supabase access_token>`, and `get-scopes`/`save-scope` derive the client email from the verified session token (never from request parameters) via `src/lib/sessionVerify.ts`.
 - `src/lib/auth.ts` and `src/context/AuthContext.tsx` — Universal Supabase Auth layer with dual cookie + localStorage persistence adapter and direct JWT hash fragment parser for robust session restoration across Safari ITP & OAuth redirects.
 - `src/proxy.ts` is the Next.js 16 proxy (formerly middleware) file that intercepts requests for telemetry logging.
 - `src/components/rag/` contains the interactive RAG Lab playground (`ChatPanel.tsx`, `UploadPanel.tsx`, `SearchPanel.tsx`, `ConfigPanel.tsx`, `PricingSection.tsx`) connected to the `retriever` backend via `src/lib/rag-client.ts`. Features include 👍/👎 message feedback (`submitFeedback`), clickable presigned citation downloads (`getDownloadUrl`), semantic cache badges (`⚡ Cached`), Geo-IP pricing (INR/USD), and Lenis smooth scroll isolation (`data-lenis-prevent`).
@@ -160,6 +160,7 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
 - Treat analytics data as sensitive. Do not publicly expose raw visitor activity, detailed referrers, location, browser, OS, or device data without an explicit product decision.
 - Do not weaken `server-only` protections around Supabase service-role access.
 - **Row-Level Security (RLS):** All Supabase tables (`page_visits`, `projects`, `skills`, `certificates`, `profile`, `posts`) must have Row-Level Security enabled. Public write access must remain disabled. Telemetry and content updates should only be performed server-side or via local scripts using the `SUPABASE_SERVICE_ROLE_KEY`. Do not introduce public write policies.
+- **Client Scope APIs:** `/api/client/get-scopes` and `/api/client/save-scope` must stay session-gated. Client emails are always derived from the verified Bearer access token (`src/lib/sessionVerify.ts`), never from request params/bodies. `save-scope` must only ever update client-editable fields — server-managed fields (`status`, `delivery_stage`, `deposit_paid`) are set by tooling (`scripts/sync_tabs/clients.py`) and must be preserved on edit.
 - Contact form changes must preserve input validation and HTML escaping.
 - Do not introduce runtime shell execution or filesystem writes in public request paths unless there is a reason and the behavior is bounded.
 - Be careful with comments that claim compliance. Describe what the code does, not what laws it satisfies.
