@@ -66,10 +66,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const initAuth = async () => {
       if (typeof window !== 'undefined') {
         const searchParams = new URLSearchParams(window.location.search);
-        const hashStr = window.location.hash.substring(1);
-        const hashParams = new URLSearchParams(hashStr);
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
 
-        // 1. Capture OAuth Error Parameters
         const errorDesc =
           searchParams.get('error_description') ||
           hashParams.get('error_description') ||
@@ -78,55 +76,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (errorDesc) {
           console.error('Supabase OAuth Error:', errorDesc);
-          alert(`Google Sign-In Notice: ${decodeURIComponent(errorDesc).replace(/\+/g, ' ')}`);
         }
 
-        // 2. Direct Session Restoration from OAuth Hash Fragment
-        const accessToken = hashParams.get('access_token');
-        const refreshToken = hashParams.get('refresh_token');
-        if (accessToken && refreshToken) {
+        // Clean URL parameters if OAuth return params exist
+        if (searchParams.has('code') || searchParams.has('error') || hashParams.has('access_token')) {
           try {
-            const { data, error } = await supabaseAuth.auth.setSession({
-              access_token: accessToken,
-              refresh_token: refreshToken,
-            });
-            if (!error && data.session?.user && mounted) {
-              setSession(data.session);
-              setUser(data.session.user);
-              universalStorage.setItem('prateeq_active_user', JSON.stringify(data.session.user));
-              try {
-                window.history.replaceState(null, '', window.location.pathname);
-              } catch {}
-              setLoading(false);
-              return;
-            }
-          } catch (hashErr) {
-            console.warn('Set session from hash warning:', hashErr);
-          }
-        }
-
-        // 3. PKCE Code Exchange Fallback (if code in search params)
-        const code = searchParams.get('code');
-        if (code) {
-          try {
-            const { data, error } = await supabaseAuth.auth.exchangeCodeForSession(code);
-            if (!error && data.session?.user && mounted) {
-              setSession(data.session);
-              setUser(data.session.user);
-              universalStorage.setItem('prateeq_active_user', JSON.stringify(data.session.user));
-              try {
-                window.history.replaceState(null, '', window.location.pathname);
-              } catch {}
-              setLoading(false);
-              return;
-            }
-          } catch (codeErr) {
-            console.warn('Code exchange warning:', codeErr);
-          }
+            window.history.replaceState(null, '', window.location.pathname);
+          } catch {}
         }
       }
 
-      // 4. Let Supabase JS client detect stored session
       try {
         const { data: { session: currentSession }, error } = await supabaseAuth.auth.getSession();
         if (error) {
@@ -136,11 +95,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setSession(currentSession);
           setUser(currentSession.user);
           universalStorage.setItem('prateeq_active_user', JSON.stringify(currentSession.user));
-          if (typeof window !== 'undefined' && window.location.hash.includes('access_token=')) {
-            try {
-              window.history.replaceState(null, '', window.location.pathname);
-            } catch {}
-          }
         }
       } catch (err) {
         console.warn('Get session warning:', err);
@@ -210,16 +164,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return refreshed.session.access_token;
         }
       }
-      if (user?.email) {
-        return 'demo-session-token';
-      }
       return null;
     } catch (err) {
       console.warn('Access token resolution failed:', err);
-      if (user?.email) return 'demo-session-token';
       return null;
     }
-  }, [user?.email]);
+  }, []);
 
   return (
     <AuthContext.Provider

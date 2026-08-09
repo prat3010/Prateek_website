@@ -12,10 +12,6 @@ export async function getVerifiedSessionEmail(req: Request): Promise<string | nu
   const token = authHeader?.trim().replace(/^Bearer\s+/i, '');
   if (!token) return null;
 
-  if (token === 'demo-session-token' || token.startsWith('demo-')) {
-    return 'pointyrocket@gmail.com';
-  }
-
   try {
     const { data, error } = await supabase.auth.getUser(token);
     if (!error && data.user?.email) {

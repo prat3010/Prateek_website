@@ -71,7 +71,7 @@ export default function ClientLayout({
 }: ClientLayoutProps) {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith('/admin');
-  const isStandaloneAppRoute = isAdminRoute || pathname === '/rag/login' || pathname === '/rag/app';
+  const isStandaloneAppRoute = isAdminRoute || pathname === '/rag/app';
   const [isKonamiActive, setIsKonamiActive] = useState(false);
 
   // Konami Code global listener

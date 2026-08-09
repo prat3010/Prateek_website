@@ -231,7 +231,7 @@ export function PricingSection() {
             </ul>
 
             <a
-              href={plan.stripeUrl || "/rag/login"}
+              href={plan.stripeUrl || "/scoping?engine=saas"}
               target={plan.stripeUrl?.startsWith("http") ? "_blank" : undefined}
               rel={plan.stripeUrl?.startsWith("http") ? "noopener noreferrer" : undefined}
               className={`comic-btn ${plan.popular ? "comic-btn-blue" : "comic-btn-outline"} ${styles.planCta}`}

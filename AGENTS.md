@@ -80,7 +80,6 @@ The project uses the following environment variables (stored in `.env.local` loc
   - `/dashboard` — Client Workspace Dashboard (Google OAuth profile confirmation, active project scopes, interactive feature customizer, milestone progress tracker, invoice ledger, PDF proposal exporter, and direct scope confirmation CTA).
   - `/admin/analytics` — visitor analytics dashboard.
   - `/rag` — Retriever AI SaaS Product Landing Page (Hero, live mini-RAG sandbox, feature grid, 1-line embed snippet, Geo-IP pricing).
-  - `/rag/login` — Auth & Guest Access Portal (1-click Google OAuth + instant Guest Demo).
   - `/rag/app` — SaaS App Studio Workspace (Chat Studio, Document Library, Search Inspector, Embed Configurator, role-gated admin link).
   - `/blog` and `/blog/[slug]` — blog listing and individual post pages.
 - `src/app/api/` contains REST API routes for reading/writing portfolio & client data to Supabase: `skills`, `projects`, `certificates`, `profile`, `git-log`, `analytics-summary`, `contact`, `client/save-scope`, `client/get-scopes`, and `revalidate`. The client scope routes (`/api/client/*`) are session-gated: callers must pass `Authorization: Bearer <supabase access_token>`, and `get-scopes`/`save-scope` derive the client email from the verified session token (never from request parameters) via `src/lib/sessionVerify.ts`.

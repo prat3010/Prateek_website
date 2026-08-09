@@ -24,43 +24,30 @@ export default function RagAppStudioPage() {
     let active = true;
     Promise.resolve().then(() => {
       if (!active) return;
-      const storedTenant = localStorage.getItem("retriever_tenant_id");
-      const storedUser = localStorage.getItem("retriever_user_id");
-      const storedKey = localStorage.getItem("retriever_api_key");
+      const storedTenant = localStorage.getItem("retriever_tenant_id") || "guest-demo";
+      const storedUser = localStorage.getItem("retriever_user_id") || "guest-user";
+      const storedKey = localStorage.getItem("retriever_api_key") || "guest-demo-key";
 
-      if (!storedTenant || !storedUser || !storedKey) {
-        router.push("/rag/login");
-        return;
-      }
-
-      const tId = storedTenant;
-      const uId = storedUser;
-      const key = storedKey;
-
-      setTenantId(tId);
-      setApiKey(key);
-      setUserId(uId);
-      setIsAdmin(key.includes("admin") || key === "dev-admin-master-key-change-in-production");
+      setTenantId(storedTenant);
+      setApiKey(storedKey);
+      setUserId(storedUser);
+      setIsAdmin(storedKey.includes("admin") || storedKey === "dev-admin-master-key-change-in-production");
 
       const cli = new RetrieverClient({
         apiUrl: process.env.NEXT_PUBLIC_RETRIEVER_API_URL || "https://rag.prateeq.in",
-        tenantId: tId,
-        apiKey: key,
-        userId: uId,
+        tenantId: storedTenant,
+        apiKey: storedKey,
+        userId: storedUser,
       });
       setClient(cli);
     });
     return () => {
       active = false;
     };
-  }, [router]);
+  }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("retriever_tenant_id");
-    localStorage.removeItem("retriever_user_id");
-    localStorage.removeItem("retriever_api_key");
-    localStorage.removeItem("retriever_jwt");
-    router.push("/rag/login");
+  const handleExitStudio = () => {
+    router.push("/rag");
   };
 
   return (
@@ -81,8 +68,8 @@ export default function RagAppStudioPage() {
             </Link>
           )}
 
-          <button className="comic-btn comic-btn-outline" onClick={handleLogout}>
-            Log Out
+          <button className="comic-btn comic-btn-outline" onClick={handleExitStudio}>
+            ← Back to Product Landing
           </button>
         </div>
       </div>

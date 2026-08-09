@@ -23,7 +23,6 @@ A highly interactive, storyteller-driven personal portfolio website designed wit
 | `/scoping` | Project Scoping Lab & Instant Quote wizard page (deep-linkable via `?engine=landing\|multipage\|saas` or `?goal=<archetype id>`) |
 | `/admin/analytics` | Visitor analytics dashboard |
 | `/rag` | Retriever AI SaaS Product Landing Page — Hero, live mini-RAG sandbox, feature grid, 1-line embed snippet, and dynamic Geo-IP pricing (INR vs. USD). |
-| `/rag/login` | Auth & Guest Access Portal — 1-click Google OAuth + instant Guest Demo button. |
 | `/rag/app` | SaaS App Studio Workspace — Chat Studio, Document Library, Search Inspector, Embed Configurator, and role-gated admin link. |
 | `/blog` | Blog listing page |
 | `/blog/[slug]` | Individual blog post page |

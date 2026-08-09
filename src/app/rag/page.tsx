@@ -65,8 +65,8 @@ export default function RagLandingPage() {
           </p>
 
           <div className={styles.heroCtas}>
-            <Link href="/rag/login" className="comic-btn comic-btn-blue">
-              🚀 Get Started Free
+            <Link href="/rag/app" className="comic-btn comic-btn-blue">
+              🚀 Launch App Studio
             </Link>
             <a href="#demo" onClick={scrollToDemo} className="comic-btn comic-btn-outline">
               💬 Try Live Demo Below
