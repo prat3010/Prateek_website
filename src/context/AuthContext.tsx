@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { User, Session } from '@supabase/supabase-js';
-import { supabaseAuth, signInWithGoogle, signOut } from '@/lib/auth';
+import { supabaseAuth, signInWithGoogle, signOut, universalStorage } from '@/lib/auth';
 
 interface AuthContextType {
   user: User | null;
@@ -47,12 +47,12 @@ export function isJwtExpired(token: string): boolean {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(() => {
     if (typeof window === 'undefined') return null;
-    const raw = localStorage.getItem('prateeq_active_user');
+    const raw = universalStorage.getItem('prateeq_active_user');
     if (!raw) return null;
     try {
       const parsed = JSON.parse(raw) as User;
       if (parsed.email === 'client@example.com' || parsed.app_metadata?.provider === 'guest') {
-        localStorage.removeItem('prateeq_active_user');
+        universalStorage.removeItem('prateeq_active_user');
         return null;
       }
       return parsed;
@@ -61,6 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return null;
     }
   });
+
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -85,7 +86,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           alert(`Google Sign-In Error: ${decodeURIComponent(errorDesc).replace(/\+/g, ' ')}`);
         }
 
-        // 2. PKCE Code Exchange Fallback (if code in search params)
+        // 2. Direct Session Restoration from OAuth Hash Fragment
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+        if (accessToken && refreshToken) {
+          try {
+            const { data, error } = await supabaseAuth.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken,
+            });
+            if (!error && data.session?.user && mounted) {
+              setSession(data.session);
+              setUser(data.session.user);
+              universalStorage.setItem('prateeq_active_user', JSON.stringify(data.session.user));
+              try {
+                window.history.replaceState(null, '', window.location.pathname + window.location.search);
+              } catch {}
+              setLoading(false);
+              return;
+            }
+          } catch (hashErr) {
+            console.warn('Set session from hash warning:', hashErr);
+          }
+        }
+
+        // 3. PKCE Code Exchange Fallback (if code in search params)
         const code = searchParams.get('code');
         if (code) {
           try {
@@ -93,7 +118,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (!error && data.session?.user && mounted) {
               setSession(data.session);
               setUser(data.session.user);
-              localStorage.setItem('prateeq_active_user', JSON.stringify(data.session.user));
+              universalStorage.setItem('prateeq_active_user', JSON.stringify(data.session.user));
               try {
                 window.history.replaceState(null, '', window.location.pathname);
               } catch {}
@@ -106,7 +131,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      // 3. Let Supabase JS client detect URL session hash & read stored session
+      // 4. Let Supabase JS client detect stored session
       try {
         const { data: { session: currentSession }, error } = await supabaseAuth.auth.getSession();
         if (error) {
@@ -115,13 +140,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (mounted && currentSession?.user) {
           setSession(currentSession);
           setUser(currentSession.user);
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('prateeq_active_user', JSON.stringify(currentSession.user));
-            if (window.location.hash.includes('access_token=')) {
-              try {
-                window.history.replaceState(null, '', window.location.pathname + window.location.search);
-              } catch {}
-            }
+          universalStorage.setItem('prateeq_active_user', JSON.stringify(currentSession.user));
+          if (typeof window !== 'undefined' && window.location.hash.includes('access_token=')) {
+            try {
+              window.history.replaceState(null, '', window.location.pathname + window.location.search);
+            } catch {}
           }
         }
       } catch (err) {
@@ -133,24 +156,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     initAuth();
 
-    // 4. Listen for Auth State Changes (SIGNED_IN, SIGNED_OUT, TOKEN_REFRESHED)
-    const { data: { subscription } } = supabaseAuth.auth.onAuthStateChange((_event, newSession) => {
+    // 5. Listen for Auth State Changes (SIGNED_IN, TOKEN_REFRESHED, SIGNED_OUT)
+    const { data: { subscription } } = supabaseAuth.auth.onAuthStateChange((event, newSession) => {
       if (!mounted) return;
       if (newSession?.user) {
         setSession(newSession);
         setUser(newSession.user);
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('prateeq_active_user', JSON.stringify(newSession.user));
-        }
-      } else if (_event === 'SIGNED_OUT' || !newSession) {
+        universalStorage.setItem('prateeq_active_user', JSON.stringify(newSession.user));
+        setLoading(false);
+      } else if (event === 'SIGNED_OUT') {
         setSession(null);
         setUser(null);
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('prateeq_active_user');
-          document.cookie = 'prateeq_active_user=; path=/; max-age=0; SameSite=Lax;';
-        }
+        universalStorage.removeItem('prateeq_active_user');
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     const safetyTimer = setTimeout(() => {
@@ -174,10 +193,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const handleLogout = async () => {
     await signOut().catch(() => {});
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('prateeq_active_user');
-      document.cookie = 'prateeq_active_user=; path=/; max-age=0;';
-    }
+    universalStorage.removeItem('prateeq_active_user');
     setUser(null);
     setSession(null);
   };
