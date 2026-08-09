@@ -21,7 +21,12 @@ export const universalStorage = {
     try {
       localStorage.setItem(key, value);
     } catch {}
-    document.cookie = `${encodeURIComponent(key)}=${encodeURIComponent(value)}; path=/; max-age=2592000; SameSite=Lax;`;
+    try {
+      const encodedVal = encodeURIComponent(value);
+      if (encodedVal.length < 3800) {
+        document.cookie = `${encodeURIComponent(key)}=${encodedVal}; path=/; max-age=2592000; SameSite=Lax;`;
+      }
+    } catch {}
   },
   removeItem: (key: string): void => {
     if (typeof window === 'undefined') return;
@@ -37,17 +42,19 @@ export const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
+    flowType: 'pkce',
     storage: universalStorage,
   },
 });
 
 /**
  * Initiates Google OAuth Sign-In flow with Supabase Auth.
- * Redirects to window.location.origin to match Supabase Auth Site URL settings perfectly.
+ * Strips query parameters to ensure canonical match against Supabase Auth Redirect URIs.
  */
 export async function signInWithGoogle(redirectTo?: string) {
   const origin = typeof window !== 'undefined' ? window.location.origin : 'https://prateeq.in';
-  const targetRedirect = redirectTo && !redirectTo.startsWith('/') ? redirectTo : `${origin}${redirectTo || '/dashboard'}`;
+  const pathOnly = redirectTo ? redirectTo.split('?')[0] : '/dashboard';
+  const targetRedirect = `${origin}${pathOnly}`;
 
   const { data, error } = await supabaseAuth.auth.signInWithOAuth({
     provider: 'google',
