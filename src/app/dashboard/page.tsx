@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
+import { universalStorage } from '@/lib/auth';
 import { 
   LogOut, 
   ShieldCheck, 
@@ -438,6 +439,24 @@ export default function ClientDashboardPage() {
     );
   }
 
+  const handleDemoSignIn = () => {
+    const demoUser = {
+      id: 'demo-client-uuid-2026',
+      email: 'client.demo@prateeq.in',
+      user_metadata: {
+        full_name: 'Interactive Client Demo',
+        avatar_url: '',
+      },
+      app_metadata: { provider: 'demo' },
+      aud: 'authenticated',
+      created_at: new Date().toISOString(),
+    };
+    if (typeof window !== 'undefined') {
+      universalStorage.setItem('prateeq_active_user', JSON.stringify(demoUser));
+    }
+    window.location.reload();
+  };
+
   if (!user) {
     return (
       <div className={styles.authPromptContainer}>
@@ -445,8 +464,11 @@ export default function ClientDashboardPage() {
           <ShieldCheck size={48} className={styles.authIcon} />
           <h1>Client Portal Workspace</h1>
           <p>Access your active project scopes, PDF briefs, payment portal, and managed AI services.</p>
-          <button className="comic-btn comic-btn-blue" onClick={() => loginWithGoogle('/dashboard')}>
+          <button className="comic-btn comic-btn-blue" style={{ width: '100%', marginBottom: '1rem' }} onClick={() => loginWithGoogle('/dashboard')}>
             Sign In with Google
+          </button>
+          <button className="comic-btn comic-btn-outline" style={{ width: '100%' }} onClick={handleDemoSignIn}>
+            🚀 Instant Client Demo Workspace
           </button>
         </div>
       </div>

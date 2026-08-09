@@ -50,12 +50,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const raw = universalStorage.getItem('prateeq_active_user');
     if (!raw) return null;
     try {
-      const parsed = JSON.parse(raw) as User;
-      if (parsed.email === 'client@example.com' || parsed.app_metadata?.provider === 'guest') {
-        universalStorage.removeItem('prateeq_active_user');
-        return null;
-      }
-      return parsed;
+      return JSON.parse(raw) as User;
     } catch (e) {
       console.warn('Failed to parse cached user:', e);
       return null;
@@ -83,7 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (errorDesc) {
           console.error('Supabase OAuth Error:', errorDesc);
-          alert(`Google Sign-In Error: ${decodeURIComponent(errorDesc).replace(/\+/g, ' ')}`);
+          alert(`Google Sign-In Notice: ${decodeURIComponent(errorDesc).replace(/\+/g, ' ')}`);
         }
 
         // 2. Direct Session Restoration from OAuth Hash Fragment
@@ -100,7 +95,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               setUser(data.session.user);
               universalStorage.setItem('prateeq_active_user', JSON.stringify(data.session.user));
               try {
-                window.history.replaceState(null, '', window.location.pathname + window.location.search);
+                window.history.replaceState(null, '', window.location.pathname);
               } catch {}
               setLoading(false);
               return;
@@ -143,7 +138,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           universalStorage.setItem('prateeq_active_user', JSON.stringify(currentSession.user));
           if (typeof window !== 'undefined' && window.location.hash.includes('access_token=')) {
             try {
-              window.history.replaceState(null, '', window.location.pathname + window.location.search);
+              window.history.replaceState(null, '', window.location.pathname);
             } catch {}
           }
         }
