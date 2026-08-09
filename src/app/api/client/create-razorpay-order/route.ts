@@ -113,6 +113,7 @@ export async function POST(req: Request) {
           amount: amountInSubunits,
           currency: razorpayCurrency,
           receipt: scopeCode,
+          payment_capture: 1,
           notes: {
             scope_code: scopeCode,
             client_email: clientEmail,
