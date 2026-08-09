@@ -26,6 +26,12 @@ import resumeData from '@/data/resume.json';
 import type { ResumeData } from '@/data/resume';
 import styles from './dashboard.module.css';
 
+declare global {
+  interface Window {
+    Razorpay?: new (options: Record<string, unknown>) => { open: () => void };
+  }
+}
+
 export default function ClientDashboardPage() {
   const { user, loading, logout, loginWithGoogle, getAccessToken } = useAuth();
   const [activeTab, setActiveTab] = useState<'scopes' | 'invoices'>('scopes');
