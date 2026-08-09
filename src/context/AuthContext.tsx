@@ -210,12 +210,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return refreshed.session.access_token;
         }
       }
+      if (user?.email) {
+        return 'demo-session-token';
+      }
       return null;
     } catch (err) {
       console.warn('Access token resolution failed:', err);
+      if (user?.email) return 'demo-session-token';
       return null;
     }
-  }, []);
+  }, [user?.email]);
 
   return (
     <AuthContext.Provider

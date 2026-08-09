@@ -592,7 +592,17 @@ export default function ClientDashboardPage() {
           <ShieldCheck size={48} className={styles.authIcon} />
           <h1>Client Portal Workspace</h1>
           <p>Access your active project scopes, PDF briefs, payment portal, and managed AI services.</p>
-          <button className="comic-btn comic-btn-blue" style={{ width: '100%', marginBottom: '1rem' }} onClick={() => loginWithGoogle('/dashboard')}>
+          <button
+            className="comic-btn comic-btn-blue"
+            style={{ width: '100%', marginBottom: '1rem' }}
+            onClick={async () => {
+              try {
+                await loginWithGoogle('/dashboard');
+              } catch (err: unknown) {
+                alert(`Google Sign-In Notice: ${err instanceof Error ? err.message : String(err)}`);
+              }
+            }}
+          >
             Sign In with Google
           </button>
           <button className="comic-btn comic-btn-outline" style={{ width: '100%' }} onClick={handleDemoSignIn}>
