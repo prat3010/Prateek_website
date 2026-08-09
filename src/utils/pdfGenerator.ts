@@ -7,6 +7,8 @@ import { ScopingBriefPDF } from '@/components/pdf/ScopingBriefPDF';
 import { MiddlemanAgreementPDF } from '@/components/pdf/MiddlemanAgreementPDF';
 import { DeveloperResumePDF } from '@/components/pdf/DeveloperResumePDF';
 import { ServicesAndPricingPDF } from '@/components/pdf/ServicesAndPricingPDF';
+import { InvoicePDF } from '@/components/pdf/InvoicePDF';
+import type { InvoiceEntity } from '@/lib/clientOrder';
 import { registerPdfFontsClient } from '@/components/pdf/pdfFontsClient';
 
 let fontsRegistered = false;
@@ -125,5 +127,12 @@ export async function generateServicesAndPricingPDF(resumeData: ResumeData, isNo
   ensurePdfFonts();
   const fileName = `Prateeq_Sharma_Services_And_Pricing_Guide.pdf`;
   const element = React.createElement(ServicesAndPricingPDF, { resumeData, isNoir }) as unknown as React.ReactElement<DocumentProps>;
+  await renderAndOpenPDF(element, fileName);
+}
+
+export async function generateInvoicePDF(invoice: InvoiceEntity, isNoir = false) {
+  ensurePdfFonts();
+  const fileName = `Invoice_${invoice.invoice_number}.pdf`;
+  const element = React.createElement(InvoicePDF, { invoice, isNoir }) as unknown as React.ReactElement<DocumentProps>;
   await renderAndOpenPDF(element, fileName);
 }

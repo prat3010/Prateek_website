@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
 import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
+import { calculateInvoiceTotals } from '@/lib/invoicing';
 
 const USD_TO_INR_RATE = 85;
 
@@ -154,19 +155,46 @@ export async function POST(req: Request) {
 
     const orderData = await razorpayRes.json();
 
+    // Calculate rich invoice breakdown with SAC code and tax details
+    const itemDescription = `50% deposit lock for project scope ${scopeCode}`;
+    const invoiceCalc = calculateInvoiceTotals({
+      currency: originalCurrency,
+      place_of_supply: 'Delhi',
+      line_items: [
+        {
+          name: `Scope Deposit (50%) — ${scope.company_name || scopeCode}`,
+          description: itemDescription,
+          sac_hsn: '998314',
+          rate: depositAmount,
+          quantity: 1,
+          tax_rate: originalCurrency === 'INR' ? 18 : 0,
+          tax_type: 'exclusive',
+        },
+      ],
+    });
+
     // Record invoice entry in database
     try {
       await supabase.from('invoices').insert({
         invoice_number: `INV-${orderData.id.slice(-8).toUpperCase()}`,
         scope_id: scope?.id || null,
         client_id: scope?.client_id || null,
+        customer_name: scope.company_name || 'Valued Client',
+        customer_email: clientEmail,
+        place_of_supply: 'Delhi',
+        is_gst: invoiceCalc.is_gst,
+        line_items: invoiceCalc.line_items,
+        tax_breakup: invoiceCalc.tax_breakup,
         milestone_name: '50% Scope Deposit & Development Lock',
-        amount: depositAmount,
+        amount: invoiceCalc.grand_total,
         currency: originalCurrency,
         payment_status: 'pending',
         razorpay_order_id: orderData.id,
+        issue_date: new Date().toISOString(),
         due_date: new Date(Date.now() + 7 * 86400 * 1000).toISOString(),
+        expiry_date: new Date(Date.now() + 7 * 86400 * 1000).toISOString(),
         created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       });
     } catch (invErr) {
       console.warn('Invoice ledger insert warning:', invErr);

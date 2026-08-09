@@ -19,10 +19,14 @@ import {
   Save,
   Clock,
   Compass,
-  FileCheck
+  FileCheck,
+  FileText,
+  X
 } from 'lucide-react';
-import { generateQuestionnairePDF } from '@/utils/pdfGenerator';
-import { dbToClientScope, type ClientScope } from '@/lib/clientOrder';
+import Portal from '@/components/ui/Portal';
+import { generateQuestionnairePDF, generateInvoicePDF } from '@/utils/pdfGenerator';
+import { dbToClientScope, type ClientScope, type InvoiceEntity, type CreateInvoiceInput } from '@/lib/clientOrder';
+import { calculateInvoiceTotals, SUPPORTED_CURRENCIES, formatCurrencyAmount, SELLER_CONFIG } from '@/lib/invoicing';
 import resumeData from '@/data/resume.json';
 import intakeDefaults from '@/data/intakeQuestionnaireDefaults.json';
 import { calcQuote, type Currency } from '@/lib/pricing';
@@ -88,6 +92,38 @@ export default function ClientDashboardPage() {
   const [newFeatureInput, setNewFeatureInput] = useState('');
   const [authGateError, setAuthGateError] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
+
+  // Invoices & Payment Ledger State
+  const [invoices, setInvoices] = useState<InvoiceEntity[]>([]);
+  const [isInvoiceLoading, setIsInvoiceLoading] = useState(false);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+
+  // Invoice Creator Modal Form State
+  const [invCustomerName, setInvCustomerName] = useState('');
+  const [invCustomerEmail, setInvCustomerEmail] = useState('');
+  const [invCustomerPhone, setInvCustomerPhone] = useState('');
+  const [invCustomerGstin, setInvCustomerGstin] = useState('');
+  const [invStreet, setInvStreet] = useState('Central Park, CP');
+  const [invCity, setInvCity] = useState('New Delhi');
+  const [invState, setInvState] = useState('Delhi');
+  const [invPincode, setInvPincode] = useState('110001');
+  const [invPlaceOfSupply, setInvPlaceOfSupply] = useState('Delhi');
+  const [invCurrency, setInvCurrency] = useState('INR');
+  const [invNotes, setInvNotes] = useState('Thank you for choosing Prateeq Studio for your engineering build.');
+  const [invTerms, setInvTerms] = useState('Payment is due within 14 days of issue. Deliverables strictly subject to acceptance sign-off.');
+  const [invLineItems, setInvLineItems] = useState<
+    { name: string; description: string; sac_hsn: string; rate: number; quantity: number; tax_rate: number; tax_type: 'inclusive' | 'exclusive' }[]
+  >([
+    {
+      name: 'Web Application Engineering Services',
+      description: 'Phase 1 Core Engineering & Architecture Build',
+      sac_hsn: '998314',
+      rate: 87500,
+      quantity: 1,
+      tax_rate: 18,
+      tax_type: 'exclusive',
+    },
+  ]);
 
   // Profile setup state for pre-fetched Google details
   const [companyInputs, setCompanyInputs] = useState<Record<string, string>>({});
@@ -227,6 +263,117 @@ export default function ClientDashboardPage() {
       mounted = false;
     };
   }, [user?.email, getAccessToken, saveScopeToDatabase]);
+
+  const loadInvoices = React.useCallback(async () => {
+    if (!user?.email) return;
+    const accessToken = await getAccessToken();
+    if (!accessToken) return;
+    setIsInvoiceLoading(true);
+    fetch('/api/client/get-invoices', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.invoices) {
+          setInvoices(data.invoices);
+        }
+      })
+      .catch((err) => console.warn('Fetch invoices error:', err))
+      .finally(() => setIsInvoiceLoading(false));
+  }, [user?.email, getAccessToken]);
+
+  React.useEffect(() => {
+    if (activeTab === 'invoices') {
+      loadInvoices();
+    }
+  }, [activeTab, loadInvoices]);
+
+  const currentInvoiceCalc = calculateInvoiceTotals({
+    currency: invCurrency,
+    place_of_supply: invPlaceOfSupply,
+    billing_address: { state: invState },
+    line_items: invLineItems,
+  });
+
+  const handleAddLineItem = () => {
+    setInvLineItems((prev) => [
+      ...prev,
+      {
+        name: 'Additional Milestone / Feature',
+        description: 'Engineering deliverable',
+        sac_hsn: '998314',
+        rate: 25000,
+        quantity: 1,
+        tax_rate: invCurrency === 'INR' ? 18 : 0,
+        tax_type: 'exclusive',
+      },
+    ]);
+  };
+
+  const handleRemoveLineItem = (idx: number) => {
+    if (invLineItems.length <= 1) return;
+    setInvLineItems((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const handleCreateInvoiceSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const accessToken = await getAccessToken();
+    if (!accessToken) {
+      setAuthGateError(true);
+      return;
+    }
+
+    const payload: CreateInvoiceInput = {
+      customer_name: invCustomerName || user?.user_metadata?.full_name || 'Valued Client',
+      customer_email: invCustomerEmail || user?.email || '',
+      customer_phone: invCustomerPhone,
+      customer_gstin: invCustomerGstin,
+      billing_address: {
+        street: invStreet,
+        city: invCity,
+        state: invState,
+        pincode: invPincode,
+        country: 'India',
+      },
+      shipping_address: {
+        street: invStreet,
+        city: invCity,
+        state: invState,
+        pincode: invPincode,
+        country: 'India',
+      },
+      place_of_supply: invPlaceOfSupply || invState,
+      currency: invCurrency,
+      line_items: invLineItems.map((item) => ({
+        ...item,
+        tax_rate: invCurrency === 'INR' ? item.tax_rate : 0,
+      })),
+      milestone_name: 'Custom Project Service Invoice',
+      customer_notes: invNotes,
+      terms_and_conditions: invTerms,
+    };
+
+    try {
+      const res = await fetch('/api/client/create-razorpay-invoice', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setShowInvoiceModal(false);
+        loadInvoices();
+      } else {
+        alert(data.error || 'Failed to create invoice.');
+      }
+    } catch (err) {
+      console.error('Invoice submit error:', err);
+    }
+  };
 
   const handleSaveProfile = (scopeId: string) => {
     const compName = companyInputs[scopeId]?.trim() || user?.user_metadata?.full_name || 'My Custom Project';
@@ -927,36 +1074,496 @@ export default function ClientDashboardPage() {
         {activeTab === 'invoices' && (
           <div className={styles.sectionGrid}>
             <div className={styles.tableCard}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                <FileCheck size={20} />
-                <h3 style={{ margin: 0 }}>Itemized Invoices & Payment Ledger</h3>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.25rem' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <FileCheck size={22} style={{ color: '#2563eb' }} />
+                    <h3 style={{ margin: 0 }}>Itemized Invoices & Payment Ledger</h3>
+                  </div>
+                  <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', opacity: 0.8 }}>
+                    GST-Compliant (CGST/SGST/IGST) & International Multi-Currency Invoices
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className={styles.createInvoiceBtn}
+                  onClick={() => setShowInvoiceModal(true)}
+                >
+                  <Plus size={16} /> + Create New Invoice
+                </button>
               </div>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Scope Ref</th>
-                    <th>Deposit Amount</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {scopes.map((s) => (
-                    <tr key={s.id}>
-                      <td>{new Date(s.created_at).toLocaleDateString()}</td>
-                      <td><code>{s.scope_code}</code></td>
-                      <td><strong>{s.currency === 'INR' ? `₹${Math.round(s.total_cost_inr * 0.5).toLocaleString('en-IN')}` : `$${Math.round(s.total_cost_usd * 0.5)}`}</strong></td>
-                      <td>
-                        <span className={s.deposit_paid ? styles.paidBadge : styles.pendingBadge}>
-                          {s.deposit_paid ? 'PAID' : 'PENDING'}
-                        </span>
-                      </td>
+
+              {isInvoiceLoading ? (
+                <div style={{ padding: '2rem', textAlign: 'center', opacity: 0.7 }}>Loading client invoices...</div>
+              ) : invoices.length === 0 ? (
+                <div>
+                  <div style={{ padding: '1.5rem', background: 'rgba(0,0,0,0.03)', borderRadius: '12px', marginBottom: '1.5rem', textAlign: 'center' }}>
+                    <p style={{ margin: '0 0 0.75rem 0', fontWeight: 600 }}>No custom issued invoices recorded yet.</p>
+                    <p style={{ margin: 0, fontSize: '0.85rem', opacity: 0.8 }}>
+                      You can create GST-compliant or International non-GST invoices for your project scopes below.
+                    </p>
+                  </div>
+                  <h4 style={{ margin: '0 0 0.75rem 0' }}>Scope 50% Deposit Records</h4>
+                  <table className={styles.table}>
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Scope Ref</th>
+                        <th>Deposit Amount</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {scopes.map((s) => (
+                        <tr key={s.id}>
+                          <td>{new Date(s.created_at).toLocaleDateString()}</td>
+                          <td><code>{s.scope_code}</code></td>
+                          <td>
+                            <strong>
+                              {s.currency === 'INR'
+                                ? `₹${Math.round(s.total_cost_inr * 0.5).toLocaleString('en-IN')}`
+                                : `$${Math.round(s.total_cost_usd * 0.5).toLocaleString('en-US')}`}
+                            </strong>
+                          </td>
+                          <td>
+                            <span className={s.deposit_paid ? styles.paidBadge : styles.pendingBadge}>
+                              {s.deposit_paid ? 'PAID' : 'PENDING'}
+                            </span>
+                          </td>
+                          <td>
+                            <button
+                              type="button"
+                              className={styles.pdfBtn}
+                              onClick={() =>
+                                generateInvoicePDF(
+                                  {
+                                    id: s.id,
+                                    invoice_number: `INV-${s.scope_code}`,
+                                    customer_name: s.company_name,
+                                    customer_email: user?.email || '',
+                                    place_of_supply: 'Delhi',
+                                    is_gst: s.currency === 'INR',
+                                    milestone_name: '50% Scope Deposit',
+                                    amount: Math.round(s.currency === 'INR' ? s.total_cost_inr * 0.5 : s.total_cost_usd * 0.5),
+                                    currency: s.currency,
+                                    payment_status: s.deposit_paid ? 'paid' : 'pending',
+                                    created_at: s.created_at,
+                                    line_items: [
+                                      {
+                                        name: `50% Deposit — ${s.base_engine}`,
+                                        description: `Project Scope ${s.scope_code}`,
+                                        sac_hsn: '998314',
+                                        rate: Math.round(s.currency === 'INR' ? s.total_cost_inr * 0.5 : s.total_cost_usd * 0.5),
+                                        quantity: 1,
+                                        subtotal: Math.round(s.currency === 'INR' ? s.total_cost_inr * 0.5 : s.total_cost_usd * 0.5),
+                                        tax_amount: 0,
+                                        total: Math.round(s.currency === 'INR' ? s.total_cost_inr * 0.5 : s.total_cost_usd * 0.5),
+                                      },
+                                    ],
+                                  },
+                                  true
+                                )
+                              }
+                            >
+                              <FileText size={14} /> PDF
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th>Issue Date</th>
+                      <th>Invoice #</th>
+                      <th>Billed Customer</th>
+                      <th>Place of Supply</th>
+                      <th>Total ({invoices[0]?.currency || 'INR'})</th>
+                      <th>Status</th>
+                      <th>Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {invoices.map((inv) => (
+                      <tr key={inv.id}>
+                        <td>{new Date(inv.issue_date || inv.created_at).toLocaleDateString()}</td>
+                        <td><code>{inv.invoice_number}</code></td>
+                        <td>
+                          <strong>{inv.customer_name || 'Client'}</strong>
+                          <div style={{ fontSize: '0.78rem', opacity: 0.75 }}>{inv.customer_email}</div>
+                        </td>
+                        <td>{inv.place_of_supply || 'Delhi'}</td>
+                        <td>
+                          <strong>{formatCurrencyAmount(inv.amount, inv.currency)}</strong>
+                          {inv.is_gst && (
+                            <div style={{ fontSize: '0.72rem', color: '#10b981' }}>
+                              GST {inv.tax_breakup?.is_interstate ? 'IGST' : 'CGST+SGST'} Included
+                            </div>
+                          )}
+                        </td>
+                        <td>
+                          <span
+                            className={
+                              inv.payment_status === 'paid'
+                                ? styles.paidBadge
+                                : inv.payment_status === 'issued'
+                                ? styles.badgeIssued
+                                : styles.pendingBadge
+                            }
+                          >
+                            {(inv.payment_status || 'PENDING').toUpperCase()}
+                          </span>
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', gap: '0.4rem' }}>
+                            <button
+                              type="button"
+                              className={styles.pdfBtn}
+                              onClick={() => generateInvoicePDF(inv, true)}
+                            >
+                              <FileText size={14} /> PDF
+                            </button>
+                            {inv.payment_url && inv.payment_status !== 'paid' && (
+                              <a
+                                href={inv.payment_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="comic-btn comic-btn-blue"
+                                style={{ padding: '0.35rem 0.6rem', fontSize: '0.8rem' }}
+                              >
+                                Pay Online
+                              </a>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           </div>
+        )}
+
+        {/* Create GST / Non-GST Invoice Modal */}
+        {showInvoiceModal && (
+          <Portal>
+            <div className={styles.invoiceModalOverlay} onClick={() => setShowInvoiceModal(false)}>
+              <div className={styles.invoiceModalCard} onClick={(e) => e.stopPropagation()}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <h3 style={{ margin: 0 }}>Create GST / Non-GST Invoice</h3>
+                    <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.85rem', opacity: 0.8 }}>
+                      Razorpay Invoice Creation & Itemized Tax Breakdown Engine
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit' }}
+                    onClick={() => setShowInvoiceModal(false)}
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
+
+                <form onSubmit={handleCreateInvoiceSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  {/* Customer Information */}
+                  <div>
+                    <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '0.9rem', color: '#2563eb' }}>1. Billed Customer Details</h4>
+                    <div className={styles.formGrid}>
+                      <div className={styles.formGroup}>
+                        <label>Customer Name *</label>
+                        <input
+                          type="text"
+                          required
+                          className={styles.formInput}
+                          placeholder="e.g. Acme Tech Solutions"
+                          value={invCustomerName}
+                          onChange={(e) => setInvCustomerName(e.target.value)}
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label>Customer Email *</label>
+                        <input
+                          type="email"
+                          required
+                          className={styles.formInput}
+                          placeholder="billing@acme.com"
+                          value={invCustomerEmail}
+                          onChange={(e) => setInvCustomerEmail(e.target.value)}
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label>Contact Phone</label>
+                        <input
+                          type="tel"
+                          className={styles.formInput}
+                          placeholder="+91 98765 43210"
+                          value={invCustomerPhone}
+                          onChange={(e) => setInvCustomerPhone(e.target.value)}
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label>GSTIN (Optional for Non-GST)</label>
+                        <input
+                          type="text"
+                          className={styles.formInput}
+                          placeholder="07AAAAA0000A1Z5"
+                          value={invCustomerGstin}
+                          onChange={(e) => setInvCustomerGstin(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Address & Place of Supply */}
+                  <div>
+                    <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '0.9rem', color: '#2563eb' }}>2. Billing Address & Place of Supply</h4>
+                    <div className={styles.formGrid}>
+                      <div className={styles.formGroup}>
+                        <label>Street Address</label>
+                        <input
+                          type="text"
+                          className={styles.formInput}
+                          placeholder="Building, Street"
+                          value={invStreet}
+                          onChange={(e) => setInvStreet(e.target.value)}
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label>City & Pincode</label>
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                          <input
+                            type="text"
+                            className={styles.formInput}
+                            placeholder="City"
+                            value={invCity}
+                            onChange={(e) => setInvCity(e.target.value)}
+                            style={{ flex: 2 }}
+                          />
+                          <input
+                            type="text"
+                            className={styles.formInput}
+                            placeholder="Pincode"
+                            value={invPincode}
+                            onChange={(e) => setInvPincode(e.target.value)}
+                            style={{ flex: 1 }}
+                          />
+                        </div>
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label>State / Territory</label>
+                        <input
+                          type="text"
+                          className={styles.formInput}
+                          value={invState}
+                          onChange={(e) => setInvState(e.target.value)}
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label>Place of Supply (GST Tax Determinant) *</label>
+                        <select
+                          className={styles.formSelect}
+                          value={invPlaceOfSupply}
+                          onChange={(e) => setInvPlaceOfSupply(e.target.value)}
+                        >
+                          <option value="Delhi">Delhi (Intra-State: CGST 9% + SGST 9%)</option>
+                          <option value="Karnataka">Karnataka (Inter-State: IGST 18%)</option>
+                          <option value="Maharashtra">Maharashtra (Inter-State: IGST 18%)</option>
+                          <option value="Tamil Nadu">Tamil Nadu (Inter-State: IGST 18%)</option>
+                          <option value="Telangana">Telangana (Inter-State: IGST 18%)</option>
+                          <option value="Uttar Pradesh">Uttar Pradesh (Inter-State: IGST 18%)</option>
+                          <option value="West Bengal">West Bengal (Inter-State: IGST 18%)</option>
+                          <option value="Outside India">Outside India (Export / Non-GST)</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Currency Selection */}
+                  <div>
+                    <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '0.9rem', color: '#2563eb' }}>3. Invoice Currency</h4>
+                    <div className={styles.formGroup}>
+                      <select
+                        className={styles.formSelect}
+                        value={invCurrency}
+                        onChange={(e) => setInvCurrency(e.target.value)}
+                      >
+                        {SUPPORTED_CURRENCIES.map((c) => (
+                          <option key={c.code} value={c.code}>
+                            {c.code} — {c.name}
+                          </option>
+                        ))}
+                      </select>
+                      {invCurrency !== 'INR' && (
+                        <span style={{ fontSize: '0.78rem', color: '#f59e0b', marginTop: '0.2rem' }}>
+                          ℹ️ International Currency selected: Tax rates are set to 0% (Non-GST invoice) per Razorpay rules.
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Line Items */}
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                      <h4 style={{ margin: 0, fontSize: '0.9rem', color: '#2563eb' }}>4. Itemized Line Items</h4>
+                      <button
+                        type="button"
+                        onClick={handleAddLineItem}
+                        style={{ background: 'none', border: 'none', color: '#2563eb', fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem' }}
+                      >
+                        + Add Line Item
+                      </button>
+                    </div>
+
+                    <div className={styles.lineItemsContainer}>
+                      {invLineItems.map((item, idx) => (
+                        <div key={idx} className={styles.lineItemGrid}>
+                          <input
+                            type="text"
+                            className={styles.formInput}
+                            placeholder="Item Title"
+                            value={item.name}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setInvLineItems((prev) => prev.map((it, i) => (i === idx ? { ...it, name: val } : it)));
+                            }}
+                          />
+                          <input
+                            type="text"
+                            className={styles.formInput}
+                            placeholder="SAC (998314)"
+                            value={item.sac_hsn}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setInvLineItems((prev) => prev.map((it, i) => (i === idx ? { ...it, sac_hsn: val } : it)));
+                            }}
+                          />
+                          <input
+                            type="number"
+                            className={styles.formInput}
+                            placeholder="Qty"
+                            min="1"
+                            value={item.quantity}
+                            onChange={(e) => {
+                              const val = Number(e.target.value);
+                              setInvLineItems((prev) => prev.map((it, i) => (i === idx ? { ...it, quantity: val } : it)));
+                            }}
+                          />
+                          <input
+                            type="number"
+                            className={styles.formInput}
+                            placeholder="Rate"
+                            value={item.rate}
+                            onChange={(e) => {
+                              const val = Number(e.target.value);
+                              setInvLineItems((prev) => prev.map((it, i) => (i === idx ? { ...it, rate: val } : it)));
+                            }}
+                          />
+                          {invCurrency === 'INR' ? (
+                            <select
+                              className={styles.formSelect}
+                              value={item.tax_rate}
+                              onChange={(e) => {
+                                const val = Number(e.target.value);
+                                setInvLineItems((prev) => prev.map((it, i) => (i === idx ? { ...it, tax_rate: val } : it)));
+                              }}
+                            >
+                              <option value={18}>18% GST</option>
+                              <option value={12}>12% GST</option>
+                              <option value={5}>5% GST</option>
+                              <option value={0}>0% Tax</option>
+                            </select>
+                          ) : (
+                            <input type="text" disabled className={styles.formInput} value="0% Tax" />
+                          )}
+                          <button
+                            type="button"
+                            disabled={invLineItems.length <= 1}
+                            onClick={() => handleRemoveLineItem(idx)}
+                            style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Real-time Tax Preview */}
+                  <div className={styles.taxPreviewCard}>
+                    <div className={styles.taxRow}>
+                      <span>Subtotal:</span>
+                      <strong>{formatCurrencyAmount(currentInvoiceCalc.subtotal, invCurrency)}</strong>
+                    </div>
+                    {currentInvoiceCalc.is_gst && currentInvoiceCalc.tax_breakup.cgst_amount ? (
+                      <>
+                        <div className={styles.taxRow}>
+                          <span>CGST ({currentInvoiceCalc.tax_breakup.cgst_rate}%):</span>
+                          <span>{formatCurrencyAmount(currentInvoiceCalc.tax_breakup.cgst_amount || 0, invCurrency)}</span>
+                        </div>
+                        <div className={styles.taxRow}>
+                          <span>SGST ({currentInvoiceCalc.tax_breakup.sgst_rate}%):</span>
+                          <span>{formatCurrencyAmount(currentInvoiceCalc.tax_breakup.sgst_amount || 0, invCurrency)}</span>
+                        </div>
+                      </>
+                    ) : null}
+                    {currentInvoiceCalc.is_gst && currentInvoiceCalc.tax_breakup.igst_amount ? (
+                      <div className={styles.taxRow}>
+                        <span>IGST ({currentInvoiceCalc.tax_breakup.igst_rate}%):</span>
+                        <span>{formatCurrencyAmount(currentInvoiceCalc.tax_breakup.igst_amount || 0, invCurrency)}</span>
+                      </div>
+                    ) : null}
+                    <div className={styles.taxTotalRow}>
+                      <span>Grand Total:</span>
+                      <span>{formatCurrencyAmount(currentInvoiceCalc.grand_total, invCurrency)}</span>
+                    </div>
+                  </div>
+
+                  {/* Notes and Terms */}
+                  <div className={styles.formGrid}>
+                    <div className={styles.formGroup}>
+                      <label>Customer Notes (Max 2048 chars)</label>
+                      <textarea
+                        rows={2}
+                        className={styles.formTextarea}
+                        maxLength={2048}
+                        value={invNotes}
+                        onChange={(e) => setInvNotes(e.target.value)}
+                      />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label>Terms & Conditions (Max 2048 chars)</label>
+                      <textarea
+                        rows={2}
+                        className={styles.formTextarea}
+                        maxLength={2048}
+                        value={invTerms}
+                        onChange={(e) => setInvTerms(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
+                    <button
+                      type="button"
+                      className="comic-btn comic-btn-outline"
+                      onClick={() => setShowInvoiceModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button type="submit" className="comic-btn comic-btn-blue">
+                      <Save size={16} style={{ marginRight: '0.4rem' }} /> Save & Issue Invoice
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </Portal>
         )}
       </div>
     </div>

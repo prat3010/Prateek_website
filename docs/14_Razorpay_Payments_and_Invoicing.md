@@ -82,6 +82,23 @@ The system enables clients to lock 50% upfront project deposits via Razorpay Sta
 
 ## **Database Schema ([`supabase_schema.sql`](file:///Users/prateeksharma/Developer/Prateek_website/supabase_schema.sql))**
 
+### 4. **Invoice Creation Endpoint**: [`POST /api/client/create-razorpay-invoice`](file:///Users/prateeksharma/Developer/Prateek_website/src/app/api/client/create-razorpay-invoice/route.ts)
+
+* **Authentication**: Requires valid session token via `Authorization: Bearer <token>`.
+* **GST & Tax Rules**: Automatically calculates Intra-State (CGST 9% + SGST 9%) vs Inter-State (IGST 18%) tax based on `place_of_supply`. Standard SAC code `998314` applied for IT engineering services.
+* **International Currency**: International currencies (`USD`, `EUR`, `GBP`, etc.) reset tax rates to 0% as per Razorpay non-GST invoice rules.
+* **Razorpay Invoices API Sync**: Posts invoice details to `https://api.razorpay.com/v1/invoices` when server credentials are configured.
+* **Invoice Record**: Inserts an `issued` record into the `invoices` table with line items, tax breakup, terms, notes, and payment URL.
+
+### 5. **Invoice Retrieval Endpoint**: [`GET /api/client/get-invoices`](file:///Users/prateeksharma/Developer/Prateek_website/src/app/api/client/get-invoices/route.ts)
+
+* **Authentication**: Session-gated via JWT bearer token.
+* **Scope Isolation**: Returns invoices belonging strictly to the verified client email (`customer_email`).
+
+---
+
+## **Database Schema ([`supabase_schema.sql`](file:///Users/prateeksharma/Developer/Prateek_website/supabase_schema.sql))**
+
 ### **`invoices` Table**
 
 ```sql
@@ -90,13 +107,30 @@ CREATE TABLE IF NOT EXISTS invoices (
   invoice_number TEXT UNIQUE NOT NULL,
   scope_id UUID REFERENCES client_scopes(id) ON DELETE CASCADE,
   client_id UUID REFERENCES clients(id) ON DELETE CASCADE,
+  customer_name TEXT,
+  customer_email TEXT,
+  customer_phone TEXT,
+  customer_gstin TEXT,
+  billing_address JSONB,
+  shipping_address JSONB,
+  place_of_supply TEXT,
+  is_gst BOOLEAN DEFAULT false,
+  line_items JSONB,
+  tax_breakup JSONB,
   milestone_name TEXT NOT NULL,
   amount NUMERIC NOT NULL DEFAULT 0,
   currency TEXT DEFAULT 'INR',
-  payment_status TEXT DEFAULT 'pending' CHECK (payment_status IN ('pending', 'paid', 'cancelled', 'refunded')),
+  payment_status TEXT DEFAULT 'pending' CHECK (payment_status IN ('draft', 'pending', 'issued', 'paid', 'cancelled', 'refunded', 'expired')),
   razorpay_order_id TEXT DEFAULT '',
   razorpay_payment_id TEXT DEFAULT '',
+  razorpay_invoice_id TEXT DEFAULT '',
+  payment_url TEXT DEFAULT '',
+  issue_date TIMESTAMPTZ,
   due_date TIMESTAMPTZ,
+  expiry_date TIMESTAMPTZ,
+  customer_notes TEXT,
+  terms_and_conditions TEXT,
+  allow_partial BOOLEAN DEFAULT false,
   paid_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL

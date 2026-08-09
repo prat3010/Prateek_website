@@ -30,20 +30,98 @@ export interface ClientEntity {
   created_at: string;
 }
 
+export interface AddressDetails {
+  street?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  country?: string;
+}
+
+export interface InvoiceLineItem {
+  id?: string;
+  name: string;
+  description?: string;
+  sac_hsn?: string;
+  rate: number;
+  quantity: number;
+  tax_rate?: number;
+  tax_type?: 'inclusive' | 'exclusive';
+  subtotal: number;
+  tax_amount: number;
+  total: number;
+}
+
+export interface TaxBreakup {
+  cgst_rate?: number;
+  cgst_amount?: number;
+  sgst_rate?: number;
+  sgst_amount?: number;
+  igst_rate?: number;
+  igst_amount?: number;
+  total_tax: number;
+  is_interstate: boolean;
+}
+
 export interface InvoiceEntity {
   id: string;
   invoice_number: string;
   scope_id?: string;
   client_id?: string;
+  customer_name?: string;
+  customer_email?: string;
+  customer_phone?: string;
+  customer_gstin?: string;
+  billing_address?: AddressDetails;
+  shipping_address?: AddressDetails;
+  place_of_supply?: string;
+  is_gst?: boolean;
+  line_items?: InvoiceLineItem[];
+  tax_breakup?: TaxBreakup;
   milestone_name: string;
   amount: number;
-  currency: 'INR' | 'USD';
-  payment_status: 'pending' | 'paid' | 'cancelled' | 'refunded';
+  currency: 'INR' | 'USD' | 'EUR' | 'GBP' | string;
+  payment_status: 'draft' | 'pending' | 'issued' | 'paid' | 'cancelled' | 'refunded' | 'expired';
   razorpay_order_id?: string;
   razorpay_payment_id?: string;
+  razorpay_invoice_id?: string;
+  payment_url?: string;
+  issue_date?: string;
   due_date?: string;
+  expiry_date?: string;
+  customer_notes?: string;
+  terms_and_conditions?: string;
+  allow_partial?: boolean;
   paid_at?: string;
   created_at: string;
+  updated_at?: string;
+}
+
+export interface CreateInvoiceInput {
+  scope_code?: string;
+  customer_name: string;
+  customer_email: string;
+  customer_phone?: string;
+  customer_gstin?: string;
+  billing_address?: AddressDetails;
+  shipping_address?: AddressDetails;
+  place_of_supply?: string;
+  currency: 'INR' | 'USD' | 'EUR' | 'GBP' | string;
+  line_items: {
+    name: string;
+    description?: string;
+    sac_hsn?: string;
+    rate: number;
+    quantity: number;
+    tax_rate?: number;
+    tax_type?: 'inclusive' | 'exclusive';
+  }[];
+  milestone_name?: string;
+  customer_notes?: string;
+  terms_and_conditions?: string;
+  issue_date?: string;
+  expiry_date?: string;
+  allow_partial?: boolean;
 }
 
 export interface DeliverableEntity {

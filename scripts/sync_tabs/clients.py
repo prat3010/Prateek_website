@@ -1,23 +1,33 @@
 import streamlit as st
 import json
+import os
 from datetime import datetime
 from sync_tabs.shared import (
     HAS_SYNC,
+    SCRIPTS_DIR,
+    atomic_write_json,
+    git_commit_push_file,
     fetch_records,
     upsert_record,
 )
 
 def render_clients_tab():
     st.header("🏢 Client Orders & Delivery Command Center")
-    st.markdown("Manage incoming scope submissions, track 50% deposit payments, and update live client delivery milestones.")
+    st.markdown("Manage incoming scope submissions, track 50% deposit payments, update client delivery milestones, and configure GST seller credentials.")
 
     # 1. Commercial Overview Metrics Cards
     orders = []
+    invoices = []
     if HAS_SYNC:
         try:
             orders = fetch_records("client_orders") or []
         except Exception as e:
             st.warning(f"Could not fetch orders from Supabase: {e}")
+
+        try:
+            invoices = fetch_records("invoices") or []
+        except Exception as e:
+            st.warning(f"Could not fetch invoices from Supabase: {e}")
 
     total_orders = len(orders)
     paid_orders = [o for o in orders if o.get("deposit_paid")]
@@ -28,15 +38,108 @@ def render_clients_tab():
     with col1:
         st.metric("Total Scopes Received", total_orders)
     with col2:
-        st.metric("Paid Scope Deposits", len(paid_orders))
+        st.metric("Total Invoices Issued", len(invoices))
     with col3:
         st.metric("Total Paid (INR)", f"₹{total_paid_inr:,.0f}")
     with col4:
         st.metric("Total Paid (USD)", f"${total_paid_usd:,.0f}")
 
+    # 2. Registered Seller GST & Invoicing Settings
+    st.markdown("---")
+    with st.expander("🏛️ Edit Registered Business & GST Invoicing Credentials (Seller Config)", expanded=False):
+        st.caption("These credentials appear on all PDF invoices and are sent to Razorpay for GST compliance.")
+        seller_path = os.path.join(os.path.dirname(SCRIPTS_DIR), "src/data/seller.json")
+        seller_data = {}
+        if os.path.exists(seller_path):
+            try:
+                with open(seller_path, "r", encoding="utf-8") as f:
+                    seller_data = json.load(f)
+            except Exception as e:
+                st.warning(f"Could not read seller.json: {e}")
+
+        c_s1, c_s2 = st.columns(2)
+        with c_s1:
+            s_name = st.text_input("Seller / Founder Name", seller_data.get('name', 'Prateek Sharma'), key="s_name")
+            s_company = st.text_input("Registered Company Name", seller_data.get('company', 'Prateeq Studio'), key="s_company")
+            s_email = st.text_input("Billing Email", seller_data.get('email', 'prateeqsharma@gmail.com'), key="s_email")
+            s_phone = st.text_input("Billing Phone", seller_data.get('phone', '+91 98765 43210'), key="s_phone")
+            s_gstin = st.text_input("15-Digit GSTIN Number", seller_data.get('gstin', '07AAAAA0000A1Z5'), key="s_gstin")
+        with c_s2:
+            s_street = st.text_input("Street Address", seller_data.get('street', 'Developer Studio, CP'), key="s_street")
+            s_city = st.text_input("City", seller_data.get('city', 'New Delhi'), key="s_city")
+            s_state = st.text_input("State", seller_data.get('state', 'Delhi'), key="s_state")
+            s_pincode = st.text_input("Pincode", seller_data.get('pincode', '110001'), key="s_pincode")
+            s_country = st.text_input("Country", seller_data.get('country', 'India'), key="s_country")
+            s_sac = st.text_input("Default SAC / HSN Code", seller_data.get('defaultSacCode', '998314'), key="s_sac")
+
+        if st.button("💾 Save Business & GST Invoicing Credentials", key="btn_save_seller"):
+            updated_seller = {
+                "name": s_name,
+                "company": s_company,
+                "email": s_email,
+                "phone": s_phone,
+                "gstin": s_gstin,
+                "street": s_street,
+                "city": s_city,
+                "state": s_state,
+                "pincode": s_pincode,
+                "country": s_country,
+                "defaultSacCode": s_sac,
+            }
+            try:
+                atomic_write_json(seller_path, updated_seller)
+                git_ok, git_msg = git_commit_push_file("src/data/seller.json", "chore(seller): update seller GST credentials")
+                st.success(f"Saved seller credentials directly to src/data/seller.json! ({git_msg if git_ok else 'Local saved'})")
+            except Exception as ex:
+                st.error(f"Failed to save seller credentials: {ex}")
+
     st.markdown("---")
 
-    # 2. Orders Data Table & Milestone Manager
+    # 3. Invoices & Tax Breakdown Section
+    st.subheader("🧾 GST & Multi-Currency Invoices Ledger")
+    if not invoices:
+        st.info("No custom invoices issued yet. Client scope deposit invoices will appear here once generated.")
+    else:
+        for inv in invoices:
+            inv_num = inv.get("invoice_number", "INV-UNKNOWN")
+            cust_name = inv.get("customer_name", "Valued Client")
+            cust_email = inv.get("customer_email", "")
+            amt = inv.get("amount", 0)
+            curr = inv.get("currency", "INR")
+            pos = inv.get("place_of_supply", "Delhi")
+            is_gst = inv.get("is_gst", False)
+            status = inv.get("payment_status", "pending")
+
+            with st.expander(f"📄 {inv_num} — {cust_name} ({curr} {amt:,.2f}) [{status.upper()}]"):
+                c1, c2 = st.columns(2)
+                with c1:
+                    st.markdown(f"**Customer Email:** `{cust_email}`")
+                    st.markdown(f"**Place of Supply:** {pos}")
+                    st.markdown(f"**Tax Treatment:** {'GST Compliant (CGST/SGST/IGST)' if is_gst else 'Non-GST / International Export'}")
+                    st.markdown(f"**Issue Date:** {inv.get('issue_date', inv.get('created_at', 'N/A'))}")
+                with c2:
+                    st.markdown(f"**Status:** `{status.upper()}`")
+                    st.markdown(f"**Razorpay Invoice ID:** `{inv.get('razorpay_invoice_id', 'N/A')}`")
+                    st.markdown(f"**Payment Link:** {inv.get('payment_url', 'N/A')}")
+
+                # Status update
+                new_status = st.selectbox(
+                    f"Update Status for {inv_num}",
+                    options=["draft", "issued", "pending", "paid", "cancelled"],
+                    index=["draft", "issued", "pending", "paid", "cancelled"].index(status) if status in ["draft", "issued", "pending", "paid", "cancelled"] else 2,
+                    key=f"inv_status_{inv_num}"
+                )
+
+                if st.button(f"Save Status for {inv_num}", key=f"btn_inv_save_{inv_num}"):
+                    if HAS_SYNC:
+                        inv["payment_status"] = new_status
+                        inv["updated_at"] = datetime.utcnow().isoformat()
+                        upsert_record("invoices", inv, key_col="invoice_number")
+                        st.success(f"Updated {inv_num} status to '{new_status}'!")
+
+    st.markdown("---")
+
+    # 4. Orders Data Table & Milestone Manager
     if not orders:
         st.info("No client orders recorded in Supabase yet. Incoming submissions from /scoping will appear here automatically.")
         return
@@ -51,7 +154,7 @@ def render_clients_tab():
         status = order.get("status", "Draft Proposal")
         delivery_stage = order.get("delivery_stage", "architecture")
 
-        with st.expander(f"📦 {scope_code} — {company} ({'✅ 50% DEPOSIT PAID' if deposit_paid else '⏳ DRAFT PROPOSAL'})", expanded=True):
+        with st.expander(f"📦 {scope_code} — {company} ({'✅ 50% DEPOSIT PAID' if deposit_paid else '⏳ DRAFT PROPOSAL'})", expanded=False):
             c1, c2 = st.columns(2)
             with c1:
                 st.markdown(f"**Client Email:** `{email}`")
