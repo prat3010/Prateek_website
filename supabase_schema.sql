@@ -228,6 +228,10 @@ DROP POLICY IF EXISTS "Clients can select own client_scopes" ON client_scopes;
 CREATE POLICY "Clients can select own client_scopes" ON client_scopes FOR SELECT
   USING (auth.jwt() ->> 'email' = client_email);
 
+DROP POLICY IF EXISTS "Clients can delete own unpaid client_scopes" ON client_scopes;
+CREATE POLICY "Clients can delete own unpaid client_scopes" ON client_scopes FOR DELETE
+  USING (auth.jwt() ->> 'email' = client_email AND deposit_paid = false);
+
 CREATE INDEX IF NOT EXISTS idx_client_scopes_email ON client_scopes (client_email);
 CREATE INDEX IF NOT EXISTS idx_client_scopes_code ON client_scopes (scope_code);
 CREATE INDEX IF NOT EXISTS idx_client_scopes_client ON client_scopes (client_id);
@@ -565,4 +569,20 @@ BEGIN
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+
+-- ============================================================
+-- 12. Razorpay Webhook Idempotency & Event Audit Ledger
+-- ============================================================
+CREATE TABLE IF NOT EXISTS processed_webhooks (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  event_id TEXT UNIQUE NOT NULL,
+  event_type TEXT NOT NULL,
+  processed_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE processed_webhooks ENABLE ROW LEVEL SECURITY;
+-- Writes are service-role only via API routes.
+CREATE INDEX IF NOT EXISTS idx_processed_webhooks_event_id ON processed_webhooks (event_id);
+
 

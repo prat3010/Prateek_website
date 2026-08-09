@@ -3,10 +3,9 @@ import crypto from 'crypto';
 import { supabase } from '@/data/supabase';
 import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
 
-const KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || 'ovUdxjgONEk4RFGhqhabWKR0';
-
 export async function POST(req: Request) {
   try {
+    const KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '';
     const payload = await req.json();
     const { scopeCode, razorpayOrderId, razorpayPaymentId, razorpaySignature } = payload;
 
@@ -22,19 +21,26 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized: valid session required.' }, { status: 401 });
     }
 
-    // Verify HMAC-SHA256 Signature
+    const isDev = process.env.NODE_ENV === 'development' || !supabase;
     const isMockBypass =
-      razorpayOrderId === 'order_mock_fallback' ||
-      razorpaySignature === 'test_signature_mock_fallback';
+      isDev &&
+      (razorpayOrderId.startsWith('order_mock_') ||
+        razorpaySignature === 'test_signature_mock_fallback');
 
-    const expectedSignature = crypto
-      .createHmac('sha256', KEY_SECRET)
-      .update(`${razorpayOrderId}|${razorpayPaymentId}`)
-      .digest('hex');
+    if (!isMockBypass && !KEY_SECRET) {
+      return NextResponse.json({ error: 'Razorpay secret key not configured on server.' }, { status: 500 });
+    }
 
-    if (!isMockBypass && expectedSignature !== razorpaySignature) {
-      console.warn('Razorpay signature mismatch:', { expectedSignature, razorpaySignature });
-      return NextResponse.json({ error: 'Payment signature verification failed.' }, { status: 400 });
+    if (!isMockBypass) {
+      const expectedSignature = crypto
+        .createHmac('sha256', KEY_SECRET)
+        .update(`${razorpayOrderId}|${razorpayPaymentId}`)
+        .digest('hex');
+
+      if (expectedSignature !== razorpaySignature) {
+        console.warn('Razorpay signature mismatch:', { expectedSignature, razorpaySignature });
+        return NextResponse.json({ error: 'Payment signature verification failed.' }, { status: 400 });
+      }
     }
 
     if (!supabase) {

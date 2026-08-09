@@ -2,15 +2,19 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { supabase } from '@/data/supabase';
 
-const WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET || process.env.RAZORPAY_KEY_SECRET || 'ovUdxjgONEk4RFGhqhabWKR0';
-
 export async function POST(req: Request) {
   try {
+    const WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET || process.env.RAZORPAY_KEY_SECRET || '';
     const rawBody = await req.text();
     const signature = req.headers.get('x-razorpay-signature');
 
     if (!signature) {
       return NextResponse.json({ error: 'Missing Razorpay signature header' }, { status: 400 });
+    }
+
+    if (!WEBHOOK_SECRET) {
+      console.error('Razorpay webhook secret not configured on server.');
+      return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 });
     }
 
     // Verify HMAC-SHA256 signature against raw body
@@ -26,16 +30,38 @@ export async function POST(req: Request) {
 
     const payload = JSON.parse(rawBody);
     const event = payload.event;
+    const eventId = payload.event_id || payload.payload?.payment?.entity?.id || `${event}_${Date.now()}`;
+
+    if (!supabase) {
+      return NextResponse.json({ status: 'ok', mode: 'degraded' });
+    }
+
+    // Idempotency check: prevent processing duplicate webhook events
+    try {
+      const { data: existingEvent } = await supabase
+        .from('processed_webhooks')
+        .select('event_id')
+        .eq('event_id', eventId)
+        .maybeSingle();
+
+      if (existingEvent) {
+        return NextResponse.json({ status: 'ok', duplicate: true });
+      }
+
+      await supabase.from('processed_webhooks').insert({
+        event_id: eventId,
+        event_type: event,
+        processed_at: new Date().toISOString(),
+      });
+    } catch (idemErr) {
+      console.warn('Webhook idempotency log warning:', idemErr);
+    }
 
     if (event === 'payment.captured' || event === 'order.paid') {
       const entity = payload.payload?.payment?.entity || payload.payload?.order?.entity;
       const razorpayOrderId = entity?.order_id || entity?.id;
       const razorpayPaymentId = entity?.id;
       const scopeCode = entity?.notes?.scope_code;
-
-      if (!supabase) {
-        return NextResponse.json({ status: 'ok', mode: 'degraded' });
-      }
 
       const nowIso = new Date().toISOString();
 

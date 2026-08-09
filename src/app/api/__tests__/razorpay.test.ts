@@ -70,6 +70,9 @@ beforeEach(() => {
   vi.clearAllMocks();
   mocks.state.invalidToken = false;
   mocks.state.invalidSignature = false;
+  process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID = 'rzp_test_TNlzrkOYoHQLxv';
+  process.env.RAZORPAY_KEY_SECRET = 'ocJs7m0Gr5GxIm4cMnyNT0pK';
+  process.env.RAZORPAY_WEBHOOK_SECRET = 'ocJs7m0Gr5GxIm4cMnyNT0pK';
 });
 
 const authorizedHeaders = { Authorization: 'Bearer valid-token' };
@@ -119,14 +122,14 @@ describe('POST /api/client/create-razorpay-order', () => {
     const json = await res.json();
     expect(json.orderId).toBe('order_test_123456789');
     expect(json.amount).toBe(8750000);
-    expect(json.keyId).toBe('rzp_test_TNPVXp6uorhxs3');
+    expect(json.keyId).toBe('rzp_test_TNlzrkOYoHQLxv');
 
     vi.unstubAllGlobals();
   });
 });
 
 describe('POST /api/client/verify-razorpay-payment', () => {
-  const keySecret = 'ovUdxjgONEk4RFGhqhabWKR0';
+  const keySecret = 'ocJs7m0Gr5GxIm4cMnyNT0pK';
   const orderId = 'order_test_123456789';
   const paymentId = 'pay_test_987654321';
   const validSignature = crypto
@@ -173,7 +176,7 @@ describe('POST /api/client/verify-razorpay-payment', () => {
 });
 
 describe('POST /api/webhooks/razorpay', () => {
-  const secret = 'ovUdxjgONEk4RFGhqhabWKR0';
+  const secret = 'ocJs7m0Gr5GxIm4cMnyNT0pK';
 
   it('returns 400 when signature is missing', async () => {
     const req = new Request('http://localhost/api/webhooks/razorpay', {

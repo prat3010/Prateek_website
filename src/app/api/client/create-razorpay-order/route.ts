@@ -2,12 +2,12 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
 import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
 
-const KEY_ID = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_TNPVXp6uorhxs3';
-const KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || 'ovUdxjgONEk4RFGhqhabWKR0';
 const USD_TO_INR_RATE = 85;
 
 export async function POST(req: Request) {
   try {
+    const KEY_ID = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || '';
+    const KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '';
     const payload = await req.json();
     const scopeCode = payload.scopeCode as string | undefined;
 
@@ -20,6 +20,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized: valid session required.' }, { status: 401 });
     }
 
+    const isDev = process.env.NODE_ENV === 'development';
+
     if (!supabase) {
       // CI / degraded mode
       return NextResponse.json({
@@ -27,11 +29,11 @@ export async function POST(req: Request) {
         orderId: `order_mock_${Date.now()}`,
         amount: 8750000,
         currency: 'INR',
-        keyId: KEY_ID,
+        keyId: KEY_ID || 'rzp_test_mock',
       });
     }
 
-    // Read scope from client_scopes (or client_orders fallback)
+    // Read scope strictly from database to prevent client-side price tampering
     let scope: {
       id?: string;
       client_id?: string;
@@ -62,11 +64,20 @@ export async function POST(req: Request) {
       console.warn('Supabase lookup warning in create-razorpay-order:', dbErr);
     }
 
-    const originalCurrency = scope?.currency || payload.currency || 'INR';
+    if (!scope) {
+      return NextResponse.json(
+        { error: 'Scope not found in database. Please persist your scope brief before initiating deposit lock.' },
+        { status: 400 }
+      );
+    }
+
+    const originalCurrency = scope.currency || 'INR';
     const isUSD = originalCurrency === 'USD';
-    const rawTotal = scope
-      ? (isUSD ? Number(scope.total_cost_usd || 0) : Number(scope.total_cost_inr || 0))
-      : (isUSD ? Number(payload.totalCostUSD || 2500) : Number(payload.totalCostINR || 175000));
+    const rawTotal = isUSD ? Number(scope.total_cost_usd || 0) : Number(scope.total_cost_inr || 0);
+
+    if (rawTotal <= 0) {
+      return NextResponse.json({ error: 'Invalid scope cost amount.' }, { status: 400 });
+    }
 
     const depositAmount = Math.round(rawTotal * 0.5);
 
@@ -74,6 +85,19 @@ export async function POST(req: Request) {
     const razorpayCurrency = 'INR';
     const inrDepositAmount = isUSD ? Math.round(depositAmount * USD_TO_INR_RATE) : depositAmount;
     const amountInSubunits = Math.max(100, inrDepositAmount * 100);
+
+    if (!KEY_ID || !KEY_SECRET) {
+      if (isDev) {
+        return NextResponse.json({
+          isMock: true,
+          orderId: `order_mock_${Date.now()}`,
+          amount: amountInSubunits,
+          currency: razorpayCurrency,
+          keyId: 'rzp_test_mock',
+        });
+      }
+      return NextResponse.json({ error: 'Razorpay API credentials not configured on server.' }, { status: 500 });
+    }
 
     // Call Razorpay Order API
     const authHeader = 'Basic ' + Buffer.from(`${KEY_ID}:${KEY_SECRET}`).toString('base64');
@@ -92,33 +116,39 @@ export async function POST(req: Request) {
           notes: {
             scope_code: scopeCode,
             client_email: clientEmail,
-            company_name: scope?.company_name || payload.companyName || 'My Custom Project',
+            company_name: scope.company_name || 'My Custom Project',
             original_currency: originalCurrency,
             original_deposit: depositAmount,
           },
         }),
       });
     } catch (fetchErr) {
-      console.warn('Razorpay server fetch offline (switching to mock order mode):', fetchErr);
-      return NextResponse.json({
-        isMock: true,
-        orderId: `order_mock_${Date.now()}`,
-        amount: amountInSubunits,
-        currency: razorpayCurrency,
-        keyId: KEY_ID,
-      });
+      console.warn('Razorpay server fetch offline:', fetchErr);
+      if (isDev) {
+        return NextResponse.json({
+          isMock: true,
+          orderId: `order_mock_${Date.now()}`,
+          amount: amountInSubunits,
+          currency: razorpayCurrency,
+          keyId: KEY_ID,
+        });
+      }
+      return NextResponse.json({ error: 'Unable to reach Razorpay servers.' }, { status: 502 });
     }
 
     if (!razorpayRes || !razorpayRes.ok) {
       const errText = razorpayRes ? await razorpayRes.text() : 'No response';
-      console.error('Razorpay create order API error (switching to mock order mode):', errText);
-      return NextResponse.json({
-        isMock: true,
-        orderId: `order_mock_${Date.now()}`,
-        amount: amountInSubunits,
-        currency: razorpayCurrency,
-        keyId: KEY_ID,
-      });
+      console.error('Razorpay create order API error:', errText);
+      if (isDev) {
+        return NextResponse.json({
+          isMock: true,
+          orderId: `order_mock_${Date.now()}`,
+          amount: amountInSubunits,
+          currency: razorpayCurrency,
+          keyId: KEY_ID,
+        });
+      }
+      return NextResponse.json({ error: 'Failed to initialize Razorpay order.' }, { status: 500 });
     }
 
     const orderData = await razorpayRes.json();

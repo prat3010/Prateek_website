@@ -24,6 +24,8 @@ import {
 import { generateQuestionnairePDF } from '@/utils/pdfGenerator';
 import { dbToClientScope, type ClientScope } from '@/lib/clientOrder';
 import resumeData from '@/data/resume.json';
+import intakeDefaults from '@/data/intakeQuestionnaireDefaults.json';
+import { calcQuote, type Currency } from '@/lib/pricing';
 import type { ResumeData } from '@/data/resume';
 import styles from './dashboard.module.css';
 
@@ -31,6 +33,52 @@ declare global {
   interface Window {
     Razorpay?: new (options: Record<string, unknown>) => { open: () => void };
   }
+}
+
+function recalculateScopeTotals(
+  baseEngineTitle: string,
+  featureList: string[],
+  brandAssetOption: string,
+  maintenancePlanOption: string
+) {
+  const engine = intakeDefaults.engines.find(
+    (e) => e.title === baseEngineTitle || baseEngineTitle.includes(e.title) || e.title.includes(baseEngineTitle)
+  ) || intakeDefaults.engines[2];
+
+  const matchedFeatureIds = intakeDefaults.features
+    .filter((f) =>
+      featureList.some(
+        (featStr) => featStr.toLowerCase().includes(f.label.toLowerCase()) || f.label.toLowerCase().includes(featStr.toLowerCase())
+      )
+    )
+    .map((f) => f.id);
+
+  const brandAsset = intakeDefaults.brandAssets.find(
+    (b) => b.label.toLowerCase().includes(brandAssetOption.toLowerCase()) || brandAssetOption.toLowerCase().includes(b.label.toLowerCase())
+  ) || intakeDefaults.brandAssets[0];
+
+  const maintenancePlan = intakeDefaults.maintenancePlans.find(
+    (m) => m.name.toLowerCase().includes(maintenancePlanOption.toLowerCase()) || maintenancePlanOption.toLowerCase().includes(m.name.toLowerCase())
+  ) || intakeDefaults.maintenancePlans[0];
+
+  const quoteINR = calcQuote(
+    intakeDefaults.engines,
+    intakeDefaults.features,
+    intakeDefaults.brandAssets,
+    intakeDefaults.maintenancePlans,
+    {
+      engineId: engine.id,
+      featureIds: matchedFeatureIds,
+      brandAssetId: brandAsset.id,
+      maintenancePlanId: maintenancePlan.id,
+    },
+    'INR'
+  );
+
+  return {
+    totalINR: quoteINR.totalINR,
+    totalUSD: quoteINR.totalUSD,
+  };
 }
 
 export default function ClientDashboardPage() {
@@ -410,7 +458,19 @@ export default function ClientDashboardPage() {
     setScopes((prev) =>
       prev.map((s) => {
         if (s.id !== scopeId) return s;
-        const updated = { ...s, features: [...s.features, newFeatureInput.trim()] };
+        const updatedFeatures = [...s.features, newFeatureInput.trim()];
+        const totals = recalculateScopeTotals(
+          s.base_engine,
+          updatedFeatures,
+          s.brand_asset,
+          s.maintenance_plan
+        );
+        const updated = {
+          ...s,
+          features: updatedFeatures,
+          total_cost_inr: totals.totalINR,
+          total_cost_usd: totals.totalUSD,
+        };
         saveScopeToDatabase(updated);
         return updated;
       })
@@ -423,11 +483,52 @@ export default function ClientDashboardPage() {
       prev.map((s) => {
         if (s.id !== scopeId) return s;
         const updatedFeatures = s.features.filter((_, idx) => idx !== featureIndex);
-        const updated = { ...s, features: updatedFeatures };
+        const totals = recalculateScopeTotals(
+          s.base_engine,
+          updatedFeatures,
+          s.brand_asset,
+          s.maintenance_plan
+        );
+        const updated = {
+          ...s,
+          features: updatedFeatures,
+          total_cost_inr: totals.totalINR,
+          total_cost_usd: totals.totalUSD,
+        };
         saveScopeToDatabase(updated);
         return updated;
       })
     );
+  };
+
+  const handleDeleteScope = async (scopeCode: string, depositPaid: boolean) => {
+    if (depositPaid) {
+      alert('Paid scopes in active engineering cannot be deleted. Please contact engineering for scope cancellation/refund queries.');
+      return;
+    }
+    const confirmed = window.confirm(`Are you sure you want to delete Scope proposal ${scopeCode}?\n\nThis will remove the draft proposal so you can submit fresh project requirements.`);
+    if (!confirmed) return;
+
+    try {
+      const accessToken = await getAccessToken();
+      const res = await fetch(`/api/client/delete-scope?scopeCode=${encodeURIComponent(scopeCode)}`, {
+        method: 'DELETE',
+        headers: {
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        clearPendingScopeFromStorage();
+        setScopes((prev) => prev.filter((s) => s.scope_code !== scopeCode));
+        alert(`✅ Scope proposal ${scopeCode} deleted successfully.`);
+      } else {
+        alert(`Delete error: ${data.error || 'Failed to delete scope.'}`);
+      }
+    } catch (err) {
+      console.error('Delete scope request failed:', err);
+      alert('Failed to delete scope. Please check network connection.');
+    }
   };
 
   if (loading) {
@@ -511,9 +612,18 @@ export default function ClientDashboardPage() {
             <p className={styles.userEmail}>{user.email}</p>
           </div>
         </div>
-        <button className="comic-btn comic-btn-outline" onClick={logout}>
-          <LogOut size={14} style={{ marginRight: '0.4rem' }} /> Sign Out
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <a
+            href="/scoping"
+            className="comic-btn comic-btn-blue"
+            style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+          >
+            <Plus size={14} /> Commission New Project
+          </a>
+          <button className="comic-btn comic-btn-outline" onClick={logout}>
+            <LogOut size={14} style={{ marginRight: '0.4rem' }} /> Sign Out
+          </button>
+        </div>
       </header>
 
       {/* Workspace Tabs */}
@@ -559,9 +669,25 @@ export default function ClientDashboardPage() {
                           {s.company_name || user.user_metadata?.full_name || 'My Custom Project'}
                         </h3>
                       </div>
-                      <span className={`${styles.statusBadge} ${s.deposit_paid ? styles.statusPaid : styles.statusDraft}`}>
-                        {s.deposit_paid ? 'DEPOSIT PAID (50%)' : 'DRAFT PROPOSAL'}
-                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span className={`${styles.statusBadge} ${s.deposit_paid ? styles.statusPaid : styles.statusDraft}`}>
+                          {s.deposit_paid ? 'DEPOSIT PAID (50%)' : 'DRAFT PROPOSAL'}
+                        </span>
+                        <button
+                          type="button"
+                          className="comic-btn comic-btn-outline"
+                          title={s.deposit_paid ? 'Paid scopes in active engineering cannot be deleted.' : 'Delete unpaid draft proposal'}
+                          disabled={s.deposit_paid}
+                          onClick={() => handleDeleteScope(s.scope_code, s.deposit_paid)}
+                          style={{
+                            padding: '0.3rem 0.6rem',
+                            opacity: s.deposit_paid ? 0.4 : 1,
+                            cursor: s.deposit_paid ? 'not-allowed' : 'pointer',
+                          }}
+                        >
+                          <Trash2 size={14} color={s.deposit_paid ? '#888' : '#ff4444'} />
+                        </button>
+                      </div>
                     </div>
 
                     {/* Pre-fetched Profile Confirmation Banner */}
@@ -780,7 +906,7 @@ export default function ClientDashboardPage() {
                             {payingScopeId === s.id ? 'Initializing Razorpay...' : 'Pay 50% Scope Deposit (Razorpay)'}
                           </button>
                           <p className={styles.testModeTip}>
-                            💡 <strong>Razorpay Test Mode:</strong> Select <strong>Netbanking</strong> (any bank → Success), <strong>UPI</strong> (<code>success@razorpay</code>), or domestic card <code>4000 0000 0000 0002</code>.
+                            💡 <strong>Razorpay Test Mode Tip:</strong> Razorpay accounts block international test cards by default. For card payments, use official Indian Domestic Test Cards: <strong>Visa Debit</strong> <code>4100 2800 0000 1007</code> or <strong>Mastercard</strong> <code>5555 5100 0008 1006</code> (Expiry: <code>12/30</code>, CVV: <code>123</code>). For Netbanking, select any bank and click <strong>[ Success ]</strong> on the prompt.
                           </p>
                         </div>
                       )}

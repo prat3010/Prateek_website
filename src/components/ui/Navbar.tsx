@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, useRef, type MouseEvent } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef, useSyncExternalStore, type MouseEvent } from 'react';
 import { usePathname } from 'next/navigation';
 import { useLenis } from 'lenis/react';
 import { useReducedMotion } from 'framer-motion';
@@ -31,15 +31,15 @@ export interface NavbarProps {
   className?: string;
 }
 
+const emptySubscribe = () => () => {};
+const getSnapshot = () => true;
+const getServerSnapshot = () => false;
+
 export default function Navbar({ items, className }: NavbarProps) {
   const pathname = usePathname();
   const { theme, toggleTheme, audience, setAudience } = useTheme();
   const { user } = useAuth();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(emptySubscribe, getSnapshot, getServerSnapshot);
 
   const handleAudienceChange = useCallback((value: string) => {
     setAudience(value as Audience);

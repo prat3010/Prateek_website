@@ -87,9 +87,9 @@ export async function POST(req: Request) {
     };
 
     // Check existing in normalized table
-    let { data: existingScope, error: selectErr } = await supabase
+    const { data: existingScope, error: selectErr } = await supabase
       .from(targetTable)
-      .select('scope_code')
+      .select('scope_code, client_email')
       .eq('scope_code', scopeCode)
       .maybeSingle();
 
@@ -97,11 +97,14 @@ export async function POST(req: Request) {
       // Fallback to legacy client_orders if client_scopes table doesn't exist yet
       const { data: legacyExisting } = await supabase
         .from('client_orders')
-        .select('scope_code')
+        .select('scope_code, client_email')
         .eq('scope_code', scopeCode)
         .maybeSingle();
 
       if (legacyExisting) {
+        if (legacyExisting.client_email && legacyExisting.client_email !== clientEmail) {
+          return NextResponse.json({ error: 'Forbidden: scope belongs to another account.' }, { status: 403 });
+        }
         await supabase
           .from('client_orders')
           .update(scopeData)
@@ -118,6 +121,10 @@ export async function POST(req: Request) {
     }
 
     if (existingScope) {
+      if (existingScope.client_email && existingScope.client_email !== clientEmail) {
+        return NextResponse.json({ error: 'Forbidden: scope belongs to another account.' }, { status: 403 });
+      }
+
       const { error: updateErr } = await supabase
         .from(targetTable)
         .update(scopeData)
