@@ -94,12 +94,77 @@ CREATE TABLE IF NOT EXISTS certificates (
 ```
 
 ### **4. Profile (`profile` table)**
-Singleton table (exactly 1 row) storing the resume fields and metadata.
+Singleton table (exactly 1 row) storing resume fields, contact copy, and Project Scoping Lab default configurations.
 ```sql
 CREATE TABLE IF NOT EXISTS profile (
   id INTEGER DEFAULT 1 PRIMARY KEY CHECK (id = 1),
-  data JSONB NOT NULL DEFAULT '{}', -- Composes resume items, contact copy, and standard settings
+  data JSONB NOT NULL DEFAULT '{}', -- Composes resume items, intake questionnaire defaults, contact copy
   updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+```
+
+### **5. Clients & Scopes (`clients`, `client_scopes` tables)**
+Stores client workspace profiles, OAuth user mapping, and project scopes configured via `/scoping` or `/dashboard`.
+```sql
+CREATE TABLE IF NOT EXISTS clients (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  full_name TEXT DEFAULT '',
+  company_name TEXT DEFAULT '',
+  phone TEXT DEFAULT '',
+  tax_id_gst TEXT DEFAULT '',
+  country TEXT DEFAULT '',
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS client_scopes (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  scope_code TEXT UNIQUE NOT NULL,
+  client_id UUID REFERENCES clients(id) ON DELETE CASCADE,
+  client_email TEXT NOT NULL,
+  company_name TEXT NOT NULL,
+  client_phone TEXT DEFAULT '',
+  base_engine TEXT NOT NULL,
+  features JSONB DEFAULT '[]'::jsonb,
+  brand_asset TEXT NOT NULL DEFAULT 'none',
+  maintenance_plan TEXT NOT NULL DEFAULT 'none',
+  total_cost_inr NUMERIC NOT NULL DEFAULT 0,
+  total_cost_usd NUMERIC NOT NULL DEFAULT 0,
+  currency TEXT DEFAULT 'INR',
+  timeline TEXT DEFAULT 'Standard Turnaround',
+  status TEXT DEFAULT 'Draft Proposal',
+  delivery_stage TEXT DEFAULT 'architecture' CHECK (delivery_stage IN ('architecture', 'engineering', 'staging', 'live')),
+  deposit_paid BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+```
+
+### **6. Invoices & Webhooks (`invoices`, `processed_webhooks` tables)**
+Payment ledger for 50% deposit locks, milestone invoices, and Razorpay webhook deduplication log.
+```sql
+CREATE TABLE IF NOT EXISTS invoices (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  invoice_number TEXT UNIQUE NOT NULL,
+  scope_id UUID REFERENCES client_scopes(id) ON DELETE CASCADE,
+  client_id UUID REFERENCES clients(id) ON DELETE CASCADE,
+  milestone_name TEXT NOT NULL,
+  amount NUMERIC NOT NULL DEFAULT 0,
+  currency TEXT DEFAULT 'INR',
+  payment_status TEXT DEFAULT 'pending' CHECK (payment_status IN ('pending', 'paid', 'cancelled', 'refunded')),
+  razorpay_order_id TEXT DEFAULT '',
+  razorpay_payment_id TEXT DEFAULT '',
+  due_date TIMESTAMPTZ,
+  paid_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS processed_webhooks (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  event_id TEXT UNIQUE NOT NULL,
+  event_type TEXT NOT NULL,
+  processed_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 ```
 

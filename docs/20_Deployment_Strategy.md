@@ -37,6 +37,17 @@ The following secrets are registered in Vercel project settings:
 | `RESEND_API_KEY` | Server-only | Token for Resend transactional email services. |
 | `CONTACT_EMAIL_TO` | Server-only | Recipient email address for contact form dispatches. |
 | `SYNC_API_KEY` | Server-only | Secret token to authenticate `/api/revalidate` cache purges. |
+| `NEXT_PUBLIC_RAZORPAY_KEY_ID` | Public | Razorpay Key ID for client modal initialization (`rzp_live_...`). |
+| `RAZORPAY_KEY_SECRET` | Server-only | Razorpay Key Secret for order creation & HMAC signature checks. |
+| `RAZORPAY_WEBHOOK_SECRET` | Server-only | Webhook signing secret for `/api/webhooks/razorpay`. |
+
+---
+
+# **Razorpay Webhook Registration**
+
+* **Production Webhook Endpoint**: `https://prateeq.in/api/webhooks/razorpay`
+* **Configured Events**: `payment.captured`, `order.paid`
+* **Signing Secret**: `RAZORPAY_WEBHOOK_SECRET` configured in Razorpay Dashboard → Settings → Webhooks.
 
 ---
 

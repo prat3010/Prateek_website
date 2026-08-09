@@ -22,6 +22,8 @@ Below is a summary of all section specifications:
 * [09_Footer.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/09_Section_Specifications/09_Footer.md): Site directories, social maps, and diagnostics linkages.
 * [10_Terminal.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/09_Section_Specifications/10_Terminal.md): Interactive command line page, git-log parsers, and custom codes.
 * [11_Blog.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/09_Section_Specifications/11_Blog.md): Blog and log entries section detailing adaptive titles and listing formats.
+* [12_Scoping_Lab.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/09_Section_Specifications/12_Scoping_Lab.md): Interactive Project Scoping Lab & Instant Quote wizard (`/scoping`), module dependency resolution, and proposal PDF export.
+* [13_Client_Workspace_Dashboard.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/09_Section_Specifications/13_Client_Workspace_Dashboard.md): Client Workspace Dashboard (`/dashboard`), active scope management, milestone tracking, commercial PDF exports, and 50% deposit lock action.
 
 ---
 

@@ -58,9 +58,28 @@ The proxy telemetry pipeline is structured around strict privacy boundaries:
 
 ---
 
+# **Client Session Verification & Bearer Auth**
+
+To secure the Client Workspace (`/dashboard`) and REST APIs (`/api/client/*`):
+* **Supabase JWT Verification**: Endpoints require `Authorization: Bearer <token>` headers. The server verifies tokens via [`getVerifiedSessionEmail`](file:///Users/prateeksharma/Developer/Prateek_website/src/lib/sessionVerify.ts) against Supabase Auth API.
+* **Email Scope Binding**: Client emails are derived strictly from the verified JWT payload, never from request body parameters. A client can read or modify only their own scopes (`client_scopes`) and invoices (`invoices`).
+* **Unpaid Scope Deletion**: Deletion `/api/client/delete-scope` is restricted to unpaid scopes (`deposit_paid = false`). Paid scopes are immutable via client APIs.
+
+---
+
+# **Razorpay Payment Security & Signature Verification**
+
+* **Server-Side Price Calculation**: Order costs are retrieved strictly from database scope records in `/api/client/create-razorpay-order`. Client inputs cannot alter the payment amount.
+* **HMAC-SHA256 Signature Verification**: Both synchronous payment verification (`verify-razorpay-payment`) and asynchronous webhooks (`webhooks/razorpay`) compute cryptographic SHA-256 HMAC signatures using `RAZORPAY_KEY_SECRET` / `RAZORPAY_WEBHOOK_SECRET`. Unverified signatures return HTTP 400 Bad Request.
+* **Webhook Idempotency**: Webhook events check `processed_webhooks` by `event_id` to prevent duplicate processing or replay attacks.
+
+---
+
 # **Acceptance Criteria**
 - Supabase Row-Level Security (RLS) is enabled on all tables.
 - Public write access remains disabled across the database.
 - Server-side files throwing runtime errors are never imported client-side.
+- Client endpoints derive identity strictly from verified session JWT bearer tokens.
+- Razorpay payment orders derive amounts from DB records and require HMAC SHA-256 signature verification.
 - Telemetry logs contain no raw IP addresses or precise coordinates.
 - Contact route input validation and HTML escaping prevent script injections.

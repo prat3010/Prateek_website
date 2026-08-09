@@ -21,15 +21,16 @@ Below is a summary of all documentation files, categorized by their domain.
 * [08_Information_Architecture.md](08_Information_Architecture.md): How information relates and flows progressively.
 
 ## **Section Specifications**
-* [09_Section_Specifications/](09_Section_Specifications/README.md): Individual section specs for Hero, About, Skills, Projects, Playground, Resume, Pricing, Contact, Footer, Terminal, and Blog.
+* [09_Section_Specifications/](09_Section_Specifications/README.md): Individual section specs for Hero, About, Skills, Projects, Playground, Resume, Pricing (Scoping Lab), Contact, Footer, Terminal, Blog, Scoping Lab (`12_Scoping_Lab.md`), and Client Workspace Dashboard (`13_Client_Workspace_Dashboard.md`).
 
 ## **System Architecture Specifications**
-* [10_Content_Platform_Architecture.md](10_Content_Platform_Architecture.md): Tech specs of the content database tables, caches, and fallbacks.
+* [10_Content_Platform_Architecture.md](10_Content_Platform_Architecture.md): Tech specs of content database tables, client scopes, caches, and fallbacks.
 * [11_Content_Management_System.md](11_Content_Management_System.md): The local Streamlit-based Content Synchronizer specifications.
 * [12_AI_Integration_Strategy.md](12_AI_Integration_Strategy.md): Safe usage guidelines for Google Gemini in the local synchronizer.
 * [13_Telemetry_and_Analytics.md](13_Telemetry_and_Analytics.md): GDPR-compliant, privacy-first session telemetry.
+* [14_Razorpay_Payments_and_Invoicing.md](14_Razorpay_Payments_and_Invoicing.md): Razorpay Payment Gateway, 50% deposit lock, HMAC verification, and invoice ledger.
 * [15_Performance_and_Accessibility.md](15_Performance_and_Accessibility.md): Core Web Vitals targets, Lighthouse metrics, and accessibility standards.
-* [16_Security_and_Privacy.md](16_Security_and_Privacy.md): Row-Level Security (RLS), keys protection, and data privacy rules.
+* [16_Security_and_Privacy.md](16_Security_and_Privacy.md): Row-Level Security (RLS), keys protection, session verification, and data privacy rules.
 * [17_SEO_Strategy.md](17_SEO_Strategy.md): Search engine optimization rules, OG images, and structured metadata.
 
 ## **Operational and Implementation Rules**
