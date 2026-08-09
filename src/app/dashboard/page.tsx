@@ -274,6 +274,33 @@ export default function ClientDashboardPage() {
     }
   };
 
+  const handleCreateLiveTestScope = async () => {
+    if (!user?.email) return;
+    const testCode = `SCOPE-TEST-${Date.now().toString().slice(-4)}`;
+    const testScopeObj: ClientScope = {
+      id: `scope-${testCode}`,
+      scope_code: testCode,
+      company_name: 'Live Gateway Test',
+      client_phone: '+91 99999 99999',
+      base_engine: 'High-Conversion Landing Page (Live Test)',
+      features: ['auth', 'payments'],
+      brand_asset: 'none',
+      maintenance_plan: 'none',
+      total_cost_inr: 2,
+      total_cost_usd: 1,
+      currency: 'INR',
+      timeline: 'Immediate Live Test',
+      status: 'Draft Proposal',
+      delivery_stage: 'architecture',
+      deposit_paid: false,
+      created_at: new Date().toISOString(),
+    };
+
+    setScopes((prev) => [testScopeObj, ...prev]);
+    await saveScopeToDatabase(testScopeObj);
+    alert(`⚡ Live Test Scope (${testCode}) created for ₹2.00 (50% Deposit = ₹1.00)! Click "Pay 50% Scope Deposit (Razorpay)" on the card below.`);
+  };
+
   const [payingScopeId, setPayingScopeId] = useState<string | null>(null);
 
   const loadRazorpayScript = (): Promise<boolean> => {
@@ -646,6 +673,42 @@ export default function ClientDashboardPage() {
       <div className={styles.contentBody}>
         {activeTab === 'scopes' && (
           <div className={styles.sectionGrid}>
+            {(user?.email === 'pointyrocket@gmail.com' ||
+              user?.email === 'prateeqsharma@gmail.com' ||
+              user?.email === '3010prateeksharma@gmail.com') && (
+              <div
+                style={{
+                  gridColumn: '1 / -1',
+                  marginBottom: '1rem',
+                  padding: '1rem 1.2rem',
+                  background: 'rgba(255, 215, 0, 0.12)',
+                  border: '1px dashed #ffd700',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '1rem',
+                }}
+              >
+                <div>
+                  <strong style={{ color: '#ffd700', fontSize: '0.95rem' }}>
+                    🧪 Live Payment Test Launcher ({user.email})
+                  </strong>
+                  <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', opacity: 0.9, color: '#fff' }}>
+                    Generate a live test scope for ₹2.00 (50% deposit = <strong>₹1.00</strong>). Perform a live UPI/Card payment on prateeq.in to verify real Razorpay gateway capture.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="comic-btn comic-btn-blue"
+                  onClick={handleCreateLiveTestScope}
+                  style={{ fontSize: '0.85rem' }}
+                >
+                  ⚡ Create ₹1.00 Live Test Scope
+                </button>
+              </div>
+            )}
             {scopes.length === 0 ? (
               <div className={styles.emptyCard}>
                 <p>No active project scopes found. Configure your architecture in our Instant Scoping Lab!</p>
