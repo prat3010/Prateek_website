@@ -10,9 +10,15 @@ import skillsFallback from '@/data/skills.json';
 import certificatesFallback from '@/data/certificates.json';
 import resumeFallback from '@/data/resume.json';
 
+const getErrorMessage = (err: unknown): string => {
+  if (err && typeof err === 'object' && 'message' in err) {
+    return String((err as { message: unknown }).message);
+  }
+  return err instanceof Error ? err.message : 'Offline mode';
+};
+
 export async function getProjects(): Promise<Project[]> {
   if (!supabase) {
-    console.log('Supabase not configured, using projects fallback');
     return projectsFallback as Project[];
   }
   try {
@@ -26,14 +32,13 @@ export async function getProjects(): Promise<Project[]> {
       id: p.slug || p.id,
     })) as Project[];
   } catch (err) {
-    console.error('Failed to fetch projects from Supabase, falling back to local data:', err);
+    console.warn('Projects data notice (using local fallback):', getErrorMessage(err));
     return projectsFallback as Project[];
   }
 }
 
 export async function getSkills(): Promise<Skill[]> {
   if (!supabase) {
-    console.log('Supabase not configured, using skills fallback');
     return skillsFallback as unknown as Skill[];
   }
   try {
@@ -44,14 +49,13 @@ export async function getSkills(): Promise<Skill[]> {
     if (error || !data) throw error || new Error('No data');
     return data as unknown as Skill[];
   } catch (err) {
-    console.error('Failed to fetch skills from Supabase, falling back to local data:', err);
+    console.warn('Skills data notice (using local fallback):', getErrorMessage(err));
     return skillsFallback as unknown as Skill[];
   }
 }
 
 export async function getCertificates(): Promise<Certificate[]> {
   if (!supabase) {
-    console.log('Supabase not configured, using certificates fallback');
     return certificatesFallback as Certificate[];
   }
   try {
@@ -65,14 +69,13 @@ export async function getCertificates(): Promise<Certificate[]> {
       id: c.slug || c.id,
     })) as Certificate[];
   } catch (err) {
-    console.error('Failed to fetch certificates from Supabase, falling back to local data:', err);
+    console.warn('Certificates data notice (using local fallback):', getErrorMessage(err));
     return certificatesFallback as Certificate[];
   }
 }
 
 export async function getProfile(): Promise<ResumeData | null> {
   if (!supabase) {
-    console.log('Supabase not configured, using resume fallback');
     return resumeFallback as ResumeData;
   }
   try {
@@ -84,8 +87,7 @@ export async function getProfile(): Promise<ResumeData | null> {
     if (error || !data) throw error || new Error('No data');
     return data.data as ResumeData;
   } catch (err) {
-    console.error('Failed to fetch profile from Supabase, falling back to local data:', err);
+    console.warn('Profile data notice (using local fallback):', getErrorMessage(err));
     return resumeFallback as ResumeData;
   }
 }
-

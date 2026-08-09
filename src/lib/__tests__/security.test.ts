@@ -91,3 +91,46 @@ describe('HONEYPOT_PATTERNS', () => {
     expect(HONEYPOT_PATTERNS.some(p => p.test('/admin/analytics'))).toBe(false);
   });
 });
+
+describe('isJwtExpired', () => {
+  const createMockJwt = (expInSeconds: number) => {
+    const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+    const payload = btoa(JSON.stringify({ sub: 'user-123', exp: expInSeconds }));
+    return `${header}.${payload}.mockSignature`;
+  };
+
+  it('returns true for malformed tokens', async () => {
+    const { isJwtExpired } = await import('@/context/AuthContext');
+    expect(isJwtExpired('')).toBe(true);
+    expect(isJwtExpired('invalid.token')).toBe(true);
+    expect(isJwtExpired('not-a-jwt')).toBe(true);
+  });
+
+  it('returns true for expired tokens', async () => {
+    const { isJwtExpired } = await import('@/context/AuthContext');
+    const expiredExp = Math.floor(Date.now() / 1000) - 3600; // 1 hour ago
+    const expiredToken = createMockJwt(expiredExp);
+    expect(isJwtExpired(expiredToken)).toBe(true);
+  });
+
+  it('returns false for valid future tokens', async () => {
+    const { isJwtExpired } = await import('@/context/AuthContext');
+    const futureExp = Math.floor(Date.now() / 1000) + 3600; // 1 hour in future
+    const validToken = createMockJwt(futureExp);
+    expect(isJwtExpired(validToken)).toBe(false);
+  });
+});
+
+describe('universalStorage', () => {
+  it('manages key-value pairs in cookie and localStorage', async () => {
+    const { universalStorage } = await import('../auth');
+    universalStorage.setItem('test_session_key', 'test_token_value');
+    const value = universalStorage.getItem('test_session_key');
+    expect(value).toBe('test_token_value');
+
+    universalStorage.removeItem('test_session_key');
+    const cleared = universalStorage.getItem('test_session_key');
+    expect(cleared).toBeNull();
+  });
+});
+

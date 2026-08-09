@@ -16,23 +16,34 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Unauthorized: valid session required.' }, { status: 401 });
     }
 
-    const { data, error } = await supabase
-      .from('client_orders')
-      .select('*')
-      .eq('client_email', clientEmail)
-      .order('created_at', { ascending: false });
+    try {
+      let { data, error } = await supabase
+        .from('client_scopes')
+        .select('*')
+        .eq('client_email', clientEmail)
+        .order('created_at', { ascending: false });
 
-    if (error) {
-      console.warn('Get scopes DB error:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      if (error) {
+        // Fall back to client_orders if client_scopes table is not created yet
+        const fallback = await supabase
+          .from('client_orders')
+          .select('*')
+          .eq('client_email', clientEmail)
+          .order('created_at', { ascending: false });
+
+        if (!fallback.error) {
+          data = fallback.data;
+          error = null;
+        }
+      }
+
+      return NextResponse.json({ scopes: data || [] });
+    } catch (dbErr) {
+      console.warn('Get scopes DB connection warning (returning empty array fallback):', dbErr);
+      return NextResponse.json({ scopes: [] });
     }
-
-    return NextResponse.json({ scopes: data || [] });
   } catch (err: unknown) {
     console.error('Get Scopes API error:', err);
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Internal Server Error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ scopes: [] });
   }
 }

@@ -6,7 +6,7 @@ const defaultAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmF
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || defaultAnonKey;
 
 // Dual Cookie + LocalStorage adapter to guarantee session persistence across Safari ITP & redirects
-const universalStorage = {
+export const universalStorage = {
   getItem: (key: string): string | null => {
     if (typeof window === 'undefined') return null;
     try {

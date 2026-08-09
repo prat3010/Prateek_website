@@ -19,9 +19,62 @@ export interface ClientScope {
   created_at: string;
 }
 
+export interface ClientEntity {
+  id: string;
+  email: string;
+  full_name?: string;
+  company_name?: string;
+  phone?: string;
+  tax_id_gst?: string;
+  country?: string;
+  created_at: string;
+}
+
+export interface InvoiceEntity {
+  id: string;
+  invoice_number: string;
+  scope_id?: string;
+  client_id?: string;
+  milestone_name: string;
+  amount: number;
+  currency: 'INR' | 'USD';
+  payment_status: 'pending' | 'paid' | 'cancelled' | 'refunded';
+  razorpay_order_id?: string;
+  razorpay_payment_id?: string;
+  due_date?: string;
+  paid_at?: string;
+  created_at: string;
+}
+
+export interface DeliverableEntity {
+  id: string;
+  scope_id: string;
+  staging_url?: string;
+  production_url?: string;
+  github_repo?: string;
+  figma_url?: string;
+  signoff_pdf_url?: string;
+  environment_variables?: Record<string, string>;
+  created_at: string;
+}
+
+export interface RagSubscriptionEntity {
+  id: string;
+  client_id: string;
+  tenant_id: string;
+  plan_tier: string;
+  monthly_token_limit: number;
+  tokens_used_this_month: number;
+  api_key_hash?: string;
+  is_active: boolean;
+  current_period_end?: string;
+  created_at: string;
+}
+
 export interface ClientOrderRow {
   id?: string;
   scope_code: string;
+  client_id?: string;
   client_email?: string;
   company_name: string;
   client_phone?: string;

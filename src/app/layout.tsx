@@ -73,7 +73,7 @@ export default async function RootLayout({
   const headersList = await headers();
   const theme = (headersList.get("x-theme") || "light") as Theme;
   const audience = headersList.get("x-audience") as Audience | null;
-  const region = (headersList.get("x-region") || "global") as Region;
+  const region = (headersList.get("x-region") || "india") as Region;
 
   // Fetch dynamic profile and skills details for structured SEO data (JSON-LD)
   const [profile, skills] = await Promise.all([
@@ -154,8 +154,10 @@ export default async function RootLayout({
             `,
           }}
         />
-        <script
+        <Script
+          id="json-ld"
           type="application/ld+json"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(dynamicJsonLd) }}
         />
 

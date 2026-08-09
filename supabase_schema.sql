@@ -29,6 +29,7 @@ ALTER TABLE page_visits ENABLE ROW LEVEL SECURITY;
 -- DROP POLICY IF EXISTS "Allow public insert access" ON page_visits;
 
 -- Allow public read access to the dashboard for telemetry display
+DROP POLICY IF EXISTS "Allow public select access" ON page_visits;
 CREATE POLICY "Allow public select access" 
   ON page_visits 
   FOR SELECT 
@@ -177,7 +178,132 @@ DROP POLICY IF EXISTS "Allow service update profile" ON profile;
 CREATE POLICY "Allow public select profile" ON profile FOR SELECT USING (true);
 -- Writes must remain service-role only.
 
--- 8. Client Orders & Commercial Scopes
+-- 8. Normalized Client Infrastructure & Commercial Entities
+
+-- 8a. Central Clients Table
+CREATE TABLE IF NOT EXISTS clients (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  full_name TEXT DEFAULT '',
+  company_name TEXT DEFAULT '',
+  phone TEXT DEFAULT '',
+  tax_id_gst TEXT DEFAULT '',
+  country TEXT DEFAULT '',
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Clients can select own profile" ON clients;
+CREATE POLICY "Clients can select own profile" ON clients FOR SELECT
+  USING (auth.jwt() ->> 'email' = email);
+
+CREATE INDEX IF NOT EXISTS idx_clients_email ON clients (email);
+
+-- 8b. Normalized Client Scopes Table
+CREATE TABLE IF NOT EXISTS client_scopes (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  scope_code TEXT UNIQUE NOT NULL,
+  client_id UUID REFERENCES clients(id) ON DELETE CASCADE,
+  client_email TEXT NOT NULL,
+  company_name TEXT NOT NULL,
+  client_phone TEXT DEFAULT '',
+  base_engine TEXT DEFAULT 'Full-Stack Web Engine',
+  features JSONB NOT NULL DEFAULT '[]',
+  brand_asset TEXT DEFAULT 'Standard',
+  maintenance_plan TEXT DEFAULT 'Self-Managed (30-Day Warranty)',
+  total_cost_inr NUMERIC DEFAULT 0,
+  total_cost_usd NUMERIC DEFAULT 0,
+  currency TEXT DEFAULT 'INR',
+  timeline TEXT DEFAULT 'Standard Turnaround',
+  status TEXT DEFAULT 'Draft Proposal',
+  delivery_stage TEXT DEFAULT 'architecture',
+  deposit_paid BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE client_scopes ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Clients can select own client_scopes" ON client_scopes;
+CREATE POLICY "Clients can select own client_scopes" ON client_scopes FOR SELECT
+  USING (auth.jwt() ->> 'email' = client_email);
+
+CREATE INDEX IF NOT EXISTS idx_client_scopes_email ON client_scopes (client_email);
+CREATE INDEX IF NOT EXISTS idx_client_scopes_code ON client_scopes (scope_code);
+CREATE INDEX IF NOT EXISTS idx_client_scopes_client ON client_scopes (client_id);
+
+-- 8c. Invoices & Payment Ledger
+CREATE TABLE IF NOT EXISTS invoices (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  invoice_number TEXT UNIQUE NOT NULL,
+  scope_id UUID REFERENCES client_scopes(id) ON DELETE CASCADE,
+  client_id UUID REFERENCES clients(id) ON DELETE CASCADE,
+  milestone_name TEXT NOT NULL,
+  amount NUMERIC NOT NULL DEFAULT 0,
+  currency TEXT DEFAULT 'INR',
+  payment_status TEXT DEFAULT 'pending' CHECK (payment_status IN ('pending', 'paid', 'cancelled', 'refunded')),
+  razorpay_order_id TEXT DEFAULT '',
+  razorpay_payment_id TEXT DEFAULT '',
+  due_date TIMESTAMPTZ,
+  paid_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE invoices ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Clients can select own invoices" ON invoices;
+CREATE POLICY "Clients can select own invoices" ON invoices FOR SELECT
+  USING (
+    auth.jwt() ->> 'email' = (SELECT email FROM clients WHERE id = invoices.client_id)
+  );
+
+CREATE INDEX IF NOT EXISTS idx_invoices_client ON invoices (client_id);
+CREATE INDEX IF NOT EXISTS idx_invoices_scope ON invoices (scope_id);
+
+-- 8d. Project Deliverables Vault & Credentials
+CREATE TABLE IF NOT EXISTS project_deliverables (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  scope_id UUID UNIQUE REFERENCES client_scopes(id) ON DELETE CASCADE,
+  staging_url TEXT DEFAULT '',
+  production_url TEXT DEFAULT '',
+  github_repo TEXT DEFAULT '',
+  figma_url TEXT DEFAULT '',
+  signoff_pdf_url TEXT DEFAULT '',
+  environment_variables JSONB DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE project_deliverables ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Clients can select own deliverables" ON project_deliverables;
+CREATE POLICY "Clients can select own deliverables" ON project_deliverables FOR SELECT
+  USING (
+    auth.jwt() ->> 'email' = (SELECT client_email FROM client_scopes WHERE id = project_deliverables.scope_id)
+  );
+
+-- 8e. RAG & AI Subscriptions
+CREATE TABLE IF NOT EXISTS rag_subscriptions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  client_id UUID REFERENCES clients(id) ON DELETE CASCADE,
+  tenant_id UUID UNIQUE NOT NULL DEFAULT gen_random_uuid(),
+  plan_tier TEXT DEFAULT 'starter',
+  monthly_token_limit INTEGER DEFAULT 100000,
+  tokens_used_this_month INTEGER DEFAULT 0,
+  api_key_hash TEXT DEFAULT '',
+  is_active BOOLEAN DEFAULT true,
+  current_period_end TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE rag_subscriptions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Clients can select own RAG subscriptions" ON rag_subscriptions;
+CREATE POLICY "Clients can select own RAG subscriptions" ON rag_subscriptions FOR SELECT
+  USING (
+    auth.jwt() ->> 'email' = (SELECT email FROM clients WHERE id = rag_subscriptions.client_id)
+  );
+
+-- Legacy client_orders Table (preserves backward compatibility for legacy queries)
 CREATE TABLE IF NOT EXISTS client_orders (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   scope_code TEXT UNIQUE NOT NULL,
@@ -202,8 +328,6 @@ CREATE TABLE IF NOT EXISTS client_orders (
 ALTER TABLE client_orders ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow public select client_orders" ON client_orders;
 DROP POLICY IF EXISTS "Clients can select own scopes" ON client_orders;
--- Reads via the anon/user key are restricted to the session's own orders;
--- writes remain service-role only (server routes + local tooling).
 CREATE POLICY "Clients can select own scopes" ON client_orders FOR SELECT
   USING (auth.jwt() ->> 'email' = client_email);
 
@@ -330,6 +454,8 @@ CREATE INDEX IF NOT EXISTS idx_posts_date ON posts (date DESC);
 
 CREATE TABLE IF NOT EXISTS intake_leads (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  draft_token TEXT UNIQUE DEFAULT '',
+  scope_code TEXT DEFAULT '',
   created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
   company_name TEXT NOT NULL,
   contact_email TEXT NOT NULL,
@@ -354,6 +480,89 @@ ALTER TABLE intake_leads ENABLE ROW LEVEL SECURITY;
 -- Direct public reads/writes are disabled; all interactions go through service-role API routes.
 
 CREATE INDEX IF NOT EXISTS idx_intake_leads_email ON intake_leads (contact_email);
+CREATE INDEX IF NOT EXISTS idx_intake_leads_token ON intake_leads (draft_token);
 CREATE INDEX IF NOT EXISTS idx_intake_leads_status ON intake_leads (status);
 CREATE INDEX IF NOT EXISTS idx_intake_leads_created_at ON intake_leads (created_at DESC);
+
+-- ============================================================
+-- 11. Lead Conversion & Scope Binding Stored Procedure
+-- ============================================================
+CREATE OR REPLACE FUNCTION convert_draft_lead_to_scope(
+  p_draft_token TEXT,
+  p_client_email TEXT,
+  p_full_name TEXT DEFAULT ''
+) RETURNS JSON AS $$
+DECLARE
+  v_lead RECORD;
+  v_client_id UUID;
+  v_scope_id UUID;
+BEGIN
+  -- 1. Locate intake lead by draft token or email
+  SELECT * INTO v_lead
+  FROM intake_leads
+  WHERE (draft_token IS NOT NULL AND draft_token = p_draft_token AND draft_token != '')
+     OR (contact_email = p_client_email AND status = 'new')
+  ORDER BY created_at DESC
+  LIMIT 1;
+
+  IF v_lead IS NULL THEN
+    RETURN json_build_object('success', false, 'reason', 'No matching pending lead found');
+  END IF;
+
+  -- 2. Upsert client record
+  INSERT INTO clients (email, full_name, company_name, phone)
+  VALUES (p_client_email, COALESCE(p_full_name, ''), v_lead.company_name, COALESCE(v_lead.contact_phone, ''))
+  ON CONFLICT (email) DO UPDATE SET
+    company_name = EXCLUDED.company_name,
+    phone = CASE WHEN clients.phone = '' THEN EXCLUDED.phone ELSE clients.phone END,
+    updated_at = NOW()
+  RETURNING id INTO v_client_id;
+
+  -- 3. Insert converted scope
+  INSERT INTO client_scopes (
+    scope_code,
+    client_id,
+    client_email,
+    company_name,
+    client_phone,
+    base_engine,
+    features,
+    brand_asset,
+    maintenance_plan,
+    total_cost_inr,
+    total_cost_usd,
+    timeline,
+    status
+  ) VALUES (
+    COALESCE(NULLIF(v_lead.scope_code, ''), 'SCOPE-' || floor(10000 + random() * 90000)::text),
+    v_client_id,
+    p_client_email,
+    v_lead.company_name,
+    COALESCE(v_lead.contact_phone, ''),
+    v_lead.base_engine_title,
+    v_lead.selected_features,
+    COALESCE(v_lead.brand_asset_option, 'Standard'),
+    COALESCE(v_lead.maintenance_plan, 'Self-Managed (30-Day Warranty)'),
+    v_lead.total_cost_inr,
+    v_lead.total_cost_usd,
+    COALESCE(v_lead.timeline, 'Standard Turnaround'),
+    'Draft Proposal'
+  )
+  ON CONFLICT (scope_code) DO NOTHING
+  RETURNING id INTO v_scope_id;
+
+  -- 4. Mark lead as converted
+  UPDATE intake_leads
+  SET status = 'converted',
+      notes_internal = 'Converted to client_scope ' || COALESCE(v_scope_id::text, '')
+  WHERE id = v_lead.id;
+
+  RETURN json_build_object(
+    'success', true,
+    'client_id', v_client_id,
+    'scope_id', v_scope_id,
+    'scope_code', v_lead.scope_code
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 

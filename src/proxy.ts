@@ -12,16 +12,24 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
   // Retrieve country header (populated automatically by Vercel in production)
   const country = request.headers.get('x-vercel-ip-country') || 'Local/Unknown';
   if (!regionCookie) {
-    regionCookie = country === 'IN' ? 'india' : 'global';
+    regionCookie = (country === 'IN' || country === 'Local/Unknown') ? 'india' : 'global';
   }
   
   // Parse User Agent via Next.js helper
   const { device, browser, os, isBot } = userAgent(request);
 
-  // Set request headers for layouts
+  // Check for presence of active auth user or Supabase session tokens
+  const hasUserCookie = Boolean(
+    request.cookies.get('prateeq_active_user')?.value ||
+    request.cookies.get('sb-access-token')?.value ||
+    Array.from(request.cookies.getAll()).some(c => c.name.includes('-auth-token'))
+  );
+
+  // Set request headers for layouts & components
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-theme', themeCookie);
   requestHeaders.set('x-region', regionCookie);
+  requestHeaders.set('x-user-authenticated', hasUserCookie ? 'true' : 'false');
   if (isBot) {
     requestHeaders.set('x-audience', 'developer');
   } else if (audienceCookie) {

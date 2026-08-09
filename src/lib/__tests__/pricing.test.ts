@@ -34,7 +34,7 @@ describe('formatting helpers', () => {
   it('resolveDefaultCurrency maps geo region to currency', () => {
     expect(resolveDefaultCurrency('india')).toBe('INR');
     expect(resolveDefaultCurrency('global')).toBe('USD');
-    expect(resolveDefaultCurrency(null)).toBe('USD');
+    expect(resolveDefaultCurrency(null)).toBe('INR');
   });
 });
 

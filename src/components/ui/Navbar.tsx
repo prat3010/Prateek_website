@@ -35,6 +35,11 @@ export default function Navbar({ items, className }: NavbarProps) {
   const pathname = usePathname();
   const { theme, toggleTheme, audience, setAudience } = useTheme();
   const { user } = useAuth();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleAudienceChange = useCallback((value: string) => {
     setAudience(value as Audience);
@@ -292,8 +297,9 @@ export default function Navbar({ items, className }: NavbarProps) {
           href="/dashboard"
           className="comic-btn comic-btn-outline"
           style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem', whiteSpace: 'nowrap' }}
+          suppressHydrationWarning
         >
-          {user ? '👤 DASHBOARD' : 'CLIENT LOGIN'}
+          {mounted && user ? '👤 DASHBOARD' : 'CLIENT LOGIN'}
         </a>
 
         {/* ---- Hamburger ---- */}

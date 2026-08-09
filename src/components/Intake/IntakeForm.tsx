@@ -447,6 +447,17 @@ interface IntakeFormData {
         document.cookie = `prateeq_pending_scope=${encodeURIComponent(JSON.stringify(scopePayload))}; path=/; max-age=86400; SameSite=Lax;`;
       }
 
+      // Persist unauthenticated lead draft to Supabase server-side (awaited to guarantee DB write before redirect)
+      try {
+        await fetch('/api/client/intake-draft', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(scopePayload),
+        });
+      } catch (draftErr) {
+        console.warn('Intake draft API warning:', draftErr);
+      }
+
       // 2. Dispatch background email notification to Resend
       const pdfBase64 = await generateQuestionnairePDFBase64(
         resumeData,

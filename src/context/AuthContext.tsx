@@ -44,40 +44,6 @@ export function isJwtExpired(token: string): boolean {
   }
 }
 
-/**
- * Decodes authentic JWT access token payload returned by Supabase Auth in URL hash
- */
-function parseJwtUser(accessToken: string): User | null {
-  try {
-    const base64Url = accessToken.split('.')[1];
-    if (!base64Url) return null;
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    const payload = JSON.parse(jsonPayload);
-    if (!payload.sub || !payload.email) return null;
-
-    return {
-      id: payload.sub,
-      app_metadata: payload.app_metadata || { provider: 'google' },
-      user_metadata: payload.user_metadata || {},
-      aud: payload.aud || 'authenticated',
-      created_at: new Date().toISOString(),
-      email: payload.email,
-      phone: payload.phone || '',
-      role: payload.role || 'authenticated',
-      updated_at: new Date().toISOString(),
-    };
-  } catch (err) {
-    console.warn('Failed to decode JWT user from hash:', err);
-    return null;
-  }
-}
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(() => {
     if (typeof window === 'undefined') return null;
@@ -108,48 +74,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const hashParams = new URLSearchParams(hashStr);
 
         // 1. Capture OAuth Error Parameters
-        const errorDesc = searchParams.get('error_description') || hashParams.get('error_description') || searchParams.get('error') || hashParams.get('error');
+        const errorDesc =
+          searchParams.get('error_description') ||
+          hashParams.get('error_description') ||
+          searchParams.get('error') ||
+          hashParams.get('error');
+
         if (errorDesc) {
           console.error('Supabase OAuth Error:', errorDesc);
           alert(`Google Sign-In Error: ${decodeURIComponent(errorDesc).replace(/\+/g, ' ')}`);
         }
 
-        // 2. Direct Extraction from URL Hash Fragment (#access_token=...)
-        const accessToken = hashParams.get('access_token');
-        const refreshToken = hashParams.get('refresh_token');
-
-        if (accessToken) {
-          const userFromJwt = parseJwtUser(accessToken);
-          if (userFromJwt && mounted) {
-            setUser(userFromJwt);
-            localStorage.setItem('prateeq_active_user', JSON.stringify(userFromJwt));
-            document.cookie = `prateeq_active_user=${encodeURIComponent(JSON.stringify(userFromJwt))}; path=/; max-age=2592000; SameSite=Lax;`;
-
-            // Clear hash fragment from address bar cleanly
-            try {
-              window.history.replaceState(null, '', window.location.pathname + window.location.search);
-            } catch {}
-
-            // Sync session in background with Supabase JS client
-            supabaseAuth.auth.setSession({
-              access_token: accessToken,
-              refresh_token: refreshToken || '',
-            }).then(({ data }) => {
-              if (data.session && mounted) {
-                setSession(data.session);
-                if (data.session.user) {
-                  setUser(data.session.user);
-                  localStorage.setItem('prateeq_active_user', JSON.stringify(data.session.user));
-                }
-              }
-            }).catch((err) => console.warn('Background setSession warning:', err));
-
-            setLoading(false);
-            return;
-          }
-        }
-
-        // 3. PKCE Code Exchange Fallback
+        // 2. PKCE Code Exchange Fallback (if code in search params)
         const code = searchParams.get('code');
         if (code) {
           try {
@@ -158,6 +94,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               setSession(data.session);
               setUser(data.session.user);
               localStorage.setItem('prateeq_active_user', JSON.stringify(data.session.user));
+              try {
+                window.history.replaceState(null, '', window.location.pathname);
+              } catch {}
               setLoading(false);
               return;
             }
@@ -167,14 +106,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      // 4. Read initial Supabase session
+      // 3. Let Supabase JS client detect URL session hash & read stored session
       try {
-        const { data: { session } } = await supabaseAuth.auth.getSession();
-        if (mounted && session?.user) {
-          setSession(session);
-          setUser(session.user);
+        const { data: { session: currentSession }, error } = await supabaseAuth.auth.getSession();
+        if (error) {
+          console.warn('Get session error:', error);
+        }
+        if (mounted && currentSession?.user) {
+          setSession(currentSession);
+          setUser(currentSession.user);
           if (typeof window !== 'undefined') {
-            localStorage.setItem('prateeq_active_user', JSON.stringify(session.user));
+            localStorage.setItem('prateeq_active_user', JSON.stringify(currentSession.user));
+            if (window.location.hash.includes('access_token=')) {
+              try {
+                window.history.replaceState(null, '', window.location.pathname + window.location.search);
+              } catch {}
+            }
           }
         }
       } catch (err) {
@@ -186,21 +133,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     initAuth();
 
-    // 5. Listen for Auth State Changes
-    const { data: { subscription } } = supabaseAuth.auth.onAuthStateChange((_event, session) => {
+    // 4. Listen for Auth State Changes (SIGNED_IN, SIGNED_OUT, TOKEN_REFRESHED)
+    const { data: { subscription } } = supabaseAuth.auth.onAuthStateChange((_event, newSession) => {
       if (!mounted) return;
-      if (session?.user) {
-        setSession(session);
-        setUser(session.user);
+      if (newSession?.user) {
+        setSession(newSession);
+        setUser(newSession.user);
         if (typeof window !== 'undefined') {
-          localStorage.setItem('prateeq_active_user', JSON.stringify(session.user));
+          localStorage.setItem('prateeq_active_user', JSON.stringify(newSession.user));
         }
-      } else if (_event === 'SIGNED_OUT') {
+      } else if (_event === 'SIGNED_OUT' || !newSession) {
         setSession(null);
         setUser(null);
         if (typeof window !== 'undefined') {
           localStorage.removeItem('prateeq_active_user');
-          document.cookie = 'prateeq_active_user=; path=/; max-age=0;';
+          document.cookie = 'prateeq_active_user=; path=/; max-age=0; SameSite=Lax;';
         }
       }
       setLoading(false);

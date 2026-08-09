@@ -32,6 +32,7 @@ export default function ClientDashboardPage() {
   const [editingScopeId, setEditingScopeId] = useState<string | null>(null);
   const [newFeatureInput, setNewFeatureInput] = useState('');
   const [authGateError, setAuthGateError] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
 
   // Profile setup state for pre-fetched Google details
   const [companyInputs, setCompanyInputs] = useState<Record<string, string>>({});
@@ -218,6 +219,185 @@ export default function ClientDashboardPage() {
     }
   };
 
+  const [payingScopeId, setPayingScopeId] = useState<string | null>(null);
+
+  const loadRazorpayScript = (): Promise<boolean> => {
+    return new Promise((resolve) => {
+      if (typeof window === 'undefined') return resolve(false);
+      if (window.Razorpay) return resolve(true);
+
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const handleRazorpayCheckout = async (scope: ClientScope) => {
+    try {
+      setPayingScopeId(scope.id);
+      const isLoaded = await loadRazorpayScript();
+      if (!isLoaded) {
+        alert('Could not load Razorpay checkout SDK. Please check your network connection.');
+        setPayingScopeId(null);
+        return;
+      }
+
+      const accessToken = await getAccessToken();
+      const res = await fetch('/api/client/create-razorpay-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
+        body: JSON.stringify({
+          scopeCode: scope.scope_code,
+          totalCostINR: scope.total_cost_inr,
+          totalCostUSD: scope.total_cost_usd,
+          currency: scope.currency,
+          companyName: scope.company_name,
+        }),
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        alert(`Order Creation Error: ${errJson.error || 'Failed to initialize payment'}`);
+        setPayingScopeId(null);
+        return;
+      }
+
+      const orderData = await res.json();
+
+      if (orderData.isMock) {
+        const depositDisplay =
+          scope.currency === 'INR'
+            ? `₹${Math.round(scope.total_cost_inr * 0.5).toLocaleString('en-IN')}`
+            : `$${Math.round(scope.total_cost_usd * 0.5).toLocaleString('en-US')}`;
+
+        const confirmSimulated = window.confirm(
+          `⚡ Razorpay Sandbox Mode (Offline Dev Server):\n\nSimulate successful 50% deposit lock (${depositDisplay}) for Scope ${scope.scope_code}?`
+        );
+
+        if (confirmSimulated) {
+          try {
+            const token = await getAccessToken();
+            const verifyRes = await fetch('/api/client/verify-razorpay-payment', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              },
+              body: JSON.stringify({
+                scopeCode: scope.scope_code,
+                razorpayOrderId: orderData.orderId,
+                razorpayPaymentId: `pay_mock_${Date.now()}`,
+                razorpaySignature: 'test_signature_mock_fallback',
+              }),
+            });
+
+            const verifyData = await verifyRes.json();
+            if (verifyData.success) {
+              setScopes((prev) =>
+                prev.map((s) =>
+                  s.scope_code === scope.scope_code
+                    ? {
+                        ...s,
+                        deposit_paid: true,
+                        delivery_stage: 'engineering',
+                        status: 'Deposit Paid — In Development',
+                      }
+                    : s
+                )
+              );
+              alert('✅ Deposit Locked! Scope has advanced to Phase 2 (Core Engineering).');
+            } else {
+              alert(`Verification failed: ${verifyData.error || 'Unknown error'}`);
+            }
+          } catch (simErr) {
+            console.error('Simulated payment error:', simErr);
+          } finally {
+            setPayingScopeId(null);
+          }
+        } else {
+          setPayingScopeId(null);
+        }
+        return;
+      }
+
+      const options = {
+        key: orderData.keyId,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'Prateek Sharma Engineering',
+        description: `50% Deposit for Scope ${scope.scope_code}`,
+        order_id: orderData.orderId,
+        prefill: {
+          name: scope.company_name || user?.user_metadata?.full_name || '',
+          email: user?.email || '',
+          contact: scope.client_phone || '',
+        },
+        theme: {
+          color: '#00E676',
+        },
+        handler: async (response: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string }) => {
+          try {
+            const token = await getAccessToken();
+            const verifyRes = await fetch('/api/client/verify-razorpay-payment', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              },
+              body: JSON.stringify({
+                scopeCode: scope.scope_code,
+                razorpayOrderId: response.razorpay_order_id || orderData.orderId,
+                razorpayPaymentId: response.razorpay_payment_id || `pay_test_${Date.now()}`,
+                razorpaySignature: response.razorpay_signature || 'test_signature',
+              }),
+            });
+
+            const verifyData = await verifyRes.json();
+            if (verifyData.success) {
+              setScopes((prev) =>
+                prev.map((s) =>
+                  s.scope_code === scope.scope_code
+                    ? {
+                        ...s,
+                        deposit_paid: true,
+                        delivery_stage: 'engineering',
+                        status: 'Deposit Paid — In Development',
+                      }
+                    : s
+                )
+              );
+              alert('✅ Payment Verified! Your 50% deposit has been locked and development has moved to Phase 2 (Core Engineering).');
+            } else {
+              alert(`Payment verification failed: ${verifyData.error || 'Unknown error'}`);
+            }
+          } catch (verifyErr) {
+            console.error('Payment verification handler error:', verifyErr);
+            alert('Verification request failed. Please refresh your dashboard.');
+          } finally {
+            setPayingScopeId(null);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setPayingScopeId(null);
+          },
+        },
+      };
+
+      const rzp = new (window as unknown as { Razorpay: new (opts: unknown) => { open: () => void } }).Razorpay(options);
+      rzp.open();
+    } catch (err: unknown) {
+      console.error('Razorpay checkout error:', err);
+      alert('An error occurred while launching payment. Please try again.');
+      setPayingScopeId(null);
+    }
+  };
+
   const handleAddFeature = (scopeId: string) => {
     if (!newFeatureInput.trim()) return;
     setScopes((prev) =>
@@ -282,13 +462,15 @@ export default function ClientDashboardPage() {
       {/* Workspace Header */}
       <header className={styles.header}>
         <div className={styles.userInfo}>
-          {user.user_metadata?.avatar_url ? (
+          {user.user_metadata?.avatar_url && !avatarError ? (
             <Image
               src={user.user_metadata.avatar_url}
               alt="Profile"
               width={48}
               height={48}
               className={styles.avatar}
+              unoptimized
+              onError={() => setAvatarError(true)}
             />
           ) : (
             <div className={styles.avatarFallback}>{(user.email || 'C')[0].toUpperCase()}</div>
@@ -555,17 +737,23 @@ export default function ClientDashboardPage() {
 
                       {s.deposit_paid ? (
                         <div className={styles.paidNotice}>
-                          <CheckCircle2 size={16} /> 50% Deposit Locked — Development In Architecture
+                          <CheckCircle2 size={16} /> 50% Deposit Locked — Development In Core Engineering
                         </div>
                       ) : (
-                        <div className={styles.paymentContainer}>
-                          <a
-                            href={`mailto:prateeqsharma@gmail.com?subject=Confirming Scope ${s.scope_code}&body=Hi Prateek, I have finalized my scope ${s.scope_code} for ${s.company_name || 'my project'}. Total: ${s.currency === 'INR' ? `₹${totalAmount.toLocaleString('en-IN')}` : `$${totalAmount}`}. Let us proceed!`}
+                        <div className={styles.paymentContainer} style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+                          <button
+                            type="button"
                             className="comic-btn comic-btn-blue"
-                            style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
+                            disabled={payingScopeId === s.id}
+                            onClick={() => handleRazorpayCheckout(s)}
+                            style={{ display: 'inline-flex', alignItems: 'center' }}
                           >
-                            <Zap size={15} style={{ marginRight: '0.4rem' }} /> Confirm Scope & Start Build
-                          </a>
+                            <Zap size={15} style={{ marginRight: '0.4rem' }} />
+                            {payingScopeId === s.id ? 'Initializing Razorpay...' : 'Pay 50% Scope Deposit (Razorpay)'}
+                          </button>
+                          <p className={styles.testModeTip}>
+                            💡 <strong>Razorpay Test Mode:</strong> Select <strong>Netbanking</strong> (any bank → Success), <strong>UPI</strong> (<code>success@razorpay</code>), or domestic card <code>4000 0000 0000 0002</code>.
+                          </p>
                         </div>
                       )}
                     </div>

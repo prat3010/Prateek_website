@@ -3,6 +3,20 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.googleusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com",
+      },
+    ],
   },
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion"],
@@ -14,19 +28,19 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: [
           {
-                        key: "Content-Security-Policy",
+            key: "Content-Security-Policy",
             value:
               "default-src 'self'; " +
-              `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'${isDev ? " 'unsafe-eval'" : ""} https://va.vercel-scripts.com https://cdn.jsdelivr.net https://www.google.com https://www.gstatic.com; ` +
-              "style-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com; " +
-              "img-src 'self' data: blob: https://www.google.com https://www.gstatic.com; " +
-              `connect-src 'self'${isDev ? " ws: wss: http://localhost:8000" : ""} https://va.vercel-scripts.com https://cdn.jsdelivr.net https://rag.prateeq.in https://storage.googleapis.com https://www.google.com; ` +
+              `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'${isDev ? " 'unsafe-eval'" : ""} https://va.vercel-scripts.com https://cdn.jsdelivr.net https://www.google.com https://www.gstatic.com https://checkout.razorpay.com; ` +
+              "style-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com https://checkout.razorpay.com; " +
+              "img-src 'self' data: blob: https://www.google.com https://www.gstatic.com https://lh3.googleusercontent.com https://*.googleusercontent.com https://avatars.githubusercontent.com https://checkout.razorpay.com; " +
+              `connect-src 'self'${isDev ? " ws: wss: http://localhost:8000" : ""} https://va.vercel-scripts.com https://cdn.jsdelivr.net https://rag.prateeq.in https://storage.googleapis.com https://www.google.com https://api.razorpay.com https://lumberjack.razorpay.com; ` +
               "worker-src 'self' blob:; " +
               "font-src 'self' https://www.gstatic.com; " +
               "object-src 'none'; " +
               "base-uri 'self'; " +
               "form-action 'self'; " +
-              "frame-src 'self' https://www.google.com https://www.gstatic.com; " +
+              "frame-src 'self' https://www.google.com https://www.gstatic.com https://api.razorpay.com https://checkout.razorpay.com; " +
               "frame-ancestors 'none';",
           },
           {
@@ -62,7 +76,7 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-}
+};
 
 export default ((): NextConfig => {
   if (process.env.ANALYZE === "true") {

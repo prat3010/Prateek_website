@@ -30,9 +30,23 @@ export function formatPricePair(inr: number, usd: number, currency: Currency): s
   return currency === 'INR' ? `${inrStr} / ${usdStr}` : `${usdStr} / ${inrStr}`;
 }
 
-/** Existing geo-IP `region` cookie value ('india' | 'global') → currency. */
+/** Existing geo-IP `region` cookie value ('india' | 'global') → currency. Default: 'INR' for India location. */
 export function resolveDefaultCurrency(region: string | null | undefined): Currency {
-  return region === 'india' ? 'INR' : 'USD';
+  if (region === 'global') return 'USD';
+  if (region === 'india' || region === 'IN' || region === 'in') return 'INR';
+
+  if (typeof window !== 'undefined' && typeof Intl !== 'undefined') {
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+      if (tz.includes('Kolkata') || tz.includes('Calcutta') || tz.startsWith('Asia/Kolkata') || tz.startsWith('Asia/Calcutta')) {
+        return 'INR';
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  return 'INR';
 }
 
 export interface QuoteSelection {
