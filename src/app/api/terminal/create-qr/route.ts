@@ -1,6 +1,36 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
 
+function generateRazorpayQrSvg(amount: number): string {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 340" width="300" height="340">
+    <rect width="300" height="340" rx="16" fill="#090d16" stroke="#0ea5e9" stroke-width="2"/>
+    <rect x="20" y="20" width="260" height="40" rx="8" fill="#0284c7"/>
+    <text x="150" y="45" font-family="monospace" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">RAZORPAY UPI (₹${amount})</text>
+    <rect x="30" y="80" width="240" height="240" rx="12" fill="#ffffff"/>
+    <rect x="45" y="95" width="60" height="60" fill="#090d16"/><rect x="53" y="103" width="44" height="44" fill="#ffffff"/><rect x="61" y="111" width="28" height="28" fill="#0ea5e9"/>
+    <rect x="195" y="95" width="60" height="60" fill="#090d16"/><rect x="203" y="103" width="44" height="44" fill="#ffffff"/><rect x="211" y="111" width="28" height="28" fill="#0ea5e9"/>
+    <rect x="45" y="245" width="60" height="60" fill="#090d16"/><rect x="53" y="253" width="44" height="44" fill="#ffffff"/><rect x="61" y="261" width="28" height="28" fill="#0ea5e9"/>
+    <rect x="120" y="95" width="12" height="12" fill="#090d16"/><rect x="140" y="95" width="12" height="12" fill="#0ea5e9"/><rect x="160" y="95" width="12" height="12" fill="#090d16"/>
+    <rect x="120" y="115" width="12" height="12" fill="#0ea5e9"/><rect x="140" y="115" width="12" height="12" fill="#090d16"/><rect x="160" y="115" width="12" height="12" fill="#0ea5e9"/>
+    <rect x="120" y="135" width="12" height="12" fill="#090d16"/><rect x="140" y="135" width="12" height="12" fill="#0ea5e9"/><rect x="160" y="135" width="12" height="12" fill="#090d16"/>
+    <rect x="120" y="155" width="12" height="12" fill="#0ea5e9"/><rect x="140" y="155" width="12" height="12" fill="#090d16"/><rect x="160" y="155" width="12" height="12" fill="#0ea5e9"/>
+    <rect x="180" y="155" width="12" height="12" fill="#090d16"/><rect x="200" y="155" width="12" height="12" fill="#0ea5e9"/><rect x="220" y="155" width="12" height="12" fill="#090d16"/>
+    <rect x="120" y="175" width="12" height="12" fill="#090d16"/><rect x="140" y="175" width="12" height="12" fill="#0ea5e9"/><rect x="160" y="175" width="12" height="12" fill="#090d16"/>
+    <rect x="180" y="175" width="12" height="12" fill="#0ea5e9"/><rect x="200" y="175" width="12" height="12" fill="#090d16"/><rect x="240" y="175" width="12" height="12" fill="#0ea5e9"/>
+    <rect x="120" y="195" width="12" height="12" fill="#0ea5e9"/><rect x="140" y="195" width="12" height="12" fill="#090d16"/><rect x="160" y="195" width="12" height="12" fill="#0ea5e9"/>
+    <rect x="180" y="195" width="12" height="12" fill="#090d16"/><rect x="200" y="195" width="12" height="12" fill="#0ea5e9"/><rect x="220" y="195" width="12" height="12" fill="#090d16"/>
+    <rect x="120" y="215" width="12" height="12" fill="#090d16"/><rect x="140" y="215" width="12" height="12" fill="#0ea5e9"/><rect x="160" y="215" width="12" height="12" fill="#090d16"/>
+    <rect x="180" y="215" width="12" height="12" fill="#0ea5e9"/><rect x="200" y="215" width="12" height="12" fill="#090d16"/><rect x="240" y="215" width="12" height="12" fill="#0ea5e9"/>
+    <rect x="120" y="235" width="12" height="12" fill="#0ea5e9"/><rect x="140" y="235" width="12" height="12" fill="#090d16"/><rect x="160" y="235" width="12" height="12" fill="#0ea5e9"/>
+    <rect x="180" y="235" width="12" height="12" fill="#090d16"/><rect x="200" y="235" width="12" height="12" fill="#0ea5e9"/><rect x="220" y="235" width="12" height="12" fill="#090d16"/>
+    <rect x="120" y="255" width="12" height="12" fill="#090d16"/><rect x="140" y="255" width="12" height="12" fill="#0ea5e9"/><rect x="160" y="255" width="12" height="12" fill="#090d16"/>
+    <rect x="180" y="255" width="12" height="12" fill="#0ea5e9"/><rect x="200" y="255" width="12" height="12" fill="#090d16"/><rect x="240" y="255" width="12" height="12" fill="#0ea5e9"/>
+    <rect x="120" y="275" width="12" height="12" fill="#0ea5e9"/><rect x="140" y="275" width="12" height="12" fill="#090d16"/><rect x="160" y="275" width="12" height="12" fill="#0ea5e9"/>
+    <rect x="180" y="275" width="12" height="12" fill="#090d16"/><rect x="200" y="275" width="12" height="12" fill="#0ea5e9"/><rect x="220" y="275" width="12" height="12" fill="#090d16"/>
+  </svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
 export async function POST(req: Request) {
   try {
     const KEY_ID = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || '';
@@ -13,7 +43,7 @@ export async function POST(req: Request) {
     }
 
     const amountInSubunits = amountInr * 100;
-    const isDev = process.env.NODE_ENV === 'development';
+    const fallbackSvgUrl = generateRazorpayQrSvg(amountInr);
 
     if (!KEY_ID || !KEY_SECRET) {
       const mockQrId = `qr_mock_${Date.now()}`;
@@ -33,7 +63,7 @@ export async function POST(req: Request) {
         isMock: true,
         qr_id: mockQrId,
         amount: amountInr,
-        image_url: '/phonepe_qr.svg',
+        image_url: fallbackSvgUrl,
         payment_url: `upi://pay?pa=prateeqsharma@ybl&pn=Prateek%20Sharma&am=${amountInr}&cu=INR`,
       });
     }
@@ -69,14 +99,14 @@ export async function POST(req: Request) {
           isMock: true,
           qr_id: mockQrId,
           amount: amountInr,
-          image_url: '/phonepe_qr.svg',
+          image_url: fallbackSvgUrl,
           payment_url: `upi://pay?pa=prateeqsharma@ybl&pn=Prateek%20Sharma&am=${amountInr}&cu=INR`,
         });
       }
 
       const qrData = await response.json();
       const qrId = qrData.id;
-      const imageUrl = qrData.image_url || '/phonepe_qr.svg';
+      const imageUrl = qrData.image_url || fallbackSvgUrl;
 
       if (supabase) {
         try {
@@ -105,7 +135,7 @@ export async function POST(req: Request) {
         isMock: true,
         qr_id: mockQrId,
         amount: amountInr,
-        image_url: '/phonepe_qr.svg',
+        image_url: fallbackSvgUrl,
         payment_url: `upi://pay?pa=prateeqsharma@ybl&pn=Prateek%20Sharma&am=${amountInr}&cu=INR`,
       });
     }

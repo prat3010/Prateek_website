@@ -438,19 +438,8 @@ export default function SiteInfoConsole() {
     if (trimmedCmd === 'qrcode' || trimmedCmd === 'pay' || trimmedCmd.startsWith('qrcode ') || trimmedCmd.startsWith('pay ')) {
       const parts = trimmedCmd.split(/\s+/);
       const rawAmt = parts[1];
-      const amount = rawAmt ? parseInt(rawAmt, 10) : NaN;
-
-      if (!rawAmt || isNaN(amount) || amount <= 0) {
-        setTerminalHistory(prev => [
-          ...prev,
-          { text: 'RAZORPAY DYNAMIC UPI QR PAYMENT PORTAL:', type: 'success' },
-          { text: '⚠️ Please specify a payment or donation amount in INR.', type: 'error' },
-          { text: '  Usage  : qrcode <amount>   or   pay <amount>', type: 'output' },
-          { text: '  Example: qrcode 500   or   pay 1000', type: 'success' }
-        ]);
-        setTerminalInput('');
-        return;
-      }
+      const parsedAmt = rawAmt ? parseInt(rawAmt, 10) : NaN;
+      const amount = (!rawAmt || isNaN(parsedAmt) || parsedAmt <= 0) ? 500 : parsedAmt;
 
       setTerminalHistory(prev => [
         ...prev,
@@ -476,9 +465,10 @@ export default function SiteInfoConsole() {
 
           setTerminalHistory(prev => [
             ...prev,
-            { text: `  Scan the QR code below using any UPI app (PhonePe, GPay, Paytm, BHIM) for ₹${amount}:`, type: 'output' },
+            { text: `  Scan the QR code below using any UPI app (GPay, PhonePe, Paytm, BHIM) for ₹${amount}:`, type: 'output' },
             { text: '', type: 'image', imageUrl: data.image_url },
-            { text: `  🔗 UPI Direct Link: ${data.payment_url}`, type: 'link', href: data.payment_url },
+            { text: `  🔗 Mobile Deep-Link (GPay / WhatsApp Pay): ${data.payment_url}`, type: 'link', href: data.payment_url },
+            { text: '  💡 Note: On desktop, scan the QR graphic with your phone camera or banking app.', type: 'output' },
             { text: `[ ⏳ WAITING FOR UPI PAYMENT (Session: ${data.qr_id}) ... ]`, type: 'success' }
           ]);
 
@@ -768,7 +758,7 @@ export default function SiteInfoConsole() {
                 if (line.type === 'image' && line.imageUrl) {
                   return (
                     <div key={index} className={styles.terminalImageContainer}>
-                      <Image src={line.imageUrl} alt="PhonePe QR Code" className={styles.terminalImage} width={200} height={200} unoptimized />
+                      <Image src={line.imageUrl} alt="Razorpay UPI QR Code" className={styles.terminalImage} width={200} height={200} unoptimized />
                     </div>
                   );
                 }
