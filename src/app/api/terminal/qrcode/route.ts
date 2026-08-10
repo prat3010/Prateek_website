@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import QRCode from 'qrcode';
 
 export async function POST(req: Request) {
   try {
@@ -60,11 +61,25 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: errorMsg }, { status: rzpRes.status });
     }
 
-    const imageUrl = qrData.image_content || qrData.image_url;
+    let imageUrl = qrData.image_content;
+
+    if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.startsWith('data:image')) {
+      const qrTarget = qrData.image_url || qrData.short_url || (qrData.id ? `https://rzp.io/i/${qrData.id}` : null);
+      if (qrTarget) {
+        imageUrl = await QRCode.toDataURL(qrTarget, {
+          width: 300,
+          margin: 2,
+          color: {
+            dark: '#000000',
+            light: '#ffffff',
+          },
+        });
+      }
+    }
 
     if (!imageUrl) {
       return NextResponse.json(
-        { error: 'Razorpay response did not include a valid QR code image.' },
+        { error: 'Razorpay response did not include a valid QR code image or target URL.' },
         { status: 502 }
       );
     }

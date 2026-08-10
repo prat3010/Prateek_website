@@ -98,7 +98,7 @@ describe('POST /api/terminal/qrcode', () => {
     expect(res.status).toBe(200);
     expect(data.success).toBe(true);
     expect(data.amount).toBe(500);
-    expect(data.imageUrl).toBe('https://rzp.io/i/mock_qr_image');
+    expect(data.imageUrl).toMatch(/^data:image\/png;base64,/);
 
     expect(mockFetch).toHaveBeenCalledWith(
       'https://api.razorpay.com/v1/payments/qr_codes',
