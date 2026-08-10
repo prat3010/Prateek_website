@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabaseAuth } from '@/lib/auth';
+import { createClient } from '@/lib/supabase/server';
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
@@ -22,35 +22,17 @@ export async function GET(request: Request) {
 
   if (code) {
     try {
-      const { data, error: exchangeErr } = await supabaseAuth.auth.exchangeCodeForSession(code);
+      const supabase = await createClient();
+      const { data, error: exchangeErr } = await supabase.auth.exchangeCodeForSession(code);
       if (!exchangeErr && data.session) {
         const response = NextResponse.redirect(`${origin}${targetPath}`);
-
-        const maxAge = 2592000; // 30 days
-        const isSecure = origin.startsWith('https:');
-
-        response.cookies.set('sb-access-token', data.session.access_token, {
-          path: '/',
-          maxAge,
-          sameSite: 'lax',
-          secure: isSecure,
-        });
-
-        if (data.session.refresh_token) {
-          response.cookies.set('sb-refresh-token', data.session.refresh_token, {
-            path: '/',
-            maxAge,
-            sameSite: 'lax',
-            secure: isSecure,
-          });
-        }
 
         if (data.session.user) {
           response.cookies.set('prateeq_active_user', JSON.stringify(data.session.user), {
             path: '/',
-            maxAge,
+            maxAge: 2592000,
             sameSite: 'lax',
-            secure: isSecure,
+            secure: origin.startsWith('https:'),
           });
         }
 
