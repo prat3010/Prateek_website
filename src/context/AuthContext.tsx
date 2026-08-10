@@ -80,10 +80,62 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         isOAuthReturn = searchParams.has('code') || searchParams.has('error') || hashParams.has('access_token');
+
+        // 1. Direct PKCE Code Exchange if ?code= is present in URL
+        const code = searchParams.get('code');
+        if (code) {
+          try {
+            const { data, error } = await supabaseAuth.auth.exchangeCodeForSession(code);
+            if (!error && data.session?.user) {
+              if (mounted) {
+                setSession(data.session);
+                setUser(data.session.user);
+                universalStorage.setItem('prateeq_active_user', JSON.stringify(data.session.user));
+              }
+              try {
+                window.history.replaceState(null, '', window.location.pathname);
+              } catch {}
+              if (mounted) setLoading(false);
+              return;
+            } else if (error) {
+              console.warn('PKCE exchange warning:', error);
+            }
+          } catch (codeErr) {
+            console.warn('Code exchange error:', codeErr);
+          }
+        }
+
+        // 2. Hash Fragment Token Exchange if #access_token= is present in URL
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+        if (accessToken && refreshToken) {
+          try {
+            const { data, error } = await supabaseAuth.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken,
+            });
+            if (!error && data.session?.user) {
+              if (mounted) {
+                setSession(data.session);
+                setUser(data.session.user);
+                universalStorage.setItem('prateeq_active_user', JSON.stringify(data.session.user));
+              }
+              try {
+                window.history.replaceState(null, '', window.location.pathname);
+              } catch {}
+              if (mounted) setLoading(false);
+              return;
+            } else if (error) {
+              console.warn('Set session from hash warning:', error);
+            }
+          } catch (hashErr) {
+            console.warn('Set session from hash error:', hashErr);
+          }
+        }
       }
 
+      // 3. Fallback to stored session detection
       try {
-        // Fetch session BEFORE stripping URL params so PKCE token exchange can read ?code=
         const { data: { session: currentSession }, error } = await supabaseAuth.auth.getSession();
         if (error) {
           console.warn('Get session error:', error);
@@ -95,10 +147,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setUser(currentSession.user);
             universalStorage.setItem('prateeq_active_user', JSON.stringify(currentSession.user));
           } else {
-            // Clear unverified/stale cached user state if no valid session exists
-            setSession(null);
-            setUser(null);
-            universalStorage.removeItem('prateeq_active_user');
+            const cachedUser = universalStorage.getItem('prateeq_active_user');
+            if (!cachedUser) {
+              setSession(null);
+              setUser(null);
+            }
           }
         }
       } catch (err) {
@@ -115,7 +168,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     initAuth();
 
-    // 5. Listen for Auth State Changes (SIGNED_IN, TOKEN_REFRESHED, SIGNED_OUT)
+    // 4. Listen for Auth State Changes (SIGNED_IN, TOKEN_REFRESHED, SIGNED_OUT)
     const { data: { subscription } } = supabaseAuth.auth.onAuthStateChange((event, newSession) => {
       if (!mounted) return;
       if (newSession?.user) {
@@ -123,7 +176,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(newSession.user);
         universalStorage.setItem('prateeq_active_user', JSON.stringify(newSession.user));
         setLoading(false);
-      } else if (event === 'SIGNED_OUT' || (!newSession && event !== 'INITIAL_SESSION')) {
+      } else if (event === 'SIGNED_OUT') {
         setSession(null);
         setUser(null);
         universalStorage.removeItem('prateeq_active_user');
@@ -174,12 +227,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return refreshed.session.access_token;
         }
       }
+      if (session?.access_token && !isJwtExpired(session.access_token)) {
+        return session.access_token;
+      }
       return null;
     } catch (err) {
       console.warn('Access token resolution failed:', err);
+      if (session?.access_token && !isJwtExpired(session.access_token)) {
+        return session.access_token;
+      }
       return null;
     }
-  }, []);
+  }, [session]);
 
   return (
     <AuthContext.Provider
