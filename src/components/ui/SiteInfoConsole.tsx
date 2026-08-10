@@ -435,6 +435,60 @@ export default function SiteInfoConsole() {
       return;
     }
 
+    if (trimmedCmd.startsWith('qrcode') || trimmedCmd.startsWith('qr')) {
+      const parts = trimmedCmd.split(/\s+/);
+      const arg = parts[1];
+      const amount = arg ? parseFloat(arg) : NaN;
+
+      if (!isNaN(amount) && amount > 0) {
+        setTerminalHistory(prev => [
+          ...prev,
+          { text: `RAZORPAY DYNAMIC GATEWAY // Requesting single-use QR for ₹${amount.toLocaleString('en-IN')}...`, type: 'output' }
+        ]);
+
+        fetch('/api/terminal/qrcode', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount }),
+        })
+          .then(async res => {
+            const data = await res.json();
+            if (res.ok && data.success && data.imageUrl) {
+              setTerminalHistory(prev => [
+                ...prev,
+                { text: `RAZORPAY DYNAMIC UPI QR CODE (₹${data.amount.toLocaleString('en-IN')}):`, type: 'success' },
+                { text: `  Scan using any UPI app (PhonePe, GPay, Paytm, BHIM) to pay exactly ₹${data.amount.toLocaleString('en-IN')}.`, type: 'output' },
+                { text: '', type: 'image', imageUrl: data.imageUrl }
+              ]);
+            } else {
+              setTerminalHistory(prev => [
+                ...prev,
+                { text: `FAILED: ${data.error || 'Could not generate dynamic QR Code.'}`, type: 'error' }
+              ]);
+            }
+          })
+          .catch(() => {
+            setTerminalHistory(prev => [
+              ...prev,
+              { text: 'FAILED: Network error contacting payment gateway.', type: 'error' }
+            ]);
+          });
+
+        setTerminalInput('');
+        return;
+      }
+
+      setTerminalHistory(prev => [
+        ...prev,
+        { text: 'PHONEPE UPI PAYMENT PORTAL:', type: 'success' },
+        { text: '  Tip: Pass an amount to generate a dynamic Razorpay QR Code (e.g. "qrcode 500").', type: 'output' },
+        { text: '  Scan the default QR code below using any UPI app (PhonePe, GPay, Paytm, BHIM) to pay or donate.', type: 'output' },
+        { text: '', type: 'image', imageUrl: '/phonepe_qr.svg' }
+      ]);
+      setTerminalInput('');
+      return;
+    }
+
     switch (trimmedCmd) {
       case 'help':
         response = [
@@ -448,15 +502,8 @@ export default function SiteInfoConsole() {
           { text: '  analytics  - Show visitor statistics summary', type: 'output' },
           { text: '  cheatcode  - Run retro developer override (3D WebGL pizza rat)', type: 'output' },
           { text: '  git-info   - Open the generated portfolio commit log', type: 'output' },
-          { text: '  qrcode     - Scan PhonePe QR code to pay or donate directly', type: 'output' },
+          { text: '  qrcode     - Scan default PhonePe QR or generate dynamic (e.g. qrcode 500)', type: 'output' },
           { text: '  clear      - Clear the command interface screen', type: 'output' }
-        ];
-        break;
-      case 'qrcode':
-        response = [
-          { text: 'PHONEPE UPI PAYMENT PORTAL:', type: 'success' },
-          { text: '  Scan the QR code below using any UPI app (PhonePe, GPay, Paytm, BHIM) to pay or donate.', type: 'output' },
-          { text: '', type: 'image', imageUrl: '/phonepe_qr.svg' }
         ];
         break;
       case 'projects':
