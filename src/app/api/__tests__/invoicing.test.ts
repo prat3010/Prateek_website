@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { calculateInvoiceTotals, isIntraState, formatCurrencyAmount } from '@/lib/invoicing';
+import { describe, it, expect, vi } from 'vitest';
+import { calculateInvoiceTotals, formatCurrencyAmount } from '@/lib/invoicing';
 
 vi.mock('@/data/supabase', () => ({
   get supabase() {

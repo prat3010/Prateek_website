@@ -64,6 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let mounted = true;
 
     const initAuth = async () => {
+      let isOAuthReturn = false;
       if (typeof window !== 'undefined') {
         const searchParams = new URLSearchParams(window.location.search);
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
@@ -78,27 +79,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.error('Supabase OAuth Error:', errorDesc);
         }
 
-        // Clean URL parameters if OAuth return params exist
-        if (searchParams.has('code') || searchParams.has('error') || hashParams.has('access_token')) {
-          try {
-            window.history.replaceState(null, '', window.location.pathname);
-          } catch {}
-        }
+        isOAuthReturn = searchParams.has('code') || searchParams.has('error') || hashParams.has('access_token');
       }
 
       try {
+        // Fetch session BEFORE stripping URL params so PKCE token exchange can read ?code=
         const { data: { session: currentSession }, error } = await supabaseAuth.auth.getSession();
         if (error) {
           console.warn('Get session error:', error);
         }
-        if (mounted && currentSession?.user) {
-          setSession(currentSession);
-          setUser(currentSession.user);
-          universalStorage.setItem('prateeq_active_user', JSON.stringify(currentSession.user));
+
+        if (mounted) {
+          if (currentSession?.user) {
+            setSession(currentSession);
+            setUser(currentSession.user);
+            universalStorage.setItem('prateeq_active_user', JSON.stringify(currentSession.user));
+          } else {
+            // Clear unverified/stale cached user state if no valid session exists
+            setSession(null);
+            setUser(null);
+            universalStorage.removeItem('prateeq_active_user');
+          }
         }
       } catch (err) {
         console.warn('Get session warning:', err);
       } finally {
+        if (typeof window !== 'undefined' && isOAuthReturn) {
+          try {
+            window.history.replaceState(null, '', window.location.pathname);
+          } catch {}
+        }
         if (mounted) setLoading(false);
       }
     };
@@ -113,7 +123,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(newSession.user);
         universalStorage.setItem('prateeq_active_user', JSON.stringify(newSession.user));
         setLoading(false);
-      } else if (event === 'SIGNED_OUT') {
+      } else if (event === 'SIGNED_OUT' || (!newSession && event !== 'INITIAL_SESSION')) {
         setSession(null);
         setUser(null);
         universalStorage.removeItem('prateeq_active_user');

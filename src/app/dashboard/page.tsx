@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
-import { universalStorage } from '@/lib/auth';
 import { 
   LogOut, 
   ShieldCheck, 
@@ -26,10 +25,10 @@ import {
 import Portal from '@/components/ui/Portal';
 import { generateQuestionnairePDF, generateInvoicePDF } from '@/utils/pdfGenerator';
 import { dbToClientScope, type ClientScope, type InvoiceEntity, type CreateInvoiceInput } from '@/lib/clientOrder';
-import { calculateInvoiceTotals, SUPPORTED_CURRENCIES, formatCurrencyAmount, SELLER_CONFIG } from '@/lib/invoicing';
+import { calculateInvoiceTotals, SUPPORTED_CURRENCIES, formatCurrencyAmount } from '@/lib/invoicing';
 import resumeData from '@/data/resume.json';
 import intakeDefaults from '@/data/intakeQuestionnaireDefaults.json';
-import { calcQuote, type Currency } from '@/lib/pricing';
+import { calcQuote } from '@/lib/pricing';
 import type { ResumeData } from '@/data/resume';
 import styles from './dashboard.module.css';
 
@@ -269,24 +268,48 @@ export default function ClientDashboardPage() {
     const accessToken = await getAccessToken();
     if (!accessToken) return;
     setIsInvoiceLoading(true);
-    fetch('/api/client/get-invoices', {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.invoices) {
-          setInvoices(data.invoices);
-        }
-      })
-      .catch((err) => console.warn('Fetch invoices error:', err))
-      .finally(() => setIsInvoiceLoading(false));
+    try {
+      const res = await fetch('/api/client/get-invoices', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const data = await res.json();
+      if (data?.invoices) {
+        setInvoices(data.invoices);
+      }
+    } catch (err) {
+      console.warn('Fetch invoices error:', err);
+    } finally {
+      setIsInvoiceLoading(false);
+    }
   }, [user?.email, getAccessToken]);
 
   React.useEffect(() => {
     if (activeTab === 'invoices') {
-      loadInvoices();
+      let isSubscribed = true;
+      (async () => {
+        if (!user?.email) return;
+        const accessToken = await getAccessToken();
+        if (!accessToken || !isSubscribed) return;
+        setIsInvoiceLoading(true);
+        try {
+          const res = await fetch('/api/client/get-invoices', {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          });
+          const data = await res.json();
+          if (isSubscribed && data?.invoices) {
+            setInvoices(data.invoices);
+          }
+        } catch (err) {
+          console.warn('Fetch invoices error:', err);
+        } finally {
+          if (isSubscribed) setIsInvoiceLoading(false);
+        }
+      })();
+      return () => {
+        isSubscribed = false;
+      };
     }
-  }, [activeTab, loadInvoices]);
+  }, [activeTab, user?.email, getAccessToken]);
 
   const currentInvoiceCalc = calculateInvoiceTotals({
     currency: invCurrency,
@@ -683,24 +706,6 @@ export default function ClientDashboardPage() {
     );
   }
 
-  const handleDemoSignIn = () => {
-    const demoUser = {
-      id: 'demo-client-uuid-2026',
-      email: 'client.demo@prateeq.in',
-      user_metadata: {
-        full_name: 'Interactive Client Demo',
-        avatar_url: '',
-      },
-      app_metadata: { provider: 'demo' },
-      aud: 'authenticated',
-      created_at: new Date().toISOString(),
-    };
-    if (typeof window !== 'undefined') {
-      universalStorage.setItem('prateeq_active_user', JSON.stringify(demoUser));
-    }
-    window.location.reload();
-  };
-
   if (!user) {
     return (
       <div className={styles.authPromptContainer}>
@@ -710,7 +715,7 @@ export default function ClientDashboardPage() {
           <p>Access your active project scopes, PDF briefs, payment portal, and managed AI services.</p>
           <button
             className="comic-btn comic-btn-blue"
-            style={{ width: '100%', marginBottom: '1rem' }}
+            style={{ width: '100%' }}
             onClick={async () => {
               try {
                 await loginWithGoogle('/dashboard');
@@ -720,9 +725,6 @@ export default function ClientDashboardPage() {
             }}
           >
             Sign In with Google
-          </button>
-          <button className="comic-btn comic-btn-outline" style={{ width: '100%' }} onClick={handleDemoSignIn}>
-            🚀 Instant Client Demo Workspace
           </button>
         </div>
       </div>
