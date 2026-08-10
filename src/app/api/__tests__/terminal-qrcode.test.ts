@@ -53,10 +53,25 @@ describe('POST /api/terminal/qrcode', () => {
     expect(data.error).toMatch(/exceeds maximum/i);
   });
 
-  it('generates direct upi:// URI scheme and base64 PNG QR code', async () => {
+  it('returns 503 if Razorpay credentials are not set', async () => {
+    delete process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+    delete process.env.RAZORPAY_KEY_SECRET;
+
+    const req = new Request('http://localhost/api/terminal/qrcode', {
+      method: 'POST',
+      body: JSON.stringify({ amount: 500 }),
+    });
+
+    const res = await POST(req);
+    const data = await res.json();
+
+    expect(res.status).toBe(503);
+    expect(data.error).toMatch(/not configured/i);
+  });
+
+  it('calls Razorpay API and returns exact QR payload on success', async () => {
     process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID = 'rzp_test_123';
     process.env.RAZORPAY_KEY_SECRET = 'secret_456';
-    process.env.NEXT_PUBLIC_UPI_VPA = 'prateeqsharma@ybl';
 
     const mockFetch = vi.fn().mockResolvedValue({
       ok: true,
@@ -66,6 +81,7 @@ describe('POST /api/terminal/qrcode', () => {
         type: 'upi_qr',
         fixed_amount: true,
         payment_amount: 50000,
+        image_url: 'https://rzp.io/i/mock_qr_image',
       }),
     });
 
@@ -82,8 +98,18 @@ describe('POST /api/terminal/qrcode', () => {
     expect(res.status).toBe(200);
     expect(data.success).toBe(true);
     expect(data.amount).toBe(500);
-    expect(data.payloadType).toBe('upi_direct');
-    expect(data.upiString).toContain('upi://pay?pa=prateeqsharma%40ybl&pn=Prateek%20Sharma&am=500.00&cu=INR');
+    expect(data.qrId).toBe('qr_test_id_99');
     expect(data.imageUrl).toMatch(/^data:image\/png;base64,/);
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://api.razorpay.com/v1/payments/qr_codes',
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({
+          'Content-Type': 'application/json',
+        }),
+        body: expect.stringContaining('"payment_amount":50000'),
+      })
+    );
   });
 });
