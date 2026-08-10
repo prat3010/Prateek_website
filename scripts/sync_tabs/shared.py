@@ -26,10 +26,25 @@ try:
         delete_project,
         delete_skill,
         delete_certificate,
+        fetch_records,
+        upsert_record,
     )
     HAS_SYNC = True
 except ImportError:
     HAS_SYNC = False
+    sync_projects = lambda *a, **kw: None
+    sync_skills = lambda *a, **kw: None
+    sync_certificates = lambda *a, **kw: None
+    sync_resume = lambda *a, **kw: None
+    call_rpc = lambda *a, **kw: None
+    fetch_page_visits = lambda *a, **kw: None
+    sync_blog_post = lambda *a, **kw: None
+    delete_blog_post = lambda *a, **kw: False
+    delete_project = lambda *a, **kw: False
+    delete_skill = lambda *a, **kw: False
+    delete_certificate = lambda *a, **kw: False
+    fetch_records = lambda *a, **kw: None
+    upsert_record = lambda *a, **kw: None
 
 from sync_assets import cleanup_staged_file, copy_to_staged_file, delete_existing_files, finalize_staged_file
 from sync_git import commit_and_push_paths

@@ -135,12 +135,12 @@ if st.session_state.deploy_status is None or deploy_status_val == "running":
         run_async_task(fetch_deployment_status, "deploy_status_task")
         status = {"state": "pending", "description": "Fetching latest status in background..."}
         last_checked = "Fetching..."
-    elif deploy_status_val == "running":
-        status = {"state": "pending", "description": "Fetching latest status in background..."}
-        last_checked = "Fetching..."
     elif deploy_status_val == "error":
         status = {"error": st.session_state.get("deploy_status_task_error", "Failed to fetch")}
         last_checked = "Error"
+    else:
+        status = {"state": "pending", "description": "Fetching latest status in background..."}
+        last_checked = "Fetching..."
 else:
     status = st.session_state.deploy_status
     last_checked = st.session_state.last_checked

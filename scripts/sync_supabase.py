@@ -346,3 +346,32 @@ def delete_intake_lead(lead_id):
     return _delete_by_filter('intake_leads', 'id', lead_id)
 
 
+def fetch_records(table, order='created_at.desc'):
+    if not _has_config():
+        return None
+    params = [('order', order)] if order else None
+    return _supabase_rest(table, method='GET', params=params)
+
+
+def upsert_record(table, record, key_col='id'):
+    if not _has_config():
+        return None
+    url = f'{_URL}/rest/v1/{table}?on_conflict={key_col}'
+    headers = {
+        'apikey': _KEY,
+        'Authorization': f'Bearer {_KEY}',
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates,return=representation',
+    }
+    body = [record] if isinstance(record, dict) else record
+    data = json.dumps(body).encode()
+    req = urllib.request.Request(url, data=data, headers=headers, method='POST')
+    try:
+        with urllib.request.urlopen(req) as resp:
+            return json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        print(f'  HTTP {e.code} upserting {table}: {e.read().decode()}')
+        return None
+
+
+
