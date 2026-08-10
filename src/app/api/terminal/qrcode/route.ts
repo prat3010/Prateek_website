@@ -61,12 +61,46 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: errorMsg }, { status: rzpRes.status });
     }
 
-    let imageUrl = qrData.image_content;
+    let imageUrl: string | null = (typeof qrData.image_content === 'string' && qrData.image_content.startsWith('data:image'))
+      ? qrData.image_content
+      : null;
+    let upiString: string | null = null;
 
-    if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.startsWith('data:image')) {
-      const qrTarget = qrData.image_url || qrData.short_url || (qrData.id ? `https://rzp.io/i/${qrData.id}` : null);
-      if (qrTarget) {
-        imageUrl = await QRCode.toDataURL(qrTarget, {
+    const qrTarget = qrData.image_url || qrData.short_url || (qrData.id ? `https://rzp.io/i/${qrData.id}` : null);
+
+    if (!imageUrl && qrTarget) {
+      try {
+        const pageRes = await fetch(qrTarget, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          },
+        });
+
+        if (pageRes.ok) {
+          const htmlText = await pageRes.text();
+
+          // Search for direct upi://pay?... URI scheme
+          const upiMatch = htmlText.match(/upi:\/\/pay\?[^"'\s<>\\]+/i);
+          if (upiMatch) {
+            upiString = decodeURIComponent(upiMatch[0]).replace(/&amp;/g, '&');
+          }
+
+          // Search for embedded base64 QR image in HTML if upi string not found
+          if (!upiString) {
+            const base64Match = htmlText.match(/data:image\/(?:png|jpeg);base64,[A-Za-z0-9+/=]+/i);
+            if (base64Match) {
+              imageUrl = base64Match[0];
+            }
+          }
+        }
+      } catch {
+        // Ignore fetch errors; proceed to fallback
+      }
+
+      if (!imageUrl) {
+        const payloadToEncode = upiString || qrTarget;
+        imageUrl = await QRCode.toDataURL(payloadToEncode, {
           width: 300,
           margin: 2,
           color: {
@@ -90,6 +124,7 @@ export async function POST(req: Request) {
       imageUrl,
       amount,
       fixedAmount: qrData.fixed_amount ?? true,
+      payloadType: upiString ? 'upi_direct' : 'web_link',
       closeBy: qrData.close_by || null,
     });
   } catch (err: unknown) {
