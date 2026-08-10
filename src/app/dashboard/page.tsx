@@ -128,28 +128,6 @@ export default function ClientDashboardPage() {
   const [companyInputs, setCompanyInputs] = useState<Record<string, string>>({});
   const [phoneInputs, setPhoneInputs] = useState<Record<string, string>>({});
 
-  const DEFAULT_LIVE_TEST_SCOPE: ClientScope = {
-    id: 'scope-live-test-01',
-    scope_code: 'SCOPE-TEST01',
-    company_name: 'Razorpay Live Test Scope (₹1 Deposit)',
-    client_phone: '+91 99999 99999',
-    base_engine: 'Landing Page Web Engine',
-    features: [
-      'Payment Gateway Integration (Razorpay)',
-      'Contact Form / Lead Capture (ReCAPTCHA Protected)',
-    ],
-    brand_asset: 'Standard',
-    maintenance_plan: 'Self-Managed (30-Day Warranty)',
-    total_cost_inr: 2,
-    total_cost_usd: 1,
-    currency: 'INR',
-    timeline: 'Instant Live Test',
-    status: 'Draft Proposal',
-    delivery_stage: 'architecture',
-    deposit_paid: false,
-    created_at: '2026-08-10T00:00:00.000Z',
-  };
-
   // Storage & Cookie Fallback Reader for Safari ITP protection
   const getPendingScopeFromStorage = (): string | null => {
     if (typeof window === 'undefined') return null;
@@ -170,8 +148,7 @@ export default function ClientDashboardPage() {
   // Lazy state initialization for local pending scopes
   const [scopes, setScopes] = useState<ClientScope[]>(() => {
     const pendingScopeRaw = getPendingScopeFromStorage();
-    const initialList: ClientScope[] = [DEFAULT_LIVE_TEST_SCOPE];
-    if (!pendingScopeRaw) return initialList;
+    if (!pendingScopeRaw) return [];
 
     try {
       const parsed = JSON.parse(pendingScopeRaw);
@@ -194,10 +171,10 @@ export default function ClientDashboardPage() {
         created_at: new Date().toISOString(),
       };
 
-      return [importedScope, ...initialList];
+      return [importedScope];
     } catch (err) {
       console.warn('Failed to parse pending scope:', err);
-      return initialList;
+      return [];
     }
   });
 
@@ -265,11 +242,8 @@ export default function ClientDashboardPage() {
           setScopes((prev) => {
             // Merge db scopes with any local pending scope not yet in DB
             const existingCodes = new Set(dbScopes.map((s) => s.scope_code));
-            const unpersistedLocal = prev.filter((s) => !existingCodes.has(s.scope_code) && s.scope_code !== 'SCOPE-TEST01');
+            const unpersistedLocal = prev.filter((s) => !existingCodes.has(s.scope_code));
             const merged = [...unpersistedLocal, ...dbScopes];
-            if (!merged.some((s) => s.scope_code === 'SCOPE-TEST01')) {
-              merged.push(DEFAULT_LIVE_TEST_SCOPE);
-            }
 
             // Auto-persist imported/pending scopes to Supabase DB now that user is logged in
             unpersistedLocal.forEach((scopeToPersist) => {
@@ -1087,9 +1061,6 @@ export default function ClientDashboardPage() {
                             <Zap size={15} style={{ marginRight: '0.4rem' }} />
                             {payingScopeId === s.id ? 'Initializing Razorpay...' : 'Pay 50% Scope Deposit (Razorpay)'}
                           </button>
-                          <p className={styles.testModeTip}>
-                            💡 <strong>Razorpay Test Mode Tip:</strong> Razorpay accounts block international test cards by default. For card payments, use official Indian Domestic Test Cards: <strong>Visa Debit</strong> <code>4100 2800 0000 1007</code> or <strong>Mastercard</strong> <code>5555 5100 0008 1006</code> (Expiry: <code>12/30</code>, CVV: <code>123</code>). For Netbanking, select any bank and click <strong>[ Success ]</strong> on the prompt.
-                          </p>
                         </div>
                       )}
                     </div>

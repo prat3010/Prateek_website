@@ -66,17 +66,6 @@ export async function POST(req: Request) {
       console.warn('Supabase lookup warning in create-razorpay-order:', dbErr);
     }
 
-    if (!scope && scopeCode === 'SCOPE-TEST01') {
-      scope = {
-        id: 'scope-live-test-01',
-        scope_code: 'SCOPE-TEST01',
-        currency: 'INR',
-        total_cost_inr: 2,
-        total_cost_usd: 1,
-        company_name: 'Razorpay Live Test Scope (₹1 Deposit)',
-      };
-    }
-
     if (!scope) {
       return NextResponse.json(
         { error: 'Scope not found in database. Please persist your scope brief before initiating deposit lock.' },
