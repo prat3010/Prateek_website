@@ -435,93 +435,28 @@ export default function SiteInfoConsole() {
       return;
     }
 
-    if (trimmedCmd === 'qrcode' || trimmedCmd === 'pay' || trimmedCmd.startsWith('qrcode ') || trimmedCmd.startsWith('pay ')) {
-      const parts = trimmedCmd.split(/\s+/);
-      const rawAmt = parts[1];
-      const parsedAmt = rawAmt ? parseInt(rawAmt, 10) : NaN;
-      const amount = (!rawAmt || isNaN(parsedAmt) || parsedAmt <= 0) ? 500 : parsedAmt;
-
-      setTerminalHistory(prev => [
-        ...prev,
-        { text: `RAZORPAY DYNAMIC UPI PAYMENT PORTAL (₹${amount}):`, type: 'success' },
-        { text: `  Initializing live Razorpay UPI QR code for ₹${amount}...`, type: 'output' }
-      ]);
-      setTerminalInput('');
-
-      fetch('/api/terminal/create-qr', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount })
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (!data.success) {
-            setTerminalHistory(prev => [
-              ...prev,
-              { text: `Failed to generate Razorpay UPI QR: ${data.error || 'Unknown error'}`, type: 'error' }
-            ]);
-            return;
-          }
-
-          setTerminalHistory(prev => [
-            ...prev,
-            { text: `  Scan the QR code below using any UPI app (GPay, PhonePe, Paytm, BHIM) for ₹${amount}:`, type: 'output' },
-            { text: '', type: 'image', imageUrl: data.image_url },
-            { text: `  🔗 Mobile Deep-Link (GPay / WhatsApp Pay): ${data.payment_url}`, type: 'link', href: data.payment_url },
-            { text: '  💡 Note: On desktop, scan the QR graphic with your phone camera or banking app.', type: 'output' },
-            { text: `[ ⏳ WAITING FOR UPI PAYMENT (Session: ${data.qr_id}) ... ]`, type: 'success' }
-          ]);
-
-          let pollCount = 0;
-          const maxPolls = 60;
-          const intervalId = setInterval(() => {
-            pollCount++;
-            fetch(`/api/terminal/check-qr-status?qr_id=${data.qr_id}`)
-              .then(res => res.json())
-              .then(statusData => {
-                if (statusData.status === 'paid') {
-                  clearInterval(intervalId);
-                  setTerminalHistory(prev => [
-                    ...prev,
-                    { text: '===========================================================', type: 'success' },
-                    { text: `⚡ [PAYMENT CONFIRMED!] Received ₹${amount} via Razorpay UPI!`, type: 'success' },
-                    { text: '   Thank you for supporting Prateek Sharma\'s studio & engineering work!', type: 'output' },
-                    { text: '===========================================================', type: 'success' }
-                  ]);
-                } else if (pollCount >= maxPolls) {
-                  clearInterval(intervalId);
-                }
-              })
-              .catch(() => {
-                if (pollCount >= maxPolls) clearInterval(intervalId);
-              });
-          }, 3000);
-        })
-        .catch(() => {
-          setTerminalHistory(prev => [
-            ...prev,
-            { text: 'Failed to communicate with Razorpay UPI QR service.', type: 'error' }
-          ]);
-        });
-      return;
-    }
-
     switch (trimmedCmd) {
       case 'help':
         response = [
           { text: 'Available commands:', type: 'success' },
-          { text: '  projects         - List portfolio projects and tags', type: 'output' },
-          { text: '  partner          - Print Sales Partner & Broker Agreement with PDF links', type: 'output' },
-          { text: '  system           - Show CPU, memory, and display metrics', type: 'output' },
-          { text: '  storage          - Inspect local and session storage', type: 'output' },
-          { text: '  stack            - List the website technologies', type: 'output' },
-          { text: '  sync             - Show the local content sync workflow', type: 'output' },
-          { text: '  analytics        - Show visitor statistics summary', type: 'output' },
-          { text: '  cheatcode        - Run retro developer override (3D WebGL pizza rat)', type: 'output' },
-          { text: '  git-info         - Open the generated portfolio commit log', type: 'output' },
-          { text: '  qrcode <amount>  - Generate live Razorpay UPI QR code (e.g. qrcode 500)', type: 'output' },
-          { text: '  pay <amount>     - Quick pay/donate via dynamic Razorpay UPI QR', type: 'output' },
-          { text: '  clear            - Clear the command interface screen', type: 'output' }
+          { text: '  projects   - List portfolio projects and tags', type: 'output' },
+          { text: '  partner    - Print Sales Partner & Broker Agreement with PDF links', type: 'output' },
+          { text: '  system     - Show CPU, memory, and display metrics', type: 'output' },
+          { text: '  storage    - Inspect local and session storage', type: 'output' },
+          { text: '  stack      - List the website technologies', type: 'output' },
+          { text: '  sync       - Show the local content sync workflow', type: 'output' },
+          { text: '  analytics  - Show visitor statistics summary', type: 'output' },
+          { text: '  cheatcode  - Run retro developer override (3D WebGL pizza rat)', type: 'output' },
+          { text: '  git-info   - Open the generated portfolio commit log', type: 'output' },
+          { text: '  qrcode     - Scan PhonePe QR code to pay or donate directly', type: 'output' },
+          { text: '  clear      - Clear the command interface screen', type: 'output' }
+        ];
+        break;
+      case 'qrcode':
+        response = [
+          { text: 'PHONEPE UPI PAYMENT PORTAL:', type: 'success' },
+          { text: '  Scan the QR code below using any UPI app (PhonePe, GPay, Paytm, BHIM) to pay or donate.', type: 'output' },
+          { text: '', type: 'image', imageUrl: '/phonepe_qr.svg' }
         ];
         break;
       case 'projects':
@@ -758,7 +693,7 @@ export default function SiteInfoConsole() {
                 if (line.type === 'image' && line.imageUrl) {
                   return (
                     <div key={index} className={styles.terminalImageContainer}>
-                      <Image src={line.imageUrl} alt="Razorpay UPI QR Code" className={styles.terminalImage} width={200} height={200} unoptimized />
+                      <Image src={line.imageUrl} alt="PhonePe QR Code" className={styles.terminalImage} width={200} height={200} unoptimized />
                     </div>
                   );
                 }

@@ -107,22 +107,6 @@ export async function POST(req: Request) {
           })
           .eq('razorpay_subscription_id', subId);
       }
-    } else if (event === 'qr_code.credited' || event === 'qr_code.closed') {
-      const qrEntity = payload.payload?.qr_code?.entity;
-      const qrId = qrEntity?.id;
-      const paymentId = payload.payload?.payment?.entity?.id || '';
-      const nowIso = new Date().toISOString();
-
-      if (qrId) {
-        await supabase
-          .from('terminal_qr_sessions')
-          .update({
-            status: 'paid',
-            payment_id: paymentId,
-            paid_at: nowIso,
-          })
-          .eq('qr_id', qrId);
-      }
     }
 
     return NextResponse.json({ status: 'ok', event });

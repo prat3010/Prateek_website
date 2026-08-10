@@ -326,23 +326,6 @@ CREATE POLICY "Clients can select own RAG subscriptions" ON rag_subscriptions FO
     auth.jwt() ->> 'email' = (SELECT email FROM clients WHERE id = rag_subscriptions.client_id)
   );
 
--- 8f. Interactive Terminal Dynamic UPI QR Sessions
-CREATE TABLE IF NOT EXISTS terminal_qr_sessions (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  qr_id TEXT UNIQUE NOT NULL,
-  amount_inr NUMERIC NOT NULL,
-  status TEXT DEFAULT 'active' CHECK (status IN ('active', 'paid', 'closed', 'expired')),
-  payment_id TEXT DEFAULT '',
-  paid_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
-);
-
-ALTER TABLE terminal_qr_sessions ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Allow public select active terminal qr sessions" ON terminal_qr_sessions;
-CREATE POLICY "Allow public select active terminal qr sessions" ON terminal_qr_sessions FOR SELECT USING (true);
--- Service role handles inserts/updates via API routes and webhooks
-
-
 -- Legacy client_orders Table (preserves backward compatibility for legacy queries)
 CREATE TABLE IF NOT EXISTS client_orders (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
