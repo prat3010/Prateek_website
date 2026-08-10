@@ -24,108 +24,68 @@ export async function POST(req: Request) {
     const KEY_ID = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || '';
     const KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '';
 
-    if (!KEY_ID || !KEY_SECRET) {
-      return NextResponse.json(
-        { error: 'Razorpay API credentials (NEXT_PUBLIC_RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET) are not configured.' },
-        { status: 503 }
-      );
-    }
+    let qrId: string | null = null;
 
-    const amountInPaise = Math.round(amount * 100);
-    const authHeader = `Basic ${Buffer.from(`${KEY_ID}:${KEY_SECRET}`).toString('base64')}`;
-
-    const rzpRes = await fetch('https://api.razorpay.com/v1/payments/qr_codes', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: authHeader,
-      },
-      body: JSON.stringify({
-        type: 'upi_qr',
-        name: 'Terminal Custom Payment',
-        usage: 'single_use',
-        fixed_amount: true,
-        payment_amount: amountInPaise,
-        description: `Dynamic QR code generated from terminal for ₹${amount.toLocaleString('en-IN')}`,
-        notes: {
-          source: 'cobalt_terminal',
-          amount_inr: amount,
-        },
-      }),
-    });
-
-    const qrData = await rzpRes.json();
-
-    if (!rzpRes.ok) {
-      const errorMsg = qrData.error?.description || 'Failed to generate Razorpay QR Code.';
-      return NextResponse.json({ error: errorMsg }, { status: rzpRes.status });
-    }
-
-    let imageUrl: string | null = (typeof qrData.image_content === 'string' && qrData.image_content.startsWith('data:image'))
-      ? qrData.image_content
-      : null;
-    let upiString: string | null = null;
-
-    const qrTarget = qrData.image_url || qrData.short_url || (qrData.id ? `https://rzp.io/i/${qrData.id}` : null);
-
-    if (!imageUrl && qrTarget) {
+    // Call Razorpay API to log/track the dynamic QR Code entity if server credentials are set
+    if (KEY_ID && KEY_SECRET) {
       try {
-        const pageRes = await fetch(qrTarget, {
+        const amountInPaise = Math.round(amount * 100);
+        const authHeader = `Basic ${Buffer.from(`${KEY_ID}:${KEY_SECRET}`).toString('base64')}`;
+
+        const rzpRes = await fetch('https://api.razorpay.com/v1/payments/qr_codes', {
+          method: 'POST',
           headers: {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Content-Type': 'application/json',
+            Authorization: authHeader,
           },
+          body: JSON.stringify({
+            type: 'upi_qr',
+            name: 'Terminal Custom Payment',
+            usage: 'single_use',
+            fixed_amount: true,
+            payment_amount: amountInPaise,
+            description: `Dynamic QR code generated from terminal for ₹${amount.toLocaleString('en-IN')}`,
+            notes: {
+              source: 'cobalt_terminal',
+              amount_inr: amount,
+            },
+          }),
         });
 
-        if (pageRes.ok) {
-          const htmlText = await pageRes.text();
-
-          // Search for direct upi://pay?... URI scheme
-          const upiMatch = htmlText.match(/upi:\/\/pay\?[^"'\s<>\\]+/i);
-          if (upiMatch) {
-            upiString = decodeURIComponent(upiMatch[0]).replace(/&amp;/g, '&');
-          }
-
-          // Search for embedded base64 QR image in HTML if upi string not found
-          if (!upiString) {
-            const base64Match = htmlText.match(/data:image\/(?:png|jpeg);base64,[A-Za-z0-9+/=]+/i);
-            if (base64Match) {
-              imageUrl = base64Match[0];
-            }
-          }
+        if (rzpRes.ok) {
+          const qrData = await rzpRes.json();
+          qrId = qrData.id || null;
         }
       } catch {
-        // Ignore fetch errors; proceed to fallback
-      }
-
-      if (!imageUrl) {
-        const payloadToEncode = upiString || qrTarget;
-        imageUrl = await QRCode.toDataURL(payloadToEncode, {
-          width: 300,
-          margin: 2,
-          color: {
-            dark: '#000000',
-            light: '#ffffff',
-          },
-        });
+        // Fallback gracefully to direct UPI generation if Razorpay API call is unreachable
       }
     }
 
-    if (!imageUrl) {
-      return NextResponse.json(
-        { error: 'Razorpay response did not include a valid QR code image or target URL.' },
-        { status: 502 }
-      );
-    }
+    // Direct NPCI compliant upi:// URI scheme so phone cameras open UPI apps directly (PhonePe, GPay, Paytm)
+    const vpa = process.env.NEXT_PUBLIC_UPI_VPA || process.env.RAZORPAY_UPI_VPA || 'prateeqsharma@ybl';
+    const payeeName = 'Prateek Sharma';
+    const note = `Terminal Payment${qrId ? ` (${qrId})` : ''}`;
+
+    const directUpiString = `upi://pay?pa=${encodeURIComponent(vpa)}&pn=${encodeURIComponent(payeeName)}&am=${amount.toFixed(2)}&cu=INR&tn=${encodeURIComponent(note)}`;
+
+    // Generate base64 PNG QR code encoding the direct upi:// link
+    const imageUrl = await QRCode.toDataURL(directUpiString, {
+      width: 300,
+      margin: 2,
+      color: {
+        dark: '#000000',
+        light: '#ffffff',
+      },
+    });
 
     return NextResponse.json({
       success: true,
-      qrId: qrData.id,
+      qrId,
       imageUrl,
       amount,
-      fixedAmount: qrData.fixed_amount ?? true,
-      payloadType: upiString ? 'upi_direct' : 'web_link',
-      closeBy: qrData.close_by || null,
+      fixedAmount: true,
+      payloadType: 'upi_direct',
+      upiString: directUpiString,
     });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Internal server error';
