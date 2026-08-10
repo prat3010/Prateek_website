@@ -46,22 +46,13 @@ export async function POST(req: Request) {
     } | null = null;
 
     try {
-      const { data: s1 } = await supabase
+      const { data } = await supabase
         .from('client_scopes')
         .select('*')
         .eq('scope_code', scopeCode)
         .maybeSingle();
 
-      scope = s1;
-
-      if (!scope) {
-        const { data: s2 } = await supabase
-          .from('client_orders')
-          .select('*')
-          .eq('scope_code', scopeCode)
-          .maybeSingle();
-        scope = s2;
-      }
+      scope = data;
     } catch (dbErr) {
       console.warn('Supabase lookup warning in create-razorpay-order:', dbErr);
     }

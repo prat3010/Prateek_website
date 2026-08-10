@@ -62,6 +62,7 @@ The proxy telemetry pipeline is structured around strict privacy boundaries:
 
 To secure the Client Workspace (`/dashboard`) and REST APIs (`/api/client/*`):
 * **Supabase JWT Verification**: Endpoints require `Authorization: Bearer <token>` headers. The server verifies tokens via [`getVerifiedSessionEmail`](file:///Users/prateeksharma/Developer/Prateek_website/src/lib/sessionVerify.ts) against Supabase Auth API.
+* **Server-Side PKCE OAuth Callback Handler**: OAuth returns are handled server-side via [`/auth/callback`](file:///Users/prateeksharma/Developer/Prateek_website/src/app/auth/callback/route.ts) using `@supabase/ssr`. It exchanges the PKCE code for a session (`exchangeCodeForSession`), sets HTTP-only `prateeq_active_user` session cookies, handles OAuth errors, and canonicalizes redirects back to `/dashboard`.
 * **Email Scope Binding**: Client emails are derived strictly from the verified JWT payload, never from request body parameters. A client can read or modify only their own scopes (`client_scopes`) and invoices (`invoices`).
 * **Unpaid Scope Deletion**: Deletion `/api/client/delete-scope` is restricted to unpaid scopes (`deposit_paid = false`). Paid scopes are immutable via client APIs.
 

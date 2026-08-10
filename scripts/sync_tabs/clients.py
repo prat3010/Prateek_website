@@ -20,9 +20,9 @@ def render_clients_tab():
     invoices = []
     if HAS_SYNC:
         try:
-            orders = fetch_records("client_orders") or []
+            orders = fetch_records("client_scopes") or fetch_records("client_orders") or []
         except Exception as e:
-            st.warning(f"Could not fetch orders from Supabase: {e}")
+            st.warning(f"Could not fetch scopes from Supabase: {e}")
 
         try:
             invoices = fetch_records("invoices") or []
@@ -211,5 +211,5 @@ def render_clients_tab():
                     order["deposit_paid"] = new_paid
                     order["status"] = "Deposit Paid — In Development" if new_paid else "Draft Proposal"
                     order["updated_at"] = datetime.utcnow().isoformat()
-                    upsert_record("client_orders", order, key_col="scope_code")
+                    upsert_record("client_scopes", order, key_col="scope_code")
                     st.success(f"Updated {scope_code}! Stage set to '{new_stage}', Deposit Paid = {new_paid}. Live on prateeq.in/dashboard.")

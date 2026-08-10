@@ -79,21 +79,6 @@ export async function POST(req: Request) {
       console.warn('Client scope update error:', scopeErr);
     }
 
-    // 3. Mirror update to legacy client_orders
-    try {
-      await supabase
-        .from('client_orders')
-        .update({
-          deposit_paid: true,
-          delivery_stage: 'engineering',
-          status: 'Deposit Paid — In Development',
-          updated_at: nowIso,
-        })
-        .eq('scope_code', scopeCode);
-    } catch (legacyErr) {
-      console.warn('Legacy client_orders update error:', legacyErr);
-    }
-
     return NextResponse.json({
       success: true,
       message: 'Payment verified and scope deposit locked successfully!',

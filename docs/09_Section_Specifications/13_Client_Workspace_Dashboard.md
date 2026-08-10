@@ -36,8 +36,9 @@ The **Client Workspace Dashboard** (`/dashboard`) serves as the client portal wh
      - **Scoping Brief PDF** ([`ScopingBriefPDF.tsx`](file:///Users/prateeksharma/Developer/Prateek_website/src/components/pdf/ScopingBriefPDF.tsx))
      - **Services & Pricing Guide PDF** ([`ServicesAndPricingPDF.tsx`](file:///Users/prateeksharma/Developer/Prateek_website/src/components/pdf/ServicesAndPricingPDF.tsx))
 
-7. **Scope Deletion**:
-   - Clients can delete unpaid scope drafts via `/api/client/delete-scope` endpoint (session-gated and restricted to unpaid scopes).
+7. **Scope Deletion & Draft Intake**:
+   - Clients can delete unpaid scope drafts via [`/api/client/delete-scope`](file:///Users/prateeksharma/Developer/Prateek_website/src/app/api/client/delete-scope/route.ts) endpoint (session-gated, deriving identity via Bearer token, and strictly restricted to unpaid scopes where `deposit_paid = false`).
+   - Unauthenticated wizard progress or preliminary scoping choices are saved via [`/api/client/intake-draft`](file:///Users/prateeksharma/Developer/Prateek_website/src/app/api/client/intake-draft/route.ts) to the `intake_leads` table, ensuring work is preserved across session redirects.
 
 8. **Razorpay 50% Deposit Lock Trigger**:
    - Provides a direct action button: **"Pay 50% Scope Deposit (Razorpay)"**.

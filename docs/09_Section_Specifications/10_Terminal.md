@@ -31,7 +31,7 @@ The terminal parses input strings dynamically. Available commands include:
 * `sync`: Shows the local content sync workflow.
 * `analytics`: Shows visitor statistics summary. Links to the full analytics dashboard at `/admin/analytics`.
 * `cheatcode`: Runs retro developer override (activates the Three.js WebGL pizza rat easter egg).
-* `qrcode`: Renders a PhonePe UPI QR code for payment or donation.
+* `qrcode`: Generates a dynamic Razorpay UPI QR code for custom payment amounts (e.g., `qrcode 500` via `/api/terminal/qrcode`) with base64 PNG fallback and native `upi://pay` URI scheme launch support.
 * `clear`: Clears the terminal screen memory history.
 
 ---

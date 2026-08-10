@@ -30,21 +30,11 @@ export async function DELETE(req: Request) {
     }
 
     // Look up scope to verify ownership and deposit payment status
-    let { data: scope } = await supabase
+    const { data: scope } = await supabase
       .from('client_scopes')
       .select('scope_code, client_email, deposit_paid')
       .eq('scope_code', scopeCode)
       .maybeSingle();
-
-    if (!scope) {
-      // Fallback check on legacy client_orders
-      const { data: legacyScope } = await supabase
-        .from('client_orders')
-        .select('scope_code, client_email, deposit_paid')
-        .eq('scope_code', scopeCode)
-        .maybeSingle();
-      scope = legacyScope;
-    }
 
     if (!scope) {
       return NextResponse.json({ error: 'Scope proposal not found' }, { status: 404 });
@@ -61,17 +51,11 @@ export async function DELETE(req: Request) {
       );
     }
 
-    // Perform cascade deletion from normalized client_scopes and legacy client_orders
+    // Perform deletion from normalized client_scopes table
     try {
       await supabase.from('client_scopes').delete().eq('scope_code', scopeCode);
     } catch (err) {
       console.warn('Delete client_scopes warning:', err);
-    }
-
-    try {
-      await supabase.from('client_orders').delete().eq('scope_code', scopeCode);
-    } catch (err) {
-      console.warn('Delete client_orders warning:', err);
     }
 
     try {

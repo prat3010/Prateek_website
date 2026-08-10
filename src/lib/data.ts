@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache';
 import { supabase } from '@/data/supabase';
 import type { Project } from '@/data/projects';
 import type { Skill } from '@/data/skills';
@@ -17,77 +18,94 @@ const getErrorMessage = (err: unknown): string => {
   return err instanceof Error ? err.message : 'Offline mode';
 };
 
-export async function getProjects(): Promise<Project[]> {
-  if (!supabase) {
-    return projectsFallback as Project[];
-  }
-  try {
-    const { data, error } = await supabase
-      .from('projects')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (error || !data) throw error || new Error('No data');
-    return data.map((p) => ({
-      ...p,
-      id: p.slug || p.id,
-    })) as Project[];
-  } catch (err) {
-    console.warn('Projects data notice (using local fallback):', getErrorMessage(err));
-    return projectsFallback as Project[];
-  }
-}
+export const getProjects = unstable_cache(
+  async (): Promise<Project[]> => {
+    if (!supabase) {
+      return projectsFallback as Project[];
+    }
+    try {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error || !data) throw error || new Error('No data');
+      return data.map((p) => ({
+        ...p,
+        id: p.slug || p.id,
+      })) as Project[];
+    } catch (err) {
+      console.warn('Projects data notice (using local fallback):', getErrorMessage(err));
+      return projectsFallback as Project[];
+    }
+  },
+  ['getProjects'],
+  { tags: ['portfolio-data', 'projects'] }
+);
 
-export async function getSkills(): Promise<Skill[]> {
-  if (!supabase) {
-    return skillsFallback as unknown as Skill[];
-  }
-  try {
-    const { data, error } = await supabase
-      .from('skills')
-      .select('*')
-      .order('created_at', { ascending: true });
-    if (error || !data) throw error || new Error('No data');
-    return data as unknown as Skill[];
-  } catch (err) {
-    console.warn('Skills data notice (using local fallback):', getErrorMessage(err));
-    return skillsFallback as unknown as Skill[];
-  }
-}
+export const getSkills = unstable_cache(
+  async (): Promise<Skill[]> => {
+    if (!supabase) {
+      return skillsFallback as unknown as Skill[];
+    }
+    try {
+      const { data, error } = await supabase
+        .from('skills')
+        .select('*')
+        .order('created_at', { ascending: true });
+      if (error || !data) throw error || new Error('No data');
+      return data as unknown as Skill[];
+    } catch (err) {
+      console.warn('Skills data notice (using local fallback):', getErrorMessage(err));
+      return skillsFallback as unknown as Skill[];
+    }
+  },
+  ['getSkills'],
+  { tags: ['portfolio-data', 'skills'] }
+);
 
-export async function getCertificates(): Promise<Certificate[]> {
-  if (!supabase) {
-    return certificatesFallback as Certificate[];
-  }
-  try {
-    const { data, error } = await supabase
-      .from('certificates')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (error || !data) throw error || new Error('No data');
-    return data.map((c) => ({
-      ...c,
-      id: c.slug || c.id,
-    })) as Certificate[];
-  } catch (err) {
-    console.warn('Certificates data notice (using local fallback):', getErrorMessage(err));
-    return certificatesFallback as Certificate[];
-  }
-}
+export const getCertificates = unstable_cache(
+  async (): Promise<Certificate[]> => {
+    if (!supabase) {
+      return certificatesFallback as Certificate[];
+    }
+    try {
+      const { data, error } = await supabase
+        .from('certificates')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error || !data) throw error || new Error('No data');
+      return data.map((c) => ({
+        ...c,
+        id: c.slug || c.id,
+      })) as Certificate[];
+    } catch (err) {
+      console.warn('Certificates data notice (using local fallback):', getErrorMessage(err));
+      return certificatesFallback as Certificate[];
+    }
+  },
+  ['getCertificates'],
+  { tags: ['portfolio-data', 'certificates'] }
+);
 
-export async function getProfile(): Promise<ResumeData | null> {
-  if (!supabase) {
-    return resumeFallback as ResumeData;
-  }
-  try {
-    const { data, error } = await supabase
-      .from('profile')
-      .select('data')
-      .eq('id', 1)
-      .single();
-    if (error || !data) throw error || new Error('No data');
-    return data.data as ResumeData;
-  } catch (err) {
-    console.warn('Profile data notice (using local fallback):', getErrorMessage(err));
-    return resumeFallback as ResumeData;
-  }
-}
+export const getProfile = unstable_cache(
+  async (): Promise<ResumeData | null> => {
+    if (!supabase) {
+      return resumeFallback as ResumeData;
+    }
+    try {
+      const { data, error } = await supabase
+        .from('profile')
+        .select('data')
+        .eq('id', 1)
+        .single();
+      if (error || !data) throw error || new Error('No data');
+      return data.data as ResumeData;
+    } catch (err) {
+      console.warn('Profile data notice (using local fallback):', getErrorMessage(err));
+      return resumeFallback as ResumeData;
+    }
+  },
+  ['getProfile'],
+  { tags: ['portfolio-data', 'profile'] }
+);
+

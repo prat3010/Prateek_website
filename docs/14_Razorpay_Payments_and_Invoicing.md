@@ -97,6 +97,15 @@ The system enables clients to lock 50% upfront project deposits via Razorpay Sta
 
 ---
 
+### 6. **Subscription Creation Endpoint**: [`POST /api/client/create-razorpay-subscription`](file:///Users/prateeksharma/Developer/Prateek_website/src/app/api/client/create-razorpay-subscription/route.ts)
+
+* **Authentication**: Requires valid session token via `Authorization: Bearer <token>` verified by `getVerifiedSessionEmail`.
+* **Subscription Plan Initialization**: Sends a POST request to `https://api.razorpay.com/v1/subscriptions` with `plan_id` (e.g., `plan_starter_inr`), `total_count`, and client metadata notes.
+* **Mock Mode Fallback**: Provides automatic mock subscription ID response in development or offline environments when Razorpay keys are not configured.
+* **Response**: Returns `{ subscriptionId, planId, status, keyId }`.
+
+---
+
 ## **Database Schema ([`supabase_schema.sql`](file:///Users/prateeksharma/Developer/Prateek_website/supabase_schema.sql))**
 
 ### **`invoices` Table**

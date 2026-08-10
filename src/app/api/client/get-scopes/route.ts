@@ -17,24 +17,15 @@ export async function GET(req: Request) {
     }
 
     try {
-      let { data, error } = await supabase
+      const { data, error } = await supabase
         .from('client_scopes')
         .select('*')
         .eq('client_email', clientEmail)
         .order('created_at', { ascending: false });
 
       if (error) {
-        // Fall back to client_orders if client_scopes table is not created yet
-        const fallback = await supabase
-          .from('client_orders')
-          .select('*')
-          .eq('client_email', clientEmail)
-          .order('created_at', { ascending: false });
-
-        if (!fallback.error) {
-          data = fallback.data;
-          error = null;
-        }
+        console.warn('Get client_scopes DB error:', error);
+        return NextResponse.json({ scopes: [] });
       }
 
       return NextResponse.json({ scopes: data || [] });

@@ -67,8 +67,7 @@ export async function POST(req: Request) {
         .eq('status', 'draft');
     } catch {}
 
-    // 3. Target normalized `client_scopes` table first, fallback to `client_orders`
-    const targetTable = 'client_scopes';
+    // 3. Target normalized `client_scopes` table
     const scopeData = {
       scope_code: scopeCode,
       client_id: clientId,
@@ -88,36 +87,14 @@ export async function POST(req: Request) {
 
     // Check existing in normalized table
     const { data: existingScope, error: selectErr } = await supabase
-      .from(targetTable)
+      .from('client_scopes')
       .select('scope_code, client_email')
       .eq('scope_code', scopeCode)
       .maybeSingle();
 
     if (selectErr) {
-      // Fallback to legacy client_orders if client_scopes table doesn't exist yet
-      const { data: legacyExisting } = await supabase
-        .from('client_orders')
-        .select('scope_code, client_email')
-        .eq('scope_code', scopeCode)
-        .maybeSingle();
-
-      if (legacyExisting) {
-        if (legacyExisting.client_email && legacyExisting.client_email !== clientEmail) {
-          return NextResponse.json({ error: 'Forbidden: scope belongs to another account.' }, { status: 403 });
-        }
-        await supabase
-          .from('client_orders')
-          .update(scopeData)
-          .eq('scope_code', scopeCode);
-      } else {
-        await supabase.from('client_orders').insert({
-          ...scopeData,
-          status: 'Draft Proposal',
-          delivery_stage: 'architecture',
-          deposit_paid: false,
-        });
-      }
-      return NextResponse.json({ success: true, message: 'Scope brief persisted successfully (legacy mode).' });
+      console.warn('Select client_scopes DB error:', selectErr);
+      return NextResponse.json({ error: selectErr.message }, { status: 500 });
     }
 
     if (existingScope) {
@@ -126,7 +103,7 @@ export async function POST(req: Request) {
       }
 
       const { error: updateErr } = await supabase
-        .from(targetTable)
+        .from('client_scopes')
         .update(scopeData)
         .eq('scope_code', scopeCode);
 
@@ -135,7 +112,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: updateErr.message }, { status: 500 });
       }
     } else {
-      const { error: insertErr } = await supabase.from(targetTable).insert({
+      const { error: insertErr } = await supabase.from('client_scopes').insert({
         ...scopeData,
         status: 'Draft Proposal',
         delivery_stage: 'architecture',
@@ -147,26 +124,6 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: insertErr.message }, { status: 500 });
       }
     }
-
-    // Also mirror to client_orders to guarantee backward compatibility
-    try {
-      const { data: legacyCheck } = await supabase
-        .from('client_orders')
-        .select('scope_code')
-        .eq('scope_code', scopeCode)
-        .maybeSingle();
-
-      if (legacyCheck) {
-        await supabase.from('client_orders').update(scopeData).eq('scope_code', scopeCode);
-      } else {
-        await supabase.from('client_orders').insert({
-          ...scopeData,
-          status: 'Draft Proposal',
-          delivery_stage: 'architecture',
-          deposit_paid: false,
-        });
-      }
-    } catch {}
 
     return NextResponse.json({ success: true, message: 'Scope brief persisted successfully.' });
   } catch (err: unknown) {

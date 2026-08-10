@@ -18,7 +18,7 @@ This Agreement outlines the commercial terms, commission structure, payment sche
 
 ### **A. Sales Representative / Partner Responsibilities:**
 1. **Lead Generation & Client Relationship:** Prospecting, initiating client contact, and acting as the primary business contact.
-2. **Scoping Brief Collection:** Distributing the official **Client Discovery & Scoping Brief** (via `prateeq.in/?mode=business#intake` web form or printable A4 PDF brief) to collect client goals, features, asset readiness, and budget range.
+2. **Scoping Brief Collection:** Distributing the official **Client Discovery & Scoping Brief** (via `prateeq.in/scoping` web form or printable A4 PDF brief) to collect client goals, features, asset readiness, and budget range.
 3. **Quotation Delivery & Follow-up:** Delivering the formal fixed-price quotation (prepared by Developer) to the client and securing signed brief & initial deposit.
 
 ### **B. Developer / Lead Architect Responsibilities:**
