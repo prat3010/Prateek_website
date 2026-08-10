@@ -63,112 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let mounted = true;
 
-    const initAuth = async () => {
-      let isOAuthReturn = false;
-      if (typeof window !== 'undefined') {
-        const searchParams = new URLSearchParams(window.location.search);
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-
-        const errorDesc =
-          searchParams.get('error_description') ||
-          hashParams.get('error_description') ||
-          searchParams.get('error') ||
-          hashParams.get('error');
-
-        if (errorDesc) {
-          console.error('Supabase OAuth Error:', errorDesc);
-        }
-
-        isOAuthReturn = searchParams.has('code') || searchParams.has('error') || hashParams.has('access_token');
-
-        // 1. Direct PKCE Code Exchange if ?code= is present in URL
-        const code = searchParams.get('code');
-        if (code) {
-          try {
-            const { data, error } = await supabaseAuth.auth.exchangeCodeForSession(code);
-            if (!error && data.session?.user) {
-              if (mounted) {
-                setSession(data.session);
-                setUser(data.session.user);
-                universalStorage.setItem('prateeq_active_user', JSON.stringify(data.session.user));
-              }
-              try {
-                window.history.replaceState(null, '', window.location.pathname);
-              } catch {}
-              if (mounted) setLoading(false);
-              return;
-            } else if (error) {
-              console.warn('PKCE exchange warning:', error);
-            }
-          } catch (codeErr) {
-            console.warn('Code exchange error:', codeErr);
-          }
-        }
-
-        // 2. Hash Fragment Token Exchange if #access_token= is present in URL
-        const accessToken = hashParams.get('access_token');
-        const refreshToken = hashParams.get('refresh_token');
-        if (accessToken && refreshToken) {
-          try {
-            const { data, error } = await supabaseAuth.auth.setSession({
-              access_token: accessToken,
-              refresh_token: refreshToken,
-            });
-            if (!error && data.session?.user) {
-              if (mounted) {
-                setSession(data.session);
-                setUser(data.session.user);
-                universalStorage.setItem('prateeq_active_user', JSON.stringify(data.session.user));
-              }
-              try {
-                window.history.replaceState(null, '', window.location.pathname);
-              } catch {}
-              if (mounted) setLoading(false);
-              return;
-            } else if (error) {
-              console.warn('Set session from hash warning:', error);
-            }
-          } catch (hashErr) {
-            console.warn('Set session from hash error:', hashErr);
-          }
-        }
-      }
-
-      // 3. Fallback to stored session detection
-      try {
-        const { data: { session: currentSession }, error } = await supabaseAuth.auth.getSession();
-        if (error) {
-          console.warn('Get session error:', error);
-        }
-
-        if (mounted) {
-          if (currentSession?.user) {
-            setSession(currentSession);
-            setUser(currentSession.user);
-            universalStorage.setItem('prateeq_active_user', JSON.stringify(currentSession.user));
-          } else {
-            const cachedUser = universalStorage.getItem('prateeq_active_user');
-            if (!cachedUser) {
-              setSession(null);
-              setUser(null);
-            }
-          }
-        }
-      } catch (err) {
-        console.warn('Get session warning:', err);
-      } finally {
-        if (typeof window !== 'undefined' && isOAuthReturn) {
-          try {
-            window.history.replaceState(null, '', window.location.pathname);
-          } catch {}
-        }
-        if (mounted) setLoading(false);
-      }
-    };
-
-    initAuth();
-
-    // 4. Listen for Auth State Changes (SIGNED_IN, TOKEN_REFRESHED, SIGNED_OUT)
+    // 1. Register Auth State listener FIRST so detectSessionInUrl events are captured immediately
     const { data: { subscription } } = supabaseAuth.auth.onAuthStateChange((event, newSession) => {
       if (!mounted) return;
       if (newSession?.user) {
@@ -183,6 +78,64 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setLoading(false);
       }
     });
+
+    const initAuth = async () => {
+      let isOAuthReturn = false;
+      let urlErrorDesc: string | null = null;
+
+      if (typeof window !== 'undefined') {
+        const searchParams = new URLSearchParams(window.location.search);
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+
+        urlErrorDesc =
+          searchParams.get('error_description') ||
+          hashParams.get('error_description') ||
+          searchParams.get('error') ||
+          hashParams.get('error');
+
+        if (urlErrorDesc) {
+          const decoded = decodeURIComponent(urlErrorDesc).replace(/\+/g, ' ');
+          console.error('Supabase OAuth Error:', decoded);
+          alert(`Google Sign-In Notice: ${decoded}`);
+        }
+
+        isOAuthReturn = searchParams.has('code') || searchParams.has('error') || hashParams.has('access_token');
+      }
+
+      try {
+        const { data: { session: currentSession }, error } = await supabaseAuth.auth.getSession();
+        if (error) {
+          console.warn('Get session error:', error);
+        }
+
+        if (mounted) {
+          if (currentSession?.user) {
+            setSession(currentSession);
+            setUser(currentSession.user);
+            universalStorage.setItem('prateeq_active_user', JSON.stringify(currentSession.user));
+          } else if (!isOAuthReturn) {
+            const cachedUser = universalStorage.getItem('prateeq_active_user');
+            if (!cachedUser) {
+              setSession(null);
+              setUser(null);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Get session warning:', err);
+      } finally {
+        if (typeof window !== 'undefined' && isOAuthReturn) {
+          setTimeout(() => {
+            try {
+              window.history.replaceState(null, '', window.location.pathname);
+            } catch {}
+          }, 150);
+        }
+        if (mounted) setLoading(false);
+      }
+    };
+
+    initAuth();
 
     const safetyTimer = setTimeout(() => {
       if (mounted) setLoading(false);

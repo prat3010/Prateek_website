@@ -101,7 +101,10 @@ export const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
  * Strips query parameters to ensure canonical match against Supabase Auth Redirect URIs.
  */
 export async function signInWithGoogle(redirectTo?: string) {
-  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://prateeq.in';
+  let origin = typeof window !== 'undefined' ? window.location.origin : 'https://prateeq.in';
+  if (origin.includes('www.prateeq.in')) {
+    origin = origin.replace('www.prateeq.in', 'prateeq.in');
+  }
   const pathOnly = redirectTo ? redirectTo.split('?')[0] : '/dashboard';
   const targetRedirect = `${origin}${pathOnly}`;
 
