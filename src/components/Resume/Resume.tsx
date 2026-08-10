@@ -287,63 +287,37 @@ function Resume({ resumeData, certificates }: ResumeProps) {
 
                     {/* Terms and Deliverables */}
                     {/* Build Engines & Pricing Tiers Grid */}
+                    {/* Build Engines & Pricing Tiers Grid */}
                     <div className={styles.resumeSectionBlock}>
                       <h3 className={styles.blockTitle}>
                         <Cpu size={16} />
                         <span>COMMERCIAL BUILD ENGINES & TIERS</span>
                       </h3>
                       <div className={styles.packageGrid}>
-                        <div className={styles.packageCard}>
-                          <div>
-                            <span className={styles.packageBadge}>Tier 1 • Single Page</span>
-                            <h4 className={styles.packageTitle}>Landing Page Engine</h4>
-                            <div className={styles.packagePrice}>{tierPrice('landing')}</div>
-                            <p className={styles.packageDesc}>High-converting showcase with Framer Motion, lead capture form, mobile responsive layout & SEO schema.</p>
-                          </div>
-                          <Link href="/scoping?engine=landing" className={styles.packageBtn}>
-                            <span>SCOPE TIER 1</span>
-                            <ArrowRight size={12} />
-                          </Link>
-                        </div>
+                        {engines.map((engine, idx) => {
+                          const goal = goals.find((g) => g.recommendedEngineId === engine.id);
+                          const scopingHref = engine.id === 'ai_rag_app' || (goal && goal.id === 'ai_rag_app')
+                            ? '/scoping?goal=ai_rag_app'
+                            : `/scoping?engine=${engine.id}`;
+                          const priceStr = engine.id === 'ai_rag_app' && ragTotalINR
+                            ? formatPricePair(ragTotalINR, ragTotalUSD, currency)
+                            : tierPrice(engine.id);
 
-                        <div className={styles.packageCard}>
-                          <div>
-                            <span className={styles.packageBadge}>Tier 2 • Multi-Page</span>
-                            <h4 className={styles.packageTitle}>Multi-Page Web App</h4>
-                            <div className={styles.packagePrice}>{tierPrice('multipage')}</div>
-                            <p className={styles.packageDesc}>Next.js 16 App Router, 3–6 pages, headless CMS integration, analytics telemetry & custom visual effects.</p>
-                          </div>
-                          <Link href="/scoping?engine=multipage" className={styles.packageBtn}>
-                            <span>SCOPE TIER 2</span>
-                            <ArrowRight size={12} />
-                          </Link>
-                        </div>
-
-                        <div className={styles.packageCard}>
-                          <div>
-                            <span className={styles.packageBadge}>Tier 3 • Full-Stack</span>
-                            <h4 className={styles.packageTitle}>SaaS MVP & App Portal</h4>
-                            <div className={styles.packagePrice}>{tierPrice('saas')}</div>
-                            <p className={styles.packageDesc}>Supabase Auth & Database, Razorpay payments, role-gated admin portal & REST API integrations.</p>
-                          </div>
-                          <Link href="/scoping?engine=saas" className={styles.packageBtn}>
-                            <span>SCOPE TIER 3</span>
-                            <ArrowRight size={12} />
-                          </Link>
-                        </div>
-
-                        <div className={styles.packageCard}>
-                          <div>
-                            <span className={styles.packageBadge}>Tier 4 • AI Vector</span>
-                            <h4 className={styles.packageTitle}>Enterprise AI RAG Engine</h4>
-                            <div className={styles.packagePrice}>{ragTotalINR ? formatPricePair(ragTotalINR, ragTotalUSD, currency) : ''}</div>
-                            <p className={styles.packageDesc}>Retriever RAG Core, vector search, grounded LLM assistant, clickable citations & team access controls.</p>
-                          </div>
-                          <Link href="/scoping?goal=ai_rag_app" className={styles.packageBtn}>
-                            <span>SCOPE TIER 4</span>
-                            <ArrowRight size={12} />
-                          </Link>
-                        </div>
+                          return (
+                            <div key={engine.id} className={styles.packageCard}>
+                              <div>
+                                <span className={styles.packageBadge}>{engine.tier || `Tier ${idx + 1}`}</span>
+                                <h4 className={styles.packageTitle}>{engine.title}</h4>
+                                <div className={styles.packagePrice}>{priceStr}</div>
+                                <p className={styles.packageDesc}>{engine.laymanDescription}</p>
+                              </div>
+                              <Link href={scopingHref} className={styles.packageBtn}>
+                                <span>SCOPE TIER {idx + 1}</span>
+                                <ArrowRight size={12} />
+                              </Link>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
 
@@ -354,21 +328,13 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                         <span>MONTHLY INFRASTRUCTURE & SLA CARE PLANS</span>
                       </h3>
                       <div className={styles.careGrid}>
-                        <div className={styles.careCard}>
-                          <h4 className={styles.careTitle}>Basic Care Plan</h4>
-                          <div className={styles.carePrice}>{carePrice('basic')}</div>
-                          <p className={styles.careDesc}>Hosting support, daily automated DB backups, security updates & 24/7 uptime monitoring.</p>
-                        </div>
-                        <div className={styles.careCard}>
-                          <h4 className={styles.careTitle}>Standard Care Plan</h4>
-                          <div className={styles.carePrice}>{carePrice('standard')}</div>
-                          <p className={styles.careDesc}>Includes Basic Care + 2–4 hours monthly developer allocation for text/image updates & page tuning.</p>
-                        </div>
-                        <div className={styles.careCard}>
-                          <h4 className={styles.careTitle}>Premium AI SLA Plan</h4>
-                          <div className={styles.carePrice}>{carePrice('premium')}</div>
-                          <p className={styles.careDesc}>Priority 24h SLA, AI vector index tuning, latency monitoring & dedicated feature engineering hours.</p>
-                        </div>
+                        {maintenancePlans.map((plan) => (
+                          <div key={plan.id} className={styles.careCard}>
+                            <h4 className={styles.careTitle}>{plan.name}</h4>
+                            <div className={styles.carePrice}>{carePrice(plan.id)}</div>
+                            <p className={styles.careDesc}>{plan.laymanDescription}</p>
+                          </div>
+                        ))}
                       </div>
                     </div>
 

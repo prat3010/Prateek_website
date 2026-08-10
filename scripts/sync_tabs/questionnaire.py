@@ -225,6 +225,18 @@ def render_questionnaire_tab():
         )
         intake["timelineOptions"] = [t.strip() for t in tl_edit.split("\n") if t.strip()]
 
+    # 7. Standard Terms & Conditions
+    with st.container(border=True):
+        st.markdown("##### 7. Standard Terms & Conditions (One per line)")
+        tc_val = intake.get("termsAndConditions", [])
+        tc_edit = st.text_area(
+            "Terms & Conditions List",
+            value="\n".join(tc_val),
+            height=130,
+            key="qe_terms_conditions",
+        )
+        intake["termsAndConditions"] = [t.strip() for t in tc_edit.split("\n") if t.strip()]
+
     # ──────────────────────────────────────────────────────────
     # RESET, SAVE & LIVE JSON VIEW
     # ──────────────────────────────────────────────────────────
@@ -236,7 +248,7 @@ def render_questionnaire_tab():
                 intake[key] = [dict(item) for item in value]
             for widget_key in (
                 "qe_engines", "qe_features", "qe_goals", "qe_brand_assets",
-                "qe_maintenance_plans", "qe_timeline",
+                "qe_maintenance_plans", "qe_timeline", "qe_terms_conditions",
             ):
                 if widget_key in st.session_state:
                     del st.session_state[widget_key]

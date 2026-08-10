@@ -4,19 +4,38 @@ import os
 from datetime import datetime
 from sync_tabs.shared import write_resume_file, git_commit_push_file
 
-def render_resume_tab():
+
+def _save_resume_changes(res, key_prefix="resume"):
+    st.markdown("---")
+    dry_run_resume = st.checkbox("Dry-Run Mode (Save locally only, do not push to remote)", value=True, key=f"dry_{key_prefix}")
+    if st.button("💾 Save Resume Changes", type="primary", key=f"btn_save_{key_prefix}_changes", use_container_width=True):
+        try:
+            write_resume_file(res)
+            st.success("Resume data updated and saved successfully directly in src/data/resume.json!")
+            if not dry_run_resume:
+                st.info("🚀 Pushing changes to GitHub...")
+                git_ok, git_msg = git_commit_push_file("src/data/resume.json", f"chore(resume): manual update for {key_prefix}")
+                if git_ok:
+                    st.toast(f"📝 Resume saved and {git_msg}")
+                else:
+                    st.error(f"❌ Git failed: {git_msg}")
+        except Exception as e:
+            st.error(f"Failed to write file: {e}")
+
+    with st.expander("🔍 Live JSON Code View (Resume Object)", expanded=False):
+        st.code(json.dumps(res, indent=2), language="json")
+
+
+def render_resume_profile_tab():
     if st.session_state.resume is None:
         st.error("Could not load resume.json. Please verify the file is present.")
         return
 
     res = st.session_state.resume
 
-    # Re-organized 4-subtab layout
-    tab_res_profile, tab_res_career, tab_res_pricing, tab_res_partner = st.tabs([
-        "👤 Profile & Bio",
-        "💼 Career & Education",
-        "💰 Quotation & Engagement Terms",
-        "🤝 Partner & Scoping"
+    tab_res_profile, tab_res_career = st.tabs([
+        "👤 Profile & Bio Details",
+        "💼 Career & Education Timeline"
     ])
 
     # ──────────────────────────────────────────────────────────
@@ -211,275 +230,248 @@ def render_resume_tab():
                         res['education'].pop(edu_idx)
                         st.rerun()
 
-    # ──────────────────────────────────────────────────────────
-    # SUB-TAB 3: 💰 Quotation & Engagement Terms
-    # ──────────────────────────────────────────────────────────
-    with tab_res_pricing:
-        # Freelance Quotation Details
-        with st.container(border=True):
-            st.markdown('<div class="section-header">Freelance Quotation & Engagement Terms</div>', unsafe_allow_html=True)
+    _save_resume_changes(res, "profile")
 
-            tab_q_global, tab_q_india = st.tabs(["Global Terms (USD)", "India Terms (INR)"])
 
-            with tab_q_global:
-                quote_data = res.get('quotation', {}) or {}
-                col_q1, col_q2 = st.columns(2)
-                with col_q1:
-                    q_scope = st.text_input("Fixed Scope Guarantee", value=quote_data.get('scopeModel', 'Fixed-Price Milestones (No hidden hourly charges)'), key="quote_scope")
-                    q_sprint = st.text_input("Delivery Sprint Speed", value=quote_data.get('deliverySprint', '1 to 3 Weeks Turnaround Sprint'), key="quote_sprint")
-                    q_warranty = st.text_input("Post-Launch Warranty", value=quote_data.get('warrantyModel', 'Included 30-Day Post-Launch Support & Warranty'), key="quote_warranty")
-                with col_q2:
-                    q_terms = st.text_area("Standard Payment Terms (USD)", value=quote_data.get('paymentTerms', ''), key="quote_terms", height=90)
+def render_quotation_terms_tab():
+    if st.session_state.resume is None:
+        st.error("Could not load resume.json. Please verify the file is present.")
+        return
 
-                q_deliv_str = "\n".join(quote_data.get('deliverables', []))
-                q_deliv_edit = st.text_area("Service Deliverables Checklist (USD - One per line)", value=q_deliv_str, height=90, key="quote_deliv")
-                q_deliv_list = [d.strip() for d in q_deliv_edit.split("\n") if d.strip()]
+    res = st.session_state.resume
 
-                res['quotation'] = {
-                    "scopeModel": q_scope.strip(),
-                    "deliverySprint": q_sprint.strip(),
-                    "warrantyModel": q_warranty.strip(),
-                    "hourlyRate": quote_data.get('hourlyRate', '$40'),
-                    "dayRate": quote_data.get('dayRate', '$300'),
-                    "paymentTerms": q_terms.strip(),
-                    "deliverables": q_deliv_list
-                }
+    # Freelance Quotation Details
+    with st.container(border=True):
+        st.markdown('<div class="section-header">Freelance Quotation & Engagement Terms</div>', unsafe_allow_html=True)
 
-            with tab_q_india:
-                quote_data_in = res.get('quotation_india', {}) or {}
-                col_qi1, col_qi2 = st.columns(2)
-                with col_qi1:
-                    qi_scope = st.text_input("Fixed Scope Guarantee [INR]", value=quote_data_in.get('scopeModel', 'Fixed-Price Milestones (No hidden hourly charges)'), key="quote_scope_in")
-                    qi_sprint = st.text_input("Delivery Sprint Speed [INR]", value=quote_data_in.get('deliverySprint', '1 to 3 Weeks Turnaround Sprint'), key="quote_sprint_in")
-                    qi_warranty = st.text_input("Post-Launch Warranty [INR]", value=quote_data_in.get('warrantyModel', 'Included 30-Day Post-Launch Support & Warranty'), key="quote_warranty_in")
-                with col_qi2:
-                    qi_terms = st.text_area("Standard Payment Terms (INR)", value=quote_data_in.get('paymentTerms', ''), key="quote_terms_in", height=90)
+        tab_q_global, tab_q_india = st.tabs(["Global Terms (USD)", "India Terms (INR)"])
 
-                qi_deliv_str = "\n".join(quote_data_in.get('deliverables', []))
-                qi_deliv_edit = st.text_area("Service Deliverables Checklist (INR - One per line)", value=qi_deliv_str, height=90, key="quote_deliv_in")
-                qi_deliv_list = [d.strip() for d in qi_deliv_edit.split("\n") if d.strip()]
+        with tab_q_global:
+            quote_data = res.get('quotation', {}) or {}
+            col_q1, col_q2 = st.columns(2)
+            with col_q1:
+                q_scope = st.text_input("Fixed Scope Guarantee", value=quote_data.get('scopeModel', 'Fixed-Price Milestones (No hidden hourly charges)'), key="quote_scope")
+                q_sprint = st.text_input("Delivery Sprint Speed", value=quote_data.get('deliverySprint', '1 to 3 Weeks Turnaround Sprint'), key="quote_sprint")
+                q_warranty = st.text_input("Post-Launch Warranty", value=quote_data.get('warrantyModel', 'Included 30-Day Post-Launch Support & Warranty'), key="quote_warranty")
+            with col_q2:
+                q_terms = st.text_area("Standard Payment Terms (USD)", value=quote_data.get('paymentTerms', ''), key="quote_terms", height=90)
 
-                res['quotation_india'] = {
-                    "scopeModel": qi_scope.strip(),
-                    "deliverySprint": qi_sprint.strip(),
-                    "warrantyModel": qi_warranty.strip(),
-                    "hourlyRate": quote_data_in.get('hourlyRate', '₹3,000'),
-                    "dayRate": quote_data_in.get('dayRate', '₹20,000'),
-                    "paymentTerms": qi_terms.strip(),
-                    "deliverables": qi_deliv_list
-                }
+            q_deliv_str = "\n".join(quote_data.get('deliverables', []))
+            q_deliv_edit = st.text_area("Service Deliverables Checklist (USD - One per line)", value=q_deliv_str, height=90, key="quote_deliv")
+            q_deliv_list = [d.strip() for d in q_deliv_edit.split("\n") if d.strip()]
 
-    # ──────────────────────────────────────────────────────────
-    # SUB-TAB 4: 🤝 Partner & Scoping
-    # ──────────────────────────────────────────────────────────
-    with tab_res_partner:
-        intake_data = res.get('intake', {}) or {}
-
-        # Middleman Partnership Terms & PDF Agreement Manager
-        with st.container(border=True):
-            st.markdown('<div class="section-header">Middleman Partnership Agreement & PDF Config</div>', unsafe_allow_html=True)
-            mm_data = intake_data.get('middlemanAgreement', {}) or {}
-
-            col_mm1, col_mm2 = st.columns(2)
-            with col_mm1:
-                partner_name = st.text_input("Partner / Sales Rep Name", value=mm_data.get('partnerName', '[Partner Name]'), key="mm_partner_name")
-                partner_email = st.text_input("Partner Email", value=mm_data.get('partnerEmail', ''), key="mm_partner_email")
-                eff_date = st.text_input("Effective Date", value=mm_data.get('effectiveDate', 'August 2, 2026'), key="mm_eff_date")
-                dev_name = st.text_input("Developer Name", value=mm_data.get('developerName', 'Prateeq Sharma'), key="mm_dev_name")
-                dev_email = st.text_input("Developer Email", value=mm_data.get('developerEmail', 'prateeqsharma@gmail.com'), key="mm_dev_email")
-            with col_mm2:
-                st.markdown("**Commission Band Schedule** *(read-only — single source of truth is `src/data/commissionConfig.json`)*")
-                try:
-                    commission_path = os.path.join(os.path.dirname(__file__), '..', '..', 'src', 'data', 'commissionConfig.json')
-                    with open(commission_path, 'r', encoding='utf-8') as cf:
-                        commission_cfg = json.load(cf)
-                except Exception:
-                    commission_cfg = {}
-                for band in commission_cfg.get('bands', []):
-                    band_range = f"{band.get('minINR') or 'up to'}–{band.get('maxINR') or 'no cap'} INR"
-                    st.caption(f"**Band {band.get('id')}**: {band.get('rate')}% · {band_range}")
-                st.caption(f"Recurring care: {commission_cfg.get('recurringRate')}% · Window: {commission_cfg.get('disbursementWindow')}")
-
-            default_disburse = [
-                "Rule 3.1 (No Out-of-Pocket Liability): Developer will never pay commissions out-of-pocket prior to client funds clearing bank accounts.",
-                "Rule 3.2 (Proportional Payout Schedule): 50% of Commission disbursed within 24 hours of receiving Client's 50% Upfront Deposit. 50% disbursed upon receiving Client's Final 50% Balance.",
-                "Rule 3.3 (Cancellations & Defaults): In the event of a client default or partial scope cancellation, commission is calculated strictly on net funds actually collected and retained."
-            ]
-            default_confid = [
-                "Rule 4.1 (Non-Circumvention): Partner agrees not to bypass Developer or refer introduced clients to alternative software developers without express written consent.",
-                "Rule 4.2 (Codebase & IP Ownership): All codebase assets, databases, and intellectual property remain the property of Developer until 100% of project contract fees are paid by Client.",
-                "Rule 4.3 (Confidentiality & Non-Disclosure): Both parties agree to keep project quotes, client contact information, and internal commercial terms strictly confidential."
-            ]
-
-            disburse_val = mm_data.get('disbursementRules') if mm_data.get('disbursementRules') else default_disburse
-            confid_val = mm_data.get('confidentialityRules') if mm_data.get('confidentialityRules') else default_confid
-
-            st.markdown("##### Section 3: Payment Disbursement Rules (One per line)")
-            disburse_edit = st.text_area("Disbursement Rules", value="\n".join(disburse_val), height=90, key="mm_disburse_rules")
-            disburse_list = [r.strip() for r in disburse_edit.split("\n") if r.strip()]
-
-            st.markdown("##### Section 4: Non-Circumvention & Confidentiality Rules (One per line)")
-            confid_edit = st.text_area("Confidentiality Rules", value="\n".join(confid_val), height=90, key="mm_confid_rules")
-            confid_list = [r.strip() for r in confid_edit.split("\n") if r.strip()]
-
-            agreed_edit = st.text_area(
-                "Agreed Electronically Clause",
-                value=mm_data.get('agreedElectronically', 'The parties acknowledge that this Agreement may be accepted and signed electronically, and an electronic signature or a documented email acceptance of these terms shall have the same force and effect as a manually executed signature.'),
-                height=70,
-                key="mm_agreed_e"
-            )
-
-            st.markdown("##### Editable Agreement Prose (Sections below render inside the PDF in order)")
-            st.caption("Each section shows its heading and one line per paragraph/bullet. Prefix a line with '- ' to render it as a bullet. Use {{partnerName}}, {{developerName}}, {{developerEmail}}, {{partnerEmail}}, {{effectiveDate}} placeholders.")
-            defaults_path = os.path.join(os.path.dirname(__file__), '..', '..', 'src', 'data', 'middlemanAgreementDefaults.json')
-            if not getattr(st.session_state, '_mm_defaults_loaded', False):
-                try:
-                    with open(defaults_path, 'r', encoding='utf-8') as df:
-                        st.session_state['_mm_defaults'] = json.load(df)
-                except Exception:
-                    st.session_state['_mm_defaults'] = {'sections': []}
-                st.session_state['_mm_defaults_loaded'] = True
-            _mm_defaults = st.session_state.get('_mm_defaults', {'sections': []})
-            existing_sections = mm_data.get('sections') or []
-            section_by_key = {s.get('key'): s for s in existing_sections if isinstance(s, dict) and s.get('key')}
-            default_sections = _mm_defaults.get('sections', [])
-
-            if st.button("↺ Reset Agreement Prose to Defaults", key="mm_reset_prose"):
-                section_by_key = {}
-                existing_sections = []
-                st.session_state['_mm_prose_rev'] = st.session_state.get('_mm_prose_rev', 0) + 1
-            prose_rev = st.session_state.get('_mm_prose_rev', 0)
-
-            expanded_sections = []
-            for idx, def_sec in enumerate(default_sections):
-                sec_key = def_sec.get('key', f'sec_{idx}')
-                cur = section_by_key.get(sec_key, {})
-                heading_val = cur.get('heading', def_sec.get('heading', ''))
-                lines_val = cur.get('lines') or def_sec.get('lines', [])
-                col_h, col_t = st.columns([1, 4])
-                with col_h:
-                    heading_edit = st.text_input("Heading", value=heading_val, key=f"mm_sec_{sec_key}_head_{prose_rev}")
-                with col_t:
-                    lines_edit = st.text_area(
-                        def_sec.get('heading', sec_key),
-                        value="\n".join(lines_val),
-                        height=max(70, len(lines_val) * 16),
-                        key=f"mm_sec_{sec_key}_lines_{prose_rev}"
-                    )
-                expanded_sections.append({
-                    "key": sec_key,
-                    "heading": heading_edit.strip(),
-                    "lines": [l.strip() for l in lines_edit.split("\n") if l.strip()]
-                })
-
-            if 'intake' not in res:
-                res['intake'] = {}
-
-            res['intake']['middlemanAgreement'] = {
-                "partnerName": partner_name.strip(),
-                "partnerEmail": partner_email.strip(),
-                "effectiveDate": eff_date.strip(),
-                "developerName": dev_name.strip(),
-                "developerEmail": dev_email.strip(),
-                "agreedElectronically": agreed_edit.strip(),
-                "disbursementRules": disburse_list,
-                "confidentialityRules": confid_list,
-                "sections": expanded_sections
+            res['quotation'] = {
+                "scopeModel": q_scope.strip(),
+                "deliverySprint": q_sprint.strip(),
+                "warrantyModel": q_warranty.strip(),
+                "hourlyRate": quote_data.get('hourlyRate', '$40'),
+                "dayRate": quote_data.get('dayRate', '$300'),
+                "paymentTerms": q_terms.strip(),
+                "deliverables": q_deliv_list
             }
 
-            target_pdf = "Sales_Partner_Agreement.pdf"
+        with tab_q_india:
+            quote_data_in = res.get('quotation_india', {}) or {}
+            col_qi1, col_qi2 = st.columns(2)
+            with col_qi1:
+                qi_scope = st.text_input("Fixed Scope Guarantee [INR]", value=quote_data_in.get('scopeModel', 'Fixed-Price Milestones (No hidden hourly charges)'), key="quote_scope_in")
+                qi_sprint = st.text_input("Delivery Sprint Speed [INR]", value=quote_data_in.get('deliverySprint', '1 to 3 Weeks Turnaround Sprint'), key="quote_sprint_in")
+                qi_warranty = st.text_input("Post-Launch Warranty [INR]", value=quote_data_in.get('warrantyModel', 'Included 30-Day Post-Launch Support & Warranty'), key="quote_warranty_in")
+            with col_qi2:
+                qi_terms = st.text_area("Standard Payment Terms (INR)", value=quote_data_in.get('paymentTerms', ''), key="quote_terms_in", height=90)
 
-            pdf_theme = st.radio(
-                "Agreement PDF Theme",
-                options=["azure", "noir"],
-                index=0,
-                horizontal=True,
-                key="mm_pdf_theme",
-                help="Visual palette used when building the agreement PDF (azure = pop-art cream, noir = cyber-noir)."
-            )
+            qi_deliv_str = "\n".join(quote_data_in.get('deliverables', []))
+            qi_deliv_edit = st.text_area("Service Deliverables Checklist (INR - One per line)", value=qi_deliv_str, height=90, key="quote_deliv_in")
+            qi_deliv_list = [d.strip() for d in qi_deliv_edit.split("\n") if d.strip()]
 
-            col_b1, col_b2 = st.columns([1, 1])
-            with col_b1:
-                import re as _re, tempfile, json as _json, subprocess
-                safe_partner = _re.sub(r'[^A-Za-z0-9]+', '_', partner_name.strip()).strip('_') or 'Partner'
-                if st.button("📄 Build Current Agreement PDF", key="btn_build_mm_pdf"):
-                    try:
-                        gen_pdf = None
-                        with tempfile.NamedTemporaryFile('w', suffix='.json', delete=False) as tmp_cfg:
-                            _json.dump({'intake': {'middlemanAgreement': res['intake']['middlemanAgreement']}}, tmp_cfg)
-                            cfg_path = tmp_cfg.name
-                        with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as tmp_pdf:
-                            pdf_path = tmp_pdf.name
-                        proc = subprocess.run(
-                            ['node', 'scripts/generate-middleman-pdf.mjs', '--config', cfg_path, '--out', pdf_path, '--theme', pdf_theme],
-                            capture_output=True,
-                            text=True
-                        )
-                        os.unlink(cfg_path)
-                        if proc.returncode == 0 and os.path.exists(pdf_path):
-                            with open(pdf_path, 'rb') as f:
-                                gen_pdf = f.read()
-                            os.unlink(pdf_path)
-                            st.session_state['mm_pdf_bytes'] = gen_pdf
-                            st.session_state['mm_pdf_name'] = f"{safe_partner}_Sales_Partner_Agreement.pdf"
-                            st.success("📄 Agreement built from current form values!")
-                        else:
-                            st.session_state.pop('mm_pdf_bytes', None)
-                            st.error(f"Failed to generate PDF: {proc.stderr}")
-                    except Exception as e:
-                        st.error(f"Error generating PDF: {e}")
+            res['quotation_india'] = {
+                "scopeModel": qi_scope.strip(),
+                "deliverySprint": qi_sprint.strip(),
+                "warrantyModel": qi_warranty.strip(),
+                "hourlyRate": quote_data_in.get('hourlyRate', '₹3,000'),
+                "dayRate": quote_data_in.get('dayRate', '₹20,000'),
+                "paymentTerms": qi_terms.strip(),
+                "deliverables": qi_deliv_list
+            }
 
-                if st.session_state.get('mm_pdf_bytes'):
-                    st.download_button(
-                        label="📥 Download Partnership Agreement PDF",
-                        data=st.session_state['mm_pdf_bytes'],
-                        file_name=st.session_state.get('mm_pdf_name', target_pdf),
-                        mime="application/pdf",
-                        key="btn_download_mm_pdf"
+    _save_resume_changes(res, "quotation")
+
+
+def render_partner_agreement_tab():
+    if st.session_state.resume is None:
+        st.error("Could not load resume.json. Please verify the file is present.")
+        return
+
+    res = st.session_state.resume
+    intake_data = res.get('intake', {}) or {}
+
+    # Middleman Partnership Terms & PDF Agreement Manager
+    with st.container(border=True):
+        st.markdown('<div class="section-header">Middleman Partnership Agreement & PDF Config</div>', unsafe_allow_html=True)
+        mm_data = intake_data.get('middlemanAgreement', {}) or {}
+
+        col_mm1, col_mm2 = st.columns(2)
+        with col_mm1:
+            partner_name = st.text_input("Partner / Sales Rep Name", value=mm_data.get('partnerName', '[Partner Name]'), key="mm_partner_name")
+            partner_email = st.text_input("Partner Email", value=mm_data.get('partnerEmail', ''), key="mm_partner_email")
+            eff_date = st.text_input("Effective Date", value=mm_data.get('effectiveDate', 'August 2, 2026'), key="mm_eff_date")
+            dev_name = st.text_input("Developer Name", value=mm_data.get('developerName', 'Prateeq Sharma'), key="mm_dev_name")
+            dev_email = st.text_input("Developer Email", value=mm_data.get('developerEmail', 'prateeqsharma@gmail.com'), key="mm_dev_email")
+        with col_mm2:
+            st.markdown("**Commission Band Schedule** *(read-only — single source of truth is `src/data/commissionConfig.json`)*")
+            try:
+                commission_path = os.path.join(os.path.dirname(__file__), '..', '..', 'src', 'data', 'commissionConfig.json')
+                with open(commission_path, 'r', encoding='utf-8') as cf:
+                    commission_cfg = json.load(cf)
+            except Exception:
+                commission_cfg = {}
+            for band in commission_cfg.get('bands', []):
+                band_range = f"{band.get('minINR') or 'up to'}–{band.get('maxINR') or 'no cap'} INR"
+                st.caption(f"**Band {band.get('id')}**: {band.get('rate')}% · {band_range}")
+            st.caption(f"Recurring care: {commission_cfg.get('recurringRate')}% · Window: {commission_cfg.get('disbursementWindow')}")
+
+        default_disburse = [
+            "Rule 3.1 (No Out-of-Pocket Liability): Developer will never pay commissions out-of-pocket prior to client funds clearing bank accounts.",
+            "Rule 3.2 (Proportional Payout Schedule): 50% of Commission disbursed within 24 hours of receiving Client's 50% Upfront Deposit. 50% disbursed upon receiving Client's Final 50% Balance.",
+            "Rule 3.3 (Cancellations & Defaults): In the event of a client default or partial scope cancellation, commission is calculated strictly on net funds actually collected and retained."
+        ]
+        default_confid = [
+            "Rule 4.1 (Non-Circumvention): Partner agrees not to bypass Developer or refer introduced clients to alternative software developers without express written consent.",
+            "Rule 4.2 (Codebase & IP Ownership): All codebase assets, databases, and intellectual property remain the property of Developer until 100% of project contract fees are paid by Client.",
+            "Rule 4.3 (Confidentiality & Non-Disclosure): Both parties agree to keep project quotes, client contact information, and internal commercial terms strictly confidential."
+        ]
+
+        disburse_val = mm_data.get('disbursementRules') if mm_data.get('disbursementRules') else default_disburse
+        confid_val = mm_data.get('confidentialityRules') if mm_data.get('confidentialityRules') else default_confid
+
+        st.markdown("##### Section 3: Payment Disbursement Rules (One per line)")
+        disburse_edit = st.text_area("Disbursement Rules", value="\n".join(disburse_val), height=90, key="mm_disburse_rules")
+        disburse_list = [r.strip() for r in disburse_edit.split("\n") if r.strip()]
+
+        st.markdown("##### Section 4: Non-Circumvention & Confidentiality Rules (One per line)")
+        confid_edit = st.text_area("Confidentiality Rules", value="\n".join(confid_val), height=90, key="mm_confid_rules")
+        confid_list = [r.strip() for r in confid_edit.split("\n") if r.strip()]
+
+        agreed_edit = st.text_area(
+            "Agreed Electronically Clause",
+            value=mm_data.get('agreedElectronically', 'The parties acknowledge that this Agreement may be accepted and signed electronically, and an electronic signature or a documented email acceptance of these terms shall have the same force and effect as a manually executed signature.'),
+            height=70,
+            key="mm_agreed_e"
+        )
+
+        st.markdown("##### Editable Agreement Prose (Sections below render inside the PDF in order)")
+        st.caption("Each section shows its heading and one line per paragraph/bullet. Prefix a line with '- ' to render it as a bullet. Use {{partnerName}}, {{developerName}}, {{developerEmail}}, {{partnerEmail}}, {{effectiveDate}} placeholders.")
+        defaults_path = os.path.join(os.path.dirname(__file__), '..', '..', 'src', 'data', 'middlemanAgreementDefaults.json')
+        if not getattr(st.session_state, '_mm_defaults_loaded', False):
+            try:
+                with open(defaults_path, 'r', encoding='utf-8') as df:
+                    st.session_state['_mm_defaults'] = json.load(df)
+            except Exception:
+                st.session_state['_mm_defaults'] = {'sections': []}
+            st.session_state['_mm_defaults_loaded'] = True
+        _mm_defaults = st.session_state.get('_mm_defaults', {'sections': []})
+        existing_sections = mm_data.get('sections') or []
+        section_by_key = {s.get('key'): s for s in existing_sections if isinstance(s, dict) and s.get('key')}
+        default_sections = _mm_defaults.get('sections', [])
+
+        if st.button("↺ Reset Agreement Prose to Defaults", key="mm_reset_prose"):
+            section_by_key = {}
+            existing_sections = []
+            st.session_state['_mm_prose_rev'] = st.session_state.get('_mm_prose_rev', 0) + 1
+        prose_rev = st.session_state.get('_mm_prose_rev', 0)
+
+        expanded_sections = []
+        for idx, def_sec in enumerate(default_sections):
+            sec_key = def_sec.get('key', f'sec_{idx}')
+            cur = section_by_key.get(sec_key, {})
+            heading_val = cur.get('heading', def_sec.get('heading', ''))
+            lines_val = cur.get('lines') or def_sec.get('lines', [])
+            col_h, col_t = st.columns([1, 4])
+            with col_h:
+                heading_edit = st.text_input("Heading", value=heading_val, key=f"mm_sec_{sec_key}_head_{prose_rev}")
+            with col_t:
+                lines_edit = st.text_area(
+                    def_sec.get('heading', sec_key),
+                    value="\n".join(lines_val),
+                    height=max(70, len(lines_val) * 16),
+                    key=f"mm_sec_{sec_key}_lines_{prose_rev}"
+                )
+            expanded_sections.append({
+                "key": sec_key,
+                "heading": heading_edit.strip(),
+                "lines": [l.strip() for l in lines_edit.split("\n") if l.strip()]
+            })
+
+        if 'intake' not in res:
+            res['intake'] = {}
+
+        res['intake']['middlemanAgreement'] = {
+            "partnerName": partner_name.strip(),
+            "partnerEmail": partner_email.strip(),
+            "effectiveDate": eff_date.strip(),
+            "developerName": dev_name.strip(),
+            "developerEmail": dev_email.strip(),
+            "agreedElectronically": agreed_edit.strip(),
+            "disbursementRules": disburse_list,
+            "confidentialityRules": confid_list,
+            "sections": expanded_sections
+        }
+
+        target_pdf = "Sales_Partner_Agreement.pdf"
+
+        pdf_theme = st.radio(
+            "Agreement PDF Theme",
+            options=["azure", "noir"],
+            index=0,
+            horizontal=True,
+            key="mm_pdf_theme",
+            help="Visual palette used when building the agreement PDF (azure = pop-art cream, noir = cyber-noir)."
+        )
+
+        col_b1, col_b2 = st.columns([1, 1])
+        with col_b1:
+            import re as _re, tempfile, json as _json, subprocess
+            safe_partner = _re.sub(r'[^A-Za-z0-9]+', '_', partner_name.strip()).strip('_') or 'Partner'
+            if st.button("📄 Build Current Agreement PDF", key="btn_build_mm_pdf"):
+                try:
+                    gen_pdf = None
+                    with tempfile.NamedTemporaryFile('w', suffix='.json', delete=False) as tmp_cfg:
+                        _json.dump({'intake': {'middlemanAgreement': res['intake']['middlemanAgreement']}}, tmp_cfg)
+                        cfg_path = tmp_cfg.name
+                    with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as tmp_pdf:
+                        pdf_path = tmp_pdf.name
+                    proc = subprocess.run(
+                        ['node', 'scripts/generate-middleman-pdf.mjs', '--config', cfg_path, '--out', pdf_path, '--theme', pdf_theme],
+                        capture_output=True,
+                        text=True
                     )
-                else:
-                    st.info("📄 Click 'Build Current Agreement PDF' to generate the download.")
+                    os.unlink(cfg_path)
+                    if proc.returncode == 0 and os.path.exists(pdf_path):
+                        with open(pdf_path, 'rb') as f:
+                            gen_pdf = f.read()
+                        os.unlink(pdf_path)
+                        st.session_state['mm_pdf_bytes'] = gen_pdf
+                        st.session_state['mm_pdf_name'] = f"{safe_partner}_Sales_Partner_Agreement.pdf"
+                        st.success("📄 Agreement built from current form values!")
+                    else:
+                        st.session_state.pop('mm_pdf_bytes', None)
+                        st.error(f"Failed to generate PDF: {proc.stderr}")
+                except Exception as e:
+                    st.error(f"Error generating PDF: {e}")
 
-        # Project Intake & Questionnaire Config
-        with st.container(border=True):
-            st.markdown('<div class="section-header">Project Scoping Brief & T&C Config</div>', unsafe_allow_html=True)
-            
-            in_title = st.text_input("Form & PDF Title", value=intake_data.get('title', 'PROJECT DISCOVERY & SCOPING BRIEF'), key="intake_title")
-            in_sub = st.text_area("Form Subtitle Description", value=intake_data.get('subtitle', ''), height=60, key="intake_sub")
+            if st.session_state.get('mm_pdf_bytes'):
+                st.download_button(
+                    label="📥 Download Partnership Agreement PDF",
+                    data=st.session_state['mm_pdf_bytes'],
+                    file_name=st.session_state.get('mm_pdf_name', target_pdf),
+                    mime="application/pdf",
+                    key="btn_download_mm_pdf"
+                )
+            else:
+                st.info("📄 Click 'Build Current Agreement PDF' to generate the download.")
 
-            st.markdown("##### Feature Modules Options (One per line)")
-            feat_opts_str = "\n".join(intake_data.get('featureOptions', []))
-            feat_opts_edit = st.text_area("Feature Options", value=feat_opts_str, height=90, key="intake_feats")
-            feat_opts_list = [f.strip() for f in feat_opts_edit.split("\n") if f.strip()]
+    _save_resume_changes(res, "partner")
 
-            st.markdown("##### Standard Terms & Conditions (One per line)")
-            tc_str = "\n".join(intake_data.get('termsAndConditions', []))
-            tc_edit = st.text_area("Terms & Conditions List", value=tc_str, height=140, key="intake_tc")
-            tc_list = [t.strip() for t in tc_edit.split("\n") if t.strip()]
 
-            res['intake']['title'] = in_title.strip()
-            res['intake']['subtitle'] = in_sub.strip()
-            res['intake']['featureOptions'] = feat_opts_list
-            res['intake']['termsAndConditions'] = tc_list
-
-    # ──────────────────────────────────────────────────────────
-    # SAVE BUTTON & LIVE JSON CODE VIEW (Global Footer)
-    # ──────────────────────────────────────────────────────────
-    st.markdown("---")
-    dry_run_resume = st.checkbox("Dry-Run Mode (Save locally only, do not push to remote)", value=True, key="dry_resume")
-    if st.button("💾 Save Resume Changes", type="primary", key="btn_save_resume_changes", use_container_width=True):
-        try:
-            write_resume_file(res)
-            st.success("Resume updated and saved successfully directly in src/data/resume.json!")
-            if not dry_run_resume:
-                st.info("🚀 Pushing changes to GitHub...")
-                git_ok, git_msg = git_commit_push_file("src/data/resume.json", "chore(resume): manual resume update")
-                if git_ok:
-                    st.toast(f"📝 Resume saved and {git_msg}")
-                else:
-                    st.error(f"❌ Git failed: {git_msg}")
-        except Exception as e:
-            st.error(f"Failed to write file: {e}")
-
-    with st.expander("🔍 Live JSON Code View (Resume Object)", expanded=False):
-        st.code(json.dumps(res, indent=2), language="json")
+def render_resume_tab():
+    render_resume_profile_tab()

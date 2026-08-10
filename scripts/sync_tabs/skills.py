@@ -13,6 +13,56 @@ def render_skills_tab():
     st.write("Create, modify, delete, and link skills directly. Changes will update `src/data/skills.json` immediately.")
     dry_run_skills = st.checkbox("Dry-Run Mode (Save locally only, do not push to remote)", value=True, key="dry_skills")
 
+    if 'pending_skills' in st.session_state and st.session_state.pending_skills:
+        with st.container(border=True):
+            st.markdown(f'<div class="section-header">💡 Pending Skill Approvals ({len(st.session_state.pending_skills)} Queued)</div>', unsafe_allow_html=True)
+            st.info("The following tags were auto-extracted by Gemini and are waiting for your review.")
+            
+            skill = st.session_state.pending_skills[0]
+            skill_name_sanitized = skill.get('name', 'default').replace(' ', '_').lower()
+            
+            col_p1, col_p2 = st.columns(2)
+            with col_p1:
+                name = st.text_input("Name", value=skill.get('name'), key=f"pend_main_name_{skill_name_sanitized}")
+                icon = st.text_input("Icon (Lucide)", value=skill.get('icon', 'sparkles'), key=f"pend_main_icon_{skill_name_sanitized}")
+                desc = st.text_area("Description", value=skill.get('description', ''), key=f"pend_main_desc_{skill_name_sanitized}")
+            with col_p2:
+                categories_opts = ['orchestration', 'logic', 'product', 'dynamic']
+                default_cat = skill.get('category', 'dynamic')
+                if default_cat not in categories_opts:
+                    default_cat = 'dynamic'
+                category = st.selectbox("Category", options=categories_opts, index=categories_opts.index(default_cat), key=f"pend_main_cat_{skill_name_sanitized}")
+                color = st.text_input("Hex Color", value=skill.get('color', '#00E676'), key=f"pend_main_color_{skill_name_sanitized}")
+                
+                col_pa1, col_pa2 = st.columns(2)
+                with col_pa1:
+                    if st.button("Approve Skill", key="approve_skill_main_btn", type="primary", use_container_width=True):
+                        current_skills = parse_skills_file()
+                        if any(s.get("name", "").lower() == name.lower() for s in current_skills):
+                            st.error("Skill already exists!")
+                        else:
+                            new_skill = {
+                                "name": name,
+                                "name_business": name,
+                                "icon": icon,
+                                "description": desc,
+                                "category": category,
+                                "color": color
+                            }
+                            current_skills.append(new_skill)
+                            try:
+                                write_skills_file(current_skills)
+                                st.success(f"Added {name}!")
+                                st.session_state.pending_skills.pop(0)
+                                st.session_state.skills = current_skills
+                                st.rerun()
+                            except Exception as e:
+                                st.error(f"Failed to save: {e}")
+                with col_pa2:
+                    if st.button("Dismiss Skill", key="dismiss_skill_main_btn", type="secondary", use_container_width=True):
+                        st.session_state.pending_skills.pop(0)
+                        st.rerun()
+
     # 1. Create New Skill Section
     with st.container(border=True):
         st.markdown('<h3 style="margin-top:0;">Create New Skill</h3>', unsafe_allow_html=True)
