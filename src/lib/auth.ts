@@ -106,7 +106,7 @@ export async function signInWithGoogle(redirectTo?: string) {
     origin = origin.replace('www.prateeq.in', 'prateeq.in');
   }
   const pathOnly = redirectTo ? redirectTo.split('?')[0] : '/dashboard';
-  const targetRedirect = `${origin}${pathOnly}`;
+  const targetRedirect = `${origin}/auth/callback?next=${encodeURIComponent(pathOnly)}`;
 
   const { data, error } = await supabaseAuth.auth.signInWithOAuth({
     provider: 'google',
