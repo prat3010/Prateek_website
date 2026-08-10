@@ -65,7 +65,20 @@ else
   echo -e "${RED}Test Failures:${NC}\n$TEST_OUT\n"
 fi
 
-# Step 6: Test Production Build
+# Step 6: Data Contract Integrity & Architecture Map Audit
+echo -n "Running Data Contract & Architecture Map audit... "
+AUDIT_OUT=$(python3 scripts/audit_contracts.py && python3 scripts/generate_architecture_map.py 2>&1)
+AUDIT_EXIT=$?
+if [ $AUDIT_EXIT -eq 0 ]; then
+  AUDIT_STATUS="${GREEN}✓ Passed${NC}"
+  echo -e "$AUDIT_STATUS"
+else
+  AUDIT_STATUS="${RED}✗ Failed${NC}"
+  echo -e "$AUDIT_STATUS"
+  echo -e "${RED}Contract Audit Failure Details:${NC}\n$AUDIT_OUT\n"
+fi
+
+# Step 7: Test Production Build
 echo -n "Running trial production build... "
 BUILD_OUT=$(npm run build 2>&1)
 BUILD_EXIT=$?
@@ -86,10 +99,11 @@ echo -e "  Git Status:      $GIT_STATUS"
 echo -e "  Type Checks:     $TSC_STATUS"
 echo -e "  ESLint Check:    $LINT_STATUS"
 echo -e "  Unit Tests:      $TEST_STATUS"
+echo -e "  Contract Audit:  $AUDIT_STATUS"
 echo -e "  Prod Build:      $BUILD_STATUS"
 echo -e "${BOLD}=========================================${NC}"
 
-if [ $TSC_EXIT -eq 0 ] && [ $LINT_EXIT -eq 0 ] && [ $TEST_EXIT -eq 0 ] && [ $BUILD_EXIT -eq 0 ]; then
+if [ $TSC_EXIT -eq 0 ] && [ $LINT_EXIT -eq 0 ] && [ $TEST_EXIT -eq 0 ] && [ $AUDIT_EXIT -eq 0 ] && [ $BUILD_EXIT -eq 0 ]; then
   echo -e "\n${GREEN}${BOLD}🎉 Verification Passed! Your changes are safe and ready to push.${NC}\n"
   exit 0
 else

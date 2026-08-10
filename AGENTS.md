@@ -38,6 +38,7 @@ The selected audience profile and visual theme are propagated through server-sid
 
 ### Agent Behavior & Communication
 - **Explicit Manual Actions:** The agent must explicitly call out any manual configuration tasks (e.g., executing SQL migrations in the Supabase Dashboard, registering environment variables, or clearing deployment caches) directly in the final chat response. Do not hide manual action steps solely inside walkthroughs or implementation plans.
+- **Architecture & Dependency Mapping:** Before creating, modifying, or deleting any data field, component, PDF renderer, or Synchronizer tab, the agent MUST consult `docs/ARCHITECTURE_DEPENDENCY_MAP.md` to identify all connected files across Data, Web App, PDF, and Synchronizer layers. After applying changes, the agent MUST run `python3 scripts/audit_contracts.py` and `python3 scripts/generate_architecture_map.py` to ensure schema & graph synchronization.
 - **Environment & DB Safety:** Always verify if database schema updates require manual script execution or if they affect local JSON fallback synchronization before applying code changes.
 - **Workspace Hygiene:** Do not make any code modifications or run tests without first checking `git status` to ensure you are not conflicting with uncommitted developer work.
 - **Selective Replacements:** Use targeted line replacements. Avoid full file overwrites unless creating brand new files.
