@@ -90,6 +90,39 @@ export async function POST(req: Request) {
           })
           .eq('scope_code', scopeCode);
       }
+    } else if (event === 'subscription.charged' || event === 'subscription.authenticated') {
+      const subEntity = payload.payload?.subscription?.entity;
+      const subId = subEntity?.id;
+      const clientEmail = subEntity?.notes?.client_email;
+      const nowIso = new Date().toISOString();
+
+      if (subId) {
+        await supabase
+          .from('rag_subscriptions')
+          .update({
+            is_active: true,
+            razorpay_subscription_id: subId,
+            current_period_end: subEntity?.current_end ? new Date(subEntity.current_end * 1000).toISOString() : null,
+            updated_at: nowIso,
+          })
+          .eq('razorpay_subscription_id', subId);
+      }
+    } else if (event === 'qr_code.credited' || event === 'qr_code.closed') {
+      const qrEntity = payload.payload?.qr_code?.entity;
+      const qrId = qrEntity?.id;
+      const paymentId = payload.payload?.payment?.entity?.id || '';
+      const nowIso = new Date().toISOString();
+
+      if (qrId) {
+        await supabase
+          .from('terminal_qr_sessions')
+          .update({
+            status: 'paid',
+            payment_id: paymentId,
+            paid_at: nowIso,
+          })
+          .eq('qr_id', qrId);
+      }
     }
 
     return NextResponse.json({ status: 'ok', event });

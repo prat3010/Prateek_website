@@ -12,7 +12,7 @@ interface PlanItem {
   description: string;
   features: string[];
   cta: string;
-  stripeUrl: string;
+  planId?: string;
 }
 
 interface CurrencyGroup {
@@ -46,7 +46,7 @@ const DEFAULT_PRICING_FALLBACK: PricingPayload = {
           "Standard Support",
         ],
         cta: "Start 7-Day Free Trial",
-        stripeUrl: "https://buy.stripe.com/test_starter_inr",
+        planId: "plan_starter_inr",
       },
       {
         id: "pro_inr",
@@ -64,7 +64,7 @@ const DEFAULT_PRICING_FALLBACK: PricingPayload = {
           "Priority Hybrid Search & Re-ranking",
         ],
         cta: "Upgrade to Pro",
-        stripeUrl: "https://buy.stripe.com/test_pro_inr",
+        planId: "plan_pro_inr",
       },
       {
         id: "business_inr",
@@ -82,7 +82,7 @@ const DEFAULT_PRICING_FALLBACK: PricingPayload = {
           "99.9% Uptime SLA & 24/7 Support",
         ],
         cta: "Get Business Plan",
-        stripeUrl: "https://buy.stripe.com/test_business_inr",
+        planId: "plan_business_inr",
       },
     ],
   },
@@ -105,7 +105,7 @@ const DEFAULT_PRICING_FALLBACK: PricingPayload = {
           "Standard Support",
         ],
         cta: "Start 7-Day Free Trial",
-        stripeUrl: "https://buy.stripe.com/test_starter_usd",
+        planId: "plan_starter_usd",
       },
       {
         id: "pro_usd",
@@ -123,7 +123,7 @@ const DEFAULT_PRICING_FALLBACK: PricingPayload = {
           "Priority Hybrid Search & Re-ranking",
         ],
         cta: "Upgrade to Pro",
-        stripeUrl: "https://buy.stripe.com/test_pro_usd",
+        planId: "plan_pro_usd",
       },
       {
         id: "business_usd",
@@ -141,7 +141,7 @@ const DEFAULT_PRICING_FALLBACK: PricingPayload = {
           "99.9% Uptime SLA & 24/7 Support",
         ],
         cta: "Get Business Plan",
-        stripeUrl: "https://buy.stripe.com/test_business_usd",
+        planId: "plan_business_usd",
       },
     ],
   },
@@ -149,6 +149,7 @@ const DEFAULT_PRICING_FALLBACK: PricingPayload = {
 
 export function PricingSection() {
   const [pricing, setPricing] = useState<PricingPayload>(DEFAULT_PRICING_FALLBACK);
+  const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
   const [currencyMode, setCurrencyMode] = useState<"inr" | "usd">(() => {
     if (typeof window !== "undefined") {
       try {
@@ -178,6 +179,72 @@ export function PricingSection() {
       active = false;
     };
   }, []);
+
+  const loadRazorpayScript = (): Promise<boolean> => {
+    return new Promise((resolve) => {
+      if (typeof window === "undefined") return resolve(false);
+      if ((window as unknown as { Razorpay?: unknown }).Razorpay) return resolve(true);
+
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const handleSubscribe = async (plan: PlanItem) => {
+    try {
+      setLoadingPlanId(plan.id);
+      const isLoaded = await loadRazorpayScript();
+      if (!isLoaded) {
+        alert("Could not load Razorpay checkout SDK. Please check your connection.");
+        setLoadingPlanId(null);
+        return;
+      }
+
+      const res = await fetch("/api/client/create-razorpay-subscription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planId: plan.planId || plan.id }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        alert(data.error || "Failed to initialize subscription.");
+        setLoadingPlanId(null);
+        return;
+      }
+
+      if (data.isMock) {
+        alert(`⚡ Razorpay Subscription Sandbox Mode:\n\nSimulated active subscription for ${plan.name} Plan (${data.subscriptionId}).`);
+        setLoadingPlanId(null);
+        return;
+      }
+
+      const options = {
+        key: data.keyId,
+        subscription_id: data.subscriptionId,
+        name: "Retriever AI SaaS",
+        description: `Subscription for ${plan.name} Plan`,
+        image: "/images/gremlin-head.png",
+        handler: function (response: { razorpay_subscription_id: string }) {
+          alert(`Subscription activated successfully! ID: ${response.razorpay_subscription_id}`);
+        },
+        theme: {
+          color: "#0ea5e9",
+        },
+      };
+
+      const rzp = new (window as unknown as { Razorpay: new (opts: unknown) => { open: () => void } }).Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      console.error("Subscription launch error:", err);
+      alert("An unexpected error occurred while launching checkout.");
+    } finally {
+      setLoadingPlanId(null);
+    }
+  };
 
   const currentGroup = currencyMode === "inr" ? pricing.inr : pricing.usd;
 
@@ -230,14 +297,13 @@ export function PricingSection() {
               ))}
             </ul>
 
-            <a
-              href={plan.stripeUrl || "/scoping?engine=saas"}
-              target={plan.stripeUrl?.startsWith("http") ? "_blank" : undefined}
-              rel={plan.stripeUrl?.startsWith("http") ? "noopener noreferrer" : undefined}
+            <button
+              onClick={() => handleSubscribe(plan)}
+              disabled={loadingPlanId === plan.id}
               className={`comic-btn ${plan.popular ? "comic-btn-blue" : "comic-btn-outline"} ${styles.planCta}`}
             >
-              {plan.cta}
-            </a>
+              {loadingPlanId === plan.id ? "Launching Razorpay..." : plan.cta}
+            </button>
           </div>
         ))}
       </div>

@@ -324,7 +324,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                             <span className={styles.packageBadge}>Tier 3 • Full-Stack</span>
                             <h4 className={styles.packageTitle}>SaaS MVP & App Portal</h4>
                             <div className={styles.packagePrice}>{tierPrice('saas')}</div>
-                            <p className={styles.packageDesc}>Supabase Auth & Database, Stripe/Razorpay payments, role-gated admin portal & REST API integrations.</p>
+                            <p className={styles.packageDesc}>Supabase Auth & Database, Razorpay payments, role-gated admin portal & REST API integrations.</p>
                           </div>
                           <Link href="/scoping?engine=saas" className={styles.packageBtn}>
                             <span>SCOPE TIER 3</span>

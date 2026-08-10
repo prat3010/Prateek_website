@@ -218,3 +218,41 @@ describe('POST /api/webhooks/razorpay', () => {
     expect(json.status).toBe('ok');
   });
 });
+
+import { POST as createSubPOST } from '@/app/api/client/create-razorpay-subscription/route';
+import { POST as createQrPOST } from '@/app/api/terminal/create-qr/route';
+
+describe('POST /api/client/create-razorpay-subscription', () => {
+  it('creates mock subscription when credentials are missing or in dev', async () => {
+    delete process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+    delete process.env.RAZORPAY_KEY_SECRET;
+
+    const req = new Request('http://localhost/api/client/create-razorpay-subscription', {
+      method: 'POST',
+      body: JSON.stringify({ planId: 'plan_starter_inr' }),
+    });
+
+    const res = await createSubPOST(req);
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.isMock).toBe(true);
+    expect(json.subscriptionId).toContain('sub_mock_');
+  });
+});
+
+describe('POST /api/terminal/create-qr', () => {
+  it('generates dynamic QR response with provided amount', async () => {
+    const req = new Request('http://localhost/api/terminal/create-qr', {
+      method: 'POST',
+      body: JSON.stringify({ amount: 500 }),
+    });
+
+    const res = await createQrPOST(req);
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.success).toBe(true);
+    expect(json.amount).toBe(500);
+    expect(json.qr_id).toBeDefined();
+  });
+});
+

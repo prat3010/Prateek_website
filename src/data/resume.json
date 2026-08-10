@@ -151,7 +151,7 @@
     ],
     "featureOptions": [
       "Contact Form / Lead Capture (ReCAPTCHA Protected)",
-      "Payment Gateway (Stripe/Razorpay)",
+      "Payment Gateway (Razorpay)",
       "User Auth & Client Portal (Google/Magic Link)",
       "Headless Blog / CMS Content Management",
       "Private AI Knowledge Base / Vector Search (RAG)",
@@ -377,11 +377,11 @@
       },
       {
         "id": "payments",
-        "label": "Payment Gateway Integration (Stripe/Razorpay)",
+        "label": "Payment Gateway Integration (Razorpay)",
         "priceINR": 45000,
         "priceUSD": 600,
         "laymanDescription": "Enables your website to collect payments via Credit Cards, Apple Pay, UPI, or subscriptions with automatic digital invoicing.",
-        "techSpecs": "Stripe & Razorpay Webhook Listeners, 1-Click Checkout, Recurring Billing, PCI-compliant hosted checkout configuration with sensitive card data handled by the payment provider"
+        "techSpecs": "Razorpay Webhook Listeners, 1-Click Checkout, Recurring Billing, PCI-compliant hosted checkout configuration with sensitive card data handled by the payment provider"
       },
       {
         "id": "cms",
@@ -524,7 +524,7 @@
         "recommendedEngineId": "multipage",
         "compulsoryFeatureLabels": [
           "E-Commerce Storefront & Cart Module",
-          "Payment Gateway Integration (Stripe/Razorpay)",
+          "Payment Gateway Integration (Razorpay)",
           "User Auth & Client Portal (Google/Magic Link)",
           "Automated Email Workflows (Resend Transactional)"
         ]
@@ -537,7 +537,7 @@
         "recommendedEngineId": "multipage",
         "compulsoryFeatureLabels": [
           "Booking & Appointments Module",
-          "Payment Gateway Integration (Stripe/Razorpay)",
+          "Payment Gateway Integration (Razorpay)",
           "Automated Email Workflows (Resend Transactional)"
         ]
       },
@@ -549,7 +549,7 @@
         "recommendedEngineId": "saas",
         "compulsoryFeatureLabels": [
           "User Auth & Client Portal (Google/Magic Link)",
-          "Payment Gateway Integration (Stripe/Razorpay)",
+          "Payment Gateway Integration (Razorpay)",
           "Admin Dashboard & Role Access Control (RBAC)"
         ]
       },
@@ -562,7 +562,7 @@
         "compulsoryFeatureLabels": [
           "LMS & Online Course Portal Module",
           "User Auth & Client Portal (Google/Magic Link)",
-          "Payment Gateway Integration (Stripe/Razorpay)",
+          "Payment Gateway Integration (Razorpay)",
           "Headless Blog & CMS Content Management"
         ]
       },
