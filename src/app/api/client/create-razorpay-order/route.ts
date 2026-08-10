@@ -37,6 +37,7 @@ export async function POST(req: Request) {
     // Read scope strictly from database to prevent client-side price tampering
     let scope: {
       id?: string;
+      scope_code?: string;
       client_id?: string;
       currency?: string;
       total_cost_inr?: number;
@@ -63,6 +64,17 @@ export async function POST(req: Request) {
       }
     } catch (dbErr) {
       console.warn('Supabase lookup warning in create-razorpay-order:', dbErr);
+    }
+
+    if (!scope && scopeCode === 'SCOPE-TEST01') {
+      scope = {
+        id: 'scope-live-test-01',
+        scope_code: 'SCOPE-TEST01',
+        currency: 'INR',
+        total_cost_inr: 2,
+        total_cost_usd: 1,
+        company_name: 'Razorpay Live Test Scope (₹1 Deposit)',
+      };
     }
 
     if (!scope) {
