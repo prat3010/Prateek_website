@@ -26,6 +26,15 @@
       "priceUSD": 2400,
       "laymanDescription": "A production software foundation connected to a cloud database for web apps where users create accounts, manage data, and run software workflows.",
       "techSpecs": "Full Web App Shell, Supabase PostgreSQL Architecture, Server Caching (unstable_cache), Production Vercel Wiring"
+    },
+    {
+      "id": "ai_rag_app",
+      "title": "Enterprise AI RAG Engine",
+      "tier": "Tier 4",
+      "priceINR": 175000,
+      "priceUSD": 2400,
+      "laymanDescription": "Retriever RAG Core, vector search, grounded LLM assistant, clickable citations & team access controls.",
+      "techSpecs": "pgvector Vector Embeddings, Document Chunking Pipeline, Semantic Search, Presigned Citation Downloads, Feedback Telemetry"
     }
   ],
   "features": [
@@ -230,7 +239,7 @@
       "label": "🤖 Custom AI & Vector RAG Platform",
       "shortLabel": "AI RAG Platform",
       "description": "Private document knowledge base, AI search, and assistant",
-      "recommendedEngineId": "saas",
+      "recommendedEngineId": "ai_rag_app",
       "compulsoryFeatureLabels": [
         "Private AI Knowledge Base / Vector Search (RAG)",
         "User Auth & Client Portal (Google/Magic Link)",
