@@ -363,6 +363,43 @@
   color: var(--color-text-muted);
 }
 
+/* ── Chip Selectors ── */
+
+.chipGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.chipCard {
+  background: #FFFFFF;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--border-radius-sm, 6px);
+  padding: 8px 14px;
+  font-family: var(--font-code);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--pop-black);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+  box-shadow: 0 1px 3px rgba(43, 43, 54, 0.04);
+}
+
+.chipCard:hover {
+  border-color: var(--pop-blue);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(43, 43, 54, 0.08);
+}
+
+.chipCardActive {
+  background: var(--pop-blue);
+  color: #FFFFFF;
+  border-color: var(--pop-blue);
+  box-shadow: 0 0 0 2px rgba(90, 142, 182, 0.2), 0 2px 8px rgba(43, 43, 54, 0.1);
+}
+
 /* ── Inputs (light panels with warm ink borders) ── */
 
 .input, .textarea, .select {
@@ -1155,6 +1192,23 @@
   background: #030304;
   border-color: #2F2F3D;
   color: #94a3b8;
+}
+
+:global([data-theme='noir']) .chipCard {
+  background: #0d0d10;
+  border: 1px solid #2F2F3D;
+  color: #e0e0e3;
+}
+
+:global([data-theme='noir']) .chipCard:hover {
+  border-color: var(--neon-cyan, #00f0ff);
+}
+
+:global([data-theme='noir']) .chipCardActive {
+  background: var(--neon-cyan, #00f0ff);
+  color: #08080a;
+  border-color: var(--neon-cyan, #00f0ff);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.35);
 }
 
 .recaptchaWarning {

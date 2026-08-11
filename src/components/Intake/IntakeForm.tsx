@@ -18,7 +18,7 @@ import {
   Sparkles,
   Check
 } from 'lucide-react';
-import { generateQuestionnairePDF, generateQuestionnairePDFBase64 } from '@/utils/pdfGenerator';
+import { generateQuestionnairePDF, generateQuestionnairePDFBase64, type QuestionnaireData } from '@/utils/pdfGenerator';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import {
@@ -168,11 +168,15 @@ interface IntakeFormData {
   contactEmail: string;
   contactPhone: string;
   projectGoal: string;
+  projectStartType: string;
   targetAudience: string;
   selectedBaseEngineId: string;
   selectedFeatures: string[];
   selectedBrandAssetId: string;
+  designReadiness: string;
   selectedMaintenanceId: string;
+  hostingOwnership: string;
+  taxInvoicingPreference: string;
   inspirationLinks: string;
   timeline: string;
   additionalNotes: string;
@@ -190,11 +194,15 @@ interface IntakeFormData {
             contactEmail: parsed.contactEmail || '',
             contactPhone: parsed.contactPhone || '',
             projectGoal: parsed.projectGoal || initialArchetype.label,
+            projectStartType: parsed.projectStartType || 'greenfield',
             targetAudience: parsed.targetAudience || '',
             selectedBaseEngineId: parsed.selectedBaseEngineId || initialArchetype.recommendedEngineId,
             selectedFeatures: Array.isArray(parsed.selectedFeatures) ? (parsed.selectedFeatures as string[]) : initialSelectedFeatures,
             selectedBrandAssetId: parsed.selectedBrandAssetId || (brandAssets[0]?.id || ''),
+            designReadiness: parsed.designReadiness || 'figma_ready',
             selectedMaintenanceId: parsed.selectedMaintenanceId || '',
+            hostingOwnership: parsed.hostingOwnership || 'client_owned',
+            taxInvoicingPreference: parsed.taxInvoicingPreference || 'standard',
             inspirationLinks: parsed.inspirationLinks || '',
             timeline: parsed.timeline || (timelineOptions[1] || timelineOptions[0]),
             additionalNotes: parsed.additionalNotes || '',
@@ -209,11 +217,15 @@ interface IntakeFormData {
       contactEmail: '',
       contactPhone: '',
       projectGoal: initialArchetype.label,
+      projectStartType: 'greenfield',
       targetAudience: '',
       selectedBaseEngineId: initialArchetype.recommendedEngineId,
       selectedFeatures: initialSelectedFeatures,
       selectedBrandAssetId: brandAssets[0]?.id || '',
+      designReadiness: 'figma_ready',
       selectedMaintenanceId: '',
+      hostingOwnership: 'client_owned',
+      taxInvoicingPreference: 'standard',
       inspirationLinks: '',
       timeline: timelineOptions[1] || timelineOptions[0],
       additionalNotes: '',
@@ -359,15 +371,23 @@ interface IntakeFormData {
     return maintenancePlans.find(p => p.id === targetId) || maintenancePlans[1];
   }, [formData.selectedMaintenanceId, autoMaintenancePlanId, maintenancePlans]);
 
-  const buildQuestionnaireData = () => ({
+  const buildQuestionnaireData = (): QuestionnaireData => ({
     companyName: formData.companyName,
     contactEmail: formData.contactEmail,
     contactPhone: formData.contactPhone,
     projectGoal: formData.projectGoal,
+    projectStartType: formData.projectStartType === 'legacy_rebuild' ? 'Legacy Refactor / Rebuild' : 'Greenfield Build (From Scratch)',
+    designReadiness: formData.designReadiness === 'concept_only'
+      ? 'Concept Only (Needs Design System)'
+      : formData.designReadiness === 'wireframes_ready'
+      ? 'Wireframes / Sketches Ready'
+      : 'Figma / Specs Ready',
+    hostingOwnership: formData.hostingOwnership === 'needs_setup' ? 'Setup Support Required' : 'Client-Owned Accounts',
+    taxInvoicingPreference: formData.taxInvoicingPreference === 'corporate_gst' ? 'GST / Corporate Invoice Required' : 'Standard Digital Receipt',
     targetAudience: formData.targetAudience,
     projectCategory: selectedEngine.title,
     features: formData.selectedFeatures,
-    assetsStatus: totalCost.brandOpt.label,
+    assetsStatus: `${totalCost.brandOpt.label} (${formData.designReadiness === 'concept_only' ? 'Concept Only' : formData.designReadiness === 'wireframes_ready' ? 'Wireframes' : 'Figma Ready'})`,
     inspirationLinks: formData.inspirationLinks,
     timeline: formData.timeline,
     budgetRange: `Estimated ${selectedEngine.tier}: ${formatPricePair(totalCost.totalINR, totalCost.totalUSD, currency)}`,
@@ -376,7 +396,12 @@ interface IntakeFormData {
     maintenanceCostUSD: activeMaintenancePlan.priceUSD,
     totalBuildCostINR: totalCost.totalINR,
     totalBuildCostUSD: totalCost.totalUSD,
-    additionalNotes: formData.additionalNotes
+    additionalNotes: [
+      formData.projectStartType === 'legacy_rebuild' ? '[Context: Legacy Rebuild]' : '',
+      formData.hostingOwnership === 'needs_setup' ? '[Cloud Setup Requested]' : '',
+      formData.taxInvoicingPreference === 'corporate_gst' ? '[GST/Corporate Invoicing Required]' : '',
+      formData.additionalNotes
+    ].filter(Boolean).join(' | ')
   });
 
   const handleDownloadPDF = () => {
@@ -450,6 +475,10 @@ interface IntakeFormData {
         contactEmail: formData.contactEmail,
         contactPhone: formData.contactPhone,
         projectGoal: formData.projectGoal,
+        projectStartType: formData.projectStartType === 'legacy_rebuild' ? 'Legacy Refactor' : 'Greenfield',
+        designReadiness: formData.designReadiness,
+        hostingOwnership: formData.hostingOwnership,
+        taxInvoicingPreference: formData.taxInvoicingPreference,
         targetAudience: formData.targetAudience,
         baseEngineTitle: selectedEngine.title,
         selectedFeatures: formData.selectedFeatures.map((id: string) => labelOfFeature(id) || id),
@@ -687,6 +716,30 @@ interface IntakeFormData {
                     </div>
                   </div>
 
+                  <div className={styles.field}>
+                    <label className={styles.label}>Project Scope Starting Point</label>
+                    <div className={styles.chipGrid} role="radiogroup" aria-label="Project Scope Starting Point">
+                      <button
+                        type="button"
+                        role="radio"
+                        aria-checked={formData.projectStartType === 'greenfield'}
+                        className={`${styles.chipCard} ${formData.projectStartType === 'greenfield' ? styles.chipCardActive : ''}`}
+                        onClick={() => setFormData({ ...formData, projectStartType: 'greenfield' })}
+                      >
+                        🌱 Greenfield Build (From Scratch)
+                      </button>
+                      <button
+                        type="button"
+                        role="radio"
+                        aria-checked={formData.projectStartType === 'legacy_rebuild'}
+                        className={`${styles.chipCard} ${formData.projectStartType === 'legacy_rebuild' ? styles.chipCardActive : ''}`}
+                        onClick={() => setFormData({ ...formData, projectStartType: 'legacy_rebuild' })}
+                      >
+                        🔧 Legacy Refactor / Rebuild
+                      </button>
+                    </div>
+                  </div>
+
                   <div className={styles.fieldGrid}>
                     <div className={styles.field}>
                       <label className={styles.label}>Project / Company Name (Optional)</label>
@@ -915,6 +968,37 @@ interface IntakeFormData {
                   </div>
 
                   <div className={styles.field}>
+                    <label className={styles.label}>UI Design &amp; Layout Readiness</label>
+                    <div className={styles.chipGrid} role="radiogroup" aria-label="UI Design Readiness">
+                      {[
+                        { id: 'figma_ready', label: '🎨 Figma / Specs Ready' },
+                        { id: 'wireframes_ready', label: '📐 Wireframes / Sketches Ready' },
+                        { id: 'concept_only', label: '💡 Concept Only (Needs Design System)' }
+                      ].map(item => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          role="radio"
+                          aria-checked={formData.designReadiness === item.id}
+                          className={`${styles.chipCard} ${formData.designReadiness === item.id ? styles.chipCardActive : ''}`}
+                          onClick={() => {
+                            const autoBrandId = item.id === 'concept_only' && formData.selectedBrandAssetId === brandAssets[0]?.id
+                              ? (brandAssets[1]?.id || brandAssets[0]?.id)
+                              : formData.selectedBrandAssetId;
+                            setFormData({
+                              ...formData,
+                              designReadiness: item.id,
+                              selectedBrandAssetId: autoBrandId
+                            });
+                          }}
+                        >
+                          {item.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className={styles.field}>
                     <label className={styles.label}>Brand Readiness & Copywriting Add-on</label>
                     <div className={styles.checkboxGrid}>
                       {brandAssets.map(b => {
@@ -1087,6 +1171,56 @@ interface IntakeFormData {
                         value={formData.additionalNotes}
                         onChange={e => setFormData({ ...formData, additionalNotes: e.target.value })}
                       />
+                    </div>
+                  </div>
+
+                  <div className={styles.fieldGrid} style={{ marginTop: '12px' }}>
+                    <div className={styles.field}>
+                      <label className={styles.label}>Cloud Infrastructure Ownership</label>
+                      <div className={styles.chipGrid} role="radiogroup" aria-label="Cloud Infrastructure Ownership">
+                        <button
+                          type="button"
+                          role="radio"
+                          aria-checked={formData.hostingOwnership === 'client_owned'}
+                          className={`${styles.chipCard} ${formData.hostingOwnership === 'client_owned' ? styles.chipCardActive : ''}`}
+                          onClick={() => setFormData({ ...formData, hostingOwnership: 'client_owned' })}
+                        >
+                          🌐 Client-Owned Accounts
+                        </button>
+                        <button
+                          type="button"
+                          role="radio"
+                          aria-checked={formData.hostingOwnership === 'needs_setup'}
+                          className={`${styles.chipCard} ${formData.hostingOwnership === 'needs_setup' ? styles.chipCardActive : ''}`}
+                          onClick={() => setFormData({ ...formData, hostingOwnership: 'needs_setup' })}
+                        >
+                          🛠️ Setup Support Required
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className={styles.field}>
+                      <label className={styles.label}>Tax &amp; Procurement Invoicing</label>
+                      <div className={styles.chipGrid} role="radiogroup" aria-label="Tax Invoicing Preference">
+                        <button
+                          type="button"
+                          role="radio"
+                          aria-checked={formData.taxInvoicingPreference === 'standard'}
+                          className={`${styles.chipCard} ${formData.taxInvoicingPreference === 'standard' ? styles.chipCardActive : ''}`}
+                          onClick={() => setFormData({ ...formData, taxInvoicingPreference: 'standard' })}
+                        >
+                          📄 Standard Digital Receipt
+                        </button>
+                        <button
+                          type="button"
+                          role="radio"
+                          aria-checked={formData.taxInvoicingPreference === 'corporate_gst'}
+                          className={`${styles.chipCard} ${formData.taxInvoicingPreference === 'corporate_gst' ? styles.chipCardActive : ''}`}
+                          onClick={() => setFormData({ ...formData, taxInvoicingPreference: 'corporate_gst' })}
+                        >
+                          🏢 GST / Corporate Invoice Required
+                        </button>
+                      </div>
                     </div>
                   </div>
 

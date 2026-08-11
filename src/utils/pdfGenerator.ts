@@ -27,6 +27,10 @@ export interface QuestionnaireData {
   projectGoal?: string;
   targetAudience?: string;
   projectCategory?: string;
+  projectStartType?: string;
+  designReadiness?: string;
+  hostingOwnership?: string;
+  taxInvoicingPreference?: string;
   features?: string[];
   assetsStatus?: string;
   inspirationLinks?: string;
