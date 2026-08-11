@@ -31,10 +31,10 @@
       "id": "standalone_embed",
       "title": "Standalone Widget Embed Core",
       "tier": "Tier 0",
-      "priceINR": 0,
-      "priceUSD": 0,
-      "laymanDescription": "Lightweight script embed for existing websites requiring an embedded AI chatbot widget.",
-      "techSpecs": "Script Loader, iFrame Host, CORS Validation, Shadow DOM"
+      "priceINR": 15000,
+      "priceUSD": 200,
+      "laymanDescription": "Lightweight script embed for existing websites. Built with responsive widget UI, CORS security, and Shadow DOM isolation. Ideal for simple FAQ & lead-capture chatbots.",
+      "techSpecs": "Script Loader, iFrame Host, CORS Validation, Shadow DOM, Lead Capture API"
     }
   ],
   "features": [
@@ -256,13 +256,11 @@
     },
     {
       "id": "standalone_chatbot",
-      "label": "💬 Standalone Embedded AI Chatbot Widget",
-      "shortLabel": "AI Chatbot Widget",
-      "description": "Embed a 24/7 intelligent AI chatbot into your existing website (WordPress, Webflow, Shopify, custom HTML) trained on your PDFs & docs.",
+      "label": "💬 Standalone Embedded Chatbot Widget",
+      "shortLabel": "Chatbot Widget",
+      "description": "Embed a 24/7 chatbot widget into your existing website (WordPress, Webflow, Shopify, custom HTML) for simple lead capture or trained AI document search.",
       "recommendedEngineId": "standalone_embed",
-      "compulsoryFeatureLabels": [
-        "Private AI Knowledge Base / Vector Search (RAG)"
-      ]
+      "compulsoryFeatureLabels": []
     },
     {
       "id": "custom",
