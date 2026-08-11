@@ -47,13 +47,13 @@ const VIBE_TEXTS: ScramblerProps['texts'] = {
 };
 
 const PRIMARY_TEXTS: ScramblerProps['texts'] = {
-  developer: bothThemes('Terminal Console 💻'),
-  business:  bothThemes('Launch Scoping Lab 🚀'),
+  developer: bothThemes('Terminal Console'),
+  business:  bothThemes('Launch Scoping Lab'),
 };
 
 const SECONDARY_TEXTS: ScramblerProps['texts'] = {
   developer: bothThemes('Live Telemetry'),
-  business:  bothThemes('Retriever AI Engine 🤖'),
+  business:  bothThemes('Retriever AI Engine'),
 };
 
 export default function HeroClient({ taglines }: HeroClientProps) {

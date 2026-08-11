@@ -71,7 +71,7 @@ function ProjectImage({ src, alt, fill, width, height, sizes, className, style }
       fill={fill}
       width={width}
       height={height}
-      sizes={sizes}
+      sizes={sizes || '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'}
       className={className}
       style={style}
       onError={() => setError(true)}

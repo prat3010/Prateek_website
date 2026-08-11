@@ -118,13 +118,29 @@ export default async function RootLayout({
 
   const dynamicJsonLd = {
     "@context": "https://schema.org",
-    "@type": "Person",
-    "name": profile?.name || "Prateeq Sharma",
-    "jobTitle": profile?.title || "Full Stack Developer & Designer",
-    "url": "https://prateeq.in",
-    "description": profile?.summary?.general || "Portfolio of Prateeq Sharma focused on web applications, interface quality, and practical AI-assisted workflows.",
-    "sameAs": sameAs,
-    "knowsAbout": knowsAbout
+    "@graph": [
+      {
+        "@type": "Person",
+        "@id": "https://prateeq.in/#person",
+        "name": profile?.name || "Prateeq Sharma",
+        "jobTitle": profile?.title || "Full Stack Developer & Designer",
+        "url": "https://prateeq.in",
+        "description": profile?.summary?.general || "Portfolio of Prateeq Sharma focused on web applications, interface quality, and practical AI-assisted workflows.",
+        "sameAs": sameAs,
+        "knowsAbout": knowsAbout
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://prateeq.in/#website",
+        "url": "https://prateeq.in",
+        "name": "Prateeq Sharma Portfolio",
+        "description": "Crafting Digital Worlds, One Panel at a Time — Web Architecture & AI Engineering Services.",
+        "publisher": {
+          "@id": "https://prateeq.in/#person"
+        },
+        "inLanguage": "en-US"
+      }
+    ]
   };
 
   return (

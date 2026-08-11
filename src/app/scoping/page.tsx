@@ -29,8 +29,28 @@ export default async function ScopingPage({ searchParams }: ScopingPageProps) {
     preset = { goalId: params.goal };
   }
 
+  const serviceJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ProfessionalService',
+    'name': 'Prateeq Sharma — Web Architecture & Product Engineering',
+    'url': 'https://prateeq.in/scoping',
+    'description':
+      'Fixed-scope web engineering, SaaS application development, UI design systems, and SLA maintenance care plans.',
+    'provider': {
+      '@type': 'Person',
+      'name': 'Prateeq Sharma',
+      'url': 'https://prateeq.in',
+    },
+    'areaServed': 'Global',
+    'priceRange': '$$',
+  };
+
   return (
     <div className={styles.wrapper}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
+      />
       <div className={styles.container}>
         <div className={styles.header}>
           <Link href="/" className={styles.backLink}>

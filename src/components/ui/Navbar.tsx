@@ -155,7 +155,9 @@ export default function Navbar({ items, className }: NavbarProps) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  /* ---------- Lock body scroll when mobile menu open ---------- */
+  /* ---------- Lock body scroll & focus trap when mobile menu open ---------- */
+  const navRef = useRef<HTMLElement>(null);
+
   useEffect(() => {
     if (!lenis) return;
     if (mobileOpen) {
@@ -164,6 +166,42 @@ export default function Navbar({ items, className }: NavbarProps) {
       lenis.start();
     }
   }, [mobileOpen, lenis]);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMobileOpen(false);
+        return;
+      }
+
+      if (e.key === 'Tab' && navRef.current) {
+        const focusables = navRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button, input, textarea, select, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusables.length === 0) return;
+
+        const firstElement = focusables[0];
+        const lastElement = focusables[focusables.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mobileOpen]);
 
   /* ---------- Smooth scroll handler ---------- */
   const handleNavClick = useCallback(
@@ -202,6 +240,7 @@ export default function Navbar({ items, className }: NavbarProps) {
 
   return (
     <nav
+      ref={navRef}
       className={`${styles.navbar} ${scrolled ? styles.scrolled : ''} ${
         isScrolling ? styles.scrollActive : ''
       } ${mobileOpen ? styles.menuOpen : ''} ${className ?? ''}`}

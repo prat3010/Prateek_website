@@ -902,7 +902,7 @@ interface IntakeFormData {
                       <span style={{ fontFamily: 'var(--font-code)', fontSize: '12px', color: 'var(--intake-summary-label)' }}>BRAND KIT ADD-ON</span>
                       <span style={{ fontWeight: 700, color: 'var(--intake-summary-value)' }}>{totalCost.brandOpt.priceINR > 0 ? `+${priceInCurrency(totalCost.brandOpt.priceINR, totalCost.brandOpt.priceUSD)}` : 'Included'}</span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '4px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '4px' }} aria-live="polite" aria-atomic="true">
                       <span style={{ fontFamily: 'var(--font-code)', fontSize: '13px', fontWeight: 800, color: 'var(--intake-summary-text)' }}>TOTAL BUILD INVESTMENT (ESTIMATE)</span>
                       <span style={{ fontFamily: 'var(--font-code)', fontSize: '18px', fontWeight: 800, color: 'var(--intake-summary-accent)' }}>{formatPricePair(totalCost.totalINR, totalCost.totalUSD, currency)}</span>
                     </div>

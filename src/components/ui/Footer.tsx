@@ -213,7 +213,10 @@ export default function Footer({ socials, profile, className }: FooterProps) {
           {/* Bottom strip */}
           <div className={styles.bottomBar}>
             <p className={styles.copyright}>
-              © {year} Prateeq Sharma. All rights reserved.
+              © {year} Prateeq Sharma. All rights reserved. •{' '}
+              <Link href="/privacy" className={styles.privacyLink}>
+                Privacy &amp; Telemetry
+              </Link>
             </p>
           </div>
         </div>
@@ -382,7 +385,10 @@ export default function Footer({ socials, profile, className }: FooterProps) {
           {/* Bottom strip */}
           <div className={styles.bottomBar}>
             <p className={styles.copyright}>
-              © {year} Prateeq Sharma. All rights reserved.
+              © {year} Prateeq Sharma. All rights reserved. •{' '}
+              <Link href="/privacy" className={styles.privacyLink}>
+                Privacy &amp; Telemetry
+              </Link>
             </p>
           </div>
         </div>

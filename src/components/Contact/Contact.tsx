@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useLenis } from 'lenis/react';
 import { useTheme } from '@/context/ThemeContext';
 import { NAVBAR_SCROLL_OFFSET } from '@/lib/constants';
-import { Copy, Check, Terminal as TerminalIcon, Mail, Clock, Globe } from 'lucide-react';
+import { Copy, Check, Terminal as TerminalIcon, Mail, Clock, Globe, ShieldCheck } from 'lucide-react';
 import SpeechBubble from '@/components/ui/SpeechBubble';
 import ConfettiBurst, { type ConfettiBurstHandle } from '@/components/effects/ConfettiBurst';
 import styles from './Contact.module.css';
@@ -293,6 +293,12 @@ function Contact() {
                     </a>
                   </div>
                 )}
+              </div>
+
+              {/* Security Trust Badge Micro-copy */}
+              <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', opacity: 0.72, color: 'var(--color-text-muted)' }}>
+                <ShieldCheck size={13} style={{ flexShrink: 0 }} />
+                <span>256-bit Encrypted • reCAPTCHA Protected</span>
               </div>
 
               {status === 'success' && (

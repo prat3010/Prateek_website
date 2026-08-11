@@ -38,7 +38,7 @@
   --border-muted: rgba(43, 43, 54, 0.4);
   --border-accent: var(--pop-black);
   --border-accent-light: var(--pop-black);
-  --color-text-dim: #8a8a93;
+  --color-text-dim: #545460;
 
   /* ─ Shadow Tokens (Soft Sketch Offsets) ─ */
   --shadow-comic: 3px 3px 0px rgba(43, 43, 54, 0.18);

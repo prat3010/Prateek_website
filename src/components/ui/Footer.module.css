@@ -563,6 +563,18 @@
   color: #8a8a93;
 }
 
+.privacyLink {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: opacity var(--transition-fast);
+}
+
+.privacyLink:hover {
+  opacity: 1;
+  color: var(--color-link);
+}
+
 .analyticsLink {
   display: inline-flex;
   align-items: center;
