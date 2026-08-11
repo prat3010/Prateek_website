@@ -40,31 +40,33 @@ def audit_intake_sync():
         errors.append("resume.json is missing top-level 'intake' key.")
         return errors
 
-    # Check Engines 1:1 match
-    def_engines = {e["id"]: e for e in defaults.get("engines", [])}
-    res_engines = {e["id"]: e for e in resume_intake.get("engines", [])}
-    
-    missing_in_resume = set(def_engines.keys()) - set(res_engines.keys())
-    if missing_in_resume:
-        errors.append(f"resume.json intake.engines missing engine IDs: {missing_in_resume}")
-        
-    for eid, def_eng in def_engines.items():
-        if eid in res_engines:
-            res_eng = res_engines[eid]
-            for price_key in ("priceINR", "priceUSD"):
-                if def_eng.get(price_key) != res_eng.get(price_key):
-                    errors.append(
-                        f"Engine '{eid}' price mismatch on '{price_key}': "
-                        f"defaults={def_eng.get(price_key)} vs resume.json={res_eng.get(price_key)}"
-                    )
+    sections = [
+        ("engines", "priceINR", "priceUSD"),
+        ("features", "priceINR", "priceUSD"),
+        ("goals",),
+        ("brandAssets", "priceINR", "priceUSD"),
+        ("maintenancePlans", "priceINR", "priceUSD"),
+    ]
 
-    # Check Care Plans 1:1 match
-    def_plans = {p["id"]: p for p in defaults.get("maintenancePlans", [])}
-    res_plans = {p["id"]: p for p in resume_intake.get("maintenancePlans", [])}
-    
-    missing_plans = set(def_plans.keys()) - set(res_plans.keys())
-    if missing_plans:
-        errors.append(f"resume.json intake.maintenancePlans missing plan IDs: {missing_plans}")
+    for sec_tuple in sections:
+        sec = sec_tuple[0]
+        price_keys = sec_tuple[1:]
+        def_items = {item["id"]: item for item in defaults.get(sec, [])}
+        res_items = {item["id"]: item for item in resume_intake.get(sec, [])}
+
+        missing = set(def_items.keys()) - set(res_items.keys())
+        if missing:
+            errors.append(f"resume.json intake.{sec} missing IDs: {missing}")
+
+        for item_id, def_item in def_items.items():
+            if item_id in res_items:
+                res_item = res_items[item_id]
+                for pk in price_keys:
+                    if def_item.get(pk) != res_item.get(pk):
+                        errors.append(
+                            f"Section '{sec}' item '{item_id}' price mismatch on '{pk}': "
+                            f"defaults={def_item.get(pk)} vs resume.json={res_item.get(pk)}"
+                        )
 
     return errors
 

@@ -83,29 +83,40 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   const [currency, setCurrency] = useState<Currency>(() => resolveDefaultCurrency(region));
   const intakeConfig = resumeData?.intake;
 
-  const engines = useMemo(
-    () => (intakeConfig?.engines?.length ? intakeConfig.engines : BASE_ENGINES),
-    [intakeConfig]
-  );
-  const features = useMemo(() => {
-    const rawFeatures = intakeConfig?.features?.length ? intakeConfig.features : FEATURE_MODULES;
-    const existingIds = new Set(rawFeatures.map(f => f.id));
-    const missingDefaults = FEATURE_MODULES.filter(f => !existingIds.has(f.id));
-    return [...rawFeatures, ...missingDefaults];
+  const engines = useMemo(() => {
+    const raw = intakeConfig?.engines?.length ? intakeConfig.engines : BASE_ENGINES;
+    const ids = new Set(raw.map((item: BaseEngineItem) => item.id));
+    const missing = BASE_ENGINES.filter((item: BaseEngineItem) => !ids.has(item.id));
+    return [...raw, ...missing];
   }, [intakeConfig]);
-  const goals = useMemo(
-    () => (intakeConfig?.goals?.length ? intakeConfig.goals : GOAL_ARCHETYPES),
-    [intakeConfig]
-  );
-  const brandAssets = useMemo(
-    () => (intakeConfig?.brandAssets?.length ? intakeConfig.brandAssets : BRAND_ASSET_OPTIONS),
-    [intakeConfig]
-  );
-  const maintenancePlans = useMemo(
-    () =>
-      intakeConfig?.maintenancePlans?.length ? intakeConfig.maintenancePlans : MAINTENANCE_PLANS,
-    [intakeConfig]
-  );
+
+  const features = useMemo(() => {
+    const raw = intakeConfig?.features?.length ? intakeConfig.features : FEATURE_MODULES;
+    const ids = new Set(raw.map((item: FeatureItem) => item.id));
+    const missing = FEATURE_MODULES.filter((item: FeatureItem) => !ids.has(item.id));
+    return [...raw, ...missing];
+  }, [intakeConfig]);
+
+  const goals = useMemo(() => {
+    const raw = intakeConfig?.goals?.length ? intakeConfig.goals : GOAL_ARCHETYPES;
+    const ids = new Set(raw.map((item: GoalArchetype) => item.id));
+    const missing = GOAL_ARCHETYPES.filter((item: GoalArchetype) => !ids.has(item.id));
+    return [...raw, ...missing];
+  }, [intakeConfig]);
+
+  const brandAssets = useMemo(() => {
+    const raw = intakeConfig?.brandAssets?.length ? intakeConfig.brandAssets : BRAND_ASSET_OPTIONS;
+    const ids = new Set(raw.map((item: BrandAssetOption) => item.id));
+    const missing = BRAND_ASSET_OPTIONS.filter((item: BrandAssetOption) => !ids.has(item.id));
+    return [...raw, ...missing];
+  }, [intakeConfig]);
+
+  const maintenancePlans = useMemo(() => {
+    const raw = intakeConfig?.maintenancePlans?.length ? intakeConfig.maintenancePlans : MAINTENANCE_PLANS;
+    const ids = new Set(raw.map((item: MaintenancePlanOption) => item.id));
+    const missing = MAINTENANCE_PLANS.filter((item: MaintenancePlanOption) => !ids.has(item.id));
+    return [...raw, ...missing];
+  }, [intakeConfig]);
   const timelineOptions = intakeConfig?.timelineOptions || [
     'Express Delivery Sprint (7–10 Days - Rush Fee Applies)',
     'Standard Turnaround (2–4 Weeks)',
