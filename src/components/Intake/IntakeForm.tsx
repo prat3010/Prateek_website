@@ -1038,90 +1038,34 @@ interface IntakeFormData {
                   </div>
 
                   <div className={styles.field}>
-                    <label className={styles.label}>UI Design &amp; Layout Readiness</label>
-                    <p className={styles.fieldHint}>Select your current design readiness level to pair the appropriate design system assets.</p>
-                    <div className={styles.checkboxGrid} role="radiogroup" aria-label="UI Design Readiness">
-                      {[
-                        {
-                          id: 'figma_ready',
-                          title: '🎨 Figma / Specs Ready',
-                          description: 'Client provides finalized Figma frames, design tokens, or UI specs.',
-                          priceLabel: 'Included in Base Engine (₹0 / $0)'
-                        },
-                        {
-                          id: 'wireframes_ready',
-                          title: '📐 Wireframes / Sketches Ready',
-                          description: 'Wireframes or sketches converted to production UI with technical copywriting.',
-                          priceLabel: `Pairs with Copywriting & Layout (+${formatPricePair(15000, 200, currency)})`
-                        },
-                        {
-                          id: 'concept_only',
-                          title: '💡 Concept Only (Needs Design System)',
-                          description: 'Unstructured concept requiring complete UI Design System & Brand Kit build.',
-                          priceLabel: `Pairs with Starter Brand Kit (+${formatPricePair(45000, 600, currency)})`
-                        }
-                      ].map(item => {
-                        const isSelected = formData.designReadiness === item.id;
-                        return (
-                          <button
-                            key={item.id}
-                            type="button"
-                            role="radio"
-                            aria-checked={isSelected}
-                            className={`${styles.checkboxCard} ${isSelected ? styles.checkboxCardSelected : ''}`}
-                            onClick={() => {
-                              let autoBrandId = formData.selectedBrandAssetId;
-                              if (item.id === 'figma_ready') {
-                                autoBrandId = brandAssets[0]?.id || 'ready';
-                              } else if (item.id === 'wireframes_ready') {
-                                autoBrandId = brandAssets[1]?.id || 'copy';
-                              } else if (item.id === 'concept_only') {
-                                autoBrandId = brandAssets[2]?.id || 'scratch';
-                              }
-                              setFormData({
-                                ...formData,
-                                designReadiness: item.id,
-                                selectedBrandAssetId: autoBrandId
-                              });
-                            }}
-                            style={{ flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left', padding: '12px 14px' }}
-                          >
-                            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center', gap: '8px' }}>
-                              <span style={{ fontWeight: 800, fontSize: '13px' }}>{item.title}</span>
-                              <span className={styles.itemPrice} style={{ fontSize: '10px' }}>{item.priceLabel}</span>
-                            </div>
-                            <p style={{ margin: '4px 0 0 0', fontSize: '11px', opacity: 0.8, lineHeight: 1.4 }}>{item.description}</p>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  <div className={styles.field}>
-                    <label className={styles.label}>Brand Readiness & Copywriting Add-on</label>
-                    <div className={styles.checkboxGrid}>
-                      {brandAssets.map(b => {
+                    <label className={styles.label}>Design System &amp; Content Readiness Tier</label>
+                    <p className={styles.fieldHint}>Select your current design and brand collateral status. This determines whether design system assets or copywriting support is added to your baseline build.</p>
+                    <div className={styles.checkboxGrid} role="radiogroup" aria-label="Design & Content Readiness">
+                      {brandAssets.map((b) => {
                         const isSelected = formData.selectedBrandAssetId === b.id;
+                        const mappedDesignReadiness =
+                          b.id === 'scratch' ? 'concept_only' : b.id === 'copy' ? 'wireframes_ready' : 'figma_ready';
+
                         return (
                           <label
                             key={b.id}
                             className={`${styles.checkboxCard} ${isSelected ? styles.checkboxCardSelected : ''}`}
-                            onClick={() => setFormData({ ...formData, selectedBrandAssetId: b.id })}
-                            style={{ cursor: 'pointer' }}
+                            onClick={() =>
+                              setFormData({
+                                ...formData,
+                                selectedBrandAssetId: b.id,
+                                designReadiness: mappedDesignReadiness,
+                              })
+                            }
+                            style={{ cursor: 'pointer', flexDirection: 'column', alignItems: 'flex-start', padding: '14px 16px' }}
                           >
-                            <input
-                              type="radio"
-                              name="brandAsset"
-                              checked={isSelected}
-                              onChange={() => setFormData({ ...formData, selectedBrandAssetId: b.id })}
-                            />
-                            <div style={{ flex: 1 }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <span style={{ fontWeight: 700 }}>{b.label}</span>
-                                <span className={styles.priceBadge}>{b.priceINR > 0 ? `+${priceInCurrency(b.priceINR, b.priceUSD)}` : 'Included'}</span>
-                              </div>
-                              <p style={{ margin: '2px 0 0 0', fontSize: '11px', opacity: 0.7 }}>{b.description}</p>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center', gap: '8px' }}>
+                              <span style={{ fontWeight: 800, fontSize: '13px' }}>{b.label}</span>
+                              <span className={styles.itemPrice} style={{ fontSize: '11px', fontWeight: 700 }}>
+                                {b.priceINR > 0 ? `+${formatPricePair(b.priceINR, b.priceUSD, currency)}` : 'Included in Base Engine'}
+                              </span>
                             </div>
+                            <p style={{ margin: '6px 0 0 0', fontSize: '11px', opacity: 0.8, lineHeight: 1.45 }}>{b.description}</p>
                           </label>
                         );
                       })}
