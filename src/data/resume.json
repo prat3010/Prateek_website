@@ -364,6 +364,15 @@
         "priceUSD": 2400,
         "laymanDescription": "A production software foundation connected to a cloud database for web apps where users create accounts, manage data, and run software workflows.",
         "techSpecs": "Full Web App Shell, Supabase PostgreSQL Architecture, Server Caching (unstable_cache), Production Vercel Wiring"
+      },
+      {
+        "id": "standalone_embed",
+        "title": "Micro-Widget Script Core Engine",
+        "tier": "Tier 0",
+        "priceINR": 15000,
+        "priceUSD": 200,
+        "laymanDescription": "Standalone script loader and widget host for embedding single-purpose tools (chatbots, calculators, booking widgets) onto existing websites.",
+        "techSpecs": "Script Loader, iFrame Host, CORS Validation, Shadow DOM Isolation, Webhook Messaging"
       }
     ],
     "features": [
@@ -611,10 +620,8 @@
         "label": "💬 Standalone Embedded Chatbot Widget",
         "shortLabel": "Chatbot Widget",
         "description": "Embed a 24/7 chatbot widget into your existing website (WordPress, Webflow, Shopify, custom HTML) for simple lead capture or trained AI document search.",
-        "recommendedEngineId": "landing",
-        "compulsoryFeatureLabels": [
-          "Standalone Script Embed & CORS Host Module"
-        ]
+        "recommendedEngineId": "standalone_embed",
+        "compulsoryFeatureLabels": []
       },
       {
         "id": "custom",
