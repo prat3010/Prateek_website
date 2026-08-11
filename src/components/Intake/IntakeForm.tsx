@@ -1052,7 +1052,7 @@ interface IntakeFormData {
                           id: 'wireframes_ready',
                           title: '📐 Wireframes / Sketches Ready',
                           description: 'Wireframes, PDFs, or hand sketches translated into production UI.',
-                          priceLabel: 'Included with Prototyping'
+                          priceLabel: 'Included in Base Engine'
                         },
                         {
                           id: 'concept_only',
