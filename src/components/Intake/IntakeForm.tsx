@@ -284,7 +284,8 @@ interface IntakeFormData {
       ...prev,
       projectGoal: newGoalLabel,
       selectedBaseEngineId: newEngineId,
-      selectedFeatures: Array.from(mergedLabels)
+      selectedFeatures: Array.from(mergedLabels),
+      selectedBrandAssetId: archetype.id === 'standalone_chatbot' ? (brandAssets[0]?.id || 'ready') : prev.selectedBrandAssetId,
     }));
   };
 
@@ -991,7 +992,9 @@ interface IntakeFormData {
                     <div className={styles.stickyLeft}>
                       <span className={styles.stickyTitle}>⚡ Live Pure Additive Arithmetic Formula</span>
                       <span className={styles.stickyBreakdown}>
-                        {`Base (${selectedEngine.title}: ${priceInCurrency(selectedEngine.priceINR, selectedEngine.priceUSD)}) + Add-ons (${priceInCurrency(totalCost.featuresINR, totalCost.featuresUSD)})`}
+                        {`Base (${selectedEngine.title}: ${priceInCurrency(selectedEngine.priceINR, selectedEngine.priceUSD)})` +
+                         ` + Add-ons (${priceInCurrency(totalCost.featuresINR, totalCost.featuresUSD)})` +
+                         (totalCost.brandPriceINR > 0 ? ` + Brand Collateral (${priceInCurrency(totalCost.brandPriceINR, totalCost.brandPriceUSD)})` : '')}
                       </span>
                     </div>
                     <div className={styles.stickyTotal}>
