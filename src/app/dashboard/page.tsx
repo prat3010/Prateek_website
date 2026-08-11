@@ -20,15 +20,20 @@ import {
   Compass,
   FileCheck,
   FileText,
+  ExternalLink,
+  Check,
+  Calendar,
+  Lock,
   X
 } from 'lucide-react';
 import Portal from '@/components/ui/Portal';
 import { generateQuestionnairePDF, generateInvoicePDF } from '@/utils/pdfGenerator';
 import { dbToClientScope, type ClientScope, type InvoiceEntity, type CreateInvoiceInput } from '@/lib/clientOrder';
+import { generateOnboardingChecklist, calcOnboardingReadiness, type ChecklistItem } from '@/lib/onboardingChecklist';
 import { calculateInvoiceTotals, SUPPORTED_CURRENCIES, formatCurrencyAmount } from '@/lib/invoicing';
 import resumeData from '@/data/resume.json';
 import intakeDefaults from '@/data/intakeQuestionnaireDefaults.json';
-import { calcQuote } from '@/lib/pricing';
+import { calcQuote, formatMoney, type Currency } from '@/lib/pricing';
 import type { ResumeData } from '@/data/resume';
 import styles from './dashboard.module.css';
 
@@ -86,11 +91,20 @@ function recalculateScopeTotals(
 
 export default function ClientDashboardPage() {
   const { user, loading, logout, loginWithGoogle, getAccessToken } = useAuth();
-  const [activeTab, setActiveTab] = useState<'scopes' | 'invoices'>('scopes');
+  const [activeTab, setActiveTab] = useState<'scopes' | 'onboarding' | 'invoices'>('scopes');
   const [editingScopeId, setEditingScopeId] = useState<string | null>(null);
   const [newFeatureInput, setNewFeatureInput] = useState('');
   const [authGateError, setAuthGateError] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
+
+  // Scope Digital Sign-off & Milestone State
+  const [signingScope, setSigningScope] = useState<ClientScope | null>(null);
+  const [signoffTermsAgreed, setSignoffTermsAgreed] = useState(false);
+  const [signoffPaymentStructure, setSignoffPaymentStructure] = useState<'50/50' | '40/30/30'>('50/50');
+
+  // Dynamic Onboarding Checklist State
+  const [onboardingInputs, setOnboardingInputs] = useState<Record<string, Record<string, string>>>({});
+  const [activeCategoryFilter, setActiveCategoryFilter] = useState<'all' | 'financial' | 'technical' | 'design' | 'governance'>('all');
 
   // Invoices & Payment Ledger State
   const [invoices, setInvoices] = useState<InvoiceEntity[]>([]);
@@ -204,15 +218,62 @@ export default function ClientDashboardPage() {
           totalCostUSD: updatedScope.total_cost_usd,
           currency: updatedScope.currency,
           timeline: updatedScope.timeline,
+          businessKPI: updatedScope.business_kpi || '',
+          paymentStructure: updatedScope.payment_structure || '50/50',
+          signedAt: updatedScope.signed_at,
+          signedByEmail: updatedScope.signed_by_email,
+          onboardingChecklist: updatedScope.onboarding_checklist || {},
         }),
       })
         .then((res) => {
           if (res.status === 401) setAuthGateError(true);
         })
-        .catch((err) => console.warn('Save scope DB warning:', err));
     },
     [user?.email, getAccessToken]
   );
+
+  const handleOpenSignoffModal = (scope: ClientScope) => {
+    setSigningScope(scope);
+    setSignoffTermsAgreed(false);
+    setSignoffPaymentStructure((scope.payment_structure as '50/50' | '40/30/30') || '50/50');
+  };
+
+  const handleConfirmSignoffAndPay = async () => {
+    if (!signingScope || !user?.email) return;
+    if (!signoffTermsAgreed) {
+      alert('Please confirm that you agree to the commercial scoping specifications & engagement terms.');
+      return;
+    }
+
+    const updatedScope: ClientScope = {
+      ...signingScope,
+      signed_at: new Date().toISOString(),
+      signed_by_email: user.email,
+      payment_structure: signoffPaymentStructure,
+      status: 'Proposal Signed — Pending Deposit',
+    };
+
+    setScopes((prev) => prev.map((s) => (s.id === signingScope.id ? updatedScope : s)));
+    await saveScopeToDatabase(updatedScope);
+
+    const targetScope = updatedScope;
+    setSigningScope(null);
+    handleRazorpayCheckout(targetScope);
+  };
+
+  const handleToggleChecklistItem = (scope: ClientScope, itemId: string, value: boolean | string) => {
+    const currentChecklist = scope.onboarding_checklist || {};
+    const updatedChecklist = { ...currentChecklist, [itemId]: value };
+
+    setScopes((prev) =>
+      prev.map((s) => {
+        if (s.id !== scope.id) return s;
+        const updated = { ...s, onboarding_checklist: updatedChecklist };
+        saveScopeToDatabase(updated);
+        return updated;
+      })
+    );
+  };
 
   // Fetch client's persisted scopes from Supabase multi-device DB
   React.useEffect(() => {
@@ -791,10 +852,16 @@ export default function ClientDashboardPage() {
           <Layers size={16} /> Active Scopes ({scopes.length})
         </button>
         <button
+          className={`${styles.tabBtn} ${activeTab === 'onboarding' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('onboarding')}
+        >
+          <CheckCircle2 size={16} /> Onboarding &amp; Kickoff ({scopes.length})
+        </button>
+        <button
           className={`${styles.tabBtn} ${activeTab === 'invoices' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('invoices')}
         >
-          <CreditCard size={16} /> Invoices & Receipts
+          <CreditCard size={16} /> Invoices &amp; Receipts
         </button>
       </div>
 
@@ -1045,9 +1112,17 @@ export default function ClientDashboardPage() {
                         <Download size={15} style={{ marginRight: '0.4rem' }} /> PDF Brief
                       </button>
 
+                      <button
+                        type="button"
+                        className="comic-btn comic-btn-outline"
+                        onClick={() => setActiveTab('onboarding')}
+                      >
+                        <CheckCircle2 size={15} style={{ marginRight: '0.4rem' }} /> View Onboarding Tasks
+                      </button>
+
                       {s.deposit_paid ? (
                         <div className={styles.paidNotice}>
-                          <CheckCircle2 size={16} /> 50% Deposit Locked — Development In Core Engineering
+                          <CheckCircle2 size={16} /> Deposit Paid — Engineering In Progress
                         </div>
                       ) : (
                         <div className={styles.paymentContainer} style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
@@ -1055,14 +1130,159 @@ export default function ClientDashboardPage() {
                             type="button"
                             className="comic-btn comic-btn-blue"
                             disabled={payingScopeId === s.id}
-                            onClick={() => handleRazorpayCheckout(s)}
+                            onClick={() => handleOpenSignoffModal(s)}
                             style={{ display: 'inline-flex', alignItems: 'center' }}
                           >
                             <Zap size={15} style={{ marginRight: '0.4rem' }} />
-                            {payingScopeId === s.id ? 'Initializing Razorpay...' : 'Pay 50% Scope Deposit (Razorpay)'}
+                            {s.signed_at ? 'Pay Deposit & Launch Build' : 'Accept Scope & Sign Terms'}
                           </button>
                         </div>
                       )}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        )}
+
+        {activeTab === 'onboarding' && (
+          <div className={styles.sectionGrid}>
+            {scopes.length === 0 ? (
+              <div className={styles.emptyCard}>
+                <p>No active scopes found. Create a project scope in our Scoping Lab to view your tailored onboarding checklist!</p>
+                <a href="/scoping" className="comic-btn comic-btn-blue" style={{ marginTop: '1rem', display: 'inline-block' }}>
+                  Open Scoping Lab
+                </a>
+              </div>
+            ) : (
+              scopes.map((s) => {
+                const checklist = generateOnboardingChecklist(s);
+                const readiness = calcOnboardingReadiness(s);
+
+                const filteredChecklist = checklist.filter((item) => {
+                  if (activeCategoryFilter === 'all') return true;
+                  return item.category === activeCategoryFilter;
+                });
+
+                return (
+                  <div key={s.id} className={styles.orderCard}>
+                    <div className={styles.orderHeader}>
+                      <div>
+                        <span className={styles.scopeBadge}>{s.scope_code}</span>
+                        <h3 className={styles.companyName}>{s.company_name || 'My Custom Project'} — Onboarding Checklist</h3>
+                      </div>
+                      <div className={styles.readinessPill}>
+                        <strong>{readiness.percent}% Assets Collected</strong>
+                      </div>
+                    </div>
+
+                    {/* Onboarding Readiness Meter */}
+                    <div className={styles.readinessBox}>
+                      <div className={styles.readinessMeta}>
+                        <span>📋 Onboarding Readiness Score</span>
+                        <span>{readiness.completed} of {readiness.total} Items Completed ({readiness.percent}%)</span>
+                      </div>
+                      <div className={styles.readinessTrack}>
+                        <div className={styles.readinessFill} style={{ width: `${readiness.percent}%` }} />
+                      </div>
+                    </div>
+
+                    {/* Category Filter Buttons */}
+                    <div className={styles.categoryFilterRow}>
+                      {[
+                        { id: 'all', label: 'All Tasks' },
+                        { id: 'financial', label: '💳 Financial' },
+                        { id: 'technical', label: '🛠️ Technical Keys' },
+                        { id: 'design', label: '🎨 Design Assets' },
+                        { id: 'governance', label: '🏛️ Governance' },
+                      ].map((cat) => (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          className={`${styles.categoryFilterBtn} ${activeCategoryFilter === cat.id ? styles.categoryFilterBtnActive : ''}`}
+                          onClick={() => setActiveCategoryFilter(cat.id as any)}
+                        >
+                          {cat.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Checklist Task Items Grid */}
+                    <div className={styles.checklistGrid}>
+                      {filteredChecklist.map((item) => {
+                        const isCompleted = item.id === 'deposit_upfront' ? s.deposit_paid : Boolean(s.onboarding_checklist?.[item.id]);
+                        const textVal = typeof s.onboarding_checklist?.[item.id] === 'string' ? (s.onboarding_checklist?.[item.id] as string) : '';
+
+                        return (
+                          <div
+                            key={item.id}
+                            className={`${styles.checklistItemCard} ${isCompleted ? styles.checklistItemCompleted : ''}`}
+                          >
+                            <div className={styles.checklistItemHeader}>
+                              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={isCompleted}
+                                  disabled={item.id === 'deposit_upfront' && s.deposit_paid}
+                                  onChange={(e) => handleToggleChecklistItem(s, item.id, e.target.checked)}
+                                  className={styles.checklistCheckbox}
+                                />
+                                <div>
+                                  <div className={styles.checklistItemTitle}>
+                                    {item.title}
+                                    {item.isMandatory && <span className={styles.mandatoryTag}>REQUIRED</span>}
+                                  </div>
+                                  <p className={styles.checklistItemDesc}>{item.description}</p>
+                                </div>
+                              </div>
+                              <span className={styles.categoryTag}>{item.category.toUpperCase()}</span>
+                            </div>
+
+                            {/* Input / Action Area */}
+                            {(item.inputType === 'text' || item.inputType === 'link') && (
+                              <div className={styles.checklistInputRow}>
+                                <input
+                                  type="text"
+                                  className={styles.checklistInput}
+                                  placeholder={item.placeholder || 'Enter value...'}
+                                  value={onboardingInputs[s.id]?.[item.id] ?? textVal}
+                                  onChange={(e) =>
+                                    setOnboardingInputs({
+                                      ...onboardingInputs,
+                                      [s.id]: { ...(onboardingInputs[s.id] || {}), [item.id]: e.target.value },
+                                    })
+                                  }
+                                />
+                                <button
+                                  type="button"
+                                  className="comic-btn comic-btn-blue"
+                                  style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
+                                  onClick={() => {
+                                    const valToSave = onboardingInputs[s.id]?.[item.id] ?? textVal;
+                                    handleToggleChecklistItem(s, item.id, valToSave);
+                                  }}
+                                >
+                                  Save
+                                </button>
+                              </div>
+                            )}
+
+                            {item.inputType === 'payment' && !s.deposit_paid && (
+                              <div style={{ marginTop: '0.6rem' }}>
+                                <button
+                                  type="button"
+                                  className="comic-btn comic-btn-blue"
+                                  onClick={() => handleOpenSignoffModal(s)}
+                                  style={{ fontSize: '0.8rem', padding: '0.35rem 0.75rem' }}
+                                >
+                                  <Zap size={13} style={{ marginRight: '0.3rem' }} /> {item.actionLabel || 'Pay Deposit'}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 );
@@ -1565,6 +1785,105 @@ export default function ClientDashboardPage() {
             </div>
           </Portal>
         )}
+
+      {/* Scope Digital Sign-off & Commercial Terms Modal */}
+      {signingScope && (
+        <Portal>
+          <div className={styles.modalOverlay} onClick={() => setSigningScope(null)}>
+            <div className={styles.signoffModalBox} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.modalHeader}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <ShieldCheck size={22} style={{ color: '#2563eb' }} />
+                  <h3 style={{ margin: 0, fontSize: '1.1rem' }}>COMMERCIAL PROPOSAL SIGN-OFF &amp; TERMS CONFIRMATION</h3>
+                </div>
+                <X size={18} style={{ cursor: 'pointer' }} onClick={() => setSigningScope(null)} />
+              </div>
+
+              <div className={styles.modalBody}>
+                <div className={styles.signoffScopeSummary}>
+                  <div className={styles.signoffRow}>
+                    <span>Scope Ref Code:</span>
+                    <strong>{signingScope.scope_code}</strong>
+                  </div>
+                  <div className={styles.signoffRow}>
+                    <span>Client / Company:</span>
+                    <strong>{signingScope.company_name || 'My Custom Project'}</strong>
+                  </div>
+                  <div className={styles.signoffRow}>
+                    <span>Architecture Engine:</span>
+                    <strong>{signingScope.base_engine}</strong>
+                  </div>
+                  <div className={styles.signoffRow}>
+                    <span>Primary Business Goal / KPI:</span>
+                    <strong>{signingScope.business_kpi || '🚀 Increase Lead & Customer Conversion Rate'}</strong>
+                  </div>
+                  <div className={styles.signoffRow}>
+                    <span>Included Scope Modules ({signingScope.features.length}):</span>
+                    <span style={{ fontSize: '0.8rem', opacity: 0.9 }}>{signingScope.features.join(', ')}</span>
+                  </div>
+                </div>
+
+                <div style={{ margin: '1.25rem 0' }}>
+                  <label style={{ fontWeight: 700, fontSize: '0.9rem', display: 'block', marginBottom: '0.6rem' }}>
+                    Select Preferred Deposit &amp; Milestone Payment Structure
+                  </label>
+                  <div className={styles.paymentStructureGrid}>
+                    <div
+                      className={`${styles.structureCard} ${signoffPaymentStructure === '50/50' ? styles.structureCardSelected : ''}`}
+                      onClick={() => setSignoffPaymentStructure('50/50')}
+                    >
+                      <div className={styles.structureTitle}>50 / 50 Standard Milestone Split</div>
+                      <p className={styles.structureDesc}>
+                        50% Upfront Development Deposit ({formatMoney(Math.round((signingScope.currency === 'USD' ? signingScope.total_cost_usd : signingScope.total_cost_inr) * 0.5), (signingScope.currency === 'USD' ? 'USD' : 'INR') as Currency)})
+                        {' + '}50% Final Balance prior to production handover.
+                      </p>
+                    </div>
+
+                    <div
+                      className={`${styles.structureCard} ${signoffPaymentStructure === '40/30/30' ? styles.structureCardSelected : ''}`}
+                      onClick={() => setSignoffPaymentStructure('40/30/30')}
+                    >
+                      <div className={styles.structureTitle}>40 / 30 / 30 Three-Part Milestone Split</div>
+                      <p className={styles.structureDesc}>
+                        40% Upfront Deposit ({formatMoney(Math.round((signingScope.currency === 'USD' ? signingScope.total_cost_usd : signingScope.total_cost_inr) * 0.4), (signingScope.currency === 'USD' ? 'USD' : 'INR') as Currency)})
+                        {' + '}30% Beta Milestone Sign-off + 30% Final Balance Handover.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.signoffTermsBox}>
+                  <label className={styles.termsCheckboxLabel}>
+                    <input
+                      type="checkbox"
+                      checked={signoffTermsAgreed}
+                      onChange={(e) => setSignoffTermsAgreed(e.target.checked)}
+                      style={{ marginTop: '0.2rem', cursor: 'pointer' }}
+                    />
+                    <span style={{ fontSize: '0.85rem', lineHeight: 1.5 }}>
+                      I confirm and approve the itemized scope specification, commercial milestone terms, 2 rounds of layout revisions, and 100% intellectual property transfer upon final payment.
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              <div className={styles.modalFooter}>
+                <button type="button" className="comic-btn comic-btn-outline" onClick={() => setSigningScope(null)}>
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="comic-btn comic-btn-blue"
+                  disabled={!signoffTermsAgreed}
+                  onClick={handleConfirmSignoffAndPay}
+                >
+                  <Zap size={16} style={{ marginRight: '0.4rem' }} /> Confirm Signature &amp; Pay Upfront Deposit
+                </button>
+              </div>
+            </div>
+          </div>
+        </Portal>
+      )}
       </div>
     </div>
   );

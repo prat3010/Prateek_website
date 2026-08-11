@@ -25,6 +25,7 @@ export interface QuestionnaireData {
   contactEmail?: string;
   contactPhone?: string;
   projectGoal?: string;
+  businessKPI?: string;
   targetAudience?: string;
   projectCategory?: string;
   projectStartType?: string;

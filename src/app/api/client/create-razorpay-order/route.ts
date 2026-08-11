@@ -43,6 +43,7 @@ export async function POST(req: Request) {
       total_cost_inr?: number;
       total_cost_usd?: number;
       company_name?: string;
+      payment_structure?: string;
     } | null = null;
 
     try {
@@ -72,7 +73,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid scope cost amount.' }, { status: 400 });
     }
 
-    const depositAmount = Math.round(rawTotal * 0.5);
+    const isThreePart = scope.payment_structure === '40/30/30';
+    const multiplier = isThreePart ? 0.4 : 0.5;
+    const depositAmount = Math.round(rawTotal * multiplier);
 
     // Convert USD to INR for standard Razorpay checkout to prevent "International cards not supported" error
     const razorpayCurrency = 'INR';

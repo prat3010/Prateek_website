@@ -181,6 +181,7 @@ interface IntakeFormData {
   contactEmail: string;
   contactPhone: string;
   projectGoal: string;
+  businessKPI: string;
   projectStartType: string;
   targetAudience: string;
   selectedBaseEngineId: string;
@@ -207,6 +208,7 @@ interface IntakeFormData {
             contactEmail: parsed.contactEmail || '',
             contactPhone: parsed.contactPhone || '',
             projectGoal: parsed.projectGoal || initialArchetype.label,
+            businessKPI: parsed.businessKPI || '🚀 Increase Lead & Customer Conversion Rate',
             projectStartType: parsed.projectStartType || 'greenfield',
             targetAudience: parsed.targetAudience || '',
             selectedBaseEngineId: parsed.selectedBaseEngineId || initialArchetype.recommendedEngineId,
@@ -230,6 +232,7 @@ interface IntakeFormData {
       contactEmail: '',
       contactPhone: '',
       projectGoal: initialArchetype.label,
+      businessKPI: '🚀 Increase Lead & Customer Conversion Rate',
       projectStartType: 'greenfield',
       targetAudience: '',
       selectedBaseEngineId: initialArchetype.recommendedEngineId,
@@ -412,6 +415,7 @@ interface IntakeFormData {
     contactEmail: formData.contactEmail,
     contactPhone: formData.contactPhone,
     projectGoal: formData.projectGoal,
+    businessKPI: formData.businessKPI,
     projectStartType: formData.projectStartType === 'legacy_rebuild' ? 'Legacy Refactor / Rebuild' : 'Greenfield Build (From Scratch)',
     designReadiness: formData.designReadiness === 'concept_only'
       ? 'Concept Only (Needs Design System)'
@@ -511,6 +515,7 @@ interface IntakeFormData {
         contactEmail: formData.contactEmail,
         contactPhone: formData.contactPhone,
         projectGoal: formData.projectGoal,
+        businessKPI: formData.businessKPI,
         projectStartType: formData.projectStartType === 'legacy_rebuild' ? 'Legacy Refactor' : 'Greenfield',
         designReadiness: formData.designReadiness,
         hostingOwnership: formData.hostingOwnership,
@@ -750,6 +755,26 @@ interface IntakeFormData {
                         );
                       })}
                     </div>
+                  </div>
+
+                  <div className={styles.field}>
+                    <label className={styles.label}>Primary Business Goal &amp; Key Success Metric</label>
+                    <select
+                      className={styles.select}
+                      value={formData.businessKPI}
+                      onChange={e => setFormData({ ...formData, businessKPI: e.target.value })}
+                    >
+                      {[
+                        '🚀 Increase Lead & Customer Conversion Rate',
+                        '⚡ Accelerate Application Speed & Performance (LCP/CWV)',
+                        '🛠️ Launch MVP Product to Market Rapidly',
+                        '🎨 Modernize Legacy Web Infrastructure & Brand Identity',
+                        '🤖 Automate Business Workflows with AI Integration',
+                        '🔐 Enterprise Security, Compliance & User RBAC'
+                      ].map(kpi => (
+                        <option key={kpi} value={kpi}>{kpi}</option>
+                      ))}
+                    </select>
                   </div>
 
                   <div className={styles.field}>

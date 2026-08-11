@@ -16,6 +16,11 @@ export interface ClientScope {
   status: string;
   delivery_stage?: ClientDeliveryStage;
   deposit_paid: boolean;
+  business_kpi?: string;
+  payment_structure?: '50/50' | '40/30/30' | string;
+  signed_at?: string;
+  signed_by_email?: string;
+  onboarding_checklist?: Record<string, boolean | string>;
   created_at: string;
 }
 
@@ -167,10 +172,20 @@ export interface ClientOrderRow {
   status?: string;
   delivery_stage?: ClientDeliveryStage;
   deposit_paid?: boolean;
+  business_kpi?: string;
+  payment_structure?: string;
+  signed_at?: string;
+  signed_by_email?: string;
+  onboarding_checklist?: Record<string, boolean | string> | unknown;
   created_at?: string;
 }
 
 export function dbToClientScope(row: ClientOrderRow): ClientScope {
+  let checklistParsed: Record<string, boolean | string> = {};
+  if (row.onboarding_checklist && typeof row.onboarding_checklist === 'object') {
+    checklistParsed = row.onboarding_checklist as Record<string, boolean | string>;
+  }
+
   return {
     id: row.id || `scope-${row.scope_code}`,
     scope_code: row.scope_code,
@@ -187,6 +202,11 @@ export function dbToClientScope(row: ClientOrderRow): ClientScope {
     status: row.status || 'Draft Proposal',
     delivery_stage: row.delivery_stage || 'architecture',
     deposit_paid: Boolean(row.deposit_paid),
+    business_kpi: row.business_kpi || '',
+    payment_structure: row.payment_structure || '50/50',
+    signed_at: row.signed_at || undefined,
+    signed_by_email: row.signed_by_email || '',
+    onboarding_checklist: checklistParsed,
     created_at: row.created_at || new Date().toISOString(),
   };
 }

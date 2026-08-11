@@ -219,9 +219,20 @@ CREATE TABLE IF NOT EXISTS client_scopes (
   status TEXT DEFAULT 'Draft Proposal',
   delivery_stage TEXT DEFAULT 'architecture',
   deposit_paid BOOLEAN DEFAULT false,
+  business_kpi TEXT DEFAULT '',
+  payment_structure TEXT DEFAULT '50/50',
+  signed_at TIMESTAMPTZ,
+  signed_by_email TEXT DEFAULT '',
+  onboarding_checklist JSONB DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS business_kpi TEXT DEFAULT '';
+ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS payment_structure TEXT DEFAULT '50/50';
+ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS signed_at TIMESTAMPTZ;
+ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS signed_by_email TEXT DEFAULT '';
+ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS onboarding_checklist JSONB DEFAULT '{}';
 
 ALTER TABLE client_scopes ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Clients can select own client_scopes" ON client_scopes;

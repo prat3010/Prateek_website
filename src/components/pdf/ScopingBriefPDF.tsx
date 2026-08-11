@@ -373,6 +373,12 @@ export function ScopingBriefPDF({ resumeData, data, isNoir, currency = 'INR' }: 
           <Text style={styles.fieldLabel}>Primary Business Goal:</Text>
           <Text style={styles.fieldVal}>{projectGoal}</Text>
         </View>
+        {data?.businessKPI ? (
+          <View style={styles.fieldRow}>
+            <Text style={styles.fieldLabel}>Target Business KPI:</Text>
+            <Text style={styles.fieldVal}>{cleanPDFText(data.businessKPI)}</Text>
+          </View>
+        ) : null}
         <View style={styles.fieldRow}>
           <Text style={styles.fieldLabel}>Target Audience Persona:</Text>
           <Text style={styles.fieldVal}>{targetAudience}</Text>
@@ -458,10 +464,14 @@ export function ScopingBriefPDF({ resumeData, data, isNoir, currency = 'INR' }: 
           </View>
         </View>
 
-        <Text style={styles.sectionHeader}>4. BRAND ASSET & CONTENT INVENTORY</Text>
+        <Text style={styles.sectionHeader}>4. BRAND ASSETS & EXCLUSION BOUNDARIES</Text>
         <View style={styles.fieldRow}>
           <Text style={styles.fieldLabel}>Brand Assets Status:</Text>
           <Text style={styles.fieldVal}>{assetsStatus}</Text>
+        </View>
+        <View style={styles.fieldRow}>
+          <Text style={styles.fieldLabel}>Standard Exclusions:</Text>
+          <Text style={styles.fieldVal}>Copywriting, third-party API licensing, custom 3D renders, and non-scoped integrations.</Text>
         </View>
         <View style={styles.fieldRow}>
           <Text style={styles.fieldLabel}>Visual & Competitor Inspo:</Text>

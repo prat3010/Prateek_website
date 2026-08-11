@@ -82,6 +82,11 @@ export async function POST(req: Request) {
       total_cost_usd: Number(payload.totalCostUSD) || 0,
       currency: payload.currency || 'INR',
       timeline: payload.timeline || 'Standard Turnaround',
+      business_kpi: payload.businessKPI || payload.business_kpi || '',
+      payment_structure: payload.paymentStructure || payload.payment_structure || '50/50',
+      signed_at: payload.signedAt || payload.signed_at || undefined,
+      signed_by_email: payload.signedByEmail || payload.signed_by_email || undefined,
+      onboarding_checklist: payload.onboardingChecklist || payload.onboarding_checklist || {},
       updated_at: new Date().toISOString(),
     };
 
