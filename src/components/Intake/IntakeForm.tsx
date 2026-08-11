@@ -1046,18 +1046,18 @@ interface IntakeFormData {
                           id: 'figma_ready',
                           title: '🎨 Figma / Specs Ready',
                           description: 'Client provides finalized Figma frames, design tokens, or UI specs.',
-                          priceLabel: 'Included in Base Engine'
+                          priceLabel: 'Included in Base Engine (₹0 / $0)'
                         },
                         {
                           id: 'wireframes_ready',
                           title: '📐 Wireframes / Sketches Ready',
-                          description: 'Wireframes, PDFs, or hand sketches translated into production UI.',
-                          priceLabel: 'Included in Base Engine'
+                          description: 'Wireframes or sketches converted to production UI with technical copywriting.',
+                          priceLabel: `Pairs with Copywriting & Layout (+${formatPricePair(15000, 200, currency)})`
                         },
                         {
                           id: 'concept_only',
                           title: '💡 Concept Only (Needs Design System)',
-                          description: 'Idea only. Requires complete UI Design System & Component Library build.',
+                          description: 'Unstructured concept requiring complete UI Design System & Brand Kit build.',
                           priceLabel: `Pairs with Starter Brand Kit (+${formatPricePair(45000, 600, currency)})`
                         }
                       ].map(item => {
@@ -1070,9 +1070,14 @@ interface IntakeFormData {
                             aria-checked={isSelected}
                             className={`${styles.checkboxCard} ${isSelected ? styles.checkboxCardSelected : ''}`}
                             onClick={() => {
-                              const autoBrandId = item.id === 'concept_only' && formData.selectedBrandAssetId === brandAssets[0]?.id
-                                ? (brandAssets[1]?.id || brandAssets[0]?.id)
-                                : formData.selectedBrandAssetId;
+                              let autoBrandId = formData.selectedBrandAssetId;
+                              if (item.id === 'figma_ready') {
+                                autoBrandId = brandAssets[0]?.id || 'ready';
+                              } else if (item.id === 'wireframes_ready') {
+                                autoBrandId = brandAssets[1]?.id || 'copy';
+                              } else if (item.id === 'concept_only') {
+                                autoBrandId = brandAssets[2]?.id || 'scratch';
+                              }
                               setFormData({
                                 ...formData,
                                 designReadiness: item.id,
