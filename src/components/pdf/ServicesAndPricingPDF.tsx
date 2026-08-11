@@ -141,7 +141,7 @@ function createStyles(theme: PDFThemeConfig) {
       flexDirection: 'row',
       borderBottomWidth: 1,
       borderBottomColor: theme.tableRowAlt,
-      padding: '3.8 5',
+      padding: '2.8 5',
       alignItems: 'flex-start',
     },
     tableRowHighlight: {

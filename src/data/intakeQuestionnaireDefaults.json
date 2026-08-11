@@ -26,15 +26,6 @@
       "priceUSD": 2400,
       "laymanDescription": "A production software foundation connected to a cloud database for web apps where users create accounts, manage data, and run software workflows.",
       "techSpecs": "Full Web App Shell, Supabase PostgreSQL Architecture, Server Caching (unstable_cache), Production Vercel Wiring"
-    },
-    {
-      "id": "standalone_embed",
-      "title": "Standalone Widget Embed Core",
-      "tier": "Tier 0",
-      "priceINR": 15000,
-      "priceUSD": 200,
-      "laymanDescription": "Lightweight script embed for existing websites. Built with responsive widget UI, CORS security, and Shadow DOM isolation. Ideal for simple FAQ & lead-capture chatbots.",
-      "techSpecs": "Script Loader, iFrame Host, CORS Validation, Shadow DOM, Lead Capture API"
     }
   ],
   "features": [
@@ -161,6 +152,14 @@
       "priceUSD": 400,
       "laymanDescription": "Extracts, transforms, and imports user accounts, posts, or legacy SQL tables into your new cloud database.",
       "techSpecs": "ETL Pipeline, Supabase DB Schema Mapping, Data Cleansing, Foreign Key Integrity Verification, Migration Telemetry"
+    },
+    {
+      "id": "widget_embed",
+      "label": "Standalone Script Embed & CORS Host Module",
+      "priceINR": 15000,
+      "priceUSD": 200,
+      "laymanDescription": "Packaging your chatbot, booking widget, or web app as an installable 1-line script embed for external sites (WordPress, Webflow, Shopify).",
+      "techSpecs": "Script Loader, iFrame Host, CORS Domain Whitelisting, Shadow DOM CSS Isolation, Webhook Messaging"
     }
   ],
   "goals": [
@@ -259,8 +258,10 @@
       "label": "💬 Standalone Embedded Chatbot Widget",
       "shortLabel": "Chatbot Widget",
       "description": "Embed a 24/7 chatbot widget into your existing website (WordPress, Webflow, Shopify, custom HTML) for simple lead capture or trained AI document search.",
-      "recommendedEngineId": "standalone_embed",
-      "compulsoryFeatureLabels": []
+      "recommendedEngineId": "landing",
+      "compulsoryFeatureLabels": [
+        "Standalone Script Embed & CORS Host Module"
+      ]
     },
     {
       "id": "custom",
