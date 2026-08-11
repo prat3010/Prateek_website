@@ -89,12 +89,31 @@
     box-shadow var(--transition-normal);
 }
 
-/* ── Step Indicator ── */
+/* ── Step Indicator & Progress Track ── */
+
+.progressContainer {
+  margin-bottom: var(--space-xl);
+}
+
+.progressBarTrack {
+  width: 100%;
+  height: 4px;
+  background: var(--color-border);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: var(--space-md);
+}
+
+.progressBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--pop-blue) 0%, var(--pop-green) 100%);
+  border-radius: 999px;
+  transition: width 0.35s ease;
+}
 
 .stepIndicator {
   display: flex;
   justify-content: space-between;
-  margin-bottom: var(--space-2xl);
   position: relative;
   gap: var(--space-xs);
 }
@@ -121,6 +140,11 @@
   padding: 0 10px;
   cursor: pointer;
   border: none;
+  transition: transform 0.2s ease;
+}
+
+.stepItem:hover {
+  transform: translateY(-1px);
 }
 
 .stepBadge {
@@ -139,17 +163,17 @@
   transition: all 0.25s ease;
 }
 
-.stepItem.active .stepBadge {
-  background: var(--pop-blue);
-  color: #FFFFFF;
-  border-color: var(--pop-blue);
+.stepBadgeActive {
+  background: var(--pop-blue) !important;
+  color: #FFFFFF !important;
+  border-color: var(--pop-blue) !important;
   box-shadow: 0 0 12px rgba(90, 142, 182, 0.4);
 }
 
-.stepItem.completed .stepBadge {
-  background: var(--pop-green);
-  color: #FFFFFF;
-  border-color: var(--pop-green);
+.stepBadgeDone {
+  background: var(--pop-green) !important;
+  color: #FFFFFF !important;
+  border-color: var(--pop-green) !important;
 }
 
 .stepLabel {
@@ -161,9 +185,24 @@
   letter-spacing: 0.05em;
 }
 
-.stepItem.active .stepLabel {
-  color: var(--pop-black);
+.stepLabelActive {
+  color: var(--pop-black) !important;
   font-weight: 900;
+}
+
+.mobileStepSubhead {
+  display: none;
+  font-family: var(--font-code);
+  font-size: 12px;
+  color: var(--pop-blue);
+  margin-top: 10px;
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+
+.mobileStepSubhead span {
+  opacity: 0.7;
+  margin-right: 6px;
 }
 
 /* ── Form Step Content ── */
@@ -206,6 +245,124 @@
   letter-spacing: 0.05em;
 }
 
+.fieldHelpText {
+  font-family: var(--font-code);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin: -2px 0 6px 0;
+  line-height: 1.4;
+  opacity: 0.85;
+}
+
+/* ── Goal Archetype Cards (Step 1) ── */
+
+.archetypeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.archetypeCard {
+  background: #FFFFFF;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--border-radius-sm, 8px);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  box-shadow: 0 1px 4px rgba(43, 43, 54, 0.06);
+  position: relative;
+  outline: none;
+}
+
+.archetypeCard:hover {
+  border-color: var(--pop-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(43, 43, 54, 0.1);
+}
+
+.archetypeCard:focus-visible {
+  border-color: var(--pop-blue);
+  box-shadow: 0 0 0 3px rgba(90, 142, 182, 0.3);
+}
+
+.archetypeCardSelected {
+  border-color: var(--pop-blue);
+  border-left: 4px solid var(--pop-blue);
+  background: rgba(90, 142, 182, 0.06);
+  box-shadow: 0 0 0 2px rgba(90, 142, 182, 0.18), 0 4px 12px rgba(43, 43, 54, 0.08);
+}
+
+.archetypeHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.archetypeLabel {
+  font-family: var(--font-code);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--pop-black);
+  line-height: 1.3;
+}
+
+.selectedBadge {
+  font-family: var(--font-code);
+  font-size: 9px;
+  font-weight: 800;
+  color: #FFFFFF;
+  background: var(--pop-blue);
+  padding: 2px 7px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.archetypeDesc {
+  font-family: var(--font-code);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  line-height: 1.45;
+  margin: 0;
+  flex: 1;
+}
+
+.archetypeFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--color-border);
+}
+
+.engineTag {
+  font-family: var(--font-code);
+  font-size: 10px;
+  font-weight: 700;
+  color: #3F6E91;
+  background: var(--pop-cream);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+}
+
+.featureCountTag {
+  font-family: var(--font-code);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
 /* ── Inputs (light panels with warm ink borders) ── */
 
 .input, .textarea, .select {
@@ -235,7 +392,7 @@
 
 .checkboxGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: var(--space-sm);
   margin-top: var(--space-xs);
 }
@@ -300,6 +457,25 @@
 
 .lockedCard:hover {
   transform: none;
+}
+
+.lockedNotice {
+  font-family: var(--font-code);
+  font-size: 10px;
+  font-weight: 700;
+  color: #3F6E91;
+  background: rgba(90, 142, 182, 0.12);
+  border: 1px solid var(--pop-blue);
+  border-radius: 4px;
+  padding: 4px 8px;
+  margin-top: 6px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+:global([data-theme='noir']) .lockedNotice {
+  color: var(--neon-cyan, #00f0ff);
+  background: rgba(0, 240, 255, 0.12);
+  border-color: var(--neon-cyan, #00f0ff);
 }
 
 /* ── Action Bar ── */
@@ -397,7 +573,11 @@
 
 .stickyBar {
   margin-top: 16px;
-  background: var(--pop-black);
+  position: sticky;
+  bottom: 12px;
+  z-index: 40;
+  background: rgba(27, 27, 34, 0.95);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-sm);
   padding: 12px 16px;
@@ -407,7 +587,7 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 12px;
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .stickyLeft {
@@ -441,7 +621,7 @@
 
 .careGrid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 12px;
   margin-top: 10px;
 }
@@ -609,6 +789,9 @@
   .stepLabel {
     display: none;
   }
+  .mobileStepSubhead {
+    display: block;
+  }
   .actions {
     flex-direction: column-reverse;
     align-items: stretch;
@@ -671,25 +854,29 @@
   color: #e0e0e3;
 }
 
-:global([data-theme='noir']) .stepItem.active .stepBadge {
-  background: var(--neon-cyan, #00f0ff);
-  color: #08080a;
-  border-color: var(--neon-cyan, #00f0ff);
+:global([data-theme='noir']) .stepBadgeActive {
+  background: var(--neon-cyan, #00f0ff) !important;
+  color: #08080a !important;
+  border-color: var(--neon-cyan, #00f0ff) !important;
   box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
 }
 
-:global([data-theme='noir']) .stepItem.completed .stepBadge {
-  background: var(--neon-green, #39ff14);
-  color: #08080a;
-  border-color: var(--neon-green, #39ff14);
+:global([data-theme='noir']) .stepBadgeDone {
+  background: var(--neon-green, #39ff14) !important;
+  color: #08080a !important;
+  border-color: var(--neon-green, #39ff14) !important;
 }
 
 :global([data-theme='noir']) .stepLabel {
   color: #8a8a93;
 }
 
-:global([data-theme='noir']) .stepItem.active .stepLabel {
-  color: #FAFAFA;
+:global([data-theme='noir']) .stepLabelActive {
+  color: #FAFAFA !important;
+}
+
+:global([data-theme='noir']) .mobileStepSubhead {
+  color: var(--neon-cyan, #00f0ff);
 }
 
 :global([data-theme='noir']) .groupTitle {
@@ -698,6 +885,54 @@
 }
 
 :global([data-theme='noir']) .label {
+  color: #8a8a93;
+}
+
+:global([data-theme='noir']) .fieldHelpText {
+  color: #8a8a93;
+}
+
+:global([data-theme='noir']) .archetypeCard {
+  background: #0d0d10;
+  border: 1px solid #2F2F3D;
+  color: #e0e0e3;
+}
+
+:global([data-theme='noir']) .archetypeCard:hover {
+  border-color: var(--neon-cyan, #00f0ff);
+}
+
+:global([data-theme='noir']) .archetypeCardSelected {
+  border-color: var(--neon-cyan, #00f0ff);
+  border-left: 4px solid var(--neon-cyan, #00f0ff);
+  background: rgba(0, 240, 255, 0.08);
+  box-shadow: 0 0 0 2px rgba(0, 240, 255, 0.15), 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+:global([data-theme='noir']) .archetypeLabel {
+  color: #FAFAFA;
+}
+
+:global([data-theme='noir']) .selectedBadge {
+  background: var(--neon-cyan, #00f0ff);
+  color: #08080a;
+}
+
+:global([data-theme='noir']) .archetypeDesc {
+  color: #8a8a93;
+}
+
+:global([data-theme='noir']) .archetypeFooter {
+  border-top-color: #2F2F3D;
+}
+
+:global([data-theme='noir']) .engineTag {
+  background: #08080a;
+  color: var(--neon-cyan, #00f0ff);
+  border-color: #2F2F3D;
+}
+
+:global([data-theme='noir']) .featureCountTag {
   color: #8a8a93;
 }
 
@@ -777,7 +1012,7 @@
 }
 
 :global([data-theme='noir']) .stickyBar {
-  background: #030304;
+  background: rgba(3, 3, 4, 0.95);
   border: 1px solid #2F2F3D;
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.9);
 }
@@ -908,6 +1143,8 @@
   font-size: 12px;
   color: #475569;
   line-height: 1.5;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
 }
 
 .termsContentBox p {

@@ -13,7 +13,10 @@ import {
   ShieldCheck,
   Layers,
   X,
-  Lock
+  Lock,
+  Info,
+  Sparkles,
+  Check
 } from 'lucide-react';
 import { generateQuestionnairePDF, generateQuestionnairePDFBase64 } from '@/utils/pdfGenerator';
 import { useTheme } from '@/context/ThemeContext';
@@ -124,6 +127,14 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   const [errorMsg, setErrorMsg] = useState('');
   const [activePopoverId, setActivePopoverId] = useState<string | null>(null);
   const [popoverAnchor, setPopoverAnchor] = useState<{ x: number; y: number } | null>(null);
+  const [lockedHintId, setLockedHintId] = useState<string | null>(null);
+
+  const triggerLockedHint = (id: string) => {
+    setLockedHintId(id);
+    setTimeout(() => {
+      setLockedHintId(prev => (prev === id ? null : prev));
+    }, 2800);
+  };
   const [, setRecaptchaReady] = useState(!SITE_KEY);
   const [recaptchaUnavailable, setRecaptchaUnavailable] = useState(false);
 
@@ -253,19 +264,27 @@ interface IntakeFormData {
   };
 
   const handleFeatureToggle = (label: string) => {
+    const feature = features.find((f: FeatureItem) => f.label === label);
+    if (!feature) return;
+
     // If feature is compulsory for current goal archetype, prevent toggling off
-    if (currentArchetype.compulsoryFeatureLabels.includes(label)) return;
+    if (currentArchetype.compulsoryFeatureLabels.includes(label)) {
+      triggerLockedHint(feature.id);
+      return;
+    }
 
     setFormData((prev: IntakeFormData) => {
       const exists = prev.selectedFeatures.includes(label);
-      const feature = features.find((f: FeatureItem) => f.label === label);
 
       if (exists) {
         // Block removing a module that another selected module depends on
         const remaining = prev.selectedFeatures.filter((f: string) => f !== label);
         const remainingIds = features.filter((f: FeatureItem) => remaining.includes(f.label)).map((f: FeatureItem) => f.id);
         const requiredIds = new Set(resolveFeatureDependencies(remainingIds, features));
-        if (feature && requiredIds.has(feature.id)) return prev;
+        if (requiredIds.has(feature.id)) {
+          triggerLockedHint(feature.id);
+          return prev;
+        }
         return { ...prev, selectedFeatures: remaining };
       }
 
@@ -553,27 +572,40 @@ interface IntakeFormData {
           </div>
 
           {/* STEP INDICATOR */}
-          <div className={styles.stepIndicator}>
-            {steps.map(s => {
-              const Icon = s.icon;
-              const isActive = currentStep === s.num;
-              const isDone = currentStep > s.num;
-              return (
-                <button
-                  key={s.num}
-                  type="button"
-                  onClick={() => setCurrentStep(s.num)}
-                  className={styles.stepItem}
-                >
-                  <div className={`${styles.stepBadge} ${isActive ? styles.stepBadgeActive : ''} ${isDone ? styles.stepBadgeDone : ''}`}>
-                    {isDone ? <CheckCircle2 size={16} /> : <Icon size={16} />}
-                  </div>
-                  <span className={`${styles.stepLabel} ${isActive ? styles.stepLabelActive : ''}`}>
-                    {s.title}
-                  </span>
-                </button>
-              );
-            })}
+          <div className={styles.progressContainer}>
+            <div className={styles.progressBarTrack} aria-hidden="true">
+              <div
+                className={styles.progressBarFill}
+                style={{ width: `${(currentStep / 4) * 100}%` }}
+              />
+            </div>
+            <div className={styles.stepIndicator}>
+              {steps.map(s => {
+                const Icon = s.icon;
+                const isActive = currentStep === s.num;
+                const isDone = currentStep > s.num;
+                return (
+                  <button
+                    key={s.num}
+                    type="button"
+                    onClick={() => setCurrentStep(s.num)}
+                    className={`${styles.stepItem} ${isActive ? styles.stepItemActive : ''} ${isDone ? styles.stepItemDone : ''}`}
+                    title={`Go to Step ${s.num}: ${s.title}`}
+                  >
+                    <div className={`${styles.stepBadge} ${isActive ? styles.stepBadgeActive : ''} ${isDone ? styles.stepBadgeDone : ''}`}>
+                      {isDone ? <CheckCircle2 size={16} /> : <Icon size={16} />}
+                    </div>
+                    <span className={`${styles.stepLabel} ${isActive ? styles.stepLabelActive : ''}`}>
+                      {s.title}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <div className={styles.mobileStepSubhead}>
+              <span>STEP {currentStep} OF 4</span>
+              <strong>{steps[currentStep - 1].title}</strong>
+            </div>
           </div>
 
           {submitted ? (
@@ -601,25 +633,61 @@ interface IntakeFormData {
                 <div className={styles.formStep}>
                   <div className={styles.groupTitle}>
                     <Building2 size={18} />
-                    <span>STEP 1: PROJECT GOAL & TARGET AUDIENCE</span>
+                    <span>STEP 1: PROJECT GOAL &amp; TARGET AUDIENCE</span>
+                  </div>
+
+                  <div className={styles.field}>
+                    <label className={styles.label}>
+                      <Sparkles size={14} style={{ display: 'inline', marginRight: '4px' }} />
+                      Select Primary Project Archetype *
+                    </label>
+                    <p className={styles.fieldHelpText}>
+                      Selecting a core archetype automatically configures your baseline engine and essential feature modules.
+                    </p>
+
+                    <div className={styles.archetypeGrid} role="radiogroup" aria-label="Primary Project Archetype">
+                      {goals.map(g => {
+                        const isSelected = formData.projectGoal === g.label;
+                        const recommendedEngine = engines.find(e => e.id === g.recommendedEngineId);
+                        return (
+                          <div
+                            key={g.id}
+                            tabIndex={0}
+                            role="radio"
+                            aria-checked={isSelected}
+                            className={`${styles.archetypeCard} ${isSelected ? styles.archetypeCardSelected : ''}`}
+                            onClick={() => handleGoalChange(g.label)}
+                            onKeyDown={e => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                handleGoalChange(g.label);
+                              }
+                            }}
+                          >
+                            <div className={styles.archetypeHeader}>
+                              <span className={styles.archetypeLabel}>{g.label}</span>
+                              {isSelected && (
+                                <span className={styles.selectedBadge}>
+                                  <Check size={12} /> SELECTED
+                                </span>
+                              )}
+                            </div>
+                            <p className={styles.archetypeDesc}>{g.description}</p>
+                            <div className={styles.archetypeFooter}>
+                              <span className={styles.engineTag}>
+                                {`Engine: ${recommendedEngine?.title ? recommendedEngine.title.replace(' Engine', '').replace(' Core', '') : 'Base'}`}
+                              </span>
+                              <span className={styles.featureCountTag}>
+                                {`${g.compulsoryFeatureLabels.length} Core Module${g.compulsoryFeatureLabels.length > 1 ? 's' : ''}`}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   <div className={styles.fieldGrid}>
-                    <div className={styles.field}>
-                      <label className={styles.label}>Primary Business Goal *</label>
-                      <select
-                        className={styles.select}
-                        value={formData.projectGoal}
-                        onChange={e => handleGoalChange(e.target.value)}
-                      >
-                        {goals.map(g => (
-                          <option key={g.id} value={g.label}>
-                            {g.label} — {g.description}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
                     <div className={styles.field}>
                       <label className={styles.label}>Project / Company Name (Optional)</label>
                       <input
@@ -630,17 +698,17 @@ interface IntakeFormData {
                         onChange={e => setFormData({ ...formData, companyName: e.target.value })}
                       />
                     </div>
-                  </div>
 
-                  <div className={styles.field}>
-                    <label className={styles.label}>Target Audience Persona & Industry</label>
-                    <input
-                      type="text"
-                      className={styles.input}
-                      placeholder="e.g., B2B Tech Founders, Healthcare SMBs, E-Commerce Buyers"
-                      value={formData.targetAudience}
-                      onChange={e => setFormData({ ...formData, targetAudience: e.target.value })}
-                    />
+                    <div className={styles.field}>
+                      <label className={styles.label}>Target Audience Persona &amp; Industry</label>
+                      <input
+                        type="text"
+                        className={styles.input}
+                        placeholder="e.g., B2B Tech Founders, Healthcare SMBs, E-Commerce Buyers"
+                        value={formData.targetAudience}
+                        onChange={e => setFormData({ ...formData, targetAudience: e.target.value })}
+                      />
+                    </div>
                   </div>
                 </div>
               )}
@@ -685,8 +753,9 @@ interface IntakeFormData {
                                     onClick={(ev) => togglePopover(ev, e.id)}
                                     className={`${styles.infoBtn} ${isPopoverOpen ? styles.infoBtnActive : ''}`}
                                     title="Click to view Technical Engineering Specs"
+                                    aria-label="View Technical Engineering Specs"
                                   >
-                                    ℹ
+                                    <Info size={12} />
                                   </button>
                                 </div>
                                 <span className={styles.priceBadge}>{formatPricePair(e.priceINR, e.priceUSD, currency)}</span>
@@ -778,13 +847,22 @@ interface IntakeFormData {
                                     onClick={(ev) => togglePopover(ev, m.id)}
                                     className={`${styles.infoBtn} ${isPopoverOpen ? styles.infoBtnActive : ''}`}
                                     title="Click to view Technical Engineering Specs"
+                                    aria-label="View Technical Engineering Specs"
                                   >
-                                    ℹ
+                                    <Info size={12} />
                                   </button>
                                 </div>
                                 <span className={styles.priceBadge}>{`+${priceInCurrency(m.priceINR, m.priceUSD)}`}</span>
                               </div>
                               <p style={{ margin: '3px 0 0 0', fontSize: '11px', opacity: 0.7, lineHeight: 1.4 }}>{m.laymanDescription}</p>
+
+                              {lockedHintId === m.id && (
+                                <div className={styles.lockedNotice}>
+                                  {isCompulsory
+                                    ? `Required baseline module for ${currentArchetype.shortLabel}`
+                                    : dependencyTitle || 'Required dependency for another active module'}
+                                </div>
+                              )}
 
                               {isPopoverOpen && popoverAnchor && (
                                 <Portal>
@@ -939,8 +1017,9 @@ interface IntakeFormData {
                                     onClick={(ev) => togglePopover(ev, p.id)}
                                     className={`${styles.infoBtn} ${isPopoverOpen ? styles.infoBtnActive : ''}`}
                                     title="Click to view Technical SLA Specs"
+                                    aria-label="View Technical SLA Specs"
                                   >
-                                    ℹ
+                                    <Info size={12} />
                                   </button>
                                 </div>
                               </div>
@@ -1046,13 +1125,19 @@ interface IntakeFormData {
                 <div className={styles.leftActions}>
                   <button
                     type="button"
-                    onClick={handleDownloadPDF}
-                    disabled={!isFormValid}
+                    onClick={() => {
+                      if (isFormValid) {
+                        handleDownloadPDF();
+                      } else {
+                        setErrorMsg('Please accept the Standard Commercial Terms in Step 4 to generate your Proposal PDF.');
+                        if (currentStep !== 4) setCurrentStep(4);
+                      }
+                    }}
                     className={`${styles.btn} ${styles.btnSecondary} ${!isFormValid ? styles.btnDisabled : ''}`}
                     title={
                       isFormValid
                         ? 'Open Canva-grade PDF proposal preview'
-                        : 'Please fill in your Company Name, Email, and accept Commercial Terms in Step 4 to unlock Proposal PDF'
+                        : 'Accept Commercial Terms in Step 4 to unlock Proposal PDF'
                     }
                   >
                     {isFormValid ? <Download size={16} /> : <Lock size={16} />}
