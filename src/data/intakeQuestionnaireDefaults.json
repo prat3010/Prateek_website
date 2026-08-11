@@ -153,6 +153,14 @@
       "priceUSD": 850,
       "laymanDescription": "Uploads, transcodes, and streams video courses or marketing content inside your app with secure playback and progress tracking.",
       "techSpecs": "Transcoding Pipeline, Adaptive Bitrate Player, Secure Signed Playback, Upload Dashboards, Watch Progress"
+    },
+    {
+      "id": "migration",
+      "label": "Legacy Database & Data Migration",
+      "priceINR": 30000,
+      "priceUSD": 400,
+      "laymanDescription": "Extracts, transforms, and imports user accounts, posts, or legacy SQL tables into your new cloud database.",
+      "techSpecs": "ETL Pipeline, Supabase DB Schema Mapping, Data Cleansing, Foreign Key Integrity Verification, Migration Telemetry"
     }
   ],
   "goals": [

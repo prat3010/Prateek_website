@@ -275,6 +275,25 @@ interface IntakeFormData {
     }));
   };
 
+  const handleScopeStartTypeChange = (newType: string) => {
+    const migrationLabel = "Legacy Database & Data Migration";
+    setFormData((prev: IntakeFormData) => {
+      let updatedFeatures = [...prev.selectedFeatures];
+      if (newType === 'legacy_rebuild') {
+        if (!updatedFeatures.includes(migrationLabel)) {
+          updatedFeatures.push(migrationLabel);
+        }
+      } else if (newType === 'greenfield') {
+        updatedFeatures = updatedFeatures.filter((f) => f !== migrationLabel);
+      }
+      return {
+        ...prev,
+        projectStartType: newType,
+        selectedFeatures: Array.from(new Set(updatedFeatures)),
+      };
+    });
+  };
+
   const handleFeatureToggle = (label: string) => {
     const feature = features.find((f: FeatureItem) => f.label === label);
     if (!feature) return;
@@ -724,7 +743,7 @@ interface IntakeFormData {
                         role="radio"
                         aria-checked={formData.projectStartType === 'greenfield'}
                         className={`${styles.chipCard} ${formData.projectStartType === 'greenfield' ? styles.chipCardActive : ''}`}
-                        onClick={() => setFormData({ ...formData, projectStartType: 'greenfield' })}
+                        onClick={() => handleScopeStartTypeChange('greenfield')}
                       >
                         🌱 Greenfield Build (From Scratch)
                       </button>
@@ -733,7 +752,7 @@ interface IntakeFormData {
                         role="radio"
                         aria-checked={formData.projectStartType === 'legacy_rebuild'}
                         className={`${styles.chipCard} ${formData.projectStartType === 'legacy_rebuild' ? styles.chipCardActive : ''}`}
-                        onClick={() => setFormData({ ...formData, projectStartType: 'legacy_rebuild' })}
+                        onClick={() => handleScopeStartTypeChange('legacy_rebuild')}
                       >
                         🔧 Legacy Refactor / Rebuild
                       </button>
