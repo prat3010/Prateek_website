@@ -385,8 +385,7 @@ interface IntakeFormData {
       .filter(f => {
         const isCompulsory = currentArchetype.compulsoryFeatureLabels.includes(f.label);
         const isLegacyRequired = formData.projectStartType === 'legacy_rebuild' && f.id === 'migration';
-        const isEngineRequired = selectedEngine.id === 'standalone_embed' && f.id === 'ai_rag';
-        return isCompulsory || isLegacyRequired || isEngineRequired || formData.selectedFeatures.includes(f.label);
+        return isCompulsory || isLegacyRequired || formData.selectedFeatures.includes(f.label);
       })
       .map(f => f.id);
 
@@ -918,9 +917,8 @@ interface IntakeFormData {
                     <div className={styles.checkboxGrid}>
                       {features.map(m => {
                         const isCompulsory = currentArchetype.compulsoryFeatureLabels.includes(m.label);
-                        const isEngineRequired = selectedEngine.id === 'standalone_embed' && m.id === 'ai_rag';
                         const isLegacyRequired = formData.projectStartType === 'legacy_rebuild' && m.id === 'migration';
-                        const isChecked = isCompulsory || isEngineRequired || isLegacyRequired || formData.selectedFeatures.includes(m.label);
+                        const isChecked = isCompulsory || isLegacyRequired || formData.selectedFeatures.includes(m.label);
                         const otherSelectedIds = features
                           .filter(f => formData.selectedFeatures.includes(f.label) && f.id !== m.id)
                           .map(f => f.id);
@@ -940,7 +938,7 @@ interface IntakeFormData {
                                 : 'This module is required by another selected module';
                             })()
                           : '';
-                        const isLocked = isCompulsory || isEngineRequired || isRequiredDependency || isLegacyRequired;
+                        const isLocked = isCompulsory || isRequiredDependency || isLegacyRequired;
                         const isPopoverOpen = activePopoverId === m.id;
                         return (
                           <label
@@ -958,11 +956,7 @@ interface IntakeFormData {
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
                                   <span style={{ fontWeight: 700 }}>{m.label}</span>
-                                  {isEngineRequired ? (
-                                    <span className={styles.lockedBadge} title="Required component for Standalone Widget Embed Core">
-                                      🔒 REQUIRED FOR EMBED CORE
-                                    </span>
-                                  ) : isCompulsory ? (
+                                  {isCompulsory ? (
                                     <span className={styles.lockedBadge} title={`Required component for ${currentArchetype.shortLabel}`}>
                                       🔒 REQUIRED
                                     </span>
@@ -991,9 +985,7 @@ interface IntakeFormData {
 
                               {lockedHintId === m.id && (
                                 <div className={styles.lockedNotice}>
-                                  {isEngineRequired
-                                    ? 'Required engine module for Standalone Widget Embed Core'
-                                    : isCompulsory
+                                  {isCompulsory
                                     ? `Required baseline module for ${currentArchetype.shortLabel}`
                                     : isLegacyRequired
                                     ? 'Required component for Legacy Refactor scope (switch to Greenfield in Step 1 to remove)'
