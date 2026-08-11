@@ -1011,21 +1011,6 @@ interface IntakeFormData {
                       })}
                     </div>
                   </div>
-
-                  {/* Live Transparent Arithmetic Bar */}
-                  <div className={styles.stickyBar}>
-                    <div className={styles.stickyLeft}>
-                      <span className={styles.stickyTitle}>⚡ Live Pure Additive Arithmetic Formula</span>
-                      <span className={styles.stickyBreakdown}>
-                        {`Base (${selectedEngine.title}: ${priceInCurrency(selectedEngine.priceINR, selectedEngine.priceUSD)})` +
-                         ` + Add-ons (${priceInCurrency(totalCost.featuresINR, totalCost.featuresUSD)})` +
-                         (totalCost.brandPriceINR > 0 ? ` + Brand Collateral (${priceInCurrency(totalCost.brandPriceINR, totalCost.brandPriceUSD)})` : '')}
-                      </span>
-                    </div>
-                    <div className={styles.stickyTotal}>
-                      {`Estimated Total: ${formatPricePair(totalCost.totalINR, totalCost.totalUSD, currency)}`}
-                    </div>
-                  </div>
                 </div>
               )}
 
@@ -1296,6 +1281,21 @@ interface IntakeFormData {
               {errorMsg && (
                 <p style={{ color: '#dc2626', fontSize: '13px', marginTop: '12px' }}>{errorMsg}</p>
               )}
+
+              {/* Live Persistent Arithmetic Bar */}
+              <div className={styles.stickyBar} style={{ marginTop: '1.5rem' }}>
+                <div className={styles.stickyLeft}>
+                  <span className={styles.stickyTitle}>⚡ Live Pure Additive Arithmetic Formula</span>
+                  <span className={styles.stickyBreakdown}>
+                    {`Base (${selectedEngine.title}: ${priceInCurrency(selectedEngine.priceINR, selectedEngine.priceUSD)})` +
+                     ` + Add-ons (${priceInCurrency(totalCost.featuresINR, totalCost.featuresUSD)})` +
+                     (totalCost.brandPriceINR > 0 ? ` + Brand Collateral (${priceInCurrency(totalCost.brandPriceINR, totalCost.brandPriceUSD)})` : '')}
+                  </span>
+                </div>
+                <div className={styles.stickyTotal}>
+                  {`Estimated Total: ${formatPricePair(totalCost.totalINR, totalCost.totalUSD, currency)}`}
+                </div>
+              </div>
 
               {/* Actions Footer */}
               <div className={styles.actions}>
