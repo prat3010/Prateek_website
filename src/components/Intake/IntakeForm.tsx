@@ -311,8 +311,11 @@ interface IntakeFormData {
     const feature = features.find((f: FeatureItem) => f.label === label);
     if (!feature) return;
 
-    // If feature is compulsory for current goal archetype, prevent toggling off
-    if (currentArchetype.compulsoryFeatureLabels.includes(label)) {
+    // If feature is compulsory for current goal archetype or legacy rebuild, prevent toggling off
+    if (
+      currentArchetype.compulsoryFeatureLabels.includes(label) ||
+      (formData.projectStartType === 'legacy_rebuild' && feature.id === 'migration')
+    ) {
       triggerLockedHint(feature.id);
       return;
     }
@@ -880,7 +883,8 @@ interface IntakeFormData {
                     <div className={styles.checkboxGrid}>
                       {features.map(m => {
                         const isCompulsory = currentArchetype.compulsoryFeatureLabels.includes(m.label);
-                        const isChecked = isCompulsory || formData.selectedFeatures.includes(m.label);
+                        const isLegacyRequired = formData.projectStartType === 'legacy_rebuild' && m.id === 'migration';
+                        const isChecked = isCompulsory || isLegacyRequired || formData.selectedFeatures.includes(m.label);
                         const otherSelectedIds = features
                           .filter(f => formData.selectedFeatures.includes(f.label) && f.id !== m.id)
                           .map(f => f.id);
@@ -900,7 +904,7 @@ interface IntakeFormData {
                                 : 'This module is required by another selected module';
                             })()
                           : '';
-                        const isLocked = isCompulsory || isRequiredDependency;
+                        const isLocked = isCompulsory || isRequiredDependency || isLegacyRequired;
                         const isPopoverOpen = activePopoverId === m.id;
                         return (
                           <label
@@ -921,6 +925,10 @@ interface IntakeFormData {
                                   {isCompulsory ? (
                                     <span className={styles.lockedBadge} title={`Required component for ${currentArchetype.shortLabel}`}>
                                       🔒 REQUIRED
+                                    </span>
+                                  ) : isLegacyRequired ? (
+                                    <span className={styles.lockedBadge} title="Required component for Legacy Refactor scope">
+                                      🔒 REQUIRED FOR LEGACY REBUILD
                                     </span>
                                   ) : isRequiredDependency ? (
                                     <span className={styles.lockedBadge} title={dependencyTitle}>
@@ -945,6 +953,8 @@ interface IntakeFormData {
                                 <div className={styles.lockedNotice}>
                                   {isCompulsory
                                     ? `Required baseline module for ${currentArchetype.shortLabel}`
+                                    : isLegacyRequired
+                                    ? 'Required component for Legacy Refactor scope (switch to Greenfield in Step 1 to remove)'
                                     : dependencyTitle || 'Required dependency for another active module'}
                                 </div>
                               )}
