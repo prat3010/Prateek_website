@@ -1039,32 +1039,56 @@ interface IntakeFormData {
 
                   <div className={styles.field}>
                     <label className={styles.label}>UI Design &amp; Layout Readiness</label>
-                    <div className={styles.chipGrid} role="radiogroup" aria-label="UI Design Readiness">
+                    <p className={styles.fieldHint}>Select your current design readiness level to pair the appropriate design system assets.</p>
+                    <div className={styles.checkboxGrid} role="radiogroup" aria-label="UI Design Readiness">
                       {[
-                        { id: 'figma_ready', label: '🎨 Figma / Specs Ready' },
-                        { id: 'wireframes_ready', label: '📐 Wireframes / Sketches Ready' },
-                        { id: 'concept_only', label: '💡 Concept Only (Needs Design System)' }
-                      ].map(item => (
-                        <button
-                          key={item.id}
-                          type="button"
-                          role="radio"
-                          aria-checked={formData.designReadiness === item.id}
-                          className={`${styles.chipCard} ${formData.designReadiness === item.id ? styles.chipCardActive : ''}`}
-                          onClick={() => {
-                            const autoBrandId = item.id === 'concept_only' && formData.selectedBrandAssetId === brandAssets[0]?.id
-                              ? (brandAssets[1]?.id || brandAssets[0]?.id)
-                              : formData.selectedBrandAssetId;
-                            setFormData({
-                              ...formData,
-                              designReadiness: item.id,
-                              selectedBrandAssetId: autoBrandId
-                            });
-                          }}
-                        >
-                          {item.label}
-                        </button>
-                      ))}
+                        {
+                          id: 'figma_ready',
+                          title: '🎨 Figma / Specs Ready',
+                          description: 'Client provides finalized Figma frames, design tokens, or UI specs.',
+                          priceLabel: 'Included in Base Engine'
+                        },
+                        {
+                          id: 'wireframes_ready',
+                          title: '📐 Wireframes / Sketches Ready',
+                          description: 'Wireframes, PDFs, or hand sketches translated into production UI.',
+                          priceLabel: 'Included with Prototyping'
+                        },
+                        {
+                          id: 'concept_only',
+                          title: '💡 Concept Only (Needs Design System)',
+                          description: 'Idea only. Requires complete UI Design System & Component Library build.',
+                          priceLabel: `Pairs with Starter Brand Kit (+${formatPricePair(45000, 600, currency)})`
+                        }
+                      ].map(item => {
+                        const isSelected = formData.designReadiness === item.id;
+                        return (
+                          <button
+                            key={item.id}
+                            type="button"
+                            role="radio"
+                            aria-checked={isSelected}
+                            className={`${styles.checkboxCard} ${isSelected ? styles.checkboxCardSelected : ''}`}
+                            onClick={() => {
+                              const autoBrandId = item.id === 'concept_only' && formData.selectedBrandAssetId === brandAssets[0]?.id
+                                ? (brandAssets[1]?.id || brandAssets[0]?.id)
+                                : formData.selectedBrandAssetId;
+                              setFormData({
+                                ...formData,
+                                designReadiness: item.id,
+                                selectedBrandAssetId: autoBrandId
+                              });
+                            }}
+                            style={{ flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left', padding: '12px 14px' }}
+                          >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center', gap: '8px' }}>
+                              <span style={{ fontWeight: 800, fontSize: '13px' }}>{item.title}</span>
+                              <span className={styles.itemPrice} style={{ fontSize: '10px' }}>{item.priceLabel}</span>
+                            </div>
+                            <p style={{ margin: '4px 0 0 0', fontSize: '11px', opacity: 0.8, lineHeight: 1.4 }}>{item.description}</p>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
