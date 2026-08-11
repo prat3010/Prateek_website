@@ -87,10 +87,12 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     () => (intakeConfig?.engines?.length ? intakeConfig.engines : BASE_ENGINES),
     [intakeConfig]
   );
-  const features = useMemo(
-    () => (intakeConfig?.features?.length ? intakeConfig.features : FEATURE_MODULES),
-    [intakeConfig]
-  );
+  const features = useMemo(() => {
+    const rawFeatures = intakeConfig?.features?.length ? intakeConfig.features : FEATURE_MODULES;
+    const existingIds = new Set(rawFeatures.map(f => f.id));
+    const missingDefaults = FEATURE_MODULES.filter(f => !existingIds.has(f.id));
+    return [...rawFeatures, ...missingDefaults];
+  }, [intakeConfig]);
   const goals = useMemo(
     () => (intakeConfig?.goals?.length ? intakeConfig.goals : GOAL_ARCHETYPES),
     [intakeConfig]
