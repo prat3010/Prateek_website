@@ -181,7 +181,7 @@
   --border-accent: #3F3F4E;         /* Slate borders */
   --border-accent-light: #5A5A72;   /* Light slate-grey borders */
   --color-text-muted: #B0B0C4;      /* Muted text color */
-  --color-text-dim: #8a8a93;        /* Dim text color */
+  --color-text-dim: #A0A0B0;        /* Dim text color (tuned for WCAG AA contrast) */
 
   /* ─ Border Overrides (Keep original comic thickness in dark mode) ─ */
   --border-thin: 2px solid var(--color-border);
@@ -250,9 +250,17 @@ footer {
 }
 
 
-/* ─ Smooth body background color fade during theme transition ─ */
-.theme-transition body {
-  transition: background-color 0.8s cubic-bezier(0.76, 0, 0.24, 1) !important;
+/* ─ Smooth body & surface background color fade during theme transition ─ */
+.theme-transition body,
+.theme-transition main,
+.theme-transition header,
+.theme-transition footer,
+.theme-transition nav,
+.theme-transition [class*="card"],
+.theme-transition [class*="Panel"],
+.theme-transition [class*="Console"],
+.theme-transition [class*="wrapper"] {
+  transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease !important;
 }
 
 /* ─ Flickering Light Bulb Neon Transition Keyframes ─ */
