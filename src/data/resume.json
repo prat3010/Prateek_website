@@ -366,13 +366,13 @@
         "techSpecs": "Full Web App Shell, Supabase PostgreSQL Architecture, Server Caching (unstable_cache), Production Vercel Wiring"
       },
       {
-        "id": "ai_rag_app",
-        "title": "Enterprise AI RAG Engine",
-        "tier": "Tier 4",
-        "priceINR": 175000,
-        "priceUSD": 2400,
-        "laymanDescription": "Retriever RAG Core, vector search, grounded LLM assistant, clickable citations & team access controls.",
-        "techSpecs": "pgvector Vector Embeddings, Document Chunking Pipeline, Semantic Search, Presigned Citation Downloads, Feedback Telemetry"
+        "id": "standalone_embed",
+        "title": "Standalone Widget Embed Core",
+        "tier": "Tier 0",
+        "priceINR": 0,
+        "priceUSD": 0,
+        "laymanDescription": "Lightweight script embed for existing websites requiring an embedded AI chatbot widget.",
+        "techSpecs": "Script Loader, iFrame Host, CORS Validation, Shadow DOM"
       }
     ],
     "features": [
@@ -600,11 +600,21 @@
         "label": "🤖 Custom AI & Vector RAG Platform",
         "shortLabel": "AI RAG Platform",
         "description": "Private document knowledge base, AI search, and assistant",
-        "recommendedEngineId": "ai_rag_app",
+        "recommendedEngineId": "saas",
         "compulsoryFeatureLabels": [
           "Private AI Knowledge Base / Vector Search (RAG)",
           "User Auth & Client Portal (Google/Magic Link)",
           "Admin Dashboard & Role Access Control (RBAC)"
+        ]
+      },
+      {
+        "id": "standalone_chatbot",
+        "label": "💬 Standalone Embedded AI Chatbot Widget",
+        "shortLabel": "AI Chatbot Widget",
+        "description": "Embed a 24/7 intelligent AI chatbot into your existing website (WordPress, Webflow, Shopify, custom HTML) trained on your PDFs & docs.",
+        "recommendedEngineId": "standalone_embed",
+        "compulsoryFeatureLabels": [
+          "Private AI Knowledge Base / Vector Search (RAG)"
         ]
       },
       {
