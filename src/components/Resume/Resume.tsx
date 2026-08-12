@@ -21,7 +21,8 @@ import {
   User, 
   FileText,
   ArrowRight,
-  ShieldCheck
+  ShieldCheck,
+  Layers
 } from 'lucide-react';
 import { getSkillsHighlight, type Persona } from '@/lib/skills';
 import {
@@ -34,6 +35,7 @@ import type {
   FeatureItem,
   GoalArchetype,
   MaintenancePlanOption,
+  QuickServiceItem,
 } from '@/data/resume';
 import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
 import styles from './Resume.module.css';
@@ -85,6 +87,9 @@ function Resume({ resumeData, certificates }: ResumeProps) {
   const maintenancePlans: MaintenancePlanOption[] = intake?.maintenancePlans?.length
     ? intake.maintenancePlans
     : (questionnaireDefaults.maintenancePlans as MaintenancePlanOption[]);
+  const quickServices: QuickServiceItem[] = intake?.quickServices?.length
+    ? intake.quickServices
+    : (questionnaireDefaults.quickServices as QuickServiceItem[]) || [];
 
   const enginePrice = (engineId: string): string => {
     const engine = engines.find((e) => e.id === engineId);
@@ -98,10 +103,6 @@ function Resume({ resumeData, certificates }: ResumeProps) {
     const totalUSD = packageTotalForArchetype(goal, engines, features, 'USD');
     return totalINR ? formatPricePair(totalINR, totalUSD, currency) : enginePrice(engineId);
   };
-
-  const ragGoal = goals.find((g) => g.id === 'ai_rag_app');
-  const ragTotalINR = ragGoal ? packageTotalForArchetype(ragGoal, engines, features, 'INR') : 0;
-  const ragTotalUSD = ragGoal ? packageTotalForArchetype(ragGoal, engines, features, 'USD') : 0;
 
   const carePrice = (planId: string): string => {
     const plan = maintenancePlans.find((p) => p.id === planId);
@@ -294,13 +295,22 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                         <span>COMMERCIAL BUILD ENGINES & TIERS</span>
                       </h3>
                       <div className={styles.packageGrid}>
-                        {engines.map((engine, idx) => {
+                        {engines.filter(e => !e.hideFromFullProject).map((engine, idx) => {
                           const goal = goals.find((g) => g.recommendedEngineId === engine.id);
-                          const scopingHref = engine.id === 'ai_rag_app' || (goal && goal.id === 'ai_rag_app')
-                            ? '/scoping?goal=ai_rag_app'
-                            : `/scoping?engine=${engine.id}`;
-                          const priceStr = engine.id === 'ai_rag_app' && ragTotalINR
-                            ? formatPricePair(ragTotalINR, ragTotalUSD, currency)
+                          const bundledGoal = engine.bundledPriceGoalId
+                            ? goals.find(g => g.id === engine.bundledPriceGoalId)
+                            : null;
+                          const scopingHref = bundledGoal
+                            ? `/scoping?goal=${bundledGoal.id}`
+                            : goal
+                              ? `/scoping?goal=${goal.id}`
+                              : `/scoping?engine=${engine.id}`;
+                          const priceStr = bundledGoal
+                            ? (() => {
+                                const bINR = packageTotalForArchetype(bundledGoal, engines, features, 'INR');
+                                const bUSD = packageTotalForArchetype(bundledGoal, engines, features, 'USD');
+                                return bINR ? formatPricePair(bINR, bUSD, currency) : tierPrice(engine.id);
+                              })()
                             : tierPrice(engine.id);
 
                           return (
@@ -337,6 +347,34 @@ function Resume({ resumeData, certificates }: ResumeProps) {
                         ))}
                       </div>
                     </div>
+
+                    {/* Quick Services */}
+                    {quickServices.length > 0 && (
+                      <div className={styles.resumeSectionBlock}>
+                        <h3 className={styles.blockTitle}>
+                          <Layers size={16} />
+                          <span>QUICK SERVICES — ADD TO YOUR EXISTING SITE</span>
+                        </h3>
+                        <div className={styles.packageGrid}>
+                          {quickServices.slice(0, 8).map((svc) => (
+                            <div key={svc.id} className={styles.packageCard}>
+                              <div>
+                                <span className={styles.packageBadge}>{svc.turnaround}</span>
+                                <h4 className={styles.packageTitle}>{svc.label}</h4>
+                                <div className={styles.packagePrice}>
+                                  {formatPricePair(svc.priceINR, svc.priceUSD, currency)}
+                                </div>
+                                <p className={styles.packageDesc}>{svc.laymanDescription}</p>
+                              </div>
+                              <Link href={`/scoping?type=quick&service=${svc.id}`} className={styles.packageBtn}>
+                                <span>GET QUOTE</span>
+                                <ArrowRight size={12} />
+                              </Link>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Terms and Deliverables */}
                     <div className={styles.resumeSectionBlock}>

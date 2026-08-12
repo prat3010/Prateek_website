@@ -15,18 +15,25 @@ export const metadata: Metadata = {
 };
 
 interface ScopingPageProps {
-  searchParams?: Promise<{ engine?: string; goal?: string }>;
+  searchParams?: Promise<{ engine?: string; goal?: string; type?: string; service?: string }>;
 }
 
 export default async function ScopingPage({ searchParams }: ScopingPageProps) {
   const params = searchParams ? await searchParams : null;
   const profile = await getProfile();
 
-  let preset: { goalId?: string; engineId?: string } | null = null;
-  if (params?.engine) {
-    preset = { engineId: params.engine };
+  let preset: { goalId?: string; engineId?: string; serviceType?: 'full' | 'quick' | 'care'; quickServiceId?: string } | null = null;
+  
+  if (params?.type === 'full') {
+    preset = { serviceType: 'full', engineId: params?.engine, goalId: params?.goal };
+  } else if (params?.type === 'quick') {
+    preset = { serviceType: 'quick', quickServiceId: params?.service };
+  } else if (params?.type === 'care') {
+    preset = { serviceType: 'care' };
+  } else if (params?.engine) {
+    preset = { serviceType: 'full', engineId: params.engine };
   } else if (params?.goal) {
-    preset = { goalId: params.goal };
+    preset = { serviceType: 'full', goalId: params.goal };
   }
 
   const serviceJsonLd = {

@@ -120,7 +120,7 @@ def validate_blog_fields(title, excerpt, tags, content):
     return clean_title, clean_excerpt[:500], validate_tags(tags, max_items=12), clean_content
 
 
-def validate_questionnaire(engines, features, goals, brand_assets, maintenance_plans):
+def validate_questionnaire(engines, features, goals, brand_assets, maintenance_plans, quick_services=None, business_kpis=None):
     """Validate scoping questionnaire config. Returns a list of error strings (empty = valid)."""
     errors = []
 
@@ -234,5 +234,23 @@ def validate_questionnaire(engines, features, goals, brand_assets, maintenance_p
                     errors.append(f"Care plan '{plan.get('id', '?')}' '{sla_field}' must be a string.")
         unique_ids(maintenance_plans, "Care plans")
         check_prices(maintenance_plans, "Care plan")
+
+    if quick_services is not None:
+        if not isinstance(quick_services, list):
+            errors.append("Quick services must be a list.")
+        else:
+            for qs in quick_services:
+                for field in ("id", "label", "turnaround", "category", "laymanDescription", "techSpecs"):
+                    if not isinstance(qs.get(field), str) or not qs.get(field).strip():
+                        errors.append(f"Quick service '{qs.get('id', '?')}' is missing required field '{field}'.")
+            unique_ids(quick_services, "Quick services")
+            check_prices(quick_services, "Quick service")
+
+    if business_kpis is not None:
+        if not isinstance(business_kpis, list):
+            errors.append("Business KPIs must be a list.")
+        else:
+            if not all(isinstance(kpi, str) and kpi.strip() for kpi in business_kpis):
+                errors.append("Business KPIs must be a list of non-empty strings.")
 
     return errors

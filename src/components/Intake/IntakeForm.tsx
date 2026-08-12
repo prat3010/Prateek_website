@@ -16,7 +16,8 @@ import {
   Lock,
   Info,
   Sparkles,
-  Check
+  Check,
+  Rocket
 } from 'lucide-react';
 import { generateQuestionnairePDF, generateQuestionnairePDFBase64, type QuestionnaireData } from '@/utils/pdfGenerator';
 import { useTheme } from '@/context/ThemeContext';
@@ -37,7 +38,8 @@ import type {
   FeatureItem,
   GoalArchetype,
   MaintenancePlanOption,
-  ResumeData
+  ResumeData,
+  QuickServiceItem
 } from '@/data/resume';
 import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
 import styles from './IntakeForm.module.css';
@@ -57,6 +59,8 @@ declare global {
 export interface IntakePreset {
   goalId?: string;
   engineId?: string;
+  serviceType?: 'full' | 'quick' | 'care';
+  quickServiceId?: string;
 }
 
 interface IntakeFormProps {
@@ -77,6 +81,8 @@ export const FEATURE_MODULES: FeatureItem[] = questionnaireDefaults.features;
 export const GOAL_ARCHETYPES: GoalArchetype[] = questionnaireDefaults.goals;
 export const BRAND_ASSET_OPTIONS: BrandAssetOption[] = questionnaireDefaults.brandAssets;
 export const MAINTENANCE_PLANS: MaintenancePlanOption[] = questionnaireDefaults.maintenancePlans;
+export const QUICK_SERVICES: QuickServiceItem[] = questionnaireDefaults.quickServices || [];
+export const BUSINESS_KPIS: string[] = questionnaireDefaults.businessKPIs || [];
 
 export default function IntakeForm({ resumeData, initialPreset = null }: IntakeFormProps) {
   const { isNoir, region } = useTheme();
@@ -84,38 +90,23 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   const intakeConfig = resumeData?.intake;
 
   const engines = useMemo(() => {
-    const raw = intakeConfig?.engines?.length ? intakeConfig.engines : BASE_ENGINES;
-    const ids = new Set(raw.map((item: BaseEngineItem) => item.id));
-    const missing = BASE_ENGINES.filter((item: BaseEngineItem) => !ids.has(item.id));
-    return [...raw, ...missing];
+    return intakeConfig?.engines?.length ? intakeConfig.engines : BASE_ENGINES;
   }, [intakeConfig]);
 
   const features = useMemo(() => {
-    const raw = intakeConfig?.features?.length ? intakeConfig.features : FEATURE_MODULES;
-    const ids = new Set(raw.map((item: FeatureItem) => item.id));
-    const missing = FEATURE_MODULES.filter((item: FeatureItem) => !ids.has(item.id));
-    return [...raw, ...missing];
+    return intakeConfig?.features?.length ? intakeConfig.features : FEATURE_MODULES;
   }, [intakeConfig]);
 
   const goals = useMemo(() => {
-    const raw = intakeConfig?.goals?.length ? intakeConfig.goals : GOAL_ARCHETYPES;
-    const ids = new Set(raw.map((item: GoalArchetype) => item.id));
-    const missing = GOAL_ARCHETYPES.filter((item: GoalArchetype) => !ids.has(item.id));
-    return [...raw, ...missing];
+    return intakeConfig?.goals?.length ? intakeConfig.goals : GOAL_ARCHETYPES;
   }, [intakeConfig]);
 
   const brandAssets = useMemo(() => {
-    const raw = intakeConfig?.brandAssets?.length ? intakeConfig.brandAssets : BRAND_ASSET_OPTIONS;
-    const ids = new Set(raw.map((item: BrandAssetOption) => item.id));
-    const missing = BRAND_ASSET_OPTIONS.filter((item: BrandAssetOption) => !ids.has(item.id));
-    return [...raw, ...missing];
+    return intakeConfig?.brandAssets?.length ? intakeConfig.brandAssets : BRAND_ASSET_OPTIONS;
   }, [intakeConfig]);
 
   const maintenancePlans = useMemo(() => {
-    const raw = intakeConfig?.maintenancePlans?.length ? intakeConfig.maintenancePlans : MAINTENANCE_PLANS;
-    const ids = new Set(raw.map((item: MaintenancePlanOption) => item.id));
-    const missing = MAINTENANCE_PLANS.filter((item: MaintenancePlanOption) => !ids.has(item.id));
-    return [...raw, ...missing];
+    return intakeConfig?.maintenancePlans?.length ? intakeConfig.maintenancePlans : MAINTENANCE_PLANS;
   }, [intakeConfig]);
   const timelineOptions = intakeConfig?.timelineOptions || [
     'Express Delivery Sprint (7–10 Days - Rush Fee Applies)',
@@ -135,6 +126,21 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
 
   const { user, loginWithGoogle, getAccessToken } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
+  const [serviceType, setServiceType] = useState<'full' | 'quick' | 'care' | null>(() => initialPreset?.serviceType || null);
+  const [selectedQuickServices, setSelectedQuickServices] = useState<string[]>(() => 
+    initialPreset?.quickServiceId ? [initialPreset.quickServiceId] : []
+  );
+  const [quickStep, setQuickStep] = useState(initialPreset?.quickServiceId ? 2 : 1);
+  const [quickFormData, setQuickFormData] = useState({ companyName: '', siteUrl: '', additionalNotes: '', agreedToTerms: false });
+
+  const quickServices = useMemo(() => {
+    return intakeConfig?.quickServices?.length ? intakeConfig.quickServices : QUICK_SERVICES;
+  }, [intakeConfig]);
+
+  const businessKPIs = useMemo(() => {
+    return intakeConfig?.businessKPIs?.length ? intakeConfig.businessKPIs : BUSINESS_KPIS;
+  }, [intakeConfig]);
+
   const [submitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -288,19 +294,20 @@ interface IntakeFormData {
       projectGoal: newGoalLabel,
       selectedBaseEngineId: newEngineId,
       selectedFeatures: Array.from(mergedLabels),
-      selectedBrandAssetId: archetype.id === 'standalone_chatbot' ? (brandAssets[0]?.id || 'ready') : prev.selectedBrandAssetId,
+      selectedBrandAssetId: archetype.skipBrandAssets ? (brandAssets[0]?.id || 'ready') : prev.selectedBrandAssetId,
     }));
   };
 
   const handleScopeStartTypeChange = (newType: string) => {
-    const migrationLabel = "Legacy Database & Data Migration";
+    const migrationFeature = features.find(f => f.autoIncludeOnLegacy);
+    const migrationLabel = migrationFeature?.label;
     setFormData((prev: IntakeFormData) => {
       let updatedFeatures = [...prev.selectedFeatures];
-      if (newType === 'legacy_rebuild') {
+      if (newType === 'legacy_rebuild' && migrationLabel) {
         if (!updatedFeatures.includes(migrationLabel)) {
           updatedFeatures.push(migrationLabel);
         }
-      } else if (newType === 'greenfield') {
+      } else if (newType === 'greenfield' && migrationLabel) {
         updatedFeatures = updatedFeatures.filter((f) => f !== migrationLabel);
       }
       return {
@@ -318,7 +325,7 @@ interface IntakeFormData {
     // If feature is compulsory for current goal archetype or legacy rebuild, prevent toggling off
     if (
       currentArchetype.compulsoryFeatureLabels.includes(label) ||
-      (formData.projectStartType === 'legacy_rebuild' && feature.id === 'migration')
+      (formData.projectStartType === 'legacy_rebuild' && feature.autoIncludeOnLegacy)
     ) {
       triggerLockedHint(feature.id);
       return;
@@ -368,15 +375,19 @@ interface IntakeFormData {
     return engines.find(e => e.id === formData.selectedBaseEngineId) || engines[0];
   }, [formData.selectedBaseEngineId, engines]);
 
-  // Smart Maintenance Auto-Selection
+  // Smart Maintenance Auto-Selection (config-driven)
   const autoMaintenancePlanId = useMemo(() => {
-    const hasAI = formData.selectedFeatures.some(f => f.includes('RAG') || f.includes('AI'));
-    const hasComplex = formData.selectedFeatures.some(f => f.includes('Auth') || f.includes('Payment') || f.includes('CMS'));
-
-    if (hasAI) return 'premium';
-    if (hasComplex) return 'standard';
-    return 'basic';
-  }, [formData.selectedFeatures]);
+    const selectedFeatureObjs = features.filter(f => formData.selectedFeatures.includes(f.label));
+    // Find highest-priority recommendedMaintenanceId among selected features
+    const planPriority: Record<string, number> = { premium: 3, standard: 2, basic: 1 };
+    let bestPlan = 'basic';
+    for (const f of selectedFeatureObjs) {
+      if (f.recommendedMaintenanceId && (planPriority[f.recommendedMaintenanceId] || 0) > (planPriority[bestPlan] || 0)) {
+        bestPlan = f.recommendedMaintenanceId;
+      }
+    }
+    return bestPlan;
+  }, [formData.selectedFeatures, features]);
 
   // Quote computed from the centralized pricing module (pure additive)
   const totalCost = useMemo(() => {
@@ -384,7 +395,7 @@ interface IntakeFormData {
     const activeFeatureIds = features
       .filter(f => {
         const isCompulsory = currentArchetype.compulsoryFeatureLabels.includes(f.label);
-        const isLegacyRequired = formData.projectStartType === 'legacy_rebuild' && f.id === 'migration';
+        const isLegacyRequired = formData.projectStartType === 'legacy_rebuild' && f.autoIncludeOnLegacy;
         return isCompulsory || isLegacyRequired || formData.selectedFeatures.includes(f.label);
       })
       .map(f => f.id);
@@ -650,7 +661,209 @@ interface IntakeFormData {
           </div>
 
           {/* STEP INDICATOR */}
-          <div className={styles.progressContainer}>
+          {serviceType === null ? (
+            /* Step 0: Service Type Gate */
+            <div className={styles.formStep}>
+              <div className={styles.groupTitle}>
+                <Layers size={18} />
+                <span>WHAT DO YOU NEED?</span>
+              </div>
+              <p className={styles.fieldHint}>Select the type of engagement to customize your scoping experience.</p>
+              <div className={styles.checkboxGrid} role="radiogroup" aria-label="Service Type">
+                <label
+                  className={`${styles.checkboxCard} ${styles.step0Card}`}
+                  onClick={() => setServiceType('full')}
+                  style={{ cursor: 'pointer', flexDirection: 'column', alignItems: 'flex-start', padding: '20px' }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                    <Rocket size={22} />
+                    <span style={{ fontWeight: 800, fontSize: '15px' }}>🏗️ Full Project Build</span>
+                  </div>
+                  <p style={{ fontSize: '13px', opacity: 0.75, margin: 0 }}>New website, web app, or SaaS platform from scratch with full scoping wizard.</p>
+                </label>
+                <label
+                  className={`${styles.checkboxCard} ${styles.step0Card}`}
+                  onClick={() => setServiceType('quick')}
+                  style={{ cursor: 'pointer', flexDirection: 'column', alignItems: 'flex-start', padding: '20px' }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                    <Sparkles size={22} />
+                    <span style={{ fontWeight: 800, fontSize: '15px' }}>🔧 Quick Service</span>
+                  </div>
+                  <p style={{ fontSize: '13px', opacity: 0.75, margin: 0 }}>Add a feature to your existing site — chatbot, SEO, speed fix, payments, and more.</p>
+                </label>
+              </div>
+            </div>
+          ) : serviceType === 'quick' ? (
+            /* Quick Service Flow */
+            <>
+              <div className={styles.progressContainer}>
+                <div className={styles.progressBarTrack} aria-hidden="true">
+                  <div className={styles.progressBarFill} style={{ width: `${(quickStep / 2) * 100}%` }} />
+                </div>
+                <div className={styles.stepIndicator}>
+                  <button type="button" onClick={() => setQuickStep(1)} className={`${styles.stepItem} ${quickStep === 1 ? styles.stepItemActive : ''} ${quickStep > 1 ? styles.stepItemDone : ''}`}>
+                    <div className={`${styles.stepBadge} ${quickStep === 1 ? styles.stepBadgeActive : ''} ${quickStep > 1 ? styles.stepBadgeDone : ''}`}>
+                      {quickStep > 1 ? <CheckCircle2 size={16} /> : <Sparkles size={16} />}
+                    </div>
+                    <span className={`${styles.stepLabel} ${quickStep === 1 ? styles.stepLabelActive : ''}`}>Services</span>
+                  </button>
+                  <button type="button" onClick={() => quickStep > 1 && setQuickStep(2)} className={`${styles.stepItem} ${quickStep === 2 ? styles.stepItemActive : ''}`}>
+                    <div className={`${styles.stepBadge} ${quickStep === 2 ? styles.stepBadgeActive : ''}`}>
+                      <Building2 size={16} />
+                    </div>
+                    <span className={`${styles.stepLabel} ${quickStep === 2 ? styles.stepLabelActive : ''}`}>Details</span>
+                  </button>
+                </div>
+              </div>
+              
+              {quickStep === 1 ? (
+                <div className={styles.formStep}>
+                  <div className={styles.groupTitle}>
+                    <Sparkles size={18} />
+                    <span>SELECT QUICK SERVICES</span>
+                    <button type="button" className={styles.backToStep0} onClick={() => { setServiceType(null); setSelectedQuickServices([]); setQuickStep(1); }} style={{ marginLeft: 'auto', fontSize: '12px', opacity: 0.6, background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', textDecoration: 'underline' }}>
+                      ← Change service type
+                    </button>
+                  </div>
+                  <p className={styles.fieldHint}>Pick one or more services. Each includes a 30-day post-delivery warranty.</p>
+                  <div className={styles.checkboxGrid} role="group" aria-label="Quick Services">
+                    {quickServices.map(svc => {
+                      const isSelected = selectedQuickServices.includes(svc.id);
+                      return (
+                        <label
+                          key={svc.id}
+                          className={`${styles.checkboxCard} ${isSelected ? styles.checkboxCardSelected : ''}`}
+                          onClick={() => {
+                            setSelectedQuickServices(prev =>
+                              prev.includes(svc.id) ? prev.filter(id => id !== svc.id) : [...prev, svc.id]
+                            );
+                          }}
+                          style={{ cursor: 'pointer', flexDirection: 'column', alignItems: 'flex-start', padding: '14px 16px' }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ fontWeight: 800, fontSize: '13px' }}>{svc.label}</span>
+                            <span className={styles.itemPrice} style={{ fontSize: '11px', fontWeight: 700 }}>
+                              {formatPricePair(svc.priceINR, svc.priceUSD, currency)}
+                            </span>
+                          </div>
+                          <p style={{ fontSize: '12px', opacity: 0.65, margin: '6px 0 4px 0' }}>{svc.laymanDescription}</p>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                            <span style={{ fontSize: '11px', opacity: 0.5 }}>⏱ {svc.turnaround}</span>
+                            <button
+                              type="button"
+                              className={styles.infoBtn}
+                              onClick={(e) => togglePopover(e, `qs-${svc.id}`)}
+                              aria-label={`Details for ${svc.label}`}
+                            >
+                              <Info size={14} />
+                            </button>
+                          </div>
+                          {isSelected && <div className={styles.checkMark}><Check size={14} /></div>}
+                        </label>
+                      );
+                    })}
+                  </div>
+                  {/* Quick Service total */}
+                  {selectedQuickServices.length > 0 && (
+                    <div className={styles.quoteSummaryCompact} style={{ marginTop: '16px' }}>
+                      <span style={{ fontWeight: 700 }}>{selectedQuickServices.length} service{selectedQuickServices.length > 1 ? 's' : ''} selected</span>
+                      <span style={{ fontWeight: 800, fontSize: '16px' }}>
+                        {formatPricePair(
+                          quickServices.filter(s => selectedQuickServices.includes(s.id)).reduce((sum, s) => sum + s.priceINR, 0),
+                          quickServices.filter(s => selectedQuickServices.includes(s.id)).reduce((sum, s) => sum + s.priceUSD, 0),
+                          currency
+                        )}
+                      </span>
+                    </div>
+                  )}
+                  <div className={styles.navigationRow}>
+                    <button
+                      type="button"
+                      disabled={selectedQuickServices.length === 0}
+                      onClick={() => setQuickStep(2)}
+                      className={`${styles.btn} ${styles.btnPrimary} ${selectedQuickServices.length === 0 ? styles.btnDisabled : ''}`}
+                    >
+                      <span>NEXT: YOUR DETAILS</span>
+                      <ArrowRight size={16} />
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className={styles.formStep}>
+                  <div className={styles.groupTitle}>
+                    <Building2 size={18} />
+                    <span>YOUR DETAILS & QUOTE</span>
+                  </div>
+                  <div className={styles.field}>
+                    <label className={styles.label}>Company / Brand Name</label>
+                    <input type="text" className={styles.input} placeholder="Your company or brand name" value={quickFormData.companyName} onChange={e => setQuickFormData(prev => ({ ...prev, companyName: e.target.value }))} />
+                  </div>
+                  <div className={styles.field}>
+                    <label className={styles.label}>Existing Website URL</label>
+                    <input type="url" className={styles.input} placeholder="https://your-existing-site.com" value={quickFormData.siteUrl} onChange={e => setQuickFormData(prev => ({ ...prev, siteUrl: e.target.value }))} />
+                  </div>
+                  <div className={styles.field}>
+                    <label className={styles.label}>Additional Notes</label>
+                    <textarea className={styles.textarea} rows={3} placeholder="Any specifics about what you need..." value={quickFormData.additionalNotes} onChange={e => setQuickFormData(prev => ({ ...prev, additionalNotes: e.target.value }))} />
+                  </div>
+                  {/* Quick Service Quote Summary */}
+                  <div className={styles.quoteSummary}>
+                    <h4 className={styles.quoteTitle}>Quick Service Quote</h4>
+                    {quickServices.filter(s => selectedQuickServices.includes(s.id)).map(svc => (
+                      <div key={svc.id} className={styles.quoteRow}>
+                        <span>{svc.label}</span>
+                        <span className={styles.itemPrice}>{formatPricePair(svc.priceINR, svc.priceUSD, currency)}</span>
+                      </div>
+                    ))}
+                    <div className={`${styles.quoteRow} ${styles.quoteRowTotal}`}>
+                      <strong>TOTAL</strong>
+                      <strong className={styles.totalPrice}>
+                        {formatPricePair(
+                          quickServices.filter(s => selectedQuickServices.includes(s.id)).reduce((sum, s) => sum + s.priceINR, 0),
+                          quickServices.filter(s => selectedQuickServices.includes(s.id)).reduce((sum, s) => sum + s.priceUSD, 0),
+                          currency
+                        )}
+                      </strong>
+                    </div>
+                    <p style={{ fontSize: '12px', opacity: 0.55, marginTop: '8px' }}>Includes 30-day post-delivery warranty. {ESTIMATE_DISCLAIMER}</p>
+                  </div>
+                  {/* Terms */}
+                  <div className={styles.field}>
+                    <label className={styles.termsCheckbox}>
+                      <input type="checkbox" checked={quickFormData.agreedToTerms} onChange={e => setQuickFormData(prev => ({ ...prev, agreedToTerms: e.target.checked }))} />
+                      <span>I agree to the fixed-scope commercial terms, 50/50 milestone payments, and 30-day warranty.</span>
+                    </label>
+                  </div>
+                  <div className={styles.navigationRow}>
+                    <button type="button" onClick={() => setQuickStep(1)} className={`${styles.btn} ${styles.btnSecondary}`}>
+                      <ArrowLeft size={16} />
+                      <span>BACK</span>
+                    </button>
+                    <button
+                      type="button"
+                      disabled={!quickFormData.agreedToTerms}
+                      onClick={() => {
+                        const params = new URLSearchParams({
+                          services: selectedQuickServices.join(','),
+                          company: quickFormData.companyName,
+                          site: quickFormData.siteUrl,
+                        });
+                        window.location.href = `/dashboard?quick=true&${params.toString()}`;
+                      }}
+                      className={`${styles.btn} ${styles.btnPrimary} ${!quickFormData.agreedToTerms ? styles.btnDisabled : ''}`}
+                    >
+                      🚀 SAVE SCOPE & CONTINUE IN DASHBOARD
+                      <Send size={16} />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            /* Full Project Flow (existing wizard) */
+            <>
+              <div className={styles.progressContainer}>
             <div className={styles.progressBarTrack} aria-hidden="true">
               <div
                 className={styles.progressBarFill}
@@ -712,6 +925,9 @@ interface IntakeFormData {
                   <div className={styles.groupTitle}>
                     <Building2 size={18} />
                     <span>STEP 1: PROJECT GOAL &amp; TARGET AUDIENCE</span>
+                    <button type="button" className={styles.backToStep0} onClick={() => { setServiceType(null); setSelectedQuickServices([]); setQuickStep(1); }} style={{ marginLeft: 'auto', fontSize: '12px', opacity: 0.6, background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', textDecoration: 'underline' }}>
+                      ← Change service type
+                    </button>
                   </div>
 
                   <div className={styles.field}>
@@ -772,14 +988,7 @@ interface IntakeFormData {
                       value={formData.businessKPI}
                       onChange={e => setFormData({ ...formData, businessKPI: e.target.value })}
                     >
-                      {[
-                        '🚀 Increase Lead & Customer Conversion Rate',
-                        '⚡ Accelerate Application Speed & Performance (LCP/CWV)',
-                        '🛠️ Launch MVP Product to Market Rapidly',
-                        '🎨 Modernize Legacy Web Infrastructure & Brand Identity',
-                        '🤖 Automate Business Workflows with AI Integration',
-                        '🔐 Enterprise Security, Compliance & User RBAC'
-                      ].map(kpi => (
+                      {businessKPIs.map(kpi => (
                         <option key={kpi} value={kpi}>{kpi}</option>
                       ))}
                     </select>
@@ -917,7 +1126,7 @@ interface IntakeFormData {
                     <div className={styles.checkboxGrid}>
                       {features.map(m => {
                         const isCompulsory = currentArchetype.compulsoryFeatureLabels.includes(m.label);
-                        const isLegacyRequired = formData.projectStartType === 'legacy_rebuild' && m.id === 'migration';
+                        const isLegacyRequired = formData.projectStartType === 'legacy_rebuild' && m.autoIncludeOnLegacy;
                         const isChecked = isCompulsory || isLegacyRequired || formData.selectedFeatures.includes(m.label);
                         const otherSelectedIds = features
                           .filter(f => formData.selectedFeatures.includes(f.label) && f.id !== m.id)
@@ -1036,8 +1245,7 @@ interface IntakeFormData {
                     <div className={styles.checkboxGrid} role="radiogroup" aria-label="Design & Content Readiness">
                       {brandAssets.map((b) => {
                         const isSelected = formData.selectedBrandAssetId === b.id;
-                        const mappedDesignReadiness =
-                          b.id === 'scratch' ? 'concept_only' : b.id === 'copy' ? 'wireframes_ready' : 'figma_ready';
+                        const mappedDesignReadiness = b.designReadiness || 'figma_ready';
 
                         return (
                           <label
@@ -1373,7 +1581,9 @@ interface IntakeFormData {
               </div>
             </form>
           )}
-        </div>
+        </>
+      )}
+    </div>
       </div>
     </section>
   );

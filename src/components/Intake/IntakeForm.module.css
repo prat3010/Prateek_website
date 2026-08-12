@@ -1228,3 +1228,126 @@
   border-color: rgba(245, 158, 11, 0.4);
 }
 
+/* ── Step 0: Service Type Gate ── */
+
+.step0Card {
+  min-height: 100px;
+  border-width: 2px;
+  transition: all 0.25s ease;
+}
+
+.step0Card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(43, 43, 54, 0.14);
+  border-color: var(--pop-blue);
+}
+
+:global([data-theme='noir']) .step0Card:hover {
+  box-shadow: 0 8px 24px rgba(0, 240, 255, 0.12);
+  border-color: var(--neon-cyan, #00f0ff);
+}
+
+.backToStep0 {
+  margin-left: auto;
+  font-size: 12px;
+  font-family: var(--font-code);
+  opacity: 0.55;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: opacity 0.2s;
+}
+
+.backToStep0:hover {
+  opacity: 1;
+}
+
+/* ── Quick Service Quote Summary ── */
+
+.quoteSummary {
+  margin-top: 16px;
+  background: #F7F2E8;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--border-radius-sm, 6px);
+  padding: 16px;
+  font-family: var(--font-code);
+}
+
+:global([data-theme='noir']) .quoteSummary {
+  background: rgba(30, 30, 40, 0.8);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.quoteTitle {
+  font-family: var(--font-code);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--pop-black);
+  margin: 0 0 12px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+:global([data-theme='noir']) .quoteTitle {
+  color: var(--pop-cream, #f7f2e8);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.quoteRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 12px;
+  color: var(--pop-black);
+}
+
+:global([data-theme='noir']) .quoteRow {
+  color: rgba(247, 242, 232, 0.8);
+}
+
+.quoteRowTotal {
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1.5px solid var(--pop-blue);
+  font-size: 14px;
+}
+
+:global([data-theme='noir']) .quoteRowTotal {
+  border-color: var(--neon-cyan, #00f0ff);
+}
+
+.totalPrice {
+  color: var(--pop-blue);
+  font-size: 16px;
+}
+
+:global([data-theme='noir']) .totalPrice {
+  color: var(--neon-cyan, #00f0ff);
+}
+
+/* ── Quick Service Compact Summary (inline total bar) ── */
+
+.quoteSummaryCompact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: rgba(90, 142, 182, 0.08);
+  border: 1.5px solid var(--pop-blue);
+  border-radius: var(--border-radius-sm, 6px);
+  font-family: var(--font-code);
+  font-size: 13px;
+  color: var(--pop-black);
+}
+
+:global([data-theme='noir']) .quoteSummaryCompact {
+  background: rgba(0, 240, 255, 0.06);
+  border-color: var(--neon-cyan, #00f0ff);
+  color: var(--pop-cream, #f7f2e8);
+}
+

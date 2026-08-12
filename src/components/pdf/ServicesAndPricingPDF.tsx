@@ -7,6 +7,7 @@ import type {
   GoalArchetype,
   MaintenancePlanOption,
   ResumeData,
+  QuickServiceItem,
 } from '@/data/resume';
 import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
 import { ESTIMATE_DISCLAIMER, resolveFeatureDependencies } from '@/lib/pricing';
@@ -257,6 +258,40 @@ function createStyles(theme: PDFThemeConfig) {
       textAlign: 'right',
       paddingLeft: 6,
     },
+    colQuickService: {
+      width: '25%',
+      borderRightWidth: 1,
+      borderRightColor: theme.cardBorder,
+      paddingRight: 6,
+    },
+    colQuickDesc: {
+      width: '40%',
+      borderRightWidth: 1,
+      borderRightColor: theme.cardBorder,
+      paddingLeft: 6,
+      paddingRight: 6,
+    },
+    colQuickPriceINR: {
+      width: '13%',
+      borderRightWidth: 1,
+      borderRightColor: theme.cardBorder,
+      textAlign: 'right',
+      paddingLeft: 6,
+      paddingRight: 6,
+    },
+    colQuickPriceUSD: {
+      width: '10%',
+      borderRightWidth: 1,
+      borderRightColor: theme.cardBorder,
+      textAlign: 'right',
+      paddingLeft: 6,
+      paddingRight: 6,
+    },
+    colQuickTurnaround: {
+      width: '12%',
+      textAlign: 'right',
+      paddingLeft: 6,
+    },
     moduleTitle: {
       fontFamily: theme.labelBoldFont,
       fontSize: scaleBodyFont(theme, 7),
@@ -380,6 +415,10 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
   const maintenancePlans: MaintenancePlanOption[] = intakeConfig?.maintenancePlans?.length
     ? intakeConfig.maintenancePlans
     : questionnaireDefaults.maintenancePlans;
+
+  const quickServices: QuickServiceItem[] = intakeConfig?.quickServices?.length
+    ? intakeConfig.quickServices
+    : (questionnaireDefaults.quickServices as QuickServiceItem[]);
 
   const terms: string[] = intakeConfig?.termsAndConditions?.length
     ? intakeConfig.termsAndConditions
@@ -697,6 +736,49 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
           <Text style={[styles.contactText, { marginTop: 4, fontFamily: theme.labelBoldFont }]}>
             Direct Engineering Email: prateeqsharma@gmail.com | Web: https://prateeq.in
           </Text>
+        </View>
+
+        <PdfFooter theme={theme} leftText={FOOTER_TEXT} />
+      </Page>
+
+      {/* PAGE 6 — Quick Services */}
+      <Page size="A4" style={styles.page}>
+        <Text style={[styles.sectionHeader, { marginTop: 0 }]}>8. QUICK SERVICES — ADD TO YOUR EXISTING SITE</Text>
+        <View style={styles.table}>
+          <View style={styles.tableHeader}>
+            <Text style={[styles.tableHeaderCell, styles.colQuickService]}>SERVICE</Text>
+            <Text style={[styles.tableHeaderCell, styles.colQuickDesc]}>DESCRIPTION</Text>
+            <Text style={[styles.tableHeaderCell, styles.colQuickPriceINR]}>PRICE (INR)</Text>
+            <Text style={[styles.tableHeaderCell, styles.colQuickPriceUSD]}>PRICE (USD)</Text>
+            <Text style={[styles.tableHeaderCell, styles.colQuickTurnaround]}>TURNAROUND</Text>
+          </View>
+          {quickServices.map((service, idx) => (
+            <View
+              key={service.id}
+              wrap={false}
+              style={idx % 2 === 1 ? [styles.tableRow, styles.tableRowHighlight] : styles.tableRow}
+            >
+              <View style={styles.colQuickService}>
+                <Text style={styles.moduleTitle}>{cleanPDFText(service.label)}</Text>
+              </View>
+              <View style={styles.colQuickDesc}>
+                <Text style={styles.moduleDesc}>{service.laymanDescription}</Text>
+              </View>
+              <View style={styles.colQuickPriceINR}>
+                <Text style={styles.priceVal}>
+                  {service.priceINR === 0 ? 'Custom' : `INR ${service.priceINR.toLocaleString('en-IN')}`}
+                </Text>
+              </View>
+              <View style={styles.colQuickPriceUSD}>
+                <Text style={styles.priceVal}>
+                  {service.priceUSD === 0 ? 'Custom' : `$${service.priceUSD.toLocaleString('en-US')}`}
+                </Text>
+              </View>
+              <View style={styles.colQuickTurnaround}>
+                <Text style={styles.moduleDesc}>{service.turnaround}</Text>
+              </View>
+            </View>
+          ))}
         </View>
 
         <PdfFooter theme={theme} leftText={FOOTER_TEXT} />

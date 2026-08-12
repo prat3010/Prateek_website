@@ -4,6 +4,7 @@ import type {
   FeatureItem,
   GoalArchetype,
   MaintenancePlanOption,
+  QuickServiceItem,
 } from '@/data/resume';
 
 export type Currency = 'INR' | 'USD';
@@ -198,4 +199,23 @@ export function packageTotals(
     goalId: goal.id,
     total: packageTotalForArchetype(goal, engines, features, currency),
   }));
+}
+
+/**
+ * Calculate total for selected quick services (simple sum, no engine/brand/care).
+ */
+export function calcQuickServiceQuote(
+  quickServices: QuickServiceItem[],
+  selectedIds: string[],
+  currency: Currency,
+): { total: number; totalINR: number; totalUSD: number; items: QuickServiceItem[] } {
+  const items = quickServices.filter(s => selectedIds.includes(s.id));
+  const totalINR = items.reduce((sum, s) => sum + s.priceINR, 0);
+  const totalUSD = items.reduce((sum, s) => sum + s.priceUSD, 0);
+  return {
+    total: currency === 'INR' ? totalINR : totalUSD,
+    totalINR,
+    totalUSD,
+    items,
+  };
 }

@@ -29,7 +29,7 @@ describe('commercial PDF render smoke tests', () => {
       React.createElement(ServicesAndPricingPDF, { isNoir }) as React.ReactElement<DocumentProps>,
     );
     expect(pdf.subarray(0, 5).toString()).toBe('%PDF-');
-    expect(pageCount(pdf)).toBe(5);
+    expect(pageCount(pdf)).toBe(6);
 
     const tmp = path.join(os.tmpdir(), `pricing_${isNoir ? 'noir' : 'azure'}_${Date.now()}.pdf`);
     fs.writeFileSync(tmp, pdf);

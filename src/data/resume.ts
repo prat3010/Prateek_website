@@ -63,6 +63,10 @@ export interface BaseEngineItem {
   priceUSD: number;
   laymanDescription: string;
   techSpecs: string;
+  /** Goal ID whose bundled price should replace the raw engine price in the Resume tier grid. */
+  bundledPriceGoalId?: string;
+  /** If true, this engine is hidden from the Full Project engine selector (used for Quick Service infrastructure). */
+  hideFromFullProject?: boolean;
 }
 
 export interface FeatureItem {
@@ -74,6 +78,10 @@ export interface FeatureItem {
   techSpecs: string;
   /** Feature ids that must be selected whenever this module is selected. */
   dependsOn?: string[];
+  /** If true, auto-include this feature when project start type is 'legacy_rebuild'. */
+  autoIncludeOnLegacy?: boolean;
+  /** Maintenance plan ID to auto-recommend when this feature is selected. */
+  recommendedMaintenanceId?: string;
 }
 
 export interface GoalArchetype {
@@ -83,6 +91,8 @@ export interface GoalArchetype {
   description: string;
   recommendedEngineId: string;
   compulsoryFeatureLabels: string[];
+  /** If true, skip Step 3 (Brand Assets) for this archetype — used for standalone widgets/services. */
+  skipBrandAssets?: boolean;
 }
 
 export interface BrandAssetOption {
@@ -91,6 +101,8 @@ export interface BrandAssetOption {
   priceINR: number;
   priceUSD: number;
   description: string;
+  /** Design readiness value mapped from this brand tier (e.g. 'concept_only', 'wireframes_ready', 'figma_ready'). */
+  designReadiness?: string;
 }
 
 export interface MaintenancePlanOption {
@@ -111,6 +123,18 @@ export interface MaintenancePlanOption {
   overageRules?: string;
 }
 
+/** Quick service offered as a standalone micro-engagement (Step 0 → Quick flow). */
+export interface QuickServiceItem {
+  id: string;
+  label: string;
+  laymanDescription: string;
+  techSpecs: string;
+  priceINR: number;
+  priceUSD: number;
+  turnaround: string;
+  category: string;
+}
+
 export interface IntakeConfig {
   title: string;
   subtitle: string;
@@ -125,6 +149,9 @@ export interface IntakeConfig {
   goals?: GoalArchetype[];
   brandAssets?: BrandAssetOption[];
   maintenancePlans?: MaintenancePlanOption[];
+  quickServices?: QuickServiceItem[];
+  /** Business KPI dropdown options shown in Step 1. */
+  businessKPIs?: string[];
 }
 
 export interface ResumeData {
