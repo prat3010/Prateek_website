@@ -20,10 +20,6 @@ import {
   Compass,
   FileCheck,
   FileText,
-  ExternalLink,
-  Check,
-  Calendar,
-  Lock,
   X
 } from 'lucide-react';
 import Portal from '@/components/ui/Portal';
@@ -1201,7 +1197,7 @@ export default function ClientDashboardPage() {
                           key={cat.id}
                           type="button"
                           className={`${styles.categoryFilterBtn} ${activeCategoryFilter === cat.id ? styles.categoryFilterBtnActive : ''}`}
-                          onClick={() => setActiveCategoryFilter(cat.id as any)}
+                          onClick={() => setActiveCategoryFilter(cat.id as 'all' | 'financial' | 'technical' | 'design' | 'governance')}
                         >
                           {cat.label}
                         </button>

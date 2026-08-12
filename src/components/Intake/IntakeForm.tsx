@@ -24,6 +24,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import {
   calcQuote,
+  calcQuickServiceQuote,
   ESTIMATE_DISCLAIMER,
   formatMoney,
   formatPricePair,
@@ -422,7 +423,7 @@ interface IntakeFormData {
       featuresUSD: quote.featuresPriceUSD,
       itemizedList: quote.itemized.map(i => `${i.label} (+${formatMoney(currency === 'INR' ? i.priceINR : i.priceUSD, currency)})`),
     };
-  }, [selectedEngine, engines, features, brandAssets, maintenancePlans, formData.selectedFeatures, formData.selectedBrandAssetId, formData.selectedMaintenanceId, autoMaintenancePlanId, currency]);
+  }, [selectedEngine, engines, features, brandAssets, maintenancePlans, formData.selectedFeatures, formData.selectedBrandAssetId, formData.selectedMaintenanceId, autoMaintenancePlanId, currency, currentArchetype.compulsoryFeatureLabels, formData.projectStartType]);
 
   const activeMaintenancePlan = useMemo(() => {
     const targetId = formData.selectedMaintenanceId || autoMaintenancePlanId;
@@ -618,6 +619,75 @@ interface IntakeFormData {
       await loginWithGoogle('/dashboard?imported=true');
     } catch (err: unknown) {
       console.error('Intake form submission error:', err);
+      window.location.href = '/dashboard?imported=true';
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleQuickSubmit = async () => {
+    if (!quickFormData.agreedToTerms || selectedQuickServices.length === 0) return;
+    setSubmitting(true);
+    try {
+      const quote = calcQuickServiceQuote(quickServices, selectedQuickServices, currency);
+      const selectedServiceObjs = quickServices.filter(s => selectedQuickServices.includes(s.id));
+      const serviceLabels = selectedServiceObjs.map(s => s.label);
+
+      const quickScopePayload = {
+        scopeCode: generatedScopeCode,
+        companyName: quickFormData.companyName.trim() || 'Quick Service Order',
+        clientPhone: '',
+        baseEngineTitle: `Quick Service: ${serviceLabels.join(', ')}`,
+        selectedFeatures: serviceLabels,
+        brandAssetOption: 'Not Applicable (Existing Site)',
+        maintenancePlan: 'Self-Managed (30-Day Warranty)',
+        totalCostINR: quote.totalINR,
+        totalCostUSD: quote.totalUSD,
+        currency,
+        timeline: selectedServiceObjs[0]?.turnaround || '3–7 days',
+        businessKPI: '⚡ Quick Service Integration',
+        paymentStructure: '50/50',
+      };
+
+      if (typeof window !== 'undefined') {
+        try { localStorage.setItem('prateeq_pending_scope', JSON.stringify(quickScopePayload)); } catch {}
+        document.cookie = `prateeq_pending_scope=${encodeURIComponent(JSON.stringify(quickScopePayload))}; path=/; max-age=86400; SameSite=Lax;`;
+      }
+
+      try {
+        await fetch('/api/client/intake-draft', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(quickScopePayload),
+        });
+      } catch (draftErr) {
+        console.warn('Quick service intake draft API warning:', draftErr);
+      }
+
+      if (user?.email) {
+        try {
+          const accessToken = await getAccessToken();
+          await fetch('/api/client/save-scope', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+            },
+            body: JSON.stringify({
+              clientEmail: user.email,
+              ...quickScopePayload,
+            }),
+          });
+        } catch (saveErr) {
+          console.warn('Quick service save scope API warning:', saveErr);
+        }
+        window.location.href = '/dashboard?imported=true';
+        return;
+      }
+
+      await loginWithGoogle('/dashboard?imported=true');
+    } catch (err: unknown) {
+      console.error('Quick service submit error:', err);
       window.location.href = '/dashboard?imported=true';
     } finally {
       setSubmitting(false);
@@ -842,18 +912,11 @@ interface IntakeFormData {
                     </button>
                     <button
                       type="button"
-                      disabled={!quickFormData.agreedToTerms}
-                      onClick={() => {
-                        const params = new URLSearchParams({
-                          services: selectedQuickServices.join(','),
-                          company: quickFormData.companyName,
-                          site: quickFormData.siteUrl,
-                        });
-                        window.location.href = `/dashboard?quick=true&${params.toString()}`;
-                      }}
-                      className={`${styles.btn} ${styles.btnPrimary} ${!quickFormData.agreedToTerms ? styles.btnDisabled : ''}`}
+                      disabled={!quickFormData.agreedToTerms || submitting}
+                      onClick={handleQuickSubmit}
+                      className={`${styles.btn} ${styles.btnPrimary} ${!quickFormData.agreedToTerms || submitting ? styles.btnDisabled : ''}`}
                     >
-                      🚀 SAVE SCOPE & CONTINUE IN DASHBOARD
+                      {submitting ? 'PROCESSING...' : '🚀 SAVE SCOPE & CONTINUE IN DASHBOARD'}
                       <Send size={16} />
                     </button>
                   </div>

@@ -2,7 +2,6 @@
   "name": "Prateeq Sharma",
   "about": {
     "business": {
-      "light": "I'm Prateeq Sharma, a freelance developer who builds websites, custom tools, and simple admin flows for businesses that want something practical and maintainable.",
       "noir": "I'm Prateeq Sharma, a freelance developer who builds websites, custom tools, and admin flows for businesses that want something practical and maintainable.",
       "facts": [
         "SERVICE // Direct freelance partnership",
@@ -10,6 +9,7 @@
         "VALUE // Practical, maintainable builds",
         "LOCATION // Based in India, working remotely"
       ],
+      "light": "I'm Prateeq Sharma, a freelance developer who builds websites, custom tools, and simple admin flows for businesses that want something practical and maintainable.",
       "factsNoir": [
         "Custom websites with a low-friction handoff.",
         "Delivering working products directly to clients.",
@@ -18,7 +18,6 @@
       ]
     },
     "developer": {
-      "light": "I'm Prateeq Sharma, a developer focused on web applications, interface quality, and practical AI-assisted workflows. I like solving real problems with simple structure and dependable delivery.",
       "noir": "I'm Prateeq Sharma, a developer focused on web applications, interface quality, and practical AI-assisted workflows. I prefer clear structure, dependable delivery, and systems that are easy to maintain.",
       "facts": [
         "SYSTEM // Web apps built with clear structure",
@@ -26,6 +25,7 @@
         "ENGINE // AI-assisted workflows and tooling",
         "LOCATION // Based in India, working remotely"
       ],
+      "light": "I'm Prateeq Sharma, a developer focused on web applications, interface quality, and practical AI-assisted workflows. I like solving real problems with simple structure and dependable delivery.",
       "factsNoir": [
         "Working with clear structure and a small technical footprint.",
         "Turning rough ideas into working interfaces.",
@@ -38,486 +38,7 @@
   "phone": "+91 9050433260",
   "title": "Full-Stack Developer & AI Orchestration Engineer",
   "github": "https://github.com/prat3010",
-  "summary": {
-    "ai": "Builds AI-assisted workflows, content pipelines, and automation tools that make recurring tasks easier to run and review.",
-    "general": "Builds web applications and interactive interfaces with attention to clear structure, performance, and maintainability.",
-    "creative": "Designs responsive interfaces with careful motion, layout, and visual hierarchy.",
-    "fullstack": "Builds full-stack web systems with Next.js, Flask, FastAPI, and Supabase, with attention to data flow and reliability."
-  },
-  "twitter": "https://x.com/3010prateek",
-  "website": "https://prateeq.in",
-  "linkedin": "https://linkedin.com/in/freshlimevodka",
-  "education": [
-    {
-      "degree": "Bachelor of Commerce",
-      "period": "2020",
-      "school": "Delhi University",
-      "location": "New Delhi, India"
-    }
-  ],
-  "instagram": "https://www.instagram.com/freshlimevodka",
-  "quotation": {
-    "scopeModel": "Fixed-Price Milestones (No hidden hourly charges)",
-    "deliverySprint": "1 to 3 Weeks Turnaround Sprint",
-    "warrantyModel": "Included 30-Day Post-Launch Support & Warranty",
-    "hourlyRate": "$40",
-    "dayRate": "$300",
-    "paymentTerms": "50% upfront deposit to initiate development, 50% upon final project delivery.",
-    "deliverables": [
-      "Custom UI Design & Interactive Prototypes",
-      "Production-ready React & Next.js web applications",
-      "Supabase database engineering & security setups",
-      "Search Engine Optimization (SEO) & Web Telemetry setup",
-      "30 days of post-launch support & handoff documentation"
-    ]
-  },
-  "experience": [
-    {
-      "id": "freelance-developer",
-      "role": "Full-Stack Engineer & AI Prototyper",
-      "tags": [
-        "React",
-        "Next.js",
-        "Flutter",
-        "Python",
-        "FastAPI",
-        "Supabase",
-        "Framer Motion",
-        "SQLite",
-        "Google Gemini",
-        "Streamlit",
-        "GitHub API",
-        "TypeScript"
-      ],
-      "period": "2023 - Present",
-      "bullets": [
-        {
-          "ai": "Built LLM-assisted workflows for content drafting, OCR, and project analysis using Gemini-based tooling.",
-          "general": "Designed and shipped web platforms, simulation tools, and mobile utilities using React, Next.js, Flutter, and Python.",
-          "creative": "Translated visual layouts into responsive interfaces with motion and custom CSS.",
-          "fullstack": "Built API layers in Flask and FastAPI and connected them to PostgreSQL and Supabase data models."
-        },
-        {
-          "ai": "Used AI-assisted tools to prototype features quickly and keep repetitive work low.",
-          "general": "Improved website performance and navigation with Lenis scrolling and viewport-linked motion.",
-          "creative": "Designed custom interactive layouts and responsive visual frameworks with precise control.",
-          "fullstack": "Programmed offline-capable data layers with Drift and SQLite for mobile apps that keep working without network coverage."
-        },
-        {
-          "ai": "Built a Gemini-assisted tool for OCR, draft generation, and repo analysis.",
-          "general": "Built PrateeqSync AI, a local content manager for portfolio updates, credential review, and generated drafts.",
-          "creative": "Built an interactive Streamlit dashboard for managing skills, certificates, and media assets.",
-          "fullstack": "Built a Python-based content manager with Streamlit, GitHub API integration, and TypeScript file sync."
-        },
-        {
-          "ai": "Built a full-stack RAG platform with hybrid search, streaming LLM chat, and multi-tenant isolation.",
-          "general": "Designed and deployed Retriever, a production RAG engine with document ingestion, semantic search, and grounded chat.",
-          "creative": "Built an interactive RAG Lab UI with real-time SSE streaming and dual-theme design system.",
-          "fullstack": "Architected a FastAPI backend with pgvector, self-hosted Ollama embeddings, Supabase RLS, and Nginx reverse proxy on Oracle Cloud."
-        }
-      ],
-      "company": "Independent Consultant / Freelance Developer",
-      "location": "Remote / India"
-    }
-  ],
-  "lastSynced": {
-    "status": "success",
-    "summary": "Published blog post: Building a Dynamic Game Backend with Flask: A Technical Deep Dive into Earth Evolution Simulator",
-    "timestamp": "2026-07-08T18:33:08.544052"
-  },
-  "quotation_india": {
-    "scopeModel": "Fixed-Price Milestones (No hidden hourly charges)",
-    "deliverySprint": "1 to 3 Weeks Turnaround Sprint",
-    "warrantyModel": "Included 30-Day Post-Launch Support & Warranty",
-    "hourlyRate": "₹3,000",
-    "dayRate": "₹20,000",
-    "paymentTerms": "50% upfront deposit to initiate development, 50% upon final project delivery.",
-    "deliverables": [
-      "Custom UI Design & Interactive Prototypes",
-      "Production-ready React & Next.js web applications",
-      "Supabase database engineering & security setups",
-      "Search Engine Optimization (SEO) & Web Telemetry setup",
-      "30 days of post-launch support & handoff documentation"
-    ]
-  },
   "intake": {
-    "title": "PROJECT DISCOVERY & SCOPING BRIEF",
-    "subtitle": "Fill out this brief or download the printable PDF version for your team/client. Receive a fixed-price proposal within 24 hours.",
-    "categories": [
-      "Tier 1: High-Converting Landing Page (Single Page)",
-      "Tier 2: Custom Multi-Page Website (3–6 Pages)",
-      "Tier 3: Full-Stack Web Application + Admin Dashboard",
-      "Tier 4: Private AI Assistant / RAG Integration"
-    ],
-    "featureOptions": [
-      "Contact Form / Lead Capture (ReCAPTCHA Protected)",
-      "Payment Gateway (Razorpay)",
-      "User Auth & Client Portal (Google/Magic Link)",
-      "Headless Blog / CMS Content Management",
-      "Private AI Knowledge Base / Vector Search (RAG)",
-      "Admin Dashboard & Role Access Control",
-      "Automated Email Workflows (Resend Transactional)",
-      "Privacy-Compliant Analytics & Visitor Telemetry"
-    ],
-    "timelineOptions": [
-      "Express Delivery Sprint (7–10 Days - Rush Fee Applies)",
-      "Standard Turnaround (2–4 Weeks)",
-      "Flexible Timeline"
-    ],
-    "assetOptions": [
-      "All Brand Assets Ready (Logo SVG, Copywriting, Media)",
-      "Logo & Colors Ready (Need Copywriting & Formatting)",
-      "Starting from Scratch (Need Logo & Brand Kit)"
-    ],
-    "termsAndConditions": [
-      "1. Payment Milestone Structure: 50% Upfront Deposit required to initiate development & architecture setup. 50% Final Balance prior to domain mapping & production handover.",
-      "2. Scope Creep & Change Orders: Any feature, page, or integration requested after signing that is not listed in Section 2 will be classified as a 'Change Order' and quoted separately under a Phase 2 add-on contract.",
-      "3. Revision Policy: Includes up to 2 rounds of comprehensive design/layout revisions. Revision requests must be provided in writing within 5 business days of draft delivery.",
-      "4. Client Dependencies: Timeline countdown begins ONLY after receiving all required client assets (text, logo, media, API credentials). Client delays in asset delivery will extend the final delivery date accordingly.",
-      "5. Intellectual Property (IP) Ownership: 100% Intellectual Property and code ownership transfer to Client upon receipt of final payment.",
-      "6. Infrastructure & Third-Party Billing: Hosting (Vercel), Database (Supabase), Domain Registration, and API costs (OpenAI/Resend) are billed directly to client-owned accounts. Developer is not liable for third-party service outages.",
-      "7. Post-Launch Warranty: Includes 30 days of complimentary technical support & bug fixes post-launch. Continued support is available under a Monthly Care Plan."
-    ],
-    "middlemanAgreement": {
-      "partnerName": "[Partner Name]",
-      "effectiveDate": "",
-      "developerName": "Prateeq Sharma",
-      "developerEmail": "prateeqsharma@gmail.com",
-      "tier1Commission": "10%",
-      "tier2Commission": "12%",
-      "tier3Commission": "15%",
-      "recurringCommission": "10%",
-      "disbursementRules": [
-        "Rule 3.1 (No Out-of-Pocket Liability): Developer will never pay commissions out-of-pocket prior to client funds clearing bank accounts.",
-        "Rule 3.2 (Proportional Payout Schedule): 50% of Commission disbursed within 48 business hours of receiving Client's 50% Upfront Deposit. 50% disbursed upon receiving Client's Final 50% Balance.",
-        "Rule 3.3 (Cancellations & Defaults): In the event of a client default or partial scope cancellation, commission is calculated strictly on net funds actually collected and retained."
-      ],
-      "confidentialityRules": [
-        "Rule 4.1 (Non-Circumvention): Partner agrees not to bypass Developer or refer introduced clients to alternative software developers without express written consent.",
-        "Rule 4.2 (Codebase & IP Ownership): All codebase assets, databases, and intellectual property remain the property of Developer until 100% of project contract fees are paid by Client.",
-        "Rule 4.3 (Confidentiality & Non-Disclosure): Both parties agree to keep project quotes, client contact information, and internal commercial terms strictly confidential."
-      ],
-      "partnerEmail": "",
-      "agreedElectronically": "The parties acknowledge that this Agreement may be accepted and signed electronically, and an electronic signature or a documented email acceptance of these terms shall have the same force and effect as a manually executed signature.",
-      "sections": [
-        {
-          "key": "parties",
-          "heading": "1. PARTIES & DEFINITIONS",
-          "lines": [
-            "This Agreement is entered into between {{developerName}} (\"Developer\"), a freelance software engineer operating through prateeq.in, and {{partnerName}} (\"Partner\", \"Sales Representative\", or \"Sales Rep\"), in respect of the referral and closing of software development projects.",
-            "- \"Client\" means any person, company, or entity introduced by the Partner to the Developer and who agrees to purchase the Developer's services.",
-            "- \"Qualified Client\" means a Client who has signed the Developer's Project Scoping Specification and paid the 50% upfront deposit.",
-            "- \"Net Funds\" means amounts actually cleared and retained in the Developer's bank accounts in respect of a project, net of refunds, chargebacks, and applicable tax deductions.",
-            "- \"Recurring Care Plan\" means the Developer's paid monthly maintenance, hosting, and support retainer billed to a Client after project launch.",
-            "- \"Commission\" means the compensation payable to the Partner under Section 3, calculated as a percentage of Net Funds.",
-            "- \"Intellectual Property\" means the Developer's source code, designs, database schemas, architecture, documentation, and all other digital assets produced in connection with any project."
-          ]
-        },
-        {
-          "key": "purpose",
-          "heading": "2. PURPOSE & ROLES OF ENGAGEMENT",
-          "lines": [
-            "The purpose of this Agreement is to set out the commercial terms, commission structure, payout schedule, and operating rules under which the Partner introduces prospective Clients to the Developer for web development, custom software, and AI integration projects.",
-            "- The Partner acts as an independent introducer only, and not as an employee, agent, or legal representative of the Developer.",
-            "- The Partner has no authority to bind the Developer to any contract, price, or undertaking, whether verbally or in writing.",
-            "- The Partner will introduce Clients, encourage completion of the Developer's Project Scoping Lab & Instant Quote questionnaire, and support a warm handoff to the Developer.",
-            "- The Developer is responsible for scoping, pricing, delivery, and all client-facing terms after qualification."
-          ]
-        },
-        {
-          "key": "commission",
-          "heading": "3. COMMISSION TIER STRUCTURE & PAYOUT RATES",
-          "lines": [
-            "For every Qualified Client, the Partner earns the tiered Commission set out in the table below, computed as a percentage of Net Funds.",
-            "The tier is selected by the signed contract value of the project. The Developer may adjust commission percentages only by a written note signed at the time such Client is introduced; any such adjustment applies only to that specific Client."
-          ]
-        },
-        {
-          "key": "payment",
-          "heading": "4. PAYMENT & DISBURSEMENT RULES",
-          "lines": [
-            "- Rule 1 (No Out-of-Pocket Liability): The Developer will never pay Commission out of operating funds before Client funds clear the Developer's bank accounts. A Commission obligation arises only once Net Funds have been realized.",
-            "- Rule 2 (Proportional Schedule): 50% of the Commission is paid within 48 business hours of receiving the Qualified Client's 50% upfront deposit; the remaining 50% is paid within 48 business hours of receiving the Qualified Client's final 50% balance.",
-            "- Rule 3 (Cancellations & Defaults): If a Client defaults or partially cancels the project, the Commission is recalculated strictly against the Net Funds actually collected and retained. No Commission is payable on refunded, chargebacked, or disputed sums.",
-            "- Recurring Care: For Clients who subscribe to a Recurring Care Plan, the Partner is paid the recurring Commission rate each month, on cleared Net Funds, for as long as the care plan remains active."
-          ]
-        },
-        {
-          "key": "qualification",
-          "heading": "5. CLIENT HANDOFF & PROJECT QUALIFICATION",
-          "lines": [
-            "The Partner introduces the referred Client via a warm email introduction or the Project Scoping Lab & Instant Quote wizard at https://prateeq.in/scoping. A project is considered Qualified, and the Partner's Commission becomes committed, when the Client signs the relevant Scoping Specification and pays the 50% upfront deposit.",
-            "The Developer retains sole authority to accept or reject any referred Client, scope, budget, or project for any reason, including technical feasibility. A rejection does not create any obligation to pay Commission."
-          ]
-        },
-        {
-          "key": "attribution",
-          "heading": "6. LEAD ATTRIBUTION & TRAILING COMMISSIONS",
-          "lines": [
-            "- Attribution: A Client is attributed to the Partner only if the introduction was made through the Partner's intake link or a warm email that names the Partner. If more than one introducer claims the same Client, the earlier timestamped introduction (per the intake form or email records) prevails. The Developer's good-faith determination of the first reference, following a written explanation, is final.",
-            "- Trailing Commission: For as long as this Agreement is in effect, and for twelve (12) months after termination, the Partner continues to earn Commission on additional projects or Recurring Care Plans purchased by a Qualified Client whom the Partner originally introduced, provided the Client was Qualified while the contract was in force.",
-            "- Expiry: If a referred Client does not become qualified within twelve months of the original introduction, the Partner's right to Commission in respect of that Client lapses unless both parties agree otherwise in writing."
-          ]
-        },
-        {
-          "key": "confidentiality",
-          "heading": "7. NON-CIRCUMVENTION & CONFIDENTIALITY",
-          "lines": [
-            "- Non-Circumvention: The Partner agrees not to bypass the Developer or to refer Introduced Clients to alternative software developers without the Developer's prior written consent.",
-            "- Codebase & IP Ownership: All code, data, and other deliverables created for a project are the Developer's property until 100% of the applicable project contract fees are paid by the Client.",
-            "- Confidentiality: Both parties undertake to keep project quotations, Client contact details, commercial terms, and the contents of this Agreement strictly confidential."
-          ]
-        },
-        {
-          "key": "ip",
-          "heading": "8. INTELLECTUAL PROPERTY & CODEBASE OWNERSHIP",
-          "lines": [
-            "Until the applicable project's contract fees are paid in full, all code, architecture, design, and deliverables remain the Developer's exclusive property. Ownership transfers to the Client only upon full payment and subject to the Developer's own project agreement with that Client.",
-            "The Partner acquires no rights in the Developer's methodology, libraries, or reusable components, many of which are licensed and not assigned."
-          ]
-        },
-        {
-          "key": "termination",
-          "heading": "9. TERM & TERMINATION",
-          "lines": [
-            "- This Agreement takes effect on the Effective Date and continues indefinitely until terminated.",
-            "- Either party may terminate this Agreement at any time with 30 days' prior written notice.",
-            "- Either party may also terminate with immediate effect on written notice if the other party materially defaults under this Agreement and fails to remedy within 7 days of written notice.",
-            "- Commissions accrued and payable for Qualified, validly contracted and funded work at the date of termination remain due and are paid under Section 4.",
-            "- The obligations under Sections 6 (Trailing Commissions), 7 (Confidentiality), and 8 (Intellectual Property) survive termination."
-          ]
-        },
-        {
-          "key": "liability",
-          "heading": "10. REPRESENTATIONS, WARRANTIES & LIMITATION OF LIABILITY",
-          "lines": [
-            "- Each party represents that it has the full right and authority to enter into and perform its obligations under this Agreement.",
-            "- The Developer warrants that project services will be provided with reasonable skill and care, but makes no guarantee of specific project outcomes or profitability.",
-            "- Subject to applicable law, the Developer's total liability under or in connection with this Agreement shall not exceed the total Commission paid or accrued to the Partner in the twelve months preceding the event giving rise to the claim.",
-            "- Neither party shall be liable to the other for any indirect, incidental, consequential, or loss-of-profit damages."
-          ]
-        },
-        {
-          "key": "taxes",
-          "heading": "11. TAXES & COMPLIANCE",
-          "lines": [
-            "- Each party is responsible for filing and paying its own tax obligations on amounts received under this Agreement.",
-            "- Where applicable law requires tax to be deducted or withheld (for example, Indian TDS), the Developer may deduct such amount before paying Commission and will furnish the corresponding certificate to the Partner.",
-            "- Commission is paid to the Partner's bank or payout details on file, unless updated by the Partner in writing under Section 13.",
-            "- Neither party will offer bribes, gifts, or unlawful inducements to any Client or counterparty in connection with this Agreement."
-          ]
-        },
-        {
-          "key": "governance",
-          "heading": "12. GOVERNING LAW & DISPUTE RESOLUTION",
-          "lines": [
-            "This Agreement is governed by and construed in accordance with the laws of India, without regard to its conflict-of-laws principles.",
-            "The parties shall first seek to resolve any dispute amicably through written notice and a good-faith mediation video call within 30 days.",
-            "If the dispute is not resolved within 60 days, it shall be referred to a sole arbitrator appointed by mutual agreement, the seat and venue of arbitration being a neutral location in India, conducted in English, whose decision shall be final and binding in accordance with the law in force on arbitration in India. Each party bears its own costs.",
-            "For any matter not subject to arbitration, the courts having territorial jurisdiction over the Developer's principal place of business in India shall have exclusive jurisdiction, and any claims are subject to the limitations in Section 10."
-          ]
-        },
-        {
-          "key": "entire",
-          "heading": "13. ENTIRE AGREEMENT & GENERAL PROVISIONS",
-          "lines": [
-            "- Entire Agreement: This Agreement, together with any documents expressly referred to in it, constitutes the entire agreement between the parties and supersedes all prior discussions and understandings.",
-            "- Amendments: No amendment, waiver, or adjustment is binding unless made in writing and signed by both parties.",
-            "- Severability: If any provision is held unenforceable, that provision is limited or severed, and the remainder of the Agreement continues in full force.",
-            "- Force Majeure: Neither party is liable for delays or failures caused by events beyond its reasonable control.",
-            "- Notices: Notices under this Agreement are delivered to the contact email on file for each party, unless changed in a signed written notice."
-          ]
-        },
-        {
-          "key": "signature",
-          "heading": "SIGNATURE & AGREEMENT ACCEPTANCE",
-          "lines": [
-            "By signing below (or by providing an electronic signature or documented written acceptance), the parties confirm that they have read and understood the entire Agreement, including the Commission Structure in Section 3 and the Payment & Disbursement Rules in Section 4, and agree to be bound by its terms."
-          ]
-        }
-      ]
-    },
-    "engines": [
-      {
-        "id": "landing",
-        "title": "Landing Page Core Engine",
-        "tier": "Tier 1",
-        "priceINR": 30000,
-        "priceUSD": 400,
-        "laymanDescription": "A single, ultra-fast, high-converting webpage built to capture leads, showcase your brand, and turn visitors into clients.",
-        "techSpecs": "Next.js 16 App Router, Responsive Motion UI, CSS Modules, ReCAPTCHA v3, Telemetry, SEO Schema"
-      },
-      {
-        "id": "multipage",
-        "title": "Multi-Page Web App Core Engine",
-        "tier": "Tier 2",
-        "priceINR": 55000,
-        "priceUSD": 750,
-        "laymanDescription": "A complete multi-page business website (Home, About, Services, Case Studies, Contact) with smooth page transitions and consistent branding.",
-        "techSpecs": "Multi-page routing (3–6 pages), Framer Motion Page Transitions, Shared Layout Shell, Dynamic Routes"
-      },
-      {
-        "id": "saas",
-        "title": "Full-Stack SaaS MVP Core Engine",
-        "tier": "Tier 3",
-        "priceINR": 175000,
-        "priceUSD": 2400,
-        "laymanDescription": "A production software foundation connected to a cloud database for web apps where users create accounts, manage data, and run software workflows.",
-        "techSpecs": "Full Web App Shell, Supabase PostgreSQL Architecture, Server Caching (unstable_cache), Production Vercel Wiring"
-      },
-      {
-        "id": "standalone_embed",
-        "title": "Micro-Widget Script Core Engine",
-        "tier": "Tier 0",
-        "priceINR": 15000,
-        "priceUSD": 200,
-        "laymanDescription": "Standalone script loader and widget host for embedding single-purpose tools (chatbots, calculators, booking widgets) onto existing websites.",
-        "techSpecs": "Script Loader, iFrame Host, CORS Validation, Shadow DOM Isolation, Webhook Messaging",
-        "hideFromFullProject": true
-      }
-    ],
-    "features": [
-      {
-        "id": "auth",
-        "label": "User Auth & Client Portal (Google/Magic Link)",
-        "priceINR": 25000,
-        "priceUSD": 350,
-        "laymanDescription": "Allows your customers to securely sign in using Google or Email links and access their private personal dashboard.",
-        "techSpecs": "Google OAuth 2.0, Passwordless Magic Links, Supabase Row-Level Security (RLS), Encrypted Session Tokens",
-        "recommendedMaintenanceId": "standard"
-      },
-      {
-        "id": "payments",
-        "label": "Payment Gateway Integration (Razorpay)",
-        "priceINR": 45000,
-        "priceUSD": 600,
-        "laymanDescription": "Enables your website to collect payments via Credit Cards, Apple Pay, UPI, or subscriptions with automatic digital invoicing.",
-        "techSpecs": "Razorpay Webhook Listeners, 1-Click Checkout, Recurring Billing, PCI-compliant hosted checkout configuration with sensitive card data handled by the payment provider",
-        "recommendedMaintenanceId": "standard"
-      },
-      {
-        "id": "cms",
-        "label": "Headless Blog & CMS Content Management",
-        "priceINR": 30000,
-        "priceUSD": 400,
-        "laymanDescription": "Gives you an easy backend manager to publish blog posts, news, or case studies anytime without touching code, boosting your Google ranking.",
-        "techSpecs": "Markdown Parser, Supabase DB Content Tables, On-Demand Cache Revalidation (/api/revalidate), OpenGraph SEO",
-        "recommendedMaintenanceId": "standard"
-      },
-      {
-        "id": "ai_rag",
-        "label": "Private AI Knowledge Base / Vector Search (RAG)",
-        "priceINR": 125000,
-        "priceUSD": 1700,
-        "laymanDescription": "An intelligent AI assistant trained exclusively on your business documents, FAQs, and PDFs that answers customer questions 24/7 with source citations.",
-        "techSpecs": "pgvector Vector Embeddings, Document Chunking Pipeline, Semantic Search, Presigned Citation Downloads, Feedback Telemetry",
-        "recommendedMaintenanceId": "premium"
-      },
-      {
-        "id": "admin",
-        "label": "Admin Dashboard & Role Access Control (RBAC)",
-        "priceINR": 75000,
-        "priceUSD": 1000,
-        "laymanDescription": "A private internal command center for you and your team to view real-time traffic, manage customer data, and assign staff permissions.",
-        "techSpecs": "Single-Pass SQL RPC Aggregations (get_analytics_summary), Visitor Analytics Charts, Content Forms, Admin Security Guards"
-      },
-      {
-        "id": "email",
-        "label": "Automated Email Workflows (Resend Transactional)",
-        "priceINR": 15000,
-        "priceUSD": 200,
-        "laymanDescription": "Sends instant, professionally branded email receipts, welcome sequences, or contact notifications directly to your clients whenever they take action.",
-        "techSpecs": "Resend Transactional API, Custom HTML Templates, SMTP Fallbacks, Delivery Failure Telemetry"
-      },
-      {
-        "id": "booking",
-        "label": "Booking & Appointments Module",
-        "priceINR": 50000,
-        "priceUSD": 700,
-        "laymanDescription": "Lets customers book services, reserve time slots, and pay deposits online with calendar syncing and automatic reminders.",
-        "techSpecs": "Availability Calendar, Time-Slot Scheduling, Calendar Sync (Google/iCal), Deposit Holds, Booking Reminders",
-        "dependsOn": [
-          "payments",
-          "auth"
-        ]
-      },
-      {
-        "id": "commerce",
-        "label": "E-Commerce Storefront & Cart Module",
-        "priceINR": 75000,
-        "priceUSD": 1000,
-        "laymanDescription": "A complete online store with product catalog, shopping cart, secure checkout, and order management.",
-        "techSpecs": "Product Catalog, Cart & Checkout Flow, Inventory Management, Order Confirmation Emails",
-        "dependsOn": [
-          "payments",
-          "auth"
-        ]
-      },
-      {
-        "id": "lms",
-        "label": "LMS & Online Course Portal Module",
-        "priceINR": 85000,
-        "priceUSD": 1150,
-        "laymanDescription": "Student enrollment, a course player with progress tracking, and gated lesson content for online training.",
-        "techSpecs": "Course Builder, Video/Text Lesson Player, Progress Tracking, Enrollment & Certificates",
-        "dependsOn": [
-          "payments",
-          "auth"
-        ]
-      },
-      {
-        "id": "crm",
-        "label": "CRM & Lead Management Module",
-        "priceINR": 60000,
-        "priceUSD": 800,
-        "laymanDescription": "A private pipeline to track leads, customers, deals, and team activity with custom fields and exports.",
-        "techSpecs": "Deal Pipeline & Kanban, Custom Fields, Activity Timeline, Team Permissions, Export Tools",
-        "dependsOn": [
-          "auth"
-        ]
-      },
-      {
-        "id": "pwa",
-        "label": "Progressive Web App (PWA) & Offline Module",
-        "priceINR": 35000,
-        "priceUSD": 450,
-        "laymanDescription": "Turns your web app into an installable app-like experience with offline support, push notifications, and home-screen launch.",
-        "techSpecs": "Service Worker Caching, Web App Manifest, Install Prompts, Push Notifications, Offline Fallback Shell"
-      },
-      {
-        "id": "i18n",
-        "label": "Multilingual & i18n Localization Module",
-        "priceINR": 30000,
-        "priceUSD": 400,
-        "laymanDescription": "Renders your site or app in multiple languages with automatic browser detection, currency-aware pricing, and SEO language tags.",
-        "techSpecs": "i18n Routing & Dictionaries, Locale Auto-Detection, hreflang SEO Tags, Date/Currency Localization"
-      },
-      {
-        "id": "integrations",
-        "label": "Third-Party Integrations (Slack/Zapier/Webhooks)",
-        "priceINR": 40000,
-        "priceUSD": 550,
-        "laymanDescription": "Connects your app to the tools you already use — Slack alerts, Zapier automations, and outbound webhooks to third-party services.",
-        "techSpecs": "Slack Notifications, Zapier/Webhook Connectors, Outbound Event Hooks, Retry & Delivery Logging"
-      },
-      {
-        "id": "video",
-        "label": "Video Hosting & Streaming Module",
-        "priceINR": 65000,
-        "priceUSD": 850,
-        "laymanDescription": "Uploads, transcodes, and streams video courses or marketing content inside your app with secure playback and progress tracking.",
-        "techSpecs": "Transcoding Pipeline, Adaptive Bitrate Player, Secure Signed Playback, Upload Dashboards, Watch Progress"
-      },
-      {
-        "id": "migration",
-        "label": "Legacy Database & Data Migration",
-        "priceINR": 30000,
-        "priceUSD": 400,
-        "laymanDescription": "Extracts, transforms, and imports user accounts, posts, or legacy SQL tables into your new cloud database.",
-        "techSpecs": "ETL Pipeline, Supabase DB Schema Mapping, Data Cleansing, Foreign Key Integrity Verification, Migration Telemetry",
-        "autoIncludeOnLegacy": true
-      }
-    ],
     "goals": [
       {
         "id": "landing_page",
@@ -615,12 +136,13 @@
       },
       {
         "id": "standalone_chatbot",
-        "label": "💬 Standalone Embedded Chatbot Widget",
-        "shortLabel": "Chatbot Widget",
-        "description": "Embed a 24/7 chatbot widget into your existing website (WordPress, Webflow, Shopify, custom HTML) for simple lead capture or trained AI document search.",
+        "label": "💬 Standalone Embedded AI Chatbot Widget",
+        "shortLabel": "AI Chatbot Widget",
+        "description": "Embed a 24/7 intelligent AI chatbot into your existing website (WordPress, Webflow, Shopify, custom HTML) trained on your PDFs & docs.",
         "recommendedEngineId": "standalone_embed",
-        "compulsoryFeatureLabels": [],
-        "skipBrandAssets": true
+        "compulsoryFeatureLabels": [
+          "Private AI Knowledge Base / Vector Search (RAG)"
+        ]
       },
       {
         "id": "custom",
@@ -631,237 +153,578 @@
         "compulsoryFeatureLabels": []
       }
     ],
+    "title": "PROJECT DISCOVERY & SCOPING BRIEF",
+    "engines": [
+      {
+        "id": "landing",
+        "tier": "Tier 1",
+        "title": "Landing Page Core Engine",
+        "priceINR": 30000,
+        "priceUSD": 400,
+        "techSpecs": "Next.js 16 App Router, Responsive Motion UI, CSS Modules, ReCAPTCHA v3, Telemetry, SEO Schema",
+        "laymanDescription": "A single, ultra-fast, high-converting webpage built to capture leads, showcase your brand, and turn visitors into clients."
+      },
+      {
+        "id": "multipage",
+        "tier": "Tier 2",
+        "title": "Multi-Page Web App Core Engine",
+        "priceINR": 55000,
+        "priceUSD": 750,
+        "techSpecs": "Multi-page routing (3–6 pages), Framer Motion Page Transitions, Shared Layout Shell, Dynamic Routes",
+        "laymanDescription": "A complete multi-page business website (Home, About, Services, Case Studies, Contact) with smooth page transitions and consistent branding."
+      },
+      {
+        "id": "saas",
+        "tier": "Tier 3",
+        "title": "Full-Stack SaaS MVP Core Engine",
+        "priceINR": 175000,
+        "priceUSD": 2400,
+        "techSpecs": "Full Web App Shell, Supabase PostgreSQL Architecture, Server Caching (unstable_cache), Production Vercel Wiring",
+        "laymanDescription": "A production software foundation connected to a cloud database for web apps where users create accounts, manage data, and run software workflows."
+      },
+      {
+        "id": "standalone_embed",
+        "tier": "Tier 0",
+        "title": "Micro-Widget Script Core Engine",
+        "priceINR": 15000,
+        "priceUSD": 200,
+        "laymanDescription": "Standalone script loader and widget host for embedding single-purpose tools (chatbots, calculators, booking widgets) onto existing websites.",
+        "techSpecs": "Script Loader, iFrame Host, CORS Validation, Shadow DOM Isolation, Webhook Messaging",
+        "hideFromFullProject": true
+      }
+    ],
+    "features": [
+      {
+        "id": "auth",
+        "label": "User Auth & Client Portal (Google/Magic Link)",
+        "priceINR": 25000,
+        "priceUSD": 350,
+        "techSpecs": "Google OAuth 2.0, Passwordless Magic Links, Supabase Row-Level Security (RLS), Encrypted Session Tokens",
+        "laymanDescription": "Allows your customers to securely sign in using Google or Email links and access their private personal dashboard."
+      },
+      {
+        "id": "payments",
+        "label": "Payment Gateway Integration (Razorpay)",
+        "priceINR": 45000,
+        "priceUSD": 600,
+        "techSpecs": "Razorpay Webhook Listeners, 1-Click Checkout, Recurring Billing, PCI-compliant hosted checkout configuration with sensitive card data handled by the payment provider",
+        "laymanDescription": "Enables your website to collect payments via Credit Cards, Apple Pay, UPI, or subscriptions with automatic digital invoicing."
+      },
+      {
+        "id": "cms",
+        "label": "Headless Blog & CMS Content Management",
+        "priceINR": 30000,
+        "priceUSD": 400,
+        "techSpecs": "Markdown Parser, Supabase DB Content Tables, On-Demand Cache Revalidation (/api/revalidate), OpenGraph SEO",
+        "laymanDescription": "Gives you an easy backend manager to publish blog posts, news, or case studies anytime without touching code, boosting your Google ranking."
+      },
+      {
+        "id": "ai_rag",
+        "label": "Private AI Knowledge Base / Vector Search (RAG)",
+        "priceINR": 125000,
+        "priceUSD": 1700,
+        "techSpecs": "pgvector Vector Embeddings, Document Chunking Pipeline, Semantic Search, Presigned Citation Downloads, Feedback Telemetry",
+        "laymanDescription": "An intelligent AI assistant trained exclusively on your business documents, FAQs, and PDFs that answers customer questions 24/7 with source citations."
+      },
+      {
+        "id": "admin",
+        "label": "Admin Dashboard & Role Access Control (RBAC)",
+        "priceINR": 75000,
+        "priceUSD": 1000,
+        "techSpecs": "Single-Pass SQL RPC Aggregations (get_analytics_summary), Visitor Analytics Charts, Content Forms, Admin Security Guards",
+        "laymanDescription": "A private internal command center for you and your team to view real-time traffic, manage customer data, and assign staff permissions."
+      },
+      {
+        "id": "email",
+        "label": "Automated Email Workflows (Resend Transactional)",
+        "priceINR": 15000,
+        "priceUSD": 200,
+        "techSpecs": "Resend Transactional API, Custom HTML Templates, SMTP Fallbacks, Delivery Failure Telemetry",
+        "laymanDescription": "Sends instant, professionally branded email receipts, welcome sequences, or contact notifications directly to your clients whenever they take action."
+      },
+      {
+        "id": "booking",
+        "label": "Booking & Appointments Module",
+        "priceINR": 50000,
+        "priceUSD": 700,
+        "dependsOn": [
+          "payments",
+          "auth"
+        ],
+        "techSpecs": "Availability Calendar, Time-Slot Scheduling, Calendar Sync (Google/iCal), Deposit Holds, Booking Reminders",
+        "laymanDescription": "Lets customers book services, reserve time slots, and pay deposits online with calendar syncing and automatic reminders."
+      },
+      {
+        "id": "commerce",
+        "label": "E-Commerce Storefront & Cart Module",
+        "priceINR": 75000,
+        "priceUSD": 1000,
+        "dependsOn": [
+          "payments",
+          "auth"
+        ],
+        "techSpecs": "Product Catalog, Cart & Checkout Flow, Inventory Management, Order Confirmation Emails",
+        "laymanDescription": "A complete online store with product catalog, shopping cart, secure checkout, and order management."
+      },
+      {
+        "id": "lms",
+        "label": "LMS & Online Course Portal Module",
+        "priceINR": 85000,
+        "priceUSD": 1150,
+        "dependsOn": [
+          "payments",
+          "auth"
+        ],
+        "techSpecs": "Course Builder, Video/Text Lesson Player, Progress Tracking, Enrollment & Certificates",
+        "laymanDescription": "Student enrollment, a course player with progress tracking, and gated lesson content for online training."
+      },
+      {
+        "id": "crm",
+        "label": "CRM & Lead Management Module",
+        "priceINR": 60000,
+        "priceUSD": 800,
+        "dependsOn": [
+          "auth"
+        ],
+        "techSpecs": "Deal Pipeline & Kanban, Custom Fields, Activity Timeline, Team Permissions, Export Tools",
+        "laymanDescription": "A private pipeline to track leads, customers, deals, and team activity with custom fields and exports."
+      },
+      {
+        "id": "pwa",
+        "label": "Progressive Web App (PWA) & Offline Module",
+        "priceINR": 35000,
+        "priceUSD": 450,
+        "techSpecs": "Service Worker Caching, Web App Manifest, Install Prompts, Push Notifications, Offline Fallback Shell",
+        "laymanDescription": "Turns your web app into an installable app-like experience with offline support, push notifications, and home-screen launch."
+      },
+      {
+        "id": "i18n",
+        "label": "Multilingual & i18n Localization Module",
+        "priceINR": 30000,
+        "priceUSD": 400,
+        "techSpecs": "i18n Routing & Dictionaries, Locale Auto-Detection, hreflang SEO Tags, Date/Currency Localization",
+        "laymanDescription": "Renders your site or app in multiple languages with automatic browser detection, currency-aware pricing, and SEO language tags."
+      },
+      {
+        "id": "integrations",
+        "label": "Third-Party Integrations (Slack/Zapier/Webhooks)",
+        "priceINR": 40000,
+        "priceUSD": 550,
+        "techSpecs": "Slack Notifications, Zapier/Webhook Connectors, Outbound Event Hooks, Retry & Delivery Logging",
+        "laymanDescription": "Connects your app to the tools you already use — Slack alerts, Zapier automations, and outbound webhooks to third-party services."
+      },
+      {
+        "id": "video",
+        "label": "Video Hosting & Streaming Module",
+        "priceINR": 65000,
+        "priceUSD": 850,
+        "techSpecs": "Transcoding Pipeline, Adaptive Bitrate Player, Secure Signed Playback, Upload Dashboards, Watch Progress",
+        "laymanDescription": "Uploads, transcodes, and streams video courses or marketing content inside your app with secure playback and progress tracking."
+      },
+      {
+        "id": "migration",
+        "label": "Legacy Database & Data Migration",
+        "priceINR": 30000,
+        "priceUSD": 400,
+        "techSpecs": "ETL Pipeline, Supabase DB Schema Mapping, Data Cleansing, Foreign Key Integrity Verification, Migration Telemetry",
+        "laymanDescription": "Extracts, transforms, and imports user accounts, posts, or legacy SQL tables into your new cloud database."
+      }
+    ],
+    "subtitle": "Fill out this brief or download the printable PDF version for your team/client. Receive a fixed-price proposal within 24 hours.",
+    "categories": [
+      "Tier 1: High-Converting Landing Page (Single Page)",
+      "Tier 2: Custom Multi-Page Website (3–6 Pages)",
+      "Tier 3: Full-Stack Web Application + Admin Dashboard",
+      "Tier 4: Private AI Assistant / RAG Integration"
+    ],
     "brandAssets": [
       {
         "id": "ready",
         "label": "All Brand Assets Ready (Logo SVG & Copywriting)",
         "priceINR": 0,
         "priceUSD": 0,
-        "description": "Client supplies vector logo, color kit, and text content.",
-        "designReadiness": "figma_ready"
+        "description": "Client supplies vector logo, color kit, and text content."
       },
       {
         "id": "copy",
         "label": "Need Technical Copywriting & Section Formatting",
         "priceINR": 15000,
         "priceUSD": 200,
-        "description": "Professional tech copywriting, tagline crafting, and bullet formatting. Includes up to 5 pages of copy with 1 revision round.",
-        "designReadiness": "wireframes_ready"
+        "description": "Professional tech copywriting, tagline crafting, and bullet formatting. Includes up to 5 pages of copy with 1 revision round."
       },
       {
         "id": "scratch",
         "label": "Starting from Scratch (Starter Brand Kit & Copy)",
         "priceINR": 45000,
         "priceUSD": 600,
-        "description": "Starter Brand Kit: custom logo concepts, color palette, typography pairing, and copywriting. Includes up to 3 logo concepts and 2 revision rounds; final brand files delivered as vectors.",
-        "designReadiness": "concept_only"
+        "description": "Starter Brand Kit: custom logo concepts, color palette, typography pairing, and copywriting. Includes up to 3 logo concepts and 2 revision rounds; final brand files delivered as vectors."
       }
+    ],
+    "assetOptions": [
+      "All Brand Assets Ready (Logo SVG, Copywriting, Media)",
+      "Logo & Colors Ready (Need Copywriting & Formatting)",
+      "Starting from Scratch (Need Logo & Brand Kit)"
+    ],
+    "featureOptions": [
+      "Contact Form / Lead Capture (ReCAPTCHA Protected)",
+      "Payment Gateway (Razorpay)",
+      "User Auth & Client Portal (Google/Magic Link)",
+      "Headless Blog / CMS Content Management",
+      "Private AI Knowledge Base / Vector Search (RAG)",
+      "Admin Dashboard & Role Access Control",
+      "Automated Email Workflows (Resend Transactional)",
+      "Privacy-Compliant Analytics & Visitor Telemetry"
+    ],
+    "timelineOptions": [
+      "Express Delivery Sprint (7–10 Days - Rush Fee Applies)",
+      "Standard Turnaround (2–4 Weeks)",
+      "Flexible Timeline"
     ],
     "maintenancePlans": [
       {
         "id": "basic",
         "name": "Basic Care Plan",
-        "priceINR": 5000,
-        "priceUSD": 70,
-        "period": "/ month",
         "badge": "💡 Recommended for Landing Pages",
-        "laymanDescription": "Keeps your server healthy, creates daily automated database backups, installs security patches, and ensures your site stays online 24/7.",
-        "techSpecs": "Vercel/Supabase Uptime Monitoring, Daily PostgreSQL Backups, SSL Renewals, Security Dependency Updates",
+        "period": "/ month",
         "includes": [
           "Hosting support & SSL management",
           "Daily automated database backups",
           "Dependency & security patching",
           "Minor bug fixes & uptime monitoring"
         ],
+        "priceINR": 5000,
+        "priceUSD": 70,
+        "techSpecs": "Vercel/Supabase Uptime Monitoring, Daily PostgreSQL Backups, SSL Renewals, Security Dependency Updates",
+        "overageRules": "Overage beyond the included hours requires written approval and is billed separately. Unused hours do not roll over.",
         "responseTime": "Within 2 business days",
         "includedHours": "Up to 1 hour of developer time/month",
-        "overageRules": "Overage beyond the included hours requires written approval and is billed separately. Unused hours do not roll over."
+        "laymanDescription": "Keeps your server healthy, creates daily automated database backups, installs security patches, and ensures your site stays online 24/7."
       },
       {
         "id": "standard",
         "name": "Standard Care Plan",
-        "priceINR": 10000,
-        "priceUSD": 140,
-        "period": "/ month",
         "badge": "💡 Recommended for Auth/Payments/CMS",
-        "laymanDescription": "Includes everything in Basic plus up to 4 hours of monthly developer support to edit text, swap images, update pages, or tweak designs whenever you need.",
-        "techSpecs": "Everything in Basic + 3–4 Hours Monthly Dev Allocation, Core Web Vitals Performance Tuning, Content Schema Updates",
+        "period": "/ month",
         "includes": [
           "Everything in Basic Care",
           "Monthly text & media content updates",
           "3–4 hours of dedicated dev time/month",
           "Performance & page speed tuning"
         ],
+        "priceINR": 10000,
+        "priceUSD": 140,
+        "techSpecs": "Everything in Basic + 3–4 Hours Monthly Dev Allocation, Core Web Vitals Performance Tuning, Content Schema Updates",
+        "overageRules": "Overage beyond the included hours requires written approval and is billed separately. Unused hours do not roll over.",
         "responseTime": "Within 1 business day",
         "includedHours": "3–4 hours of developer time/month",
-        "overageRules": "Overage beyond the included hours requires written approval and is billed separately. Unused hours do not roll over."
+        "laymanDescription": "Includes everything in Basic plus up to 4 hours of monthly developer support to edit text, swap images, update pages, or tweak designs whenever you need."
       },
       {
         "id": "premium",
         "name": "Premium AI & Dev SLA Care Plan",
-        "priceINR": 35000,
-        "priceUSD": 475,
-        "period": "/ month",
         "badge": "💡 Recommended for AI Chatbot & RAG Engines",
-        "laymanDescription": "For critical business apps and AI engines. Includes a guaranteed priority response SLA, AI model accuracy tuning, SEO reports, and dedicated dev hours.",
-        "techSpecs": "24-Hour Priority SLA, AI Vector Index Tuning & Latency Monitoring, SEO Analytics Reports, Dedicated Feature Engineering",
+        "period": "/ month",
         "includes": [
           "Priority 24-hour SLA response",
           "AI Vector DB & LLM latency monitoring",
           "Dedicated feature development hours",
           "Analytics & SEO health reports"
         ],
+        "priceINR": 35000,
+        "priceUSD": 475,
+        "techSpecs": "24-Hour Priority SLA, AI Vector Index Tuning & Latency Monitoring, SEO Analytics Reports, Dedicated Feature Engineering",
+        "overageRules": "Overage beyond the included hours requires written approval and is billed separately. Unused hours do not roll over. Third-party service billing is excluded and billed directly to the client.",
         "responseTime": "Within 24 hours (response-not-resolution commitment)",
         "includedHours": "Up to 8 hours of developer time/month",
-        "overageRules": "Overage beyond the included hours requires written approval and is billed separately. Unused hours do not roll over. Third-party service billing is excluded and billed directly to the client."
+        "laymanDescription": "For critical business apps and AI engines. Includes a guaranteed priority response SLA, AI model accuracy tuning, SEO reports, and dedicated dev hours."
       },
       {
         "id": "self",
         "name": "Self-Managed (Complimentary 30-Day Warranty)",
-        "priceINR": 0,
-        "priceUSD": 0,
-        "period": "",
         "badge": "30-Day Warranty Included",
-        "laymanDescription": "Includes 30 days of complimentary technical support post-launch. Client manages cloud hosting and database updates afterwards.",
-        "techSpecs": "30-Day Post-Launch Bug Warranty, Developer Handover Documentation",
+        "period": "",
         "includes": [
           "30 days complimentary post-launch support",
           "Client manages cloud hosting & patches afterwards"
         ],
+        "priceINR": 0,
+        "priceUSD": 0,
+        "techSpecs": "30-Day Post-Launch Bug Warranty, Developer Handover Documentation",
+        "overageRules": "Post-warranty work is billed separately under a paid care plan.",
         "responseTime": "Within 2 business days (warranty period)",
         "includedHours": "Complimentary warranty support only",
-        "overageRules": "Post-warranty work is billed separately under a paid care plan."
+        "laymanDescription": "Includes 30 days of complimentary technical support post-launch. Client manages cloud hosting and database updates afterwards."
       }
     ],
-    "businessKPIs": [
-      "🚀 Increase Lead & Customer Conversion Rate",
-      "⚡ Accelerate Application Speed & Performance (LCP/CWV)",
-      "🛠️ Launch MVP Product to Market Rapidly",
-      "🎨 Modernize Legacy Web Infrastructure & Brand Identity",
-      "🤖 Automate Business Workflows with AI Integration",
-      "🔐 Enterprise Security, Compliance & User RBAC"
-    ],
-    "quickServices": [
-      {
-        "id": "chatbot",
-        "label": "💬 AI Chatbot Widget",
-        "laymanDescription": "24/7 AI assistant on your website that answers customer questions, captures leads, and reduces support workload.",
-        "techSpecs": "Script Loader, Shadow DOM Isolation, System Prompt Configuration, Fallback Routing, Webhook Messaging",
-        "priceINR": 20000,
-        "priceUSD": 250,
-        "turnaround": "5–7 days",
-        "category": "ai"
-      },
-      {
-        "id": "rag_knowledge_base",
-        "label": "🧠 AI Knowledge Base (RAG)",
-        "laymanDescription": "Train an AI on your business documents, PDFs, and FAQs so it answers questions with source citations.",
-        "techSpecs": "pgvector Embeddings, Document Chunking, Semantic Search, Presigned Citation Downloads, Feedback Telemetry",
-        "priceINR": 125000,
-        "priceUSD": 1700,
-        "turnaround": "7–14 days",
-        "category": "ai"
-      },
-      {
-        "id": "transactional_email",
-        "label": "📧 Transactional Email Setup",
-        "laymanDescription": "Branded email notifications (welcome, receipt, password reset) with SPF/DKIM/DMARC verification so emails land in inbox, not spam.",
-        "techSpecs": "Resend/SendGrid Integration, SPF/DKIM/DMARC DNS Auth, Custom HTML Templates, Delivery Telemetry",
-        "priceINR": 15000,
-        "priceUSD": 200,
-        "turnaround": "3–5 days",
-        "category": "email"
-      },
-      {
-        "id": "payment_gateway",
-        "label": "💳 Payment Gateway Integration",
-        "laymanDescription": "Add Razorpay/Stripe checkout to your existing site for one-time payments or subscriptions with automatic invoicing.",
-        "techSpecs": "Razorpay/Stripe Webhooks, Checkout Flow, Recurring Billing, PCI-Compliant Hosted Checkout",
-        "priceINR": 45000,
-        "priceUSD": 600,
-        "turnaround": "5–7 days",
-        "category": "integration"
-      },
-      {
-        "id": "api_integration",
-        "label": "🔗 Third-Party API Integration",
-        "laymanDescription": "Connect your site to Slack, Zapier, Google Sheets, CRM, or any external service with webhook automation.",
-        "techSpecs": "Webhook Connectors, Serverless Route Handlers, Retry & Delivery Logging, Outbound Event Hooks",
-        "priceINR": 40000,
-        "priceUSD": 550,
-        "turnaround": "3–7 days",
-        "category": "integration"
-      },
-      {
-        "id": "speed_optimization",
-        "label": "⚡ Core Web Vitals Optimization",
-        "laymanDescription": "Fix loading speed, interaction lag, and layout shifts to rank higher on Google and load under 2 seconds.",
-        "techSpecs": "LCP/INP/CLS Audit & Fix, Image Compression, Script Deferral, Font Optimization, CDN Caching",
-        "priceINR": 25000,
-        "priceUSD": 350,
-        "turnaround": "3–5 days",
-        "category": "performance"
-      },
-      {
-        "id": "seo_audit",
-        "label": "🔍 Technical SEO Audit & Fix",
-        "laymanDescription": "Meta tags, structured JSON-LD data, sitemap, robots.txt, OpenGraph cards, and canonical tags for better Google indexing.",
-        "techSpecs": "JSON-LD Schema Markup, Canonical Tags, Sitemap Generation, robots.txt, OpenGraph & Twitter Cards",
-        "priceINR": 30000,
-        "priceUSD": 400,
-        "turnaround": "3–7 days",
-        "category": "performance"
-      },
-      {
-        "id": "accessibility_audit",
-        "label": "♿ Accessibility Audit & Fixes",
-        "laymanDescription": "WCAG 2.1 compliance: screen readers, keyboard navigation, color contrast, ARIA labels to prevent legal claims.",
-        "techSpecs": "WCAG 2.1 AA Audit, ARIA Landmarks, Keyboard Navigation, Color Contrast Fixes, Screen Reader Testing",
-        "priceINR": 40000,
-        "priceUSD": 500,
-        "turnaround": "5–7 days",
-        "category": "performance"
-      },
-      {
-        "id": "i18n_setup",
-        "label": "🌐 Multilingual / i18n Setup",
-        "laymanDescription": "Multiple languages with browser auto-detection, locale-aware URLs, and SEO-friendly hreflang tags.",
-        "techSpecs": "next-intl / react-i18next, Locale Auto-Detection, hreflang SEO Tags, Translation JSON Structure",
-        "priceINR": 30000,
-        "priceUSD": 400,
-        "turnaround": "5–7 days",
-        "category": "integration"
-      },
-      {
-        "id": "pwa_conversion",
-        "label": "📱 PWA Conversion",
-        "laymanDescription": "Turn your website into an installable app with offline support, home screen icon, and splash screen.",
-        "techSpecs": "Service Worker, Web App Manifest, Install Prompts, Offline Fallback Shell, Push Notifications",
-        "priceINR": 30000,
-        "priceUSD": 400,
-        "turnaround": "3–5 days",
-        "category": "integration"
-      },
-      {
-        "id": "analytics_setup",
-        "label": "📊 Analytics & Event Tracking",
-        "laymanDescription": "Custom event tracking, conversion funnels, and dashboard setup so you know exactly how visitors use your site.",
-        "techSpecs": "GA4/PostHog/Custom Events, Conversion Funnel Setup, Dashboard Widgets, UTM Tracking",
-        "priceINR": 20000,
-        "priceUSD": 250,
-        "turnaround": "2–4 days",
-        "category": "performance"
-      },
-      {
-        "id": "data_migration",
-        "label": "🗄️ Data Migration",
-        "laymanDescription": "Clean, transform, and import legacy data (spreadsheets, old databases) into modern cloud database without data loss.",
-        "techSpecs": "ETL Pipeline, Schema Mapping, Data Cleansing, Foreign Key Integrity, Migration Verification",
-        "priceINR": 30000,
-        "priceUSD": 400,
-        "turnaround": "3–7 days",
-        "category": "integration"
-      }
+    "middlemanAgreement": {
+      "sections": [
+        {
+          "key": "parties",
+          "lines": [
+            "This Agreement is entered into between {{developerName}} (\"Developer\"), a freelance software engineer operating through prateeq.in, and {{partnerName}} (\"Partner\", \"Sales Representative\", or \"Sales Rep\"), in respect of the referral and closing of software development projects.",
+            "- \"Client\" means any person, company, or entity introduced by the Partner to the Developer and who agrees to purchase the Developer's services.",
+            "- \"Qualified Client\" means a Client who has signed the Developer's Project Scoping Specification and paid the 50% upfront deposit.",
+            "- \"Net Funds\" means amounts actually cleared and retained in the Developer's bank accounts in respect of a project, net of refunds, chargebacks, and applicable tax deductions.",
+            "- \"Recurring Care Plan\" means the Developer's paid monthly maintenance, hosting, and support retainer billed to a Client after project launch.",
+            "- \"Commission\" means the compensation payable to the Partner under Section 3, calculated as a percentage of Net Funds.",
+            "- \"Intellectual Property\" means the Developer's source code, designs, database schemas, architecture, documentation, and all other digital assets produced in connection with any project."
+          ],
+          "heading": "1. PARTIES & DEFINITIONS"
+        },
+        {
+          "key": "purpose",
+          "lines": [
+            "The purpose of this Agreement is to set out the commercial terms, commission structure, payout schedule, and operating rules under which the Partner introduces prospective Clients to the Developer for web development, custom software, and AI integration projects.",
+            "- The Partner acts as an independent introducer only, and not as an employee, agent, or legal representative of the Developer.",
+            "- The Partner has no authority to bind the Developer to any contract, price, or undertaking, whether verbally or in writing.",
+            "- The Partner will introduce Clients, encourage completion of the Developer's Project Scoping Lab & Instant Quote questionnaire, and support a warm handoff to the Developer.",
+            "- The Developer is responsible for scoping, pricing, delivery, and all client-facing terms after qualification."
+          ],
+          "heading": "2. PURPOSE & ROLES OF ENGAGEMENT"
+        },
+        {
+          "key": "commission",
+          "lines": [
+            "For every Qualified Client, the Partner earns the tiered Commission set out in the table below, computed as a percentage of Net Funds.",
+            "The tier is selected by the signed contract value of the project. The Developer may adjust commission percentages only by a written note signed at the time such Client is introduced; any such adjustment applies only to that specific Client."
+          ],
+          "heading": "3. COMMISSION TIER STRUCTURE & PAYOUT RATES"
+        },
+        {
+          "key": "payment",
+          "lines": [
+            "- Rule 1 (No Out-of-Pocket Liability): The Developer will never pay Commission out of operating funds before Client funds clear the Developer's bank accounts. A Commission obligation arises only once Net Funds have been realized.",
+            "- Rule 2 (Proportional Schedule): 50% of the Commission is paid within 48 business hours of receiving the Qualified Client's 50% upfront deposit; the remaining 50% is paid within 48 business hours of receiving the Qualified Client's final 50% balance.",
+            "- Rule 3 (Cancellations & Defaults): If a Client defaults or partially cancels the project, the Commission is recalculated strictly against the Net Funds actually collected and retained. No Commission is payable on refunded, chargebacked, or disputed sums.",
+            "- Recurring Care: For Clients who subscribe to a Recurring Care Plan, the Partner is paid the recurring Commission rate each month, on cleared Net Funds, for as long as the care plan remains active."
+          ],
+          "heading": "4. PAYMENT & DISBURSEMENT RULES"
+        },
+        {
+          "key": "qualification",
+          "lines": [
+            "The Partner introduces the referred Client via a warm email introduction or the Project Scoping Lab & Instant Quote wizard at https://prateeq.in/scoping. A project is considered Qualified, and the Partner's Commission becomes committed, when the Client signs the relevant Scoping Specification and pays the 50% upfront deposit.",
+            "The Developer retains sole authority to accept or reject any referred Client, scope, budget, or project for any reason, including technical feasibility. A rejection does not create any obligation to pay Commission."
+          ],
+          "heading": "5. CLIENT HANDOFF & PROJECT QUALIFICATION"
+        },
+        {
+          "key": "attribution",
+          "lines": [
+            "- Attribution: A Client is attributed to the Partner only if the introduction was made through the Partner's intake link or a warm email that names the Partner. If more than one introducer claims the same Client, the earlier timestamped introduction (per the intake form or email records) prevails. The Developer's good-faith determination of the first reference, following a written explanation, is final.",
+            "- Trailing Commission: For as long as this Agreement is in effect, and for twelve (12) months after termination, the Partner continues to earn Commission on additional projects or Recurring Care Plans purchased by a Qualified Client whom the Partner originally introduced, provided the Client was Qualified while the contract was in force.",
+            "- Expiry: If a referred Client does not become qualified within twelve months of the original introduction, the Partner's right to Commission in respect of that Client lapses unless both parties agree otherwise in writing."
+          ],
+          "heading": "6. LEAD ATTRIBUTION & TRAILING COMMISSIONS"
+        },
+        {
+          "key": "confidentiality",
+          "lines": [
+            "- Non-Circumvention: The Partner agrees not to bypass the Developer or to refer Introduced Clients to alternative software developers without the Developer's prior written consent.",
+            "- Codebase & IP Ownership: All code, data, and other deliverables created for a project are the Developer's property until 100% of the applicable project contract fees are paid by the Client.",
+            "- Confidentiality: Both parties undertake to keep project quotations, Client contact details, commercial terms, and the contents of this Agreement strictly confidential."
+          ],
+          "heading": "7. NON-CIRCUMVENTION & CONFIDENTIALITY"
+        },
+        {
+          "key": "ip",
+          "lines": [
+            "Until the applicable project's contract fees are paid in full, all code, architecture, design, and deliverables remain the Developer's exclusive property. Ownership transfers to the Client only upon full payment and subject to the Developer's own project agreement with that Client.",
+            "The Partner acquires no rights in the Developer's methodology, libraries, or reusable components, many of which are licensed and not assigned."
+          ],
+          "heading": "8. INTELLECTUAL PROPERTY & CODEBASE OWNERSHIP"
+        },
+        {
+          "key": "termination",
+          "lines": [
+            "- This Agreement takes effect on the Effective Date and continues indefinitely until terminated.",
+            "- Either party may terminate this Agreement at any time with 30 days' prior written notice.",
+            "- Either party may also terminate with immediate effect on written notice if the other party materially defaults under this Agreement and fails to remedy within 7 days of written notice.",
+            "- Commissions accrued and payable for Qualified, validly contracted and funded work at the date of termination remain due and are paid under Section 4.",
+            "- The obligations under Sections 6 (Trailing Commissions), 7 (Confidentiality), and 8 (Intellectual Property) survive termination."
+          ],
+          "heading": "9. TERM & TERMINATION"
+        },
+        {
+          "key": "liability",
+          "lines": [
+            "- Each party represents that it has the full right and authority to enter into and perform its obligations under this Agreement.",
+            "- The Developer warrants that project services will be provided with reasonable skill and care, but makes no guarantee of specific project outcomes or profitability.",
+            "- Subject to applicable law, the Developer's total liability under or in connection with this Agreement shall not exceed the total Commission paid or accrued to the Partner in the twelve months preceding the event giving rise to the claim.",
+            "- Neither party shall be liable to the other for any indirect, incidental, consequential, or loss-of-profit damages."
+          ],
+          "heading": "10. REPRESENTATIONS, WARRANTIES & LIMITATION OF LIABILITY"
+        },
+        {
+          "key": "taxes",
+          "lines": [
+            "- Each party is responsible for filing and paying its own tax obligations on amounts received under this Agreement.",
+            "- Where applicable law requires tax to be deducted or withheld (for example, Indian TDS), the Developer may deduct such amount before paying Commission and will furnish the corresponding certificate to the Partner.",
+            "- Commission is paid to the Partner's bank or payout details on file, unless updated by the Partner in writing under Section 13.",
+            "- Neither party will offer bribes, gifts, or unlawful inducements to any Client or counterparty in connection with this Agreement."
+          ],
+          "heading": "11. TAXES & COMPLIANCE"
+        },
+        {
+          "key": "governance",
+          "lines": [
+            "This Agreement is governed by and construed in accordance with the laws of India, without regard to its conflict-of-laws principles.",
+            "The parties shall first seek to resolve any dispute amicably through written notice and a good-faith mediation video call within 30 days.",
+            "If the dispute is not resolved within 60 days, it shall be referred to a sole arbitrator appointed by mutual agreement, the seat and venue of arbitration being a neutral location in India, conducted in English, whose decision shall be final and binding in accordance with the law in force on arbitration in India. Each party bears its own costs.",
+            "For any matter not subject to arbitration, the courts having territorial jurisdiction over the Developer's principal place of business in India shall have exclusive jurisdiction, and any claims are subject to the limitations in Section 10."
+          ],
+          "heading": "12. GOVERNING LAW & DISPUTE RESOLUTION"
+        },
+        {
+          "key": "entire",
+          "lines": [
+            "- Entire Agreement: This Agreement, together with any documents expressly referred to in it, constitutes the entire agreement between the parties and supersedes all prior discussions and understandings.",
+            "- Amendments: No amendment, waiver, or adjustment is binding unless made in writing and signed by both parties.",
+            "- Severability: If any provision is held unenforceable, that provision is limited or severed, and the remainder of the Agreement continues in full force.",
+            "- Force Majeure: Neither party is liable for delays or failures caused by events beyond its reasonable control.",
+            "- Notices: Notices under this Agreement are delivered to the contact email on file for each party, unless changed in a signed written notice."
+          ],
+          "heading": "13. ENTIRE AGREEMENT & GENERAL PROVISIONS"
+        },
+        {
+          "key": "signature",
+          "lines": [
+            "By signing below (or by providing an electronic signature or documented written acceptance), the parties confirm that they have read and understood the entire Agreement, including the Commission Structure in Section 3 and the Payment & Disbursement Rules in Section 4, and agree to be bound by its terms."
+          ],
+          "heading": "SIGNATURE & AGREEMENT ACCEPTANCE"
+        }
+      ],
+      "partnerName": "[Partner Name]",
+      "partnerEmail": "",
+      "developerName": "Prateeq Sharma",
+      "effectiveDate": "",
+      "developerEmail": "prateeqsharma@gmail.com",
+      "tier1Commission": "10%",
+      "tier2Commission": "12%",
+      "tier3Commission": "15%",
+      "disbursementRules": [
+        "Rule 3.1 (No Out-of-Pocket Liability): Developer will never pay commissions out-of-pocket prior to client funds clearing bank accounts.",
+        "Rule 3.2 (Proportional Payout Schedule): 50% of Commission disbursed within 48 business hours of receiving Client's 50% Upfront Deposit. 50% disbursed upon receiving Client's Final 50% Balance.",
+        "Rule 3.3 (Cancellations & Defaults): In the event of a client default or partial scope cancellation, commission is calculated strictly on net funds actually collected and retained."
+      ],
+      "recurringCommission": "10%",
+      "agreedElectronically": "The parties acknowledge that this Agreement may be accepted and signed electronically, and an electronic signature or a documented email acceptance of these terms shall have the same force and effect as a manually executed signature.",
+      "confidentialityRules": [
+        "Rule 4.1 (Non-Circumvention): Partner agrees not to bypass Developer or refer introduced clients to alternative software developers without express written consent.",
+        "Rule 4.2 (Codebase & IP Ownership): All codebase assets, databases, and intellectual property remain the property of Developer until 100% of project contract fees are paid by Client.",
+        "Rule 4.3 (Confidentiality & Non-Disclosure): Both parties agree to keep project quotes, client contact information, and internal commercial terms strictly confidential."
+      ]
+    },
+    "termsAndConditions": [
+      "1. Payment Milestone Structure: 50% Upfront Deposit required to initiate development & architecture setup. 50% Final Balance prior to domain mapping & production handover.",
+      "2. Scope Creep & Change Orders: Any feature, page, or integration requested after signing that is not listed in Section 2 will be classified as a 'Change Order' and quoted separately under a Phase 2 add-on contract.",
+      "3. Revision Policy: Includes up to 2 rounds of comprehensive design/layout revisions. Revision requests must be provided in writing within 5 business days of draft delivery.",
+      "4. Client Dependencies: Timeline countdown begins ONLY after receiving all required client assets (text, logo, media, API credentials). Client delays in asset delivery will extend the final delivery date accordingly.",
+      "5. Intellectual Property (IP) Ownership: 100% Intellectual Property and code ownership transfer to Client upon receipt of final payment.",
+      "6. Infrastructure & Third-Party Billing: Hosting (Vercel), Database (Supabase), Domain Registration, and API costs (OpenAI/Resend) are billed directly to client-owned accounts. Developer is not liable for third-party service outages.",
+      "7. Post-Launch Warranty: Includes 30 days of complimentary technical support & bug fixes post-launch. Continued support is available under a Monthly Care Plan."
     ]
+  },
+  "summary": {
+    "ai": "Builds AI-assisted workflows, content pipelines, and automation tools that make recurring tasks easier to run and review.",
+    "general": "Builds web applications and interactive interfaces with attention to clear structure, performance, and maintainability.",
+    "creative": "Designs responsive interfaces with careful motion, layout, and visual hierarchy.",
+    "fullstack": "Builds full-stack web systems with Next.js, Flask, FastAPI, and Supabase, with attention to data flow and reliability."
+  },
+  "twitter": "https://x.com/3010prateek",
+  "website": "https://prateeq.in",
+  "linkedin": "https://linkedin.com/in/freshlimevodka",
+  "education": [
+    {
+      "degree": "Bachelor of Commerce",
+      "period": "2020",
+      "school": "Delhi University",
+      "location": "New Delhi, India"
+    }
+  ],
+  "instagram": "https://www.instagram.com/freshlimevodka",
+  "quotation": {
+    "dayRate": "$300",
+    "hourlyRate": "$40",
+    "scopeModel": "Fixed-Price Milestones (No hidden hourly charges)",
+    "deliverables": [
+      "Custom UI Design & Interactive Prototypes",
+      "Production-ready React & Next.js web applications",
+      "Supabase database engineering & security setups",
+      "Search Engine Optimization (SEO) & Web Telemetry setup",
+      "30 days of post-launch support & handoff documentation"
+    ],
+    "paymentTerms": "50% upfront deposit to initiate development, 50% upon final project delivery.",
+    "warrantyModel": "Included 30-Day Post-Launch Support & Warranty",
+    "deliverySprint": "1 to 3 Weeks Turnaround Sprint"
+  },
+  "experience": [
+    {
+      "id": "freelance-developer",
+      "role": "Full-Stack Engineer & AI Prototyper",
+      "tags": [
+        "React",
+        "Next.js",
+        "Flutter",
+        "Python",
+        "FastAPI",
+        "Supabase",
+        "Framer Motion",
+        "SQLite",
+        "Google Gemini",
+        "Streamlit",
+        "GitHub API",
+        "TypeScript"
+      ],
+      "period": "2023 - Present",
+      "bullets": [
+        {
+          "ai": "Built LLM-assisted workflows for content drafting, OCR, and project analysis using Gemini-based tooling.",
+          "general": "Designed and shipped web platforms, simulation tools, and mobile utilities using React, Next.js, Flutter, and Python.",
+          "creative": "Translated visual layouts into responsive interfaces with motion and custom CSS.",
+          "fullstack": "Built API layers in Flask and FastAPI and connected them to PostgreSQL and Supabase data models."
+        },
+        {
+          "ai": "Used AI-assisted tools to prototype features quickly and keep repetitive work low.",
+          "general": "Improved website performance and navigation with Lenis scrolling and viewport-linked motion.",
+          "creative": "Designed custom interactive layouts and responsive visual frameworks with precise control.",
+          "fullstack": "Programmed offline-capable data layers with Drift and SQLite for mobile apps that keep working without network coverage."
+        },
+        {
+          "ai": "Built a Gemini-assisted tool for OCR, draft generation, and repo analysis.",
+          "general": "Built PrateeqSync AI, a local content manager for portfolio updates, credential review, and generated drafts.",
+          "creative": "Built an interactive Streamlit dashboard for managing skills, certificates, and media assets.",
+          "fullstack": "Built a Python-based content manager with Streamlit, GitHub API integration, and TypeScript file sync."
+        },
+        {
+          "ai": "Built a full-stack RAG platform with hybrid search, streaming LLM chat, and multi-tenant isolation.",
+          "general": "Designed and deployed Retriever, a production RAG engine with document ingestion, semantic search, and grounded chat.",
+          "creative": "Built an interactive RAG Lab UI with real-time SSE streaming and dual-theme design system.",
+          "fullstack": "Architected a FastAPI backend with pgvector, self-hosted Ollama embeddings, Supabase RLS, and Nginx reverse proxy on Oracle Cloud."
+        }
+      ],
+      "company": "Independent Consultant / Freelance Developer",
+      "location": "Remote / India"
+    }
+  ],
+  "lastSynced": {
+    "status": "success",
+    "summary": "Published blog post: Building a Dynamic Game Backend with Flask: A Technical Deep Dive into Earth Evolution Simulator",
+    "timestamp": "2026-07-08T18:33:08.544052"
+  },
+  "quotation_india": {
+    "dayRate": "₹20,000",
+    "hourlyRate": "₹3,000",
+    "scopeModel": "Fixed-Price Milestones (No hidden hourly charges)",
+    "deliverables": [
+      "Custom UI Design & Interactive Prototypes",
+      "Production-ready React & Next.js web applications",
+      "Supabase database engineering & security setups",
+      "Search Engine Optimization (SEO) & Web Telemetry setup",
+      "30 days of post-launch support & handoff documentation"
+    ],
+    "paymentTerms": "50% upfront deposit to initiate development, 50% upon final project delivery.",
+    "warrantyModel": "Included 30-Day Post-Launch Support & Warranty",
+    "deliverySprint": "1 to 3 Weeks Turnaround Sprint"
   }
 }
