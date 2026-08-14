@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { type RetrieverConfig } from "@/lib/rag-client";
+import { useAuth } from "@/context/AuthContext";
 import { isValidUrl } from "./utils";
 import styles from "./rag.module.css";
 
@@ -20,6 +21,7 @@ export function ConfigPanel({
   onClear: () => void;
   hidden: boolean;
 }) {
+  const { user, getAccessToken } = useAuth();
   const [form, setForm] = useState<RetrieverConfig>(
     config ?? DEMO_GUEST_CONFIG,
   );
@@ -44,6 +46,35 @@ export function ConfigPanel({
       onSave(DEMO_GUEST_CONFIG);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Guest connection failed";
+      setConnectResult({ ok: false, msg });
+    } finally {
+      setConnecting(false);
+    }
+  }
+
+  async function handleSupabaseSessionConnect() {
+    setConnecting(true);
+    setConnectResult(null);
+    try {
+      const token = await getAccessToken();
+      if (!token) throw new Error("No active Supabase session token found. Please sign in.");
+      const baseUrl = form.apiUrl.replace(/\/$/, "");
+      const res = await fetch(`${baseUrl}/v1/auth/session`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error(`Auth session endpoint returned ${res.status}`);
+      const data = await res.json();
+      const newConfig: RetrieverConfig = {
+        apiUrl: baseUrl,
+        tenantId: data.tenantId,
+        userId: data.userId,
+        apiKey: token,
+      };
+      setForm(newConfig);
+      setConnectResult({ ok: true, msg: "Connected via Supabase Auth" });
+      onSave(newConfig);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Supabase session connection failed";
       setConnectResult({ ok: false, msg });
     } finally {
       setConnecting(false);
@@ -80,8 +111,13 @@ export function ConfigPanel({
         Connect to your Retriever instance to search documents, upload new content, and chat with your data.
       </p>
 
-      <div style={{ marginBottom: "1.25rem" }}>
-        <button className="comic-btn comic-btn-blue" onClick={handleGuestLogin} disabled={connecting}>
+      <div style={{ marginBottom: "1.25rem", display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+        {user ? (
+          <button className="comic-btn comic-btn-blue" onClick={handleSupabaseSessionConnect} disabled={connecting}>
+            {connecting ? "Connecting…" : `🔐 Connect as ${user.email?.split("@")[0]}`}
+          </button>
+        ) : null}
+        <button className="comic-btn comic-btn-outline" onClick={handleGuestLogin} disabled={connecting}>
           {connecting ? "Connecting…" : "⚡ Login as Guest"}
         </button>
       </div>

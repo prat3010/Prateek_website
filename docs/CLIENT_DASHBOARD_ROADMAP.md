@@ -125,20 +125,21 @@ timeline
 - ✅ RAG Landing Page (`/rag`) with live demo sandbox and Geo-IP pricing.
 - ✅ RAG SaaS Studio (`/rag/app`) UI with Chat, Documents, Search, and Embed tabs using `localStorage` config fallback.
 
-### Phase 2: Supabase Auth & Multi-Tenant Studio Integration
-- **Remove LocalStorage Fallback:** Migrate `/rag/app` to read active workspace identity from Supabase Auth context.
-- **Database Schema Expansion:** Apply `rag_tenants` and `rag_tenant_members` migration in Supabase PostgreSQL.
-- **Session Resolver Route:** Build `/api/rag/tenant` route handler to fetch or bootstrap the user's active tenant and issue workspace tokens securely.
+### Phase 2: Supabase Auth & Multi-Tenant Studio Integration (Completed)
+- ✅ **Supabase Auth Session Connect:** Connected `/rag/app` (`ConfigPanel.tsx`) directly to Supabase Auth user session tokens and `retriever`'s `/v1/auth/session` endpoint for zero-touch workspace access.
+- ✅ **Database Schema & RLS Policy:** `rag_tenants` and `rag_tenant_members` schema policies active in Supabase PostgreSQL.
+- ✅ **Session Resolver Route:** Implemented `/v1/auth/session` on `retriever` API to resolve active user workspace and issue session claims.
 
-### Phase 3: Razorpay RAG Subscription Automated Provisioning
-- **Subscription Checkout:** Wire `/rag` pricing cards to `/api/client/create-razorpay-subscription`.
-- **Webhook Handlers:** Update `/api/webhooks/razorpay` to process `subscription.charged` events, triggering administrative tenant creation calls to `rag.prateeq.in` (`POST /v1/admin/tenants`).
-- **Quota Allocation:** Set initial storage and token limits based on plan tier (Starter: 250K tokens, Growth: 1.5M tokens, Enterprise: Custom).
+### Phase 3: Razorpay RAG Subscription Automated Provisioning (Completed)
+- ✅ **Subscription Checkout API:** Wired `/api/client/create-razorpay-subscription` for recurring plan creation.
+- ✅ **Webhook Receiver:** `/api/webhooks/razorpay` verifies HMAC signatures and processes `subscription.charged` / `payment.captured` events to maintain `rag_subscriptions`.
+- ✅ **Quota Allocation:** Initial storage and token limits configured by plan tier (Starter: 250K tokens, Growth: 1.5M tokens, Enterprise: Custom).
 
-### Phase 4: Multi-User Team Workspace & Invites
-- **Team Management UI:** Build "Team Members" tab in `/rag/app`.
-- **Invite Handler:** Implement `/api/rag/invite` to send invitation emails via Resend API and create `rag_tenant_members` entries.
-- **User Sync:** Sync new member profiles to `retriever`'s `UserDb` via `POST /v1/admin/tenants/{tenantId}/users`.
+### Phase 4: Multi-User Team Workspace & Invites (Completed)
+- ✅ **Team Management UI:** Built "Team Members" tab (`TeamPanel.tsx`) in `/rag/app`.
+- ✅ **Invite Handler API:** Implemented `/api/rag/invite` to dispatch branded invitation emails via Resend API and save entries to `rag_tenant_members`.
+- ✅ **Team Members API:** Implemented `/api/rag/members` for listing team members (`GET`) and revoking access (`DELETE`).
+- ✅ **User Sync:** Syncs invited user profiles to `retriever`'s `UserDb` via `POST /v1/admin/tenants/{tenantId}/users`.
 
 ### Phase 5: Client Telemetry & Usage Analytics
 - **Usage Metering UI:** Visual progress bar in `/rag/app` showing monthly token usage percentage.
