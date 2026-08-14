@@ -8,9 +8,10 @@ import { ChatPanel } from "./ChatPanel";
 import { SearchPanel } from "./SearchPanel";
 import { DocumentsPanel } from "./DocumentsPanel";
 import { TeamPanel } from "./TeamPanel";
+import { TelemetryPanel } from "./TelemetryPanel";
 import styles from "./rag.module.css";
 
-type Tab = "config" | "chat" | "search" | "documents" | "team";
+type Tab = "config" | "chat" | "search" | "documents" | "team" | "telemetry";
 
 export default function RagInterface() {
   const [tab, setTab] = useState<Tab>("config");
@@ -53,6 +54,9 @@ export default function RagInterface() {
           <button className={`${styles.tab} ${tab === "team" ? styles.active : ""}`} onClick={() => setTab("team")}>
             Team
           </button>
+          <button className={`${styles.tab} ${tab === "telemetry" ? styles.active : ""}`} onClick={() => setTab("telemetry")}>
+            Telemetry
+          </button>
         </nav>
 
         <div className={styles.status}>
@@ -67,6 +71,7 @@ export default function RagInterface() {
           <SearchPanel client={client} hidden={tab !== "search"} />
           <DocumentsPanel client={client} hidden={tab !== "documents"} />
           <TeamPanel config={config} hidden={tab !== "team"} />
+          <TelemetryPanel config={config} hidden={tab !== "telemetry"} />
         </div>
       </div>
     </RagErrorBoundary>

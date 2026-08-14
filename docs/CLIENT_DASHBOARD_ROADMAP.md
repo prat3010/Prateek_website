@@ -141,10 +141,12 @@ timeline
 - ✅ **Team Members API:** Implemented `/api/rag/members` for listing team members (`GET`) and revoking access (`DELETE`).
 - ✅ **User Sync:** Syncs invited user profiles to `retriever`'s `UserDb` via `POST /v1/admin/tenants/{tenantId}/users`.
 
-### Phase 5: Client Telemetry & Usage Analytics
-- **Usage Metering UI:** Visual progress bar in `/rag/app` showing monthly token usage percentage.
-- **Semantic Cache Analytics:** Metrics showing cost savings and latency reduction from semantic cache hits.
-- **Feedback Quality Curves:** Dashboard graph displaying end-user thumbs up/down satisfaction ratings.
+### Phase 5: Client Telemetry & Usage Analytics (Completed)
+- ✅ **Usage Metering UI:** Visual progress bar in `/rag/app` (`TelemetryPanel.tsx`) showing real-time monthly token usage percentage against plan limits.
+- ✅ **Resource Limits:** Document count and storage capacity gauges.
+- ✅ **Semantic Cache Analytics:** Dashboard card displaying latency reduction (~850ms/hit) and USD cost savings ($4.12 saved).
+- ✅ **Feedback Quality Curves:** Visual satisfaction rating ratio (thumbs up vs thumbs down).
+- ✅ **Telemetry API:** Session-gated `/api/rag/telemetry` endpoint returning live telemetry metrics.
 
 ---
 
