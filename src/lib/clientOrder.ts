@@ -20,6 +20,10 @@ export interface ClientScope {
   payment_structure?: '50/50' | '40/30/30' | string;
   signed_at?: string;
   signed_by_email?: string;
+  design_readiness?: string;
+  hosting_ownership?: string;
+  tax_invoicing_preference?: string;
+  inspiration_links?: string;
   onboarding_checklist?: Record<string, boolean | string>;
   created_at: string;
 }
@@ -176,6 +180,10 @@ export interface ClientOrderRow {
   payment_structure?: string;
   signed_at?: string;
   signed_by_email?: string;
+  design_readiness?: string;
+  hosting_ownership?: string;
+  tax_invoicing_preference?: string;
+  inspiration_links?: string;
   onboarding_checklist?: Record<string, boolean | string> | unknown;
   created_at?: string;
 }
@@ -206,6 +214,10 @@ export function dbToClientScope(row: ClientOrderRow): ClientScope {
     payment_structure: row.payment_structure || '50/50',
     signed_at: row.signed_at || undefined,
     signed_by_email: row.signed_by_email || '',
+    design_readiness: row.design_readiness || (checklistParsed.design_readiness as string) || undefined,
+    hosting_ownership: row.hosting_ownership || (checklistParsed.hosting_ownership as string) || undefined,
+    tax_invoicing_preference: row.tax_invoicing_preference || (checklistParsed.tax_invoicing_preference as string) || undefined,
+    inspiration_links: row.inspiration_links || (checklistParsed.inspiration_links as string) || undefined,
     onboarding_checklist: checklistParsed,
     created_at: row.created_at || new Date().toISOString(),
   };

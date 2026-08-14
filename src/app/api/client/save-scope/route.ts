@@ -67,6 +67,15 @@ export async function POST(req: Request) {
         .eq('status', 'draft');
     } catch {}
 
+    const existingChecklist = (payload.onboardingChecklist || payload.onboarding_checklist || {}) as Record<string, unknown>;
+    const onboardingChecklistMerged = {
+      ...existingChecklist,
+      ...(payload.designReadiness ? { design_readiness: payload.designReadiness } : {}),
+      ...(payload.hostingOwnership ? { hosting_ownership: payload.hostingOwnership } : {}),
+      ...(payload.taxInvoicingPreference ? { tax_invoicing_preference: payload.taxInvoicingPreference } : {}),
+      ...(payload.inspirationLinks ? { inspiration_links: payload.inspirationLinks } : {}),
+    };
+
     // 3. Target normalized `client_scopes` table
     const scopeData = {
       scope_code: scopeCode,
@@ -86,7 +95,7 @@ export async function POST(req: Request) {
       payment_structure: payload.paymentStructure || payload.payment_structure || '50/50',
       signed_at: payload.signedAt || payload.signed_at || undefined,
       signed_by_email: payload.signedByEmail || payload.signed_by_email || undefined,
-      onboarding_checklist: payload.onboardingChecklist || payload.onboarding_checklist || {},
+      onboarding_checklist: onboardingChecklistMerged,
       updated_at: new Date().toISOString(),
     };
 

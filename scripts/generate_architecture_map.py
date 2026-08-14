@@ -72,10 +72,13 @@ def main():
         "commissionConfig.json",
         "middlemanAgreementDefaults.json",
         "pricing.ts",
+        "clientOrder.ts",
+        "onboardingChecklist.ts",
         "IntakeForm.tsx",
         "Resume.tsx",
         "ServicesAndPricingPDF.tsx",
         "questionnaire.py",
+        "clients.py",
         "proxy.ts",
     ]
     

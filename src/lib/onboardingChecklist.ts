@@ -76,11 +76,15 @@ export function generateOnboardingChecklist(scope: ClientScope): ChecklistItem[]
 
   // 2. Base Engine Infrastructure Tasks
   const engineLower = scope.base_engine.toLowerCase();
+  const needsCloudSetup = scope.hosting_ownership === 'needs_setup' || scope.onboarding_checklist?.hosting_ownership === 'needs_setup';
+
   if (engineLower.includes('saas') || engineLower.includes('full-stack') || engineLower.includes('application')) {
     items.push({
       id: 'hosting_credentials',
       title: 'Provide Target Hosting & Cloud Environment Preferences',
-      description: 'Specify preferred hosting provider (Vercel, AWS, Cloudflare) and team admin email.',
+      description: needsCloudSetup
+        ? 'Setup support requested: Specify preferred cloud provider (Vercel, AWS, Cloudflare) and team admin email.'
+        : 'Specify preferred hosting provider (Vercel, AWS, Cloudflare) and team admin email.',
       category: 'technical',
       isMandatory: false,
       inputType: 'text',
@@ -95,6 +99,20 @@ export function generateOnboardingChecklist(scope: ClientScope): ChecklistItem[]
       isMandatory: true,
       inputType: 'text',
       placeholder: 'Domain name (e.g. mycompany.com)...',
+    });
+  }
+
+  // Corporate GST Invoicing Preference Task
+  const isCorporateGst = scope.tax_invoicing_preference === 'corporate_gst' || scope.onboarding_checklist?.tax_invoicing_preference === 'corporate_gst';
+  if (isCorporateGst) {
+    items.push({
+      id: 'gst_credentials',
+      title: 'Provide Corporate GSTIN & Billing Address',
+      description: '15-digit GSTIN number and registered legal address for GST-compliant invoicing.',
+      category: 'financial',
+      isMandatory: false,
+      inputType: 'text',
+      placeholder: 'e.g. 07AAAAA0000A1Z5...',
     });
   }
 
@@ -163,7 +181,9 @@ export function generateOnboardingChecklist(scope: ClientScope): ChecklistItem[]
 
   // 4. Design & Brand Asset Tasks
   const brandAssetLower = (scope.brand_asset || '').toLowerCase();
-  if (brandAssetLower.includes('figma') || brandAssetLower.includes('specs')) {
+  const designReadinessVal = scope.design_readiness || (scope.onboarding_checklist?.design_readiness as string) || '';
+
+  if (brandAssetLower.includes('figma') || brandAssetLower.includes('specs') || designReadinessVal === 'figma_ready') {
     items.push({
       id: 'figma_access',
       title: 'Share Figma Design System & Vector Brand Icons',
@@ -173,7 +193,7 @@ export function generateOnboardingChecklist(scope: ClientScope): ChecklistItem[]
       inputType: 'link',
       placeholder: 'https://figma.com/file/...',
     });
-  } else if (brandAssetLower.includes('wireframe')) {
+  } else if (brandAssetLower.includes('wireframe') || designReadinessVal === 'wireframes_ready') {
     items.push({
       id: 'wireframe_signoff',
       title: 'Review & Sign Off on Wireframe Layout Structure',

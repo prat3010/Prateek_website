@@ -1,0 +1,17 @@
+{
+  "contract-auditor": {
+    "enabled": true,
+    "PostToolUse": [
+      {
+        "matcher": "replace_file_content|write_to_file|multi_replace_file_content",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 scripts/audit_contracts.py",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}

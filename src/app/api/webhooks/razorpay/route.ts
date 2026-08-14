@@ -93,7 +93,6 @@ export async function POST(req: Request) {
     } else if (event === 'subscription.charged' || event === 'subscription.authenticated') {
       const subEntity = payload.payload?.subscription?.entity;
       const subId = subEntity?.id;
-      const clientEmail = subEntity?.notes?.client_email;
       const nowIso = new Date().toISOString();
 
       if (subId) {

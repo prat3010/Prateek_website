@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import { RetrieverClient } from "@/lib/rag-client";
 import { ChatPanel } from "@/components/rag/ChatPanel";
 import { DocumentsPanel } from "@/components/rag/DocumentsPanel";
@@ -12,18 +13,52 @@ import styles from "@/components/rag/rag.module.css";
 
 export default function RagAppStudioPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"chat" | "upload" | "search" | "config">("chat");
+  const { user, loading: authLoading, getAccessToken, loginWithGoogle } = useAuth();
 
+  const [activeTab, setActiveTab] = useState<"chat" | "upload" | "search" | "config">("chat");
   const [tenantId, setTenantId] = useState<string>("");
   const [apiKey, setApiKey] = useState<string>("");
   const [userId, setUserId] = useState<string>("");
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [client, setClient] = useState<RetrieverClient | null>(null);
+  const [tenantLoading, setTenantLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    let active = true;
-    Promise.resolve().then(() => {
-      if (!active) return;
+  const initWorkspace = useCallback(async () => {
+    setTenantLoading(true);
+    try {
+      if (user) {
+        const token = await getAccessToken();
+        if (token) {
+          const res = await fetch("/api/rag/tenant", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            const resolvedTenant = data.tenantId || "guest-demo";
+            const resolvedUser = data.userId || user.id;
+
+            setTenantId(resolvedTenant);
+            setApiKey(token);
+            setUserId(resolvedUser);
+            setIsAdmin(data.role === "owner" || data.role === "admin");
+
+            const cli = new RetrieverClient({
+              apiUrl: process.env.NEXT_PUBLIC_RETRIEVER_API_URL || "https://rag.prateeq.in",
+              tenantId: resolvedTenant,
+              apiKey: token,
+              userId: resolvedUser,
+            });
+            setClient(cli);
+            setTenantLoading(false);
+            return;
+          }
+        }
+      }
+
+      // Guest / Fallback Mode when unauthenticated or offline
       const storedTenant = localStorage.getItem("retriever_tenant_id") || "guest-demo";
       const storedUser = localStorage.getItem("retriever_user_id") || "guest-user";
       const storedKey = localStorage.getItem("retriever_api_key") || "guest-demo-key";
@@ -40,11 +75,21 @@ export default function RagAppStudioPage() {
         userId: storedUser,
       });
       setClient(cli);
-    });
-    return () => {
-      active = false;
-    };
-  }, []);
+    } catch (err) {
+      console.warn("RAG Studio workspace resolution warning:", err);
+    } finally {
+      setTenantLoading(false);
+    }
+  }, [user, getAccessToken]);
+
+  useEffect(() => {
+    if (!authLoading) {
+      const timer = setTimeout(() => {
+        void initWorkspace();
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [authLoading, initWorkspace]);
 
   const handleExitStudio = () => {
     router.push("/rag");
@@ -57,8 +102,21 @@ export default function RagAppStudioPage() {
         <div className={styles.workspaceTitleGroup}>
           <h1 className={styles.workspaceTitle}>SaaS Studio Workspace</h1>
           <span className={styles.heroBadge} style={{ margin: 0 }}>
-            Tenant ID: {tenantId.slice(0, 8)}…
+            {tenantLoading ? "Loading…" : `Tenant ID: ${tenantId.slice(0, 8)}…`}
           </span>
+          {user ? (
+            <span className={styles.heroBadge} style={{ margin: 0, backgroundColor: "rgba(0, 230, 118, 0.15)", color: "#00E676" }}>
+              ✓ Authenticated ({user.email})
+            </span>
+          ) : (
+            <button
+              onClick={() => loginWithGoogle("/rag/app")}
+              className="comic-btn comic-btn-blue"
+              style={{ padding: "0.2rem 0.6rem", fontSize: "0.8rem" }}
+            >
+              Sign In with Google for Workspace
+            </button>
+          )}
         </div>
 
         <div className={styles.navLinks}>
@@ -111,7 +169,7 @@ export default function RagAppStudioPage() {
           config={
             client
               ? {
-                  apiUrl: "https://rag.prateeq.in",
+                  apiUrl: process.env.NEXT_PUBLIC_RETRIEVER_API_URL || "https://rag.prateeq.in",
                   tenantId,
                   apiKey,
                   userId,

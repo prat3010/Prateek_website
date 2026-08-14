@@ -337,6 +337,58 @@ CREATE POLICY "Clients can select own RAG subscriptions" ON rag_subscriptions FO
     auth.jwt() ->> 'email' = (SELECT email FROM clients WHERE id = rag_subscriptions.client_id)
   );
 
+-- 8f. RAG Multi-Tenant Schemas & Team Memberships
+CREATE TABLE IF NOT EXISTS rag_tenants (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  tenant_id UUID UNIQUE NOT NULL DEFAULT gen_random_uuid(),
+  client_id UUID REFERENCES clients(id) ON DELETE SET NULL,
+  name TEXT NOT NULL DEFAULT 'My Workspace',
+  plan_tier TEXT DEFAULT 'starter' CHECK (plan_tier IN ('starter', 'growth', 'enterprise', 'free')),
+  api_key_hash TEXT DEFAULT '',
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE rag_tenants ENABLE ROW LEVEL SECURITY;
+
+CREATE TABLE IF NOT EXISTS rag_tenant_members (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  tenant_id UUID NOT NULL REFERENCES rag_tenants(tenant_id) ON DELETE CASCADE,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  email TEXT NOT NULL,
+  role TEXT DEFAULT 'member' CHECK (role IN ('owner', 'admin', 'member')),
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  CONSTRAINT unique_tenant_user UNIQUE (tenant_id, user_id),
+  CONSTRAINT unique_tenant_email UNIQUE (tenant_id, email)
+);
+
+ALTER TABLE rag_tenant_members ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can select own memberships" ON rag_tenant_members;
+CREATE POLICY "Users can select own memberships" ON rag_tenant_members FOR SELECT
+  USING (
+    user_id = auth.uid() 
+    OR email = auth.jwt() ->> 'email'
+  );
+
+DROP POLICY IF EXISTS "Members can select matching rag_tenants" ON rag_tenants;
+CREATE POLICY "Members can select matching rag_tenants" ON rag_tenants FOR SELECT
+  USING (
+    tenant_id IN (
+      SELECT tenant_id FROM rag_tenant_members
+      WHERE user_id = auth.uid() OR email = auth.jwt() ->> 'email'
+    )
+  );
+
+CREATE INDEX IF NOT EXISTS idx_rag_tenants_tenant_id ON rag_tenants (tenant_id);
+CREATE INDEX IF NOT EXISTS idx_rag_tenants_client_id ON rag_tenants (client_id);
+CREATE INDEX IF NOT EXISTS idx_rag_tenant_members_tenant ON rag_tenant_members (tenant_id);
+CREATE INDEX IF NOT EXISTS idx_rag_tenant_members_user ON rag_tenant_members (user_id);
+CREATE INDEX IF NOT EXISTS idx_rag_tenant_members_email ON rag_tenant_members (email);
+
+
 -- Legacy client_orders Table (preserves backward compatibility for legacy queries)
 CREATE TABLE IF NOT EXISTS client_orders (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -613,6 +665,29 @@ CREATE TABLE IF NOT EXISTS processed_webhooks (
 
 ALTER TABLE processed_webhooks ENABLE ROW LEVEL SECURITY;
 -- Writes are service-role only via API routes.
-CREATE INDEX IF NOT EXISTS idx_processed_webhooks_event_id ON processed_webhooks (event_id);
+-- event_id is UNIQUE NOT NULL (which creates an implicit unique B-Tree index).
+
+-- Performance Indexes for Invoices & RAG Subscriptions
+CREATE INDEX IF NOT EXISTS idx_invoices_status_date 
+  ON invoices (payment_status, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_rag_subscriptions_active 
+  ON rag_subscriptions (client_id, is_active);
+
+-- Webhook idempotency ledger auto-pruning (60-day retention window)
+CREATE OR REPLACE FUNCTION purge_old_webhooks()
+RETURNS trigger AS $$
+BEGIN
+  IF random() < 0.05 THEN
+    DELETE FROM processed_webhooks WHERE processed_at < NOW() - INTERVAL '60 days';
+  END IF;
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_purge_webhooks ON processed_webhooks;
+CREATE TRIGGER trg_purge_webhooks
+AFTER INSERT ON processed_webhooks
+FOR EACH STATEMENT EXECUTE FUNCTION purge_old_webhooks();
 
 

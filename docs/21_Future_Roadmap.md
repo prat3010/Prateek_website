@@ -53,6 +53,22 @@ timeline
 
 ---
 
+## **Phase 7: RAG SaaS Subscription Platform & Multi-Tenant Studio Workspace**
+* **Razorpay Subscription Automation**: Wire `/rag` pricing tiers to Razorpay subscription APIs and automate tenant provisioning in `retriever` via webhooks.
+* **Supabase Auth Session Gate**: Connect `/rag/app` natively to Supabase Auth user sessions (`rag_tenants` and `rag_tenant_members` schemas).
+* **Multi-User Team Invites**: Enable tenant owners to invite team members by email with role-based access control.
+* **Detailed Ecosystem Roadmap**: See **[Client Dashboard Ecosystem Roadmap](file:///Users/prateeksharma/Developer/Prateek_website/docs/CLIENT_DASHBOARD_ROADMAP.md)** for full specifications.
+
+---
+
+> 📌 **Cross-Repository Roadmap & Field Documentation:**  
+> - **Client Dashboard Ecosystem (`prateeq.in`):** **[CLIENT_DASHBOARD_ROADMAP.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/CLIENT_DASHBOARD_ROADMAP.md)**  
+> - **Admin Platform Control Panel (`admin.rag.prateeq.in`):** **[ADMIN_DASHBOARD_ROADMAP.md](file:///Users/prateeksharma/Developer/retriever/docs/ADMIN_DASHBOARD_ROADMAP.md)**  
+> - **High-Converting Demo Field Guide:** **[DEMO_PLAYBOOK_AND_SHOWCASE_GUIDE.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/DEMO_PLAYBOOK_AND_SHOWCASE_GUIDE.md)**
+
+---
+
 # **Acceptance Criteria**
 - Future roadmap items align with the non-negotiable principles defined in [01_Vision_and_Philosophy.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/01_Vision_and_Philosophy.md).
 - Architectural patterns remain open to roadmap implementations (e.g. schema layers and route configs).
+

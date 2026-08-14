@@ -25,7 +25,7 @@ import {
 import Portal from '@/components/ui/Portal';
 import { generateQuestionnairePDF, generateInvoicePDF } from '@/utils/pdfGenerator';
 import { dbToClientScope, type ClientScope, type InvoiceEntity, type CreateInvoiceInput } from '@/lib/clientOrder';
-import { generateOnboardingChecklist, calcOnboardingReadiness, type ChecklistItem } from '@/lib/onboardingChecklist';
+import { generateOnboardingChecklist, calcOnboardingReadiness } from '@/lib/onboardingChecklist';
 import { calculateInvoiceTotals, SUPPORTED_CURRENCIES, formatCurrencyAmount } from '@/lib/invoicing';
 import resumeData from '@/data/resume.json';
 import intakeDefaults from '@/data/intakeQuestionnaireDefaults.json';
@@ -479,9 +479,15 @@ export default function ClientDashboardPage() {
         {
           companyName: scope.company_name || user?.user_metadata?.full_name || 'Client Scope',
           contactEmail: user?.email || '',
+          contactPhone: scope.client_phone || '',
           projectGoal: `${scope.base_engine} Custom Architecture`,
+          businessKPI: scope.business_kpi || (scope.onboarding_checklist?.business_kpi as string) || undefined,
           targetAudience: 'Global / Enterprise',
           projectCategory: scope.base_engine,
+          designReadiness: scope.design_readiness || (scope.onboarding_checklist?.design_readiness as string) || undefined,
+          hostingOwnership: scope.hosting_ownership || (scope.onboarding_checklist?.hosting_ownership as string) || undefined,
+          taxInvoicingPreference: scope.tax_invoicing_preference || (scope.onboarding_checklist?.tax_invoicing_preference as string) || undefined,
+          inspirationLinks: scope.inspiration_links || (scope.onboarding_checklist?.inspiration_links as string) || undefined,
           features: scope.features,
           assetsStatus: scope.brand_asset,
           maintenancePlan: scope.maintenance_plan,
@@ -1028,6 +1034,11 @@ export default function ClientDashboardPage() {
                       <p className={styles.engineName}>
                         <strong>Base Engine Tier:</strong> {s.base_engine}
                       </p>
+                      {s.business_kpi && (
+                        <p style={{ fontSize: '0.85rem', color: '#2563eb', fontWeight: 600, marginTop: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                          <span>🎯 Target Business KPI:</span> {s.business_kpi}
+                        </p>
+                      )}
                       <p style={{ fontSize: '0.85rem', opacity: 0.8, marginTop: '0.2rem' }}>
                         <Clock size={14} style={{ display: 'inline', marginRight: '0.3rem' }} />
                         Target Timeline: {s.timeline}
@@ -1047,6 +1058,11 @@ export default function ClientDashboardPage() {
 
                         {isEditing ? (
                           <div className={styles.editableFeaturesList}>
+                            {s.deposit_paid && (
+                              <div style={{ fontSize: '0.78rem', color: '#2563eb', padding: '0.4rem 0.6rem', background: 'rgba(37,99,235,0.08)', borderRadius: '6px', marginBottom: '0.5rem', fontWeight: 500 }}>
+                                ℹ️ Build is in active engineering. Feature additions will generate a Phase 2 milestone invoice.
+                              </div>
+                            )}
                             {s.features.map((feat, idx) => (
                               <div key={idx} className={styles.featureItemRow}>
                                 <span>• {feat}</span>

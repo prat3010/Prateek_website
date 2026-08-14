@@ -10,7 +10,7 @@ Controls base engines, feature modules, goal archetypes, maintenance plans, bran
 
 ```mermaid
 graph TD
-    DB[(Supabase DB: profile.data.intake)] -->|Primary Read/Write| Session[src/lib/data.ts & pricing.ts]
+    DB[(Supabase DB: profile.data.intake & client_scopes)] -->|Primary Read/Write| Session[src/lib/data.ts & pricing.ts]
     Fallback[src/data/intakeQuestionnaireDefaults.json] -->|Fallback Load| Session
     ResumeJSON[src/data/resume.json] -->|Local JSON Backup| Session
     
@@ -22,7 +22,13 @@ graph TD
     PricingLib -->|PDF Proposal| ScopingPDF[src/components/pdf/ScopingBriefPDF.tsx]
     PricingLib -->|PDF Pricing Guide| ServicesPDF[src/components/pdf/ServicesAndPricingPDF.tsx]
     
+    ScopingLab -->|Scope Persistence| ClientScopeAPI[src/app/api/client/save-scope & intake-draft]
+    ClientScopeAPI -->|Data Models| ClientOrderLib[src/lib/clientOrder.ts]
+    ClientOrderLib -->|Checklist Engine| OnboardingChecklist[src/lib/onboardingChecklist.ts]
+    OnboardingChecklist -->|Interactive Tasks| ClientDashboard
+    
     SyncQuestionnaire[scripts/sync_tabs/questionnaire.py] -->|Grid Edit & Sync| DB
+    SyncClients[scripts/sync_tabs/clients.py] -->|Command Center & GST Invoices| DB
     SyncQuestionnaire -->|Atomic Backup| ResumeJSON
     SyncQuestionnaire -->|Revalidate Cache| CacheAPI[src/app/api/revalidate/route.ts]
 ```
@@ -30,15 +36,18 @@ graph TD
 ### Component Connection Matrix: Commercial Scoping
 | Layer | File / Module | Responsibility |
 | :--- | :--- | :--- |
-| **Primary Data** | `profile.data.intake` (Supabase DB) | Live database record for intake defaults & tiers. |
+| **Primary Data** | `profile.data.intake` & `client_scopes` (Supabase DB) | Live database record for intake defaults, tiers, & active client scopes. |
 | **JSON Fallback** | `src/data/intakeQuestionnaireDefaults.json` | Default base engines, features, goals, care plans. |
 | **JSON Backup** | `src/data/resume.json` | Local fallback JSON updated during Synchronizer saves. |
 | **Calculation Engine** | `src/lib/pricing.ts` | Dynamic INR/USD price formatting & archetype totals. |
+| **Scope Types & Utilities** | `src/lib/clientOrder.ts` | Data schema for `ClientScope`, `dbToClientScope`, and invoice entities. |
+| **Checklist Engine** | `src/lib/onboardingChecklist.ts` | Dynamically generates milestone tasks based on payment structure & features. |
 | **Interactive UI** | `src/components/Intake/IntakeForm.tsx` | Scoping Lab wizard (`/scoping`). |
 | **Homepage UI** | `src/components/Resume/Resume.tsx` | Services & Guarantees 2x2 card grid (`/#resume`). |
-| **Client UI** | `src/app/dashboard/page.tsx` | Client Workspace scope view & checkout. |
+| **Client UI** | `src/app/dashboard/page.tsx` | Client Workspace scope view, milestone tracker, & checkout. |
+| **Client API Routes** | `src/app/api/client/save-scope/route.ts`, `intake-draft`, `get-scopes` | Server endpoints for scope persistence, lead drafts, and retrieval. |
 | **PDF Renderers** | `src/components/pdf/ScopingBriefPDF.tsx`, `ServicesAndPricingPDF.tsx` | Itemized PDF proposals & pricing guide. |
-| **Synchronizer** | `scripts/sync_tabs/questionnaire.py` | Streamlit grid editor for questionnaire config. |
+| **Synchronizer Tabs** | `scripts/sync_tabs/questionnaire.py`, `clients.py` | Streamlit grid editor & Client Orders Command Center. |
 
 ---
 
