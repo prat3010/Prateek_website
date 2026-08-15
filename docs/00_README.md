@@ -19,6 +19,7 @@ Below is a summary of all documentation files, categorized by their domain.
 * [06_Adaptive_Identity_System.md](06_Adaptive_Identity_System.md): Composition of Visual Themes and Communication Identities.
 * [07_Content_Strategy.md](07_Content_Strategy.md): Copywriting tone of voice and positioning checklist.
 * [08_Information_Architecture.md](08_Information_Architecture.md): How information relates and flows progressively.
+* [REVENUE_EXECUTION_PLAN.md](REVENUE_EXECUTION_PLAN.md): Fast-track client acquisition, high-ticket pricing, social pitch scripts, and revenue roadmap.
 
 ## **Section Specifications**
 * [09_Section_Specifications/](09_Section_Specifications/README.md): Individual section specs for Hero, About, Skills, Projects, Playground, Resume, Pricing (Scoping Lab), Contact, Footer, Terminal, Blog, Scoping Lab (`12_Scoping_Lab.md`), and Client Workspace Dashboard (`13_Client_Workspace_Dashboard.md`).
@@ -32,6 +33,7 @@ Below is a summary of all documentation files, categorized by their domain.
 * [15_Performance_and_Accessibility.md](15_Performance_and_Accessibility.md): Core Web Vitals targets, Lighthouse metrics, and accessibility standards.
 * [16_Security_and_Privacy.md](16_Security_and_Privacy.md): Row-Level Security (RLS), keys protection, session verification, and data privacy rules.
 * [17_SEO_Strategy.md](17_SEO_Strategy.md): Search engine optimization rules, OG images, and structured metadata.
+* [AI_OUTREACH_AGENT_ROADMAP.md](AI_OUTREACH_AGENT_ROADMAP.md): Strategic roadmap for 24/7 Autonomous AI Lead Prospecting, Gmail & Social Media Content Agent.
 
 ## **Operational and Implementation Rules**
 * [18_Codebase_Modernization_and_Refactoring.md](18_Codebase_Modernization_and_Refactoring.md): Guidelines on updating React/Next versions and refactoring rules.

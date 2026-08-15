@@ -85,6 +85,47 @@ export const MAINTENANCE_PLANS: MaintenancePlanOption[] = questionnaireDefaults.
 export const QUICK_SERVICES: QuickServiceItem[] = questionnaireDefaults.quickServices || [];
 export const BUSINESS_KPIS: string[] = questionnaireDefaults.businessKPIs || [];
 
+export const GOAL_CATEGORIES: { id: 'all' | 'websites' | 'saas' | 'ai_widgets'; label: string; ids: string[] }[] = [
+  { id: 'all', label: 'All Archetypes', ids: [] },
+  { id: 'websites', label: 'Websites & Stores', ids: ['landing_page', 'business_multipage', 'ecommerce', 'booking_appointments'] },
+  { id: 'saas', label: 'SaaS & Apps', ids: ['saas_app', 'lms_portal', 'crm_admin'] },
+  { id: 'ai_widgets', label: 'AI & Custom Tools', ids: ['ai_rag_app', 'standalone_chatbot', 'custom'] },
+];
+
+export const FEATURE_CATEGORIES = [
+  {
+    id: 'security_infra',
+    title: '🔐 Security, Auth & Core Infrastructure',
+    description: 'User access control, administration center, and data migration pipelines',
+    featureIds: ['auth', 'admin', 'migration'],
+  },
+  {
+    id: 'commerce_billing',
+    title: '💳 Commerce, Booking & Monetization',
+    description: 'Payment gateway integration, online scheduling, shopping cart, and course portals',
+    featureIds: ['payments', 'booking', 'commerce', 'lms'],
+  },
+  {
+    id: 'ai_automation',
+    title: '🤖 AI Knowledge Base & Workflows',
+    description: 'Vector search (RAG), automated emails, CRM lead tracking, and webhooks',
+    featureIds: ['ai_rag', 'email', 'crm', 'integrations'],
+  },
+  {
+    id: 'experience_scale',
+    title: '🚀 Content Management & Mobile Experience',
+    description: 'Headless blog CMS, installable PWA app, multilingual i18n, and video streaming',
+    featureIds: ['cms', 'pwa', 'i18n', 'video'],
+  },
+];
+
+export const QUICK_CATEGORIES: { id: 'all' | 'ai' | 'integration' | 'performance'; label: string; categories: string[] }[] = [
+  { id: 'all', label: 'All Services', categories: [] },
+  { id: 'ai', label: '🤖 AI & Email', categories: ['ai', 'email'] },
+  { id: 'integration', label: '🔗 Integrations & APIs', categories: ['integration'] },
+  { id: 'performance', label: '⚡ Performance & SEO', categories: ['performance'] },
+];
+
 export default function IntakeForm({ resumeData, initialPreset = null }: IntakeFormProps) {
   const { isNoir, region } = useTheme();
   const [currency, setCurrency] = useState<Currency>(() => resolveDefaultCurrency(region));
@@ -133,6 +174,10 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   );
   const [quickStep, setQuickStep] = useState(initialPreset?.quickServiceId ? 2 : 1);
   const [quickFormData, setQuickFormData] = useState({ companyName: '', siteUrl: '', additionalNotes: '', agreedToTerms: false });
+  const [selectedGoalCategory, setSelectedGoalCategory] = useState<'all' | 'websites' | 'saas' | 'ai_widgets'>('all');
+  const [selectedQuickCategory, setSelectedQuickCategory] = useState<'all' | 'ai' | 'integration' | 'performance'>('all');
+  const [showEngineOverride, setShowEngineOverride] = useState(false);
+  const [showMobileFormula, setShowMobileFormula] = useState(false);
 
   const quickServices = useMemo(() => {
     return intakeConfig?.quickServices?.length ? intakeConfig.quickServices : QUICK_SERVICES;
@@ -271,6 +316,8 @@ interface IntakeFormData {
   const currentArchetype = useMemo(() => {
     return goals.find(g => g.label === formData.projectGoal) || goals[0];
   }, [formData.projectGoal, goals]);
+
+  const shouldSkipBrandStep = Boolean(currentArchetype?.skipBrandAssets);
 
   const labelOfFeature = (id: string) => features.find(f => f.id === id)?.label;
 
@@ -797,8 +844,38 @@ interface IntakeFormData {
                     </button>
                   </div>
                   <p className={styles.fieldHint}>Pick one or more services. Each includes a 30-day post-delivery warranty.</p>
+
+                  {/* Quick Service Category Filter Tabs */}
+                  <div className={styles.categoryTabs} role="tablist" aria-label="Quick Service Categories">
+                    {QUICK_CATEGORIES.map(cat => {
+                      const isSelected = selectedQuickCategory === cat.id;
+                      const count = cat.id === 'all'
+                        ? quickServices.length
+                        : quickServices.filter(s => cat.categories.includes(s.category || '')).length;
+                      return (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          role="tab"
+                          aria-selected={isSelected}
+                          className={`${styles.categoryTabBtn} ${isSelected ? styles.categoryTabBtnActive : ''}`}
+                          onClick={() => setSelectedQuickCategory(cat.id)}
+                        >
+                          <span>{cat.label}</span>
+                          <span className={styles.categoryTabBadge}>{count}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
                   <div className={styles.checkboxGrid} role="group" aria-label="Quick Services">
-                    {quickServices.map(svc => {
+                    {(selectedQuickCategory === 'all'
+                      ? quickServices
+                      : quickServices.filter(s => {
+                          const cat = QUICK_CATEGORIES.find(c => c.id === selectedQuickCategory);
+                          return cat?.categories.includes(s.category || '');
+                        })
+                    ).map(svc => {
                       const isSelected = selectedQuickServices.includes(svc.id);
                       return (
                         <label
@@ -910,15 +987,20 @@ interface IntakeFormData {
                       <ArrowLeft size={16} />
                       <span>BACK</span>
                     </button>
-                    <button
-                      type="button"
-                      disabled={!quickFormData.agreedToTerms || submitting}
-                      onClick={handleQuickSubmit}
-                      className={`${styles.btn} ${styles.btnPrimary} ${!quickFormData.agreedToTerms || submitting ? styles.btnDisabled : ''}`}
-                    >
-                      {submitting ? 'PROCESSING...' : '🚀 SAVE SCOPE & CONTINUE IN DASHBOARD'}
-                      <Send size={16} />
-                    </button>
+                    <div className={styles.submitWrapper}>
+                      <button
+                        type="button"
+                        disabled={!quickFormData.agreedToTerms || submitting}
+                        onClick={handleQuickSubmit}
+                        className={`${styles.btn} ${styles.btnPrimary} ${!quickFormData.agreedToTerms || submitting ? styles.btnDisabled : ''}`}
+                      >
+                        {submitting ? 'PROCESSING...' : '🚀 SAVE SCOPE & CONTINUE IN DASHBOARD'}
+                        <Send size={16} />
+                      </button>
+                      <p className={styles.ctaSubtext}>
+                        🔒 Instant setup via Google OAuth — your quick service order will be saved to your dashboard.
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
@@ -936,21 +1018,26 @@ interface IntakeFormData {
             <div className={styles.stepIndicator}>
               {steps.map(s => {
                 const Icon = s.icon;
+                const isSkipped = s.num === 3 && shouldSkipBrandStep;
                 const isActive = currentStep === s.num;
-                const isDone = currentStep > s.num;
+                const isDone = currentStep > s.num || (currentStep === 4 && s.num === 3 && shouldSkipBrandStep);
                 return (
                   <button
                     key={s.num}
                     type="button"
-                    onClick={() => setCurrentStep(s.num)}
-                    className={`${styles.stepItem} ${isActive ? styles.stepItemActive : ''} ${isDone ? styles.stepItemDone : ''}`}
-                    title={`Go to Step ${s.num}: ${s.title}`}
+                    disabled={isSkipped}
+                    onClick={() => {
+                      if (isSkipped) return;
+                      setCurrentStep(s.num);
+                    }}
+                    className={`${styles.stepItem} ${isActive ? styles.stepItemActive : ''} ${isDone ? styles.stepItemDone : ''} ${isSkipped ? styles.stepItemSkipped : ''}`}
+                    title={isSkipped ? 'Brand Kit skipped (Standalone / Widget scope)' : `Go to Step ${s.num}: ${s.title}`}
                   >
-                    <div className={`${styles.stepBadge} ${isActive ? styles.stepBadgeActive : ''} ${isDone ? styles.stepBadgeDone : ''}`}>
+                    <div className={`${styles.stepBadge} ${isActive ? styles.stepBadgeActive : ''} ${isDone ? styles.stepBadgeDone : ''} ${isSkipped ? styles.stepBadgeSkipped : ''}`}>
                       {isDone ? <CheckCircle2 size={16} /> : <Icon size={16} />}
                     </div>
                     <span className={`${styles.stepLabel} ${isActive ? styles.stepLabelActive : ''}`}>
-                      {s.title}
+                      {isSkipped ? 'Brand (N/A)' : s.title}
                     </span>
                   </button>
                 );
@@ -958,7 +1045,7 @@ interface IntakeFormData {
             </div>
             <div className={styles.mobileStepSubhead}>
               <span>STEP {currentStep} OF 4</span>
-              <strong>{steps[currentStep - 1].title}</strong>
+              <strong>{steps[currentStep - 1].title}{shouldSkipBrandStep && currentStep !== 3 ? ' (Brand N/A)' : ''}</strong>
             </div>
           </div>
 
@@ -1002,8 +1089,35 @@ interface IntakeFormData {
                       Selecting a core archetype automatically configures your baseline engine and essential feature modules.
                     </p>
 
+                    {/* Category Filter Tabs */}
+                    <div className={styles.categoryTabs} role="tablist" aria-label="Goal Archetype Categories">
+                      {GOAL_CATEGORIES.map(cat => {
+                        const isSelected = selectedGoalCategory === cat.id;
+                        const count = cat.id === 'all' ? goals.length : goals.filter(g => cat.ids.includes(g.id)).length;
+                        return (
+                          <button
+                            key={cat.id}
+                            type="button"
+                            role="tab"
+                            aria-selected={isSelected}
+                            className={`${styles.categoryTabBtn} ${isSelected ? styles.categoryTabBtnActive : ''}`}
+                            onClick={() => setSelectedGoalCategory(cat.id)}
+                          >
+                            <span>{cat.label}</span>
+                            <span className={styles.categoryTabBadge}>{count}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
                     <div className={styles.archetypeGrid} role="radiogroup" aria-label="Primary Project Archetype">
-                      {goals.map(g => {
+                      {(selectedGoalCategory === 'all'
+                        ? goals
+                        : goals.filter(g => {
+                            const cat = GOAL_CATEGORIES.find(c => c.id === selectedGoalCategory);
+                            return cat?.ids.includes(g.id);
+                          })
+                      ).map(g => {
                         const isSelected = formData.projectGoal === g.label;
                         const recommendedEngine = engines.find(e => e.id === g.recommendedEngineId);
                         return (
@@ -1116,180 +1230,276 @@ interface IntakeFormData {
                   </div>
 
                   {/* Base Engine Selector */}
-                  <div className={styles.field} style={{ marginBottom: '16px' }}>
+                  <div className={styles.field} style={{ marginBottom: '20px' }}>
                     <label className={styles.label}>
                       <Layers size={14} style={{ display: 'inline', marginRight: '4px' }} />
-                      Select Base Platform Foundation Engine
+                      Base Platform Foundation Engine
                     </label>
-                    <div className={styles.checkboxGrid}>
-                      {engines.map(e => {
-                        const isSelected = formData.selectedBaseEngineId === e.id;
-                        const isPopoverOpen = activePopoverId === e.id;
-                        return (
-                          <div
-                            key={e.id}
-                            className={`${styles.checkboxCard} ${isSelected ? styles.checkboxCardSelected : ''}`}
-                            onClick={() => setFormData({ ...formData, selectedBaseEngineId: e.id })}
-                            style={{ cursor: 'pointer' }}
-                          >
-                            <input
-                              type="radio"
-                              name="baseEngine"
-                              checked={isSelected}
-                              onChange={() => setFormData({ ...formData, selectedBaseEngineId: e.id })}
-                            />
-                            <div style={{ flex: 1 }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
-                                   <span style={{ fontWeight: 700 }}>{`${e.title} (${e.tier})`}</span>
-                                  <button
-                                    type="button"
-                                    onClick={(ev) => togglePopover(ev, e.id)}
-                                    className={`${styles.infoBtn} ${isPopoverOpen ? styles.infoBtnActive : ''}`}
-                                    title="Click to view Technical Engineering Specs"
-                                    aria-label="View Technical Engineering Specs"
-                                  >
-                                    <Info size={12} />
-                                  </button>
-                                </div>
-                                <span className={styles.priceBadge}>{formatPricePair(e.priceINR, e.priceUSD, currency)}</span>
-                              </div>
-                              <p style={{ margin: '3px 0 0 0', fontSize: '11px', opacity: 0.7, lineHeight: 1.4 }}>{e.laymanDescription}</p>
+                    <p className={styles.fieldHelpText}>
+                      Auto-assigned based on your Step 1 archetype target. Expand to override with a custom foundation.
+                    </p>
 
-                              {isPopoverOpen && popoverAnchor && (
-                                <Portal>
-                                  <>
-                                    <div className={styles.popoverOverlay} onClick={() => { setActivePopoverId(null); setPopoverAnchor(null); }} />
-                                    <div
-                                      className={styles.popoverPortal}
-                                      style={{ left: popoverAnchor.x, top: popoverAnchor.y }}
-                                      onClick={ev => ev.stopPropagation()}
-                                    >
-                                      <div className={styles.popoverBox} style={{ position: 'static', left: 'auto', right: 'auto' }}>
-                                        <div className={styles.popoverHeader}>
-                                          <span>🛠️ TECHNICAL ARCHITECTURE SPECS</span>
-                                          <X size={12} style={{ cursor: 'pointer' }} onClick={() => { setActivePopoverId(null); setPopoverAnchor(null); }} />
-                                        </div>
-                                        <p className={styles.popoverTechText}>{e.techSpecs}</p>
-                                      </div>
-                                    </div>
-                                  </>
-                                </Portal>
-                              )}
-                            </div>
+                    {!showEngineOverride ? (
+                      <div className={styles.engineSummaryCard}>
+                        <div className={styles.engineSummaryLeft}>
+                          <div className={styles.engineSummaryHeader}>
+                            <span className={styles.engineSummaryTitle}>{selectedEngine.title}</span>
+                            <span className={styles.engineTierTag}>{selectedEngine.tier}</span>
                           </div>
-                        );
-                      })}
-                    </div>
+                          <p className={styles.engineSummaryDesc}>{selectedEngine.laymanDescription}</p>
+                        </div>
+                        <div className={styles.engineSummaryRight}>
+                          <span className={styles.priceBadge}>{formatPricePair(selectedEngine.priceINR, selectedEngine.priceUSD, currency)}</span>
+                          <button
+                            type="button"
+                            className={styles.engineOverrideBtn}
+                            onClick={() => setShowEngineOverride(true)}
+                            title="Click to select a different base platform engine"
+                          >
+                            <span>⚙️ Change Base Engine</span>
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className={styles.engineOverrideBox}>
+                        <div className={styles.engineOverrideHeader}>
+                          <span className={styles.engineOverrideNotice}>SELECT PLATFORM FOUNDATION OVERRIDE</span>
+                          <button
+                            type="button"
+                            className={styles.engineCollapseBtn}
+                            onClick={() => setShowEngineOverride(false)}
+                          >
+                            Done Editing
+                          </button>
+                        </div>
+                        <div className={styles.checkboxGrid}>
+                          {engines.map(e => {
+                            const isSelected = formData.selectedBaseEngineId === e.id;
+                            const isPopoverOpen = activePopoverId === e.id;
+                            return (
+                              <div
+                                key={e.id}
+                                className={`${styles.checkboxCard} ${isSelected ? styles.checkboxCardSelected : ''}`}
+                                onClick={() => setFormData({ ...formData, selectedBaseEngineId: e.id })}
+                                style={{ cursor: 'pointer' }}
+                              >
+                                <input
+                                  type="radio"
+                                  name="baseEngine"
+                                  checked={isSelected}
+                                  onChange={() => setFormData({ ...formData, selectedBaseEngineId: e.id })}
+                                />
+                                <div style={{ flex: 1 }}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                                       <span style={{ fontWeight: 700 }}>{`${e.title} (${e.tier})`}</span>
+                                      <button
+                                        type="button"
+                                        onClick={(ev) => togglePopover(ev, e.id)}
+                                        className={`${styles.infoBtn} ${isPopoverOpen ? styles.infoBtnActive : ''}`}
+                                        title="Click to view Technical Engineering Specs"
+                                        aria-label="View Technical Engineering Specs"
+                                      >
+                                        <Info size={12} />
+                                      </button>
+                                    </div>
+                                    <span className={styles.priceBadge}>{formatPricePair(e.priceINR, e.priceUSD, currency)}</span>
+                                  </div>
+                                  <p style={{ margin: '3px 0 0 0', fontSize: '11px', opacity: 0.7, lineHeight: 1.4 }}>{e.laymanDescription}</p>
+
+                                  {isPopoverOpen && popoverAnchor && (
+                                    <Portal>
+                                      <>
+                                        <div className={styles.popoverOverlay} onClick={() => { setActivePopoverId(null); setPopoverAnchor(null); }} />
+                                        <div
+                                          className={styles.popoverPortal}
+                                          style={{ left: popoverAnchor.x, top: popoverAnchor.y }}
+                                          onClick={ev => ev.stopPropagation()}
+                                        >
+                                          <div className={styles.popoverBox} style={{ position: 'static', left: 'auto', right: 'auto' }}>
+                                            <div className={styles.popoverHeader}>
+                                              <span>🛠️ TECHNICAL ARCHITECTURE SPECS</span>
+                                              <X size={12} style={{ cursor: 'pointer' }} onClick={() => { setActivePopoverId(null); setPopoverAnchor(null); }} />
+                                            </div>
+                                            <p className={styles.popoverTechText}>{e.techSpecs}</p>
+                                          </div>
+                                        </div>
+                                      </>
+                                    </Portal>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Feature Checkboxes */}
+                  {/* Grouped Feature Checkboxes */}
                   <div className={styles.field}>
                     <label className={styles.label}>Select Architecture Add-on Modules (Pure Additive Pricing)</label>
-                    <div className={styles.checkboxGrid}>
-                      {features.map(m => {
-                        const isCompulsory = currentArchetype.compulsoryFeatureLabels.includes(m.label);
-                        const isLegacyRequired = formData.projectStartType === 'legacy_rebuild' && m.autoIncludeOnLegacy;
-                        const isChecked = isCompulsory || isLegacyRequired || formData.selectedFeatures.includes(m.label);
-                        const otherSelectedIds = features
-                          .filter(f => formData.selectedFeatures.includes(f.label) && f.id !== m.id)
-                          .map(f => f.id);
-                        const isRequiredDependency = new Set(resolveFeatureDependencies(otherSelectedIds, features)).has(m.id);
-                        const dependencyTitle = isRequiredDependency
-                          ? (() => {
-                              const dependents = features
-                                .filter((f) => f.id !== m.id && f.dependsOn?.includes(m.id))
-                                .map((f) => f.label)
-                                .filter(
-                                  (label) =>
-                                    formData.selectedFeatures.includes(label) ||
-                                    currentArchetype.compulsoryFeatureLabels.includes(label),
-                                );
-                              return dependents.length
-                                ? `Required by selected module${dependents.length > 1 ? 's' : ''}: ${dependents.join(', ')}`
-                                : 'This module is required by another selected module';
-                            })()
-                          : '';
-                        const isLocked = isCompulsory || isRequiredDependency || isLegacyRequired;
-                        const isPopoverOpen = activePopoverId === m.id;
-                        return (
-                          <label
-                            key={m.id}
-                            className={`${styles.checkboxCard} ${isLocked ? styles.lockedCard : ''} ${isChecked ? styles.checkboxCardSelected : ''}`}
-                            style={{ cursor: isLocked ? 'not-allowed' : 'pointer' }}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={isChecked}
-                              disabled={isLocked}
-                              onChange={() => handleFeatureToggle(m.label)}
-                            />
-                            <div style={{ flex: 1 }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
-                                  <span style={{ fontWeight: 700 }}>{m.label}</span>
-                                  {isCompulsory ? (
-                                    <span className={styles.lockedBadge} title={`Required component for ${currentArchetype.shortLabel}`}>
-                                      🔒 REQUIRED
-                                    </span>
-                                  ) : isLegacyRequired ? (
-                                    <span className={styles.lockedBadge} title="Required component for Legacy Refactor scope">
-                                      🔒 REQUIRED FOR LEGACY REBUILD
-                                    </span>
-                                  ) : isRequiredDependency ? (
-                                    <span className={styles.lockedBadge} title={dependencyTitle}>
-                                      🔗 REQUIRED BY SELECTED MODULE
-                                    </span>
-                                  ) : null}
-                                  <button
-                                    type="button"
-                                    onClick={(ev) => togglePopover(ev, m.id)}
-                                    className={`${styles.infoBtn} ${isPopoverOpen ? styles.infoBtnActive : ''}`}
-                                    title="Click to view Technical Engineering Specs"
-                                    aria-label="View Technical Engineering Specs"
-                                  >
-                                    <Info size={12} />
-                                  </button>
-                                </div>
-                                <span className={styles.priceBadge}>{`+${priceInCurrency(m.priceINR, m.priceUSD)}`}</span>
-                              </div>
-                              <p style={{ margin: '3px 0 0 0', fontSize: '11px', opacity: 0.7, lineHeight: 1.4 }}>{m.laymanDescription}</p>
 
-                              {lockedHintId === m.id && (
-                                <div className={styles.lockedNotice}>
-                                  {isCompulsory
-                                    ? `Required baseline module for ${currentArchetype.shortLabel}`
-                                    : isLegacyRequired
-                                    ? 'Required component for Legacy Refactor scope (switch to Greenfield in Step 1 to remove)'
-                                    : dependencyTitle || 'Required dependency for another active module'}
-                                </div>
-                              )}
-
-                              {isPopoverOpen && popoverAnchor && (
-                                <Portal>
-                                  <>
-                                    <div className={styles.popoverOverlay} onClick={() => { setActivePopoverId(null); setPopoverAnchor(null); }} />
-                                    <div
-                                      className={styles.popoverPortal}
-                                      style={{ left: popoverAnchor.x, top: popoverAnchor.y }}
-                                      onClick={ev => ev.stopPropagation()}
-                                    >
-                                      <div className={styles.popoverBox} style={{ position: 'static', left: 'auto', right: 'auto' }}>
-                                        <div className={styles.popoverHeader}>
-                                          <span>🛠️ TECHNICAL ARCHITECTURE SPECS</span>
-                                          <X size={12} style={{ cursor: 'pointer' }} onClick={() => { setActivePopoverId(null); setPopoverAnchor(null); }} />
-                                        </div>
-                                        <p className={styles.popoverTechText}>{m.techSpecs}</p>
+                    {FEATURE_CATEGORIES.map(cat => {
+                      const categoryFeatures = features.filter(f => cat.featureIds.includes(f.id));
+                      if (categoryFeatures.length === 0) return null;
+                      return (
+                        <div key={cat.id} className={styles.featureCategoryBlock}>
+                          <div className={styles.featureCategoryHeader}>
+                            <h4 className={styles.featureCategoryTitle}>{cat.title}</h4>
+                            <p className={styles.featureCategoryDesc}>{cat.description}</p>
+                          </div>
+                          <div className={styles.checkboxGrid}>
+                            {categoryFeatures.map(m => {
+                              const isCompulsory = currentArchetype.compulsoryFeatureLabels.includes(m.label);
+                              const isLegacyRequired = formData.projectStartType === 'legacy_rebuild' && m.autoIncludeOnLegacy;
+                              const isChecked = isCompulsory || isLegacyRequired || formData.selectedFeatures.includes(m.label);
+                              const otherSelectedIds = features
+                                .filter(f => formData.selectedFeatures.includes(f.label) && f.id !== m.id)
+                                .map(f => f.id);
+                              const isRequiredDependency = new Set(resolveFeatureDependencies(otherSelectedIds, features)).has(m.id);
+                              const dependencyTitle = isRequiredDependency
+                                ? (() => {
+                                    const dependents = features
+                                      .filter((f) => f.id !== m.id && f.dependsOn?.includes(m.id))
+                                      .map((f) => f.label)
+                                      .filter(
+                                        (label) =>
+                                          formData.selectedFeatures.includes(label) ||
+                                          currentArchetype.compulsoryFeatureLabels.includes(label),
+                                      );
+                                    return dependents.length
+                                      ? `Required by selected module${dependents.length > 1 ? 's' : ''}: ${dependents.join(', ')}`
+                                      : 'This module is required by another selected module';
+                                  })()
+                                : '';
+                              const isLocked = isCompulsory || isRequiredDependency || isLegacyRequired;
+                              const isPopoverOpen = activePopoverId === m.id;
+                              return (
+                                <label
+                                  key={m.id}
+                                  className={`${styles.checkboxCard} ${isLocked ? styles.lockedCard : ''} ${isChecked ? styles.checkboxCardSelected : ''}`}
+                                  style={{ cursor: isLocked ? 'not-allowed' : 'pointer' }}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    disabled={isLocked}
+                                    onChange={() => handleFeatureToggle(m.label)}
+                                  />
+                                  <div style={{ flex: 1 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                                        <span style={{ fontWeight: 700 }}>{m.label}</span>
+                                        {isCompulsory ? (
+                                          <span className={styles.lockedBadge} title={`Required component for ${currentArchetype.shortLabel}`}>
+                                            🔒 REQUIRED
+                                          </span>
+                                        ) : isLegacyRequired ? (
+                                          <span className={styles.lockedBadge} title="Required component for Legacy Refactor scope">
+                                            🔒 REQUIRED FOR LEGACY REBUILD
+                                          </span>
+                                        ) : isRequiredDependency ? (
+                                          <span className={styles.lockedBadge} title={dependencyTitle}>
+                                            🔗 REQUIRED BY SELECTED MODULE
+                                          </span>
+                                        ) : null}
+                                        <button
+                                          type="button"
+                                          onClick={(ev) => togglePopover(ev, m.id)}
+                                          className={`${styles.infoBtn} ${isPopoverOpen ? styles.infoBtnActive : ''}`}
+                                          title="Click to view Technical Engineering Specs"
+                                          aria-label="View Technical Engineering Specs"
+                                        >
+                                          <Info size={12} />
+                                        </button>
                                       </div>
+                                      <span className={styles.priceBadge}>{`+${priceInCurrency(m.priceINR, m.priceUSD)}`}</span>
                                     </div>
-                                  </>
-                                </Portal>
-                              )}
-                            </div>
-                          </label>
-                        );
-                      })}
-                    </div>
+                                    <p style={{ margin: '3px 0 0 0', fontSize: '11px', opacity: 0.7, lineHeight: 1.4 }}>{m.laymanDescription}</p>
+
+                                    {lockedHintId === m.id && (
+                                      <div className={styles.lockedNotice}>
+                                        {isCompulsory
+                                          ? `Required baseline module for ${currentArchetype.shortLabel}`
+                                          : isLegacyRequired
+                                          ? 'Required component for Legacy Refactor scope (switch to Greenfield in Step 1 to remove)'
+                                          : dependencyTitle || 'Required dependency for another active module'}
+                                      </div>
+                                    )}
+
+                                    {isPopoverOpen && popoverAnchor && (
+                                      <Portal>
+                                        <>
+                                          <div className={styles.popoverOverlay} onClick={() => { setActivePopoverId(null); setPopoverAnchor(null); }} />
+                                          <div
+                                            className={styles.popoverPortal}
+                                            style={{ left: popoverAnchor.x, top: popoverAnchor.y }}
+                                            onClick={ev => ev.stopPropagation()}
+                                          >
+                                            <div className={styles.popoverBox} style={{ position: 'static', left: 'auto', right: 'auto' }}>
+                                              <div className={styles.popoverHeader}>
+                                                <span>🛠️ TECHNICAL ARCHITECTURE SPECS</span>
+                                                <X size={12} style={{ cursor: 'pointer' }} onClick={() => { setActivePopoverId(null); setPopoverAnchor(null); }} />
+                                              </div>
+                                              <p className={styles.popoverTechText}>{m.techSpecs}</p>
+                                            </div>
+                                          </div>
+                                        </>
+                                      </Portal>
+                                    )}
+                                  </div>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    {/* Fallback group for any dynamic features from Supabase not in standard categories */}
+                    {(() => {
+                      const knownIds = new Set(FEATURE_CATEGORIES.flatMap(c => c.featureIds));
+                      const uncategorizedFeatures = features.filter(f => !knownIds.has(f.id));
+                      if (uncategorizedFeatures.length === 0) return null;
+                      return (
+                        <div className={styles.featureCategoryBlock}>
+                          <div className={styles.featureCategoryHeader}>
+                            <h4 className={styles.featureCategoryTitle}>✨ Additional Architecture Modules</h4>
+                          </div>
+                          <div className={styles.checkboxGrid}>
+                            {uncategorizedFeatures.map(m => {
+                              const isCompulsory = currentArchetype.compulsoryFeatureLabels.includes(m.label);
+                              const isLegacyRequired = formData.projectStartType === 'legacy_rebuild' && m.autoIncludeOnLegacy;
+                              const isChecked = isCompulsory || isLegacyRequired || formData.selectedFeatures.includes(m.label);
+                              const isLocked = isCompulsory || isLegacyRequired;
+                              const isPopoverOpen = activePopoverId === m.id;
+                              return (
+                                <label
+                                  key={m.id}
+                                  className={`${styles.checkboxCard} ${isLocked ? styles.lockedCard : ''} ${isChecked ? styles.checkboxCardSelected : ''}`}
+                                  style={{ cursor: isLocked ? 'not-allowed' : 'pointer' }}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    disabled={isLocked}
+                                    onChange={() => handleFeatureToggle(m.label)}
+                                  />
+                                  <div style={{ flex: 1 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                      <span style={{ fontWeight: 700 }}>{m.label}</span>
+                                      <span className={styles.priceBadge}>{`+${priceInCurrency(m.priceINR, m.priceUSD)}`}</span>
+                                    </div>
+                                    <p style={{ margin: '3px 0 0 0', fontSize: '11px', opacity: 0.7, lineHeight: 1.4 }}>{m.laymanDescription}</p>
+                                  </div>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
               )}
@@ -1564,8 +1774,17 @@ interface IntakeFormData {
               {/* Live Persistent Arithmetic Bar */}
               <div className={styles.stickyBar} style={{ marginTop: '1.5rem' }}>
                 <div className={styles.stickyLeft}>
-                  <span className={styles.stickyTitle}>⚡ Live Pure Additive Arithmetic Formula</span>
-                  <span className={styles.stickyBreakdown}>
+                  <div className={styles.stickyTitleRow}>
+                    <span className={styles.stickyTitle}>⚡ Live Pure Additive Arithmetic Formula</span>
+                    <button
+                      type="button"
+                      className={styles.mobileFormulaToggle}
+                      onClick={() => setShowMobileFormula(prev => !prev)}
+                    >
+                      {showMobileFormula ? 'Hide Formula' : 'Show Formula'}
+                    </button>
+                  </div>
+                  <span className={`${styles.stickyBreakdown} ${showMobileFormula ? styles.stickyBreakdownMobileShow : ''}`}>
                     {`Base (${selectedEngine.title}: ${priceInCurrency(selectedEngine.priceINR, selectedEngine.priceUSD)})` +
                      ` + Add-ons (${priceInCurrency(totalCost.featuresINR, totalCost.featuresUSD)})` +
                      (totalCost.brandPriceINR > 0 ? ` + Brand Collateral (${priceInCurrency(totalCost.brandPriceINR, totalCost.brandPriceUSD)})` : '')}
@@ -1581,29 +1800,24 @@ interface IntakeFormData {
                 <div className={styles.leftActions}>
                   <button
                     type="button"
-                    onClick={() => {
-                      if (isFormValid) {
-                        handleDownloadPDF();
-                      } else {
-                        setErrorMsg('Please accept the Standard Commercial Terms in Step 4 to generate your Proposal PDF.');
-                        if (currentStep !== 4) setCurrentStep(4);
-                      }
-                    }}
-                    className={`${styles.btn} ${styles.btnSecondary} ${!isFormValid ? styles.btnDisabled : ''}`}
-                    title={
-                      isFormValid
-                        ? 'Open Canva-grade PDF proposal preview'
-                        : 'Accept Commercial Terms in Step 4 to unlock Proposal PDF'
-                    }
+                    onClick={handleDownloadPDF}
+                    className={`${styles.btn} ${styles.btnSecondary}`}
+                    title="Open Canva-grade PDF proposal preview"
                   >
-                    {isFormValid ? <Download size={16} /> : <Lock size={16} />}
-                    <span>{isFormValid ? 'OPEN PROPOSAL PDF' : '🔒 OPEN PROPOSAL PDF'}</span>
+                    <Download size={16} />
+                    <span>OPEN PROPOSAL PDF</span>
                   </button>
 
                   {currentStep > 1 && (
                     <button
                       type="button"
-                      onClick={() => setCurrentStep(prev => prev - 1)}
+                      onClick={() => {
+                        if (currentStep === 4 && shouldSkipBrandStep) {
+                          setCurrentStep(2);
+                        } else {
+                          setCurrentStep(prev => prev - 1);
+                        }
+                      }}
                       className={`${styles.btn} ${styles.btnSecondary}`}
                     >
                       <ArrowLeft size={16} />
@@ -1612,33 +1826,67 @@ interface IntakeFormData {
                   )}
                 </div>
 
-                <div>
+                <div className={styles.submitWrapper}>
                   {currentStep < 4 ? (
                     <button
                       type="button"
-                      onClick={() => setCurrentStep(prev => prev + 1)}
+                      onClick={() => {
+                        if (currentStep === 2 && shouldSkipBrandStep) {
+                          setCurrentStep(4);
+                        } else {
+                          setCurrentStep(prev => prev + 1);
+                        }
+                      }}
                       className={`${styles.btn} ${styles.btnPrimary}`}
                     >
                       <span>NEXT STEP</span>
                       <ArrowRight size={16} />
                     </button>
                   ) : (
-                    <button
-                      type="submit"
-                      disabled={submitting || !formData.agreedToTerms}
-                      className={`${styles.btn} ${styles.btnPrimary} ${!formData.agreedToTerms ? styles.btnDisabled : ''}`}
-                      title={!formData.agreedToTerms ? 'Accept commercial terms to submit' : 'Save scope & continue in client dashboard'}
-                    >
-                      {submitting ? 'SAVING SCOPE...' : '🚀 SAVE SCOPE & CONTINUE IN DASHBOARD'}
-                      <Send size={16} />
-                    </button>
+                    <>
+                      <button
+                        type="submit"
+                        disabled={submitting || !formData.agreedToTerms}
+                        className={`${styles.btn} ${styles.btnPrimary} ${!formData.agreedToTerms ? styles.btnDisabled : ''}`}
+                        title={!formData.agreedToTerms ? 'Accept commercial terms to submit' : 'Save scope & continue in client dashboard'}
+                      >
+                        {submitting ? 'SAVING SCOPE...' : '🚀 SAVE SCOPE & CONTINUE IN DASHBOARD'}
+                        <Send size={16} />
+                      </button>
+                      <p className={styles.ctaSubtext}>
+                        🔒 Instant setup via Google OAuth — your custom scope will be saved directly to your client dashboard.
+                      </p>
+                    </>
                   )}
                   {recaptchaUnavailable && (
-                    <p className={styles.recaptchaWarning}>
-                      reCAPTCHA could not be initialized on this origin — this usually means a
-                      browser extension is blocking it, or this origin is not registered in the
-                      Google reCAPTCHA admin console.
-                    </p>
+                    <div className={styles.recaptchaNoticeBox}>
+                      <p className={styles.recaptchaWarning}>
+                        reCAPTCHA could not be initialized on this origin — this usually means a
+                        browser extension is blocking it, or this origin is not registered in the
+                        Google reCAPTCHA admin console.
+                      </p>
+                      <button
+                        type="button"
+                        className={styles.recaptchaRetryBtn}
+                        onClick={() => {
+                          setRecaptchaUnavailable(false);
+                          if (typeof window !== 'undefined' && window.grecaptcha && SITE_KEY) {
+                            window.grecaptcha.ready(() => setRecaptchaReady(true));
+                          } else if (typeof document !== 'undefined' && SITE_KEY) {
+                            const existing = document.getElementById('recaptcha-script');
+                            if (existing) existing.remove();
+                            const script = document.createElement('script');
+                            script.id = 'recaptcha-script';
+                            script.src = `https://www.google.com/recaptcha/api.js?render=${SITE_KEY}`;
+                            script.async = true;
+                            script.onerror = () => setRecaptchaUnavailable(true);
+                            document.head.appendChild(script);
+                          }
+                        }}
+                      >
+                        ⚡ Retry reCAPTCHA Setup
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>

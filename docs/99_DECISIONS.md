@@ -231,7 +231,28 @@ This document serves as the registry of critical architectural design decisions 
 
 ---
 
+# **ADR 16: Scoping Questionnaire Friction Reduction (Phases 1, 2 & 3)**
+
+* **Status**: Approved & Implemented
+* **Context**: Audit of the interactive scoping wizard (`IntakeForm.tsx`) revealed key friction bottlenecks: (1) downloading a proposal PDF required checking the commercial terms checkbox in Step 4, blocking prospects who wanted a preliminary estimate PDF for internal review; (2) widget/micro-scopes with `skipBrandAssets: true` (e.g. `standalone_chatbot`) still forced users through Step 3 (Brand Kit & Inspiration Links); (3) primary submission CTAs lacked clear expectations about Google OAuth setup and dashboard scope saving; (4) 10 goal archetypes presented in an unstructured grid caused choice paralysis; (5) 15 feature modules in a single list created scroll fatigue; (6) engine picker in Step 2 duplicated choices made in Step 1; (7) 12 quick services in a single list caused scroll depth; (8) mobile sticky pricing bar occupied ~60px of vertical height.
+* **Decision**:
+  1. **Unblocked PDF Download**: Unbound `OPEN PROPOSAL PDF` from the `agreedToTerms` check. Visitors on any step can generate and download a Canva-grade proposal PDF at any point without error prompts or lock states. Legal sign-off remains required for saving the scope to the database in Step 4.
+  2. **Auto-Skip Step 3 for Micro-Scopes**: When `currentArchetype.skipBrandAssets` is true, navigation automatically skips Step 3 (Next from Step 2 jumps to Step 4; Previous from Step 4 returns to Step 2). The step indicator marks Step 3 as `Brand (N/A)` and disables clicking on it.
+  3. **CTA Subtext & OAuth Handover Clarity**: Added `.ctaSubtext` micro-captions under submit buttons in both Full Project and Quick Service flows: `🔒 Instant setup via Google OAuth — your custom scope will be saved directly to your client dashboard.`
+  4. **Goal Archetype Category Tabs (Step 1)**: Added interactive category filter pills (`All Archetypes`, `Websites & Stores`, `SaaS & Apps`, `AI & Custom Tools`) with live item counts to eliminate choice paralysis.
+  5. **Collapsible Base Engine Summary (Step 2)**: Defaulted the Base Engine picker to a collapsed summary card showing `Active Platform Foundation: <Engine Title> (<Tier>)` with a `[⚙️ Change Base Engine]` override toggle button.
+  6. **Functional Grouping for Add-on Modules (Step 2)**: Divided the 15 additive feature modules into 4 labeled sub-categories (`Security & Infrastructure`, `Commerce & Monetization`, `AI Knowledge Base & Workflows`, `Content & Scale`).
+  7. **Quick Service Category Tabs**: Added filter pills (`All Services`, `AI & Email`, `Integrations & APIs`, `Performance & SEO`) to the Quick Service grid.
+  8. **Mobile Sticky Bar Compaction**: Compressed the persistent pricing bar on mobile viewports (< 640px) into a single-line summary with a tap-to-expand `[Show Formula]` toggle button.
+  9. **reCAPTCHA Graceful Retry Button**: Added an inline `⚡ Retry reCAPTCHA Setup` action button to the reCAPTCHA fallback notice.
+* **Consequences**:
+  - **Pros**: Zero-friction lead magnet proposal PDF downloads; reduced step counts for micro-scopes; transparent onboarding expectations; structured choice architecture with reduced cognitive load, visual clutter, and mobile viewport obstruction.
+  - **Cons**: None. Fallback groups preserve any dynamic features loaded from Supabase that are outside standard categories.
+
+---
+
 # **Acceptance Criteria**
 - Registry records cover the core v2 architectural choices.
 - Format follows standard ADR structures (Context, Decision, Consequences).
+
 

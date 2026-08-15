@@ -8,6 +8,7 @@ This is Prateek Sharma's personal portfolio, built with Next.js 16 App Router, R
 - Prefer the existing App Router structure under `src/app/`.
 - Keep server-only code server-only. `src/data/supabase.ts` intentionally imports `server-only` and must not be pulled into client components.
 - Do not make broad refactors unless the task explicitly asks for them.
+- **Enforced Codebase Patterns:** Always follow the learned architectural conventions documented in `.agents/rules/patterns.md`.
 
 ### ScrollSection Containing Block
 `ScrollSection` wraps every page section in an `m.div` with `will-change: transform` and a Framer Motion `translateY`. Both properties create a CSS containing block that traps `position: fixed` descendants. Any modal, overlay, or fullscreen element rendered inside a `ScrollSection` **must** use the `<Portal>` component (`src/components/ui/Portal.tsx`) to escape this containing block. See `docs/99_DECISIONS.md` ADR 05.
