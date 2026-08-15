@@ -3,10 +3,12 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import styles from "@/components/rag/rag.module.css";
 
 export default function RagLoginPage() {
   const router = useRouter();
+  const { loginWithGoogle } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -18,31 +20,9 @@ export default function RagLoginPage() {
     setLoading(true);
     setError("");
     try {
-      // Execute 1-click Google Auth token exchange with backend
-      const res = await fetch("https://rag.prateeq.in/v1/auth/google", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id_token: "google_oidc_user_token",
-          email: "user@example.com",
-          name: "SaaS Subscriber",
-        }),
-      });
-
-      if (!res.ok) throw new Error("Google authentication failed");
-      const data = await res.json();
-
-      // Store credentials in localStorage
-      localStorage.setItem("retriever_tenant_id", data.tenantId);
-      localStorage.setItem("retriever_user_id", data.userId);
-      localStorage.setItem("retriever_api_key", data.apiKey);
-      localStorage.setItem("retriever_jwt", data.jwtToken);
-
-      // Redirect to App Workspace
-      router.push("/rag/app");
+      await loginWithGoogle("/rag/app");
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Login failed");
-    } finally {
+      setError(err instanceof Error ? err.message : "Google Sign-In failed");
       setLoading(false);
     }
   };
