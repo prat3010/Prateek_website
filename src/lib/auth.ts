@@ -97,7 +97,9 @@ export async function signInWithGoogle(redirectTo?: string) {
   if (origin.includes('www.prateeq.in')) {
     origin = origin.replace('www.prateeq.in', 'prateeq.in');
   }
-  const pathOnly = redirectTo ? redirectTo.split('?')[0] : '/dashboard';
+  const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/dashboard';
+  const defaultTarget = currentPath.startsWith('/rag') ? '/rag/app' : '/dashboard';
+  const pathOnly = redirectTo ? redirectTo.split('?')[0] : defaultTarget;
   const targetRedirect = `${origin}/auth/callback?next=${encodeURIComponent(pathOnly)}`;
 
   const { data, error } = await supabaseAuth.auth.signInWithOAuth({

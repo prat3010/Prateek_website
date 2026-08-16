@@ -31,6 +31,7 @@ import resumeData from '@/data/resume.json';
 import intakeDefaults from '@/data/intakeQuestionnaireDefaults.json';
 import { calcQuote, formatMoney, type Currency } from '@/lib/pricing';
 import type { ResumeData } from '@/data/resume';
+import WorkspaceSwitcher from '@/components/ui/WorkspaceSwitcher';
 import styles from './dashboard.module.css';
 
 declare global {
@@ -797,6 +798,7 @@ export default function ClientDashboardPage() {
 
   return (
     <div className={styles.dashboardShell}>
+      <WorkspaceSwitcher active="dashboard" />
       {authGateError && (
         <div className={styles.authGateBanner}>
           <ShieldCheck size={16} />

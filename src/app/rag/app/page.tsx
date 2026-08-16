@@ -9,6 +9,7 @@ import { ChatPanel } from "@/components/rag/ChatPanel";
 import { DocumentsPanel } from "@/components/rag/DocumentsPanel";
 import { SearchPanel } from "@/components/rag/SearchPanel";
 import { ConfigPanel } from "@/components/rag/ConfigPanel";
+import WorkspaceSwitcher from "@/components/ui/WorkspaceSwitcher";
 import styles from "@/components/rag/rag.module.css";
 
 export default function RagAppStudioPage() {
@@ -97,6 +98,7 @@ export default function RagAppStudioPage() {
 
   return (
     <div className={styles.landingWrapper}>
+      <WorkspaceSwitcher active="rag" />
       {/* Workspace Sub-Header */}
       <div className={styles.workspaceHeader}>
         <div className={styles.workspaceTitleGroup}>
