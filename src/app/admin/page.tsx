@@ -195,10 +195,22 @@ export default function AdminControlCenter() {
       <div className={styles.container}>
         {/* Header Navigation */}
         <div className={styles.header}>
-          <Link href="/analytics" className={styles.backLink}>
-            <ArrowLeft size={18} />
-            <span>Public Visitor Analytics</span>
-          </Link>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <Link href="/analytics" className={styles.backLink}>
+              <ArrowLeft size={18} />
+              <span>Public Visitor Analytics</span>
+            </Link>
+            <a
+              href="https://admin.rag.prateeq.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.backLink}
+              style={{ color: '#38BDF8', fontWeight: 600 }}
+            >
+              <Zap size={16} />
+              <span>Retriever SaaS Portal (admin.rag.prateeq.in)</span>
+            </a>
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div className={styles.badge}>
               <ShieldCheck size={14} color="#10B981" />
