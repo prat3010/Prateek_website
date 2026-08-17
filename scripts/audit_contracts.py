@@ -80,13 +80,29 @@ def audit_commission_config():
             errors.append(f"commissionConfig.json is missing required key '{key}'.")
     return errors
 
+def audit_middleman_sync():
+    """Audit middlemanAgreementDefaults.json vs resume.json middlemanAgreement sections."""
+    errors = []
+    defaults = load_json(MIDDLEMAN_DEFAULTS_PATH)
+    resume = load_json(RESUME_PATH)
+    res_mm = resume.get("intake", {}).get("middlemanAgreement", {})
+    if res_mm and "sections" in res_mm:
+        def_sections = {s["key"]: s for s in defaults.get("sections", [])}
+        res_sections = {s["key"]: s for s in res_mm.get("sections", []) if isinstance(s, dict) and "key" in s}
+        for key, def_sec in def_sections.items():
+            if key in res_sections:
+                if def_sec.get("lines") != res_sections[key].get("lines"):
+                    errors.append(f"middlemanAgreement section '{key}' lines mismatch between middlemanAgreementDefaults.json and resume.json")
+    return errors
+
 def main():
     print("🔍 Auditing codebase data contracts & JSON fallback synchronization...")
     
     intake_errors = audit_intake_sync()
     comm_errors = audit_commission_config()
+    mm_errors = audit_middleman_sync()
     
-    all_errors = intake_errors + comm_errors
+    all_errors = intake_errors + comm_errors + mm_errors
     
     if all_errors:
         print("\n❌ CONTRACT AUDIT FAILED with errors:")
