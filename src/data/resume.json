@@ -2,14 +2,14 @@
   "name": "Prateeq Sharma",
   "about": {
     "business": {
-      "noir": "I'm Prateeq Sharma, a freelance developer who builds websites, custom tools, and admin flows for businesses that want something practical and maintainable.",
+      "noir": "I'm Prateeq Sharma, a freelance developer and AI strategist who builds custom web applications, AI integrations, and admin flows for businesses that want practical, maintainable solutions.",
       "facts": [
-        "SERVICE // Direct freelance partnership",
+        "SERVICE // Direct freelance & AI strategy partnership",
         "SPEED // Clear delivery and iteration",
-        "VALUE // Practical, maintainable builds",
+        "VALUE // Practical, high-ROI AI builds",
         "LOCATION // Based in India, working remotely"
       ],
-      "light": "I'm Prateeq Sharma, a freelance developer who builds websites, custom tools, and simple admin flows for businesses that want something practical and maintainable.",
+      "light": "I'm Prateeq Sharma, a freelance developer and AI strategist who builds custom web applications, AI integrations, and admin flows for businesses that want practical, maintainable solutions.",
       "factsNoir": [
         "Custom websites with a low-friction handoff.",
         "Delivering working products directly to clients.",
@@ -145,6 +145,15 @@
         ]
       },
       {
+        "id": "ai_strategy_consulting",
+        "label": "🧠 AI Strategy & Solutioning Audit",
+        "shortLabel": "AI Strategy Sprint",
+        "description": "Workflow audit, AI feasibility analysis, cost/latency modeling, and a custom 3-page architecture blueprint",
+        "recommendedEngineId": "ai_strategy_audit",
+        "compulsoryFeatureLabels": [],
+        "skipBrandAssets": true
+      },
+      {
         "id": "custom",
         "label": "⚙️ Custom Web Application (Bespoke Scope)",
         "shortLabel": "Custom Scope",
@@ -181,6 +190,16 @@
         "priceUSD": 2400,
         "techSpecs": "Full Web App Shell, Supabase PostgreSQL Architecture, Server Caching (unstable_cache), Production Vercel Wiring",
         "laymanDescription": "A production software foundation connected to a cloud database for web apps where users create accounts, manage data, and run software workflows."
+      },
+      {
+        "id": "ai_strategy_audit",
+        "title": "AI Strategy & Architecture Audit",
+        "tier": "Sprint Tier",
+        "priceINR": 20000,
+        "priceUSD": 300,
+        "laymanDescription": "A 60-minute operational workflow audit to identify high-ROI AI opportunities, resolve technical bottlenecks, and deliver a 3-page custom AI Integration Architecture Blueprint.",
+        "techSpecs": "Operational Bottleneck Analysis, AI Feasibility & Stack Selection, Cost/Latency Modeling, Custom 3-Page Architecture Blueprint PDF",
+        "hideFromFullProject": true
       },
       {
         "id": "standalone_embed",
@@ -626,7 +645,7 @@
     ]
   },
   "summary": {
-    "ai": "Builds AI-assisted workflows, content pipelines, and automation tools that make recurring tasks easier to run and review.",
+    "ai": "Audits operational workflows, designs AI solution architecture, and builds practical AI-assisted pipelines that make recurring tasks easier to run and review.",
     "general": "Builds web applications and interactive interfaces with attention to clear structure, performance, and maintainability.",
     "creative": "Designs responsive interfaces with careful motion, layout, and visual hierarchy.",
     "fullstack": "Builds full-stack web systems with Next.js, Flask, FastAPI, and Supabase, with attention to data flow and reliability."
@@ -648,6 +667,7 @@
     "hourlyRate": "$40",
     "scopeModel": "Fixed-Price Milestones (No hidden hourly charges)",
     "deliverables": [
+      "AI Strategy & Architecture Audits (Custom 3-Page AI Blueprint)",
       "Custom UI Design & Interactive Prototypes",
       "Production-ready React & Next.js web applications",
       "Supabase database engineering & security setups",
@@ -717,6 +737,7 @@
     "hourlyRate": "₹3,000",
     "scopeModel": "Fixed-Price Milestones (No hidden hourly charges)",
     "deliverables": [
+      "AI Strategy & Architecture Audits (Custom 3-Page AI Blueprint)",
       "Custom UI Design & Interactive Prototypes",
       "Production-ready React & Next.js web applications",
       "Supabase database engineering & security setups",

@@ -28,6 +28,16 @@
       "techSpecs": "Full Web App Shell, Supabase PostgreSQL Architecture, Server Caching (unstable_cache), Production Vercel Wiring"
     },
     {
+      "id": "ai_strategy_audit",
+      "title": "AI Strategy & Architecture Audit",
+      "tier": "Sprint Tier",
+      "priceINR": 20000,
+      "priceUSD": 300,
+      "laymanDescription": "A 60-minute operational workflow audit to identify high-ROI AI opportunities, resolve technical bottlenecks, and deliver a 3-page custom AI Integration Architecture Blueprint.",
+      "techSpecs": "Operational Bottleneck Analysis, AI Feasibility & Stack Selection, Cost/Latency Modeling, Custom 3-Page Architecture Blueprint PDF",
+      "hideFromFullProject": true
+    },
+    {
       "id": "standalone_embed",
       "title": "Micro-Widget Script Core Engine",
       "tier": "Tier 0",
@@ -266,6 +276,15 @@
       "shortLabel": "Chatbot Widget",
       "description": "Embed a 24/7 chatbot widget into your existing website (WordPress, Webflow, Shopify, custom HTML) for simple lead capture or trained AI document search.",
       "recommendedEngineId": "standalone_embed",
+      "compulsoryFeatureLabels": [],
+      "skipBrandAssets": true
+    },
+    {
+      "id": "ai_strategy_consulting",
+      "label": "🧠 AI Strategy & Solutioning Audit",
+      "shortLabel": "AI Strategy Sprint",
+      "description": "Workflow audit, AI feasibility analysis, cost/latency modeling, and a custom 3-page architecture blueprint",
+      "recommendedEngineId": "ai_strategy_audit",
       "compulsoryFeatureLabels": [],
       "skipBrandAssets": true
     },
