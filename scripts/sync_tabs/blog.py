@@ -394,38 +394,100 @@ def render_blog_tab():
                         st.error(f"Failed to publish post: {e}")
 
         with col_seo:
-            st.markdown("#### 🔍 Real-Time SEO Audit")
+            st.markdown("#### 🔍 Real-Time SEO Audit & Quality Score")
             focus_keyword = st.text_input("Focus Keyword:", key="blog_focus_keyword", placeholder="e.g. Next.js, RAG, Python")
 
+            # -----------------------------------------------------------------
+            # SEO Score Meter Calculation (0 - 100%)
+            # -----------------------------------------------------------------
+            score = 0
             title_len = len(draft_title) if draft_title else 0
-            if 40 <= title_len <= 60: st.markdown("🟢 **Title Length:** Good (40-60 chars)")
-            elif title_len == 0: st.markdown("🔴 **Title Length:** Empty (Target: 40-60)")
-            else: st.markdown(f"🔴 **Title Length:** {title_len} chars (Target: 40-60)")
+            if 40 <= title_len <= 60: score += 25
+            elif 30 <= title_len <= 70: score += 15
 
             excerpt_len = len(draft_excerpt) if draft_excerpt else 0
-            if 120 <= excerpt_len <= 160: st.markdown("🟢 **Excerpt Length:** Good (120-160 chars)")
-            elif excerpt_len == 0: st.markdown("🔴 **Excerpt Length:** Empty (Target: 120-160)")
-            else: st.markdown(f"🟡 **Excerpt Length:** {excerpt_len} chars (Target: 120-160)")
+            if 120 <= excerpt_len <= 160: score += 20
+            elif 90 <= excerpt_len <= 180: score += 10
 
             if focus_keyword:
                 kw = focus_keyword.lower().strip()
-                if draft_title and kw in draft_title.lower(): st.markdown("🟢 **Keyword in Title:** Yes")
-                else: st.markdown("🔴 **Keyword in Title:** No")
-
-                if draft_excerpt and kw in draft_excerpt.lower(): st.markdown("🟢 **Keyword in Excerpt:** Yes")
-                else: st.markdown("🔴 **Keyword in Excerpt:** No")
+                if draft_title and kw in draft_title.lower(): score += 20
+                if draft_excerpt and kw in draft_excerpt.lower(): score += 15
 
                 body_lower = draft_content.lower() if draft_content else ""
                 kw_count = body_lower.count(kw)
                 words = [w for w in body_lower.split() if w.strip()]
                 word_count = len(words)
                 density = (kw_count / word_count * 100) if word_count > 0 else 0
+                if 1.0 <= density <= 2.5: score += 10
+                elif 0.5 <= density <= 3.5: score += 5
 
-                if 1.0 <= density <= 2.5: st.markdown(f"🟢 **Keyword Density:** {density:.2f}% (Good, count: {kw_count})")
-                elif density < 1.0: st.markdown(f"🟡 **Keyword Density:** {density:.2f}% (Too low, target: 1-2.5%)")
-                else: st.markdown(f"🔴 **Keyword Density:** {density:.2f}% (Stuffing detected!)")
-            else:
-                st.info("Enter a focus keyword to perform density audits.")
+                has_h2 = any(line.startswith('##') and kw in line for line in body_lower.split('\n'))
+                if has_h2: score += 10
+
+            score = min(score, 100)
+
+            # Score Badge & Bar
+            if score >= 80: st.markdown(f"🟢 **SEO Score:** `{score}%` (Excellent)")
+            elif score >= 50: st.markdown(f"🟡 **SEO Score:** `{score}%` (Fair)")
+            else: st.markdown(f"🔴 **SEO Score:** `{score}%` (Needs Improvement)")
+            st.progress(score / 100)
+
+            # Checkpoints list
+            if 40 <= title_len <= 60: st.markdown(f"🟢 Title Length: {title_len} chars")
+            else: st.markdown(f"🔴 Title Length: {title_len} chars (Target: 40-60)")
+
+            if 120 <= excerpt_len <= 160: st.markdown(f"🟢 Excerpt Length: {excerpt_len} chars")
+            else: st.markdown(f"🟡 Excerpt Length: {excerpt_len} chars (Target: 120-160)")
+
+            if focus_keyword:
+                kw = focus_keyword.lower().strip()
+                if draft_title and kw in draft_title.lower(): st.markdown("🟢 Keyword in Title: Yes")
+                else: st.markdown("🔴 Keyword in Title: No")
+                if draft_excerpt and kw in draft_excerpt.lower(): st.markdown("🟢 Keyword in Excerpt: Yes")
+                else: st.markdown("🔴 Keyword in Excerpt: No")
+
+            st.markdown("---")
+
+            # -----------------------------------------------------------------
+            # 🪄 1-Click AI Auto-Optimizer
+            # -----------------------------------------------------------------
+            auto_seo_status = st.session_state.get("auto_seo_opt_task_status", "idle")
+            if auto_seo_status == "success":
+                opt_res = st.session_state.get("auto_seo_opt_task_result")
+                if opt_res:
+                    if opt_res.get("optimized_title"): st.session_state.blog_draft_title = opt_res["optimized_title"]
+                    if opt_res.get("optimized_excerpt"): st.session_state.blog_draft_excerpt = opt_res["optimized_excerpt"]
+                    st.toast("🪄 Title & Excerpt auto-optimized for 100% SEO!")
+                st.session_state.auto_seo_opt_task_status = "idle"
+
+            if st.button("🪄 AI Auto-Optimize Title & Excerpt", key="btn_auto_seo", disabled=(auto_seo_status == "running"), use_container_width=True):
+                if not draft_title or not draft_content:
+                    st.error("Please enter Title and Content first!")
+                else:
+                    opt_prompt = f"""
+                    You are an expert SEO copywriter. Optimize this blog post's title and excerpt for high CTR and 100% SEO quality:
+                    - Target Title length: 45 to 55 characters (MUST contain focus keyword if provided).
+                    - Target Excerpt length: 130 to 155 characters (MUST contain focus keyword if provided).
+                    
+                    Focus Keyword: {focus_keyword or "Engineering & Architecture"}
+                    Current Title: {draft_title}
+                    Current Excerpt: {draft_excerpt}
+                    Content Snippet: {draft_content[:800]}
+                    
+                    Return strictly JSON:
+                    {{
+                      "optimized_title": "Optimized Title 45-55 chars",
+                      "optimized_excerpt": "Optimized Excerpt 130-155 chars"
+                    }}
+                    Return strictly raw JSON without markdown code fences.
+                    """
+                    def run_auto_seo():
+                        res = call_gemini(opt_prompt)
+                        if res is None: raise ValueError("Failed to auto-optimize SEO.")
+                        return res
+                    run_async_task(run_auto_seo, "auto_seo_opt_task")
+                    st.rerun()
 
             st.markdown("---")
             seo_task_status = st.session_state.get("blog_seo_review_task_status", "idle")
