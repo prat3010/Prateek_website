@@ -28,6 +28,7 @@ from sync_tabs.shared import (
     HAS_SYNC,
     read_local_path_context,
 )
+from sync_tabs.retriever_query import query_system_memory, format_evidence_block
 from sync_git import commit_and_push_paths
 
 
@@ -328,8 +329,15 @@ def render_blog_tab():
                     if raw_notes: context_blocks.append(f"[RAW NOTES]\n{raw_notes}")
                     if path_context: context_blocks.append(f"[SOURCE CODE]\n{path_context}")
 
+                    # Query Supabase System Memory Vectors
+                    search_query = f"{raw_notes} {local_path_val}".strip()
+                    vector_results = query_system_memory(search_query, top_k=5)
+                    evidence_block = format_evidence_block(vector_results)
+                    if evidence_block:
+                        context_blocks.append(f"[INDEXED CODEBASE EVIDENCE (SUPABASE RAG)]\n{evidence_block}")
+
                     prompt = f"""
-                    You are a senior full-stack developer. Write a clear developer blog post.
+                    You are a senior full-stack developer. Write a clear developer blog post based on real codebase evidence.
                     Context: {"\n\n".join(context_blocks)}
                     Tone: {tone}
                     Return JSON:

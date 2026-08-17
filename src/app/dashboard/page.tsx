@@ -32,6 +32,7 @@ import intakeDefaults from '@/data/intakeQuestionnaireDefaults.json';
 import { calcQuote, formatMoney, type Currency } from '@/lib/pricing';
 import type { ResumeData } from '@/data/resume';
 import WorkspaceSwitcher from '@/components/ui/WorkspaceSwitcher';
+import ClientProjectCopilot from '@/components/ClientDashboard/ClientProjectCopilot';
 import styles from './dashboard.module.css';
 
 declare global {
@@ -1898,6 +1899,7 @@ export default function ClientDashboardPage() {
           </div>
         </Portal>
       )}
+      <ClientProjectCopilot />
       </div>
     </div>
   );

@@ -101,7 +101,16 @@ def load_env():
 env = load_env()
 GEMINI_API_KEY = env.get("GEMINI_API_KEY")
 
+def trigger_contract_and_schema_audit():
+    """Trigger background execution of contract audit and architecture dependency map generator."""
+    try:
+        subprocess.run([sys.executable, "scripts/audit_contracts.py"], capture_output=True, timeout=5, cwd=os.getcwd())
+        subprocess.run([sys.executable, "scripts/generate_architecture_map.py"], capture_output=True, timeout=5, cwd=os.getcwd())
+    except Exception:
+        pass
+
 def trigger_revalidation():
+    trigger_contract_and_schema_audit()
     secret = env.get("SYNC_API_KEY")
     if secret:
         urls = [

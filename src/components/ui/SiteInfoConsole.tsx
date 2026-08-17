@@ -489,10 +489,56 @@ export default function SiteInfoConsole() {
       return;
     }
 
+    if (trimmedCmd.startsWith('ask ') || trimmedCmd.startsWith('explain ') || (!['help', 'projects', 'partner', 'system', 'storage', 'stack', 'sync', 'synchronizer', 'analytics', 'cheatcode', 'git-info', 'qrcode', 'clear'].includes(trimmedCmd.split(/\s+/)[0]))) {
+      const queryText = trimmedCmd.replace(/^(ask|explain)\s+/i, '').trim();
+      if (queryText.length >= 3) {
+        setTerminalHistory(prev => [
+          ...prev,
+          { text: `SEARCHING SUPABASE SYSTEM MEMORY VECTORS FOR: "${queryText}"...`, type: 'success' }
+        ]);
+
+        fetch('/api/terminal/query', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: queryText })
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.results && data.results.length > 0) {
+              const lines: ConsoleLine[] = [];
+              lines.push({ text: `RETRIEVED ${data.results.length} CODEBASE EVIDENCE CHUNKS FROM SUPABASE:`, type: 'success' });
+              data.results.forEach((r: { meta_data?: Record<string, unknown>; content: string }, idx: number) => {
+                const meta = r.meta_data || {};
+                const file = meta.file_path || 'unknown';
+                const symbol = meta.symbol_name ? ` | Symbol: ${meta.symbol_name}` : '';
+                lines.push({ text: `  [${idx + 1}] File: ${file}${symbol}`, type: 'success' });
+                lines.push({ text: r.content.slice(0, 300) + '...', type: 'output' });
+              });
+              setTerminalHistory(prev => [...prev, ...lines]);
+            } else {
+              setTerminalHistory(prev => [
+                ...prev,
+                { text: `No matching codebase chunks found for query: "${queryText}"`, type: 'error' }
+              ]);
+            }
+          })
+          .catch(() => {
+            setTerminalHistory(prev => [
+              ...prev,
+              { text: 'Error querying Supabase system memory.', type: 'error' }
+            ]);
+          });
+
+        setTerminalInput('');
+        return;
+      }
+    }
+
     switch (trimmedCmd) {
       case 'help':
         response = [
           { text: 'Available commands:', type: 'success' },
+          { text: '  ask <query>  - Query Supabase vector memory for codebase ASTs & docs', type: 'output' },
           { text: '  projects   - List portfolio projects and tags', type: 'output' },
           { text: '  partner    - Print Sales Partner & Broker Agreement with PDF links', type: 'output' },
           { text: '  system     - Show CPU, memory, and display metrics', type: 'output' },
