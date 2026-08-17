@@ -123,7 +123,7 @@ export async function POST(request: Request) {
     }
 
     const resend = new Resend(process.env.RESEND_API_KEY);
-    const contactEmailTo = process.env.CONTACT_EMAIL_TO?.trim() || 'prateeqsharma@gmail.com';
+    const contactEmailTo = process.env.CONTACT_EMAIL_TO?.trim() || '3010prateeksharma@gmail.com';
 
     // Escape HTML special characters for HTML email context
     const escapedName = escapeHtml(name);
@@ -133,10 +133,9 @@ export async function POST(request: Request) {
     // Sanitize name for subject line to prevent CRLF injection or HTML tags in the subject
     const cleanSubjectName = name.replace(/[\r\n]/g, '').replace(/<[^>]*>/g, '').trim();
 
-    // Send the email
-    // onboarding@resend.dev is the default unverified domain sender
+    // Send the email via verified domain prateeq.in
     const { data, error } = await resend.emails.send({
-      from: 'Portfolio Contact Form <onboarding@resend.dev>',
+      from: 'Portfolio Contact Form <notifications@prateeq.in>',
       to: contactEmailTo,
       replyTo: email,
       subject: `New Portfolio Signal from ${cleanSubjectName}`,

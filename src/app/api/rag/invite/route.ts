@@ -77,7 +77,7 @@ export async function POST(req: Request) {
         const escapedRole = escapeHtml(role.toUpperCase());
 
         await resend.emails.send({
-          from: 'Retriever Team <onboarding@resend.dev>',
+          from: 'Retriever Team <notifications@prateeq.in>',
           to: inviteeEmail,
           subject: `You've been invited to join an RAG SaaS Workspace on prateeq.in`,
           html: `

@@ -121,10 +121,24 @@ def call_gemini_json(prompt: str):
         method="POST"
     )
     
-    with urllib.request.urlopen(req, timeout=30) as resp:
+    with urllib.request.urlopen(req, timeout=35) as resp:
         res_data = json.loads(resp.read().decode("utf-8"))
-        text = res_data["candidates"][0]["content"]["parts"][0]["text"]
-        return json.loads(text)
+        text = res_data["candidates"][0]["content"]["parts"][0]["text"].strip()
+        if text.startswith("```"):
+            lines = text.splitlines()
+            if lines[0].startswith("```"):
+                lines = lines[1:]
+            if lines and lines[-1].startswith("```"):
+                lines = lines[:-1]
+            text = "\n".join(lines).strip()
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            # Fallback regex extraction of largest JSON object block
+            match = re.search(r'\{.*\}', text, re.DOTALL)
+            if match:
+                return json.loads(match.group(0))
+            raise
 
 def generate_blog_draft(news_items, projects):
     """Evaluate news items and synthesize a structured technical blog post."""
@@ -272,7 +286,7 @@ def send_resend_notification(draft_data, is_auto_publish=False):
     """
 
     payload = {
-        "from": "Portfolio Contact Form <onboarding@resend.dev>",
+        "from": "Prateeq Studio <notifications@prateeq.in>",
         "to": [CONTACT_EMAIL_TO],
         "subject": subject,
         "html": html_body
