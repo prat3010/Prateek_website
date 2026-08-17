@@ -26,25 +26,51 @@ import urllib.request
 import xml.etree.ElementTree as ET
 import html
 
-RSS_FEEDS = [
+DEFAULT_RSS_FEEDS = [
     {"name": "HackerNews", "url": "https://news.ycombinator.com/rss"},
     {"name": "TechCrunch AI", "url": "https://techcrunch.com/category/artificial-intelligence/feed/"},
     {"name": "HuggingFace Blog", "url": "https://huggingface.co/blog/feed.xml"}
 ]
 
-def fetch_rss_news() -> list[dict]:
+RSS_CONFIG_FILE = os.path.join("src", "data", "rss_feeds.json")
+
+def get_rss_feeds() -> list[dict]:
+    """Get active RSS feeds list from src/data/rss_feeds.json or fallback to defaults."""
+    if os.path.exists(RSS_CONFIG_FILE):
+        try:
+            with open(RSS_CONFIG_FILE, "r", encoding="utf-8") as f:
+                feeds = json.load(f)
+                if isinstance(feeds, list) and feeds:
+                    return feeds
+        except Exception:
+            pass
+    return DEFAULT_RSS_FEEDS
+
+def save_rss_feeds(feeds: list[dict]) -> bool:
+    """Save active RSS feeds list to src/data/rss_feeds.json."""
+    try:
+        os.makedirs(os.path.dirname(RSS_CONFIG_FILE), exist_ok=True)
+        with open(RSS_CONFIG_FILE, "w", encoding="utf-8") as f:
+            json.dumps(feeds, indent=2)
+            f.write(json.dumps(feeds, indent=2))
+        return True
+    except Exception as e:
+        print(f"Failed to save RSS feeds config: {e}", file=sys.stderr)
+        return False
+
+def fetch_rss_news(custom_feeds: list[dict] | None = None) -> list[dict]:
     """Fetch recent AI/tech items from RSS feeds for Streamlit preview & generation."""
     news_items = []
     headers = {"User-Agent": "Mozilla/5.0 (Python/AI-Blog-Generator)"}
+    active_feeds = custom_feeds or get_rss_feeds()
     
-    for feed in RSS_FEEDS:
+    for feed in active_feeds:
         try:
             req = urllib.request.Request(feed["url"], headers=headers)
             with urllib.request.urlopen(req, timeout=10) as resp:
                 xml_data = resp.read()
                 root = ET.fromstring(xml_data)
                 
-                # Support RSS 2.0 and Atom feeds
                 items = root.findall("./channel/item") or root.findall("./{http://www.w3.org/2005/Atom}entry")
                 for item in items[:5]:
                     title_elem = item.find("title") or item.find("{http://www.w3.org/2005/Atom}title")

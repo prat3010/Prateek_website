@@ -23,6 +23,8 @@ from sync_tabs.shared import (
     delete_post_from_all_layers,
     fetch_pending_ai_drafts,
     fetch_rss_news,
+    get_rss_feeds,
+    save_rss_feeds,
     HAS_SYNC,
     read_local_path_context,
 )
@@ -74,6 +76,32 @@ def render_blog_tab():
                     if "rss_news_items" in st.session_state:
                         del st.session_state.rss_news_items
                     st.rerun()
+
+            with st.expander("⚙️ Manage Newsjacking RSS Feeds"):
+                current_feeds = get_rss_feeds()
+                st.markdown("**Active Monitored Feeds:**")
+                for f_idx, feed in enumerate(current_feeds):
+                    st.caption(f"{f_idx+1}. **{feed['name']}**: `{feed['url']}`")
+                
+                new_feed_name = st.text_input("New Feed Name:", placeholder="e.g. VentureBeat AI", key="new_rss_name")
+                new_feed_url = st.text_input("New Feed RSS URL:", placeholder="https://example.com/rss", key="new_rss_url")
+                
+                col_add_rss, col_reset_rss = st.columns(2)
+                with col_add_rss:
+                    if st.button("➕ Add RSS Feed", use_container_width=True, key="btn_add_rss"):
+                        if new_feed_name and new_feed_url:
+                            updated = current_feeds + [{"name": new_feed_name.strip(), "url": new_feed_url.strip()}]
+                            if save_rss_feeds(updated):
+                                st.success(f"Added feed '{new_feed_name}'!")
+                                st.rerun()
+                        else:
+                            st.error("Please enter both feed name and URL.")
+                with col_reset_rss:
+                    if st.button("🔄 Reset to Default Feeds", use_container_width=True, key="btn_reset_rss"):
+                        from sync_tabs.blog_service import DEFAULT_RSS_FEEDS
+                        if save_rss_feeds(DEFAULT_RSS_FEEDS):
+                            st.success("Reset feeds to default list!")
+                            st.rerun()
 
             news_items = st.session_state.get("rss_news_items", [])
             if news_items:
@@ -451,45 +479,74 @@ def render_blog_tab():
                 if not draft_posts:
                     st.info("No pending AI draft posts in Supabase database.")
                 else:
-                    for draft in draft_posts:
-                        with st.container(border=True):
-                            col_info, col_load, col_approve, col_del = st.columns([3.5, 1.3, 1.5, 1])
-                            raw_title = draft.get('title', 'Untitled Draft')
-                            clean_title = raw_title.replace('[DRAFT]', '').strip()
+                    draft_filter = st.radio(
+                        "Filter Drafts by Source:",
+                        ["All Drafts", "🤖 Newsjacking", "💡 Codebase Brainstorm", "✍️ Ghostwriter"],
+                        horizontal=True,
+                        key="draft_source_filter"
+                    )
 
-                            with col_info:
-                                st.markdown(f"**🤖 {clean_title}** `[DRAFT]`")
-                                st.caption(f"Slug: `{draft.get('slug')}` | Excerpt: {draft.get('excerpt', '')[:100]}...")
+                    filtered_drafts = []
+                    for d in draft_posts:
+                        s_type = d.get('source_type', '')
+                        slug_val = d.get('slug', '').lower()
+                        title_val = d.get('title', '').lower()
+                        
+                        if s_type == 'newsjacking' or 'gateway' in slug_val or 'openrouter' in slug_val or 'ai' in slug_val:
+                            inferred_source = "🤖 Newsjacking"
+                        elif s_type == 'brainstorm' or 'dev log' in title_val or 'architecting' in title_val:
+                            inferred_source = "💡 Codebase Brainstorm"
+                        else:
+                            inferred_source = "✍️ Ghostwriter"
 
-                            with col_load:
-                                if st.button("✏️ Load in Editor", key=f"queue_load_{draft.get('slug')}", use_container_width=True):
-                                    st.session_state.blog_draft_title = clean_title
-                                    st.session_state.blog_draft_excerpt = draft.get('excerpt', '')
-                                    raw_tags = draft.get('tags', [])
-                                    st.session_state.blog_draft_tags = ", ".join(raw_tags) if isinstance(raw_tags, list) else str(raw_tags)
-                                    st.session_state.blog_draft_content = draft.get('content', '')
-                                    st.session_state.blog_draft_date = draft.get('date', '')
-                                    st.toast("Loaded draft into Editor tab!")
+                        d['_inferred_source'] = inferred_source
 
-                            with col_approve:
-                                if st.button("🚀 1-Click Publish", key=f"queue_pub_{draft.get('slug')}", type="primary", use_container_width=True):
-                                    ok, msg = publish_post_to_all_layers(
-                                        draft, dry_run=True, old_draft_slug=draft.get('slug'), is_offline=is_offline
-                                    )
-                                    if ok:
-                                        st.success(msg)
-                                        st.rerun()
-                                    else:
-                                        st.error(msg)
+                        if draft_filter == "All Drafts" or draft_filter == inferred_source:
+                            filtered_drafts.append(d)
 
-                            with col_del:
-                                if st.button("Remove", key=f"queue_del_{draft.get('slug')}", type="secondary", use_container_width=True):
-                                    ok, msg = delete_post_from_all_layers(draft.get('slug'), is_offline=is_offline)
-                                    if ok:
-                                        st.success(msg)
-                                        st.rerun()
-                                    else:
-                                        st.error(msg)
+                    if not filtered_drafts:
+                        st.warning(f"No drafts match filter '{draft_filter}'.")
+                    else:
+                        for draft in filtered_drafts:
+                            with st.container(border=True):
+                                col_info, col_load, col_approve, col_del = st.columns([3.5, 1.3, 1.5, 1])
+                                raw_title = draft.get('title', 'Untitled Draft')
+                                clean_title = raw_title.replace('[DRAFT]', '').strip()
+                                badge = draft.get('_inferred_source', '🤖 AI Draft')
+
+                                with col_info:
+                                    st.markdown(f"**{clean_title}** `{badge}` `[DRAFT]`")
+                                    st.caption(f"Slug: `{draft.get('slug')}` | Excerpt: {draft.get('excerpt', '')[:100]}...")
+
+                                with col_load:
+                                    if st.button("✏️ Load in Editor", key=f"queue_load_{draft.get('slug')}", use_container_width=True):
+                                        st.session_state.blog_draft_title = clean_title
+                                        st.session_state.blog_draft_excerpt = draft.get('excerpt', '')
+                                        raw_tags = draft.get('tags', [])
+                                        st.session_state.blog_draft_tags = ", ".join(raw_tags) if isinstance(raw_tags, list) else str(raw_tags)
+                                        st.session_state.blog_draft_content = draft.get('content', '')
+                                        st.session_state.blog_draft_date = draft.get('date', '')
+                                        st.toast("Loaded draft into Editor tab!")
+
+                                with col_approve:
+                                    if st.button("🚀 1-Click Publish", key=f"queue_pub_{draft.get('slug')}", type="primary", use_container_width=True):
+                                        ok, msg = publish_post_to_all_layers(
+                                            draft, dry_run=True, old_draft_slug=draft.get('slug'), is_offline=is_offline
+                                        )
+                                        if ok:
+                                            st.success(msg)
+                                            st.rerun()
+                                        else:
+                                            st.error(msg)
+
+                                with col_del:
+                                    if st.button("Remove", key=f"queue_del_{draft.get('slug')}", type="secondary", use_container_width=True):
+                                        ok, msg = delete_post_from_all_layers(draft.get('slug'), is_offline=is_offline)
+                                        if ok:
+                                            st.success(msg)
+                                            st.rerun()
+                                        else:
+                                            st.error(msg)
             except Exception as e:
                 st.error(f"Failed to fetch drafts: {e}")
         else:

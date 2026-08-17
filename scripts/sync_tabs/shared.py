@@ -53,12 +53,16 @@ try:
         delete_post_from_all_layers,
         fetch_pending_ai_drafts,
         fetch_rss_news,
+        get_rss_feeds,
+        save_rss_feeds,
     )
 except ImportError:
     publish_post_to_all_layers = lambda *a, **kw: (False, "Service unavailable")
     delete_post_from_all_layers = lambda *a, **kw: (False, "Service unavailable")
     fetch_pending_ai_drafts = lambda *a, **kw: []
     fetch_rss_news = lambda *a, **kw: []
+    get_rss_feeds = lambda *a, **kw: []
+    save_rss_feeds = lambda *a, **kw: False
 
 from sync_assets import cleanup_staged_file, copy_to_staged_file, delete_existing_files, finalize_staged_file
 from sync_git import commit_and_push_paths

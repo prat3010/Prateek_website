@@ -43,18 +43,31 @@ RESEND_API_KEY = os.environ.get('RESEND_API_KEY')
 CONTACT_EMAIL_TO = os.environ.get('CONTACT_EMAIL_TO', '3010prateeksharma@gmail.com')
 SYNC_API_KEY = os.environ.get('SYNC_API_KEY', 'secret_key')
 
-RSS_FEEDS = [
+DEFAULT_RSS_FEEDS = [
     {"name": "HackerNews", "url": "https://news.ycombinator.com/rss"},
     {"name": "TechCrunch AI", "url": "https://techcrunch.com/category/artificial-intelligence/feed/"},
     {"name": "HuggingFace Blog", "url": "https://huggingface.co/blog/feed.xml"}
 ]
 
+def load_rss_feeds():
+    rss_json_path = os.path.join(ROOT_DIR, "src", "data", "rss_feeds.json")
+    if os.path.exists(rss_json_path):
+        try:
+            with open(rss_json_path, "r", encoding="utf-8") as f:
+                feeds = json.load(f)
+                if isinstance(feeds, list) and feeds:
+                    return feeds
+        except Exception:
+            pass
+    return DEFAULT_RSS_FEEDS
+
 def fetch_rss_news():
     """Fetch recent AI/tech items from RSS feeds."""
     news_items = []
     headers = {"User-Agent": "Mozilla/5.0 (Python/AI-Blog-Generator)"}
+    feeds = load_rss_feeds()
     
-    for feed in RSS_FEEDS:
+    for feed in feeds:
         try:
             req = urllib.request.Request(feed["url"], headers=headers)
             with urllib.request.urlopen(req, timeout=10) as resp:
