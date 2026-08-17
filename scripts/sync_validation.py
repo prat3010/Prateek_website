@@ -107,6 +107,22 @@ def validate_certificate_response(data):
     }
 
 
+BANNED_LLM_WORDS = [
+    r"\bdelve\b", r"\bdelving\b", r"\btapestry\b",
+    r"rapidly evolving", r"\bgame-changer\b", r"\brevolutionary\b",
+    r"\bspearhead\b", r"\bbeacon\b", r"testament to",
+    r"in conclusion", r"to summarize"
+]
+BANNED_LLM_REGEX = re.compile("|".join(BANNED_LLM_WORDS), re.IGNORECASE)
+
+
+def validate_banned_words(text):
+    """Scan text for prohibited LLM cliché vocabulary. Returns list of matches."""
+    if not text:
+        return []
+    return BANNED_LLM_REGEX.findall(text)
+
+
 def validate_blog_fields(title, excerpt, tags, content):
     clean_title = title.strip()
     clean_excerpt = excerpt.strip()
@@ -117,6 +133,12 @@ def validate_blog_fields(title, excerpt, tags, content):
         raise ValueError("Blog content is required.")
     if len(clean_title) > 180:
         raise ValueError("Blog title is too long.")
+    
+    banned_matches = validate_banned_words(f"{clean_title} {clean_excerpt} {clean_content}")
+    if banned_matches:
+        unique_banned = list(set(m.lower() for m in banned_matches))
+        print(f"Warning: Blog payload contains banned LLM words: {', '.join(unique_banned)}")
+
     return clean_title, clean_excerpt[:500], validate_tags(tags, max_items=12), clean_content
 
 

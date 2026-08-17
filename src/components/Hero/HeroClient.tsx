@@ -36,9 +36,9 @@ const PRIMARY_HREFS = { developer: '/terminal', business: '/scoping' } as const;
 const SECONDARY_HREFS = { developer: '/admin/analytics', business: '/rag' } as const;
 
 const BADGE_TEXTS: ScramblerProps['texts'][] = [
-  { developer: bothThemes('Developer'),      business: bothThemes('Tech Partner') },
-  { developer: bothThemes('Designer'),       business: bothThemes('Product Builder') },
-  { developer: bothThemes('Engineer'),       business: bothThemes('Consultant') },
+  { developer: bothThemes('Forward Deployed Engineer'), business: bothThemes('AI Solution Architect') },
+  { developer: bothThemes('RAG Systems Specialist'),     business: bothThemes('Technical Partner') },
+  { developer: bothThemes('Full-Stack Architect'),       business: bothThemes('Product Builder') },
 ];
 
 const VIBE_TEXTS: ScramblerProps['texts'] = {

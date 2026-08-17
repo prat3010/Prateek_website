@@ -13,6 +13,8 @@ Usage:
 import os
 import sys
 import json
+import html
+import re
 import argparse
 import urllib.request
 import urllib.parse
@@ -38,7 +40,7 @@ GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
 SUPABASE_URL = os.environ.get('NEXT_PUBLIC_SUPABASE_URL')
 SUPABASE_KEY = os.environ.get('SUPABASE_SERVICE_ROLE_KEY')
 RESEND_API_KEY = os.environ.get('RESEND_API_KEY')
-CONTACT_EMAIL_TO = os.environ.get('CONTACT_EMAIL_TO', 'prateeqsharma@gmail.com')
+CONTACT_EMAIL_TO = os.environ.get('CONTACT_EMAIL_TO', '3010prateeksharma@gmail.com')
 SYNC_API_KEY = os.environ.get('SYNC_API_KEY', 'secret_key')
 
 RSS_FEEDS = [
@@ -70,15 +72,16 @@ def fetch_rss_news():
                         link_elem = item.find("{http://www.w3.org/2005/Atom}link")
                     
                     title = title_elem.text if title_elem is not None else ""
+                    title = html.unescape(title).strip()
                     if link_elem is not None:
                         link = link_elem.text if link_elem.text else link_elem.get("href", "")
                     else:
                         link = ""
                         
-                    if title and ("AI" in title or "LLM" in title or "Model" in title or "Data" in title or "Python" in title or "Code" in title or "Web" in title or "Agent" in title):
+                    if title and re.search(r'\b(AI|LLM|GPT|Claude|DeepSeek|RAG|Vector|Python|Next\.js|Model|Agent|Data|Code|Web)\b', title, re.I):
                         news_items.append({
                             "source": feed["name"],
-                            "title": title.strip(),
+                            "title": title,
                             "url": link.strip()
                         })
         except Exception as e:
@@ -185,26 +188,35 @@ def save_to_supabase(draft_data, status="draft"):
         "Prefer": "resolution=merge-duplicates,return=representation"
     }
 
-    now_iso = datetime.now(timezone.utc).isoformat()
     today_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
+    # Only include valid columns defined on the Supabase 'posts' table schema
+    slug = draft_data["slug"]
+    if status == "draft" and not slug.startswith("draft-"):
+        slug = f"draft-{slug}"
+    elif status == "published" and slug.startswith("draft-"):
+        slug = slug.replace("draft-", "")
+
+    now_iso = datetime.now(timezone.utc).isoformat()
     record = {
-        "slug": draft_data["slug"],
-        "title": draft_data["post_title"],
+        "slug": slug,
+        "title": f"[DRAFT] {draft_data['post_title']}" if status == "draft" else draft_data["post_title"],
         "date": today_date,
         "excerpt": draft_data["excerpt"],
-        "content": draft_data["content_markdown"],
         "tags": draft_data.get("tags", ["AI", "Engineering"]),
+        "content": draft_data["content_markdown"],
         "status": status,
-        "published_at": now_iso,
-        "created_at": now_iso
+        "published_at": now_iso if status == "published" else None
     }
 
     req = urllib.request.Request(endpoint, data=json.dumps([record]).encode("utf-8"), headers=headers, method="POST")
     try:
         with urllib.request.urlopen(req) as resp:
-            print(f"Successfully saved post '{draft_data['post_title']}' to Supabase posts!")
+            print(f"✓ Successfully saved post '{draft_data['post_title']}' to Supabase posts table! (Slug: {slug})")
             return True
+    except urllib.error.HTTPError as e:
+        print(f"Failed to save post to Supabase: HTTP {e.code} - {e.read().decode()}", file=sys.stderr)
+        return False
     except Exception as e:
         print(f"Failed to save post to Supabase: {e}", file=sys.stderr)
         return False
@@ -216,11 +228,12 @@ def send_resend_notification(draft_data, is_auto_publish=False):
         return False
 
     title = draft_data.get("post_title", "Untitled Draft")
-    slug = draft_data.get("slug", "")
+    raw_slug = draft_data.get("slug", "")
+    slug = raw_slug.replace("draft-", "")
     mode = draft_data.get("mode", "thought_leadership")
     excerpt = draft_data.get("excerpt", "")
 
-    publish_url = f"https://prateeq.in/api/blog/publish?slug={slug}&secret={SYNC_API_KEY}"
+    publish_url = f"https://prateeq.in/api/blog/publish?slug=draft-{slug}&secret={SYNC_API_KEY}"
     live_url = f"https://prateeq.in/blog/{slug}"
 
     if is_auto_publish:
@@ -259,7 +272,7 @@ def send_resend_notification(draft_data, is_auto_publish=False):
     """
 
     payload = {
-        "from": "Prateeq Studio <onboarding@resend.dev>",
+        "from": "Portfolio Contact Form <onboarding@resend.dev>",
         "to": [CONTACT_EMAIL_TO],
         "subject": subject,
         "html": html_body
@@ -279,6 +292,9 @@ def send_resend_notification(draft_data, is_auto_publish=False):
         with urllib.request.urlopen(req) as resp:
             print(f"✓ Resend notification email sent to {CONTACT_EMAIL_TO}!")
             return True
+    except urllib.error.HTTPError as e:
+        print(f"Failed to send Resend email: HTTP {e.code} - {e.read().decode()}", file=sys.stderr)
+        return False
     except Exception as e:
         print(f"Failed to send Resend email: {e}", file=sys.stderr)
         return False

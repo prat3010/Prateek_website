@@ -50,23 +50,23 @@ export const noirTaglines = [
 ];
 
 export const businessStandardTaglines = [
-  "Practical websites that make the next step obvious.",
+  "Forward-deployed execution: From business scope to production AI systems.",
+  "Direct technical partnership from architecture to deployment.",
+  "Practical web applications with custom RAG integrations.",
   "Clean web applications with clear scope and delivery.",
-  "Product pages that help people understand quickly.",
   "Custom tools built around real business needs.",
-  "Focused frontends with maintainable backend structure.",
   "Design and development aligned around outcomes.",
   "Simple handoff, clear communication, dependable delivery.",
   "Web work that stays useful after launch.",
 ];
 
 export const businessNoirTaglines = [
+  "Forward Deployed Engineering: Zero fluff, direct production delivery.",
   "Clear scope. Clean delivery. Measured results.",
-  "A direct build process with fewer moving parts.",
+  "Custom RAG pipelines and scalable architecture.",
   "Practical systems that are easy to review and support.",
   "Structure first, noise last.",
   "Web applications built to be useful, not decorative.",
-  "A calm process for work that needs to last.",
   "The brief stays sharp. The implementation stays disciplined.",
   "Direct delivery for teams that need clarity.",
 ];

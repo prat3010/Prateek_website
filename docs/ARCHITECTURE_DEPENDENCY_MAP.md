@@ -120,7 +120,11 @@ graph TD
     PendingSkills -->|Approve/Dismiss| SkillsMatrix[scripts/sync_tabs/skills.py & src/data/skills.json]
     
     BlogPosts[src/content/posts/*.md] -->|Gemini Brainstorm & Draft| SyncBlog[scripts/sync_tabs/blog.py]
+    AIBlogGen[scripts/ai_blog_generator.py] -->|Daily Cron Draft| SupabasePostsDB[Supabase posts Table]
+    AIBlogGen -->|Resend Email Link| PublishRoute[src/app/api/blog/publish/route.ts]
+    PublishRoute -->|Atomically Approve & Publish| SupabasePostsDB
     SyncBlog -->|Publish Post| MarkdownLib[src/lib/markdown.ts & /blog]
+    SupabasePostsDB -->|Filter Published Status| MarkdownLib
 ```
 
 ---

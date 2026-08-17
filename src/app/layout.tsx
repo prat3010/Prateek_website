@@ -30,10 +30,19 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://prateeq.in"),
-  title: "Prateeq Sharma | Portfolio",
+  title: "Prateeq Sharma | Forward Deployed AI Engineer & Solutions Architect",
   description:
-    "Crafting Digital Worlds, One Panel at a Time — Portfolio of Prateeq Sharma, developer, designer, and storyteller.",
-  keywords: ["portfolio", "web developer", "Prateeq Sharma", "Prateeq", "comic book", "azure", "watercolor", "illustration"],
+    "Forward Deployed AI Engineer & Solutions Architect. Direct technical partnership building custom RAG systems, Next.js web applications, and high-ROI software.",
+  keywords: [
+    "Forward Deployed Engineer",
+    "AI Solution Architect",
+    "RAG Systems Engineer",
+    "Full-Stack Developer",
+    "Prateeq Sharma",
+    "Prateeq",
+    "Next.js",
+    "Supabase"
+  ],
   authors: [{ name: "Prateeq Sharma" }],
   alternates: {
     canonical: "/",
@@ -42,8 +51,8 @@ export const metadata: Metadata = {
     icon: "/icon.svg",
   },
   openGraph: {
-    title: "Prateeq Sharma | Portfolio",
-    description: "Crafting Digital Worlds, One Panel at a Time",
+    title: "Prateeq Sharma | Forward Deployed AI Engineer",
+    description: "Forward Deployed AI Engineer & Solutions Architect — Direct technical partnership building custom RAG systems & production web apps.",
     type: "website",
     url: "https://prateeq.in",
     siteName: "Prateeq Sharma Portfolio",

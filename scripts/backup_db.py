@@ -156,11 +156,11 @@ def main():
                     tags = []
             
             file_content = f"""---
-title: "{p.get('title', '')}"
-date: "{p.get('date', '')}"
-excerpt: "{p.get('excerpt', '')}"
+title: {json.dumps(p.get('title', ''))}
+date: {json.dumps(p.get('date', ''))}
+excerpt: {json.dumps(p.get('excerpt', ''))}
 tags: {json.dumps(tags)}
-coverImage: "{p.get('coverImage', '/images/blog/default.jpg')}"
+coverImage: {json.dumps(p.get('coverImage', '/images/blog/default.jpg'))}
 ---
 
 {p.get('content', '')}

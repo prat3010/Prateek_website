@@ -78,6 +78,8 @@ export const getAllPosts = unstable_cache(
       const { data, error } = await supabase
         .from('posts')
         .select('*')
+        .or('status.eq.published,status.is.null')
+        .not('slug', 'like', 'draft-%')
         .order('date', { ascending: false });
       if (error || !data) throw error || new Error('No data');
       return data.map((p) => ({

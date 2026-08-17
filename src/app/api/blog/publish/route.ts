@@ -20,17 +20,49 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Database service unavailable' }, { status: 500 });
   }
 
-  // Update post status to published
+  // Fetch existing post by slug (handles both draft-prefix and raw slug)
+  const initialFetch = await supabase
+    .from('posts')
+    .select('id, slug, title')
+    .eq('slug', slug)
+    .maybeSingle();
+
+  let existingPost = initialFetch.data;
+  const fetchError = initialFetch.error;
+
+  if (!existingPost && !slug.startsWith('draft-')) {
+    const draftSlug = `draft-${slug}`;
+    const { data: draftPost } = await supabase
+      .from('posts')
+      .select('id, slug, title')
+      .eq('slug', draftSlug)
+      .maybeSingle();
+    if (draftPost) {
+      existingPost = draftPost;
+    }
+  }
+
+  if (fetchError || !existingPost) {
+    return NextResponse.json({ error: `Blog post with slug '${slug}' not found` }, { status: 404 });
+  }
+
+  const targetSlug = existingPost.slug.replace(/^draft-/, '');
+  const targetTitle = existingPost.title.replace(/^\[DRAFT\]\s*/i, '');
+  const nowIso = new Date().toISOString();
+
+  // Update post status to published and sanitize slug and title
   const { data, error } = await supabase
     .from('posts')
     .update({
+      slug: targetSlug,
+      title: targetTitle,
       status: 'published',
-      published_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      published_at: nowIso,
+      updated_at: nowIso,
     })
-    .eq('slug', slug)
+    .eq('id', existingPost.id)
     .select('slug, title')
-    .maybeSingle();
+    .single();
 
   if (error) {
     console.error('Failed to publish blog draft:', error);
@@ -60,8 +92,8 @@ export async function GET(request: NextRequest) {
     <body>
       <div class="card">
         <h1>🚀 Post Published Live!</h1>
-        <p><strong>"${data?.title || slug}"</strong> has been successfully published to <code>prateeq.in/blog</code> and Next.js cache has been revalidated.</p>
-        <a href="/blog/${slug}" class="btn">View Live Blog Post →</a>
+        <p><strong>"${data?.title || targetTitle}"</strong> has been successfully published to <code>prateeq.in/blog</code> and Next.js cache has been revalidated.</p>
+        <a href="/blog/${data?.slug || targetSlug}" class="btn">View Live Blog Post →</a>
       </div>
     </body>
     </html>

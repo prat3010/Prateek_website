@@ -40,5 +40,7 @@ graph TD
 
 ### Phase 4: 1-Click Approval & Automation Pipeline
 - GitHub Actions daily cron job (`.github/workflows/daily_ai_blog.yml`).
-- Telegram/Gmail notification dispatching 1-click `[🚀 Publish to Live]` webhook links.
-- Integration with local Synchronizer (`scripts/sync_tabs/blog.py`) for draft management and 1-click deletion.
+- Resend email notification dispatching 1-click `[🚀 Publish to Live]` webhook links (`/api/blog/publish?slug=draft-<slug>&secret=...`).
+- Atomic transition in API handler: removes `draft-` from slug, strips `[DRAFT]` from title, updates `status: 'published'`, and revalidates Next.js cache.
+- Data layer isolation: `markdown.ts` filters `.or('status.eq.published,status.is.null')` so raw drafts are hidden from live site listing until approved.
+- Integration with local Synchronizer (`scripts/sync_tabs/blog.py`) for manual editing, SEO analysis, and deletion.

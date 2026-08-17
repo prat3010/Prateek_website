@@ -519,6 +519,8 @@ CREATE TABLE IF NOT EXISTS posts (
   tags JSONB NOT NULL DEFAULT '[]',
   "coverImage" TEXT NOT NULL DEFAULT '',
   content TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'published' CHECK (status IN ('draft', 'published')),
+  published_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -533,6 +535,7 @@ CREATE POLICY "Allow public select posts" ON posts FOR SELECT USING (true);
 
 CREATE INDEX IF NOT EXISTS idx_posts_slug ON posts (slug);
 CREATE INDEX IF NOT EXISTS idx_posts_date ON posts (date DESC);
+CREATE INDEX IF NOT EXISTS idx_posts_status ON posts (status);
 
 -- ============================================================
 -- 10. Scoping Intake Leads
