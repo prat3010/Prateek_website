@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
-import { classifyReferrer, getCountryName } from '@/app/admin/analytics/_lib/utils';
+import { classifyReferrer, getCountryName } from '@/app/analytics/_lib/utils';
 
 export const dynamic = 'force-dynamic';
 

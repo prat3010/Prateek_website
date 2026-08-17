@@ -53,6 +53,7 @@ from sync_tabs.blog import render_blog_tab
 from sync_tabs.rag_pricing import render_rag_pricing_tab
 from sync_tabs.clients import render_clients_tab
 from sync_tabs.questionnaire import render_questionnaire_tab
+from sync_tabs.outreach import render_outreach_tab
 
 st.set_page_config(
     page_title="Resume & Portfolio Manager",
@@ -333,13 +334,16 @@ with tab_blog:
 
 # ── 3. COMMERCIAL & CLIENT OPS HUB ──────────────────────────────────────
 with tab_commercial:
-    sub_scoping, sub_clients, sub_partner, sub_terms, sub_rag = st.tabs([
+    sub_outreach, sub_scoping, sub_clients, sub_partner, sub_terms, sub_rag = st.tabs([
+        "🎯 Lead Prospecting Deck",
         "🧾 Scoping Questionnaire Config",
         "🏢 Client Orders & Invoices",
         "🤝 Sales Partner Agreements",
         "💰 Terms & Rates",
         "💳 RAG SaaS Pricing"
     ])
+    with sub_outreach:
+        render_outreach_tab()
     with sub_scoping:
         render_questionnaire_tab()
     with sub_clients:

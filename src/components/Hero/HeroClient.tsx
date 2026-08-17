@@ -33,7 +33,7 @@ const HEADLINE_PARTS = {
 } as const;
 
 const PRIMARY_HREFS = { developer: '/terminal', business: '/scoping' } as const;
-const SECONDARY_HREFS = { developer: '/admin/analytics', business: '/rag' } as const;
+const SECONDARY_HREFS = { developer: '/analytics', business: '/rag' } as const;
 
 const BADGE_TEXTS: ScramblerProps['texts'][] = [
   { developer: bothThemes('Forward Deployed Engineer'), business: bothThemes('AI Solution Architect') },

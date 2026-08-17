@@ -123,7 +123,7 @@ export default function RagAppStudioPage() {
 
         <div className={styles.navLinks}>
           {isAdmin && (
-            <Link href="/admin/analytics" className="comic-btn comic-btn-blue">
+            <Link href="/analytics" className="comic-btn comic-btn-blue">
               🛠️ Admin Dashboard
             </Link>
           )}

@@ -366,7 +366,7 @@ export default function SiteInfoConsole() {
 
     if (trimmedCmd === 'go-analytics') {
       if (typeof window !== 'undefined') {
-        window.location.href = '/admin/analytics';
+        window.location.href = '/analytics';
       }
       setTerminalInput('');
       return;
@@ -685,7 +685,7 @@ export default function SiteInfoConsole() {
             <ArrowLeft size={18} />
             <span>Return to Base</span>
           </Link>
-          <Link href="/admin/analytics" className={styles.backLink}>
+          <Link href="/analytics" className={styles.backLink}>
             <span>Visitor Analytics</span>
           </Link>
         </div>

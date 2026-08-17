@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { safeDecode, getCountryName, getRelativeTime, classifyReferrer } from '@/app/admin/analytics/_lib/utils';
+import { safeDecode, getCountryName, getRelativeTime, classifyReferrer } from '@/app/analytics/_lib/utils';
 
 describe('safeDecode', () => {
   it('returns empty string for null input', () => {

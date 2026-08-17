@@ -91,7 +91,7 @@ export default async function AnalyticsPage(props: {
           return (
             <Link
               key={btn.value}
-              href={`/admin/analytics?range=${btn.value}`}
+              href={`/analytics?range=${btn.value}`}
               className={`comic-btn text-xs font-headline ${
                 isActive ? `comic-btn-yellow ${styles.activeFilter}` : 'comic-btn-outline'
               }`}
