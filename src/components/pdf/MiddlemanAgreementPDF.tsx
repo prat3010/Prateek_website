@@ -1,7 +1,7 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import type { ResumeData, MiddlemanAgreementConfig } from '@/data/resume';
-import { getPdfTheme, scaleBodyFont, type PDFThemeConfig } from './pdfTheme';
+import { getPdfTheme, scaleBodyFont, cleanPDFText, type PDFThemeConfig } from './pdfTheme';
 import { PdfBrandHeader } from './PdfBrandHeader';
 import { PdfFooter } from './PdfFooter';
 import {
@@ -116,32 +116,32 @@ function createStyles(theme: PDFThemeConfig) {
       borderWidth: 1,
       padding: '3 6',
       borderRadius: 3,
-      marginBottom: 8,
-      marginTop: 8,
+      marginBottom: 5,
+      marginTop: 6,
       borderLeftWidth: 3,
       borderLeftColor: theme.accentColor,
       letterSpacing: 0.05,
     },
     paragraph: {
       fontSize: scaleBodyFont(theme, 8),
-      lineHeight: 1.5,
+      lineHeight: 1.4,
       color: theme.textSecondary,
-      marginBottom: 8,
+      marginBottom: 5,
     },
     bulletRow: {
       flexDirection: 'row',
-      marginBottom: 4,
+      marginBottom: 3,
     },
     bulletDot: {
       width: 10,
       fontSize: scaleBodyFont(theme, 8),
-      lineHeight: 1.5,
+      lineHeight: 1.4,
       color: theme.accentColor,
     },
     bulletText: {
       flex: 1,
       fontSize: scaleBodyFont(theme, 8),
-      lineHeight: 1.5,
+      lineHeight: 1.4,
       color: theme.textSecondary,
     },
     table: {
@@ -150,12 +150,12 @@ function createStyles(theme: PDFThemeConfig) {
       borderWidth: 1,
       borderRadius: 4,
       overflow: 'hidden',
-      marginBottom: 12,
+      marginBottom: 8,
     },
     tableHeader: {
       flexDirection: 'row',
       backgroundColor: theme.tableRowAlt,
-      padding: '6 5',
+      padding: '5 5',
       borderBottomWidth: 1,
       borderBottomColor: theme.cardBorder,
     },
@@ -167,7 +167,7 @@ function createStyles(theme: PDFThemeConfig) {
     },
     tableRow: {
       flexDirection: 'row',
-      padding: '7 5',
+      padding: '5 5',
       borderBottomWidth: 1,
       borderBottomColor: theme.tableRowAlt,
     },
@@ -176,7 +176,7 @@ function createStyles(theme: PDFThemeConfig) {
       color: theme.textSecondary,
     },
     signatureSection: {
-      marginTop: 10,
+      marginTop: 8,
     },
     signatureGrid: {
       flexDirection: 'row',
@@ -195,7 +195,7 @@ function createStyles(theme: PDFThemeConfig) {
       fontFamily: theme.labelBoldFont,
       fontSize: scaleBodyFont(theme, 6.5),
       color: theme.textSecondary,
-      marginBottom: 10,
+      marginBottom: 8,
       letterSpacing: 0.05,
     },
     signatureLine: {
@@ -204,14 +204,14 @@ function createStyles(theme: PDFThemeConfig) {
       marginTop: 2,
     },
     agreedBox: {
-      marginTop: 8,
+      marginTop: 6,
       backgroundColor: theme.cardBg,
       borderColor: theme.cardBorder,
       borderLeftWidth: 3,
       borderLeftColor: theme.accentColor,
       borderWidth: 1,
       borderRadius: 4,
-      padding: 8,
+      padding: 7,
     },
     agreedTitle: {
       fontFamily: theme.labelBoldFont,
@@ -222,7 +222,7 @@ function createStyles(theme: PDFThemeConfig) {
     },
     agreedText: {
       fontSize: scaleBodyFont(theme, 7.5),
-      lineHeight: 1.5,
+      lineHeight: 1.4,
       color: theme.textSecondary,
     },
   });
@@ -269,22 +269,23 @@ export function MiddlemanAgreementPDF({ resumeData, isNoir }: MiddlemanAgreement
     const isSignature = section.key === 'signature';
 
     return (
-      <View key={section.key || index}>
-        <Text style={styles.sectionTitle}>{section.heading}</Text>
+      <View key={section.key || index} wrap={false}>
+        <Text style={styles.sectionTitle}>{cleanPDFText(section.heading)}</Text>
         {section.lines.map((line, lineIdx) => {
           const isBullet = line.startsWith('- ');
+          const cleaned = cleanPDFText(line);
           return isBullet ? (
             <View key={lineIdx} style={styles.bulletRow}>
               <Text style={styles.bulletDot}>{'\u2022'}</Text>
-              <Text style={styles.bulletText}>{line.slice(2)}</Text>
+              <Text style={styles.bulletText}>{cleaned.slice(2)}</Text>
             </View>
           ) : (
-            <Text key={lineIdx} style={styles.paragraph}>{line}</Text>
+            <Text key={lineIdx} style={styles.paragraph}>{cleaned}</Text>
           );
         })}
 
         {isCommission && (
-          <View>
+          <View wrap={false}>
             <View style={styles.table}>
               <View style={styles.tableHeader}>
                 <Text style={[styles.tableCellBold, { width: '40%', borderRightWidth: 1, borderRightColor: theme.cardBorder, paddingRight: 6 }]}>PROJECT TIER & BUDGET RANGE</Text>
@@ -306,7 +307,7 @@ export function MiddlemanAgreementPDF({ resumeData, isNoir }: MiddlemanAgreement
                 <Text style={[styles.tableCell, { width: '30%', paddingLeft: 6 }]}>Monthly on cleared Net Funds</Text>
               </View>
             </View>
-            <View style={styles.agreedBox}>
+            <View style={styles.agreedBox} wrap={false}>
               <Text style={styles.agreedTitle}>WORKED COMMISSION EXAMPLE</Text>
               <Text style={styles.agreedText}>
                 {`Illustrative only: a SaaS contract signed at ${fmtINR(COMMISSION_EXAMPLE.contractValueINR)} falls in Tier ${COMMISSION_EXAMPLE.tier} (${tier3Cut}). Total commission is ${tier3Cut} × ${fmtINR(COMMISSION_EXAMPLE.contractValueINR)} = ${fmtINR(Math.round(COMMISSION_EXAMPLE.contractValueINR * parsePct(tier3Cut) / 100))}. It is paid 50% (${fmtINR(Math.round(Math.round(COMMISSION_EXAMPLE.contractValueINR * parsePct(tier3Cut) / 100) / 2))}) within ${COMMISSION_DISBURSEMENT_WINDOW} after the client's 50% deposit (${fmtINR(Math.round(COMMISSION_EXAMPLE.contractValueINR / 2))}) clears, and 50% (${fmtINR(Math.round(Math.round(COMMISSION_EXAMPLE.contractValueINR * parsePct(tier3Cut) / 100) / 2))}) after the final balance clears.`}
@@ -333,9 +334,9 @@ export function MiddlemanAgreementPDF({ resumeData, isNoir }: MiddlemanAgreement
               </View>
             </View>
             {agreedElectronically && (
-              <View style={styles.agreedBox}>
+              <View style={styles.agreedBox} wrap={false}>
                 <Text style={styles.agreedTitle}>AGREED ELECTRONICALLY</Text>
-                <Text style={styles.agreedText}>{agreedElectronically}</Text>
+                <Text style={styles.agreedText}>{cleanPDFText(agreedElectronically)}</Text>
               </View>
             )}
           </View>
@@ -343,6 +344,7 @@ export function MiddlemanAgreementPDF({ resumeData, isNoir }: MiddlemanAgreement
       </View>
     );
   };
+
 
   return (
     <Document title={`${partnerName.replace(/\s+/g, '_')}_Sales_Partner_Agreement`}>

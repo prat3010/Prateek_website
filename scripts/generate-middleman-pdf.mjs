@@ -378,32 +378,32 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath, theme }) 
       borderWidth: 1,
       padding: '3 6',
       borderRadius: 3,
-      marginBottom: 8,
-      marginTop: 8,
+      marginBottom: 5,
+      marginTop: 6,
       borderLeftWidth: 3,
       borderLeftColor: themeConfig.accentColor,
       letterSpacing: 0.05,
     },
     paragraph: {
       fontSize: 8,
-      lineHeight: 1.5,
+      lineHeight: 1.4,
       color: themeConfig.textSecondary,
-      marginBottom: 8,
+      marginBottom: 5,
     },
     bulletRow: {
       flexDirection: 'row',
-      marginBottom: 4,
+      marginBottom: 3,
     },
     bulletDot: {
       width: 10,
       fontSize: 8,
-      lineHeight: 1.5,
+      lineHeight: 1.4,
       color: themeConfig.accentColor,
     },
     bulletText: {
       flex: 1,
       fontSize: 8,
-      lineHeight: 1.5,
+      lineHeight: 1.4,
       color: themeConfig.textSecondary,
     },
     table: {
@@ -412,12 +412,12 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath, theme }) 
       borderWidth: 1,
       borderRadius: 4,
       overflow: 'hidden',
-      marginBottom: 12,
+      marginBottom: 8,
     },
     tableHeader: {
       flexDirection: 'row',
       backgroundColor: themeConfig.tableRowAlt,
-      padding: '6 5',
+      padding: '5 5',
       borderBottomWidth: 1,
       borderBottomColor: themeConfig.cardBorder,
     },
@@ -429,7 +429,7 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath, theme }) 
     },
     tableRow: {
       flexDirection: 'row',
-      padding: '7 5',
+      padding: '5 5',
       borderBottomWidth: 1,
       borderBottomColor: themeConfig.tableRowAlt,
     },
@@ -438,7 +438,7 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath, theme }) 
       color: themeConfig.textSecondary,
     },
     signatureSection: {
-      marginTop: 10,
+      marginTop: 8,
     },
     signatureGrid: {
       flexDirection: 'row',
@@ -457,7 +457,7 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath, theme }) 
       fontFamily: themeConfig.labelBoldFont,
       fontSize: 6.5,
       color: themeConfig.textSecondary,
-      marginBottom: 10,
+      marginBottom: 8,
       letterSpacing: 0.05,
     },
     signatureLine: {
@@ -466,14 +466,14 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath, theme }) 
       marginTop: 2,
     },
     agreedBox: {
-      marginTop: 8,
+      marginTop: 6,
       backgroundColor: themeConfig.cardBg,
       borderColor: themeConfig.cardBorder,
       borderLeftWidth: 3,
       borderLeftColor: themeConfig.accentColor,
       borderWidth: 1,
       borderRadius: 4,
-      padding: 8,
+      padding: 7,
     },
     agreedTitle: {
       fontFamily: themeConfig.labelBoldFont,
@@ -484,7 +484,7 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath, theme }) 
     },
     agreedText: {
       fontSize: 7.5,
-      lineHeight: 1.5,
+      lineHeight: 1.4,
       color: themeConfig.textSecondary,
     },
   });
@@ -520,7 +520,7 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath, theme }) 
       const exampleDeposit = Math.round(commissionExample.contractValueINR / 2);
 
       children.push(
-        h(View, { key: 'commission_block' },
+        h(View, { key: 'commission_block', wrap: false },
           h(View, { style: styles.table },
             h(View, { style: styles.tableHeader },
               h(Text, { style: [styles.tableCellBold, { width: '40%', borderRightWidth: 1, borderRightColor: themeConfig.cardBorder, paddingRight: 6 }] }, 'PROJECT TIER & BUDGET RANGE'),
@@ -534,7 +534,7 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath, theme }) 
               h(Text, { style: [styles.tableCell, { width: '30%', paddingLeft: 6 }] }, 'Monthly on cleared Net Funds')
             )
           ),
-          h(View, { style: styles.agreedBox },
+          h(View, { style: styles.agreedBox, wrap: false },
             h(Text, { style: styles.agreedTitle }, 'WORKED COMMISSION EXAMPLE'),
             h(Text, { style: styles.agreedText },
               `Illustrative only: a SaaS contract signed at ${fmtINR(commissionExample.contractValueINR)} falls in Tier ${commissionExample.tier} (${tier3Cut}). Total commission is ${tier3Cut} × ${fmtINR(commissionExample.contractValueINR)} = ${fmtINR(exampleTotal)}. It is paid 50% (${fmtINR(exampleSplit)}) within ${disbursementWindow} after the client's 50% deposit (${fmtINR(exampleDeposit)}) clears, and 50% (${fmtINR(exampleSplit)}) after the final balance clears.`
@@ -563,7 +563,7 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath, theme }) 
             )
           ),
           agreedElectronically
-            ? h(View, { key: 'agreed_electronically', style: styles.agreedBox },
+            ? h(View, { key: 'agreed_electronically', style: styles.agreedBox, wrap: false },
                 h(Text, { style: styles.agreedTitle }, 'AGREED ELECTRONICALLY'),
                 h(Text, { style: styles.agreedText }, agreedElectronically)
               )
@@ -572,7 +572,7 @@ async function generateMiddlemanAgreementPDF({ configPath, outputPath, theme }) 
       );
     }
 
-    return h(View, { key: section.key || index }, children);
+    return h(View, { key: section.key || index, wrap: false }, children);
   };
 
   const docElement = h(Document, { title: `${partnerName.replace(/\s+/g, '_')}_Sales_Partner_Agreement` },

@@ -11,18 +11,9 @@ import type {
 } from '@/data/resume';
 import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
 import { ESTIMATE_DISCLAIMER, resolveFeatureDependencies } from '@/lib/pricing';
-import { getPdfTheme, scaleBodyFont, type PDFThemeConfig } from './pdfTheme';
+import { getPdfTheme, scaleBodyFont, cleanPDFText, type PDFThemeConfig } from './pdfTheme';
 import { PdfBrandHeader } from './PdfBrandHeader';
 import { PdfFooter } from './PdfFooter';
-
-function cleanPDFText(text?: string | null): string {
-  if (!text) return '';
-  return text
-    .replace(/₹/g, 'INR ')
-    .replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]/gu, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
 
 function formatPrice(inr: number, usd: number, zeroLabel = 'INCLUDED'): string {
   if (inr === 0 && usd === 0) return zeroLabel;
@@ -524,11 +515,11 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
               style={idx % 2 === 1 ? [styles.tableRow, styles.tableRowHighlight] : styles.tableRow}
             >
               <View style={styles.colEngine}>
-                <Text style={styles.moduleTitle}>{engine.tier}: {engine.title}</Text>
-                <Text style={styles.moduleDesc}>{engine.laymanDescription}</Text>
+                <Text style={styles.moduleTitle}>{cleanPDFText(engine.tier)}: {cleanPDFText(engine.title)}</Text>
+                <Text style={styles.moduleDesc}>{cleanPDFText(engine.laymanDescription)}</Text>
               </View>
               <View style={styles.colScope}>
-                <Text style={styles.moduleDesc}>{engine.techSpecs}</Text>
+                <Text style={styles.moduleDesc}>{cleanPDFText(engine.techSpecs)}</Text>
               </View>
               <View style={styles.colPrice}>
                 <Text style={styles.priceVal}>{formatPrice(engine.priceINR, engine.priceUSD)}</Text>
@@ -558,16 +549,16 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
               style={idx % 2 === 1 ? [styles.tableRow, styles.tableRowHighlight] : styles.tableRow}
             >
               <View style={styles.colFeatureLabel}>
-                <Text style={styles.moduleTitle}>{feature.label}</Text>
+                <Text style={styles.moduleTitle}>{cleanPDFText(feature.label)}</Text>
                 {featureRequires(feature) ? (
-                  <Text style={[styles.moduleDesc, { marginTop: 1 }]}>{featureRequires(feature)}</Text>
+                  <Text style={[styles.moduleDesc, { marginTop: 1 }]}>{cleanPDFText(featureRequires(feature))}</Text>
                 ) : null}
               </View>
               <View style={styles.colFeatureDesc}>
-                <Text style={styles.moduleDesc}>{feature.laymanDescription}</Text>
+                <Text style={styles.moduleDesc}>{cleanPDFText(feature.laymanDescription)}</Text>
               </View>
               <View style={styles.colFeatureTech}>
-                <Text style={styles.moduleDesc}>{feature.techSpecs}</Text>
+                <Text style={styles.moduleDesc}>{cleanPDFText(feature.techSpecs)}</Text>
               </View>
               <View style={styles.colFeaturePrice}>
                 <Text style={styles.priceVal}>{formatPrice(feature.priceINR, feature.priceUSD)}</Text>
@@ -596,10 +587,10 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
               style={idx % 2 === 1 ? [styles.tableRow, styles.tableRowHighlight] : styles.tableRow}
             >
               <View style={styles.colBrandLabel}>
-                <Text style={styles.moduleTitle}>{asset.label}</Text>
+                <Text style={styles.moduleTitle}>{cleanPDFText(asset.label)}</Text>
               </View>
               <View style={styles.colBrandDesc}>
-                <Text style={styles.moduleDesc}>{asset.description}</Text>
+                <Text style={styles.moduleDesc}>{cleanPDFText(asset.description)}</Text>
               </View>
               <View style={styles.colBrandPrice}>
                 <Text style={styles.priceVal}>{formatPrice(asset.priceINR, asset.priceUSD)}</Text>
@@ -641,15 +632,15 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
                 <Text style={styles.moduleTitle}>{cleanPDFText(goal.label)}</Text>
               </View>
               <View style={styles.colGoalDesc}>
-                <Text style={styles.moduleDesc}>{goal.description}</Text>
+                <Text style={styles.moduleDesc}>{cleanPDFText(goal.description)}</Text>
               </View>
               <View style={styles.colGoalEngine}>
-                <Text style={styles.moduleDesc}>{engineLabel(goal.recommendedEngineId)}</Text>
+                <Text style={styles.moduleDesc}>{cleanPDFText(engineLabel(goal.recommendedEngineId))}</Text>
               </View>
               <View style={styles.colGoalAddons}>
                 {goal.compulsoryFeatureLabels.length > 0
                   ? goalAddons(goal).map((label, i) => (
-                      <Text key={i} style={styles.bullet}>• {label}</Text>
+                      <Text key={i} style={styles.bullet}>• {cleanPDFText(label)}</Text>
                     ))
                   : (
                       <Text style={styles.moduleDesc}>
@@ -683,20 +674,20 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
               style={idx % 2 === 1 ? [styles.tableRow, styles.tableRowHighlight] : styles.tableRow}
             >
               <View style={styles.colCare}>
-                <Text style={styles.moduleTitle}>{plan.name}</Text>
+                <Text style={styles.moduleTitle}>{cleanPDFText(plan.name)}</Text>
                 <Text style={styles.moduleDesc}>{cleanPDFText(plan.badge)}</Text>
               </View>
               <View style={styles.colCareIncludes}>
                 {plan.includes.map((item, i) => (
-                  <Text key={i} style={styles.bullet}>• {item}</Text>
+                  <Text key={i} style={styles.bullet}>• {cleanPDFText(item)}</Text>
                 ))}
                 <Text style={styles.slaLine}>{`SLA: ${plan.responseTime ?? 'Standard response SLA'} · ${plan.includedHours ?? 'Dedicated monthly support hours'}`}</Text>
                 {plan.overageRules ? (
-                  <Text style={styles.slaOverage}>{plan.overageRules}</Text>
+                  <Text style={styles.slaOverage}>{cleanPDFText(plan.overageRules)}</Text>
                 ) : null}
               </View>
               <View style={styles.colCareTech}>
-                <Text style={styles.moduleDesc}>{plan.techSpecs}</Text>
+                <Text style={styles.moduleDesc}>{cleanPDFText(plan.techSpecs)}</Text>
               </View>
               <View style={styles.colCarePrice}>
                 {plan.priceINR === 0 && plan.priceUSD === 0 ? (
@@ -704,7 +695,7 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
                 ) : (
                   <>
                     <Text style={styles.priceVal}>{formatPrice(plan.priceINR, plan.priceUSD)}</Text>
-                    {plan.period ? <Text style={styles.pricePeriod}>{plan.period}</Text> : null}
+                    {plan.period ? <Text style={styles.pricePeriod}>{cleanPDFText(plan.period)}</Text> : null}
                   </>
                 )}
               </View>
@@ -762,7 +753,7 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
                 <Text style={styles.moduleTitle}>{cleanPDFText(service.label)}</Text>
               </View>
               <View style={styles.colQuickDesc}>
-                <Text style={styles.moduleDesc}>{service.laymanDescription}</Text>
+                <Text style={styles.moduleDesc}>{cleanPDFText(service.laymanDescription)}</Text>
               </View>
               <View style={styles.colQuickPriceINR}>
                 <Text style={styles.priceVal}>
@@ -775,7 +766,7 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
                 </Text>
               </View>
               <View style={styles.colQuickTurnaround}>
-                <Text style={styles.moduleDesc}>{service.turnaround}</Text>
+                <Text style={styles.moduleDesc}>{cleanPDFText(service.turnaround)}</Text>
               </View>
             </View>
           ))}

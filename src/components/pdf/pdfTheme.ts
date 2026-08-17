@@ -126,3 +126,23 @@ export function pdfFontScale(theme: PDFThemeConfig): number {
 export function scaleBodyFont(theme: PDFThemeConfig, size: number): number {
   return Math.round(size * pdfFontScale(theme) * 10) / 10;
 }
+
+/**
+ * Sanitizes strings for React-PDF fonts:
+ * 1. Replaces non-Latin Rupee symbol (₹) with 'INR '
+ * 2. Strips all unicode emoji glyphs, variation selectors (e.g. \uFE0F), skin tone modifiers,
+ *    and zero-width joiners (\u200D) that render as broken boxes or cause extra leading whitespace
+ * 3. Collapses whitespace and trims leading/trailing space
+ */
+export function cleanPDFText(text?: string | null): string {
+  if (!text) return '';
+  return text
+    .replace(/₹/g, 'INR ')
+    .replace(
+      /\p{Extended_Pictographic}|\p{Emoji_Presentation}|[\u{1F000}-\u{1FFFF}]|[\u{2600}-\u{27BF}]|[\u{FE00}-\u{FE0F}]|[\u{200D}]|[\u{2000}-\u{200F}]/gu,
+      ''
+    )
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+

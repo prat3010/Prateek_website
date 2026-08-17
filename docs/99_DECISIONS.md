@@ -177,9 +177,9 @@ This document serves as the registry of critical architectural design decisions 
 * **Status**: Approved
 * **Context**: The commercial PDF trio uses two theme fonts — azure renders body copy in Lora (proportional) while noir uses JetBrains Mono (monospace, visibly wider). For identical content and font sizes the noir render of `ServicesAndPricingPDF` spilled from 4 to 6 pages and `MiddlemanAgreementPDF` from 3 to 4, pushing orphan pages (a lone brand-asset row, the CTA box, or a split signature heading).
 * **Decision**: Add `pdfFontScale(theme)` / `scaleBodyFont(theme, size)` to `src/components/pdf/pdfTheme.ts`. Noir scales body font sizes to 88% of azure so both themes produce identical page counts (pricing 5, scoping 3, middleman 3) while keeping the noir brand lockup (header/title sizes) untouched. `MiddlemanAgreementPDF` keeps its `wrap={false}` signature grid so the signature block never splits across pages. In 2026-08 the Services & Pricing guide grew from 4 to 5 pages (feature table expanded to 14 modules and the brand/content section moved to its own page); `pdf-smoke.test.ts` asserts 5/3/3.
-* **Consequences**:
-  * **Pros**: Noir PDFs fit the same fixed page counts as azure with no orphan pages; body text remains readable (only ~12% smaller); a single multiplier controls density.
-  * **Cons**: Noir body text is slightly smaller than azure by design; if the defaults JSON adds content the fixed page counts must be re-verified (the pdf-smoke tests assert the exact counts in both themes).
+* **2026-08 Addendum**:
+  1. Updated `cleanPDFText` helper in `src/components/pdf/pdfTheme.ts` to use a comprehensive Unicode Emoji & Variation Selector regex (`/\p{Extended_Pictographic}|\p{Emoji_Presentation}|[\u{1F000}-\u{1FFFF}]|[\u{2600}-\u{27BF}]|[\u{FE00}-\u{FE0F}]|[\u{200D}]|[\u{2000}-\u{200F}]/gu`). This cleanly strips hidden Variation Selectors (`\uFE0F`, etc.) without leaving extra space before labels like `Custom Web Application (Bespoke Scope)` and `Data Migration`.
+  2. Set `wrap={false}` on `agreedBox` and section containers in `MiddlemanAgreementPDF.tsx` and `scripts/generate-middleman-pdf.mjs` and optimized vertical line & section spacing. This prevents section title bars (such as Section 10) and worked example cards from splitting, cropping, or being orphaned across page boundaries while preserving the exact 3-page Middleman agreement layout.
 
 ---
 

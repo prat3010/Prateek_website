@@ -10,23 +10,9 @@ import type {
 import type { QuestionnaireData } from '@/utils/pdfGenerator';
 import { calcQuote, formatPricePair, ESTIMATE_DISCLAIMER, type Currency } from '@/lib/pricing';
 import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
-import { getPdfTheme, type PDFThemeConfig } from './pdfTheme';
+import { getPdfTheme, cleanPDFText, type PDFThemeConfig } from './pdfTheme';
 import { PdfBrandHeader } from './PdfBrandHeader';
 import { PdfFooter } from './PdfFooter';
-
-/**
- * Sanitizes strings for React-PDF fonts:
- * 1. Replaces non-Latin Rupee symbol (₹) with 'INR '
- * 2. Strips unicode emoji glyphs that render as broken boxes
- */
-function cleanPDFText(text?: string | null): string {
-  if (!text) return '';
-  return text
-    .replace(/₹/g, 'INR ')
-    .replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]/gu, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
 
 function createStyles(theme: PDFThemeConfig) {
   return StyleSheet.create({
