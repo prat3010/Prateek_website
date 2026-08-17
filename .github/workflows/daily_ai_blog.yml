@@ -1,0 +1,36 @@
+name: Automated AI Newsjacking Daily Blog Generator
+
+on:
+  schedule:
+    # Runs daily at 02:30 UTC (8:00 AM IST)
+    - cron: '30 2 * * *'
+  workflow_dispatch:
+    inputs:
+      auto_publish:
+        description: 'Set to true to publish live immediately without manual email approval'
+        required: false
+        default: 'false'
+
+jobs:
+  generate-blog-draft:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run AI Newsjacking Blog Generator
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          CONTACT_EMAIL_TO: ${{ secrets.CONTACT_EMAIL_TO }}
+          SYNC_API_KEY: ${{ secrets.SYNC_API_KEY }}
+          AUTO_PUBLISH: ${{ github.event.inputs.auto_publish || 'false' }}
+        run: |
+          python3 scripts/ai_blog_generator.py --publish

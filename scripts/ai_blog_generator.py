@@ -2,18 +2,17 @@
 """
 Automated AI Newsjacking & Content Generator Script
 Parses trending AI/Tech RSS news feeds, dynamically discovers portfolio projects from src/data/projects.json,
-synthesizes code-first technical case studies via Gemini 2.5 Flash, and generates structured draft blog posts.
+synthesizes code-first technical case studies via Gemini 2.5 Flash, saves to Supabase, and sends Resend notifications with 1-click publishing.
 
 Usage:
     python3 scripts/ai_blog_generator.py --dry-run
     python3 scripts/ai_blog_generator.py --publish
+    python3 scripts/ai_blog_generator.py --publish --auto-publish
 """
 
 import os
 import sys
 import json
-import re
-import random
 import argparse
 import urllib.request
 import urllib.parse
@@ -38,6 +37,9 @@ load_env()
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
 SUPABASE_URL = os.environ.get('NEXT_PUBLIC_SUPABASE_URL')
 SUPABASE_KEY = os.environ.get('SUPABASE_SERVICE_ROLE_KEY')
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY')
+CONTACT_EMAIL_TO = os.environ.get('CONTACT_EMAIL_TO', 'prateeqsharma@gmail.com')
+SYNC_API_KEY = os.environ.get('SYNC_API_KEY', 'secret_key')
 
 RSS_FEEDS = [
     {"name": "HackerNews", "url": "https://news.ycombinator.com/rss"},
@@ -169,8 +171,8 @@ YOUR TASK:
 """
     return call_gemini_json(prompt)
 
-def save_draft_to_supabase(draft_data):
-    """Save generated blog draft to Supabase blog_posts table."""
+def save_to_supabase(draft_data, status="draft"):
+    """Save generated blog post to Supabase blog_posts table."""
     if not SUPABASE_URL or not SUPABASE_KEY:
         print("Supabase credentials missing, skipping DB save.", file=sys.stderr)
         return False
@@ -189,7 +191,7 @@ def save_draft_to_supabase(draft_data):
         "excerpt": draft_data["excerpt"],
         "content": draft_data["content_markdown"],
         "tags": draft_data.get("tags", ["AI", "Engineering"]),
-        "status": "draft",
+        "status": status,
         "published_at": datetime.utcnow().isoformat(),
         "created_at": datetime.utcnow().isoformat()
     }
@@ -197,22 +199,99 @@ def save_draft_to_supabase(draft_data):
     req = urllib.request.Request(endpoint, data=json.dumps([record]).encode("utf-8"), headers=headers, method="POST")
     try:
         with urllib.request.urlopen(req) as resp:
-            print(f"Successfully saved draft '{draft_data['post_title']}' to Supabase blog_posts!")
+            print(f"Successfully saved post '{draft_data['post_title']}' to Supabase (Status: {status})!")
             return True
     except Exception as e:
-        print(f"Failed to save draft to Supabase: {e}", file=sys.stderr)
+        print(f"Failed to save post to Supabase: {e}", file=sys.stderr)
+        return False
+
+def send_resend_notification(draft_data, is_auto_publish=False):
+    """Send formatted email notification via Resend API."""
+    if not RESEND_API_KEY:
+        print("RESEND_API_KEY missing, skipping email notification.", file=sys.stderr)
+        return False
+
+    title = draft_data.get("post_title", "Untitled Draft")
+    slug = draft_data.get("slug", "")
+    mode = draft_data.get("mode", "thought_leadership")
+    excerpt = draft_data.get("excerpt", "")
+
+    publish_url = f"https://prateeq.in/api/blog/publish?slug={slug}&secret={SYNC_API_KEY}"
+    live_url = f"https://prateeq.in/blog/{slug}"
+
+    if is_auto_publish:
+        subject = f"✅ [AUTO-PUBLISHED] AI Blog: {title}"
+        action_button_html = f"""
+            <a href="{live_url}" style="background:#10b981; color:#ffffff; padding:12px 24px; text-decoration:none; font-weight:bold; border-radius:6px; display:inline-block;">View Live Blog Post →</a>
+            <p style="font-size:12px; color:#9ca3af; margin-top:12px;">If you want to unpublish or delete this post, open your local Streamlit Synchronizer (Blog tab).</p>
+        """
+    else:
+        subject = f"📝 [DRAFT READY] AI Blog: {title}"
+        action_button_html = f"""
+            <a href="{publish_url}" style="background:#2563eb; color:#ffffff; padding:14px 28px; text-decoration:none; font-weight:bold; border-radius:6px; display:inline-block;">🚀 1-Click Approve & Publish Live</a>
+            <p style="font-size:12px; color:#9ca3af; margin-top:12px;">Clicking this link will update status to 'published' and purge the Next.js production cache.</p>
+        """
+
+    html_body = f"""
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width:600px; margin:0 auto; padding:24px; border:1px solid #e5e7eb; border-radius:12px; background-color:#ffffff;">
+            <div style="border-bottom:2px solid #2563eb; padding-bottom:12px; margin-bottom:16px;">
+                <h2 style="color:#111827; margin:0; font-size:20px;">🤖 Automated AI Newsjacking Engine</h2>
+                <span style="font-size:12px; color:#6b7280; font-weight:bold;">Mode: {mode.upper()}</span>
+            </div>
+
+            <h3 style="color:#1f2937; margin:0 0 12px 0;">{title}</h3>
+            <p style="color:#4b5563; line-height:1.6; background-color:#f9fafb; padding:12px; border-radius:8px; border-left:4px solid #2563eb;">
+                {excerpt}
+            </p>
+
+            <div style="margin:24px 0; text-align:center;">
+                {action_button_html}
+            </div>
+
+            <div style="border-top:1px solid #f3f4f6; padding-top:16px; font-size:12px; color:#9ca3af; text-align:center;">
+                Prateeq Studio Content Engine • Scheduled Newsjacking Runner
+            </div>
+        </div>
+    """
+
+    payload = {
+        "from": "Prateeq Studio <onboarding@resend.dev>",
+        "to": [CONTACT_EMAIL_TO],
+        "subject": subject,
+        "html": html_body
+    }
+
+    req = urllib.request.Request(
+        "https://api.resend.com/emails",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "Authorization": f"Bearer {RESEND_API_KEY}",
+            "Content-Type": "application/json"
+        },
+        method="POST"
+    )
+
+    try:
+        with urllib.request.urlopen(req) as resp:
+            print(f"✓ Resend notification email sent to {CONTACT_EMAIL_TO}!")
+            return True
+    except Exception as e:
+        print(f"Failed to send Resend email: {e}", file=sys.stderr)
         return False
 
 def main():
-    parser = argparse.ArgumentParser(description="Automated AI Newsjacking Blog Draft Generator")
+    parser = argparse.ArgumentParser(description="Automated AI Newsjacking Blog Generator Engine")
     parser.add_argument("--dry-run", action="store_true", help="Generate draft without saving to database")
-    parser.add_argument("--publish", action="store_true", help="Save draft directly to Supabase DB as draft")
+    parser.add_argument("--publish", action="store_true", help="Save draft to Supabase DB and send Resend notification")
+    parser.add_argument("--auto-publish", action="store_true", help="Publish directly live without waiting for manual email approval")
     args = parser.parse_args()
+
+    is_auto = args.auto_publish or (os.environ.get('AUTO_PUBLISH', 'false').lower() in ('true', '1', 'yes'))
+    target_status = "published" if is_auto else "draft"
 
     print("🔍 Fetching trending AI/Tech news feeds...")
     news_items = fetch_rss_news()
     if not news_items:
-        # Fallback news items if feeds are unreachable
         news_items = [
             {"source": "Tech Feed", "title": "Scaling Local RAG Pipelines with Hybrid Vector Search and Ollama", "url": "https://huggingface.co/blog"},
             {"source": "Dev Feed", "title": "Next.js 16 Server Component Caching and On-Demand Revalidation Patterns", "url": "https://news.ycombinator.com"}
@@ -230,15 +309,17 @@ def main():
     print(f"TITLE: {draft.get('post_title')}")
     print(f"SLUG: {draft.get('slug')}")
     print(f"MODE: {draft.get('mode')} (Matched Project: {draft.get('matched_project_id')})")
+    print(f"PUBLISH MODE: {'AUTO-PUBLISHED LIVE' if is_auto else 'MANUAL DRAFT APPROVAL'}")
     print(f"EXCERPT: {draft.get('excerpt')}")
     print(f"TAGS: {', '.join(draft.get('tags', []))}")
     print("="*60)
-    print(draft.get('content_markdown')[:500] + "\n...\n")
+    print(draft.get('content_markdown')[:400] + "\n...\n")
 
     if args.publish:
-        save_draft_to_supabase(draft)
+        save_to_supabase(draft, status=target_status)
+        send_resend_notification(draft, is_auto_publish=is_auto)
     else:
-        print("💡 Dry run complete. Run with --publish to save draft to Supabase.")
+        print("💡 Dry run complete. Run with --publish to save draft & send Resend email.")
 
 if __name__ == "__main__":
     main()
