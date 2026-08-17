@@ -213,3 +213,74 @@ def render_clients_tab():
                     order["updated_at"] = datetime.utcnow().isoformat()
                     upsert_record("client_scopes", order, key_col="scope_code")
                     st.success(f"Updated {scope_code}! Stage set to '{new_stage}', Deposit Paid = {new_paid}. Live on prateeq.in/dashboard.")
+
+            st.markdown("---")
+            st.markdown("#### 🧾 Generate & Issue Commercial Non-GST Invoice")
+            
+            c_inv_type, c_inv_act = st.columns(2)
+            with c_inv_type:
+                inv_milestone_type = st.radio(
+                    f"Invoice Type for {scope_code}",
+                    options=["50% Upfront Deposit", "50% Final Milestone Balance", "100% Full Project Total"],
+                    key=f"inv_type_{scope_code}"
+                )
+            
+            with c_inv_act:
+                curr = order.get("currency", "INR")
+                cost_inr = float(order.get("total_cost_inr", 0))
+                cost_usd = float(order.get("total_cost_usd", 0))
+                base_cost = cost_inr if curr == "INR" else cost_usd
+                
+                if "50%" in inv_milestone_type:
+                    inv_amt = base_cost * 0.5
+                else:
+                    inv_amt = base_cost
+
+                st.markdown(f"**Invoice Amount:** `{curr} {inv_amt:,.2f}`")
+                st.caption("Issued as Non-GST Commercial Bill / Invoice.")
+
+            if st.button(f"🚀 Issue Invoice for {scope_code}", key=f"btn_issue_inv_{scope_code}"):
+                if HAS_SYNC:
+                    suffix = "50" if "Deposit" in inv_milestone_type else ("BAL" if "Balance" in inv_milestone_type else "FULL")
+                    inv_number = f"INV-{scope_code}-{suffix}"
+                    milestone_label = inv_milestone_type
+                    
+                    line_items = [
+                        {
+                            "name": f"{order.get('base_engine', 'Web Application Engine')} — {milestone_label}",
+                            "description": f"Scope Code {scope_code} ({order.get('company_name', 'Client')})",
+                            "rate": inv_amt,
+                            "quantity": 1,
+                            "subtotal": inv_amt,
+                            "tax_amount": 0,
+                            "total": inv_amt
+                        }
+                    ]
+
+                    invoice_record = {
+                        "invoice_number": inv_number,
+                        "scope_id": order.get("id", scope_code),
+                        "customer_name": order.get("company_name", "Valued Client"),
+                        "customer_email": order.get("client_email", email),
+                        "customer_phone": order.get("client_phone", ""),
+                        "amount": inv_amt,
+                        "currency": curr,
+                        "is_gst": False,
+                        "milestone_name": milestone_label,
+                        "payment_status": "issued" if not deposit_paid else "paid",
+                        "issue_date": datetime.utcnow().strftime("%Y-%m-%d"),
+                        "due_date": (datetime.utcnow() + timedelta(days=7)).strftime("%Y-%m-%d"),
+                        "line_items": json.dumps(line_items) if isinstance(line_items, list) else line_items,
+                        "tax_breakup": json.dumps({"total_tax": 0, "is_interstate": False}),
+                        "customer_notes": "Commercial Bill / Invoice issued by a Non-GST Registered Freelance Developer under Section 22 of the CGST Act.",
+                        "terms_and_conditions": "100% Intellectual Property transfers upon final balance payment. 30 days post-launch support included.",
+                        "created_at": datetime.utcnow().isoformat(),
+                        "updated_at": datetime.utcnow().isoformat()
+                    }
+
+                    try:
+                        upsert_record("invoices", invoice_record, key_col="invoice_number")
+                        st.success(f"Successfully issued non-GST invoice '{inv_number}' for {curr} {inv_amt:,.2f}! Visible on client dashboard.")
+                    except Exception as ex:
+                        st.error(f"Failed to issue invoice: {ex}")
+
