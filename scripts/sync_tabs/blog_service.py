@@ -22,6 +22,53 @@ from sync_tabs.shared import (
 from sync_git import commit_and_push_paths, run_safe_git_command
 
 
+import urllib.request
+import xml.etree.ElementTree as ET
+import html
+
+RSS_FEEDS = [
+    {"name": "HackerNews", "url": "https://news.ycombinator.com/rss"},
+    {"name": "TechCrunch AI", "url": "https://techcrunch.com/category/artificial-intelligence/feed/"},
+    {"name": "HuggingFace Blog", "url": "https://huggingface.co/blog/feed.xml"}
+]
+
+def fetch_rss_news() -> list[dict]:
+    """Fetch recent AI/tech items from RSS feeds for Streamlit preview & generation."""
+    news_items = []
+    headers = {"User-Agent": "Mozilla/5.0 (Python/AI-Blog-Generator)"}
+    
+    for feed in RSS_FEEDS:
+        try:
+            req = urllib.request.Request(feed["url"], headers=headers)
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                xml_data = resp.read()
+                root = ET.fromstring(xml_data)
+                
+                # Support RSS 2.0 and Atom feeds
+                items = root.findall("./channel/item") or root.findall("./{http://www.w3.org/2005/Atom}entry")
+                for item in items[:5]:
+                    title_elem = item.find("title") or item.find("{http://www.w3.org/2005/Atom}title")
+                    link_elem = item.find("link") or item.find("{http://www.w3.org/2005/Atom}link")
+                    
+                    title = title_elem.text.strip() if title_elem is not None and title_elem.text else ""
+                    if link_elem is not None:
+                        link = link_elem.text.strip() if link_elem.text else link_elem.attrib.get("href", "")
+                    else:
+                        link = ""
+                        
+                    if title and link:
+                        clean_title = html.unescape(title)
+                        news_items.append({
+                            "source": feed["name"],
+                            "title": clean_title,
+                            "url": link
+                        })
+        except Exception as e:
+            print(f"Warning: Failed to fetch {feed['name']} RSS: {e}", file=sys.stderr)
+            
+    return news_items
+
+
 def fetch_pending_ai_drafts() -> list[dict]:
     """Fetch all pending AI blog drafts stored in Supabase with status='draft'."""
     if not HAS_SYNC:
