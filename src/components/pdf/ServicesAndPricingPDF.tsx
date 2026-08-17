@@ -492,7 +492,7 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
 
         <View style={styles.valueBlurb}>
           <Text style={styles.valueBlurbText}>
-            Every service in this rate card is built from scratch — production-grade TypeScript on Next.js 16, deployed to Vercel, backed by a real PostgreSQL database on Supabase. No page builders. No WordPress themes. No drag-and-drop subscriptions you cannot migrate off. What you commission is a software asset your business owns outright, built to the same architectural standard as funded startups — at a fraction of agency rates.
+            Every service in this rate card is built from scratch — production-grade TypeScript on Next.js 16, deployed to Vercel, backed by a real PostgreSQL database on Supabase. No page builders. No WordPress themes. No drag-and-drop subscriptions you cannot migrate off. What you commission is a software asset your business owns outright. Every client receives 24/7 access to a private Client Workspace Dashboard (prateeq.in/dashboard) for real-time build milestone tracking, live feature customization, and direct invoice ledgers.
           </Text>
         </View>
 
@@ -713,8 +713,9 @@ export function ServicesAndPricingPDF({ resumeData, isNoir }: ServicesAndPricing
         <Text style={styles.sectionHeader}>7. QUALITY GUARANTEES & RESPONSE COMMITMENTS</Text>
         <Text style={styles.paragraph}>
           Every project is built with production-ready TypeScript, modular architecture, responsive design, and
-          aggressive server-side performance optimisation. We commit to a maximum 24-hour response SLA for all
-          commercial inquiries and active projects.
+          aggressive server-side performance optimisation. Clients receive private Client Workspace Dashboard access
+          (https://prateeq.in/dashboard) to track real-time build milestones, manage active scopes, and download
+          commercial invoices. We commit to a maximum 24-hour response SLA for all commercial inquiries and active projects.
         </Text>
 
         <View style={styles.contactBox}>
