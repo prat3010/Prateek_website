@@ -19,6 +19,9 @@ from sync_tabs.shared import (
     delete_blog_post,
     sync_blog_post,
     fetch_blog_posts,
+    publish_post_to_all_layers,
+    delete_post_from_all_layers,
+    fetch_pending_ai_drafts,
     HAS_SYNC,
     read_local_path_context
 )
@@ -514,86 +517,34 @@ def render_blog_tab():
                 tags_parsed,
                 draft_content,
             )
-            slug = slugify(validated_title)
+            is_offline = st.session_state.get("offline_mode", False)
             date_str = st.session_state.get("blog_draft_date", datetime.now().strftime('%Y-%m-%d'))
             
-            file_content = f"""---
-title: {json.dumps(validated_title)}
-date: {json.dumps(date_str)}
-excerpt: {json.dumps(validated_excerpt)}
-tags: {json.dumps(tags_list)}
-coverImage: "/images/blog/default.jpg"
----
-
-{validated_content}
-"""
-            is_offline = st.session_state.get("offline_mode", False)
-            supabase_success = True
+            post_payload = {
+                'title': validated_title,
+                'excerpt': validated_excerpt,
+                'tags': tags_list,
+                'content': validated_content,
+                'date': date_str,
+            }
             
-            if HAS_SYNC and not is_offline:
-                st.info("Syncing blog post to Supabase...")
-                post_data = {
-                    'slug': slug,
-                    'title': validated_title,
-                    'date': date_str,
-                    'excerpt': validated_excerpt,
-                    'tags': tags_list,
-                    'coverImage': '/images/blog/default.jpg',
-                    'content': validated_content
-                }
-                res = sync_blog_post(post_data)
-                if res is None:
-                    supabase_success = False
-                    st.error("Failed to sync blog post to Supabase.")
-            
-            if supabase_success:
-                try:
-                    posts_dir = os.path.join("src", "content", "posts")
-                    os.makedirs(posts_dir, exist_ok=True)
-                    file_path = os.path.join(posts_dir, f"{slug}.md")
-                    atomic_write_text(file_path, file_content)
-                    
-                    resume = parse_resume_file()
-                    if resume:
-                        if 'lastSynced' not in resume:
-                            resume['lastSynced'] = {}
-                        resume['lastSynced'] = {
-                            "timestamp": datetime.now().isoformat(),
-                            "status": "success",
-                            "summary": f"Published blog post: {validated_title}"
-                        }
-                        write_resume_file(resume)
-                        st.session_state.resume = resume
-                    
-                    st.success(f"Successfully published blog post locally! File created at: `{file_path}`")
-                    
-                    if HAS_SYNC and not is_offline:
-                        st.info("Purging website cache...")
-                        trigger_revalidation()
-                        st.success("Website cache revalidated successfully!")
-                    
-                    if not dry_run_blog:
-                        st.info("🚀 Pushing changes to GitHub...")
-                        git_ok, git_msg = commit_and_push_paths(
-                            run_safe_git_command,
-                            [file_path, "src/data/resume.json"],
-                            f"chore(blog): publish post - {validated_title}",
-                            cwd=os.getcwd(),
-                        )
-                        if git_ok:
-                            st.success(git_msg)
-                        else:
-                            st.error(f"Git failed: {git_msg}")
-                    
-                    if "blog_draft_title" in st.session_state: del st.session_state.blog_draft_title
-                    if "blog_draft_excerpt" in st.session_state: del st.session_state.blog_draft_excerpt
-                    if "blog_draft_content" in st.session_state: del st.session_state.blog_draft_content
-                    if "blog_draft_tags" in st.session_state: del st.session_state.blog_draft_tags
-                    if "blog_draft_date" in st.session_state: del st.session_state.blog_draft_date
-                    st.rerun()
-                    
-                except Exception as e:
-                    st.error(f"Failed to publish post: {e}")
+            ok, msg = publish_post_to_all_layers(
+                post_payload,
+                dry_run=dry_run_blog,
+                is_offline=is_offline
+            )
+            if ok:
+                st.success(msg)
+                if "blog_draft_title" in st.session_state: del st.session_state.blog_draft_title
+                if "blog_draft_excerpt" in st.session_state: del st.session_state.blog_draft_excerpt
+                if "blog_draft_content" in st.session_state: del st.session_state.blog_draft_content
+                if "blog_draft_tags" in st.session_state: del st.session_state.blog_draft_tags
+                if "blog_draft_date" in st.session_state: del st.session_state.blog_draft_date
+                st.rerun()
+            else:
+                st.error(msg)
+        except Exception as e:
+            st.error(f"Failed to publish post: {e}")
         except Exception as e:
             st.error(str(e))
 
@@ -630,45 +581,26 @@ coverImage: "/images/blog/default.jpg"
                                 
                         with col_approve:
                             if st.button("🚀 Publish", key=f"pub_draft_{draft.get('slug')}", type="primary", use_container_width=True):
-                                clean_slug = draft.get('slug', '').replace('draft-', '')
-                                updated_payload = {
-                                    **draft,
-                                    'title': clean_title,
-                                    'slug': clean_slug,
-                                    'status': 'published',
-                                    'published_at': datetime.now().isoformat()
-                                }
-                                # Delete draft record and save published record
-                                delete_blog_post(draft.get('slug'))
-                                sync_blog_post(updated_payload)
-                                
-                                # Write local .md post file
-                                posts_dir = os.path.join("src", "content", "posts")
-                                os.makedirs(posts_dir, exist_ok=True)
-                                file_path = os.path.join(posts_dir, f"{clean_slug}.md")
-                                tags_val = draft.get('tags', [])
-                                if isinstance(tags_val, str):
-                                    tags_val = [t.strip() for t in tags_val.split(',') if t.strip()]
-                                file_md = f"""---
-title: {json.dumps(clean_title)}
-date: {json.dumps(draft.get('date', datetime.now().strftime('%Y-%m-%d')))}
-excerpt: {json.dumps(draft.get('excerpt', ''))}
-tags: {json.dumps(tags_val)}
-coverImage: "/images/blog/default.jpg"
----
-
-{draft.get('content', '')}
-"""
-                                atomic_write_text(file_path, file_md)
-                                trigger_revalidation()
-                                st.success(f"Published '{clean_title}' successfully!")
-                                st.rerun()
+                                ok, msg = publish_post_to_all_layers(
+                                    draft,
+                                    dry_run=True,
+                                    old_draft_slug=draft.get('slug'),
+                                    is_offline=is_offline
+                                )
+                                if ok:
+                                    st.success(msg)
+                                    st.rerun()
+                                else:
+                                    st.error(msg)
                                 
                         with col_del:
                             if st.button("Remove", key=f"del_draft_{draft.get('slug')}", type="secondary", use_container_width=True):
-                                delete_blog_post(draft.get('slug'))
-                                st.success(f"Deleted draft `{draft.get('slug')}`!")
-                                st.rerun()
+                                ok, msg = delete_post_from_all_layers(draft.get('slug'), is_offline=is_offline)
+                                if ok:
+                                    st.success(msg)
+                                    st.rerun()
+                                else:
+                                    st.error(msg)
         except Exception as e:
             st.error(f"Failed to fetch drafts from Supabase: {e}")
     else:
@@ -750,20 +682,12 @@ coverImage: "/images/blog/default.jpg"
                     with col_del:
                         btn_key = f"delete_{post['file_name']}"
                         if st.button("Remove", key=btn_key, type="secondary", use_container_width=True):
-                            try:
-                                os.remove(post['file_path'])
-                            except Exception as e:
-                                st.error(f"Error deleting file: {e}")
-                            
                             is_offline = st.session_state.get("offline_mode", False)
-                            if HAS_SYNC and not is_offline:
-                                slug = post['file_name'].replace(".md", "")
-                                if delete_blog_post(slug):
-                                    trigger_revalidation()
-                                else:
-                                    st.error("Deleted local blog file, but Supabase delete failed.")
-                            
-                            st.success(f"Deleted `{post['file_name']}` successfully!")
-                            st.rerun()
+                            ok, msg = delete_post_from_all_layers(post['file_name'], is_offline=is_offline)
+                            if ok:
+                                st.success(msg)
+                                st.rerun()
+                            else:
+                                st.error(msg)
     else:
         st.info("No blog posts directory found.")

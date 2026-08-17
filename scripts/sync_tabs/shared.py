@@ -45,8 +45,18 @@ except ImportError:
     delete_skill = lambda *a, **kw: False
     delete_certificate = lambda *a, **kw: False
     fetch_records = lambda *a, **kw: None
-    upsert_record = lambda *a, **kw: None
     fetch_blog_posts = lambda *a, **kw: None
+
+try:
+    from sync_tabs.blog_service import (
+        publish_post_to_all_layers,
+        delete_post_from_all_layers,
+        fetch_pending_ai_drafts,
+    )
+except ImportError:
+    publish_post_to_all_layers = lambda *a, **kw: (False, "Service unavailable")
+    delete_post_from_all_layers = lambda *a, **kw: (False, "Service unavailable")
+    fetch_pending_ai_drafts = lambda *a, **kw: []
 
 from sync_assets import cleanup_staged_file, copy_to_staged_file, delete_existing_files, finalize_staged_file
 from sync_git import commit_and_push_paths
