@@ -226,6 +226,21 @@
   .fieldGrid {
     grid-template-columns: 1fr;
   }
+
+  .actionRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .devQuickLinks {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .quickLinkBtn {
+    flex: 1;
+    justify-content: center;
+  }
 }
 
 .field {

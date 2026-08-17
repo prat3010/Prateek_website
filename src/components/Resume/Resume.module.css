@@ -682,7 +682,19 @@
   margin-bottom: 32px;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
+  .contactInfo {
+    align-items: flex-start;
+    text-align: left;
+    margin-top: var(--space-xs);
+  }
+
+  .personaBar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-xs);
+  }
+
   .quoteGrid {
     grid-template-columns: 1fr;
     gap: 16px;

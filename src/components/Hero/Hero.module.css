@@ -425,6 +425,10 @@
     align-items: center;
   }
 
+  .brandingName {
+    transform: rotate(0deg);
+  }
+
   .taglineBadges {
     justify-content: center;
   }

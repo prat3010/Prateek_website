@@ -270,7 +270,7 @@
 
 .archetypeGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 12px;
   margin-top: 4px;
 }
@@ -647,7 +647,7 @@
 
 .checkboxGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: var(--space-sm);
   margin-top: var(--space-xs);
 }
@@ -1133,6 +1133,10 @@
 @media (max-width: 640px) {
   .card {
     padding: var(--space-lg);
+  }
+  .stepIndicator::before {
+    left: 20px;
+    right: 20px;
   }
   .stepLabel {
     display: none;
