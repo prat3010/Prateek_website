@@ -28,6 +28,7 @@ try:
         delete_certificate,
         fetch_records,
         upsert_record,
+        fetch_blog_posts,
     )
     HAS_SYNC = True
 except ImportError:
@@ -45,6 +46,7 @@ except ImportError:
     delete_certificate = lambda *a, **kw: False
     fetch_records = lambda *a, **kw: None
     upsert_record = lambda *a, **kw: None
+    fetch_blog_posts = lambda *a, **kw: None
 
 from sync_assets import cleanup_staged_file, copy_to_staged_file, delete_existing_files, finalize_staged_file
 from sync_git import commit_and_push_paths

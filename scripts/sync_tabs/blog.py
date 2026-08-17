@@ -17,6 +17,8 @@ from sync_tabs.shared import (
     git_commit_push_file,
     trigger_revalidation,
     delete_blog_post,
+    sync_blog_post,
+    fetch_blog_posts,
     HAS_SYNC,
     read_local_path_context
 )
@@ -594,6 +596,83 @@ coverImage: "/images/blog/default.jpg"
                     st.error(f"Failed to publish post: {e}")
         except Exception as e:
             st.error(str(e))
+
+    st.markdown("---")
+    st.subheader("📝 Pending Supabase AI Drafts")
+    
+    is_offline = st.session_state.get("offline_mode", False)
+    if HAS_SYNC and not is_offline:
+        try:
+            db_posts = fetch_blog_posts() or []
+            draft_posts = [p for p in db_posts if p.get('status') == 'draft' or p.get('slug', '').startswith('draft-')]
+            
+            if not draft_posts:
+                st.info("No pending AI draft posts in Supabase database.")
+            else:
+                for draft in draft_posts:
+                    with st.container(border=True):
+                        col_info, col_load, col_approve, col_del = st.columns([3.5, 1.3, 1.5, 1])
+                        with col_info:
+                            raw_title = draft.get('title', 'Untitled Draft')
+                            clean_title = raw_title.replace('[DRAFT]', '').strip()
+                            st.markdown(f"**🤖 {clean_title}** `[DRAFT]`")
+                            st.caption(f"Slug: `{draft.get('slug')}` | Excerpt: {draft.get('excerpt', '')[:100]}...")
+                        
+                        with col_load:
+                            if st.button("✏️ Edit Draft", key=f"load_draft_{draft.get('slug')}", use_container_width=True):
+                                st.session_state.blog_draft_title = clean_title
+                                st.session_state.blog_draft_excerpt = draft.get('excerpt', '')
+                                raw_tags = draft.get('tags', [])
+                                st.session_state.blog_draft_tags = ", ".join(raw_tags) if isinstance(raw_tags, list) else str(raw_tags)
+                                st.session_state.blog_draft_content = draft.get('content', '')
+                                st.session_state.blog_draft_date = draft.get('date', '')
+                                st.rerun()
+                                
+                        with col_approve:
+                            if st.button("🚀 Publish", key=f"pub_draft_{draft.get('slug')}", type="primary", use_container_width=True):
+                                clean_slug = draft.get('slug', '').replace('draft-', '')
+                                updated_payload = {
+                                    **draft,
+                                    'title': clean_title,
+                                    'slug': clean_slug,
+                                    'status': 'published',
+                                    'published_at': datetime.now().isoformat()
+                                }
+                                # Delete draft record and save published record
+                                delete_blog_post(draft.get('slug'))
+                                sync_blog_post(updated_payload)
+                                
+                                # Write local .md post file
+                                posts_dir = os.path.join("src", "content", "posts")
+                                os.makedirs(posts_dir, exist_ok=True)
+                                file_path = os.path.join(posts_dir, f"{clean_slug}.md")
+                                tags_val = draft.get('tags', [])
+                                if isinstance(tags_val, str):
+                                    tags_val = [t.strip() for t in tags_val.split(',') if t.strip()]
+                                file_md = f"""---
+title: {json.dumps(clean_title)}
+date: {json.dumps(draft.get('date', datetime.now().strftime('%Y-%m-%d')))}
+excerpt: {json.dumps(draft.get('excerpt', ''))}
+tags: {json.dumps(tags_val)}
+coverImage: "/images/blog/default.jpg"
+---
+
+{draft.get('content', '')}
+"""
+                                atomic_write_text(file_path, file_md)
+                                trigger_revalidation()
+                                st.success(f"Published '{clean_title}' successfully!")
+                                st.rerun()
+                                
+                        with col_del:
+                            if st.button("Remove", key=f"del_draft_{draft.get('slug')}", type="secondary", use_container_width=True):
+                                delete_blog_post(draft.get('slug'))
+                                st.success(f"Deleted draft `{draft.get('slug')}`!")
+                                st.rerun()
+        except Exception as e:
+            st.error(f"Failed to fetch drafts from Supabase: {e}")
+    else:
+        st.caption("Offline mode active — Supabase database drafts unavailable.")
 
     st.markdown("---")
     st.subheader("Already Published Logs")
