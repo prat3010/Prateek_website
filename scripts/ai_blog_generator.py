@@ -17,7 +17,7 @@ import argparse
 import urllib.request
 import urllib.parse
 import xml.etree.ElementTree as ET
-from datetime import datetime
+from datetime import datetime, timezone
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -172,12 +172,12 @@ YOUR TASK:
     return call_gemini_json(prompt)
 
 def save_to_supabase(draft_data, status="draft"):
-    """Save generated blog post to Supabase blog_posts table."""
+    """Save generated blog post to Supabase posts table."""
     if not SUPABASE_URL or not SUPABASE_KEY:
         print("Supabase credentials missing, skipping DB save.", file=sys.stderr)
         return False
 
-    endpoint = f"{SUPABASE_URL.rstrip('/')}/rest/v1/blog_posts?on_conflict=slug"
+    endpoint = f"{SUPABASE_URL.rstrip('/')}/rest/v1/posts?on_conflict=slug"
     headers = {
         "apikey": SUPABASE_KEY,
         "Authorization": f"Bearer {SUPABASE_KEY}",
@@ -185,21 +185,25 @@ def save_to_supabase(draft_data, status="draft"):
         "Prefer": "resolution=merge-duplicates,return=representation"
     }
 
+    now_iso = datetime.now(timezone.utc).isoformat()
+    today_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
     record = {
         "slug": draft_data["slug"],
         "title": draft_data["post_title"],
+        "date": today_date,
         "excerpt": draft_data["excerpt"],
         "content": draft_data["content_markdown"],
         "tags": draft_data.get("tags", ["AI", "Engineering"]),
         "status": status,
-        "published_at": datetime.utcnow().isoformat(),
-        "created_at": datetime.utcnow().isoformat()
+        "published_at": now_iso,
+        "created_at": now_iso
     }
 
     req = urllib.request.Request(endpoint, data=json.dumps([record]).encode("utf-8"), headers=headers, method="POST")
     try:
         with urllib.request.urlopen(req) as resp:
-            print(f"Successfully saved post '{draft_data['post_title']}' to Supabase (Status: {status})!")
+            print(f"Successfully saved post '{draft_data['post_title']}' to Supabase posts!")
             return True
     except Exception as e:
         print(f"Failed to save post to Supabase: {e}", file=sys.stderr)

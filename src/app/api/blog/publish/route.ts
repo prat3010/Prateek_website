@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 
   // Update post status to published
   const { data, error } = await supabase
-    .from('blog_posts')
+    .from('posts')
     .update({
       status: 'published',
       published_at: new Date().toISOString(),
