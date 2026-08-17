@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { sendAdminSignupNotification } from '@/lib/emailNotification';
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
@@ -28,12 +29,21 @@ export async function GET(request: Request) {
         const response = NextResponse.redirect(`${origin}${targetPath}`);
 
         if (data.session.user) {
-          response.cookies.set('prateeq_active_user', JSON.stringify(data.session.user), {
+          const user = data.session.user;
+          response.cookies.set('prateeq_active_user', JSON.stringify(user), {
             path: '/',
             maxAge: 2592000,
             sameSite: 'lax',
             secure: origin.startsWith('https:'),
           });
+
+          // Trigger admin email alert asynchronously (does not block redirect)
+          sendAdminSignupNotification({
+            email: user.email || 'unknown@client.com',
+            fullName: user.user_metadata?.full_name || user.user_metadata?.name || 'Client',
+            provider: user.app_metadata?.provider || 'Google OAuth',
+            signedUpAt: user.created_at,
+          }).catch(err => console.warn('Failed to send admin signup notification:', err));
         }
 
         return response;
@@ -47,3 +57,4 @@ export async function GET(request: Request) {
 
   return NextResponse.redirect(`${origin}${targetPath}`);
 }
+

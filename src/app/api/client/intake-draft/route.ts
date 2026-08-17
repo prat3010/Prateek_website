@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
+import { sendAdminIntakeLeadNotification } from '@/lib/emailNotification';
 
 export async function POST(req: Request) {
   try {
@@ -55,6 +56,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    // Trigger admin email alert for new intake lead
+    sendAdminIntakeLeadNotification({
+      scopeCode,
+      companyName: leadData.company_name,
+      contactEmail: leadData.contact_email,
+      contactPhone: leadData.contact_phone,
+      baseEngineTitle: leadData.base_engine_title,
+      totalCostINR: leadData.total_cost_inr,
+      totalCostUSD: leadData.total_cost_usd,
+      timeline: leadData.timeline,
+    }).catch(err => console.warn('Failed to send admin intake lead email alert:', err));
+
     const response = NextResponse.json({ success: true, draftId: data?.id || draftToken, scopeCode });
 
     // Set cookie with 7 day retention
@@ -78,3 +91,4 @@ export async function POST(req: Request) {
     );
   }
 }
+

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
 import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
+import { sendAdminScopeSavedNotification } from '@/lib/emailNotification';
+
 
 export async function POST(req: Request) {
   try {
@@ -138,6 +140,15 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: insertErr.message }, { status: 500 });
       }
     }
+
+    sendAdminScopeSavedNotification({
+      scopeCode,
+      companyName: scopeData.company_name,
+      clientEmail,
+      baseEngineTitle: scopeData.base_engine,
+      totalCostINR: scopeData.total_cost_inr,
+      totalCostUSD: scopeData.total_cost_usd,
+    }).catch(err => console.warn('Failed to send admin scope saved notification:', err));
 
     return NextResponse.json({ success: true, message: 'Scope brief persisted successfully.' });
   } catch (err: unknown) {

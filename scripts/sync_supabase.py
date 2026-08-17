@@ -346,6 +346,26 @@ def delete_intake_lead(lead_id):
     return _delete_by_filter('intake_leads', 'id', lead_id)
 
 
+def fetch_clients():
+    if not _has_config():
+        return None
+    return _supabase_rest('clients', method='GET', params=[('order', 'created_at.desc')])
+
+
+def delete_client(client_id):
+    return _delete_by_filter('clients', 'id', client_id)
+
+
+def fetch_project_deliverables():
+    if not _has_config():
+        return None
+    return _supabase_rest('project_deliverables', method='GET', params=[('order', 'created_at.desc')])
+
+
+def delete_project_deliverable(deliverable_id):
+    return _delete_by_filter('project_deliverables', 'id', deliverable_id)
+
+
 def fetch_records(table, order='created_at.desc'):
     if not _has_config():
         return None
@@ -372,6 +392,7 @@ def upsert_record(table, record, key_col='id'):
     except urllib.error.HTTPError as e:
         print(f'  HTTP {e.code} upserting {table}: {e.read().decode()}')
         return None
+
 
 
 

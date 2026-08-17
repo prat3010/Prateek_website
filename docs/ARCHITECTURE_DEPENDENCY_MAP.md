@@ -45,9 +45,10 @@ graph TD
 | **Interactive UI** | `src/components/Intake/IntakeForm.tsx` | Scoping Lab wizard (`/scoping`). |
 | **Homepage UI** | `src/components/Resume/Resume.tsx` | Services & Guarantees 2x2 card grid (`/#resume`). |
 | **Client UI** | `src/app/dashboard/page.tsx` | Client Workspace scope view, milestone tracker, & checkout. |
-| **Client API Routes** | `src/app/api/client/save-scope/route.ts`, `intake-draft`, `get-scopes` | Server endpoints for scope persistence, lead drafts, and retrieval. |
+| **Client API Routes** | `src/app/api/client/save-scope/route.ts`, `intake-draft`, `get-scopes`, `auth/callback/route.ts` | Server endpoints for scope persistence, lead drafts, OAuth callback, & Resend email alerts. |
+| **Admin Email Alerts** | `src/lib/emailNotification.ts` | Sends instant Resend notifications to Prateek on user signups, intake leads, & scope confirmations. |
 | **PDF Renderers** | `src/components/pdf/ScopingBriefPDF.tsx`, `ServicesAndPricingPDF.tsx` | Itemized PDF proposals & pricing guide. |
-| **Synchronizer Tabs** | `scripts/sync_tabs/questionnaire.py`, `clients.py` | Streamlit grid editor & Client Orders Command Center. |
+| **Synchronizer Tabs** | `scripts/sync_tabs/questionnaire.py`, `clients.py` | Streamlit grid editor & Client, Lead, Order, Deliverables Command Center. |
 
 ---
 
