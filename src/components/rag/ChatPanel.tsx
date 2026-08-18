@@ -22,6 +22,7 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [abortController, setAbortController] = useState<AbortController | null>(null);
+  const [isStartingSession, setIsStartingSession] = useState(false);
   const [showJumpBottom, setShowJumpBottom] = useState(false);
 
   // Feedback modal state
@@ -69,8 +70,9 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
   }, [messages.length]);
 
   const startSession = useCallback(async () => {
-    if (!client) return;
+    if (!client || isStartingSession) return;
     setError("");
+    setIsStartingSession(true);
     try {
       const res = await client.createSession();
       setSessionId(res.sessionId);
@@ -80,8 +82,10 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
       setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 100);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to start session");
+    } finally {
+      setIsStartingSession(false);
     }
-  }, [client]);
+  }, [client, isStartingSession]);
 
   useEffect(() => {
     let active = true;
@@ -332,7 +336,13 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
 
       <div className={styles.chatControls}>
         {!sessionId ? (
-          <button className="comic-btn comic-btn-blue" onClick={startSession}>Start Session</button>
+          <button
+            className="comic-btn comic-btn-blue"
+            onClick={startSession}
+            disabled={isStartingSession}
+          >
+            {isStartingSession ? "Starting Session…" : "Start Session"}
+          </button>
         ) : (
           <span className={styles.sessionBadge}>
             Session: {sessionId.slice(0, 8)}…
