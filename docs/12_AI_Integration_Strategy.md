@@ -31,7 +31,7 @@ The line between developer tooling and runtime application code is absolute:
 
 # **Core AI Capabilities (Local Synchronizer)**
 
-The Streamlit dashboard uses the `GEMINI_API_KEY` from `.env.local` to call the `gemini-2.5-flash` model for three specific tasks:
+The Streamlit dashboard uses the `GEMINI_API_KEY` from `.env.local` to call the `gemini-3.6-flash` model for three specific tasks:
 
 ### **1. Certificate Analysis & Parsing**
 When the developer uploads a certificate file:
@@ -69,6 +69,6 @@ AI recommendations are always treated as drafts:
 
 # **Acceptance Criteria**
 - Gemini integrations run exclusively inside local synchronizer scripts.
-- The `gemini-2.5-flash` model returns structured metadata from uploaded certificates.
+- The `gemini-3.6-flash` model returns structured metadata from uploaded certificates.
 - AI recommendations are presented in an approval UI before database write actions.
 - The Next.js frontend has zero dependencies on Google Gemini packages or configurations.

@@ -24,7 +24,7 @@ graph TD
 ### Phase 1: Brand Voice & Writing Style Blueprint
 - Define Prateek's tone: Direct, developer-first, concise, code-heavy, slightly humorous.
 - Build LLM Banned-Words List (`delve`, `tapestry`, `game-changer`, `rapidly evolving`, `in conclusion`).
-- Construct few-shot prompt templates for `gemini-2.5-flash`.
+- Construct few-shot prompt templates for `gemini-3.6-flash`.
 
 ### Phase 2: Deep-Linking Project & Service Taxonomy
 - Map tech news domains to portfolio projects:

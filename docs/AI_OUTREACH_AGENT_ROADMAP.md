@@ -19,7 +19,7 @@ It eliminates the tedious manual labor of lead prospecting, cold outreach drafti
 
 1. **Zero-Laptop Reliance:** Runs on serverless cloud crons and database queues. No local background processes or open browser windows needed.
 2. **Account Safety & Anti-Ban Throttling:** Strictly rate-limited (e.g., max 10–15 emails/day, max 2 posts/day) via official OAuth2 APIs (Google OAuth2, X API, Buffer API).
-3. **Hyper-Personalization:** Leverages `gemini-2.5-flash` to parse lead bios, recent posts, or business websites to generate custom opening hooks rather than static templates.
+3. **Hyper-Personalization:** Leverages `gemini-3.6-flash` to parse lead bios, recent posts, or business websites to generate custom opening hooks rather than static templates.
 4. **Positioning Mix (60/40):** 
    - **60% Technical & Build-in-Public:** Architecture highlights (Next.js 16, Supabase, RAG engine, vector search insights).
    - **40% Business Outcomes & Scoping CTAs:** Case studies, instant scoping lab previews, ROI metrics, and `/scoping` deep-links.
