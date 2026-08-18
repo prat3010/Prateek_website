@@ -205,6 +205,13 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
                 break;
               }
 
+              if (parsed.event === "error") {
+                const errMsg = parsed.message || parsed.error || parsed.detail || "Server error during chat stream";
+                setError(`Stream Error: ${errMsg}`);
+                isDone = true;
+                break;
+              }
+
               // Update metadata if present
               if (parsed.message_id || parsed.cached !== undefined || parsed.latency_ms) {
                 setMessages((prev) => {
@@ -245,7 +252,7 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
         const last = prev[prev.length - 1];
         if (last?.role === "assistant" && last.id === assistantId) {
           if (!last.content.trim()) {
-            return [...prev.slice(0, -1), { ...last, content: "No response received. Please try again." }];
+            return [...prev.slice(0, -1), { ...last, content: "No response received from model stream. Please try again." }];
           }
         }
         return prev;
