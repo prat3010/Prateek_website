@@ -76,6 +76,17 @@ To secure the Client Workspace (`/dashboard`) and REST APIs (`/api/client/*`):
 
 ---
 
+# **Automated AI Penetration Testing (Strix Framework)**
+
+Dynamic vulnerability scanning and proof-of-concept (PoC) security validation are performed using [Strix](https://github.com/usestrix/strix) (`usestrix/strix`), an open-source autonomous AI penetration testing framework:
+
+* **Execution Script**: [`scripts/security_audit_strix.sh`](file:///Users/prateeksharma/Developer/Prateek_website/scripts/security_audit_strix.sh)
+* **Target Scope**: Local Next.js 16 App Router dev server (`http://localhost:3000`), public & auth-gated API endpoints (`/api/client/*`, `/api/contact`, `/api/terminal/*`), PKCE callback handlers (`/auth/callback`), telemetry proxy (`src/proxy.ts`), and static codebase (`src/`).
+* **LLM Orchestration**: Strix autonomous multi-agent security teams utilize OpenRouter (`openrouter/anthropic/claude-3.5-sonnet` or configured model) via `OPENROUTER_API_KEY` / `LLM_API_KEY`.
+* **Report Generation**: Execution logs and validated vulnerability proof-of-concepts are output to `./strix_runs/`.
+
+---
+
 # **Acceptance Criteria**
 - Supabase Row-Level Security (RLS) is enabled on all tables.
 - Public write access remains disabled across the database.
@@ -84,3 +95,5 @@ To secure the Client Workspace (`/dashboard`) and REST APIs (`/api/client/*`):
 - Razorpay payment orders derive amounts from DB records and require HMAC SHA-256 signature verification.
 - Telemetry logs contain no raw IP addresses or precise coordinates.
 - Contact route input validation and HTML escaping prevent script injections.
+- Strix AI penetration testing script (`scripts/security_audit_strix.sh`) is configured for local dynamic & static security audits.
+
