@@ -87,6 +87,14 @@ Dynamic vulnerability scanning and proof-of-concept (PoC) security validation ar
 
 ---
 
+# **RAG Guest API Key & Session Security**
+
+* **Seeded Guest API Key**: Public RAG chat requests on `prateeq.in/rag` authenticate using a dedicated guest key (`ret_live_GuestAccessKey2026.ReadOnlyChat`) seeded in the backend `api_keys` database table under guest tenant `00000000-0000-0000-0000-000000000000`.
+* **Request-Level Identity Caching**: Backend API security checks (`get_current_user`) cache resolved `UserContext` on `request.state` to eliminate redundant database queries per request and prevent external OIDC JWKS lookup timeouts.
+* **Fast-Path Session Isolation**: Chat session creation (`/v1/tenants/{tenantId}/chat/sessions`) uses isolated UUID generation and fast-path fallback handling to protect guest tenant boundaries without exposing user directory table locks.
+
+---
+
 # **Acceptance Criteria**
 - Supabase Row-Level Security (RLS) is enabled on all tables.
 - Public write access remains disabled across the database.
@@ -96,4 +104,5 @@ Dynamic vulnerability scanning and proof-of-concept (PoC) security validation ar
 - Telemetry logs contain no raw IP addresses or precise coordinates.
 - Contact route input validation and HTML escaping prevent script injections.
 - Strix AI penetration testing script (`scripts/security_audit_strix.sh`) is configured for local dynamic & static security audits.
+- RAG guest API keys are seeded in the database and security contexts are cached per request to prevent auth timeouts.
 
