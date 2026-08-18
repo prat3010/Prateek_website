@@ -2,7 +2,7 @@
 """
 Automated AI Newsjacking & Content Generator Script
 Parses trending AI/Tech RSS news feeds, dynamically discovers portfolio projects from src/data/projects.json,
-synthesizes code-first technical case studies via Gemini 2.5 Flash, saves to Supabase, and sends Resend notifications with 1-click publishing.
+synthesizes code-first technical case studies via Gemini 3.6 Flash, saves to Supabase, and sends Resend notifications with 1-click publishing.
 
 Usage:
     python3 scripts/ai_blog_generator.py --dry-run
@@ -114,11 +114,11 @@ def load_local_projects():
     return []
 
 def call_gemini_json(prompt: str):
-    """Invoke Gemini 2.5 Flash API expecting JSON response."""
+    """Invoke Gemini 3.6 Flash API expecting JSON response."""
     if not GEMINI_API_KEY:
         raise ValueError("Missing GEMINI_API_KEY in environment variables.")
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GEMINI_API_KEY}"
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
@@ -349,7 +349,7 @@ def main():
     projects = load_local_projects()
     print(f"✓ Loaded {len(projects)} projects from projects.json.")
 
-    print("🤖 Synthesizing AI Newsjacking Draft with Gemini 2.5 Flash...")
+    print("🤖 Synthesizing AI Newsjacking Draft with Gemini 3.6 Flash...")
     draft = generate_blog_draft(news_items, projects)
 
     print("\n" + "="*60)

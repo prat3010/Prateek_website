@@ -435,6 +435,9 @@ sudo certbot renew                           # Renew TLS cert
 
 ### ✅ Working
 
+- **Embed Script (`widget.js`)** — Standalone vanilla JS Shadow DOM web component served at `https://prateeq.in/widget.js` for 1-line website deployment.
+- **Landing Page Revamp (`/rag`)** — Includes interactive no-code widget customizer, competitor comparison matrix, developer RAG API showcase (cURL/Python/TS), and direct Scoping Lab (`/scoping`) integration.
+- **Model Upgrade** — Upgraded Gemini provider default from `gemini-2.5-flash` to `gemini-3.6-flash`.
 - **Search** — Hybrid search (vector + keyword) across indexed documents. Returns results with scores.
 - **Document upload** — PDF, TXT, Markdown, DOCX upload and processing. Status tracking (pending → processing → indexed).
 - **Auth** — Bearer token validation, tenant isolation, scope enforcement.

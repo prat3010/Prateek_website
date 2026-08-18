@@ -61,7 +61,7 @@ The project uses the following environment variables (stored in `.env.local` loc
 - `CONTACT_EMAIL_TO`: The email address that receives notifications from the contact form (default is `prateeqsharma@gmail.com`).
 - `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`: Google reCAPTCHA v3 site key (public). Loaded client-side by the contact form to obtain an invisible score-based challenge token.
 - `RECAPTCHA_SECRET_KEY`: Google reCAPTCHA v3 secret key (server-only). Used by `/api/contact` to verify tokens via Google's `siteverify` endpoint. If absent, verification is skipped with a warning (dev/CI mode).
-- `GEMINI_API_KEY`: Google AI Gemini API key (version `gemini-2.5-flash`), used by the local Synchronizer dashboard for certificate analysis and skill scanning.
+- `GEMINI_API_KEY`: Google AI Gemini API key (version `gemini-3.6-flash`), used by the local Synchronizer dashboard for certificate analysis and skill scanning.
 - `SYNC_API_KEY`: Shared secret key used to authenticate requests to the Next.js API revalidation endpoint (`/api/revalidate`) and ensure secure cache purging.
 - `GITHUB_TOKEN` (or `GITHUB_PAT` / `GH_TOKEN`): Optional GitHub personal access token, used by the local Synchronizer dashboard to raise the rate limit on deployment status checks.
 
@@ -136,7 +136,7 @@ The project uses the following environment variables (stored in `.env.local` loc
 
 A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfolio, and content updates.
 - **Running locally:** Execute `streamlit run scripts/synchronizer.py`. Requires `pip install streamlit` and `PIL/Pillow`.
-- **AI Integration:** Uses `GEMINI_API_KEY` from `.env.local` to call `gemini-2.5-flash` for scanning missing skills and analyzing certificates.
+- **AI Integration:** Uses `GEMINI_API_KEY` from `.env.local` to call `gemini-3.6-flash` for scanning missing skills and analyzing certificates.
 - **Core Tabs:**
   - **Edit Resume Manually:** Writes resume data to Supabase (plus file fallback). Includes biography details, freelance quotation/engagement terms editing. (Static service-package "pricing" tiers were removed from the site in 2026-08; the interactive Project Scoping wizard in `src/components/Intake/IntakeForm.tsx` is now the only pricing path.) Also hosts the **Middleman Partnership Agreement** manager: partner identity (name/email), a read-only commission band schedule sourced from `src/data/commissionConfig.json`, payout rules, and fully editable agreement prose — the document's sections render from `middlemanAgreement.sections` in the profile data (fallback to `src/data/middlemanAgreementDefaults.json`), with a "Reset Agreement Prose to Defaults" button. The PDF renderers (`src/components/pdf/MiddlemanAgreementPDF.tsx` for the site, `scripts/generate-middleman-pdf.mjs` for the synchronizer) must stay in sync with each other and with the defaults JSON — both carry the azure/noir brand theme (`getPdfTheme(isNoir)` on the site; mirrored tokens + font registration inside the `.mjs`, selected by an azure/noir radio in the Partner & Scoping tab that passes `--theme azure|noir`).
   - **Sync Projects:** Syncs GitHub projects to Supabase (plus file fallback) and supports side-by-side editing of Developer and Business project copy.

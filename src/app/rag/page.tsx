@@ -6,6 +6,9 @@ import { useLenis } from "lenis/react";
 import ScrollSection from "@/components/ScrollSection/ScrollSection";
 import { ChatPanel } from "@/components/rag/ChatPanel";
 import { PricingSection } from "@/components/rag/PricingSection";
+import { InteractiveWidgetCustomizer } from "@/components/rag/InteractiveWidgetCustomizer";
+import { ComparisonSection } from "@/components/rag/ComparisonSection";
+import { DeveloperApiSection } from "@/components/rag/DeveloperApiSection";
 import { RetrieverClient } from "@/lib/rag-client";
 import { NAVBAR_SCROLL_OFFSET } from "@/lib/constants";
 import styles from "@/components/rag/rag.module.css";
@@ -29,7 +32,7 @@ export default function RagLandingPage() {
 
   const copySnippet = () => {
     navigator.clipboard.writeText(
-      `<script src="https://rag.prateeq.in/widget.js" data-tenant="YOUR_TENANT_ID" data-key="YOUR_API_KEY"></script>`
+      `<script src="https://prateeq.in/widget.js" data-tenant="YOUR_TENANT_ID" data-key="YOUR_API_KEY"></script>`
     );
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -53,7 +56,7 @@ export default function RagLandingPage() {
       <ScrollSection gap={80}>
         <section className={styles.heroSection} id="home">
           <div className={styles.heroBadge}>
-            ✨ Enterprise Hybrid RAG Engine • Powered by Meta Llama 3.3 70B
+            ✨ Multi-Model Enterprise RAG • Powered by Llama 3.3 70B, Gemini 3.6 Flash, GPT-4o & BYOK
           </div>
 
           <h1 className={styles.heroTitle}>
@@ -115,7 +118,7 @@ export default function RagLandingPage() {
                   </div>
                   <pre className={styles.heroCodeBlock}>
                     <code>
-                      {"<script\n  src=\"https://rag.prateeq.in/widget.js\"\n  data-tenant=\"YOUR_TENANT_ID\"\n  data-key=\"YOUR_API_KEY\">\n</script>"}
+                      {"<script\n  src=\"https://prateeq.in/widget.js\"\n  data-tenant=\"YOUR_TENANT_ID\"\n  data-key=\"YOUR_API_KEY\">\n</script>"}
                     </code>
                   </pre>
                 </div>
@@ -205,12 +208,40 @@ export default function RagLandingPage() {
         </section>
       </ScrollSection>
 
-      {/* 3. Dynamic Geo-IP Pricing Section */}
+      {/* 3. Interactive No-Code Widget Customizer */}
+      <ScrollSection verticalOffset={120} gap={80}>
+        <InteractiveWidgetCustomizer />
+      </ScrollSection>
+
+      {/* 4. Retriever AI vs Legacy Chatbots Comparison Matrix */}
+      <ScrollSection verticalOffset={120} gap={80}>
+        <ComparisonSection />
+      </ScrollSection>
+
+      {/* 5. Developer RAG REST API Showcase */}
+      <ScrollSection verticalOffset={120} gap={80}>
+        <DeveloperApiSection />
+      </ScrollSection>
+
+      {/* 6. Dynamic Geo-IP Pricing Section */}
       <ScrollSection verticalOffset={120} gap={80}>
         <PricingSection />
       </ScrollSection>
 
-      {/* 5. Live Interactive Sandbox Demo (Shifted to End) */}
+      {/* 7. Enterprise Custom Deployment Scoping Banner */}
+      <ScrollSection verticalOffset={120} gap={80}>
+        <div className={styles.scopingBanner}>
+          <h2 className={styles.scopingBannerTitle}>Need a Dedicated or Private Cloud RAG Engine?</h2>
+          <p className={styles.scopingBannerDesc}>
+            We build custom on-premise RAG pipelines, multi-modal vector search systems, and HIPAA/GDPR-compliant enterprise knowledge hubs.
+          </p>
+          <Link href="/scoping?engine=saas&goal=ai-copilot" className="comic-btn comic-btn-blue">
+            🛠️ Build Custom Scope in Scoping Lab →
+          </Link>
+        </div>
+      </ScrollSection>
+
+      {/* 8. Live Interactive Sandbox Demo */}
       <ScrollSection verticalOffset={120} gap={80}>
         <section className={styles.demoSection} id="demo">
           <h2 className={styles.demoSectionTitle}>Experience retriever AI Live</h2>
