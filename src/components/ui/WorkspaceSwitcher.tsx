@@ -3,7 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { Layers, Bot, UserCheck } from 'lucide-react';
+import { isAdminEmail } from '@/lib/auth';
+import { Layers, ShieldCheck, Bot, UserCheck } from 'lucide-react';
 import styles from './WorkspaceSwitcher.module.css';
 
 interface WorkspaceSwitcherProps {
@@ -12,16 +13,17 @@ interface WorkspaceSwitcherProps {
 
 export default function WorkspaceSwitcher({ active }: WorkspaceSwitcherProps) {
   const { user } = useAuth();
+  const isAdmin = isAdminEmail(user?.email);
 
   return (
     <div className={styles.container}>
       <div className={styles.switchGroup}>
         <Link
-          href="/dashboard"
+          href={isAdmin ? '/admin' : '/dashboard'}
           className={`${styles.switchBtn} ${active === 'dashboard' ? styles.activeDashboard : ''}`}
         >
-          <Layers size={16} />
-          <span>📁 Custom Dev Client Portal</span>
+          {isAdmin ? <ShieldCheck size={16} /> : <Layers size={16} />}
+          <span>{isAdmin ? '🛡️ Master Admin Center' : '📁 Custom Dev Client Portal'}</span>
         </Link>
         <Link
           href="/rag/app"

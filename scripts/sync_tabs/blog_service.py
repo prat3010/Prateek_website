@@ -51,7 +51,6 @@ def save_rss_feeds(feeds: list[dict]) -> bool:
     try:
         os.makedirs(os.path.dirname(RSS_CONFIG_FILE), exist_ok=True)
         with open(RSS_CONFIG_FILE, "w", encoding="utf-8") as f:
-            json.dumps(feeds, indent=2)
             f.write(json.dumps(feeds, indent=2))
         return True
     except Exception as e:

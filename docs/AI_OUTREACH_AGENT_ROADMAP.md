@@ -11,7 +11,7 @@
 
 The **Autonomous AI Outreach & Content Agent** is an end-to-end cloud-hosted automation platform built directly into the `Prateek_website` Next.js 16 architecture. 
 
-It eliminates the tedious manual labor of lead prospecting, cold outreach drafting, and social media posting. The agent runs silently 24/7 on **Vercel Cloud Crons** without requiring a laptop to stay open. To guarantee 100% social account safety and prevent platform bans or AI hallucinations, the agent operates on a **Human-in-the-Loop (HITL)** model: the AI discovers leads and drafts messages, while you review and dispatch them with a single click from your private Web Control Center (`/admin/outreach` or `/dashboard`).
+It eliminates the tedious manual labor of lead prospecting, cold outreach drafting, and social media posting. The agent runs silently 24/7 on **Vercel Cloud Crons** without requiring a laptop to stay open. To guarantee 100% social account safety and prevent platform bans or AI hallucinations, the agent operates on a **Human-in-the-Loop (HITL)** model: the AI discovers leads and drafts messages, while you review and dispatch them with a single click from your private Web Control Center (`/admin` or `/dashboard`).
 
 ---
 
@@ -52,7 +52,7 @@ It eliminates the tedious manual labor of lead prospecting, cold outreach drafti
                                         │
                                         ▼
  ┌─────────────────────────────────────────────────────────────────────────────┐
- │                   💻 WEB CONTROL CENTER (`/admin/outreach`)                │
+ │                   💻 WEB CONTROL CENTER (`/admin`)                │
  │  • Pending Approvals Queue (Swipe/Click to Approve, Edit, or Dismiss)       │
  │  • Manual CSV Import Backup (Drag & Drop Lead Lists)                        │
  │  • Daily Quotas & Dispatch Telemetry Dashboard                              │
@@ -97,7 +97,7 @@ It eliminates the tedious manual labor of lead prospecting, cold outreach drafti
 
 ---
 
-### Phase 3: Web Control Center UI (`/admin/outreach` or `/dashboard/outreach`)
+### Phase 3: Web Control Center UI (`/admin` or `/dashboard/outreach`)
 - [ ] **Pending Approvals Queue UI:**
   - Build responsive Next.js 16 React 19 Client Component with tabbed view: `Draft Emails`, `Social Posts`, `Dispatched History`.
   - Add inline rich-text editor for quick pitch modifications before sending.

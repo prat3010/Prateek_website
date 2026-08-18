@@ -4,6 +4,16 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://osaqaemntuz
 const defaultAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zYXFhZW1udHV6cmpvdXpvYnZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyOTI2NDAsImV4cCI6MjA5NTg2ODY0MH0.gYgeBTCcz4zxb-CHTPI8qrbogRcwMArTfHiZ9twcf7k';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || defaultAnonKey;
 
+export const ADMIN_EMAILS = [
+  '3010prateeksharma@gmail.com',
+  'prateeqsharma@gmail.com',
+];
+
+export function isAdminEmail(email?: string | null): boolean {
+  if (!email) return false;
+  return ADMIN_EMAILS.includes(email.toLowerCase().trim());
+}
+
 // Dual Cookie + LocalStorage adapter with chunking to guarantee session persistence across Safari ITP & redirects
 export const universalStorage = {
   getItem: (key: string): string | null => {

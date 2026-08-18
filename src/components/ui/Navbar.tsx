@@ -7,6 +7,7 @@ import { useReducedMotion } from 'framer-motion';
 import { Sun, Moon, Code2, Briefcase } from 'lucide-react';
 import { useTheme, type Audience } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
+import { isAdminEmail } from '@/lib/auth';
 import { useLenisScroll } from '@/context/LenisProvider';
 import Scrambler from '@/components/ui/Scrambler';
 import type { ScramblerProps } from '@/components/ui/Scrambler';
@@ -331,14 +332,14 @@ export default function Navbar({ items, className }: NavbarProps) {
           ariaLabel={theme === 'light' ? 'Switch to Noir mode' : 'Switch to Azure mode'}
         />
 
-        {/* ---- Client Dashboard Link ---- */}
+        {/* ---- Client Dashboard / Master Admin Link ---- */}
         <a
-          href="/dashboard"
+          href={mounted && user && isAdminEmail(user.email) ? '/admin' : '/dashboard'}
           className="comic-btn comic-btn-outline"
           style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem', whiteSpace: 'nowrap' }}
           suppressHydrationWarning
         >
-          {mounted && user ? '👤 DASHBOARD' : 'CLIENT LOGIN'}
+          {mounted && user ? (isAdminEmail(user.email) ? '🛡️ ADMIN' : '👤 DASHBOARD') : 'CLIENT LOGIN'}
         </a>
 
         {/* ---- Hamburger ---- */}
@@ -375,6 +376,15 @@ export default function Navbar({ items, className }: NavbarProps) {
             )}
           </a>
         ))}
+        <a
+          href={mounted && user && isAdminEmail(user.email) ? '/admin' : '/dashboard'}
+          className="comic-btn comic-btn-outline"
+          style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', marginTop: '1rem' }}
+          onClick={() => setMobileOpen(false)}
+          suppressHydrationWarning
+        >
+          {mounted && user ? (isAdminEmail(user.email) ? '🛡️ ADMIN CONTROL' : '👤 CLIENT DASHBOARD') : 'CLIENT LOGIN'}
+        </a>
       </div>
     </nav>
   );

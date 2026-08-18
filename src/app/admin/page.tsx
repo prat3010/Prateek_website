@@ -17,7 +17,6 @@ import {
   ExternalLink,
   CheckCircle2,
   X,
-  Database,
   Lock,
   Zap,
 } from 'lucide-react';
@@ -43,7 +42,7 @@ interface ClientRecord {
   created_at: string;
 }
 
-const ADMIN_EMAIL = '3010prateeksharma@gmail.com';
+import { isAdminEmail } from '@/lib/auth';
 
 export default function AdminControlCenter() {
   const { user, loading: authLoading, loginWithGoogle, logout, getAccessToken } = useAuth();
@@ -90,11 +89,26 @@ export default function AdminControlCenter() {
   };
 
   useEffect(() => {
-    if (user && user.email === ADMIN_EMAIL) {
-      fetchLeads();
-      fetchClients();
+    let isMounted = true;
+    if (user && isAdminEmail(user.email)) {
+      Promise.all([
+        fetch('/api/outreach/get-leads').then(r => r.ok ? r.json() : { leads: [] }),
+        getAccessToken().then(token =>
+          fetch('/api/client/get-scopes', {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          }).then(r => r.ok ? r.json() : { scopes: [] })
+        )
+      ]).then(([leadsData, clientsData]) => {
+        if (isMounted) {
+          setLeads(leadsData.leads || []);
+          setClients(clientsData.scopes || []);
+        }
+      }).catch(err => {
+        console.error('Failed to load admin data:', err);
+      });
     }
-  }, [user]);
+    return () => { isMounted = false; };
+  }, [user, getAccessToken]);
 
   const handleGenerateProspects = async () => {
     setLoadingLeads(true);
@@ -168,7 +182,7 @@ export default function AdminControlCenter() {
   }
 
   // 2. Non-Admin Access Denied Gate
-  if (user.email !== ADMIN_EMAIL) {
+  if (!isAdminEmail(user.email)) {
     return (
       <div className={styles.wrapper} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div className={styles.card} style={{ maxWidth: '440px', width: '100%', textAlign: 'center', padding: '40px 24px' }}>

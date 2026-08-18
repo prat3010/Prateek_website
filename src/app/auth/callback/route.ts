@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { sendAdminSignupNotification } from '@/lib/emailNotification';
+import { isAdminEmail } from '@/lib/auth';
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
@@ -26,10 +27,14 @@ export async function GET(request: Request) {
       const supabase = await createClient();
       const { data, error: exchangeErr } = await supabase.auth.exchangeCodeForSession(code);
       if (!exchangeErr && data.session) {
-        const response = NextResponse.redirect(`${origin}${targetPath}`);
+        const user = data.session.user;
+        let redirectPath = targetPath;
+        if (user && isAdminEmail(user.email) && targetPath === '/dashboard') {
+          redirectPath = '/admin';
+        }
+        const response = NextResponse.redirect(`${origin}${redirectPath}`);
 
-        if (data.session.user) {
-          const user = data.session.user;
+        if (user) {
           response.cookies.set('prateeq_active_user', JSON.stringify(user), {
             path: '/',
             maxAge: 2592000,

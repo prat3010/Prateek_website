@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
+import { isAdminEmail } from '@/lib/auth';
 import { 
   LogOut, 
   ShieldCheck, 
@@ -88,7 +90,15 @@ function recalculateScopeTotals(
 }
 
 export default function ClientDashboardPage() {
+  const router = useRouter();
   const { user, loading, logout, loginWithGoogle, getAccessToken } = useAuth();
+
+  useEffect(() => {
+    if (!loading && user && isAdminEmail(user.email)) {
+      router.replace('/admin');
+    }
+  }, [user, loading, router]);
+
   const [activeTab, setActiveTab] = useState<'scopes' | 'onboarding' | 'invoices'>('scopes');
   const [editingScopeId, setEditingScopeId] = useState<string | null>(null);
   const [newFeatureInput, setNewFeatureInput] = useState('');

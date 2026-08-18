@@ -81,7 +81,8 @@ The project uses the following environment variables (stored in `.env.local` loc
   - `/terminal` — interactive diagnostics terminal console.
   - `/scoping` — Project Scoping Lab & Instant Quote wizard page (deep-linkable via `?engine=landing|multipage|saas` or `?goal=<goal archetype id>`).
   - `/dashboard` — Client Workspace Dashboard (Google OAuth profile confirmation, active project scopes, interactive feature customizer, milestone progress tracker, invoice ledger, PDF proposal exporter, and direct scope confirmation CTA).
-  - `/admin/analytics` — visitor analytics dashboard.
+  - `/admin` — Master Admin Control Center (Google OAuth auth gate, Autonomous Outreach queue, client scopes & ledgers).
+  - `/analytics` — public visitor analytics dashboard.
   - `/rag` — Retriever AI SaaS Product Landing Page (Hero, live mini-RAG sandbox, feature grid, 1-line embed snippet, Geo-IP pricing, server layout metadata in `src/app/rag/layout.tsx`).
   - `/rag/app` — SaaS App Studio Workspace (Chat Studio, Document Library, Search Inspector, Embed Configurator, role-gated admin link).
   - `/blog` and `/blog/[slug]` — blog listing and individual post pages.

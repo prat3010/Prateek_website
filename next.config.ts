@@ -21,6 +21,15 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion"],
   },
+  async redirects() {
+    return [
+      {
+        source: "/admin/outreach",
+        destination: "/admin",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     const isDev = process.env.NODE_ENV === 'development';
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
