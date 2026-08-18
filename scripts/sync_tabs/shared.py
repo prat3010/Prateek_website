@@ -95,7 +95,10 @@ def load_env():
                     continue
                 if "=" in line:
                     key, val = line.split("=", 1)
-                    env_vars[key.strip()] = val.strip()
+                    k = key.strip()
+                    v = val.strip()
+                    env_vars[k] = v
+                    os.environ[k] = v
     return env_vars
 
 env = load_env()
@@ -1025,37 +1028,34 @@ def git_commit_push_file(file_path, commit_message):
 def inject_global_styles():
     st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=JetBrains+Mono:wght@400;700&family=Quicksand:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
     
     /* Font overrides */
     html, body, [class*="css"], .stWidgetFormContainer {
-        font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif !important;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
     }
     
     h1, h2, h3, h4, h5, h6, .section-header {
-        font-family: 'Fredoka', sans-serif !important;
-        font-weight: 700 !important;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        font-weight: 600 !important;
+        color: #ffffff !important;
+        letter-spacing: -0.02em !important;
     }
     
     code, pre {
         font-family: 'JetBrains Mono', monospace !important;
     }
 
-    /* Core Page Styling with sweet gradients, candy violet background, and sugar grid texture */
+    /* Vercel Ultra-Dark Background with subtle dot grid */
     .stApp {
-        background-color: #1a162b !important;
-        background-image: 
-            linear-gradient(rgba(255, 117, 151, 0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 117, 151, 0.03) 1px, transparent 1px),
-            radial-gradient(at 10% 10%, rgba(255, 117, 151, 0.18) 0px, transparent 50%),
-            radial-gradient(at 90% 20%, rgba(90, 214, 255, 0.16) 0px, transparent 50%),
-            radial-gradient(at 50% 80%, rgba(220, 181, 255, 0.18) 0px, transparent 50%) !important;
-        background-size: 32px 32px, 32px 32px, auto, auto, auto !important;
+        background-color: #000000 !important;
+        background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px) !important;
+        background-size: 24px 24px !important;
         background-attachment: fixed !important;
-        color: #e2dff0 !important;
+        color: #ededed !important;
     }
     
-    /* Hide the Streamlit Deploy button specifically */
+    /* Hide Streamlit Deploy buttons */
     .stAppDeployButton,
     [data-testid="stAppDeployButton"],
     .stDeployButton,
@@ -1066,7 +1066,7 @@ def inject_global_styles():
         display: none !important;
     }
 
-    /* Make the header bar background transparent with default height and prevent cropping */
+    /* Transparent Header Bar */
     header[data-testid="stHeader"],
     header[data-testid="stHeader"] > div,
     header[data-testid="stHeader"] [class*="st-emotion-cache"] {
@@ -1076,323 +1076,343 @@ def inject_global_styles():
         box-shadow: none !important;
     }
 
-    /* Style the header toggle and settings menu icons to fit the Candy Theme */
     header[data-testid="stHeader"] button,
     header[data-testid="stHeader"] button svg,
     header[data-testid="stHeader"] button svg * {
-        color: #ff7597 !important;
-        fill: #ff7597 !important;
+        color: #888888 !important;
+        fill: #888888 !important;
     }
 
-    /* Maintain comfortable top padding for content */
+    /* Padding for top container */
     .block-container {
-        padding-top: 3.5rem !important;
+        padding-top: 2rem !important;
+        padding-bottom: 3rem !important;
+        max-width: 1300px !important;
     }
     
-    /* Section Headers */
+    /* Vercel Section Headers */
     .section-header {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #ff7597; /* Cotton candy pink */
-        margin-top: 0.5rem;
-        margin-bottom: 1.5rem;
-        border-bottom: 2px dashed rgba(255, 117, 151, 0.25);
-        padding-bottom: 8px;
-        display: inline-block;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-        font-family: 'Fredoka', sans-serif !important;
+        font-size: 1.15rem !important;
+        font-weight: 600 !important;
+        color: #ffffff !important;
+        margin-top: 0.5rem !important;
+        margin-bottom: 1.25rem !important;
+        border-bottom: 1px solid #222222 !important;
+        padding-bottom: 8px !important;
+        display: block !important;
+        letter-spacing: -0.01em !important;
+        text-transform: none !important;
+        font-family: 'Inter', sans-serif !important;
     }
 
-    /* Rounded Bouncy Containers */
+    /* Vercel Dark Card Containers */
     div[data-testid="stVerticalBlockBorder"] {
-        background: rgba(38, 32, 69, 0.6) !important;
-        backdrop-filter: blur(12px) !important;
-        -webkit-backdrop-filter: blur(12px) !important;
-        border: 1px solid rgba(255, 117, 151, 0.15) !important;
-        border-radius: 16px !important;
-        padding: 24px !important;
-        margin-bottom: 24px !important;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25) !important;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+        background: #0a0a0a !important;
+        border: 1px solid #222222 !important;
+        border-radius: 8px !important;
+        padding: 20px !important;
+        margin-bottom: 20px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+        transition: all 0.2s ease !important;
     }
     div[data-testid="stVerticalBlockBorder"]:hover {
-        border-color: rgba(255, 117, 151, 0.35) !important;
-        box-shadow: 0 8px 32px 0 rgba(255, 117, 151, 0.12) !important;
-        transform: translateY(-2px) scale(1.005) !important;
+        border-color: #333333 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
     }
 
-    /* Sweet Expanders */
+    /* Vercel Expanders */
     details[data-testid="stExpander"] {
-        background: rgba(38, 32, 69, 0.4) !important;
-        backdrop-filter: blur(8px) !important;
-        -webkit-backdrop-filter: blur(8px) !important;
-        border: 1px solid rgba(255, 117, 151, 0.12) !important;
-        border-radius: 12px !important;
+        background: #0a0a0a !important;
+        border: 1px solid #222222 !important;
+        border-radius: 8px !important;
         margin-bottom: 12px !important;
-        box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.15) !important;
-        transition: all 0.25s ease !important;
+        box-shadow: none !important;
+        transition: all 0.15s ease !important;
     }
     details[data-testid="stExpander"]:hover {
-        border-color: rgba(255, 117, 151, 0.25) !important;
-        background: rgba(38, 32, 69, 0.6) !important;
+        border-color: #333333 !important;
+        background: #111111 !important;
     }
     summary[data-testid="stExpanderSummary"] {
-        font-weight: 700 !important;
+        font-weight: 500 !important;
         color: #ffffff !important;
-        font-family: 'Fredoka', sans-serif !important;
+        font-family: 'Inter', sans-serif !important;
     }
 
-    /* Glossy Bouncy buttons */
+    /* Vercel High-Contrast Buttons */
     button[data-testid="baseButton-primary"] {
-        background: linear-gradient(135deg, #ff7597 0%, #dcb5ff 100%) !important; /* Sweet bubblegum gradient */
-        color: #100a21 !important;
-        font-weight: 700 !important;
-        font-family: 'Fredoka', sans-serif !important;
-        text-transform: uppercase !important;
-        letter-spacing: 0.5px !important;
-        border: none !important;
-        border-radius: 12px !important;
-        box-shadow: 0 4px 15px 0 rgba(255, 117, 151, 0.3) !important;
-        transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-        padding: 0.5rem 1.5rem !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-weight: 600 !important;
+        font-family: 'Inter', sans-serif !important;
+        text-transform: none !important;
+        letter-spacing: -0.01em !important;
+        border: 1px solid #ffffff !important;
+        border-radius: 6px !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+        transition: all 0.15s ease !important;
+        padding: 0.4rem 1.2rem !important;
     }
     button[data-testid="baseButton-primary"]:hover {
-        transform: translateY(-2px) scale(1.03) !important;
-        box-shadow: 0 6px 20px 0 rgba(255, 117, 151, 0.45) !important;
+        background: #e6e6e6 !important;
+        border-color: #e6e6e6 !important;
+        color: #000000 !important;
+        transform: none !important;
     }
     button[data-testid="baseButton-primary"]:active {
-        transform: translateY(1px) scale(0.98) !important;
+        background: #cccccc !important;
     }
 
     button[data-testid="baseButton-secondary"] {
-        background: rgba(255, 255, 255, 0.04) !important;
-        color: #e2dff0 !important;
-        font-weight: 600 !important;
-        font-family: 'Quicksand', sans-serif !important;
-        border: 1px solid rgba(255, 117, 151, 0.2) !important;
-        border-radius: 12px !important;
-        box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.1) !important;
-        transition: all 0.2s ease !important;
+        background: #111111 !important;
+        color: #ededed !important;
+        font-weight: 500 !important;
+        font-family: 'Inter', sans-serif !important;
+        border: 1px solid #222222 !important;
+        border-radius: 6px !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+        transition: all 0.15s ease !important;
     }
     button[data-testid="baseButton-secondary"]:hover {
-        background: rgba(255, 117, 151, 0.08) !important;
-        border-color: rgba(255, 117, 151, 0.4) !important;
+        background: #1f1f1f !important;
+        border-color: #333333 !important;
         color: #ffffff !important;
-        transform: translateY(-1px) !important;
+        transform: none !important;
     }
 
     /* Danger delete buttons */
     button[id^="del_exp_"]:hover, button[id^="del_edu_"]:hover, button[id^="rem_bul_"]:hover, button[id^="delete_"]:hover {
-        border-color: rgba(255, 90, 95, 0.6) !important;
-        color: #ff5a5f !important;
-        background-color: rgba(255, 90, 95, 0.08) !important;
+        border-color: #5c1d24 !important;
+        color: #f87171 !important;
+        background-color: #1f1213 !important;
     }
 
-    /* Glassmorphic inputs */
+    /* Vercel Dark Inputs */
     .stTextInput>div>div>input, .stTextArea>div>div>textarea, .stSelectbox>div>div>div {
-        background-color: rgba(28, 22, 52, 0.8) !important;
+        background-color: #0d0d0d !important;
         color: #ffffff !important;
-        border: 1px solid rgba(255, 117, 151, 0.15) !important;
-        border-radius: 10px !important;
-        transition: all 0.25s !important;
-        font-family: 'Quicksand', sans-serif !important;
-        font-weight: 500 !important;
+        border: 1px solid #222222 !important;
+        border-radius: 6px !important;
+        transition: all 0.15s ease !important;
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 400 !important;
+        font-size: 0.9rem !important;
     }
     .stTextInput>div>div>input:focus, .stTextArea>div>div>textarea:focus {
-        border-color: #5ad6ff !important;
-        box-shadow: 0 0 10px 0 rgba(90, 214, 255, 0.3) !important;
-        background-color: rgba(34, 26, 62, 0.8) !important;
+        border-color: #0070f3 !important;
+        box-shadow: 0 0 0 1px #0070f3 !important;
+        background-color: #111111 !important;
     }
     
-    /* Labels */
+    /* Vercel Form Labels */
     label[data-testid="stWidgetLabel"] p {
-        color: #ffb7c5 !important;
-        font-weight: 600 !important;
-        font-family: 'Fredoka', sans-serif !important;
+        color: #a1a1aa !important;
+        font-weight: 500 !important;
+        font-size: 0.82rem !important;
+        font-family: 'Inter', sans-serif !important;
     }
 
-    /* Sidebar Glassmorphic Candy Styling */
+    /* Vercel Sidebar Dark Panel */
     section[data-testid="stSidebar"] {
-        background-color: #120e20 !important;
-        border-right: 1px solid rgba(255, 117, 151, 0.1) !important;
+        background-color: #0a0a0a !important;
+        border-right: 1px solid #1f1f1f !important;
     }
     section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] li, section[data-testid="stSidebar"] span {
-        color: #e2dff0 !important;
+        color: #a1a1aa !important;
     }
     section[data-testid="stSidebar"] h1, section[data-testid="stSidebar"] h2, section[data-testid="stSidebar"] h3 {
         color: #ffffff !important;
-        font-family: 'Fredoka', sans-serif !important;
-        font-weight: 700 !important;
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 600 !important;
     }
     section[data-testid="stSidebar"] .stButton>button {
-        background: rgba(255, 117, 151, 0.05) !important;
-        color: #ffb7c5 !important;
-        border: 1px solid rgba(255, 117, 151, 0.2) !important;
+        background: #111111 !important;
+        color: #ededed !important;
+        border: 1px solid #222222 !important;
+        border-radius: 6px !important;
+        font-weight: 500 !important;
     }
     section[data-testid="stSidebar"] .stButton>button:hover {
-        background: rgba(255, 117, 151, 0.12) !important;
-        border-color: rgba(255, 117, 151, 0.4) !important;
-    }
-
-    /* Floating Candy Tabs list */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 12px !important;
-        background: rgba(38, 32, 69, 0.8) !important;
-        padding: 8px !important;
-        border-radius: 16px !important;
-        border: 1px solid rgba(255, 117, 151, 0.15) !important;
-        margin-bottom: 24px !important;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2) !important;
-    }
-    .stTabs [data-baseweb="tab"] {
-        height: 40px !important;
-        border-radius: 12px !important;
-        background-color: transparent !important;
-        color: #ffb7c5 !important;
-        font-family: 'Fredoka', sans-serif !important;
-        font-weight: 600 !important;
-        padding: 0px 18px !important;
-        transition: all 0.25s !important;
-    }
-    .stTabs [data-baseweb="tab"]:hover {
+        background: #1f1f1f !important;
+        border-color: #333333 !important;
         color: #ffffff !important;
-        background-color: rgba(255, 117, 151, 0.08) !important;
-    }
-    .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, #ff7597 0%, #dcb5ff 100%) !important;
-        color: #100a21 !important;
-        box-shadow: 0 4px 12px 0 rgba(255, 117, 151, 0.3) !important;
     }
 
-    /* Custom scrollbars */
+    /* Vercel Left Vertical Navigation Sidebar Menu */
+    div[data-testid="stRadio"] div[role="radiogroup"] {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 3px !important;
+    }
+    div[data-testid="stRadio"] div[role="radiogroup"] > label {
+        background: transparent !important;
+        border-radius: 6px !important;
+        padding: 8px 12px !important;
+        color: #888888 !important;
+        font-size: 0.85rem !important;
+        font-weight: 500 !important;
+        line-height: 1.35 !important;
+        border: 1px solid transparent !important;
+        transition: all 0.15s ease !important;
+        cursor: pointer !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+    div[data-testid="stRadio"] div[role="radiogroup"] > label:hover {
+        background: #141414 !important;
+        color: #ededed !important;
+    }
+    div[data-testid="stRadio"] div[role="radiogroup"] > label[data-checked="true"],
+    div[data-testid="stRadio"] div[role="radiogroup"] > label:has(input:checked) {
+        background: #1f1f1f !important;
+        color: #ffffff !important;
+        border-color: #333333 !important;
+        font-weight: 600 !important;
+    }
+    div[data-testid="stRadio"] div[role="radiogroup"] > label > div:first-child {
+        display: none !important;
+    }
+
+    /* Vercel Dark Callouts & Alert Boxes */
+    div[data-testid="stAlert"], div[role="alert"] {
+        background-color: #0d0d0d !important;
+        border: 1px solid #222222 !important;
+        border-radius: 6px !important;
+        color: #ededed !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+    }
+    div[data-testid="stAlert"] * {
+        color: #ededed !important;
+    }
+
+    /* Custom Slim Vercel Scrollbars */
     ::-webkit-scrollbar {
-        width: 10px;
-        height: 10px;
+        width: 6px;
+        height: 6px;
     }
     ::-webkit-scrollbar-track {
-        background: #1a162b;
+        background: #000000;
     }
     ::-webkit-scrollbar-thumb {
-        background: rgba(255, 117, 151, 0.25);
-        border-radius: 10px;
-        border: 3px solid #1a162b;
+        background: #222222;
+        border-radius: 4px;
     }
     ::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 117, 151, 0.45);
+        background: #333333;
     }
 
-    /* Telemetry cards */
+    /* Vercel Telemetry Metric Cards */
     .telemetry-card {
-        border: 1px solid rgba(255, 117, 151, 0.15);
-        box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.25);
-        background: rgba(38, 32, 69, 0.6);
-        border-radius: 16px;
-        padding: 18px;
+        border: 1px solid #222222;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        background: #0a0a0a;
+        border-radius: 8px;
+        padding: 16px;
         margin-bottom: 16px;
-        text-align: center;
-        transition: all 0.3s ease;
+        text-align: left;
+        transition: all 0.15s ease;
     }
     .telemetry-card:hover {
-        border-color: rgba(255, 117, 151, 0.35);
-        background: rgba(38, 32, 69, 0.8);
-        transform: translateY(-2px);
-        box-shadow: 0 12px 28px 0 rgba(255, 117, 151, 0.15);
+        border-color: #333333;
+        background: #111111;
     }
     .telemetry-card-val {
-        font-size: 2.4rem;
+        font-size: 2rem;
         font-weight: 700;
-        color: #5ad6ff;
-        font-family: 'Fredoka', sans-serif !important;
+        color: #ffffff;
+        font-family: 'Inter', sans-serif !important;
         margin-bottom: 4px;
-        letter-spacing: -0.5px;
+        letter-spacing: -0.03em;
     }
     .telemetry-card-lbl {
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: #ffb7c5;
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: #888888;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-family: 'Quicksand', sans-serif !important;
+        letter-spacing: 0.05em;
+        font-family: 'Inter', sans-serif !important;
     }
 
     /* Custom progress bar graphs */
     .bar-container {
-        margin-bottom: 14px;
+        margin-bottom: 12px;
     }
     .bar-label-row {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 6px;
-        font-size: 0.85rem;
-        font-family: 'Quicksand', sans-serif !important;
-        font-weight: 700;
+        margin-bottom: 4px;
+        font-size: 0.8rem;
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 500;
     }
     .bar-label {
-        color: #e2dff0;
+        color: #ededed;
     }
     .bar-count {
-        color: #ffb7c5;
+        color: #888888;
     }
     .bar-track {
-        background-color: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 117, 151, 0.12);
-        height: 12px;
-        border-radius: 6px;
+        background-color: #141414;
+        border: 1px solid #222222;
+        height: 8px;
+        border-radius: 4px;
         overflow: hidden;
     }
     .bar-fill {
         height: 100%;
-        border-radius: 6px;
+        background-color: #0070f3;
+        border-radius: 4px;
     }
 
     /* Skill capsules visual preview styling */
     .skill-capsule-preview {
         display: inline-flex;
         align-items: center;
-        padding: 4px 12px;
-        border: 1px solid rgba(255, 117, 151, 0.15);
+        padding: 3px 10px;
+        border: 1px solid #222222;
         border-radius: 20px;
-        background: rgba(38, 32, 69, 0.6);
-        font-family: 'Quicksand', sans-serif !important;
-        font-weight: 700;
+        background: #0d0d0d;
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 500;
         font-size: 0.8rem;
-        margin-right: 8px;
-        margin-bottom: 8px;
-        transition: all 0.2s ease;
+        color: #ededed;
+        margin-right: 6px;
+        margin-bottom: 6px;
+        transition: all 0.15s ease;
     }
     .skill-capsule-preview:hover {
-        border-color: rgba(255, 117, 151, 0.35);
-        background: rgba(38, 32, 69, 0.8);
+        border-color: #333333;
+        background: #171717;
     }
     .skill-capsule-dot {
-        width: 8px;
-        height: 8px;
+        width: 6px;
+        height: 6px;
         border-radius: 50%;
-        margin-right: 8px;
-        border: 1px solid rgba(255, 255, 255, 0.15);
+        margin-right: 6px;
+        background-color: #10b981;
     }
 
     /* Status badge */
     .status-badge {
         display: inline-block;
-        padding: 3px 8px;
-        border-radius: 6px;
+        padding: 2px 8px;
+        border-radius: 4px;
         font-size: 0.7rem;
-        font-family: 'Fredoka', sans-serif;
-        font-weight: 700;
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 600;
         text-transform: uppercase;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid #222222;
     }
     .status-badge-bot {
-        background-color: rgba(255, 90, 95, 0.12) !important;
-        color: #ff767a !important;
-        border-color: rgba(255, 90, 95, 0.25) !important;
+        background-color: rgba(239, 68, 68, 0.1) !important;
+        color: #f87171 !important;
+        border-color: rgba(239, 68, 68, 0.25) !important;
     }
     .status-badge-user {
-        background-color: rgba(90, 214, 255, 0.12) !important;
-        color: #5ad6ff !important;
-        border-color: rgba(90, 214, 255, 0.25) !important;
+        background-color: rgba(0, 112, 243, 0.1) !important;
+        color: #38bdf8 !important;
+        border-color: rgba(0, 112, 243, 0.25) !important;
     }
 </style>
 """, unsafe_allow_html=True)
+

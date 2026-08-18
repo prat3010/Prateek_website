@@ -131,18 +131,47 @@ if st.session_state.get("deploy_status_task_status") == "success":
     st.rerun()
 
 # ──────────────────────────────────────────
-# Streamlined Sidebar Navigation & Status
+# Left Sidebar Vertical Navigation & Workspace Hubs
 # ──────────────────────────────────────────
 st.sidebar.markdown("""
-<div style="background: rgba(38, 32, 69, 0.8); border: 1px solid rgba(255, 117, 151, 0.15); border-radius: 14px; padding: 16px; margin-bottom: 20px; text-align: center; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);">
-    <h3 style="color: #ffffff; margin: 0; font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.5px; text-transform: uppercase;">SWEET SYNC</h3>
-    <span style="display: block; color: #ffb7c5; font-size: 0.7rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; margin-top: 2px;">LOLLIPOP ENGINE v1.3.0</span>
+<div style="padding: 12px 14px; margin-bottom: 16px; background: #0d0d0d; border: 1px solid #222222; border-radius: 8px;">
+    <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 1.1rem; color: #ffffff; font-weight: 700;">▲</span>
+        <span style="color: #ffffff; font-weight: 600; font-size: 0.92rem; font-family: 'Inter', sans-serif; letter-spacing: -0.02em;">PRATEEQ / SYNCHRONIZER</span>
+    </div>
+    <span style="display: block; color: #888888; font-size: 0.68rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; margin-top: 4px;">v2.0 // VERCEL EDITION</span>
 </div>
 """, unsafe_allow_html=True)
 
+nav_options = [
+    "👤 Profile, Bio & Career",
+    "🚀 Projects Showcase",
+    "⚡ Skills Matrix",
+    "📜 Verified Badges",
+    "🖼️ Photos & Assets",
+    "✍️ Blog & Content Studio",
+    "🎯 Lead Prospecting Deck",
+    "🧾 Scoping Questionnaire",
+    "🏢 Client Orders & Invoices",
+    "🤝 Sales Partner Agreements",
+    "💰 Quotation Terms & Rates",
+    "💳 RAG SaaS Pricing",
+    "📈 Traffic Telemetry",
+    "⚙️ Server Control & CI/CD",
+]
+
+selected_tab = st.sidebar.radio(
+    "WORKSPACE NAVIGATION",
+    nav_options,
+    index=0,
+    key="vertical_nav_tab",
+)
+
+st.sidebar.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+
 # System & Environment Status
 with st.sidebar.container(border=True):
-    st.markdown("#### System & Environment")
+    st.markdown("##### System & Environment")
     
     # CI/CD Quick Status Pill
     if "error" in deploy_info:
@@ -169,8 +198,8 @@ with st.sidebar.container(border=True):
 
 # Quick Utilities
 with st.sidebar.container(border=True):
-    st.markdown("#### Quick Utilities")
-    if st.button("🔍 Scan for Missing Skills", use_container_width=True):
+    st.markdown("##### Quick Utilities")
+    if st.button("🔍 Scan Missing Skills", use_container_width=True):
         all_tags = []
         if 'projects' in st.session_state and st.session_state.projects:
             for p in st.session_state.projects:
@@ -185,18 +214,24 @@ with st.sidebar.container(border=True):
             st.info("No projects or certificates found to scan.")
 
 if 'pending_skills' in st.session_state and st.session_state.pending_skills:
-    st.sidebar.info(f"💡 **{len(st.session_state.pending_skills)}** pending skill(s) queued for review in **Portfolio -> Skills Matrix**.")
+    st.sidebar.info(f"💡 **{len(st.session_state.pending_skills)}** pending skill(s) queued for review in **Skills Matrix**.")
 
 # ──────────────────────────────────────────
-# Main Header Section
+# Top Breadcrumb / Workspace Header
 # ──────────────────────────────────────────
-st.markdown("""
-<div style="text-align: center; padding: 24px 20px; margin-bottom: 24px; background: rgba(38, 32, 69, 0.8); border-radius: 16px; border: 1px solid rgba(255, 117, 151, 0.15); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);">
-    <h1 style="color: #ffffff; font-family: 'Fredoka', sans-serif; font-weight: 700; margin: 0; font-size: 2.2rem; letter-spacing: -0.5px; text-transform: uppercase;">🍬 CANDY SYNC STUDIO 🍬</h1>
-    <p style="color: #ffb7c5; margin: 6px 0 0 0; font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 0.78rem; letter-spacing: 0.5px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px;">
-        <span style="display: inline-block; width: 8px; height: 8px; background-color: #34d399; border-radius: 50%; box-shadow: 0 0 8px #34d399;"></span>
-        ENGINE STATUS: SWEET & ACTIVE  //  LOCAL RESUME & CONTENT ORCHESTRATOR
-    </p>
+st.markdown(f"""
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; margin-bottom: 24px; background: #0a0a0a; border: 1px solid #222222; border-radius: 8px;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 1.1rem; font-weight: 700; color: #ffffff;">▲ Synchronizer</span>
+        <span style="color: #444444;">/</span>
+        <span style="font-size: 0.9rem; color: #ffffff; font-weight: 500; font-family: 'Inter', sans-serif;">{selected_tab}</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: #111111; border: 1px solid #222222; border-radius: 20px; font-size: 0.72rem; color: #10b981; font-family: 'JetBrains Mono', monospace;">
+            <span style="width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
+            LOCAL HOST: ACTIVE
+        </span>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -298,70 +333,25 @@ def render_control_room_tab():
                     st.toast("🧹 Purged Next.js cache!")
 
 
-# ──────────────────────────────────────────
-# 4 Main Purpose-Built Domain Hubs
-# ──────────────────────────────────────────
-tab_portfolio, tab_blog, tab_commercial, tab_telemetry = st.tabs([
-    "👤 Portfolio & Resume Hub",
-    "✍️ Content & Blog Studio",
-    "💼 Commercial & Client Ops",
-    "📊 Telemetry & Control Room"
-])
+# Dispatcher map for active view rendering
+NAV_DISPATCH = {
+    "👤 Profile, Bio & Career": render_resume_profile_tab,
+    "🚀 Projects Showcase": render_projects_tab,
+    "⚡ Skills Matrix": render_skills_tab,
+    "📜 Verified Badges": render_certificates_tab,
+    "🖼️ Photos & Assets": render_photos_tab,
+    "✍️ Blog & Content Studio": render_blog_tab,
+    "🎯 Lead Prospecting Deck": render_outreach_tab,
+    "🧾 Scoping Questionnaire": render_questionnaire_tab,
+    "🏢 Client Orders & Invoices": render_clients_tab,
+    "🤝 Sales Partner Agreements": render_partner_agreement_tab,
+    "💰 Quotation Terms & Rates": render_quotation_terms_tab,
+    "💳 RAG SaaS Pricing": render_rag_pricing_tab,
+    "📈 Traffic Telemetry": render_analytics_tab,
+    "⚙️ Server Control & CI/CD": render_control_room_tab,
+}
 
-# ── 1. PORTFOLIO & RESUME HUB ──────────────────────────────────────────
-with tab_portfolio:
-    sub_profile, sub_projects, sub_skills, sub_certs, sub_photos = st.tabs([
-        "👤 Profile, Bio & Career",
-        "🚀 Projects Showcase",
-        "⚡ Skills Matrix",
-        "📜 Verified Badges",
-        "🖼️ Photos & Assets"
-    ])
-    with sub_profile:
-        render_resume_profile_tab()
-    with sub_projects:
-        render_projects_tab()
-    with sub_skills:
-        render_skills_tab()
-    with sub_certs:
-        render_certificates_tab()
-    with sub_photos:
-        render_photos_tab()
+render_target = NAV_DISPATCH.get(selected_tab)
+if render_target:
+    render_target()
 
-# ── 2. CONTENT & BLOG STUDIO ───────────────────────────────────────────
-with tab_blog:
-    render_blog_tab()
-
-# ── 3. COMMERCIAL & CLIENT OPS HUB ──────────────────────────────────────
-with tab_commercial:
-    sub_outreach, sub_scoping, sub_clients, sub_partner, sub_terms, sub_rag = st.tabs([
-        "🎯 Lead Prospecting Deck",
-        "🧾 Scoping Questionnaire Config",
-        "🏢 Client Orders & Invoices",
-        "🤝 Sales Partner Agreements",
-        "💰 Terms & Rates",
-        "💳 RAG SaaS Pricing"
-    ])
-    with sub_outreach:
-        render_outreach_tab()
-    with sub_scoping:
-        render_questionnaire_tab()
-    with sub_clients:
-        render_clients_tab()
-    with sub_partner:
-        render_partner_agreement_tab()
-    with sub_terms:
-        render_quotation_terms_tab()
-    with sub_rag:
-        render_rag_pricing_tab()
-
-# ── 4. TELEMETRY & CONTROL ROOM HUB ────────────────────────────────────
-with tab_telemetry:
-    sub_analytics, sub_control = st.tabs([
-        "📈 Traffic Telemetry",
-        "⚙️ Server Control & CI/CD"
-    ])
-    with sub_analytics:
-        render_analytics_tab()
-    with sub_control:
-        render_control_room_tab()

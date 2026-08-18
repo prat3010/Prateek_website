@@ -3,13 +3,14 @@ import sys
 import json
 import urllib.request
 import streamlit as st
+from sync_tabs.shared import env
 
 def render_outreach_tab():
-    st.title("🎯 Autonomous Lead Prospecting & Control Deck")
+    st.markdown('<div class="section-header">Autonomous Lead Prospecting & Control Deck</div>', unsafe_allow_html=True)
     st.caption("Manage AI prospect pitches, review generated lead drafts, and dispatch 1-click emails.")
 
-    SUPABASE_URL = os.environ.get("NEXT_PUBLIC_SUPABASE_URL", "https://osaqaemntuzrjouzobvx.supabase.co")
-    SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
+    SUPABASE_URL = env.get("NEXT_PUBLIC_SUPABASE_URL") or os.environ.get("NEXT_PUBLIC_SUPABASE_URL", "https://osaqaemntuzrjouzobvx.supabase.co")
+    SUPABASE_SERVICE_KEY = env.get("SUPABASE_SERVICE_ROLE_KEY") or os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 
     if not SUPABASE_SERVICE_KEY:
         st.warning("SUPABASE_SERVICE_ROLE_KEY environment variable is missing in .env.local")

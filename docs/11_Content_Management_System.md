@@ -8,14 +8,12 @@ The Content Management System (CMS) manages portfolio updates. Rather than relyi
 
 # **The Local Synchronizer**
 
-The Synchronizer is built with Streamlit and executes locally on the developer's computer. It is structured into multiple functional tabs:
+The Synchronizer is built with Streamlit and executes locally on the developer's computer. It features a high-contrast **Vercel Dashboard UI aesthetic** (Inter & JetBrains Mono typography, `#000000`/`#0A0A0A` pitch dark surfaces, 1px `#222222` crisp borders) with **1-click vertical left sidebar navigation** organized into four domain hubs:
 
-1. **Edit Resume Manually**: Directly modifies the resume json structure stored in the Supabase singleton `profile` row.
-2. **Sync Projects**: Synchronizes GitHub repositories, reads tags, and pushes project details to Supabase.
-3. **Sync Certificates**: Uploads certificates, saves image assets locally, and syncs metadata to the database.
-4. **Manage Skills**: Edits skills, lists pending auto-scanned tags, and updates category mappings.
-5. **Update Photos**: Manages visual variants of photos (Azure vs. Noir variants) stored in `public/images/`.
-6. **Blog Editor**: A markdown composer that reads and writes posts directly to `src/content/posts/`.
+1. **Portfolio & Resume Hub**: Profile & Bio, Projects Showcase, Skills Matrix, Verified Badges, Photos & Assets.
+2. **Content Studio**: Blog Editor & AI technical article brainstorming.
+3. **Commercial & Client Ops**: Lead Prospecting Deck, Scoping Questionnaire Config, Client Orders & Invoices, Partner Agreements, Terms & Rates, RAG SaaS Pricing.
+4. **System & Telemetry**: Traffic Telemetry, Server Control & CI/CD Operations.
 
 ---
 
