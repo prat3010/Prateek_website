@@ -272,11 +272,13 @@
     },
     {
       "id": "standalone_chatbot",
-      "label": "💬 Standalone Embedded Chatbot Widget",
-      "shortLabel": "Chatbot Widget",
-      "description": "Embed a 24/7 chatbot widget into your existing website (WordPress, Webflow, Shopify, custom HTML) for simple lead capture or trained AI document search.",
+      "label": "💬 Standalone Embedded AI Chatbot Widget",
+      "shortLabel": "AI Chatbot Widget",
+      "description": "Embed a 24/7 intelligent AI chatbot into your existing website (WordPress, Webflow, Shopify, custom HTML) trained on your PDFs & docs.",
       "recommendedEngineId": "standalone_embed",
-      "compulsoryFeatureLabels": [],
+      "compulsoryFeatureLabels": [
+        "Private AI Knowledge Base / Vector Search (RAG)"
+      ],
       "skipBrandAssets": true
     },
     {

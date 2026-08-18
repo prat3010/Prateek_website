@@ -46,6 +46,7 @@ def audit_intake_sync():
         ("goals",),
         ("brandAssets", "priceINR", "priceUSD"),
         ("maintenancePlans", "priceINR", "priceUSD"),
+        ("quickServices", "priceINR", "priceUSD"),
     ]
 
     for sec_tuple in sections:
@@ -67,6 +68,13 @@ def audit_intake_sync():
                             f"Section '{sec}' item '{item_id}' price mismatch on '{pk}': "
                             f"defaults={def_item.get(pk)} vs resume.json={res_item.get(pk)}"
                         )
+                if sec == "goals":
+                    for goal_key in ("label", "compulsoryFeatureLabels"):
+                        if def_item.get(goal_key) != res_item.get(goal_key):
+                            errors.append(
+                                f"Goal '{item_id}' mismatch on '{goal_key}': "
+                                f"defaults={def_item.get(goal_key)} vs resume.json={res_item.get(goal_key)}"
+                            )
 
     return errors
 

@@ -475,6 +475,128 @@
         "laymanDescription": "Includes 30 days of complimentary technical support post-launch. Client manages cloud hosting and database updates afterwards."
       }
     ],
+    "quickServices": [
+      {
+        "id": "chatbot",
+        "label": "💬 AI Chatbot Widget",
+        "laymanDescription": "24/7 AI assistant on your website that answers customer questions, captures leads, and reduces support workload.",
+        "techSpecs": "Script Loader, Shadow DOM Isolation, System Prompt Configuration, Fallback Routing, Webhook Messaging",
+        "priceINR": 20000,
+        "priceUSD": 250,
+        "turnaround": "5–7 days",
+        "category": "ai"
+      },
+      {
+        "id": "rag_knowledge_base",
+        "label": "🧠 AI Knowledge Base (RAG)",
+        "laymanDescription": "Train an AI on your business documents, PDFs, and FAQs so it answers questions with source citations.",
+        "techSpecs": "pgvector Embeddings, Document Chunking, Semantic Search, Presigned Citation Downloads, Feedback Telemetry",
+        "priceINR": 125000,
+        "priceUSD": 1700,
+        "turnaround": "7–14 days",
+        "category": "ai"
+      },
+      {
+        "id": "transactional_email",
+        "label": "📧 Transactional Email Setup",
+        "laymanDescription": "Branded email notifications (welcome, receipt, password reset) with SPF/DKIM/DMARC verification so emails land in inbox, not spam.",
+        "techSpecs": "Resend/SendGrid Integration, SPF/DKIM/DMARC DNS Auth, Custom HTML Templates, Delivery Telemetry",
+        "priceINR": 15000,
+        "priceUSD": 200,
+        "turnaround": "3–5 days",
+        "category": "email"
+      },
+      {
+        "id": "payment_gateway",
+        "label": "💳 Payment Gateway Integration",
+        "laymanDescription": "Add Razorpay/Stripe checkout to your existing site for one-time payments or subscriptions with automatic invoicing.",
+        "techSpecs": "Razorpay/Stripe Webhooks, Checkout Flow, Recurring Billing, PCI-Compliant Hosted Checkout",
+        "priceINR": 45000,
+        "priceUSD": 600,
+        "turnaround": "5–7 days",
+        "category": "integration"
+      },
+      {
+        "id": "api_integration",
+        "label": "🔗 Third-Party API Integration",
+        "laymanDescription": "Connect your site to Slack, Zapier, Google Sheets, CRM, or any external service with webhook automation.",
+        "techSpecs": "Webhook Connectors, Serverless Route Handlers, Retry & Delivery Logging, Outbound Event Hooks",
+        "priceINR": 40000,
+        "priceUSD": 550,
+        "turnaround": "3–7 days",
+        "category": "integration"
+      },
+      {
+        "id": "speed_optimization",
+        "label": "⚡ Core Web Vitals Optimization",
+        "laymanDescription": "Fix loading speed, interaction lag, and layout shifts to rank higher on Google and load under 2 seconds.",
+        "techSpecs": "LCP/INP/CLS Audit & Fix, Image Compression, Script Deferral, Font Optimization, CDN Caching",
+        "priceINR": 25000,
+        "priceUSD": 350,
+        "turnaround": "3–5 days",
+        "category": "performance"
+      },
+      {
+        "id": "seo_audit",
+        "label": "🔍 Technical SEO Audit & Fix",
+        "laymanDescription": "Meta tags, structured JSON-LD data, sitemap, robots.txt, OpenGraph cards, and canonical tags for better Google indexing.",
+        "techSpecs": "JSON-LD Schema Markup, Canonical Tags, Sitemap Generation, robots.txt, OpenGraph & Twitter Cards",
+        "priceINR": 30000,
+        "priceUSD": 400,
+        "turnaround": "3–7 days",
+        "category": "performance"
+      },
+      {
+        "id": "accessibility_audit",
+        "label": "♿ Accessibility Audit & Fixes",
+        "laymanDescription": "WCAG 2.1 compliance: screen readers, keyboard navigation, color contrast, ARIA labels to prevent legal claims.",
+        "techSpecs": "WCAG 2.1 AA Audit, ARIA Landmarks, Keyboard Navigation, Color Contrast Fixes, Screen Reader Testing",
+        "priceINR": 40000,
+        "priceUSD": 500,
+        "turnaround": "5–7 days",
+        "category": "performance"
+      },
+      {
+        "id": "i18n_setup",
+        "label": "🌐 Multilingual / i18n Setup",
+        "laymanDescription": "Multiple languages with browser auto-detection, locale-aware URLs, and SEO-friendly hreflang tags.",
+        "techSpecs": "next-intl / react-i18next, Locale Auto-Detection, hreflang SEO Tags, Translation JSON Structure",
+        "priceINR": 30000,
+        "priceUSD": 400,
+        "turnaround": "5–7 days",
+        "category": "integration"
+      },
+      {
+        "id": "pwa_conversion",
+        "label": "📱 PWA Conversion",
+        "laymanDescription": "Turn your website into an installable app with offline support, home screen icon, and splash screen.",
+        "techSpecs": "Service Worker, Web App Manifest, Install Prompts, Offline Fallback Shell, Push Notifications",
+        "priceINR": 30000,
+        "priceUSD": 400,
+        "turnaround": "3–5 days",
+        "category": "integration"
+      },
+      {
+        "id": "analytics_setup",
+        "label": "📊 Analytics & Event Tracking",
+        "laymanDescription": "Custom event tracking, conversion funnels, and dashboard setup so you know exactly how visitors use your site.",
+        "techSpecs": "GA4/PostHog/Custom Events, Conversion Funnel Setup, Dashboard Widgets, UTM Tracking",
+        "priceINR": 20000,
+        "priceUSD": 250,
+        "turnaround": "2–4 days",
+        "category": "performance"
+      },
+      {
+        "id": "data_migration",
+        "label": "🗄️ Data Migration",
+        "laymanDescription": "Clean, transform, and import legacy data (spreadsheets, old databases) into modern cloud database without data loss.",
+        "techSpecs": "ETL Pipeline, Schema Mapping, Data Cleansing, Foreign Key Integrity, Migration Verification",
+        "priceINR": 30000,
+        "priceUSD": 400,
+        "turnaround": "3–7 days",
+        "category": "integration"
+      }
+    ],
     "middlemanAgreement": {
       "sections": [
         {

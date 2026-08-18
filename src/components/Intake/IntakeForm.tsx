@@ -249,6 +249,8 @@ interface IntakeFormData {
   agreedToTerms: boolean;
 }
 
+  const hasDeepLink = Boolean(initialPreset?.goalId || initialPreset?.engineId);
+
   const [formData, setFormData] = useState<IntakeFormData>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -259,12 +261,12 @@ interface IntakeFormData {
             companyName: parsed.companyName || '',
             contactEmail: parsed.contactEmail || '',
             contactPhone: parsed.contactPhone || '',
-            projectGoal: parsed.projectGoal || initialArchetype.label,
+            projectGoal: (hasDeepLink ? initialArchetype.label : parsed.projectGoal) || initialArchetype.label,
             businessKPI: parsed.businessKPI || '🚀 Increase Lead & Customer Conversion Rate',
             projectStartType: parsed.projectStartType || 'greenfield',
             targetAudience: parsed.targetAudience || '',
-            selectedBaseEngineId: parsed.selectedBaseEngineId || initialArchetype.recommendedEngineId,
-            selectedFeatures: Array.isArray(parsed.selectedFeatures) ? (parsed.selectedFeatures as string[]) : initialSelectedFeatures,
+            selectedBaseEngineId: (hasDeepLink ? initialArchetype.recommendedEngineId : parsed.selectedBaseEngineId) || initialArchetype.recommendedEngineId,
+            selectedFeatures: hasDeepLink ? initialSelectedFeatures : (Array.isArray(parsed.selectedFeatures) ? (parsed.selectedFeatures as string[]) : initialSelectedFeatures),
             selectedBrandAssetId: parsed.selectedBrandAssetId || (brandAssets[0]?.id || ''),
             designReadiness: parsed.designReadiness || 'figma_ready',
             selectedMaintenanceId: parsed.selectedMaintenanceId || '',
@@ -328,22 +330,29 @@ interface IntakeFormData {
     const archetype = goals.find((g) => g.label === newGoalLabel) || goals[0];
     const newEngineId = archetype.recommendedEngineId;
 
-    // Auto-merge compulsory features plus any dependencies they require
-    const mergedLabels = new Set([...formData.selectedFeatures, ...archetype.compulsoryFeatureLabels]);
-    const baseIds = features.filter((f: FeatureItem) => mergedLabels.has(f.label)).map((f: FeatureItem) => f.id);
-    const extraIds = resolveFeatureDependencies(baseIds, features);
-    extraIds.forEach((id: string) => {
-      const label = labelOfFeature(id);
-      if (label) mergedLabels.add(label);
-    });
+    // Remove compulsory features from former archetype that are not compulsory in new archetype
+    const formerCompulsory = new Set(currentArchetype.compulsoryFeatureLabels);
+    const newCompulsory = new Set(archetype.compulsoryFeatureLabels);
+    const toRemove = Array.from(formerCompulsory).filter(label => !newCompulsory.has(label));
 
-    setFormData((prev: IntakeFormData) => ({
-      ...prev,
-      projectGoal: newGoalLabel,
-      selectedBaseEngineId: newEngineId,
-      selectedFeatures: Array.from(mergedLabels),
-      selectedBrandAssetId: archetype.skipBrandAssets ? (brandAssets[0]?.id || 'ready') : prev.selectedBrandAssetId,
-    }));
+    setFormData((prev: IntakeFormData) => {
+      const cleanedFeatures = prev.selectedFeatures.filter(f => !toRemove.includes(f));
+      const mergedLabels = new Set([...cleanedFeatures, ...archetype.compulsoryFeatureLabels]);
+      const baseIds = features.filter((f: FeatureItem) => mergedLabels.has(f.label)).map((f: FeatureItem) => f.id);
+      const extraIds = resolveFeatureDependencies(baseIds, features);
+      extraIds.forEach((id: string) => {
+        const label = labelOfFeature(id);
+        if (label) mergedLabels.add(label);
+      });
+
+      return {
+        ...prev,
+        projectGoal: newGoalLabel,
+        selectedBaseEngineId: newEngineId,
+        selectedFeatures: Array.from(mergedLabels),
+        selectedBrandAssetId: archetype.skipBrandAssets ? (brandAssets[0]?.id || 'ready') : prev.selectedBrandAssetId,
+      };
+    });
   };
 
   const handleScopeStartTypeChange = (newType: string) => {
@@ -439,7 +448,8 @@ interface IntakeFormData {
 
   // Quote computed from the centralized pricing module (pure additive)
   const totalCost = useMemo(() => {
-    const brandOpt = brandAssets.find(b => b.id === formData.selectedBrandAssetId) || brandAssets[0];
+    const effectiveBrandAssetId = shouldSkipBrandStep ? (brandAssets[0]?.id || 'ready') : formData.selectedBrandAssetId;
+    const brandOpt = brandAssets.find(b => b.id === effectiveBrandAssetId) || brandAssets[0];
     const activeFeatureIds = features
       .filter(f => {
         const isCompulsory = currentArchetype.compulsoryFeatureLabels.includes(f.label);
@@ -470,12 +480,16 @@ interface IntakeFormData {
       featuresUSD: quote.featuresPriceUSD,
       itemizedList: quote.itemized.map(i => `${i.label} (+${formatMoney(currency === 'INR' ? i.priceINR : i.priceUSD, currency)})`),
     };
-  }, [selectedEngine, engines, features, brandAssets, maintenancePlans, formData.selectedFeatures, formData.selectedBrandAssetId, formData.selectedMaintenanceId, autoMaintenancePlanId, currency, currentArchetype.compulsoryFeatureLabels, formData.projectStartType]);
+  }, [selectedEngine, engines, features, brandAssets, maintenancePlans, formData.selectedFeatures, formData.selectedBrandAssetId, formData.selectedMaintenanceId, autoMaintenancePlanId, currency, currentArchetype.compulsoryFeatureLabels, formData.projectStartType, shouldSkipBrandStep]);
 
   const activeMaintenancePlan = useMemo(() => {
     const targetId = formData.selectedMaintenanceId || autoMaintenancePlanId;
     return maintenancePlans.find(p => p.id === targetId) || maintenancePlans[1];
   }, [formData.selectedMaintenanceId, autoMaintenancePlanId, maintenancePlans]);
+
+  const quickQuote = useMemo(() => {
+    return calcQuickServiceQuote(quickServices, selectedQuickServices, currency);
+  }, [quickServices, selectedQuickServices, currency]);
 
   const buildQuestionnaireData = (): QuestionnaireData => ({
     companyName: formData.companyName,
@@ -589,7 +603,7 @@ interface IntakeFormData {
         taxInvoicingPreference: formData.taxInvoicingPreference,
         targetAudience: formData.targetAudience,
         baseEngineTitle: selectedEngine.title,
-        selectedFeatures: formData.selectedFeatures.map((id: string) => labelOfFeature(id) || id),
+        selectedFeatures: formData.selectedFeatures,
         brandAssetOption: totalCost.brandOpt.label,
         maintenancePlan: activeMaintenancePlan.name,
         totalCostINR: totalCost.totalINR,
@@ -916,11 +930,7 @@ interface IntakeFormData {
                     <div className={styles.quoteSummaryCompact} style={{ marginTop: '16px' }}>
                       <span style={{ fontWeight: 700 }}>{selectedQuickServices.length} service{selectedQuickServices.length > 1 ? 's' : ''} selected</span>
                       <span style={{ fontWeight: 800, fontSize: '16px' }}>
-                        {formatPricePair(
-                          quickServices.filter(s => selectedQuickServices.includes(s.id)).reduce((sum, s) => sum + s.priceINR, 0),
-                          quickServices.filter(s => selectedQuickServices.includes(s.id)).reduce((sum, s) => sum + s.priceUSD, 0),
-                          currency
-                        )}
+                        {formatPricePair(quickQuote.totalINR, quickQuote.totalUSD, currency)}
                       </span>
                     </div>
                   )}
@@ -966,11 +976,7 @@ interface IntakeFormData {
                     <div className={`${styles.quoteRow} ${styles.quoteRowTotal}`}>
                       <strong>TOTAL</strong>
                       <strong className={styles.totalPrice}>
-                        {formatPricePair(
-                          quickServices.filter(s => selectedQuickServices.includes(s.id)).reduce((sum, s) => sum + s.priceINR, 0),
-                          quickServices.filter(s => selectedQuickServices.includes(s.id)).reduce((sum, s) => sum + s.priceUSD, 0),
-                          currency
-                        )}
+                        {formatPricePair(quickQuote.totalINR, quickQuote.totalUSD, currency)}
                       </strong>
                     </div>
                     <p style={{ fontSize: '12px', opacity: 0.55, marginTop: '8px' }}>Includes 30-day post-delivery warranty. {ESTIMATE_DISCLAIMER}</p>

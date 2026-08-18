@@ -162,6 +162,7 @@ describe('goal archetype package totals', () => {
     lms_portal: { inr: 360000, usd: 4900 },
     crm_admin: { inr: 335000, usd: 4550 },
     ai_rag_app: { inr: 400000, usd: 5450 },
+    standalone_chatbot: { inr: 140000, usd: 1900 },
   };
 
   it.each(Object.entries(expected))(
