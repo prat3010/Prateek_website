@@ -2,12 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import styles from "@/components/rag/rag.module.css";
 
 export default function RagLoginPage() {
-  const router = useRouter();
   const { loginWithGoogle } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -25,13 +23,6 @@ export default function RagLoginPage() {
       setError(err instanceof Error ? err.message : "Google Sign-In failed");
       setLoading(false);
     }
-  };
-
-  const handleGuestDemo = () => {
-    localStorage.setItem("retriever_tenant_id", "00000000-0000-0000-0000-000000000000");
-    localStorage.setItem("retriever_user_id", "00000000-0000-0000-0000-000000000001");
-    localStorage.setItem("retriever_api_key", "ret_live_GuestAccessKey2026.ReadOnlyChat");
-    router.push("/rag/app");
   };
 
   return (
@@ -52,18 +43,6 @@ export default function RagLoginPage() {
           disabled={loading}
         >
           {loading ? "Authenticating..." : "🔑 Sign in with Google"}
-        </button>
-
-        <div style={{ margin: "1.5rem 0", color: "var(--color-text-muted)", fontSize: "0.8rem" }}>
-          ─── OR ───
-        </div>
-
-        <button
-          className="comic-btn comic-btn-outline"
-          style={{ width: "100%", justifyContent: "center", marginBottom: "1.5rem" }}
-          onClick={handleGuestDemo}
-        >
-          🚀 Try Live Demo (No Login Required)
         </button>
 
         <p style={{ fontSize: "0.8rem", color: "var(--color-text-muted)" }}>

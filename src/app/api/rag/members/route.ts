@@ -115,6 +115,35 @@ export async function DELETE(req: Request) {
       );
     }
 
+    // An admin must not be able to remove an owner, and an owner can never
+    // remove the final owner of a workspace. Without this guard a valid admin
+    // session could permanently orphan a tenant.
+    if (targetMember.role === 'owner') {
+      if (callerRoleRecord.role !== 'owner') {
+        return NextResponse.json(
+          { error: 'Forbidden: Only an owner can remove another owner.' },
+          { status: 403 }
+        );
+      }
+
+      const { data: owners, error: ownersError } = await supabase
+        .from('rag_tenant_members')
+        .select('id')
+        .eq('tenant_id', targetMember.tenant_id)
+        .eq('role', 'owner');
+
+      if (ownersError) {
+        console.error('Failed to verify tenant owners:', ownersError.message);
+        return NextResponse.json({ error: 'Failed to verify tenant ownership.' }, { status: 500 });
+      }
+      if ((owners || []).length <= 1) {
+        return NextResponse.json(
+          { error: 'A workspace must retain at least one owner.' },
+          { status: 409 }
+        );
+      }
+    }
+
     const { error: deleteError } = await supabase
       .from('rag_tenant_members')
       .delete()
@@ -134,4 +163,3 @@ export async function DELETE(req: Request) {
     );
   }
 }
-

@@ -6,11 +6,11 @@ import { useAuth } from "@/context/AuthContext";
 import { isValidUrl } from "./utils";
 import styles from "./rag.module.css";
 
-export const DEMO_GUEST_CONFIG: RetrieverConfig = {
+const EMPTY_CONFIG: RetrieverConfig = {
   apiUrl: "https://rag.prateeq.in",
-  tenantId: "00000000-0000-0000-0000-000000000000",
-  apiKey: "ret_live_GuestAccessKey2026.ReadOnlyChat",
-  userId: "c9b00431-74d1-43fa-ac72-d4382cfd584f",
+  tenantId: "",
+  apiKey: "",
+  userId: "",
 };
 
 export function ConfigPanel({
@@ -23,7 +23,7 @@ export function ConfigPanel({
 }) {
   const { user, getAccessToken } = useAuth();
   const [form, setForm] = useState<RetrieverConfig>(
-    config ?? DEMO_GUEST_CONFIG,
+    config ?? EMPTY_CONFIG,
   );
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [connecting, setConnecting] = useState(false);
@@ -32,25 +32,6 @@ export function ConfigPanel({
   if (hidden) return null;
 
   const valid = isValidUrl(form.apiUrl) && form.tenantId.length > 0 && form.userId.length > 0 && form.apiKey.length > 0;
-
-  async function handleGuestLogin() {
-    setConnecting(true);
-    setConnectResult(null);
-    setForm(DEMO_GUEST_CONFIG);
-    try {
-      const res = await fetch(`${DEMO_GUEST_CONFIG.apiUrl}/health/liveness`, {
-        headers: { Authorization: `Bearer ${DEMO_GUEST_CONFIG.apiKey}` },
-      });
-      if (!res.ok) throw new Error(`Backend returned ${res.status}`);
-      setConnectResult({ ok: true, msg: "Connected as Guest (Read-Only)" });
-      onSave(DEMO_GUEST_CONFIG);
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Guest connection failed";
-      setConnectResult({ ok: false, msg });
-    } finally {
-      setConnecting(false);
-    }
-  }
 
   async function handleSupabaseSessionConnect() {
     setConnecting(true);
@@ -117,9 +98,6 @@ export function ConfigPanel({
             {connecting ? "Connecting…" : `🔐 Connect as ${user.email?.split("@")[0]}`}
           </button>
         ) : null}
-        <button className="comic-btn comic-btn-outline" onClick={handleGuestLogin} disabled={connecting}>
-          {connecting ? "Connecting…" : "⚡ Login as Guest"}
-        </button>
       </div>
       {showAdvanced && (
         <div>

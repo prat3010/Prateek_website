@@ -4,17 +4,14 @@ import { isAdminEmail } from '@/lib/auth';
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://osaqaemntuzrjouzobvx.supabase.co';
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-const SYSTEM_TENANT_ID = '00000000-0000-0000-0000-000000000000';
+const PUBLIC_DEMO_TENANT_ID = 'demo_public_docs';
+const SYSTEM_TENANT_ID = 'system_master';
 
 export async function POST(req: NextRequest) {
   try {
     const userEmail = await getVerifiedSessionEmail(req);
-    if (!userEmail) {
-      return NextResponse.json({ error: 'Unauthorized: Authentication required' }, { status: 401 });
-    }
-    if (!isAdminEmail(userEmail)) {
-      return NextResponse.json({ error: 'Forbidden: Admin access required to query system memory' }, { status: 403 });
-    }
+    const isAdmin = userEmail ? isAdminEmail(userEmail) : false;
+    const targetTenantId = isAdmin ? SYSTEM_TENANT_ID : PUBLIC_DEMO_TENANT_ID;
 
     const body = await req.json();
     const queryStr = (body.query || '').trim();
@@ -33,9 +30,9 @@ export async function POST(req: NextRequest) {
       'Content-Type': 'application/json',
     };
 
-    // Fetch document chunks for system tenant
+    // Fetch document chunks for target tenant
     const res = await fetch(
-      `${SUPABASE_URL.replace(/\/$/, '')}/rest/v1/document_chunks?tenant_id=eq.${SYSTEM_TENANT_ID}&select=chunk_id,content,meta_data&limit=500`,
+      `${SUPABASE_URL.replace(/\/$/, '')}/rest/v1/document_chunks?tenant_id=eq.${targetTenantId}&select=chunk_id,content,meta_data&limit=500`,
       { headers, next: { revalidate: 60 } }
     );
 

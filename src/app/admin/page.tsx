@@ -61,7 +61,10 @@ export default function AdminControlCenter() {
   const fetchLeads = async () => {
     setLoadingLeads(true);
     try {
-      const res = await fetch('/api/outreach/get-leads');
+      const token = await getAccessToken();
+      const res = await fetch('/api/outreach/get-leads', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
       if (res.ok) {
         const data = await res.json();
         setLeads(data.leads || []);
@@ -73,26 +76,15 @@ export default function AdminControlCenter() {
     }
   };
 
-  const fetchClients = async () => {
-    try {
-      const token = await getAccessToken();
-      const res = await fetch('/api/client/get-scopes', {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setClients(data.scopes || []);
-      }
-    } catch (err) {
-      console.error('Failed to fetch clients:', err);
-    }
-  };
-
   useEffect(() => {
     let isMounted = true;
     if (user && isAdminEmail(user.email)) {
       Promise.all([
-        fetch('/api/outreach/get-leads').then(r => r.ok ? r.json() : { leads: [] }),
+        getAccessToken().then(token =>
+          fetch('/api/outreach/get-leads', {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          }).then(r => r.ok ? r.json() : { leads: [] })
+        ),
         getAccessToken().then(token =>
           fetch('/api/client/get-scopes', {
             headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -113,7 +105,11 @@ export default function AdminControlCenter() {
   const handleGenerateProspects = async () => {
     setLoadingLeads(true);
     try {
-      const res = await fetch('/api/outreach/prospect', { method: 'POST' });
+      const token = await getAccessToken();
+      const res = await fetch('/api/outreach/prospect', {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
       if (res.ok) {
         const data = await res.json();
         setActionMessage(data.message || 'Generated new prospect pitches!');
@@ -128,9 +124,13 @@ export default function AdminControlCenter() {
 
   const handleDispatch = async (leadId: string, action: 'approve' | 'reject') => {
     try {
+      const token = await getAccessToken();
       const res = await fetch('/api/outreach/dispatch', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({
           leadId,
           action,

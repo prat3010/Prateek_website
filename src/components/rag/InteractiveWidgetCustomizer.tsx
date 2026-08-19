@@ -5,7 +5,7 @@ import styles from "./rag.module.css";
 
 export function InteractiveWidgetCustomizer() {
   const [color, setColor] = useState("#2563eb");
-  const [botName, setBotName] = useState("AI Support Assistant");
+  const [botName, setBotName] = useState("Retriever Concierge");
   const [position, setPosition] = useState("bottom-right");
   const [copied, setCopied] = useState(false);
   const [widgetMounted, setWidgetMounted] = useState(false);
@@ -26,21 +26,9 @@ export function InteractiveWidgetCustomizer() {
   };
 
   const handleTestLive = () => {
-    if (document.getElementById("retriever-widget-host")) {
-      document.getElementById("retriever-widget-host")?.remove();
-      // Reset loaded flag
-      // @ts-expect-error global flag reset
-      delete window.__RETRIEVER_WIDGET_LOADED__;
-    }
-
-    const script = document.createElement("script");
-    script.src = "/widget.js";
-    script.setAttribute("data-tenant", "00000000-0000-0000-0000-000000000000");
-    script.setAttribute("data-key", "ret_live_GuestAccessKey2026.ReadOnlyChat");
-    script.setAttribute("data-color", color);
-    script.setAttribute("data-title", botName);
-    script.setAttribute("data-position", position);
-    document.body.appendChild(script);
+    // A browser-visible demo key would be a public credential. The preview is
+    // therefore deliberately kept credential-free; test the generated snippet
+    // after creating a tenant-scoped API key in the studio.
     setWidgetMounted(true);
   };
 
@@ -117,7 +105,7 @@ export function InteractiveWidgetCustomizer() {
 
             <div className={styles.actionRow}>
               <button className="comic-btn comic-btn-blue" onClick={handleTestLive}>
-                {widgetMounted ? "⚡ Refresh Live Widget" : "🚀 Test Live Widget on Page"}
+                {widgetMounted ? "✓ Configure a workspace to test" : "🔐 Test with your workspace key"}
               </button>
             </div>
           </div>

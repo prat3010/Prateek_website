@@ -39,6 +39,7 @@ export async function POST(req: Request) {
       id?: string;
       scope_code?: string;
       client_id?: string;
+      client_email?: string;
       currency?: string;
       total_cost_inr?: number;
       total_cost_usd?: number;
@@ -47,11 +48,17 @@ export async function POST(req: Request) {
     } | null = null;
 
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('client_scopes')
         .select('*')
         .eq('scope_code', scopeCode)
+        .eq('client_email', clientEmail)
         .maybeSingle();
+
+      if (error) {
+        console.error('Could not load the requested payment scope:', error);
+        return NextResponse.json({ error: 'Could not load payment scope.' }, { status: 500 });
+      }
 
       scope = data;
     } catch (dbErr) {
@@ -60,8 +67,8 @@ export async function POST(req: Request) {
 
     if (!scope) {
       return NextResponse.json(
-        { error: 'Scope not found in database. Please persist your scope brief before initiating deposit lock.' },
-        { status: 400 }
+        { error: 'Payment scope was not found.' },
+        { status: 404 }
       );
     }
 

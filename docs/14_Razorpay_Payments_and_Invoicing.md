@@ -59,16 +59,20 @@ The system enables clients to lock 50% upfront project deposits via Razorpay Sta
 ### 2. **Payment Verification Endpoint**: [`POST /api/client/verify-razorpay-payment`](file:///Users/prateeksharma/Developer/Prateek_website/src/app/api/client/verify-razorpay-payment/route.ts)
 
 * **Authentication**: Session-gated via JWT bearer token.
-* **Signature Verification**: Verifies Razorpay HMAC-SHA256 signature:
+* **Signature Verification**: Verifies Razorpay HMAC-SHA256 signature using `crypto.timingSafeEqual`:
   ```ts
   const expectedSignature = crypto
     .createHmac('sha256', KEY_SECRET)
     .update(`${razorpayOrderId}|${razorpayPaymentId}`)
     .digest('hex');
+
+  const isValid =
+    expectedSignature.length === razorpaySignature.length &&
+    crypto.timingSafeEqual(Buffer.from(expectedSignature), Buffer.from(razorpaySignature));
   ```
-* **State Transition**:
-  * Updates `invoices` record: `payment_status = 'paid'`, `paid_at = now()`, `razorpay_payment_id`.
-  * Updates `client_scopes` record: `deposit_paid = true`, `delivery_stage = 'engineering'`, `status = 'Deposit Paid — In Development'`.
+* **State Transition & Webhook Authority**:
+  * Verifies payment signature and returns `202 Accepted`.
+  * Commercial state mutations (`invoices` `payment_status = 'paid'`, `client_scopes` `deposit_paid = true`) are executed authoritatively via the signed, idempotent Razorpay provider webhook (`/api/webhooks/razorpay`).
 
 ---
 

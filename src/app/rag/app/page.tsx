@@ -38,7 +38,7 @@ export default function RagAppStudioPage() {
 
           if (res.ok) {
             const data = await res.json();
-            const resolvedTenant = data.tenantId || "guest-demo";
+            const resolvedTenant = data.tenantId;
             const resolvedUser = data.userId || user.id;
 
             setTenantId(resolvedTenant);
@@ -59,23 +59,13 @@ export default function RagAppStudioPage() {
         }
       }
 
-      // Guest / Fallback Mode when unauthenticated or offline
-      const storedTenant = localStorage.getItem("retriever_tenant_id") || "guest-demo";
-      const storedUser = localStorage.getItem("retriever_user_id") || "guest-user";
-      const storedKey = localStorage.getItem("retriever_api_key") || "guest-demo-key";
-
-      setTenantId(storedTenant);
-      setApiKey(storedKey);
-      setUserId(storedUser);
-      setIsAdmin(storedKey.includes("admin") || storedKey === "dev-admin-master-key-change-in-production");
-
-      const cli = new RetrieverClient({
-        apiUrl: process.env.NEXT_PUBLIC_RETRIEVER_API_URL || "https://rag.prateeq.in",
-        tenantId: storedTenant,
-        apiKey: storedKey,
-        userId: storedUser,
-      });
-      setClient(cli);
+      // No guest credential or cached API key is available by design. A user
+      // must authenticate before the studio receives a tenant-scoped token.
+      setTenantId("");
+      setApiKey("");
+      setUserId("");
+      setIsAdmin(false);
+      setClient(null);
     } catch (err) {
       console.warn("RAG Studio workspace resolution warning:", err);
     } finally {
@@ -179,16 +169,16 @@ export default function RagAppStudioPage() {
               : null
           }
           onSave={(cfg) => {
-            localStorage.setItem("retriever_tenant_id", cfg.tenantId);
-            localStorage.setItem("retriever_api_key", cfg.apiKey);
-            localStorage.setItem("retriever_user_id", cfg.userId);
-            window.location.reload();
+            setTenantId(cfg.tenantId);
+            setApiKey(cfg.apiKey);
+            setUserId(cfg.userId);
+            setClient(new RetrieverClient(cfg));
           }}
           onClear={() => {
-            localStorage.removeItem("retriever_tenant_id");
-            localStorage.removeItem("retriever_api_key");
-            localStorage.removeItem("retriever_user_id");
-            window.location.reload();
+            setTenantId("");
+            setApiKey("");
+            setUserId("");
+            setClient(null);
           }}
           hidden={activeTab !== "config"}
         />

@@ -16,39 +16,49 @@ const mocks = vi.hoisted(() => {
     total_cost_inr: 175000,
     total_cost_usd: 2500,
     currency: 'INR',
+    deposit_paid: false,
   };
 
-  const selectFn = vi.fn().mockReturnValue({
-    eq: vi.fn().mockReturnValue({
-      maybeSingle: vi.fn().mockResolvedValue({
-        data: mockScopeRow,
-        error: null,
-      }),
-      eq: vi.fn().mockReturnValue({
-        maybeSingle: vi.fn().mockResolvedValue({
-          data: mockScopeRow,
-          error: null,
-        }),
-      }),
-    }),
-  });
+  const mockInvoiceRow = {
+    id: 'invoice-uuid-1',
+    scope_id: 'scope-uuid-1',
+    customer_email: 'client@example.com',
+    payment_status: 'pending',
+    razorpay_payment_id: null,
+  };
+
+  const makeSelectQuery = (data: unknown) => {
+    const query = {
+      eq: vi.fn(),
+      maybeSingle: vi.fn().mockResolvedValue({ data, error: null }),
+    };
+    query.eq.mockReturnValue(query);
+    return query;
+  };
+
+  const makeUpdateQuery = () => {
+    const query = {
+      eq: vi.fn(),
+      select: vi.fn().mockResolvedValue({ data: [{ id: 'updated-record' }], error: null }),
+    };
+    query.eq.mockReturnValue(query);
+    return query;
+  };
 
   const insertFn = vi.fn().mockResolvedValue({ data: null, error: null });
-  const updateFn = vi.fn().mockReturnValue({
-    eq: vi.fn().mockResolvedValue({ data: null, error: null }),
-  });
+  const fromFn = vi.fn((table: string) => ({
+    select: vi.fn(() => makeSelectQuery(table === 'invoices' ? mockInvoiceRow : mockScopeRow)),
+    insert: insertFn,
+    update: vi.fn(() => makeUpdateQuery()),
+  }));
 
-  return { state, selectFn, insertFn, updateFn };
+  return { state, fromFn, insertFn };
 });
 
 vi.mock('@/data/supabase', () => ({
   get supabase() {
     return {
-      from: vi.fn(() => ({
-        select: mocks.selectFn,
-        insert: mocks.insertFn,
-        update: mocks.updateFn,
-      })),
+      from: mocks.fromFn,
     };
   },
 }));
@@ -155,7 +165,7 @@ describe('POST /api/client/verify-razorpay-payment', () => {
     expect(json.error).toContain('verification failed');
   });
 
-  it('verifies valid signature and activates scope deposit', async () => {
+  it('verifies a valid signature but leaves ledger updates to the webhook', async () => {
     const req = new Request('http://localhost/api/client/verify-razorpay-payment', {
       method: 'POST',
       headers: authorizedHeaders,
@@ -168,10 +178,10 @@ describe('POST /api/client/verify-razorpay-payment', () => {
     });
 
     const res = await verifyPaymentPOST(req);
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(202);
     const json = await res.json();
     expect(json.success).toBe(true);
-    expect(json.message).toContain('Payment verified');
+    expect(json.message).toContain('webhook');
   });
 });
 
@@ -238,4 +248,3 @@ describe('POST /api/client/create-razorpay-subscription', () => {
     expect(json.subscriptionId).toContain('sub_mock_');
   });
 });
-

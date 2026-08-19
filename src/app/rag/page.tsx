@@ -1,30 +1,19 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useLenis } from "lenis/react";
 import ScrollSection from "@/components/ScrollSection/ScrollSection";
-import { ChatPanel } from "@/components/rag/ChatPanel";
 import { PricingSection } from "@/components/rag/PricingSection";
 import { InteractiveWidgetCustomizer } from "@/components/rag/InteractiveWidgetCustomizer";
 import { ComparisonSection } from "@/components/rag/ComparisonSection";
 import { DeveloperApiSection } from "@/components/rag/DeveloperApiSection";
-import { RetrieverClient } from "@/lib/rag-client";
 import { NAVBAR_SCROLL_OFFSET } from "@/lib/constants";
 import styles from "@/components/rag/rag.module.css";
-
-const GUEST_CONFIG = {
-  apiUrl: "https://rag.prateeq.in",
-  tenantId: "00000000-0000-0000-0000-000000000000",
-  apiKey: "ret_live_GuestAccessKey2026.ReadOnlyChat",
-  userId: "00000000-0000-0000-0000-000000000001",
-};
 
 export default function RagLandingPage() {
   const [copied, setCopied] = useState(false);
   const lenis = useLenis();
-
-  const guestClient = useMemo(() => new RetrieverClient(GUEST_CONFIG), []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -246,11 +235,13 @@ export default function RagLandingPage() {
         <section className={styles.demoSection} id="demo">
           <h2 className={styles.demoSectionTitle}>Experience retriever AI Live</h2>
           <p className={styles.demoSectionSub}>
-            Ask questions, test semantic caching, and download presigned citations in real time.
+            Sign in to try a tenant-scoped workspace. Demo keys are not embedded in this public page.
           </p>
 
           <div className={styles.heroDemoSandbox}>
-            <ChatPanel client={guestClient} hidden={false} />
+            <Link href="/rag/login" className="comic-btn comic-btn-blue">
+              🔐 Sign in to try Retriever AI
+            </Link>
           </div>
         </section>
       </ScrollSection>

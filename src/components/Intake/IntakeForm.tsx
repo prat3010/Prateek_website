@@ -13,7 +13,6 @@ import {
   ShieldCheck,
   Layers,
   X,
-  Lock,
   Info,
   Sparkles,
   Check,
@@ -310,10 +309,6 @@ interface IntakeFormData {
       localStorage.setItem('prateeq_scoping_draft', JSON.stringify(formData));
     } catch {}
   }, [formData]);
-
-  const isFormValid = useMemo(() => {
-    return formData.agreedToTerms;
-  }, [formData.agreedToTerms]);
 
   const currentArchetype = useMemo(() => {
     return goals.find(g => g.label === formData.projectGoal) || goals[0];
@@ -1479,7 +1474,6 @@ interface IntakeFormData {
                               const isLegacyRequired = formData.projectStartType === 'legacy_rebuild' && m.autoIncludeOnLegacy;
                               const isChecked = isCompulsory || isLegacyRequired || formData.selectedFeatures.includes(m.label);
                               const isLocked = isCompulsory || isLegacyRequired;
-                              const isPopoverOpen = activePopoverId === m.id;
                               return (
                                 <label
                                   key={m.id}

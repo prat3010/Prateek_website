@@ -538,7 +538,7 @@ export default function SiteInfoConsole() {
       case 'help':
         response = [
           { text: 'Available commands:', type: 'success' },
-          { text: '  ask <query>  - Query Supabase vector memory for codebase ASTs & docs', type: 'output' },
+          { text: '  ask <query>  - Query Retriever Concierge vector memory for platform specs & docs', type: 'output' },
           { text: '  projects   - List portfolio projects and tags', type: 'output' },
           { text: '  partner    - Print Sales Partner & Broker Agreement with PDF links', type: 'output' },
           { text: '  system     - Show CPU, memory, and display metrics', type: 'output' },

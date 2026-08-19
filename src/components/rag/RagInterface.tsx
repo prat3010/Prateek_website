@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { getConfig, saveConfig, clearConfig, RetrieverClient, type RetrieverConfig } from "@/lib/rag-client";
+import { RetrieverClient, type RetrieverConfig } from "@/lib/rag-client";
 import { RagErrorBoundary } from "./ErrorBoundary";
 import { ConfigPanel } from "./ConfigPanel";
 import { ChatPanel } from "./ChatPanel";
@@ -15,22 +15,18 @@ type Tab = "config" | "chat" | "search" | "documents" | "team" | "telemetry";
 
 export default function RagInterface() {
   const [tab, setTab] = useState<Tab>("config");
-  const [config, setConfig] = useState<RetrieverConfig | null>(() => typeof window !== "undefined" ? getConfig() : null);
-  const [client, setClient] = useState<RetrieverClient | null>(() => {
-    if (typeof window === "undefined") return null;
-    const c = getConfig();
-    return c ? new RetrieverClient(c) : null;
-  });
+  // API and BYOK credentials intentionally live only for this browser tab.
+  // Persisting them in localStorage makes any XSS issue an account compromise.
+  const [config, setConfig] = useState<RetrieverConfig | null>(null);
+  const [client, setClient] = useState<RetrieverClient | null>(null);
 
   function handleSaveConfig(c: RetrieverConfig) {
-    saveConfig(c);
     setConfig(c);
     setClient(new RetrieverClient(c));
     setTab("chat");
   }
 
   function handleClear() {
-    clearConfig();
     setConfig(null);
     setClient(null);
   }

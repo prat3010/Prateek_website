@@ -7,22 +7,6 @@ export interface RetrieverConfig {
   llmProvider?: string;
 }
 
-const STORAGE_KEY = "rag_config";
-
-export function getConfig(): RetrieverConfig | null {
-  if (typeof window === "undefined") return null;
-  const raw = localStorage.getItem(STORAGE_KEY);
-  return raw ? JSON.parse(raw) : null;
-}
-
-export function saveConfig(config: RetrieverConfig) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
-}
-
-export function clearConfig() {
-  localStorage.removeItem(STORAGE_KEY);
-}
-
 const REQUEST_TIMEOUT = 90_000;
 const MAX_RETRIES = 2;
 
@@ -47,11 +31,9 @@ async function fetchWithRetry(url: string, options: RequestInit, retries = MAX_R
 }
 
 const UUID_REGEX = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
-const DEFAULT_GUEST_USER_ID = "00000000-0000-0000-0000-000000000001";
-
-function sanitizeUserId(userId?: string): string {
+function requireUserId(userId?: string): string {
   if (userId && UUID_REGEX.test(userId)) return userId;
-  return DEFAULT_GUEST_USER_ID;
+  throw new Error("A valid authenticated user ID is required for RAG requests.");
 }
 
 export class RetrieverClient {
@@ -63,7 +45,7 @@ export class RetrieverClient {
 
   private async request<T>(path: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.config.apiUrl.replace(/\/$/, "")}${path}`;
-    const validUserId = sanitizeUserId(this.config.userId);
+    const validUserId = requireUserId(this.config.userId);
     const headers: Record<string, string> = {
       "Authorization": `Bearer ${this.config.apiKey}`,
       "X-User-ID": validUserId,
@@ -103,7 +85,7 @@ export class RetrieverClient {
   }
 
   async createSession() {
-    const validUserId = sanitizeUserId(this.config.userId);
+    const validUserId = requireUserId(this.config.userId);
     return this.request<{ sessionId: string; createdAt: string }>(
       `/v1/tenants/${this.config.tenantId}/chat/sessions`,
       { method: "POST", body: JSON.stringify({ user_id: validUserId }) },
@@ -112,7 +94,7 @@ export class RetrieverClient {
 
   async chat(sessionId: string, message: string, signal?: AbortSignal): Promise<ReadableStream<Uint8Array> | null> {
     const url = `${this.config.apiUrl.replace(/\/$/, "")}/v1/tenants/${this.config.tenantId}/chat/sessions/${sessionId}/messages`;
-    const validUserId = sanitizeUserId(this.config.userId);
+    const validUserId = requireUserId(this.config.userId);
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${this.config.apiKey}`,

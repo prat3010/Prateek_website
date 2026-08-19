@@ -1,0 +1,33 @@
+# RAG Ingestion Ignore List
+.env*
+*.env
+*.pem
+*.key
+*secret*
+SUPABASE_SERVICE_ROLE_KEY
+RESEND_API_KEY
+RECAPTCHA_SECRET_KEY
+GEMINI_API_KEY
+SYNC_API_KEY
+
+# Virtual environments and dependencies
+node_modules/
+.venv*/
+**/venv/
+__pycache__/
+.git/
+.next/
+dist/
+build/
+out/
+
+# Lock files and generated logs
+package-lock.json
+git-log.json
+wobblyPaths.generated.ts
+*.log
+*.png
+*.jpg
+*.jpeg
+*.svg
+*.pdf

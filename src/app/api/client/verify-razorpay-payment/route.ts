@@ -37,7 +37,10 @@ export async function POST(req: Request) {
         .update(`${razorpayOrderId}|${razorpayPaymentId}`)
         .digest('hex');
 
-      if (expectedSignature !== razorpaySignature) {
+      if (
+        expectedSignature.length !== razorpaySignature.length ||
+        !crypto.timingSafeEqual(Buffer.from(expectedSignature), Buffer.from(razorpaySignature))
+      ) {
         console.warn('Razorpay signature mismatch:', { expectedSignature, razorpaySignature });
         return NextResponse.json({ error: 'Payment signature verification failed.' }, { status: 400 });
       }
@@ -47,42 +50,53 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, message: 'Payment acknowledged (degraded mode).' });
     }
 
-    const nowIso = new Date().toISOString();
+    // Verify that both the project scope and the Razorpay order belong to the
+    // authenticated client. The service-role database client bypasses RLS, so
+    // these filters are mandatory authorization checks, not just convenience.
+    const { data: scope, error: scopeError } = await supabase
+      .from('client_scopes')
+      .select('id, deposit_paid')
+      .eq('scope_code', scopeCode)
+      .eq('client_email', clientEmail)
+      .maybeSingle();
 
-    // 1. Update Invoices Ledger
-    try {
-      await supabase
-        .from('invoices')
-        .update({
-          payment_status: 'paid',
-          paid_at: nowIso,
-          razorpay_payment_id: razorpayPaymentId,
-          updated_at: nowIso,
-        })
-        .eq('razorpay_order_id', razorpayOrderId);
-    } catch (invErr) {
-      console.warn('Invoice update error:', invErr);
+    if (scopeError) {
+      console.error('Could not load payment scope:', scopeError);
+      return NextResponse.json({ error: 'Could not load payment scope.' }, { status: 500 });
+    }
+    if (!scope) {
+      return NextResponse.json({ error: 'Payment scope was not found.' }, { status: 404 });
+    }
+    if (scope.deposit_paid) {
+      return NextResponse.json({ error: 'Deposit has already been recorded for this scope.' }, { status: 409 });
     }
 
-    // 2. Update client_scopes status & milestone stage
-    try {
-      await supabase
-        .from('client_scopes')
-        .update({
-          deposit_paid: true,
-          delivery_stage: 'engineering',
-          status: 'Deposit Paid — In Development',
-          updated_at: nowIso,
-        })
-        .eq('scope_code', scopeCode);
-    } catch (scopeErr) {
-      console.warn('Client scope update error:', scopeErr);
+    const { data: invoice, error: invoiceError } = await supabase
+      .from('invoices')
+      .select('id, payment_status, razorpay_payment_id')
+      .eq('razorpay_order_id', razorpayOrderId)
+      .eq('scope_id', scope.id)
+      .eq('customer_email', clientEmail)
+      .maybeSingle();
+
+    if (invoiceError) {
+      console.error('Could not load payment invoice:', invoiceError);
+      return NextResponse.json({ error: 'Could not load payment invoice.' }, { status: 500 });
+    }
+    if (!invoice) {
+      return NextResponse.json({ error: 'Payment invoice was not found.' }, { status: 404 });
+    }
+    if (invoice.payment_status === 'paid' || invoice.razorpay_payment_id) {
+      return NextResponse.json({ error: 'This payment has already been recorded.' }, { status: 409 });
     }
 
+    // Razorpay's signed webhook is the sole authority allowed to make the
+    // invoice and scope paid. A browser callback can prove it received a
+    // Razorpay response, but it must not mutate the commercial ledger.
     return NextResponse.json({
       success: true,
-      message: 'Payment verified and scope deposit locked successfully!',
-    });
+      message: 'Payment signature verified. Your workspace will activate once the provider webhook is processed.',
+    }, { status: 202 });
   } catch (err: unknown) {
     console.error('Verify Razorpay Payment API error:', err);
     return NextResponse.json(
