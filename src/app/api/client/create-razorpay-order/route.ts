@@ -151,13 +151,14 @@ export async function POST(req: Request) {
     const orderData = await razorpayRes.json();
 
     // Calculate rich invoice breakdown with SAC code and tax details
-    const itemDescription = `50% deposit lock for project scope ${scopeCode}`;
+    const percentageText = isThreePart ? '40%' : '50%';
+    const itemDescription = `${percentageText} deposit lock for project scope ${scopeCode}`;
     const invoiceCalc = calculateInvoiceTotals({
       currency: originalCurrency,
       place_of_supply: 'Delhi',
       line_items: [
         {
-          name: `Scope Deposit (50%) — ${scope.company_name || scopeCode}`,
+          name: `Scope Deposit (${percentageText}) — ${scope.company_name || scopeCode}`,
           description: itemDescription,
           sac_hsn: '998314',
           rate: depositAmount,
@@ -180,7 +181,7 @@ export async function POST(req: Request) {
         is_gst: invoiceCalc.is_gst,
         line_items: invoiceCalc.line_items,
         tax_breakup: invoiceCalc.tax_breakup,
-        milestone_name: '50% Scope Deposit & Development Lock',
+        milestone_name: `${percentageText} Scope Deposit & Development Lock`,
         amount: invoiceCalc.grand_total,
         currency: originalCurrency,
         payment_status: 'pending',

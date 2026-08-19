@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
+import { isAdminEmail } from '@/lib/auth';
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://osaqaemntuzrjouzobvx.supabase.co';
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
@@ -6,6 +8,14 @@ const SYSTEM_TENANT_ID = '00000000-0000-0000-0000-000000000000';
 
 export async function POST(req: NextRequest) {
   try {
+    const userEmail = await getVerifiedSessionEmail(req);
+    if (!userEmail) {
+      return NextResponse.json({ error: 'Unauthorized: Authentication required' }, { status: 401 });
+    }
+    if (!isAdminEmail(userEmail)) {
+      return NextResponse.json({ error: 'Forbidden: Admin access required to query system memory' }, { status: 403 });
+    }
+
     const body = await req.json();
     const queryStr = (body.query || '').trim();
 

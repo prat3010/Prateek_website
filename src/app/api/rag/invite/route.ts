@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     if (!targetTenantId) {
       const { data: memberRecord } = await supabase
         .from('rag_tenant_members')
-        .select('tenant_id, role')
+        .select('tenant_id')
         .eq('email', callerEmail)
         .maybeSingle();
 
@@ -44,6 +44,28 @@ export async function POST(req: Request) {
 
     if (!targetTenantId) {
       return NextResponse.json({ error: 'No active RAG tenant found for user session.' }, { status: 404 });
+    }
+
+    // Assert caller is an owner or admin of targetTenantId
+    const { data: callerMembership } = await supabase
+      .from('rag_tenant_members')
+      .select('role')
+      .eq('email', callerEmail)
+      .eq('tenant_id', targetTenantId)
+      .maybeSingle();
+
+    if (!callerMembership || !['owner', 'admin'].includes(callerMembership.role)) {
+      return NextResponse.json(
+        { error: 'Forbidden: Only tenant owners or admins can invite team members.' },
+        { status: 403 }
+      );
+    }
+
+    if (role === 'owner' && callerMembership.role !== 'owner') {
+      return NextResponse.json(
+        { error: 'Forbidden: Only workspace owners can assign owner role.' },
+        { status: 403 }
+      );
     }
 
     // 2. Insert or update rag_tenant_members record in Supabase DB

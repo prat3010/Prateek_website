@@ -1,11 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
+import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
+import { isAdminEmail } from '@/lib/auth';
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
 const CONTACT_EMAIL_TO = process.env.CONTACT_EMAIL_TO || '3010prateeksharma@gmail.com';
 
 export async function POST(req: NextRequest) {
   try {
+    const userEmail = await getVerifiedSessionEmail(req);
+    if (!userEmail) {
+      return NextResponse.json({ error: 'Unauthorized: Authentication required' }, { status: 401 });
+    }
+    if (!isAdminEmail(userEmail)) {
+      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    }
+
     const body = await req.json();
     const { leadId, action, editedPitch } = body;
 

@@ -16,9 +16,22 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const requestedTenantId = searchParams.get('tenantId');
 
+    // First check caller's membership in the target tenant
     let tenantId = requestedTenantId;
 
-    if (!tenantId) {
+    if (tenantId) {
+      // Confirm caller belongs to requestedTenantId
+      const { data: callerMembership } = await supabase
+        .from('rag_tenant_members')
+        .select('tenant_id')
+        .eq('email', callerEmail)
+        .eq('tenant_id', tenantId)
+        .maybeSingle();
+
+      if (!callerMembership) {
+        return NextResponse.json({ error: 'Forbidden: Access denied to requested tenant workspace.' }, { status: 403 });
+      }
+    } else {
       const { data: memberRecord } = await supabase
         .from('rag_tenant_members')
         .select('tenant_id')
@@ -74,16 +87,41 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: 'memberId or email is required.' }, { status: 400 });
     }
 
-    let query = supabase.from('rag_tenant_members').delete();
+    // Look up target member first to identify target tenant
+    let targetQuery = supabase.from('rag_tenant_members').select('id, tenant_id, role, email');
     if (memberId) {
-      query = query.eq('id', memberId);
-    } else if (email) {
-      query = query.eq('email', email);
+      targetQuery = targetQuery.eq('id', memberId);
+    } else {
+      targetQuery = targetQuery.eq('email', email);
+    }
+    const { data: targetMember, error: findError } = await targetQuery.maybeSingle();
+
+    if (findError || !targetMember) {
+      return NextResponse.json({ error: 'Team member not found.' }, { status: 404 });
     }
 
-    const { error } = await query;
-    if (error) {
-      console.error('Failed to remove team member from Supabase:', error.message);
+    // Verify caller is an owner or admin of targetMember.tenant_id
+    const { data: callerRoleRecord } = await supabase
+      .from('rag_tenant_members')
+      .select('role')
+      .eq('email', callerEmail)
+      .eq('tenant_id', targetMember.tenant_id)
+      .maybeSingle();
+
+    if (!callerRoleRecord || !['owner', 'admin'].includes(callerRoleRecord.role)) {
+      return NextResponse.json(
+        { error: 'Forbidden: Only tenant owners or admins can remove team members.' },
+        { status: 403 }
+      );
+    }
+
+    const { error: deleteError } = await supabase
+      .from('rag_tenant_members')
+      .delete()
+      .eq('id', targetMember.id);
+
+    if (deleteError) {
+      console.error('Failed to remove team member from Supabase:', deleteError.message);
       return NextResponse.json({ error: 'Failed to remove team member.' }, { status: 500 });
     }
 
@@ -96,3 +134,4 @@ export async function DELETE(req: Request) {
     );
   }
 }
+

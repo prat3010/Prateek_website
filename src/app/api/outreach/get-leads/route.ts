@@ -1,8 +1,18 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
+import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
+import { isAdminEmail } from '@/lib/auth';
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    const userEmail = await getVerifiedSessionEmail(req);
+    if (!userEmail) {
+      return NextResponse.json({ error: 'Unauthorized: Authentication required' }, { status: 401 });
+    }
+    if (!isAdminEmail(userEmail)) {
+      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    }
+
     if (!supabase) {
       return NextResponse.json({ leads: [] });
     }

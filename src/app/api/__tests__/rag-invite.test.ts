@@ -1,26 +1,27 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('server-only', () => ({}));
-vi.mock('@/data/supabase', () => ({
-  supabase: {
-    from: () => ({
+vi.mock('@/data/supabase', () => {
+  const createChainableMock = () => {
+    const chain: Record<string, any> = {};
+    chain.select = () => chain;
+    chain.delete = () => chain;
+    chain.upsert = () => ({
       select: () => ({
-        eq: () => ({
-          maybeSingle: () => Promise.resolve({ data: { tenant_id: 'tenant-123', role: 'owner' } }),
-          order: () => Promise.resolve({ data: [{ id: '1', email: 'member@example.com', role: 'member', created_at: new Date().toISOString() }] }),
-        }),
+        single: () => Promise.resolve({ data: { id: 'm-1', tenant_id: 'tenant-123', email: 'invited@example.com', role: 'member' }, error: null }),
       }),
-      upsert: () => ({
-        select: () => ({
-          single: () => Promise.resolve({ data: { id: 'm-1', tenant_id: 'tenant-123', email: 'invited@example.com', role: 'member' }, error: null }),
-        }),
-      }),
-      delete: () => ({
-        eq: () => Promise.resolve({ error: null }),
-      }),
-    }),
-  },
-}));
+    });
+    chain.eq = () => chain;
+    chain.order = () => Promise.resolve({ data: [{ id: '1', email: 'member@example.com', role: 'member', created_at: new Date().toISOString() }] });
+    chain.maybeSingle = () => Promise.resolve({ data: { id: 'm-1', tenant_id: 'tenant-123', role: 'owner', email: 'owner@example.com' } });
+    return chain;
+  };
+  return {
+    supabase: {
+      from: () => createChainableMock(),
+    },
+  };
+});
 
 vi.mock('@/lib/sessionVerify', () => ({
   getVerifiedSessionEmail: vi.fn(async (req: Request) => {

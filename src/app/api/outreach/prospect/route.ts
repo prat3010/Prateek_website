@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
+import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
+import { isAdminEmail } from '@/lib/auth';
 
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
@@ -67,6 +69,14 @@ async function searchLiveWeb(query: string): Promise<WebSearchResult[]> {
 
 export async function POST(req: NextRequest) {
   try {
+    const userEmail = await getVerifiedSessionEmail(req);
+    if (!userEmail) {
+      return NextResponse.json({ error: 'Unauthorized: Authentication required' }, { status: 401 });
+    }
+    if (!isAdminEmail(userEmail)) {
+      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    }
+
     if (!supabase || !SUPABASE_SERVICE_KEY) {
       return NextResponse.json({ error: 'Supabase configuration missing' }, { status: 500 });
     }
