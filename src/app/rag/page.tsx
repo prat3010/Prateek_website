@@ -179,6 +179,22 @@ export default function RagLandingPage() {
             </div>
 
             <div className={styles.featureCard}>
+              <div className={styles.featureIcon}>🕸️</div>
+              <h3 className={styles.featureCardTitle}>GraphRAG Knowledge Engine</h3>
+              <p className={styles.featureCardDesc}>
+                Traverses multi-hop entity relationships and knowledge triples (&quot;Subject &rarr; Predicate &rarr; Object&quot;) for complex analytical queries.
+              </p>
+            </div>
+
+            <div className={styles.featureCard}>
+              <div className={styles.featureIcon}>👁️</div>
+              <h3 className={styles.featureCardTitle}>Multi-Modal Vision & PP-OCRv4</h3>
+              <p className={styles.featureCardDesc}>
+                Extracts text, charts, and image diagrams using Baidu PP-OCRv4 deep learning engine with LLM Vision API fallback.
+              </p>
+            </div>
+
+            <div className={styles.featureCard}>
               <div className={styles.featureIcon}>📥</div>
               <h3 className={styles.featureCardTitle}>Presigned PDF Downloads</h3>
               <p className={styles.featureCardDesc}>

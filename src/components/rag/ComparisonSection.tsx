@@ -41,6 +41,18 @@ export function ComparisonSection() {
       highlight: true,
     },
     {
+      feature: "Knowledge Graph Traversal",
+      retriever: "GraphRAG Multi-Hop Triples (Subject -- Predicate --> Object)",
+      others: "None (Vector Similarity Only)",
+      highlight: true,
+    },
+    {
+      feature: "Multi-Modal Document Parsing",
+      retriever: "Baidu PP-OCRv4 Deep Learning + LLM Vision Engine",
+      others: "Plain Text Extraction / Fails on Scanned PDFs & Charts",
+      highlight: true,
+    },
+    {
       feature: "Multi-Tenant Security",
       retriever: "Isolated Tenant Schema + AES-256 Key Encryption",
       others: "Shared Unencrypted Context",
