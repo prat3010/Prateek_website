@@ -53,6 +53,24 @@ export function ComparisonSection() {
       highlight: true,
     },
     {
+      feature: "Live Web Grounding Fallback",
+      retriever: "Automated Tavily & Brave Search Integration",
+      others: "None (Fails when internal docs lack context)",
+      highlight: true,
+    },
+    {
+      feature: "Metadata & Tag Filtering",
+      retriever: "Self-Querying Natural Language to SQL JSONB Filters",
+      others: "Manual Hardcoded Tags / No Structured Filters",
+      highlight: false,
+    },
+    {
+      feature: "Security & Compliance Audit",
+      retriever: "SHA-256 Cryptographic Audit Chain & 90-Day Retention Pruning",
+      others: "Unverified Plain Text Logs / Manual Deletion",
+      highlight: true,
+    },
+    {
       feature: "Multi-Tenant Security",
       retriever: "Isolated Tenant Schema + AES-256 Key Encryption",
       others: "Shared Unencrypted Context",

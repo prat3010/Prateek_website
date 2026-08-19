@@ -19,7 +19,7 @@ curl -N -X POST https://rag.prateeq.in/v1/tenants/YOUR_TENANT_ID/chat/sessions/S
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "X-User-ID: YOUR_USER_ID" \\
   -H "Content-Type: application/json" \\
-  -d '{"query": "What are your core platform security SLA requirements?", "stream": true}'`,
+  -d '{"query": "What are your core platform security SLA requirements?", "stream": true, "web_search_grounding": true, "metadata_filter": {"year": 2026}}'`,
 
     python: `import httpx
 

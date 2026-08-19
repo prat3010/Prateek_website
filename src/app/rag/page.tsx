@@ -209,6 +209,46 @@ export default function RagLandingPage() {
                 Pre-indexes past query vectors to serve instant cached responses, lowering API costs and delivering sub-second speeds.
               </p>
             </div>
+
+            <div className={styles.featureCard}>
+              <div className={styles.featureIcon}>🌐</div>
+              <h3 className={styles.featureCardTitle}>Live Web Search Grounding</h3>
+              <p className={styles.featureCardDesc}>
+                Automatically falls back to Tavily &amp; Brave Search APIs for real-time web context when internal documents are silent.
+              </p>
+            </div>
+
+            <div className={styles.featureCard}>
+              <div className={styles.featureIcon}>🎯</div>
+              <h3 className={styles.featureCardTitle}>Self-Querying Metadata Filters</h3>
+              <p className={styles.featureCardDesc}>
+                Converts natural language queries (&quot;invoices from Q3 above $5,000&quot;) into structured PostgreSQL JSONB filters automatically.
+              </p>
+            </div>
+
+            <div className={styles.featureCard}>
+              <div className={styles.featureIcon}>🔍</div>
+              <h3 className={styles.featureCardTitle}>Parent-Child Context Expansion</h3>
+              <p className={styles.featureCardDesc}>
+                Embeds precise small chunks while automatically restoring full parent document context during generation.
+              </p>
+            </div>
+
+            <div className={styles.featureCard}>
+              <div className={styles.featureIcon}>🔌</div>
+              <h3 className={styles.featureCardTitle}>Cloud Data Connectors</h3>
+              <p className={styles.featureCardDesc}>
+                Background synchronization connectors for Notion, Google Drive, REST endpoints, and custom Webhooks.
+              </p>
+            </div>
+
+            <div className={styles.featureCard}>
+              <div className={styles.featureIcon}>🔐</div>
+              <h3 className={styles.featureCardTitle}>Cryptographic Audit Chains</h3>
+              <p className={styles.featureCardDesc}>
+                SHA-256 tamper-evident audit log chains with automated 90-day retention pruning for HIPAA &amp; GDPR compliance.
+              </p>
+            </div>
           </div>
         </section>
       </ScrollSection>
