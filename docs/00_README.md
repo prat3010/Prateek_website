@@ -33,6 +33,7 @@ Below is a summary of all documentation files, categorized by their domain.
 * [15_Performance_and_Accessibility.md](15_Performance_and_Accessibility.md): Core Web Vitals targets, Lighthouse metrics, and accessibility standards.
 * [16_Security_and_Privacy.md](16_Security_and_Privacy.md): Row-Level Security (RLS), keys protection, session verification, and data privacy rules.
 * [17_SEO_Strategy.md](17_SEO_Strategy.md): Search engine optimization rules, OG images, and structured metadata.
+* [24_RAG_App_Studio_PRD.md](24_RAG_App_Studio_PRD.md): Product Requirements Document (PRD) for the complete revamp of /rag/app SaaS Studio, including dual account architecture, 7-day trial engine, 6 core sub-views, team multi-tenancy, hybrid BYOK/managed quotas, and live visual widget studio.
 * [AI_OUTREACH_AGENT_ROADMAP.md](AI_OUTREACH_AGENT_ROADMAP.md): Strategic roadmap for 24/7 Autonomous AI Lead Prospecting, Gmail & Social Media Content Agent.
 
 ## **Operational and Implementation Rules**

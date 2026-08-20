@@ -15,7 +15,7 @@ interface ChatMessageItem {
   feedback?: "up" | "down";
 }
 
-export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; hidden: boolean }) {
+export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClient | null; hidden: boolean; isExpired?: boolean }) {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Array<ChatMessageItem>>([]);
   const [input, setInput] = useState("");
@@ -437,15 +437,15 @@ export function ChatPanel({ client, hidden }: { client: RetrieverClient | null; 
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
-            placeholder="Type a message..."
-            disabled={loading}
+            placeholder={isExpired ? "🔒 Trial Expired — Read-only mode active. Please upgrade to chat." : "Type a message..."}
+            disabled={loading || isExpired}
           />
           {loading ? (
             <button className="comic-btn comic-btn-outline" onClick={stopGeneration}>
               Stop
             </button>
           ) : (
-            <button className="comic-btn comic-btn-blue" onClick={sendMessage} disabled={!input.trim()}>
+            <button className="comic-btn comic-btn-blue" onClick={sendMessage} disabled={!input.trim() || isExpired}>
               Send
             </button>
           )}

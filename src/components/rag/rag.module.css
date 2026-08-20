@@ -1602,3 +1602,186 @@
   }
 }
 
+/* Phase 2 RAG App Studio Left Sidebar Shell */
+.studioContainer {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 1.5rem;
+  min-height: calc(100vh - 120px);
+  align-items: start;
+}
+
+.studioSidebar {
+  background: var(--surface-card, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--color-border, #333);
+  border-radius: var(--border-radius-xl, 12px);
+  padding: 1.25rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: sticky;
+  top: 80px;
+}
+
+.sidebarTitle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted, #888);
+  padding: 0.25rem 0.75rem 0.5rem;
+  margin-bottom: 0.25rem;
+  border-bottom: 1px solid var(--color-border, #222);
+}
+
+.sidebarNav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.sidebarItem {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--color-text, #ccc);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sidebarItem:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text, #fff);
+}
+
+.sidebarItemActive {
+  background: rgba(90, 142, 182, 0.18) !important;
+  color: var(--color-link, #5A8EB6) !important;
+  font-weight: 700;
+  border-left: 3px solid var(--color-link, #5A8EB6);
+}
+
+.trialBanner {
+  background: linear-gradient(90deg, rgba(255, 171, 0, 0.15), rgba(255, 109, 0, 0.15));
+  border: 1px solid rgba(255, 171, 0, 0.4);
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: #FFB300;
+  margin-bottom: 1rem;
+}
+
+.mobileToggleBtn {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 6px;
+  border: 1px solid var(--color-border, #444);
+  background: var(--surface-card, #1e293b);
+  color: var(--color-text, #fff);
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 900px) {
+  .studioContainer {
+    grid-template-columns: 1fr;
+  }
+
+  .mobileToggleBtn {
+    display: flex;
+  }
+
+  .studioSidebar {
+    position: static;
+  }
+}
+
+/* Phase 3 Core & Advanced Sub-Views CSS */
+.subTabNav {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--color-border, #333);
+  padding-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.subTabBtn {
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--color-text-muted, #999);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.subTabBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text, #fff);
+}
+
+.subTabBtnActive {
+  background: rgba(90, 142, 182, 0.15);
+  border-color: rgba(90, 142, 182, 0.3);
+  color: var(--color-link, #5A8EB6);
+  font-weight: 700;
+}
+
+.graphCanvas {
+  background: #090d16;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 1rem;
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.benchmarkGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.scoreCard {
+  background: var(--surface-card, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--color-border, #333);
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+
+.widgetPreviewCanvas {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 1.25rem;
+  min-height: 340px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+
+
