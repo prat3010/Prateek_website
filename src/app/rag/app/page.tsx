@@ -26,6 +26,7 @@ export default function RagAppStudioPage() {
   const [tenantId, setTenantId] = useState<string>("");
   const [apiKey, setApiKey] = useState<string>("");
   const [userId, setUserId] = useState<string>("");
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [client, setClient] = useState<RetrieverClient | null>(null);
   const [tenantLoading, setTenantLoading] = useState<boolean>(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
@@ -135,7 +136,7 @@ export default function RagAppStudioPage() {
           {user ? (
             <span className={styles.userBadgePill}>
               <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#00E676", display: "inline-block" }} />
-              {user.email}
+              {user.email} {isAdmin ? "(Owner)" : ""}
             </span>
           ) : (
             <button

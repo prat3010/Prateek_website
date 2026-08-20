@@ -117,9 +117,9 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
               </div>
 
               {results.results.map((r, i) => {
-                const isContextual = r.content.includes("[Context:") || r.metadata?.context_prepended;
+                const isContextual = r.content.includes("[Context:") || Boolean(r.metadata?.context_prepended);
                 const contextTag = isContextual
-                  ? r.content.match(/\[Context:\s*([^\]]+)\]/)?.[1] || r.metadata?.context_prefix || "Document Context"
+                  ? r.content.match(/\[Context:\s*([^\]]+)\]/)?.[1] || String(r.metadata?.context_prefix || "Document Context")
                   : null;
 
                 return (
@@ -140,7 +140,7 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
                     <p className={styles.resultContent}>{highlightText(r.content, query)}</p>
                     {(r.metadata?.filename || r.metadata?.document_id) && (
                       <p className={styles.searchDoc}>
-                        {"📄"} {r.metadata?.filename ?? r.metadata?.document_id?.slice(0, 8) ?? ""}
+                        {"📄"} {String(r.metadata?.filename ?? String(r.metadata?.document_id ?? "").slice(0, 8))}
                       </p>
                     )}
                   </div>
