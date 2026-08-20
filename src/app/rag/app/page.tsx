@@ -190,7 +190,7 @@ export default function RagAppStudioPage() {
 
         {/* Main Sub-View Content Panel Container */}
         <main className={styles.panelContainer}>
-          <OverviewPanel hidden={activeTab !== "overview"} onNavigateTab={(tab) => setActiveTab(tab as SubViewTab)} />
+          <OverviewPanel client={client} hidden={activeTab !== "overview"} onNavigateTab={(tab) => setActiveTab(tab as SubViewTab)} />
           <ChatPanel client={client} hidden={activeTab !== "chat"} isExpired={trialDaysRemaining <= 0} />
           <DocumentsPanel client={client} hidden={activeTab !== "upload"} isExpired={trialDaysRemaining <= 0} />
           <SearchPanel client={client} hidden={activeTab !== "search"} />

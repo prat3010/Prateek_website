@@ -1,14 +1,43 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { RetrieverClient } from "@/lib/rag-client";
 import styles from "./rag.module.css";
 
 interface OverviewPanelProps {
   hidden?: boolean;
+  client?: RetrieverClient | null;
   onNavigateTab?: (tab: string) => void;
 }
 
-export function OverviewPanel({ hidden, onNavigateTab }: OverviewPanelProps) {
+export function OverviewPanel({ hidden, client, onNavigateTab }: OverviewPanelProps) {
+  const [docCount, setDocCount] = useState<number | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (client && !hidden) {
+      let isMounted = true;
+      setLoading(true);
+      client
+        .listDocuments()
+        .then((docs) => {
+          if (isMounted) {
+            setDocCount(docs ? docs.length : 0);
+          }
+        })
+        .catch((err) => {
+          console.warn("[Overview] Failed to fetch document metrics:", err);
+          if (isMounted) setDocCount(0);
+        })
+        .finally(() => {
+          if (isMounted) setLoading(false);
+        });
+      return () => {
+        isMounted = false;
+      };
+    }
+  }, [client, hidden]);
+
   if (hidden) return null;
 
   return (
@@ -24,25 +53,29 @@ export function OverviewPanel({ hidden, onNavigateTab }: OverviewPanelProps) {
       <div className={styles.metricsGrid} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem", marginBottom: "1.5rem" }}>
         <div className={styles.metricCard} style={{ background: "var(--surface-card, rgba(255, 255, 255, 0.03))", border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1.25rem" }}>
           <span style={{ fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--color-text-muted, #888)" }}>Total Documents</span>
-          <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem" }}>12</div>
-          <span style={{ fontSize: "0.75rem", color: "#00E676" }}>✓ 100% Vector Indexed</span>
+          <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem" }}>
+            {loading ? "..." : docCount !== null ? docCount : 0}
+          </div>
+          <span style={{ fontSize: "0.75rem", color: docCount && docCount > 0 ? "#00E676" : "var(--color-text-muted, #888)" }}>
+            {docCount && docCount > 0 ? "✓ 100% Vector Indexed" : "No documents indexed yet"}
+          </span>
         </div>
 
         <div className={styles.metricCard} style={{ background: "var(--surface-card, rgba(255, 255, 255, 0.03))", border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1.25rem" }}>
           <span style={{ fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--color-text-muted, #888)" }}>Monthly Query Quota</span>
-          <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem" }}>142 / 1,000</div>
+          <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem" }}>0 / 1,000</div>
           <span style={{ fontSize: "0.75rem", color: "#5A8EB6" }}>Starter Trial Tier</span>
         </div>
 
         <div className={styles.metricCard} style={{ background: "var(--surface-card, rgba(255, 255, 255, 0.03))", border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1.25rem" }}>
           <span style={{ fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--color-text-muted, #888)" }}>Semantic Cache Hit Rate</span>
-          <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem" }}>84.2%</div>
-          <span style={{ fontSize: "0.75rem", color: "#00E676" }}>⚡ Sub-50ms Latency Saved</span>
+          <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem" }}>0.0%</div>
+          <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted, #888)" }}>⚡ Sub-50ms Latency Ready</span>
         </div>
 
         <div className={styles.metricCard} style={{ background: "var(--surface-card, rgba(255, 255, 255, 0.03))", border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1.25rem" }}>
           <span style={{ fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--color-text-muted, #888)" }}>Avg Query Latency</span>
-          <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem" }}>186 ms</div>
+          <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem" }}>-- ms</div>
           <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted, #888)" }}>Hybrid Rerank Active</span>
         </div>
       </div>
@@ -90,11 +123,11 @@ export function OverviewPanel({ hidden, onNavigateTab }: OverviewPanelProps) {
         <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.5rem 0.75rem", background: "var(--color-bg, #111)", borderRadius: "4px", fontSize: "0.85rem" }}>
             <span><strong>Gemini 3.6 Flash</strong> (Default Inference)</span>
-            <span style={{ color: "#00E676" }}>$0.012 (Included in Trial)</span>
+            <span style={{ color: "#00E676" }}>$0.000 (Included in Trial)</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.5rem 0.75rem", background: "var(--color-bg, #111)", borderRadius: "4px", fontSize: "0.85rem" }}>
             <span><strong>Llama 3.3 70B</strong> (Groq Fast Inference)</span>
-            <span style={{ color: "#00E676" }}>$0.008 (Included in Trial)</span>
+            <span style={{ color: "#00E676" }}>$0.000 (Included in Trial)</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.5rem 0.75rem", background: "var(--color-bg, #111)", borderRadius: "4px", fontSize: "0.85rem" }}>
             <span><strong>GPT-4o</strong> (High-Precision Fallback)</span>
