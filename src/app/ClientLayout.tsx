@@ -13,6 +13,7 @@ import { LazyMotion, domAnimation } from 'framer-motion';
 import OnboardingSelector from '@/components/ui/OnboardingSelector';
 import { AuthProvider } from '@/context/AuthContext';
 import type { ResumeData } from '@/data/resume';
+import { Toaster } from 'sonner';
 
 // Lazy load heavy client side animations
 const NoirSkyline = dynamic(() => import('@/components/effects/NoirSkyline'), { ssr: false });
@@ -39,11 +40,12 @@ function ClientLayoutContent({
   isKonamiActive: boolean; 
   profile?: ResumeData | null;
 }) {
-  const { audience } = useTheme();
+  const { audience, theme } = useTheme();
 
   return (
     <PerformanceGovernorProvider>
       <LenisProvider>
+        <Toaster position="bottom-right" theme={theme === 'noir' ? 'dark' : 'light'} richColors closeButton />
         {!isStandaloneAppRoute && <NoirSkyline />}
         {!isStandaloneAppRoute && <CursorTrail />}
         <Navbar />

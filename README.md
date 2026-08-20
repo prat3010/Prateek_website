@@ -9,7 +9,7 @@ A highly interactive, storyteller-driven personal portfolio website designed wit
 - **Styling:** CSS Modules & global unified card theme system (with fallback variables)
 - **Database / Analytics:** Supabase (portfolio content storage + custom telemetry logging via Next.js Proxy) & Vercel Web Analytics / Speed Insights
 - **Contact Service:** Resend Email API
-- **Animations & Scrolling:** Framer Motion, Lenis smooth scroll, and MediaPipe Hands API (loaded dynamically)
+- **Animations & Micro-Interactions:** Framer Motion, Lenis smooth scroll, `@number-flow/react` (odometer price tickers), `canvas-confetti` (brief submission explosions), `sonner` (theme-aware toasts), and MediaPipe Hands API (loaded dynamically)
 - **3D & Visual Effects:** Three.js (Pizza Rat) and SVG filter distortions
 
 ---

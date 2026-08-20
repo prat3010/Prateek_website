@@ -9,6 +9,7 @@ import {
   ArrowLeft,
   Layers
 } from 'lucide-react';
+import { toast } from 'sonner';
 import styles from './SiteInfoConsole.module.css';
 import type { ResumeData, MiddlemanAgreementConfig } from '@/data/resume';
 import { COMMISSION_BANDS, COMMISSION_DISBURSEMENT_WINDOW, RECURRING_COMMISSION_RATE, type CommissionBand } from '@/lib/commission';
@@ -323,6 +324,7 @@ export default function SiteInfoConsole() {
       if (sub === 'clear' || sub === 'wipe') {
         if (typeof localStorage !== 'undefined') localStorage.clear();
         if (typeof sessionStorage !== 'undefined') sessionStorage.clear();
+        toast.success('Storage Wiped', { description: 'Cleared all local and session storage caches.' });
         setTerminalHistory(prev => [
           ...prev,
           { text: 'STORAGE INVENTORY WIPED:', type: 'success' },
@@ -659,6 +661,7 @@ export default function SiteInfoConsole() {
       case 'clear':
         setTerminalHistory([]);
         setTerminalInput('');
+        toast.info('Terminal screen cleared');
         return;
       default:
         response = [

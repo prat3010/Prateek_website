@@ -20,11 +20,13 @@
   },
   "dependencies": {
     "@mediapipe/tasks-vision": "^1.0.0",
+    "@number-flow/react": "^0.6.2",
     "@react-pdf/renderer": "^4.5.1",
     "@supabase/ssr": "^0.12.4",
     "@supabase/supabase-js": "^2.106.2",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
+    "canvas-confetti": "^1.9.4",
     "framer-motion": "^12.40.0",
     "gray-matter": "^4.0.3",
     "jspdf": "^4.2.1",
@@ -39,6 +41,7 @@
     "react-markdown": "^10.1.0",
     "resend": "^6.12.4",
     "server-only": "^0.0.1",
+    "sonner": "^2.0.8",
     "three": "^0.184.0"
   },
   "devDependencies": {
@@ -46,6 +49,7 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
+    "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^20",
     "@types/pngjs": "^6.0.5",
     "@types/qrcode": "^1.5.6",

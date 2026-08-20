@@ -18,6 +18,9 @@ import {
   Check,
   Rocket
 } from 'lucide-react';
+import NumberFlow from '@number-flow/react';
+import confetti from 'canvas-confetti';
+import { toast } from 'sonner';
 import { generateQuestionnairePDF, generateQuestionnairePDFBase64, type QuestionnaireData } from '@/utils/pdfGenerator';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
@@ -522,6 +525,12 @@ interface IntakeFormData {
 
   const handleDownloadPDF = () => {
     generateQuestionnairePDF(resumeData, buildQuestionnaireData(), isNoir, currency);
+    try {
+      confetti({ particleCount: 80, spread: 65, origin: { y: 0.6 } });
+    } catch {}
+    toast.success('Commercial Proposal Generated!', {
+      description: 'Your custom scoping brief PDF is ready and downloading.',
+    });
   };
 
   // Load Google reCAPTCHA v3 script dynamically if configured
@@ -582,6 +591,12 @@ interface IntakeFormData {
     }
     setErrorMsg('');
     setSubmitting(true);
+    try {
+      confetti({ particleCount: 120, spread: 80, origin: { y: 0.5 } });
+    } catch {}
+    toast.success('Scope Submitted!', {
+      description: 'Preparing your client workspace environment...',
+    });
 
     try {
       // 1. Package current scoping selections into a persistent draft payload
@@ -1583,7 +1598,12 @@ interface IntakeFormData {
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '4px' }} aria-live="polite" aria-atomic="true">
                       <span style={{ fontFamily: 'var(--font-code)', fontSize: '13px', fontWeight: 800, color: 'var(--intake-summary-text)' }}>TOTAL BUILD INVESTMENT (ESTIMATE)</span>
-                      <span style={{ fontFamily: 'var(--font-code)', fontSize: '18px', fontWeight: 800, color: 'var(--intake-summary-accent)' }}>{formatPricePair(totalCost.totalINR, totalCost.totalUSD, currency)}</span>
+                      <span style={{ fontFamily: 'var(--font-code)', fontSize: '18px', fontWeight: 800, color: 'var(--intake-summary-accent)' }}>
+                        <NumberFlow
+                          value={currency === 'INR' ? totalCost.totalINR : totalCost.totalUSD}
+                          format={{ style: 'currency', currency, maximumFractionDigits: 0 }}
+                        />
+                      </span>
                     </div>
                   </div>
 
