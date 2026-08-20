@@ -12,7 +12,6 @@ import { SearchPanel } from "@/components/rag/SearchPanel";
 import { CachePanel } from "@/components/rag/CachePanel";
 import { ConfigPanel } from "@/components/rag/ConfigPanel";
 import { TeamPanel } from "@/components/rag/TeamPanel";
-import WorkspaceSwitcher from "@/components/ui/WorkspaceSwitcher";
 import styles from "@/components/rag/rag.module.css";
 
 type SubViewTab = "overview" | "chat" | "upload" | "search" | "cache" | "config" | "team";
@@ -102,60 +101,55 @@ export default function RagAppStudioPage() {
   ];
 
   return (
-    <div className={styles.landingWrapper}>
-      <WorkspaceSwitcher active="rag" />
-
-      {/* Top Telemetry & Workspace Sub-Header */}
-      <div className={styles.workspaceHeader}>
-        <div className={styles.workspaceTitleGroup}>
-          <h1 className={styles.workspaceTitle}>SaaS Studio Workspace</h1>
-          <span className={styles.heroBadge} style={{ margin: 0 }}>
-            {tenantLoading ? "Loading Workspace…" : `Tenant: ${tenantId ? tenantId.slice(0, 8) + "…" : "Demo Tier"}`}
+    <div className={styles.landingWrapper} style={{ minHeight: "100vh", background: "var(--color-bg, #0b0f19)" }}>
+      {/* Sleek Unified 56px B2B AI Studio Top Header Bar */}
+      <header className={styles.studioTopBar}>
+        <div className={styles.studioTopLeft}>
+          <Link href="/rag" className={styles.studioBrandTitle}>
+            <span>⚡</span>
+            <span>Retriever Studio</span>
+          </Link>
+          <span className={styles.tenantPill}>
+            {tenantLoading ? "Loading…" : tenantId ? `Tenant: ${tenantId.slice(0, 8)}…` : "Demo Tier"}
           </span>
+        </div>
+
+        <div className={styles.studioTopCenter}>
+          <Link
+            href="/rag#pricing"
+            className={`${styles.trialPillCompact} ${trialDaysRemaining <= 0 ? styles.trialPillExpired : ""}`}
+          >
+            <span>{trialDaysRemaining <= 0 ? "🔒" : "⏱️"}</span>
+            <span>
+              {trialDaysRemaining <= 0
+                ? "Trial Expired (Soft Paywall Active)"
+                : `${trialDaysRemaining} Days Starter Trial`}
+            </span>
+            <span style={{ fontSize: "0.7rem", opacity: 0.8 }}>➔ Upgrade</span>
+          </Link>
+        </div>
+
+        <div className={styles.studioTopRight}>
           {user ? (
-            <span className={styles.heroBadge} style={{ margin: 0, backgroundColor: "rgba(0, 230, 118, 0.15)", color: "#00E676" }}>
-              ✓ Authenticated ({user.email})
+            <span className={styles.userBadgePill}>
+              <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#00E676", display: "inline-block" }} />
+              {user.email}
             </span>
           ) : (
             <button
               onClick={() => loginWithGoogle("/rag/app")}
               className="comic-btn comic-btn-blue"
-              style={{ padding: "0.2rem 0.6rem", fontSize: "0.8rem" }}
+              style={{ padding: "0.25rem 0.65rem", fontSize: "0.78rem" }}
             >
-              Sign In for Workspace
+              Sign In
             </button>
           )}
-        </div>
 
-        <div className={styles.navLinks}>
-          {isAdmin && (
-            <Link href="/analytics" className="comic-btn comic-btn-blue">
-              🛠️ Admin Dashboard
-            </Link>
-          )}
-
-          <button className="comic-btn comic-btn-outline" onClick={handleExitStudio}>
-            ← Back to Product Landing
+          <button className={styles.exitStudioBtn} onClick={handleExitStudio}>
+            Exit Studio ➔
           </button>
         </div>
-      </div>
-
-      {/* 7-Day Free Trial Telemetry Banner */}
-      <div className={styles.trialBanner} style={trialDaysRemaining <= 0 ? { background: "rgba(255, 23, 68, 0.15)", borderColor: "#FF1744", color: "#FF1744" } : {}}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <span>{trialDaysRemaining <= 0 ? "🔒" : "⏱️"}</span>
-          <span>
-            {trialDaysRemaining <= 0 ? (
-              <strong>Trial Expired — Soft Read-Only Paywall Active</strong>
-            ) : (
-              <><strong>7-Day Free Starter Trial Active</strong> — {trialDaysRemaining} Days Remaining before soft lockout</>
-            )}
-          </span>
-        </div>
-        <Link href="/rag#pricing" className="comic-btn comic-btn-blue" style={{ padding: "0.2rem 0.6rem", fontSize: "0.75rem" }}>
-          Upgrade Plan ➔
-        </Link>
-      </div>
+      </header>
 
       {/* Mobile Drawer Toggle */}
       <button
