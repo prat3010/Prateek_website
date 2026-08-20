@@ -1601,6 +1601,7 @@ interface IntakeFormData {
                       <span style={{ fontFamily: 'var(--font-code)', fontSize: '18px', fontWeight: 800, color: 'var(--intake-summary-accent)' }}>
                         <NumberFlow
                           value={currency === 'INR' ? totalCost.totalINR : totalCost.totalUSD}
+                          locales={currency === 'INR' ? 'en-IN' : 'en-US'}
                           format={{ style: 'currency', currency, maximumFractionDigits: 0 }}
                         />
                       </span>
@@ -1810,8 +1811,25 @@ interface IntakeFormData {
                      (totalCost.brandPriceINR > 0 ? ` + Brand Collateral (${priceInCurrency(totalCost.brandPriceINR, totalCost.brandPriceUSD)})` : '')}
                   </span>
                 </div>
-                <div className={styles.stickyTotal}>
-                  {`Estimated Total: ${formatPricePair(totalCost.totalINR, totalCost.totalUSD, currency)}`}
+                <div className={styles.stickyTotal} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <span>Estimated Total: </span>
+                  {currency === 'INR' ? (
+                    <>
+                      <NumberFlow value={totalCost.totalINR} locales="en-IN" format={{ style: 'currency', currency: 'INR', maximumFractionDigits: 0 }} />
+                      <span style={{ opacity: 0.55, margin: '0 2px' }}>/</span>
+                      <span style={{ opacity: 0.72, fontSize: '0.92em' }}>
+                        <NumberFlow value={totalCost.totalUSD} locales="en-US" format={{ style: 'currency', currency: 'USD', maximumFractionDigits: 0 }} />
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <NumberFlow value={totalCost.totalUSD} locales="en-US" format={{ style: 'currency', currency: 'USD', maximumFractionDigits: 0 }} />
+                      <span style={{ opacity: 0.55, margin: '0 2px' }}>/</span>
+                      <span style={{ opacity: 0.72, fontSize: '0.92em' }}>
+                        <NumberFlow value={totalCost.totalINR} locales="en-IN" format={{ style: 'currency', currency: 'INR', maximumFractionDigits: 0 }} />
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
 

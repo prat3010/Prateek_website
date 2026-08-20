@@ -32,3 +32,10 @@
 ### 7. Single Source of Truth for Commercial Pricing & Tiers
 - **Rule:** Engine tier rates, care/maintenance plan fees, and feature pricing are strictly stored in `intakeQuestionnaireDefaults.json` and resolved via `src/lib/pricing.ts`.
 - **Constraint:** Never hardcode currency figures, absolute prices, or tier multipliers inside TypeScript UI components or frontend JSX.
+
+### 8. Full Feature Flow Pre-Audit & End-to-End Verification
+- **Rule:** Before creating, editing, or integrating any UI feature, animation, or state property:
+  1. **Exhaustive Variable/State Search:** Grep/search the entire target file and connected components for ALL render instances of target state variables (e.g. `totalCost`, `price`, `theme`). Never assume a state variable only renders in a single JSX block or summary card.
+  2. **Contract & Formatting Alignment:** Verify third-party library defaults against local domain contracts (`src/lib/pricing.ts`, `formatMoney`, `pdfTheme.ts`). Always pass explicit locale/formatting parameters (`locales={currency === 'INR' ? 'en-IN' : 'en-US'}`) matching site-wide conventions.
+  3. **Primary User Flow Coverage:** Ensure visual animations and interactive polish are integrated directly into the primary active interaction paths (e.g., sticky action toolbars, live input controls, interactive cards) rather than only on static end steps.
+- **Constraint:** Never mark a feature complete without verifying the entire end-to-end user interaction flow across all steps and screen sizes.

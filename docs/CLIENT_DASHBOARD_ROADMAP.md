@@ -148,6 +148,11 @@ timeline
 - ✅ **Feedback Quality Curves:** Visual satisfaction rating ratio (thumbs up vs thumbs down).
 - ✅ **Telemetry API:** Session-gated `/api/rag/telemetry` endpoint returning live telemetry metrics.
 
+### Phase 6: 2026 RAG Engine Full Surface Alignment (M54–M60 Alignment)
+- **Full SDK Surface Parity (M54):** Update `RetrieverClient` (`src/lib/rag-client.ts`) and Studio UI to support Context Compression toggles, Multi-Agent Consensus badges, Guardrail status alerts, and RLM execution mode.
+- **Citation Span Visualizer (M55):** Highlight exact string-span context matches in Chat Studio messages (`ChatPanel.tsx`), displaying warning tags for ungrounded citations.
+- **Interactive RLM Python REPL Studio (M59):** Dedicated RLM Studio tab (`/rag/app/rlm`) displaying interactive Python code execution streams and recursive document vault traversal visualization.
+
 ---
 
 ## 5. Client API & Database Contract Reference Table

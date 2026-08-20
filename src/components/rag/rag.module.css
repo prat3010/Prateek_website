@@ -532,6 +532,40 @@
   transform: translateY(-1px);
 }
 
+.groundedHighlight {
+  background: rgba(16, 185, 129, 0.15);
+  color: inherit;
+  border-bottom: 1.5px solid rgba(16, 185, 129, 0.5);
+  padding: 0 0.2rem;
+  border-radius: 3px;
+}
+
+.badgeGroundedExact {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 12px;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.685rem;
+  font-weight: 600;
+}
+
+.badgeUngroundedWarning {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 12px;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.685rem;
+  font-weight: 600;
+}
+
 /* Feedback Modal Overlay (Portal) */
 .feedbackBackdrop {
   position: fixed;

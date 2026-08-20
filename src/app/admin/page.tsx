@@ -102,6 +102,13 @@ export default function AdminControlCenter() {
     return () => { isMounted = false; };
   }, [user, getAccessToken]);
 
+  useEffect(() => {
+    if (actionMessage) {
+      const timer = setTimeout(() => setActionMessage(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [actionMessage]);
+
   const handleGenerateProspects = async () => {
     setLoadingLeads(true);
     try {

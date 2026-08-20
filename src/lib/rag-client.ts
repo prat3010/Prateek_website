@@ -213,6 +213,56 @@ export class RetrieverClient {
       }
     );
   }
+
+  async compressContext(text: string, compressionRatio = 0.5): Promise<import("./rag-types").CompressionResponse> {
+    return this.request<import("./rag-types").CompressionResponse>(
+      `/v1/tenants/${this.config.tenantId}/context/compress`,
+      {
+        method: "POST",
+        body: JSON.stringify({ text, target_ratio: compressionRatio }),
+      }
+    );
+  }
+
+  async generateConsensus(
+    query: string,
+    options?: { generatorProvider?: string; criticProvider?: string }
+  ): Promise<import("./rag-types").ConsensusResponse> {
+    return this.request<import("./rag-types").ConsensusResponse>(
+      `/v1/tenants/${this.config.tenantId}/consensus/generate`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          query,
+          generator_provider: options?.generatorProvider,
+          critic_provider: options?.criticProvider,
+        }),
+      }
+    );
+  }
+
+  async executeRlmSubroutine(
+    query: string,
+    maxSteps = 5
+  ): Promise<import("./rag-types").RlmExecutionResponse> {
+    return this.request<import("./rag-types").RlmExecutionResponse>(
+      `/v1/rlm/execute`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          tenant_id: this.config.tenantId,
+          query,
+          max_steps: maxSteps,
+        }),
+      }
+    );
+  }
+
+  async getOnlineEvaluationSummary(): Promise<import("./rag-types").OnlineEvaluationSummaryResponse> {
+    return this.request<import("./rag-types").OnlineEvaluationSummaryResponse>(
+      `/v1/admin/tenants/${this.config.tenantId}/evaluation/online/summary`
+    );
+  }
 }
 
 export interface GraphCapabilitiesResponse {

@@ -67,6 +67,46 @@ async function searchLiveWeb(query: string): Promise<WebSearchResult[]> {
   }
 }
 
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+
+async function generateGeminiPitch(companyName: string, domain: string, snippet: string): Promise<string> {
+  const fallbackPitch = `Hi ${companyName} Team,\n\nI came across ${domain} while researching B2B software solutions (${snippet.slice(0, 90)}...).\n\nWe recently shipped Next.js 16 + Supabase RAG architectures with sub-100ms analytics and instant commercial PDF proposal exports.\n\nI created a custom interactive scoping spec for your tech stack: https://prateeq.in/scoping?engine=saas\n\nWould love to connect for a quick 5-minute showcase!\n\nBest,\nPrateek Sharma`;
+
+  if (!GEMINI_API_KEY) return fallbackPitch;
+
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              {
+                text: `Write a concise 4-sentence B2B outreach email pitch to the founder/CTO of ${companyName} (${domain}).
+Company context: ${snippet}
+Rules:
+1. Start with a direct custom hook referencing their company (${domain}).
+2. Highlight expertise in Next.js 16, Supabase, pgvector RAG, and micro-SaaS architecture.
+3. Include the CTA deep link: https://prateeq.in/scoping?engine=saas
+4. Sign off from Prateek Sharma.
+Do NOT include markdown formatting or subject lines. Just the email body prose.`,
+              },
+            ],
+          },
+        ],
+      }),
+    });
+
+    if (!res.ok) return fallbackPitch;
+    const data = await res.json();
+    const generatedText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    return generatedText ? generatedText.trim() : fallbackPitch;
+  } catch {
+    return fallbackPitch;
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const userEmail = await getVerifiedSessionEmail(req);
@@ -97,14 +137,15 @@ export async function POST(req: NextRequest) {
         try {
           const domain = new URL(res.link).hostname.replace('www.', '');
           const companyName = domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1);
-          
+          const customPitch = await generateGeminiPitch(companyName, domain, res.snippet);
+
           prospectsToInsert.push({
             lead_name: `Founder / CTO`,
             company: `${companyName} (${domain})`,
             role: 'Managing Director & Tech Lead',
             email: `contact@${domain}`,
             source_url: res.link,
-            ai_generated_pitch: `Hi ${companyName} Team,\n\nI came across ${domain} while researching B2B platforms (${res.snippet.slice(0, 100)}...).\n\nWe recently shipped Next.js 16 + Supabase RAG architectures with sub-100ms analytics and instant commercial PDF proposal exports.\n\nI built a custom interactive scoping spec for your tech stack: https://prateeq.in/scoping?engine=saas\n\nWould love to connect for a quick 5-minute showcase!\n\nBest,\nPrateek Sharma`,
+            ai_generated_pitch: customPitch,
           });
         } catch {}
       }

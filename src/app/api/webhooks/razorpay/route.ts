@@ -119,18 +119,38 @@ export async function POST(req: Request) {
     } else if (event === 'subscription.charged' || event === 'subscription.authenticated') {
       const subEntity = payload.payload?.subscription?.entity;
       const subId = subEntity?.id;
+      const clientEmail = subEntity?.notes?.client_email;
+      const planId = subEntity?.plan_id || 'plan_starter_inr';
       const nowIso = new Date().toISOString();
 
       if (subId) {
         await supabase
           .from('rag_subscriptions')
-          .update({
-            is_active: true,
-            razorpay_subscription_id: subId,
-            current_period_end: subEntity?.current_end ? new Date(subEntity.current_end * 1000).toISOString() : null,
-            updated_at: nowIso,
-          })
-          .eq('razorpay_subscription_id', subId);
+          .upsert(
+            {
+              razorpay_subscription_id: subId,
+              plan_tier: planId.includes('pro') ? 'pro' : planId.includes('business') ? 'business' : 'starter',
+              is_active: true,
+              current_period_end: subEntity?.current_end ? new Date(subEntity.current_end * 1000).toISOString() : null,
+              updated_at: nowIso,
+            },
+            { onConflict: 'razorpay_subscription_id' }
+          );
+
+        if (clientEmail) {
+          try {
+            await supabase
+              .from('rag_tenant_members')
+              .upsert(
+                {
+                  email: clientEmail,
+                  role: 'owner',
+                  updated_at: nowIso,
+                },
+                { onConflict: 'email' }
+              );
+          } catch {}
+        }
       }
     }
 

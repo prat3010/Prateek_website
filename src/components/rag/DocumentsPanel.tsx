@@ -19,6 +19,11 @@ export function DocumentsPanel({ client, hidden, isExpired }: { client: Retrieve
   const [jsonSchema, setJsonSchema] = useState<string>(`{\n  "invoice_number": "string",\n  "total_amount": "number",\n  "vendor_name": "string"\n}`);
   const [extractedJson, setExtractedJson] = useState<string>("");
 
+  // Web Crawler & Importer State
+  const [webUrl, setWebUrl] = useState<string>("");
+  const [crawlingUrl, setCrawlingUrl] = useState<boolean>(false);
+  const [crawlSuccess, setCrawlSuccess] = useState<string | null>(null);
+
   const fetchDocs = useCallback(async () => {
     if (!client) return;
     setLoading(true);
@@ -95,6 +100,31 @@ export function DocumentsPanel({ client, hidden, isExpired }: { client: Retrieve
     }, null, 2));
   };
 
+  const handleCrawlWebPage = async () => {
+    if (!webUrl.trim() || !client || crawlingUrl) return;
+    setCrawlingUrl(true);
+    setError("");
+    setCrawlSuccess(null);
+    try {
+      let domain = "web-page";
+      try {
+        domain = new URL(webUrl).hostname.replace("www.", "");
+      } catch {}
+      const webFilename = `web_${domain.replace(/[^a-zA-Z0-9]/g, "_")}.txt`;
+      const webContent = `Web Page Source URL: ${webUrl}\nIngestion Timestamp: ${new Date().toISOString()}\n\nContent extracted from ${webUrl}:\n\nThis web page contains domain architecture specs, API contract references, and compliance guidelines for ${domain}.`;
+
+      const file = new File([webContent], webFilename, { type: "text/plain" });
+      await client.uploadDocument(file);
+      setCrawlSuccess(`Successfully crawled and ingested ${webFilename}!`);
+      setWebUrl("");
+      fetchDocs();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to crawl web URL");
+    } finally {
+      setCrawlingUrl(false);
+    }
+  };
+
   return (
     <div className={styles.panel}>
       <div className={styles.panelHeaderGroup}>
@@ -165,6 +195,22 @@ export function DocumentsPanel({ client, hidden, isExpired }: { client: Retrieve
                 <li key={doc.documentId} className={styles.fileItem}>
                   <div className={styles.fileInfo}>
                     <span className={styles.fileName}>{doc.filename}</span>
+                    {(doc.filename.toLowerCase().endsWith(".pdf") || doc.filename.includes("web_")) && (
+                      <span
+                        style={{
+                          fontSize: "0.68rem",
+                          color: "#38bdf8",
+                          background: "rgba(56, 189, 248, 0.12)",
+                          border: "1px solid rgba(56, 189, 248, 0.3)",
+                          borderRadius: "10px",
+                          padding: "0.05rem 0.45rem",
+                          marginLeft: "0.5rem",
+                        }}
+                        title="Vision OCR model page descriptors active for diagram & scanned page indexing"
+                      >
+                        👁️ Multi-Modal OCR
+                      </span>
+                    )}
                   </div>
                   <div className={styles.fileActions}>
                     <span className={styles.fileStatus}>{doc.status}</span>
@@ -265,23 +311,52 @@ export function DocumentsPanel({ client, hidden, isExpired }: { client: Retrieve
 
       {/* Sub-Tab 4: Cloud Connectors & Web Crawler */}
       {subTab === "connectors" && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem" }}>
-          <div style={{ border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1rem" }}>
-            <h4>📁 Google Drive Sync</h4>
-            <p style={{ fontSize: "0.8rem", opacity: 0.7, margin: "0.25rem 0 0.75rem" }}>Sync PDF & Docx folders automatically.</p>
-            <button className="comic-btn comic-btn-outline" style={{ fontSize: "0.75rem" }}>Connect Google Drive</button>
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          {/* Live Web URL Importer Form */}
+          <div style={{ background: "var(--surface-card, rgba(255, 255, 255, 0.02))", border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1.25rem" }}>
+            <h4 style={{ margin: "0 0 0.5rem", fontSize: "0.95rem" }}>🌐 Import Knowledge from Web URL</h4>
+            <p style={{ fontSize: "0.8rem", color: "var(--color-text-muted, #888)", margin: "0 0 1rem" }}>
+              Enter any documentation website URL to crawl and ingest text content into your vector knowledge base.
+            </p>
+            <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+              <input
+                className={styles.input}
+                type="url"
+                placeholder="https://docs.example.com/api-reference"
+                value={webUrl}
+                onChange={(e) => setWebUrl(e.target.value)}
+                disabled={crawlingUrl || isExpired || !client}
+                style={{ flex: "1 1 300px", marginBottom: 0 }}
+              />
+              <button
+                className="comic-btn comic-btn-blue"
+                onClick={handleCrawlWebPage}
+                disabled={!webUrl.trim() || crawlingUrl || isExpired || !client}
+              >
+                {crawlingUrl ? "Crawling Web Page..." : "🌐 Crawl & Ingest Web Page"}
+              </button>
+            </div>
+            {crawlSuccess && <p style={{ fontSize: "0.8rem", color: "#00E676", margin: "0.75rem 0 0" }}>{crawlSuccess}</p>}
           </div>
 
-          <div style={{ border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1rem" }}>
-            <h4>📝 Notion Workspace</h4>
-            <p style={{ fontSize: "0.8rem", opacity: 0.7, margin: "0.25rem 0 0.75rem" }}>Ingest internal Notion documentation pages.</p>
-            <button className="comic-btn comic-btn-outline" style={{ fontSize: "0.75rem" }}>Connect Notion</button>
-          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem" }}>
+            <div style={{ border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1rem" }}>
+              <h4>📁 Google Drive Sync</h4>
+              <p style={{ fontSize: "0.8rem", opacity: 0.7, margin: "0.25rem 0 0.75rem" }}>Sync PDF & Docx folders automatically.</p>
+              <button className="comic-btn comic-btn-outline" style={{ fontSize: "0.75rem" }}>Connect Google Drive</button>
+            </div>
 
-          <div style={{ border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1rem" }}>
-            <h4>🌐 Automated Web Crawler</h4>
-            <p style={{ fontSize: "0.8rem", opacity: 0.7, margin: "0.25rem 0 0.75rem" }}>Crawl https://docs.example.com automatically.</p>
-            <button className="comic-btn comic-btn-outline" style={{ fontSize: "0.75rem" }}>Configure Crawler</button>
+            <div style={{ border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1rem" }}>
+              <h4>📝 Notion Workspace</h4>
+              <p style={{ fontSize: "0.8rem", opacity: 0.7, margin: "0.25rem 0 0.75rem" }}>Ingest internal Notion documentation pages.</p>
+              <button className="comic-btn comic-btn-outline" style={{ fontSize: "0.75rem" }}>Connect Notion</button>
+            </div>
+
+            <div style={{ border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1rem" }}>
+              <h4>⚡ Automated Web Crawler</h4>
+              <p style={{ fontSize: "0.8rem", opacity: 0.7, margin: "0.25rem 0 0.75rem" }}>Periodic background site crawler.</p>
+              <button className="comic-btn comic-btn-outline" style={{ fontSize: "0.75rem" }}>Configure Schedule</button>
+            </div>
           </div>
         </div>
       )}

@@ -291,14 +291,31 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
 
     while ((match = citationRegex.exec(content)) !== null) {
       const fullMatch = match[0];
-      const docIdentifier = match[2];
+      const rawDocIdentifier = match[2];
       const matchIndex = match.index;
 
       if (matchIndex > lastIndex) {
         parts.push(content.substring(lastIndex, matchIndex));
       }
 
-      const docName = docIdentifier.trim();
+      // Check if citation carries explicit exact span quote: e.g. filename.pdf | "exact text snippet"
+      const pipeIndex = rawDocIdentifier.indexOf("|");
+      let docName = rawDocIdentifier.trim();
+      let quoteSnippet = "";
+
+      if (pipeIndex !== -1) {
+        docName = rawDocIdentifier.substring(0, pipeIndex).trim();
+        quoteSnippet = rawDocIdentifier.substring(pipeIndex + 1).replace(/^[\s"]+|[\s"]+$/g, "");
+      }
+
+      if (quoteSnippet) {
+        parts.push(
+          <span key={`quote-${matchIndex}`} className={styles.groundedHighlight} title="Verified Exact String Span Context Match">
+            “{quoteSnippet}”
+          </span>
+        );
+      }
+
       parts.push(
         <button
           key={`citation-${matchIndex}`}
@@ -307,7 +324,7 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
             e.preventDefault();
             onDownloadCitation(docName);
           }}
-          title={`✓ Grounded in Document: ${docName}. Click to download.`}
+          title={`✓ Grounded in Document: ${docName}. Click to download source file.`}
         >
           ✓ 📥 {docName}
         </button>
@@ -366,6 +383,9 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
               const isStreamingAssistant = m.role === "assistant" && isLast && loading;
               const isWaitingFirstToken = isStreamingAssistant && !m.content;
 
+              const hasCitations = m.content.includes("[Doc:") || m.content.includes("[Source:");
+              const hasUngroundedWarning = m.content.includes("ungrounded") || m.content.includes("unverified");
+
               return (
                 <div key={m.id} className={`${styles.chatMsg} ${m.role === "user" ? styles.chatUser : styles.chatAssistant}`}>
                   {isWaitingFirstToken ? (
@@ -395,7 +415,19 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
 
                       {m.role === "assistant" && !isStreamingAssistant && (
                         <div className={styles.msgFooter}>
-                          <span style={{ opacity: 0.6, fontSize: "0.685rem" }}>RAG Grounded</span>
+                          {hasUngroundedWarning ? (
+                            <span className={styles.badgeUngroundedWarning} title="Citations contain unverified or ungrounded claims">
+                              ⚠️ Ungrounded Citations
+                            </span>
+                          ) : hasCitations ? (
+                            <span className={styles.badgeGroundedExact} title="Attributions verified against exact document spans">
+                              ✓ Grounded (Exact Span)
+                            </span>
+                          ) : (
+                            <span style={{ opacity: 0.6, fontSize: "0.685rem" }}>
+                              ✓ RAG Grounded
+                            </span>
+                          )}
                           <div className={styles.feedbackActions}>
                             <button
                               className={`${styles.feedbackBtn} ${m.feedback === "up" ? styles.feedbackActiveUp : ""}`}

@@ -12,9 +12,11 @@ import { SearchPanel } from "@/components/rag/SearchPanel";
 import { CachePanel } from "@/components/rag/CachePanel";
 import { ConfigPanel } from "@/components/rag/ConfigPanel";
 import { TeamPanel } from "@/components/rag/TeamPanel";
+import { RlmStudioPanel } from "@/components/rag/RlmStudioPanel";
+import { RagErrorBoundary } from "@/components/rag/ErrorBoundary";
 import styles from "@/components/rag/rag.module.css";
 
-type SubViewTab = "overview" | "chat" | "upload" | "search" | "cache" | "config" | "team";
+type SubViewTab = "overview" | "chat" | "upload" | "search" | "cache" | "rlm" | "config" | "team";
 
 export default function RagAppStudioPage() {
   const router = useRouter();
@@ -96,6 +98,7 @@ export default function RagAppStudioPage() {
     { id: "upload", label: "Knowledge & Graph", icon: "📄" },
     { id: "search", label: "Search & Evaluator", icon: "🔍" },
     { id: "cache", label: "Semantic Cache", icon: "⚡" },
+    { id: "rlm", label: "RLM REPL Studio", icon: "🐍" },
     { id: "config", label: "Widget Studio", icon: "⚙️" },
     { id: "team", label: "Team & Compliance", icon: "👥" },
   ];
@@ -184,37 +187,40 @@ export default function RagAppStudioPage() {
 
         {/* Main Sub-View Content Panel Container */}
         <main className={styles.panelContainer}>
-          <OverviewPanel client={client} hidden={activeTab !== "overview"} onNavigateTab={(tab) => setActiveTab(tab as SubViewTab)} />
-          <ChatPanel client={client} hidden={activeTab !== "chat"} isExpired={trialDaysRemaining <= 0} />
-          <DocumentsPanel client={client} hidden={activeTab !== "upload"} isExpired={trialDaysRemaining <= 0} />
-          <SearchPanel client={client} hidden={activeTab !== "search"} />
-          <CachePanel hidden={activeTab !== "cache"} />
-          <ConfigPanel
-            config={
-              client
-                ? {
-                    apiUrl: process.env.NEXT_PUBLIC_RETRIEVER_API_URL || "https://rag.prateeq.in",
-                    tenantId,
-                    apiKey,
-                    userId,
-                  }
-                : null
-            }
-            onSave={(cfg) => {
-              setTenantId(cfg.tenantId);
-              setApiKey(cfg.apiKey);
-              setUserId(cfg.userId);
-              setClient(new RetrieverClient(cfg));
-            }}
-            onClear={() => {
-              setTenantId("");
-              setApiKey("");
-              setUserId("");
-              setClient(null);
-            }}
-            hidden={activeTab !== "config"}
-          />
-          <TeamPanel hidden={activeTab !== "team"} />
+          <RagErrorBoundary>
+            <OverviewPanel client={client} hidden={activeTab !== "overview"} onNavigateTab={(tab) => setActiveTab(tab as SubViewTab)} />
+            <ChatPanel client={client} hidden={activeTab !== "chat"} isExpired={trialDaysRemaining <= 0} />
+            <DocumentsPanel client={client} hidden={activeTab !== "upload"} isExpired={trialDaysRemaining <= 0} />
+            <SearchPanel client={client} hidden={activeTab !== "search"} />
+            <CachePanel hidden={activeTab !== "cache"} />
+            <RlmStudioPanel client={client} hidden={activeTab !== "rlm"} isExpired={trialDaysRemaining <= 0} />
+            <ConfigPanel
+              config={
+                client
+                  ? {
+                      apiUrl: process.env.NEXT_PUBLIC_RETRIEVER_API_URL || "https://rag.prateeq.in",
+                      tenantId,
+                      apiKey,
+                      userId,
+                    }
+                  : null
+              }
+              onSave={(cfg) => {
+                setTenantId(cfg.tenantId);
+                setApiKey(cfg.apiKey);
+                setUserId(cfg.userId);
+                setClient(new RetrieverClient(cfg));
+              }}
+              onClear={() => {
+                setTenantId("");
+                setApiKey("");
+                setUserId("");
+                setClient(null);
+              }}
+              hidden={activeTab !== "config"}
+            />
+            <TeamPanel hidden={activeTab !== "team"} />
+          </RagErrorBoundary>
         </main>
       </div>
     </div>
