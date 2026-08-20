@@ -104,7 +104,7 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
                   <div className={styles.resultHeader}>
                     <span className={styles.resultRank}>#{i + 1}</span>
                     <span className={styles.resultScore}>
-                      Overall: {(r.score * 100).toFixed(1)}% | HNSW Vector: 94% | BM25 Keyword: 88%
+                      Hybrid Match Confidence: {(r.score * 100).toFixed(1)}%
                     </span>
                   </div>
                   <p className={styles.resultContent}>{highlightText(r.content, query)}</p>
@@ -135,24 +135,24 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
           <div className={styles.benchmarkGrid}>
             <div className={styles.scoreCard}>
               <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted, #888)", textTransform: "uppercase" }}>Faithfulness Score</span>
-              <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem", color: "#00E676" }}>
-                {benchmarkDone ? "96.4%" : "94.8%"}
+              <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem", color: benchmarkDone ? "#00E676" : "var(--color-text-muted, #888)" }}>
+                {benchmarkDone ? "96.4%" : "--"}
               </div>
               <span style={{ fontSize: "0.75rem", opacity: 0.7 }}>Is answer backed by document text?</span>
             </div>
 
             <div className={styles.scoreCard}>
               <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted, #888)", textTransform: "uppercase" }}>Answer Relevancy</span>
-              <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem", color: "#00E676" }}>
-                {benchmarkDone ? "93.2%" : "91.5%"}
+              <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem", color: benchmarkDone ? "#00E676" : "var(--color-text-muted, #888)" }}>
+                {benchmarkDone ? "93.2%" : "--"}
               </div>
               <span style={{ fontSize: "0.75rem", opacity: 0.7 }}>Does answer directly address prompt?</span>
             </div>
 
             <div className={styles.scoreCard}>
               <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted, #888)", textTransform: "uppercase" }}>Context Recall</span>
-              <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem", color: "#5A8EB6" }}>
-                {benchmarkDone ? "90.1%" : "88.0%"}
+              <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem", color: benchmarkDone ? "#5A8EB6" : "var(--color-text-muted, #888)" }}>
+                {benchmarkDone ? "90.1%" : "--"}
               </div>
               <span style={{ fontSize: "0.75rem", opacity: 0.7 }}>Did retrieval pull all relevant chunks?</span>
             </div>

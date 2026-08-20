@@ -34,15 +34,15 @@ export function CachePanel({ hidden }: CachePanelProps) {
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", fontSize: "0.875rem" }}>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               <span>Total Cached Embeddings:</span>
-              <strong>1,420 vectors</strong>
+              <strong>{cacheFlushed ? "0 vectors" : "0 vectors (Active)"}</strong>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               <span>Average Response Latency:</span>
-              <strong style={{ color: "#00E676" }}>38 ms</strong>
+              <strong style={{ color: "#00E676" }}>-- ms</strong>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               <span>Est. Tokens Saved (30 Days):</span>
-              <strong>412,800 tokens ($0.62)</strong>
+              <strong>0 tokens ($0.00)</strong>
             </div>
           </div>
         </div>

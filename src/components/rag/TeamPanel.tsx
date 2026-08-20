@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 import styles from "./rag.module.css";
 
 interface TeamPanelProps {
@@ -9,6 +10,7 @@ interface TeamPanelProps {
 }
 
 export function TeamPanel({ hidden, config }: TeamPanelProps) {
+  const { user } = useAuth();
   const [inviteEmail, setInviteEmail] = useState<string>("");
   const [inviteRole, setInviteRole] = useState<string>("member");
   const [invitedStatus, setInvitedStatus] = useState<string>("");
@@ -97,7 +99,7 @@ export function TeamPanel({ hidden, config }: TeamPanelProps) {
             <span>Status</span>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", padding: "0.75rem 1rem", fontSize: "0.85rem", borderBottom: "1px solid var(--color-border, #222)", alignItems: "center" }}>
-            <span>Owner (Active User)</span>
+            <span>{user?.email || "Owner (Active User)"}</span>
             <span style={{ textTransform: "capitalize" }}><strong>Owner</strong></span>
             <span style={{ color: "#00E676" }}>Active</span>
           </div>
