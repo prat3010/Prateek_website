@@ -227,21 +227,41 @@ export function ConfigPanel({
       </button>
 
       {showAdvanced && (
-        <div className={styles.row}>
-          <div>
-            <label className={styles.label}>BYOK LLM Key (AES-256 Encrypted)</label>
-            <input className={styles.input} value={form.llmKey ?? ""} onChange={(e) => setForm({ ...form, llmKey: e.target.value || undefined })} type="password" placeholder="sk-..." />
+        <>
+          <div className={styles.row}>
+            <div>
+              <label className={styles.label}>BYOK LLM Key (AES-256 Encrypted)</label>
+              <input className={styles.input} value={form.llmKey ?? ""} onChange={(e) => setForm({ ...form, llmKey: e.target.value || undefined })} type="password" placeholder="sk-..." />
+            </div>
+            <div>
+              <label className={styles.label}>BYOK LLM Provider</label>
+              <select className={styles.input} value={form.llmProvider ?? ""} onChange={(e) => setForm({ ...form, llmProvider: e.target.value || undefined })}>
+                <option value="">Managed Platform Credits</option>
+                <option value="gemini">Google Gemini</option>
+                <option value="openai">OpenAI</option>
+                <option value="anthropic">Anthropic Claude</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <label className={styles.label}>BYOK LLM Provider</label>
-            <select className={styles.input} value={form.llmProvider ?? ""} onChange={(e) => setForm({ ...form, llmProvider: e.target.value || undefined })}>
-              <option value="">Managed Platform Credits</option>
-              <option value="gemini">Google Gemini</option>
-              <option value="openai">OpenAI</option>
-              <option value="anthropic">Anthropic Claude</option>
-            </select>
+
+          <div className={styles.row} style={{ marginTop: "0.75rem" }}>
+            <div>
+              <label className={styles.label}>🏷️ Anthropic Contextual Prepending Header</label>
+              <input
+                className={styles.input}
+                defaultValue="Document Title & Section Scope"
+                placeholder="Prefix attached to chunk text before vector embedding..."
+              />
+            </div>
+            <div>
+              <label className={styles.label}>⚡ Search Fusion Strategy</label>
+              <select className={styles.input} defaultValue="normalized_hybrid">
+                <option value="normalized_hybrid">Normalized Min-Max Hybrid Score Fusion</option>
+                <option value="hybrid_rrf">Standard Reciprocal Rank Fusion (RRF)</option>
+              </select>
+            </div>
           </div>
-        </div>
+        </>
       )}
 
       <div className={styles.actions}>

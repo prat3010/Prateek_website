@@ -89,32 +89,63 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
             </button>
           </div>
 
+          <div style={{ display: "flex", gap: "1rem", marginTop: "0.75rem", fontSize: "0.8rem", opacity: 0.9 }}>
+            <span style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+              <input type="checkbox" id="mq-toggle" defaultChecked />
+              <label htmlFor="mq-toggle">🔀 Multi-Query Expansion</label>
+            </span>
+            <span style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+              <input type="checkbox" id="norm-toggle" defaultChecked />
+              <label htmlFor="norm-toggle">⚡ Min-Max Score Normalization</label>
+            </span>
+          </div>
+
           {!results && !loading && (
             <p className={styles.empty}>Enter a query above to search your indexed documents.</p>
           )}
 
           {results && (
             <div style={{ marginTop: "1.5rem" }}>
-              <p className={styles.resultMeta}>
-                Found {results.results.length} result{results.results.length !== 1 ? "s" : ""}
-                {results.searchMeta?.durationMs && ` in ${results.searchMeta.durationMs}ms`}
-              </p>
-              {results.results.map((r, i) => (
-                <div key={r.chunkId ?? i} className={styles.resultItem}>
-                  <div className={styles.resultHeader}>
-                    <span className={styles.resultRank}>#{i + 1}</span>
-                    <span className={styles.resultScore}>
-                      Hybrid Match Confidence: {(r.score * 100).toFixed(1)}%
-                    </span>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
+                <p className={styles.resultMeta} style={{ margin: 0 }}>
+                  Found {results.results.length} result{results.results.length !== 1 ? "s" : ""}
+                  {results.searchMeta?.durationMs && ` in ${results.searchMeta.durationMs}ms`}
+                </p>
+                <span className={styles.tag} style={{ background: "rgba(0,230,118,0.15)", color: "#00E676", fontSize: "0.75rem" }}>
+                  ⚡ Strategy: {results.searchMeta?.strategy || "normalized_hybrid"}
+                </span>
+              </div>
+
+              {results.results.map((r, i) => {
+                const isContextual = r.content.includes("[Context:") || r.metadata?.context_prepended;
+                const contextTag = isContextual
+                  ? r.content.match(/\[Context:\s*([^\]]+)\]/)?.[1] || r.metadata?.context_prefix || "Document Context"
+                  : null;
+
+                return (
+                  <div key={r.chunkId ?? i} className={styles.resultItem}>
+                    <div className={styles.resultHeader}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                        <span className={styles.resultRank}>#{i + 1}</span>
+                        {contextTag && (
+                          <span className={styles.tag} style={{ background: "rgba(0,180,216,0.2)", color: "#00b4d8", fontSize: "0.7rem" }}>
+                            🏷️ Context: {contextTag}
+                          </span>
+                        )}
+                      </div>
+                      <span className={styles.resultScore}>
+                        Match Confidence: {(r.score * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                    <p className={styles.resultContent}>{highlightText(r.content, query)}</p>
+                    {(r.metadata?.filename || r.metadata?.document_id) && (
+                      <p className={styles.searchDoc}>
+                        {"📄"} {r.metadata?.filename ?? r.metadata?.document_id?.slice(0, 8) ?? ""}
+                      </p>
+                    )}
                   </div>
-                  <p className={styles.resultContent}>{highlightText(r.content, query)}</p>
-                  {(r.metadata?.filename || r.metadata?.document_id) && (
-                    <p className={styles.searchDoc}>
-                      {"📄"} {r.metadata?.filename ?? r.metadata?.document_id?.slice(0, 8) ?? ""}
-                    </p>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

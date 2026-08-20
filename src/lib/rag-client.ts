@@ -73,10 +73,17 @@ export class RetrieverClient {
     }
   }
 
-  async search(query: string, limit = 5) {
+  async search(query: string, options?: { limit?: number; enableQueryRewriting?: boolean; enableHybrid?: boolean; strategy?: string }) {
+    const limit = options?.limit ?? 5;
     return this.request<import("./rag-types").SearchResponse>(`/v1/tenants/${this.config.tenantId}/search`, {
       method: "POST",
-      body: JSON.stringify({ query, top_k: limit }),
+      body: JSON.stringify({
+        query,
+        top_k: limit,
+        enable_query_rewriting: options?.enableQueryRewriting ?? true,
+        enable_hybrid: options?.enableHybrid ?? true,
+        ...(options?.strategy ? { strategy: options.strategy } : {}),
+      }),
     });
   }
 

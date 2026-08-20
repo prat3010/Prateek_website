@@ -307,9 +307,9 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
             e.preventDefault();
             onDownloadCitation(docName);
           }}
-          title={`Download source document: ${docName}`}
+          title={`✓ Grounded in Document: ${docName}. Click to download.`}
         >
-          📥 {docName}
+          ✓ 📥 {docName}
         </button>
       );
 
