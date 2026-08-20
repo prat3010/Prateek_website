@@ -4,7 +4,7 @@ export interface SearchResult {
   content: string;
   score: number;
   normalizedScore?: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface DocumentMeta {

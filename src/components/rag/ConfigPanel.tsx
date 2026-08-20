@@ -140,7 +140,7 @@ export function ConfigPanel({
               <select
                 className={styles.input}
                 value={launcherPosition}
-                onChange={(e) => setLauncherPosition(e.target.value as any)}
+                onChange={(e) => setLauncherPosition(e.target.value as "bottom-right" | "bottom-left")}
               >
                 <option value="bottom-right">Bottom Right</option>
                 <option value="bottom-left">Bottom Left</option>

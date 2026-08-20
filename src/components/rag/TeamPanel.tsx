@@ -6,10 +6,9 @@ import styles from "./rag.module.css";
 
 interface TeamPanelProps {
   hidden?: boolean;
-  config?: any;
 }
 
-export function TeamPanel({ hidden, config }: TeamPanelProps) {
+export function TeamPanel({ hidden }: TeamPanelProps) {
   const { user } = useAuth();
   const [inviteEmail, setInviteEmail] = useState<string>("");
   const [inviteRole, setInviteRole] = useState<string>("member");

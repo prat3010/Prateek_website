@@ -13,7 +13,7 @@ interface OverviewPanelProps {
 
 export function OverviewPanel({ hidden, client, onNavigateTab }: OverviewPanelProps) {
   const [docCount, setDocCount] = useState<number | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [telemetry, setTelemetry] = useState<{
     monthlyTokensUsed: number;
     maxMonthlyTokens: number;
@@ -31,7 +31,6 @@ export function OverviewPanel({ hidden, client, onNavigateTab }: OverviewPanelPr
   useEffect(() => {
     if (!hidden) {
       let isMounted = true;
-      setLoading(true);
 
       if (client) {
         client

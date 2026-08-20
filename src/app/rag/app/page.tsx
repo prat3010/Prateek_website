@@ -26,11 +26,10 @@ export default function RagAppStudioPage() {
   const [tenantId, setTenantId] = useState<string>("");
   const [apiKey, setApiKey] = useState<string>("");
   const [userId, setUserId] = useState<string>("");
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [client, setClient] = useState<RetrieverClient | null>(null);
   const [tenantLoading, setTenantLoading] = useState<boolean>(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
-  const [trialDaysRemaining, setTrialDaysRemaining] = useState<number>(6);
+  const [trialDaysRemaining] = useState<number>(6);
 
   const initWorkspace = useCallback(async () => {
     setTenantLoading(true);
