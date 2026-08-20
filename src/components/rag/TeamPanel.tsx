@@ -91,7 +91,7 @@ export function TeamPanel({ hidden, config }: TeamPanelProps) {
       <div style={{ marginBottom: "1.5rem" }}>
         <h3 style={{ fontSize: "1rem", margin: "0 0 0.75rem" }}>📋 Workspace Members</h3>
         <div style={{ border: "1px solid var(--color-border, #333)", borderRadius: "8px", overflow: "hidden" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", padding: "0.75rem 1rem", background: "var(--color-bg, #111)", fontSize: "0.8rem", fontWeight 600, borderBottom: "1px solid var(--color-border, #333)" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", padding: "0.75rem 1rem", background: "var(--color-bg, #111)", fontSize: "0.8rem", fontWeight: 600, borderBottom: "1px solid var(--color-border, #333)" }}>
             <span>Email</span>
             <span>Role</span>
             <span>Status</span>
