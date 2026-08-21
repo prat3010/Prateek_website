@@ -34,10 +34,10 @@
   gap: 1rem;
 }
 
-.grid > *:nth-child(1) { grid-column: span 2; }
-.grid > *:nth-child(2) { grid-column: span 1; }
-.grid > *:nth-child(3) { grid-column: span 1; }
-.grid > *:nth-child(4) { grid-column: span 2; }
+.grid > *:nth-child(4n + 1) { grid-column: span 2; }
+.grid > *:nth-child(4n + 2) { grid-column: span 1; }
+.grid > *:nth-child(4n + 3) { grid-column: span 1; }
+.grid > *:nth-child(4n + 4) { grid-column: span 2; }
 
 /* ---- Panel ---- */
 
@@ -64,8 +64,15 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
-.panel:hover .panelOverlay {
-  opacity: 1;
+.panel:hover .panelOverlay,
+.panel:focus-visible .panelOverlay,
+.panel:focus-within .panelOverlay {
+  background: linear-gradient(
+    to top,
+    rgba(26, 26, 46, 0.98) 0%,
+    rgba(26, 26, 46, 0.75) 60%,
+    rgba(26, 26, 46, 0.2) 100%
+  );
 }
 
 
@@ -87,15 +94,15 @@
   background: linear-gradient(
     to top,
     rgba(26, 26, 46, 0.95) 0%,
-    rgba(26, 26, 46, 0.6) 50%,
+    rgba(26, 26, 46, 0.5) 50%,
     transparent 100%
   );
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 1.5rem;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  padding: 1.25rem;
+  opacity: 1;
+  transition: background 0.3s ease;
 }
 
 
@@ -108,9 +115,21 @@
 }
 
 .panelDesc {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.88);
   line-height: 1.4;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  margin-bottom: 0;
+  transition: max-height 0.35s ease, opacity 0.35s ease, margin-bottom 0.35s ease;
+}
+
+.panel:hover .panelDesc,
+.panel:focus-visible .panelDesc,
+.panel:focus-within .panelDesc {
+  max-height: 120px;
+  opacity: 1;
   margin-bottom: 0.75rem;
 }
 
@@ -459,70 +478,70 @@
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
-/* Individual Panel Hover Glows */
-:global([data-theme='noir']) .panel:nth-child(1):hover {
+/* Individual Panel Hover Glows (Cyclic across all cards) */
+:global([data-theme='noir']) .panel:nth-child(4n + 1):hover {
   border-color: var(--neon-cyan);
   box-shadow: 0 0 15px var(--neon-cyan);
 }
-:global([data-theme='noir']) .panel:nth-child(1):hover .statusLive,
-:global([data-theme='noir']) .panel:nth-child(1):hover .statusSoon,
-:global([data-theme='noir']) .panel:nth-child(1):hover .statusPersonal {
+:global([data-theme='noir']) .panel:nth-child(4n + 1):hover .statusLive,
+:global([data-theme='noir']) .panel:nth-child(4n + 1):hover .statusSoon,
+:global([data-theme='noir']) .panel:nth-child(4n + 1):hover .statusPersonal {
   border-color: var(--neon-cyan);
   color: var(--neon-cyan);
   box-shadow: 0 0 8px var(--neon-cyan);
 }
-:global([data-theme='noir']) .panel:nth-child(1):hover .tag {
+:global([data-theme='noir']) .panel:nth-child(4n + 1):hover .tag {
   border-color: var(--neon-cyan);
   color: var(--neon-cyan);
   box-shadow: 0 0 5px var(--neon-cyan);
 }
 
-:global([data-theme='noir']) .panel:nth-child(2):hover {
+:global([data-theme='noir']) .panel:nth-child(4n + 2):hover {
   border-color: var(--neon-pink);
   box-shadow: 0 0 15px var(--neon-pink);
 }
-:global([data-theme='noir']) .panel:nth-child(2):hover .statusLive,
-:global([data-theme='noir']) .panel:nth-child(2):hover .statusSoon,
-:global([data-theme='noir']) .panel:nth-child(2):hover .statusPersonal {
+:global([data-theme='noir']) .panel:nth-child(4n + 2):hover .statusLive,
+:global([data-theme='noir']) .panel:nth-child(4n + 2):hover .statusSoon,
+:global([data-theme='noir']) .panel:nth-child(4n + 2):hover .statusPersonal {
   border-color: var(--neon-pink);
   color: var(--neon-pink);
   box-shadow: 0 0 8px var(--neon-pink);
 }
-:global([data-theme='noir']) .panel:nth-child(2):hover .tag {
+:global([data-theme='noir']) .panel:nth-child(4n + 2):hover .tag {
   border-color: var(--neon-pink);
   color: var(--neon-pink);
   box-shadow: 0 0 5px var(--neon-pink);
 }
 
-:global([data-theme='noir']) .panel:nth-child(3):hover {
+:global([data-theme='noir']) .panel:nth-child(4n + 3):hover {
   border-color: var(--neon-yellow);
   box-shadow: 0 0 15px var(--neon-yellow);
 }
-:global([data-theme='noir']) .panel:nth-child(3):hover .statusLive,
-:global([data-theme='noir']) .panel:nth-child(3):hover .statusSoon,
-:global([data-theme='noir']) .panel:nth-child(3):hover .statusPersonal {
+:global([data-theme='noir']) .panel:nth-child(4n + 3):hover .statusLive,
+:global([data-theme='noir']) .panel:nth-child(4n + 3):hover .statusSoon,
+:global([data-theme='noir']) .panel:nth-child(4n + 3):hover .statusPersonal {
   border-color: var(--neon-yellow);
   color: var(--neon-yellow);
   box-shadow: 0 0 8px var(--neon-yellow);
 }
-:global([data-theme='noir']) .panel:nth-child(3):hover .tag {
+:global([data-theme='noir']) .panel:nth-child(4n + 3):hover .tag {
   border-color: var(--neon-yellow);
   color: var(--neon-yellow);
   box-shadow: 0 0 5px var(--neon-yellow);
 }
 
-:global([data-theme='noir']) .panel:nth-child(4):hover {
+:global([data-theme='noir']) .panel:nth-child(4n + 0):hover {
   border-color: var(--neon-green);
   box-shadow: 0 0 15px var(--neon-green);
 }
-:global([data-theme='noir']) .panel:nth-child(4):hover .statusLive,
-:global([data-theme='noir']) .panel:nth-child(4):hover .statusSoon,
-:global([data-theme='noir']) .panel:nth-child(4):hover .statusPersonal {
+:global([data-theme='noir']) .panel:nth-child(4n + 0):hover .statusLive,
+:global([data-theme='noir']) .panel:nth-child(4n + 0):hover .statusSoon,
+:global([data-theme='noir']) .panel:nth-child(4n + 0):hover .statusPersonal {
   border-color: var(--neon-green);
   color: var(--neon-green);
   box-shadow: 0 0 8px var(--neon-green);
 }
-:global([data-theme='noir']) .panel:nth-child(4):hover .tag {
+:global([data-theme='noir']) .panel:nth-child(4n + 0):hover .tag {
   border-color: var(--neon-green);
   color: var(--neon-green);
   box-shadow: 0 0 5px var(--neon-green);
@@ -546,5 +565,226 @@
   border-color: var(--neon-pink);
   color: var(--neon-pink);
   box-shadow: 0 0 8px var(--neon-pink);
+}
+
+/* ---- Category Filter Bar ---- */
+
+.filterBar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.filterPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.9rem;
+  font-family: var(--font-headline);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: var(--pop-white);
+  color: var(--pop-black);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.filterPill:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.filterPillActive {
+  background: var(--pop-yellow);
+  color: var(--pop-black);
+  border-color: var(--pop-black);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.filterCount {
+  display: inline-block;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.7rem;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.08);
+  color: inherit;
+}
+
+:global([data-theme='noir']) .filterPill {
+  background: var(--surface-primary);
+  color: var(--color-text-dim);
+  border-color: var(--border-muted);
+  box-shadow: none;
+}
+
+:global([data-theme='noir']) .filterPill:hover {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  box-shadow: 0 0 10px var(--neon-cyan);
+}
+
+:global([data-theme='noir']) .filterPillActive {
+  background: var(--surface-primary);
+  color: var(--neon-pink);
+  border-color: var(--neon-pink);
+  box-shadow: 0 0 12px var(--neon-pink);
+}
+
+:global([data-theme='noir']) .filterCount {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ---- Modal Multi-Tab Styling ---- */
+
+.modalTabList {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.modalTab {
+  padding: 0.4rem 0.8rem;
+  font-family: var(--font-headline);
+  font-size: 0.85rem;
+  font-weight: 700;
+  background: transparent;
+  color: var(--pop-black);
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.modalTab:hover {
+  color: var(--pop-yellow);
+}
+
+.modalTabActive {
+  border-bottom-color: var(--pop-yellow);
+  color: var(--pop-black);
+}
+
+:global([data-theme='noir']) .modalTab {
+  color: var(--color-text-dim);
+}
+
+:global([data-theme='noir']) .modalTab:hover {
+  color: var(--neon-cyan);
+}
+
+:global([data-theme='noir']) .modalTabActive {
+  border-bottom-color: var(--neon-pink);
+  color: var(--neon-pink);
+}
+
+.subHeading {
+  font-family: var(--font-headline);
+  font-size: 1.1rem;
+  color: var(--pop-black);
+  margin-bottom: 0.75rem;
+}
+
+:global([data-theme='noir']) .subHeading {
+  color: var(--neon-cyan);
+}
+
+.architectureList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.architectureItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--pop-black);
+  background: rgba(0, 0, 0, 0.03);
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  border-left: 3px solid var(--pop-yellow);
+}
+
+:global([data-theme='noir']) .architectureItem {
+  color: var(--color-text);
+  background: rgba(255, 255, 255, 0.03);
+  border-left-color: var(--neon-pink);
+}
+
+.bulletIcon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  opacity: 0.7;
+}
+
+.challengesList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.challengeCard {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+:global([data-theme='noir']) .challengeCard {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: var(--border-muted);
+}
+
+.challengeHeader {
+  margin-bottom: 0.4rem;
+  color: var(--pop-black);
+}
+
+:global([data-theme='noir']) .challengeHeader {
+  color: var(--neon-yellow);
+}
+
+.solutionBody {
+  color: rgba(0, 0, 0, 0.8);
+}
+
+:global([data-theme='noir']) .solutionBody {
+  color: var(--color-text);
+}
+
+.deliverablesList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.deliverableItem {
+  font-size: 0.88rem;
+  color: var(--pop-black);
+}
+
+:global([data-theme='noir']) .deliverableItem {
+  color: var(--color-text);
 }
 

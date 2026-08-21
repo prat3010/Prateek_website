@@ -76,12 +76,34 @@ def validate_project_response(data):
     color = optional_string(data, "color", max_len=16) or "#00E676"
     if not HEX_RE.match(color):
         raise ValueError("Gemini project response field 'color' must be a #RRGGBB hex color.")
+    arch_highlights = data.get("architectureHighlights", [])
+    if not isinstance(arch_highlights, list):
+      arch_highlights = []
+
+    challenges_raw = data.get("challenges", [])
+    challenges_clean = []
+    if isinstance(challenges_raw, list):
+      for item in challenges_raw:
+        if isinstance(item, dict) and "challenge" in item and "solution" in item:
+          challenges_clean.append({
+            "challenge": str(item["challenge"])[:500],
+            "solution": str(item["solution"])[:500]
+          })
+
+    key_deliv = data.get("keyDeliverables", [])
+    if not isinstance(key_deliv, list):
+      key_deliv = []
+
     return {
         "title": require_string(data, "title", max_len=140),
         "description": require_string(data, "description", max_len=500),
         "longDescription": require_string(data, "longDescription", max_len=2500),
         "tags": validate_tags(data.get("tags"), min_items=1, max_items=8),
         "color": color,
+        "category": optional_string(data, "category", max_len=50) or "fullstack",
+        "architectureHighlights": [str(x)[:500] for x in arch_highlights],
+        "challenges": challenges_clean,
+        "keyDeliverables": [str(x)[:500] for x in key_deliv],
         "resumeBullet": {
             "general": require_string(resume_bullet, "general", max_len=500),
             "fullstack": optional_string(resume_bullet, "fullstack", max_len=500),

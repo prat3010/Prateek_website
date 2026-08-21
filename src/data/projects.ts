@@ -1,3 +1,8 @@
+export interface CaseStudyChallenge {
+  challenge: string;
+  solution: string;
+}
+
 export interface Project {
   id: string;
   title: string;
@@ -13,5 +18,9 @@ export interface Project {
   isLive: boolean;
   status: 'live' | 'soon' | 'personal';
   ctaLabel?: string;
+  category?: 'ai' | 'fullstack' | 'mobile' | 'simulation';
+  architectureHighlights?: string[];
+  challenges?: CaseStudyChallenge[];
+  keyDeliverables?: string[];
 }
 

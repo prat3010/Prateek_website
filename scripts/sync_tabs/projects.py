@@ -182,7 +182,11 @@ def render_projects_tab():
                         "githubUrl": f"https://github.com/{repo}" if project_mode != "Local Directory" else "",
                         "color": project_data["color"],
                         "isLive": False,
-                        "status": "soon"
+                        "status": "soon",
+                        "category": project_data.get("category", "fullstack"),
+                        "architectureHighlights": project_data.get("architectureHighlights", []),
+                        "challenges": project_data.get("challenges", []),
+                        "keyDeliverables": project_data.get("keyDeliverables", [])
                     }
                     
                     current_projects.append(new_project)
