@@ -152,6 +152,15 @@ def render_projects_tab():
                       "longDescription": "Detailed 3-4 sentence paragraph describing the architecture, core algorithms, libraries, databases used, and interesting implementation details. Highlight the technical engineering complexities.",
                       "tags": ["3 to 6 programming languages, database names, or key frameworks used (capitalize appropriately, e.g. React, Next.js, FastAPI, SQLite)"],
                       "color": "A neo-brutalist pop-art hex color (e.g. #FF9100, #00E676, #2979FF, #E040FB) that matches this project's visual branding",
+                      "category": "One of: ai, fullstack, mobile, simulation",
+                      "architectureHighlights": ["2 to 3 bullet points highlighting technical architecture, database setup, or async execution"],
+                      "challenges": [
+                        {{
+                          "challenge": "Short 1-sentence description of an engineering hurdle",
+                          "solution": "1-sentence technical solution implemented"
+                        }}
+                      ],
+                      "keyDeliverables": ["2 to 3 key deliverables or capabilities"],
                       "resumeBullet": {{
                         "general": "A concise, active resume bullet point (Accomplished [X], measured by [Y], by doing [Z]). Make it professional.",
                         "fullstack": "An alternative version of the bullet point focused strictly on APIs, databases, servers, and backend logic.",
@@ -395,6 +404,18 @@ def render_projects_tab():
                     curr_tags = ", ".join(project.get("tags", []))
                     edit_tags_str = st.text_input("Tags / Technologies (comma separated)", value=curr_tags, key=f"edit_tags_{p_id}")
                     edit_tags = [t.strip() for t in edit_tags_str.split(",") if t.strip()]
+
+                    st.markdown("#### Case Study & Architecture Breakdown")
+                    cat_opts = ["fullstack", "ai", "mobile", "simulation"]
+                    curr_cat = project.get("category", "fullstack")
+                    cat_idx = cat_opts.index(curr_cat) if curr_cat in cat_opts else 0
+                    edit_category = st.selectbox("Domain Category", options=cat_opts, index=cat_idx, key=f"edit_cat_{p_id}")
+
+                    curr_arch = "\n".join(project.get("architectureHighlights", []))
+                    edit_arch_str = st.text_area("Architecture Highlights (1 bullet per line)", value=curr_arch, height=80, key=f"edit_arch_{p_id}")
+
+                    curr_deliv = "\n".join(project.get("keyDeliverables", []))
+                    edit_deliv_str = st.text_area("Key Deliverables (1 item per line)", value=curr_deliv, height=80, key=f"edit_deliv_{p_id}")
                     
                     col_pb1, col_pb2 = st.columns(2)
                     
@@ -419,6 +440,9 @@ def render_projects_tab():
                                 else:
                                     project["status"] = "soon"
                                 project["tags"] = edit_tags
+                                project["category"] = edit_category
+                                project["architectureHighlights"] = [line.strip() for line in edit_arch_str.split("\n") if line.strip()]
+                                project["keyDeliverables"] = [line.strip() for line in edit_deliv_str.split("\n") if line.strip()]
                                 
                                 try:
                                     write_projects_file(current_projects)
