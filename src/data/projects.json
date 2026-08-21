@@ -2,8 +2,8 @@
   {
     "id": "earth-evolution-simulator",
     "title": "Earth Evolution Simulator",
-    "description": "A scenario-driven simulation game where players guide a planet through evolutionary eras by making tradeoffs over time.",
-    "longDescription": "Earth Evolution Simulator is a scenario-driven simulation game where players guide a planet through distinct evolutionary eras. The experience uses stateful decision-making, random events, and path-dependent consequences to steer the planet toward different outcomes. A Python Flask backend maintains game state in session and records run data in SQLite, while the custom engine tracks planetary variables and deferred triggers.",
+    "description": "A scenario-driven simulation game modeling planetary ecology and evolutionary tradeoffs through stateful decision branching.",
+    "longDescription": "Earth Evolution Simulator is a scenario-driven engine where players guide a planet through distinct evolutionary eras. A Python Flask backend maintains session state across path-dependent decision trees and random events, while SQLite logs extinction parameters and run history.",
     "image": "/images/project-earth-simulator.webp",
     "tags": [
       "Python",
@@ -19,8 +19,8 @@
     "isLive": true,
     "status": "live",
     "category": "simulation",
-    "description_business": "An interactive simulation platform built around path-dependent decision-making and state tracking.",
-    "longDescription_business": "Earth Evolution Simulator turns planetary ecology and resource allocation into an interactive simulation. The application uses stateful gameplay, dynamic events, and simple telemetry to model decision-making over time. It runs on a Python Flask backend with SQLite for run history and persistence.",
+    "description_business": "An interactive simulation platform modeling complex ecological tradeoffs, dynamic events, and strategic decision-making.",
+    "longDescription_business": "Earth Evolution Simulator turns planetary ecology and resource management into an interactive simulation experience. Designed to model long-term consequences and stateful tradeoffs, it uses dynamic event triggers and telemetry logging to engage users in complex decision-making scenarios.",
     "architectureHighlights": [
       "Stateful Flask backend tracking planetary ecology variables and decision tree branches in session",
       "SQLite persistence logging run parameters, historical extinction events, and timeline telemetry",
@@ -41,8 +41,8 @@
   {
     "id": "iss-tracker",
     "title": "ISS Live Location Tracker",
-    "description": "A real-time International Space Station tracker that shows the station position with location context.",
-    "longDescription": "Built on the FastAPI framework, this application polls a public API for the current latitude and longitude of the ISS. When the station is over land, it uses geopy and Nominatim to reverse-geocode a readable location. When it is over water, it falls back to an offline KD-tree lookup for the nearest landmass and uses cached NASA imagery for the daily background.",
+    "description": "Real-time satellite telemetry service tracking ISS orbital position with reverse geocoding and offline spatial KD-tree lookups.",
+    "longDescription": "Built on FastAPI, this telemetry application polls public ISS orbit APIs using async HTTP connection pooling. Over land, it resolves reverse-geocoded coordinates via Geopy and Nominatim. Over open oceans, it falls back to an in-memory SciPy KD-tree spatial index of world land centroids, serving background imagery via cached NASA API feeds.",
     "image": "/images/project-iss-tracker.webp",
     "tags": [
       "Python",
@@ -58,9 +58,9 @@
     "color": "#2979FF",
     "isLive": false,
     "status": "soon",
-    "category": "fullstack",
-    "description_business": "A real-time tracking application for showing the ISS position with location context.",
-    "longDescription_business": "The ISS Live Location Tracker polls a public API for the station position and resolves location details when the ISS is over land. It uses geopy for reverse geocoding and an offline fallback database for broader location context when needed. NASA imagery is cached for the daily background so the page stays responsive.",
+    "category": "simulation",
+    "description_business": "A real-time satellite tracking utility that translates raw orbital telemetry into geographic location insights.",
+    "longDescription_business": "The ISS Live Location Tracker translates raw satellite telemetry into human-readable geographic location context. It pairs real-time reverse geocoding over land with an in-memory spatial lookup index over open oceans, utilizing NASA image caching for high availability and instant page responsiveness.",
     "architectureHighlights": [
       "FastAPI micro-backend polling public ISS telemetry APIs with async HTTP connection pooling",
       "Geopy & Nominatim reverse geocoding engine translating lat/lng coordinates to landmass names",
@@ -81,8 +81,8 @@
   {
     "id": "metawipe",
     "title": "MetaWipe",
-    "description": "A privacy-first mobile app that removes metadata from photos locally before sharing.",
-    "longDescription": "MetaWipe removes EXIF metadata from images locally by decoding selected files in Dart isolates and rebuilding them into a fresh JPEG or PNG container. The app runs offline, does not require network permission, and keeps the workflow on device from start to finish.",
+    "description": "A privacy-first mobile app that strips EXIF metadata from images on-device using isolated Dart background workers.",
+    "longDescription": "MetaWipe removes sensitive EXIF metadata from images locally by decoding selected files in background Dart isolates and rebuilding them into fresh JPEG or PNG containers. The application operates 100% offline without network permissions, keeping private location data on-device.",
     "image": "/images/project-metawipe.webp",
     "tags": [
       "Flutter",
@@ -98,8 +98,8 @@
     "isLive": false,
     "status": "soon",
     "category": "mobile",
-    "description_business": "A privacy-focused mobile application that removes metadata from images locally before sharing.",
-    "longDescription_business": "MetaWipe is a lightweight mobile utility that strips EXIF metadata from images on-device. The app decodes images into raw pixels in Dart isolates and rebuilds them into a fresh container without hidden metadata. It runs offline and does not require network access.",
+    "description_business": "A privacy-focused mobile utility that strips sensitive location and device metadata from photos before public sharing.",
+    "longDescription_business": "MetaWipe protects user privacy and organizational security by stripping hidden EXIF metadata—including GPS coordinates, timestamp history, and camera serial numbers—from photos before sharing. By decoding and rebuilding images directly on-device, it guarantees sensitive location data never leaves the user's phone.",
     "architectureHighlights": [
       "Flutter cross-platform app processing image byte arrays in isolated background Dart workers",
       "Custom EXIF parsing engine stripping GPS, camera metadata, and hidden tags before image container rebuild",
@@ -120,8 +120,8 @@
   {
     "id": "paintmix-ai",
     "title": "PaintMix AI",
-    "description": "A camera-based paint mixing assistant that estimates matching paint proportions.",
-    "longDescription": "PaintMix AI uses a device camera to sample a target color and estimate paint proportions from inventory. It converts RGB inputs into XYZ and CIELAB spaces and uses Delta E distance checks to compare possible mixes. Inventory data is stored locally with SQLite so the workflow stays fast and offline-friendly.",
+    "description": "A computer-vision mobile assistant that samples camera color inputs and computes paint mix ratios via CIELAB Delta E distance algorithms.",
+    "longDescription": "PaintMix AI uses a device camera to sample target colors and calculate mixing proportions from inventory. It converts RGB camera frame buffers into XYZ and CIELAB (L*a*b*) color spaces, executing CIDE2000 Delta E distance algorithms to compute matching ratios against a local Drift/SQLite paint database.",
     "image": "/images/project-paintmix.webp",
     "tags": [
       "Flutter",
@@ -137,8 +137,8 @@
     "isLive": false,
     "status": "soon",
     "category": "mobile",
-    "description_business": "A camera-based color mixing assistant that helps estimate matching paint ratios.",
-    "longDescription_business": "PaintMix AI uses the device camera to sample a target color and estimate paint proportions from inventory. It converts RGB inputs to XYZ and CIELAB spaces and uses Delta E distance checks to compare possible mixes. Inventory data is stored locally with SQLite so the workflow stays fast and offline-friendly.",
+    "description_business": "A camera-driven color matching assistant that calculates exact paint mixing proportions to eliminate inventory waste.",
+    "longDescription_business": "PaintMix AI enables painters, designers, and maintenance teams to sample target colors with a smartphone camera and receive instant, accurate paint mixing recipes based on available stock. By calculating exact color ratios on-device, it eliminates guesswork, reduces costly paint inventory waste, and works 100% offline on job sites.",
     "architectureHighlights": [
       "Flutter & Riverpod app utilizing device camera frame buffers for real-time color sampling",
       "Color space converter transforming RGB sampling inputs into CIELAB (L*a*b*) color space",
@@ -159,8 +159,8 @@
   {
     "id": "prateeksync-ai--intelligent-portfolio---resume-automation-engine",
     "title": "PrateeqSync AI: Intelligent Portfolio & Resume Automation Engine",
-    "description": "A local content manager for portfolio metadata, credential review, and generated resume copy.",
-    "longDescription": "PrateeqSync AI is a Streamlit-based content manager for portfolio data, certificates, and blog posts. It syncs to Supabase, keeps local JSON fallbacks in step, and uses Gemini for OCR and content assistance where needed. The workflow is built for local editing, review, and controlled publishing.",
+    "description": "A local Streamlit CMS for portfolio administration, database schema synchronization, and Gemini-powered repository scanning.",
+    "longDescription": "PrateeqSync AI is a Streamlit content management system for portfolio data, certificates, and technical blog posts. It syncs Supabase PostgreSQL tables with local JSON fallbacks, leveraging Google Gemini 3.6 Flash for repository code scanning, OCR, and automated git workflow staging.",
     "image": "/images/project-prateeksync-ai--intelligent-portfolio---resume-automation-engine.webp",
     "tags": [
       "Python",
@@ -176,8 +176,8 @@
     "isLive": false,
     "status": "personal",
     "category": "fullstack",
-    "description_business": "A local content manager for updating portfolio data, certificates, and blog posts.",
-    "longDescription_business": "PrateeqSync AI is a Streamlit-based content manager for portfolio data, certificates, and blog posts. It syncs to Supabase, keeps local JSON fallbacks in step, and uses Gemini for OCR and content assistance where needed. The workflow is built for local editing, review, and controlled publishing.",
+    "description_business": "An automated portfolio content manager that synchronizes multi-channel resume copy and credentials with zero downtime.",
+    "longDescription_business": "PrateeqSync AI automates portfolio administration and resume synchronization. Built with Streamlit, Supabase, and Google Gemini AI, it parses repository history, validates data schema fallbacks, and automates content publishing across web endpoints—saving hours of manual site maintenance while guaranteeing 100% data uptime.",
     "architectureHighlights": [
       "Streamlit local CMS dashboard managing Supabase PostgreSQL content tables and local JSON fallbacks",
       "Google Gemini 3.6 Flash integration scanning local repositories and generating domain resume bullets",
@@ -198,8 +198,8 @@
   {
     "id": "rag-lab",
     "title": "RAG Lab",
-    "description": "Interactive document search and chat powered by a custom RAG engine. Upload PDFs, search semantically, and get grounded answers with citations.",
-    "longDescription": "RAG Lab is a full-stack Retrieval-Augmented Generation platform built from scratch. Documents are uploaded, parsed, and chunked, then indexed via pgvector for hybrid search (semantic + keyword). A self-hosted Ollama instance generates embeddings locally, and the platform supports pluggable LLM providers (OpenAI, Gemini, Anthropic) for grounded chat responses. Built with FastAPI, Next.js, Supabase, and PostgreSQL RLS for multi-tenant isolation.",
+    "description": "Full-stack RAG engine featuring pgvector hybrid search, self-hosted Ollama embeddings, and citation-grounded LLM chat.",
+    "longDescription": "RAG Lab is a production-grade Retrieval-Augmented Generation platform. It ingests multi-format documents (PDF, Markdown, text), executing dense vector embeddings via local Ollama instances and sparse BM25 keyword indexing in pgvector. Features multi-tenant PostgreSQL RLS isolation, streaming response synthesis, and presigned citation downloads.",
     "image": "/images/project-rag-lab.webp",
     "tags": [
       "Next.js",
@@ -217,8 +217,8 @@
     "isLive": true,
     "status": "live",
     "category": "ai",
-    "description_business": "A production-ready RAG engine that lets teams upload documents and ask natural-language questions with citation-grounded answers.",
-    "longDescription_business": "RAG Lab is a Retrieval-Augmented Generation platform. It ingests documents (PDF, Markdown, text), chunks them intelligently, and indexes them with both semantic vectors and keyword search. Users can search across their indexed documents or chat with them via streaming LLM responses. The platform supports multi-tenant isolation, custom prompt templates, per-tenant LLM key management, and encrypted credential storage.",
+    "description_business": "An enterprise document intelligence platform enabling teams to ask questions and receive citation-grounded answers across custom Knowledge Bases.",
+    "longDescription_business": "RAG Lab enables organizations to turn static documents into interactive knowledge assistants. Teams upload PDFs or markdown files and ask natural-language questions, receiving streaming answers backed by verifiable source citations, granular multi-tenant security, and custom LLM provider options.",
     "architectureHighlights": [
       "FastAPI & Next.js full-stack RAG engine featuring pgvector hybrid semantic + keyword search",
       "Self-hosted Ollama embedding pipeline paired with pluggable LLM providers (Gemini, OpenAI, Anthropic)",

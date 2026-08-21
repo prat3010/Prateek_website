@@ -233,7 +233,7 @@ function Projects({ projects }: ProjectsProps) {
             { id: 'ai', label: 'AI & RAG' },
             { id: 'fullstack', label: 'FULLSTACK' },
             { id: 'mobile', label: 'MOBILE' },
-            { id: 'simulation', label: 'SIMULATION' },
+            { id: 'simulation', label: 'SIMULATION & TELEMETRY' },
           ].map((cat) => (
             <button
               key={cat.id}
