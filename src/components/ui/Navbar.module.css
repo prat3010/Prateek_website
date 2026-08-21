@@ -358,31 +358,30 @@
 .themeSegmented {
   --st-active-bg: var(--pop-yellow);
   --st-active-color: var(--pop-black);
-  --st-hover-bg: var(--pop-pink);
-  --st-hover-color: var(--pop-white);
+  --st-hover-color: var(--pop-black);
 }
 
 :global([data-theme='noir']) .themeSegmented {
-  --st-active-bg: #E8E8E8;
-  --st-active-color: #121214;
+  --st-active-bg: #22222a;
+  --st-active-color: var(--neon-yellow);
   --st-hover-color: var(--neon-yellow);
-  --st-hover-bg: rgba(255, 234, 0, 0.08);
   --st-accent: var(--neon-yellow);
+  --st-accent-glow: rgba(255, 234, 0, 0.35);
 }
 
 /* Audience Toggle */
 .audienceSegmented {
   --st-active-bg: var(--pop-blue);
   --st-active-color: var(--pop-white);
-  --st-hover-bg: var(--pop-green);
   --st-hover-color: var(--pop-black);
 }
 
 :global([data-theme='noir']) .audienceSegmented {
+  --st-active-bg: #1a2332;
   --st-active-color: var(--neon-cyan);
   --st-hover-color: var(--neon-cyan);
-  --st-hover-bg: rgba(0, 240, 255, 0.08);
   --st-accent: var(--neon-cyan);
+  --st-accent-glow: rgba(0, 240, 255, 0.35);
 }
 
 /* ── Nav link overrides ── */

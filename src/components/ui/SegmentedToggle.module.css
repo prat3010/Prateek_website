@@ -1,26 +1,30 @@
 .container {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border: 2px solid var(--pop-black);
+  border-radius: 14px;
+  background-color: var(--st-bg, rgba(255, 248, 225, 0.75));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 2px 2px 0px var(--pop-black);
   gap: 2px;
   padding: 3px;
-  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
 }
 
 .container:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 3px 3px 0px var(--pop-black);
 }
 
 .segment {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
   padding: 6px 14px;
   font-family: var(--font-headline);
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   text-transform: uppercase;
   letter-spacing: 1px;
   cursor: pointer;
@@ -28,85 +32,111 @@
   background: none;
   color: var(--st-inactive-color, var(--pop-black));
   border-radius: 10px;
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
   user-select: none;
   -webkit-user-select: none;
   line-height: 1;
   white-space: nowrap;
+  transition: color 0.2s ease, opacity 0.2s ease;
 }
 
 .segment:focus-visible {
   outline: 2px solid var(--pop-blue);
-  outline-offset: -2px;
+  outline-offset: 2px;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.activePill {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background-color: var(--st-active-bg, var(--pop-yellow));
+  border: 1.5px solid var(--pop-black);
+  box-shadow: 1px 1px 0px var(--pop-black);
+  z-index: 0;
 }
 
 .active {
-  background-color: var(--st-active-bg, var(--pop-yellow));
   color: var(--st-active-color, var(--pop-black));
   cursor: default;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
 .inactive {
-  opacity: 0.5;
+  opacity: 0.65;
 }
 
 .inactive:hover {
   opacity: 1;
-  transform: translateY(-1px);
-  background-color: var(--st-hover-bg, rgba(0, 0, 0, 0.06));
   color: var(--st-hover-color, var(--pop-black));
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .icon {
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 /* ── Noir Theme Overrides ── */
 :global([data-theme='noir']) .container {
-  border-color: var(--st-border, #3f3f4e);
-  box-shadow: none;
+  border: 1px solid var(--st-border, #2a2a35);
+  background-color: var(--st-bg, rgba(18, 18, 20, 0.8));
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.4);
 }
 
 :global([data-theme='noir']) .container:hover {
-  box-shadow: none;
+  border-color: var(--st-accent, rgba(255, 255, 255, 0.25));
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 :global([data-theme='noir']) .segment {
   font-family: var(--font-code);
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--st-inactive-color, #666);
+  color: var(--st-inactive-color, #71717a);
+}
+
+:global([data-theme='noir']) .activePill {
+  background-color: var(--st-active-bg, #22222a);
+  border: 1px solid var(--st-accent, var(--neon-cyan));
+  box-shadow: 0 0 12px var(--st-accent-glow, rgba(0, 240, 255, 0.35)), inset 0 0 8px var(--st-accent-glow, rgba(0, 240, 255, 0.15));
 }
 
 :global([data-theme='noir']) .active {
-  background-color: var(--st-active-bg, #2a2a35);
   color: var(--st-active-color, #fafafa);
-  opacity: 1;
-  box-shadow: 0 0 8px var(--st-accent, rgba(255, 255, 255, 0.1));
+  text-shadow: 0 0 8px var(--st-accent-glow, rgba(0, 240, 255, 0.4));
 }
 
 :global([data-theme='noir']) .inactive {
-  opacity: 0.65;
+  opacity: 0.7;
 }
 
 :global([data-theme='noir']) .inactive:hover {
-  background-color: var(--st-hover-bg, rgba(255, 255, 255, 0.05));
   color: var(--st-hover-color, #fafafa);
-  box-shadow: 0 0 10px var(--st-accent, rgba(255, 255, 255, 0.08));
+  opacity: 1;
 }
 
 /* ── Responsive Mobile Overrides ── */
 @media (max-width: 768px) {
+  .container {
+    padding: 2px;
+    border-width: 1.5px;
+    border-radius: 12px;
+  }
+
   .segment {
-    padding: 6px 8px;
-    gap: 0;
+    padding: 6px 10px;
+    border-radius: 8px;
+  }
+
+  .activePill {
+    border-radius: 8px;
   }
 
   .labelText {
@@ -121,3 +151,4 @@
     border-width: 0;
   }
 }
+

@@ -244,7 +244,7 @@ The visitor should not be asked repeatedly.
 
 Persistence should be implemented using the most appropriate modern approach while respecting privacy.
 
-To allow visitors to dynamically switch their communication audience setting at any point during their session, the global **Navbar** renders a dedicated text/button toggle next to the visual theme toggle switch.
+To allow visitors to dynamically switch their communication audience setting at any point during their session, the global **Navbar** renders dedicated `SegmentedToggle` controls powered by Framer Motion spring physics (`layoutId` sliding pill, Pop-Art 3D offset shadow in Azure, and glowing neon glass accents in Noir) next to the visual theme toggle switch.
 
 ---
 

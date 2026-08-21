@@ -315,6 +315,7 @@ export default function Navbar({ items, className }: NavbarProps) {
         {/* ---- Communication Identity Toggle ---- */}
         {audience && (
           <SegmentedToggle
+            id="audience-toggle"
             options={audienceOptions}
             activeValue={audience}
             onChange={handleAudienceChange}
@@ -325,6 +326,7 @@ export default function Navbar({ items, className }: NavbarProps) {
 
         {/* ---- Theme Toggle Switch ---- */}
         <SegmentedToggle
+          id="theme-toggle"
           options={themeOptions}
           activeValue={theme}
           onChange={handleThemeChange}

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { m } from 'framer-motion';
 import styles from './SegmentedToggle.module.css';
 
 export interface SegmentedOption {
@@ -10,6 +11,7 @@ export interface SegmentedOption {
 }
 
 interface SegmentedToggleProps {
+  id?: string;
   options: [SegmentedOption, SegmentedOption];
   activeValue: string;
   onChange: (value: string) => void;
@@ -18,6 +20,7 @@ interface SegmentedToggleProps {
 }
 
 export default function SegmentedToggle({
+  id = 'segmented-toggle',
   options,
   activeValue,
   onChange,
@@ -43,11 +46,32 @@ export default function SegmentedToggle({
             }}
             tabIndex={isActive ? -1 : 0}
           >
-            {opt.icon && <span className={styles.icon}>{opt.icon}</span>}
-            <span className={styles.labelText}>{opt.label}</span>
+            {isActive && (
+              <m.div
+                layoutId={`${id}-active-pill`}
+                className={styles.activePill}
+                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              />
+            )}
+            <span className={styles.content}>
+              {opt.icon && (
+                <m.span
+                  className={styles.icon}
+                  animate={{
+                    scale: isActive ? 1.12 : 1,
+                    rotate: isActive && (opt.value === 'noir' || opt.value === 'business') ? 180 : 0,
+                  }}
+                  transition={{ type: 'spring', stiffness: 350, damping: 22 }}
+                >
+                  {opt.icon}
+                </m.span>
+              )}
+              <span className={styles.labelText}>{opt.label}</span>
+            </span>
           </button>
         );
       })}
     </div>
   );
 }
+
