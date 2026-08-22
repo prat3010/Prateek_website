@@ -20,7 +20,7 @@ import resumeFallback from '@/data/resume.json';
 
 function consoleBandRange(band: CommissionBand): string {
   if (band.minINR == null) return `up to ₹${band.maxINR?.toLocaleString('en-IN')} / $${band.maxUSD?.toLocaleString('en-US')}`;
-  if (band.minINR == null) return `₹${band.minINR.toLocaleString('en-IN')}+ / $${band.minUSD?.toLocaleString('en-US')}+`;
+  if (band.maxINR == null) return `₹${band.minINR.toLocaleString('en-IN')}+ / $${band.minUSD?.toLocaleString('en-US')}+`;
   return `₹${band.minINR.toLocaleString('en-IN')}-${band.maxINR.toLocaleString('en-IN')} / $${band.minUSD?.toLocaleString('en-US')}-${band.maxUSD?.toLocaleString('en-US')}`;
 }
 
@@ -91,7 +91,6 @@ export default function SiteInfoConsole() {
       } catch {}
     }
   }, []);
->(-1);
 
   // Real telemetry state
   const [stats, setStats] = useState({
