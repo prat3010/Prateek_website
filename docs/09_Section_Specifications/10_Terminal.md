@@ -27,11 +27,10 @@ The terminal parses input strings dynamically. Available commands include:
 * `projects`: Lists portfolio projects and tags.
 * `system`: Shows CPU, memory, and display metrics.
 * `storage`: Inspects local and session storage. Subcommand `storage clear` or `storage wipe` clears all storage.
-* `stack`: Lists the website technologies.
+* `stack`: Lists the website technology stack and automatically copies the Technical System Dossier to the clipboard.
 * `sync`: Shows the local content sync workflow.
 * `analytics`: Shows visitor statistics summary. Links to the full analytics dashboard at `/admin/analytics`.
 * `inspect`: Probes real-time Supabase latency, JS heap memory footprint, active theme, and DOM node count.
-* `summary`: Generates and copies the Technical System Dossier to the clipboard.
 * `matrix`: Toggles retro Matrix green digital rain overlay.
 * `sfx`: Toggles Web Audio 8-bit sound synthesizer.
 * `snake`: Launches the interactive Snake Game with global Supabase leaderboard.

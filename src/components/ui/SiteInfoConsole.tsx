@@ -652,14 +652,13 @@ export default function SiteInfoConsole() {
           { text: '  projects   - List portfolio projects and tags', type: 'output' },
           { text: '  partner    - Print Sales Partner & Broker Agreement with PDF links', type: 'output' },
           { text: '  inspect    - Probe real Supabase latency, JS heap memory & React state', type: 'output' },
-          { text: '  summary    - Generate & copy Technical System Dossier to clipboard', type: 'output' },
           { text: '  matrix     - Toggle retro Matrix green digital rain overlay', type: 'output' },
           { text: '  sfx        - Toggle Web Audio 8-bit sound synthesizer', type: 'output' },
           { text: '  snake      - Launch interactive Snake Game with Supabase Leaderboard', type: 'output' },
           { text: '  pizzarat   - Toggle 3D WebGL NYC Pizza Rat physics model', type: 'output' },
           { text: '  system     - Show CPU, memory, and display metrics', type: 'output' },
           { text: '  storage    - Inspect local and session storage', type: 'output' },
-          { text: '  stack      - List the website technologies', type: 'output' },
+          { text: '  stack      - Print tech stack & copy architecture dossier to clipboard', type: 'output' },
           { text: '  sync       - Show the local content sync workflow', type: 'output' },
           { text: '  analytics  - Show visitor statistics summary', type: 'output' },
           { text: '  git-info   - Open the generated portfolio commit log (subcommands: show, repo)', type: 'output' },
@@ -727,22 +726,47 @@ export default function SiteInfoConsole() {
         break;
       }
       case 'stack':
+      case 'dossier':
+      case 'architecture': {
+        const summaryText = [
+          '===========================================================',
+          '      PRATEEK SHARMA PORTFOLIO - TECHNICAL SYSTEM DOSSIER  ',
+          '===========================================================',
+          '• Core Architecture : Next.js 16 App Router (React 19, TypeScript 5)',
+          '• Styling & Tokens  : CSS Modules / Custom Properties (Azure & Noir Themes)',
+          '• Database & Auth   : Supabase PostgreSQL (RLS-gated service role proxy)',
+          '• Scroll & Motion   : Lenis Smooth Scroll 1.3 + Framer Motion 12',
+          '• 3D & Graphics     : Three.js 0.184 + HTML Canvas Shaders',
+          '• Payment Gateway   : Razorpay Dynamic UPI QR & Webhook Ledger',
+          '• Email Delivery    : Resend API with PDF Scoping Brief Attachments',
+          '==========================================================='
+        ].join('\n');
+
+        if (typeof navigator !== 'undefined' && navigator.clipboard) {
+          navigator.clipboard.writeText(summaryText).then(() => {
+            toast.success('Technical Dossier Copied to Clipboard!');
+          }).catch(() => {});
+        }
+
         response = [
-          { text: 'WEBSITE TECHNOLOGY STACK:', type: 'success' },
+          { text: 'WEBSITE TECHNOLOGY STACK & ARCHITECTURE DOSSIER:', type: 'success' },
           { text: '  - Core Framework: Next.js 16.2.6 (React 19.2.4)', type: 'output' },
           { text: '  - Language: TypeScript 5.x', type: 'output' },
-          { text: '  - Database & Backend: Supabase JS SDK 2.106.2', type: 'output' },
+          { text: '  - Database & Backend: Supabase JS SDK 2.106.2 (RLS proxy)', type: 'output' },
           { text: '  - Styling & Layout: Vanilla CSS / CSS Modules', type: 'output' },
-          { text: '  - Animations: Framer Motion 12.40.0', type: 'output' },
-          { text: '  - 3D Graphics: Three.js 0.184.0', type: 'output' },
+          { text: '  - Animations & Motion: Framer Motion 12.40.0', type: 'output' },
+          { text: '  - 3D Graphics: Three.js 0.184.0 + HTML Canvas Shaders', type: 'output' },
           { text: '  - Smooth Scrolling: Lenis Scroll 1.3.23', type: 'output' },
-          { text: '  - Document/PDF Engine: jsPDF 4.2.1', type: 'output' },
+          { text: '  - Payment Gateway: Razorpay Dynamic UPI QR & Webhook Ledger', type: 'output' },
+          { text: '  - Document/PDF Engine: jsPDF 4.2.1 / @react-pdf', type: 'output' },
           { text: '  - UI Icons: Lucide React 1.16.0', type: 'output' },
           { text: '  - Markdown Parser: React Markdown 10.1.0', type: 'output' },
           { text: '  - Email Delivery: Resend SDK 6.12.4', type: 'output' },
-          { text: '  - Performance Audits: Vercel Speed Insights 2.0.0', type: 'output' }
+          { text: '  - Performance Audits: Vercel Speed Insights 2.0.0', type: 'output' },
+          { text: 'Tip: System dossier has been copied to your clipboard.', type: 'success' }
         ];
         break;
+      }
       case 'sync':
       case 'synchronizer':
         response = [
@@ -797,37 +821,6 @@ export default function SiteInfoConsole() {
           .catch(() => {
             setTerminalHistory(prev => [...prev, { text: 'Failed to probe database latency.', type: 'error' }]);
           });
-        setTerminalInput('');
-        return;
-      }
-      case 'summary':
-      case 'dossier':
-      case 'architecture': {
-        const summaryText = [
-          '===========================================================',
-          '      PRATEEK SHARMA PORTFOLIO - TECHNICAL SYSTEM DOSSIER  ',
-          '===========================================================',
-          '• Core Architecture : Next.js 16 App Router (React 19, TypeScript 5)',
-          '• Styling & Tokens  : CSS Modules / Custom Properties (Azure & Noir Themes)',
-          '• Database & Auth   : Supabase PostgreSQL (RLS-gated service role proxy)',
-          '• Scroll & Motion   : Lenis Smooth Scroll 1.3 + Framer Motion 12',
-          '• 3D & Graphics     : Three.js 0.184 + HTML Canvas Shaders',
-          '• Payment Gateway   : Razorpay Dynamic UPI QR & Webhook Ledger',
-          '• Email Delivery    : Resend API with PDF Scoping Brief Attachments',
-          '==========================================================='
-        ].join('\n');
-
-        if (typeof navigator !== 'undefined' && navigator.clipboard) {
-          navigator.clipboard.writeText(summaryText).then(() => {
-            toast.success('Technical Dossier Copied to Clipboard!');
-          }).catch(() => {});
-        }
-
-        setTerminalHistory(prev => [
-          ...prev,
-          { text: summaryText, type: 'success' },
-          { text: 'Tip: System dossier has been copied to your clipboard.', type: 'output' }
-        ]);
         setTerminalInput('');
         return;
       }
@@ -1073,7 +1066,7 @@ export default function SiteInfoConsole() {
           <div className={styles.shortcutsContainer}>
             <span className={styles.shortcutsLabel}>QUICK SHORTCUTS:</span>
             <div className={styles.shortcutsGrid}>
-              {['help', 'inspect', 'summary', 'matrix', 'sfx', 'snake', 'pizzarat', 'projects', 'partner', 'system', 'storage', 'stack', 'sync', 'analytics', 'git-info', 'qrcode', 'clear'].map(cmd => (
+              {['help', 'inspect', 'stack', 'matrix', 'sfx', 'snake', 'pizzarat', 'projects', 'partner', 'system', 'storage', 'sync', 'analytics', 'git-info', 'qrcode', 'clear'].map(cmd => (
                 <button
                   key={cmd}
                   onClick={() => executeCommand(cmd)}
