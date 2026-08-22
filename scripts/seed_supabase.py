@@ -94,7 +94,18 @@ for p in projects_raw:
     p.setdefault('longDescription_business', '')
     p.pop('ctaLabel', None)
 if projects_raw:
-    upsert('projects', projects_raw, 'slug')
+    res = upsert('projects', projects_raw, 'slug')
+    if res is None:
+        print('  Notice: Missing column detected on Supabase DB. Retrying with core project columns...')
+        core_projects = []
+        for item in projects_raw:
+            cp = dict(item)
+            cp.pop('category', None)
+            cp.pop('architectureHighlights', None)
+            cp.pop('challenges', None)
+            cp.pop('keyDeliverables', None)
+            core_projects.append(cp)
+        upsert('projects', core_projects, 'slug')
 print(f'  {len(projects_raw)} projects synced')
 
 # ── 2. Skills ────────────────────────────────────────────────────────

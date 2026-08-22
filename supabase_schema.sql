@@ -95,9 +95,18 @@ CREATE TABLE IF NOT EXISTS projects (
   color TEXT NOT NULL DEFAULT '#00E676',
   "isLive" BOOLEAN NOT NULL DEFAULT FALSE,
   status TEXT NOT NULL DEFAULT 'soon' CHECK (status IN ('live', 'soon', 'personal')),
+  category TEXT DEFAULT 'fullstack',
+  "architectureHighlights" JSONB DEFAULT '[]',
+  challenges JSONB DEFAULT '[]',
+  "keyDeliverables" JSONB DEFAULT '[]',
   created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS category TEXT DEFAULT 'fullstack';
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS "architectureHighlights" JSONB DEFAULT '[]';
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS challenges JSONB DEFAULT '[]';
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS "keyDeliverables" JSONB DEFAULT '[]';
 
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow public select projects" ON projects;
