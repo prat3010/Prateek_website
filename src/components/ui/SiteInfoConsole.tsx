@@ -13,6 +13,8 @@ import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
 import { toggleAudio, playKeySound, playAchievementSound } from '@/lib/terminalAudio';
 import TerminalSnakeGame from './TerminalSnakeGame';
+import Portal from '@/components/ui/Portal';
+import MatrixRainOverlay from '@/components/effects/MatrixRainOverlay';
 import styles from './SiteInfoConsole.module.css';
 import type { ResumeData, MiddlemanAgreementConfig } from '@/data/resume';
 import { COMMISSION_BANDS, COMMISSION_DISBURSEMENT_WINDOW, RECURRING_COMMISSION_RATE, type CommissionBand } from '@/lib/commission';
@@ -1084,6 +1086,11 @@ export default function SiteInfoConsole() {
           </div>
         </div>
       </div>
+      {isMatrixActive && (
+        <Portal>
+          <MatrixRainOverlay onClose={() => setIsMatrixActive(false)} />
+        </Portal>
+      )}
     </div>
   );
 }
