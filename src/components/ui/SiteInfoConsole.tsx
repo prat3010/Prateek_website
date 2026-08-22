@@ -69,6 +69,9 @@ export default function SiteInfoConsole() {
     BOOT_LOGS.map(log => ({ text: log, type: 'success' }))
   );
   
+  const [cmdHistory, setCmdHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState<number>(-1);
+
   // Real telemetry state
   const [stats, setStats] = useState({
     fps: 60,
@@ -99,6 +102,14 @@ export default function SiteInfoConsole() {
     }
   }, [terminalHistory]);
 
+  // Dynamically update DOM nodes count when terminal history renders
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const nodes = document.getElementsByTagName('*').length;
+      setStats(prev => ({ ...prev, domNodes: nodes }));
+    }
+  }, [terminalHistory]);
+
   // Focus input on click of terminal area
   const focusTerminalInput = () => {
     if (inputRef.current) {
@@ -120,13 +131,17 @@ export default function SiteInfoConsole() {
     let animId: number;
 
     const countFrames = () => {
-      frameCount++;
-      const now = performance.now();
-      if (now - lastTime >= 1000) {
-        const currentFps = Math.round((frameCount * 1000) / (now - lastTime));
-        setStats(prev => ({ ...prev, fps: currentFps }));
-        frameCount = 0;
-        lastTime = now;
+      if (isVisibleRef.current) {
+        frameCount++;
+        const now = performance.now();
+        if (now - lastTime >= 1000) {
+          const currentFps = Math.round((frameCount * 1000) / (now - lastTime));
+          setStats(prev => ({ ...prev, fps: currentFps }));
+          frameCount = 0;
+          lastTime = now;
+        }
+      } else {
+        lastTime = performance.now();
       }
       animId = requestAnimationFrame(countFrames);
     };
@@ -174,7 +189,7 @@ export default function SiteInfoConsole() {
           uptime: uptimeStr
         };
       });
-    }, 200);
+    }, 1000);
 
     return () => {
       clearInterval(timer);
@@ -241,18 +256,29 @@ export default function SiteInfoConsole() {
     const trimmedCmd = cmd.trim().toLowerCase();
     if (!trimmedCmd) return;
 
-    // Add input command to history
+    // Add input command to history & reset history index pointer
+    setCmdHistory(prev => [...prev, cmd]);
+    setHistoryIndex(-1);
     setTerminalHistory(prev => [...prev, { text: `> ${cmd}`, type: 'input' }]);
 
     let response: ConsoleLine[] = [];
 
     if (trimmedCmd.startsWith('git-info')) {
-      const parts = trimmedCmd.split(/\s+/);
+      const parts = cmd.trim().split(/\s+/);
       const subCommand = parts[1]?.toLowerCase() || '';
-      
+
       if (subCommand === 'show') {
         const commitHash = parts[2] || '';
-        
+        if (!commitHash) {
+          setTerminalHistory(prev => [
+            ...prev,
+            { text: 'Usage: git-info show <commit_hash>', type: 'error' },
+            { text: 'Click here to return to Commit Journal', type: 'link', command: 'git-info' }
+          ]);
+          setTerminalInput('');
+          return;
+        }
+
         fetch(`/api/git-log?commit=${encodeURIComponent(commitHash)}`)
           .then(res => {
             if (!res.ok) throw new Error();
@@ -260,10 +286,10 @@ export default function SiteInfoConsole() {
           })
           .then(data => {
             const lines: ConsoleLine[] = [];
-            lines.push({ text: `GIT INSPECTOR // COMMIT SPECIFICATIONS:`, type: 'success' });
+            lines.push({ text: `GIT INSPECTOR // COMMIT SPECIFICATIONS (${data.repo || 'Repository'}):`, type: 'success' });
             lines.push({ text: ' ', type: 'output' });
-            
-            const detailLines = data.content.split('\n');
+
+            const detailLines = (data.content || '').split('\n');
             detailLines.forEach((l: string) => {
               lines.push({ text: l, type: 'output' });
             });
@@ -282,19 +308,27 @@ export default function SiteInfoConsole() {
               { text: 'Click here to return to Commit Journal', type: 'link', command: 'git-info' }
             ]);
           });
-      } else {
-        // Default: fetch list of commits
-        fetch('/api/git-log')
+      } else if (subCommand === 'repo') {
+        const targetRepo = parts[2] || '';
+        if (!targetRepo || !targetRepo.includes('/')) {
+          setTerminalHistory(prev => [
+            ...prev,
+            { text: 'Usage: git-info repo <owner/repo> (e.g. git-info repo prat3010/retriever)', type: 'error' }
+          ]);
+          setTerminalInput('');
+          return;
+        }
+        fetch(`/api/git-log?repo=${encodeURIComponent(targetRepo)}`)
           .then(res => {
             if (!res.ok) throw new Error();
             return res.json();
           })
           .then(data => {
             const lines: ConsoleLine[] = [];
-            lines.push({ text: 'PORTFOLIO DEVELOPMENT GIT COMMIT JOURNAL:', type: 'success' });
-            lines.push({ text: '  Click on any commit line to inspect the generated build-time commit record.', type: 'output' });
+            lines.push({ text: `GIT COMMIT JOURNAL (${data.repo || targetRepo}):`, type: 'success' });
+            lines.push({ text: '  Click on any commit line to inspect details.', type: 'output' });
             lines.push({ text: ' ', type: 'output' });
-            
+
             data.commits.forEach((c: { hash: string; subject: string; date: string; author: string }) => {
               lines.push({
                 text: `  [${c.hash}] ${c.subject} (${c.date})`,
@@ -303,7 +337,37 @@ export default function SiteInfoConsole() {
               });
             });
             lines.push({ text: ' ', type: 'output' });
-            lines.push({ text: 'Tip: Type "git-info show <commit_hash>" to open a generated commit record.', type: 'success' });
+            lines.push({ text: 'Tip: Type "git-info show <commit_hash>" to open a commit record.', type: 'success' });
+            setTerminalHistory(prev => [...prev, ...lines]);
+          })
+          .catch(() => {
+            setTerminalHistory(prev => [
+              ...prev,
+              { text: `Failed to retrieve git log for repository '${targetRepo}'.`, type: 'error' }
+            ]);
+          });
+      } else if (!subCommand) {
+        // Default: fetch list of commits
+        fetch('/api/git-log')
+          .then(res => {
+            if (!res.ok) throw new Error();
+            return res.json();
+          })
+          .then(data => {
+            const lines: ConsoleLine[] = [];
+            lines.push({ text: `PORTFOLIO DEVELOPMENT GIT COMMIT JOURNAL (${data.repo || 'prat3010/Prateek_website'}):`, type: 'success' });
+            lines.push({ text: '  Click on any commit line to inspect live/build-time commit record.', type: 'output' });
+            lines.push({ text: ' ', type: 'output' });
+
+            data.commits.forEach((c: { hash: string; subject: string; date: string; author: string }) => {
+              lines.push({
+                text: `  [${c.hash}] ${c.subject} (${c.date})`,
+                type: 'link',
+                command: `git-info show ${c.hash}`
+              });
+            });
+            lines.push({ text: ' ', type: 'output' });
+            lines.push({ text: 'Tip: Type "git-info show <commit_hash>" or "git-info repo <owner/repo>" to inspect repositories.', type: 'success' });
             setTerminalHistory(prev => [...prev, ...lines]);
           })
           .catch(() => {
@@ -312,8 +376,13 @@ export default function SiteInfoConsole() {
               { text: 'Failed to retrieve git logs.', type: 'error' }
             ]);
           });
+      } else {
+        setTerminalHistory(prev => [
+          ...prev,
+          { text: `Invalid git-info subcommand: '${subCommand}'. Usage: git-info [show <hash> | repo <owner/repo>]`, type: 'error' }
+        ]);
       }
-      
+
       setTerminalInput('');
       return;
     }
@@ -440,9 +509,17 @@ export default function SiteInfoConsole() {
     if (trimmedCmd.startsWith('qrcode') || trimmedCmd.startsWith('qr')) {
       const parts = trimmedCmd.split(/\s+/);
       const arg = parts[1];
-      const amount = arg ? parseFloat(arg) : NaN;
+      if (arg !== undefined) {
+        const amount = parseFloat(arg);
+        if (isNaN(amount) || amount <= 0) {
+          setTerminalHistory(prev => [
+            ...prev,
+            { text: `Invalid amount '${arg}'. Usage: qrcode <amount_in_inr> (e.g. qrcode 500)`, type: 'error' }
+          ]);
+          setTerminalInput('');
+          return;
+        }
 
-      if (!isNaN(amount) && amount > 0) {
         setTerminalHistory(prev => [
           ...prev,
           { text: `RAZORPAY DYNAMIC GATEWAY // Requesting single-use QR for ₹${amount.toLocaleString('en-IN')}...`, type: 'output' }
@@ -491,8 +568,8 @@ export default function SiteInfoConsole() {
       return;
     }
 
-    if (trimmedCmd.startsWith('ask ') || trimmedCmd.startsWith('explain ') || (!['help', 'projects', 'partner', 'system', 'storage', 'stack', 'sync', 'synchronizer', 'analytics', 'cheatcode', 'git-info', 'qrcode', 'clear'].includes(trimmedCmd.split(/\s+/)[0]))) {
-      const queryText = trimmedCmd.replace(/^(ask|explain)\s+/i, '').trim();
+    if (trimmedCmd.startsWith('ask ') || trimmedCmd.startsWith('explain ')) {
+      const queryText = cmd.trim().replace(/^(ask|explain)\s+/i, '').trim();
       if (queryText.length >= 3) {
         setTerminalHistory(prev => [
           ...prev,
@@ -549,7 +626,7 @@ export default function SiteInfoConsole() {
           { text: '  sync       - Show the local content sync workflow', type: 'output' },
           { text: '  analytics  - Show visitor statistics summary', type: 'output' },
           { text: '  cheatcode  - Run retro developer override (3D WebGL pizza rat)', type: 'output' },
-          { text: '  git-info   - Open the generated portfolio commit log', type: 'output' },
+          { text: '  git-info   - Open the generated portfolio commit log (subcommands: show, repo)', type: 'output' },
           { text: '  qrcode     - Scan default PhonePe QR or generate dynamic (e.g. qrcode 500)', type: 'output' },
           { text: '  clear      - Clear the command interface screen', type: 'output' }
         ];
@@ -676,6 +753,23 @@ export default function SiteInfoConsole() {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       executeCommand(terminalInput);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (cmdHistory.length === 0) return;
+      const nextIndex = historyIndex === -1 ? cmdHistory.length - 1 : Math.max(0, historyIndex - 1);
+      setHistoryIndex(nextIndex);
+      setTerminalInput(cmdHistory[nextIndex] || '');
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (historyIndex === -1) return;
+      const nextIndex = historyIndex + 1;
+      if (nextIndex >= cmdHistory.length) {
+        setHistoryIndex(-1);
+        setTerminalInput('');
+      } else {
+        setHistoryIndex(nextIndex);
+        setTerminalInput(cmdHistory[nextIndex] || '');
+      }
     }
   };
 
