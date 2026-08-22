@@ -649,12 +649,17 @@ export default function SiteInfoConsole() {
           { text: '  ask <query>  - Query Retriever Concierge vector memory for platform specs & docs', type: 'output' },
           { text: '  projects   - List portfolio projects and tags', type: 'output' },
           { text: '  partner    - Print Sales Partner & Broker Agreement with PDF links', type: 'output' },
+          { text: '  inspect    - Probe real Supabase latency, JS heap memory & React state', type: 'output' },
+          { text: '  summary    - Generate & copy Technical System Dossier to clipboard', type: 'output' },
+          { text: '  matrix     - Toggle retro Matrix green digital rain overlay', type: 'output' },
+          { text: '  sfx        - Toggle Web Audio 8-bit sound synthesizer', type: 'output' },
+          { text: '  snake      - Launch interactive Snake Game with Supabase Leaderboard', type: 'output' },
+          { text: '  pizzarat   - Toggle 3D WebGL NYC Pizza Rat physics model', type: 'output' },
           { text: '  system     - Show CPU, memory, and display metrics', type: 'output' },
           { text: '  storage    - Inspect local and session storage', type: 'output' },
           { text: '  stack      - List the website technologies', type: 'output' },
           { text: '  sync       - Show the local content sync workflow', type: 'output' },
           { text: '  analytics  - Show visitor statistics summary', type: 'output' },
-          { text: '  cheatcode  - Run retro developer override (3D WebGL pizza rat)', type: 'output' },
           { text: '  git-info   - Open the generated portfolio commit log (subcommands: show, repo)', type: 'output' },
           { text: '  qrcode     - Scan default PhonePe QR or generate dynamic (e.g. qrcode 500)', type: 'output' },
           { text: '  clear      - Clear the command interface screen', type: 'output' }
@@ -751,149 +756,111 @@ export default function SiteInfoConsole() {
           { text: '  - Local Command: streamlit run scripts/synchronizer.py', type: 'output' }
         ];
         break;
-      case 'cheatcode':
-      case 'cheat': {
-        const parts = cmd.trim().split(/\s+/);
-        const sub = parts[1]?.toLowerCase() || '';
-
-        if (sub === 'snake' || sub === 'play' || sub === 'game') {
-          setActiveGame('snake');
-          setTerminalHistory(prev => [
-            ...prev,
-            { text: 'LAUNCHING RETRO TERMINAL SNAKE ENGINE...', type: 'success' },
-            { text: '  - High scores are synchronized with Supabase Global Leaderboard.', type: 'output' }
-          ]);
-          setTerminalInput('');
-          return;
-        }
-
-        if (sub === 'inspect' || sub === 'probe') {
-          const startTime = performance.now();
-          fetch('/api/profile')
-            .then(() => {
-              const latency = Math.round(performance.now() - startTime);
-              const memory = (performance as unknown as { memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
-              const heapUsed = memory ? `${Math.round(memory.usedJSHeapSize / 1048576)} MB` : 'Protected/Browser Restricted';
-              const heapLimit = memory ? `${Math.round(memory.jsHeapSizeLimit / 1048576)} MB` : 'Unavailable';
-              const activeTheme = isNoir ? 'Noir Cyber-Glow' : 'Comic Ink Light';
-
-              const lines: ConsoleLine[] = [
-                { text: '===========================================================', type: 'success' },
-                { text: '      REAL-TIME SYSTEM & SUPABASE ARCHITECTURE PROBE       ', type: 'success' },
-                { text: '===========================================================', type: 'success' },
-                { text: `⚡ SUPABASE RLS DATABASE LATENCY : ${latency} ms`, type: 'success' },
-                { text: `🧠 JS HEAP MEMORY FOOTPRINT      : ${heapUsed} (Limit: ${heapLimit})`, type: 'output' },
-                { text: `🎨 ACTIVE DESIGN THEME ENGINE     : ${activeTheme}`, type: 'output' },
-                { text: `📜 LOADED SCRIPT BUNDLE FOOTPRINT : ${stats.bundleSize} KB`, type: 'output' },
-                { text: `🌐 DOM CONTAINER NODES COUNT     : ${stats.domNodes} elements`, type: 'output' },
-                { text: '===========================================================', type: 'success' }
-              ];
-              setTerminalHistory(prev => [...prev, ...lines]);
-              unlockAchievement('cyber_inspector', 'Cyber Inspector', 'Executed real-time Supabase latency & JS memory probe');
-            })
-            .catch(() => {
-              setTerminalHistory(prev => [...prev, { text: 'Failed to probe database latency.', type: 'error' }]);
-            });
-          setTerminalInput('');
-          return;
-        }
-
-        if (sub === 'summary' || sub === 'dossier') {
-          const summaryText = [
-            '===========================================================',
-            '      PRATEEK SHARMA PORTFOLIO - TECHNICAL SYSTEM DOSSIER  ',
-            '===========================================================',
-            '• Core Architecture : Next.js 16 App Router (React 19, TypeScript 5)',
-            '• Styling & Tokens  : CSS Modules / Custom Properties (Azure & Noir Themes)',
-            '• Database & Auth   : Supabase PostgreSQL (RLS-gated service role proxy)',
-            '• Scroll & Motion   : Lenis Smooth Scroll 1.3 + Framer Motion 12',
-            '• 3D & Graphics     : Three.js 0.184 + HTML Canvas Shaders',
-            '• Payment Gateway   : Razorpay Dynamic UPI QR & Webhook Ledger',
-            '• Email Delivery    : Resend API with PDF Scoping Brief Attachments',
-            '==========================================================='
-          ].join('\n');
-
-          if (typeof navigator !== 'undefined' && navigator.clipboard) {
-            navigator.clipboard.writeText(summaryText).then(() => {
-              toast.success('Technical Dossier Copied to Clipboard!');
-            }).catch(() => {});
-          }
-
-          setTerminalHistory(prev => [
-            ...prev,
-            { text: summaryText, type: 'success' },
-            { text: 'Tip: System dossier has been copied to your clipboard.', type: 'output' }
-          ]);
-          setTerminalInput('');
-          return;
-        }
-
-        if (sub === 'matrix') {
-          setIsMatrixActive(prev => !prev);
-          const nextState = !isMatrixActive;
-          setTerminalHistory(prev => [
-            ...prev,
-            { text: `MATRIX DIGITAL RAIN OVERLAY: ${nextState ? 'ENGAGED' : 'DISENGAGED'}`, type: 'success' }
-          ]);
-          if (nextState) unlockAchievement('cyber_hacker', 'Cyber Hacker', 'Activated Matrix Digital Rain Canvas');
-          setTerminalInput('');
-          return;
-        }
-
-        if (sub === 'pizzarat') {
-          if (typeof window !== 'undefined') {
-            const isActive = document.documentElement.classList.toggle('konami-active');
-            setTerminalHistory(prev => [
-              ...prev,
-              { text: `NYC PIZZA RAT 3D MODEL: ${isActive ? 'ACTIVE' : 'INACTIVE'}`, type: 'success' }
-            ]);
-            if (isActive) unlockAchievement('pizza_legend', 'NYC Pizza Legend', 'Summoned 3D Pizza Rat WebGL model');
-          }
-          setTerminalInput('');
-          return;
-        }
-
-        if (sub === 'sfx' || sub === 'sound' || sub === 'audio') {
-          const isEnabled = toggleAudio();
-          setTerminalHistory(prev => [
-            ...prev,
-            { text: `WEB AUDIO SFX SYNTHESIZER: ${isEnabled ? 'ENABLED' : 'MUTED'}`, type: 'success' }
-          ]);
-          setTerminalInput('');
-          return;
-        }
-
-        // Default cheatcode menu
-        response = [
-          { text: '===========================================================', type: 'success' },
-          { text: '        SECRET TERMINAL UTILITY & CHEAT MENU               ', type: 'success' },
-          { text: '===========================================================', type: 'success' },
-          { text: '  snake      - Launch interactive Snake Game with Supabase Leaderboard', type: 'link', command: 'cheatcode snake' },
-          { text: '  inspect    - Probe real Supabase latency, JS heap memory & React state', type: 'link', command: 'cheatcode inspect' },
-          { text: '  summary    - Generate & copy Technical System Dossier to clipboard', type: 'link', command: 'cheatcode summary' },
-          { text: '  matrix     - Toggle retro Matrix green digital rain overlay', type: 'link', command: 'cheatcode matrix' },
-          { text: '  pizzarat   - Toggle 3D WebGL NYC Pizza Rat physics model', type: 'link', command: 'cheatcode pizzarat' },
-          { text: '  sfx        - Toggle Web Audio 8-bit sound synthesizer', type: 'link', command: 'cheatcode sfx' },
-          { text: '===========================================================', type: 'success' }
-        ];
-        break;
-      }
       case 'snake':
       case 'play':
+      case 'game':
         setActiveGame('snake');
         setTerminalHistory(prev => [
           ...prev,
-          { text: 'LAUNCHING RETRO TERMINAL SNAKE ENGINE...', type: 'success' }
+          { text: 'LAUNCHING RETRO TERMINAL SNAKE ENGINE...', type: 'success' },
+          { text: '  - High scores are synchronized with Supabase Global Leaderboard.', type: 'output' }
         ]);
         setTerminalInput('');
         return;
       case 'inspect':
-      case 'summary':
-      case 'matrix':
-      case 'pizzarat':
-      case 'sfx':
-        executeCommand(`cheatcode ${trimmedCmd}`);
+      case 'probe': {
+        const startTime = performance.now();
+        fetch('/api/profile')
+          .then(() => {
+            const latency = Math.round(performance.now() - startTime);
+            const memory = (performance as unknown as { memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
+            const heapUsed = memory ? `${Math.round(memory.usedJSHeapSize / 1048576)} MB` : 'Protected/Browser Restricted';
+            const heapLimit = memory ? `${Math.round(memory.jsHeapSizeLimit / 1048576)} MB` : 'Unavailable';
+            const activeTheme = isNoir ? 'Noir Cyber-Glow' : 'Comic Ink Light';
+
+            const lines: ConsoleLine[] = [
+              { text: '===========================================================', type: 'success' },
+              { text: '      REAL-TIME SYSTEM & SUPABASE ARCHITECTURE PROBE       ', type: 'success' },
+              { text: '===========================================================', type: 'success' },
+              { text: `⚡ SUPABASE RLS DATABASE LATENCY : ${latency} ms`, type: 'success' },
+              { text: `🧠 JS HEAP MEMORY FOOTPRINT      : ${heapUsed} (Limit: ${heapLimit})`, type: 'output' },
+              { text: `🎨 ACTIVE DESIGN THEME ENGINE     : ${activeTheme}`, type: 'output' },
+              { text: `📜 LOADED SCRIPT BUNDLE FOOTPRINT : ${stats.bundleSize} KB`, type: 'output' },
+              { text: `🌐 DOM CONTAINER NODES COUNT     : ${stats.domNodes} elements`, type: 'output' },
+              { text: '===========================================================', type: 'success' }
+            ];
+            setTerminalHistory(prev => [...prev, ...lines]);
+            unlockAchievement('cyber_inspector', 'Cyber Inspector', 'Executed real-time Supabase latency & JS memory probe');
+          })
+          .catch(() => {
+            setTerminalHistory(prev => [...prev, { text: 'Failed to probe database latency.', type: 'error' }]);
+          });
+        setTerminalInput('');
         return;
+      }
+      case 'summary':
+      case 'dossier':
+      case 'architecture': {
+        const summaryText = [
+          '===========================================================',
+          '      PRATEEK SHARMA PORTFOLIO - TECHNICAL SYSTEM DOSSIER  ',
+          '===========================================================',
+          '• Core Architecture : Next.js 16 App Router (React 19, TypeScript 5)',
+          '• Styling & Tokens  : CSS Modules / Custom Properties (Azure & Noir Themes)',
+          '• Database & Auth   : Supabase PostgreSQL (RLS-gated service role proxy)',
+          '• Scroll & Motion   : Lenis Smooth Scroll 1.3 + Framer Motion 12',
+          '• 3D & Graphics     : Three.js 0.184 + HTML Canvas Shaders',
+          '• Payment Gateway   : Razorpay Dynamic UPI QR & Webhook Ledger',
+          '• Email Delivery    : Resend API with PDF Scoping Brief Attachments',
+          '==========================================================='
+        ].join('\n');
+
+        if (typeof navigator !== 'undefined' && navigator.clipboard) {
+          navigator.clipboard.writeText(summaryText).then(() => {
+            toast.success('Technical Dossier Copied to Clipboard!');
+          }).catch(() => {});
+        }
+
+        setTerminalHistory(prev => [
+          ...prev,
+          { text: summaryText, type: 'success' },
+          { text: 'Tip: System dossier has been copied to your clipboard.', type: 'output' }
+        ]);
+        setTerminalInput('');
+        return;
+      }
+      case 'matrix':
+        setIsMatrixActive(prev => !prev);
+        setTerminalHistory(prev => [
+          ...prev,
+          { text: `MATRIX DIGITAL RAIN OVERLAY: ${!isMatrixActive ? 'ENGAGED' : 'DISENGAGED'}`, type: 'success' }
+        ]);
+        if (!isMatrixActive) unlockAchievement('cyber_hacker', 'Cyber Hacker', 'Activated Matrix Digital Rain Canvas');
+        setTerminalInput('');
+        return;
+      case 'pizzarat':
+      case 'konami':
+        if (typeof window !== 'undefined') {
+          const isActive = document.documentElement.classList.toggle('konami-active');
+          setTerminalHistory(prev => [
+            ...prev,
+            { text: `NYC PIZZA RAT 3D MODEL: ${isActive ? 'ACTIVE' : 'INACTIVE'}`, type: 'success' }
+          ]);
+          if (isActive) unlockAchievement('pizza_legend', 'NYC Pizza Legend', 'Summoned 3D Pizza Rat WebGL model');
+        }
+        setTerminalInput('');
+        return;
+      case 'sfx':
+      case 'sound':
+      case 'audio': {
+        const isEnabled = toggleAudio();
+        setTerminalHistory(prev => [
+          ...prev,
+          { text: `WEB AUDIO SFX SYNTHESIZER: ${isEnabled ? 'ENABLED' : 'MUTED'}`, type: 'success' }
+        ]);
+        setTerminalInput('');
+        return;
+      }
       case 'clear':
         setTerminalHistory([]);
         setTerminalInput('');
@@ -1104,7 +1071,7 @@ export default function SiteInfoConsole() {
           <div className={styles.shortcutsContainer}>
             <span className={styles.shortcutsLabel}>QUICK SHORTCUTS:</span>
             <div className={styles.shortcutsGrid}>
-              {['help', 'projects', 'partner', 'system', 'storage', 'stack', 'sync', 'analytics', 'cheatcode', 'git-info', 'qrcode', 'clear'].map(cmd => (
+              {['help', 'inspect', 'summary', 'matrix', 'sfx', 'snake', 'pizzarat', 'projects', 'partner', 'system', 'storage', 'stack', 'sync', 'analytics', 'git-info', 'qrcode', 'clear'].map(cmd => (
                 <button
                   key={cmd}
                   onClick={() => executeCommand(cmd)}

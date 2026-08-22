@@ -30,7 +30,12 @@ The terminal parses input strings dynamically. Available commands include:
 * `stack`: Lists the website technologies.
 * `sync`: Shows the local content sync workflow.
 * `analytics`: Shows visitor statistics summary. Links to the full analytics dashboard at `/admin/analytics`.
-* `cheatcode`: Runs retro developer override (activates the Three.js WebGL pizza rat easter egg).
+* `inspect`: Probes real-time Supabase latency, JS heap memory footprint, active theme, and DOM node count.
+* `summary`: Generates and copies the Technical System Dossier to the clipboard.
+* `matrix`: Toggles retro Matrix green digital rain overlay.
+* `sfx`: Toggles Web Audio 8-bit sound synthesizer.
+* `snake`: Launches the interactive Snake Game with global Supabase leaderboard.
+* `pizzarat`: Toggles the 3D WebGL NYC Pizza Rat physics model.
 * `qrcode`: Generates a dynamic Razorpay UPI QR code for custom payment amounts (e.g., `qrcode 500` via `/api/terminal/qrcode`) with base64 PNG fallback and native `upi://pay` URI scheme launch support.
 * `clear`: Clears the terminal screen memory history.
 

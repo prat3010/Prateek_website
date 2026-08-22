@@ -69,8 +69,60 @@ def upsert(table, rows, conflict_col='id'):
 def clear_table(table):
     supabase_rest('DELETE', table)
 
+SAFE_SYNC = '--safe-sync' in sys.argv or os.environ.get('SAFE_SYNC', '').lower() in ('1', 'true')
+
+def get_existing_db_records(table, conflict_col='id'):
+    """Fetch existing table records with updated_at timestamp to check for drift."""
+    try:
+        url = os.environ['NEXT_PUBLIC_SUPABASE_URL'].rstrip('/') + f'/rest/v1/{table}?select={conflict_col},updated_at'
+        key = os.environ['SUPABASE_SERVICE_ROLE_KEY']
+        headers = {
+            'apikey': key,
+            'Authorization': f'Bearer {key}',
+        }
+        req = urllib.request.Request(url, headers=headers, method='GET')
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read())
+            return {row[conflict_col]: row.get('updated_at') for row in data if conflict_col in row}
+    except Exception:
+        return {}
+
+def filter_drift_protected_rows(table, rows, file_path, conflict_col='id'):
+    """Filter out rows where Supabase DB updated_at is newer than local JSON file mtime."""
+    if not SAFE_SYNC or not rows or not os.path.exists(file_path):
+        return rows
+    
+    file_mtime = os.path.getmtime(file_path)
+    existing = get_existing_db_records(table, conflict_col)
+    if not existing:
+        return rows
+
+    safe_rows = []
+    skipped_count = 0
+    from datetime import datetime, timezone
+    file_dt = datetime.fromtimestamp(file_mtime, timezone.utc)
+
+    for row in rows:
+        key_val = row.get(conflict_col)
+        db_updated_str = existing.get(key_val)
+        if db_updated_str:
+            try:
+                db_dt = datetime.fromisoformat(db_updated_str.replace('Z', '+00:00'))
+                if db_dt > file_dt:
+                    skipped_count += 1
+                    continue
+            except Exception:
+                pass
+        safe_rows.append(row)
+    
+    if skipped_count > 0:
+        print(f'  [Drift Protect] Skipped {skipped_count} row(s) in {table} because live Supabase data is newer than local file.')
+    return safe_rows
+
 print('')
 print('Seeding portfolio data into Supabase…')
+if SAFE_SYNC:
+    print('  [Drift Protect Enabled: Checking record timestamps before upserting]')
 print('')
 
 load_env()
@@ -78,8 +130,9 @@ load_env()
 # ── 1. Projects ──────────────────────────────────────────────────────
 
 print('Projects…')
+projects_file = os.path.join(ROOT, 'src', 'data', 'projects.json')
 try:
-    with open(os.path.join(ROOT, 'src', 'data', 'projects.json'), 'r') as f:
+    with open(projects_file, 'r') as f:
         projects_raw = json.load(f)
 except Exception as e:
     print(f'  Failed to load projects.json: {e}')
@@ -94,19 +147,21 @@ for p in projects_raw:
     p.setdefault('longDescription_business', '')
     p.pop('ctaLabel', None)
 if projects_raw:
-    res = upsert('projects', projects_raw, 'slug')
-    if res is None:
-        print('  Notice: Missing column detected on Supabase DB. Retrying with core project columns...')
-        core_projects = []
-        for item in projects_raw:
-            cp = dict(item)
-            cp.pop('category', None)
-            cp.pop('architectureHighlights', None)
-            cp.pop('challenges', None)
-            cp.pop('keyDeliverables', None)
-            core_projects.append(cp)
-        upsert('projects', core_projects, 'slug')
-print(f'  {len(projects_raw)} projects synced')
+    projects_to_upsert = filter_drift_protected_rows('projects', projects_raw, projects_file, 'slug')
+    if projects_to_upsert:
+        res = upsert('projects', projects_to_upsert, 'slug')
+        if res is None:
+            print('  Notice: Missing column detected on Supabase DB. Retrying with core project columns...')
+            core_projects = []
+            for item in projects_to_upsert:
+                cp = dict(item)
+                cp.pop('category', None)
+                cp.pop('architectureHighlights', None)
+                cp.pop('challenges', None)
+                cp.pop('keyDeliverables', None)
+                core_projects.append(cp)
+            upsert('projects', core_projects, 'slug')
+print(f'  {len(projects_raw)} projects processed')
 
 # ── 2. Skills ────────────────────────────────────────────────────────
 

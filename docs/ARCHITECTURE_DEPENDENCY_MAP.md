@@ -152,3 +152,4 @@ graph TD
 > 1. **Editing Scoping/Pricing:** If you modify `intakeQuestionnaireDefaults.json`, you MUST update `src/data/resume.json` and run `python3 scripts/audit_contracts.py`.
 > 2. **Editing Middleman Terms:** If you modify agreement prose in `middlemanAgreementDefaults.json`, verify both `src/components/pdf/MiddlemanAgreementPDF.tsx` and `scripts/generate-middleman-pdf.mjs`.
 > 3. **Creating Components/Routes:** Run `python3 scripts/generate_architecture_map.py` to automatically update the import dependency graphs.
+> 4. **CI Database Seeding:** `.github/workflows/db_sync.yml` runs `python3 scripts/seed_supabase.py --safe-sync` to compare timestamps (`updated_at`) and prevent overwriting newer live Supabase rows.
