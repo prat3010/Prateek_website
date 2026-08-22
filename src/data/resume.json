@@ -767,10 +767,10 @@
     ]
   },
   "summary": {
-    "ai": "Audits operational workflows, designs AI solution architecture, and builds practical AI-assisted pipelines that make recurring tasks easier to run and review.",
-    "general": "Builds web applications and interactive interfaces with attention to clear structure, performance, and maintainability.",
-    "creative": "Designs responsive interfaces with careful motion, layout, and visual hierarchy.",
-    "fullstack": "Builds full-stack web systems with Next.js, Flask, FastAPI, and Supabase, with attention to data flow and reliability."
+    "ai": "Forward Deployed AI Engineer who designs RAG architectures, structured LLM prompt pipelines, and multi-tenant vector search systems to turn complex business workflows into reliable production software.",
+    "general": "Forward Deployed Engineer & Solutions Architect who designs, builds, and deploys high-ROI web platforms, cloud databases, and AI systems with zero agency overhead.",
+    "creative": "Product-minded engineer crafting accessible web interfaces, custom design systems, and interactive visual experiences using Framer Motion, CSS Modules, and dual-mode theme architecture (Azure & Noir).",
+    "fullstack": "Full-stack engineer building type-safe web applications with Next.js 16, React 19, TypeScript, FastAPI, and Supabase PostgreSQL. Experienced in API design, database architecture, and production deployment."
   },
   "twitter": "https://x.com/3010prateek",
   "website": "https://prateeq.in",
@@ -803,7 +803,7 @@
   "experience": [
     {
       "id": "freelance-developer",
-      "role": "Full-Stack Engineer & AI Prototyper",
+      "role": "Forward Deployed Engineer & AI Architect",
       "tags": [
         "React",
         "Next.js",
@@ -821,28 +821,28 @@
       "period": "2023 - Present",
       "bullets": [
         {
-          "ai": "Built LLM-assisted workflows for content drafting, OCR, and project analysis using Gemini-based tooling.",
-          "general": "Designed and shipped web platforms, simulation tools, and mobile utilities using React, Next.js, Flutter, and Python.",
-          "creative": "Translated visual layouts into responsive interfaces with motion and custom CSS.",
-          "fullstack": "Built API layers in Flask and FastAPI and connected them to PostgreSQL and Supabase data models."
+          "ai": "Architected Retriever, a production full-stack RAG platform featuring pgvector semantic search, self-hosted Ollama embeddings, streaming LLM chat, and multi-tenant isolation.",
+          "general": "End-to-end technical ownership: Scoped, architected, and shipped responsive web platforms, AI tools, and mobile utilities from concept to production Vercel deployment.",
+          "creative": "Built custom pop-art (Azure) and cyber-noir design systems featuring hand-drawn SVG skyline backdrop layers, fluid micro-interactions, and accessible UI controls.",
+          "fullstack": "Engineered type-safe Web App shells using Next.js 16 App Router, TypeScript, and server-side caching (unstable_cache) with PostgreSQL database architecture."
         },
         {
-          "ai": "Used AI-assisted tools to prototype features quickly and keep repetitive work low.",
-          "general": "Improved website performance and navigation with Lenis scrolling and viewport-linked motion.",
-          "creative": "Designed custom interactive layouts and responsive visual frameworks with precise control.",
-          "fullstack": "Programmed offline-capable data layers with Drift and SQLite for mobile apps that keep working without network coverage."
+          "ai": "Engineered structured prompts, function-calling schemas, and evaluation guardrails to reduce hallucination and latency across complex LLM workflows.",
+          "general": "Designed and deployed Retriever, a production vector search platform with grounded citation downloads, feedback telemetry, and dynamic pricing.",
+          "creative": "Engineered interactive workspace interfaces including an RAG Lab sandbox with SSE real-time streaming, parameter sliders, and dual-theme state propagation.",
+          "fullstack": "Architected high-performance FastAPI backends integrated with Supabase Row-Level Security (RLS), custom SQL RPC aggregations, and Nginx reverse proxies."
         },
         {
-          "ai": "Built a Gemini-assisted tool for OCR, draft generation, and repo analysis.",
-          "general": "Built PrateeqSync AI, a local content manager for portfolio updates, credential review, and generated drafts.",
-          "creative": "Built an interactive Streamlit dashboard for managing skills, certificates, and media assets.",
-          "fullstack": "Built a Python-based content manager with Streamlit, GitHub API integration, and TypeScript file sync."
+          "ai": "Built PrateeqSync AI, an autonomous content manager that parses local codebases, analyzes certificates via Gemini Vision, and auto-generates structured technical drafts.",
+          "general": "Optimized Core Web Vitals and user interface performance, delivering sub-second page loads and 60fps interaction using Lenis smooth scroll and hardware-accelerated motion.",
+          "creative": "Designed responsive visual layouts with Framer Motion layout animations, portal-isolated modals, and touch gesture scroll controllers.",
+          "fullstack": "Programmed offline-first mobile data sync layers using Flutter, Drift, and SQLite for uninterrupted application state without network coverage."
         },
         {
-          "ai": "Built a full-stack RAG platform with hybrid search, streaming LLM chat, and multi-tenant isolation.",
-          "general": "Designed and deployed Retriever, a production RAG engine with document ingestion, semantic search, and grounded chat.",
-          "creative": "Built an interactive RAG Lab UI with real-time SSE streaming and dual-theme design system.",
-          "fullstack": "Architected a FastAPI backend with pgvector, self-hosted Ollama embeddings, Supabase RLS, and Nginx reverse proxy on Oracle Cloud."
+          "ai": "Designed OCR and multi-modal document extraction pipelines to parse complex unstructured files into structured JSON for downstream database models.",
+          "general": "Built PrateeqSync AI, a local content manager for automated portfolio updates, credential verification, and git synchronization.",
+          "creative": "Built an interactive Streamlit dashboard for managing skills, certificates, and media assets with side-by-side theme previews.",
+          "fullstack": "Built an automated Python content synchronization pipeline using Streamlit, GitHub REST API integration, and atomic JSON fallback handlers."
         }
       ],
       "company": "Independent Consultant / Freelance Developer",
