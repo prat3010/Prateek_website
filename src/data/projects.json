@@ -197,19 +197,20 @@
   },
   {
     "id": "rag-lab",
-    "title": "RAG Lab",
-    "description": "Full-stack RAG engine featuring pgvector hybrid search, self-hosted Ollama embeddings, and citation-grounded LLM chat.",
-    "longDescription": "RAG Lab is a production-grade Retrieval-Augmented Generation platform. It ingests multi-format documents (PDF, Markdown, text), executing dense vector embeddings via local Ollama instances and sparse BM25 keyword indexing in pgvector. Features multi-tenant PostgreSQL RLS isolation, streaming response synthesis, and presigned citation downloads.",
+    "title": "Retriever AI (RAG Engine & SaaS Studio)",
+    "description": "Enterprise-grade Retrieval-Augmented Generation platform featuring Hexagonal Architecture, pgvector hybrid search, local Ollama embeddings, RLM reasoning, and semantic response caching.",
+    "longDescription": "Retriever AI is a production-grade RAG platform built using strict Hexagonal Architecture boundaries. It ingests multi-format documents (PDF, Markdown, text, OpenAPI), executing dense vector embeddings via local Ollama instances (nomic-embed-text) and sparse BM25 keyword indexing in pgvector. Features multi-tenant PostgreSQL RLS isolation, streaming response synthesis with RLM (Recursive Language Modeling) reasoning loops, automated query rewriting, presigned citation downloads, and sub-100ms semantic response caching (⚡ Cached).",
     "image": "/images/project-rag-lab.webp",
     "tags": [
-      "Next.js",
+      "Next.js 16",
       "FastAPI",
-      "Python",
+      "Python 3.11",
       "Supabase",
       "pgvector",
       "Ollama",
-      "RAG",
-      "AI"
+      "RAG Architecture",
+      "Hexagonal Design",
+      "Google Gemini"
     ],
     "liveUrl": "/rag",
     "githubUrl": "https://github.com/prat3010/retriever",
@@ -217,23 +218,28 @@
     "isLive": true,
     "status": "live",
     "category": "ai",
-    "description_business": "An enterprise document intelligence platform enabling teams to ask questions and receive citation-grounded answers across custom Knowledge Bases.",
-    "longDescription_business": "RAG Lab enables organizations to turn static documents into interactive knowledge assistants. Teams upload PDFs or markdown files and ask natural-language questions, receiving streaming answers backed by verifiable source citations, granular multi-tenant security, and custom LLM provider options.",
+    "description_business": "An enterprise document intelligence platform enabling teams to transform static documents into interactive, citation-backed AI assistants with zero data leakage.",
+    "longDescription_business": "Retriever AI enables organizations to turn static documents into secure, interactive knowledge assistants. Teams upload PDFs or operational documentation and ask complex natural-language questions, receiving streaming answers backed by verifiable source citations, granular multi-tenant isolation, real-time feedback loops, and semantic query caching for sub-100ms response times.",
     "architectureHighlights": [
-      "FastAPI & Next.js full-stack RAG engine featuring pgvector hybrid semantic + keyword search",
-      "Self-hosted Ollama embedding pipeline paired with pluggable LLM providers (Gemini, OpenAI, Anthropic)",
-      "Multi-tenant PostgreSQL RLS isolation with presigned citation downloads and semantic caching"
+      "Strict Hexagonal Architecture decoupling domain core entities from FastAPI routers, pgvector storage adapters, and external LLM APIs",
+      "Hybrid Retrieval Pipeline combining dense Ollama embeddings (nomic-embed-text) and sparse BM25 keyword matching with score threshold re-ranking",
+      "Multi-tenant PostgreSQL Row-Level Security (RLS) isolation with encrypted tenant API keys, presigned citation downloads, and sub-100ms semantic response caching"
     ],
     "challenges": [
       {
-        "challenge": "High query latency and hallucinations during multi-document question answering",
-        "solution": "Implemented hybrid dense-sparse retrieval with score threshold re-ranking and citation source grounding in prompt contexts."
+        "challenge": "High query latency, API rate-limit bottlenecks, and hallucinations across multi-document contextual searches",
+        "solution": "Implemented an in-memory semantic response cache with automatic query rewriting, RLM (Recursive Language Model) context verification, and strict citation grounding in prompt templates."
+      },
+      {
+        "challenge": "Preventing cross-tenant data leakage while allowing flexible external LLM key usage",
+        "solution": "Enforced strict tenant-scoped DB schema isolation combined with local-only embedding generation to prevent sensitive client data from hitting third-party API quotas."
       }
     ],
     "keyDeliverables": [
-      "pgvector hybrid search engine",
-      "Interactive document chat & citation panel",
-      "Multi-tenant RLS isolation architecture"
+      "Hexagonal FastAPI & Next.js RAG Engine",
+      "Hybrid pgvector + BM25 Search Pipeline",
+      "Semantic Response Cache & Telemetry Feedback",
+      "Multi-Tenant RLS Security & Presigned Citations"
     ]
   }
 ]
