@@ -43,9 +43,10 @@ def render_skills_tab():
                         else:
                             new_skill = {
                                 "name": name,
-                                "name_business": name,
+                                "name_business": skill.get("name_business") or name,
                                 "icon": icon,
                                 "description": desc,
+                                "description_business": skill.get("description_business") or desc,
                                 "category": category,
                                 "color": color
                             }

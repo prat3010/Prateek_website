@@ -1,30 +1,47 @@
 [
   {
-    "name": "AI Agent Orchestration",
+    "name": "AI Agent & RAG Architecture",
+    "name_business": "AI Workflows & RAG Document Intelligence",
     "icon": "bot",
-    "description": "Designing and running autonomous multi-agent networks to perform complex development tasks.",
+    "description": "Designing autonomous multi-agent networks, vector embeddings (pgvector/Ollama), and citation-grounded RAG pipelines.",
+    "description_business": "Automating repetitive business processes and building AI-powered chat systems with verified document citations.",
     "category": "orchestration",
     "color": "#E10098",
     "level": "Level Max",
-    "prereq": "Structured Prompting",
+    "status": "legendary",
+    "projects": [
+      {
+        "id": "rag-lab",
+        "title": "RAG Lab"
+      }
+    ]
+  },
+  {
+    "name": "Structured Prompting & LLM Tuning",
+    "name_business": "AI Prompt Engineering & Context Design",
+    "icon": "brain",
+    "description": "Architecting prompt templates, context window packing, and guiding complex LLM logical reasoning paths.",
+    "description_business": "Designing structured prompts and context flows to optimize AI accuracy and lower API token costs.",
+    "category": "orchestration",
+    "color": "#FFEB3B",
+    "level": "Level Max",
     "status": "mastered",
     "projects": [
       {
         "id": "rag-lab",
         "title": "RAG Lab"
       }
-    ],
-    "description_business": "Designing agent workflows that reduce repetitive manual work.",
-    "name_business": "Workflow Automations & AI Agents"
+    ]
   },
   {
-    "name": "AI Dev Workflows",
+    "name": "AI-Assisted Engineering Workflows",
+    "name_business": "Rapid Software Delivery & AI Workflows",
     "icon": "sparkles",
-    "description": "Accelerating building speed using agentic composer environments like Cursor and visual prototypes.",
+    "description": "Accelerating build speed using agentic composer setups, visual prototypes, and automated task execution.",
+    "description_business": "Utilizing modern AI build pipelines to ship custom web platforms and tools significantly faster.",
     "category": "orchestration",
     "color": "#00E5FF",
     "level": "Level Max",
-    "prereq": "",
     "status": "mastered",
     "projects": [
       {
@@ -34,136 +51,52 @@
       {
         "id": "metawipe",
         "title": "MetaWipe"
-      },
-      {
-        "id": "rag-lab",
-        "title": "RAG Lab"
       }
-    ],
-    "description_business": "Building practical automation flows for repeatable work.",
-    "name_business": "Rapid Software Delivery"
+    ]
   },
   {
-    "name": "API Architecture",
-    "icon": "server",
-    "description": "Building light REST APIs in Python (Flask/FastAPI) and orchestrating data exchange loops.",
+    "name": "Next.js & React App Architecture",
+    "name_business": "High-Performance Web Applications",
+    "icon": "atom",
+    "description": "Building full-stack web applications with Next.js 16 App Router, React 19, Server Components, and optimized rendering.",
+    "description_business": "Developing fast, SEO-optimized web applications and portals built on Next.js infrastructure.",
     "category": "logic",
-    "color": "#059669",
+    "color": "#3178C6",
     "level": "Level Max",
-    "prereq": "",
     "status": "mastered",
     "projects": [
       {
-        "id": "iss-tracker",
-        "title": "ISS Live Location Tracker"
-      },
-      {
-        "id": "earth-evolution-simulator",
-        "title": "Earth Evolution Simulator"
-      },
-      {
         "id": "rag-lab",
         "title": "RAG Lab"
       }
-    ],
-    "description_business": "Building integrations and data pipelines between services.",
-    "name_business": "Integrations & Data Pipelines"
+    ]
   },
   {
-    "name": "APIs (Application Programming Interfaces)",
-    "icon": "plug",
-    "description": "Steering AI to design, consume, and secure diverse Application Programming Interfaces efficiently.",
-    "category": "logic",
-    "color": "#336699",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [],
-    "description_business": "Building reliable APIs and data layers for web apps.",
-    "name_business": "System Integration Services"
-  },
-  {
-    "name": "Algorithmic Translation",
+    "name": "Python Systems & Async APIs",
+    "name_business": "High-Speed Server APIs & Background Workers",
     "icon": "terminal",
-    "description": "Translating complex mathematical models, coordinate spaces, and geometry into working logic.",
+    "description": "Developing backend microservices, asynchronous workers, and REST APIs using Python (FastAPI / Flask).",
+    "description_business": "Building backend services and API automation layers to power modern web apps.",
     "category": "logic",
     "color": "#3776AB",
     "level": "Level Max",
-    "prereq": "Database Engineering",
     "status": "mastered",
     "projects": [
       {
-        "id": "paintmix-ai",
-        "title": "PaintMix AI"
-      },
-      {
-        "id": "iss-tracker",
-        "title": "ISS Live Location Tracker"
+        "id": "rag-lab",
+        "title": "RAG Lab"
       }
-    ],
-    "description_business": "Building reliable APIs and data layers for web apps.",
-    "name_business": "Mathematical Logic & Rules Engines"
+    ]
   },
   {
-    "name": "CSS",
-    "icon": "paintbrush",
-    "description": "Crafting responsive layouts, custom animations, and design systems with modern CSS.",
-    "category": "dynamic",
-    "color": "#1572B6",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [],
-    "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
-    "name_business": "Polished & Responsive Styling"
-  },
-  {
-    "name": "Computer Vision",
-    "icon": "eye",
-    "description": "Developing systems to interpret and analyze visual data for object recognition and scene understanding.",
-    "category": "logic",
-    "color": "#007ACC",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [],
-    "description_business": "Building reliable APIs and data layers for web apps.",
-    "name_business": "Visual Image Processing"
-  },
-  {
-    "name": "Custom CMS",
-    "icon": "sparkles",
-    "description": "Designing intuitive, secure admin dashboards that empower non-technical clients to update copy, media, and site data independently.",
-    "category": "product",
-    "color": "#00E676",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [],
-    "description_business": "Improving user experience, frontend performance, and responsive layout systems.",
-    "name_business": "Self-Managed Admin Portals"
-  },
-  {
-    "name": "Data Analysis",
-    "icon": "bar-chart",
-    "description": "Analyzing raw datasets, Excel modeling, and structuring analytical insights.",
-    "category": "logic",
-    "color": "#00897B",
-    "level": "Active Quest",
-    "prereq": "Database Engineering",
-    "status": "quest",
-    "projects": [],
-    "description_business": "Turning raw data into practical operational insight.",
-    "name_business": "Business Intelligence & Insights"
-  },
-  {
-    "name": "Database Engineering",
+    "name": "PostgreSQL & Supabase Engineering",
+    "name_business": "Secure Cloud Database & Data Storage",
     "icon": "database",
-    "description": "Structuring relational databases and offline data synchronization via SQLite and Supabase.",
+    "description": "Designing relational schemas, Row-Level Security (RLS), pgvector semantic indexing, and Supabase BaaS integrations.",
+    "description_business": "Structuring secure databases with automated data access controls and cloud backend hosting.",
     "category": "logic",
     "color": "#3ECF8E",
     "level": "Level Max",
-    "prereq": "API Architecture",
     "status": "mastered",
     "projects": [
       {
@@ -171,280 +104,75 @@
         "title": "PaintMix AI"
       },
       {
-        "id": "earth-evolution-simulator",
-        "title": "Earth Evolution Simulator"
-      },
-      {
         "id": "rag-lab",
         "title": "RAG Lab"
       }
-    ],
-    "description_business": "Building secure databases and offline sync layers for reliable apps.",
-    "name_business": "Secure Backend & Data Storage"
+    ]
   },
   {
-    "name": "Design to Code",
-    "icon": "paintbrush",
-    "description": "Converting blueprints into clean, responsive web layouts, custom animations, and UI variables.",
-    "category": "product",
-    "color": "#FF4081",
+    "name": "TypeScript & Type-Safe Architecture",
+    "name_business": "Reliable & Maintainable Codebases",
+    "icon": "shield",
+    "description": "Enforcing strict end-to-end type safety, shared interfaces, and runtime data contract validation across client and server.",
+    "description_business": "Writing robust, type-checked web application logic that minimizes software bugs and maintenance costs.",
+    "category": "logic",
+    "color": "#007ACC",
     "level": "Level Max",
-    "prereq": "Product Strategy & UX",
     "status": "mastered",
     "projects": [
       {
-        "id": "earth-evolution-simulator",
-        "title": "Earth Evolution Simulator"
+        "id": "rag-lab",
+        "title": "RAG Lab"
       }
-    ],
-    "description_business": "Translating prototypes into responsive layouts across devices.",
-    "name_business": "Interactive Frontend Development"
+    ]
   },
   {
-    "name": "Drift Detection",
-    "icon": "alert-triangle",
-    "description": "Directing AI to monitor and mitigate model performance drift in production systems dynamically.",
-    "category": "dynamic",
-    "color": "#FF5733",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [],
-    "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
-    "name_business": "Performance & Quality Monitoring"
-  },
-  {
-    "name": "EXIF Data Handling",
-    "icon": "image",
-    "description": "Extracting, parsing, and stripping metadata from digital images for privacy and analysis.",
-    "category": "logic",
-    "color": "#60A5FA",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [],
-    "description_business": "Building reliable APIs and data layers for web apps.",
-    "name_business": "Media Metadata Sanitization"
-  },
-  {
-    "name": "FastAPI",
+    "name": "API & Integration Pipelines",
+    "name_business": "System Integrations & Data Streaming",
     "icon": "server",
-    "description": "Building async REST APIs with FastAPI — data serialization, endpoint design, and deployment.",
+    "description": "Designing resilient REST endpoints, Server-Sent Events (SSE) streaming, and third-party API orchestration.",
+    "description_business": "Connecting third-party business services, payment portals, and real-time live data streams.",
     "category": "logic",
     "color": "#059669",
-    "level": "",
-    "prereq": "",
-    "status": "",
+    "level": "Level Max",
+    "status": "mastered",
     "projects": [
       {
-        "id": "rag-lab",
-        "title": "RAG Lab"
-      }
-    ],
-    "description_business": "Building reliable APIs and data layers for web apps.",
-    "name_business": "High-Speed Server APIs"
-  },
-  {
-    "name": "Flask",
-    "icon": "flask",
-    "description": "Building lightweight web applications and REST APIs with Flask.",
-    "category": "logic",
-    "color": "#000000",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [],
-    "description_business": "Building reliable APIs and data layers for web apps.",
-    "name_business": "Lightweight Web Services"
-  },
-  {
-    "name": "Flutter / Dart",
-    "icon": "smartphone",
-    "description": "Building cross-platform mobile apps, designing reactive layouts, and compiled state systems.",
-    "category": "dynamic",
-    "color": "#02569B",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [],
-    "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
-    "name_business": "Cross-Platform Mobile Apps"
-  },
-  {
-    "name": "GeoPy",
-    "icon": "globe",
-    "description": "Integrating geospatial data and geocoding services for location-based features.",
-    "category": "logic",
-    "color": "#3465A4",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [],
-    "description_business": "Building reliable APIs and data layers for web apps.",
-    "name_business": "Geospatial & Location Services"
-  },
-  {
-    "name": "GitHub API",
-    "icon": "git-branch",
-    "description": "Automating repository management, CI/CD triggers, and deployment workflows via the GitHub API.",
-    "category": "logic",
-    "color": "#181717",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [
-      {
-        "id": "rag-lab",
-        "title": "RAG Lab"
-      }
-    ],
-    "description_business": "Building reliable APIs and data layers for web apps.",
-    "name_business": "Release & Deployment Automation"
-  },
-  {
-    "name": "GoRouter",
-    "icon": "route",
-    "description": "Configuring declarative client-side routing and deep linking in Flutter apps.",
-    "category": "dynamic",
-    "color": "#00ADD8",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [],
-    "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
-    "name_business": "Mobile App Navigation"
-  },
-  {
-    "name": "Google Gemini",
-    "icon": "brain",
-    "description": "Integrating Gemini models for content analysis, skill scanning, and intelligent automation.",
-    "category": "orchestration",
-    "color": "#4285F4",
-    "level": "Legendary",
-    "prereq": "",
-    "status": "",
-    "projects": [
-      {
-        "id": "prateeksync-ai--intelligent-portfolio---resume-automation-engine",
-        "title": "PrateeqSync AI: Intelligent Portfolio & Resume Automation Engine"
+        "id": "iss-tracker",
+        "title": "ISS Live Location Tracker"
       },
       {
         "id": "rag-lab",
         "title": "RAG Lab"
       }
-    ],
-    "description_business": "Building practical automation flows for repeatable work.",
-    "name_business": "AI & Language Model Integrations"
+    ]
   },
   {
-    "name": "JavaScript",
-    "icon": "zap",
-    "description": "Building interactive web applications, backend services, and automation scripts for dynamic experiences.",
-    "category": "dynamic",
-    "color": "#F7DF1E",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [],
-    "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
-    "name_business": "Interactive Client Features"
-  },
-  {
-    "name": "Jinja2",
-    "icon": "file-text",
-    "description": "Generating dynamic content and structured text outputs through template rendering.",
-    "category": "dynamic",
-    "color": "#9A5012",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [],
-    "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
-    "name_business": "Dynamic Document Generation"
-  },
-  {
-    "name": "Microsoft Excel",
-    "icon": "file-text",
-    "description": "Analyzing data, building spreadsheets, and organizing complex datasets.",
-    "category": "logic",
-    "color": "#107C41",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [],
-    "description_business": "Building reliable APIs and data layers for web apps.",
-    "name_business": "Advanced Spreadsheet Modeling"
-  },
-  {
-    "name": "Microsoft Office",
-    "icon": "briefcase",
-    "description": "Utilizing productivity applications to document workflows and present reports.",
-    "category": "dynamic",
-    "color": "#D83B01",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [],
-    "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
-    "name_business": "Client Deliverable Formatting"
-  },
-  {
-    "name": "NumPy",
-    "icon": "brain",
-    "description": "Performing numerical computation and array manipulation with NumPy.",
-    "category": "logic",
-    "color": "#013243",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [],
-    "description_business": "Building reliable APIs and data layers for web apps.",
-    "name_business": "Array Calculations & Analysis"
-  },
-  {
-    "name": "Ollama",
-    "icon": "server",
-    "description": "Deploying and managing local LLM and embedding models with Ollama — nomic-embed-text for embeddings, CPU-only inference on free-tier VPS.",
-    "category": "orchestration",
-    "color": "#000000",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [
-      {
-        "id": "rag-lab",
-        "title": "RAG Lab"
-      }
-    ],
-    "description_business": "Running AI models on cost-effective infrastructure without third-party API dependencies.",
-    "name_business": "Self-Hosted AI Serving"
-  },
-  {
-    "name": "Privacy Sandboxing",
-    "icon": "shield",
-    "description": "Designing offline-first mobile apps that secure data by operating strictly on local device runtime.",
+    "name": "Flutter & Cross-Platform Mobile",
+    "name_business": "Cross-Platform iOS & Android Apps",
+    "icon": "smartphone",
+    "description": "Architecting compiled mobile applications with Flutter/Dart, Riverpod state management, and declarative routing.",
+    "description_business": "Building high-performance native-feeling mobile applications for iOS and Android from a unified codebase.",
     "category": "product",
-    "color": "#00E676",
+    "color": "#02569B",
     "level": "Level Max",
-    "prereq": "Product Strategy & UX",
     "status": "mastered",
     "projects": [
       {
         "id": "metawipe",
         "title": "MetaWipe"
       }
-    ],
-    "description_business": "Using offline-first processing to keep sensitive data local.",
-    "name_business": "Local Privacy Sandboxing"
+    ]
   },
   {
-    "name": "Product Strategy & UX",
+    "name": "Product Strategy & UX Design",
+    "name_business": "Customer Journey & Experience Design",
     "icon": "layout",
-    "description": "Defining user flows, functional requirements, and shipping MVPs focused on target problems.",
+    "description": "Defining user flows, functional requirements, and shipping friction-free MVPs aligned with user goals.",
+    "description_business": "Designing intuitive user interfaces and user flows that improve customer conversion and retention.",
     "category": "product",
     "color": "#FF1744",
     "level": "Level Max",
-    "prereq": "",
     "status": "mastered",
     "projects": [
       {
@@ -455,142 +183,68 @@
         "id": "metawipe",
         "title": "MetaWipe"
       }
-    ],
-    "description_business": "Designing product flows that reduce friction and support conversion.",
-    "name_business": "Customer Journey & Experience Design"
+    ]
   },
   {
-    "name": "Python",
-    "icon": "terminal",
-    "description": "Writing utility scripts, automation pipelines, and backend services in Python.",
-    "category": "logic",
-    "color": "#3776AB",
-    "level": "",
-    "prereq": "",
-    "status": "",
+    "name": "Design Systems & Web Performance",
+    "name_business": "Polished Frontend & Speed Optimization",
+    "icon": "paintbrush",
+    "description": "Crafting modular CSS systems, Framer Motion transitions, and optimizing Core Web Vitals (LCP, CLS, INP).",
+    "description_business": "Improving site loading speeds, visual polish, and responsive layouts across desktop and mobile devices.",
+    "category": "product",
+    "color": "#FF4081",
+    "level": "Level Max",
+    "status": "mastered",
     "projects": [
       {
-        "id": "rag-lab",
-        "title": "RAG Lab"
+        "id": "earth-evolution-simulator",
+        "title": "Earth Evolution Simulator"
       }
-    ],
-    "description_business": "Building automation scripts, background workers, and ML utilities.",
-    "name_business": "AI & Workflow Automation"
+    ]
   },
   {
-    "name": "RAG / LLM Orchestration",
-    "icon": "brain",
-    "description": "Designing full RAG pipelines — document chunking, embedding indexing, hybrid search, context window packing, citation validation, and streaming LLM inference.",
-    "category": "orchestration",
-    "color": "#E10098",
-    "level": "",
-    "prereq": "",
-    "status": "",
+    "name": "Privacy Sandboxing & Offline Architecture",
+    "name_business": "Local Device Privacy & Offline Security",
+    "icon": "shield",
+    "description": "Designing privacy-first applications operating strictly on local device runtimes with zero external data telemetry.",
+    "description_business": "Securing sensitive user data by processing files directly on the user's local device without external servers.",
+    "category": "product",
+    "color": "#00E676",
+    "level": "Level Max",
+    "status": "mastered",
     "projects": [
       {
-        "id": "rag-lab",
-        "title": "RAG Lab"
+        "id": "metawipe",
+        "title": "MetaWipe"
       }
-    ],
-    "description_business": "Building AI-powered document search and chat systems with citation-grounded answers.",
-    "name_business": "Retrieval-Augmented Generation Architecture"
+    ]
   },
   {
-    "name": "React / Next.js",
-    "icon": "atom",
-    "description": "Building component-driven web apps with React and Next.js — server/client architecture, state management, and App Router patterns.",
+    "name": "Data Science & Numerical Modeling",
+    "name_business": "Business Intelligence & Data Insights",
+    "icon": "bar-chart",
+    "description": "Analyzing raw datasets, mathematical space transformations, NumPy/SciPy computation, and analytical modeling.",
+    "description_business": "Translating raw operational data into actionable insights, analytical dashboards, and predictive models.",
     "category": "dynamic",
-    "color": "#000000",
-    "level": "",
-    "prereq": "",
-    "status": "",
+    "color": "#00897B",
+    "level": "Active Quest",
+    "status": "quest",
     "projects": [
       {
-        "id": "rag-lab",
-        "title": "RAG Lab"
+        "id": "earth-evolution-simulator",
+        "title": "Earth Evolution Simulator"
       }
-    ],
-    "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
-    "name_business": "High-Performance Web Applications"
+    ]
   },
   {
-    "name": "Riverpod",
+    "name": "Adaptive Stack & Rapid Prototyping",
+    "name_business": "Adaptive Technical Consultation & MVPs",
     "icon": "zap",
-    "description": "Architecting reactive state management for Flutter apps with Riverpod.",
-    "category": "dynamic",
-    "color": "#007BFF",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [],
-    "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
-    "name_business": "Mobile State & Logic Flow"
-  },
-  {
-    "name": "SQLite",
-    "icon": "database",
-    "description": "Managing light, relational databases for local automation and offline mobile data storage.",
-    "category": "logic",
-    "color": "#003B57",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [],
-    "description_business": "Building reliable APIs and data layers for web apps.",
-    "name_business": "Local Database Management"
-  },
-  {
-    "name": "SciPy",
-    "icon": "atom",
-    "description": "Applying scientific computing methods for data analysis and mathematical modeling.",
-    "category": "logic",
-    "color": "#8CAAE6",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [],
-    "description_business": "Building reliable APIs and data layers for web apps.",
-    "name_business": "Complex Numerical Modeling"
-  },
-  {
-    "name": "Server-Sent Events (SSE)",
-    "icon": "zap",
-    "description": "Implementing real-time server-sent event streams for token-by-token LLM response delivery in web applications.",
-    "category": "dynamic",
-    "color": "#FF6B35",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [
-      {
-        "id": "rag-lab",
-        "title": "RAG Lab"
-      }
-    ],
-    "description_business": "Building real-time data streaming for live-updating web interfaces.",
-    "name_business": "Real-Time Data Streaming"
-  },
-  {
-    "name": "Spreadsheets",
-    "icon": "layout",
-    "description": "Structuring tabular data, utilizing formulas, and modeling numeric information.",
-    "category": "logic",
-    "color": "#107C41",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [],
-    "description_business": "Building reliable APIs and data layers for web apps.",
-    "name_business": "Data Management & Structuring"
-  },
-  {
-    "name": "Stack-on-Demand",
-    "icon": "zap",
-    "description": "Learning and deploying tools as needed. Shipped projects in Next.js, Flutter/Dart, Python, and SQL.",
+    "description": "Rapidly mastering and deploying tools as required to ship end-to-end web apps, internal dashboards, and automation tooling.",
+    "description_business": "Providing flexible end-to-end technical execution tailored to your specific project requirements.",
     "category": "dynamic",
     "color": "#FF9100",
     "level": "Legendary",
-    "prereq": "",
     "status": "legendary",
     "projects": [
       {
@@ -598,14 +252,6 @@
         "title": "PaintMix AI"
       },
       {
-        "id": "earth-evolution-simulator",
-        "title": "Earth Evolution Simulator"
-      },
-      {
-        "id": "iss-tracker",
-        "title": "ISS Live Location Tracker"
-      },
-      {
         "id": "metawipe",
         "title": "MetaWipe"
       },
@@ -613,111 +259,6 @@
         "id": "rag-lab",
         "title": "RAG Lab"
       }
-    ],
-    "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
-    "name_business": "Adaptive Technical Consultation"
-  },
-  {
-    "name": "Streamlit",
-    "icon": "layout",
-    "description": "Building interactive dashboards and data management tools with Streamlit.",
-    "category": "dynamic",
-    "color": "#FF4B4B",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [],
-    "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
-    "name_business": "Custom Internal Dashboards"
-  },
-  {
-    "name": "Structured Prompting",
-    "icon": "brain",
-    "description": "Writing prompt templates, optimizing context windows, and guiding LLM logical reasoning paths.",
-    "category": "orchestration",
-    "color": "#FFEB3B",
-    "level": "Level Max",
-    "prereq": "AI Dev Workflows",
-    "status": "mastered",
-    "projects": [
-      {
-        "id": "rag-lab",
-        "title": "RAG Lab"
-      }
-    ],
-    "description_business": "Building practical automation flows for repeatable work.",
-    "name_business": "AI Prompt Design & Tuning"
-  },
-  {
-    "name": "Supabase",
-    "icon": "database",
-    "description": "Building full-stack apps with Supabase — PostgreSQL, pgvector, Row-Level Security, real-time subscriptions, and connection pooling.",
-    "category": "logic",
-    "color": "#3ECF8E",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [
-      {
-        "id": "rag-lab",
-        "title": "RAG Lab"
-      }
-    ],
-    "description_business": "Building secure backends with PostgreSQL, managed auth, and real-time data sync.",
-    "name_business": "Backend-as-a-Service & PostgreSQL Hosting"
-  },
-  {
-    "name": "TypeScript",
-    "icon": "terminal",
-    "description": "Developing type-safe applications with TypeScript across full-stack web and tooling projects.",
-    "category": "logic",
-    "color": "#3178C6",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [
-      {
-        "id": "rag-lab",
-        "title": "RAG Lab"
-      }
-    ],
-    "description_business": "Writing type-safe web logic that is easier to maintain.",
-    "name_business": "Reliable & Maintainable Applications"
-  },
-  {
-    "name": "Vercel",
-    "icon": "server",
-    "description": "Managing cloud deployment pipelines, serverless API routing, edge middleware integration, and production hosting setups.",
-    "category": "dynamic",
-    "color": "#00E676",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [
-      {
-        "id": "rag-lab",
-        "title": "RAG Lab"
-      }
-    ],
-    "description_business": "Building client-facing interfaces, dashboards, and internal tools.",
-    "name_business": "Production Web Infrastructure"
-  },
-  {
-    "name": "pgvector",
-    "icon": "database",
-    "description": "Implementing semantic vector similarity search with pgvector extension — HNSW indexes, cosine distance, and hybrid search pipelines.",
-    "category": "logic",
-    "color": "#336791",
-    "level": "",
-    "prereq": "",
-    "status": "",
-    "projects": [
-      {
-        "id": "rag-lab",
-        "title": "RAG Lab"
-      }
-    ],
-    "description_business": "Building semantic search capabilities into PostgreSQL for AI-powered retrieval features.",
-    "name_business": "Vector Search Infrastructure"
+    ]
   }
 ]

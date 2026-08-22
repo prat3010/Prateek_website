@@ -99,9 +99,11 @@ export async function generateQuestionnairePDFBase64(
   return { fileName, base64 };
 }
 
-export async function generateResumePDF(activePersona: Persona, resumeData: ResumeData) {
-  const fileName = `Prateek_Sharma_Resume_${activePersona}.pdf`;
-  const element = React.createElement(DeveloperResumePDF, { activePersona, resumeData }) as unknown as React.ReactElement<DocumentProps>;
+export async function generateResumePDF(activePersona: Persona, resumeData: ResumeData, isNoir = false) {
+  ensurePdfFonts();
+  const themeTag = isNoir ? 'noir' : 'azure';
+  const fileName = `Prateek_Sharma_Resume_${activePersona}_${themeTag}.pdf`;
+  const element = React.createElement(DeveloperResumePDF, { activePersona, resumeData, isNoir }) as unknown as React.ReactElement<DocumentProps>;
   await renderAndOpenPDF(element, fileName);
 }
 

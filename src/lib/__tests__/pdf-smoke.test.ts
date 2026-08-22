@@ -7,6 +7,7 @@ import path from 'path';
 import { ServicesAndPricingPDF } from '@/components/pdf/ServicesAndPricingPDF';
 import { MiddlemanAgreementPDF } from '@/components/pdf/MiddlemanAgreementPDF';
 import { ScopingBriefPDF } from '@/components/pdf/ScopingBriefPDF';
+import { DeveloperResumePDF } from '@/components/pdf/DeveloperResumePDF';
 import { registerPdfFontsServer } from '@/components/pdf/pdfFontsServer';
 
 function pageCount(pdfBuffer: Buffer): number {
@@ -64,5 +65,20 @@ describe('commercial PDF render smoke tests', () => {
     const tmp = path.join(os.tmpdir(), `middleman_${isNoir ? 'noir' : 'azure'}_${Date.now()}.pdf`);
     fs.writeFileSync(tmp, pdf);
     process.env.__MIDDLEMAN_PDF_PATH__ = tmp;
+  }, 60000);
+
+  it.each([
+    ['azure', false],
+    ['noir', true],
+  ] as const)('DeveloperResumePDF renders a valid PDF in %s theme', async (_theme, isNoir) => {
+    const pdf = await renderToPdf(
+      React.createElement(DeveloperResumePDF, { activePersona: 'ai', isNoir }) as React.ReactElement<DocumentProps>,
+    );
+    expect(pdf.subarray(0, 5).toString()).toBe('%PDF-');
+    expect(pageCount(pdf)).toBeGreaterThanOrEqual(1);
+
+    const tmp = path.join(os.tmpdir(), `resume_${isNoir ? 'noir' : 'azure'}_${Date.now()}.pdf`);
+    fs.writeFileSync(tmp, pdf);
+    process.env.__RESUME_PDF_PATH__ = tmp;
   }, 60000);
 });

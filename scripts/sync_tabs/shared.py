@@ -225,110 +225,115 @@ def st_image_safe(image_path_or_bytes, **kwargs):
         st.image(image_path_or_bytes, **kwargs)
 
 FALLBACK_SKILLS = {
-    "excel": {
-        "name": "Microsoft Excel",
-        "icon": "file-text",
-        "description": "Analyzing data, building spreadsheets, and organizing complex datasets.",
-        "category": "logic",
-        "color": "#107C41"
+    "rag": {
+        "name": "AI Agent & RAG Architecture",
+        "name_business": "AI Workflows & RAG Document Intelligence",
+        "icon": "bot",
+        "description": "Designing autonomous multi-agent networks, vector embeddings, and citation-grounded RAG pipelines.",
+        "description_business": "Automating repetitive business processes and building AI-powered chat systems with verified document citations.",
+        "category": "orchestration",
+        "color": "#E10098",
+        "level": "Level Max",
+        "status": "legendary"
     },
-    "spreadsheet": {
-        "name": "Spreadsheets",
-        "icon": "layout",
-        "description": "Structuring tabular data, utilizing formulas, and modeling numeric information.",
-        "category": "logic",
-        "color": "#107C41"
-    },
-    "data analysis": {
-        "name": "Data Analysis",
-        "icon": "bar-chart",
-        "description": "Extracting insights from raw records, cleaning datasets, and visualizing metrics.",
-        "category": "logic",
-        "color": "#00897B"
-    },
-    "microsoft office": {
-        "name": "Microsoft Office",
-        "icon": "briefcase",
-        "description": "Utilizing productivity applications to document workflows and present reports.",
-        "category": "dynamic",
-        "color": "#D83B01"
-    },
-    "business intelligence": {
-        "name": "Business Intelligence",
-        "icon": "trending-up",
-        "description": "Synthesizing operational data into dashboards and strategic insights.",
-        "category": "logic",
-        "color": "#F2C811"
-    },
-    "supabase": {
-        "name": "Supabase",
-        "icon": "database",
-        "description": "Orchestrating backend authentication, building postgres databases, and managing real-time data flow.",
-        "category": "logic",
-        "color": "#3ECF8E"
-    },
-    "fastapi": {
-        "name": "FastAPI",
-        "icon": "server",
-        "description": "Building async REST APIs with data serialization and endpoint design.",
-        "category": "logic",
-        "color": "#059669"
-    },
-    "react": {
-        "name": "React / Next.js",
-        "icon": "atom",
-        "description": "Building component-driven web apps with server/client architecture.",
-        "category": "dynamic",
-        "color": "#61DAFB"
-    },
-    "python": {
-        "name": "Python",
-        "icon": "terminal",
-        "description": "Writing utility scripts, automation pipelines, and backend services.",
-        "category": "logic",
-        "color": "#3776AB"
-    },
-    "framer motion": {
-        "name": "Framer Motion",
-        "icon": "sparkles",
-        "description": "Orchestrating fluid React transitions, micro-animations, and viewport-driven scroll effects.",
-        "category": "product",
-        "color": "#E10098"
-    },
-    "sqlite": {
-        "name": "SQLite",
-        "icon": "database",
-        "description": "Managing light, relational databases for local automation and offline mobile data storage.",
-        "category": "logic",
-        "color": "#003B57"
-    },
-    "flutter": {
-        "name": "Flutter / Dart",
-        "icon": "smartphone",
-        "description": "Building cross-platform mobile apps, designing reactive layouts, and compiled state systems.",
-        "category": "dynamic",
-        "color": "#02569B"
+    "llm": {
+        "name": "Structured Prompting & LLM Tuning",
+        "name_business": "AI Prompt Engineering & Context Design",
+        "icon": "brain",
+        "description": "Architecting prompt templates, context window packing, and guiding complex LLM logical reasoning paths.",
+        "description_business": "Designing structured prompts and context flows to optimize AI accuracy and lower API token costs.",
+        "category": "orchestration",
+        "color": "#FFEB3B",
+        "level": "Level Max",
+        "status": "mastered"
     },
     "next.js": {
-        "name": "React / Next.js",
+        "name": "Next.js & React App Architecture",
+        "name_business": "High-Performance Web Applications",
         "icon": "atom",
-        "description": "Building full-stack web apps with React and Next.js App Router.",
-        "category": "dynamic",
-        "color": "#000000"
+        "description": "Building full-stack web applications with Next.js 16 App Router, React 19, Server Components, and optimized rendering.",
+        "description_business": "Developing fast, SEO-optimized web applications and portals built on Next.js infrastructure.",
+        "category": "logic",
+        "color": "#3178C6",
+        "level": "Level Max",
+        "status": "mastered"
     },
-    "git": {
-        "name": "Git & GitHub",
-        "icon": "git-branch",
-        "description": "Managing branch workflows, commit history, and deployment sync.",
-        "category": "dynamic",
-        "color": "#F05032"
+    "react": {
+        "name": "Next.js & React App Architecture",
+        "name_business": "High-Performance Web Applications",
+        "icon": "atom",
+        "description": "Building full-stack web applications with Next.js 16 App Router, React 19, Server Components, and optimized rendering.",
+        "description_business": "Developing fast, SEO-optimized web applications and portals built on Next.js infrastructure.",
+        "category": "logic",
+        "color": "#3178C6",
+        "level": "Level Max",
+        "status": "mastered"
     },
-    "github": {
-        "name": "Git & GitHub",
-        "icon": "git-branch",
-        "description": "Managing branch workflows, commit history, and deployment sync.",
-        "category": "dynamic",
-        "color": "#181717"
+    "python": {
+        "name": "Python Systems & Async APIs",
+        "name_business": "High-Speed Server APIs & Background Workers",
+        "icon": "terminal",
+        "description": "Developing backend microservices, asynchronous workers, and REST APIs using Python (FastAPI / Flask).",
+        "description_business": "Building backend services and API automation layers to power modern web apps.",
+        "category": "logic",
+        "color": "#3776AB",
+        "level": "Level Max",
+        "status": "mastered"
+    },
+    "fastapi": {
+        "name": "Python Systems & Async APIs",
+        "name_business": "High-Speed Server APIs & Background Workers",
+        "icon": "terminal",
+        "description": "Developing backend microservices, asynchronous workers, and REST APIs using Python (FastAPI / Flask).",
+        "description_business": "Building backend services and API automation layers to power modern web apps.",
+        "category": "logic",
+        "color": "#3776AB",
+        "level": "Level Max",
+        "status": "mastered"
+    },
+    "supabase": {
+        "name": "PostgreSQL & Supabase Engineering",
+        "name_business": "Secure Cloud Database & Data Storage",
+        "icon": "database",
+        "description": "Designing relational schemas, Row-Level Security (RLS), pgvector semantic indexing, and Supabase BaaS integrations.",
+        "description_business": "Structuring secure databases with automated data access controls and cloud backend hosting.",
+        "category": "logic",
+        "color": "#3ECF8E",
+        "level": "Level Max",
+        "status": "mastered"
+    },
+    "postgres": {
+        "name": "PostgreSQL & Supabase Engineering",
+        "name_business": "Secure Cloud Database & Data Storage",
+        "icon": "database",
+        "description": "Designing relational schemas, Row-Level Security (RLS), pgvector semantic indexing, and Supabase BaaS integrations.",
+        "description_business": "Structuring secure databases with automated data access controls and cloud backend hosting.",
+        "category": "logic",
+        "color": "#3ECF8E",
+        "level": "Level Max",
+        "status": "mastered"
+    },
+    "typescript": {
+        "name": "TypeScript & Type-Safe Architecture",
+        "name_business": "Reliable & Maintainable Codebases",
+        "icon": "shield",
+        "description": "Enforcing strict end-to-end type safety, shared interfaces, and runtime data contract validation across client and server.",
+        "description_business": "Writing robust, type-checked web application logic that minimizes software bugs and maintenance costs.",
+        "category": "logic",
+        "color": "#007ACC",
+        "level": "Level Max",
+        "status": "mastered"
+    },
+    "flutter": {
+        "name": "Flutter & Cross-Platform Mobile",
+        "name_business": "Cross-Platform iOS & Android Apps",
+        "icon": "smartphone",
+        "description": "Architecting compiled mobile applications with Flutter/Dart, Riverpod state management, and declarative routing.",
+        "description_business": "Building high-performance native-feeling mobile applications for iOS and Android from a unified codebase.",
+        "category": "product",
+        "color": "#02569B",
+        "level": "Level Max",
+        "status": "mastered"
     }
 }
 
@@ -337,14 +342,16 @@ def generate_skills_from_tags_batch(tags_list):
         return []
     tags_str = ", ".join([f'"{t}"' for t in tags_list])
     prompt = f"""
-    You are a technical portfolio writer. Generate a list of structured Skill entries for the following technology tags: {tags_str}.
+    You are a technical portfolio writer. Generate senior-level structured Skill entries for the following technology tags: {tags_str}.
     
     For each tag, output a structured JSON object. The response must be a JSON array of objects, where each object matches this format:
     {{
       "tag": "the original lowercase tag name that was passed",
-      "name": "Formatted capitalization of the technology (e.g. 'react' -> 'React / Next.js', 'fastapi' -> 'FastAPI', 'excel' -> 'Microsoft Excel', 'supabase' -> 'Supabase', etc.)",
-      "icon": "A lowercase string representing a relevant Lucide icon (e.g. 'atom', 'server', 'database', 'terminal', 'layout', 'paintbrush', 'sparkles', 'brain', 'bot', 'git-branch', 'cloud', 'figma', 'zap', 'image', 'file-text')",
-      "description": "A short 1-sentence description of the skill focusing on what it enables the developer to build or accomplish (e.g., 'Building component-driven web apps with server/client architecture.', 'Writing utility scripts and automation pipelines.', 'Crafting responsive layouts and design systems.'). Maximum 15 words.",
+      "name": "Authoritative High-Impact Skill Title (e.g. 'react' -> 'Next.js & React App Architecture', 'fastapi' -> 'Python Systems & Async APIs', 'supabase' -> 'PostgreSQL & Supabase Engineering', 'flutter' -> 'Flutter & Cross-Platform Mobile')",
+      "name_business": "Client Outcome Service Title (e.g. 'High-Performance Web Applications', 'Secure Cloud Database & Data Storage')",
+      "icon": "A lowercase string representing a relevant Lucide icon (e.g. 'atom', 'server', 'database', 'terminal', 'layout', 'paintbrush', 'sparkles', 'brain', 'bot', 'smartphone', 'shield', 'bar-chart', 'zap')",
+      "description": "A short 1-sentence senior developer description of the capability. Maximum 18 words.",
+      "description_business": "A short 1-sentence client value proposition description. Maximum 18 words.",
       "category": "One of 'orchestration', 'logic', 'product', or 'dynamic'",
       "color": "A hex color code suitable for the technology brand"
     }}

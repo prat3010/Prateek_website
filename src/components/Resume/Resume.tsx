@@ -116,7 +116,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
       });
     } else {
       import('@/utils/pdfGenerator').then(({ generateResumePDF }) => {
-        generateResumePDF(activePersona, resumeData);
+        generateResumePDF(activePersona, resumeData, isNoir);
       });
     }
   };

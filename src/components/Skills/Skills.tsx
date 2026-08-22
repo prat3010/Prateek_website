@@ -17,6 +17,7 @@ import {
   Layout, 
   Paintbrush, 
   Shield,
+  Smartphone,
   Target,
   type LucideIcon
 } from 'lucide-react';
@@ -34,7 +35,8 @@ const iconMap: Record<string, LucideIcon> = {
   'bar-chart': BarChart,
   layout: Layout,
   paintbrush: Paintbrush,
-  shield: Shield
+  shield: Shield,
+  smartphone: Smartphone
 };
 
 interface SkillsProps {
@@ -47,6 +49,7 @@ interface SkillsCopy {
   moHeader: string;
   moText: string;
   tabs: {
+    all: string;
     orchestration: string;
     logic: string;
     product: string;
@@ -62,6 +65,7 @@ const SKILLS_COPY: Record<'developer' | 'business', Record<'light' | 'noir', Ski
       moHeader: "METHOD OF OPERATION",
       moText: "I use AI tools to move faster, but I keep the stack understandable. The focus stays on architecture, product design, UX, and shipping work that can be maintained.",
       tabs: {
+        all: "ALL CAPABILITIES",
         orchestration: "I. AI ORCHESTRATION",
         logic: "II. SYSTEMS & LOGIC",
         product: "III. PRODUCT & UX",
@@ -74,6 +78,7 @@ const SKILLS_COPY: Record<'developer' | 'business', Record<'light' | 'noir', Ski
       moHeader: "DEVELOPMENT METHODOLOGY",
       moText: "AI helps accelerate delivery, but the stack still needs to be clear. The work stays centered on architecture, product design, debugging, and maintenance.",
       tabs: {
+        all: "ALL CAPABILITIES",
         orchestration: "I. AI ORCHESTRATION",
         logic: "II. SYSTEMS & LOGIC",
         product: "III. PRODUCT & UX",
@@ -88,6 +93,7 @@ const SKILLS_COPY: Record<'developer' | 'business', Record<'light' | 'noir', Ski
       moHeader: "HOW WE WORK",
       moText: "I work directly with businesses on websites, custom tools, and practical workflows. The process stays simple, with clear communication and maintainable delivery.",
       tabs: {
+        all: "ALL SERVICES",
         orchestration: "I. AI INTEGRATION",
         logic: "II. WEB APPLICATIONS",
         product: "III. DESIGN & UX",
@@ -100,6 +106,7 @@ const SKILLS_COPY: Record<'developer' | 'business', Record<'light' | 'noir', Ski
       moHeader: "ENGAGEMENT MODEL",
       moText: "Independent delivery keeps communication direct and the scope clear. The work covers prototypes, frontend builds, and data setup without extra layers.",
       tabs: {
+        all: "ALL SERVICES",
         orchestration: "I. AI INTEGRATION",
         logic: "II. WEB APPLICATIONS",
         product: "III. DESIGN & UX",
@@ -122,6 +129,11 @@ const SKILL_MO_BADGE_TEXTS: ScramblerProps['texts'] = {
 const SKILL_MO_HEADER_TEXTS: ScramblerProps['texts'] = {
   developer: { light: 'METHOD OF OPERATION',      noir: 'DEVELOPMENT METHODOLOGY' },
   business:  { light: 'HOW WE WORK',               noir: 'ENGAGEMENT MODEL' },
+};
+
+const SKILL_TAB_ALL_TEXTS: ScramblerProps['texts'] = {
+  developer: { light: 'ALL CAPABILITIES',  noir: 'ALL CAPABILITIES' },
+  business:  { light: 'ALL SERVICES',      noir: 'ALL SERVICES' },
 };
 
 const SKILL_TAB_TEXTS: ScramblerProps['texts'][] = [
@@ -150,7 +162,7 @@ const SKILL_FORGED_LABEL_TEXTS: ScramblerProps['texts'] = {
 
 function Skills({ skills }: SkillsProps) {
   const { isNoir, audience } = useTheme();
-  const [activeTab, setActiveTab] = React.useState<'orchestration' | 'logic' | 'product' | 'dynamic' | null>(null);
+  const [activeTab, setActiveTab] = React.useState<'all' | 'orchestration' | 'logic' | 'product' | 'dynamic'>('all');
 
   const activeAudience = audience || 'developer';
   const activeTheme = isNoir ? 'noir' : 'light';
@@ -159,10 +171,10 @@ function Skills({ skills }: SkillsProps) {
     return SKILLS_COPY[activeAudience][activeTheme];
   }, [activeAudience, activeTheme]);
 
-  const orchestrationSkills = skills.filter(s => s.category === 'orchestration');
-  const logicSkills = skills.filter(s => s.category === 'logic');
-  const productSkills = skills.filter(s => s.category === 'product');
-  const dynamicSkills = skills.filter(s => s.category === 'dynamic');
+  const filteredSkills = useMemo(() => {
+    if (activeTab === 'all') return skills;
+    return skills.filter(s => s.category === activeTab);
+  }, [skills, activeTab]);
 
   const renderSkillCard = (skill: Skill) => {
     const Icon = iconMap[skill.icon] || Sparkles;
@@ -248,6 +260,7 @@ function Skills({ skills }: SkillsProps) {
   };
 
   const TAB_CONFIG = [
+    { id: 'all' as const, color: 'var(--pop-black)', neon: 'var(--neon-yellow)' },
     { id: 'orchestration' as const, color: 'var(--pop-pink)', neon: 'var(--neon-pink)' },
     { id: 'logic' as const, color: 'var(--pop-blue)', neon: 'var(--neon-cyan)' },
     { id: 'product' as const, color: 'var(--pop-red)', neon: 'var(--neon-yellow)' },
@@ -291,7 +304,27 @@ function Skills({ skills }: SkillsProps) {
         </header>
 
         <div className={styles.tabs} role="tablist" aria-label="Profile Dossier Sections">
-          {TAB_CONFIG.map((tab, i) => (
+          <button
+            role="tab"
+            aria-selected={activeTab === 'all'}
+            aria-controls="panel-all"
+            id="tab-all"
+            className={`${styles.tab} ${activeTab === 'all' ? styles.tabActive : ''}`}
+            onClick={() => setActiveTab('all')}
+            style={{
+              '--tab-color': 'var(--pop-black)',
+              '--tab-neon': 'var(--neon-yellow)',
+            } as React.CSSProperties}
+          >
+            <Scrambler
+              texts={SKILL_TAB_ALL_TEXTS}
+              variant="nav-label"
+              as="span"
+            >
+              {copy.tabs.all}
+            </Scrambler>
+          </button>
+          {TAB_CONFIG.slice(1).map((tab, i) => (
             <button
               key={tab.id}
               role="tab"
@@ -299,7 +332,7 @@ function Skills({ skills }: SkillsProps) {
               aria-controls={`panel-${tab.id}`}
               id={`tab-${tab.id}`}
               className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
-              onClick={() => setActiveTab(prev => prev === tab.id ? null : tab.id)}
+              onClick={() => setActiveTab(tab.id)}
               style={{
                 '--tab-color': tab.color,
                 '--tab-neon': tab.neon,
@@ -317,31 +350,26 @@ function Skills({ skills }: SkillsProps) {
         </div>
 
         <m.div
-          animate={{ height: activeTab ? 'auto' : 0 }}
+          animate={{ height: 'auto' }}
           transition={{ duration: 0.25, ease: 'easeInOut' }}
           style={{ overflow: 'hidden' }}
         >
           <AnimatePresence mode="wait">
-            {activeTab && (
-              <m.div
-                key={activeTab}
-                id={`panel-${activeTab}`}
-                role="tabpanel"
-                aria-labelledby={`tab-${activeTab}`}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.25, ease: 'easeInOut' }}
-                className={styles.panel}
-              >
-                <div className={styles.cardsGrid}>
-                  {activeTab === 'orchestration' && orchestrationSkills.map(renderSkillCard)}
-                  {activeTab === 'logic' && logicSkills.map(renderSkillCard)}
-                  {activeTab === 'product' && productSkills.map(renderSkillCard)}
-                  {activeTab === 'dynamic' && dynamicSkills.map(renderSkillCard)}
-                </div>
-              </m.div>
-            )}
+            <m.div
+              key={activeTab}
+              id={`panel-${activeTab}`}
+              role="tabpanel"
+              aria-labelledby={`tab-${activeTab}`}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              className={styles.panel}
+            >
+              <div className={styles.cardsGrid}>
+                {filteredSkills.map(renderSkillCard)}
+              </div>
+            </m.div>
           </AnimatePresence>
         </m.div>
       </div>

@@ -41,7 +41,7 @@ Both PDF outputs are generated client-side:
   * Both `generateResumePDF()` and `generateQuotationPDF()` are implemented and exported. The shared `Persona` type and `getSkillsHighlight` helper are imported from `src/lib/skills.ts`.
 * **Dynamic Data Source**: Data is fetched from the Supabase singleton `profile` table fallback. Changes saved in the CMS reflect in the PDFs without code changes.
 * **PDF Output Design**:
-  * Resume: ATS-friendly, clean single-column structure.
+  * Resume: Brand-aligned PDF (`DeveloperResumePDF.tsx`) utilizing `pdfTheme.ts` tokens (Azure cream paper & Noir cyber themes), `PdfBrandHeader` hero banner with the navbar gremlin mark, custom Playfair/Lora/JetBrains Mono typography, skill chip badges, and `PdfFooter` page numbering.
   * Quotation: Professional invoice-style billing structure listing services, estimates, and contract terms.
 
 ---

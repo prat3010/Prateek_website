@@ -2,100 +2,72 @@
 
 ## **Purpose**
 
-The Skills & Services section communicates capability. In Developer Mode, it displays technical skills, categories, and competence levels. In Business Mode, it translates these technical capabilities into client-focused services.
+The Skills & Services section communicates capability with ultra-premium architectural clarity. In Developer Mode, it displays 14 curated technical power skills, category breakdowns, and competence levels. In Business Mode, it translates these technical capabilities into outcome-focused client services.
 
 ---
 
 ## **Product Philosophy**
 
-Rather than simply listing buzzwords, this section demonstrates structured competency. It highlights that technology is a tool to solve problems. It bridges technical capability with business outcomes.
+Rather than cluttering the screen with 40+ redundant buzzwords or micro-libraries, this section showcases structured, senior-level competency across 4 core domain quadrants:
+1. **AI & Agent Architecture** (Multi-Agent Networks, RAG, Prompt Engineering, AI Workflows)
+2. **Full-Stack Systems & Backend** (Next.js 16, Python Async APIs, PostgreSQL/Supabase, TypeScript, Streaming APIs)
+3. **Product, UX & Mobile** (Flutter Mobile, UX Strategy, Design Systems & Core Web Vitals, Privacy Sandboxing)
+4. **Data & Adaptive Delivery** (Data Science & Numerical Modeling, Adaptive Stack & Rapid Prototyping)
 
 ---
 
 ## **User Goals**
 
-* **Hiring a Developer**: Evaluate the developer's tech stack, category splits (orchestration, logic, product, dynamic), and prerequisites.
-* **Need a Website**: Discover available freelance service offerings (Custom Web Apps, Site Optimization, Consultation).
+* **Hiring a Developer**: Evaluate core engineering stack, domain splits, and concrete production proof links.
+* **Need a Website / Service**: Discover high-impact service offerings (Custom Web Platforms, AI Integrations, Site Speed Optimization, Mobile Apps).
 
 ---
 
-## **Behavior**
+## **Behavior & Design System**
 
-* The section displays cards or tags in a modular grid.
-* Selecting tabs or hovering over elements triggers smooth CSS transitions and category highlight overlays.
+* **Default Active View**: Displays all 14 curated power skills by default in a spacious 2-column grid layout with generous line-height and whitespace.
+* **Domain Filtering**: Category tabs (`ALL CAPABILITIES`, `I. AI ORCHESTRATION`, `II. SYSTEMS & LOGIC`, `III. PRODUCT & UX`, `IV. DYNAMIC COMMAND`) allow fast single-click domain filtering.
+* **Shipped Production Proof**: Inline project tags (`FORGED IN:` / `APPLIED IN:`) trigger smooth scrolling to `#projects` with a 2-second focus flash highlight.
 
 ---
 
-## **Adaptive Behavior**
+## **Adaptive Behavior (Dual Identity & Dual Theme)**
 
-* **Developer Mode (Skills)**: Renders skills sorted by categories:
-  * **Orchestration**: Cloud, CI/CD, database structures.
-  * **Logic**: TypeScript, React core, Node logic.
-  * **Product**: CSS styling, UI designs, performance metrics.
-  * **Dynamic**: Client integration engines, runtime configurations.
-* **Business Mode (Services)**: Renders a list of client services. It translates the technical skill categories into outcome-focused business offerings:
+* **Developer Mode (Skills)**: Renders technical titles, architecture descriptions, developer status badges (`Level Max`, `Legendary`, `Active Quest`), and `FORGED IN:` project proof.
+* **Business Mode (Services)**: Renders outcome-focused service titles (*AI Workflows & RAG Document Intelligence*, *High-Performance Web Applications*), client ROI descriptions, and `APPLIED IN:` project proof.
   
-  | Technical Skill Category | Business Service Offering | Client Value Description | Supporting Tech Tags |
+  | Technical Skill Category | Business Service Offering | Client Value Description | Supporting Tech |
   | :--- | :--- | :--- | :--- |
-  | **AI Orchestration** | **AI Agent Workflows & Automation** | Automate repetitive business tasks, integrate custom LLM assistants, and configure structured database extraction. | `Gemini SDK`, `Python`, `Prompt Engineering` |
-  | **Systems & Logic** | **Custom Web Applications** | Build secure, scalable database-driven apps with dedicated administration control panels. | `Next.js`, `Supabase`, `TypeScript` |
-  | **Product & UX** | **Performance & UX Optimization** | Fix slow load speeds (LCP/INP) to improve search ranking (SEO) and user conversions. | `CSS Modules`, `Core Web Vitals`, `SEO` |
-  | **Dynamic Command** | **Interactive Tools & Diagnostics** | Implement custom CLI diagnostic terminals, QR payment portals, and dynamic client features. | `Three.js`, `Canvas APIs`, `Resend` |
+  | **AI Orchestration** | **AI Workflows & RAG Document Intelligence** | Automate repetitive business tasks and build citation-grounded document search models. | `Gemini SDK`, `pgvector`, `Python` |
+  | **Systems & Logic** | **High-Performance Web Applications** | Build fast, secure, database-driven web platforms and admin portals. | `Next.js 16`, `Supabase`, `TypeScript` |
+  | **Product & UX** | **Customer Journey & Performance** | Improve conversion rates, mobile experience, and Core Web Vitals speed scores. | `Flutter`, `CSS Modules`, `UX Strategy` |
+  | **Dynamic Command** | **Adaptive Technical Consultation & MVPs** | Deliver end-to-end technical execution and rapid software prototypes tailored to business goals. | `Streamlit`, `Python`, `REST APIs` |
 
-* **Visual Identity (Azure/Noir)**:
-  * Azure: Uses creative tag descriptions, colorful borders, and hover micro-animations.
-  * Noir: Uses precise, refined monospaced text layouts and grayscale outline styling.
+* **Visual Identity (Azure / Noir)**:
+  * **Azure (Light)**: Cold-press linen canvas (`#FAF9F6`), serif typography (`Playfair Display` + `Lora`), soft graphite borders (`rgba(43,43,54,0.12)`), and ambient elevation shadows.
+  * **Noir (Dark)**: Translucent obsidian glass panels (`rgba(20,20,24,0.75)` with `backdrop-filter: blur(12px)`), 100% `JetBrains Mono` monospaced code fonts, hairline borders (`rgba(255,255,255,0.08)`), and subtle accent top glows.
 
 ---
 
 ## **Content Requirements**
 
-* **Skills Object**: Name, category, description, level (learning/intermediate/advanced), icon name, projects list.
-* **Services Object**: Title, client value description, supporting technical tags.
+* **Skills Object**: Name, name_business, icon, description, description_business, category, color, level, status, projects list.
+* **Curated Count**: Exactly 14 high-impact power skills (no filler, no redundant micro-libraries).
 * **Excluded Content**: Avoid self-assessed percentage ratings (e.g., "React: 90%").
 
 ---
 
 ## **CMS Requirements**
 
-Manageable via **Manage Skills** tab:
+Manageable via **Manage Skills** tab in Streamlit Synchronizer (`scripts/sync_tabs/skills.py`):
 * Add/delete/edit skills.
-* Re-assign categories and prerequisites.
-* Update business service descriptions.
-
----
-
-## **Analytics**
-
-* Anonymous hover counts on categories.
-* Click events on projects associated with a skill.
-
----
-
-## **Accessibility**
-
-* High contrast focus indicators.
-* Screen readers describe category relationships.
-* Respects `prefers-reduced-motion`.
-
----
-
-## **Performance**
-
-* Uses lightweight SVG icons instead of raster images.
-* Grid rendering uses CSS Grid for zero layout shift.
-
----
-
-## **Future Expansion**
-
-* Auto-linking certification badges.
-* Interactive skill tree mappings.
+* Re-assign categories and project proof links.
+* Update Developer and Business mode descriptions.
 
 ---
 
 ## **Acceptance Criteria**
 - Developer Mode shows technical skills categorized correctly.
 - Business Mode translates skills into readable services.
-- Hover animations align with the active visual identity (Azure/Noir).
-- Content edits reflect updates without source code modifications.
+- Clean, spacious 2-column grid rendering without crowding or layout shifts.
+- 100% pass rate on TypeScript, ESLint, Vitest, and Next.js production builds.
