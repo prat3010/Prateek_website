@@ -25,8 +25,8 @@ Rather than cluttering the screen with 40+ redundant buzzwords or micro-librarie
 
 ## **Behavior & Design System**
 
-* **Default Active View**: Displays all 14 curated power skills by default in a spacious 2-column grid layout with generous line-height and whitespace.
-* **Domain Filtering**: Category tabs (`ALL CAPABILITIES`, `I. AI ORCHESTRATION`, `II. SYSTEMS & LOGIC`, `III. PRODUCT & UX`, `IV. DYNAMIC COMMAND`) allow fast single-click domain filtering.
+* **Default Active View**: Displays skills organized by category tab quadrant (`I. AI ORCHESTRATION` by default) in a clean, focused grid layout.
+* **Domain Filtering**: Category tabs (`I. AI ORCHESTRATION`, `II. SYSTEMS & LOGIC`, `III. PRODUCT & UX`, `IV. DYNAMIC COMMAND`) allow fast single-click domain switching without cluttering the screen with a monolithic view.
 * **Shipped Production Proof**: Inline project tags (`FORGED IN:` / `APPLIED IN:`) trigger smooth scrolling to `#projects` with a 2-second focus flash highlight.
 
 ---
