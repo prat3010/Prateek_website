@@ -703,3 +703,22 @@ AFTER INSERT ON processed_webhooks
 FOR EACH STATEMENT EXECUTE FUNCTION purge_old_webhooks();
 
 
+-- ============================================================
+-- 13. Terminal Snake Global Leaderboard Table
+-- ============================================================
+CREATE TABLE IF NOT EXISTS snake_leaderboard (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  player_name TEXT NOT NULL,
+  score INTEGER NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE snake_leaderboard ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow public select snake_leaderboard" ON snake_leaderboard;
+CREATE POLICY "Allow public select snake_leaderboard" ON snake_leaderboard FOR SELECT USING (true);
+-- Service role key writes bypass RLS policies.
+
+CREATE INDEX IF NOT EXISTS idx_snake_leaderboard_score ON snake_leaderboard (score DESC, created_at ASC);
+
+
+

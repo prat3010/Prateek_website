@@ -10,6 +10,9 @@ import {
   Layers
 } from 'lucide-react';
 import { toast } from 'sonner';
+import confetti from 'canvas-confetti';
+import { toggleAudio, playKeySound, playAchievementSound } from '@/lib/terminalAudio';
+import TerminalSnakeGame from './TerminalSnakeGame';
 import styles from './SiteInfoConsole.module.css';
 import type { ResumeData, MiddlemanAgreementConfig } from '@/data/resume';
 import { COMMISSION_BANDS, COMMISSION_DISBURSEMENT_WINDOW, RECURRING_COMMISSION_RATE, type CommissionBand } from '@/lib/commission';
@@ -17,7 +20,7 @@ import resumeFallback from '@/data/resume.json';
 
 function consoleBandRange(band: CommissionBand): string {
   if (band.minINR == null) return `up to ₹${band.maxINR?.toLocaleString('en-IN')} / $${band.maxUSD?.toLocaleString('en-US')}`;
-  if (band.maxINR == null) return `₹${band.minINR.toLocaleString('en-IN')}+ / $${band.minUSD?.toLocaleString('en-US')}+`;
+  if (band.minINR == null) return `₹${band.minINR.toLocaleString('en-IN')}+ / $${band.minUSD?.toLocaleString('en-US')}+`;
   return `₹${band.minINR.toLocaleString('en-IN')}-${band.maxINR.toLocaleString('en-IN')} / $${band.minUSD?.toLocaleString('en-US')}-${band.maxUSD?.toLocaleString('en-US')}`;
 }
 
@@ -71,6 +74,24 @@ export default function SiteInfoConsole() {
   
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number>(-1);
+  const [activeGame, setActiveGame] = useState<'none' | 'snake'>('none');
+  const [isMatrixActive, setIsMatrixActive] = useState<boolean>(false);
+  const [cmdCount, setCmdCount] = useState<number>(0);
+
+  const unlockAchievement = useCallback((id: string, title: string, desc: string) => {
+    if (typeof window === 'undefined') return;
+    const saved = JSON.parse(localStorage.getItem('terminal_achievements') || '[]');
+    if (!saved.includes(id)) {
+      const updated = [...saved, id];
+      localStorage.setItem('terminal_achievements', JSON.stringify(updated));
+      playAchievementSound();
+      toast.success(`🏆 ACHIEVEMENT UNLOCKED: ${title}`, { description: desc });
+      try {
+        confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 } });
+      } catch {}
+    }
+  }, []);
+>(-1);
 
   // Real telemetry state
   const [stats, setStats] = useState({
@@ -255,6 +276,15 @@ export default function SiteInfoConsole() {
   const executeCommand = useCallback((cmd: string) => {
     const trimmedCmd = cmd.trim().toLowerCase();
     if (!trimmedCmd) return;
+
+    playKeySound();
+    setCmdCount(prev => {
+      const next = prev + 1;
+      if (next >= 5) {
+        unlockAchievement('terminal_master', 'Terminal Master', 'Executed 5 terminal commands');
+      }
+      return next;
+    });
 
     // Add input command to history & reset history index pointer
     setCmdHistory(prev => [...prev, cmd]);
@@ -723,18 +753,148 @@ export default function SiteInfoConsole() {
         ];
         break;
       case 'cheatcode':
-        if (typeof window !== 'undefined') {
-          const isActive = document.documentElement.classList.toggle('konami-active');
-          response = [
-            { text: 'KONAMI CODE DECRYPTED:', type: 'success' },
-            { text: '  - Keyboard Sequence: [↑, ↑, ↓, ↓, ←, →, ←, →, B, A]', type: 'success' },
-            { text: `  - Cheat Override Mode: ${isActive ? 'ACTIVE' : 'INACTIVE'}`, type: 'output' },
-            { text: isActive
-              ? '  - Engage: NYC Pizza Rat (Bounce & Tail Sway Physics Activated)!'
-              : '  - Disengage: Unmounting WebGL Canvas and releasing GPU memory.', type: 'output' }
-          ];
+      case 'cheat': {
+        const parts = cmd.trim().split(/\s+/);
+        const sub = parts[1]?.toLowerCase() || '';
+
+        if (sub === 'snake' || sub === 'play' || sub === 'game') {
+          setActiveGame('snake');
+          setTerminalHistory(prev => [
+            ...prev,
+            { text: 'LAUNCHING RETRO TERMINAL SNAKE ENGINE...', type: 'success' },
+            { text: '  - High scores are synchronized with Supabase Global Leaderboard.', type: 'output' }
+          ]);
+          setTerminalInput('');
+          return;
         }
+
+        if (sub === 'inspect' || sub === 'probe') {
+          const startTime = performance.now();
+          fetch('/api/profile')
+            .then(() => {
+              const latency = Math.round(performance.now() - startTime);
+              const memory = (performance as unknown as { memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
+              const heapUsed = memory ? `${Math.round(memory.usedJSHeapSize / 1048576)} MB` : 'Protected/Browser Restricted';
+              const heapLimit = memory ? `${Math.round(memory.jsHeapSizeLimit / 1048576)} MB` : 'Unavailable';
+              const activeTheme = isNoir ? 'Noir Cyber-Glow' : 'Comic Ink Light';
+
+              const lines: ConsoleLine[] = [
+                { text: '===========================================================', type: 'success' },
+                { text: '      REAL-TIME SYSTEM & SUPABASE ARCHITECTURE PROBE       ', type: 'success' },
+                { text: '===========================================================', type: 'success' },
+                { text: `⚡ SUPABASE RLS DATABASE LATENCY : ${latency} ms`, type: 'success' },
+                { text: `🧠 JS HEAP MEMORY FOOTPRINT      : ${heapUsed} (Limit: ${heapLimit})`, type: 'output' },
+                { text: `🎨 ACTIVE DESIGN THEME ENGINE     : ${activeTheme}`, type: 'output' },
+                { text: `📜 LOADED SCRIPT BUNDLE FOOTPRINT : ${stats.bundleSize} KB`, type: 'output' },
+                { text: `🌐 DOM CONTAINER NODES COUNT     : ${stats.domNodes} elements`, type: 'output' },
+                { text: '===========================================================', type: 'success' }
+              ];
+              setTerminalHistory(prev => [...prev, ...lines]);
+              unlockAchievement('cyber_inspector', 'Cyber Inspector', 'Executed real-time Supabase latency & JS memory probe');
+            })
+            .catch(() => {
+              setTerminalHistory(prev => [...prev, { text: 'Failed to probe database latency.', type: 'error' }]);
+            });
+          setTerminalInput('');
+          return;
+        }
+
+        if (sub === 'summary' || sub === 'dossier') {
+          const summaryText = [
+            '===========================================================',
+            '      PRATEEK SHARMA PORTFOLIO - TECHNICAL SYSTEM DOSSIER  ',
+            '===========================================================',
+            '• Core Architecture : Next.js 16 App Router (React 19, TypeScript 5)',
+            '• Styling & Tokens  : CSS Modules / Custom Properties (Azure & Noir Themes)',
+            '• Database & Auth   : Supabase PostgreSQL (RLS-gated service role proxy)',
+            '• Scroll & Motion   : Lenis Smooth Scroll 1.3 + Framer Motion 12',
+            '• 3D & Graphics     : Three.js 0.184 + HTML Canvas Shaders',
+            '• Payment Gateway   : Razorpay Dynamic UPI QR & Webhook Ledger',
+            '• Email Delivery    : Resend API with PDF Scoping Brief Attachments',
+            '==========================================================='
+          ].join('\n');
+
+          if (typeof navigator !== 'undefined' && navigator.clipboard) {
+            navigator.clipboard.writeText(summaryText).then(() => {
+              toast.success('Technical Dossier Copied to Clipboard!');
+            }).catch(() => {});
+          }
+
+          setTerminalHistory(prev => [
+            ...prev,
+            { text: summaryText, type: 'success' },
+            { text: 'Tip: System dossier has been copied to your clipboard.', type: 'output' }
+          ]);
+          setTerminalInput('');
+          return;
+        }
+
+        if (sub === 'matrix') {
+          setIsMatrixActive(prev => !prev);
+          const nextState = !isMatrixActive;
+          setTerminalHistory(prev => [
+            ...prev,
+            { text: `MATRIX DIGITAL RAIN OVERLAY: ${nextState ? 'ENGAGED' : 'DISENGAGED'}`, type: 'success' }
+          ]);
+          if (nextState) unlockAchievement('cyber_hacker', 'Cyber Hacker', 'Activated Matrix Digital Rain Canvas');
+          setTerminalInput('');
+          return;
+        }
+
+        if (sub === 'pizzarat') {
+          if (typeof window !== 'undefined') {
+            const isActive = document.documentElement.classList.toggle('konami-active');
+            setTerminalHistory(prev => [
+              ...prev,
+              { text: `NYC PIZZA RAT 3D MODEL: ${isActive ? 'ACTIVE' : 'INACTIVE'}`, type: 'success' }
+            ]);
+            if (isActive) unlockAchievement('pizza_legend', 'NYC Pizza Legend', 'Summoned 3D Pizza Rat WebGL model');
+          }
+          setTerminalInput('');
+          return;
+        }
+
+        if (sub === 'sfx' || sub === 'sound' || sub === 'audio') {
+          const isEnabled = toggleAudio();
+          setTerminalHistory(prev => [
+            ...prev,
+            { text: `WEB AUDIO SFX SYNTHESIZER: ${isEnabled ? 'ENABLED' : 'MUTED'}`, type: 'success' }
+          ]);
+          setTerminalInput('');
+          return;
+        }
+
+        // Default cheatcode menu
+        response = [
+          { text: '===========================================================', type: 'success' },
+          { text: '        SECRET TERMINAL UTILITY & CHEAT MENU               ', type: 'success' },
+          { text: '===========================================================', type: 'success' },
+          { text: '  snake      - Launch interactive Snake Game with Supabase Leaderboard', type: 'link', command: 'cheatcode snake' },
+          { text: '  inspect    - Probe real Supabase latency, JS heap memory & React state', type: 'link', command: 'cheatcode inspect' },
+          { text: '  summary    - Generate & copy Technical System Dossier to clipboard', type: 'link', command: 'cheatcode summary' },
+          { text: '  matrix     - Toggle retro Matrix green digital rain overlay', type: 'link', command: 'cheatcode matrix' },
+          { text: '  pizzarat   - Toggle 3D WebGL NYC Pizza Rat physics model', type: 'link', command: 'cheatcode pizzarat' },
+          { text: '  sfx        - Toggle Web Audio 8-bit sound synthesizer', type: 'link', command: 'cheatcode sfx' },
+          { text: '===========================================================', type: 'success' }
+        ];
         break;
+      }
+      case 'snake':
+      case 'play':
+        setActiveGame('snake');
+        setTerminalHistory(prev => [
+          ...prev,
+          { text: 'LAUNCHING RETRO TERMINAL SNAKE ENGINE...', type: 'success' }
+        ]);
+        setTerminalInput('');
+        return;
+      case 'inspect':
+      case 'summary':
+      case 'matrix':
+      case 'pizzarat':
+      case 'sfx':
+        executeCommand(`cheatcode ${trimmedCmd}`);
+        return;
       case 'clear':
         setTerminalHistory([]);
         setTerminalInput('');
@@ -748,7 +908,7 @@ export default function SiteInfoConsole() {
 
     setTerminalHistory(prev => [...prev, ...response]);
     setTerminalInput('');
-  }, [projects, profileData]);
+  }, [projects, profileData, isNoir, stats, isMatrixActive, unlockAchievement]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -878,58 +1038,67 @@ export default function SiteInfoConsole() {
 
           {/* Terminal Console */}
           <div className={styles.terminalContainer} onClick={focusTerminalInput}>
-            <div className={styles.terminalScreen} ref={terminalScreenRef} data-lenis-prevent>
-              {terminalHistory.map((line, index) => {
-                if (line.type === 'image' && line.imageUrl) {
-                  return (
-                    <div key={index} className={styles.terminalImageContainer}>
-                      <Image src={line.imageUrl} alt="PhonePe QR Code" className={styles.terminalImage} width={200} height={200} unoptimized />
-                    </div>
-                  );
-                }
-                if (line.href) {
-                  return (
-                    <div key={index} className={`${styles.terminalLine} ${styles.link}`}>
-                      <a
-                        href={line.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.link}
-                        onClick={(e) => e.stopPropagation()}
+            {activeGame === 'snake' ? (
+              <TerminalSnakeGame
+                onClose={() => setActiveGame('none')}
+                onAchievementUnlocked={unlockAchievement}
+              />
+            ) : (
+              <>
+                <div className={styles.terminalScreen} ref={terminalScreenRef} data-lenis-prevent>
+                  {terminalHistory.map((line, index) => {
+                    if (line.type === 'image' && line.imageUrl) {
+                      return (
+                        <div key={index} className={styles.terminalImageContainer}>
+                          <Image src={line.imageUrl} alt="PhonePe QR Code" className={styles.terminalImage} width={200} height={200} unoptimized />
+                        </div>
+                      );
+                    }
+                    if (line.href) {
+                      return (
+                        <div key={index} className={`${styles.terminalLine} ${styles.link}`}>
+                          <a
+                            href={line.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={styles.link}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {line.text}
+                          </a>
+                        </div>
+                      );
+                    }
+                    return (
+                      <div
+                        key={index}
+                        className={`${styles.terminalLine} ${styles[line.type]} ${line.command ? styles.clickableLine : ''}`}
+                        onClick={line.command ? (e) => {
+                          e.stopPropagation();
+                          executeCommand(line.command!);
+                        } : undefined}
                       >
                         {line.text}
-                      </a>
-                    </div>
-                  );
-                }
-                return (
-                  <div
-                    key={index}
-                    className={`${styles.terminalLine} ${styles[line.type]} ${line.command ? styles.clickableLine : ''}`}
-                    onClick={line.command ? (e) => {
-                      e.stopPropagation();
-                      executeCommand(line.command!);
-                    } : undefined}
-                  >
-                    {line.text}
-                  </div>
-                );
-              })}
-            </div>
-            <div className={styles.terminalPromptLine}>
-              <span className={styles.promptSymbol}>&gt;</span>
-              <input
-                ref={inputRef}
-                type="text"
-                className={styles.terminalInput}
-                value={terminalInput}
-                onChange={(e) => setTerminalInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Type a command..."
-                aria-label="Terminal prompt"
-                autoFocus
-              />
-            </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className={styles.terminalPromptLine}>
+                  <span className={styles.promptSymbol}>&gt;</span>
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    className={styles.terminalInput}
+                    value={terminalInput}
+                    onChange={(e) => setTerminalInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Type a command..."
+                    aria-label="Terminal prompt"
+                    autoFocus
+                  />
+                </div>
+              </>
+            )}
           </div>
 
           {/* Command Shortcuts list for easy mobile use */}
