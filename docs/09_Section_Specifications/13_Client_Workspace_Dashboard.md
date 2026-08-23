@@ -2,6 +2,8 @@
 
 ## **Purpose**
 
+> 📌 **Master Product Requirements & v2 Architecture:** For the forward-looking SOTA Scoping Engine and Client Workspace PRD, see [`docs/25_SOTA_Scoping_Engine_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/25_SOTA_Scoping_Engine_PRD.md).
+
 The **Client Workspace Dashboard** (`/dashboard`) serves as the client portal where authenticated clients manage active project scopes, customize scope features, track project delivery milestones, export commercial PDF proposals, delete draft proposals, and initiate 50% deposit lock payments via Razorpay.
 
 ---

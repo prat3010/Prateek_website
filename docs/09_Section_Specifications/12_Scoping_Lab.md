@@ -2,6 +2,8 @@
 
 ## **Purpose**
 
+> 📌 **Master Product Requirements & v2 Architecture:** For the forward-looking SOTA Scoping Engine and Client Workspace PRD, see [`docs/25_SOTA_Scoping_Engine_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/25_SOTA_Scoping_Engine_PRD.md).
+
 The **Project Scoping Lab** (`/scoping`) provides an interactive, client-driven scoping wizard where potential clients can configure web engineering projects, select base architecture engines, customize feature modules, choose brand identity assets, pick maintenance care plans, and generate instant region-aware commercial proposals (INR/USD) with client-side PDF export (`ScopingBriefPDF`).
 
 ---

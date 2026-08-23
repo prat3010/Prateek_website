@@ -149,4 +149,148 @@ stateDiagram-v2
 
 ---
 
-*This unified foundation covers the entire client journey from first discovery prompt to final production handover. We are now ready to expand each module in extreme detail.*
+## 7. Deep-Dive Specification: Module 1 — AI Natural Language Scoping Copilot
+
+### 7.1 Objective & Strategic Purpose
+The **AI Natural Language Scoping Copilot** removes blank-page anxiety and decision fatigue for non-technical buyers. Instead of forcing visitors to navigate 15+ checkboxes, it translates plain-English requirements into a fully resolved technical architecture blueprint in under **1.2 seconds**.
+
+---
+
+### 7.2 UI/UX Specification (`AiScopingPromptBar.tsx`)
+
+#### Visual Placement & Layout
+- Positioned prominently at the top of **Step 1: Identity & Goal Archetype** (`StepGoalArchetype.tsx`).
+- Styled with a subtle gradient border glow (`var(--brand-accent)`) and a spark icon (`Sparkles` from `lucide-react`).
+
+```text
+┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+│  ✨ AI Architecture Copilot                                                                     │
+│  ┌────────────────────────────────────────────────────────────────────────────┬────────────────┐ │
+│  │ e.g. "B2B SaaS with AI document search, Stripe billing, and admin center" │ [⚡ Auto-Scope] │ │
+│  └────────────────────────────────────────────────────────────────────────────┴────────────────┘ │
+│  Quick Prompts: [🚀 Real Estate RAG Portal] [🤖 Healthcare Voice Bot] [🛍️ Headless E-Commerce]     │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### Micro-Interactions & States
+1. **Idle / Focused State:** Input field expands slightly with an ambient azure/noir pulse; suggestion pills appear below.
+2. **Generating State (Loading):** 
+   - Button switches to spinning icon with text: *"Analyzing Architecture..."*.
+   - Feature cards in Step 2 show a brief shimmer/skeleton animation to indicate live AI hydration.
+3. **Completed State (Success):**
+   - Renders a floating highlight banner:
+     `🎯 95% Match Blueprint: B2B SaaS Platform — Rationale: Configured for document processing, recurring subscriptions, and role-based access.`
+   - Smoothly scrolls and focuses the user onto the resolved choices with an animated checkmark sequence.
+
+---
+
+### 7.3 API Contract: `/api/scoping/parse-intent`
+
+- **HTTP Method:** `POST`
+- **Authentication:** Public route (rate-limited via IP hash).
+- **Backend Model:** Google Gemini `gemini-3.6-flash` via `@google/genai` or standard REST endpoint with low temperature ($T = 0.2$) for deterministic mapping.
+
+#### Request Schema
+```typescript
+interface ParseIntentRequest {
+  prompt: string;                        // Client's plain-English input
+  currency: 'INR' | 'USD';               // Target currency
+  currentContext?: {
+    existingEngineId?: string;
+    existingFeatureIds?: string[];
+  };
+}
+```
+
+#### Response Schema
+```typescript
+interface ParseIntentResponse {
+  success: boolean;
+  archetypeId: string;                   // Matches GoalArchetype.id
+  baseEngineId: string;                  // Matches BaseEngineItem.id
+  featureIds: string[];                  // Array of valid FeatureItem.id
+  brandAssetId: string;                  // Matches BrandAssetOption.id
+  maintenancePlanId: string;             // Matches MaintenancePlanOption.id
+  suggestedTimeline: string;             // e.g. "Standard (3–4 weeks)"
+  confidenceScore: number;               // Float between 0.0 and 1.0 (e.g. 0.94)
+  summaryRationale: string;              // 1-2 sentence layman explanation of the technical choices
+  unrecognizedRequirements?: string[];   // Any custom niche needs to be logged in additionalNotes
+}
+```
+
+#### System Prompt & Grounding Rules
+The prompt grounds Gemini strictly in the single source of truth (`intakeQuestionnaireDefaults.json`):
+```text
+You are a Lead Solutions Architect. Your role is to parse a client's project description and map it STRICTLY to the available engines and feature IDs in our engineering catalog.
+
+Catalog Rules:
+1. Valid Archetype IDs: landing_page, business_multipage, ecommerce, booking_appointments, saas_app, lms_portal, crm_admin, ai_rag_app, autonomous_agents, voice_ai_agent_app, vision_ocr_saas, standalone_chatbot, custom.
+2. Valid Engine IDs: engine_landing, engine_multipage, engine_saas, engine_ecommerce, engine_ai_saas, engine_custom.
+3. Valid Feature IDs: auth, payments, database_pgvector, ai_rag, ai_agents, ai_voice_agent, ai_vision, search, cms, email, analytics, realtime, admin, pwa, i18n, integrations, video, pdf.
+4. Valid Maintenance IDs: essential, growth, scale, enterprise.
+5. You MUST resolve all mandatory prerequisites (e.g., if payments or admin is selected, auth MUST be included).
+6. Always return valid JSON matching the specified schema. Do not invent non-existent feature IDs.
+```
+
+---
+
+### 7.4 State Hydration & Hook Integration (`useIntakeFormState.ts`)
+
+Upon receiving a successful response from `/api/scoping/parse-intent`:
+```typescript
+const handleApplyAiBlueprint = (blueprint: ParseIntentResponse) => {
+  const targetArchetype = goals.find(g => g.id === blueprint.archetypeId) || goals[0];
+  const targetEngine = engines.find(e => e.id === blueprint.baseEngineId) || engines[0];
+  
+  // 1. Resolve compulsory features for archetype + AI recommended features
+  const compulsoryIds = targetArchetype.compulsoryFeatureLabels
+    .map(label => features.find(f => f.label === label)?.id)
+    .filter(Boolean) as string[];
+    
+  const mergedFeatureIds = new Set([...compulsoryIds, ...blueprint.featureIds]);
+  
+  // 2. Resolve graph dependencies
+  const resolvedAllIds = resolveFeatureDependencies(Array.from(mergedFeatureIds), features);
+  resolvedAllIds.forEach(id => mergedFeatureIds.add(id));
+
+  // 3. Hydrate state
+  setFormData(prev => ({
+    ...prev,
+    projectGoal: targetArchetype.label,
+    businessKPI: blueprint.summaryRationale || targetArchetype.primaryOutcome,
+    selectedBaseEngineId: targetEngine.id,
+    selectedFeatures: Array.from(mergedFeatureIds),
+    selectedBrandAssetId: blueprint.brandAssetId || prev.selectedBrandAssetId,
+    selectedMaintenanceId: blueprint.maintenancePlanId || prev.selectedMaintenanceId,
+    timeline: blueprint.suggestedTimeline || prev.timeline,
+    additionalNotes: blueprint.unrecognizedRequirements?.length 
+      ? `[AI Custom Requirements: ${blueprint.unrecognizedRequirements.join(', ')}]` 
+      : prev.additionalNotes,
+  }));
+
+  // 4. Trigger UI notification
+  toast.success('AI Architecture Blueprint Applied!', {
+    description: blueprint.summaryRationale,
+  });
+};
+```
+
+---
+
+### 7.5 Edge Cases & Resilience Strategy
+
+1. **Vague Prompts (e.g., *"Make a website"*):**
+   - Returns baseline `business_multipage` archetype with `confidenceScore = 0.65`.
+   - UI displays 3 interactive clarifying chip options: `[E-Commerce Store?]` `[SaaS Product?]` `[Portfolio / Company?]`.
+2. **API Outage / Rate Limit:**
+   - Gracefully catches errors and renders an informative toast: *"AI Copilot is momentarily resting. You can customize your architecture manually below."*
+   - Wizard remains 100% interactive with zero broken states.
+3. **Manual Overrides after AI Generation:**
+   - Clients can freely uncheck or add features; manual edits preserve the AI-generated business KPI note while updating the active feature array.
+4. **Rate Limiting & Abuse Prevention:**
+   - Rate limit: **10 AI parsing calls per IP per 10 minutes** using `getIpHash()`. Rejections return HTTP 429.
+
+---
+
+*Module 1 specification is locked. Ready to proceed to Module 2: Interactive Prerequisite Solver & Cascade Disconnect UX.*
+
