@@ -349,7 +349,7 @@
       "id": "standalone_chatbot",
       "label": "💬 Standalone Embedded AI Chatbot Widget",
       "shortLabel": "AI Chatbot Widget",
-      "description": "Embed a 24/7 intelligent AI chatbot into your existing website (WordPress, Webflow, Shopify, custom HTML) trained on your PDFs & docs.",
+      "description": "Custom Vector RAG Infrastructure & Native Script Embed (pgvector embeddings, PDF chunking pipeline, presigned citations) for your existing website (WordPress, Webflow, Shopify, custom HTML).",
       "recommendedEngineId": "standalone_embed",
       "compulsoryFeatureLabels": [
         "Private AI Knowledge Base / Vector Search (RAG)"

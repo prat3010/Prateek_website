@@ -280,7 +280,7 @@ export default function RagLandingPage() {
           <p className={styles.scopingBannerDesc}>
             We build custom on-premise RAG pipelines, multi-modal vector search systems, and HIPAA/GDPR-compliant enterprise knowledge hubs.
           </p>
-          <Link href="/scoping?engine=saas&goal=ai-copilot" className="comic-btn comic-btn-blue">
+          <Link href="/scoping?engine=saas&goal=ai_rag_app" className="comic-btn comic-btn-blue">
             🛠️ Build Custom Scope in Scoping Lab →
           </Link>
         </div>

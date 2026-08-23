@@ -239,7 +239,7 @@ export async function POST(req: NextRequest) {
         role: 'Founder & Managing Partner',
         email: 'david@apexdigital.io',
         source_url: 'https://apexdigital.io',
-        ai_generated_pitch: `Hi David,\n\nI noticed Apex Digital Solutions is expanding custom software services. We recently built a multi-tenant hybrid search & RAG platform ("Retriever") on Next.js 16 and PostgreSQL pgvector.\n\nI created a custom interactive scoping spec for your stack: https://prateeq.in/scoping?engine=landing&goal=rag-saas\n\nBest,\nPrateek Sharma`,
+        ai_generated_pitch: `Hi David,\n\nI noticed Apex Digital Solutions is expanding custom software services. We recently built a multi-tenant hybrid search & RAG platform ("Retriever") on Next.js 16 and PostgreSQL pgvector.\n\nI created a custom interactive scoping spec for your stack: https://prateeq.in/scoping?engine=landing&goal=ai_rag_app\n\nBest,\nPrateek Sharma`,
         quality_score: 90,
         intent_source: 'b2b_agency',
         verification_reason: 'Verified fallback lead',
