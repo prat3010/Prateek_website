@@ -83,17 +83,19 @@ It eliminates the tedious manual labor of lead prospecting, cold outreach drafti
 
 ---
 
-### Phase 2: AI Prospecting & Draft Generation Engine
-- [ ] **Lead Discovery Worker (`src/lib/agent/prospector.ts`):**
-  - Search public web directories/APIs for target personas (Agency Founders, E-commerce Owners, Law/Real Estate firms).
-  - Extract public bio, company website, and pain points.
-- [ ] **Hyper-Personalized Pitch Generator (`src/lib/agent/pitcher.ts`):**
-  - Feed lead profile + `/scoping` lab offerings + `retriever` SaaS capabilities to Gemini 2.5 Flash.
-  - Generate non-generic, high-converting opening email drafts with instant quote CTAs.
-- [ ] **Social Media Content Generator (`src/lib/agent/contentGenerator.ts`):**
-  - Read `src/data/git-log.json`, `projects.json`, and blog posts.
-  - Draft 60% Technical / Build-in-Public posts & 40% Business Outcome / Scoping Lab previews.
-  - Queue generated drafts into Supabase.
+### Phase 2: AI Prospecting & Draft Generation Engine (Upgraded to Gemini 3.6 Flash)
+- [x] **Centralized Prompt & Model Config (`src/data/outreach_defaults.json`):**
+  - Standardized on `gemini-3.6-flash` across all synchronizer Python tools and Next.js routes.
+  - Centralized target queries, system prompts, CTA deep links, and minimum quality score thresholds (`75/100`).
+- [x] **Multi-Source Job Board & Web Scraper (`src/app/api/outreach/prospect/route.ts` & `scripts/sync_tabs/outreach.py`):**
+  - Expanded search to active hiring portals: `site:naukri.com`, `site:indeed.com`, `site:ycombinator.com/companies`, and B2B Google Search.
+  - Positioned Prateek as high-speed Contract MVP alternative to full-time hires.
+- [x] **2-Step AI Quality Evaluation & Pitch Generator:**
+  - **Step 1 (AI Evaluator)**: Calls Gemini 3.6 Flash to evaluate web snippets, discard directory list sellers (`readycontacts`, `datacaptive`, `yellowpages`), and return quality scores.
+  - **Step 2 (AI Pitcher)**: Generates 4-sentence tailored B2B pitches with instant scoping CTA (`https://prateeq.in/scoping?engine=saas`).
+- [x] **Streamlit GUI Config Expander & Quality Badges (`scripts/sync_tabs/outreach.py`):**
+  - Display quality score badges (`⭐ Score: 85/100 | Source: naukri_job`).
+  - Added "⚙️ Target Search Sources & AI Settings" GUI editor for live prompt & query customization.
 
 ---
 

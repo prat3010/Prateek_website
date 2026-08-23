@@ -39,3 +39,11 @@
   2. **Contract & Formatting Alignment:** Verify third-party library defaults against local domain contracts (`src/lib/pricing.ts`, `formatMoney`, `pdfTheme.ts`). Always pass explicit locale/formatting parameters (`locales={currency === 'INR' ? 'en-IN' : 'en-US'}`) matching site-wide conventions.
   3. **Primary User Flow Coverage:** Ensure visual animations and interactive polish are integrated directly into the primary active interaction paths (e.g., sticky action toolbars, live input controls, interactive cards) rather than only on static end steps.
 - **Constraint:** Never mark a feature complete without verifying the entire end-to-end user interaction flow across all steps and screen sizes.
+
+### 9. Mandatory Database Schema Pre-Check & Migration Execution
+- **Rule:** Whenever modifying, adding, or extending any backend data model, API payload, or python synchronizer record fields (e.g. adding new columns to `outreach_leads`, `projects`, `skills`, or `certificates`):
+  1. **Schema Check First:** BEFORE adding new fields to application code or Python write payloads, ALWAYS inspect the live Supabase database table schema using `execute_sql` or database inspection tools.
+  2. **Execute Migrations Immediately:** Run `ALTER TABLE ... ADD COLUMN IF NOT EXISTS ...` via Supabase SQL before making code writes so API REST payloads never fail with `HTTP 400 (PGRST204)` schema cache mismatch errors.
+  3. **Synchronize SQL Manifests:** Immediately update `supabase_schema.sql` and run `python3 scripts/audit_contracts.py` to ensure local SQL manifests stay 100% synchronized with the live database.
+- **Constraint:** NEVER push new data properties or write payloads to Supabase without first verifying that the target database table has the required columns in the live schema.
+

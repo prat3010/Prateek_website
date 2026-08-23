@@ -135,6 +135,18 @@
         ]
       },
       {
+        "id": "autonomous_agents",
+        "label": "🤖 Autonomous AI Agent & Workflow Platform",
+        "shortLabel": "AI Agents Platform",
+        "description": "Autonomous AI agents, API tool execution, and automated business decision loops",
+        "recommendedEngineId": "saas",
+        "compulsoryFeatureLabels": [
+          "Autonomous AI Agents & Workflow Automation",
+          "User Auth & Client Portal (Google/Magic Link)",
+          "Admin Dashboard & Role Access Control (RBAC)"
+        ]
+      },
+      {
         "id": "standalone_chatbot",
         "label": "💬 Standalone Embedded AI Chatbot Widget",
         "shortLabel": "AI Chatbot Widget",
@@ -244,6 +256,14 @@
         "priceUSD": 1700,
         "techSpecs": "pgvector Vector Embeddings, Document Chunking Pipeline, Semantic Search, Presigned Citation Downloads, Feedback Telemetry",
         "laymanDescription": "An intelligent AI assistant trained exclusively on your business documents, FAQs, and PDFs that answers customer questions 24/7 with source citations."
+      },
+      {
+        "id": "ai_agents",
+        "label": "Autonomous AI Agents & Workflow Automation",
+        "priceINR": 135000,
+        "priceUSD": 1800,
+        "techSpecs": "Multi-Agent Orchestration, Tool Calling & API Actions, Web Scraping & Crawling Hooks, Webhook Execution",
+        "laymanDescription": "Autonomous AI agents that execute business tasks, search the web, call external APIs, and automate multi-step operational workflows."
       },
       {
         "id": "admin",

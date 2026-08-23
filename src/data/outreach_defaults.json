@@ -1,0 +1,42 @@
+{
+  "activeModel": "gemini-3.6-flash",
+  "minQualityScore": 75,
+  "maxLeadsPerRun": 1,
+  "ctaDeepLink": "https://prateeq.in/scoping?engine=saas",
+  "bannedDomains": [
+    "duckduckgo",
+    "wikipedia",
+    "readycontacts",
+    "datacaptive",
+    "yellowpages",
+    "glassdoor",
+    "goodfirms",
+    "clutch.co",
+    "g2.com"
+  ],
+  "portfolioMatrix": {
+    "developerName": "Prateek Sharma",
+    "roleTitle": "Forward Deployed Engineer & AI Solutions Architect",
+    "coreCapabilities": "Custom Autonomous AI Agents, Tool Calling, Vector Search & pgvector RAG, Micro-SaaS Backends, Next.js 16 App Router, Supabase PostgreSQL, Rapid 0-to-1 Product Execution",
+    "keyProjects": [
+      {
+        "name": "Retriever AI SaaS",
+        "description": "Multi-tenant hybrid search & RAG platform built on Next.js 16 and PostgreSQL pgvector with presigned citation downloads and 1-line embed scripts."
+      },
+      {
+        "name": "Synchronizer Control Deck",
+        "description": "Streamlit management dashboard integrated with Gemini 3.6 Flash for automated skills scanning, certificate analysis, and real-time database sync."
+      },
+      {
+        "name": "Client Workspace Dashboard",
+        "description": "Google OAuth 2.0 workspace with interactive milestone tracking, Razorpay payment processing, and dynamic commercial PDF proposal exports."
+      },
+      {
+        "name": "Portfolio & Telemetry Engine",
+        "description": "Next.js 16 edge proxy architecture with sub-100ms SQL telemetry aggregations and automated daily IP hashing."
+      }
+    ]
+  },
+  "evaluatorPromptTemplate": "Analyze this active tech hiring post for a potential freelance/contract software engineering lead. Context: Company={companyName}, Role={role}, Snippet={snippet}. Return valid JSON ONLY: {\"is_valid_lead\": boolean, \"quality_score\": number (0-100), \"source_type\": \"hn_whoishiring\" | \"weworkremotely\" | \"remoteok\", \"reason\": \"brief 1-sentence reason\"}",
+  "pitcherPromptTemplate": "You are writing a B2B outreach email as Prateek Sharma (Forward Deployed Engineer & AI Solutions Architect). Read the client's hiring post snippet ({snippet}) for {companyName}'s {role} position. Compare their exact tech requirements against Prateek's real project achievements (Retriever AI SaaS RAG platform, Synchronizer Control Deck, Client Workspace Dashboard, Next.js 16 + Supabase). Rules: 1. Write a 3-sentence, highly personalized pitch connecting their hiring needs to Prateek's real production builds. 2. Position as a Forward Deployed Engineer who builds custom AI solutions and full-stack software. 3. Include targeted CTA link: {ctaDeepLink}. Sign off from Prateek Sharma. Return plain text ONLY."
+}

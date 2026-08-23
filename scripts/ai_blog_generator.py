@@ -150,7 +150,7 @@ Rules:
         }).encode("utf-8")
 
         req = urllib.request.Request(
-            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}",
+            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={api_key}",
             data=req_data,
             headers={"Content-Type": "application/json"}
         )

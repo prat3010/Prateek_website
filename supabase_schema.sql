@@ -720,5 +720,31 @@ CREATE POLICY "Allow public select snake_leaderboard" ON snake_leaderboard FOR S
 
 CREATE INDEX IF NOT EXISTS idx_snake_leaderboard_score ON snake_leaderboard (score DESC, created_at ASC);
 
+-- ============================================================
+-- 14. Autonomous Lead Prospecting & Control Queue
+-- ============================================================
+CREATE TABLE IF NOT EXISTS outreach_leads (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  lead_name TEXT NOT NULL,
+  company TEXT NOT NULL,
+  role TEXT,
+  email TEXT,
+  source_url TEXT,
+  ai_generated_pitch TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'sent', 'dismissed')),
+  quality_score INTEGER DEFAULT 80,
+  intent_source TEXT DEFAULT 'google',
+  verification_reason TEXT DEFAULT '',
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE outreach_leads ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow service role full access outreach_leads" ON outreach_leads;
+CREATE POLICY "Allow service role full access outreach_leads" ON outreach_leads USING (true);
+
+CREATE INDEX IF NOT EXISTS idx_outreach_leads_status ON outreach_leads (status, created_at DESC);
+
+
 
 

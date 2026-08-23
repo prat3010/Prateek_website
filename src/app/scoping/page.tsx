@@ -30,10 +30,8 @@ export default async function ScopingPage({ searchParams }: ScopingPageProps) {
     preset = { serviceType: 'quick', quickServiceId: params?.service };
   } else if (params?.type === 'care') {
     preset = { serviceType: 'care' };
-  } else if (params?.engine) {
-    preset = { serviceType: 'full', engineId: params.engine };
-  } else if (params?.goal) {
-    preset = { serviceType: 'full', goalId: params.goal };
+  } else if (params?.engine || params?.goal) {
+    preset = { serviceType: 'full', engineId: params?.engine, goalId: params?.goal };
   }
 
   const serviceJsonLd = {

@@ -86,6 +86,15 @@
       "recommendedMaintenanceId": "premium"
     },
     {
+      "id": "ai_agents",
+      "label": "Autonomous AI Agents & Workflow Automation",
+      "priceINR": 135000,
+      "priceUSD": 1800,
+      "laymanDescription": "Autonomous AI agents that execute business tasks, search the web, call external APIs, and automate multi-step operational workflows.",
+      "techSpecs": "Multi-Agent Orchestration, Tool Calling & API Actions, Web Scraping & Crawling Hooks, Webhook Execution",
+      "recommendedMaintenanceId": "premium"
+    },
+    {
       "id": "admin",
       "label": "Admin Dashboard & Role Access Control (RBAC)",
       "priceINR": 75000,
@@ -266,6 +275,18 @@
       "recommendedEngineId": "saas",
       "compulsoryFeatureLabels": [
         "Private AI Knowledge Base / Vector Search (RAG)",
+        "User Auth & Client Portal (Google/Magic Link)",
+        "Admin Dashboard & Role Access Control (RBAC)"
+      ]
+    },
+    {
+      "id": "autonomous_agents",
+      "label": "🤖 Autonomous AI Agent & Workflow Platform",
+      "shortLabel": "AI Agents Platform",
+      "description": "Autonomous AI agents, API tool execution, and automated business decision loops",
+      "recommendedEngineId": "saas",
+      "compulsoryFeatureLabels": [
+        "Autonomous AI Agents & Workflow Automation",
         "User Auth & Client Portal (Google/Magic Link)",
         "Admin Dashboard & Role Access Control (RBAC)"
       ]

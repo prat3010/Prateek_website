@@ -110,8 +110,8 @@ export const FEATURE_CATEGORIES = [
   {
     id: 'ai_automation',
     title: '🤖 AI Knowledge Base & Workflows',
-    description: 'Vector search (RAG), automated emails, CRM lead tracking, and webhooks',
-    featureIds: ['ai_rag', 'email', 'crm', 'integrations'],
+    description: 'Vector search (RAG), autonomous AI agents, automated emails, CRM lead tracking, and webhooks',
+    featureIds: ['ai_rag', 'ai_agents', 'email', 'crm', 'integrations'],
   },
   {
     id: 'experience_scale',
