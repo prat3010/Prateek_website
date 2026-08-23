@@ -366,10 +366,10 @@
   "brandAssets": [
     {
       "id": "ready",
-      "label": "All Brand Assets Ready (Logo SVG & Copywriting)",
+      "label": "All Brand Assets Ready (Figma, Adobe XD, Logo & Copy)",
       "priceINR": 0,
       "priceUSD": 0,
-      "description": "Client supplies vector logo, color kit, and text content.",
+      "description": "Client supplies Figma / Adobe XD design files, vector logo, color kit, and text content.",
       "designReadiness": "figma_ready"
     },
     {

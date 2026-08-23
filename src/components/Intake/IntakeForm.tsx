@@ -262,6 +262,37 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     });
   };
 
+  const applySmartPreset = (presetKey: 'essential' | 'growth' | 'ai') => {
+    let targetFeatureIds: string[] = [];
+    if (presetKey === 'essential') {
+      targetFeatureIds = ['auth', 'email'];
+    } else if (presetKey === 'growth') {
+      targetFeatureIds = ['auth', 'payments', 'admin', 'cms', 'email'];
+    } else if (presetKey === 'ai') {
+      targetFeatureIds = ['auth', 'payments', 'admin', 'cms', 'ai_rag', 'ai_agents', 'ai_voice_agent', 'email'];
+    }
+
+    const labels = new Set<string>(initialArchetype.compulsoryFeatureLabels);
+    targetFeatureIds.forEach(id => {
+      const feat = features.find(f => f.id === id);
+      if (feat) labels.add(feat.label);
+    });
+
+    const baseIds = features.filter(f => labels.has(f.label)).map(f => f.id);
+    resolveFeatureDependencies(baseIds, features).forEach(id => {
+      const label = features.find(f => f.id === id)?.label;
+      if (label) labels.add(label);
+    });
+
+    setFormData(prev => ({
+      ...prev,
+      selectedFeatures: Array.from(labels),
+    }));
+
+    const presetName = presetKey === 'essential' ? 'Essential MVP' : presetKey === 'growth' ? 'Growth Bundle' : 'Full AI Powerhouse';
+    toast.success(`Applied ${presetName} Scope Preset!`);
+  };
+
   const [generatedScopeCode] = useState(() => `SCOPE-${Math.floor(10000 + Math.random() * 90000)}`);
 
   // Resolve deep-link preset (engine or goal archetype) to the wizard's initial selections
@@ -1160,14 +1191,26 @@ interface IntakeFormData {
               <p style={{ opacity: 0.7, fontSize: '14px', margin: '8px 0 16px 0' }}>
                 Thank you, <strong>{formData.companyName}</strong>. Your itemized quote proposal has been generated. You can also download your formal PDF brief below.
               </p>
-              <button
-                type="button"
-                onClick={handleDownloadPDF}
-                className={`${styles.btn} ${styles.btnPrimary}`}
-              >
-                <Download size={16} />
-                <span>OPEN CANVA-GRADE PDF BRIEF</span>
-              </button>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center', marginTop: '12px' }}>
+                <button
+                  type="button"
+                  onClick={handleDownloadPDF}
+                  className={`${styles.btn} ${styles.btnPrimary}`}
+                >
+                  <Download size={16} />
+                  <span>OPEN CANVA-GRADE PDF BRIEF</span>
+                </button>
+                <a
+                  href={`https://wa.me/919910793616?text=${encodeURIComponent(`Hi Prateeq, I just generated a scoping brief (${generatedScopeCode}) for ${formData.companyName || 'my project'} with quote ${formatMoney(totalCost.totalINR, 'INR')}. Let's discuss!`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${styles.btn} ${styles.btnSecondary} ${styles.whatsappContactBtn}`}
+                  style={{ textDecoration: 'none' }}
+                >
+                  <Send size={16} />
+                  <span>DISCUSS QUOTE ON WHATSAPP</span>
+                </a>
+              </div>
             </div>
           ) : (
             <form onSubmit={handleSubmitOnline}>
@@ -1444,6 +1487,34 @@ interface IntakeFormData {
                   {/* Grouped Feature Checkboxes */}
                   <div className={styles.field}>
                     <label className={styles.label}>Select Architecture Add-on Modules (Pure Additive Pricing)</label>
+
+                    {/* 1-Click Smart Scope Presets */}
+                    <div className={styles.smartPresetBar}>
+                      <span className={styles.smartPresetLabel}>⚡ 1-Click Scope Presets:</span>
+                      <div className={styles.smartPresetButtons}>
+                        <button
+                          type="button"
+                          className={styles.smartPresetBtn}
+                          onClick={() => applySmartPreset('essential')}
+                        >
+                          🌟 Essential MVP
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.smartPresetBtn}
+                          onClick={() => applySmartPreset('growth')}
+                        >
+                          🚀 Growth Bundle
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.smartPresetBtn}
+                          onClick={() => applySmartPreset('ai')}
+                        >
+                          🤖 Full AI Powerhouse
+                        </button>
+                      </div>
+                    </div>
 
                     {FEATURE_CATEGORIES.map(cat => {
                       const categoryFeatures = features.filter(f => cat.featureIds.includes(f.id));
@@ -1986,6 +2057,17 @@ interface IntakeFormData {
                     </button>
                   ) : (
                     <>
+                      {!user && (
+                        <button
+                          type="button"
+                          onClick={() => loginWithGoogle()}
+                          className={`${styles.btn} ${styles.googleFastPassBtn}`}
+                          title="Fast-pass: Sign in with Google to automatically save your scope to your client dashboard"
+                        >
+                          <Rocket size={16} />
+                          <span>1-CLICK GOOGLE FAST-PASS</span>
+                        </button>
+                      )}
                       <button
                         type="submit"
                         disabled={submitting || !formData.agreedToTerms}
