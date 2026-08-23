@@ -204,6 +204,51 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   };
   const [, setRecaptchaReady] = useState(!SITE_KEY);
   const [recaptchaUnavailable, setRecaptchaUnavailable] = useState(false);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (containerRef.current && currentStep > 1) {
+      containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [currentStep]);
+
+  const dependsOnMap = useMemo(() => {
+    const map: Record<string, string[]> = {};
+    features.forEach(f => {
+      if (f.dependsOn && f.dependsOn.length > 0) {
+        f.dependsOn.forEach(prereqId => {
+          if (!map[prereqId]) map[prereqId] = [];
+          if (!map[prereqId].includes(f.label)) {
+            map[prereqId].push(f.label);
+          }
+        });
+      }
+    });
+    return map;
+  }, [features]);
+
+  const handleCopyShareableUrl = () => {
+    if (typeof window === 'undefined') return;
+    const selectedGoalObj = goals.find(g => g.label === formData.projectGoal);
+    const selectedFeatureIds = features
+      .filter(f => formData.selectedFeatures.includes(f.label))
+      .map(f => f.id);
+
+    const params = new URLSearchParams();
+    params.set('type', 'full');
+    if (formData.selectedBaseEngineId) params.set('engine', formData.selectedBaseEngineId);
+    if (selectedGoalObj) params.set('goal', selectedGoalObj.id);
+    if (selectedFeatureIds.length > 0) params.set('features', selectedFeatureIds.join(','));
+    if (formData.selectedBrandAssetId) params.set('brand', formData.selectedBrandAssetId);
+    if (formData.selectedMaintenanceId) params.set('care', formData.selectedMaintenanceId);
+    params.set('currency', currency);
+
+    const shareableUrl = `${window.location.origin}/scoping?${params.toString()}`;
+    navigator.clipboard.writeText(shareableUrl);
+    toast.success('Shareable Custom Quote URL copied!', {
+      description: 'Anyone with this link can view and load your exact configuration.',
+    });
+  };
 
   const [generatedScopeCode] = useState(() => `SCOPE-${Math.floor(10000 + Math.random() * 90000)}`);
 
@@ -773,7 +818,7 @@ interface IntakeFormData {
   ];
 
   return (
-    <section className={styles.intakeSection} id="scoping-form" onClick={() => { setActivePopoverId(null); setPopoverAnchor(null); }}>
+    <section className={styles.intakeSection} id="scoping-form" ref={containerRef} onClick={() => { setActivePopoverId(null); setPopoverAnchor(null); }}>
       <div className={styles.container}>
         <div className={styles.card}>
           <div className={styles.header}>
@@ -1365,7 +1410,7 @@ interface IntakeFormData {
                             <h4 className={styles.featureCategoryTitle}>{cat.title}</h4>
                             <p className={styles.featureCategoryDesc}>{cat.description}</p>
                           </div>
-                          <div className={styles.checkboxGrid}>
+                          <div className={styles.checkboxGrid} data-lenis-prevent>
                             {categoryFeatures.map(m => {
                               const isCompulsory = currentArchetype.compulsoryFeatureLabels.includes(m.label);
                               const isLegacyRequired = formData.projectStartType === 'legacy_rebuild' && m.autoIncludeOnLegacy;
@@ -1432,6 +1477,11 @@ interface IntakeFormData {
                                       </div>
                                       <span className={styles.priceBadge}>{`+${priceInCurrency(m.priceINR, m.priceUSD)}`}</span>
                                     </div>
+                                    {dependsOnMap[m.id] && dependsOnMap[m.id].some(parentLabel => formData.selectedFeatures.includes(parentLabel)) && (
+                                       <span className={styles.transitiveBadge} title={`Auto-included as prerequisite for ${dependsOnMap[m.id].filter(p => formData.selectedFeatures.includes(p)).join(', ')}`}>
+                                         ⚡ Required by {dependsOnMap[m.id].filter(p => formData.selectedFeatures.includes(p))[0]}
+                                       </span>
+                                     )}
                                     <p style={{ margin: '3px 0 0 0', fontSize: '11px', opacity: 0.7, lineHeight: 1.4 }}>{m.laymanDescription}</p>
 
                                     {lockedHintId === m.id && (
@@ -1844,6 +1894,16 @@ interface IntakeFormData {
                   >
                     <Download size={16} />
                     <span>OPEN PROPOSAL PDF</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleCopyShareableUrl}
+                    className={`${styles.btn} ${styles.btnSecondary}`}
+                    title="Copy shareable deep link to this custom quote"
+                  >
+                    <Sparkles size={16} />
+                    <span>COPY SHAREABLE LINK</span>
                   </button>
 
                   {currentStep > 1 && (
