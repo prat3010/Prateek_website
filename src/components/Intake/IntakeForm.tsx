@@ -92,7 +92,7 @@ export const GOAL_CATEGORIES: { id: 'all' | 'websites' | 'saas' | 'ai_widgets'; 
   { id: 'all', label: 'All Archetypes', ids: [] },
   { id: 'websites', label: 'Websites & Stores', ids: ['landing_page', 'business_multipage', 'ecommerce', 'booking_appointments'] },
   { id: 'saas', label: 'SaaS & Apps', ids: ['saas_app', 'lms_portal', 'crm_admin'] },
-  { id: 'ai_widgets', label: 'AI & Custom Tools', ids: ['ai_rag_app', 'autonomous_agents', 'standalone_chatbot', 'ai_strategy_consulting', 'custom'] },
+  { id: 'ai_widgets', label: 'AI & Custom Tools', ids: ['ai_rag_app', 'autonomous_agents', 'standalone_chatbot', 'ai_strategy_consulting', 'voice_ai_agent_app', 'vision_ocr_saas', 'custom'] },
 ];
 
 export const FEATURE_CATEGORIES = [
@@ -111,8 +111,8 @@ export const FEATURE_CATEGORIES = [
   {
     id: 'ai_automation',
     title: '🤖 AI Knowledge Base & Workflows',
-    description: 'Vector search (RAG), autonomous AI agents, automated emails, CRM lead tracking, and webhooks',
-    featureIds: ['ai_rag', 'ai_agents', 'email', 'crm', 'integrations'],
+    description: 'Vector search (RAG), autonomous AI agents, voice AI, vision OCR, automated emails, CRM tracking, and webhooks',
+    featureIds: ['ai_rag', 'ai_agents', 'ai_voice_agent', 'ai_vision_ocr', 'email', 'crm', 'integrations'],
   },
   {
     id: 'experience_scale',

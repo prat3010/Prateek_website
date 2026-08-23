@@ -133,7 +133,7 @@ function createStyles(theme: PDFThemeConfig) {
       flexDirection: 'row',
       borderBottomWidth: 1,
       borderBottomColor: theme.tableRowAlt,
-      padding: '2.8 5',
+      padding: '1.2 5',
       alignItems: 'flex-start',
     },
     tableRowHighlight: {
@@ -293,7 +293,7 @@ function createStyles(theme: PDFThemeConfig) {
     moduleDesc: {
       fontSize: scaleBodyFont(theme, 6.5),
       color: theme.textSecondary,
-      lineHeight: 1.5,
+      lineHeight: 1.4,
     },
     bullet: {
       fontSize: scaleBodyFont(theme, 6),

@@ -186,6 +186,24 @@
       "laymanDescription": "Extracts, transforms, and imports user accounts, posts, or legacy SQL tables into your new cloud database.",
       "techSpecs": "ETL Pipeline, Supabase DB Schema Mapping, Data Cleansing, Foreign Key Integrity Verification, Migration Telemetry",
       "autoIncludeOnLegacy": true
+    },
+    {
+      "id": "ai_voice_agent",
+      "label": "Real-Time Voice AI Agent & WebRTC Call Assistant",
+      "priceINR": 95000,
+      "priceUSD": 1250,
+      "laymanDescription": "A real-time conversational voice AI widget embedded into your website or app that handles voice intake, customer support calls, or voice appointment bookings with sub-second latency.",
+      "techSpecs": "LiveKit WebRTC, Deepgram STT, ElevenLabs TTS / OpenAI Realtime, Webhook Function Calling, Call Transcript Telemetry",
+      "recommendedMaintenanceId": "premium"
+    },
+    {
+      "id": "ai_vision_ocr",
+      "label": "Multimodal AI Vision & Document Processing Engine",
+      "priceINR": 75000,
+      "priceUSD": 1000,
+      "laymanDescription": "Automated document, receipt, invoice, and image scanner powered by multimodal AI that extracts structured JSON data and populates your database.",
+      "techSpecs": "Gemini 1.5 / Claude Vision API, Schema Validation, PDF/Image OCR Extraction Pipeline, Supabase Storage Sync",
+      "recommendedMaintenanceId": "standard"
     }
   ],
   "goals": [
@@ -288,6 +306,31 @@
       "compulsoryFeatureLabels": [
         "Autonomous AI Agents & Workflow Automation",
         "User Auth & Client Portal (Google/Magic Link)",
+        "Admin Dashboard & Role Access Control (RBAC)"
+      ]
+    },
+    {
+      "id": "voice_ai_agent_app",
+      "label": "🎙️ Real-Time Voice AI & Phone Call Assistant",
+      "shortLabel": "Voice AI App",
+      "description": "Real-time conversational voice intake, phone call scheduling, and voice customer support",
+      "recommendedEngineId": "saas",
+      "compulsoryFeatureLabels": [
+        "Real-Time Voice AI Agent & WebRTC Call Assistant",
+        "User Auth & Client Portal (Google/Magic Link)",
+        "Admin Dashboard & Role Access Control (RBAC)"
+      ]
+    },
+    {
+      "id": "vision_ocr_saas",
+      "label": "👁️ Intelligent Document & OCR Extraction SaaS",
+      "shortLabel": "Document AI SaaS",
+      "description": "Automated invoice, contract, and identity document scanner with structured database export",
+      "recommendedEngineId": "saas",
+      "compulsoryFeatureLabels": [
+        "Multimodal AI Vision & Document Processing Engine",
+        "User Auth & Client Portal (Google/Magic Link)",
+        "Payment Gateway Integration (Razorpay)",
         "Admin Dashboard & Role Access Control (RBAC)"
       ]
     },
