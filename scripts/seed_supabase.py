@@ -237,7 +237,9 @@ if resume_data:
                     intake[key].append(default_item)
 
     row = {'id': 1, 'data': resume_data}
-    upsert('profile', [row], 'id')
+    res = upsert('profile', [row], 'id')
+    if res is None:
+        supabase_rest('PATCH', 'profile?id=eq.1', {'data': resume_data})
     try:
         with open(os.path.join(ROOT, 'src', 'data', 'resume.json'), 'w', encoding='utf-8') as f:
             json.dump(resume_data, f, indent=2, ensure_ascii=False)
