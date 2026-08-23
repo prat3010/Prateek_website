@@ -571,9 +571,11 @@ CREATE TABLE IF NOT EXISTS intake_leads (
   inspiration_links TEXT,
   additional_notes TEXT,
   status TEXT DEFAULT 'new' NOT NULL,
+  ip_hash TEXT,
   notes_internal TEXT DEFAULT ''
 );
 
+ALTER TABLE intake_leads ADD COLUMN IF NOT EXISTS ip_hash TEXT;
 ALTER TABLE intake_leads ENABLE ROW LEVEL SECURITY;
 -- Direct public reads/writes are disabled; all interactions go through service-role API routes.
 
@@ -581,6 +583,7 @@ CREATE INDEX IF NOT EXISTS idx_intake_leads_email ON intake_leads (contact_email
 CREATE INDEX IF NOT EXISTS idx_intake_leads_token ON intake_leads (draft_token);
 CREATE INDEX IF NOT EXISTS idx_intake_leads_status ON intake_leads (status);
 CREATE INDEX IF NOT EXISTS idx_intake_leads_created_at ON intake_leads (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_intake_leads_ip_hash ON intake_leads (ip_hash);
 
 -- ============================================================
 -- 11. Lead Conversion & Scope Binding Stored Procedure

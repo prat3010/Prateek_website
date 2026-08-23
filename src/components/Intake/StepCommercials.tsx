@@ -11,6 +11,7 @@ import {
   FileCode,
   Globe,
   Building2,
+  Sparkles,
 } from 'lucide-react';
 import NumberFlow from '@number-flow/react';
 import Portal from '@/components/ui/Portal';
@@ -170,7 +171,12 @@ export function StepCommercials({
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
-                    {isAutoRecommended && <div className={styles.careCardBadge}>{p.badge}</div>}
+                    {isAutoRecommended && (
+                      <div className={styles.careCardBadge}>
+                        <Sparkles size={10} className={styles.inlineIcon} />
+                        {p.badge ? p.badge.replace(/^[\p{Emoji_Presentation}\p{Extended_Pictographic}\u{FE00}-\u{FE0F}\u{200D}\s]+/gu, '').trim() : 'RECOMMENDED FOR ACTIVE SCOPE'}
+                      </div>
+                    )}
                     <div className={styles.careCardTitle}>
                       {p.name}
                       <button
@@ -338,6 +344,12 @@ export function StepCommercials({
               GST / Corporate Invoice Required
             </button>
           </div>
+          {formData.taxInvoicingPreference === 'corporate_gst' && (
+            <p className={styles.chipHelpText}>
+              <Building2 size={12} className={styles.inlineIcon} />
+              Baseline estimates reflect developer fees. Applicable 18% GST (with GSTIN input tax credit) will be itemized on formal corporate tax invoices.
+            </p>
+          )}
         </div>
       </div>
 

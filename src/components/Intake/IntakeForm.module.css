@@ -574,6 +574,22 @@
   color: currentColor;
 }
 
+.chipHelpText {
+  margin-top: 8px;
+  margin-bottom: 0;
+  font-family: var(--font-code);
+  font-size: 11px;
+  font-weight: 600;
+  color: #3F6E91;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+:global([data-theme='noir']) .chipHelpText {
+  color: var(--neon-cyan, #00f0ff);
+}
+
 /* ── Category Filter Tabs (Step 1) ── */
 
 .categoryTabs {
@@ -833,6 +849,7 @@
   font-size: var(--text-xs);
   color: var(--pop-black);
   box-shadow: 0 1px 4px rgba(43, 43, 54, 0.06);
+  text-align: left;
 }
 
 .checkboxCard:hover {
@@ -1006,6 +1023,9 @@
 }
 
 .smartPresetBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: var(--pop-cream);
   border: 1px solid var(--color-border);
   border-radius: 6px;
@@ -1018,6 +1038,12 @@
   transition: all 0.15s ease;
 }
 
+.smartPresetBtn svg,
+.smartPresetBtn .inlineIcon {
+  color: inherit;
+  transition: color 0.15s ease;
+}
+
 .smartPresetBtn:hover {
   background: var(--pop-blue);
   color: #FFFFFF;
@@ -1025,10 +1051,26 @@
   transform: translateY(-1px);
 }
 
+.smartPresetBtn:hover svg,
+.smartPresetBtn:hover .inlineIcon {
+  color: #FFFFFF;
+}
+
 :global([data-theme='noir']) .smartPresetBtn {
   color: var(--neon-cyan, #00f0ff);
   background: rgba(0, 240, 255, 0.08);
   border-color: rgba(0, 240, 255, 0.3);
+}
+
+:global([data-theme='noir']) .smartPresetBtn:hover {
+  background: var(--neon-cyan, #00f0ff);
+  color: #08080a;
+  border-color: var(--neon-cyan, #00f0ff);
+}
+
+:global([data-theme='noir']) .smartPresetBtn:hover svg,
+:global([data-theme='noir']) .smartPresetBtn:hover .inlineIcon {
+  color: #08080a;
 }
 
 .whatsappContactBtn {
@@ -1820,6 +1862,10 @@
 /* ── Step 0: Service Type Gate ── */
 
 .step0Card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
   min-height: 100px;
   border-width: 2px;
   transition: all 0.25s ease;
@@ -1959,17 +2005,21 @@
   align-items: center;
   gap: 10px;
   margin-bottom: 8px;
+  width: 100%;
+  text-align: left;
 }
 
 .step0CardTitle {
   font-weight: 800;
   font-size: 15px;
+  text-align: left;
 }
 
 .step0CardDesc {
   font-size: 13px;
   opacity: 0.75;
   margin: 0;
+  text-align: left;
 }
 
 /* ── Submitted Card Actions ── */

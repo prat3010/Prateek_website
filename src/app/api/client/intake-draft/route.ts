@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
 import { sendAdminIntakeLeadNotification } from '@/lib/emailNotification';
+import { getIpHash } from '@/lib/security';
 
 export async function POST(req: Request) {
   try {
@@ -23,9 +24,27 @@ export async function POST(req: Request) {
       return res;
     }
 
+    const forwardedFor = req.headers.get('x-forwarded-for');
+    const ip = forwardedFor ? forwardedFor.split(',')[0].trim() : '127.0.0.1';
+    const ipHash = await getIpHash(ip);
+
+    // Rate limit: max 5 drafts per IP per hour
+    const { count: recentCount } = await supabase
+      .from('intake_leads')
+      .select('id', { count: 'exact', head: true })
+      .eq('ip_hash', ipHash)
+      .gte('created_at', new Date(Date.now() - 3600_000).toISOString());
+    if (recentCount !== null && recentCount >= 5) {
+      return NextResponse.json(
+        { error: 'Too many draft submissions. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     const leadData = {
       draft_token: draftToken,
       scope_code: scopeCode,
+      ip_hash: ipHash,
       company_name: payload.companyName || 'Untitled Project',
       contact_email: payload.contactEmail || 'lead@unauthenticated.client',
       contact_phone: payload.contactPhone || '',

@@ -56,7 +56,7 @@ export const GOAL_CATEGORIES: { id: 'all' | 'websites' | 'saas' | 'ai_widgets'; 
   { id: 'all', label: 'All Archetypes', ids: [] },
   { id: 'websites', label: 'Websites & Stores', ids: ['landing_page', 'business_multipage', 'ecommerce', 'booking_appointments'] },
   { id: 'saas', label: 'SaaS & Apps', ids: ['saas_app', 'lms_portal', 'crm_admin'] },
-  { id: 'ai_widgets', label: 'AI & Custom Tools', ids: ['ai_rag_app', 'autonomous_agents', 'standalone_chatbot', 'standalone_voice_bot', 'ai_strategy_consulting', 'voice_ai_agent_app', 'vision_ocr_saas', 'custom'] },
+  { id: 'ai_widgets', label: 'AI & Custom Tools', ids: ['ai_rag_app', 'autonomous_agents', 'voice_ai_agent_app', 'vision_ocr_saas', 'standalone_voice_bot', 'standalone_chatbot', 'ai_strategy_consulting', 'custom'] },
 ];
 
 export const FEATURE_CATEGORIES = [
@@ -158,6 +158,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     quickQuote,
     generatedScopeCode,
     handleDownloadPDF,
+    handleDownloadQuickPDF,
     handleCopyShareableUrl,
     togglePopover,
     handleGoalChange,
@@ -180,13 +181,13 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   }, [currentStep, lenis]);
 
   const dependsOnMap = React.useMemo(() => {
-    const map: Record<string, string[]> = {};
+    const map: Record<string, { id: string; label: string }[]> = {};
     features.forEach((f: FeatureItem) => {
       if (f.dependsOn && f.dependsOn.length > 0) {
         f.dependsOn.forEach((prereqId: string) => {
           if (!map[prereqId]) map[prereqId] = [];
-          if (!map[prereqId].includes(f.label)) {
-            map[prereqId].push(f.label);
+          if (!map[prereqId].some((item) => item.id === f.id)) {
+            map[prereqId].push({ id: f.id, label: f.label });
           }
         });
       }
@@ -197,66 +198,55 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   const priceInCurrency = (inr: number, usd: number) =>
     formatPricePair(inr, usd, currency);
 
-  const labelOfFeature = React.useCallback((featureId: string) =>
-    features.find((f: FeatureItem) => f.id === featureId)?.label,
-    [features]
-  );
+  const handleFeatureToggle = React.useCallback((featureId: string) => {
+    const targetFeature = features.find((f: FeatureItem) => f.id === featureId);
+    if (!targetFeature) return;
 
-  const handleFeatureToggle = React.useCallback((featureLabel: string) => {
-    const isCompulsory = currentArchetype.compulsoryFeatureLabels.includes(featureLabel);
-    const targetFeature = features.find((f: FeatureItem) => f.label === featureLabel);
+    const isCompulsory = currentArchetype.compulsoryFeatureLabels.includes(targetFeature.label);
     const isLegacyRequired =
-      formData.projectStartType === 'legacy_rebuild' && targetFeature?.autoIncludeOnLegacy;
+      formData.projectStartType === 'legacy_rebuild' && targetFeature.autoIncludeOnLegacy;
 
-    const otherSelectedIds = features
-      .filter((f: FeatureItem) => formData.selectedFeatures.includes(f.label) && f.label !== featureLabel)
-      .map((f: FeatureItem) => f.id);
+    const otherSelectedIds = formData.selectedFeatures.filter((id: string) => id !== featureId);
     const requiredPrereqIds = new Set(resolveFeatureDependencies(otherSelectedIds, features));
 
-    if (targetFeature && requiredPrereqIds.has(targetFeature.id)) {
-      if (targetFeature.id) triggerLockedHint(targetFeature.id);
+    if (requiredPrereqIds.has(featureId)) {
+      triggerLockedHint(featureId);
       return;
     }
 
     if (isCompulsory || isLegacyRequired) {
-      if (targetFeature?.id) triggerLockedHint(targetFeature.id);
+      triggerLockedHint(featureId);
       return;
     }
 
     setFormData((prev) => {
-      const exists = prev.selectedFeatures.includes(featureLabel);
-      let updatedLabels: string[];
+      const exists = prev.selectedFeatures.includes(featureId);
+      let updatedIds: string[];
       if (exists) {
-        updatedLabels = prev.selectedFeatures.filter((f: string) => f !== featureLabel);
+        updatedIds = prev.selectedFeatures.filter((id: string) => id !== featureId);
       } else {
-        updatedLabels = [...prev.selectedFeatures, featureLabel];
+        updatedIds = [...prev.selectedFeatures, featureId];
       }
 
-      const activeIds = features
-        .filter((f: FeatureItem) => updatedLabels.includes(f.label))
-        .map((f: FeatureItem) => f.id);
-      const allRequiredIds = resolveFeatureDependencies(activeIds, features);
-      const mergedSet = new Set(updatedLabels);
-      allRequiredIds.forEach((reqId: string) => {
-        const reqLabel = labelOfFeature(reqId);
-        if (reqLabel) mergedSet.add(reqLabel);
-      });
+      const allRequiredIds = resolveFeatureDependencies(updatedIds, features);
+      const mergedSet = new Set(updatedIds);
+      allRequiredIds.forEach((reqId: string) => mergedSet.add(reqId));
 
       return {
         ...prev,
         selectedFeatures: Array.from(mergedSet),
       };
     });
-  }, [currentArchetype, formData.projectStartType, formData.selectedFeatures, features, labelOfFeature, setFormData, triggerLockedHint]);
+  }, [currentArchetype, formData.projectStartType, formData.selectedFeatures, features, setFormData, triggerLockedHint]);
 
   const handleScopeStartTypeChange = (type: 'greenfield' | 'legacy_rebuild') => {
     setFormData((prev) => {
       let updatedFeatures = [...prev.selectedFeatures];
       if (type === 'legacy_rebuild') {
-        const legacyLabels = features
+        const legacyIds = features
           .filter((f: FeatureItem) => f.autoIncludeOnLegacy)
-          .map((f: FeatureItem) => f.label);
-        const merged = new Set([...updatedFeatures, ...legacyLabels]);
+          .map((f: FeatureItem) => f.id);
+        const merged = new Set([...updatedFeatures, ...legacyIds]);
         updatedFeatures = Array.from(merged);
       }
       return {
@@ -277,33 +267,27 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
       presetIds = ['auth', 'admin', 'ai_rag', 'ai_agents', 'ai_voice_agent', 'integrations'];
     }
 
-    const presetLabels = features
-      .filter((f: FeatureItem) => presetIds.includes(f.id))
-      .map((f: FeatureItem) => f.label);
+    const compulsoryIds = currentArchetype.compulsoryFeatureLabels
+      .map((label: string) => features.find((f: FeatureItem) => f.label === label)?.id)
+      .filter(Boolean) as string[];
 
-    const mergedLabels = new Set([
-      ...presetLabels,
-      ...currentArchetype.compulsoryFeatureLabels,
+    const mergedIds = new Set([
+      ...presetIds,
+      ...compulsoryIds,
     ]);
 
     if (formData.projectStartType === 'legacy_rebuild') {
       features
         .filter((f: FeatureItem) => f.autoIncludeOnLegacy)
-        .forEach((f: FeatureItem) => mergedLabels.add(f.label));
+        .forEach((f: FeatureItem) => mergedIds.add(f.id));
     }
 
-    const baseIds = features
-      .filter((f: FeatureItem) => mergedLabels.has(f.label))
-      .map((f: FeatureItem) => f.id);
-    const extraIds = resolveFeatureDependencies(baseIds, features);
-    extraIds.forEach((id: string) => {
-      const label = labelOfFeature(id);
-      if (label) mergedLabels.add(label);
-    });
+    const extraIds = resolveFeatureDependencies(Array.from(mergedIds), features);
+    extraIds.forEach((id: string) => mergedIds.add(id));
 
     setFormData((prev) => ({
       ...prev,
-      selectedFeatures: Array.from(mergedLabels),
+      selectedFeatures: Array.from(mergedIds),
     }));
   };
 
@@ -432,7 +416,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
               setPopoverAnchor={setPopoverAnchor}
               onResetServiceType={resetServiceType}
               onQuickSubmit={handleQuickSubmit}
-              onDownloadPDF={handleDownloadPDF}
+              onDownloadPDF={handleDownloadQuickPDF}
               togglePopover={togglePopover}
             />
           ) : (
@@ -661,7 +645,8 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                           <Send size={16} />
                         </button>
                         <p className={styles.ctaSubtext}>
-                          Instant setup via Google OAuth — your custom scope will be saved directly to your client dashboard.
+                          <ShieldCheck size={12} className={styles.inlineIcon} />
+                          Your active scope configuration is automatically preserved and saved to your workspace upon Google sign-in.
                         </p>
                         <div className={styles.socialProofBox}>
                           <em>&ldquo;Prateeq delivered our SaaS MVP in 3 weeks. The scoping brief was spot-on.&rdquo;</em> &mdash; <strong>B2B SaaS Founder</strong>

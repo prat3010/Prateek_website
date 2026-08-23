@@ -22,7 +22,7 @@ import {
   Settings,
 } from 'lucide-react';
 import type { GoalArchetype, BaseEngineItem, FeatureItem } from '@/data/resume';
-import { formatMoney, packageTotalForArchetype, type Currency } from '@/lib/pricing';
+import { formatMoney, formatPricePair, packageTotalForArchetype, type Currency } from '@/lib/pricing';
 import { GOAL_CATEGORIES } from './IntakeForm';
 import styles from './IntakeForm.module.css';
 import type { User } from '@supabase/supabase-js';
@@ -63,7 +63,9 @@ const getArchetypeIcon = (id: string): React.ReactNode => {
 };
 
 const cleanArchetypeLabel = (label: string): string => {
-  return label.replace(/^[\p{Emoji_Presentation}\p{Extended_Pictographic}\s]+/u, '').trim();
+  return label
+    .replace(/^[\p{Emoji_Presentation}\p{Extended_Pictographic}\u{FE00}-\u{FE0F}\u{200D}\s]+/gu, '')
+    .trim();
 };
 
 interface StepGoalArchetypeProps {
@@ -271,6 +273,12 @@ export function StepGoalArchetype({
             Legacy Refactor / Rebuild
           </button>
         </div>
+        {formData.projectStartType === 'legacy_rebuild' && (
+          <p className={styles.chipHelpText}>
+            <Wrench size={12} className={styles.inlineIcon} />
+            Selecting Legacy Refactor auto-includes the Legacy Data Migration module (+{formatPricePair(30000, 400, currency)}).
+          </p>
+        )}
       </div>
 
       <div className={styles.fieldGrid}>

@@ -10,7 +10,21 @@ const mocks = vi.hoisted(() => {
     }),
   });
 
-  return { insertFn };
+  const selectGteFn = vi.fn().mockResolvedValue({
+    count: 0,
+    data: [],
+    error: null,
+  });
+
+  const selectEqFn = vi.fn().mockReturnValue({
+    gte: selectGteFn,
+  });
+
+  const selectFn = vi.fn().mockReturnValue({
+    eq: selectEqFn,
+  });
+
+  return { insertFn, selectFn, selectEqFn, selectGteFn };
 });
 
 vi.mock('@/data/supabase', () => ({
@@ -18,6 +32,7 @@ vi.mock('@/data/supabase', () => ({
     return {
       from: vi.fn(() => ({
         insert: mocks.insertFn,
+        select: mocks.selectFn,
       })),
     };
   },
@@ -73,5 +88,33 @@ describe('POST /api/client/intake-draft', () => {
 
     const setCookieHeader = res.headers.get('set-cookie');
     expect(setCookieHeader).toContain('prateeq_draft_token=');
+  });
+
+  it('returns 429 when rate limit of 5 drafts per hour is exceeded', async () => {
+    mocks.selectGteFn.mockResolvedValueOnce({
+      count: 5,
+      data: [],
+      error: null,
+    });
+
+    const payload = {
+      companyName: 'Acme Test Corp',
+      contactEmail: 'lead@acmetest.corp',
+    };
+
+    const req = new Request('http://localhost/api/client/intake-draft', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-forwarded-for': '192.168.1.1',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(429);
+    const json = await res.json();
+    expect(json.error).toBe('Too many draft submissions. Please try again later.');
+    expect(mocks.insertFn).not.toHaveBeenCalled();
   });
 });

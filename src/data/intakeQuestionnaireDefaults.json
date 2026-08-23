@@ -25,7 +25,7 @@
       "priceINR": 175000,
       "priceUSD": 2400,
       "laymanDescription": "A production software foundation connected to a cloud database for web apps where users create accounts, manage data, and run software workflows.",
-      "techSpecs": "Full Web App Shell, Supabase PostgreSQL Architecture, Server Caching (unstable_cache), Production Vercel Wiring"
+      "techSpecs": "Full Web App Shell, Supabase Encrypted PostgreSQL Architecture, High-Speed Server Caching, Production Vercel Wiring"
     },
     {
       "id": "ai_strategy_audit",
@@ -55,7 +55,7 @@
       "priceINR": 25000,
       "priceUSD": 350,
       "laymanDescription": "Allows your customers to securely sign in using Google or Email links and access their private personal dashboard.",
-      "techSpecs": "Google OAuth 2.0, Passwordless Magic Links, Supabase Row-Level Security (RLS), Encrypted Session Tokens",
+      "techSpecs": "Google OAuth 2.0, Passwordless Magic Links, Row-Level Database Security (RLS), Encrypted Session Tokens",
       "recommendedMaintenanceId": "standard"
     },
     {
@@ -73,7 +73,7 @@
       "priceINR": 30000,
       "priceUSD": 400,
       "laymanDescription": "Gives you an easy backend manager to publish blog posts, news, or case studies anytime without touching code, boosting your Google ranking.",
-      "techSpecs": "Markdown Parser, Supabase DB Content Tables, On-Demand Cache Revalidation (/api/revalidate), OpenGraph SEO",
+      "techSpecs": "Markdown Content Parser, Supabase Database Tables, Instant On-Demand Cache Refresh, Search-Engine (SEO) Metadata",
       "recommendedMaintenanceId": "standard"
     },
     {
@@ -82,7 +82,7 @@
       "priceINR": 125000,
       "priceUSD": 1700,
       "laymanDescription": "An intelligent AI assistant trained exclusively on your business documents, FAQs, and PDFs that answers customer questions 24/7 with source citations.",
-      "techSpecs": "pgvector Vector Embeddings, Document Chunking Pipeline, Semantic Search, Presigned Citation Downloads, Feedback Telemetry",
+      "techSpecs": "AI Vector Indexing & Document Embeddings, Chunking Pipeline, Semantic Search, Presigned Citation Downloads, Feedback Telemetry",
       "recommendedMaintenanceId": "premium"
     },
     {
@@ -100,7 +100,7 @@
       "priceINR": 75000,
       "priceUSD": 1000,
       "laymanDescription": "A private internal command center for you and your team to view real-time traffic, manage customer data, and assign staff permissions.",
-      "techSpecs": "Single-Pass SQL RPC Aggregations (get_analytics_summary), Visitor Analytics Charts, Content Forms, Admin Security Guards"
+      "techSpecs": "High-Performance Visitor Analytics Engine, Real-Time Data Charts, Content Management Forms, Role Access Security Guards"
     },
     {
       "id": "email",
@@ -220,7 +220,7 @@
   "goals": [
     {
       "id": "landing_page",
-      "label": "-Converting Landing Page",
+      "label": "🚀 High-Converting Landing Page",
       "shortLabel": "Landing Page",
       "description": "Single-page lead generation or product launch page",
       "primaryOutcome": "\ud83d\ude80 Increase Lead & Customer Conversion Rate",
@@ -362,7 +362,7 @@
     },
     {
       "id": "standalone_voice_bot",
-      "label": "\ud83c\udf99\ufe0f Standalone Voice AI Widget / Phone Assistant",
+      "label": "🎙️ Standalone Voice AI & Phone Assistant",
       "shortLabel": "Voice AI Bot",
       "description": "Embed a 24/7 real-time voice WebRTC widget onto your site or route inbound/outbound phone calls with webhook summaries",
       "primaryOutcome": "\ud83c\udf99\ufe0f Embed 24/7 Real-Time Voice Widget & Phone Assistant",
@@ -399,7 +399,7 @@
       "label": "(Bespoke Scope)",
       "shortLabel": "Custom Scope",
       "description": "Tailored requirements with flexible component picking",
-      "primaryOutcome": "& Customized Web Scope",
+      "primaryOutcome": "Tailored Architecture & Custom Web Scope",
       "recommendedEngineId": "landing",
       "compulsoryFeatureLabels": []
     }
@@ -494,7 +494,7 @@
       "priceINR": 0,
       "priceUSD": 0,
       "period": "",
-      "badge": "-Day Warranty Included",
+      "badge": "💡 30-Day Warranty Included",
       "laymanDescription": "Includes 30 days of complimentary technical support post-launch. Client manages cloud hosting and database updates afterwards.",
       "techSpecs": "30-Day Post-Launch Bug Warranty, Developer Handover Documentation",
       "includes": [
@@ -579,7 +579,7 @@
     },
     {
       "id": "speed_optimization",
-      "label": "",
+      "label": "⚡ Core Web Vitals & Speed Optimization",
       "laymanDescription": "Fix loading speed, interaction lag, and layout shifts to rank higher on Google and load under 2 seconds.",
       "techSpecs": "LCP/INP/CLS Audit & Fix, Image Compression, Script Deferral, Font Optimization, CDN Caching",
       "priceINR": 25000,
@@ -599,7 +599,7 @@
     },
     {
       "id": "accessibility_audit",
-      "label": "& Fixes",
+      "label": "\ud83d\udebc WCAG Accessibility Audit & Fixes",
       "laymanDescription": "WCAG 2.1 compliance: screen readers, keyboard navigation, color contrast, ARIA labels to prevent legal claims.",
       "techSpecs": "WCAG 2.1 AA Audit, ARIA Landmarks, Keyboard Navigation, Color Contrast Fixes, Screen Reader Testing",
       "priceINR": 40000,

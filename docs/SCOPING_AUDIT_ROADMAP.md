@@ -21,7 +21,15 @@ After completing all 25 issues, a comprehensive post-implementation audit was pe
 - **Email prop type** — Already present in `StepGoalArchetypeProps.formData.contactEmail`. No fix needed.
 - **invoiceLayout/itemLine CSS classes** — Do not exist in the codebase. Audit finding was incorrect.
 - **Inline styles** — Converted ~50+ inline styles to CSS module classes across all decomposed components.
+- **Quick Services & Scoping Audit** — Fixed missing quick service labels (`speed_optimization` label set to `⚡ Core Web Vitals & Speed Optimization`, `accessibility_audit` label set to `♿ WCAG Accessibility Audit & Fixes`), goal archetype label (`landing_page` set to `🚀 High-Converting Landing Page`), and maintenance plan badge (`self` set to `💡 30-Day Warranty Included`) across `intakeQuestionnaireDefaults.json` and `resume.json`. Updated `getQuickServiceIcon` in `QuickServiceFlow.tsx` to handle full JSON quick service IDs alongside short aliases.
 - **Final score** — Architecture is solid with proper decomposition into 8 sub-components + custom hook.
+- **Architectural Polish (6 Concerns Resolved)**:
+  1. **Feature Labels vs IDs**: Migrated `formData.selectedFeatures` from fragile display labels to canonical IDs across `useIntakeFormState.ts`, `IntakeForm.tsx`, and `StepTechnicalScope.tsx`. Converted to labels at render/payload boundaries for seamless backward compatibility.
+  2. **Save-Scope Error Feedback**: Replaced silent `console.warn` error swallowing in `handleSubmitOnline` and `handleQuickSubmit` with non-blocking user warning toasts (`toast.warning(...)`).
+  3. **`type=care` Service Flow**: Auto-advances deep links with `type=care` straight to Step 4 (Commercials & SLA) with the requested care plan pre-selected.
+  4. **Session-Unique Scope Codes**: Added `sessionSeed` to the djb2 hash to prevent collisions between identical configurations across different sessions.
+  5. **Quick Service Proposal PDF**: Built `buildQuickServiceData()` and `handleDownloadQuickPDF()` to generate accurate, itemized quick service proposal PDFs.
+  6. **`intake-draft` Rate Limiting**: Added IP-based rate limiting (max 5 drafts/IP/hour) backed by `ip_hash` in `intake_leads` table.
 
 ---
 

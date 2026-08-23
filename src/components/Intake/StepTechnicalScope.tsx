@@ -26,10 +26,10 @@ interface StepTechnicalScopeProps {
   currency: Currency;
   priceInCurrency: (inr: number, usd: number) => string;
   onEngineSelect: (engineId: string) => void;
-  onFeatureToggle: (featureLabel: string) => void;
+  onFeatureToggle: (featureId: string) => void;
   onApplySmartPreset: (presetType: 'essential' | 'growth' | 'ai') => void;
   togglePopover: (e: React.MouseEvent, id: string) => void;
-  dependsOnMap: Record<string, string[]>;
+  dependsOnMap: Record<string, { id: string; label: string }[]>;
   stepHeadingRef?: React.RefObject<HTMLDivElement | null>;
 }
 
@@ -88,31 +88,39 @@ export function StepTechnicalScope({
         </p>
 
         {!showEngineOverride ? (
-          <div className={styles.engineSummaryCard}>
-            <div className={styles.engineSummaryLeft}>
-              <div className={styles.engineSummaryHeader}>
-                <span className={styles.engineSummaryTitle}>{selectedEngine.title}</span>
-                <span className={styles.engineTierTag}>{selectedEngine.tier}</span>
+          <>
+            <div className={styles.engineSummaryCard}>
+              <div className={styles.engineSummaryLeft}>
+                <div className={styles.engineSummaryHeader}>
+                  <span className={styles.engineSummaryTitle}>{selectedEngine.title}</span>
+                  <span className={styles.engineTierTag}>{selectedEngine.tier}</span>
+                </div>
+                <p className={styles.engineSummaryDesc}>{selectedEngine.laymanDescription}</p>
               </div>
-              <p className={styles.engineSummaryDesc}>{selectedEngine.laymanDescription}</p>
-            </div>
-            <div className={styles.engineSummaryRight}>
-              <span className={styles.priceBadge}>
-                {formatPricePair(selectedEngine.priceINR, selectedEngine.priceUSD, currency)}
-              </span>
-              <button
-                type="button"
-                className={styles.engineOverrideBtn}
-                onClick={() => setShowEngineOverride(true)}
-                title="Click to select a different base platform engine"
-              >
-                <span>
-                  <Settings size={12} className={styles.inlineIcon} />
-                  Change Base Engine
+              <div className={styles.engineSummaryRight}>
+                <span className={styles.priceBadge}>
+                  {formatPricePair(selectedEngine.priceINR, selectedEngine.priceUSD, currency)}
                 </span>
-              </button>
+                <button
+                  type="button"
+                  className={styles.engineOverrideBtn}
+                  onClick={() => setShowEngineOverride(true)}
+                  title="Click to select a different base platform engine"
+                >
+                  <span>
+                    <Settings size={12} className={styles.inlineIcon} />
+                    Change Base Engine
+                  </span>
+                </button>
+              </div>
             </div>
-          </div>
+            {currentArchetype && currentArchetype.recommendedEngineId && selectedEngine.id !== currentArchetype.recommendedEngineId && (
+              <p className={styles.chipHelpText} style={{ marginTop: '8px' }}>
+                <Info size={12} className={styles.inlineIcon} />
+                Recommended engine for {currentArchetype.shortLabel} is &quot;{engines.find(e => e.id === currentArchetype.recommendedEngineId)?.title || currentArchetype.recommendedEngineId}&quot;.
+              </p>
+            )}
+          </>
         ) : (
           <div className={styles.engineOverrideBox}>
             <div className={styles.engineOverrideHeader}>
@@ -289,10 +297,8 @@ export function StepTechnicalScope({
                   const isLegacyRequired =
                     formData.projectStartType === 'legacy_rebuild' && m.autoIncludeOnLegacy;
                   const isChecked =
-                    isCompulsory || isLegacyRequired || formData.selectedFeatures.includes(m.label);
-                  const otherSelectedIds = features
-                    .filter((f) => formData.selectedFeatures.includes(f.label) && f.id !== m.id)
-                    .map((f) => f.id);
+                    isCompulsory || isLegacyRequired || formData.selectedFeatures.includes(m.id);
+                  const otherSelectedIds = formData.selectedFeatures.filter((id) => id !== m.id);
                   const isRequiredDependency = new Set(
                     resolveFeatureDependencies(otherSelectedIds, features)
                   ).has(m.id);
@@ -300,12 +306,12 @@ export function StepTechnicalScope({
                     ? (() => {
                         const dependents = features
                           .filter((f) => f.id !== m.id && f.dependsOn?.includes(m.id))
-                          .map((f) => f.label)
                           .filter(
-                            (label) =>
-                              formData.selectedFeatures.includes(label) ||
-                              currentArchetype.compulsoryFeatureLabels.includes(label)
-                          );
+                            (f) =>
+                              formData.selectedFeatures.includes(f.id) ||
+                              currentArchetype.compulsoryFeatureLabels.includes(f.label)
+                          )
+                          .map((f) => f.label);
                         return dependents.length
                           ? `Required by selected module${dependents.length > 1 ? 's' : ''}: ${dependents.join(', ')}`
                           : 'This module is required by another selected module';
@@ -318,12 +324,18 @@ export function StepTechnicalScope({
                       key={m.id}
                       className={`${styles.checkboxCard} ${isLocked ? styles.lockedCard : ''} ${isChecked ? styles.checkboxCardSelected : ''}`}
                       style={{ cursor: isLocked ? 'not-allowed' : 'pointer' }}
+                      onClick={(e) => {
+                        if (isLocked) {
+                          e.preventDefault();
+                          onFeatureToggle(m.id);
+                        }
+                      }}
                     >
                       <input
                         type="checkbox"
                         checked={isChecked}
                         disabled={isLocked}
-                        onChange={() => onFeatureToggle(m.label)}
+                        onChange={() => onFeatureToggle(m.id)}
                       />
                       <div className={styles.engineCardInner}>
                         <div className={styles.engineCardHeader}>
@@ -364,18 +376,19 @@ export function StepTechnicalScope({
                           <span className={styles.priceBadge}>{`+${priceInCurrency(m.priceINR, m.priceUSD)}`}</span>
                         </div>
                         {dependsOnMap[m.id] &&
-                          dependsOnMap[m.id].some((parentLabel) =>
-                            formData.selectedFeatures.includes(parentLabel)
+                          dependsOnMap[m.id].some((parent) =>
+                            formData.selectedFeatures.includes(parent.id)
                           ) && (
                             <span
                               className={styles.transitiveBadge}
                               title={`Auto-included as prerequisite for ${dependsOnMap[m.id]
-                                .filter((p) => formData.selectedFeatures.includes(p))
+                                .filter((p) => formData.selectedFeatures.includes(p.id))
+                                .map((p) => p.label)
                                 .join(', ')}`}
                             >
                               <Zap size={10} className={styles.inlineIcon} />
                               Required by{' '}
-                              {dependsOnMap[m.id].filter((p) => formData.selectedFeatures.includes(p))[0]}
+                              {dependsOnMap[m.id].filter((p) => formData.selectedFeatures.includes(p.id))[0]?.label}
                             </span>
                           )}
                         <p className={styles.engineCardDesc}>

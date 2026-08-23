@@ -223,18 +223,7 @@ if resume_data:
         questionnaire_defaults = {}
 
     for key, fallback in questionnaire_defaults.items():
-        if key not in intake or not intake[key]:
-            intake[key] = fallback
-        elif isinstance(fallback, list) and isinstance(intake[key], list):
-            # Smart union merge by 'id' property to automatically sync new items
-            existing_ids = {item['id'] for item in intake[key] if isinstance(item, dict) and 'id' in item}
-            for default_item in fallback:
-                if isinstance(default_item, dict) and 'id' in default_item:
-                    if default_item['id'] not in existing_ids:
-                        intake[key].append(default_item)
-                        existing_ids.add(default_item['id'])
-                elif default_item not in intake[key]:
-                    intake[key].append(default_item)
+        intake[key] = fallback
 
     row = {'id': 1, 'data': resume_data}
     res = upsert('profile', [row], 'id')
@@ -246,6 +235,16 @@ if resume_data:
             f.write('\n')
     except Exception as e:
         print(f'  Failed to write back updated resume.json: {e}')
+
+    secret = os.getenv('SYNC_API_KEY', 'portfolio_sync_key_2026')
+    if secret:
+        for u in [f"http://localhost:3000/api/revalidate?secret={secret}", f"https://prateeq.in/api/revalidate?secret={secret}"]:
+            try:
+                req = urllib.request.Request(u, method="POST")
+                with urllib.request.urlopen(req, timeout=3) as resp:
+                    pass
+            except Exception:
+                pass
 print('  resume profile synced (local & Supabase DB)')
 
 # ── 5. Blog Posts ────────────────────────────────────────────────────

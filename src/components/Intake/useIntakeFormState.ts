@@ -113,19 +113,28 @@ export function useIntakeFormState(
 
   const initialEngineObj = initialEngine || engines.find((e: BaseEngineItem) => e.id === initialArchetype.recommendedEngineId) || engines[0];
 
-  const initialFeatureLabels = useMemo(() => {
+  /** Resolve a feature label to its ID. */
+  const labelToId = useCallback((label: string) => {
+    return features.find((f: FeatureItem) => f.label === label)?.id;
+  }, [features]);
+
+  /** Resolve compulsory labels → IDs, merge with any deep-link preset IDs. */
+  const initialFeatureIds = useMemo(() => {
+    const compulsoryIds = initialArchetype.compulsoryFeatureLabels
+      .map((label: string) => features.find((f: FeatureItem) => f.label === label)?.id)
+      .filter(Boolean) as string[];
+
     if (initialPreset?.featureIds && initialPreset.featureIds.length > 0) {
-      const labelsFromPreset = features
-        .filter((f: FeatureItem) => initialPreset.featureIds?.includes(f.id))
-        .map((f: FeatureItem) => f.label);
-      const merged = new Set([...labelsFromPreset, ...initialArchetype.compulsoryFeatureLabels]);
+      const merged = new Set([...initialPreset.featureIds, ...compulsoryIds]);
       return Array.from(merged);
     }
-    return initialArchetype.compulsoryFeatureLabels;
+    return compulsoryIds;
   }, [initialPreset, features, initialArchetype]);
 
-  const [currentStep, setCurrentStep] = useState(1);
-  const [serviceType, setServiceType] = useState<'full' | 'quick' | 'care' | null>(() => initialPreset?.serviceType || null);
+  const [currentStep, setCurrentStep] = useState(() => (initialPreset?.serviceType === 'care' ? 4 : 1));
+  const [serviceType, setServiceType] = useState<'full' | 'quick' | 'care' | null>(() =>
+    initialPreset?.serviceType === 'care' ? 'full' : initialPreset?.serviceType || null
+  );
   const [currency, setCurrency] = useState<Currency>(() => initialPreset?.currency || resolveDefaultCurrency(null));
   const [selectedQuickServices, setSelectedQuickServices] = useState<string[]>(() =>
     initialPreset?.quickServiceId ? [initialPreset.quickServiceId] : []
@@ -145,6 +154,8 @@ export function useIntakeFormState(
   const [lockedHintId, setLockedHintId] = useState<string | null>(null);
   const [recaptchaUnavailable, setRecaptchaUnavailable] = useState(false);
 
+  const [sessionSeed] = useState(() => Math.random().toString(36).slice(2, 8));
+
   const [formData, setFormData] = useState<IntakeFormData>(() => ({
     companyName: '',
     contactEmail: user?.email || '',
@@ -157,7 +168,7 @@ export function useIntakeFormState(
     taxInvoicingPreference: 'standard',
     targetAudience: '',
     selectedBaseEngineId: initialEngineObj.id,
-    selectedFeatures: initialFeatureLabels,
+    selectedFeatures: initialFeatureIds,
     selectedBrandAssetId: initialPreset?.brandId || brandAssets[0]?.id || 'ready',
     selectedMaintenanceId: initialPreset?.careId || maintenancePlans[0]?.id || 'growth',
     timeline: 'Standard (3–4 weeks)',
@@ -208,7 +219,7 @@ export function useIntakeFormState(
 
   const totalCost = useMemo(() => {
     const brandOpt = brandAssets.find((b: BrandAssetOption) => b.id === formData.selectedBrandAssetId) || brandAssets[0] || { label: 'Included', priceINR: 0, priceUSD: 0 };
-    const featureObjs = features.filter((f: FeatureItem) => formData.selectedFeatures.includes(f.label) || formData.selectedFeatures.includes(f.id));
+    const featureObjs = features.filter((f: FeatureItem) => formData.selectedFeatures.includes(f.id));
     const featureIds = featureObjs.map((f: FeatureItem) => f.id);
 
     const quote = calcQuote(
@@ -243,18 +254,14 @@ export function useIntakeFormState(
 
   const generatedScopeCode = useMemo(() => {
     let hash = 0;
-    const key = `${formData.companyName}-${formData.projectGoal}-${formData.selectedBaseEngineId}-${formData.selectedFeatures.join(',')}`;
+    const key = `${sessionSeed}-${formData.companyName}-${formData.projectGoal}-${formData.selectedBaseEngineId}-${formData.selectedFeatures.join(',')}`;
     for (let i = 0; i < key.length; i++) {
       hash = (hash << 5) - hash + key.charCodeAt(i);
       hash |= 0;
     }
     const positiveHash = Math.abs(hash) % 90000 + 10000;
     return `SCOPE-${positiveHash}`;
-  }, [formData.companyName, formData.projectGoal, formData.selectedBaseEngineId, formData.selectedFeatures]);
-
-  const labelOfFeature = useCallback((featureId: string) => {
-    return features.find((f: FeatureItem) => f.id === featureId)?.label;
-  }, [features]);
+  }, [sessionSeed, formData.companyName, formData.projectGoal, formData.selectedBaseEngineId, formData.selectedFeatures]);
 
   const buildQuestionnaireData = useCallback(() => {
     return {
@@ -264,7 +271,9 @@ export function useIntakeFormState(
       baseEngineTitle: selectedEngine.title,
       baseEnginePriceINR: selectedEngine.priceINR,
       baseEnginePriceUSD: selectedEngine.priceUSD,
-      selectedFeatures: formData.selectedFeatures,
+      selectedFeatures: features
+        .filter((f: FeatureItem) => formData.selectedFeatures.includes(f.id))
+        .map((f: FeatureItem) => f.label),
       brandAssetOption: totalCost.brandOpt.label,
       brandAssetPriceINR: totalCost.brandOpt.priceINR,
       brandAssetPriceUSD: totalCost.brandOpt.priceUSD,
@@ -285,7 +294,7 @@ export function useIntakeFormState(
         formData.additionalNotes,
       ].filter(Boolean).join(' | '),
     };
-  }, [formData, selectedEngine, totalCost, activeMaintenancePlan]);
+  }, [formData, selectedEngine, totalCost, activeMaintenancePlan, features]);
 
   const handleDownloadPDF = useCallback(async () => {
     setGeneratingPdf(true);
@@ -305,18 +314,61 @@ export function useIntakeFormState(
     }
   }, [resumeData, buildQuestionnaireData, isNoir, currency]);
 
+  const buildQuickServiceData = useCallback(() => {
+    const selectedServiceObjs = quickServices.filter((s: QuickServiceItem) => selectedQuickServices.includes(s.id));
+    const serviceLabels = selectedServiceObjs.map((s: QuickServiceItem) => s.label);
+    const quote = calcQuickServiceQuote(quickServices, selectedQuickServices, currency);
+    return {
+      companyName: quickFormData.companyName.trim() || 'Quick Service Order',
+      projectGoal: 'Quick Service Integration',
+      selectedBaseEngineId: 'quick_service',
+      baseEngineTitle: `Quick Service: ${serviceLabels.join(', ') || 'Custom Tasks'}`,
+      baseEnginePriceINR: 0,
+      baseEnginePriceUSD: 0,
+      selectedFeatures: serviceLabels,
+      brandAssetOption: 'Not Applicable (Existing Site)',
+      brandAssetPriceINR: 0,
+      brandAssetPriceUSD: 0,
+      maintenancePlan: 'Self-Managed (30-Day Warranty)',
+      maintenancePriceINR: 0,
+      maintenancePriceUSD: 0,
+      totalCostINR: quote.totalINR,
+      totalCostUSD: quote.totalUSD,
+      timeline: selectedServiceObjs[0]?.turnaround || '3–7 days',
+      additionalNotes: [
+        quickFormData.siteUrl ? `[Site URL: ${quickFormData.siteUrl}]` : '',
+        quickFormData.additionalNotes,
+      ].filter(Boolean).join(' | '),
+    };
+  }, [quickServices, selectedQuickServices, quickFormData, currency]);
+
+  const handleDownloadQuickPDF = useCallback(async () => {
+    setGeneratingPdf(true);
+    try {
+      await generateQuestionnairePDF(resumeData, buildQuickServiceData(), isNoir, currency);
+      try {
+        confetti({ particleCount: 80, spread: 65, origin: { y: 0.6 } });
+      } catch {}
+      toast.success('Commercial Proposal Generated!', {
+        description: 'Your quick service proposal PDF is ready and downloading.',
+      });
+    } catch (pdfErr) {
+      console.warn('Quick PDF generation warning:', pdfErr);
+      toast.error('Failed to generate PDF. Please try again.');
+    } finally {
+      setGeneratingPdf(false);
+    }
+  }, [resumeData, buildQuickServiceData, isNoir, currency]);
+
   const handleCopyShareableUrl = useCallback(() => {
     if (typeof window === 'undefined') return;
     const selectedGoalObj = goals.find((g: GoalArchetype) => g.label === formData.projectGoal || g.id === formData.projectGoal);
-    const selectedFeatureIds = features
-      .filter((f: FeatureItem) => formData.selectedFeatures.includes(f.label))
-      .map((f: FeatureItem) => f.id);
 
     const params = new URLSearchParams();
     params.set('type', serviceType || 'full');
     if (formData.selectedBaseEngineId) params.set('engine', formData.selectedBaseEngineId);
     if (selectedGoalObj) params.set('goal', selectedGoalObj.id);
-    if (selectedFeatureIds.length > 0) params.set('features', selectedFeatureIds.join(','));
+    if (formData.selectedFeatures.length > 0) params.set('features', formData.selectedFeatures.join(','));
     if (formData.selectedBrandAssetId) params.set('brand', formData.selectedBrandAssetId);
     if (formData.selectedMaintenanceId) params.set('care', formData.selectedMaintenanceId);
     params.set('currency', currency);
@@ -326,7 +378,7 @@ export function useIntakeFormState(
     toast.success('Shareable Custom Quote URL copied!', {
       description: 'Anyone with this link can view and load your exact configuration.',
     });
-  }, [goals, features, formData, serviceType, currency]);
+  }, [goals, formData, serviceType, currency]);
 
   const togglePopover = useCallback((e: React.MouseEvent, id: string) => {
     e.stopPropagation();
@@ -345,30 +397,34 @@ export function useIntakeFormState(
     const newEngineId = archetype.recommendedEngineId;
     const autoOutcome = archetype.primaryOutcome || archetype.description;
 
-    const formerCompulsory = new Set(currentArchetype.compulsoryFeatureLabels);
-    const newCompulsory = new Set(archetype.compulsoryFeatureLabels);
-    const toRemove = Array.from(formerCompulsory).filter((label) => !newCompulsory.has(label));
+    const formerCompulsoryIds = new Set(
+      currentArchetype.compulsoryFeatureLabels
+        .map((label: string) => labelToId(label))
+        .filter(Boolean) as string[]
+    );
+    const newCompulsoryIds = new Set(
+      archetype.compulsoryFeatureLabels
+        .map((label: string) => labelToId(label))
+        .filter(Boolean) as string[]
+    );
+    const toRemove = Array.from(formerCompulsoryIds).filter((id) => !newCompulsoryIds.has(id));
 
     setFormData((prev: IntakeFormData) => {
-      const cleanedFeatures = prev.selectedFeatures.filter((f) => !toRemove.includes(f));
-      const mergedLabels = new Set([...cleanedFeatures, ...archetype.compulsoryFeatureLabels]);
-      const baseIds = features.filter((f: FeatureItem) => mergedLabels.has(f.label)).map((f: FeatureItem) => f.id);
-      const extraIds = resolveFeatureDependencies(baseIds, features);
-      extraIds.forEach((id: string) => {
-        const label = labelOfFeature(id);
-        if (label) mergedLabels.add(label);
-      });
+      const cleanedIds = prev.selectedFeatures.filter((id) => !toRemove.includes(id));
+      const mergedIds = new Set([...cleanedIds, ...Array.from(newCompulsoryIds)]);
+      const extraIds = resolveFeatureDependencies(Array.from(mergedIds), features);
+      extraIds.forEach((id: string) => mergedIds.add(id));
 
       return {
         ...prev,
         projectGoal: newGoalLabel,
         businessKPI: autoOutcome,
         selectedBaseEngineId: newEngineId,
-        selectedFeatures: Array.from(mergedLabels),
+        selectedFeatures: Array.from(mergedIds),
         selectedBrandAssetId: archetype.skipBrandAssets ? brandAssets[0]?.id || 'ready' : prev.selectedBrandAssetId,
       };
     });
-  }, [goals, currentArchetype, features, brandAssets, labelOfFeature]);
+  }, [goals, currentArchetype, features, brandAssets, labelToId]);
 
   const handleSubmitOnline = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -405,7 +461,9 @@ export function useIntakeFormState(
         taxInvoicingPreference: formData.taxInvoicingPreference,
         targetAudience: formData.targetAudience,
         baseEngineTitle: selectedEngine.title,
-        selectedFeatures: formData.selectedFeatures,
+        selectedFeatures: features
+          .filter((f: FeatureItem) => formData.selectedFeatures.includes(f.id))
+          .map((f: FeatureItem) => f.label),
         brandAssetOption: totalCost.brandOpt.label,
         maintenancePlan: activeMaintenancePlan.name,
         totalCostINR: totalCost.totalINR,
@@ -480,6 +538,7 @@ export function useIntakeFormState(
           });
         } catch (saveErr) {
           console.warn('Save scope API warning:', saveErr);
+          toast.warning('Scope saved locally but cloud sync failed. It will be retried when you visit the dashboard.');
         }
       }
 
@@ -509,7 +568,7 @@ export function useIntakeFormState(
     } finally {
       setSubmitting(false);
     }
-  }, [formData, user, generatedScopeCode, selectedEngine, totalCost, activeMaintenancePlan, currency, recaptchaUnavailable, resumeData, buildQuestionnaireData, isNoir, getAccessToken]);
+  }, [formData, user, generatedScopeCode, selectedEngine, totalCost, activeMaintenancePlan, currency, recaptchaUnavailable, resumeData, buildQuestionnaireData, isNoir, getAccessToken, features]);
 
   const handleQuickSubmit = useCallback(async () => {
     if (!quickFormData.agreedToTerms || selectedQuickServices.length === 0) return;
@@ -573,6 +632,7 @@ export function useIntakeFormState(
           });
         } catch (saveErr) {
           console.warn('Quick service save scope API warning:', saveErr);
+          toast.warning('Scope saved locally but cloud sync failed. It will be retried when you visit the dashboard.');
         }
         window.location.href = '/dashboard?imported=true';
         return;
@@ -639,7 +699,9 @@ export function useIntakeFormState(
     quickQuote,
     generatedScopeCode,
     buildQuestionnaireData,
+    buildQuickServiceData,
     handleDownloadPDF,
+    handleDownloadQuickPDF,
     handleCopyShareableUrl,
     togglePopover,
     handleGoalChange,

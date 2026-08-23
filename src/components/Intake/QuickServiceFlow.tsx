@@ -39,30 +39,43 @@ const getQuickServiceIcon = (id: string): React.ReactNode => {
   switch (id) {
     case 'chatbot':
       return <MessageSquare size={16} className={styles.inlineIcon} />;
+    case 'voice_ai_setup':
     case 'voice_bot':
       return <Mic size={16} className={styles.inlineIcon} />;
+    case 'vision_ocr_setup':
     case 'ocr':
       return <Eye size={16} className={styles.inlineIcon} />;
+    case 'rag_knowledge_base':
     case 'rag':
       return <Brain size={16} className={styles.inlineIcon} />;
+    case 'transactional_email':
     case 'email':
       return <Mail size={16} className={styles.inlineIcon} />;
+    case 'payment_gateway':
     case 'payments':
       return <CreditCard size={16} className={styles.inlineIcon} />;
+    case 'api_integration':
     case 'integrations':
       return <Link size={16} className={styles.inlineIcon} />;
+    case 'speed_optimization':
     case 'cwv':
       return <Zap size={16} className={styles.inlineIcon} />;
+    case 'seo_audit':
     case 'seo':
       return <Search size={16} className={styles.inlineIcon} />;
+    case 'accessibility_audit':
     case 'a11y':
       return <ShieldCheck size={16} className={styles.inlineIcon} />;
+    case 'i18n_setup':
     case 'i18n':
       return <Globe size={16} className={styles.inlineIcon} />;
+    case 'pwa_conversion':
     case 'pwa':
       return <Smartphone size={16} className={styles.inlineIcon} />;
+    case 'analytics_setup':
     case 'analytics':
       return <BarChart size={16} className={styles.inlineIcon} />;
+    case 'data_migration':
     case 'migration':
       return <Database size={16} className={styles.inlineIcon} />;
     default:
@@ -71,7 +84,9 @@ const getQuickServiceIcon = (id: string): React.ReactNode => {
 };
 
 const cleanSvcLabel = (label: string): string => {
-  return label.replace(/^[\p{Emoji_Presentation}\p{Extended_Pictographic}\s]+/u, '').trim();
+  return label
+    .replace(/^[\p{Emoji_Presentation}\p{Extended_Pictographic}\u{FE00}-\u{FE0F}\u{200D}\s]+/gu, '')
+    .trim();
 };
 
 interface QuickServiceFlowProps {
