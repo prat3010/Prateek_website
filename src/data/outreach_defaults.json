@@ -3,6 +3,12 @@
   "minQualityScore": 75,
   "maxLeadsPerRun": 1,
   "ctaDeepLink": "https://prateeq.in/scoping?engine=saas",
+  "targetQueries": [
+    "remote Agentic AI Engineer hiring",
+    "remote Next.js Supabase developer hiring",
+    "b2b software agency founders contact us",
+    "remote Full Stack Python RAG developer hiring"
+  ],
   "bannedDomains": [
     "duckduckgo",
     "wikipedia",
