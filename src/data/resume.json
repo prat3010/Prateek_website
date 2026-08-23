@@ -784,6 +784,14 @@
       "5. Intellectual Property (IP) Ownership: 100% Intellectual Property and code ownership transfer to Client upon receipt of final payment.",
       "6. Infrastructure & Third-Party Billing: Hosting (Vercel), Database (Supabase), Domain Registration, and API costs (OpenAI/Resend) are billed directly to client-owned accounts. Developer is not liable for third-party service outages.",
       "7. Post-Launch Warranty: Includes 30 days of complimentary technical support & bug fixes post-launch. Continued support is available under a Monthly Care Plan."
+    ],
+    "businessKPIs": [
+      "🚀 Increase Lead & Customer Conversion Rate",
+      "⚡ Accelerate Application Speed & Performance (LCP/CWV)",
+      "🛠️ Launch MVP Product to Market Rapidly",
+      "🎨 Modernize Legacy Web Infrastructure & Brand Identity",
+      "🤖 Automate Business Workflows with AI Integration",
+      "🔐 Enterprise Security, Compliance & User RBAC"
     ]
   },
   "summary": {

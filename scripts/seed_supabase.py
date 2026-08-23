@@ -221,12 +221,30 @@ if resume_data:
     except Exception as e:
         print(f'  Failed to load intakeQuestionnaireDefaults.json: {e}')
         questionnaire_defaults = {}
+
     for key, fallback in questionnaire_defaults.items():
-        if not isinstance(intake.get(key), list) or not intake.get(key):
+        if key not in intake or not intake[key]:
             intake[key] = fallback
+        elif isinstance(fallback, list) and isinstance(intake[key], list):
+            # Smart union merge by 'id' property to automatically sync new items
+            existing_ids = {item['id'] for item in intake[key] if isinstance(item, dict) and 'id' in item}
+            for default_item in fallback:
+                if isinstance(default_item, dict) and 'id' in default_item:
+                    if default_item['id'] not in existing_ids:
+                        intake[key].append(default_item)
+                        existing_ids.add(default_item['id'])
+                elif default_item not in intake[key]:
+                    intake[key].append(default_item)
+
     row = {'id': 1, 'data': resume_data}
     upsert('profile', [row], 'id')
-print('  resume profile synced')
+    try:
+        with open(os.path.join(ROOT, 'src', 'data', 'resume.json'), 'w', encoding='utf-8') as f:
+            json.dump(resume_data, f, indent=2, ensure_ascii=False)
+            f.write('\n')
+    except Exception as e:
+        print(f'  Failed to write back updated resume.json: {e}')
+print('  resume profile synced (local & Supabase DB)')
 
 # ── 5. Blog Posts ────────────────────────────────────────────────────
 
