@@ -91,6 +91,8 @@ export interface GoalArchetype {
   description: string;
   recommendedEngineId: string;
   compulsoryFeatureLabels: string[];
+  /** Primary business outcome auto-derived for this archetype when generating scoping proposals. */
+  primaryOutcome?: string;
   /** If true, skip Step 3 (Brand Assets) for this archetype — used for standalone widgets/services. */
   skipBrandAssets?: boolean;
 }
@@ -150,8 +152,6 @@ export interface IntakeConfig {
   brandAssets?: BrandAssetOption[];
   maintenancePlans?: MaintenancePlanOption[];
   quickServices?: QuickServiceItem[];
-  /** Business KPI dropdown options shown in Step 1. */
-  businessKPIs?: string[];
 }
 
 export interface ResumeData {

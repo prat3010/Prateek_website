@@ -91,7 +91,6 @@ export const GOAL_ARCHETYPES: GoalArchetype[] = questionnaireDefaults.goals;
 export const BRAND_ASSET_OPTIONS: BrandAssetOption[] = questionnaireDefaults.brandAssets;
 export const MAINTENANCE_PLANS: MaintenancePlanOption[] = questionnaireDefaults.maintenancePlans;
 export const QUICK_SERVICES: QuickServiceItem[] = questionnaireDefaults.quickServices || [];
-export const BUSINESS_KPIS: string[] = questionnaireDefaults.businessKPIs || [];
 
 export const GOAL_CATEGORIES: { id: 'all' | 'websites' | 'saas' | 'ai_widgets'; label: string; ids: string[] }[] = [
   { id: 'all', label: 'All Archetypes', ids: [] },
@@ -189,10 +188,6 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
 
   const quickServices = useMemo(() => {
     return intakeConfig?.quickServices?.length ? intakeConfig.quickServices : QUICK_SERVICES;
-  }, [intakeConfig]);
-
-  const businessKPIs = useMemo(() => {
-    return intakeConfig?.businessKPIs?.length ? intakeConfig.businessKPIs : BUSINESS_KPIS;
   }, [intakeConfig]);
 
   const [submitted] = useState(false);
@@ -371,6 +366,8 @@ interface IntakeFormData {
       ? initialPreset.careId
       : '';
 
+    const initialOutcome = initialArchetype.primaryOutcome || initialArchetype.description;
+
     if (typeof window !== 'undefined') {
       try {
         const savedDraft = localStorage.getItem('prateeq_scoping_draft');
@@ -381,7 +378,7 @@ interface IntakeFormData {
             contactEmail: parsed.contactEmail || '',
             contactPhone: parsed.contactPhone || '',
             projectGoal: (hasDeepLink ? initialArchetype.label : parsed.projectGoal) || initialArchetype.label,
-            businessKPI: parsed.businessKPI || '🚀 Increase Lead & Customer Conversion Rate',
+            businessKPI: parsed.businessKPI || initialOutcome,
             projectStartType: parsed.projectStartType || 'greenfield',
             targetAudience: parsed.targetAudience || '',
             selectedBaseEngineId: hasDeepLink ? initialEngineId : (parsed.selectedBaseEngineId || initialEngineId),
@@ -405,7 +402,7 @@ interface IntakeFormData {
       contactEmail: '',
       contactPhone: '',
       projectGoal: initialArchetype.label,
-      businessKPI: '🚀 Increase Lead & Customer Conversion Rate',
+      businessKPI: initialOutcome,
       projectStartType: 'greenfield',
       targetAudience: '',
       selectedBaseEngineId: initialEngineId,
@@ -444,6 +441,7 @@ interface IntakeFormData {
   const handleGoalChange = (newGoalLabel: string) => {
     const archetype = goals.find((g) => g.label === newGoalLabel) || goals[0];
     const newEngineId = archetype.recommendedEngineId;
+    const autoOutcome = archetype.primaryOutcome || archetype.description;
 
     // Remove compulsory features from former archetype that are not compulsory in new archetype
     const formerCompulsory = new Set(currentArchetype.compulsoryFeatureLabels);
@@ -463,6 +461,7 @@ interface IntakeFormData {
       return {
         ...prev,
         projectGoal: newGoalLabel,
+        businessKPI: autoOutcome,
         selectedBaseEngineId: newEngineId,
         selectedFeatures: Array.from(mergedLabels),
         selectedBrandAssetId: archetype.skipBrandAssets ? (brandAssets[0]?.id || 'ready') : prev.selectedBrandAssetId,
@@ -1346,19 +1345,6 @@ interface IntakeFormData {
                         );
                       })}
                     </div>
-                  </div>
-
-                  <div className={styles.field}>
-                    <label className={styles.label}>Primary Business Goal &amp; Key Success Metric</label>
-                    <select
-                      className={styles.select}
-                      value={formData.businessKPI}
-                      onChange={e => setFormData({ ...formData, businessKPI: e.target.value })}
-                    >
-                      {businessKPIs.map(kpi => (
-                        <option key={kpi} value={kpi}>{kpi}</option>
-                      ))}
-                    </select>
                   </div>
 
                   <div className={styles.field}>

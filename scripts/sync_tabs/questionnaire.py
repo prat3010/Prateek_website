@@ -142,6 +142,7 @@ def render_questionnaire_tab():
                 "label": TextColumn("Label (with emoji)", required=True),
                 "shortLabel": TextColumn("Short Label", required=True),
                 "description": TextColumn("Description", required=True),
+                "primaryOutcome": TextColumn("Primary Outcome (Derived KPI)", required=False),
                 "recommendedEngineId": SelectboxColumn(
                     "Recommended Engine", required=True,
                     options=[e["id"] for e in intake["engines"]],
@@ -152,7 +153,7 @@ def render_questionnaire_tab():
         intake["goals"] = [
             _keep_fields(
                 row,
-                ("id", "label", "shortLabel", "description", "recommendedEngineId", "compulsoryFeatureLabels"),
+                ("id", "label", "shortLabel", "description", "primaryOutcome", "recommendedEngineId", "compulsoryFeatureLabels"),
             )
             for row in _editor_or_empty(edited_goals)
         ]
@@ -257,18 +258,6 @@ def render_questionnaire_tab():
             },
         ))
 
-    # 9. Business KPIs
-    with st.container(border=True):
-        st.markdown("##### 9. Business KPIs (One per line)")
-        kpi_val = intake.get("businessKPIs", [])
-        kpi_edit = st.text_area(
-            "Business KPIs List",
-            value="\n".join(kpi_val),
-            height=130,
-            key="qe_business_kpis",
-        )
-        intake["businessKPIs"] = [k.strip() for k in kpi_edit.split("\n") if k.strip()]
-
     # ──────────────────────────────────────────────────────────
     # RESET, SAVE & LIVE JSON VIEW
     # ──────────────────────────────────────────────────────────
@@ -281,7 +270,7 @@ def render_questionnaire_tab():
             for widget_key in (
                 "qe_engines", "qe_features", "qe_goals", "qe_brand_assets",
                 "qe_maintenance_plans", "qe_timeline", "qe_terms_conditions",
-                "qe_quick_services", "qe_business_kpis",
+                "qe_quick_services",
             ):
                 if widget_key in st.session_state:
                     del st.session_state[widget_key]
@@ -301,7 +290,6 @@ def render_questionnaire_tab():
                 intake["brandAssets"],
                 intake["maintenancePlans"],
                 intake.get("quickServices"),
-                intake.get("businessKPIs"),
             )
             if errors:
                 st.error(f"Validation failed ({len(errors)} issue(s)) — nothing saved:")

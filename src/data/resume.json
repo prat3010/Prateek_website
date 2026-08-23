@@ -45,6 +45,7 @@
         "label": "⚡ High-Converting Landing Page",
         "shortLabel": "Landing Page",
         "description": "Single-page lead generation or product launch page",
+        "primaryOutcome": "🚀 Increase Lead & Customer Conversion Rate",
         "recommendedEngineId": "landing",
         "compulsoryFeatureLabels": [
           "Automated Email Workflows (Resend Transactional)"
@@ -55,6 +56,7 @@
         "label": "🏢 Multi-Page Business Website",
         "shortLabel": "Business Web",
         "description": "Corporate profile with services, showcase, and blog",
+        "primaryOutcome": "🎨 Modernize Brand Identity & Digital Infrastructure",
         "recommendedEngineId": "multipage",
         "compulsoryFeatureLabels": [
           "Automated Email Workflows (Resend Transactional)"
@@ -65,6 +67,7 @@
         "label": "🛒 E-commerce & Digital Store",
         "shortLabel": "E-commerce",
         "description": "Product catalog, shopping cart, and online payments",
+        "primaryOutcome": "🛒 Boost Online Direct Sales & Payment Conversion",
         "recommendedEngineId": "multipage",
         "compulsoryFeatureLabels": [
           "E-Commerce Storefront & Cart Module",
@@ -78,6 +81,7 @@
         "label": "📅 Booking & Appointment Platform",
         "shortLabel": "Booking Platform",
         "description": "Reservation scheduling, calendar sync, and upfront deposits",
+        "primaryOutcome": "📅 Streamline Booking & Upfront Payments",
         "recommendedEngineId": "multipage",
         "compulsoryFeatureLabels": [
           "Booking & Appointments Module",
@@ -91,6 +95,7 @@
         "label": "🚀 Full-Stack SaaS Web Application",
         "shortLabel": "SaaS MVP",
         "description": "User accounts, interactive dashboards, and subscriptions",
+        "primaryOutcome": "🚀 Rapid MVP Launch & Subscription Scalability",
         "recommendedEngineId": "saas",
         "compulsoryFeatureLabels": [
           "User Auth & Client Portal (Google/Magic Link)",
@@ -103,6 +108,7 @@
         "label": "🎓 LMS & Online Course Portal",
         "shortLabel": "LMS Portal",
         "description": "Student accounts, course player, and subscription billing",
+        "primaryOutcome": "🎓 Automated Course Delivery & Student Monetization",
         "recommendedEngineId": "saas",
         "compulsoryFeatureLabels": [
           "LMS & Online Course Portal Module",
@@ -116,6 +122,7 @@
         "label": "📊 Internal CRM / Admin Control Center",
         "shortLabel": "Admin CRM",
         "description": "Private business dashboard, data management, and staff roles",
+        "primaryOutcome": "📊 Streamline Business Operations & Staff Workflow Automation",
         "recommendedEngineId": "saas",
         "compulsoryFeatureLabels": [
           "CRM & Lead Management Module",
@@ -128,6 +135,7 @@
         "label": "🤖 Custom AI & Vector RAG Platform",
         "shortLabel": "AI RAG Platform",
         "description": "Private document knowledge base, AI search, and assistant",
+        "primaryOutcome": "🧠 24/7 Document Knowledge Retrieval & Vector Search",
         "recommendedEngineId": "saas",
         "compulsoryFeatureLabels": [
           "Private AI Knowledge Base / Vector Search (RAG)",
@@ -140,6 +148,7 @@
         "label": "🤖 Autonomous AI Agent & Workflow Platform",
         "shortLabel": "AI Agents Platform",
         "description": "Autonomous AI agents, API tool execution, and automated business decision loops",
+        "primaryOutcome": "🤖 Automate Business Workflows with Autonomous AI Agents",
         "recommendedEngineId": "saas",
         "compulsoryFeatureLabels": [
           "Autonomous AI Agents & Workflow Automation",
@@ -152,6 +161,7 @@
         "label": "💬 Standalone Embedded AI Chatbot Widget",
         "shortLabel": "AI Chatbot Widget",
         "description": "Custom Vector RAG Infrastructure & Native Script Embed (pgvector embeddings, PDF chunking pipeline, presigned citations) for your existing website (WordPress, Webflow, Shopify, custom HTML).",
+        "primaryOutcome": "💬 Embed 24/7 AI Knowledge Base & Support Chatbot",
         "recommendedEngineId": "standalone_embed",
         "compulsoryFeatureLabels": [
           "Private AI Knowledge Base / Vector Search (RAG)"
@@ -163,6 +173,7 @@
         "label": "🧠 AI Strategy & Solutioning Audit",
         "shortLabel": "AI Strategy Sprint",
         "description": "Workflow audit, AI feasibility analysis, cost/latency modeling, and a custom 3-page architecture blueprint",
+        "primaryOutcome": "🧠 AI Technical Feasibility Audit & Architecture Blueprint",
         "recommendedEngineId": "ai_strategy_audit",
         "compulsoryFeatureLabels": [],
         "skipBrandAssets": true
@@ -172,6 +183,7 @@
         "label": "⚙️ Custom Web Application (Bespoke Scope)",
         "shortLabel": "Custom Scope",
         "description": "Tailored requirements with flexible component picking",
+        "primaryOutcome": "⚙️ Bespoke Technical Architecture & Customized Web Scope",
         "recommendedEngineId": "landing",
         "compulsoryFeatureLabels": []
       },
@@ -180,6 +192,7 @@
         "label": "🎙️ Custom Voice SaaS & Call Center Platform",
         "shortLabel": "Voice Call Platform",
         "description": "Multi-tenant voice platform with user accounts, live call transcripts, RBAC seat permissions, and phone routing",
+        "primaryOutcome": "🎙️ Automated 24/7 Real-Time Voice Assistant & Call Routing",
         "recommendedEngineId": "saas",
         "compulsoryFeatureLabels": [
           "Real-Time Voice AI Agent & WebRTC Call Assistant",
@@ -192,6 +205,7 @@
         "label": "👁️ Intelligent Document & OCR Extraction SaaS",
         "shortLabel": "Document AI SaaS",
         "description": "Automated invoice, contract, and identity document scanner with structured database export",
+        "primaryOutcome": "👁️ Automated Multimodal Document OCR & Data Extraction",
         "recommendedEngineId": "saas",
         "compulsoryFeatureLabels": [
           "Multimodal AI Vision & Document Processing Engine",
@@ -204,6 +218,7 @@
         "label": "🎙️ Standalone Voice AI Widget / Phone Assistant",
         "shortLabel": "Voice AI Bot",
         "description": "Embed a 24/7 real-time voice WebRTC widget onto your site or route inbound/outbound phone calls with webhook summaries",
+        "primaryOutcome": "🎙️ Embed 24/7 Real-Time Voice Widget & Phone Assistant",
         "recommendedEngineId": "standalone_embed",
         "compulsoryFeatureLabels": [
           "Real-Time Voice AI Agent & WebRTC Call Assistant"
@@ -859,14 +874,6 @@
       "5. Intellectual Property (IP) Ownership: 100% Intellectual Property and code ownership transfer to Client upon receipt of final payment.",
       "6. Infrastructure & Third-Party Billing: Hosting (Vercel), Database (Supabase), Domain Registration, and API costs (OpenAI/Resend) are billed directly to client-owned accounts. Developer is not liable for third-party service outages.",
       "7. Post-Launch Warranty: Includes 30 days of complimentary technical support & bug fixes post-launch. Continued support is available under a Monthly Care Plan."
-    ],
-    "businessKPIs": [
-      "🚀 Increase Lead & Customer Conversion Rate",
-      "⚡ Accelerate Application Speed & Performance (LCP/CWV)",
-      "🛠️ Launch MVP Product to Market Rapidly",
-      "🎨 Modernize Legacy Web Infrastructure & Brand Identity",
-      "🤖 Automate Business Workflows with AI Integration",
-      "🔐 Enterprise Security, Compliance & User RBAC"
     ]
   },
   "summary": {
