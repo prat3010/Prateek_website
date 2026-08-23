@@ -91,7 +91,7 @@ export const GOAL_CATEGORIES: { id: 'all' | 'websites' | 'saas' | 'ai_widgets'; 
   { id: 'all', label: 'All Archetypes', ids: [] },
   { id: 'websites', label: 'Websites & Stores', ids: ['landing_page', 'business_multipage', 'ecommerce', 'booking_appointments'] },
   { id: 'saas', label: 'SaaS & Apps', ids: ['saas_app', 'lms_portal', 'crm_admin'] },
-  { id: 'ai_widgets', label: 'AI & Custom Tools', ids: ['ai_rag_app', 'standalone_chatbot', 'custom'] },
+  { id: 'ai_widgets', label: 'AI & Custom Tools', ids: ['ai_rag_app', 'autonomous_agents', 'standalone_chatbot', 'ai_strategy_consulting', 'custom'] },
 ];
 
 export const FEATURE_CATEGORIES = [
