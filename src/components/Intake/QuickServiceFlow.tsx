@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
   Wrench,
   Building2,
@@ -135,6 +135,21 @@ export function QuickServiceFlow({
   onDownloadPDF,
   togglePopover,
 }: QuickServiceFlowProps) {
+  const popoverCloseRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (activePopoverId && popoverAnchor) {
+      popoverCloseRef.current?.focus();
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          setActivePopoverId(null);
+          setPopoverAnchor(null);
+        }
+      };
+      document.addEventListener('keydown', handleEscape);
+      return () => document.removeEventListener('keydown', handleEscape);
+    }
+  }, [activePopoverId, popoverAnchor, setActivePopoverId, setPopoverAnchor]);
   return (
     <div>
       {quickStep === 1 ? (
@@ -156,7 +171,7 @@ export function QuickServiceFlow({
 
           {/* Quick Service Category Filter Tabs */}
           <div className={styles.categoryTabs} role="tablist" aria-label="Quick Service Categories">
-            {QUICK_CATEGORIES.map((cat) => {
+            {QUICK_CATEGORIES.map((cat, catIdx) => {
               const isSelected = selectedQuickCategory === cat.id;
               const count =
                 cat.id === 'all'
@@ -168,8 +183,30 @@ export function QuickServiceFlow({
                   type="button"
                   role="tab"
                   aria-selected={isSelected}
+                  tabIndex={isSelected ? 0 : -1}
                   className={`${styles.categoryTabBtn} ${isSelected ? styles.categoryTabBtnActive : ''}`}
                   onClick={() => setSelectedQuickCategory(cat.id as 'all' | 'ai' | 'integration' | 'performance')}
+                  onKeyDown={(e) => {
+                    if (e.key === 'ArrowRight') {
+                      e.preventDefault();
+                      const next = (catIdx + 1) % QUICK_CATEGORIES.length;
+                      const tabs = e.currentTarget.parentElement?.querySelectorAll('[role="tab"]');
+                      (tabs?.[next] as HTMLElement)?.focus();
+                    } else if (e.key === 'ArrowLeft') {
+                      e.preventDefault();
+                      const prev = (catIdx - 1 + QUICK_CATEGORIES.length) % QUICK_CATEGORIES.length;
+                      const tabs = e.currentTarget.parentElement?.querySelectorAll('[role="tab"]');
+                      (tabs?.[prev] as HTMLElement)?.focus();
+                    } else if (e.key === 'Home') {
+                      e.preventDefault();
+                      const tabs = e.currentTarget.parentElement?.querySelectorAll('[role="tab"]');
+                      (tabs?.[0] as HTMLElement)?.focus();
+                    } else if (e.key === 'End') {
+                      e.preventDefault();
+                      const tabs = e.currentTarget.parentElement?.querySelectorAll('[role="tab"]');
+                      (tabs?.[tabs.length - 1] as HTMLElement)?.focus();
+                    }
+                  }}
                 >
                   <span>{cat.label}</span>
                   <span className={styles.categoryTabBadge}>{count}</span>
@@ -185,17 +222,53 @@ export function QuickServiceFlow({
                   const cat = QUICK_CATEGORIES.find((c) => c.id === selectedQuickCategory);
                   return cat?.categories.includes(s.category || '');
                 })
-            ).map((svc) => {
+            ).map((svc, svcIdx) => {
               const isSelected = selectedQuickServices.includes(svc.id);
               const isPopoverOpen = activePopoverId === `qs-${svc.id}`;
+              const allVisible = (selectedQuickCategory === 'all'
+                ? quickServices
+                : quickServices.filter((s) => {
+                    const cat = QUICK_CATEGORIES.find((c) => c.id === selectedQuickCategory);
+                    return cat?.categories.includes(s.category || '');
+                  })
+              );
               return (
-                <label
+                <div
                   key={svc.id}
+                  role="checkbox"
+                  aria-checked={isSelected}
+                  tabIndex={svcIdx === 0 ? 0 : -1}
                   className={`${styles.checkboxCard} ${isSelected ? styles.checkboxCardSelected : ''} ${styles.cardSelectable}`}
                   onClick={() => {
                     setSelectedQuickServices((prev) =>
                       prev.includes(svc.id) ? prev.filter((id) => id !== svc.id) : [...prev, svc.id]
                     );
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setSelectedQuickServices((prev) =>
+                        prev.includes(svc.id) ? prev.filter((id) => id !== svc.id) : [...prev, svc.id]
+                      );
+                    } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                      e.preventDefault();
+                      const next = (svcIdx + 1) % allVisible.length;
+                      const card = (e.currentTarget.parentElement?.children[next] as HTMLElement);
+                      card?.focus();
+                    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                      e.preventDefault();
+                      const prev = (svcIdx - 1 + allVisible.length) % allVisible.length;
+                      const card = (e.currentTarget.parentElement?.children[prev] as HTMLElement);
+                      card?.focus();
+                    } else if (e.key === 'Home') {
+                      e.preventDefault();
+                      const card = (e.currentTarget.parentElement?.children[0] as HTMLElement);
+                      card?.focus();
+                    } else if (e.key === 'End') {
+                      e.preventDefault();
+                      const card = (e.currentTarget.parentElement?.children[allVisible.length - 1] as HTMLElement);
+                      card?.focus();
+                    }
                   }}
                 >
                   <div className={styles.cardHeader}>
@@ -255,15 +328,19 @@ export function QuickServiceFlow({
                                 <Wrench size={12} className={styles.inlineIcon} />
                                 TECHNICAL STACK &amp; DELIVERABLES
                               </span>
-                              <X
-                                size={12}
-                                className={styles.popoverCloseBtn}
-                                onClick={(ev) => {
-                                  ev.stopPropagation();
-                                  setActivePopoverId(null);
-                                  setPopoverAnchor(null);
-                                }}
-                              />
+                              <button
+                                  type="button"
+                                  ref={popoverCloseRef}
+                                  className={styles.popoverCloseBtn}
+                                  aria-label="Close"
+                                  onClick={(ev) => {
+                                    ev.stopPropagation();
+                                    setActivePopoverId(null);
+                                    setPopoverAnchor(null);
+                                  }}
+                                >
+                                  <X size={12} />
+                                </button>
                             </div>
                             <p className={styles.popoverTechText}>{svc.techSpecs}</p>
                           </div>
@@ -271,7 +348,7 @@ export function QuickServiceFlow({
                       </>
                     </Portal>
                   )}
-                </label>
+                </div>
               );
             })}
           </div>
@@ -347,20 +424,30 @@ export function QuickServiceFlow({
 
           <div className={styles.quoteSummary}>
             <h4 className={styles.quoteTitle}>Quick Service Quote</h4>
-            {quickServices
-              .filter((s) => selectedQuickServices.includes(s.id))
-              .map((svc) => (
-                <div key={svc.id} className={styles.quoteRow}>
-                  <span>{svc.label}</span>
-                  <span className={styles.itemPrice}>{formatPricePair(svc.priceINR, svc.priceUSD, currency)}</span>
-                </div>
-              ))}
-            <div className={`${styles.quoteRow} ${styles.quoteRowTotal}`}>
-              <strong>TOTAL</strong>
-              <strong className={styles.totalPrice}>
-                {formatPricePair(quickQuote.totalINR, quickQuote.totalUSD, currency)}
-              </strong>
-            </div>
+            <table className={styles.quoteTable}>
+              <thead className="sr-only">
+                <tr>
+                  <th>Service</th>
+                  <th>Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                {quickServices
+                  .filter((s) => selectedQuickServices.includes(s.id))
+                  .map((svc) => (
+                    <tr key={svc.id} className={styles.quoteRow}>
+                      <td>{svc.label}</td>
+                      <td className={styles.itemPrice}>{formatPricePair(svc.priceINR, svc.priceUSD, currency)}</td>
+                    </tr>
+                  ))}
+                <tr className={`${styles.quoteRow} ${styles.quoteRowTotal}`}>
+                  <td><strong>TOTAL</strong></td>
+                  <td className={styles.totalPrice}>
+                    <strong>{formatPricePair(quickQuote.totalINR, quickQuote.totalUSD, currency)}</strong>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
             <div className={styles.fieldMarginTop}>
               <button
                 type="button"

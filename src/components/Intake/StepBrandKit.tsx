@@ -9,6 +9,7 @@ interface StepBrandKitProps {
   selectedBrandAssetId: string;
   currency: Currency;
   onSelectBrandAsset: (asset: BrandAssetOption) => void;
+  stepHeadingRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 export function StepBrandKit({
@@ -16,10 +17,19 @@ export function StepBrandKit({
   selectedBrandAssetId,
   currency,
   onSelectBrandAsset,
+  stepHeadingRef,
 }: StepBrandKitProps) {
+  const cardRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
+  const focusedIndex = brandAssets.findIndex((b) => b.id === selectedBrandAssetId);
+
+  const focusCard = (index: number) => {
+    const clamped = Math.max(0, Math.min(index, brandAssets.length - 1));
+    cardRefs.current[clamped]?.focus();
+  };
+
   return (
     <div className={styles.formStep}>
-      <div className={styles.groupTitle}>
+      <div className={styles.groupTitle} ref={stepHeadingRef} tabIndex={-1}>
         <Palette size={18} />
         <span>STEP 3: BRAND ASSETS &amp; CONTENT READINESS</span>
       </div>
@@ -33,13 +43,24 @@ export function StepBrandKit({
           Select your current design and brand collateral status. This determines whether design system assets or copywriting support is added to your baseline build.
         </p>
         <div className={styles.checkboxGrid} role="radiogroup" aria-label="Design & Content Readiness">
-          {brandAssets.map((b) => {
+          {brandAssets.map((b, idx) => {
             const isSelected = selectedBrandAssetId === b.id;
             return (
-              <label
+              <button
                 key={b.id}
+                type="button"
+                ref={(el) => { cardRefs.current[idx] = el; }}
+                role="radio"
+                aria-checked={isSelected}
+                tabIndex={isSelected || focusedIndex === -1 ? 0 : -1}
                 className={`${styles.checkboxCard} ${isSelected ? styles.checkboxCardSelected : ''} ${styles.cardSelectable}`}
                 onClick={() => onSelectBrandAsset(b)}
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); focusCard(idx + 1); }
+                  else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); focusCard(idx - 1); }
+                  else if (e.key === 'Home') { e.preventDefault(); focusCard(0); }
+                  else if (e.key === 'End') { e.preventDefault(); focusCard(brandAssets.length - 1); }
+                }}
               >
                 <div className={styles.cardHeader}>
                   <span className={styles.cardTitle}>{b.label}</span>
@@ -48,7 +69,7 @@ export function StepBrandKit({
                   </span>
                 </div>
                 <p className={styles.cardDesc}>{b.description}</p>
-              </label>
+              </button>
             );
           })}
         </div>

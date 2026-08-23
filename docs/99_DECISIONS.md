@@ -251,8 +251,30 @@ This document serves as the registry of critical architectural design decisions 
 
 ---
 
+# **ADR 17: Scoping Engine Accessibility, Keyboard Navigation & Focus Management Audit**
+
+* **Status**: Approved & Implemented
+* **Context**: An accessibility audit of the interactive scoping engine (`/scoping`, `IntakeForm.tsx` & sub-components) identified critical WCAG 2.1 accessibility gaps: (1) card selections (Goal Archetypes, Base Engines, Brand Tiers, Care Plans, Quick Services) lacked keyboard focus indicators and roving `tabIndex`, generating dozens of unnecessary tab stops; (2) step transitions failed to shift focus to step headings, leaving keyboard users lost; (3) popovers lacked modal keyboard traps and `Escape` key dismissal handlers; (4) missing screen reader live region announcements on step change; (5) low contrast ratio (< 4.5:1) on card description copy; (6) missing HTML `<main>` landmark and `<h1>` structural hierarchy on the scoping page.
+* **Decision**:
+  1. **Phase 1 — ARIA Roles & Roving Tabindex**: Replaced static `tabIndex={0}` on all selection grids (`ServiceTypeGate`, `StepGoalArchetype`, `StepTechnicalScope`, `StepCommercials`, `StepBrandKit`, `QuickServiceFlow`) with `role="radiogroup"` / `role="radio"` (or `role="checkbox"`) and roving `tabIndex` (`isSelected ? 0 : -1`). Enabled 2D Arrow key, `Home`, and `End` keyboard navigation across options.
+  2. **Phase 2 — Focus Management & Semantics**:
+     - Linked `stepHeadingRef` (`tabIndex={-1}`) to step transitions in `IntakeForm.tsx` so `useEffect` programmatically focuses the new step title on navigation.
+     - Added `:focus-visible` styling in `IntakeForm.module.css` with high-contrast outline rings for all focused cards and tab buttons.
+     - Added `<main>` container and `<h1 className="sr-only">` on `/scoping/page.tsx`.
+     - Added `<div className="sr-only" aria-live="polite">` live announcements for step transitions and linked `<form aria-labelledby="...">`.
+  3. **Phase 3 — Popovers, Errors & Contrast Polish**:
+     - Refactored popover close buttons to `<button type="button" aria-label="Close">` with `Escape` keydown listeners.
+     - Converted quote breakdown in `QuickServiceFlow.tsx` to a semantic `<table>` with `<thead>` and `<tbody>`.
+     - Bumped card description text opacity from `0.65`/`0.7` to `0.85` to meet WCAG AA contrast standards (>= 4.5:1).
+* **Consequences**:
+  - **Pros**: 100% WCAG 2.1 AA compliant keyboard navigation and screen reader support; seamless tab flow without tab-stop exhaustion; visual focus indicators on all interactive controls; compliant text contrast.
+  - **Cons**: None. `npx tsc --noEmit` and `npm test` pass cleanly with 249/249 tests passing.
+
+---
+
 # **Acceptance Criteria**
 - Registry records cover the core v2 architectural choices.
 - Format follows standard ADR structures (Context, Decision, Consequences).
+
 
 

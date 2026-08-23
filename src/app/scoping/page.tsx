@@ -88,7 +88,10 @@ export default async function ScopingPage({ searchParams }: ScopingPageProps) {
             <span>PRATEEQ.IN | PROJECT SCOPING LAB &amp; INSTANT QUOTE</span>
           </div>
         </div>
-        <IntakeForm resumeData={profile} initialPreset={preset} />
+        <main>
+          <h1 className="sr-only">Project Scoping Lab &amp; Instant Quote</h1>
+          <IntakeForm resumeData={profile} initialPreset={preset} />
+        </main>
       </div>
     </div>
   );

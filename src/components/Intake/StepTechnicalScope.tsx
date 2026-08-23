@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { SlidersHorizontal, Layers, Info, X, Boxes, Settings, Zap, Sparkles, Rocket, Bot, Lock, Link, Wrench } from 'lucide-react';
 import Portal from '@/components/ui/Portal';
 import type { GoalArchetype, BaseEngineItem, FeatureItem } from '@/data/resume';
@@ -30,6 +30,7 @@ interface StepTechnicalScopeProps {
   onApplySmartPreset: (presetType: 'essential' | 'growth' | 'ai') => void;
   togglePopover: (e: React.MouseEvent, id: string) => void;
   dependsOnMap: Record<string, string[]>;
+  stepHeadingRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 export function StepTechnicalScope({
@@ -52,10 +53,26 @@ export function StepTechnicalScope({
   onApplySmartPreset,
   togglePopover,
   dependsOnMap,
+  stepHeadingRef,
 }: StepTechnicalScopeProps) {
+  const popoverCloseRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (activePopoverId && popoverAnchor) {
+      popoverCloseRef.current?.focus();
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          setActivePopoverId(null);
+          setPopoverAnchor(null);
+        }
+      };
+      document.addEventListener('keydown', handleEscape);
+      return () => document.removeEventListener('keydown', handleEscape);
+    }
+  }, [activePopoverId, popoverAnchor, setActivePopoverId, setPopoverAnchor]);
   return (
     <div className={styles.formStep}>
-      <div className={styles.groupTitle}>
+      <div className={styles.groupTitle} ref={stepHeadingRef} tabIndex={-1}>
         <SlidersHorizontal size={18} />
         <span>STEP 2: TECHNICAL ARCHITECTURE &amp; FEATURE MATRIX</span>
       </div>
@@ -108,21 +125,41 @@ export function StepTechnicalScope({
                 Done Editing
               </button>
             </div>
-            <div className={styles.checkboxGrid}>
-              {engines.map((e) => {
+            <div className={styles.checkboxGrid} role="radiogroup" aria-label="Base Platform Engine">
+              {engines.map((e, eIdx) => {
                 const isSelected = formData.selectedBaseEngineId === e.id;
                 const isPopoverOpen = activePopoverId === e.id;
                 return (
                   <div
                     key={e.id}
+                    role="radio"
+                    aria-checked={isSelected}
+                    tabIndex={isSelected ? 0 : -1}
                     className={`${styles.checkboxCard} ${isSelected ? styles.checkboxCardSelected : ''}`}
                     onClick={() => onEngineSelect(e.id)}
+                    onKeyDown={(ev) => {
+                      if (ev.key === 'Enter' || ev.key === ' ') {
+                        ev.preventDefault();
+                        onEngineSelect(e.id);
+                      } else if (ev.key === 'ArrowDown' || ev.key === 'ArrowRight') {
+                        ev.preventDefault();
+                        const next = (eIdx + 1) % engines.length;
+                        const card = (ev.currentTarget.parentElement?.children[next] as HTMLElement);
+                        card?.focus();
+                      } else if (ev.key === 'ArrowUp' || ev.key === 'ArrowLeft') {
+                        ev.preventDefault();
+                        const prev = (eIdx - 1 + engines.length) % engines.length;
+                        const card = (ev.currentTarget.parentElement?.children[prev] as HTMLElement);
+                        card?.focus();
+                      }
+                    }}
                     style={{ cursor: 'pointer' }}
                   >
                     <input
                       type="radio"
                       name="baseEngine"
                       checked={isSelected}
+                      tabIndex={-1}
                       onChange={() => onEngineSelect(e.id)}
                     />
                     <div className={styles.engineCardInner}>
@@ -168,14 +205,18 @@ export function StepTechnicalScope({
                                     <Wrench size={12} className={styles.inlineIcon} />
                                     TECHNICAL ARCHITECTURE SPECS
                                   </span>
-                                  <X
-                                    size={12}
+                                  <button
+                                    type="button"
+                                    ref={popoverCloseRef}
                                     className={styles.popoverCloseBtn}
+                                    aria-label="Close"
                                     onClick={() => {
                                       setActivePopoverId(null);
                                       setPopoverAnchor(null);
                                     }}
-                                  />
+                                  >
+                                    <X size={12} />
+                                  </button>
                                 </div>
                                 <p className={styles.popoverTechText}>{e.techSpecs}</p>
                               </div>
@@ -372,14 +413,17 @@ export function StepTechnicalScope({
                                       <Wrench size={12} className={styles.inlineIcon} />
                                       TECHNICAL ARCHITECTURE SPECS
                                     </span>
-                                    <X
-                                      size={12}
+                                   <button
+                                      type="button"
                                       className={styles.popoverCloseBtn}
+                                      aria-label="Close"
                                       onClick={() => {
                                         setActivePopoverId(null);
                                         setPopoverAnchor(null);
                                       }}
-                                    />
+                                    >
+                                      <X size={12} />
+                                    </button>
                                   </div>
                                   <p className={styles.popoverTechText}>{m.techSpecs}</p>
                                 </div>

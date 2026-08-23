@@ -104,6 +104,8 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   const isNoir = theme === 'noir';
   const lenis = useLenis();
   const containerRef = useRef<HTMLDivElement>(null);
+  const stepHeadingRef = useRef<HTMLDivElement>(null);
+  const formTitleId = 'scoping-form-title';
 
   const state = useIntakeFormState(resumeData, initialPreset, user, isNoir);
 
@@ -171,6 +173,9 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
         const top = containerRef.current.getBoundingClientRect().top + window.scrollY - 90;
         window.scrollTo({ top, behavior: 'smooth' });
       }
+      setTimeout(() => {
+        stepHeadingRef.current?.focus({ preventScroll: true });
+      }, 100);
     }
   }, [currentStep, lenis]);
 
@@ -340,7 +345,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
       <div className={styles.container}>
         <div className={styles.card}>
           <div className={styles.header}>
-            <h3 className={styles.title}>Interactive Scoping &amp; Commercial Engine</h3>
+            <h3 id={formTitleId} className={styles.title}>Interactive Scoping &amp; Commercial Engine</h3>
             <p className={styles.subtitle}>
               Configure your web architecture, itemized modules, brand assets, and maintenance care plan for an instant quotation.
             </p>
@@ -472,9 +477,12 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                   <span>STEP {currentStep} OF 4</span>
                   <strong>{steps[currentStep - 1].title}{shouldSkipBrandStep && currentStep !== 3 ? ' (Brand N/A)' : ''}</strong>
                 </div>
+                <div className="sr-only" aria-live="polite" aria-atomic="true">
+                  Step {currentStep} of 4: {steps[currentStep - 1].title}
+                </div>
               </div>
 
-              <form onSubmit={handleSubmitOnline}>
+              <form onSubmit={handleSubmitOnline} aria-labelledby={formTitleId}>
                 {currentStep === 1 && (
                   <StepGoalArchetype
                     goals={goals}
@@ -489,6 +497,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                     onScopeStartTypeChange={handleScopeStartTypeChange}
                     onResetServiceType={resetServiceType}
                     onChangeField={(field, val) => setFormData((prev) => ({ ...prev, [field]: val }))}
+                    stepHeadingRef={stepHeadingRef}
                   />
                 )}
 
@@ -513,6 +522,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                     onApplySmartPreset={applySmartPreset}
                     togglePopover={togglePopover}
                     dependsOnMap={dependsOnMap}
+                    stepHeadingRef={stepHeadingRef}
                   />
                 )}
 
@@ -528,6 +538,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                         designReadiness: (b.designReadiness as 'figma_ready' | 'needs_design_system' | 'needs_copywriting') || 'figma_ready',
                       }))
                     }
+                    stepHeadingRef={stepHeadingRef}
                   />
                 )}
 
@@ -548,11 +559,13 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                     termsList={termsList}
                     togglePopover={togglePopover}
                     onChangeField={(field, val) => setFormData((prev) => ({ ...prev, [field]: val }))}
+                    agreedToTermsError={!formData.agreedToTerms}
+                    stepHeadingRef={stepHeadingRef}
                   />
                 )}
 
                 {errorMsg && (
-                  <p role="alert" aria-live="assertive" className={styles.formError}>
+                  <p id="form-error" role="alert" aria-live="assertive" className={styles.formError}>
                     {errorMsg}
                   </p>
                 )}
@@ -642,6 +655,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                           disabled={submitting || !formData.agreedToTerms}
                           className={`${styles.btn} ${styles.btnPrimary} ${!formData.agreedToTerms ? styles.btnDisabled : ''}`}
                           title={!formData.agreedToTerms ? 'Accept commercial terms to submit' : 'Save scope & continue in client dashboard'}
+                          aria-describedby={errorMsg ? 'form-error' : undefined}
                         >
                           <span>{submitting ? 'SAVING SCOPE...' : 'SAVE SCOPE & CONTINUE IN DASHBOARD'}</span>
                           <Send size={16} />

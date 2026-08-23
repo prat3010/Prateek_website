@@ -86,6 +86,7 @@ interface StepGoalArchetypeProps {
   onScopeStartTypeChange: (type: 'greenfield' | 'legacy_rebuild') => void;
   onResetServiceType: () => void;
   onChangeField: (field: string, value: string) => void;
+  stepHeadingRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 export function StepGoalArchetype({
@@ -101,10 +102,34 @@ export function StepGoalArchetype({
   onScopeStartTypeChange,
   onResetServiceType,
   onChangeField,
+  stepHeadingRef,
 }: StepGoalArchetypeProps) {
+  const archetypeCardRefs = React.useRef<(HTMLDivElement | null)[]>([]);
+  const categoryTabRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
+
+  const filteredGoals = (selectedGoalCategory === 'all'
+    ? goals
+    : goals.filter((g) => {
+        const cat = GOAL_CATEGORIES.find((c) => c.id === selectedGoalCategory);
+        return cat?.ids.includes(g.id);
+      })
+  );
+
+  const selectedArchetypeIndex = filteredGoals.findIndex((g) => formData.projectGoal === g.label);
+
+  const focusArchetype = (index: number) => {
+    const clamped = Math.max(0, Math.min(index, filteredGoals.length - 1));
+    archetypeCardRefs.current[clamped]?.focus();
+  };
+
+  const focusCategoryTab = (index: number) => {
+    const clamped = Math.max(0, Math.min(index, GOAL_CATEGORIES.length - 1));
+    categoryTabRefs.current[clamped]?.focus();
+  };
+
   return (
     <div className={styles.formStep}>
-      <div className={styles.groupTitle}>
+      <div className={styles.groupTitle} ref={stepHeadingRef} tabIndex={-1}>
         <Building2 size={18} />
         <span>STEP 1: PROJECT GOAL &amp; TARGET AUDIENCE</span>
         <button
@@ -127,7 +152,7 @@ export function StepGoalArchetype({
 
         {/* Goal Category Filter Tabs */}
         <div className={styles.categoryTabs} role="tablist" aria-label="Goal Archetype Categories">
-          {GOAL_CATEGORIES.map((cat) => {
+          {GOAL_CATEGORIES.map((cat, catIdx) => {
             const isSelected = selectedGoalCategory === cat.id;
             const count =
               cat.id === 'all' ? goals.length : goals.filter((g) => cat.ids.includes(g.id)).length;
@@ -135,10 +160,18 @@ export function StepGoalArchetype({
               <button
                 key={cat.id}
                 type="button"
+                ref={(el) => { categoryTabRefs.current[catIdx] = el; }}
                 role="tab"
                 aria-selected={isSelected}
+                tabIndex={isSelected ? 0 : -1}
                 className={`${styles.categoryTabBtn} ${isSelected ? styles.categoryTabBtnActive : ''}`}
                 onClick={() => setSelectedGoalCategory(cat.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowRight') { e.preventDefault(); focusCategoryTab(catIdx + 1); }
+                  else if (e.key === 'ArrowLeft') { e.preventDefault(); focusCategoryTab(catIdx - 1); }
+                  else if (e.key === 'Home') { e.preventDefault(); focusCategoryTab(0); }
+                  else if (e.key === 'End') { e.preventDefault(); focusCategoryTab(GOAL_CATEGORIES.length - 1); }
+                }}
               >
                 <span>{cat.label}</span>
                 <span className={styles.categoryTabBadge}>{count}</span>
@@ -148,19 +181,14 @@ export function StepGoalArchetype({
         </div>
 
         <div className={styles.archetypeGrid} role="radiogroup" aria-label="Primary Project Archetype">
-          {(selectedGoalCategory === 'all'
-            ? goals
-            : goals.filter((g) => {
-                const cat = GOAL_CATEGORIES.find((c) => c.id === selectedGoalCategory);
-                return cat?.ids.includes(g.id);
-              })
-          ).map((g) => {
+          {filteredGoals.map((g, idx) => {
             const isSelected = formData.projectGoal === g.label;
             const recommendedEngine = engines.find((e) => e.id === g.recommendedEngineId);
             return (
               <div
                 key={g.id}
-                tabIndex={0}
+                ref={(el) => { archetypeCardRefs.current[idx] = el; }}
+                tabIndex={isSelected || selectedArchetypeIndex === -1 ? 0 : -1}
                 role="radio"
                 aria-checked={isSelected}
                 className={`${styles.archetypeCard} ${isSelected ? styles.archetypeCardSelected : ''}`}
@@ -169,6 +197,18 @@ export function StepGoalArchetype({
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     onGoalChange(g.label);
+                  } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    focusArchetype(idx + 1);
+                  } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    focusArchetype(idx - 1);
+                  } else if (e.key === 'Home') {
+                    e.preventDefault();
+                    focusArchetype(0);
+                  } else if (e.key === 'End') {
+                    e.preventDefault();
+                    focusArchetype(filteredGoals.length - 1);
                   }
                 }}
               >

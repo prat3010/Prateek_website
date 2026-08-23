@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
   ShieldCheck,
   Info,
@@ -48,6 +48,8 @@ interface StepCommercialsProps {
   termsList: string[];
   togglePopover: (e: React.MouseEvent, id: string) => void;
   onChangeField: (field: string, value: string | boolean) => void;
+  agreedToTermsError?: boolean;
+  stepHeadingRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 export function StepCommercials({
@@ -66,10 +68,27 @@ export function StepCommercials({
   termsList,
   togglePopover,
   onChangeField,
+  agreedToTermsError,
+  stepHeadingRef,
 }: StepCommercialsProps) {
+  const popoverCloseRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (activePopoverId && popoverAnchor) {
+      popoverCloseRef.current?.focus();
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          setActivePopoverId(null);
+          setPopoverAnchor(null);
+        }
+      };
+      document.addEventListener('keydown', handleEscape);
+      return () => document.removeEventListener('keydown', handleEscape);
+    }
+  }, [activePopoverId, popoverAnchor, setActivePopoverId, setPopoverAnchor]);
   return (
     <div className={styles.formStep}>
-      <div className={styles.groupTitle}>
+      <div className={styles.groupTitle} ref={stepHeadingRef} tabIndex={-1}>
         <ShieldCheck size={18} />
         <span>STEP 4: COMMERCIAL PROPOSAL &amp; MAINTENANCE CARE PLAN</span>
       </div>
@@ -118,16 +137,35 @@ export function StepCommercials({
           <Wrench size={14} className={styles.inlineIcon} />
           Select Monthly Maintenance &amp; SLA Care Plan
         </label>
-        <div className={styles.careGrid}>
-          {maintenancePlans.map((p) => {
+        <div className={styles.careGrid} role="radiogroup" aria-label="Maintenance Care Plan">
+          {maintenancePlans.map((p, pIdx) => {
             const isSelected = (formData.selectedMaintenanceId || autoMaintenancePlanId) === p.id;
             const isAutoRecommended = autoMaintenancePlanId === p.id;
             const isPopoverOpen = activePopoverId === p.id;
             return (
               <div
                 key={p.id}
+                role="radio"
+                aria-checked={isSelected}
+                tabIndex={isSelected ? 0 : -1}
                 className={`${styles.careCard} ${isSelected ? styles.careCardSelected : ''}`}
                 onClick={() => onChangeField('selectedMaintenanceId', p.id)}
+                onKeyDown={(ev) => {
+                  if (ev.key === 'Enter' || ev.key === ' ') {
+                    ev.preventDefault();
+                    onChangeField('selectedMaintenanceId', p.id);
+                  } else if (ev.key === 'ArrowDown' || ev.key === 'ArrowRight') {
+                    ev.preventDefault();
+                    const next = (pIdx + 1) % maintenancePlans.length;
+                    const card = (ev.currentTarget.parentElement?.children[next] as HTMLElement);
+                    card?.focus();
+                  } else if (ev.key === 'ArrowUp' || ev.key === 'ArrowLeft') {
+                    ev.preventDefault();
+                    const prev = (pIdx - 1 + maintenancePlans.length) % maintenancePlans.length;
+                    const card = (ev.currentTarget.parentElement?.children[prev] as HTMLElement);
+                    card?.focus();
+                  }
+                }}
                 style={{ position: 'relative' }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -184,14 +222,18 @@ export function StepCommercials({
                               <Wrench size={12} className={styles.inlineIcon} />
                               TECHNICAL SLA SPECS
                             </span>
-                            <X
-                              size={12}
-                              className={styles.popoverCloseBtn}
-                              onClick={() => {
-                                setActivePopoverId(null);
-                                setPopoverAnchor(null);
-                              }}
-                            />
+                            <button
+                                type="button"
+                                ref={popoverCloseRef}
+                                className={styles.popoverCloseBtn}
+                                aria-label="Close"
+                                onClick={() => {
+                                  setActivePopoverId(null);
+                                  setPopoverAnchor(null);
+                                }}
+                              >
+                                <X size={12} />
+                              </button>
                           </div>
                           <p className={styles.popoverTechText}>{p.techSpecs}</p>
                         </div>
@@ -342,6 +384,11 @@ export function StepCommercials({
             <strong>I agree to the Standard Commercial Terms</strong> (50% upfront deposit to initiate development, 50% upon final delivery prior to source code transfer &amp; deployment handoff).
           </span>
         </label>
+        {agreedToTermsError && !formData.agreedToTerms && (
+          <p className={styles.fieldHint} role="alert">
+            You must accept the terms to submit your scope.
+          </p>
+        )}
       </div>
     </div>
   );
