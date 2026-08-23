@@ -245,6 +245,7 @@
       "compulsoryFeatureLabels": [
         "Booking & Appointments Module",
         "Payment Gateway Integration (Razorpay)",
+        "User Auth & Client Portal (Google/Magic Link)",
         "Automated Email Workflows (Resend Transactional)"
       ]
     },
@@ -311,9 +312,9 @@
     },
     {
       "id": "voice_ai_agent_app",
-      "label": "🎙️ Real-Time Voice AI & Phone Call Assistant",
-      "shortLabel": "Voice AI App",
-      "description": "Real-time conversational voice intake, phone call scheduling, and voice customer support",
+      "label": "🎙️ Custom Voice SaaS & Call Center Platform",
+      "shortLabel": "Voice Call Platform",
+      "description": "Multi-tenant voice platform with user accounts, live call transcripts, RBAC seat permissions, and phone routing",
       "recommendedEngineId": "saas",
       "compulsoryFeatureLabels": [
         "Real-Time Voice AI Agent & WebRTC Call Assistant",
@@ -330,9 +331,19 @@
       "compulsoryFeatureLabels": [
         "Multimodal AI Vision & Document Processing Engine",
         "User Auth & Client Portal (Google/Magic Link)",
-        "Payment Gateway Integration (Razorpay)",
         "Admin Dashboard & Role Access Control (RBAC)"
       ]
+    },
+    {
+      "id": "standalone_voice_bot",
+      "label": "🎙️ Standalone Voice AI Widget / Phone Assistant",
+      "shortLabel": "Voice AI Bot",
+      "description": "Embed a 24/7 real-time voice WebRTC widget onto your site or route inbound/outbound phone calls with webhook summaries",
+      "recommendedEngineId": "standalone_embed",
+      "compulsoryFeatureLabels": [
+        "Real-Time Voice AI Agent & WebRTC Call Assistant"
+      ],
+      "skipBrandAssets": true
     },
     {
       "id": "standalone_chatbot",
@@ -459,10 +470,30 @@
     {
       "id": "chatbot",
       "label": "💬 AI Chatbot Widget",
-      "laymanDescription": "24/7 AI assistant on your website that answers customer questions, captures leads, and reduces support workload.",
+      "laymanDescription": "24/7 3rd-party AI chatbot widget (Voiceflow/Tidio) embedded on your website to answer FAQs, capture leads, and reduce support workload.",
       "techSpecs": "Script Loader, Shadow DOM Isolation, System Prompt Configuration, Fallback Routing, Webhook Messaging",
       "priceINR": 20000,
       "priceUSD": 250,
+      "turnaround": "5–7 days",
+      "category": "ai"
+    },
+    {
+      "id": "voice_ai_setup",
+      "label": "🎙️ Real-Time Voice AI / Phone Bot Setup",
+      "laymanDescription": "Embed a 24/7 conversational voice widget on your website or setup an automated inbound/outbound phone call assistant with email/CRM webhook notifications.",
+      "techSpecs": "LiveKit WebRTC Embed, Deepgram STT, ElevenLabs/OpenAI Realtime TTS, Twilio Voice Webhooks, Call Transcript Telemetry",
+      "priceINR": 45000,
+      "priceUSD": 600,
+      "turnaround": "5–7 days",
+      "category": "ai"
+    },
+    {
+      "id": "vision_ocr_setup",
+      "label": "👁️ Multimodal Document OCR Scanner",
+      "laymanDescription": "Automated invoice, receipt, ID document, and PDF scanner powered by vision AI that extracts structured JSON data to your system.",
+      "techSpecs": "Gemini/Claude Vision API, Schema Validation, PDF/Image OCR Extraction Pipeline, Webhook Export",
+      "priceINR": 40000,
+      "priceUSD": 500,
       "turnaround": "5–7 days",
       "category": "ai"
     },
