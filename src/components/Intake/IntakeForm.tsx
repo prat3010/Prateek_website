@@ -1018,6 +1018,7 @@ interface IntakeFormData {
                         })
                     ).map(svc => {
                       const isSelected = selectedQuickServices.includes(svc.id);
+                      const isPopoverOpen = activePopoverId === `qs-${svc.id}`;
                       return (
                         <label
                           key={svc.id}
@@ -1040,14 +1041,55 @@ interface IntakeFormData {
                             <span style={{ fontSize: '11px', opacity: 0.5 }}>⏱ {svc.turnaround}</span>
                             <button
                               type="button"
-                              className={styles.infoBtn}
-                              onClick={(e) => togglePopover(e, `qs-${svc.id}`)}
+                              className={`${styles.infoBtn} ${isPopoverOpen ? styles.infoBtnActive : ''}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                togglePopover(e, `qs-${svc.id}`);
+                              }}
+                              title="Click to view Technical Stack & Deliverables Specs"
                               aria-label={`Details for ${svc.label}`}
                             >
                               <Info size={14} />
                             </button>
                           </div>
                           {isSelected && <div className={styles.checkMark}><Check size={14} /></div>}
+
+                          {isPopoverOpen && popoverAnchor && (
+                            <Portal>
+                              <>
+                                <div
+                                  className={styles.popoverOverlay}
+                                  onClick={(ev) => {
+                                    ev.stopPropagation();
+                                    setActivePopoverId(null);
+                                    setPopoverAnchor(null);
+                                  }}
+                                />
+                                <div
+                                  className={styles.popoverPortal}
+                                  style={{ left: popoverAnchor.x, top: popoverAnchor.y }}
+                                  onClick={(ev) => ev.stopPropagation()}
+                                >
+                                  <div className={styles.popoverBox} style={{ position: 'static', left: 'auto', right: 'auto' }}>
+                                    <div className={styles.popoverHeader}>
+                                      <span>🛠️ TECHNICAL STACK &amp; DELIVERABLES</span>
+                                      <X
+                                        size={12}
+                                        style={{ cursor: 'pointer' }}
+                                        onClick={(ev) => {
+                                          ev.stopPropagation();
+                                          setActivePopoverId(null);
+                                          setPopoverAnchor(null);
+                                        }}
+                                      />
+                                    </div>
+                                    <p className={styles.popoverTechText}>{svc.techSpecs}</p>
+                                  </div>
+                                </div>
+                              </>
+                            </Portal>
+                          )}
                         </label>
                       );
                     })}
