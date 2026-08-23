@@ -88,13 +88,13 @@ It eliminates the tedious manual labor of lead prospecting, cold outreach drafti
   - Standardized on `gemini-3.6-flash` across all synchronizer Python tools and Next.js routes.
   - Centralized target queries, system prompts, CTA deep links, and minimum quality score thresholds (`75/100`).
 - [x] **Multi-Source Job Board & Web Scraper (`src/app/api/outreach/prospect/route.ts` & `scripts/sync_tabs/outreach.py`):**
-  - Expanded search to active hiring portals: `site:naukri.com`, `site:indeed.com`, `site:ycombinator.com/companies`, and B2B Google Search.
-  - Positioned Prateek as high-speed Contract MVP alternative to full-time hires.
+  - Direct integration with open high-intent hiring feeds: Hacker News 'Who is Hiring' API, WeWorkRemotely RSS, and RemoteOK.
+  - Positioned Prateek as Forward Deployed Engineer & AI Solutions Architect.
 - [x] **2-Step AI Quality Evaluation & Pitch Generator:**
-  - **Step 1 (AI Evaluator)**: Calls Gemini 3.6 Flash to evaluate web snippets, discard directory list sellers (`readycontacts`, `datacaptive`, `yellowpages`), and return quality scores.
-  - **Step 2 (AI Pitcher)**: Generates 4-sentence tailored B2B pitches with instant scoping CTA (`https://prateeq.in/scoping?engine=saas`).
+  - **Step 1 (AI Evaluator)**: Calls Gemini 3.6 Flash to evaluate web snippets, discard directory list sellers (`goodfirms`, `clutch`, `readycontacts`, `datacaptive`, `yellowpages`), and return quality scores.
+  - **Step 2 (AI Pitcher)**: Generates 3-sentence tailored B2B pitches with targeted instant scoping CTA (`https://prateeq.in/scoping?engine=saas&goal=autonomous_agents`).
 - [x] **Streamlit GUI Config Expander & Quality Badges (`scripts/sync_tabs/outreach.py`):**
-  - Display quality score badges (`⭐ Score: 85/100 | Source: naukri_job`).
+  - Display quality score badges (`⭐ Score: 95/100 | Source: hn_whoishiring`).
   - Added "⚙️ Target Search Sources & AI Settings" GUI editor for live prompt & query customization.
 
 ---

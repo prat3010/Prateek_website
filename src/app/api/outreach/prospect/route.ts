@@ -117,7 +117,7 @@ async function evaluateLeadWithGemini(companyName: string, domain: string, snipp
   if (!GEMINI_API_KEY) return fallbackResult;
 
   try {
-    const promptText = `Analyze this web snippet/search result for a potential software development lead. Determine if this is an active company, startup, or hiring job post that needs custom web/AI software development (Next.js, Python, RAG AI). Filter out contact directories, database sellers, spam lists, and irrelevant blogs. Context: Company=${companyName}, Domain=${domain}, Snippet=${snippet}. Return valid JSON ONLY with schema: {"is_valid_lead": boolean, "quality_score": number, "source_type": "naukri_job" | "indeed_job" | "yc_startup" | "b2b_agency" | "directory_spam", "reason": "brief 1-sentence reason"}`;
+    const promptText = `Analyze this web snippet/search result for a potential software development lead. Determine if this is an active company, startup, or hiring job post that needs custom web/AI software development (Next.js, Python, RAG AI). Filter out contact directories, database sellers, spam lists, and irrelevant blogs. Context: Company=${companyName}, Domain=${domain}, Snippet=${snippet}. Return valid JSON ONLY with schema: {"is_valid_lead": boolean, "quality_score": number, "source_type": "hn_whoishiring" | "weworkremotely" | "remoteok" | "b2b_startup" | "directory_spam", "reason": "brief 1-sentence reason"}`;
     
     const text = await callGeminiWithFallback(promptText);
     if (!text) return fallbackResult;
@@ -187,8 +187,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Supabase configuration missing' }, { status: 500 });
     }
 
-    const targetQueries = outreachDefaults.targetQueries || [
-      'site:naukri.com "Next.js" OR "React" OR "AI" developer hiring',
+    const targetQueries = (outreachDefaults as Record<string, unknown>).targetQueries as string[] | undefined || [
+      'remote "Forward Deployed Engineer" OR "Agentic AI" developer hiring',
+      'remote Next.js Supabase AI engineer hiring',
       'b2b software agency founders contact us',
     ];
     const selectedQuery = targetQueries[Math.floor(Math.random() * targetQueries.length)];
