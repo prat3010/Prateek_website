@@ -16,7 +16,7 @@
       "priceINR": 55000,
       "priceUSD": 750,
       "laymanDescription": "A complete multi-page business website (Home, About, Services, Case Studies, Contact) with smooth page transitions and consistent branding.",
-      "techSpecs": "Multi-page routing (3–6 pages), Framer Motion Page Transitions, Shared Layout Shell, Dynamic Routes"
+      "techSpecs": "Multi-page routing (3\u20136 pages), Framer Motion Page Transitions, Shared Layout Shell, Dynamic Routes"
     },
     {
       "id": "saas",
@@ -117,7 +117,10 @@
       "priceUSD": 700,
       "laymanDescription": "Lets customers book services, reserve time slots, and pay deposits online with calendar syncing and automatic reminders.",
       "techSpecs": "Availability Calendar, Time-Slot Scheduling, Calendar Sync (Google/iCal), Deposit Holds, Booking Reminders",
-      "dependsOn": ["payments", "auth"]
+      "dependsOn": [
+        "payments",
+        "auth"
+      ]
     },
     {
       "id": "commerce",
@@ -126,7 +129,10 @@
       "priceUSD": 1000,
       "laymanDescription": "A complete online store with product catalog, shopping cart, secure checkout, and order management.",
       "techSpecs": "Product Catalog, Cart & Checkout Flow, Inventory Management, Order Confirmation Emails",
-      "dependsOn": ["payments", "auth"]
+      "dependsOn": [
+        "payments",
+        "auth"
+      ]
     },
     {
       "id": "lms",
@@ -135,7 +141,10 @@
       "priceUSD": 1150,
       "laymanDescription": "Student enrollment, a course player with progress tracking, and gated lesson content for online training.",
       "techSpecs": "Course Builder, Video/Text Lesson Player, Progress Tracking, Enrollment & Certificates",
-      "dependsOn": ["payments", "auth"]
+      "dependsOn": [
+        "payments",
+        "auth"
+      ]
     },
     {
       "id": "crm",
@@ -144,7 +153,9 @@
       "priceUSD": 800,
       "laymanDescription": "A private pipeline to track leads, customers, deals, and team activity with custom fields and exports.",
       "techSpecs": "Deal Pipeline & Kanban, Custom Fields, Activity Timeline, Team Permissions, Export Tools",
-      "dependsOn": ["auth"]
+      "dependsOn": [
+        "auth"
+      ]
     },
     {
       "id": "pwa",
@@ -167,7 +178,7 @@
       "label": "Third-Party Integrations (Slack/Zapier/Webhooks)",
       "priceINR": 40000,
       "priceUSD": 550,
-      "laymanDescription": "Connects your app to the tools you already use — Slack alerts, Zapier automations, and outbound webhooks to third-party services.",
+      "laymanDescription": "Connects your app to the tools you already use \u2014 Slack alerts, Zapier automations, and outbound webhooks to third-party services.",
       "techSpecs": "Slack Notifications, Zapier/Webhook Connectors, Outbound Event Hooks, Retry & Delivery Logging"
     },
     {
@@ -209,28 +220,32 @@
   "goals": [
     {
       "id": "landing_page",
-      "label": "⚡ High-Converting Landing Page",
+      "label": "-Converting Landing Page",
       "shortLabel": "Landing Page",
       "description": "Single-page lead generation or product launch page",
-      "primaryOutcome": "🚀 Increase Lead & Customer Conversion Rate",
+      "primaryOutcome": "\ud83d\ude80 Increase Lead & Customer Conversion Rate",
       "recommendedEngineId": "landing",
-      "compulsoryFeatureLabels": ["Automated Email Workflows (Resend Transactional)"]
+      "compulsoryFeatureLabels": [
+        "Automated Email Workflows (Resend Transactional)"
+      ]
     },
     {
       "id": "business_multipage",
-      "label": "🏢 Multi-Page Business Website",
+      "label": "\ud83c\udfe2 Multi-Page Business Website",
       "shortLabel": "Business Web",
       "description": "Corporate profile with services, showcase, and blog",
-      "primaryOutcome": "🎨 Modernize Brand Identity & Digital Infrastructure",
+      "primaryOutcome": "\ud83c\udfa8 Modernize Brand Identity & Digital Infrastructure",
       "recommendedEngineId": "multipage",
-      "compulsoryFeatureLabels": ["Automated Email Workflows (Resend Transactional)"]
+      "compulsoryFeatureLabels": [
+        "Automated Email Workflows (Resend Transactional)"
+      ]
     },
     {
       "id": "ecommerce",
-      "label": "🛒 E-commerce & Digital Store",
+      "label": "\ud83d\uded2 E-commerce & Digital Store",
       "shortLabel": "E-commerce",
       "description": "Product catalog, shopping cart, and online payments",
-      "primaryOutcome": "🛒 Boost Online Direct Sales & Payment Conversion",
+      "primaryOutcome": "\ud83d\uded2 Boost Online Direct Sales & Payment Conversion",
       "recommendedEngineId": "multipage",
       "compulsoryFeatureLabels": [
         "E-Commerce Storefront & Cart Module",
@@ -241,10 +256,10 @@
     },
     {
       "id": "booking_appointments",
-      "label": "📅 Booking & Appointment Platform",
+      "label": "\ud83d\udcc5 Booking & Appointment Platform",
       "shortLabel": "Booking Platform",
       "description": "Reservation scheduling, calendar sync, and upfront deposits",
-      "primaryOutcome": "📅 Streamline Booking & Upfront Payments",
+      "primaryOutcome": "\ud83d\udcc5 Streamline Booking & Upfront Payments",
       "recommendedEngineId": "multipage",
       "compulsoryFeatureLabels": [
         "Booking & Appointments Module",
@@ -255,10 +270,10 @@
     },
     {
       "id": "saas_app",
-      "label": "🚀 Full-Stack SaaS Web Application",
+      "label": "\ud83d\ude80 Full-Stack SaaS Web Application",
       "shortLabel": "SaaS MVP",
       "description": "User accounts, interactive dashboards, and subscriptions",
-      "primaryOutcome": "🚀 Rapid MVP Launch & Subscription Scalability",
+      "primaryOutcome": "\ud83d\ude80 Rapid MVP Launch & Subscription Scalability",
       "recommendedEngineId": "saas",
       "compulsoryFeatureLabels": [
         "User Auth & Client Portal (Google/Magic Link)",
@@ -268,10 +283,10 @@
     },
     {
       "id": "lms_portal",
-      "label": "🎓 LMS & Online Course Portal",
+      "label": "\ud83c\udf93 LMS & Online Course Portal",
       "shortLabel": "LMS Portal",
       "description": "Student accounts, course player, and subscription billing",
-      "primaryOutcome": "🎓 Automated Course Delivery & Student Monetization",
+      "primaryOutcome": "\ud83c\udf93 Automated Course Delivery & Student Monetization",
       "recommendedEngineId": "saas",
       "compulsoryFeatureLabels": [
         "LMS & Online Course Portal Module",
@@ -282,10 +297,10 @@
     },
     {
       "id": "crm_admin",
-      "label": "📊 Internal CRM / Admin Control Center",
+      "label": "\ud83d\udcca Internal CRM / Admin Control Center",
       "shortLabel": "Admin CRM",
       "description": "Private business dashboard, data management, and staff roles",
-      "primaryOutcome": "📊 Streamline Business Operations & Staff Workflow Automation",
+      "primaryOutcome": "\ud83d\udcca Streamline Business Operations & Staff Workflow Automation",
       "recommendedEngineId": "saas",
       "compulsoryFeatureLabels": [
         "CRM & Lead Management Module",
@@ -295,10 +310,10 @@
     },
     {
       "id": "ai_rag_app",
-      "label": "🤖 Custom AI & Vector RAG Platform",
+      "label": "\ud83e\udd16 Custom AI & Vector RAG Platform",
       "shortLabel": "AI RAG Platform",
       "description": "Private document knowledge base, AI search, and assistant",
-      "primaryOutcome": "🧠 24/7 Document Knowledge Retrieval & Vector Search",
+      "primaryOutcome": "\ud83e\udde0 24/7 Document Knowledge Retrieval & Vector Search",
       "recommendedEngineId": "saas",
       "compulsoryFeatureLabels": [
         "Private AI Knowledge Base / Vector Search (RAG)",
@@ -308,10 +323,10 @@
     },
     {
       "id": "autonomous_agents",
-      "label": "🤖 Autonomous AI Agent & Workflow Platform",
+      "label": "\ud83e\udd16 Autonomous AI Agent & Workflow Platform",
       "shortLabel": "AI Agents Platform",
       "description": "Autonomous AI agents, API tool execution, and automated business decision loops",
-      "primaryOutcome": "🤖 Automate Business Workflows with Autonomous AI Agents",
+      "primaryOutcome": "\ud83e\udd16 Automate Business Workflows with Autonomous AI Agents",
       "recommendedEngineId": "saas",
       "compulsoryFeatureLabels": [
         "Autonomous AI Agents & Workflow Automation",
@@ -321,10 +336,10 @@
     },
     {
       "id": "voice_ai_agent_app",
-      "label": "🎙️ Custom Voice SaaS & Call Center Platform",
+      "label": "\ud83c\udf99\ufe0f Custom Voice SaaS & Call Center Platform",
       "shortLabel": "Voice Call Platform",
       "description": "Multi-tenant voice platform with user accounts, live call transcripts, RBAC seat permissions, and phone routing",
-      "primaryOutcome": "🎙️ Automated 24/7 Real-Time Voice Assistant & Call Routing",
+      "primaryOutcome": "\ud83c\udf99\ufe0f Automated 24/7 Real-Time Voice Assistant & Call Routing",
       "recommendedEngineId": "saas",
       "compulsoryFeatureLabels": [
         "Real-Time Voice AI Agent & WebRTC Call Assistant",
@@ -334,10 +349,10 @@
     },
     {
       "id": "vision_ocr_saas",
-      "label": "👁️ Intelligent Document & OCR Extraction SaaS",
+      "label": "\ud83d\udc41\ufe0f Intelligent Document & OCR Extraction SaaS",
       "shortLabel": "Document AI SaaS",
       "description": "Automated invoice, contract, and identity document scanner with structured database export",
-      "primaryOutcome": "👁️ Automated Multimodal Document OCR & Data Extraction",
+      "primaryOutcome": "\ud83d\udc41\ufe0f Automated Multimodal Document OCR & Data Extraction",
       "recommendedEngineId": "saas",
       "compulsoryFeatureLabels": [
         "Multimodal AI Vision & Document Processing Engine",
@@ -347,10 +362,10 @@
     },
     {
       "id": "standalone_voice_bot",
-      "label": "🎙️ Standalone Voice AI Widget / Phone Assistant",
+      "label": "\ud83c\udf99\ufe0f Standalone Voice AI Widget / Phone Assistant",
       "shortLabel": "Voice AI Bot",
       "description": "Embed a 24/7 real-time voice WebRTC widget onto your site or route inbound/outbound phone calls with webhook summaries",
-      "primaryOutcome": "🎙️ Embed 24/7 Real-Time Voice Widget & Phone Assistant",
+      "primaryOutcome": "\ud83c\udf99\ufe0f Embed 24/7 Real-Time Voice Widget & Phone Assistant",
       "recommendedEngineId": "standalone_embed",
       "compulsoryFeatureLabels": [
         "Real-Time Voice AI Agent & WebRTC Call Assistant"
@@ -359,10 +374,10 @@
     },
     {
       "id": "standalone_chatbot",
-      "label": "💬 Standalone Embedded AI Chatbot Widget",
+      "label": "\ud83d\udcac Standalone Embedded AI Chatbot Widget",
       "shortLabel": "AI Chatbot Widget",
       "description": "Custom Vector RAG Infrastructure & Native Script Embed (pgvector embeddings, PDF chunking pipeline, presigned citations) for your existing website (WordPress, Webflow, Shopify, custom HTML).",
-      "primaryOutcome": "💬 Embed 24/7 AI Knowledge Base & Support Chatbot",
+      "primaryOutcome": "\ud83d\udcac Embed 24/7 AI Knowledge Base & Support Chatbot",
       "recommendedEngineId": "standalone_embed",
       "compulsoryFeatureLabels": [
         "Private AI Knowledge Base / Vector Search (RAG)"
@@ -371,20 +386,20 @@
     },
     {
       "id": "ai_strategy_consulting",
-      "label": "🧠 AI Strategy & Solutioning Audit",
+      "label": "\ud83e\udde0 AI Strategy & Solutioning Audit",
       "shortLabel": "AI Strategy Sprint",
       "description": "Workflow audit, AI feasibility analysis, cost/latency modeling, and a custom 3-page architecture blueprint",
-      "primaryOutcome": "🧠 AI Technical Feasibility Audit & Architecture Blueprint",
+      "primaryOutcome": "\ud83e\udde0 AI Technical Feasibility Audit & Architecture Blueprint",
       "recommendedEngineId": "ai_strategy_audit",
       "compulsoryFeatureLabels": [],
       "skipBrandAssets": true
     },
     {
       "id": "custom",
-      "label": "⚙️ Custom Web Application (Bespoke Scope)",
+      "label": "(Bespoke Scope)",
       "shortLabel": "Custom Scope",
       "description": "Tailored requirements with flexible component picking",
-      "primaryOutcome": "⚙️ Bespoke Technical Architecture & Customized Web Scope",
+      "primaryOutcome": "& Customized Web Scope",
       "recommendedEngineId": "landing",
       "compulsoryFeatureLabels": []
     }
@@ -422,10 +437,15 @@
       "priceINR": 5000,
       "priceUSD": 70,
       "period": "/ month",
-      "badge": "💡 Recommended for Landing Pages",
+      "badge": "\ud83d\udca1 Recommended for Landing Pages",
       "laymanDescription": "Keeps your server healthy, creates daily automated database backups, installs security patches, and ensures your site stays online 24/7.",
       "techSpecs": "Vercel/Supabase Uptime Monitoring, Daily PostgreSQL Backups, SSL Renewals, Security Dependency Updates",
-      "includes": ["Hosting support & SSL management", "Daily automated database backups", "Dependency & security patching", "Minor bug fixes & uptime monitoring"],
+      "includes": [
+        "Hosting support & SSL management",
+        "Daily automated database backups",
+        "Dependency & security patching",
+        "Minor bug fixes & uptime monitoring"
+      ],
       "responseTime": "Within 2 business days",
       "includedHours": "Up to 1 hour of developer time/month",
       "overageRules": "Overage beyond the included hours requires written approval and is billed separately. Unused hours do not roll over."
@@ -436,12 +456,17 @@
       "priceINR": 10000,
       "priceUSD": 140,
       "period": "/ month",
-      "badge": "💡 Recommended for Auth/Payments/CMS",
+      "badge": "\ud83d\udca1 Recommended for Auth/Payments/CMS",
       "laymanDescription": "Includes everything in Basic plus up to 4 hours of monthly developer support to edit text, swap images, update pages, or tweak designs whenever you need.",
-      "techSpecs": "Everything in Basic + 3–4 Hours Monthly Dev Allocation, Core Web Vitals Performance Tuning, Content Schema Updates",
-      "includes": ["Everything in Basic Care", "Monthly text & media content updates", "3–4 hours of dedicated dev time/month", "Performance & page speed tuning"],
+      "techSpecs": "Everything in Basic + 3\u20134 Hours Monthly Dev Allocation, Core Web Vitals Performance Tuning, Content Schema Updates",
+      "includes": [
+        "Everything in Basic Care",
+        "Monthly text & media content updates",
+        "3\u20134 hours of dedicated dev time/month",
+        "Performance & page speed tuning"
+      ],
       "responseTime": "Within 1 business day",
-      "includedHours": "3–4 hours of developer time/month",
+      "includedHours": "3\u20134 hours of developer time/month",
       "overageRules": "Overage beyond the included hours requires written approval and is billed separately. Unused hours do not roll over."
     },
     {
@@ -450,10 +475,15 @@
       "priceINR": 35000,
       "priceUSD": 475,
       "period": "/ month",
-      "badge": "💡 Recommended for AI Chatbot & RAG Engines",
+      "badge": "\ud83d\udca1 Recommended for AI Chatbot & RAG Engines",
       "laymanDescription": "For critical business apps and AI engines. Includes a guaranteed priority response SLA, AI model accuracy tuning, SEO reports, and dedicated dev hours.",
       "techSpecs": "24-Hour Priority SLA, AI Vector Index Tuning & Latency Monitoring, SEO Analytics Reports, Dedicated Feature Engineering",
-      "includes": ["Priority 24-hour SLA response", "AI Vector DB & LLM latency monitoring", "Dedicated feature development hours", "Analytics & SEO health reports"],
+      "includes": [
+        "Priority 24-hour SLA response",
+        "AI Vector DB & LLM latency monitoring",
+        "Dedicated feature development hours",
+        "Analytics & SEO health reports"
+      ],
       "responseTime": "Within 24 hours (response-not-resolution commitment)",
       "includedHours": "Up to 8 hours of developer time/month",
       "overageRules": "Overage beyond the included hours requires written approval and is billed separately. Unused hours do not roll over. Third-party service billing is excluded and billed directly to the client."
@@ -464,10 +494,13 @@
       "priceINR": 0,
       "priceUSD": 0,
       "period": "",
-      "badge": "30-Day Warranty Included",
+      "badge": "-Day Warranty Included",
       "laymanDescription": "Includes 30 days of complimentary technical support post-launch. Client manages cloud hosting and database updates afterwards.",
       "techSpecs": "30-Day Post-Launch Bug Warranty, Developer Handover Documentation",
-      "includes": ["30 days complimentary post-launch support", "Client manages cloud hosting & patches afterwards"],
+      "includes": [
+        "30 days complimentary post-launch support",
+        "Client manages cloud hosting & patches afterwards"
+      ],
       "responseTime": "Within 2 business days (warranty period)",
       "includedHours": "Complimentary warranty support only",
       "overageRules": "Post-warranty work is billed separately under a paid care plan."
@@ -476,142 +509,142 @@
   "quickServices": [
     {
       "id": "chatbot",
-      "label": "💬 AI Chatbot Widget",
+      "label": "\ud83d\udcac AI Chatbot Widget",
       "laymanDescription": "24/7 3rd-party AI chatbot widget (Voiceflow/Tidio) embedded on your website to answer FAQs, capture leads, and reduce support workload.",
       "techSpecs": "Script Loader, Shadow DOM Isolation, System Prompt Configuration, Fallback Routing, Webhook Messaging",
       "priceINR": 20000,
       "priceUSD": 250,
-      "turnaround": "5–7 days",
+      "turnaround": "5\u20137 days",
       "category": "ai"
     },
     {
       "id": "voice_ai_setup",
-      "label": "🎙️ Real-Time Voice AI / Phone Bot Setup",
+      "label": "\ud83c\udf99\ufe0f Real-Time Voice AI / Phone Bot Setup",
       "laymanDescription": "Embed a 24/7 conversational voice widget on your website or setup an automated inbound/outbound phone call assistant with email/CRM webhook notifications.",
       "techSpecs": "LiveKit WebRTC Embed, Deepgram STT, ElevenLabs/OpenAI Realtime TTS, Twilio Voice Webhooks, Call Transcript Telemetry",
       "priceINR": 45000,
       "priceUSD": 600,
-      "turnaround": "5–7 days",
+      "turnaround": "5\u20137 days",
       "category": "ai"
     },
     {
       "id": "vision_ocr_setup",
-      "label": "👁️ Multimodal Document OCR Scanner",
+      "label": "\ud83d\udc41\ufe0f Multimodal Document OCR Scanner",
       "laymanDescription": "Automated invoice, receipt, ID document, and PDF scanner powered by vision AI that extracts structured JSON data to your system.",
       "techSpecs": "Gemini/Claude Vision API, Schema Validation, PDF/Image OCR Extraction Pipeline, Webhook Export",
       "priceINR": 40000,
       "priceUSD": 500,
-      "turnaround": "5–7 days",
+      "turnaround": "5\u20137 days",
       "category": "ai"
     },
     {
       "id": "rag_knowledge_base",
-      "label": "🧠 AI Knowledge Base (RAG)",
+      "label": "\ud83e\udde0 AI Knowledge Base (RAG)",
       "laymanDescription": "Train an AI on your business documents, PDFs, and FAQs so it answers questions with source citations.",
       "techSpecs": "pgvector Embeddings, Document Chunking, Semantic Search, Presigned Citation Downloads, Feedback Telemetry",
       "priceINR": 125000,
       "priceUSD": 1700,
-      "turnaround": "7–14 days",
+      "turnaround": "7\u201314 days",
       "category": "ai"
     },
     {
       "id": "transactional_email",
-      "label": "📧 Transactional Email Setup",
+      "label": "\ud83d\udce7 Transactional Email Setup",
       "laymanDescription": "Branded email notifications (welcome, receipt, password reset) with SPF/DKIM/DMARC verification so emails land in inbox, not spam.",
       "techSpecs": "Resend/SendGrid Integration, SPF/DKIM/DMARC DNS Auth, Custom HTML Templates, Delivery Telemetry",
       "priceINR": 15000,
       "priceUSD": 200,
-      "turnaround": "3–5 days",
+      "turnaround": "3\u20135 days",
       "category": "email"
     },
     {
       "id": "payment_gateway",
-      "label": "💳 Payment Gateway Integration",
+      "label": "\ud83d\udcb3 Payment Gateway Integration",
       "laymanDescription": "Add Razorpay/Stripe checkout to your existing site for one-time payments or subscriptions with automatic invoicing.",
       "techSpecs": "Razorpay/Stripe Webhooks, Checkout Flow, Recurring Billing, PCI-Compliant Hosted Checkout",
       "priceINR": 45000,
       "priceUSD": 600,
-      "turnaround": "5–7 days",
+      "turnaround": "5\u20137 days",
       "category": "integration"
     },
     {
       "id": "api_integration",
-      "label": "🔗 Third-Party API Integration",
+      "label": "\ud83d\udd17 Third-Party API Integration",
       "laymanDescription": "Connect your site to Slack, Zapier, Google Sheets, CRM, or any external service with webhook automation.",
       "techSpecs": "Webhook Connectors, Serverless Route Handlers, Retry & Delivery Logging, Outbound Event Hooks",
       "priceINR": 40000,
       "priceUSD": 550,
-      "turnaround": "3–7 days",
+      "turnaround": "3\u20137 days",
       "category": "integration"
     },
     {
       "id": "speed_optimization",
-      "label": "⚡ Core Web Vitals Optimization",
+      "label": "",
       "laymanDescription": "Fix loading speed, interaction lag, and layout shifts to rank higher on Google and load under 2 seconds.",
       "techSpecs": "LCP/INP/CLS Audit & Fix, Image Compression, Script Deferral, Font Optimization, CDN Caching",
       "priceINR": 25000,
       "priceUSD": 350,
-      "turnaround": "3–5 days",
+      "turnaround": "3\u20135 days",
       "category": "performance"
     },
     {
       "id": "seo_audit",
-      "label": "🔍 Technical SEO Audit & Fix",
+      "label": "\ud83d\udd0d Technical SEO Audit & Fix",
       "laymanDescription": "Meta tags, structured JSON-LD data, sitemap, robots.txt, OpenGraph cards, and canonical tags for better Google indexing.",
       "techSpecs": "JSON-LD Schema Markup, Canonical Tags, Sitemap Generation, robots.txt, OpenGraph & Twitter Cards",
       "priceINR": 30000,
       "priceUSD": 400,
-      "turnaround": "3–7 days",
+      "turnaround": "3\u20137 days",
       "category": "performance"
     },
     {
       "id": "accessibility_audit",
-      "label": "♿ Accessibility Audit & Fixes",
+      "label": "& Fixes",
       "laymanDescription": "WCAG 2.1 compliance: screen readers, keyboard navigation, color contrast, ARIA labels to prevent legal claims.",
       "techSpecs": "WCAG 2.1 AA Audit, ARIA Landmarks, Keyboard Navigation, Color Contrast Fixes, Screen Reader Testing",
       "priceINR": 40000,
       "priceUSD": 500,
-      "turnaround": "5–7 days",
+      "turnaround": "5\u20137 days",
       "category": "performance"
     },
     {
       "id": "i18n_setup",
-      "label": "🌐 Multilingual / i18n Setup",
+      "label": "\ud83c\udf10 Multilingual / i18n Setup",
       "laymanDescription": "Multiple languages with browser auto-detection, locale-aware URLs, and SEO-friendly hreflang tags.",
       "techSpecs": "next-intl / react-i18next, Locale Auto-Detection, hreflang SEO Tags, Translation JSON Structure",
       "priceINR": 30000,
       "priceUSD": 400,
-      "turnaround": "5–7 days",
+      "turnaround": "5\u20137 days",
       "category": "integration"
     },
     {
       "id": "pwa_conversion",
-      "label": "📱 PWA Conversion",
+      "label": "\ud83d\udcf1 PWA Conversion",
       "laymanDescription": "Turn your website into an installable app with offline support, home screen icon, and splash screen.",
       "techSpecs": "Service Worker, Web App Manifest, Install Prompts, Offline Fallback Shell, Push Notifications",
       "priceINR": 30000,
       "priceUSD": 400,
-      "turnaround": "3–5 days",
+      "turnaround": "3\u20135 days",
       "category": "integration"
     },
     {
       "id": "analytics_setup",
-      "label": "📊 Analytics & Event Tracking",
+      "label": "\ud83d\udcca Analytics & Event Tracking",
       "laymanDescription": "Custom event tracking, conversion funnels, and dashboard setup so you know exactly how visitors use your site.",
       "techSpecs": "GA4/PostHog/Custom Events, Conversion Funnel Setup, Dashboard Widgets, UTM Tracking",
       "priceINR": 20000,
       "priceUSD": 250,
-      "turnaround": "2–4 days",
+      "turnaround": "2\u20134 days",
       "category": "performance"
     },
     {
       "id": "data_migration",
-      "label": "🗄️ Data Migration",
+      "label": "\ud83d\uddc4\ufe0f Data Migration",
       "laymanDescription": "Clean, transform, and import legacy data (spreadsheets, old databases) into modern cloud database without data loss.",
       "techSpecs": "ETL Pipeline, Schema Mapping, Data Cleansing, Foreign Key Integrity, Migration Verification",
       "priceINR": 30000,
       "priceUSD": 400,
-      "turnaround": "3–7 days",
+      "turnaround": "3\u20137 days",
       "category": "integration"
     }
   ]

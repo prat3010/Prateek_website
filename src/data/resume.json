@@ -42,7 +42,7 @@
     "goals": [
       {
         "id": "landing_page",
-        "label": "⚡ High-Converting Landing Page",
+        "label": "-Converting Landing Page",
         "shortLabel": "Landing Page",
         "description": "Single-page lead generation or product launch page",
         "primaryOutcome": "🚀 Increase Lead & Customer Conversion Rate",
@@ -180,10 +180,10 @@
       },
       {
         "id": "custom",
-        "label": "⚙️ Custom Web Application (Bespoke Scope)",
+        "label": "(Bespoke Scope)",
         "shortLabel": "Custom Scope",
         "description": "Tailored requirements with flexible component picking",
-        "primaryOutcome": "⚙️ Bespoke Technical Architecture & Customized Web Scope",
+        "primaryOutcome": "& Customized Web Scope",
         "recommendedEngineId": "landing",
         "compulsoryFeatureLabels": []
       },
@@ -550,7 +550,7 @@
       {
         "id": "self",
         "name": "Self-Managed (Complimentary 30-Day Warranty)",
-        "badge": "30-Day Warranty Included",
+        "badge": "-Day Warranty Included",
         "period": "",
         "includes": [
           "30 days complimentary post-launch support",
@@ -638,7 +638,7 @@
       },
       {
         "id": "speed_optimization",
-        "label": "⚡ Core Web Vitals Optimization",
+        "label": "",
         "laymanDescription": "Fix loading speed, interaction lag, and layout shifts to rank higher on Google and load under 2 seconds.",
         "techSpecs": "LCP/INP/CLS Audit & Fix, Image Compression, Script Deferral, Font Optimization, CDN Caching",
         "priceINR": 25000,
@@ -658,7 +658,7 @@
       },
       {
         "id": "accessibility_audit",
-        "label": "♿ Accessibility Audit & Fixes",
+        "label": "& Fixes",
         "laymanDescription": "WCAG 2.1 compliance: screen readers, keyboard navigation, color contrast, ARIA labels to prevent legal claims.",
         "techSpecs": "WCAG 2.1 AA Audit, ARIA Landmarks, Keyboard Navigation, Color Contrast Fixes, Screen Reader Testing",
         "priceINR": 40000,

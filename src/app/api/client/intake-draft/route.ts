@@ -6,8 +6,8 @@ export async function POST(req: Request) {
   try {
     const payload = await req.json();
 
-    if (!payload.baseEngineTitle && !payload.companyName && !payload.contactEmail) {
-      return NextResponse.json({ error: 'Invalid intake lead payload' }, { status: 400 });
+    if (!payload.companyName && !payload.contactEmail) {
+      return NextResponse.json({ error: 'Invalid intake lead payload: companyName or contactEmail required' }, { status: 400 });
     }
 
     const scopeCode = payload.scopeCode || `SCOPE-${Math.floor(10000 + Math.random() * 90000)}`;

@@ -30,11 +30,11 @@ beforeEach(() => {
 });
 
 describe('POST /api/client/intake-draft', () => {
-  it('returns 400 when lead payload is invalid or empty', async () => {
+  it('returns 400 when lead payload lacks companyName and contactEmail', async () => {
     const req = new Request('http://localhost/api/client/intake-draft', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({}),
+      body: JSON.stringify({ baseEngineTitle: 'Full-Stack Web Engine' }),
     });
 
     const res = await POST(req);

@@ -176,6 +176,14 @@
   border-color: var(--pop-green) !important;
 }
 
+.stepItemActive {
+  opacity: 1;
+}
+
+.stepItemDone {
+  opacity: 0.95;
+}
+
 .stepItemSkipped {
   opacity: 0.5;
   cursor: not-allowed;
@@ -257,6 +265,13 @@
   letter-spacing: 0.05em;
 }
 
+.inlineIcon {
+  display: inline-block;
+  vertical-align: -2px;
+  margin-right: 6px;
+  color: var(--pop-blue);
+}
+
 .fieldHelpText {
   font-family: var(--font-code);
   font-size: 11px;
@@ -264,6 +279,115 @@
   margin: -2px 0 6px 0;
   line-height: 1.4;
   opacity: 0.85;
+}
+
+.fieldHint {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  opacity: 0.85;
+  margin: 0 0 12px 0;
+  line-height: 1.5;
+}
+
+.navigationRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.termsCheckbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  margin: 16px 0;
+  color: var(--color-text-main, inherit);
+}
+
+.itemPrice {
+  font-family: var(--font-code);
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--intake-summary-accent, var(--pop-blue));
+}
+
+.checkMark {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: var(--pop-blue);
+}
+
+/* ── Phase 3 Conversion & Trust Elements ── */
+
+.popularBadge {
+  font-family: var(--font-code);
+  font-size: 10px;
+  font-weight: 800;
+  color: #FFFFFF;
+  background: var(--pop-blue);
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 6px rgba(90, 142, 182, 0.3);
+}
+
+.paymentMilestones {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface-elevated, rgba(43, 43, 54, 0.04));
+  border: 1px dashed var(--color-border);
+  border-radius: var(--border-radius-sm, 8px);
+  padding: 12px 16px;
+  margin: 16px 0 12px 0;
+  gap: 8px;
+}
+
+.milestoneStep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.milestoneStep span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-main, inherit);
+}
+
+.milestoneBadge {
+  font-family: var(--font-code);
+  font-size: 11px;
+  font-weight: 800;
+  background: var(--pop-blue);
+  color: #FFFFFF;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.milestoneConnector {
+  height: 2px;
+  flex: 0 0 24px;
+  background: var(--color-border);
+}
+
+.socialProofBox {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: rgba(90, 142, 182, 0.08);
+  border-left: 3px solid var(--pop-blue);
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-text-muted);
 }
 
 /* ── Goal Archetype Cards (Step 1) ── */
@@ -322,6 +446,15 @@
   font-weight: 800;
   color: var(--pop-black);
   line-height: 1.3;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.archetypeTitleIcon {
+  display: inline-block;
+  color: var(--pop-blue);
+  flex-shrink: 0;
 }
 
 .selectedBadge {
@@ -429,6 +562,11 @@
   color: #FFFFFF;
   border-color: var(--pop-blue);
   box-shadow: 0 0 0 2px rgba(90, 142, 182, 0.2), 0 2px 8px rgba(43, 43, 54, 0.1);
+}
+
+.chipCardActive .inlineIcon,
+.chipCardActive svg {
+  color: currentColor;
 }
 
 /* ── Category Filter Tabs (Step 1) ── */
@@ -1042,11 +1180,12 @@
     opacity: 0.9;
   }
   .stickyBar {
-    padding: 10px 12px;
+    padding: 8px 12px;
     bottom: 8px;
+    font-size: 12px;
   }
   .stickyTotal {
-    font-size: 14px;
+    font-size: 13px;
   }
 }
 
@@ -1374,6 +1513,10 @@
 
 :global([data-theme='noir']) .archetypeLabel {
   color: #FAFAFA;
+}
+
+:global([data-theme='noir']) .archetypeTitleIcon {
+  color: var(--neon-cyan, #00f0ff);
 }
 
 :global([data-theme='noir']) .selectedBadge {
@@ -1775,5 +1918,299 @@
   background: rgba(0, 240, 255, 0.06);
   border-color: var(--neon-cyan, #00f0ff);
   color: var(--pop-cream, #f7f2e8);
+}
+
+/* ── Step 0 Card Content Layout ── */
+
+.step0CardContent {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.step0CardTitle {
+  font-weight: 800;
+  font-size: 15px;
+}
+
+.step0CardDesc {
+  font-size: 13px;
+  opacity: 0.75;
+  margin: 0;
+}
+
+/* ── Submitted Card Actions ── */
+
+.submittedActions {
+  margin-top: 20px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+@media (max-width: 640px) {
+  .submittedActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* ── Error Message ── */
+
+.formError {
+  color: #dc2626;
+  font-size: 13px;
+  margin-top: 12px;
+}
+
+/* ── Summary Box (Step 4 Commercials) ── */
+
+.summaryBox {
+  background: var(--intake-summary-bg);
+  border-radius: 8px;
+  padding: 14px 18px;
+  color: var(--intake-summary-text);
+  margin-bottom: 16px;
+  border: 1px solid var(--intake-summary-border);
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--intake-summary-border);
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.summaryLabel {
+  font-family: var(--font-code);
+  font-size: 12px;
+  color: var(--intake-summary-label);
+}
+
+.summaryValue {
+  font-weight: 700;
+  color: var(--intake-summary-value);
+}
+
+.summaryAccent {
+  font-weight: 700;
+  color: var(--intake-summary-accent);
+}
+
+.summaryTotalRow {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 4px;
+}
+
+.summaryTotalLabel {
+  font-family: var(--font-code);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--intake-summary-text);
+}
+
+.summaryTotalValue {
+  font-family: var(--font-code);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--intake-summary-accent);
+}
+
+.summaryDisclaimer {
+  font-size: 11px;
+  opacity: 0.75;
+  line-height: 1.4;
+  margin: 4px 0 16px 0;
+  color: var(--intake-summary-text);
+}
+
+/* ── Card Content Layouts ── */
+
+.cardSelectable {
+  cursor: pointer;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+  gap: 8px;
+}
+
+.cardTitle {
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.cardPrice {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.cardDesc {
+  margin: 6px 0 0 0;
+  font-size: 11px;
+  opacity: 0.8;
+  line-height: 1.45;
+}
+
+.cardDescShort {
+  font-size: 12px;
+  opacity: 0.65;
+  margin: 6px 0 4px 0;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+}
+
+.cardTurnaround {
+  font-size: 11px;
+  opacity: 0.5;
+}
+
+/* ── Engine & Feature Card Inner Layouts ── */
+
+.engineCardInner {
+  flex: 1;
+}
+
+.engineCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.engineCardTitleRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.engineCardTitle {
+  font-weight: 700;
+}
+
+.engineCardDesc {
+  margin: 3px 0 0 0;
+  font-size: 11px;
+  opacity: 0.7;
+  line-height: 1.4;
+}
+
+/* ── Care Card Description ── */
+
+.careCardDesc {
+  margin: 0 0 8px 0;
+  font-size: 11px;
+  opacity: 0.7;
+  line-height: 1.4;
+}
+
+/* ── Popover Positioning Helpers ── */
+
+.popoverStatic {
+  position: static;
+  left: auto;
+  right: auto;
+}
+
+.popoverCloseBtn {
+  cursor: pointer;
+}
+
+/* ── Quick Service Summary ── */
+
+.quickSummaryLabel {
+  font-weight: 700;
+}
+
+.quickSummaryTotal {
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.quickPdfBtn {
+  width: 100%;
+  justify-content: center;
+}
+
+.quickDisclaimer {
+  font-size: 12px;
+  opacity: 0.65;
+  margin-top: 10px;
+}
+
+/* ── Submit Row Layout ── */
+
+.submitRow {
+  margin-top: 0;
+}
+
+/* ── Field Spacing Helpers ── */
+
+.fieldMarginSm {
+  margin-bottom: 16px;
+}
+
+.fieldMarginMd {
+  margin-bottom: 20px;
+}
+
+.fieldMarginTop {
+  margin-top: 12px;
+}
+
+/* ── Inline Icon ── */
+
+.inlineIcon {
+  display: inline;
+  margin-right: 4px;
+}
+
+/* ── Submitted Card (new naming) ── */
+
+.submittedCard {
+  text-align: center;
+  padding: var(--space-2xl) 0;
+}
+
+.submittedIcon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto var(--space-md) auto;
+  border-radius: 50%;
+  background: rgba(121, 180, 139, 0.15);
+  color: var(--pop-green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.submittedTitle {
+  font-family: var(--font-headline);
+  font-size: var(--text-lg);
+  font-weight: 800;
+  color: var(--pop-green);
+  margin-bottom: var(--space-sm);
+}
+
+.submittedText {
+  font-family: var(--font-code);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: 1.5;
 }
 
