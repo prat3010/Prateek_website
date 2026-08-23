@@ -343,3 +343,102 @@ After each phase:
 4. Mobile testing (375px viewport)
 5. PDF download testing (both themes)
 6. Scope submission + dashboard import end-to-end
+
+---
+
+## Phase 5 — State-of-the-Art (SOTA) Scoping & Quotation Engine
+
+> **Objective:** Elevate the `/scoping` engine from an advanced interactive form into an industry-defining, AI-assisted, productized engineering quotation system (target score: **9.8 / 10**).
+> Designed for high-ticket client acquisition ($3,000 to $35,000+ USD contracts / ₹2.5L to ₹30L INR).
+
+```mermaid
+graph TD
+    subgraph "SOTA Intake Gateway"
+        ENTRY["Landing on /scoping"] --> AUDIENCE_GATE{"Audience Persona Selection"}
+        AUDIENCE_GATE -->|"Outcome-First (Founders/Marketers)"| COPILOT["AI Natural Language Scoping Copilot"]
+        AUDIENCE_GATE -->|"Architecture-First (CTOs/Engineers)"| MATRIX["Granular 4-Step Technical Configurator"]
+        AUDIENCE_GATE -->|"Quick Add-on"| QUICK["Modular Task & Audit Service Flow"]
+    end
+
+    subgraph "Dynamic CPQ Intelligence Engine"
+        COPILOT -->|"Auto-Parsed Scope"| ENGINE["Adaptive Pricing & Graph Solver"]
+        MATRIX -->|"Manual Toggles"| ENGINE
+        ENGINE --> GRAPH_RESOLVER["Bidirectional Graph Dependency Solver"]
+        GRAPH_RESOLVER --> BUNDLE_CALC["Volume Bundle Discounts & Rush Timeline Multipliers"]
+        BUNDLE_CALC --> TOPOLOGY_MAP["Live Visual Architecture Topology Map"]
+    end
+
+    subgraph "Commercial Conversion & Collaboration Portal"
+        TOPOLOGY_MAP --> OUTPUT_SELECT{"Multi-Format Commercial Deliverables"}
+        OUTPUT_SELECT --> PDF_EXEC["1-Page Executive Pitch Brief"]
+        OUTPUT_SELECT --> PDF_SOW["3-Page Itemized Master SOW Brief"]
+        OUTPUT_SELECT --> COLLAB_URL["Live Multi-Stakeholder Collaboration Link"]
+        OUTPUT_SELECT --> DASHBOARD_SYNC["Instant Client Workspace Rehydration (/dashboard)"]
+    end
+```
+
+---
+
+### Phase 5 Work Packages
+
+#### 5.1 AI Natural Language Scoping Copilot
+- [ ] **1-Line Natural Language Scope Parser**
+  - **Component:** `src/components/Intake/AiScopingPromptBar.tsx`
+  - **Behavior:** Renders an intelligent input bar at the top of Step 1: *"Describe what you want to build in plain English (e.g. 'B2B SaaS with AI document search, Stripe billing, and admin center')."*
+  - **API:** Lightweight Edge API route `/api/scoping/parse-intent` (powered by `gemini-3.6-flash`). Returns structured JSON mapping to existing `archetypeId`, `baseEngineId`, and `featureIds` with confidence scores.
+  - **UX:** Auto-populates the wizard with an animated highlight ring on auto-selected features and a summary badge: *"AI Blueprint Generated (94% confidence) — Review & Customize below"*.
+
+#### 5.2 Interactive Dependency Cascade UX (Prerequisite Solver)
+- [ ] **Smart Dependency Disconnect Dialog**
+  - **Component:** `src/components/Intake/DependencyResolutionModal.tsx`
+  - **Problem:** Currently, clicking a prerequisite feature flashes a temporary locked hint with no way to cascade-remove dependents.
+  - **Fix:** When a user clicks to uncheck a prerequisite module (e.g., `auth`), display an immediate, non-blocking confirmation dialog:
+    ```text
+    ┌──────────────────────────────────────────────────────────┐
+    │  Remove Authentication Module?                           │
+    │  This will also remove 2 dependent features:              │
+    │  • Role-Based Admin CMS Center                           │
+    │  • Stripe Customer Billing Portal                        │
+    │                                                          │
+    │  [Keep Prerequisite]       [Remove All 3 Modules (-$900)]│
+    └──────────────────────────────────────────────────────────┘
+    ```
+  - **Test Impact:** Unit tests for recursive dependency removal in `pricing.test.ts`.
+
+#### 5.3 CPQ Commercial Economics & Dynamic Bundling
+- [ ] **Volume Bundle Discounting & Savings Badge**
+  - **Module:** `src/lib/pricing.ts`
+  - **Formula:**
+    - 4–6 selected add-on modules: `5%` bundle discount on total add-on cost.
+    - 7+ selected add-on modules: `10%` bundle discount on total add-on cost.
+  - **UI:** Display animated savings chip in `StickyPriceBar.tsx` and `StepCommercials.tsx`:
+    `🎁 Bundle Savings Applied: -$350 / -₹28,000`.
+- [ ] **Expedited Timeline Rush Multiplier**
+  - **Options:**
+    - `Standard Delivery (3–4 weeks)`: `1.0x` baseline.
+    - `Fast-Track MVP Sprint (2 weeks)`: `1.25x` rush multiplier (+25% dedicated sprint priority).
+    - `Flexible Off-Peak (6–8 weeks)`: `0.95x` discount (-5% flexible turnaround).
+  - **Storage:** Persisted to `scopePayload.timelineMultiplier` and reflected in itemized SOW.
+
+#### 5.4 Live Visual Architecture Topology Map
+- [ ] **Real-Time Interactive Stack Diagram**
+  - **Component:** `src/components/Intake/ArchitectureTopologyMap.tsx`
+  - **Behavior:** A collapsible visual topology view rendered on Step 2 that updates in real time as modules are checked.
+  - **Visual Nodes:**
+    `[Client / PWA]` ──→ `[Next.js 16 Edge Proxy]` ──→ `[Supabase PostgreSQL / RLS]` ──→ `[PgVector / RAG Engine]` ──→ `[Resend / Stripe]`
+  - **Technology:** Lightweight CSS Grid / SVG connector lines with micro-pulse animations when new nodes are added. Gives non-technical clients immediate visual clarity and reassurance of enterprise-grade architecture.
+
+#### 5.5 Multi-Stakeholder Collaboration & Interactive Proposal Portal
+- [ ] **Live Collaborative Scope URL with Versioning**
+  - **Route:** `/scoping?share=SCOPE-XXXXX&version=1`
+  - **Capability:** Anyone opening a share link sees the exact configuration with a "Fork & Customize" button. Allows technical leads and co-founders to tweak options side-by-side without overriding the original sender's draft.
+- [ ] **Dashboard Bidirectional Scope Customizer**
+  - **Location:** `src/app/dashboard/components/ScopeDetailModal.tsx`
+  - **Capability:** Authenticated clients can reopen their saved scope in an interactive editor on `/dashboard`, modify features, see updated milestone payments, and re-sign the proposal before executing the deposit.
+
+#### 5.6 Multi-Format Commercial Proposal Suite (PDF 2.0)
+- [ ] **1-Page Executive Pitch Sheet** (`ExecutiveOnePagerPDF.tsx`)
+  - Designed specifically for non-technical investors, CEOs, and board approvals.
+  - Focuses on ROI, primary business outcome KPI, delivery timeline, and total investment summary without overwhelming technical module jargon.
+- [ ] **3-Page Technical Scope of Work (SOW)** (`ScopingBriefPDF.tsx` enhancement)
+  - Enhanced with explicit boundary matrices: *Included in Build* vs *Out of Scope Boundaries*, Cloud Infrastructure SLA, and Milestone Escrow terms.
