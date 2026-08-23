@@ -31,6 +31,7 @@ import {
   ESTIMATE_DISCLAIMER,
   formatMoney,
   formatPricePair,
+  packageTotalForArchetype,
   resolveDefaultCurrency,
   resolveFeatureDependencies,
   type Currency,
@@ -65,6 +66,10 @@ export interface IntakePreset {
   engineId?: string;
   serviceType?: 'full' | 'quick' | 'care';
   quickServiceId?: string;
+  featureIds?: string[];
+  brandId?: string;
+  careId?: string;
+  currency?: Currency;
 }
 
 interface IntakeFormProps {
@@ -131,7 +136,7 @@ export const QUICK_CATEGORIES: { id: 'all' | 'ai' | 'integration' | 'performance
 
 export default function IntakeForm({ resumeData, initialPreset = null }: IntakeFormProps) {
   const { isNoir, region } = useTheme();
-  const [currency, setCurrency] = useState<Currency>(() => resolveDefaultCurrency(region));
+  const [currency, setCurrency] = useState<Currency>(() => initialPreset?.currency || resolveDefaultCurrency(region));
   const intakeConfig = resumeData?.intake;
 
   const engines = useMemo(() => {
@@ -270,8 +275,8 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     return goals[0];
   }, [initialPreset, goals]);
 
-  // Compulsory goal features plus any transitive dependsOn modules, so a deep-linked
-  // archetype (e.g. booking → auth) starts with a complete, consistent selection.
+  // Compulsory goal features plus any transitive dependsOn modules, plus any explicitly
+  // passed featureIds in deep link URLs (e.g. shareable custom quote link).
   const initialSelectedFeatures = useMemo(() => {
     const labels = new Set<string>(initialArchetype.compulsoryFeatureLabels);
     const baseIds = features.filter(f => labels.has(f.label)).map(f => f.id);
@@ -279,8 +284,20 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
       const label = features.find(f => f.id === id)?.label;
       if (label) labels.add(label);
     });
+
+    if (initialPreset?.featureIds && initialPreset.featureIds.length > 0) {
+      initialPreset.featureIds.forEach(id => {
+        const feat = features.find(f => f.id === id);
+        if (feat) labels.add(feat.label);
+      });
+      const allIds = features.filter(f => labels.has(f.label)).map(f => f.id);
+      resolveFeatureDependencies(allIds, features).forEach(id => {
+        const label = features.find(f => f.id === id)?.label;
+        if (label) labels.add(label);
+      });
+    }
     return Array.from(labels);
-  }, [initialArchetype, features]);
+  }, [initialArchetype, initialPreset, features]);
 
 interface IntakeFormData {
   companyName: string;
@@ -303,9 +320,26 @@ interface IntakeFormData {
   agreedToTerms: boolean;
 }
 
-  const hasDeepLink = Boolean(initialPreset?.goalId || initialPreset?.engineId);
+  const hasDeepLink = Boolean(
+    initialPreset?.goalId ||
+    initialPreset?.engineId ||
+    (initialPreset?.featureIds && initialPreset.featureIds.length > 0) ||
+    initialPreset?.brandId ||
+    initialPreset?.careId ||
+    initialPreset?.currency
+  );
 
   const [formData, setFormData] = useState<IntakeFormData>(() => {
+    const initialEngineId = (hasDeepLink && initialPreset?.engineId)
+      ? initialPreset.engineId
+      : initialArchetype.recommendedEngineId;
+    const initialBrandId = (hasDeepLink && initialPreset?.brandId)
+      ? initialPreset.brandId
+      : (brandAssets[0]?.id || '');
+    const initialCareId = (hasDeepLink && initialPreset?.careId)
+      ? initialPreset.careId
+      : '';
+
     if (typeof window !== 'undefined') {
       try {
         const savedDraft = localStorage.getItem('prateeq_scoping_draft');
@@ -319,11 +353,11 @@ interface IntakeFormData {
             businessKPI: parsed.businessKPI || '🚀 Increase Lead & Customer Conversion Rate',
             projectStartType: parsed.projectStartType || 'greenfield',
             targetAudience: parsed.targetAudience || '',
-            selectedBaseEngineId: (hasDeepLink ? initialArchetype.recommendedEngineId : parsed.selectedBaseEngineId) || initialArchetype.recommendedEngineId,
+            selectedBaseEngineId: hasDeepLink ? initialEngineId : (parsed.selectedBaseEngineId || initialEngineId),
             selectedFeatures: hasDeepLink ? initialSelectedFeatures : (Array.isArray(parsed.selectedFeatures) ? (parsed.selectedFeatures as string[]) : initialSelectedFeatures),
-            selectedBrandAssetId: parsed.selectedBrandAssetId || (brandAssets[0]?.id || ''),
+            selectedBrandAssetId: hasDeepLink ? initialBrandId : (parsed.selectedBrandAssetId || initialBrandId),
             designReadiness: parsed.designReadiness || 'figma_ready',
-            selectedMaintenanceId: parsed.selectedMaintenanceId || '',
+            selectedMaintenanceId: hasDeepLink ? initialCareId : (parsed.selectedMaintenanceId || initialCareId),
             hostingOwnership: parsed.hostingOwnership || 'client_owned',
             taxInvoicingPreference: parsed.taxInvoicingPreference || 'standard',
             inspirationLinks: parsed.inspirationLinks || '',
@@ -343,11 +377,11 @@ interface IntakeFormData {
       businessKPI: '🚀 Increase Lead & Customer Conversion Rate',
       projectStartType: 'greenfield',
       targetAudience: '',
-      selectedBaseEngineId: initialArchetype.recommendedEngineId,
+      selectedBaseEngineId: initialEngineId,
       selectedFeatures: initialSelectedFeatures,
-      selectedBrandAssetId: brandAssets[0]?.id || '',
+      selectedBrandAssetId: initialBrandId,
       designReadiness: 'figma_ready',
-      selectedMaintenanceId: '',
+      selectedMaintenanceId: initialCareId,
       hostingOwnership: 'client_owned',
       taxInvoicingPreference: 'standard',
       inspirationLinks: '',
@@ -1218,6 +1252,9 @@ interface IntakeFormData {
                               </span>
                               <span className={styles.featureCountTag}>
                                 {`${g.compulsoryFeatureLabels.length} Core Module${g.compulsoryFeatureLabels.length > 1 ? 's' : ''}`}
+                              </span>
+                              <span className={styles.archetypePriceBadge}>
+                                {`Starts at ${formatMoney(packageTotalForArchetype(g, engines, features, currency), currency)}`}
                               </span>
                             </div>
                           </div>

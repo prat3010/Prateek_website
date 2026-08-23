@@ -375,6 +375,25 @@
   color: var(--color-text-muted);
 }
 
+.archetypePriceBadge {
+  font-family: var(--font-code);
+  font-size: 10px;
+  font-weight: 800;
+  color: #3F6E91;
+  background: rgba(90, 142, 182, 0.1);
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid var(--pop-blue);
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+:global([data-theme='noir']) .archetypePriceBadge {
+  color: var(--neon-cyan, #00f0ff);
+  background: rgba(0, 240, 255, 0.12);
+  border-color: var(--neon-cyan, #00f0ff);
+}
+
 /* ── Chip Selectors ── */
 
 .chipGrid {
