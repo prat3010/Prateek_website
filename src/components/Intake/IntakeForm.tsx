@@ -22,6 +22,7 @@ import NumberFlow from '@number-flow/react';
 import confetti from 'canvas-confetti';
 import { toast } from 'sonner';
 import { generateQuestionnairePDF, generateQuestionnairePDFBase64, type QuestionnaireData } from '@/utils/pdfGenerator';
+import { useLenis } from 'lenis/react';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import {
@@ -204,13 +205,19 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   };
   const [, setRecaptchaReady] = useState(!SITE_KEY);
   const [recaptchaUnavailable, setRecaptchaUnavailable] = useState(false);
+  const lenis = useLenis();
   const containerRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (containerRef.current && currentStep > 1) {
-      containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (lenis) {
+        lenis.scrollTo(containerRef.current, { offset: -90, duration: 0.8 });
+      } else {
+        const top = containerRef.current.getBoundingClientRect().top + window.scrollY - 90;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
     }
-  }, [currentStep]);
+  }, [currentStep, lenis]);
 
   const dependsOnMap = useMemo(() => {
     const map: Record<string, string[]> = {};
@@ -1410,7 +1417,7 @@ interface IntakeFormData {
                             <h4 className={styles.featureCategoryTitle}>{cat.title}</h4>
                             <p className={styles.featureCategoryDesc}>{cat.description}</p>
                           </div>
-                          <div className={styles.checkboxGrid} data-lenis-prevent>
+                          <div className={styles.checkboxGrid}>
                             {categoryFeatures.map(m => {
                               const isCompulsory = currentArchetype.compulsoryFeatureLabels.includes(m.label);
                               const isLegacyRequired = formData.projectStartType === 'legacy_rebuild' && m.autoIncludeOnLegacy;
