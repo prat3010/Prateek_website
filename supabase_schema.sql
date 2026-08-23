@@ -735,9 +735,14 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
   quality_score INTEGER DEFAULT 80,
   intent_source TEXT DEFAULT 'google',
   verification_reason TEXT DEFAULT '',
+  linkedin_url TEXT DEFAULT '',
+  twitter_handle TEXT DEFAULT '',
   created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+ALTER TABLE outreach_leads ADD COLUMN IF NOT EXISTS linkedin_url TEXT DEFAULT '';
+ALTER TABLE outreach_leads ADD COLUMN IF NOT EXISTS twitter_handle TEXT DEFAULT '';
 
 ALTER TABLE outreach_leads ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow service role full access outreach_leads" ON outreach_leads;

@@ -56,7 +56,7 @@ export interface InvoiceCalculationResult {
 /**
  * Determines whether a place of supply or state matches the seller state for Intra-State GST.
  */
-export function isIntraState(placeOfSupply?: string): boolean {
+function isIntraState(placeOfSupply?: string): boolean {
   if (!placeOfSupply) return true;
   const sellerState = SELLER_CONFIG.address.state.trim().toLowerCase();
   const clientState = placeOfSupply.trim().toLowerCase();

@@ -15,8 +15,6 @@ export const ESTIMATE_DISCLAIMER =
   'third-party dependencies, technical complexity, and project-specific risk. A final line-item quotation and ' +
   'Scoping Specification will be issued before development begins.';
 
-export const CARE_OVERAGE_DEFAULT =
-  'Overage beyond the included hours requires written approval and is billed separately. Unused hours do not roll over.';
 
 export function formatMoney(amount: number, currency: Currency): string {
   const locale = currency === 'INR' ? 'en-IN' : 'en-US';

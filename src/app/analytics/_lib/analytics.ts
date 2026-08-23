@@ -25,7 +25,7 @@ interface FetchResult {
  * is not configured or the query fails — no mock data fallback.
  * Uses a limit of QUERY_LIMIT to prevent fetching too many rows.
  */
-export async function fetchVisits(range: TimeRange, customLimit?: number): Promise<FetchResult> {
+async function fetchVisits(range: TimeRange, customLimit?: number): Promise<FetchResult> {
   if (!supabase) {
     return {
       visits: [],
@@ -57,7 +57,7 @@ export async function fetchVisits(range: TimeRange, customLimit?: number): Promi
 /**
  * Aggregate raw visits into dashboard statistics in a single optimized pass.
  */
-export function aggregateVisits(visits: PageVisit[]): AggregatedStats {
+function aggregateVisits(visits: PageVisit[]): AggregatedStats {
   let totalViews = 0;
   let totalBots = 0;
   let mobileCount = 0;

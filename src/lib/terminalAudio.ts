@@ -20,9 +20,6 @@ export function toggleAudio(): boolean {
   return !isMuted;
 }
 
-export function isAudioMuted(): boolean {
-  return isMuted;
-}
 
 export function playKeySound(): void {
   if (isMuted) return;
