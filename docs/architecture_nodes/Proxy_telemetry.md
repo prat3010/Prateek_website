@@ -4,14 +4,22 @@ tier: 4_api_gateway
 platform: Prateek_Website
 status: production
 auth_level: service_role
+blast_radius: critical
 file_path: src/proxy.ts
 ide_cursor_uri: "cursor://file/Users/prateeksharma/Developer/Prateek_website/src/proxy.ts"
 ide_vscode_uri: "vscode://file/Users/prateeksharma/Developer/Prateek_website/src/proxy.ts"
+runbook: docs/runbooks/RUNBOOK_NEW_API_ENDPOINT.md
 tags:
   - tier/4_api_gateway
   - security/service_role
   - domain/telemetry
   - platform/website
+invariants:
+  - "All public telemetry IP addresses MUST be hashed daily using salted SHA-256 (GDPR zero-PII)."
+  - "Service role key MUST stay strictly server-only and never leak to client bundle."
+  - "Session tokens MUST be cryptographically verified via Supabase Auth getUser()."
+test_suites:
+  - src/lib/__tests__/security.test.ts
 downstream:
   - ../13_Telemetry_and_Analytics
   - ../16_Security_and_Privacy
@@ -42,3 +50,11 @@ downstream:
 - [16_Security_and_Privacy](../16_Security_and_Privacy.md)
 - [Schema: page_visits](Schema_page_visits.md)
 - [Route: /analytics](Route_analytics.md)
+
+## 🛡️ Non-Negotiable Invariants & Safety Constraints
+> **Blast Radius:** `CRITICAL` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](docs/runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
+
+1. **All public telemetry IP addresses MUST be hashed daily using salted SHA-256 (GDPR zero-PII).**
+2. **Service role key MUST stay strictly server-only and never leak to client bundle.**
+3. **Session tokens MUST be cryptographically verified via Supabase Auth getUser().**
+

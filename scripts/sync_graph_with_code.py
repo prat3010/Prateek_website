@@ -49,8 +49,19 @@ def main():
     os.system(f"python3 {WEBSITE_DIR}/scripts/enrich_docs_links.py")
     os.system(f"python3 {WEBSITE_DIR}/scripts/create_architecture_canvas.py")
     os.system(f"python3 {WEBSITE_DIR}/scripts/create_subsystem_canvases.py")
+    os.system(f"python3 {WEBSITE_DIR}/scripts/generate_architecture_index.py")
     os.system(f"python3 {WEBSITE_DIR}/scripts/audit_contracts.py")
     os.system(f"python3 {WEBSITE_DIR}/scripts/generate_architecture_map.py")
+    
+    # Sync Runbooks & Index to Obsidian Ecosystem Vault
+    vault_dir = Path("/Users/prateeksharma/Developer/Prateek_Ecosystem_Vault")
+    if vault_dir.exists():
+        import shutil
+        (vault_dir / "runbooks").mkdir(exist_ok=True)
+        for rb in (DOCS_DIR / "runbooks").glob("*.md"):
+            shutil.copy2(rb, vault_dir / "runbooks" / rb.name)
+        if (DOCS_DIR / "00_ARCHITECTURE_INDEX.md").exists():
+            shutil.copy2(DOCS_DIR / "00_ARCHITECTURE_INDEX.md", vault_dir / "00_ARCHITECTURE_INDEX.md")
     
     print("\n✨ Codebase and Architecture Knowledge Graph are 100% synchronized!")
 

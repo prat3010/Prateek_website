@@ -4,14 +4,21 @@ tier: 3_workspace_control
 platform: Prateek_Website
 status: production
 auth_level: public
+blast_radius: medium
 file_path: src/app/admin/page.tsx
 ide_cursor_uri: "cursor://file/Users/prateeksharma/Developer/Prateek_website/src/app/admin/page.tsx"
 ide_vscode_uri: "vscode://file/Users/prateeksharma/Developer/Prateek_website/src/app/admin/page.tsx"
+runbook: docs/runbooks/RUNBOOK_NEW_API_ENDPOINT.md
 tags:
   - tier/3_workspace_control
   - security/public
   - domain/workspace
   - platform/website
+invariants:
+  - "Interactive modals inside ScrollSection MUST use <Portal> to escape CSS containing blocks."
+  - "Component / handler MUST handle missing Supabase connections gracefully via local fallback."
+test_suites:
+  - src/lib/__tests__/data.test.ts
 downstream:
   - ../AI_OUTREACH_AGENT_ROADMAP
   - Route_admin
@@ -38,3 +45,10 @@ downstream:
 - [Route: /admin](Route_admin.md)
 - [API: outreach/dispatch](API_outreach_dispatch.md)
 - [Schema: outreach_leads](Schema_outreach_leads.md)
+
+## 🛡️ Non-Negotiable Invariants & Safety Constraints
+> **Blast Radius:** `MEDIUM` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](docs/runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
+
+1. **Interactive modals inside ScrollSection MUST use <Portal> to escape CSS containing blocks.**
+2. **Component / handler MUST handle missing Supabase connections gracefully via local fallback.**
+

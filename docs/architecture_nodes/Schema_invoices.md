@@ -4,14 +4,24 @@ tier: 8_persistence
 platform: Prateek_Website
 status: production
 auth_level: public
+blast_radius: critical
 file_path: supabase_schema.sql
 ide_cursor_uri: "cursor://file/Users/prateeksharma/Developer/Prateek_website/supabase_schema.sql"
 ide_vscode_uri: "vscode://file/Users/prateeksharma/Developer/Prateek_website/supabase_schema.sql"
+runbook: docs/runbooks/RUNBOOK_NEW_API_ENDPOINT.md
 tags:
   - tier/8_persistence
   - security/public
   - domain/database
   - platform/website
+invariants:
+  - "Client email MUST be extracted from verified JWT session, NEVER accepted from request parameters."
+  - "Order amounts MUST match exact pricing rules (50% milestone deposit) computed server-side."
+  - "Payment signatures MUST be validated using crypto.timingSafeEqual HMAC-SHA256."
+  - "Webhook events MUST be deduplicated via processed_webhooks unique event_id ledger."
+test_suites:
+  - src/app/api/__tests__/razorpay.test.ts
+  - src/app/api/__tests__/invoicing.test.ts
 downstream:
   - ../14_Razorpay_Payments_and_Invoicing
   - Schema_client_scopes
@@ -52,3 +62,12 @@ CREATE TABLE IF NOT EXISTS invoices (
 - [Schema: client_scopes](Schema_client_scopes.md)
 - [API: client/verify-razorpay-payment](API_client_verify_razorpay_payment.md)
 - [Engine: Digital SOW Escrow Freeze](Engine_Digital_SOW_Escrow_Freeze.md)
+
+## 🛡️ Non-Negotiable Invariants & Safety Constraints
+> **Blast Radius:** `CRITICAL` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](docs/runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
+
+1. **Client email MUST be extracted from verified JWT session, NEVER accepted from request parameters.**
+2. **Order amounts MUST match exact pricing rules (50% milestone deposit) computed server-side.**
+3. **Payment signatures MUST be validated using crypto.timingSafeEqual HMAC-SHA256.**
+4. **Webhook events MUST be deduplicated via processed_webhooks unique event_id ledger.**
+

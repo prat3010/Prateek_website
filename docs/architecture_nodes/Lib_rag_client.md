@@ -4,14 +4,21 @@ tier: 5_domain_providers
 platform: Prateek_Website
 status: production
 auth_level: public
+blast_radius: medium
 file_path: src/lib/rag-client.ts
 ide_cursor_uri: "cursor://file/Users/prateeksharma/Developer/Prateek_website/src/lib/rag-client.ts"
 ide_vscode_uri: "vscode://file/Users/prateeksharma/Developer/Prateek_website/src/lib/rag-client.ts"
+runbook: docs/runbooks/RUNBOOK_NEW_API_ENDPOINT.md
 tags:
   - tier/5_domain_providers
   - security/public
   - domain/domain_lib
   - platform/website
+invariants:
+  - "Interactive modals inside ScrollSection MUST use <Portal> to escape CSS containing blocks."
+  - "Component / handler MUST handle missing Supabase connections gracefully via local fallback."
+test_suites:
+  - src/lib/__tests__/data.test.ts
 downstream:
   - ../24_RAG_App_Studio_PRD
   - Route_rag_app
@@ -42,3 +49,10 @@ downstream:
 - [Route: /rag/app](Route_rag_app.md)
 - [Retriever_API: v1/chat](Retriever_API_v1_chat.md)
 - [Engine: Dogfooding Tenant prateeq_scoping](Engine_Dogfooding_Tenant_prateeq_scoping.md)
+
+## 🛡️ Non-Negotiable Invariants & Safety Constraints
+> **Blast Radius:** `MEDIUM` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](docs/runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
+
+1. **Interactive modals inside ScrollSection MUST use <Portal> to escape CSS containing blocks.**
+2. **Component / handler MUST handle missing Supabase connections gracefully via local fallback.**
+

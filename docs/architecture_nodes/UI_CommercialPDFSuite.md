@@ -4,14 +4,21 @@ tier: 5_domain_providers
 platform: Prateek_Website
 status: production
 auth_level: public
+blast_radius: medium
 file_path: src/
 ide_cursor_uri: "cursor://file/Users/prateeksharma/Developer/Prateek_website/src/"
 ide_vscode_uri: "vscode://file/Users/prateeksharma/Developer/Prateek_website/src/"
+runbook: docs/runbooks/RUNBOOK_NEW_API_ENDPOINT.md
 tags:
   - tier/5_domain_providers
   - security/public
   - domain/pdf
   - platform/website
+invariants:
+  - "Interactive modals inside ScrollSection MUST use <Portal> to escape CSS containing blocks."
+  - "Component / handler MUST handle missing Supabase connections gracefully via local fallback."
+test_suites:
+  - src/lib/__tests__/data.test.ts
 downstream:
   - ../99_DECISIONS
   - UI_ScopingLab
@@ -39,3 +46,10 @@ downstream:
 - [99_DECISIONS (ADR 11 & 12)](../99_DECISIONS.md)
 - [UI: ScopingLab](UI_ScopingLab.md)
 - [UI: MiddlemanAgreement](UI_MiddlemanAgreement.md)
+
+## 🛡️ Non-Negotiable Invariants & Safety Constraints
+> **Blast Radius:** `MEDIUM` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_NEW_API_ENDPOINT](docs/runbooks/RUNBOOK_NEW_API_ENDPOINT.md)
+
+1. **Interactive modals inside ScrollSection MUST use <Portal> to escape CSS containing blocks.**
+2. **Component / handler MUST handle missing Supabase connections gracefully via local fallback.**
+
