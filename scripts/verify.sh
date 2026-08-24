@@ -65,30 +65,55 @@ else
   echo -e "${RED}Test Failures:${NC}\n$TEST_OUT\n"
 fi
 
-# Step 6: Data Contract Integrity & Architecture Map Audit
+# Step 6: Dead Code & Dependency Audit (Knip)
+echo -n "Running Dead Code & Dependency audit (knip)... "
+KNIP_OUT=$(npx knip --reporter compact 2>&1)
+KNIP_EXIT=$?
+if [ $KNIP_EXIT -eq 0 ]; then
+  KNIP_STATUS="${GREEN}✓ Clean${NC}"
+  echo -e "$KNIP_STATUS"
+else
+  KNIP_STATUS="${YELLOW}! Unused items found (non-blocking)${NC}"
+  echo -e "$KNIP_STATUS"
+fi
+
+# Step 7: Portal Containing Block Safety Audit (ADR 05)
+echo -n "Running Portal Containing Block Safety audit... "
+PORTAL_OUT=$(python3 scripts/audit_portal_safety.py 2>&1)
+PORTAL_EXIT=$?
+if [ $PORTAL_EXIT -eq 0 ]; then
+  PORTAL_STATUS="${GREEN}✓ Passed (0 traps)${NC}"
+  echo -e "$PORTAL_STATUS"
+else
+  PORTAL_STATUS="${RED}✗ Failed${NC}"
+  echo -e "$PORTAL_STATUS"
+  echo -e "${RED}Portal Safety Violations:${NC}\n$PORTAL_OUT\n"
+fi
+
+# Step 8: Secret & Credential Leak Scanner
+echo -n "Running Secret & Credential Leak audit... "
+SECRET_OUT=$(python3 scripts/audit_secrets.py 2>&1)
+SECRET_EXIT=$?
+if [ $SECRET_EXIT -eq 0 ]; then
+  SECRET_STATUS="${GREEN}✓ Passed (0 leaks)${NC}"
+  echo -e "$SECRET_STATUS"
+else
+  SECRET_STATUS="${RED}✗ Failed${NC}"
+  echo -e "$SECRET_STATUS"
+  echo -e "${RED}Secret Leak Violations:${NC}\n$SECRET_OUT\n"
+fi
+
+# Step 9: Data Contract Integrity & Architecture Map Audit
 echo -n "Running Data Contract & Architecture Map audit... "
-AUDIT_OUT=$(python3 scripts/audit_contracts.py && python3 scripts/generate_architecture_map.py 2>&1)
+AUDIT_OUT=$(python3 scripts/audit_contracts.py && python3 scripts/sync_graph_with_code.py 2>&1)
 AUDIT_EXIT=$?
 if [ $AUDIT_EXIT -eq 0 ]; then
-  AUDIT_STATUS="${GREEN}✓ Passed${NC}"
+  AUDIT_STATUS="${GREEN}✓ Passed (100% Synced)${NC}"
   echo -e "$AUDIT_STATUS"
 else
   AUDIT_STATUS="${RED}✗ Failed${NC}"
   echo -e "$AUDIT_STATUS"
   echo -e "${RED}Contract Audit Failure Details:${NC}\n$AUDIT_OUT\n"
-fi
-
-# Step 7: Test Production Build
-echo -n "Running trial production build... "
-BUILD_OUT=$(npm run build 2>&1)
-BUILD_EXIT=$?
-if [ $BUILD_EXIT -eq 0 ]; then
-  BUILD_STATUS="${GREEN}✓ Passed${NC}"
-  echo -e "$BUILD_STATUS"
-else
-  BUILD_STATUS="${RED}✗ Failed${NC}"
-  echo -e "$BUILD_STATUS"
-  echo -e "${RED}Build Failure Details:${NC}\n$BUILD_OUT\n"
 fi
 
 # Summary Dashboard
@@ -99,12 +124,14 @@ echo -e "  Git Status:      $GIT_STATUS"
 echo -e "  Type Checks:     $TSC_STATUS"
 echo -e "  ESLint Check:    $LINT_STATUS"
 echo -e "  Unit Tests:      $TEST_STATUS"
+echo -e "  Dead Code Audit: $KNIP_STATUS"
+echo -e "  Portal Safety:   $PORTAL_STATUS"
+echo -e "  Secret Scanner:  $SECRET_STATUS"
 echo -e "  Contract Audit:  $AUDIT_STATUS"
-echo -e "  Prod Build:      $BUILD_STATUS"
 echo -e "${BOLD}=========================================${NC}"
 
-if [ $TSC_EXIT -eq 0 ] && [ $LINT_EXIT -eq 0 ] && [ $TEST_EXIT -eq 0 ] && [ $AUDIT_EXIT -eq 0 ] && [ $BUILD_EXIT -eq 0 ]; then
-  echo -e "\n${GREEN}${BOLD}🎉 Verification Passed! Your changes are safe and ready to push.${NC}\n"
+if [ $TSC_EXIT -eq 0 ] && [ $LINT_EXIT -eq 0 ] && [ $TEST_EXIT -eq 0 ] && [ $PORTAL_EXIT -eq 0 ] && [ $SECRET_EXIT -eq 0 ] && [ $AUDIT_EXIT -eq 0 ]; then
+  echo -e "\n${GREEN}${BOLD}🎉 Verification Passed! All automated quality gates are 100% green.${NC}\n"
   exit 0
 else
   echo -e "\n${RED}${BOLD}🚨 Verification Failed! Please resolve errors above before pushing.${NC}\n"

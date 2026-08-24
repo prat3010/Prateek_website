@@ -1,0 +1,20 @@
+{
+  "$schema": "https://unpkg.com/knip@5/overview/configuration-schema.json",
+  "entry": [
+    "src/app/**/{page,layout,loading,error,not-found,route}.{ts,tsx}",
+    "scripts/**/*.{js,mjs,ts}",
+    "playwright.config.ts",
+    "e2e/**/*.spec.ts"
+  ],
+  "project": [
+    "src/**/*.{ts,tsx}!",
+    "scripts/**/*.{js,mjs,ts}!",
+    "e2e/**/*.spec.ts!"
+  ],
+  "ignore": [
+    "src/components/effects/wobblyPaths.generated.ts"
+  ],
+  "ignoreDependencies": [
+    "streamlit"
+  ]
+}

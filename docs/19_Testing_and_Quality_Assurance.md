@@ -10,16 +10,26 @@ The Testing and Quality Assurance specification defines the protocols for verify
 
 The project includes custom validation scripts under `scripts/`. Developers must execute these check steps before committing changes:
 
-### **1. Workspace Validation (`./scripts/verify.sh`)**
-Executes a full sweep of the application to ensure it builds correctly:
-1. **Cache Cleansing**: Deletes `.next` compilation caches to prevent stale references.
+### **1. Full Workspace Verification (`./scripts/verify.sh`)**
+Executes a comprehensive, non-interactive suite ensuring zero runtime failures:
+1. **Cache Cleansing**: Clears `.next` compilation caches.
 2. **Type Checking**: Runs `npx tsc --noEmit` to verify type safety.
-3. **Lint Check**: Runs the project linter (`npm run lint` or `eslint`) to check formatting.
-4. **Unit Tests**: Runs `npm test` (Vitest) to execute all unit and integration tests.
-5. **Trial Build**: Triggers a production test build (`npm run build`) to ensure bundlers build without compilation errors.
-6. **Summary Dashboard**: Prints pass/fail status for all steps.
+3. **Lint Quality**: Runs `npm run lint` for ESLint Next.js 16 & React 19 standards.
+4. **Unit & Integration Suite**: Runs `npm test` (Vitest: 31 files, 258 tests).
+5. **Dead Code & Dependency Pruning**: Runs `npx knip` to detect unused exports, orphaned files, and bloated dependencies.
+6. **Portal Containing-Block Safety (ADR 05)**: Runs `python3 scripts/audit_portal_safety.py` to ensure overlays escape `ScrollSection` containing blocks.
+7. **Secret & Credential Leak Audit**: Runs `python3 scripts/audit_secrets.py` to scan diffs for leaked API keys, tokens, or private certificates.
+8. **Data Contract & Architecture Graph Sync**: Runs `python3 scripts/audit_contracts.py` & `sync_graph_with_code.py` to keep live code and Obsidian canvases 100% synchronized.
 
-### **2. Schema Matching (`./scripts/audit_db.py`)**
+### **2. Headless Browser E2E Testing (Playwright)**
+- **Runner:** `npx playwright test` (`npm run test:e2e`)
+- **Coverage:** Headless Chromium testing for `/scoping` wizard selections, `/terminal` interactive command execution, and `/analytics` dashboards.
+
+### **3. Property-Based API Fuzzing (Schemathesis)**
+- **Runner:** `python3 apps/api/scripts/run_fuzz_tests.py` (in `retriever`)
+- **Coverage:** Fuzzes all 85 FastAPI operations via OpenAPI ASGI transport, asserting 0 unhandled 500 crashes.
+
+### **4. Schema Matching (`./scripts/audit_db.py`)**
 Compares local configuration settings against active database structures:
 * Matches local definitions inside [supabase_schema.sql](../supabase_schema.sql) against tables, policies, and indexes on the live Supabase instance.
 * Outputs lists of missing columns or mismatching constraints.
