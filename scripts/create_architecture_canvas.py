@@ -129,9 +129,9 @@ def generate_nodes():
     g6_files = [
         "Retriever_API_v1_chat.md", "Retriever_API_v1_search.md", "Retriever_API_v1_documents.md", "Retriever_API_v1_admin.md",
         "Retriever_API_v1_workflow.md", "Retriever_API_v1_health.md", "Retriever_API_v1_auth.md", "Retriever_API_v1_consensus.md",
-        "Retriever_API_v1_payments.md", "Retriever_API_v1_rlm.md", "Retriever_API_v1_tenant.md", "Engine_Docling_Layout_OCR.md",
-        "Engine_LlamaGuard_Guardrails.md", "Engine_MultiAgent_Consensus.md", "Engine_LongLLMLingua_Compression.md",
-        "Engine_RLM_Python_REPL.md", "Engine_GraphRAG_Topology.md"
+        "Retriever_API_v1_payments.md", "Retriever_API_v1_pricing.md", "Retriever_API_v1_agentic.md", "Retriever_API_v1_rlm.md",
+        "Retriever_API_v1_tenant.md", "Engine_Docling_Layout_OCR.md", "Engine_LlamaGuard_Guardrails.md",
+        "Engine_MultiAgent_Consensus.md", "Engine_LongLLMLingua_Compression.md", "Engine_RLM_Python_REPL.md", "Engine_GraphRAG_Topology.md"
     ]
     g6_nodes, col3_y = layout_group("grp-retriever", "6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPI Routers", "4", g6_files, col3_x, col3_y, 2)
     nodes.extend(g6_nodes)

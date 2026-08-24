@@ -1562,6 +1562,37 @@ CREATE TABLE IF NOT EXISTS promo_codes (
 - [14_Razorpay_Payments_and_Invoicing](../14_Razorpay_Payments_and_Invoicing.md)
 """,
 
+    "Retriever_API_v1_pricing.md": """# Retriever API: `apps/api/src/routers/pricing.py`
+
+#retriever #api #pricing #saas
+
+> **Multi-Currency SaaS Tier Pricing Engine & Plan Catalog.**
+
+- **Endpoints:** `/v1/pricing`, `/v1/pricing` (Admin)
+
+---
+
+## 🔗 Related Architecture & Cross-References
+- [24_RAG_App_Studio_PRD](../24_RAG_App_Studio_PRD.md)
+- [Lib: pricing](Lib_pricing.md)
+""",
+
+    "Retriever_API_v1_agentic.md": """# Retriever API: `apps/api/src/routers/agentic.py`
+
+#retriever #api #agentic #react #reasoning
+
+> **Agentic ReAct Reasoning Loops, Tool Calling & Multi-Step Planning.**
+
+- **Endpoints:** `/v1/agentic/reason`
+
+---
+
+## 🔗 Related Architecture & Cross-References
+- [24_RAG_App_Studio_PRD](../24_RAG_App_Studio_PRD.md)
+- [Engine: RLM Python REPL Sandbox](Engine_RLM_Python_REPL.md)
+- [Engine: MultiAgent Consensus](Engine_MultiAgent_Consensus.md)
+""",
+
     "Retriever_API_v1_workflow.md": """# Retriever API: `apps/api/src/routers/workflow.py`
 
 #retriever #api #agentic #workflow

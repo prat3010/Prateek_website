@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
@@ -120,8 +121,6 @@ async function fetchGitHubCommitDetail(owner: string, repo: string, commitHash: 
 function readLocalDevCommits(): GitCommit[] {
   if (process.env.NODE_ENV !== 'development') return [];
   try {
-    // eslint-disable-next-disable-next-line @typescript-eslint/no-require-imports
-    const { execSync } = require('child_process');
     const stdout = execSync('git log -n 10 --pretty=format:"%h|%an|%ar|%s"', { timeout: 3000 }).toString();
     const commits = stdout.trim().split('\n').map((line: string) => {
       const [hash, author, date, subject] = line.split('|');
@@ -136,8 +135,6 @@ function readLocalDevCommits(): GitCommit[] {
 function readLocalDevCommitDetail(sha: string): string | null {
   if (process.env.NODE_ENV !== 'development') return null;
   try {
-    // eslint-disable-next-disable-next-line @typescript-eslint/no-require-imports
-    const { execSync } = require('child_process');
     const stdout = execSync(`git show --stat --oneline ${sha}`, { timeout: 3000 }).toString();
     return stdout.trim();
   } catch {

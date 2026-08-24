@@ -717,7 +717,7 @@
       "x": 100,
       "y": -100,
       "width": 1140,
-      "height": 3890,
+      "height": 4310,
       "color": "4"
     },
     {
@@ -811,11 +811,31 @@
       "color": "4"
     },
     {
+      "id": "node-retriever-api-v1-pricing",
+      "type": "file",
+      "file": "architecture_nodes/Retriever_API_v1_pricing.md",
+      "x": 690,
+      "y": 1670,
+      "width": 500,
+      "height": 380,
+      "color": "4"
+    },
+    {
+      "id": "node-retriever-api-v1-agentic",
+      "type": "file",
+      "file": "architecture_nodes/Retriever_API_v1_agentic.md",
+      "x": 150,
+      "y": 2090,
+      "width": 500,
+      "height": 380,
+      "color": "4"
+    },
+    {
       "id": "node-retriever-api-v1-rlm",
       "type": "file",
       "file": "architecture_nodes/Retriever_API_v1_rlm.md",
       "x": 690,
-      "y": 1670,
+      "y": 2090,
       "width": 500,
       "height": 380,
       "color": "4"
@@ -825,7 +845,7 @@
       "type": "file",
       "file": "architecture_nodes/Retriever_API_v1_tenant.md",
       "x": 150,
-      "y": 2090,
+      "y": 2510,
       "width": 500,
       "height": 380,
       "color": "4"
@@ -835,7 +855,7 @@
       "type": "file",
       "file": "architecture_nodes/Engine_Docling_Layout_OCR.md",
       "x": 690,
-      "y": 2090,
+      "y": 2510,
       "width": 500,
       "height": 380,
       "color": "4"
@@ -845,7 +865,7 @@
       "type": "file",
       "file": "architecture_nodes/Engine_LlamaGuard_Guardrails.md",
       "x": 150,
-      "y": 2510,
+      "y": 2930,
       "width": 500,
       "height": 380,
       "color": "4"
@@ -855,7 +875,7 @@
       "type": "file",
       "file": "architecture_nodes/Engine_MultiAgent_Consensus.md",
       "x": 690,
-      "y": 2510,
+      "y": 2930,
       "width": 500,
       "height": 380,
       "color": "4"
@@ -865,7 +885,7 @@
       "type": "file",
       "file": "architecture_nodes/Engine_LongLLMLingua_Compression.md",
       "x": 150,
-      "y": 2930,
+      "y": 3350,
       "width": 500,
       "height": 380,
       "color": "4"
@@ -875,7 +895,7 @@
       "type": "file",
       "file": "architecture_nodes/Engine_RLM_Python_REPL.md",
       "x": 690,
-      "y": 2930,
+      "y": 3350,
       "width": 500,
       "height": 380,
       "color": "4"
@@ -885,7 +905,7 @@
       "type": "file",
       "file": "architecture_nodes/Engine_GraphRAG_Topology.md",
       "x": 150,
-      "y": 3350,
+      "y": 3770,
       "width": 500,
       "height": 380,
       "color": "4"
@@ -895,7 +915,7 @@
       "type": "group",
       "label": "7. ASYNC INFRASTRUCTURE: Workers, Brokers & Encryption Envelopes",
       "x": 100,
-      "y": 3890,
+      "y": 4310,
       "width": 600,
       "height": 1370,
       "color": "3"
@@ -905,7 +925,7 @@
       "type": "file",
       "file": "architecture_nodes/Engine_Celery_RabbitMQ.md",
       "x": 150,
-      "y": 3980,
+      "y": 4400,
       "width": 500,
       "height": 380,
       "color": "3"
@@ -915,7 +935,7 @@
       "type": "file",
       "file": "architecture_nodes/Engine_Dogfooding_Tenant_prateeq_scoping.md",
       "x": 150,
-      "y": 4400,
+      "y": 4820,
       "width": 500,
       "height": 380,
       "color": "3"
@@ -925,7 +945,7 @@
       "type": "file",
       "file": "architecture_nodes/Engine_Envelope_Encryption.md",
       "x": 150,
-      "y": 4820,
+      "y": 5240,
       "width": 500,
       "height": 380,
       "color": "3"

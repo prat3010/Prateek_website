@@ -27,18 +27,29 @@ exit 0
 
 
 def main():
+    hook_file = WEBSITE_DIR / "scripts" / "pre-commit-hook.sh"
+    hook_file.write_text(HOOK_SCRIPT.strip() + "\n", encoding="utf-8")
+    
+    try:
+        st = os.stat(hook_file)
+        os.chmod(hook_file, st.st_mode | stat.S_IEXEC)
+    except Exception:
+        pass
+
     if not HOOKS_DIR.exists():
         print(f"⚠️ Git hooks directory not found at {HOOKS_DIR}")
         return
 
-    PRE_COMMIT_HOOK.write_text(HOOK_SCRIPT.strip() + "\n", encoding="utf-8")
-    
-    # Make executable (chmod +x)
-    st = os.stat(PRE_COMMIT_HOOK)
-    os.chmod(PRE_COMMIT_HOOK, st.st_mode | stat.S_IEXEC)
-    
-    print(f"✓ Git pre-commit hook successfully installed at: {PRE_COMMIT_HOOK}")
-    print("✨ Future git commits will automatically synchronize your Obsidian Architecture Graph!")
+    try:
+        PRE_COMMIT_HOOK.write_text(HOOK_SCRIPT.strip() + "\n", encoding="utf-8")
+        st = os.stat(PRE_COMMIT_HOOK)
+        os.chmod(PRE_COMMIT_HOOK, st.st_mode | stat.S_IEXEC)
+        print(f"✓ Git pre-commit hook successfully installed at: {PRE_COMMIT_HOOK}")
+        print("✨ Future git commits will automatically synchronize your Obsidian Architecture Graph!")
+    except Exception as e:
+        print(f"ℹ Note: Direct write to .git/hooks prevented by sandbox permissions ({e}).")
+        print("💡 You can activate it manually anytime by running:")
+        print(f"   cp scripts/pre-commit-hook.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit")
 
 
 if __name__ == "__main__":

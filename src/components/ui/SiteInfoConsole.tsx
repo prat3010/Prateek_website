@@ -78,7 +78,7 @@ export default function SiteInfoConsole() {
   const [historyIndex, setHistoryIndex] = useState<number>(-1);
   const [activeGame, setActiveGame] = useState<'none' | 'snake'>('none');
   const [isMatrixActive, setIsMatrixActive] = useState<boolean>(false);
-  const [cmdCount, setCmdCount] = useState<number>(0);
+  const cmdCountRef = useRef<number>(0);
 
   const unlockAchievement = useCallback((id: string, title: string, desc: string) => {
     if (typeof window === 'undefined') return;
@@ -127,8 +127,11 @@ export default function SiteInfoConsole() {
   // Dynamically update DOM nodes count when terminal history renders
   useEffect(() => {
     if (typeof document !== 'undefined') {
-      const nodes = document.getElementsByTagName('*').length;
-      setStats(prev => ({ ...prev, domNodes: nodes }));
+      const animId = requestAnimationFrame(() => {
+        const nodes = document.getElementsByTagName('*').length;
+        setStats(prev => ({ ...prev, domNodes: nodes }));
+      });
+      return () => cancelAnimationFrame(animId);
     }
   }, [terminalHistory]);
 
@@ -279,13 +282,10 @@ export default function SiteInfoConsole() {
     if (!trimmedCmd) return;
 
     playKeySound();
-    setCmdCount(prev => {
-      const next = prev + 1;
-      if (next >= 5) {
-        unlockAchievement('terminal_master', 'Terminal Master', 'Executed 5 terminal commands');
-      }
-      return next;
-    });
+    cmdCountRef.current += 1;
+    if (cmdCountRef.current >= 5) {
+      unlockAchievement('terminal_master', 'Terminal Master', 'Executed 5 terminal commands');
+    }
 
     // Add input command to history & reset history index pointer
     setCmdHistory(prev => [...prev, cmd]);

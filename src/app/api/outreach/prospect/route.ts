@@ -98,7 +98,7 @@ async function callGeminiWithFallback(prompt: string): Promise<string | null> {
       if (!res.ok) continue;
       const data = await res.json();
       const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (text) return (text as any).strip ? (text as any).strip() : text.trim();
+      if (typeof text === 'string') return text.trim();
     } catch {
       // Failover to next model
     }

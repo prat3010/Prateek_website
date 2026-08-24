@@ -25,12 +25,27 @@ const GRID_ROWS = 16;
 const CELL_SIZE = 14;
 
 export default function TerminalSnakeGame({ onClose, onAchievementUnlocked }: TerminalSnakeGameProps) {
-  const [playerName, setPlayerName] = useState<string>('');
-  const [isCallsignPrompt, setIsCallsignPrompt] = useState<boolean>(true);
+  const [playerName, setPlayerName] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('terminal_player_name') || '';
+    }
+    return '';
+  });
+  const [isCallsignPrompt, setIsCallsignPrompt] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return !localStorage.getItem('terminal_player_name');
+    }
+    return true;
+  });
   const [callsignInput, setCallsignInput] = useState<string>('');
 
   const [score, setScore] = useState<number>(0);
-  const [highScore, setHighScore] = useState<number>(0);
+  const [highScore, setHighScore] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      return Number(localStorage.getItem('terminal_snake_highscore') || '0');
+    }
+    return 0;
+  });
   const [globalRecord, setGlobalRecord] = useState<{ player_name: string; score: number }>({
     player_name: 'CYBER_NINJA',
     score: 140,
@@ -51,19 +66,8 @@ export default function TerminalSnakeGame({ onClose, onAchievementUnlocked }: Te
   const gameLoopRef = useRef<number | null>(null);
   const lastTickTimeRef = useRef<number>(0);
 
-  // 1. Fetch initial leaderboard and saved callsign on mount
+  // 1. Fetch initial leaderboard on mount
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedName = localStorage.getItem('terminal_player_name') || '';
-      if (savedName) {
-        setPlayerName(savedName);
-        setIsCallsignPrompt(false);
-      }
-
-      const savedHigh = Number(localStorage.getItem('terminal_snake_highscore') || '0');
-      setHighScore(savedHigh);
-    }
-
     fetch('/api/terminal/snake-leaderboard')
       .then((res) => res.json())
       .then((data) => {

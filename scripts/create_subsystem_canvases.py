@@ -26,17 +26,20 @@ def write_canvas(filename: str, nodes: list, edges: list):
     print(f"✓ Created {out_web}")
 
     # Ecosystem Vault canvas (adjusts file paths to Prateek_Website/...)
-    vault_nodes = []
-    for n in nodes:
-        nc = dict(n)
-        if nc.get("type") == "file" and nc.get("file", "").startswith("architecture_nodes/"):
-            nc["file"] = "Prateek_Website/" + nc["file"]
-        vault_nodes.append(nc)
+    try:
+        vault_nodes = []
+        for n in nodes:
+            nc = dict(n)
+            if nc.get("type") == "file" and nc.get("file", "").startswith("architecture_nodes/"):
+                nc["file"] = "Prateek_Website/" + nc["file"]
+            vault_nodes.append(nc)
 
-    canvas_vault = {"nodes": vault_nodes, "edges": edges}
-    out_vault = VAULT_DIR / filename
-    out_vault.write_text(json.dumps(canvas_vault, indent=2), encoding="utf-8")
-    print(f"✓ Created {out_vault}")
+        canvas_vault = {"nodes": vault_nodes, "edges": edges}
+        out_vault = VAULT_DIR / filename
+        out_vault.write_text(json.dumps(canvas_vault, indent=2), encoding="utf-8")
+        print(f"✓ Created {out_vault}")
+    except Exception as e:
+        print(f"ℹ Note on Vault sync (running sandboxed): {e}")
 
 
 # =========================================================================

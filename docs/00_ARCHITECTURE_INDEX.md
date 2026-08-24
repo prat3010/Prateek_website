@@ -103,7 +103,7 @@
 | `Lib_skills` | **Lib: `skills.ts` (Persona Filter & Narrative Mapper)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Lib_skills.md](architecture_nodes/Lib_skills.md) |
 | `UI_CommercialPDFSuite` | **UI: `pdfTheme.ts`, `pdfFonts.ts` & React-PDF Exporters** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_CommercialPDFSuite.md](architecture_nodes/UI_CommercialPDFSuite.md) |
 
-### 🔹 6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPIs (18 Nodes)
+### 🔹 6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPIs (20 Nodes)
 
 | Node ID | Title / Component | Blast Radius | Security Auth | Specification File |
 | :--- | :--- | :---: | :---: | :--- |
@@ -115,12 +115,14 @@
 | `Engine_MultiAgent_Consensus` | **Engine: Multi-Agent Consensus & Reflection Loops (Milestone 48)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_MultiAgent_Consensus.md](architecture_nodes/Engine_MultiAgent_Consensus.md) |
 | `Engine_RLM_Python_REPL` | **Engine: RLM Python REPL Sandbox (Milestone 47)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_RLM_Python_REPL.md](architecture_nodes/Engine_RLM_Python_REPL.md) |
 | `Retriever_API_v1_admin` | **Retriever API: `apps/api/src/routers/admin.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_admin.md](architecture_nodes/Retriever_API_v1_admin.md) |
+| `Retriever_API_v1_agentic` | **Retriever API: `apps/api/src/routers/agentic.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_agentic.md](architecture_nodes/Retriever_API_v1_agentic.md) |
 | `Retriever_API_v1_auth` | **Retriever API: `apps/api/src/routers/auth.py`** | 🔴 `CRITICAL` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_auth.md](architecture_nodes/Retriever_API_v1_auth.md) |
 | `Retriever_API_v1_chat` | **Retriever API: `POST /v1/chat`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_chat.md](architecture_nodes/Retriever_API_v1_chat.md) |
 | `Retriever_API_v1_consensus` | **Retriever API: `apps/api/src/routers/consensus.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_consensus.md](architecture_nodes/Retriever_API_v1_consensus.md) |
 | `Retriever_API_v1_documents` | **Retriever API: `POST /v1/documents`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_documents.md](architecture_nodes/Retriever_API_v1_documents.md) |
 | `Retriever_API_v1_health` | **Retriever API: `apps/api/src/routers/health.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_health.md](architecture_nodes/Retriever_API_v1_health.md) |
 | `Retriever_API_v1_payments` | **Retriever API: `apps/api/src/routers/payments.py`** | 🔴 `CRITICAL` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_payments.md](architecture_nodes/Retriever_API_v1_payments.md) |
+| `Retriever_API_v1_pricing` | **Retriever API: `apps/api/src/routers/pricing.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_pricing.md](architecture_nodes/Retriever_API_v1_pricing.md) |
 | `Retriever_API_v1_rlm` | **Retriever API: `apps/api/src/routers/rlm.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_rlm.md](architecture_nodes/Retriever_API_v1_rlm.md) |
 | `Retriever_API_v1_search` | **Retriever API: `POST /v1/search`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_search.md](architecture_nodes/Retriever_API_v1_search.md) |
 | `Retriever_API_v1_tenant` | **Retriever API: `apps/api/src/routers/tenant.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_tenant.md](architecture_nodes/Retriever_API_v1_tenant.md) |

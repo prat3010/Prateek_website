@@ -5,7 +5,7 @@ vi.mock('@/data/supabase', () => ({
   supabase: {
     from: () => ({
       select: () => {
-        const query: any = {
+        const query = {
           eq: () => query,
           maybeSingle: () => Promise.resolve({ data: { tenant_id: 'tenant-123', plan_tier: 'growth' } }),
         };
