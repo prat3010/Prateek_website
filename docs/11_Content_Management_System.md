@@ -90,3 +90,13 @@ To maintain a clean separation of concerns, Python environments are kept local:
 - Direct JSON modifications are seeded to Supabase automatically on pushing to GitHub.
 - Image assets are staged and committed properly via Git integration when Dry-Run is disabled.
 - Decoupling constraints prevent python utilities from being included in frontend bundle builds.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Content Platform Architecture](10_Content_Platform_Architecture.md)
+- [Gemini AI Synchronizer Integration](12_AI_Integration_Strategy.md)
+- [Middleman Agreement Tab](MIDDLEMAN_PARTNERSHIP_AGREEMENT.md)
+- [Scoping Questionnaire Editor](09_Section_Specifications/12_Scoping_Lab.md)
+- [Architecture Node: Streamlit CMS Dashboard](architecture_nodes/Tool_Synchronizer.md)

@@ -1,0 +1,296 @@
+{
+  "nodes": [
+    {
+      "id": "grp-rag-ui",
+      "type": "group",
+      "label": "1. RAG LAB STUDIO & CHAT INTERFACE",
+      "x": -1200,
+      "y": -100,
+      "width": 600,
+      "height": 1360,
+      "color": "1"
+    },
+    {
+      "id": "node-rag-app",
+      "type": "file",
+      "file": "architecture_nodes/Route_rag_app.md",
+      "x": -1140,
+      "y": -30,
+      "width": 480,
+      "height": 400,
+      "color": "1"
+    },
+    {
+      "id": "node-rag-playground",
+      "type": "file",
+      "file": "architecture_nodes/UI_RAGLabPlayground.md",
+      "x": -1140,
+      "y": 430,
+      "width": 480,
+      "height": 400,
+      "color": "1"
+    },
+    {
+      "id": "node-rag-client",
+      "type": "file",
+      "file": "architecture_nodes/Lib_rag_client.md",
+      "x": -1140,
+      "y": 890,
+      "width": 480,
+      "height": 400,
+      "color": "3"
+    },
+    {
+      "id": "grp-rag-gateway",
+      "type": "group",
+      "label": "2. GATEWAY & MULTIMODAL INGESTION",
+      "x": -540,
+      "y": -100,
+      "width": 600,
+      "height": 1360,
+      "color": "6"
+    },
+    {
+      "id": "node-intent",
+      "type": "file",
+      "file": "architecture_nodes/API_scoping_parse_intent.md",
+      "x": -480,
+      "y": -30,
+      "width": 480,
+      "height": 400,
+      "color": "6"
+    },
+    {
+      "id": "node-rfp",
+      "type": "file",
+      "file": "architecture_nodes/API_scoping_parse_rfp.md",
+      "x": -480,
+      "y": 430,
+      "width": 480,
+      "height": 400,
+      "color": "6"
+    },
+    {
+      "id": "node-docling",
+      "type": "file",
+      "file": "architecture_nodes/Engine_Docling_Layout_OCR.md",
+      "x": -480,
+      "y": 890,
+      "width": 480,
+      "height": 400,
+      "color": "4"
+    },
+    {
+      "id": "grp-rag-core",
+      "type": "group",
+      "label": "3. COGNITIVE CORE & GUARDRAILS",
+      "x": 120,
+      "y": -100,
+      "width": 600,
+      "height": 1360,
+      "color": "4"
+    },
+    {
+      "id": "node-chat",
+      "type": "file",
+      "file": "architecture_nodes/Retriever_API_v1_chat.md",
+      "x": 180,
+      "y": -30,
+      "width": 480,
+      "height": 400,
+      "color": "4"
+    },
+    {
+      "id": "node-guard",
+      "type": "file",
+      "file": "architecture_nodes/Engine_LlamaGuard_Guardrails.md",
+      "x": 180,
+      "y": 430,
+      "width": 480,
+      "height": 400,
+      "color": "4"
+    },
+    {
+      "id": "node-search",
+      "type": "file",
+      "file": "architecture_nodes/Retriever_API_v1_search.md",
+      "x": 180,
+      "y": 890,
+      "width": 480,
+      "height": 400,
+      "color": "4"
+    },
+    {
+      "id": "grp-rag-reasoning",
+      "type": "group",
+      "label": "4. REASONING, REPL & REFLECTION",
+      "x": 780,
+      "y": -100,
+      "width": 600,
+      "height": 1360,
+      "color": "4"
+    },
+    {
+      "id": "node-repl",
+      "type": "file",
+      "file": "architecture_nodes/Engine_RLM_Python_REPL.md",
+      "x": 840,
+      "y": -30,
+      "width": 480,
+      "height": 400,
+      "color": "4"
+    },
+    {
+      "id": "node-consensus",
+      "type": "file",
+      "file": "architecture_nodes/Engine_MultiAgent_Consensus.md",
+      "x": 840,
+      "y": 430,
+      "width": 480,
+      "height": 400,
+      "color": "4"
+    },
+    {
+      "id": "node-compress",
+      "type": "file",
+      "file": "architecture_nodes/Engine_LongLLMLingua_Compression.md",
+      "x": 840,
+      "y": 890,
+      "width": 480,
+      "height": 400,
+      "color": "4"
+    },
+    {
+      "id": "grp-rag-vector",
+      "type": "group",
+      "label": "5. VECTOR PARTITIONS & TELEMETRY",
+      "x": 1440,
+      "y": -100,
+      "width": 600,
+      "height": 1360,
+      "color": "7"
+    },
+    {
+      "id": "node-pgvector",
+      "type": "file",
+      "file": "architecture_nodes/Schema_pgvector_store.md",
+      "x": 1500,
+      "y": -30,
+      "width": 480,
+      "height": 480,
+      "color": "7"
+    },
+    {
+      "id": "node-tenants",
+      "type": "file",
+      "file": "architecture_nodes/Schema_rag_tenants.md",
+      "x": 1500,
+      "y": 480,
+      "width": 480,
+      "height": 480,
+      "color": "7"
+    },
+    {
+      "id": "node-logs",
+      "type": "file",
+      "file": "architecture_nodes/Schema_retriever_inference_logs.md",
+      "x": 1500,
+      "y": 990,
+      "width": 480,
+      "height": 480,
+      "color": "7"
+    }
+  ],
+  "edges": [
+    {
+      "id": "er1",
+      "fromNode": "node-rag-playground",
+      "fromSide": "bottom",
+      "toNode": "node-rag-client",
+      "toSide": "top",
+      "color": "3",
+      "label": "Client State"
+    },
+    {
+      "id": "er2",
+      "fromNode": "node-rag-client",
+      "fromSide": "right",
+      "toNode": "node-chat",
+      "toSide": "left",
+      "color": "4",
+      "label": "POST /v1/chat (SSE)"
+    },
+    {
+      "id": "er3",
+      "fromNode": "node-rfp",
+      "fromSide": "bottom",
+      "toNode": "node-docling",
+      "toSide": "top",
+      "color": "4",
+      "label": "Layout OCR Chunking"
+    },
+    {
+      "id": "er4",
+      "fromNode": "node-chat",
+      "fromSide": "bottom",
+      "toNode": "node-guard",
+      "toSide": "top",
+      "color": "4",
+      "label": "LlamaGuard 3 Filter"
+    },
+    {
+      "id": "er5",
+      "fromNode": "node-chat",
+      "fromSide": "bottom",
+      "toNode": "node-search",
+      "toSide": "top",
+      "color": "4",
+      "label": "Hybrid Query"
+    },
+    {
+      "id": "er6",
+      "fromNode": "node-search",
+      "fromSide": "right",
+      "toNode": "node-pgvector",
+      "toSide": "left",
+      "color": "7",
+      "label": "Cosine HNSW"
+    },
+    {
+      "id": "er7",
+      "fromNode": "node-chat",
+      "fromSide": "right",
+      "toNode": "node-repl",
+      "toSide": "left",
+      "color": "4",
+      "label": "Math Sandbox (M47)"
+    },
+    {
+      "id": "er8",
+      "fromNode": "node-chat",
+      "fromSide": "right",
+      "toNode": "node-consensus",
+      "toSide": "left",
+      "color": "4",
+      "label": "Critic Evaluation (M48)"
+    },
+    {
+      "id": "er9",
+      "fromNode": "node-chat",
+      "fromSide": "right",
+      "toNode": "node-compress",
+      "toSide": "left",
+      "color": "4",
+      "label": "Context Compression (M49)"
+    },
+    {
+      "id": "er10",
+      "fromNode": "node-chat",
+      "fromSide": "right",
+      "toNode": "node-logs",
+      "toSide": "left",
+      "color": "7",
+      "label": "Tokens & Latency"
+    }
+  ]
+}

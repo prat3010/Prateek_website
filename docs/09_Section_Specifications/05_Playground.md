@@ -66,3 +66,11 @@ Creative code must remain performant to prevent browser heating:
 - Canvas render loops halt when the section is offscreen.
 - Visual theme shifts align with Azure/Noir aesthetics.
 - Respects `prefers-reduced-motion` settings.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Previous Section: Projects](04_Projects.md)
+- [WebGL & Performance Throttling](../15_Performance_and_Accessibility.md)
+- [Next Section: Resume](06_Resume_and_Quotations.md)

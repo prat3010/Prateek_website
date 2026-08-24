@@ -84,3 +84,13 @@ Accepting 2 business integrations for custom AI document hubs this week. DM for 
 - [ ] **Day 4:** Post Template 1 on LinkedIn & X (Twitter).
 - [ ] **Day 5:** Post Template 2 on LinkedIn & X.
 - [ ] **Day 6–7:** Follow up on inbound DMs & warm leads → Send `/scoping` link → Lock 50% deposit via Razorpay.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Product Goals & Metrics](03_Product_Goals_Objectives_and_Success_Metrics.md)
+- [High-Ticket Scoping Lab](25_SOTA_Scoping_Engine_PRD.md)
+- [Retriever SaaS Revenue](24_RAG_App_Studio_PRD.md)
+- [Sales Affiliate Program](MIDDLEMAN_PARTNERSHIP_AGREEMENT.md)
+- [Client Demo Showcase](DEMO_PLAYBOOK_AND_SHOWCASE_GUIDE.md)

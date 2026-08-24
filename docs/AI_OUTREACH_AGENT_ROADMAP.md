@@ -1,6 +1,7 @@
-# Autonomous AI Outreach & Social Content Agent — Strategic Roadmap
-
-> **Status:** Queued (Scheduled after primary client dashboard roadmap completion)  
+# Autonomous AI Outreach & Social Content Agent — Technical Specification
+ 
+> 📌 **Master Roadmap (SSoT):** For active platform milestone sequencing, see [`UNIFIED_MASTER_ROADMAP.md`](UNIFIED_MASTER_ROADMAP.md) (**Milestones 57 & 58**).  
+> **Status:** Technical Specification Baseline (Completed M57–M58)  
 > **Target Platform:** Next.js 16 App Router (`src/app/`), Supabase Database & RLS, Vercel Cloud Crons, Gemini 2.5 Flash AI Engine  
 > **Channels:** Gmail Cold Email Outreach, X (Twitter), LinkedIn  
 > **Primary Goal:** 24/7 hands-free lead discovery, hyper-personalized pitch generation, and build-in-public social content drafting with a zero-friction 1-click Web Control Center.
@@ -165,3 +166,17 @@ src/
 - [x] **Requirements & Channel Alignment** (All 3 Channels: Gmail + X + LinkedIn, Hybrid Sourcing, 60/40 Content Mix, OAuth2 Auth)
 - [x] **Roadmap Documentation Created** (`docs/AI_OUTREACH_AGENT_ROADMAP.md`)
 - [ ] **Execution Phase 1–5:** To be started immediately after completing current primary portfolio & dashboard roadmap items.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Master Roadmap (Milestones 57–58)](UNIFIED_MASTER_ROADMAP.md)
+- [Gemini 2.5 Flash Integration](12_AI_Integration_Strategy.md)
+- [OAuth2 & Anti-Ban Rate Limiting](16_Security_and_Privacy.md)
+- [Admin Control Center (`/admin`)](09_Section_Specifications/13_Client_Workspace_Dashboard.md)
+- [Cold Outreach Conversion Scripts](REVENUE_EXECUTION_PLAN.md)
+- [Architecture Node: Route /admin](architecture_nodes/Route_admin.md)
+- [Architecture Node: Admin Portal](architecture_nodes/UI_AdminPortal.md)
+- [Architecture Node: Outreach Dispatch API](architecture_nodes/API_outreach_dispatch.md)
+- [Architecture Node: Outreach Leads Schema](architecture_nodes/Schema_outreach_leads.md)

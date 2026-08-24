@@ -21,7 +21,7 @@ Executes a full sweep of the application to ensure it builds correctly:
 
 ### **2. Schema Matching (`./scripts/audit_db.py`)**
 Compares local configuration settings against active database structures:
-* Matches local definitions inside [supabase_schema.sql](file:///Users/prateeksharma/Developer/Prateek_website/supabase_schema.sql) against tables, policies, and indexes on the live Supabase instance.
+* Matches local definitions inside [supabase_schema.sql](../supabase_schema.sql) against tables, policies, and indexes on the live Supabase instance.
 * Outputs lists of missing columns or mismatching constraints.
 
 ---
@@ -94,3 +94,11 @@ For interactive visual changes, developers must complete this checklist:
 - `./scripts/verify.sh` runs and exits with code 0 (zero errors and warnings).
 - `./scripts/audit_db.py` reports no missing tables or column schema gaps.
 - Manual test checks pass across both desktop and mobile viewports.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Audit Checklist & Test Baselines](MASTER_CODEBASE_AUDIT_CHECKLIST.md)
+- [Codebase Modernization Rules](18_Codebase_Modernization_and_Refactoring.md)
+- [CI/CD & Deployment Verification](20_Deployment_Strategy.md)

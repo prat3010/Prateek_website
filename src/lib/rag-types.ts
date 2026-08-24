@@ -48,10 +48,15 @@ export interface ConsensusResponse {
 }
 
 export interface RlmExecutionResponse {
-  output: string;
-  steps_executed: number;
+  tenant_id?: string;
+  prompt?: string;
+  analysis_summary?: string;
+  code_executions?: Array<Record<string, unknown>>;
+  subcalls_count?: number;
+  output?: string;
+  steps_executed?: number;
   execution_time_ms: number;
-  status: string;
+  status?: string;
 }
 
 export interface OnlineEvaluationSummaryResponse {

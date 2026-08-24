@@ -73,3 +73,12 @@ If none are met, keep the original implementation intact.
 - Static and database data loading is driven by Server Components.
 - Styles are encapsulated in CSS Modules; globals remain untouched.
 - Cleanups are executed before production releases to ensure no dead resources persist.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Master Codebase Audit Checklist](MASTER_CODEBASE_AUDIT_CHECKLIST.md)
+- [Architecture Dependency Map](ARCHITECTURE_DEPENDENCY_MAP.md)
+- [Architecture Decision Records](99_DECISIONS.md)
+- [Automated Test Baselines](19_Testing_and_Quality_Assurance.md)

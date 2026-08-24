@@ -16,7 +16,20 @@ export async function GET(req: Request) {
     let planTier = 'starter';
 
     if (supabase) {
-      if (!tenantId) {
+      if (requestedTenantId) {
+        // Confirm caller belongs to requestedTenantId
+        const { data: callerMembership } = await supabase
+          .from('rag_tenant_members')
+          .select('tenant_id')
+          .eq('email', callerEmail)
+          .eq('tenant_id', requestedTenantId)
+          .maybeSingle();
+
+        if (!callerMembership) {
+          return NextResponse.json({ error: 'Forbidden: Access denied to requested tenant workspace.' }, { status: 403 });
+        }
+        tenantId = requestedTenantId;
+      } else {
         const { data: member } = await supabase
           .from('rag_tenant_members')
           .select('tenant_id')

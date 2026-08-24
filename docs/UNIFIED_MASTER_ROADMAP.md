@@ -2,7 +2,7 @@
 
 **System Architecture:** Dual-Repository Platform Control Plane & AI Resource Server  
 **Repositories:** `Prateek_website` (Control Plane on Vercel) & `retriever` (FastAPI AI Backend on Oracle VPS)  
-**Document Version:** `v1.0.0` (Unified Master Baseline)  
+**Document Version:** `v2.0.0` (Unified Master Baseline with Productized E-Commerce Scoping & Full Ecosystem Integrations)  
 **Status:** Active Single Source of Truth (SSoT) Roadmap  
 
 ---
@@ -16,7 +16,8 @@
  │  • Client Workspace Dashboard (`/dashboard`) ➔ Project Scopes, Invoices, Razorpay 50% │
  │  • SaaS RAG App Studio (`/rag/app`) ➔ Chat Studio, Docs, Search Inspector, Embed Config│
  │  • Master Admin Control Center (`/admin`) ➔ Autonomous Outreach & Prospecting Queue    │
- │  • Project Scoping Lab (`/scoping`) ➔ Instant Dual-Currency Quote Wizard & PDF Export  │
+ │  • Project Scoping Lab (`/scoping`) ➔ Multimodal CPQ, Cart Drawer & Live Dogfooding   │
+ │  • Interactive Diagnostics Terminal (`/terminal`) ➔ Hacker CLI Scoping & Mobile QR Pay│
  │  • Public Portfolio & Newsjacking Blog (`/`, `/blog`) ➔ Case Studies & Auto-Articles   │
  └────────────────────────────────────────┬───────────────────────────────────────────────┘
                                           │
@@ -26,18 +27,20 @@
  ┌────────────────────────────────────────────────────────────────────────────────────────┐
  │ AI RESOURCE SERVER & ENGINE: retriever (rag.prateeq.in) on Oracle VPS                  │
  │                                                                                        │
+ │  • Public Scoping Tenant (`prateeq_scoping`) ➔ Catalog Grounding, RFP OCR & Sem Cache  │
+ │  • Client Dedicated Tenants (`tn_client_...`) ➔ Private Vault, ACLs & AES-256 Encrypt │
  │  • FastAPI REST/SSE Gateways (`apps/api/src/routers/`)                                 │
  │  • Multi-Tenant Row-Level Security (RLS) & PostgreSQL Isolation                        │
  │  • Hybrid Vector Search (HNSW Dense + BM25 Sparse + Cohere Rerank)                      │
- │  • GraphRAG (Entity Extraction, Neo4j/Pg Triples & Community Summaries)                │
- │  • Recursive Language Model (RLM) Python REPL Execution Sandbox                        │
+ │  • GraphRAG (Entity Extraction, Neo4j/Pg Triples & "Frequently Built Together" Graph)  │
+ │  • Recursive Language Model (RLM) Python REPL Execution Sandbox (Deterministic CPQ)    │
  │  • LongLLMLingua Context Compression & Llama Guard 3 Safety Guardrails                 │
  └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 2. Master Sequential Implementation Timeline (M1 – M62)
+## 2. Master Sequential Implementation Timeline (M1 – M68)
 
 ```mermaid
 timeline
@@ -45,9 +48,10 @@ timeline
     Phase A (M1–M30) : Core Platform Foundation & RAG Engine : Completed
     Phase B (M31–M45) : Multi-Tenant Auth, Security & Client Portals : Completed
     Phase C (M46–M53) : GraphRAG, RLM REPL, LLM Safety & 360 Deep Audit : Completed
-    Phase D (M54–M56) : Surface Polish, Citation Visualizer & RLM Studio : ACTIVE NEXT
-    Phase E (M57–M60) : Autonomous Growth, Cold Outreach & AI Newsjacking : Queued
-    Phase F (M61–M62) : Data Connectors & Vision OCR Ingestion : Future
+    Phase D (M54–M56) : Surface Polish, Citation Visualizer & RLM Studio : Completed
+    Phase E (M57–M60) : Autonomous Growth, Cold Outreach & AI Newsjacking : Completed
+    Phase F (M61–M62) : Data Connectors & Vision OCR Ingestion : Completed
+    Phase G (M63–M68) : Productized E-Commerce Scoping & Agency Ecosystem : ACTIVE NEXT
 ```
 
 ---
@@ -74,68 +78,96 @@ timeline
 | **M46–M50**| SaaS Quotas & RLM Engine | Both | Token quotas, Context compression, RLM Python REPL execution subroutines | **Completed** |
 | **M51–M53**| 360° Codebase Audit | Both | 0 dead code files, 100% schema sync, 243 frontend tests & 505 backend tests passed | **Completed** |
 
----
+### Phase D: Surface Polish, Citation Visualizer & RLM Studio (M54 – M56)
+| Milestone | Title | Repository Scope | Primary Deliverable | Status |
+|---|---|---|---|---|
+| **M54** | Citation Span Visualizer | `Prateek_website` | ChatPanel string-span grounding badges & ungrounded warnings | **Completed** |
+| **M55** | RLM Python REPL Studio | Both | Dedicated `/rag/app/rlm` interactive code execution tab | **Completed** |
+| **M56** | Razorpay SaaS Auto-Provision | `Prateek_website` | Webhook subscription handler & tenant token quota allocation | **Completed** |
 
-### Phase D: Surface Polish, Citation Visualizer & RLM Studio (M54 – M56) — **CURRENT ACTIVE NEXT**
+### Phase E: Autonomous Growth & Outreach Automation (M57 – M60)
+| Milestone | Title | Repository Scope | Primary Deliverable | Status |
+|---|---|---|---|---|
+| **M57** | AI Lead Prospecting Engine | `Prateek_website` | 24/7 lead discovery & `gemini-3.6-flash` personalized pitch generator | **Completed** |
+| **M58** | Web Control Center HITL Queue| `Prateek_website` | Mobile-friendly 1-click email/social approval queue in `/admin` | **Completed** |
+| **M59** | Automated AI Newsjacking | `Prateek_website` | Daily HN/HF news scraper + technical blog case study synthesis | **Completed** |
+| **M60** | Client Telemetry Analytics | Both | Real-time token usage meter & semantic cache USD savings display | **Completed** |
 
-#### 🎯 Milestone 54: Citation Span Visualizer & Ungrounded Warnings
-- **Repo Scope:** `Prateek_website` (`src/components/rag/ChatPanel.tsx`)
-- **Deliverable:**
-  - Highlight exact string-span matches in Chat Studio messages.
-  - Display green `✓ Grounded (Exact Span)` badges for verified sources and orange warning tags for ungrounded citations.
-- **Status:** **Completed**
-
-#### 🎯 Milestone 55: Interactive RLM Python REPL Studio Tab
-- **Repo Scope:** Both (`Prateek_website` `/rag/app` & `retriever` `/v1/rlm/execute`)
-- **Deliverable:**
-  - Add dedicated RLM Studio tab in `/rag/app` displaying real-time Python code execution streams.
-  - Visual step-by-step document vault traversal inspector.
-- **Status:** **Completed**
-
-#### 🎯 Milestone 56: Live Razorpay SaaS Plan Auto-Provisioning
-- **Repo Scope:** `Prateek_website` (`src/app/api/client/create-razorpay-subscription`, `/api/webhooks/razorpay`)
-- **Deliverable:**
-  - Wire live Razorpay subscription checkout for Starter, Growth, and Enterprise tiers.
-  - Auto-provision `rag_subscriptions` and issue tenant API keys upon successful webhook payment.
-- **Status:** **Completed**
+### Phase F: Zero-Config Data Connectors & Multi-Modal Processing (M61 – M62)
+| Milestone | Title | Repository Scope | Primary Deliverable | Status |
+|---|---|---|---|---|
+| **M61** | Zero-Config Cloud Connectors | `retriever` | Web crawler & Google Drive connectors with delta sync | **Completed** |
+| **M62** | Vision OCR & Scanned PDF Ingest | `retriever` | Layout-aware vision parsing and table-to-markdown extraction | **Completed** |
 
 ---
 
-### Phase E: Autonomous Growth & Outreach Automation (M57 – M60) — **CURRENT ACTIVE NEXT**
+### Phase G: Productized E-Commerce Scoping & Full Agency Ecosystem (M63 – M68) — **CURRENT ACTIVE NEXT**
 
-#### 🚀 Milestone 57: AI Lead Prospecting & Personalized Pitch Generator
-- **Repo Scope:** `Prateek_website` (`src/app/api/outreach/prospect`, `src/app/api/outreach/dispatch`)
-- **Deliverable:** 24/7 lead discovery engine and `gemini-3.6-flash` personalized pitch generator.
-- **Status:** **Completed**
+```text
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                   PHASE G: SOTA SCOPING & AGENCY ECOSYSTEM MAP (M63–M68)               │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  [M63] Multimodal Discovery & Public Dogfooding Tenant (`prateeq_scoping`)             │
+│  [M64] Productized Architecture Cart Drawer, GraphRAG Upsells & Promo Engine           │
+│  [M65] Live Visual Architecture Topology Map & Dependency Cascade Solver               │
+│  [M66] Terminal Scoping CLI (/terminal) & Mobile QR Code Checkout                     │
+│  [M67] Dashboard Workspace Bridge, Cryptographic SOW Freeze & Phase 2 Change Orders    │
+│  [M68] Unified Persistent Copilot, Git CI/CD Feeds & Post-Launch SLA Monitoring        │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
 
-#### 🚀 Milestone 58: Web Control Center 1-Click Approval Queue
-- **Repo Scope:** `Prateek_website` (`src/app/admin/page.tsx`)
-- **Deliverable:** Mobile-friendly HITL approval queue in `/admin` for 1-click email dispatch and build-in-public social posts (X/LinkedIn).
-- **Status:** **Completed**
+#### 🛒 Milestone 63: Multimodal Discovery & Dogfooding Tenant (`prateeq_scoping`)
+- **Repo Scope:** Both (`Prateek_website` `/scoping` & `retriever` `/v1/tenants/prateeq_scoping`)
+- **Deliverable:**
+  - Provision dedicated `prateeq_scoping` dogfooding tenant on Retriever with catalog embeddings, dependency triples, and extraction schemas.
+  - Implement 1-Line Natural Language Prompt Bar + Drag-and-Drop RFP/PRD PDF Dropzone (up to 25MB) using Retriever Layout OCR (M42) & Structured JSON Extraction (M22).
+  - Add live telemetry proof badge on UI:
+    `⚡ Powered by Retriever Engine (prateeq-scoping-live) • Latency: 380ms • ⚡ Semantic Cache: Active (HNSW pgvector)`.
+- **Status:** **Active Next**
 
-#### 🚀 Milestone 59: Automated AI Newsjacking & Content Engine
-- **Repo Scope:** `Prateek_website` (`scripts/ai_blog_generator.py`, `src/content/posts/`)
-- **Deliverable:** Daily HackerNews/HuggingFace news scraper + Gemini technical case-study synthesis engine.
-- **Status:** **Completed**
+#### 🛒 Milestone 64: Productized Architecture Cart Drawer, GraphRAG Upsells & Promo Engine
+- **Repo Scope:** Both (`Prateek_website` `ArchitectureCartDrawer.tsx` & `retriever` RLM REPL / GraphRAG)
+- **Deliverable:**
+  - Build slide-over `ArchitectureCartDrawer.tsx` with live line-item itemization, removal, and 5-second `[Undo]` toast.
+  - Implement GraphRAG "Frequently Built Together" upsell recommender based on technology compatibility.
+  - Add Volume Bundle Discount progress meter (5% on Growth Stacks, 10% on Full Suites).
+  - Implement Promo & Sales Partner referral code validation (`/api/scoping/validate-promo`, `promo_codes` table, strikethrough pricing).
+  - Power pricing calculations via Retriever's sandboxed Python REPL script (`pricing_repl.py`, M47).
+- **Status:** **Active Next**
 
-#### 🚀 Milestone 60: Client Telemetry Analytics & Usage Billing
-- **Repo Scope:** Both (`src/components/rag/TelemetryPanel.tsx`, `retriever` `/v1/admin/tenants/{id}/telemetry`)
-- **Deliverable:** Real-time token usage meter, storage capacity gauges, and semantic cache cost savings display.
-- **Status:** **Completed**
+#### 🛒 Milestone 65: Live Visual Architecture Topology Map & Dependency Cascade Solver
+- **Repo Scope:** `Prateek_website` (`ArchitectureTopologyMap.tsx`, `DependencyCascadeModal.tsx`)
+- **Deliverable:**
+  - Lightweight SVG/Canvas node visualizer rendering Client $\rightarrow$ Edge WAF $\rightarrow$ Services $\rightarrow$ Data $\rightarrow$ Integrations with real-time node illumination.
+  - Interactive GraphRAG DAG dependency solver with active cascade disconnect modal (*"Removing Auth drops Admin Center & Stripe Subscriptions, saving $1,200. [Remove All] or [Keep]"*).
+- **Status:** **Active Next**
 
----
+#### 🛒 Milestone 66: Terminal Scoping CLI (`/terminal`) & Mobile QR Code Checkout
+- **Repo Scope:** `Prateek_website` (`src/app/terminal/`, `src/app/api/terminal/qrcode`)
+- **Deliverable:**
+  - Add hacker/CTO CLI scoping commands in `/terminal`: `scope new`, `scope analyze "..."`, `cart status`, `cart checkout --deposit 50`.
+  - Generate ASCII QR code in terminal for mobile scanning and instant Razorpay/Stripe checkout.
+- **Status:** **Active Next**
 
-### Phase F: Zero-Config Data Connectors & Multi-Modal Processing (M61 – M62) — **COMPLETED**
+#### 🛒 Milestone 67: Dashboard Workspace Bridge, Cryptographic SOW Freeze & Phase 2 Change Orders
+- **Repo Scope:** Both (`Prateek_website` `/dashboard` & `retriever` `/v1/auth/session`)
+- **Deliverable:**
+  - Supabase Auth PKCE handoff auto-provisioning private client tenant (`tn_client_uuid`) on Retriever (M39).
+  - Embed the full SOTA CPQ customizer and Cart Drawer directly in `/dashboard` (replacing legacy regex text editing).
+  - Digital SOW proposal sign-off modal and Razorpay 50% deposit checkout (`checkout.js`).
+  - Cryptographic SHA-256 SOW freezing (`sow_hash`) upon deposit capture and private workspace collection ingestion (M27).
+  - Phase 2 Change Order engine calculating scope delta in REPL and generating automated milestone invoices.
+- **Status:** **Active Next**
 
-#### 🔮 Milestone 61: Zero-Config Cloud Data Connectors
-- **Repo Scope:** `retriever` (`src/adapters/ingestion/`)
-- **Deliverable:** Web crawler & Google Drive cloud connectors with automated periodic sync.
-- **Status:** **Completed**
-
-#### 🔮 Milestone 62: Multi-Modal Vision & Scanned PDF OCR
-- **Repo Scope:** `retriever` (`src/adapters/ingestion/ocr_service.py`)
-- **Deliverable:** Vision-model page descriptors and OCR chunking pipeline for scanned PDF diagrams.
-- **Status:** **Completed**
+#### 🛒 Milestone 68: Unified Persistent Copilot, Git CI/CD Feeds & Post-Launch SLA Monitoring
+- **Repo Scope:** Both (`Prateek_website` `ClientProjectCopilot.tsx`, `/dashboard`, and `retriever` chat router)
+- **Deliverable:**
+  - Connect `ClientProjectCopilot.tsx` to private Retriever tenant chat session (grounded in client RFP and sprint milestones).
+  - Automate 1-click private GitHub repository scaffolding upon deposit and stream live sprint commit feeds into `/dashboard`.
+  - Embed Vercel staging preview frames directly inside the milestone progress tab.
+  - Post-launch SLA & production uptime monitoring cockpit (5-minute health pings, Retriever token metering, automated monthly SLA report PDF).
+  - Multi-format commercial proposal suite (1-Page Executive Pitch vs 3-Page Master SOW PDF).
+- **Status:** **Active Next**
 
 ---
 
@@ -144,11 +176,28 @@ timeline
 | Domain | Entity / Endpoint | Primary Repository | Purpose |
 |:---|:---|:---|:---|
 | **Auth** | Supabase Auth JWT | `Prateek_website` | User registration, Google OAuth PKCE, session token issuing |
-| **Auth Sync** | `GET /v1/auth/session` | `retriever` | Maps Supabase JWT claim to `tenant_id` & `user_id` |
-| **Client** | `client_scopes` | `Prateek_website` | Project scoping briefs & 50% deposit tracking |
-| **Billing** | `invoices` & `rag_subscriptions` | `Prateek_website` | Commercial invoice ledger & Razorpay subscriptions |
-| **RAG Chat** | `POST /v1/tenants/{id}/chat/sessions/{id}/messages` | `retriever` | SSE token streaming with grounded citations |
-| **RAG Docs** | `POST /v1/tenants/{id}/documents` | `retriever` | Knowledge document parsing & vector indexing |
-| **GraphRAG** | `POST /v1/admin/tenants/{id}/graph/query` | `retriever` | Entity-relationship graph traversal |
-| **RLM** | `POST /v1/rlm/execute` | `retriever` | Recursive language model Python execution |
-| **Outreach** | `/api/outreach/prospect` & `/admin` | `Prateek_website` | Lead prospecting queue & 1-click email dispatch |
+| **Auth Sync** | `GET /v1/auth/session` | `retriever` | Maps Supabase JWT claim to `tenant_id` & `user_id` (M39) |
+| **Scoping Dogfood**| `prateeq_scoping` | `retriever` | Public tenant for catalog grounding, RFP OCR & semantic cache |
+| **Client Scopes** | `client_scopes` | `Prateek_website` | Project scoping briefs, Order IDs (`ORD-2026-XXXX`), & SOW hashes |
+| **Change Orders** | `scope_change_orders` | `Prateek_website` | Post-deposit scope deltas & add-on milestones |
+| **Promos** | `promo_codes` | `Prateek_website` | Coupon discounts & Sales Partner middleman attribution |
+| **Billing** | `invoices` & `rag_subscriptions` | `Prateek_website` | Commercial milestone invoices & Razorpay SaaS subscriptions |
+| **RAG Chat** | `POST /v1/tenants/{id}/chat/sessions/{id}/messages` | `retriever` | Persistent copilot chat with grounded citations |
+| **RAG Docs** | `POST /v1/tenants/{id}/documents` | `retriever` | Knowledge document parsing, OCR & vector indexing |
+| **GraphRAG** | `POST /v1/admin/tenants/{id}/graph/query` | `retriever` | Entity-relationship graph traversal & upsell recommender |
+| **RLM Math** | `POST /v1/rlm/execute` | `retriever` | Deterministic Python CPQ pricing calculation script |
+| **Terminal CLI** | `/terminal` & `/api/terminal/qrcode` | `Prateek_website` | Hacker CLI scoping & mobile QR deposit payment |
+| **Outreach** | `/api/outreach/prospect` & `/admin` | `Prateek_website` | Lead prospecting queue & automated pitch deep-link generation |
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Phase G: SOTA Scoping Engine & Commerce PRD (M63–M68)](25_SOTA_Scoping_Engine_PRD.md)
+- [Phase D: RAG SaaS Studio Workspace PRD (M54–M56)](24_RAG_App_Studio_PRD.md)
+- [Client Dashboard Specification](CLIENT_DASHBOARD_ROADMAP.md)
+- [Phase E: Autonomous AI Outreach Agent (M57–M58)](AI_OUTREACH_AGENT_ROADMAP.md)
+- [Phase E: Automated AI Newsjacking (M59)](AUTOMATED_AI_BLOGGING_ROADMAP.md)
+- [Razorpay Payments & Invoicing System](14_Razorpay_Payments_and_Invoicing.md)
+- [Content Platform Architecture](10_Content_Platform_Architecture.md)
+- [All Section Specifications](09_Section_Specifications/README.md)

@@ -52,3 +52,12 @@ Getting in touch should feel effortless. The contact workflow should be reassuri
 - Form inputs are validated and sanitized server-side.
 - Success and error states display clearly on all viewports.
 - Rate-limiting rules successfully block rapid form submissions.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Previous Section: Resume](06_Resume_and_Quotations.md)
+- [reCAPTCHA v3 & Spam Prevention](../16_Security_and_Privacy.md)
+- [Next Section: Footer](09_Footer.md)
+- [Architecture Node: Contact API](../architecture_nodes/API_contact.md)

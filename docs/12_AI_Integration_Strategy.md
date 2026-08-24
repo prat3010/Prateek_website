@@ -72,3 +72,14 @@ AI recommendations are always treated as drafts:
 - The `gemini-3.6-flash` model returns structured metadata from uploaded certificates.
 - AI recommendations are presented in an approval UI before database write actions.
 - The Next.js frontend has zero dependencies on Google Gemini packages or configurations.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Content Synchronizer AI Assistant](11_Content_Management_System.md)
+- [AI Intent Parsing & PDF OCR](25_SOTA_Scoping_Engine_PRD.md)
+- [Retriever RAG Cognitive Architecture](24_RAG_App_Studio_PRD.md)
+- [Autonomous AI Outreach Agent](AI_OUTREACH_AGENT_ROADMAP.md)
+- [AI Newsjacking Engine](AUTOMATED_AI_BLOGGING_ROADMAP.md)
+- [Architecture Node: Python REPL Sandbox](architecture_nodes/Engine_RLM_Python_REPL.md)

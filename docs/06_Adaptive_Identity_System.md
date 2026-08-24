@@ -404,3 +404,14 @@ The product remains coherent regardless of future expansion.
 - The architecture supports future identities.
 - Failure states degrade gracefully.
 - The implementation remains scalable and maintainable.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Adaptive Portfolio Experience](04_Adaptive_Portfolio_Experience.md)
+- [Brand Tone & Content Strategy](07_Content_Strategy.md)
+- [Hero Identity Switcher](09_Section_Specifications/01_Hero.md)
+- [Persona-Aware Skills](09_Section_Specifications/03_Skills_and_Services.md)
+- [ADR 01 (Independent Theme & Identity States)](99_DECISIONS.md)
+- [Architecture Node: Persona Skill Filter](architecture_nodes/Lib_skills.md)

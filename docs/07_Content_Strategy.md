@@ -398,3 +398,14 @@ It should quietly build confidence.
 - Editorial standards are documented.
 - Content remains presentation-independent.
 - The Content Management System remains the single source of truth.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Vision & Philosophy](01_Vision_and_Philosophy.md)
+- [Adaptive Identity System](06_Adaptive_Identity_System.md)
+- [Brand Tone & Copywriting Guidelines](BRAND_TONE_GUIDELINES.md)
+- [SEO Project Deep Linking Taxonomy](BLOG_DEEP_LINKING_MAP.md)
+- [Automated AI Content Engine](AUTOMATED_AI_BLOGGING_ROADMAP.md)
+- [Architecture Node: Blog Publication Engine](architecture_nodes/Route_blog.md)

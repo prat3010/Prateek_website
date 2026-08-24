@@ -21,9 +21,11 @@ A highly interactive, storyteller-driven personal portfolio website designed wit
 | `/` | Home page — all portfolio sections (hero, about, skills, projects, resume, playground, blog, contact) |
 | `/terminal` | Interactive diagnostics terminal console (supports commands like `git-info`, `qrcode`, `projects`, `system`, `analytics`) |
 | `/scoping` | Project Scoping Lab & Instant Quote wizard page (deep-linkable via `?engine=landing\|multipage\|saas` or `?goal=<archetype id>`) |
+| `/dashboard` | Client Workspace Dashboard (Google OAuth profile confirmation, active project scopes, interactive feature customizer, milestone progress tracker, invoice ledger, PDF proposal exporter, and direct scope confirmation CTA) |
+| `/admin` | Master Admin Control Center (Google OAuth auth gate, Autonomous Outreach queue, client scopes & ledgers) |
 | `/admin/analytics` | Visitor analytics dashboard |
-| `/rag` | Retriever AI SaaS Product Landing Page — Hero, live mini-RAG sandbox, feature grid, 1-line embed snippet, and dynamic Geo-IP pricing (INR vs. USD). |
-| `/rag/app` | SaaS App Studio Workspace — Chat Studio, Document Library, Search Inspector, Embed Configurator, and role-gated admin link. |
+| `/rag` | Retriever AI SaaS Product Landing Page — Hero, live mini-RAG sandbox, feature grid, 1-line embed snippet, and dynamic Geo-IP pricing (INR vs. USD) |
+| `/rag/app` | SaaS App Studio Workspace — Chat Studio, Document Library, Search Inspector, Embed Configurator, and role-gated admin link |
 | `/blog` | Blog listing page |
 | `/blog/[slug]` | Individual blog post page |
 | `/Middleman_Partnership_Agreement.pdf` | Server-rendered Sales Partner Agreement PDF (follows the visitor's active azure/noir theme) |
@@ -44,8 +46,20 @@ The client-side commercial PDFs (Scoping Brief, Services & Pricing Guide, Sales 
 | `/api/git-log` | GET | Read generated commit log |
 | `/api/analytics-summary` | GET | Aggregated visitor stats |
 | `/api/contact` | POST | Send contact form email |
+| `/api/terminal/qrcode` | GET | Generate ASCII / PNG QR code for terminal |
 | `/api/client/save-scope` | POST | Upsert client scope (requires Supabase `Bearer` session token; client-editable fields only) |
 | `/api/client/get-scopes` | GET | List scopes for the verified session email (requires Supabase `Bearer` session token) |
+| `/api/client/delete-scope` | DELETE | Delete draft/unpaid scope (session-gated) |
+| `/api/client/intake-draft` | POST | Save unauthenticated scoping draft to intake_leads |
+| `/api/client/create-razorpay-order` | POST | Initiate 50% scope deposit Razorpay order |
+| `/api/client/verify-razorpay-payment`| POST | Verify Razorpay payment signature & update scope status |
+| `/api/client/create-razorpay-subscription` | POST | Initiate RAG SaaS recurring subscription |
+| `/api/client/create-razorpay-invoice` | POST | Generate Razorpay invoice for milestones |
+| `/api/client/get-invoices` | GET | Retrieve itemized invoice ledger for client |
+| `/api/rag/invite` | POST | Dispatch team member invitation email |
+| `/api/rag/members` | GET, DELETE | Manage RAG tenant team memberships |
+| `/api/rag/telemetry` | GET | Fetch real-time RAG usage telemetry & cache stats |
+| `/api/webhooks/razorpay` | POST | Verify webhook signature and process payment/subscription events |
 | `/api/revalidate` | POST, GET | Purge Next.js cache (requires `SYNC_API_KEY`) |
 
 ---

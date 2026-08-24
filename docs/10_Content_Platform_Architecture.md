@@ -197,10 +197,10 @@ To prevent client-side layout shifts (CLS) and keep pages SEO-friendly:
 
 If connection to Supabase fails, or if keys are missing from local environments (`.env.local`), the app must degrade gracefully by falling back to local static JSON assets under `src/data/`:
 
-* [projects.json](file:///Users/prateeksharma/Developer/Prateek_website/src/data/projects.json)
-* [skills.json](file:///Users/prateeksharma/Developer/Prateek_website/src/data/skills.json)
-* [certificates.json](file:///Users/prateeksharma/Developer/Prateek_website/src/data/certificates.json)
-* [resume.json](file:///Users/prateeksharma/Developer/Prateek_website/src/data/resume.json)
+* [projects.json](../src/data/projects.json)
+* [skills.json](../src/data/skills.json)
+* [certificates.json](../src/data/certificates.json)
+* [resume.json](../src/data/resume.json)
 
 The server data access layer (`src/lib/data.ts`) catches Supabase query exceptions, prints warning logs, and serves the corresponding JSON array. This guarantees that the portfolio remains fully active even in offline development or database outages.
 
@@ -222,3 +222,16 @@ To make manual JSON updates robust, the project maintains an automated GitHub Ac
 - On-demand revalidation functions purge Next.js cached data.
 - Fallback JSON files are loaded successfully when Supabase is offline.
 - Push workflow seeds database tables automatically on commits to repository data files.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Streamlit Content Synchronizer](11_Content_Management_System.md)
+- [Telemetry & Page Visits Schema](13_Telemetry_and_Analytics.md)
+- [Payments & Invoice Schema](14_Razorpay_Payments_and_Invoicing.md)
+- [Row-Level Security & Cache Invalidation](16_Security_and_Privacy.md)
+- [SOTA Scoping & Client Scope Schema](25_SOTA_Scoping_Engine_PRD.md)
+- [Codebase Architecture Dependency Map](ARCHITECTURE_DEPENDENCY_MAP.md)
+- [Architecture Node: Cached Supabase Layer](architecture_nodes/Lib_data.md)
+- [Architecture Node: ISR Cache Purge](architecture_nodes/API_revalidate.md)

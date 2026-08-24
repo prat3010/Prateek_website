@@ -66,3 +66,13 @@ Keep updated via **Edit Resume Manually** tab in the CMS:
 - Business Mode shows quotation sheet and triggers quotation PDF download.
 - Generated PDFs parse correctly and match the data stored in the database.
 - Document previews render cleanly across all device widths.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Previous Section: Playground](05_Playground.md)
+- [Interactive Scoping Lab](12_Scoping_Lab.md)
+- [Sales Partner Agreement](../MIDDLEMAN_PARTNERSHIP_AGREEMENT.md)
+- [Next Section: Contact](08_Contact.md)
+- [Architecture Node: Commercial PDF Suite](../architecture_nodes/UI_CommercialPDFSuite.md)

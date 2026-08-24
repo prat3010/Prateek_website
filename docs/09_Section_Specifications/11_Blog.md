@@ -65,3 +65,13 @@ Manageable via **Blog Editor** tab:
 - Header text matches the visual theme and identity variables.
 - Individual post pages display safe, sanitized HTML compiled from markdown.
 - Clicking posts links to correct `/blog/[slug]` route paths.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Content Strategy & Tone](../07_Content_Strategy.md)
+- [SEO Strategy](../17_SEO_Strategy.md)
+- [Automated AI Content Engine](../AUTOMATED_AI_BLOGGING_ROADMAP.md)
+- [Blog Deep-Linking Map](../BLOG_DEEP_LINKING_MAP.md)
+- [Architecture Node: Blog Route](../architecture_nodes/Route_blog.md)

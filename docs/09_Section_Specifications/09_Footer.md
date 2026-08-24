@@ -44,3 +44,11 @@ The layout uses a three-column CSS Grid:
 - The Resume/Quotation label toggles based on the active Communication Identity.
 - Social links point to active, correct URLs.
 - Theme-specific layouts render correctly for both Azure and Noir modes.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Previous Section: Contact](08_Contact.md)
+- [Interactive Diagnostics Terminal](10_Terminal.md)
+- [Documentation Index](../00_README.md)

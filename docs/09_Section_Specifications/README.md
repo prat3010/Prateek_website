@@ -10,20 +10,20 @@ This folder contains the complete user stories, functional requirements, adaptiv
 
 Below is a summary of all section specifications:
 
-* [README.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/09_Section_Specifications/README.md): You are here. A guide and navigation index for this sub-folder.
-* [01_Hero.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/09_Section_Specifications/01_Hero.md): First impressions, identity establishment, and CTA configurations.
-* [02_About_Me.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/09_Section_Specifications/02_About_Me.md): Mindset descriptions, learning patterns, and storytelling approaches.
-* [03_Skills_and_Services.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/09_Section_Specifications/03_Skills_and_Services.md): Technical categories and business services translation.
-* [04_Projects.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/09_Section_Specifications/04_Projects.md): Project cards, engineering details, and outcome metrics.
-* [05_Playground.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/09_Section_Specifications/05_Playground.md): WebGL simulations, performance throttling, and canvas renders.
-* [06_Resume_and_Quotations.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/09_Section_Specifications/06_Resume_and_Quotations.md): Document pipelines, PDF calculations, and interactive previews.
-* [07_Pricing.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/09_Section_Specifications/07_Pricing.md): Freelance tiers, project features list, and pre-populated CTAs.
-* [08_Contact.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/09_Section_Specifications/08_Contact.md): Contact fields, rate limits, Resend APIs, and input validations.
-* [09_Footer.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/09_Section_Specifications/09_Footer.md): Site directories, social maps, and diagnostics linkages.
-* [10_Terminal.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/09_Section_Specifications/10_Terminal.md): Interactive command line page, git-log parsers, and custom codes.
-* [11_Blog.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/09_Section_Specifications/11_Blog.md): Blog and log entries section detailing adaptive titles and listing formats.
-* [12_Scoping_Lab.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/09_Section_Specifications/12_Scoping_Lab.md): Interactive Project Scoping Lab & Instant Quote wizard (`/scoping`), module dependency resolution, and proposal PDF export.
-* [13_Client_Workspace_Dashboard.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/09_Section_Specifications/13_Client_Workspace_Dashboard.md): Client Workspace Dashboard (`/dashboard`), active scope management, milestone tracking, commercial PDF exports, and 50% deposit lock action.
+* [README.md](README.md): You are here. A guide and navigation index for this sub-folder.
+* [01_Hero.md](01_Hero.md): First impressions, identity establishment, and CTA configurations.
+* [02_About_Me.md](02_About_Me.md): Mindset descriptions, learning patterns, and storytelling approaches.
+* [03_Skills_and_Services.md](03_Skills_and_Services.md): Technical categories and business services translation.
+* [04_Projects.md](04_Projects.md): Project cards, engineering details, and outcome metrics.
+* [05_Playground.md](05_Playground.md): WebGL simulations, performance throttling, and canvas renders.
+* [06_Resume_and_Quotations.md](06_Resume_and_Quotations.md): Document pipelines, PDF calculations, and interactive previews.
+* [07_Pricing.md](07_Pricing.md): Freelance tiers, project features list, and pre-populated CTAs.
+* [08_Contact.md](08_Contact.md): Contact fields, rate limits, Resend APIs, and input validations.
+* [09_Footer.md](09_Footer.md): Site directories, social maps, and diagnostics linkages.
+* [10_Terminal.md](10_Terminal.md): Interactive command line page, git-log parsers, and custom codes.
+* [11_Blog.md](11_Blog.md): Blog and log entries section detailing adaptive titles and listing formats.
+* [12_Scoping_Lab.md](12_Scoping_Lab.md): Interactive Project Scoping Lab & Instant Quote wizard (`/scoping`), module dependency resolution, and proposal PDF export.
+* [13_Client_Workspace_Dashboard.md](13_Client_Workspace_Dashboard.md): Client Workspace Dashboard (`/dashboard`), active scope management, milestone tracking, commercial PDF exports, and 50% deposit lock action.
 
 ---
 

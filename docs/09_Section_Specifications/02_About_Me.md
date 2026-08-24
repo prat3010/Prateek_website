@@ -336,3 +336,11 @@ Trust creates opportunity.
 - Accessibility requirements are satisfied.
 - Performance remains lightweight.
 - Visitors feel a stronger personal connection after reading the section.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Previous Section: Hero](01_Hero.md)
+- [Developer vs Business Mindset](../06_Adaptive_Identity_System.md)
+- [Next Section: Skills & Services](03_Skills_and_Services.md)

@@ -1,8 +1,10 @@
-# Client Dashboard & SaaS Studio Ecosystem Roadmap
+# Client Dashboard & SaaS Studio Ecosystem Specification
 **System:** Prateek Website Control Plane (`prateeq.in`)  
 **Deployment URL:** `https://prateeq.in/dashboard` & `https://prateeq.in/rag/app`  
 **Target Audience:** Commercial Services Clients & RAG SaaS Subscribers  
-**Cross-Reference:** Linked directly with the **[Admin Dashboard Architecture & Operational Roadmap](file:///Users/prateeksharma/Developer/retriever/docs/ADMIN_DASHBOARD_ROADMAP.md)** in `retriever`.
+> 📌 **Master Roadmap (SSoT):** For active platform milestone sequencing (M1 to M68), see [`docs/UNIFIED_MASTER_ROADMAP.md`](UNIFIED_MASTER_ROADMAP.md).  
+> 📌 **Scoping PRD:** For the complete SOTA Scoping Engine & Productized E-Commerce specification, see [`docs/25_SOTA_Scoping_Engine_PRD.md`](25_SOTA_Scoping_Engine_PRD.md).  
+**Cross-Reference:** Linked directly with the **[Unified Master Product & Architectural Roadmap](UNIFIED_MASTER_ROADMAP.md)** and **[Admin Dashboard Architecture Roadmap](../../retriever/docs/ADMIN_DASHBOARD_ROADMAP.md)** in `retriever`.
 
 ---
 
@@ -75,7 +77,7 @@ The **Client Dashboard Ecosystem** on `prateeq.in` serves as the primary commerc
 * **Interactive Scope Customizer:** Add or remove feature modules dynamically with instant price recalculations (INR/USD).
 * **4-Stage Progress Tracker:** Visual milestone progression: `architecture` ➔ `engineering` (unlocked on 50% deposit) ➔ `staging` ➔ `live`.
 * **Invoice & Payment Ledger:** Itemized billing ledger from `invoices` table showing payment status (`pending`, `paid`, `cancelled`), due dates, and payment timestamps.
-* **Commercial PDF Exporters:** Downloadable high-res PDF proposals rendered client-side ([`ScopingBriefPDF.tsx`](file:///Users/prateeksharma/Developer/Prateek_website/src/components/pdf/ScopingBriefPDF.tsx) and [`ServicesAndPricingPDF.tsx`](file:///Users/prateeksharma/Developer/Prateek_website/src/components/pdf/ServicesAndPricingPDF.tsx)).
+* **Commercial PDF Exporters:** Downloadable high-res PDF proposals rendered client-side ([`ScopingBriefPDF.tsx`](../src/components/pdf/ScopingBriefPDF.tsx) and [`ServicesAndPricingPDF.tsx`](../src/components/pdf/ServicesAndPricingPDF.tsx)).
 * **Razorpay 50% Deposit Trigger:** **"Pay 50% Scope Deposit"** button launching Razorpay checkout modal (`checkout.js`).
 
 ### Portal B: RAG SaaS Studio Workspace (`/rag/app`)
@@ -83,7 +85,7 @@ The **Client Dashboard Ecosystem** on `prateeq.in` serves as the primary commerc
   * Real-time SSE token streaming from `rag.prateeq.in`.
   * Response latency indicators and token count breakdown.
   * Clickable presigned citation links to download source PDFs.
-  * Thumbs up / down feedback submission (`POST /v1/tenants/{tenantId}/chat/sessions/{sessionId}/messages/{messageId}/feedback`).
+  * Thumbs up / down feedback submission.
 * **Document Library Tab:**
   * Drag-and-drop file uploader (`.pdf`, `.txt`, `.md`, `.docx`).
   * Ingestion status indicators (`INDEXED`, `PROCESSING`, `FAILED`).
@@ -92,19 +94,9 @@ The **Client Dashboard Ecosystem** on `prateeq.in` serves as the primary commerc
   * One-shot hybrid search debugger (pgvector HNSW + BM25 keyword + Cohere rerank).
   * Score inspection cards showing rank order and relevance scores.
 * **Embed Configurator Tab:**
-  * 1-line script generator:
-    ```html
-    <script
-      src="https://rag.prateeq.in/widget.js"
-      data-tenant="TENANT_ID"
-      data-key="API_KEY">
-    </script>
-    ```
-  * Custom widget preview (theme colors, position, welcome message, bot avatar).
-* **Team Members Tab (Upcoming Phase 4):**
-  * Invite team members by email.
-  * Assign roles (`owner`, `admin`, `member`).
-  * Revoke team member access.
+  * 1-line script generator and custom widget preview.
+* **Team Members Tab:**
+  * Invite team members by email with role assignment (`owner`, `admin`, `member`).
 
 ---
 
@@ -118,6 +110,8 @@ timeline
     Phase 3 : Razorpay RAG Subscription Automated Provisioning
     Phase 4 : Multi-User Team Workspace & Invites
     Phase 5 : Client Telemetry & Usage Analytics
+    Phase 6 : Surface Parity, Citation Visualizer & RLM Studio
+    Phase 7 : SOTA Productized Scoping & Full Agency Ecosystem : ACTIVE NEXT
 ```
 
 ### Phase 1: Completed Baseline Setup (Current State)
@@ -133,7 +127,7 @@ timeline
 ### Phase 3: Razorpay RAG Subscription Automated Provisioning (Completed)
 - ✅ **Subscription Checkout API:** Wired `/api/client/create-razorpay-subscription` for recurring plan creation.
 - ✅ **Webhook Receiver:** `/api/webhooks/razorpay` verifies HMAC signatures and processes `subscription.charged` / `payment.captured` events to maintain `rag_subscriptions`.
-- ✅ **Quota Allocation:** Initial storage and token limits configured by plan tier (Starter: 250K tokens, Growth: 1.5M tokens, Enterprise: Custom).
+- ✅ **Quota Allocation:** Initial storage and token limits configured by plan tier.
 
 ### Phase 4: Multi-User Team Workspace & Invites (Completed)
 - ✅ **Team Management UI:** Built "Team Members" tab (`TeamPanel.tsx`) in `/rag/app`.
@@ -148,27 +142,97 @@ timeline
 - ✅ **Feedback Quality Curves:** Visual satisfaction rating ratio (thumbs up vs thumbs down).
 - ✅ **Telemetry API:** Session-gated `/api/rag/telemetry` endpoint returning live telemetry metrics.
 
-### Phase 6: 2026 RAG Engine Full Surface Alignment (M54–M60 Alignment)
-- **Full SDK Surface Parity (M54):** Update `RetrieverClient` (`src/lib/rag-client.ts`) and Studio UI to support Context Compression toggles, Multi-Agent Consensus badges, Guardrail status alerts, and RLM execution mode.
-- **Citation Span Visualizer (M55):** Highlight exact string-span context matches in Chat Studio messages (`ChatPanel.tsx`), displaying warning tags for ungrounded citations.
-- **Interactive RLM Python REPL Studio (M59):** Dedicated RLM Studio tab (`/rag/app/rlm`) displaying interactive Python code execution streams and recursive document vault traversal visualization.
+### Phase 6: Surface Polish, Citation Visualizer & RLM Studio (Completed)
+- ✅ **Full SDK Surface Parity (M54):** Update `RetrieverClient` (`src/lib/rag-client.ts`) and Studio UI to support Context Compression toggles, Multi-Agent Consensus badges, Guardrail status alerts, and RLM execution mode.
+- ✅ **Citation Span Visualizer (M55):** Highlight exact string-span context matches in Chat Studio messages (`ChatPanel.tsx`), displaying warning tags for ungrounded citations.
+- ✅ **Interactive RLM Python REPL Studio (M59):** Dedicated RLM Studio tab (`/rag/app/rlm`) displaying interactive Python code execution streams and recursive document vault traversal visualization.
+
+---
+
+### Phase 7: SOTA Productized Scoping & Full Agency Ecosystem (M63 – M68) — **CURRENT ACTIVE NEXT**
+
+```text
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│             PHASE 7: SOTA SCOPING & CLIENT WORKSPACE ECOSYSTEM (M63–M68)               │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  [M63] Multimodal Discovery & Public Dogfooding Tenant (`prateeq_scoping`)             │
+│  [M64] Productized Architecture Cart Drawer, GraphRAG Upsells & Promo Engine           │
+│  [M65] Live Visual Architecture Topology Map & Dependency Cascade Solver               │
+│  [M66] Terminal Scoping CLI (/terminal) & Mobile QR Code Checkout                     │
+│  [M67] Dashboard Workspace Bridge, Cryptographic SOW Freeze & Phase 2 Change Orders    │
+│  [M68] Unified Persistent Copilot, Git CI/CD Feeds & Post-Launch SLA Monitoring        │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+* **Milestone 63: Multimodal Discovery & Dogfooding Tenant (`prateeq_scoping`)**
+  - Public `prateeq_scoping` tenant on Retriever with catalog embeddings and dependency triples.
+  - 1-line prompt bar + Drag-and-drop RFP/PRD PDF dropzone with Retriever M42 Layout OCR & M22 JSON extraction.
+  - Live latency & semantic cache telemetry proof badge (`⚡ Powered by Retriever Engine • Latency: 380ms`).
+
+* **Milestone 64: Productized Architecture Cart Drawer, GraphRAG Upsells & Promo Engine**
+  - Slide-over `ArchitectureCartDrawer.tsx` with live line-item itemization, removal, and 5-second `[Undo]` toast.
+  - GraphRAG "Frequently Built Together" companion recommendations.
+  - Volume bundle discount progress bar (5% on Growth Stacks, 10% on Full Suites).
+  - Promo code validation engine (`/api/scoping/validate-promo`, `promo_codes` table, strikethrough pricing).
+  - Sandboxed Python REPL CPQ pricing script (`pricing_repl.py`, M47).
+
+* **Milestone 65: Live Visual Architecture Topology Map & Dependency Cascade Solver**
+  - Interactive SVG/Canvas node visualizer (`ArchitectureTopologyMap.tsx`) with real-time node highlighting and technical SLA tooltips.
+  - GraphRAG DAG dependency solver with active cascade disconnect modal (`DependencyCascadeModal.tsx`).
+
+* **Milestone 66: Terminal Scoping CLI (`/terminal`) & Mobile QR Code Checkout**
+  - Hacker/CTO CLI scoping commands in `/terminal`: `scope new`, `scope analyze`, `cart status`, `cart checkout`.
+  - Terminal QR code deposit generator (`/api/terminal/qrcode`) for scanning and paying on mobile.
+
+* **Milestone 67: Dashboard Workspace Bridge, Cryptographic SOW Freeze & Phase 2 Change Orders**
+  - Supabase Auth PKCE handoff auto-provisioning private client tenant (`tn_client_uuid`) on Retriever (M39).
+  - Embed the full SOTA CPQ customizer and Cart Drawer directly in `/dashboard` (replacing legacy regex text editing).
+  - Digital SOW proposal sign-off modal and Razorpay 50% deposit checkout (`checkout.js`).
+  - Cryptographic SHA-256 SOW freezing (`sow_hash`) upon deposit capture and private workspace collection ingestion (M27).
+  - Phase 2 Change Order engine calculating scope delta in REPL and generating automated milestone invoices.
+
+* **Milestone 68: Unified Persistent Copilot, Git CI/CD Feeds & Post-Launch SLA Monitoring**
+  - Connect `ClientProjectCopilot.tsx` to private Retriever tenant chat session (grounded in client RFP and sprint milestones).
+  - GitHub private repo auto-scaffolding and live sprint commit feed in `/dashboard`.
+  - Embed Vercel staging preview frames directly inside the milestone progress tab.
+  - Post-launch SLA & production uptime monitoring cockpit (5-minute health pings, Retriever token metering, automated monthly SLA report PDF).
+  - Multi-format commercial proposal suite (1-Page Executive Pitch vs 3-Page Master SOW PDF).
 
 ---
 
 ## 5. Client API & Database Contract Reference Table
 
-| Entity / Endpoint | Type | Purpose |
+| Entity / Endpoint | Type | Primary Purpose |
 | :--- | :--- | :--- |
 | `clients` | Supabase DB Table | Central client profile (`email`, `company_name`, `country`) |
-| `client_scopes` | Supabase DB Table | Commercial project scope records and deposit status |
-| `invoices` | Supabase DB Table | Itemized milestone invoices and payment status |
+| `client_scopes` | Supabase DB Table | Commercial project scope records, Order IDs (`ORD-2026-XXXX`), & SOW hashes |
+| `scope_change_orders` | Supabase DB Table | Post-deposit scope deltas & Phase 2 add-on milestones (`CO-2026-XXXX-XX`) |
+| `promo_codes` | Supabase DB Table | Coupon discount rules & Sales Partner middleman attribution |
+| `invoices` | Supabase DB Table | Itemized milestone invoices, GST tax ledger, and Razorpay payment tracking |
+| `sprint_capacity` | Supabase DB Table | Quarterly engineering slots & fast-track rush capacity limits |
 | `rag_tenants` | Supabase DB Table | RAG tenant registry mapping client to `retriever` `tenant_id` |
 | `rag_tenant_members` | Supabase DB Table | Multi-user team memberships (`tenant_id`, `user_id`, `role`) |
 | `rag_subscriptions` | Supabase DB Table | Subscription billing tracking (`plan_tier`, `monthly_token_limit`, `razorpay_subscription_id`) |
-| `/api/client/save-scope` | Next.js API Route | Save/update scope feature customizations |
+| `/api/scoping/parse-intent` | Next.js API Route | Natural language intent parser proxying to Retriever `prateeq_scoping` |
+| `/api/scoping/parse-rfp` | Next.js API Route | Multimodal RFP/PRD PDF parser proxying to Retriever M42/M22 |
+| `/api/scoping/validate-promo` | Next.js API Route | Promo code validator and Sales Partner attribution resolver |
+| `/api/client/save-scope` | Next.js API Route | Save/update scope feature customizations in draft mode |
 | `/api/client/create-razorpay-order` | Next.js API Route | Initiate 50% scope deposit Razorpay order |
 | `/api/client/create-razorpay-subscription` | Next.js API Route | Initiate RAG SaaS plan subscription |
+| `/api/terminal/qrcode` | Next.js API Route | Generate ASCII / PNG QR code for terminal mobile checkout |
 | `/api/webhooks/razorpay` | Next.js API Route | Process Razorpay payment & subscription webhooks |
 
 ---
-*Refer to `retriever/docs/ADMIN_DASHBOARD_ROADMAP.md` for the corresponding Admin Dashboard specifications.*
+
+## **Related Architecture & Cross-References**
+
+- [Unified Master Roadmap (SSoT)](UNIFIED_MASTER_ROADMAP.md)
+- [SOTA Scoping Engine & Commerce PRD](25_SOTA_Scoping_Engine_PRD.md)
+- [RAG SaaS Studio PRD](24_RAG_App_Studio_PRD.md)
+- [Client Workspace Dashboard Spec](09_Section_Specifications/13_Client_Workspace_Dashboard.md)
+- [Payments & Subscriptions](14_Razorpay_Payments_and_Invoicing.md)
+- [Supabase Auth PKCE Session Verification](16_Security_and_Privacy.md)
+- [Architecture Node: Route /dashboard](architecture_nodes/Route_dashboard.md)
+- [Architecture Node: Dashboard UI](architecture_nodes/UI_ClientWorkspaceDashboard.md)
+- [Architecture Node: Copilot API](architecture_nodes/API_client_copilot.md)
+- [Architecture Node: Client Scopes Schema](architecture_nodes/Schema_client_scopes.md)

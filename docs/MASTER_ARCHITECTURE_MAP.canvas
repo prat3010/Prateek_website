@@ -1,0 +1,1209 @@
+{
+  "nodes": [
+    {
+      "id": "grp-frontend",
+      "type": "group",
+      "label": "1. FRONTEND: Portfolio & Adaptive Identity System",
+      "x": -2400,
+      "y": -100,
+      "width": 1140,
+      "height": 2210,
+      "color": "5"
+    },
+    {
+      "id": "node-route-home",
+      "type": "file",
+      "file": "architecture_nodes/Route_home.md",
+      "x": -2350,
+      "y": -10,
+      "width": 500,
+      "height": 380,
+      "color": "5"
+    },
+    {
+      "id": "node-ui-noirskyline",
+      "type": "file",
+      "file": "architecture_nodes/UI_NoirSkyline.md",
+      "x": -1810,
+      "y": -10,
+      "width": 500,
+      "height": 380,
+      "color": "5"
+    },
+    {
+      "id": "node-route-terminal",
+      "type": "file",
+      "file": "architecture_nodes/Route_terminal.md",
+      "x": -2350,
+      "y": 410,
+      "width": 500,
+      "height": 380,
+      "color": "5"
+    },
+    {
+      "id": "node-ui-terminal",
+      "type": "file",
+      "file": "architecture_nodes/UI_Terminal.md",
+      "x": -1810,
+      "y": 410,
+      "width": 500,
+      "height": 380,
+      "color": "5"
+    },
+    {
+      "id": "node-route-blog",
+      "type": "file",
+      "file": "architecture_nodes/Route_blog.md",
+      "x": -2350,
+      "y": 830,
+      "width": 500,
+      "height": 380,
+      "color": "5"
+    },
+    {
+      "id": "node-ui-blogengine",
+      "type": "file",
+      "file": "architecture_nodes/UI_BlogEngine.md",
+      "x": -1810,
+      "y": 830,
+      "width": 500,
+      "height": 380,
+      "color": "5"
+    },
+    {
+      "id": "node-route-analytics",
+      "type": "file",
+      "file": "architecture_nodes/Route_analytics.md",
+      "x": -2350,
+      "y": 1250,
+      "width": 500,
+      "height": 380,
+      "color": "5"
+    },
+    {
+      "id": "node-ui-analyticsdashboard",
+      "type": "file",
+      "file": "architecture_nodes/UI_AnalyticsDashboard.md",
+      "x": -1810,
+      "y": 1250,
+      "width": 500,
+      "height": 380,
+      "color": "5"
+    },
+    {
+      "id": "node-context-themeprovider-lenis",
+      "type": "file",
+      "file": "architecture_nodes/Context_ThemeProvider_Lenis.md",
+      "x": -2350,
+      "y": 1670,
+      "width": 500,
+      "height": 380,
+      "color": "5"
+    },
+    {
+      "id": "grp-commerce",
+      "type": "group",
+      "label": "2. DISCOVERY & COMMERCE: Multimodal CPQ Scoping & SOW Freeze",
+      "x": -2400,
+      "y": 2210,
+      "width": 1140,
+      "height": 1790,
+      "color": "3"
+    },
+    {
+      "id": "node-route-scoping",
+      "type": "file",
+      "file": "architecture_nodes/Route_scoping.md",
+      "x": -2350,
+      "y": 2300,
+      "width": 500,
+      "height": 380,
+      "color": "3"
+    },
+    {
+      "id": "node-ui-scopinglab",
+      "type": "file",
+      "file": "architecture_nodes/UI_ScopingLab.md",
+      "x": -1810,
+      "y": 2300,
+      "width": 500,
+      "height": 380,
+      "color": "3"
+    },
+    {
+      "id": "node-ui-architecturecartdrawer",
+      "type": "file",
+      "file": "architecture_nodes/UI_ArchitectureCartDrawer.md",
+      "x": -2350,
+      "y": 2720,
+      "width": 500,
+      "height": 380,
+      "color": "3"
+    },
+    {
+      "id": "node-ui-topologymap",
+      "type": "file",
+      "file": "architecture_nodes/UI_TopologyMap.md",
+      "x": -1810,
+      "y": 2720,
+      "width": 500,
+      "height": 380,
+      "color": "3"
+    },
+    {
+      "id": "node-ui-predepositbridge",
+      "type": "file",
+      "file": "architecture_nodes/UI_PreDepositBridge.md",
+      "x": -2350,
+      "y": 3140,
+      "width": 500,
+      "height": 380,
+      "color": "3"
+    },
+    {
+      "id": "node-engine-digital-sow-escrow-freeze",
+      "type": "file",
+      "file": "architecture_nodes/Engine_Digital_SOW_Escrow_Freeze.md",
+      "x": -1810,
+      "y": 3140,
+      "width": 500,
+      "height": 380,
+      "color": "3"
+    },
+    {
+      "id": "node-ui-middlemanagreement",
+      "type": "file",
+      "file": "architecture_nodes/UI_MiddlemanAgreement.md",
+      "x": -2350,
+      "y": 3560,
+      "width": 500,
+      "height": 380,
+      "color": "3"
+    },
+    {
+      "id": "grp-workspace",
+      "type": "group",
+      "label": "3. WORKSPACE & CONTROL: Client Dashboard, Admin & SaaS Studio",
+      "x": -2400,
+      "y": 4100,
+      "width": 1140,
+      "height": 1790,
+      "color": "1"
+    },
+    {
+      "id": "node-route-dashboard",
+      "type": "file",
+      "file": "architecture_nodes/Route_dashboard.md",
+      "x": -2350,
+      "y": 4190,
+      "width": 500,
+      "height": 380,
+      "color": "1"
+    },
+    {
+      "id": "node-ui-clientworkspacedashboard",
+      "type": "file",
+      "file": "architecture_nodes/UI_ClientWorkspaceDashboard.md",
+      "x": -1810,
+      "y": 4190,
+      "width": 500,
+      "height": 380,
+      "color": "1"
+    },
+    {
+      "id": "node-route-admin",
+      "type": "file",
+      "file": "architecture_nodes/Route_admin.md",
+      "x": -2350,
+      "y": 4610,
+      "width": 500,
+      "height": 380,
+      "color": "1"
+    },
+    {
+      "id": "node-ui-adminportal",
+      "type": "file",
+      "file": "architecture_nodes/UI_AdminPortal.md",
+      "x": -1810,
+      "y": 4610,
+      "width": 500,
+      "height": 380,
+      "color": "1"
+    },
+    {
+      "id": "node-route-rag-app",
+      "type": "file",
+      "file": "architecture_nodes/Route_rag_app.md",
+      "x": -2350,
+      "y": 5030,
+      "width": 500,
+      "height": 380,
+      "color": "1"
+    },
+    {
+      "id": "node-ui-raglabplayground",
+      "type": "file",
+      "file": "architecture_nodes/UI_RAGLabPlayground.md",
+      "x": -1810,
+      "y": 5030,
+      "width": 500,
+      "height": 380,
+      "color": "1"
+    },
+    {
+      "id": "node-tool-synchronizer",
+      "type": "file",
+      "file": "architecture_nodes/Tool_Synchronizer.md",
+      "x": -2350,
+      "y": 5450,
+      "width": 500,
+      "height": 380,
+      "color": "1"
+    },
+    {
+      "id": "grp-gateway",
+      "type": "group",
+      "label": "4. API GATEWAY: Next.js 16 Edge & REST Layer (34 Handlers)",
+      "x": -1150,
+      "y": -100,
+      "width": 1140,
+      "height": 7250,
+      "color": "6"
+    },
+    {
+      "id": "node-proxy-telemetry",
+      "type": "file",
+      "file": "architecture_nodes/Proxy_telemetry.md",
+      "x": -1100,
+      "y": -10,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-route-auth-callback",
+      "type": "file",
+      "file": "architecture_nodes/Route_auth_callback.md",
+      "x": -560,
+      "y": -10,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-scoping-parse-intent",
+      "type": "file",
+      "file": "architecture_nodes/API_scoping_parse_intent.md",
+      "x": -1100,
+      "y": 410,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-scoping-parse-rfp",
+      "type": "file",
+      "file": "architecture_nodes/API_scoping_parse_rfp.md",
+      "x": -560,
+      "y": 410,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-client-save-scope",
+      "type": "file",
+      "file": "architecture_nodes/API_client_save_scope.md",
+      "x": -1100,
+      "y": 830,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-client-intake-draft",
+      "type": "file",
+      "file": "architecture_nodes/API_client_intake_draft.md",
+      "x": -560,
+      "y": 830,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-client-get-scopes",
+      "type": "file",
+      "file": "architecture_nodes/API_client_get_scopes.md",
+      "x": -1100,
+      "y": 1250,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-client-delete-scope",
+      "type": "file",
+      "file": "architecture_nodes/API_client_delete_scope.md",
+      "x": -560,
+      "y": 1250,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-client-create-razorpay-order",
+      "type": "file",
+      "file": "architecture_nodes/API_client_create_razorpay_order.md",
+      "x": -1100,
+      "y": 1670,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-client-verify-razorpay-payment",
+      "type": "file",
+      "file": "architecture_nodes/API_client_verify_razorpay_payment.md",
+      "x": -560,
+      "y": 1670,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-client-create-razorpay-invoice",
+      "type": "file",
+      "file": "architecture_nodes/API_client_create_razorpay_invoice.md",
+      "x": -1100,
+      "y": 2090,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-client-create-razorpay-subscription",
+      "type": "file",
+      "file": "architecture_nodes/API_client_create_razorpay_subscription.md",
+      "x": -560,
+      "y": 2090,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-client-get-invoices",
+      "type": "file",
+      "file": "architecture_nodes/API_client_get_invoices.md",
+      "x": -1100,
+      "y": 2510,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-client-copilot",
+      "type": "file",
+      "file": "architecture_nodes/API_client_copilot.md",
+      "x": -560,
+      "y": 2510,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-outreach-prospect",
+      "type": "file",
+      "file": "architecture_nodes/API_outreach_prospect.md",
+      "x": -1100,
+      "y": 2930,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-outreach-dispatch",
+      "type": "file",
+      "file": "architecture_nodes/API_outreach_dispatch.md",
+      "x": -560,
+      "y": 2930,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-outreach-get-leads",
+      "type": "file",
+      "file": "architecture_nodes/API_outreach_get_leads.md",
+      "x": -1100,
+      "y": 3350,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-contact",
+      "type": "file",
+      "file": "architecture_nodes/API_contact.md",
+      "x": -560,
+      "y": 3350,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-revalidate",
+      "type": "file",
+      "file": "architecture_nodes/API_revalidate.md",
+      "x": -1100,
+      "y": 3770,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-git-log",
+      "type": "file",
+      "file": "architecture_nodes/API_git_log.md",
+      "x": -560,
+      "y": 3770,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-analytics-summary",
+      "type": "file",
+      "file": "architecture_nodes/API_analytics_summary.md",
+      "x": -1100,
+      "y": 4190,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-terminal-qrcode",
+      "type": "file",
+      "file": "architecture_nodes/API_terminal_qrcode.md",
+      "x": -560,
+      "y": 4190,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-terminal-snake-leaderboard",
+      "type": "file",
+      "file": "architecture_nodes/API_terminal_snake_leaderboard.md",
+      "x": -1100,
+      "y": 4610,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-terminal-query",
+      "type": "file",
+      "file": "architecture_nodes/API_terminal_query.md",
+      "x": -560,
+      "y": 4610,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-projects",
+      "type": "file",
+      "file": "architecture_nodes/API_projects.md",
+      "x": -1100,
+      "y": 5030,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-skills",
+      "type": "file",
+      "file": "architecture_nodes/API_skills.md",
+      "x": -560,
+      "y": 5030,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-certificates",
+      "type": "file",
+      "file": "architecture_nodes/API_certificates.md",
+      "x": -1100,
+      "y": 5450,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-profile",
+      "type": "file",
+      "file": "architecture_nodes/API_profile.md",
+      "x": -560,
+      "y": 5450,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-blog-publish",
+      "type": "file",
+      "file": "architecture_nodes/API_blog_publish.md",
+      "x": -1100,
+      "y": 5870,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-rag-tenant",
+      "type": "file",
+      "file": "architecture_nodes/API_rag_tenant.md",
+      "x": -560,
+      "y": 5870,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-rag-invite",
+      "type": "file",
+      "file": "architecture_nodes/API_rag_invite.md",
+      "x": -1100,
+      "y": 6290,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-rag-members",
+      "type": "file",
+      "file": "architecture_nodes/API_rag_members.md",
+      "x": -560,
+      "y": 6290,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-rag-telemetry",
+      "type": "file",
+      "file": "architecture_nodes/API_rag_telemetry.md",
+      "x": -1100,
+      "y": 6710,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "node-api-webhooks-razorpay",
+      "type": "file",
+      "file": "architecture_nodes/API_webhooks_razorpay.md",
+      "x": -560,
+      "y": 6710,
+      "width": 500,
+      "height": 380,
+      "color": "6"
+    },
+    {
+      "id": "grp-domain",
+      "type": "group",
+      "label": "5. CORE DOMAIN & GUARDS: CPQ Pricing, Auth & PDF Suite",
+      "x": -1150,
+      "y": 7250,
+      "width": 1140,
+      "height": 2210,
+      "color": "2"
+    },
+    {
+      "id": "node-lib-pricing",
+      "type": "file",
+      "file": "architecture_nodes/Lib_pricing.md",
+      "x": -1100,
+      "y": 7340,
+      "width": 500,
+      "height": 380,
+      "color": "2"
+    },
+    {
+      "id": "node-lib-commission",
+      "type": "file",
+      "file": "architecture_nodes/Lib_commission.md",
+      "x": -560,
+      "y": 7340,
+      "width": 500,
+      "height": 380,
+      "color": "2"
+    },
+    {
+      "id": "node-lib-sessionverify",
+      "type": "file",
+      "file": "architecture_nodes/Lib_sessionVerify.md",
+      "x": -1100,
+      "y": 7760,
+      "width": 500,
+      "height": 380,
+      "color": "2"
+    },
+    {
+      "id": "node-context-authcontext",
+      "type": "file",
+      "file": "architecture_nodes/Context_AuthContext.md",
+      "x": -560,
+      "y": 7760,
+      "width": 500,
+      "height": 380,
+      "color": "2"
+    },
+    {
+      "id": "node-ui-commercialpdfsuite",
+      "type": "file",
+      "file": "architecture_nodes/UI_CommercialPDFSuite.md",
+      "x": -1100,
+      "y": 8180,
+      "width": 500,
+      "height": 380,
+      "color": "2"
+    },
+    {
+      "id": "node-lib-rag-client",
+      "type": "file",
+      "file": "architecture_nodes/Lib_rag_client.md",
+      "x": -560,
+      "y": 8180,
+      "width": 500,
+      "height": 380,
+      "color": "2"
+    },
+    {
+      "id": "node-lib-data",
+      "type": "file",
+      "file": "architecture_nodes/Lib_data.md",
+      "x": -1100,
+      "y": 8600,
+      "width": 500,
+      "height": 380,
+      "color": "2"
+    },
+    {
+      "id": "node-lib-markdown",
+      "type": "file",
+      "file": "architecture_nodes/Lib_markdown.md",
+      "x": -560,
+      "y": 8600,
+      "width": 500,
+      "height": 380,
+      "color": "2"
+    },
+    {
+      "id": "node-lib-skills",
+      "type": "file",
+      "file": "architecture_nodes/Lib_skills.md",
+      "x": -1100,
+      "y": 9020,
+      "width": 500,
+      "height": 380,
+      "color": "2"
+    },
+    {
+      "id": "grp-retriever",
+      "type": "group",
+      "label": "6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPI Routers",
+      "x": 100,
+      "y": -100,
+      "width": 1140,
+      "height": 3890,
+      "color": "4"
+    },
+    {
+      "id": "node-retriever-api-v1-chat",
+      "type": "file",
+      "file": "architecture_nodes/Retriever_API_v1_chat.md",
+      "x": 150,
+      "y": -10,
+      "width": 500,
+      "height": 380,
+      "color": "4"
+    },
+    {
+      "id": "node-retriever-api-v1-search",
+      "type": "file",
+      "file": "architecture_nodes/Retriever_API_v1_search.md",
+      "x": 690,
+      "y": -10,
+      "width": 500,
+      "height": 380,
+      "color": "4"
+    },
+    {
+      "id": "node-retriever-api-v1-documents",
+      "type": "file",
+      "file": "architecture_nodes/Retriever_API_v1_documents.md",
+      "x": 150,
+      "y": 410,
+      "width": 500,
+      "height": 380,
+      "color": "4"
+    },
+    {
+      "id": "node-retriever-api-v1-admin",
+      "type": "file",
+      "file": "architecture_nodes/Retriever_API_v1_admin.md",
+      "x": 690,
+      "y": 410,
+      "width": 500,
+      "height": 380,
+      "color": "4"
+    },
+    {
+      "id": "node-retriever-api-v1-workflow",
+      "type": "file",
+      "file": "architecture_nodes/Retriever_API_v1_workflow.md",
+      "x": 150,
+      "y": 830,
+      "width": 500,
+      "height": 380,
+      "color": "4"
+    },
+    {
+      "id": "node-retriever-api-v1-health",
+      "type": "file",
+      "file": "architecture_nodes/Retriever_API_v1_health.md",
+      "x": 690,
+      "y": 830,
+      "width": 500,
+      "height": 380,
+      "color": "4"
+    },
+    {
+      "id": "node-retriever-api-v1-auth",
+      "type": "file",
+      "file": "architecture_nodes/Retriever_API_v1_auth.md",
+      "x": 150,
+      "y": 1250,
+      "width": 500,
+      "height": 380,
+      "color": "4"
+    },
+    {
+      "id": "node-retriever-api-v1-consensus",
+      "type": "file",
+      "file": "architecture_nodes/Retriever_API_v1_consensus.md",
+      "x": 690,
+      "y": 1250,
+      "width": 500,
+      "height": 380,
+      "color": "4"
+    },
+    {
+      "id": "node-retriever-api-v1-payments",
+      "type": "file",
+      "file": "architecture_nodes/Retriever_API_v1_payments.md",
+      "x": 150,
+      "y": 1670,
+      "width": 500,
+      "height": 380,
+      "color": "4"
+    },
+    {
+      "id": "node-retriever-api-v1-rlm",
+      "type": "file",
+      "file": "architecture_nodes/Retriever_API_v1_rlm.md",
+      "x": 690,
+      "y": 1670,
+      "width": 500,
+      "height": 380,
+      "color": "4"
+    },
+    {
+      "id": "node-retriever-api-v1-tenant",
+      "type": "file",
+      "file": "architecture_nodes/Retriever_API_v1_tenant.md",
+      "x": 150,
+      "y": 2090,
+      "width": 500,
+      "height": 380,
+      "color": "4"
+    },
+    {
+      "id": "node-engine-docling-layout-ocr",
+      "type": "file",
+      "file": "architecture_nodes/Engine_Docling_Layout_OCR.md",
+      "x": 690,
+      "y": 2090,
+      "width": 500,
+      "height": 380,
+      "color": "4"
+    },
+    {
+      "id": "node-engine-llamaguard-guardrails",
+      "type": "file",
+      "file": "architecture_nodes/Engine_LlamaGuard_Guardrails.md",
+      "x": 150,
+      "y": 2510,
+      "width": 500,
+      "height": 380,
+      "color": "4"
+    },
+    {
+      "id": "node-engine-multiagent-consensus",
+      "type": "file",
+      "file": "architecture_nodes/Engine_MultiAgent_Consensus.md",
+      "x": 690,
+      "y": 2510,
+      "width": 500,
+      "height": 380,
+      "color": "4"
+    },
+    {
+      "id": "node-engine-longllmlingua-compression",
+      "type": "file",
+      "file": "architecture_nodes/Engine_LongLLMLingua_Compression.md",
+      "x": 150,
+      "y": 2930,
+      "width": 500,
+      "height": 380,
+      "color": "4"
+    },
+    {
+      "id": "node-engine-rlm-python-repl",
+      "type": "file",
+      "file": "architecture_nodes/Engine_RLM_Python_REPL.md",
+      "x": 690,
+      "y": 2930,
+      "width": 500,
+      "height": 380,
+      "color": "4"
+    },
+    {
+      "id": "node-engine-graphrag-topology",
+      "type": "file",
+      "file": "architecture_nodes/Engine_GraphRAG_Topology.md",
+      "x": 150,
+      "y": 3350,
+      "width": 500,
+      "height": 380,
+      "color": "4"
+    },
+    {
+      "id": "grp-async",
+      "type": "group",
+      "label": "7. ASYNC INFRASTRUCTURE: Workers, Brokers & Encryption Envelopes",
+      "x": 100,
+      "y": 3890,
+      "width": 600,
+      "height": 1370,
+      "color": "3"
+    },
+    {
+      "id": "node-engine-celery-rabbitmq",
+      "type": "file",
+      "file": "architecture_nodes/Engine_Celery_RabbitMQ.md",
+      "x": 150,
+      "y": 3980,
+      "width": 500,
+      "height": 380,
+      "color": "3"
+    },
+    {
+      "id": "node-engine-dogfooding-tenant-prateeq-scoping",
+      "type": "file",
+      "file": "architecture_nodes/Engine_Dogfooding_Tenant_prateeq_scoping.md",
+      "x": 150,
+      "y": 4400,
+      "width": 500,
+      "height": 380,
+      "color": "3"
+    },
+    {
+      "id": "node-engine-envelope-encryption",
+      "type": "file",
+      "file": "architecture_nodes/Engine_Envelope_Encryption.md",
+      "x": 150,
+      "y": 4820,
+      "width": 500,
+      "height": 380,
+      "color": "3"
+    },
+    {
+      "id": "grp-persistence",
+      "type": "group",
+      "label": "8. DUAL PERSISTENCE: Supabase Relational + pgvector HNSW Store",
+      "x": 1350,
+      "y": -100,
+      "width": 1140,
+      "height": 2630,
+      "color": "7"
+    },
+    {
+      "id": "node-schema-client-scopes",
+      "type": "file",
+      "file": "architecture_nodes/Schema_client_scopes.md",
+      "x": 1400,
+      "y": -10,
+      "width": 500,
+      "height": 380,
+      "color": "7"
+    },
+    {
+      "id": "node-schema-invoices",
+      "type": "file",
+      "file": "architecture_nodes/Schema_invoices.md",
+      "x": 1940,
+      "y": -10,
+      "width": 500,
+      "height": 380,
+      "color": "7"
+    },
+    {
+      "id": "node-schema-promo-codes",
+      "type": "file",
+      "file": "architecture_nodes/Schema_promo_codes.md",
+      "x": 1400,
+      "y": 410,
+      "width": 500,
+      "height": 380,
+      "color": "7"
+    },
+    {
+      "id": "node-schema-outreach-leads",
+      "type": "file",
+      "file": "architecture_nodes/Schema_outreach_leads.md",
+      "x": 1940,
+      "y": 410,
+      "width": 500,
+      "height": 380,
+      "color": "7"
+    },
+    {
+      "id": "node-schema-rag-tenants",
+      "type": "file",
+      "file": "architecture_nodes/Schema_rag_tenants.md",
+      "x": 1400,
+      "y": 830,
+      "width": 500,
+      "height": 380,
+      "color": "7"
+    },
+    {
+      "id": "node-schema-page-visits",
+      "type": "file",
+      "file": "architecture_nodes/Schema_page_visits.md",
+      "x": 1940,
+      "y": 830,
+      "width": 500,
+      "height": 380,
+      "color": "7"
+    },
+    {
+      "id": "node-schema-blog-posts",
+      "type": "file",
+      "file": "architecture_nodes/Schema_blog_posts.md",
+      "x": 1400,
+      "y": 1250,
+      "width": 500,
+      "height": 380,
+      "color": "7"
+    },
+    {
+      "id": "node-schema-projects",
+      "type": "file",
+      "file": "architecture_nodes/Schema_projects.md",
+      "x": 1940,
+      "y": 1250,
+      "width": 500,
+      "height": 380,
+      "color": "7"
+    },
+    {
+      "id": "node-schema-skills",
+      "type": "file",
+      "file": "architecture_nodes/Schema_skills.md",
+      "x": 1400,
+      "y": 1670,
+      "width": 500,
+      "height": 380,
+      "color": "7"
+    },
+    {
+      "id": "node-schema-retriever-inference-logs",
+      "type": "file",
+      "file": "architecture_nodes/Schema_retriever_inference_logs.md",
+      "x": 1940,
+      "y": 1670,
+      "width": 500,
+      "height": 380,
+      "color": "7"
+    },
+    {
+      "id": "node-schema-pgvector-store",
+      "type": "file",
+      "file": "architecture_nodes/Schema_pgvector_store.md",
+      "x": 1400,
+      "y": 2090,
+      "width": 500,
+      "height": 380,
+      "color": "7"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-scoping-to-cart",
+      "fromNode": "node-ui-scopinglab",
+      "fromSide": "right",
+      "toNode": "node-ui-architecturecartdrawer",
+      "toSide": "left",
+      "color": "3",
+      "label": "Live Quote Sync"
+    },
+    {
+      "id": "e-cart-to-pricing",
+      "fromNode": "node-ui-architecturecartdrawer",
+      "fromSide": "right",
+      "toNode": "node-lib-pricing",
+      "toSide": "left",
+      "color": "2",
+      "label": "calcQuote() Math"
+    },
+    {
+      "id": "e-cart-to-save-scope",
+      "fromNode": "node-ui-architecturecartdrawer",
+      "fromSide": "right",
+      "toNode": "node-api-client-save-scope",
+      "toSide": "left",
+      "color": "6",
+      "label": "Session Scope Upsert"
+    },
+    {
+      "id": "e-save-scope-to-db",
+      "fromNode": "node-api-client-save-scope",
+      "fromSide": "right",
+      "toNode": "node-schema-client-scopes",
+      "toSide": "left",
+      "color": "7",
+      "label": "client_scopes Store"
+    },
+    {
+      "id": "e-predeposit-to-order",
+      "fromNode": "node-ui-predepositbridge",
+      "fromSide": "right",
+      "toNode": "node-api-client-create-razorpay-order",
+      "toSide": "left",
+      "color": "6",
+      "label": "50% Milestone Deposit"
+    },
+    {
+      "id": "e-webhook-to-verify",
+      "fromNode": "node-api-webhooks-razorpay",
+      "fromSide": "left",
+      "toNode": "node-api-client-verify-razorpay-payment",
+      "toSide": "right",
+      "color": "6",
+      "label": "HMAC-SHA256 Sig Check"
+    },
+    {
+      "id": "e-webhook-to-sow-freeze",
+      "fromNode": "node-api-webhooks-razorpay",
+      "fromSide": "left",
+      "toNode": "node-engine-digital-sow-escrow-freeze",
+      "toSide": "right",
+      "color": "3",
+      "label": "sow_hash Snapshot Lock"
+    },
+    {
+      "id": "e-webhook-to-invoices",
+      "fromNode": "node-api-webhooks-razorpay",
+      "fromSide": "right",
+      "toNode": "node-schema-invoices",
+      "toSide": "left",
+      "color": "7",
+      "label": "Invoice Paid Lock"
+    },
+    {
+      "id": "e-rag-ui-to-client",
+      "fromNode": "node-ui-raglabplayground",
+      "fromSide": "right",
+      "toNode": "node-lib-rag-client",
+      "toSide": "left",
+      "color": "2",
+      "label": "Client SDK Calls"
+    },
+    {
+      "id": "e-rag-client-to-chat",
+      "fromNode": "node-lib-rag-client",
+      "fromSide": "right",
+      "toNode": "node-retriever-api-v1-chat",
+      "toSide": "left",
+      "color": "4",
+      "label": "SSE Stream /v1/chat"
+    },
+    {
+      "id": "e-rag-client-to-search",
+      "fromNode": "node-lib-rag-client",
+      "fromSide": "right",
+      "toNode": "node-retriever-api-v1-search",
+      "toSide": "left",
+      "color": "4",
+      "label": "Hybrid /v1/search"
+    },
+    {
+      "id": "e-chat-to-guard",
+      "fromNode": "node-retriever-api-v1-chat",
+      "fromSide": "bottom",
+      "toNode": "node-engine-llamaguard-guardrails",
+      "toSide": "top",
+      "color": "4",
+      "label": "LlamaGuard 3 Filter"
+    },
+    {
+      "id": "e-search-to-pgvector",
+      "fromNode": "node-retriever-api-v1-search",
+      "fromSide": "right",
+      "toNode": "node-schema-pgvector-store",
+      "toSide": "left",
+      "color": "7",
+      "label": "Cosine HNSW Index"
+    },
+    {
+      "id": "e-proxy-to-page-visits",
+      "fromNode": "node-proxy-telemetry",
+      "fromSide": "right",
+      "toNode": "node-schema-page-visits",
+      "toSide": "left",
+      "color": "7",
+      "label": "Service Role Insert"
+    },
+    {
+      "id": "e-analytics-to-summary",
+      "fromNode": "node-ui-analyticsdashboard",
+      "fromSide": "right",
+      "toNode": "node-api-analytics-summary",
+      "toSide": "left",
+      "color": "6",
+      "label": "Fast-Path RPC"
+    },
+    {
+      "id": "e-admin-to-prospect",
+      "fromNode": "node-ui-adminportal",
+      "fromSide": "right",
+      "toNode": "node-api-outreach-prospect",
+      "toSide": "left",
+      "color": "6",
+      "label": "ICP Scoring"
+    },
+    {
+      "id": "e-outreach-to-leads-db",
+      "fromNode": "node-api-outreach-dispatch",
+      "fromSide": "right",
+      "toNode": "node-schema-outreach-leads",
+      "toSide": "left",
+      "color": "7",
+      "label": "Status: dispatched"
+    }
+  ]
+}

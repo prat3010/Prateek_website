@@ -128,10 +128,13 @@ Examples include:
 - Projects
 - Playground
 - Resume / Quotations
-- Pricing
+- Scoping Lab (`/scoping`) & Instant Quote Wizard
+- Client Workspace Dashboard (`/dashboard`)
+- RAG SaaS Studio (`/rag`, `/rag/app`)
 - Contact
 - Footer
-- Terminal
+- Terminal (`/terminal`)
+- Blog (`/blog`)
 
 Sections should remain modular.
 
@@ -418,3 +421,14 @@ The product grows without becoming disorganized.
 - Future expansion is supported.
 - Ownership of information is clearly defined.
 - Engineering decisions align with the Information Architecture.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Adaptive Portfolio Experience](04_Adaptive_Portfolio_Experience.md)
+- [Documentation Index](00_README.md)
+- [Content Platform Architecture](10_Content_Platform_Architecture.md)
+- [Scoping Lab Specification](09_Section_Specifications/12_Scoping_Lab.md)
+- [Client Workspace Specification](09_Section_Specifications/13_Client_Workspace_Dashboard.md)
+- [Unified Master Roadmap](UNIFIED_MASTER_ROADMAP.md)

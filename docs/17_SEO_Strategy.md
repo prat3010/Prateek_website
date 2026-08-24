@@ -109,3 +109,13 @@ To assist both search crawlers and automated tests (e.g. Playwright or Selenium 
 - Dynamically generated sitemap maps all public page links.
 - Schema JSON-LD markup validates without syntax warnings on Google Rich Results tools.
 - Major actions contain explicit and unique HTML identifiers.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Content Strategy & Copywriting](07_Content_Strategy.md)
+- [Blog & Project Cross-Linking](BLOG_DEEP_LINKING_MAP.md)
+- [Automated AI Content Engine](AUTOMATED_AI_BLOGGING_ROADMAP.md)
+- [Blog Section Specification](09_Section_Specifications/11_Blog.md)
+- [Architecture Node: Blog Engine](architecture_nodes/Route_blog.md)

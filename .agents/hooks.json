@@ -1,5 +1,5 @@
 {
-  "contract-auditor": {
+  "contract-and-graph-auditor": {
     "enabled": true,
     "PostToolUse": [
       {
@@ -7,8 +7,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 scripts/audit_contracts.py",
-            "timeout": 15
+            "command": "python3 scripts/audit_contracts.py && python3 scripts/sync_graph_with_code.py",
+            "timeout": 30
           }
         ]
       }

@@ -1,0 +1,13 @@
+{
+  "useTab": true,
+  "tabSize": 2,
+  "showLineNumber": true,
+  "autoPairMarkdown": true,
+  "autoPairBrackets": true,
+  "livePreview": true,
+  "readableLineLength": true,
+  "strictLineBreaks": false,
+  "attachmentFolderPath": "archive",
+  "promptDelete": false,
+  "alwaysUpdateLinks": true
+}

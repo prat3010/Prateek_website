@@ -1,0 +1,237 @@
+{
+  "nodes": [
+    {
+      "id": "grp-discovery",
+      "type": "group",
+      "label": "1. DISCOVERY & LIVE CPQ ESTIMATE",
+      "x": -1200,
+      "y": -100,
+      "width": 600,
+      "height": 1360,
+      "color": "5"
+    },
+    {
+      "id": "node-scoping",
+      "type": "file",
+      "file": "architecture_nodes/Route_scoping.md",
+      "x": -1140,
+      "y": -30,
+      "width": 480,
+      "height": 400,
+      "color": "5"
+    },
+    {
+      "id": "node-cart",
+      "type": "file",
+      "file": "architecture_nodes/UI_ArchitectureCartDrawer.md",
+      "x": -1140,
+      "y": 430,
+      "width": 480,
+      "height": 400,
+      "color": "5"
+    },
+    {
+      "id": "node-predeposit",
+      "type": "file",
+      "file": "architecture_nodes/UI_PreDepositBridge.md",
+      "x": -1140,
+      "y": 890,
+      "width": 480,
+      "height": 400,
+      "color": "5"
+    },
+    {
+      "id": "grp-math-sow",
+      "type": "group",
+      "label": "2. CPQ FORMULAS & SOW BRIEF",
+      "x": -540,
+      "y": -100,
+      "width": 600,
+      "height": 1360,
+      "color": "3"
+    },
+    {
+      "id": "node-pricing",
+      "type": "file",
+      "file": "architecture_nodes/Lib_pricing.md",
+      "x": -480,
+      "y": -30,
+      "width": 480,
+      "height": 400,
+      "color": "3"
+    },
+    {
+      "id": "node-pdf",
+      "type": "file",
+      "file": "architecture_nodes/UI_CommercialPDFSuite.md",
+      "x": -480,
+      "y": 430,
+      "width": 480,
+      "height": 400,
+      "color": "3"
+    },
+    {
+      "id": "node-sow-freeze",
+      "type": "file",
+      "file": "architecture_nodes/Engine_Digital_SOW_Escrow_Freeze.md",
+      "x": -480,
+      "y": 890,
+      "width": 480,
+      "height": 400,
+      "color": "3"
+    },
+    {
+      "id": "grp-gateway",
+      "type": "group",
+      "label": "3. RAZORPAY PAYMENT GATEWAY",
+      "x": 120,
+      "y": -100,
+      "width": 600,
+      "height": 1360,
+      "color": "6"
+    },
+    {
+      "id": "node-create-order",
+      "type": "file",
+      "file": "architecture_nodes/API_client_create_razorpay_order.md",
+      "x": 180,
+      "y": -30,
+      "width": 480,
+      "height": 400,
+      "color": "6"
+    },
+    {
+      "id": "node-verify-payment",
+      "type": "file",
+      "file": "architecture_nodes/API_client_verify_razorpay_payment.md",
+      "x": 180,
+      "y": 430,
+      "width": 480,
+      "height": 400,
+      "color": "6"
+    },
+    {
+      "id": "node-save-scope",
+      "type": "file",
+      "file": "architecture_nodes/API_client_save_scope.md",
+      "x": 180,
+      "y": 890,
+      "width": 480,
+      "height": 400,
+      "color": "6"
+    },
+    {
+      "id": "grp-ledger",
+      "type": "group",
+      "label": "4. SCOPES & FINANCIAL LEDGER",
+      "x": 780,
+      "y": -100,
+      "width": 600,
+      "height": 1360,
+      "color": "7"
+    },
+    {
+      "id": "node-schema-scopes",
+      "type": "file",
+      "file": "architecture_nodes/Schema_client_scopes.md",
+      "x": 840,
+      "y": -30,
+      "width": 480,
+      "height": 560,
+      "color": "7"
+    },
+    {
+      "id": "node-schema-invoices",
+      "type": "file",
+      "file": "architecture_nodes/Schema_invoices.md",
+      "x": 840,
+      "y": 590,
+      "width": 480,
+      "height": 560,
+      "color": "7"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "fromNode": "node-scoping",
+      "fromSide": "bottom",
+      "toNode": "node-cart",
+      "toSide": "top",
+      "color": "5",
+      "label": "Select Modules"
+    },
+    {
+      "id": "e2",
+      "fromNode": "node-cart",
+      "fromSide": "right",
+      "toNode": "node-pricing",
+      "toSide": "left",
+      "color": "3",
+      "label": "calcQuote() Formula"
+    },
+    {
+      "id": "e3",
+      "fromNode": "node-cart",
+      "fromSide": "bottom",
+      "toNode": "node-predeposit",
+      "toSide": "top",
+      "color": "5",
+      "label": "Proceed to Escrow"
+    },
+    {
+      "id": "e4",
+      "fromNode": "node-predeposit",
+      "fromSide": "right",
+      "toNode": "node-pdf",
+      "toSide": "left",
+      "color": "3",
+      "label": "Export SOW Brief PDF"
+    },
+    {
+      "id": "e5",
+      "fromNode": "node-predeposit",
+      "fromSide": "right",
+      "toNode": "node-create-order",
+      "toSide": "left",
+      "color": "6",
+      "label": "POST 50% Deposit Order"
+    },
+    {
+      "id": "e6",
+      "fromNode": "node-create-order",
+      "fromSide": "bottom",
+      "toNode": "node-verify-payment",
+      "toSide": "top",
+      "color": "6",
+      "label": "HMAC Webhook Verify"
+    },
+    {
+      "id": "e7",
+      "fromNode": "node-verify-payment",
+      "fromSide": "left",
+      "toNode": "node-sow-freeze",
+      "toSide": "right",
+      "color": "3",
+      "label": "SHA-256 SOW Lock"
+    },
+    {
+      "id": "e8",
+      "fromNode": "node-verify-payment",
+      "fromSide": "right",
+      "toNode": "node-schema-scopes",
+      "toSide": "left",
+      "color": "7",
+      "label": "status='deposit_paid'"
+    },
+    {
+      "id": "e9",
+      "fromNode": "node-verify-payment",
+      "fromSide": "right",
+      "toNode": "node-schema-invoices",
+      "toSide": "left",
+      "color": "7",
+      "label": "Record Invoice Receipt"
+    }
+  ]
+}

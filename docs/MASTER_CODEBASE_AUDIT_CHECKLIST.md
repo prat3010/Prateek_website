@@ -85,3 +85,12 @@ Legend:
 - [x] `src/lib/sessionVerify.ts` (Bearer token session verification & user email extraction)
 - [x] `src/app/api/contact/route.ts` (Resend email delivery & reCAPTCHA server verification)
 - [x] `src/app/api/revalidate/route.ts` (Cache purging with `SYNC_API_KEY`)
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Codebase Modernization Rules](18_Codebase_Modernization_and_Refactoring.md)
+- [Testing & Verification](19_Testing_and_Quality_Assurance.md)
+- [Architecture Dependency Map](ARCHITECTURE_DEPENDENCY_MAP.md)
+- [Unified Master Roadmap](UNIFIED_MASTER_ROADMAP.md)

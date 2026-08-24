@@ -193,3 +193,18 @@ To give subscribers flexibility, Retriever SaaS supports two operational billing
 | **Phase 3** | Core & Advanced Sub-Views | Implementation of all 7 sub-views (Overview, Chat, Knowledge+Graph, Search+Eval, Cache, Widget, Team+Audit) | ✅ Complete |
 | **Phase 4** | Subscription & Trial Integration | 7-day trial countdown engine & Razorpay soft paywall lockout | ✅ Complete |
 | **Phase 5** | End-to-End Verification | Build verification, contract audits, unit tests, and final certification | ✅ Complete |
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [RAG Lab Showcase Overview](rag-lab.md)
+- [Scoping Lab Dogfooding Tenant (`prateeq_scoping`)](25_SOTA_Scoping_Engine_PRD.md)
+- [Client Workspace & RAG Studio Auth](CLIENT_DASHBOARD_ROADMAP.md)
+- [SaaS Plan Subscriptions](14_Razorpay_Payments_and_Invoicing.md)
+- [Multi-Tenant Isolation & RLS](16_Security_and_Privacy.md)
+- [Master Roadmap (Phases B, D, G)](UNIFIED_MASTER_ROADMAP.md)
+- [Architecture Node: SaaS Studio](architecture_nodes/Route_rag_app.md)
+- [Architecture Node: RAG Client SDK](architecture_nodes/Lib_rag_client.md)
+- [Architecture Node: /v1/chat](architecture_nodes/Retriever_API_v1_chat.md)
+- [Architecture Node: Tenants Schema](architecture_nodes/Schema_rag_tenants.md)

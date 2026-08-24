@@ -86,3 +86,14 @@ Database storage overhead is managed through an automated trigger:
 - Raw IP addresses are hashed using a rotating daily salt.
 - Database records older than 90 days are pruned automatically.
 - Dashboard queries run through the optimized `get_analytics_summary` RPC.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Database Logging & RPC Aggregation](10_Content_Platform_Architecture.md)
+- [GDPR-Compliant IP Hashing & RLS](16_Security_and_Privacy.md)
+- [Terminal Analytics Commands](09_Section_Specifications/10_Terminal.md)
+- [RAG Studio Telemetry & Token Metering](24_RAG_App_Studio_PRD.md)
+- [Architecture Node: Edge Proxy](architecture_nodes/Proxy_telemetry.md)
+- [Architecture Node: Page Visits Schema](architecture_nodes/Schema_page_visits.md)

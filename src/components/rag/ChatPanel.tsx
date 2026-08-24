@@ -284,51 +284,69 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
     content: string,
     onDownloadCitation: (docId: string) => void
   ): ReactNode {
-    const citationRegex = /\[(Doc|Source):\s*([^\]]+)\]/g;
+    const citationRegex = /\[(?:(Doc|Source):\s*([^\]]+)|(\d+))\]/g;
     const parts: ReactNode[] = [];
     let lastIndex = 0;
     let match: RegExpExecArray | null;
 
     while ((match = citationRegex.exec(content)) !== null) {
       const fullMatch = match[0];
-      const rawDocIdentifier = match[2];
+      const isNamed = Boolean(match[1] || match[2]);
+      const rawDocIdentifier = isNamed ? match[2] : `Reference ${match[3]}`;
       const matchIndex = match.index;
 
       if (matchIndex > lastIndex) {
         parts.push(content.substring(lastIndex, matchIndex));
       }
 
-      // Check if citation carries explicit exact span quote: e.g. filename.pdf | "exact text snippet"
-      const pipeIndex = rawDocIdentifier.indexOf("|");
-      let docName = rawDocIdentifier.trim();
-      let quoteSnippet = "";
+      if (isNamed) {
+        // Check if citation carries explicit exact span quote: e.g. filename.pdf | "exact text snippet"
+        const pipeIndex = rawDocIdentifier.indexOf("|");
+        let docName = rawDocIdentifier.trim();
+        let quoteSnippet = "";
 
-      if (pipeIndex !== -1) {
-        docName = rawDocIdentifier.substring(0, pipeIndex).trim();
-        quoteSnippet = rawDocIdentifier.substring(pipeIndex + 1).replace(/^[\s"]+|[\s"]+$/g, "");
-      }
+        if (pipeIndex !== -1) {
+          docName = rawDocIdentifier.substring(0, pipeIndex).trim();
+          quoteSnippet = rawDocIdentifier.substring(pipeIndex + 1).replace(/^[\s"]+|[\s"]+$/g, "");
+        }
 
-      if (quoteSnippet) {
+        if (quoteSnippet) {
+          parts.push(
+            <span key={`quote-${matchIndex}`} className={styles.groundedHighlight} title="Verified Exact String Span Context Match">
+              “{quoteSnippet}”
+            </span>
+          );
+        }
+
         parts.push(
-          <span key={`quote-${matchIndex}`} className={styles.groundedHighlight} title="Verified Exact String Span Context Match">
-            “{quoteSnippet}”
-          </span>
+          <button
+            key={`citation-${matchIndex}`}
+            className={styles.citationBadge}
+            onClick={(e) => {
+              e.preventDefault();
+              onDownloadCitation(docName);
+            }}
+            title={`✓ Grounded in Document: ${docName}. Click to download source file.`}
+          >
+            ✓ 📥 {docName}
+          </button>
+        );
+      } else {
+        const indexNum = match[3];
+        parts.push(
+          <button
+            key={`citation-idx-${matchIndex}`}
+            className={styles.citationBadge}
+            onClick={(e) => {
+              e.preventDefault();
+              onDownloadCitation(indexNum);
+            }}
+            title={`✓ Grounded in Verified Source Reference [${indexNum}]`}
+          >
+            ✓ [{indexNum}]
+          </button>
         );
       }
-
-      parts.push(
-        <button
-          key={`citation-${matchIndex}`}
-          className={styles.citationBadge}
-          onClick={(e) => {
-            e.preventDefault();
-            onDownloadCitation(docName);
-          }}
-          title={`✓ Grounded in Document: ${docName}. Click to download source file.`}
-        >
-          ✓ 📥 {docName}
-        </button>
-      );
 
       lastIndex = matchIndex + fullMatch.length;
     }
@@ -383,7 +401,7 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
               const isStreamingAssistant = m.role === "assistant" && isLast && loading;
               const isWaitingFirstToken = isStreamingAssistant && !m.content;
 
-              const hasCitations = m.content.includes("[Doc:") || m.content.includes("[Source:");
+              const hasCitations = /\[(Doc|Source):|\[\d+\]/.test(m.content);
               const hasUngroundedWarning = m.content.includes("ungrounded") || m.content.includes("unverified");
 
               return (

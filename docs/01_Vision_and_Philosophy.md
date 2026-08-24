@@ -338,3 +338,15 @@ This separation ensures that product vision, engineering practices, and operatio
 - Identity layers are established.
 - The long-term vision is articulated.
 - Future contributors can understand _why_ the product exists before learning _how_ it is implemented.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Goals & Success Metrics](03_Product_Goals_Objectives_and_Success_Metrics.md)
+- [Adaptive Portfolio Experience](04_Adaptive_Portfolio_Experience.md)
+- [Adaptive Identity System](06_Adaptive_Identity_System.md)
+- [Content Strategy](07_Content_Strategy.md)
+- [Master Development Roadmap (SSoT)](UNIFIED_MASTER_ROADMAP.md)
+- [Architecture Decision Records](99_DECISIONS.md)
+- [Architecture Node: Route /](architecture_nodes/Route_home.md)

@@ -78,3 +78,11 @@ Transparency builds confidence. Presenting pricing tiers and project rates early
 - Pricing details adapt dynamically to the active Communication Identity.
 - Selecting a package pre-populates the corresponding field in the contact form.
 - The layout remains responsive and fits well on mobile viewports.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Interactive Scoping Lab (Replaced Pricing)](12_Scoping_Lab.md)
+- [SOTA Scoping & CPQ Engine](../25_SOTA_Scoping_Engine_PRD.md)
+- [Client Workspace Dashboard](13_Client_Workspace_Dashboard.md)

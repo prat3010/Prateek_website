@@ -33,11 +33,12 @@
 - **Rule:** Engine tier rates, care/maintenance plan fees, and feature pricing are strictly stored in `intakeQuestionnaireDefaults.json` and resolved via `src/lib/pricing.ts`.
 - **Constraint:** Never hardcode currency figures, absolute prices, or tier multipliers inside TypeScript UI components or frontend JSX.
 
-### 8. Full Feature Flow Pre-Audit & End-to-End Verification
-- **Rule:** Before creating, editing, or integrating any UI feature, animation, or state property:
-  1. **Exhaustive Variable/State Search:** Grep/search the entire target file and connected components for ALL render instances of target state variables (e.g. `totalCost`, `price`, `theme`). Never assume a state variable only renders in a single JSX block or summary card.
-  2. **Contract & Formatting Alignment:** Verify third-party library defaults against local domain contracts (`src/lib/pricing.ts`, `formatMoney`, `pdfTheme.ts`). Always pass explicit locale/formatting parameters (`locales={currency === 'INR' ? 'en-IN' : 'en-US'}`) matching site-wide conventions.
-  3. **Primary User Flow Coverage:** Ensure visual animations and interactive polish are integrated directly into the primary active interaction paths (e.g., sticky action toolbars, live input controls, interactive cards) rather than only on static end steps.
+### 9. Agent Architecture Pre-Flight & Graph Intelligence
+- **Rule:** Before creating, editing, or modifying ANY database table, API route handler, core domain utility (`pricing.ts`, `sessionVerify.ts`, `rag-client.ts`), or UI component, the agent **MUST** run:
+  ```bash
+  python3 scripts/query_architecture.py --target <entity_or_api>
+  ```
+- **Constraint:** Inspect upstream callers, downstream dependents, and linked PRD specifications before writing code to eliminate regression bugs. After completing changes, execute `python3 scripts/sync_graph_with_code.py` to keep the live code and Obsidian Knowledge Graph synchronized.
 - **Constraint:** Never mark a feature complete without verifying the entire end-to-end user interaction flow across all steps and screen sizes.
 
 ### 9. Mandatory Database Schema Pre-Check & Migration Execution
@@ -46,4 +47,9 @@
   2. **Execute Migrations Immediately:** Run `ALTER TABLE ... ADD COLUMN IF NOT EXISTS ...` via Supabase SQL before making code writes so API REST payloads never fail with `HTTP 400 (PGRST204)` schema cache mismatch errors.
   3. **Synchronize SQL Manifests:** Immediately update `supabase_schema.sql` and run `python3 scripts/audit_contracts.py` to ensure local SQL manifests stay 100% synchronized with the live database.
 - **Constraint:** NEVER push new data properties or write payloads to Supabase without first verifying that the target database table has the required columns in the live schema.
+
+### 10. Episodic Memory Bank & Failure Postmortems
+- **Rule:** Before attempting any complex refactor, CSS layout modification, or debugging task, the agent **MUST** inspect `docs/LEARNINGS.md` for known framework quirks (e.g. Next.js 16 proxy headers, Framer Motion ScrollSection containing block, React 19 synchronous effects).
+- **Constraint:** Whenever a non-trivial bug or framework trap is resolved, the agent **MUST** document the failure signature, root cause, anti-pattern, and enforced solution in `docs/LEARNINGS.md`.
+
 

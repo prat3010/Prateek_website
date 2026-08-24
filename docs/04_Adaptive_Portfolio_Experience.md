@@ -425,3 +425,15 @@ The experience should become the product’s defining characteristic.
 - Resume and quotation systems are clearly separated.
 - Projects communicate differently while remaining technically identical.
 - Future audience expansion is supported by the architecture.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Adaptive Identity System](06_Adaptive_Identity_System.md)
+- [UX & Interaction Design](05_User_Experience_and_Interaction_Design.md)
+- [Information Architecture](08_Information_Architecture.md)
+- [Hero Section Specification](09_Section_Specifications/01_Hero.md)
+- [Architecture Decision Records](99_DECISIONS.md)
+- [Architecture Node: Route /](architecture_nodes/Route_home.md)
+- [Architecture Node: NoirSkyline Parallax](architecture_nodes/UI_NoirSkyline.md)

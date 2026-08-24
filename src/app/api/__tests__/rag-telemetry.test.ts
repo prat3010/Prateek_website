@@ -4,11 +4,13 @@ vi.mock('server-only', () => ({}));
 vi.mock('@/data/supabase', () => ({
   supabase: {
     from: () => ({
-      select: () => ({
-        eq: () => ({
+      select: () => {
+        const query: any = {
+          eq: () => query,
           maybeSingle: () => Promise.resolve({ data: { tenant_id: 'tenant-123', plan_tier: 'growth' } }),
-        }),
-      }),
+        };
+        return query;
+      },
     }),
   },
 }));

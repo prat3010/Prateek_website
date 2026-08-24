@@ -1,4 +1,6 @@
-# **21. Future Roadmap**
+# **21. Future Roadmap (Portfolio Overview)**
+
+> 📌 **Master SSoT Roadmap:** For active platform-wide sequential development tracking (M1 to M68) across `Prateek_website` and `retriever`, see: [`UNIFIED_MASTER_ROADMAP.md`](UNIFIED_MASTER_ROADMAP.md).
 
 ## **Purpose**
 
@@ -57,18 +59,26 @@ timeline
 * **Razorpay Subscription Automation**: Wire `/rag` pricing tiers to Razorpay subscription APIs and automate tenant provisioning in `retriever` via webhooks.
 * **Supabase Auth Session Gate**: Connect `/rag/app` natively to Supabase Auth user sessions (`rag_tenants` and `rag_tenant_members` schemas).
 * **Multi-User Team Invites**: Enable tenant owners to invite team members by email with role-based access control.
-* **Detailed Ecosystem Roadmap**: See **[Client Dashboard Ecosystem Roadmap](file:///Users/prateeksharma/Developer/Prateek_website/docs/CLIENT_DASHBOARD_ROADMAP.md)** for full specifications.
+* **Detailed Ecosystem Roadmap**: See **[Client Dashboard Ecosystem Roadmap](CLIENT_DASHBOARD_ROADMAP.md)** for full specifications.
 
 ---
 
 > 📌 **Cross-Repository Roadmap & Field Documentation:**  
-> - **Client Dashboard Ecosystem (`prateeq.in`):** **[CLIENT_DASHBOARD_ROADMAP.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/CLIENT_DASHBOARD_ROADMAP.md)**  
-> - **Admin Platform Control Panel (`admin.rag.prateeq.in`):** **[ADMIN_DASHBOARD_ROADMAP.md](file:///Users/prateeksharma/Developer/retriever/docs/ADMIN_DASHBOARD_ROADMAP.md)**  
-> - **High-Converting Demo Field Guide:** **[DEMO_PLAYBOOK_AND_SHOWCASE_GUIDE.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/DEMO_PLAYBOOK_AND_SHOWCASE_GUIDE.md)**
+> - **Client Dashboard Ecosystem (`prateeq.in`):** **[CLIENT_DASHBOARD_ROADMAP.md](CLIENT_DASHBOARD_ROADMAP.md)**  
+> - **Admin Platform Control Panel (`admin.rag.prateeq.in`):** **[ADMIN_DASHBOARD_ROADMAP.md](../../retriever/docs/ADMIN_DASHBOARD_ROADMAP.md)**  
+> - **High-Converting Demo Field Guide:** **[DEMO_PLAYBOOK_AND_SHOWCASE_GUIDE.md](DEMO_PLAYBOOK_AND_SHOWCASE_GUIDE.md)**
 
 ---
 
 # **Acceptance Criteria**
-- Future roadmap items align with the non-negotiable principles defined in [01_Vision_and_Philosophy.md](file:///Users/prateeksharma/Developer/Prateek_website/docs/01_Vision_and_Philosophy.md).
+- Future roadmap items align with the non-negotiable principles defined in [01_Vision_and_Philosophy.md](01_Vision_and_Philosophy.md).
 - Architectural patterns remain open to roadmap implementations (e.g. schema layers and route configs).
 
+---
+
+## **Related Architecture & Cross-References**
+
+- [Unified Master Roadmap (SSoT: M1–M68)](UNIFIED_MASTER_ROADMAP.md)
+- [SOTA Scoping Engine & Commerce PRD](25_SOTA_Scoping_Engine_PRD.md)
+- [RAG SaaS Studio Workspace PRD](24_RAG_App_Studio_PRD.md)
+- [Client Workspace Specification](CLIENT_DASHBOARD_ROADMAP.md)

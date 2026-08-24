@@ -276,5 +276,14 @@ This document serves as the registry of critical architectural design decisions 
 - Registry records cover the core v2 architectural choices.
 - Format follows standard ADR structures (Context, Decision, Consequences).
 
+---
 
+## **Related Architecture & Cross-References**
 
+- [Vision & Philosophy](01_Vision_and_Philosophy.md)
+- [Adaptive Portfolio Experience](04_Adaptive_Portfolio_Experience.md)
+- [Interaction Design](05_User_Experience_and_Interaction_Design.md)
+- [Identity System](06_Adaptive_Identity_System.md)
+- [Unified Master Roadmap](UNIFIED_MASTER_ROADMAP.md)
+- [ADR 10: Skyline Parallax Decoupling](architecture_nodes/UI_NoirSkyline.md)
+- [ADR 11 & 12: PDF Token Architecture](architecture_nodes/UI_CommercialPDFSuite.md)

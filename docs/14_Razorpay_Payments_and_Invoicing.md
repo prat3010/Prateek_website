@@ -44,9 +44,9 @@ The system enables clients to lock 50% upfront project deposits via Razorpay Sta
 
 ## **API Routes & Responsibilities**
 
-### 1. **Order Creation Endpoint**: [`POST /api/client/create-razorpay-order`](file:///Users/prateeksharma/Developer/Prateek_website/src/app/api/client/create-razorpay-order/route.ts)
+### 1. **Order Creation Endpoint**: [`POST /api/client/create-razorpay-order`](../src/app/api/client/create-razorpay-order/route.ts)
 
-* **Authentication**: Requires valid Supabase session token via `Authorization: Bearer <token>` verified by [`getVerifiedSessionEmail`](file:///Users/prateeksharma/Developer/Prateek_website/src/lib/sessionVerify.ts).
+* **Authentication**: Requires valid Supabase session token via `Authorization: Bearer <token>` verified by [`getVerifiedSessionEmail`](../src/lib/sessionVerify.ts).
 * **Anti-Price Tampering**: Order cost is read strictly from the database (`client_scopes` / `client_orders` table) by `scopeCode`. The client cannot supply a custom payment amount.
 * **Currency Conversion**: If the scope currency is `USD`, the amount is converted to `INR` at a fixed rate of `85` (`USD_TO_INR_RATE`) to ensure compatibility with domestic and international checkout cards.
 * **Subunit Conversion**: Amount is converted to currency subunits (paise) by multiplying by `100` (`amountInSubunits = depositAmount * 100`).
@@ -56,7 +56,7 @@ The system enables clients to lock 50% upfront project deposits via Razorpay Sta
 
 ---
 
-### 2. **Payment Verification Endpoint**: [`POST /api/client/verify-razorpay-payment`](file:///Users/prateeksharma/Developer/Prateek_website/src/app/api/client/verify-razorpay-payment/route.ts)
+### 2. **Payment Verification Endpoint**: [`POST /api/client/verify-razorpay-payment`](../src/app/api/client/verify-razorpay-payment/route.ts)
 
 * **Authentication**: Session-gated via JWT bearer token.
 * **Signature Verification**: Verifies Razorpay HMAC-SHA256 signature using `crypto.timingSafeEqual`:
@@ -76,7 +76,7 @@ The system enables clients to lock 50% upfront project deposits via Razorpay Sta
 
 ---
 
-### 3. **Idempotent Webhook Handler**: [`POST /api/webhooks/razorpay`](file:///Users/prateeksharma/Developer/Prateek_website/src/app/api/webhooks/razorpay/route.ts)
+### 3. **Idempotent Webhook Handler**: [`POST /api/webhooks/razorpay`](../src/app/api/webhooks/razorpay/route.ts)
 
 * **Raw Body HMAC Validation**: Verifies HTTP header `x-razorpay-signature` against raw request body using `RAZORPAY_WEBHOOK_SECRET` (or `RAZORPAY_KEY_SECRET`).
 * **Idempotency Control**: Checks `processed_webhooks` table by `event_id` before processing. Skips already processed events to prevent duplicate ledger updates.
@@ -84,9 +84,9 @@ The system enables clients to lock 50% upfront project deposits via Razorpay Sta
 
 ---
 
-## **Database Schema ([`supabase_schema.sql`](file:///Users/prateeksharma/Developer/Prateek_website/supabase_schema.sql))**
+## **Database Schema ([`supabase_schema.sql`](../supabase_schema.sql))**
 
-### 4. **Invoice Creation Endpoint**: [`POST /api/client/create-razorpay-invoice`](file:///Users/prateeksharma/Developer/Prateek_website/src/app/api/client/create-razorpay-invoice/route.ts)
+### 4. **Invoice Creation Endpoint**: [`POST /api/client/create-razorpay-invoice`](../src/app/api/client/create-razorpay-invoice/route.ts)
 
 * **Authentication**: Requires valid session token via `Authorization: Bearer <token>`.
 * **GST & Tax Rules**: Automatically calculates Intra-State (CGST 9% + SGST 9%) vs Inter-State (IGST 18%) tax based on `place_of_supply`. Standard SAC code `998314` applied for IT engineering services.
@@ -94,14 +94,14 @@ The system enables clients to lock 50% upfront project deposits via Razorpay Sta
 * **Razorpay Invoices API Sync**: Posts invoice details to `https://api.razorpay.com/v1/invoices` when server credentials are configured.
 * **Invoice Record**: Inserts an `issued` record into the `invoices` table with line items, tax breakup, terms, notes, and payment URL.
 
-### 5. **Invoice Retrieval Endpoint**: [`GET /api/client/get-invoices`](file:///Users/prateeksharma/Developer/Prateek_website/src/app/api/client/get-invoices/route.ts)
+### 5. **Invoice Retrieval Endpoint**: [`GET /api/client/get-invoices`](../src/app/api/client/get-invoices/route.ts)
 
 * **Authentication**: Session-gated via JWT bearer token.
 * **Scope Isolation**: Returns invoices belonging strictly to the verified client email (`customer_email`).
 
 ---
 
-### 6. **Subscription Creation Endpoint**: [`POST /api/client/create-razorpay-subscription`](file:///Users/prateeksharma/Developer/Prateek_website/src/app/api/client/create-razorpay-subscription/route.ts)
+### 6. **Subscription Creation Endpoint**: [`POST /api/client/create-razorpay-subscription`](../src/app/api/client/create-razorpay-subscription/route.ts)
 
 * **Authentication**: Requires valid session token via `Authorization: Bearer <token>` verified by `getVerifiedSessionEmail`.
 * **Subscription Plan Initialization**: Sends a POST request to `https://api.razorpay.com/v1/subscriptions` with `plan_id` (e.g., `plan_starter_inr`), `total_count`, and client metadata notes.
@@ -110,7 +110,7 @@ The system enables clients to lock 50% upfront project deposits via Razorpay Sta
 
 ---
 
-## **Database Schema ([`supabase_schema.sql`](file:///Users/prateeksharma/Developer/Prateek_website/supabase_schema.sql))**
+## **Database Schema ([`supabase_schema.sql`](../supabase_schema.sql))**
 
 ### **`invoices` Table**
 
@@ -179,10 +179,23 @@ CREATE TABLE IF NOT EXISTS processed_webhooks (
 
 ## **Automated Testing**
 
-Unit and integration tests are maintained in [`src/app/api/__tests__/razorpay.test.ts`](file:///Users/prateeksharma/Developer/Prateek_website/src/app/api/__tests__/razorpay.test.ts):
+Unit and integration tests are maintained in [`src/app/api/__tests__/razorpay.test.ts`](../src/app/api/__tests__/razorpay.test.ts):
 - Authorization rejection (401 without Bearer token).
 - Input validation (400 on missing scope code).
 - Order creation & price lookup verification.
 - HMAC signature mismatch rejection (400).
 - Successful payment verification & DB milestone advance.
 - Webhook signature validation & idempotency checks.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [50% Scope Deposit Escrow & CPQ Math](25_SOTA_Scoping_Engine_PRD.md)
+- [Client Workspace Invoice Ledger](09_Section_Specifications/13_Client_Workspace_Dashboard.md)
+- [HMAC Signature Verification & Webhooks](16_Security_and_Privacy.md)
+- [RAG SaaS Subscriptions Billing](24_RAG_App_Studio_PRD.md)
+- [Payment Milestones (M64, M67)](UNIFIED_MASTER_ROADMAP.md)
+- [Architecture Node: Create Order API](architecture_nodes/API_client_create_razorpay_order.md)
+- [Architecture Node: Verify Payment API](architecture_nodes/API_client_verify_razorpay_payment.md)
+- [Architecture Node: Invoices Schema](architecture_nodes/Schema_invoices.md)

@@ -1,5 +1,7 @@
 # RAG Lab
 
+> 📌 **Master SaaS Studio PRD:** For the complete RAG App Studio (`/rag/app`) product specification, see [`docs/24_RAG_App_Studio_PRD.md`](24_RAG_App_Studio_PRD.md).
+
 **Interactive document search and chat powered by a custom RAG engine.**
 
 RAG Lab is a full-stack Retrieval-Augmented Generation platform. Upload PDFs, search semantically, and get grounded answers with citations. The frontend lives in this portfolio at `/rag` and talks to a FastAPI backend running on an Oracle Cloud VPS. An admin dashboard is available at [`admin.rag.prateeq.in`](https://admin.rag.prateeq.in) for tenant and platform management.
@@ -573,3 +575,12 @@ Stored in the `configurations` table per tenant. Key fields editable via `PUT /v
 | `system_prompt` | string | Custom system prompt template |
 | `summarize_after_turns` | integer | Compress history after N turns |
 | `budget_limit_monthly` | float | Monthly LLM spend cap in USD |
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [RAG SaaS Studio Workspace PRD](24_RAG_App_Studio_PRD.md)
+- [Scoping Dogfooding Tenant](25_SOTA_Scoping_Engine_PRD.md)
+- [Telemetry & Semantic Cache Tracking](13_Telemetry_and_Analytics.md)
+- [Unified Master Roadmap](UNIFIED_MASTER_ROADMAP.md)

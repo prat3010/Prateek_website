@@ -61,8 +61,8 @@ The proxy telemetry pipeline is structured around strict privacy boundaries:
 # **Client Session Verification & Bearer Auth**
 
 To secure the Client Workspace (`/dashboard`) and REST APIs (`/api/client/*`):
-* **Supabase JWT Verification**: Endpoints require `Authorization: Bearer <token>` headers. The server verifies tokens via [`getVerifiedSessionEmail`](file:///Users/prateeksharma/Developer/Prateek_website/src/lib/sessionVerify.ts) against Supabase Auth API.
-* **Server-Side PKCE OAuth Callback Handler**: OAuth returns are handled server-side via [`/auth/callback`](file:///Users/prateeksharma/Developer/Prateek_website/src/app/auth/callback/route.ts) using `@supabase/ssr`. It exchanges the PKCE code for a session (`exchangeCodeForSession`), sets HTTP-only `prateeq_active_user` session cookies, handles OAuth errors, and canonicalizes redirects back to `/dashboard`.
+* **Supabase JWT Verification**: Endpoints require `Authorization: Bearer <token>` headers. The server verifies tokens via [`getVerifiedSessionEmail`](../src/lib/sessionVerify.ts) against Supabase Auth API.
+* **Server-Side PKCE OAuth Callback Handler**: OAuth returns are handled server-side via [`/auth/callback`](../src/app/auth/callback/route.ts) using `@supabase/ssr`. It exchanges the PKCE code for a session (`exchangeCodeForSession`), sets HTTP-only `prateeq_active_user` session cookies, handles OAuth errors, and canonicalizes redirects back to `/dashboard`.
 * **Email Scope Binding**: Client emails are derived strictly from the verified JWT payload, never from request body parameters. A client can read or modify only their own scopes (`client_scopes`) and invoices (`invoices`).
 * **Unpaid Scope Deletion**: Deletion `/api/client/delete-scope` is restricted to unpaid scopes (`deposit_paid = false`). Paid scopes are immutable via client APIs.
 
@@ -80,7 +80,7 @@ To secure the Client Workspace (`/dashboard`) and REST APIs (`/api/client/*`):
 
 Dynamic vulnerability scanning and proof-of-concept (PoC) security validation are performed using [Strix](https://github.com/usestrix/strix) (`usestrix/strix`), an open-source autonomous AI penetration testing framework:
 
-* **Execution Script**: [`scripts/security_audit_strix.sh`](file:///Users/prateeksharma/Developer/Prateek_website/scripts/security_audit_strix.sh)
+* **Execution Script**: [`scripts/security_audit_strix.sh`](../scripts/security_audit_strix.sh)
 * **Target Scope**: Local Next.js 16 App Router dev server (`http://localhost:3000`), public & auth-gated API endpoints (`/api/client/*`, `/api/contact`, `/api/terminal/*`), PKCE callback handlers (`/auth/callback`), telemetry proxy (`src/proxy.ts`), and static codebase (`src/`).
 * **LLM Orchestration**: Strix autonomous multi-agent security teams utilize OpenRouter (`openrouter/anthropic/claude-3.5-sonnet` or configured model) via `OPENROUTER_API_KEY` / `LLM_API_KEY`.
 * **Report Generation**: Execution logs and validated vulnerability proof-of-concepts are output to `./strix_runs/`.
@@ -106,3 +106,13 @@ Dynamic vulnerability scanning and proof-of-concept (PoC) security validation ar
 - Strix AI penetration testing script (`scripts/security_audit_strix.sh`) is configured for local dynamic & static security audits.
 - RAG guest API keys are seeded in the database and security contexts are cached per request to prevent auth timeouts.
 
+---
+
+## **Related Architecture & Cross-References**
+
+- [Supabase Service Role & Public RLS](10_Content_Platform_Architecture.md)
+- [Payment Security & Webhook Signatures](14_Razorpay_Payments_and_Invoicing.md)
+- [Supabase Auth PKCE Session Gate](CLIENT_DASHBOARD_ROADMAP.md)
+- [SHA-256 SOW Cryptographic Freeze](25_SOTA_Scoping_Engine_PRD.md)
+- [Architecture Node: Session Guard](architecture_nodes/Lib_sessionVerify.md)
+- [Architecture Node: OAuth Handler](architecture_nodes/Route_auth_callback.md)

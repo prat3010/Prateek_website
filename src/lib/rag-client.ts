@@ -79,6 +79,7 @@ export class RetrieverClient {
       method: "POST",
       body: JSON.stringify({
         query,
+        limit,
         top_k: limit,
         enable_query_rewriting: options?.enableQueryRewriting ?? true,
         enable_hybrid: options?.enableHybrid ?? true,
@@ -149,11 +150,12 @@ export class RetrieverClient {
   }
 
   async submitFeedback(sessionId: string, messageId: string, rating: "up" | "down", feedbackText?: string) {
+    const numericRating = rating === "up" ? 1 : -1;
     return this.request(
       `/v1/tenants/${this.config.tenantId}/chat/sessions/${sessionId}/messages/${messageId}/feedback`,
       {
         method: "POST",
-        body: JSON.stringify({ rating, feedback_text: feedbackText || "" }),
+        body: JSON.stringify({ rating: numericRating, feedback_text: feedbackText || "" }),
       }
     );
   }
@@ -243,16 +245,16 @@ export class RetrieverClient {
 
   async executeRlmSubroutine(
     query: string,
-    maxSteps = 5
+    maxSteps = 3
   ): Promise<import("./rag-types").RlmExecutionResponse> {
     return this.request<import("./rag-types").RlmExecutionResponse>(
-      `/v1/rlm/execute`,
+      `/v1/tenants/${this.config.tenantId}/rlm/analyze`,
       {
         method: "POST",
         body: JSON.stringify({
           tenant_id: this.config.tenantId,
-          query,
-          max_steps: maxSteps,
+          prompt: query,
+          max_depth: maxSteps,
         }),
       }
     );

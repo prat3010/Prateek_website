@@ -90,3 +90,12 @@ Manageable via **Sync Projects** tab:
 - Case study text adapts to the selected Communication Identity.
 - External links satisfy screen reader accessible labeling.
 - Image assets use correct optimized web dimensions.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Previous Section: Skills](03_Skills_and_Services.md)
+- [Project Case Studies & Deep Links](../BLOG_DEEP_LINKING_MAP.md)
+- [Next Section: Playground](05_Playground.md)
+- [Architecture Node: Projects Schema](../architecture_nodes/Schema_projects.md)

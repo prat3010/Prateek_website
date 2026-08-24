@@ -1,0 +1,43 @@
+---
+id: API_scoping_parse_rfp
+tier: 4_api_gateway
+platform: Prateek_Website
+status: production
+auth_level: public
+file_path: src/app/api/scoping/parse/rfp/route.ts
+ide_cursor_uri: "cursor://file/Users/prateeksharma/Developer/Prateek_website/src/app/api/scoping/parse/rfp/route.ts"
+ide_vscode_uri: "vscode://file/Users/prateeksharma/Developer/Prateek_website/src/app/api/scoping/parse/rfp/route.ts"
+tags:
+  - tier/4_api_gateway
+  - security/public
+  - domain/commerce
+  - platform/website
+downstream:
+  - ../25_SOTA_Scoping_Engine_PRD
+  - Engine_Docling_Layout_OCR
+  - UI_ScopingLab
+  - UI_ArchitectureCartDrawer
+---
+
+# API: `POST /api/scoping/parse-rfp`
+
+> [!NOTE] Quick IDE Jump
+> ⚡ **[Open in Cursor](cursor://file/Users/prateeksharma/Developer/Prateek_website/src/app/api/scoping/parse/rfp/route.ts)** &nbsp;|&nbsp; 💻 **[Open in VS Code](vscode://file/Users/prateeksharma/Developer/Prateek_website/src/app/api/scoping/parse/rfp/route.ts)**
+
+#api #multimodal #ocr #pdf #phase_g
+
+> **Multimodal RFP & Wireframe Ingestion Stream using Docling Layout OCR (M42).**
+
+- **Endpoint:** `POST /api/scoping/parse-rfp`
+- **Gateway:** Next.js 16 Route Handler with `multipart/form-data`
+- **Processing Engine:** Docling Layout OCR + PyMuPDF AST Chunker
+- **Payload:** `FormData` containing `.pdf`, `.docx`, or image wireframes
+- **Output:** Extracted functional specifications, automatically checked cart features, and estimate matrix.
+
+---
+
+## 🔗 Related Architecture & Cross-References
+- [25_SOTA_Scoping_Engine_PRD](../25_SOTA_Scoping_Engine_PRD.md)
+- [Engine: Docling Layout OCR](Engine_Docling_Layout_OCR.md)
+- [UI: ScopingLab](UI_ScopingLab.md)
+- [UI: ArchitectureCartDrawer](UI_ArchitectureCartDrawer.md)

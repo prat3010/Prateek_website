@@ -71,3 +71,12 @@ Manageable via **Manage Skills** tab in Streamlit Synchronizer (`scripts/sync_ta
 - Business Mode translates skills into readable services.
 - Clean, spacious 2-column grid rendering without crowding or layout shifts.
 - 100% pass rate on TypeScript, ESLint, Vitest, and Next.js production builds.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Previous Section: About Me](02_About_Me.md)
+- [Persona-Aware Skills](../06_Adaptive_Identity_System.md)
+- [Next Section: Projects Showcase](04_Projects.md)
+- [Architecture Node: Skills Schema](../architecture_nodes/Schema_skills.md)

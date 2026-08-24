@@ -333,3 +333,14 @@ Everything else is secondary.
 - AI’s role is clearly defined.
 - Long-term direction is documented.
 - Success can be evaluated using qualitative and quantitative metrics.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Vision & Philosophy](01_Vision_and_Philosophy.md)
+- [Telemetry & Performance Metrics](13_Telemetry_and_Analytics.md)
+- [Core Web Vitals Standards](15_Performance_and_Accessibility.md)
+- [Revenue Execution Plan](REVENUE_EXECUTION_PLAN.md)
+- [Unified Master Roadmap](UNIFIED_MASTER_ROADMAP.md)
+- [Architecture Node: Analytics Route](architecture_nodes/Route_analytics.md)

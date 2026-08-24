@@ -99,12 +99,34 @@ export async function POST(req: Request) {
         }
 
         if (invoice.scope_id) {
+          let sowHash = '';
+          try {
+            const { data: targetScope } = await supabase
+              .from('client_scopes')
+              .select('scope_code, client_email, base_engine, features, brand_asset, maintenance_plan, total_cost_inr, total_cost_usd, currency, timeline')
+              .eq('id', invoice.scope_id)
+              .maybeSingle();
+
+            if (targetScope) {
+              const snapshot = {
+                ...targetScope,
+                deposit_paid_at: nowIso,
+                razorpay_order_id: razorpayOrderId,
+                razorpay_payment_id: razorpayPaymentId,
+              };
+              sowHash = crypto.createHash('sha256').update(JSON.stringify(snapshot)).digest('hex');
+            }
+          } catch (hashErr) {
+            console.warn('Could not generate SOW hash on payment capture:', hashErr);
+          }
+
           const { error: updateScopeError } = await supabase
             .from('client_scopes')
             .update({
               deposit_paid: true,
               delivery_stage: 'engineering',
               status: 'Deposit Paid — In Development',
+              sow_hash: sowHash,
               updated_at: nowIso,
             })
             .eq('id', invoice.scope_id)

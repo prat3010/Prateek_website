@@ -61,3 +61,13 @@ The terminal parses input strings dynamically. Available commands include:
 - CLI commands execute and display responses immediately.
 - `git-info` reads and displays current commit records.
 - Input focus behavior is reliable on both desktop and mobile keyboards.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Footer Diagnostics Link](09_Footer.md)
+- [Visitor Analytics](../13_Telemetry_and_Analytics.md)
+- [Terminal Scoping CLI (`scope new`)](../25_SOTA_Scoping_Engine_PRD.md)
+- [Architecture Node: Terminal Route](../architecture_nodes/Route_terminal.md)
+- [Architecture Node: Terminal UI](../architecture_nodes/UI_Terminal.md)

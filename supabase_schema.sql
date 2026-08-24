@@ -233,6 +233,7 @@ CREATE TABLE IF NOT EXISTS client_scopes (
   signed_at TIMESTAMPTZ,
   signed_by_email TEXT DEFAULT '',
   onboarding_checklist JSONB DEFAULT '{}',
+  sow_hash TEXT DEFAULT '',
   created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -242,6 +243,7 @@ ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS payment_structure TEXT DEFAUL
 ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS signed_at TIMESTAMPTZ;
 ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS signed_by_email TEXT DEFAULT '';
 ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS onboarding_checklist JSONB DEFAULT '{}';
+ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS sow_hash TEXT DEFAULT '';
 
 ALTER TABLE client_scopes ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Clients can select own client_scopes" ON client_scopes;

@@ -439,3 +439,15 @@ Interaction before conversion.
 - Accessibility requirements are satisfied.
 - Performance remains excellent.
 - Visitors naturally continue exploring the portfolio.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Adaptive Portfolio Experience](../04_Adaptive_Portfolio_Experience.md)
+- [Adaptive Identity System](../06_Adaptive_Identity_System.md)
+- [Motion & Visual Aesthetics](../05_User_Experience_and_Interaction_Design.md)
+- [ADR 01 & ADR 10 (Noir Skyline)](../99_DECISIONS.md)
+- [Next Section: About Me](02_About_Me.md)
+- [Architecture Node: Route /](../architecture_nodes/Route_home.md)
+- [Architecture Node: NoirSkyline](../architecture_nodes/UI_NoirSkyline.md)

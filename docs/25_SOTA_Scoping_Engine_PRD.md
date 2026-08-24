@@ -1,107 +1,168 @@
 # PRD: Unified SOTA Scoping Engine & Client Workspace Dashboard (v2.0)
 
-> **Document Status:** Working Draft — Unified Architecture Established  
+> **Document Status:** Master Production Specification — Productized E-Commerce & Retriever Multi-Tenant Cognitive Control Plane  
 > **Target Release:** Q3 2026  
 > **Lead Architect:** Prateek Sharma  
-> **Target Audience:** High-ticket B2B Founders, CTOs, Enterprise Product Managers, and Sales Partners  
+> **Target Audience:** High-Ticket B2B Founders, CTOs, Enterprise Product Managers, and Sales Partners  
 > **Deal Size Focus:** $3,000 to $35,000+ USD / ₹2,50,000 to ₹30,00,000+ INR  
+> **Core Cognitive Engine:** Retriever Platform (`rag.prateeq.in` — FastAPI, pgvector, GraphRAG, Multi-Agent Consensus, RLM Python REPL)  
+> **Live Production Tenant:** `prateeq_scoping` (Dedicated dogfooding tenant providing real-time proof of Retriever's capabilities)  
+> **Commerce Paradigm:** Bespoke Productized Engineering & B2B Architecture Checkout  
 
 ---
 
 ## 1. Executive Summary & Product Vision
 
-The **Unified SOTA Scoping & Client Workspace Engine** merges the public Scoping Lab (`/scoping`) and the authenticated Client Portal (`/dashboard`) into a **single, continuous client lifecycle**.
+The **Unified SOTA Scoping & Client Workspace Engine** transforms custom software acquisition by merging the public Scoping Lab (`/scoping`), the authenticated Client Portal (`/dashboard`), and the **Retriever AI Platform** (`rag.prateeq.in`) into an **agency-grade productized engineering e-commerce ecosystem**.
 
-Instead of treating scoping as a static one-off cost calculator and the dashboard as a disconnected post-sale viewer, v2.0 unifies them into an **agency-grade productized engineering platform**:
-1. **At Discovery (`/scoping`)**: Prospective clients articulate their vision via an AI Natural Language Copilot or technical configurator, generating instant line-item CPQ pricing, visual architecture topologies, and Canva-grade proposal PDFs.
-2. **At Alignment & Onboarding (`/dashboard`)**: Clients authenticate with 1-click Google Fast-Pass to enter their personal workspace, fine-tune architecture via an embedded customizer, invite co-founders with versioned collaboration links, and review dynamic onboarding requirements.
-3. **At Commitment & Execution**: Clients digitally sign terms, execute 50% milestone deposits via Razorpay, lock scope to prevent project creep, and track development live through a 4-phase milestone engine—with post-deposit feature additions automatically managed as structured Phase 2 Change Orders.
-4. **Across the Entire Journey**: A **Unified AI Project Copilot** maintains persistent project memory from the client's first prompt on `/scoping` through live sprint delivery on `/dashboard`.
+### 1.1 The Paradigm Shift: Productized Engineering Commerce
+Traditional software agency scoping relies on opaque "Request a Quote" forms, delayed email exchanges, and fuzzy estimates—resulting in decision paralysis, protracted sales cycles, and scope creep.
+
+v2.0 replaces this broken model with **Productized Engineering Commerce**:
+1. **Interactive Architecture Cart & Checkout**: Base engines serve as core foundations (SKUs), add-on features serve as modular upgrades, brand kits serve as creative packages, and maintenance plans serve as recurring retainer subscriptions. Prospective clients configure, customize, and inspect itemized costs in a **Slide-over Architecture Cart Drawer** with live currency conversion (INR/USD), volume bundle discounts, and promo code validation.
+2. **Live Production Proof via Dogfooding (`prateeq_scoping`)**: The scoping engine is not a mock form—it is an **active production tenant on Retriever**. When a client enters a natural-language prompt or drops an RFP PDF, Retriever's multimodal OCR and structured extraction engines process the request live. The UI displays real-time telemetry (`⚡ Powered by Retriever Engine • Latency: 380ms • ⚡ Semantic Cache Active`), giving buyers indisputable proof of our technical capabilities before they commit capital.
+3. **GraphRAG "Frequently Built Together" Recommendations**: Powered by Retriever's Knowledge Graph (`PgGraphRepository`), the cart dynamically recommends essential companion modules (e.g. recommending *Role-Based Admin* and *Automated Invoicing* when *Stripe Subscriptions* is added), increasing Average Order Value (AOV) while ensuring architectural integrity.
+4. **Google Fast-Pass & Zero-Touch Tenancy Provisioning**: Clients authenticate with 1-click Google OAuth via Supabase Auth PKCE. This triggers an automated handoff (`GET /v1/auth/session`) that provisions a dedicated private client tenant (`tn_client_uuid`) and workspace collection on Retriever.
+5. **Cryptographic SOW Lock & Phase 2 Change Orders**: Clients digitally sign terms, select milestone payment structures (50/50 or 40/30/30), and execute deposits via Razorpay/Stripe. Upon verification, the baseline SOW is **cryptographically frozen** (`sow_hash = SHA256`). Post-deposit additions are isolated into formal **Phase 2 Change Orders** with auto-generated milestone invoices.
+6. **Dual Commercial Monetization**: Every AI feature configured in a scope (RAG, Chatbots, Document Search, Voice AI) automatically provisions and cross-sells a **Retriever Managed SaaS Subscription** ($199–$499/mo) alongside the upfront custom engineering milestone fee.
 
 ---
 
-## 2. The 4-Stage Continuous Client Lifecycle
+## 2. End-to-End System Architecture
 
 ```mermaid
 graph TD
-    subgraph "STAGE 1: Discovery & Intake (/scoping)"
-        VISITOR["Prospective Client"] --> INTAKE_MODE{"Select Discovery Mode"}
-        INTAKE_MODE -->|"Non-Tech Founder"| COPILOT["🤖 Natural Language AI Copilot<br/>(1-Line Intent Prompt)"]
-        INTAKE_MODE -->|"CTO / Tech Lead"| CONFIGURATOR["🛠️ Technical Architecture Matrix<br/>(Granular Line-Item Customizer)"]
-        INTAKE_MODE -->|"Modular Task"| QUICK_FLOW["⚡ Quick Service Add-on Flow"]
+    subgraph "CLIENT FRONTEND (prateeq.in - Next.js 16 App Router)"
+        VISITOR["Prospective Client / CTO"] --> DISCOVERY_GATE{"Discovery Input Mode"}
+        DISCOVERY_GATE -->|"1-Line Prompt"| NL_COPILOT["🤖 Natural Language Prompt Bar"]
+        DISCOVERY_GATE -->|"Upload File"| RFP_DROP["📄 RFP / PRD PDF Dropzone"]
+        DISCOVERY_GATE -->|"Visual Configurator"| TECH_MATRIX["🛠️ SOTA CPQ Matrix"]
         
-        COPILOT & CONFIGURATOR --> CPQ_ENGINE["Dynamic CPQ & Graph Solver<br/>(Bundle Savings + Rush Multipliers)"]
-        CPQ_ENGINE --> TOPOLOGY_PREVIEW["Live Visual Architecture Map"]
-        TOPOLOGY_PREVIEW --> INSTANT_PDF["📄 Download Instant Proposal PDF"]
-    end
-
-    subgraph "STAGE 2: Pre-Deposit Draft Workspace (/dashboard)"
-        INSTANT_PDF -->|"1-Click Google Auth"| DASH_WORKSPACE["💼 Client Dashboard Workspace"]
-        DASH_WORKSPACE -->|"Multi-Stakeholder Link"| COLLAB["🔗 Share with Co-Founder / CTO (Versioning)"]
-        DASH_WORKSPACE -->|"Need to Tweak Architecture?"| EMBED_SCOPER["🛠️ Embedded Live Scope Customizer<br/>(Full CPQ Engine in Dashboard)"]
-        EMBED_SCOPER -->|"Update Draft"| DASH_WORKSPACE
-    end
-
-    subgraph "STAGE 3: Digital Sign-off & Escrow Lock"
-        DASH_WORKSPACE --> SIGN_MODAL["✍️ Digital Proposal Sign-off<br/>(Payment Structure: 50/50 or 40/30/30)"]
-        SIGN_MODAL --> RAZORPAY["💳 Razorpay 50% Milestone Escrow"]
-        RAZORPAY -->|"Payment Verified"| SCOPE_FREEZE["🔒 Scope LOCKED (Freeze Baseline SOW)"]
-    end
-
-    subgraph "STAGE 4: Active Engineering & Change Management"
-        SCOPE_FREEZE --> MILESTONES["📊 4-Phase Live Milestone Progress Bar<br/>(Architecture → Engineering → Staging → Live)"]
-        SCOPE_FREEZE --> ONBOARDING["📋 Dynamic Onboarding Checklist<br/>(Cloud setup, Figma assets, API keys)"]
-        SCOPE_FREEZE --> GST_INVOICES["🧾 GST Tax Invoices & Ledger"]
+        NL_COPILOT & RFP_DROP & TECH_MATRIX --> CART_DRAWER["🛒 Interactive Slide-Over Cart Drawer<br/>• Line-Item Subtotals & Undo Removal<br/>• Volume Bundle Progress Meter<br/>• Promo & Partner Referral Engine<br/>• Live INR/USD Currency Toggle"]
         
-        SCOPE_FREEZE -->|"Client requests new feature mid-sprint?"| CHANGE_ORDER["⚡ Phase 2 Change Request Order<br/>(Generates standalone milestone invoice)"]
-        CHANGE_ORDER --> GST_INVOICES
+        CART_DRAWER --> TOPOLOGY_PREVIEW["Live Visual Architecture Map"]
+        TOPOLOGY_PREVIEW --> CHECKOUT_FLOW["💳 3-Step Productized B2B Checkout<br/>• Review & Tax Calculation<br/>• Digital SOW Signature Pad<br/>• Milestone Split (50/50 or 40/30/30)"]
+        
+        CHECKOUT_FLOW --> INSTANT_PDF["📄 Download Instant Pitch / SOW PDF"]
+        CHECKOUT_FLOW -->|"1-Click Google Auth (PKCE)"| DASH_WORKSPACE["💼 Client Workspace Dashboard (/dashboard)"]
+        DASH_WORKSPACE --> EMBEDDED_SCOPER["🛠️ Embedded Live Scope Customizer"]
+        DASH_WORKSPACE --> ACTIVE_SPRINT["📊 4-Phase Milestone Tracker & Change Orders"]
     end
 
-    subgraph "Persistent AI Layer"
-        UNIFIED_AI["🧠 Unified AI Project Architect & Copilot<br/>(Persistent memory from prompt to production)"] -.-> STAGE1
-        UNIFIED_AI -.-> STAGE2
-        UNIFIED_AI -.-> STAGE3
-        UNIFIED_AI -.-> STAGE4
+    subgraph "RETRIEVER COGNITIVE CONTROL PLANE (rag.prateeq.in - FastAPI)"
+        subgraph "Public Scoping Tenant: prateeq_scoping"
+            RFP_DROP -->|"Multi-Modal Ingestion"| RET_INGEST["M42 Layout-Aware OCR & Table Parser"]
+            RET_INGEST --> RET_EXTRACT["M22 Structured JSON Extraction"]
+            
+            NL_COPILOT --> RET_AGENTIC["M46 Agentic Workflow & ReAct Engine"]
+            RET_AGENTIC --> RET_CONSENSUS["M48 Multi-Agent Reflection Loop<br/>(Architect Agent vs. Feasibility Critic)"]
+            
+            CART_DRAWER -.->|"Frequently Built Together"| RET_RECOMMENDER["M37/M44 GraphRAG Recommendation Engine"]
+            
+            RET_CONSENSUS & RET_EXTRACT --> RET_REPL["M47 RLM & Python REPL Sandbox<br/>(Deterministic CPQ Math & Bundle Discounts)"]
+            RET_CONSENSUS --> RET_GRAPHRAG["M37/M44 GraphRAG Dependency Solver<br/>(Prerequisite Resolution & Topology Generator)"]
+            RET_CONSENSUS --> RET_CACHE["M14 HNSW Semantic Cache (Sub-100ms Hits)"]
+        end
+
+        subgraph "Client Dedicated Tenant: tn_client_..."
+            DASH_WORKSPACE -.->|"Auto-Provisioned (M39)"| RET_PRIVATE_VAULT["Private Workspace Collection (M27)<br/>• Ingested Client RFP & Specs<br/>• Cryptographic SOW Baseline<br/>• Onboarding Asset Memory"]
+            RET_PRIVATE_VAULT --> RET_COPILOT_SESSION["Unified Project Copilot (M8)<br/>(Vector Search + Graph Triples + Sprint Context)"]
+        end
+    end
+
+    subgraph "DATA, COMMERCE & ESCROW LAYER"
+        RET_REPL --> SUPABASE_DB[("Supabase PostgreSQL<br/>(client_scopes, invoices, promo_codes, page_visits)")]
+        CHECKOUT_FLOW --> RAZORPAY_GATEWAY["💳 Razorpay / Stripe Escrow Deposit"]
+        RAZORPAY_GATEWAY -->|"Payment Webhook"| ORDER_CONFIRM["🧾 Order Confirmation & Packing Slip (ORD-2026-XXXX)"]
+        ORDER_CONFIRM --> SOW_FREEZE["🔒 Cryptographic SOW Freeze & Audit Chain (M15)"]
+        SOW_FREEZE --> AUTO_PROVISION["⚡ Promote Tenant to Managed SaaS Production"]
+        AUTO_PROVISION --> RETRIEVER_TENANTS[("Retriever Multi-Tenant Store<br/>(rag_tenants, rag_subscriptions)")]
     end
 ```
 
 ---
 
-## 3. Problem Statement & Key Gaps Solved
+## 3. The 4-Stage Continuous Lifecycle & Sequence Flow
 
-| Problem in Current System | Root Cause | SOTA Unified Solution (v2.0) |
-|:---|:---|:---|
-| **High Drop-off on Step 2** | Non-technical buyers face 15+ complex checkboxes (PgVector, Redis, OAuth) and suffer from decision fatigue. | **AI Intent Copilot**: Types 1 line of plain English $\rightarrow$ auto-generates 95% accurate architectural blueprint with 1 click. |
-| **Prerequisite Lock Confusion** | Clicking a prerequisite flashes a temporary locked hint with no cascade action. | **Interactive Cascade Dialog**: *"Removing Auth will also remove Role-Based Admin & Stripe Billing. [Remove All 3] or [Keep]"*. |
-| **Primitive Dashboard Feature Customizer** | Dashboard currently uses a plain text-box feature list with fuzzy regex string matching for price recalculations. | **Embedded SOTA Configurator**: Opens the full visual CPQ engine and architecture topology map directly inside `/dashboard`. |
-| **Scope Creep & Post-Deposit Mutation** | Modifying features on dashboard after deposit directly mutates `client_scopes.features` without a formal invoice. | **Scope Freeze & Change Order Engine**: Locks baseline SOW upon deposit; new features become formal Phase 2 Change Orders with auto-generated invoices. |
-| **Disconnected AI Assistants** | `AiScopingPromptBar` on `/scoping` and `ClientProjectCopilot` on `/dashboard` have separated logic and context. | **Unified Project Copilot**: Single persistent assistant tracking client intent, technical stack, timeline, and deliverables across both routes. |
-| **Flat Pricing Economics** | No rush delivery multipliers, and large multi-feature scopes lack bundle discount incentives. | **Dynamic CPQ Economics**: 5%–10% Volume Bundle Savings badges + 1.25x Fast-Track Rush Delivery multipliers. |
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Client as Prospective Client / CTO
+    participant Web as Web Client (prateeq.in)
+    participant ScopingTenant as Retriever (Tenant: prateeq_scoping)
+    participant Supabase as Supabase Auth & DB
+    participant ClientTenant as Retriever (Tenant: tn_client_...)
+    participant Razorpay as Razorpay Gateway
+
+    Note over Client,ScopingTenant: STAGE 1: Discovery, Cart Assembly & Live Proof
+    Client->>Web: Enters prompt or drops RFP PDF on /scoping
+    Web->>ScopingTenant: POST /v1/tenants/prateeq_scoping/documents/ingest (M42 OCR)
+    ScopingTenant->>Web: Returns Structured Architecture Scope + Telemetry (380ms)
+    Web-->>Client: Renders Cart Drawer, Live Topology & "⚡ Powered by Retriever Engine" badge
+    Client->>Web: Toggles features; enters partner promo code (e.g. PARTNER-VIP-10)
+    Web->>ScopingTenant: Evaluates GraphRAG companion suggestions ("Frequently Built Together")
+    Web-->>Client: Displays Volume Bundle Savings ($1,450 saved) + Sprint Slot Availability
+
+    Note over Client,ClientTenant: STAGE 2: 1-Click Fast-Pass & Tenant Auto-Provisioning
+    Client->>Web: Clicks "Proceed to Checkout" (Google OAuth Sign-in)
+    Web->>Supabase: Exchanges OAuth Code for PKCE Session
+    Web->>ClientTenant: GET /v1/auth/session (Bearer Supabase JWT)
+    ClientTenant-->>Web: Auto-provisions tn_client_uuid + API Keys (M39)
+    Web->>Supabase: Inserts draft client_scopes record linked to retriever_tenant_id
+
+    Note over Client,Razorpay: STAGE 3: Proposal Sign-Off & Escrow Lock
+    Client->>Web: Digitally signs SOW, selects 50/50 split & clicks "Pay Deposit"
+    Web->>Razorpay: Creates Order & opens Checkout Modal (50% Scope Deposit)
+    Client->>Razorpay: Completes Payment
+    Razorpay-->>Web: Webhook payment.captured verified
+    Web->>Supabase: Locks scope (scope_status = 'locked', sow_hash = SHA256)
+    Web->>ClientTenant: Ingests frozen SOW + RFP into private collection (M27)
+    Web-->>Client: Displays Order Confirmation & Packing Slip (ORD-2026-8941)
+
+    Note over Client,ClientTenant: STAGE 4: Active Sprint, Change Orders & Recurring SaaS
+    Client->>Web: Lands in /dashboard workspace; interacts with Unified Copilot
+    Web->>ClientTenant: POST /v1/tenants/tn_client_uuid/chat (Persistent Memory)
+    ClientTenant-->>Client: Real-time context-aware sprint assistance
+    Client->>Web: Requests new feature mid-sprint
+    Web->>Supabase: Creates scope_change_orders record + Phase 2 milestone invoice
+```
 
 ---
 
-## 4. User Personas & End-to-End Journeys
+## 4. Productized Engineering Commerce Capabilities
 
 ```text
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                   END-TO-END USER JOURNEYS                                       │
+│                               PRODUCTIZED COMMERCE MECHANICS MATRIX                              │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ 1. ROHAN (Non-Technical Founder):                                                                 │
-│    • Enters /scoping → Types: "AI podcast transcription app with Stripe subscriptions"          │
-│    • AI Copilot auto-selects SaaS Engine + AI Vision/Audio + Stripe + Admin Center (1 second)    │
-│    • Sees Live Topology Map connect nodes → Sees "Growth Bundle Saves $400"                     │
-│    • Downloads 1-Page Executive Pitch PDF for his angel investors                                │
-│    • 1-Click Google Fast-Pass → Lands in /dashboard with scope preloaded                         │
-│    • Signs digital agreement → Pays 50% deposit via Razorpay → Scope freezes                     │
-│    • Fills Dynamic Onboarding tasks (Figma link, Supabase invite) → Tracks 4 milestone stages   │
+│ 1. SLIDE-OVER ARCHITECTURE CART DRAWER (`ArchitectureCartDrawer.tsx`):                          │
+│    • Real-time line-item itemization (Base Engine Foundation + Modular Add-ons + Care Retainer). │
+│    • Item removal with instant 5-second `[Undo]` toast notifications.                           │
+│    • Live currency switch (INR ₹ with 18% GST breakdown / USD $ international).                  │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ 2. MIKE (CTO / Technical Buyer):                                                                 │
-│    • Enters /scoping via deep link (?engine=saas&goal=ai_rag_app)                                │
-│    • Opens Technical Architect Matrix → Overrides foundation tier → Toggles specific SLA care    │
-│    • Copies Collaborative Share Link (?share=SCOPE-49102) to get CFO sign-off                   │
-│    • Downloads 3-Page Master SOW PDF with explicit boundary exclusions                           │
-│    • Authenticates on /dashboard → Selects 40/30/30 milestone structure → Executes wire/card    │
-│    • Mid-sprint, requests Voice AI bot → Dashboard creates Phase 2 Change Order invoice          │
+│ 2. "FREQUENTLY BUILT TOGETHER" UPSELLS (`CartUpsellRecommender.tsx`):                            │
+│    • Powered by Retriever GraphRAG: analyzes selected nodes to suggest synergistic features.     │
+│    • e.g. "94% of SaaS platforms with Payments also add Role-Based Admin & Automated Invoicing." │
+│    • 1-Click `[➕ Add Bundle & Save 5%]` direct insertion into cart.                             │
+├──────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ 3. VOLUME BUNDLE SAVINGS PROGRESS METER:                                                         │
+│    • Starter Stack (1–2 features): 0% discount.                                                 │
+│    • Growth Stack (3–5 features): 5% discount (`🏷️ Growth Stack Applied: Save $450`).            │
+│    • Enterprise Stack (6+ features): 10% discount (`🔥 Full Suite Applied: Save $1,450`).       │
+│    • Visual progress bar: *"Add 1 more feature to unlock the 10% Enterprise Discount!"*          │
+├──────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ 4. PROMO & SALES PARTNER REFERRAL ENGINE (`/api/scoping/validate-promo`):                        │
+│    • Supports coupon codes (e.g. `FOUNDER2026`, `PARTNER-VIP-10`).                               │
+│    • Dynamic strikethrough pricing display: `~~$14,500~~ $13,050`.                               │
+│    • Automatically tracks Sales Partner attribution in Supabase `client_scopes.metadata`.        │
+├──────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ 5. SPRINT CAPACITY & SCARCITY TELEMETRY:                                                         │
+│    • Live banner: `⚡ Q3 Engineering Capacity: 2 of 3 Dedicated Sprint Slots Available`.          │
+│    • Displays earliest kickoff date (e.g. *"Earliest Sprint Start: Sept 1, 2026"*).              │
+├──────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ 6. PRODUCTIZED B2B CHECKOUT & DIGITAL PACKING SLIP:                                              │
+│    • 3-Step checkout modal: Review Cart ➔ Billing & Tax Details ➔ Payment Split ➔ Escrow Pay.   │
+│    • Generates Order ID (`ORD-2026-XXXX`) and instant downloadable Tax Invoice & SOW PDF.       │
 └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -113,13 +174,13 @@ graph TD
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
 │               UNIFIED SOTA SCOPING & CLIENT WORKSPACE v2.0 — MODULE MAP                │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
-│  [MODULE 1]  AI Natural Language Scoping Copilot (Prompt Bar, Intent Parser)            │
-│  [MODULE 2]  Interactive Prerequisite Solver & Cascade Disconnect UX                   │
-│  [MODULE 3]  Dynamic CPQ Commercial Engine (Bundle Discounts, Timeline Rush Surge)     │
-│  [MODULE 4]  Live Visual Architecture Topology Map (Interactive Node Graph)            │
-│  [MODULE 5]  Dashboard Workspace Bridge & Pre-Deposit Scoping Customizer                │
-│  [MODULE 6]  Digital Sign-off, 50% Milestone Escrow & Scope Freeze Protocol            │
-│  [MODULE 7]  Post-Deposit Change Order & Phase 2 Milestone Invoicing Engine             │
+│  [MODULE 1]  Multimodal AI Scoping Copilot & RFP Document Ingestion Engine             │
+│  [MODULE 2]  GraphRAG Interactive Prerequisite Solver & Cascade Disconnect UX           │
+│  [MODULE 3]  Productized Architecture Cart Drawer, Bundles & Promo Engine              │
+│  [MODULE 4]  Live Interactive Architecture Topology Map (Node Flow Visualizer)         │
+│  [MODULE 5]  Pre-Deposit Dashboard Bridge, Deep Links & Embedded SOTA Customizer       │
+│  [MODULE 6]  Digital Proposal Sign-Off, 50% Escrow & Cryptographic Scope Freeze        │
+│  [MODULE 7]  Post-Deposit Phase 2 Change Order & Milestone Invoicing Engine             │
 │  [MODULE 8]  Unified Persistent AI Project Copilot (Scoping ↔ Dashboard Continuity)   │
 │  [MODULE 9]  Multi-Format Commercial Proposal Suite 2.0 (1-Page Exec vs 3-Page SOW)    │
 └────────────────────────────────────────────────────────────────────────────────────────┘
@@ -127,170 +188,498 @@ graph TD
 
 ---
 
-## 6. Core Database Schema & State Lifecycle
+## 6. Core Database Schema & DDL Specifications
 
-```mermaid
-stateDiagram-v2
-    [*] --> Draft_Lead : Visitor configures /scoping (intake_leads)
-    Draft_Lead --> Draft_Proposal : Client authenticates via Google (client_scopes created)
-    Draft_Proposal --> Draft_Proposal : Fine-tuning via Embedded Dashboard Customizer
-    Draft_Proposal --> Proposal_Signed : Client accepts Digital Terms & Payment Structure
-    Proposal_Signed --> Active_Engineering : 50% Escrow Deposit Verified (Scope LOCKED)
-    Active_Engineering --> Staging_QA : Phase 2 & 3 Milestones Completed
-    Staging_QA --> Production_Live : Final UAT Approval & 50% Balance Paid (100% IP Transferred)
+```sql
+-- 1. Promo Codes & Partner Attribution Table
+CREATE TABLE promo_codes (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  code TEXT UNIQUE NOT NULL, -- e.g. 'FOUNDER2026', 'PARTNER-VIP-10'
+  discount_type TEXT NOT NULL CHECK (discount_type IN ('percentage', 'fixed_amount', 'free_feature', 'free_maintenance_months')),
+  discount_value NUMERIC(12, 2) NOT NULL, -- e.g. 10.00 for 10%
+  currency TEXT DEFAULT 'USD' CHECK (currency IN ('INR', 'USD', 'ANY')),
+  partner_id UUID REFERENCES clients(id) ON DELETE SET NULL, -- Attribution to sales partner
+  partner_commission_pct NUMERIC(5, 2) DEFAULT 0.00, -- Commission percentage for partner
+  max_uses INT DEFAULT 100,
+  times_used INT DEFAULT 0,
+  valid_from TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  valid_until TIMESTAMPTZ,
+  is_active BOOLEAN DEFAULT true NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 2. Client Scopes Table (Unified Discovery, Cart & Dashboard Entity)
+CREATE TABLE client_scopes (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  client_id UUID REFERENCES clients(id) ON DELETE CASCADE,
+  client_email TEXT NOT NULL,
+  order_number TEXT UNIQUE NOT NULL, -- e.g. 'ORD-2026-8941'
+  project_title TEXT NOT NULL,
+  project_goal TEXT NOT NULL,
+  target_audience TEXT,
+  business_kpi TEXT,
+  base_engine_id TEXT NOT NULL,
+  selected_features TEXT[] DEFAULT '{}' NOT NULL,
+  brand_asset_id TEXT DEFAULT 'none',
+  maintenance_plan_id TEXT DEFAULT 'none',
+  timeline TEXT NOT NULL,
+  currency TEXT DEFAULT 'INR' CHECK (currency IN ('INR', 'USD')),
+  subtotal_price NUMERIC(12, 2) NOT NULL,
+  bundle_discount_amount NUMERIC(12, 2) DEFAULT 0.00,
+  promo_code_id UUID REFERENCES promo_codes(id),
+  promo_discount_amount NUMERIC(12, 2) DEFAULT 0.00,
+  tax_amount NUMERIC(12, 2) DEFAULT 0.00, -- GST or International VAT
+  total_price NUMERIC(12, 2) NOT NULL,
+  deposit_amount NUMERIC(12, 2) NOT NULL,
+  payment_structure TEXT DEFAULT '50/50' CHECK (payment_structure IN ('50/50', '40/30/30')),
+  scope_status TEXT DEFAULT 'draft' CHECK (scope_status IN ('draft', 'signed', 'locked', 'in_progress', 'completed', 'cancelled')),
+  sow_hash TEXT, -- Cryptographic SHA-256 hash of the frozen scope JSON
+  signed_at TIMESTAMPTZ,
+  locked_at TIMESTAMPTZ,
+  retriever_tenant_id UUID, -- Mapped Retriever managed tenant (tn_client_...)
+  metadata JSONB DEFAULT '{}'::jsonb, -- Holds partner_id, company_gst, billing_address
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 3. Scope Change Orders Table (Post-Deposit Delta Management)
+CREATE TABLE scope_change_orders (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  scope_id UUID REFERENCES client_scopes(id) ON DELETE CASCADE,
+  change_order_number TEXT UNIQUE NOT NULL, -- e.g. 'CO-2026-8941-01'
+  title TEXT NOT NULL,
+  description TEXT,
+  added_features TEXT[] DEFAULT '{}' NOT NULL,
+  removed_features TEXT[] DEFAULT '{}' NOT NULL,
+  delta_price NUMERIC(12, 2) NOT NULL,
+  currency TEXT NOT NULL CHECK (currency IN ('INR', 'USD')),
+  invoice_id UUID REFERENCES invoices(id),
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'paid', 'declined')),
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 4. Dynamic Invoices & Commercial Ledger Table
+CREATE TABLE invoices (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  client_id UUID REFERENCES clients(id) ON DELETE CASCADE,
+  scope_id UUID REFERENCES client_scopes(id) ON DELETE SET NULL,
+  change_order_id UUID REFERENCES scope_change_orders(id) ON DELETE SET NULL,
+  invoice_number TEXT UNIQUE NOT NULL, -- e.g. 'INV-2026-0842'
+  invoice_type TEXT DEFAULT 'deposit' CHECK (invoice_type IN ('deposit', 'milestone', 'change_order', 'maintenance', 'subscription')),
+  amount NUMERIC(12, 2) NOT NULL,
+  tax_amount NUMERIC(12, 2) DEFAULT 0.00,
+  currency TEXT NOT NULL CHECK (currency IN ('INR', 'USD')),
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'paid', 'cancelled', 'refunded')),
+  razorpay_order_id TEXT,
+  razorpay_payment_id TEXT,
+  due_date DATE NOT NULL,
+  paid_at TIMESTAMPTZ,
+  metadata JSONB DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 5. Sprint Capacity Management Table
+CREATE TABLE sprint_capacity (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  quarter_label TEXT NOT NULL, -- e.g. 'Q3 2026'
+  total_slots INT DEFAULT 3 NOT NULL,
+  allocated_slots INT DEFAULT 1 NOT NULL,
+  earliest_start_date DATE NOT NULL,
+  is_accepting_fast_track BOOLEAN DEFAULT true NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+```
+
+---
+
+## 7. Exhaustive Specification: The 9 Master Modules
+
+---
+
+### MODULE 1: Multimodal AI Scoping Copilot & RFP Document Ingestion
+
+#### 1.1 Purpose & Strategic Value
+Removes friction for non-technical buyers and enterprise CTOs by providing dual entry paths: a **1-Line Natural Language Prompt** and a **Drag-and-Drop RFP/PRD PDF Dropzone**, resolving a complete architecture blueprint in under **1.5 seconds** using Retriever's `prateeq_scoping` tenant.
+
+#### 1.2 UI/UX Specification (`AiScopingPromptBar.tsx` & `RfpUploaderModal.tsx`)
+* **Visual Placement**: Positioned at the top of Step 1 (`StepGoalArchetype.tsx`), styled with an azure/noir gradient border pulse.
+* **Modes**:
+  1. **Prompt Mode**: Clean input field with quick-suggestion pills (`[🚀 Real Estate RAG Portal]`, `[🤖 Healthcare Voice Bot]`, `[🛍️ Headless E-Commerce]`).
+  2. **Document Mode**: Drag-and-drop zone accepting `.pdf`, `.docx`, `.md`, or `.txt` up to 25MB.
+* **Live Telemetry Proof Badge**:
+  ```text
+  ┌────────────────────────────────────────────────────────────────────────────┐
+  │ ⚡ Powered by Retriever Multi-Tenant Engine (prateeq-scoping-live)          │
+  │ • Latency: 380ms • ⚡ Semantic Cache: Active (HNSW pgvector) • Models: M42/M22│
+  └────────────────────────────────────────────────────────────────────────────┘
+  ```
+* **Loading State**: Displays multi-stage progress telemetry:
+  `[1/3 Parsing Layout & OCR via Retriever M42...]` $\rightarrow$ `[2/3 Running Architect & Critic Consensus...]` $\rightarrow$ `[3/3 Synthesizing CPQ Blueprint...]`.
+* **Success Banner**: Floating toast showing confidence score and layman rationale:
+  `🎯 96% Match Blueprint: AI SaaS Platform — Rationale: Configured for pgvector document search, recurring Stripe subscriptions, and RBAC admin center.`
+
+#### 1.3 API Contracts
+
+1. **Natural Language Parser**: `POST /api/scoping/parse-intent`
+   ```typescript
+   interface ParseIntentRequest {
+     prompt: string;
+     currency: 'INR' | 'USD';
+     currentContext?: { existingEngineId?: string; existingFeatureIds?: string[] };
+   }
+   interface ParseIntentResponse {
+     success: boolean;
+     archetypeId: string;
+     baseEngineId: string;
+     featureIds: string[];
+     brandAssetId: string;
+     maintenancePlanId: string;
+     suggestedTimeline: string;
+     confidenceScore: number;
+     summaryRationale: string;
+     retrieverEngineRecommended: boolean;
+     telemetry: {
+       latencyMs: number;
+       semanticCacheHit: boolean;
+       tenantId: string;
+     };
+     unrecognizedRequirements?: string[];
+   }
+   ```
+
+2. **Multimodal RFP Parser**: `POST /api/scoping/parse-rfp`
+   * Accepts `multipart/form-data` with document binary.
+   * Proxies directly to Retriever:
+     `POST https://rag.prateeq.in/v1/tenants/prateeq_scoping/documents/ingest`
+     followed by:
+     `POST https://rag.prateeq.in/v1/tenants/prateeq_scoping/documents/{documentId}/extract`
+   * Uses JSON Schema extraction matching `ParseIntentResponse`.
+
+---
+
+### MODULE 2: GraphRAG Interactive Prerequisite Solver & Cascade Disconnect UX
+
+#### 2.1 Purpose & Strategic Value
+Modern application architectures have strict dependencies. Selecting "Stripe Billing" or "Admin Center" without "Authentication" creates broken systems. Module 2 replaces passive warnings with an **active, interactive cascade solver** powered by Retriever's Knowledge Graph (`PgGraphRepository`).
+
+#### 2.2 Dependency Graph Data Model
+```json
+{
+  "admin": { "requires": ["auth"], "label": "Role-Based Admin Center" },
+  "payments": { "requires": ["auth"], "label": "Payment Processing & Subscriptions" },
+  "ai_rag": { "requires": ["database_pgvector"], "label": "AI Knowledge Base / RAG" },
+  "ai_voice_agent": { "requires": ["ai_rag", "realtime"], "label": "Autonomous Voice AI Agent" },
+  "lms": { "requires": ["auth", "payments", "video"], "label": "Course & LMS Portal" }
+}
+```
+
+#### 2.3 Interactive Cascade Modal UX (`DependencyCascadeModal.tsx`)
+When a user attempts to uncheck a required prerequisite (e.g. unchecking `auth` when `admin` and `payments` are active):
+```text
+┌────────────────────────────────────────────────────────────────────────┐
+│ ⚠️ Dependency Conflict Detected                                       │
+│                                                                        │
+│ Disabling [Authentication] affects 2 dependent modules:                │
+│  • Role-Based Admin Center (-$600 / -₹45,000)                          │
+│  • Payment Gateway & Subscriptions (-$800 / -₹60,000)                  │
+│                                                                        │
+│ What would you like to do?                                             │
+│ [ 🗑️ Remove All 3 Modules (Save $1,900) ]   [ 🛡️ Keep Authentication ] │
+└────────────────────────────────────────────────────────────────────────┘
+```
+Clicking **Remove All** executes an atomic batch removal across `selectedFeatures` and recalculates CPQ totals in one render pass.
+
+---
+
+### MODULE 3: Productized Architecture Cart Drawer, Bundles & Promo Engine
+
+#### 3.1 Purpose & Strategic Value
+Treats software acquisition with the fluidity and transparent economics of high-end e-commerce. Clients can inspect itemized costs, unlock volume stack discounts, enter partner promo codes, and add GraphRAG companion recommendations.
+
+#### 3.2 Slide-Over Architecture Cart Drawer (`ArchitectureCartDrawer.tsx`)
+* **Trigger**: Floating cart badge in the bottom-right or sticky bottom action bar displaying `🛒 View Architecture Cart (X Modules | Total: $XX,XXX)`.
+* **Contents**:
+  1. **Core Engine SKU**: Displays selected base engine with price, icon, and description.
+  2. **Modular Upgrades List**: Lists each selected feature with tag pills (`AI`, `Security`, `Commerce`), price, and a `[✕]` remove button (with 5-second `[Undo]` toast).
+  3. **Creative & Retainer Packages**: Shows selected Brand Kit tier and Maintenance Plan.
+  4. **Volume Discount Tier Progress Bar**: Visual progress bar showing remaining items needed to unlock 5% or 10% stack discounts.
+  5. **"Frequently Built Together" Box**: Powered by Retriever GraphRAG—recommends complementary modules with a 1-click `[➕ Add Both & Save 5%]` action.
+  6. **Promo & Partner Referral Code Box**: Input field validating coupons via `/api/scoping/validate-promo` with live strikethrough pricing (`~~$14,500~~ $13,050`).
+
+#### 3.3 Sandboxed Calculation Script (`pricing_repl.py`)
+Powered by Retriever's **RLM Python REPL Engine (M47)**:
+```python
+def calculate_quote(engine, features, brand, care, timeline, promo_code, currency):
+    subtotal = engine["price"] + sum(f["price"] for f in features) + brand["price"] + care["price"]
     
-    state Active_Engineering {
-        [*] --> Milestone_Progress
-        Milestone_Progress --> Onboarding_Tasks
-        Milestone_Progress --> Change_Order_Created : Client requests add-on module
-        Change_Order_Created --> Milestone_Progress : Change Order Invoice Paid
+    # 1. Volume discount
+    volume_discount_pct = 0.10 if len(features) >= 6 else (0.05 if len(features) >= 3 else 0.0)
+    bundle_savings = round(subtotal * volume_discount_pct, 2)
+    net_after_bundle = subtotal - bundle_savings
+    
+    # 2. Promo code discount
+    promo_discount = 0.0
+    if promo_code and promo_code.get("is_valid"):
+        if promo_code["discount_type"] == "percentage":
+            promo_discount = round(net_after_bundle * (promo_code["discount_value"] / 100.0), 2)
+        elif promo_code["discount_type"] == "fixed_amount":
+            promo_discount = min(promo_code["discount_value"], net_after_bundle)
+            
+    net_after_promo = net_after_bundle - promo_discount
+    
+    # 3. Timeline rush multiplier
+    timeline_multiplier = 1.25 if timeline == "fast_track" else (0.95 if timeline == "relaxed" else 1.0)
+    final_total = round(net_after_promo * timeline_multiplier, 2)
+    
+    # 4. Tax calculation (18% GST for INR; 0% for export USD)
+    tax_amount = round(final_total * 0.18, 2) if currency == "INR" else 0.00
+    grand_total = final_total + tax_amount
+    
+    # 5. Milestone splits
+    deposit_50 = round(grand_total * 0.50, 2)
+    milestone_40 = round(grand_total * 0.40, 2)
+    milestone_30 = round(grand_total * 0.30, 2)
+    
+    return {
+        "subtotal": subtotal,
+        "bundle_savings": bundle_savings,
+        "promo_discount": promo_discount,
+        "tax_amount": tax_amount,
+        "final_total": final_total,
+        "grand_total": grand_total,
+        "deposit_50": deposit_50,
+        "milestones_40_30_30": [milestone_40, milestone_30, milestone_30]
     }
 ```
 
 ---
 
-## 7. Deep-Dive Specification: Module 1 — AI Natural Language Scoping Copilot
+### MODULE 4: Live Interactive Architecture Topology Map
 
-### 7.1 Objective & Strategic Purpose
-The **AI Natural Language Scoping Copilot** removes blank-page anxiety and decision fatigue for non-technical buyers. Instead of forcing visitors to navigate 15+ checkboxes, it translates plain-English requirements into a fully resolved technical architecture blueprint in under **1.2 seconds**.
+#### 4.1 Purpose & Strategic Value
+Gives high-ticket buyers immediate visual clarity on how their chosen technologies connect. Module 4 renders a **live interactive node graph** generated dynamically from `selectedBaseEngineId` and `selectedFeatures`.
+
+#### 4.2 Visual Node Flow Architecture
+```text
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                              LIVE SYSTEM TOPOLOGY PREVIEW                              │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                        │
+│   [ Client Layer ]              [ Edge & API Gateway ]         [ Core Services ]       │
+│   ┌──────────────┐              ┌──────────────────┐          ┌────────────────────┐   │
+│   │ Next.js 16   │ ──────────►  │ Vercel Edge      │ ───────► │ Next.js Server     │   │
+│   │ Web Platform │              │ WAF / Rate Limit │          │ Actions & Handlers │   │
+│   └──────────────┘              └──────────────────┘          └─────────┬──────────┘   │
+│                                                                         │              │
+│                                                                         ├──────────┐   │
+│                                                                         ▼          ▼   │
+│   [ Data & Search ]             [ Cognitive Intelligence ]    [ Integrations ]         │
+│   ┌──────────────┐              ┌──────────────────┐          ┌────────────────────┐   │
+│   │ PostgreSQL   │ ◄──────────  │ Retriever Managed│          │ Razorpay / Stripe  │   │
+│   │ + pgvector   │              │ Cognitive RAG    │          │ Webhook Escrow     │   │
+│   └──────────────┘              └──────────────────┘          └────────────────────┘   │
+│                                                                                        │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### 4.3 Component Implementation (`ArchitectureTopologyMap.tsx`)
+* **Technology**: Lightweight SVG/HTML Canvas with CSS transitions (zero heavy D3 dependencies).
+* **Interactivity**: Hovering over a node displays technical SLA tooltips (e.g. hovering on `Retriever RAG` displays: *"<450ms P95 Latency, HNSW Vector Index, AES-256 Encryption"*). Toggling features instantly illuminates or dims nodes and animated connection edges.
 
 ---
 
-### 7.2 UI/UX Specification (`AiScopingPromptBar.tsx`)
+### MODULE 5: Pre-Deposit Dashboard Bridge, Deep Links & Embedded SOTA Customizer
 
-#### Visual Placement & Layout
-- Positioned prominently at the top of **Step 1: Identity & Goal Archetype** (`StepGoalArchetype.tsx`).
-- Styled with a subtle gradient border glow (`var(--brand-accent)`) and a spark icon (`Sparkles` from `lucide-react`).
+#### 5.1 Purpose & Strategic Value
+Eliminates discovery-to-portal friction. Clients can save configurations, invite co-founders via versioned share URLs, and adjust features inside their private dashboard before committing funds.
+
+#### 5.2 Google Fast-Pass Authentication & PKCE Session Handoff
+1. When a visitor clicks **"Save Scope & Open Workspace"** or **"Proceed to Checkout"**:
+   - Scope state is serialized into an encrypted transient cookie (`prateeq_pending_scope`).
+   - Launches 1-Click Google OAuth Fast-Pass via Supabase Auth PKCE flow.
+2. Upon redirection to `/auth/callback` $\rightarrow$ `/dashboard`:
+   - Server reads `prateeq_pending_scope`, inserts a record into `client_scopes`, and creates the client profile in `clients`.
+   - Invokes Retriever's session resolver (`GET /v1/auth/session`) to auto-provision their dedicated private tenant (`tn_client_uuid`).
+
+#### 5.3 Collaborative Share Links (`?share=SCOPE-XXXX`)
+* Generates a permanent collaborative link: `https://prateeq.in/scoping?share=SCOPE-49102`.
+* Allows founders to send interactive scopes to CTOs or CFOs with real-time recalculations.
+
+#### 5.4 Embedded SOTA Configurator in `/dashboard`
+* Completely replaces the legacy regex text box in `dashboard/page.tsx`.
+* Directly embeds the full SOTA CPQ Matrix, Cart Drawer, and Topology Map inside `/dashboard` in draft mode.
+
+---
+
+### MODULE 6: Digital Proposal Sign-Off, 50% Escrow & Cryptographic Scope Freeze
+
+#### 6.1 Purpose & Strategic Value
+Formalizes the commercial commitment, captures digital consent, collects the 50% deposit, and **locks the baseline scope** to permanently eliminate scope creep.
+
+#### 6.2 Digital Sign-Off Flow (`ProposalSignModal.tsx`)
+1. **Contract Review**: Displays the complete SOW, timeline, deliverables, boundary exclusions, and payment schedule.
+2. **Milestone Structure Selection**:
+   * **Option A (Default)**: 50% Upfront Deposit / 50% Final UAT Delivery.
+   * **Option B (Enterprise)**: 40% Kickoff / 30% Staging Beta / 30% Final Production Release.
+3. **Digital Signature**: Client types full name and company legal entity, consenting to terms.
+
+#### 6.3 Escrow Deposit Trigger (Razorpay / Stripe)
+* Invokes `POST /api/client/create-razorpay-order` with the calculated deposit amount.
+* Launches Razorpay `checkout.js` modal natively on `/dashboard`.
+
+#### 6.4 Cryptographic Scope Freeze Protocol (M15)
+Upon verified payment confirmation (`payment.captured` webhook):
+1. `client_scopes.scope_status` switches from `'draft'` $\rightarrow$ `'locked'`.
+2. Computes an immutable SHA-256 hash of the complete scope payload:
+   ```typescript
+   const sowHash = crypto
+     .createHash('sha256')
+     .update(JSON.stringify({ orderNumber, engineId, featureIds, price, currency, timestamp }))
+     .digest('hex');
+   ```
+3. Writes `sow_hash` and `locked_at` to `client_scopes`.
+4. Ingests the frozen SOW and client RFP into their private Retriever workspace collection (`collection_id: scope_id`).
+5. Displays the **Order Confirmation & Digital Packing Slip** (`ORD-2026-XXXX`).
+6. Unlocks **Active Engineering Sprint Tracking** on the dashboard.
+
+---
+
+### MODULE 7: Post-Deposit Phase 2 Change Order & Milestone Invoicing Engine
+
+#### 7.1 Purpose & Strategic Value
+Clients frequently identify new feature requirements mid-development. Rather than haphazardly altering the active sprint or absorbing unpaid scope creep, Module 7 formalizes additions into structured **Phase 2 Change Orders**.
+
+#### 7.2 Delta Scope Analyzer & Change Order Workflow
+1. Client clicks **"Request Additional Feature"** on `/dashboard`.
+2. Opens the embedded SOTA customizer in **Delta Mode** (baseline locked features are marked with 🔒).
+3. Client selects new add-on features (e.g. adding `ai_voice_agent` and `pwa`).
+4. **Delta Calculation**: Retriever's REPL sandbox calculates the incremental delta cost ($+\$3,500$ / $+₹2,80,000$) and estimated timeline extension ($+1.5$ weeks).
+5. Client clicks **"Generate Change Order"**:
+   - Inserts record into `scope_change_orders` (`status = 'pending'`).
+   - Generates a dedicated milestone invoice in `invoices` (`invoice_type = 'change_order'`).
+6. Upon client payment of the Change Order invoice:
+   - The new features are formally appended to the sprint backlog without disrupting active Phase 1 milestones.
+
+---
+
+### MODULE 8: Unified Persistent AI Project Copilot (Scoping ↔ Dashboard Continuity)
+
+#### 8.1 Purpose & Strategic Value
+Provides a single, continuous AI project manager with complete lifecycle memory. The copilot knows every requirement mentioned in the initial scoping prompt, every note extracted from uploaded RFPs, and the real-time status of sprint milestones.
+
+#### 8.2 Architectural Implementation
+* Backed by the client's dedicated **Retriever Private Tenant Chat Session** (`/v1/tenants/{tn_client_id}/chat/sessions/{sessionId}/messages`).
+* **Grounding Sources**:
+  1. `Scope Data`: Base engine, selected features, timeline, SOW boundaries.
+  2. `RFP Documents`: Indexed vector chunks of client-uploaded PRD/spec files stored in their private collection.
+  3. `Sprint Milestones`: Real-time phase status (Architecture $\rightarrow$ Engineering $\rightarrow$ Staging $\rightarrow$ Live).
+  4. `Onboarding Tasks`: Outstanding items (e.g. missing Supabase credentials, Figma designs).
+
+#### 8.3 Context-Aware Capabilities
+* **During Discovery**: *"Why do I need pgvector for my legal document search app?"* $\rightarrow$ Explains dense vector similarity search and hybrid ranking in plain business terms.
+* **During Alignment**: *"What happens if we remove the CMS module?"* $\rightarrow$ Outlines impact on content editing autonomy and cost reduction.
+* **During Active Sprint**: *"What is blocking Milestone 2?"* $\rightarrow$ Identifies pending client onboarding tasks: *"Milestone 2 is in progress. We are waiting on your Stripe API keys in the onboarding checklist."*
+
+---
+
+### MODULE 9: Multi-Format Commercial Proposal Suite 2.0 (1-Page Exec vs 3-Page SOW)
+
+#### 9.1 Purpose & Strategic Value
+Different stakeholders require different levels of detail: Angel investors, CEOs, and CFOs need a concise, high-level financial summary, while CTOs, Lead Architects, and Legal teams demand a rigorous, line-item SOW with explicit boundary exclusions.
+
+#### 9.2 Proposal Formats (`@react-pdf/renderer` + `pdfTheme.ts`)
 
 ```text
-┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-│  ✨ AI Architecture Copilot                                                                     │
-│  ┌────────────────────────────────────────────────────────────────────────────┬────────────────┐ │
-│  │ e.g. "B2B SaaS with AI document search, Stripe billing, and admin center" │ [⚡ Auto-Scope] │ │
-│  └────────────────────────────────────────────────────────────────────────────┴────────────────┘ │
-│  Quick Prompts: [🚀 Real Estate RAG Portal] [🤖 Healthcare Voice Bot] [🛍️ Headless E-Commerce]     │
-└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                        COMMERCIAL PROPOSAL SUITE 2.0 FORMATS                           │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                        │
+│  FORMAT A: 1-Page Executive Pitch Brief                                                │
+│  ──────────────────────────────────────                                                │
+│  • Audience: Non-technical Founders, CEOs, Angel Investors, CFOs                       │
+│  • Contents:                                                                           │
+│    - Executive Project Vision & KPI Goals                                              │
+│    - High-Level Architecture Node Diagram                                              │
+│    - Itemized Investment Summary & Volume Bundle Savings Badge                         │
+│    - Projected ROI & 4-Stage Milestone Timeline Delivery Schedule                      │
+│                                                                                        │
+│  FORMAT B: 3-Page Master Statement of Work (SOW)                                       │
+│  ────────────────────────────────────────────────                                      │
+│  • Audience: CTOs, VP of Engineering, Procurement & Legal Teams                        │
+│  • Page 1: Executive Summary, System Architecture Topology, Technology Stack Matrix     │
+│  • Page 2: Granular Feature Specifications, API Dependencies & Managed Retriever SLA   │
+│  • Page 3: Milestone Payment Schedule, Boundary Exclusions, IP Transfer, SLA Guarantees│
+│                                                                                        │
+└────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-#### Micro-Interactions & States
-1. **Idle / Focused State:** Input field expands slightly with an ambient azure/noir pulse; suggestion pills appear below.
-2. **Generating State (Loading):** 
-   - Button switches to spinning icon with text: *"Analyzing Architecture..."*.
-   - Feature cards in Step 2 show a brief shimmer/skeleton animation to indicate live AI hydration.
-3. **Completed State (Success):**
-   - Renders a floating highlight banner:
-     `🎯 95% Match Blueprint: B2B SaaS Platform — Rationale: Configured for document processing, recurring subscriptions, and role-based access.`
-   - Smoothly scrolls and focuses the user onto the resolved choices with an animated checkmark sequence.
+#### 9.3 Pinned Page-Budget & Brand Token Enforcement
+* Built using shared brand tokens (`getPdfTheme(isNoir)`) in Azure and Noir themes.
+* Pinned page budgets are strictly asserted by automated test suites (`tests/pdf-smoke.test.ts`) to ensure zero awkward trailing page overflows.
 
 ---
 
-### 7.3 API Contract: `/api/scoping/parse-intent`
+## 8. Implementation Phasing & Verification Strategy
 
-- **HTTP Method:** `POST`
-- **Authentication:** Public route (rate-limited via IP hash).
-- **Backend Model:** Google Gemini `gemini-3.6-flash` via `@google/genai` or standard REST endpoint with low temperature ($T = 0.2$) for deterministic mapping.
-
-#### Request Schema
-```typescript
-interface ParseIntentRequest {
-  prompt: string;                        // Client's plain-English input
-  currency: 'INR' | 'USD';               // Target currency
-  currentContext?: {
-    existingEngineId?: string;
-    existingFeatureIds?: string[];
-  };
-}
+```mermaid
+timeline
+    title SOTA Scoping Engine & Client Workspace Rollout Roadmap
+    Phase 1 : Multimodal AI Copilot, RFP Ingestion & Cart Drawer (M1, M2, M3)
+    Phase 2 : Dynamic CPQ, REPL Sandbox & Visual Topology (M3, M4)
+    Phase 3 : Dashboard Bridge, SOW Freeze & Change Orders (M5, M6, M7)
+    Phase 4 : Unified Persistent AI Copilot & Proposal Suite 2.0 (M8, M9)
+    Phase 5 : End-to-End Security, DB Audit & Production Verification
 ```
 
-#### Response Schema
-```typescript
-interface ParseIntentResponse {
-  success: boolean;
-  archetypeId: string;                   // Matches GoalArchetype.id
-  baseEngineId: string;                  // Matches BaseEngineItem.id
-  featureIds: string[];                  // Array of valid FeatureItem.id
-  brandAssetId: string;                  // Matches BrandAssetOption.id
-  maintenancePlanId: string;             // Matches MaintenancePlanOption.id
-  suggestedTimeline: string;             // e.g. "Standard (3–4 weeks)"
-  confidenceScore: number;               // Float between 0.0 and 1.0 (e.g. 0.94)
-  summaryRationale: string;              // 1-2 sentence layman explanation of the technical choices
-  unrecognizedRequirements?: string[];   // Any custom niche needs to be logged in additionalNotes
-}
-```
+### Phase Breakdown
 
-#### System Prompt & Grounding Rules
-The prompt grounds Gemini strictly in the single source of truth (`intakeQuestionnaireDefaults.json`):
-```text
-You are a Lead Solutions Architect. Your role is to parse a client's project description and map it STRICTLY to the available engines and feature IDs in our engineering catalog.
+* **Phase 1: Multimodal Discovery, Cart Drawer & Graph Solver (Modules 1, 2, 3)**
+  - Provision and configure `prateeq_scoping` tenant on Retriever with engineering catalog and dependency triples.
+  - Implement `/api/scoping/parse-intent` and `/api/scoping/parse-rfp` proxying to Retriever M42/M22.
+  - Build `AiScopingPromptBar.tsx` with live Retriever telemetry badge (`Latency: 380ms`, `⚡ Semantic Cache Active`) and `RfpUploaderModal.tsx`.
+  - Build `ArchitectureCartDrawer.tsx` with live line items, volume discount progress bar, and promo code box (`/api/scoping/validate-promo`).
+  - Implement interactive prerequisite cascade modal (`DependencyCascadeModal.tsx`).
 
-Catalog Rules:
-1. Valid Archetype IDs: landing_page, business_multipage, ecommerce, booking_appointments, saas_app, lms_portal, crm_admin, ai_rag_app, autonomous_agents, voice_ai_agent_app, vision_ocr_saas, standalone_chatbot, custom.
-2. Valid Engine IDs: engine_landing, engine_multipage, engine_saas, engine_ecommerce, engine_ai_saas, engine_custom.
-3. Valid Feature IDs: auth, payments, database_pgvector, ai_rag, ai_agents, ai_voice_agent, ai_vision, search, cms, email, analytics, realtime, admin, pwa, i18n, integrations, video, pdf.
-4. Valid Maintenance IDs: essential, growth, scale, enterprise.
-5. You MUST resolve all mandatory prerequisites (e.g., if payments or admin is selected, auth MUST be included).
-6. Always return valid JSON matching the specified schema. Do not invent non-existent feature IDs.
-```
+* **Phase 2: Dynamic CPQ & Visual Topology (Modules 3 & 4)**
+  - Update `src/lib/pricing.ts` with sandboxed REPL calculation rules, volume discount tiers (5%–10%), and rush surge multipliers (1.25x).
+  - Build `ArchitectureTopologyMap.tsx` interactive node visualizer.
+
+* **Phase 3: Client Dashboard Integration & Scope Freeze (Modules 5, 6, 7)**
+  - Embed the SOTA CPQ configurator directly inside `/dashboard`.
+  - Wire Supabase Auth PKCE handoff to auto-provision private client tenants (`tn_client_...`) on Retriever (M39).
+  - Implement digital proposal signature modal and Razorpay 50% deposit escrow.
+  - Implement cryptographic SHA-256 SOW freezing and Phase 2 Change Order engine with automated milestone invoicing.
+
+* **Phase 4: Unified Copilot & Multi-Tier PDF Proposals (Modules 8 & 9)**
+  - Connect `ClientProjectCopilot.tsx` to private Retriever tenant chat sessions.
+  - Upgrade proposal PDF generator to support 1-Page Executive Pitch and 3-Page Technical SOW with pinned page budgets.
+
+* **Phase 5: Verification & Governance**
+  - Execute database DDL schema migrations via `execute_sql`.
+  - Run automated contracts audit: `python3 scripts/audit_contracts.py`.
+  - Run database schema verification: `python3 scripts/audit_db.py`.
+  - Run database seed and audit sync: `python3 scripts/seed_supabase.py` and `python3 scripts/audit_db.py`.
+  - Run PDF rendering smoke tests: `npm test tests/pdf-smoke.test.ts`.
 
 ---
 
-### 7.4 State Hydration & Hook Integration (`useIntakeFormState.ts`)
-
-Upon receiving a successful response from `/api/scoping/parse-intent`:
-```typescript
-const handleApplyAiBlueprint = (blueprint: ParseIntentResponse) => {
-  const targetArchetype = goals.find(g => g.id === blueprint.archetypeId) || goals[0];
-  const targetEngine = engines.find(e => e.id === blueprint.baseEngineId) || engines[0];
-  
-  // 1. Resolve compulsory features for archetype + AI recommended features
-  const compulsoryIds = targetArchetype.compulsoryFeatureLabels
-    .map(label => features.find(f => f.label === label)?.id)
-    .filter(Boolean) as string[];
-    
-  const mergedFeatureIds = new Set([...compulsoryIds, ...blueprint.featureIds]);
-  
-  // 2. Resolve graph dependencies
-  const resolvedAllIds = resolveFeatureDependencies(Array.from(mergedFeatureIds), features);
-  resolvedAllIds.forEach(id => mergedFeatureIds.add(id));
-
-  // 3. Hydrate state
-  setFormData(prev => ({
-    ...prev,
-    projectGoal: targetArchetype.label,
-    businessKPI: blueprint.summaryRationale || targetArchetype.primaryOutcome,
-    selectedBaseEngineId: targetEngine.id,
-    selectedFeatures: Array.from(mergedFeatureIds),
-    selectedBrandAssetId: blueprint.brandAssetId || prev.selectedBrandAssetId,
-    selectedMaintenanceId: blueprint.maintenancePlanId || prev.selectedMaintenanceId,
-    timeline: blueprint.suggestedTimeline || prev.timeline,
-    additionalNotes: blueprint.unrecognizedRequirements?.length 
-      ? `[AI Custom Requirements: ${blueprint.unrecognizedRequirements.join(', ')}]` 
-      : prev.additionalNotes,
-  }));
-
-  // 4. Trigger UI notification
-  toast.success('AI Architecture Blueprint Applied!', {
-    description: blueprint.summaryRationale,
-  });
-};
-```
+*Master PRD v2.0 is finalized, fully specified, and locked. Ready for implementation plan generation upon approval.*
 
 ---
 
-### 7.5 Edge Cases & Resilience Strategy
+## **Related Architecture & Cross-References**
 
-1. **Vague Prompts (e.g., *"Make a website"*):**
-   - Returns baseline `business_multipage` archetype with `confidenceScore = 0.65`.
-   - UI displays 3 interactive clarifying chip options: `[E-Commerce Store?]` `[SaaS Product?]` `[Portfolio / Company?]`.
-2. **API Outage / Rate Limit:**
-   - Gracefully catches errors and renders an informative toast: *"AI Copilot is momentarily resting. You can customize your architecture manually below."*
-   - Wizard remains 100% interactive with zero broken states.
-3. **Manual Overrides after AI Generation:**
-   - Clients can freely uncheck or add features; manual edits preserve the AI-generated business KPI note while updating the active feature array.
-4. **Rate Limiting & Abuse Prevention:**
-   - Rate limit: **10 AI parsing calls per IP per 10 minutes** using `getIpHash()`. Rejections return HTTP 429.
-
----
-
-*Module 1 specification is locked. Ready to proceed to Module 2: Interactive Prerequisite Solver & Cascade Disconnect UX.*
-
+- [Master Sequential Roadmap (Phase G: M63–M68)](UNIFIED_MASTER_ROADMAP.md)
+- [Scoping Lab Section Specification](09_Section_Specifications/12_Scoping_Lab.md)
+- [Client Workspace Dashboard Spec](09_Section_Specifications/13_Client_Workspace_Dashboard.md)
+- [50% Deposit Lock & Invoicing Ledger](14_Razorpay_Payments_and_Invoicing.md)
+- [RAG SaaS Studio & `prateeq_scoping` Tenant](24_RAG_App_Studio_PRD.md)
+- [Client Workspace Architecture Spec](CLIENT_DASHBOARD_ROADMAP.md)
+- [Sales Partner Commission Engine](MIDDLEMAN_PARTNERSHIP_AGREEMENT.md)
+- [Revenue Strategy & Client Conversion](REVENUE_EXECUTION_PLAN.md)
+- [Architecture Node: Route /scoping](architecture_nodes/Route_scoping.md)
+- [Architecture Node: Scoping Lab Wizard](architecture_nodes/UI_ScopingLab.md)
+- [Architecture Node: Cart Drawer](architecture_nodes/UI_ArchitectureCartDrawer.md)
+- [Architecture Node: CPQ Math SSoT](architecture_nodes/Lib_pricing.md)
+- [Architecture Node: Client Scopes Schema](architecture_nodes/Schema_client_scopes.md)

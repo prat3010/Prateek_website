@@ -79,3 +79,11 @@ Craftsmanship requires standard semantic architecture:
 - LCP, INP, and CLS fall within safe ranges on both desktop and mobile networks.
 - Interactive animations and canvas effects are disabled under `prefers-reduced-motion`.
 - All visual-only SVGs and theme controllers possess correct screen reader label descriptors.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Motion & Reduced Motion Standards](05_User_Experience_and_Interaction_Design.md)
+- [Automated QA & CI/CD Verification](19_Testing_and_Quality_Assurance.md)
+- [ADR 05 (ScrollSection) & ADR 10 (Mobile Parallax)](99_DECISIONS.md)

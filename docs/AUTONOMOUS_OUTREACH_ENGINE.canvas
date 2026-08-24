@@ -1,0 +1,189 @@
+{
+  "nodes": [
+    {
+      "id": "grp-outreach-admin",
+      "type": "group",
+      "label": "1. OPERATOR COCKPIT & CONTROLS",
+      "x": -1200,
+      "y": -100,
+      "width": 600,
+      "height": 900,
+      "color": "1"
+    },
+    {
+      "id": "node-route-admin",
+      "type": "file",
+      "file": "architecture_nodes/Route_admin.md",
+      "x": -1140,
+      "y": -30,
+      "width": 480,
+      "height": 400,
+      "color": "1"
+    },
+    {
+      "id": "node-ui-admin",
+      "type": "file",
+      "file": "architecture_nodes/UI_AdminPortal.md",
+      "x": -1140,
+      "y": 430,
+      "width": 480,
+      "height": 400,
+      "color": "1"
+    },
+    {
+      "id": "grp-outreach-gateway",
+      "type": "group",
+      "label": "2. QUALIFICATION & DISPATCH GATEWAY",
+      "x": -540,
+      "y": -100,
+      "width": 600,
+      "height": 900,
+      "color": "6"
+    },
+    {
+      "id": "node-api-prospect",
+      "type": "file",
+      "file": "architecture_nodes/API_outreach_prospect.md",
+      "x": -480,
+      "y": -30,
+      "width": 480,
+      "height": 400,
+      "color": "6"
+    },
+    {
+      "id": "node-api-dispatch",
+      "type": "file",
+      "file": "architecture_nodes/API_outreach_dispatch.md",
+      "x": -480,
+      "y": 430,
+      "width": 480,
+      "height": 400,
+      "color": "6"
+    },
+    {
+      "id": "grp-outreach-crm",
+      "type": "group",
+      "label": "3. OUTREACH CRM LEDGER & RESEND SMTP",
+      "x": 120,
+      "y": -100,
+      "width": 600,
+      "height": 900,
+      "color": "7"
+    },
+    {
+      "id": "node-schema-leads",
+      "type": "file",
+      "file": "architecture_nodes/Schema_outreach_leads.md",
+      "x": 180,
+      "y": -30,
+      "width": 480,
+      "height": 480,
+      "color": "7"
+    },
+    {
+      "id": "node-api-contact",
+      "type": "file",
+      "file": "architecture_nodes/API_contact.md",
+      "x": 180,
+      "y": 480,
+      "width": 480,
+      "height": 400,
+      "color": "6"
+    },
+    {
+      "id": "grp-outreach-telemetry",
+      "type": "group",
+      "label": "4. CAMPAIGN VISITOR TELEMETRY",
+      "x": 780,
+      "y": -100,
+      "width": 600,
+      "height": 900,
+      "color": "7"
+    },
+    {
+      "id": "node-proxy-telemetry",
+      "type": "file",
+      "file": "architecture_nodes/Proxy_telemetry.md",
+      "x": 840,
+      "y": -30,
+      "width": 480,
+      "height": 400,
+      "color": "6"
+    },
+    {
+      "id": "node-schema-visits",
+      "type": "file",
+      "file": "architecture_nodes/Schema_page_visits.md",
+      "x": 840,
+      "y": 480,
+      "width": 480,
+      "height": 480,
+      "color": "7"
+    }
+  ],
+  "edges": [
+    {
+      "id": "eo1",
+      "fromNode": "node-route-admin",
+      "fromSide": "bottom",
+      "toNode": "node-ui-admin",
+      "toSide": "top",
+      "color": "1",
+      "label": "Admin Gate"
+    },
+    {
+      "id": "eo2",
+      "fromNode": "node-ui-admin",
+      "fromSide": "right",
+      "toNode": "node-api-prospect",
+      "toSide": "left",
+      "color": "6",
+      "label": "Ingest Target ICP"
+    },
+    {
+      "id": "eo3",
+      "fromNode": "node-ui-admin",
+      "fromSide": "right",
+      "toNode": "node-api-dispatch",
+      "toSide": "left",
+      "color": "6",
+      "label": "Dispatch Email"
+    },
+    {
+      "id": "eo4",
+      "fromNode": "node-api-prospect",
+      "fromSide": "right",
+      "toNode": "node-schema-leads",
+      "toSide": "left",
+      "color": "7",
+      "label": "Store ICP Score"
+    },
+    {
+      "id": "eo5",
+      "fromNode": "node-api-dispatch",
+      "fromSide": "right",
+      "toNode": "node-schema-leads",
+      "toSide": "left",
+      "color": "7",
+      "label": "status='sent'"
+    },
+    {
+      "id": "eo6",
+      "fromNode": "node-api-dispatch",
+      "fromSide": "bottom",
+      "toNode": "node-api-contact",
+      "toSide": "top",
+      "color": "6",
+      "label": "Resend API Dispatch"
+    },
+    {
+      "id": "eo7",
+      "fromNode": "node-proxy-telemetry",
+      "fromSide": "bottom",
+      "toNode": "node-schema-visits",
+      "toSide": "top",
+      "color": "7",
+      "label": "UTM Campaign Telemetry"
+    }
+  ]
+}

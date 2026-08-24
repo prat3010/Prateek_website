@@ -1,8 +1,8 @@
-# Scoping Audit — Implementation Roadmap
+# Scoping Audit & Monolith Decomposition Log (Archived)
 
-> Generated from the UX/UX audit of the Scoping Lab (`/scoping`), with assumptions challenged and findings revised.
-> Each phase should be completed and verified before moving to the next.
-> Mark items `[x]` when complete. Run `npm run verify` after each phase.
+> 📌 **Status:** Archived Verification Log (Phases 1–4 Completed).  
+> 📌 **Master Roadmap (SSoT):** For active roadmap milestones (Phase G: M63–M68), see [`docs/UNIFIED_MASTER_ROADMAP.md`](UNIFIED_MASTER_ROADMAP.md).  
+> 📌 **Master Scoping PRD:** For the complete SOTA Scoping Engine & Productized E-Commerce specification, see [`docs/25_SOTA_Scoping_Engine_PRD.md`](25_SOTA_Scoping_Engine_PRD.md).
 
 ---
 
@@ -442,3 +442,11 @@ graph TD
   - Focuses on ROI, primary business outcome KPI, delivery timeline, and total investment summary without overwhelming technical module jargon.
 - [ ] **3-Page Technical Scope of Work (SOW)** (`ScopingBriefPDF.tsx` enhancement)
   - Enhanced with explicit boundary matrices: *Included in Build* vs *Out of Scope Boundaries*, Cloud Infrastructure SLA, and Milestone Escrow terms.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Active SOTA Scoping Engine PRD](25_SOTA_Scoping_Engine_PRD.md)
+- [Scoping Lab Section Spec](09_Section_Specifications/12_Scoping_Lab.md)
+- [Unified Master Roadmap](UNIFIED_MASTER_ROADMAP.md)

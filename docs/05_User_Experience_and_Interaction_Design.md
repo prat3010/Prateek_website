@@ -391,3 +391,13 @@ The experience should remain.
 - Accessibility is integrated throughout.
 - Product personality remains consistent across every adaptive state.
 - The overall experience feels premium, effortless, and memorable.
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Adaptive Portfolio Experience](04_Adaptive_Portfolio_Experience.md)
+- [Visual & Communication Identities](06_Adaptive_Identity_System.md)
+- [Performance & Motion Accessibility](15_Performance_and_Accessibility.md)
+- [ADR 05 (ScrollSection) & ADR 10 (Skyline Parallax)](99_DECISIONS.md)
+- [Architecture Node: Theme & Lenis Providers](architecture_nodes/Context_ThemeProvider_Lenis.md)
