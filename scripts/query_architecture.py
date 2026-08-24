@@ -54,8 +54,8 @@ def load_all_nodes():
         inv_match = re.search(r"## 🛡️ Non-Negotiable Invariants & Safety Constraints\s*\n(.*?)(?:\n## |\Z)", content, re.DOTALL)
         if inv_match:
             lines = inv_match.group(1).strip().split("\n")
-            for l in lines:
-                l_clean = l.strip()
+            for line_item in lines:
+                l_clean = line_item.strip()
                 if l_clean and (l_clean[0].isdigit() or l_clean.startswith("-") or l_clean.startswith("*")):
                     rule_text = re.sub(r"^[0-9\.\-\*\s]+\*\*?", "", l_clean).rstrip("*").strip()
                     if rule_text:
