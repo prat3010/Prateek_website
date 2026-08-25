@@ -162,6 +162,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     handleCopyShareableUrl,
     togglePopover,
     handleGoalChange,
+    applyBlueprint,
     handleSubmitOnline,
     handleQuickSubmit,
   } = state;
@@ -481,6 +482,8 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                     onScopeStartTypeChange={handleScopeStartTypeChange}
                     onResetServiceType={resetServiceType}
                     onChangeField={(field, val) => setFormData((prev) => ({ ...prev, [field]: val }))}
+                    onApplyBlueprint={applyBlueprint}
+                    isNoir={isNoir}
                     stepHeadingRef={stepHeadingRef}
                   />
                 )}

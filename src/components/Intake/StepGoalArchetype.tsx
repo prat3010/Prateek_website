@@ -23,6 +23,8 @@ import {
 } from 'lucide-react';
 import type { GoalArchetype, BaseEngineItem, FeatureItem } from '@/data/resume';
 import { formatMoney, formatPricePair, packageTotalForArchetype, type Currency } from '@/lib/pricing';
+import type { ParseIntentResponse } from '@/lib/rag-client';
+import { AiScopingPromptBar } from './AiScopingPromptBar';
 import { GOAL_CATEGORIES } from './IntakeForm';
 import styles from './IntakeForm.module.css';
 import type { User } from '@supabase/supabase-js';
@@ -88,6 +90,8 @@ interface StepGoalArchetypeProps {
   onScopeStartTypeChange: (type: 'greenfield' | 'legacy_rebuild') => void;
   onResetServiceType: () => void;
   onChangeField: (field: string, value: string) => void;
+  onApplyBlueprint?: (blueprint: ParseIntentResponse) => void;
+  isNoir?: boolean;
   stepHeadingRef?: React.RefObject<HTMLDivElement | null>;
 }
 
@@ -104,6 +108,8 @@ export function StepGoalArchetype({
   onScopeStartTypeChange,
   onResetServiceType,
   onChangeField,
+  onApplyBlueprint,
+  isNoir = false,
   stepHeadingRef,
 }: StepGoalArchetypeProps) {
   const archetypeCardRefs = React.useRef<(HTMLDivElement | null)[]>([]);
@@ -143,10 +149,17 @@ export function StepGoalArchetype({
         </button>
       </div>
 
+      {/* Multimodal AI Intent Discovery Copilot & 1-Line Scoping Bar */}
+      <AiScopingPromptBar
+        onApplyBlueprint={onApplyBlueprint || (() => {})}
+        currency={currency}
+        isNoir={isNoir}
+      />
+
       <div className={`${styles.field} ${styles.fieldMarginSm}`}>
         <label className={styles.label}>
           <Target size={14} className={styles.inlineIcon} />
-          Select Primary Goal Archetype
+          Or Manually Select Primary Goal Archetype
         </label>
         <p className={styles.fieldHint}>
           Choosing an archetype automatically configures your recommended engine tier, primary business outcome, and compulsory core module dependencies.

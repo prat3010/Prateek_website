@@ -137,10 +137,24 @@ export class RetrieverClient {
   async uploadDocument(file: File) {
     const formData = new FormData();
     formData.append("file", file);
-    return this.request(`/v1/tenants/${this.config.tenantId}/documents`, {
+    return this.request<{ documentId: string; status: string }>(`/v1/tenants/${this.config.tenantId}/documents`, {
       method: "POST",
       body: formData,
     });
+  }
+
+  async extractDocument<T = Record<string, unknown>>(
+    documentId: string,
+    jsonSchema: Record<string, unknown>,
+    model?: string
+  ): Promise<{ data: T; provider: string; model: string; inputTokens: number; outputTokens: number }> {
+    return this.request<{ data: T; provider: string; model: string; inputTokens: number; outputTokens: number }>(
+      `/v1/tenants/${this.config.tenantId}/documents/${documentId}/extract`,
+      {
+        method: "POST",
+        body: JSON.stringify({ json_schema: jsonSchema, model }),
+      }
+    );
   }
 
   async deleteDocument(documentId: string) {
@@ -310,3 +324,35 @@ function combineAbortSignals(...signals: AbortSignal[]): AbortSignal {
   }
   return controller.signal;
 }
+
+export interface ParseIntentRequest {
+  prompt: string;
+  currency?: 'INR' | 'USD';
+  currentContext?: {
+    existingEngineId?: string;
+    existingFeatureIds?: string[];
+  };
+}
+
+export interface ScopingTelemetry {
+  latencyMs: number;
+  semanticCacheHit: boolean;
+  tenantId: string;
+  modelUsed?: string;
+}
+
+export interface ParseIntentResponse {
+  success: boolean;
+  archetypeId: string;
+  baseEngineId: string;
+  featureIds: string[];
+  brandAssetId: string;
+  maintenancePlanId: string;
+  suggestedTimeline: string;
+  confidenceScore: number;
+  summaryRationale: string;
+  retrieverEngineRecommended: boolean;
+  telemetry: ScopingTelemetry;
+  unrecognizedRequirements?: string[];
+}
+

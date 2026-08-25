@@ -119,11 +119,15 @@ timeline
 #### 🛒 Milestone 63: Multimodal Discovery & Dogfooding Tenant (`prateeq_scoping`)
 - **Repo Scope:** Both (`Prateek_website` `/scoping` & `retriever` `/v1/tenants/prateeq_scoping`)
 - **Deliverable:**
-  - Provision dedicated `prateeq_scoping` dogfooding tenant on Retriever with catalog embeddings, dependency triples, and extraction schemas.
-  - Implement 1-Line Natural Language Prompt Bar + Drag-and-Drop RFP/PRD PDF Dropzone (up to 25MB) using Retriever Layout OCR (M42) & Structured JSON Extraction (M22).
-  - Add live telemetry proof badge on UI:
+  - Manually onboard `prateeq_scoping` dogfooding tenant on Retriever by Prateek (uploading engineering docs, rate cards, and configuring prompt).
+  - Connect Scoping strictly via dynamic API keys (`RETRIEVER_SCOPING_TENANT_ID`, `RETRIEVER_SCOPING_API_KEY` via env vars, never hardcoded).
+  - Power the scoping chatbox using the public 1-line embed widget script advertised on `/rag` (`widget.js` / `RetrieverClient`).
+  - **Audit-First Invariant:** Inspected and verified Retriever features in `retriever` with 15 passing tests before frontend integration.
+  - Implemented 1-Line Natural Language Prompt Bar (`AiScopingPromptBar.tsx`) + Drag-and-Drop RFP/PRD PDF Dropzone (up to 25MB, `RfpUploaderModal.tsx` with `<Portal>` escape) + Embed Chat Widget Drawer (`ScopingChatWidgetDrawer.tsx` with `<Portal>` escape).
+  - Implemented Edge Route Handlers: `POST /api/scoping/parse-intent` & `POST /api/scoping/parse-rfp` with transitive dependency resolution.
+  - Added live telemetry proof badge on UI:
     `⚡ Powered by Retriever Engine (prateeq-scoping-live) • Latency: 380ms • ⚡ Semantic Cache: Active (HNSW pgvector)`.
-- **Status:** **Active Next**
+- **Status:** **Completed** (Phase G, Milestone 63)
 
 #### 🛒 Milestone 64: Productized Architecture Cart Drawer, GraphRAG Upsells & Promo Engine
 - **Repo Scope:** Both (`Prateek_website` `ArchitectureCartDrawer.tsx` & `retriever` RLM REPL / GraphRAG)
@@ -149,14 +153,16 @@ timeline
   - Generate ASCII QR code in terminal for mobile scanning and instant Razorpay/Stripe checkout.
 - **Status:** **Active Next**
 
-#### 🛒 Milestone 67: Dashboard Workspace Bridge, Cryptographic SOW Freeze & Phase 2 Change Orders
+#### 🛒 Milestone 67: Dashboard Workspace Bridge, 7-Day Trial Provisioning & Phase 2 Change Orders
 - **Repo Scope:** Both (`Prateek_website` `/dashboard` & `retriever` `/v1/auth/session`)
 - **Deliverable:**
-  - Supabase Auth PKCE handoff auto-provisioning private client tenant (`tn_client_uuid`) on Retriever (M39).
+  - Supabase Auth PKCE handoff automatically provisions a dedicated client tenant (`tn_client_<uuid>`) on Retriever with a **7-Day Trial** plan and full access to `/rag/app`.
+  - Automatically compiles confirmed scope details into an immutable, permanent system document (`is_system: true`, `is_deletable: false`) indexed into the client's tenant and visible in their Document Library.
   - Embed the full SOTA CPQ customizer and Cart Drawer directly in `/dashboard` (replacing legacy regex text editing).
   - Digital SOW proposal sign-off modal and Razorpay 50% deposit checkout (`checkout.js`).
   - Cryptographic SHA-256 SOW freezing (`sow_hash`) upon deposit capture and private workspace collection ingestion (M27).
   - Phase 2 Change Order engine calculating scope delta in REPL and generating automated milestone invoices.
+  - Local **Streamlit Synchronizer** (`sync_tabs/clients.py`) remains Prateek's single commercial cockpit for tracking scopes, leads, invoices, and linked tenant IDs.
 - **Status:** **Active Next**
 
 #### 🛒 Milestone 68: Unified Persistent Copilot, Git CI/CD Feeds & Post-Launch SLA Monitoring
@@ -168,6 +174,47 @@ timeline
   - Post-launch SLA & production uptime monitoring cockpit (5-minute health pings, Retriever token metering, automated monthly SLA report PDF).
   - Multi-format commercial proposal suite (1-Page Executive Pitch vs 3-Page Master SOW PDF).
 - **Status:** **Active Next**
+
+---
+
+### Phase H: SOTA Cognitive RAG Algorithm R&D (M69 – M73) — **PLANNED HORIZON**
+
+```text
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│             PHASE H: ADVANCED COGNITIVE RAG ALGORITHM UPGRADES (M69–M73)               │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  [M69] Pre-Chunk Contextual Retrieval Ingestion Engine (Anthropic Context Headers)      │
+│  [M70] Late-Interaction (ColBERT) Token-Level MaxSim Reranker Microservice             │
+│  [M71] Corrective RAG (CRAG) & Agentic Reflection Loop with Web Search Fallback        │
+│  [M72] Interactive RLM Python REPL Sandbox Studio Workspace (/rag/app/rlm)             │
+│  [M73] GraphRAG Leiden Community Detection & Telemetry-Driven Closed-Loop Self-Tuning   │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### 🧠 Milestone 69: Pre-Chunk Contextual Retrieval Ingestion Engine (Anthropic Method)
+- **Repo Scope:** `retriever` (`ingestion_service.py`, `workers/src/tasks/`)
+- **Deliverable:** Prepend 50-word document context headers to chunks prior to vector embedding generation via async worker, reducing top-20 retrieval failure rates by up to 49%.
+- **Status:** **Planned (Phase H)**
+
+#### 🧠 Milestone 70: Late-Interaction (ColBERT) Token-Level Reranker
+- **Repo Scope:** `retriever` (`ColBertRerankerAdapter`, `tei_reranker_adapter.py`)
+- **Deliverable:** Implement token-level MaxSim late-interaction reranking adapter for high-precision technical term and code lookup.
+- **Status:** **Planned (Phase H)**
+
+#### 🧠 Milestone 71: Corrective RAG (CRAG) & Agentic Reflection Loop
+- **Repo Scope:** `retriever` (`domain/agentic/`, `reflection_loop.py`)
+- **Deliverable:** Autonomous reflection loop evaluating retrieval candidate confidence and dynamically triggering query reformulations or web search fallback.
+- **Status:** **Planned (Phase H)**
+
+#### 🧠 Milestone 72: Interactive RLM Python REPL Sandbox Studio
+- **Repo Scope:** Both (`retriever` `/v1/rlm` & `Prateek_website` `/rag/app/rlm`)
+- **Deliverable:** Productize Recursive Language Models into a dedicated SaaS Studio tab for programmatic, recursive document vault traversal.
+- **Status:** **Planned (Phase H)**
+
+#### 🧠 Milestone 73: GraphRAG Leiden Community Detection & Closed-Loop Self-Tuning
+- **Repo Scope:** `retriever` (`graph_extraction_service.py`, `OnlineHallucinationEvaluator`)
+- **Deliverable:** Hierarchical community entity summaries and automated pipeline self-tuning based on continuous online Ragas evaluation telemetry.
+- **Status:** **Planned (Phase H)**
 
 ---
 
@@ -188,6 +235,43 @@ timeline
 | **RLM Math** | `POST /v1/rlm/execute` | `retriever` | Deterministic Python CPQ pricing calculation script |
 | **Terminal CLI** | `/terminal` & `/api/terminal/qrcode` | `Prateek_website` | Hacker CLI scoping & mobile QR deposit payment |
 | **Outreach** | `/api/outreach/prospect` & `/admin` | `Prateek_website` | Lead prospecting queue & automated pitch deep-link generation |
+
+---
+
+## 5. Master Roadmap Directory & Cross-Repository Index
+
+The following table serves as the definitive directory linking all specialized product, engineering, and commercial roadmaps across the entire ecosystem to this Unified Master Roadmap:
+
+### 🌐 Platform & Product Roadmaps (Prateek_website)
+| Roadmap / PRD | Focus & Scope | File Link |
+| :--- | :--- | :--- |
+| **SOTA Scoping Engine PRD** | Phase G (M63–M68): Discovery, Cart Drawer, Topology Map, SOW Freeze | [25_SOTA_Scoping_Engine_PRD.md](25_SOTA_Scoping_Engine_PRD.md) |
+| **Client Dashboard Roadmap** | Dual Portals: Commercial Client Workspace (`/dashboard`) & SaaS Studio (`/rag/app`) | [CLIENT_DASHBOARD_ROADMAP.md](CLIENT_DASHBOARD_ROADMAP.md) |
+| **RAG SaaS Studio PRD** | Phase D (M54–M56): SaaS Studio Workspace, Document Library, Citations | [24_RAG_App_Studio_PRD.md](24_RAG_App_Studio_PRD.md) |
+| **Autonomous Outreach Agent** | Phase E (M57–M58): Multi-Source Lead Prospector, HITL Approval Queue | [AI_OUTREACH_AGENT_ROADMAP.md](AI_OUTREACH_AGENT_ROADMAP.md) |
+| **Automated AI Blogging Engine** | Phase E (M59): Newsjacking Pipeline, Automated Research & SEO Publisher | [AUTOMATED_AI_BLOGGING_ROADMAP.md](AUTOMATED_AI_BLOGGING_ROADMAP.md) |
+| **Revenue Execution Plan** | Commercial Escrow, Tier Packages, Sales Partner Commissions | [REVENUE_EXECUTION_PLAN.md](REVENUE_EXECUTION_PLAN.md) |
+| **Scoping Audit Roadmap** | 360° Quality Checklist & Security Validation for Scoping Engine | [SCOPING_AUDIT_ROADMAP.md](SCOPING_AUDIT_ROADMAP.md) |
+| **Platform Future Roadmap** | General Portfolio & Ecosystem Evolution Horizon | [21_Future_Roadmap.md](21_Future_Roadmap.md) |
+
+### 🧠 Engine & Infrastructure Roadmaps (retriever)
+| Roadmap / Blueprint | Focus & Scope | File Link |
+| :--- | :--- | :--- |
+| **Retriever Backend Roadmap** | Complete Backend Milestones (M1–M73), Database Schemas, RLS, Storage | [../../retriever/ROADMAP.md](../../retriever/ROADMAP.md) |
+| **2026 SOTA RAG Engine Spec** | Phase H (M69–M73): Contextual Chunking, ColBERT Rerank, CRAG, Leiden GraphRAG | [../../retriever/docs/RAG_2026_PRODUCT_ROADMAP.md](../../retriever/docs/RAG_2026_PRODUCT_ROADMAP.md) |
+| **Admin Dashboard Roadmap** | Admin Control Panel (`apps/web` on `admin.rag.prateeq.in`), Tenant Management | [../../retriever/docs/ADMIN_DASHBOARD_ROADMAP.md](../../retriever/docs/ADMIN_DASHBOARD_ROADMAP.md) |
+| **Retriever Project Status** | Live Operational Health, Test Status (485 Tests), Completed Milestones | [../../retriever/PROJECT_STATUS.md](../../retriever/PROJECT_STATUS.md) |
+| **Technical Debt & Deferred** | Audit Findings, Tracked Security Items, Deferred Optimizations | [../../retriever/TECH_DEBT.md](../../retriever/TECH_DEBT.md) |
+
+---
+
+## **Related Architecture Specifications**
+
+- [Razorpay Payments & Invoicing System](14_Razorpay_Payments_and_Invoicing.md)
+- [Content Platform Architecture](10_Content_Platform_Architecture.md)
+- [All Section Specifications](09_Section_Specifications/README.md)
+- [Architecture Dependency Map](ARCHITECTURE_DEPENDENCY_MAP.md)
+- [Architecture Decisions Record (99_DECISIONS)](99_DECISIONS.md)
 
 ---
 

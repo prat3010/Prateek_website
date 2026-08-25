@@ -17,6 +17,7 @@ import {
   resolveFeatureDependencies,
   type Currency,
 } from '@/lib/pricing';
+import type { ParseIntentResponse } from '@/lib/rag-client';
 import { generateQuestionnairePDF, generateQuestionnairePDFBase64 } from '@/utils/pdfGenerator';
 import { useAuth } from '@/context/AuthContext';
 import { signInWithGoogle } from '@/lib/auth';
@@ -426,6 +427,37 @@ export function useIntakeFormState(
     });
   }, [goals, currentArchetype, features, brandAssets, labelToId]);
 
+  const applyBlueprint = useCallback((blueprint: ParseIntentResponse) => {
+    const matchedGoal = goals.find((g: GoalArchetype) => g.id === blueprint.archetypeId) ||
+                        goals.find((g: GoalArchetype) => g.label === blueprint.archetypeId) ||
+                        goals[0];
+
+    if (matchedGoal) {
+      const websites = ['landing_page', 'business_multipage', 'ecommerce', 'booking_appointments'];
+      const saas = ['saas_app', 'lms_portal', 'crm_admin'];
+      const aiWidgets = ['ai_rag_app', 'autonomous_agents', 'voice_ai_agent_app', 'vision_ocr_saas', 'standalone_voice_bot', 'standalone_chatbot', 'ai_strategy_consulting', 'custom'];
+
+      if (websites.includes(matchedGoal.id)) setSelectedGoalCategory('websites');
+      else if (saas.includes(matchedGoal.id)) setSelectedGoalCategory('saas');
+      else if (aiWidgets.includes(matchedGoal.id)) setSelectedGoalCategory('ai_widgets');
+      else setSelectedGoalCategory('all');
+    }
+
+    const resolvedFeatureIds = resolveFeatureDependencies(blueprint.featureIds, features);
+    const autoOutcome = matchedGoal?.primaryOutcome || matchedGoal?.description || '';
+
+    setFormData((prev: IntakeFormData) => ({
+      ...prev,
+      projectGoal: matchedGoal?.label || prev.projectGoal,
+      businessKPI: autoOutcome || prev.businessKPI,
+      selectedBaseEngineId: blueprint.baseEngineId || prev.selectedBaseEngineId,
+      selectedFeatures: resolvedFeatureIds,
+      selectedBrandAssetId: blueprint.brandAssetId || prev.selectedBrandAssetId,
+      selectedMaintenanceId: blueprint.maintenancePlanId || prev.selectedMaintenanceId,
+      timeline: blueprint.suggestedTimeline || prev.timeline,
+    }));
+  }, [goals, features]);
+
   const handleSubmitOnline = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.agreedToTerms) {
@@ -705,6 +737,7 @@ export function useIntakeFormState(
     handleCopyShareableUrl,
     togglePopover,
     handleGoalChange,
+    applyBlueprint,
     handleSubmitOnline,
     handleQuickSubmit,
   };
