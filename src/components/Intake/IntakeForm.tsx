@@ -40,6 +40,7 @@ import { StepBrandKit } from './StepBrandKit';
 import { StepCommercials } from './StepCommercials';
 import { QuickServiceFlow } from './QuickServiceFlow';
 import { StickyPriceBar } from './StickyPriceBar';
+import { ArchitectureCartDrawer } from './ArchitectureCartDrawer';
 
 import styles from './IntakeForm.module.css';
 
@@ -157,6 +158,13 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     totalCost,
     quickQuote,
     generatedScopeCode,
+    isCartOpen,
+    setIsCartOpen,
+    appliedPromo,
+    applyPromoCode,
+    removePromoCode,
+    removeFeature,
+    addFeature,
     handleDownloadPDF,
     handleDownloadQuickPDF,
     handleCopyShareableUrl,
@@ -564,6 +572,8 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                   priceInCurrency={priceInCurrency}
                   showMobileFormula={showMobileFormula}
                   setShowMobileFormula={setShowMobileFormula}
+                  onOpenCart={() => setIsCartOpen(true)}
+                  itemCount={(selectedEngine ? 1 : 0) + formData.selectedFeatures.length}
                 />
 
                 {/* Actions Footer */}
@@ -684,6 +694,23 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
           )}
         </div>
       </div>
+
+      <ArchitectureCartDrawer
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        quote={totalCost}
+        currency={currency}
+        allFeatures={features}
+        onRemoveFeature={removeFeature}
+        onAddFeature={addFeature}
+        onSwitchEngine={() => setCurrentStep(2)}
+        promoCode={appliedPromo}
+        onApplyPromo={applyPromoCode}
+        onRemovePromo={removePromoCode}
+        onProceed={() => setCurrentStep(4)}
+        onExportPdf={handleDownloadPDF}
+        isNoir={isNoir}
+      />
     </section>
   );
 }

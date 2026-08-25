@@ -194,3 +194,77 @@ describe('goal archetype package totals', () => {
     );
   });
 });
+
+describe('volume bundle discounts, promo codes, and deposit split', () => {
+  it('applies 0% bundle discount for 1-2 features', () => {
+    const quote = calcQuote(engines, features, brandAssets, maintenancePlans, {
+      engineId: 'landing',
+      featureIds: ['email', 'crm'],
+      brandAssetId: 'none',
+      maintenancePlanId: 'essential',
+    }, 'INR');
+
+    expect(quote.bundleDiscountPercent).toBe(0);
+    expect(quote.bundleDiscountAmountINR).toBe(0);
+    // Landing (30k) + Email (15k) + CRM (60k) = 105,000
+    expect(quote.grossTotalINR).toBe(105000);
+    expect(quote.netTotalINR).toBe(105000);
+    expect(quote.depositINR).toBe(52500);
+    expect(quote.balanceINR).toBe(52500);
+  });
+
+  it('applies 5% Growth Stack discount for 3-5 features', () => {
+    const quote = calcQuote(engines, features, brandAssets, maintenancePlans, {
+      engineId: 'multipage',
+      featureIds: ['auth', 'admin', 'email'], // 3 features (25k + 75k + 15k = 115k)
+      brandAssetId: 'none',
+      maintenancePlanId: 'essential',
+    }, 'INR');
+
+    expect(quote.bundleDiscountPercent).toBe(5);
+    // Features total = 115,000. 5% discount = 5,750
+    expect(quote.bundleDiscountAmountINR).toBe(5750);
+    // Gross = 55,000 + 115,000 = 170,000. Net = 170,000 - 5,750 = 164,250
+    expect(quote.grossTotalINR).toBe(170000);
+    expect(quote.netTotalINR).toBe(164250);
+    expect(quote.depositINR).toBe(82125);
+    expect(quote.balanceINR).toBe(82125);
+  });
+
+  it('applies 10% Full Suite discount for 6+ features', () => {
+    const quote = calcQuote(engines, features, brandAssets, maintenancePlans, {
+      engineId: 'saas',
+      featureIds: ['auth', 'admin', 'payments', 'email', 'crm', 'ai_rag'], // 6 features
+      brandAssetId: 'none',
+      maintenancePlanId: 'essential',
+    }, 'INR');
+
+    expect(quote.bundleDiscountPercent).toBe(10);
+    expect(quote.bundleDiscountAmountINR).toBeGreaterThan(0);
+    expect(quote.netTotalINR).toBe(quote.grossTotalINR - quote.bundleDiscountAmountINR);
+  });
+
+  it('applies percentage promo code on top of bundle discount', () => {
+    const quote = calcQuote(engines, features, brandAssets, maintenancePlans, {
+      engineId: 'landing',
+      featureIds: ['email', 'crm'],
+      brandAssetId: 'none',
+      maintenancePlanId: 'essential',
+      promoCode: {
+        code: 'PRATEEQ10',
+        discountType: 'percentage',
+        discountValue: 10,
+        discountAmountINR: 0,
+        discountAmountUSD: 0,
+      },
+    }, 'INR');
+
+    // Gross = 105,000. 10% promo = 10,500. Net = 94,500
+    expect(quote.grossTotalINR).toBe(105000);
+    expect(quote.promoDiscountAmountINR).toBe(10500);
+    expect(quote.netTotalINR).toBe(94500);
+    expect(quote.depositINR).toBe(47250);
+    expect(quote.balanceINR).toBe(47250);
+  });
+});
+

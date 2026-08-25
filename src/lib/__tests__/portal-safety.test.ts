@@ -12,8 +12,9 @@ describe('ADR 05: ScrollSection Containing Block & <Portal> Safety', () => {
       const filePath = path.join(dir, file);
       const stat = fs.statSync(filePath);
       if (stat.isDirectory()) {
+        if (file === '__tests__') continue;
         results = results.concat(getTsxFiles(filePath));
-      } else if (file.endsWith('.tsx')) {
+      } else if (file.endsWith('.tsx') && !file.includes('.test.')) {
         results.push(filePath);
       }
     }

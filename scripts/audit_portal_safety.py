@@ -31,6 +31,8 @@ def audit_portals():
     ]
     
     for tsx_file in sorted(COMPONENTS_DIR.rglob("*.tsx")):
+        if "__tests__" in str(tsx_file) or ".test." in tsx_file.name:
+            continue
         # Skip Portal component itself and effects/background layers that are intentionally mounted at root
         if tsx_file.name in ["Portal.tsx", "ScrollSection.tsx", "NoirSkyline.tsx", "GestureScroll.tsx"]:
             continue

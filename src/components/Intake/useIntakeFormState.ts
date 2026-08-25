@@ -16,6 +16,7 @@ import {
   resolveDefaultCurrency,
   resolveFeatureDependencies,
   type Currency,
+  type PromoDiscountInfo,
 } from '@/lib/pricing';
 import type { ParseIntentResponse } from '@/lib/rag-client';
 import { generateQuestionnairePDF, generateQuestionnairePDFBase64 } from '@/utils/pdfGenerator';
@@ -155,6 +156,8 @@ export function useIntakeFormState(
   const [lockedHintId, setLockedHintId] = useState<string | null>(null);
   const [recaptchaUnavailable, setRecaptchaUnavailable] = useState(false);
 
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [appliedPromo, setAppliedPromo] = useState<PromoDiscountInfo | null>(null);
   const [sessionSeed] = useState(() => Math.random().toString(36).slice(2, 8));
 
   const [formData, setFormData] = useState<IntakeFormData>(() => ({
@@ -233,6 +236,7 @@ export function useIntakeFormState(
         featureIds,
         brandAssetId: formData.selectedBrandAssetId,
         maintenancePlanId: formData.selectedMaintenanceId || autoMaintenancePlanId,
+        promoCode: appliedPromo,
       },
       currency
     );
@@ -247,7 +251,54 @@ export function useIntakeFormState(
         priceUSD: quote.brandPriceUSD,
       },
     };
-  }, [engines, features, brandAssets, maintenancePlans, selectedEngine.id, formData.selectedFeatures, formData.selectedBrandAssetId, formData.selectedMaintenanceId, autoMaintenancePlanId, currency]);
+  }, [engines, features, brandAssets, maintenancePlans, selectedEngine.id, formData.selectedFeatures, formData.selectedBrandAssetId, formData.selectedMaintenanceId, autoMaintenancePlanId, appliedPromo, currency]);
+
+  const applyPromoCode = useCallback(async (code: string) => {
+    try {
+      const res = await fetch('/api/scoping/validate-promo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code,
+          currency,
+          subtotal: totalCost.grossTotal,
+        }),
+      });
+      const data = await res.json();
+      if (data.valid) {
+        setAppliedPromo({
+          code: data.code,
+          discountType: data.discountType,
+          discountValue: data.discountValue,
+          discountAmountINR: data.discountAmountINR,
+          discountAmountUSD: data.discountAmountUSD,
+        });
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  }, [currency, totalCost.grossTotal]);
+
+  const removePromoCode = useCallback(() => {
+    setAppliedPromo(null);
+  }, []);
+
+  const removeFeature = useCallback((featureId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      selectedFeatures: prev.selectedFeatures.filter((id) => id !== featureId),
+    }));
+  }, []);
+
+  const addFeature = useCallback((featureId: string) => {
+    setFormData((prev) => {
+      const resolved = resolveFeatureDependencies([featureId], features);
+      const set = new Set([...prev.selectedFeatures, featureId, ...resolved]);
+      return { ...prev, selectedFeatures: Array.from(set) };
+    });
+  }, [features]);
 
   const quickQuote = useMemo(() => {
     return calcQuickServiceQuote(quickServices, selectedQuickServices, currency);
@@ -730,6 +781,13 @@ export function useIntakeFormState(
     totalCost,
     quickQuote,
     generatedScopeCode,
+    isCartOpen,
+    setIsCartOpen,
+    appliedPromo,
+    applyPromoCode,
+    removePromoCode,
+    removeFeature,
+    addFeature,
     buildQuestionnaireData,
     buildQuickServiceData,
     handleDownloadPDF,

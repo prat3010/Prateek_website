@@ -137,7 +137,7 @@ timeline
   - Add Volume Bundle Discount progress meter (5% on Growth Stacks, 10% on Full Suites).
   - Implement Promo & Sales Partner referral code validation (`/api/scoping/validate-promo`, `promo_codes` table, strikethrough pricing).
   - Power pricing calculations via Retriever's sandboxed Python REPL script (`pricing_repl.py`, M47).
-- **Status:** **Active Next**
+- **Status:** **Completed** (Phase G, Milestone 64)
 
 #### 🛒 Milestone 65: Live Visual Architecture Topology Map & Dependency Cascade Solver
 - **Repo Scope:** `Prateek_website` (`ArchitectureTopologyMap.tsx`, `DependencyCascadeModal.tsx`)

@@ -48,11 +48,20 @@ export function resolveDefaultCurrency(region: string | null | undefined): Curre
   return 'INR';
 }
 
+export interface PromoDiscountInfo {
+  code: string;
+  discountType: 'percentage' | 'fixed';
+  discountValue: number;
+  discountAmountINR: number;
+  discountAmountUSD: number;
+}
+
 export interface QuoteSelection {
   engineId: string;
   featureIds: string[];
   brandAssetId: string;
   maintenancePlanId: string;
+  promoCode?: PromoDiscountInfo | null;
 }
 
 export interface QuoteLineItem {
@@ -79,10 +88,33 @@ export interface QuoteResult {
   brandPriceUSD: number;
   maintenancePriceINR: number;
   maintenancePriceUSD: number;
-  /** Total build (engine + features + brand) in the selected currency. */
+  /** Volume bundle discount tier applied on features (0, 5, or 10) */
+  bundleDiscountPercent: number;
+  bundleDiscountAmountINR: number;
+  bundleDiscountAmountUSD: number;
+  /** Promo code discount applied */
+  promoDiscount: PromoDiscountInfo | null;
+  promoDiscountAmountINR: number;
+  promoDiscountAmountUSD: number;
+  /** Gross build total (engine + features + brand) before discounts */
+  grossTotal: number;
+  grossTotalINR: number;
+  grossTotalUSD: number;
+  /** Net build total after all discounts */
+  netTotal: number;
+  netTotalINR: number;
+  netTotalUSD: number;
+  /** Total build in active currency (maps to netTotal for backward compatibility) */
   total: number;
   totalINR: number;
   totalUSD: number;
+  /** 50% upfront deposit and 50% delivery balance */
+  deposit: number;
+  depositINR: number;
+  depositUSD: number;
+  balance: number;
+  balanceINR: number;
+  balanceUSD: number;
   itemized: QuoteLineItem[];
 }
 
@@ -108,8 +140,49 @@ export function calcQuote(
   const maintenanceINR = maintenancePlan?.priceINR ?? 0;
   const maintenanceUSD = maintenancePlan?.priceUSD ?? 0;
 
-  const totalINR = engineINR + featuresINR + brandINR;
-  const totalUSD = engineUSD + featuresUSD + brandUSD;
+  const grossTotalINR = engineINR + featuresINR + brandINR;
+  const grossTotalUSD = engineUSD + featuresUSD + brandUSD;
+
+  // Volume Bundle Discount (3-5 features = 5%, 6+ features = 10% off features)
+  let bundleDiscountPercent = 0;
+  if (selectedFeatures.length >= 6) {
+    bundleDiscountPercent = 10;
+  } else if (selectedFeatures.length >= 3) {
+    bundleDiscountPercent = 5;
+  }
+
+  const bundleDiscountAmountINR = Math.round((featuresINR * bundleDiscountPercent) / 100);
+  const bundleDiscountAmountUSD = Math.round((featuresUSD * bundleDiscountPercent) / 100);
+
+  // Promo Code Discount Calculation
+  let promoDiscountAmountINR = 0;
+  let promoDiscountAmountUSD = 0;
+  const promo = selection.promoCode ?? null;
+
+  if (promo) {
+    if (promo.discountType === 'percentage') {
+      const baseAfterBundleINR = Math.max(0, grossTotalINR - bundleDiscountAmountINR);
+      const baseAfterBundleUSD = Math.max(0, grossTotalUSD - bundleDiscountAmountUSD);
+      promoDiscountAmountINR = Math.round((baseAfterBundleINR * promo.discountValue) / 100);
+      promoDiscountAmountUSD = Math.round((baseAfterBundleUSD * promo.discountValue) / 100);
+    } else if (promo.discountType === 'fixed') {
+      promoDiscountAmountINR = promo.discountAmountINR || promo.discountValue;
+      promoDiscountAmountUSD = promo.discountAmountUSD || promo.discountValue;
+    }
+  }
+
+  const netTotalINR = Math.max(0, grossTotalINR - bundleDiscountAmountINR - promoDiscountAmountINR);
+  const netTotalUSD = Math.max(0, grossTotalUSD - bundleDiscountAmountUSD - promoDiscountAmountUSD);
+
+  const depositINR = Math.round(netTotalINR * 0.5);
+  const depositUSD = Math.round(netTotalUSD * 0.5);
+  const balanceINR = netTotalINR - depositINR;
+  const balanceUSD = netTotalUSD - depositUSD;
+
+  const netTotal = currency === 'INR' ? netTotalINR : netTotalUSD;
+  const grossTotal = currency === 'INR' ? grossTotalINR : grossTotalUSD;
+  const deposit = currency === 'INR' ? depositINR : depositUSD;
+  const balance = currency === 'INR' ? balanceINR : balanceUSD;
 
   return {
     currency,
@@ -129,9 +202,27 @@ export function calcQuote(
     brandPriceUSD: brandUSD,
     maintenancePriceINR: maintenanceINR,
     maintenancePriceUSD: maintenanceUSD,
-    total: currency === 'INR' ? totalINR : totalUSD,
-    totalINR,
-    totalUSD,
+    bundleDiscountPercent,
+    bundleDiscountAmountINR,
+    bundleDiscountAmountUSD,
+    promoDiscount: promo,
+    promoDiscountAmountINR,
+    promoDiscountAmountUSD,
+    grossTotal,
+    grossTotalINR,
+    grossTotalUSD,
+    netTotal,
+    netTotalINR,
+    netTotalUSD,
+    total: netTotal,
+    totalINR: netTotalINR,
+    totalUSD: netTotalUSD,
+    deposit,
+    depositINR,
+    depositUSD,
+    balance,
+    balanceINR,
+    balanceUSD,
     itemized: [
       ...(engine ? [{ label: `${engine.tier}: ${engine.title}`, priceINR: engineINR, priceUSD: engineUSD }] : []),
       ...selectedFeatures.map((f) => ({ label: f.label, priceINR: f.priceINR, priceUSD: f.priceUSD })),
