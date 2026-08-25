@@ -210,7 +210,7 @@ export async function POST(req: NextRequest) {
     }
 
     let semanticCacheHit = false;
-    let classification = classifyIntentWithCatalog(prompt);
+    const classification = classifyIntentWithCatalog(prompt);
 
     // If Retriever credentials are provided, attempt grounded LLM search/extraction
     if (RETRIEVER_API_KEY && RETRIEVER_TENANT_ID) {
