@@ -1645,6 +1645,24 @@ CREATE TABLE IF NOT EXISTS promo_codes (
 - [Retriever: Architecture](../../../retriever/docs/architecture.md)
 """,
 
+    "Retriever_API_v1_security_compression.md": """# Retriever API: `apps/api/src/routers/security_compression.py`
+
+#retriever #api #security #compression #encryption #m49
+
+> **Context Window Token Compression & Zero-Trust Field Envelope Encryption Router (Milestone 49).**
+
+- **Endpoints:**
+  - `POST /v1/tenants/{tenantId}/context/compress` — LongLLMLingua prompt token compression
+  - `POST /v1/tenants/{tenantId}/security/encrypt` — AES-256-GCM field encryption
+  - `POST /v1/tenants/{tenantId}/security/decrypt` — AES-256-GCM field decryption
+
+---
+
+## 🔗 Related Architecture & Cross-References
+- [Engine: LongLLMLingua Compression](Engine_LongLLMLingua_Compression.md)
+- [Engine: Envelope Encryption](Engine_Envelope_Encryption.md)
+""",
+
     # -------------------------------------------------------------
     # 7. RETRIEVER COGNITIVE ENGINES & AGENTIC SYSTEMS (6 Nodes)
     # -------------------------------------------------------------

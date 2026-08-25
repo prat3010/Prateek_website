@@ -1,5 +1,5 @@
 # 🏛️ Master Architecture Knowledge Graph Index
-**Total Registered Architecture Nodes:** 97 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
+**Total Registered Architecture Nodes:** 100 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
 
 ## ⚡ Quick Navigation
 - [Master Architecture Visual Canvas](MASTER_ARCHITECTURE_MAP.canvas)
@@ -103,7 +103,7 @@
 | `Lib_skills` | **Lib: `skills.ts` (Persona Filter & Narrative Mapper)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Lib_skills.md](architecture_nodes/Lib_skills.md) |
 | `UI_CommercialPDFSuite` | **UI: `pdfTheme.ts`, `pdfFonts.ts` & React-PDF Exporters** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_CommercialPDFSuite.md](architecture_nodes/UI_CommercialPDFSuite.md) |
 
-### 🔹 6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPIs (20 Nodes)
+### 🔹 6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPIs (21 Nodes)
 
 | Node ID | Title / Component | Blast Radius | Security Auth | Specification File |
 | :--- | :--- | :---: | :---: | :--- |
@@ -125,6 +125,7 @@
 | `Retriever_API_v1_pricing` | **Retriever API: `apps/api/src/routers/pricing.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_pricing.md](architecture_nodes/Retriever_API_v1_pricing.md) |
 | `Retriever_API_v1_rlm` | **Retriever API: `apps/api/src/routers/rlm.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_rlm.md](architecture_nodes/Retriever_API_v1_rlm.md) |
 | `Retriever_API_v1_search` | **Retriever API: `POST /v1/search`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_search.md](architecture_nodes/Retriever_API_v1_search.md) |
+| `Retriever_API_v1_security_compression` | **Retriever API: `apps/api/src/routers/security_compression.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_security_compression.md](architecture_nodes/Retriever_API_v1_security_compression.md) |
 | `Retriever_API_v1_tenant` | **Retriever API: `apps/api/src/routers/tenant.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_tenant.md](architecture_nodes/Retriever_API_v1_tenant.md) |
 | `Retriever_API_v1_workflow` | **Retriever API: `apps/api/src/routers/workflow.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_workflow.md](architecture_nodes/Retriever_API_v1_workflow.md) |
 

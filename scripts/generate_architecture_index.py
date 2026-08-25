@@ -59,7 +59,7 @@ tier_titles = {
 
 lines = []
 lines.append("# 🏛️ Master Architecture Knowledge Graph Index")
-lines.append("**Total Registered Architecture Nodes:** 97 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4\n")
+lines.append(f"**Total Registered Architecture Nodes:** {len(node_files)} | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4\n")
 lines.append("## ⚡ Quick Navigation")
 lines.append("- [Master Architecture Visual Canvas](MASTER_ARCHITECTURE_MAP.canvas)")
 lines.append("- [Commerce & Escrow Flow Canvas](COMMERCE_AND_ESCROW_FLOW.canvas)")

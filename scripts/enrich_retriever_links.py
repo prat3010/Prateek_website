@@ -190,6 +190,75 @@ RETRIEVER_CROSS_REFS = {
         ("constitution/master-vision.md", "Engineering Constitution"),
         ("features/core-platform.md", "Core Platform Features"),
         ("engineering/rag-audit-report.md", "RAG Audit Report"),
+        ("../infrastructure/database_and_schemas.md", "Database Schemas & Partitions"),
+    ],
+    "docs/features/core-platform.md": [
+        ("../api/chat.md", "Chat & Grounded Inference API"),
+        ("../api/search.md", "Hybrid Search API"),
+        ("../api/document.md", "Document Management API"),
+        ("../cognitive/hybrid_search_and_fusion.md", "Hybrid Search & RRF Deep Dive"),
+        ("../cognitive/guardrails_and_safety.md", "LLM Safety Guardrails"),
+        ("../infrastructure/database_and_schemas.md", "Database Schemas & pgvector"),
+    ],
+    "docs/cognitive/hybrid_search_and_fusion.md": [
+        ("../api/search.md", "Search API Specification"),
+        ("query_intelligence.md", "Query Intelligence & CRAG"),
+        ("chunking_and_parsing.md", "Chunking & Vision OCR"),
+        ("../infrastructure/database_and_schemas.md", "Database Vector Partitions"),
+    ],
+    "docs/cognitive/query_intelligence.md": [
+        ("../api/search.md", "Search API Specification"),
+        ("hybrid_search_and_fusion.md", "Hybrid Search & Fusion"),
+        ("guardrails_and_safety.md", "LLM Safety Guardrails"),
+    ],
+    "docs/cognitive/chunking_and_parsing.md": [
+        ("../api/document.md", "Document API Specification"),
+        ("../infrastructure/async_workers_and_queues.md", "Async Workers & Celery Queues"),
+        ("../infrastructure/storage_and_encryption.md", "Storage & S3 Integration"),
+    ],
+    "docs/cognitive/graphrag.md": [
+        ("../api/admin.md", "Admin API: GraphRAG Endpoints"),
+        ("hybrid_search_and_fusion.md", "Hybrid Search & Fusion"),
+        ("../infrastructure/database_and_schemas.md", "Database Schema & Triples"),
+    ],
+    "docs/cognitive/agentic_workflows_and_repl.md": [
+        ("../api/agentic.md", "Agentic API Specification"),
+        ("../api/rlm.md", "RLM API Specification"),
+        ("consensus_and_reflection.md", "Multi-Agent Consensus"),
+    ],
+    "docs/cognitive/consensus_and_reflection.md": [
+        ("../api/consensus.md", "Consensus API Specification"),
+        ("evaluation_and_hallucinations.md", "Evaluation & Hallucinations"),
+        ("guardrails_and_safety.md", "LLM Safety Guardrails"),
+    ],
+    "docs/cognitive/context_compression.md": [
+        ("../api/security_compression.md", "Security & Compression API"),
+        ("hybrid_search_and_fusion.md", "Hybrid Search & Fusion"),
+    ],
+    "docs/cognitive/guardrails_and_safety.md": [
+        ("../api/chat.md", "Chat API Specification"),
+        ("../infrastructure/storage_and_encryption.md", "Compliance & Sovereignty"),
+        ("../infrastructure/telemetry_and_observability.md", "Audit Logging"),
+    ],
+    "docs/cognitive/evaluation_and_hallucinations.md": [
+        ("../api/admin.md", "Admin API: Evaluation Endpoints"),
+        ("../infrastructure/async_workers_and_queues.md", "Async Workers & Queues"),
+        ("consensus_and_reflection.md", "Consensus & Reflection"),
+    ],
+    "docs/infrastructure/database_and_schemas.md": [
+        ("caching_and_performance.md", "Caching & Performance"),
+        ("storage_and_encryption.md", "Storage & Encryption"),
+        ("../implementation/system-design.md", "Master System Design"),
+    ],
+    "docs/infrastructure/async_workers_and_queues.md": [
+        ("../api/document.md", "Document Management API"),
+        ("../cognitive/evaluation_and_hallucinations.md", "Evaluation & Hallucinations"),
+        ("../../DEPLOYMENT.md", "Deployment Guide"),
+    ],
+    "docs/integrations/typescript_sdk.md": [
+        ("../api/chat.md", "Chat API Specification"),
+        ("../api/search.md", "Search API Specification"),
+        ("cloudflare_proxy_worker.md", "Cloudflare Edge Proxy"),
     ],
 }
 
