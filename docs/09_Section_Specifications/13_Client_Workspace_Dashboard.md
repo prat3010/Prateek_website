@@ -46,6 +46,13 @@ The **Client Workspace Dashboard** (`/dashboard`) serves as the client portal wh
    - Provides a direct action button: **"Pay 50% Scope Deposit (Razorpay)"**.
    - Invokes `/api/client/create-razorpay-order`, loads Razorpay Checkout modal (`checkout.js`), and initiates payment signature verification upon completion.
 
+9. **Design System 2.0 & Typographic Hierarchy**:
+    - Centralized CSS tokens in `globals.css` driving `dashboard.module.css`.
+    - Headings and company titles use `var(--font-headline)` (`Playfair Display` in Azure, `JetBrains Mono` in Noir).
+    - Data badges, scope codes, and milestone pills use `var(--font-code)` (`JetBrains Mono`).
+    - Body text, inputs, and instructions use `var(--font-body)` (`Lora` in Azure, `JetBrains Mono` in Noir).
+    - Status badges leverage unified semantic tokens (`--badge-draft-*`, `--badge-active-*`, `--badge-success-*`, `--badge-danger-*`).
+
 ---
 
 ## **Interface Architecture**
@@ -77,6 +84,7 @@ The **Client Workspace Dashboard** (`/dashboard`) serves as the client portal wh
 - Feature modifications immediately recalculate total cost and update Supabase.
 - Unpaid scopes can be deleted by the client; paid scopes disable deletion.
 - Clicking "Pay 50% Scope Deposit" opens Razorpay checkout and advances milestone to `engineering` upon payment verification.
+- Typography and surface styling conform to Design System 2.0 without raw hardcoded hex codes.
 
 ---
 

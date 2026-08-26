@@ -4,6 +4,7 @@ import Portal from '@/components/ui/Portal';
 import type { GoalArchetype, BaseEngineItem, FeatureItem } from '@/data/resume';
 import { formatPricePair, resolveFeatureDependencies, type Currency } from '@/lib/pricing';
 import { FEATURE_CATEGORIES } from './IntakeForm';
+import TiltCard from '@/components/ui/TiltCard';
 import styles from './IntakeForm.module.css';
 
 interface StepTechnicalScopeProps {
@@ -138,102 +139,103 @@ export function StepTechnicalScope({
                 const isSelected = formData.selectedBaseEngineId === e.id;
                 const isPopoverOpen = activePopoverId === e.id;
                 return (
-                  <div
-                    key={e.id}
-                    role="radio"
-                    aria-checked={isSelected}
-                    tabIndex={isSelected ? 0 : -1}
-                    className={`${styles.checkboxCard} ${isSelected ? styles.checkboxCardSelected : ''}`}
-                    onClick={() => onEngineSelect(e.id)}
-                    onKeyDown={(ev) => {
-                      if (ev.key === 'Enter' || ev.key === ' ') {
-                        ev.preventDefault();
-                        onEngineSelect(e.id);
-                      } else if (ev.key === 'ArrowDown' || ev.key === 'ArrowRight') {
-                        ev.preventDefault();
-                        const next = (eIdx + 1) % engines.length;
-                        const card = (ev.currentTarget.parentElement?.children[next] as HTMLElement);
-                        card?.focus();
-                      } else if (ev.key === 'ArrowUp' || ev.key === 'ArrowLeft') {
-                        ev.preventDefault();
-                        const prev = (eIdx - 1 + engines.length) % engines.length;
-                        const card = (ev.currentTarget.parentElement?.children[prev] as HTMLElement);
-                        card?.focus();
-                      }
-                    }}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <input
-                      type="radio"
-                      name="baseEngine"
-                      checked={isSelected}
-                      tabIndex={-1}
-                      onChange={() => onEngineSelect(e.id)}
-                    />
-                    <div className={styles.engineCardInner}>
-                      <div className={styles.engineCardHeader}>
-                        <div className={styles.engineCardTitleRow}>
-                          <span className={styles.engineCardTitle}>{`${e.title} (${e.tier})`}</span>
-                          <button
-                            type="button"
-                            onClick={(ev) => togglePopover(ev, e.id)}
-                            className={`${styles.infoBtn} ${isPopoverOpen ? styles.infoBtnActive : ''}`}
-                            title="Click to view Technical Engineering Specs"
-                            aria-label="View Technical Engineering Specs"
-                          >
-                            <Info size={12} />
-                          </button>
-                        </div>
-                        <span className={styles.priceBadge}>
-                          {formatPricePair(e.priceINR, e.priceUSD, currency)}
-                        </span>
-                      </div>
-                      <p className={styles.engineCardDesc}>
-                        {e.laymanDescription}
-                      </p>
-
-                      {isPopoverOpen && popoverAnchor && (
-                        <Portal>
-                          <>
-                            <div
-                              className={styles.popoverOverlay}
-                              onClick={() => {
-                                setActivePopoverId(null);
-                                setPopoverAnchor(null);
-                              }}
-                            />
-                            <div
-                              className={styles.popoverPortal}
-                              style={{ left: popoverAnchor.x, top: popoverAnchor.y }}
-                              onClick={(ev) => ev.stopPropagation()}
+                  <TiltCard key={e.id} maxAngle={2} glare={false}>
+                    <div
+                      role="radio"
+                      aria-checked={isSelected}
+                      tabIndex={isSelected ? 0 : -1}
+                      className={`${styles.checkboxCard} ${isSelected ? styles.checkboxCardSelected : ''}`}
+                      onClick={() => onEngineSelect(e.id)}
+                      onKeyDown={(ev) => {
+                        if (ev.key === 'Enter' || ev.key === ' ') {
+                          ev.preventDefault();
+                          onEngineSelect(e.id);
+                        } else if (ev.key === 'ArrowDown' || ev.key === 'ArrowRight') {
+                          ev.preventDefault();
+                          const next = (eIdx + 1) % engines.length;
+                          const card = (ev.currentTarget.parentElement?.parentElement?.children[next]?.firstElementChild as HTMLElement);
+                          card?.focus();
+                        } else if (ev.key === 'ArrowUp' || ev.key === 'ArrowLeft') {
+                          ev.preventDefault();
+                          const prev = (eIdx - 1 + engines.length) % engines.length;
+                          const card = (ev.currentTarget.parentElement?.parentElement?.children[prev]?.firstElementChild as HTMLElement);
+                          card?.focus();
+                        }
+                      }}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <input
+                        type="radio"
+                        name="baseEngine"
+                        checked={isSelected}
+                        tabIndex={-1}
+                        onChange={() => onEngineSelect(e.id)}
+                      />
+                      <div className={styles.engineCardInner}>
+                        <div className={styles.engineCardHeader}>
+                          <div className={styles.engineCardTitleRow}>
+                            <span className={styles.engineCardTitle}>{`${e.title} (${e.tier})`}</span>
+                            <button
+                              type="button"
+                              onClick={(ev) => togglePopover(ev, e.id)}
+                              className={`${styles.infoBtn} ${isPopoverOpen ? styles.infoBtnActive : ''}`}
+                              title="Click to view Technical Engineering Specs"
+                              aria-label="View Technical Engineering Specs"
                             >
-                              <div className={`${styles.popoverBox} ${styles.popoverStatic}`}>
-                                <div className={styles.popoverHeader}>
-                                  <span>
-                                    <Wrench size={12} className={styles.inlineIcon} />
-                                    TECHNICAL ARCHITECTURE SPECS
-                                  </span>
-                                  <button
-                                    type="button"
-                                    ref={popoverCloseRef}
-                                    className={styles.popoverCloseBtn}
-                                    aria-label="Close"
-                                    onClick={() => {
-                                      setActivePopoverId(null);
-                                      setPopoverAnchor(null);
-                                    }}
-                                  >
-                                    <X size={12} />
-                                  </button>
+                              <Info size={12} />
+                            </button>
+                          </div>
+                          <span className={styles.priceBadge}>
+                            {formatPricePair(e.priceINR, e.priceUSD, currency)}
+                          </span>
+                        </div>
+                        <p className={styles.engineCardDesc}>
+                          {e.laymanDescription}
+                        </p>
+
+                        {isPopoverOpen && popoverAnchor && (
+                          <Portal>
+                            <>
+                              <div
+                                className={styles.popoverOverlay}
+                                onClick={() => {
+                                  setActivePopoverId(null);
+                                  setPopoverAnchor(null);
+                                }}
+                              />
+                              <div
+                                className={styles.popoverPortal}
+                                style={{ left: popoverAnchor.x, top: popoverAnchor.y }}
+                                onClick={(ev) => ev.stopPropagation()}
+                              >
+                                <div className={`${styles.popoverBox} ${styles.popoverStatic}`}>
+                                  <div className={styles.popoverHeader}>
+                                    <span>
+                                      <Wrench size={12} className={styles.inlineIcon} />
+                                      TECHNICAL ARCHITECTURE SPECS
+                                    </span>
+                                    <button
+                                      type="button"
+                                      ref={popoverCloseRef}
+                                      className={styles.popoverCloseBtn}
+                                      aria-label="Close"
+                                      onClick={() => {
+                                        setActivePopoverId(null);
+                                        setPopoverAnchor(null);
+                                      }}
+                                    >
+                                      <X size={12} />
+                                    </button>
+                                  </div>
+                                  <p className={styles.popoverTechText}>{e.techSpecs}</p>
                                 </div>
-                                <p className={styles.popoverTechText}>{e.techSpecs}</p>
                               </div>
-                            </div>
-                          </>
-                        </Portal>
-                      )}
+                            </>
+                          </Portal>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  </TiltCard>
                 );
               })}
             </div>

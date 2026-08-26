@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import styles from './Skills.module.css';
 import { m, AnimatePresence } from 'framer-motion';
+import TiltCard from '@/components/ui/TiltCard';
 
 const iconMap: Record<string, LucideIcon> = {
   zap: Zap,
@@ -165,6 +166,20 @@ function Skills({ skills }: SkillsProps) {
     return skills.filter(s => s.category === activeTab);
   }, [skills, activeTab]);
 
+  const getLevelGauge = (level?: string) => {
+    const lvl = level?.toLowerCase() || '';
+    if (lvl.includes('expert') || lvl.includes('master') || lvl.includes('senior') || lvl.includes('lead') || lvl.includes('architect')) {
+      return '■■■■■';
+    }
+    if (lvl.includes('advanced') || lvl.includes('proficient')) {
+      return '■■■■□';
+    }
+    if (lvl.includes('intermediate') || lvl.includes('working')) {
+      return '■■■□□';
+    }
+    return '■■■■□';
+  };
+
   const renderSkillCard = (skill: Skill) => {
     const Icon = iconMap[skill.icon] || Sparkles;
     
@@ -179,8 +194,9 @@ function Skills({ skills }: SkillsProps) {
     const forgedLabel = activeAudience === 'business' ? 'APPLIED IN:' : 'FORGED IN:';
 
     return (
-      <div
+      <TiltCard
         key={skill.name}
+        maxAngle={2.5}
         className={styles.skillCard}
         style={{ '--card-accent': skill.color } as React.CSSProperties}
       >
@@ -192,11 +208,16 @@ function Skills({ skills }: SkillsProps) {
             <div className={styles.skillCardNameRow}>
               <h3 className={styles.skillCardName}>{displayName}</h3>
               {skill.level && (
-                <span
-                  className={`${styles.skillCardBadge} ${styles['level_' + (skill.status || 'mastered')]}`}
-                >
-                  {skill.level}
-                </span>
+                <div className={styles.skillLevelContainer}>
+                  <span
+                    className={`${styles.skillCardBadge} ${styles['level_' + (skill.status || 'mastered')]}`}
+                  >
+                    {skill.level}
+                  </span>
+                  <span className={styles.skillGauge} aria-hidden="true" title={`Proficiency: ${getLevelGauge(skill.level)}`}>
+                    {getLevelGauge(skill.level)}
+                  </span>
+                </div>
               )}
             </div>
             <p className={styles.skillCardDesc}>{description}</p>
@@ -244,7 +265,7 @@ function Skills({ skills }: SkillsProps) {
             <span>Active Quest: Deploying analytical data science pipelines.</span>
           </div>
         )}
-      </div>
+      </TiltCard>
     );
   };
 
@@ -306,13 +327,22 @@ function Skills({ skills }: SkillsProps) {
                 '--tab-neon': tab.neon,
               } as React.CSSProperties}
             >
-              <Scrambler
-                texts={SKILL_TAB_TEXTS[i]}
-                variant="nav-label"
-                as="span"
-              >
-                {copy.tabs[tab.id]}
-              </Scrambler>
+              {activeTab === tab.id && (
+                <m.span
+                  layoutId="activeSkillsTabPill"
+                  className={styles.activeTabPill}
+                  transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+                />
+              )}
+              <span className={styles.tabContent}>
+                <Scrambler
+                  texts={SKILL_TAB_TEXTS[i]}
+                  variant="nav-label"
+                  as="span"
+                >
+                  {copy.tabs[tab.id]}
+                </Scrambler>
+              </span>
             </button>
           ))}
         </div>

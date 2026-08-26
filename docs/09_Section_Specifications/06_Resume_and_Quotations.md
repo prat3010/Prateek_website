@@ -62,8 +62,8 @@ Keep updated via **Edit Resume Manually** tab in the CMS:
 ---
 
 ## **Acceptance Criteria**
-- Developer Mode shows resume timeline and triggers resume PDF download.
-- Business Mode shows quotation sheet and triggers quotation PDF download.
+- Developer Mode shows resume timeline with a continuous vertical ink line and pulsing milestone nodes, and triggers resume PDF download.
+- Business Mode shows quotation sheet with perforated dashed voucher rate cards and triggers quotation PDF download.
 - Generated PDFs parse correctly and match the data stored in the database.
 - Document previews render cleanly across all device widths.
 

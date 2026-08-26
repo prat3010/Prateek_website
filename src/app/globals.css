@@ -21,7 +21,7 @@
   /* ─ Semantic Colors ─ */
   --color-bg: var(--pop-cream);
   --color-text: var(--pop-black);
-  --color-text-muted: #5d5d6d;
+  --color-text-muted: #525060;
   --color-border: var(--pop-black);
   --color-link: var(--pop-blue);
   --color-link-hover: var(--pop-red);
@@ -38,7 +38,39 @@
   --border-muted: rgba(43, 43, 54, 0.4);
   --border-accent: var(--pop-black);
   --border-accent-light: var(--pop-black);
-  --color-text-dim: #545460;
+  --color-text-dim: #444252;
+
+  /* ─ Surface Glassmorphism & App Tokens ─ */
+  --surface-glass-bg: rgba(250, 249, 246, 0.88);
+  --surface-glass-border: rgba(43, 43, 54, 0.12);
+  --surface-glass-blur: blur(16px);
+  --surface-glass-header: rgba(255, 255, 255, 0.88);
+  --surface-glass-card: rgba(255, 255, 255, 0.90);
+  --shadow-glass: 0 8px 24px rgba(43, 43, 54, 0.05);
+  --shadow-glass-lg: 0 12px 36px rgba(43, 43, 54, 0.07);
+
+  /* ─ Semantic Status Tokens ─ */
+  --badge-draft-bg: rgba(244, 220, 149, 0.28);
+  --badge-draft-text: #8c5b00;
+  --badge-draft-border: rgba(140, 91, 0, 0.25);
+  --badge-active-bg: rgba(90, 142, 182, 0.18);
+  --badge-active-text: #2c597d;
+  --badge-active-border: rgba(44, 89, 125, 0.3);
+  --badge-success-bg: rgba(121, 180, 139, 0.22);
+  --badge-success-text: #205632;
+  --badge-success-border: rgba(32, 86, 50, 0.3);
+  --badge-danger-bg: rgba(217, 93, 103, 0.18);
+  --badge-danger-text: #962832;
+  --badge-danger-border: rgba(150, 40, 50, 0.3);
+  --badge-info-bg: rgba(90, 142, 182, 0.15);
+  --badge-info-text: #375975;
+  --badge-info-border: rgba(55, 89, 117, 0.25);
+
+  /* ─ App Action Button Tokens ─ */
+  --app-btn-primary-bg: var(--pop-blue);
+  --app-btn-primary-text: var(--pop-white);
+  --app-btn-primary-hover: #467498;
+  --app-btn-primary-shadow: 0 4px 12px rgba(90, 142, 182, 0.25);
 
   /* ─ Shadow Tokens (Soft Sketch Offsets) ─ */
   --shadow-comic: 3px 3px 0px rgba(43, 43, 54, 0.18);
@@ -182,6 +214,38 @@
   --border-accent-light: #5A5A72;   /* Light slate-grey borders */
   --color-text-muted: #B0B0C4;      /* Muted text color */
   --color-text-dim: #A0A0B0;        /* Dim text color (tuned for WCAG AA contrast) */
+
+  /* ─ Surface Glassmorphism & App Tokens (Noir) ─ */
+  --surface-glass-bg: rgba(18, 20, 26, 0.92);
+  --surface-glass-border: rgba(255, 255, 255, 0.12);
+  --surface-glass-blur: blur(16px);
+  --surface-glass-header: rgba(18, 20, 26, 0.92);
+  --surface-glass-card: rgba(18, 20, 26, 0.94);
+  --shadow-glass: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-glass-lg: 0 12px 36px rgba(0, 0, 0, 0.45);
+
+  /* ─ Semantic Status Tokens (Noir) ─ */
+  --badge-draft-bg: rgba(255, 230, 0, 0.12);
+  --badge-draft-text: var(--neon-yellow);
+  --badge-draft-border: rgba(255, 230, 0, 0.3);
+  --badge-active-bg: rgba(0, 240, 255, 0.12);
+  --badge-active-text: var(--neon-cyan);
+  --badge-active-border: rgba(0, 240, 255, 0.3);
+  --badge-success-bg: rgba(57, 255, 20, 0.12);
+  --badge-success-text: var(--neon-green);
+  --badge-success-border: rgba(57, 255, 20, 0.3);
+  --badge-danger-bg: rgba(255, 42, 85, 0.15);
+  --badge-danger-text: var(--neon-pink);
+  --badge-danger-border: rgba(255, 42, 85, 0.35);
+  --badge-info-bg: rgba(0, 240, 255, 0.12);
+  --badge-info-text: var(--neon-cyan);
+  --badge-info-border: rgba(0, 240, 255, 0.3);
+
+  /* ─ App Action Button Tokens (Noir) ─ */
+  --app-btn-primary-bg: #0284c7;
+  --app-btn-primary-text: #ffffff;
+  --app-btn-primary-hover: #0369a1;
+  --app-btn-primary-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
 
   /* ─ Border Overrides (Keep original comic thickness in dark mode) ─ */
   --border-thin: 2px solid var(--color-border);

@@ -23,9 +23,98 @@
   width: 100%;
 }
 
+/* Corner Graphic Novel Registration Marks */
+.crosshairTL,
+.crosshairTR,
+.crosshairBL,
+.crosshairBR {
+  position: absolute;
+  font-family: var(--font-code);
+  font-size: 1.25rem;
+  color: var(--color-text-muted);
+  opacity: 0.35;
+  user-select: none;
+  pointer-events: none;
+  line-height: 1;
+}
+
+.crosshairTL { top: -1.25rem; left: -1.25rem; }
+.crosshairTR { top: -1.25rem; right: -1.25rem; }
+.crosshairBL { bottom: -1.25rem; left: -1.25rem; }
+.crosshairBR { bottom: -1.25rem; right: -1.25rem; }
+
+:global([data-theme='noir']) .crosshairTL,
+:global([data-theme='noir']) .crosshairTR,
+:global([data-theme='noir']) .crosshairBL,
+:global([data-theme='noir']) .crosshairBR {
+  color: var(--neon-cyan);
+  opacity: 0.45;
+  text-shadow: 0 0 6px rgba(0, 240, 255, 0.4);
+}
+
 /* ===== TEXT SIDE ===== */
 .textSide {
   position: relative;
+}
+
+/* Vintage Editorial Watermark Stamp */
+.editorialStamp {
+  position: absolute;
+  top: -2.5rem;
+  right: 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  border: 1.5px dashed var(--pop-red);
+  padding: 0.25rem 0.65rem;
+  border-radius: 4px;
+  transform: rotate(3deg);
+  opacity: 0.85;
+  user-select: none;
+  pointer-events: none;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.stampIssue {
+  font-family: var(--font-code);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--pop-red);
+}
+
+.stampLabel {
+  font-family: var(--font-headline);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--color-text-muted);
+}
+
+:global([data-theme='noir']) .editorialStamp {
+  border-color: var(--neon-pink);
+  box-shadow: 0 0 10px rgba(255, 42, 85, 0.25);
+  transform: rotate(-2deg);
+}
+
+:global([data-theme='noir']) .stampIssue {
+  color: var(--neon-pink);
+  text-shadow: var(--neon-pink-glow);
+}
+
+:global([data-theme='noir']) .stampLabel {
+  color: var(--neon-cyan);
+  text-shadow: var(--neon-cyan-glow);
+}
+
+@media (max-width: 768px) {
+  .editorialStamp {
+    position: static;
+    margin-bottom: 1rem;
+    align-items: flex-start;
+    transform: rotate(0deg);
+    width: fit-content;
+  }
 }
 
 

@@ -39,7 +39,13 @@ The **Project Scoping Lab** (`/scoping`) provides an interactive, client-driven 
 7. **Client-Side PDF Exporter**:
    - Generates and downloads a custom commercial proposal PDF ([`ScopingBriefPDF.tsx`](../../src/components/pdf/ScopingBriefPDF.tsx)) client-side using `@react-pdf/renderer` and shared brand design tokens (`pdfTheme.ts`).
 
-8. **Direct Save & Scope Confirmation**:
+8. **Design Tokens 2.0 & Sensory Kinetics**:
+   - **AI Scoping Prompt Bar (`AiScopingPromptBar.tsx`)**: Fully harmonized with `--surface-glass-*` and `--badge-active-*` tokens, delivering frosted linen styling in Azure light mode and obsidian cyber-glass in Noir.
+   - **Magnetic Attraction Physics**: Analyze Intent CTA and Architecture Cart trigger buttons are wrapped in `<MagneticButton>` for delightful tactile responsiveness.
+   - **3D Perspective Tilt**: Goal Archetype blueprint cards and Base Engine override tiers incorporate `<TiltCard maxAngle={2} glare={false}>` for interactive card elevation on desktop.
+   - **Dual-Theme Modals & Drawers**: RFP Uploader Modal and live Retriever Scoping Chat Drawer are styled with `--surface-card`, `--surface-glass-header`, and `--border-muted` with zero hardcoded Tailwind hex drift.
+
+9. **Direct Save & Scope Confirmation**:
    - Authenticated clients can save their configured scope directly to Supabase (`client_scopes` table) via `/api/client/save-scope`, which automatically surfaces the scope in their Client Workspace Dashboard (`/dashboard`).
 
 ---

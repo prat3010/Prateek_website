@@ -69,6 +69,8 @@ Manageable via **Manage Skills** tab in Streamlit Synchronizer (`scripts/sync_ta
 ## **Acceptance Criteria**
 - Developer Mode shows technical skills categorized correctly.
 - Business Mode translates skills into readable services.
+- Category tabs feature a kinetic sliding background pill powered by Framer Motion (`layoutId="activeSkillsTabPill"`).
+- Skill cards feature a discrete 5-segment proficiency gauge (`■■■■□`) alongside status badges.
 - Clean, spacious 2-column grid rendering without crowding or layout shifts.
 - 100% pass rate on TypeScript, ESLint, Vitest, and Next.js production builds.
 

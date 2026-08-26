@@ -26,6 +26,7 @@ import { formatMoney, formatPricePair, packageTotalForArchetype, type Currency }
 import type { ParseIntentResponse } from '@/lib/rag-client';
 import { AiScopingPromptBar } from './AiScopingPromptBar';
 import { GOAL_CATEGORIES } from './IntakeForm';
+import TiltCard from '@/components/ui/TiltCard';
 import styles from './IntakeForm.module.css';
 import type { User } from '@supabase/supabase-js';
 
@@ -200,60 +201,61 @@ export function StepGoalArchetype({
             const isSelected = formData.projectGoal === g.label;
             const recommendedEngine = engines.find((e) => e.id === g.recommendedEngineId);
             return (
-              <div
-                key={g.id}
-                ref={(el) => { archetypeCardRefs.current[idx] = el; }}
-                tabIndex={isSelected || selectedArchetypeIndex === -1 ? 0 : -1}
-                role="radio"
-                aria-checked={isSelected}
-                className={`${styles.archetypeCard} ${isSelected ? styles.archetypeCardSelected : ''}`}
-                onClick={() => onGoalChange(g.label)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    onGoalChange(g.label);
-                  } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-                    e.preventDefault();
-                    focusArchetype(idx + 1);
-                  } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-                    e.preventDefault();
-                    focusArchetype(idx - 1);
-                  } else if (e.key === 'Home') {
-                    e.preventDefault();
-                    focusArchetype(0);
-                  } else if (e.key === 'End') {
-                    e.preventDefault();
-                    focusArchetype(filteredGoals.length - 1);
-                  }
-                }}
-              >
-                <div className={styles.archetypeHeader}>
-                  <span className={styles.archetypeLabel}>
-                    {getArchetypeIcon(g.id)}
-                    <span>{cleanArchetypeLabel(g.label)}</span>
-                  </span>
-                  {g.id === 'business_multipage' && !isSelected && (
-                    <span className={styles.popularBadge}>POPULAR CHOICE</span>
-                  )}
-                  {isSelected && (
-                    <span className={styles.selectedBadge}>
-                      <Check size={12} /> SELECTED
+              <TiltCard key={g.id} maxAngle={2} glare={false}>
+                <div
+                  ref={(el) => { archetypeCardRefs.current[idx] = el; }}
+                  tabIndex={isSelected || selectedArchetypeIndex === -1 ? 0 : -1}
+                  role="radio"
+                  aria-checked={isSelected}
+                  className={`${styles.archetypeCard} ${isSelected ? styles.archetypeCardSelected : ''}`}
+                  onClick={() => onGoalChange(g.label)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onGoalChange(g.label);
+                    } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                      e.preventDefault();
+                      focusArchetype(idx + 1);
+                    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                      e.preventDefault();
+                      focusArchetype(idx - 1);
+                    } else if (e.key === 'Home') {
+                      e.preventDefault();
+                      focusArchetype(0);
+                    } else if (e.key === 'End') {
+                      e.preventDefault();
+                      focusArchetype(filteredGoals.length - 1);
+                    }
+                  }}
+                >
+                  <div className={styles.archetypeHeader}>
+                    <span className={styles.archetypeLabel}>
+                      {getArchetypeIcon(g.id)}
+                      <span>{cleanArchetypeLabel(g.label)}</span>
                     </span>
-                  )}
+                    {g.id === 'business_multipage' && !isSelected && (
+                      <span className={styles.popularBadge}>POPULAR CHOICE</span>
+                    )}
+                    {isSelected && (
+                      <span className={styles.selectedBadge}>
+                        <Check size={12} /> SELECTED
+                      </span>
+                    )}
+                  </div>
+                  <p className={styles.archetypeDesc}>{g.description}</p>
+                  <div className={styles.archetypeFooter}>
+                    <span className={styles.engineTag}>
+                      {`Engine: ${recommendedEngine?.title ? recommendedEngine.title.replace(' Engine', '').replace(' Core', '') : 'Base'}`}
+                    </span>
+                    <span className={styles.featureCountTag}>
+                      {`${g.compulsoryFeatureLabels.length} Core Module${g.compulsoryFeatureLabels.length > 1 ? 's' : ''}`}
+                    </span>
+                    <span className={styles.archetypePriceBadge}>
+                      {`Starts at ${formatMoney(packageTotalForArchetype(g, engines, features, currency), currency)}`}
+                    </span>
+                  </div>
                 </div>
-                <p className={styles.archetypeDesc}>{g.description}</p>
-                <div className={styles.archetypeFooter}>
-                  <span className={styles.engineTag}>
-                    {`Engine: ${recommendedEngine?.title ? recommendedEngine.title.replace(' Engine', '').replace(' Core', '') : 'Base'}`}
-                  </span>
-                  <span className={styles.featureCountTag}>
-                    {`${g.compulsoryFeatureLabels.length} Core Module${g.compulsoryFeatureLabels.length > 1 ? 's' : ''}`}
-                  </span>
-                  <span className={styles.archetypePriceBadge}>
-                    {`Starts at ${formatMoney(packageTotalForArchetype(g, engines, features, currency), currency)}`}
-                  </span>
-                </div>
-              </div>
+              </TiltCard>
             );
           })}
         </div>

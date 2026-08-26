@@ -88,6 +88,8 @@ Manageable via **Sync Projects** tab:
 ## **Acceptance Criteria**
 - Project details are fetched dynamically from the database.
 - Case study text adapts to the selected Communication Identity.
+- Each project card features a retro minimalist browser window header (`● ● ●` controls and monospace URL bar).
+- Hovering or focusing a project card triggers the floating `"EXPLORE CASE STUDY ↗"` badge.
 - External links satisfy screen reader accessible labeling.
 - Image assets use correct optimized web dimensions.
 

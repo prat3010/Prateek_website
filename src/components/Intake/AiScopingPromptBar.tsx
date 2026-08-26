@@ -7,14 +7,13 @@ import {
   FileUp,
   MessageSquare,
   Activity,
-  CheckCircle2,
-  AlertCircle,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Currency } from '@/lib/pricing';
 import type { ParseIntentResponse, ScopingTelemetry } from '@/lib/rag-client';
 import { RfpUploaderModal } from './RfpUploaderModal';
 import { ScopingChatWidgetDrawer } from './ScopingChatWidgetDrawer';
+import MagneticButton from '@/components/ui/MagneticButton';
 import styles from './AiScopingPromptBar.module.css';
 
 interface AiScopingPromptBarProps {
@@ -168,25 +167,27 @@ export function AiScopingPromptBar({
           aria-label="Describe your project in natural language"
         />
 
-        <button
-          type="button"
-          className={styles.analyzeBtn}
-          onClick={() => void handleAnalyze()}
-          disabled={isLoading || !promptText.trim()}
-          aria-label="Analyze Intent"
-        >
-          {isLoading ? (
-            <>
-              <div className={styles.spinner} />
-              <span>Analyzing...</span>
-            </>
-          ) : (
-            <>
-              <Zap size={15} />
-              <span>Analyze Scope</span>
-            </>
-          )}
-        </button>
+        <MagneticButton strength={0.25}>
+          <button
+            type="button"
+            className={styles.analyzeBtn}
+            onClick={() => void handleAnalyze()}
+            disabled={isLoading || !promptText.trim()}
+            aria-label="Analyze Intent"
+          >
+            {isLoading ? (
+              <>
+                <div className={styles.spinner} />
+                <span>Analyzing...</span>
+              </>
+            ) : (
+              <>
+                <Zap size={15} />
+                <span>Analyze Scope</span>
+              </>
+            )}
+          </button>
+        </MagneticButton>
       </div>
 
       {progressStep && (

@@ -11,6 +11,7 @@ import { type Project } from '@/data/projects';
 import { useTheme } from '@/context/ThemeContext';
 import Scrambler from '@/components/ui/Scrambler';
 import type { ScramblerProps } from '@/components/ui/Scrambler';
+import TiltCard from '@/components/ui/TiltCard';
 import styles from './Projects.module.css';
 
 const PROJECT_SECTION_TITLE_TEXTS: ScramblerProps['texts'] = {
@@ -259,15 +260,30 @@ function Projects({ projects }: ProjectsProps) {
             transition={{ duration: 0.3 }}
           >
             {filteredProjects.map((project, index) => (
+              <TiltCard
+                key={project.id}
+                maxAngle={3.5}
+                className={styles[`area${index}`]}
+                style={{ width: '100%', height: '100%' }}
+              >
                 <button
-                  key={project.id}
                   id={project.id}
-                  className={`${styles.panel} ${styles[`area${index}`]}`}
+                  className={styles.panel}
                   style={{
                     '--panel-color': project.color,
                   } as React.CSSProperties}
                   onClick={() => handleOpenModal(project.id)}
                 >
+                  {/* Retro Browser Window Header */}
+                  <div className={styles.browserHeader} aria-hidden="true">
+                    <div className={styles.browserDots}>
+                      <span className={styles.browserDot} />
+                      <span className={styles.browserDot} />
+                      <span className={styles.browserDot} />
+                    </div>
+                    <span className={styles.browserAddress}>projects.prateeq.in/{project.id}</span>
+                  </div>
+
                   {/* Status Badge */}
                   <div
                     className={`${styles.statusBadge} ${
@@ -283,6 +299,12 @@ function Projects({ projects }: ProjectsProps) {
                       : getProjectStatus(project) === 'personal'
                       ? 'PERSONAL'
                       : 'COMING SOON'}
+                  </div>
+
+                  {/* Floating Case Study Hover Tag */}
+                  <div className={styles.caseStudyTag} aria-hidden="true">
+                    <span>CASE STUDY</span>
+                    <ExternalLink size={10} />
                   </div>
 
                   <div className={styles.panelImageWrapper}>
@@ -313,6 +335,7 @@ function Projects({ projects }: ProjectsProps) {
                   </div>
                   <span className="sr-only"> - View project details</span>
                 </button>
+              </TiltCard>
             ))}
           </motion.div>
         </AnimatePresence>

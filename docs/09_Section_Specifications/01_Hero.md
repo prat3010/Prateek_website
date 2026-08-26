@@ -427,8 +427,6 @@ Interaction before conversion.
 
 ---
 
-# **Acceptance Criteria**
-
 - The Hero establishes trust immediately.
 - Audience selection precedes the Hero.
 - Communication adapts while layout remains consistent.
@@ -436,6 +434,7 @@ Interaction before conversion.
 - Calls to action are audience-aware.
 - Hero content is fully CMS-managed.
 - Animations feel premium and purposeful.
+- Vintage editorial watermark stamp ("VOL. 26 // ISSUE 1") and registration crosshairs (`⌜`, `⌝`, `⌞`, `⌟`) provide graphic novel flavor without obstructing interaction.
 - Accessibility requirements are satisfied.
 - Performance remains excellent.
 - Visitors naturally continue exploring the portfolio.

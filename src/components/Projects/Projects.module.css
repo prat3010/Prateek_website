@@ -64,6 +64,91 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
+/* Retro Browser Window Chrome */
+.browserHeader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 24px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.65rem;
+  background: rgba(43, 43, 54, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  user-select: none;
+  pointer-events: none;
+}
+
+:global([data-theme='noir']) .browserHeader {
+  background: rgba(8, 8, 10, 0.94);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.browserDots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.browserDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.browserDot:nth-child(1) { background: #ff5f56; }
+.browserDot:nth-child(2) { background: #ffbd2e; }
+.browserDot:nth-child(3) { background: #27c93f; }
+
+.browserAddress {
+  font-family: var(--font-code);
+  font-size: 0.6rem;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 0.02em;
+}
+
+/* Floating Case Study Hover Tag */
+.caseStudyTag {
+  position: absolute;
+  top: 32px;
+  right: 10px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-code);
+  font-size: 0.62rem;
+  font-weight: 700;
+  background: var(--surface-glass-bg);
+  color: var(--color-text);
+  border: 1px solid var(--border-muted);
+  padding: 2px 7px;
+  border-radius: 4px;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+  pointer-events: none;
+}
+
+.panel:hover .caseStudyTag,
+.panel:focus-visible .caseStudyTag {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+:global([data-theme='noir']) .caseStudyTag {
+  background: rgba(18, 20, 26, 0.9);
+  color: var(--neon-cyan);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
+}
+
 .panel:hover .panelOverlay,
 .panel:focus-visible .panelOverlay,
 .panel:focus-within .panelOverlay {
@@ -141,16 +226,22 @@
 
 .tag {
   display: inline-block;
-  padding: 0.2rem 0.6rem;
-  font-size: 0.7rem;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.04em;
   background: var(--pop-yellow);
   color: var(--pop-black);
-  border: 1px solid var(--color-border);
+  border: 1px dashed var(--color-border);
   border-radius: 4px;
-  font-family: var(--font-body);
+  font-family: var(--font-code);
+}
+
+:global([data-theme='noir']) .tag {
+  background: var(--surface-card);
+  color: var(--neon-yellow);
+  border: 1px dashed var(--border-muted);
 }
 
 /* ---- Modal ---- */

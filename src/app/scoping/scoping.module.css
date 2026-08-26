@@ -33,26 +33,28 @@
   gap: 8px;
   font-family: var(--font-headline);
   font-weight: 700;
-  font-size: 1.1rem;
-  color: var(--pop-black);
-  padding: 6px 12px;
-  background-color: var(--pop-white);
-  border: 1px solid var(--color-border);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  font-size: 1rem;
+  color: var(--color-text);
+  padding: 6px 14px;
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-muted);
+  box-shadow: var(--shadow-comic-sm);
   border-radius: var(--border-radius-sm);
   text-decoration: none;
-  transition: transform 0.2s ease, box-shadow 0.25s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
 .backLink:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-comic-md);
   background-color: var(--pop-yellow);
+  color: var(--pop-black);
+  border-color: var(--color-border);
 }
 
 .backLink:active {
   transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-comic-sm);
 }
 
 .brandBadge {
@@ -61,35 +63,35 @@
   gap: 8px;
   padding: 6px 12px;
   border-radius: var(--border-radius-sm);
-  border: 1px solid var(--color-border);
-  background-color: var(--pop-white);
+  border: 1px solid var(--badge-active-border);
+  background-color: var(--badge-active-bg);
   font-family: var(--font-code);
   font-size: 11px;
   font-weight: 700;
-  color: var(--pop-blue);
-  letter-spacing: 0.05em;
+  color: var(--badge-active-text);
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 /* ── Noir Theme Overrides: CRT Cyber-Glow ── */
 
 :global([data-theme='noir']) .backLink {
-  background-color: #121214;
-  border-color: #3F3F4E;
-  color: #e0e0e3;
+  background-color: var(--surface-card);
+  border-color: var(--border-muted);
+  color: var(--color-text);
   box-shadow: none;
 }
 
 :global([data-theme='noir']) .backLink:hover {
-  border-color: var(--neon-cyan, #00f0ff);
-  color: #ffffff;
-  background-color: #121216;
-  text-shadow: 0 0 2px rgba(0, 240, 255, 0.5);
-  transform: translate(0, 0);
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  background-color: var(--surface-card);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+  transform: translateY(-2px);
 }
 
 :global([data-theme='noir']) .brandBadge {
-  background-color: #121214;
-  border-color: #2F2F3D;
-  color: #8a8a93;
+  background-color: var(--badge-active-bg);
+  border-color: var(--badge-active-border);
+  color: var(--badge-active-text);
 }

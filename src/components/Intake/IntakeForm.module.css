@@ -1223,6 +1223,52 @@
   color: var(--pop-yellow);
 }
 
+.cartBtn {
+  background: var(--app-btn-primary-bg);
+  color: var(--app-btn-primary-text);
+  border: none;
+  border-radius: 8px;
+  padding: 0.45rem 0.85rem;
+  font-family: var(--font-headline);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: var(--app-btn-primary-shadow);
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.cartBtn:hover {
+  background: var(--app-btn-primary-hover);
+  transform: translateY(-1px);
+}
+
+.cartBadge {
+  background: rgba(255, 255, 255, 0.25);
+  color: inherit;
+  border-radius: 9999px;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.72rem;
+  font-family: var(--font-code);
+  font-weight: 800;
+}
+
+.discountBadge {
+  font-family: var(--font-code);
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: var(--badge-success-bg);
+  color: var(--badge-success-text);
+  border: 1px solid var(--badge-success-border);
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
 @media (max-width: 640px) {
   .mobileFormulaToggle {
     display: inline-block;

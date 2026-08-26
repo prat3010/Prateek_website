@@ -93,25 +93,46 @@
   color: var(--color-text-muted);
   cursor: pointer;
   border-radius: 10px;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease;
   white-space: nowrap;
   position: relative;
 }
 
 .tab:hover {
   color: var(--pop-black);
-  background: color-mix(in srgb, var(--pop-black) 6%, transparent);
+}
+
+:global([data-theme='noir']) .tab:hover {
+  color: var(--pop-white);
+}
+
+.activeTabPill {
+  position: absolute;
+  inset: 0;
+  background: var(--tab-color);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  z-index: 1;
+}
+
+:global([data-theme='noir']) .activeTabPill {
+  background: var(--surface-card);
+  border: 1px solid var(--border-accent);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.06);
+}
+
+.tabContent {
+  position: relative;
+  z-index: 2;
+  transition: color 0.2s ease;
 }
 
 .tabActive {
-  background: var(--tab-color);
   color: var(--pop-white);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
 }
 
-.tabActive:hover {
-  background: var(--tab-color);
-  color: var(--pop-white);
+:global([data-theme='noir']) .tabActive {
+  color: var(--neon-cyan);
 }
 
 /* ===== CARDS GRID ===== */
@@ -197,6 +218,26 @@
   margin: 0;
   line-height: 1.3;
   letter-spacing: 0.01em;
+}
+
+.skillLevelContainer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.skillGauge {
+  font-family: var(--font-code);
+  font-size: 0.62rem;
+  letter-spacing: -0.05em;
+  color: var(--pop-red);
+  opacity: 0.85;
+  user-select: none;
+}
+
+:global([data-theme='noir']) .skillGauge {
+  color: var(--neon-cyan);
+  text-shadow: var(--neon-cyan-glow);
 }
 
 .skillCardBadge {

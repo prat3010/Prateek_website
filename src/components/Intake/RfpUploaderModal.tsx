@@ -5,8 +5,6 @@ import {
   FileUp,
   X,
   FileText,
-  CheckCircle2,
-  AlertCircle,
   Zap,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -87,6 +85,7 @@ export function RfpUploaderModal({
     try {
       const formData = new FormData();
       formData.append('file', selectedFile);
+      formData.append('currency', currency);
 
       const res = await fetch('/api/scoping/parse-rfp', {
         method: 'POST',

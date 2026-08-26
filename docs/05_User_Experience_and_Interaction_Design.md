@@ -379,11 +379,11 @@ The experience should remain.
 
 ---
 
-# **Acceptance Criteria**
-
 - Every interaction has a clear purpose.
 - Motion communicates rather than decorates.
-- Navigation remains intuitive.
+- Primary CTA buttons feature subtle spring-based magnetic pull physics (`MagneticButton.tsx`) for delightful cursor responsiveness.
+- Bento cards and skill items incorporate 3D perspective tilt and specular light sheen (`TiltCard.tsx`), automatically disabling on touch devices and reduced motion.
+- Navigation remains intuitive with animated sliding tab and link indicators.
 - Visual hierarchy guides attention naturally.
 - Feedback is immediate and meaningful.
 - Loading and error states preserve confidence.

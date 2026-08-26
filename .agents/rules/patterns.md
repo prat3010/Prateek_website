@@ -67,5 +67,22 @@
      ```
   4. **Zero-Drift Invariant:** Never finish a milestone task while leaving Obsidian canvases, architecture index files, or markdown PRDs desynchronized from the live codebase.
 
+### 12. Design System 2.0 & Sensory Aesthetics Invariant Rule
+- **Rule:** Every future component, modal, drawer, page, widget, or UI section created or edited in this codebase MUST strictly adhere to Design System 2.0 dual-theme aesthetics, micro-interactions, and semantic token contracts.
+- **Dual-Theme Aesthetic Parity:**
+  - **Azure Mode (Graphic Novel Print & Warm Editorial):** Warm linen/paper surfaces (`#FAF9F6`), crisp `#FFFFFF` cards (`var(--surface-card)`), graphite typography (`var(--color-text)` / `#2B2B36`), muted terracotta/slate metadata (`var(--color-text-muted)`), terracotta warm accents (`var(--pop-yellow)`, `#E06D53`), and slate blue interactive highlights (`var(--pop-blue)`, `#3F6E91`).
+  - **Noir Mode (Cyber-Monospace & Obsidian Glass):** Obsidian glass surfaces (`#08080a`), deep dark cards (`#0d0d10`), `#2F2F3D` borders, glowing neon cyan (`var(--neon-cyan)`, `#00f0ff`), neon green highlights (`var(--neon-green)`, `#39ff14`), and hot magenta (`var(--neon-pink)`).
+- **Zero Hardcoded Tailwind Drift:**
+  - **Constraint:** NEVER use hardcoded dark Tailwind palette hex codes (such as `#f8fafc`, `#94a3b8`, `#1e293b`, `#0f172a`, `#fff`, `rgba(255,255,255,...)`) inside CSS modules or inline JSX styles.
+  - **Constraint:** Always use semantic tokens: `--color-text`, `--color-text-muted`, `--color-text-dim`, `--surface-card`, `--surface-elevated`, `--surface-glass-bg`, `--surface-glass-border`, `--surface-glass-header`, `--badge-active-*`, `--badge-success-*`, `--badge-danger-*`, `--app-btn-primary-*`.
+- **Sensory Kinetics & Micro-Interactions Standard:**
+  - **Magnetic Button Kinetics:** Primary CTAs, key navigation triggers, and interactive submit buttons must be wrapped in `<MagneticButton strength={0.25}>` (`src/components/ui/MagneticButton.tsx`) to provide tactile physics and cursor attraction.
+  - **3D Card Tilt & Depth:** Primary showcase cards, blueprint options, and interactive tiles should utilize `<TiltCard maxAngle={2} glare={false}>` (`src/components/ui/TiltCard.tsx`).
+  - **Animated Numerical Transitions:** Dynamic financial figures, pricing breakdowns, currency values, and counters must use `@number-flow/react` (`<NumberFlow value={...} format={{ style: 'currency', currency }} />`).
+  - **Framer Motion Layout Transitions:** Tab switchers, mode toggles, and state pill indicators must use Framer Motion `m.span` with `layoutId` (spring physics `type: 'spring', stiffness: 350, damping: 28`) for morphing indicator pills.
+  - **Graphic Novel & Editorial Detailing:** Vintage issue stamps (`VOL. 26`), registration crosshair brackets (`⌜ ⌟`), perforated dashed voucher lines (`border-top: 1.5px dashed var(--border-muted)`), and 5-segment proficiency gauge meters.
+
+
+
 
 

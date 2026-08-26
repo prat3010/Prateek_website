@@ -8,6 +8,7 @@ import { useTheme } from '@/context/ThemeContext';
 import ComicPanel from '@/components/ui/ComicPanel';
 import Scrambler from '@/components/ui/Scrambler';
 import type { ScramblerProps } from '@/components/ui/Scrambler';
+import MagneticButton from '@/components/ui/MagneticButton';
 import { businessStandardTaglines, businessNoirTaglines } from '@/data/taglines';
 import styles from './Hero.module.css';
 
@@ -96,7 +97,19 @@ export default function HeroClient({ taglines }: HeroClientProps) {
 
   return (
     <div className={styles.content}>
+      {/* Corner Graphic Novel Registration Crosshairs */}
+      <span className={styles.crosshairTL} aria-hidden="true">⌜</span>
+      <span className={styles.crosshairTR} aria-hidden="true">⌝</span>
+      <span className={styles.crosshairBL} aria-hidden="true">⌞</span>
+      <span className={styles.crosshairBR} aria-hidden="true">⌟</span>
+
       <div className={styles.textSide}>
+        {/* Vintage Editorial Watermark Stamp */}
+        <div className={styles.editorialStamp} aria-hidden="true">
+          <span className={styles.stampIssue}>VOL. 26 // ISSUE 1</span>
+          <span className={styles.stampLabel}>ARCHITECT EDITION</span>
+        </div>
+
         <Scrambler
           texts={HEADLINE_TEXTS}
           variant="headline"
@@ -141,32 +154,36 @@ export default function HeroClient({ taglines }: HeroClientProps) {
         </div>
 
         <div className={styles.ctaContainer}>
-          <Link
-            href={PRIMARY_HREFS[activeAudience]}
-            className={styles.ctaButton}
-            aria-label={activeAudience === 'business' ? 'Launch Project Scoping Wizard' : 'View Terminal Diagnostics Console'}
-          >
-            <Scrambler
-              texts={PRIMARY_TEXTS}
-              variant="nav-label"
-              as="span"
-              className={styles.ctaText}
-            />
-          </Link>
+          <MagneticButton strength={0.25}>
+            <Link
+              href={PRIMARY_HREFS[activeAudience]}
+              className={styles.ctaButton}
+              aria-label={activeAudience === 'business' ? 'Launch Project Scoping Wizard' : 'View Terminal Diagnostics Console'}
+            >
+              <Scrambler
+                texts={PRIMARY_TEXTS}
+                variant="nav-label"
+                as="span"
+                className={styles.ctaText}
+              />
+            </Link>
+          </MagneticButton>
 
-          <Link
-            href={SECONDARY_HREFS[activeAudience]}
-            className={styles.telemetryBadge}
-            aria-label={activeAudience === 'business' ? 'View Retriever AI SaaS Product' : 'Live analytics dashboard'}
-          >
-            <span className={styles.pulseDot} />
-            <Scrambler
-              texts={SECONDARY_TEXTS}
-              variant="nav-label"
-              as="span"
-              className={styles.ctaText}
-            />
-          </Link>
+          <MagneticButton strength={0.2}>
+            <Link
+              href={SECONDARY_HREFS[activeAudience]}
+              className={styles.telemetryBadge}
+              aria-label={activeAudience === 'business' ? 'View Retriever AI SaaS Product' : 'Live analytics dashboard'}
+            >
+              <span className={styles.pulseDot} />
+              <Scrambler
+                texts={SECONDARY_TEXTS}
+                variant="nav-label"
+                as="span"
+                className={styles.ctaText}
+              />
+            </Link>
+          </MagneticButton>
         </div>
       </div>
 

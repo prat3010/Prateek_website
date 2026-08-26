@@ -3,6 +3,7 @@ import { Zap, ShoppingCart, Sparkles } from 'lucide-react';
 import NumberFlow from '@number-flow/react';
 import type { BaseEngineItem } from '@/data/resume';
 import type { Currency, PromoDiscountInfo } from '@/lib/pricing';
+import MagneticButton from '@/components/ui/MagneticButton';
 import styles from './IntakeForm.module.css';
 
 interface StickyPriceBarProps {
@@ -46,7 +47,7 @@ export function StickyPriceBar({
             Live Pure Additive Arithmetic Formula
           </span>
           {hasDiscount ? (
-            <span style={{ fontSize: '0.72rem', background: 'rgba(16, 185, 129, 0.18)', color: '#34d399', border: '1px solid rgba(16, 185, 129, 0.35)', padding: '0.15rem 0.45rem', borderRadius: '4px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+            <span className={styles.discountBadge}>
               <Sparkles size={11} />
               {totalCost.bundleDiscountPercent && totalCost.bundleDiscountPercent > 0 ? `${totalCost.bundleDiscountPercent}% Bundle Active` : 'Promo Active'}
             </span>
@@ -89,33 +90,22 @@ export function StickyPriceBar({
           )}
         </div>
         {onOpenCart ? (
-          <button
-            type="button"
-            onClick={onOpenCart}
-            style={{
-              background: '#2563eb',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '8px',
-              padding: '0.45rem 0.85rem',
-              fontSize: '0.82rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              boxShadow: '0 2px 10px rgba(37, 99, 235, 0.3)',
-              transition: 'background 0.15s ease',
-            }}
-          >
-            <ShoppingCart size={15} />
-            <span>Architecture Cart</span>
-            {itemCount !== undefined ? (
-              <span style={{ background: 'rgba(255, 255, 255, 0.25)', borderRadius: '9999px', padding: '0.1rem 0.4rem', fontSize: '0.72rem' }}>
-                {itemCount}
-              </span>
-            ) : null}
-          </button>
+          <MagneticButton strength={0.25}>
+            <button
+              type="button"
+              onClick={onOpenCart}
+              className={styles.cartBtn}
+              aria-label="Open Architecture Cart"
+            >
+              <ShoppingCart size={15} />
+              <span>Architecture Cart</span>
+              {itemCount !== undefined ? (
+                <span className={styles.cartBadge}>
+                  {itemCount}
+                </span>
+              ) : null}
+            </button>
+          </MagneticButton>
         ) : null}
       </div>
     </div>

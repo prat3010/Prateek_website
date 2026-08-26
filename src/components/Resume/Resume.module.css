@@ -344,15 +344,67 @@
   color: var(--pop-black);
 }
 
-/* Experience Timeline */
+/* Experience Timeline — Connected Ink Thread */
 .timeline {
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 0;
+  width: 2px;
+  background: var(--color-border);
+  opacity: 0.3;
+  border-radius: 1px;
+}
+
+:global([data-theme='noir']) .timeline::before {
+  background: var(--neon-cyan);
+  opacity: 0.35;
+  box-shadow: 0 0 6px rgba(0, 240, 255, 0.3);
 }
 
 .timelineItem {
   position: relative;
+}
+
+.timelineItem::before {
+  content: '';
+  position: absolute;
+  left: -1.5rem;
+  top: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--pop-white);
+  border: 2px solid var(--pop-blue);
+  transform: translateX(-40%);
+  box-shadow: 0 0 0 2px var(--surface-primary);
+  z-index: 2;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.timelineItem:hover::before {
+  transform: translateX(-40%) scale(1.25);
+  border-color: var(--pop-red);
+}
+
+:global([data-theme='noir']) .timelineItem::before {
+  background: #08080a;
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 6px rgba(0, 240, 255, 0.6);
+}
+
+:global([data-theme='noir']) .timelineItem:hover::before {
+  border-color: var(--neon-pink);
+  box-shadow: 0 0 8px rgba(255, 42, 85, 0.7);
 }
 
 .timelineHeader {
@@ -707,11 +759,12 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
-  border: 1px solid var(--color-border);
-  background-color: var(--pop-cream);
+  border: 1.5px dashed var(--color-border);
+  background-color: var(--surface-primary);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   border-radius: 12px;
   text-align: center;
+  position: relative;
   transition: transform 0.2s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 

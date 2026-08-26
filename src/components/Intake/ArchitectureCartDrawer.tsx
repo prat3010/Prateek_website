@@ -12,6 +12,8 @@ import {
   Tag,
 } from 'lucide-react';
 import Portal from '@/components/ui/Portal';
+import MagneticButton from '@/components/ui/MagneticButton';
+import NumberFlow from '@number-flow/react';
 import { toast } from 'sonner';
 import type { FeatureItem } from '@/data/resume';
 import { formatMoney, type Currency, type QuoteResult, type PromoDiscountInfo } from '@/lib/pricing';
@@ -213,7 +215,7 @@ export function ArchitectureCartDrawer({
                     onSwitchEngine();
                     onClose();
                   }}
-                  style={{ background: 'transparent', border: 'none', color: '#38bdf8', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 600 }}
+                  className={styles.changeEngineBtn}
                 >
                   Change Engine
                 </button>
@@ -240,9 +242,9 @@ export function ArchitectureCartDrawer({
               </div>
               <div className={styles.itemList}>
                 {quote.features.length === 0 ? (
-                  <p style={{ fontSize: '0.85rem', color: '#94a3b8', margin: '0.5rem 0' }}>
-                    No add-on modules selected yet.
-                  </p>
+                  <div className={styles.emptyCart}>
+                    <p>No add-on modules selected yet.</p>
+                  </div>
                 ) : (
                   quote.features.map((f) => {
                     const price = currency === 'INR' ? f.priceINR : f.priceUSD;
@@ -334,7 +336,7 @@ export function ArchitectureCartDrawer({
               </div>
               {promoCode ? (
                 <div className={styles.promoBadgeActive}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <div className={styles.promoBadgeText}>
                     <Tag size={14} />
                     <span>
                       {promoCode.code} applied (
@@ -378,14 +380,25 @@ export function ArchitectureCartDrawer({
             <div className={styles.mathBreakdown}>
               <div className={styles.mathRow}>
                 <span>Gross Architecture Subtotal:</span>
-                <span>{formatMoney(quote.grossTotal, currency)}</span>
+                <span>
+                  <NumberFlow
+                    value={quote.grossTotal}
+                    locales={currency === 'INR' ? 'en-IN' : 'en-US'}
+                    format={{ style: 'currency', currency, maximumFractionDigits: 0 }}
+                  />
+                </span>
               </div>
 
               {quote.bundleDiscountPercent > 0 ? (
                 <div className={`${styles.mathRow} ${styles.mathDiscount}`}>
                   <span>Volume Bundle Discount ({quote.bundleDiscountPercent}%):</span>
                   <span>
-                    -{formatMoney(currency === 'INR' ? quote.bundleDiscountAmountINR : quote.bundleDiscountAmountUSD, currency)}
+                    -
+                    <NumberFlow
+                      value={currency === 'INR' ? quote.bundleDiscountAmountINR : quote.bundleDiscountAmountUSD}
+                      locales={currency === 'INR' ? 'en-IN' : 'en-US'}
+                      format={{ style: 'currency', currency, maximumFractionDigits: 0 }}
+                    />
                   </span>
                 </div>
               ) : null}
@@ -394,7 +407,12 @@ export function ArchitectureCartDrawer({
                 <div className={`${styles.mathRow} ${styles.mathDiscount}`}>
                   <span>Promo Code ({quote.promoDiscount.code}):</span>
                   <span>
-                    -{formatMoney(currency === 'INR' ? quote.promoDiscountAmountINR : quote.promoDiscountAmountUSD, currency)}
+                    -
+                    <NumberFlow
+                      value={currency === 'INR' ? quote.promoDiscountAmountINR : quote.promoDiscountAmountUSD}
+                      locales={currency === 'INR' ? 'en-IN' : 'en-US'}
+                      format={{ style: 'currency', currency, maximumFractionDigits: 0 }}
+                    />
                   </span>
                 </div>
               ) : null}
@@ -407,7 +425,13 @@ export function ArchitectureCartDrawer({
                       {formatMoney(quote.grossTotal, currency)}
                     </span>
                   ) : null}
-                  <span>{formatMoney(quote.netTotal, currency)}</span>
+                  <span>
+                    <NumberFlow
+                      value={quote.netTotal}
+                      locales={currency === 'INR' ? 'en-IN' : 'en-US'}
+                      format={{ style: 'currency', currency, maximumFractionDigits: 0 }}
+                    />
+                  </span>
                 </div>
               </div>
             </div>
@@ -417,39 +441,52 @@ export function ArchitectureCartDrawer({
               <div className={styles.depositCol}>
                 <span className={styles.depositLabel}>50% Upfront Deposit (SOW Sign-off)</span>
                 <span className={styles.depositValue}>
-                  {formatMoney(currency === 'INR' ? quote.depositINR : quote.depositUSD, currency)}
+                  <NumberFlow
+                    value={currency === 'INR' ? quote.depositINR : quote.depositUSD}
+                    locales={currency === 'INR' ? 'en-IN' : 'en-US'}
+                    format={{ style: 'currency', currency, maximumFractionDigits: 0 }}
+                  />
                 </span>
               </div>
-              <div className={styles.depositCol} style={{ textAlign: 'right' }}>
+              <div className={styles.depositColRight}>
                 <span className={styles.depositLabel}>50% Milestone Balance (Delivery)</span>
                 <span className={styles.depositValue}>
-                  {formatMoney(currency === 'INR' ? quote.balanceINR : quote.balanceUSD, currency)}
+                  <NumberFlow
+                    value={currency === 'INR' ? quote.balanceINR : quote.balanceUSD}
+                    locales={currency === 'INR' ? 'en-IN' : 'en-US'}
+                    format={{ style: 'currency', currency, maximumFractionDigits: 0 }}
+                  />
                 </span>
               </div>
             </div>
 
             {/* Action Buttons */}
             <div className={styles.actionRow}>
-              <button
-                type="button"
-                className={styles.primaryActionBtn}
-                onClick={() => {
-                  onProceed();
-                  onClose();
-                }}
-              >
-                <span>Proceed to Proposal & SOW</span>
-                <ArrowRight size={16} />
-              </button>
-              <button
-                type="button"
-                className={styles.secondaryActionBtn}
-                onClick={onExportPdf}
-                title="Export PDF Brief"
-              >
-                <Download size={15} />
-                <span>PDF Brief</span>
-              </button>
+              <MagneticButton strength={0.25} style={{ flex: 1 }}>
+                <button
+                  type="button"
+                  className={styles.primaryActionBtn}
+                  onClick={() => {
+                    onProceed();
+                    onClose();
+                  }}
+                  style={{ width: '100%' }}
+                >
+                  <span>Proceed to Proposal & SOW</span>
+                  <ArrowRight size={16} />
+                </button>
+              </MagneticButton>
+              <MagneticButton strength={0.25}>
+                <button
+                  type="button"
+                  className={styles.secondaryActionBtn}
+                  onClick={onExportPdf}
+                  title="Export PDF Brief"
+                >
+                  <Download size={15} />
+                  <span>PDF Brief</span>
+                </button>
+              </MagneticButton>
             </div>
           </div>
         </div>

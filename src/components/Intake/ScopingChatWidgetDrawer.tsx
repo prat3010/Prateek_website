@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { X, MessageSquare, ShieldCheck } from 'lucide-react';
+import { X, MessageSquare } from 'lucide-react';
 import Portal from '@/components/ui/Portal';
 import styles from './ScopingChatWidgetDrawer.module.css';
 
