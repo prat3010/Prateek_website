@@ -2,8 +2,11 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { m } from "framer-motion";
 import { useLenis } from "lenis/react";
 import ScrollSection from "@/components/ScrollSection/ScrollSection";
+import MagneticButton from "@/components/ui/MagneticButton";
+import TiltCard from "@/components/ui/TiltCard";
 import { PricingSection } from "@/components/rag/PricingSection";
 import { InteractiveWidgetCustomizer } from "@/components/rag/InteractiveWidgetCustomizer";
 import { ComparisonSection } from "@/components/rag/ComparisonSection";
@@ -42,7 +45,7 @@ export default function RagLandingPage() {
   return (
     <div className={styles.landingWrapper}>
       {/* 1. Hero & Product Overview Section */}
-      <ScrollSection gap={80}>
+      <ScrollSection gap={80} disableFade>
         <section className={styles.heroSection} id="home">
           <div className={styles.heroBadge}>
             ✨ Multi-Model Enterprise RAG • Powered by Llama 3.3 70B, Gemini 3.6 Flash, GPT-4o & BYOK
@@ -57,21 +60,25 @@ export default function RagLandingPage() {
           </p>
 
           <div className={styles.heroCtas}>
-            <Link href="/rag/app" className="comic-btn comic-btn-blue">
-              🚀 Launch App Studio
-            </Link>
-            <a href="#demo" onClick={scrollToDemo} className="comic-btn comic-btn-outline">
-              💬 Try Live Demo Below
-            </a>
+            <MagneticButton strength={0.25}>
+              <Link href="/rag/app" className="comic-btn comic-btn-blue">
+                🚀 Launch App Studio
+              </Link>
+            </MagneticButton>
+            <MagneticButton strength={0.25}>
+              <a href="#demo" onClick={scrollToDemo} className="comic-btn comic-btn-outline">
+                💬 Try Live Demo Below
+              </a>
+            </MagneticButton>
           </div>
 
           {/* Interactive Hero Showcase Window */}
           <div className={styles.heroShowcaseWindow}>
             <div className={styles.heroWindowHeader}>
               <div className={styles.heroWindowDots}>
-                <span style={{ background: "#ff5f56" }} />
-                <span style={{ background: "#ffbd2e" }} />
-                <span style={{ background: "#27c93f" }} />
+                <span className={styles.windowDotRed} />
+                <span className={styles.windowDotYellow} />
+                <span className={styles.windowDotGreen} />
               </div>
 
               <div className={styles.heroWindowTabs}>
@@ -79,18 +86,39 @@ export default function RagLandingPage() {
                   className={`${styles.heroWindowTab} ${heroTab === "embed" ? styles.heroWindowTabActive : ""}`}
                   onClick={() => setHeroTab("embed")}
                 >
+                  {heroTab === "embed" && (
+                    <m.span
+                      layoutId="ragHeroTabPill"
+                      className={styles.heroTabPill}
+                      transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                    />
+                  )}
                   ⚡ 1-Line Script
                 </button>
                 <button
                   className={`${styles.heroWindowTab} ${heroTab === "response" ? styles.heroWindowTabActive : ""}`}
                   onClick={() => setHeroTab("response")}
                 >
+                  {heroTab === "response" && (
+                    <m.span
+                      layoutId="ragHeroTabPill"
+                      className={styles.heroTabPill}
+                      transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                    />
+                  )}
                   🎯 Verified PDF Response
                 </button>
                 <button
                   className={`${styles.heroWindowTab} ${heroTab === "engine" ? styles.heroWindowTabActive : ""}`}
                   onClick={() => setHeroTab("engine")}
                 >
+                  {heroTab === "engine" && (
+                    <m.span
+                      layoutId="ragHeroTabPill"
+                      className={styles.heroTabPill}
+                      transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                    />
+                  )}
                   🛡️ Self-Aware Engine
                 </button>
               </div>
@@ -135,7 +163,7 @@ export default function RagLandingPage() {
                   <div className={styles.mockEngineBox}>
                     <div className={styles.engineMetricRow}>
                       <span>Query Relevance Score:</span>
-                      <strong style={{ color: "#22c55e" }}>0.98 / 1.0 (High Confidence)</strong>
+                      <strong className={styles.metricValueGreen}>0.98 / 1.0 (High Confidence)</strong>
                     </div>
                     <div className={styles.engineMetricRow}>
                       <span>Retrieval Pipeline:</span>
@@ -143,7 +171,7 @@ export default function RagLandingPage() {
                     </div>
                     <div className={styles.engineMetricRow}>
                       <span>Corrective Guardrail:</span>
-                      <strong style={{ color: "#3b82f6" }}>ACTIVE — Rejects Unbacked Prompts</strong>
+                      <strong className={styles.metricValueBlue}>ACTIVE — Rejects Unbacked Prompts</strong>
                     </div>
                   </div>
                 </div>
@@ -154,7 +182,7 @@ export default function RagLandingPage() {
       </ScrollSection>
 
       {/* 2. Feature Grid Section */}
-      <ScrollSection verticalOffset={120} gap={80}>
+      <ScrollSection verticalOffset={120} gap={80} disableFade>
         <section className={styles.featureGridSection} id="features">
           <h2 className={styles.featureGridTitle}>Engineered for Zero-Hallucination Precision</h2>
           <p className={styles.featureGridSub}>
@@ -162,132 +190,156 @@ export default function RagLandingPage() {
           </p>
 
           <div className={styles.featureGrid}>
-            <div className={styles.featureCard}>
-              <div className={styles.featureIcon}>🛡️</div>
-              <h3 className={styles.featureCardTitle}>Self-Aware CRAG</h3>
-              <p className={styles.featureCardDesc}>
-                Evaluates relevance scores before generating responses. Rejects low-confidence queries instead of inventing fake answers.
-              </p>
-            </div>
+            <TiltCard maxAngle={2} glare={false}>
+              <div className={styles.featureCard}>
+                <div className={styles.featureIcon}>🛡️</div>
+                <h3 className={styles.featureCardTitle}>Self-Aware CRAG</h3>
+                <p className={styles.featureCardDesc}>
+                  Evaluates relevance scores before generating responses. Rejects low-confidence queries instead of inventing fake answers.
+                </p>
+              </div>
+            </TiltCard>
 
-            <div className={styles.featureCard}>
-              <div className={styles.featureIcon}>🔍</div>
-              <h3 className={styles.featureCardTitle}>Hybrid Search & Reranking</h3>
-              <p className={styles.featureCardDesc}>
-                Fuses pgvector HNSW semantic embeddings with BM25 full-text keyword search and Cohere reranking for exact line matches.
-              </p>
-            </div>
+            <TiltCard maxAngle={2} glare={false}>
+              <div className={styles.featureCard}>
+                <div className={styles.featureIcon}>🔍</div>
+                <h3 className={styles.featureCardTitle}>Hybrid Search & Reranking</h3>
+                <p className={styles.featureCardDesc}>
+                  Fuses pgvector HNSW semantic embeddings with BM25 full-text keyword search and Cohere reranking for exact line matches.
+                </p>
+              </div>
+            </TiltCard>
 
-            <div className={styles.featureCard}>
-              <div className={styles.featureIcon}>🕸️</div>
-              <h3 className={styles.featureCardTitle}>GraphRAG Knowledge Engine</h3>
-              <p className={styles.featureCardDesc}>
-                Traverses multi-hop entity relationships and knowledge triples (&quot;Subject &rarr; Predicate &rarr; Object&quot;) for complex analytical queries.
-              </p>
-            </div>
+            <TiltCard maxAngle={2} glare={false}>
+              <div className={styles.featureCard}>
+                <div className={styles.featureIcon}>🕸️</div>
+                <h3 className={styles.featureCardTitle}>GraphRAG Knowledge Engine</h3>
+                <p className={styles.featureCardDesc}>
+                  Traverses multi-hop entity relationships and knowledge triples (&quot;Subject &rarr; Predicate &rarr; Object&quot;) for complex analytical queries.
+                </p>
+              </div>
+            </TiltCard>
 
-            <div className={styles.featureCard}>
-              <div className={styles.featureIcon}>👁️</div>
-              <h3 className={styles.featureCardTitle}>Multi-Modal Vision & PP-OCRv4</h3>
-              <p className={styles.featureCardDesc}>
-                Extracts text, charts, and image diagrams using Baidu PP-OCRv4 deep learning engine with LLM Vision API fallback.
-              </p>
-            </div>
+            <TiltCard maxAngle={2} glare={false}>
+              <div className={styles.featureCard}>
+                <div className={styles.featureIcon}>👁️</div>
+                <h3 className={styles.featureCardTitle}>Multi-Modal Vision & PP-OCRv4</h3>
+                <p className={styles.featureCardDesc}>
+                  Extracts text, charts, and image diagrams using Baidu PP-OCRv4 deep learning engine with LLM Vision API fallback.
+                </p>
+              </div>
+            </TiltCard>
 
-            <div className={styles.featureCard}>
-              <div className={styles.featureIcon}>📥</div>
-              <h3 className={styles.featureCardTitle}>Presigned PDF Downloads</h3>
-              <p className={styles.featureCardDesc}>
-                Every answer includes 1-click downloadable source citations so users can inspect original verification documents.
-              </p>
-            </div>
+            <TiltCard maxAngle={2} glare={false}>
+              <div className={styles.featureCard}>
+                <div className={styles.featureIcon}>📥</div>
+                <h3 className={styles.featureCardTitle}>Presigned PDF Downloads</h3>
+                <p className={styles.featureCardDesc}>
+                  Every answer includes 1-click downloadable source citations so users can inspect original verification documents.
+                </p>
+              </div>
+            </TiltCard>
 
-            <div className={styles.featureCard}>
-              <div className={styles.featureIcon}>⚡</div>
-              <h3 className={styles.featureCardTitle}>Sub-50ms Semantic Cache</h3>
-              <p className={styles.featureCardDesc}>
-                Pre-indexes past query vectors to serve instant cached responses, lowering API costs and delivering sub-second speeds.
-              </p>
-            </div>
+            <TiltCard maxAngle={2} glare={false}>
+              <div className={styles.featureCard}>
+                <div className={styles.featureIcon}>⚡</div>
+                <h3 className={styles.featureCardTitle}>Sub-50ms Semantic Cache</h3>
+                <p className={styles.featureCardDesc}>
+                  Pre-indexes past query vectors to serve instant cached responses, lowering API costs and delivering sub-second speeds.
+                </p>
+              </div>
+            </TiltCard>
 
-            <div className={styles.featureCard}>
-              <div className={styles.featureIcon}>🌐</div>
-              <h3 className={styles.featureCardTitle}>Live Web Search Grounding</h3>
-              <p className={styles.featureCardDesc}>
-                Automatically falls back to Tavily &amp; Brave Search APIs for real-time web context when internal documents are silent.
-              </p>
-            </div>
+            <TiltCard maxAngle={2} glare={false}>
+              <div className={styles.featureCard}>
+                <div className={styles.featureIcon}>🌐</div>
+                <h3 className={styles.featureCardTitle}>Live Web Search Grounding</h3>
+                <p className={styles.featureCardDesc}>
+                  Automatically falls back to Tavily &amp; Brave Search APIs for real-time web context when internal documents are silent.
+                </p>
+              </div>
+            </TiltCard>
 
-            <div className={styles.featureCard}>
-              <div className={styles.featureIcon}>🎯</div>
-              <h3 className={styles.featureCardTitle}>Self-Querying Metadata Filters</h3>
-              <p className={styles.featureCardDesc}>
-                Converts natural language queries (&quot;invoices from Q3 above $5,000&quot;) into structured PostgreSQL JSONB filters automatically.
-              </p>
-            </div>
+            <TiltCard maxAngle={2} glare={false}>
+              <div className={styles.featureCard}>
+                <div className={styles.featureIcon}>🎯</div>
+                <h3 className={styles.featureCardTitle}>Self-Querying Metadata Filters</h3>
+                <p className={styles.featureCardDesc}>
+                  Converts natural language queries (&quot;invoices from Q3 above $5,000&quot;) into structured PostgreSQL JSONB filters automatically.
+                </p>
+              </div>
+            </TiltCard>
 
-            <div className={styles.featureCard}>
-              <div className={styles.featureIcon}>🔍</div>
-              <h3 className={styles.featureCardTitle}>Parent-Child Context Expansion</h3>
-              <p className={styles.featureCardDesc}>
-                Embeds precise small chunks while automatically restoring full parent document context during generation.
-              </p>
-            </div>
+            <TiltCard maxAngle={2} glare={false}>
+              <div className={styles.featureCard}>
+                <div className={styles.featureIcon}>🔍</div>
+                <h3 className={styles.featureCardTitle}>Parent-Child Context Expansion</h3>
+                <p className={styles.featureCardDesc}>
+                  Embeds precise small chunks while automatically restoring full parent document context during generation.
+                </p>
+              </div>
+            </TiltCard>
 
-            <div className={styles.featureCard}>
-              <div className={styles.featureIcon}>🔌</div>
-              <h3 className={styles.featureCardTitle}>Cloud Data Connectors</h3>
-              <p className={styles.featureCardDesc}>
-                Background synchronization connectors for Notion, Google Drive, REST endpoints, and custom Webhooks.
-              </p>
-            </div>
+            <TiltCard maxAngle={2} glare={false}>
+              <div className={styles.featureCard}>
+                <div className={styles.featureIcon}>🔌</div>
+                <h3 className={styles.featureCardTitle}>Cloud Data Connectors</h3>
+                <p className={styles.featureCardDesc}>
+                  Background synchronization connectors for Notion, Google Drive, REST endpoints, and custom Webhooks.
+                </p>
+              </div>
+            </TiltCard>
 
-            <div className={styles.featureCard}>
-              <div className={styles.featureIcon}>🔐</div>
-              <h3 className={styles.featureCardTitle}>Cryptographic Audit Chains</h3>
-              <p className={styles.featureCardDesc}>
-                SHA-256 tamper-evident audit log chains with automated 90-day retention pruning for HIPAA &amp; GDPR compliance.
-              </p>
-            </div>
+            <TiltCard maxAngle={2} glare={false}>
+              <div className={styles.featureCard}>
+                <div className={styles.featureIcon}>🔐</div>
+                <h3 className={styles.featureCardTitle}>Cryptographic Audit Chains</h3>
+                <p className={styles.featureCardDesc}>
+                  SHA-256 tamper-evident audit log chains with automated 90-day retention pruning for HIPAA &amp; GDPR compliance.
+                </p>
+              </div>
+            </TiltCard>
           </div>
         </section>
       </ScrollSection>
 
       {/* 3. Interactive No-Code Widget Customizer */}
-      <ScrollSection verticalOffset={120} gap={80}>
+      <ScrollSection verticalOffset={120} gap={80} disableFade>
         <InteractiveWidgetCustomizer />
       </ScrollSection>
 
       {/* 4. Retriever AI vs Legacy Chatbots Comparison Matrix */}
-      <ScrollSection verticalOffset={120} gap={80}>
+      <ScrollSection verticalOffset={120} gap={80} disableFade>
         <ComparisonSection />
       </ScrollSection>
 
       {/* 5. Developer RAG REST API Showcase */}
-      <ScrollSection verticalOffset={120} gap={80}>
+      <ScrollSection verticalOffset={120} gap={80} disableFade>
         <DeveloperApiSection />
       </ScrollSection>
 
       {/* 6. Dynamic Geo-IP Pricing Section */}
-      <ScrollSection verticalOffset={120} gap={80}>
+      <ScrollSection verticalOffset={120} gap={80} disableFade>
         <PricingSection />
       </ScrollSection>
 
       {/* 7. Enterprise Custom Deployment Scoping Banner */}
-      <ScrollSection verticalOffset={120} gap={80}>
+      <ScrollSection verticalOffset={120} gap={80} disableFade>
         <div className={styles.scopingBanner}>
           <h2 className={styles.scopingBannerTitle}>Need a Dedicated or Private Cloud RAG Engine?</h2>
           <p className={styles.scopingBannerDesc}>
             We build custom on-premise RAG pipelines, multi-modal vector search systems, and HIPAA/GDPR-compliant enterprise knowledge hubs.
           </p>
-          <Link href="/scoping?engine=saas&goal=ai_rag_app" className="comic-btn comic-btn-blue">
-            🛠️ Build Custom Scope in Scoping Lab →
-          </Link>
+          <MagneticButton strength={0.25}>
+            <Link href="/scoping?engine=saas&goal=ai_rag_app" className="comic-btn comic-btn-blue">
+              🛠️ Build Custom Scope in Scoping Lab →
+            </Link>
+          </MagneticButton>
         </div>
       </ScrollSection>
 
       {/* 8. Live Interactive Sandbox Demo */}
-      <ScrollSection verticalOffset={120} gap={80}>
+      <ScrollSection verticalOffset={120} gap={80} disableFade>
         <section className={styles.demoSection} id="demo">
           <h2 className={styles.demoSectionTitle}>Experience retriever AI Live</h2>
           <p className={styles.demoSectionSub}>
@@ -295,9 +347,11 @@ export default function RagLandingPage() {
           </p>
 
           <div className={styles.heroDemoSandbox}>
-            <Link href="/rag/login" className="comic-btn comic-btn-blue">
-              🔐 Sign in to try Retriever AI
-            </Link>
+            <MagneticButton strength={0.25}>
+              <Link href="/rag/login" className="comic-btn comic-btn-blue">
+                🔐 Sign in to try Retriever AI
+              </Link>
+            </MagneticButton>
           </div>
         </section>
       </ScrollSection>

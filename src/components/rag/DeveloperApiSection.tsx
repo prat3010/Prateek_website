@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { m } from "framer-motion";
 import styles from "./rag.module.css";
 
 export function DeveloperApiSection() {
@@ -79,18 +80,39 @@ console.log("Top Chunks:", searchResults);`,
               className={`${styles.tabBtn} ${activeTab === "curl" ? styles.tabBtnActive : ""}`}
               onClick={() => setActiveTab("curl")}
             >
+              {activeTab === "curl" && (
+                <m.span
+                  layoutId="ragApiTabPill"
+                  className={styles.apiTabPill}
+                  transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                />
+              )}
               cURL
             </button>
             <button
               className={`${styles.tabBtn} ${activeTab === "python" ? styles.tabBtnActive : ""}`}
               onClick={() => setActiveTab("python")}
             >
+              {activeTab === "python" && (
+                <m.span
+                  layoutId="ragApiTabPill"
+                  className={styles.apiTabPill}
+                  transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                />
+              )}
               Python (httpx)
             </button>
             <button
               className={`${styles.tabBtn} ${activeTab === "typescript" ? styles.tabBtnActive : ""}`}
               onClick={() => setActiveTab("typescript")}
             >
+              {activeTab === "typescript" && (
+                <m.span
+                  layoutId="ragApiTabPill"
+                  className={styles.apiTabPill}
+                  transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                />
+              )}
               TypeScript / Node
             </button>
           </div>

@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { m } from "framer-motion";
+import NumberFlow from "@number-flow/react";
+import MagneticButton from "@/components/ui/MagneticButton";
 import styles from "./rag.module.css";
 
 interface PlanItem {
@@ -262,12 +265,26 @@ export function PricingSection() {
             className={`${styles.currencyBtn} ${currencyMode === "inr" ? styles.currencyActive : ""}`}
             onClick={() => setCurrencyMode("inr")}
           >
+            {currencyMode === "inr" && (
+              <m.span
+                layoutId="ragCurrencyPill"
+                className={styles.currencyPill}
+                transition={{ type: "spring", stiffness: 400, damping: 32 }}
+              />
+            )}
             🇮🇳 INR Rates (India)
           </button>
           <button
             className={`${styles.currencyBtn} ${currencyMode === "usd" ? styles.currencyActive : ""}`}
             onClick={() => setCurrencyMode("usd")}
           >
+            {currencyMode === "usd" && (
+              <m.span
+                layoutId="ragCurrencyPill"
+                className={styles.currencyPill}
+                transition={{ type: "spring", stiffness: 400, damping: 32 }}
+              />
+            )}
             🌐 USD Rates (Global)
           </button>
         </div>
@@ -285,7 +302,9 @@ export function PricingSection() {
 
             <div className={styles.planPriceContainer}>
               <span className={styles.planSymbol}>{currentGroup.symbol}</span>
-              <span className={styles.planPrice}>{plan.price}</span>
+              <span className={styles.planPrice}>
+                <NumberFlow value={Number(plan.price.replace(/,/g, "")) || 0} />
+              </span>
               <span className={styles.planPeriod}>{plan.period}</span>
             </div>
 
@@ -297,13 +316,15 @@ export function PricingSection() {
               ))}
             </ul>
 
-            <button
-              onClick={() => handleSubscribe(plan)}
-              disabled={loadingPlanId === plan.id}
-              className={`comic-btn ${plan.popular ? "comic-btn-blue" : "comic-btn-outline"} ${styles.planCta}`}
-            >
-              {loadingPlanId === plan.id ? "Launching Razorpay..." : plan.cta}
-            </button>
+            <MagneticButton strength={0.25} style={{ width: "100%" }}>
+              <button
+                onClick={() => handleSubscribe(plan)}
+                disabled={loadingPlanId === plan.id}
+                className={`comic-btn ${plan.popular ? "comic-btn-blue" : "comic-btn-outline"} ${styles.planCta}`}
+              >
+                {loadingPlanId === plan.id ? "Launching Razorpay..." : plan.cta}
+              </button>
+            </MagneticButton>
           </div>
         ))}
       </div>

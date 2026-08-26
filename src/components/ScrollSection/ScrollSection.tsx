@@ -10,6 +10,7 @@ interface Props {
   verticalOffset?: number;
   centerOnly?: boolean;
   gap?: number;
+  disableFade?: boolean;
 }
 
 interface SectionMetrics {
@@ -39,13 +40,13 @@ function measure(el: HTMLElement): SectionMetrics {
   };
 }
 
-export default function ScrollSection({ children, verticalOffset, centerOnly, gap = 0 }: Props) {
+export default function ScrollSection({ children, verticalOffset, centerOnly, gap = 0, disableFade = false }: Props) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useLenisScroll();
   const prefersReducedMotion = useReducedMotion();
   const [isMobile, setIsMobile] = useState(false);
 
-  const scrollOpacity = useMotionValue(0);
+  const scrollOpacity = useMotionValue(disableFade ? 1 : 0);
   const y = useMotionValue(0);
 
   useEffect(() => {
@@ -63,10 +64,12 @@ export default function ScrollSection({ children, verticalOffset, centerOnly, ga
 
   const verticalOffsetRef = useRef(verticalOffset);
   const centerOnlyRef = useRef(centerOnly);
+  const disableFadeRef = useRef(disableFade);
 
   useEffect(() => {
     verticalOffsetRef.current = verticalOffset;
     centerOnlyRef.current = centerOnly;
+    disableFadeRef.current = disableFade;
   });
 
   /* eslint-disable react-hooks/exhaustive-deps */
@@ -87,9 +90,12 @@ export default function ScrollSection({ children, verticalOffset, centerOnly, ga
 
       const cO = centerOnlyRef.current;
       const vO = verticalOffsetRef.current || 0;
+      const dF = disableFadeRef.current;
 
       let opacity: number;
-      if (cO) {
+      if (dF) {
+        opacity = 1;
+      } else if (cO) {
         const maxP = m.maxReachable || 1;
         opacity = Math.min(raw / (maxP * 0.3 || 0.3), 1);
       } else if (raw < 0.25) {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import MagneticButton from "@/components/ui/MagneticButton";
 import styles from "./rag.module.css";
 
 export function InteractiveWidgetCustomizer() {
@@ -104,9 +105,11 @@ export function InteractiveWidgetCustomizer() {
             </div>
 
             <div className={styles.actionRow}>
-              <button className="comic-btn comic-btn-blue" onClick={handleTestLive}>
-                {widgetMounted ? "✓ Configure a workspace to test" : "🔐 Test with your workspace key"}
-              </button>
+              <MagneticButton strength={0.25}>
+                <button className="comic-btn comic-btn-blue" onClick={handleTestLive}>
+                  {widgetMounted ? "✓ Configure a workspace to test" : "🔐 Test with your workspace key"}
+                </button>
+              </MagneticButton>
             </div>
           </div>
 
