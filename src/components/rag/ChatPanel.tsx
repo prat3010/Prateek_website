@@ -358,6 +358,17 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
     return parts.length > 0 ? parts : content;
   }
 
+  useEffect(() => {
+    if (!feedbackModalMsg) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setFeedbackModalMsg(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [feedbackModalMsg]);
+
   if (hidden) return null;
 
   return (
@@ -484,6 +495,7 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
           <input
             ref={inputRef}
             className={styles.input}
+            aria-label="Ask workspace knowledge base"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
@@ -506,14 +518,21 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
 
       {feedbackModalMsg && (
         <Portal>
-          <div className={styles.feedbackBackdrop} onClick={() => setFeedbackModalMsg(null)}>
+          <div
+            className={styles.feedbackBackdrop}
+            onClick={() => setFeedbackModalMsg(null)}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="feedback-dialog-title"
+          >
             <div className={styles.feedbackModal} onClick={(e) => e.stopPropagation()}>
-              <h3 className={styles.feedbackTitle}>Provide Response Feedback</h3>
+              <h3 id="feedback-dialog-title" className={styles.feedbackTitle}>Provide Response Feedback</h3>
               <p style={{ fontSize: "0.85rem", opacity: 0.7, margin: 0 }}>
                 Help us improve responses by sharing details:
               </p>
               <textarea
                 className={styles.feedbackTextarea}
+                aria-label="Feedback comments"
                 placeholder="Optional: What was incorrect, missing, or unhelpful?"
                 value={feedbackText}
                 onChange={(e) => setFeedbackText(e.target.value)}

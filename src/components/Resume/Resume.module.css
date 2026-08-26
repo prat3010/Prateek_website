@@ -937,8 +937,8 @@
 
 .packageBtn {
   margin-top: auto;
-  background: #0F172A;
-  color: #FFFFFF;
+  background: var(--app-btn-primary-bg);
+  color: var(--app-btn-primary-text);
   border: none;
   border-radius: 6px;
   padding: 8px 12px;
@@ -955,7 +955,7 @@
 }
 
 .packageBtn:hover {
-  background: var(--pop-blue, #0284C7);
+  background: var(--app-btn-primary-hover);
 }
 
 /* Care Plan Grid */
@@ -967,8 +967,8 @@
 }
 
 .careCard {
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
+  background: var(--surface-card);
+  border: 1px solid var(--border-muted);
   border-radius: 8px;
   padding: 12px 14px;
 }
@@ -977,7 +977,7 @@
   font-family: var(--font-headline);
   font-size: 13px;
   font-weight: 700;
-  color: #0F172A;
+  color: var(--color-text);
   margin: 0 0 2px 0;
 }
 

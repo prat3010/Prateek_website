@@ -22,7 +22,8 @@ import {
   Settings,
 } from 'lucide-react';
 import type { GoalArchetype, BaseEngineItem, FeatureItem } from '@/data/resume';
-import { formatMoney, formatPricePair, packageTotalForArchetype, type Currency } from '@/lib/pricing';
+import { formatPricePair, packageTotalForArchetype, type Currency } from '@/lib/pricing';
+import NumberFlow from '@number-flow/react';
 import type { ParseIntentResponse } from '@/lib/rag-client';
 import { AiScopingPromptBar } from './AiScopingPromptBar';
 import { GOAL_CATEGORIES } from './IntakeForm';
@@ -251,7 +252,12 @@ export function StepGoalArchetype({
                       {`${g.compulsoryFeatureLabels.length} Core Module${g.compulsoryFeatureLabels.length > 1 ? 's' : ''}`}
                     </span>
                     <span className={styles.archetypePriceBadge}>
-                      {`Starts at ${formatMoney(packageTotalForArchetype(g, engines, features, currency), currency)}`}
+                      Starts at{' '}
+                      <NumberFlow
+                        value={packageTotalForArchetype(g, engines, features, currency)}
+                        locales={currency === 'INR' ? 'en-IN' : 'en-US'}
+                        format={{ style: 'currency', currency, maximumFractionDigits: 0 }}
+                      />
                     </span>
                   </div>
                 </div>
@@ -305,6 +311,7 @@ export function StepGoalArchetype({
           <input
             type="text"
             className={styles.input}
+            aria-label="Project or Company Name"
             placeholder="e.g., Acme SaaS Engine / Stealth Startup"
             value={formData.companyName}
             onChange={(e) => onChangeField('companyName', e.target.value)}
@@ -319,6 +326,7 @@ export function StepGoalArchetype({
           <input
             type="text"
             className={styles.input}
+            aria-label="Target Audience Persona & Industry"
             placeholder="e.g., B2B Tech Founders, Healthcare SMBs, E-Commerce Buyers"
             value={formData.targetAudience}
             onChange={(e) => onChangeField('targetAudience', e.target.value)}
@@ -334,6 +342,7 @@ export function StepGoalArchetype({
             type="email"
             inputMode="email"
             className={styles.input}
+            aria-label="Contact Email"
             placeholder="e.g., founder@company.com"
             value={formData.contactEmail}
             onChange={(e) => onChangeField('contactEmail', e.target.value)}
@@ -349,6 +358,7 @@ export function StepGoalArchetype({
             type="tel"
             inputMode="tel"
             className={styles.input}
+            aria-label="Contact Phone or WhatsApp"
             placeholder="e.g., +91 99107 93616 / +1 (555) 019-2831"
             value={formData.contactPhone}
             onChange={(e) => onChangeField('contactPhone', e.target.value)}

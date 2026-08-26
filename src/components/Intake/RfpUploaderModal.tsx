@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   FileUp,
   X,
@@ -34,6 +34,17 @@ export function RfpUploaderModal({
   const [isUploading, setIsUploading] = useState(false);
   const [progressStatus, setProgressStatus] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -114,18 +125,18 @@ export function RfpUploaderModal({
 
   return (
     <Portal>
-      <div className={styles.backdrop} onClick={onClose} role="dialog" aria-modal="true">
+      <div className={styles.backdrop} onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="rfp-uploader-title">
         <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
           <div className={styles.header}>
             <div className={styles.titleArea}>
               <FileUp size={20} className={styles.titleIcon} />
-              <h2 className={styles.title}>Multimodal RFP / PRD Parser</h2>
+              <h2 id="rfp-uploader-title" className={styles.title}>Multimodal RFP / PRD Parser</h2>
             </div>
             <button
               type="button"
               className={styles.closeBtn}
               onClick={onClose}
-              aria-label="Close modal"
+              aria-label="Close RFP uploader modal"
             >
               <X size={18} />
             </button>
@@ -150,6 +161,7 @@ export function RfpUploaderModal({
                 ref={fileInputRef}
                 type="file"
                 className={styles.hiddenInput}
+                aria-label="Upload RFP or project brief document"
                 accept=".pdf,.docx,.md,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/markdown,text/plain"
                 onChange={(e) => {
                   if (e.target.files && e.target.files.length > 0) {

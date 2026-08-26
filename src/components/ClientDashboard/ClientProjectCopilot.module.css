@@ -1,0 +1,174 @@
+.toggleButton {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background-color: var(--app-btn-primary-bg);
+  color: var(--app-btn-primary-text);
+  border: none;
+  border-radius: 50px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow-glass-lg);
+  z-index: 9999;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.toggleButton:hover {
+  background-color: var(--app-btn-primary-hover);
+  transform: translateY(-2px);
+}
+
+.copilotDialog {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 380px;
+  max-width: calc(100vw - 32px);
+  max-height: 520px;
+  height: 100%;
+  background-color: var(--surface-card);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: var(--border-radius-xl, 16px);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-glass-lg);
+  z-index: 9999;
+  overflow: hidden;
+  backdrop-filter: var(--surface-glass-blur);
+}
+
+.copilotHeader {
+  padding: 16px;
+  background-color: var(--surface-elevated);
+  border-bottom: 1px solid var(--surface-glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.headerTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.botIcon {
+  color: var(--pop-blue);
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.closeButton:hover {
+  color: var(--color-text);
+}
+
+.messagesList {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.userMessage {
+  align-self: flex-end;
+  background-color: var(--app-btn-primary-bg);
+  color: var(--app-btn-primary-text);
+  padding: 10px 14px;
+  border-radius: 12px 12px 2px 12px;
+  max-width: 85%;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.copilotMessage {
+  align-self: flex-start;
+  background-color: var(--surface-elevated);
+  color: var(--color-text);
+  border: 1px solid var(--surface-glass-border);
+  padding: 10px 14px;
+  border-radius: 12px 12px 12px 2px;
+  max-width: 85%;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.loadingIndicator {
+  align-self: flex-start;
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.inputArea {
+  padding: 12px;
+  background-color: var(--surface-elevated);
+  border-top: 1px solid var(--surface-glass-border);
+  display: flex;
+  gap: 8px;
+}
+
+.textInput {
+  flex: 1;
+  background-color: var(--surface-card);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--color-text);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.textInput:focus {
+  border-color: var(--pop-blue);
+}
+
+.textInput::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.7;
+}
+
+.sendButton {
+  background-color: var(--app-btn-primary-bg);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--app-btn-primary-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.sendButton:hover:not(:disabled) {
+  background-color: var(--app-btn-primary-hover);
+}
+
+.sendButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { m } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import { RetrieverClient } from "@/lib/rag-client";
 import { OverviewPanel } from "@/components/rag/OverviewPanel";
@@ -176,18 +177,28 @@ export default function RagAppStudioPage() {
         {/* Left Sidebar Navigation */}
         <aside className={`${styles.studioSidebar} ${mobileMenuOpen ? styles.mobileSidebarOpen : ""}`}>
           <div className={styles.sidebarTitle}>Workspace Views</div>
-          <nav className={styles.sidebarNav}>
+          <nav className={styles.sidebarNav} role="tablist" aria-label="Retriever Studio Workspace Views">
             {navItems.map((item) => (
               <button
                 key={item.id}
+                role="tab"
+                aria-selected={activeTab === item.id}
+                tabIndex={activeTab === item.id ? 0 : -1}
                 onClick={() => {
                   setActiveTab(item.id);
                   setMobileMenuOpen(false);
                 }}
                 className={`${styles.sidebarItem} ${activeTab === item.id ? styles.sidebarItemActive : ""}`}
               >
-                <span>{item.icon}</span>
-                <span>{item.label}</span>
+                {activeTab === item.id && (
+                  <m.span
+                    layoutId="ragStudioTabPill"
+                    className={styles.sidebarTabPill}
+                    transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                  />
+                )}
+                <span style={{ position: "relative", zIndex: 1 }}>{item.icon}</span>
+                <span style={{ position: "relative", zIndex: 1 }}>{item.label}</span>
               </button>
             ))}
           </nav>

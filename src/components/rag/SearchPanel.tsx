@@ -79,6 +79,7 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
           <div className={styles.chatInput}>
             <input
               className={styles.input}
+              aria-label="Search knowledge base vector chunks"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}

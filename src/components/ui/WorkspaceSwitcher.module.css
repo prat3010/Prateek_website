@@ -4,10 +4,10 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 0.75rem 1.25rem;
-  background: var(--bg-surface-elevated, rgba(15, 23, 42, 0.85));
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+  background: var(--surface-glass-card);
+  border: 1px solid var(--surface-glass-border);
   border-radius: 12px;
-  backdrop-filter: blur(8px);
+  backdrop-filter: var(--surface-glass-blur);
   margin-bottom: 1.5rem;
   flex-wrap: wrap;
 }
@@ -28,21 +28,21 @@
   border-radius: 8px;
   border: 1px solid transparent;
   background: transparent;
-  color: var(--text-muted, #94a3b8);
+  color: var(--color-text-muted);
   cursor: pointer;
   text-decoration: none;
   transition: all 0.2s ease;
 }
 
 .switchBtn:hover {
-  color: var(--text-main, #f8fafc);
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text);
+  background: var(--surface-elevated);
 }
 
 .activeDashboard {
-  background: rgba(59, 130, 246, 0.15);
-  border-color: rgba(59, 130, 246, 0.4);
-  color: #60a5fa;
+  background: var(--badge-active-bg);
+  border-color: var(--badge-active-border);
+  color: var(--badge-active-text);
 }
 
 .activeRag {
@@ -56,11 +56,11 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.8rem;
-  color: var(--text-muted, #94a3b8);
+  color: var(--color-text-muted);
   padding: 0.35rem 0.75rem;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--surface-card);
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--surface-glass-border);
 }
 
 .userDot {

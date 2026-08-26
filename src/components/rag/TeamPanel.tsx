@@ -62,6 +62,7 @@ export function TeamPanel({ hidden }: TeamPanelProps) {
         <form onSubmit={handleInvite} style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
           <input
             type="email"
+            aria-label="Colleague email address for invitation"
             placeholder="colleague@company.com"
             value={inviteEmail}
             onChange={(e) => setInviteEmail(e.target.value)}
@@ -71,6 +72,7 @@ export function TeamPanel({ hidden }: TeamPanelProps) {
           />
           <select
             value={inviteRole}
+            aria-label="Workspace member role"
             onChange={(e) => setInviteRole(e.target.value)}
             className={styles.input}
             style={{ width: "120px", margin: 0 }}

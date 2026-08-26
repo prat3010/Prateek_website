@@ -328,6 +328,7 @@ export default function TerminalSnakeGame({ onClose, onAchievementUnlocked }: Te
           type="button"
           onClick={onClose}
           className={styles.closeBtn}
+          aria-label="Exit Snake game and return to terminal"
           title="Exit Snake and return to terminal"
         >
           ✕ Exit [ESC]
@@ -348,6 +349,7 @@ export default function TerminalSnakeGame({ onClose, onAchievementUnlocked }: Te
             <input
               type="text"
               className={styles.callsignInput}
+              aria-label="Player callsign or handle"
               value={callsignInput}
               onChange={(e) => setCallsignInput(e.target.value)}
               placeholder="e.g. CYBER_VIPER"

@@ -127,6 +127,7 @@
 }
 
 .tabBtn {
+  position: relative;
   background: transparent;
   border: none;
   color: var(--color-text-muted);
@@ -140,23 +141,28 @@
   font-weight: 600;
   font-size: 0.9rem;
   letter-spacing: 0.02em;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease;
+}
+
+.tabPill {
+  position: absolute;
+  inset: 0;
+  background: var(--app-btn-primary-bg);
+  border-radius: var(--border-radius-md, 8px);
+  box-shadow: var(--app-btn-primary-shadow);
+  z-index: 0;
 }
 
 .tabBtn:hover {
   color: var(--color-text);
-  background: rgba(43, 43, 54, 0.06);
 }
 
 :global([data-theme='noir']) .tabBtn:hover {
   color: var(--pop-black);
-  background: rgba(255, 255, 255, 0.08);
 }
 
 .activeTab {
   color: var(--app-btn-primary-text) !important;
-  background: var(--app-btn-primary-bg) !important;
-  box-shadow: var(--app-btn-primary-shadow);
 }
 
 .sectionGrid {
@@ -452,7 +458,7 @@
   font-weight: 600;
   background: rgba(0, 0, 0, 0.05);
   border: 1px solid rgba(0, 0, 0, 0.1);
-  color: #1e293b;
+  color: var(--color-text);
   padding: 0.35rem 0.75rem;
   border-radius: 8px;
 }

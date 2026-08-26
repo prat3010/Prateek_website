@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bot, Send, Sparkles, X } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import styles from './ClientProjectCopilot.module.css';
 
 export default function ClientProjectCopilot() {
   const { getAccessToken } = useAuth();
@@ -15,6 +16,17 @@ export default function ClientProjectCopilot() {
       text: "👋 Hi! I am your Project Copilot. Ask me anything about your project scope, features, deliverables, payment terms, or maintenance SLAs!",
     },
   ]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
 
   const handleSend = async () => {
     const query = inputQuery.trim();
@@ -60,23 +72,8 @@ export default function ClientProjectCopilot() {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          style={{
-            position: 'fixed',
-            bottom: '24px',
-            right: '24px',
-            backgroundColor: '#0066FF',
-            color: '#FFFFFF',
-            border: 'none',
-            borderRadius: '50px',
-            padding: '12px 20px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            boxShadow: '0 8px 24px rgba(0, 102, 255, 0.3)',
-            zIndex: 9999,
-          }}
+          aria-label="Open Client Project Copilot"
+          className={styles.toggleButton}
         >
           <Sparkles size={18} />
           <span>Project Copilot</span>
@@ -86,122 +83,59 @@ export default function ClientProjectCopilot() {
       {/* Copilot Drawer / Modal */}
       {isOpen && (
         <div
-          style={{
-            position: 'fixed',
-            bottom: '24px',
-            right: '24px',
-            width: '380px',
-            maxHeight: '520px',
-            height: '100%',
-            backgroundColor: '#0F172A',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.5)',
-            zIndex: 9999,
-            overflow: 'hidden',
-          }}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Client Project Copilot"
+          className={styles.copilotDialog}
         >
           {/* Header */}
-          <div
-            style={{
-              padding: '16px',
-              backgroundColor: '#1E293B',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#FFFFFF', fontWeight: 600 }}>
-              <Bot size={20} color="#0066FF" />
+          <div className={styles.copilotHeader}>
+            <div className={styles.headerTitleGroup}>
+              <Bot size={20} className={styles.botIcon} />
               <span>Client Project Copilot</span>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              style={{ background: 'none', border: 'none', color: '#94A3B8', cursor: 'pointer' }}
+              aria-label="Close Project Copilot"
+              className={styles.closeButton}
             >
               <X size={18} />
             </button>
           </div>
 
           {/* Messages List */}
-          <div
-            style={{
-              flex: 1,
-              padding: '16px',
-              overflowY: 'auto',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '12px',
-            }}
-          >
+          <div className={styles.messagesList}>
             {messages.map((m, idx) => (
               <div
                 key={idx}
-                style={{
-                  alignSelf: m.sender === 'user' ? 'flex-end' : 'flex-start',
-                  backgroundColor: m.sender === 'user' ? '#0066FF' : '#1E293B',
-                  color: '#FFFFFF',
-                  padding: '10px 14px',
-                  borderRadius: '12px',
-                  maxWidth: '85%',
-                  fontSize: '13px',
-                  lineHeight: '1.5',
-                  whiteSpace: 'pre-wrap',
-                }}
+                className={m.sender === 'user' ? styles.userMessage : styles.copilotMessage}
               >
                 {m.text}
               </div>
             ))}
             {loading && (
-              <div style={{ alignSelf: 'flex-start', color: '#94A3B8', fontSize: '12px' }}>
+              <div className={styles.loadingIndicator}>
                 Copilot searching active scope in Supabase...
               </div>
             )}
           </div>
 
           {/* Input Box */}
-          <div
-            style={{
-              padding: '12px',
-              backgroundColor: '#1E293B',
-              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-              display: 'flex',
-              gap: '8px',
-            }}
-          >
+          <div className={styles.inputArea}>
             <input
               type="text"
               value={inputQuery}
               onChange={e => setInputQuery(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSend()}
               placeholder="Ask about deliverables, SLAs, timeline..."
-              style={{
-                flex: 1,
-                backgroundColor: '#0F172A',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '8px',
-                padding: '8px 12px',
-                color: '#FFFFFF',
-                fontSize: '13px',
-                outline: 'none',
-              }}
+              aria-label="Ask Project Copilot about deliverables, SLAs, timeline..."
+              className={styles.textInput}
             />
             <button
               onClick={handleSend}
               disabled={loading}
-              style={{
-                backgroundColor: '#0066FF',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '8px 12px',
-                color: '#FFFFFF',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-              }}
+              aria-label="Send message to Project Copilot"
+              className={styles.sendButton}
             >
               <Send size={16} />
             </button>

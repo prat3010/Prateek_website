@@ -19,6 +19,17 @@ export function ScopingChatWidgetDrawer({
 
   useEffect(() => {
     if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
+  useEffect(() => {
+    if (!isOpen) return;
 
     const containerId = 'scoping-chat-widget-container';
     const existingContainer = document.getElementById(containerId);
@@ -55,12 +66,12 @@ export function ScopingChatWidgetDrawer({
 
   return (
     <Portal>
-      <div className={styles.backdrop} onClick={onClose} role="dialog" aria-modal="true">
+      <div className={styles.backdrop} onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="scoping-drawer-title">
         <div className={styles.drawer} onClick={(e) => e.stopPropagation()}>
           <div className={styles.header}>
             <div className={styles.titleArea}>
               <span className={styles.statusDot} />
-              <h2 className={styles.title}>
+              <h2 id="scoping-drawer-title" className={styles.title}>
                 <MessageSquare size={16} />
                 <span>Scoping AI Concierge</span>
               </h2>
@@ -69,7 +80,7 @@ export function ScopingChatWidgetDrawer({
               type="button"
               className={styles.closeBtn}
               onClick={onClose}
-              aria-label="Close chat drawer"
+              aria-label="Close scoping AI concierge drawer"
             >
               <X size={18} />
             </button>

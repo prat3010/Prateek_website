@@ -91,6 +91,7 @@ export function RlmStudioPanel({ client, hidden, isExpired }: RlmStudioPanelProp
         </label>
         <textarea
           className={styles.textarea}
+          aria-label="RLM prompt or task directive"
           rows={3}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -104,6 +105,7 @@ export function RlmStudioPanel({ client, hidden, isExpired }: RlmStudioPanelProp
             <label style={{ fontSize: "0.8rem", opacity: 0.8 }}>Max Execution Steps:</label>
             <select
               value={maxSteps}
+              aria-label="Maximum execution steps"
               onChange={(e) => setMaxSteps(Number(e.target.value))}
               disabled={loading || isExpired}
               style={{ background: "var(--surface-secondary, #1a202c)", color: "inherit", border: "1px solid var(--color-border, #444)", borderRadius: "4px", padding: "0.25rem 0.5rem", fontSize: "0.8rem" }}

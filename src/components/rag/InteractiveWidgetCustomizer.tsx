@@ -62,12 +62,14 @@ export function InteractiveWidgetCustomizer() {
                     className={`${styles.swatchBtn} ${color === c.hex ? styles.swatchActive : ""}`}
                     style={{ background: c.hex }}
                     onClick={() => setColor(c.hex)}
+                    aria-label={`Select ${c.name} color`}
                     title={c.name}
                   />
                 ))}
                 <input
                   type="color"
                   value={color}
+                  aria-label="Custom hex color picker"
                   onChange={(e) => setColor(e.target.value)}
                   className={styles.colorPickerInput}
                   title="Custom hex color"
@@ -80,6 +82,7 @@ export function InteractiveWidgetCustomizer() {
               <input
                 type="text"
                 value={botName}
+                aria-label="Bot Header Title"
                 onChange={(e) => setBotName(e.target.value)}
                 placeholder="e.g. Acme Support AI"
                 className={styles.customizerInput}

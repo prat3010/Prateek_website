@@ -160,14 +160,14 @@
   position: absolute;
   bottom: 1rem;
   right: 1.5rem;
-  background: var(--surface-card, #0f172a);
-  color: var(--color-link, #60a5fa);
-  border: 1px solid var(--color-border, #334155);
+  background: var(--surface-card);
+  color: var(--color-link);
+  border: 1px solid var(--color-border);
   border-radius: 20px;
   padding: 0.35rem 0.85rem;
   font-size: 0.75rem;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow-glass);
   transition: transform 0.15s ease, opacity 0.15s ease;
   z-index: 10;
   display: flex;
@@ -177,7 +177,7 @@
 
 .jumpBottomBtn:hover {
   transform: translateY(-2px);
-  background: var(--color-surface-hover, #1e293b);
+  background: var(--surface-elevated);
 }
 
 .typingIndicator {
@@ -1844,6 +1844,7 @@
 }
 
 .sidebarItem {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.65rem;
@@ -1856,19 +1857,27 @@
   font-weight: 500;
   cursor: pointer;
   text-align: left;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: color 0.15s ease;
+}
+
+.sidebarTabPill {
+  position: absolute;
+  inset: 0;
+  background: var(--surface-card);
+  border: 1px solid var(--surface-glass-border);
+  border-left: 3px solid var(--pop-blue);
+  border-radius: 8px;
+  z-index: 0;
+  box-shadow: var(--shadow-glass);
 }
 
 .sidebarItem:hover {
-  background: var(--surface-secondary);
   color: var(--color-text);
 }
 
 .sidebarItemActive {
-  background: var(--surface-card) !important;
-  color: var(--color-link) !important;
+  color: var(--color-text) !important;
   font-weight: 700;
-  border-left: 3px solid var(--color-link);
 }
 
 .trialBanner {

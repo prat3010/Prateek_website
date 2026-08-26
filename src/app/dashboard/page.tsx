@@ -31,8 +31,10 @@ import { generateOnboardingChecklist, calcOnboardingReadiness } from '@/lib/onbo
 import { calculateInvoiceTotals, SUPPORTED_CURRENCIES, formatCurrencyAmount } from '@/lib/invoicing';
 import resumeData from '@/data/resume.json';
 import intakeDefaults from '@/data/intakeQuestionnaireDefaults.json';
-import { calcQuote, formatMoney, type Currency } from '@/lib/pricing';
+import { calcQuote } from '@/lib/pricing';
 import type { ResumeData } from '@/data/resume';
+import { m } from 'framer-motion';
+import NumberFlow from '@number-flow/react';
 import WorkspaceSwitcher from '@/components/ui/WorkspaceSwitcher';
 import ClientProjectCopilot from '@/components/ClientDashboard/ClientProjectCopilot';
 import styles from './dashboard.module.css';
@@ -380,6 +382,18 @@ export default function ClientDashboardPage() {
       };
     }
   }, [activeTab, user?.email, getAccessToken]);
+
+  useEffect(() => {
+    if (!showInvoiceModal && !signingScope) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (showInvoiceModal) setShowInvoiceModal(false);
+        if (signingScope) setSigningScope(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showInvoiceModal, signingScope]);
 
   const currentInvoiceCalc = calculateInvoiceTotals({
     currency: invCurrency,
@@ -859,24 +873,57 @@ export default function ClientDashboardPage() {
       </header>
 
       {/* Workspace Tabs */}
-      <div className={styles.tabNav}>
+      <div className={styles.tabNav} role="tablist" aria-label="Client Workspace Navigation">
         <button
+          role="tab"
+          aria-selected={activeTab === 'scopes'}
+          tabIndex={activeTab === 'scopes' ? 0 : -1}
           className={`${styles.tabBtn} ${activeTab === 'scopes' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('scopes')}
         >
-          <Layers size={16} /> Active Scopes ({scopes.length})
+          {activeTab === 'scopes' && (
+            <m.span
+              layoutId="dashboardTabPill"
+              className={styles.tabPill}
+              transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+            />
+          )}
+          <Layers size={16} style={{ position: 'relative', zIndex: 1 }} />
+          <span style={{ position: 'relative', zIndex: 1 }}>Active Scopes ({scopes.length})</span>
         </button>
         <button
+          role="tab"
+          aria-selected={activeTab === 'onboarding'}
+          tabIndex={activeTab === 'onboarding' ? 0 : -1}
           className={`${styles.tabBtn} ${activeTab === 'onboarding' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('onboarding')}
         >
-          <CheckCircle2 size={16} /> Onboarding &amp; Kickoff ({scopes.length})
+          {activeTab === 'onboarding' && (
+            <m.span
+              layoutId="dashboardTabPill"
+              className={styles.tabPill}
+              transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+            />
+          )}
+          <CheckCircle2 size={16} style={{ position: 'relative', zIndex: 1 }} />
+          <span style={{ position: 'relative', zIndex: 1 }}>Onboarding &amp; Kickoff ({scopes.length})</span>
         </button>
         <button
+          role="tab"
+          aria-selected={activeTab === 'invoices'}
+          tabIndex={activeTab === 'invoices' ? 0 : -1}
           className={`${styles.tabBtn} ${activeTab === 'invoices' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('invoices')}
         >
-          <CreditCard size={16} /> Invoices &amp; Receipts
+          {activeTab === 'invoices' && (
+            <m.span
+              layoutId="dashboardTabPill"
+              className={styles.tabPill}
+              transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+            />
+          )}
+          <CreditCard size={16} style={{ position: 'relative', zIndex: 1 }} />
+          <span style={{ position: 'relative', zIndex: 1 }}>Invoices &amp; Receipts</span>
         </button>
       </div>
 
@@ -942,6 +989,7 @@ export default function ClientDashboardPage() {
                               type="text"
                               disabled
                               readOnly
+                              aria-label="Name from Google Auth"
                               value={user.user_metadata?.full_name || 'Prefetched Client'}
                               className={styles.readOnlyInput}
                             />
@@ -952,6 +1000,7 @@ export default function ClientDashboardPage() {
                               type="email"
                               disabled
                               readOnly
+                              aria-label="Email from Google Auth"
                               value={user.email || ''}
                               className={styles.readOnlyInput}
                             />
@@ -961,6 +1010,7 @@ export default function ClientDashboardPage() {
                             <input
                               type="text"
                               placeholder="e.g. Acme Tech Labs"
+                              aria-label="Company or Project Name"
                               value={companyInputs[s.id] ?? (s.company_name === 'My Custom Project' ? '' : s.company_name)}
                               onChange={(e) => setCompanyInputs({ ...companyInputs, [s.id]: e.target.value })}
                               className={styles.profileInput}
@@ -971,6 +1021,7 @@ export default function ClientDashboardPage() {
                             <input
                               type="tel"
                               placeholder="+91 98765 43210"
+                              aria-label="Phone or WhatsApp Number"
                               value={phoneInputs[s.id] ?? (s.client_phone || '')}
                               onChange={(e) => setPhoneInputs({ ...phoneInputs, [s.id]: e.target.value })}
                               className={styles.profileInput}
@@ -1092,6 +1143,7 @@ export default function ClientDashboardPage() {
                               <input
                                 type="text"
                                 className={styles.addFeatureInput}
+                                aria-label="Add custom feature to scope"
                                 placeholder="Add custom feature..."
                                 value={newFeatureInput}
                                 onChange={(e) => setNewFeatureInput(e.target.value)}
@@ -1119,10 +1171,24 @@ export default function ClientDashboardPage() {
 
                       <div className={styles.costSummary}>
                         <div>
-                          Total Investment: <strong>{s.currency === 'INR' ? `₹${s.total_cost_inr.toLocaleString('en-IN')}` : `$${s.total_cost_usd.toLocaleString('en-US')}`}</strong>
+                          Total Investment:{' '}
+                          <strong>
+                            <NumberFlow
+                              value={s.currency === 'INR' ? s.total_cost_inr : s.total_cost_usd}
+                              locales={s.currency === 'INR' ? 'en-IN' : 'en-US'}
+                              format={{ style: 'currency', currency: s.currency, maximumFractionDigits: 0 }}
+                            />
+                          </strong>
                         </div>
                         <div>
-                          50% Scope Deposit: <strong className={styles.paidText}>{s.currency === 'INR' ? `₹${depositAmount.toLocaleString('en-IN')}` : `$${depositAmount.toLocaleString('en-US')}`}</strong>
+                          50% Scope Deposit:{' '}
+                          <strong className={styles.paidText}>
+                            <NumberFlow
+                              value={depositAmount}
+                              locales={s.currency === 'INR' ? 'en-IN' : 'en-US'}
+                              format={{ style: 'currency', currency: s.currency, maximumFractionDigits: 0 }}
+                            />
+                          </strong>
                         </div>
                       </div>
                     </div>
@@ -1250,6 +1316,7 @@ export default function ClientDashboardPage() {
                                   type="checkbox"
                                   checked={isCompleted}
                                   disabled={item.id === 'deposit_upfront' && s.deposit_paid}
+                                  aria-label={`Mark ${item.title} as completed`}
                                   onChange={(e) => handleToggleChecklistItem(s, item.id, e.target.checked)}
                                   className={styles.checklistCheckbox}
                                 />
@@ -1270,6 +1337,7 @@ export default function ClientDashboardPage() {
                                 <input
                                   type="text"
                                   className={styles.checklistInput}
+                                  aria-label={`${item.title} value`}
                                   placeholder={item.placeholder || 'Enter value...'}
                                   value={onboardingInputs[s.id]?.[item.id] ?? textVal}
                                   onChange={(e) =>
@@ -1497,17 +1565,24 @@ export default function ClientDashboardPage() {
         {/* Create GST / Non-GST Invoice Modal */}
         {showInvoiceModal && (
           <Portal>
-            <div className={styles.invoiceModalOverlay} onClick={() => setShowInvoiceModal(false)}>
+            <div
+              className={styles.invoiceModalOverlay}
+              onClick={() => setShowInvoiceModal(false)}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="invoice-modal-title"
+            >
               <div className={styles.invoiceModalCard} onClick={(e) => e.stopPropagation()}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
-                    <h3 style={{ margin: 0 }}>Create GST / Non-GST Invoice</h3>
+                    <h3 id="invoice-modal-title" style={{ margin: 0 }}>Create GST / Non-GST Invoice</h3>
                     <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.85rem', opacity: 0.8 }}>
                       Razorpay Invoice Creation & Itemized Tax Breakdown Engine
                     </p>
                   </div>
                   <button
                     type="button"
+                    aria-label="Close invoice creation modal"
                     style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit' }}
                     onClick={() => setShowInvoiceModal(false)}
                   >
@@ -1525,6 +1600,7 @@ export default function ClientDashboardPage() {
                         <input
                           type="text"
                           required
+                          aria-label="Customer Name"
                           className={styles.formInput}
                           placeholder="e.g. Acme Tech Solutions"
                           value={invCustomerName}
@@ -1536,6 +1612,7 @@ export default function ClientDashboardPage() {
                         <input
                           type="email"
                           required
+                          aria-label="Customer Email"
                           className={styles.formInput}
                           placeholder="billing@acme.com"
                           value={invCustomerEmail}
@@ -1546,6 +1623,7 @@ export default function ClientDashboardPage() {
                         <label>Contact Phone</label>
                         <input
                           type="tel"
+                          aria-label="Contact Phone"
                           className={styles.formInput}
                           placeholder="+91 98765 43210"
                           value={invCustomerPhone}
@@ -1556,6 +1634,7 @@ export default function ClientDashboardPage() {
                         <label>GSTIN (Optional for Non-GST)</label>
                         <input
                           type="text"
+                          aria-label="GSTIN"
                           className={styles.formInput}
                           placeholder="07AAAAA0000A1Z5"
                           value={invCustomerGstin}
@@ -1573,6 +1652,7 @@ export default function ClientDashboardPage() {
                         <label>Street Address</label>
                         <input
                           type="text"
+                          aria-label="Street Address"
                           className={styles.formInput}
                           placeholder="Building, Street"
                           value={invStreet}
@@ -1584,6 +1664,7 @@ export default function ClientDashboardPage() {
                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                           <input
                             type="text"
+                            aria-label="City"
                             className={styles.formInput}
                             placeholder="City"
                             value={invCity}
@@ -1592,6 +1673,7 @@ export default function ClientDashboardPage() {
                           />
                           <input
                             type="text"
+                            aria-label="Pincode"
                             className={styles.formInput}
                             placeholder="Pincode"
                             value={invPincode}
@@ -1604,6 +1686,7 @@ export default function ClientDashboardPage() {
                         <label>State / Territory</label>
                         <input
                           type="text"
+                          aria-label="State or Territory"
                           className={styles.formInput}
                           value={invState}
                           onChange={(e) => setInvState(e.target.value)}
@@ -1613,6 +1696,7 @@ export default function ClientDashboardPage() {
                         <label>Place of Supply (GST Tax Determinant) *</label>
                         <select
                           className={styles.formSelect}
+                          aria-label="Place of Supply"
                           value={invPlaceOfSupply}
                           onChange={(e) => setInvPlaceOfSupply(e.target.value)}
                         >
@@ -1635,6 +1719,7 @@ export default function ClientDashboardPage() {
                     <div className={styles.formGroup}>
                       <select
                         className={styles.formSelect}
+                        aria-label="Invoice Currency"
                         value={invCurrency}
                         onChange={(e) => setInvCurrency(e.target.value)}
                       >
@@ -1671,6 +1756,7 @@ export default function ClientDashboardPage() {
                           <input
                             type="text"
                             className={styles.formInput}
+                            aria-label={`Line item ${idx + 1} title`}
                             placeholder="Item Title"
                             value={item.name}
                             onChange={(e) => {
@@ -1681,6 +1767,7 @@ export default function ClientDashboardPage() {
                           <input
                             type="text"
                             className={styles.formInput}
+                            aria-label={`Line item ${idx + 1} SAC code`}
                             placeholder="SAC (998314)"
                             value={item.sac_hsn}
                             onChange={(e) => {
@@ -1691,6 +1778,7 @@ export default function ClientDashboardPage() {
                           <input
                             type="number"
                             className={styles.formInput}
+                            aria-label={`Line item ${idx + 1} quantity`}
                             placeholder="Qty"
                             min="1"
                             value={item.quantity}
@@ -1702,6 +1790,7 @@ export default function ClientDashboardPage() {
                           <input
                             type="number"
                             className={styles.formInput}
+                            aria-label={`Line item ${idx + 1} rate`}
                             placeholder="Rate"
                             value={item.rate}
                             onChange={(e) => {
@@ -1712,6 +1801,7 @@ export default function ClientDashboardPage() {
                           {invCurrency === 'INR' ? (
                             <select
                               className={styles.formSelect}
+                              aria-label={`Line item ${idx + 1} tax rate`}
                               value={item.tax_rate}
                               onChange={(e) => {
                                 const val = Number(e.target.value);
@@ -1724,11 +1814,12 @@ export default function ClientDashboardPage() {
                               <option value={0}>0% Tax</option>
                             </select>
                           ) : (
-                            <input type="text" disabled className={styles.formInput} value="0% Tax" />
+                            <input type="text" disabled aria-label={`Line item ${idx + 1} tax rate`} className={styles.formInput} value="0% Tax" />
                           )}
                           <button
                             type="button"
                             disabled={invLineItems.length <= 1}
+                            aria-label={`Remove line item ${item.name || idx + 1}`}
                             onClick={() => handleRemoveLineItem(idx)}
                             style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}
                           >
@@ -1743,29 +1834,59 @@ export default function ClientDashboardPage() {
                   <div className={styles.taxPreviewCard}>
                     <div className={styles.taxRow}>
                       <span>Subtotal:</span>
-                      <strong>{formatCurrencyAmount(currentInvoiceCalc.subtotal, invCurrency)}</strong>
+                      <strong>
+                        <NumberFlow
+                          value={currentInvoiceCalc.subtotal}
+                          locales={invCurrency === 'INR' ? 'en-IN' : 'en-US'}
+                          format={{ style: 'currency', currency: invCurrency, maximumFractionDigits: 0 }}
+                        />
+                      </strong>
                     </div>
                     {currentInvoiceCalc.is_gst && currentInvoiceCalc.tax_breakup.cgst_amount ? (
                       <>
                         <div className={styles.taxRow}>
                           <span>CGST ({currentInvoiceCalc.tax_breakup.cgst_rate}%):</span>
-                          <span>{formatCurrencyAmount(currentInvoiceCalc.tax_breakup.cgst_amount || 0, invCurrency)}</span>
+                          <span>
+                            <NumberFlow
+                              value={currentInvoiceCalc.tax_breakup.cgst_amount || 0}
+                              locales={invCurrency === 'INR' ? 'en-IN' : 'en-US'}
+                              format={{ style: 'currency', currency: invCurrency, maximumFractionDigits: 0 }}
+                            />
+                          </span>
                         </div>
                         <div className={styles.taxRow}>
                           <span>SGST ({currentInvoiceCalc.tax_breakup.sgst_rate}%):</span>
-                          <span>{formatCurrencyAmount(currentInvoiceCalc.tax_breakup.sgst_amount || 0, invCurrency)}</span>
+                          <span>
+                            <NumberFlow
+                              value={currentInvoiceCalc.tax_breakup.sgst_amount || 0}
+                              locales={invCurrency === 'INR' ? 'en-IN' : 'en-US'}
+                              format={{ style: 'currency', currency: invCurrency, maximumFractionDigits: 0 }}
+                            />
+                          </span>
                         </div>
                       </>
                     ) : null}
                     {currentInvoiceCalc.is_gst && currentInvoiceCalc.tax_breakup.igst_amount ? (
                       <div className={styles.taxRow}>
                         <span>IGST ({currentInvoiceCalc.tax_breakup.igst_rate}%):</span>
-                        <span>{formatCurrencyAmount(currentInvoiceCalc.tax_breakup.igst_amount || 0, invCurrency)}</span>
+                        <span>
+                          <NumberFlow
+                            value={currentInvoiceCalc.tax_breakup.igst_amount || 0}
+                            locales={invCurrency === 'INR' ? 'en-IN' : 'en-US'}
+                            format={{ style: 'currency', currency: invCurrency, maximumFractionDigits: 0 }}
+                          />
+                        </span>
                       </div>
                     ) : null}
                     <div className={styles.taxTotalRow}>
                       <span>Grand Total:</span>
-                      <span>{formatCurrencyAmount(currentInvoiceCalc.grand_total, invCurrency)}</span>
+                      <span>
+                        <NumberFlow
+                          value={currentInvoiceCalc.grand_total}
+                          locales={invCurrency === 'INR' ? 'en-IN' : 'en-US'}
+                          format={{ style: 'currency', currency: invCurrency, maximumFractionDigits: 0 }}
+                        />
+                      </span>
                     </div>
                   </div>
 
@@ -1775,6 +1896,7 @@ export default function ClientDashboardPage() {
                       <label>Customer Notes (Max 2048 chars)</label>
                       <textarea
                         rows={2}
+                        aria-label="Customer Notes"
                         className={styles.formTextarea}
                         maxLength={2048}
                         value={invNotes}
@@ -1785,6 +1907,7 @@ export default function ClientDashboardPage() {
                       <label>Terms & Conditions (Max 2048 chars)</label>
                       <textarea
                         rows={2}
+                        aria-label="Terms and Conditions"
                         className={styles.formTextarea}
                         maxLength={2048}
                         value={invTerms}
@@ -1814,14 +1937,27 @@ export default function ClientDashboardPage() {
       {/* Scope Digital Sign-off & Commercial Terms Modal */}
       {signingScope && (
         <Portal>
-          <div className={styles.modalOverlay} onClick={() => setSigningScope(null)}>
+          <div
+            className={styles.modalOverlay}
+            onClick={() => setSigningScope(null)}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="signoff-modal-title"
+          >
             <div className={styles.signoffModalBox} onClick={(e) => e.stopPropagation()}>
               <div className={styles.modalHeader}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <ShieldCheck size={22} style={{ color: '#2563eb' }} />
-                  <h3 style={{ margin: 0, fontSize: '1.1rem' }}>COMMERCIAL PROPOSAL SIGN-OFF &amp; TERMS CONFIRMATION</h3>
+                  <h3 id="signoff-modal-title" style={{ margin: 0, fontSize: '1.1rem' }}>COMMERCIAL PROPOSAL SIGN-OFF &amp; TERMS CONFIRMATION</h3>
                 </div>
-                <X size={18} style={{ cursor: 'pointer' }} onClick={() => setSigningScope(null)} />
+                <button
+                  type="button"
+                  aria-label="Close proposal sign-off modal"
+                  onClick={() => setSigningScope(null)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', display: 'flex', alignItems: 'center' }}
+                >
+                  <X size={18} />
+                </button>
               </div>
 
               <div className={styles.modalBody}>
@@ -1849,29 +1985,47 @@ export default function ClientDashboardPage() {
                 </div>
 
                 <div style={{ margin: '1.25rem 0' }}>
-                  <label style={{ fontWeight: 700, fontSize: '0.9rem', display: 'block', marginBottom: '0.6rem' }}>
+                  <label id="payment-structure-label" style={{ fontWeight: 700, fontSize: '0.9rem', display: 'block', marginBottom: '0.6rem' }}>
                     Select Preferred Deposit &amp; Milestone Payment Structure
                   </label>
-                  <div className={styles.paymentStructureGrid}>
+                  <div className={styles.paymentStructureGrid} role="radiogroup" aria-labelledby="payment-structure-label">
                     <div
+                      role="radio"
+                      aria-checked={signoffPaymentStructure === '50/50'}
+                      tabIndex={0}
                       className={`${styles.structureCard} ${signoffPaymentStructure === '50/50' ? styles.structureCardSelected : ''}`}
                       onClick={() => setSignoffPaymentStructure('50/50')}
+                      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setSignoffPaymentStructure('50/50')}
                     >
                       <div className={styles.structureTitle}>50 / 50 Standard Milestone Split</div>
                       <p className={styles.structureDesc}>
-                        50% Upfront Development Deposit ({formatMoney(Math.round((signingScope.currency === 'USD' ? signingScope.total_cost_usd : signingScope.total_cost_inr) * 0.5), (signingScope.currency === 'USD' ? 'USD' : 'INR') as Currency)})
-                        {' + '}50% Final Balance prior to production handover.
+                        50% Upfront Development Deposit (
+                        <NumberFlow
+                          value={Math.round((signingScope.currency === 'USD' ? signingScope.total_cost_usd : signingScope.total_cost_inr) * 0.5)}
+                          locales={signingScope.currency === 'USD' ? 'en-US' : 'en-IN'}
+                          format={{ style: 'currency', currency: signingScope.currency, maximumFractionDigits: 0 }}
+                        />
+                        ) + 50% Final Balance prior to production handover.
                       </p>
                     </div>
 
                     <div
+                      role="radio"
+                      aria-checked={signoffPaymentStructure === '40/30/30'}
+                      tabIndex={0}
                       className={`${styles.structureCard} ${signoffPaymentStructure === '40/30/30' ? styles.structureCardSelected : ''}`}
                       onClick={() => setSignoffPaymentStructure('40/30/30')}
+                      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setSignoffPaymentStructure('40/30/30')}
                     >
                       <div className={styles.structureTitle}>40 / 30 / 30 Three-Part Milestone Split</div>
                       <p className={styles.structureDesc}>
-                        40% Upfront Deposit ({formatMoney(Math.round((signingScope.currency === 'USD' ? signingScope.total_cost_usd : signingScope.total_cost_inr) * 0.4), (signingScope.currency === 'USD' ? 'USD' : 'INR') as Currency)})
-                        {' + '}30% Beta Milestone Sign-off + 30% Final Balance Handover.
+                        40% Upfront Deposit (
+                        <NumberFlow
+                          value={Math.round((signingScope.currency === 'USD' ? signingScope.total_cost_usd : signingScope.total_cost_inr) * 0.4)}
+                          locales={signingScope.currency === 'USD' ? 'en-US' : 'en-IN'}
+                          format={{ style: 'currency', currency: signingScope.currency, maximumFractionDigits: 0 }}
+                        />
+                        ) + 30% Beta Milestone Sign-off + 30% Final Balance Handover.
                       </p>
                     </div>
                   </div>
@@ -1881,6 +2035,7 @@ export default function ClientDashboardPage() {
                   <label className={styles.termsCheckboxLabel}>
                     <input
                       type="checkbox"
+                      aria-label="Confirm proposal terms and IP transfer"
                       checked={signoffTermsAgreed}
                       onChange={(e) => setSignoffTermsAgreed(e.target.checked)}
                       style={{ marginTop: '0.2rem', cursor: 'pointer' }}

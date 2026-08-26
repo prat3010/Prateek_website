@@ -261,6 +261,7 @@ export function StepCommercials({
           </label>
           <select
             className={styles.select}
+            aria-label="Target Launch Timeline"
             value={formData.timeline}
             onChange={(e) => onChangeField('timeline', e.target.value)}
           >
@@ -280,6 +281,7 @@ export function StepCommercials({
           <input
             type="text"
             className={styles.input}
+            aria-label="Additional Scope Notes"
             placeholder="Special constraints, legacy data to migrate..."
             value={formData.additionalNotes}
             onChange={(e) => onChangeField('additionalNotes', e.target.value)}

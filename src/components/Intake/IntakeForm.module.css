@@ -1517,12 +1517,12 @@
    ============================================================ */
 
 :global([data-theme='noir']) .intakeSection {
-  --intake-summary-bg: #0f172a;
+  --intake-summary-bg: var(--surface-card);
   --intake-summary-border: transparent;
-  --intake-summary-label: #94a3b8;
-  --intake-summary-value: #e2e8f0;
+  --intake-summary-label: var(--color-text-muted);
+  --intake-summary-value: var(--color-text);
   --intake-summary-text: #ffffff;
-  --intake-summary-accent: #38bdf8;
+  --intake-summary-accent: var(--pop-blue);
 }
 
 :global([data-theme='noir']) .card {
@@ -1868,7 +1868,7 @@
 :global([data-theme='noir']) .termsContentBox {
   background: #030304;
   border-color: #2F2F3D;
-  color: #94a3b8;
+  color: var(--color-text-muted);
 }
 
 :global([data-theme='noir']) .chipCard {

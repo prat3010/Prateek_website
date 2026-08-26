@@ -174,7 +174,14 @@ export function DocumentsPanel({ client, hidden, isExpired }: { client: Retrieve
             ) : (
               <label className="comic-btn comic-btn-outline" style={{ cursor: uploading ? "wait" : "pointer" }}>
                 {uploading ? `Uploading ${uploadName}…` : "Upload Document"}
-                <input type="file" accept=".pdf,.txt,.md,.docx,.csv" style={{ display: "none" }} onChange={handleUpload} disabled={uploading} />
+                <input
+                  type="file"
+                  aria-label="Upload document to knowledge base"
+                  accept=".pdf,.txt,.md,.docx,.csv"
+                  style={{ display: "none" }}
+                  onChange={handleUpload}
+                  disabled={uploading}
+                />
               </label>
             )}
           </div>
@@ -214,7 +221,14 @@ export function DocumentsPanel({ client, hidden, isExpired }: { client: Retrieve
                   </div>
                   <div className={styles.fileActions}>
                     <span className={styles.fileStatus}>{doc.status}</span>
-                    <button className={styles.deleteBtn} onClick={() => handleDelete(doc)} title="Delete document">{"✕"}</button>
+                    <button
+                      className={styles.deleteBtn}
+                      onClick={() => handleDelete(doc)}
+                      aria-label={`Delete document ${doc.filename}`}
+                      title="Delete document"
+                    >
+                      {"✕"}
+                    </button>
                   </div>
                 </li>
               ))}
@@ -236,26 +250,26 @@ export function DocumentsPanel({ client, hidden, isExpired }: { client: Retrieve
 
               {/* Node 1: Subject */}
               <g transform="translate(120, 120)">
-                <circle r="32" fill="#1e293b" stroke="#5A8EB6" strokeWidth="2" />
-                <text textAnchor="middle" dy="4" fill="#fff" fontSize="11" fontWeight="600">Company PDF</text>
+                <circle r="32" fill="var(--surface-elevated)" stroke="#5A8EB6" strokeWidth="2" />
+                <text textAnchor="middle" dy="4" fill="var(--color-text)" fontSize="11" fontWeight="600">Company PDF</text>
               </g>
 
               {/* Node 2: Entity */}
               <g transform="translate(300, 60)">
-                <circle r="28" fill="#1e293b" stroke="#00E676" strokeWidth="2" />
-                <text textAnchor="middle" dy="4" fill="#fff" fontSize="10">ISO Security</text>
+                <circle r="28" fill="var(--surface-elevated)" stroke="#00E676" strokeWidth="2" />
+                <text textAnchor="middle" dy="4" fill="var(--color-text)" fontSize="10">ISO Security</text>
               </g>
 
               {/* Node 3: Entity */}
               <g transform="translate(300, 180)">
-                <circle r="28" fill="#1e293b" stroke="#8b5cf6" strokeWidth="2" />
-                <text textAnchor="middle" dy="4" fill="#fff" fontSize="10">HIPAA Data</text>
+                <circle r="28" fill="var(--surface-elevated)" stroke="#8b5cf6" strokeWidth="2" />
+                <text textAnchor="middle" dy="4" fill="var(--color-text)" fontSize="10">HIPAA Data</text>
               </g>
 
               {/* Node 4: Target */}
               <g transform="translate(480, 120)">
-                <circle r="32" fill="#1e293b" stroke="#FFB300" strokeWidth="2" />
-                <text textAnchor="middle" dy="4" fill="#fff" fontSize="11" fontWeight="600">Compliance</text>
+                <circle r="32" fill="var(--surface-elevated)" stroke="#FFB300" strokeWidth="2" />
+                <text textAnchor="middle" dy="4" fill="var(--color-text)" fontSize="11" fontWeight="600">Compliance</text>
               </g>
 
               {/* Predicate Labels */}
@@ -287,6 +301,7 @@ export function DocumentsPanel({ client, hidden, isExpired }: { client: Retrieve
               <label className={styles.label}>Target JSON Schema</label>
               <textarea
                 className={styles.input}
+                aria-label="Target JSON Schema"
                 style={{ height: "140px", fontFamily: "monospace", fontSize: "0.8rem" }}
                 value={jsonSchema}
                 onChange={(e) => setJsonSchema(e.target.value)}
@@ -300,6 +315,7 @@ export function DocumentsPanel({ client, hidden, isExpired }: { client: Retrieve
               <label className={styles.label}>Validated JSON Output</label>
               <textarea
                 className={styles.input}
+                aria-label="Validated JSON Output"
                 style={{ height: "140px", fontFamily: "monospace", fontSize: "0.8rem", color: "#00E676" }}
                 value={extractedJson || "// Output will appear here..."}
                 readOnly
@@ -322,6 +338,7 @@ export function DocumentsPanel({ client, hidden, isExpired }: { client: Retrieve
               <input
                 className={styles.input}
                 type="url"
+                aria-label="Web URL to crawl and index"
                 placeholder="https://docs.example.com/api-reference"
                 value={webUrl}
                 onChange={(e) => setWebUrl(e.target.value)}

@@ -116,19 +116,21 @@ export function ConfigPanel({
           <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.75rem" }}>
             <input
               type="color"
+              aria-label="Brand Primary Color picker"
               value={brandColor}
               onChange={(e) => setBrandColor(e.target.value)}
               style={{ width: "36px", height: "36px", border: "none", borderRadius: "4px", cursor: "pointer" }}
             />
-            <input className={styles.input} value={brandColor} onChange={(e) => setBrandColor(e.target.value)} style={{ margin: 0 }} />
+            <input className={styles.input} aria-label="Brand Primary Color hex value" value={brandColor} onChange={(e) => setBrandColor(e.target.value)} style={{ margin: 0 }} />
           </div>
 
           <label className={styles.label}>Bot Title Name</label>
-          <input className={styles.input} value={botTitle} onChange={(e) => setBotTitle(e.target.value)} />
+          <input className={styles.input} aria-label="Bot Title Name" value={botTitle} onChange={(e) => setBotTitle(e.target.value)} />
 
           <label className={styles.label}>Initial Welcome Greeting</label>
           <textarea
             className={styles.input}
+            aria-label="Initial Welcome Greeting"
             rows={2}
             value={welcomeMessage}
             onChange={(e) => setWelcomeMessage(e.target.value)}
@@ -139,6 +141,7 @@ export function ConfigPanel({
               <label className={styles.label}>Launcher Position</label>
               <select
                 className={styles.input}
+                aria-label="Launcher Position"
                 value={launcherPosition}
                 onChange={(e) => setLauncherPosition(e.target.value as "bottom-right" | "bottom-left")}
               >
@@ -150,6 +153,7 @@ export function ConfigPanel({
               <label className={styles.label}>CORS Whitelist Origin</label>
               <input
                 className={styles.input}
+                aria-label="CORS Whitelist Origin"
                 value={corsDomain}
                 onChange={(e) => setCorsDomain(e.target.value)}
                 placeholder="https://mysite.com"
@@ -211,16 +215,16 @@ export function ConfigPanel({
       <div className={styles.row}>
         <div>
           <label className={styles.label}>Tenant ID</label>
-          <input className={styles.input} value={form.tenantId} onChange={(e) => setForm({ ...form, tenantId: e.target.value })} placeholder="Tenant UUID" />
+          <input className={styles.input} aria-label="Tenant ID" value={form.tenantId} onChange={(e) => setForm({ ...form, tenantId: e.target.value })} placeholder="Tenant UUID" />
         </div>
         <div>
           <label className={styles.label}>User ID</label>
-          <input className={styles.input} value={form.userId} onChange={(e) => setForm({ ...form, userId: e.target.value })} placeholder="User UUID" />
+          <input className={styles.input} aria-label="User ID" value={form.userId} onChange={(e) => setForm({ ...form, userId: e.target.value })} placeholder="User UUID" />
         </div>
       </div>
 
       <label className={styles.label}>API Key</label>
-      <input className={styles.input} value={form.apiKey} onChange={(e) => setForm({ ...form, apiKey: e.target.value })} type="password" placeholder="ret_live_..." />
+      <input className={styles.input} aria-label="API Key" value={form.apiKey} onChange={(e) => setForm({ ...form, apiKey: e.target.value })} type="password" placeholder="ret_live_..." />
 
       <button className="comic-btn comic-btn-outline" style={{ fontSize: "0.75rem", marginBottom: "0.75rem" }} onClick={() => setShowAdvanced(!showAdvanced)}>
         {showAdvanced ? "Hide" : "Show"} Advanced Settings
@@ -231,11 +235,11 @@ export function ConfigPanel({
           <div className={styles.row}>
             <div>
               <label className={styles.label}>BYOK LLM Key (AES-256 Encrypted)</label>
-              <input className={styles.input} value={form.llmKey ?? ""} onChange={(e) => setForm({ ...form, llmKey: e.target.value || undefined })} type="password" placeholder="sk-..." />
+              <input className={styles.input} aria-label="BYOK LLM Key" value={form.llmKey ?? ""} onChange={(e) => setForm({ ...form, llmKey: e.target.value || undefined })} type="password" placeholder="sk-..." />
             </div>
             <div>
               <label className={styles.label}>BYOK LLM Provider</label>
-              <select className={styles.input} value={form.llmProvider ?? ""} onChange={(e) => setForm({ ...form, llmProvider: e.target.value || undefined })}>
+              <select className={styles.input} aria-label="BYOK LLM Provider" value={form.llmProvider ?? ""} onChange={(e) => setForm({ ...form, llmProvider: e.target.value || undefined })}>
                 <option value="">Managed Platform Credits</option>
                 <option value="gemini">Google Gemini</option>
                 <option value="openai">OpenAI</option>
@@ -249,13 +253,14 @@ export function ConfigPanel({
               <label className={styles.label}>🏷️ Anthropic Contextual Prepending Header</label>
               <input
                 className={styles.input}
+                aria-label="Anthropic Contextual Prepending Header"
                 defaultValue="Document Title & Section Scope"
                 placeholder="Prefix attached to chunk text before vector embedding..."
               />
             </div>
             <div>
               <label className={styles.label}>⚡ Search Fusion Strategy</label>
-              <select className={styles.input} defaultValue="normalized_hybrid">
+              <select className={styles.input} aria-label="Search Fusion Strategy" defaultValue="normalized_hybrid">
                 <option value="normalized_hybrid">Normalized Min-Max Hybrid Score Fusion</option>
                 <option value="hybrid_rrf">Standard Reciprocal Rank Fusion (RRF)</option>
               </select>

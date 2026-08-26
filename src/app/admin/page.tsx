@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { m } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import {
   ShieldCheck,
@@ -158,8 +159,8 @@ export default function AdminControlCenter() {
 
   if (authLoading) {
     return (
-      <div className={styles.wrapper} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ color: '#94A3B8' }}>Verifying admin authentication credentials...</p>
+      <div className={styles.authCenterWrapper}>
+        <p style={{ color: 'var(--color-text-muted)' }}>Verifying admin authentication credentials...</p>
       </div>
     );
   }
@@ -167,13 +168,13 @@ export default function AdminControlCenter() {
   // 1. Unauthenticated Login Gate
   if (!user) {
     return (
-      <div className={styles.wrapper} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className={styles.card} style={{ maxWidth: '440px', width: '100%', textAlign: 'center', padding: '40px 24px' }}>
-          <div style={{ margin: '0 auto 16px', background: 'rgba(0, 102, 255, 0.1)', width: '48px', height: '48px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Lock size={24} color="#0066FF" />
+      <div className={styles.authCenterWrapper}>
+        <div className={styles.authGateCard}>
+          <div className={styles.authIconCircle}>
+            <Lock size={24} />
           </div>
-          <h2 style={{ fontSize: '20px', color: '#FFFFFF', margin: '0 0 8px' }}>Restricted Admin Workspace</h2>
-          <p style={{ fontSize: '14px', color: '#94A3B8', margin: '0 0 24px' }}>
+          <h2 className={styles.authTitle}>Restricted Admin Workspace</h2>
+          <p className={styles.authSubtitle}>
             This workspace is protected. Sign in with your administrator Google account to access client ledgers and outreach controls.
           </p>
           <button
@@ -191,13 +192,13 @@ export default function AdminControlCenter() {
   // 2. Non-Admin Access Denied Gate
   if (!isAdminEmail(user.email)) {
     return (
-      <div className={styles.wrapper} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className={styles.card} style={{ maxWidth: '440px', width: '100%', textAlign: 'center', padding: '40px 24px' }}>
-          <div style={{ margin: '0 auto 16px', background: 'rgba(239, 68, 68, 0.1)', width: '48px', height: '48px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <ShieldAlert size={24} color="#EF4444" />
+      <div className={styles.authCenterWrapper}>
+        <div className={styles.authGateCard}>
+          <div className={styles.authAlertCircle}>
+            <ShieldAlert size={24} />
           </div>
-          <h2 style={{ fontSize: '20px', color: '#FFFFFF', margin: '0 0 8px' }}>403 Access Denied</h2>
-          <p style={{ fontSize: '14px', color: '#94A3B8', margin: '0 0 24px' }}>
+          <h2 className={styles.authTitle}>403 Access Denied</h2>
+          <p className={styles.authSubtitle}>
             Logged in as <strong>{user.email}</strong>. This email does not have administrator privileges for Prateeq Sharma Workspace.
           </p>
           <button onClick={logout} className={styles.secondaryBtn} style={{ width: '100%', justifyContent: 'center' }}>
@@ -226,7 +227,7 @@ export default function AdminControlCenter() {
               target="_blank"
               rel="noopener noreferrer"
               className={styles.backLink}
-              style={{ color: '#38BDF8', fontWeight: 600 }}
+              style={{ color: 'var(--pop-blue)', fontWeight: 600 }}
             >
               <Zap size={16} />
               <span>Retriever SaaS Portal (admin.rag.prateeq.in)</span>
@@ -234,10 +235,10 @@ export default function AdminControlCenter() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div className={styles.badge}>
-              <ShieldCheck size={14} color="#10B981" />
+              <ShieldCheck size={14} />
               <span>Admin Verified: {user.email}</span>
             </div>
-            <button onClick={logout} className={styles.logoutBtn} title="Sign Out">
+            <button onClick={logout} className={styles.logoutBtn} aria-label="Sign Out" title="Sign Out">
               <LogOut size={16} />
             </button>
           </div>
@@ -257,21 +258,35 @@ export default function AdminControlCenter() {
             onClick={() => setActiveTab('prospects')}
             className={`${styles.tabBtn} ${activeTab === 'prospects' ? styles.tabActive : ''}`}
           >
-            <Sparkles size={16} />
-            <span>Autonomous Outreach ({pendingLeads.length})</span>
+            {activeTab === 'prospects' && (
+              <m.span
+                layoutId="adminTabPill"
+                className={styles.tabPill}
+                transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+              />
+            )}
+            <Sparkles size={16} style={{ position: 'relative', zIndex: 1 }} />
+            <span style={{ position: 'relative', zIndex: 1 }}>Autonomous Outreach ({pendingLeads.length})</span>
           </button>
           <button
             onClick={() => setActiveTab('clients')}
             className={`${styles.tabBtn} ${activeTab === 'clients' ? styles.tabActive : ''}`}
           >
-            <Users size={16} />
-            <span>Client Scopes &amp; Ledgers ({clients.length})</span>
+            {activeTab === 'clients' && (
+              <m.span
+                layoutId="adminTabPill"
+                className={styles.tabPill}
+                transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+              />
+            )}
+            <Users size={16} style={{ position: 'relative', zIndex: 1 }} />
+            <span style={{ position: 'relative', zIndex: 1 }}>Client Scopes &amp; Ledgers ({clients.length})</span>
           </button>
         </div>
 
         {actionMessage && (
           <div className={styles.messageBanner}>
-            <CheckCircle2 size={16} color="#10B981" />
+            <CheckCircle2 size={16} />
             <span>{actionMessage}</span>
           </div>
         )}
@@ -306,7 +321,13 @@ export default function AdminControlCenter() {
                         </p>
                       </div>
                       {lead.source_url && (
-                        <a href={lead.source_url} target="_blank" rel="noopener noreferrer" className={styles.linkIcon}>
+                        <a
+                          href={lead.source_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.linkIcon}
+                          aria-label={`Visit source website for ${lead.company}`}
+                        >
                           <ExternalLink size={16} />
                         </a>
                       )}
@@ -322,6 +343,7 @@ export default function AdminControlCenter() {
                           value={editedPitchText}
                           onChange={e => setEditedPitchText(e.target.value)}
                           className={styles.pitchTextarea}
+                          aria-label="Edit pitch message text"
                           rows={6}
                         />
                       ) : (
