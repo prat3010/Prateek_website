@@ -1,71 +1,42 @@
-# **Playground Section**
+# **Terminal Pathfinder & Algorithm Lab**
 
 ## **Purpose**
 
-The Playground section showcases creative coding, interaction design, and visual experiments. It acts as an interactive canvas where visitors experience coding craftsmanship firsthand.
+The Pathfinder & Algorithm Lab showcases creative coding, graph theory, heuristic search algorithms, and interactive diagnostics. Integrated directly inside the system console at `/terminal` (command: `pathfinder` / `playground` / `algo`), it acts as an interactive simulation canvas where visitors test search algorithms against dynamic mazes and obstacle layouts.
 
 ---
 
 ## **Product Philosophy**
 
-Playground is a place for exploration. It proves that technical execution can also produce visual delight. It shows a passion for digital craftsmanship outside standard business requirements.
+Migrated from the landing page into `/terminal`, the Algorithm Lab sits naturally inside the hacker/diagnostics console. It proves technical execution in graph algorithms, spatial data structures, and state-machine visualizers without disrupting the commercial narrative of the homepage.
 
 ---
 
-## **User Goals**
+## **Features & Capabilities**
 
-* **Hiring a Developer**: Evaluate creative problem solving, Math/physics integration, WebGL/Three.js optimization, and animation mechanics.
-* **Need a Website**: Experience interaction design, modern animations, and professional visual polish.
-
----
-
-## **Behavior**
-
-* Renders interactive visual experiments (such as selective particle networks, physics engines, or canvas shaders).
-* Supports user-directed play (mouse tracking, scroll interaction, or click updates).
+* **13 Pathfinding Heuristics**:
+  - `astar`: A* Heuristic Search (Optimal Manhattan)
+  - `dijkstra`: Dijkstra's Full-Grid Wave Search
+  - `bfs` / `dfs`: Breadth-First & Depth-First Search
+  - `bidirectional`: Bidirectional BFS Dual Search
+  - `jps`: Jump Point Search (Quantum Leap)
+  - `thetastar`: Theta* Any-Angle Direct Line-of-Sight
+  - `iddfs` / `idastar`: Iterative Deepening DFS & A*
+  - `greedy`: Greedy Best-First Search
+  - `tremaux`: Trémaux's Contour Maze Tracker
+  - `wall`: Pledge Wall Follower
+  - `random`: Brownian Motion Random Walk
+* **Procedural Maze Generator**: Instant procedural barricade generation.
+* **Interactive Canvas**: Drag & drop Start/End nodes, live wall drawing/erasing.
+* **Execution Telemetry**: Visited nodes count, path step length, duration in milliseconds.
+* **Gamification**: Unlocks the `🏆 Algorithm Explorer` terminal achievement upon path resolution.
 
 ---
 
 ## **Adaptive Behavior**
 
-* **Azure Theme (Vibrant Interaction)**:
-  * Uses active 3D particle fields, colorful canvas models, and fluid animations.
-  * Colors shift dynamically matching coordinate mouse coordinates.
-* **Noir Theme (Monochrome High-Contrast Console)**:
-  * Displays high-contrast halftone effects, vector drawing pads, or CRT monitor filters.
-  * Animations are stylized to mimic clean outline blueprint sketch drawings.
-* **Accessibility Fallback**: If the visitor has "Reduced Motion" enabled, animations pause, rendering a clean static layout instead.
-
----
-
-## **Performance Guidelines**
-
-Creative code must remain performant to prevent browser heating:
-1. **Intersection Observer**: The WebGL render loop must execute **only** when the Playground is visible on the screen. Loops pause when scrolled out of view.
-2. **Lazy Initialization**: Three.js/Canvas elements are dynamically imported (`next/dynamic` with `ssr: false`) and load only when the section is about to scroll into the viewport.
-3. **Low-Polygon Models**: Visual models use minimal polygons and compressed shaders to reduce CPU overhead.
-
----
-
-## **Content Requirements**
-
-* Static titles and summary descriptions.
-* Interactive tags explaining the math or shaders utilized.
-
----
-
-## **Analytics**
-
-* Interaction duration.
-* Clicks on "Reset Simulation" or experiment switch keys.
-
----
-
-## **Acceptance Criteria**
-- Playground runs smoothly without blocking the browser main thread.
-- Canvas render loops halt when the section is offscreen.
-- Visual theme shifts align with Azure/Noir aesthetics.
-- Respects `prefers-reduced-motion` settings.
+* **Azure Theme**: Clean graphic ink contrast, bright green start nodes, gold path trails.
+* **Noir Theme**: Cyber-noir glowing accents (`#00f0ff` scanlines, `#39ff14` neon nodes, dark obsidian backdrop).
 
 ---
 

@@ -11,7 +11,6 @@ const About = dynamic(() => import('@/components/About/About'));
 const Skills = dynamic(() => import('@/components/Skills/Skills'));
 const Projects = dynamic(() => import('@/components/Projects/Projects'));
 const Resume = dynamic(() => import('@/components/Resume/Resume'));
-const Playground = dynamic(() => import('@/components/Playground/Playground'));
 const Contact = dynamic(() => import('@/components/Contact/Contact'));
 
 function SectionSkeleton({ height }: { height: string }) {
@@ -80,10 +79,6 @@ export default function Home() {
           <ResumeSection />
         </ScrollSection>
       </Suspense>
-
-      <ScrollSection verticalOffset={120} gap={80}>
-        <Playground />
-      </ScrollSection>
 
       <Suspense fallback={<SectionSkeleton height="550px" />}>
         <ScrollSection verticalOffset={120} gap={80}>

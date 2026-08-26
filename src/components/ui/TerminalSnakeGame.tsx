@@ -324,6 +324,14 @@ export default function TerminalSnakeGame({ onClose, onAchievementUnlocked }: Te
     <div className={styles.wrapper}>
       {/* Header Info Bar */}
       <div className={styles.headerBar}>
+        <button
+          type="button"
+          onClick={onClose}
+          className={styles.closeBtn}
+          title="Exit Snake and return to terminal"
+        >
+          ✕ Exit [ESC]
+        </button>
         <span className={styles.recordBadge}>
           🏆 RECORD: {globalRecord.score} pts (@{globalRecord.player_name})
         </span>

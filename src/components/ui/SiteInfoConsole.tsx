@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
 import { toggleAudio, playKeySound, playAchievementSound } from '@/lib/terminalAudio';
 import TerminalSnakeGame from './TerminalSnakeGame';
+import TerminalPathfinder from './TerminalPathfinder';
 import Portal from '@/components/ui/Portal';
 import MatrixRainOverlay from '@/components/effects/MatrixRainOverlay';
 import styles from './SiteInfoConsole.module.css';
@@ -76,7 +77,7 @@ export default function SiteInfoConsole() {
   
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number>(-1);
-  const [activeGame, setActiveGame] = useState<'none' | 'snake'>('none');
+  const [activeGame, setActiveGame] = useState<'none' | 'snake' | 'pathfinder'>('none');
   const [isMatrixActive, setIsMatrixActive] = useState<boolean>(false);
   const cmdCountRef = useRef<number>(0);
 
@@ -649,6 +650,7 @@ export default function SiteInfoConsole() {
         response = [
           { text: 'Available commands:', type: 'success' },
           { text: '  ask <query>  - Query Retriever Concierge vector memory for platform specs & docs', type: 'output' },
+          { text: '  pathfinder - Launch interactive 2D Pathfinding & Graph Algorithm Lab', type: 'output' },
           { text: '  projects   - List portfolio projects and tags', type: 'output' },
           { text: '  partner    - Print Sales Partner & Broker Agreement with PDF links', type: 'output' },
           { text: '  inspect    - Probe real Supabase latency, JS heap memory & React state', type: 'output' },
@@ -782,6 +784,20 @@ export default function SiteInfoConsole() {
           { text: '  - Local Command: streamlit run scripts/synchronizer.py', type: 'output' }
         ];
         break;
+      case 'pathfinder':
+      case 'playground':
+      case 'algo':
+      case 'lab':
+      case 'path':
+        setActiveGame('pathfinder');
+        setTerminalHistory(prev => [
+          ...prev,
+          { text: 'LAUNCHING 2D GRAPH PATHFINDER & ALGORITHM LAB...', type: 'success' },
+          { text: '  - Select from 13 pathfinding heuristics (A*, Dijkstra, Theta*, JPS).', type: 'output' },
+          { text: '  - Press [ESC] or Close Lab to return to terminal console.', type: 'output' }
+        ]);
+        setTerminalInput('');
+        return;
       case 'snake':
       case 'play':
       case 'game':
@@ -1004,6 +1020,11 @@ export default function SiteInfoConsole() {
                 onClose={() => setActiveGame('none')}
                 onAchievementUnlocked={unlockAchievement}
               />
+            ) : activeGame === 'pathfinder' ? (
+              <TerminalPathfinder
+                onClose={() => setActiveGame('none')}
+                onAchievementUnlocked={unlockAchievement}
+              />
             ) : (
               <>
                 <div className={styles.terminalScreen} ref={terminalScreenRef} data-lenis-prevent>
@@ -1066,7 +1087,7 @@ export default function SiteInfoConsole() {
           <div className={styles.shortcutsContainer}>
             <span className={styles.shortcutsLabel}>QUICK SHORTCUTS:</span>
             <div className={styles.shortcutsGrid}>
-              {['help', 'inspect', 'stack', 'matrix', 'sfx', 'snake', 'pizzarat', 'projects', 'partner', 'system', 'storage', 'sync', 'analytics', 'git-info', 'qrcode', 'clear'].map(cmd => (
+              {['help', 'inspect', 'stack', 'pathfinder', 'snake', 'matrix', 'sfx', 'pizzarat', 'projects', 'partner', 'system', 'storage', 'sync', 'analytics', 'git-info', 'qrcode', 'clear'].map(cmd => (
                 <button
                   key={cmd}
                   onClick={() => executeCommand(cmd)}

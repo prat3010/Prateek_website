@@ -2,11 +2,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
   width: 100%;
-  padding: 12px;
-  background-color: #0c0c0e;
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-sm);
+  height: 100%;
+  min-height: 370px;
+  background: transparent;
+  border: none;
+  padding: 0;
   color: var(--pop-white);
   font-family: var(--font-code);
   box-sizing: border-box;
@@ -17,12 +19,30 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  margin-bottom: 10px;
-  padding-bottom: 8px;
-  border-bottom: 1px dashed var(--pop-black);
-  font-size: 0.78rem;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+  font-size: 0.76rem;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.closeBtn {
+  background: #2C2C3A;
+  color: #FAF9F6;
+  border: 1px solid #4C4C60;
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-family: var(--font-code, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.closeBtn:hover {
+  background: var(--pop-red, #D95D67);
+  color: #FFFFFF;
+  border-color: var(--pop-red, #D95D67);
 }
 
 .recordBadge {
