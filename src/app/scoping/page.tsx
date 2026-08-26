@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Script from 'next/script';
 import { ArrowLeft, Rocket } from 'lucide-react';
 import IntakeForm from '@/components/Intake/IntakeForm';
 import { getProfile } from '@/lib/data';
@@ -73,8 +74,10 @@ export default async function ScopingPage({ searchParams }: ScopingPageProps) {
 
   return (
     <div className={styles.wrapper}>
-      <script
+      <Script
+        id="service-jsonld"
         type="application/ld+json"
+        strategy="beforeInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
       />
       <div className={styles.container}>

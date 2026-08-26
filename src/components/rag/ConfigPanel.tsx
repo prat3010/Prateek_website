@@ -21,7 +21,7 @@ export function ConfigPanel({
   onClear: () => void;
   hidden: boolean;
 }) {
-  const { user, getAccessToken } = useAuth();
+  const { user, loading: authLoading, getAccessToken } = useAuth();
   const [form, setForm] = useState<RetrieverConfig>(
     config ?? EMPTY_CONFIG,
   );
@@ -201,7 +201,7 @@ export function ConfigPanel({
       {/* Credentials & API Settings */}
       <h3 style={{ fontSize: "1rem", margin: "0 0 0.75rem" }}>🔑 Workspace Connection & BYOK Keys</h3>
       <div style={{ marginBottom: "1.25rem", display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-        {user ? (
+        {!authLoading && user ? (
           <button className="comic-btn comic-btn-blue" onClick={handleSupabaseSessionConnect} disabled={connecting}>
             {connecting ? "Connecting…" : `🔐 Connect via Supabase Auth (${user.email?.split("@")[0]})`}
           </button>

@@ -101,7 +101,7 @@ export interface IntakeFormProps {
 
 export default function IntakeForm({ resumeData, initialPreset = null }: IntakeFormProps) {
   const { theme } = useTheme();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const isNoir = theme === 'noir';
   const lenis = useLenis();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -636,7 +636,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                       </button>
                     ) : (
                       <>
-                        {!user && (
+                        {!user && !authLoading && (
                           <button
                             type="button"
                             onClick={() => signInWithGoogle()}

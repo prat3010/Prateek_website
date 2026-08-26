@@ -45,20 +45,22 @@ export function isJwtExpired(token: string): boolean {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    if (typeof window === 'undefined') return null;
-    const raw = universalStorage.getItem('prateeq_active_user');
-    if (!raw) return null;
-    try {
-      return JSON.parse(raw) as User;
-    } catch (e) {
-      console.warn('Failed to parse cached user:', e);
-      return null;
-    }
-  });
-
+  const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+
+  // Hydrate user from localStorage after mount (safe — runs after hydration)
+  useEffect(() => {
+    const raw = universalStorage.getItem('prateeq_active_user');
+    if (!raw) return;
+    try {
+      const cached = JSON.parse(raw) as User;
+      /* eslint-disable react-hooks/set-state-in-effect -- intentional: syncing localStorage (external state) once on mount for hydration safety; cannot read localStorage during SSR state init */
+      setUser(cached);
+    } catch {
+      // corrupt cache, ignore
+    }
+  }, []);
 
   useEffect(() => {
     let mounted = true;

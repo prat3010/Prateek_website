@@ -1,6 +1,7 @@
 import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Script from 'next/script';
 import { notFound } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import { getPostBySlug, getAllPosts } from '@/lib/markdown';
@@ -83,8 +84,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   return (
     <article className={styles.postPage}>
-      <script
+      <Script
+        id="blog-jsonld"
         type="application/ld+json"
+        strategy="beforeInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className={styles.container}>

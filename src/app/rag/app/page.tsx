@@ -133,7 +133,15 @@ export default function RagAppStudioPage() {
         </div>
 
         <div className={styles.studioTopRight}>
-          {user ? (
+          {authLoading ? (
+            <button
+              className="comic-btn comic-btn-blue"
+              style={{ padding: "0.25rem 0.65rem", fontSize: "0.78rem", opacity: 0.6 }}
+              disabled
+            >
+              Sign In
+            </button>
+          ) : user ? (
             <span className={styles.userBadgePill}>
               <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#00E676", display: "inline-block" }} />
               {user.email} {isAdmin ? "(Owner)" : ""}
