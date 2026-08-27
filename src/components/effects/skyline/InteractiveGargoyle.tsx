@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useSkylineInteraction } from '../SkylineInteractionContext';
 import styles from '../NoirSkyline.module.css';
 import { LayerProps } from './types';
@@ -59,7 +59,7 @@ const WING_FRAMES = [
 
 const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
   const [state, setState] = useState<
-    'sitting' | 'blinking' | 'awakening' | 'leaping' | 'gliding_fg' | 'gliding_bg' | 'returning' | 'landing'
+    'sitting' | 'blinking' | 'awakening' | 'leaping' | 'gliding_fg' | 'gliding_bg' | 'returning' | 'landing' | 'cooldown'
   >('sitting');
   const [posX, setPosX] = useState(1426);
   const [posY, setPosY] = useState(756);
@@ -71,7 +71,8 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
   const stateRef = useRef(state);
   const gargoyleRef = useRef<SVGGElement>(null);
 
-  const stateStartTimeRef = useRef<number>(0);
+  const elapsedRef = useRef<number>(0);
+  const lastFrameTimeRef = useRef<number | null>(null);
   const rafRef = useRef<number | null>(null);
   const boundingRectRef = useRef<DOMRect | null>(null);
   const { tick, isTabVisible, isIdle, geometryVersion, scrollVelocityRef, mousePosRef, lastClickRef } = useSkylineInteraction();
@@ -88,7 +89,8 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
 
   useEffect(() => {
     stateRef.current = state;
-    stateStartTimeRef.current = performance.now();
+    elapsedRef.current = 0;
+    lastFrameTimeRef.current = null;
     boundingRectRef.current = null;
   }, [state]);
 
@@ -96,25 +98,52 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
     boundingRectRef.current = null;
   }, [geometryVersion]);
 
-  // Smooth position updates using requestAnimationFrame
+  const triggerAwaken = useCallback(() => {
+    setState((s) => {
+      if (s === 'sitting' || s === 'blinking') {
+        ticksRef.current = 0;
+        elapsedRef.current = 0;
+        lastFrameTimeRef.current = null;
+        return 'awakening';
+      }
+      return s;
+    });
+  }, []);
+
+  const isMoving = ['leaping', 'gliding_fg', 'gliding_bg', 'returning', 'landing'].includes(state);
+  const currentPosX = isMoving ? posX : 1426;
+  const currentPosY = isMoving ? posY : 756;
+  const currentScale = isMoving ? scale : 1.0;
+  const currentOpacity = isMoving ? opacity : 1.0;
+
+  // Smooth position updates using requestAnimationFrame with delta-time accumulation
   useEffect(() => {
     if (reducedMotion) return;
 
     const isMovingState = ['leaping', 'gliding_fg', 'gliding_bg', 'returning', 'landing'].includes(state);
-    if (!isMovingState) {
-      requestAnimationFrame(() => {
-        setPosX(1426);
-        setPosY(756);
-        setScale(1.0);
-        setOpacity(1.0);
-      });
+    if (!isMovingState || !isTabVisible || isIdle) {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+      lastFrameTimeRef.current = null;
       return;
     }
 
-    const tick = () => {
-      if (!isVisibleRef.current || isIdleRef.current) { rafRef.current = null; return; }
+    const loop = (timestamp: number) => {
+      if (!isVisibleRef.current || isIdleRef.current) {
+        rafRef.current = null;
+        lastFrameTimeRef.current = null;
+        return;
+      }
+
+      if (lastFrameTimeRef.current !== null) {
+        const dt = Math.min(timestamp - lastFrameTimeRef.current, 100);
+        elapsedRef.current += dt;
+      }
+      lastFrameTimeRef.current = timestamp;
+      const elapsed = elapsedRef.current;
       const currentState = stateRef.current;
-      const elapsed = performance.now() - stateStartTimeRef.current;
 
       if (currentState === 'leaping') {
         const progress = Math.min(elapsed / 640, 1); // 4 ticks * 160ms = 640ms
@@ -123,7 +152,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
         setScale(1.0);
         setOpacity(1.0);
       } else if (currentState === 'gliding_fg') {
-        const speedX = -0.25; // -20px per 80ms = -0.25px/ms
+        const speedX = -0.25; // 1440px over 5760ms = -0.25px/ms
         const x = Math.max(-80, 1360 + speedX * elapsed);
         setPosX(x);
         if (x > 200) {
@@ -137,14 +166,14 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
           setPosY(420 + ratio * (400 - 420));
         }
       } else if (currentState === 'gliding_bg') {
-        const speedX = 0.125; // 10px per 80ms = 0.125px/ms
+        const speedX = 0.3611; // 2080px over 5760ms (36 ticks) = ~0.3611px/ms
         const x = Math.min(2000, -80 + speedX * elapsed);
         setPosX(x);
         setPosY(420 + Math.sin((elapsed / 80) * 0.15) * 15);
         setScale(0.35);
         setOpacity(0.55);
       } else if (currentState === 'returning') {
-        const speedX = -0.25; // -20px per 80ms = -0.25px/ms
+        const speedX = -0.2286; // 512px over 2240ms (14 ticks) = -0.2286px/ms
         const x = Math.max(1488, 2000 + speedX * elapsed);
         setPosX(x);
         const ratio = Math.max(0, Math.min(1, (x - 1488) / (2000 - 1488)));
@@ -154,19 +183,22 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
       } else if (currentState === 'landing') {
         const progress = Math.min(elapsed / 480, 1); // 3 ticks * 160ms = 480ms
         setPosX(1488 - progress * 62);
-        setPosY(710 - progress * (710 - 756));
+        setPosY(710 + progress * 46);
         setScale(1.0);
         setOpacity(1.0);
       }
 
-      rafRef.current = requestAnimationFrame(tick);
+      rafRef.current = requestAnimationFrame(loop);
     };
 
-    rafRef.current = requestAnimationFrame(tick);
+    rafRef.current = requestAnimationFrame(loop);
     return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
     };
-  }, [state, reducedMotion]);
+  }, [state, isTabVisible, isIdle, reducedMotion]);
 
   // Shared tick drives state machine (single 160ms interval from SkylineInteractionContext)
   useEffect(() => {
@@ -189,7 +221,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
           mouse.y <= rect.bottom + padding;
 
         const click = lastClickRef.current;
-        const isClick = click && click.time > performance.now() - 200 &&
+        const isClick = !!click && click.time > performance.now() - 200 &&
           click.x >= rect.left - padding &&
           click.x <= rect.right + padding &&
           click.y >= rect.top - padding &&
@@ -197,8 +229,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
 
         if (isOver || isClick) {
           lastClickRef.current = null;
-          ticksRef.current = 0;
-          setState('awakening');
+          triggerAwaken();
           return;
         }
       }
@@ -217,8 +248,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
     if (currentState === 'sitting') {
       // High scroll velocity awakens the gargoyle
       if (scrollVelocityRef.current > 200) {
-        ticksRef.current = 0;
-        setState('awakening');
+        triggerAwaken();
       } else if (ticks >= 40) { // every 6.4 seconds, blink eyes
         ticksRef.current = 0;
         setState('blinking');
@@ -226,9 +256,8 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
     } else if (currentState === 'blinking') {
       // Can be startled mid-blink by fast scroll
       if (scrollVelocityRef.current > 200) {
-        ticksRef.current = 0;
-        setState('awakening');
-      } else if (ticks >= 3) { // blink duration
+        triggerAwaken();
+      } else if (ticks >= 3) { // blink duration (480ms)
         ticksRef.current = 0;
         setState('sitting');
       }
@@ -248,22 +277,28 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
         setState('gliding_bg');
       }
     } else if (currentState === 'gliding_bg') {
-      if (ticks >= 104) {
+      if (ticks >= 36) {
         ticksRef.current = 0;
         setState('returning');
       }
     } else if (currentState === 'returning') {
-      if (ticks >= 13) {
+      if (ticks >= 14) {
         ticksRef.current = 0;
         setState('landing');
       }
     } else if (currentState === 'landing') {
       if (ticks >= 3) {
         ticksRef.current = 0;
+        setState('cooldown');
+      }
+    } else if (currentState === 'cooldown') {
+      // Rest on pedestal after landing before accepting hover wake-ups (prevents infinite loop)
+      if (ticks >= 12) { // 12 ticks * 160ms = ~1.9s cooldown
+        ticksRef.current = 0;
         setState('sitting');
       }
     }
-  }, [tick, reducedMotion, lastClickRef, mousePosRef, scrollVelocityRef]);
+  }, [tick, reducedMotion, lastClickRef, mousePosRef, scrollVelocityRef, triggerAwaken]);
 
   // ── Pigeon on the same pedestal ──
   const [pigeonOffsetX, setPigeonOffsetX] = useState(0);
@@ -280,7 +315,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
         setPigeonAlert(false);
         setPigeonOffsetX(15);
       }, 0);
-    } else if (state === 'sitting' || state === 'blinking') {
+    } else if (state === 'cooldown' || state === 'sitting' || state === 'blinking') {
       timer1 = setTimeout(() => setPigeonOffsetX(0), 0);
       timer2 = setTimeout(() => setPigeonAlert(false), 800);
     }
@@ -291,22 +326,13 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
     };
   }, [state]);
 
-  const handleMouseEnter = () => {
-    setState((s) => {
-      if (s === 'sitting' || s === 'blinking') {
-        return 'awakening';
-      }
-      return s;
-    });
-  };
-
   const renderedFrame = useMemo(() => {
     const gargoyleFill = 'var(--skyline-gargoyle-fill)';
     const strokeColor = 'var(--skyline-stroke-fg)';
     const eyeColor = 'var(--skyline-gargoyle-eyes)';
 
     // Distant background scale down and color blend
-    const isDistant = state === 'gliding_bg' || (state === 'gliding_fg' && scale < 0.6) || (state === 'returning' && scale < 0.6);
+    const isDistant = state === 'gliding_bg' || (state === 'gliding_fg' && currentScale < 0.6) || (state === 'returning' && currentScale < 0.6);
     const fillValue = isDistant ? 'var(--skyline-stroke-mid)' : gargoyleFill;
     const strokeValue = isDistant ? 'var(--skyline-stroke-bg)' : strokeColor;
 
@@ -316,6 +342,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
       switch (state) {
         case 'sitting':
         case 'blinking':
+        case 'cooldown':
           return (
             <g>
               {/* Pedestal */}
@@ -491,7 +518,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
     const element = getElement();
     if (!element) return null;
 
-    let transformStr = `scale(${scale})`;
+    let transformStr = `scale(${currentScale})`;
     if (isFacingRight) {
       transformStr += ' scale(-1, 1)';
     }
@@ -501,7 +528,7 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
         {element}
       </g>
     );
-  }, [state, frameIndex, scale]);
+  }, [state, frameIndex, currentScale]);
 
   if (reducedMotion) return null;
 
@@ -509,13 +536,13 @@ const InteractiveGargoyle: React.FC<LayerProps> = ({ reducedMotion }) => {
     <>
       <g
         ref={gargoyleRef}
-        transform={`translate(${posX}, ${posY})`}
-        onMouseEnter={handleMouseEnter}
-        onClick={handleMouseEnter}
+        transform={`translate(${currentPosX}, ${currentPosY})`}
+        onMouseEnter={triggerAwaken}
+        onClick={triggerAwaken}
         style={{
           cursor: (state === 'sitting' || state === 'blinking') ? 'pointer' : 'default',
           pointerEvents: 'auto',
-          opacity
+          opacity: currentOpacity
         }}
       >
         <rect x="-35" y="-35" width="70" height="45" fill="black" opacity="0" style={{ pointerEvents: 'all' }} />
