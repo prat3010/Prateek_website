@@ -30,7 +30,9 @@ Documents represent the final stage of professional verification. Resumes confir
   * Displays typical project timelines (discovery, design, dev, test, launch).
   * Primary Action: **Download Service Quotation PDF**.
 * **Theme Styling**:
-  * Visual previews of the documents adapt their typography and accent lines to match the active theme (Azure gradients or Noir monochrome lines).
+  * Visual previews of the documents adapt their typography, surface backgrounds, and accent lines to match the active theme:
+    * **Azure Theme**: Cold-press `#FAF9F6` paper background, `#FFFFFF` document card, warm graphite `#2B2B36` typography, slate blue and terracotta accents.
+    * **Noir Theme**: Dark obsidian `#0e0e12` surface background, cyber monochrome `#e0e0e3` text, high-contrast `#ffffff` headings, glowing neon cyan (`#00f0ff`) subtitle & action accents, neon yellow (`#ffe600`) rate badges, and neon green (`#39ff14`) SLA care indicators (100% WCAG 2.1 AA compliant).
 
 ---
 
