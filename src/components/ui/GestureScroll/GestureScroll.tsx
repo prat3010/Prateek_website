@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLenis } from 'lenis/react';
 import { useTheme } from '@/context/ThemeContext';
 import { Hand, X, HelpCircle, Loader2 } from 'lucide-react';
-import { HandLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 import styles from './GestureScroll.module.css';
 
 // Hand landmark connections index structure
@@ -45,7 +44,7 @@ export default function GestureScroll() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   // Instance Refs
-  const landmarkerRef = useRef<HandLandmarker | null>(null);
+  const landmarkerRef = useRef<import('@mediapipe/tasks-vision').HandLandmarker | null>(null);
   const animFrameIdRef = useRef<number | null>(null);
 
   // Refs for state callbacks
@@ -118,7 +117,7 @@ export default function GestureScroll() {
         if (currentLenis) {
           currentLenis.scrollTo(scrollState.current.currentScrollY, { immediate: true });
         } else {
-          window.scrollTo({ top: scrollState.current.currentScrollY, behavior: 'instant' });
+          window.scrollTo(0, scrollState.current.currentScrollY);
         }
       }
       frameId = requestAnimationFrame(updateScroll);
@@ -139,6 +138,8 @@ export default function GestureScroll() {
 
     const initVision = async () => {
       try {
+        const { FilesetResolver, HandLandmarker } = await import('@mediapipe/tasks-vision');
+
         // Load WASM fileset for Tasks Vision
         const vision = await FilesetResolver.forVisionTasks(
           'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm'
