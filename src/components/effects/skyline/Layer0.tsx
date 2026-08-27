@@ -2,9 +2,12 @@
 
 import React from 'react';
 import styles from '../NoirSkyline.module.css';
+import { WobblyPath, WobblyLine, WobblyRect } from '../WobblySVG';
 import type { LayerProps } from './types';
 
-const Layer0 = React.memo(function Layer0({ isMobile }: LayerProps) {
+const Layer0 = React.memo(function Layer0({ reducedMotion, wobble: propWobble, isMobile }: LayerProps) {
+  const wobble = propWobble ?? !reducedMotion;
+  const strength = 1.0;
   // Generate 24 conic rays radiating from the center of the horizon (960, 450)
   const raysCount = 24;
   const raysPath = Array.from({ length: raysCount }).map((_, i) => {
@@ -156,61 +159,63 @@ const Layer0 = React.memo(function Layer0({ isMobile }: LayerProps) {
           />
 
           {/* Structural envelope outline */}
-          <path 
+          <WobblyPath 
+            wobble={wobble}
+            wobbleStrength={strength}
             d="M 104 180 C 104 160, 135 154, 185 154 C 225 154, 250 168, 250 180 C 250 192, 225 206, 185 206 C 135 206, 104 200, 104 180 Z" 
             fill="var(--skyline-blimp-envelope)" 
             stroke="var(--skyline-blimp-stroke)" 
             strokeWidth="1.2" 
           />
           {/* Long envelope longitudinal panel lines */}
-          <path d="M 105 180 Q 177 159 249 180" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
-          <path d="M 105 180 Q 177 201 249 180" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 105 180 Q 177 159 249 180" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 105 180 Q 177 201 249 180" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
           
           {/* Extra detailed longitudinal panel lines for premium texture */}
-          <path d="M 104.5 180 Q 177 169 249.5 180" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.6" />
-          <path d="M 104.5 180 Q 177 191 249.5 180" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.6" />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 104.5 180 Q 177 169 249.5 180" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.6" />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 104.5 180 Q 177 191 249.5 180" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.6" />
 
           {/* Vertical framing bands (ribs) */}
-          <path d="M 130 162 A 18 18 0 0 0 130 198" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
-          <path d="M 160 154 A 26 26 0 0 0 160 206" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
-          <path d="M 190 154 A 26 26 0 0 0 190 206" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
-          <path d="M 220 162 A 18 18 0 0 0 220 198" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 130 162 A 18 18 0 0 0 130 198" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 160 154 A 26 26 0 0 0 160 206" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 190 154 A 26 26 0 0 0 190 206" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 220 162 A 18 18 0 0 0 220 198" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
           {/* Nose cap lines */}
-          <path d="M 238 171 A 11 11 0 0 0 238 189" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 238 171 A 11 11 0 0 0 238 189" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
 
           {/* Aerodynamic stabilizers & fins */}
           {/* Top Fin */}
-          <path d="M 115 170 L 92 153 L 90 178 L 118 178 Z" fill="var(--skyline-blimp-envelope)" stroke="var(--skyline-blimp-stroke)" strokeWidth="1" />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 115 170 L 92 153 L 90 178 L 118 178 Z" fill="var(--skyline-blimp-envelope)" stroke="var(--skyline-blimp-stroke)" strokeWidth="1" />
           {/* Top fin hinge and rudder line */}
-          <line x1="96" y1="156" x2="94" y2="178" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
+          <WobblyLine wobble={wobble} wobbleStrength={strength} x1="96" y1="156" x2="94" y2="178" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
 
           {/* Bottom Fin */}
-          <path d="M 115 190 L 92 207 L 90 182 L 118 182 Z" fill="var(--skyline-blimp-envelope)" stroke="var(--skyline-blimp-stroke)" strokeWidth="1" />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 115 190 L 92 207 L 90 182 L 118 182 Z" fill="var(--skyline-blimp-envelope)" stroke="var(--skyline-blimp-stroke)" strokeWidth="1" />
           {/* Bottom fin hinge and rudder line */}
-          <line x1="96" y1="204" x2="94" y2="182" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
+          <WobblyLine wobble={wobble} wobbleStrength={strength} x1="96" y1="204" x2="94" y2="182" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.8" />
 
           {/* Rear Propeller Engine Pod */}
-          <rect x="135" y="202" width="10" height="4" rx="0.5" fill="var(--skyline-blimp-envelope)" stroke="var(--skyline-blimp-stroke)" strokeWidth="0.8" />
+          <WobblyRect wobble={wobble} wobbleStrength={strength} x="135" y="202" width="10" height="4" rx="0.5" fill="var(--skyline-blimp-envelope)" stroke="var(--skyline-blimp-stroke)" strokeWidth="0.8" />
           {/* Spin blades */}
-          <line x1="130" y1="199" x2="130" y2="209" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="1" />
+          <WobblyLine wobble={wobble} wobbleStrength={strength} x1="130" y1="199" x2="130" y2="209" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="1" />
 
           {/* Gondola Cabin (connected by struts and rigging) */}
           {/* Structural struts */}
-          <line x1="165" y1="200" x2="165" y2="204" stroke="var(--skyline-blimp-stroke)" strokeWidth="0.8" />
-          <line x1="180" y1="200" x2="180" y2="204" stroke="var(--skyline-blimp-stroke)" strokeWidth="0.8" />
-          <line x1="195" y1="200" x2="195" y2="204" stroke="var(--skyline-blimp-stroke)" strokeWidth="0.8" />
+          <WobblyLine wobble={wobble} wobbleStrength={strength} x1="165" y1="200" x2="165" y2="204" stroke="var(--skyline-blimp-stroke)" strokeWidth="0.8" />
+          <WobblyLine wobble={wobble} wobbleStrength={strength} x1="180" y1="200" x2="180" y2="204" stroke="var(--skyline-blimp-stroke)" strokeWidth="0.8" />
+          <WobblyLine wobble={wobble} wobbleStrength={strength} x1="195" y1="200" x2="195" y2="204" stroke="var(--skyline-blimp-stroke)" strokeWidth="0.8" />
           {/* Rigging lines cross bracing */}
-          <line x1="165" y1="200" x2="180" y2="204" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.5" />
-          <line x1="180" y1="200" x2="165" y2="204" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.5" />
-          <line x1="180" y1="200" x2="195" y2="204" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.5" />
-          <line x1="195" y1="200" x2="180" y2="204" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.5" />
+          <WobblyLine wobble={wobble} wobbleStrength={strength} x1="165" y1="200" x2="180" y2="204" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.5" />
+          <WobblyLine wobble={wobble} wobbleStrength={strength} x1="180" y1="200" x2="165" y2="204" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.5" />
+          <WobblyLine wobble={wobble} wobbleStrength={strength} x1="180" y1="200" x2="195" y2="204" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.5" />
+          <WobblyLine wobble={wobble} wobbleStrength={strength} x1="195" y1="200" x2="180" y2="204" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.5" />
 
           {/* Gondola Body */}
-          <path d="M 158 204 L 202 204 L 197 212 L 163 212 Z" fill="var(--skyline-blimp-envelope)" stroke="var(--skyline-blimp-stroke)" strokeWidth="1" />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 158 204 L 202 204 L 197 212 L 163 212 Z" fill="var(--skyline-blimp-envelope)" stroke="var(--skyline-blimp-stroke)" strokeWidth="1" />
           {/* Cabin windows */}
-          <rect x="168" y="206" width="5" height="3" rx="0.3" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.6" />
-          <rect x="177" y="206" width="5" height="3" rx="0.3" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.6" />
-          <rect x="186" y="206" width="5" height="3" rx="0.3" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.6" />
+          <WobblyRect wobble={wobble} wobbleStrength={strength} x="168" y="206" width="5" height="3" rx="0.3" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.6" />
+          <WobblyRect wobble={wobble} wobbleStrength={strength} x="177" y="206" width="5" height="3" rx="0.3" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.6" />
+          <WobblyRect wobble={wobble} wobbleStrength={strength} x="186" y="206" width="5" height="3" rx="0.3" fill="none" stroke="var(--skyline-blimp-stroke-fine)" strokeWidth="0.6" />
 
           {/* White Tail flashing beacon */}
           <circle cx="89" cy="153" r="1.5" className={styles.blimpBeacon} />

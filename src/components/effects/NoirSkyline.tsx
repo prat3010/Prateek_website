@@ -166,7 +166,7 @@ function SkylineInner() {
 
       {/* ── Layer 0: Sky backdrop, Searchlights, and Rain ── */}
       <div className={styles.layer}>
-        <Layer0 isMobile={isMobile} />
+        <Layer0 reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} />
       </div>
 
       {/* ── Layer 1: Background Buildings (Parallax Scale 1.12) ── */}

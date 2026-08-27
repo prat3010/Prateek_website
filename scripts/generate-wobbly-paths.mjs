@@ -8,6 +8,7 @@ const SKYLINE_DIR = path.join(ROOT, 'src/components/effects/skyline');
 const OUTPUT_FILE = path.join(ROOT, 'src/components/effects/wobblyPaths.generated.ts');
 
 const SOURCE_FILES = [
+  'Layer0.tsx',
   'Layer1.tsx',
   'Layer1_5.tsx',
   'Layer2.tsx',
