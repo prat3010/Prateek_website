@@ -336,7 +336,7 @@ export default function Navbar({ items, className }: NavbarProps) {
         {/* ---- Client Dashboard / Master Admin Link ---- */}
         <a
           href={mounted && user && isAdminEmail(user.email) ? '/admin' : '/dashboard'}
-          className="comic-btn comic-btn-outline"
+          className={`comic-btn comic-btn-outline ${styles.headerLoginBtn}`}
           style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem', whiteSpace: 'nowrap' }}
           suppressHydrationWarning
         >
@@ -377,10 +377,25 @@ export default function Navbar({ items, className }: NavbarProps) {
             )}
           </a>
         ))}
+
+        {audience && (
+          <div className={styles.mobileAudienceRow}>
+            <span className={styles.mobileAudienceLabel}>Perspective:</span>
+            <SegmentedToggle
+              id="audience-toggle-mobile"
+              options={audienceOptions}
+              activeValue={audience}
+              onChange={handleAudienceChange}
+              className={styles.audienceSegmented}
+              ariaLabel={audience === 'developer' ? 'Switch to Business perspective' : 'Switch to Developer perspective'}
+            />
+          </div>
+        )}
+
         <a
           href={mounted && user && isAdminEmail(user.email) ? '/admin' : '/dashboard'}
           className="comic-btn comic-btn-outline"
-          style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', marginTop: '1rem' }}
+          style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem', marginTop: '0.5rem', width: '100%', maxWidth: '280px', textAlign: 'center', justifyContent: 'center' }}
           onClick={() => setMobileOpen(false)}
           suppressHydrationWarning
         >

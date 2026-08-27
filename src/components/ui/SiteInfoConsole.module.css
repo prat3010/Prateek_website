@@ -115,8 +115,24 @@
 }
 
 @media (max-width: 640px) {
+  .consoleContainer {
+    padding: 12px;
+  }
+
   .consoleGrid {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .terminalContainer {
+    min-height: 480px;
+    height: auto;
+    padding: 10px 8px;
+    overflow: visible;
+  }
+
+  .terminalScreen {
+    height: 320px;
   }
 }
 

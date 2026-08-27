@@ -320,6 +320,50 @@ export default function TerminalSnakeGame({ onClose, onAchievementUnlocked }: Te
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isCallsignPrompt, isGameOver, resetGame, onClose]);
 
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+
+  const handleCanvasTouchStart = (e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    if (touch) {
+      touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+    }
+  };
+
+  const handleCanvasTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStartRef.current) return;
+    const touch = e.changedTouches[0];
+    if (!touch) return;
+
+    const dx = touch.clientX - touchStartRef.current.x;
+    const dy = touch.clientY - touchStartRef.current.y;
+    touchStartRef.current = null;
+
+    if (Math.abs(dx) < 20 && Math.abs(dy) < 20) return;
+
+    const currentDir = dirRef.current;
+    if (Math.abs(dx) > Math.abs(dy)) {
+      if (dx > 0 && currentDir.x === 0) {
+        dirRef.current = { x: 1, y: 0 };
+      } else if (dx < 0 && currentDir.x === 0) {
+        dirRef.current = { x: -1, y: 0 };
+      }
+    } else {
+      if (dy > 0 && currentDir.y === 0) {
+        dirRef.current = { x: 0, y: 1 };
+      } else if (dy < 0 && currentDir.y === 0) {
+        dirRef.current = { x: 0, y: -1 };
+      }
+    }
+  };
+
+  const handleDpad = (dir: 'UP' | 'DOWN' | 'LEFT' | 'RIGHT') => {
+    const currentDir = dirRef.current;
+    if (dir === 'UP' && currentDir.y === 0) dirRef.current = { x: 0, y: -1 };
+    if (dir === 'DOWN' && currentDir.y === 0) dirRef.current = { x: 0, y: 1 };
+    if (dir === 'LEFT' && currentDir.x === 0) dirRef.current = { x: -1, y: 0 };
+    if (dir === 'RIGHT' && currentDir.x === 0) dirRef.current = { x: 1, y: 0 };
+  };
+
   return (
     <div className={styles.wrapper}>
       {/* Header Info Bar */}
@@ -369,6 +413,8 @@ export default function TerminalSnakeGame({ onClose, onAchievementUnlocked }: Te
             width={GRID_COLS * CELL_SIZE}
             height={GRID_ROWS * CELL_SIZE}
             className={styles.gameCanvas}
+            onTouchStart={handleCanvasTouchStart}
+            onTouchEnd={handleCanvasTouchEnd}
           />
 
           {/* Game Over / Paused Overlay */}
@@ -409,12 +455,62 @@ export default function TerminalSnakeGame({ onClose, onAchievementUnlocked }: Te
               )}
             </div>
           )}
+
+          {/* Mobile On-Screen D-Pad */}
+          <div className={styles.mobileDpad} aria-label="Mobile game controls">
+            <div className={styles.dpadRow}>
+              <button
+                type="button"
+                className={styles.dpadBtn}
+                onClick={() => handleDpad('UP')}
+                aria-label="Move Up"
+              >
+                ▲
+              </button>
+            </div>
+            <div className={styles.dpadRowMiddle}>
+              <button
+                type="button"
+                className={styles.dpadBtn}
+                onClick={() => handleDpad('LEFT')}
+                aria-label="Move Left"
+              >
+                ◀
+              </button>
+              <button
+                type="button"
+                className={`${styles.dpadBtn} ${styles.dpadPauseBtn}`}
+                onClick={() => setIsPaused((prev) => !prev)}
+                aria-label={isPaused ? 'Resume game' : 'Pause game'}
+              >
+                {isPaused ? '▶' : '❚❚'}
+              </button>
+              <button
+                type="button"
+                className={styles.dpadBtn}
+                onClick={() => handleDpad('RIGHT')}
+                aria-label="Move Right"
+              >
+                ▶
+              </button>
+            </div>
+            <div className={styles.dpadRow}>
+              <button
+                type="button"
+                className={styles.dpadBtn}
+                onClick={() => handleDpad('DOWN')}
+                aria-label="Move Down"
+              >
+                ▼
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
       {/* Keyboard Controls Help footer */}
       <div className={styles.controlsHelp}>
-        CONTROLS: [Arrow Keys / WASD] to Move • [Space / P] to Pause • [Esc] to Exit Terminal
+        CONTROLS: [Arrow Keys / WASD / Swipe] to Move • [Space / P] to Pause • [Esc] to Exit
       </div>
     </div>
   );

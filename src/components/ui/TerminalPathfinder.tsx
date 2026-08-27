@@ -36,8 +36,10 @@ import {
 import { playKeySound, playAchievementSound } from '@/lib/terminalAudio';
 import styles from './TerminalPathfinder.module.css';
 
-const GRID_COLS = 24;
-const GRID_ROWS = 11;
+const DESKTOP_COLS = 24;
+const DESKTOP_ROWS = 11;
+const MOBILE_COLS = 16;
+const MOBILE_ROWS = 9;
 
 const SPEED_OPTIONS = [
   { label: '1x', delay: 80 },
@@ -132,6 +134,18 @@ type InteractionMode = 'idle' | 'drag-start' | 'drag-end' | 'draw-walls' | 'eras
 export default function TerminalPathfinder({ onClose, onAchievementUnlocked }: TerminalPathfinderProps) {
   const { isNoir } = useTheme();
 
+  // Responsive mobile viewport detection
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const cols = isMobile ? MOBILE_COLS : DESKTOP_COLS;
+  const rows = isMobile ? MOBILE_ROWS : DESKTOP_ROWS;
+
   // Grid coordinates (default start & target)
   const [startNode, setStartNode] = useState<GridNode>({ col: 2, row: 5 });
   const [endNode, setEndNode] = useState<GridNode>({ col: 21, row: 5 });
@@ -152,11 +166,27 @@ export default function TerminalPathfinder({ onClose, onAchievementUnlocked }: T
   const activeVisitedRef = useRef<Set<string>>(new Set());
   const startTimeRef = useRef<number>(0);
 
-  // Global mouseup to release drawing/dragging
+  // Sync coordinates when switching between mobile and desktop dimensions
   useEffect(() => {
-    const handleMouseUp = () => setInteractionMode('idle');
-    window.addEventListener('mouseup', handleMouseUp);
-    return () => window.removeEventListener('mouseup', handleMouseUp);
+    setStartNode(prev => ({
+      col: Math.min(prev.col, cols - 2),
+      row: Math.min(prev.row, rows - 1)
+    }));
+    setEndNode(prev => ({
+      col: isMobile ? Math.min(Math.max(prev.col, 3), cols - 2) : Math.min(prev.col, cols - 2),
+      row: Math.min(prev.row, rows - 1)
+    }));
+  }, [cols, rows, isMobile]);
+
+  // Global mouseup and touchend to release drawing/dragging
+  useEffect(() => {
+    const handleRelease = () => setInteractionMode('idle');
+    window.addEventListener('mouseup', handleRelease);
+    window.addEventListener('touchend', handleRelease);
+    return () => {
+      window.removeEventListener('mouseup', handleRelease);
+      window.removeEventListener('touchend', handleRelease);
+    };
   }, []);
 
   // Halt simulation
@@ -202,13 +232,13 @@ export default function TerminalPathfinder({ onClose, onAchievementUnlocked }: T
   // Reset grid
   const resetGrid = useCallback(() => {
     if (isRunning) return;
-    setStartNode({ col: 2, row: 5 });
-    setEndNode({ col: 21, row: 5 });
+    setStartNode({ col: isMobile ? 1 : 2, row: Math.floor(rows / 2) });
+    setEndNode({ col: cols - 2, row: Math.floor(rows / 2) });
     setWalls(new Set());
     setVisitedNodes(new Set());
     setPathNodes(new Set());
     setStats({ visitedCount: 0, pathLength: 0, durationMs: 0 });
-  }, [isRunning]);
+  }, [isRunning, isMobile, cols, rows]);
 
   // Procedural Maze Presets
   const applyMazePreset = useCallback((preset: 'random' | 'corridors' | 'slalom' | 'fortress') => {
@@ -217,27 +247,27 @@ export default function TerminalPathfinder({ onClose, onAchievementUnlocked }: T
     const newWalls = new Set<string>();
 
     if (preset === 'random') {
-      for (let r = 0; r < GRID_ROWS; r++) {
-        for (let c = 0; c < GRID_COLS; c++) {
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
           if ((c === startNode.col && r === startNode.row) || (c === endNode.col && r === endNode.row)) continue;
           if (Math.random() < 0.28) newWalls.add(`${c},${r}`);
         }
       }
     } else if (preset === 'corridors') {
-      for (let r = 2; r < GRID_ROWS; r += 3) {
-        const gap = Math.floor(Math.random() * (GRID_COLS - 4)) + 2;
-        for (let c = 0; c < GRID_COLS; c++) {
+      for (let r = 2; r < rows; r += 3) {
+        const gap = Math.floor(Math.random() * (cols - 4)) + 2;
+        for (let c = 0; c < cols; c++) {
           if (c === gap || c === gap + 1) continue;
           if ((c === startNode.col && r === startNode.row) || (c === endNode.col && r === endNode.row)) continue;
           newWalls.add(`${c},${r}`);
         }
       }
     } else if (preset === 'slalom') {
-      for (let c = 4; c < GRID_COLS - 2; c += 4) {
-        const isOpenTop = (c / 4) % 2 === 0;
-        for (let r = 0; r < GRID_ROWS; r++) {
-          if (isOpenTop && r < 3) continue;
-          if (!isOpenTop && r > GRID_ROWS - 4) continue;
+      for (let c = 3; c < cols - 2; c += 3) {
+        const isOpenTop = (c / 3) % 2 === 0;
+        for (let r = 0; r < rows; r++) {
+          if (isOpenTop && r < 2) continue;
+          if (!isOpenTop && r > rows - 3) continue;
           if ((c === startNode.col && r === startNode.row) || (c === endNode.col && r === endNode.row)) continue;
           newWalls.add(`${c},${r}`);
         }
@@ -245,8 +275,8 @@ export default function TerminalPathfinder({ onClose, onAchievementUnlocked }: T
     } else if (preset === 'fortress') {
       const er = endNode.row;
       const ec = endNode.col;
-      for (let r = Math.max(0, er - 2); r <= Math.min(GRID_ROWS - 1, er + 2); r++) {
-        for (let c = Math.max(0, ec - 2); c <= Math.min(GRID_COLS - 1, ec + 2); c++) {
+      for (let r = Math.max(0, er - 2); r <= Math.min(rows - 1, er + 2); r++) {
+        for (let c = Math.max(0, ec - 2); c <= Math.min(cols - 1, ec + 2); c++) {
           if (r === er && c === ec) continue;
           if (r === er && c === ec - 2) continue; // breach doorway
           if (r === er - 2 || r === er + 2 || c === ec - 2 || c === ec + 2) {
@@ -258,7 +288,7 @@ export default function TerminalPathfinder({ onClose, onAchievementUnlocked }: T
     }
 
     setWalls(newWalls);
-  }, [isRunning, clearPath, startNode, endNode]);
+  }, [isRunning, clearPath, startNode, endNode, cols, rows]);
 
   // Visualizer Orchestrator
   const visualize = useCallback(() => {
@@ -277,46 +307,46 @@ export default function TerminalPathfinder({ onClose, onAchievementUnlocked }: T
     let generator: Generator<PathfindingStep, void, unknown>;
     switch (algorithm) {
       case 'dijkstra':
-        generator = runDijkstra(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
+        generator = runDijkstra(startNode, endNode, cols, rows, walls);
         break;
       case 'astar':
-        generator = runAStar(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
+        generator = runAStar(startNode, endNode, cols, rows, walls);
         break;
       case 'bfs':
-        generator = runBFS(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
+        generator = runBFS(startNode, endNode, cols, rows, walls);
         break;
       case 'dfs':
-        generator = runDFS(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
+        generator = runDFS(startNode, endNode, cols, rows, walls);
         break;
       case 'greedy':
-        generator = runGreedyBestFirst(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
+        generator = runGreedyBestFirst(startNode, endNode, cols, rows, walls);
         break;
       case 'bidirectional':
-        generator = runBidirectionalBFS(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
+        generator = runBidirectionalBFS(startNode, endNode, cols, rows, walls);
         break;
       case 'jps':
-        generator = runJPS(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
+        generator = runJPS(startNode, endNode, cols, rows, walls);
         break;
       case 'iddfs':
-        generator = runIDDFS(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
+        generator = runIDDFS(startNode, endNode, cols, rows, walls);
         break;
       case 'random':
-        generator = runRandomWalk(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
+        generator = runRandomWalk(startNode, endNode, cols, rows, walls);
         break;
       case 'wall':
-        generator = runWallFollower(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
+        generator = runWallFollower(startNode, endNode, cols, rows, walls);
         break;
       case 'tremaux':
-        generator = runTremaux(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
+        generator = runTremaux(startNode, endNode, cols, rows, walls);
         break;
       case 'thetastar':
-        generator = runThetaStar(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
+        generator = runThetaStar(startNode, endNode, cols, rows, walls);
         break;
       case 'idastar':
-        generator = runIDAStar(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
+        generator = runIDAStar(startNode, endNode, cols, rows, walls);
         break;
       default:
-        generator = runDijkstra(startNode, endNode, GRID_COLS, GRID_ROWS, walls);
+        generator = runDijkstra(startNode, endNode, cols, rows, walls);
     }
 
     const currentDelay = SPEED_OPTIONS[speedIndex]?.delay ?? 30;
@@ -353,9 +383,9 @@ export default function TerminalPathfinder({ onClose, onAchievementUnlocked }: T
     };
 
     stepSimulation();
-  }, [isRunning, algorithm, isNoir, startNode, endNode, walls, speedIndex, onAchievementUnlocked]);
+  }, [isRunning, algorithm, isNoir, startNode, endNode, walls, speedIndex, cols, rows, onAchievementUnlocked]);
 
-  // Grid Drag / Draw Wall handlers
+  // Grid Drag / Draw Wall handlers (Mouse)
   const handleGridMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (isRunning) return;
     const target = e.target as HTMLElement;
@@ -437,6 +467,87 @@ export default function TerminalPathfinder({ onClose, onAchievementUnlocked }: T
     }
   }, [isRunning, interactionMode, startNode, endNode, walls, pathNodes, visitedNodes]);
 
+  // Touch handlers for Mobile / Tablet touchscreens
+  const handleTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    if (isRunning) return;
+    const touch = e.touches[0];
+    if (!touch) return;
+    const target = document.elementFromPoint(touch.clientX, touch.clientY) as HTMLElement;
+    const cellEl = target?.closest('[data-col]');
+    if (!cellEl) return;
+
+    const col = parseInt(cellEl.getAttribute('data-col') || '', 10);
+    const row = parseInt(cellEl.getAttribute('data-row') || '', 10);
+    if (isNaN(col) || isNaN(row)) return;
+
+    const key = `${col},${row}`;
+    const isStart = col === startNode.col && row === startNode.row;
+    const isEnd = col === endNode.col && row === endNode.row;
+
+    if (isStart) {
+      setInteractionMode('drag-start');
+    } else if (isEnd) {
+      setInteractionMode('drag-end');
+    } else {
+      if (walls.has(key)) {
+        setInteractionMode('erase-walls');
+        setWalls(prev => {
+          const next = new Set(prev);
+          next.delete(key);
+          return next;
+        });
+      } else {
+        setInteractionMode('draw-walls');
+        setWalls(prev => {
+          const next = new Set(prev);
+          next.add(key);
+          return next;
+        });
+      }
+    }
+  }, [isRunning, startNode, endNode, walls]);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    if (isRunning || interactionMode === 'idle') return;
+    const touch = e.touches[0];
+    if (!touch) return;
+    const target = document.elementFromPoint(touch.clientX, touch.clientY) as HTMLElement;
+    const cellEl = target?.closest('[data-col]');
+    if (!cellEl) return;
+
+    const col = parseInt(cellEl.getAttribute('data-col') || '', 10);
+    const row = parseInt(cellEl.getAttribute('data-row') || '', 10);
+    if (isNaN(col) || isNaN(row)) return;
+
+    const key = `${col},${row}`;
+    const isStart = col === startNode.col && row === startNode.row;
+    const isEnd = col === endNode.col && row === endNode.row;
+    const isWall = walls.has(key);
+    const isPath = pathNodes.has(key);
+    const isVisited = visitedNodes.has(key);
+
+    const cellType = isStart ? 'Start Node' : isEnd ? 'Target Node' : isWall ? 'Wall Barricade' : isPath ? 'Shortest Path' : isVisited ? 'Visited Node' : 'Empty';
+    setHoverCoord({ col, row, type: cellType });
+
+    if (interactionMode === 'drag-start') {
+      if (!isEnd && !walls.has(key)) setStartNode({ col, row });
+    } else if (interactionMode === 'drag-end') {
+      if (!isStart && !walls.has(key)) setEndNode({ col, row });
+    } else if (interactionMode === 'draw-walls') {
+      if (!isStart && !isEnd && !walls.has(key)) {
+        setWalls(prev => new Set(prev).add(key));
+      }
+    } else if (interactionMode === 'erase-walls') {
+      if (walls.has(key)) {
+        setWalls(prev => {
+          const next = new Set(prev);
+          next.delete(key);
+          return next;
+        });
+      }
+    }
+  }, [isRunning, interactionMode, startNode, endNode, walls, pathNodes, visitedNodes]);
+
   const activeInfo = ALGORITHM_INFO_MAP[algorithm];
 
   return (
@@ -449,6 +560,7 @@ export default function TerminalPathfinder({ onClose, onAchievementUnlocked }: T
             onClick={onClose}
             className={styles.closeBtn}
             title="Exit Lab and return to terminal"
+            aria-label="Exit Pathfinder Lab"
           >
             <X size={12} />
             <span>Exit [ESC]</span>
@@ -536,6 +648,7 @@ export default function TerminalPathfinder({ onClose, onAchievementUnlocked }: T
                 onClick={() => setSpeedIndex(idx)}
                 disabled={isRunning}
                 className={`${styles.speedBtn} ${speedIndex === idx ? styles.speedBtnActive : ''}`}
+                aria-label={`Speed ${opt.label}`}
               >
                 {opt.label}
               </button>
@@ -570,6 +683,7 @@ export default function TerminalPathfinder({ onClose, onAchievementUnlocked }: T
             disabled={isRunning}
             className={styles.toolBtn}
             title="Clear visited & path marks"
+            aria-label="Clear path"
           >
             <Sparkles size={11} />
             <span>Path</span>
@@ -581,6 +695,7 @@ export default function TerminalPathfinder({ onClose, onAchievementUnlocked }: T
             disabled={isRunning}
             className={styles.toolBtn}
             title="Clear all walls"
+            aria-label="Clear walls"
           >
             <Trash2 size={11} />
             <span>Walls</span>
@@ -592,6 +707,7 @@ export default function TerminalPathfinder({ onClose, onAchievementUnlocked }: T
             disabled={isRunning}
             className={styles.toolBtn}
             title="Reset coordinates"
+            aria-label="Reset grid"
           >
             <RotateCcw size={11} />
             <span>Reset</span>
@@ -599,18 +715,21 @@ export default function TerminalPathfinder({ onClose, onAchievementUnlocked }: T
         </div>
       </div>
 
-      {/* 3. Hero 2D Grid Arena (Contained 230px) */}
+      {/* 3. Hero 2D Grid Arena */}
       <div className={styles.gridWrapper}>
         <div
           ref={gridRef}
           className={styles.grid}
-          style={{ gridTemplateColumns: `repeat(${GRID_COLS}, 1fr)` }}
+          style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
           onMouseDown={handleGridMouseDown}
           onMouseOver={handleGridMouseOver}
           onMouseLeave={() => setHoverCoord(null)}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={() => setInteractionMode('idle')}
         >
-          {Array.from({ length: GRID_ROWS }).map((_, r) =>
-            Array.from({ length: GRID_COLS }).map((__, c) => {
+          {Array.from({ length: rows }).map((_, r) =>
+            Array.from({ length: cols }).map((__, c) => {
               const key = `${c},${r}`;
               const isStart = c === startNode.col && r === startNode.row;
               const isEnd = c === endNode.col && r === endNode.row;
@@ -625,6 +744,8 @@ export default function TerminalPathfinder({ onClose, onAchievementUnlocked }: T
               else if (isPath) cellClass += ` ${styles.cellPath}`;
               else if (isVisited) cellClass += ` ${styles.cellVisited}`;
 
+              const iconSize = isMobile ? 10 : 13;
+
               return (
                 <div
                   key={key}
@@ -636,12 +757,12 @@ export default function TerminalPathfinder({ onClose, onAchievementUnlocked }: T
                 >
                   {isStart && (
                     <span className={styles.nodeIcon}>
-                      {isNoir ? <Search size={13} /> : <Zap size={13} />}
+                      {isNoir ? <Search size={iconSize} /> : <Zap size={iconSize} />}
                     </span>
                   )}
                   {isEnd && (
                     <span className={styles.nodeIcon}>
-                      {isNoir ? <FileText size={13} /> : <Target size={13} />}
+                      {isNoir ? <FileText size={iconSize} /> : <Target size={iconSize} />}
                     </span>
                   )}
                 </div>
@@ -678,13 +799,13 @@ export default function TerminalPathfinder({ onClose, onAchievementUnlocked }: T
 
         <div className={styles.algoBadge}>
           <span>⚡ {isNoir ? activeInfo.nameNoir : activeInfo.name}</span>
-          <span style={{ color: '#A0A0B0', fontWeight: 400 }}>• {activeInfo.property}</span>
+          <span className={styles.algoPropText}>• {activeInfo.property}</span>
         </div>
 
         <div className={styles.coordText}>
           {hoverCoord
             ? `[${String(hoverCoord.col).padStart(2, '0')}, ${String(hoverCoord.row).padStart(2, '0')}] ${hoverCoord.type}`
-            : 'Drag nodes • Draw laser walls'}
+            : (isMobile ? 'Touch & drag nodes or walls' : 'Drag nodes • Draw laser walls')}
         </div>
       </div>
     </div>

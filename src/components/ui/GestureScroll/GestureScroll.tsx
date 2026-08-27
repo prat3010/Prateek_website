@@ -21,6 +21,17 @@ export default function GestureScroll() {
   const lenis = useLenis();
   const { isDetailsHidden, isNoir } = useTheme();
 
+  // Touch device detection (MediaPipe gesture scroll is desktop pointer-only)
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  useEffect(() => {
+    const checkTouch = () => {
+      setIsTouchDevice(window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768);
+    };
+    checkTouch();
+    window.addEventListener('resize', checkTouch);
+    return () => window.removeEventListener('resize', checkTouch);
+  }, []);
+
   // Component States
   const [isActive, setIsActive] = useState(false);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
@@ -56,6 +67,8 @@ export default function GestureScroll() {
     currentScrollY: 0,
     targetScrollY: 0,
   });
+
+  if (isTouchDevice) return null;
 
   // Toggle Hand Gesture Mode
   const handleToggle = () => {

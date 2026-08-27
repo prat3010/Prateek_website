@@ -532,3 +532,170 @@
 :global([data-theme='noir']) .coordText {
   color: #39ff14;
 }
+
+.algoPropText {
+  color: #A0A0B0;
+  font-weight: 400;
+}
+
+/* ──────────────────────────────────────────────────────────
+   5. MOBILE RESPONSIVE ENHANCEMENTS (< 640px)
+   ────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .wrapper {
+    min-height: unset;
+    height: auto;
+    gap: 8px;
+    overflow: visible;
+  }
+
+  .headerBar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    padding-bottom: 8px;
+  }
+
+  .headerLeft {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .closeBtn {
+    min-height: 32px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+  }
+
+  .headerRight {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    width: 100%;
+  }
+
+  .statPill {
+    justify-content: center;
+    padding: 3px 4px;
+    font-size: 0.68rem;
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .toolbarLeft {
+    min-width: 0;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .algoSelect {
+    grid-column: span 2;
+    max-width: none;
+    width: 100%;
+    min-height: 38px;
+    font-size: 0.8rem;
+  }
+
+  .mazeSelect {
+    min-height: 34px;
+    font-size: 0.75rem;
+  }
+
+  .speedGroup {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .speedLabel {
+    font-size: 0.65rem;
+  }
+
+  .speedBtn {
+    flex: 1;
+    min-height: 34px;
+    padding: 4px 2px;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .toolbarRight {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .runBtn,
+  .stopBtn {
+    flex: 1.8;
+    min-height: 38px;
+    justify-content: center;
+    font-size: 0.78rem;
+    padding: 6px 8px;
+  }
+
+  .toolBtn {
+    flex: 1;
+    min-height: 38px;
+    justify-content: center;
+    font-size: 0.72rem;
+    padding: 6px 4px;
+  }
+
+  .gridWrapper {
+    height: 220px;
+    padding: 4px;
+  }
+
+  .hudFooter {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    padding: 6px 8px;
+  }
+
+  .legendGroup {
+    justify-content: space-between;
+    width: 100%;
+    gap: 4px;
+  }
+
+  .legendChip {
+    font-size: 0.68rem;
+    gap: 3px;
+  }
+
+  .algoBadge {
+    justify-content: space-between;
+    width: 100%;
+    font-size: 0.72rem;
+  }
+
+  .algoPropText {
+    display: none;
+  }
+
+  .coordText {
+    text-align: center;
+    font-size: 0.7rem;
+    padding-top: 2px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+  }
+
+  :global([data-theme='noir']) .coordText {
+    border-top-color: rgba(0, 240, 255, 0.15);
+  }
+}
