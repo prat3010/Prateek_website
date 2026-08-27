@@ -1,58 +1,55 @@
 .container {
   position: relative;
-  pointer-events: auto;
+  display: inline-flex;
 }
 
 .toggleButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 18px;
+  gap: 6px;
+  padding: 6px 12px;
   font-family: var(--font-headline);
-  font-size: 1.1rem;
-  letter-spacing: 0.05em;
-  color: var(--pop-black);
-  background-color: var(--pop-yellow);
-  border: 1px solid var(--color-border);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--color-text);
+  background-color: transparent;
+  border: 1px solid transparent;
   cursor: pointer;
-  border-radius: 12px;
+  border-radius: 9999px;
   text-transform: uppercase;
   user-select: none;
   -webkit-user-select: none;
+  min-height: 36px;
+  touch-action: manipulation;
   transition: 
-    transform 0.2s ease,
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.25s ease,
-    color 0.2s ease;
+    transform 0.15s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.2s ease,
+    color 0.15s ease;
 }
 
 .toggleButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  background-color: var(--pop-orange);
-  border-color: var(--pop-orange);
-  color: var(--pop-white);
+  background-color: rgba(244, 220, 149, 0.4);
+  color: var(--pop-black);
 }
 
 .toggleButton:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transform: scale(0.96);
 }
 
-/* Active (details are hidden) State styling */
+/* Active (details are hidden / Zen mode ON) */
 .toggleButton.active {
-  background-color: var(--pop-red);
-  color: var(--pop-white);
-  border-color: var(--pop-red);
+  background-color: var(--pop-red, #E06D53);
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(224, 109, 83, 0.35);
 }
 
 .toggleButton.active:hover {
-  background-color: var(--pop-blue);
-  color: var(--pop-white);
-  border-color: var(--pop-blue);
+  background-color: var(--pop-red-hover, #c8533c);
+  color: #FFFFFF;
 }
 
 .iconWrapper {
@@ -78,53 +75,47 @@
 /* ── Noir Theme Overrides ──────────────────────────────────── */
 :global([data-theme='noir']) .toggleButton {
   font-family: var(--font-code);
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  color: #FAFAFA;
-  background-color: #121214;
-  border: 1px solid #3F3F4E;
-  box-shadow: none;
-  border-radius: 12px;
+  color: #A0A0B0;
+  background-color: transparent;
+  border-color: transparent;
 }
 
 :global([data-theme='noir']) .toggleButton:hover {
-  transform: translateY(-2px);
-  background-color: #1C1C24;
-  border-color: #FAFAFA;
-  box-shadow: 0 0 15px rgba(250, 250, 250, 0.15);
+  background-color: rgba(255, 255, 255, 0.08);
   color: #FFFFFF;
 }
 
-:global([data-theme='noir']) .toggleButton:active {
-  transform: translateY(0);
-  box-shadow: none;
-}
-
-/* Active (details are hidden) State styling in Noir Mode */
 :global([data-theme='noir']) .toggleButton.active {
-  background-color: #1C1C24;
-  border-color: #FF1744;
+  background-color: rgba(255, 23, 68, 0.15);
+  border-color: rgba(255, 23, 68, 0.4);
   color: #FF1744;
-  box-shadow: 0 0 15px rgba(255, 23, 68, 0.25);
+  box-shadow: 0 0 12px rgba(255, 23, 68, 0.3);
 }
 
 :global([data-theme='noir']) .toggleButton.active:hover {
-  background-color: #2F2F3D;
-  border-color: #FF4D6D;
+  background-color: rgba(255, 23, 68, 0.25);
+  border-color: #FF1744;
   color: #FF4D6D;
-  box-shadow: 0 0 20px rgba(255, 77, 109, 0.35);
+  box-shadow: 0 0 16px rgba(255, 77, 109, 0.4);
+}
+
+/* ── Responsive Mobile ─────────────────────────────────────── */
+@media (max-width: 768px) {
+  .toggleButton {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+    gap: 5px;
+    min-height: 38px;
+  }
 }
 
 @media (max-width: 480px) {
-  
   .toggleButton {
-    padding: 10px;
-    border-radius: var(--border-radius-round);
-    gap: 0;
-  }
-  
-  .buttonText {
-    display: none;
+    padding: 6px 8px;
+    font-size: 0.72rem;
+    gap: 4px;
   }
 }

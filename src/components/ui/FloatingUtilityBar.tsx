@@ -12,9 +12,12 @@ const GestureScroll = dynamic(
 
 export default function FloatingUtilityBar() {
   return (
-    <div className={styles.barContainer}>
-      <ZenToggle />
-      <GestureScroll />
-    </div>
+    <aside className={styles.barContainer} aria-label="Quick controls dock">
+      <div className={styles.dockCapsule}>
+        <ZenToggle />
+        <div className={styles.dockDivider} aria-hidden="true" />
+        <GestureScroll />
+      </div>
+    </aside>
   );
 }

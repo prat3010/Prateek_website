@@ -18,13 +18,13 @@ export default function ZenToggle() {
       >
         <span className={styles.iconWrapper}>
           {isDetailsHidden ? (
-            <EyeOff className={styles.icon} size={20} strokeWidth={2.5} />
+            <EyeOff className={styles.icon} size={15} strokeWidth={2.2} />
           ) : (
-            <Eye className={styles.icon} size={20} strokeWidth={2.5} />
+            <Eye className={styles.icon} size={15} strokeWidth={2.2} />
           )}
         </span>
         <span className={styles.buttonText}>
-          {isDetailsHidden ? 'SHOW UI' : 'ZEN MODE'}
+          {isDetailsHidden ? 'SHOW UI' : 'ZEN'}
         </span>
       </button>
     </div>

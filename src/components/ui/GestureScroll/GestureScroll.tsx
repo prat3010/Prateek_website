@@ -397,13 +397,13 @@ export default function GestureScroll() {
         onClick={handleToggle}
         className={`${styles.gestureButton} ${isActive ? styles.active : ''}`}
         aria-label={isActive ? 'Disable hand gesture scrolling' : 'Enable hand gesture scrolling'}
-        title="Scroll using Hand Gestures"
+        title={isActive ? 'Disable Gesture Scroll' : 'Gesture Scroll (Webcam)'}
       >
         <span className={styles.iconWrapper}>
-          <Hand className={styles.icon} size={20} strokeWidth={2.5} />
+          <Hand className={styles.icon} size={15} strokeWidth={2.2} />
         </span>
         <span className={styles.buttonText}>
-          {isActive ? 'GESTURE ON' : 'GESTURE SCROLL'}
+          {isActive ? 'GESTURE ON' : 'GESTURE'}
         </span>
       </button>
 
