@@ -20,17 +20,6 @@ export default function GestureScroll() {
   const lenis = useLenis();
   const { isDetailsHidden, isNoir } = useTheme();
 
-  // Touch device detection (MediaPipe gesture scroll is desktop pointer-only)
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
-  useEffect(() => {
-    const checkTouch = () => {
-      setIsTouchDevice(window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768);
-    };
-    checkTouch();
-    window.addEventListener('resize', checkTouch);
-    return () => window.removeEventListener('resize', checkTouch);
-  }, []);
-
   // Component States
   const [isActive, setIsActive] = useState(false);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
@@ -66,8 +55,6 @@ export default function GestureScroll() {
     currentScrollY: 0,
     targetScrollY: 0,
   });
-
-  if (isTouchDevice) return null;
 
   // Toggle Hand Gesture Mode
   const handleToggle = () => {
@@ -147,15 +134,28 @@ export default function GestureScroll() {
 
         if (isCancelled) return;
 
-        // Initialize HandLandmarker
-        const landmarker = await HandLandmarker.createFromOptions(vision, {
-          baseOptions: {
-            modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
-            delegate: 'GPU'
-          },
-          runningMode: 'VIDEO',
-          numHands: 1
-        });
+        // Initialize HandLandmarker with GPU delegate and CPU fallback for mobile devices
+        let landmarker;
+        try {
+          landmarker = await HandLandmarker.createFromOptions(vision, {
+            baseOptions: {
+              modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
+              delegate: 'GPU'
+            },
+            runningMode: 'VIDEO',
+            numHands: 1
+          });
+        } catch (gpuErr) {
+          console.warn('GPU delegate unavailable, falling back to CPU mode:', gpuErr);
+          landmarker = await HandLandmarker.createFromOptions(vision, {
+            baseOptions: {
+              modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
+              delegate: 'CPU'
+            },
+            runningMode: 'VIDEO',
+            numHands: 1
+          });
+        }
 
         if (isCancelled) {
           landmarker.close();

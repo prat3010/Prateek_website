@@ -291,12 +291,43 @@
 }
 
 /* ── Responsive Styling ────────────────────────────────────── */
-@media (max-width: 1023px) {
-  /* Hide the gesture scroll controller on tablets and mobiles */
-  .container {
-    display: none !important;
+@media (max-width: 768px) {
+  .gestureButton {
+    padding: 8px 12px;
+    font-size: 0.82rem;
+    gap: 6px;
+    border-radius: 10px;
+    min-height: 44px;
   }
+
   .visualizerPanel {
-    display: none !important;
+    bottom: 72px;
+    right: 16px;
+    width: 170px;
+    padding: 8px;
+    border-radius: 12px;
+    gap: 6px;
+  }
+
+  .visualizerTitle {
+    font-size: 0.8rem;
+  }
+
+  .instructions {
+    font-size: 0.7rem;
+    padding-top: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .gestureButton {
+    padding: 8px 10px;
+    font-size: 0.75rem;
+  }
+
+  .visualizerPanel {
+    bottom: 68px;
+    right: 12px;
+    width: 150px;
   }
 }
