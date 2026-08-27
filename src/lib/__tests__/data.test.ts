@@ -60,13 +60,13 @@ describe('getProjects', () => {
 
   it('returns Supabase data when available', async () => {
     const fakeData = [{ id: 1, slug: 'proj-1', title: 'Project' }];
-    mockSupabaseClient = { from: vi.fn(() => ({ select: mockSelect.mockReturnThis(), order: mockOrder.mockResolvedValue({ data: fakeData, error: null }) })) };
+    mockSupabaseClient = { from: vi.fn(() => ({ select: mockSelect.mockResolvedValue({ data: fakeData, error: null }) })) };
     const result = await getProjects();
     expect(result).toHaveLength(1);
   });
 
   it('falls back on Supabase error', async () => {
-    mockSupabaseClient = { from: vi.fn(() => ({ select: mockSelect.mockReturnThis(), order: mockOrder.mockResolvedValue({ data: null, error: { message: 'fail' } }) })) };
+    mockSupabaseClient = { from: vi.fn(() => ({ select: mockSelect.mockResolvedValue({ data: null, error: { message: 'fail' } }) })) };
     const result = await getProjects();
     expect(result).toEqual([{ id: 'fallback-1', title: 'Fallback Project' }]);
   });

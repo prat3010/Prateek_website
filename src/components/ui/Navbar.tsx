@@ -74,7 +74,7 @@ export default function Navbar({ items, className }: NavbarProps) {
       { label: 'Home', href: '/#home' },
       { label: 'About', href: '/#about' },
       { label: 'Capabilities', href: '/#capabilities' },
-      { label: 'Projects', href: '/#projects' },
+      { label: 'Deployments', href: '/#deployments' },
       { label: audience === 'business' ? 'Services & Guarantees' : 'Resume', href: '/#resume' },
       { label: 'Contact', href: '/#contact' },
     ];

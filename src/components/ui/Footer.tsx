@@ -85,7 +85,7 @@ export default function Footer({ socials, profile, className }: FooterProps) {
     { label: 'Home', href: '/#home' },
     { label: 'About', href: '/#about' },
     { label: 'Capabilities', href: '/#capabilities' },
-    { label: 'Projects', href: '/#projects' },
+    { label: 'Deployments', href: '/#deployments' },
     { label: audience === 'business' ? 'Quotation' : 'Resume', href: '/#resume' },
     { label: 'Contact', href: '/#contact' },
     { label: 'Blog', href: '/blog' },

@@ -18,6 +18,14 @@ const getErrorMessage = (err: unknown): string => {
   return err instanceof Error ? err.message : 'Offline mode';
 };
 
+const CANONICAL_PROJECT_ORDER = [
+  'rag-lab',
+  'scoping-studio',
+  'client-workspace',
+  'synchronizer-engine',
+  'systems-terminal',
+];
+
 export const getProjects = unstable_cache(
   async (): Promise<Project[]> => {
     if (!supabase) {
@@ -26,13 +34,21 @@ export const getProjects = unstable_cache(
     try {
       const { data, error } = await supabase
         .from('projects')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .select('*');
       if (error || !data) throw error || new Error('No data');
-      return data.map((p) => ({
+      const mapped = data.map((p) => ({
         ...p,
         id: p.slug || p.id,
       })) as Project[];
+
+      return mapped.sort((a, b) => {
+        const indexA = CANONICAL_PROJECT_ORDER.indexOf(a.id);
+        const indexB = CANONICAL_PROJECT_ORDER.indexOf(b.id);
+        if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+        if (indexA !== -1) return -1;
+        if (indexB !== -1) return 1;
+        return 0;
+      });
     } catch (err) {
       console.warn('Projects data notice (using local fallback):', getErrorMessage(err));
       return projectsFallback as Project[];

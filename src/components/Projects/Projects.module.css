@@ -20,24 +20,46 @@
   font-size: clamp(2.5rem, 6vw, 4.5rem);
   text-align: center;
   color: var(--pop-black);
-  margin-bottom: 3rem;
+  margin-bottom: 0.75rem;
   position: relative;
 }
 
+.sectionSubtitle {
+  font-family: var(--font-body);
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  line-height: 1.6;
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto 2.5rem auto;
+  color: var(--color-text-muted);
+}
 
-/* ---- Comic Panel Grid ---- */
+:global([data-theme='noir']) .sectionSubtitle {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.legacyAnchor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 1px;
+  width: 1px;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* ---- FDE Deployed Systems Bento Grid ---- */
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: 280px;
-  gap: 1rem;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: 320px;
+  gap: 1.5rem;
 }
 
-.grid > *:nth-child(4n + 1) { grid-column: span 2; }
-.grid > *:nth-child(4n + 2) { grid-column: span 1; }
-.grid > *:nth-child(4n + 3) { grid-column: span 1; }
-.grid > *:nth-child(4n + 4) { grid-column: span 2; }
+.grid > *:first-child {
+  grid-column: span 2;
+}
 
 /* ---- Panel ---- */
 
@@ -50,7 +72,8 @@
   background: var(--pop-white);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-  display: block;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
   padding: 0;
@@ -877,5 +900,63 @@
 
 :global([data-theme='noir']) .deliverableItem {
   color: var(--color-text);
+}
+
+/* ---- Telemetry & FDE System Tag Styles ---- */
+
+.systemRoleText {
+  font-family: var(--font-code);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.88);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.telemetryPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-code);
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.4);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+:global([data-theme='noir']) .telemetryPill {
+  background: rgba(0, 240, 255, 0.1);
+  border-color: rgba(0, 240, 255, 0.35);
+  color: var(--neon-cyan);
+}
+
+.pulseDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #27c93f;
+  box-shadow: 0 0 6px #27c93f;
+  animation: pulseGlow 2s infinite ease-in-out;
+}
+
+:global([data-theme='noir']) .pulseDot {
+  background: var(--neon-cyan);
+  box-shadow: 0 0 6px var(--neon-cyan);
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    transform: scale(0.9);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 1;
+  }
 }
 

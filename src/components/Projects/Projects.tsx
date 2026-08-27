@@ -15,8 +15,8 @@ import TiltCard from '@/components/ui/TiltCard';
 import styles from './Projects.module.css';
 
 const PROJECT_SECTION_TITLE_TEXTS: ScramblerProps['texts'] = {
-  developer: { light: 'EPIC ADVENTURES', noir: 'EPIC ADVENTURES' },
-  business:  { light: 'SELECTED WORK',   noir: 'SELECTED WORK' },
+  developer: { light: 'DEPLOYED SYSTEMS', noir: 'DEPLOYED SYSTEMS' },
+  business:  { light: 'SYSTEM ARCHITECTURE & DEPLOYMENTS', noir: 'SYSTEM ARCHITECTURE & DEPLOYMENTS' },
 };
 
 interface ProjectsProps {
@@ -92,7 +92,14 @@ function ProjectImage({ src, fallbackSrc, alt, fill, width, height, sizes, class
   );
 }
 
-const CTA_LABELS: Record<string, string> = { 'rag-lab': 'OPEN APP' };
+const CTA_LABELS: Record<string, string> = {
+  'rag-lab': 'LAUNCH RAG STUDIO',
+  'scoping-studio': 'BUILD PROJECT SCOPE',
+  'client-workspace': 'ENTER CLIENT WORKSPACE',
+  'synchronizer-engine': 'INSPECT SCRIPT SOURCE',
+  'systems-console': 'INSPECT SCRIPT SOURCE',
+  'systems-terminal': 'OPEN TERMINAL',
+};
 
 function Projects({ projects }: ProjectsProps) {
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
@@ -110,11 +117,13 @@ function Projects({ projects }: ProjectsProps) {
 
   const getProjectCategory = (proj: Project): string => {
     if (proj.category) return proj.category;
+    if (proj.id === 'rag-lab') return 'ai';
+    if (proj.id === 'scoping-studio') return 'scoping';
+    if (proj.id === 'client-workspace') return 'workspace';
+    if (proj.id === 'synchronizer-engine' || proj.id === 'systems-terminal' || proj.id === 'systems-console') return 'systems';
     const tags = proj.tags.map((t) => t.toLowerCase());
     if (tags.some((t) => t.includes('rag') || t.includes('ai') || t.includes('ollama') || t.includes('gemini'))) return 'ai';
-    if (tags.some((t) => t.includes('flutter') || t.includes('dart') || t.includes('mobile'))) return 'mobile';
-    if (tags.some((t) => t.includes('flask') || t.includes('game') || t.includes('simulation'))) return 'simulation';
-    return 'fullstack';
+    return 'systems';
   };
 
   const filteredProjects = projects.filter((p) => {
@@ -123,7 +132,7 @@ function Projects({ projects }: ProjectsProps) {
   });
 
   const categoryCounts = React.useMemo(() => {
-    const counts: Record<string, number> = { all: projects.length, ai: 0, fullstack: 0, mobile: 0, simulation: 0 };
+    const counts: Record<string, number> = { all: projects.length, ai: 0, scoping: 0, workspace: 0, systems: 0 };
     projects.forEach((p) => {
       const cat = getProjectCategory(p);
       counts[cat] = (counts[cat] || 0) + 1;
@@ -216,7 +225,8 @@ function Projects({ projects }: ProjectsProps) {
   }, [selectedProject]);
 
   return (
-    <section id="projects" className={styles.projects} aria-label="Projects">
+    <section id="deployments" className={styles.projects} aria-label="Deployed Systems">
+      <div id="projects" className={styles.legacyAnchor} aria-hidden="true" />
       <div className={styles.container}>
         <Scrambler
           texts={PROJECT_SECTION_TITLE_TEXTS}
@@ -224,17 +234,23 @@ function Projects({ projects }: ProjectsProps) {
           as="h2"
           className={styles.sectionTitle}
         >
-          {activeAudience === 'business' ? 'SELECTED WORK' : 'EPIC ADVENTURES'}
+          {activeAudience === 'business' ? 'SYSTEM ARCHITECTURE & DEPLOYMENTS' : 'DEPLOYED SYSTEMS'}
         </Scrambler>
 
+        <p className={styles.sectionSubtitle}>
+          {activeAudience === 'business'
+            ? 'Commercial software platforms, requirement modeling engines, and high-performance AI infrastructure engineered for enterprise delivery.'
+            : 'Production-grade cognitive AI platforms, autonomous scoping engines, and mission-critical telemetry tooling deployed across the enterprise lifecycle.'}
+        </p>
+
         {/* Category Filter Bar */}
-        <div className={styles.filterBar} role="tablist" aria-label="Filter projects by category">
+        <div className={styles.filterBar} role="tablist" aria-label="Filter deployed systems by category">
           {[
-            { id: 'all', label: 'ALL' },
-            { id: 'ai', label: 'AI & RAG' },
-            { id: 'fullstack', label: 'FULLSTACK' },
-            { id: 'mobile', label: 'MOBILE' },
-            { id: 'simulation', label: 'SIMULATION & TELEMETRY' },
+            { id: 'all', label: 'ALL SYSTEMS' },
+            { id: 'ai', label: 'COGNITIVE AI' },
+            { id: 'scoping', label: 'SCOPING & SOW' },
+            { id: 'workspace', label: 'CLIENT WORKSPACE' },
+            { id: 'systems', label: 'TELEMETRY & CONSOLE' },
           ].map((cat) => (
             <button
               key={cat.id}
@@ -274,36 +290,25 @@ function Projects({ projects }: ProjectsProps) {
                   } as React.CSSProperties}
                   onClick={() => handleOpenModal(project.id)}
                 >
-                  {/* Retro Browser Window Header */}
+                  {/* Retro Browser Window Header with Telemetry Status */}
                   <div className={styles.browserHeader} aria-hidden="true">
                     <div className={styles.browserDots}>
                       <span className={styles.browserDot} />
                       <span className={styles.browserDot} />
                       <span className={styles.browserDot} />
+                      <span className={styles.systemRoleText}>
+                        {project.systemRole || `SYS-0${index + 1} // DEPLOYMENT`}
+                      </span>
                     </div>
-                    <span className={styles.browserAddress}>projects.prateeq.in/{project.id}</span>
-                  </div>
-
-                  {/* Status Badge */}
-                  <div
-                    className={`${styles.statusBadge} ${
-                      getProjectStatus(project) === 'live'
-                        ? styles.statusLive
-                        : getProjectStatus(project) === 'personal'
-                        ? styles.statusPersonal
-                        : styles.statusSoon
-                    }`}
-                  >
-                    {getProjectStatus(project) === 'live'
-                      ? 'LIVE NOW'
-                      : getProjectStatus(project) === 'personal'
-                      ? 'PERSONAL'
-                      : 'COMING SOON'}
+                    <div className={styles.telemetryPill}>
+                      <span className={styles.pulseDot} />
+                      <span>{project.telemetryBadge || 'LIVE SYSTEM'}</span>
+                    </div>
                   </div>
 
                   {/* Floating Case Study Hover Tag */}
                   <div className={styles.caseStudyTag} aria-hidden="true">
-                    <span>CASE STUDY</span>
+                    <span>CASE STUDY & SPECS</span>
                     <ExternalLink size={10} />
                   </div>
 
@@ -326,14 +331,14 @@ function Projects({ projects }: ProjectsProps) {
                         : project.description}
                     </p>
                     <div className={styles.panelTags}>
-                      {project.tags.slice(0, 3).map((tag) => (
+                      {project.tags.slice(0, 4).map((tag) => (
                         <span key={tag} className={styles.tag}>
                           {tag}
                         </span>
                       ))}
                     </div>
                   </div>
-                  <span className="sr-only"> - View project details</span>
+                  <span className="sr-only"> - View system architecture and case study</span>
                 </button>
               </TiltCard>
             ))}
@@ -367,7 +372,22 @@ function Projects({ projects }: ProjectsProps) {
               </button>
 
               <div className={styles.modalHeader}>
-                <h3 className={styles.modalTitle}>{selected.title}</h3>
+                <div>
+                  {selected.systemRole && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.35rem' }}>
+                      <span className={styles.systemRoleText} style={{ color: 'var(--color-text-muted)' }}>
+                        {selected.systemRole}
+                      </span>
+                      {selected.telemetryBadge && (
+                        <div className={styles.telemetryPill} style={{ background: 'var(--surface-elevated)' }}>
+                          <span className={styles.pulseDot} />
+                          <span style={{ color: 'var(--color-text)' }}>{selected.telemetryBadge}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  <h3 className={styles.modalTitle}>{selected.title}</h3>
+                </div>
               </div>
 
               {/* Case Study Tab Switcher */}
@@ -379,7 +399,7 @@ function Projects({ projects }: ProjectsProps) {
                   className={`${styles.modalTab} ${activeModalTab === 'overview' ? styles.modalTabActive : ''}`}
                   onClick={() => setActiveModalTab('overview')}
                 >
-                  Overview & Links
+                  Mission & Overview
                 </button>
                 <button
                   type="button"
@@ -388,7 +408,7 @@ function Projects({ projects }: ProjectsProps) {
                   className={`${styles.modalTab} ${activeModalTab === 'architecture' ? styles.modalTabActive : ''}`}
                   onClick={() => setActiveModalTab('architecture')}
                 >
-                  Architecture & Tech
+                  Architecture & Stack
                 </button>
                 <button
                   type="button"
@@ -448,7 +468,7 @@ function Projects({ projects }: ProjectsProps) {
                     </p>
                   )}
 
-                  <h4 className={styles.subHeading} style={{ marginTop: '1.25rem' }}>Technologies & Stack</h4>
+                  <h4 className={styles.subHeading} style={{ marginTop: '1.25rem' }}>Technologies & Deployment Stack</h4>
                   <div className={styles.modalTags}>
                     {selected.tags.map((tag) => (
                       <span key={tag} className={styles.tag}>
@@ -495,89 +515,35 @@ function Projects({ projects }: ProjectsProps) {
               )}
 
               <div className={styles.modalActions}>
-                 {getProjectStatus(selected) === 'live' ? (
-                  <>
-                    {selected.liveUrl && selected.liveUrl.startsWith('/') ? (
-                      <Link
-                        href={selected.liveUrl}
-                        className="comic-btn comic-btn-blue"
-                        style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
-                      >
-                        {CTA_LABELS[selected.id] || selected.ctaLabel || 'PLAY GAME'} <ExternalLink size={16} />
-                      </Link>
-                    ) : selected.liveUrl ? (
-                      <a
-                        href={selected.liveUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="comic-btn comic-btn-blue"
-                        style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
-                      >
-                        {CTA_LABELS[selected.id] || selected.ctaLabel || 'PLAY GAME'} <ExternalLink size={16} />
-                      </a>
-                    ) : null}
-                    {selected.githubUrl && (
-                      <a
-                        href={selected.githubUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="comic-btn comic-btn-outline"
-                        style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
-                      >
-                        GITHUB <Code2 size={16} />
-                      </a>
-                    )}
-                  </>
-                ) : getProjectStatus(selected) === 'personal' ? (
-                  <>
-                    {selected.liveUrl && selected.liveUrl.startsWith('/') ? (
-                      <Link
-                        href={selected.liveUrl}
-                        className="comic-btn comic-btn-blue"
-                        style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
-                      >
-                        {CTA_LABELS[selected.id] || selected.ctaLabel || 'LIVE DEMO'} <ExternalLink size={16} />
-                      </Link>
-                    ) : selected.liveUrl ? (
-                      <a
-                        href={selected.liveUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="comic-btn comic-btn-blue"
-                        style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
-                      >
-                        {CTA_LABELS[selected.id] || selected.ctaLabel || 'LIVE DEMO'} <ExternalLink size={16} />
-                      </a>
-                    ) : null}
-                    {selected.githubUrl && (
-                      <a
-                        href={selected.githubUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="comic-btn comic-btn-outline"
-                        style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
-                      >
-                        GITHUB <Code2 size={16} />
-                      </a>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <button
-                      disabled
-                      className={`${styles.disabledBtn} comic-btn`}
-                      style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
-                    >
-                      {CTA_LABELS[selected.id] || selected.ctaLabel || 'COMING SOON'} <ExternalLink size={16} />
-                    </button>
-                    <button
-                      disabled
-                      className={`${styles.disabledBtn} comic-btn comic-btn-outline`}
-                      style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
-                    >
-                      CODE UNDER DEV <Code2 size={16} />
-                    </button>
-                  </>
+                {selected.liveUrl && selected.liveUrl.startsWith('/') ? (
+                  <Link
+                    href={selected.liveUrl}
+                    className="comic-btn comic-btn-blue"
+                    style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
+                  >
+                    {CTA_LABELS[selected.id] || selected.ctaLabel || 'LAUNCH SYSTEM'} <ExternalLink size={16} />
+                  </Link>
+                ) : selected.liveUrl ? (
+                  <a
+                    href={selected.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="comic-btn comic-btn-blue"
+                    style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
+                  >
+                    {CTA_LABELS[selected.id] || selected.ctaLabel || 'LAUNCH SYSTEM'} <ExternalLink size={16} />
+                  </a>
+                ) : null}
+                {selected.githubUrl && (
+                  <a
+                    href={selected.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="comic-btn comic-btn-outline"
+                    style={{ gap: '0.5rem', fontSize: '1rem', padding: '0.5rem 1rem' }}
+                  >
+                    GITHUB <Code2 size={16} />
+                  </a>
                 )}
               </div>
 

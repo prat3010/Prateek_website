@@ -18,7 +18,9 @@ export interface Project {
   isLive: boolean;
   status: 'live' | 'soon' | 'personal';
   ctaLabel?: string;
-  category?: 'ai' | 'fullstack' | 'mobile' | 'simulation';
+  category?: 'ai' | 'scoping' | 'workspace' | 'systems' | 'fullstack' | 'mobile' | 'simulation';
+  systemRole?: string;
+  telemetryBadge?: string;
   architectureHighlights?: string[];
   challenges?: CaseStudyChallenge[];
   keyDeliverables?: string[];

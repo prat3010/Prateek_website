@@ -72,6 +72,13 @@ def sync_projects(projects):
             'color': p.get('color', '#00E676'),
             'isLive': p.get('isLive', False),
             'status': p.get('status', 'soon'),
+            'category': p.get('category', 'fullstack'),
+            'ctaLabel': p.get('ctaLabel', ''),
+            'systemRole': p.get('systemRole', ''),
+            'telemetryBadge': p.get('telemetryBadge', ''),
+            'architectureHighlights': p.get('architectureHighlights', []),
+            'challenges': p.get('challenges', []),
+            'keyDeliverables': p.get('keyDeliverables', []),
         })
     # Upsert via POST with merge-duplicates
     if not _has_config():

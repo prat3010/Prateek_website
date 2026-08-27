@@ -145,7 +145,8 @@ for p in projects_raw:
     p.setdefault('longDescription', p.get('longDescription', ''))
     p.setdefault('description_business', '')
     p.setdefault('longDescription_business', '')
-    p.pop('ctaLabel', None)
+    p.setdefault('systemRole', '')
+    p.setdefault('telemetryBadge', '')
 if projects_raw:
     projects_to_upsert = filter_drift_protected_rows('projects', projects_raw, projects_file, 'slug')
     if projects_to_upsert:
@@ -156,6 +157,9 @@ if projects_raw:
             for item in projects_to_upsert:
                 cp = dict(item)
                 cp.pop('category', None)
+                cp.pop('systemRole', None)
+                cp.pop('telemetryBadge', None)
+                cp.pop('ctaLabel', None)
                 cp.pop('architectureHighlights', None)
                 cp.pop('challenges', None)
                 cp.pop('keyDeliverables', None)

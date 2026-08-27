@@ -12,7 +12,7 @@
     "projects": [
       {
         "id": "rag-lab",
-        "title": "RAG Lab"
+        "title": "Retriever AI"
       }
     ]
   },
@@ -29,7 +29,11 @@
     "projects": [
       {
         "id": "rag-lab",
-        "title": "RAG Lab"
+        "title": "Retriever AI"
+      },
+      {
+        "id": "synchronizer-engine",
+        "title": "PrateekSync AI"
       }
     ]
   },
@@ -45,12 +49,12 @@
     "status": "mastered",
     "projects": [
       {
-        "id": "earth-evolution-simulator",
-        "title": "Earth Evolution Simulator"
+        "id": "scoping-studio",
+        "title": "Scoping Studio"
       },
       {
-        "id": "metawipe",
-        "title": "MetaWipe"
+        "id": "synchronizer-engine",
+        "title": "PrateekSync AI"
       }
     ]
   },
@@ -67,7 +71,11 @@
     "projects": [
       {
         "id": "rag-lab",
-        "title": "RAG Lab"
+        "title": "Retriever AI"
+      },
+      {
+        "id": "scoping-studio",
+        "title": "Scoping Studio"
       }
     ]
   },
@@ -84,7 +92,11 @@
     "projects": [
       {
         "id": "rag-lab",
-        "title": "RAG Lab"
+        "title": "Retriever AI"
+      },
+      {
+        "id": "synchronizer-engine",
+        "title": "PrateekSync AI"
       }
     ]
   },
@@ -100,12 +112,12 @@
     "status": "mastered",
     "projects": [
       {
-        "id": "paintmix-ai",
-        "title": "PaintMix AI"
+        "id": "rag-lab",
+        "title": "Retriever AI"
       },
       {
-        "id": "rag-lab",
-        "title": "RAG Lab"
+        "id": "client-workspace",
+        "title": "Client Workspace"
       }
     ]
   },
@@ -121,8 +133,12 @@
     "status": "mastered",
     "projects": [
       {
-        "id": "rag-lab",
-        "title": "RAG Lab"
+        "id": "scoping-studio",
+        "title": "Scoping Studio"
+      },
+      {
+        "id": "client-workspace",
+        "title": "Client Workspace"
       }
     ]
   },
@@ -138,12 +154,12 @@
     "status": "mastered",
     "projects": [
       {
-        "id": "iss-tracker",
-        "title": "ISS Live Location Tracker"
+        "id": "rag-lab",
+        "title": "Retriever AI"
       },
       {
-        "id": "rag-lab",
-        "title": "RAG Lab"
+        "id": "client-workspace",
+        "title": "Client Workspace"
       }
     ]
   },
@@ -159,8 +175,8 @@
     "status": "mastered",
     "projects": [
       {
-        "id": "metawipe",
-        "title": "MetaWipe"
+        "id": "client-workspace",
+        "title": "Client Workspace"
       }
     ]
   },
@@ -176,12 +192,12 @@
     "status": "mastered",
     "projects": [
       {
-        "id": "paintmix-ai",
-        "title": "PaintMix AI"
+        "id": "scoping-studio",
+        "title": "Scoping Studio"
       },
       {
-        "id": "metawipe",
-        "title": "MetaWipe"
+        "id": "client-workspace",
+        "title": "Client Workspace"
       }
     ]
   },
@@ -197,8 +213,12 @@
     "status": "mastered",
     "projects": [
       {
-        "id": "earth-evolution-simulator",
-        "title": "Earth Evolution Simulator"
+        "id": "scoping-studio",
+        "title": "Scoping Studio"
+      },
+      {
+        "id": "rag-lab",
+        "title": "Retriever AI"
       }
     ]
   },
@@ -214,8 +234,12 @@
     "status": "mastered",
     "projects": [
       {
-        "id": "metawipe",
-        "title": "MetaWipe"
+        "id": "rag-lab",
+        "title": "Retriever AI"
+      },
+      {
+        "id": "synchronizer-engine",
+        "title": "PrateekSync AI"
       }
     ]
   },
@@ -231,8 +255,12 @@
     "status": "quest",
     "projects": [
       {
-        "id": "earth-evolution-simulator",
-        "title": "Earth Evolution Simulator"
+        "id": "rag-lab",
+        "title": "Retriever AI"
+      },
+      {
+        "id": "scoping-studio",
+        "title": "Scoping Studio"
       }
     ]
   },
@@ -248,16 +276,20 @@
     "status": "legendary",
     "projects": [
       {
-        "id": "paintmix-ai",
-        "title": "PaintMix AI"
-      },
-      {
-        "id": "metawipe",
-        "title": "MetaWipe"
-      },
-      {
         "id": "rag-lab",
-        "title": "RAG Lab"
+        "title": "Retriever AI"
+      },
+      {
+        "id": "scoping-studio",
+        "title": "Scoping Studio"
+      },
+      {
+        "id": "client-workspace",
+        "title": "Client Workspace"
+      },
+      {
+        "id": "synchronizer-engine",
+        "title": "PrateekSync AI"
       }
     ]
   }

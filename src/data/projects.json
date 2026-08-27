@@ -1,216 +1,19 @@
 [
   {
-    "id": "earth-evolution-simulator",
-    "title": "Earth Evolution Simulator",
-    "description": "A scenario-driven simulation game modeling planetary ecology and evolutionary tradeoffs through stateful decision branching.",
-    "longDescription": "Earth Evolution Simulator is a scenario-driven engine where players guide a planet through distinct evolutionary eras. A Python Flask backend maintains session state across path-dependent decision trees and random events, while SQLite logs extinction parameters and run history.",
-    "image": "/images/project-earth-simulator.webp",
-    "tags": [
-      "Python",
-      "Flask",
-      "SQLite3",
-      "Jinja2",
-      "JavaScript",
-      "CSS"
-    ],
-    "liveUrl": "https://earth-evolution-simulator.onrender.com",
-    "githubUrl": "https://github.com/prat3010/earth-evolution-simulator",
-    "color": "#00E676",
-    "isLive": true,
-    "status": "live",
-    "category": "simulation",
-    "description_business": "An interactive simulation platform modeling complex ecological tradeoffs, dynamic events, and strategic decision-making.",
-    "longDescription_business": "Earth Evolution Simulator turns planetary ecology and resource management into an interactive simulation experience. Designed to model long-term consequences and stateful tradeoffs, it uses dynamic event triggers and telemetry logging to engage users in complex decision-making scenarios.",
-    "architectureHighlights": [
-      "Stateful Flask backend tracking planetary ecology variables and decision tree branches in session",
-      "SQLite persistence logging run parameters, historical extinction events, and timeline telemetry",
-      "Custom Jinja2 dynamic UI rendering event triggers and resource allocation sliders"
-    ],
-    "challenges": [
-      {
-        "challenge": "Preventing state explosion across multiple branching decision paths",
-        "solution": "Designed a dynamic event dispatcher that evaluates planetary state variables against threshold triggers instead of static hardcoded state trees."
-      }
-    ],
-    "keyDeliverables": [
-      "Interactive scenario simulation engine",
-      "Session state & run history logger",
-      "Resource tradeoff calculator"
-    ]
-  },
-  {
-    "id": "iss-tracker",
-    "title": "ISS Live Location Tracker",
-    "description": "Real-time satellite telemetry service tracking ISS orbital position with reverse geocoding and offline spatial KD-tree lookups.",
-    "longDescription": "Built on FastAPI, this telemetry application polls public ISS orbit APIs using async HTTP connection pooling. Over land, it resolves reverse-geocoded coordinates via Geopy and Nominatim. Over open oceans, it falls back to an in-memory SciPy KD-tree spatial index of world land centroids, serving background imagery via cached NASA API feeds.",
-    "image": "/images/project-iss-tracker.webp",
-    "tags": [
-      "Python",
-      "FastAPI",
-      "Jinja2",
-      "Geopy",
-      "NumPy",
-      "SciPy",
-      "APIs"
-    ],
-    "liveUrl": "https://iss-tracker.pythonanywhere.com",
-    "githubUrl": "https://github.com/prat3010/iss-tracker",
-    "color": "#2979FF",
-    "isLive": false,
-    "status": "soon",
-    "category": "simulation",
-    "description_business": "A real-time satellite tracking utility that translates raw orbital telemetry into geographic location insights.",
-    "longDescription_business": "The ISS Live Location Tracker translates raw satellite telemetry into human-readable geographic location context. It pairs real-time reverse geocoding over land with an in-memory spatial lookup index over open oceans, utilizing NASA image caching for high availability and instant page responsiveness.",
-    "architectureHighlights": [
-      "FastAPI micro-backend polling public ISS telemetry APIs with async HTTP connection pooling",
-      "Geopy & Nominatim reverse geocoding engine translating lat/lng coordinates to landmass names",
-      "Offline KD-tree spatial fallback database resolving nearest landmass when station orbits over oceans"
-    ],
-    "challenges": [
-      {
-        "challenge": "Gracefully handling reverse geocoding API rate limits and ocean overflights",
-        "solution": "Implemented an in-memory KD-tree spatial index containing world land centroids for instant offline lookup when reverse geocoding fails."
-      }
-    ],
-    "keyDeliverables": [
-      "Real-time telemetry map interface",
-      "Offline spatial KD-tree lookup fallback",
-      "Daily NASA image caching middleware"
-    ]
-  },
-  {
-    "id": "metawipe",
-    "title": "MetaWipe",
-    "description": "A privacy-first mobile app that strips EXIF metadata from images on-device using isolated Dart background workers.",
-    "longDescription": "MetaWipe removes sensitive EXIF metadata from images locally by decoding selected files in background Dart isolates and rebuilding them into fresh JPEG or PNG containers. The application operates 100% offline without network permissions, keeping private location data on-device.",
-    "image": "/images/project-metawipe.webp",
-    "tags": [
-      "Flutter",
-      "Dart",
-      "Riverpod",
-      "GoRouter",
-      "Exif",
-      "Cryptography"
-    ],
-    "liveUrl": "https://play.google.com/store/apps/details?id=com.metawipe",
-    "githubUrl": "https://github.com/prat3010/metawipe",
-    "color": "#00E676",
-    "isLive": false,
-    "status": "soon",
-    "category": "mobile",
-    "description_business": "A privacy-focused mobile utility that strips sensitive location and device metadata from photos before public sharing.",
-    "longDescription_business": "MetaWipe protects user privacy and organizational security by stripping hidden EXIF metadata—including GPS coordinates, timestamp history, and camera serial numbers—from photos before sharing. By decoding and rebuilding images directly on-device, it guarantees sensitive location data never leaves the user's phone.",
-    "architectureHighlights": [
-      "Flutter cross-platform app processing image byte arrays in isolated background Dart workers",
-      "Custom EXIF parsing engine stripping GPS, camera metadata, and hidden tags before image container rebuild",
-      "100% offline security boundary requiring zero network permissions"
-    ],
-    "challenges": [
-      {
-        "challenge": "Main thread UI stuttering during high-resolution image decoding and re-encoding",
-        "solution": "Offloaded raw pixel decoding and EXIF container reconstruction to background Dart isolates using thread-safe transfer channels."
-      }
-    ],
-    "keyDeliverables": [
-      "EXIF metadata sanitization pipeline",
-      "Isolated background image processor",
-      "Zero-network privacy guarantee"
-    ]
-  },
-  {
-    "id": "paintmix-ai",
-    "title": "PaintMix AI",
-    "description": "A computer-vision mobile assistant that samples camera color inputs and computes paint mix ratios via CIELAB Delta E distance algorithms.",
-    "longDescription": "PaintMix AI uses a device camera to sample target colors and calculate mixing proportions from inventory. It converts RGB camera frame buffers into XYZ and CIELAB (L*a*b*) color spaces, executing CIDE2000 Delta E distance algorithms to compute matching ratios against a local Drift/SQLite paint database.",
-    "image": "/images/project-paintmix.webp",
-    "tags": [
-      "Flutter",
-      "Dart",
-      "Riverpod",
-      "Drift",
-      "SQLite",
-      "Computer Vision"
-    ],
-    "liveUrl": "https://paintmix-ai.web.app",
-    "githubUrl": "https://github.com/prat3010/paintmix-ai",
-    "color": "#FF9100",
-    "isLive": false,
-    "status": "soon",
-    "category": "mobile",
-    "description_business": "A camera-driven color matching assistant that calculates exact paint mixing proportions to eliminate inventory waste.",
-    "longDescription_business": "PaintMix AI enables painters, designers, and maintenance teams to sample target colors with a smartphone camera and receive instant, accurate paint mixing recipes based on available stock. By calculating exact color ratios on-device, it eliminates guesswork, reduces costly paint inventory waste, and works 100% offline on job sites.",
-    "architectureHighlights": [
-      "Flutter & Riverpod app utilizing device camera frame buffers for real-time color sampling",
-      "Color space converter transforming RGB sampling inputs into CIELAB (L*a*b*) color space",
-      "Delta E (CIDE2000) distance matching engine comparing sampled targets against stored paint inventory in Drift/SQLite"
-    ],
-    "challenges": [
-      {
-        "challenge": "Varying ambient lighting conditions causing inaccurate camera color sampling",
-        "solution": "Added a normalized white-balance calibration target prompt and CIELAB Delta E color difference algorithm to compute exact paint ratios."
-      }
-    ],
-    "keyDeliverables": [
-      "Real-time camera color sampler",
-      "CIELAB Delta E color matching engine",
-      "Offline Drift/SQLite paint inventory"
-    ]
-  },
-  {
-    "id": "prateeksync-ai--intelligent-portfolio---resume-automation-engine",
-    "title": "PrateeqSync AI: Intelligent Portfolio & Resume Automation Engine",
-    "description": "A local Streamlit CMS for portfolio administration, database schema synchronization, and Gemini-powered repository scanning.",
-    "longDescription": "PrateeqSync AI is a Streamlit content management system for portfolio data, certificates, and technical blog posts. It syncs Supabase PostgreSQL tables with local JSON fallbacks, leveraging Google Gemini 3.6 Flash for repository code scanning, OCR, and automated git workflow staging.",
-    "image": "/images/project-prateeksync-ai--intelligent-portfolio---resume-automation-engine.webp",
-    "tags": [
-      "Python",
-      "Google Gemini",
-      "Streamlit",
-      "GitHub API",
-      "TypeScript",
-      "Next.js"
-    ],
-    "liveUrl": "",
-    "githubUrl": "https://github.com/prat3010/Prateek_website",
-    "color": "#2979FF",
-    "isLive": false,
-    "status": "personal",
-    "category": "fullstack",
-    "description_business": "An automated portfolio content manager that synchronizes multi-channel resume copy and credentials with zero downtime.",
-    "longDescription_business": "PrateeqSync AI automates portfolio administration and resume synchronization. Built with Streamlit, Supabase, and Google Gemini AI, it parses repository history, validates data schema fallbacks, and automates content publishing across web endpoints—saving hours of manual site maintenance while guaranteeing 100% data uptime.",
-    "architectureHighlights": [
-      "Streamlit local CMS dashboard managing Supabase PostgreSQL content tables and local JSON fallbacks",
-      "Google Gemini 3.6 Flash integration scanning local repositories and generating domain resume bullets",
-      "Git automation layer staging, committing, and pushing asset updates directly to GitHub"
-    ],
-    "challenges": [
-      {
-        "challenge": "Ensuring database schema changes and local JSON fallback files stay 100% synchronized",
-        "solution": "Built atomic JSON transaction writers and validation routines (`sync_validation.py`) that verify payloads before DB writes."
-      }
-    ],
-    "keyDeliverables": [
-      "Automated repository code scanner",
-      "Atomic JSON/Supabase synchronizer",
-      "Streamlit admin dashboard"
-    ]
-  },
-  {
     "id": "rag-lab",
-    "title": "Retriever AI (RAG Engine & SaaS Studio)",
-    "description": "Enterprise-grade Retrieval-Augmented Generation platform featuring Hexagonal Architecture, pgvector hybrid search, local Ollama embeddings, RLM reasoning, and semantic response caching.",
-    "longDescription": "Retriever AI is a production-grade RAG platform built using strict Hexagonal Architecture boundaries. It ingests multi-format documents (PDF, Markdown, text, OpenAPI), executing dense vector embeddings via local Ollama instances (nomic-embed-text) and sparse BM25 keyword indexing in pgvector. Features multi-tenant PostgreSQL RLS isolation, streaming response synthesis with RLM (Recursive Language Modeling) reasoning loops, automated query rewriting, presigned citation downloads, and sub-100ms semantic response caching (⚡ Cached).",
+    "title": "Retriever AI (Enterprise Cognitive RAG Platform)",
+    "description": "Enterprise-grade Retrieval-Augmented Generation platform featuring Hexagonal Architecture, pgvector hybrid search, local Ollama embeddings, RLM reasoning, and sub-100ms semantic response caching.",
+    "longDescription": "Retriever AI is a production-grade RAG platform built using strict Hexagonal Architecture boundaries. It ingests multi-format documents (PDF, Markdown, text, OpenAPI), executing dense vector embeddings via local Ollama instances (nomic-embed-text) and sparse BM25 keyword indexing in pgvector. Features multi-tenant PostgreSQL RLS isolation, streaming response synthesis with RLM reasoning loops, automated query rewriting, presigned citation downloads, and sub-100ms semantic response caching (⚡ Cached).",
     "image": "/images/project-rag-lab.webp",
     "tags": [
       "Next.js 16",
       "FastAPI",
-      "Python 3.11",
-      "Supabase",
       "pgvector",
       "Ollama",
-      "RAG Architecture",
+      "Docker",
+      "Oracle Cloud VPS",
       "Hexagonal Design",
-      "Google Gemini"
+      "RAG"
     ],
     "liveUrl": "/rag",
     "githubUrl": "https://github.com/prat3010/retriever",
@@ -218,7 +21,10 @@
     "isLive": true,
     "status": "live",
     "category": "ai",
-    "description_business": "An enterprise document intelligence platform enabling teams to transform static documents into interactive, citation-backed AI assistants with zero data leakage.",
+    "ctaLabel": "LAUNCH RAG STUDIO",
+    "systemRole": "SYS-01 // COGNITIVE RETRIEVAL ENGINE",
+    "telemetryBadge": "LIVE ON ORACLE VPS",
+    "description_business": "An enterprise document intelligence platform transforming static documents into interactive, citation-backed AI assistants with zero data leakage.",
     "longDescription_business": "Retriever AI enables organizations to turn static documents into secure, interactive knowledge assistants. Teams upload PDFs or operational documentation and ask complex natural-language questions, receiving streaming answers backed by verifiable source citations, granular multi-tenant isolation, real-time feedback loops, and semantic query caching for sub-100ms response times.",
     "architectureHighlights": [
       "Strict Hexagonal Architecture decoupling domain core entities from FastAPI routers, pgvector storage adapters, and external LLM APIs",
@@ -228,11 +34,11 @@
     "challenges": [
       {
         "challenge": "High query latency, API rate-limit bottlenecks, and hallucinations across multi-document contextual searches",
-        "solution": "Implemented an in-memory semantic response cache with automatic query rewriting, RLM (Recursive Language Model) context verification, and strict citation grounding in prompt templates."
+        "solution": "Implemented an in-memory semantic response cache with automatic query rewriting, RLM context verification, and strict citation grounding in prompt templates."
       },
       {
         "challenge": "Preventing cross-tenant data leakage while allowing flexible external LLM key usage",
-        "solution": "Enforced strict tenant-scoped DB schema isolation combined with local-only embedding generation to prevent sensitive client data from hitting third-party API quotas."
+        "solution": "Enforced strict tenant-scoped DB schema isolation combined with local-only embedding generation on Oracle VPS to prevent sensitive client data from hitting third-party API quotas."
       }
     ],
     "keyDeliverables": [
@@ -240,6 +46,194 @@
       "Hybrid pgvector + BM25 Search Pipeline",
       "Semantic Response Cache & Telemetry Feedback",
       "Multi-Tenant RLS Security & Presigned Citations"
+    ]
+  },
+  {
+    "id": "scoping-studio",
+    "title": "Scoping Studio (Autonomous Client Discovery & SOW Compiler)",
+    "description": "Interactive requirement modeling engine featuring dynamic cost calculations, transitive dependency trees, and instant commercial SOW PDF compilation.",
+    "longDescription": "The Scoping Studio is a client discovery engine that models commercial software requirements into structured technical deliverables. It computes multi-variable quote pricing across base engines, feature modules, brand assets, and care plans, dynamically resolving transitive dependency graphs while compiling customized, print-ready Statement of Work (SOW) PDFs client-side.",
+    "image": "/images/project-scoping-studio.webp",
+    "tags": [
+      "Next.js 16",
+      "React 19",
+      "Dynamic Pricing",
+      "React-PDF",
+      "Framer Motion",
+      "TypeScript"
+    ],
+    "liveUrl": "/scoping",
+    "githubUrl": "https://github.com/prat3010/Prateek_website",
+    "color": "#E06D53",
+    "isLive": true,
+    "status": "live",
+    "category": "scoping",
+    "ctaLabel": "BUILD PROJECT SCOPE",
+    "systemRole": "SYS-02 // COMMERCIAL DISCOVERY & SOW ENGINE",
+    "telemetryBadge": "REALTIME PRICING ENGINE",
+    "description_business": "An autonomous client discovery portal that translates high-level project goals into verified technical roadmaps, transparent pricing estimates, and downloadable SOW agreements.",
+    "longDescription_business": "The Scoping Studio transforms the traditional friction of client proposals into an interactive discovery experience. Clients select their goal archetypes, customize feature capabilities, and instantly receive fully transparent pricing breakdowns with instant PDF proposals—reducing the sales scoping cycle from weeks to minutes.",
+    "architectureHighlights": [
+      "Reactive commercial calculation engine dynamically computing engine tiers, add-ons, and maintenance schedules",
+      "Transitive dependency resolver ensuring prerequisites (e.g. database auth before subscription billing) are automatically activated",
+      "Client-side React-PDF compilation generating pixel-perfect, pinned-page-count commercial proposals and middleman agreements"
+    ],
+    "challenges": [
+      {
+        "challenge": "Managing complex, multi-tiered feature dependencies without UI lag or invalid quote states",
+        "solution": "Built a deterministic directed-acyclic dependency graph resolver that computes transitive closures in sub-millisecond timeframes."
+      },
+      {
+        "challenge": "Client-side PDF rendering performance and font-rendering inconsistencies across mobile/desktop browsers",
+        "solution": "Architected custom canvas font loaders with pre-instantiated Google variable fonts and pinned page-count layout geometry."
+      }
+    ],
+    "keyDeliverables": [
+      "Interactive Goal & Feature Discovery Wizard",
+      "Dynamic Pricing & Dependency Graph Resolver",
+      "Client-Side SOW & Commercial PDF Generator",
+      "Deep-Linkable Archetype Pre-configurations"
+    ]
+  },
+  {
+    "id": "client-workspace",
+    "title": "Client Workspace & Lifecycle Control Plane",
+    "description": "Closed-loop client mission control featuring PKCE OAuth, milestone tracking, automated 7-day trial tenant provisioning, and immutable baseline contract indexing.",
+    "longDescription": "The Client Workspace is a secure operational portal where enterprise clients manage their project lifecycle. Built with Supabase Auth (PKCE) and session-gated API routes, it automatically provisions dedicated trial tenants on the Retriever platform upon authentication, locks initial SOW specifications as permanent baseline knowledge, and provides milestone tracking alongside Razorpay-integrated invoice ledgers.",
+    "image": "/images/project-client-workspace.webp",
+    "tags": [
+      "Supabase Auth (PKCE)",
+      "Next.js 16",
+      "Razorpay Ledger",
+      "Session Security",
+      "Multi-Tenancy"
+    ],
+    "liveUrl": "/dashboard",
+    "githubUrl": "https://github.com/prat3010/Prateek_website",
+    "color": "#2979FF",
+    "isLive": true,
+    "status": "live",
+    "category": "workspace",
+    "ctaLabel": "ENTER CLIENT WORKSPACE",
+    "systemRole": "SYS-03 // MISSION CONTROL & DELIVERY PORTAL",
+    "telemetryBadge": "PKCE SESSION GATE",
+    "description_business": "A dedicated commercial client portal for tracking active project scopes, reviewing deliverables, and accessing dedicated AI copilot workspaces.",
+    "longDescription_business": "The Client Workspace offers transparency and control for enterprise engagements. Clients log in securely to track sprint milestones, view verified architectural deliverables, process invoices, and interact with a dedicated AI copilot pre-grounded on their specific project contract.",
+    "architectureHighlights": [
+      "PKCE OAuth session verification layer deriving client identities strictly from cryptographically verified tokens",
+      "Automated tenant provisioning bridge calling Retriever cognitive APIs to spin up client workspaces on initial login",
+      "Immutable contract indexing engine storing baseline SOW briefs as permanent, non-deletable grounding documents"
+    ],
+    "challenges": [
+      {
+        "challenge": "Ensuring secure authentication and token persistence across Safari ITP and OAuth redirect fragments",
+        "solution": "Architected a dual cookie + localStorage persistence adapter with server-side PKCE code exchange routes."
+      },
+      {
+        "challenge": "Preventing client scope tampering and cross-tenant data access",
+        "solution": "Session-gated all REST endpoints with cryptographic token verification, guaranteeing queries are filtered solely by verified session email."
+      }
+    ],
+    "keyDeliverables": [
+      "PKCE OAuth Client Authentication Gate",
+      "Automated Retriever 7-Day Trial Provisioner",
+      "Interactive Feature Customizer & Scope Confirmer",
+      "Milestone Tracker & Razorpay Invoice Ledger"
+    ]
+  },
+  {
+    "id": "synchronizer-engine",
+    "title": "PrateekSync AI (Local Synchronizer & AST Architecture Engine)",
+    "description": "Local Streamlit developer cockpit and AST architecture engine featuring zero-drift Supabase sync, Gemini multimodal AI scanning, and automated Obsidian canvas synchronization.",
+    "longDescription": "PrateekSync is an internal developer control cockpit built with Streamlit, Python AST analyzers, and Google Gemini AI. It powers 14 modular hubs across content synchronization, client scoping, invoice ledgers, and outreach queues. Features atomic dual-write local JSON fallbacks with Supabase REST service-role synchronization, automated git hooks, and an AST-driven Architecture Knowledge Graph (`query_architecture.py`, `sync_graph_with_code.py`) that keeps Obsidian Canvas system models 100% synchronized with live code.",
+    "image": "/images/project-synchronizer.webp",
+    "tags": [
+      "Streamlit",
+      "Python AST",
+      "Google Gemini",
+      "Supabase BaaS",
+      "Knowledge Graph",
+      "Obsidian Canvas",
+      "Automation"
+    ],
+    "liveUrl": "https://github.com/prat3010/Prateek_website/blob/main/scripts/synchronizer.py",
+    "githubUrl": "https://github.com/prat3010/Prateek_website/tree/main/scripts",
+    "color": "#00E676",
+    "isLive": true,
+    "status": "live",
+    "category": "systems",
+    "ctaLabel": "INSPECT SCRIPT SOURCE",
+    "systemRole": "SYS-04 // LOCAL CMS & AST ARCHITECTURE ENGINE",
+    "telemetryBadge": "LOCAL STREAMLIT COCKPIT",
+    "description_business": "An internal operations and synchronization cockpit automating database governance, multi-channel client orders, and continuous architecture mapping.",
+    "longDescription_business": "PrateekSync provides single-pane-of-glass operational governance for the entire digital portfolio. By automating database updates with local offline fallbacks, validating schema integrity, scanning incoming credentials with multimodal AI, and continuously synchronizing architectural dependency graphs, it guarantees zero-drift deployments and flawless platform reliability.",
+    "architectureHighlights": [
+      "Modular Streamlit control cockpit with 14 specialized tabs managing clients, blogs, outreach, and analytics",
+      "AST-based Architecture Knowledge Graph engine analyzing cross-file blast radii and synchronizing Obsidian Canvas diagrams",
+      "Zero-drift dual-write pipeline coordinating atomic local JSON writes with Supabase REST service-role mutations"
+    ],
+    "challenges": [
+      {
+        "challenge": "Preventing architectural documentation and visual diagrams from drifting out of sync with rapid codebase changes",
+        "solution": "Engineered automated AST parsers (`sync_graph_with_code.py`) that regenerate Obsidian Canvas topologies directly from source code."
+      },
+      {
+        "challenge": "Maintaining zero-downtime database updates with local offline fallbacks",
+        "solution": "Built atomic transaction writers with pre-commit validation routines that verify payloads before database writes."
+      }
+    ],
+    "keyDeliverables": [
+      "Streamlit Multi-Hub Management Cockpit",
+      "Python AST Architecture Knowledge Graph & Canvas Sync",
+      "Gemini Multimodal Document & Certificate Scanner",
+      "Zero-Drift Supabase / Local JSON Fallback Pipeline"
+    ]
+  },
+  {
+    "id": "systems-terminal",
+    "title": "Systems Terminal & Interactive Telemetry Console",
+    "description": "Interactive in-browser diagnostic shell featuring live command execution, real-time git commit inspection, QR diagnostic matrix generation, and server telemetry.",
+    "longDescription": "The Systems Terminal is an interactive in-browser diagnostic shell engineered with sub-millisecond command parsing, ANSI color formatting, and real-time observability tooling. It surfaces live Git commit histories, generates encrypted QR payloads for mobile verification, and allows visitors to run system telemetry diagnostics directly in a retro CRT green phosphor interface.",
+    "image": "/images/project-systems-terminal.webp",
+    "tags": [
+      "Next.js 16",
+      "Web CLI",
+      "Interactive Shell",
+      "QR Generator",
+      "System Telemetry",
+      "Framer Motion"
+    ],
+    "liveUrl": "/terminal",
+    "githubUrl": "https://github.com/prat3010/Prateek_website",
+    "color": "#39FF14",
+    "isLive": true,
+    "status": "live",
+    "category": "systems",
+    "ctaLabel": "OPEN DIAGNOSTICS CONSOLE",
+    "systemRole": "SYS-05 // INTERACTIVE DIAGNOSTICS & WEB CLI",
+    "telemetryBadge": "LIVE WEB TELEMETRY",
+    "description_business": "An interactive developer console showcasing system observability, server health checks, and live audit telemetry.",
+    "longDescription_business": "The Systems Terminal demonstrates deep systems observability and developer tooling craftsmanship. Prospective clients and technical leaders can interactively execute audit commands, review real-time commit integrity, and inspect security telemetry directly from a lightweight web CLI.",
+    "architectureHighlights": [
+      "In-browser shell interpreter with command history stack, auto-completion, and ANSI escape styling",
+      "Dynamic QR code encoding pipeline for secure mobile diagnostics payload verification",
+      "Real-time Git log integration streaming recent commit hashes and metadata directly to the terminal"
+    ],
+    "challenges": [
+      {
+        "challenge": "Simulating a low-latency, authentic Unix terminal experience with smooth keystroke buffering in React",
+        "solution": "Architected an asynchronous command dispatcher with a virtualized scroll buffer and accessible keyboard traps."
+      },
+      {
+        "challenge": "Rendering scannable diagnostic QR codes without external blocking network calls",
+        "solution": "Implemented a local server-side QR SVG generator endpoint (/api/terminal/qrcode) with sub-10ms response times."
+      }
+    ],
+    "keyDeliverables": [
+      "Interactive Web CLI & Command Dispatcher",
+      "Live Git Log & Telemetry Inspector",
+      "Server-Side QR Matrix Generator",
+      "Retro CRT Phosphor Screen Aesthetics"
     ]
   }
 ]

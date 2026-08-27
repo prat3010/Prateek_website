@@ -17,6 +17,7 @@ from sync_tabs.shared import (
     save_uploaded_image,
     delete_existing_files,
     delete_project,
+    sync_projects,
     run_safe_git_command,
     HAS_SYNC,
     run_async_task,
@@ -26,8 +27,8 @@ from sync_git import commit_and_push_paths
 
 def render_projects_tab():
     with st.container(border=True):
-        st.markdown('<div class="section-header">Import & Sync Project Showcase</div>', unsafe_allow_html=True)
-        st.write("Extract descriptions, tags, and custom resume bullet points from your repos using the Gemini API.")
+        st.markdown('<div class="section-header">Import & Formulate Deployed System</div>', unsafe_allow_html=True)
+        st.write("Extract descriptions, tags, system roles, and custom resume bullet points from your repos using the Gemini API.")
 
         project_mode = st.radio("Choose Project Input Type:", ["Local Directory", "GitHub Repository"])
 
@@ -134,7 +135,7 @@ def render_projects_tab():
                     
                     prompt = f"""
                     Analyze the following project code artifacts (README, package config, and git logs).
-                    Use these details to formulate a showcase entry matching our Next.js Project schema.
+                    Use these details to formulate a system deployment entry matching our Next.js Deployed Systems schema.
                     
                     [README CONTENT]
                     {readme_content}
@@ -147,12 +148,15 @@ def render_projects_tab():
                     
                     Generate and return strictly the following JSON structure:
                     {{
-                      "title": "Catchy, polished title of the project",
-                      "description": "Short, 1-sentence summary of what the project does",
+                      "title": "Catchy, polished title of the system",
+                      "description": "Short, 1-sentence technical summary of what the system does (Developer mode)",
                       "longDescription": "Detailed 3-4 sentence paragraph describing the architecture, core algorithms, libraries, databases used, and interesting implementation details. Highlight the technical engineering complexities.",
                       "tags": ["3 to 6 programming languages, database names, or key frameworks used (capitalize appropriately, e.g. React, Next.js, FastAPI, SQLite)"],
-                      "color": "A neo-brutalist pop-art hex color (e.g. #FF9100, #00E676, #2979FF, #E040FB) that matches this project's visual branding",
-                      "category": "One of: ai, fullstack, mobile, simulation",
+                      "color": "A neo-brutalist pop-art hex color (e.g. #FF9100, #00E676, #2979FF, #E040FB) that matches this system's visual branding",
+                      "category": "One of: ai, scoping, workspace, systems, fullstack, mobile, simulation",
+                      "systemRole": "SYS-0X // ROLE TITLE (e.g. SYS-01 // COGNITIVE RETRIEVAL ENGINE)",
+                      "telemetryBadge": "Short live status badge (e.g. LIVE ON ORACLE VPS, REALTIME PRICING ENGINE, PKCE SESSION GATE, ACTIVE TELEMETRY HUB)",
+                      "ctaLabel": "Action button text (e.g. LAUNCH RAG STUDIO, BUILD PROJECT SCOPE, ENTER WORKSPACE, OPEN TERMINAL)",
                       "architectureHighlights": ["2 to 3 bullet points highlighting technical architecture, database setup, or async execution"],
                       "challenges": [
                         {{
@@ -185,14 +189,19 @@ def render_projects_tab():
                         "title": project_data["title"],
                         "description": project_data["description"],
                         "longDescription": project_data["longDescription"],
+                        "description_business": project_data.get("description_business", project_data["description"]),
+                        "longDescription_business": project_data.get("longDescription_business", project_data["longDescription"]),
                         "image": f"/images/project-{project_id}.webp", 
                         "tags": project_data["tags"],
                         "liveUrl": "",
                         "githubUrl": f"https://github.com/{repo}" if project_mode != "Local Directory" else "",
                         "color": project_data["color"],
-                        "isLive": False,
-                        "status": "soon",
-                        "category": project_data.get("category", "fullstack"),
+                        "isLive": True,
+                        "status": "live",
+                        "category": project_data.get("category", "systems"),
+                        "systemRole": project_data.get("systemRole", f"SYS-{len(current_projects)+1:02d} // PRODUCTION SYSTEM"),
+                        "telemetryBadge": project_data.get("telemetryBadge", "LIVE SYSTEM"),
+                        "ctaLabel": project_data.get("ctaLabel", "EXPLORE SYSTEM"),
                         "architectureHighlights": project_data.get("architectureHighlights", []),
                         "challenges": project_data.get("challenges", []),
                         "keyDeliverables": project_data.get("keyDeliverables", [])
@@ -257,37 +266,38 @@ def render_projects_tab():
                 run_async_task(run_project_sync, "project_sync_task")
                 st.rerun()
 
-    # 2. Manage & Edit Active Projects Section
-    st.markdown('<div class="section-header" style="margin-top: 2rem;">Manage & Edit Active Projects</div>', unsafe_allow_html=True)
+    # 2. Manage & Edit Deployed Systems Section
+    st.markdown('<div class="section-header" style="margin-top: 2rem;">Manage & Edit Deployed Systems</div>', unsafe_allow_html=True)
     
     current_projects = st.session_state.projects or []
     if not current_projects:
-        st.info("No active projects found in projects.json.")
+        st.info("No active systems found in projects.json.")
     else:
-        st.write(f"Currently showing **{len(current_projects)}** project(s):")
+        st.write(f"Currently managing **{len(current_projects)}** deployed system(s):")
         
         for idx, project in enumerate(current_projects):
             p_id = project.get("id")
-            p_title = project.get("title", "Untitled Project")
+            p_title = project.get("title", "Untitled System")
+            sys_role = project.get("systemRole", f"SYS-{idx+1:02d} // SYSTEM")
+            telem_badge = project.get("telemetryBadge", "LIVE SYSTEM")
+            cta_label = project.get("ctaLabel", "EXPLORE")
             
-            with st.expander(f"📁 {p_title} (ID: {p_id})"):
+            with st.expander(f"🚀 {sys_role} — {p_title} (ID: {p_id})"):
                 tags_html = " ".join([f'<span class="skill-capsule-preview" style="box-shadow: 0 4px 10px rgba(0,0,0,0.15); border-color: rgba(255,255,255,0.08); padding: 2px 10px; font-size: 0.7rem; margin-right: 4px; margin-bottom: 4px;"><span class="skill-capsule-dot" style="background-color: {project.get("color", "#00E676")};"></span>{t}</span>' for t in project.get("tags", [])])
-                status_style = {
-                    "live": "background-color: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; border-color: rgba(16, 185, 129, 0.3) !important;",
-                    "soon": "background-color: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; border-color: rgba(245, 158, 11, 0.3) !important;",
-                    "personal": "background-color: rgba(59, 130, 246, 0.15) !important; color: #60a5fa !important; border-color: rgba(59, 130, 246, 0.3) !important;"
-                }
-                curr_status = project.get("status", "live" if project.get("isLive") else "soon")
-                status_badge_html = f'<span class="status-badge" style="{status_style.get(curr_status, "")}">{curr_status.upper()}</span>'
+                
                 st.markdown(f"""
                 <div style="border: 1px solid rgba(255, 255, 255, 0.1); border-left: 4px solid {project.get("color", "#00E676")}; border-radius: 12px; padding: 20px; background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); margin-bottom: 25px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <span style="font-size: 0.75rem; color: #a1a1aa; font-weight: 700; text-transform: uppercase; font-family: 'Space Grotesk', sans-serif;">Card Preview</span>
-                        {status_badge_html}
+                        <span style="font-size: 0.72rem; color: #a1a1aa; font-weight: 700; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em;">{sys_role}</span>
+                        <span style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; background: rgba(0, 230, 118, 0.1); border: 1px solid rgba(0, 230, 118, 0.3); border-radius: 20px; font-size: 0.7rem; color: #00E676; font-family: 'JetBrains Mono', monospace;">
+                            <span style="width: 6px; height: 6px; background-color: #00E676; border-radius: 50%;"></span>
+                            {telem_badge}
+                        </span>
                     </div>
                     <h3 style="margin: 0 0 8px 0; color: #ffffff; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 1.45rem; letter-spacing: 0.2px;">{p_title}</h3>
                     <p style="font-size: 0.85rem; color: #D1D1D6; margin: 0 0 16px 0; font-family: 'Space Grotesk', sans-serif; line-height: 1.4;">{project.get("description", "")}</p>
-                    <div style="display: flex; flex-wrap: wrap;">{tags_html}</div>
+                    <div style="display: flex; flex-wrap: wrap; margin-bottom: 12px;">{tags_html}</div>
+                    <div style="font-size: 0.75rem; color: #888888; font-family: 'JetBrains Mono', monospace;">Action CTA: <strong>[{cta_label}]</strong></div>
                 </div>
                 """, unsafe_allow_html=True)
                 
@@ -375,7 +385,15 @@ def render_projects_tab():
                                 st.error(msg)
                                 
                 with col_p2:
-                    edit_title = st.text_input("Project Title", value=project.get("title", ""), key=f"edit_title_{p_id}")
+                    edit_title = st.text_input("System Title", value=project.get("title", ""), key=f"edit_title_{p_id}")
+                    
+                    col_p2_sys1, col_p2_sys2 = st.columns(2)
+                    with col_p2_sys1:
+                        edit_system_role = st.text_input("System Role & Identifier", value=project.get("systemRole", ""), placeholder="e.g. SYS-01 // COGNITIVE RETRIEVAL ENGINE", key=f"edit_sysrole_{p_id}")
+                        edit_cta_label = st.text_input("Card Action CTA Label", value=project.get("ctaLabel", ""), placeholder="e.g. LAUNCH RAG STUDIO", key=f"edit_cta_{p_id}")
+                    with col_p2_sys2:
+                        edit_telemetry_badge = st.text_input("Telemetry Status Badge", value=project.get("telemetryBadge", ""), placeholder="e.g. LIVE ON ORACLE VPS", key=f"edit_telem_{p_id}")
+                        edit_color = st.text_input("Hex Color Code", value=project.get("color", "#00E676"), key=f"edit_color_{p_id}")
                     
                     st.markdown("#### Developer Mode Copy")
                     edit_desc = st.text_input("Short Description (Dev)", value=project.get("description", ""), key=f"edit_desc_{p_id}")
@@ -387,7 +405,6 @@ def render_projects_tab():
                     
                     col_p2_1, col_p2_2 = st.columns(2)
                     with col_p2_1:
-                        edit_color = st.text_input("Hex Color Code", value=project.get("color", "#00E676"), key=f"edit_color_{p_id}")
                         edit_live_url = st.text_input("Live URL Link", value=project.get("liveUrl", ""), key=f"edit_live_url_{p_id}")
                     with col_p2_2:
                         edit_github_url = st.text_input("GitHub Repo Link", value=project.get("githubUrl", ""), key=f"edit_github_url_{p_id}")
@@ -399,15 +416,15 @@ def render_projects_tab():
                             status_idx = 2
                         else:
                             status_idx = 0
-                        edit_status = st.selectbox("Project Status", options=status_opts, index=status_idx, key=f"edit_status_{p_id}")
+                        edit_status = st.selectbox("System Status", options=status_opts, index=status_idx, key=f"edit_status_{p_id}")
                     
                     curr_tags = ", ".join(project.get("tags", []))
                     edit_tags_str = st.text_input("Tags / Technologies (comma separated)", value=curr_tags, key=f"edit_tags_{p_id}")
                     edit_tags = [t.strip() for t in edit_tags_str.split(",") if t.strip()]
 
                     st.markdown("#### Case Study & Architecture Breakdown")
-                    cat_opts = ["fullstack", "ai", "mobile", "simulation"]
-                    curr_cat = project.get("category", "fullstack")
+                    cat_opts = ["ai", "scoping", "workspace", "systems", "fullstack", "mobile", "simulation"]
+                    curr_cat = project.get("category", "systems")
                     cat_idx = cat_opts.index(curr_cat) if curr_cat in cat_opts else 0
                     edit_category = st.selectbox("Domain Category", options=cat_opts, index=cat_idx, key=f"edit_cat_{p_id}")
 
@@ -420,11 +437,14 @@ def render_projects_tab():
                     col_pb1, col_pb2 = st.columns(2)
                     
                     with col_pb1:
-                        if st.button("Save Project Changes", key=f"btn_save_proj_{p_id}", type="primary", use_container_width=True):
+                        if st.button("Save System Changes", key=f"btn_save_proj_{p_id}", type="primary", use_container_width=True):
                             if not edit_title.strip():
-                                st.error("Project Title is required!")
+                                st.error("System Title is required!")
                             else:
                                 project["title"] = edit_title.strip()
+                                project["systemRole"] = edit_system_role.strip()
+                                project["telemetryBadge"] = edit_telemetry_badge.strip()
+                                project["ctaLabel"] = edit_cta_label.strip()
                                 project["description"] = edit_desc.strip()
                                 project["longDescription"] = edit_long_desc.strip()
                                 project["description_business"] = edit_desc_biz.strip()
@@ -447,14 +467,20 @@ def render_projects_tab():
                                 try:
                                     write_projects_file(current_projects)
                                     st.session_state.projects = current_projects
-                                    st.success(f"Successfully saved project changes locally!")
+                                    
+                                    # Sync with Supabase if online
+                                    is_offline = st.session_state.get("offline_mode", False)
+                                    if HAS_SYNC and not is_offline:
+                                        sync_projects(current_projects)
+                                        
+                                    st.success(f"Successfully saved system changes locally and synced!")
                                     
                                     if not dry_run_proj:
                                         st.info("🚀 Pushing changes to GitHub...")
                                         git_ok, git_msg = commit_and_push_paths(
                                             run_safe_git_command,
                                             ["src/data/projects.json"],
-                                            f"chore(sync): update project - {project['title']}",
+                                            f"chore(sync): update system - {project['title']}",
                                             cwd=os.getcwd(),
                                         )
                                         if git_ok:
@@ -467,7 +493,7 @@ def render_projects_tab():
                                     st.error(f"Failed to write file: {e}")
                                     
                     with col_pb2:
-                        if st.button("Delete Project", key=f"btn_del_proj_{p_id}", type="secondary", use_container_width=True):
+                        if st.button("Delete System", key=f"btn_del_proj_{p_id}", type="secondary", use_container_width=True):
                             updated_projects = [p for p in current_projects if p.get("id") != p_id]
                             
                             try:

@@ -145,7 +145,7 @@ st.sidebar.markdown("""
 
 nav_options = [
     "👤 Profile, Bio & Career",
-    "🚀 Projects Showcase",
+    "🚀 Deployed Systems & Architecture",
     "⚡ Skills Matrix",
     "📜 Verified Badges",
     "🖼️ Photos & Assets",
@@ -336,7 +336,7 @@ def render_control_room_tab():
 # Dispatcher map for active view rendering
 NAV_DISPATCH = {
     "👤 Profile, Bio & Career": render_resume_profile_tab,
-    "🚀 Projects Showcase": render_projects_tab,
+    "🚀 Deployed Systems & Architecture": render_projects_tab,
     "⚡ Skills Matrix": render_skills_tab,
     "📜 Verified Badges": render_certificates_tab,
     "🖼️ Photos & Assets": render_photos_tab,

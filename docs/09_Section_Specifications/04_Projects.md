@@ -1,44 +1,48 @@
-# **Projects Section**
+# **Deployed Systems (Mission Infrastructure)**
 
 ## **Purpose**
 
-The Projects section is the core evidence library of the portfolio. It showcases previous work, demonstrating practical expertise through finished software products and case studies.
+The Deployed Systems section (`#deployments`, backwards-compatible with `#projects`) is the primary operational proof-of-work library for the portfolio. It showcases production-deployed platforms, commercial scoping engines, cognitive AI architectures, and observability tooling engineered across the full Forward Deployed Engineer (FDE) lifecycle.
 
 ---
 
 ## **Product Philosophy**
 
-Projects prove capability. Rather than telling visitors I can build software, this section shows what was built, how it was approached, and what outcomes were achieved.
+Deployed Systems prove authentic FDE execution. Rather than listing disconnected student apps or toy prototypes, this section demonstrates a unified 5-pillar operating ecosystem:
+1. **Retriever AI** (`/rag`): Enterprise Cognitive Retrieval & Multi-Tenant RAG
+2. **Scoping Studio** (`/scoping`): Autonomous Client Discovery & SOW Compiler
+3. **Client Workspace** (`/dashboard`): Commercial Mission Control & Automated Tenant Provisioning
+4. **PrateekSync AI** (`scripts/synchronizer.py`): Local Streamlit CMS & AST Architecture Knowledge Engine
+5. **Systems Terminal** (`/terminal`): Interactive Web CLI & Realtime Diagnostics Shell
 
 ---
 
 ## **User Goals**
 
-* **Hiring a Developer**: Evaluate code quality, technical choices, structural architecture, engineering hurdles, and GitHub repositories.
-* **Need a Website**: Review design polish, user flow solutions, business outcomes, and client value.
+* **Enterprise Clients & Founders**: Test live systems, evaluate commercial scoping rigor, and verify closed-loop delivery capabilities.
+* **Engineering Leaders**: Audit architectural topologies (Hexagonal, pgvector, AST graphs, local Ollama on VPS), code quality, and security boundaries.
 
 ---
 
 ## **Behavior**
 
-* Projects are rendered in a responsive card grid.
-* Selecting a project opens a detailed case study sub-page or modal.
+* Systems are rendered in a responsive Bento Grid (flagship hero card spanning the top row, with a 2×2 grid of systems below) with retro browser window chrome, system role tags (`SYS-01` through `SYS-05`), and live telemetry pulse badges (`● LIVE ON ORACLE VPS`, `● REALTIME PRICING ENGINE`, `● PKCE SESSION GATE`, `● LOCAL STREAMLIT COCKPIT`, `● LIVE WEB TELEMETRY`).
+* Selecting a card opens an in-depth case study modal featuring Mission & Overview, Architecture & Stack, and Engineering Challenges & Solutions.
+* Direct action buttons allow instant navigation to live applications and source code inspection.
 
 ---
 
 ## **Adaptive Behavior**
 
-* **Developer Mode (Engineering Case Studies)**:
-  * Prioritizes technical architecture descriptions.
-  * Displays repository status, code patterns, and direct links to GitHub.
-  * Lists detailed technology logs and implementation lessons.
-* **Business Mode (Client Case Studies)**:
-  * Prioritizes the business problem and the final solution.
-  * Highlights outcomes, user-experience decisions, and project metrics.
-  * Displays layout screenshots and links to the live website.
+* **Developer Mode**:
+  * Title: `DEPLOYED SYSTEMS`
+  * Prioritizes technical architecture descriptions, infrastructure topologies, and GitHub repositories.
+* **Business Mode**:
+  * Title: `SYSTEM ARCHITECTURE & DEPLOYMENTS`
+  * Prioritizes business pain points, ROI, requirement modeling, and commercial delivery transparency.
 * **Visual Identity (Azure/Noir)**:
-  * Azure: Projects feature bright color gradients, interactive tag overlays, and smooth hover scales.
-  * Noir: Projects are styled as high-contrast card panels with subtle outline glows.
+  * Azure: Cold-press paper cards, terracotta & slate blue accents, crisp borders.
+  * Noir: Obsidian glass panels, glowing cyan and neon green telemetry pulse badges, cyber-monospace typography.
 
 ---
 
