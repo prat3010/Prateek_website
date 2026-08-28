@@ -96,17 +96,30 @@ CREATE TABLE IF NOT EXISTS projects (
   "isLive" BOOLEAN NOT NULL DEFAULT FALSE,
   status TEXT NOT NULL DEFAULT 'soon' CHECK (status IN ('live', 'soon', 'personal')),
   category TEXT DEFAULT 'fullstack',
+  "ctaLabel" TEXT DEFAULT '',
+  "systemRole" TEXT DEFAULT '',
+  "telemetryBadge" TEXT DEFAULT '',
   "architectureHighlights" JSONB DEFAULT '[]',
+  "architectureHighlights_business" JSONB DEFAULT '[]',
   challenges JSONB DEFAULT '[]',
+  "challenges_business" JSONB DEFAULT '[]',
   "keyDeliverables" JSONB DEFAULT '[]',
+  "keyDeliverables_business" JSONB DEFAULT '[]',
+  metrics JSONB DEFAULT '[]',
+  "metrics_business" JSONB DEFAULT '[]',
   created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
 ALTER TABLE projects ADD COLUMN IF NOT EXISTS category TEXT DEFAULT 'fullstack';
 ALTER TABLE projects ADD COLUMN IF NOT EXISTS "architectureHighlights" JSONB DEFAULT '[]';
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS "architectureHighlights_business" JSONB DEFAULT '[]';
 ALTER TABLE projects ADD COLUMN IF NOT EXISTS challenges JSONB DEFAULT '[]';
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS "challenges_business" JSONB DEFAULT '[]';
 ALTER TABLE projects ADD COLUMN IF NOT EXISTS "keyDeliverables" JSONB DEFAULT '[]';
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS "keyDeliverables_business" JSONB DEFAULT '[]';
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS "metrics" JSONB DEFAULT '[]';
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS "metrics_business" JSONB DEFAULT '[]';
 
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow public select projects" ON projects;

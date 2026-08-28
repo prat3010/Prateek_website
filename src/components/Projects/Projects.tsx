@@ -421,98 +421,148 @@ function Projects({ projects }: ProjectsProps) {
                 </button>
               </div>
 
-              {activeModalTab === 'overview' && (
-                <>
-                  <div className={styles.modalImageWrapper}>
-                    <ProjectImage
-                      src={isNoir ? selected.image.replace(/\.webp$/, '-noir.webp') : selected.image}
-                      fallbackSrc={selected.image}
-                      alt={selected.title}
-                      width={600}
-                      height={400}
-                      className={styles.modalImage}
-                    />
-                  </div>
+              {(() => {
+                const isBiz = activeAudience === 'business';
+                const resolvedDescription = (isBiz && selected.longDescription_business) ? selected.longDescription_business : selected.longDescription;
+                const resolvedHighlights = (isBiz && selected.architectureHighlights_business && selected.architectureHighlights_business.length > 0)
+                  ? selected.architectureHighlights_business
+                  : selected.architectureHighlights;
+                const resolvedChallenges = (isBiz && selected.challenges_business && selected.challenges_business.length > 0)
+                  ? selected.challenges_business
+                  : selected.challenges;
+                const resolvedDeliverables = (isBiz && selected.keyDeliverables_business && selected.keyDeliverables_business.length > 0)
+                  ? selected.keyDeliverables_business
+                  : selected.keyDeliverables;
+                const resolvedMetrics = (isBiz && selected.metrics_business && selected.metrics_business.length > 0)
+                  ? selected.metrics_business
+                  : selected.metrics;
 
-                  <p className={styles.modalDescription}>
-                    {activeAudience === 'business' && selected.longDescription_business
-                      ? selected.longDescription_business
-                      : selected.longDescription}
-                  </p>
-
-                  <div className={styles.modalTags}>
-                    {selected.tags.map((tag) => (
-                      <span key={tag} className={styles.tag}>
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </>
-              )}
-
-              {activeModalTab === 'architecture' && (
-                <div className={styles.architectureTabContent}>
-                  <h4 className={styles.subHeading}>Key Technical Architecture</h4>
-                  {selected.architectureHighlights && selected.architectureHighlights.length > 0 ? (
-                    <ul className={styles.architectureList}>
-                      {selected.architectureHighlights.map((point, idx) => (
-                        <li key={idx} className={styles.architectureItem}>
-                          <Code2 size={16} className={styles.bulletIcon} />
-                          <span>{point}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className={styles.modalDescription}>
-                      {selected.longDescription}
-                    </p>
-                  )}
-
-                  <h4 className={styles.subHeading} style={{ marginTop: '1.25rem' }}>Technologies & Deployment Stack</h4>
-                  <div className={styles.modalTags}>
-                    {selected.tags.map((tag) => (
-                      <span key={tag} className={styles.tag}>
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {activeModalTab === 'challenges' && (
-                <div className={styles.challengesTabContent}>
-                  <h4 className={styles.subHeading}>Engineering Challenges & Solutions</h4>
-                  {selected.challenges && selected.challenges.length > 0 ? (
-                    <div className={styles.challengesList}>
-                      {selected.challenges.map((item, idx) => (
-                        <div key={idx} className={styles.challengeCard}>
-                          <div className={styles.challengeHeader}>
-                            <strong>Challenge:</strong> {item.challenge}
-                          </div>
-                          <div className={styles.solutionBody}>
-                            <strong>Solution:</strong> {item.solution}
-                          </div>
+                return (
+                  <>
+                    {activeModalTab === 'overview' && (
+                      <>
+                        <div className={styles.modalImageWrapper}>
+                          <ProjectImage
+                            src={isNoir ? selected.image.replace(/\.webp$/, '-noir.webp') : selected.image}
+                            fallbackSrc={selected.image}
+                            alt={selected.title}
+                            width={600}
+                            height={400}
+                            className={styles.modalImage}
+                          />
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className={styles.modalDescription}>
-                      The architecture was engineered for modularity, low query latency, and high system reliability.
-                    </p>
-                  )}
 
-                  {selected.keyDeliverables && selected.keyDeliverables.length > 0 && (
-                    <>
-                      <h4 className={styles.subHeading} style={{ marginTop: '1.25rem' }}>Core Deliverables</h4>
-                      <ul className={styles.deliverablesList}>
-                        {selected.keyDeliverables.map((deliv, idx) => (
-                          <li key={idx} className={styles.deliverableItem}>✓ {deliv}</li>
-                        ))}
-                      </ul>
-                    </>
-                  )}
-                </div>
-              )}
+                        {resolvedMetrics && resolvedMetrics.length > 0 && (
+                          <div className={styles.metricsGrid}>
+                            {resolvedMetrics.map((m, idx) => (
+                              <div key={idx} className={styles.metricCard}>
+                                <div className={styles.metricValue}>{m.value}</div>
+                                <div className={styles.metricLabel}>{m.label}</div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        <p className={styles.modalDescription}>
+                          {resolvedDescription}
+                        </p>
+
+                        <div className={styles.modalTags}>
+                          {selected.tags.map((tag) => (
+                            <span key={tag} className={styles.tag}>
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </>
+                    )}
+
+                    {activeModalTab === 'architecture' && (
+                      <div className={styles.architectureTabContent}>
+                        <h4 className={styles.subHeading}>
+                          {isBiz ? 'Enterprise Architecture & Business Capabilities' : 'Key Technical Architecture'}
+                        </h4>
+                        {resolvedHighlights && resolvedHighlights.length > 0 ? (
+                          <ul className={styles.architectureList}>
+                            {resolvedHighlights.map((point, idx) => (
+                              <li key={idx} className={styles.architectureItem}>
+                                <Code2 size={16} className={styles.bulletIcon} />
+                                <span>{point}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className={styles.modalDescription}>
+                            {resolvedDescription}
+                          </p>
+                        )}
+
+                        {resolvedMetrics && resolvedMetrics.length > 0 && (
+                          <>
+                            <h4 className={styles.subHeading} style={{ marginTop: '1.25rem' }}>Verified Performance Benchmarks</h4>
+                            <div className={styles.metricsGrid}>
+                              {resolvedMetrics.map((m, idx) => (
+                                <div key={idx} className={styles.metricCard}>
+                                  <div className={styles.metricValue}>{m.value}</div>
+                                  <div className={styles.metricLabel}>{m.label}</div>
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        )}
+
+                        <h4 className={styles.subHeading} style={{ marginTop: '1.25rem' }}>Technologies & Deployment Stack</h4>
+                        <div className={styles.modalTags}>
+                          {selected.tags.map((tag) => (
+                            <span key={tag} className={styles.tag}>
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {activeModalTab === 'challenges' && (
+                      <div className={styles.challengesTabContent}>
+                        <h4 className={styles.subHeading}>
+                          {isBiz ? 'Commercial & Operational Challenges Solved' : 'Engineering Challenges & Solutions'}
+                        </h4>
+                        {resolvedChallenges && resolvedChallenges.length > 0 ? (
+                          <div className={styles.challengesList}>
+                            {resolvedChallenges.map((item, idx) => (
+                              <div key={idx} className={styles.challengeCard}>
+                                <div className={styles.challengeHeader}>
+                                  <strong>{isBiz ? 'Obstacle:' : 'Challenge:'}</strong> {item.challenge}
+                                </div>
+                                <div className={styles.solutionBody}>
+                                  <strong>Solution:</strong> {item.solution}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className={styles.modalDescription}>
+                            The architecture was engineered for modularity, low query latency, and high system reliability.
+                          </p>
+                        )}
+
+                        {resolvedDeliverables && resolvedDeliverables.length > 0 && (
+                          <>
+                            <h4 className={styles.subHeading} style={{ marginTop: '1.25rem' }}>
+                              {isBiz ? 'Commercial Deliverables' : 'Core Technical Deliverables'}
+                            </h4>
+                            <ul className={styles.deliverablesList}>
+                              {resolvedDeliverables.map((deliv, idx) => (
+                                <li key={idx} className={styles.deliverableItem}>✓ {deliv}</li>
+                              ))}
+                            </ul>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
 
               <div className={styles.modalActions}>
                 {selected.liveUrl && selected.liveUrl.startsWith('/') ? (

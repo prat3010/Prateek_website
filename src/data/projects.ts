@@ -3,6 +3,12 @@ export interface CaseStudyChallenge {
   solution: string;
 }
 
+export interface ProjectMetric {
+  label: string;
+  value: string;
+  description?: string;
+}
+
 export interface Project {
   id: string;
   title: string;
@@ -22,7 +28,12 @@ export interface Project {
   systemRole?: string;
   telemetryBadge?: string;
   architectureHighlights?: string[];
+  architectureHighlights_business?: string[];
   challenges?: CaseStudyChallenge[];
+  challenges_business?: CaseStudyChallenge[];
   keyDeliverables?: string[];
+  keyDeliverables_business?: string[];
+  metrics?: ProjectMetric[];
+  metrics_business?: ProjectMetric[];
 }
 

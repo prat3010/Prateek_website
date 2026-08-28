@@ -28,6 +28,14 @@ import {
 } from '@/lib/terminalScoping';
 import { generateQuestionnairePDF } from '@/utils/pdfGenerator';
 import type { BaseEngineItem, FeatureItem, BrandAssetOption, MaintenancePlanOption } from '@/data/resume';
+import {
+  TERMINAL_PITCH_LINES,
+  TERMINAL_ARCHITECTURE_LINES,
+  TERMINAL_WAR_STORIES_LINES,
+  TERMINAL_TEST_SUITE_LINES,
+  handleInterviewModeCommand,
+  type InterviewSessionState,
+} from '@/lib/terminalPresentation';
 
 function consoleBandRange(band: CommissionBand): string {
   if (band.minINR == null) return `up to ₹${band.maxINR?.toLocaleString('en-IN')} / $${band.maxUSD?.toLocaleString('en-US')}`;
@@ -79,6 +87,7 @@ export default function SiteInfoConsole() {
   }, []);
   const { isNoir } = useTheme();
   const [scopeSession, setScopeSession] = useState<TerminalScopeSession>(() => createInitialTerminalScopeSession('INR'));
+  const [interviewSession, setInterviewSession] = useState<InterviewSessionState>({ step: 'role_select' });
   const [terminalInput, setTerminalInput] = useState('');
   const [terminalHistory, setTerminalHistory] = useState<ConsoleLine[]>(
     BOOT_LOGS.map(log => ({ text: log, type: 'success' }))
@@ -303,6 +312,46 @@ export default function SiteInfoConsole() {
     setTerminalHistory(prev => [...prev, { text: `> ${cmd}`, type: 'input' }]);
 
     let response: ConsoleLine[] = [];
+
+    if (['pitch', 'why-hire', 'whyhire', 'story', 'about'].includes(trimmedCmd)) {
+      setTerminalHistory(prev => [...prev, ...TERMINAL_PITCH_LINES]);
+      unlockAchievement('presentation_master', 'Architectural Storyteller', 'Explored the executive system architecture pitch');
+      setTerminalInput('');
+      return;
+    }
+
+    if (['architecture', 'system-design', 'systemdesign', 'sysdesign', 'blueprint'].includes(trimmedCmd)) {
+      setTerminalHistory(prev => [...prev, ...TERMINAL_ARCHITECTURE_LINES]);
+      unlockAchievement('presentation_master', 'Architectural Storyteller', 'Explored the master 8-tier architecture blueprint');
+      setTerminalInput('');
+      return;
+    }
+
+    if (['war-stories', 'warstories', 'learnings', 'postmortems', 'postmortem'].includes(trimmedCmd)) {
+      setTerminalHistory(prev => [...prev, ...TERMINAL_WAR_STORIES_LINES]);
+      unlockAchievement('presentation_master', 'Architectural Storyteller', 'Inspected production engineering war stories');
+      setTerminalInput('');
+      return;
+    }
+
+    if (['tests', 'test', 'test-suite', 'testsuite', 'vitest', 'pytest'].includes(trimmedCmd)) {
+      setTerminalHistory(prev => [...prev, ...TERMINAL_TEST_SUITE_LINES]);
+      unlockAchievement('presentation_master', 'Architectural Storyteller', 'Inspected the 330+ automated test suite matrix');
+      setTerminalInput('');
+      return;
+    }
+
+    if (
+      ['interview', 'interview-mode', 'interviewmode', 'demo'].includes(trimmedCmd) ||
+      (interviewSession.step === 'role_select' && (trimmedCmd === '1' || trimmedCmd === '2' || trimmedCmd.startsWith('1 ') || trimmedCmd.startsWith('2 ')))
+    ) {
+      const result = handleInterviewModeCommand(cmd, interviewSession);
+      setInterviewSession(result.nextState);
+      setTerminalHistory(prev => [...prev, ...result.lines]);
+      unlockAchievement('presentation_master', 'Architectural Storyteller', 'Completed an interactive role-tailored interview walkthrough');
+      setTerminalInput('');
+      return;
+    }
 
     if (trimmedCmd.startsWith('scope') || trimmedCmd === 'cart' || trimmedCmd.startsWith('cart ')) {
       const { engines, features, brandAssets, maintenancePlans } = (profileData.intake || questionnaireDefaults) as {
@@ -732,6 +781,11 @@ export default function SiteInfoConsole() {
       case 'help':
         response = [
           { text: 'Available commands:', type: 'success' },
+          { text: '  pitch       - Executive Summary & Core Engineering Superpowers', type: 'output' },
+          { text: '  architecture- Master 8-Tier Developer Ecosystem Architecture Blueprint', type: 'output' },
+          { text: '  tests       - Inspect 330+ automated test suites & verification matrix', type: 'output' },
+          { text: '  war-stories - Real-world production engineering feats & tough traps solved', type: 'output' },
+          { text: '  interview   - Interactive role-tailored interview console (CTO vs Founder)', type: 'output' },
           { text: '  scope <cmd> - Interactive Architecture Scoping CLI (new, list, analyze, add, remove, export, checkout)', type: 'output' },
           { text: '  cart        - View active scoping bill of materials and price ledger', type: 'output' },
           { text: '  ask <query> - Query Retriever Concierge vector memory for platform specs & docs', type: 'output' },
@@ -970,7 +1024,21 @@ export default function SiteInfoConsole() {
 
     setTerminalHistory(prev => [...prev, ...response]);
     setTerminalInput('');
-  }, [projects, profileData, isNoir, stats, isMatrixActive, unlockAchievement]);
+  }, [projects, profileData, isNoir, stats, isMatrixActive, unlockAchievement, interviewSession, scopeSession]);
+
+  // URL query parameter auto-execution (e.g. /terminal?exec=pitch or /terminal?cmd=interview-mode)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const autoCmd = params.get('exec') || params.get('cmd');
+      if (autoCmd) {
+        const timer = setTimeout(() => {
+          executeCommand(autoCmd);
+        }, 150);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [executeCommand]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
