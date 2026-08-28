@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
@@ -22,17 +22,24 @@ import {
   Compass,
   FileCheck,
   FileText,
-  X
+  X,
+  Sliders,
+  ExternalLink,
+  Sparkles,
+  Lock,
+  ArrowRight,
+  RefreshCw
 } from 'lucide-react';
 import Portal from '@/components/ui/Portal';
 import { generateQuestionnairePDF, generateInvoicePDF } from '@/utils/pdfGenerator';
-import { dbToClientScope, type ClientScope, type InvoiceEntity, type CreateInvoiceInput } from '@/lib/clientOrder';
+import { dbToClientScope, type ClientScope, type InvoiceEntity, type CreateInvoiceInput, type ScopeChangeOrderEntity } from '@/lib/clientOrder';
 import { generateOnboardingChecklist, calcOnboardingReadiness } from '@/lib/onboardingChecklist';
 import { calculateInvoiceTotals, SUPPORTED_CURRENCIES, formatCurrencyAmount } from '@/lib/invoicing';
 import resumeData from '@/data/resume.json';
 import intakeDefaults from '@/data/intakeQuestionnaireDefaults.json';
-import { calcQuote } from '@/lib/pricing';
-import type { ResumeData } from '@/data/resume';
+import { calcQuote, resolveFeatureDependencies, findDependentFeatures, formatPricePair, type Currency, type PromoDiscountInfo } from '@/lib/pricing';
+import type { ResumeData, FeatureItem } from '@/data/resume';
+import { DependencyCascadeModal } from '@/components/Intake/DependencyCascadeModal';
 import { m } from 'framer-motion';
 import NumberFlow from '@number-flow/react';
 import WorkspaceSwitcher from '@/components/ui/WorkspaceSwitcher';
@@ -148,9 +155,46 @@ export default function ClientDashboardPage() {
     },
   ]);
 
-  // Profile setup state for pre-fetched Google details
   const [companyInputs, setCompanyInputs] = useState<Record<string, string>>({});
   const [phoneInputs, setPhoneInputs] = useState<Record<string, string>>({});
+
+  // SOTA Customizer Modal State
+  const [customizingScope, setCustomizingScope] = useState<ClientScope | null>(null);
+  const [custEngineId, setCustEngineId] = useState<string>('multipage');
+  const [custFeatureIds, setCustFeatureIds] = useState<string[]>([]);
+  const [custBrandId, setCustBrandId] = useState<string>('none');
+  const [custMaintenanceId, setCustMaintenanceId] = useState<string>('none');
+  const [custCurrency, setCustCurrency] = useState<Currency>('INR');
+  const [custPromoCode, setCustPromoCode] = useState<PromoDiscountInfo | null>(null);
+  const [promoInput, setPromoInput] = useState('');
+  const [promoLoading, setPromoLoading] = useState(false);
+  const [promoMessage, setPromoMessage] = useState<string | null>(null);
+  const [isSubmittingChangeOrder, setIsSubmittingChangeOrder] = useState(false);
+
+  // Dependency Cascade Modal State
+  const [cascadeTarget, setCascadeTarget] = useState<FeatureItem | null>(null);
+  const [cascadeDependents, setCascadeDependents] = useState<FeatureItem[]>([]);
+
+  // Change Orders List State per scope
+  const [scopeChangeOrders, setScopeChangeOrders] = useState<Record<string, ScopeChangeOrderEntity[]>>({});
+
+  // Real-time Quote Calculation for SOTA Customizer
+  const custQuote = useMemo(() => {
+    return calcQuote(
+      intakeDefaults.engines,
+      intakeDefaults.features,
+      intakeDefaults.brandAssets,
+      intakeDefaults.maintenancePlans,
+      {
+        engineId: custEngineId,
+        featureIds: custFeatureIds,
+        brandAssetId: custBrandId,
+        maintenancePlanId: custMaintenanceId,
+        promoCode: custPromoCode,
+      },
+      custCurrency
+    );
+  }, [custEngineId, custFeatureIds, custBrandId, custMaintenanceId, custPromoCode, custCurrency]);
 
   // Storage & Cookie Fallback Reader for Safari ITP protection
   const getPendingScopeFromStorage = (): string | null => {
@@ -233,6 +277,9 @@ export default function ClientDashboardPage() {
           signedAt: updatedScope.signed_at,
           signedByEmail: updatedScope.signed_by_email,
           onboardingChecklist: updatedScope.onboarding_checklist || {},
+          sowHash: updatedScope.sow_hash,
+          retrieverTenantId: updatedScope.retriever_tenant_id,
+          metadata: updatedScope.metadata || {},
         }),
       })
         .then((res) => {
@@ -241,6 +288,190 @@ export default function ClientDashboardPage() {
     },
     [user?.email, getAccessToken]
   );
+
+  const loadChangeOrders = useCallback(async (scopeCode: string) => {
+    const accessToken = await getAccessToken();
+    if (!accessToken) return;
+    try {
+      const res = await fetch(`/api/client/change-orders?scopeCode=${encodeURIComponent(scopeCode)}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const data = await res.json();
+      if (data?.changeOrders) {
+        setScopeChangeOrders((prev) => ({ ...prev, [scopeCode]: data.changeOrders }));
+      }
+    } catch (err) {
+      console.warn('Failed to load change orders:', err);
+    }
+  }, [getAccessToken]);
+
+  const openCustomizer = (scope: ClientScope) => {
+    setCustomizingScope(scope);
+    const matchedEngine = intakeDefaults.engines.find(
+      (e) => e.title.toLowerCase() === scope.base_engine.toLowerCase() ||
+             scope.base_engine.toLowerCase().includes(e.title.toLowerCase())
+    ) || intakeDefaults.engines[1];
+    setCustEngineId(matchedEngine.id);
+
+    const matchedFeatureIds = intakeDefaults.features
+      .filter((f) =>
+        scope.features.some(
+          (featStr) => featStr.toLowerCase().includes(f.label.toLowerCase()) || f.label.toLowerCase().includes(featStr.toLowerCase())
+        )
+      )
+      .map((f) => f.id);
+    setCustFeatureIds(matchedFeatureIds);
+
+    const matchedBrand = intakeDefaults.brandAssets.find(
+      (b) => b.label.toLowerCase().includes((scope.brand_asset || '').toLowerCase())
+    ) || intakeDefaults.brandAssets[0];
+    setCustBrandId(matchedBrand.id);
+
+    const matchedMaint = intakeDefaults.maintenancePlans.find(
+      (m) => m.name.toLowerCase().includes((scope.maintenance_plan || '').toLowerCase())
+    ) || intakeDefaults.maintenancePlans[0];
+    setCustMaintenanceId(matchedMaint.id);
+
+    setCustCurrency((scope.currency === 'USD' ? 'USD' : 'INR') as Currency);
+    setCustPromoCode(null);
+    setPromoInput('');
+    setPromoMessage(null);
+  };
+
+  const handleToggleCustomizerFeature = (featureId: string) => {
+    if (custFeatureIds.includes(featureId)) {
+      const dependents = findDependentFeatures(featureId, custFeatureIds, intakeDefaults.features);
+      if (dependents.length > 0) {
+        const target = intakeDefaults.features.find((f) => f.id === featureId) || null;
+        setCascadeTarget(target);
+        setCascadeDependents(dependents);
+        return;
+      }
+      setCustFeatureIds((prev) => prev.filter((id) => id !== featureId));
+    } else {
+      const resolvedExtra = resolveFeatureDependencies([featureId], intakeDefaults.features);
+      setCustFeatureIds((prev) => Array.from(new Set([...prev, featureId, ...resolvedExtra])));
+    }
+  };
+
+  const handleConfirmCascadeRemove = () => {
+    if (!cascadeTarget) return;
+    const dependentIds = new Set(cascadeDependents.map((d) => d.id));
+    dependentIds.add(cascadeTarget.id);
+    setCustFeatureIds((prev) => prev.filter((id) => !dependentIds.has(id)));
+    setCascadeTarget(null);
+    setCascadeDependents([]);
+  };
+
+  const handleValidateCustomizerPromo = async () => {
+    if (!promoInput.trim()) return;
+    setPromoLoading(true);
+    setPromoMessage(null);
+    try {
+      const res = await fetch('/api/scoping/validate-promo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: promoInput.trim(),
+          currency: custCurrency,
+        }),
+      });
+      const data = await res.json();
+      if (data.valid && data.promo) {
+        setCustPromoCode({
+          code: data.promo.code,
+          discountType: data.promo.discount_type || 'percentage',
+          discountValue: Number(data.promo.discount_value) || 0,
+          discountAmountINR: Number(data.promo.discount_amount_inr) || 0,
+          discountAmountUSD: Number(data.promo.discount_amount_usd) || 0,
+        });
+        setPromoMessage(`✅ Promo '${data.promo.code}' applied!`);
+      } else {
+        setPromoMessage(`❌ ${data.error || 'Invalid promo code'}`);
+      }
+    } catch {
+      setPromoMessage('❌ Failed to validate promo code.');
+    } finally {
+      setPromoLoading(false);
+    }
+  };
+
+  const handleSaveCustomizer = async () => {
+    if (!customizingScope) return;
+
+    if (!customizingScope.deposit_paid) {
+      // Draft mode: direct update
+      const updatedScope: ClientScope = {
+        ...customizingScope,
+        base_engine: custQuote.engine?.title || customizingScope.base_engine,
+        features: custQuote.features.map((f) => f.label),
+        brand_asset: custQuote.brandAsset?.label || customizingScope.brand_asset,
+        maintenance_plan: custQuote.maintenancePlan?.name || customizingScope.maintenance_plan,
+        total_cost_inr: custQuote.netTotalINR,
+        total_cost_usd: custQuote.netTotalUSD,
+        currency: custCurrency,
+        metadata: {
+          ...customizingScope.metadata,
+          engineId: custEngineId,
+          featureIds: custFeatureIds,
+        },
+      };
+
+      setScopes((prev) => prev.map((s) => (s.id === customizingScope.id ? updatedScope : s)));
+      await saveScopeToDatabase(updatedScope);
+      setCustomizingScope(null);
+    } else {
+      // Deposit paid: submit Phase 2 Change Order
+      setIsSubmittingChangeOrder(true);
+      try {
+        const baselineFeatureIds = intakeDefaults.features
+          .filter((f) =>
+            customizingScope.features.some(
+              (featStr) => featStr.toLowerCase().includes(f.label.toLowerCase()) || f.label.toLowerCase().includes(featStr.toLowerCase())
+            )
+          )
+          .map((f) => f.id);
+
+        const addedIds = custFeatureIds.filter((id) => !baselineFeatureIds.includes(id));
+        const removedIds = baselineFeatureIds.filter((id) => !custFeatureIds.includes(id));
+
+        const deltaINR = Math.max(0, custQuote.netTotalINR - customizingScope.total_cost_inr);
+        const deltaUSD = Math.max(0, custQuote.netTotalUSD - customizingScope.total_cost_usd);
+
+        const accessToken = await getAccessToken();
+        const res = await fetch('/api/client/change-orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+          },
+          body: JSON.stringify({
+            scopeCode: customizingScope.scope_code,
+            addedFeatures: addedIds.map((id) => intakeDefaults.features.find((f) => f.id === id)?.label || id),
+            removedFeatures: removedIds.map((id) => intakeDefaults.features.find((f) => f.id === id)?.label || id),
+            priceDeltaINR: deltaINR,
+            priceDeltaUSD: deltaUSD,
+            timelineImpact: addedIds.length > 2 ? '+2 Weeks' : addedIds.length > 0 ? '+1 Week' : 'Standard Delivery',
+          }),
+        });
+
+        if (res.ok) {
+          await loadChangeOrders(customizingScope.scope_code);
+          await loadInvoices();
+          setCustomizingScope(null);
+          alert('✅ Phase 2 Change Order submitted and added to Invoices ledger!');
+        } else {
+          const errData = await res.json().catch(() => ({}));
+          alert(`Change Order Error: ${errData.error || 'Failed to create change order'}`);
+        }
+      } catch (err) {
+        console.error('Change order submit error:', err);
+        alert('Failed to submit change order.');
+      } finally {
+        setIsSubmittingChangeOrder(false);
+      }
+    }
+  };
 
   const handleOpenSignoffModal = (scope: ClientScope) => {
     setSigningScope(scope);
@@ -309,6 +540,10 @@ export default function ClientDashboardPage() {
           if (!mounted || !data?.scopes) return;
 
           const dbScopes: ClientScope[] = data.scopes.map(dbToClientScope);
+
+          dbScopes.forEach((s) => {
+            loadChangeOrders(s.scope_code);
+          });
 
           setScopes((prev) => {
             // Merge db scopes with any local pending scope not yet in DB
@@ -939,225 +1174,216 @@ export default function ClientDashboardPage() {
                 </a>
               </div>
             ) : (
-              scopes.map((s) => {
-                const totalAmount = s.currency === 'INR' ? s.total_cost_inr : s.total_cost_usd;
-                const depositAmount = Math.round(totalAmount * 0.5);
-                const isEditing = editingScopeId === s.id;
-                const needsProfileConfirmation = !s.company_name || s.company_name === 'My Custom Project';
-
-                return (
-                  <div key={s.id} className={styles.orderCard}>
-                    <div className={styles.orderHeader}>
-                      <div>
-                        <span className={styles.scopeBadge}>{s.scope_code}</span>
-                        <h3 className={styles.companyName}>
-                          {s.company_name || user.user_metadata?.full_name || 'My Custom Project'}
-                        </h3>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span className={`${styles.statusBadge} ${s.deposit_paid ? styles.statusPaid : styles.statusDraft}`}>
-                          {s.deposit_paid ? 'DEPOSIT PAID (50%)' : 'DRAFT PROPOSAL'}
-                        </span>
-                        <button
-                          type="button"
-                          className="comic-btn comic-btn-outline"
-                          title={s.deposit_paid ? 'Paid scopes in active engineering cannot be deleted.' : 'Delete unpaid draft proposal'}
-                          disabled={s.deposit_paid}
-                          onClick={() => handleDeleteScope(s.scope_code, s.deposit_paid)}
-                          style={{
-                            padding: '0.3rem 0.6rem',
-                            opacity: s.deposit_paid ? 0.4 : 1,
-                            cursor: s.deposit_paid ? 'not-allowed' : 'pointer',
-                          }}
-                        >
-                          <Trash2 size={14} color={s.deposit_paid ? '#888' : '#ff4444'} />
-                        </button>
-                      </div>
+              <>
+                {/* Dedicated Retriever SaaS Tenant 7-Day Trial Gateway */}
+                <div className={styles.retrieverTrialCard}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                      <span className={styles.retrieverTrialBadge}>🚀 7-Day Trial Activated</span>
+                      <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>Dedicated Retriever AI Tenant Provisioned</h3>
                     </div>
+                    <p style={{ margin: 0, fontSize: '0.85rem', opacity: 0.85 }}>
+                      Your workspace AI copilot is grounded in your project architecture SOW baseline. Access your Document Library, test hybrid vector search, or configure embed snippets in Retriever Studio.
+                    </p>
+                  </div>
+                  <a
+                    href="/rag/app"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="comic-btn comic-btn-blue"
+                    style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', whiteSpace: 'nowrap' }}
+                  >
+                    Open Retriever Studio <ExternalLink size={14} />
+                  </a>
+                </div>
 
-                    {/* Pre-fetched Profile Confirmation Banner */}
-                    {needsProfileConfirmation && (
-                      <div className={styles.profileConfirmBox}>
-                        <div className={styles.profileConfirmHeader}>
-                          <UserCheck size={18} />
-                          <span>Confirm Client Details (Prefetched from Google Auth)</span>
+                {scopes.map((s) => {
+                  const totalAmount = s.currency === 'INR' ? s.total_cost_inr : s.total_cost_usd;
+                  const depositAmount = Math.round(totalAmount * 0.5);
+                  const needsProfileConfirmation = !s.company_name || s.company_name === 'My Custom Project';
+
+                  return (
+                    <div key={s.id} className={styles.orderCard}>
+                      <div className={styles.orderHeader}>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <span className={styles.scopeBadge}>{s.scope_code}</span>
+                            {s.sow_hash && (
+                              <span className={styles.sowSealBadge} title={`SHA-256 SOW Hash: ${s.sow_hash}`}>
+                                <Lock size={11} /> SOW Sealed: {s.sow_hash.substring(0, 8)}...{s.sow_hash.substring(s.sow_hash.length - 4)}
+                              </span>
+                            )}
+                          </div>
+                          <h3 className={styles.companyName} style={{ marginTop: '0.25rem' }}>
+                            {s.company_name || user.user_metadata?.full_name || 'My Custom Project'}
+                          </h3>
                         </div>
-                        <div className={styles.profileGrid}>
-                          <div>
-                            <label className={styles.inputLabel}>Name (Google Auth)</label>
-                            <input
-                              type="text"
-                              disabled
-                              readOnly
-                              aria-label="Name from Google Auth"
-                              value={user.user_metadata?.full_name || 'Prefetched Client'}
-                              className={styles.readOnlyInput}
-                            />
-                          </div>
-                          <div>
-                            <label className={styles.inputLabel}>Email (Google Auth)</label>
-                            <input
-                              type="email"
-                              disabled
-                              readOnly
-                              aria-label="Email from Google Auth"
-                              value={user.email || ''}
-                              className={styles.readOnlyInput}
-                            />
-                          </div>
-                          <div>
-                            <label className={styles.inputLabel}>Company / Project Name</label>
-                            <input
-                              type="text"
-                              placeholder="e.g. Acme Tech Labs"
-                              aria-label="Company or Project Name"
-                              value={companyInputs[s.id] ?? (s.company_name === 'My Custom Project' ? '' : s.company_name)}
-                              onChange={(e) => setCompanyInputs({ ...companyInputs, [s.id]: e.target.value })}
-                              className={styles.profileInput}
-                            />
-                          </div>
-                          <div>
-                            <label className={styles.inputLabel}>Phone / WhatsApp (Optional)</label>
-                            <input
-                              type="tel"
-                              placeholder="+91 98765 43210"
-                              aria-label="Phone or WhatsApp Number"
-                              value={phoneInputs[s.id] ?? (s.client_phone || '')}
-                              onChange={(e) => setPhoneInputs({ ...phoneInputs, [s.id]: e.target.value })}
-                              className={styles.profileInput}
-                            />
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          className="comic-btn comic-btn-blue"
-                          style={{ marginTop: '0.75rem', fontSize: '0.85rem' }}
-                          onClick={() => handleSaveProfile(s.id)}
-                        >
-                          <Save size={14} style={{ marginRight: '0.4rem' }} /> Confirm & Save Details
-                        </button>
-                      </div>
-                    )}
-
-                    {/* Dynamic Connected Milestone Progress Bar */}
-                    {(() => {
-                      const stageLevels: Record<string, number> = {
-                        architecture: 1,
-                        engineering: 2,
-                        staging: 3,
-                        live: 4,
-                      };
-                      const currentLevel = stageLevels[s.delivery_stage || 'architecture'] || (s.deposit_paid ? 2 : 1);
-                      const progressPercentage = ((currentLevel - 1) / 3) * 100;
-
-                      return (
-                        <div className={styles.milestoneSection}>
-                          <div className={styles.milestoneHeader}>
-                            <div className={styles.milestoneHeaderLeft}>
-                              <Compass size={16} />
-                              <span>Development Milestone Tracker</span>
-                            </div>
-                            <span className={styles.phaseBadge}>
-                              {s.delivery_stage === 'live' ? '🚀 PHASE 4: PRODUCTION LAUNCH' :
-                               s.delivery_stage === 'staging' ? '🧪 PHASE 3: STAGING & QA' :
-                               s.delivery_stage === 'engineering' ? '⚡ PHASE 2: CORE ENGINEERING' :
-                               '📐 PHASE 1: ARCHITECTURE & SPECS'}
-                            </span>
-                          </div>
-
-                          <div className={styles.milestonePipeline}>
-                            <div className={styles.pipelineTrackBackdrop} />
-                            <div
-                              className={styles.pipelineTrackProgress}
-                              style={{ width: `${progressPercentage}%` }}
-                            />
-                            <div className={styles.milestoneSteps}>
-                              <div className={`${styles.milestoneStep} ${currentLevel >= 1 ? styles.stepActive : ''}`}>
-                                <span className={styles.stepDot}>1</span>
-                                <span>Architecture & Specs</span>
-                              </div>
-                              <div className={`${styles.milestoneStep} ${currentLevel >= 2 ? styles.stepActive : ''}`}>
-                                <span className={styles.stepDot}>2</span>
-                                <span>Core Engineering</span>
-                              </div>
-                              <div className={`${styles.milestoneStep} ${currentLevel >= 3 ? styles.stepActive : ''}`}>
-                                <span className={styles.stepDot}>3</span>
-                                <span>Staging & QA</span>
-                              </div>
-                              <div className={`${styles.milestoneStep} ${currentLevel >= 4 ? styles.stepActive : ''}`}>
-                                <span className={styles.stepDot}>4</span>
-                                <span>Production Launch</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })()}
-
-                    <div className={styles.orderDetails}>
-                      <p className={styles.engineName}>
-                        <strong>Base Engine Tier:</strong> {s.base_engine}
-                      </p>
-                      {s.business_kpi && (
-                        <p style={{ fontSize: '0.85rem', color: '#2563eb', fontWeight: 600, marginTop: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                          <span>🎯 Target Business KPI:</span> {s.business_kpi}
-                        </p>
-                      )}
-                      <p style={{ fontSize: '0.85rem', opacity: 0.8, marginTop: '0.2rem' }}>
-                        <Clock size={14} style={{ display: 'inline', marginRight: '0.3rem' }} />
-                        Target Timeline: {s.timeline}
-                      </p>
-
-                      <div className={styles.featuresSection}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <strong>Scope Features & Modules ({s.features.length}):</strong>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <span className={`${styles.statusBadge} ${s.deposit_paid ? styles.statusPaid : styles.statusDraft}`}>
+                            {s.deposit_paid ? 'DEPOSIT PAID (50%)' : 'DRAFT PROPOSAL'}
+                          </span>
                           <button
                             type="button"
-                            className={styles.editToggleBtn}
-                            onClick={() => setEditingScopeId(isEditing ? null : s.id)}
+                            className="comic-btn comic-btn-outline"
+                            title={s.deposit_paid ? 'Paid scopes in active engineering cannot be deleted.' : 'Delete unpaid draft proposal'}
+                            disabled={s.deposit_paid}
+                            onClick={() => handleDeleteScope(s.scope_code, s.deposit_paid)}
+                            style={{
+                              padding: '0.3rem 0.6rem',
+                              opacity: s.deposit_paid ? 0.4 : 1,
+                              cursor: s.deposit_paid ? 'not-allowed' : 'pointer',
+                            }}
                           >
-                            <Edit3 size={14} /> {isEditing ? 'Done Editing' : 'Customize Features'}
+                            <Trash2 size={14} color={s.deposit_paid ? '#888' : '#ff4444'} />
                           </button>
                         </div>
+                      </div>
 
-                        {isEditing ? (
-                          <div className={styles.editableFeaturesList}>
-                            {s.deposit_paid && (
-                              <div style={{ fontSize: '0.78rem', color: '#2563eb', padding: '0.4rem 0.6rem', background: 'rgba(37,99,235,0.08)', borderRadius: '6px', marginBottom: '0.5rem', fontWeight: 500 }}>
-                                ℹ️ Build is in active engineering. Feature additions will generate a Phase 2 milestone invoice.
-                              </div>
-                            )}
-                            {s.features.map((feat, idx) => (
-                              <div key={idx} className={styles.featureItemRow}>
-                                <span>• {feat}</span>
-                                <button
-                                  type="button"
-                                  className={styles.removeFeatureBtn}
-                                  onClick={() => handleRemoveFeature(s.id, idx)}
-                                >
-                                  <Trash2 size={13} />
-                                </button>
-                              </div>
-                            ))}
-                            <div className={styles.addFeatureRow}>
+                      {/* Pre-fetched Profile Confirmation Banner */}
+                      {needsProfileConfirmation && (
+                        <div className={styles.profileConfirmBox}>
+                          <div className={styles.profileConfirmHeader}>
+                            <UserCheck size={18} />
+                            <span>Confirm Client Details (Prefetched from Google Auth)</span>
+                          </div>
+                          <div className={styles.profileGrid}>
+                            <div>
+                              <label className={styles.inputLabel}>Name (Google Auth)</label>
                               <input
                                 type="text"
-                                className={styles.addFeatureInput}
-                                aria-label="Add custom feature to scope"
-                                placeholder="Add custom feature..."
-                                value={newFeatureInput}
-                                onChange={(e) => setNewFeatureInput(e.target.value)}
+                                disabled
+                                readOnly
+                                aria-label="Name from Google Auth"
+                                value={user.user_metadata?.full_name || 'Prefetched Client'}
+                                className={styles.readOnlyInput}
                               />
-                              <button
-                                type="button"
-                                className={styles.addFeatureBtn}
-                                onClick={() => handleAddFeature(s.id)}
-                              >
-                                <Plus size={14} /> Add
-                              </button>
+                            </div>
+                            <div>
+                              <label className={styles.inputLabel}>Email (Google Auth)</label>
+                              <input
+                                type="email"
+                                disabled
+                                readOnly
+                                aria-label="Email from Google Auth"
+                                value={user.email || ''}
+                                className={styles.readOnlyInput}
+                              />
+                            </div>
+                            <div>
+                              <label className={styles.inputLabel}>Company / Project Name</label>
+                              <input
+                                type="text"
+                                placeholder="e.g. Acme Tech Labs"
+                                aria-label="Company or Project Name"
+                                value={companyInputs[s.id] ?? (s.company_name === 'My Custom Project' ? '' : s.company_name)}
+                                onChange={(e) => setCompanyInputs({ ...companyInputs, [s.id]: e.target.value })}
+                                className={styles.profileInput}
+                              />
+                            </div>
+                            <div>
+                              <label className={styles.inputLabel}>Phone / WhatsApp (Optional)</label>
+                              <input
+                                type="tel"
+                                placeholder="+91 98765 43210"
+                                aria-label="Phone or WhatsApp Number"
+                                value={phoneInputs[s.id] ?? (s.client_phone || '')}
+                                onChange={(e) => setPhoneInputs({ ...phoneInputs, [s.id]: e.target.value })}
+                                className={styles.profileInput}
+                              />
                             </div>
                           </div>
-                        ) : (
+                          <button
+                            type="button"
+                            className="comic-btn comic-btn-blue"
+                            style={{ marginTop: '0.75rem', fontSize: '0.85rem' }}
+                            onClick={() => handleSaveProfile(s.id)}
+                          >
+                            <Save size={14} style={{ marginRight: '0.4rem' }} /> Confirm & Save Details
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Dynamic Connected Milestone Progress Bar */}
+                      {(() => {
+                        const stageLevels: Record<string, number> = {
+                          architecture: 1,
+                          engineering: 2,
+                          staging: 3,
+                          live: 4,
+                        };
+                        const currentLevel = stageLevels[s.delivery_stage || 'architecture'] || (s.deposit_paid ? 2 : 1);
+                        const progressPercentage = ((currentLevel - 1) / 3) * 100;
+
+                        return (
+                          <div className={styles.milestoneSection}>
+                            <div className={styles.milestoneHeader}>
+                              <div className={styles.milestoneHeaderLeft}>
+                                <Compass size={16} />
+                                <span>Development Milestone Tracker</span>
+                              </div>
+                              <span className={styles.phaseBadge}>
+                                {s.delivery_stage === 'live' ? '🚀 PHASE 4: PRODUCTION LAUNCH' :
+                                 s.delivery_stage === 'staging' ? '🧪 PHASE 3: STAGING & QA' :
+                                 s.delivery_stage === 'engineering' ? '⚡ PHASE 2: CORE ENGINEERING' :
+                                 '📐 PHASE 1: ARCHITECTURE & SPECS'}
+                              </span>
+                            </div>
+
+                            <div className={styles.milestonePipeline}>
+                              <div className={styles.pipelineTrackBackdrop} />
+                              <div
+                                className={styles.pipelineTrackProgress}
+                                style={{ width: `${progressPercentage}%` }}
+                              />
+                              <div className={styles.milestoneSteps}>
+                                <div className={`${styles.milestoneStep} ${currentLevel >= 1 ? styles.stepActive : ''}`}>
+                                  <span className={styles.stepDot}>1</span>
+                                  <span>Architecture & Specs</span>
+                                </div>
+                                <div className={`${styles.milestoneStep} ${currentLevel >= 2 ? styles.stepActive : ''}`}>
+                                  <span className={styles.stepDot}>2</span>
+                                  <span>Core Engineering</span>
+                                </div>
+                                <div className={`${styles.milestoneStep} ${currentLevel >= 3 ? styles.stepActive : ''}`}>
+                                  <span className={styles.stepDot}>3</span>
+                                  <span>Staging & QA</span>
+                                </div>
+                                <div className={`${styles.milestoneStep} ${currentLevel >= 4 ? styles.stepActive : ''}`}>
+                                  <span className={styles.stepDot}>4</span>
+                                  <span>Production Launch</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })()}
+
+                      <div className={styles.orderDetails}>
+                        <p className={styles.engineName}>
+                          <strong>Base Engine Tier:</strong> {s.base_engine}
+                        </p>
+                        {s.business_kpi && (
+                          <p style={{ fontSize: '0.85rem', color: '#2563eb', fontWeight: 600, marginTop: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                            <span>🎯 Target Business KPI:</span> {s.business_kpi}
+                          </p>
+                        )}
+                        <p style={{ fontSize: '0.85rem', opacity: 0.8, marginTop: '0.2rem' }}>
+                          <Clock size={14} style={{ display: 'inline', marginRight: '0.3rem' }} />
+                          Target Timeline: {s.timeline}
+                        </p>
+
+                        <div className={styles.featuresSection}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+                            <strong>Scope Features & Modules ({s.features.length}):</strong>
+                            <button
+                              type="button"
+                              className={styles.editToggleBtn}
+                              onClick={() => openCustomizer(s)}
+                            >
+                              <Sliders size={14} /> {s.deposit_paid ? 'Request Phase 2 Change Order' : 'Customize Architecture & Modules'}
+                            </button>
+                          </div>
+
                           <div className={styles.featureBadgeGrid}>
                             {s.features.map((f, i) => (
                               <span key={i} className={styles.featureBadgeTag}>
@@ -1166,73 +1392,122 @@ export default function ClientDashboardPage() {
                               </span>
                             ))}
                           </div>
+
+                          {/* Historical Phase 2 Change Orders List */}
+                          {scopeChangeOrders[s.scope_code] && scopeChangeOrders[s.scope_code].length > 0 && (
+                            <div className={styles.changeOrdersSection}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem' }}>
+                                <RefreshCw size={14} style={{ color: '#2563eb' }} />
+                                <strong>Phase 2 Change Orders ({scopeChangeOrders[s.scope_code].length}):</strong>
+                              </div>
+                              <table className={styles.changeOrdersTable}>
+                                <thead>
+                                  <tr>
+                                    <th>Order #</th>
+                                    <th>Modifications</th>
+                                    <th>Delta</th>
+                                    <th>Status</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {scopeChangeOrders[s.scope_code].map((co) => (
+                                    <tr key={co.id}>
+                                      <td><strong>{co.change_order_number}</strong></td>
+                                      <td>
+                                        {co.added_features?.length > 0 && (
+                                          <span style={{ color: '#059669', fontSize: '0.8rem', display: 'block' }}>
+                                            +{co.added_features.join(', ')}
+                                          </span>
+                                        )}
+                                        {co.removed_features?.length > 0 && (
+                                          <span style={{ color: '#ef4444', fontSize: '0.8rem', display: 'block' }}>
+                                            -{co.removed_features.join(', ')}
+                                          </span>
+                                        )}
+                                      </td>
+                                      <td>
+                                        {s.currency === 'INR'
+                                          ? `+₹${Number(co.price_delta_inr).toLocaleString('en-IN')}`
+                                          : `+$${Number(co.price_delta_usd).toLocaleString('en-US')}`}
+                                      </td>
+                                      <td>
+                                        <span className={co.status === 'paid' ? styles.coBadgeApproved : co.status === 'invoiced' ? styles.coBadgeInvoiced : styles.coBadgePending}>
+                                          {co.status.toUpperCase()}
+                                        </span>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className={styles.costSummary}>
+                          <div>
+                            Total Investment:{' '}
+                            <strong>
+                              <NumberFlow
+                                value={s.currency === 'INR' ? s.total_cost_inr : s.total_cost_usd}
+                                locales={s.currency === 'INR' ? 'en-IN' : 'en-US'}
+                                format={{ style: 'currency', currency: s.currency, maximumFractionDigits: 0 }}
+                              />
+                            </strong>
+                          </div>
+                          <div>
+                            50% Scope Deposit:{' '}
+                            <strong className={styles.paidText}>
+                              <NumberFlow
+                                value={depositAmount}
+                                locales={s.currency === 'INR' ? 'en-IN' : 'en-US'}
+                                format={{ style: 'currency', currency: s.currency, maximumFractionDigits: 0 }}
+                              />
+                            </strong>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Actions Footer */}
+                      <div className={styles.cardActions}>
+                        <button
+                          type="button"
+                          className="comic-btn comic-btn-outline"
+                          onClick={() => handleDownloadPDF(s)}
+                        >
+                          <Download size={15} style={{ marginRight: '0.4rem' }} /> PDF Brief
+                        </button>
+
+                        <button
+                          type="button"
+                          className="comic-btn comic-btn-outline"
+                          onClick={() => setActiveTab('onboarding')}
+                        >
+                          <CheckCircle2 size={15} style={{ marginRight: '0.4rem' }} /> View Onboarding Tasks
+                        </button>
+
+                        {s.deposit_paid ? (
+                          <div className={styles.paidNotice}>
+                            <CheckCircle2 size={16} /> Deposit Paid — Engineering In Progress
+                          </div>
+                        ) : (
+                          <div className={styles.paymentContainer} style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+                            <button
+                              type="button"
+                              className="comic-btn comic-btn-blue"
+                              disabled={payingScopeId === s.id}
+                              onClick={() => handleOpenSignoffModal(s)}
+                              style={{ display: 'inline-flex', alignItems: 'center' }}
+                            >
+                              <Zap size={15} style={{ marginRight: '0.4rem' }} />
+                              {s.signed_at ? 'Pay Deposit & Launch Build' : 'Accept Scope & Sign Terms'}
+                            </button>
+                          </div>
                         )}
                       </div>
-
-                      <div className={styles.costSummary}>
-                        <div>
-                          Total Investment:{' '}
-                          <strong>
-                            <NumberFlow
-                              value={s.currency === 'INR' ? s.total_cost_inr : s.total_cost_usd}
-                              locales={s.currency === 'INR' ? 'en-IN' : 'en-US'}
-                              format={{ style: 'currency', currency: s.currency, maximumFractionDigits: 0 }}
-                            />
-                          </strong>
-                        </div>
-                        <div>
-                          50% Scope Deposit:{' '}
-                          <strong className={styles.paidText}>
-                            <NumberFlow
-                              value={depositAmount}
-                              locales={s.currency === 'INR' ? 'en-IN' : 'en-US'}
-                              format={{ style: 'currency', currency: s.currency, maximumFractionDigits: 0 }}
-                            />
-                          </strong>
-                        </div>
-                      </div>
                     </div>
-
-                    {/* Actions Footer */}
-                    <div className={styles.cardActions}>
-                      <button
-                        type="button"
-                        className="comic-btn comic-btn-outline"
-                        onClick={() => handleDownloadPDF(s)}
-                      >
-                        <Download size={15} style={{ marginRight: '0.4rem' }} /> PDF Brief
-                      </button>
-
-                      <button
-                        type="button"
-                        className="comic-btn comic-btn-outline"
-                        onClick={() => setActiveTab('onboarding')}
-                      >
-                        <CheckCircle2 size={15} style={{ marginRight: '0.4rem' }} /> View Onboarding Tasks
-                      </button>
-
-                      {s.deposit_paid ? (
-                        <div className={styles.paidNotice}>
-                          <CheckCircle2 size={16} /> Deposit Paid — Engineering In Progress
-                        </div>
-                      ) : (
-                        <div className={styles.paymentContainer} style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
-                          <button
-                            type="button"
-                            className="comic-btn comic-btn-blue"
-                            disabled={payingScopeId === s.id}
-                            onClick={() => handleOpenSignoffModal(s)}
-                            style={{ display: 'inline-flex', alignItems: 'center' }}
-                          >
-                            <Zap size={15} style={{ marginRight: '0.4rem' }} />
-                            {s.signed_at ? 'Pay Deposit & Launch Build' : 'Accept Scope & Sign Terms'}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })
+                  );
+                })}
+              </>
             )}
           </div>
         )}
@@ -2064,8 +2339,276 @@ export default function ClientDashboardPage() {
           </div>
         </Portal>
       )}
+
+      {/* SOTA Embedded Architecture Customizer & Phase 2 Change Order Modal */}
+      {customizingScope && (
+        <Portal>
+          <div
+            className={styles.modalOverlay}
+            onClick={() => setCustomizingScope(null)}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="customizer-modal-title"
+          >
+            <div className={styles.customizerModalBox} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.customizerHeader}>
+                <div>
+                  <h3 id="customizer-modal-title" className={styles.customizerHeaderTitle}>
+                    <Sliders size={20} style={{ color: '#2563eb' }} />
+                    {customizingScope.deposit_paid
+                      ? `Phase 2 Change Order: ${customizingScope.scope_code}`
+                      : `Architecture Customizer: ${customizingScope.scope_code}`}
+                  </h3>
+                  <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', opacity: 0.8 }}>
+                    {customizingScope.deposit_paid
+                      ? 'Adjust features and modules for your active build. Additions will generate a Phase 2 change order invoice.'
+                      : 'Customize your core engine, feature modules, brand assets, and service care plan.'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  aria-label="Close customizer modal"
+                  onClick={() => setCustomizingScope(null)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit' }}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* Base Engine Selection */}
+              <div>
+                <h4 className={styles.customizerSectionTitle}>
+                  <Layers size={16} /> 1. Base Application Engine
+                </h4>
+                <div className={styles.engineGrid}>
+                  {intakeDefaults.engines.map((eng) => {
+                    const isSelected = custEngineId === eng.id;
+                    const p = formatPricePair(eng.priceINR, eng.priceUSD, custCurrency);
+                    return (
+                      <div
+                        key={eng.id}
+                        className={`${styles.engineCard} ${isSelected ? styles.engineCardActive : ''}`}
+                        onClick={() => !customizingScope.deposit_paid && setCustEngineId(eng.id)}
+                        style={{ cursor: customizingScope.deposit_paid ? 'default' : 'pointer' }}
+                      >
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <strong style={{ fontSize: '0.9rem' }}>{eng.title}</strong>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#2563eb' }}>{p}</span>
+                          </div>
+                          <p style={{ fontSize: '0.78rem', margin: '0.4rem 0 0 0', opacity: 0.8, lineHeight: 1.4 }}>
+                            {eng.laymanDescription}
+                          </p>
+                        </div>
+                        <span style={{ fontSize: '0.72rem', opacity: 0.6, marginTop: '0.5rem' }}>Tier: {eng.tier}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Add-on Feature Modules */}
+              <div>
+                <h4 className={styles.customizerSectionTitle}>
+                  <Sparkles size={16} /> 2. Architecture Add-On Modules ({custFeatureIds.length} Selected)
+                </h4>
+                <div className={styles.featuresGrid}>
+                  {intakeDefaults.features.map((feat) => {
+                    const isChecked = custFeatureIds.includes(feat.id);
+                    const p = formatPricePair(feat.priceINR, feat.priceUSD, custCurrency);
+                    return (
+                      <div
+                        key={feat.id}
+                        className={`${styles.featureCard} ${isChecked ? styles.featureCardActive : ''}`}
+                        onClick={() => handleToggleCustomizerFeature(feat.id)}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => {}}
+                          style={{ marginTop: '0.2rem', cursor: 'pointer' }}
+                          aria-label={feat.label}
+                        />
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <strong style={{ fontSize: '0.82rem' }}>{feat.label}</strong>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#2563eb' }}>{p}</span>
+                          </div>
+                          <p style={{ fontSize: '0.72rem', margin: '0.2rem 0 0 0', opacity: 0.75, lineHeight: 1.3 }}>
+                            {feat.laymanDescription}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Volume Bundle Discount Meter */}
+              <div className={styles.volumeMeterBox}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem' }}>
+                  <span>
+                    <strong>Volume Bundle Savings:</strong>{' '}
+                    {custQuote.bundleDiscountPercent > 0
+                      ? `${custQuote.bundleDiscountPercent}% Discount Applied!`
+                      : 'Add 3+ modules to unlock 5% off, 6+ for 10% off'}
+                  </span>
+                  <strong>
+                    {custQuote.bundleDiscountPercent > 0 && (
+                      <span style={{ color: '#059669' }}>
+                        -
+                        <NumberFlow
+                          value={custCurrency === 'INR' ? custQuote.bundleDiscountAmountINR : custQuote.bundleDiscountAmountUSD}
+                          locales={custCurrency === 'INR' ? 'en-IN' : 'en-US'}
+                          format={{ style: 'currency', currency: custCurrency, maximumFractionDigits: 0 }}
+                        />
+                      </span>
+                    )}
+                  </strong>
+                </div>
+                <div className={styles.volumeMeterTrack}>
+                  <div
+                    className={styles.volumeMeterFill}
+                    style={{
+                      width: `${Math.min(100, (custFeatureIds.length / 6) * 100)}%`,
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Promo Code Input */}
+              <div style={{ margin: '1rem 0', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                <input
+                  type="text"
+                  placeholder="Enter Promo or Partner Code..."
+                  value={promoInput}
+                  onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+                  style={{
+                    padding: '0.45rem 0.75rem',
+                    borderRadius: '6px',
+                    border: '1px solid var(--surface-glass-border)',
+                    background: 'var(--surface-primary)',
+                    color: 'var(--color-text)',
+                    fontSize: '0.85rem',
+                    flex: 1,
+                  }}
+                />
+                <button
+                  type="button"
+                  className="comic-btn comic-btn-outline"
+                  disabled={promoLoading || !promoInput.trim()}
+                  onClick={handleValidateCustomizerPromo}
+                >
+                  {promoLoading ? 'Checking...' : 'Apply Code'}
+                </button>
+              </div>
+              {promoMessage && (
+                <div style={{ fontSize: '0.8rem', marginTop: '-0.5rem', marginBottom: '0.75rem' }}>
+                  {promoMessage}
+                </div>
+              )}
+
+              {/* Change Order Live Delta Summary if deposit is already paid */}
+              {customizingScope.deposit_paid && (
+                <div className={styles.changeOrderBanner}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <RefreshCw size={16} style={{ color: '#2563eb' }} />
+                    <strong style={{ fontSize: '0.9rem' }}>Phase 2 Change Order Delta Review</strong>
+                  </div>
+                  <div className={styles.changeOrderDeltaBox}>
+                    <div>
+                      <span style={{ fontSize: '0.8rem', opacity: 0.8, display: 'block' }}>Baseline Scope:</span>
+                      <strong>
+                        <NumberFlow
+                          value={custCurrency === 'INR' ? customizingScope.total_cost_inr : customizingScope.total_cost_usd}
+                          locales={custCurrency === 'INR' ? 'en-IN' : 'en-US'}
+                          format={{ style: 'currency', currency: custCurrency, maximumFractionDigits: 0 }}
+                        />
+                      </strong>
+                    </div>
+                    <ArrowRight size={16} style={{ opacity: 0.5 }} />
+                    <div>
+                      <span style={{ fontSize: '0.8rem', opacity: 0.8, display: 'block' }}>Revised Architecture:</span>
+                      <strong>
+                        <NumberFlow
+                          value={custCurrency === 'INR' ? custQuote.netTotalINR : custQuote.netTotalUSD}
+                          locales={custCurrency === 'INR' ? 'en-IN' : 'en-US'}
+                          format={{ style: 'currency', currency: custCurrency, maximumFractionDigits: 0 }}
+                        />
+                      </strong>
+                    </div>
+                    <ArrowRight size={16} style={{ opacity: 0.5 }} />
+                    <div>
+                      <span style={{ fontSize: '0.8rem', color: '#2563eb', fontWeight: 600, display: 'block' }}>Change Order Invoice:</span>
+                      <strong style={{ color: '#2563eb', fontSize: '1.05rem' }}>
+                        +
+                        <NumberFlow
+                          value={Math.max(0, (custCurrency === 'INR' ? custQuote.netTotalINR : custQuote.netTotalUSD) - (custCurrency === 'INR' ? customizingScope.total_cost_inr : customizingScope.total_cost_usd))}
+                          locales={custCurrency === 'INR' ? 'en-IN' : 'en-US'}
+                          format={{ style: 'currency', currency: custCurrency, maximumFractionDigits: 0 }}
+                        />
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Customizer Price Footer & Actions */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--surface-glass-border)' }}>
+                <div>
+                  <span style={{ fontSize: '0.85rem', opacity: 0.8, display: 'block' }}>Estimated Build Total:</span>
+                  <strong style={{ fontSize: '1.25rem', color: '#2563eb' }}>
+                    <NumberFlow
+                      value={custCurrency === 'INR' ? custQuote.netTotalINR : custQuote.netTotalUSD}
+                      locales={custCurrency === 'INR' ? 'en-IN' : 'en-US'}
+                      format={{ style: 'currency', currency: custCurrency, maximumFractionDigits: 0 }}
+                    />
+                  </strong>
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                  <button
+                    type="button"
+                    className="comic-btn comic-btn-outline"
+                    onClick={() => setCustomizingScope(null)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className="comic-btn comic-btn-blue"
+                    disabled={isSubmittingChangeOrder}
+                    onClick={handleSaveCustomizer}
+                  >
+                    {isSubmittingChangeOrder
+                      ? 'Submitting...'
+                      : customizingScope.deposit_paid
+                      ? 'Submit Change Order & Issue Invoice'
+                      : 'Save Architecture Configuration'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Portal>
+      )}
+
+      {/* Dependency Cascade Safety Modal */}
+      <DependencyCascadeModal
+        isOpen={Boolean(cascadeTarget)}
+        targetFeature={cascadeTarget}
+        dependentFeatures={cascadeDependents}
+        currency={custCurrency}
+        onConfirmRemoveAll={handleConfirmCascadeRemove}
+        onCancel={() => {
+          setCascadeTarget(null);
+          setCascadeDependents([]);
+        }}
+      />
+
       <ClientProjectCopilot />
       </div>
     </div>
   );
 }
+

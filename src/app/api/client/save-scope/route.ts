@@ -98,6 +98,9 @@ export async function POST(req: Request) {
       signed_at: payload.signedAt || payload.signed_at || undefined,
       signed_by_email: payload.signedByEmail || payload.signed_by_email || undefined,
       onboarding_checklist: onboardingChecklistMerged,
+      sow_hash: payload.sowHash || payload.sow_hash || undefined,
+      retriever_tenant_id: payload.retrieverTenantId || payload.retriever_tenant_id || undefined,
+      metadata: payload.metadata || {},
       updated_at: new Date().toISOString(),
     };
 

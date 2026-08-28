@@ -25,7 +25,27 @@ export interface ClientScope {
   tax_invoicing_preference?: string;
   inspiration_links?: string;
   onboarding_checklist?: Record<string, boolean | string>;
+  sow_hash?: string;
+  retriever_tenant_id?: string;
+  metadata?: Record<string, unknown>;
   created_at: string;
+}
+
+export interface ScopeChangeOrderEntity {
+  id: string;
+  scope_id: string;
+  change_order_number: string;
+  requested_by_email: string;
+  added_features: string[];
+  removed_features: string[];
+  price_delta_inr: number;
+  price_delta_usd: number;
+  timeline_impact?: string;
+  status: 'pending' | 'approved' | 'rejected' | 'invoiced' | 'paid';
+  invoice_id?: string;
+  metadata?: Record<string, unknown>;
+  created_at: string;
+  updated_at?: string;
 }
 
 export interface ClientEntity {
@@ -185,6 +205,9 @@ export interface ClientOrderRow {
   tax_invoicing_preference?: string;
   inspiration_links?: string;
   onboarding_checklist?: Record<string, boolean | string> | unknown;
+  sow_hash?: string;
+  retriever_tenant_id?: string;
+  metadata?: Record<string, unknown>;
   created_at?: string;
 }
 
@@ -219,6 +242,9 @@ export function dbToClientScope(row: ClientOrderRow): ClientScope {
     tax_invoicing_preference: row.tax_invoicing_preference || (checklistParsed.tax_invoicing_preference as string) || undefined,
     inspiration_links: row.inspiration_links || (checklistParsed.inspiration_links as string) || undefined,
     onboarding_checklist: checklistParsed,
+    sow_hash: row.sow_hash,
+    retriever_tenant_id: row.retriever_tenant_id,
+    metadata: (row.metadata as Record<string, unknown>) || {},
     created_at: row.created_at || new Date().toISOString(),
   };
 }

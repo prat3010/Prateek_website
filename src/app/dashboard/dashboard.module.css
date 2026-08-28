@@ -1220,4 +1220,290 @@
   color: var(--color-text);
 }
 
+/* SOTA Embedded Customizer & Change Order Modal Styles */
+.customizerModalBox {
+  background: var(--surface-glass-card);
+  border: 1px solid var(--surface-glass-border);
+  box-shadow: var(--shadow-glass-lg);
+  border-radius: var(--border-radius-xl, 16px);
+  padding: 2rem;
+  max-width: 840px;
+  width: 95%;
+  max-height: 90vh;
+  overflow-y: auto;
+  color: var(--color-text);
+}
+
+.customizerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--surface-glass-border);
+}
+
+.customizerHeaderTitle {
+  font-family: var(--font-headline);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.customizerSectionTitle {
+  font-family: var(--font-headline);
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 1.25rem 0 0.75rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--color-text);
+}
+
+.engineGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .engineGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.engineCard {
+  background: var(--surface-secondary);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: var(--border-radius-md, 8px);
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.engineCard:hover {
+  border-color: var(--pop-blue);
+  transform: translateY(-2px);
+}
+
+:global([data-theme='noir']) .engineCard:hover {
+  border-color: var(--neon-cyan);
+}
+
+.engineCardActive {
+  border-color: var(--pop-blue) !important;
+  background: var(--badge-active-bg) !important;
+  box-shadow: 0 0 12px rgba(63, 110, 145, 0.2);
+}
+
+:global([data-theme='noir']) .engineCardActive {
+  border-color: var(--neon-cyan) !important;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 0.6rem;
+}
+
+.featureCard {
+  background: var(--surface-secondary);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: var(--border-radius-md, 8px);
+  padding: 0.75rem 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  transition: all 0.15s ease;
+}
+
+.featureCard:hover {
+  border-color: var(--pop-blue);
+}
+
+:global([data-theme='noir']) .featureCard:hover {
+  border-color: var(--neon-cyan);
+}
+
+.featureCardActive {
+  border-color: var(--pop-blue) !important;
+  background: var(--badge-active-bg) !important;
+}
+
+:global([data-theme='noir']) .featureCardActive {
+  border-color: var(--neon-cyan) !important;
+}
+
+/* Volume Bundle Discount Meter */
+.volumeMeterBox {
+  background: var(--surface-secondary);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: var(--border-radius-md, 8px);
+  padding: 0.85rem 1rem;
+  margin: 1rem 0;
+}
+
+.volumeMeterTrack {
+  height: 6px;
+  background: var(--surface-primary);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 0.4rem;
+}
+
+.volumeMeterFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--pop-blue), var(--pop-orange));
+  border-radius: 999px;
+  transition: width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+:global([data-theme='noir']) .volumeMeterFill {
+  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green));
+}
+
+/* Change Order Delta Display */
+.changeOrderBanner {
+  background: var(--surface-secondary);
+  border: 1px solid var(--pop-blue);
+  border-radius: var(--border-radius-md, 8px);
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+:global([data-theme='noir']) .changeOrderBanner {
+  border-color: var(--neon-cyan);
+}
+
+.changeOrderDeltaBox {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: var(--surface-primary);
+  border-radius: var(--border-radius-sm, 4px);
+}
+
+/* Cryptographic SOW Seal Badge */
+.sowSealBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  background: var(--badge-active-bg);
+  border: 1px solid var(--pop-blue);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+:global([data-theme='noir']) .sowSealBadge {
+  border-color: var(--neon-cyan);
+}
+
+/* Retriever SaaS Trial Banner Card */
+.retrieverTrialCard {
+  background: var(--surface-secondary);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: var(--border-radius-lg, 12px);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .retrieverTrialCard {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.retrieverTrialBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.5rem;
+  background: var(--pop-blue);
+  color: #fff;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+:global([data-theme='noir']) .retrieverTrialBadge {
+  background: var(--neon-cyan);
+  color: #000;
+}
+
+/* Change Orders History Table */
+.changeOrdersSection {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--surface-glass-border);
+}
+
+.changeOrdersTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.changeOrdersTable th,
+.changeOrdersTable td {
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  border-bottom: 1px solid var(--surface-glass-border);
+}
+
+.changeOrdersTable th {
+  font-family: var(--font-headline);
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.coBadgePending {
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  background: rgba(245, 158, 11, 0.15);
+  color: #d97706;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.coBadgeApproved {
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.coBadgeInvoiced {
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  background: rgba(37, 99, 235, 0.15);
+  color: #2563eb;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
 
