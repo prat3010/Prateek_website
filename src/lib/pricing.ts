@@ -308,3 +308,68 @@ export function calcQuickServiceQuote(
     items,
   };
 }
+
+/**
+ * Finds all currently selected features that depend (directly or transitively) on targetFeatureId.
+ * Uses Breadth-First Search (BFS) to traverse the dependency graph.
+ */
+export function findDependentFeatures(
+  targetFeatureId: string,
+  selectedFeatureIds: string[],
+  allFeatures: FeatureItem[]
+): FeatureItem[] {
+  const dependentFeatures: FeatureItem[] = [];
+  const selectedSet = new Set(selectedFeatureIds.filter((id) => id !== targetFeatureId));
+  const queue: string[] = [targetFeatureId];
+  const visited = new Set<string>([targetFeatureId]);
+
+  while (queue.length > 0) {
+    const currentId = queue.shift()!;
+    
+    // Find all selected features that declare currentId in their dependsOn array
+    for (const f of allFeatures) {
+      if (selectedSet.has(f.id) && f.dependsOn && f.dependsOn.includes(currentId)) {
+        if (!visited.has(f.id)) {
+          visited.add(f.id);
+          dependentFeatures.push(f);
+          queue.push(f.id); // Add to queue for transitive downstream search
+        }
+      }
+    }
+  }
+
+  return dependentFeatures;
+}
+
+export interface CascadeRemovalSavingsResult {
+  targetFeature: FeatureItem | null;
+  dependentFeatures: FeatureItem[];
+  totalSavingsINR: number;
+  totalSavingsUSD: number;
+  totalSavingsFormatted: string;
+}
+
+/**
+ * Calculates total savings if target feature and all its dependent features are removed.
+ */
+export function calcCascadeRemovalSavings(
+  targetFeatureId: string,
+  dependentFeatureIds: string[],
+  allFeatures: FeatureItem[],
+  currency: Currency
+): CascadeRemovalSavingsResult {
+  const targetFeature = allFeatures.find((f) => f.id === targetFeatureId) ?? null;
+  const dependentFeatures = allFeatures.filter((f) => dependentFeatureIds.includes(f.id));
+  
+  const allAffected = targetFeature ? [targetFeature, ...dependentFeatures] : dependentFeatures;
+  const totalSavingsINR = allAffected.reduce((sum, f) => sum + (f.priceINR || 0), 0);
+  const totalSavingsUSD = allAffected.reduce((sum, f) => sum + (f.priceUSD || 0), 0);
+
+  return {
+    targetFeature,
+    dependentFeatures,
+    totalSavingsINR,
+    totalSavingsUSD,
+    totalSavingsFormatted: formatPricePair(totalSavingsINR, totalSavingsUSD, currency),
+  };
+}

@@ -8,6 +8,8 @@ import {
   packageTotals,
   resolveDefaultCurrency,
   resolveFeatureDependencies,
+  findDependentFeatures,
+  calcCascadeRemovalSavings,
 } from '@/lib/pricing';
 import type { BaseEngineItem, FeatureItem } from '@/data/resume';
 
@@ -265,6 +267,46 @@ describe('volume bundle discounts, promo codes, and deposit split', () => {
     expect(quote.netTotalINR).toBe(94500);
     expect(quote.depositINR).toBe(47250);
     expect(quote.balanceINR).toBe(47250);
+  });
+});
+
+describe('findDependentFeatures (transitive BFS graph resolution)', () => {
+  it('finds direct dependents (crm depends on auth)', () => {
+    const selectedIds = ['auth', 'crm', 'email'];
+    const dependents = findDependentFeatures('auth', selectedIds, features as FeatureItem[]);
+    expect(dependents.map((d) => d.id)).toContain('crm');
+    expect(dependents.map((d) => d.id)).not.toContain('email');
+  });
+
+  it('finds dependents of payments (commerce & booking depend on payments and auth)', () => {
+    const selectedIds = ['auth', 'payments', 'commerce', 'booking', 'email'];
+    const dependents = findDependentFeatures('payments', selectedIds, features as FeatureItem[]);
+    const depIds = dependents.map((d) => d.id);
+    expect(depIds).toContain('commerce');
+    expect(depIds).toContain('booking');
+    expect(depIds).not.toContain('email');
+    expect(depIds).not.toContain('auth');
+  });
+
+  it('returns empty array if no selected feature depends on target', () => {
+    const selectedIds = ['auth', 'email', 'pwa'];
+    const dependents = findDependentFeatures('email', selectedIds, features as FeatureItem[]);
+    expect(dependents).toEqual([]);
+  });
+});
+
+describe('calcCascadeRemovalSavings', () => {
+  it('calculates total savings correctly in INR and USD', () => {
+    const targetId = 'auth';
+    const dependentIds = ['admin'];
+    const savings = calcCascadeRemovalSavings(targetId, dependentIds, features as FeatureItem[], 'INR');
+    
+    // Auth (25k / $350) + Admin (75k / $1000) = 100k / $1350
+    expect(savings.totalSavingsINR).toBe(100000);
+    expect(savings.totalSavingsUSD).toBe(1350);
+    expect(savings.targetFeature?.id).toBe('auth');
+    expect(savings.dependentFeatures.length).toBe(1);
+    expect(savings.totalSavingsFormatted).toContain('₹1,00,000');
   });
 });
 

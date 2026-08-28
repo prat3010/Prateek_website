@@ -15,6 +15,7 @@ import {
   calcQuickServiceQuote,
   resolveDefaultCurrency,
   resolveFeatureDependencies,
+  findDependentFeatures,
   type Currency,
   type PromoDiscountInfo,
 } from '@/lib/pricing';
@@ -158,6 +159,7 @@ export function useIntakeFormState(
 
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [appliedPromo, setAppliedPromo] = useState<PromoDiscountInfo | null>(null);
+  const [cascadeState, setCascadeState] = useState<{ targetFeature: FeatureItem; dependentFeatures: FeatureItem[] } | null>(null);
   const [sessionSeed] = useState(() => Math.random().toString(36).slice(2, 8));
 
   const [formData, setFormData] = useState<IntakeFormData>(() => ({
@@ -299,6 +301,57 @@ export function useIntakeFormState(
       return { ...prev, selectedFeatures: Array.from(set) };
     });
   }, [features]);
+
+  const requestRemoveFeature = useCallback((featureId: string) => {
+    const targetFeature = features.find((f: FeatureItem) => f.id === featureId);
+    if (!targetFeature) return false;
+
+    const dependentFeatures = findDependentFeatures(featureId, formData.selectedFeatures, features);
+    if (dependentFeatures.length > 0) {
+      setCascadeState({ targetFeature, dependentFeatures });
+      return false;
+    }
+
+    // No dependents - remove directly with single-item undo toast
+    removeFeature(featureId);
+    toast(`Removed ${targetFeature.label}`, {
+      action: {
+        label: 'Undo',
+        onClick: () => addFeature(featureId),
+      },
+    });
+    return true;
+  }, [features, formData.selectedFeatures, removeFeature, addFeature]);
+
+  const confirmCascadeRemoval = useCallback(() => {
+    if (!cascadeState) return;
+
+    const target = cascadeState.targetFeature;
+    const removedIds = [target.id, ...cascadeState.dependentFeatures.map((f) => f.id)];
+
+    setFormData((prev) => ({
+      ...prev,
+      selectedFeatures: prev.selectedFeatures.filter((id) => !removedIds.includes(id)),
+    }));
+
+    setCascadeState(null);
+
+    toast(`Removed ${target.label} and ${cascadeState.dependentFeatures.length} dependent module(s)`, {
+      action: {
+        label: 'Undo',
+        onClick: () => {
+          setFormData((prev) => ({
+            ...prev,
+            selectedFeatures: Array.from(new Set([...prev.selectedFeatures, ...removedIds])),
+          }));
+        },
+      },
+    });
+  }, [cascadeState]);
+
+  const cancelCascadeRemoval = useCallback(() => {
+    setCascadeState(null);
+  }, []);
 
   const quickQuote = useMemo(() => {
     return calcQuickServiceQuote(quickServices, selectedQuickServices, currency);
@@ -788,6 +841,11 @@ export function useIntakeFormState(
     removePromoCode,
     removeFeature,
     addFeature,
+    cascadeState,
+    setCascadeState,
+    requestRemoveFeature,
+    confirmCascadeRemoval,
+    cancelCascadeRemoval,
     buildQuestionnaireData,
     buildQuickServiceData,
     handleDownloadPDF,

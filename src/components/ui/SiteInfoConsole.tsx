@@ -20,6 +20,14 @@ import styles from './SiteInfoConsole.module.css';
 import type { ResumeData, MiddlemanAgreementConfig } from '@/data/resume';
 import { COMMISSION_BANDS, COMMISSION_DISBURSEMENT_WINDOW, RECURRING_COMMISSION_RATE, type CommissionBand } from '@/lib/commission';
 import resumeFallback from '@/data/resume.json';
+import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
+import {
+  createInitialTerminalScopeSession,
+  handleTerminalScopeCommand,
+  type TerminalScopeSession,
+} from '@/lib/terminalScoping';
+import { generateQuestionnairePDF } from '@/utils/pdfGenerator';
+import type { BaseEngineItem, FeatureItem, BrandAssetOption, MaintenancePlanOption } from '@/data/resume';
 
 function consoleBandRange(band: CommissionBand): string {
   if (band.minINR == null) return `up to ₹${band.maxINR?.toLocaleString('en-IN')} / $${band.maxUSD?.toLocaleString('en-US')}`;
@@ -70,6 +78,7 @@ export default function SiteInfoConsole() {
       .catch(() => {});
   }, []);
   const { isNoir } = useTheme();
+  const [scopeSession, setScopeSession] = useState<TerminalScopeSession>(() => createInitialTerminalScopeSession('INR'));
   const [terminalInput, setTerminalInput] = useState('');
   const [terminalHistory, setTerminalHistory] = useState<ConsoleLine[]>(
     BOOT_LOGS.map(log => ({ text: log, type: 'success' }))
@@ -294,6 +303,80 @@ export default function SiteInfoConsole() {
     setTerminalHistory(prev => [...prev, { text: `> ${cmd}`, type: 'input' }]);
 
     let response: ConsoleLine[] = [];
+
+    if (trimmedCmd.startsWith('scope') || trimmedCmd === 'cart' || trimmedCmd.startsWith('cart ')) {
+      const { engines, features, brandAssets, maintenancePlans } = (profileData.intake || questionnaireDefaults) as {
+        engines: BaseEngineItem[];
+        features: FeatureItem[];
+        brandAssets: BrandAssetOption[];
+        maintenancePlans: MaintenancePlanOption[];
+      };
+
+      handleTerminalScopeCommand(cmd, scopeSession, engines, features, brandAssets, maintenancePlans)
+        .then((result) => {
+          setScopeSession(result.nextSession);
+          unlockAchievement('cyber_scoper', 'Cyber Scoper', 'Configured an enterprise architecture blueprint entirely via CLI');
+
+          const newHistory = [...result.lines];
+
+          if (result.triggerExportPdf) {
+            try {
+              const selectedEngine = engines.find((e) => e.id === result.nextSession.selectedEngineId) || engines[0];
+              const questionnaireData = {
+                companyName: result.nextSession.companyName,
+                projectGoal: result.nextSession.projectGoal,
+                features: features
+                  .filter((f) => result.nextSession.selectedFeatures.includes(f.id))
+                  .map((f) => f.label),
+                timeline: `${selectedEngine.tier}`,
+                totalBuildCostINR: selectedEngine.priceINR,
+                totalBuildCostUSD: selectedEngine.priceUSD,
+              };
+              generateQuestionnairePDF(profileData, questionnaireData, isNoir, result.nextSession.currency);
+              toast.success('Downloaded Scoping Proposal PDF');
+            } catch (pdfErr) {
+              console.error('PDF export error:', pdfErr);
+            }
+          }
+
+          if (result.triggerCheckoutQr) {
+            fetch('/api/terminal/qrcode', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ amount: result.triggerCheckoutQr.amount }),
+            })
+              .then((res) => (res.ok ? res.json() : null))
+              .then((qrData) => {
+                if (qrData?.imageUrl) {
+                  setTerminalHistory((prev) => [
+                    ...prev,
+                    ...newHistory,
+                    { text: `QR Code generated for ₹${result.triggerCheckoutQr?.amount?.toLocaleString('en-IN')}:`, type: 'success' },
+                    { text: '', type: 'image', imageUrl: qrData.imageUrl },
+                  ]);
+                } else {
+                  setTerminalHistory((prev) => [...prev, ...newHistory]);
+                }
+              })
+              .catch(() => {
+                setTerminalHistory((prev) => [...prev, ...newHistory]);
+              });
+            setTerminalInput('');
+            return;
+          }
+
+          setTerminalHistory((prev) => [...prev, ...newHistory]);
+          setTerminalInput('');
+        })
+        .catch(() => {
+          setTerminalHistory((prev) => [
+            ...prev,
+            { text: 'Failed to process scope command.', type: 'error' },
+          ]);
+          setTerminalInput('');
+        });
+      return;
+    }
 
     if (trimmedCmd.startsWith('git-info')) {
       const parts = cmd.trim().split(/\s+/);
@@ -649,23 +732,25 @@ export default function SiteInfoConsole() {
       case 'help':
         response = [
           { text: 'Available commands:', type: 'success' },
-          { text: '  ask <query>  - Query Retriever Concierge vector memory for platform specs & docs', type: 'output' },
-          { text: '  pathfinder - Launch interactive 2D Pathfinding & Graph Algorithm Lab', type: 'output' },
-          { text: '  projects   - List portfolio projects and tags', type: 'output' },
-          { text: '  partner    - Print Sales Partner & Broker Agreement with PDF links', type: 'output' },
-          { text: '  inspect    - Probe real Supabase latency, JS heap memory & React state', type: 'output' },
-          { text: '  matrix     - Toggle retro Matrix green digital rain overlay', type: 'output' },
-          { text: '  sfx        - Toggle Web Audio 8-bit sound synthesizer', type: 'output' },
-          { text: '  snake      - Launch interactive Snake Game with Supabase Leaderboard', type: 'output' },
-          { text: '  pizzarat   - Toggle 3D WebGL NYC Pizza Rat physics model', type: 'output' },
-          { text: '  system     - Show CPU, memory, and display metrics', type: 'output' },
-          { text: '  storage    - Inspect local and session storage', type: 'output' },
-          { text: '  stack      - Print tech stack & copy architecture dossier to clipboard', type: 'output' },
-          { text: '  sync       - Show the local content sync workflow', type: 'output' },
-          { text: '  analytics  - Show visitor statistics summary', type: 'output' },
-          { text: '  git-info   - Open the generated portfolio commit log (subcommands: show, repo)', type: 'output' },
-          { text: '  qrcode     - Scan default PhonePe QR or generate dynamic (e.g. qrcode 500)', type: 'output' },
-          { text: '  clear      - Clear the command interface screen', type: 'output' }
+          { text: '  scope <cmd> - Interactive Architecture Scoping CLI (new, list, analyze, add, remove, export, checkout)', type: 'output' },
+          { text: '  cart        - View active scoping bill of materials and price ledger', type: 'output' },
+          { text: '  ask <query> - Query Retriever Concierge vector memory for platform specs & docs', type: 'output' },
+          { text: '  pathfinder  - Launch interactive 2D Pathfinding & Graph Algorithm Lab', type: 'output' },
+          { text: '  projects    - List portfolio projects and tags', type: 'output' },
+          { text: '  partner     - Print Sales Partner & Broker Agreement with PDF links', type: 'output' },
+          { text: '  inspect     - Probe real Supabase latency, JS heap memory & React state', type: 'output' },
+          { text: '  matrix      - Toggle retro Matrix green digital rain overlay', type: 'output' },
+          { text: '  sfx         - Toggle Web Audio 8-bit sound synthesizer', type: 'output' },
+          { text: '  snake       - Launch interactive Snake Game with Supabase Leaderboard', type: 'output' },
+          { text: '  pizzarat    - Toggle 3D WebGL NYC Pizza Rat physics model', type: 'output' },
+          { text: '  system      - Show CPU, memory, and display metrics', type: 'output' },
+          { text: '  storage     - Inspect local and session storage', type: 'output' },
+          { text: '  stack       - Print tech stack & copy architecture dossier to clipboard', type: 'output' },
+          { text: '  sync        - Show the local content sync workflow', type: 'output' },
+          { text: '  analytics   - Show visitor statistics summary', type: 'output' },
+          { text: '  git-info    - Open the generated portfolio commit log (subcommands: show, repo)', type: 'output' },
+          { text: '  qrcode      - Scan default PhonePe QR or generate dynamic (e.g. qrcode 500)', type: 'output' },
+          { text: '  clear       - Clear the command interface screen', type: 'output' }
         ];
         break;
       case 'projects':
@@ -1087,7 +1172,7 @@ export default function SiteInfoConsole() {
           <div className={styles.shortcutsContainer}>
             <span className={styles.shortcutsLabel}>QUICK SHORTCUTS:</span>
             <div className={styles.shortcutsGrid}>
-              {['help', 'inspect', 'stack', 'pathfinder', 'snake', 'matrix', 'sfx', 'pizzarat', 'projects', 'partner', 'system', 'storage', 'sync', 'analytics', 'git-info', 'qrcode', 'clear'].map(cmd => (
+              {['help', 'scope help', 'cart', 'inspect', 'stack', 'pathfinder', 'snake', 'matrix', 'sfx', 'pizzarat', 'projects', 'partner', 'system', 'storage', 'sync', 'analytics', 'git-info', 'qrcode', 'clear'].map(cmd => (
                 <button
                   key={cmd}
                   onClick={() => executeCommand(cmd)}

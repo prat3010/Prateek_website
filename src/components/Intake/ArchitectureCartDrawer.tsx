@@ -144,13 +144,6 @@ export function ArchitectureCartDrawer({
 
   const handleRemoveFeatureWithToast = (feature: FeatureItem) => {
     onRemoveFeature(feature.id);
-    toast(`Removed ${feature.label}`, {
-      action: {
-        label: 'Undo',
-        onClick: () => onAddFeature(feature.id),
-      },
-      duration: 5000,
-    });
   };
 
   if (!isOpen) return null;

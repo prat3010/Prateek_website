@@ -41,6 +41,7 @@ import { StepCommercials } from './StepCommercials';
 import { QuickServiceFlow } from './QuickServiceFlow';
 import { StickyPriceBar } from './StickyPriceBar';
 import { ArchitectureCartDrawer } from './ArchitectureCartDrawer';
+import { DependencyCascadeModal } from './DependencyCascadeModal';
 
 import styles from './IntakeForm.module.css';
 
@@ -165,6 +166,10 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     removePromoCode,
     removeFeature,
     addFeature,
+    cascadeState,
+    requestRemoveFeature,
+    confirmCascadeRemoval,
+    cancelCascadeRemoval,
     handleDownloadPDF,
     handleDownloadQuickPDF,
     handleCopyShareableUrl,
@@ -215,38 +220,18 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     const isLegacyRequired =
       formData.projectStartType === 'legacy_rebuild' && targetFeature.autoIncludeOnLegacy;
 
-    const otherSelectedIds = formData.selectedFeatures.filter((id: string) => id !== featureId);
-    const requiredPrereqIds = new Set(resolveFeatureDependencies(otherSelectedIds, features));
-
-    if (requiredPrereqIds.has(featureId)) {
-      triggerLockedHint(featureId);
-      return;
-    }
-
     if (isCompulsory || isLegacyRequired) {
       triggerLockedHint(featureId);
       return;
     }
 
-    setFormData((prev) => {
-      const exists = prev.selectedFeatures.includes(featureId);
-      let updatedIds: string[];
-      if (exists) {
-        updatedIds = prev.selectedFeatures.filter((id: string) => id !== featureId);
-      } else {
-        updatedIds = [...prev.selectedFeatures, featureId];
-      }
-
-      const allRequiredIds = resolveFeatureDependencies(updatedIds, features);
-      const mergedSet = new Set(updatedIds);
-      allRequiredIds.forEach((reqId: string) => mergedSet.add(reqId));
-
-      return {
-        ...prev,
-        selectedFeatures: Array.from(mergedSet),
-      };
-    });
-  }, [currentArchetype, formData.projectStartType, formData.selectedFeatures, features, setFormData, triggerLockedHint]);
+    const exists = formData.selectedFeatures.includes(featureId);
+    if (exists) {
+      requestRemoveFeature(featureId);
+    } else {
+      addFeature(featureId);
+    }
+  }, [currentArchetype, formData.projectStartType, formData.selectedFeatures, features, triggerLockedHint, requestRemoveFeature, addFeature]);
 
   const handleScopeStartTypeChange = (type: 'greenfield' | 'legacy_rebuild') => {
     setFormData((prev) => {
@@ -701,7 +686,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
         quote={totalCost}
         currency={currency}
         allFeatures={features}
-        onRemoveFeature={removeFeature}
+        onRemoveFeature={requestRemoveFeature}
         onAddFeature={addFeature}
         onSwitchEngine={() => setCurrentStep(2)}
         promoCode={appliedPromo}
@@ -710,6 +695,15 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
         onProceed={() => setCurrentStep(4)}
         onExportPdf={handleDownloadPDF}
         isNoir={isNoir}
+      />
+
+      <DependencyCascadeModal
+        isOpen={Boolean(cascadeState)}
+        targetFeature={cascadeState?.targetFeature || null}
+        dependentFeatures={cascadeState?.dependentFeatures || []}
+        currency={currency}
+        onConfirmRemoveAll={confirmCascadeRemoval}
+        onCancel={cancelCascadeRemoval}
       />
     </section>
   );

@@ -5,6 +5,7 @@ import type { GoalArchetype, BaseEngineItem, FeatureItem } from '@/data/resume';
 import { formatPricePair, resolveFeatureDependencies, type Currency } from '@/lib/pricing';
 import { FEATURE_CATEGORIES } from './IntakeForm';
 import TiltCard from '@/components/ui/TiltCard';
+import { ArchitectureTopologyMap } from './ArchitectureTopologyMap';
 import styles from './IntakeForm.module.css';
 
 interface StepTechnicalScopeProps {
@@ -242,6 +243,16 @@ export function StepTechnicalScope({
           </div>
         )}
       </div>
+
+      {/* Live Visual Architecture Topology Map */}
+      <ArchitectureTopologyMap
+        selectedEngineId={formData.selectedBaseEngineId}
+        selectedFeatureIds={formData.selectedFeatures}
+        allEngines={engines}
+        allFeatures={features}
+        currency={currency}
+        onAddFeature={onFeatureToggle}
+      />
 
       {/* Grouped Feature Checkboxes */}
       <div className={styles.field}>

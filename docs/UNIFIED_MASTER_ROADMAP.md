@@ -52,6 +52,8 @@ timeline
     Phase E (M57–M60) : Autonomous Growth, Cold Outreach & AI Newsjacking : Completed
     Phase F (M61–M62) : Data Connectors & Vision OCR Ingestion : Completed
     Phase G (M63–M68) : Productized E-Commerce Scoping & Agency Ecosystem : ACTIVE NEXT
+    Phase H (M69–M73) : SOTA Cognitive RAG Algorithm R&D : Planned
+    Phase I (M74–M78) : Enterprise Cognitive Evaluation & Deep Observability : Planned
 ```
 
 ---
@@ -144,14 +146,14 @@ timeline
 - **Deliverable:**
   - Lightweight SVG/Canvas node visualizer rendering Client $\rightarrow$ Edge WAF $\rightarrow$ Services $\rightarrow$ Data $\rightarrow$ Integrations with real-time node illumination.
   - Interactive GraphRAG DAG dependency solver with active cascade disconnect modal (*"Removing Auth drops Admin Center & Stripe Subscriptions, saving $1,200. [Remove All] or [Keep]"*).
-- **Status:** **Active Next**
+- **Status:** **Completed** (Phase G, Milestone 65)
 
 #### 🛒 Milestone 66: Terminal Scoping CLI (`/terminal`) & Mobile QR Code Checkout
-- **Repo Scope:** `Prateek_website` (`src/app/terminal/`, `src/app/api/terminal/qrcode`)
+- **Repo Scope:** `Prateek_website` (`src/app/terminal/`, `src/app/api/terminal/qrcode`, `terminalScoping.ts`)
 - **Deliverable:**
   - Add hacker/CTO CLI scoping commands in `/terminal`: `scope new`, `scope analyze "..."`, `cart status`, `cart checkout --deposit 50`.
   - Generate ASCII QR code in terminal for mobile scanning and instant Razorpay/Stripe checkout.
-- **Status:** **Active Next**
+- **Status:** **Completed** (Phase G, Milestone 66)
 
 #### 🛒 Milestone 67: Dashboard Workspace Bridge, 7-Day Trial Provisioning & Phase 2 Change Orders
 - **Repo Scope:** Both (`Prateek_website` `/dashboard` & `retriever` `/v1/auth/session`)
@@ -215,6 +217,63 @@ timeline
 - **Repo Scope:** `retriever` (`graph_extraction_service.py`, `OnlineHallucinationEvaluator`)
 - **Deliverable:** Hierarchical community entity summaries and automated pipeline self-tuning based on continuous online Ragas evaluation telemetry.
 - **Status:** **Planned (Phase H)**
+
+---
+
+### Phase I: Enterprise Cognitive Evaluation & Deep Observability Hardening (M74 – M78) — **PLANNED HORIZON**
+
+```text
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│      PHASE I: ENTERPRISE COGNITIVE EVALUATION & OBSERVABILITY HARDENING (M74–M78)      │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  [M74] Semantic NLI & SLM-as-a-Judge Online Hallucination Engine (DeBERTa / Ollama)     │
+│  [M75] Full-Stack OpenTelemetry Auto-Instrumentation (SQLAlchemy, HTTPX, Celery)       │
+│  [M76] Real-Time Telemetry Live Aggregations & SLA Webhook Alerting (Slack/Discord)   │
+│  [M77] Synthetic Golden Dataset Auto-Generation & Automated CI/CD Regression Gate      │
+│  [M78] Visual Claim-by-Claim Grounding Diff & Synchronizer Observability Cockpit       │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### 🛡️ Milestone 74: Semantic NLI & SLM-as-a-Judge Online Hallucination Engine
+- **Repo Scope:** `retriever` (`apps/api/src/domain/evaluation/`, `apps/api/src/adapters/cognitive/`, `workers/src/tasks/`)
+- **Deliverable:**
+  - Replace heuristic keyword-matching in `calculate_faithfulness()` with a true Natural Language Inference (NLI) pipeline.
+  - **Tier 1 (Fast Cross-Encoder):** Lightweight HuggingFace DeBERTa cross-encoder (`cross-encoder/nli-deberta-v3-small`) classifying claim-premise pairs into calibrated probabilities (`entailment`, `neutral`, `contradiction`).
+  - **Tier 2 (Async SLM Judge via Celery):** Async Celery task `tasks.evaluate_inference_nli` running a local Ollama judge (`qwen2.5:3b` / `llama3.2:3b`) with structured JSON output: claim breakdown, verification rationale, citation grounding span, and calibrated faithfulness score ($0.0 - 1.0$).
+  - Calculate real-time Hallucination Index based on true contradiction/unsupported claim ratio and trigger dynamic retrieval auto-tuning only on verified semantic confidence drops.
+- **Status:** **Planned (Phase I)**
+
+#### ⏱️ Milestone 75: Full-Stack OpenTelemetry Auto-Instrumentation & Distributed Trace Graph
+- **Repo Scope:** Both (`retriever` `apps/api/src/adapters/telemetry/`, `workers/` & `Prateek_website` `src/proxy.ts`, `src/lib/rag-client.ts`)
+- **Deliverable:**
+  - Add `SQLAlchemyInstrumentor().instrument(engine=engine)` to capture granular SQL query execution, pgvector similarity lookup latency, and transaction lock timings.
+  - Add `HTTPXClientInstrumentor().instrument()` to trace outbound LLM provider latency (Ollama, Gemini, Groq, Tavily, Resend).
+  - Add `CeleryInstrumentor().instrument()` to trace asynchronous document ingestion, OCR parsing, and async evaluation tasks across Celery worker queues.
+  - Propagate W3C standard `traceparent` headers from Next.js Edge proxy $\rightarrow$ FastAPI Gateway $\rightarrow$ Celery workers $\rightarrow$ pgvector/Redis.
+- **Status:** **Planned (Phase I)**
+
+#### 🚨 Milestone 76: Real-Time Telemetry Live Aggregations & SLA Webhook Alerting Engine
+- **Repo Scope:** Both (`retriever` `alert_service.py`, `routers/admin.py` & `Prateek_website` `src/app/api/rag/telemetry/route.ts`)
+- **Deliverable:**
+  - Replace static fallback values in `src/app/api/rag/telemetry/route.ts` with real-time SQL/Redis queries against live `inference_logs` and `online_evaluations` tables.
+  - Build multi-channel Webhook Alerting Engine in Retriever (`alert_service.py`):
+    - Configurable alert webhooks (Slack, Discord, custom webhooks, email via Resend).
+    - Proactive dispatch triggers: (1) Rolling 1-hour Hallucination Index $> 30\%$, (2) Tenant token quota consumption $\ge 90\%$ or $100\%$, (3) P99 inference latency spike $> 5\text{s}$, (4) RLS tenancy violation attempts.
+- **Status:** **Planned (Phase I)**
+
+#### 🧪 Milestone 77: Synthetic Golden Dataset Generation & Automated CI/CD Regression Gate
+- **Repo Scope:** `retriever` (`apps/api/src/domain/evaluation/`, `scripts/run_eval_regression.py`, `.github/workflows/eval_regression.yml`)
+- **Deliverable:**
+  - Synthetic Test Generator (`synthetic_dataset_generator.py`): Ingests tenant documents, extracts key factual propositions, and automatically generates high-coverage Q&A benchmark pairs with ground-truth chunk IDs.
+  - Automated CI/CD Regression Gate: GitHub Action workflow executing Ragas + DeepEval runs before canary deployments, enforcing a strict minimum threshold (Faithfulness $\ge 0.90$, Answer Relevancy $\ge 0.85$, Hallucination $\le 0.10$) to prevent regression releases.
+- **Status:** **Planned (Phase I)**
+
+#### 📊 Milestone 78: Visual Claim-by-Claim Grounding Diff & Synchronizer Observability Cockpit
+- **Repo Scope:** Both (`retriever/apps/web` `tenant-hallucinations.tsx`, `Prateek_website` `scripts/sync_tabs/analytics.py`, `ChatPanel.tsx`)
+- **Deliverable:**
+  - Visual Claim Grounding Inspector: Enhance `tenant-hallucinations.tsx` in Retriever Admin and `ChatPanel.tsx` in the SaaS App Studio to highlight generated answers sentence-by-sentence (green = verified in source, red = ungrounded/hallucinated), with interactive popovers showing the exact source chunk citation.
+  - Synchronizer Analytics Cockpit Overhaul: Add live Retriever inference metrics, cost breakdowns, and active hallucination alert feeds directly to `scripts/sync_tabs/analytics.py` in the local Streamlit desktop dashboard.
+- **Status:** **Planned (Phase I)**
 
 ---
 

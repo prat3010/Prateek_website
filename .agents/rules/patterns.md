@@ -82,7 +82,12 @@
   - **Framer Motion Layout Transitions:** Tab switchers, mode toggles, and state pill indicators must use Framer Motion `m.span` with `layoutId` (spring physics `type: 'spring', stiffness: 350, damping: 28`) for morphing indicator pills.
   - **Graphic Novel & Editorial Detailing:** Vintage issue stamps (`VOL. 26`), registration crosshair brackets (`⌜ ⌟`), perforated dashed voucher lines (`border-top: 1.5px dashed var(--border-muted)`), and 5-segment proficiency gauge meters.
 
-
-
-
-
+### 13. Mandatory Pre-Implementation Double-Audit & Edge-Case Stress Testing
+- **Rule:** Before executing implementation code on ANY approved plan or milestone, the agent **MUST** perform an exhaustive double-audit of the implementation plan to identify hidden gaps, cascading side-effects, responsive edge cases, and state desync risks.
+- **Stress-Testing Checklist:**
+  1. **Transitive Graph & State Cascades:** Verify direct and transitive dependency resolution (BFS graph traversal), batch state updates, atomic financial recalculations (volume discounts, promo codes, taxes), and multi-item undo state restoration.
+  2. **Viewport & Responsive Constraints:** Verify mobile rendering (<640px, coarse pointers), responsive SVG `viewBox` vs fallback matrix views, and touch target sizing (≥44px).
+  3. **Containing Block & Portal Safety:** Verify that all modals, drawers, tooltips, and popovers escape CSS containing blocks using `<Portal>` (`ADR 05`).
+  4. **Design System 2.0 & Dual-Theme SVG Parity:** Verify contrast and token mapping across both Azure and Noir themes without hardcoded hex drift.
+  5. **Zero-Breakage Backward Compatibility:** Ensure domain helper signatures (`calcQuote`, `generateQuestionnairePDF`, `resolveFeatureDependencies`) maintain strict backward compatibility with existing tests and callers.
+- **Constraint:** Never rush to execute source code modifications before double-auditing and refining the implementation plan.
