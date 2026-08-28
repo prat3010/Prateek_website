@@ -187,16 +187,16 @@ timeline
   - Hacker/CTO CLI scoping commands in `/terminal`: `scope new`, `scope analyze`, `cart status`, `cart checkout`.
   - Terminal QR code deposit generator (`/api/terminal/qrcode`) for scanning and paying on mobile.
 
-* **Milestone 67: Dashboard Workspace Bridge, 7-Day Trial Provisioning & Phase 2 Change Orders**
-  - Supabase Auth PKCE handoff automatically provisions a dedicated client tenant (`tn_client_<uuid>`) on Retriever with a **7-Day Trial** plan and full access to `/rag/app`.
-  - Compiles the confirmed scope/SOW into an immutable, permanent system document (`is_system: true`, `is_deletable: false`) indexed into the client's tenant and displayed in their Document Library.
-  - Embed the full SOTA CPQ customizer and Cart Drawer directly in `/dashboard` (replacing legacy regex text editing).
-  - Digital SOW proposal sign-off modal and Razorpay 50% deposit checkout (`checkout.js`).
-  - Cryptographic SHA-256 SOW freezing (`sow_hash`) upon deposit capture and private workspace collection ingestion (M27).
-  - Phase 2 Change Order engine calculating scope delta in REPL and generating automated milestone invoices.
-  - Local **Streamlit Synchronizer** (`sync_tabs/clients.py`) remains Prateek's single commercial cockpit for tracking scopes, leads, invoices, and linked tenant IDs.
+* **Milestone 67: Dashboard Workspace Bridge, 7-Day Trial Provisioning & Phase 2 Change Orders (Completed)**
+  - ✅ Supabase Auth PKCE handoff automatically provisions a dedicated client tenant (`tn_client_<uuid>`) on Retriever with a **7-Day Trial** plan and full access to `/rag/app`.
+  - ✅ Compiles the confirmed scope/SOW into an immutable, permanent system document (`is_system: true`, `is_deletable: false`) indexed into the client's tenant and displayed in their Document Library.
+  - ✅ Embed the full SOTA CPQ customizer and Cart Drawer directly in `/dashboard` (replacing legacy regex text editing).
+  - ✅ Digital SOW proposal sign-off modal and Razorpay 50% deposit checkout (`checkout.js`).
+  - ✅ Cryptographic SHA-256 SOW freezing (`sow_hash`) upon deposit capture and private workspace collection ingestion (M27).
+  - ✅ Phase 2 Change Order engine calculating scope delta in REPL and generating automated milestone invoices.
+  - ✅ Local **Streamlit Synchronizer** (`sync_tabs/clients.py`) remains Prateek's single commercial cockpit for tracking scopes, leads, invoices, and linked tenant IDs.
 
-* **Milestone 68: Unified Persistent Copilot, Git CI/CD Feeds & Post-Launch SLA Monitoring**
+* **Milestone 68: Unified Persistent Copilot, Git CI/CD Feeds & Post-Launch SLA Monitoring — ACTIVE NEXT**
   - Connect `ClientProjectCopilot.tsx` to private Retriever tenant chat session (grounded in client RFP and sprint milestones).
   - GitHub private repo auto-scaffolding and live sprint commit feed in `/dashboard`.
   - Embed Vercel staging preview frames directly inside the milestone progress tab.

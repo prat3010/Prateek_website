@@ -36,6 +36,16 @@ The terminal parses input strings dynamically. Available commands include:
 * `snake`: Launches the interactive Snake Game with global Supabase leaderboard.
 * `pizzarat`: Toggles the 3D WebGL NYC Pizza Rat physics model.
 * `qrcode`: Generates a dynamic Razorpay UPI QR code for custom payment amounts (e.g., `qrcode 500` via `/api/terminal/qrcode`) with base64 PNG fallback and native `upi://pay` URI scheme launch support.
+* `scope`: Headless Project Scoping & CPQ CLI Engine (`src/lib/terminalScoping.ts`):
+  * `scope new [engine]`: Initialize a new architecture quote (`landing`, `multipage`, `saas`).
+  * `scope add <module_id>`: Add module with automatic GraphRAG prerequisite resolution.
+  * `scope remove <module_id>`: Remove module with dependent cascade checks.
+  * `scope promo <code>`: Apply and validate coupon or partner attribution codes.
+  * `scope analyze "<query>"`: Multimodal NLP intent parsing proxying to Retriever's `prateeq_scoping` tenant (`/api/scoping/parse-intent`).
+  * `scope export [azure|noir]`: Download client-side generated Scoping Brief PDF.
+* `cart`: Architecture Cart & Escrow Checkout Command:
+  * `cart status`: Render ASCII tabular summary of selected engine, modules, volume bundle discount meter, and total price.
+  * `cart checkout [--deposit 50|40]`: Generate dynamic UPI / Razorpay payment QR code directly in the terminal console for instant mobile checkout.
 * `clear`: Clears the terminal screen memory history.
 
 ---

@@ -272,6 +272,44 @@ This document serves as the registry of critical architectural design decisions 
 
 ---
 
+# **ADR 18: Headless Scoping CLI Engine & QR Code Checkout (Milestone 66)**
+
+* **Status**: Approved & Implemented
+* **Context**: Technical clients, engineering leads, and CTOs prefer command-line interfaces for querying specifications, configuring software stacks, and calculating pricing quotes without navigating multi-step graphical wizards. Furthermore, seamless transition from desktop terminal exploration to mobile UPI/card payment required an instant QR code generation mechanism.
+* **Decision**:
+  1. **Pure Domain Scoping CLI (`src/lib/terminalScoping.ts`)**: Built a modular, zero-DOM terminal scoping engine providing commands:
+     - `scope new [engine]`: Initializes quote with selected base engine.
+     - `scope add <module>` & `scope remove <module>`: Add/remove modules with automatic GraphRAG prerequisite resolution (`resolveFeatureDependencies`).
+     - `scope promo <code>`: Validates coupon and Sales Partner attribution.
+     - `scope analyze "<query>"`: Multimodal NLP intent parser proxying to Retriever's `prateeq_scoping` live tenant (`/api/scoping/parse-intent`).
+     - `scope export [azure|noir]`: Triggers direct client-side PDF download.
+     - `cart status` & `cart checkout [--deposit 50|40]`: ASCII table rendering and mobile payment QR code generator.
+  2. **Synchronized SSoT**: Consumes `intakeQuestionnaireDefaults.json` and `pricing.ts` directly, guaranteeing exact mathematical and feature alignment with the web scoping wizard.
+* **Consequences**:
+  - **Pros**: High-credibility developer-first interaction surface; zero drift between GUI and CLI pricing; instant mobile checkout via ASCII/PNG QR codes.
+  - **Cons**: None. 12 dedicated unit tests in `terminalScoping.test.ts` verify all CLI paths.
+
+---
+
+# **ADR 19: Dashboard Workspace Bridge, 7-Day Trial Provisioning & Phase 2 Change Orders (Milestone 67)**
+
+* **Status**: Approved & Implemented
+* **Context**: The legacy client dashboard (`/dashboard`) used simple regex-based text edits for scope modification, lacked prerequisite dependency safety, and did not handle post-deposit scope modifications gracefully. Additionally, new commercial clients needed automated onboarding into the Retriever SaaS platform with an active 7-day trial and pre-grounded baseline contract indexing.
+* **Decision**:
+  1. **SOTA Visual Customizer Modal in Dashboard**: Embedded the full visual CPQ customizer modal inside `<Portal>`, wired to `calcQuote`, `resolveFeatureDependencies`, `DependencyCascadeModal`, promo code validation, and volume bundle savings progress meters.
+  2. **Phase 2 Change Order Workflow**: When a scope has its deposit paid (`deposit_paid: true`), feature customization automatically transitions into a **Phase 2 Change Order Review**:
+     - Calculates delta pricing in real time (added features vs removed features).
+     - Submits change orders to `/api/client/change-orders` (persisted in `scope_change_orders`).
+     - Automatically generates an itemized milestone invoice in `invoices`.
+  3. **Cryptographic SOW Seal & 7-Day Trial Gateway**:
+     - Signed proposals display an immutable SHA-256 SOW Seal badge (`sow_hash`).
+     - Dashboard prominently displays a Retriever 7-Day Trial Gateway card linking clients directly to `/rag/app`.
+* **Consequences**:
+  - **Pros**: Eliminates scope creep through formal change order milestone invoicing; prevents orphaned feature dependencies; delivers seamless SaaS onboarding and instant copilot grounding.
+  - **Cons**: Requires live Supabase DDL migrations for `scope_change_orders` table and new columns on `client_scopes` (applied via `execute_sql`).
+
+---
+
 # **Acceptance Criteria**
 - Registry records cover the core v2 architectural choices.
 - Format follows standard ADR structures (Context, Decision, Consequences).

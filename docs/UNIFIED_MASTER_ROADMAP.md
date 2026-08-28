@@ -165,7 +165,7 @@ timeline
   - Cryptographic SHA-256 SOW freezing (`sow_hash`) upon deposit capture and private workspace collection ingestion (M27).
   - Phase 2 Change Order engine calculating scope delta in REPL and generating automated milestone invoices.
   - Local **Streamlit Synchronizer** (`sync_tabs/clients.py`) remains Prateek's single commercial cockpit for tracking scopes, leads, invoices, and linked tenant IDs.
-- **Status:** **Active Next**
+- **Status:** **Completed** (Phase G, Milestone 67)
 
 #### 🛒 Milestone 68: Unified Persistent Copilot, Git CI/CD Feeds & Post-Launch SLA Monitoring
 - **Repo Scope:** Both (`Prateek_website` `ClientProjectCopilot.tsx`, `/dashboard`, and `retriever` chat router)

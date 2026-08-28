@@ -14,39 +14,45 @@ The **Client Workspace Dashboard** (`/dashboard`) serves as the client portal wh
    - Integrated with Supabase Google OAuth sign-in ([`AuthContext.tsx`](../../src/context/AuthContext.tsx)).
    - Session tokens are verified via [`getVerifiedSessionEmail`](../../src/lib/sessionVerify.ts) to restrict data access strictly to the authenticated client's scopes and invoices.
 
-2. **Active Scope Management**:
+2. **Dedicated Retriever SaaS 7-Day Trial Provisioning**:
+   - Displays a prominent trial gateway card linking client directly to `/rag/app`.
+   - Workspace AI copilot is pre-grounded in the client's confirmed scope/SOW baseline.
+
+3. **Active Scope Management & SOW Cryptographic Seal**:
    - Displays all scopes associated with the client (`client_scopes` table).
    - Shows scope details: `scope_code`, `company_name`, selected base engine, feature modules, total cost (INR/USD), and deposit status.
+   - For signed contracts, renders the **Cryptographic SHA-256 SOW Seal Badge** (`sow_hash`).
 
-3. **Interactive Scope Feature Customizer**:
-   - Clients can add or remove feature modules directly inside the dashboard.
-   - Saves updates back to Supabase via `/api/client/save-scope`, maintaining live synchronized state between client edits and admin views.
+4. **SOTA Embedded Architecture Customizer & Phase 2 Change Orders**:
+   - Replaced legacy text editing with an interactive modal embedded via `<Portal>`.
+   - Supports real-time `calcQuote` math, volume bundle progress meters, promo code validation, and prerequisite auto-resolution with [`DependencyCascadeModal`](../../src/components/Intake/DependencyCascadeModal.tsx).
+   - For paid scopes (`deposit_paid: true`), transitions into **Phase 2 Change Order Delta Mode**: computes added/removed feature cost deltas, creates change order records in `scope_change_orders`, and generates automated milestone invoices via `/api/client/change-orders`.
 
-4. **4-Stage Delivery Milestone Tracker**:
+5. **4-Stage Delivery Milestone Tracker**:
    - Tracks project progress across four stages:
      1. `architecture` — Scope definition & technical architecture sign-off (Default).
      2. `engineering` — Core feature implementation & backend development (Triggered upon 50% deposit payment).
      3. `staging` — Staging deployment, testing, and client sign-off.
      4. `live` — Production release & domain handover.
 
-5. **Invoice & Payment Ledger**:
-   - Renders itemized invoice records from the `invoices` table.
-   - Shows payment status (`pending`, `paid`, `cancelled`, `refunded`), invoice number, milestone title, due date, and payment dates.
+6. **Invoice & Payment Ledger & Change Orders History**:
+   - Renders itemized invoice records from the `invoices` table and change order audit trails from `scope_change_orders`.
+   - Shows payment status (`pending`, `paid`, `cancelled`, `refunded`, `invoiced`), invoice number, milestone title, due date, and payment dates.
 
-6. **Commercial PDF Exporters**:
+7. **Commercial PDF Exporters**:
    - Exports high-resolution commercial PDF documents client-side:
      - **Scoping Brief PDF** ([`ScopingBriefPDF.tsx`](../../src/components/pdf/ScopingBriefPDF.tsx))
      - **Services & Pricing Guide PDF** ([`ServicesAndPricingPDF.tsx`](../../src/components/pdf/ServicesAndPricingPDF.tsx))
 
-7. **Scope Deletion & Draft Intake**:
+8. **Scope Deletion & Draft Intake**:
    - Clients can delete unpaid scope drafts via [`/api/client/delete-scope`](../../src/app/api/client/delete-scope/route.ts) endpoint (session-gated, deriving identity via Bearer token, and strictly restricted to unpaid scopes where `deposit_paid = false`).
    - Unauthenticated wizard progress or preliminary scoping choices are saved via [`/api/client/intake-draft`](../../src/app/api/client/intake-draft/route.ts) to the `intake_leads` table, ensuring work is preserved across session redirects.
 
-8. **Razorpay 50% Deposit Lock Trigger**:
-   - Provides a direct action button: **"Pay 50% Scope Deposit (Razorpay)"**.
+9. **Razorpay 50% Deposit Lock Trigger & Proposal Sign-off Modal**:
+   - Provides a digital sign-off modal with milestone payment structure selection (`50/50` vs `40/30/30`) and IP transfer terms confirmation.
    - Invokes `/api/client/create-razorpay-order`, loads Razorpay Checkout modal (`checkout.js`), and initiates payment signature verification upon completion.
 
-9. **Design System 2.0 & Typographic Hierarchy**:
+10. **Design System 2.0 & Typographic Hierarchy**:
     - Centralized CSS tokens in `globals.css` driving `dashboard.module.css`.
     - Headings and company titles use `var(--font-headline)` (`Playfair Display` in Azure, `JetBrains Mono` in Noir).
     - Data badges, scope codes, and milestone pills use `var(--font-code)` (`JetBrains Mono`).
