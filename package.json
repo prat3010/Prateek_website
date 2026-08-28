@@ -2,6 +2,12 @@
   "name": "prateek-website",
   "version": "0.1.0",
   "private": true,
+  "allowScripts": {
+    "esbuild": true,
+    "sharp": true,
+    "unrs-resolver": true,
+    "workerd": true
+  },
   "scripts": {
     "dev": "next dev",
     "generate:wobbly-paths": "node scripts/generate-wobbly-paths.mjs",
