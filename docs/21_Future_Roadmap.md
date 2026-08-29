@@ -1,6 +1,6 @@
 # **21. Future Roadmap (Portfolio Overview)**
 
-> 📌 **Master SSoT Roadmap:** For active platform-wide sequential development tracking (M1 to M68) across `Prateek_website` and `retriever`, see: [`UNIFIED_MASTER_ROADMAP.md`](UNIFIED_MASTER_ROADMAP.md).
+> 📌 **Master SSoT Roadmap:** For active platform-wide sequential development tracking (M1 to M78) across `Prateek_website` and `retriever`, see: [`UNIFIED_MASTER_ROADMAP.md`](UNIFIED_MASTER_ROADMAP.md).
 
 ## **Purpose**
 
@@ -10,7 +10,7 @@ The Future Roadmap tracks proposed feature enhancements, system scale requiremen
 
 # **Roadmap Milestones**
 
-The evolution of Adaptive Portfolio is structured across six future phases:
+The evolution of Adaptive Portfolio is structured across future phases:
 
 ```mermaid
 timeline
@@ -21,6 +21,9 @@ timeline
     Phase 4 : Telemetry Dashboard & Advanced CMS Analytics
     Phase 5 : Client Document Customization
     Phase 6 : Interactive AI Guest Sandbox
+    Phase 7 : RAG SaaS Subscription Platform & Studio Workspace
+    Phase 8 : SOTA Cognitive RAG Algorithm R&D (M69–M73)
+    Phase 9 : Enterprise Cognitive Evaluation & Deep Observability (M74–M78)
 ```
 
 ---
@@ -60,6 +63,21 @@ timeline
 * **Supabase Auth Session Gate**: Connect `/rag/app` natively to Supabase Auth user sessions (`rag_tenants` and `rag_tenant_members` schemas).
 * **Multi-User Team Invites**: Enable tenant owners to invite team members by email with role-based access control.
 * **Detailed Ecosystem Roadmap**: See **[Client Dashboard Ecosystem Roadmap](CLIENT_DASHBOARD_ROADMAP.md)** for full specifications.
+
+---
+
+## **Phase 8: SOTA Cognitive RAG Algorithm R&D (M69 – M73)**
+* **Anthropic Contextual Retrieval**: Prepend 50-word document context headers to chunks prior to vector embedding.
+* **ColBERT Token-Level Reranking**: Late-interaction MaxSim operations on top-50 candidate sets.
+* **Corrective RAG (CRAG)**: Autonomous agentic reflection loop with web search fallbacks.
+* **RLM REPL Studio & Leiden Graph Community RAG**: Dedicated SaaS Studio workspace tab and global hierarchical graph summaries.
+
+---
+
+## **Phase 9: Enterprise Cognitive Evaluation & Deep Observability (M74 – M78)**
+* **Semantic NLI & SLM-as-a-Judge**: DeBERTa cross-encoder + local Ollama evaluation tasks for zero false-positive hallucination tracing.
+* **Full-Stack OpenTelemetry Auto-Instrumentation**: End-to-end distributed tracing across SQL, pgvector, HTTPX LLM calls, and Celery workers.
+* **Automated Golden Dataset CI/CD Gates & SLA Webhooks**: Automated regression gates and real-time SLA incident webhooks.
 
 ---
 

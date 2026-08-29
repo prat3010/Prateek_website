@@ -2,7 +2,7 @@
 **System:** Prateek Website Control Plane (`prateeq.in`)  
 **Deployment URL:** `https://prateeq.in/dashboard` & `https://prateeq.in/rag/app`  
 **Target Audience:** Commercial Services Clients & RAG SaaS Subscribers  
-> 📌 **Master Roadmap (SSoT):** For active platform milestone sequencing (M1 to M68), see [`docs/UNIFIED_MASTER_ROADMAP.md`](UNIFIED_MASTER_ROADMAP.md).  
+> 📌 **Master Roadmap (SSoT):** For active platform milestone sequencing (M1 to M78), see [`docs/UNIFIED_MASTER_ROADMAP.md`](UNIFIED_MASTER_ROADMAP.md).  
 > 📌 **Scoping PRD:** For the complete SOTA Scoping Engine & Productized E-Commerce specification, see [`docs/25_SOTA_Scoping_Engine_PRD.md`](25_SOTA_Scoping_Engine_PRD.md).  
 **Cross-Reference:** Linked directly with the **[Unified Master Product & Architectural Roadmap](UNIFIED_MASTER_ROADMAP.md)** and **[Admin Dashboard Architecture Roadmap](../../retriever/docs/ADMIN_DASHBOARD_ROADMAP.md)** in `retriever`.
 

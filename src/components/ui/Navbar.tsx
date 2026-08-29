@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef, useSyncExternalStore, type MouseEvent } from 'react';
 import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 import { useLenis } from 'lenis/react';
 import { useReducedMotion } from 'framer-motion';
 import { Sun, Moon, Code2, Briefcase } from 'lucide-react';
@@ -87,6 +88,9 @@ export default function Navbar({ items, className }: NavbarProps) {
   const [activeSection, setActiveSection] = useState<string>('');
 
   const effectiveActiveSection = useMemo(() => {
+    if (pathname !== '/' && !pathname?.startsWith('/rag') && !items) {
+      return '';
+    }
     if (activeSection) return activeSection;
     if (items && items.length > 0) return items[0].href;
     if (pathname?.startsWith('/rag')) return '/rag#home';
@@ -209,15 +213,13 @@ export default function Navbar({ items, className }: NavbarProps) {
       if (typeof window === 'undefined') return;
 
       const hashIndex = href.indexOf('#');
-      const targetPath = hashIndex !== -1 ? href.substring(0, hashIndex) : href;
+      const targetPath = hashIndex !== -1 ? (href.substring(0, hashIndex) || '/') : href;
       const anchorId = hashIndex !== -1 ? href.substring(hashIndex) : '';
       
       const currentPath = window.location.pathname;
       const isCurrentPage =
-        targetPath === '' ||
-        targetPath === '/' ||
         targetPath === currentPath ||
-        (targetPath === '/rag' && currentPath === '/rag');
+        ((targetPath === '/' || targetPath === '') && (currentPath === '/' || currentPath === ''));
 
       if (isCurrentPage && anchorId) {
         e.preventDefault();
@@ -248,10 +250,10 @@ export default function Navbar({ items, className }: NavbarProps) {
       aria-label="Main navigation"
     >
       {/* ---- Logo ---- */}
-      <a
-        href="#home"
+      <Link
+        href="/#home"
         className={styles.logo}
-        onClick={(e) => handleNavClick(e, '#home')}
+        onClick={(e) => handleNavClick(e, '/#home')}
         aria-label="Prateeq Sharma — go to home"
       >
         <svg
@@ -275,7 +277,7 @@ export default function Navbar({ items, className }: NavbarProps) {
           <ellipse cx="37" cy="63" rx="3.5" ry="2" className={styles.logoBlush} />
           <ellipse cx="63" cy="63" rx="3.5" ry="2" className={styles.logoBlush} />
         </svg>
-      </a>
+      </Link>
 
       {/* ---- Right Side Controls Group ---- */}
       <div className={styles.rightGroup}>
@@ -283,7 +285,7 @@ export default function Navbar({ items, className }: NavbarProps) {
         <ul className={styles.navLinks}>
           {navItems.map((item) => (
             <li key={item.href}>
-              <a
+              <Link
                 href={item.href}
                 className={`${styles.navLink} ${effectiveActiveSection === item.href ? styles.active : ''}`}
                 onClick={(e) => handleNavClick(e, item.href)}
@@ -295,20 +297,20 @@ export default function Navbar({ items, className }: NavbarProps) {
                 ) : (
                   item.label
                 )}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
 
         {/* ---- RAG Context Action Button ---- */}
         {pathname?.startsWith('/rag') && (
-          <a
+          <Link
             href="/rag/app"
             className="comic-btn comic-btn-blue"
             style={{ padding: '0.35rem 0.85rem', fontSize: '0.8rem', whiteSpace: 'nowrap' }}
           >
             🚀 Launch App
-          </a>
+          </Link>
         )}
 
         {/* ---- Communication Identity Toggle ---- */}
@@ -334,14 +336,14 @@ export default function Navbar({ items, className }: NavbarProps) {
         />
 
         {/* ---- Client Dashboard / Master Admin Link ---- */}
-        <a
+        <Link
           href={mounted && user && isAdminEmail(user.email) ? '/admin' : '/dashboard'}
           className={`comic-btn comic-btn-outline ${styles.headerLoginBtn}`}
           style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem', whiteSpace: 'nowrap' }}
           suppressHydrationWarning
         >
           {mounted && user ? (isAdminEmail(user.email) ? '🛡️ ADMIN' : '👤 DASHBOARD') : 'CLIENT LOGIN'}
-        </a>
+        </Link>
 
         {/* ---- Hamburger ---- */}
         <button
@@ -362,7 +364,7 @@ export default function Navbar({ items, className }: NavbarProps) {
         aria-hidden={!mobileOpen}
       >
         {navItems.map((item) => (
-          <a
+          <Link
             key={item.href}
             href={item.href}
             className={`${styles.mobileNavLink} ${activeSection === item.href ? styles.active : ''}`}
@@ -375,7 +377,7 @@ export default function Navbar({ items, className }: NavbarProps) {
             ) : (
               item.label
             )}
-          </a>
+          </Link>
         ))}
 
         {audience && (
@@ -392,7 +394,7 @@ export default function Navbar({ items, className }: NavbarProps) {
           </div>
         )}
 
-        <a
+        <Link
           href={mounted && user && isAdminEmail(user.email) ? '/admin' : '/dashboard'}
           className="comic-btn comic-btn-outline"
           style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem', marginTop: '0.5rem', width: '100%', maxWidth: '280px', textAlign: 'center', justifyContent: 'center' }}
@@ -400,7 +402,7 @@ export default function Navbar({ items, className }: NavbarProps) {
           suppressHydrationWarning
         >
           {mounted && user ? (isAdminEmail(user.email) ? '🛡️ ADMIN CONTROL' : '👤 CLIENT DASHBOARD') : 'CLIENT LOGIN'}
-        </a>
+        </Link>
       </div>
     </nav>
   );

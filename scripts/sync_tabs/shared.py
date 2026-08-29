@@ -181,23 +181,39 @@ def call_gemini(prompt, file_data=None, file_mime=None):
                 text_content = candidates[0]["content"]["parts"][0]["text"]
                 text = text_content.strip()
                 try:
-                    return json.loads(text)
+                    return json.loads(text, strict=False)
                 except json.JSONDecodeError:
                     pattern = r"```(?:json)?\s*(.*?)\s*```"
                     match = re.search(pattern, text, re.DOTALL)
                     if match:
                         try:
-                            return json.loads(match.group(1).strip())
+                            return json.loads(match.group(1).strip(), strict=False)
                         except json.JSONDecodeError:
                             pass
                     
                     first_brace = text.find('{')
                     last_brace = text.rfind('}')
                     if first_brace != -1 and last_brace != -1:
+                        chunk = text[first_brace:last_brace+1]
                         try:
-                            return json.loads(text[first_brace:last_brace+1])
+                            return json.loads(chunk, strict=False)
                         except json.JSONDecodeError:
                             pass
+                        # Regex fallback for structured responses with embedded unescaped quotes
+                        extracted = {}
+                        for k in ["title", "excerpt", "optimized_title", "optimized_excerpt", "readability_grade", "meta_description", "content"]:
+                            m = re.search(rf'"{k}"\s*:\s*"(.*?)(?="\s*,\s*"\w+"|\s*}})', chunk, re.DOTALL)
+                            if m:
+                                extracted[k] = m.group(1).replace(r'\"', '"').replace(r'\n', '\n')
+                        for list_k in ["tags", "suggested_titles", "seo_recommendations", "ideas", "skills"]:
+                            m_list = re.search(rf'"{list_k}"\s*:\s*\[(.*?)\]', chunk, re.DOTALL)
+                            if m_list:
+                                try:
+                                    extracted[list_k] = json.loads(f"[{m_list.group(1)}]", strict=False)
+                                except Exception:
+                                    pass
+                        if extracted and (("title" in extracted and "content" in extracted) or "ideas" in extracted or "optimized_title" in extracted):
+                            return extracted
                     raise
             else:
                 show_api_error("Error: Empty candidates response from Gemini")

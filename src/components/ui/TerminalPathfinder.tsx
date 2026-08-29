@@ -168,14 +168,17 @@ export default function TerminalPathfinder({ onClose, onAchievementUnlocked }: T
 
   // Sync coordinates when switching between mobile and desktop dimensions
   useEffect(() => {
-    setStartNode(prev => ({
-      col: Math.min(prev.col, cols - 2),
-      row: Math.min(prev.row, rows - 1)
-    }));
-    setEndNode(prev => ({
-      col: isMobile ? Math.min(Math.max(prev.col, 3), cols - 2) : Math.min(prev.col, cols - 2),
-      row: Math.min(prev.row, rows - 1)
-    }));
+    const handle = requestAnimationFrame(() => {
+      setStartNode(prev => ({
+        col: Math.min(prev.col, cols - 2),
+        row: Math.min(prev.row, rows - 1)
+      }));
+      setEndNode(prev => ({
+        col: isMobile ? Math.min(Math.max(prev.col, 3), cols - 2) : Math.min(prev.col, cols - 2),
+        row: Math.min(prev.row, rows - 1)
+      }));
+    });
+    return () => cancelAnimationFrame(handle);
   }, [cols, rows, isMobile]);
 
   // Global mouseup and touchend to release drawing/dragging

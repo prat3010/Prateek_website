@@ -483,97 +483,6 @@
       "Logo & Colors Ready (Need Copywriting & Formatting)",
       "Starting from Scratch (Need Logo & Brand Kit)"
     ],
-    "featureOptions": [
-      "Contact Form / Lead Capture (ReCAPTCHA Protected)",
-      "Payment Gateway (Razorpay)",
-      "User Auth & Client Portal (Google/Magic Link)",
-      "Headless Blog / CMS Content Management",
-      "Private AI Knowledge Base / Vector Search (RAG)",
-      "Admin Dashboard & Role Access Control",
-      "Automated Email Workflows (Resend Transactional)",
-      "Privacy-Compliant Analytics & Visitor Telemetry"
-    ],
-    "timelineOptions": [
-      "Express Delivery Sprint (7–10 Days - Rush Fee Applies)",
-      "Standard Turnaround (2–4 Weeks)",
-      "Flexible Timeline"
-    ],
-    "maintenancePlans": [
-      {
-        "id": "basic",
-        "name": "Basic Care Plan",
-        "priceINR": 5000,
-        "priceUSD": 70,
-        "period": "/ month",
-        "badge": "💡 Recommended for Landing Pages",
-        "laymanDescription": "Keeps your server healthy, creates daily automated database backups, installs security patches, and ensures your site stays online 24/7.",
-        "techSpecs": "Vercel/Supabase Uptime Monitoring, Daily PostgreSQL Backups, SSL Renewals, Security Dependency Updates",
-        "includes": [
-          "Hosting support & SSL management",
-          "Daily automated database backups",
-          "Dependency & security patching",
-          "Minor bug fixes & uptime monitoring"
-        ],
-        "responseTime": "Within 2 business days",
-        "includedHours": "Up to 1 hour of developer time/month",
-        "overageRules": "Overage beyond the included hours requires written approval and is billed separately. Unused hours do not roll over."
-      },
-      {
-        "id": "standard",
-        "name": "Standard Care Plan",
-        "priceINR": 10000,
-        "priceUSD": 140,
-        "period": "/ month",
-        "badge": "💡 Recommended for Auth/Payments/CMS",
-        "laymanDescription": "Includes everything in Basic plus up to 4 hours of monthly developer support to edit text, swap images, update pages, or tweak designs whenever you need.",
-        "techSpecs": "Everything in Basic + 3–4 Hours Monthly Dev Allocation, Core Web Vitals Performance Tuning, Content Schema Updates",
-        "includes": [
-          "Everything in Basic Care",
-          "Monthly text & media content updates",
-          "3–4 hours of dedicated dev time/month",
-          "Performance & page speed tuning"
-        ],
-        "responseTime": "Within 1 business day",
-        "includedHours": "3–4 hours of developer time/month",
-        "overageRules": "Overage beyond the included hours requires written approval and is billed separately. Unused hours do not roll over."
-      },
-      {
-        "id": "premium",
-        "name": "Premium AI & Dev SLA Care Plan",
-        "priceINR": 35000,
-        "priceUSD": 475,
-        "period": "/ month",
-        "badge": "💡 Recommended for AI Chatbot & RAG Engines",
-        "laymanDescription": "For critical business apps and AI engines. Includes a guaranteed priority response SLA, AI model accuracy tuning, SEO reports, and dedicated dev hours.",
-        "techSpecs": "24-Hour Priority SLA, AI Vector Index Tuning & Latency Monitoring, SEO Analytics Reports, Dedicated Feature Engineering",
-        "includes": [
-          "Priority 24-hour SLA response",
-          "AI Vector DB & LLM latency monitoring",
-          "Dedicated feature development hours",
-          "Analytics & SEO health reports"
-        ],
-        "responseTime": "Within 24 hours (response-not-resolution commitment)",
-        "includedHours": "Up to 8 hours of developer time/month",
-        "overageRules": "Overage beyond the included hours requires written approval and is billed separately. Unused hours do not roll over. Third-party service billing is excluded and billed directly to the client."
-      },
-      {
-        "id": "self",
-        "name": "Self-Managed (Complimentary 30-Day Warranty)",
-        "priceINR": 0,
-        "priceUSD": 0,
-        "period": "",
-        "badge": "💡 30-Day Warranty Included",
-        "laymanDescription": "Includes 30 days of complimentary technical support post-launch. Client manages cloud hosting and database updates afterwards.",
-        "techSpecs": "30-Day Post-Launch Bug Warranty, Developer Handover Documentation",
-        "includes": [
-          "30 days complimentary post-launch support",
-          "Client manages cloud hosting & patches afterwards"
-        ],
-        "responseTime": "Within 2 business days (warranty period)",
-        "includedHours": "Complimentary warranty support only",
-        "overageRules": "Post-warranty work is billed separately under a paid care plan."
-      }
-    ],
     "quickServices": [
       {
         "id": "chatbot",
@@ -714,6 +623,97 @@
         "priceUSD": 400,
         "turnaround": "3–7 days",
         "category": "integration"
+      }
+    ],
+    "featureOptions": [
+      "Contact Form / Lead Capture (ReCAPTCHA Protected)",
+      "Payment Gateway (Razorpay)",
+      "User Auth & Client Portal (Google/Magic Link)",
+      "Headless Blog / CMS Content Management",
+      "Private AI Knowledge Base / Vector Search (RAG)",
+      "Admin Dashboard & Role Access Control",
+      "Automated Email Workflows (Resend Transactional)",
+      "Privacy-Compliant Analytics & Visitor Telemetry"
+    ],
+    "timelineOptions": [
+      "Express Delivery Sprint (7–10 Days - Rush Fee Applies)",
+      "Standard Turnaround (2–4 Weeks)",
+      "Flexible Timeline"
+    ],
+    "maintenancePlans": [
+      {
+        "id": "basic",
+        "name": "Basic Care Plan",
+        "priceINR": 5000,
+        "priceUSD": 70,
+        "period": "/ month",
+        "badge": "💡 Recommended for Landing Pages",
+        "laymanDescription": "Keeps your server healthy, creates daily automated database backups, installs security patches, and ensures your site stays online 24/7.",
+        "techSpecs": "Vercel/Supabase Uptime Monitoring, Daily PostgreSQL Backups, SSL Renewals, Security Dependency Updates",
+        "includes": [
+          "Hosting support & SSL management",
+          "Daily automated database backups",
+          "Dependency & security patching",
+          "Minor bug fixes & uptime monitoring"
+        ],
+        "responseTime": "Within 2 business days",
+        "includedHours": "Up to 1 hour of developer time/month",
+        "overageRules": "Overage beyond the included hours requires written approval and is billed separately. Unused hours do not roll over."
+      },
+      {
+        "id": "standard",
+        "name": "Standard Care Plan",
+        "priceINR": 10000,
+        "priceUSD": 140,
+        "period": "/ month",
+        "badge": "💡 Recommended for Auth/Payments/CMS",
+        "laymanDescription": "Includes everything in Basic plus up to 4 hours of monthly developer support to edit text, swap images, update pages, or tweak designs whenever you need.",
+        "techSpecs": "Everything in Basic + 3–4 Hours Monthly Dev Allocation, Core Web Vitals Performance Tuning, Content Schema Updates",
+        "includes": [
+          "Everything in Basic Care",
+          "Monthly text & media content updates",
+          "3–4 hours of dedicated dev time/month",
+          "Performance & page speed tuning"
+        ],
+        "responseTime": "Within 1 business day",
+        "includedHours": "3–4 hours of developer time/month",
+        "overageRules": "Overage beyond the included hours requires written approval and is billed separately. Unused hours do not roll over."
+      },
+      {
+        "id": "premium",
+        "name": "Premium AI & Dev SLA Care Plan",
+        "priceINR": 35000,
+        "priceUSD": 475,
+        "period": "/ month",
+        "badge": "💡 Recommended for AI Chatbot & RAG Engines",
+        "laymanDescription": "For critical business apps and AI engines. Includes a guaranteed priority response SLA, AI model accuracy tuning, SEO reports, and dedicated dev hours.",
+        "techSpecs": "24-Hour Priority SLA, AI Vector Index Tuning & Latency Monitoring, SEO Analytics Reports, Dedicated Feature Engineering",
+        "includes": [
+          "Priority 24-hour SLA response",
+          "AI Vector DB & LLM latency monitoring",
+          "Dedicated feature development hours",
+          "Analytics & SEO health reports"
+        ],
+        "responseTime": "Within 24 hours (response-not-resolution commitment)",
+        "includedHours": "Up to 8 hours of developer time/month",
+        "overageRules": "Overage beyond the included hours requires written approval and is billed separately. Unused hours do not roll over. Third-party service billing is excluded and billed directly to the client."
+      },
+      {
+        "id": "self",
+        "name": "Self-Managed (Complimentary 30-Day Warranty)",
+        "priceINR": 0,
+        "priceUSD": 0,
+        "period": "",
+        "badge": "💡 30-Day Warranty Included",
+        "laymanDescription": "Includes 30 days of complimentary technical support post-launch. Client manages cloud hosting and database updates afterwards.",
+        "techSpecs": "30-Day Post-Launch Bug Warranty, Developer Handover Documentation",
+        "includes": [
+          "30 days complimentary post-launch support",
+          "Client manages cloud hosting & patches afterwards"
+        ],
+        "responseTime": "Within 2 business days (warranty period)",
+        "includedHours": "Complimentary warranty support only",
+        "overageRules": "Post-warranty work is billed separately under a paid care plan."
       }
     ],
     "middlemanAgreement": {
@@ -969,9 +969,9 @@
     }
   ],
   "lastSynced": {
+    "timestamp": "2026-08-29T05:26:51.035789",
     "status": "success",
-    "summary": "Published blog post: Building a Dynamic Game Backend with Flask: A Technical Deep Dive into Earth Evolution Simulator",
-    "timestamp": "2026-07-08T18:33:08.544052"
+    "summary": "Published blog post: Architecting a Hybrid Cloud RAG Engine on OCI & Edge"
   },
   "quotation_india": {
     "dayRate": "₹20,000",

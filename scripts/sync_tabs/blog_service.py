@@ -18,8 +18,9 @@ from sync_tabs.shared import (
     fetch_blog_posts,
     slugify,
     HAS_SYNC,
+    run_safe_git_command,
 )
-from sync_git import commit_and_push_paths, run_safe_git_command
+from sync_git import commit_and_push_paths
 
 
 import urllib.request

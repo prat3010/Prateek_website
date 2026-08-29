@@ -40,6 +40,23 @@ This document serves as the **Episodic Long-Term Memory** for AI agents and deve
   ```
 - **Enforced Solution**: Initialize state lazily in `useState(() => ...)` or derive state values during render whenever possible.
 
+### Quirk: Cross-Page Anchor Navigation Interception in Navbar
+- **Context / Framework**: Next.js App Router + Lenis Smooth Scroll
+- **Symptom**: Clicking "Home" (or other section anchors like `/#about`) from subpages (`/blog`, `/terminal`, `/scoping`, etc.) fails silently with no navigation.
+- **Root Cause**: `handleNavClick` checked `targetPath === '/'` unconditionally when determining `isCurrentPage`. On subpages like `/blog`, `targetPath === '/'` evaluated to `true`, causing `e.preventDefault()` to run and attempt to Lenis-scroll to `#home`, which does not exist on `/blog`.
+- **Anti-Pattern**:
+  ```tsx
+  // BAD: Treats targetPath === '/' as current page even when window.location.pathname === '/blog'
+  const isCurrentPage = targetPath === '' || targetPath === '/' || targetPath === currentPath;
+  ```
+- **Enforced Solution**: Check exact path equality against `window.location.pathname` and use Next.js `<Link>` for all navbar items and the logo so cross-route transitions occur naturally without preventDefault interception.
+  ```tsx
+  // GOOD: Only intercepts when actually on the same page
+  const isCurrentPage =
+    targetPath === currentPath ||
+    ((targetPath === '/' || targetPath === '') && (currentPath === '/' || currentPath === ''));
+  ```
+
 ---
 
 ## 2. Framework & Routing Quirks
