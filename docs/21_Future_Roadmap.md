@@ -81,6 +81,17 @@ timeline
 
 ---
 
+## **Phase 10: Machine Learning & Predictive Intelligence Framework (M79 – M85)**
+* **Scikit-Learn Sparse Hybrid & PyTorch LoRA Domain Adapters (M79)**: Custom code-aware TF-IDF vectorizer + contrastive LoRA fine-tuning for legal/SOW domains.
+* **PyTorch ColBERT MaxSim Engine (M80)**: Apple Silicon MPS / CUDA accelerated token-level reranking (<10ms).
+* **HDBSCAN Dynamic Topic Modeling (M81)**: Unsupervised clustering of 768-dim embeddings into semantic GraphRAG community nodes.
+* **2D/3D Embedding Space Projection Pipeline (M82)**: Server-side PCA/UMAP projection powering interactive 3D WebGL point cloud in SaaS Studio (`/rag/app`).
+* **Isolation Forest Anomaly Sentinel (M83)**: Celery ML worker detecting token abuse and API key scraping.
+* **ML Project Effort & Timeline Regressor (M84)**: Multi-Output Gradient Boosting regression model for CPQ scoping effort & confidence interval timelines.
+* **Zero-Cookie Visitor Persona & Lead Propensity Classifier (M85)**: Unsupervised clustering on GDPR telemetry for dynamic CTAs and automated outreach lead prioritization.
+
+---
+
 > 📌 **Cross-Repository Roadmap & Field Documentation:**  
 > - **Client Dashboard Ecosystem (`prateeq.in`):** **[CLIENT_DASHBOARD_ROADMAP.md](CLIENT_DASHBOARD_ROADMAP.md)**  
 > - **Admin Platform Control Panel (`admin.rag.prateeq.in`):** **[ADMIN_DASHBOARD_ROADMAP.md](../../retriever/docs/ADMIN_DASHBOARD_ROADMAP.md)**  

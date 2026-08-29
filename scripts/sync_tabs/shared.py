@@ -4,8 +4,10 @@ import re
 import json
 import urllib.request
 import urllib.parse
-from datetime import datetime, timedelta
-import streamlit as st
+try:
+    import streamlit as st
+except ImportError:
+    st = None
 
 # Setup sys.path to resolve script directory modules properly
 SCRIPTS_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

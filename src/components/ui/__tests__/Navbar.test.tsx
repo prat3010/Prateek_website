@@ -74,21 +74,24 @@ describe('Navbar Component Navigation', () => {
       toggleTheme: vi.fn(),
       setTheme: vi.fn(),
       isNoir: false,
+      isDetailsHidden: false,
+      toggleDetailsHidden: vi.fn(),
       audience: 'developer',
       setAudience: vi.fn(),
-      region: 'IND',
-      currency: 'INR',
-      setCurrency: vi.fn(),
-    });
+      prevAudience: null,
+      modeTransitionSeed: 0,
+      region: 'india',
+      setRegion: vi.fn(),
+    } as any);
 
     // Mock AuthContext
     vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
       user: null,
       session: null,
       loading: false,
-      error: null,
-      signInWithGoogle: vi.fn(),
-      signOut: vi.fn(),
+      loginWithGoogle: vi.fn(),
+      logout: vi.fn(),
+      getAccessToken: vi.fn().mockResolvedValue(null),
     });
 
     // Mock LenisProvider

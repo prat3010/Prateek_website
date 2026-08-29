@@ -55,13 +55,13 @@ async function searchLiveWeb(query: string): Promise<WebSearchResult[]> {
       snippets.push(match[1].replace(/<[^>]+>/g, '').trim());
     }
 
-    const bannedList = outreachDefaults.bannedDomains || ['duckduckgo', 'wikipedia', 'readycontacts', 'datacaptive'];
+    const bannedList: string[] = ['duckduckgo', 'wikipedia', 'readycontacts', 'datacaptive'];
 
     for (let i = 0; i < links.length; i++) {
       try {
         const urlObj = new URL(links[i]);
         const domain = urlObj.hostname.replace('www.', '');
-        const isBanned = bannedList.some((b) => domain.includes(b));
+        const isBanned = bannedList.some((b: string) => domain.includes(b));
         if (domain && !isBanned) {
           results.push({
             title: domain.split('.')[0].toUpperCase() + ' Corp',

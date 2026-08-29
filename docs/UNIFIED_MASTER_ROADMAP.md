@@ -40,7 +40,7 @@
 
 ---
 
-## 2. Master Sequential Implementation Timeline (M1 – M68)
+## 2. Master Sequential Implementation Timeline (M1 – M85)
 
 ```mermaid
 timeline
@@ -54,6 +54,7 @@ timeline
     Phase G (M63–M68) : Productized E-Commerce Scoping & Agency Ecosystem : ACTIVE NEXT
     Phase H (M69–M73) : SOTA Cognitive RAG Algorithm R&D : Planned
     Phase I (M74–M78) : Enterprise Cognitive Evaluation & Deep Observability : Planned
+    Phase J (M79–M85) : Machine Learning & Predictive Intelligence Framework : Planned
 ```
 
 ---
@@ -274,6 +275,91 @@ timeline
   - Visual Claim Grounding Inspector: Enhance `tenant-hallucinations.tsx` in Retriever Admin and `ChatPanel.tsx` in the SaaS App Studio to highlight generated answers sentence-by-sentence (green = verified in source, red = ungrounded/hallucinated), with interactive popovers showing the exact source chunk citation.
   - Synchronizer Analytics Cockpit Overhaul: Add live Retriever inference metrics, cost breakdowns, and active hallucination alert feeds directly to `scripts/sync_tabs/analytics.py` in the local Streamlit desktop dashboard.
 - **Status:** **Planned (Phase I)**
+
+---
+
+### Phase J: Machine Learning & Predictive Intelligence Framework (M79 – M85) — **PLANNED HORIZON**
+
+```text
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│     PHASE J: MACHINE LEARNING & PREDICTIVE INTELLIGENCE FRAMEWORK (M79–M85)            │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  [M79] PyTorch & Scikit-Learn Sparse-Dense Hybrid Engine & Contrastive LoRA Adapters   │
+│  [M80] PyTorch ColBERT Late-Interaction Multi-Vector MaxSim Retrieval Engine           │
+│  [M81] Scikit-Learn Unsupervised Chunk Clustering & HDBSCAN Dynamic Topic Modeling     │
+│  [M82] Scikit-Learn 2D/3D Embedding Space Projection Pipeline for SaaS Studio         │
+│  [M83] Scikit-Learn Real-Time Telemetry Anomaly Detection & Token Quota Abuse Guard    │
+│  [M84] Scikit-Learn ML Project Effort & Sprint Delivery Timeline Regression Model      │
+│  [M85] Scikit-Learn & PyTorch Visitor Persona & Lead Conversion Propensity Classifier  │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### 🧪 Milestone 79: Sparse-Dense Hybrid Engine & Contrastive LoRA Domain Adapters
+- **Libraries:** `scikit-learn` (`TfidfVectorizer`, `cosine_similarity`) & `PyTorch` (`torch.nn`, `MultipleNegativesRankingLoss`)
+- **Repo Scope:** `retriever` (`packages/processing-core/`, `apps/api/src/adapters/vector/`, `workers/src/tasks/`)
+- **Deliverable:**
+  - **Custom Sublinear TF-IDF / BM25 Vectorizer (`scikit-learn`):** Implement a domain-aware sparse vectorizer with custom code-aware regex tokenizers (preserving camelCase, snake_case, URLs, and framework symbols like `Next.js 16` or `FastAPI`), custom n-gram ranges $(1, 3)$, and domain stopwords. This powers sub-millisecond sparse lookup alongside pgvector dense embeddings.
+  - **PyTorch Contrastive LoRA Domain Adapter:** Implement a lightweight 2-layer MLP projection adapter (or LoRA fine-tuning script) on top of base 768-dim embeddings (`nomic-embed-text` / `bge-small`) using `MultipleNegativesRankingLoss`. Adapts the shared embedding space specifically to legal SOW terminology, software architecture jargon, and Prateek's engineering deliverables.
+- **Status:** **Planned (Phase J)**
+
+#### ⚡ Milestone 80: PyTorch Late-Interaction ColBERT Token-Level MaxSim Engine
+- **Libraries:** `PyTorch` (`torch.einsum`, `torch.nn.functional`, Apple Silicon `mps` / CUDA backend)
+- **Repo Scope:** `retriever` (`apps/api/src/adapters/reranker/`, `workers/src/tasks/colbert_worker.py`)
+- **Deliverable:**
+  - **Multi-Vector Token Representation:** Instead of compressing entire documents into a single fixed vector, encode query tokens $Q \in \mathbb{R}^{|Q| \times D}$ and document chunk tokens $D \in \mathbb{R}^{|D| \times D}$ using a PyTorch ColBERT model.
+  - **Hardware-Accelerated MaxSim Operator:** Implement the Late-Interaction operator via `torch.einsum` or batch matrix multiplication:
+    $$\text{Score}(Q, D) = \sum_{i \in Q} \max_{j \in D} \left( E_Q[i] \cdot E_D[j]^\top \right)$$
+    Accelerated via Apple Silicon Metal Performance Shaders (`torch.device("mps")`) locally and CUDA on Oracle VPS workers, achieving <10ms token-level reranking on top-50 candidates without calling third-party APIs.
+- **Status:** **Planned (Phase J)**
+
+#### 🌳 Milestone 81: Scikit-Learn Unsupervised Chunk Clustering & HDBSCAN Dynamic Topic Modeling
+- **Libraries:** `scikit-learn` (`cluster.HDBSCAN`, `cluster.KMeans`, `decomposition.TruncatedSVD`)
+- **Repo Scope:** `retriever` (`apps/api/src/domain/clustering/`, `graph_extraction_service.py`, `workers/`)
+- **Deliverable:**
+  - **Hierarchical Density-Based Clustering (`HDBSCAN`):** Automatically cluster 768-dim embeddings across a tenant's document library into semantic topic groups without requiring manual cluster count ($k$) specification.
+  - **Dynamic Knowledge Graph Community Genesis:** Automatically synthesize high-level topic summary nodes and link disjoint chunks to parent topic nodes in the GraphRAG store, powering multi-document synthesis and hierarchical retrieval.
+- **Status:** **Planned (Phase J)**
+
+#### 🪐 Milestone 82: Scikit-Learn 2D/3D Embedding Space Projection Pipeline for SaaS Studio
+- **Libraries:** `scikit-learn` (`decomposition.PCA`, `manifold.TSNE`, `umap-learn`)
+- **Repo Scope:** Both (`retriever` `POST /v1/tenants/{id}/embeddings/project` & `Prateek_website` `/rag/app/visualizer`)
+- **Deliverable:**
+  - **Dimensionality Reduction Pipeline:** Server-side `PCA` + `UMAP` projection pipeline in `retriever` reducing 768-dim vectors down to 3D Cartesian coordinates $(x, y, z)$ alongside cluster centroid labels and silhouette scores.
+  - **Interactive 3D Vector Explorer in SaaS Studio (`/rag/app`):** Three.js / Canvas WebGL interactive point cloud showing tenant documents as floating clustered spheres, with live query projection (rendering user search queries as glowing beacon vectors intersecting nearest document clusters).
+- **Status:** **Planned (Phase J)**
+
+#### 🛡️ Milestone 83: Scikit-Learn Real-Time Telemetry Anomaly Detection & Quota Abuse Guard
+- **Libraries:** `scikit-learn` (`ensemble.IsolationForest`, `svm.OneClassSVM`, `preprocessing.StandardScaler`)
+- **Repo Scope:** `retriever` (`apps/api/src/domain/telemetry/`, `workers/src/tasks/anomaly_sentinel.py`)
+- **Deliverable:**
+  - **Inference Anomaly Detector (`IsolationForest`):** Asynchronous Celery task processing streaming inference telemetry features (request rate velocity, token prompt entropy, P99 latency variance, geographic IP hops, error frequency).
+  - **Autonomous Rate Limit & Abuse Quarantine:** Instantly flags automated scraping, prompt extraction attacks, or compromised tenant API keys, dynamically downgrading malicious actors to rate-limited queues and triggering Slack/Discord security webhooks.
+- **Status:** **Planned (Phase J)**
+
+#### 📈 Milestone 84: Scikit-Learn ML Project Effort & Sprint Delivery Timeline Regression Model
+- **Libraries:** `scikit-learn` (`ensemble.GradientBoostingRegressor`, `ensemble.RandomForestRegressor`, `pipeline.Pipeline`)
+- **Repo Scope:** `Prateek_website` (`src/lib/pricing.ts`, `/api/scoping/estimate-timeline`, `/scoping`, `/dashboard`)
+- **Deliverable:**
+  - **Predictive SOW Regression Model:** Train a Multi-Output Gradient Boosting Regressor on historical scoping feature sets (engine complexity, route count, auth providers, database models, payment integrations, SLA tiers) to predict:
+    1. Realistic Engineering Sprint Hours ($P_{50}$ median vs $P_{90}$ buffer).
+    2. Estimated Delivery Window (Calendar days with 95% confidence bounds).
+    3. Architecture Complexity Index ($1.0 - 5.0$).
+  - **Client Scoping Lab & Dashboard Integration:** Live dynamic timeline bar with confidence intervals displayed in the Cart Drawer (`/scoping`) and Client Workspace (`/dashboard`), replacing static flat-rate delivery estimates.
+- **Status:** **Planned (Phase J)**
+
+#### 🎯 Milestone 85: Scikit-Learn & PyTorch Visitor Persona & Lead Conversion Propensity Classifier
+- **Libraries:** `scikit-learn` (`cluster.KMeans`, `linear_model.LogisticRegression`, `metrics.roc_auc_score`) & `PyTorch` (Intent Cross-Encoder)
+- **Repo Scope:** `Prateek_website` (`src/proxy.ts`, `src/app/admin/`, `scripts/sync_tabs/clients.py`, `scripts/sync_tabs/analytics.py`)
+- **Deliverable:**
+  - **Zero-Cookie Visitor Intent Clustering (`KMeans`):** Unsupervised clustering on GDPR-compliant daily telemetry (`page_visits` dwell time, section scroll velocity, audience switch toggles, terminal command history) classifying visitors into 4 dynamic personas:
+    1. *Enterprise Decision Maker* $\rightarrow$ Automatically boosts Enterprise Architecture & SOW CTA prominence.
+    2. *SaaS AI Buyer* $\rightarrow$ Highlights `/rag` live sandbox and 7-day trial badges.
+    3. *Technical Recruiter* $\rightarrow$ Highlights Resume PDF download & Skill verified badges.
+    4. *Open-Source Peer Developer* $\rightarrow$ Highlights `/terminal` hacker mode and GitHub repository links.
+  - **Autonomous Outreach Conversion Propensity Scorer:** Supervised classifier scoring cold outreach prospects in `/admin` by predicted reply rate, prioritizing high-value leads for Prateek's weekly pipeline.
+- **Status:** **Planned (Phase J)**
+
+---
 
 ---
 

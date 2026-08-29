@@ -1,6 +1,6 @@
 # Product & Architectural Roadmap (Single Source of Truth)
 
-> 📌 **Master Roadmap Location:** For the comprehensive, platform-wide sequential timeline (M1 to M78) and active milestone tracking across both `Prateek_website` and `retriever`, see:
+> 📌 **Master Roadmap Location:** For the comprehensive, platform-wide sequential timeline (M1 to M85) and active milestone tracking across both `Prateek_website` and `retriever`, see:
 > 👉 **[`docs/UNIFIED_MASTER_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md)**
 
 ---
@@ -19,6 +19,7 @@ timeline
     Phase G (M63–M68) : SOTA Productized E-Commerce Scoping & Agency Ecosystem : ACTIVE NEXT
     Phase H (M69–M73) : SOTA Cognitive RAG Algorithm R&D : Planned
     Phase I (M74–M78) : Enterprise Cognitive Evaluation & Deep Observability : Planned
+    Phase J (M79–M85) : Machine Learning & Predictive Intelligence Framework : Planned
 ```
 
 ---

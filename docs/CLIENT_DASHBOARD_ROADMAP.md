@@ -112,6 +112,7 @@ timeline
     Phase 5 : Client Telemetry & Usage Analytics
     Phase 6 : Surface Parity, Citation Visualizer & RLM Studio
     Phase 7 : SOTA Productized Scoping & Full Agency Ecosystem : ACTIVE NEXT
+    Phase 8 : Predictive Machine Learning & 3D Studio Visualizer (M79–M85) : Planned
 ```
 
 ### Phase 1: Completed Baseline Setup (Current State)
@@ -205,6 +206,32 @@ timeline
 
 ---
 
+### Phase 8: Predictive Machine Learning & 3D Studio Visualizer (M79 – M85) — **PLANNED**
+
+```text
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│         PHASE 8: PREDICTIVE ML & 3D SAAS STUDIO VISUALIZER (M79–M85)                   │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  [M82] Interactive 3D WebGL Vector Cloud Visualizer in SaaS Studio (/rag/app)          │
+│  [M83] Scikit-Learn Anomaly Sentinel for API Quotas & Suspicious Tenant Traffic         │
+│  [M84] ML-Powered SOW Effort & Sprint Delivery Timeline Regression Engine              │
+│  [M85] Zero-Cookie Visitor Persona Classifier & Outreach Conversion Propensity Scorer  │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+* **Milestone 82: Interactive 3D WebGL Vector Visualizer in SaaS Studio (`/rag/app`)**
+  - Server-side PCA/UMAP projection endpoint in `retriever` reducing 768-dim tenant document vectors to 3D coordinates.
+  - Three.js / Canvas interactive point cloud tab in SaaS Studio (`VectorVisualizer.tsx`) rendering document clusters, centroid labels, and glowing real-time search query vector intersections.
+
+* **Milestone 84: ML-Powered SOW Effort & Sprint Delivery Timeline Regression Model**
+  - Multi-Output Gradient Boosting Regressor trained on historical CPQ scoping configurations in `src/lib/pricing.ts` and `/api/scoping/estimate-timeline`.
+  - Replaces static timeline estimates with dynamic $P_{50} / P_{90}$ sprint confidence intervals displayed inside the Cart Drawer (`/scoping`) and Client Workspace (`/dashboard`).
+
+* **Milestone 85: Zero-Cookie Visitor Persona Classifier & Dynamic CTAs**
+  - Unsupervised `KMeans` clustering on GDPR-compliant daily telemetry classifying visitors into Enterprise Clients, SaaS Buyers, Recruiters, and Dev Peers, tailoring dynamic UI CTAs and lead propensity scoring.
+
+---
+
 ## 5. Client API & Database Contract Reference Table
 
 | Entity / Endpoint | Type | Primary Purpose |
@@ -220,12 +247,14 @@ timeline
 | `rag_subscriptions` | Supabase DB Table | Subscription billing tracking (`plan_tier`, `monthly_token_limit`, `razorpay_subscription_id`) |
 | `/api/scoping/parse-intent` | Next.js API Route | Natural language intent parser proxying to Retriever `prateeq_scoping` |
 | `/api/scoping/parse-rfp` | Next.js API Route | Multimodal RFP/PRD PDF parser proxying to Retriever M42/M22 |
+| `/api/scoping/estimate-timeline` | Next.js API Route | ML regression endpoint predicting sprint hours & confidence bounds (M84) |
 | `/api/scoping/validate-promo` | Next.js API Route | Promo code validator and Sales Partner attribution resolver |
 | `/api/client/save-scope` | Next.js API Route | Save/update scope feature customizations in draft mode |
 | `/api/client/create-razorpay-order` | Next.js API Route | Initiate 50% scope deposit Razorpay order |
 | `/api/client/create-razorpay-subscription` | Next.js API Route | Initiate RAG SaaS plan subscription |
 | `/api/terminal/qrcode` | Next.js API Route | Generate ASCII / PNG QR code for terminal mobile checkout |
 | `/api/webhooks/razorpay` | Next.js API Route | Process Razorpay payment & subscription webhooks |
+| `POST /v1/tenants/{id}/embeddings/project` | FastAPI Route | 3D UMAP/PCA dimensionality reduction for Studio visualizer (M82) |
 
 ---
 
