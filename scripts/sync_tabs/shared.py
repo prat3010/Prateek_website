@@ -242,117 +242,292 @@ def st_image_safe(image_path_or_bytes, **kwargs):
     else:
         st.image(image_path_or_bytes, **kwargs)
 
+# ==========================================
+# Domain Taxonomy & Fallback Capability Pillars
+# ==========================================
+PILLAR_AI_RAG = {
+    "name": "AI Agent & RAG Architecture",
+    "name_business": "AI Workflows & RAG Document Intelligence",
+    "icon": "bot",
+    "description": "Designing autonomous multi-agent networks, vector embeddings (pgvector/Ollama), and citation-grounded RAG pipelines.",
+    "description_business": "Automating repetitive business processes and building AI-powered chat systems with verified document citations.",
+    "category": "orchestration",
+    "color": "#E10098",
+    "level": "Level Max",
+    "status": "legendary"
+}
+
+PILLAR_PROMPT_ENGINEERING = {
+    "name": "Structured Prompting & LLM Tuning",
+    "name_business": "AI Prompt Engineering & Context Design",
+    "icon": "brain",
+    "description": "Architecting prompt templates, context window packing, and guiding complex LLM logical reasoning paths.",
+    "description_business": "Designing structured prompts and context flows to optimize AI accuracy and lower API token costs.",
+    "category": "orchestration",
+    "color": "#FFEB3B",
+    "level": "Level Max",
+    "status": "mastered"
+}
+
+PILLAR_AI_ASSISTED = {
+    "name": "AI-Assisted Engineering Workflows",
+    "name_business": "Rapid Software Delivery & AI Workflows",
+    "icon": "sparkles",
+    "description": "Accelerating build speed using agentic composer setups, visual prototypes, and automated task execution.",
+    "description_business": "Utilizing modern AI build pipelines to ship custom web platforms and tools significantly faster.",
+    "category": "orchestration",
+    "color": "#00E5FF",
+    "level": "Level Max",
+    "status": "mastered"
+}
+
+PILLAR_NEXT_REACT = {
+    "name": "Next.js & React App Architecture",
+    "name_business": "High-Performance Web Applications",
+    "icon": "atom",
+    "description": "Building full-stack web applications with Next.js 16 App Router, React 19, Server Components, and optimized rendering.",
+    "description_business": "Developing fast, SEO-optimized web applications and portals built on Next.js infrastructure.",
+    "category": "logic",
+    "color": "#3178C6",
+    "level": "Level Max",
+    "status": "mastered"
+}
+
+PILLAR_PYTHON_SYSTEMS = {
+    "name": "Python Systems & Async APIs",
+    "name_business": "High-Speed Server APIs & Background Workers",
+    "icon": "terminal",
+    "description": "Developing backend microservices, asynchronous workers, and REST APIs using Python (FastAPI / Flask).",
+    "description_business": "Building backend services and API automation layers to power modern web apps.",
+    "category": "logic",
+    "color": "#3776AB",
+    "level": "Level Max",
+    "status": "mastered"
+}
+
+PILLAR_SUPABASE_POSTGRES = {
+    "name": "PostgreSQL & Supabase Engineering",
+    "name_business": "Secure Cloud Database & Data Storage",
+    "icon": "database",
+    "description": "Designing relational schemas, Row-Level Security (RLS), pgvector semantic indexing, and Supabase BaaS integrations.",
+    "description_business": "Structuring secure databases with automated data access controls and cloud backend hosting.",
+    "category": "logic",
+    "color": "#3ECF8E",
+    "level": "Level Max",
+    "status": "mastered"
+}
+
+PILLAR_TYPESCRIPT = {
+    "name": "TypeScript & Type-Safe Architecture",
+    "name_business": "Reliable & Maintainable Codebases",
+    "icon": "shield",
+    "description": "Enforcing strict end-to-end type safety, shared interfaces, and runtime data contract validation across client and server.",
+    "description_business": "Writing robust, type-checked web application logic that minimizes software bugs and maintenance costs.",
+    "category": "logic",
+    "color": "#007ACC",
+    "level": "Level Max",
+    "status": "mastered"
+}
+
+PILLAR_API_INTEGRATION = {
+    "name": "API & Integration Pipelines",
+    "name_business": "System Integrations & Data Streaming",
+    "icon": "server",
+    "description": "Designing resilient REST endpoints, Server-Sent Events (SSE) streaming, and third-party API orchestration.",
+    "description_business": "Connecting third-party business services, payment portals, and real-time live data streams.",
+    "category": "logic",
+    "color": "#059669",
+    "level": "Level Max",
+    "status": "mastered"
+}
+
+PILLAR_FLUTTER = {
+    "name": "Flutter & Cross-Platform Mobile",
+    "name_business": "Cross-Platform iOS & Android Apps",
+    "icon": "smartphone",
+    "description": "Architecting compiled mobile applications with Flutter/Dart, Riverpod state management, and declarative routing.",
+    "description_business": "Building high-performance native-feeling mobile applications for iOS and Android from a unified codebase.",
+    "category": "product",
+    "color": "#02569B",
+    "level": "Level Max",
+    "status": "mastered"
+}
+
+PILLAR_PRODUCT_UX = {
+    "name": "Product Strategy & UX Design",
+    "name_business": "Customer Journey & Experience Design",
+    "icon": "layout",
+    "description": "Defining user flows, functional requirements, and shipping friction-free MVPs aligned with user goals.",
+    "description_business": "Designing intuitive user interfaces and user flows that improve customer conversion and retention.",
+    "category": "product",
+    "color": "#FF1744",
+    "level": "Level Max",
+    "status": "mastered"
+}
+
+PILLAR_DESIGN_SYSTEMS = {
+    "name": "Design Systems & Web Performance",
+    "name_business": "Polished Frontend & Speed Optimization",
+    "icon": "paintbrush",
+    "description": "Crafting modular CSS systems, Framer Motion transitions, and optimizing Core Web Vitals (LCP, CLS, INP).",
+    "description_business": "Improving site loading speeds, visual polish, and responsive layouts across desktop and mobile devices.",
+    "category": "product",
+    "color": "#FF4081",
+    "level": "Level Max",
+    "status": "mastered"
+}
+
+PILLAR_OFFLINE_PRIVACY = {
+    "name": "Privacy Sandboxing & Offline Architecture",
+    "name_business": "Local Device Privacy & Offline Security",
+    "icon": "shield",
+    "description": "Designing privacy-first applications operating strictly on local device runtimes with zero external data telemetry.",
+    "description_business": "Securing sensitive user data by processing files directly on the user's local device without external servers.",
+    "category": "product",
+    "color": "#00E676",
+    "level": "Level Max",
+    "status": "mastered"
+}
+
+PILLAR_DATA_SCIENCE = {
+    "name": "Data Science & Numerical Modeling",
+    "name_business": "Business Intelligence & Data Insights",
+    "icon": "bar-chart",
+    "description": "Analyzing raw datasets, mathematical space transformations, NumPy/SciPy computation, and analytical modeling.",
+    "description_business": "Translating raw operational data into actionable insights, analytical dashboards, and predictive models.",
+    "category": "dynamic",
+    "color": "#00897B",
+    "level": "Active Quest",
+    "status": "quest"
+}
+
+PILLAR_ADAPTIVE_STACK = {
+    "name": "Adaptive Stack & Rapid Prototyping",
+    "name_business": "Adaptive Technical Consultation & MVPs",
+    "icon": "zap",
+    "description": "Rapidly mastering and deploying tools as required to ship end-to-end web apps, internal dashboards, and automation tooling.",
+    "description_business": "Providing flexible end-to-end technical execution tailored to your specific project requirements.",
+    "category": "dynamic",
+    "color": "#FF9100",
+    "level": "Legendary",
+    "status": "legendary"
+}
+
 FALLBACK_SKILLS = {
-    "rag": {
-        "name": "AI Agent & RAG Architecture",
-        "name_business": "AI Workflows & RAG Document Intelligence",
-        "icon": "bot",
-        "description": "Designing autonomous multi-agent networks, vector embeddings, and citation-grounded RAG pipelines.",
-        "description_business": "Automating repetitive business processes and building AI-powered chat systems with verified document citations.",
-        "category": "orchestration",
-        "color": "#E10098",
-        "level": "Level Max",
-        "status": "legendary"
-    },
-    "llm": {
-        "name": "Structured Prompting & LLM Tuning",
-        "name_business": "AI Prompt Engineering & Context Design",
-        "icon": "brain",
-        "description": "Architecting prompt templates, context window packing, and guiding complex LLM logical reasoning paths.",
-        "description_business": "Designing structured prompts and context flows to optimize AI accuracy and lower API token costs.",
-        "category": "orchestration",
-        "color": "#FFEB3B",
-        "level": "Level Max",
-        "status": "mastered"
-    },
-    "next.js": {
-        "name": "Next.js & React App Architecture",
-        "name_business": "High-Performance Web Applications",
-        "icon": "atom",
-        "description": "Building full-stack web applications with Next.js 16 App Router, React 19, Server Components, and optimized rendering.",
-        "description_business": "Developing fast, SEO-optimized web applications and portals built on Next.js infrastructure.",
-        "category": "logic",
-        "color": "#3178C6",
-        "level": "Level Max",
-        "status": "mastered"
-    },
-    "react": {
-        "name": "Next.js & React App Architecture",
-        "name_business": "High-Performance Web Applications",
-        "icon": "atom",
-        "description": "Building full-stack web applications with Next.js 16 App Router, React 19, Server Components, and optimized rendering.",
-        "description_business": "Developing fast, SEO-optimized web applications and portals built on Next.js infrastructure.",
-        "category": "logic",
-        "color": "#3178C6",
-        "level": "Level Max",
-        "status": "mastered"
-    },
-    "python": {
-        "name": "Python Systems & Async APIs",
-        "name_business": "High-Speed Server APIs & Background Workers",
-        "icon": "terminal",
-        "description": "Developing backend microservices, asynchronous workers, and REST APIs using Python (FastAPI / Flask).",
-        "description_business": "Building backend services and API automation layers to power modern web apps.",
-        "category": "logic",
-        "color": "#3776AB",
-        "level": "Level Max",
-        "status": "mastered"
-    },
-    "fastapi": {
-        "name": "Python Systems & Async APIs",
-        "name_business": "High-Speed Server APIs & Background Workers",
-        "icon": "terminal",
-        "description": "Developing backend microservices, asynchronous workers, and REST APIs using Python (FastAPI / Flask).",
-        "description_business": "Building backend services and API automation layers to power modern web apps.",
-        "category": "logic",
-        "color": "#3776AB",
-        "level": "Level Max",
-        "status": "mastered"
-    },
-    "supabase": {
-        "name": "PostgreSQL & Supabase Engineering",
-        "name_business": "Secure Cloud Database & Data Storage",
-        "icon": "database",
-        "description": "Designing relational schemas, Row-Level Security (RLS), pgvector semantic indexing, and Supabase BaaS integrations.",
-        "description_business": "Structuring secure databases with automated data access controls and cloud backend hosting.",
-        "category": "logic",
-        "color": "#3ECF8E",
-        "level": "Level Max",
-        "status": "mastered"
-    },
-    "postgres": {
-        "name": "PostgreSQL & Supabase Engineering",
-        "name_business": "Secure Cloud Database & Data Storage",
-        "icon": "database",
-        "description": "Designing relational schemas, Row-Level Security (RLS), pgvector semantic indexing, and Supabase BaaS integrations.",
-        "description_business": "Structuring secure databases with automated data access controls and cloud backend hosting.",
-        "category": "logic",
-        "color": "#3ECF8E",
-        "level": "Level Max",
-        "status": "mastered"
-    },
-    "typescript": {
-        "name": "TypeScript & Type-Safe Architecture",
-        "name_business": "Reliable & Maintainable Codebases",
-        "icon": "shield",
-        "description": "Enforcing strict end-to-end type safety, shared interfaces, and runtime data contract validation across client and server.",
-        "description_business": "Writing robust, type-checked web application logic that minimizes software bugs and maintenance costs.",
-        "category": "logic",
-        "color": "#007ACC",
-        "level": "Level Max",
-        "status": "mastered"
-    },
-    "flutter": {
-        "name": "Flutter & Cross-Platform Mobile",
-        "name_business": "Cross-Platform iOS & Android Apps",
-        "icon": "smartphone",
-        "description": "Architecting compiled mobile applications with Flutter/Dart, Riverpod state management, and declarative routing.",
-        "description_business": "Building high-performance native-feeling mobile applications for iOS and Android from a unified codebase.",
-        "category": "product",
-        "color": "#02569B",
-        "level": "Level Max",
-        "status": "mastered"
-    }
+    # AI / RAG
+    "rag": PILLAR_AI_RAG,
+    "agent": PILLAR_AI_RAG,
+    "agents": PILLAR_AI_RAG,
+    "multi-agent": PILLAR_AI_RAG,
+    "vector": PILLAR_AI_RAG,
+    "embeddings": PILLAR_AI_RAG,
+    "pgvector": PILLAR_AI_RAG,
+    "ollama": PILLAR_AI_RAG,
+    "semantic-search": PILLAR_AI_RAG,
+    "retrieval": PILLAR_AI_RAG,
+    
+    # Prompting / LLM
+    "llm": PILLAR_PROMPT_ENGINEERING,
+    "prompting": PILLAR_PROMPT_ENGINEERING,
+    "prompt-engineering": PILLAR_PROMPT_ENGINEERING,
+    "gemini": PILLAR_PROMPT_ENGINEERING,
+    "openai": PILLAR_PROMPT_ENGINEERING,
+    "claude": PILLAR_PROMPT_ENGINEERING,
+    
+    # AI Build Workflows
+    "cursor": PILLAR_AI_ASSISTED,
+    "copilot": PILLAR_AI_ASSISTED,
+    "composer": PILLAR_AI_ASSISTED,
+    "ai-coding": PILLAR_AI_ASSISTED,
+    
+    # Next.js / React / Web
+    "next.js": PILLAR_NEXT_REACT,
+    "nextjs": PILLAR_NEXT_REACT,
+    "react": PILLAR_NEXT_REACT,
+    "react19": PILLAR_NEXT_REACT,
+    "frontend": PILLAR_NEXT_REACT,
+    "web-development": PILLAR_NEXT_REACT,
+    "web development": PILLAR_NEXT_REACT,
+    
+    # Python Systems & Async
+    "python": PILLAR_PYTHON_SYSTEMS,
+    "python3": PILLAR_PYTHON_SYSTEMS,
+    "fastapi": PILLAR_PYTHON_SYSTEMS,
+    "flask": PILLAR_PYTHON_SYSTEMS,
+    "django": PILLAR_PYTHON_SYSTEMS,
+    "oop": PILLAR_PYTHON_SYSTEMS,
+    "asyncio": PILLAR_PYTHON_SYSTEMS,
+    "backend": PILLAR_PYTHON_SYSTEMS,
+    
+    # Database
+    "supabase": PILLAR_SUPABASE_POSTGRES,
+    "postgres": PILLAR_SUPABASE_POSTGRES,
+    "postgresql": PILLAR_SUPABASE_POSTGRES,
+    "sql": PILLAR_SUPABASE_POSTGRES,
+    "database": PILLAR_SUPABASE_POSTGRES,
+    "relational": PILLAR_SUPABASE_POSTGRES,
+    
+    # TypeScript
+    "typescript": PILLAR_TYPESCRIPT,
+    "ts": PILLAR_TYPESCRIPT,
+    "type-safety": PILLAR_TYPESCRIPT,
+    
+    # API & Integrations
+    "api": PILLAR_API_INTEGRATION,
+    "apis": PILLAR_API_INTEGRATION,
+    "rest": PILLAR_API_INTEGRATION,
+    "graphql": PILLAR_API_INTEGRATION,
+    "sse": PILLAR_API_INTEGRATION,
+    "webhooks": PILLAR_API_INTEGRATION,
+    "stripe": PILLAR_API_INTEGRATION,
+    "razorpay": PILLAR_API_INTEGRATION,
+    
+    # Mobile
+    "flutter": PILLAR_FLUTTER,
+    "dart": PILLAR_FLUTTER,
+    "mobile": PILLAR_FLUTTER,
+    "ios": PILLAR_FLUTTER,
+    "android": PILLAR_FLUTTER,
+    
+    # Product & UX
+    "ux": PILLAR_PRODUCT_UX,
+    "ui": PILLAR_PRODUCT_UX,
+    "product-design": PILLAR_PRODUCT_UX,
+    "figma": PILLAR_PRODUCT_UX,
+    "wireframing": PILLAR_PRODUCT_UX,
+    
+    # Design Systems & Performance
+    "css": PILLAR_DESIGN_SYSTEMS,
+    "css-modules": PILLAR_DESIGN_SYSTEMS,
+    "tailwind": PILLAR_DESIGN_SYSTEMS,
+    "framer-motion": PILLAR_DESIGN_SYSTEMS,
+    "performance": PILLAR_DESIGN_SYSTEMS,
+    
+    # Security & Offline
+    "privacy": PILLAR_OFFLINE_PRIVACY,
+    "sandboxing": PILLAR_OFFLINE_PRIVACY,
+    "security": PILLAR_OFFLINE_PRIVACY,
+    "offline": PILLAR_OFFLINE_PRIVACY,
+    "wasm": PILLAR_OFFLINE_PRIVACY,
+    
+    # Data Science
+    "data science": PILLAR_DATA_SCIENCE,
+    "data-science": PILLAR_DATA_SCIENCE,
+    "data analysis": PILLAR_DATA_SCIENCE,
+    "pandas": PILLAR_DATA_SCIENCE,
+    "numpy": PILLAR_DATA_SCIENCE,
+    "scipy": PILLAR_DATA_SCIENCE,
+    "machine learning": PILLAR_DATA_SCIENCE,
+    "ml": PILLAR_DATA_SCIENCE,
+    "analytics": PILLAR_DATA_SCIENCE,
+    
+    # Prototyping & Automation
+    "automation": PILLAR_ADAPTIVE_STACK,
+    "web scraping": PILLAR_ADAPTIVE_STACK,
+    "web-scraping": PILLAR_ADAPTIVE_STACK,
+    "prototyping": PILLAR_ADAPTIVE_STACK,
+    "scripting": PILLAR_ADAPTIVE_STACK,
+    "tooling": PILLAR_ADAPTIVE_STACK,
 }
 
 def generate_skills_from_tags_batch(tags_list):
@@ -360,18 +535,26 @@ def generate_skills_from_tags_batch(tags_list):
         return []
     tags_str = ", ".join([f'"{t}"' for t in tags_list])
     prompt = f"""
-    You are a technical portfolio writer. Generate senior-level structured Skill entries for the following technology tags: {tags_str}.
+    You are a technical portfolio writer. Generate senior-level structured Capability Pillar entries for the following novel technology tags: {tags_str}.
     
-    For each tag, output a structured JSON object. The response must be a JSON array of objects, where each object matches this format:
+    The portfolio groups skills into 4 core architectural pillars:
+    - 'orchestration': AI agents, LLMs, RAG, prompt tuning
+    - 'logic': fullstack web apps, async backend APIs, databases, TypeScript
+    - 'product': mobile apps, UX strategy, CSS/design systems, offline security
+    - 'dynamic': data science, analytics, rapid prototyping, adaptive tools
+
+    For each tag, output a structured JSON object matching this format:
     {{
       "tag": "the original lowercase tag name that was passed",
-      "name": "Authoritative High-Impact Skill Title (e.g. 'react' -> 'Next.js & React App Architecture', 'fastapi' -> 'Python Systems & Async APIs', 'supabase' -> 'PostgreSQL & Supabase Engineering', 'flutter' -> 'Flutter & Cross-Platform Mobile')",
-      "name_business": "Client Outcome Service Title (e.g. 'High-Performance Web Applications', 'Secure Cloud Database & Data Storage')",
-      "icon": "A lowercase string representing a relevant Lucide icon (e.g. 'atom', 'server', 'database', 'terminal', 'layout', 'paintbrush', 'sparkles', 'brain', 'bot', 'smartphone', 'shield', 'bar-chart', 'zap')",
-      "description": "A short 1-sentence senior developer description of the capability. Maximum 18 words.",
-      "description_business": "A short 1-sentence client value proposition description. Maximum 18 words.",
+      "name": "Authoritative High-Impact Capability Title (e.g. 'Cloud Infrastructure & DevOps Architecture', 'Blockchain & Smart Contract Engineering')",
+      "name_business": "Client Outcome Service Title (e.g. 'Scalable Cloud Infrastructure', 'Decentralized Applications & Smart Contracts')",
+      "icon": "A lowercase string representing a relevant Lucide icon (e.g. 'atom', 'server', 'database', 'terminal', 'layout', 'paintbrush', 'sparkles', 'brain', 'bot', 'smartphone', 'shield', 'bar-chart', 'zap', 'cloud', 'cpu', 'code', 'globe', 'lock')",
+      "description": "A short 1-sentence senior developer description of the capability. Maximum 20 words.",
+      "description_business": "A short 1-sentence client value proposition description. Maximum 20 words.",
       "category": "One of 'orchestration', 'logic', 'product', or 'dynamic'",
-      "color": "A hex color code suitable for the technology brand"
+      "color": "A hex color code suitable for the technology brand (e.g. '#FF9900')",
+      "level": "Level Max",
+      "status": "mastered"
     }}
     
     Do not return any conversational text, markdown packaging, or backticks. Only return the raw JSON array of objects.
@@ -386,68 +569,106 @@ def generate_skills_from_tags_batch(tags_list):
                     return res[key]
             return [res]
     except Exception as e:
-        st.error(f"Error generating skills in batch: {e}")
+        print(f"Error generating skills in batch: {e}")
     return []
 
 def check_and_add_pending_skills(tags_list):
     current_skills = parse_skills_file()
-    existing_skill_names = {s.get("name", "").lower() for s in current_skills}
+    existing_skill_names = {s.get("name", "").strip().lower() for s in current_skills if s.get("name")}
     
     if 'pending_skills' not in st.session_state:
         st.session_state.pending_skills = []
-    pending_names = {s.get("name", "").lower() for s in st.session_state.pending_skills}
+    pending_names = {s.get("name", "").strip().lower() for s in st.session_state.pending_skills if s.get("name")}
     
-    new_tags = []
+    import threading
+    is_main_thread = (threading.current_thread() is threading.main_thread())
+    
+    new_tags_for_gemini = []
     for tag in tags_list:
         tag_clean = tag.strip().lower()
         if not tag_clean:
             continue
             
-        is_existing = False
+        # 1. Exact match against existing or pending pillar names
+        if tag_clean in existing_skill_names or tag_clean in pending_names:
+            continue
+            
+        # 2. Check if the tag matches a known taxonomy pillar in FALLBACK_SKILLS
+        if tag_clean in FALLBACK_SKILLS:
+            pillar = FALLBACK_SKILLS[tag_clean]
+            pillar_name_lower = pillar["name"].lower()
+            if pillar_name_lower in existing_skill_names:
+                # Already represented by an active capability pillar
+                continue
+            elif pillar_name_lower in pending_names:
+                # Already queued in pending
+                continue
+            else:
+                st.session_state.pending_skills.append(dict(pillar))
+                pending_names.add(pillar_name_lower)
+                if is_main_thread and st:
+                    st.toast(f"💡 Resolved tag '{tag_clean}' to pillar '{pillar['name']}'!")
+                continue
+                
+        # 3. Check if tag matches an existing pillar name using word-boundary regex
+        matched_existing = False
         for name in existing_skill_names:
-            if tag_clean == name or tag_clean in name or name in tag_clean:
-                is_existing = True
+            if re.search(rf'\b{re.escape(tag_clean)}\b', name, re.IGNORECASE):
+                matched_existing = True
                 break
+        if matched_existing:
+            continue
+            
         for name in pending_names:
-            if tag_clean == name or tag_clean in name or name in tag_clean:
-                is_existing = True
+            if re.search(rf'\b{re.escape(tag_clean)}\b', name, re.IGNORECASE):
+                matched_existing = True
                 break
-                
-        if not is_existing:
-            new_tags.append(tag_clean)
+        if matched_existing:
+            continue
             
-    if new_tags:
-        tags_needing_gemini = []
-        for tag in new_tags:
-            if tag in FALLBACK_SKILLS:
-                st.session_state.pending_skills.append(FALLBACK_SKILLS[tag])
-                st.toast(f"💡 Resolved new tag '{tag}' locally from database!")
-            else:
-                tags_needing_gemini.append(tag)
-                
-        if tags_needing_gemini:
-            batch_tags = tags_needing_gemini[:5]
-            st.toast(f"🔍 New unknown tags: {', '.join(batch_tags)}. Calling Gemini (Batch)...")
-            proposals = generate_skills_from_tags_batch(batch_tags)
-            
-            if proposals:
-                added_count = 0
-                for prop in proposals:
-                    if prop.get("name"):
-                        st.session_state.pending_skills.append(prop)
-                        added_count += 1
-                st.toast(f"💡 Generated {added_count} skill proposals!")
-            else:
-                st.warning("⚠️ Gemini API limit reached or key exhausted. Created template proposals for missing tags.")
-                for tag in batch_tags:
-                    fallback_prop = {
-                        "name": tag.capitalize(),
-                        "icon": "sparkles",
-                        "description": f"Building with {tag} for project development and implementation.",
-                        "category": "dynamic",
-                        "color": "#00E676"
-                    }
-                    st.session_state.pending_skills.append(fallback_prop)
+        # 4. If completely unknown novel tag, queue for Gemini batch proposal
+        new_tags_for_gemini.append(tag_clean)
+        
+    if new_tags_for_gemini:
+        batch_tags = new_tags_for_gemini[:5]
+        if is_main_thread and st:
+            st.toast(f"🔍 New novel domain tags: {', '.join(batch_tags)}. Calling Gemini...")
+        proposals = generate_skills_from_tags_batch(batch_tags)
+        
+        if proposals:
+            added_count = 0
+            for prop in proposals:
+                if prop.get("name"):
+                    if not prop.get("name_business"):
+                        prop["name_business"] = prop["name"]
+                    if not prop.get("description_business"):
+                        prop["description_business"] = prop.get("description", "")
+                    if not prop.get("level"):
+                        prop["level"] = "Level Max"
+                    if not prop.get("status"):
+                        prop["status"] = "mastered"
+                    st.session_state.pending_skills.append(prop)
+                    pending_names.add(prop["name"].lower())
+                    added_count += 1
+            if is_main_thread and st:
+                st.toast(f"💡 Generated {added_count} capability pillar proposal(s)!")
+        else:
+            if is_main_thread and st:
+                st.warning("⚠️ Gemini key exhausted or limit reached. Generated template proposal.")
+            for tag in batch_tags:
+                fallback_prop = {
+                    "name": f"{tag.capitalize()} & Systems Engineering",
+                    "name_business": f"{tag.capitalize()} Development & Solutions",
+                    "icon": "sparkles",
+                    "description": f"Architecting, implementing, and deploying solutions utilizing {tag}.",
+                    "description_business": f"Building reliable applications and solutions with {tag}.",
+                    "category": "dynamic",
+                    "color": "#00E676",
+                    "level": "Level Max",
+                    "status": "mastered"
+                }
+                st.session_state.pending_skills.append(fallback_prop)
+                pending_names.add(fallback_prop["name"].lower())
 
 def run_async_task(task_func, key_prefix):
     import threading

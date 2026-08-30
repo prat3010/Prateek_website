@@ -15,7 +15,7 @@ interface SkylineInteractionValue {
 
 const SkylineInteractionContext = createContext<SkylineInteractionValue | null>(null);
 
-const IDLE_TIMEOUT_MS = 30_000;
+const IDLE_TIMEOUT_MS = 10_000;
 
 const ACTIVITY_EVENTS = ['mousemove', 'wheel', 'click', 'keydown', 'touchstart'] as const;
 

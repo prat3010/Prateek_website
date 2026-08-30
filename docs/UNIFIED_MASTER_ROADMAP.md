@@ -93,6 +93,7 @@ timeline
 |---|---|---|---|---|
 | **M57** | AI Lead Prospecting Engine | `Prateek_website` | 24/7 lead discovery & `gemini-3.6-flash` personalized pitch generator | **Completed** |
 | **M58** | Web Control Center HITL Queue| `Prateek_website` | Mobile-friendly 1-click email/social approval queue in `/admin` | **Completed** |
+| **M58.5** | Retriever Grounded Outbound (`prateeq_outreach`) | Both | Dedicated Retriever tenant for Synchronizer pitch generation & evidence inspector | **Planned** |
 | **M59** | Automated AI Newsjacking | `Prateek_website` | Daily HN/HF news scraper + technical blog case study synthesis | **Completed** |
 | **M60** | Client Telemetry Analytics | Both | Real-time token usage meter & semantic cache USD savings display | **Completed** |
 

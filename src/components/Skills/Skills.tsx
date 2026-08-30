@@ -19,6 +19,19 @@ import {
   Shield,
   Smartphone,
   Target,
+  Atom,
+  Cloud,
+  Cpu,
+  Code,
+  GitBranch,
+  Globe,
+  Layers,
+  Lock,
+  Workflow,
+  Box,
+  Network,
+  Braces,
+  FileCode,
   type LucideIcon
 } from 'lucide-react';
 import styles from './Skills.module.css';
@@ -37,7 +50,21 @@ const iconMap: Record<string, LucideIcon> = {
   layout: Layout,
   paintbrush: Paintbrush,
   shield: Shield,
-  smartphone: Smartphone
+  smartphone: Smartphone,
+  target: Target,
+  atom: Atom,
+  cloud: Cloud,
+  cpu: Cpu,
+  code: Code,
+  'git-branch': GitBranch,
+  globe: Globe,
+  layers: Layers,
+  lock: Lock,
+  workflow: Workflow,
+  box: Box,
+  network: Network,
+  braces: Braces,
+  'file-code': FileCode
 };
 
 interface SkillsProps {

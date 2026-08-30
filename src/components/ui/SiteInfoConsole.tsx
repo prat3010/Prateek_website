@@ -161,37 +161,47 @@ export default function SiteInfoConsole() {
     }
   };
 
-  // Pause intervals/RAF loops when tab is hidden
-  useEffect(() => {
-    const handler = () => { isVisibleRef.current = !document.hidden; };
-    document.addEventListener('visibilitychange', handler);
-    return () => document.removeEventListener('visibilitychange', handler);
-  }, []);
-
-  // FPS requestAnimationFrame counter
+  // FPS requestAnimationFrame counter (pauses when tab is hidden)
   useEffect(() => {
     let frameCount = 0;
     let lastTime = performance.now();
-    let animId: number;
+    let animId: number | null = null;
 
     const countFrames = () => {
-      if (isVisibleRef.current) {
-        frameCount++;
-        const now = performance.now();
-        if (now - lastTime >= 1000) {
-          const currentFps = Math.round((frameCount * 1000) / (now - lastTime));
-          setStats(prev => ({ ...prev, fps: currentFps }));
-          frameCount = 0;
-          lastTime = now;
-        }
-      } else {
-        lastTime = performance.now();
+      if (document.hidden) {
+        animId = null;
+        return;
+      }
+      frameCount++;
+      const now = performance.now();
+      if (now - lastTime >= 1000) {
+        const currentFps = Math.round((frameCount * 1000) / (now - lastTime));
+        setStats(prev => ({ ...prev, fps: currentFps }));
+        frameCount = 0;
+        lastTime = now;
       }
       animId = requestAnimationFrame(countFrames);
     };
 
+    const handleVisibility = () => {
+      isVisibleRef.current = !document.hidden;
+      if (!document.hidden && animId === null) {
+        lastTime = performance.now();
+        frameCount = 0;
+        animId = requestAnimationFrame(countFrames);
+      } else if (document.hidden && animId !== null) {
+        cancelAnimationFrame(animId);
+        animId = null;
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
     animId = requestAnimationFrame(countFrames);
-    return () => cancelAnimationFrame(animId);
+
+    return () => {
+      if (animId !== null) cancelAnimationFrame(animId);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, []);
 
   // Hardware sync: script sizes, DOM nodes, and uptime

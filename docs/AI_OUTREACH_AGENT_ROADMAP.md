@@ -131,6 +131,21 @@ It eliminates the tedious manual labor of lead prospecting, cold outreach drafti
 
 ---
 
+### Phase 6: Retriever-Powered Dogfooding Tenant (`prateeq_outreach`) & Grounded Pitch Synthesis (Planned)
+- [ ] **Dedicated Retriever Tenant Provisioning (`prateeq_outreach`):**
+  - Provision dedicated tenant in Retriever with API key (`RETRIEVER_OUTREACH_TENANT_ID`, `RETRIEVER_OUTREACH_API_KEY`).
+  - Configure specialized outbound system prompt on Retriever tenant (Hook $\rightarrow$ Evidence/Analogous System Proof $\rightarrow$ Interactive Scoping CTA; direct senior engineer voice).
+- [ ] **Automated Portfolio Knowledge Ingestion (`scripts/sync_outreach_knowledge.py`):**
+  - Script & Synchronizer button to chunk and vector-index Prateek's entire portfolio: `projects.json` (architecture, performance benchmarks, URLs, repos), `resume.json` (skills & work history), `docs/99_DECISIONS.md` (ADRs & technical trade-offs), and commercial pricing packages.
+- [ ] **Retriever Outbound Pitch Generation in Synchronizer (`scripts/sync_tabs/outreach.py`):**
+  - Pass shortlisted job descriptions, required stacks, and lead types (`client` SOW vs. `job` full-time) to Retriever's `/api/v1/chat` or `/api/v1/search` endpoint.
+  - Generate grounded pitches citing real matching systems and metrics with zero hallucination.
+- [ ] **Streamlit "Evidence Inspector" UI:**
+  - Display retrieved chunk citations, system match similarity scores, and referenced project links alongside the editable pitch draft.
+  - Add 1-click fallback to local Gemini 3.6 Flash if Retriever backend is unreachable.
+
+---
+
 ## File Architecture Map
 
 ```text
@@ -157,6 +172,10 @@ src/
 │       └── socialDispatcher.ts             # Buffer / X / LinkedIn Publisher
 └── data/
     └── outreach_defaults.json              # Pitch templates & seed prompts
+scripts/
+├── sync_tabs/
+│   └── outreach.py                         # Synchronizer Outreach Tab (Retriever Client & Evidence Inspector)
+└── sync_outreach_knowledge.py              # Ingests Portfolio, ADRs & Case Studies into Retriever prateeq_outreach tenant
 ```
 
 ---
@@ -166,6 +185,7 @@ src/
 - [x] **Requirements & Channel Alignment** (All 3 Channels: Gmail + X + LinkedIn, Hybrid Sourcing, 60/40 Content Mix, OAuth2 Auth)
 - [x] **Roadmap Documentation Created** (`docs/AI_OUTREACH_AGENT_ROADMAP.md`)
 - [ ] **Execution Phase 1–5:** To be started immediately after completing current primary portfolio & dashboard roadmap items.
+- [ ] **Execution Phase 6 (Retriever Grounded Pitch Engine):** Integration with Retriever `prateeq_outreach` tenant and Synchronizer Evidence Inspector.
 
 ---
 

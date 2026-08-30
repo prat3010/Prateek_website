@@ -15,54 +15,74 @@ def render_skills_tab():
 
     if 'pending_skills' in st.session_state and st.session_state.pending_skills:
         with st.container(border=True):
-            st.markdown(f'<div class="section-header">💡 Pending Skill Approvals ({len(st.session_state.pending_skills)} Queued)</div>', unsafe_allow_html=True)
-            st.info("The following tags were auto-extracted by Gemini and are waiting for your review.")
+            st.markdown(f'<div class="section-header">💡 Pending Capability Pillar Approvals ({len(st.session_state.pending_skills)} Queued)</div>', unsafe_allow_html=True)
+            st.info("The following capability domain proposal was extracted by Gemini and is ready for your review.")
             
             skill = st.session_state.pending_skills[0]
             skill_name_sanitized = skill.get('name', 'default').replace(' ', '_').lower()
             
             col_p1, col_p2 = st.columns(2)
             with col_p1:
-                name = st.text_input("Name", value=skill.get('name'), key=f"pend_main_name_{skill_name_sanitized}")
+                name = st.text_input("Skill Name (Dev Mode)", value=skill.get('name', ''), key=f"pend_main_name_{skill_name_sanitized}")
+                name_biz = st.text_input("Skill Name (Business Mode)", value=skill.get('name_business') or skill.get('name', ''), key=f"pend_main_name_biz_{skill_name_sanitized}")
                 icon = st.text_input("Icon (Lucide)", value=skill.get('icon', 'sparkles'), key=f"pend_main_icon_{skill_name_sanitized}")
-                desc = st.text_area("Description", value=skill.get('description', ''), key=f"pend_main_desc_{skill_name_sanitized}")
+                desc = st.text_area("Description (Dev Mode)", value=skill.get('description', ''), key=f"pend_main_desc_{skill_name_sanitized}")
             with col_p2:
                 categories_opts = ['orchestration', 'logic', 'product', 'dynamic']
+                categories_labels = {
+                    'orchestration': 'AI Orchestration (orchestration)',
+                    'logic': 'Systems & Logic (logic)',
+                    'product': 'Product & UX (product)',
+                    'dynamic': 'Dynamic Command (dynamic)'
+                }
                 default_cat = skill.get('category', 'dynamic')
                 if default_cat not in categories_opts:
                     default_cat = 'dynamic'
-                category = st.selectbox("Category", options=categories_opts, index=categories_opts.index(default_cat), key=f"pend_main_cat_{skill_name_sanitized}")
+                category = st.selectbox("Category", options=categories_opts, index=categories_opts.index(default_cat), format_func=lambda x: categories_labels[x], key=f"pend_main_cat_{skill_name_sanitized}")
                 color = st.text_input("Hex Color", value=skill.get('color', '#00E676'), key=f"pend_main_color_{skill_name_sanitized}")
+                level = st.text_input("Level", value=skill.get('level', 'Level Max'), key=f"pend_main_level_{skill_name_sanitized}")
+                status_opts = ['mastered', 'legendary', 'quest']
+                curr_status = skill.get('status', 'mastered')
+                status_idx = status_opts.index(curr_status) if curr_status in status_opts else 0
+                status = st.selectbox("Status", options=status_opts, index=status_idx, key=f"pend_main_status_{skill_name_sanitized}")
+                desc_biz = st.text_area("Description (Business Mode)", value=skill.get('description_business') or skill.get('description', ''), key=f"pend_main_desc_biz_{skill_name_sanitized}")
                 
-                col_pa1, col_pa2 = st.columns(2)
-                with col_pa1:
-                    if st.button("Approve Skill", key="approve_skill_main_btn", type="primary", use_container_width=True):
-                        current_skills = parse_skills_file()
-                        if any(s.get("name", "").lower() == name.lower() for s in current_skills):
-                            st.error("Skill already exists!")
-                        else:
-                            new_skill = {
-                                "name": name,
-                                "name_business": skill.get("name_business") or name,
-                                "icon": icon,
-                                "description": desc,
-                                "description_business": skill.get("description_business") or desc,
-                                "category": category,
-                                "color": color
-                            }
-                            current_skills.append(new_skill)
-                            try:
-                                write_skills_file(current_skills)
-                                st.success(f"Added {name}!")
-                                st.session_state.pending_skills.pop(0)
-                                st.session_state.skills = current_skills
-                                st.rerun()
-                            except Exception as e:
-                                st.error(f"Failed to save: {e}")
-                with col_pa2:
-                    if st.button("Dismiss Skill", key="dismiss_skill_main_btn", type="secondary", use_container_width=True):
-                        st.session_state.pending_skills.pop(0)
-                        st.rerun()
+            col_pa1, col_pa2 = st.columns(2)
+            with col_pa1:
+                if st.button("Approve as Capability Pillar", key="approve_skill_main_btn", type="primary", use_container_width=True):
+                    current_skills = parse_skills_file()
+                    if any(s.get("name", "").lower() == name.strip().lower() for s in current_skills):
+                        st.error("A skill pillar with this name already exists!")
+                    else:
+                        new_skill = {
+                            "name": name.strip(),
+                            "name_business": name_biz.strip() or name.strip(),
+                            "icon": icon.strip() or "sparkles",
+                            "description": desc.strip(),
+                            "description_business": desc_biz.strip() or desc.strip(),
+                            "category": category,
+                            "color": color.strip() or "#00E676",
+                            "level": level.strip() or "Level Max",
+                            "status": status
+                        }
+                        current_skills.append(new_skill)
+                        try:
+                            write_skills_file(current_skills)
+                            st.success(f"Added Capability Pillar: **{name.strip()}**!")
+                            st.session_state.pending_skills.pop(0)
+                            st.session_state.skills = current_skills
+                            if not dry_run_skills:
+                                st.info("🚀 Pushing changes to GitHub...")
+                                git_ok, git_msg = git_commit_push_file("src/data/skills.json", f"chore(skills): approve capability pillar - {name.strip()}")
+                                if git_ok:
+                                    st.toast(f"💡 Skill created and {git_msg}")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Failed to save: {e}")
+            with col_pa2:
+                if st.button("Dismiss Proposal", key="dismiss_skill_main_btn", type="secondary", use_container_width=True):
+                    st.session_state.pending_skills.pop(0)
+                    st.rerun()
 
     # 1. Create New Skill Section
     with st.container(border=True):

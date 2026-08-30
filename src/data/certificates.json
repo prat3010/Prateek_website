@@ -1,5 +1,21 @@
 [
   {
+    "id": "100-days-of-code-the-complete-python-pro-bootcamp",
+    "title": "100 Days of Code™: The Complete Python Pro Bootcamp",
+    "issuer": "Udemy",
+    "date": "2026-08-30",
+    "credentialId": "UC-fa3a372b-2fa2-41f7-8cd9-ba11bf864658",
+    "verifyUrl": "https://www.udemy.com/certificate/UC-fa3a372b-2fa2-41f7-8cd9-ba11bf864658/",
+    "image": "/certificates/100-days-of-code-the-complete-python-pro-bootcamp.jpg",
+    "tags": [
+      "python",
+      "automation",
+      "oop",
+      "data science",
+      "web development"
+    ]
+  },
+  {
     "id": "microsoft-excel---excel-from-beginner-to-advanced-3138",
     "title": "Microsoft Excel - Excel from Beginner to Advanced",
     "issuer": "Udemy",

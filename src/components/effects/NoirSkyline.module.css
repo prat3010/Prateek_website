@@ -13,6 +13,55 @@
   opacity: 1;
 }
 
+/* ─ Energy Saver / Idle Pause: Pauses heavy SVG rasterization animations when user is inactive ─ */
+.isIdle .searchlight,
+.isIdle .searchlightLeft,
+.isIdle .searchlightRight,
+.isIdle .blimpGroup,
+.isIdle .blimpSpotlight,
+.isIdle .flock,
+.isIdle .star1,
+.isIdle .star2,
+.isIdle .star3,
+.isIdle .fanBlade,
+.isIdle .blowerFan,
+.isIdle .tugboatTransit,
+.isIdle .tugboatBobbing,
+.isIdle .smokePuff1,
+.isIdle .smokePuff2,
+.isIdle .smokePuff3,
+.isIdle .tugboatWake1,
+.isIdle .tugboatWake2,
+.isIdle .sailboatTransit,
+.isIdle .sailboatBobbing,
+.isIdle .sailboatWake,
+.isIdle .speedboatTransit,
+.isIdle .speedboatBobbing,
+.isIdle .speedboatWake1,
+.isIdle .speedboatWake2,
+.isIdle .trafficHL14,
+.isIdle .trafficHL10,
+.isIdle .trafficHL20,
+.isIdle .trafficTL16,
+.isIdle .trafficTL12,
+.isIdle .trafficTL22,
+.isIdle .windowFlicker1,
+.isIdle .windowFlicker2,
+.isIdle .windowFlicker3,
+.isIdle .windowFlicker4,
+.isIdle .beaconRed1,
+.isIdle .beaconRed2,
+.isIdle .beaconRed3,
+.isIdle .laundry1,
+.isIdle .laundry2,
+.isIdle .laundry3,
+.isIdle .steam,
+.isIdle .steamDelayed,
+.isIdle .catTail,
+.isIdle .catEyes {
+  animation-play-state: paused !important;
+}
+
 /* Mobile (portrait): the 1920×1080 scene is letterboxed with `meet` and
    anchored to the bottom, so the tall viewport is mostly sky. Paint the
    empty area above the scene with the same sky fill the scene itself uses

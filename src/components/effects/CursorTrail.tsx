@@ -205,7 +205,7 @@ export default function CursorTrail() {
       trailRef.current = [];
 
       const cig = cigStateRef.current;
-      const fade = Math.max(0, 1 - Math.max(0, idleDuration - 5000) / 1000);
+      const fade = Math.max(0, 1 - Math.max(0, idleDuration - 350) / 300);
 
       if (isMouseActive && fade > 0) {
         if (!cig.initialized) {
@@ -364,7 +364,7 @@ export default function CursorTrail() {
     ctx.globalAlpha = 1;
 
     const fade = isNoir
-      ? Math.max(0, 1 - Math.max(0, idleDuration - 5000) / 1000)
+      ? Math.max(0, 1 - Math.max(0, idleDuration - 350) / 300)
       : 1;
 
     const hasItemsToDraw = isNoir
@@ -396,7 +396,7 @@ export default function CursorTrail() {
     if (!canvas) return;
 
     const handleResize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, perfTierRef.current === 'high' ? 1.5 : 1.0);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.0);
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
       canvas.style.width = `${window.innerWidth}px`;

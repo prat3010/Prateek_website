@@ -5,7 +5,7 @@ import { m, useTransform, useMotionValue, useSpring } from 'framer-motion';
 import { useTheme, useThemeTransition } from '@/context/ThemeContext';
 import { useLenisScroll } from '@/context/LenisProvider';
 import { usePerformanceGovernor } from '@/context/PerformanceGovernor';
-import { SkylineInteractionProvider } from './SkylineInteractionContext';
+import { useSkylineInteraction, SkylineInteractionProvider } from './SkylineInteractionContext';
 import styles from './NoirSkyline.module.css';
 
 import Layer0 from './skyline/Layer0';
@@ -19,6 +19,7 @@ function SkylineInner() {
   const { theme } = useTheme();
   const { isTransitioning } = useThemeTransition();
   const { performanceTier } = usePerformanceGovernor();
+  const { isIdle } = useSkylineInteraction();
   const perfTierRef = useRef(performanceTier);
   useEffect(() => { perfTierRef.current = performanceTier; }, [performanceTier]);
   const { scrollProgress: scrollYProgress } = useLenisScroll();
@@ -47,43 +48,29 @@ function SkylineInner() {
   const fgScale = useTransform(scrollYProgress, [0, 1], [1, 1.40]);
   const fgY = useTransform(scrollYProgress, [0, 1], [0, 75]);
 
-
-
   // Motion values for tracking mouse cursor coordinates
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  // Distinct springs per layer to create organic lag
-  const springX1 = useSpring(mouseX, { damping: 30, stiffness: 90 });
-  const springY1 = useSpring(mouseY, { damping: 30, stiffness: 90 });
-
-  const springX1_5 = useSpring(mouseX, { damping: 29, stiffness: 87 });
-  const springY1_5 = useSpring(mouseY, { damping: 29, stiffness: 87 });
-
-  const springX2 = useSpring(mouseX, { damping: 28, stiffness: 85 });
-  const springY2 = useSpring(mouseY, { damping: 28, stiffness: 85 });
-
-  const springXBridge = useSpring(mouseX, { damping: 26, stiffness: 82 });
-  const springYBridge = useSpring(mouseY, { damping: 26, stiffness: 82 });
-
-  const springX3 = useSpring(mouseX, { damping: 24, stiffness: 80 });
-  const springY3 = useSpring(mouseY, { damping: 24, stiffness: 80 });
+  // Consolidated spring physics (single spring pair instead of 10 separate springs)
+  const springX = useSpring(mouseX, { damping: 28, stiffness: 85 });
+  const springY = useSpring(mouseY, { damping: 28, stiffness: 85 });
 
   // Transforms for mouse offsets
-  const layer1X = useTransform(springX1, (x) => x * -10);
-  const layer1Y = useTransform(springY1, (y) => y * -8);
+  const layer1X = useTransform(springX, (x) => x * -10);
+  const layer1Y = useTransform(springY, (y) => y * -8);
 
-  const layer1_5X = useTransform(springX1_5, (x) => x * -17);
-  const layer1_5Y = useTransform(springY1_5, (y) => y * -12);
+  const layer1_5X = useTransform(springX, (x) => x * -17);
+  const layer1_5Y = useTransform(springY, (y) => y * -12);
 
-  const layer2X = useTransform(springX2, (x) => x * -24);
-  const layer2Y = useTransform(springY2, (y) => y * -16);
+  const layer2X = useTransform(springX, (x) => x * -24);
+  const layer2Y = useTransform(springY, (y) => y * -16);
 
-  const bridgeLayerX = useTransform(springXBridge, (x) => x * -33);
-  const bridgeLayerY = useTransform(springYBridge, (y) => y * -22);
+  const bridgeLayerX = useTransform(springX, (x) => x * -33);
+  const bridgeLayerY = useTransform(springY, (y) => y * -22);
 
-  const layer3X = useTransform(springX3, (x) => x * -42);
-  const layer3Y = useTransform(springY3, (y) => y * -28);
+  const layer3X = useTransform(springX, (x) => x * -42);
+  const layer3Y = useTransform(springY, (y) => y * -28);
 
   // Mobile composition (full panorama, sky extended above) is decoupled from
   // reducedMotion: phones render the whole 1920-wide scene and keep the same
@@ -158,7 +145,7 @@ function SkylineInner() {
   }, [mouseX, mouseY]);
 
   return (
-    <div className={`${styles.container} ${styles.active} ${theme === 'light' ? styles.lightPopart : styles.darkNoir} ${reducedMotion ? styles.reducedMotion : ''} ${isMobile ? styles.mobileSkyline : ''}`}>
+    <div className={`${styles.container} ${styles.active} ${isIdle ? styles.isIdle : ''} ${theme === 'light' ? styles.lightPopart : styles.darkNoir} ${reducedMotion ? styles.reducedMotion : ''} ${isMobile ? styles.mobileSkyline : ''}`}>
       {/* ── Vignette Overlay ── */}
       <div className={styles.vignette} aria-hidden="true" />
 

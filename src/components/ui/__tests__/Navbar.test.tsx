@@ -82,7 +82,7 @@ describe('Navbar Component Navigation', () => {
       modeTransitionSeed: 0,
       region: 'india',
       setRegion: vi.fn(),
-    } as any);
+    } as unknown as ReturnType<typeof ThemeContext.useTheme>);
 
     // Mock AuthContext
     vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
