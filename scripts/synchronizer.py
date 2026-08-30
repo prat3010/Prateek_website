@@ -26,6 +26,7 @@ from sync_tabs.shared import (
     GEMINI_API_KEY,
     run_async_task,
     is_port_active,
+    stop_dev_server,
     trigger_rebuild_commit,
     run_safe_git_command,
     parse_projects_file,
@@ -310,6 +311,17 @@ def render_control_room_tab():
                         st.rerun()
                     except Exception as e:
                         st.error(f"Failed to start dev server: {e}")
+            else:
+                if st.button("🛑 Stop Dev Server (`kill :3000`)", key="btn_stop_dev_ctrl", use_container_width=True, type="primary"):
+                    try:
+                        success, msg = stop_dev_server(3000)
+                        if success:
+                            st.toast("🛑 Dev server stopped successfully!")
+                        else:
+                            st.warning(f"Stop command sent: {msg}")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Failed to stop dev server: {e}")
 
             st.markdown("---")
             rebuild_status = st.session_state.get("vercel_rebuild_status", "idle")

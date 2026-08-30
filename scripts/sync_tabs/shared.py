@@ -744,6 +744,51 @@ def is_port_active(port):
     except Exception:
         return False
 
+def stop_dev_server(port=3000):
+    """Terminates any process listening on the given port (e.g. Next.js dev server)."""
+    import subprocess
+    import signal
+    import os
+    import time
+    
+    # 1. Try finding and terminating PIDs on port via lsof
+    try:
+        res = subprocess.run(["lsof", "-ti", f":{port}"], capture_output=True, text=True)
+        pids = [int(p.strip()) for p in res.stdout.splitlines() if p.strip().isdigit()]
+        if pids:
+            for pid in pids:
+                try:
+                    os.kill(pid, signal.SIGTERM)
+                except ProcessLookupError:
+                    pass
+            time.sleep(0.3)
+            # Send SIGKILL to stubborn remaining processes
+            res2 = subprocess.run(["lsof", "-ti", f":{port}"], capture_output=True, text=True)
+            pids2 = [int(p.strip()) for p in res2.stdout.splitlines() if p.strip().isdigit()]
+            for pid in pids2:
+                try:
+                    os.kill(pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+            return True, f"Terminated process(es) on port {port}: {pids}"
+    except Exception:
+        pass
+
+    # 2. Fallback on fuser (Linux)
+    try:
+        subprocess.run(["fuser", "-k", f"{port}/tcp"], capture_output=True)
+        return True, f"Killed process on port {port} via fuser."
+    except Exception:
+        pass
+
+    # 3. Fallback on pkill for next dev / next-server
+    try:
+        subprocess.run(["pkill", "-f", "next dev|next-server"], capture_output=True)
+    except Exception:
+        pass
+
+    return not is_port_active(port), f"Dev server check complete on port {port}"
+
 def trigger_rebuild_commit():
     success, out = run_safe_git_command(["git", "commit", "--allow-empty", "-m", "chore(deploy): force vercel rebuild"])
     if not success:
