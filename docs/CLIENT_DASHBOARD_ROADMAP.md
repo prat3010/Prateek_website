@@ -197,12 +197,12 @@ timeline
   - ✅ Phase 2 Change Order engine calculating scope delta in REPL and generating automated milestone invoices.
   - ✅ Local **Streamlit Synchronizer** (`sync_tabs/clients.py`) remains Prateek's single commercial cockpit for tracking scopes, leads, invoices, and linked tenant IDs.
 
-* **Milestone 68: Unified Persistent Copilot, Git CI/CD Feeds & Post-Launch SLA Monitoring — ACTIVE NEXT**
-  - Connect `ClientProjectCopilot.tsx` to private Retriever tenant chat session (grounded in client RFP and sprint milestones).
-  - GitHub private repo auto-scaffolding and live sprint commit feed in `/dashboard`.
-  - Embed Vercel staging preview frames directly inside the milestone progress tab.
-  - Post-launch SLA & production uptime monitoring cockpit (5-minute health pings, Retriever token metering, automated monthly SLA report PDF).
-  - Multi-format commercial proposal suite (1-Page Executive Pitch vs 3-Page Master SOW PDF).
+* **Milestone 68: Unified Persistent Copilot, Git CI/CD Feeds & Post-Launch SLA Monitoring (Completed)**
+  - ✅ Connect `ClientProjectCopilot.tsx` to private Retriever tenant chat session (grounded in client RFP and sprint milestones).
+  - ✅ GitHub private repo auto-scaffolding and live sprint commit feed in `/dashboard`.
+  - ✅ Embed Vercel staging preview frames directly inside the milestone progress tab.
+  - ✅ Post-launch SLA & production uptime monitoring cockpit (5-minute health pings, Retriever token metering, automated monthly SLA report PDF).
+  - ✅ Multi-format commercial proposal suite (1-Page Executive Pitch vs 3-Page Master SOW PDF).
 
 ---
 

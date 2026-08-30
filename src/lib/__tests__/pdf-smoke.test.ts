@@ -7,6 +7,7 @@ import path from 'path';
 import { ServicesAndPricingPDF } from '@/components/pdf/ServicesAndPricingPDF';
 import { MiddlemanAgreementPDF } from '@/components/pdf/MiddlemanAgreementPDF';
 import { ScopingBriefPDF } from '@/components/pdf/ScopingBriefPDF';
+import { ProposalExecutiveBriefPDF } from '@/components/pdf/ProposalExecutiveBriefPDF';
 import { DeveloperResumePDF } from '@/components/pdf/DeveloperResumePDF';
 import { registerPdfFontsServer } from '@/components/pdf/pdfFontsServer';
 
@@ -50,6 +51,21 @@ describe('commercial PDF render smoke tests', () => {
     const tmp = path.join(os.tmpdir(), `scoping_${isNoir ? 'noir' : 'azure'}_${Date.now()}.pdf`);
     fs.writeFileSync(tmp, pdf);
     process.env.__SCOPING_PDF_PATH__ = tmp;
+  }, 60000);
+
+  it.each([
+    ['azure', false],
+    ['noir', true],
+  ] as const)('ProposalExecutiveBriefPDF renders a valid 1-page PDF in %s theme', async (_theme, isNoir) => {
+    const pdf = await renderToPdf(
+      React.createElement(ProposalExecutiveBriefPDF, { isNoir }) as React.ReactElement<DocumentProps>,
+    );
+    expect(pdf.subarray(0, 5).toString()).toBe('%PDF-');
+    expect(pageCount(pdf)).toBe(1);
+
+    const tmp = path.join(os.tmpdir(), `executive_${isNoir ? 'noir' : 'azure'}_${Date.now()}.pdf`);
+    fs.writeFileSync(tmp, pdf);
+    process.env.__EXECUTIVE_PDF_PATH__ = tmp;
   }, 60000);
 
   it.each([

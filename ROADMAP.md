@@ -16,24 +16,25 @@ timeline
     Phase D (M54–M56) : Surface Polish, Citation Visualizer & RLM Studio : Completed
     Phase E (M57–M60) : Autonomous Growth, Cold Outreach & AI Newsjacking : Completed
     Phase F (M61–M62) : Data Connectors & Vision OCR Ingestion : Completed
-    Phase G (M63–M68) : SOTA Productized E-Commerce Scoping & Agency Ecosystem : ACTIVE NEXT
-    Phase H (M69–M73) : SOTA Cognitive RAG Algorithm R&D : Planned
+    Phase G (M63–M68) : SOTA Productized E-Commerce Scoping & Agency Ecosystem : Completed
+    Phase H (M69–M73) : SOTA Cognitive RAG Algorithm R&D : ACTIVE NEXT
     Phase I (M74–M78) : Enterprise Cognitive Evaluation & Deep Observability : Planned
     Phase J (M79–M85) : Machine Learning & Predictive Intelligence Framework : Planned
+    Phase K (M86–M90) : Enterprise Scale, Edge Replication & Universal Plugins : Planned
 ```
 
 ---
 
-## Active Milestone Sequence (Phase G: M63 – M68)
+## Active Milestone Sequence (Phase H: M69 – M73)
 
 | Milestone | Title | Focus Area | Status | Detailed Specification |
 |:---|:---|:---|:---|:---|
-| **M63** | Multimodal Discovery & Dogfooding Tenant | 1-line prompt + RFP/PRD PDF OCR dropzone on `prateeq_scoping` public tenant with live telemetry badge | **Completed** | [`docs/25_SOTA_Scoping_Engine_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/25_SOTA_Scoping_Engine_PRD.md#module-1-multimodal-ai-scoping-copilot--rfp-document-ingestion) |
-| **M64** | Productized Architecture Cart Drawer & CPQ | Slide-over cart drawer, GraphRAG upsells, volume discount meter, promo validation engine | **Completed** | [`docs/25_SOTA_Scoping_Engine_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/25_SOTA_Scoping_Engine_PRD.md#module-3-productized-architecture-cart-drawer-bundles--promo-engine) |
-| **M65** | Live Architecture Topology Map | Interactive SVG/Canvas node visualizer & active dependency cascade disconnect modal | **Completed** | [`docs/25_SOTA_Scoping_Engine_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/25_SOTA_Scoping_Engine_PRD.md#module-4-live-interactive-architecture-topology-map) |
-| **M66** | Terminal Scoping CLI & Mobile QR Pay | `/terminal` CLI scoping commands (`scope new`, `cart checkout`) + QR code deposit payment | **Completed** | [`docs/25_SOTA_Scoping_Engine_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/25_SOTA_Scoping_Engine_PRD.md#module-5-pre-deposit-dashboard-bridge-deep-links--embedded-sota-customizer) |
-| **M67** | Dashboard Bridge & Cryptographic SOW Freeze | Google Fast-Pass PKCE handoff (`tn_client_uuid`), embedded CPQ, SHA-256 SOW lock, Phase 2 Change Orders | **Completed** | [`docs/25_SOTA_Scoping_Engine_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/25_SOTA_Scoping_Engine_PRD.md#module-6-digital-proposal-sign-off-50-escrow--cryptographic-scope-freeze) |
-| **M68** | Unified Persistent Copilot & Post-Launch SLA | Persistent Retriever Copilot chat, 1-click GitHub repo scaffolding, post-launch SLA cockpit | **ACTIVE NEXT** | [`docs/25_SOTA_Scoping_Engine_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/25_SOTA_Scoping_Engine_PRD.md#module-8-unified-persistent-ai-project-copilot-scoping--dashboard-continuity) |
+| **M68** | Unified Persistent Copilot & Post-Launch SLA | Persistent Retriever Copilot chat, 1-click GitHub repo scaffolding, post-launch SLA cockpit | **Completed** | [`docs/25_SOTA_Scoping_Engine_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/25_SOTA_Scoping_Engine_PRD.md#module-8-unified-persistent-ai-project-copilot-scoping--dashboard-continuity) |
+| **M69** | Pre-Chunk Contextual Retrieval Ingestion Engine | Prepend 50–80 word document context headers to chunks prior to vector embedding (Anthropic method) | **Completed** | [`../../retriever/docs/RAG_2026_PRODUCT_ROADMAP.md`](file:///Users/prateeksharma/Developer/retriever/docs/RAG_2026_PRODUCT_ROADMAP.md#milestone-m69-pre-chunk-contextual-retrieval-ingestion-engine) |
+| **M70** | Late-Interaction (ColBERT) Token-Level Reranker | Token-level MaxSim candidate re-scoring for sub-15ms reranking over technical terms | **Completed** | [`../../retriever/docs/RAG_2026_PRODUCT_ROADMAP.md`](file:///Users/prateeksharma/Developer/retriever/docs/RAG_2026_PRODUCT_ROADMAP.md#milestone-m70-late-interaction-colbert-token-level-reranker) |
+| **M71** | Corrective RAG (CRAG) & Agentic Reflection Loop | Autonomous reflection loop evaluating retrieval confidence and triggering web search fallback | **Completed** | [`../../retriever/docs/RAG_2026_PRODUCT_ROADMAP.md`](file:///Users/prateeksharma/Developer/retriever/docs/RAG_2026_PRODUCT_ROADMAP.md#milestone-m71-corrective-rag-crag--agentic-reflection-loop) |
+| **M72** | Interactive RLM Python REPL Sandbox Studio | Productize Recursive Language Models into a dedicated SaaS Studio tab (`/rag/app/rlm`) | **Completed** | [`../../retriever/docs/RAG_2026_PRODUCT_ROADMAP.md`](file:///Users/prateeksharma/Developer/retriever/docs/RAG_2026_PRODUCT_ROADMAP.md#milestone-m72-interactive-rlm-python-repl-sandbox-studio) |
+| **M73** | GraphRAG Leiden Community Detection | Global entity clustering and automated closed-loop self-tuning from online evaluations | **ACTIVE NEXT** | [`../../retriever/docs/RAG_2026_PRODUCT_ROADMAP.md`](file:///Users/prateeksharma/Developer/retriever/docs/RAG_2026_PRODUCT_ROADMAP.md#milestone-m73-graphrag-leiden-community-detection--closed-loop-self-tuning) |
 
 ---
 
