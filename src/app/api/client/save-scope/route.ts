@@ -2,15 +2,24 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
 import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
 import { sendAdminScopeSavedNotification } from '@/lib/emailNotification';
-
+import { saveScopeSchema } from '@/lib/clientOrder';
 
 export async function POST(req: Request) {
   try {
-    const payload = await req.json();
-    const scopeCode = payload.scopeCode as string | undefined;
-    if (!scopeCode) {
-      return NextResponse.json({ error: 'Missing scopeCode' }, { status: 400 });
+    let rawJson: unknown;
+    try {
+      rawJson = await req.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
     }
+
+    const parseResult = saveScopeSchema.safeParse(rawJson);
+    if (!parseResult.success) {
+      return NextResponse.json({ error: parseResult.error.message, issues: parseResult.error.issues }, { status: 400 });
+    }
+
+    const payload = parseResult.data;
+    const scopeCode = payload.scopeCode;
 
     // Degraded dev/CI mode: no Supabase environment, skip auth + persistence.
     if (!supabase) {
@@ -69,7 +78,7 @@ export async function POST(req: Request) {
         .eq('status', 'draft');
     } catch {}
 
-    const existingChecklist = (payload.onboardingChecklist || payload.onboarding_checklist || {}) as Record<string, unknown>;
+    const existingChecklist = (payload.onboardingChecklist || {}) as Record<string, unknown>;
     const onboardingChecklistMerged = {
       ...existingChecklist,
       ...(payload.designReadiness ? { design_readiness: payload.designReadiness } : {}),
@@ -93,13 +102,13 @@ export async function POST(req: Request) {
       total_cost_usd: Number(payload.totalCostUSD) || 0,
       currency: payload.currency || 'INR',
       timeline: payload.timeline || 'Standard Turnaround',
-      business_kpi: payload.businessKPI || payload.business_kpi || '',
-      payment_structure: payload.paymentStructure || payload.payment_structure || '50/50',
-      signed_at: payload.signedAt || payload.signed_at || undefined,
-      signed_by_email: payload.signedByEmail || payload.signed_by_email || undefined,
+      business_kpi: payload.businessKPI || '',
+      payment_structure: payload.paymentStructure || '50/50',
+      signed_at: payload.signedAt || undefined,
+      signed_by_email: payload.signedByEmail || undefined,
       onboarding_checklist: onboardingChecklistMerged,
-      sow_hash: payload.sowHash || payload.sow_hash || undefined,
-      retriever_tenant_id: payload.retrieverTenantId || payload.retriever_tenant_id || undefined,
+      sow_hash: payload.sowHash || undefined,
+      retriever_tenant_id: payload.retrieverTenantId || undefined,
       metadata: payload.metadata || {},
       updated_at: new Date().toISOString(),
     };

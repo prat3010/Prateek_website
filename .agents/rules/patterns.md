@@ -91,3 +91,12 @@
   4. **Design System 2.0 & Dual-Theme SVG Parity:** Verify contrast and token mapping across both Azure and Noir themes without hardcoded hex drift.
   5. **Zero-Breakage Backward Compatibility:** Ensure domain helper signatures (`calcQuote`, `generateQuestionnairePDF`, `resolveFeatureDependencies`) maintain strict backward compatibility with existing tests and callers.
 - **Constraint:** Never rush to execute source code modifications before double-auditing and refining the implementation plan.
+
+### 14. Production-First & Zero-Toy Utility Invariant Rule (No Mocks, No Gimmicks)
+- **Rule:** Every feature, API endpoint, UI component, and mathematical model MUST solve a real-world enterprise/commercial use case with 100% genuine end-to-end functionality.
+- **Strict Invariants:**
+  1. **Zero Toyish Gimmicks:** Do NOT propose or implement superficial visual gimmicks (e.g. standalone spinning 3D particle screensavers or heavy Canvas animations) that add client-side GPU overhead without delivering tangible daily operational or analytical value to real users.
+  2. **Zero Mock Implementations & Hardcoded Placeholders:** NEVER write mock data branches, static `if/else` keyword checks simulating AI cognition, fake progress timers, or superficial UI facades in place of authentic backend engines. Everything must connect to real database tables, live Supabase/Retriever endpoints, authentic vector search, and verified business logic.
+  3. **High-Leverage Production Prioritization:** Always prioritize mission-critical production systems (zero-downtime deployment pipelines, automated load/latency benchmarks, empirical GraphRAG community clustering, and revenue-generating lead pipelines) over decorative flair.
+  4. **Fully Working & Verified:** Never declare a task complete unless every interaction path is fully wired, verified with real inputs, and backed by automated tests.
+

@@ -9,11 +9,18 @@ export async function POST(req: Request) {
   try {
     const KEY_ID = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || '';
     const KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '';
-    const payload = await req.json();
-    const scopeCode = payload.scopeCode as string | undefined;
+
+    let payload: Record<string, any>;
+    try {
+      payload = await req.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
+
+    const scopeCode = typeof payload.scopeCode === 'string' ? payload.scopeCode.trim() : '';
 
     if (!scopeCode) {
-      return NextResponse.json({ error: 'Missing scopeCode' }, { status: 400 });
+      return NextResponse.json({ error: 'Missing or invalid scopeCode' }, { status: 400 });
     }
 
     const clientEmail = await getVerifiedSessionEmail(req);

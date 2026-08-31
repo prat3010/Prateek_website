@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
 import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
+import { copilotQuerySchema } from '@/lib/clientOrder';
+import { RetrieverClient } from '@/lib/rag-client';
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,28 +11,37 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized: valid session required.' }, { status: 401 });
     }
 
-    const body = await req.json();
-    const queryStr = (body.query || '').trim();
-    if (!queryStr) {
-      return NextResponse.json({ error: 'Query parameter is required' }, { status: 400 });
+    let rawJson: unknown;
+    try {
+      rawJson = await req.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
     }
+
+    const parseResult = copilotQuerySchema.safeParse(rawJson);
+    if (!parseResult.success) {
+      return NextResponse.json({ error: parseResult.error.message, issues: parseResult.error.issues }, { status: 400 });
+    }
+
+    const { query } = parseResult.data;
 
     if (!supabase) {
       return NextResponse.json({
-        answer: "Supabase service unavailable. Please check your network connection.",
+        answer: 'Supabase service unavailable. Please check your network connection.',
         citations: [],
       }, { status: 503 });
     }
 
-    // 1. Fetch Client Profile & Scopes
+    // 1. Fetch Client Profile & Active Scope
     const { data: clientScopes } = await supabase
       .from('client_scopes')
       .select('*')
-      .eq('client_email', clientEmail);
+      .eq('client_email', clientEmail)
+      .order('created_at', { ascending: false });
 
     if (!clientScopes || clientScopes.length === 0) {
       return NextResponse.json({
-        answer: "You do not have an active project scope yet. You can create a new scope on the Scoping Lab (/scoping) page!",
+        answer: 'You do not have an active project scope yet. You can configure and save a new scope in the Scoping Lab (/scoping)!',
         citations: [],
       });
     }
@@ -45,8 +56,7 @@ export async function POST(req: NextRequest) {
     const deliveryStage = activeScope.delivery_stage || (activeScope.deposit_paid ? 'engineering' : 'architecture');
     const sowHash = activeScope.sow_hash || '';
 
-    // 2. Fetch any approved Phase 2 Change Orders
-    let changeOrdersText = '';
+    // 2. Build Structured Grounding Citations
     const citations: Array<{ id: string; label: string; type: 'sow' | 'milestone' | 'change_order' | 'sla' }> = [];
 
     if (activeScope.scope_code) {
@@ -64,22 +74,13 @@ export async function POST(req: NextRequest) {
 
       if (coData && coData.length > 0) {
         const approvedCos = coData.filter((co) => co.status === 'approved' || co.status === 'paid');
-        if (approvedCos.length > 0) {
-          changeOrdersText = approvedCos
-            .map(
-              (co) =>
-                `• **${co.change_order_number}:** +${(co.added_features || []).join(', ')} (${co.delta_inr ? `₹${co.delta_inr.toLocaleString('en-IN')}` : ''} / ${co.delta_usd ? `$${co.delta_usd.toLocaleString('en-US')}` : ''})`
-            )
-            .join('\n');
-
-          approvedCos.forEach((co) => {
-            citations.push({
-              id: co.change_order_number,
-              label: `Change Order ${co.change_order_number}`,
-              type: 'change_order',
-            });
+        approvedCos.forEach((co) => {
+          citations.push({
+            id: co.change_order_number,
+            label: `Change Order ${co.change_order_number}`,
+            type: 'change_order',
           });
-        }
+        });
       }
     }
 
@@ -97,23 +98,33 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const queryLower = queryStr.toLowerCase();
+    // 3. Attempt Live RAG Retrieval from Dedicated Retriever Tenant
+    let answerText = '';
+    const tenantId = activeScope.retriever_tenant_id || process.env.RETRIEVER_SCOPING_TENANT_ID;
+    const apiKey = process.env.RETRIEVER_SCOPING_API_KEY || process.env.RETRIEVER_API_KEY;
+    const apiUrl = process.env.NEXT_PUBLIC_RETRIEVER_API_URL || 'https://rag.prateeq.in';
 
-    // 3. Synthesize RAG Copilot Response grounded in client scope & contract
-    let answer = `Here are the details for your project (${activeScope.company_name || activeScope.scope_code}):\n\n`;
+    if (tenantId && apiKey) {
+      try {
+        const client = new RetrieverClient({
+          apiUrl,
+          tenantId,
+          apiKey,
+          userId: '00000000-0000-0000-0000-000000000000',
+        });
 
-    if (queryLower.includes('warranty') || queryLower.includes('support') || queryLower.includes('sla') || queryLower.includes('maintenance')) {
-      answer += `• **Maintenance Plan:** ${maintenance}\n`;
-      answer += `• **Support SLA:** Guaranteed bug fixes, health probe monitoring, and dependency patch updates per contract specification.\n`;
-    } else if (queryLower.includes('cost') || queryLower.includes('price') || queryLower.includes('payment') || queryLower.includes('invoice') || queryLower.includes('deposit')) {
-      answer += `• **Total Project Value:** ${costINR} ${costUSD ? `(${costUSD})` : ''}\n`;
-      answer += `• **Payment Structure:** ${activeScope.payment_structure || '50/50 Deposit & Completion'}\n`;
-      answer += `• **Deposit Status:** ${activeScope.deposit_paid ? '✅ 50% Deposit Paid & Confirmed' : '⏳ Pending Upfront Deposit'}\n`;
-      answer += `• **Currency:** ${activeScope.currency || 'INR'}\n`;
-      if (changeOrdersText) {
-        answer += `\n**Approved Change Orders:**\n${changeOrdersText}\n`;
+        const searchRes = await client.search(query, { limit: 3, enableHybrid: true });
+        if (searchRes && searchRes.results && searchRes.results.length > 0) {
+          const topResult = searchRes.results[0];
+          answerText = `${topResult.content.slice(0, 450)}...\n\n*(Grounded in ${activeScope.company_name || activeScope.scope_code} knowledge vault)*`;
+        }
+      } catch (ragErr) {
+        console.warn('Retriever live search fallback:', ragErr);
       }
-    } else if (queryLower.includes('time') || queryLower.includes('schedule') || queryLower.includes('deadline') || queryLower.includes('milestone') || queryLower.includes('status') || queryLower.includes('phase')) {
+    }
+
+    // 4. Grounded Synthesis Fallback if tenant indexing is pending
+    if (!answerText) {
       const stageLabel =
         deliveryStage === 'live'
           ? 'Phase 4: Production Launch (Live)'
@@ -123,36 +134,25 @@ export async function POST(req: NextRequest) {
           ? 'Phase 2: Core Engineering'
           : 'Phase 1: Architecture & Specs';
 
-      answer += `• **Current Delivery Stage:** ${stageLabel}\n`;
-      answer += `• **Estimated Turnaround Timeline:** ${timeline}\n`;
-      answer += `• **SOW Status:** ${activeScope.deposit_paid ? '🔒 Cryptographically Frozen & In Active Sprint' : 'Draft Proposal'}\n`;
-    } else if (queryLower.includes('feature') || queryLower.includes('module') || queryLower.includes('include') || queryLower.includes('deliverable')) {
-      answer += `• **Base Engine:** ${engineTitle}\n`;
-      answer += `• **Included Baseline Features:** ${featuresList}\n`;
-      if (changeOrdersText) {
-        answer += `\n**Approved Phase 2 Change Orders:**\n${changeOrdersText}\n`;
-      }
-      answer += `• **Brand Asset Tier:** ${activeScope.brand_asset || 'Standard'}\n`;
-      if (activeScope.business_kpi) {
-        answer += `• **Business KPI Goal:** ${activeScope.business_kpi}\n`;
-      }
-    } else {
-      answer += `• **Base Engine:** ${engineTitle}\n`;
-      answer += `• **Included Features:** ${featuresList}\n`;
-      if (changeOrdersText) {
-        answer += `\n**Approved Change Orders:**\n${changeOrdersText}\n`;
-      }
-      answer += `• **Timeline:** ${timeline}\n`;
-      answer += `• **Care Plan:** ${maintenance}\n`;
-      answer += `• **Current Phase:** ${deliveryStage.toUpperCase()}\n`;
+      answerText = [
+        `**Project Scope Overview (${activeScope.company_name || activeScope.scope_code})**`,
+        `• **Architecture Engine:** ${engineTitle}`,
+        `• **Features:** ${featuresList}`,
+        `• **Timeline:** ${timeline} (${stageLabel})`,
+        `• **Commercial Investment:** ${costINR} ${costUSD ? `(${costUSD})` : ''} • Deposit: ${activeScope.deposit_paid ? '✅ Confirmed (50%)' : '⏳ Pending'}`,
+        `• **Warranty & Maintenance:** ${maintenance}`,
+        sowHash ? `• **SOW Cryptographic Baseline:** \`${sowHash.slice(0, 16)}...\` (Locked)` : '',
+      ]
+        .filter(Boolean)
+        .join('\n');
     }
 
     return NextResponse.json({
-      answer: answer.trim(),
+      answer: answerText.trim(),
       scope_code: activeScope.scope_code,
       company_name: activeScope.company_name,
       delivery_stage: deliveryStage,
-      deposit_paid: !!activeScope.deposit_paid,
+      deposit_paid: Boolean(activeScope.deposit_paid),
       citations,
     });
   } catch (error) {

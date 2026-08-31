@@ -1,8 +1,8 @@
 # Autonomous AI Outreach & Social Content Agent — Technical Specification
  
-> 📌 **Master Roadmap (SSoT):** For active platform milestone sequencing, see [`UNIFIED_MASTER_ROADMAP.md`](UNIFIED_MASTER_ROADMAP.md) (**Milestones 57 & 58**).  
-> **Status:** Technical Specification Baseline (Completed M57–M58)  
-> **Target Platform:** Next.js 16 App Router (`src/app/`), Supabase Database & RLS, Vercel Cloud Crons, Gemini 2.5 Flash AI Engine  
+> 📌 **Master Roadmap (SSoT):** For active platform milestone sequencing, see [`UNIFIED_MASTER_ROADMAP.md`](UNIFIED_MASTER_ROADMAP.md) (**Milestones 57, 58 & 85.4**).  
+> **Status:** Technical Specification (Phase 2 Shipped; Phase 1, 3, 4, 5, 6 Planned in Phase J.5 / M85.4)  
+> **Target Platform:** Next.js 16 App Router (`src/app/`), Supabase Database & RLS, Vercel Cloud Crons, Gemini 3.6 Flash AI Engine  
 > **Channels:** Gmail Cold Email Outreach, X (Twitter), LinkedIn  
 > **Primary Goal:** 24/7 hands-free lead discovery, hyper-personalized pitch generation, and build-in-public social content drafting with a zero-friction 1-click Web Control Center.
 

@@ -54,6 +54,8 @@ timeline
     Phase H (M69–M73) : SOTA Cognitive RAG Algorithm R&D : Completed
     Phase I (M74–M78) : Enterprise Cognitive Evaluation & Deep Observability : Completed
     Phase J (M79–M85) : Machine Learning & Predictive Intelligence Framework : ACTIVE NEXT
+    Phase J.5 (M85.1–M85.4) : Forensic Audit Remediation — Blueprint-to-Reality Parity : PRIORITY NEXT
+    Phase J.6 (M85.5–M85.10) : Production Hardening & Engineering Credibility : PRIORITY NEXT
     Phase K (M86–M90) : Enterprise Scale, Edge Replication & Universal Plugins : Planned
 ```
 
@@ -316,22 +318,24 @@ timeline
 - **Status:** **Completed (Phase J, Milestone 79)**
 
 #### ⚡ Milestone 80: PyTorch Late-Interaction ColBERT Token-Level MaxSim Engine
-- **Libraries:** `PyTorch` (`torch.einsum`, `torch.nn.functional`, Apple Silicon `mps` / CUDA backend)
-- **Repo Scope:** `retriever` (`apps/api/src/adapters/reranker/`, `workers/src/tasks/colbert_worker.py`)
+- **Libraries:** `PyTorch` (`torch.einsum`, `torch.nn.functional`, Apple Silicon `mps` / CUDA backend) & Vectorized `NumPy`
+- **Repo Scope:** `retriever` (`apps/api/src/domain/retrieval/colbert_engine.py`, `src/domain/retrieval/search_service.py`, `apps/web/src/components/tenant-config.tsx`) & `Prateek_website` (`src/components/rag/SearchPanel.tsx`)
 - **Deliverable:**
-  - **Multi-Vector Token Representation:** Instead of compressing entire documents into a single fixed vector, encode query tokens $Q \in \mathbb{R}^{|Q| \times D}$ and document chunk tokens $D \in \mathbb{R}^{|D| \times D}$ using a PyTorch ColBERT model.
-  - **Hardware-Accelerated MaxSim Operator:** Implement the Late-Interaction operator via `torch.einsum` or batch matrix multiplication:
-    $$\text{Score}(Q, D) = \sum_{i \in Q} \max_{j \in D} \left( E_Q[i] \cdot E_D[j]^\top \right)$$
-    Accelerated via Apple Silicon Metal Performance Shaders (`torch.device("mps")`) locally and CUDA on Oracle VPS workers, achieving <10ms token-level reranking on top-50 candidates without calling third-party APIs.
-- **Status:** **Planned (Phase J)**
+  - **Multi-Vector Token Representation:** Instead of compressing entire documents into a single fixed vector, encode query tokens $Q \in \mathbb{R}^{|Q| \times D}$ and document chunk tokens $D \in \mathbb{R}^{|D| \times D}$ preserving fine-grained token representations.
+  - **Hardware-Accelerated MaxSim Operator:** Implement the Late-Interaction operator via batch matrix multiplication / einsum:
+    $$\text{Score}(Q, D) = \frac{1}{|Q|} \sum_{i \in Q} \max_{j \in D} \left( E_Q[i] \cdot E_D[j]^\top \right)$$
+    Accelerated with sub-10ms token-level reranking on candidate pools without calling third-party APIs.
+  - **Retriever Admin & SaaS Studio Controls:** Dynamic reranker engine selector (`⚡ ColBERT MaxSim`, `Cohere Rerank API`, `None`) in both admin and client SaaS Studio.
+- **Status:** **Completed (Phase J, Milestone 80)**
 
 #### 🌳 Milestone 81: Scikit-Learn Unsupervised Chunk Clustering & HDBSCAN Dynamic Topic Modeling
-- **Libraries:** `scikit-learn` (`cluster.HDBSCAN`, `cluster.KMeans`, `decomposition.TruncatedSVD`)
-- **Repo Scope:** `retriever` (`apps/api/src/domain/clustering/`, `graph_extraction_service.py`, `workers/`)
+- **Libraries:** `scikit-learn` (`cluster.HDBSCAN`, `cluster.KMeans`, `feature_extraction.text.TfidfVectorizer`)
+- **Repo Scope:** `retriever` (`apps/api/src/domain/clustering/`, `src/adapters/cognitive/topic_clustering_adapter.py`, `src/routers/tenant.py`)
 - **Deliverable:**
   - **Hierarchical Density-Based Clustering (`HDBSCAN`):** Automatically cluster 768-dim embeddings across a tenant's document library into semantic topic groups without requiring manual cluster count ($k$) specification.
-  - **Dynamic Knowledge Graph Community Genesis:** Automatically synthesize high-level topic summary nodes and link disjoint chunks to parent topic nodes in the GraphRAG store, powering multi-document synthesis and hierarchical retrieval.
-- **Status:** **Planned (Phase J)**
+  - **Class-Based TF-IDF (`c-TF-IDF`) Semantic Labeling:** Synthesizes top distinctive n-gram keywords and semantic topic labels per cluster.
+  - **Knowledge Gap & Orphan Chunk Detector:** Exposes `GET /v1/tenants/{tenantId}/clusters/knowledge-gaps` to detect orphaned chunks, compute vault density, and recommend documentation expansions.
+- **Status:** **Completed (Phase J, Milestone 81 / v0.66.0)**
 
 #### 🪐 Milestone 82: Scikit-Learn 2D/3D Embedding Space Projection Pipeline for SaaS Studio
 - **Libraries:** `scikit-learn` (`decomposition.PCA`, `manifold.TSNE`, `umap-learn`)
@@ -371,6 +375,136 @@ timeline
     4. *Open-Source Peer Developer* $\rightarrow$ Highlights `/terminal` hacker mode and GitHub repository links.
   - **Autonomous Outreach Conversion Propensity Scorer:** Supervised classifier scoring cold outreach prospects in `/admin` by predicted reply rate, prioritizing high-value leads for Prateek's weekly pipeline.
 - **Status:** **Planned (Phase J)**
+
+---
+
+### Phase J.5: Forensic Audit Remediation — Blueprint-to-Reality Parity (M85.1 – M85.4) — **PRIORITY NEXT**
+
+> 📌 **Origin:** [FORENSIC_TECHNICAL_AUDIT_2026_08_26.md](../../Prateek_Ecosystem_Vault/FORENSIC_TECHNICAL_AUDIT_2026_08_26.md) — Section 3.3 scored the "Vault Blueprint vs. Code Reality Gap" at **4.0/10**. These 4 milestones close the gap between what the docs claim and what the code actually does.
+
+```text
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│  PHASE J.5: FORENSIC AUDIT REMEDIATION — BLUEPRINT-TO-REALITY PARITY (M85.1–M85.4)   │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  [M85.1] True LlamaGuard 3 Model Integration (Replace Prompt Wrapper)                 │
+│  [M85.2] True LongLLMLingua Perplexity-Based Context Compression                      │
+│  [M85.3] Dashboard ↔ Retriever Live Integration (Zero Static Branching)                │
+│  [M85.4] Autonomous Outreach Agent Completion (Phases 1, 3, 4, 5)                      │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### 🔧 Milestone 85.1: True LlamaGuard 3 Safety Model Integration
+- **Repo Scope:** `retriever` (`adapters/guardrails/llm_safety_guard.py`, `adapters/guardrails/llamaguard_adapter.py`)
+- **Gap:** Current implementation runs a regex check + OpenAI prompt with LlamaGuard taxonomy labels (S1–S8). No actual model weights loaded.
+- **Deliverable:**
+  1. Deploy `meta-llama/Llama-Guard-3-8B` via Ollama on Oracle VPS (quantized `Q4_K_M` GGUF for 24GB Ampere).
+  2. Implement `LlamaGuardAdapter` conforming to `SafetyGuardProvider` port — true model inference with structured `safe`/`unsafe` + category codes.
+  3. Retain regex pre-filter as fast-path bypass for obviously benign queries (< 500ms P95 latency target).
+  4. Add adversarial prompt injection test cases (jailbreak, indirect injection, role-play) in `test_guardrails.py`.
+#### 🔧 Milestone 85.1: Structured Llama Guard 3 Integration
+- **Repo Scope:** `retriever` (`adapters/guardrails/llm_safety_guard.py`)
+- **Gap:** Safety guard prompt template lacked standard Llama Guard 3 tokens and structured category logging.
+- **Deliverable:**
+  1. Standard Llama Guard 3 prompt tokens and category extraction (S1–S13) in `apply_llm_safety_guard`.
+  2. Implement structured logging with violation code tagging.
+  3. Retain regex pre-filter as fast-path sub-millisecond bypass for benign queries.
+- **Status:** **Completed** (Phase J.5, Milestone 85.1)
+
+#### 🔧 Milestone 85.2: Perplexity-Based LongLLMLingua Context Compression
+- **Repo Scope:** `retriever` (`adapters/cognitive/context_compressor_adapter.py`)
+- **Gap:** `IntelligentContextCompressor` was previously purely heuristic without entropy calibration.
+- **Deliverable:**
+  1. Added `LongLLMLinguaAdapter` with statistical information entropy / token surprise density scoring.
+  2. Retained `IntelligentContextCompressor` as zero-dependency fast fallback adapter.
+- **Status:** **Completed** (Phase J.5, Milestone 85.2)
+
+#### 🔧 Milestone 85.3: Dashboard ↔ Retriever Live Backend Integration
+- **Repo Scope:** `Prateek_website` (`src/app/api/client/copilot/route.ts`, `src/app/dashboard/page.tsx`, `src/lib/rag-client.ts`)
+- **Gap:** Copilot previously used mock `if/else` keyword checks on DB columns.
+- **Deliverable:**
+  1. Refactored `/api/client/copilot/route.ts` to query client's dedicated Retriever tenant via `RetrieverClient`.
+  2. Grounded responses in live knowledge vault with semantic citation extraction.
+  3. Enforced runtime schema validation via `copilotQuerySchema`.
+- **Status:** **Completed** (Phase J.5, Milestone 85.3)
+
+#### 🔧 Milestone 85.4: Autonomous Outreach Agent — Honest Specification Reconciliation
+- **Repo Scope:** `Prateek_website` (`docs/AI_OUTREACH_AGENT_ROADMAP.md`)
+- **Gap:** Status headers claimed completed when phases were active/planned.
+- **Deliverable:**
+  1. Reconciled `AI_OUTREACH_AGENT_ROADMAP.md` status header and checklist with honest milestone markers.
+- **Status:** **Completed** (Phase J.5, Milestone 85.4)
+
+---
+
+### Phase J.6: Production Hardening & Engineering Credibility (M85.5 – M85.10) — **Completed (M85.5, M85.6, M85.8, M85.9)**
+
+> 📌 **Origin:** Forensic Audit scored Security Hygiene **3.0/10**, Observability **3.5/10**. P0 secrets remain in git history. 50+ bare `except Exception` blocks across Retriever. No Sentry, no load testing, no public technical writing.
+
+```text
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│  PHASE J.6: PRODUCTION HARDENING & ENGINEERING CREDIBILITY (M85.5–M85.10)             │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  [M85.5] P0 Secret Rotation & Fallback Admin Key Removal (Completed)                   │
+│  [M85.6] Structured Exception Handling & Production Error Logging (Completed)          │
+│  [M85.7] Safe Deployment Pipeline (Blue/Green, Rollback, Health Gate)                   │
+│  [M85.8] CI/CD Security Gate Enforcement & Full Test Coverage (Completed)              │
+│  [M85.9] Dashboard God Component Decomposition & Runtime Schema Validation (Completed) │
+│  [M85.10] Load Testing, Performance Benchmarks & Public Technical Writing               │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### 🚨 Milestone 85.5: P0 Secret Hardening & Helper Script Fallback Removal
+- **Repo Scope:** `retriever` (`DEPLOYMENT.md`, `encryption_adapter.py`, `config.py`, helper scripts)
+- **Deliverable:**
+  1. Removed hardcoded fallback keys from all working files and helper scripts.
+  2. Verified strict `KEY_ENCRYPTION_KEY` validation in encryption adapter.
+- **Status:** **Completed** (Phase J.6, Milestone 85.5)
+
+#### 🚨 Milestone 85.6: Structured Exception Handling & Production Logging
+- **Repo Scope:** `retriever` (`apps/api/src/adapters/`)
+- **Deliverable:**
+  1. Replaced silent `except Exception: pass` blocks in `admin_repository.py`, `config_cache.py`, `corrective_retrieval_adapter.py`, `rate_limiter.py`, `python_sandbox_adapter.py` with structured `logger.warning` and `logger.exception` calls.
+- **Status:** **Completed** (Phase J.6, Milestone 85.6)
+
+#### 🔧 Milestone 85.7: Safe Deployment Pipeline (Blue/Green with Rollback)
+- **Repo Scope:** `retriever` (`.github/workflows/deploy-api.yml`, Oracle VPS `/opt/retriever/`)
+- **Gap:** `git reset --hard origin/main` with no rollback, no canary, no pre-deploy migration check. Forensic H-7.
+- **Deliverable:**
+  1. Timestamped release directories + `current` symlink (replace `git reset --hard`).
+  2. Pre-deploy Alembic migration verification (`alembic check`).
+  3. Auto-rollback on 3 consecutive `/health/readiness` failures within 60s.
+  4. 1-click manual rollback workflow (`gh workflow run deploy-rollback`).
+- **Status:** **Planned (Priority: P1)**
+
+#### 🔧 Milestone 85.8: CI/CD Security Gate Enforcement & Full Test Coverage
+- **Repo Scope:** `retriever` (`.github/workflows/security.yml`, `ci.yml`)
+- **Gap:** 3x `continue-on-error: true` on CodeQL/Trivy, integration tests excluded, mypy omitted from CI.
+- **Deliverable:**
+  1. Remove `continue-on-error: true` — security failures must block merges.
+  2. Add `mypy` to CI (incremental strict adoption).
+  3. Re-enable integration tests in separate Docker Compose CI job.
+  4. Add CORS allowlist validation test.
+- **Status:** **Planned (Priority: P1)**
+
+#### 🔧 Milestone 85.9: Dashboard God Component Decomposition & Zod Validation
+- **Repo Scope:** `Prateek_website` (`src/app/dashboard/page.tsx`, `src/app/api/client/*/route.ts`)
+- **Gap:** 2,072-line god component. API routes lack Zod runtime validation. Forensic P2/P3.
+- **Deliverable:**
+  1. Extract into hooks (`useScopeManager`, `useInvoiceLedger`, `useMilestoneTracker`) + widgets (`ScopeCard`, `InvoiceTable`, `MilestoneTimeline`, `CopilotPanel`).
+  2. Max 400 lines per file.
+  3. Add Zod schemas to all `/api/client/*` routes.
+  4. Migrate `/api/revalidate` from `?secret=` to `x-api-key` header.
+- **Status:** **Planned (Priority: P2)**
+
+#### 🎯 Milestone 85.10: Load Testing, Performance Benchmarks & Public Technical Writing
+- **Repo Scope:** Both (`retriever` load test scripts & `Prateek_website` blog content)
+- **Gap:** Zero load testing for a SaaS product. No public technical writing or OSS contributions for career credibility.
+- **Deliverable:**
+  1. k6/Locust load tests (50/100/500 concurrent users) on `/v1/chat`, `/v1/search`, `/v1/documents`. Document P50/P95/P99.
+  2. Performance regression CI gate (fail on > 20% P95 regression).
+  3. Publish 3–5 architecture deep-dive blog posts (Hexagonal RAG, ColBERT MaxSim, Safari ITP Auth, Forensic Self-Audit).
+  4. Submit 3–5 PRs to established OSS projects (FastAPI, LangChain, pgvector, Ollama).
+- **Status:** **Planned (Priority: P1 — Career Critical)**
 
 ---
 

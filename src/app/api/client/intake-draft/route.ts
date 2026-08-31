@@ -2,10 +2,23 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
 import { sendAdminIntakeLeadNotification } from '@/lib/emailNotification';
 import { getIpHash } from '@/lib/security';
+import { intakeDraftSchema } from '@/lib/clientOrder';
 
 export async function POST(req: Request) {
   try {
-    const payload = await req.json();
+    let rawJson: unknown;
+    try {
+      rawJson = await req.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
+
+    const parseResult = intakeDraftSchema.safeParse(rawJson);
+    if (!parseResult.success) {
+      return NextResponse.json({ error: parseResult.error.message, issues: parseResult.error.issues }, { status: 400 });
+    }
+
+    const payload = rawJson as Record<string, any>;
 
     if (!payload.companyName && !payload.contactEmail) {
       return NextResponse.json({ error: 'Invalid intake lead payload: companyName or contactEmail required' }, { status: 400 });

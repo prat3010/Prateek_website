@@ -47,10 +47,12 @@ The client-side commercial PDFs (Scoping Brief, Services & Pricing Guide, Sales 
 | `/api/analytics-summary` | GET | Aggregated visitor stats |
 | `/api/contact` | POST | Send contact form email |
 | `/api/terminal/qrcode` | GET | Generate ASCII / PNG QR code for terminal |
-| `/api/client/save-scope` | POST | Upsert client scope (requires Supabase `Bearer` session token; client-editable fields only) |
+| `/api/client/save-scope` | POST | Upsert client scope with Zod validation (requires Supabase `Bearer` session token) |
 | `/api/client/get-scopes` | GET | List scopes for the verified session email (requires Supabase `Bearer` session token) |
 | `/api/client/delete-scope` | DELETE | Delete draft/unpaid scope (session-gated) |
-| `/api/client/intake-draft` | POST | Save unauthenticated scoping draft to intake_leads |
+| `/api/client/copilot` | POST | Grounded AI copilot querying client's dedicated Retriever RAG tenant |
+| `/api/client/change-orders` | POST, GET | Submit and list Phase 2 Change Orders for active sprint scopes |
+| `/api/client/intake-draft` | POST | Save unauthenticated scoping draft to intake_leads with Zod validation |
 | `/api/client/create-razorpay-order` | POST | Initiate 50% scope deposit Razorpay order |
 | `/api/client/verify-razorpay-payment`| POST | Verify Razorpay payment signature & update scope status |
 | `/api/client/create-razorpay-subscription` | POST | Initiate RAG SaaS recurring subscription |

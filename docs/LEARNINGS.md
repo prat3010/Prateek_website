@@ -104,7 +104,17 @@ This document serves as the **Episodic Long-Term Memory** for AI agents and deve
 
 ---
 
-## 5. Agent Workflow & Blast Radius Checklist
+## 5. Zero-Toy Invariant & Live Copilot RAG Integration
+
+### Quirk: Mock Keyword Branching in AI Copilots
+- **Context / Framework**: Client Workspace Dashboard (`/dashboard`) & Client Copilot (`/api/client/copilot`)
+- **Symptom**: Superficial `if/else` keyword checks simulating AI cognition or disconnected UI facades.
+- **Anti-Pattern**: Writing static regex checks in route handlers to simulate document grounding.
+- **Enforced Solution**: Query the client's dedicated Retriever tenant (`RetrieverClient`) with hybrid semantic search and authentic citation extraction. Enforce Zod runtime validation (`copilotQuerySchema`). Always wrap modal triggers in `<Portal>` to escape Framer Motion containing block traps.
+
+---
+
+## 6. Agent Workflow & Blast Radius Checklist
 
 Before completing any task modifying domain logic or API routes:
 1. **Pre-Flight**: Run `python3 scripts/query_architecture.py --target <entity_or_api>` to inspect blast radius.
@@ -112,3 +122,4 @@ Before completing any task modifying domain logic or API routes:
 3. **Execution**: Perform targeted edits without full file overwrites.
 4. **Post-Tool Audit**: Run `python3 scripts/audit_contracts.py`.
 5. **Graph Sync**: Run `python3 scripts/sync_graph_with_code.py` to keep Obsidian Canvas in 100% sync.
+

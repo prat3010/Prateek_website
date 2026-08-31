@@ -40,12 +40,12 @@ graph TD
 | **JSON Fallback** | `src/data/intakeQuestionnaireDefaults.json` | Default base engines, features, goals, care plans. |
 | **JSON Backup** | `src/data/resume.json` | Local fallback JSON updated during Synchronizer saves. |
 | **Calculation Engine** | `src/lib/pricing.ts` | Dynamic INR/USD price formatting & archetype totals. |
-| **Scope Types & Utilities** | `src/lib/clientOrder.ts` | Data schema for `ClientScope`, `dbToClientScope`, and invoice entities. |
+| **Scope Types & Schema Safety** | `src/lib/clientOrder.ts` | Data schema for `ClientScope`, `dbToClientScope`, and Zod runtime schema validators (`saveScopeSchema`, `copilotQuerySchema`, `intakeDraftSchema`). |
 | **Checklist Engine** | `src/lib/onboardingChecklist.ts` | Dynamically generates milestone tasks based on payment structure & features. |
 | **Interactive UI** | `src/components/Intake/IntakeForm.tsx` | Scoping Lab wizard (`/scoping`). |
 | **Homepage UI** | `src/components/Resume/Resume.tsx` | Services & Guarantees 2x2 card grid (`/#resume`). |
-| **Client UI** | `src/app/dashboard/page.tsx` | Client Workspace scope view, milestone tracker, & checkout. |
-| **Client API Routes** | `src/app/api/client/save-scope/route.ts`, `intake-draft`, `get-scopes`, `auth/callback/route.ts` | Server endpoints for scope persistence, lead drafts, OAuth callback, & Resend email alerts. |
+| **Client Workspace UI** | `src/app/dashboard/page.tsx` & `src/components/ClientDashboard/` | Modular client portal (`ScopeCard`, `ScopeEditorModal`, `SowSignoffModal`, `ProposalSuiteModal`, `StagingPreviewModal`, `InvoiceCreatorModal`, `InvoiceLedgerTable`, `OnboardingChecklistWidget`, `ClientProjectCopilot`). |
+| **Client API Routes** | `src/app/api/client/save-scope/route.ts`, `copilot`, `intake-draft`, `get-scopes`, `auth/callback/route.ts` | Server endpoints for scope persistence, live Retriever RAG copilot, lead drafts, OAuth callback, & Resend email alerts. |
 | **Admin Email Alerts** | `src/lib/emailNotification.ts` | Sends instant Resend notifications to Prateek on user signups, intake leads, & scope confirmations. |
 | **PDF Renderers** | `src/components/pdf/ScopingBriefPDF.tsx`, `ServicesAndPricingPDF.tsx` | Itemized PDF proposals & pricing guide. |
 | **Synchronizer Tabs** | `scripts/sync_tabs/questionnaire.py`, `clients.py` | Streamlit grid editor & Client, Lead, Order, Deliverables Command Center. |

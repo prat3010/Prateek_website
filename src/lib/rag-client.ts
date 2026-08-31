@@ -91,7 +91,7 @@ export class RetrieverClient {
   }
 
 
-  async search(query: string, options?: { limit?: number; enableQueryRewriting?: boolean; enableHybrid?: boolean; strategy?: string; hybridAlpha?: number; enableLoraAdapter?: boolean }) {
+  async search(query: string, options?: { limit?: number; enableQueryRewriting?: boolean; enableHybrid?: boolean; strategy?: string; hybridAlpha?: number; enableLoraAdapter?: boolean; rerankerEngine?: "cohere" | "colbert" | "none"; enableColbertRerank?: boolean }) {
     const limit = options?.limit ?? 5;
     return this.request<import("./rag-types").SearchResponse>(`/v1/tenants/${this.config.tenantId}/search`, {
       method: "POST",
@@ -103,6 +103,8 @@ export class RetrieverClient {
         enable_hybrid: options?.enableHybrid ?? true,
         hybridAlpha: options?.hybridAlpha ?? 0.7,
         enableLoraAdapter: options?.enableLoraAdapter ?? false,
+        rerankerEngine: options?.rerankerEngine ?? "colbert",
+        enableColbertRerank: options?.enableColbertRerank ?? (options?.rerankerEngine === "colbert"),
         ...(options?.strategy ? { strategy: options.strategy } : {}),
       }),
     });

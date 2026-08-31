@@ -17,6 +17,7 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
 
   const [hybridAlpha, setHybridAlpha] = useState(0.7);
   const [enableLora, setEnableLora] = useState(false);
+  const [rerankerEngine, setRerankerEngine] = useState<"colbert" | "cohere" | "none">("colbert");
 
   // Ragas benchmark runner state
   const [runningBenchmark, setRunningBenchmark] = useState(false);
@@ -32,6 +33,8 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
       const res = await client.search(query, {
         hybridAlpha,
         enableLoraAdapter: enableLora,
+        rerankerEngine,
+        enableColbertRerank: rerankerEngine === "colbert",
       });
       setResults(res);
     } catch (e: unknown) {
@@ -119,7 +122,7 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
               <span>1.0 (Dense Vector)</span>
             </div>
 
-            <div style={{ display: "flex", gap: "1.5rem", marginTop: "0.75rem", fontSize: "0.8rem" }}>
+            <div style={{ display: "flex", gap: "1.5rem", marginTop: "0.75rem", fontSize: "0.8rem", flexWrap: "wrap", alignItems: "center" }}>
               <span style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
                 <input
                   type="checkbox"
@@ -127,12 +130,63 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
                   checked={enableLora}
                   onChange={(e) => setEnableLora(e.target.checked)}
                 />
-                <label htmlFor="lora-toggle">🧠 LoRA Domain Adaptation Layer</label>
+                <label htmlFor="lora-toggle">🧠 LoRA Domain Adapter</label>
               </span>
               <span style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
                 <input type="checkbox" id="mq-toggle" defaultChecked />
                 <label htmlFor="mq-toggle">🔀 Multi-Query Expansion</label>
               </span>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginLeft: "auto" }}>
+                <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>Reranker:</span>
+                <button
+                  type="button"
+                  onClick={() => setRerankerEngine("colbert")}
+                  style={{
+                    padding: "2px 8px",
+                    borderRadius: "4px",
+                    border: "1px solid var(--surface-glass-border, rgba(0,0,0,0.1))",
+                    fontSize: "0.75rem",
+                    cursor: "pointer",
+                    background: rerankerEngine === "colbert" ? "var(--badge-active-bg, rgba(0,230,118,0.15))" : "transparent",
+                    color: rerankerEngine === "colbert" ? "var(--badge-active-color, #00E676)" : "var(--color-text-muted)",
+                    fontWeight: rerankerEngine === "colbert" ? 600 : 400,
+                  }}
+                >
+                  ⚡ ColBERT MaxSim
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRerankerEngine("cohere")}
+                  style={{
+                    padding: "2px 8px",
+                    borderRadius: "4px",
+                    border: "1px solid var(--surface-glass-border, rgba(0,0,0,0.1))",
+                    fontSize: "0.75rem",
+                    cursor: "pointer",
+                    background: rerankerEngine === "cohere" ? "rgba(0,180,216,0.15)" : "transparent",
+                    color: rerankerEngine === "cohere" ? "var(--pop-blue, #00b4d8)" : "var(--color-text-muted)",
+                    fontWeight: rerankerEngine === "cohere" ? 600 : 400,
+                  }}
+                >
+                  Cohere API
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRerankerEngine("none")}
+                  style={{
+                    padding: "2px 8px",
+                    borderRadius: "4px",
+                    border: "1px solid var(--surface-glass-border, rgba(0,0,0,0.1))",
+                    fontSize: "0.75rem",
+                    cursor: "pointer",
+                    background: rerankerEngine === "none" ? "var(--surface-elevated, rgba(0,0,0,0.06))" : "transparent",
+                    color: rerankerEngine === "none" ? "var(--color-text)" : "var(--color-text-muted)",
+                    fontWeight: rerankerEngine === "none" ? 600 : 400,
+                  }}
+                >
+                  Off
+                </button>
+              </div>
             </div>
           </div>
 
@@ -148,7 +202,7 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
                   {results.searchMeta?.durationMs && ` in ${results.searchMeta.durationMs}ms`}
                 </p>
                 <span className={styles.tag} style={{ background: "var(--badge-active-bg, rgba(0,230,118,0.15))", color: "var(--badge-active-color, #00E676)", fontSize: "0.75rem" }}>
-                  ⚡ Strategy: {results.searchMeta?.strategy || "normalized_hybrid"}
+                  {results.searchMeta?.strategy?.includes("colbert_maxsim") ? "⚡ ColBERT MaxSim Reranked" : `⚡ Strategy: ${results.searchMeta?.strategy || "normalized_hybrid"}`}
                 </span>
               </div>
 

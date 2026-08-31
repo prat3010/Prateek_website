@@ -73,12 +73,17 @@ The **Client Dashboard Ecosystem** on `prateeq.in` serves as the primary commerc
 
 ### Portal A: Commercial Services Client Workspace (`/dashboard`)
 * **Google OAuth Session Gate:** Restricted to authenticated clients via `AuthContext.tsx` and `sessionVerify.ts`.
-* **Active Scope Management:** Displays client's active project scopes (`client_scopes` table).
-* **Interactive Scope Customizer:** Add or remove feature modules dynamically with instant price recalculations (INR/USD).
+* **Modular Dashboard Architecture:** High-cohesion subcomponents under `src/components/ClientDashboard/` orchestrating scopes, onboarding, and invoices:
+  * **[`ScopeCard.tsx`](../src/components/ClientDashboard/ScopeCard.tsx):** Dynamic status badges, SOW cryptographic baseline hashes, live price calculations (`@number-flow/react`), and Phase 2 change order ledgers.
+  * **[`ScopeEditorModal.tsx`](../src/components/ClientDashboard/ScopeEditorModal.tsx):** Interactive CPQ architecture engine customizer with DAG dependency cascades (`DependencyCascadeModal.tsx`) and Phase 2 change order submissions.
+  * **[`SowSignoffModal.tsx`](../src/components/ClientDashboard/SowSignoffModal.tsx):** Digital proposal agreement with flexible payment structure selection (50/50 vs 40/30/30) and Razorpay deposit checkout (`checkout.js`).
+  * **[`ProposalSuiteModal.tsx`](../src/components/ClientDashboard/ProposalSuiteModal.tsx):** Dual-format commercial PDF exporter (1-Page Executive Pitch Brief vs 3-Page Master SOW Contract).
+  * **[`StagingPreviewModal.tsx`](../src/components/ClientDashboard/StagingPreviewModal.tsx):** Desktop and mobile viewport staging sandbox with live URL sharing.
+  * **[`InvoiceCreatorModal.tsx`](../src/components/ClientDashboard/InvoiceCreatorModal.tsx) & [`InvoiceLedgerTable.tsx`](../src/components/ClientDashboard/InvoiceLedgerTable.tsx):** GST-compliant tax invoicing, itemized line items, PDF generation, and Razorpay checkout actions.
+  * **[`OnboardingChecklistWidget.tsx`](../src/components/ClientDashboard/OnboardingChecklistWidget.tsx):** Categorized technical, financial, and governance prerequisite tracker with real-time readiness scoring.
+  * **[`ClientProjectCopilot.tsx`](../src/components/ClientDashboard/ClientProjectCopilot.tsx):** Persistent floating AI copilot querying the client's dedicated Retriever tenant (`RetrieverClient`) with grounded semantic citations and live SLA status.
 * **4-Stage Progress Tracker:** Visual milestone progression: `architecture` ➔ `engineering` (unlocked on 50% deposit) ➔ `staging` ➔ `live`.
-* **Invoice & Payment Ledger:** Itemized billing ledger from `invoices` table showing payment status (`pending`, `paid`, `cancelled`), due dates, and payment timestamps.
-* **Commercial PDF Exporters:** Downloadable high-res PDF proposals rendered client-side ([`ScopingBriefPDF.tsx`](../src/components/pdf/ScopingBriefPDF.tsx) and [`ServicesAndPricingPDF.tsx`](../src/components/pdf/ServicesAndPricingPDF.tsx)).
-* **Razorpay 50% Deposit Trigger:** **"Pay 50% Scope Deposit"** button launching Razorpay checkout modal (`checkout.js`).
+* **Runtime Schema Safety:** All client API mutations validated at runtime via Zod schemas (`saveScopeSchema`, `copilotQuerySchema`, `intakeDraftSchema`).
 
 ### Portal B: RAG SaaS Studio Workspace (`/rag/app`)
 * **Chat Studio Tab:**
