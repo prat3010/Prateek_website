@@ -15,6 +15,9 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const [hybridAlpha, setHybridAlpha] = useState(0.7);
+  const [enableLora, setEnableLora] = useState(false);
+
   // Ragas benchmark runner state
   const [runningBenchmark, setRunningBenchmark] = useState(false);
   const [benchmarkDone, setBenchmarkDone] = useState(false);
@@ -26,7 +29,10 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
     setLoading(true);
     setError("");
     try {
-      const res = await client.search(query);
+      const res = await client.search(query, {
+        hybridAlpha,
+        enableLoraAdapter: enableLora,
+      });
       setResults(res);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Search failed");
@@ -48,7 +54,7 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
     <div className={styles.panel}>
       <div className={styles.panelHeaderGroup}>
         <h2 className={styles.panelTitle}>🔍 Search Inspector, Experiments & RAG Evaluator</h2>
-        <p className={styles.panelDesc}>Debug hybrid search vector/keyword score breakdowns, run automated Ragas benchmarks, and conduct A/B variant experiments.</p>
+        <p className={styles.panelDesc}>Debug hybrid search vector/keyword score breakdowns, calibrate sparse-dense convex ratios, and evaluate LoRA adapters.</p>
       </div>
 
       {/* Sub-Nav Tabs */}
@@ -90,15 +96,44 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
             </button>
           </div>
 
-          <div style={{ display: "flex", gap: "1rem", marginTop: "0.75rem", fontSize: "0.8rem", opacity: 0.9 }}>
-            <span style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
-              <input type="checkbox" id="mq-toggle" defaultChecked />
-              <label htmlFor="mq-toggle">🔀 Multi-Query Expansion</label>
-            </span>
-            <span style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
-              <input type="checkbox" id="norm-toggle" defaultChecked />
-              <label htmlFor="norm-toggle">⚡ Min-Max Score Normalization</label>
-            </span>
+          {/* M79: Sparse-Dense Hybrid Balance & LoRA Controls */}
+          <div style={{ marginTop: "1rem", padding: "0.85rem", background: "var(--surface-elevated, rgba(0,0,0,0.03))", borderRadius: "8px", border: "1px solid var(--surface-glass-border, rgba(0,0,0,0.1))" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
+              <span style={{ fontSize: "0.8rem", fontWeight: 600 }}>⚖️ Hybrid Blend Ratio (α): {hybridAlpha.toFixed(2)}</span>
+              <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", fontFamily: "monospace" }}>
+                {(hybridAlpha * 100).toFixed(0)}% Semantic Dense / {((1 - hybridAlpha) * 100).toFixed(0)}% BM25 Sparse
+              </span>
+            </div>
+            <input
+              type="range"
+              min="0.0"
+              max="1.0"
+              step="0.05"
+              value={hybridAlpha}
+              onChange={(e) => setHybridAlpha(parseFloat(e.target.value))}
+              style={{ width: "100%", cursor: "pointer" }}
+            />
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.7rem", color: "var(--color-text-muted)", marginTop: "0.25rem", fontFamily: "monospace" }}>
+              <span>0.0 (BM25 Code/Keywords)</span>
+              <span>0.5 (Balanced)</span>
+              <span>1.0 (Dense Vector)</span>
+            </div>
+
+            <div style={{ display: "flex", gap: "1.5rem", marginTop: "0.75rem", fontSize: "0.8rem" }}>
+              <span style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                <input
+                  type="checkbox"
+                  id="lora-toggle"
+                  checked={enableLora}
+                  onChange={(e) => setEnableLora(e.target.checked)}
+                />
+                <label htmlFor="lora-toggle">🧠 LoRA Domain Adaptation Layer</label>
+              </span>
+              <span style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                <input type="checkbox" id="mq-toggle" defaultChecked />
+                <label htmlFor="mq-toggle">🔀 Multi-Query Expansion</label>
+              </span>
+            </div>
           </div>
 
           {!results && !loading && (
@@ -112,7 +147,7 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
                   Found {results.results.length} result{results.results.length !== 1 ? "s" : ""}
                   {results.searchMeta?.durationMs && ` in ${results.searchMeta.durationMs}ms`}
                 </p>
-                <span className={styles.tag} style={{ background: "rgba(0,230,118,0.15)", color: "#00E676", fontSize: "0.75rem" }}>
+                <span className={styles.tag} style={{ background: "var(--badge-active-bg, rgba(0,230,118,0.15))", color: "var(--badge-active-color, #00E676)", fontSize: "0.75rem" }}>
                   ⚡ Strategy: {results.searchMeta?.strategy || "normalized_hybrid"}
                 </span>
               </div>
@@ -129,7 +164,7 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
                       <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                         <span className={styles.resultRank}>#{i + 1}</span>
                         {contextTag && (
-                          <span className={styles.tag} style={{ background: "rgba(0,180,216,0.2)", color: "#00b4d8", fontSize: "0.7rem" }}>
+                          <span className={styles.tag} style={{ background: "rgba(0,180,216,0.2)", color: "var(--pop-blue, #00b4d8)", fontSize: "0.7rem" }}>
                             🏷️ Context: {contextTag}
                           </span>
                         )}
@@ -166,24 +201,24 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
 
           <div className={styles.benchmarkGrid}>
             <div className={styles.scoreCard}>
-              <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted, #888)", textTransform: "uppercase" }}>Faithfulness Score</span>
-              <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem", color: benchmarkDone ? "#00E676" : "var(--color-text-muted, #888)" }}>
+              <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textTransform: "uppercase" }}>Faithfulness Score</span>
+              <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem", color: benchmarkDone ? "var(--badge-active-color, #00E676)" : "var(--color-text-muted)" }}>
                 {benchmarkDone ? "96.4%" : "--"}
               </div>
               <span style={{ fontSize: "0.75rem", opacity: 0.7 }}>Is answer backed by document text?</span>
             </div>
 
             <div className={styles.scoreCard}>
-              <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted, #888)", textTransform: "uppercase" }}>Answer Relevancy</span>
-              <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem", color: benchmarkDone ? "#00E676" : "var(--color-text-muted, #888)" }}>
+              <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textTransform: "uppercase" }}>Answer Relevancy</span>
+              <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem", color: benchmarkDone ? "var(--badge-active-color, #00E676)" : "var(--color-text-muted)" }}>
                 {benchmarkDone ? "93.2%" : "--"}
               </div>
               <span style={{ fontSize: "0.75rem", opacity: 0.7 }}>Does answer directly address prompt?</span>
             </div>
 
             <div className={styles.scoreCard}>
-              <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted, #888)", textTransform: "uppercase" }}>Context Recall</span>
-              <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem", color: benchmarkDone ? "#5A8EB6" : "var(--color-text-muted, #888)" }}>
+              <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textTransform: "uppercase" }}>Context Recall</span>
+              <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem", color: benchmarkDone ? "var(--pop-blue, #5A8EB6)" : "var(--color-text-muted)" }}>
                 {benchmarkDone ? "90.1%" : "--"}
               </div>
               <span style={{ fontSize: "0.75rem", opacity: 0.7 }}>Did retrieval pull all relevant chunks?</span>

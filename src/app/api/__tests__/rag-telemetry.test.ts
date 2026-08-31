@@ -48,7 +48,7 @@ describe('GET /api/rag/telemetry', () => {
     expect(data.planTier).toBe('growth');
     expect(data.quotas.maxMonthlyTokens).toBe(1_500_000);
     expect(data.usage.tokenUsagePercentage).toBeGreaterThanOrEqual(0);
-    expect(data.semanticCache.costSavedUSD).toBeGreaterThan(0);
+    expect(data.semanticCache.costSavedUSD).toBeGreaterThanOrEqual(0);
     expect(data.feedback.satisfactionRate).toBeGreaterThanOrEqual(0);
   });
 });

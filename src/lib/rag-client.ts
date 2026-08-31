@@ -91,7 +91,7 @@ export class RetrieverClient {
   }
 
 
-  async search(query: string, options?: { limit?: number; enableQueryRewriting?: boolean; enableHybrid?: boolean; strategy?: string }) {
+  async search(query: string, options?: { limit?: number; enableQueryRewriting?: boolean; enableHybrid?: boolean; strategy?: string; hybridAlpha?: number; enableLoraAdapter?: boolean }) {
     const limit = options?.limit ?? 5;
     return this.request<import("./rag-types").SearchResponse>(`/v1/tenants/${this.config.tenantId}/search`, {
       method: "POST",
@@ -101,6 +101,8 @@ export class RetrieverClient {
         top_k: limit,
         enable_query_rewriting: options?.enableQueryRewriting ?? true,
         enable_hybrid: options?.enableHybrid ?? true,
+        hybridAlpha: options?.hybridAlpha ?? 0.7,
+        enableLoraAdapter: options?.enableLoraAdapter ?? false,
         ...(options?.strategy ? { strategy: options.strategy } : {}),
       }),
     });
@@ -295,6 +297,41 @@ export class RetrieverClient {
   async getOnlineEvaluationSummary(): Promise<import("./rag-types").OnlineEvaluationSummaryResponse> {
     return this.request<import("./rag-types").OnlineEvaluationSummaryResponse>(
       `/v1/admin/tenants/${this.config.tenantId}/evaluation/online/summary`
+    );
+  }
+
+  async computeGroundingDiff(
+    answer: string,
+    contexts: string[] = []
+  ): Promise<import("./rag-types").GroundingDiffResponse> {
+    return this.request<import("./rag-types").GroundingDiffResponse>(
+      `/v1/tenants/${this.config.tenantId}/evaluations/grounding-diff`,
+      {
+        method: "POST",
+        body: JSON.stringify({ answer, contexts }),
+      }
+    );
+  }
+
+  async listLoraAdapters(): Promise<import("./rag-types").LoraAdapterInfo[]> {
+    return this.request<import("./rag-types").LoraAdapterInfo[]>(
+      `/v1/admin/tenants/${this.config.tenantId}/lora/adapters`
+    );
+  }
+
+  async trainLoraAdapter(payload: {
+    name?: string;
+    domain_tag?: string;
+    rank?: number;
+    epochs?: number;
+    learning_rate?: number;
+  }): Promise<import("./rag-types").LoraTrainResponse> {
+    return this.request<import("./rag-types").LoraTrainResponse>(
+      `/v1/admin/tenants/${this.config.tenantId}/lora/train`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }
     );
   }
 }

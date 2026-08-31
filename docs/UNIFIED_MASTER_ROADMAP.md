@@ -51,9 +51,9 @@ timeline
     Phase D (M54–M56) : Surface Polish, Citation Visualizer & RLM Studio : Completed
     Phase E (M57–M60) : Autonomous Growth, Cold Outreach & AI Newsjacking : Completed
     Phase G (M63–M68) : Productized E-Commerce Scoping & Agency Ecosystem : Completed
-    Phase H (M69–M73) : SOTA Cognitive RAG Algorithm R&D : ACTIVE NEXT
-    Phase I (M74–M78) : Enterprise Cognitive Evaluation & Deep Observability : Planned
-    Phase J (M79–M85) : Machine Learning & Predictive Intelligence Framework : Planned
+    Phase H (M69–M73) : SOTA Cognitive RAG Algorithm R&D : Completed
+    Phase I (M74–M78) : Enterprise Cognitive Evaluation & Deep Observability : Completed
+    Phase J (M79–M85) : Machine Learning & Predictive Intelligence Framework : ACTIVE NEXT
     Phase K (M86–M90) : Enterprise Scale, Edge Replication & Universal Plugins : Planned
 ```
 
@@ -227,7 +227,7 @@ timeline
 
 ---
 
-### Phase I: Enterprise Cognitive Evaluation & Deep Observability Hardening (M74 – M78) — **CURRENT ACTIVE NEXT**
+### Phase I: Enterprise Cognitive Evaluation & Deep Observability Hardening (M74 – M78) — **COMPLETED**
 
 
 ```text
@@ -284,13 +284,13 @@ timeline
   - Visual Claim Grounding Inspector: Build interactive sentence-by-sentence claim highlighting in Retriever Admin (`tenant-hallucinations.tsx` & `grounding-diff.tsx`) and SaaS App Studio (`ChatPanel.tsx`) with color coding (green = verified in source, red = ungrounded/hallucinated, yellow = partial/neutral) and interactive popovers showing the exact source chunk citation.
   - Retriever Admin Observability Cockpit (`tenant-metrics.tsx` & `tenant-telemetry.tsx`): Real-time graphs for Hallucination Trends, Token Burn Rate, P99 Latency SLAs, and Active Alert Incident feeds.
   - Client Plan Quota Status: Lightweight commercial token usage badge in Synchronizer (`scripts/sync_tabs/clients.py`).
-- **Status:** **CURRENT ACTIVE NEXT (Phase I)**
+- **Status:** **Completed (Phase I, Milestone 78)**
 
 
 
 ---
 
-### Phase J: Machine Learning & Predictive Intelligence Framework (M79 – M85) — **PLANNED HORIZON**
+### Phase J: Machine Learning & Predictive Intelligence Framework (M79 – M85) — **CURRENT ACTIVE NEXT**
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
@@ -307,12 +307,13 @@ timeline
 ```
 
 #### 🧪 Milestone 79: Sparse-Dense Hybrid Engine & Contrastive LoRA Domain Adapters
-- **Libraries:** `scikit-learn` (`TfidfVectorizer`, `cosine_similarity`) & `PyTorch` (`torch.nn`, `MultipleNegativesRankingLoss`)
-- **Repo Scope:** `retriever` (`packages/processing-core/`, `apps/api/src/adapters/vector/`, `workers/src/tasks/`)
+- **Libraries:** `scikit-learn` (`TfidfVectorizer`, `cosine_similarity`) & `NumPy` / `PyTorch` (`MultipleNegativesRankingLoss`, LoRA residual layer)
+- **Repo Scope:** `retriever` (`apps/api/src/domain/retrieval/sparse_vectorizer.py`, `src/domain/embeddings/lora_adapter.py`, `apps/web/src/components/tenant-config.tsx`) & `Prateek_website` (`src/components/rag/SearchPanel.tsx`)
 - **Deliverable:**
-  - **Custom Sublinear TF-IDF / BM25 Vectorizer (`scikit-learn`):** Implement a domain-aware sparse vectorizer with custom code-aware regex tokenizers (preserving camelCase, snake_case, URLs, and framework symbols like `Next.js 16` or `FastAPI`), custom n-gram ranges $(1, 3)$, and domain stopwords. This powers sub-millisecond sparse lookup alongside pgvector dense embeddings.
-  - **PyTorch Contrastive LoRA Domain Adapter:** Implement a lightweight 2-layer MLP projection adapter (or LoRA fine-tuning script) on top of base 768-dim embeddings (`nomic-embed-text` / `bge-small`) using `MultipleNegativesRankingLoss`. Adapts the shared embedding space specifically to legal SOW terminology, software architecture jargon, and Prateek's engineering deliverables.
-- **Status:** **Planned (Phase J)**
+  - **Custom Sublinear TF-IDF / BM25 Vectorizer:** Domain-aware sparse vectorizer with custom code-aware regex tokenizers (preserving camelCase, snake_case, URLs, and framework symbols), sublinear TF scaling ($1 + \ln(\text{tf})$), and Robertson-Spärck Jones probabilistic BM25 ranking.
+  - **Contrastive LoRA Domain Adapter:** Low-rank residual adaptation layer ($h_{\text{adapted}} = h + \frac{\alpha_{\text{lora}}}{r} (h \cdot B) \cdot A$) trained via `MultipleNegativesRankingLoss` (InfoNCE) for technical SOW & software architecture calibration.
+  - **Calibrated Convex Hybrid Combination:** Dynamic slider blending dense and sparse scores ($\alpha \cdot \text{Dense} + (1 - \alpha) \cdot \text{Sparse}$) in Retriever Admin & SaaS Studio Search Inspector.
+- **Status:** **Completed (Phase J, Milestone 79)**
 
 #### ⚡ Milestone 80: PyTorch Late-Interaction ColBERT Token-Level MaxSim Engine
 - **Libraries:** `PyTorch` (`torch.einsum`, `torch.nn.functional`, Apple Silicon `mps` / CUDA backend)

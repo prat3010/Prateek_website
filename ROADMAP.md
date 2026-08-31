@@ -18,23 +18,21 @@ timeline
     Phase F (M61–M62) : Data Connectors & Vision OCR Ingestion : Completed
     Phase G (M63–M68) : SOTA Productized E-Commerce Scoping & Agency Ecosystem : Completed
     Phase H (M69–M73) : SOTA Cognitive RAG Algorithm R&D : Completed
-    Phase I (M74–M78) : Enterprise Cognitive Evaluation & Deep Observability : ACTIVE NEXT
-    Phase J (M79–M85) : Machine Learning & Predictive Intelligence Framework : Planned
+    Phase I (M74–M78) : Enterprise Cognitive Evaluation & Deep Observability : Completed
+    Phase J (M79–M85) : Machine Learning & Predictive Intelligence Framework : ACTIVE NEXT
     Phase K (M86–M90) : Enterprise Scale, Edge Replication & Universal Plugins : Planned
 ```
 
 ---
 
-## Active Milestone Sequence (Phase I: M74 – M78)
+## Active Milestone Sequence (Phase J: M79 – M85)
 
 | Milestone | Title | Focus Area | Status | Detailed Specification |
 |:---|:---|:---|:---|:---|
-| **M73** | GraphRAG Leiden Community Detection & Closed-Loop Self-Tuning | Global entity clustering and automated closed-loop self-tuning from online evaluations | **Completed** | [`../../retriever/docs/RAG_2026_PRODUCT_ROADMAP.md`](file:///Users/prateeksharma/Developer/retriever/docs/RAG_2026_PRODUCT_ROADMAP.md#milestone-m73-graphrag-leiden-community-detection--closed-loop-self-tuning) |
-| **M74** | Semantic NLI & SLM-as-a-Judge Online Hallucination Engine | Semantic NLI Cross-Encoder + structured SLM judge in Celery worker | **Completed** | [`../../retriever/docs/RAG_2026_PRODUCT_ROADMAP.md`](file:///Users/prateeksharma/Developer/retriever/docs/RAG_2026_PRODUCT_ROADMAP.md#milestone-m74-semantic-nli--slm-as-a-judge-online-hallucination-engine) |
-| **M75** | Full-Stack OpenTelemetry Auto-Instrumentation | Auto-instrument SQLAlchemy, HTTPX, Celery and propagate W3C traceparent headers | **Completed** | [`../../retriever/docs/RAG_2026_PRODUCT_ROADMAP.md`](file:///Users/prateeksharma/Developer/retriever/docs/RAG_2026_PRODUCT_ROADMAP.md#milestone-m75-full-stack-opentelemetry-auto-instrumentation--distributed-trace-graph) |
-| **M76** | Real-Time Telemetry Live Aggregations & SLA Webhook Alerting | Live SQL multi-tenant aggregations and Slack/Discord/Email webhook incident dispatcher | **Completed** | [`../../retriever/docs/RAG_2026_PRODUCT_ROADMAP.md`](file:///Users/prateeksharma/Developer/retriever/docs/RAG_2026_PRODUCT_ROADMAP.md#milestone-m76-real-time-telemetry-live-aggregations--sla-webhook-alerting-engine) |
-| **M77** | Synthetic Golden Dataset Generation & Automated CI/CD Gate | Auto-generate benchmark Q&A pairs from documents and enforce GitHub Actions regression gate | **Completed** | [`../../retriever/docs/RAG_2026_PRODUCT_ROADMAP.md`](file:///Users/prateeksharma/Developer/retriever/docs/RAG_2026_PRODUCT_ROADMAP.md#milestone-m77-synthetic-golden-dataset-generation--automated-cicd-regression-gate) |
-| **M78** | Visual Claim-by-Claim Grounding Diff & Retriever Admin Observability | Visual claim-by-claim grounding highlighter and dedicated Retriever Admin observability cockpit | **ACTIVE NEXT** | [`../../retriever/docs/RAG_2026_PRODUCT_ROADMAP.md`](file:///Users/prateeksharma/Developer/retriever/docs/RAG_2026_PRODUCT_ROADMAP.md#milestone-m78-visual-claim-by-claim-grounding-diff--retriever-admin-observability-cockpit) |
+| **M78** | Visual Claim-by-Claim Grounding Diff & Retriever Admin Observability | Visual claim-by-claim grounding highlighter and dedicated Retriever Admin observability cockpit | **Completed** | [`../../retriever/docs/RAG_2026_PRODUCT_ROADMAP.md`](file:///Users/prateeksharma/Developer/retriever/docs/RAG_2026_PRODUCT_ROADMAP.md#milestone-m78-visual-claim-by-claim-grounding-diff--retriever-admin-observability-cockpit) |
+| **M79** | Sparse-Dense Hybrid Engine & Contrastive LoRA Domain Adapters | Sublinear BM25 vectorization + Contrastive LoRA residual embedding calibration | **Completed** | [`../../retriever/docs/RAG_2026_PRODUCT_ROADMAP.md`](file:///Users/prateeksharma/Developer/retriever/docs/RAG_2026_PRODUCT_ROADMAP.md#milestone-m79-sparse-dense-hybrid-engine--contrastive-lora-domain-adapters) |
+| **M80** | PyTorch Late-Interaction ColBERT Token-Level MaxSim Engine | Multi-vector token representation and hardware-accelerated MaxSim late-interaction operator | **ACTIVE NEXT** | [`../../retriever/docs/RAG_2026_PRODUCT_ROADMAP.md`](file:///Users/prateeksharma/Developer/retriever/docs/RAG_2026_PRODUCT_ROADMAP.md#milestone-m80-pytorch-late-interaction-colbert-token-level-maxsim-engine) |
+
 
 
 

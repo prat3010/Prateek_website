@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, ReactNode } from "react";
 import { RetrieverClient } from "@/lib/rag-client";
+import { GroundingDiffResponse, ClaimClassification } from "@/lib/rag-types";
 import Portal from "@/components/ui/Portal";
 import styles from "./rag.module.css";
 
@@ -24,6 +25,12 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
   const [abortController, setAbortController] = useState<AbortController | null>(null);
   const [isStartingSession, setIsStartingSession] = useState(false);
   const [showJumpBottom, setShowJumpBottom] = useState(false);
+
+  // Grounding Inspector state
+  const [activeGroundingMsgId, setActiveGroundingMsgId] = useState<number | null>(null);
+  const [groundingDiffs, setGroundingDiffs] = useState<Record<number, GroundingDiffResponse>>({});
+  const [loadingGroundingId, setLoadingGroundingId] = useState<number | null>(null);
+  const [selectedClaim, setSelectedClaim] = useState<ClaimClassification | null>(null);
 
   // Feedback modal state
   const [feedbackModalMsg, setFeedbackModalMsg] = useState<{ msgId: number; backendMessageId?: string } | null>(null);
@@ -158,6 +165,36 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
       }
     },
     [client]
+  );
+
+  const toggleGroundingInspector = useCallback(
+    async (msgId: number, content: string) => {
+      if (activeGroundingMsgId === msgId) {
+        setActiveGroundingMsgId(null);
+        setSelectedClaim(null);
+        return;
+      }
+
+      if (groundingDiffs[msgId]) {
+        setActiveGroundingMsgId(msgId);
+        setSelectedClaim(groundingDiffs[msgId].claims[0] || null);
+        return;
+      }
+
+      if (!client) return;
+      setLoadingGroundingId(msgId);
+      try {
+        const diff = await client.computeGroundingDiff(content);
+        setGroundingDiffs((prev) => ({ ...prev, [msgId]: diff }));
+        setActiveGroundingMsgId(msgId);
+        setSelectedClaim(diff.claims[0] || null);
+      } catch (err) {
+        console.warn("[Grounding] Failed to compute grounding diff:", err);
+      } finally {
+        setLoadingGroundingId(null);
+      }
+    },
+    [activeGroundingMsgId, groundingDiffs, client]
   );
 
   async function sendMessage() {
@@ -459,6 +496,14 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
                           )}
                           <div className={styles.feedbackActions}>
                             <button
+                              className={`${styles.groundingDiffBtn} ${activeGroundingMsgId === m.id ? styles.groundingDiffBtnActive : ""}`}
+                              onClick={() => toggleGroundingInspector(m.id, m.content)}
+                              title="Inspect sentence-level NLI claim grounding"
+                              disabled={loadingGroundingId === m.id}
+                            >
+                              {loadingGroundingId === m.id ? "Analyzing..." : "🔬 Grounding Diff"}
+                            </button>
+                            <button
                               className={`${styles.feedbackBtn} ${m.feedback === "up" ? styles.feedbackActiveUp : ""}`}
                               onClick={() => handleFeedback(m.id, m.backendMessageId, "up")}
                               title="Helpful response"
@@ -473,6 +518,67 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
                               👎
                             </button>
                           </div>
+                        </div>
+                      )}
+
+                      {/* M78 Inline Claim Grounding Diff Panel */}
+                      {m.role === "assistant" && activeGroundingMsgId === m.id && groundingDiffs[m.id] && (
+                        <div className={styles.groundingPanel}>
+                          <div className={styles.groundingHeader}>
+                            <span style={{ fontWeight: 600 }}>Claim-by-Claim Visual Grounding</span>
+                            <div className={styles.groundingScorePills}>
+                              <span className={`${styles.groundingScorePill} ${styles.pillFaithful}`}>
+                                Faithfulness: {(groundingDiffs[m.id].faithfulness_score * 100).toFixed(0)}%
+                              </span>
+                              <span className={`${styles.groundingScorePill} ${styles.pillHallucination}`}>
+                                Hallucination: {(groundingDiffs[m.id].hallucination_index * 100).toFixed(0)}%
+                              </span>
+                            </div>
+                          </div>
+
+                          <div>
+                            {groundingDiffs[m.id].claims.map((claimItem, cIdx) => {
+                              const claimClass =
+                                claimItem.status === "entailment"
+                                  ? styles.claimEntailed
+                                  : claimItem.status === "contradiction"
+                                  ? styles.claimContradicted
+                                  : styles.claimNeutral;
+
+                              return (
+                                <span
+                                  key={cIdx}
+                                  className={`${styles.groundingClaimSpan} ${claimClass}`}
+                                  onClick={() => setSelectedClaim(claimItem)}
+                                  title={`Status: ${claimItem.status} (Entailment: ${(claimItem.entailment_prob * 100).toFixed(0)}%)`}
+                                >
+                                  {claimItem.claim}{" "}
+                                  <span style={{ fontSize: "0.65rem", opacity: 0.8 }}>
+                                    [{claimItem.status === "entailment" ? "✓" : claimItem.status === "contradiction" ? "✗" : "?"}]
+                                  </span>
+                                </span>
+                              );
+                            })}
+                          </div>
+
+                          {selectedClaim && (
+                            <div className={styles.claimInspectorCard}>
+                              <div className={styles.claimInspectorTitle}>
+                                <span>Claim Verification Span</span>
+                                <span style={{ fontSize: "0.7rem", fontFamily: "var(--font-code)" }}>
+                                  {selectedClaim.status === "entailment"
+                                    ? "🟢 Entailed (Verified)"
+                                    : selectedClaim.status === "contradiction"
+                                    ? "🔴 Contradicted (Hallucination)"
+                                    : "🟡 Neutral (Unsupported)"}
+                                </span>
+                              </div>
+                              <div style={{ fontStyle: "italic", marginBottom: "0.25rem" }}>"{selectedClaim.claim}"</div>
+                              <div className={styles.claimPremiseText}>
+                                <strong>Grounding Source:</strong> {selectedClaim.premise || "No direct matching context chunk found in retrieved documents."}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </>

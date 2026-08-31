@@ -67,3 +67,44 @@ export interface OnlineEvaluationSummaryResponse {
   hallucination_count: number;
 }
 
+export interface ClaimClassification {
+  claim: string;
+  premise: string;
+  status: "entailment" | "neutral" | "contradiction";
+  entailment_prob: number;
+  contradiction_prob: number;
+  neutral_prob: number;
+}
+
+export interface GroundingDiffResponse {
+  tenant_id: string;
+  total_claims: number;
+  entailed_claims: number;
+  contradicted_claims: number;
+  neutral_claims: number;
+  faithfulness_score: number;
+  hallucination_index: number;
+  claims: ClaimClassification[];
+}
+
+export interface LoraAdapterInfo {
+  adapter_id: string;
+  tenant_id: string;
+  name: string;
+  domain_tag: string;
+  rank: number;
+  loss_score: number | null;
+  created_at: string;
+}
+
+export interface LoraTrainResponse {
+  adapter_id: string;
+  tenant_id: string;
+  name: string;
+  rank: number;
+  loss_score: number;
+  message: string;
+}
+
+
+

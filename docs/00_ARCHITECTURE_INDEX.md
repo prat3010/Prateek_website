@@ -1,5 +1,5 @@
 # 🏛️ Master Architecture Knowledge Graph Index
-**Total Registered Architecture Nodes:** 107 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
+**Total Registered Architecture Nodes:** 109 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
 
 ## ⚡ Quick Navigation
 - [Master Architecture Visual Canvas](MASTER_ARCHITECTURE_MAP.canvas)
@@ -103,7 +103,7 @@
 | `Lib_skills` | **Lib: `skills.ts` (Persona Filter & Narrative Mapper)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Lib_skills.md](architecture_nodes/Lib_skills.md) |
 | `UI_CommercialPDFSuite` | **UI: `pdfTheme.ts`, `pdfFonts.ts` & React-PDF Exporters** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_CommercialPDFSuite.md](architecture_nodes/UI_CommercialPDFSuite.md) |
 
-### 🔹 6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPIs (28 Nodes)
+### 🔹 6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPIs (30 Nodes)
 
 | Node ID | Title / Component | Blast Radius | Security Auth | Specification File |
 | :--- | :--- | :---: | :---: | :--- |
@@ -121,6 +121,8 @@
 | `Engine_RLM_Python_REPL_Studio` | **Engine: Interactive RLM Python REPL Sandbox Studio (Milestone 72)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_RLM_Python_REPL_Studio.md](architecture_nodes/Engine_RLM_Python_REPL_Studio.md) |
 | `Engine_RealTime_Alerting_Telemetry` | **Engine: Real-Time Telemetry Live Aggregations & SLA Webhook Alerting (Milestone 76)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_RealTime_Alerting_Telemetry.md](architecture_nodes/Engine_RealTime_Alerting_Telemetry.md) |
 | `Engine_Semantic_NLI_Evaluator` | **Engine: Semantic NLI & SLM-as-a-Judge Online Hallucination Engine (Milestone 74)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Semantic_NLI_Evaluator.md](architecture_nodes/Engine_Semantic_NLI_Evaluator.md) |
+| `Engine_Sparse_Dense_LoRA` | **Sparse-Dense Hybrid Engine & Contrastive LoRA Domain Adapters** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Sparse_Dense_LoRA.md](architecture_nodes/Engine_Sparse_Dense_LoRA.md) |
+| `Engine_Visual_Grounding_Observability` | **Engine: Visual Claim-by-Claim Grounding Diff & Retriever Admin Observability Cockpit (Milestone 78)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Visual_Grounding_Observability.md](architecture_nodes/Engine_Visual_Grounding_Observability.md) |
 | `Retriever_API_v1_admin` | **Retriever API: `apps/api/src/routers/admin.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_admin.md](architecture_nodes/Retriever_API_v1_admin.md) |
 | `Retriever_API_v1_agentic` | **Retriever API: `apps/api/src/routers/agentic.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_agentic.md](architecture_nodes/Retriever_API_v1_agentic.md) |
 | `Retriever_API_v1_auth` | **Retriever API: `apps/api/src/routers/auth.py`** | 🔴 `CRITICAL` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_auth.md](architecture_nodes/Retriever_API_v1_auth.md) |
