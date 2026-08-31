@@ -18,6 +18,7 @@ This document serves as the registry of critical architectural design decisions 
 * [ADR 08: Config-Driven Scoping Questionnaire with Shared Defaults JSON](#adr-08-config-driven-scoping-questionnaire-with-shared-defaults-json)
 * [ADR 09: Brand-Themed PDFs with Embedded Site Fonts](#adr-09-brand-themed-pdfs-with-embedded-site-fonts)
 * [ADR 10: Full-Panorama Mobile Skyline with Desktop-Parity Parallax](#adr-10-full-panorama-mobile-skyline-with-desktop-parity-parallax)
+* [ADR 20: Separation of Concerns: Local Streamlit Developer Tooling vs. Cloud Next.js Mobile Control Center (/admin)](#adr-20-separation-of-concerns-local-streamlit-developer-tooling-vs-cloud-nextjs-mobile-control-center-admin)
 
 ---
 
@@ -307,6 +308,25 @@ This document serves as the registry of critical architectural design decisions 
 * **Consequences**:
   - **Pros**: Eliminates scope creep through formal change order milestone invoicing; prevents orphaned feature dependencies; delivers seamless SaaS onboarding and instant copilot grounding.
   - **Cons**: Requires live Supabase DDL migrations for `scope_change_orders` table and new columns on `client_scopes` (applied via `execute_sql`).
+
+---
+
+# **ADR 20: Separation of Concerns: Local Streamlit Developer Tooling vs. Cloud Next.js Mobile Control Center (`/admin`)**
+
+* **Status**: Approved & Architecturally Specified
+* **Context**: As the platform grew, the local Python Streamlit dashboard (`scripts/synchronizer.py`, `scripts/sync_tabs/`) accumulated both low-level developer tooling (local JSON fallback writes, local Git commit automation, image compression, database seeding) and executive operator workflows (job lead prospecting, AI pitch review, email dispatch, client scoping brief approvals, and invoice ledger monitoring). Running operator workflows exclusively on Streamlit created a strict dependency on an open laptop with active terminal execution (`streamlit run`), preventing convenient, on-the-go management from mobile devices or tablets.
+* **Decision**: We enforce a strict, clean architectural boundary between Desktop Developer Tooling and Cloud Executive Operations:
+  1. **Streamlit Desktop Power Tool (Laptop-Only / Local Machine)**:
+     - Retained exclusively for filesystem-bound and local OS operations: `src/data/*.json` updates, `resume.json` editing, atomic Git commit staging (`scripts/sync_git.py`), image asset optimization and staging (`scripts/sync_assets.py`), local database seeding/backups (`backup_db.py`, `seed_supabase.py`), and heavy Python AI parsing scripts.
+  2. **Next.js 16 Web Control Center (`/admin` - Mobile-First Cloud Cockpit)**:
+     - Dedicated to executive, mobile-friendly operator workflows accessible anywhere on phone/tablet via secure Google OAuth PKCE:
+       - **Outreach & Job Hunter Approval Queue (HITL)**: Mobile-responsive card view displaying 75+ fit score leads, one-tap AI pitch review, one-click Resend SMTP email dispatch, and direct ATS application links.
+       - **Client Discovery & Scope Approvals**: Real-time review of scoping briefs submitted at `/scoping`, milestone confirmations, and instant commercial SOW PDF link generation.
+       - **Invoicing & Escrow Ledger**: Mobile tracking of Razorpay 50% deposit transactions, milestone disbursements, and cryptographic receipts.
+       - **Live Visitor Telemetry**: Real-time traffic pulse, top referrers, and Geo-IP visitor analytics.
+* **Consequences**:
+  * **Pros**: Enables seamless mobile operator workflows without opening a laptop; eliminates full script re-runs for daily lead approvals; keeps local developer and Git tooling firmly in Python without unnecessary rewrites; provides cryptographically secure, session-verified access from any device.
+  * **Cons**: Requires background cron workers or API triggers for serverless scraping and REST endpoint bridges for `/admin` UI components.
 
 ---
 

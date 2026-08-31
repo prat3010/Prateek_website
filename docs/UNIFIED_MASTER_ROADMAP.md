@@ -94,8 +94,13 @@ timeline
 | **M57** | AI Lead Prospecting Engine | `Prateek_website` | 24/7 lead discovery & `gemini-3.6-flash` personalized pitch generator | **Completed** |
 | **M58** | Web Control Center HITL Queue| `Prateek_website` | Mobile-friendly 1-click email/social approval queue in `/admin` | **Completed** |
 | **M58.5** | Retriever Grounded Outbound (`prateeq_outreach`) | Both | Dedicated Retriever tenant for Synchronizer pitch generation & evidence inspector | **Planned** |
+| **M58.6** | Dual-Plane Operational Decoupling | `Prateek_website` | Streamlit Desktop Developer Tooling vs Mobile-First `/admin` Cloud Control Center ([`ADR 20`](99_DECISIONS.md#adr-20-separation-of-concerns-local-streamlit-developer-tooling-vs-cloud-nextjs-mobile-control-center-admin)) | **Architecturally Specified** |
 | **M59** | Automated AI Newsjacking | `Prateek_website` | Daily HN/HF news scraper + technical blog case study synthesis | **Completed** |
 | **M60** | Client Telemetry Analytics | Both | Real-time token usage meter & semantic cache USD savings display | **Completed** |
+
+> 📌 **Operational Plane Decoupling ([ADR 20](99_DECISIONS.md#adr-20-separation-of-concerns-local-streamlit-developer-tooling-vs-cloud-nextjs-mobile-control-center-admin)):**
+> - **💻 Desktop Streamlit Cockpit (Laptop Only):** Local JSON fallbacks (`src/data/*.json`), Git operations (`sync_git.py`), asset optimization (`photos.py`), DB backups (`backup_db.py`).
+> - **📱 Mobile `/admin` Control Center (Smartphone/Anywhere):** Real-time lead review queue, 1-tap Resend dispatch, client scoping brief approvals, Razorpay invoice tracking, live traffic pulse.
 
 ### Phase F: Zero-Config Data Connectors & Multi-Modal Processing (M61 – M62)
 | Milestone | Title | Repository Scope | Primary Deliverable | Status |
@@ -181,7 +186,7 @@ timeline
 
 ---
 
-### Phase H: SOTA Cognitive RAG Algorithm R&D (M69 – M73) — **CURRENT ACTIVE NEXT**
+### Phase H: SOTA Cognitive RAG Algorithm R&D (M69 – M73) — **COMPLETED**
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
@@ -216,13 +221,14 @@ timeline
 - **Status:** **Completed** (Phase H, Milestone 72)
 
 #### 🧠 Milestone 73: GraphRAG Leiden Community Detection & Closed-Loop Self-Tuning
-- **Repo Scope:** `retriever` (`graph_extraction_service.py`, `OnlineHallucinationEvaluator`)
+- **Repo Scope:** `retriever` (`leiden_detector.py`, `community_summarizer.py`, `self_tuner.py`, `OnlineHallucinationEvaluator`)
 - **Deliverable:** Hierarchical community entity summaries and automated pipeline self-tuning based on continuous online Ragas evaluation telemetry.
-- **Status:** **CURRENT ACTIVE NEXT (Phase H)**
+- **Status:** **Completed** (Phase H, Milestone 73)
 
 ---
 
-### Phase I: Enterprise Cognitive Evaluation & Deep Observability Hardening (M74 – M78) — **PLANNED HORIZON**
+### Phase I: Enterprise Cognitive Evaluation & Deep Observability Hardening (M74 – M78) — **CURRENT ACTIVE NEXT**
+
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
@@ -243,7 +249,7 @@ timeline
   - **Tier 1 (Fast Cross-Encoder):** Lightweight HuggingFace DeBERTa cross-encoder (`cross-encoder/nli-deberta-v3-small`) classifying claim-premise pairs into calibrated probabilities (`entailment`, `neutral`, `contradiction`).
   - **Tier 2 (Async SLM Judge via Celery):** Async Celery task `tasks.evaluate_inference_nli` running a local Ollama judge (`qwen2.5:3b` / `llama3.2:3b`) with structured JSON output: claim breakdown, verification rationale, citation grounding span, and calibrated faithfulness score ($0.0 - 1.0$).
   - Calculate real-time Hallucination Index based on true contradiction/unsupported claim ratio and trigger dynamic retrieval auto-tuning only on verified semantic confidence drops.
-- **Status:** **Planned (Phase I)**
+- **Status:** **Completed (Phase I, Milestone 74)**
 
 #### ⏱️ Milestone 75: Full-Stack OpenTelemetry Auto-Instrumentation & Distributed Trace Graph
 - **Repo Scope:** Both (`retriever` `apps/api/src/adapters/telemetry/`, `workers/` & `Prateek_website` `src/proxy.ts`, `src/lib/rag-client.ts`)
@@ -252,7 +258,7 @@ timeline
   - Add `HTTPXClientInstrumentor().instrument()` to trace outbound LLM provider latency (Ollama, Gemini, Groq, Tavily, Resend).
   - Add `CeleryInstrumentor().instrument()` to trace asynchronous document ingestion, OCR parsing, and async evaluation tasks across Celery worker queues.
   - Propagate W3C standard `traceparent` headers from Next.js Edge proxy $\rightarrow$ FastAPI Gateway $\rightarrow$ Celery workers $\rightarrow$ pgvector/Redis.
-- **Status:** **Planned (Phase I)**
+- **Status:** **Completed (Phase I, Milestone 75)**
 
 #### 🚨 Milestone 76: Real-Time Telemetry Live Aggregations & SLA Webhook Alerting Engine
 - **Repo Scope:** Both (`retriever` `alert_service.py`, `routers/admin.py` & `Prateek_website` `src/app/api/rag/telemetry/route.ts`)
@@ -261,21 +267,26 @@ timeline
   - Build multi-channel Webhook Alerting Engine in Retriever (`alert_service.py`):
     - Configurable alert webhooks (Slack, Discord, custom webhooks, email via Resend).
     - Proactive dispatch triggers: (1) Rolling 1-hour Hallucination Index $> 30\%$, (2) Tenant token quota consumption $\ge 90\%$ or $100\%$, (3) P99 inference latency spike $> 5\text{s}$, (4) RLS tenancy violation attempts.
-- **Status:** **Planned (Phase I)**
+- **Status:** **Completed (Phase I, Milestone 76)**
+
 
 #### 🧪 Milestone 77: Synthetic Golden Dataset Generation & Automated CI/CD Regression Gate
 - **Repo Scope:** `retriever` (`apps/api/src/domain/evaluation/`, `scripts/run_eval_regression.py`, `.github/workflows/eval_regression.yml`)
 - **Deliverable:**
   - Synthetic Test Generator (`synthetic_dataset_generator.py`): Ingests tenant documents, extracts key factual propositions, and automatically generates high-coverage Q&A benchmark pairs with ground-truth chunk IDs.
   - Automated CI/CD Regression Gate: GitHub Action workflow executing Ragas + DeepEval runs before canary deployments, enforcing a strict minimum threshold (Faithfulness $\ge 0.90$, Answer Relevancy $\ge 0.85$, Hallucination $\le 0.10$) to prevent regression releases.
-- **Status:** **Planned (Phase I)**
+- **Status:** **Completed (Phase I, Milestone 77)**
 
-#### 📊 Milestone 78: Visual Claim-by-Claim Grounding Diff & Synchronizer Observability Cockpit
-- **Repo Scope:** Both (`retriever/apps/web` `tenant-hallucinations.tsx`, `Prateek_website` `scripts/sync_tabs/analytics.py`, `ChatPanel.tsx`)
+
+#### 📊 Milestone 78: Visual Claim-by-Claim Grounding Diff & Retriever Admin Observability Cockpit
+- **Repo Scope:** Both (`retriever/apps/web` `tenant-hallucinations.tsx`, `grounding-diff.tsx`, `tenant-metrics.tsx` & `Prateek_website` `src/components/rag/ChatPanel.tsx`, `scripts/sync_tabs/clients.py`)
 - **Deliverable:**
-  - Visual Claim Grounding Inspector: Enhance `tenant-hallucinations.tsx` in Retriever Admin and `ChatPanel.tsx` in the SaaS App Studio to highlight generated answers sentence-by-sentence (green = verified in source, red = ungrounded/hallucinated), with interactive popovers showing the exact source chunk citation.
-  - Synchronizer Analytics Cockpit Overhaul: Add live Retriever inference metrics, cost breakdowns, and active hallucination alert feeds directly to `scripts/sync_tabs/analytics.py` in the local Streamlit desktop dashboard.
-- **Status:** **Planned (Phase I)**
+  - Visual Claim Grounding Inspector: Build interactive sentence-by-sentence claim highlighting in Retriever Admin (`tenant-hallucinations.tsx` & `grounding-diff.tsx`) and SaaS App Studio (`ChatPanel.tsx`) with color coding (green = verified in source, red = ungrounded/hallucinated, yellow = partial/neutral) and interactive popovers showing the exact source chunk citation.
+  - Retriever Admin Observability Cockpit (`tenant-metrics.tsx` & `tenant-telemetry.tsx`): Real-time graphs for Hallucination Trends, Token Burn Rate, P99 Latency SLAs, and Active Alert Incident feeds.
+  - Client Plan Quota Status: Lightweight commercial token usage badge in Synchronizer (`scripts/sync_tabs/clients.py`).
+- **Status:** **CURRENT ACTIVE NEXT (Phase I)**
+
+
 
 ---
 

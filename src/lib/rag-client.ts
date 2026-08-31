@@ -36,8 +36,17 @@ function requireUserId(userId?: string): string {
   throw new Error("A valid authenticated user ID is required for RAG requests.");
 }
 
+function generateTraceparent(): { traceparent: string; traceId: string } {
+  const hex = (len: number) =>
+    Array.from({ length: len }, () => Math.floor(Math.random() * 16).toString(16)).join("");
+  const traceId = hex(32);
+  const spanId = hex(16);
+  return { traceparent: `00-${traceId}-${spanId}-01`, traceId };
+}
+
 export class RetrieverClient {
   private config: RetrieverConfig;
+  public lastTraceId: string | null = null;
 
   constructor(config: RetrieverConfig) {
     this.config = config;
@@ -46,10 +55,14 @@ export class RetrieverClient {
   private async request<T>(path: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.config.apiUrl.replace(/\/$/, "")}${path}`;
     const validUserId = requireUserId(this.config.userId);
+    const { traceparent, traceId } = generateTraceparent();
+    this.lastTraceId = traceId;
+
     const headers: Record<string, string> = {
       "Authorization": `Bearer ${this.config.apiKey}`,
       "X-User-ID": validUserId,
       "X-Tenant-ID": this.config.tenantId,
+      "traceparent": traceparent,
     };
     if (!(options.body instanceof FormData)) {
       headers["Content-Type"] = "application/json";
@@ -65,6 +78,10 @@ export class RetrieverClient {
         signal: options.signal ?? controller.signal,
       });
       clearTimeout(timeoutId);
+      const respTraceId = res.headers.get("x-trace-id") || res.headers.get("X-Trace-Id");
+      if (respTraceId) {
+        this.lastTraceId = respTraceId;
+      }
       if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
       return res.json();
     } catch (err) {
@@ -72,6 +89,7 @@ export class RetrieverClient {
       throw err;
     }
   }
+
 
   async search(query: string, options?: { limit?: number; enableQueryRewriting?: boolean; enableHybrid?: boolean; strategy?: string }) {
     const limit = options?.limit ?? 5;

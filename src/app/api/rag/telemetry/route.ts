@@ -69,19 +69,55 @@ export async function GET(req: Request) {
       maxStorageBytes = 10 * 1024 * 1024 * 1024; // 10 GB
     }
 
-    // Sample/Default Usage metrics for display
-    const monthlyTokensUsed = 18_500;
-    const documentsCount = 14;
-    const storageBytesUsed = 4.2 * 1024 * 1024; // 4.2 MB
+    // Fetch Live Metrics from Retriever Backend
+    let monthlyTokensUsed = 0;
+    let documentsCount = 0;
+    let storageBytesUsed = 0;
+    let cacheHits = 0;
+    let latencySavedMs = 0;
+    let costSavedUSD = 0.0;
+    let thumbsUp = 0;
+    let thumbsDown = 0;
+    let satisfactionRate = 100;
+    let avgFaithfulness = 1.0;
+    let avgPrecision = 1.0;
+    let hallucinationIndex = 0.0;
+    let p99LatencyMs = 0.0;
 
-    const cacheHits = 124;
-    const latencySavedMs = 850 * cacheHits;
-    const costSavedUSD = 4.12;
+    const retrieverApiUrl = process.env.RETRIEVER_API_URL || 'https://rag.prateeq.in';
+    const adminKey = process.env.RETRIEVER_ADMIN_KEY || process.env.ADMIN_MASTER_KEY;
 
-    const thumbsUp = 45;
-    const thumbsDown = 3;
+    if (tenantId && adminKey) {
+      try {
+        const liveRes = await fetch(`${retrieverApiUrl}/v1/admin/tenants/${tenantId}/telemetry/live`, {
+          headers: {
+            'X-Admin-Master-Key': adminKey,
+          },
+          next: { revalidate: 30 },
+        });
+
+        if (liveRes.ok) {
+          const liveData = await liveRes.json();
+          monthlyTokensUsed = liveData.monthly_tokens_used ?? 0;
+          documentsCount = liveData.documents_count ?? 0;
+          storageBytesUsed = liveData.storage_bytes_used ?? 0;
+          cacheHits = liveData.cache_hits ?? 0;
+          latencySavedMs = liveData.latency_saved_ms ?? 0;
+          costSavedUSD = liveData.cost_saved_usd ?? 0.0;
+          thumbsUp = liveData.thumbs_up ?? 0;
+          thumbsDown = liveData.thumbs_down ?? 0;
+          satisfactionRate = liveData.satisfaction_rate ?? 100;
+          avgFaithfulness = liveData.avg_faithfulness ?? 1.0;
+          avgPrecision = liveData.avg_precision ?? 1.0;
+          hallucinationIndex = liveData.hallucination_index ?? 0.0;
+          p99LatencyMs = liveData.p99_latency_ms ?? 0.0;
+        }
+      } catch (e) {
+        console.warn('Could not reach Retriever live telemetry backend, using baseline:', e);
+      }
+    }
+
     const totalFeedback = thumbsUp + thumbsDown;
-    const satisfactionRate = totalFeedback > 0 ? Math.round((thumbsUp / totalFeedback) * 100) : 100;
 
     return NextResponse.json({
       success: true,
@@ -111,7 +147,14 @@ export async function GET(req: Request) {
         totalFeedback,
         satisfactionRate,
       },
+      sla: {
+        avgFaithfulness,
+        avgPrecision,
+        hallucinationIndex,
+        p99LatencyMs,
+      },
     });
+
   } catch (err: unknown) {
     console.error('RAG Telemetry GET API error:', err);
     return NextResponse.json(

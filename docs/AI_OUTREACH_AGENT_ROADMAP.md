@@ -12,15 +12,17 @@
 
 The **Autonomous AI Outreach & Content Agent** is an end-to-end cloud-hosted automation platform built directly into the `Prateek_website` Next.js 16 architecture. 
 
-It eliminates the tedious manual labor of lead prospecting, cold outreach drafting, and social media posting. The agent runs silently 24/7 on **Vercel Cloud Crons** without requiring a laptop to stay open. To guarantee 100% social account safety and prevent platform bans or AI hallucinations, the agent operates on a **Human-in-the-Loop (HITL)** model: the AI discovers leads and drafts messages, while you review and dispatch them with a single click from your private Web Control Center (`/admin` or `/dashboard`).
+It eliminates the tedious manual labor of lead prospecting, cold outreach drafting, and social media posting. The agent operates on a **Human-in-the-Loop (HITL)** model across a decoupled dual-environment architecture (see [`ADR 20`](99_DECISIONS.md#adr-20-separation-of-concerns-local-streamlit-developer-tooling-vs-cloud-nextjs-mobile-control-center-admin)):
+- **Desktop Streamlit Tooling (`scripts/sync_tabs/outreach.py`):** Deep local developer control deck for query configuration, local JSON syncing, and bulk scraping inspection.
+- **Mobile-First Web Control Center (`/admin` on `prateeq.in`):** Cloud-hosted executive cockpit accessible anywhere on smartphone or tablet, featuring a 1-tap review & dispatch queue, direct ATS application links, and real-time telemetry gauges.
 
 ---
 
 ## Key System Objectives & Constraints
 
-1. **Zero-Laptop Reliance:** Runs on serverless cloud crons and database queues. No local background processes or open browser windows needed.
-2. **Account Safety & Anti-Ban Throttling:** Strictly rate-limited (e.g., max 10–15 emails/day, max 2 posts/day) via official OAuth2 APIs (Google OAuth2, X API, Buffer API).
-3. **Hyper-Personalization:** Leverages `gemini-3.6-flash` to parse lead bios, recent posts, or business websites to generate custom opening hooks rather than static templates.
+1. **Zero-Laptop Reliance for Daily Approvals:** Background scrapers populate database queues; daily review and 1-tap dispatch are performed directly from smartphone/tablet on `/admin`.
+2. **Account Safety & Anti-Ban Throttling:** Strictly rate-limited (e.g., max 10–15 emails/day, max 2 posts/day) via official OAuth2 APIs (Google OAuth2, X API, Buffer API, Resend SMTP).
+3. **Hyper-Personalization:** Leverages `gemini-3.6-flash` and Retriever RAG context to parse lead bios, recent posts, or job specs to generate custom opening hooks grounded in real production systems.
 4. **Positioning Mix (60/40):** 
    - **60% Technical & Build-in-Public:** Architecture highlights (Next.js 16, Supabase, RAG engine, vector search insights).
    - **40% Business Outcomes & Scoping CTAs:** Case studies, instant scoping lab previews, ROI metrics, and `/scoping` deep-links.
