@@ -22,20 +22,6 @@ from sync_tabs.shared import env, HAS_SYNC, upsert_record
 
 DEFAULTS_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "src", "data", "outreach_defaults.json")
 
-PORTFOLIO_CONTEXT_PROMPT = """
-Prateek Sharma's Proven Production Background:
-- Role: Forward Deployed Engineer & AI Solutions Architect
-- Retriever AI SaaS: Built a multi-tenant hybrid search & pgvector RAG platform on Next.js 16 and Supabase with presigned citation downloads and 1-line script embeds.
-- Synchronizer Control Deck: Streamlit management dashboard integrated with Gemini 3.6 Flash for automated skills scanning, certificate analysis, and real-time database sync.
-- Client Workspace Dashboard: Google OAuth 2.0 workspace with interactive milestone tracking, Razorpay payment processing, and dynamic commercial PDF proposal exports.
-- Portfolio & Telemetry Engine: Next.js 16 edge proxy architecture with sub-100ms SQL telemetry aggregations.
-"""
-
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
-    "Accept": "application/json, text/xml, application/xml, */*"
-}
-
 def load_defaults():
     try:
         if os.path.exists(DEFAULTS_PATH):
@@ -66,7 +52,7 @@ def call_gemini_with_fallback(prompt, preferred_model="gemini-3.6-flash", api_ke
     models = [preferred_model, "gemini-3.5-flash", "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-flash-latest"]
     seen = set()
     ordered = [m for m in models if not (m in seen or seen.add(m))]
-    
+
     for model in ordered:
         try:
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
@@ -97,17 +83,106 @@ def get_known_source_urls(supabase_url, service_key):
     except Exception:
         return set()
 
+PORTFOLIO_CONTEXT_PROMPT = """
+Prateek Sharma's Proven Production Background:
+- Role: Forward Deployed Engineer & AI Solutions Architect
+- Retriever AI SaaS: Built a multi-tenant hybrid search & pgvector HNSW RAG platform with PyTorch ColBERT token MaxSim reranking, HDBSCAN topic modeling, and 3D PCA/UMAP latent projections on Next.js 16 and FastAPI.
+- Synchronizer Control Deck: Streamlit management dashboard integrated with Gemini 3.6 Flash for automated skills scanning, certificate analysis, and real-time database sync.
+- Client Workspace Dashboard: Google OAuth 2.0 workspace with interactive milestone tracking, Razorpay payment processing, and dynamic commercial PDF proposal exports.
+- Cognitive Systems & Reliability: DeBERTa semantic NLI evaluator, AST hexagonal boundary verification with 950+ unit tests, zero-downtime blue/green release deployments, and full OpenTelemetry distributed tracing.
+"""
+
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+    "Accept": "application/json, text/xml, application/xml, */*"
+}
+
+try:
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.metrics.pairwise import cosine_similarity
+    SKLEARN_AVAILABLE = True
+except ImportError:
+    SKLEARN_AVAILABLE = False
+
+class SemanticProfileMatcher:
+    """Scikit-Learn TF-IDF N-Gram Vectorizer & Cosine Similarity Engine for Prateek's Profile."""
+    def __init__(self):
+        self.vectorizer = None
+        self.profile_matrix = None
+        self.feature_names = None
+        self._init_engine()
+
+    def _init_engine(self):
+        if not SKLEARN_AVAILABLE:
+            return
+        try:
+            resume_file = os.path.join(os.path.dirname(__file__), "..", "..", "src", "data", "resume.json")
+            resume_data = {}
+            if os.path.exists(resume_file):
+                with open(resume_file, "r", encoding="utf-8") as f:
+                    resume_data = json.load(f)
+
+            corpus_parts = [
+                PORTFOLIO_CONTEXT_PROMPT,
+                resume_data.get("about", {}).get("developer", {}).get("noir", ""),
+                resume_data.get("about", {}).get("business", {}).get("noir", ""),
+                " ".join(resume_data.get("about", {}).get("developer", {}).get("facts", [])),
+                " ".join(resume_data.get("about", {}).get("developer", {}).get("factsNoir", [])),
+                "Forward Deployed Engineer AI Solutions Architect Retriever AI SaaS ColBERT MaxSim einsum token reranker",
+                "pgvector HNSW hybrid search BM25 Next.js 16 React 19 FastAPI Python Celery RabbitMQ OpenTelemetry",
+                "HDBSCAN topic clustering c-TF-IDF 3D PCA UMAP embedding space projection Three.js WebGL particle cloud",
+                "Semantic NLI DeBERTa judge hallucination evaluation RLM Python REPL sandbox Docling Layout OCR LlamaGuard 3",
+                "Digital SOW SHA-256 cryptographic freezing 50% deposit escrow HMAC timing-safe webhooks Razorpay"
+            ]
+
+            skills = resume_data.get("skills", {})
+            if isinstance(skills, dict):
+                for cat, sk_list in skills.items():
+                    if isinstance(sk_list, list):
+                        corpus_parts.append(" ".join(sk_list))
+
+            profile_text = " ".join(corpus_parts)
+            self.vectorizer = TfidfVectorizer(
+                ngram_range=(1, 2),
+                sublinear_tf=True,
+                stop_words="english",
+                token_pattern=r'(?u)\b[\w\.\-]{2,}\b'
+            )
+            self.profile_matrix = self.vectorizer.fit_transform([profile_text])
+            self.feature_names = self.vectorizer.get_feature_names_out()
+        except Exception:
+            self.vectorizer = None
+
+    def match(self, title, description):
+        if not SKLEARN_AVAILABLE or not self.vectorizer:
+            return 0.0, []
+        try:
+            job_text = f"{title} {description}"
+            job_vec = self.vectorizer.transform([job_text])
+            sim = float(cosine_similarity(job_vec, self.profile_matrix)[0][0])
+
+            # Find top overlapping n-grams
+            job_dense = job_vec.toarray()[0]
+            prof_dense = self.profile_matrix.toarray()[0]
+            overlap = job_dense * prof_dense
+            top_indices = overlap.argsort()[::-1][:5]
+            top_terms = [self.feature_names[i] for i in top_indices if overlap[i] > 0]
+            return sim, top_terms
+        except Exception:
+            return 0.0, []
+
+PROFILE_MATCHER = SemanticProfileMatcher()
+
 def is_india_eligible_remote(text):
-    """Return True if the job is 100% remote and accessible from India / Worldwide."""
+    """Return True if the job is 100% remote and accessible from India / Worldwide, or open to global candidates."""
     low = text.lower()
     excl = [
         "us citizen only", "us citizenship", "must be in us", "must reside in us",
         "must be located in", "must be based in the us", "must live in the us",
         "authorized to work in the us", "us work authorization", "w2 only", "c2c only",
         "security clearance", "us only", "usa only", "united states only",
-        "north america only", "canada only", "uk only", "uk citizen", "eu only",
-        "eu citizen", "latin america only", "latam only", "hybrid", "on-site",
-        "relocation required", "us time zones only", "must be based in europe",
+        "north america only", "canada only", "uk citizen only", "eu citizen only",
+        "latin america only", "latam only",
         "(us & canada)", "us & canada", "us and canada", "us/canada", "us / canada",
         "us or canada", "us/ca", "us & ca", "us/can", "remote (us", "remote (canada",
         "remote (uk", "remote (eu", "remote - us", "remote - uk", "remote - eu",
@@ -115,7 +190,7 @@ def is_india_eligible_remote(text):
     ]
     if any(e in low for e in excl):
         return False
-    incl = ["remote", "worldwide", "anywhere", "global", "telecommute", "wfh", "work from home", "india", "apac", "emea"]
+    incl = ["remote", "worldwide", "anywhere", "global", "telecommute", "wfh", "work from home", "india", "apac", "emea", "london", "singapore", "bengaluru", "bangalore"]
     return any(i in low for i in incl)
 
 def detect_lead_type(title, description):
@@ -131,9 +206,9 @@ def detect_lead_type(title, description):
     return "job"
 
 def calculate_job_fit_score(title, description):
-    """Calculate weighted skill relevance score (0 to 100) and breakdown reasons."""
+    """Calculate weighted skill relevance score (0 to 100) using Scikit-Learn TF-IDF cosine similarity."""
     text = f"{title} {description}".lower()
-    
+
     negative_keywords = [
         "ios", "swift", "swiftui", "android", "kotlin", "objective-c", "c++", "embedded", "firmware",
         "java spring", "spring boot", "php", "wordpress", "drupal", "ruby on rails", "salesforce",
@@ -144,48 +219,65 @@ def calculate_job_fit_score(title, description):
         if re.search(r'\b' + re.escape(nk) + r'\b', text):
             return 0, f"Filtered out: {nk}"
 
-    score = 0
     reasons = []
 
-    # Tech Stack (+50 max)
-    tech_matches = []
-    tier1_tech = {
-        "rag": 25, "pgvector": 25, "vector": 15, "embedding": 15, "fastapi": 20,
-        "next.js": 20, "nextjs": 20, "react": 10, "typescript": 10, "python": 15,
-        "ai agent": 25, "agentic": 25, "langchain": 15, "llamaindex": 15,
-        "supabase": 15, "postgresql": 10, "postgres": 10, "llm": 15
-    }
-    for tech, pts in tier1_tech.items():
-        if re.search(r'\b' + re.escape(tech) + r'\b', text):
-            tech_matches.append(tech)
-            score += pts
-    if tech_matches:
-        reasons.append(f"Tech: {', '.join(tech_matches[:4])}")
+    # 1. Scikit-Learn ML Cosine Similarity
+    sim, top_ngrams = PROFILE_MATCHER.match(title, description)
+    if sim > 0:
+        sim_pct = round(sim * 100, 1)
+        reasons.append(f"ML Cosine: {sim_pct}%")
+        if top_ngrams:
+            reasons.append(f"Matches: {', '.join(top_ngrams[:3])}")
 
-    # Role Title Alignment (+35 max)
-    role_matches = []
+    # 2. Scaled ML base score
+    if sim >= 0.35:
+        base_score = 85 + min(14, int((sim - 0.35) * 100))
+    elif sim >= 0.20:
+        base_score = 70 + int(((sim - 0.20) / 0.15) * 15)
+    elif sim >= 0.10:
+        base_score = 55 + int(((sim - 0.10) / 0.10) * 15)
+    else:
+        base_score = int(sim * 500)
+
+    # 3. Role Title Alignment bonus (+10 to +20)
+    role_bonus = 0
     tier1_roles = {
-        "forward deployed": 35, "ai engineer": 35, "solutions architect": 30,
-        "founding engineer": 30, "full stack": 25, "fullstack": 25, "product engineer": 25,
-        "backend engineer": 15, "frontend engineer": 15
+        "forward deployed": 20, "ai engineer": 18, "solutions architect": 15,
+        "founding engineer": 15, "full stack": 12, "fullstack": 12, "product engineer": 12,
+        "backend engineer": 8, "frontend engineer": 8
     }
     for role_kw, pts in tier1_roles.items():
         if role_kw in text:
-            role_matches.append(role_kw)
-            score += pts
-    if role_matches:
-        reasons.append(f"Role: {', '.join(role_matches[:2])}")
+            role_bonus = max(role_bonus, pts)
+            reasons.append(f"Role: {role_kw}")
+            break
 
-    # Location Alignment (+20)
-    if any(w in text for w in ["worldwide", "anywhere", "global", "india", "apac"]):
-        score += 20
-        reasons.append("Worldwide Remote")
+    # 4. Location Alignment (+10)
+    loc_bonus = 0
+    if any(w in text for w in ["worldwide", "anywhere", "global", "india", "apac", "london", "singapore"]):
+        loc_bonus = 10
+        reasons.append("Global/Worldwide")
     elif "remote" in text:
-        score += 15
+        loc_bonus = 8
         reasons.append("Remote")
 
-    final_score = min(max(score, 0), 98)
-    return final_score, " | ".join(reasons) if reasons else "General Match"
+    # If scikit-learn is not available, fallback to legacy heuristic
+    if not SKLEARN_AVAILABLE or sim == 0:
+        legacy_score = 0
+        tier1_tech = {
+            "rag": 25, "pgvector": 25, "vector": 15, "embedding": 15, "fastapi": 20,
+            "next.js": 20, "nextjs": 20, "react": 10, "typescript": 10, "python": 15,
+            "ai agent": 25, "agentic": 25, "langchain": 15, "llamaindex": 15,
+            "supabase": 15, "postgresql": 10, "postgres": 10, "llm": 15
+        }
+        for tech, pts in tier1_tech.items():
+            if re.search(r'\b' + re.escape(tech) + r'\b', text):
+                legacy_score += pts
+        final_score = min(max(legacy_score + role_bonus + loc_bonus, 0), 98)
+        return final_score, " | ".join(reasons) if reasons else "General Match"
+
+    final_score = min(max(base_score + (role_bonus // 2) + (loc_bonus // 2), 0), 99)
+    return final_score, " | ".join(reasons) if reasons else "ML Match"
 
 def extract_compensation(text, structured_val=None):
     """Extract salary, hourly rate, or project compensation from text or structured API fields."""
@@ -231,6 +323,41 @@ def extract_compensation(text, structured_val=None):
             return val
 
     return None
+
+def format_compensation_with_inr(comp_str):
+    """Normalize and format compensation string with live INR equivalent (1 USD ≈ ₹84)."""
+    if not comp_str:
+        return None, None
+    clean_comp = str(comp_str).strip()
+    if any(k in clean_comp.lower() for k in ["lpa", "lakh", "inr", "₹"]):
+        return clean_comp, clean_comp
+
+    if "$" in clean_comp:
+        usd_matches = re.findall(r'\$\s*(\d{1,3}(?:,\d{3})*|\d+)\s*([kK])?', clean_comp)
+        if usd_matches:
+            vals = []
+            for num_s, k_flag in usd_matches:
+                v = float(num_s.replace(',', ''))
+                if k_flag.lower() == 'k' or v < 1000:
+                    v *= 1000
+                vals.append(v)
+            if vals:
+                def to_inr_text(val):
+                    lakhs = (val * 84) / 100000
+                    if lakhs >= 100:
+                        cr = round(lakhs / 100, 2)
+                        return f"₹{cr} Cr LPA"
+                    else:
+                        return f"₹{round(lakhs, 1)} LPA"
+
+                if len(vals) == 1:
+                    inr_str = f"~{to_inr_text(vals[0])}"
+                else:
+                    t_min = to_inr_text(min(vals))
+                    t_max = to_inr_text(max(vals))
+                    inr_str = f"~{t_min} - {t_max}"
+                return clean_comp, inr_str
+    return clean_comp, None
 
 def extract_contact_info(text, company=""):
     """Extract real direct emails and application / ATS links from posting text."""
@@ -684,10 +811,20 @@ def fetch_arbeitnow_jobs(known_urls):
     return results
 
 def fetch_direct_ats_jobs(known_urls):
-    """Source 9: Direct ATS JSON APIs across 20+ Top AI & Remote Startups (Greenhouse + Ashby)."""
+    """Source 9: Direct ATS JSON APIs across 45+ Top AI & Remote Giants (Greenhouse + Ashby)."""
     results = []
-    gh_companies = ['gitlab', 'sourcegraph', 'elastic', 'sentry', 'retool', 'canonical', 'duckduckgo', 'hashicorp', 'automattic', 'zapier', 'mux']
-    ashby_companies = ['linear', 'vercel', 'langchain', 'perplexity', 'together', 'modal', 'elevenlabs', 'anyscale']
+    gh_companies = [
+        'gitlab', 'sourcegraph', 'elastic', 'sentry', 'retool', 'canonical',
+        'duckduckgo', 'hashicorp', 'automattic', 'zapier', 'mux', 'stripe',
+        'postman', 'browserstack', 'supabase', 'datadog', 'cloudflare',
+        'airtable', 'snowflake', 'clickhouse', 'mongodb', 'cockroachlabs'
+    ]
+    ashby_companies = [
+        'linear', 'vercel', 'langchain', 'perplexity', 'together', 'modal',
+        'elevenlabs', 'anyscale', 'cursor', 'cohere', 'replit', 'groq',
+        'mistral', 'tavily', 'firecrawl', 'browserbase', 'pinecone', 'weaviate',
+        'qdrant', 'glean', 'braintrust', 'deepgram', 'dust', 'writer', 'huggingface'
+    ]
 
     def check_gh(slug):
         sub_res = []
@@ -706,7 +843,7 @@ def fetch_direct_ats_jobs(known_urls):
                 if not is_india_eligible_remote(full_text):
                     continue
                 score, reason = calculate_job_fit_score(title, full_text)
-                if score >= 75:
+                if score >= 70:
                     direct_email, ats_link = extract_contact_info(full_text, slug.capitalize())
                     comp = extract_compensation(full_text)
                     sub_res.append({
@@ -744,7 +881,7 @@ def fetch_direct_ats_jobs(known_urls):
                 if not is_india_eligible_remote(full_text):
                     continue
                 score, reason = calculate_job_fit_score(title, full_text)
-                if score >= 75:
+                if score >= 70:
                     direct_email, ats_link = extract_contact_info(full_text, slug.capitalize())
                     comp = extract_compensation(full_text, comp_str)
                     sub_res.append({
@@ -764,13 +901,82 @@ def fetch_direct_ats_jobs(known_urls):
         return sub_res
 
     try:
-        with ThreadPoolExecutor(max_workers=15) as executor:
+        with ThreadPoolExecutor(max_workers=20) as executor:
             gh_futures = [executor.submit(check_gh, s) for s in gh_companies]
             ashby_futures = [executor.submit(check_ashby, s) for s in ashby_companies]
             for f in gh_futures + ashby_futures:
                 results.extend(f.result())
     except Exception:
         pass
+    return results
+
+def fetch_direct_lever_jobs(known_urls):
+    """Source 11: Direct Lever ATS JSON APIs across Tier-1 AI & Global Tech Leaders (Palantir, Spotify, etc.)."""
+    results = []
+    lever_companies = ['palantir', 'spotify', 'wealthfront', 'canva', 'atlassian', 'netflix']
+
+    def check_lever(slug):
+        sub_res = []
+        try:
+            url = f'https://api.lever.co/v0/postings/{slug}?mode=json'
+            req = urllib.request.Request(url, headers=HEADERS)
+            with urllib.request.urlopen(req, timeout=6) as resp:
+                jobs = json.loads(resp.read().decode('utf-8'))
+
+            for j in jobs:
+                link = j.get('hostedUrl', '') or j.get('applyUrl', '')
+                if not link or link in known_urls:
+                    continue
+                title = j.get('text', '')
+                cats = j.get('categories', {})
+                loc = str(cats.get('location', ''))
+                team = str(cats.get('team', ''))
+                workplace = str(j.get('workplaceType', ''))
+                desc_plain = j.get('descriptionPlain', '') or ''
+                additional = j.get('additionalPlain', '') or ''
+                full_text = f"{title} Location: {loc} Team: {team} Workplace: {workplace}\n{desc_plain}\n{additional}"
+
+                if not is_india_eligible_remote(f"{title} {loc} {workplace}"):
+                    continue
+
+                score, reason = calculate_job_fit_score(title, full_text)
+                if score >= 70:
+                    direct_email, ats_link = extract_contact_info(full_text, slug.capitalize())
+                    comp = extract_compensation(full_text)
+                    lead_type = detect_lead_type(title, full_text)
+                    sub_res.append({
+                        'company': slug.capitalize(),
+                        'role': title.strip(),
+                        'source_url': ats_link or link,
+                        'snippet': f"Direct Lever ATS: {title} ({loc}) - {desc_plain[:300]}",
+                        'email': direct_email,
+                        'quality_score': score,
+                        'intent_source': f'lever_{slug}',
+                        'lead_type': lead_type,
+                        'compensation': comp,
+                        'verification_reason': f"Tier-1 AI Lever ATS ({reason})"
+                    })
+        except Exception:
+            pass
+        return sub_res
+
+    try:
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            futures = [executor.submit(check_lever, s) for s in lever_companies]
+            for f in futures:
+                results.extend(f.result())
+    except Exception:
+        pass
+    return results
+
+def fetch_tier1_fast_scan(known_urls):
+    """Fast scan focused exclusively on 50+ Tier-1 AI Unicorns and Direct ATS Boards (Lever, Ashby, Greenhouse)."""
+    results = []
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        f_lever = executor.submit(fetch_direct_lever_jobs, known_urls)
+        f_ats = executor.submit(fetch_direct_ats_jobs, known_urls)
+        results.extend(f_lever.result())
+        results.extend(f_ats.result())
     return results
 
 def fetch_jobspy_multiboard(known_urls):
@@ -828,8 +1034,37 @@ def fetch_jobspy_multiboard(known_urls):
         pass
     return results
 
-def generate_tailored_pitch(company, role, snippet_text, config, api_key, lead_type="job"):
-    """Generate a hyper-personalized 3-sentence pitch linking to Prateek's production systems."""
+def query_retriever_for_job_match(job_title, job_company, job_details):
+    """Query live Retriever API on rag.prateeq.in for deep semantic vector retrieval & ColBERT evidence."""
+    retriever_url = os.environ.get("NEXT_PUBLIC_RETRIEVER_API_URL") or "https://rag.prateeq.in"
+    tenant_id = os.environ.get("RETRIEVER_SCOPING_TENANT_ID") or "1f85286c-9d9a-4ebc-9c62-a99360a5ece4"
+    api_key = os.environ.get("RETRIEVER_SCOPING_API_KEY") or ""
+
+    query_text = f"{job_title} at {job_company}: {job_details[:300]}"
+    try:
+        url = f"{retriever_url.rstrip('/')}/v1/search"
+        payload = json.dumps({
+            "tenant_id": tenant_id,
+            "query": query_text,
+            "top_k": 3
+        }).encode("utf-8")
+        headers = {
+            "Content-Type": "application/json",
+            "User-Agent": "SynchronizerHeadhunter/1.0"
+        }
+        if api_key:
+            headers["Authorization"] = f"Bearer {api_key}"
+            headers["X-API-Key"] = api_key
+
+        req = urllib.request.Request(url, data=payload, headers=headers)
+        with urllib.request.urlopen(req, timeout=6) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            return data.get("results", [])
+    except Exception as e:
+        return [{"error": str(e)}]
+
+def generate_multi_channel_pitches(company, role, snippet_text, config, api_key, lead_type="job"):
+    """Generate 3 distinct high-impact outreach assets (Email, LinkedIn <300 chars, and ATS Cover Letter)."""
     low_snip = snippet_text.lower()
     if "agent" in low_snip or "workflow" in low_snip or "tool" in low_snip:
         targeted_cta = "https://prateeq.in/scoping?engine=saas&goal=autonomous_agents"
@@ -839,28 +1074,76 @@ def generate_tailored_pitch(company, role, snippet_text, config, api_key, lead_t
         targeted_cta = "https://prateeq.in/scoping?engine=saas&goal=saas_app"
 
     clean_snippet = snippet_text[:120].rstrip('.') if snippet_text else role
-    if lead_type == "client":
-        fallback_pitch = f"Hi {company} Team,\n\nI noticed your project requirements for {role} ({clean_snippet}...).\n\nAs an independent AI Solutions Architect & Forward Deployed Engineer, I build custom multi-tenant RAG systems, AI agents, and full-stack software assets on contract with rapid sprint delivery.\n\nI put together an interactive scope & digital architecture spec for your stack: {targeted_cta}\n\nBest,\nPrateek Sharma"
-    else:
-        fallback_pitch = f"Hi {company} Team,\n\nI saw your post for {role} ({clean_snippet}...).\n\nAs a Forward Deployed Engineer & AI Solutions Architect, I specialize in building custom AI agents, vector search, and full-stack software assets.\n\nI put together an interactive scoping spec for your stack: {targeted_cta}\n\nBest,\nPrateek Sharma"
 
-    if api_key:
-        if lead_type == "client":
-            positioning = "Position Prateek as an independent AI Solutions Architect / Forward Deployed Contractor who delivers high-velocity software assets and AI integrations."
-        else:
-            positioning = "Position Prateek as an embedded Forward Deployed Engineer / AI Product Engineer."
-            
-        pitch_prompt = f"You are writing an outreach pitch as Prateek Sharma (Forward Deployed Engineer & AI Solutions Architect).\n{PORTFOLIO_CONTEXT_PROMPT}\nClient Job Post: Company={company}, Role={role}, Snippet={snippet_text}, Lead Type={lead_type}.\nRules: Write a 3-sentence, hyper-personalized pitch connecting their exact hiring/project needs to Prateek's real production builds (Retriever AI RAG, Synchronizer, Workspace Dashboard, Next.js 16 + Supabase). {positioning} Include CTA link {targeted_cta}. Sign off from Prateek Sharma. Return plain text ONLY, no markdown."
-        gen_text = call_gemini_with_fallback(pitch_prompt, preferred_model=config.get("activeModel", "gemini-3.6-flash"), api_key=api_key)
-        if gen_text:
-            return gen_text.strip()
-    return fallback_pitch
+    if lead_type == "client":
+        fallback_email = f"Hi {company} Team,\n\nI noticed your project requirements for {role} ({clean_snippet}...).\n\nAs an independent AI Solutions Architect & Forward Deployed Engineer, I build custom multi-tenant RAG systems, AI agents, and full-stack software assets on contract with rapid sprint delivery.\n\nI put together an interactive scope & digital architecture spec for your stack: {targeted_cta}\n\nBest,\nPrateek Sharma"
+        fallback_li = f"Hi {company} Team, saw your {role} requirements. I build custom multi-tenant RAG systems & AI agents with rapid sprint delivery (prateeq.in). Let's connect!"
+        fallback_cover = f"Dear {company} Team,\n\nI am writing to express my strong interest in the {role} project. Over recent production cycles, I architected and deployed enterprise-grade cognitive platforms (Next.js 16, pgvector HNSW, ColBERT MaxSim, and distributed Celery workers) with 950+ passing tests.\n\nMy forward-deployed engineering approach bridges client strategy with rapid code delivery. You can inspect my live production systems at https://prateeq.in. I welcome the opportunity to discuss how I can accelerate {company}'s technical roadmap."
+    else:
+        fallback_email = f"Hi {company} Team,\n\nI saw your post for {role} ({clean_snippet}...).\n\nAs a Forward Deployed Engineer & AI Solutions Architect, I specialize in building custom AI agents, vector search, and full-stack software assets.\n\nI put together an interactive scoping spec for your stack: {targeted_cta}\n\nBest,\nPrateek Sharma"
+        fallback_li = f"Hi {company} Team, saw your {role} opening! I architected a multi-tenant RAG platform with ColBERT MaxSim, pgvector, and Next.js 16 (prateeq.in). Would love to connect and contribute!"
+        fallback_cover = f"Dear {company} Hiring Team,\n\nI am writing to apply for the {role} position. As a Forward Deployed Engineer & AI Solutions Architect, I build and take production AI workflows to scale—including pgvector hybrid retrieval, ColBERT token MaxSim rerankers, and zero-downtime blue/green deployment pipelines.\n\nMy live production builds and architecture knowledge graphs are accessible at https://prateeq.in. I look forward to contributing my systems execution velocity to {company}."
+
+    if len(fallback_li) > 295:
+        fallback_li = fallback_li[:292] + "..."
+
+    default_result = {
+        "email": fallback_email,
+        "linkedin": fallback_li,
+        "cover_letter": fallback_cover
+    }
+
+    if not api_key:
+        return default_result
+
+    positioning = (
+        "Position Prateek as an independent AI Solutions Architect / Forward Deployed Contractor."
+        if lead_type == "client"
+        else "Position Prateek as an embedded Forward Deployed Engineer / AI Product Engineer."
+    )
+
+    prompt = f"""You are writing high-conversion multi-channel outreach assets as Prateek Sharma (Forward Deployed Engineer & AI Solutions Architect).
+{PORTFOLIO_CONTEXT_PROMPT}
+
+Target Opportunity:
+Company: {company}
+Role: {role}
+Posting Details: {snippet_text}
+Lead Type: {lead_type}
+
+Rules:
+1. "email": Write a 3-sentence, hyper-personalized pitch connecting their exact hiring/project needs to Prateek's real production builds (Retriever AI SaaS RAG, ColBERT token MaxSim, pgvector HNSW, Next.js 16 + Supabase). {positioning} Include CTA link {targeted_cta}. Sign off from Prateek Sharma.
+2. "linkedin": Write a punchy, personalized LinkedIn connection note strictly UNDER 280 CHARACTERS (character count is crucial for LinkedIn limit). Highlight Prateek's relevant production architecture (prateeq.in) and express eagerness to connect.
+3. "cover_letter": Write a 2-paragraph technical ATS cover letter snippet explaining specifically why Prateek's production systems and forward deployed engineering velocity make him an ideal fit for {company}.
+
+Return ONLY valid JSON matching this exact structure:
+{{"email": "...", "linkedin": "...", "cover_letter": "..."}}"""
+
+    gen_text = call_gemini_with_fallback(prompt, preferred_model=config.get("activeModel", "gemini-3.6-flash"), api_key=api_key)
+    if gen_text:
+        try:
+            clean_json = re.sub(r"^```json\s*", "", gen_text.strip())
+            clean_json = re.sub(r"\s*```$", "", clean_json.strip())
+            parsed = json.loads(clean_json)
+            if isinstance(parsed, dict) and "email" in parsed and "linkedin" in parsed:
+                li = parsed.get("linkedin", "")
+                if len(li) > 295:
+                    parsed["linkedin"] = li[:292] + "..."
+                return parsed
+        except Exception:
+            pass
+    return default_result
+
+def generate_tailored_pitch(company, role, snippet_text, config, api_key, lead_type="job"):
+    """Generate structured multi-channel pitches and return as JSON string."""
+    pitches = generate_multi_channel_pitches(company, role, snippet_text, config, api_key, lead_type=lead_type)
+    return json.dumps(pitches)
 
 def render_outreach_tab():
     if not st:
         return
     st.markdown('<div class="section-header">Autonomous Job Hunter & Lead Prospecting Cockpit</div>', unsafe_allow_html=True)
-    st.caption("8-Source Real-Time Aggregator: Hacker News, WeWorkRemotely, Himalayas, Jobicy, RemoteOK, Remotive, Arbeitnow & HN Freelance Live. Auto-filters for India-accessible remote opportunities.")
+    st.caption("11-Source Real-Time Aggregator: Hacker News, Direct Lever (Palantir/Spotify), Direct Ashby (25+ AI Startups), Direct Greenhouse (20+ Giants), WeWorkRemotely, Himalayas, Jobicy, RemoteOK, Remotive, Arbeitnow & HN Freelance Live. Powered by Scikit-Learn TF-IDF Cosine Match & Gemini 3.6 Flash.")
 
     config = load_defaults()
 
@@ -871,11 +1154,11 @@ def render_outreach_tab():
     if not SUPABASE_SERVICE_KEY:
         st.warning("⚠️ SUPABASE_SERVICE_ROLE_KEY environment variable is missing in .env.local")
 
-    with st.expander("⚙️ Lead Sources & AI Settings (Gemini 3.6 Flash)", expanded=False):
+    with st.expander("⚙️ Lead Sources & AI Settings (Gemini 3.6 Flash & Scikit-Learn)", expanded=False):
         c_model = st.text_input("Active AI Model", value=config.get("activeModel", "gemini-3.6-flash"))
         c_min_score = st.slider("Minimum Quality Score Threshold", 50, 95, config.get("minQualityScore", 75))
         c_cta = st.text_input("CTA Deep Link Base", value=config.get("ctaDeepLink", "https://prateeq.in/scoping?engine=saas"))
-        
+
         col_a, col_b = st.columns([1, 1])
         with col_a:
             if st.button("💾 Save Config", use_container_width=True):
@@ -910,9 +1193,9 @@ def render_outreach_tab():
                             st.error(f"🔴 `{m}`: Exception {ex}")
 
     # Main Action Controls
-    c_btn1, c_btn2 = st.columns([3, 1])
+    c_btn1, c_btn_fast, c_btn2 = st.columns([2.5, 2.5, 1])
     with c_btn1:
-        if st.button("🚀 Scan All 10 Mega Sources & Shortlist Opportunities (Jobs, Clients, Direct ATS)", type="primary", use_container_width=True):
+        if st.button("🚀 Scan All 11 Mega Sources (Full Deep Hunter)", type="primary", use_container_width=True):
             if not SUPABASE_SERVICE_KEY:
                 st.error("Cannot run hunter: SUPABASE_SERVICE_ROLE_KEY missing!")
             else:
@@ -920,25 +1203,29 @@ def render_outreach_tab():
                 known_urls = get_known_source_urls(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 
                 all_discovered = []
-                
-                # Fetch all 10 feeds concurrently
-                progress_bar.progress(10, text="🔍 Scanning Hacker News 'Who is Hiring' (120+ comments)...")
+
+                # Fetch all 11 feeds concurrently
+                progress_bar.progress(8, text="🔍 Scanning Hacker News 'Who is Hiring' (120+ comments)...")
                 hn_leads = fetch_hn_whoishiring_concurrent(known_urls)
                 all_discovered.extend(hn_leads)
 
-                progress_bar.progress(20, text="🔍 Scanning Hacker News Live Freelance Gigs (Algolia API)...")
+                progress_bar.progress(16, text="🔍 Scanning Hacker News Live Freelance Gigs (Algolia API)...")
                 hn_free = fetch_hn_freelance_live(known_urls)
                 all_discovered.extend(hn_free)
 
-                progress_bar.progress(35, text="🔍 Scanning Direct ATS Boards (Greenhouse & Ashby for 20+ Top AI Startups)...")
+                progress_bar.progress(28, text="🔍 Scanning Direct Lever ATS (Palantir, Spotify, Atlassian, Canva)...")
+                lever_leads = fetch_direct_lever_jobs(known_urls)
+                all_discovered.extend(lever_leads)
+
+                progress_bar.progress(42, text="🔍 Scanning Direct ATS Boards (Ashby & Greenhouse for 45+ AI Startups)...")
                 ats_leads = fetch_direct_ats_jobs(known_urls)
                 all_discovered.extend(ats_leads)
 
-                progress_bar.progress(50, text="🔍 Scanning WeWorkRemotely RSS feed...")
+                progress_bar.progress(55, text="🔍 Scanning WeWorkRemotely RSS feed...")
                 wwr_leads = fetch_weworkremotely_jobs(known_urls)
                 all_discovered.extend(wwr_leads)
 
-                progress_bar.progress(65, text="🔍 Scanning Himalayas Remote Startup feed (100 jobs)...")
+                progress_bar.progress(66, text="🔍 Scanning Himalayas Remote Startup feed (100 jobs)...")
                 hima_leads = fetch_himalayas_jobs(known_urls)
                 all_discovered.extend(hima_leads)
 
@@ -946,7 +1233,7 @@ def render_outreach_tab():
                 jobicy_leads = fetch_jobicy_jobs(known_urls)
                 all_discovered.extend(jobicy_leads)
 
-                progress_bar.progress(85, text="🔍 Scanning RemoteOK API...")
+                progress_bar.progress(83, text="🔍 Scanning RemoteOK API...")
                 rok_leads = fetch_remoteok_jobs(known_urls)
                 all_discovered.extend(rok_leads)
 
@@ -984,13 +1271,57 @@ def render_outreach_tab():
 
                 progress_bar.progress(100, text="Done!")
                 if new_count > 0:
-                    st.success(f"🎯 Discovered and shortlisted {new_count} new opportunities (Jobs & Freelance Clients) across 10 platforms!")
+                    st.success(f"🎯 Discovered and shortlisted {new_count} new opportunities across 11 platforms!")
                 else:
                     st.info("Scan complete. No new unrecorded matching jobs or clients found at this moment.")
                 st.rerun()
 
+    with c_btn_fast:
+        if st.button("🎯 Fast-Scan: Tier-1 AI Startups Only (Palantir, Ashby, Greenhouse)", use_container_width=True):
+            if not SUPABASE_SERVICE_KEY:
+                st.error("Cannot run hunter: SUPABASE_SERVICE_ROLE_KEY missing!")
+            else:
+                progress_bar = st.progress(0, text="Fetching history for deduplication...")
+                known_urls = get_known_source_urls(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+
+                progress_bar.progress(30, text="🎯 Fast-scanning Palantir & Tier-1 Direct Lever Boards...")
+                lever_leads = fetch_direct_lever_jobs(known_urls)
+
+                progress_bar.progress(70, text="🎯 Fast-scanning 45+ Top AI Startups on Ashby & Greenhouse...")
+                ats_leads = fetch_direct_ats_jobs(known_urls)
+
+                all_tier1 = lever_leads + ats_leads
+                progress_bar.progress(90, text="Persisting Tier-1 matches...")
+
+                new_count = 0
+                for item in all_tier1:
+                    lead_payload = {
+                        "lead_name": "Hiring Manager / Founder",
+                        "company": item["company"],
+                        "role": item["role"],
+                        "email": item["email"],
+                        "source_url": item["source_url"],
+                        "ai_generated_pitch": "",
+                        "quality_score": item["quality_score"],
+                        "intent_source": item["intent_source"],
+                        "lead_type": item.get("lead_type", "job"),
+                        "compensation": item.get("compensation"),
+                        "verification_reason": item["verification_reason"],
+                        "status": "shortlisted",
+                        "created_at": datetime.utcnow().isoformat()
+                    }
+                    upsert_record("outreach_leads", lead_payload)
+                    new_count += 1
+
+                progress_bar.progress(100, text="Done!")
+                if new_count > 0:
+                    st.success(f"🎯 Discovered and shortlisted {new_count} new Tier-1 AI openings (Palantir, Vercel, Linear, etc.)!")
+                else:
+                    st.info("Fast-scan complete. All current Tier-1 AI openings are already in your shortlist.")
+                st.rerun()
+
     with c_btn2:
-        if st.button("🔄 Refresh All", use_container_width=True):
+        if st.button("🔄 Refresh", use_container_width=True):
             st.rerun()
 
     st.markdown("---")
@@ -1029,60 +1360,132 @@ def render_outreach_tab():
     ])
 
     with tab1:
-        st.caption("Review shortlisted remote jobs & client projects. Click '❌ Decline' to blacklist, or '✍️ Draft Pitch' to generate a tailored pitch with Gemini.")
-        
-        # Sub-filter for Jobs vs Clients
-        job_count = len([l for l in shortlisted_leads if l.get("lead_type", "job") == "job"])
-        client_count = len([l for l in shortlisted_leads if l.get("lead_type") == "client"])
-        
-        type_filter = st.radio(
+        st.caption("Review shortlisted opportunities. Powered by Scikit-Learn TF-IDF Cosine Match scoring, live USD ↔ INR normalizer, and 3-in-1 pitch drafting.")
+
+        # Interactive Search & Filter Row
+        c_search, c_comp_filter = st.columns([3, 2])
+        with c_search:
+            search_query = st.text_input("🔍 Search by Keyword, Role, or Company:", placeholder="e.g. Palantir, ColBERT, RAG, Forward Deployed...", key="lead_search_kw")
+        with c_comp_filter:
+            comp_filter = st.selectbox("💵 Compensation Filter:", [
+                "All Compensation Levels",
+                "High-Ticket Only ($100k+ / ₹35L+)",
+                "Mid-to-High ($50k+ / ₹20L+)",
+                "Disclosed Pay Only"
+            ], key="lead_comp_sel")
+
+        # Quick Preset Category Pills
+        quick_preset = st.radio(
             "Filter Category:",
-            [f"All Opportunities ({len(shortlisted_leads)})", f"💼 Remote Jobs ({job_count})", f"🤝 Freelance / Client Projects ({client_count})"],
+            [
+                f"All Opportunities ({len(shortlisted_leads)})",
+                f"🔥 Top ML Matches ({len([l for l in shortlisted_leads if l.get('quality_score', 0) >= 85])})",
+                f"🎯 Tier-1 Direct ATS ({len([l for l in shortlisted_leads if any(k in l.get('intent_source', '') for k in ['lever', 'ashby', 'ats'])])})",
+                f"💼 Remote Jobs ({len([l for l in shortlisted_leads if l.get('lead_type', 'job') == 'job'])})",
+                f"🤝 Freelance / Client Projects ({len([l for l in shortlisted_leads if l.get('lead_type') == 'client'])})"
+            ],
             horizontal=True
         )
 
         filtered_shortlist = shortlisted_leads
-        if "💼 Remote Jobs" in type_filter:
-            filtered_shortlist = [l for l in shortlisted_leads if l.get("lead_type", "job") == "job"]
-        elif "🤝 Freelance" in type_filter:
-            filtered_shortlist = [l for l in shortlisted_leads if l.get("lead_type") == "client"]
+        if "🔥 Top ML Matches" in quick_preset:
+            filtered_shortlist = [l for l in filtered_shortlist if l.get("quality_score", 0) >= 85]
+        elif "🎯 Tier-1 Direct ATS" in quick_preset:
+            filtered_shortlist = [l for l in filtered_shortlist if any(k in l.get("intent_source", "") for k in ["lever", "ashby", "ats"])]
+        elif "💼 Remote Jobs" in quick_preset:
+            filtered_shortlist = [l for l in filtered_shortlist if l.get("lead_type", "job") == "job"]
+        elif "🤝 Freelance" in quick_preset:
+            filtered_shortlist = [l for l in filtered_shortlist if l.get("lead_type") == "client"]
+
+        # Apply search query filter
+        if search_query:
+            sq_low = search_query.lower()
+            filtered_shortlist = [
+                l for l in filtered_shortlist
+                if sq_low in l.get("role", "").lower()
+                or sq_low in l.get("company", "").lower()
+                or sq_low in l.get("verification_reason", "").lower()
+                or sq_low in l.get("snippet", "").lower()
+            ]
+
+        # Apply comp filter
+        if comp_filter == "Disclosed Pay Only":
+            filtered_shortlist = [l for l in filtered_shortlist if l.get("compensation")]
+        elif comp_filter == "High-Ticket Only ($100k+ / ₹35L+)":
+            def is_high_ticket(l):
+                c = l.get("compensation", "") or ""
+                if not c: return False
+                if any(x in c.lower() for x in ["100k", "120k", "130k", "140k", "150k", "160k", "170k", "180k", "200k", "35l", "40l", "45l", "50l", "1cr", "cr"]):
+                    return True
+                vals = re.findall(r'\$\s*(\d{2,3}),?\d{3}', c)
+                if vals and any(int(v) >= 100 for v in vals):
+                    return True
+                return False
+            filtered_shortlist = [l for l in filtered_shortlist if is_high_ticket(l)]
+        elif comp_filter == "Mid-to-High ($50k+ / ₹20L+)":
+            def is_mid_to_high(l):
+                c = l.get("compensation", "") or ""
+                if not c: return False
+                if any(x in c.lower() for x in ["50k", "60k", "70k", "80k", "90k", "100k", "120k", "130k", "140k", "150k", "20l", "25l", "30l", "35l"]):
+                    return True
+                vals = re.findall(r'\$\s*(\d{2,3}),?\d{3}', c)
+                if vals and any(int(v) >= 50 for v in vals):
+                    return True
+                return False
+            filtered_shortlist = [l for l in filtered_shortlist if is_mid_to_high(l)]
 
         if not filtered_shortlist:
-            st.info("No opportunities currently matching this filter. Click 'Scan All 8 Sources' above to discover new openings!")
+            st.info("No opportunities currently matching this filter. Click 'Fast-Scan Tier-1 AI Startups' or 'Scan All 11 Sources' above to discover new openings!")
         else:
             for lead in filtered_shortlist:
                 lead_id = lead.get("id")
                 lead_type = lead.get("lead_type", "job")
                 type_badge = "🤝 **FREELANCE / CLIENT PROJECT**" if lead_type == "client" else "💼 **FULL-TIME REMOTE JOB**"
                 badge_color = "#10b981" if lead_type == "client" else "#3b82f6"
-                
-                comp_str = lead.get("compensation")
-                if comp_str:
-                    comp_badge = f"<span style='background:#f59e0b22; color:#d97706; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:700;'>💰 {comp_str}</span>"
+
+                raw_comp, inr_comp = format_compensation_with_inr(lead.get("compensation"))
+                if raw_comp:
+                    inr_str_html = f" &nbsp;<span style='color:#059669;'>({inr_comp})</span>" if inr_comp and inr_comp != raw_comp else ""
+                    comp_badge = f"<span style='background:#f59e0b22; color:#d97706; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:700;'>💰 {raw_comp}{inr_str_html}</span>"
                 else:
                     comp_badge = "<span style='background:#6b728018; color:#9ca3af; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:600;'>💰 Pay: Not Disclosed</span>"
+
+                score = lead.get("quality_score", 85)
+                score_color = "#10b981" if score >= 85 else "#3b82f6" if score >= 75 else "#f59e0b"
+                score_badge = f"<span style='background:{score_color}22; color:{score_color}; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:700;'>🎯 Match: {score}/100</span>"
 
                 with st.container(border=True):
                     col_info, col_act = st.columns([3, 1])
                     with col_info:
-                        st.markdown(f"<div style='display:flex; align-items:center; gap:8px; margin-bottom:6px;'><span style='background:{badge_color}22; color:{badge_color}; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:700;'>{type_badge}</span>{comp_badge}</div>", unsafe_allow_html=True)
+                        st.markdown(f"<div style='display:flex; align-items:center; gap:8px; margin-bottom:6px;'><span style='background:{badge_color}22; color:{badge_color}; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:700;'>{type_badge}</span>{comp_badge}{score_badge}</div>", unsafe_allow_html=True)
                         st.markdown(f"### {lead.get('role', 'Software Engineer')} @ **{lead.get('company', 'Company')}**")
-                        score = lead.get("quality_score", 85)
                         source = lead.get("intent_source", "unknown")
                         reason = lead.get("verification_reason", "")
-                        st.markdown(f"⭐ **Match Score:** `{score}/100` | 🎯 **Source:** `{source}` | 🔍 `{reason}`")
-                        
+                        st.markdown(f"🎯 **Source:** `{source}` | 🔍 `{reason}`")
+
                         src_url = lead.get("source_url", "")
                         if src_url:
-                            st.markdown(f"🔗 [**Open Opportunity / ATS Application**]({src_url})")
+                            st.markdown(f"🔗 [**Open Opportunity / Direct ATS Application**]({src_url})")
+
+                        # Optional Deep Retriever VPS Vector Match Check
+                        with st.expander("⚡ Deep Retriever Cognitive Search (Live VPS)", expanded=False):
+                            if st.button("🔍 Run Semantic Match on rag.prateeq.in", key=f"ret_q_{lead_id}"):
+                                with st.spinner("Querying Retriever API..."):
+                                    res = query_retriever_for_job_match(lead.get('role', ''), lead.get('company', ''), lead.get('verification_reason', '') + " " + lead.get('snippet', ''))
+                                    if res and isinstance(res, list) and len(res) > 0 and "error" not in res[0]:
+                                        st.success(f"Retriever verified {len(res)} matching architecture knowledge chunks:")
+                                        for r in res[:2]:
+                                            st.markdown(f"- **{r.get('document_title', 'Spec')}** (Score: `{round(r.get('score', 0)*100, 1)}%`): {r.get('chunk_text', '')[:250]}...")
+                                    else:
+                                        st.info(f"Retriever query note: {res}")
 
                     with col_act:
-                        if st.button("✍️ Draft AI Pitch", key=f"draft_{lead_id}", type="primary", use_container_width=True):
-                            with st.spinner("Generating hyper-personalized pitch..."):
+                        if st.button("✍️ Draft 3-in-1 Pitch", key=f"draft_{lead_id}", type="primary", use_container_width=True):
+                            with st.spinner("Generating 3-in-1 multi-channel pitch (Email, LinkedIn, Cover Letter)..."):
                                 pitch = generate_tailored_pitch(
                                     lead.get("company", ""),
                                     lead.get("role", ""),
-                                    lead.get("verification_reason", "") + " " + lead.get("company", ""),
+                                    lead.get("verification_reason", "") + " " + lead.get("snippet", "") + " " + lead.get("company", ""),
                                     config,
                                     GEMINI_API_KEY,
                                     lead_type=lead_type
@@ -1091,40 +1494,80 @@ def render_outreach_tab():
                                 lead["status"] = "pending"
                                 lead["updated_at"] = datetime.utcnow().isoformat()
                                 upsert_record("outreach_leads", lead, key_col="id")
-                                st.success("Pitch drafted! Moved to 'Pitches Ready' tab.")
+                                st.success("3-in-1 Pitch drafted! Moved to 'Pitches Ready' tab.")
                                 st.rerun()
 
                         if st.button("❌ Decline", key=f"dec_{lead_id}", use_container_width=True):
                             lead["status"] = "declined"
                             lead["updated_at"] = datetime.utcnow().isoformat()
                             upsert_record("outreach_leads", lead, key_col="id")
-                            st.info(f"Declined {lead.get('company')}. It will never be suggested again.")
+                            st.info(f"Declined {lead.get('company')}. It will not appear in future scans.")
                             st.rerun()
 
     with tab2:
-        st.caption("Review and fine-tune AI-drafted pitches before approving and dispatching.")
+        st.caption("Review and fine-tune AI-drafted multi-channel pitches (Email, LinkedIn Connection Note, ATS Cover Letter) before approving.")
         if not pending_pitches:
-            st.info("No drafted pitches waiting for review. Go to 'Shortlisted Opportunities' tab and click '✍️ Draft Pitch' on jobs you want to apply to.")
+            st.info("No drafted pitches waiting for review. Go to 'Shortlisted Opportunities' tab and click '✍️ Draft 3-in-1 Pitch' on jobs you want to target.")
         else:
             for lead in pending_pitches:
                 lead_id = lead.get("id")
                 comp_str = lead.get("compensation")
                 comp_text = f" | 💰 **Pay:** `{comp_str}`" if comp_str else ""
 
+                # Parse multi-channel pitch JSON
+                raw_pitch = lead.get("ai_generated_pitch", "")
+                pitch_data = {}
+                try:
+                    if raw_pitch and raw_pitch.strip().startswith("{"):
+                        pitch_data = json.loads(raw_pitch)
+                except Exception:
+                    pitch_data = {}
+
+                email_val = pitch_data.get("email") or raw_pitch
+                linkedin_val = pitch_data.get("linkedin") or f"Hi {lead.get('company')} Team, saw your {lead.get('role')} search! I build custom multi-tenant RAG platforms with ColBERT MaxSim, pgvector, and Next.js 16 (prateeq.in). Would love to connect and contribute!"
+                cover_val = pitch_data.get("cover_letter") or f"Dear {lead.get('company')} Hiring Team,\n\nI am writing to apply for the {lead.get('role')} position. As a Forward Deployed Engineer & AI Solutions Architect, I build and take production AI workflows to scale—including pgvector hybrid retrieval, ColBERT token MaxSim rerankers, and zero-downtime blue/green deployment pipelines.\n\nMy live production builds and architecture knowledge graphs are accessible at https://prateeq.in. I look forward to contributing my systems execution velocity to {lead.get('company')}."
+
                 with st.container(border=True):
                     st.markdown(f"### {lead.get('company')} — {lead.get('role')}")
-                    st.caption(f"Score: `{lead.get('quality_score')}/100` | Target Email: `{lead.get('email')}` | Source: `{lead.get('intent_source')}`{comp_text}")
-                    
+                    st.caption(f"Match Score: `{lead.get('quality_score')}/100` | Target Email: `{lead.get('email')}` | Source: `{lead.get('intent_source')}`{comp_text}")
+
                     src_url = lead.get("source_url", "")
                     if src_url:
-                        st.markdown(f"🔗 [**Direct Link / ATS Link**]({src_url})")
+                        st.markdown(f"🔗 [**Direct Link / ATS Application Portal**]({src_url})")
 
-                    pitch_text = st.text_area(
-                        "AI Pitch Draft",
-                        value=lead.get("ai_generated_pitch", ""),
-                        key=f"pitch_edit_{lead_id}",
-                        height=140
-                    )
+                    # 3-in-1 Multi-Channel Tabs
+                    p_tab_email, p_tab_li, p_tab_cover = st.tabs([
+                        "📧 Founder / EM Email Pitch",
+                        "💼 LinkedIn Note (<300 Chars)",
+                        "📑 ATS Cover Letter Snippet"
+                    ])
+
+                    with p_tab_email:
+                        edited_email = st.text_area(
+                            "Direct Email Pitch (3 sentences + deep-link CTA)",
+                            value=email_val,
+                            key=f"pitch_email_{lead_id}",
+                            height=130
+                        )
+
+                    with p_tab_li:
+                        edited_li = st.text_area(
+                            "LinkedIn Connection Note (Under 300 characters)",
+                            value=linkedin_val,
+                            key=f"pitch_li_{lead_id}",
+                            height=90
+                        )
+                        li_len = len(edited_li)
+                        li_color = "#10b981" if li_len <= 300 else "#ef4444"
+                        st.markdown(f"<span style='color:{li_color}; font-size:0.8rem; font-weight:600;'>Character Count: {li_len} / 300 chars {'(✅ Perfect for LinkedIn connection request)' if li_len <= 300 else '(⚠️ Exceeds LinkedIn 300 character limit!)'}</span>", unsafe_allow_html=True)
+
+                    with p_tab_cover:
+                        edited_cover = st.text_area(
+                            "ATS Application Cover Letter (Tailored to Greenhouse / Lever text boxes)",
+                            value=cover_val,
+                            key=f"pitch_cover_{lead_id}",
+                            height=160
+                        )
 
                     c1, c2 = st.columns(2)
                     with c1:
@@ -1135,24 +1578,41 @@ def render_outreach_tab():
                             st.info(f"Declined {lead.get('company')}")
                             st.rerun()
                     with c2:
-                        if st.button("🚀 1-Click Approve & Send", key=f"send_p_{lead_id}", type="primary", use_container_width=True):
-                            lead["ai_generated_pitch"] = pitch_text
+                        if st.button("🚀 1-Click Approve & Save Formats", key=f"send_p_{lead_id}", type="primary", use_container_width=True):
+                            updated_pitch_payload = {
+                                "email": edited_email,
+                                "linkedin": edited_li,
+                                "cover_letter": edited_cover
+                            }
+                            lead["ai_generated_pitch"] = json.dumps(updated_pitch_payload)
                             lead["status"] = "sent"
                             lead["updated_at"] = datetime.utcnow().isoformat()
                             upsert_record("outreach_leads", lead, key_col="id")
-                            st.success(f"Dispatched pitch for {lead.get('company')}!")
+                            st.success(f"Approved and archived outreach assets for {lead.get('company')}!")
                             st.rerun()
 
     with tab3:
-        st.caption("History of sent / approved job outreach communications.")
+        st.caption("History of approved / dispatched job outreach communications.")
         if not sent_leads:
             st.info("No sent pitches recorded yet.")
         else:
             for lead in sent_leads:
                 with st.container(border=True):
                     st.markdown(f"**{lead.get('company')}** — {lead.get('role')}")
-                    st.caption(f"Sent at: `{lead.get('updated_at', lead.get('created_at'))}` | Email: `{lead.get('email')}`")
-                    st.text(lead.get("ai_generated_pitch", ""))
+                    st.caption(f"Archived at: `{lead.get('updated_at', lead.get('created_at'))}` | Target Email: `{lead.get('email')}`")
+                    raw_p = lead.get("ai_generated_pitch", "")
+                    try:
+                        p_dict = json.loads(raw_p) if raw_p and raw_p.startswith("{") else {"email": raw_p}
+                        st.markdown("**📧 Email Pitch:**")
+                        st.text(p_dict.get("email", ""))
+                        if p_dict.get("linkedin"):
+                            st.markdown("**💼 LinkedIn Note:**")
+                            st.text(p_dict.get("linkedin", ""))
+                        if p_dict.get("cover_letter"):
+                            st.markdown("**📑 Cover Letter:**")
+                            st.text(p_dict.get("cover_letter", ""))
+                    except Exception:
+                        st.text(raw_p)
 
     with tab4:
         st.caption("Archive of declined jobs. These URLs are permanently remembered and will never be fetched again in future scans.")

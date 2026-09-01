@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import NumberFlow from "@number-flow/react";
+import { useAuth } from "@/context/AuthContext";
 import { RetrieverClient } from "@/lib/rag-client";
 import styles from "./rag.module.css";
 
@@ -12,6 +13,7 @@ interface OverviewPanelProps {
 }
 
 export function OverviewPanel({ hidden, client, onNavigateTab }: OverviewPanelProps) {
+  const { getAccessToken } = useAuth();
   const [docCount, setDocCount] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [telemetry, setTelemetry] = useState<{
@@ -21,11 +23,11 @@ export function OverviewPanel({ hidden, client, onNavigateTab }: OverviewPanelPr
     cacheHitRatePct: number;
     avgLatencyMs: number;
   }>({
-    monthlyTokensUsed: 18500,
+    monthlyTokensUsed: 0,
     maxMonthlyTokens: 250000,
     planTier: "starter",
-    cacheHitRatePct: 42.5,
-    avgLatencyMs: 68,
+    cacheHitRatePct: 0,
+    avgLatencyMs: 0,
   });
 
   useEffect(() => {
@@ -49,18 +51,35 @@ export function OverviewPanel({ hidden, client, onNavigateTab }: OverviewPanelPr
           });
       }
 
-      fetch("/api/rag/telemetry")
-        .then((res) => (res.ok ? res.json() : null))
-        .then((data) => {
-          if (isMounted && data) {
-            setTelemetry({
-              monthlyTokensUsed: data.monthlyTokensUsed ?? 18500,
-              maxMonthlyTokens: data.maxMonthlyTokens ?? 250000,
-              planTier: data.planTier || "starter",
-              cacheHitRatePct: data.cacheHitRatePct ?? 42.5,
-              avgLatencyMs: data.avgLatencyMs ?? 68,
-            });
-          }
+      getAccessToken()
+        .then((token) => {
+          if (!token) return;
+          const query = client?.tenantId ? `?tenantId=${client.tenantId}` : "";
+
+          fetch(`/api/rag/telemetry${query}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+            .then((res) => (res.ok ? res.json() : null))
+            .then((data) => {
+              if (isMounted && data?.success) {
+                const used = data.usage?.monthlyTokensUsed ?? 0;
+                const maxTokens = data.quotas?.maxMonthlyTokens ?? 250000;
+                const hits = data.semanticCache?.cacheHits ?? 0;
+                const p99 = Math.round(data.sla?.p99LatencyMs ?? 0);
+                const docsTotal = data.usage?.documentsCount ?? (docCount || 0);
+
+                setTelemetry({
+                  monthlyTokensUsed: used,
+                  maxMonthlyTokens: maxTokens,
+                  planTier: data.planTier || "starter",
+                  cacheHitRatePct: hits > 0 ? Math.min(100, Math.round((hits / Math.max(1, hits + docsTotal)) * 100)) : 0,
+                  avgLatencyMs: p99 > 0 ? p99 : 0,
+                });
+              }
+            })
+            .catch(() => {});
         })
         .catch(() => {});
 
@@ -68,7 +87,8 @@ export function OverviewPanel({ hidden, client, onNavigateTab }: OverviewPanelPr
         isMounted = false;
       };
     }
-  }, [client, hidden]);
+  }, [client, hidden, getAccessToken, docCount]);
+
 
   if (hidden) return null;
 

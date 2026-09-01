@@ -9,7 +9,6 @@ export function InteractiveWidgetCustomizer() {
   const [botName, setBotName] = useState("Retriever Concierge");
   const [position, setPosition] = useState("bottom-right");
   const [copied, setCopied] = useState(false);
-  const [widgetMounted, setWidgetMounted] = useState(false);
 
   const snippet = `<script
   src="https://prateeq.in/widget.js"
@@ -26,12 +25,6 @@ export function InteractiveWidgetCustomizer() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleTestLive = () => {
-    // A browser-visible demo key would be a public credential. The preview is
-    // therefore deliberately kept credential-free; test the generated snippet
-    // after creating a tenant-scoped API key in the studio.
-    setWidgetMounted(true);
-  };
 
   return (
     <section className={styles.customizerSection} id="widget-builder">
@@ -109,11 +102,12 @@ export function InteractiveWidgetCustomizer() {
 
             <div className={styles.actionRow}>
               <MagneticButton strength={0.25}>
-                <button className="comic-btn comic-btn-blue" onClick={handleTestLive}>
-                  {widgetMounted ? "✓ Configure a workspace to test" : "🔐 Test with your workspace key"}
-                </button>
+                <a href="/rag/app" className="comic-btn comic-btn-blue" style={{ textDecoration: "none", display: "inline-block" }}>
+                  🚀 Launch SaaS Studio to Test Live
+                </a>
               </MagneticButton>
             </div>
+
           </div>
 
           {/* Right: Code Block */}

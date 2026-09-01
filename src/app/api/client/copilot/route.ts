@@ -59,6 +59,8 @@ export async function POST(req: NextRequest) {
     // 2. Build Structured Grounding Citations
     const citations: Array<{ id: string; label: string; type: 'sow' | 'milestone' | 'change_order' | 'sla' }> = [];
 
+    let changeOrdersList: Array<{ change_order_number: string; added_features?: string[]; status?: string }> = [];
+
     if (activeScope.scope_code) {
       citations.push({
         id: `sow-${activeScope.scope_code}`,
@@ -73,6 +75,7 @@ export async function POST(req: NextRequest) {
         .order('created_at', { ascending: true });
 
       if (coData && coData.length > 0) {
+        changeOrdersList = coData;
         const approvedCos = coData.filter((co) => co.status === 'approved' || co.status === 'paid');
         approvedCos.forEach((co) => {
           citations.push({
@@ -134,13 +137,25 @@ export async function POST(req: NextRequest) {
           ? 'Phase 2: Core Engineering'
           : 'Phase 1: Architecture & Specs';
 
+      const changeOrderSummary =
+        changeOrdersList.length > 0
+          ? changeOrdersList
+              .filter((co) => co.status === 'approved' || co.status === 'paid')
+              .map(
+                (co) =>
+                  `• **Change Order ${co.change_order_number}:** ${(co.added_features || []).join(', ')}`
+              )
+              .join('\n')
+          : '';
+
       answerText = [
         `**Project Scope Overview (${activeScope.company_name || activeScope.scope_code})**`,
         `• **Architecture Engine:** ${engineTitle}`,
         `• **Features:** ${featuresList}`,
         `• **Timeline:** ${timeline} (${stageLabel})`,
-        `• **Commercial Investment:** ${costINR} ${costUSD ? `(${costUSD})` : ''} • Deposit: ${activeScope.deposit_paid ? '✅ Confirmed (50%)' : '⏳ Pending'}`,
+        `• **Commercial Investment:** ${costINR} ${costUSD ? `(${costUSD})` : ''} • Terms: 50/50 Deposit & Completion • Deposit: ${activeScope.deposit_paid ? '✅ Confirmed (50%)' : '⏳ Pending'}`,
         `• **Warranty & Maintenance:** ${maintenance}`,
+        changeOrderSummary,
         sowHash ? `• **SOW Cryptographic Baseline:** \`${sowHash.slice(0, 16)}...\` (Locked)` : '',
       ]
         .filter(Boolean)

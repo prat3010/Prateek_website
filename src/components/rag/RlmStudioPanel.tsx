@@ -65,9 +65,27 @@ export function RlmStudioPanel({ client, hidden, isExpired }: RlmStudioPanelProp
 
   const executions = result?.code_executions || [];
   const currentExecution = executions[selectedTurn] as Record<string, unknown> | undefined;
-  const currentCode = typeof currentExecution?.code === "string" ? currentExecution.code : "";
-  const currentStdout = typeof currentExecution?.stdout === "string" ? currentExecution.stdout : "";
-  const currentResult = typeof currentExecution?.result === "string" ? currentExecution.result : "";
+  const currentCode =
+    typeof currentExecution?.code === "string"
+      ? currentExecution.code
+      : typeof currentExecution?.script === "string"
+        ? currentExecution.script
+        : "";
+  const currentStdout =
+    typeof currentExecution?.stdout === "string"
+      ? currentExecution.stdout
+      : typeof currentExecution?.output === "string"
+        ? currentExecution.output
+        : "";
+  const currentResult =
+    typeof currentExecution?.result === "string"
+      ? currentExecution.result
+      : typeof currentExecution?.return_value === "string"
+        ? currentExecution.return_value
+        : currentExecution?.return_value
+          ? JSON.stringify(currentExecution.return_value, null, 2)
+          : "";
+
 
   return (
     <div className={styles.panel}>

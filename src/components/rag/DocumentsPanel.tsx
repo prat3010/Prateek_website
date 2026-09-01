@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { RetrieverClient } from "@/lib/rag-client";
-import type { DocumentMeta } from "@/lib/rag-types";
+import type { DocumentMeta, GraphQueryResponse, GraphSummaryResponse, EntityTripleItem } from "@/lib/rag-types";
 import styles from "./rag.module.css";
 
 type DocSubTab = "library" | "graph" | "schema" | "connectors";
@@ -16,13 +16,20 @@ export function DocumentsPanel({ client, hidden, isExpired }: { client: Retrieve
   const [error, setError] = useState("");
 
   // Doc-to-JSON state
+  const [selectedDocId, setSelectedDocId] = useState<string>("");
+  const [extracting, setExtracting] = useState<boolean>(false);
   const [jsonSchema, setJsonSchema] = useState<string>(`{\n  "invoice_number": "string",\n  "total_amount": "number",\n  "vendor_name": "string"\n}`);
   const [extractedJson, setExtractedJson] = useState<string>("");
 
-  // Web Crawler & Importer State
-  const [webUrl, setWebUrl] = useState<string>("");
-  const [crawlingUrl, setCrawlingUrl] = useState<boolean>(false);
-  const [crawlSuccess, setCrawlSuccess] = useState<string | null>(null);
+  // Real Knowledge Graph state
+  const [graphEntity, setGraphEntity] = useState<string>("");
+  const [graphHops, setGraphHops] = useState<number>(2);
+  const [graphLoading, setGraphLoading] = useState<boolean>(false);
+  const [graphResult, setGraphResult] = useState<GraphQueryResponse | null>(null);
+  const [graphSummary, setGraphSummary] = useState<GraphSummaryResponse | null>(null);
+  const [deletingTripleId, setDeletingTripleId] = useState<string | null>(null);
+
+
 
   const fetchDocs = useCallback(async () => {
     if (!client) return;
@@ -87,43 +94,66 @@ export function DocumentsPanel({ client, hidden, isExpired }: { client: Retrieve
     }
   }
 
-  const handleRunSchemaExtraction = () => {
-    setExtractedJson(JSON.stringify({
-      invoice_number: "INV-2026-0891",
-      total_amount: 1450.00,
-      vendor_name: "Acme Cloud Services Inc.",
-      line_items: [
-        { item: "Vector DB Storage Hosting", amount: 950.00 },
-        { item: "Cohere Rerank API Calls", amount: 500.00 }
-      ],
-      extraction_confidence: "98.4%"
-    }, null, 2));
-  };
+  useEffect(() => {
+    if (subTab === "graph" && client) {
+      client.getGraphSummary().then(setGraphSummary).catch(() => {});
+    }
+  }, [subTab, client]);
 
-  const handleCrawlWebPage = async () => {
-    if (!webUrl.trim() || !client || crawlingUrl) return;
-    setCrawlingUrl(true);
+  const handleTraverseGraph = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!graphEntity.trim() || !client || graphLoading) return;
+    setGraphLoading(true);
     setError("");
-    setCrawlSuccess(null);
     try {
-      let domain = "web-page";
-      try {
-        domain = new URL(webUrl).hostname.replace("www.", "");
-      } catch {}
-      const webFilename = `web_${domain.replace(/[^a-zA-Z0-9]/g, "_")}.txt`;
-      const webContent = `Web Page Source URL: ${webUrl}\nIngestion Timestamp: ${new Date().toISOString()}\n\nContent extracted from ${webUrl}:\n\nThis web page contains domain architecture specs, API contract references, and compliance guidelines for ${domain}.`;
-
-      const file = new File([webContent], webFilename, { type: "text/plain" });
-      await client.uploadDocument(file);
-      setCrawlSuccess(`Successfully crawled and ingested ${webFilename}!`);
-      setWebUrl("");
-      fetchDocs();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to crawl web URL");
+      const res = await client.queryGraph(graphEntity.trim(), graphHops);
+      setGraphResult(res);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Knowledge graph query failed");
     } finally {
-      setCrawlingUrl(false);
+      setGraphLoading(false);
     }
   };
+
+  const handleDeleteTriple = async (tripleId: string) => {
+    if (!client || deletingTripleId) return;
+    setDeletingTripleId(tripleId);
+    setError("");
+    try {
+      await client.deleteTriple(tripleId);
+      if (graphResult) {
+        setGraphResult({
+          ...graphResult,
+          triples: graphResult.triples.filter((t: EntityTripleItem) => t.triple_id !== tripleId),
+        });
+      }
+
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to delete triple");
+    } finally {
+      setDeletingTripleId(null);
+    }
+  };
+
+  const handleRunSchemaExtraction = async () => {
+    if (!client) return;
+    if (!selectedDocId) {
+      setError("Please select an uploaded document to extract structured data from.");
+      return;
+    }
+    setExtracting(true);
+    setError("");
+    setExtractedJson("");
+    try {
+      const res = await client.extractDocument(selectedDocId, jsonSchema);
+      setExtractedJson(JSON.stringify(res.data, null, 2));
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Schema extraction failed");
+    } finally {
+      setExtracting(false);
+    }
+  };
+
 
   return (
     <div className={styles.panel}>
@@ -239,54 +269,135 @@ export function DocumentsPanel({ client, hidden, isExpired }: { client: Retrieve
 
       {/* Sub-Tab 2: GraphRAG Entity Triples Visualizer */}
       {subTab === "graph" && (
-        <div>
-          <div className={styles.graphCanvas}>
-            <svg width="100%" height="240" viewBox="0 0 600 240" style={{ maxWidth: "600px" }}>
-              {/* Graph Connections */}
-              <line x1="120" y1="120" x2="300" y2="60" stroke="#5A8EB6" strokeWidth="2" strokeDasharray="4 2" />
-              <line x1="300" y1="60" x2="480" y2="120" stroke="#00E676" strokeWidth="2" />
-              <line x1="120" y1="120" x2="300" y2="180" stroke="#8b5cf6" strokeWidth="2" />
-              <line x1="300" y1="180" x2="480" y2="120" stroke="#FFB300" strokeWidth="2" />
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          {graphSummary && (
+            <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", fontSize: "0.8rem", background: "var(--surface-elevated, #16161a)", padding: "0.75rem 1rem", borderRadius: "8px", border: "1px solid var(--color-border, #333)" }}>
+              <span>🗄️ Engine: <strong>{graphSummary.storage_engine.toUpperCase()}</strong></span>
+              <span>🔗 Total Triples: <strong>{graphSummary.total_triples}</strong></span>
+              <span>🏷️ Unique Entities: <strong>{graphSummary.unique_entities}</strong></span>
+              {graphSummary.neo4j_status && <span>⚡ Neo4j: <strong>{graphSummary.neo4j_status}</strong></span>}
+            </div>
+          )}
 
-              {/* Node 1: Subject */}
-              <g transform="translate(120, 120)">
-                <circle r="32" fill="var(--surface-elevated)" stroke="#5A8EB6" strokeWidth="2" />
-                <text textAnchor="middle" dy="4" fill="var(--color-text)" fontSize="11" fontWeight="600">Company PDF</text>
-              </g>
+          <form onSubmit={handleTraverseGraph} style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+            <input
+              className={styles.input}
+              type="text"
+              aria-label="Root Entity to traverse"
+              placeholder="Enter entity name (e.g. Authentication, PostgreSQL, Security)..."
+              value={graphEntity}
+              onChange={(e) => setGraphEntity(e.target.value)}
+              style={{ flex: "1 1 240px", marginBottom: 0 }}
+            />
+            <select
+              className={styles.input}
+              value={graphHops}
+              onChange={(e) => setGraphHops(Number(e.target.value))}
+              aria-label="Max Hops Depth"
+              style={{ width: "120px", marginBottom: 0 }}
+            >
+              <option value={1}>1 Hop Depth</option>
+              <option value={2}>2 Hops Depth</option>
+              <option value={3}>3 Hops Depth</option>
+            </select>
+            <button
+              type="submit"
+              className="comic-btn comic-btn-blue"
+              disabled={!graphEntity.trim() || graphLoading || !client}
+            >
+              {graphLoading ? "Traversing..." : "🔍 Traverse Entity Graph"}
+            </button>
+          </form>
 
-              {/* Node 2: Entity */}
-              <g transform="translate(300, 60)">
-                <circle r="28" fill="var(--surface-elevated)" stroke="#00E676" strokeWidth="2" />
-                <text textAnchor="middle" dy="4" fill="var(--color-text)" fontSize="10">ISO Security</text>
-              </g>
+          {graphResult ? (
+            <div style={{ background: "var(--surface-card, rgba(255, 255, 255, 0.02))", border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1rem" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
+                <span style={{ fontSize: "0.85rem", fontWeight: 600 }}>
+                  Entity Subgraph for &quot;{graphResult.root_entity}&quot; ({graphResult.triples.length} triples, {graphResult.connected_entities.length} connected entities)
+                </span>
+              </div>
 
-              {/* Node 3: Entity */}
-              <g transform="translate(300, 180)">
-                <circle r="28" fill="var(--surface-elevated)" stroke="#8b5cf6" strokeWidth="2" />
-                <text textAnchor="middle" dy="4" fill="var(--color-text)" fontSize="10">HIPAA Data</text>
-              </g>
+              {graphResult.connected_entities.length > 0 && (
+                <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", marginBottom: "1rem" }}>
+                  {graphResult.connected_entities.map((ent: string) => (
+                    <button
+                      key={ent}
+                      type="button"
+                      onClick={() => {
+                        setGraphEntity(ent);
+                        client?.queryGraph(ent, graphHops).then(setGraphResult).catch(() => {});
+                      }}
+                      style={{
+                        background: "var(--surface-elevated, #222)",
+                        border: "1px solid var(--color-border, #444)",
+                        borderRadius: "12px",
+                        padding: "0.2rem 0.6rem",
+                        fontSize: "0.75rem",
+                        cursor: "pointer",
+                        color: "var(--color-text, #fff)",
+                      }}
+                      title="Click to pivot graph traversal to this entity"
+                    >
+                      {ent}
+                    </button>
+                  ))}
+                </div>
+              )}
 
-              {/* Node 4: Target */}
-              <g transform="translate(480, 120)">
-                <circle r="32" fill="var(--surface-elevated)" stroke="#FFB300" strokeWidth="2" />
-                <text textAnchor="middle" dy="4" fill="var(--color-text)" fontSize="11" fontWeight="600">Compliance</text>
-              </g>
+              {graphResult.triples.length === 0 ? (
+                <p style={{ fontSize: "0.8rem", color: "var(--color-text-muted, #888)", margin: 0 }}>
+                  No relationships or triples found for &quot;{graphResult.root_entity}&quot;. Try ingesting more documents or querying another entity.
+                </p>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                  {graphResult.triples.map((t: EntityTripleItem) => (
+                    <div
+                      key={t.triple_id}
 
-              {/* Predicate Labels */}
-              <text x="210" y="80" fill="#5A8EB6" fontSize="10" textAnchor="middle">requires ➔</text>
-              <text x="390" y="80" fill="#00E676" fontSize="10" textAnchor="middle">validates ➔</text>
-              <text x="210" y="160" fill="#8b5cf6" fontSize="10" textAnchor="middle">enforces ➔</text>
-            </svg>
-          </div>
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        padding: "0.45rem 0.75rem",
+                        background: "var(--surface-elevated, #1a1a20)",
+                        borderRadius: "6px",
+                        fontSize: "0.8rem",
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+                        <span style={{ color: "#5A8EB6", fontWeight: 600 }}>{t.subject}</span>
+                        <span style={{ color: "#00E676", fontSize: "0.75rem" }}>── {t.predicate} ──&gt;</span>
+                        <span style={{ color: "#FFB300", fontWeight: 600 }}>{t.object}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => t.triple_id && handleDeleteTriple(t.triple_id)}
+                        disabled={!t.triple_id || deletingTripleId === t.triple_id}
 
-          <div style={{ marginTop: "1rem", background: "var(--color-bg, #111)", padding: "0.85rem", borderRadius: "6px", fontSize: "0.85rem" }}>
-            <strong>Extracted Knowledge Triples:</strong>
-            <ul style={{ margin: "0.5rem 0 0", paddingLeft: "1.25rem", opacity: 0.85 }}>
-              <li><code>Company PDF ➔ requires ➔ ISO Security Standard</code></li>
-              <li><code>ISO Security Standard ➔ validates ➔ Enterprise Compliance</code></li>
-              <li><code>Company PDF ➔ enforces ➔ HIPAA Data Privacy</code></li>
-            </ul>
-          </div>
+                        style={{
+                          background: "transparent",
+                          border: "none",
+                          color: "#ff5252",
+                          cursor: "pointer",
+                          fontSize: "0.8rem",
+                          padding: "0.2rem 0.4rem",
+                        }}
+                        title="Delete this triple from knowledge graph"
+                      >
+                        {deletingTripleId === t.triple_id ? "..." : "✕"}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div style={{ textAlign: "center", padding: "2rem", background: "var(--surface-card, rgba(255,255,255,0.01))", borderRadius: "8px", border: "1px dashed var(--color-border, #333)" }}>
+              <p style={{ fontSize: "0.85rem", color: "var(--color-text-muted, #888)", margin: 0 }}>
+                Enter an entity keyword above to query recursive multi-hop relational paths stored in PostgreSQL pgvector / Neo4j.
+              </p>
+            </div>
+          )}
         </div>
       )}
 
@@ -294,30 +405,52 @@ export function DocumentsPanel({ client, hidden, isExpired }: { client: Retrieve
       {subTab === "schema" && (
         <div>
           <p style={{ fontSize: "0.85rem", color: "var(--color-text-muted, #888)", marginBottom: "0.75rem" }}>
-            Specify a target JSON Schema to extract structured JSON objects from invoices, medical reports, or unstructured contracts.
+            Select an ingested document from your library and specify a target JSON schema. The LLM will parse unstructured text chunks directly into validated JSON.
           </p>
+
+          <div style={{ marginBottom: "1rem" }}>
+            <label className={styles.label}>Select Ingested Document</label>
+            <select
+              className={styles.input}
+              value={selectedDocId}
+              onChange={(e) => setSelectedDocId(e.target.value)}
+              aria-label="Select Document for JSON Schema Extraction"
+            >
+              <option value="">-- Choose a document ({docs?.length ?? 0} available) --</option>
+              {docs?.map((d) => (
+                <option key={d.documentId} value={d.documentId}>
+                  {d.filename} ({d.chunksCount ?? 0} chunks)
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className={styles.row}>
             <div>
               <label className={styles.label}>Target JSON Schema</label>
               <textarea
                 className={styles.input}
                 aria-label="Target JSON Schema"
-                style={{ height: "140px", fontFamily: "monospace", fontSize: "0.8rem" }}
+                style={{ height: "160px", fontFamily: "monospace", fontSize: "0.8rem" }}
                 value={jsonSchema}
                 onChange={(e) => setJsonSchema(e.target.value)}
               />
-              <button onClick={handleRunSchemaExtraction} className="comic-btn comic-btn-blue">
-                ⚡ Extract Structured JSON
+              <button
+                onClick={handleRunSchemaExtraction}
+                disabled={extracting || !selectedDocId || !client}
+                className="comic-btn comic-btn-blue"
+              >
+                {extracting ? "⚡ Extracting via LLM..." : "⚡ Extract Structured JSON"}
               </button>
             </div>
 
             <div>
-              <label className={styles.label}>Validated JSON Output</label>
+              <label className={styles.label}>Validated LLM Output</label>
               <textarea
                 className={styles.input}
                 aria-label="Validated JSON Output"
-                style={{ height: "140px", fontFamily: "monospace", fontSize: "0.8rem", color: "#00E676" }}
-                value={extractedJson || "// Output will appear here..."}
+                style={{ height: "160px", fontFamily: "monospace", fontSize: "0.8rem", color: "#00E676" }}
+                value={extractedJson || "// Output will appear here once extracted..."}
                 readOnly
               />
             </div>
@@ -328,55 +461,54 @@ export function DocumentsPanel({ client, hidden, isExpired }: { client: Retrieve
       {/* Sub-Tab 4: Cloud Connectors & Web Crawler */}
       {subTab === "connectors" && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-          {/* Live Web URL Importer Form */}
           <div style={{ background: "var(--surface-card, rgba(255, 255, 255, 0.02))", border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1.25rem" }}>
-            <h4 style={{ margin: "0 0 0.5rem", fontSize: "0.95rem" }}>🌐 Import Knowledge from Web URL</h4>
-            <p style={{ fontSize: "0.8rem", color: "var(--color-text-muted, #888)", margin: "0 0 1rem" }}>
-              Enter any documentation website URL to crawl and ingest text content into your vector knowledge base.
+            <h4 style={{ margin: "0 0 0.5rem", fontSize: "0.95rem" }}>🌐 Managed Ingestion Connectors</h4>
+            <p style={{ fontSize: "0.8rem", color: "var(--color-text-muted, #888)", margin: "0 0 1rem", lineHeight: 1.5 }}>
+              Enterprise data sources sync automatically via scheduled background workers on your dedicated Retriever container instance.
             </p>
-            <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-              <input
-                className={styles.input}
-                type="url"
-                aria-label="Web URL to crawl and index"
-                placeholder="https://docs.example.com/api-reference"
-                value={webUrl}
-                onChange={(e) => setWebUrl(e.target.value)}
-                disabled={crawlingUrl || isExpired || !client}
-                style={{ flex: "1 1 300px", marginBottom: 0 }}
-              />
-              <button
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "1rem" }}>
+              <div style={{ border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1rem", background: "var(--surface-elevated, #16161a)" }}>
+                <h4 style={{ margin: "0 0 0.25rem" }}>🌐 Web Crawler Pipeline</h4>
+                <p style={{ fontSize: "0.75rem", opacity: 0.75, margin: "0 0 0.75rem" }}>
+                  Trafilatura + Playwright crawler indexing external documentation into pgvector with cron-based delta updates.
+                </p>
+                <span style={{ fontSize: "0.7rem", color: "#00E676", fontWeight: 600 }}>Active in Enterprise Cluster</span>
+              </div>
+
+              <div style={{ border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1rem", background: "var(--surface-elevated, #16161a)" }}>
+                <h4 style={{ margin: "0 0 0.25rem" }}>📁 Google Drive Integration</h4>
+                <p style={{ fontSize: "0.75rem", opacity: 0.75, margin: "0 0 0.75rem" }}>
+                  Bidirectional webhook listener for shared drive folders, indexing PDFs, Sheets, and Docx files automatically.
+                </p>
+                <span style={{ fontSize: "0.7rem", color: "#5A8EB6", fontWeight: 600 }}>Provisioned via Admin Dashboard</span>
+              </div>
+
+              <div style={{ border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1rem", background: "var(--surface-elevated, #16161a)" }}>
+                <h4 style={{ margin: "0 0 0.25rem" }}>📝 Notion Knowledge Workspace</h4>
+                <p style={{ fontSize: "0.75rem", opacity: 0.75, margin: "0 0 0.75rem" }}>
+                  Syncs company wikis and internal databases directly into multi-tenant collections with permission preservation.
+                </p>
+                <span style={{ fontSize: "0.7rem", color: "#5A8EB6", fontWeight: 600 }}>Provisioned via Admin Dashboard</span>
+              </div>
+            </div>
+
+            <div style={{ marginTop: "1.25rem", padding: "0.75rem 1rem", background: "var(--surface-card, rgba(0,0,0,0.2))", borderRadius: "6px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
+              <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted, #888)" }}>
+                Need a dedicated connector or private cloud storage sync?
+              </span>
+              <a
+                href="/scoping?engine=saas&goal=ai_rag_app"
                 className="comic-btn comic-btn-blue"
-                onClick={handleCrawlWebPage}
-                disabled={!webUrl.trim() || crawlingUrl || isExpired || !client}
+                style={{ fontSize: "0.75rem", padding: "0.4rem 0.8rem", textDecoration: "none" }}
               >
-                {crawlingUrl ? "Crawling Web Page..." : "🌐 Crawl & Ingest Web Page"}
-              </button>
-            </div>
-            {crawlSuccess && <p style={{ fontSize: "0.8rem", color: "#00E676", margin: "0.75rem 0 0" }}>{crawlSuccess}</p>}
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem" }}>
-            <div style={{ border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1rem" }}>
-              <h4>📁 Google Drive Sync</h4>
-              <p style={{ fontSize: "0.8rem", opacity: 0.7, margin: "0.25rem 0 0.75rem" }}>Sync PDF & Docx folders automatically.</p>
-              <button className="comic-btn comic-btn-outline" style={{ fontSize: "0.75rem" }}>Connect Google Drive</button>
-            </div>
-
-            <div style={{ border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1rem" }}>
-              <h4>📝 Notion Workspace</h4>
-              <p style={{ fontSize: "0.8rem", opacity: 0.7, margin: "0.25rem 0 0.75rem" }}>Ingest internal Notion documentation pages.</p>
-              <button className="comic-btn comic-btn-outline" style={{ fontSize: "0.75rem" }}>Connect Notion</button>
-            </div>
-
-            <div style={{ border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1rem" }}>
-              <h4>⚡ Automated Web Crawler</h4>
-              <p style={{ fontSize: "0.8rem", opacity: 0.7, margin: "0.25rem 0 0.75rem" }}>Periodic background site crawler.</p>
-              <button className="comic-btn comic-btn-outline" style={{ fontSize: "0.75rem" }}>Configure Schedule</button>
+                🛠️ Scope Enterprise Connector
+              </a>
             </div>
           </div>
         </div>
       )}
+
 
       {error && <p className={styles.error}>{error}</p>}
     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { type RetrieverConfig } from "@/lib/rag-client";
 import { useAuth } from "@/context/AuthContext";
 import { isValidUrl } from "./utils";
@@ -35,6 +35,27 @@ export function ConfigPanel({
   const [botTitle, setBotTitle] = useState<string>("Retriever AI Support");
   const [welcomeMessage, setWelcomeMessage] = useState<string>("Hi there! How can I help answer questions from our documentation today?");
   const [corsDomain, setCorsDomain] = useState<string>("https://mysite.com");
+  const [contextualHeader, setContextualHeader] = useState<string>("Document Title & Section Scope");
+  const [searchFusionStrategy, setSearchFusionStrategy] = useState<string>("normalized_hybrid");
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && form.tenantId) {
+      const saved = localStorage.getItem(`widget_config_${form.tenantId}`);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed.brandColor) setBrandColor(parsed.brandColor);
+          if (parsed.launcherPosition) setLauncherPosition(parsed.launcherPosition);
+          if (parsed.botTitle) setBotTitle(parsed.botTitle);
+          if (parsed.welcomeMessage) setWelcomeMessage(parsed.welcomeMessage);
+          if (parsed.corsDomain) setCorsDomain(parsed.corsDomain);
+          if (parsed.contextualHeader) setContextualHeader(parsed.contextualHeader);
+          if (parsed.searchFusionStrategy) setSearchFusionStrategy(parsed.searchFusionStrategy);
+        } catch {}
+      }
+    }
+  }, [form.tenantId]);
+
 
   if (hidden) return null;
 
@@ -82,7 +103,20 @@ export function ConfigPanel({
       });
       clearTimeout(timeoutId);
       if (!res.ok) throw new Error(`Backend returned ${res.status}`);
-      setConnectResult({ ok: true, msg: "Connected" });
+
+      if (typeof window !== "undefined" && form.tenantId) {
+        localStorage.setItem(`widget_config_${form.tenantId}`, JSON.stringify({
+          brandColor,
+          launcherPosition,
+          botTitle,
+          welcomeMessage,
+          corsDomain,
+          contextualHeader,
+          searchFusionStrategy,
+        }));
+      }
+
+      setConnectResult({ ok: true, msg: "Connected & Configuration Saved" });
       onSave(form);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Connection failed";
@@ -91,6 +125,7 @@ export function ConfigPanel({
       setConnecting(false);
     }
   }
+
 
   const scriptSnippet = `<script
   src="https://prateeq.in/widget.js"
@@ -254,18 +289,25 @@ export function ConfigPanel({
               <input
                 className={styles.input}
                 aria-label="Anthropic Contextual Prepending Header"
-                defaultValue="Document Title & Section Scope"
+                value={contextualHeader}
+                onChange={(e) => setContextualHeader(e.target.value)}
                 placeholder="Prefix attached to chunk text before vector embedding..."
               />
             </div>
             <div>
               <label className={styles.label}>⚡ Search Fusion Strategy</label>
-              <select className={styles.input} aria-label="Search Fusion Strategy" defaultValue="normalized_hybrid">
+              <select
+                className={styles.input}
+                aria-label="Search Fusion Strategy"
+                value={searchFusionStrategy}
+                onChange={(e) => setSearchFusionStrategy(e.target.value)}
+              >
                 <option value="normalized_hybrid">Normalized Min-Max Hybrid Score Fusion</option>
                 <option value="hybrid_rrf">Standard Reciprocal Rank Fusion (RRF)</option>
               </select>
             </div>
           </div>
+
         </>
       )}
 

@@ -1,21 +1,51 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { RetrieverClient } from "@/lib/rag-client";
 import styles from "./rag.module.css";
 
 interface CachePanelProps {
   hidden?: boolean;
+  client?: RetrieverClient | null;
 }
 
-export function CachePanel({ hidden }: CachePanelProps) {
+export function CachePanel({ hidden, client }: CachePanelProps) {
   const [similarityThreshold, setSimilarityThreshold] = useState<number>(0.95);
-  const [cacheFlushed, setCacheFlushed] = useState<boolean>(false);
+  const [cachedVectors, setCachedVectors] = useState<number | null>(null);
+  const [purging, setPurging] = useState<boolean>(false);
+  const [purgeMessage, setPurgeMessage] = useState<string | null>(null);
+
+  const fetchStats = useCallback(async () => {
+    if (!client) return;
+    try {
+      const stats = await client.getCacheStats();
+      setCachedVectors(stats.total_vectors);
+    } catch {
+      // Fallback
+    }
+  }, [client]);
+
+  useEffect(() => {
+    if (!hidden && client) {
+      fetchStats();
+    }
+  }, [hidden, client, fetchStats]);
 
   if (hidden) return null;
 
-  const handleFlushCache = () => {
-    setCacheFlushed(true);
-    setTimeout(() => setCacheFlushed(false), 3000);
+  const handleFlushCache = async () => {
+    if (!client || purging) return;
+    setPurging(true);
+    setPurgeMessage(null);
+    try {
+      const res = await client.purgeCache();
+      setCachedVectors(0);
+      setPurgeMessage(`✓ Successfully purged semantic cache (${res.deleted_count ?? 0} query vectors deleted).`);
+    } catch (e: unknown) {
+      setPurgeMessage(e instanceof Error ? e.message : "Cache purge failed");
+    } finally {
+      setPurging(false);
+    }
   };
 
   return (
@@ -23,7 +53,7 @@ export function CachePanel({ hidden }: CachePanelProps) {
       <div className={styles.panelHeaderGroup}>
         <h2 className={styles.panelTitle}>⚡ Sub-50ms Semantic Cache Management</h2>
         <p className={styles.panelDesc}>
-          Save query latency and token financial costs by fine-tuning vector semantic hit thresholds and flushing stale cached responses.
+          Save query latency and token financial costs by caching high-confidence query embeddings in PostgreSQL pgvector.
         </p>
       </div>
 
@@ -34,15 +64,15 @@ export function CachePanel({ hidden }: CachePanelProps) {
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", fontSize: "0.875rem" }}>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               <span>Total Cached Embeddings:</span>
-              <strong>{cacheFlushed ? "0 vectors" : "0 vectors (Active)"}</strong>
+              <strong>{cachedVectors !== null ? `${cachedVectors} vectors` : "Checking pgvector..."}</strong>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span>Average Response Latency:</span>
-              <strong style={{ color: "#00E676" }}>-- ms</strong>
+              <span>Cache Strategy:</span>
+              <strong style={{ color: "#00E676" }}>pgvector HNSW Cosine Distance</strong>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span>Est. Tokens Saved (30 Days):</span>
-              <strong>0 tokens ($0.00)</strong>
+              <span>Cache TTL:</span>
+              <strong>24 Hours (Rolling Expiry)</strong>
             </div>
           </div>
         </div>
@@ -51,7 +81,7 @@ export function CachePanel({ hidden }: CachePanelProps) {
         <div style={{ background: "var(--surface-card, rgba(255, 255, 255, 0.03))", border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1.25rem" }}>
           <h3 style={{ fontSize: "1rem", margin: "0 0 0.5rem" }}>🎯 Similarity Hit Threshold</h3>
           <p style={{ fontSize: "0.8rem", color: "var(--color-text-muted, #888)", margin: "0 0 1rem" }}>
-            Higher values (e.g. 0.98) enforce strict prompt similarity before returning cached answers.
+            Controls the minimum vector similarity required to return an instantaneous cached answer before invoking the LLM.
           </p>
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.875rem", marginBottom: "0.25rem" }}>
@@ -79,16 +109,25 @@ export function CachePanel({ hidden }: CachePanelProps) {
       <div style={{ background: "rgba(255, 23, 68, 0.06)", border: "1px solid rgba(255, 23, 68, 0.2)", borderRadius: "8px", padding: "1.25rem" }}>
         <h3 style={{ fontSize: "1rem", color: "#FF1744", margin: "0 0 0.5rem" }}>🧹 Cache Invalidation & Purge</h3>
         <p style={{ fontSize: "0.85rem", margin: "0 0 1rem", opacity: 0.8 }}>
-          If knowledge base documents have been significantly modified, flush the semantic cache to prevent outdated answers.
+          If knowledge base documents have been significantly updated, purge the semantic vector cache to ensure responses reflect latest documents.
         </p>
-        <button
-          onClick={handleFlushCache}
-          className="comic-btn comic-btn-outline"
-          style={{ borderColor: "#FF1744", color: "#FF1744" }}
-        >
-          {cacheFlushed ? "✓ Semantic Vector Cache Flushed!" : "Purge Semantic Vector Cache"}
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
+          <button
+            onClick={handleFlushCache}
+            disabled={purging || !client}
+            className="comic-btn comic-btn-outline"
+            style={{ borderColor: "#FF1744", color: "#FF1744" }}
+          >
+            {purging ? "Purging Cache Vectors..." : "Purge Semantic Vector Cache"}
+          </button>
+          {purgeMessage && (
+            <span style={{ fontSize: "0.8rem", color: purgeMessage.startsWith("✓") ? "#00E676" : "#FF1744" }}>
+              {purgeMessage}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
 }
+

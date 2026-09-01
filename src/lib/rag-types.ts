@@ -12,6 +12,7 @@ export interface DocumentMeta {
   filename: string;
   status: string;
   createdAt: string;
+  chunksCount?: number;
 }
 
 export interface SearchResponse {
@@ -40,12 +41,21 @@ export interface CompressionResponse {
 }
 
 export interface ConsensusResponse {
-  answer: string;
-  generator_model: string;
-  critic_model: string;
-  iterations: number;
-  consensus_score: number;
+  answer?: string;
+  final_response?: string;
+  generator_model?: string;
+  generator_used?: string;
+  critic_model?: string;
+  critic_used?: string;
+  iterations?: number;
+  approved_on_round?: number;
+  consensus_score?: number;
+  reflection_history?: Array<Record<string, unknown>>;
+  execution_time_ms?: number;
+  prompt?: string;
+  tenant_id?: string;
 }
+
 
 export interface RlmExecutionResponse {
   tenant_id?: string;
@@ -60,12 +70,41 @@ export interface RlmExecutionResponse {
 }
 
 export interface OnlineEvaluationSummaryResponse {
-  tenant_id: string;
+  tenant_id?: string;
   total_evaluations: number;
   avg_faithfulness: number;
-  avg_context_relevance: number;
-  hallucination_count: number;
+  avg_context_precision?: number;
+  avg_context_relevance?: number;
+  avg_hallucination_index?: number;
+  hallucination_count?: number;
+  total_alerts?: number;
 }
+
+export interface EntityTripleItem {
+  triple_id?: string;
+  subject: string;
+  predicate: string;
+  object: string;
+  chunk_id?: string;
+  confidence?: number;
+}
+
+
+export interface GraphSummaryResponse {
+  tenant_id: string;
+  total_triples: number;
+  unique_entities: number;
+  storage_engine: string;
+  neo4j_status?: string;
+}
+
+export interface GraphQueryResponse {
+  root_entity: string;
+  max_hops: number;
+  triples: EntityTripleItem[];
+  connected_entities: string[];
+}
+
 
 export interface ClaimClassification {
   claim: string;
@@ -104,6 +143,46 @@ export interface LoraTrainResponse {
   rank: number;
   loss_score: number;
   message: string;
+}
+
+export interface ProjectedPoint {
+  chunk_id: string;
+  document_id: string;
+  document_title: string;
+  coordinates: number[];
+  cluster_id: number;
+  cluster_label: string;
+  text_preview: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface ProjectionCentroid {
+  cluster_id: number;
+  cluster_label: string;
+  coordinates: number[];
+  chunk_count: number;
+}
+
+export interface EmbeddingProjectionRequest {
+  method?: "pca" | "tsne" | "umap";
+  dimensions?: 2 | 3;
+  perplexity?: number;
+  n_neighbors?: number;
+  min_dist?: number;
+  normalize?: boolean;
+  query_vector?: number[];
+}
+
+export interface EmbeddingProjectionResponse {
+  tenant_id: string;
+  total_points: number;
+  dimensions: number;
+  method_used: string;
+  points: ProjectedPoint[];
+  centroids: ProjectionCentroid[];
+  variance_explained?: number[] | null;
+  silhouette_score?: number | null;
+  query_point?: ProjectedPoint | null;
 }
 
 

@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { RetrieverClient } from "@/lib/rag-client";
-import type { SearchResponse } from "@/lib/rag-types";
+import type { SearchResponse, OnlineEvaluationSummaryResponse } from "@/lib/rag-types";
 import { highlightText } from "./utils";
 import styles from "./rag.module.css";
 
-type SearchSubTab = "search" | "benchmarks" | "abtest";
+type SearchSubTab = "search" | "benchmarks" | "pipeline";
 
 export function SearchPanel({ client, hidden }: { client: RetrieverClient | null; hidden: boolean }) {
   const [subTab, setSubTab] = useState<SearchSubTab>("search");
@@ -19,9 +19,28 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
   const [enableLora, setEnableLora] = useState(false);
   const [rerankerEngine, setRerankerEngine] = useState<"colbert" | "cohere" | "none">("colbert");
 
-  // Ragas benchmark runner state
-  const [runningBenchmark, setRunningBenchmark] = useState(false);
-  const [benchmarkDone, setBenchmarkDone] = useState(false);
+  // Real Online Evaluation Telemetry State
+  const [onlineEval, setOnlineEval] = useState<OnlineEvaluationSummaryResponse | null>(null);
+  const [loadingEval, setLoadingEval] = useState(false);
+
+  const fetchOnlineEval = useCallback(async () => {
+    if (!client) return;
+    setLoadingEval(true);
+    try {
+      const summary = await client.getOnlineEvaluationSummary();
+      setOnlineEval(summary);
+    } catch {
+      // Keep null if not recorded yet
+    } finally {
+      setLoadingEval(false);
+    }
+  }, [client]);
+
+  useEffect(() => {
+    if (subTab === "benchmarks") {
+      fetchOnlineEval();
+    }
+  }, [subTab, fetchOnlineEval]);
 
   if (hidden) return null;
 
@@ -44,14 +63,7 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
     }
   }
 
-  const handleRunBenchmark = () => {
-    setRunningBenchmark(true);
-    setBenchmarkDone(false);
-    setTimeout(() => {
-      setRunningBenchmark(false);
-      setBenchmarkDone(true);
-    }, 2000);
-  };
+
 
   return (
     <div className={styles.panel}>
@@ -72,15 +84,16 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
           onClick={() => setSubTab("benchmarks")}
           className={`${styles.subTabBtn} ${subTab === "benchmarks" ? styles.subTabBtnActive : ""}`}
         >
-          🧪 Ragas Quality Benchmarks
+          📊 Online Evaluator & Ragas
         </button>
         <button
-          onClick={() => setSubTab("abtest")}
-          className={`${styles.subTabBtn} ${subTab === "abtest" ? styles.subTabBtnActive : ""}`}
+          onClick={() => setSubTab("pipeline")}
+          className={`${styles.subTabBtn} ${subTab === "pipeline" ? styles.subTabBtnActive : ""}`}
         >
-          ⚖️ A/B Variant Playground
+          ⚙️ Active Pipeline Inspector
         </button>
       </div>
+
 
       {/* Sub-Tab 1: Hybrid Search Debugger */}
       {subTab === "search" && (
@@ -241,66 +254,71 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
         </div>
       )}
 
-      {/* Sub-Tab 2: Ragas & DeepEval Automated Benchmarks */}
+
+      {/* Sub-Tab 2: Online Evaluations & Ragas Telemetry */}
       {subTab === "benchmarks" && (
         <div>
-          <div style={{ marginBottom: "1.25rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <p style={{ fontSize: "0.85rem", opacity: 0.8, margin: 0 }}>
-              Run automated benchmark evaluation suites against your uploaded test questions to verify accuracy.
+          <div style={{ marginBottom: "1.25rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
+            <p style={{ fontSize: "0.85rem", color: "var(--color-text-muted, #888)", margin: 0 }}>
+              Live telemetry aggregated from verified chat responses, evaluating context faithfulness, prompt relevancy, and NLI entailment.
             </p>
-            <button onClick={handleRunBenchmark} className="comic-btn comic-btn-blue" disabled={runningBenchmark}>
-              {runningBenchmark ? "Evaluating Ragas Suite…" : "▶️ Run Ragas Benchmark Suite"}
+            <button onClick={fetchOnlineEval} className="comic-btn comic-btn-blue" disabled={loadingEval}>
+              {loadingEval ? "Refreshing..." : "🔄 Refresh Telemetry"}
             </button>
           </div>
 
           <div className={styles.benchmarkGrid}>
             <div className={styles.scoreCard}>
               <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textTransform: "uppercase" }}>Faithfulness Score</span>
-              <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem", color: benchmarkDone ? "var(--badge-active-color, #00E676)" : "var(--color-text-muted)" }}>
-                {benchmarkDone ? "96.4%" : "--"}
+              <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem", color: onlineEval && onlineEval.total_evaluations > 0 ? "var(--badge-active-color, #00E676)" : "var(--color-text-muted)" }}>
+                {onlineEval && onlineEval.total_evaluations > 0 ? `${(onlineEval.avg_faithfulness * 100).toFixed(1)}%` : "--"}
               </div>
               <span style={{ fontSize: "0.75rem", opacity: 0.7 }}>Is answer backed by document text?</span>
             </div>
 
             <div className={styles.scoreCard}>
-              <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textTransform: "uppercase" }}>Answer Relevancy</span>
-              <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem", color: benchmarkDone ? "var(--badge-active-color, #00E676)" : "var(--color-text-muted)" }}>
-                {benchmarkDone ? "93.2%" : "--"}
+              <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textTransform: "uppercase" }}>Context Precision</span>
+              <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem", color: onlineEval && onlineEval.total_evaluations > 0 ? "var(--badge-active-color, #00E676)" : "var(--color-text-muted)" }}>
+                {onlineEval && onlineEval.total_evaluations > 0 && onlineEval.avg_context_precision != null ? `${(onlineEval.avg_context_precision * 100).toFixed(1)}%` : "--"}
               </div>
-              <span style={{ fontSize: "0.75rem", opacity: 0.7 }}>Does answer directly address prompt?</span>
+              <span style={{ fontSize: "0.75rem", opacity: 0.7 }}>Signal-to-noise ratio of retrieved chunks</span>
             </div>
 
             <div className={styles.scoreCard}>
-              <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textTransform: "uppercase" }}>Context Recall</span>
-              <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem", color: benchmarkDone ? "var(--pop-blue, #5A8EB6)" : "var(--color-text-muted)" }}>
-                {benchmarkDone ? "90.1%" : "--"}
+              <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textTransform: "uppercase" }}>Hallucination Risk</span>
+              <div style={{ fontSize: "1.75rem", fontWeight: 700, margin: "0.5rem 0 0.25rem", color: onlineEval && onlineEval.total_evaluations > 0 ? "var(--pop-blue, #5A8EB6)" : "var(--color-text-muted)" }}>
+                {onlineEval && onlineEval.total_evaluations > 0 && onlineEval.avg_hallucination_index != null ? `${(onlineEval.avg_hallucination_index * 100).toFixed(1)}%` : "--"}
               </div>
-              <span style={{ fontSize: "0.75rem", opacity: 0.7 }}>Did retrieval pull all relevant chunks?</span>
+              <span style={{ fontSize: "0.75rem", opacity: 0.7 }}>Unverified claim ratio across responses</span>
             </div>
+
+          </div>
+
+          <div style={{ marginTop: "1.25rem", padding: "0.85rem 1rem", background: "var(--surface-elevated, #16161a)", borderRadius: "8px", border: "1px solid var(--color-border, #333)", fontSize: "0.8rem" }}>
+            <strong>Evaluation Summary: </strong>
+            <span>{onlineEval?.total_evaluations ?? 0} verified query evaluations logged. {onlineEval?.total_alerts ?? 0} hallucination threshold alerts triggered.</span>
           </div>
         </div>
       )}
 
-      {/* Sub-Tab 3: A/B Testing & Variant Playground */}
-      {subTab === "abtest" && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-          {/* Variant A */}
-          <div style={{ border: "1px solid #5A8EB6", borderRadius: "8px", padding: "1rem", background: "rgba(90, 142, 182, 0.05)" }}>
-            <span style={{ fontSize: "0.75rem", color: "#5A8EB6", fontWeight: 700, textTransform: "uppercase" }}>Variant A (Default Pipeline)</span>
-            <h4 style={{ margin: "0.5rem 0 0.25rem" }}>Hybrid HNSW Vector + Cohere Rerank</h4>
-            <p style={{ fontSize: "0.8rem", opacity: 0.7 }}>Model: Gemini 3.6 Flash | Top K: 5</p>
-            <div style={{ background: "var(--color-bg, #111)", padding: "0.5rem", borderRadius: "4px", fontSize: "0.8rem", margin: "0.5rem 0" }}>
-              Avg Latency: <strong>142 ms</strong> | Est. Cost: <strong>$0.0004 / query</strong>
+      {/* Sub-Tab 3: Active Pipeline Configuration Inspector */}
+      {subTab === "pipeline" && (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1rem" }}>
+          <div style={{ border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1rem", background: "var(--surface-card, rgba(255,255,255,0.02))" }}>
+            <span style={{ fontSize: "0.75rem", color: "#5A8EB6", fontWeight: 700, textTransform: "uppercase" }}>Vector Retrieval Layer</span>
+            <h4 style={{ margin: "0.5rem 0 0.25rem" }}>HNSW Dense + Convex BM25</h4>
+            <p style={{ fontSize: "0.8rem", color: "var(--color-text-muted, #888)", margin: "0 0 0.75rem" }}>Embedding Model: <code>nomic-embed-text</code> (768-dim, cosine distance)</p>
+            <div style={{ background: "var(--surface-elevated, #111)", padding: "0.5rem 0.75rem", borderRadius: "6px", fontSize: "0.8rem" }}>
+              Convex Alpha: <strong>{hybridAlpha}</strong> (Dense weight: {Math.round(hybridAlpha * 100)}% / Sparse: {Math.round((1 - hybridAlpha) * 100)}%)
             </div>
           </div>
 
-          {/* Variant B */}
-          <div style={{ border: "1px solid #8b5cf6", borderRadius: "8px", padding: "1rem", background: "rgba(139, 92, 246, 0.05)" }}>
-            <span style={{ fontSize: "0.75rem", color: "#8b5cf6", fontWeight: 700, textTransform: "uppercase" }}>Variant B (GraphRAG Pipeline)</span>
-            <h4 style={{ margin: "0.5rem 0 0.25rem" }}>GraphRAG Triples + BM25 Keyword</h4>
-            <p style={{ fontSize: "0.8rem", opacity: 0.7 }}>Model: Llama 3.3 70B | Top K: 8</p>
-            <div style={{ background: "var(--color-bg, #111)", padding: "0.5rem", borderRadius: "4px", fontSize: "0.8rem", margin: "0.5rem 0" }}>
-              Avg Latency: <strong>198 ms</strong> | Est. Cost: <strong>$0.0003 / query</strong>
+          <div style={{ border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1rem", background: "var(--surface-card, rgba(255,255,255,0.02))" }}>
+            <span style={{ fontSize: "0.75rem", color: "#00E676", fontWeight: 700, textTransform: "uppercase" }}>Cross-Encoder Reranking</span>
+            <h4 style={{ margin: "0.5rem 0 0.25rem" }}>{rerankerEngine === "colbert" ? "ColBERT MaxSim Late-Interaction" : rerankerEngine === "cohere" ? "Cohere Rerank v3" : "Dense-Only (No Rerank)"}</h4>
+            <p style={{ fontSize: "0.8rem", color: "var(--color-text-muted, #888)", margin: "0 0 0.75rem" }}>Token-level multi-vector late interaction scoring over top candidate chunks.</p>
+            <div style={{ background: "var(--surface-elevated, #111)", padding: "0.5rem 0.75rem", borderRadius: "6px", fontSize: "0.8rem" }}>
+              LoRA Adapter: <strong>{enableLora ? "Active" : "Disabled (Base Model)"}</strong>
             </div>
           </div>
         </div>

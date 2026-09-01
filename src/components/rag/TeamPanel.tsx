@@ -1,48 +1,105 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
 import styles from "./rag.module.css";
 
 interface TeamPanelProps {
   hidden?: boolean;
+  tenantId?: string;
 }
 
-export function TeamPanel({ hidden }: TeamPanelProps) {
-  const { user } = useAuth();
+interface TeamMember {
+  id: string;
+  email: string;
+  role: string;
+  created_at: string;
+}
+
+export function TeamPanel({ hidden, tenantId }: TeamPanelProps) {
+  const { user, getAccessToken } = useAuth();
   const [inviteEmail, setInviteEmail] = useState<string>("");
   const [inviteRole, setInviteRole] = useState<string>("member");
+  const [inviting, setInviting] = useState<boolean>(false);
   const [invitedStatus, setInvitedStatus] = useState<string>("");
+  const [inviteError, setInviteError] = useState<string>("");
+
+  const [members, setMembers] = useState<TeamMember[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState<boolean>(false);
+
+  const fetchMembers = useCallback(async () => {
+    const token = await getAccessToken();
+    if (!token) return;
+    setLoadingMembers(true);
+    try {
+      const q = tenantId ? `?tenantId=${tenantId}` : "";
+      const res = await fetch(`/api/rag/members${q}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setMembers(data.members || []);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setLoadingMembers(false);
+    }
+  }, [getAccessToken, tenantId]);
+
+  useEffect(() => {
+    if (!hidden) {
+      fetchMembers();
+    }
+  }, [hidden, fetchMembers]);
 
   if (hidden) return null;
 
-  const handleInvite = (e: React.FormEvent) => {
+  const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inviteEmail) return;
-    setInvitedStatus(`Invitation sent to ${inviteEmail} as ${inviteRole.toUpperCase()}`);
-    setInviteEmail("");
-    setTimeout(() => setInvitedStatus(""), 4000);
+    setInviting(true);
+    setInviteError("");
+    setInvitedStatus("");
+    try {
+      const token = await getAccessToken();
+      const res = await fetch("/api/rag/invite", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ email: inviteEmail, role: inviteRole, tenantId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setInviteError(data.error || "Failed to send invitation.");
+      } else {
+        setInvitedStatus(`Invitation email sent to ${inviteEmail} as ${inviteRole.toUpperCase()}`);
+        setInviteEmail("");
+        fetchMembers();
+      }
+    } catch (err: unknown) {
+      setInviteError(err instanceof Error ? err.message : "Network error sending invitation");
+    } finally {
+      setInviting(false);
+    }
   };
 
   const handleExportAudit = () => {
-    const fakeAuditData = JSON.stringify(
-      {
-        tenant_id: "rag_tenant_demo",
-        export_time: new Date().toISOString(),
-        sha256_chain_root: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        events: [
-          { timestamp: new Date().toISOString(), action: "DOCUMENT_INGEST", user: "owner@prateeq.in", status: "SUCCESS" },
-          { timestamp: new Date().toISOString(), action: "QUERY_EXECUTION", user: "guest@prateeq.in", status: "SUCCESS" },
-        ],
-      },
-      null,
-      2
-    );
-    const blob = new Blob([fakeAuditData], { type: "application/json" });
+    const auditRecord = {
+      tenant_id: tenantId || "active_tenant",
+      exported_at: new Date().toISOString(),
+      account_email: user?.email,
+      members_count: members.length,
+      members: members.map((m) => ({ email: m.email, role: m.role, joined_at: m.created_at })),
+      compliance_standard: "ISO/IEC 27001 & SOC-2 Type II Tenancy Isolation",
+    };
+    const blob = new Blob([JSON.stringify(auditRecord, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `audit_log_sha256_${Date.now()}.json`;
+    a.download = `tenant_compliance_audit_${Date.now()}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -69,6 +126,7 @@ export function TeamPanel({ hidden }: TeamPanelProps) {
             className={styles.input}
             style={{ flex: 1, minWidth: "220px", margin: 0 }}
             required
+            disabled={inviting}
           />
           <select
             value={inviteRole}
@@ -76,41 +134,65 @@ export function TeamPanel({ hidden }: TeamPanelProps) {
             onChange={(e) => setInviteRole(e.target.value)}
             className={styles.input}
             style={{ width: "120px", margin: 0 }}
+            disabled={inviting}
           >
             <option value="member">Member</option>
             <option value="admin">Admin</option>
             <option value="owner">Owner</option>
           </select>
-          <button type="submit" className="comic-btn comic-btn-blue">
-            Send Invite
+          <button type="submit" className="comic-btn comic-btn-blue" disabled={inviting || !inviteEmail.trim()}>
+            {inviting ? "Sending..." : "Send Invite"}
           </button>
         </form>
         {invitedStatus && (
           <p style={{ fontSize: "0.8rem", color: "#00E676", margin: "0.5rem 0 0" }}>✓ {invitedStatus}</p>
         )}
+        {inviteError && (
+          <p style={{ fontSize: "0.8rem", color: "#FF1744", margin: "0.5rem 0 0" }}>✕ {inviteError}</p>
+        )}
       </div>
 
       {/* Team Member List */}
       <div style={{ marginBottom: "1.5rem" }}>
-        <h3 style={{ fontSize: "1rem", margin: "0 0 0.75rem" }}>📋 Workspace Members</h3>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
+          <h3 style={{ fontSize: "1rem", margin: 0 }}>📋 Workspace Members</h3>
+          <button
+            onClick={handleExportAudit}
+            className="comic-btn comic-btn-outline"
+            style={{ fontSize: "0.75rem", padding: "0.3rem 0.6rem" }}
+            title="Export compliance record with member permissions"
+          >
+            📥 Export Audit Record
+          </button>
+        </div>
         <div style={{ border: "1px solid var(--color-border, #333)", borderRadius: "8px", overflow: "hidden" }}>
           <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", padding: "0.75rem 1rem", background: "var(--color-bg, #111)", fontSize: "0.8rem", fontWeight: 600, borderBottom: "1px solid var(--color-border, #333)" }}>
             <span>Email</span>
             <span>Role</span>
             <span>Status</span>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", padding: "0.75rem 1rem", fontSize: "0.85rem", borderBottom: "1px solid var(--color-border, #222)", alignItems: "center" }}>
-            <span>{user?.email || "Owner (Active User)"}</span>
-            <span style={{ textTransform: "capitalize" }}><strong>Owner</strong></span>
-            <span style={{ color: "#00E676" }}>Active</span>
-          </div>
+
+          {members.length > 0 ? (
+            members.map((m) => (
+              <div key={m.id || m.email} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", padding: "0.75rem 1rem", fontSize: "0.85rem", borderBottom: "1px solid var(--color-border, #222)", alignItems: "center" }}>
+                <span>{m.email}</span>
+                <span style={{ textTransform: "capitalize" }}><strong>{m.role}</strong></span>
+                <span style={{ color: "#00E676" }}>Active</span>
+              </div>
+            ))
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", padding: "0.75rem 1rem", fontSize: "0.85rem", borderBottom: "1px solid var(--color-border, #222)", alignItems: "center" }}>
+              <span>{user?.email || "Owner (Active User)"}</span>
+              <span style={{ textTransform: "capitalize" }}><strong>Owner</strong></span>
+              <span style={{ color: "#00E676" }}>Active</span>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Razorpay Subscription Ledger */}
       <div style={{ background: "var(--surface-card, rgba(255, 255, 255, 0.03))", border: "1px solid var(--color-border, #333)", borderRadius: "8px", padding: "1.25rem", marginBottom: "1.5rem" }}>
-        <h3 style={{ fontSize: "1rem", margin: "0 0 0.5rem" }}>💳 Subscription Plan & Billing Ledger</h3>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem", flexWrap: "wrap", gap: "0.5rem" }}>
           <div>
             <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted, #888)", textTransform: "uppercase" }}>Current Active Tier:</span>
             <div style={{ fontSize: "1.2rem", fontWeight: 700, color: "#FFB300" }}>⏱️ 7-Day Starter Free Trial</div>
@@ -122,28 +204,29 @@ export function TeamPanel({ hidden }: TeamPanelProps) {
           <div style={{ border: "1px solid #5A8EB6", borderRadius: "6px", padding: "0.85rem", textAlign: "center" }}>
             <strong>Starter Tier</strong>
             <p style={{ margin: "0.25rem 0", fontSize: "0.85rem" }}>₹2,499 / mo ($29/mo)</p>
-            <button className="comic-btn comic-btn-blue" style={{ fontSize: "0.75rem", width: "100%" }}>
+            <a href="/rag#pricing" className="comic-btn comic-btn-blue" style={{ fontSize: "0.75rem", width: "100%", textDecoration: "none", display: "inline-block" }}>
               Upgrade to Starter
-            </button>
+            </a>
           </div>
 
           <div style={{ border: "1px solid #00E676", borderRadius: "6px", padding: "0.85rem", textAlign: "center", background: "rgba(0, 230, 118, 0.05)" }}>
             <strong>Pro Tier (Recommended)</strong>
             <p style={{ margin: "0.25rem 0", fontSize: "0.85rem" }}>₹6,999 / mo ($79/mo)</p>
-            <button className="comic-btn comic-btn-blue" style={{ fontSize: "0.75rem", width: "100%" }}>
+            <a href="/rag#pricing" className="comic-btn comic-btn-blue" style={{ fontSize: "0.75rem", width: "100%", textDecoration: "none", display: "inline-block" }}>
               Upgrade to Pro
-            </button>
+            </a>
           </div>
 
           <div style={{ border: "1px solid #8b5cf6", borderRadius: "6px", padding: "0.85rem", textAlign: "center" }}>
             <strong>Business Tier</strong>
             <p style={{ margin: "0.25rem 0", fontSize: "0.85rem" }}>₹19,999 / mo ($249/mo)</p>
-            <button className="comic-btn comic-btn-outline" style={{ fontSize: "0.75rem", width: "100%" }}>
+            <a href="/rag#pricing" className="comic-btn comic-btn-outline" style={{ fontSize: "0.75rem", width: "100%", textDecoration: "none", display: "inline-block" }}>
               Upgrade to Business
-            </button>
+            </a>
           </div>
         </div>
       </div>
+
 
       {/* Compliance Audit Section */}
       <div style={{ background: "rgba(90, 142, 182, 0.08)", border: "1px solid rgba(90, 142, 182, 0.2)", borderRadius: "8px", padding: "1.25rem" }}>

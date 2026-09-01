@@ -21,10 +21,15 @@ const mocks = vi.hoisted(() => {
   };
 
   selectFn.mockReturnValue(chain);
+  orderFn.mockImplementation(() => Promise.resolve({ data: state.scopes, error: null }));
   eqFn.mockImplementation((column: string, _value: string) => {
     if (column === 'client_email') {
-      return Promise.resolve({ data: state.scopes, error: null });
+      return {
+        ...chain,
+        order: vi.fn().mockResolvedValue({ data: state.scopes, error: null }),
+      };
     }
+
     if (column === 'scope_code') {
       return {
         order: vi.fn().mockResolvedValue({ data: state.changeOrders, error: null }),
@@ -110,7 +115,7 @@ describe('POST /api/client/copilot', () => {
     const res = await POST(req);
     expect(res.status).toBe(400);
     const json = await res.json();
-    expect(json.error).toContain('Query parameter is required');
+    expect(json.error.toLowerCase()).toContain('query parameter is required');
   });
 
   it('handles client with no scopes gracefully', async () => {

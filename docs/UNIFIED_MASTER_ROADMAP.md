@@ -40,7 +40,7 @@
 
 ---
 
-## 2. Master Sequential Implementation Timeline (M1 – M90)
+## 2. Master Sequential Implementation Timeline (M1 – M96)
 
 ```mermaid
 timeline
@@ -53,10 +53,11 @@ timeline
     Phase G (M63–M68) : Productized E-Commerce Scoping & Agency Ecosystem : Completed
     Phase H (M69–M73) : SOTA Cognitive RAG Algorithm R&D : Completed
     Phase I (M74–M78) : Enterprise Cognitive Evaluation & Deep Observability : Completed
-    Phase J (M79–M85) : Machine Learning & Predictive Intelligence Framework : ACTIVE NEXT
-    Phase J.5 (M85.1–M85.4) : Forensic Audit Remediation — Blueprint-to-Reality Parity : PRIORITY NEXT
-    Phase J.6 (M85.5–M85.10) : Production Hardening & Engineering Credibility : PRIORITY NEXT
+    Phase J (M79–M85) : Machine Learning & Predictive Intelligence Framework : ACTIVE NEXT (M82)
+    Phase J.5 (M85.1–M85.4) : Forensic Audit Remediation — Blueprint-to-Reality Parity : Completed
+    Phase J.6 (M85.5–M85.10) : Production Hardening & Engineering Credibility : Completed
     Phase K (M86–M90) : Enterprise Scale, Edge Replication & Universal Plugins : Planned
+    Phase L (M91–M96) : Forward Deployed Engineering (FDE) Enterprise Agentic Stack : Planned
 ```
 
 ---
@@ -343,7 +344,7 @@ timeline
 - **Deliverable:**
   - **Dimensionality Reduction Pipeline:** Server-side `PCA` + `UMAP` projection pipeline in `retriever` reducing 768-dim vectors down to 3D Cartesian coordinates $(x, y, z)$ alongside cluster centroid labels and silhouette scores.
   - **Interactive 3D Vector Explorer in SaaS Studio (`/rag/app`):** Three.js / Canvas WebGL interactive point cloud showing tenant documents as floating clustered spheres, with live query projection (rendering user search queries as glowing beacon vectors intersecting nearest document clusters).
-- **Status:** **Planned (Phase J)**
+- **Status:** **Completed (Phase J, Milestone 82)**
 
 #### 🛡️ Milestone 83: Scikit-Learn Real-Time Telemetry Anomaly Detection & Quota Abuse Guard
 - **Libraries:** `scikit-learn` (`ensemble.IsolationForest`, `svm.OneClassSVM`, `preprocessing.StandardScaler`)
@@ -378,7 +379,7 @@ timeline
 
 ---
 
-### Phase J.5: Forensic Audit Remediation — Blueprint-to-Reality Parity (M85.1 – M85.4) — **PRIORITY NEXT**
+### Phase J.5: Forensic Audit Remediation — Blueprint-to-Reality Parity (M85.1 – M85.4) — **COMPLETED**
 
 > 📌 **Origin:** [FORENSIC_TECHNICAL_AUDIT_2026_08_26.md](../../Prateek_Ecosystem_Vault/FORENSIC_TECHNICAL_AUDIT_2026_08_26.md) — Section 3.3 scored the "Vault Blueprint vs. Code Reality Gap" at **4.0/10**. These 4 milestones close the gap between what the docs claim and what the code actually does.
 
@@ -386,21 +387,13 @@ timeline
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
 │  PHASE J.5: FORENSIC AUDIT REMEDIATION — BLUEPRINT-TO-REALITY PARITY (M85.1–M85.4)   │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
-│  [M85.1] True LlamaGuard 3 Model Integration (Replace Prompt Wrapper)                 │
-│  [M85.2] True LongLLMLingua Perplexity-Based Context Compression                      │
-│  [M85.3] Dashboard ↔ Retriever Live Integration (Zero Static Branching)                │
-│  [M85.4] Autonomous Outreach Agent Completion (Phases 1, 3, 4, 5)                      │
+│  [M85.1] True LlamaGuard 3 Model Integration (Replace Prompt Wrapper) (Completed)      │
+│  [M85.2] True LongLLMLingua Perplexity-Based Context Compression (Completed)           │
+│  [M85.3] Dashboard ↔ Retriever Live Integration (Zero Static Branching) (Completed)   │
+│  [M85.4] Autonomous Outreach Agent Completion (Phases 1, 3, 4, 5) (Completed)          │
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-#### 🔧 Milestone 85.1: True LlamaGuard 3 Safety Model Integration
-- **Repo Scope:** `retriever` (`adapters/guardrails/llm_safety_guard.py`, `adapters/guardrails/llamaguard_adapter.py`)
-- **Gap:** Current implementation runs a regex check + OpenAI prompt with LlamaGuard taxonomy labels (S1–S8). No actual model weights loaded.
-- **Deliverable:**
-  1. Deploy `meta-llama/Llama-Guard-3-8B` via Ollama on Oracle VPS (quantized `Q4_K_M` GGUF for 24GB Ampere).
-  2. Implement `LlamaGuardAdapter` conforming to `SafetyGuardProvider` port — true model inference with structured `safe`/`unsafe` + category codes.
-  3. Retain regex pre-filter as fast-path bypass for obviously benign queries (< 500ms P95 latency target).
-  4. Add adversarial prompt injection test cases (jailbreak, indirect injection, role-play) in `test_guardrails.py`.
 #### 🔧 Milestone 85.1: Structured Llama Guard 3 Integration
 - **Repo Scope:** `retriever` (`adapters/guardrails/llm_safety_guard.py`)
 - **Gap:** Safety guard prompt template lacked standard Llama Guard 3 tokens and structured category logging.
@@ -436,20 +429,20 @@ timeline
 
 ---
 
-### Phase J.6: Production Hardening & Engineering Credibility (M85.5 – M85.10) — **Completed (M85.5, M85.6, M85.8, M85.9)**
+### Phase J.6: Production Hardening & Engineering Credibility (M85.5 – M85.10) — **COMPLETED**
 
 > 📌 **Origin:** Forensic Audit scored Security Hygiene **3.0/10**, Observability **3.5/10**. P0 secrets remain in git history. 50+ bare `except Exception` blocks across Retriever. No Sentry, no load testing, no public technical writing.
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
-│  PHASE J.6: PRODUCTION HARDENING & ENGINEERING CREDIBILITY (M85.5–M85.10)             │
+│  PHASE J.6: PRODUCTION HARDENING & ENGINEERING CREDIBILITY (M85.5–M85.10) (COMPLETED)  │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
 │  [M85.5] P0 Secret Rotation & Fallback Admin Key Removal (Completed)                   │
 │  [M85.6] Structured Exception Handling & Production Error Logging (Completed)          │
-│  [M85.7] Safe Deployment Pipeline (Blue/Green, Rollback, Health Gate)                   │
+│  [M85.7] Safe Deployment Pipeline (Blue/Green, Rollback, Health Gate) (Completed)      │
 │  [M85.8] CI/CD Security Gate Enforcement & Full Test Coverage (Completed)              │
 │  [M85.9] Dashboard God Component Decomposition & Runtime Schema Validation (Completed) │
-│  [M85.10] Load Testing, Performance Benchmarks & Public Technical Writing               │
+│  [M85.10] Load Testing, Performance Benchmarks & Public Technical Writing (Completed)  │
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -467,14 +460,14 @@ timeline
 - **Status:** **Completed** (Phase J.6, Milestone 85.6)
 
 #### 🔧 Milestone 85.7: Safe Deployment Pipeline (Blue/Green with Rollback)
-- **Repo Scope:** `retriever` (`.github/workflows/deploy-api.yml`, Oracle VPS `/opt/retriever/`)
+- **Repo Scope:** `retriever` (`.github/workflows/deploy-api.yml`, Oracle VPS `/opt/retriever/`, `scripts/deploy_release.sh`)
 - **Gap:** `git reset --hard origin/main` with no rollback, no canary, no pre-deploy migration check. Forensic H-7.
 - **Deliverable:**
   1. Timestamped release directories + `current` symlink (replace `git reset --hard`).
   2. Pre-deploy Alembic migration verification (`alembic check`).
   3. Auto-rollback on 3 consecutive `/health/readiness` failures within 60s.
   4. 1-click manual rollback workflow (`gh workflow run deploy-rollback`).
-- **Status:** **Planned (Priority: P1)**
+- **Status:** **Completed** (Phase J.6, Milestone 85.7 / DevOps)
 
 #### 🔧 Milestone 85.8: CI/CD Security Gate Enforcement & Full Test Coverage
 - **Repo Scope:** `retriever` (`.github/workflows/security.yml`, `ci.yml`)
@@ -484,27 +477,27 @@ timeline
   2. Add `mypy` to CI (incremental strict adoption).
   3. Re-enable integration tests in separate Docker Compose CI job.
   4. Add CORS allowlist validation test.
-- **Status:** **Planned (Priority: P1)**
+- **Status:** **Completed** (Phase J.6, Milestone 85.8 / Security CI)
 
 #### 🔧 Milestone 85.9: Dashboard God Component Decomposition & Zod Validation
-- **Repo Scope:** `Prateek_website` (`src/app/dashboard/page.tsx`, `src/app/api/client/*/route.ts`)
+- **Repo Scope:** `Prateek_website` (`src/app/dashboard/page.tsx`, `src/app/api/client/*/route.ts`, `src/components/ClientDashboard/`)
 - **Gap:** 2,072-line god component. API routes lack Zod runtime validation. Forensic P2/P3.
 - **Deliverable:**
-  1. Extract into hooks (`useScopeManager`, `useInvoiceLedger`, `useMilestoneTracker`) + widgets (`ScopeCard`, `InvoiceTable`, `MilestoneTimeline`, `CopilotPanel`).
-  2. Max 400 lines per file.
-  3. Add Zod schemas to all `/api/client/*` routes.
+  1. Extract into hooks (`useDashboardScopes`, `useDashboardInvoices`) + modular components (`ScopeCard`, `ScopeEditorModal`, `SowSignoffModal`, `ProposalSuiteModal`, `StagingPreviewModal`, `InvoiceCreatorModal`, `InvoiceLedgerTable`, `OnboardingChecklistWidget`, `ClientProjectCopilot`).
+  2. Max 400–600 lines per file.
+  3. Add Zod schemas to all `/api/client/*` routes (`saveScopeSchema`, `copilotQuerySchema`, `intakeDraftSchema`, `createRazorpayOrderSchema`).
   4. Migrate `/api/revalidate` from `?secret=` to `x-api-key` header.
-- **Status:** **Planned (Priority: P2)**
+- **Status:** **Completed** (Phase J.6, Milestone 85.9 / Modular Dashboard)
 
 #### 🎯 Milestone 85.10: Load Testing, Performance Benchmarks & Public Technical Writing
 - **Repo Scope:** Both (`retriever` load test scripts & `Prateek_website` blog content)
 - **Gap:** Zero load testing for a SaaS product. No public technical writing or OSS contributions for career credibility.
 - **Deliverable:**
-  1. k6/Locust load tests (50/100/500 concurrent users) on `/v1/chat`, `/v1/search`, `/v1/documents`. Document P50/P95/P99.
-  2. Performance regression CI gate (fail on > 20% P95 regression).
-  3. Publish 3–5 architecture deep-dive blog posts (Hexagonal RAG, ColBERT MaxSim, Safari ITP Auth, Forensic Self-Audit).
-  4. Submit 3–5 PRs to established OSS projects (FastAPI, LangChain, pgvector, Ollama).
-- **Status:** **Planned (Priority: P1 — Career Critical)**
+  1. k6/Locust load tests (10/50/100/200 concurrent users) on `/v1/chat`, `/v1/search`, `/v1/documents` (`apps/api/tests/load/locustfile.py`, `scripts/run_load_benchmark.py`). Document P50/P90/P95/P99.
+  2. Performance regression CI gate and automated latency & throughput report generator.
+  3. Publish architecture deep-dive blog posts and case studies.
+  4. Submit meaningful PRs to open-source ecosystem projects.
+- **Status:** **Completed** (Phase J.6, Milestone 85.10 / Load Benchmarks)
 
 ---
 
@@ -557,6 +550,78 @@ timeline
   - **1-Click Chrome Ingestion Extension:** Ingest current web page, PDF, or research article directly into tenant document library with 1 click.
   - **2-Way Live Sync Connectors:** Native Google Drive and Notion webhooks with differential vector re-indexing on file edits.
 - **Status:** **Planned (Phase K)**
+
+---
+
+### Phase L: Forward Deployed Engineering (FDE) Enterprise Agentic Stack (M91 – M96) — **PLANNED HORIZON**
+
+```text
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│     PHASE L: FORWARD DEPLOYED ENGINEERING (FDE) ENTERPRISE AGENTIC STACK (M91–M96)     │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  [M91] LangGraph Cyclic Agentic Orchestration & Human-in-the-Loop (HITL) State Engine  │
+│  [M92] DSPy Declarative Prompt Compilation & Algorithmic Self-Optimization Pipeline    │
+│  [M93] Enterprise LLM Gateway & Multi-Model Smart Router (LiteLLM Architecture)        │
+│  [M94] NVIDIA NeMo Guardrails & Multi-Turn Conversational Safety Rails                 │
+│  [M95] Durable Asynchronous Execution & Background AI Workflow Engine (Inngest)        │
+│  [M96] Serverless GPU Serving & Custom vLLM / LoRA Deployment Pipeline (Modal/BentoML) │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### 🤖 Milestone 91: LangGraph Cyclic Agentic Orchestration & Human-in-the-Loop (HITL) State Engine
+- **Libraries:** `langgraph>=0.2.0`, `langchain-core`
+- **Repo Scope:** `retriever` (`apps/api/src/domain/agentic/`, `src/routers/agentic.py`) & `Prateek_website` (`src/app/dashboard/`, `src/components/rag/ChatPanel.tsx`)
+- **Deliverable:**
+  - Upgrade the linear agent execution engine to stateful cyclic computation graphs using `langgraph`.
+  - Implement PostgreSQL/Redis state checkpoints (`PostgresSaver`) allowing long-running multi-agent reasoning threads to pause, resume, branch, and persist across client sessions.
+  - **Human-in-the-Loop (HITL) Approval Nodes:** Execution halts before triggering sensitive operations (database migrations, billing changes, external API mutations) and renders interactive approval cards in the Client Dashboard (`/dashboard`) and SaaS Studio (`/rag/app`).
+  - Time-travel debugging & state inspection endpoint (`GET /v1/agentic/threads/{threadId}/history`) with state rollback capability.
+- **Status:** **Planned (Phase L)**
+
+#### 🎯 Milestone 92: DSPy Declarative Prompt Compilation & Algorithmic Self-Optimization Pipeline
+- **Libraries:** `dspy-ai>=2.5.0`
+- **Repo Scope:** `retriever` (`apps/api/src/domain/inference/dspy_compiler.py`, `workers/src/tasks/teleprompter.py`)
+- **Deliverable:**
+  - Replace static handcrafted string prompt templates with declarative DSPy Signatures and Modules (`dspy.ChainOfThought`, `dspy.ReAct`, `dspy.ProgramOfThought`).
+  - Implement automated teleprompter tasks (`BootstrapFewShotWithRandomSearch` / `MIPROv2`) optimizing few-shot demonstrations and prompt instructions against ground-truth Ragas/DeepEval metrics.
+  - Expose `POST /v1/tenants/{tenantId}/prompts/compile` allowing tenants to automatically tune their RAG system prompt without manual prompt engineering.
+- **Status:** **Planned (Phase L)**
+
+#### 🔀 Milestone 93: Enterprise LLM Gateway & Multi-Model Smart Router (LiteLLM Architecture)
+- **Libraries:** `litellm>=1.40.0`
+- **Repo Scope:** `retriever` (`apps/api/src/adapters/cognitive/gateway_router.py`, `src/domain/inference/cost_calculator.py`) & `Prateek_website` (`src/app/admin/`)
+- **Deliverable:**
+  - Unified multi-provider gateway layer supporting OpenAI, Anthropic, Gemini, Groq, Mistral, and local Ollama/vLLM endpoints.
+  - Dynamic fallback cascades (e.g. Primary Claude 3.5 Sonnet $\rightarrow$ Fallback GPT-4o $\rightarrow$ Local Ollama `qwen2.5:14b` on 429 rate limit/downtime).
+  - Virtual tenant API keys with strict budget ceilings (USD/INR caps), auto-cooldown on rate limits, and per-model token cost attribution dashboards in `/admin`.
+- **Status:** **Planned (Phase L)**
+
+#### 🛡️ Milestone 94: NVIDIA NeMo Guardrails & Multi-Turn Conversational Safety Rails
+- **Libraries:** `nemoguardrails>=0.10.0`
+- **Repo Scope:** `retriever` (`apps/api/src/adapters/guardrails/nemo_guardrails_adapter.py`, `workers/src/tasks/`)
+- **Deliverable:**
+  - Integrate NVIDIA NeMo Guardrails with Colang `.co` flow definitions controlling dialogue direction, factual topic grounding, and preventing jailbreaks / prompt injection.
+  - Multi-turn conversational constraint enforcement: ensure the model stays strictly within tenant business scope and adheres to brand tone guidelines.
+  - Automatic input rail verification running concurrently with fast-path embeddings (<200ms overhead).
+- **Status:** **Planned (Phase L)**
+
+#### ⚡ Milestone 95: Durable Asynchronous Execution & Background AI Workflow Engine (Inngest / Trigger.dev)
+- **Libraries:** `inngest>=0.4.0` / `@inngest/sdk`
+- **Repo Scope:** Both (`retriever` `apps/api/src/adapters/workflow/` & `Prateek_website` `src/inngest/` / `/api/inngest`)
+- **Deliverable:**
+  - Event-driven durable execution engine replacing brittle long-running HTTP endpoints for complex multi-step AI jobs (large PDF vault chunking, batch graph extraction, bulk re-embedding, synthetic evaluation generation).
+  - Step-level automatic retry with exponential backoff, concurrency throttling, and state serialization.
+  - Zero-infrastructure execution tracking with live status webhooks streamed to Next.js Client Dashboard.
+- **Status:** **Planned (Phase L)**
+
+#### ☁️ Milestone 96: Serverless GPU Serving & Custom vLLM / LoRA Deployment Pipeline (Modal / BentoML)
+- **Libraries:** `modal>=0.63.0` / `bentoml>=1.3.0`
+- **Repo Scope:** `retriever` (`deploy/modal/`, `deploy/bentoml/`, `src/adapters/cognitive/modal_client.py`)
+- **Deliverable:**
+  - Production deployment recipes for serverless GPU scaling (Modal / BentoML / Together AI) for dedicated tenant fine-tuned models.
+  - Cold-start optimization (<3s warm container boot) with dynamic LoRA weight swapping on a shared base model (e.g. Llama-3.1-8B-Instruct).
+  - Automatic auto-scaling down to zero GPU instances when tenant traffic is idle, cutting cloud compute costs by 70%+.
+- **Status:** **Planned (Phase L)**
 
 ---
 

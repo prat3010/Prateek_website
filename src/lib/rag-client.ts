@@ -52,6 +52,11 @@ export class RetrieverClient {
     this.config = config;
   }
 
+  get tenantId(): string {
+    return this.config.tenantId;
+  }
+
+
   private async request<T>(path: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.config.apiUrl.replace(/\/$/, "")}${path}`;
     const validUserId = requireUserId(this.config.userId);
@@ -167,17 +172,26 @@ export class RetrieverClient {
 
   async extractDocument<T = Record<string, unknown>>(
     documentId: string,
-    jsonSchema: Record<string, unknown>,
+    jsonSchema: Record<string, unknown> | string,
     model?: string
-  ): Promise<{ data: T; provider: string; model: string; inputTokens: number; outputTokens: number }> {
-    return this.request<{ data: T; provider: string; model: string; inputTokens: number; outputTokens: number }>(
+  ): Promise<{ data: T; provider?: string; model?: string; inputTokens?: number; outputTokens?: number }> {
+    let schemaObj = jsonSchema;
+    if (typeof jsonSchema === "string") {
+      try {
+        schemaObj = JSON.parse(jsonSchema);
+      } catch {
+        schemaObj = { schema: jsonSchema };
+      }
+    }
+    return this.request<{ data: T; provider?: string; model?: string; inputTokens?: number; outputTokens?: number }>(
       `/v1/tenants/${this.config.tenantId}/documents/${documentId}/extract`,
       {
         method: "POST",
-        body: JSON.stringify({ json_schema: jsonSchema, model }),
+        body: JSON.stringify({ json_schema: schemaObj, model }),
       }
     );
   }
+
 
   async deleteDocument(documentId: string) {
     return this.request(`/v1/tenants/${this.config.tenantId}/documents/${documentId}`, {
@@ -229,13 +243,13 @@ export class RetrieverClient {
 
   async getGraphSummary(): Promise<GraphSummaryResponse> {
     return this.request<GraphSummaryResponse>(
-      `/v1/admin/tenants/${this.config.tenantId}/graph`
+      `/v1/tenants/${this.config.tenantId}/graph`
     );
   }
 
   async queryGraph(entity: string, maxHops = 2): Promise<GraphQueryResponse> {
     return this.request<GraphQueryResponse>(
-      `/v1/admin/tenants/${this.config.tenantId}/graph/query`,
+      `/v1/tenants/${this.config.tenantId}/graph/query`,
       {
         method: "POST",
         body: JSON.stringify({ entity, max_hops: maxHops }),
@@ -245,9 +259,28 @@ export class RetrieverClient {
 
   async deleteTriple(tripleId: string) {
     return this.request(
-      `/v1/admin/tenants/${this.config.tenantId}/graph/triples/${tripleId}`,
+      `/v1/tenants/${this.config.tenantId}/graph/triples/${tripleId}`,
       {
         method: "DELETE",
+      }
+    );
+  }
+
+
+  async purgeCache(): Promise<{ status: string; purged: boolean; deleted_count?: number }> {
+    return this.request<{ status: string; purged: boolean; deleted_count?: number }>(
+      `/v1/tenants/${this.config.tenantId}/cache/purge`,
+      {
+        method: "POST",
+      }
+    );
+  }
+
+  async getCacheStats(): Promise<{ status: string; total_vectors: number }> {
+    return this.request<{ status: string; total_vectors: number }>(
+      `/v1/tenants/${this.config.tenantId}/cache/stats`,
+      {
+        method: "GET",
       }
     );
   }
@@ -271,13 +304,16 @@ export class RetrieverClient {
       {
         method: "POST",
         body: JSON.stringify({
+          tenant_id: this.config.tenantId,
+          prompt: query,
           query,
-          generator_provider: options?.generatorProvider,
-          critic_provider: options?.criticProvider,
+          generator_provider_name: options?.generatorProvider,
+          critic_provider_name: options?.criticProvider,
         }),
       }
     );
   }
+
 
   async executeRlmSubroutine(
     query: string,
@@ -298,7 +334,7 @@ export class RetrieverClient {
 
   async getOnlineEvaluationSummary(): Promise<import("./rag-types").OnlineEvaluationSummaryResponse> {
     return this.request<import("./rag-types").OnlineEvaluationSummaryResponse>(
-      `/v1/admin/tenants/${this.config.tenantId}/evaluation/online/summary`
+      `/v1/tenants/${this.config.tenantId}/evaluations/summary`
     );
   }
 
@@ -314,6 +350,7 @@ export class RetrieverClient {
       }
     );
   }
+
 
   async listLoraAdapters(): Promise<import("./rag-types").LoraAdapterInfo[]> {
     return this.request<import("./rag-types").LoraAdapterInfo[]>(
@@ -333,6 +370,18 @@ export class RetrieverClient {
       {
         method: "POST",
         body: JSON.stringify(payload),
+      }
+    );
+  }
+
+  async projectEmbeddings(
+    options?: import("./rag-types").EmbeddingProjectionRequest
+  ): Promise<import("./rag-types").EmbeddingProjectionResponse> {
+    return this.request<import("./rag-types").EmbeddingProjectionResponse>(
+      `/v1/tenants/${this.config.tenantId}/embeddings/project`,
+      {
+        method: "POST",
+        body: JSON.stringify(options || {}),
       }
     );
   }

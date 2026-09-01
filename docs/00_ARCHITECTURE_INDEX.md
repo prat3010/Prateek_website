@@ -1,5 +1,5 @@
 # 🏛️ Master Architecture Knowledge Graph Index
-**Total Registered Architecture Nodes:** 110 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
+**Total Registered Architecture Nodes:** 111 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
 
 ## ⚡ Quick Navigation
 - [Master Architecture Visual Canvas](MASTER_ARCHITECTURE_MAP.canvas)
@@ -103,7 +103,7 @@
 | `Lib_skills` | **Lib: `skills.ts` (Persona Filter & Narrative Mapper)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Lib_skills.md](architecture_nodes/Lib_skills.md) |
 | `UI_CommercialPDFSuite` | **UI: `pdfTheme.ts`, `pdfFonts.ts` & React-PDF Exporters** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_CommercialPDFSuite.md](architecture_nodes/UI_CommercialPDFSuite.md) |
 
-### 🔹 6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPIs (31 Nodes)
+### 🔹 6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPIs (32 Nodes)
 
 | Node ID | Title / Component | Blast Radius | Security Auth | Specification File |
 | :--- | :--- | :---: | :---: | :--- |
@@ -113,6 +113,7 @@
 | `Engine_Corrective_RAG_Agentic_Loop` | **Engine: Corrective RAG (CRAG) & Agentic Reflection Loop (Milestone 71)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Corrective_RAG_Agentic_Loop.md](architecture_nodes/Engine_Corrective_RAG_Agentic_Loop.md) |
 | `Engine_Digital_SOW_Escrow_Freeze` | **Engine: Digital SOW & 50% Escrow Freeze** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Digital_SOW_Escrow_Freeze.md](architecture_nodes/Engine_Digital_SOW_Escrow_Freeze.md) |
 | `Engine_Docling_Layout_OCR` | **Engine: Docling Layout OCR & Multimodal Ingestion (Milestone 42)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Docling_Layout_OCR.md](architecture_nodes/Engine_Docling_Layout_OCR.md) |
+| `Engine_Embedding_Space_Projection` | **Engine Specification: Scikit-Learn 2D/3D Embedding Space Projection Pipeline & SaaS Studio 3D Vector Explorer (Milestone 82)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Embedding_Space_Projection.md](architecture_nodes/Engine_Embedding_Space_Projection.md) |
 | `Engine_GraphRAG_Topology` | **Engine: GraphRAG Knowledge Graph & Dynamic Topology** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_GraphRAG_Topology.md](architecture_nodes/Engine_GraphRAG_Topology.md) |
 | `Engine_LlamaGuard_Guardrails` | **Engine: Llama Guard 3 Prompt Injection Filter (Milestone 40)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_LlamaGuard_Guardrails.md](architecture_nodes/Engine_LlamaGuard_Guardrails.md) |
 | `Engine_LongLLMLingua_Compression` | **Engine: LongLLMLingua Context Compression (Milestone 49)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_LongLLMLingua_Compression.md](architecture_nodes/Engine_LongLLMLingua_Compression.md) |

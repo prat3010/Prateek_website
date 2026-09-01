@@ -14,10 +14,11 @@ import { CachePanel } from "@/components/rag/CachePanel";
 import { ConfigPanel } from "@/components/rag/ConfigPanel";
 import { TeamPanel } from "@/components/rag/TeamPanel";
 import { RlmStudioPanel } from "@/components/rag/RlmStudioPanel";
+import { VectorVisualizerPanel } from "@/components/rag/VectorVisualizerPanel";
 import { RagErrorBoundary } from "@/components/rag/ErrorBoundary";
 import styles from "@/components/rag/rag.module.css";
 
-type SubViewTab = "overview" | "chat" | "upload" | "search" | "cache" | "rlm" | "config" | "team";
+type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "rlm" | "config" | "team";
 
 export default function RagAppStudioPage() {
   const router = useRouter();
@@ -98,6 +99,7 @@ export default function RagAppStudioPage() {
     { id: "chat", label: "Chat Studio", icon: "💬" },
     { id: "upload", label: "Knowledge & Graph", icon: "📄" },
     { id: "search", label: "Search & Evaluator", icon: "🔍" },
+    { id: "visualizer", label: "3D Vector Explorer", icon: "🪐" },
     { id: "cache", label: "Semantic Cache", icon: "⚡" },
     { id: "rlm", label: "RLM REPL Studio", icon: "🐍" },
     { id: "config", label: "Widget Studio", icon: "⚙️" },
@@ -211,8 +213,10 @@ export default function RagAppStudioPage() {
             <ChatPanel client={client} hidden={activeTab !== "chat"} isExpired={trialDaysRemaining <= 0} />
             <DocumentsPanel client={client} hidden={activeTab !== "upload"} isExpired={trialDaysRemaining <= 0} />
             <SearchPanel client={client} hidden={activeTab !== "search"} />
-            <CachePanel hidden={activeTab !== "cache"} />
+            <VectorVisualizerPanel client={client} hidden={activeTab !== "visualizer"} />
+            <CachePanel client={client} hidden={activeTab !== "cache"} />
             <RlmStudioPanel client={client} hidden={activeTab !== "rlm"} isExpired={trialDaysRemaining <= 0} />
+
             <ConfigPanel
               config={
                 client
@@ -238,7 +242,8 @@ export default function RagAppStudioPage() {
               }}
               hidden={activeTab !== "config"}
             />
-            <TeamPanel hidden={activeTab !== "team"} />
+            <TeamPanel hidden={activeTab !== "team"} tenantId={tenantId} />
+
           </RagErrorBoundary>
         </main>
       </div>
