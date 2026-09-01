@@ -1,6 +1,8 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
+
+
 import { X, Sparkles, Sliders, CheckCircle2 } from 'lucide-react';
 import Portal from '@/components/ui/Portal';
 import { DependencyCascadeModal } from '@/components/Intake/DependencyCascadeModal';
@@ -33,19 +35,62 @@ interface ScopeEditorModalProps {
   isSubmittingChangeOrder: boolean;
 }
 
-export function ScopeEditorModal({
+function getInitialEngine(scope: ClientScope): string {
+  const matched =
+    intakeDefaults.engines.find(
+      (e) =>
+        e.title.toLowerCase() === scope.base_engine.toLowerCase() ||
+        scope.base_engine.toLowerCase().includes(e.title.toLowerCase())
+    ) || intakeDefaults.engines[1];
+  return matched.id;
+}
+
+function getInitialFeatures(scope: ClientScope): string[] {
+  return intakeDefaults.features
+    .filter((f) =>
+      scope.features.some(
+        (featStr) =>
+          featStr.toLowerCase().includes(f.label.toLowerCase()) ||
+          f.label.toLowerCase().includes(featStr.toLowerCase())
+      )
+    )
+    .map((f) => f.id);
+}
+
+function getInitialBrand(scope: ClientScope): string {
+  const matched =
+    intakeDefaults.brandAssets.find((b) =>
+      b.label.toLowerCase().includes((scope.brand_asset || '').toLowerCase())
+    ) || intakeDefaults.brandAssets[0];
+  return matched.id;
+}
+
+function getInitialMaintenance(scope: ClientScope): string {
+  const matched =
+    intakeDefaults.maintenancePlans.find((m) =>
+      m.name.toLowerCase().includes((scope.maintenance_plan || '').toLowerCase())
+    ) || intakeDefaults.maintenancePlans[0];
+  return matched.id;
+}
+
+export function ScopeEditorModal(props: ScopeEditorModalProps) {
+  if (!props.isOpen || !props.scope) return null;
+  return <ScopeEditorModalInner key={props.scope.id} {...props} scope={props.scope} />;
+}
+
+function ScopeEditorModalInner({
   scope,
-  isOpen,
   onClose,
   onSaveDraft,
   onSubmitChangeOrder,
   isSubmittingChangeOrder,
-}: ScopeEditorModalProps) {
-  const [custEngineId, setCustEngineId] = useState<string>('multipage');
-  const [custFeatureIds, setCustFeatureIds] = useState<string[]>([]);
-  const [custBrandId, setCustBrandId] = useState<string>('none');
-  const [custMaintenanceId, setCustMaintenanceId] = useState<string>('none');
-  const [custCurrency, setCustCurrency] = useState<Currency>('INR');
+}: ScopeEditorModalProps & { scope: ClientScope }) {
+  const [custEngineId, setCustEngineId] = useState<string>(() => getInitialEngine(scope));
+  const [custFeatureIds, setCustFeatureIds] = useState<string[]>(() => getInitialFeatures(scope));
+  const custBrandId = getInitialBrand(scope);
+  const custMaintenanceId = getInitialMaintenance(scope);
+
+  const [custCurrency, setCustCurrency] = useState<Currency>(() => (scope.currency === 'USD' ? 'USD' : 'INR') as Currency);
   const [custPromoCode, setCustPromoCode] = useState<PromoDiscountInfo | null>(null);
   const [promoInput, setPromoInput] = useState('');
   const [promoLoading, setPromoLoading] = useState(false);
@@ -54,46 +99,6 @@ export function ScopeEditorModal({
   // Dependency Cascade Modal State
   const [cascadeTarget, setCascadeTarget] = useState<FeatureItem | null>(null);
   const [cascadeDependents, setCascadeDependents] = useState<FeatureItem[]>([]);
-
-  useEffect(() => {
-    if (!scope || !isOpen) return;
-
-    const matchedEngine =
-      intakeDefaults.engines.find(
-        (e) =>
-          e.title.toLowerCase() === scope.base_engine.toLowerCase() ||
-          scope.base_engine.toLowerCase().includes(e.title.toLowerCase())
-      ) || intakeDefaults.engines[1];
-    setCustEngineId(matchedEngine.id);
-
-    const matchedFeatureIds = intakeDefaults.features
-      .filter((f) =>
-        scope.features.some(
-          (featStr) =>
-            featStr.toLowerCase().includes(f.label.toLowerCase()) ||
-            f.label.toLowerCase().includes(featStr.toLowerCase())
-        )
-      )
-      .map((f) => f.id);
-    setCustFeatureIds(matchedFeatureIds);
-
-    const matchedBrand =
-      intakeDefaults.brandAssets.find((b) =>
-        b.label.toLowerCase().includes((scope.brand_asset || '').toLowerCase())
-      ) || intakeDefaults.brandAssets[0];
-    setCustBrandId(matchedBrand.id);
-
-    const matchedMaint =
-      intakeDefaults.maintenancePlans.find((m) =>
-        m.name.toLowerCase().includes((scope.maintenance_plan || '').toLowerCase())
-      ) || intakeDefaults.maintenancePlans[0];
-    setCustMaintenanceId(matchedMaint.id);
-
-    setCustCurrency((scope.currency === 'USD' ? 'USD' : 'INR') as Currency);
-    setCustPromoCode(null);
-    setPromoInput('');
-    setPromoMessage(null);
-  }, [scope, isOpen]);
 
   const custQuote = useMemo(() => {
     return calcQuote(
@@ -112,7 +117,6 @@ export function ScopeEditorModal({
     );
   }, [custEngineId, custFeatureIds, custBrandId, custMaintenanceId, custPromoCode, custCurrency]);
 
-  if (!isOpen || !scope) return null;
 
   const handleToggleCustomizerFeature = (featureId: string) => {
     if (custFeatureIds.includes(featureId)) {

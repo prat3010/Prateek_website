@@ -6,22 +6,14 @@ import {
   Maximize2,
   Minimize2,
   Layers,
-  Sparkles,
-  ShieldCheck,
   Zap,
-  CheckCircle2,
-  Circle,
   Plus,
   X,
-  Cpu,
-  Server,
-  Database,
-  Cloud,
-  Terminal,
 } from 'lucide-react';
 import Portal from '@/components/ui/Portal';
 import type { BaseEngineItem, FeatureItem } from '@/data/resume';
-import { formatPricePair, type Currency } from '@/lib/pricing';
+import type { Currency } from '@/lib/pricing';
+
 import styles from './ArchitectureTopologyMap.module.css';
 
 export interface TopologyNode {
@@ -42,10 +34,11 @@ export interface ArchitectureTopologyMapProps {
   selectedFeatureIds: string[];
   allEngines: BaseEngineItem[];
   allFeatures: FeatureItem[];
-  currency: Currency;
+  currency?: Currency;
   onAddFeature?: (featureId: string) => void;
   isNoir?: boolean;
 }
+
 
 const TOPOLOGY_TIERS = [
   { id: 'client', label: '1. Client & Presentation Layer' },
@@ -61,9 +54,10 @@ export function ArchitectureTopologyMap({
   selectedFeatureIds,
   allEngines,
   allFeatures,
-  currency,
   onAddFeature,
 }: ArchitectureTopologyMapProps) {
+
+
   const [viewMode, setViewMode] = useState<'diagram' | 'matrix'>('diagram');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [inspectedNode, setInspectedNode] = useState<TopologyNode | null>(null);
@@ -280,7 +274,8 @@ export function ArchitectureTopologyMap({
         isAlwaysActive: true,
       },
     ];
-  }, [selectedEngine, allFeatures]);
+  }, [selectedEngine]);
+
 
   // Compute active state for a given node
   const isNodeActive = (node: TopologyNode) => {

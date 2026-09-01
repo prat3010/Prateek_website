@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import styles from "./rag.module.css";
 
@@ -27,10 +27,49 @@ export function TeamPanel({ hidden, tenantId }: TeamPanelProps) {
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [loadingMembers, setLoadingMembers] = useState<boolean>(false);
 
-  const fetchMembers = useCallback(async () => {
-    const token = await getAccessToken();
-    if (!token) return;
+  useEffect(() => {
+    let isMounted = true;
+    if (!hidden) {
+      Promise.resolve().then(async () => {
+        if (!isMounted) return;
+        setLoadingMembers(true);
+        const token = await getAccessToken();
+        if (!token || !isMounted) {
+          if (isMounted) setLoadingMembers(false);
+          return;
+        }
+        try {
+          const q = tenantId ? `?tenantId=${tenantId}` : "";
+          const res = await fetch(`/api/rag/members${q}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (isMounted) setMembers(data.members || []);
+          }
+        } catch {
+          // ignore
+        } finally {
+          if (isMounted) setLoadingMembers(false);
+        }
+      });
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [hidden, getAccessToken, tenantId]);
+
+
+
+  if (hidden) return null;
+
+  const handleFetchMembers = async () => {
     setLoadingMembers(true);
+    const token = await getAccessToken();
+    if (!token) {
+      setLoadingMembers(false);
+      return;
+    }
     try {
       const q = tenantId ? `?tenantId=${tenantId}` : "";
       const res = await fetch(`/api/rag/members${q}`, {
@@ -45,15 +84,7 @@ export function TeamPanel({ hidden, tenantId }: TeamPanelProps) {
     } finally {
       setLoadingMembers(false);
     }
-  }, [getAccessToken, tenantId]);
-
-  useEffect(() => {
-    if (!hidden) {
-      fetchMembers();
-    }
-  }, [hidden, fetchMembers]);
-
-  if (hidden) return null;
+  };
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,7 +108,7 @@ export function TeamPanel({ hidden, tenantId }: TeamPanelProps) {
       } else {
         setInvitedStatus(`Invitation email sent to ${inviteEmail} as ${inviteRole.toUpperCase()}`);
         setInviteEmail("");
-        fetchMembers();
+        handleFetchMembers();
       }
     } catch (err: unknown) {
       setInviteError(err instanceof Error ? err.message : "Network error sending invitation");
@@ -85,6 +116,7 @@ export function TeamPanel({ hidden, tenantId }: TeamPanelProps) {
       setInviting(false);
     }
   };
+
 
   const handleExportAudit = () => {
     const auditRecord = {
@@ -172,7 +204,11 @@ export function TeamPanel({ hidden, tenantId }: TeamPanelProps) {
             <span>Status</span>
           </div>
 
-          {members.length > 0 ? (
+          {loadingMembers ? (
+            <div style={{ padding: "0.75rem 1rem", fontSize: "0.85rem", color: "var(--color-text-muted)" }}>
+              Loading workspace members...
+            </div>
+          ) : members.length > 0 ? (
             members.map((m) => (
               <div key={m.id || m.email} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", padding: "0.75rem 1rem", fontSize: "0.85rem", borderBottom: "1px solid var(--color-border, #222)", alignItems: "center" }}>
                 <span>{m.email}</span>
@@ -187,6 +223,7 @@ export function TeamPanel({ hidden, tenantId }: TeamPanelProps) {
               <span style={{ color: "#00E676" }}>Active</span>
             </div>
           )}
+
         </div>
       </div>
 

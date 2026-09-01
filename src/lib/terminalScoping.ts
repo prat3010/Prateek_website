@@ -94,9 +94,9 @@ export function formatTerminalCartTable(
 
   const curr = session.currency;
   const isINR = curr === 'INR';
-  const sym = isINR ? '₹' : '$';
 
   const fmt = (inr?: number, usd?: number) => {
+
     const valINR = inr ?? 0;
     const valUSD = usd ?? 0;
     return isINR

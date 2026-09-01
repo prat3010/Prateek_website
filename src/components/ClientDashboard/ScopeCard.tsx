@@ -2,26 +2,17 @@
 
 import React from 'react';
 import {
-  ShieldCheck,
-  Zap,
-  Layers,
-  CreditCard,
   CheckCircle2,
-  Edit3,
   Trash2,
   FileText,
   Sliders,
-  ExternalLink,
-  Sparkles,
   Lock,
-  ArrowRight,
-  GitCommit,
-  GitBranch,
   Eye,
   Activity,
   Server,
   Clock,
 } from 'lucide-react';
+
 import type { ClientScope, ScopeChangeOrderEntity, ClientDeliveryStage } from '@/lib/clientOrder';
 import NumberFlow from '@number-flow/react';
 import styles from '@/app/dashboard/dashboard.module.css';

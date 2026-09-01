@@ -16,7 +16,7 @@ export function usePerformanceGovernor() {
   return useContext(PerformanceGovernorContext);
 }
 
-const SAMPLE_COUNT = 60;
+const SAMPLE_COUNT = 30;
 const FPS_HIGH = 50;
 const FPS_MEDIUM = 25;
 const HYST = 5;
@@ -56,7 +56,8 @@ export function PerformanceGovernorProvider({ children }: { children: React.Reac
       lastTimeRef.current = time;
 
       const samples = samplesRef.current;
-      if (samples.length >= 30) {
+      if (samples.length >= SAMPLE_COUNT) {
+
         const totalTime = samples.reduce((a, b) => a + b, 0);
         const fps = (samples.length / totalTime) * 1000;
 

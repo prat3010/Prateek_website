@@ -45,6 +45,13 @@ export function DocumentsPanel({ client, hidden, isExpired }: { client: Retrieve
     }
   }, [client]);
 
+  useEffect(() => {
+
+    if (subTab === "graph" && client) {
+      client.getGraphSummary().then(setGraphSummary).catch(() => {});
+    }
+  }, [subTab, client]);
+
   if (hidden) return null;
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -94,14 +101,9 @@ export function DocumentsPanel({ client, hidden, isExpired }: { client: Retrieve
     }
   }
 
-  useEffect(() => {
-    if (subTab === "graph" && client) {
-      client.getGraphSummary().then(setGraphSummary).catch(() => {});
-    }
-  }, [subTab, client]);
-
   const handleTraverseGraph = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+
     if (!graphEntity.trim() || !client || graphLoading) return;
     setGraphLoading(true);
     setError("");

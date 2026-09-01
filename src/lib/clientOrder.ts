@@ -358,8 +358,8 @@ export const saveScopeSchema = {
 };
 
 export interface IntakeDraftPayload {
-  engineId: string;
-  selectedFeatures: string[];
+  engineId?: string;
+  selectedFeatures?: string[];
   companyName?: string;
   contactEmail?: string;
   contactPhone?: string;
@@ -369,6 +369,14 @@ export interface IntakeDraftPayload {
   stepIndex?: number;
   brandAssetOption?: string;
   maintenancePlan?: string;
+  scopeCode?: string;
+  projectGoal?: string;
+  targetAudience?: string;
+  baseEngineId?: string;
+  baseEngineTitle?: string;
+  timeline?: string;
+  inspirationLinks?: string;
+  additionalNotes?: string;
 }
 
 export const intakeDraftSchema = {
@@ -400,10 +408,19 @@ export const intakeDraftSchema = {
         stepIndex: typeof obj.stepIndex === 'number' ? obj.stepIndex : Number(obj.stepIndex) || 0,
         brandAssetOption: typeof obj.brandAssetOption === 'string' ? obj.brandAssetOption : undefined,
         maintenancePlan: typeof obj.maintenancePlan === 'string' ? obj.maintenancePlan : undefined,
+        scopeCode: typeof obj.scopeCode === 'string' ? obj.scopeCode.trim() : undefined,
+        projectGoal: typeof obj.projectGoal === 'string' ? obj.projectGoal.trim() : undefined,
+        targetAudience: typeof obj.targetAudience === 'string' ? obj.targetAudience.trim() : undefined,
+        baseEngineId: typeof obj.baseEngineId === 'string' ? obj.baseEngineId.trim() : undefined,
+        baseEngineTitle: typeof obj.baseEngineTitle === 'string' ? obj.baseEngineTitle.trim() : undefined,
+        timeline: typeof obj.timeline === 'string' ? obj.timeline.trim() : undefined,
+        inspirationLinks: typeof obj.inspirationLinks === 'string' ? obj.inspirationLinks.trim() : undefined,
+        additionalNotes: typeof obj.additionalNotes === 'string' ? obj.additionalNotes.trim() : undefined,
       },
     };
   },
 };
+
 
 export interface CreateRazorpayOrderPayload {
   scopeCode: string;

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { RetrieverClient } from "@/lib/rag-client";
 import styles from "./rag.module.css";
 
@@ -15,21 +15,21 @@ export function CachePanel({ hidden, client }: CachePanelProps) {
   const [purging, setPurging] = useState<boolean>(false);
   const [purgeMessage, setPurgeMessage] = useState<string | null>(null);
 
-  const fetchStats = useCallback(async () => {
-    if (!client) return;
-    try {
-      const stats = await client.getCacheStats();
-      setCachedVectors(stats.total_vectors);
-    } catch {
-      // Fallback
-    }
-  }, [client]);
-
   useEffect(() => {
+    let isMounted = true;
     if (!hidden && client) {
-      fetchStats();
+      client
+        .getCacheStats()
+        .then((stats) => {
+          if (isMounted) setCachedVectors(stats.total_vectors);
+        })
+        .catch(() => {});
     }
-  }, [hidden, client, fetchStats]);
+    return () => {
+      isMounted = false;
+    };
+  }, [hidden, client]);
+
 
   if (hidden) return null;
 

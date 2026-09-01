@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { CheckCircle2, UserCheck, Save, Clock, HelpCircle } from 'lucide-react';
+import { UserCheck, Save } from 'lucide-react';
 import { generateOnboardingChecklist, calcOnboardingReadiness } from '@/lib/onboardingChecklist';
 import type { ClientScope } from '@/lib/clientOrder';
 import styles from '@/app/dashboard/dashboard.module.css';

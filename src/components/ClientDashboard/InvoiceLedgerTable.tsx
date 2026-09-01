@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { CreditCard, Download, Plus, RefreshCw, CheckCircle2, Clock, XCircle } from 'lucide-react';
+import { CreditCard, Download, Plus, RefreshCw, CheckCircle2, Clock } from 'lucide-react';
 import { formatCurrencyAmount } from '@/lib/invoicing';
 import type { InvoiceEntity } from '@/lib/clientOrder';
 import styles from '@/app/dashboard/dashboard.module.css';

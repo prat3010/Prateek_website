@@ -573,7 +573,7 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
                                     : "🟡 Neutral (Unsupported)"}
                                 </span>
                               </div>
-                              <div style={{ fontStyle: "italic", marginBottom: "0.25rem" }}>"{selectedClaim.claim}"</div>
+                              <div style={{ fontStyle: "italic", marginBottom: "0.25rem" }}>&quot;{selectedClaim.claim}&quot;</div>
                               <div className={styles.claimPremiseText}>
                                 <strong>Grounding Source:</strong> {selectedClaim.premise || "No direct matching context chunk found in retrieved documents."}
                               </div>

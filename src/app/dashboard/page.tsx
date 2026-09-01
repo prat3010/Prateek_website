@@ -8,18 +8,14 @@ import { isAdminEmail } from '@/lib/auth';
 import {
   LogOut,
   ShieldCheck,
-  Zap,
   Layers,
   CreditCard,
-  CheckCircle2,
-  FileCheck,
-  FileText,
   UserCheck,
   ArrowRight,
-  ExternalLink,
 } from 'lucide-react';
 import { generateQuestionnairePDF, generateExecutiveBriefPDF } from '@/utils/pdfGenerator';
-import type { ClientScope, InvoiceEntity } from '@/lib/clientOrder';
+import type { ClientScope } from '@/lib/clientOrder';
+
 import resumeData from '@/data/resume.json';
 import type { ResumeData } from '@/data/resume';
 import WorkspaceSwitcher from '@/components/ui/WorkspaceSwitcher';
@@ -70,10 +66,10 @@ export default function ClientDashboardPage() {
     setScopes,
     scopeChangeOrders,
     isLoading: isScopesLoading,
-    saveScopeToDatabase,
     loadChangeOrders,
     handleDeleteScope,
     updateScope,
+
   } = useDashboardScopes({
     userEmail: user?.email,
     getAccessToken,
@@ -455,7 +451,15 @@ export default function ClientDashboardPage() {
         </div>
       </header>
 
+
+      {authGateError && (
+        <div style={{ margin: '1rem 0', padding: '0.75rem 1rem', background: '#FF174422', border: '1px solid #FF1744', borderRadius: '8px', color: '#FF1744', fontSize: '0.85rem' }}>
+          ⚠️ Authentication session expired or unauthorized. Please sign in again to save scope changes.
+        </div>
+      )}
+
       {/* Main Tab Navigation */}
+
       <nav className={styles.tabNav}>
         <button
           className={`${styles.tabBtn} ${activeTab === 'scopes' ? styles.tabBtnActive : ''}`}

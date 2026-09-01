@@ -164,8 +164,8 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     appliedPromo,
     applyPromoCode,
     removePromoCode,
-    removeFeature,
     addFeature,
+
     cascadeState,
     requestRemoveFeature,
     confirmCascadeRemoval,

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import type { InvoiceEntity } from '@/lib/clientOrder';
 import { generateInvoicePDF } from '@/utils/pdfGenerator';
 
@@ -17,11 +17,45 @@ export function useDashboardInvoices({
   const [isInvoiceLoading, setIsInvoiceLoading] = useState(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
 
-  const loadInvoices = useCallback(async () => {
+  useEffect(() => {
+    let isMounted = true;
+    if (userEmail) {
+      Promise.resolve().then(async () => {
+        if (!isMounted) return;
+        setIsInvoiceLoading(true);
+        const accessToken = await getAccessToken();
+        if (!accessToken || !isMounted) {
+          if (isMounted) setIsInvoiceLoading(false);
+          return;
+        }
+        try {
+          const res = await fetch('/api/client/get-invoices', {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          });
+          const data = await res.json();
+          if (data?.invoices && isMounted) {
+            setInvoices(data.invoices);
+          }
+        } catch (err) {
+          console.warn('Failed to load invoices:', err);
+        } finally {
+          if (isMounted) setIsInvoiceLoading(false);
+        }
+      });
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [userEmail, getAccessToken]);
+
+  const loadInvoices = async () => {
     if (!userEmail) return;
-    const accessToken = await getAccessToken();
-    if (!accessToken) return;
     setIsInvoiceLoading(true);
+    const accessToken = await getAccessToken();
+    if (!accessToken) {
+      setIsInvoiceLoading(false);
+      return;
+    }
     try {
       const res = await fetch('/api/client/get-invoices', {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -35,12 +69,7 @@ export function useDashboardInvoices({
     } finally {
       setIsInvoiceLoading(false);
     }
-  }, [userEmail, getAccessToken]);
-
-  useEffect(() => {
-    loadInvoices();
-  }, [loadInvoices]);
-
+  };
   const handleDownloadInvoicePdf = (inv: InvoiceEntity) => {
     try {
       generateInvoicePDF(inv);

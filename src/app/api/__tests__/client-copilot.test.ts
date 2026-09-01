@@ -22,8 +22,10 @@ const mocks = vi.hoisted(() => {
 
   selectFn.mockReturnValue(chain);
   orderFn.mockImplementation(() => Promise.resolve({ data: state.scopes, error: null }));
-  eqFn.mockImplementation((column: string, _value: string) => {
+  eqFn.mockImplementation((column: string) => {
+
     if (column === 'client_email') {
+
       return {
         ...chain,
         order: vi.fn().mockResolvedValue({ data: state.scopes, error: null }),

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { type RetrieverConfig } from "@/lib/rag-client";
 import { useAuth } from "@/context/AuthContext";
 import { isValidUrl } from "./utils";
@@ -29,32 +29,41 @@ export function ConfigPanel({
   const [connecting, setConnecting] = useState(false);
   const [connectResult, setConnectResult] = useState<{ ok: boolean; msg: string } | null>(null);
 
-  // Widget Visual Customizer State
-  const [brandColor, setBrandColor] = useState<string>("#2563EB");
-  const [launcherPosition, setLauncherPosition] = useState<"bottom-right" | "bottom-left">("bottom-right");
-  const [botTitle, setBotTitle] = useState<string>("Retriever AI Support");
-  const [welcomeMessage, setWelcomeMessage] = useState<string>("Hi there! How can I help answer questions from our documentation today?");
-  const [corsDomain, setCorsDomain] = useState<string>("https://mysite.com");
-  const [contextualHeader, setContextualHeader] = useState<string>("Document Title & Section Scope");
-  const [searchFusionStrategy, setSearchFusionStrategy] = useState<string>("normalized_hybrid");
-
-  useEffect(() => {
-    if (typeof window !== "undefined" && form.tenantId) {
-      const saved = localStorage.getItem(`widget_config_${form.tenantId}`);
+  // Widget Visual Customizer State Helpers
+  const getSavedWidgetConfig = (tenantId: string, key: string, fallback: string) => {
+    if (typeof window === "undefined" || !tenantId) return fallback;
+    try {
+      const saved = localStorage.getItem(`widget_config_${tenantId}`);
       if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          if (parsed.brandColor) setBrandColor(parsed.brandColor);
-          if (parsed.launcherPosition) setLauncherPosition(parsed.launcherPosition);
-          if (parsed.botTitle) setBotTitle(parsed.botTitle);
-          if (parsed.welcomeMessage) setWelcomeMessage(parsed.welcomeMessage);
-          if (parsed.corsDomain) setCorsDomain(parsed.corsDomain);
-          if (parsed.contextualHeader) setContextualHeader(parsed.contextualHeader);
-          if (parsed.searchFusionStrategy) setSearchFusionStrategy(parsed.searchFusionStrategy);
-        } catch {}
+        const parsed = JSON.parse(saved);
+        if (parsed[key] !== undefined) return parsed[key];
       }
-    }
-  }, [form.tenantId]);
+    } catch {}
+    return fallback;
+  };
+
+  const [brandColor, setBrandColor] = useState<string>(() =>
+    getSavedWidgetConfig(form.tenantId, "brandColor", "#2563EB")
+  );
+  const [launcherPosition, setLauncherPosition] = useState<"bottom-right" | "bottom-left">(() =>
+    getSavedWidgetConfig(form.tenantId, "launcherPosition", "bottom-right") as "bottom-right" | "bottom-left"
+  );
+  const [botTitle, setBotTitle] = useState<string>(() =>
+    getSavedWidgetConfig(form.tenantId, "botTitle", "Retriever AI Support")
+  );
+  const [welcomeMessage, setWelcomeMessage] = useState<string>(() =>
+    getSavedWidgetConfig(form.tenantId, "welcomeMessage", "Hi there! How can I help answer questions from our documentation today?")
+  );
+  const [corsDomain, setCorsDomain] = useState<string>(() =>
+    getSavedWidgetConfig(form.tenantId, "corsDomain", "https://mysite.com")
+  );
+  const [contextualHeader, setContextualHeader] = useState<string>(() =>
+    getSavedWidgetConfig(form.tenantId, "contextualHeader", "Document Title & Section Scope")
+  );
+  const [searchFusionStrategy, setSearchFusionStrategy] = useState<string>(() =>
+    getSavedWidgetConfig(form.tenantId, "searchFusionStrategy", "normalized_hybrid")
+  );
+
 
 
   if (hidden) return null;

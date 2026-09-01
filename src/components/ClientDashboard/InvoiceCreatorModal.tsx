@@ -243,7 +243,7 @@ export function InvoiceCreatorModal({
                     />
                   </div>
                   <div className={styles.inputGroup}>
-                    <label>City & State</label>
+                    <label>City, State & Pincode</label>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                       <input
                         type="text"
@@ -257,10 +257,18 @@ export function InvoiceCreatorModal({
                         onChange={(e) => setInvState(e.target.value)}
                         placeholder="State"
                       />
+                      <input
+                        type="text"
+                        value={invPincode}
+                        onChange={(e) => setInvPincode(e.target.value)}
+                        placeholder="Pincode"
+                        style={{ width: '110px' }}
+                      />
                     </div>
                   </div>
                 </div>
               </div>
+
 
               {/* Currency & Tax Place */}
               <div className={styles.formSection}>
@@ -366,6 +374,32 @@ export function InvoiceCreatorModal({
                   ))}
                 </div>
               </div>
+
+              {/* Notes & Terms */}
+              <div className={styles.formSection}>
+                <h4 className={styles.formSectionTitle}>4. Notes & Terms</h4>
+                <div className={styles.inputRow}>
+                  <div className={styles.inputGroup}>
+                    <label>Invoice Notes</label>
+                    <input
+                      type="text"
+                      value={invNotes}
+                      onChange={(e) => setInvNotes(e.target.value)}
+                      placeholder="Thank you for choosing Prateeq Studio"
+                    />
+                  </div>
+                  <div className={styles.inputGroup}>
+                    <label>Payment Terms</label>
+                    <input
+                      type="text"
+                      value={invTerms}
+                      onChange={(e) => setInvTerms(e.target.value)}
+                      placeholder="Payment due in 14 days"
+                    />
+                  </div>
+                </div>
+              </div>
+
 
               {/* Totals Summary */}
               <div className={styles.invoiceTotalsSummary}>

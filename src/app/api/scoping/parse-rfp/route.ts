@@ -4,11 +4,9 @@ import { resolveFeatureDependencies } from '@/lib/pricing';
 import type { FeatureItem } from '@/data/resume';
 import type { ParseIntentResponse } from '@/lib/rag-client';
 
-const RETRIEVER_TENANT_ID = process.env.RETRIEVER_SCOPING_TENANT_ID || '';
-const RETRIEVER_API_KEY = process.env.RETRIEVER_SCOPING_API_KEY || '';
-const RETRIEVER_API_URL = (process.env.RETRIEVER_API_URL || 'https://rag.prateeq.in').replace(/\/$/, '');
-
+const RETRIEVER_TENANT_ID = process.env.RETRIEVER_SCOPING_TENANT_ID || 'prateeq_scoping';
 const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024; // 25 MB
+
 
 const { features: rawFeatures } = questionnaireDefaults;
 const featureCatalog = rawFeatures as FeatureItem[];

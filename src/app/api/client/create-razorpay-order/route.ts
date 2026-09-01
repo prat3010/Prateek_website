@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     const KEY_ID = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || '';
     const KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '';
 
-    let payload: Record<string, any>;
+    let payload: Record<string, unknown>;
     try {
       payload = await req.json();
     } catch {

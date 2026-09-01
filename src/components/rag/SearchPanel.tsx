@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { RetrieverClient } from "@/lib/rag-client";
 import type { SearchResponse, OnlineEvaluationSummaryResponse } from "@/lib/rag-types";
 import { highlightText } from "./utils";
@@ -23,26 +23,43 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
   const [onlineEval, setOnlineEval] = useState<OnlineEvaluationSummaryResponse | null>(null);
   const [loadingEval, setLoadingEval] = useState(false);
 
-  const fetchOnlineEval = useCallback(async () => {
+  useEffect(() => {
+    let isMounted = true;
+    if (subTab === "benchmarks" && client) {
+      Promise.resolve().then(async () => {
+        if (!isMounted) return;
+        setLoadingEval(true);
+        try {
+          const summary = await client.getOnlineEvaluationSummary();
+          if (isMounted) setOnlineEval(summary);
+        } catch {
+          // ignore
+        } finally {
+          if (isMounted) setLoadingEval(false);
+        }
+      });
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [subTab, client]);
+
+  const handleRefreshEval = async () => {
+
     if (!client) return;
     setLoadingEval(true);
     try {
       const summary = await client.getOnlineEvaluationSummary();
       setOnlineEval(summary);
     } catch {
-      // Keep null if not recorded yet
+      // ignore
     } finally {
       setLoadingEval(false);
     }
-  }, [client]);
-
-  useEffect(() => {
-    if (subTab === "benchmarks") {
-      fetchOnlineEval();
-    }
-  }, [subTab, fetchOnlineEval]);
+  };
 
   if (hidden) return null;
+
 
   async function handleSearch() {
     if (!client || !query.trim()) return;
@@ -262,9 +279,10 @@ export function SearchPanel({ client, hidden }: { client: RetrieverClient | null
             <p style={{ fontSize: "0.85rem", color: "var(--color-text-muted, #888)", margin: 0 }}>
               Live telemetry aggregated from verified chat responses, evaluating context faithfulness, prompt relevancy, and NLI entailment.
             </p>
-            <button onClick={fetchOnlineEval} className="comic-btn comic-btn-blue" disabled={loadingEval}>
+            <button onClick={handleRefreshEval} className="comic-btn comic-btn-blue" disabled={loadingEval}>
               {loadingEval ? "Refreshing..." : "🔄 Refresh Telemetry"}
             </button>
+
           </div>
 
           <div className={styles.benchmarkGrid}>

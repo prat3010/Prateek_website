@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import type { ClientScope, ScopeChangeOrderEntity, ClientDeliveryStage } from '@/lib/clientOrder';
+import type { ClientScope, ScopeChangeOrderEntity } from '@/lib/clientOrder';
 import { dbToClientScope } from '@/lib/clientOrder';
 
 interface UseDashboardScopesProps {
@@ -10,25 +10,54 @@ interface UseDashboardScopesProps {
   setAuthGateError: (err: boolean) => void;
 }
 
+// Storage & Cookie Fallback Reader for Safari ITP protection
+const getPendingScopeFromStorage = (): string | null => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const fromLocal = localStorage.getItem('prateeq_pending_scope');
+    if (fromLocal) return fromLocal;
+  } catch {}
+  const match = document.cookie.match(new RegExp('(?:^|; )' + encodeURIComponent('prateeq_pending_scope') + '=([^;]*)'));
+  return match ? decodeURIComponent(match[1]) : null;
+};
+
+const getInitialScopes = (): ClientScope[] => {
+  const raw = getPendingScopeFromStorage();
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return [{
+      id: `scope-${Date.now()}`,
+      scope_code: parsed.scopeCode || `SCOPE-${Math.floor(10000 + Math.random() * 90000)}`,
+      company_name: parsed.companyName?.trim() || '',
+      client_phone: parsed.contactPhone || '',
+      base_engine: parsed.baseEngineTitle || 'Full-Stack Web Engine',
+      features: parsed.selectedFeatures || [],
+      brand_asset: parsed.brandAssetOption || 'Standard',
+      maintenance_plan: parsed.maintenancePlan || 'Self-Managed (30-Day Warranty)',
+      total_cost_inr: parsed.totalCostINR || 175000,
+      total_cost_usd: parsed.totalCostUSD || 2500,
+      currency: parsed.currency || 'INR',
+      timeline: parsed.timeline || 'Standard Turnaround (2-4 Weeks)',
+      status: 'Draft Proposal',
+      delivery_stage: 'architecture',
+      deposit_paid: false,
+      created_at: new Date().toISOString(),
+    }];
+  } catch (e) {
+    console.warn('Failed to parse pending scope:', e);
+    return [];
+  }
+};
+
 export function useDashboardScopes({
   userEmail,
   getAccessToken,
   setAuthGateError,
 }: UseDashboardScopesProps) {
-  const [scopes, setScopes] = useState<ClientScope[]>([]);
+  const [scopes, setScopes] = useState<ClientScope[]>(() => getInitialScopes());
   const [scopeChangeOrders, setScopeChangeOrders] = useState<Record<string, ScopeChangeOrderEntity[]>>({});
   const [isLoading, setIsLoading] = useState(true);
-
-  // Storage & Cookie Fallback Reader for Safari ITP protection
-  const getPendingScopeFromStorage = (): string | null => {
-    if (typeof window === 'undefined') return null;
-    try {
-      const fromLocal = localStorage.getItem('prateeq_pending_scope');
-      if (fromLocal) return fromLocal;
-    } catch {}
-    const match = document.cookie.match(new RegExp('(?:^|; )' + encodeURIComponent('prateeq_pending_scope') + '=([^;]*)'));
-    return match ? decodeURIComponent(match[1]) : null;
-  };
 
   const clearPendingScopeFromStorage = (): void => {
     if (typeof window === 'undefined') return;
@@ -36,35 +65,6 @@ export function useDashboardScopes({
     document.cookie = 'prateeq_pending_scope=; path=/; max-age=0; SameSite=Lax;';
   };
 
-  // Initial local pending scope import
-  useEffect(() => {
-    const raw = getPendingScopeFromStorage();
-    if (!raw) return;
-    try {
-      const parsed = JSON.parse(raw);
-      const imported: ClientScope = {
-        id: `scope-${Date.now()}`,
-        scope_code: parsed.scopeCode || `SCOPE-${Math.floor(10000 + Math.random() * 90000)}`,
-        company_name: parsed.companyName?.trim() || '',
-        client_phone: parsed.contactPhone || '',
-        base_engine: parsed.baseEngineTitle || 'Full-Stack Web Engine',
-        features: parsed.selectedFeatures || [],
-        brand_asset: parsed.brandAssetOption || 'Standard',
-        maintenance_plan: parsed.maintenancePlan || 'Self-Managed (30-Day Warranty)',
-        total_cost_inr: parsed.totalCostINR || 175000,
-        total_cost_usd: parsed.totalCostUSD || 2500,
-        currency: parsed.currency || 'INR',
-        timeline: parsed.timeline || 'Standard Turnaround (2-4 Weeks)',
-        status: 'Draft Proposal',
-        delivery_stage: 'architecture',
-        deposit_paid: false,
-        created_at: new Date().toISOString(),
-      };
-      setScopes([imported]);
-    } catch (e) {
-      console.warn('Failed to parse pending scope:', e);
-    }
-  }, []);
 
   const saveScopeToDatabase = useCallback(
     async (updatedScope: ClientScope) => {

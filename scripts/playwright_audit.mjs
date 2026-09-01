@@ -110,9 +110,10 @@ async function runAudit() {
           const noirScreenshot = path.join(OUTPUT_DIR, `${route.name}_${vp.name}_noir.png`);
           await page.screenshot({ path: noirScreenshot, fullPage: false });
           noirCaptured = true;
-        } catch (e) {
+        } catch {
           // Noir toggle fallback
         }
+
 
         // Test Interactive Modals or CLI on desktop
         if (route.path === '/' && vp.name === 'desktop') {

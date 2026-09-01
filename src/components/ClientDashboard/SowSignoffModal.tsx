@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Lock, CreditCard, ShieldCheck } from 'lucide-react';
+import { X, Lock, CreditCard } from 'lucide-react';
 import Portal from '@/components/ui/Portal';
 import type { ClientScope } from '@/lib/clientOrder';
 import styles from '@/app/dashboard/dashboard.module.css';

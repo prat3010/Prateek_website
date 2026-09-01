@@ -6,8 +6,8 @@ import { RetrieverClient } from "@/lib/rag-client";
 import {
   EmbeddingProjectionResponse,
   ProjectedPoint,
-  ProjectionCentroid,
 } from "@/lib/rag-types";
+
 import styles from "./rag.module.css";
 
 // Distinctive palette for clusters in Azure & Noir themes
@@ -101,10 +101,40 @@ export function VectorVisualizerPanel({ client, hidden }: VectorVisualizerPanelP
   );
 
   useEffect(() => {
+    let isMounted = true;
     if (!hidden && client) {
-      void fetchProjection();
+      Promise.resolve().then(async () => {
+        if (!isMounted) return;
+        setLoading(true);
+        setError(null);
+        try {
+          const res = await client.projectEmbeddings({
+            method,
+            dimensions,
+            normalize,
+          });
+          if (isMounted) {
+            setData(res);
+            if (res.query_point) {
+              setActiveQueryPoint(res.query_point);
+            }
+          }
+        } catch (err: unknown) {
+          if (isMounted) {
+            const msg = err instanceof Error ? err.message : "Failed to project embeddings";
+            setError(msg);
+          }
+        } finally {
+          if (isMounted) setLoading(false);
+        }
+      });
     }
-  }, [hidden, client, fetchProjection]);
+    return () => {
+      isMounted = false;
+    };
+  }, [hidden, client, method, dimensions, normalize]);
+
+
 
   // Handle Search Query projection
   const handleProjectSearchQuery = async (e: React.FormEvent) => {
@@ -640,7 +670,7 @@ export function VectorVisualizerPanel({ client, hidden }: VectorVisualizerPanelP
             All Clusters ({data.total_points})
           </button>
 
-          {data.centroids.map((c, i) => {
+          {data.centroids.map((c) => {
             const hex = CLUSTER_COLORS[Math.abs(c.cluster_id) % CLUSTER_COLORS.length];
             const isSelected = selectedClusterId === c.cluster_id;
             return (

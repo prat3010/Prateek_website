@@ -110,10 +110,6 @@ function Projects({ projects }: ProjectsProps) {
   const activeAudience = audience || 'developer';
   const lenis = useLenis();
 
-  const getProjectStatus = (proj: Project) => {
-    if (proj.status) return proj.status;
-    return proj.isLive ? 'live' : 'soon';
-  };
 
   const getProjectCategory = (proj: Project): string => {
     if (proj.category) return proj.category;

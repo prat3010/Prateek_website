@@ -18,13 +18,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: parseResult.error.message, issues: parseResult.error.issues }, { status: 400 });
     }
 
-    const payload = rawJson as Record<string, any>;
+    const payload = parseResult.data;
+    const rawObj = (rawJson && typeof rawJson === 'object') ? (rawJson as Record<string, unknown>) : {};
 
     if (!payload.companyName && !payload.contactEmail) {
       return NextResponse.json({ error: 'Invalid intake lead payload: companyName or contactEmail required' }, { status: 400 });
     }
 
-    const scopeCode = payload.scopeCode || `SCOPE-${Math.floor(10000 + Math.random() * 90000)}`;
+    const scopeCode = (typeof rawObj.scopeCode === 'string' && rawObj.scopeCode.trim())
+      ? rawObj.scopeCode.trim()
+      : `SCOPE-${Math.floor(10000 + Math.random() * 90000)}`;
+
     const draftToken = `draft_${scopeCode}_${Date.now()}`;
 
     if (!supabase) {

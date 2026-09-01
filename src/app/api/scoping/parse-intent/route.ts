@@ -9,7 +9,8 @@ const RETRIEVER_API_KEY = process.env.RETRIEVER_SCOPING_API_KEY || '';
 const RETRIEVER_USER_ID = process.env.RETRIEVER_SCOPING_USER_ID || '';
 const RETRIEVER_API_URL = (process.env.RETRIEVER_API_URL || 'https://rag.prateeq.in').replace(/\/$/, '');
 
-const { goals, features: rawFeatures } = questionnaireDefaults;
+const { features: rawFeatures } = questionnaireDefaults;
+
 const featureCatalog = rawFeatures as FeatureItem[];
 
 /**
