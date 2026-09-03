@@ -598,7 +598,7 @@ timeline
 ├────────────────────────────────────────────────────────────────────────────────────────┤
 │  [M86] Edge AI Token Shield, DDoS Defense & Upstash Redis Sliding-Window Rate Limiter  │
 │  [M86.5] Platform Capabilities & Active Batteries Observability Cockpit (Completed)   │
-│  [M87] Automated Cloud Database Snapshots, S3/R2 WAL Archival & PITR Recovery Engine   │
+│  [M87] Automated Cloud Database Snapshots, S3/R2 WAL Archival & PITR Engine (Completed)│
 │  [M88] Enterprise Compliance Vault: Presidio PII Redaction & GDPR Cryptographic Wipe   │
 │  [M89] Geo-Distributed Multi-Region Edge Vector Read-Replicas (<30ms Global Latency)  │
 │  [M90] Universal Ecosystem Plugins (Slack App, Chrome Extension & 2-Way GDrive Sync)   │
@@ -624,11 +624,14 @@ timeline
 - **Status:** **Completed (2026-09-04)**
 
 #### 💾 Milestone 87: Automated Cloud Database Snapshots, S3/R2 WAL Archival & PITR Recovery Engine
-- **Repo Scope:** `retriever` (`scripts/db_snapshot.py`, `.github/workflows/db_backup_cron.yml`, Oracle VPS `retriever-db-backup.timer`)
-- **Deliverable:**
-  - Automated daily encrypted `pg_dump` snapshot routine with AES-256 GCM encryption and automated upload to Cloudflare R2 / AWS S3.
-  - Write-Ahead Logging (WAL) stream archival for Point-in-Time Recovery (PITR) with automated single-command disaster recovery CLI script.
-- **Status:** **Planned (Phase K)**
+- **Repo Scope:** `retriever` (`apps/api/src/adapters/backup/`, `scripts/db_snapshot.py`, `scripts/db_restore.py`, `apps/web/src/app/(dashboard)/system-data/page.tsx`)
+- **Deliverables:**
+  1. Built pooler-safe logical table streamer with gzip compression, AES-256 GCM envelope encryption, and SHA-256 integrity manifest generation.
+  2. Integrated off-site Cloudflare R2 / AWS S3 cloud storage upload via `S3Storage` with automated 14-day retention rotation.
+  3. Implemented Point-in-Time Recovery (PITR) engine with topological foreign key DAG traversal (`tenants` -> `users` -> `documents` -> `vector_records`) and zero-downtime `--dry-run` simulation mode.
+  4. Created standalone CLI utilities `scripts/db_snapshot.py` and `scripts/db_restore.py`.
+  5. Deployed Disaster Recovery & Cloud Snapshots command center in Admin Dashboard (`/system-data`) with on-demand snapshot trigger and dry-run audit buttons.
+- **Status:** **Completed (2026-09-04)**
 
 #### 🔒 Milestone 88: Enterprise Compliance Vault: Presidio PII Redaction & GDPR Cryptographic Wipe
 - **Repo Scope:** `retriever` (`apps/api/src/adapters/security/`, `workers/src/tasks/`)
