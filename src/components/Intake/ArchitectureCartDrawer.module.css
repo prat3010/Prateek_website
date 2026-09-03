@@ -642,4 +642,114 @@
   .actionRow {
     flex-direction: column;
   }
+  .sprintStatsGrid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
+.sprintMeterCard {
+  background: var(--surface-card);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--border-radius-md, 8px);
+  padding: 1rem 1.15rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sprintHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.sprintTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-headline);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.sprintConfidenceBadge {
+  font-family: var(--font-code);
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: var(--badge-active-bg);
+  color: var(--badge-active-text);
+  border: 1px solid var(--badge-active-border);
+}
+
+.sprintStatsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  background: var(--surface-elevated);
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
+}
+
+.sprintStatItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.sprintStatLabel {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.sprintStatValue {
+  font-family: var(--font-code);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.sprintP90 {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.complexityScore {
+  color: var(--pop-blue);
+}
+
+:global([data-theme='noir']) .complexityScore {
+  color: var(--neon-cyan);
+}
+
+.sprintRiskArea {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  border-top: 1px dashed var(--border-muted);
+  padding-top: 0.5rem;
+}
+
+.sprintRiskItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  line-height: 1.35;
+}
+
+.sprintRiskIcon {
+  color: var(--pop-terracotta, #e06d53);
+  flex-shrink: 0;
+  margin-top: 1px;
 }

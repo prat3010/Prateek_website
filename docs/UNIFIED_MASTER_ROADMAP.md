@@ -365,7 +365,7 @@ timeline
     2. Estimated Delivery Window (Calendar days with 95% confidence bounds).
     3. Architecture Complexity Index ($1.0 - 5.0$).
   - **Client Scoping Lab & Dashboard Integration:** Live dynamic timeline bar with confidence intervals displayed in the Cart Drawer (`/scoping`) and Client Workspace (`/dashboard`), replacing static flat-rate delivery estimates.
-- **Status:** **Planned (Phase J)**
+- **Status:** **Completed (Phase J, Milestone 84 / v0.69.0)**
 
 #### 🎯 Milestone 85: Scikit-Learn & PyTorch Visitor Persona & Lead Conversion Propensity Classifier
 - **Libraries:** `scikit-learn` (`cluster.KMeans`, `linear_model.LogisticRegression`, `metrics.roc_auc_score`) & `PyTorch` (Intent Cross-Encoder)

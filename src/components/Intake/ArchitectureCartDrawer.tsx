@@ -10,13 +10,22 @@ import {
   ArrowRight,
   Download,
   Tag,
+  Clock,
+  AlertCircle,
 } from 'lucide-react';
 import Portal from '@/components/ui/Portal';
 import MagneticButton from '@/components/ui/MagneticButton';
 import NumberFlow from '@number-flow/react';
 import { toast } from 'sonner';
 import type { FeatureItem } from '@/data/resume';
-import { formatMoney, type Currency, type QuoteResult, type PromoDiscountInfo } from '@/lib/pricing';
+import {
+  formatMoney,
+  type Currency,
+  type QuoteResult,
+  type PromoDiscountInfo,
+  estimateScopeTimeline,
+  type TimelineEstimateResult,
+} from '@/lib/pricing';
 import styles from './ArchitectureCartDrawer.module.css';
 
 interface ArchitectureCartDrawerProps {
@@ -54,6 +63,48 @@ export function ArchitectureCartDrawer({
   const [promoInput, setPromoInput] = useState('');
   const [promoLoading, setPromoLoading] = useState(false);
   const [promoError, setPromoError] = useState('');
+
+  // Milestone 84: ML Sprint Delivery Confidence & Complexity Estimation
+  const localTimeline = useMemo(() => {
+    return estimateScopeTimeline(
+      {
+        engineId: quote.engine?.id || 'saas',
+        featureIds: quote.features.map((f) => f.id),
+        brandAssetId: quote.brandAsset?.id,
+        maintenancePlanId: quote.maintenancePlan?.id,
+      },
+      allFeatures
+    );
+  }, [quote.engine?.id, quote.features, quote.brandAsset?.id, quote.maintenancePlan?.id, allFeatures]);
+
+  const [mlTimeline, setMlTimeline] = useState<TimelineEstimateResult | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetch('/api/scoping/estimate-timeline', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        engineId: quote.engine?.id || 'saas',
+        featureIds: quote.features.map((f) => f.id),
+        brandAssetId: quote.brandAsset?.id,
+        maintenancePlanId: quote.maintenancePlan?.id,
+      }),
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (isMounted && data && !data.isFallback) {
+          setMlTimeline(data);
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      isMounted = false;
+    };
+  }, [quote.engine?.id, quote.features, quote.brandAsset?.id, quote.maintenancePlan?.id]);
+
+  const activeTimeline = mlTimeline || localTimeline;
 
   // Close drawer on Escape key
   useEffect(() => {
@@ -427,6 +478,53 @@ export function ArchitectureCartDrawer({
                   </span>
                 </div>
               </div>
+            </div>
+
+            {/* Milestone 84: ML Sprint Delivery Confidence & Complexity Meter */}
+            <div className={styles.sprintMeterCard}>
+              <div className={styles.sprintHeader}>
+                <div className={styles.sprintTitle}>
+                  <Clock size={15} />
+                  <span>Sprint Effort & Delivery Timeline</span>
+                </div>
+                <span className={styles.sprintConfidenceBadge}>
+                  {activeTimeline.isFallback ? 'Deterministic Model' : 'ML Gradient Boosted (P50/P90)'}
+                </span>
+              </div>
+
+              <div className={styles.sprintStatsGrid}>
+                <div className={styles.sprintStatItem}>
+                  <span className={styles.sprintStatLabel}>Estimated Sprint Hours</span>
+                  <span className={styles.sprintStatValue}>
+                    {activeTimeline.hoursP50}h <span className={styles.sprintP90}>({activeTimeline.hoursP90}h buffer)</span>
+                  </span>
+                </div>
+
+                <div className={styles.sprintStatItem}>
+                  <span className={styles.sprintStatLabel}>Delivery Turnaround</span>
+                  <span className={styles.sprintStatValue}>
+                    {activeTimeline.calendarDaysMin}–{activeTimeline.calendarDaysMax} Days
+                  </span>
+                </div>
+
+                <div className={styles.sprintStatItem}>
+                  <span className={styles.sprintStatLabel}>Architecture Complexity</span>
+                  <span className={styles.sprintStatValue}>
+                    <span className={styles.complexityScore}>{activeTimeline.complexityIndex.toFixed(1)}</span> / 5.0
+                  </span>
+                </div>
+              </div>
+
+              {activeTimeline.riskFactors && activeTimeline.riskFactors.length > 0 ? (
+                <div className={styles.sprintRiskArea}>
+                  {activeTimeline.riskFactors.map((rf, idx) => (
+                    <div key={idx} className={styles.sprintRiskItem}>
+                      <AlertCircle size={12} className={styles.sprintRiskIcon} />
+                      <span>{rf}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
             </div>
 
             {/* 50% Deposit Split */}

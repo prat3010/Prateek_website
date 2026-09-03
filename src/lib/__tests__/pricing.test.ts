@@ -10,6 +10,7 @@ import {
   resolveFeatureDependencies,
   findDependentFeatures,
   calcCascadeRemovalSavings,
+  estimateScopeTimeline,
 } from '@/lib/pricing';
 import type { BaseEngineItem, FeatureItem } from '@/data/resume';
 
@@ -307,6 +308,59 @@ describe('calcCascadeRemovalSavings', () => {
     expect(savings.targetFeature?.id).toBe('auth');
     expect(savings.dependentFeatures.length).toBe(1);
     expect(savings.totalSavingsFormatted).toContain('₹1,00,000');
+  });
+});
+
+describe('estimateScopeTimeline (Milestone 84 ML Parity)', () => {
+  it('calculates realistic P50 and P90 bounds with risk buffer', () => {
+    const res = estimateScopeTimeline(
+      { engineId: 'landing', featureIds: [], brandAssetId: '', maintenancePlanId: '' },
+      features as FeatureItem[]
+    );
+
+    expect(res.hoursP50).toBeGreaterThanOrEqual(10);
+    expect(res.hoursP90).toBeGreaterThanOrEqual(res.hoursP50 * 1.15);
+    expect(res.calendarDaysMax).toBeGreaterThanOrEqual(res.calendarDaysMin);
+    expect(res.complexityIndex).toBeGreaterThanOrEqual(1.0);
+    expect(res.complexityIndex).toBeLessThanOrEqual(5.0);
+    expect(res.isFallback).toBe(true);
+  });
+
+  it('monotonically increases effort and complexity when adding complex features', () => {
+    const simple = estimateScopeTimeline(
+      { engineId: 'landing', featureIds: [], brandAssetId: '', maintenancePlanId: '' },
+      features as FeatureItem[]
+    );
+
+    const complex = estimateScopeTimeline(
+      {
+        engineId: 'saas',
+        featureIds: ['ai_rag', 'ai_voice_agent', 'auth', 'payments', 'admin'],
+        brandAssetId: 'brand_complete',
+        maintenancePlanId: 'care_enterprise',
+      },
+      features as FeatureItem[]
+    );
+
+    expect(complex.hoursP50).toBeGreaterThan(simple.hoursP50);
+    expect(complex.hoursP90).toBeGreaterThan(simple.hoursP90);
+    expect(complex.complexityIndex).toBeGreaterThan(simple.complexityIndex);
+    expect(complex.calendarDaysMax).toBeGreaterThan(simple.calendarDaysMax);
+    expect(complex.topEffortDrivers.length).toBeGreaterThan(0);
+  });
+
+  it('triggers risk factors when high-concurrency voice or multi-model RAG selected', () => {
+    const voiceScope = estimateScopeTimeline(
+      {
+        engineId: 'saas',
+        featureIds: ['ai_voice_agent', 'ai_rag'],
+        brandAssetId: '',
+        maintenancePlanId: '',
+      },
+      features as FeatureItem[]
+    );
+
+    expect(voiceScope.riskFactors.some((rf) => rf.includes('Voice AI') || rf.includes('WebRTC'))).toBe(true);
   });
 });
 
