@@ -53,12 +53,12 @@ timeline
     Phase G (M63–M68) : Productized E-Commerce Scoping & Agency Ecosystem : Completed
     Phase H (M69–M73) : SOTA Cognitive RAG Algorithm R&D : Completed
     Phase I (M74–M78) : Enterprise Cognitive Evaluation & Deep Observability : Completed
-    Phase J (M79–M85) : Machine Learning & Predictive Intelligence Framework : ACTIVE NEXT (M82)
+    Phase J (M79–M85) : Machine Learning & Predictive Intelligence Framework : Completed
     Phase J.5 (M85.1–M85.4) : Forensic Audit Remediation — Blueprint-to-Reality Parity : Completed
     Phase J.6 (M85.5–M85.10) : Production Hardening & Engineering Credibility : Completed
     Phase J.7 (M85.11–M85.16) : Honest AI Wiring, Trust Hardening & FDE Hiring Credibility : ACTIVE NEXT
     Phase K (M86–M90) : Enterprise Scale, Edge Replication & Universal Plugins : Planned
-    Phase L (M91–M96) : Forward Deployed Engineering (FDE) Enterprise Agentic Stack : Planned
+    Phase L (M91–M97) : Forward Deployed Engineering (FDE) Enterprise Agentic Stack : Planned
 ```
 
 ---
@@ -644,11 +644,11 @@ timeline
 
 ---
 
-### Phase L: Forward Deployed Engineering (FDE) Enterprise Agentic Stack (M91 – M96) — **PLANNED HORIZON**
+### Phase L: Forward Deployed Engineering (FDE) Enterprise Agentic Stack (M91 – M97) — **PLANNED HORIZON**
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
-│     PHASE L: FORWARD DEPLOYED ENGINEERING (FDE) ENTERPRISE AGENTIC STACK (M91–M96)     │
+│     PHASE L: FORWARD DEPLOYED ENGINEERING (FDE) ENTERPRISE AGENTIC STACK (M91–M97)     │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
 │  [M91] LangGraph Cyclic Agentic Orchestration & Human-in-the-Loop (HITL) State Engine  │
 │  [M92] DSPy Declarative Prompt Compilation & Algorithmic Self-Optimization Pipeline    │
@@ -656,6 +656,7 @@ timeline
 │  [M94] NVIDIA NeMo Guardrails & Multi-Turn Conversational Safety Rails                 │
 │  [M95] Durable Asynchronous Execution & Background AI Workflow Engine (Inngest)        │
 │  [M96] Serverless GPU Serving & Custom vLLM / LoRA Deployment Pipeline (Modal/BentoML) │
+│  [M97] Autonomous FDE Metaprogrammer & Self-Extending Capability Studio                │
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -712,6 +713,18 @@ timeline
   - Production deployment recipes for serverless GPU scaling (Modal / BentoML / Together AI) for dedicated tenant fine-tuned models.
   - Cold-start optimization (<3s warm container boot) with dynamic LoRA weight swapping on a shared base model (e.g. Llama-3.1-8B-Instruct).
   - Automatic auto-scaling down to zero GPU instances when tenant traffic is idle, cutting cloud compute costs by 70%+.
+- **Status:** **Planned (Phase L)**
+
+#### 🛠️ Milestone 97: Autonomous FDE Metaprogrammer & Self-Extending Capability Studio
+- **Libraries:** Python `ast`, `jinja2`, `pydantic`, `pytest`
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/scaffolding/`, `src/routers/scaffold.py`, `retriever-cli` & `Prateek_website` `/rag/app/feature-studio`, `src/components/rag/FeatureStudioPanel.tsx`)
+- **Deliverable:**
+  - **Dual-Persona Solution Engine:**
+    1. *For Business / Non-Tech Users:* Natural language use-case wizard in SaaS Studio that recommends and configures existing batteries (System Prompts, PII redaction toggles, chunk sizes, and n8n webhooks) with zero code exposure.
+    2. *For Developers & Forward Deployed Engineers:* Autonomous Metaprogrammer agent that ingests custom domain requirements, analyzes missing capabilities, and auto-scaffolds complete Hexagonal architecture slices (`domain/abstractions/`, `domain/`, `adapters/`, `routers/`, `container.py` injection, and automated Pytest test suites).
+  - **Isolated Plugin / Extension Directory (`apps/api/src/plugins/custom/`):** Scaffolds into dedicated, git-isolated directories preventing merge conflicts when users pull upstream updates from the core open-source repository.
+  - **Automated AST & Pytest Gate:** Verifies that generated modules adhere strictly to Hexagonal boundaries (0 framework imports in domain) and pass unit tests before hot-reloading into the active container.
+  - **Community PR Generator:** 1-click command creating clean git branches and Pull Request templates for contributing verified custom adapters back to the upstream open-source project.
 - **Status:** **Planned (Phase L)**
 
 ---
