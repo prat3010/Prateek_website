@@ -138,7 +138,36 @@ export function OverviewPanel({ hidden, client, onNavigateTab }: OverviewPanelPr
         </div>
       </div>
 
+      {/* Milestone 83: Telemetry Anomaly Sentinel & Abuse Guard Banner */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0.75rem 1rem",
+          background: "rgba(0, 230, 118, 0.06)",
+          border: "1px solid rgba(0, 230, 118, 0.2)",
+          borderRadius: "8px",
+          marginBottom: "1.5rem",
+          fontSize: "0.85rem",
+          flexWrap: "wrap",
+          gap: "0.5rem",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <span style={{ fontSize: "1rem" }}>🛡️</span>
+          <span>
+            <strong>Anomaly Sentinel:</strong> Active (Isolation Forest • Telemetry Quota Abuse Guard)
+          </span>
+        </div>
+        <span style={{ color: "#00E676", fontWeight: 600, fontSize: "0.8rem", display: "flex", alignItems: "center", gap: "0.35rem" }}>
+          <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#00E676", display: "inline-block" }} />
+          Nominal • 0 Quarantined
+        </span>
+      </div>
+
       {/* Quickstart Checklist */}
+
       <div style={{ background: "rgba(90, 142, 182, 0.08)", border: "1px solid rgba(90, 142, 182, 0.2)", borderRadius: "8px", padding: "1.25rem", marginBottom: "1.5rem" }}>
         <h3 style={{ fontSize: "1rem", margin: "0 0 0.75rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
           🚀 RAG Studio Onboarding Quickstart
