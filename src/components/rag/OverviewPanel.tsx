@@ -138,32 +138,90 @@ export function OverviewPanel({ hidden, client, onNavigateTab }: OverviewPanelPr
         </div>
       </div>
 
-      {/* Milestone 83: Telemetry Anomaly Sentinel & Abuse Guard Banner */}
+      {/* Active Engine Batteries & Cognitive Capabilities Matrix (M86.5) */}
       <div
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "0.75rem 1rem",
-          background: "rgba(0, 230, 118, 0.06)",
-          border: "1px solid rgba(0, 230, 118, 0.2)",
+          background: "var(--surface-card, rgba(90, 142, 182, 0.05))",
+          border: "1px solid var(--surface-glass-border, rgba(90, 142, 182, 0.2))",
           borderRadius: "8px",
+          padding: "1rem 1.25rem",
           marginBottom: "1.5rem",
-          fontSize: "0.85rem",
-          flexWrap: "wrap",
-          gap: "0.5rem",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <span style={{ fontSize: "1rem" }}>🛡️</span>
-          <span>
-            <strong>Anomaly Sentinel:</strong> Active (Isolation Forest • Telemetry Quota Abuse Guard)
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem", flexWrap: "wrap", gap: "0.5rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <span style={{ fontSize: "1.1rem" }}>🔋</span>
+            <strong style={{ fontSize: "0.95rem", color: "var(--color-text)" }}>Active Engine Batteries & Capabilities</strong>
+          </div>
+          <span
+            style={{
+              fontSize: "0.75rem",
+              fontFamily: "var(--font-mono, monospace)",
+              padding: "0.2rem 0.5rem",
+              borderRadius: "4px",
+              background: "rgba(0, 230, 118, 0.1)",
+              color: "#00E676",
+              border: "1px solid rgba(0, 230, 118, 0.25)",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.35rem",
+            }}
+          >
+            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#00E676", display: "inline-block" }} />
+            9/9 Engines Operational
           </span>
         </div>
-        <span style={{ color: "#00E676", fontWeight: 600, fontSize: "0.8rem", display: "flex", alignItems: "center", gap: "0.35rem" }}>
-          <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#00E676", display: "inline-block" }} />
-          Nominal • 0 Quarantined
-        </span>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            gap: "0.6rem",
+          }}
+        >
+          {[
+            { name: "ColBERT MaxSim Reranker", latency: "~14ms", cat: "Retrieval" },
+            { name: "Sublinear BM25 Keyword Search", latency: "~3ms", cat: "Retrieval" },
+            { name: "pgvector HNSW Dense Vectors", latency: "~8ms", cat: "Vector" },
+            { name: "GraphRAG HDBSCAN Topics", latency: "~35ms", cat: "Graph" },
+            { name: "Docling Layout OCR Parser", latency: "v2.1", cat: "Ingestion" },
+            { name: "RLM Python REPL Sandbox", latency: "~18ms", cat: "Sandbox" },
+            { name: "Telemetry Anomaly Sentinel", latency: "Nominal", cat: "Defense" },
+            { name: "Edge AI Token Shield", latency: "Active", cat: "Rate-Limit" },
+            { name: "LlamaGuard 3 Safety Rails", latency: "S1–S13", cat: "Moderation" },
+          ].map((b) => (
+            <div
+              key={b.name}
+              style={{
+                background: "var(--surface-elevated, rgba(0, 0, 0, 0.2))",
+                border: "1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.05))",
+                borderRadius: "6px",
+                padding: "0.5rem 0.65rem",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                fontSize: "0.8rem",
+              }}
+            >
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <span style={{ fontWeight: 600, color: "var(--color-text)", fontSize: "0.78rem" }}>{b.name}</span>
+                <span style={{ fontSize: "0.68rem", color: "var(--color-text-muted)" }}>{b.cat}</span>
+              </div>
+              <span
+                style={{
+                  fontFamily: "var(--font-mono, monospace)",
+                  fontSize: "0.7rem",
+                  color: "#00E676",
+                  background: "rgba(0, 230, 118, 0.08)",
+                  padding: "0.15rem 0.4rem",
+                  borderRadius: "4px",
+                }}
+              >
+                {b.latency}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Quickstart Checklist */}

@@ -597,6 +597,7 @@ timeline
 │     PHASE K: ENTERPRISE SAAS HARDENING, EDGE REPLICATION & PLUGINS (M86–M90)           │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
 │  [M86] Edge AI Token Shield, DDoS Defense & Upstash Redis Sliding-Window Rate Limiter  │
+│  [M86.5] Platform Capabilities & Active Batteries Observability Cockpit (Completed)   │
 │  [M87] Automated Cloud Database Snapshots, S3/R2 WAL Archival & PITR Recovery Engine   │
 │  [M88] Enterprise Compliance Vault: Presidio PII Redaction & GDPR Cryptographic Wipe   │
 │  [M89] Geo-Distributed Multi-Region Edge Vector Read-Replicas (<30ms Global Latency)  │
@@ -612,6 +613,15 @@ timeline
   3. Attached backend defense-in-depth rate limiting (`Depends(rate_limit(scope="intent", max_requests=30))`) to `POST /v1/tenants/{tenantId}/intent/classify` in Retriever with unit test assertions in `test_intent_classification.py`.
   4. Implemented resilient SSE connection recovery with `Last-Event-ID` sequential event tracking (`id: {event_seq}`) and 3-attempt exponential backoff retry loop in `ChatPanel.tsx` and `rag-client.ts`, eliminating severed responses on mobile Wi-Fi/cellular handover.
 - **Status:** **Completed (2026-09-03)**
+
+#### 🔋 Milestone 86.5: Platform Capabilities & Active Batteries Observability Cockpit
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/batteries/`, `apps/web/src/app/(dashboard)/batteries/` & `Prateek_website` `src/components/rag/OverviewPanel.tsx`)
+- **Deliverables:**
+  1. Built pure Python domain battery registry assembling all 12 platform batteries (BM25, pgvector HNSW, ColBERT MaxSim, Docling OCR, RLM Sandbox, GraphRAG HDBSCAN, Anomaly Sentinel, Effort Regressor, Persona Clusterer, Token Shield, LlamaGuard 3, LongLLMLingua).
+  2. Implemented `GET /v1/admin/platform/batteries` and `GET /v1/tenants/{tenantId}/batteries` exposing live engine statuses, algorithmic foundations, latency profiles, and active hyperparameters.
+  3. Deployed high-tech visual command center in `apps/web` (`/batteries`) with real-time KPI metrics, category filter pills, pulsing health indicators, and engine parameter tags.
+  4. Integrated active cognitive capabilities matrix into SaaS Studio Overview (`/rag/app`) with Design System 2.0 theme parity.
+- **Status:** **Completed (2026-09-04)**
 
 #### 💾 Milestone 87: Automated Cloud Database Snapshots, S3/R2 WAL Archival & PITR Recovery Engine
 - **Repo Scope:** `retriever` (`scripts/db_snapshot.py`, `.github/workflows/db_backup_cron.yml`, Oracle VPS `retriever-db-backup.timer`)

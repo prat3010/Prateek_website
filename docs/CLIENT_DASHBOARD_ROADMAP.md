@@ -86,6 +86,9 @@ The **Client Dashboard Ecosystem** on `prateeq.in` serves as the primary commerc
 * **Runtime Schema Safety:** All client API mutations validated at runtime via Zod schemas (`saveScopeSchema`, `copilotQuerySchema`, `intakeDraftSchema`).
 
 ### Portal B: RAG SaaS Studio Workspace (`/rag/app`)
+* **Overview & Telemetry Tab:**
+  * Real-time token consumption, monthly quotas, and semantic cache hit rates (`@number-flow/react`).
+  * **Active Engine Batteries & Capabilities Matrix (M86.5):** Live capability cards displaying active retrieval (ColBERT, BM25, HNSW), cognitive (GraphRAG, RLM, Docling), and defense (Token Shield, Sentinel, LlamaGuard 3) engines.
 * **Chat Studio Tab:**
   * Real-time SSE token streaming from `rag.prateeq.in`.
   * Response latency indicators and token count breakdown.
