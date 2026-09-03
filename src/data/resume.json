@@ -886,10 +886,10 @@
     ]
   },
   "summary": {
-    "ai": "Forward Deployed AI Engineer specializing in production RAG architecture, pgvector search, autonomous deep-research pipelines, and tool-calling agents—taking complex AI systems from architecture to deployed software.",
+    "ai": "Forward Deployed AI Engineer & Systems Architect specializing in production RAG architecture, PostgreSQL RLS multi-tenancy, ColBERT late-interaction reranking, unsupervised ML anomaly detection, and automated Linux blue/green deployment pipelines—taking complex AI systems from architecture to deployed software.",
     "general": "Forward Deployed Engineer & Solutions Architect who designs, builds, and deploys high-ROI web platforms, cloud databases, and autonomous AI systems with zero agency overhead.",
     "creative": "Product-minded engineer crafting accessible web interfaces, custom design systems, and interactive visual experiences using Framer Motion, CSS Modules, and dual-mode theme architecture (Azure & Noir).",
-    "fullstack": "Full-Stack Engineer building type-safe web applications with Next.js 16, React 19, TypeScript, FastAPI, and Supabase PostgreSQL. Experienced in API design, database architecture, and production deployment."
+    "fullstack": "Full-Stack Systems Engineer building type-safe platforms with Next.js 16, React 19, TypeScript, FastAPI, and Supabase PostgreSQL. Experienced in API design, database architecture, and production deployment automation."
   },
   "twitter": "https://x.com/3010prateek",
   "website": "https://prateeq.in",
@@ -921,51 +921,89 @@
   },
   "experience": [
     {
-      "id": "freelance-developer",
-      "role": "Forward Deployed Engineer & AI Architect",
+      "id": "lead-systems-architect-retriever",
+      "role": "Lead Systems Architect — Retriever (Cognitive RAG Platform)",
+      "company": "Self-Hosted Enterprise RAG Infrastructure • rag.prateeq.in",
+      "location": "Remote / India",
+      "period": "2024 - Present",
       "tags": [
-        "React",
-        "Next.js",
         "Python",
         "FastAPI",
-        "Supabase",
         "PostgreSQL",
         "pgvector",
-        "Docker",
-        "TypeScript",
-        "Framer Motion",
-        "Google Gemini",
-        "Streamlit"
+        "ColBERT",
+        "Scikit-Learn",
+        "Celery",
+        "Redis",
+        "Ollama",
+        "Linux",
+        "CI/CD",
+        "Docker"
       ],
-      "period": "2023 - Present",
       "bullets": [
         {
-          "ai": "Architected Retriever (prateeq.in/rag), a production multi-tenant RAG platform using pgvector and self-hosted Ollama embeddings, reducing query latency and LLM costs by ~40% via semantic caching.",
-          "general": "End-to-end technical ownership: Scoped, architected, and shipped responsive web platforms, AI tools, and mobile utilities from concept to production Vercel deployment.",
-          "creative": "Built custom pop-art (Azure) and cyber-noir design systems featuring hand-drawn SVG skyline backdrop layers, fluid micro-interactions, and accessible UI controls.",
-          "fullstack": "Engineered type-safe Web App shells using Next.js 16 App Router, React 19, TypeScript, and server-side caching (unstable_cache) with Supabase PostgreSQL database architecture."
+          "ai": "Architected Retriever (rag.prateeq.in), an enterprise multi-tenant cognitive RAG platform with PostgreSQL Row-Level Security (RLS) contexts, isolating customer documents and vector spaces at the database engine layer.",
+          "fullstack": "Architected high-performance FastAPI backends on OCI VPS with Supabase Row-Level Security (RLS), custom SQL RPC aggregations, and Nginx reverse proxies.",
+          "general": "Designed and deployed Retriever (rag.prateeq.in), an enterprise vector search platform with grounded citation downloads, feedback telemetry, and dynamic pricing.",
+          "creative": "Engineered interactive workspace interfaces including an RAG Lab sandbox with SSE real-time streaming, parameter sliders, and dual-theme state propagation."
         },
         {
-          "ai": "Engineered structured prompting schemas, tool-calling agent workflows, and evaluation guardrails with real-time SSE streaming, presigned citation downloads, and feedback telemetry.",
-          "general": "Designed and deployed Retriever, a production vector search platform with grounded citation downloads, feedback telemetry, and dynamic pricing.",
-          "creative": "Engineered interactive workspace interfaces including an RAG Lab sandbox with SSE real-time streaming, parameter sliders, and dual-theme state propagation.",
-          "fullstack": "Architected high-performance FastAPI backends on OCI VPS with Supabase Row-Level Security (RLS), custom SQL RPC aggregations, and Nginx reverse proxies."
+          "ai": "Engineered token-level late-interaction ColBERT MaxSim reranking operator and sublinear BM25 sparse vectorizer, solving exact code symbol, error-trace, and technical identifier retrieval.",
+          "fullstack": "Implemented hybrid search merging dense HNSW vectors and BM25 sparse hits with Reciprocal Rank Fusion (RRF) and Cross-Encoder reranking pipelines.",
+          "general": "Integrated hybrid dense-sparse vector search and ColBERT reranking, improving retrieval precision for complex enterprise technical documentation.",
+          "creative": "Built interactive 3D vector space explorer and cluster visualizations in Next.js using Three.js and WebGL canvas projections."
         },
         {
-          "ai": "Built a concurrent multi-platform ingestion engine across 10+ web sources and ATS APIs, achieving sub-25s structured data extraction, deduplication, and compensation parsing without rate limits.",
-          "general": "Optimized Core Web Vitals and user interface performance, delivering sub-second page loads and 60fps interaction using Lenis smooth scroll and hardware-accelerated motion.",
-          "creative": "Designed responsive visual layouts with Framer Motion layout animations, portal-isolated modals, and touch gesture scroll controllers.",
-          "fullstack": "Engineered automated Python content synchronization pipelines using Streamlit, GitHub REST API integration, and atomic JSON fallback handlers for resilient offline state."
+          "ai": "Built an unsupervised Scikit-Learn Isolation Forest telemetry sentinel scoring 6D inference feature vectors (Shannon prompt entropy, request velocity, token asymmetry, P99 latency variance), automatically quarantining abusive API keys.",
+          "fullstack": "Implemented real-time inference telemetry pipelines, Prometheus metrics, structured structlog logging, and sliding-window Redis rate limiters.",
+          "general": "Engineered automated security sentinels protecting multi-tenant API quotas against scraping, prompt extraction, and denial-of-wallet attacks.",
+          "creative": "Designed live telemetry indicators and status badges with Design System 2.0 dual-theme token styling and Framer Motion micro-interactions."
         },
         {
-          "ai": "Designed multimodal document extraction pipelines using Gemini Vision OCR and regex parsers to transform complex unstructured documents into normalized database schemas.",
-          "general": "Built PrateeqSync AI, a local content manager for automated portfolio updates, credential verification, and git synchronization.",
-          "creative": "Built dynamic client-side PDF generation engines with React-PDF, supporting automated brand styling, custom typography registration, and responsive invoice ledgers.",
-          "fullstack": "Implemented secure authentication and commerce flows with Google OAuth 2.0 PKCE, session verification cookies, and automated Razorpay invoice webhook listeners."
+          "ai": "Automated zero-downtime Blue/Green release deployment pipeline on Oracle Cloud VPS featuring atomic symlink swapping, automated database snapshots, Alembic migrations, and 120s health probe rollback gates.",
+          "fullstack": "Enforced strict Hexagonal Architecture boundaries and robust CI/CD pipelines backed by 617 automated unit and integration tests passing in GitHub Actions.",
+          "general": "Automated continuous delivery pipelines ensuring zero-downtime releases, automated database migrations, and instant health-gate rollbacks.",
+          "creative": "Maintained strict architecture conformance and design system parity across all web portals and administration cockpits."
         }
+      ]
+    },
+    {
+      "id": "forward-deployed-engineer-consultant",
+      "role": "Forward Deployed AI Engineer & Solutions Consultant",
+      "company": "Independent Client Engagements • prateeq.in",
+      "location": "Remote / India",
+      "period": "2023 - Present",
+      "tags": [
+        "Next.js 16",
+        "React 19",
+        "TypeScript",
+        "Python",
+        "Supabase",
+        "Gemini Vision",
+        "Razorpay",
+        "Tailwind CSS",
+        "Framer Motion"
       ],
-      "company": "Independent Consultant / Freelance Developer",
-      "location": "Remote / India"
+      "bullets": [
+        {
+          "ai": "Architected an interactive CPQ scoping engine (prateeq.in/scoping) converting client intents into deterministic price estimates, dynamic architecture topologies, and instant PDF SOW contracts with Razorpay deposit verification.",
+          "fullstack": "Engineered type-safe web application shells using Next.js 16 App Router, React 19, TypeScript, and server-side caching (unstable_cache) with Supabase PostgreSQL database architecture.",
+          "general": "End-to-end technical ownership: Scoped, architected, and shipped responsive web platforms, AI tools, and commercial utilities from concept to production Vercel deployment.",
+          "creative": "Built custom pop-art (Azure) and cyber-noir design systems featuring hand-drawn SVG skyline backdrop layers, fluid micro-interactions, and accessible UI controls."
+        },
+        {
+          "ai": "Engineered multimodal document extraction pipelines using Google Gemini Vision OCR and regex parsers to transform complex unstructured invoices, contracts, and PDFs into normalized PostgreSQL schemas.",
+          "fullstack": "Implemented secure authentication and commerce flows with Google OAuth 2.0 PKCE, session verification cookies, and automated Razorpay invoice webhook listeners.",
+          "general": "Built automated client discovery and onboarding workflows, cutting technical discovery cycle time from weeks to single interactive sessions.",
+          "creative": "Built dynamic client-side PDF generation engines with React-PDF, supporting automated brand styling, custom typography registration, and responsive invoice ledgers."
+        },
+        {
+          "ai": "Built automated Python content synchronization tooling (scripts/synchronizer.py) integrating Supabase REST APIs, GitHub CI/CD cache revalidation webhooks, and atomic JSON offline fallbacks.",
+          "fullstack": "Engineered automated Python content synchronization pipelines using Streamlit, GitHub REST API integration, and atomic JSON fallback handlers for resilient offline state.",
+          "general": "Optimized Core Web Vitals and user interface performance, delivering sub-second page loads and 60fps interaction using Lenis smooth scroll and hardware-accelerated motion.",
+          "creative": "Designed responsive visual layouts with Framer Motion layout animations, portal-isolated modals, and touch gesture scroll controllers."
+        }
+      ]
     }
   ],
   "lastSynced": {
