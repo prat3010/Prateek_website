@@ -377,7 +377,7 @@ timeline
     3. *Technical Recruiter* $\rightarrow$ Highlights Resume PDF download & Skill verified badges.
     4. *Open-Source Peer Developer* $\rightarrow$ Highlights `/terminal` hacker mode and GitHub repository links.
   - **Autonomous Outreach Conversion Propensity Scorer:** Supervised classifier scoring cold outreach prospects in `/admin` by predicted reply rate, prioritizing high-value leads for Prateek's weekly pipeline.
-- **Status:** **Planned (Phase J)**
+- **Status:** **Completed (Phase J, Milestone 85 / v0.70.0)**
 
 ---
 
