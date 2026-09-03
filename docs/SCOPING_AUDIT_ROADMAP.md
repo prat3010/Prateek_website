@@ -385,7 +385,7 @@ graph TD
 - [ ] **1-Line Natural Language Scope Parser**
   - **Component:** `src/components/Intake/AiScopingPromptBar.tsx`
   - **Behavior:** Renders an intelligent input bar at the top of Step 1: *"Describe what you want to build in plain English (e.g. 'B2B SaaS with AI document search, Stripe billing, and admin center')."*
-  - **API:** Lightweight Edge API route `/api/scoping/parse-intent` (powered by `gemini-3.6-flash`). Returns structured JSON mapping to existing `archetypeId`, `baseEngineId`, and `featureIds` with confidence scores.
+  - **API:** Lightweight Edge API route `/api/scoping/parse-intent` (powered by Retriever cognitive core structured inference with deterministic catalog fallback). Returns structured JSON mapping to existing `archetypeId`, `baseEngineId`, and `featureIds` with confidence scores.
   - **UX:** Auto-populates the wizard with an animated highlight ring on auto-selected features and a summary badge: *"AI Blueprint Generated (94% confidence) — Review & Customize below"*.
 
 #### 5.2 Interactive Dependency Cascade UX (Prerequisite Solver)

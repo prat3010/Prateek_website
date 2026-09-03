@@ -37,15 +37,9 @@ export function AiScopingPromptBar({
 }: AiScopingPromptBarProps) {
   const [promptText, setPromptText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [progressStep, setProgressStep] = useState<string | null>(null);
   const [isRfpModalOpen, setIsRfpModalOpen] = useState(false);
   const [isChatDrawerOpen, setIsChatDrawerOpen] = useState(false);
-  const [telemetry, setTelemetry] = useState<ScopingTelemetry>({
-    latencyMs: 380,
-    semanticCacheHit: true,
-    tenantId: 'prateeq_scoping',
-    modelUsed: 'Retriever M42/M22 Intent Classifier',
-  });
+  const [telemetry, setTelemetry] = useState<ScopingTelemetry | null>(null);
 
   const handleAnalyze = async (overridePrompt?: string) => {
     const textToAnalyze = (overridePrompt || promptText).trim();
@@ -55,15 +49,6 @@ export function AiScopingPromptBar({
     }
 
     setIsLoading(true);
-    setProgressStep('1/3 Analyzing requirements & NLP intent...');
-
-    const timer1 = setTimeout(() => {
-      setProgressStep('2/3 Synthesizing CPQ Architecture blueprint...');
-    }, 180);
-
-    const timer2 = setTimeout(() => {
-      setProgressStep('3/3 Applying configuration & dependencies...');
-    }, 320);
 
     try {
       const res = await fetch('/api/scoping/parse-intent', {
@@ -74,9 +59,6 @@ export function AiScopingPromptBar({
           currency,
         }),
       });
-
-      clearTimeout(timer1);
-      clearTimeout(timer2);
 
       if (!res.ok) {
         const errorData = await res.json();
@@ -98,7 +80,6 @@ export function AiScopingPromptBar({
       toast.error(`Intent parsing failed: ${message}`);
     } finally {
       setIsLoading(false);
-      setProgressStep(null);
     }
   };
 
@@ -190,10 +171,10 @@ export function AiScopingPromptBar({
         </MagneticButton>
       </div>
 
-      {progressStep && (
+      {isLoading && (
         <div className={styles.progressContainer}>
           <div className={styles.spinner} />
-          <span>{progressStep}</span>
+          <span>Analyzing architecture requirements with Retriever...</span>
         </div>
       )}
 
@@ -212,20 +193,28 @@ export function AiScopingPromptBar({
         ))}
       </div>
 
-      <div className={styles.telemetryRow}>
-        <div className={styles.telemetryBadge}>
-          <Activity size={13} />
-          <span>⚡ Powered by Retriever Multi-Tenant Engine (prateeq-scoping-live)</span>
+      {telemetry && (
+        <div className={styles.telemetryRow}>
+          <div className={styles.telemetryBadge}>
+            <Activity size={13} />
+            <span>
+              {telemetry.fallbackMode
+                ? '⚙️ Catalog Rule-Based Matcher (Offline Fallback)'
+                : `⚡ Powered by Retriever (${telemetry.modelUsed || 'Live Engine'})`}
+            </span>
+          </div>
+          <div className={styles.telemetryDetails}>
+            <span>Latency: {telemetry.latencyMs}ms</span>
+            {!telemetry.fallbackMode && (
+              <span>
+                • ⚡ Semantic Cache:{' '}
+                {telemetry.semanticCacheHit ? 'Active (HNSW pgvector)' : 'Warm'}
+              </span>
+            )}
+            <span>• Tenant: {telemetry.tenantId}</span>
+          </div>
         </div>
-        <div className={styles.telemetryDetails}>
-          <span>Latency: {telemetry.latencyMs}ms</span>
-          <span>
-            • ⚡ Semantic Cache:{' '}
-            {telemetry.semanticCacheHit ? 'Active (HNSW pgvector)' : 'Warm'}
-          </span>
-          <span>• Tenant: {telemetry.tenantId}</span>
-        </div>
-      </div>
+      )}
 
       {isRfpModalOpen && (
         <RfpUploaderModal

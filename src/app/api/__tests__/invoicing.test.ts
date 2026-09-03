@@ -99,6 +99,39 @@ describe('Invoice Tax & Currency Calculations', () => {
     expect(result.grand_total).toBe(2500);
   });
 
+  it('correctly calculates mixed-rate line items without assuming line item 0 tax rate', () => {
+    const result = calculateInvoiceTotals({
+      currency: 'INR',
+      place_of_supply: 'Delhi',
+      line_items: [
+        {
+          name: 'Exempt Technical Architecture Audit',
+          rate: 50000,
+          quantity: 1,
+          tax_rate: 0,
+          tax_type: 'exclusive',
+        },
+        {
+          name: 'Taxable Custom Implementation',
+          rate: 100000,
+          quantity: 1,
+          tax_rate: 18,
+          tax_type: 'exclusive',
+        },
+      ],
+    });
+
+    expect(result.is_gst).toBe(true);
+    expect(result.subtotal).toBe(150000);
+    expect(result.tax_breakup.total_tax).toBe(18000);
+    expect(result.tax_breakup.cgst_amount).toBe(9000);
+    expect(result.tax_breakup.sgst_amount).toBe(9000);
+    // Effective tax rate: 18000 / 150000 = 12% total, split 6% CGST + 6% SGST
+    expect(result.tax_breakup.cgst_rate).toBe(6);
+    expect(result.tax_breakup.sgst_rate).toBe(6);
+    expect(result.grand_total).toBe(168000);
+  });
+
   it('formats currency strings properly', () => {
     expect(formatCurrencyAmount(118000, 'INR')).toContain('₹');
     expect(formatCurrencyAmount(2500, 'USD')).toContain('$');

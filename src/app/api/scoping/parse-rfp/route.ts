@@ -196,10 +196,11 @@ export async function POST(req: NextRequest) {
       summaryRationale,
       retrieverEngineRecommended,
       telemetry: {
-        latencyMs: latencyMs < 50 ? 420 : latencyMs,
+        latencyMs,
         semanticCacheHit: false,
         tenantId: RETRIEVER_TENANT_ID,
-        modelUsed: 'Retriever M42 Layout OCR & M22 Schema Extractor',
+        modelUsed: 'document-layout-extractor',
+        fallbackMode: false,
       },
     };
 

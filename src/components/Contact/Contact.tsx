@@ -295,10 +295,17 @@ function Contact() {
                 )}
               </div>
 
-              {/* Security Trust Badge Micro-copy */}
-              <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', opacity: 0.72, color: 'var(--color-text-muted)' }}>
-                <ShieldCheck size={13} style={{ flexShrink: 0 }} />
-                <span>256-bit Encrypted • reCAPTCHA Protected</span>
+              {/* Security Trust Badge Micro-copy & Google reCAPTCHA Compliance */}
+              <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '11px', opacity: 0.75, color: 'var(--color-text-muted)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <ShieldCheck size={13} style={{ flexShrink: 0 }} />
+                  <span>TLS Encrypted • Spam Protected</span>
+                </div>
+                <span style={{ fontSize: '10px', opacity: 0.85 }}>
+                  This form is protected by reCAPTCHA and the Google{' '}
+                  <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color: 'inherit' }}>Privacy Policy</a> and{' '}
+                  <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color: 'inherit' }}>Terms of Service</a> apply.
+                </span>
               </div>
 
               {status === 'success' && (

@@ -1301,10 +1301,10 @@ footer {
 
 
 /* ── reCAPTCHA v3 Badge ─────────────────────────────────────── */
-/* Google injects a floating "Protected by reCAPTCHA" chip at runtime on
-   every page where the reCAPTCHA script loads (Contact form, scoping
-   wizard). The invisible score check still runs; only the visual badge
-   is hidden. `!important` wins over Google's inline positioning styles. */
+/* Google injects a floating "Protected by reCAPTCHA" badge at runtime.
+   Per Google's Terms of Service, hiding this badge is officially permitted
+   provided visible attribution and links to Google Privacy & Terms are
+   included in the user flow (implemented in Contact.tsx). */
 .grecaptcha-badge {
   display: none !important;
   visibility: hidden !important;

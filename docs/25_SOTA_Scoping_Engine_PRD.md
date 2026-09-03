@@ -318,8 +318,7 @@ Removes friction for non-technical buyers and enterprise CTOs by providing dual 
   │ • Latency: 380ms • ⚡ Semantic Cache: Active (HNSW pgvector) • Models: M42/M22│
   └────────────────────────────────────────────────────────────────────────────┘
   ```
-* **Loading State**: Displays multi-stage progress telemetry:
-  `[1/3 Parsing Layout & OCR via Retriever M42...]` $\rightarrow$ `[2/3 Running Architect & Critic Consensus...]` $\rightarrow$ `[3/3 Synthesizing CPQ Blueprint...]`.
+* **Loading State**: Displays active loading state during live Retriever structured analysis.
 * **Success Banner**: Floating toast showing confidence score and layman rationale:
   `🎯 96% Match Blueprint: AI SaaS Platform — Rationale: Configured for pgvector document search, recurring Stripe subscriptions, and RBAC admin center.`
 
@@ -664,8 +663,8 @@ timeline
 
 * **Phase 1: Multimodal Discovery, Cart Drawer & Graph Solver (Modules 1, 2, 3)**
   - Provision and configure `prateeq_scoping` tenant on Retriever with engineering catalog and dependency triples.
-  - Implement `/api/scoping/parse-intent` and `/api/scoping/parse-rfp` proxying to Retriever M42/M22.
-  - Build `AiScopingPromptBar.tsx` with live Retriever telemetry badge (`Latency: 380ms`, `⚡ Semantic Cache Active`) and `RfpUploaderModal.tsx`.
+  - Implement `/api/scoping/parse-intent` and `/api/scoping/parse-rfp` powered by Retriever structured inference with deterministic catalog fallback.
+  - Build `AiScopingPromptBar.tsx` with live Retriever telemetry badge (reporting real measured latency and model attribution) and `RfpUploaderModal.tsx`.
   - Build `ArchitectureCartDrawer.tsx` with live line items, volume discount progress bar, and promo code box (`/api/scoping/validate-promo`).
   - Implement interactive prerequisite cascade modal (`DependencyCascadeModal.tsx`).
 

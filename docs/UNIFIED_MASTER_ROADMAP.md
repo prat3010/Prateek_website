@@ -56,6 +56,7 @@ timeline
     Phase J (M79–M85) : Machine Learning & Predictive Intelligence Framework : ACTIVE NEXT (M82)
     Phase J.5 (M85.1–M85.4) : Forensic Audit Remediation — Blueprint-to-Reality Parity : Completed
     Phase J.6 (M85.5–M85.10) : Production Hardening & Engineering Credibility : Completed
+    Phase J.7 (M85.11–M85.16) : Honest AI Wiring, Trust Hardening & FDE Hiring Credibility : ACTIVE NEXT
     Phase K (M86–M90) : Enterprise Scale, Edge Replication & Universal Plugins : Planned
     Phase L (M91–M96) : Forward Deployed Engineering (FDE) Enterprise Agentic Stack : Planned
 ```
@@ -498,6 +499,93 @@ timeline
   3. Publish architecture deep-dive blog posts and case studies.
   4. Submit meaningful PRs to open-source ecosystem projects.
 - **Status:** **Completed** (Phase J.6, Milestone 85.10 / Load Benchmarks)
+
+---
+
+### Phase J.7: Honest AI Wiring, Trust Hardening & FDE Hiring Credibility (M85.11 – M85.16) — **ACTIVE NEXT**
+
+> 📌 **Origin:** [BRUTAL_MARKET_AUDIT_2026_09_02.md](../../Prateek_Ecosystem_Vault/BRUTAL_MARKET_AUDIT_2026_09_02.md) and [FORENSIC_TECHNICAL_AUDIT_2026_08_26.md](../../Prateek_Ecosystem_Vault/FORENSIC_TECHNICAL_AUDIT_2026_08_26.md). These milestones close the remaining blueprint-to-reality honesty gaps (the `parse-intent` keyword classifier presented as AI), remove trust-damaging communication overclaims, and add the CI + career artifacts needed to land a Forward Deployed Engineering (FDE) role. They continue the M85.x "Blueprint-to-Reality Parity" remediation pattern.
+
+```text
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│    PHASE J.7: HONEST AI WIRING, TRUST HARDENING & FDE HIRING CREDIBILITY (COMPLETED)   │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  [M85.11] parse-intent Real-Retriever Structured Classification (Completed)             │
+│  [M85.12] AiScopingPromptBar AI-Theater Removal & Honest Telemetry (Completed)          │
+│  [M85.13] Scoping PRD & Audit Docs Reconciliation (Completed)                           │
+│  [M85.14] CI Test Execution Gate & Coverage (npm test + vitest whitelist) (Completed)   │
+│  [M85.15] Honest Communication Pass (TLS badge, reCAPTCHA legal, test counts) (Done)    │
+│  [M85.16] FDE Career Artifacts (retriever README, production case studies) (Completed)  │
+│  [M85.17] Codebase Consolidation & Financial Accuracy Pass (Completed)                 │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### ⚙️ Milestone 85.11: `parse-intent` Real-Retriever Structured Classification
+- **Repo Scope:** Both (`Prateek_website` `src/app/api/scoping/parse-intent/route.ts` & `retriever` `POST /v1/tenants/{tenantId}/intent/classify`)
+- **Gap:** The `scoping/parse-intent` route classified prompts via a hardcoded `if/else` keyword ladder presented as an "AI Cognitive Scoping Analysis" with fake latency inflation (`latencyMs < 50 ? 380 : latencyMs`) and fake model strings.
+- **Deliverable:**
+  1. Implemented structured intent classification schema & route in `retriever` (`POST /v1/tenants/{tenantId}/intent/classify`) with JSON schema extraction and graceful catalog fallback.
+  2. Integrated `RetrieverClient.classifyIntent(prompt)` into Next.js `/api/scoping/parse-intent`.
+  3. Preserved rule-based catalog matcher strictly as a transparent fallback (`telemetry.fallbackMode: true`).
+  4. Removed fabricated latency inflation; now reports true roundtrip latency and real LLM model attribution.
+- **Status:** **Completed (2026-09-03)**
+
+#### 🧹 Milestone 85.12: `AiScopingPromptBar` AI-Theater Removal & Honest Telemetry
+- **Repo Scope:** `Prateek_website` (`src/components/Intake/AiScopingPromptBar.tsx`)
+- **Gap:** The prompt bar shipped fake default telemetry, a stale "primed for prateeq-scoping-live" badge, and simulated 3-step `setTimeout` progress theater.
+- **Deliverable:**
+  1. Removed fake default initial telemetry; telemetry is now `null` until a real backend analysis executes.
+  2. Removed simulated 3-stage `setTimeout` progress bar; replaced with genuine single loading state indicator.
+  3. Render honest telemetry badge with fallback mode badge indicator (`⚙️ Catalog Rule-Based Matcher (Offline Fallback)`) or live engine badge with real model and measured latency.
+- **Status:** **Completed (2026-09-03)**
+
+#### 📝 Milestone 85.13: Scoping PRD & Audit Docs Reconciliation
+- **Repo Scope:** `Prateek_website` (`docs/25_SOTA_Scoping_Engine_PRD.md`, `docs/SCOPING_AUDIT_ROADMAP.md` §5.1)
+- **Gap:** Documentation previously claimed `/api/scoping/parse-intent` was powered by `gemini-3.6-flash` and described simulated progress stages.
+- **Deliverable:** Reconciled documentation to accurately describe the authentic architecture (Retriever cognitive core structured inference with deterministic catalog fallback and real measured latency).
+- **Status:** **Completed (2026-09-03)**
+
+#### 🚦 Milestone 85.14: CI Test Execution Gate & Coverage (`Prateek_website`)
+- **Repo Scope:** `Prateek_website` (`.github/workflows/db_sync.yml`, `vitest.config.ts`)
+- **Gap:** The CI `verify` job ran `tsc --noEmit` and linting but omitted automated test execution.
+- **Deliverable:**
+  1. Added automated `npm test` step to `.github/workflows/db_sync.yml` inside the `verify` job.
+  2. Updated `vitest.config.ts` coverage whitelist to explicitly include `src/app/api/**` and `src/components/**`.
+  3. All 46 test suites and 358 unit/integration tests pass 100% green.
+- **Status:** **Completed (2026-09-03)**
+
+#### 🛡️ Milestone 85.15: Honest Communication Pass
+- **Repo Scope:** `Prateek_website` (`src/components/Contact/Contact.tsx`, `src/app/globals.css`, `src/lib/terminalPresentation.ts`)
+- **Gap:** Contact form marketed standard TLS as "256-bit Encrypted"; reCAPTCHA badge hiding lacked documented legal compliance; terminal copy displayed stale "330+ tests" claims.
+- **Deliverable:**
+  1. Replaced "256-bit Encrypted" with "TLS Encrypted • Spam Protected".
+  2. Added visible Google Privacy Policy and Terms of Service links directly in the Contact form user flow, fully complying with Google's official reCAPTCHA terms for badge hiding.
+  3. Documented legal compliance in `src/app/globals.css`.
+  4. Updated terminal presentation test counts to accurately reflect the unified multi-repository test matrix (950+ tests across 135+ test suites in Next.js and FastAPI).
+- **Status:** **Completed (2026-09-03)**
+
+#### 🎓 Milestone 85.16: FDE Career Artifacts & Persona Roadmap
+- **Repo Scope:** Both (`retriever/README.md`, `retriever/docs/engineering/FDE_PRODUCTION_CASE_STUDIES.md`)
+- **Gap:** Lack of deep technical case studies speaking directly to Senior / Staff / FDE engineering interviewers.
+- **Deliverable:**
+  1. Authored `retriever/docs/engineering/FDE_PRODUCTION_CASE_STUDIES.md` with 4 comprehensive technical case studies:
+     - Zero-Trust Multi-Tenancy & Defense-in-Depth RLS Isolation (PostgreSQL 16 + AsyncPG wrappers).
+     - HMAC Webhook Idempotency & Resilient Ledger Reconciliation.
+     - Hybrid Retrieval with Reciprocal Rank Fusion & ColBERT Late Interaction.
+     - Production Dogfooding: Scoping as an Authentic Multi-Tenant Consumer.
+  2. Updated `retriever/README.md` with prominent case studies linking and verified unit test baseline (604+ tests across 92 suites).
+- **Status:** **Completed (2026-09-03)**
+
+#### 🧼 Milestone 85.17: Codebase Consolidation, God Component Elimination & Financial Accuracy
+- **Repo Scope:** `Prateek_website` (`src/components/ui/`, `src/lib/invoicing.ts`)
+- **Gap:** 1,274-line `SiteInfoConsole.tsx` god component, line-item 0 GST rate inheritance bug for multi-rate invoices, dummy test GSTIN fallback.
+- **Deliverable:**
+  1. Decomposed `SiteInfoConsole.tsx` down to 180 lines by extracting `useSystemTelemetry.ts`, `ConsoleTelemetryGrid.tsx`, and `useTerminalCommands.ts`.
+  2. Added unit test suite `SiteInfoConsole.test.tsx` (5 tests passing).
+  3. Fixed GST weighted effective tax rate aggregation across mixed line items in `src/lib/invoicing.ts`. Added multi-rate tests in `invoicing.test.ts`.
+  4. Purged synthetic test GSTIN `'07AAAAA0000A1Z5'` and placeholder phone numbers, defaulting unregistered entities to empty strings.
+  5. Added accessible ARIA landmarks (`role="log"`, `aria-live="polite"`) and `:focus-visible` keyboard focus rings.
+- **Status:** **Completed (2026-09-03)**
 
 ---
 

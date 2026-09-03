@@ -33,7 +33,7 @@ downstream:
 
 > **Sales Partner Commercial Agreement View & Azure/Noir React-PDF Exporter.**
 
-- **Path:** `src/components/pdf/MiddlemanAgreementPDF.tsx` & `scripts/generate-middleman-pdf.mjs`
+- **Path:** `src/components/pdf/MiddlemanAgreementPDF.tsx`
 - **Features:** Pinned 3-page layout contract, read-only commission band schedule, customizable prose sections.
 
 ---

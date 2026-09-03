@@ -385,6 +385,19 @@ export class RetrieverClient {
       }
     );
   }
+
+  async classifyIntent(
+    prompt: string,
+    model?: string
+  ): Promise<import("./rag-types").IntentClassificationResponse> {
+    return this.request<import("./rag-types").IntentClassificationResponse>(
+      `/v1/tenants/${this.config.tenantId}/intent/classify`,
+      {
+        method: "POST",
+        body: JSON.stringify({ prompt, ...(model ? { model } : {}) }),
+      }
+    );
+  }
 }
 
 export interface GraphCapabilitiesResponse {
@@ -445,6 +458,7 @@ export interface ScopingTelemetry {
   semanticCacheHit: boolean;
   tenantId: string;
   modelUsed?: string;
+  fallbackMode?: boolean;
 }
 
 export interface ParseIntentResponse {

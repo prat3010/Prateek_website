@@ -86,4 +86,87 @@ describe('POST /api/scoping/parse-intent', () => {
     expect(data.archetypeId).toBe('landing_page');
     expect(data.baseEngineId).toBe('landing');
   });
+
+  it('correctly uses live Retriever classification when available', async () => {
+    const mockIntentResponse = {
+      success: true,
+      data: {
+        archetype_id: 'vision_ocr_saas',
+        base_engine_id: 'saas',
+        feature_ids: ['ai_vision_ocr', 'auth', 'payments'],
+        brand_asset_id: 'basic',
+        maintenance_plan_id: 'standard',
+        suggested_timeline: '3 to 4 Weeks',
+        confidence_score: 0.94,
+        summary_rationale: 'Live classification from Retriever engine.',
+        retriever_engine_recommended: true,
+        unrecognized_requirements: [],
+      },
+      model: 'meta-llama/llama-3.3-70b-instruct',
+      provider: 'groq',
+      inputTokens: 120,
+      outputTokens: 60,
+      latencyMs: 145,
+    };
+
+    const originalFetch = global.fetch;
+    const prevTenant = process.env.RETRIEVER_SCOPING_TENANT_ID;
+    const prevKey = process.env.RETRIEVER_SCOPING_API_KEY;
+
+    process.env.RETRIEVER_SCOPING_TENANT_ID = 'test_scoping';
+    process.env.RETRIEVER_SCOPING_API_KEY = 'test_key';
+
+    global.fetch = async () =>
+      new Response(JSON.stringify(mockIntentResponse), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+    try {
+      const req = new NextRequest('http://localhost:3000/api/scoping/parse-intent', {
+        method: 'POST',
+        body: JSON.stringify({
+          prompt: 'Need a document OCR scanner with automated invoice parsing',
+        }),
+      });
+      const res = await POST(req);
+      expect(res.status).toBe(200);
+      const data = await res.json();
+      expect(data.success).toBe(true);
+      expect(data.telemetry.fallbackMode).toBe(false);
+      expect(data.telemetry.modelUsed).toBe('meta-llama/llama-3.3-70b-instruct');
+      expect(data.archetypeId).toBe('vision_ocr_saas');
+      expect(data.featureIds).toContain('ai_vision_ocr');
+    } finally {
+      global.fetch = originalFetch;
+      process.env.RETRIEVER_SCOPING_TENANT_ID = prevTenant;
+      process.env.RETRIEVER_SCOPING_API_KEY = prevKey;
+    }
+  });
+
+  it('marks fallbackMode: true and modelUsed: rule-based-fallback on network error', async () => {
+    const originalFetch = global.fetch;
+    global.fetch = async () => {
+      throw new Error('Connection refused to rag.prateeq.in');
+    };
+
+    try {
+      const req = new NextRequest('http://localhost:3000/api/scoping/parse-intent', {
+        method: 'POST',
+        body: JSON.stringify({
+          prompt: 'Autonomous Voice AI bot with ElevenLabs integration',
+        }),
+      });
+      const res = await POST(req);
+      expect(res.status).toBe(200);
+      const data = await res.json();
+      expect(data.success).toBe(true);
+      expect(data.telemetry.fallbackMode).toBe(true);
+      expect(data.telemetry.modelUsed).toBe('rule-based-fallback');
+      expect(data.archetypeId).toBe('voice_ai_agent_app');
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
 });
+

@@ -63,7 +63,6 @@ graph TD
     ProfileDB[(Supabase DB: profile.data.intake.middlemanAgreement)] -->|Live Agreement Data| AgreementManager
     
     CommLib -->|Commission Calculations| AgreementManager[scripts/sync_tabs/resume.py]
-    AgreementManager -->|Generates Node PDF| PDFCLI[scripts/generate-middleman-pdf.mjs]
     AgreementManager -->|Web PDF Renderer| WebPDF[src/components/pdf/MiddlemanAgreementPDF.tsx]
 ```
 
@@ -74,7 +73,6 @@ graph TD
 | **Agreement Defaults** | `src/data/middlemanAgreementDefaults.json` | Default legal prose sections & disbursement rules. |
 | **Commission Utility** | `src/lib/commission.ts` | Calculates tier commission payouts. |
 | **Synchronizer Tab** | `scripts/sync_tabs/resume.py` (`render_partner_agreement_tab`) | Partner identity & agreement prose editor. |
-| **CLI PDF Generator** | `scripts/generate-middleman-pdf.mjs` | Node.js headless React-PDF builder for Synchronizer. |
 | **Web PDF Generator** | `src/components/pdf/MiddlemanAgreementPDF.tsx` | Client-side React-PDF builder for portfolio downloads. |
 
 ---
@@ -150,6 +148,6 @@ graph TD
 > [!IMPORTANT]
 > **Mandatory Connection Checklist:**
 > 1. **Editing Scoping/Pricing:** If you modify `intakeQuestionnaireDefaults.json`, you MUST update `src/data/resume.json` and run `python3 scripts/audit_contracts.py`.
-> 2. **Editing Middleman Terms:** If you modify agreement prose in `middlemanAgreementDefaults.json`, verify both `src/components/pdf/MiddlemanAgreementPDF.tsx` and `scripts/generate-middleman-pdf.mjs`.
+> 2. **Editing Middleman Terms:** If you modify agreement prose in `middlemanAgreementDefaults.json`, verify `src/components/pdf/MiddlemanAgreementPDF.tsx`.
 > 3. **Creating Components/Routes:** Run `python3 scripts/generate_architecture_map.py` to automatically update the import dependency graphs.
 > 4. **CI Database Seeding:** `.github/workflows/db_sync.yml` runs `python3 scripts/seed_supabase.py --safe-sync` to compare timestamps (`updated_at`) and prevent overwriting newer live Supabase rows.

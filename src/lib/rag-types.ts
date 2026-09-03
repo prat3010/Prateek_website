@@ -185,5 +185,29 @@ export interface EmbeddingProjectionResponse {
   query_point?: ProjectedPoint | null;
 }
 
+export interface ScopingIntentData {
+  archetype_id: string;
+  base_engine_id: string;
+  feature_ids: string[];
+  brand_asset_id: string;
+  maintenance_plan_id: string;
+  suggested_timeline: string;
+  confidence_score: number;
+  summary_rationale: string;
+  retriever_engine_recommended: boolean;
+  unrecognized_requirements: string[];
+}
+
+export interface IntentClassificationResponse {
+  success: boolean;
+  data: ScopingIntentData;
+  model: string;
+  provider: string;
+  inputTokens: number;
+  outputTokens: number;
+  latencyMs: number;
+}
+
+
 
 

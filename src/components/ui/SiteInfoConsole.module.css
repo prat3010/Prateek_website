@@ -340,6 +340,15 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
+.shortcutBtn:focus-visible {
+  outline: 2px solid var(--neon-cyan, var(--pop-blue));
+  outline-offset: 2px;
+}
+
+.terminalInput:focus-visible {
+  outline: 1px dotted var(--pop-orange);
+}
+
 /* ──────────────────────────────────────────────────────────
    NOIR THEME OVERRIDES (Retro CRT Cyber-Glow)
    ────────────────────────────────────────────────────────── */

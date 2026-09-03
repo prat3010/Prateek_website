@@ -5,8 +5,8 @@ export const SELLER_CONFIG = {
   name: sellerData?.name || process.env.NEXT_PUBLIC_SELLER_NAME || 'Prateek Sharma',
   company: sellerData?.company || process.env.NEXT_PUBLIC_SELLER_COMPANY || 'Prateeq Studio',
   email: sellerData?.email || process.env.NEXT_PUBLIC_SELLER_EMAIL || process.env.CONTACT_EMAIL_TO || 'prateeqsharma@gmail.com',
-  phone: sellerData?.phone || process.env.NEXT_PUBLIC_SELLER_PHONE || '+91 98765 43210',
-  gstin: sellerData?.gstin || process.env.NEXT_PUBLIC_SELLER_GSTIN || '07AAAAA0000A1Z5',
+  phone: sellerData?.phone || process.env.NEXT_PUBLIC_SELLER_PHONE || '+91 9050433260',
+  gstin: sellerData?.gstin || process.env.NEXT_PUBLIC_SELLER_GSTIN || '',
   address: {
     street: sellerData?.street || process.env.NEXT_PUBLIC_SELLER_STREET || 'Developer Studio, CP',
     city: sellerData?.city || process.env.NEXT_PUBLIC_SELLER_CITY || 'New Delhi',
@@ -129,6 +129,15 @@ export function calculateInvoiceTotals(input: CalculateInvoiceInput): InvoiceCal
   // Build Tax Breakup
   let tax_breakup: TaxBreakup;
 
+  // Check if all line items share the exact same tax rate or calculate weighted effective rate
+  const distinctTaxRates = Array.from(new Set(computedLineItems.map((item) => item.tax_rate)));
+  const effectiveTaxRate =
+    distinctTaxRates.length === 1
+      ? (distinctTaxRates[0] ?? 18)
+      : aggregateSubtotal > 0
+        ? Math.round(((aggregateTax / aggregateSubtotal) * 100) * 100) / 100
+        : 0;
+
   if (!is_gst || aggregateTax === 0) {
     tax_breakup = {
       total_tax: 0,
@@ -137,20 +146,18 @@ export function calculateInvoiceTotals(input: CalculateInvoiceInput): InvoiceCal
   } else if (intraState) {
     // Intra-state split: 50% CGST + 50% SGST
     const halfTax = Math.round((aggregateTax / 2) * 100) / 100;
-    const avgTaxRate = computedLineItems[0]?.tax_rate || 18;
     tax_breakup = {
-      cgst_rate: avgTaxRate / 2,
+      cgst_rate: Math.round((effectiveTaxRate / 2) * 100) / 100,
       cgst_amount: halfTax,
-      sgst_rate: avgTaxRate / 2,
+      sgst_rate: Math.round((effectiveTaxRate / 2) * 100) / 100,
       sgst_amount: halfTax,
       total_tax: aggregateTax,
       is_interstate: false,
     };
   } else {
     // Inter-state: IGST
-    const avgTaxRate = computedLineItems[0]?.tax_rate || 18;
     tax_breakup = {
-      igst_rate: avgTaxRate,
+      igst_rate: effectiveTaxRate,
       igst_amount: aggregateTax,
       total_tax: aggregateTax,
       is_interstate: true,

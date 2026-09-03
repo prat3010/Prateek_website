@@ -37,6 +37,9 @@ jobs:
       - name: Lint check
         run: npm run lint
 
+      - name: Unit & Integration Tests (Vitest)
+        run: npm test
+
       - name: Set up Python for Architecture Audits
         uses: actions/setup-python@v5
         with:

@@ -18,16 +18,18 @@ A highly interactive, storyteller-driven personal portfolio website designed wit
 
 | Route | Description |
 |-------|-------------|
-| `/` | Home page — all portfolio sections (hero, about, skills, projects, resume, playground, blog, contact) |
+| `/` | Home page — all portfolio sections (hero, about, skills, projects, resume, blog, contact) |
 | `/terminal` | Interactive diagnostics terminal console (supports commands like `git-info`, `qrcode`, `projects`, `system`, `analytics`) |
 | `/scoping` | Project Scoping Lab & Instant Quote wizard page (deep-linkable via `?engine=landing\|multipage\|saas` or `?goal=<archetype id>`) |
 | `/dashboard` | Client Workspace Dashboard (Google OAuth profile confirmation, active project scopes, interactive feature customizer, milestone progress tracker, invoice ledger, PDF proposal exporter, and direct scope confirmation CTA) |
 | `/admin` | Master Admin Control Center (Google OAuth auth gate, Autonomous Outreach queue, client scopes & ledgers) |
-| `/admin/analytics` | Visitor analytics dashboard |
+| `/analytics` | Visitor analytics dashboard |
 | `/rag` | Retriever AI SaaS Product Landing Page — Hero, live mini-RAG sandbox, feature grid, 1-line embed snippet, and dynamic Geo-IP pricing (INR vs. USD) |
 | `/rag/app` | SaaS App Studio Workspace — Chat Studio, Document Library, Search Inspector, Embed Configurator, and role-gated admin link |
+| `/rag/login` | RAG SaaS login / authentication page |
 | `/blog` | Blog listing page |
 | `/blog/[slug]` | Individual blog post page |
+| `/privacy` | Privacy policy page |
 | `/Middleman_Partnership_Agreement.pdf` | Server-rendered Sales Partner Agreement PDF (follows the visitor's active azure/noir theme) |
 
 The client-side commercial PDFs (Scoping Brief, Services & Pricing Guide, Sales Partner Agreement) are brand-themed: they follow the visitor's azure/noir theme and embed the site's brand fonts (Playfair Display / Lora / JetBrains Mono in `public/fonts/`) plus the gremlin logo mark via `src/components/pdf/` (`pdfTheme.ts`, `PdfBrandHeader.tsx`, `PdfGremlinLogo.tsx`, `PdfFooter.tsx`). The `/scoping` intake submission renders the same branded Scoping Brief client-side and attaches it as a PDF to the `/api/contact` notification email via `generateQuestionnairePDFBase64()` in `src/utils/pdfGenerator.ts`.
@@ -63,6 +65,16 @@ The client-side commercial PDFs (Scoping Brief, Services & Pricing Guide, Sales 
 | `/api/rag/telemetry` | GET | Fetch real-time RAG usage telemetry & cache stats |
 | `/api/webhooks/razorpay` | POST | Verify webhook signature and process payment/subscription events |
 | `/api/revalidate` | POST, GET | Purge Next.js cache (requires `SYNC_API_KEY`) |
+| `/api/scoping/parse-intent` | POST | AI intent classification for scoping copilot |
+| `/api/scoping/parse-rfp` | POST | AI extraction of scope from uploaded RFP documents |
+| `/api/scoping/validate-promo` | POST | Validate promotional discount codes |
+| `/api/rag/tenant` | GET, POST | Manage RAG tenant workspace configuration |
+| `/api/outreach/prospect` | POST | Generate AI outreach prospect leads |
+| `/api/outreach/get-leads` | GET | Retrieve stored outreach leads |
+| `/api/outreach/dispatch` | POST | Dispatch approved outreach messages |
+| `/api/blog/publish` | POST | Publish draft blog post (requires `SYNC_API_KEY`) |
+| `/api/terminal/query` | POST | Process terminal diagnostic queries |
+| `/api/terminal/snake-leaderboard` | GET, POST | Terminal snake game high score leaderboard |
 
 ---
 
