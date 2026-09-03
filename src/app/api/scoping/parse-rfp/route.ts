@@ -3,6 +3,7 @@ import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
 import { resolveFeatureDependencies } from '@/lib/pricing';
 import type { FeatureItem } from '@/data/resume';
 import type { ParseIntentResponse } from '@/lib/rag-client';
+import { checkRateLimit, rateLimitResponse, applyRateLimitHeaders } from '@/lib/rateLimit';
 
 const RETRIEVER_TENANT_ID = process.env.RETRIEVER_SCOPING_TENANT_ID || 'prateeq_scoping';
 const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024; // 25 MB
@@ -13,6 +14,17 @@ const featureCatalog = rawFeatures as FeatureItem[];
 
 export async function POST(req: NextRequest) {
   const startTime = performance.now();
+
+  // Edge AI Token Shield: 5 requests per minute per IP (document OCR / layout extraction)
+  const rateLimit = await checkRateLimit(req, {
+    scope: 'scoping_rfp',
+    limit: 5,
+    windowSeconds: 60,
+  });
+
+  if (!rateLimit.success) {
+    return rateLimitResponse(rateLimit);
+  }
 
   try {
     let filename = '';
@@ -204,7 +216,8 @@ export async function POST(req: NextRequest) {
       },
     };
 
-    return NextResponse.json(responsePayload, { status: 200 });
+    const res = NextResponse.json(responsePayload, { status: 200 });
+    return applyRateLimitHeaders(res, rateLimit);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to parse RFP document';
     return NextResponse.json({ error: message, success: false }, { status: 500 });

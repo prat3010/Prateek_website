@@ -1,5 +1,5 @@
 # 🏛️ Master Architecture Knowledge Graph Index
-**Total Registered Architecture Nodes:** 111 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
+**Total Registered Architecture Nodes:** 112 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
 
 ## ⚡ Quick Navigation
 - [Master Architecture Visual Canvas](MASTER_ARCHITECTURE_MAP.canvas)
@@ -88,7 +88,7 @@
 | `Proxy_telemetry` | **Proxy: `src/proxy.ts` (Next.js 16 Edge Proxy & Telemetry)** | 🔴 `CRITICAL` | `SERVICE_ROLE` | [architecture_nodes/Proxy_telemetry.md](architecture_nodes/Proxy_telemetry.md) |
 | `Route_auth_callback` | **Route: `/auth/callback` (PKCE OAuth Handler)** | 🔴 `CRITICAL` | `BEARER_JWT` | [architecture_nodes/Route_auth_callback.md](architecture_nodes/Route_auth_callback.md) |
 
-### 🔹 5. CORE DOMAIN & GUARDS: CPQ Pricing, Auth & PDF Suite (10 Nodes)
+### 🔹 5. CORE DOMAIN & GUARDS: CPQ Pricing, Auth & PDF Suite (11 Nodes)
 
 | Node ID | Title / Component | Blast Radius | Security Auth | Specification File |
 | :--- | :--- | :---: | :---: | :--- |
@@ -99,6 +99,7 @@
 | `Lib_markdown` | **Lib: `markdown.ts` (Blog Parser & Metadata Extractor)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Lib_markdown.md](architecture_nodes/Lib_markdown.md) |
 | `Lib_pricing` | **Lib: `pricing.ts` (Commercial Pricing SSoT)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Lib_pricing.md](architecture_nodes/Lib_pricing.md) |
 | `Lib_rag_client` | **Lib: `rag-client.ts` (Retriever Backend Bridge)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Lib_rag_client.md](architecture_nodes/Lib_rag_client.md) |
+| `Lib_rateLimit` | **Lib: `rateLimit.ts` (Universal Edge AI Token Shield)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Lib_rateLimit.md](architecture_nodes/Lib_rateLimit.md) |
 | `Lib_sessionVerify` | **Lib: `sessionVerify.ts` (Universal PKCE Session Guard)** | 🔴 `CRITICAL` | `BEARER_JWT` | [architecture_nodes/Lib_sessionVerify.md](architecture_nodes/Lib_sessionVerify.md) |
 | `Lib_skills` | **Lib: `skills.ts` (Persona Filter & Narrative Mapper)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Lib_skills.md](architecture_nodes/Lib_skills.md) |
 | `UI_CommercialPDFSuite` | **UI: `pdfTheme.ts`, `pdfFonts.ts` & React-PDF Exporters** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_CommercialPDFSuite.md](architecture_nodes/UI_CommercialPDFSuite.md) |

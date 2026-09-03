@@ -2,32 +2,21 @@ import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { escapeHtml } from '@/utils/sanitize';
 import { supabase } from '@/data/supabase';
-
-const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-const RATE_LIMIT_WINDOW = 60_000;
-const RATE_LIMIT_MAX = 5;
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-  if (!entry || now > entry.resetTime) {
-    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
-    return true;
-  }
-  if (entry.count >= RATE_LIMIT_MAX) return false;
-  entry.count++;
-  return true;
-}
+import { checkRateLimit, rateLimitResponse } from '@/lib/rateLimit';
 
 export async function POST(request: Request) {
   try {
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-    if (!checkRateLimit(ip)) {
-      return NextResponse.json(
-        { error: 'Too many requests. Please try again later.' },
-        { status: 429, headers: { 'Retry-After': '60' } }
-      );
+    const rateLimit = await checkRateLimit(request, {
+      scope: 'contact',
+      limit: 5,
+      windowSeconds: 60,
+    });
+
+    if (!rateLimit.success) {
+      return rateLimitResponse(rateLimit);
     }
+
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
 
     const body = await request.json();
     const { name, email, message, recaptchaToken, pdfAttachment } = body;

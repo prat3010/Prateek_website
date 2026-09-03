@@ -127,7 +127,7 @@ export class RetrieverClient {
     );
   }
 
-  async chat(sessionId: string, message: string, signal?: AbortSignal): Promise<ReadableStream<Uint8Array> | null> {
+  async chat(sessionId: string, message: string, signal?: AbortSignal, lastEventId?: string): Promise<ReadableStream<Uint8Array> | null> {
     const url = `${this.config.apiUrl.replace(/\/$/, "")}/v1/tenants/${this.config.tenantId}/chat/sessions/${sessionId}/messages`;
     const validUserId = requireUserId(this.config.userId);
     const headers: Record<string, string> = {
@@ -138,6 +138,7 @@ export class RetrieverClient {
     };
     if (this.config.llmKey) headers["X-LLM-Key"] = this.config.llmKey;
     if (this.config.llmProvider) headers["X-LLM-Provider"] = this.config.llmProvider;
+    if (lastEventId) headers["Last-Event-ID"] = lastEventId;
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);

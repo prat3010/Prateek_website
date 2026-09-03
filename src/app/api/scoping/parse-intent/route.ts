@@ -3,6 +3,7 @@ import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
 import { resolveFeatureDependencies } from '@/lib/pricing';
 import type { FeatureItem } from '@/data/resume';
 import { RetrieverClient, type ParseIntentRequest, type ParseIntentResponse } from '@/lib/rag-client';
+import { checkRateLimit, rateLimitResponse, applyRateLimitHeaders } from '@/lib/rateLimit';
 
 const { features: rawFeatures } = questionnaireDefaults;
 
@@ -194,6 +195,17 @@ function classifyIntentWithCatalog(prompt: string): {
 export async function POST(req: NextRequest) {
   const startTime = performance.now();
 
+  // Edge AI Token Shield: 10 requests per minute per IP
+  const rateLimit = await checkRateLimit(req, {
+    scope: 'scoping_intent',
+    limit: 10,
+    windowSeconds: 60,
+  });
+
+  if (!rateLimit.success) {
+    return rateLimitResponse(rateLimit);
+  }
+
   try {
     const body: ParseIntentRequest = await req.json();
     const prompt = (body.prompt || '').trim();
@@ -299,7 +311,8 @@ export async function POST(req: NextRequest) {
       unrecognizedRequirements: classification.unrecognizedRequirements,
     };
 
-    return NextResponse.json(responsePayload, { status: 200 });
+    const res = NextResponse.json(responsePayload, { status: 200 });
+    return applyRateLimitHeaders(res, rateLimit);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown intent parsing error';
     return NextResponse.json({ error: message, success: false }, { status: 500 });

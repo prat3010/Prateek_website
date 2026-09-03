@@ -3,12 +3,25 @@ import { supabase } from '@/data/supabase';
 import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
 import { copilotQuerySchema } from '@/lib/clientOrder';
 import { RetrieverClient } from '@/lib/rag-client';
+import { checkRateLimit, rateLimitResponse, applyRateLimitHeaders } from '@/lib/rateLimit';
 
 export async function POST(req: NextRequest) {
   try {
     const clientEmail = await getVerifiedSessionEmail(req);
     if (!clientEmail) {
       return NextResponse.json({ error: 'Unauthorized: valid session required.' }, { status: 401 });
+    }
+
+    // Edge AI Token Shield: 20 requests per minute per authenticated client
+    const rateLimit = await checkRateLimit(req, {
+      scope: 'copilot',
+      limit: 20,
+      windowSeconds: 60,
+      identifier: clientEmail,
+    });
+
+    if (!rateLimit.success) {
+      return rateLimitResponse(rateLimit);
     }
 
     let rawJson: unknown;
@@ -162,7 +175,7 @@ export async function POST(req: NextRequest) {
         .join('\n');
     }
 
-    return NextResponse.json({
+    const res = NextResponse.json({
       answer: answerText.trim(),
       scope_code: activeScope.scope_code,
       company_name: activeScope.company_name,
@@ -170,6 +183,7 @@ export async function POST(req: NextRequest) {
       deposit_paid: Boolean(activeScope.deposit_paid),
       citations,
     });
+    return applyRateLimitHeaders(res, rateLimit);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json({ error: message }, { status: 500 });

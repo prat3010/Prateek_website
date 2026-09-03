@@ -346,9 +346,12 @@ Removes friction for non-technical buyers and enterprise CTOs by providing dual 
        latencyMs: number;
        semanticCacheHit: boolean;
        tenantId: string;
+       modelUsed?: string;
+       fallbackMode?: boolean;
      };
      unrecognizedRequirements?: string[];
    }
+   // Rate Limited: 10 requests / 60s per IP via Edge AI Token Shield (src/lib/rateLimit.ts)
    ```
 
 2. **Multimodal RFP Parser**: `POST /api/scoping/parse-rfp`

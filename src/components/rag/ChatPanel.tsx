@@ -212,79 +212,96 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
     setAbortController(controller);
 
     try {
-      const body = await client.chat(sessionId, msg, controller.signal);
-      if (!body) {
-        setMessages((prev) => [...prev, { id: ++msgIdCounter.current, role: "assistant", content: "(empty response)" }]);
-        setLoading(false);
-        setAbortController(null);
-        return;
-      }
-
-      const reader = body.getReader();
-      const decoder = new TextDecoder();
       const assistantId = ++msgIdCounter.current;
       setMessages((prev) => [...prev, { id: assistantId, role: "assistant", content: "" }]);
 
-      let sseBuffer = "";
-      let isDone = false;
+      const runStreamAttempt = async (currentEventId?: string): Promise<{ done: boolean; lastId?: string }> => {
+        const body = await client.chat(sessionId, msg, controller.signal, currentEventId);
+        if (!body) {
+          return { done: true, lastId: currentEventId };
+        }
 
-      while (!isDone) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        sseBuffer += decoder.decode(value, { stream: true });
-        const lines = sseBuffer.split("\n");
-        sseBuffer = lines.pop() ?? "";
+        const reader = body.getReader();
+        const decoder = new TextDecoder();
+        let sseBuffer = "";
+        let streamDone = false;
+        let latestId = currentEventId;
 
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (trimmed.startsWith("data: ")) {
-            const data = trimmed.slice(6);
-            try {
-              const parsed = JSON.parse(data);
-              if (parsed.event === "done") {
-                isDone = true;
-                break;
+        while (!streamDone) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          sseBuffer += decoder.decode(value, { stream: true });
+          const lines = sseBuffer.split("\n");
+          sseBuffer = lines.pop() ?? "";
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (trimmed.startsWith("id: ")) {
+              latestId = trimmed.slice(4).trim();
+            } else if (trimmed.startsWith("data: ")) {
+              const data = trimmed.slice(6);
+              try {
+                const parsed = JSON.parse(data);
+                if (parsed.id) latestId = String(parsed.id);
+                if (parsed.event === "done") {
+                  streamDone = true;
+                  break;
+                }
+                if (parsed.event === "error") {
+                  const errMsg = parsed.message || parsed.error || parsed.detail || "Server error during chat stream";
+                  setError(`Stream Error: ${errMsg}`);
+                  streamDone = true;
+                  break;
+                }
+                if (parsed.message_id || parsed.cached !== undefined || parsed.latency_ms) {
+                  setMessages((prev) => {
+                    const last = prev[prev.length - 1];
+                    if (last?.role === "assistant" && last.id === assistantId) {
+                      return [
+                        ...prev.slice(0, -1),
+                        {
+                          ...last,
+                          backendMessageId: parsed.message_id || last.backendMessageId,
+                          cached: parsed.cached ?? last.cached,
+                          latencyMs: parsed.latency_ms ?? last.latencyMs,
+                        },
+                      ];
+                    }
+                    return prev;
+                  });
+                }
+                const delta = parsed.content ?? parsed.delta ?? "";
+                if (delta) {
+                  setMessages((prev) => {
+                    const last = prev[prev.length - 1];
+                    if (last?.role === "assistant" && last.id === assistantId) {
+                      return [...prev.slice(0, -1), { ...last, content: last.content + delta }];
+                    }
+                    return prev;
+                  });
+                }
+              } catch (parseErr) {
+                console.warn("[SSE] Failed to parse event line:", data, parseErr);
               }
-
-              if (parsed.event === "error") {
-                const errMsg = parsed.message || parsed.error || parsed.detail || "Server error during chat stream";
-                setError(`Stream Error: ${errMsg}`);
-                isDone = true;
-                break;
-              }
-
-              // Update metadata if present
-              if (parsed.message_id || parsed.cached !== undefined || parsed.latency_ms) {
-                setMessages((prev) => {
-                  const last = prev[prev.length - 1];
-                  if (last?.role === "assistant" && last.id === assistantId) {
-                    return [
-                      ...prev.slice(0, -1),
-                      {
-                        ...last,
-                        backendMessageId: parsed.message_id || last.backendMessageId,
-                        cached: parsed.cached ?? last.cached,
-                        latencyMs: parsed.latency_ms ?? last.latencyMs,
-                      },
-                    ];
-                  }
-                  return prev;
-                });
-              }
-
-              const delta = parsed.content ?? parsed.delta ?? "";
-              if (delta) {
-                setMessages((prev) => {
-                  const last = prev[prev.length - 1];
-                  if (last?.role === "assistant" && last.id === assistantId) {
-                    return [...prev.slice(0, -1), { ...last, content: last.content + delta }];
-                  }
-                  return prev;
-                });
-              }
-            } catch (parseErr) {
-              console.warn("[SSE] Failed to parse event line:", data, parseErr);
             }
+          }
+        }
+        return { done: streamDone, lastId: latestId };
+      };
+
+      let lastEventId: string | undefined = undefined;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          const result = await runStreamAttempt(lastEventId);
+          lastEventId = result.lastId;
+          if (result.done) break;
+        } catch (streamErr) {
+          if (controller.signal.aborted) throw streamErr;
+          if (attempt < 3) {
+            console.warn(`[SSE] Stream disconnected. Reconnecting with Last-Event-ID (${lastEventId || 'none'}), attempt ${attempt}/3...`);
+            await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
+          } else {
+            throw streamErr;
           }
         }
       }

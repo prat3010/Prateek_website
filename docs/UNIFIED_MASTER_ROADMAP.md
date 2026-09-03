@@ -604,11 +604,13 @@ timeline
 ```
 
 #### 🛡️ Milestone 86: Edge AI Token Shield, DDoS Defense & Upstash Redis Rate Limiting
-- **Repo Scope:** Both (`Prateek_website` `src/proxy.ts`, `src/lib/rateLimit.ts` & `retriever` `security.py`)
-- **Deliverable:**
-  - Implement edge sliding-window token-bucket rate limiter via Upstash Redis across all public inference endpoints (`/api/scoping/parse-intent`, `/api/scoping/parse-rfp`, `/api/client/copilot`) to prevent automated API quota abuse and DDoS billing spikes.
-  - Implement resilient SSE connection recovery with `Last-Event-ID` auto-reconnect buffering, eliminating severed streaming responses on mobile Wi-Fi/5G network switches.
-- **Status:** **Planned (Phase K)**
+- **Repo Scope:** Both (`Prateek_website` `src/lib/rateLimit.ts` & `retriever` `apps/api/src/routers/tenant.py`, `apps/api/src/routers/chat.py`)
+- **Deliverables:**
+  1. Implemented universal Edge AI Token Shield (`src/lib/rateLimit.ts`) with dual-mode Upstash Redis REST API sliding-window engine and thread-safe self-cleaning In-Memory LRU fallback.
+  2. Protected `/api/scoping/parse-intent` (10 req/60s), `/api/scoping/parse-rfp` (5 req/60s), `/api/client/copilot` (20 req/60s), and `/api/contact` (5 req/60s) with RFC 429 rate limit headers (`Retry-After`, `X-RateLimit-*`).
+  3. Attached backend defense-in-depth rate limiting (`Depends(rate_limit(scope="intent", max_requests=30))`) to `POST /v1/tenants/{tenantId}/intent/classify` in Retriever with unit test assertions in `test_intent_classification.py`.
+  4. Implemented resilient SSE connection recovery with `Last-Event-ID` sequential event tracking (`id: {event_seq}`) and 3-attempt exponential backoff retry loop in `ChatPanel.tsx` and `rag-client.ts`, eliminating severed responses on mobile Wi-Fi/cellular handover.
+- **Status:** **Completed (2026-09-03)**
 
 #### 💾 Milestone 87: Automated Cloud Database Snapshots, S3/R2 WAL Archival & PITR Recovery Engine
 - **Repo Scope:** `retriever` (`scripts/db_snapshot.py`, `.github/workflows/db_backup_cron.yml`, Oracle VPS `retriever-db-backup.timer`)
