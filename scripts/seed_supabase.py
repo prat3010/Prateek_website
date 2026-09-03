@@ -67,7 +67,7 @@ def upsert(table, rows, conflict_col='id'):
         return None
 
 def clear_table(table):
-    supabase_rest('DELETE', table)
+    supabase_rest('DELETE', f'{table}?id=not.is.null')
 
 SAFE_SYNC = '--safe-sync' in sys.argv or os.environ.get('SAFE_SYNC', '').lower() in ('1', 'true')
 
@@ -201,10 +201,10 @@ except Exception as e:
     print(f'  Failed to load certificates.json: {e}')
     certs_raw = []
 
-for c in certs_raw:
-    c['slug'] = c.pop('id')
 if certs_raw:
     upsert('certificates', certs_raw, 'slug')
+else:
+    clear_table('certificates')
 print(f'  {len(certs_raw)} certificates synced')
 
 # ── 4. Profile (resume) ──────────────────────────────────────────────
