@@ -1,5 +1,5 @@
 # 🏛️ Master Architecture Knowledge Graph Index
-**Total Registered Architecture Nodes:** 115 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
+**Total Registered Architecture Nodes:** 131 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
 
 ## ⚡ Quick Navigation
 - [Master Architecture Visual Canvas](MASTER_ARCHITECTURE_MAP.canvas)
@@ -13,7 +13,7 @@
   - [Runbook: RAG Tenant Onboarding](runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)
 ---
 
-### 🔹 1. FRONTEND: Portfolio & Adaptive Identity (9 Nodes)
+### 🔹 1. FRONTEND: Portfolio & Adaptive Identity (16 Nodes)
 
 | Node ID | Title / Component | Blast Radius | Security Auth | Specification File |
 | :--- | :--- | :---: | :---: | :--- |
@@ -24,8 +24,15 @@
 | `UI_AgentStudioPanel` | **UI Component: `AgentStudioPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_AgentStudioPanel.md](architecture_nodes/UI_AgentStudioPanel.md) |
 | `UI_AnalyticsDashboard` | **UI: `AnalyticsDashboard.tsx`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_AnalyticsDashboard.md](architecture_nodes/UI_AnalyticsDashboard.md) |
 | `UI_BlogEngine` | **UI: `BlogEngine.tsx` / `BlogPost.tsx`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_BlogEngine.md](architecture_nodes/UI_BlogEngine.md) |
+| `UI_CachePanel` | **UI Component: `CachePanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_CachePanel.md](architecture_nodes/UI_CachePanel.md) |
+| `UI_GatewayPanel` | **UI Component: `GatewayPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_GatewayPanel.md](architecture_nodes/UI_GatewayPanel.md) |
+| `UI_IntegrationsPanel` | **UI Component: `IntegrationsPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_IntegrationsPanel.md](architecture_nodes/UI_IntegrationsPanel.md) |
 | `UI_NoirSkyline` | **UI: `NoirSkyline.tsx` (6-Layer Parallax Backdrop)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_NoirSkyline.md](architecture_nodes/UI_NoirSkyline.md) |
+| `UI_PromptOptimizationPanel` | **UI Component: `PromptOptimizationPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_PromptOptimizationPanel.md](architecture_nodes/UI_PromptOptimizationPanel.md) |
+| `UI_RlmStudioPanel` | **UI Component: `RlmStudioPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_RlmStudioPanel.md](architecture_nodes/UI_RlmStudioPanel.md) |
+| `UI_TeamPanel` | **UI Component: `TeamPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_TeamPanel.md](architecture_nodes/UI_TeamPanel.md) |
 | `UI_Terminal` | **UI: `Terminal.tsx` (Interactive CLI Engine)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_Terminal.md](architecture_nodes/UI_Terminal.md) |
+| `UI_VectorVisualizerPanel` | **UI Component: `VectorVisualizerPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_VectorVisualizerPanel.md](architecture_nodes/UI_VectorVisualizerPanel.md) |
 
 ### 🔹 2. DISCOVERY & COMMERCE: Multimodal CPQ & SOW Freeze (6 Nodes)
 
@@ -50,13 +57,14 @@
 | `UI_ClientWorkspaceDashboard` | **UI: `ClientWorkspaceDashboard.tsx`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_ClientWorkspaceDashboard.md](architecture_nodes/UI_ClientWorkspaceDashboard.md) |
 | `UI_RAGLabPlayground` | **UI: `RAGLabPlayground.tsx` (Retriever SaaS Studio Views)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_RAGLabPlayground.md](architecture_nodes/UI_RAGLabPlayground.md) |
 
-### 🔹 4. API GATEWAY: Next.js 16 Edge & REST Layer (34 Nodes)
+### 🔹 4. API GATEWAY: Next.js 16 Edge & REST Layer (38 Nodes)
 
 | Node ID | Title / Component | Blast Radius | Security Auth | Specification File |
 | :--- | :--- | :---: | :---: | :--- |
 | `API_analytics_summary` | **API: `GET /api/analytics-summary`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/API_analytics_summary.md](architecture_nodes/API_analytics_summary.md) |
 | `API_blog_publish` | **API: `POST /api/blog/publish`** | 🟢 `MEDIUM` | `SERVICE_ROLE` | [architecture_nodes/API_blog_publish.md](architecture_nodes/API_blog_publish.md) |
 | `API_certificates` | **API: `GET /api/certificates` & `[id]`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/API_certificates.md](architecture_nodes/API_certificates.md) |
+| `API_client_change_orders` | **API: `GET/POST /api/client/change-orders`** | 🟢 `MEDIUM` | `BEARER_JWT` | [architecture_nodes/API_client_change_orders.md](architecture_nodes/API_client_change_orders.md) |
 | `API_client_copilot` | **API: `POST /api/client/copilot`** | 🟢 `MEDIUM` | `BEARER_JWT` | [architecture_nodes/API_client_copilot.md](architecture_nodes/API_client_copilot.md) |
 | `API_client_create_razorpay_invoice` | **API: `POST /api/client/create-razorpay-invoice`** | 🔴 `CRITICAL` | `BEARER_JWT` | [architecture_nodes/API_client_create_razorpay_invoice.md](architecture_nodes/API_client_create_razorpay_invoice.md) |
 | `API_client_create_razorpay_order` | **API: `POST /api/client/create-razorpay-order`** | 🔴 `CRITICAL` | `BEARER_JWT` | [architecture_nodes/API_client_create_razorpay_order.md](architecture_nodes/API_client_create_razorpay_order.md) |
@@ -69,6 +77,7 @@
 | `API_client_verify_razorpay_payment` | **API: `POST /api/client/verify-razorpay-payment`** | 🔴 `CRITICAL` | `BEARER_JWT` | [architecture_nodes/API_client_verify_razorpay_payment.md](architecture_nodes/API_client_verify_razorpay_payment.md) |
 | `API_contact` | **API: `POST /api/contact` (Contact Form Gateway)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/API_contact.md](architecture_nodes/API_contact.md) |
 | `API_git_log` | **API: `GET /api/git-log`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/API_git_log.md](architecture_nodes/API_git_log.md) |
+| `API_ml_classify_visitor` | **API: `POST /api/ml/classify-visitor`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/API_ml_classify_visitor.md](architecture_nodes/API_ml_classify_visitor.md) |
 | `API_outreach_dispatch` | **API: `POST /api/outreach/dispatch`** | 🟠 `HIGH` | `BEARER_JWT` | [architecture_nodes/API_outreach_dispatch.md](architecture_nodes/API_outreach_dispatch.md) |
 | `API_outreach_get_leads` | **API: `GET /api/outreach/get-leads`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/API_outreach_get_leads.md](architecture_nodes/API_outreach_get_leads.md) |
 | `API_outreach_prospect` | **API: `POST /api/outreach/prospect`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/API_outreach_prospect.md](architecture_nodes/API_outreach_prospect.md) |
@@ -79,8 +88,10 @@
 | `API_rag_telemetry` | **API: `GET /api/rag/telemetry`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/API_rag_telemetry.md](architecture_nodes/API_rag_telemetry.md) |
 | `API_rag_tenant` | **API: `POST /api/rag/tenant`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/API_rag_tenant.md](architecture_nodes/API_rag_tenant.md) |
 | `API_revalidate` | **API: `POST /api/revalidate`** | 🟢 `MEDIUM` | `SERVICE_ROLE` | [architecture_nodes/API_revalidate.md](architecture_nodes/API_revalidate.md) |
+| `API_scoping_estimate_timeline` | **API: `POST /api/scoping/estimate-timeline`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/API_scoping_estimate_timeline.md](architecture_nodes/API_scoping_estimate_timeline.md) |
 | `API_scoping_parse_intent` | **API: `POST /api/scoping/parse-intent`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/API_scoping_parse_intent.md](architecture_nodes/API_scoping_parse_intent.md) |
 | `API_scoping_parse_rfp` | **API: `POST /api/scoping/parse-rfp`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/API_scoping_parse_rfp.md](architecture_nodes/API_scoping_parse_rfp.md) |
+| `API_scoping_validate_promo` | **API: `POST /api/scoping/validate-promo`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/API_scoping_validate_promo.md](architecture_nodes/API_scoping_validate_promo.md) |
 | `API_skills` | **API: `GET /api/skills` & `[id]`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/API_skills.md](architecture_nodes/API_skills.md) |
 | `API_terminal_qrcode` | **API: `POST /api/terminal/qrcode`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/API_terminal_qrcode.md](architecture_nodes/API_terminal_qrcode.md) |
 | `API_terminal_query` | **API: `POST /api/terminal/query`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/API_terminal_query.md](architecture_nodes/API_terminal_query.md) |
@@ -105,7 +116,7 @@
 | `Lib_skills` | **Lib: `skills.ts` (Persona Filter & Narrative Mapper)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Lib_skills.md](architecture_nodes/Lib_skills.md) |
 | `UI_CommercialPDFSuite` | **UI: `pdfTheme.ts`, `pdfFonts.ts` & React-PDF Exporters** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_CommercialPDFSuite.md](architecture_nodes/UI_CommercialPDFSuite.md) |
 
-### 🔹 6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPIs (34 Nodes)
+### 🔹 6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPIs (39 Nodes)
 
 | Node ID | Title / Component | Blast Radius | Security Auth | Specification File |
 | :--- | :--- | :---: | :---: | :--- |
@@ -135,9 +146,14 @@
 | `Retriever_API_v1_chat` | **Retriever API: `POST /v1/chat`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_chat.md](architecture_nodes/Retriever_API_v1_chat.md) |
 | `Retriever_API_v1_consensus` | **Retriever API: `apps/api/src/routers/consensus.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_consensus.md](architecture_nodes/Retriever_API_v1_consensus.md) |
 | `Retriever_API_v1_documents` | **Retriever API: `POST /v1/documents`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_documents.md](architecture_nodes/Retriever_API_v1_documents.md) |
+| `Retriever_API_v1_estimation` | **Retriever API: `apps/api/src/routers/estimation.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_estimation.md](architecture_nodes/Retriever_API_v1_estimation.md) |
+| `Retriever_API_v1_gateway` | **Retriever API: `apps/api/src/routers/gateway.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_gateway.md](architecture_nodes/Retriever_API_v1_gateway.md) |
 | `Retriever_API_v1_health` | **Retriever API: `apps/api/src/routers/health.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_health.md](architecture_nodes/Retriever_API_v1_health.md) |
+| `Retriever_API_v1_integrations` | **Retriever API: `apps/api/src/routers/integrations.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_integrations.md](architecture_nodes/Retriever_API_v1_integrations.md) |
 | `Retriever_API_v1_payments` | **Retriever API: `apps/api/src/routers/payments.py`** | 🔴 `CRITICAL` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_payments.md](architecture_nodes/Retriever_API_v1_payments.md) |
+| `Retriever_API_v1_persona` | **Retriever API: `apps/api/src/routers/persona.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_persona.md](architecture_nodes/Retriever_API_v1_persona.md) |
 | `Retriever_API_v1_pricing` | **Retriever API: `apps/api/src/routers/pricing.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_pricing.md](architecture_nodes/Retriever_API_v1_pricing.md) |
+| `Retriever_API_v1_prompts` | **Retriever API: `apps/api/src/routers/prompts.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_prompts.md](architecture_nodes/Retriever_API_v1_prompts.md) |
 | `Retriever_API_v1_rlm` | **Retriever API: `apps/api/src/routers/rlm.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_rlm.md](architecture_nodes/Retriever_API_v1_rlm.md) |
 | `Retriever_API_v1_search` | **Retriever API: `POST /v1/search`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_search.md](architecture_nodes/Retriever_API_v1_search.md) |
 | `Retriever_API_v1_security_compression` | **Retriever API: `apps/api/src/routers/security_compression.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_security_compression.md](architecture_nodes/Retriever_API_v1_security_compression.md) |
