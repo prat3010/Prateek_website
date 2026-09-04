@@ -287,3 +287,66 @@ export interface AgentExecutionResult {
   total_steps: number;
   execution_time_ms: number;
 }
+
+// ── Milestone 92: DSPy Declarative Prompt Compilation & Algorithmic Self-Optimization Pipeline ────
+
+export interface FewShotDemonstration {
+  question: string;
+  context: string;
+  thought?: string | null;
+  answer: string;
+  score?: number;
+}
+
+export interface CompiledPromptProgram {
+  program_id: string;
+  tenant_id: string;
+  name: string;
+  signature_name: string;
+  optimizer: "BootstrapFewShot" | "MIPROv2" | "RandomSearch" | string;
+  dataset_id?: string | null;
+  baseline_score: number;
+  compiled_score: number;
+  improvement_pct: number;
+  metric_name: string;
+  compiled_instruction: string;
+  few_shot_demos: FewShotDemonstration[];
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface PromptCompilationRequest {
+  name?: string;
+  dataset_id?: string | null;
+  optimizer?: "BootstrapFewShot" | "MIPROv2" | "RandomSearch";
+  max_demos?: number;
+  metric_target?: "faithfulness" | "context_relevance" | "composite";
+  train_data?: Array<{
+    question: string;
+    context: string;
+    ground_truth_answer: string;
+  }>;
+  val_data?: Array<{
+    question: string;
+    context: string;
+    ground_truth_answer: string;
+  }>;
+}
+
+export interface PromptCompilationResult {
+  program_id: string;
+  tenant_id: string;
+  name: string;
+  signature_name: string;
+  optimizer: string;
+  dataset_id?: string | null;
+  baseline_score: number;
+  compiled_score: number;
+  improvement_pct: number;
+  metric_name: string;
+  compiled_instruction: string;
+  few_shot_demos: FewShotDemonstration[];
+  is_active: boolean;
+  created_at: string;
+}
+

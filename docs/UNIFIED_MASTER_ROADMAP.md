@@ -693,12 +693,13 @@ timeline
 
 #### 🎯 Milestone 92: DSPy Declarative Prompt Compilation & Algorithmic Self-Optimization Pipeline
 - **Libraries:** `dspy-ai>=2.5.0`
-- **Repo Scope:** `retriever` (`apps/api/src/domain/inference/dspy_compiler.py`, `workers/src/tasks/teleprompter.py`)
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/inference/dspy_abstractions.py`, `src/adapters/cognitive/dspy_compiler_adapter.py`, `src/adapters/database/compiled_prompt_repository.py`, `src/routers/prompts.py` & `Prateek_website` `src/components/rag/PromptOptimizationPanel.tsx`, `rag-client.ts`, `/rag/app`)
 - **Deliverable:**
-  - Replace static handcrafted string prompt templates with declarative DSPy Signatures and Modules (`dspy.ChainOfThought`, `dspy.ReAct`, `dspy.ProgramOfThought`).
-  - Implement automated teleprompter tasks (`BootstrapFewShotWithRandomSearch` / `MIPROv2`) optimizing few-shot demonstrations and prompt instructions against ground-truth Ragas/DeepEval metrics.
-  - Expose `POST /v1/tenants/{tenantId}/prompts/compile` allowing tenants to automatically tune their RAG system prompt without manual prompt engineering.
-- **Status:** **Planned (Phase L)**
+  - Replace static handcrafted string prompt templates with declarative DSPy Signatures and Modules (`dspy.ChainOfThought`, `dspy.ReAct`).
+  - Implement automated teleprompter tasks (`BootstrapFewShot` & `MIPROv2`) optimizing few-shot demonstrations and prompt instructions against ground-truth evaluation metrics with measurable score lift ($\Delta > 0$).
+  - Versioned persistence in `compiled_prompt_programs` table with tenant isolation, atomic 1-click production hot-activation, and runtime `PromptBuilder` exemplar injection.
+  - Interactive DSPy Prompt Optimization Studio panel in SaaS App Studio (`/rag/app`) and Retriever Admin Dashboard (`/prompts`) with Azure/Noir dual-theme parity.
+- **Status:** **Completed (Phase L / v0.77.0)**
 
 #### 🔀 Milestone 93: Enterprise LLM Gateway & Multi-Model Smart Router (LiteLLM Architecture)
 - **Libraries:** `litellm>=1.40.0`

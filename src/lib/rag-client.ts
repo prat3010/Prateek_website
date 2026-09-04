@@ -468,6 +468,65 @@ export class RetrieverClient {
       }
     );
   }
+
+  // ── Milestone 92: DSPy Declarative Prompt Compilation & Algorithmic Self-Optimization Pipeline ────
+
+  async compilePrompt(
+    payload: import("./rag-types").PromptCompilationRequest
+  ): Promise<import("./rag-types").PromptCompilationResult> {
+    return this.request<import("./rag-types").PromptCompilationResult>(
+      `/v1/tenants/${this.config.tenantId}/prompts/compile`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }
+    );
+  }
+
+  async getCompiledPrompts(): Promise<import("./rag-types").CompiledPromptProgram[]> {
+    return this.request<import("./rag-types").CompiledPromptProgram[]>(
+      `/v1/tenants/${this.config.tenantId}/prompts/compiled`
+    );
+  }
+
+  async getActiveCompiledPrompt(): Promise<import("./rag-types").CompiledPromptProgram | null> {
+    return this.request<import("./rag-types").CompiledPromptProgram | null>(
+      `/v1/tenants/${this.config.tenantId}/prompts/compiled/active`
+    );
+  }
+
+  async activateCompiledPrompt(
+    programId: string
+  ): Promise<import("./rag-types").CompiledPromptProgram> {
+    return this.request<import("./rag-types").CompiledPromptProgram>(
+      `/v1/tenants/${this.config.tenantId}/prompts/compiled/${encodeURIComponent(programId)}/activate`,
+      {
+        method: "POST",
+      }
+    );
+  }
+
+  async deactivateCompiledPrompt(
+    programId: string
+  ): Promise<import("./rag-types").CompiledPromptProgram> {
+    return this.request<import("./rag-types").CompiledPromptProgram>(
+      `/v1/tenants/${this.config.tenantId}/prompts/compiled/${encodeURIComponent(programId)}/deactivate`,
+      {
+        method: "POST",
+      }
+    );
+  }
+
+  async deleteCompiledPrompt(
+    programId: string
+  ): Promise<{ success: boolean; program_id: string }> {
+    return this.request<{ success: boolean; program_id: string }>(
+      `/v1/tenants/${this.config.tenantId}/prompts/compiled/${encodeURIComponent(programId)}`,
+      {
+        method: "DELETE",
+      }
+    );
+  }
 }
 
 export interface GraphCapabilitiesResponse {
