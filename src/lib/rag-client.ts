@@ -715,6 +715,102 @@ export class RetrieverClient {
   async getWorkflowOverview(): Promise<import("./rag-types").WorkflowOverviewResponse> {
     return this.request<import("./rag-types").WorkflowOverviewResponse>("/v1/admin/workflows/overview");
   }
+
+  // ── Milestone 96: Serverless GPU Serving & Custom vLLM / LoRA ────
+
+  async getServerlessStatus(): Promise<import("./rag-types").ServerlessDeploymentStatus> {
+    return this.request<import("./rag-types").ServerlessDeploymentStatus>("/v1/admin/serverless/status");
+  }
+
+  async probeServerlessGpu(): Promise<import("./rag-types").WarmBootMetrics> {
+    return this.request<import("./rag-types").WarmBootMetrics>("/v1/admin/serverless/probe", {
+      method: "POST",
+    });
+  }
+
+  async getServerlessCostSavings(
+    activeComputeHours: number = 15.0,
+    gpuTier: import("./rag-types").ServerlessGpuTier = "A10G"
+  ): Promise<import("./rag-types").ServerlessCostComparison> {
+    const qs = new URLSearchParams({
+      active_compute_hours: String(activeComputeHours),
+      gpu_tier: gpuTier,
+    }).toString();
+    return this.request<import("./rag-types").ServerlessCostComparison>(
+      `/v1/admin/serverless/cost-savings?${qs}`
+    );
+  }
+
+  async getTenantLoraAdapters(tenantId?: string): Promise<import("./rag-types").LoraAdapterMetadata[]> {
+    const tid = tenantId || this.config.tenantId;
+    return this.request<import("./rag-types").LoraAdapterMetadata[]>(
+      `/v1/tenants/${tid}/lora-adapters`
+    );
+  }
+
+  async getActiveTenantLoraAdapter(tenantId?: string): Promise<import("./rag-types").LoraAdapterMetadata | null> {
+    const tid = tenantId || this.config.tenantId;
+    return this.request<import("./rag-types").LoraAdapterMetadata | null>(
+      `/v1/tenants/${tid}/lora-adapters/active`
+    );
+  }
+
+  async registerTenantLoraAdapter(
+    payload: {
+      name: string;
+      base_model: string;
+      artifact_uri: string;
+      rank?: number;
+      alpha?: number;
+      target_modules?: string[];
+      adapter_type?: string;
+      description?: string;
+      activate_immediately?: boolean;
+    },
+    tenantId?: string
+  ): Promise<import("./rag-types").LoraAdapterMetadata> {
+    const tid = tenantId || this.config.tenantId;
+    return this.request<import("./rag-types").LoraAdapterMetadata>(
+      `/v1/tenants/${tid}/lora-adapters`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }
+    );
+  }
+
+  async activateTenantLoraAdapter(
+    adapterId: string,
+    tenantId?: string
+  ): Promise<import("./rag-types").LoraAdapterMetadata> {
+    const tid = tenantId || this.config.tenantId;
+    return this.request<import("./rag-types").LoraAdapterMetadata>(
+      `/v1/tenants/${tid}/lora-adapters/${adapterId}/activate`,
+      { method: "POST" }
+    );
+  }
+
+  async deactivateTenantLoraAdapter(
+    adapterId: string,
+    tenantId?: string
+  ): Promise<{ status: string; adapter_id: string }> {
+    const tid = tenantId || this.config.tenantId;
+    return this.request<{ status: string; adapter_id: string }>(
+      `/v1/tenants/${tid}/lora-adapters/${adapterId}/deactivate`,
+      { method: "POST" }
+    );
+  }
+
+  async deleteTenantLoraAdapter(
+    adapterId: string,
+    tenantId?: string
+  ): Promise<{ deleted: boolean; adapter_id: string }> {
+    const tid = tenantId || this.config.tenantId;
+    return this.request<{ deleted: boolean; adapter_id: string }>(
+      `/v1/tenants/${tid}/lora-adapters/${adapterId}`,
+      { method: "DELETE" }
+    );
+  }
 }
 
 

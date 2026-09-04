@@ -590,5 +590,60 @@ export interface WorkflowOverviewResponse {
   checkpoint_backend: string;
 }
 
+// ── Milestone 96: Serverless GPU Serving & Custom vLLM / LoRA Types ─────────
+
+export type ServerlessProviderType = "modal" | "bentoml";
+export type ServerlessGpuTier = "T4" | "L4" | "A10G" | "A100_40GB" | "A100_80GB" | "H100";
+
+export interface LoraAdapterMetadata {
+  adapter_id: string;
+  tenant_id: string;
+  name: string;
+  base_model: string;
+  artifact_uri: string;
+  rank: number;
+  alpha: number;
+  target_modules: string[];
+  adapter_type: string;
+  description?: string;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface WarmBootMetrics {
+  container_init_time_ms: number;
+  model_weights_load_time_ms: number;
+  first_token_latency_ms: number;
+  total_cold_start_time_ms: number;
+  is_cold_start: boolean;
+  probed_at?: string;
+}
+
+export interface ServerlessDeploymentStatus {
+  provider: ServerlessProviderType;
+  gpu_tier: ServerlessGpuTier;
+  active_containers: number;
+  min_containers: number;
+  max_containers: number;
+  scaledown_window_seconds: number;
+  is_warm: boolean;
+  endpoint_url?: string;
+  current_active_model?: string;
+  active_lora_adapters: string[];
+  last_metrics?: WarmBootMetrics;
+}
+
+export interface ServerlessCostComparison {
+  active_hours: number;
+  gpu_tier: ServerlessGpuTier;
+  hourly_gpu_rate_usd: number;
+  serverless_monthly_cost_usd: number;
+  dedicated_monthly_cost_usd: number;
+  monthly_savings_usd: number;
+  savings_percentage: number;
+}
+
+
 
 

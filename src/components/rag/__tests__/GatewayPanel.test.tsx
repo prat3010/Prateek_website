@@ -8,6 +8,10 @@ import type {
   GatewayProbeResult,
   TenantGatewayRoutesResponse,
   VirtualTenantBudget,
+  ServerlessDeploymentStatus,
+  ServerlessCostComparison,
+  LoraAdapterMetadata,
+  WarmBootMetrics,
 } from '@/lib/rag-types';
 
 describe('GatewayPanel Component', () => {
@@ -16,6 +20,12 @@ describe('GatewayPanel Component', () => {
   const mockGetTenantGatewayRoutes = vi.fn();
   const mockUpdateTenantGatewayRoutes = vi.fn();
   const mockGetTenantGatewayBudget = vi.fn();
+  const mockGetServerlessStatus = vi.fn();
+  const mockProbeServerlessGpu = vi.fn();
+  const mockGetServerlessCostSavings = vi.fn();
+  const mockGetTenantLoraAdapters = vi.fn();
+  const mockActivateTenantLoraAdapter = vi.fn();
+  const mockDeactivateTenantLoraAdapter = vi.fn();
 
   const mockClient = {
     getGatewayModels: mockGetGatewayModels,
@@ -23,6 +33,12 @@ describe('GatewayPanel Component', () => {
     getTenantGatewayRoutes: mockGetTenantGatewayRoutes,
     updateTenantGatewayRoutes: mockUpdateTenantGatewayRoutes,
     getTenantGatewayBudget: mockGetTenantGatewayBudget,
+    getServerlessStatus: mockGetServerlessStatus,
+    probeServerlessGpu: mockProbeServerlessGpu,
+    getServerlessCostSavings: mockGetServerlessCostSavings,
+    getTenantLoraAdapters: mockGetTenantLoraAdapters,
+    activateTenantLoraAdapter: mockActivateTenantLoraAdapter,
+    deactivateTenantLoraAdapter: mockDeactivateTenantLoraAdapter,
   } as unknown as RetrieverClient;
 
   const sampleModels: GatewayModelInfo[] = [
@@ -97,6 +113,67 @@ describe('GatewayPanel Component', () => {
       latency_ms: 210,
     },
   ];
+
+  const sampleServerlessStatus: ServerlessDeploymentStatus = {
+    provider: 'modal',
+    gpu_tier: 'A10G',
+    active_containers: 0,
+    min_containers: 0,
+    max_containers: 5,
+    scaledown_window_seconds: 300,
+    is_warm: false,
+    endpoint_url: 'https://prateeq--vllm-llama-serve.modal.run',
+    current_active_model: 'meta-llama/Meta-Llama-3.1-8B-Instruct',
+    active_lora_adapters: ['lora_test_arch'],
+  };
+
+  const sampleServerlessCost: ServerlessCostComparison = {
+    active_hours: 15.0,
+    gpu_tier: 'A10G',
+    hourly_gpu_rate_usd: 1.0,
+    serverless_monthly_cost_usd: 15.0,
+    dedicated_monthly_cost_usd: 720.0,
+    monthly_savings_usd: 705.0,
+    savings_percentage: 97.92,
+  };
+
+  const sampleLoraAdapters: LoraAdapterMetadata[] = [
+    {
+      adapter_id: 'lora_test_arch',
+      tenant_id: 'tenant_test_123',
+      name: 'Test Architecture LoRA',
+      base_model: 'meta-llama/Meta-Llama-3.1-8B-Instruct',
+      artifact_uri: 's3://vault/adapters/arch_lora_v1',
+      rank: 16,
+      alpha: 32.0,
+      target_modules: ['q_proj', 'v_proj'],
+      adapter_type: 'llm',
+      description: 'Domain tuning for microservices',
+      is_active: true,
+    },
+    {
+      adapter_id: 'lora_test_sec',
+      tenant_id: 'tenant_test_123',
+      name: 'Security Audit LoRA',
+      base_model: 'meta-llama/Meta-Llama-3.1-8B-Instruct',
+      artifact_uri: 's3://vault/adapters/sec_lora_v1',
+      rank: 8,
+      alpha: 16.0,
+      target_modules: ['q_proj', 'k_proj'],
+      adapter_type: 'llm',
+      description: 'Vulnerability assessment fine-tuning',
+      is_active: false,
+    },
+  ];
+
+  const sampleWarmBootMetrics: WarmBootMetrics = {
+    container_init_time_ms: 1820,
+    model_weights_load_time_ms: 590,
+    first_token_latency_ms: 138,
+    total_cold_start_time_ms: 2548,
+    is_cold_start: true,
+    probed_at: '2026-09-05T02:00:00Z',
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -183,6 +260,77 @@ describe('GatewayPanel Component', () => {
     await waitFor(() => {
       expect(mockUpdateTenantGatewayRoutes).toHaveBeenCalledTimes(1);
       expect(screen.getByText(/Smart router topology & budget ceilings saved!/i)).toBeDefined();
+    });
+  });
+
+  it('renders serverless GPU serving metrics, cold-start latency, and scale-to-zero cost savings', async () => {
+    mockGetGatewayModels.mockResolvedValueOnce(sampleModels);
+    mockGetTenantGatewayRoutes.mockResolvedValueOnce(sampleRoutes);
+    mockGetTenantGatewayBudget.mockResolvedValueOnce(sampleBudget);
+    mockGetServerlessStatus.mockResolvedValueOnce(sampleServerlessStatus);
+    mockGetServerlessCostSavings.mockResolvedValueOnce(sampleServerlessCost);
+    mockGetTenantLoraAdapters.mockResolvedValueOnce(sampleLoraAdapters);
+
+    render(<GatewayPanel client={mockClient} />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Serverless Dedicated GPU Serving & Dynamic LoRA/i)).toBeDefined();
+      expect(screen.getByText(/0 Active Containers/i)).toBeDefined();
+      expect(screen.getByText(/\$705\.00 Saved/i)).toBeDefined();
+      expect(screen.getByText(/Test Architecture LoRA/i)).toBeDefined();
+      expect(screen.getByText(/ACTIVE INFERENCE/i)).toBeDefined();
+    });
+  });
+
+  it('triggers warm-boot latency probe when probe button is clicked', async () => {
+    mockGetGatewayModels.mockResolvedValueOnce(sampleModels);
+    mockGetTenantGatewayRoutes.mockResolvedValueOnce(sampleRoutes);
+    mockGetTenantGatewayBudget.mockResolvedValueOnce(sampleBudget);
+    mockGetServerlessStatus.mockResolvedValueOnce(sampleServerlessStatus);
+    mockGetServerlessCostSavings.mockResolvedValueOnce(sampleServerlessCost);
+    mockGetTenantLoraAdapters.mockResolvedValueOnce(sampleLoraAdapters);
+    mockProbeServerlessGpu.mockResolvedValueOnce(sampleWarmBootMetrics);
+
+    render(<GatewayPanel client={mockClient} />);
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Probe Warm-Boot Latency/i })).toBeDefined();
+    });
+
+    const probeBtn = screen.getByRole('button', { name: /Probe Warm-Boot Latency/i });
+    fireEvent.click(probeBtn);
+
+    await waitFor(() => {
+      expect(mockProbeServerlessGpu).toHaveBeenCalledTimes(1);
+      expect(screen.getByText(/138ms TTFT/i)).toBeDefined();
+    });
+  });
+
+  it('toggles dynamic LoRA adapter activation on serverless vLLM', async () => {
+    mockGetGatewayModels.mockResolvedValueOnce(sampleModels);
+    mockGetTenantGatewayRoutes.mockResolvedValueOnce(sampleRoutes);
+    mockGetTenantGatewayBudget.mockResolvedValueOnce(sampleBudget);
+    mockGetServerlessStatus.mockResolvedValueOnce(sampleServerlessStatus);
+    mockGetServerlessCostSavings.mockResolvedValueOnce(sampleServerlessCost);
+    mockGetTenantLoraAdapters.mockResolvedValueOnce(sampleLoraAdapters);
+    mockActivateTenantLoraAdapter.mockResolvedValueOnce({
+      ...sampleLoraAdapters[1],
+      is_active: true,
+    });
+
+    render(<GatewayPanel client={mockClient} />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Security Audit LoRA/i)).toBeDefined();
+      expect(screen.getByRole('button', { name: /⚡ Hot-Activate/i })).toBeDefined();
+    });
+
+    const activateBtn = screen.getByRole('button', { name: /⚡ Hot-Activate/i });
+    fireEvent.click(activateBtn);
+
+    await waitFor(() => {
+      expect(mockActivateTenantLoraAdapter).toHaveBeenCalledWith('lora_test_sec');
+      expect(screen.getByText(/hot-activated dynamically on serverless vLLM/i)).toBeDefined();
     });
   });
 });
