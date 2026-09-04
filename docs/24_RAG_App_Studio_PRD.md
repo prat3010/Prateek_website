@@ -138,6 +138,24 @@ The revamped `/rag/app` uses a modern **SaaS Left Sidebar + Dedicated Sub-Views 
   - `Owner`: Billing control, workspace deletion, full admin settings.
   - `Admin`: Document uploads, API key generation, widget customizer.
   - `Member`: Chat playground testing, document inspection.
+
+#### View 8: Ecosystem Plugins & Integrations (`IntegrationsPanel` — Milestone 90)
+- **💬 Native Slack Workspace Bot:**
+  - `/ask-retriever <query>` slash command for team channels.
+  - Cryptographic HMAC-SHA256 signature verification (`v0={hash}`).
+  - Grounded Block Kit message format with clickable citation link pills and interactive `👍 Helpful` / `👎 Inaccurate` telemetry buttons.
+- **🌐 1-Click Chrome Ingestion Extension (Manifest V3):**
+  - Instant `.zip` bundle download link (`/v1/integrations/extension/bundle`).
+  - Active browser DOM reader-mode extraction with tag stripping (`<script>`, `<nav>`, `<footer>`).
+  - Fast-path ingestion directly into tenant document library via `POST /v1/tenants/{tenantId}/documents/raw`.
+- **📁 Google Drive 2-Way Sync:**
+  - Google Drive v3 REST API folder synchronization.
+  - Automatic Google Docs (`application/vnd.google-apps.document`) to plain text conversion.
+  - Differential change detection via `modifiedTime` and MD5 checksums.
+- **📝 Notion Workspace Connector:**
+  - Notion API v1 recursive block children tree traversal (`/v1/blocks/{id}/children`).
+  - Conversion of headings, lists, quotes, and code blocks to clean GitHub Flavored Markdown.
+  - Differential sync using `last_edited_time`.
 - **Razorpay Plan Subscription & Invoices:** Upgrade/downgrade subscription tiers (Starter, Pro, Business), view billing history, and download tax invoices.
 - **📜 Cryptographic SHA-256 Audit Log Exporter:** Download verifiable, tamper-evident audit logs of all queries, document uploads, and configuration changes for HIPAA/GDPR compliance audits.
 
