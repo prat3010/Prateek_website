@@ -572,6 +572,74 @@ export class RetrieverClient {
       `/v1/tenants/${tid}/gateway/budget`
     );
   }
+
+  // ── Milestone 94: NeMo Guardrails & Safety API Methods ─────────────────────
+
+  async getGuardrailTemplates(): Promise<Record<string, import("./rag-types").ColangTemplate>> {
+    return this.request<Record<string, import("./rag-types").ColangTemplate>>("/v1/guardrails/templates");
+  }
+
+  async getGuardrailConfig(tenantId?: string): Promise<import("./rag-types").TenantGuardrailsConfig> {
+    const tid = tenantId || this.config.tenantId;
+    return this.request<import("./rag-types").TenantGuardrailsConfig>(`/v1/tenants/${tid}/guardrails/config`);
+  }
+
+  async updateGuardrailConfig(
+    payload: Partial<import("./rag-types").TenantGuardrailsConfig>,
+    tenantId?: string
+  ): Promise<import("./rag-types").TenantGuardrailsConfig> {
+    const tid = tenantId || this.config.tenantId;
+    return this.request<import("./rag-types").TenantGuardrailsConfig>(`/v1/tenants/${tid}/guardrails/config`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async validateGuardrailInput(
+    query: string,
+    history?: Array<{ role: string; content: string }>,
+    tenantId?: string
+  ): Promise<import("./rag-types").GuardrailCheckResult> {
+    const tid = tenantId || this.config.tenantId;
+    return this.request<import("./rag-types").GuardrailCheckResult>(`/v1/tenants/${tid}/guardrails/validate-input`, {
+      method: "POST",
+      body: JSON.stringify({ query, conversation_history: history }),
+    });
+  }
+
+  async validateGuardrailOutput(
+    query: string,
+    generatedResponse: string,
+    retrievedContexts: string[] = [],
+    tenantId?: string
+  ): Promise<import("./rag-types").GuardrailCheckResult> {
+    const tid = tenantId || this.config.tenantId;
+    return this.request<import("./rag-types").GuardrailCheckResult>(`/v1/tenants/${tid}/guardrails/validate-output`, {
+      method: "POST",
+      body: JSON.stringify({
+        query,
+        generated_response: generatedResponse,
+        retrieved_contexts: retrievedContexts,
+      }),
+    });
+  }
+
+  async testGuardrailFlow(
+    query: string,
+    customColang?: string,
+    tenantId?: string
+  ): Promise<import("./rag-types").GuardrailCheckResult> {
+    const tid = tenantId || this.config.tenantId;
+    return this.request<import("./rag-types").GuardrailCheckResult>(`/v1/tenants/${tid}/guardrails/test-flow`, {
+      method: "POST",
+      body: JSON.stringify({ query, custom_colang: customColang }),
+    });
+  }
+
+  async getGuardrailTelemetry(tenantId?: string): Promise<import("./rag-types").GuardrailTelemetry> {
+    const tid = tenantId || this.config.tenantId;
+    return this.request<import("./rag-types").GuardrailTelemetry>(`/v1/tenants/${tid}/guardrails/telemetry`);
+  }
 }
 
 export interface GraphCapabilitiesResponse {

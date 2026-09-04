@@ -420,4 +420,95 @@ export interface UpdateGatewayRoutesPayload {
   currency?: string;
 }
 
+// ── Milestone 94: NVIDIA NeMo Guardrails & Conversational Safety Rails ──────
+
+export type GuardrailExecutionMode =
+  | "off"
+  | "fast_input_only"
+  | "full_conversational"
+  | "strict_factual";
+
+export type GuardrailAction = "allow" | "steer" | "block" | "mask";
+
+export interface ColangFlowDefinition {
+  flow_id: string;
+  name: string;
+  description?: string;
+  user_intents: string[];
+  bot_responses: string[];
+  raw_colang?: string;
+  is_active: boolean;
+  priority?: number;
+}
+
+export interface GuardrailRule {
+  rule_id: string;
+  name: string;
+  category: string;
+  description?: string;
+  action: GuardrailAction;
+  enabled: boolean;
+  parameters?: Record<string, unknown>;
+}
+
+export interface GuardrailViolation {
+  violation_id: string;
+  tenant_id: string;
+  timestamp: string;
+  category: string;
+  matched_flow_or_rule: string;
+  action_taken: GuardrailAction;
+  query_excerpt: string;
+  severity: "low" | "medium" | "high" | "critical";
+  latency_ms: number;
+}
+
+export interface GuardrailCheckResult {
+  allowed: boolean;
+  action: GuardrailAction;
+  reason: string;
+  rewritten_query?: string | null;
+  bot_response?: string | null;
+  matched_flow?: string | null;
+  violations: GuardrailViolation[];
+  latency_ms: number;
+  grounding_score?: number | null;
+}
+
+export interface TenantGuardrailsConfig {
+  tenant_id: string;
+  mode: GuardrailExecutionMode;
+  colang_script: string;
+  active_flows: ColangFlowDefinition[];
+  rules: GuardrailRule[];
+  pii_redaction_enabled: boolean;
+  competitor_shield_enabled: boolean;
+  competitor_names: string[];
+  brand_tone: string;
+  grounding_threshold: number;
+  fallback_response: string;
+  updated_at?: string;
+}
+
+export interface GuardrailTelemetry {
+  tenant_id: string;
+  total_violations: number;
+  total_blocked: number;
+  total_steered: number;
+  recent_violations: GuardrailViolation[];
+  average_rail_latency_ms: number;
+}
+
+export interface ColangTemplate {
+  name: string;
+  description: string;
+  colang: string;
+  rules: Array<{
+    rule_id: string;
+    name: string;
+    category: string;
+    enabled: boolean;
+  }>;
+}
+
 

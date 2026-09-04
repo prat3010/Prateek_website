@@ -1,5 +1,5 @@
 # 🏛️ Master Architecture Knowledge Graph Index
-**Total Registered Architecture Nodes:** 131 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
+**Total Registered Architecture Nodes:** 132 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
 
 ## ⚡ Quick Navigation
 - [Master Architecture Visual Canvas](MASTER_ARCHITECTURE_MAP.canvas)
@@ -116,7 +116,7 @@
 | `Lib_skills` | **Lib: `skills.ts` (Persona Filter & Narrative Mapper)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Lib_skills.md](architecture_nodes/Lib_skills.md) |
 | `UI_CommercialPDFSuite` | **UI: `pdfTheme.ts`, `pdfFonts.ts` & React-PDF Exporters** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_CommercialPDFSuite.md](architecture_nodes/UI_CommercialPDFSuite.md) |
 
-### 🔹 6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPIs (39 Nodes)
+### 🔹 6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPIs (40 Nodes)
 
 | Node ID | Title / Component | Blast Radius | Security Auth | Specification File |
 | :--- | :--- | :---: | :---: | :--- |
@@ -133,6 +133,7 @@
 | `Engine_LlamaGuard_Guardrails` | **Engine: Llama Guard 3 Prompt Injection Filter (Milestone 40)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_LlamaGuard_Guardrails.md](architecture_nodes/Engine_LlamaGuard_Guardrails.md) |
 | `Engine_LongLLMLingua_Compression` | **Engine: LongLLMLingua Context Compression (Milestone 49)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_LongLLMLingua_Compression.md](architecture_nodes/Engine_LongLLMLingua_Compression.md) |
 | `Engine_MultiAgent_Consensus` | **Engine: Multi-Agent Consensus & Reflection Loops (Milestone 48)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_MultiAgent_Consensus.md](architecture_nodes/Engine_MultiAgent_Consensus.md) |
+| `Engine_NeMo_Conversational_Guardrails` | **Engine: NVIDIA NeMo Guardrails & Conversational Safety Rails (Milestone 94)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_NeMo_Conversational_Guardrails.md](architecture_nodes/Engine_NeMo_Conversational_Guardrails.md) |
 | `Engine_OTel_AutoInstrumentation` | **Engine: Full-Stack OpenTelemetry Auto-Instrumentation (Milestone 75)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_OTel_AutoInstrumentation.md](architecture_nodes/Engine_OTel_AutoInstrumentation.md) |
 | `Engine_RLM_Python_REPL` | **Engine: RLM Python REPL Sandbox (Milestone 47)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_RLM_Python_REPL.md](architecture_nodes/Engine_RLM_Python_REPL.md) |
 | `Engine_RLM_Python_REPL_Studio` | **Engine: Interactive RLM Python REPL Sandbox Studio (Milestone 72)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_RLM_Python_REPL_Studio.md](architecture_nodes/Engine_RLM_Python_REPL_Studio.md) |

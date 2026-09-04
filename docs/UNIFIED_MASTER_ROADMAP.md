@@ -712,12 +712,15 @@ timeline
 
 #### 🛡️ Milestone 94: NVIDIA NeMo Guardrails & Multi-Turn Conversational Safety Rails
 - **Libraries:** `nemoguardrails>=0.10.0`
-- **Repo Scope:** `retriever` (`apps/api/src/adapters/guardrails/nemo_guardrails_adapter.py`, `workers/src/tasks/`)
+- **Repo Scope:** Both (`retriever` `apps/api/src/adapters/guardrails/nemo_guardrails_adapter.py`, `src/domain/guardrails/nemo_guardrail_service.py`, `src/routers/guardrails.py`, `src/domain/batteries/battery_service.py` & `Prateek_website` `src/components/rag/GuardrailsPanel.tsx`, `rag-client.ts`, `/rag/app`)
 - **Deliverable:**
   - Integrate NVIDIA NeMo Guardrails with Colang `.co` flow definitions controlling dialogue direction, factual topic grounding, and preventing jailbreaks / prompt injection.
   - Multi-turn conversational constraint enforcement: ensure the model stays strictly within tenant business scope and adheres to brand tone guidelines.
-  - Automatic input rail verification running concurrently with fast-path embeddings (<200ms overhead).
-- **Status:** **Planned (Phase L)**
+  - Sub-20ms fast-path input rail verification running asynchronously and concurrently with vector embeddings.
+  - Post-inference factual grounding output rail verifying claim containment against retrieved context chunks.
+  - Platform Battery #13 registered in `BatteryService` under `SAFETY_DEFENSE`.
+  - Interactive SaaS Studio Guardrails Panel (`GuardrailsPanel.tsx`) with live Colang flow editor, preset templates, real-time prompt simulator, and security violation audit stream.
+- **Status:** **Completed (Phase L / v0.79.0)**
 
 #### ⚡ Milestone 95: Durable Asynchronous Execution & Background AI Workflow Engine (Inngest / Trigger.dev)
 - **Libraries:** `inngest>=0.4.0` / `@inngest/sdk`

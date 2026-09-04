@@ -472,6 +472,21 @@ This document serves as the registry of critical architectural design decisions 
 
 ---
 
+# **ADR 30: NVIDIA NeMo Guardrails, Programmable Colang & Multi-Turn Scope Anchoring (Milestone 94)**
+
+* **Status**: Approved & Implemented
+* **Context**: Production customer-facing RAG chatbots frequently face prompt-injection attacks (DAN, jailbreaks), scope drift (off-topic queries ballooning costs), and hallucinated commitments (promising nonexistent discounts). Handcrafted system prompts alone fail under adversarial pressure and cannot enforce deterministic dialog paths.
+* **Decision**: Integrated NVIDIA NeMo Guardrails architecture into Retriever as **Platform Battery #13** (`apps/api/src/adapters/guardrails/nemo_guardrails_adapter.py`, `src/routers/guardrails.py`):
+  1. Sub-20ms Fast-Path Input Rail: Asynchronous heuristic injection scanner running concurrently with vector embeddings to reject jailbreaks before wasting tokens.
+  2. Programmable Colang (`.co`) Dialog Flows: Human-readable intent and state definitions enabling tenants to steer off-topic chats, neutralize competitor mentions, and enforce brand tone.
+  3. Factual Grounding Output Rail: Automated claim entailment verification cross-checking generated responses against retrieved context chunks.
+  4. SaaS App Studio Guardrails Panel: Interactive Colang editor, pre-set enterprise templates, live test simulator, and real-time security violation audit stream.
+* **Consequences**:
+  * **Pros**: Deterministic conversational control without retraining models; $<20\text{ms}$ rejection of malicious queries; enterprise-grade brand and legal protection.
+  * **Cons**: Strict factual grounding mode adds $\sim 5\text{ms}-8\text{ms}$ post-generation token verification overhead.
+
+---
+
 # **Acceptance Criteria**
 - Registry records cover the core v2 architectural choices.
 - Format follows standard ADR structures (Context, Decision, Consequences).
