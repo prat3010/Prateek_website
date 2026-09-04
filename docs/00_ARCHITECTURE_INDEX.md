@@ -1,5 +1,5 @@
 # 🏛️ Master Architecture Knowledge Graph Index
-**Total Registered Architecture Nodes:** 112 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
+**Total Registered Architecture Nodes:** 113 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
 
 ## ⚡ Quick Navigation
 - [Master Architecture Visual Canvas](MASTER_ARCHITECTURE_MAP.canvas)
@@ -13,7 +13,7 @@
   - [Runbook: RAG Tenant Onboarding](runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)
 ---
 
-### 🔹 1. FRONTEND: Portfolio & Adaptive Identity (8 Nodes)
+### 🔹 1. FRONTEND: Portfolio & Adaptive Identity (9 Nodes)
 
 | Node ID | Title / Component | Blast Radius | Security Auth | Specification File |
 | :--- | :--- | :---: | :---: | :--- |
@@ -21,6 +21,7 @@
 | `Route_blog` | **Route: `/blog` & `/blog/[slug]` (Technical Markdown Publication)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Route_blog.md](architecture_nodes/Route_blog.md) |
 | `Route_home` | **Route: `/` (Adaptive Portfolio Home)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Route_home.md](architecture_nodes/Route_home.md) |
 | `Route_terminal` | **Route: `/terminal` (Interactive Diagnostics Console)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Route_terminal.md](architecture_nodes/Route_terminal.md) |
+| `UI_AgentStudioPanel` | **UI Component: `AgentStudioPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_AgentStudioPanel.md](architecture_nodes/UI_AgentStudioPanel.md) |
 | `UI_AnalyticsDashboard` | **UI: `AnalyticsDashboard.tsx`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_AnalyticsDashboard.md](architecture_nodes/UI_AnalyticsDashboard.md) |
 | `UI_BlogEngine` | **UI: `BlogEngine.tsx` / `BlogPost.tsx`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_BlogEngine.md](architecture_nodes/UI_BlogEngine.md) |
 | `UI_NoirSkyline` | **UI: `NoirSkyline.tsx` (6-Layer Parallax Backdrop)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_NoirSkyline.md](architecture_nodes/UI_NoirSkyline.md) |

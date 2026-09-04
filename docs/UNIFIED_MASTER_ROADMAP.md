@@ -689,7 +689,7 @@ timeline
   - Implement PostgreSQL/Redis state checkpoints (`PostgresSaver`) allowing long-running multi-agent reasoning threads to pause, resume, branch, and persist across client sessions.
   - **Human-in-the-Loop (HITL) Approval Nodes:** Execution halts before triggering sensitive operations (database migrations, billing changes, external API mutations) and renders interactive approval cards in the Client Dashboard (`/dashboard`) and SaaS Studio (`/rag/app`).
   - Time-travel debugging & state inspection endpoint (`GET /v1/agentic/threads/{threadId}/history`) with state rollback capability.
-- **Status:** **Planned (Phase L)**
+- **Status:** **Completed (Phase L / v0.76.0)**
 
 #### 🎯 Milestone 92: DSPy Declarative Prompt Compilation & Algorithmic Self-Optimization Pipeline
 - **Libraries:** `dspy-ai>=2.5.0`

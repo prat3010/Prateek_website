@@ -15,11 +15,12 @@ import { ConfigPanel } from "@/components/rag/ConfigPanel";
 import { TeamPanel } from "@/components/rag/TeamPanel";
 import { IntegrationsPanel } from "@/components/rag/IntegrationsPanel";
 import { RlmStudioPanel } from "@/components/rag/RlmStudioPanel";
+import { AgentStudioPanel } from "@/components/rag/AgentStudioPanel";
 import { VectorVisualizerPanel } from "@/components/rag/VectorVisualizerPanel";
 import { RagErrorBoundary } from "@/components/rag/ErrorBoundary";
 import styles from "@/components/rag/rag.module.css";
 
-type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "rlm" | "config" | "team" | "integrations";
+type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "rlm" | "agentic" | "config" | "team" | "integrations";
 
 export default function RagAppStudioPage() {
   const router = useRouter();
@@ -103,6 +104,7 @@ export default function RagAppStudioPage() {
     { id: "visualizer", label: "3D Vector Explorer", icon: "🪐" },
     { id: "cache", label: "Semantic Cache", icon: "⚡" },
     { id: "rlm", label: "RLM REPL Studio", icon: "🐍" },
+    { id: "agentic", label: "Agent Studio", icon: "🤖" },
     { id: "config", label: "Widget Studio", icon: "⚙️" },
     { id: "team", label: "Team & Compliance", icon: "👥" },
     { id: "integrations", label: "Plugins & Integrations", icon: "🔌" },
@@ -218,6 +220,7 @@ export default function RagAppStudioPage() {
             <VectorVisualizerPanel client={client} hidden={activeTab !== "visualizer"} />
             <CachePanel client={client} hidden={activeTab !== "cache"} />
             <RlmStudioPanel client={client} hidden={activeTab !== "rlm"} isExpired={trialDaysRemaining <= 0} />
+            <AgentStudioPanel client={client} hidden={activeTab !== "agentic"} isExpired={trialDaysRemaining <= 0} />
 
             <ConfigPanel
               config={

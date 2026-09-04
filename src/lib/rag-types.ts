@@ -208,6 +208,82 @@ export interface IntentClassificationResponse {
   latencyMs: number;
 }
 
+// ── Milestone 91: LangGraph Cyclic Agentic Workflows & HITL State Engine ────
 
+export interface ToolDefinition {
+  name: string;
+  description: string;
+  parameters_schema?: Record<string, unknown>;
+  category?: string;
+  requires_approval: boolean;
+  risk_level: "low" | "medium" | "high" | "critical";
+}
 
+export interface ToolCallItem {
+  call_id: string;
+  tool_name: string;
+  arguments: Record<string, unknown>;
+}
 
+export interface ToolResultItem {
+  call_id: string;
+  tool_name: string;
+  output: unknown;
+  is_error: boolean;
+}
+
+export interface AgentStepItem {
+  step_index: number;
+  thought: string;
+  tool_calls: ToolCallItem[];
+  tool_results: ToolResultItem[];
+}
+
+export interface HITLApprovalRequest {
+  action_id: string;
+  thread_id: string;
+  tenant_id: string;
+  tool_name: string;
+  arguments: Record<string, unknown>;
+  risk_level: "low" | "medium" | "high" | "critical";
+  description: string;
+  status: "pending" | "approved" | "rejected";
+  created_at: number;
+}
+
+export interface HITLApprovalDecision {
+  action_id: string;
+  decision: "approve" | "reject";
+  modified_arguments?: Record<string, unknown> | null;
+  comment?: string | null;
+}
+
+export interface ThreadCheckpointItem {
+  checkpoint_id: string;
+  thread_id: string;
+  tenant_id: string;
+  node_name: string;
+  step_index: number;
+  state_snapshot: Record<string, unknown>;
+  created_at: number;
+}
+
+export interface ThreadHistoryResponse {
+  thread_id: string;
+  tenant_id: string;
+  total_checkpoints: number;
+  checkpoints: ThreadCheckpointItem[];
+}
+
+export interface AgentExecutionResult {
+  tenant_id: string;
+  thread_id: string;
+  prompt: string;
+  final_answer: string;
+  status: "completed" | "waiting_approval" | "rejected" | "error";
+  steps: AgentStepItem[];
+  pending_approval?: HITLApprovalRequest | null;
+  checkpoint_id?: string | null;
+  total_steps: number;
+  execution_time_ms: number;
+}

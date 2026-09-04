@@ -8,8 +8,8 @@ const { features: rawFeatures } = questionnaireDefaults;
 const featureCatalog = rawFeatures as FeatureItem[];
 
 export async function POST(req: NextRequest) {
-  const rl = checkRateLimit(req, { limit: 60, windowMs: 60_000 });
-  if (rl.limited) {
+  const rl = await checkRateLimit(req, { scope: 'estimate-timeline', limit: 60, windowSeconds: 60 });
+  if (!rl.success) {
     return rateLimitResponse(rl);
   }
 

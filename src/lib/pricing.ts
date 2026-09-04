@@ -59,8 +59,8 @@ export interface PromoDiscountInfo {
 export interface QuoteSelection {
   engineId: string;
   featureIds: string[];
-  brandAssetId: string;
-  maintenancePlanId: string;
+  brandAssetId?: string;
+  maintenancePlanId?: string;
   promoCode?: PromoDiscountInfo | null;
 }
 
@@ -435,7 +435,7 @@ export function estimateScopeTimeline(
 
   for (const f of selectedFeatures) {
     const fid = f.id.toLowerCase();
-    const name = f.name || f.id;
+    const name = f.label || f.id;
 
     if (fid.includes('voice') || fid.includes('webrtc') || fid.includes('call')) {
       voiceHours += 22;

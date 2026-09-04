@@ -3,8 +3,8 @@ import { checkRateLimit, rateLimitResponse, applyRateLimitHeaders } from '@/lib/
 import { classifyVisitorLocally, type VisitorTelemetry, type PersonaRecommendation } from '@/lib/persona';
 
 export async function POST(req: NextRequest) {
-  const rl = checkRateLimit(req, { limit: 120, windowMs: 60_000 });
-  if (rl.limited) {
+  const rl = await checkRateLimit(req, { scope: 'classify-visitor', limit: 120, windowSeconds: 60 });
+  if (!rl.success) {
     return rateLimitResponse(rl);
   }
 

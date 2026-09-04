@@ -159,6 +159,22 @@ The revamped `/rag/app` uses a modern **SaaS Left Sidebar + Dedicated Sub-Views 
 - **Razorpay Plan Subscription & Invoices:** Upgrade/downgrade subscription tiers (Starter, Pro, Business), view billing history, and download tax invoices.
 - **📜 Cryptographic SHA-256 Audit Log Exporter:** Download verifiable, tamper-evident audit logs of all queries, document uploads, and configuration changes for HIPAA/GDPR compliance audits.
 
+#### View 9: Agentic Multi-Agent Orchestration Studio (`AgentStudioPanel` — Milestone 91)
+- **🤖 Autonomous Prompt Launchpad:**
+  - Multi-turn execution goal entry with step limit configuration ($1-10$ iterations).
+  - Dynamic tool catalog selector toggling safe tools (`calculator`, `hybrid_search`, `document_reader`, `system_metrics`) and sensitive actions (`document_delete`, `tenant_prompt_update`, `api_key_revoke`).
+- **🔄 Live Cyclic Execution Trace:**
+  - Step-by-step visual trace cards with step indices, thoughts, tool inputs, and observation badges.
+  - Final grounded synthesis card with total step count and duration telemetry.
+- **🛡️ Human-in-the-Loop (HITL) Gate Modal (`<Portal>` Escaped):**
+  - Traps sensitive tool calls before execution and renders an interactive approval drawer outside `ScrollSection` containing block.
+  - Displays risk level badges (`low`, `high`, `critical`), tool parameters, and human operator feedback input.
+  - Supports 1-click **Approve & Continue** and **Reject & Steer** actions via `POST /resume`.
+- **⏪ Time-Travel Checkpoint Scrubber & Rollback:**
+  - Timeline of immutable state snapshots loaded via `GET /history`.
+  - Node indicators (`reasoner`, `hitl_gate`, `tool_executor`, `synthesizer`).
+  - 1-click **Rollback to Here** restoring graph state and pruning subsequent steps via `POST /rollback`.
+
 ---
 
 ## 5. Hybrid LLM Key & Billing Strategy

@@ -399,6 +399,75 @@ export class RetrieverClient {
       }
     );
   }
+
+  // ── Milestone 91: LangGraph Cyclic Agentic Workflows & HITL State Engine ────
+
+  async listAgentTools(): Promise<import("./rag-types").ToolDefinition[]> {
+    return this.request<import("./rag-types").ToolDefinition[]>(
+      `/v1/tenants/${this.config.tenantId}/agentic/tools`
+    );
+  }
+
+  async executeAgentWorkflow(
+    prompt: string,
+    options?: {
+      threadId?: string;
+      maxSteps?: number;
+      allowedTools?: string[];
+    }
+  ): Promise<import("./rag-types").AgentExecutionResult> {
+    return this.request<import("./rag-types").AgentExecutionResult>(
+      `/v1/tenants/${this.config.tenantId}/agentic/execute`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          tenant_id: this.config.tenantId,
+          prompt,
+          thread_id: options?.threadId,
+          max_steps: options?.maxSteps ?? 10,
+          allowed_tools: options?.allowedTools,
+        }),
+      }
+    );
+  }
+
+  async resumeAgentWorkflow(
+    threadId: string,
+    decision: import("./rag-types").HITLApprovalDecision
+  ): Promise<import("./rag-types").AgentExecutionResult> {
+    return this.request<import("./rag-types").AgentExecutionResult>(
+      `/v1/tenants/${this.config.tenantId}/agentic/threads/${threadId}/resume`,
+      {
+        method: "POST",
+        body: JSON.stringify(decision),
+      }
+    );
+  }
+
+  async getAgentThreadHistory(
+    threadId: string
+  ): Promise<import("./rag-types").ThreadHistoryResponse> {
+    return this.request<import("./rag-types").ThreadHistoryResponse>(
+      `/v1/tenants/${this.config.tenantId}/agentic/threads/${threadId}/history`
+    );
+  }
+
+  async rollbackAgentThread(
+    threadId: string,
+    checkpointId: string,
+    fork = false
+  ): Promise<import("./rag-types").ThreadCheckpointItem> {
+    return this.request<import("./rag-types").ThreadCheckpointItem>(
+      `/v1/tenants/${this.config.tenantId}/agentic/threads/${threadId}/rollback`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          target_checkpoint_id: checkpointId,
+          fork,
+        }),
+      }
+    );
+  }
 }
 
 export interface GraphCapabilitiesResponse {

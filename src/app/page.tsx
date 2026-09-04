@@ -12,7 +12,7 @@ const Skills = dynamic(() => import('@/components/Skills/Skills'));
 const Projects = dynamic(() => import('@/components/Projects/Projects'));
 const Resume = dynamic(() => import('@/components/Resume/Resume'));
 const Contact = dynamic(() => import('@/components/Contact/Contact'));
-const PersonaAdaptiveBanner = dynamic(() => import('@/components/ui/PersonaAdaptiveBanner'), { ssr: false });
+const PersonaAdaptiveBanner = dynamic(() => import('@/components/ui/PersonaAdaptiveBanner'));
 
 function SectionSkeleton({ height }: { height: string }) {
   return (
