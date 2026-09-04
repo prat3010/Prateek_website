@@ -708,7 +708,7 @@ timeline
   - Unified multi-provider gateway layer supporting OpenAI, Anthropic, Gemini, Groq, Mistral, and local Ollama/vLLM endpoints.
   - Dynamic fallback cascades (e.g. Primary Claude 3.5 Sonnet $\rightarrow$ Fallback GPT-4o $\rightarrow$ Local Ollama `qwen2.5:14b` on 429 rate limit/downtime).
   - Virtual tenant API keys with strict budget ceilings (USD/INR caps), auto-cooldown on rate limits, and per-model token cost attribution dashboards in `/admin`.
-- **Status:** **Planned (Phase L)**
+- **Status:** **Completed (Phase L / v0.78.0)**
 
 #### 🛡️ Milestone 94: NVIDIA NeMo Guardrails & Multi-Turn Conversational Safety Rails
 - **Libraries:** `nemoguardrails>=0.10.0`

@@ -17,11 +17,12 @@ import { IntegrationsPanel } from "@/components/rag/IntegrationsPanel";
 import { RlmStudioPanel } from "@/components/rag/RlmStudioPanel";
 import { AgentStudioPanel } from "@/components/rag/AgentStudioPanel";
 import { PromptOptimizationPanel } from "@/components/rag/PromptOptimizationPanel";
+import { GatewayPanel } from "@/components/rag/GatewayPanel";
 import { VectorVisualizerPanel } from "@/components/rag/VectorVisualizerPanel";
 import { RagErrorBoundary } from "@/components/rag/ErrorBoundary";
 import styles from "@/components/rag/rag.module.css";
 
-type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "rlm" | "agentic" | "prompts" | "config" | "team" | "integrations";
+type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "rlm" | "agentic" | "prompts" | "gateway" | "config" | "team" | "integrations";
 
 export default function RagAppStudioPage() {
   const router = useRouter();
@@ -107,6 +108,7 @@ export default function RagAppStudioPage() {
     { id: "rlm", label: "RLM REPL Studio", icon: "🐍" },
     { id: "agentic", label: "Agent Studio", icon: "🤖" },
     { id: "prompts", label: "DSPy Prompt Studio", icon: "✨" },
+    { id: "gateway", label: "Smart Router & Gateway", icon: "🔀" },
     { id: "config", label: "Widget Studio", icon: "⚙️" },
     { id: "team", label: "Team & Compliance", icon: "👥" },
     { id: "integrations", label: "Plugins & Integrations", icon: "🔌" },
@@ -224,6 +226,7 @@ export default function RagAppStudioPage() {
             <RlmStudioPanel client={client} hidden={activeTab !== "rlm"} isExpired={trialDaysRemaining <= 0} />
             <AgentStudioPanel client={client} hidden={activeTab !== "agentic"} isExpired={trialDaysRemaining <= 0} />
             <PromptOptimizationPanel client={client} hidden={activeTab !== "prompts"} />
+            <GatewayPanel client={client} hidden={activeTab !== "gateway"} />
 
             <ConfigPanel
               config={

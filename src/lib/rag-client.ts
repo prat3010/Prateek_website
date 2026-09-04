@@ -527,6 +527,51 @@ export class RetrieverClient {
       }
     );
   }
+
+  // ── Milestone 93: Enterprise LLM Gateway & Smart Router ────
+
+  async getGatewayModels(): Promise<import("./rag-types").GatewayModelInfo[]> {
+    return this.request<import("./rag-types").GatewayModelInfo[]>("/v1/gateway/models");
+  }
+
+  async probeGateway(): Promise<import("./rag-types").GatewayProbeResult[]> {
+    return this.request<import("./rag-types").GatewayProbeResult[]>("/v1/gateway/probe", {
+      method: "POST",
+      body: JSON.stringify({}),
+    });
+  }
+
+  async getTenantGatewayRoutes(
+    tenantId?: string
+  ): Promise<import("./rag-types").TenantGatewayRoutesResponse> {
+    const tid = tenantId || this.config.tenantId;
+    return this.request<import("./rag-types").TenantGatewayRoutesResponse>(
+      `/v1/tenants/${tid}/gateway/routes`
+    );
+  }
+
+  async updateTenantGatewayRoutes(
+    payload: import("./rag-types").UpdateGatewayRoutesPayload,
+    tenantId?: string
+  ): Promise<{ status: string; tenant_id: string; gateway_settings: any; budget_settings: any }> {
+    const tid = tenantId || this.config.tenantId;
+    return this.request<{ status: string; tenant_id: string; gateway_settings: any; budget_settings: any }>(
+      `/v1/tenants/${tid}/gateway/routes`,
+      {
+        method: "PUT",
+        body: JSON.stringify(payload),
+      }
+    );
+  }
+
+  async getTenantGatewayBudget(
+    tenantId?: string
+  ): Promise<import("./rag-types").VirtualTenantBudget> {
+    const tid = tenantId || this.config.tenantId;
+    return this.request<import("./rag-types").VirtualTenantBudget>(
+      `/v1/tenants/${tid}/gateway/budget`
+    );
+  }
 }
 
 export interface GraphCapabilitiesResponse {
