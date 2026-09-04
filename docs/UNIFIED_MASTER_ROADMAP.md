@@ -665,19 +665,19 @@ timeline
 
 ---
 
-### Phase L: Forward Deployed Engineering (FDE) Enterprise Agentic Stack (M91 – M97) — **PLANNED HORIZON**
+### Phase L: Forward Deployed Engineering (FDE) Enterprise Agentic Stack (M91 – M97) — **IN PROGRESS (M91–M95 Complete, M96 Next)**
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
 │     PHASE L: FORWARD DEPLOYED ENGINEERING (FDE) ENTERPRISE AGENTIC STACK (M91–M97)     │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
-│  [M91] LangGraph Cyclic Agentic Orchestration & Human-in-the-Loop (HITL) State Engine  │
-│  [M92] DSPy Declarative Prompt Compilation & Algorithmic Self-Optimization Pipeline    │
-│  [M93] Enterprise LLM Gateway & Multi-Model Smart Router (LiteLLM Architecture)        │
-│  [M94] NVIDIA NeMo Guardrails & Multi-Turn Conversational Safety Rails                 │
-│  [M95] Durable Asynchronous Execution & Background AI Workflow Engine (Inngest)        │
-│  [M96] Serverless GPU Serving & Custom vLLM / LoRA Deployment Pipeline (Modal/BentoML) │
-│  [M97] Autonomous FDE Metaprogrammer & Self-Extending Capability Studio                │
+│  [M91] LangGraph Cyclic Agentic Orchestration & Human-in-the-Loop State Engine (Done)  │
+│  [M92] DSPy Declarative Prompt Compilation & Algorithmic Self-Optimization (Done)      │
+│  [M93] Enterprise LLM Gateway & Multi-Model Smart Router (LiteLLM) (Done)              │
+│  [M94] NVIDIA NeMo Guardrails & Multi-Turn Conversational Safety Rails (Done)          │
+│  [M95] Durable Asynchronous Execution & Background AI Workflow Engine (Done)           │
+│  [M96] Serverless GPU Serving & Custom vLLM / LoRA Deployment Pipeline (Active Next)   │
+│  [M97] Autonomous FDE Metaprogrammer & Self-Extending Capability Studio (Planned)      │
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
