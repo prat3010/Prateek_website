@@ -13,12 +13,13 @@ import { SearchPanel } from "@/components/rag/SearchPanel";
 import { CachePanel } from "@/components/rag/CachePanel";
 import { ConfigPanel } from "@/components/rag/ConfigPanel";
 import { TeamPanel } from "@/components/rag/TeamPanel";
+import { IntegrationsPanel } from "@/components/rag/IntegrationsPanel";
 import { RlmStudioPanel } from "@/components/rag/RlmStudioPanel";
 import { VectorVisualizerPanel } from "@/components/rag/VectorVisualizerPanel";
 import { RagErrorBoundary } from "@/components/rag/ErrorBoundary";
 import styles from "@/components/rag/rag.module.css";
 
-type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "rlm" | "config" | "team";
+type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "rlm" | "config" | "team" | "integrations";
 
 export default function RagAppStudioPage() {
   const router = useRouter();
@@ -104,6 +105,7 @@ export default function RagAppStudioPage() {
     { id: "rlm", label: "RLM REPL Studio", icon: "🐍" },
     { id: "config", label: "Widget Studio", icon: "⚙️" },
     { id: "team", label: "Team & Compliance", icon: "👥" },
+    { id: "integrations", label: "Plugins & Integrations", icon: "🔌" },
   ];
 
   return (
@@ -243,6 +245,7 @@ export default function RagAppStudioPage() {
               hidden={activeTab !== "config"}
             />
             <TeamPanel hidden={activeTab !== "team"} tenantId={tenantId} />
+            <IntegrationsPanel hidden={activeTab !== "integrations"} tenantId={tenantId} />
 
           </RagErrorBoundary>
         </main>
