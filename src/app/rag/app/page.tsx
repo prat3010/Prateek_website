@@ -20,10 +20,11 @@ import { PromptOptimizationPanel } from "@/components/rag/PromptOptimizationPane
 import { GatewayPanel } from "@/components/rag/GatewayPanel";
 import { GuardrailsPanel } from "@/components/rag/GuardrailsPanel";
 import { VectorVisualizerPanel } from "@/components/rag/VectorVisualizerPanel";
+import { WorkflowsPanel } from "@/components/rag/WorkflowsPanel";
 import { RagErrorBoundary } from "@/components/rag/ErrorBoundary";
 import styles from "@/components/rag/rag.module.css";
 
-type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "rlm" | "agentic" | "prompts" | "gateway" | "guardrails" | "config" | "team" | "integrations";
+type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "workflows" | "rlm" | "agentic" | "prompts" | "gateway" | "guardrails" | "config" | "team" | "integrations";
 
 export default function RagAppStudioPage() {
   const router = useRouter();
@@ -106,6 +107,7 @@ export default function RagAppStudioPage() {
     { id: "search", label: "Search & Evaluator", icon: "🔍" },
     { id: "visualizer", label: "3D Vector Explorer", icon: "🪐" },
     { id: "cache", label: "Semantic Cache", icon: "⚡" },
+    { id: "workflows", label: "Durable Workflows", icon: "⚡" },
     { id: "rlm", label: "RLM REPL Studio", icon: "🐍" },
     { id: "agentic", label: "Agent Studio", icon: "🤖" },
     { id: "prompts", label: "DSPy Prompt Studio", icon: "✨" },
@@ -225,6 +227,7 @@ export default function RagAppStudioPage() {
             <SearchPanel client={client} hidden={activeTab !== "search"} />
             <VectorVisualizerPanel client={client} hidden={activeTab !== "visualizer"} />
             <CachePanel client={client} hidden={activeTab !== "cache"} />
+            <WorkflowsPanel client={client} hidden={activeTab !== "workflows"} />
             <RlmStudioPanel client={client} hidden={activeTab !== "rlm"} isExpired={trialDaysRemaining <= 0} />
             <AgentStudioPanel client={client} hidden={activeTab !== "agentic"} isExpired={trialDaysRemaining <= 0} />
             <PromptOptimizationPanel client={client} hidden={activeTab !== "prompts"} />

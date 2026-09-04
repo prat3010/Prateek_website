@@ -1,5 +1,5 @@
 # 🏛️ Master Architecture Knowledge Graph Index
-**Total Registered Architecture Nodes:** 132 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
+**Total Registered Architecture Nodes:** 133 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
 
 ## ⚡ Quick Navigation
 - [Master Architecture Visual Canvas](MASTER_ARCHITECTURE_MAP.canvas)
@@ -116,7 +116,7 @@
 | `Lib_skills` | **Lib: `skills.ts` (Persona Filter & Narrative Mapper)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Lib_skills.md](architecture_nodes/Lib_skills.md) |
 | `UI_CommercialPDFSuite` | **UI: `pdfTheme.ts`, `pdfFonts.ts` & React-PDF Exporters** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_CommercialPDFSuite.md](architecture_nodes/UI_CommercialPDFSuite.md) |
 
-### 🔹 6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPIs (40 Nodes)
+### 🔹 6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPIs (41 Nodes)
 
 | Node ID | Title / Component | Blast Radius | Security Auth | Specification File |
 | :--- | :--- | :---: | :---: | :--- |
@@ -127,6 +127,7 @@
 | `Engine_DSPy_Prompt_Compilation` | **Engine: DSPy Declarative Prompt Compilation (Milestone 92)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_DSPy_Prompt_Compilation.md](architecture_nodes/Engine_DSPy_Prompt_Compilation.md) |
 | `Engine_Digital_SOW_Escrow_Freeze` | **Engine: Digital SOW & 50% Escrow Freeze** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Digital_SOW_Escrow_Freeze.md](architecture_nodes/Engine_Digital_SOW_Escrow_Freeze.md) |
 | `Engine_Docling_Layout_OCR` | **Engine: Docling Layout OCR & Multimodal Ingestion (Milestone 42)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Docling_Layout_OCR.md](architecture_nodes/Engine_Docling_Layout_OCR.md) |
+| `Engine_Durable_Workflow_Execution` | **Engine: Durable Asynchronous Execution & Background AI Workflow Engine (Milestone 95)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Durable_Workflow_Execution.md](architecture_nodes/Engine_Durable_Workflow_Execution.md) |
 | `Engine_Embedding_Space_Projection` | **Engine Specification: Scikit-Learn 2D/3D Embedding Space Projection Pipeline & SaaS Studio 3D Vector Explorer (Milestone 82)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Embedding_Space_Projection.md](architecture_nodes/Engine_Embedding_Space_Projection.md) |
 | `Engine_GraphRAG_Topology` | **Engine: GraphRAG Knowledge Graph & Dynamic Topology** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_GraphRAG_Topology.md](architecture_nodes/Engine_GraphRAG_Topology.md) |
 | `Engine_LLM_Gateway_Smart_Router` | **Engine: Enterprise LLM Gateway & Smart Router (Milestone 93)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_LLM_Gateway_Smart_Router.md](architecture_nodes/Engine_LLM_Gateway_Smart_Router.md) |

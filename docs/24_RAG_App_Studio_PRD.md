@@ -175,6 +175,31 @@ The revamped `/rag/app` uses a modern **SaaS Left Sidebar + Dedicated Sub-Views 
   - Node indicators (`reasoner`, `hitl_gate`, `tool_executor`, `synthesizer`).
   - 1-click **Rollback to Here** restoring graph state and pruning subsequent steps via `POST /rollback`.
 
+#### View 10: DSPy Declarative Prompt Optimization Studio (`PromptOptimizationPanel` — Milestone 92)
+- **✨ Declarative Signatures & Modules:** Replaces static handcrafted prompts with programmatic DSPy Signatures (`Question -> Context -> Answer`).
+- **🎯 Metric-Driven Optimization:** Automated teleprompter runs (`BootstrapFewShot` & `MIPROv2`) evaluating candidate few-shot exemplars against faithfulness and ground-truth validation scores.
+- **⚡ Production Hot-Activation:** Versioned program persistence with 1-click activation and dynamic exemplar injection into runtime RAG queries.
+
+#### View 11: Enterprise LLM Gateway & Smart Router (`GatewayPanel` — Milestone 93)
+- **🔀 Multi-Provider Routing:** Unified gateway layer across OpenAI, Anthropic, Gemini, Groq, and local Ollama endpoints.
+- **🔄 Dynamic Fallback Cascades:** Automated failover cascades on HTTP 429 rate limits or provider downtime.
+- **💳 Virtual Tenant Budgets:** Hard/soft monthly and daily cost caps with configurable fallback behavior.
+
+#### View 12: NVIDIA NeMo Guardrails & Safety Studio (`GuardrailsPanel` — Milestone 94)
+- **🛡️ Colang Dialogue Steering:** Programmable `.co` flow definitions controlling dialogue direction and preventing off-topic scope drift.
+- **⚡ Sub-20ms Fast-Path Input Rails:** Real-time heuristic scanning for DAN payloads, jailbreaks, and system extraction attempts.
+- **🔍 Factual Grounding Output Rails:** Post-generation claim entailment scoring cross-referencing output against retrieved context chunks.
+
+#### View 13: Durable Asynchronous Execution & Background AI Workflows (`WorkflowsPanel` — Milestone 95)
+- **⚡ Step-Level Memoization:** Fault-tolerant execution of multi-step pipelines (vault bulk ingest, batch graph extraction, synthetic evaluation generation, bulk re-embedding). Completed step checkpoints replay in $<2\text{ms}$ with zero compute waste.
+- **🔄 Resilient Exponential Backoff:** Automatic retries on transient errors with configurable concurrency controls.
+- **📊 Interactive Visual DAG Timeline:** Directional execution graph visualizing step progress, retry attempts, execution time, and memoized state output.
+- **🔍 Checkpoint Inspection Drawer:** Wrapped in `<Portal>` to escape containing blocks, displaying memoized JSON outputs and error traces.
+
+#### View 14: 3D Vector Space Explorer (`VectorVisualizerPanel` — Milestone 82)
+- **🪐 WebGL Point Cloud:** Interactive 3D visualization of high-dimensional document chunks reduced via PCA/UMAP.
+- **🎯 Real-Time Query Raycasting:** Interactive inspection of document clusters, semantic centroids, and live query vector distances.
+
 ---
 
 ## 5. Hybrid LLM Key & Billing Strategy

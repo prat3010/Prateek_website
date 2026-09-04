@@ -722,14 +722,18 @@ timeline
   - Interactive SaaS Studio Guardrails Panel (`GuardrailsPanel.tsx`) with live Colang flow editor, preset templates, real-time prompt simulator, and security violation audit stream.
 - **Status:** **Completed (Phase L / v0.79.0)**
 
-#### ⚡ Milestone 95: Durable Asynchronous Execution & Background AI Workflow Engine (Inngest / Trigger.dev)
-- **Libraries:** `inngest>=0.4.0` / `@inngest/sdk`
-- **Repo Scope:** Both (`retriever` `apps/api/src/adapters/workflow/` & `Prateek_website` `src/inngest/` / `/api/inngest`)
+#### ⚡ Milestone 95: Durable Asynchronous Execution & Background AI Workflow Engine
+- **Libraries:** Pure Hexagonal Python domain, `asyncio`, PostgreSQL 16 pgvector, `@number-flow/react`
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/workflow/`, `src/domain/abstractions/durable_workflow.py`, `src/adapters/workflow/durable_workflow_adapter.py`, `src/adapters/database/workflow_repository.py`, `src/routers/durable_workflow.py` & `Prateek_website` `src/components/rag/WorkflowsPanel.tsx`, `rag-client.ts`, `rag-types.ts`, `src/app/api/rag/workflow-webhook/route.ts`, `/rag/app`)
 - **Deliverable:**
   - Event-driven durable execution engine replacing brittle long-running HTTP endpoints for complex multi-step AI jobs (large PDF vault chunking, batch graph extraction, bulk re-embedding, synthetic evaluation generation).
   - Step-level automatic retry with exponential backoff, concurrency throttling, and state serialization.
-  - Zero-infrastructure execution tracking with live status webhooks streamed to Next.js Client Dashboard.
-- **Status:** **Planned (Phase L)**
+  - Step-level memoization in PostgreSQL RLS tables (`workflow_executions`, `workflow_step_checkpoints`); completed steps replay in $<2\text{ms}$ with zero computation cost.
+  - Platform Battery #15 registered in `BatteryService` under `BACKGROUND_WORKFLOWS`.
+  - Full-featured SaaS Studio Workflows Panel (`WorkflowsPanel.tsx`) in `/rag/app` with KPI summary cards, 1-click blueprint launch modal, execution ledger, visual Step DAG timeline, and step checkpoint output drawer using `<Portal>`.
+  - Webhook route in Next.js with HMAC SHA-256 signature verification.
+  - 100% automated test coverage across Pytest and Vitest.
+- **Status:** **Completed (Phase L / v0.80.0)**
 
 #### ☁️ Milestone 96: Serverless GPU Serving & Custom vLLM / LoRA Deployment Pipeline (Modal / BentoML)
 - **Libraries:** `modal>=0.63.0` / `bentoml>=1.3.0`

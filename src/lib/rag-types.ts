@@ -511,4 +511,84 @@ export interface ColangTemplate {
   }>;
 }
 
+// ── Milestone 95: Durable Asynchronous Workflows & Jobs Types ───────────────
+
+export type WorkflowStatus = "queued" | "running" | "completed" | "failed" | "cancelled";
+export type StepStatus = "pending" | "running" | "completed" | "failed" | "skipped";
+
+export interface WorkflowStepRecord {
+  step_id: string;
+  execution_id: string;
+  step_name: string;
+  step_index: number;
+  status: StepStatus;
+  attempts: number;
+  max_attempts: number;
+  memoized_output: Record<string, unknown>;
+  error_details?: string | null;
+  execution_time_ms: number;
+  started_at?: string | null;
+  completed_at?: string | null;
+}
+
+export interface WorkflowExecution {
+  execution_id: string;
+  tenant_id: string;
+  workflow_name: string;
+  status: WorkflowStatus;
+  trigger_event?: string | null;
+  idempotency_key?: string | null;
+  input_payload: Record<string, unknown>;
+  output_payload: Record<string, unknown>;
+  total_steps: number;
+  completed_steps: number;
+  current_step_name?: string | null;
+  error_message?: string | null;
+  step_history: WorkflowStepRecord[];
+  webhook_url?: string | null;
+  started_at: string;
+  completed_at?: string | null;
+}
+
+export interface WorkflowStepDefinition {
+  name: string;
+  description?: string;
+  max_attempts: number;
+  timeout_seconds: number;
+}
+
+export interface WorkflowDefinition {
+  name: string;
+  title: string;
+  description: string;
+  trigger_event?: string | null;
+  concurrency_limit: number;
+  max_step_retries: number;
+  backoff_factor: number;
+  initial_interval_seconds: number;
+  steps: WorkflowStepDefinition[];
+}
+
+export interface WorkflowRunRequest {
+  workflow_name: string;
+  input_payload?: Record<string, unknown>;
+  idempotency_key?: string | null;
+  webhook_url?: string | null;
+}
+
+export interface WorkflowListResponse {
+  items: WorkflowExecution[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface WorkflowOverviewResponse {
+  total_blueprints: number;
+  blueprints: WorkflowDefinition[];
+  engine_status: string;
+  checkpoint_backend: string;
+}
+
+
 

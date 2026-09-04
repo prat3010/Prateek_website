@@ -101,10 +101,28 @@ The **Client Dashboard Ecosystem** on `prateeq.in` serves as the primary commerc
 * **Search Inspector Tab:**
   * One-shot hybrid search debugger (pgvector HNSW + BM25 keyword + Cohere rerank).
   * Score inspection cards showing rank order and relevance scores.
-* **Embed Configurator Tab:**
-  * 1-line script generator and custom widget preview.
-* **Team Members Tab:**
-  * Invite team members by email with role assignment (`owner`, `admin`, `member`).
+* **3D Vector Explorer Tab (`VectorVisualizerPanel.tsx`, M82):**
+  * Interactive 3D WebGL point cloud rendering document embeddings via PCA/UMAP projections.
+* **Semantic Cache Management Tab (`CachePanel.tsx`):**
+  * Sub-50ms semantic cache hit-rate telemetry, similarity threshold controls, and vector store purging.
+* **Durable Workflows & Background Jobs Tab (`WorkflowsPanel.tsx`, M95):**
+  * Step-level memoization, automatic exponential backoff retries, visual step DAG timeline, execution ledger, and checkpoint state inspection via `<Portal>`.
+* **RLM Python REPL Studio Tab (`RlmStudioPanel.tsx`):**
+  * Sandboxed Python execution environment for recursive multi-turn document vault traversal and structured tabular synthesis.
+* **Agent Studio Tab (`AgentStudioPanel.tsx`, M91):**
+  * Stateful LangGraph cyclic computation graphs, time-travel thread history, and interactive Human-in-the-Loop (HITL) approval gates.
+* **DSPy Prompt Optimization Studio Tab (`PromptOptimizationPanel.tsx`, M92):**
+  * Metric-driven automated prompt compilation (`BootstrapFewShot`, `MIPROv2`) and versioned program activation.
+* **Smart Router & Gateway Tab (`GatewayPanel.tsx`, M93):**
+  * Unified multi-model routing (Gemini, OpenAI, Anthropic, Ollama), dynamic fallback cascades, and virtual tenant budget enforcement.
+* **NeMo Guardrails & Safety Tab (`GuardrailsPanel.tsx`, M94):**
+  * Colang `.co` conversational dialogue steering, sub-20ms fast-path input jailbreak screening, and factual grounding output rails.
+* **Embed Configurator Tab (`ConfigPanel.tsx`):**
+  * 1-line script generator and custom interactive widget preview.
+* **Team & Compliance Tab (`TeamPanel.tsx`):**
+  * Invite team members by email with role assignment (`owner`, `admin`, `member`) and compliance policy management.
+* **Plugins & Integrations Tab (`IntegrationsPanel.tsx`, M90):**
+  * Slack bot integration, Chrome web capture extension, and 2-way Google Drive document synchronization.
 
 ---
 
@@ -262,6 +280,9 @@ timeline
 | `/api/client/create-razorpay-subscription` | Next.js API Route | Initiate RAG SaaS plan subscription |
 | `/api/terminal/qrcode` | Next.js API Route | Generate ASCII / PNG QR code for terminal mobile checkout |
 | `/api/webhooks/razorpay` | Next.js API Route | Process Razorpay payment & subscription webhooks |
+| `/api/rag/workflow-webhook` | Next.js API Route | Process background durable workflow execution status webhooks (M95) |
+| `POST /v1/tenants/{id}/workflows/:name/run` | FastAPI Route | Trigger background durable workflow with step memoization (M95) |
+| `GET /v1/tenants/{id}/workflows/executions` | FastAPI Route | List durable workflow executions & check DAG step history (M95) |
 | `POST /v1/tenants/{id}/embeddings/project` | FastAPI Route | 3D UMAP/PCA dimensionality reduction for Studio visualizer (M82) |
 
 ---

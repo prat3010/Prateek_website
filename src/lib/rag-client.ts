@@ -640,7 +640,83 @@ export class RetrieverClient {
     const tid = tenantId || this.config.tenantId;
     return this.request<import("./rag-types").GuardrailTelemetry>(`/v1/tenants/${tid}/guardrails/telemetry`);
   }
+
+  // ── Milestone 95: Durable Asynchronous Workflows & Jobs Methods ─────────────
+
+  async listWorkflowBlueprints(tenantId?: string): Promise<import("./rag-types").WorkflowDefinition[]> {
+    const tid = tenantId || this.config.tenantId;
+    return this.request<import("./rag-types").WorkflowDefinition[]>(`/v1/tenants/${tid}/workflows/blueprints`);
+  }
+
+  async startWorkflow(
+    workflowName: string,
+    inputPayload: Record<string, unknown> = {},
+    idempotencyKey?: string | null,
+    webhookUrl?: string | null,
+    tenantId?: string
+  ): Promise<import("./rag-types").WorkflowExecution> {
+    const tid = tenantId || this.config.tenantId;
+    return this.request<import("./rag-types").WorkflowExecution>(`/v1/tenants/${tid}/workflows/${workflowName}/run`, {
+      method: "POST",
+      body: JSON.stringify({
+        input_payload: inputPayload,
+        idempotency_key: idempotencyKey,
+        webhook_url: webhookUrl,
+      }),
+    });
+  }
+
+  async listWorkflowExecutions(
+    params: { limit?: number; offset?: number; status?: string; tenantId?: string } = {}
+  ): Promise<import("./rag-types").WorkflowListResponse> {
+    const tid = params.tenantId || this.config.tenantId;
+    const query = new URLSearchParams();
+    if (params.limit) query.set("limit", String(params.limit));
+    if (params.offset) query.set("offset", String(params.offset));
+    if (params.status) query.set("status", params.status);
+    const qs = query.toString();
+    return this.request<import("./rag-types").WorkflowListResponse>(
+      `/v1/tenants/${tid}/workflows/executions${qs ? `?${qs}` : ""}`
+    );
+  }
+
+  async getWorkflowExecution(
+    executionId: string,
+    tenantId?: string
+  ): Promise<import("./rag-types").WorkflowExecution> {
+    const tid = tenantId || this.config.tenantId;
+    return this.request<import("./rag-types").WorkflowExecution>(
+      `/v1/tenants/${tid}/workflows/executions/${executionId}`
+    );
+  }
+
+  async retryWorkflowExecution(
+    executionId: string,
+    tenantId?: string
+  ): Promise<import("./rag-types").WorkflowExecution> {
+    const tid = tenantId || this.config.tenantId;
+    return this.request<import("./rag-types").WorkflowExecution>(
+      `/v1/tenants/${tid}/workflows/executions/${executionId}/retry`,
+      { method: "POST" }
+    );
+  }
+
+  async cancelWorkflowExecution(
+    executionId: string,
+    tenantId?: string
+  ): Promise<import("./rag-types").WorkflowExecution> {
+    const tid = tenantId || this.config.tenantId;
+    return this.request<import("./rag-types").WorkflowExecution>(
+      `/v1/tenants/${tid}/workflows/executions/${executionId}/cancel`,
+      { method: "POST" }
+    );
+  }
+
+  async getWorkflowOverview(): Promise<import("./rag-types").WorkflowOverviewResponse> {
+    return this.request<import("./rag-types").WorkflowOverviewResponse>("/v1/admin/workflows/overview");
+  }
 }
+
 
 export interface GraphCapabilitiesResponse {
   machine_profile: string;
