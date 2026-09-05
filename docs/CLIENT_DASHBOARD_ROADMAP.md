@@ -123,6 +123,11 @@ The **Client Dashboard Ecosystem** on `prateeq.in` serves as the primary commerc
   * Invite team members by email with role assignment (`owner`, `admin`, `member`) and compliance policy management.
 * **Plugins & Integrations Tab (`IntegrationsPanel.tsx`, M90):**
   * Slack bot integration, Chrome web capture extension, and 2-way Google Drive document synchronization.
+* **Capability Studio & Autonomous FDE Metaprogrammer Tab (`FeatureStudioPanel.tsx`, M97):**
+  * Dual-persona solution studio: Zero-code native battery matching with confidence scores for business operators, and AST-verified Hexagonal code synthesis (6 slices) for Forward Deployed Engineers.
+  * AST security gate (0 framework imports in domain), multi-slice code tabs, 1-click workspace deployment, and 1-click community PR generator with Git branch checkout.
+* **Sovereign Edge Sync Tab (`EdgeSyncPanel.tsx`, M98):**
+  * Embedded SQLite 3 distributed vector synchronization, sub-2ms local hybrid search simulator (FTS5 BM25 + float32 BLOB vector cosine), 1-click standalone `.sqlite` bundle exporter, simulated network partition switch, and Lamport LWW offline mutation reconciler (Platform Battery #18).
 
 ---
 

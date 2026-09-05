@@ -811,6 +811,172 @@ export class RetrieverClient {
       { method: "DELETE" }
     );
   }
+
+  // ── Milestone 97: Autonomous FDE Metaprogrammer & Capability Studio Methods ──
+
+  async analyzeScaffoldingRequirement(
+    req: import("./rag-types").UseCaseRequirement
+  ): Promise<import("./rag-types").ScaffoldingAnalysisResponse> {
+    return this.request<import("./rag-types").ScaffoldingAnalysisResponse>("/v1/scaffold/analyze", {
+      method: "POST",
+      body: JSON.stringify(req),
+    });
+  }
+
+  async generateScaffoldingPlan(
+    req: import("./rag-types").UseCaseRequirement
+  ): Promise<import("./rag-types").ScaffoldingPlan> {
+    return this.request<import("./rag-types").ScaffoldingPlan>("/v1/scaffold/generate", {
+      method: "POST",
+      body: JSON.stringify(req),
+    });
+  }
+
+  async verifyScaffoldingCode(
+    files: import("./rag-types").ScaffoldedFile[]
+  ): Promise<import("./rag-types").AstValidationResult> {
+    return this.request<import("./rag-types").AstValidationResult>("/v1/scaffold/verify", {
+      method: "POST",
+      body: JSON.stringify(files),
+    });
+  }
+
+  async applyScaffoldingPlan(
+    plan: import("./rag-types").ScaffoldingPlan,
+    dryRun = false
+  ): Promise<import("./rag-types").ScaffoldingApplyResponse> {
+    return this.request<import("./rag-types").ScaffoldingApplyResponse>(
+      `/v1/scaffold/apply?dry_run=${dryRun}`,
+      {
+        method: "POST",
+        body: JSON.stringify(plan),
+      }
+    );
+  }
+
+  async reloadCustomPlugins(): Promise<{ success: boolean; mounted_count: number; mounted_plugins: string[] }> {
+    return this.request<{ success: boolean; mounted_count: number; mounted_plugins: string[] }>(
+      "/v1/scaffold/reload",
+      { method: "POST" }
+    );
+  }
+
+  async listCustomPlugins(): Promise<import("./rag-types").CustomPluginSummary[]> {
+    return this.request<import("./rag-types").CustomPluginSummary[]>("/v1/scaffold/plugins", {
+      method: "GET",
+    });
+  }
+
+  async deleteCustomPlugin(
+    pluginId: string
+  ): Promise<{ success: boolean; deleted: boolean; plugin_id: string }> {
+    return this.request<{ success: boolean; deleted: boolean; plugin_id: string }>(
+      `/v1/scaffold/plugins/${pluginId}`,
+      { method: "DELETE" }
+    );
+  }
+
+  async getScaffoldingStatus(): Promise<{
+    battery_id: string;
+    name: string;
+    status: string;
+    version: string;
+    milestone: string;
+  }> {
+    return this.request<{
+      battery_id: string;
+      name: string;
+      status: string;
+      version: string;
+      milestone: string;
+    }>("/v1/scaffold/status", { method: "GET" });
+  }
+
+  // --- Milestone 98: Sovereign Edge SQLite & Vector Sync Engine ---
+
+  async getEdgeNodes(): Promise<import("./rag-types").EdgeNodeMetadata[]> {
+    return this.request<import("./rag-types").EdgeNodeMetadata[]>(
+      `/v1/tenants/${this.tenantId}/edge/nodes`,
+      { method: "GET" }
+    );
+  }
+
+  async registerEdgeNode(payload: {
+    node_id: string;
+    device_name: string;
+    platform?: string;
+    tier?: import("./rag-types").OfflineExecutionTier;
+    client_version?: string;
+    hardware_specs?: Record<string, unknown>;
+  }): Promise<import("./rag-types").EdgeNodeMetadata> {
+    return this.request<import("./rag-types").EdgeNodeMetadata>(
+      `/v1/tenants/${this.tenantId}/edge/nodes/register`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }
+    );
+  }
+
+  async getEdgeDelta(sinceSeq: number = 0, limit: number = 1000, nodeId?: string): Promise<import("./rag-types").EdgeSyncDelta> {
+    const params = new URLSearchParams({
+      since_seq: sinceSeq.toString(),
+      limit: limit.toString(),
+    });
+    if (nodeId) params.append("node_id", nodeId);
+    return this.request<import("./rag-types").EdgeSyncDelta>(
+      `/v1/tenants/${this.tenantId}/edge/delta?${params.toString()}`,
+      { method: "GET" }
+    );
+  }
+
+  async generateEdgeBundleManifest(): Promise<import("./rag-types").EdgeBundleManifest> {
+    return this.request<import("./rag-types").EdgeBundleManifest>(
+      `/v1/tenants/${this.tenantId}/edge/bundle`,
+      { method: "POST" }
+    );
+  }
+
+  async downloadEdgeBundle(): Promise<Blob> {
+    const res = await fetch(`${this.config.apiUrl}/v1/tenants/${this.tenantId}/edge/bundle?download=true`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${this.config.apiKey}`,
+        "X-Tenant-ID": this.tenantId,
+      },
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to download sovereign edge bundle: HTTP ${res.status}`);
+    }
+    return res.blob();
+  }
+
+  async searchEdgeSimulated(request: {
+    query: string;
+    top_k?: number;
+    use_hybrid?: boolean;
+    alpha?: number;
+  }): Promise<import("./rag-types").EdgeSearchResponse> {
+    return this.request<import("./rag-types").EdgeSearchResponse>(
+      `/v1/tenants/${this.tenantId}/edge/search`,
+      {
+        method: "POST",
+        body: JSON.stringify(request),
+      }
+    );
+  }
+
+  async reconcileEdgeMutations(
+    mutations: import("./rag-types").EdgeMutation[]
+  ): Promise<import("./rag-types").EdgeSyncConflictResolution[]> {
+    return this.request<import("./rag-types").EdgeSyncConflictResolution[]>(
+      `/v1/tenants/${this.tenantId}/edge/mutations`,
+      {
+        method: "POST",
+        body: JSON.stringify(mutations),
+      }
+    );
+  }
 }
 
 

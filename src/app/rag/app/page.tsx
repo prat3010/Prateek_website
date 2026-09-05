@@ -21,10 +21,12 @@ import { GatewayPanel } from "@/components/rag/GatewayPanel";
 import { GuardrailsPanel } from "@/components/rag/GuardrailsPanel";
 import { VectorVisualizerPanel } from "@/components/rag/VectorVisualizerPanel";
 import { WorkflowsPanel } from "@/components/rag/WorkflowsPanel";
+import { FeatureStudioPanel } from "@/components/rag/FeatureStudioPanel";
+import { EdgeSyncPanel } from "@/components/rag/EdgeSyncPanel";
 import { RagErrorBoundary } from "@/components/rag/ErrorBoundary";
 import styles from "@/components/rag/rag.module.css";
 
-type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "workflows" | "rlm" | "agentic" | "prompts" | "gateway" | "guardrails" | "config" | "team" | "integrations";
+type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "workflows" | "rlm" | "agentic" | "prompts" | "gateway" | "guardrails" | "config" | "team" | "integrations" | "feature-studio" | "edge";
 
 export default function RagAppStudioPage() {
   const router = useRouter();
@@ -116,6 +118,8 @@ export default function RagAppStudioPage() {
     { id: "config", label: "Widget Studio", icon: "⚙️" },
     { id: "team", label: "Team & Compliance", icon: "👥" },
     { id: "integrations", label: "Plugins & Integrations", icon: "🔌" },
+    { id: "feature-studio", label: "Capability Studio & FDE", icon: "🛠️" },
+    { id: "edge", label: "Sovereign Edge Sync", icon: "💾" },
   ];
 
   return (
@@ -261,6 +265,8 @@ export default function RagAppStudioPage() {
             />
             <TeamPanel hidden={activeTab !== "team"} tenantId={tenantId} />
             <IntegrationsPanel hidden={activeTab !== "integrations"} tenantId={tenantId} />
+            <FeatureStudioPanel client={client} hidden={activeTab !== "feature-studio"} />
+            <EdgeSyncPanel client={client} hidden={activeTab !== "edge"} />
 
           </RagErrorBoundary>
         </main>

@@ -644,6 +644,223 @@ export interface ServerlessCostComparison {
   savings_percentage: number;
 }
 
+// ── Milestone 97: Autonomous FDE Metaprogrammer & Capability Studio Types ──
+
+export type SolutionPersona = "business" | "fde_engineer";
+export type PluginCategory =
+  | "connectors"
+  | "retrieval"
+  | "agentic_tool"
+  | "workflow_step"
+  | "safety_defense"
+  | "computation"
+  | "system_extensibility";
+
+export interface IntegrationHooksDeclaration {
+  api_router?: string;
+  battery_service?: boolean;
+  agentic_tool?: {
+    name: string;
+    description: string;
+    method_name?: string;
+  };
+  workflow_step?: string;
+}
+
+export interface PluginManifest {
+  id: string;
+  name: string;
+  version: string;
+  category: PluginCategory;
+  persona: SolutionPersona;
+  description: string;
+  algorithm_foundation: string;
+  latency_profile: string;
+  integration_hooks: IntegrationHooksDeclaration;
+  required_secrets: string[];
+  tenant_isolation: string;
+}
+
+export interface UseCaseRequirement {
+  prompt: string;
+  target_domain?: string;
+  tenant_id?: string;
+  persona?: SolutionPersona;
+  preferred_stack?: string;
+}
+
+export interface RecommendedBatteryConfig {
+  battery_id: string;
+  battery_name: string;
+  category: string;
+  match_confidence: number;
+  rationale: string;
+  suggested_hyperparameters?: Record<string, unknown>;
+  health_check_endpoint?: string;
+}
+
+export interface ScaffoldedFile {
+  rel_path: string;
+  content: string;
+  module_type: "abstractions" | "service" | "adapter" | "router" | "test" | "manifest";
+}
+
+export interface AstValidationResult {
+  is_valid: boolean;
+  violations: string[];
+  forbidden_imports_found: string[];
+  type_annotations_present: boolean;
+  syntax_valid: boolean;
+  summary: string;
+}
+
+export interface ScaffoldingPlan {
+  plugin_id: string;
+  display_name: string;
+  description: string;
+  persona: SolutionPersona;
+  manifest: PluginManifest;
+  recommended_batteries: RecommendedBatteryConfig[];
+  needs_custom_scaffold: boolean;
+  scaffolded_files: ScaffoldedFile[];
+  ast_audit_passed: boolean;
+  ast_validation?: AstValidationResult;
+  git_branch_name: string;
+  pull_request_markdown: string;
+}
+
+export interface CustomPluginSummary {
+  plugin_id: string;
+  display_name: string;
+  version: string;
+  category: string;
+  persona: string;
+  description: string;
+  is_active: boolean;
+  hooks?: IntegrationHooksDeclaration;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ScaffoldingAnalysisResponse {
+  persona: string;
+  recommendations: RecommendedBatteryConfig[];
+  needs_custom_scaffold: boolean;
+  total_matched: number;
+}
+
+export interface ScaffoldingApplyResponse {
+  success: boolean;
+  applied: boolean;
+  dry_run: boolean;
+  plugin_id: string;
+  files_written: string[];
+  mounted: boolean;
+}
+
+// ============================================================================
+// Milestone 98: Sovereign Edge SQLite & Offline-First Node Sync
+// ============================================================================
+
+export type EdgeNodeStatus = "online" | "offline" | "syncing";
+export type OfflineExecutionTier = "hybrid_cache" | "local_slm" | "grounded_extraction" | "speculative_queue";
+
+export interface EdgeNodeMetadata {
+  node_id: string;
+  tenant_id: string;
+  device_name: string;
+  platform: string;
+  tier: OfflineExecutionTier;
+  last_synced_seq: number;
+  last_heartbeat_at: string;
+  status: EdgeNodeStatus;
+  vector_dimension?: number;
+  capabilities?: string[];
+  metadata?: Record<string, unknown>;
+}
+
+export interface ChunkSyncItem {
+  chunk_id: string;
+  document_id: string;
+  chunk_index: number;
+  content: string;
+  token_count: number;
+  meta_data?: Record<string, unknown>;
+  sequence_num?: number;
+}
+
+export interface VectorSyncItem {
+  chunk_id: string;
+  embedding: number[];
+  dimension: number;
+}
+
+export interface EdgeSyncDelta {
+  tenant_id: string;
+  checkpoint_sequence: number;
+  previous_sequence: number;
+  added_chunks: ChunkSyncItem[];
+  added_vectors: VectorSyncItem[];
+  deleted_chunk_ids: string[];
+  checksum_sha256: string;
+  generated_at: string;
+}
+
+export interface EdgeBundleManifest {
+  bundle_id: string;
+  tenant_id: string;
+  database_engine: string;
+  total_documents: number;
+  total_chunks: number;
+  total_vectors: number;
+  vector_dimension: number;
+  checkpoint_sequence: number;
+  checksum_sha256: string;
+  created_at: string;
+  file_size_bytes: number;
+  bundle_path?: string;
+  sqlite_version?: string;
+}
+
+export interface EdgeMutation {
+  mutation_id: string;
+  tenant_id: string;
+  node_id: string;
+  entity_type: string;
+  action: string;
+  payload: Record<string, unknown>;
+  lamport_timestamp: number;
+  device_timestamp: string;
+}
+
+export interface EdgeSyncConflictResolution {
+  mutation_id: string;
+  status: "applied" | "discarded" | "merged";
+  cloud_sequence: number;
+  resolution_strategy: string;
+  message: string;
+}
+
+export interface EdgeSearchResultItem {
+  chunk_id: string;
+  document_id: string;
+  content: string;
+  score: number;
+  vector_score: number;
+  bm25_score: number;
+  match_type: "vector" | "bm25" | "hybrid";
+  meta_data?: Record<string, unknown>;
+}
+
+export interface EdgeSearchResponse {
+  results: EdgeSearchResultItem[];
+  total_hits: number;
+  latency_ms: number;
+  source: string;
+  execution_tier: OfflineExecutionTier;
+  synthesized_answer?: string | null;
+}
+
 
 
 
