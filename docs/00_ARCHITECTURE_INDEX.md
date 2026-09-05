@@ -1,5 +1,5 @@
 # 🏛️ Master Architecture Knowledge Graph Index
-**Total Registered Architecture Nodes:** 134 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
+**Total Registered Architecture Nodes:** 135 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
 
 ## ⚡ Quick Navigation
 - [Master Architecture Visual Canvas](MASTER_ARCHITECTURE_MAP.canvas)
@@ -116,12 +116,13 @@
 | `Lib_skills` | **Lib: `skills.ts` (Persona Filter & Narrative Mapper)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Lib_skills.md](architecture_nodes/Lib_skills.md) |
 | `UI_CommercialPDFSuite` | **UI: `pdfTheme.ts`, `pdfFonts.ts` & React-PDF Exporters** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_CommercialPDFSuite.md](architecture_nodes/UI_CommercialPDFSuite.md) |
 
-### 🔹 6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPIs (42 Nodes)
+### 🔹 6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPIs (43 Nodes)
 
 | Node ID | Title / Component | Blast Radius | Security Auth | Specification File |
 | :--- | :--- | :---: | :---: | :--- |
 | `Engine_ColBERT_Late_Interaction` | **Engine Specification: PyTorch Late-Interaction ColBERT Token-Level MaxSim Engine (Milestone 80)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_ColBERT_Late_Interaction.md](architecture_nodes/Engine_ColBERT_Late_Interaction.md) |
 | `Engine_ColBERT_MaxSim_Reranker` | **Engine: Late-Interaction (ColBERT) Token-Level MaxSim Reranker (Milestone 70)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_ColBERT_MaxSim_Reranker.md](architecture_nodes/Engine_ColBERT_MaxSim_Reranker.md) |
+| `Engine_Confidential_Micro_Enclave` | **Engine: Zero-Trust Micro-Enclave Encryption & Hardware KMS Remote Attestation (Milestone 101)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Confidential_Micro_Enclave.md](architecture_nodes/Engine_Confidential_Micro_Enclave.md) |
 | `Engine_Contextual_Retrieval` | **Engine: Pre-Chunk Contextual Retrieval Ingestion Engine (Milestone 69)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Contextual_Retrieval.md](architecture_nodes/Engine_Contextual_Retrieval.md) |
 | `Engine_Corrective_RAG_Agentic_Loop` | **Engine: Corrective RAG (CRAG) & Agentic Reflection Loop (Milestone 71)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Corrective_RAG_Agentic_Loop.md](architecture_nodes/Engine_Corrective_RAG_Agentic_Loop.md) |
 | `Engine_DSPy_Prompt_Compilation` | **Engine: DSPy Declarative Prompt Compilation (Milestone 92)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_DSPy_Prompt_Compilation.md](architecture_nodes/Engine_DSPy_Prompt_Compilation.md) |

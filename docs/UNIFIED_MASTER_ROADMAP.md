@@ -824,15 +824,17 @@ timeline
 - **Status:** **Completed (Phase M / v0.85.0)**
 
 #### 🔐 Milestone 101: Zero-Trust Micro-Enclave Encryption & Hardware KMS Remote Attestation
-- **Libraries:** Python `pydantic`, `cryptography`, `pytest`
-- **Repo Scope:** `retriever` (`apps/api/src/domain/abstractions/enclave.py`, `src/adapters/security/enclave_adapter.py`, `src/routers/enclave.py`)
+- **Libraries:** Python `pydantic`, `cryptography`, `pytest`, React / Next.js 16
+- **Repo Scope:** `retriever` (`apps/api/src/domain/abstractions/enclave.py`, `src/adapters/security/enclave_adapter.py`, `src/adapters/security/memory_sanitizer.py`, `src/routers/enclave.py`, `apps/web/src/app/(dashboard)/edge/page.tsx`)
 - **Deliverable:**
-  - **Hexagonal Domain Layer (`abstractions/enclave.py`):** Pure Pydantic protocols defining `HardwareAttestationProtocol`, `EnclaveKeySealer`, `AttestationEvidence`, and `EnclaveVerificationReport` with 0 external framework imports.
-  - **Hardware-Rooted Memory Sealing:** Binding edge SQLite databases and vector BLOBs to hardware TPM/KMS chips (Intel SGX, AMD SEV, AWS Nitro Enclaves, Apple Secure Enclave) using AES-256-GCM.
-  - **Cryptographic Remote Attestation:** Nonce-signed evidence generation and verification against vendor public root CA certificates, ensuring untrusted hypervisors cannot access tenant vectors.
-  - **Zero-Knowledge RAM Sanitizer:** Automatic in-memory key scrubbing on process signals (`SIGTERM`, `SIGINT`) to prevent cold-boot memory recovery attacks.
-  - **100% Automated Test Coverage:** Pytest suite asserting attestation verification, invalid certificate rejection, and memory sealing isolation.
-- **Status:** **Planned (Phase M / v0.86.0)**
+  - **Hexagonal Domain Layer (`abstractions/enclave.py`):** Pure Pydantic protocols defining `HardwareAttestationProtocol`, `EnclaveKeySealerProtocol`, `MemorySanitizerProtocol`, `AttestationEvidence`, and `EnclaveVerificationReport` with 0 external framework imports.
+  - **Hardware-Rooted Memory Sealing:** Binding edge SQLite databases and vector BLOBs to hardware TPM/KMS chips (Intel SGX, AMD SEV, AWS Nitro Enclaves, Apple Secure Enclave) using AES-256-GCM with HKDF-SHA256 key derivation and 96-bit random IVs.
+  - **Cryptographic Remote Attestation:** Nonce-signed evidence generation and verification using asymmetric Ed25519 signatures and anti-replay challenge nonces, ensuring untrusted hypervisors cannot access tenant vectors.
+  - **Zero-Knowledge RAM Sanitizer:** Automatic in-memory key scrubbing via `ctypes.memset` and OS termination signal hooks (`SIGTERM`, `SIGINT`) to prevent cold-boot memory recovery attacks.
+  - **Platform Battery #21 (`zero_trust_micro_enclave`):** Formally cataloged and registered in `BatteryService` under `SAFETY_DEFENSE`.
+  - **Admin Dashboard UI (`/edge`):** Live confidential micro-enclave monitoring, PCR0 measurement inspection, interactive hardware attestation challenge runner, and AES-256-GCM memory sealing playground.
+  - **100% Automated Test Coverage:** Pytest suite asserting attestation verification, invalid certificate rejection, memory sealing isolation, and Hexagonal boundaries.
+- **Status:** **Completed (Phase M / v0.86.0)**
 
 #### 🕸️ Milestone 102: Autonomous Edge Fleet Swarm Mesh & P2P Gossip Replication
 - **Libraries:** Python `pydantic`, `pytest`
