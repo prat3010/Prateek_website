@@ -53,7 +53,20 @@ PATH_OVERRIDES = {
     "API_terminal_snake_leaderboard": "src/app/api/terminal/snake-leaderboard/route.ts",
     "API_webhooks_razorpay": "src/app/api/webhooks/razorpay/route.ts",
     "Route_rag_app": "src/app/rag/app/page.tsx",
-    "UI_Terminal": "src/components/ui/SiteInfoConsole.tsx"
+    "UI_Terminal": "src/components/ui/SiteInfoConsole.tsx",
+    "Retriever_API_v1_edge": "apps/api/src/routers/edge.py",
+    "Retriever_API_v1_multicloud": "apps/api/src/routers/multicloud.py",
+    "Retriever_API_v1_voice": "apps/api/src/routers/voice.py",
+    "Retriever_API_v1_enclave": "apps/api/src/routers/enclave.py",
+    "Retriever_API_v1_scaffold": "apps/api/src/routers/scaffold.py",
+    "Retriever_API_v1_serverless_gpu": "apps/api/src/routers/serverless_gpu.py",
+    "Engine_Sovereign_Edge_Sync": "apps/api/src/domain/abstractions/edge.py",
+    "Engine_MultiCloud_Replication": "apps/api/src/domain/abstractions/multicloud.py",
+    "Engine_Sovereign_Edge_Voice": "apps/api/src/domain/abstractions/voice.py",
+    "Engine_Autonomous_Metaprogrammer": "apps/api/src/domain/abstractions/scaffold.py",
+    "UI_EdgeSwarmPanel": "apps/web/src/app/edge/page.tsx",
+    "UI_CapabilityStudioPanel": "apps/web/src/app/scaffold/page.tsx",
+    "Schema_client_change_orders": "src/app/api/client/change-orders/route.ts"
 }
 
 def get_node_invariants_and_blast(nid: str):

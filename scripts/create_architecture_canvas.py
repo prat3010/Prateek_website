@@ -92,7 +92,8 @@ def generate_nodes():
 
     g3_files = [
         "Route_dashboard.md", "UI_ClientWorkspaceDashboard.md", "Route_admin.md", "UI_AdminPortal.md",
-        "Route_rag_app.md", "UI_RAGLabPlayground.md", "Tool_Synchronizer.md"
+        "Route_rag_app.md", "UI_RAGLabPlayground.md", "UI_EdgeSwarmPanel.md", "UI_CapabilityStudioPanel.md",
+        "Tool_Synchronizer.md"
     ]
     g3_nodes, col1_y = layout_group("grp-workspace", "3. WORKSPACE & CONTROL: Client Dashboard, Admin & SaaS Studio", "1", g3_files, col1_x, col1_y, 2)
     nodes.extend(g3_nodes)
@@ -130,10 +131,15 @@ def generate_nodes():
         "Retriever_API_v1_chat.md", "Retriever_API_v1_search.md", "Retriever_API_v1_documents.md", "Retriever_API_v1_admin.md",
         "Retriever_API_v1_workflow.md", "Retriever_API_v1_health.md", "Retriever_API_v1_auth.md", "Retriever_API_v1_consensus.md",
         "Retriever_API_v1_payments.md", "Retriever_API_v1_pricing.md", "Retriever_API_v1_agentic.md", "Retriever_API_v1_rlm.md",
-        "Retriever_API_v1_tenant.md", "Retriever_API_v1_security_compression.md", "Engine_Docling_Layout_OCR.md", "Engine_LlamaGuard_Guardrails.md",
-        "Engine_MultiAgent_Consensus.md", "Engine_LongLLMLingua_Compression.md", "Engine_RLM_Python_REPL.md", "Engine_GraphRAG_Topology.md"
+        "Retriever_API_v1_tenant.md", "Retriever_API_v1_security_compression.md",
+        "Retriever_API_v1_edge.md", "Retriever_API_v1_multicloud.md", "Retriever_API_v1_voice.md",
+        "Retriever_API_v1_enclave.md", "Retriever_API_v1_scaffold.md", "Retriever_API_v1_serverless_gpu.md",
+        "Engine_Docling_Layout_OCR.md", "Engine_LlamaGuard_Guardrails.md",
+        "Engine_MultiAgent_Consensus.md", "Engine_LongLLMLingua_Compression.md", "Engine_RLM_Python_REPL.md", "Engine_GraphRAG_Topology.md",
+        "Engine_Sovereign_Edge_Sync.md", "Engine_MultiCloud_Replication.md", "Engine_Sovereign_Edge_Voice.md", "Engine_Autonomous_Metaprogrammer.md",
+        "Engine_Confidential_Micro_Enclave.md", "Engine_Serverless_GPU_vLLM_Serving.md"
     ]
-    g6_nodes, col3_y = layout_group("grp-retriever", "6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPI Routers", "4", g6_files, col3_x, col3_y, 2)
+    g6_nodes, col3_y = layout_group("grp-retriever", "6. RETRIEVER COGNITIVE CORE: Guardrails, Edge Swarm & FastAPI Routers", "4", g6_files, col3_x, col3_y, 2)
     nodes.extend(g6_nodes)
 
     g7_files = [
@@ -147,7 +153,7 @@ def generate_nodes():
     col4_y = -100
 
     g8_files = [
-        "Schema_client_scopes.md", "Schema_invoices.md", "Schema_promo_codes.md", "Schema_outreach_leads.md",
+        "Schema_client_scopes.md", "Schema_client_change_orders.md", "Schema_invoices.md", "Schema_promo_codes.md", "Schema_outreach_leads.md",
         "Schema_rag_tenants.md", "Schema_page_visits.md", "Schema_blog_posts.md", "Schema_projects.md",
         "Schema_skills.md", "Schema_retriever_inference_logs.md", "Schema_pgvector_store.md"
     ]
