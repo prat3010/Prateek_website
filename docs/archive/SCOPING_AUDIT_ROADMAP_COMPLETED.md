@@ -1,8 +1,8 @@
 # Scoping Audit & Monolith Decomposition Log (Archived)
 
 > 📌 **Status:** Archived Verification Log (Phases 1–4 Completed).  
-> 📌 **Master Roadmap (SSoT):** For active roadmap milestones (Phase G: M63–M68), see [`docs/UNIFIED_MASTER_ROADMAP.md`](UNIFIED_MASTER_ROADMAP.md).  
-> 📌 **Master Scoping PRD:** For the complete SOTA Scoping Engine & Productized E-Commerce specification, see [`docs/25_SOTA_Scoping_Engine_PRD.md`](25_SOTA_Scoping_Engine_PRD.md).
+> 📌 **Master Roadmap (SSoT):** For active roadmap milestones (Phase G: M63–M68), see [`docs/UNIFIED_MASTER_ROADMAP.md`](../UNIFIED_MASTER_ROADMAP.md).  
+> 📌 **Master Scoping PRD:** For the complete SOTA Scoping Engine & Productized E-Commerce specification, see [`docs/25_SOTA_Scoping_Engine_PRD.md`](../25_SOTA_Scoping_Engine_PRD.md).
 
 ---
 

@@ -1,6 +1,6 @@
 # RAG Lab
 
-> 📌 **Master SaaS Studio PRD:** For the complete RAG App Studio (`/rag/app`) product specification, see [`docs/24_RAG_App_Studio_PRD.md`](24_RAG_App_Studio_PRD.md).
+> 📌 **Master SaaS Studio PRD:** For the complete RAG App Studio (`/rag/app`) product specification, see [`docs/24_RAG_App_Studio_PRD.md`](../24_RAG_App_Studio_PRD.md).
 
 **Interactive document search and chat powered by a custom RAG engine.**
 

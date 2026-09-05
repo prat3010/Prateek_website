@@ -62,7 +62,9 @@ def main():
             for rb in (DOCS_DIR / "runbooks").glob("*.md"):
                 shutil.copy2(rb, vault_dir / "runbooks" / rb.name)
             if (DOCS_DIR / "00_ARCHITECTURE_INDEX.md").exists():
-                shutil.copy2(DOCS_DIR / "00_ARCHITECTURE_INDEX.md", vault_dir / "00_ARCHITECTURE_INDEX.md")
+                idx_content = (DOCS_DIR / "00_ARCHITECTURE_INDEX.md").read_text(encoding="utf-8")
+                idx_vault = idx_content.replace("(architecture_nodes/", "(Prateek_Website/architecture_nodes/")
+                (vault_dir / "00_ARCHITECTURE_INDEX.md").write_text(idx_vault, encoding="utf-8")
             print("✓ Synced Runbooks and Architecture Index to Ecosystem Vault")
     except Exception as e:
         print(f"ℹ Note on Vault sync (running sandboxed): {e}")

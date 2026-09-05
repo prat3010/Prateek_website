@@ -112,7 +112,7 @@ Prompts enforce a hard ban on the following words and phrases:
 
 ## 4. Deep-Linking Commercial Taxonomy
 
-The blog engine parses extracted entities against [`BLOG_DEEP_LINKING_MAP.md`](BLOG_DEEP_LINKING_MAP.md) to insert high-intent contextual backlinks:
+The blog engine parses extracted entities against [`BLOG_DEEP_LINKING_MAP.md`](playbooks/BLOG_DEEP_LINKING_MAP.md) to insert high-intent contextual backlinks:
 
 | Entity / Technology Topic | Portfolio Deep Link Target | Commercial Conversion Goal |
 | :--- | :--- | :--- |

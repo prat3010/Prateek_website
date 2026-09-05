@@ -44,8 +44,8 @@ Every generated blog post must follow this structure:
    - Include realistic Python / TypeScript / SQL code snippets illustrating implementation.
 4. **Portfolio or Consultation Alignment**:
    - **Mode 1 (Project Match)**: Link directly to a relevant portfolio project case study from `projects.json`.
-   - **Mode 2 (Thought Leadership)**: Provide an architecture assessment and link directly to the [AI Strategy & Architecture Audit](architecture_nodes/Route_scoping.md) (₹20,000 / $300) or custom SaaS MVP build.
-5. **Call-to-Action (CTA)**: Clear, low-friction closing banner driving readers to test out the [/scoping](architecture_nodes/Route_scoping.md) engine or book an audit.
+   - **Mode 2 (Thought Leadership)**: Provide an architecture assessment and link directly to the [AI Strategy & Architecture Audit](../architecture_nodes/Route_scoping.md) (₹20,000 / $300) or custom SaaS MVP build.
+5. **Call-to-Action (CTA)**: Clear, low-friction closing banner driving readers to test out the [/scoping](../architecture_nodes/Route_scoping.md) engine or book an audit.
 
 ---
 

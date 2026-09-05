@@ -21,7 +21,7 @@ Below is a summary of all documentation files, categorized by their domain.
 * [06_Adaptive_Identity_System.md](06_Adaptive_Identity_System.md): Composition of Visual Themes and Communication Identities.
 * [07_Content_Strategy.md](07_Content_Strategy.md): Copywriting tone of voice and positioning checklist.
 * [08_Information_Architecture.md](08_Information_Architecture.md): How information relates and flows progressively.
-* [REVENUE_EXECUTION_PLAN.md](REVENUE_EXECUTION_PLAN.md): Fast-track client acquisition, high-ticket pricing, social pitch scripts, and revenue roadmap.
+* [REVENUE_EXECUTION_PLAN.md](commercial/REVENUE_EXECUTION_PLAN.md): Fast-track client acquisition, high-ticket pricing, social pitch scripts, and revenue roadmap.
 
 ## **Section & Product Specifications**
 * [09_Section_Specifications/](09_Section_Specifications/README.md): Individual section specs for Hero, About, Skills, Projects, Playground, Resume, Pricing (Scoping Lab), Contact, Footer, Terminal, Blog, Scoping Lab (`12_Scoping_Lab.md`), and Client Workspace Dashboard (`13_Client_Workspace_Dashboard.md`).
@@ -61,7 +61,7 @@ Historical documents that have been superseded or merged into other files:
 * [archive/02_Existing_Product_Analysis_and_Discovery.md](archive/02_Existing_Product_Analysis_and_Discovery.md): Discovery phase completed.
 * [archive/14_Engineering_Architecture.md](archive/14_Engineering_Architecture.md): Merged into AGENTS.md.
 * [archive/22_Implementation_Guidelines_for_AI_Agents.md](archive/22_Implementation_Guidelines_for_AI_Agents.md): Merged into AGENTS.md.
-* [archive/checklist.md](MASTER_CODEBASE_AUDIT_CHECKLIST.md): Phase model outdated; superseded by current implementation.
+* [archive/checklist.md](playbooks/MASTER_CODEBASE_AUDIT_CHECKLIST.md): Phase model outdated; superseded by current implementation.
 
 ---
 

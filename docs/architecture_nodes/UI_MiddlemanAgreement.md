@@ -20,7 +20,7 @@ invariants:
 test_suites:
   - src/lib/__tests__/data.test.ts
 downstream:
-  - ../MIDDLEMAN_PARTNERSHIP_AGREEMENT
+  - ../commercial/MIDDLEMAN_PARTNERSHIP_AGREEMENT
   - Lib_commission
 ---
 
@@ -39,7 +39,7 @@ downstream:
 ---
 
 ## 🔗 Related Architecture & Cross-References
-- [MIDDLEMAN_PARTNERSHIP_AGREEMENT](../MIDDLEMAN_PARTNERSHIP_AGREEMENT.md)
+- [MIDDLEMAN_PARTNERSHIP_AGREEMENT](../commercial/MIDDLEMAN_PARTNERSHIP_AGREEMENT.md)
 - [Lib: commission.ts](Lib_commission.md)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints

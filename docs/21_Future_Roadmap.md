@@ -95,7 +95,7 @@ timeline
 > 📌 **Cross-Repository Roadmap & Field Documentation:**  
 > - **Client Dashboard Ecosystem (`prateeq.in`):** **[CLIENT_DASHBOARD_ROADMAP.md](CLIENT_DASHBOARD_ROADMAP.md)**  
 > - **Admin Platform Control Panel (`admin.rag.prateeq.in`):** **[ADMIN_DASHBOARD_ROADMAP.md](../../retriever/docs/ADMIN_DASHBOARD_ROADMAP.md)**  
-> - **High-Converting Demo Field Guide:** **[DEMO_PLAYBOOK_AND_SHOWCASE_GUIDE.md](DEMO_PLAYBOOK_AND_SHOWCASE_GUIDE.md)**
+> - **High-Converting Demo Field Guide:** **[DEMO_PLAYBOOK_AND_SHOWCASE_GUIDE.md](playbooks/DEMO_PLAYBOOK_AND_SHOWCASE_GUIDE.md)**
 
 ---
 

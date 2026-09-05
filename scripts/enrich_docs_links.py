@@ -260,7 +260,7 @@ CROSS_REFS = {
         ("MIDDLEMAN_PARTNERSHIP_AGREEMENT.md", "Sales Affiliate Program"),
         ("DEMO_PLAYBOOK_AND_SHOWCASE_GUIDE.md", "Client Demo Showcase"),
     ],
-    "SCOPING_AUDIT_ROADMAP.md": [
+    "archive/SCOPING_AUDIT_ROADMAP_COMPLETED.md": [
         ("25_SOTA_Scoping_Engine_PRD.md", "Active SOTA Scoping Engine PRD"),
         ("09_Section_Specifications/12_Scoping_Lab.md", "Scoping Lab Section Spec"),
         ("UNIFIED_MASTER_ROADMAP.md", "Unified Master Roadmap"),
@@ -449,9 +449,13 @@ def enrich_document(file_path: Path, cross_refs: list):
 def main():
     print("🚀 Starting Docs Knowledge Mesh Link Enrichment...")
     
-    # Process top-level docs
+    # Process top-level and subfolder docs
     for filename, refs in CROSS_REFS.items():
         doc_path = DOCS_DIR / filename
+        if not doc_path.exists():
+            matches = list(DOCS_DIR.rglob(filename))
+            if matches:
+                doc_path = matches[0]
         if doc_path.exists():
             enrich_document(doc_path, refs)
         else:
