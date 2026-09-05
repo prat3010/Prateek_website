@@ -132,6 +132,8 @@ The **Client Dashboard Ecosystem** on `prateeq.in` serves as the primary commerc
   * Active-active cluster topology visualizer (Oracle Cloud Mumbai, AWS us-east-1, Fly.io Frankfurt, Cloudflare Global Anycast), mathematical quorum consensus ($Q = \lfloor N/2 \rfloor + 1 = 3/4$), monotonic generation term monitoring, dynamic EWMA latency tracking, and embedded Turso LibSQL WAL replica synchronization (Platform Battery #19).
 * **Sovereign Edge Voice Studio Tab (`VoiceStudioPanel.tsx`, M100):**
   * Full-duplex conversational voice deck with zero third-party cloud audio egress, animated 16-bar frequency visualizer, real-time VAD energy sensitivity slider ($E_{\text{RMS}}$), neural timbre selector (Atlas, Nova, Echo), streaming speech synthesis tester with sub-250ms TTFAB validation, and interactive conversational turn ledger (Platform Battery #20).
+* **Autonomous Agent Tool Surface & MCP Studio Tab (`ToolsPanel.tsx`, M106):**
+  * Live 20-battery status indicators, per-tenant capability permissions, interactive multi-turn ReAct trace visualizer with expandable Thought $\to$ Action $\to$ Observation steps, 1-click universal configuration exporter for Claude Desktop (`claude_desktop_config.json`) and Cursor, and real-time economic cost-efficiency meters.
 
 ---
 
