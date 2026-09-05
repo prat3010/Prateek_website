@@ -128,6 +128,10 @@ The **Client Dashboard Ecosystem** on `prateeq.in` serves as the primary commerc
   * AST security gate (0 framework imports in domain), multi-slice code tabs, 1-click workspace deployment, and 1-click community PR generator with Git branch checkout.
 * **Sovereign Edge Sync Tab (`EdgeSyncPanel.tsx`, M98):**
   * Embedded SQLite 3 distributed vector synchronization, sub-2ms local hybrid search simulator (FTS5 BM25 + float32 BLOB vector cosine), 1-click standalone `.sqlite` bundle exporter, simulated network partition switch, and Lamport LWW offline mutation reconciler (Platform Battery #18).
+* **Multi-Cloud Failover & Turso LibSQL Tab (`MultiCloudPanel.tsx`, M99):**
+  * Active-active cluster topology visualizer (Oracle Cloud Mumbai, AWS us-east-1, Fly.io Frankfurt, Cloudflare Global Anycast), mathematical quorum consensus ($Q = \lfloor N/2 \rfloor + 1 = 3/4$), monotonic generation term monitoring, dynamic EWMA latency tracking, and embedded Turso LibSQL WAL replica synchronization (Platform Battery #19).
+* **Sovereign Edge Voice Studio Tab (`VoiceStudioPanel.tsx`, M100):**
+  * Full-duplex conversational voice deck with zero third-party cloud audio egress, animated 16-bar frequency visualizer, real-time VAD energy sensitivity slider ($E_{\text{RMS}}$), neural timbre selector (Atlas, Nova, Echo), streaming speech synthesis tester with sub-250ms TTFAB validation, and interactive conversational turn ledger (Platform Battery #20).
 
 ---
 

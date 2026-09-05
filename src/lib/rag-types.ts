@@ -861,6 +861,218 @@ export interface EdgeSearchResponse {
   synthesized_answer?: string | null;
 }
 
+// --- Milestone 99: Distributed Multi-Cloud Failover & Edge Turso LibSQL Replication ---
+
+export type CloudRegion = "oci-bom" | "aws-iad" | "fly-fra" | "cf-global";
+export type ClusterNodeRole = "primary_leader" | "standby_replica" | "edge_follower" | "degraded" | "offline";
+export type QuorumState = "consensus_reached" | "quorum_lost" | "split_brain_avoided" | "election_in_progress";
+
+export interface CloudRegionNode {
+  node_id: string;
+  cloud_provider: string;
+  region: CloudRegion;
+  endpoint_url: string;
+  role: ClusterNodeRole;
+  is_voting_member: boolean;
+  priority_weight: number;
+  latency_ms: number;
+  consecutive_failures: number;
+  last_heartbeat_at: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface RegionHealthProbe {
+  node_id: string;
+  region: CloudRegion;
+  probe_url: string;
+  latency_ms: number;
+  status_code: number;
+  is_healthy: boolean;
+  failure_reason?: string | null;
+  probed_at: string;
+  is_simulated: boolean;
+}
+
+export interface ClusterTopology {
+  cluster_id: string;
+  active_leader_region: CloudRegion;
+  active_leader_node_id: string;
+  generation_term: number;
+  total_nodes: number;
+  healthy_nodes: number;
+  quorum_state: QuorumState;
+  nodes: CloudRegionNode[];
+  last_failover_at?: string | null;
+  last_failover_reason?: string | null;
+  environment_mode: string;
+}
+
+export interface FailoverRequest {
+  target_region: CloudRegion;
+  reason?: string;
+  trigger_type?: string;
+  force?: boolean;
+  operator_id?: string;
+}
+
+export interface FailoverResult {
+  success: boolean;
+  old_leader: CloudRegion;
+  new_leader: CloudRegion;
+  generation_term: number;
+  duration_ms: number;
+  quorum_votes_acquired: number;
+  total_voting_nodes: number;
+  quorum_state: QuorumState;
+  message: string;
+  audit_event_id: string;
+}
+
+export interface LibsqlReplicaConfig {
+  tenant_id: string;
+  primary_url: string;
+  replica_url: string;
+  auth_token: string;
+  sync_interval_seconds: number;
+  read_local: boolean;
+  write_proxy_to_primary: boolean;
+  db_file_path: string;
+  replication_engine: string;
+}
+
+export interface LibsqlReplicationStats {
+  tenant_id: string;
+  primary_wal_frame: number;
+  local_wal_frame: number;
+  replication_lag_frames: number;
+  replication_lag_ms: number;
+  sync_status: string;
+  last_synced_at: string;
+  is_embedded: boolean;
+  writes_forwarded: number;
+  reads_served_locally: number;
+}
+
+export interface MultiCloudClusterOverviewResponse {
+  topology: ClusterTopology;
+  active_battery: {
+    id: string;
+    name: string;
+    status: string;
+    algorithm_foundation: string;
+    latency_profile: string;
+    milestone: string;
+    active_parameters?: Record<string, unknown>;
+  };
+  probes_summary: {
+    total_nodes: number;
+    healthy_count: number;
+    voting_quorum_ratio: string;
+    quorum_state: string;
+    environment_mode: string;
+  };
+}
+
+// ── Milestone 100: Sovereign Edge Voice & Local Whisper / WebRTC Speech Synthesis ──
+
+export type VoiceAudioCodec = "pcm16" | "opus" | "wav" | "mp3";
+
+export type VoiceSessionState =
+  | "initializing"
+  | "signaling"
+  | "connected"
+  | "listening"
+  | "transcribing"
+  | "thinking"
+  | "speaking"
+  | "disconnected";
+
+export type VoiceTimbre =
+  | "neural_natural"
+  | "neural_fast"
+  | "warm_conversational"
+  | "crisp_authoritative";
+
+export interface VoiceSessionConfig {
+  tenant_id: string;
+  user_id?: string;
+  sample_rate_hz?: number;
+  channels?: number;
+  vad_sensitivity?: number;
+  vad_silence_duration_ms?: number;
+  selected_voice?: VoiceTimbre;
+  audio_codec?: VoiceAudioCodec;
+}
+
+export interface VoiceSession {
+  session_id: string;
+  tenant_id: string;
+  user_id: string;
+  state: VoiceSessionState;
+  config: VoiceSessionConfig;
+  created_at: string;
+  connected_at?: string | null;
+  total_turns: number;
+  last_ping_at: string;
+  meta_data?: Record<string, unknown>;
+}
+
+export interface WebRtcSignalingMessage {
+  session_id: string;
+  message_type: string;
+  sdp?: string | null;
+  candidate?: string | null;
+  sdp_mid?: string | null;
+  sdp_mline_index?: number | null;
+}
+
+export interface TranscriptionResult {
+  text: string;
+  confidence: number;
+  language: string;
+  duration_ms: number;
+  is_final: boolean;
+  words_count: number;
+}
+
+export interface SynthesizedAudioChunk {
+  audio_bytes?: string;
+  sample_rate_hz: number;
+  chunk_index: number;
+  duration_ms: number;
+  is_last: boolean;
+  format: VoiceAudioCodec;
+}
+
+export interface VoiceTurn {
+  turn_id: string;
+  session_id: string;
+  tenant_id: string;
+  user_transcript: string;
+  agent_response_text: string;
+  time_to_transcribe_ms: number;
+  time_to_first_audio_byte_ms: number;
+  total_turn_duration_ms: number;
+  created_at: string;
+}
+
+export interface VoiceTurnResponse {
+  turn: VoiceTurn;
+  audio_base64: string;
+  chunks_count: number;
+}
+
+export interface VoiceSessionTelemetry {
+  active_sessions_count: number;
+  average_turn_latency_ms: number;
+  audio_frames_processed: number;
+  vad_speech_events_count: number;
+  whisper_engine: string;
+  synthesis_engine: string;
+}
+
+
+
 
 
 

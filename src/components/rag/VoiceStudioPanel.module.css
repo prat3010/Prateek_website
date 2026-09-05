@@ -1,0 +1,567 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.headerGroup {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.headerText {
+  flex: 1;
+  min-width: 280px;
+}
+
+.title {
+  font-family: var(--font-headline, inherit);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 0.35rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.badgeM100 {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  background: var(--badge-active-bg, rgba(0, 240, 255, 0.1));
+  color: var(--badge-active-color, #00f0ff);
+  border: 1px solid var(--badge-active-border, rgba(0, 240, 255, 0.25));
+}
+
+.badgeBattery {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  background: var(--surface-elevated);
+  color: var(--color-text-muted);
+  border: 1px solid var(--surface-glass-border);
+}
+
+.description {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: 1.5;
+  max-width: 820px;
+}
+
+.actionGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.btnOutline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  background: var(--surface-glass-bg);
+  border: 1px solid var(--surface-glass-border);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.btnOutline:hover:not(:disabled) {
+  background: var(--surface-elevated);
+  border-color: var(--color-accent, #00f0ff);
+}
+
+.btnOutline:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: var(--app-btn-primary-bg, #00f0ff);
+  color: var(--app-btn-primary-fg, #08080a);
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  opacity: 0.92;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.3);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Metrics Grid */
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.metricCard {
+  display: flex;
+  flex-direction: column;
+  padding: 1.15rem;
+  background: var(--surface-card);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.metricHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.metricLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+.metricIcon {
+  font-size: 1.1rem;
+  color: var(--color-text-muted);
+}
+
+.metricValueRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.metricValue {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--color-text);
+  font-family: var(--font-mono, monospace);
+  line-height: 1.2;
+}
+
+.metricBadge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: var(--badge-active-bg, rgba(0, 240, 255, 0.12));
+  color: var(--badge-active-color, #00f0ff);
+  border: 1px solid var(--badge-active-border, rgba(0, 240, 255, 0.3));
+}
+
+.metricSubtext {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: 0.35rem;
+}
+
+/* Columns */
+.columnsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1040px) {
+  .columnsGrid {
+    grid-template-columns: 1.1fr 0.9fr;
+  }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-card);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.cardHeader {
+  padding: 1.25rem 1.25rem 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--surface-glass-border);
+}
+
+.cardTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.25rem 0;
+}
+
+.cardDescription {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.cardBody {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Session State Banner */
+.sessionStateBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-glass-border);
+}
+
+.sessionStateLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.stateDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+  position: relative;
+}
+
+.stateDotActive {
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
+
+.stateDotSpeaking {
+  background: var(--color-accent, #00f0ff);
+  box-shadow: 0 0 10px var(--color-accent, #00f0ff);
+}
+
+.stateDotListening {
+  background: #f59e0b;
+  box-shadow: 0 0 8px #f59e0b;
+}
+
+.stateDotThinking {
+  background: #8b5cf6;
+  box-shadow: 0 0 8px #8b5cf6;
+}
+
+.stateTitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.sessionSessionId {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+}
+
+/* Waveform Visualizer */
+.waveformBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 72px;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-glass-border);
+  overflow: hidden;
+}
+
+.waveformBar {
+  flex: 1;
+  max-width: 8px;
+  background: var(--surface-glass-border);
+  border-radius: 4px;
+  transition: height 0.08s ease, background 0.15s ease;
+}
+
+.waveformBarActive {
+  background: var(--color-accent, #00f0ff);
+  box-shadow: 0 0 6px rgba(0, 240, 255, 0.4);
+}
+
+.waveformBarSpeaking {
+  background: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+}
+
+/* VAD Meter */
+.vadSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.vadHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8125rem;
+}
+
+.vadLabel {
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.vadValue {
+  font-family: var(--font-mono, monospace);
+  color: var(--color-text-muted);
+}
+
+.sliderInput {
+  width: 100%;
+  accent-color: var(--color-accent, #00f0ff);
+  cursor: pointer;
+}
+
+/* Controls Grid */
+.controlsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.controlField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.controlLabel {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.selectInput {
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-glass-border);
+  color: var(--color-text);
+  font-size: 0.8125rem;
+  font-family: inherit;
+  outline: none;
+}
+
+.selectInput:focus {
+  border-color: var(--color-accent, #00f0ff);
+}
+
+/* Action Deck */
+.deckActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.btnMic {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.btnMicIdle {
+  background: var(--app-btn-primary-bg, #00f0ff);
+  color: var(--app-btn-primary-fg, #08080a);
+}
+
+.btnMicActive {
+  background: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.4);
+  animation: pulseMic 1.5s infinite;
+}
+
+@keyframes pulseMic {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+/* Synthesis Test Section */
+.synthesisBox {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 1rem;
+  border-radius: 8px;
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-glass-border);
+}
+
+.textInput {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border-radius: 6px;
+  background: var(--surface-card);
+  border: 1px solid var(--surface-glass-border);
+  color: var(--color-text);
+  font-size: 0.8125rem;
+  outline: none;
+}
+
+.textInput:focus {
+  border-color: var(--color-accent, #00f0ff);
+}
+
+/* Turns Stream */
+.turnsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.emptyTurns {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  gap: 0.5rem;
+}
+
+.turnCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.85rem;
+  border-radius: 8px;
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-glass-border);
+}
+
+.turnRoleHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+}
+
+.turnRole {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.roleUser {
+  color: var(--color-accent, #00f0ff);
+}
+
+.roleAgent {
+  color: #10b981;
+}
+
+.turnMetrics {
+  display: flex;
+  gap: 0.35rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+}
+
+.turnChip {
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  background: var(--surface-card);
+  border: 1px solid var(--surface-glass-border);
+  color: var(--color-text-muted);
+}
+
+.turnChipFast {
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.turnContent {
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--color-text);
+  margin: 0;
+}
+
+/* Status Banner */
+.statusMessage {
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.statusSuccess {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.statusError {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}

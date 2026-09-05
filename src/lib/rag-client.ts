@@ -977,6 +977,159 @@ export class RetrieverClient {
       }
     );
   }
+
+  // ── Milestone 99: Distributed Multi-Cloud Failover & Edge Turso LibSQL ────
+
+  async getMultiCloudClusters(): Promise<import("./rag-types").MultiCloudClusterOverviewResponse> {
+    return this.request<import("./rag-types").MultiCloudClusterOverviewResponse>(
+      "/v1/admin/multicloud/clusters"
+    );
+  }
+
+  async probeMultiCloudRegions(): Promise<import("./rag-types").RegionHealthProbe[]> {
+    return this.request<import("./rag-types").RegionHealthProbe[]>(
+      "/v1/admin/multicloud/probe",
+      {
+        method: "POST",
+        body: JSON.stringify({}),
+      }
+    );
+  }
+
+  async triggerMultiCloudFailover(
+    request: import("./rag-types").FailoverRequest
+  ): Promise<import("./rag-types").FailoverResult> {
+    return this.request<import("./rag-types").FailoverResult>(
+      "/v1/admin/multicloud/failover",
+      {
+        method: "POST",
+        body: JSON.stringify(request),
+      }
+    );
+  }
+
+  async getLibsqlReplicationStatus(): Promise<Record<string, unknown>> {
+    return this.request<Record<string, unknown>>(
+      "/v1/admin/multicloud/replication-status"
+    );
+  }
+
+  async getTenantLibsqlConfig(): Promise<import("./rag-types").LibsqlReplicaConfig> {
+    return this.request<import("./rag-types").LibsqlReplicaConfig>(
+      `/v1/tenants/${this.tenantId}/multicloud/replica-config`
+    );
+  }
+
+  async syncTenantLibsqlReplica(): Promise<import("./rag-types").LibsqlReplicationStats> {
+    return this.request<import("./rag-types").LibsqlReplicationStats>(
+      `/v1/tenants/${this.tenantId}/multicloud/sync`,
+      {
+        method: "POST",
+      }
+    );
+  }
+
+  // ── Milestone 100: Sovereign Edge Voice & Local Whisper / WebRTC Speech Synthesis ──
+
+  async createVoiceSession(
+    config?: Partial<import("./rag-types").VoiceSessionConfig>
+  ): Promise<import("./rag-types").VoiceSession> {
+    return this.request<import("./rag-types").VoiceSession>(
+      `/v1/tenants/${this.tenantId}/voice/session`,
+      {
+        method: "POST",
+        body: JSON.stringify(config || {}),
+      }
+    );
+  }
+
+  async sendVoiceSignal(
+    payload: import("./rag-types").WebRtcSignalingMessage
+  ): Promise<import("./rag-types").WebRtcSignalingMessage> {
+    return this.request<import("./rag-types").WebRtcSignalingMessage>(
+      `/v1/tenants/${this.tenantId}/voice/signal`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }
+    );
+  }
+
+  async transcribeAudio(
+    audioBase64: string,
+    sampleRateHz: number = 16000
+  ): Promise<import("./rag-types").TranscriptionResult> {
+    return this.request<import("./rag-types").TranscriptionResult>(
+      `/v1/tenants/${this.tenantId}/voice/transcribe`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          audio_base64: audioBase64,
+          sample_rate_hz: sampleRateHz,
+        }),
+      }
+    );
+  }
+
+  async synthesizeSpeech(
+    text: string,
+    options?: {
+      selected_voice?: import("./rag-types").VoiceTimbre;
+      speed?: number;
+    }
+  ): Promise<{
+    text: string;
+    chunks_count: number;
+    total_bytes: number;
+    audio_base64: string;
+    sample_rate_hz: number;
+    format: string;
+  }> {
+    return this.request(
+      `/v1/tenants/${this.tenantId}/voice/synthesize`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          text,
+          selected_voice: options?.selected_voice || "neural_natural",
+          speed: options?.speed ?? 1.0,
+        }),
+      }
+    );
+  }
+
+  async sendVoiceTurn(request: {
+    session_id: string;
+    audio_base64?: string;
+    text_override?: string;
+    selected_voice?: import("./rag-types").VoiceTimbre;
+    speed?: number;
+  }): Promise<import("./rag-types").VoiceTurnResponse> {
+    return this.request<import("./rag-types").VoiceTurnResponse>(
+      `/v1/tenants/${this.tenantId}/voice/turn`,
+      {
+        method: "POST",
+        body: JSON.stringify(request),
+      }
+    );
+  }
+
+  async getVoiceSession(
+    sessionId: string
+  ): Promise<{
+    session: import("./rag-types").VoiceSession;
+    turns: import("./rag-types").VoiceTurn[];
+  }> {
+    return this.request(
+      `/v1/tenants/${this.tenantId}/voice/session/${sessionId}`
+    );
+  }
+
+  async getVoiceTelemetry(): Promise<import("./rag-types").VoiceSessionTelemetry> {
+    return this.request<import("./rag-types").VoiceSessionTelemetry>(
+      "/v1/admin/voice/telemetry"
+    );
+  }
 }
 
 

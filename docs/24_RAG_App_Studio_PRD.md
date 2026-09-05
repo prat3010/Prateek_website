@@ -200,6 +200,22 @@ The revamped `/rag/app` uses a modern **SaaS Left Sidebar + Dedicated Sub-Views 
 - **🪐 WebGL Point Cloud:** Interactive 3D visualization of high-dimensional document chunks reduced via PCA/UMAP.
 - **🎯 Real-Time Query Raycasting:** Interactive inspection of document clusters, semantic centroids, and live query vector distances.
 
+#### View 15: Capability Studio & Autonomous FDE Metaprogrammer (`FeatureStudioPanel` — Milestone 97)
+- **🛠️ Dual-Persona Solution Engine:** Zero-code battery matching for business operators and AST-verified Hexagonal code synthesis (6 slices) for Forward Deployed Engineers.
+- **🛡️ AST Security Boundary Gate:** Guarantees 0 framework imports in domain logic, isolating custom plugins with live in-process mounting and 1-click community PR generation.
+
+#### View 16: Sovereign Edge SQLite & Offline-First Node Sync (`EdgeSyncPanel` — Milestone 98)
+- **💾 Embedded Edge Hybrid Search:** Zero-daemon in-process SQLite 3 FTS5 BM25 search combined with binary float32 vector BLOBs executing in $<2\text{ms}$.
+- **📦 1-Click Standalone Database Export:** Direct generation of standalone `.sqlite` bundles with SHA-256 state checksums and Lamport LWW offline mutation reconciler.
+
+#### View 17: Distributed Multi-Cloud Failover & Turso LibSQL Quorum (`MultiCloudPanel` — Milestone 99)
+- **🌐 Active-Active Multi-Cloud Resiliency:** Heterogeneous cluster topology spanning Oracle Cloud Mumbai, AWS us-east-1, Fly.io Frankfurt, and Cloudflare Global Anycast.
+- **⚖️ Mathematical Quorum Majority Consensus:** Strict $>50\%$ election majority ($Q = \lfloor N/2 \rfloor + 1 = 3/4$), monotonic generation term incrementation, and EWMA latency circuit breaker with embedded Turso LibSQL WAL frame synchronization.
+
+#### View 18: Sovereign Edge Voice & WebRTC Neural Synthesis (`VoiceStudioPanel` — Milestone 100)
+- **🎙️ Full-Duplex WebRTC Voice Deck:** Bidirectional conversational speech with zero third-party cloud audio egress, preserving strict HIPAA/GDPR data sovereignty.
+- **🎯 RMS Energy & ZCR VAD Endpointing:** Real-time mathematical speech boundary detection, local Whisper ASR, streaming neural TTS with sub-250ms TTFAB, animated 16-bar frequency visualizer, and turn latency ledger.
+
 ---
 
 ## 5. Hybrid LLM Key & Billing Strategy

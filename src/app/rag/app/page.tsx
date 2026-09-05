@@ -23,10 +23,12 @@ import { VectorVisualizerPanel } from "@/components/rag/VectorVisualizerPanel";
 import { WorkflowsPanel } from "@/components/rag/WorkflowsPanel";
 import { FeatureStudioPanel } from "@/components/rag/FeatureStudioPanel";
 import { EdgeSyncPanel } from "@/components/rag/EdgeSyncPanel";
+import { MultiCloudPanel } from "@/components/rag/MultiCloudPanel";
+import { VoiceStudioPanel } from "@/components/rag/VoiceStudioPanel";
 import { RagErrorBoundary } from "@/components/rag/ErrorBoundary";
 import styles from "@/components/rag/rag.module.css";
 
-type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "workflows" | "rlm" | "agentic" | "prompts" | "gateway" | "guardrails" | "config" | "team" | "integrations" | "feature-studio" | "edge";
+type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "workflows" | "rlm" | "agentic" | "prompts" | "gateway" | "guardrails" | "config" | "team" | "integrations" | "feature-studio" | "edge" | "multicloud" | "voice";
 
 export default function RagAppStudioPage() {
   const router = useRouter();
@@ -120,6 +122,8 @@ export default function RagAppStudioPage() {
     { id: "integrations", label: "Plugins & Integrations", icon: "🔌" },
     { id: "feature-studio", label: "Capability Studio & FDE", icon: "🛠️" },
     { id: "edge", label: "Sovereign Edge Sync", icon: "💾" },
+    { id: "multicloud", label: "Multi-Cloud & Turso LibSQL", icon: "🌐" },
+    { id: "voice", label: "Sovereign Edge Voice", icon: "🎙️" },
   ];
 
   return (
@@ -267,6 +271,8 @@ export default function RagAppStudioPage() {
             <IntegrationsPanel hidden={activeTab !== "integrations"} tenantId={tenantId} />
             <FeatureStudioPanel client={client} hidden={activeTab !== "feature-studio"} />
             <EdgeSyncPanel client={client} hidden={activeTab !== "edge"} />
+            <MultiCloudPanel client={client} tenantId={tenantId} hidden={activeTab !== "multicloud"} />
+            <VoiceStudioPanel client={client} tenantId={tenantId} hidden={activeTab !== "voice"} />
 
           </RagErrorBoundary>
         </main>
