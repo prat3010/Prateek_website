@@ -25,8 +25,14 @@ Below is a summary of all documentation files, categorized by their domain.
 
 ## **Section & Product Specifications**
 * [09_Section_Specifications/](09_Section_Specifications/README.md): Individual section specs for Hero, About, Skills, Projects, Playground, Resume, Pricing (Scoping Lab), Contact, Footer, Terminal, Blog, Scoping Lab (`12_Scoping_Lab.md`), and Client Workspace Dashboard (`13_Client_Workspace_Dashboard.md`).
-* [25_SOTA_Scoping_Engine_PRD.md](25_SOTA_Scoping_Engine_PRD.md): **Master Product Requirements Document (PRD)** for the SOTA Scoping Engine, Productized E-Commerce Cart Drawer, GraphRAG Upsells, Python REPL CPQ Math, and Client Workspace Bridge (Phase G: M63–M68).
 * [24_RAG_App_Studio_PRD.md](24_RAG_App_Studio_PRD.md): Product Requirements Document (PRD) for the /rag/app SaaS Studio, including dual account architecture, 7-day trial engine, 6 core sub-views, team multi-tenancy, and live visual widget studio.
+* [25_SOTA_Scoping_Engine_PRD.md](25_SOTA_Scoping_Engine_PRD.md): **Master Product Requirements Document (PRD)** for the SOTA Scoping Engine, Productized E-Commerce Cart Drawer, GraphRAG Upsells, Python REPL CPQ Math, and Client Workspace Bridge (Phase G: M63–M68).
+* [26_Autonomous_Outreach_Engine_PRD.md](26_Autonomous_Outreach_Engine_PRD.md): **Master Product Requirements Document (PRD)** for Autonomous AI Lead Discovery, Gemini Cold Pitch Synthesis, Cloud Review Queue (`/admin`), and Resend SMTP Dispatch.
+* [27_Client_Workspace_and_Escrow_Ledger_PRD.md](27_Client_Workspace_and_Escrow_Ledger_PRD.md): **Master Product Requirements Document (PRD)** for `/dashboard` Client Workspace, 50% Milestone Escrow Invoicing, Razorpay HMAC-SHA256 Verification, and Immutable Baseline SOW Contracts.
+* [28_Automated_AI_Blogging_Engine_PRD.md](28_Automated_AI_Blogging_Engine_PRD.md): **Master Product Requirements Document (PRD)** for Automated Daily AI Newsjacking, Brand Voice Banned Clichés, AST Commercial Deep-Linking, and 1-Click Email Publish Gate.
+* [29_Commercial_PDF_Generation_Engine_PRD.md](29_Commercial_PDF_Generation_Engine_PRD.md): **Master Product Requirements Document (PRD)** for `@react-pdf/renderer` v4 Commercial Document Suite, Dual-Theme Color Tokens, Pre-baked Variable Fonts, and Pinned Page Budgets.
+* [30_Interactive_Diagnostics_Terminal_PRD.md](30_Interactive_Diagnostics_Terminal_PRD.md): **Master Product Requirements Document (PRD)** for `/terminal` Interactive Diagnostics Console, Headless Project Scoping Engine, Web Audio Synthesizer, and Retro Arcade Ecosystem.
+* [31_Synchronizer_CMS_and_Local_Control_Plane_PRD.md](31_Synchronizer_CMS_and_Local_Control_Plane_PRD.md): **Master Product Requirements Document (PRD)** for Local Streamlit Synchronizer CMS (`scripts/synchronizer.py`), Multimodal Gemini OCR, Bidirectional Supabase Sync, and Next.js Cache Invalidation.
 * [CLIENT_DASHBOARD_ROADMAP.md](CLIENT_DASHBOARD_ROADMAP.md): Client Dashboard & SaaS Studio Ecosystem Domain Architectural Specification.
 
 ## **System Architecture Specifications**
