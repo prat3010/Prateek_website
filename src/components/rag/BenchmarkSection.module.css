@@ -1,0 +1,306 @@
+.benchmarkContainer {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.75rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-glass-border);
+  color: var(--color-link, var(--pop-blue));
+  border-radius: 9999px;
+  margin-bottom: 1rem;
+}
+
+.title {
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-family: var(--font-headline, inherit);
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  max-width: 720px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Specs Bar */
+.specGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.specCard {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.specLabel {
+  font-size: 0.75rem;
+  font-family: var(--font-mono, monospace);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+}
+
+.specValue {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* Big KPIs */
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+.kpiCard {
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.kpiCard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--color-link, var(--pop-blue));
+  opacity: 0.7;
+}
+
+.kpiNumber {
+  font-size: 2.25rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.1;
+  margin-bottom: 0.35rem;
+}
+
+.kpiUnit {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  margin-left: 0.25rem;
+  font-weight: 500;
+}
+
+.kpiTitle {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 0.25rem;
+}
+
+.kpiSub {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+/* Concurrency Tier Viewer */
+.tierViewer {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: 1rem;
+  padding: 1.75rem;
+  margin-bottom: 2rem;
+}
+
+.tierTabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--surface-glass-border);
+  padding-bottom: 0.75rem;
+  overflow-x: auto;
+}
+
+.tierTab {
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tierTab:hover {
+  color: var(--color-text);
+  background: var(--surface-elevated);
+}
+
+.tierTabActive {
+  color: var(--color-link, var(--pop-blue));
+  background: var(--surface-elevated);
+  border-color: var(--surface-glass-border);
+}
+
+/* Percentile Latency Bars */
+.percentileSection {
+  margin-bottom: 2rem;
+}
+
+.percentileTitle {
+  font-size: 0.875rem;
+  font-family: var(--font-mono, monospace);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 1rem;
+}
+
+.percentileRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.percentileLabel {
+  width: 70px;
+  font-size: 0.8125rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.percentileTrack {
+  flex: 1;
+  height: 12px;
+  background: var(--surface-elevated);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--surface-glass-border);
+}
+
+.percentileFill {
+  height: 100%;
+  background: var(--color-link, var(--pop-blue));
+  border-radius: 5px;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.percentileVal {
+  width: 90px;
+  text-align: right;
+  font-size: 0.8125rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* Endpoints Table */
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.table th {
+  text-align: left;
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid var(--surface-glass-border);
+  color: var(--color-text-muted);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.table td {
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid var(--surface-glass-border);
+  color: var(--color-text);
+}
+
+/* CLI Box */
+.cliBox {
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cliCode {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8125rem;
+  color: var(--color-text);
+  overflow-x: auto;
+}
+
+.copyBtn {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 0.375rem;
+  border: 1px solid var(--surface-glass-border);
+  background: var(--surface-card);
+  color: var(--color-text);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.copyBtn:hover {
+  background: var(--surface-elevated);
+  color: var(--color-link, var(--pop-blue));
+}
+
+@media (max-width: 640px) {
+  .specGrid {
+    grid-template-columns: 1fr;
+  }
+  .kpiGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .cliBox {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

@@ -11,6 +11,7 @@ import { PricingSection } from "@/components/rag/PricingSection";
 import { InteractiveWidgetCustomizer } from "@/components/rag/InteractiveWidgetCustomizer";
 import { ComparisonSection } from "@/components/rag/ComparisonSection";
 import { DeveloperApiSection } from "@/components/rag/DeveloperApiSection";
+import { BenchmarkSection } from "@/components/rag/BenchmarkSection";
 import { NAVBAR_SCROLL_OFFSET } from "@/lib/constants";
 import styles from "@/components/rag/rag.module.css";
 
@@ -47,8 +48,15 @@ export default function RagLandingPage() {
       {/* 1. Hero & Product Overview Section */}
       <ScrollSection gap={80} disableFade>
         <section className={styles.heroSection} id="home">
-          <div className={styles.heroBadge}>
-            ✨ Multi-Model Enterprise RAG • Powered by Llama 3.3 70B, Gemini 3.6 Flash, GPT-4o & BYOK
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", justifyContent: "center", marginBottom: "1rem" }}>
+            <div className={styles.heroBadge}>
+              ✨ Multi-Model Enterprise RAG • Powered by Llama 3.3 70B, Gemini 3.6 Flash, GPT-4o & BYOK
+            </div>
+            <Link href="/rag/benchmarks" style={{ textDecoration: "none" }}>
+              <div className={styles.heroBadge} style={{ cursor: "pointer", borderColor: "var(--color-link)" }}>
+                ⚡ Empirical Benchmarks • Verified Production Telemetry →
+              </div>
+            </Link>
           </div>
 
           <h1 className={styles.heroTitle}>
@@ -318,7 +326,12 @@ export default function RagLandingPage() {
         <DeveloperApiSection />
       </ScrollSection>
 
-      {/* 6. Dynamic Geo-IP Pricing Section */}
+      {/* 6. Empirical Load & Latency Benchmarks */}
+      <ScrollSection verticalOffset={120} gap={80} disableFade>
+        <BenchmarkSection />
+      </ScrollSection>
+
+      {/* 7. Dynamic Geo-IP Pricing Section */}
       <ScrollSection verticalOffset={120} gap={80} disableFade>
         <PricingSection />
       </ScrollSection>

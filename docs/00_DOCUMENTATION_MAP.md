@@ -30,6 +30,8 @@ Welcome to the **Prateek Sharma Engineering Platform Documentation Map**. This c
 | **29** | **[`29_Commercial_PDF_Generation_Engine_PRD.md`](29_Commercial_PDF_Generation_Engine_PRD.md)** | React-PDF engine generating pixel-perfect Scoping Briefs, Invoices, and Agreements. |
 | **30** | **[`30_Interactive_Diagnostics_Terminal_PRD.md`](30_Interactive_Diagnostics_Terminal_PRD.md)** | Interactive diagnostics terminal (`/terminal`), QR code billing, and hacker CLI. |
 | **31** | **[`31_Synchronizer_CMS_and_Local_Control_Plane_PRD.md`](31_Synchronizer_CMS_and_Local_Control_Plane_PRD.md)** | Local Streamlit control plane (`scripts/synchronizer.py`) for live database management. |
+| **32** | **[`32_Universal_Model_Context_Protocol_PRD.md`](32_Universal_Model_Context_Protocol_PRD.md)** | Universal Model Context Protocol (MCP) Server (SSE + JSON-RPC 2.0) with 20-battery tool registry. |
+| **33** | **[`33_Empirical_Load_Benchmarking_and_Production_Stress_Testing_PRD.md`](33_Empirical_Load_Benchmarking_and_Production_Stress_Testing_PRD.md)** | Automated empirical load benchmarks, P50-P99 latency distribution, and public showcase (`/rag/benchmarks`). |
 
 ---
 
