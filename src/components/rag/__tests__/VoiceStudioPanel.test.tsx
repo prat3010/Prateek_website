@@ -56,6 +56,7 @@ describe('VoiceStudioPanel Component', () => {
     user_id: 'usr_unit_test',
     state: 'listening',
     config: {
+      tenant_id: 'tn_test_voice_123',
       vad_sensitivity: 0.7,
       selected_voice: 'neural_natural',
       audio_codec: 'pcm16',
@@ -173,7 +174,7 @@ describe('VoiceStudioPanel Component', () => {
     });
 
     const timbreSelect = screen.getByDisplayValue(/Atlas \(Crisp & Technical\)/i);
-    fireEvent.change(timbreSelect, { target: { value: 'neural_expressive' } });
+    fireEvent.change(timbreSelect, { target: { value: 'warm_conversational' } });
     await waitFor(() => {
       expect(screen.getByDisplayValue(/Nova \(Warm & Conversational\)/i)).toBeInTheDocument();
     });

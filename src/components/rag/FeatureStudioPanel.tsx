@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { m, AnimatePresence } from "framer-motion";
+import { m } from "framer-motion";
 import NumberFlow from "@number-flow/react";
 import { RetrieverClient } from "@/lib/rag-client";
 import type {
@@ -12,7 +12,6 @@ import type {
   ScaffoldedFile,
 } from "@/lib/rag-types";
 import MagneticButton from "@/components/ui/MagneticButton";
-import TiltCard from "@/components/ui/TiltCard";
 import Portal from "@/components/ui/Portal";
 import styles from "./FeatureStudioPanel.module.css";
 
@@ -50,10 +49,22 @@ export function FeatureStudioPanel({ hidden, client }: FeatureStudioPanelProps) 
   }, [client]);
 
   useEffect(() => {
-    if (!hidden && client) {
-      fetchPlugins();
-    }
-  }, [hidden, client, fetchPlugins]);
+    if (hidden || !client) return;
+    let active = true;
+    client
+      .listCustomPlugins()
+      .then((list) => {
+        if (active && list) {
+          setPlugins(list);
+        }
+      })
+      .catch((err) => {
+        console.warn("Could not fetch custom plugins:", err);
+      });
+    return () => {
+      active = false;
+    };
+  }, [hidden, client]);
 
   const handleSynthesize = async () => {
     if (!prompt.trim()) {

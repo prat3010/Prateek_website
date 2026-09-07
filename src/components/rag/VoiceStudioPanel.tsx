@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import NumberFlow from "@number-flow/react";
 import { RetrieverClient } from "@/lib/rag-client";
 import type {
@@ -47,7 +47,7 @@ const INITIAL_TURNS: VoiceTurn[] = [
 export function VoiceStudioPanel({ hidden, client, tenantId }: VoiceStudioPanelProps) {
   const [telemetry, setTelemetry] = useState<VoiceSessionTelemetry>(DEFAULT_TELEMETRY);
   const [session, setSession] = useState<VoiceSession | null>(null);
-  const [sessionState, setSessionState] = useState<VoiceSessionState>("idle");
+  const [sessionState, setSessionState] = useState<VoiceSessionState>("disconnected");
   const [vadSensitivity, setVadSensitivity] = useState<number>(0.65);
   const [selectedVoice, setSelectedVoice] = useState<VoiceTimbre>("neural_natural");
   const [audioCodec, setAudioCodec] = useState<VoiceAudioCodec>("pcm16");
@@ -62,17 +62,15 @@ export function VoiceStudioPanel({ hidden, client, tenantId }: VoiceStudioPanelP
   const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   // Waveform visualization state (16 audio frequency bars)
-  const [bars, setBars] = useState<number[]>(Array(16).fill(8));
-  const animationRef = useRef<NodeJS.Timeout | null>(null);
+  const [bars, setBars] = useState<number[]>(() => Array(16).fill(8));
 
   const fetchTelemetry = useCallback(async () => {
+    if (!client) return;
     setLoadingTelemetry(true);
     try {
-      if (client) {
-        const data = await client.getVoiceTelemetry();
-        if (data) {
-          setTelemetry(data);
-        }
+      const data = await client.getVoiceTelemetry();
+      if (data) {
+        setTelemetry(data);
       }
     } catch {
       // Retain existing telemetry
@@ -82,40 +80,52 @@ export function VoiceStudioPanel({ hidden, client, tenantId }: VoiceStudioPanelP
   }, [client]);
 
   useEffect(() => {
-    if (!hidden) {
-      fetchTelemetry();
-    }
-  }, [hidden, fetchTelemetry]);
+    if (hidden || !client) return;
+    let active = true;
+
+    client
+      .getVoiceTelemetry()
+      .then((data) => {
+        if (active && data) setTelemetry(data);
+      })
+      .catch(() => {});
+
+    return () => {
+      active = false;
+    };
+  }, [hidden, client]);
 
   // Dynamic waveform animation driven by session state
   useEffect(() => {
-    if (sessionState === "listening" || sessionState === "speaking") {
-      animationRef.current = setInterval(() => {
-        setBars(
-          Array.from({ length: 16 }, () =>
-            sessionState === "speaking"
-              ? Math.floor(Math.random() * 48) + 12
-              : Math.floor(Math.random() * 32) + 6
-          )
-        );
-      }, 90);
-    } else {
-      if (animationRef.current) clearInterval(animationRef.current);
-      setBars(Array(16).fill(8));
+    if (sessionState !== "listening" && sessionState !== "speaking") {
+      return;
     }
+
+    const interval = setInterval(() => {
+      setBars(
+        Array.from({ length: 16 }, () =>
+          sessionState === "speaking"
+            ? Math.floor(Math.random() * 48) + 12
+            : Math.floor(Math.random() * 32) + 6
+        )
+      );
+    }, 90);
+
     return () => {
-      if (animationRef.current) clearInterval(animationRef.current);
+      clearInterval(interval);
+      setBars(Array(16).fill(8));
     };
   }, [sessionState]);
 
   const handleToggleMic = async () => {
-    if (sessionState === "idle") {
-      setSessionState("connecting");
+    if (sessionState === "disconnected") {
+      setSessionState("initializing");
       setStatusMessage(null);
       try {
         let createdSession: VoiceSession;
         if (client) {
           createdSession = await client.createVoiceSession({
+            tenant_id: tenantId || "tn_demo",
             vad_sensitivity: vadSensitivity,
             selected_voice: selectedVoice,
             audio_codec: audioCodec,
@@ -136,6 +146,7 @@ export function VoiceStudioPanel({ hidden, client, tenantId }: VoiceStudioPanelP
             user_id: "usr_client",
             state: "listening",
             config: {
+              tenant_id: tenantId || "tn_demo",
               vad_sensitivity: vadSensitivity,
               selected_voice: selectedVoice,
               audio_codec: audioCodec,
@@ -154,13 +165,13 @@ export function VoiceStudioPanel({ hidden, client, tenantId }: VoiceStudioPanelP
           text: `WebRTC full-duplex session established (${createdSession.session_id.slice(0, 12)}…). VAD active.`,
         });
       } catch (err: unknown) {
-        setSessionState("idle");
+        setSessionState("disconnected");
         const msg = err instanceof Error ? err.message : "Failed to initialize WebRTC voice stream";
         setStatusMessage({ type: "error", text: msg });
       }
     } else {
       // Disconnect session
-      setSessionState("idle");
+      setSessionState("disconnected");
       setStatusMessage({
         type: "success",
         text: "Voice stream closed. WebRTC audio channel released.",
@@ -194,7 +205,7 @@ export function VoiceStudioPanel({ hidden, client, tenantId }: VoiceStudioPanelP
       const priorState = sessionState;
       setSessionState("speaking");
       setTimeout(() => {
-        setSessionState(priorState === "idle" ? "idle" : "listening");
+        setSessionState(priorState === "disconnected" ? "disconnected" : "listening");
       }, 2500);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Speech synthesis failed";
@@ -248,10 +259,10 @@ export function VoiceStudioPanel({ hidden, client, tenantId }: VoiceStudioPanelP
       setTurnInput("");
       setSessionState("speaking");
       setTimeout(() => {
-        setSessionState(session ? "listening" : "idle");
+        setSessionState(session ? "listening" : "disconnected");
       }, 3000);
     } catch (err: unknown) {
-      setSessionState(session ? "listening" : "idle");
+      setSessionState(session ? "listening" : "disconnected");
       const msg = err instanceof Error ? err.message : "Turn processing failed";
       setStatusMessage({ type: "error", text: msg });
     } finally {
@@ -389,13 +400,13 @@ export function VoiceStudioPanel({ hidden, client, tenantId }: VoiceStudioPanelP
                       ? styles.stateDotThinking
                       : sessionState === "speaking"
                       ? styles.stateDotSpeaking
-                      : sessionState === "connecting"
+                      : sessionState === "initializing" || sessionState === "signaling"
                       ? styles.stateDotActive
                       : ""
                   }`}
                 />
                 <span className={styles.stateTitle}>
-                  State: {sessionState.toUpperCase()}
+                  State: {sessionState === "disconnected" ? "IDLE" : sessionState.toUpperCase()}
                 </span>
               </div>
               <span className={styles.sessionSessionId}>
@@ -447,8 +458,9 @@ export function VoiceStudioPanel({ hidden, client, tenantId }: VoiceStudioPanelP
                   className={styles.selectInput}
                 >
                   <option value="neural_natural">Atlas (Crisp & Technical)</option>
-                  <option value="neural_expressive">Nova (Warm & Conversational)</option>
-                  <option value="sovereign_local">Echo (Ultra Low Latency)</option>
+                  <option value="warm_conversational">Nova (Warm & Conversational)</option>
+                  <option value="neural_fast">Astra (Ultra Fast)</option>
+                  <option value="crisp_authoritative">Echo (Authoritative)</option>
                 </select>
               </div>
 
@@ -461,7 +473,8 @@ export function VoiceStudioPanel({ hidden, client, tenantId }: VoiceStudioPanelP
                 >
                   <option value="pcm16">PCM16 (16kHz Uncompressed)</option>
                   <option value="opus">Opus (Low Bandwidth)</option>
-                  <option value="aac">AAC (Standard)</option>
+                  <option value="wav">WAV (Lossless)</option>
+                  <option value="mp3">MP3 (Compressed)</option>
                 </select>
               </div>
             </div>
@@ -471,11 +484,11 @@ export function VoiceStudioPanel({ hidden, client, tenantId }: VoiceStudioPanelP
               <MagneticButton strength={0.25}>
                 <button
                   className={`${styles.btnMic} ${
-                    sessionState !== "idle" ? styles.btnMicActive : styles.btnMicIdle
+                    sessionState !== "disconnected" ? styles.btnMicActive : styles.btnMicIdle
                   }`}
                   onClick={handleToggleMic}
                 >
-                  <span>{sessionState !== "idle" ? "⏹ Stop Voice Stream" : "🎙️ Activate Sovereign Mic"}</span>
+                  <span>{sessionState !== "disconnected" ? "⏹ Stop Voice Stream" : "🎙️ Activate Sovereign Mic"}</span>
                 </button>
               </MagneticButton>
             </div>

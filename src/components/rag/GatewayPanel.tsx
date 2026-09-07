@@ -21,10 +21,10 @@ interface GatewayPanelProps {
 
 export function GatewayPanel({ client, hidden }: GatewayPanelProps) {
   const [models, setModels] = useState<GatewayModelInfo[]>([]);
-  const [routes, setRoutes] = useState<TenantGatewayRoutesResponse | null>(null);
+  const [, setRoutes] = useState<TenantGatewayRoutesResponse | null>(null);
   const [budget, setBudget] = useState<VirtualTenantBudget | null>(null);
   const [probes, setProbes] = useState<GatewayProbeResult[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const [probing, setProbing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);

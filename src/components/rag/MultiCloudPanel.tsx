@@ -22,57 +22,66 @@ interface MultiCloudPanelProps {
 
 const DEFAULT_NODES: CloudRegionNode[] = [
   {
-    region: "oracle-bom",
-    provider: "oracle",
-    role: "leader",
-    endpoint: "https://rag.prateeq.in",
-    is_active: true,
-    weight: 100,
-    health_status: "healthy",
+    node_id: "node_oci_bom_01",
+    cloud_provider: "oracle",
+    region: "oci-bom",
+    endpoint_url: "https://rag.prateeq.in",
+    role: "primary_leader",
+    is_voting_member: true,
+    priority_weight: 100,
+    latency_ms: 12.4,
     consecutive_failures: 0,
-    last_probe_ms: 12.4,
+    last_heartbeat_at: "2026-09-07T12:00:00Z",
   },
   {
+    node_id: "node_aws_iad_02",
+    cloud_provider: "aws",
     region: "aws-iad",
-    provider: "aws",
-    role: "standby",
-    endpoint: "https://iad.rag.prateeq.in",
-    is_active: true,
-    weight: 80,
-    health_status: "healthy",
+    endpoint_url: "https://iad.rag.prateeq.in",
+    role: "standby_replica",
+    is_voting_member: true,
+    priority_weight: 80,
+    latency_ms: 184.2,
     consecutive_failures: 0,
-    last_probe_ms: 184.2,
+    last_heartbeat_at: "2026-09-07T12:00:00Z",
   },
   {
+    node_id: "node_fly_fra_03",
+    cloud_provider: "fly_io",
     region: "fly-fra",
-    provider: "fly_io",
-    role: "standby",
-    endpoint: "https://fra.rag.fly.dev",
-    is_active: true,
-    weight: 70,
-    health_status: "healthy",
+    endpoint_url: "https://fra.rag.fly.dev",
+    role: "standby_replica",
+    is_voting_member: true,
+    priority_weight: 70,
+    latency_ms: 142.6,
     consecutive_failures: 0,
-    last_probe_ms: 142.6,
+    last_heartbeat_at: "2026-09-07T12:00:00Z",
   },
   {
+    node_id: "node_cf_global_04",
+    cloud_provider: "cloudflare",
     region: "cf-global",
-    provider: "cloudflare",
-    role: "edge_worker",
-    endpoint: "https://edge.prateeq.workers.dev",
-    is_active: true,
-    weight: 90,
-    health_status: "healthy",
+    endpoint_url: "https://edge.prateeq.workers.dev",
+    role: "edge_follower",
+    is_voting_member: false,
+    priority_weight: 90,
+    latency_ms: 8.5,
     consecutive_failures: 0,
-    last_probe_ms: 8.5,
+    last_heartbeat_at: "2026-09-07T12:00:00Z",
   },
 ];
 
 export function MultiCloudPanel({ hidden, client, tenantId }: MultiCloudPanelProps) {
   const [topology, setTopology] = useState<ClusterTopology>({
-    active_leader: "oracle-bom",
+    cluster_id: "cluster_edge_quorum",
+    active_leader_region: "oci-bom",
+    active_leader_node_id: "node_oci_bom_01",
     generation_term: 1,
+    total_nodes: 4,
+    healthy_nodes: 4,
+    quorum_state: "consensus_reached",
+    environment_mode: "production",
     nodes: DEFAULT_NODES,
-    quorum_state: "quorum_established",
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [probing, setProbing] = useState<boolean>(false);
@@ -85,35 +94,27 @@ export function MultiCloudPanel({ hidden, client, tenantId }: MultiCloudPanelPro
   const [replicaConfig, setReplicaConfig] = useState<LibsqlReplicaConfig | null>({
     tenant_id: tenantId || "tn_demo",
     primary_url: "libsql://primary.rag.prateeq.in",
-    replica_path: "/data/libsql/tenant_replica.db",
+    replica_url: "libsql://replica.rag.prateeq.in",
+    auth_token: "tkn_libsql_mock_session",
     sync_interval_seconds: 5,
-    read_your_writes: true,
-    embedded_replica_enabled: true,
+    read_local: true,
+    write_proxy_to_primary: true,
+    db_file_path: "/data/libsql/tenant_replica.db",
+    replication_engine: "turso_libsql_embedded",
   });
 
   const [replicaStats, setReplicaStats] = useState<LibsqlReplicationStats>({
     tenant_id: tenantId || "tn_demo",
-    current_wal_frame: 41829,
-    applied_wal_frame: 41829,
+    primary_wal_frame: 41829,
+    local_wal_frame: 41829,
+    replication_lag_frames: 0,
     replication_lag_ms: 0.45,
-    last_sync_timestamp: new Date().toISOString(),
-    is_synchronized: true,
+    sync_status: "synchronized",
+    last_synced_at: "2026-09-07T12:00:00Z",
+    is_embedded: true,
+    writes_forwarded: 124,
+    reads_served_locally: 4890,
   });
-
-  const refreshOverview = useCallback(async () => {
-    if (!client) return;
-    setLoading(true);
-    try {
-      const data = await client.getMultiCloudClusters();
-      if (data && data.topology) {
-        setTopology(data.topology);
-      }
-    } catch (err) {
-      console.warn("Could not fetch multi-cloud cluster status:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, [client]);
 
   const fetchTenantReplica = useCallback(async () => {
     if (!client || !tenantId) return;
@@ -125,14 +126,46 @@ export function MultiCloudPanel({ hidden, client, tenantId }: MultiCloudPanelPro
     }
   }, [client, tenantId]);
 
-  useEffect(() => {
-    if (!hidden) {
-      if (client) {
-        void refreshOverview();
-        void fetchTenantReplica();
+  const refreshOverview = useCallback(async () => {
+    if (!client) return;
+    setLoading(true);
+    try {
+      const data = await client.getMultiCloudClusters();
+      if (data && data.topology) {
+        setTopology(data.topology);
       }
+      await fetchTenantReplica();
+    } catch (err) {
+      console.warn("Could not fetch multi-cloud cluster status:", err);
+    } finally {
+      setLoading(false);
     }
-  }, [hidden, client, refreshOverview, fetchTenantReplica]);
+  }, [client, fetchTenantReplica]);
+
+  useEffect(() => {
+    if (hidden || !client) return;
+    let active = true;
+
+    client
+      .getMultiCloudClusters()
+      .then((data) => {
+        if (active && data?.topology) setTopology(data.topology);
+      })
+      .catch((err) => console.warn("Could not fetch multi-cloud cluster status:", err));
+
+    if (tenantId) {
+      client
+        .getTenantLibsqlConfig()
+        .then((cfg) => {
+          if (active && cfg) setReplicaConfig(cfg);
+        })
+        .catch((err) => console.warn("Could not fetch tenant LibSQL replica config:", err));
+    }
+
+    return () => {
+      active = false;
+    };
+  }, [hidden, client, tenantId]);
 
   if (hidden) return null;
 
@@ -149,8 +182,8 @@ export function MultiCloudPanel({ hidden, client, tenantId }: MultiCloudPanelPro
             if (!probe) return node;
             return {
               ...node,
-              health_status: probe.is_healthy ? ("healthy" as const) : ("unhealthy" as const),
-              last_probe_ms: probe.latency_ms,
+              latency_ms: probe.latency_ms,
+              consecutive_failures: probe.is_healthy ? 0 : node.consecutive_failures + 1,
             };
           });
           return { ...prev, nodes: updatedNodes };
@@ -165,7 +198,7 @@ export function MultiCloudPanel({ hidden, client, tenantId }: MultiCloudPanelPro
           ...prev,
           nodes: prev.nodes.map((n) => ({
             ...n,
-            last_probe_ms: Number((Math.random() * 20 + (n.region === "oracle-bom" ? 10 : 120)).toFixed(1)),
+            latency_ms: Number((Math.random() * 20 + (n.region === "oci-bom" ? 10 : 120)).toFixed(1)),
           })),
         }));
         setStatusMessage({
@@ -196,11 +229,15 @@ export function MultiCloudPanel({ hidden, client, tenantId }: MultiCloudPanelPro
           setTopology((prev) => {
             const updatedNodes = prev.nodes.map((n) => ({
               ...n,
-              role: (n.region === result.new_leader ? "leader" : "standby") as CloudRegionNode["role"],
+              role: (n.region === result.new_leader
+                ? "primary_leader"
+                : n.region === "cf-global"
+                ? "edge_follower"
+                : "standby_replica") as CloudRegionNode["role"],
             }));
             return {
               ...prev,
-              active_leader: result.new_leader,
+              active_leader_region: result.new_leader,
               generation_term: result.generation_term,
               nodes: updatedNodes,
             };
@@ -212,7 +249,7 @@ export function MultiCloudPanel({ hidden, client, tenantId }: MultiCloudPanelPro
         } else {
           setStatusMessage({
             type: "error",
-            text: `Failover rejected: ${result.error_details || "Insufficient quorum majority"}`,
+            text: `Failover rejected: ${result.message || "Insufficient quorum majority"}`,
           });
         }
       } else {
@@ -221,11 +258,15 @@ export function MultiCloudPanel({ hidden, client, tenantId }: MultiCloudPanelPro
           const nextTerm = prev.generation_term + 1;
           const updatedNodes = prev.nodes.map((n) => ({
             ...n,
-            role: (n.region === targetRegion ? "leader" : n.region === "cf-global" ? "edge_worker" : "standby") as CloudRegionNode["role"],
+            role: (n.region === targetRegion
+              ? "primary_leader"
+              : n.region === "cf-global"
+              ? "edge_follower"
+              : "standby_replica") as CloudRegionNode["role"],
           }));
           return {
             ...prev,
-            active_leader: targetRegion,
+            active_leader_region: targetRegion,
             generation_term: nextTerm,
             nodes: updatedNodes,
           };
@@ -246,15 +287,15 @@ export function MultiCloudPanel({ hidden, client, tenantId }: MultiCloudPanelPro
   const handleSimulatePartition = (partitionActive: boolean) => {
     setSimulatedPartition(partitionActive);
     if (partitionActive) {
-      // Simulate Oracle BOM going down
+      // Simulate OCI BOM going down
       setTopology((prev) => {
         const updatedNodes = prev.nodes.map((n) => {
-          if (n.region === "oracle-bom") {
+          if (n.region === "oci-bom") {
             return {
               ...n,
-              health_status: "unhealthy" as const,
+              role: "degraded" as const,
               consecutive_failures: 4,
-              last_probe_ms: 9999,
+              latency_ms: 9999,
             };
           }
           return n;
@@ -269,15 +310,15 @@ export function MultiCloudPanel({ hidden, client, tenantId }: MultiCloudPanelPro
         text: "⚡ Network partition injected on primary Oracle BOM! Standby nodes detecting heartbeat timeouts.",
       });
     } else {
-      // Restore Oracle BOM
+      // Restore OCI BOM
       setTopology((prev) => {
         const updatedNodes = prev.nodes.map((n) => {
-          if (n.region === "oracle-bom") {
+          if (n.region === "oci-bom") {
             return {
               ...n,
-              health_status: "healthy" as const,
+              role: "primary_leader" as const,
               consecutive_failures: 0,
-              last_probe_ms: 12.8,
+              latency_ms: 12.8,
             };
           }
           return n;
@@ -303,18 +344,22 @@ export function MultiCloudPanel({ hidden, client, tenantId }: MultiCloudPanelPro
         setReplicaStats(stats);
         setStatusMessage({
           type: "success",
-          text: `Replica synced. WAL Frame: ${stats.applied_wal_frame}, Replication Lag: ${stats.replication_lag_ms.toFixed(2)}ms.`,
+          text: `Replica synced. WAL Frame: ${stats.local_wal_frame}, Replication Lag: ${stats.replication_lag_ms.toFixed(2)}ms.`,
         });
       } else {
         // Fallback simulation
-        const nextFrame = replicaStats.current_wal_frame + 12;
+        const nextFrame = replicaStats.primary_wal_frame + 12;
         setReplicaStats({
           tenant_id: tenantId || "tn_demo",
-          current_wal_frame: nextFrame,
-          applied_wal_frame: nextFrame,
+          primary_wal_frame: nextFrame,
+          local_wal_frame: nextFrame,
+          replication_lag_frames: 0,
           replication_lag_ms: 0.38,
-          last_sync_timestamp: new Date().toISOString(),
-          is_synchronized: true,
+          sync_status: "synchronized",
+          last_synced_at: new Date().toISOString(),
+          is_embedded: true,
+          writes_forwarded: replicaStats.writes_forwarded + 1,
+          reads_served_locally: replicaStats.reads_served_locally + 45,
         });
         setStatusMessage({
           type: "success",
@@ -329,7 +374,9 @@ export function MultiCloudPanel({ hidden, client, tenantId }: MultiCloudPanelPro
     }
   };
 
-  const healthyNodesCount = topology.nodes.filter((n) => n.health_status === "healthy").length;
+  const healthyNodesCount = topology.nodes.filter(
+    (n) => n.consecutive_failures === 0 && n.role !== "degraded" && n.role !== "offline"
+  ).length;
 
   return (
     <div className={styles.container}>
@@ -400,7 +447,7 @@ export function MultiCloudPanel({ hidden, client, tenantId }: MultiCloudPanelPro
           <span className={styles.metricLabel}>Active Leader Region</span>
           <div className={styles.metricValue}>
             <span style={{ color: "var(--color-accent, #00f0ff)" }}>
-              {topology.active_leader.toUpperCase()}
+              {topology.active_leader_region.toUpperCase()}
             </span>
           </div>
           <span className={styles.metricSubtitle}>
@@ -415,7 +462,7 @@ export function MultiCloudPanel({ hidden, client, tenantId }: MultiCloudPanelPro
             <span style={{ fontSize: "0.85rem", opacity: 0.8 }}>ms</span>
           </div>
           <span className={styles.metricSubtitle}>
-            WAL Frame: <NumberFlow value={replicaStats.applied_wal_frame} />
+            WAL Frame: <NumberFlow value={replicaStats.local_wal_frame} />
           </span>
         </div>
 
@@ -439,8 +486,11 @@ export function MultiCloudPanel({ hidden, client, tenantId }: MultiCloudPanelPro
 
         <div className={styles.regionGrid}>
           {topology.nodes.map((node) => {
-            const isLeader = node.role === "leader";
-            const isDegraded = node.health_status === "unhealthy";
+            const isLeader = node.role === "primary_leader";
+            const isDegraded =
+              node.consecutive_failures > 0 ||
+              node.role === "degraded" ||
+              node.role === "offline";
 
             return (
               <div
@@ -452,7 +502,7 @@ export function MultiCloudPanel({ hidden, client, tenantId }: MultiCloudPanelPro
                 <div className={styles.cardTop}>
                   <div>
                     <div className={styles.regionName}>{node.region}</div>
-                    <div className={styles.regionProvider}>{node.provider}</div>
+                    <div className={styles.regionProvider}>{node.cloud_provider}</div>
                   </div>
                   <span
                     className={`${styles.roleBadge} ${
@@ -460,23 +510,23 @@ export function MultiCloudPanel({ hidden, client, tenantId }: MultiCloudPanelPro
                         ? styles.roleBadgeLeader
                         : isDegraded
                         ? styles.roleBadgeDegraded
-                        : node.role === "edge_worker"
+                        : node.role === "edge_follower"
                         ? styles.roleBadgeEdge
                         : styles.roleBadgeStandby
                     }`}
                   >
-                    {isDegraded ? "DEGRADED" : node.role.replace(/_/g, " ")}
+                    {isDegraded ? "DEGRADED" : node.role.replace(/_/g, " ").toUpperCase()}
                   </span>
                 </div>
 
-                <div className={styles.endpoint}>{node.endpoint}</div>
+                <div className={styles.endpoint}>{node.endpoint_url}</div>
 
                 <div className={styles.statRow}>
                   <span className={styles.statLabel}>Latency:</span>
                   <span className={styles.statValue}>
-                    {node.last_probe_ms ? (
+                    {node.latency_ms ? (
                       <>
-                        <NumberFlow value={node.last_probe_ms} format={{ minimumFractionDigits: 1 }} /> ms
+                        <NumberFlow value={node.latency_ms} format={{ minimumFractionDigits: 1 }} /> ms
                       </>
                     ) : (
                       "N/A"
@@ -487,7 +537,7 @@ export function MultiCloudPanel({ hidden, client, tenantId }: MultiCloudPanelPro
                 <div className={styles.statRow}>
                   <span className={styles.statLabel}>Weight / Failures:</span>
                   <span className={styles.statValue}>
-                    {node.weight}% / {node.consecutive_failures}
+                    {node.priority_weight}% / {node.consecutive_failures}
                   </span>
                 </div>
               </div>
@@ -534,7 +584,7 @@ export function MultiCloudPanel({ hidden, client, tenantId }: MultiCloudPanelPro
             >
               <option value="aws-iad">aws-iad (AWS US-East Standby)</option>
               <option value="fly-fra">fly-fra (Fly.io Frankfurt Standby)</option>
-              <option value="oracle-bom">oracle-bom (Oracle Mumbai Primary)</option>
+              <option value="oci-bom">oci-bom (Oracle Mumbai Primary)</option>
             </select>
           </div>
 
@@ -572,7 +622,7 @@ export function MultiCloudPanel({ hidden, client, tenantId }: MultiCloudPanelPro
             </div>
             <div className={styles.tursoRow}>
               <span style={{ color: "var(--color-text-muted)" }}>Local Replica:</span>
-              <span>{replicaConfig?.replica_path}</span>
+              <span>{replicaConfig?.db_file_path}</span>
             </div>
           </div>
 
@@ -580,13 +630,13 @@ export function MultiCloudPanel({ hidden, client, tenantId }: MultiCloudPanelPro
             <div className={styles.streamStatBox}>
               <span className={styles.streamStatLabel}>CURRENT WAL FRAME</span>
               <span className={styles.streamStatNum}>
-                <NumberFlow value={replicaStats.current_wal_frame} />
+                <NumberFlow value={replicaStats.primary_wal_frame} />
               </span>
             </div>
             <div className={styles.streamStatBox}>
               <span className={styles.streamStatLabel}>APPLIED FRAME</span>
               <span className={styles.streamStatNum} style={{ color: "#10b981" }}>
-                <NumberFlow value={replicaStats.applied_wal_frame} />
+                <NumberFlow value={replicaStats.local_wal_frame} />
               </span>
             </div>
           </div>

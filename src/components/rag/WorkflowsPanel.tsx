@@ -78,6 +78,10 @@ const DEFAULT_BLUEPRINTS: WorkflowDefinition[] = [
   },
 ];
 
+function generateWorkflowRunKey(name: string): string {
+  return `run_${name}_${Date.now()}`;
+}
+
 export function WorkflowsPanel({ hidden, client }: WorkflowsPanelProps) {
   const [blueprints, setBlueprints] = useState<WorkflowDefinition[]>(DEFAULT_BLUEPRINTS);
   const [executions, setExecutions] = useState<WorkflowExecution[]>([]);
@@ -117,10 +121,31 @@ export function WorkflowsPanel({ hidden, client }: WorkflowsPanelProps) {
   }, [client]);
 
   useEffect(() => {
-    if (!hidden && client) {
-      void fetchBlueprintsAndExecutions();
-    }
-  }, [hidden, client, fetchBlueprintsAndExecutions]);
+    if (hidden || !client) return;
+    let active = true;
+
+    Promise.all([
+      client.listWorkflowBlueprints().catch(() => DEFAULT_BLUEPRINTS),
+      client.listWorkflowExecutions({ limit: 50 }).catch(() => ({ items: [], total: 0, limit: 50, offset: 0 })),
+    ])
+      .then(([bpRes, execRes]) => {
+        if (!active) return;
+        if (bpRes && bpRes.length > 0) {
+          setBlueprints(bpRes);
+        }
+        setExecutions(execRes.items || []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        if (!active) return;
+        console.warn("[WorkflowsPanel] Fetch error:", err);
+        setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [hidden, client]);
 
   // Dynamic Polling: poll every 3 seconds if there are running or queued executions
   useEffect(() => {
@@ -153,7 +178,7 @@ export function WorkflowsPanel({ hidden, client }: WorkflowsPanelProps) {
 
   const handleOpenLaunchModal = (bp: WorkflowDefinition) => {
     setLaunchModalBlueprint(bp);
-    setLaunchIdempotencyKey(`run_${bp.name}_${Date.now()}`);
+    setLaunchIdempotencyKey(generateWorkflowRunKey(bp.name));
     let defaultPayload: Record<string, unknown> = {};
     if (bp.name === "vault_bulk_ingest") {
       defaultPayload = { vault_path: "documents/enterprise_vault", batch_size: 20 };

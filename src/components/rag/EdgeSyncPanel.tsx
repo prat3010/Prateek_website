@@ -27,7 +27,7 @@ export function EdgeSyncPanel({ hidden, client }: EdgeSyncPanelProps) {
   const [downloadingBundle, setDownloadingBundle] = useState<boolean>(false);
   const [offlinePartition, setOfflinePartition] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error" | "info"; text: string } | null>(null);
-  const [selectedTier, setSelectedTier] = useState<OfflineExecutionTier>("hybrid_cache");
+  const [selectedTier] = useState<OfflineExecutionTier>("hybrid_cache");
   const [reconcilingMutation, setReconcilingMutation] = useState<boolean>(false);
 
   const fetchNodes = useCallback(async () => {
@@ -44,10 +44,22 @@ export function EdgeSyncPanel({ hidden, client }: EdgeSyncPanelProps) {
   }, [client]);
 
   useEffect(() => {
-    if (!hidden && client) {
-      fetchNodes();
-    }
-  }, [hidden, client, fetchNodes]);
+    if (hidden || !client) return;
+    let active = true;
+    client
+      .getEdgeNodes()
+      .then((data) => {
+        if (active && data) {
+          setNodes(data);
+        }
+      })
+      .catch((err) => {
+        console.warn("Could not fetch edge nodes:", err);
+      });
+    return () => {
+      active = false;
+    };
+  }, [hidden, client]);
 
   const handleSimulateSearch = async () => {
     if (!query.trim()) return;

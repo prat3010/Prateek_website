@@ -13,9 +13,46 @@ interface PromptOptimizationPanelProps {
   hidden?: boolean;
 }
 
+const FALLBACK_ACTIVE_PROGRAM: CompiledPromptProgram = {
+  program_id: "prog_demo_bootstrap",
+  tenant_id: "tn_demo",
+  name: "production_grounded_cot",
+  signature_name: "RAGAnswerSignature",
+  optimizer: "BootstrapFewShot",
+  baseline_score: 0.684,
+  compiled_score: 0.892,
+  improvement_pct: 30.41,
+  metric_name: "composite",
+  compiled_instruction:
+    "You are Retriever's optimized cognitive agent. Answer user inquiries using solely the verified context chunks below. For every factual assertion, cross-reference source material and adhere strictly to grounded truth.",
+  few_shot_demos: [
+    {
+      question: "What is the maximum single document upload limit?",
+      context: "Retriever limits single document uploads to 50MB across PDF, DOCX, and markdown formats.",
+      thought: "Extract maximum file size constraint directly from ingestion parameters.",
+      answer: "The maximum single document upload limit is 50MB.",
+      score: 0.98,
+    },
+    {
+      question: "How is vector isolation maintained between enterprise tenants?",
+      context:
+        "Tenant vector embeddings are isolated via Row-Level Security (RLS) tenant_id metadata filters and cryptographically scoped pgvector partitions.",
+      thought: "Locate tenancy isolation mechanics.",
+      answer: "Tenants are isolated using Row-Level Security (RLS) tenant_id metadata filtering and pgvector partitions.",
+      score: 0.95,
+    },
+  ],
+  is_active: true,
+  created_at: "2026-09-01T00:00:00.000Z",
+};
+
 export function PromptOptimizationPanel({ client, hidden }: PromptOptimizationPanelProps) {
-  const [programs, setPrograms] = useState<CompiledPromptProgram[]>([]);
-  const [activeProgram, setActiveProgram] = useState<CompiledPromptProgram | null>(null);
+  const [programs, setPrograms] = useState<CompiledPromptProgram[]>(() =>
+    client ? [] : [FALLBACK_ACTIVE_PROGRAM]
+  );
+  const [activeProgram, setActiveProgram] = useState<CompiledPromptProgram | null>(() =>
+    client ? null : FALLBACK_ACTIVE_PROGRAM
+  );
   const [loading, setLoading] = useState(false);
   const [compiling, setCompiling] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +63,9 @@ export function PromptOptimizationPanel({ client, hidden }: PromptOptimizationPa
   const [optimizer, setOptimizer] = useState<"BootstrapFewShot" | "MIPROv2" | "RandomSearch">("BootstrapFewShot");
   const [metricTarget, setMetricTarget] = useState<"composite" | "faithfulness" | "context_relevance">("composite");
   const [maxDemos, setMaxDemos] = useState<number>(3);
-  const [expandedProgramId, setExpandedProgramId] = useState<string | null>(null);
+  const [expandedProgramId, setExpandedProgramId] = useState<string | null>(() =>
+    client ? null : FALLBACK_ACTIVE_PROGRAM.program_id
+  );
   const [lastCompilationResult, setLastCompilationResult] = useState<PromptCompilationResult | null>(null);
 
   // Load programs & active program
@@ -41,62 +80,46 @@ export function PromptOptimizationPanel({ client, hidden }: PromptOptimizationPa
       ]);
       const list = allPrograms || [];
       setPrograms(list);
-      setActiveProgram(active || null);
-      if (active) {
-        setExpandedProgramId((prev) => prev || active.program_id);
+      const curr = active || list.find((p) => p.is_active) || null;
+      setActiveProgram(curr);
+      if (curr) {
+        setExpandedProgramId((prev) => prev || curr.program_id);
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to load compiled prompt programs.";
-      // Fallback offline mock state if backend not connected
-      setPrograms((prev) => {
-        if (prev.length === 0) {
-          const fallbackActive: CompiledPromptProgram = {
-            program_id: "prog_demo_bootstrap",
-            tenant_id: "tn_demo",
-            name: "production_grounded_cot",
-            signature_name: "RAGAnswerSignature",
-            optimizer: "BootstrapFewShot",
-            baseline_score: 0.684,
-            compiled_score: 0.892,
-            improvement_pct: 30.41,
-            metric_name: "composite",
-            compiled_instruction: "You are Retriever's optimized cognitive agent. Answer user inquiries using solely the verified context chunks below. For every factual assertion, cross-reference source material and adhere strictly to grounded truth.",
-            few_shot_demos: [
-              {
-                question: "What is the maximum single document upload limit?",
-                context: "Retriever limits single document uploads to 50MB across PDF, DOCX, and markdown formats.",
-                thought: "Extract maximum file size constraint directly from ingestion parameters.",
-                answer: "The maximum single document upload limit is 50MB.",
-                score: 0.98,
-              },
-              {
-                question: "How is vector isolation maintained between enterprise tenants?",
-                context: "Tenant vector embeddings are isolated via Row-Level Security (RLS) tenant_id metadata filters and cryptographically scoped pgvector partitions.",
-                thought: "Locate tenancy isolation mechanics.",
-                answer: "Tenants are isolated using Row-Level Security (RLS) tenant_id metadata filtering and pgvector partitions.",
-                score: 0.95,
-              },
-            ],
-            is_active: true,
-            created_at: new Date().toISOString(),
-          };
-          setActiveProgram(fallbackActive);
-          setExpandedProgramId(fallbackActive.program_id);
-          return [fallbackActive];
-        }
-        setError(msg);
-        return prev;
-      });
+      setError(msg);
     } finally {
       setLoading(false);
     }
   }, [client]);
 
   useEffect(() => {
-    if (!hidden) {
-      void loadPrograms();
-    }
-  }, [hidden, loadPrograms]);
+    if (hidden || !client) return;
+    let active = true;
+
+    Promise.all([
+      client.getCompiledPrompts(),
+      client.getActiveCompiledPrompt(),
+    ])
+      .then(([allPrograms, activeProg]) => {
+        if (!active) return;
+        const list = allPrograms || [];
+        setPrograms(list);
+        const curr = activeProg || list.find((p) => p.is_active) || null;
+        setActiveProgram(curr);
+        if (curr) {
+          setExpandedProgramId((prev) => prev || curr.program_id);
+        }
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
+        console.warn("Could not fetch compiled prompts:", err);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [hidden, client]);
 
   // Compile Handler
   const handleCompile = async (e: React.FormEvent) => {

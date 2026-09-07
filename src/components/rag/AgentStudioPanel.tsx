@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { RetrieverClient } from "@/lib/rag-client";
 import {
   ToolDefinition,
@@ -18,9 +18,19 @@ interface AgentStudioPanelProps {
   isExpired?: boolean;
 }
 
+const FALLBACK_TOOLS: ToolDefinition[] = [
+  { name: "calculator", description: "Safe math evaluator", category: "math", requires_approval: false, risk_level: "low" },
+  { name: "hybrid_search", description: "Dense-sparse vector search across knowledge base", category: "retrieval", requires_approval: false, risk_level: "low" },
+  { name: "document_reader", description: "Read chunk or document text", category: "retrieval", requires_approval: false, risk_level: "low" },
+  { name: "system_metrics", description: "Inspect tenant usage and quota metrics", category: "system", requires_approval: false, risk_level: "low" },
+  { name: "document_delete", description: "Permanently delete document from knowledge base", category: "destructive", requires_approval: true, risk_level: "high" },
+  { name: "tenant_prompt_update", description: "Hot-reload active system prompt template", category: "configuration", requires_approval: true, risk_level: "high" },
+  { name: "api_key_revoke", description: "Instantly revoke tenant API key", category: "security", requires_approval: true, risk_level: "critical" },
+];
+
 export function AgentStudioPanel({ client, hidden, isExpired }: AgentStudioPanelProps) {
-  const [tools, setTools] = useState<ToolDefinition[]>([]);
-  const [selectedTools, setSelectedTools] = useState<string[]>([]);
+  const [tools, setTools] = useState<ToolDefinition[]>(FALLBACK_TOOLS);
+  const [selectedTools, setSelectedTools] = useState<string[]>(FALLBACK_TOOLS.map((t) => t.name));
   const [prompt, setPrompt] = useState("");
   const [activeThreadId, setActiveThreadId] = useState<string>("");
   const [running, setRunning] = useState(false);
@@ -38,35 +48,25 @@ export function AgentStudioPanel({ client, hidden, isExpired }: AgentStudioPanel
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [selectedCheckpoint, setSelectedCheckpoint] = useState<ThreadCheckpointItem | null>(null);
 
-  // Load available tools
-  const loadTools = useCallback(async () => {
-    if (!client) return;
-    try {
-      const data = await client.listAgentTools();
-      setTools(data);
-      // Pre-select all safe tools
-      setSelectedTools(data.map((t) => t.name));
-    } catch {
-      // Fallback baseline tool definitions for offline/sandbox view
-      const fallbackTools: ToolDefinition[] = [
-        { name: "calculator", description: "Safe math evaluator", category: "math", requires_approval: false, risk_level: "low" },
-        { name: "hybrid_search", description: "Dense-sparse vector search across knowledge base", category: "retrieval", requires_approval: false, risk_level: "low" },
-        { name: "document_reader", description: "Read chunk or document text", category: "retrieval", requires_approval: false, risk_level: "low" },
-        { name: "system_metrics", description: "Inspect tenant usage and quota metrics", category: "system", requires_approval: false, risk_level: "low" },
-        { name: "document_delete", description: "Permanently delete document from knowledge base", category: "destructive", requires_approval: true, risk_level: "high" },
-        { name: "tenant_prompt_update", description: "Hot-reload active system prompt template", category: "configuration", requires_approval: true, risk_level: "high" },
-        { name: "api_key_revoke", description: "Instantly revoke tenant API key", category: "security", requires_approval: true, risk_level: "critical" },
-      ];
-      setTools(fallbackTools);
-      setSelectedTools(fallbackTools.map((t) => t.name));
-    }
-  }, [client]);
+
 
   useEffect(() => {
-    if (!hidden) {
-      void loadTools();
-    }
-  }, [hidden, loadTools]);
+    if (hidden || !client) return;
+    let active = true;
+
+    client
+      .listAgentTools()
+      .then((data) => {
+        if (!active || !data || data.length === 0) return;
+        setTools(data);
+        setSelectedTools(data.map((t) => t.name));
+      })
+      .catch(() => {});
+
+    return () => {
+      active = false;
+    };
+  }, [hidden, client]);
 
   const toggleTool = (toolName: string) => {
     setSelectedTools((prev) =>

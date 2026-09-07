@@ -553,9 +553,9 @@ export class RetrieverClient {
   async updateTenantGatewayRoutes(
     payload: import("./rag-types").UpdateGatewayRoutesPayload,
     tenantId?: string
-  ): Promise<{ status: string; tenant_id: string; gateway_settings: any; budget_settings: any }> {
+  ): Promise<{ status: string; tenant_id: string; gateway_settings: Record<string, unknown>; budget_settings: Record<string, unknown> }> {
     const tid = tenantId || this.config.tenantId;
-    return this.request<{ status: string; tenant_id: string; gateway_settings: any; budget_settings: any }>(
+    return this.request<{ status: string; tenant_id: string; gateway_settings: Record<string, unknown>; budget_settings: Record<string, unknown> }>(
       `/v1/tenants/${tid}/gateway/routes`,
       {
         method: "PUT",

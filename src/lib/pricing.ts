@@ -401,8 +401,7 @@ export interface TimelineEstimateResult {
  */
 export function estimateScopeTimeline(
   selection: QuoteSelection,
-  allFeatures: FeatureItem[],
-  baseEngines?: BaseEngineItem[]
+  allFeatures: FeatureItem[]
 ): TimelineEstimateResult {
   const engineId = selection.engineId?.toLowerCase() || 'saas';
   const selectedFeatureIds = new Set((selection.featureIds || []).map((id) => id.toLowerCase()));
