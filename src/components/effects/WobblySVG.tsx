@@ -118,7 +118,7 @@ function fbm(x: number, y: number, octaves: number): number {
 }
 
 // Deterministic displacement based on 2D FBM noise fields
-export function getDisplacement(
+function getDisplacement(
   x: number,
   y: number,
   scale: number,
@@ -166,7 +166,7 @@ function wobbleLine(
   }
 }
 
-export function wobblePath(
+function wobblePath(
   d: string,
   segmentLength?: number,
   wobbleStrength = 1.0,

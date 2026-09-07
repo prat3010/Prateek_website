@@ -42,7 +42,7 @@ export interface PDFThemeConfig {
   labelBoldFont: string;
 }
 
-export const PDF_THEMES: Record<'azure' | 'noir', PDFThemeConfig> = {
+const PDF_THEMES: Record<'azure' | 'noir', PDFThemeConfig> = {
   azure: {
     isNoir: false,
     pageBg: '#F7F2E8',
@@ -118,7 +118,7 @@ export function getPdfTheme(isNoir: boolean): PDFThemeConfig {
  * down slightly to match the azure layout's page height. Header/title sizes are
  * intentionally left untouched so the brand lockup stays prominent.
  */
-export function pdfFontScale(theme: PDFThemeConfig): number {
+function pdfFontScale(theme: PDFThemeConfig): number {
   return theme.isNoir ? 0.88 : 1;
 }
 

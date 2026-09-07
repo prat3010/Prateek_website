@@ -577,5 +577,3 @@ export function ArchitectureTopologyMap({
     </section>
   );
 }
-
-export default ArchitectureTopologyMap;

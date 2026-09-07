@@ -17,14 +17,9 @@ import {
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import type {
-  GoalArchetype,
-  BrandAssetOption,
-  MaintenancePlanOption,
   FeatureItem,
-  QuickServiceItem,
   ResumeData,
 } from '@/data/resume';
-import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
 import {
   formatPricePair,
   resolveFeatureDependencies,
@@ -32,7 +27,7 @@ import {
 import { signInWithGoogle } from '@/lib/auth';
 import { useLenis } from 'lenis/react';
 
-import { useIntakeFormState, type IntakePreset, type IntakeFormData } from './useIntakeFormState';
+import { useIntakeFormState, type IntakePreset } from './useIntakeFormState';
 import { ServiceTypeGate } from './ServiceTypeGate';
 import { StepGoalArchetype } from './StepGoalArchetype';
 import { StepTechnicalScope } from './StepTechnicalScope';
@@ -47,12 +42,7 @@ import styles from './IntakeForm.module.css';
 
 const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
-export type { IntakePreset, IntakeFormData };
 
-export const GOAL_ARCHETYPES: GoalArchetype[] = questionnaireDefaults.goals;
-export const BRAND_ASSET_OPTIONS: BrandAssetOption[] = questionnaireDefaults.brandAssets;
-export const MAINTENANCE_PLANS: MaintenancePlanOption[] = questionnaireDefaults.maintenancePlans;
-export const QUICK_SERVICES: QuickServiceItem[] = questionnaireDefaults.quickServices || [];
 
 export const GOAL_CATEGORIES: { id: 'all' | 'websites' | 'saas' | 'ai_widgets'; label: string; ids: string[] }[] = [
   { id: 'all', label: 'All Archetypes', ids: [] },

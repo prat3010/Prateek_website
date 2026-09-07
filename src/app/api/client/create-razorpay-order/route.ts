@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
 import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
 import { calculateInvoiceTotals } from '@/lib/invoicing';
+import { createRazorpayOrderSchema } from '@/lib/clientOrder';
 
 const USD_TO_INR_RATE = 85;
 
@@ -17,11 +18,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
     }
 
-    const scopeCode = typeof payload.scopeCode === 'string' ? payload.scopeCode.trim() : '';
-
-    if (!scopeCode) {
-      return NextResponse.json({ error: 'Missing or invalid scopeCode' }, { status: 400 });
+    const parseResult = createRazorpayOrderSchema.safeParse(payload);
+    if (!parseResult.success) {
+      return NextResponse.json({ error: parseResult.error.message }, { status: 400 });
     }
+
+    const { scopeCode } = parseResult.data;
 
     const clientEmail = await getVerifiedSessionEmail(req);
     if (!clientEmail) {

@@ -3,7 +3,6 @@
   "entry": [
     "src/app/**/{page,layout,loading,error,not-found,route}.{ts,tsx}",
     "scripts/**/*.{js,mjs,ts}",
-    "playwright.config.ts",
     "e2e/**/*.spec.ts"
   ],
   "project": [
@@ -11,10 +10,14 @@
     "scripts/**/*.{js,mjs,ts}!",
     "e2e/**/*.spec.ts!"
   ],
-  "ignore": [
-    "src/components/effects/wobblyPaths.generated.ts"
+  "ignoreBinaries": [
+    "streamlit"
   ],
   "ignoreDependencies": [
-    "streamlit"
-  ]
+    "pako",
+    "@types/pako"
+  ],
+  "rules": {
+    "types": "off"
+  }
 }

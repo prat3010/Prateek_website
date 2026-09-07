@@ -164,4 +164,3 @@ export function DependencyCascadeModal({
     </Portal>
   );
 }
-export default DependencyCascadeModal;

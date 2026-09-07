@@ -31,7 +31,7 @@ export interface ConsoleLine {
   href?: string;
 }
 
-export const BOOT_LOGS: string[] = [
+const BOOT_LOGS: string[] = [
   'SYSTEM // Initializing cyber diagnostics console...',
   'SYSTEM // Loading dynamic route bundles...',
   'SYSTEM // Listening for performance and frame rate metrics...',

@@ -424,7 +424,7 @@ export const intakeDraftSchema = {
 
 export interface CreateRazorpayOrderPayload {
   scopeCode: string;
-  amount: number;
+  amount?: number;
   currency?: 'INR' | 'USD';
   invoiceId?: string;
   milestoneStage?: string;
@@ -447,9 +447,12 @@ export const createRazorpayOrderSchema = {
       issues.push({ field: 'scopeCode', message: 'scopeCode is required.' });
     }
 
-    const amount = typeof obj.amount === 'number' ? obj.amount : Number(obj.amount);
-    if (isNaN(amount) || amount <= 0) {
-      issues.push({ field: 'amount', message: 'amount must be a positive number greater than 0.' });
+    let amount: number | undefined;
+    if (obj.amount !== undefined) {
+      amount = typeof obj.amount === 'number' ? obj.amount : Number(obj.amount);
+      if (isNaN(amount) || amount <= 0) {
+        issues.push({ field: 'amount', message: 'amount must be a positive number greater than 0.' });
+      }
     }
 
     if (issues.length > 0) {

@@ -11,7 +11,7 @@ export interface PathfindingStep {
 }
 
 /** Check if two nodes are equal */
-export const isSameNode = (a: GridNode, b: GridNode) => a.col === b.col && a.row === b.row;
+const isSameNode = (a: GridNode, b: GridNode) => a.col === b.col && a.row === b.row;
 
 /** Convert node coordinates to a unique string key */
 export const nodeToKey = (node: GridNode) => `${node.col},${node.row}`;
@@ -853,7 +853,7 @@ export function* runTremaux(
 /**
  * Bresenham's Line Algorithm to check line of sight between two grid nodes.
  */
-export const hasLineOfSight = (a: GridNode, b: GridNode, walls: Set<string>): boolean => {
+const hasLineOfSight = (a: GridNode, b: GridNode, walls: Set<string>): boolean => {
   let x0 = a.col;
   let y0 = a.row;
   const x1 = b.col;
