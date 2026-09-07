@@ -154,11 +154,23 @@ npm run test:watch    # Watch mode
 npm run test:coverage # With coverage report
 ```
 
-Full workspace validation (types, lint, tests, build):
+Full 10-Gate Workspace Validation Suite:
 
 ```bash
-npm run verify
+npm run verify # or ./scripts/verify.sh
 ```
+
+Executes the automated quality gates:
+1. **Git Cleanliness Check** (flags uncommitted modifications)
+2. **Next.js Build Cache Cleanup** (`.next` purge)
+3. **TypeScript Type Safety** (`tsc --noEmit`)
+4. **ESLint Static Code Quality** (`npm run lint`)
+5. **Vitest Unit & Integration Suite** (`npm test`)
+6. **Knip Dead Code & Dependency Audit** (`npx knip --reporter compact`)
+7. **Portal Containing Block Safety Audit** (`scripts/audit_portal_safety.py` ADR 05)
+8. **Secret & Credential Leak Scanner** (`scripts/audit_secrets.py`)
+9. **Data Contract Integrity & Graph Sync** (`scripts/audit_contracts.py` & `sync_graph_with_code.py`)
+10. **Zero-Toy & Anti-Mock Invariant Audit** (`scripts/audit_zero_toy.py` - blocks synthetic fakes)
 
 ---
 

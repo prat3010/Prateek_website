@@ -1130,6 +1130,38 @@ export class RetrieverClient {
       "/v1/admin/voice/telemetry"
     );
   }
+
+  async getMcpConfig(tenantId?: string): Promise<import("./rag-types").McpConfigResponse> {
+    const targetTenant = tenantId || this.tenantId;
+    return this.request<import("./rag-types").McpConfigResponse>(
+      `/v1/mcp/config?tenant_id=${encodeURIComponent(targetTenant)}`
+    );
+  }
+
+  async getMcpTools(tenantId?: string): Promise<import("./rag-types").McpToolSummary[]> {
+    const targetTenant = tenantId || this.tenantId;
+    return this.request<import("./rag-types").McpToolSummary[]>(
+      `/v1/mcp/tools?tenant_id=${encodeURIComponent(targetTenant)}`
+    );
+  }
+
+  async testMcpTool(
+    toolName: string,
+    argumentsObj: Record<string, unknown> = {},
+    tenantId?: string
+  ): Promise<import("./rag-types").McpToolExecutionResult> {
+    const targetTenant = tenantId || this.tenantId;
+    return this.request<import("./rag-types").McpToolExecutionResult>(
+      `/v1/mcp/test-tool?tenant_id=${encodeURIComponent(targetTenant)}`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          tool_name: toolName,
+          arguments: argumentsObj,
+        }),
+      }
+    );
+  }
 }
 
 

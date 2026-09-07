@@ -1071,6 +1071,57 @@ export interface VoiceSessionTelemetry {
   synthesis_engine: string;
 }
 
+// ==========================================
+// Model Context Protocol (MCP) Types
+// ==========================================
+
+export interface McpToolInputSchema {
+  type: string;
+  properties?: Record<string, unknown>;
+  required?: string[];
+}
+
+export interface McpToolSummary {
+  name: string;
+  description: string;
+  category: string;
+  risk_level: string;
+  requires_approval?: boolean;
+  battery_id?: string | null;
+  inputSchema?: McpToolInputSchema;
+}
+
+export interface McpClientSnippet {
+  name: string;
+  filename: string;
+  language: string;
+  code: string;
+  description: string;
+}
+
+export interface McpConfigResponse {
+  tenant_id: string;
+  sse_endpoint: string;
+  message_endpoint: string;
+  total_tools: number;
+  active_batteries: number;
+  cursor_config: Record<string, unknown>;
+  claude_desktop_config: Record<string, unknown>;
+  cline_config: Record<string, unknown>;
+  snippets: McpClientSnippet[];
+}
+
+export interface McpToolContentItem {
+  type: string;
+  text: string;
+}
+
+export interface McpToolExecutionResult {
+  content: McpToolContentItem[];
+  is_error: boolean;
+  meta?: Record<string, unknown>;
+}
+
 
 
 

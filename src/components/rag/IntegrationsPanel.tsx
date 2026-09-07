@@ -176,6 +176,27 @@ export function IntegrationsPanel({ hidden, tenantId }: IntegrationsPanelProps) 
             Configurable via Workspace Settings or Retriever Admin Console.
           </div>
         </div>
+
+        {/* 5. Universal MCP Server */}
+        <div className={styles.featureCard}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <span style={{ fontSize: "20px" }}>🔌</span>
+              <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700 }}>Universal MCP Server</h3>
+            </div>
+            <span className={styles.badgeSuccess}>MCP 2024-11-05</span>
+          </div>
+          <p style={{ fontSize: "12px", color: "var(--color-text-muted)", lineHeight: 1.5, margin: "0 0 16px 0" }}>
+            Expose all 20 platform batteries and vector indexes as native tools to Cursor, Claude Desktop, and VS Code Cline over JSON-RPC 2.0 &amp; SSE.
+          </p>
+          <div style={{ fontSize: "11px", color: "var(--color-text-muted)", marginBottom: "12px" }}>
+            <div>• SSE Transport: <code>/v1/mcp/sse</code></div>
+            <div>• JSON-RPC Endpoint: <code>/v1/mcp/messages</code></div>
+          </div>
+          <div style={{ padding: "8px", background: "var(--surface-elevated)", borderRadius: "6px", fontSize: "11px", color: "var(--color-text-muted)" }}>
+            Access full setup snippets and live test probe in the <b>Model Context Protocol (MCP)</b> tab.
+          </div>
+        </div>
       </div>
     </div>
   );

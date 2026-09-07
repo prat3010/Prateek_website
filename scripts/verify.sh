@@ -116,6 +116,19 @@ else
   echo -e "${RED}Contract Audit Failure Details:${NC}\n$AUDIT_OUT\n"
 fi
 
+# Step 10: Zero-Toy & Authentic Engineering Audit
+echo -n "Running Zero-Toy & Anti-Mock audit... "
+ZERO_TOY_OUT=$(python3 scripts/audit_zero_toy.py 2>&1)
+ZERO_TOY_EXIT=$?
+if [ $ZERO_TOY_EXIT -eq 0 ]; then
+  ZERO_TOY_STATUS="${GREEN}✓ Passed (0 toys)${NC}"
+  echo -e "$ZERO_TOY_STATUS"
+else
+  ZERO_TOY_STATUS="${RED}✗ Failed${NC}"
+  echo -e "$ZERO_TOY_STATUS"
+  echo -e "${RED}Zero-Toy Audit Violations:${NC}\n$ZERO_TOY_OUT\n"
+fi
+
 # Summary Dashboard
 echo -e "\n${BOLD}=========================================${NC}"
 echo -e "         ${BOLD}VERIFICATION SUMMARY${NC}"
@@ -128,9 +141,10 @@ echo -e "  Dead Code Audit: $KNIP_STATUS"
 echo -e "  Portal Safety:   $PORTAL_STATUS"
 echo -e "  Secret Scanner:  $SECRET_STATUS"
 echo -e "  Contract Audit:  $AUDIT_STATUS"
+echo -e "  Zero-Toy Audit:  $ZERO_TOY_STATUS"
 echo -e "${BOLD}=========================================${NC}"
 
-if [ $TSC_EXIT -eq 0 ] && [ $LINT_EXIT -eq 0 ] && [ $TEST_EXIT -eq 0 ] && [ $PORTAL_EXIT -eq 0 ] && [ $SECRET_EXIT -eq 0 ] && [ $AUDIT_EXIT -eq 0 ]; then
+if [ $TSC_EXIT -eq 0 ] && [ $LINT_EXIT -eq 0 ] && [ $TEST_EXIT -eq 0 ] && [ $PORTAL_EXIT -eq 0 ] && [ $SECRET_EXIT -eq 0 ] && [ $AUDIT_EXIT -eq 0 ] && [ $ZERO_TOY_EXIT -eq 0 ]; then
   echo -e "\n${GREEN}${BOLD}🎉 Verification Passed! All automated quality gates are 100% green.${NC}\n"
   exit 0
 else

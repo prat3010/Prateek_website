@@ -25,10 +25,11 @@ import { FeatureStudioPanel } from "@/components/rag/FeatureStudioPanel";
 import { EdgeSyncPanel } from "@/components/rag/EdgeSyncPanel";
 import { MultiCloudPanel } from "@/components/rag/MultiCloudPanel";
 import { VoiceStudioPanel } from "@/components/rag/VoiceStudioPanel";
+import { McpPanel } from "@/components/rag/McpPanel";
 import { RagErrorBoundary } from "@/components/rag/ErrorBoundary";
 import styles from "@/components/rag/rag.module.css";
 
-type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "workflows" | "rlm" | "agentic" | "prompts" | "gateway" | "guardrails" | "config" | "team" | "integrations" | "feature-studio" | "edge" | "multicloud" | "voice";
+type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "workflows" | "rlm" | "agentic" | "prompts" | "gateway" | "guardrails" | "config" | "team" | "integrations" | "feature-studio" | "edge" | "multicloud" | "voice" | "mcp";
 
 export default function RagAppStudioPage() {
   const router = useRouter();
@@ -124,6 +125,7 @@ export default function RagAppStudioPage() {
     { id: "edge", label: "Sovereign Edge Sync", icon: "💾" },
     { id: "multicloud", label: "Multi-Cloud & Turso LibSQL", icon: "🌐" },
     { id: "voice", label: "Sovereign Edge Voice", icon: "🎙️" },
+    { id: "mcp", label: "Model Context Protocol (MCP)", icon: "🔌" },
   ];
 
   return (
@@ -273,6 +275,7 @@ export default function RagAppStudioPage() {
             <EdgeSyncPanel client={client} hidden={activeTab !== "edge"} />
             <MultiCloudPanel client={client} tenantId={tenantId} hidden={activeTab !== "multicloud"} />
             <VoiceStudioPanel client={client} tenantId={tenantId} hidden={activeTab !== "voice"} />
+            <McpPanel client={client} tenantId={tenantId} hidden={activeTab !== "mcp"} isExpired={trialDaysRemaining <= 0} />
 
           </RagErrorBoundary>
         </main>

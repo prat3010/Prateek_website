@@ -1,5 +1,5 @@
 # 🏛️ Master Architecture Knowledge Graph Index
-**Total Registered Architecture Nodes:** 148 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
+**Total Registered Architecture Nodes:** 150 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
 
 ## ⚡ Quick Navigation
 - [Master Architecture Visual Canvas](MASTER_ARCHITECTURE_MAP.canvas)
@@ -13,7 +13,7 @@
   - [Runbook: RAG Tenant Onboarding](runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)
 ---
 
-### 🔹 1. FRONTEND: Portfolio & Adaptive Identity (18 Nodes)
+### 🔹 1. FRONTEND: Portfolio & Adaptive Identity (19 Nodes)
 
 | Node ID | Title / Component | Blast Radius | Security Auth | Specification File |
 | :--- | :--- | :---: | :---: | :--- |
@@ -29,6 +29,7 @@
 | `UI_EdgeSwarmPanel` | **UI: `EdgePanel.tsx` (Sovereign Edge Swarm Studio)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_EdgeSwarmPanel.md](architecture_nodes/UI_EdgeSwarmPanel.md) |
 | `UI_GatewayPanel` | **UI Component: `GatewayPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_GatewayPanel.md](architecture_nodes/UI_GatewayPanel.md) |
 | `UI_IntegrationsPanel` | **UI Component: `IntegrationsPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_IntegrationsPanel.md](architecture_nodes/UI_IntegrationsPanel.md) |
+| `UI_McpPanel` | **UI: `McpPanel.tsx` (Universal Model Context Protocol Center)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_McpPanel.md](architecture_nodes/UI_McpPanel.md) |
 | `UI_NoirSkyline` | **UI: `NoirSkyline.tsx` (6-Layer Parallax Backdrop)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_NoirSkyline.md](architecture_nodes/UI_NoirSkyline.md) |
 | `UI_PromptOptimizationPanel` | **UI Component: `PromptOptimizationPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_PromptOptimizationPanel.md](architecture_nodes/UI_PromptOptimizationPanel.md) |
 | `UI_RlmStudioPanel` | **UI Component: `RlmStudioPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_RlmStudioPanel.md](architecture_nodes/UI_RlmStudioPanel.md) |
@@ -118,7 +119,7 @@
 | `Lib_skills` | **Lib: `skills.ts` (Persona Filter & Narrative Mapper)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Lib_skills.md](architecture_nodes/Lib_skills.md) |
 | `UI_CommercialPDFSuite` | **UI: `pdfTheme.ts`, `pdfFonts.ts` & React-PDF Exporters** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_CommercialPDFSuite.md](architecture_nodes/UI_CommercialPDFSuite.md) |
 
-### 🔹 6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPIs (53 Nodes)
+### 🔹 6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPIs (54 Nodes)
 
 | Node ID | Title / Component | Blast Radius | Security Auth | Specification File |
 | :--- | :--- | :---: | :---: | :--- |
@@ -162,6 +163,7 @@
 | `Retriever_API_v1_gateway` | **Retriever API: `apps/api/src/routers/gateway.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_gateway.md](architecture_nodes/Retriever_API_v1_gateway.md) |
 | `Retriever_API_v1_health` | **Retriever API: `apps/api/src/routers/health.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_health.md](architecture_nodes/Retriever_API_v1_health.md) |
 | `Retriever_API_v1_integrations` | **Retriever API: `apps/api/src/routers/integrations.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_integrations.md](architecture_nodes/Retriever_API_v1_integrations.md) |
+| `Retriever_API_v1_mcp` | **Retriever API: `/v1/mcp` (Model Context Protocol JSON-RPC & SSE)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_mcp.md](architecture_nodes/Retriever_API_v1_mcp.md) |
 | `Retriever_API_v1_multicloud` | **Retriever API: `apps/api/src/routers/multicloud.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_multicloud.md](architecture_nodes/Retriever_API_v1_multicloud.md) |
 | `Retriever_API_v1_payments` | **Retriever API: `apps/api/src/routers/payments.py`** | 🔴 `CRITICAL` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_payments.md](architecture_nodes/Retriever_API_v1_payments.md) |
 | `Retriever_API_v1_persona` | **Retriever API: `apps/api/src/routers/persona.py`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Retriever_API_v1_persona.md](architecture_nodes/Retriever_API_v1_persona.md) |
