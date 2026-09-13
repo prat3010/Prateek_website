@@ -1122,6 +1122,136 @@ export interface McpToolExecutionResult {
   meta?: Record<string, unknown>;
 }
 
+// ── Milestone 104: Autonomous ReAct Tool Loop & Streaming Traces ──────────
+
+export type ReActEventType =
+  | "thought"
+  | "tool_start"
+  | "tool_done"
+  | "self_healing"
+  | "circuit_breaker"
+  | "model_escalation"
+  | "final_answer"
+  | "error";
+
+export interface ReActStreamEvent {
+  event_id: string;
+  event_type: ReActEventType;
+  step_index: number;
+  state: string;
+  data: {
+    thought?: string;
+    call_id?: string;
+    tool_name?: string;
+    arguments?: Record<string, unknown>;
+    output?: string;
+    is_error?: boolean;
+    latency_ms?: number;
+    error?: string;
+    recovery_action?: string;
+    repeated_count?: number;
+    warning?: string;
+    final_answer?: string;
+    total_steps?: number;
+    execution_time_ms?: number;
+    circuit_breaker_triggered?: boolean;
+    status?: string;
+    step?: number;
+    max_turns?: number;
+    from_model?: string;
+    to_model?: string;
+    reason?: string;
+    details?: string;
+    tier?: string;
+  };
+  timestamp: string;
+}
+
+export interface ReActTraceStep {
+  stepIndex: number;
+  thought?: string;
+  toolCall?: {
+    toolName: string;
+    arguments: Record<string, unknown>;
+  };
+  toolResult?: {
+    toolName: string;
+    output: string;
+    isError: boolean;
+    latencyMs?: number;
+    selfHealingApplied?: boolean;
+  };
+  selfHealing?: {
+    toolName: string;
+    error: string;
+    recoveryAction: string;
+  };
+  circuitBreaker?: {
+    toolName: string;
+    warning: string;
+  };
+  modelEscalation?: {
+    fromModel: string;
+    toModel: string;
+    reason: string;
+    details?: string;
+  };
+}
+
+// ── Milestone 105: Smart Tool Gateway & Multi-Model Economic Orchestrator ──
+
+export type ModelTier = "mid_tier" | "frontier";
+
+export type EscalationReason =
+  | "step_count_threshold"
+  | "unrecovered_tool_exception"
+  | "self_healing_failed"
+  | "circuit_breaker_warning"
+  | "ambiguous_output"
+  | "direct_override";
+
+export interface TaskComplexity {
+  score: number;
+  tier_assigned: ModelTier;
+  estimated_steps: number;
+  rationale: string;
+  requires_code_execution: boolean;
+  requires_multi_hop: boolean;
+  requires_mathematical_synthesis: boolean;
+}
+
+export interface EconomicLedgerRecord {
+  tenant_id: string;
+  thread_id: string;
+  query_preview: string;
+  mid_tier_tokens: number;
+  frontier_tokens: number;
+  total_tokens: number;
+  actual_cost_usd: number;
+  counterfactual_frontier_cost_usd: number;
+  net_savings_usd: number;
+  savings_percentage: number;
+  escalated: boolean;
+  escalation_reason?: EscalationReason | null;
+  timestamp: string;
+}
+
+export interface EconomicLedgerSummary {
+  tenant_id: string;
+  total_queries: number;
+  total_tokens: number;
+  mid_tier_query_count: number;
+  frontier_query_count: number;
+  escalated_query_count: number;
+  mid_tier_share_percentage: number;
+  escalation_rate_percentage: number;
+  total_actual_cost_usd: number;
+  total_counterfactual_cost_usd: number;
+  total_savings_usd: number;
+  average_savings_percentage: number;
+  records: EconomicLedgerRecord[];
+}
+
 
 
 

@@ -619,6 +619,38 @@ This document serves as the registry of critical architectural design decisions 
 
 ---
 
+# **ADR 39: Autonomous Multi-Turn ReAct Tool Loop & Self-Healing Execution Engine (Milestone 104)**
+
+* **Status**: Approved & Implemented
+* **Context**: Complex customer queries and cognitive retrieval tasks often require iterative deduction, parameter adjustment, and multi-step tool execution. Single-shot RAG either fails on missing context or returns unverified hallucinations. When tool execution fails due to transient API issues, bad arguments, or database timeouts, traditional systems abort immediately. Additionally, generative LLMs often get caught in infinite repetitive tool invocation loops without progress.
+* **Decision**: Architected the Autonomous ReAct cyclic state machine and self-healing engine as **Platform Battery #23** (`react_engine.py`, `POST /v1/tenants/{tenantId}/agentic/stream`, `ChatPanel.tsx`):
+  1. Pure Hexagonal Domain Engine: Cyclic state machine (`REASONING` $\to$ `SELECTING_TOOL` $\to$ `EXECUTING_BATTERY` $\to$ `OBSERVING` $\to$ `EVALUATING_COMPLETION`) in `src/domain/abstractions/react.py`.
+  2. Cryptographic Anti-Loop Circuit Breaker: Tracks tool invocation signatures via SHA-256 hashes of `(tool_name, sorted_json_args)`. If repeated count $\ge 2$, trips the circuit breaker and injects advisory guidance to prevent infinite loops.
+  3. Self-Healing Exception Interception: Catches runtime tool errors, marks `self_healing_applied = True`, and injects structured diagnostic prompts back to the model for autonomous recovery.
+  4. Real-Time SSE Streaming Observability: Emits typed SSE events (`thought`, `tool_start`, `tool_done`, `self_healing`, `circuit_breaker`, `final_answer`, `[DONE]`) consumed by the web studio with live collapsible step traces, timing, and badges.
+  5. Deterministic Safety Guards: Enforces hard turn caps ($\le 8$) and timeout boundaries ($30\text{s}$) to guarantee bounded latency and token consumption.
+* **Consequences**:
+  * **Pros**: Transparent multi-step cognitive problem solving; self-healing resilience against transient tool failures; zero runaway loops; real-time user observability.
+  * **Cons**: Multi-turn agentic loops consume more token context and execution time than single-turn direct RAG.
+
+---
+
+# **ADR 40: Smart Tool Gateway & Multi-Model Economic Orchestrator (Milestone 105)**
+
+* **Status**: Approved & Implemented
+* **Context**: Routing every user query or agent turn to a frontier foundation model (e.g. Claude 3.5 Sonnet or GPT-4o at ~$5.00/1K tokens) imposes extreme operating costs on enterprise tenants. Conversely, routing indiscriminately to low-cost mid-tier models (e.g. Gemini 2.5 Flash at ~$0.15/1K tokens) fails on complex forensic analysis, mathematical synthesis, code debugging, or multi-turn error recovery. Tenants require an automated economic router that pre-classifies task difficulty, routes routine tasks to mid-tier models, seamlessly escalates to frontier models mid-flight when needed, and accounts for verified counterfactual cost savings.
+* **Decision**: Architected the Smart Tool Gateway & Economic Orchestrator as **Platform Battery #24** (`smart_tool_router.py`, `economic_orchestrator.py`, `GatewayPanel.tsx`, `ChatPanel.tsx`):
+  1. Pure Hexagonal Domain Models: Defined `ModelTier`, `TaskComplexity`, `EscalationReason`, `EconomicLedgerRecord`, `EconomicLedgerSummary`, and `EconomicOrchestratorProtocol` in `src/domain/abstractions/economic_orchestrator.py` with zero framework dependencies.
+  2. Heuristic Complexity Pre-Classification: Fast indicator evaluator scoring context length, code execution requirements, multi-hop forensic comparisons, and mathematical synthesis to route queries ($\le 0.65 \implies \text{MID\_TIER}, > 0.65 \implies \text{FRONTIER}$).
+  3. Dynamic Mid-Flight Escalation Decider: Automatically escalates active mid-tier threads to frontier reasoning upon step count threshold ($\ge 3$), anti-loop circuit breaker trips, or persistent tool errors following self-healing diagnostics.
+  4. Real-Time Counterfactual Economic Accounting: Computes actual token expenditure across tiers against the counterfactual cost of pure frontier execution, recording net savings in a per-tenant circular buffer.
+  5. Live SaaS Studio Telemetry: Exposed `/v1/tenants/{tenantId}/agentic/gateway/ledger` and `/classify` consumed by `GatewayPanel.tsx` (with `@number-flow/react` animated savings counters, 4-stat metrics grid, and interactive Complexity Lab) and `ChatPanel.tsx` (with `⚡ Escalated to Frontier` trace badges).
+* **Consequences**:
+  * **Pros**: Up to ~95% token cost reduction on standard workloads (~85% mid-tier share); zero-interruption execution continuity when tasks escalate; transparent counterfactual proof of economic ROI.
+  * **Cons**: Escalated threads incur minor token reloading overhead when switching models mid-flight.
+
+---
+
 # **Acceptance Criteria**
 - Registry records cover the core v2 architectural choices.
 - Format follows standard ADR structures (Context, Decision, Consequences).

@@ -180,8 +180,11 @@ The revamped `/rag/app` uses a modern **SaaS Left Sidebar + Dedicated Sub-Views 
 - **🎯 Metric-Driven Optimization:** Automated teleprompter runs (`BootstrapFewShot` & `MIPROv2`) evaluating candidate few-shot exemplars against faithfulness and ground-truth validation scores.
 - **⚡ Production Hot-Activation:** Versioned program persistence with 1-click activation and dynamic exemplar injection into runtime RAG queries.
 
-#### View 11: Enterprise LLM Gateway & Smart Router (`GatewayPanel` — Milestone 93)
-- **🔀 Multi-Provider Routing:** Unified gateway layer across OpenAI, Anthropic, Gemini, Groq, and local Ollama endpoints.
+#### View 11: Enterprise LLM Gateway & Smart Tool Economic Orchestrator (`GatewayPanel` — Milestones 93 & 105)
+- **🔀 Multi-Provider Routing & Complexity Pre-Classification:** Unified gateway layer across OpenAI, Anthropic, Gemini, Groq, and local Ollama endpoints with dynamic task complexity pre-classification ($\le 0.65$ routes to cost-effective mid-tier models like Gemini 3.6 Flash / Claude 3.5 Haiku, while $> 0.65$ routes to frontier reasoning models).
+- **📈 Counterfactual Arbitrage Ledger:** Real-time financial ledger tracking baseline frontier costs vs actual execution costs, displaying cumulative enterprise net dollar savings with `@number-flow/react` animated tickers and transaction ledgers.
+- **⚡ Mid-Flight Escalation Decider & Circuit Breaking:** Autonomous mid-flight model elevation when agentic loops exceed depth thresholds ($\ge 3$ turns), cyclic tool loops are detected, or persistent errors occur, emitting streaming `model_escalation` SSE events with visual trace badges in Chat Studio.
+- **🧪 Interactive Task Complexity Lab:** Tenant-isolated simulation sandbox for testing prompt routing decisions, confidence scores, and estimated arbitrage before production execution.
 - **🔄 Dynamic Fallback Cascades:** Automated failover cascades on HTTP 429 rate limits or provider downtime.
 - **💳 Virtual Tenant Budgets:** Hard/soft monthly and daily cost caps with configurable fallback behavior.
 

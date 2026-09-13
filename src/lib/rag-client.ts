@@ -431,6 +431,84 @@ export class RetrieverClient {
     );
   }
 
+  async streamAgenticWorkflow(
+    prompt: string,
+    onEvent: (event: import("./rag-types").ReActStreamEvent) => void,
+    signal?: AbortSignal,
+    options?: {
+      maxTurns?: number;
+      timeoutSeconds?: number;
+      allowedTools?: string[];
+    }
+  ): Promise<string> {
+    const url = `${this.config.apiUrl.replace(/\/$/, "")}/v1/tenants/${this.config.tenantId}/agentic/stream`;
+    const validUserId = requireUserId(this.config.userId);
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${this.config.apiKey}`,
+      "X-User-ID": validUserId,
+      Accept: "text/event-stream",
+    };
+    if (this.config.llmKey) headers["X-LLM-Key"] = this.config.llmKey;
+    if (this.config.llmProvider) headers["X-LLM-Provider"] = this.config.llmProvider;
+
+    const res = await fetchWithRetry(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        prompt,
+        max_turns: options?.maxTurns ?? 8,
+        timeout_seconds: options?.timeoutSeconds ?? 30.0,
+        allowed_tools: options?.allowedTools,
+      }),
+      signal,
+    });
+
+    if (!res.ok) {
+      const errText = await res.text().catch(() => "Unknown error");
+      throw new Error(`ReAct stream failed (${res.status}): ${errText}`);
+    }
+
+    const reader = res.body?.getReader();
+    if (!reader) throw new Error("No response body from ReAct stream");
+
+    const decoder = new TextDecoder();
+    let finalAnswer = "";
+    let buffer = "";
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed.startsWith("data:")) continue;
+          const dataStr = trimmed.replace(/^data:\s*/, "");
+          if (dataStr === "[DONE]") break;
+
+          try {
+            const eventObj = JSON.parse(dataStr) as import("./rag-types").ReActStreamEvent;
+            onEvent(eventObj);
+            if (eventObj.event_type === "final_answer" && eventObj.data?.final_answer) {
+              finalAnswer = eventObj.data.final_answer;
+            }
+          } catch {
+            // ignore malformed frame
+          }
+        }
+      }
+    } finally {
+      reader.releaseLock();
+    }
+
+    return finalAnswer;
+  }
+
   async resumeAgentWorkflow(
     threadId: string,
     decision: import("./rag-types").HITLApprovalDecision
@@ -465,6 +543,33 @@ export class RetrieverClient {
           target_checkpoint_id: checkpointId,
           fork,
         }),
+      }
+    );
+  }
+
+  async getAgenticEconomicLedger(
+    signal?: AbortSignal
+  ): Promise<import("./rag-types").EconomicLedgerSummary> {
+    return this.request<import("./rag-types").EconomicLedgerSummary>(
+      `/v1/tenants/${this.config.tenantId}/agentic/gateway/ledger`,
+      { signal }
+    );
+  }
+
+  async classifyAgenticComplexity(
+    query: string,
+    allowedTools?: string[],
+    signal?: AbortSignal
+  ): Promise<import("./rag-types").TaskComplexity> {
+    return this.request<import("./rag-types").TaskComplexity>(
+      `/v1/tenants/${this.config.tenantId}/agentic/gateway/classify`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          query,
+          allowed_tools: allowedTools,
+        }),
+        signal,
       }
     );
   }

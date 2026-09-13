@@ -1,13 +1,16 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import NumberFlow from "@number-flow/react";
 import { RetrieverClient } from "@/lib/rag-client";
 import {
+  EconomicLedgerSummary,
   GatewayModelInfo,
   GatewayProbeResult,
   LoraAdapterMetadata,
   ServerlessCostComparison,
   ServerlessDeploymentStatus,
+  TaskComplexity,
   TenantGatewayRoutesResponse,
   VirtualTenantBudget,
   WarmBootMetrics,
@@ -49,18 +52,26 @@ export function GatewayPanel({ client, hidden }: GatewayPanelProps) {
   const [serverlessProbing, setServerlessProbing] = useState(false);
   const [activatingLoraId, setActivatingLoraId] = useState<string | null>(null);
 
+  // Milestone 105: Multi-Model Economic Orchestration State
+  const [economicLedger, setEconomicLedger] = useState<EconomicLedgerSummary | null>(null);
+  const [complexityPrompt, setComplexityPrompt] = useState("");
+  const [classifyingComplexity, setClassifyingComplexity] = useState(false);
+  const [complexityResult, setComplexityResult] = useState<TaskComplexity | null>(null);
+  const [complexityError, setComplexityError] = useState<string | null>(null);
+
   const loadData = useCallback(async () => {
     if (!client) return;
     setLoading(true);
     setError(null);
     try {
-      const [modelsData, routesData, budgetData, serverlessData, costData, lorasData] = await Promise.all([
+      const [modelsData, routesData, budgetData, serverlessData, costData, lorasData, ledgerData] = await Promise.all([
         client.getGatewayModels(),
         client.getTenantGatewayRoutes(),
         client.getTenantGatewayBudget(),
         client.getServerlessStatus ? Promise.resolve(client.getServerlessStatus()).catch(() => null) : Promise.resolve(null),
         client.getServerlessCostSavings ? Promise.resolve(client.getServerlessCostSavings(15.0, "A10G")).catch(() => null) : Promise.resolve(null),
         client.getTenantLoraAdapters ? Promise.resolve(client.getTenantLoraAdapters()).catch(() => null) : Promise.resolve(null),
+        client.getAgenticEconomicLedger ? Promise.resolve(client.getAgenticEconomicLedger()).catch(() => null) : Promise.resolve(null),
       ]);
       setModels(modelsData || []);
       setRoutes(routesData || null);
@@ -68,6 +79,7 @@ export function GatewayPanel({ client, hidden }: GatewayPanelProps) {
       if (serverlessData) setServerlessStatus(serverlessData);
       if (costData) setServerlessCost(costData);
       if (lorasData) setLoraAdapters(lorasData);
+      if (ledgerData) setEconomicLedger(ledgerData);
 
       if (routesData?.gateway_settings) {
         const gw = routesData.gateway_settings;
@@ -286,6 +298,23 @@ export function GatewayPanel({ client, hidden }: GatewayPanelProps) {
       setError(err instanceof Error ? err.message : "Failed to toggle LoRA adapter.");
     } finally {
       setActivatingLoraId(null);
+    }
+  };
+
+  const handleClassifyPrompt = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!client || !complexityPrompt.trim()) return;
+    setClassifyingComplexity(true);
+    setComplexityError(null);
+    try {
+      if (client.classifyAgenticComplexity) {
+        const res = await client.classifyAgenticComplexity(complexityPrompt.trim());
+        setComplexityResult(res);
+      }
+    } catch (err: unknown) {
+      setComplexityError(err instanceof Error ? err.message : "Classification failed");
+    } finally {
+      setClassifyingComplexity(false);
     }
   };
 
@@ -542,6 +571,276 @@ export function GatewayPanel({ client, hidden }: GatewayPanelProps) {
               : "Alerts emitted without blocking traffic"}
           </div>
         </div>
+      </div>
+
+      {/* Milestone 105: Multi-Model Economic Orchestrator & Smart Tool Gateway */}
+      <div
+        style={{
+          padding: "1.5rem",
+          borderRadius: "8px",
+          background: "var(--surface-elevated)",
+          border: "1px solid var(--color-border)",
+          marginBottom: "1.5rem",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.25rem", flexWrap: "wrap", gap: "0.75rem" }}>
+          <div>
+            <h3 style={{ fontSize: "1.125rem", fontWeight: 700, color: "var(--color-text)", margin: 0 }}>
+              Multi-Model Economic Orchestrator & Smart Tool Gateway
+            </h3>
+            <p style={{ fontSize: "0.8125rem", color: "var(--color-text-muted)", margin: "0.25rem 0 0" }}>
+              Dynamic complexity pre-classification, mid-flight reasoning escalation, and counterfactual cost arbitrage.
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+            <span
+              style={{
+                fontSize: "0.75rem",
+                padding: "0.25rem 0.6rem",
+                borderRadius: "4px",
+                background: "var(--surface-card)",
+                border: "1px solid var(--color-border)",
+                color: "var(--color-primary)",
+                fontWeight: 600,
+              }}
+            >
+              Mid-Tier: Gemini 2.5 Flash ($0.15/1K)
+            </span>
+            <span
+              style={{
+                fontSize: "0.75rem",
+                padding: "0.25rem 0.6rem",
+                borderRadius: "4px",
+                background: "var(--surface-card)",
+                border: "1px solid var(--color-border)",
+                color: "var(--color-text)",
+                fontWeight: 600,
+              }}
+            >
+              Frontier: Claude 3.5 Sonnet ($5.00/1K)
+            </span>
+          </div>
+        </div>
+
+        {/* 4-Stat Metrics Grid */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            gap: "1rem",
+            marginBottom: "1.25rem",
+          }}
+        >
+          <div
+            style={{
+              padding: "1rem",
+              borderRadius: "6px",
+              background: "var(--surface-card)",
+              border: "1px solid var(--color-border)",
+            }}
+          >
+            <div style={{ fontSize: "0.72rem", color: "var(--color-text-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+              Net Arbitrage Savings
+            </div>
+            <div style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--color-primary)", margin: "0.35rem 0" }}>
+              $<NumberFlow value={economicLedger?.total_savings_usd ?? 0} format={{ minimumFractionDigits: 2, maximumFractionDigits: 4 }} />
+            </div>
+            <div style={{ fontSize: "0.72rem", color: "var(--color-text-muted)" }}>
+              vs Frontier Baseline (${(economicLedger?.total_counterfactual_cost_usd ?? 0).toFixed(2)})
+            </div>
+          </div>
+
+          <div
+            style={{
+              padding: "1rem",
+              borderRadius: "6px",
+              background: "var(--surface-card)",
+              border: "1px solid var(--color-border)",
+            }}
+          >
+            <div style={{ fontSize: "0.72rem", color: "var(--color-text-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+              Mid-Tier Workload Share
+            </div>
+            <div style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--color-text)", margin: "0.35rem 0" }}>
+              <NumberFlow value={economicLedger?.mid_tier_share_percentage ?? 0} format={{ maximumFractionDigits: 1 }} />%
+            </div>
+            <div style={{ fontSize: "0.72rem", color: "var(--color-text-muted)" }}>
+              {economicLedger?.mid_tier_query_count ?? 0} / {economicLedger?.total_queries ?? 0} routed to mid-tier
+            </div>
+          </div>
+
+          <div
+            style={{
+              padding: "1rem",
+              borderRadius: "6px",
+              background: "var(--surface-card)",
+              border: "1px solid var(--color-border)",
+            }}
+          >
+            <div style={{ fontSize: "0.72rem", color: "var(--color-text-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+              Mid-Flight Escalation Rate
+            </div>
+            <div style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--color-text)", margin: "0.35rem 0" }}>
+              <NumberFlow value={economicLedger?.escalation_rate_percentage ?? 0} format={{ maximumFractionDigits: 1 }} />%
+            </div>
+            <div style={{ fontSize: "0.72rem", color: "var(--color-text-muted)" }}>
+              {economicLedger?.escalated_query_count ?? 0} threads escalated to frontier
+            </div>
+          </div>
+
+          <div
+            style={{
+              padding: "1rem",
+              borderRadius: "6px",
+              background: "var(--surface-card)",
+              border: "1px solid var(--color-border)",
+            }}
+          >
+            <div style={{ fontSize: "0.72rem", color: "var(--color-text-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+              Effective Cost Reduction
+            </div>
+            <div style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--color-primary)", margin: "0.35rem 0" }}>
+              <NumberFlow value={economicLedger?.average_savings_percentage ?? 0} format={{ maximumFractionDigits: 1 }} />%
+            </div>
+            <div style={{ fontSize: "0.72rem", color: "var(--color-text-muted)" }}>
+              Spend: ${(economicLedger?.total_actual_cost_usd ?? 0).toFixed(2)}
+            </div>
+          </div>
+        </div>
+
+        {/* Interactive Complexity Lab */}
+        <div
+          style={{
+            padding: "1rem",
+            borderRadius: "6px",
+            background: "var(--surface-card)",
+            border: "1px solid var(--color-border)",
+          }}
+        >
+          <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--color-text)", marginBottom: "0.5rem" }}>
+            Interactive Task Complexity Lab & Tier Pre-Classifier
+          </div>
+          <form onSubmit={handleClassifyPrompt} style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+            <input
+              type="text"
+              value={complexityPrompt}
+              onChange={(e) => setComplexityPrompt(e.target.value)}
+              placeholder="e.g. Write a python script to calculate compound interest and debug memory..."
+              className={styles.inputField}
+              style={{ flex: "1 1 320px" }}
+            />
+            <button
+              type="submit"
+              disabled={classifyingComplexity || !complexityPrompt.trim()}
+              className={styles.primaryBtn}
+              style={{ padding: "0.5rem 1rem", fontSize: "0.8125rem" }}
+            >
+              {classifyingComplexity ? "Classifying..." : "Analyze Complexity"}
+            </button>
+          </form>
+
+          {complexityError && (
+            <div style={{ fontSize: "0.75rem", color: "var(--badge-danger-text)", marginTop: "0.5rem" }}>
+              {complexityError}
+            </div>
+          )}
+
+          {complexityResult && (
+            <div
+              style={{
+                marginTop: "0.75rem",
+                padding: "0.75rem",
+                borderRadius: "4px",
+                background: "var(--surface-elevated)",
+                border: "1px solid var(--color-border)",
+                fontSize: "0.8rem",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap", marginBottom: "0.5rem" }}>
+                <span
+                  data-testid="complexity-result-badge"
+                  style={{
+                    fontWeight: 700,
+                    padding: "0.2rem 0.5rem",
+                    borderRadius: "3px",
+                    background: complexityResult.tier_assigned === "frontier" ? "var(--badge-danger-bg)" : "var(--badge-draft-bg)",
+                    color: complexityResult.tier_assigned === "frontier" ? "var(--badge-danger-text)" : "var(--color-primary)",
+                    border: `1px solid ${complexityResult.tier_assigned === "frontier" ? "var(--badge-danger-border)" : "var(--color-primary)"}`,
+                    fontSize: "0.75rem",
+                  }}
+                >
+                  {complexityResult.tier_assigned === "frontier" ? "⚡ Frontier Model" : "✓ Mid-Tier Model"}
+                </span>
+                <span style={{ color: "var(--color-text-muted)" }}>
+                  Score: <strong>{complexityResult.score.toFixed(2)}</strong> (Est. {complexityResult.estimated_steps} {complexityResult.estimated_steps === 1 ? "step" : "steps"})
+                </span>
+                {complexityResult.requires_code_execution && (
+                  <span className={styles.badgeCircuitBreaker}>Code Execution</span>
+                )}
+                {complexityResult.requires_multi_hop && (
+                  <span className={styles.badgeSelfHealing}>Multi-Hop</span>
+                )}
+                {complexityResult.requires_mathematical_synthesis && (
+                  <span className={styles.badgeEscalation}>Math Synthesis</span>
+                )}
+              </div>
+              <div style={{ color: "var(--color-text-muted)", fontSize: "0.75rem" }}>
+                {complexityResult.rationale}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Recent Economic Ledger Transactions */}
+        {economicLedger?.records && economicLedger.records.length > 0 && (
+          <div style={{ marginTop: "1rem" }}>
+            <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--color-text)", marginBottom: "0.5rem" }}>
+              Recent Economic Ledger Transactions
+            </div>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", fontSize: "0.75rem", borderCollapse: "collapse" }}>
+                <thead>
+                  <tr style={{ borderBottom: "1px solid var(--color-border)", color: "var(--color-text-muted)", textAlign: "left" }}>
+                    <th style={{ padding: "0.4rem 0.5rem" }}>Thread ID</th>
+                    <th style={{ padding: "0.4rem 0.5rem" }}>Query</th>
+                    <th style={{ padding: "0.4rem 0.5rem" }}>Tokens</th>
+                    <th style={{ padding: "0.4rem 0.5rem" }}>Actual Spend</th>
+                    <th style={{ padding: "0.4rem 0.5rem" }}>Counterfactual</th>
+                    <th style={{ padding: "0.4rem 0.5rem" }}>Net Savings</th>
+                    <th style={{ padding: "0.4rem 0.5rem" }}>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {economicLedger.records.slice(-5).reverse().map((rec) => (
+                    <tr key={rec.thread_id} style={{ borderBottom: "1px solid var(--color-border)" }}>
+                      <td style={{ padding: "0.4rem 0.5rem", fontFamily: "var(--font-code, monospace)" }}>
+                        {rec.thread_id.slice(0, 10)}...
+                      </td>
+                      <td style={{ padding: "0.4rem 0.5rem", maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {rec.query_preview}
+                      </td>
+                      <td style={{ padding: "0.4rem 0.5rem" }}>
+                        {rec.total_tokens} ({rec.mid_tier_tokens}m / {rec.frontier_tokens}f)
+                      </td>
+                      <td style={{ padding: "0.4rem 0.5rem" }}>${rec.actual_cost_usd.toFixed(4)}</td>
+                      <td style={{ padding: "0.4rem 0.5rem" }}>${rec.counterfactual_frontier_cost_usd.toFixed(4)}</td>
+                      <td style={{ padding: "0.4rem 0.5rem", color: "var(--color-primary)", fontWeight: 600 }}>
+                        +${rec.net_savings_usd.toFixed(4)} ({rec.savings_percentage.toFixed(1)}%)
+                      </td>
+                      <td style={{ padding: "0.4rem 0.5rem" }}>
+                        {rec.escalated ? (
+                          <span className={styles.badgeEscalation}>Escalated</span>
+                        ) : (
+                          <span style={{ color: "var(--color-primary)", fontSize: "0.7rem" }}>Standard</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Milestone 96: Serverless Dedicated GPU & Dynamic LoRA Cluster */}

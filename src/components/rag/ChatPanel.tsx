@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, ReactNode } from "react";
 import { RetrieverClient } from "@/lib/rag-client";
-import { GroundingDiffResponse, ClaimClassification } from "@/lib/rag-types";
+import { GroundingDiffResponse, ClaimClassification, ReActTraceStep } from "@/lib/rag-types";
 import Portal from "@/components/ui/Portal";
 import styles from "./rag.module.css";
 
@@ -14,6 +14,7 @@ interface ChatMessageItem {
   cached?: boolean;
   latencyMs?: number;
   feedback?: "up" | "down";
+  reactTraces?: ReActTraceStep[];
 }
 
 export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClient | null; hidden: boolean; isExpired?: boolean }) {
@@ -21,6 +22,7 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
   const [messages, setMessages] = useState<Array<ChatMessageItem>>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isAgenticMode, setIsAgenticMode] = useState(false);
   const [error, setError] = useState("");
   const [abortController, setAbortController] = useState<AbortController | null>(null);
   const [isStartingSession, setIsStartingSession] = useState(false);
@@ -215,106 +217,197 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
       const assistantId = ++msgIdCounter.current;
       setMessages((prev) => [...prev, { id: assistantId, role: "assistant", content: "" }]);
 
-      const runStreamAttempt = async (currentEventId?: string): Promise<{ done: boolean; lastId?: string }> => {
-        const body = await client.chat(sessionId, msg, controller.signal, currentEventId);
-        if (!body) {
-          return { done: true, lastId: currentEventId };
+      if (isAgenticMode) {
+        const traceStepsByIndex: Record<number, ReActTraceStep> = {};
+
+        const updateAssistantState = (finalAns?: string) => {
+          const traces = Object.values(traceStepsByIndex).sort((a, b) => a.stepIndex - b.stepIndex);
+          setMessages((prev) => {
+            const last = prev[prev.length - 1];
+            if (last?.role === "assistant" && last.id === assistantId) {
+              return [
+                ...prev.slice(0, -1),
+                {
+                  ...last,
+                  content: finalAns !== undefined ? finalAns : last.content,
+                  reactTraces: traces,
+                },
+              ];
+            }
+            return prev;
+          });
+        };
+
+        const onEvent = (ev: import("@/lib/rag-types").ReActStreamEvent) => {
+          const step = ev.step_index ?? 0;
+          traceStepsByIndex[step] = traceStepsByIndex[step] || { stepIndex: step };
+
+          if (ev.event_type === "thought") {
+            traceStepsByIndex[step].thought = ev.data?.thought || "";
+            updateAssistantState();
+          } else if (ev.event_type === "tool_start") {
+            traceStepsByIndex[step].toolCall = {
+              toolName: ev.data?.tool_name || "tool",
+              arguments: ev.data?.arguments || {},
+            };
+            updateAssistantState();
+          } else if (ev.event_type === "tool_done") {
+            traceStepsByIndex[step].toolResult = {
+              toolName: ev.data?.tool_name || "tool",
+              output: ev.data?.output || "",
+              isError: Boolean(ev.data?.is_error),
+              latencyMs: ev.data?.latency_ms,
+            };
+            updateAssistantState();
+          } else if (ev.event_type === "self_healing") {
+            if (traceStepsByIndex[step].toolResult) {
+              traceStepsByIndex[step].toolResult!.selfHealingApplied = true;
+            }
+            traceStepsByIndex[step].selfHealing = {
+              toolName: ev.data?.tool_name || "",
+              error: ev.data?.error || "",
+              recoveryAction: ev.data?.recovery_action || "",
+            };
+            updateAssistantState();
+          } else if (ev.event_type === "circuit_breaker") {
+            traceStepsByIndex[step].circuitBreaker = {
+              toolName: ev.data?.tool_name || "",
+              warning: ev.data?.warning || "Execution loop detected",
+            };
+            updateAssistantState();
+          } else if (ev.event_type === "model_escalation") {
+            traceStepsByIndex[step].modelEscalation = {
+              fromModel: ev.data?.from_model || "mid_tier",
+              toModel: ev.data?.to_model || "frontier",
+              reason: ev.data?.reason || "step_count_threshold",
+              details: ev.data?.details || "",
+            };
+            updateAssistantState();
+          } else if (ev.event_type === "final_answer") {
+            const ans = ev.data?.final_answer || "";
+            updateAssistantState(ans);
+          } else if (ev.event_type === "error") {
+            const errMsg = ev.data?.error || "Agentic execution error";
+            setError(`Agent Error: ${errMsg}`);
+          }
+        };
+
+        const finalResult = await client.streamAgenticWorkflow(msg, onEvent, controller.signal);
+        if (finalResult) {
+          updateAssistantState(finalResult);
         }
 
-        const reader = body.getReader();
-        const decoder = new TextDecoder();
-        let sseBuffer = "";
-        let streamDone = false;
-        let latestId = currentEventId;
+        setMessages((prev) => {
+          const last = prev[prev.length - 1];
+          if (last?.role === "assistant" && last.id === assistantId) {
+            const traces = Object.values(traceStepsByIndex).sort((a, b) => a.stepIndex - b.stepIndex);
+            const content = last.content.trim() || (traces.length > 0 ? "Agentic task completed." : "No response received from agent.");
+            return [...prev.slice(0, -1), { ...last, content, reactTraces: traces }];
+          }
+          return prev;
+        });
+      } else {
+        const runStreamAttempt = async (currentEventId?: string): Promise<{ done: boolean; lastId?: string }> => {
+          const body = await client.chat(sessionId, msg, controller.signal, currentEventId);
+          if (!body) {
+            return { done: true, lastId: currentEventId };
+          }
 
-        while (!streamDone) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          sseBuffer += decoder.decode(value, { stream: true });
-          const lines = sseBuffer.split("\n");
-          sseBuffer = lines.pop() ?? "";
+          const reader = body.getReader();
+          const decoder = new TextDecoder();
+          let sseBuffer = "";
+          let streamDone = false;
+          let latestId = currentEventId;
 
-          for (const line of lines) {
-            const trimmed = line.trim();
-            if (trimmed.startsWith("id: ")) {
-              latestId = trimmed.slice(4).trim();
-            } else if (trimmed.startsWith("data: ")) {
-              const data = trimmed.slice(6);
-              try {
-                const parsed = JSON.parse(data);
-                if (parsed.id) latestId = String(parsed.id);
-                if (parsed.event === "done") {
-                  streamDone = true;
-                  break;
+          while (!streamDone) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            sseBuffer += decoder.decode(value, { stream: true });
+            const lines = sseBuffer.split("\n");
+            sseBuffer = lines.pop() ?? "";
+
+            for (const line of lines) {
+              const trimmed = line.trim();
+              if (trimmed.startsWith("id: ")) {
+                latestId = trimmed.slice(4).trim();
+              } else if (trimmed.startsWith("data: ")) {
+                const data = trimmed.slice(6);
+                try {
+                  const parsed = JSON.parse(data);
+                  if (parsed.id) latestId = String(parsed.id);
+                  if (parsed.event === "done") {
+                    streamDone = true;
+                    break;
+                  }
+                  if (parsed.event === "error") {
+                    const errMsg = parsed.message || parsed.error || parsed.detail || "Server error during chat stream";
+                    setError(`Stream Error: ${errMsg}`);
+                    streamDone = true;
+                    break;
+                  }
+                  if (parsed.message_id || parsed.cached !== undefined || parsed.latency_ms) {
+                    setMessages((prev) => {
+                      const last = prev[prev.length - 1];
+                      if (last?.role === "assistant" && last.id === assistantId) {
+                        return [
+                          ...prev.slice(0, -1),
+                          {
+                            ...last,
+                            backendMessageId: parsed.message_id || last.backendMessageId,
+                            cached: parsed.cached ?? last.cached,
+                            latencyMs: parsed.latency_ms ?? last.latencyMs,
+                          },
+                        ];
+                      }
+                      return prev;
+                    });
+                  }
+                  const delta = parsed.content ?? parsed.delta ?? "";
+                  if (delta) {
+                    setMessages((prev) => {
+                      const last = prev[prev.length - 1];
+                      if (last?.role === "assistant" && last.id === assistantId) {
+                        return [...prev.slice(0, -1), { ...last, content: last.content + delta }];
+                      }
+                      return prev;
+                    });
+                  }
+                } catch (parseErr) {
+                  console.warn("[SSE] Failed to parse event line:", data, parseErr);
                 }
-                if (parsed.event === "error") {
-                  const errMsg = parsed.message || parsed.error || parsed.detail || "Server error during chat stream";
-                  setError(`Stream Error: ${errMsg}`);
-                  streamDone = true;
-                  break;
-                }
-                if (parsed.message_id || parsed.cached !== undefined || parsed.latency_ms) {
-                  setMessages((prev) => {
-                    const last = prev[prev.length - 1];
-                    if (last?.role === "assistant" && last.id === assistantId) {
-                      return [
-                        ...prev.slice(0, -1),
-                        {
-                          ...last,
-                          backendMessageId: parsed.message_id || last.backendMessageId,
-                          cached: parsed.cached ?? last.cached,
-                          latencyMs: parsed.latency_ms ?? last.latencyMs,
-                        },
-                      ];
-                    }
-                    return prev;
-                  });
-                }
-                const delta = parsed.content ?? parsed.delta ?? "";
-                if (delta) {
-                  setMessages((prev) => {
-                    const last = prev[prev.length - 1];
-                    if (last?.role === "assistant" && last.id === assistantId) {
-                      return [...prev.slice(0, -1), { ...last, content: last.content + delta }];
-                    }
-                    return prev;
-                  });
-                }
-              } catch (parseErr) {
-                console.warn("[SSE] Failed to parse event line:", data, parseErr);
               }
             }
           }
-        }
-        return { done: streamDone, lastId: latestId };
-      };
+          return { done: streamDone, lastId: latestId };
+        };
 
-      let lastEventId: string | undefined = undefined;
-      for (let attempt = 1; attempt <= 3; attempt++) {
-        try {
-          const result = await runStreamAttempt(lastEventId);
-          lastEventId = result.lastId;
-          if (result.done) break;
-        } catch (streamErr) {
-          if (controller.signal.aborted) throw streamErr;
-          if (attempt < 3) {
-            console.warn(`[SSE] Stream disconnected. Reconnecting with Last-Event-ID (${lastEventId || 'none'}), attempt ${attempt}/3...`);
-            await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
-          } else {
-            throw streamErr;
+        let lastEventId: string | undefined = undefined;
+        for (let attempt = 1; attempt <= 3; attempt++) {
+          try {
+            const result = await runStreamAttempt(lastEventId);
+            lastEventId = result.lastId;
+            if (result.done) break;
+          } catch (streamErr) {
+            if (controller.signal.aborted) throw streamErr;
+            if (attempt < 3) {
+              console.warn(`[SSE] Stream disconnected. Reconnecting with Last-Event-ID (${lastEventId || 'none'}), attempt ${attempt}/3...`);
+              await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
+            } else {
+              throw streamErr;
+            }
           }
         }
+
+        setMessages((prev) => {
+          const last = prev[prev.length - 1];
+          if (last?.role === "assistant" && last.id === assistantId) {
+            if (!last.content.trim()) {
+              return [...prev.slice(0, -1), { ...last, content: "No response received from model stream. Please try again." }];
+            }
+          }
+          return prev;
+        });
       }
-
-      setMessages((prev) => {
-        const last = prev[prev.length - 1];
-        if (last?.role === "assistant" && last.id === assistantId) {
-          if (!last.content.trim()) {
-            return [...prev.slice(0, -1), { ...last, content: "No response received from model stream. Please try again." }];
-          }
-        }
-        return prev;
-      });
     } catch (e: unknown) {
       setMessages((prev) => {
         const last = prev[prev.length - 1];
@@ -444,10 +537,20 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
             {isStartingSession ? "Starting Session…" : "Start Session"}
           </button>
         ) : (
-          <span className={styles.sessionBadge}>
-            Session: {sessionId.slice(0, 8)}…
-            <button className="comic-btn comic-btn-outline" style={{ marginLeft: "0.5rem" }} onClick={() => { setSessionId(null); setMessages([]); }}>End</button>
-          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
+            <span className={styles.sessionBadge}>
+              Session: {sessionId.slice(0, 8)}…
+              <button className="comic-btn comic-btn-outline" style={{ marginLeft: "0.5rem" }} onClick={() => { setSessionId(null); setMessages([]); }}>End</button>
+            </span>
+            <button
+              type="button"
+              className={`${styles.modeToggleBtn} ${isAgenticMode ? styles.modeToggleActive : ""}`}
+              onClick={() => setIsAgenticMode(!isAgenticMode)}
+              title={isAgenticMode ? "Switch to standard Direct RAG" : "Switch to Autonomous ReAct Agent Loop"}
+            >
+              {isAgenticMode ? "⚡ ReAct Agent" : "💬 Direct RAG"}
+            </button>
+          </div>
         )}
       </div>
 
@@ -464,7 +567,8 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
             {messages.map((m, index) => {
               const isLast = index === messages.length - 1;
               const isStreamingAssistant = m.role === "assistant" && isLast && loading;
-              const isWaitingFirstToken = isStreamingAssistant && !m.content;
+              const hasTraces = Boolean(m.reactTraces && m.reactTraces.length > 0);
+              const isWaitingFirstToken = isStreamingAssistant && !m.content && !hasTraces;
 
               const hasCitations = /\[(Doc|Source):|\[\d+\]/.test(m.content);
               const hasUngroundedWarning = m.content.includes("ungrounded") || m.content.includes("unverified");
@@ -486,6 +590,82 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
                           ) : m.latencyMs ? (
                             <span className={styles.telemetryBadge}>⏱️ {(m.latencyMs / 1000).toFixed(2)}s</span>
                           ) : null}
+                        </div>
+                      )}
+
+                      {m.role === "assistant" && m.reactTraces && m.reactTraces.length > 0 && (
+                        <div className={styles.reactTraceContainer}>
+                          <details className={styles.reactTraceDetails} open={isStreamingAssistant}>
+                            <summary className={styles.reactTraceSummary}>
+                              <span>⚡ ReAct Trace ({m.reactTraces.length} {m.reactTraces.length === 1 ? "step" : "steps"})</span>
+                              {m.reactTraces.some((t) => t.modelEscalation) && (
+                                <span className={styles.badgeEscalation}>⚡ Frontier Escalation</span>
+                              )}
+                              {m.reactTraces.some((t) => t.selfHealing || t.toolResult?.selfHealingApplied) && (
+                                <span className={styles.badgeSelfHealing}>🩹 Self-Healed</span>
+                              )}
+                              {m.reactTraces.some((t) => t.circuitBreaker) && (
+                                <span className={styles.badgeCircuitBreaker}>🛡️ Circuit Breaker</span>
+                              )}
+                            </summary>
+                            <div className={styles.reactTraceSteps}>
+                              {m.reactTraces.map((trace) => (
+                                <div key={trace.stepIndex} className={styles.reactTraceStep}>
+                                  {trace.modelEscalation && (
+                                    <div className={styles.reactTraceEscalation}>
+                                      <span className={styles.badgeEscalation}>⚡ Escalated to Frontier</span>
+                                      <span>
+                                        {trace.modelEscalation.fromModel} &rarr; {trace.modelEscalation.toModel}
+                                        {trace.modelEscalation.details ? `: ${trace.modelEscalation.details}` : ` (${trace.modelEscalation.reason})`}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {trace.thought && (
+                                    <div className={styles.reactTraceThought}>
+                                      <span className={styles.reactTraceIcon}>💭</span>
+                                      <span>{trace.thought}</span>
+                                    </div>
+                                  )}
+                                  {trace.toolCall && (
+                                    <div className={styles.reactTraceToolCall}>
+                                      <span className={styles.reactTraceIcon}>🛠️</span>
+                                      <span className={styles.reactTraceToolName}>{trace.toolCall.toolName}</span>
+                                      <span className={styles.reactTraceToolArgs}>
+                                        {JSON.stringify(trace.toolCall.arguments)}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {trace.toolResult && (
+                                    <div
+                                      className={`${styles.reactTraceToolResult} ${
+                                        trace.toolResult.isError ? styles.reactTraceError : ""
+                                      }`}
+                                    >
+                                      <span className={styles.reactTraceIcon}>
+                                        {trace.toolResult.isError ? "❌" : "📋"}
+                                      </span>
+                                      <span>{trace.toolResult.output}</span>
+                                      {trace.toolResult.latencyMs !== undefined && (
+                                        <span className={styles.reactTraceLatency}>
+                                          ⏱️ {trace.toolResult.latencyMs}ms
+                                        </span>
+                                      )}
+                                      {trace.toolResult.selfHealingApplied && (
+                                        <span className={styles.badgeSelfHealing} style={{ marginLeft: "auto" }}>
+                                          🩹 Self-Healed
+                                        </span>
+                                      )}
+                                    </div>
+                                  )}
+                                  {trace.circuitBreaker && (
+                                    <div className={styles.reactTraceCircuitBreaker}>
+                                      <span>🛡️ Loop Breaker: {trace.circuitBreaker.warning}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </details>
                         </div>
                       )}
 

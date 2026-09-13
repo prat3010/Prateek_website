@@ -2248,6 +2248,217 @@
   color: var(--color-text-muted);
 }
 
+/* ── Milestone 104: ReAct Execution Traces & Agentic Mode ── */
+
+.modeToggleBtn {
+  font-family: var(--font-code, monospace);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--border-radius-sm, 4px);
+  border: 1px solid var(--color-border);
+  background: var(--surface-card);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.modeToggleBtn:hover {
+  color: var(--color-text);
+  border-color: var(--color-primary);
+}
+
+.modeToggleActive {
+  background: var(--surface-elevated);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  box-shadow: 0 0 8px var(--border-muted);
+}
+
+.reactTraceContainer {
+  margin-bottom: 0.75rem;
+  border-radius: var(--border-radius-sm, 6px);
+  border: 1px solid var(--color-border);
+  background: var(--surface-elevated);
+  overflow: hidden;
+  font-size: 0.78rem;
+}
+
+.reactTraceDetails {
+  width: 100%;
+}
+
+.reactTraceSummary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.75rem;
+  background: var(--surface-card);
+  cursor: pointer;
+  user-select: none;
+  font-weight: 600;
+  font-family: var(--font-code, monospace);
+  color: var(--color-text-muted);
+  border-bottom: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.reactTraceDetails[open] .reactTraceSummary {
+  border-bottom-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.badgeSelfHealing {
+  font-size: 0.65rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  background: var(--badge-draft-bg);
+  color: var(--badge-draft-text);
+  border: 1px solid var(--badge-draft-border);
+  font-weight: 600;
+}
+
+.badgeCircuitBreaker {
+  font-size: 0.65rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  background: var(--badge-danger-bg);
+  color: var(--badge-danger-text);
+  border: 1px solid var(--badge-danger-border);
+  font-weight: 600;
+}
+
+.reactTraceSteps {
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.reactTraceStep {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px dashed var(--color-border);
+}
+
+.reactTraceStep:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.reactTraceThought {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+  font-size: 0.75rem;
+}
+
+.reactTraceIcon {
+  flex-shrink: 0;
+}
+
+.reactTraceToolCall {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  font-family: var(--font-code, monospace);
+  font-size: 0.72rem;
+}
+
+.reactTraceToolName {
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.reactTraceToolArgs {
+  background: var(--surface-card);
+  padding: 0.15rem 0.35rem;
+  border-radius: 3px;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.reactTraceToolResult {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  font-family: var(--font-code, monospace);
+  font-size: 0.72rem;
+  background: var(--surface-card);
+  padding: 0.3rem 0.5rem;
+  border-radius: 3px;
+  color: var(--color-text);
+  border-left: 2px solid var(--color-primary);
+}
+
+.reactTraceError {
+  border-left-color: var(--badge-danger-text);
+  color: var(--badge-danger-text);
+  background: var(--badge-danger-bg);
+}
+
+.reactTraceLatency {
+  margin-left: auto;
+  opacity: 0.6;
+  font-size: 0.68rem;
+}
+
+.reactTraceSelfHealing {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  color: var(--badge-draft-text);
+  background: var(--badge-draft-bg);
+  padding: 0.25rem 0.45rem;
+  border-radius: 3px;
+}
+
+.reactTraceCircuitBreaker {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  color: var(--badge-danger-text);
+  background: var(--badge-danger-bg);
+  padding: 0.25rem 0.45rem;
+  border-radius: 3px;
+}
+
+.badgeEscalation {
+  font-size: 0.65rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 3px;
+  background: var(--badge-draft-bg);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.reactTraceEscalation {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  font-family: var(--font-code, monospace);
+  color: var(--color-text);
+  background: var(--surface-card);
+  padding: 0.35rem 0.6rem;
+  border-radius: 4px;
+  border-left: 3px solid var(--color-primary);
+}
+
 
 
 
