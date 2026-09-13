@@ -45,6 +45,7 @@ This document serves as the registry of critical architectural design decisions 
 * [ADR 35: Multi-Cloud Active-Active Replication & Turso LibSQL Distributed Quorum (Milestone 99)](#adr-35-multi-cloud-active-active-replication--turso-libsql-distributed-quorum-milestone-99)
 * [ADR 36: Sovereign Zero-Cloud Audio Egress Voice Architecture via Local Whisper & WebRTC (Milestone 100)](#adr-36-sovereign-zero-cloud-audio-egress-voice-architecture-via-local-whisper--webrtc-milestone-100)
 * [ADR 37: Zero-Trust Micro-Enclave KMS, Remote Attestation & Volatile Memory Sanitization (Milestone 101)](#adr-37-zero-trust-micro-enclave-kms-remote-attestation--volatile-memory-sanitization-milestone-101)
+* [ADR 38: Autonomous Edge Fleet Swarm Mesh, Epidemic P2P Gossip & Causal Vector Clock Partition Reconciliation (Milestone 102)](#adr-38-autonomous-edge-fleet-swarm-mesh-epidemic-p2p-gossip--causal-vector-clock-partition-reconciliation-milestone-102)
 
 ---
 
@@ -599,6 +600,22 @@ This document serves as the registry of critical architectural design decisions 
 * **Consequences**:
   * **Pros**: Tamper-proof, tenant-bound edge vector and key storage; mathematically verified remote attestation; zero-knowledge memory hygiene protecting against RAM dumps.
   * **Cons**: AES-256-GCM authenticated sealing/unsealing adds ~1ms–2ms encryption overhead per document chunk.
+
+---
+
+# **ADR 38: Autonomous Edge Fleet Swarm Mesh, Epidemic P2P Gossip & Causal Vector Clock Partition Reconciliation (Milestone 102)**
+
+* **Status**: Approved
+* **Context**: Sovereign edge nodes frequently operate across mobile, branch office, or field environments subject to WAN blackouts, network partitions, and intermittent packet loss. Centralized coordination relays create single-point-of-failure vulnerabilities, while naive direct pinging causes false-alarm failovers during asymmetric packet loss. Furthermore, concurrent offline mutations across disconnected edge subgroups risk split-brain data corruption upon reconnection.
+* **Decision**: Implement a fully decentralized peer-to-peer (P2P) edge coordination mesh (Platform Battery #22: `autonomous_swarm_mesh`) delivering:
+  1. SWIM Failure Detection: Direct pings with indirect auxiliary `ping-req` probes ($k=3$) to prevent false suspect churn from asymmetric packet drops.
+  2. Incarnation Refutation: Suspicion rumors broadcast with incarnation $I$ are refuted by live nodes advancing incarnation to $I + 1$ and broadcasting `ALIVE`.
+  3. Lamport Vector Clocks: Causality tracking ($V_A < V_B$, $V_A > V_B$, $V_A = V_B$, $V_A \parallel V_B$) ensuring all edge events maintain causal ordering.
+  4. Push-Pull Anti-Entropy Synchronization: Digest exchange discovering missing sequence numbers and replicating SQLite/vector delta frames in causal sequence.
+  5. Partition-Healing State Reconciliation: Automatically merges diverged network partitions via pairwise vector clock maxima and deterministic Last-Write-Wins (LWW) conflict resolution without split-brain corruption.
+* **Consequences**:
+  * **Pros**: Zero central cloud dependency; resilient edge operation during network blackouts; mathematical causal consistency; 100% completion of Phase M.
+  * **Cons**: Weakly consistent AP model requires anti-entropy synchronization cycles after partition reconnection.
 
 ---
 

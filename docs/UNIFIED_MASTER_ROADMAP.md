@@ -59,7 +59,7 @@ timeline
     Phase J.7 (M85.11–M85.16) : Honest AI Wiring, Trust Hardening & FDE Hiring Credibility : Completed
     Phase K (M86–M90) : Enterprise Scale, Edge Replication & Universal Plugins : Completed
     Phase L (M91–M97) : Forward Deployed Engineering (FDE) Enterprise Agentic Stack : Completed
-    Phase M (M98–M102) : Global Distributed Sovereign Edge & Multi-Cloud Resiliency : In Progress (M98–M101 Complete)
+    Phase M (M98–M102) : Global Distributed Sovereign Edge & Multi-Cloud Resiliency : Completed
 ```
 
 ---
@@ -841,11 +841,12 @@ timeline
 - **Repo Scope:** `retriever` (`apps/api/src/domain/abstractions/swarm.py`, `src/adapters/swarm/gossip_mesh_adapter.py`, `src/routers/swarm.py`)
 - **Deliverable:**
   - **Hexagonal Domain Layer (`abstractions/swarm.py`):** Pure protocols defining `SwarmNode`, `GossipMessage`, `SwarmTopology`, `AntiEntropyProtocol`, and `VectorClock` with Lamport logical timestamp ordering.
-  - **Epidemic P2P Gossip Protocol:** UDP/mDNS local cluster peer discovery, periodic push-pull anti-entropy SQLite frame sync, and SWIM failure detection heartbeats.
-  - **Partition-Healing State Reconciliation:** Automatic partition merge when disconnected edge clusters reconnect, using vector clocks to merge offline mutation ledgers without split-brain corruption.
-  - **FastAPI Endpoints:** Mounted under `/v1/admin/swarm/topology`, `/join`, `/leave`, and `/sync`.
-  - **100% Automated Test Coverage:** Pytest suite validating 5-node cluster convergence, network split recovery, and anti-entropy synchronization.
-- **Status:** **Planned (Phase M / v0.87.0)**
+  - **Epidemic P2P Gossip Protocol:** UDP/mDNS local cluster peer discovery, periodic push-pull anti-entropy SQLite frame sync, and SWIM failure detection heartbeats with incarnation refutation.
+  - **Partition-Healing State Reconciliation:** Automatic partition merge when disconnected edge clusters reconnect, using vector clocks and deterministic Last-Write-Wins (LWW) to merge offline mutation ledgers without split-brain corruption.
+  - **FastAPI Endpoints:** Mounted under `/v1/admin/swarm/topology`, `/join`, `/leave`, `/probe`, `/refute`, `/gossip`, `/sync`, and `/partition-heal`.
+  - **Platform Battery #22 (`autonomous_swarm_mesh`):** Formally registered in `BatteryService` under category `EDGE_DISTRIBUTION` and reflected into Model Context Protocol (MCP) server (`swarm_topology`, `swarm_sync`).
+  - **100% Automated Test Coverage:** Pytest suite validating 5-node cluster convergence, network split recovery, vector clock causality math, and anti-entropy synchronization (10/10 passed).
+- **Status:** **Completed (Phase M / v0.87.0)**
 
 ---
 
