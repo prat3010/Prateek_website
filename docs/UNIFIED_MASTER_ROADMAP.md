@@ -918,10 +918,20 @@ timeline
 - **Libraries:** `pydantic`, `pytest`, `pgvector`, `networkx`
 - **Repo Scope:** Both (`retriever` `apps/api/src/domain/memory/` & `Prateek_website` `src/components/rag/MemoryPanel.tsx`)
 - **Deliverable:**
-  - Episodic & Semantic Memory Synthesis: Offline consolidation daemon compressing multi-turn ReAct interaction traces into high-signal episodic memory nodes.
-  - Long-Horizon Experience Distillation: Dynamic retrieval of prior successful tool traces to prime autonomous reasoning and prevent repetitive problem exploration.
-  - Cross-Session Tenant Personalization: Contextual injection of tenant user preferences, domain jargon, and operational guidelines into system prompts.
-- **Status:** **Planned (Phase N / v0.92.0)**
+  - Episodic & Procedural Memory Synthesis: Offline consolidation daemon compressing multi-turn ReAct interaction traces into high-signal episodic memory nodes and self-healing procedural recovery heuristics.
+  - Mathematical Ebbinghaus Retention Decay: $R(t) = \exp(-\Delta t / (S \times 86400))$ with stability expansion $S \leftarrow 1.5S + 0.5$ on successful downstream priming, with zero-compute pruning for $R < 0.15$.
+  - Long-Horizon Experience Distillation: Pre-loop cognitive guidance query injecting prior successful tool paths into the ReAct reasoning prompt, eliminating redundant exploratory tool calls.
+  - SaaS Studio Operator Experience Lab: Mounted `MemoryPanel.tsx` in `/rag/app` featuring 4-stat metrics grid, interactive Experience Distillation Simulator, and Consolidated Memory Explorer.
+- **Status:** **Completed (Phase N / v0.92.0)**
+
+#### 🤝 Milestone 109: Multi-Agent Swarm Quorum & Dynamic Debate Consensus Engine
+- **Libraries:** `pydantic`, `pytest`, `asyncio`, `networkx`
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/agentic/swarm/` & `Prateek_website` `src/components/rag/SwarmPanel.tsx`)
+- **Deliverable:**
+  - Multi-Agent Specialization Roles: Orchestrate collaborative agent topologies (Planner, Forensic Auditor, Code Synthesizer, Skeptic/Critic) converging on complex multi-hop solutions.
+  - Dynamic Dialectic Debate Protocol: Structured multi-round cross-examination where agents challenge intermediate tool observations and synthesize unified consensus answers.
+  - Quorum Voting & Ambiguity Resolution: Weighted confidence voting for conflicting tool observations, pruning hallucinations before final output emission.
+- **Status:** **Planned (Phase N / v0.93.0)**
 
 
 ---

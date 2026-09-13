@@ -574,6 +574,96 @@ export class RetrieverClient {
     );
   }
 
+  // ── Milestone 108: Cognitive Agent Memory Consolidation & Experience Distillation ────
+
+  async getMemoryStats(
+    signal?: AbortSignal
+  ): Promise<import("./rag-types").MemoryStats> {
+    return this.request<import("./rag-types").MemoryStats>(
+      `/v1/tenants/${this.config.tenantId}/memory/stats`,
+      { signal }
+    );
+  }
+
+  async listMemoryNodes(
+    params?: { type?: import("./rag-types").MemoryType; query?: string; limit?: number },
+    signal?: AbortSignal
+  ): Promise<import("./rag-types").MemoryNode[]> {
+    const searchParams = new URLSearchParams();
+    if (params?.type) searchParams.set("type", params.type);
+    if (params?.query) searchParams.set("query", params.query);
+    if (params?.limit) searchParams.set("limit", params.limit.toString());
+    const queryStr = searchParams.toString() ? `?${searchParams.toString()}` : "";
+    return this.request<import("./rag-types").MemoryNode[]>(
+      `/v1/tenants/${this.config.tenantId}/memory/nodes${queryStr}`,
+      { signal }
+    );
+  }
+
+  async testMemoryGuidance(
+    query: string,
+    limit: number = 3,
+    minSimilarity: number = 0.65,
+    signal?: AbortSignal
+  ): Promise<import("./rag-types").DistilledGuidance> {
+    return this.request<import("./rag-types").DistilledGuidance>(
+      `/v1/tenants/${this.config.tenantId}/memory/guidance`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          query,
+          limit,
+          min_similarity: minSimilarity,
+        }),
+        signal,
+      }
+    );
+  }
+
+  async consolidateMemoryTrace(
+    payload: Omit<import("./rag-types").ConsolidationRequestPayload, "tenant_id">,
+    signal?: AbortSignal
+  ): Promise<import("./rag-types").ConsolidationResponse> {
+    return this.request<import("./rag-types").ConsolidationResponse>(
+      `/v1/tenants/${this.config.tenantId}/memory/consolidate`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          tenant_id: this.config.tenantId,
+          ...payload,
+        }),
+        signal,
+      }
+    );
+  }
+
+  async deleteMemoryNode(
+    nodeId: string,
+    signal?: AbortSignal
+  ): Promise<{ deleted: boolean; node_id: string }> {
+    return this.request<{ deleted: boolean; node_id: string }>(
+      `/v1/tenants/${this.config.tenantId}/memory/nodes/${nodeId}`,
+      {
+        method: "DELETE",
+        signal,
+      }
+    );
+  }
+
+  async pruneMemories(
+    minRetention: number = 0.15,
+    signal?: AbortSignal
+  ): Promise<{ pruned_count: number; min_retention: number }> {
+    return this.request<{ pruned_count: number; min_retention: number }>(
+      `/v1/tenants/${this.config.tenantId}/memory/prune`,
+      {
+        method: "POST",
+        body: JSON.stringify({ min_retention: minRetention }),
+        signal,
+      }
+    );
+  }
+
   // ── Milestone 92: DSPy Declarative Prompt Compilation & Algorithmic Self-Optimization Pipeline ────
 
   async compilePrompt(

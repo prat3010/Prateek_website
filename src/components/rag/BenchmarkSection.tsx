@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { m } from "framer-motion";
 import NumberFlow from "@number-flow/react";
 import TiltCard from "@/components/ui/TiltCard";
 import MagneticButton from "@/components/ui/MagneticButton";

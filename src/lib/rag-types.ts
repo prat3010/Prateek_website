@@ -1252,6 +1252,75 @@ export interface EconomicLedgerSummary {
   records: EconomicLedgerRecord[];
 }
 
+// ============================================================================
+// Milestone 108: Cognitive Agent Memory & Experience Distillation Types
+// ============================================================================
+
+export type MemoryType = "episodic" | "semantic" | "procedural";
+
+export interface MemoryNode {
+  id: string;
+  tenant_id: string;
+  memory_type: MemoryType;
+  query: string;
+  distilled_insight: string;
+  tool_chain: string[];
+  success: boolean;
+  turns_count: number;
+  importance_score: number;
+  stability_score: number;
+  retention_score?: number;
+  last_accessed_at: number;
+  access_count: number;
+  created_at: number;
+  metadata?: Record<string, unknown>;
+}
+
+export interface MemorySearchResult {
+  node: MemoryNode;
+  similarity_score: number;
+  retention_score: number;
+}
+
+export interface DistilledGuidance {
+  relevant_nodes: MemorySearchResult[];
+  guidance_prompt: string;
+  matched_tool_chains: string[][];
+}
+
+export interface MemoryStats {
+  total_memories: number;
+  episodic_count: number;
+  semantic_count: number;
+  procedural_count: number;
+  avg_stability: number;
+  total_access_count: number;
+}
+
+export interface ConsolidationRequestPayload {
+  tenant_id: string;
+  session_id?: string;
+  query: string;
+  turns: Array<{
+    step_index?: number;
+    thought?: string;
+    tools_called?: string[];
+    observation?: string;
+  }>;
+  final_answer?: string;
+  success?: boolean;
+}
+
+export interface ConsolidationResponse {
+  node_id: string;
+  distilled_insight: string;
+  importance_score: number;
+  tool_chain: string[];
+  memory_type: MemoryType;
+  status: string;
+}
+
+
 
 
 
