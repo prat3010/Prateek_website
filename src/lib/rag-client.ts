@@ -1578,6 +1578,36 @@ export class RetrieverClient {
     return this.request<import("./rag-types").FederatedDelegationResponse>(`/v1/mesh/federation/tasks/${delegationId}`);
   }
 
+  // ── Autonomous Mesh Dynamic Load-Balancing & Autoscaling (Battery #31 / M116) ──
+
+  async getMeshLoadMetrics(): Promise<import("./rag-types").ClusterLoadSummary> {
+    return this.request<import("./rag-types").ClusterLoadSummary>("/v1/mesh/load/metrics");
+  }
+
+  async getAutoscalingEvents(limit: number = 50): Promise<import("./rag-types").AutoscalingEvent[]> {
+    return this.request<import("./rag-types").AutoscalingEvent[]>(`/v1/mesh/load/autoscaling/events?limit=${limit}`);
+  }
+
+  async updateAutoscalingPolicy(
+    policy: import("./rag-types").AutoscalingPolicy
+  ): Promise<import("./rag-types").AutoscalingPolicy> {
+    return this.request<import("./rag-types").AutoscalingPolicy>("/v1/mesh/load/autoscaling/policy", {
+      method: "POST",
+      body: JSON.stringify(policy),
+    });
+  }
+
+  async reapIdleEnclaves(
+    clusterId: string = "cluster-primary"
+  ): Promise<import("./rag-types").AutoscalingEvent[]> {
+    return this.request<import("./rag-types").AutoscalingEvent[]>(
+      `/v1/mesh/load/scale-down/reap?cluster_id=${encodeURIComponent(clusterId)}`,
+      {
+        method: "POST",
+      }
+    );
+  }
+
   // ── Multimodal Vision GraphRAG & Schematic Ingestion (Battery #29) ─────────
 
   async extractSchematicText(

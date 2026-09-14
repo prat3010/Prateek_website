@@ -35,6 +35,7 @@ Welcome to the **Prateek Sharma Engineering Platform Documentation Map**. This c
 | **34** | **[`34_Multimodal_Vision_GraphRAG_and_Schematic_Ingestion_PRD.md`](34_Multimodal_Vision_GraphRAG_and_Schematic_Ingestion_PRD.md)** | Multimodal Vision GraphRAG, Battery #29, architectural schematic extraction, normalized bounding-box coordinates & SaaS Studio visual lightbox. |
 | **35** | **[`35_Realtime_Audio_Streaming_and_Voice_Agent_PRD.md`](35_Realtime_Audio_Streaming_and_Voice_Agent_PRD.md)** | Real-Time Audio Streaming & Full-Duplex WebRTC Voice Agent (M114), 20ms PCM16 frame streaming, in-process VAD endpointing, and conversational barge-in cancellation. |
 | **36** | **[`36_Distributed_MCP_Mesh_and_Agent_Federation_PRD.md`](36_Distributed_MCP_Mesh_and_Agent_Federation_PRD.md)** | Distributed Model Context Protocol (MCP) Mesh & Agent Federation (M115), Battery #30, peer node discovery, latency-weighted routing, HMAC trust envelopes & circular loop breaker. |
+| **37** | **[`37_Mesh_Load_Balancing_and_Ephemeral_AutoScaling_PRD.md`](37_Mesh_Load_Balancing_and_Ephemeral_AutoScaling_PRD.md)** | Autonomous Mesh Dynamic Load-Balancing & Ephemeral Enclave Auto-Scaling (M116), Battery #31, Power-of-Two-Choices (P2C), EWMA latency decay, scale-to-zero reaping & 95% load shedding. |
 
 
 ---

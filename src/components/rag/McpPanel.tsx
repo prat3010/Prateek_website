@@ -11,6 +11,9 @@ import type {
   MeshStatusSummary,
   MeshRoutingPolicy,
   FederatedDelegationResponse,
+  ClusterLoadSummary,
+  AutoscalingPolicy,
+  AutoscalingEvent,
 } from "@/lib/rag-types";
 import MagneticButton from "@/components/ui/MagneticButton";
 import styles from "./McpPanel.module.css";
@@ -22,7 +25,7 @@ interface McpPanelProps {
   isExpired?: boolean;
 }
 
-type McpSubView = "ide_config" | "mesh_topology" | "federation_cockpit";
+type McpSubView = "ide_config" | "mesh_topology" | "federation_cockpit" | "load_balancing";
 
 const DEFAULT_TOOLS: McpToolSummary[] = [
   {
@@ -139,6 +142,98 @@ const DEFAULT_MESH_NODES: MeshPeerNode[] = [
   },
 ];
 
+const DEFAULT_LOAD_METRICS: ClusterLoadSummary = {
+  total_nodes: 3,
+  online_nodes: 3,
+  ephemeral_nodes: 1,
+  clusters: {
+    cluster_primary: {
+      total_nodes: 2,
+      online_nodes: 2,
+      ephemeral_nodes: 0,
+      active_execution_slots: 4,
+      max_execution_slots: 32,
+      utilization_pct: 12.5,
+      avg_ewma_latency_ms: 8.4,
+      queue_depth: 0,
+      nodes: [
+        {
+          node_id: "node_us_gateway",
+          role: "seed_gateway",
+          status: "online",
+          is_ephemeral: false,
+          active_slots: 3,
+          max_slots: 16,
+          cpu_pct: 18.2,
+          ewma_latency_ms: 7.2,
+          queue_depth: 0,
+          idle_seconds: 0,
+        },
+        {
+          node_id: "node_apac_singapore",
+          role: "sovereign_node",
+          status: "online",
+          is_ephemeral: false,
+          active_slots: 1,
+          max_slots: 16,
+          cpu_pct: 12.0,
+          ewma_latency_ms: 9.6,
+          queue_depth: 0,
+          idle_seconds: 0,
+        },
+      ],
+    },
+    cluster_eu_enclave: {
+      total_nodes: 1,
+      online_nodes: 1,
+      ephemeral_nodes: 1,
+      active_execution_slots: 0,
+      max_execution_slots: 8,
+      utilization_pct: 0.0,
+      avg_ewma_latency_ms: 4.2,
+      queue_depth: 0,
+      nodes: [
+        {
+          node_id: "ephemeral_enclave_eu_1a",
+          role: "edge_enclave",
+          status: "online",
+          is_ephemeral: true,
+          active_slots: 0,
+          max_slots: 8,
+          cpu_pct: 4.5,
+          ewma_latency_ms: 4.2,
+          queue_depth: 0,
+          idle_seconds: 42.0,
+        },
+      ],
+    },
+  },
+};
+
+const DEFAULT_AUTOSCALING_EVENTS: AutoscalingEvent[] = [
+  {
+    event_id: "evt_scaleup_init01",
+    timestamp: Date.now() - 360000,
+    cluster_id: "cluster_eu_enclave",
+    action: "scale_up",
+    reason: "Cluster pressure exceeded 80% saturation under concurrent forensic queries.",
+    node_id: "ephemeral_enclave_eu_1a",
+    trigger_metric: "slot_utilization_pct",
+    metric_value: 84.5,
+    details: { total_ephemeral: 1 },
+  },
+  {
+    event_id: "evt_rebal_init02",
+    timestamp: Date.now() - 120000,
+    cluster_id: "cluster_primary",
+    action: "rebalance",
+    reason: "Power-of-Two-Choices (P2C) EWMA routed heavy batch to APAC sovereign node.",
+    node_id: "node_apac_singapore",
+    trigger_metric: "ewma_latency_ms",
+    metric_value: 9.6,
+  },
+];
+
 export function McpPanel({ hidden, client, tenantId, isExpired }: McpPanelProps) {
   // Navigation State
   const [subView, setSubView] = useState<McpSubView>("mesh_topology");
@@ -176,27 +271,92 @@ export function McpPanel({ hidden, client, tenantId, isExpired }: McpPanelProps)
   const [federationResponse, setFederationResponse] = useState<FederatedDelegationResponse | null>(null);
   const [federationError, setFederationError] = useState<string | null>(null);
 
+  // Load Balancing & Ephemeral Enclave Autoscaling State (Battery #31 / M116)
+  const [loadMetrics, setLoadMetrics] = useState<ClusterLoadSummary | null>(DEFAULT_LOAD_METRICS);
+  const [autoscalingEvents, setAutoscalingEvents] = useState<AutoscalingEvent[]>(DEFAULT_AUTOSCALING_EVENTS);
+  const [autoscalingPolicy, setAutoscalingPolicy] = useState<AutoscalingPolicy>({
+    scale_up_utilization_pct: 80.0,
+    scale_up_queue_depth: 10,
+    scale_up_latency_ms: 250.0,
+    scale_down_idle_seconds: 300.0,
+    min_enclaves: 0,
+    max_ephemeral_enclaves: 4,
+    load_shedding_threshold_pct: 95.0,
+  });
+  const [isUpdatingPolicy, setIsUpdatingPolicy] = useState<boolean>(false);
+  const [policyUpdateSuccess, setPolicyUpdateSuccess] = useState<boolean>(false);
+  const [isReapingEnclaves, setIsReapingEnclaves] = useState<boolean>(false);
+  const [reapStatusMessage, setReapStatusMessage] = useState<string | null>(null);
+
   const activeTenant = tenantId || client?.tenantId || "prateeq_scoping";
 
   const loadMcpData = useCallback(async () => {
     if (!client) return;
     try {
-      const [cfg, toolList, meshStat, nodesList, meshToolsList] = await Promise.all([
+      const [cfg, toolList, meshStat, nodesList, meshToolsList, loadMet, autoEvents] = await Promise.all([
         client.getMcpConfig(activeTenant).catch(() => null),
         client.getMcpTools(activeTenant).catch(() => null),
         client.getMeshStatus().catch(() => null),
         client.listMeshNodes().catch(() => null),
         client.listMeshTools().catch(() => null),
+        client.getMeshLoadMetrics().catch(() => null),
+        client.getAutoscalingEvents().catch(() => null),
       ]);
       if (cfg) setConfig(cfg);
       if (toolList && toolList.length > 0) setTools(toolList);
       if (meshStat) setMeshSummary(meshStat);
       if (nodesList && nodesList.length > 0) setMeshNodes(nodesList);
       if (meshToolsList && meshToolsList.length > 0) setMeshTools(meshToolsList);
+      if (loadMet) setLoadMetrics(loadMet);
+      if (autoEvents && autoEvents.length > 0) setAutoscalingEvents(autoEvents);
     } catch (err) {
       console.warn("MCP data resolution warning, using fallback models:", err);
     }
   }, [client, activeTenant]);
+
+  const handleUpdateAutoscalingPolicy = async () => {
+    if (isUpdatingPolicy || isExpired) return;
+    setIsUpdatingPolicy(true);
+    setPolicyUpdateSuccess(false);
+    try {
+      if (client) {
+        const res = await client.updateAutoscalingPolicy(autoscalingPolicy);
+        setAutoscalingPolicy(res);
+      }
+      setPolicyUpdateSuccess(true);
+      setTimeout(() => setPolicyUpdateSuccess(false), 3000);
+    } catch (err) {
+      console.error("Failed to update autoscaling policy:", err);
+    } finally {
+      setIsUpdatingPolicy(false);
+    }
+  };
+
+  const handleReapIdleEnclaves = async (clusterId: string = "cluster_primary") => {
+    if (isReapingEnclaves || isExpired) return;
+    setIsReapingEnclaves(true);
+    setReapStatusMessage(null);
+    try {
+      if (client) {
+        const events = await client.reapIdleEnclaves(clusterId);
+        if (events && events.length > 0) {
+          setAutoscalingEvents((prev) => [...events, ...prev]);
+          setReapStatusMessage(`Reaped ${events.length} idle enclave(s) successfully.`);
+        } else {
+          setReapStatusMessage("No idle enclaves exceeded threshold; zero actions required.");
+        }
+        const refreshed = await client.getMeshLoadMetrics().catch(() => null);
+        if (refreshed) setLoadMetrics(refreshed);
+      } else {
+        setReapStatusMessage("Simulated scale-down check: All active enclaves within idle tolerance.");
+      }
+      setTimeout(() => setReapStatusMessage(null), 4000);
+    } catch (err) {
+      setReapStatusMessage(`Reap error: ${err instanceof Error ? err.message : String(err)}`);
+    } finally {
+      setIsReapingEnclaves(false);
+    }
+  };
 
   useEffect(() => {
     if (!hidden) {
@@ -522,7 +682,7 @@ print(res)`,
           </span>
           <span className={styles.badgeBattery}>
             <span>🔋</span>
-            <span>Battery #30</span>
+            <span>Batteries #30 & #31</span>
           </span>
         </div>
       </div>
@@ -543,6 +703,14 @@ print(res)`,
         >
           <span>🤝</span>
           <span>Cross-Cluster Agent Federation</span>
+        </button>
+
+        <button
+          className={`${styles.subViewBtn} ${subView === "load_balancing" ? styles.subViewBtnActive : ""}`}
+          onClick={() => setSubView("load_balancing")}
+        >
+          <span>⚖️</span>
+          <span>Dynamic Load & Enclaves (Battery #31)</span>
         </button>
 
         <button
@@ -710,6 +878,7 @@ print(res)`,
                   <option value="local_first">Local First (Execute locally if present)</option>
                   <option value="lowest_latency">Lowest Latency (Fastest online peer)</option>
                   <option value="failover">Failover (Try local then replica)</option>
+                  <option value="load_balanced_ewma">Load-Balanced EWMA (P2C & Autoscaling)</option>
                 </select>
               </div>
 
@@ -934,6 +1103,361 @@ print(res)`,
             </div>
           )}
         </section>
+      )}
+
+      {/* ── Sub-View 4: Autonomous Mesh Dynamic Load Balancing & Autoscaling (Battery #31) ── */}
+      {subView === "load_balancing" && (
+        <>
+          {/* Cluster Metrics Grid */}
+          <div className={styles.metricsGrid}>
+            <div className={styles.metricCard}>
+              <span className={styles.metricLabel}>
+                <span>⚙️</span>
+                <span>Active Slots / Max</span>
+              </span>
+              <div className={styles.metricValue}>
+                <NumberFlow
+                  value={
+                    loadMetrics
+                      ? Object.values(loadMetrics.clusters).reduce((acc, c) => acc + c.active_execution_slots, 0)
+                      : 4
+                  }
+                />
+                <span style={{ fontSize: "1rem", color: "var(--color-text-muted)" }}>
+                  {" "}
+                  /{" "}
+                  {loadMetrics
+                    ? Object.values(loadMetrics.clusters).reduce((acc, c) => acc + c.max_execution_slots, 0)
+                    : 40}
+                </span>
+              </div>
+              <span className={styles.metricSub}>Dynamic concurrency reserve</span>
+            </div>
+
+            <div className={styles.metricCard}>
+              <span className={styles.metricLabel}>
+                <span>📊</span>
+                <span>Cluster Saturation</span>
+              </span>
+              <div className={styles.metricValue}>
+                <NumberFlow
+                  value={
+                    loadMetrics && Object.keys(loadMetrics.clusters).length > 0
+                      ? Math.round(
+                          Object.values(loadMetrics.clusters).reduce((acc, c) => acc + c.utilization_pct, 0) /
+                            Object.keys(loadMetrics.clusters).length
+                        )
+                      : 12
+                  }
+                  suffix="%"
+                />
+              </div>
+              <span className={styles.metricSub}>
+                Load-shedding ceiling: {autoscalingPolicy.load_shedding_threshold_pct}%
+              </span>
+            </div>
+
+            <div className={styles.metricCard}>
+              <span className={styles.metricLabel}>
+                <span>⏱️</span>
+                <span>EWMA Latency (α=0.2)</span>
+              </span>
+              <div className={styles.metricValue}>
+                <NumberFlow
+                  value={
+                    loadMetrics && Object.keys(loadMetrics.clusters).length > 0
+                      ? Math.round(
+                          Object.values(loadMetrics.clusters).reduce((acc, c) => acc + c.avg_ewma_latency_ms, 0) /
+                            Object.keys(loadMetrics.clusters).length
+                        )
+                      : 6
+                  }
+                  suffix="ms"
+                />
+              </div>
+              <span className={styles.metricSub}>Exponential moving decay</span>
+            </div>
+
+            <div className={styles.metricCard}>
+              <span className={styles.metricLabel}>
+                <span>🛡️</span>
+                <span>Ephemeral Enclaves</span>
+              </span>
+              <div className={styles.metricValue}>
+                <NumberFlow value={loadMetrics?.ephemeral_nodes ?? 1} />
+                <span style={{ fontSize: "1rem", color: "var(--color-text-muted)" }}>
+                  {" "}
+                  / {autoscalingPolicy.max_ephemeral_enclaves}
+                </span>
+              </div>
+              <span className={styles.metricSub}>Scale-to-zero reaping active</span>
+            </div>
+          </div>
+
+          {/* Clusters & Node Capacity Breakdown */}
+          <section className={styles.meshNodesSection}>
+            <div className={styles.sectionHeader}>
+              <h3 className={styles.sectionTitle}>
+                <span>🎛️</span>
+                <span>Live Enclave Concurrency & Node Telemetry</span>
+              </h3>
+              <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted)" }}>
+                  Algorithm: <code>Power-of-Two-Choices (P2C)</code>
+                </span>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+              {loadMetrics &&
+                Object.entries(loadMetrics.clusters).map(([clusterId, cluster]) => (
+                  <div key={clusterId} className={styles.loadClusterCard}>
+                    <div className={styles.clusterHeader}>
+                      <h4 className={styles.clusterTitle}>
+                        <span>🌐</span>
+                        <span>Cluster: {clusterId}</span>
+                      </h4>
+                      <div className={styles.clusterMetaPills}>
+                        <span className={styles.clusterPill}>
+                          <span>Nodes:</span>
+                          <b>{cluster.nodes.length}</b>
+                        </span>
+                        <span className={styles.clusterPill}>
+                          <span>Saturation:</span>
+                          <b style={{ color: cluster.utilization_pct > 80 ? "#ff5252" : "#00e676" }}>
+                            {cluster.utilization_pct}%
+                          </b>
+                        </span>
+                        <span className={styles.clusterPill}>
+                          <span>Avg EWMA:</span>
+                          <b>{cluster.avg_ewma_latency_ms}ms</b>
+                        </span>
+                        <span className={styles.clusterPill}>
+                          <span>Queue Depth:</span>
+                          <b>{cluster.queue_depth}</b>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className={styles.nodeCapacityGrid}>
+                      {cluster.nodes.map((node) => {
+                        const slotPct = Math.min(100, Math.round((node.active_slots / Math.max(1, node.max_slots)) * 100));
+                        return (
+                          <div key={node.node_id} className={styles.nodeCapacityCard}>
+                            <div className={styles.nodeCapacityHeader}>
+                              <span className={styles.nodeIdText}>{node.node_id}</span>
+                              <span
+                                className={node.is_ephemeral ? styles.actionPillScaleDown : styles.roleBadge}
+                                style={{ fontSize: "0.68rem" }}
+                              >
+                                {node.is_ephemeral ? "⚡ Ephemeral" : "🛡️ Sovereign"}
+                              </span>
+                            </div>
+
+                            <div className={styles.slotBarContainer}>
+                              <div className={styles.slotBarLabelRow}>
+                                <span>Execution Slots</span>
+                                <span>
+                                  {node.active_slots} / {node.max_slots} ({slotPct}%)
+                                </span>
+                              </div>
+                              <div className={styles.slotBarTrack}>
+                                <div
+                                  className={styles.slotBarFill}
+                                  style={{
+                                    width: `${slotPct}%`,
+                                    background: slotPct > 80 ? "#ff5252" : slotPct > 50 ? "#ffb300" : undefined,
+                                  }}
+                                />
+                              </div>
+                            </div>
+
+                            <div className={styles.nodeStatsRow}>
+                              <span>CPU: {node.cpu_pct.toFixed(1)}%</span>
+                              <span>EWMA: {node.ewma_latency_ms.toFixed(1)}ms</span>
+                              <span>Queue: {node.queue_depth}</span>
+                              {node.is_ephemeral && <span>Idle: {node.idle_seconds.toFixed(0)}s</span>}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </section>
+
+          {/* Autoscaling Policy Tuner */}
+          <section className={styles.policyTunerCard}>
+            <div className={styles.sectionHeader}>
+              <h3 className={styles.sectionTitle}>
+                <span>⚙️</span>
+                <span>Autonomous Scaling & Load-Shedding Policy</span>
+              </h3>
+              <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted)" }}>
+                Endpoint: <code>POST /v1/mesh/load/autoscaling/policy</code>
+              </span>
+            </div>
+
+            <div className={styles.policyGrid}>
+              <div className={styles.policyItem}>
+                <div className={styles.policyItemLabel}>
+                  <span>Scale-Up Utilization Threshold</span>
+                  <span className={styles.policyItemValue}>{autoscalingPolicy.scale_up_utilization_pct}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="50"
+                  max="90"
+                  step="5"
+                  className={styles.sliderControl}
+                  value={autoscalingPolicy.scale_up_utilization_pct}
+                  onChange={(e) =>
+                    setAutoscalingPolicy((prev) => ({
+                      ...prev,
+                      scale_up_utilization_pct: Number(e.target.value),
+                    }))
+                  }
+                />
+              </div>
+
+              <div className={styles.policyItem}>
+                <div className={styles.policyItemLabel}>
+                  <span>Scale-Down Idle Timeout</span>
+                  <span className={styles.policyItemValue}>{autoscalingPolicy.scale_down_idle_seconds}s</span>
+                </div>
+                <input
+                  type="range"
+                  min="30"
+                  max="600"
+                  step="30"
+                  className={styles.sliderControl}
+                  value={autoscalingPolicy.scale_down_idle_seconds}
+                  onChange={(e) =>
+                    setAutoscalingPolicy((prev) => ({
+                      ...prev,
+                      scale_down_idle_seconds: Number(e.target.value),
+                    }))
+                  }
+                />
+              </div>
+
+              <div className={styles.policyItem}>
+                <div className={styles.policyItemLabel}>
+                  <span>Max Ephemeral Enclaves</span>
+                  <span className={styles.policyItemValue}>{autoscalingPolicy.max_ephemeral_enclaves}</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  step="1"
+                  className={styles.sliderControl}
+                  value={autoscalingPolicy.max_ephemeral_enclaves}
+                  onChange={(e) =>
+                    setAutoscalingPolicy((prev) => ({
+                      ...prev,
+                      max_ephemeral_enclaves: Number(e.target.value),
+                    }))
+                  }
+                />
+              </div>
+
+              <div className={styles.policyItem}>
+                <div className={styles.policyItemLabel}>
+                  <span>Load-Shedding Invariant</span>
+                  <span className={styles.policyItemValue} style={{ color: "#ff5252" }}>
+                    {autoscalingPolicy.load_shedding_threshold_pct}%
+                  </span>
+                </div>
+                <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginTop: "0.5rem" }}>
+                  Hard circuit-breaker: Rejects tool queries when all candidate nodes reach saturation.
+                </span>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem", marginTop: "0.5rem" }}>
+              <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", flexWrap: "wrap" }}>
+                <MagneticButton strength={0.2}>
+                  <button
+                    className={styles.runBtn}
+                    onClick={handleUpdateAutoscalingPolicy}
+                    disabled={isUpdatingPolicy || isExpired}
+                  >
+                    <span>{isUpdatingPolicy ? "Saving..." : "Save Policy Config"}</span>
+                  </button>
+                </MagneticButton>
+
+                <MagneticButton strength={0.2}>
+                  <button
+                    className={styles.resetBtn}
+                    onClick={() => handleReapIdleEnclaves("cluster_primary")}
+                    disabled={isReapingEnclaves || isExpired}
+                  >
+                    <span>{isReapingEnclaves ? "Reaping..." : "Evaluate & Reap Idle Enclaves"}</span>
+                  </button>
+                </MagneticButton>
+              </div>
+
+              {policyUpdateSuccess && (
+                <span className={styles.statusSuccess}>✓ Autoscaling policy updated and active across mesh</span>
+              )}
+              {reapStatusMessage && (
+                <span style={{ fontSize: "0.78rem", color: "var(--badge-active-color, #00f0ff)" }}>
+                  {reapStatusMessage}
+                </span>
+              )}
+            </div>
+          </section>
+
+          {/* Live Autoscaling Events Audit Ledger */}
+          <section className={styles.eventsLedgerCard}>
+            <div className={styles.sectionHeader}>
+              <h3 className={styles.sectionTitle}>
+                <span>📜</span>
+                <span>Autoscaling & Load-Shedding Event Ledger ({autoscalingEvents.length})</span>
+              </h3>
+              <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted)" }}>
+                Endpoint: <code>GET /v1/mesh/load/autoscaling/events</code>
+              </span>
+            </div>
+
+            <div className={styles.eventsList}>
+              {autoscalingEvents.map((evt) => {
+                let actionBadge = styles.actionPillRebalance;
+                if (evt.action === "scale_up") actionBadge = styles.actionPillScaleUp;
+                else if (evt.action === "scale_down") actionBadge = styles.actionPillScaleDown;
+                else if (evt.action === "shed_load") actionBadge = styles.actionPillShedLoad;
+
+                return (
+                  <div key={evt.event_id} className={styles.eventCard}>
+                    <div className={styles.eventCardHeader}>
+                      <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                        <span className={actionBadge}>{evt.action.toUpperCase()}</span>
+                        <span style={{ fontFamily: "var(--font-mono, monospace)", fontSize: "0.75rem", color: "var(--color-text)" }}>
+                          {evt.cluster_id} {evt.node_id ? `→ ${evt.node_id}` : ""}
+                        </span>
+                      </div>
+                      <span style={{ fontSize: "0.7rem", color: "var(--color-text-muted)", fontFamily: "var(--font-mono, monospace)" }}>
+                        {new Date(evt.timestamp > 10000000000 ? evt.timestamp : evt.timestamp * 1000).toLocaleTimeString()}
+                      </span>
+                    </div>
+
+                    <p className={styles.eventReasonText}>{evt.reason}</p>
+
+                    <div className={styles.eventDetailsRow}>
+                      <span>Trigger: {evt.trigger_metric}</span>
+                      <span>Value: {evt.metric_value}</span>
+                      {evt.details && Object.keys(evt.details).length > 0 && (
+                        <span>Details: {JSON.stringify(evt.details)}</span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        </>
       )}
 
       {/* ── Sub-View 3: IDE Config & Stdio (Single Server) ── */}

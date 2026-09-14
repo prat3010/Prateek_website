@@ -1039,6 +1039,19 @@ timeline
   - **Control Plane Studio Upgraded:** Integrated 3-tab segmented controller in `McpPanel.tsx` with decentralized node topology visualizer, live routing dispatcher, and cross-cluster agent delegation cockpit under Design System 2.0.
 - **Status:** **Completed (Phase P / v1.5.0-alpha1)**
 
+#### ⚖️ Milestone 116: Autonomous Mesh Dynamic Load-Balancing & Ephemeral Enclave Auto-Scaling
+- **Libraries:** Power-of-Two-Choices (P2C), EWMA Latency Decay ($\alpha = 0.2$), FastAPI, React 19, TypeScript, Pytest
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/mcp/load_balancer_service.py`, `apps/api/src/routers/mcp_mesh.py`, `apps/api/tests/test_mesh_load_balancer.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `src/components/rag/McpPanel.tsx`, `src/components/rag/McpPanel.module.css`, `src/components/rag/__tests__/McpPanel.test.tsx`, `docs/37_Mesh_Load_Balancing_and_Ephemeral_AutoScaling_PRD.md`)
+- **Deliverable:**
+  - **Platform Battery #31 Registration:** Cataloged `mesh_load_balancer` in `BatteryService` under `SYSTEM_EXTENSIBILITY`.
+  - **Power-of-Two-Choices (P2C) Balancing:** Random sampling of 2 candidate nodes to minimize composite load scores ($\text{EWMA} \times (1 + \text{queue}) \times (1 + \text{slot\_utilization})$), preventing traffic stampedes.
+  - **EWMA Latency Decay ($\alpha = 0.2$):** Execution slot tracking with Exponentially Weighted Moving Average decay incorporating authentic execution runtimes.
+  - **Autonomous Scale-to-Zero Reaping:** Spawns ephemeral edge enclaves on demand under pressure ($\ge 80\%$ utilization or queue $\ge 10$) and reaps idle enclaves after 300s of inactivity.
+  - **Circuit-Breaker Load-Shedding:** Enforces a hard 95% cluster slot saturation ceiling, emitting HTTP 429 Too Many Requests to prevent cascade failure.
+  - **FastAPI Endpoints & SDK Parity:** Mounted `/v1/mesh/load/*` and added complete client SDK methods to `@prat3010/retriever-client` and `retriever-python`.
+  - **Control Plane Studio Upgraded:** Added 4th tab "Dynamic Load & Enclaves" in `McpPanel.tsx` with cluster capacity dials, interactive autoscaling policy sliders, and live event audit ledger under Design System 2.0.
+- **Status:** **Completed (Phase P / v1.6.0-alpha1)**
+
 
 ---
 

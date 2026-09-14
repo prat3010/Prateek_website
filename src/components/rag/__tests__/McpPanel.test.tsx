@@ -27,6 +27,10 @@ describe('McpPanel Component', () => {
   const mockListMeshTools = vi.fn();
   const mockExecuteMeshTool = vi.fn();
   const mockDelegateFederatedTask = vi.fn();
+  const mockGetMeshLoadMetrics = vi.fn();
+  const mockGetAutoscalingEvents = vi.fn();
+  const mockUpdateAutoscalingPolicy = vi.fn();
+  const mockReapIdleEnclaves = vi.fn();
 
   const mockClient = {
     tenantId: 'tn_test_mcp_123',
@@ -38,6 +42,10 @@ describe('McpPanel Component', () => {
     listMeshTools: mockListMeshTools,
     executeMeshTool: mockExecuteMeshTool,
     delegateFederatedTask: mockDelegateFederatedTask,
+    getMeshLoadMetrics: mockGetMeshLoadMetrics,
+    getAutoscalingEvents: mockGetAutoscalingEvents,
+    updateAutoscalingPolicy: mockUpdateAutoscalingPolicy,
+    reapIdleEnclaves: mockReapIdleEnclaves,
   } as unknown as RetrieverClient;
 
   const sampleConfig: McpConfigResponse = {
@@ -45,7 +53,7 @@ describe('McpPanel Component', () => {
     sse_endpoint: 'https://rag.prateeq.in/v1/mcp/sse',
     message_endpoint: 'https://rag.prateeq.in/v1/mcp/messages',
     total_tools: 10,
-    active_batteries: 30,
+    active_batteries: 31,
     cursor_config: { mcpServers: { retriever: { url: 'https://rag.prateeq.in/v1/mcp/sse' } } },
     claude_desktop_config: { mcpServers: { retriever: { command: 'npx' } } },
     cline_config: { mcpServers: { retriever: { url: 'https://rag.prateeq.in/v1/mcp/sse' } } },
@@ -97,13 +105,36 @@ describe('McpPanel Component', () => {
     });
     mockListMeshNodes.mockResolvedValue([]);
     mockListMeshTools.mockResolvedValue(sampleTools);
+    mockGetMeshLoadMetrics.mockResolvedValue(null);
+    mockGetAutoscalingEvents.mockResolvedValue([]);
+    mockUpdateAutoscalingPolicy.mockResolvedValue({
+      scale_up_utilization_pct: 75.0,
+      scale_up_queue_depth: 8,
+      scale_up_latency_ms: 220.0,
+      scale_down_idle_seconds: 180.0,
+      min_enclaves: 0,
+      max_ephemeral_enclaves: 6,
+      load_shedding_threshold_pct: 95.0,
+    });
+    mockReapIdleEnclaves.mockResolvedValue([
+      {
+        event_id: 'evt_reap_test_01',
+        timestamp: Date.now(),
+        cluster_id: 'cluster_primary',
+        action: 'scale_down',
+        reason: 'Terminated idle enclave',
+        node_id: 'ephemeral_enclave_01',
+        trigger_metric: 'ephemeral_idle_seconds',
+        metric_value: 320.0,
+      },
+    ]);
   });
 
-  it('renders hero title and Battery #30 badges when visible', async () => {
+  it('renders hero title and Battery #30 & #31 badges when visible', async () => {
     render(<McpPanel hidden={false} client={mockClient} tenantId="tn_test_mcp_123" />);
 
     expect(screen.getByText(/Distributed MCP Mesh & Agent Federation/i)).toBeInTheDocument();
-    expect(screen.getByText(/Battery #30/i)).toBeInTheDocument();
+    expect(screen.getByText(/Batteries #30 & #31/i)).toBeInTheDocument();
     expect(screen.getByText(/JSON-RPC 2.0 \/ SSE/i)).toBeInTheDocument();
 
     await waitFor(() => {
@@ -193,6 +224,35 @@ describe('McpPanel Component', () => {
     });
   });
 
+  it('switches to Dynamic Load & Enclaves (Battery #31) view and manages autoscaling', async () => {
+    render(<McpPanel hidden={false} client={mockClient} tenantId="tn_test_mcp_123" />);
+
+    const loadTab = screen.getByText(/Dynamic Load & Enclaves/i);
+    fireEvent.click(loadTab);
+
+    expect(screen.getByText(/Live Enclave Concurrency & Node Telemetry/i)).toBeInTheDocument();
+    expect(screen.getByText(/Autonomous Scaling & Load-Shedding Policy/i)).toBeInTheDocument();
+    expect(screen.getByText(/Autoscaling & Load-Shedding Event Ledger/i)).toBeInTheDocument();
+
+    // Test Save Policy Config button
+    const saveBtn = screen.getByText(/Save Policy Config/i);
+    fireEvent.click(saveBtn);
+
+    await waitFor(() => {
+      expect(mockUpdateAutoscalingPolicy).toHaveBeenCalled();
+      expect(screen.getByText(/Autoscaling policy updated and active across mesh/i)).toBeInTheDocument();
+    });
+
+    // Test Evaluate & Reap Idle Enclaves button
+    const reapBtn = screen.getByText(/Evaluate & Reap Idle Enclaves/i);
+    fireEvent.click(reapBtn);
+
+    await waitFor(() => {
+      expect(mockReapIdleEnclaves).toHaveBeenCalledWith('cluster_primary');
+      expect(screen.getByText(/Reaped 1 idle enclave\(s\) successfully/i)).toBeInTheDocument();
+    });
+  });
+
   it('switches to IDE Config view and displays 1-click snippets and tool registry', async () => {
     render(<McpPanel hidden={false} client={mockClient} tenantId="tn_test_mcp_123" />);
 
@@ -208,3 +268,4 @@ describe('McpPanel Component', () => {
     expect(screen.getByText(/claude_desktop_config\.json/i)).toBeInTheDocument();
   });
 });
+
