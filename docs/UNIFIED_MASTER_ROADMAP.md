@@ -61,6 +61,7 @@ timeline
     Phase L (M91–M97) : Forward Deployed Engineering (FDE) Enterprise Agentic Stack : Completed
     Phase M (M98–M102) : Global Distributed Sovereign Edge & Multi-Cloud Resiliency : Completed
     Phase N (M103–M109) : Autonomous Agent Swarms, Long-Horizon Memory & Multi-Agent Quorum : Completed
+    Phase O (M110+) : Public Open-Source Launch & Enterprise Ecosystem : Active
 ```
 
 ---
@@ -938,6 +939,55 @@ timeline
   - Operator Cockpit: Mounted `SwarmPanel.tsx` in `/rag/app` SaaS Studio featuring 4-stat metrics grid (`@number-flow/react`), dialectic debate scrubber, quorum voting meter, and hallucination pruning ledger.
 - **Status:** **Completed (Phase N / v0.93.0)**
 
+---
+
+### Phase O: Public Open-Source Launch & Enterprise Ecosystem (M110+) — **Active**
+
+```text
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│             PHASE O: PUBLIC OPEN-SOURCE LAUNCH & COMMUNITY ECOSYSTEM (M110+)           │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  [M110] Public Open-Source Launch (v1.0.0-rc1) & Decoupled SDKs                        │
+│  [M111] Community Connectors Ecosystem (Postgres/MySQL CDC, S3/GCS Watchers)          │
+│  [M112] Kubernetes Native Operator & Production Helm Charts                            │
+│  [M113] Multimodal Vision GraphRAG & Schematic Ingestion                               │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### 🚀 Milestone 110: Public Open-Source Launch (`v1.0.0-rc1`) & Decoupled SDKs
+- **Libraries:** Docker, Docker Compose, `@prat3010/retriever-client` (npm), `retriever-python` (PyPI)
+- **Repo Scope:** Both (`retriever` `docker-compose.yml`, `install.sh`, `scripts/quickstart.sh`, `packages/retriever-client/`, `packages/retriever-python/`, `docs/OPEN_SOURCE_LAUNCH_PLAYBOOK.md` & `Prateek_website` `docs/UNIFIED_MASTER_ROADMAP.md`, `ROADMAP.md`)
+- **Deliverable:**
+  - **1-Line Quickstart Drop-In (`curl -fsSL https://get.retriever.run | bash`):** Zero-friction POSIX bash installer featuring automated host hardware sensing (Apple Silicon MPS / NVIDIA CUDA / CPU fallback), port availability checks, `.env` initialization, and live search verification ("30-Second Time-to-Dopamine").
+  - **Production Docker Compose Stack (`docker-compose.yml`):** Complete self-hosted stack orchestrating PostgreSQL 16 + pgvector, Redis 7, local Ollama with `nomic-embed-text` auto-caching, multi-stage FastAPI backend, and Next.js Admin Dashboard. Zero external API keys needed.
+  - **Auto-Seeded Demo Workspace:** Automated database migration and deterministic demo key issuance (`ret_live_demo_00000000000000000000000000000000`) with sample enterprise whitepaper vector embeddings pre-indexed.
+  - **Decoupled TypeScript Client SDK (`@prat3010/retriever-client` v1.0.0):** Published on npm with dual ESM/CJS exports and complete coverage across all 26 batteries (Hybrid Search, ColBERT late interaction, ReAct streaming tool traces, Cognitive Memory, Swarm Quorum debate, Universal MCP, and Micro-Enclaves).
+  - **Decoupled Python Client SDK (`retriever-python` v1.0.0):** Published on PyPI with synchronous (`RetrieverClient`) and asynchronous (`AsyncRetrieverClient`) implementations, typed Pydantic models, and streaming SSE generators.
+  - **Reconciled Launch Playbook:** Updated `OPEN_SOURCE_LAUNCH_PLAYBOOK.md` and `README.md` reflecting all 26 platform batteries, empirical sub-10ms ColBERT benchmarks, and scale-to-zero serving economics.
+- **Status:** **Completed (Phase O / v1.0.0-rc1)**
+
+#### 🔌 Milestone 111: Community Connectors Ecosystem & Change-Data-Capture (CDC) Pipeline
+- **Libraries:** `asyncpg`, `boto3`, `httpx`, `@prat3010/retriever-client`, `retriever-python`
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/connectors/`, `apps/api/src/domain/abstractions/connector.py`, `apps/api/src/routers/admin.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `docs/UNIFIED_MASTER_ROADMAP.md`, `ROADMAP.md`)
+- **Deliverable:**
+  - **Relational Database Change-Data-Capture (CDC) Connector (`database_cdc.py`):** High-watermark chronological replication for PostgreSQL and MySQL. Queries mutated table records where `updated_at > watermark`, formats rows into structured Markdown documents with attribute tables, and updates high-watermark state.
+  - **Cloud Object Storage Auto-Indexing Watcher (`cloud_storage.py`):** S3-compatible bucket crawler supporting AWS S3, Cloudflare R2, MinIO, and Google Cloud Storage. Tracks object `ETag` checksums and `LastModified` timestamps to only ingest new or altered documents without re-downloading unchanged files.
+  - **Developer Workspace Connectors (`github.py`, `slack.py`):** GitHub Connector extracting Markdown documentation, issues, and pull requests with `since` cursor tracking; Slack Connector extracting conversations and threaded replies with participant handles and `ts` watermark cursors.
+  - **Custom Ingestion Pipeline SDK & Decorator:** Standardized `BaseConnector` lifecycle, `BaseDocumentParser`, `@register_connector` decorator for dynamic community extensions, and `GET /v1/admin/connectors/manifests` catalog endpoint.
+  - **Platform Battery #27 Registration:** Cataloged `cdc_community_connectors` in `BatteryService` under `SYSTEM_EXTENSIBILITY`.
+  - **Client SDKs Extended:** Added connector management methods to `@prat3010/retriever-client` and `retriever-python`.
+- **Status:** **Completed (Phase O / v1.1.0-alpha1)**
+
+#### ☸️ Milestone 112: Kubernetes Native Operator & Production Helm Charts
+- **Libraries:** Kubernetes API, OpenAPI v3, Helm 3, Pytest
+- **Repo Scope:** Both (`retriever` `deploy/helm/retriever/`, `deploy/operator/`, `apps/api/src/adapters/operator/`, `apps/api/src/domain/abstractions/operator.py`, `apps/api/src/routers/admin.py`, `apps/api/tests/test_kubernetes_operator.py` & `Prateek_website` `docs/UNIFIED_MASTER_ROADMAP.md`, `ROADMAP.md`)
+- **Deliverable:**
+  - **Official Production Helm 3 Chart (`deploy/helm/retriever/`):** Full cluster orchestration with multi-replica FastAPI pods, Next.js Web Studio, HorizontalPodAutoscaler v2, Ingress with cert-manager TLS, PostgreSQL 16 + pgvector StatefulSet, and Redis 7.
+  - **RetrieverCluster Custom Resource Definition (CRD):** `retriever.run/v1alpha1` with `kind: RetrieverCluster`, OpenAPI v3 validation, subresources (`status`, `scale`), and `kubectl get rc` printer columns.
+  - **Hexagonal Domain Abstractions & Level-Triggered Reconciler:** Pure domain models (`RetrieverClusterSpec`, `RetrieverClusterStatus`), level-triggered state machine managing phase transitions (`Pending` $\rightarrow$ `Provisioning` $\rightarrow$ `Running`), rolling upgrades on image tag changes, GPU accelerator node affinity/tolerations, and automated database backup jobs.
+  - **Admin Cluster Management APIs:** `GET /v1/admin/operator/status`, `GET /v1/admin/operator/clusters`, `POST /v1/admin/operator/reconcile`, and `POST /v1/admin/operator/clusters/{cluster_name}/backup`.
+  - **Platform Battery #28 Registration:** Cataloged `kubernetes_native_operator` in `BatteryService` under `SYSTEM_EXTENSIBILITY`.
+- **Status:** **Completed (Phase O / v1.2.0-alpha1)**
 
 ---
 

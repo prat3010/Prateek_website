@@ -1,6 +1,6 @@
 # Product & Architectural Roadmap (Single Source of Truth)
 
-> 📌 **Master Roadmap Location:** For the comprehensive, platform-wide sequential timeline (M1 to M109) and active milestone tracking across both `Prateek_website` and `retriever`, see:
+> 📌 **Master Roadmap Location:** For the comprehensive, platform-wide sequential timeline (M1 to M112) and active milestone tracking across both `Prateek_website` and `retriever`, see:
 > 👉 **[`docs/UNIFIED_MASTER_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md)**
 
 ---
@@ -27,11 +27,12 @@ timeline
     Phase L (M91–M97) : Forward Deployed Engineering (FDE) Agentic Stack : Completed
     Phase M (M98–M102) : Sovereign Edge & Multi-Cloud Resiliency : Completed
     Phase N (M103–M109) : Autonomous Agent Swarms, Long-Horizon Memory & Multi-Agent Quorum : Completed
+    Phase O (M110+) : Public Open-Source Launch & Community Ecosystem : Active
 ```
 
 ---
 
-## Active Milestone Sequence (Phase M: M98 – M102 & Phase N: M103 – M109)
+## Active Milestone Sequence (Phase M: M98 – M102, Phase N: M103 – M109 & Phase O: M110 – M112)
 
 | Milestone | Title | Focus Area | Status | Detailed Specification |
 |:---|:---|:---|:---|:---|
@@ -60,6 +61,9 @@ timeline
 | **M107** | Zero-Toy Invariant Enforcement & Fail-Fast Hardening across All Subsystems | Forensic audit eradicating synthetic score boosts, dummy audio fallbacks, fake probe 200s, and fake document generators; automated static analysis linter (`audit_zero_toy.py`) | **Completed** | [`docs/UNIFIED_MASTER_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md#milestone-107-zero-toy-invariant-enforcement--fail-fast-hardening-across-all-subsystems) |
 | **M108** | Cognitive Agent Memory Consolidation & Long-Horizon Experience Distillation | Ebbinghaus retention decay, episodic/procedural memory synthesis, ReAct guidance injection & Battery #25 | **Completed** | [`docs/UNIFIED_MASTER_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md#milestone-108-cognitive-agent-memory-consolidation--long-horizon-experience-distillation) |
 | **M109** | Multi-Agent Swarm Quorum & Dynamic Debate Consensus Engine | Dialectic debate DAG, weighted quorum voting, hallucination pruning & Battery #26 | **Completed** | [`docs/UNIFIED_MASTER_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md#milestone-109-multi-agent-swarm-quorum--dynamic-debate-consensus-engine) |
+| **M110** | Public Open-Source Launch (`v1.0.0-rc1`) & Decoupled SDKs | 1-line quickstart script (`curl -fsSL https://get.retriever.run \| bash`), Docker Compose stack, `@prat3010/retriever-client` on npm & `retriever-python` on PyPI | **Completed** | [`docs/UNIFIED_MASTER_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md#milestone-110-public-open-source-launch-v100-rc1--decoupled-sdks) |
+| **M111** | Community Connectors Ecosystem & Change-Data-Capture (CDC) Pipeline | Relational DB CDC (PostgreSQL/MySQL), S3/R2 object storage watcher, GitHub/Slack connectors & Battery #27 | **Completed** | [`docs/UNIFIED_MASTER_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md#milestone-111-community-connectors-ecosystem--change-data-capture-cdc-pipeline) |
+| **M112** | Kubernetes Native Operator & Helm Charts (v1.2.0-alpha1) | Production Helm 3 chart, RetrieverCluster CRD, level-triggered reconciler & Battery #28 | **Completed** | [`docs/UNIFIED_MASTER_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md#milestone-112-kubernetes-native-operator--production-helm-charts-v120-alpha1) |
 
 
 
