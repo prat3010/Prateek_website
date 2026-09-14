@@ -27,10 +27,11 @@ import { MultiCloudPanel } from "@/components/rag/MultiCloudPanel";
 import { VoiceStudioPanel } from "@/components/rag/VoiceStudioPanel";
 import { McpPanel } from "@/components/rag/McpPanel";
 import { MemoryPanel } from "@/components/rag/MemoryPanel";
+import { SwarmPanel } from "@/components/rag/SwarmPanel";
 import { RagErrorBoundary } from "@/components/rag/ErrorBoundary";
 import styles from "@/components/rag/rag.module.css";
 
-type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "workflows" | "rlm" | "agentic" | "prompts" | "gateway" | "guardrails" | "config" | "team" | "integrations" | "feature-studio" | "edge" | "multicloud" | "voice" | "mcp" | "memory";
+type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "workflows" | "rlm" | "agentic" | "prompts" | "gateway" | "guardrails" | "config" | "team" | "integrations" | "feature-studio" | "edge" | "multicloud" | "voice" | "mcp" | "memory" | "swarm";
 
 export default function RagAppStudioPage() {
   const router = useRouter();
@@ -128,6 +129,7 @@ export default function RagAppStudioPage() {
     { id: "voice", label: "Sovereign Edge Voice", icon: "🎙️" },
     { id: "mcp", label: "Model Context Protocol (MCP)", icon: "🔌" },
     { id: "memory", label: "Cognitive Memory & Distillation", icon: "🧠" },
+    { id: "swarm", label: "Multi-Agent Swarm Quorum", icon: "🤝" },
   ];
 
   return (
@@ -279,6 +281,7 @@ export default function RagAppStudioPage() {
             <VoiceStudioPanel client={client} tenantId={tenantId} hidden={activeTab !== "voice"} />
             <McpPanel client={client} tenantId={tenantId} hidden={activeTab !== "mcp"} isExpired={trialDaysRemaining <= 0} />
             <MemoryPanel client={client} tenantId={tenantId} hidden={activeTab !== "memory"} isExpired={trialDaysRemaining <= 0} />
+            <SwarmPanel client={client} tenantId={tenantId} hidden={activeTab !== "swarm"} isExpired={trialDaysRemaining <= 0} />
 
           </RagErrorBoundary>
         </main>

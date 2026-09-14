@@ -664,6 +664,43 @@ export class RetrieverClient {
     );
   }
 
+  // ── Milestone 109: Multi-Agent Swarm Quorum & Dynamic Debate Consensus ────
+
+  async executeSwarmDebate(
+    payload: Omit<import("./rag-types").SwarmDebateRequest, "tenant_id">,
+    signal?: AbortSignal
+  ): Promise<import("./rag-types").QuorumConsensusResult> {
+    return this.request<import("./rag-types").QuorumConsensusResult>(
+      `/v1/tenants/${this.config.tenantId}/agentic/swarm/debate`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          tenant_id: this.config.tenantId,
+          ...payload,
+        }),
+        signal,
+      }
+    );
+  }
+
+  async getSwarmRoles(
+    signal?: AbortSignal
+  ): Promise<import("./rag-types").SwarmAgentProfile[]> {
+    return this.request<import("./rag-types").SwarmAgentProfile[]>(
+      `/v1/tenants/${this.config.tenantId}/agentic/swarm/roles`,
+      { signal }
+    );
+  }
+
+  async getSwarmStats(
+    signal?: AbortSignal
+  ): Promise<import("./rag-types").SwarmStats> {
+    return this.request<import("./rag-types").SwarmStats>(
+      `/v1/tenants/${this.config.tenantId}/agentic/swarm/stats`,
+      { signal }
+    );
+  }
+
   // ── Milestone 92: DSPy Declarative Prompt Compilation & Algorithmic Self-Optimization Pipeline ────
 
   async compilePrompt(

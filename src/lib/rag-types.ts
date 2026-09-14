@@ -1320,6 +1320,113 @@ export interface ConsolidationResponse {
   status: string;
 }
 
+// ── Milestone 109: Multi-Agent Swarm Quorum & Dynamic Debate Consensus ────
+
+export type SwarmAgentRole = "planner" | "forensic_auditor" | "code_synthesizer" | "skeptic_critic";
+export type DebateStance = "proposal" | "critique" | "rebuttal" | "synthesis";
+
+export interface SwarmAgentProfile {
+  role: SwarmAgentRole;
+  display_name: string;
+  avatar_icon: string;
+  mandate: string;
+  base_weight: number;
+  domain_tags: string[];
+  model_tier: string;
+}
+
+export interface CandidateClaim {
+  claim_id: string;
+  agent_role: SwarmAgentRole;
+  statement: string;
+  evidence_basis: string[];
+  is_audited: boolean;
+  is_verified: boolean;
+  rejection_reason?: string | null;
+  confidence_score: number;
+}
+
+export interface DebateTurn {
+  turn_index: number;
+  round_index: number;
+  agent_role: SwarmAgentRole;
+  stance: DebateStance;
+  content: string;
+  claims_proposed: CandidateClaim[];
+  target_role?: SwarmAgentRole | null;
+  confidence_score: number;
+  timestamp: number;
+}
+
+export interface DebateRound {
+  round_index: number;
+  stage_name: string;
+  turns: DebateTurn[];
+  round_summary: string;
+  active_disagreements: string[];
+}
+
+export interface AgentBallot {
+  agent_role: SwarmAgentRole;
+  candidate_id: string;
+  confidence: number;
+  rationale: string;
+  weight: number;
+}
+
+export interface CandidateResolution {
+  resolution_id: string;
+  title: string;
+  detailed_solution: string;
+  supporting_roles: SwarmAgentRole[];
+  weighted_score: number;
+  quorum_met: boolean;
+}
+
+export interface QuorumConsensusResult {
+  debate_id: string;
+  tenant_id: string;
+  prompt: string;
+  active_roles: SwarmAgentRole[];
+  rounds_completed: number;
+  rounds: DebateRound[];
+  candidate_resolutions: CandidateResolution[];
+  winning_consensus: string;
+  winning_resolution_id: string;
+  consensus_confidence: number;
+  quorum_reached: boolean;
+  quorum_threshold: number;
+  hallucinations_pruned: CandidateClaim[];
+  execution_time_ms: number;
+  created_at: number;
+}
+
+export interface SwarmDebateRequest {
+  tenant_id: string;
+  prompt: string;
+  active_roles?: SwarmAgentRole[];
+  max_rounds?: number;
+  quorum_threshold?: number;
+  domain_context?: string;
+}
+
+export interface SwarmStats {
+  total_debates: number;
+  quorum_success_rate: number;
+  avg_debate_rounds: number;
+  total_hallucinations_pruned: number;
+  active_agent_count: number;
+}
+
+export interface SwarmDebateEvent {
+  event_type: string;
+  debate_id: string;
+  round_index?: number;
+  agent_role?: SwarmAgentRole;
+  data: Record<string, unknown>;
+  timestamp: number;
+}
+
 
 
 

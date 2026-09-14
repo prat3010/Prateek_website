@@ -928,10 +928,11 @@ timeline
 - **Libraries:** `pydantic`, `pytest`, `asyncio`, `networkx`
 - **Repo Scope:** Both (`retriever` `apps/api/src/domain/agentic/swarm/` & `Prateek_website` `src/components/rag/SwarmPanel.tsx`)
 - **Deliverable:**
-  - Multi-Agent Specialization Roles: Orchestrate collaborative agent topologies (Planner, Forensic Auditor, Code Synthesizer, Skeptic/Critic) converging on complex multi-hop solutions.
+  - Multi-Agent Specialization Roles: Orchestrated collaborative agent topologies (Planner, Forensic Auditor, Code Synthesizer, Skeptic/Critic) converging on complex multi-hop solutions via `networkx.DiGraph`.
   - Dynamic Dialectic Debate Protocol: Structured multi-round cross-examination where agents challenge intermediate tool observations and synthesize unified consensus answers.
-  - Quorum Voting & Ambiguity Resolution: Weighted confidence voting for conflicting tool observations, pruning hallucinations before final output emission.
-- **Status:** **Planned (Phase N / v0.93.0)**
+  - Quorum Voting & Ambiguity Resolution: Role-calibrated weighted confidence voting ($V(A_k) = \frac{\sum_i w_i \cdot c_{i,k} \cdot \mathbf{1}(\text{agree})}{\sum_i w_i}$), automatically pruning unverified hallucinations before final output emission.
+  - Operator Cockpit: Mounted `SwarmPanel.tsx` in `/rag/app` SaaS Studio featuring 4-stat metrics grid (`@number-flow/react`), dialectic debate scrubber, quorum voting meter, and hallucination pruning ledger.
+- **Status:** **Completed (Phase N / v0.93.0)**
 
 
 ---

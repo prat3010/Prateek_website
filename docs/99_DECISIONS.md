@@ -666,6 +666,28 @@ This document serves as the registry of critical architectural design decisions 
 
 ---
 
+# **ADR 42: Multi-Agent Swarm Quorum & Dynamic Debate Consensus Engine (Milestone 109)**
+
+* **Status**: Approved & Implemented
+* **Context**: Single-agent autonomous loops suffer from cognitive blind spots: once an LLM proposes an unverified assumption or hallucinated citation in early reasoning turns, self-reflection often compounds the error due to confirmation bias. Simple two-agent generator-critic reflection lacks specialization—critics lack the domain focus required to simultaneously audit statistical/computational logic, legal/compliance boundaries, and dependency execution DAGs.
+* **Decision**: Architected the Multi-Agent Swarm Quorum & Dynamic Debate Consensus Engine as **Platform Battery #26** (`agent_swarm.py`, `engine.py`, `agent_swarm.py` router, `SwarmPanel.tsx` in `/rag/app`):
+  1. Pure Hexagonal Domain Models: Defined `SwarmAgentRole`, `DebateStance`, `CandidateClaim`, `DebateTurn`, `DebateRound`, `AgentBallot`, `CandidateResolution`, `QuorumConsensusResult`, and `SwarmDebateProtocol` in `src/domain/abstractions/agent_swarm.py` with 0 framework imports.
+  2. Directed Debate Topology (`networkx.DiGraph`): Connects 4 specialized agent roles (Strategic Planner, Forensic Auditor, Code & Logic Synthesizer, Adversarial Skeptic) along structured cross-examination edges (`PLANNER -> SKEPTIC`, `SKEPTIC -> SYNTHESIZER`, `SYNTHESIZER -> AUDITOR`, `AUDITOR -> PLANNER`).
+  3. Structured 3-Stage Dialectic Debate Protocol:
+     - Stage 1 (Opening Theses): Each agent formulates strategic propositions grounded by Battery #25 cognitive memory guidance.
+     - Stage 2 (Dialectic Cross-Examination): Agents challenge peer assertions along DAG review channels; Forensic Auditor verifies claims.
+     - Stage 3 (Rebuttal & Quorum Voting): Agents adjust confidence and cast weighted ballots on candidate resolutions.
+  4. Role-Calibrated Weighted Quorum Voting:
+     $$V(A_k) = \frac{\sum_{i \in \text{Agents}} w_i \cdot c_{i,k} \cdot \mathbf{1}(\text{agree})}{\sum_{i \in \text{Agents}} w_i}$$
+     where role weights reflect specialized authority (Auditor 1.4x, Skeptic 1.3x, Synthesizer 1.2x, Planner 1.1x). Quorum requires $V \ge \tau_{\text{quorum}}$ ($0.70$ default).
+  5. Automated Forensic Hallucination Pruning: Any claim flagged during audit as lacking factual grounding is quarantined from the final ballot and archived into `hallucinations_pruned`.
+  6. Frontend SaaS Studio Cockpit (`SwarmPanel.tsx`): Built high-aesthetic operator panel featuring 4-stat metrics grid (`@number-flow/react`), interactive persona grid, dialectic debate timeline scrubber, quorum voting meter bar, and hallucination pruning ledger.
+* **Consequences**:
+  * **Pros**: Eliminates single-agent cognitive confirmation bias; verifiable consensus thresholds; automated quarantine of ungrounded hallucinations; real-time SSE streaming.
+  * **Cons**: Multi-agent debates increase total token throughput across rounds (~3x to 4x standard single-turn completion).
+
+---
+
 # **Acceptance Criteria**
 - Registry records cover the core v2 architectural choices.
 - Format follows standard ADR structures (Context, Decision, Consequences).
