@@ -40,7 +40,7 @@
 
 ---
 
-## 2. Master Sequential Implementation Timeline (M1 – M109)
+## 2. Master Sequential Implementation Timeline (M1 – M115)
 
 ```mermaid
 timeline
@@ -61,7 +61,8 @@ timeline
     Phase L (M91–M97) : Forward Deployed Engineering (FDE) Enterprise Agentic Stack : Completed
     Phase M (M98–M102) : Global Distributed Sovereign Edge & Multi-Cloud Resiliency : Completed
     Phase N (M103–M109) : Autonomous Agent Swarms, Long-Horizon Memory & Multi-Agent Quorum : Completed
-    Phase O (M110+) : Public Open-Source Launch & Enterprise Ecosystem : Active
+    Phase O (M110–M113) : Public Open-Source Launch & Community Ecosystem : Completed
+    Phase P (M114+) : Multimodal Real-Time Voice & Distributed Agentic Mesh : Active
 ```
 
 ---
@@ -941,17 +942,16 @@ timeline
 
 ---
 
-### Phase O: Public Open-Source Launch & Enterprise Ecosystem (M110+) — **Active**
+### Phase O: Public Open-Source Launch & Community Ecosystem (M110–M113) — **Completed**
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
-│             PHASE O: PUBLIC OPEN-SOURCE LAUNCH & COMMUNITY ECOSYSTEM (M110+)           │
+│             PHASE O: PUBLIC OPEN-SOURCE LAUNCH & COMMUNITY ECOSYSTEM (M110–M113)       │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
 │  [M110] Public Open-Source Launch (v1.0.0-rc1) & Decoupled SDKs                        │
 │  [M111] Community Connectors Ecosystem (Postgres/MySQL CDC, S3/GCS Watchers)          │
 │  [M112] Kubernetes Native Operator & Production Helm Charts                            │
 │  [M113] Multimodal Vision GraphRAG & Schematic Ingestion                               │
-│  [M114] Real-time Audio Streaming & Low-Latency Full-Duplex WebRTC Voice Agent         │
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -1003,6 +1003,19 @@ timeline
   - **Control Plane Visual Lightbox:** Integrated visual citation badges and responsive `<Portal>` bounding-box inspection lightbox in `ChatPanel.tsx` with Design System 2.0 theme parity.
 - **Status:** **Completed (Phase O / v1.3.0-alpha1)**
 
+---
+
+### Phase P: Multimodal Real-Time Voice & Distributed Agentic Mesh (M114+) — **Active**
+
+```text
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│     PHASE P: MULTIMODAL REAL-TIME VOICE & DISTRIBUTED AGENTIC MESH (M114+)             │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  [M114] Real-time Audio Streaming & Low-Latency Full-Duplex WebRTC Voice Agent         │
+│  [M115] Distributed Model Context Protocol (MCP) Mesh & Agent Federation               │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
 #### 🎙️ Milestone 114: Real-time Audio Streaming & Low-Latency Full-Duplex WebRTC Voice Agent
 - **Libraries:** WebSocket, Web Audio API, Whisper, PCM16, Pytest, React 19, TypeScript
 - **Repo Scope:** Both (`retriever` `apps/api/src/domain/voice/voice_stream_service.py`, `apps/api/src/routers/voice.py`, `apps/api/tests/test_voice_streaming.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `src/components/rag/VoiceStudioPanel.tsx`, `src/components/rag/VoiceStudioPanel.module.css`, `docs/35_Realtime_Audio_Streaming_and_Voice_Agent_PRD.md`)
@@ -1013,6 +1026,18 @@ timeline
   - **Decoupled Client SDKs Updated:** Exported `createVoiceStream` and full event typing (`onSessionReady`, `onVadState`, `onTranscript`, `onAgentAudioChunk`, `onInterrupted`, `onTurnComplete`) in `@prat3010/retriever-client` and `retriever-python`.
   - **Control Plane Voice Studio Upgrade:** Integrated genuine Web Audio API `AudioContext` + `AnalyserNode` frequency spectrum visualization in `VoiceStudioPanel.tsx` and purged all fake `Math.random()` bars and timer mocks.
 - **Status:** **Completed (Phase P / v1.4.0-alpha1)**
+
+#### 🕸️ Milestone 115: Distributed Model Context Protocol (MCP) Mesh & Agent Federation
+- **Libraries:** HMAC-SHA256, JSON-RPC 2.0, FastAPI, React 19, TypeScript, Pytest
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/abstractions/mcp_mesh.py`, `apps/api/src/domain/mcp/mesh_service.py`, `apps/api/src/domain/mcp/federation_service.py`, `apps/api/src/routers/mcp_mesh.py`, `apps/api/tests/test_mcp_mesh.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `src/components/rag/McpPanel.tsx`, `src/components/rag/McpPanel.module.css`, `src/components/rag/__tests__/McpPanel.test.tsx`, `docs/36_Distributed_MCP_Mesh_and_Agent_Federation_PRD.md`)
+- **Deliverable:**
+  - **Platform Battery #30 Registration:** Cataloged `distributed_mcp_mesh` in `BatteryService` under `SYSTEM_EXTENSIBILITY`.
+  - **Decentralized MCP Tool Mesh:** Multi-cluster tool discovery, dynamic capability advertisement, heartbeat leasing (120s eviction), and latency-weighted peer routing.
+  - **Cryptographic Trust Envelopes:** Inter-cluster tool execution and delegation signed via HMAC-SHA256 with 60-second sliding-window nonce replay protection.
+  - **Cross-Cluster Agent Federation:** Distributed ReAct cognitive loop allowing agents to delegate sub-goals to specialist agents on remote sovereign clusters with strict circular loop breakers (`FederationLoopError`).
+  - **Decoupled API Client SDKs Extended:** Added full mesh and federation API parity to `@prat3010/retriever-client` (npm) and `retriever-python` (PyPI).
+  - **Control Plane Studio Upgraded:** Integrated 3-tab segmented controller in `McpPanel.tsx` with decentralized node topology visualizer, live routing dispatcher, and cross-cluster agent delegation cockpit under Design System 2.0.
+- **Status:** **Completed (Phase P / v1.5.0-alpha1)**
 
 
 ---

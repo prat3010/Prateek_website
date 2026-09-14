@@ -1541,6 +1541,49 @@ export interface MultimodalGraphResponse {
   metadata?: Record<string, unknown>;
 }
 
+// ── Milestone 115: Distributed Model Context Protocol (MCP) Mesh & Agent Federation (Battery #30) ────
+
+export type MeshNodeRole = "seed_gateway" | "sovereign_node" | "edge_enclave" | "remote_peer";
+export type MeshNodeStatus = "online" | "degraded" | "standby" | "unreachable";
+export type MeshRoutingPolicy = "local_first" | "lowest_latency" | "round_robin" | "failover";
+export type FederatedTaskStatus = "pending" | "executing" | "completed" | "failed" | "rejected";
+
+export interface MeshPeerNode {
+  node_id: string;
+  cluster_id: string;
+  endpoint_url: string;
+  role: MeshNodeRole;
+  status: MeshNodeStatus;
+  advertised_tools: McpToolSummary[];
+  latency_ms: number;
+  last_heartbeat: number;
+  public_key_fingerprint?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface MeshStatusSummary {
+  battery_id: string;
+  status: string;
+  total_nodes: number;
+  active_nodes: number;
+  total_mesh_tools: number;
+  routing_policy: MeshRoutingPolicy;
+  nodes: MeshPeerNode[];
+}
+
+export interface FederatedDelegationResponse {
+  delegation_id: string;
+  status: FederatedTaskStatus;
+  source_cluster_id: string;
+  target_cluster_id: string;
+  tenant_id: string;
+  synthesis: string;
+  tool_trace_summary: Record<string, unknown>[];
+  execution_latency_ms: number;
+  signature: string;
+  error_message?: string | null;
+}
+
 
 
 

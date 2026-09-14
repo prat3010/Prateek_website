@@ -1518,6 +1518,66 @@ export class RetrieverClient {
     );
   }
 
+  // ── Distributed Model Context Protocol (MCP) Mesh & Agent Federation (Battery #30) ────
+
+  async getMeshStatus(): Promise<import("./rag-types").MeshStatusSummary> {
+    return this.request<import("./rag-types").MeshStatusSummary>("/v1/mesh/status");
+  }
+
+  async listMeshNodes(statusFilter?: import("./rag-types").MeshNodeStatus): Promise<import("./rag-types").MeshPeerNode[]> {
+    const query = statusFilter ? `?status=${statusFilter}` : "";
+    return this.request<import("./rag-types").MeshPeerNode[]>(`/v1/mesh/nodes${query}`);
+  }
+
+  async listMeshTools(): Promise<import("./rag-types").McpToolSummary[]> {
+    return this.request<import("./rag-types").McpToolSummary[]>("/v1/mesh/tools");
+  }
+
+  async executeMeshTool(
+    toolName: string,
+    argumentsObj: Record<string, unknown> = {},
+    targetClusterId: string = "cluster_local",
+    policy: import("./rag-types").MeshRoutingPolicy = "local_first"
+  ): Promise<import("./rag-types").McpToolExecutionResult> {
+    return this.request<import("./rag-types").McpToolExecutionResult>(`/v1/mesh/tools/execute?policy=${policy}`, {
+      method: "POST",
+      body: JSON.stringify({
+        call_id: `call_${Math.random().toString(36).slice(2, 10)}`,
+        tool_name: toolName,
+        arguments: argumentsObj,
+        tenant_id: this.tenantId,
+        source_cluster_id: "cluster_web_studio",
+        target_cluster_id: targetClusterId,
+      }),
+    });
+  }
+
+  async delegateFederatedTask(params: {
+    target_cluster_id: string;
+    intent: string;
+    target_agent_role?: string;
+    context_scope?: Record<string, unknown>;
+    max_depth?: number;
+    visited_clusters?: string[];
+  }): Promise<import("./rag-types").FederatedDelegationResponse> {
+    return this.request<import("./rag-types").FederatedDelegationResponse>("/v1/mesh/federation/delegate", {
+      method: "POST",
+      body: JSON.stringify({
+        target_cluster_id: params.target_cluster_id,
+        tenant_id: this.tenantId,
+        intent: params.intent,
+        target_agent_role: params.target_agent_role || "forensic_auditor",
+        context_scope: params.context_scope || {},
+        max_depth: params.max_depth || 2,
+        visited_clusters: params.visited_clusters || [],
+      }),
+    });
+  }
+
+  async getFederatedTaskStatus(delegationId: string): Promise<import("./rag-types").FederatedDelegationResponse> {
+    return this.request<import("./rag-types").FederatedDelegationResponse>(`/v1/mesh/federation/tasks/${delegationId}`);
+  }
+
   // ── Multimodal Vision GraphRAG & Schematic Ingestion (Battery #29) ─────────
 
   async extractSchematicText(

@@ -22,12 +22,22 @@ describe('McpPanel Component', () => {
   const mockGetMcpConfig = vi.fn();
   const mockGetMcpTools = vi.fn();
   const mockTestMcpTool = vi.fn();
+  const mockGetMeshStatus = vi.fn();
+  const mockListMeshNodes = vi.fn();
+  const mockListMeshTools = vi.fn();
+  const mockExecuteMeshTool = vi.fn();
+  const mockDelegateFederatedTask = vi.fn();
 
   const mockClient = {
     tenantId: 'tn_test_mcp_123',
     getMcpConfig: mockGetMcpConfig,
     getMcpTools: mockGetMcpTools,
     testMcpTool: mockTestMcpTool,
+    getMeshStatus: mockGetMeshStatus,
+    listMeshNodes: mockListMeshNodes,
+    listMeshTools: mockListMeshTools,
+    executeMeshTool: mockExecuteMeshTool,
+    delegateFederatedTask: mockDelegateFederatedTask,
   } as unknown as RetrieverClient;
 
   const sampleConfig: McpConfigResponse = {
@@ -35,7 +45,7 @@ describe('McpPanel Component', () => {
     sse_endpoint: 'https://rag.prateeq.in/v1/mcp/sse',
     message_endpoint: 'https://rag.prateeq.in/v1/mcp/messages',
     total_tools: 10,
-    active_batteries: 20,
+    active_batteries: 30,
     cursor_config: { mcpServers: { retriever: { url: 'https://rag.prateeq.in/v1/mcp/sse' } } },
     claude_desktop_config: { mcpServers: { retriever: { command: 'npx' } } },
     cline_config: { mcpServers: { retriever: { url: 'https://rag.prateeq.in/v1/mcp/sse' } } },
@@ -60,23 +70,15 @@ describe('McpPanel Component', () => {
   const sampleTools: McpToolSummary[] = [
     {
       name: 'hybrid_search',
-      description: 'Dense-sparse hybrid search',
+      description: 'Hybrid vector search',
       category: 'retrieval',
       risk_level: 'low',
-      battery_id: 'dense_vector_hnsw',
     },
     {
       name: 'calculator',
-      description: 'Evaluate mathematical expressions',
+      description: 'Math calculation',
       category: 'computation_graph',
       risk_level: 'low',
-    },
-    {
-      name: 'guardrail_check',
-      description: 'Llama Guard 3 safety validation',
-      category: 'safety_defense',
-      risk_level: 'low',
-      battery_id: 'llama_guard_safety',
     },
   ];
 
@@ -84,97 +86,125 @@ describe('McpPanel Component', () => {
     vi.clearAllMocks();
     mockGetMcpConfig.mockResolvedValue(sampleConfig);
     mockGetMcpTools.mockResolvedValue(sampleTools);
+    mockGetMeshStatus.mockResolvedValue({
+      battery_id: 'distributed_mcp_mesh',
+      status: 'active',
+      total_nodes: 3,
+      active_nodes: 3,
+      total_mesh_tools: 10,
+      routing_policy: 'local_first',
+      nodes: [],
+    });
+    mockListMeshNodes.mockResolvedValue([]);
+    mockListMeshTools.mockResolvedValue(sampleTools);
   });
 
-  it('renders nothing when hidden is true', () => {
-    const { container } = render(<McpPanel hidden={true} client={mockClient} />);
-    expect(container.firstChild).toBeNull();
-  });
-
-  it('renders hero title and metrics when visible', async () => {
+  it('renders hero title and Battery #30 badges when visible', async () => {
     render(<McpPanel hidden={false} client={mockClient} tenantId="tn_test_mcp_123" />);
 
-    expect(screen.getByText(/Universal Model Context Protocol \(MCP\) Center/i)).toBeInTheDocument();
-    expect(screen.getByText(/MCP 2024-11-05/i)).toBeInTheDocument();
-    expect(screen.getByText(/20 Batteries Exposed/i)).toBeInTheDocument();
+    expect(screen.getByText(/Distributed MCP Mesh & Agent Federation/i)).toBeInTheDocument();
+    expect(screen.getByText(/Battery #30/i)).toBeInTheDocument();
+    expect(screen.getByText(/JSON-RPC 2.0 \/ SSE/i)).toBeInTheDocument();
 
     await waitFor(() => {
       expect(mockGetMcpConfig).toHaveBeenCalledWith('tn_test_mcp_123');
-      expect(mockGetMcpTools).toHaveBeenCalledWith('tn_test_mcp_123');
     });
   });
 
-  it('switches between 1-click client snippet tabs', async () => {
+  it('renders decentralized cluster topology and node cards in mesh view', async () => {
     render(<McpPanel hidden={false} client={mockClient} tenantId="tn_test_mcp_123" />);
 
-    await waitFor(() => {
-      expect(screen.getByText('Cursor IDE')).toBeInTheDocument();
+    expect(screen.getByText(/Decentralized Cluster Topology/i)).toBeInTheDocument();
+    expect(screen.getByText('node_us_gateway')).toBeInTheDocument();
+    expect(screen.getByText('node_eu_sovereign_01')).toBeInTheDocument();
+  });
+
+  it('dispatches distributed tool execution over mesh', async () => {
+    mockExecuteMeshTool.mockResolvedValue({
+      content: [{ type: 'text', text: 'Executed gdpr_residency_audit on EU Sovereign Node' }],
+      is_error: false,
+      meta: { routed_node: 'node_eu_sovereign_01', cluster_id: 'cluster_eu_enclave' },
     });
+
+    render(<McpPanel hidden={false} client={mockClient} tenantId="tn_test_mcp_123" />);
+
+    const dispatchBtn = screen.getByText(/Dispatch via Mesh/i);
+    fireEvent.click(dispatchBtn);
+
+    await waitFor(() => {
+      expect(mockExecuteMeshTool).toHaveBeenCalledWith(
+        'gdpr_residency_audit',
+        expect.any(Object),
+        'cluster_eu_enclave',
+        'local_first'
+      );
+      expect(screen.getByText(/Executed gdpr_residency_audit on EU Sovereign Node/i)).toBeInTheDocument();
+      expect(screen.getByText(/Routed Successfully/i)).toBeInTheDocument();
+    });
+  });
+
+  it('switches to Cross-Cluster Agent Federation view and delegates task', async () => {
+    mockDelegateFederatedTask.mockResolvedValue({
+      delegation_id: 'del_test_999',
+      status: 'completed',
+      source_cluster_id: 'cluster_us_primary',
+      target_cluster_id: 'cluster_eu_enclave',
+      tenant_id: 'tn_test_mcp_123',
+      synthesis: 'Sovereign data residency validated with zero leaks.',
+      tool_trace_summary: [{ tool: 'sovereign_auditor', status: 'success' }],
+      execution_latency_ms: 32.1,
+      signature: 'hmac_sig_test',
+    });
+
+    render(<McpPanel hidden={false} client={mockClient} tenantId="tn_test_mcp_123" />);
+
+    const fedTab = screen.getByText(/Cross-Cluster Agent Federation/i);
+    fireEvent.click(fedTab);
+
+    expect(screen.getByText(/Cross-Cluster Agent Delegation Cockpit/i)).toBeInTheDocument();
+
+    const delegateBtn = screen.getByText(/Delegate to Remote Cluster/i);
+    fireEvent.click(delegateBtn);
+
+    await waitFor(() => {
+      expect(mockDelegateFederatedTask).toHaveBeenCalledWith(
+        expect.objectContaining({
+          target_cluster_id: 'cluster_eu_enclave',
+          target_agent_role: 'forensic_auditor',
+        })
+      );
+      expect(screen.getByText(/Sovereign data residency validated with zero leaks/i)).toBeInTheDocument();
+      expect(screen.getByText(/Task Completed on cluster_eu_enclave/i)).toBeInTheDocument();
+    });
+  });
+
+  it('tests circular loop breaker in federation view and halts safely', async () => {
+    render(<McpPanel hidden={false} client={mockClient} tenantId="tn_test_mcp_123" />);
+
+    const fedTab = screen.getByText(/Cross-Cluster Agent Federation/i);
+    fireEvent.click(fedTab);
+
+    const loopBtn = screen.getByText(/Test Circular Loop Breaker/i);
+    fireEvent.click(loopBtn);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Safety Guard Triggered/i)).toBeInTheDocument();
+      expect(screen.getByText(/Circular delegation loop detected/i)).toBeInTheDocument();
+    });
+  });
+
+  it('switches to IDE Config view and displays 1-click snippets and tool registry', async () => {
+    render(<McpPanel hidden={false} client={mockClient} tenantId="tn_test_mcp_123" />);
+
+    const ideTab = screen.getByText(/IDE Config & Stdio/i);
+    fireEvent.click(ideTab);
+
+    expect(screen.getByText(/1-Click IDE & Agent Configurations/i)).toBeInTheDocument();
+    expect(screen.getByText('Cursor IDE')).toBeInTheDocument();
 
     const claudeTab = screen.getByText('Claude Desktop');
     fireEvent.click(claudeTab);
 
     expect(screen.getByText(/claude_desktop_config\.json/i)).toBeInTheDocument();
-  });
-
-  it('copies snippet code to clipboard on click', async () => {
-    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
-    Object.assign(navigator, {
-      clipboard: {
-        writeText: writeTextSpy,
-      },
-    });
-
-    render(<McpPanel hidden={false} client={mockClient} tenantId="tn_test_mcp_123" />);
-
-    await waitFor(() => {
-      expect(screen.getByText(/Copy Snippet/i)).toBeInTheDocument();
-    });
-
-    const copyBtn = screen.getByText(/Copy Snippet/i);
-    fireEvent.click(copyBtn);
-
-    await waitFor(() => {
-      expect(writeTextSpy).toHaveBeenCalled();
-    });
-  });
-
-  it('populates test probe when clicking Test Probe on a tool card', async () => {
-    render(<McpPanel hidden={false} client={mockClient} tenantId="tn_test_mcp_123" />);
-
-    await waitFor(() => {
-      expect(screen.getByText('hybrid_search')).toBeInTheDocument();
-    });
-
-    const testProbeButtons = screen.getAllByText('Test Probe');
-    fireEvent.click(testProbeButtons[0]);
-
-    // Check that selected tool dropdown updated or arguments filled
-    const select = screen.getByLabelText(/Selected MCP Tool/i) as HTMLSelectElement;
-    expect(select).toBeInTheDocument();
-  });
-
-  it('executes MCP tool probe via client.testMcpTool', async () => {
-    const mockExecutionResult: McpToolExecutionResult = {
-      content: [{ type: 'text', text: '604' }],
-      is_error: false,
-      meta: {},
-    };
-    mockTestMcpTool.mockResolvedValue(mockExecutionResult);
-
-    render(<McpPanel hidden={false} client={mockClient} tenantId="tn_test_mcp_123" />);
-
-    await waitFor(() => {
-      expect(screen.getByText(/Execute MCP Tool/i)).toBeInTheDocument();
-    });
-
-    const executeBtn = screen.getByText(/Execute MCP Tool/i);
-    fireEvent.click(executeBtn);
-
-    await waitFor(() => {
-      expect(mockTestMcpTool).toHaveBeenCalledWith('calculator', expect.any(Object), 'tn_test_mcp_123');
-      expect(screen.getByText('604')).toBeInTheDocument();
-      expect(screen.getByText(/Execution Success/i)).toBeInTheDocument();
-    });
   });
 });

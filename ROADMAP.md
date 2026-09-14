@@ -27,12 +27,13 @@ timeline
     Phase L (M91–M97) : Forward Deployed Engineering (FDE) Agentic Stack : Completed
     Phase M (M98–M102) : Sovereign Edge & Multi-Cloud Resiliency : Completed
     Phase N (M103–M109) : Autonomous Agent Swarms, Long-Horizon Memory & Multi-Agent Quorum : Completed
-    Phase O (M110+) : Public Open-Source Launch & Community Ecosystem : Active
+    Phase O (M110–M113) : Public Open-Source Launch & Community Ecosystem : Completed
+    Phase P (M114+) : Multimodal Real-Time Voice & Distributed Agentic Mesh : Active
 ```
 
 ---
 
-## Active Milestone Sequence (Phase M: M98 – M102, Phase N: M103 – M109 & Phase O: M110 – M113)
+## Active Milestone Sequence (Phase O: M110 – M113 & Phase P: M114 – M115)
 
 | Milestone | Title | Focus Area | Status | Detailed Specification |
 |:---|:---|:---|:---|:---|
@@ -66,6 +67,7 @@ timeline
 | **M112** | Kubernetes Native Operator & Helm Charts (v1.2.0-alpha1) | Production Helm 3 chart, RetrieverCluster CRD, level-triggered reconciler & Battery #28 | **Completed** | [`docs/UNIFIED_MASTER_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md#milestone-112-kubernetes-native-operator--production-helm-charts-v120-alpha1) |
 | **M113** | Multimodal Vision GraphRAG & Schematic Ingestion (v1.3.0-alpha1) | Architectural schematic parsing, normalized bounding-box coordinates, cross-modal GraphRAG & Battery #29 | **Completed** | [`docs/UNIFIED_MASTER_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md#milestone-113-multimodal-vision-graphrag--schematic-ingestion-v130-alpha1) |
 | **M114** | Real-time Audio Streaming & Low-Latency Full-Duplex WebRTC Voice Agent (v1.4.0-alpha1) | Full-duplex WebSocket audio streaming, in-process VAD endpointing, conversational barge-in cancellation & genuine Web Audio spectrum | **Completed** | [`docs/UNIFIED_MASTER_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md#milestone-114-real-time-audio-streaming--low-latency-full-duplex-webrtc-voice-agent) |
+| **M115** | Distributed Model Context Protocol (MCP) Mesh & Agent Federation (v1.5.0-alpha1) | Decentralized P2P MCP Mesh, HMAC trust envelopes, agent federation & Battery #30 | **Completed** | [`docs/UNIFIED_MASTER_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md#milestone-115-distributed-model-context-protocol-mcp-mesh--agent-federation) |
 
 
 
