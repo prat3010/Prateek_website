@@ -66,3 +66,13 @@ The SaaS Studio Workspace (`src/components/rag/McpPanel.tsx`) at `/rag/app?tab=m
 - **Frontend Tests:** Vitest `src/components/rag/__tests__/McpPanel.test.tsx` (renders topology, dispatches distributed tool, tests federation delegation and circular loop breaker).
 - **TypeScript:** 100% type safety via `tsc --noEmit`.
 - **Zero-Toy Audit:** 100% compliant with zero synthetic facades via `audit_zero_toy.py`.
+
+---
+
+## 5. Related Architecture Specifications & Enterprise Handbooks
+
+- 🕸️ **Distributed MCP Mesh & Agent Federation Handbook:** [`../../retriever/docs/cognitive/DISTRIBUTED_MCP_MESH_HANDBOOK.md`](../../retriever/docs/cognitive/DISTRIBUTED_MCP_MESH_HANDBOOK.md)
+- 🔌 **Distributed MCP Mesh REST API Reference:** [`../../retriever/docs/api/mesh.md`](../../retriever/docs/api/mesh.md)
+- 🏛️ **Architecture Decision Record (ADR 30):** [`../../retriever/docs/decisions/0030-distributed-mcp-mesh-agent-federation.md`](../../retriever/docs/decisions/0030-distributed-mcp-mesh-agent-federation.md)
+- 📜 **Core Feature Specification:** [`../../retriever/docs/features/distributed-mcp-mesh.md`](../../retriever/docs/features/distributed-mcp-mesh.md)
+- 🛡️ **Sovereign Edge Swarm Handbook:** [`../../retriever/docs/cognitive/SOVEREIGN_EDGE_SWARM_HANDBOOK.md`](../../retriever/docs/cognitive/SOVEREIGN_EDGE_SWARM_HANDBOOK.md)

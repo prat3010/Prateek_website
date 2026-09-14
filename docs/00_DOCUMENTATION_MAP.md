@@ -90,4 +90,5 @@ Welcome to the **Prateek Sharma Engineering Platform Documentation Map**. This c
 - 🗺️ **Retriever Open-Source Roadmap:** [`../../retriever/ROADMAP.md`](../../retriever/ROADMAP.md)
 - 🔒 **Enterprise Security Whitepaper:** [`../../retriever/docs/security/ENTERPRISE_RAG_SECURITY_WHITEPAPER.md`](../../retriever/docs/security/ENTERPRISE_RAG_SECURITY_WHITEPAPER.md)
 - 🛡️ **Sovereign Edge Swarm Handbook:** [`../../retriever/docs/cognitive/SOVEREIGN_EDGE_SWARM_HANDBOOK.md`](../../retriever/docs/cognitive/SOVEREIGN_EDGE_SWARM_HANDBOOK.md)
+- 🕸️ **Distributed MCP Mesh & Federation Handbook:** [`../../retriever/docs/cognitive/DISTRIBUTED_MCP_MESH_HANDBOOK.md`](../../retriever/docs/cognitive/DISTRIBUTED_MCP_MESH_HANDBOOK.md)
 - 🤝 **Contributing Guide:** [`../../retriever/CONTRIBUTING.md`](../../retriever/CONTRIBUTING.md)
