@@ -1363,6 +1363,129 @@ export class RetrieverClient {
     );
   }
 
+  // ── Milestone 114: Real-Time Audio Streaming & Full-Duplex Voice Agent ───────
+
+  createVoiceStream(
+    sessionId: string,
+    callbacks: import("./rag-types").VoiceStreamCallbacks,
+    options?: {
+      sensitivity?: number;
+      silenceThresholdMs?: number;
+      voice?: import("./rag-types").VoiceTimbre;
+      speed?: number;
+    }
+  ): import("./rag-types").VoiceStreamSession {
+    const apiUrl = this.config.apiUrl || "http://localhost:8000";
+    const wsProto = apiUrl.startsWith("https") ? "wss" : "ws";
+    const host = apiUrl.replace(/^https?:\/\//, "").replace(/\/+$/, "");
+    const params = new URLSearchParams({
+      token: this.config.apiKey,
+      sensitivity: String(options?.sensitivity ?? 0.65),
+      silence_threshold_ms: String(options?.silenceThresholdMs ?? 400),
+      voice: options?.voice ?? "neural_natural",
+      speed: String(options?.speed ?? 1.0),
+    });
+    const url = `${wsProto}://${host}/v1/tenants/${this.tenantId}/voice/stream/${sessionId}?${params.toString()}`;
+
+    const WebSocketImpl =
+      typeof WebSocket !== "undefined"
+        ? WebSocket
+        : (globalThis as unknown as { WebSocket: typeof WebSocket }).WebSocket;
+    if (!WebSocketImpl) {
+      throw new Error("WebSocket implementation not found in global scope");
+    }
+
+    const ws = new WebSocketImpl(url);
+    ws.binaryType = "arraybuffer";
+
+    ws.onmessage = (event: MessageEvent) => {
+      if (typeof event.data === "string") {
+        try {
+          const msg = JSON.parse(event.data) as import("./rag-types").VoiceStreamControlMessage;
+          switch (msg.event_type) {
+            case "session_ready":
+              callbacks.onSessionReady?.(
+                msg.payload as { codec: string; sample_rate_hz: number; channels: number }
+              );
+              break;
+            case "vad_state":
+              callbacks.onVadState?.(
+                msg.payload?.state as "speech_detected" | "endpoint_detected",
+                msg.payload
+              );
+              break;
+            case "transcript_partial":
+            case "transcript_final":
+              callbacks.onTranscript?.({
+                text: String(msg.payload?.text ?? ""),
+                confidence: Number(msg.payload?.confidence ?? 1.0),
+                is_final: msg.event_type === "transcript_final",
+                latency_ms: msg.payload?.latency_ms as number | undefined,
+              });
+              break;
+            case "agent_thinking":
+              callbacks.onAgentThinking?.(msg.payload);
+              break;
+            case "agent_text_delta":
+              callbacks.onAgentTextDelta?.(String(msg.payload?.delta || ""));
+              break;
+            case "interrupted":
+              callbacks.onInterrupted?.(
+                msg.payload as { reason: string; cancelled_turn_id?: string; speech_frames?: number }
+              );
+              break;
+            case "turn_complete":
+              callbacks.onTurnComplete?.(msg.payload?.turn as import("./rag-types").VoiceTurn);
+              break;
+            case "error":
+              callbacks.onError?.(String(msg.payload?.error || "Unknown stream error"));
+              break;
+          }
+        } catch (e: unknown) {
+          callbacks.onError?.(e instanceof Error ? e : String(e));
+        }
+      } else if (event.data instanceof ArrayBuffer || ArrayBuffer.isView(event.data)) {
+        const chunk = event.data instanceof ArrayBuffer ? new Uint8Array(event.data) : new Uint8Array(event.data.buffer);
+        callbacks.onAgentAudioChunk?.(chunk);
+      }
+    };
+
+    ws.onerror = (err: Event | unknown) => {
+      callbacks.onError?.(err instanceof Error ? err : String(err));
+    };
+
+    ws.onclose = () => {
+      callbacks.onClose?.();
+    };
+
+    return {
+      sendAudioFrame: (frameBytes: Uint8Array | ArrayBuffer) => {
+        if (ws.readyState === (ws.OPEN ?? 1)) {
+          ws.send(frameBytes);
+        }
+      },
+      sendTextInput: (text: string) => {
+        if (ws.readyState === (ws.OPEN ?? 1)) {
+          ws.send(JSON.stringify({ event_type: "text_input", text }));
+        }
+      },
+      interrupt: (reason: string = "client_interrupt") => {
+        if (ws.readyState === (ws.OPEN ?? 1)) {
+          ws.send(JSON.stringify({ event_type: "interrupt", reason }));
+        }
+      },
+      ping: () => {
+        if (ws.readyState === (ws.OPEN ?? 1)) {
+          ws.send(JSON.stringify({ event_type: "ping" }));
+        }
+      },
+      close: () => {
+        ws.close();
+      },
+    };
+  }
+
+
   async getMcpConfig(tenantId?: string): Promise<import("./rag-types").McpConfigResponse> {
     const targetTenant = tenantId || this.tenantId;
     return this.request<import("./rag-types").McpConfigResponse>(
@@ -1393,6 +1516,62 @@ export class RetrieverClient {
         }),
       }
     );
+  }
+
+  // ── Multimodal Vision GraphRAG & Schematic Ingestion (Battery #29) ─────────
+
+  async extractSchematicText(
+    content: string,
+    filename: string = "architecture.svg",
+    documentId?: string
+  ): Promise<import("./rag-types").SchematicDiagram> {
+    return this.request<import("./rag-types").SchematicDiagram>(
+      `/v1/tenants/${this.tenantId}/vision/schematic/extract-text`,
+      {
+        method: "POST",
+        body: JSON.stringify({ content, filename, document_id: documentId }),
+      }
+    );
+  }
+
+  async queryMultimodalGraph(
+    entityQuery: string,
+    maxHops: number = 2
+  ): Promise<import("./rag-types").MultimodalGraphResponse> {
+    return this.request<import("./rag-types").MultimodalGraphResponse>(
+      `/v1/tenants/${this.tenantId}/vision/graph/query`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          tenant_id: this.tenantId,
+          entity_query: entityQuery,
+          max_hops: maxHops,
+          include_visual_boxes: true,
+        }),
+      }
+    );
+  }
+
+  async getDocumentSchematics(
+    documentId: string
+  ): Promise<{ document_id: string; total_triples: number; triples: import("./rag-types").EntityTripleItem[] }> {
+    return this.request<{ document_id: string; total_triples: number; triples: import("./rag-types").EntityTripleItem[] }>(
+      `/v1/tenants/${this.tenantId}/vision/schematics/${encodeURIComponent(documentId)}`
+    );
+  }
+
+  async getMultimodalVisionStatus(): Promise<{
+    battery_id: string;
+    status: string;
+    version: string;
+    milestone: string;
+  }> {
+    return this.request<{
+      battery_id: string;
+      status: string;
+      version: string;
+      milestone: string;
+    }>("/v1/graph/multimodal/status");
   }
 }
 

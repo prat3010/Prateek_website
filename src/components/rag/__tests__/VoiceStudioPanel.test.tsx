@@ -243,4 +243,36 @@ describe('VoiceStudioPanel Component', () => {
       expect(screen.getByText(/WebRTC full-duplex session established/i)).toBeInTheDocument();
     });
   });
+
+  it('triggers conversational barge-in when interrupt button is clicked', async () => {
+    render(<VoiceStudioPanel hidden={false} client={mockClient} tenantId="tn_test_voice_123" />);
+
+    // Activate mic
+    const micBtn = screen.getByText(/Activate Sovereign Mic/i);
+    fireEvent.click(micBtn);
+
+    await waitFor(() => {
+      expect(screen.getByText(/State: LISTENING/i)).toBeInTheDocument();
+    });
+
+    // Simulate turn to put into speaking state
+    const turnInput = screen.getByPlaceholderText(/Simulate user voice query/i);
+    fireEvent.change(turnInput, { target: { value: 'Query' } });
+    const sendBtn = screen.getByRole('button', { name: /➤ Send/i });
+    fireEvent.click(sendBtn);
+
+    await waitFor(() => {
+      expect(screen.getByText(/State: SPEAKING/i)).toBeInTheDocument();
+    });
+
+    // Click barge-in button
+    const interruptBtn = screen.getByTestId('barge-in-btn');
+    fireEvent.click(interruptBtn);
+
+    await waitFor(() => {
+      expect(screen.getByText(/State: LISTENING/i)).toBeInTheDocument();
+      expect(screen.getByText(/Conversational barge-in executed/i)).toBeInTheDocument();
+    });
+  });
 });
+

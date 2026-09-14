@@ -951,6 +951,7 @@ timeline
 │  [M111] Community Connectors Ecosystem (Postgres/MySQL CDC, S3/GCS Watchers)          │
 │  [M112] Kubernetes Native Operator & Production Helm Charts                            │
 │  [M113] Multimodal Vision GraphRAG & Schematic Ingestion                               │
+│  [M114] Real-time Audio Streaming & Low-Latency Full-Duplex WebRTC Voice Agent         │
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -988,6 +989,31 @@ timeline
   - **Admin Cluster Management APIs:** `GET /v1/admin/operator/status`, `GET /v1/admin/operator/clusters`, `POST /v1/admin/operator/reconcile`, and `POST /v1/admin/operator/clusters/{cluster_name}/backup`.
   - **Platform Battery #28 Registration:** Cataloged `kubernetes_native_operator` in `BatteryService` under `SYSTEM_EXTENSIBILITY`.
 - **Status:** **Completed (Phase O / v1.2.0-alpha1)**
+
+#### 👁️ Milestone 113: Multimodal Vision GraphRAG & Schematic Ingestion
+- **Libraries:** SVG XML, Struct, Pytest, FastAPI, React 19, TypeScript
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/abstractions/vision.py`, `apps/api/src/domain/vision/`, `apps/api/src/adapters/cognitive/vision_parser_adapter.py`, `apps/api/src/routers/vision.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `src/components/rag/ChatPanel.tsx`, `src/components/rag/rag.module.css`, `docs/UNIFIED_MASTER_ROADMAP.md`, `ROADMAP.md`)
+- **Deliverable:**
+  - **Platform Battery #29 Registration:** Cataloged `multimodal_vision_graphrag` in `BatteryService` under `COMPUTATION_GRAPH`.
+  - **Architectural Schematic Parsing Engine:** Pure domain `SchematicExtractor` parsing SVG XML layouts, binary image headers, flow patterns, and directional connectors with protocols.
+  - **Normalized Coordinate Geometry:** `BoundingBox` validation ensuring strict $[0.0, 1.0]$ bounds, IoU math, and architectural ontology classification (`api_gateway`, `database`, `microservice`, `queue`, `client_app`, `cache`, `storage`, `auth_service`).
+  - **Cross-Modal Knowledge Graph Traversal:** Multi-hop graph search linking visual layout components to textual documentation chunks with verifiable visual citations (`[Schematic: ... | Box: ... | "..."]`).
+  - **FastAPI Multimodal Endpoints:** Mounted `/v1/tenants/{tenantId}/vision/schematic/extract`, `/extract-text`, `/graph/query`, `/schematics/{documentId}`, and `/v1/graph/multimodal/status`.
+  - **Decoupled Client SDKs Updated:** Added full Vision GraphRAG API parity to `@prat3010/retriever-client` (npm) and `retriever-python` (PyPI).
+  - **Control Plane Visual Lightbox:** Integrated visual citation badges and responsive `<Portal>` bounding-box inspection lightbox in `ChatPanel.tsx` with Design System 2.0 theme parity.
+- **Status:** **Completed (Phase O / v1.3.0-alpha1)**
+
+#### 🎙️ Milestone 114: Real-time Audio Streaming & Low-Latency Full-Duplex WebRTC Voice Agent
+- **Libraries:** WebSocket, Web Audio API, Whisper, PCM16, Pytest, React 19, TypeScript
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/voice/voice_stream_service.py`, `apps/api/src/routers/voice.py`, `apps/api/tests/test_voice_streaming.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `src/components/rag/VoiceStudioPanel.tsx`, `src/components/rag/VoiceStudioPanel.module.css`, `docs/35_Realtime_Audio_Streaming_and_Voice_Agent_PRD.md`)
+- **Deliverable:**
+  - **Ultra-Low Latency Streaming Audio Pipeline:** Bi-directional full-duplex WebSocket streaming endpoint (`/v1/tenants/{tenantId}/voice/stream/{sessionId}`) with sub-300ms Time-to-First-Audio-Byte (TTFAB) and zero-cloud audio egress.
+  - **Continuous 20ms PCM16 Ingestion & VAD Endpointing:** Real-time RMS & ZCR voice activity detection and automatic speech endpointing (400ms silence threshold) eliminating manual click-to-stop.
+  - **Conversational Barge-In / Interruption Engine:** Instant cancellation of server-side synthesis tasks upon user speech detection ($\ge 3$ frames = 60ms) emitting an `interrupted` event and resetting state to `LISTENING`.
+  - **Decoupled Client SDKs Updated:** Exported `createVoiceStream` and full event typing (`onSessionReady`, `onVadState`, `onTranscript`, `onAgentAudioChunk`, `onInterrupted`, `onTurnComplete`) in `@prat3010/retriever-client` and `retriever-python`.
+  - **Control Plane Voice Studio Upgrade:** Integrated genuine Web Audio API `AudioContext` + `AnalyserNode` frequency spectrum visualization in `VoiceStudioPanel.tsx` and purged all fake `Math.random()` bars and timer mocks.
+- **Status:** **Completed (Phase P / v1.4.0-alpha1)**
+
 
 ---
 

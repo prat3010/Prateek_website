@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import NumberFlow from "@number-flow/react";
 import { RetrieverClient } from "@/lib/rag-client";
 import type {
@@ -10,6 +10,7 @@ import type {
   VoiceSession,
   VoiceTurn,
   VoiceSessionTelemetry,
+  VoiceStreamSession,
 } from "@/lib/rag-types";
 import MagneticButton from "@/components/ui/MagneticButton";
 import styles from "./VoiceStudioPanel.module.css";
@@ -61,8 +62,16 @@ export function VoiceStudioPanel({ hidden, client, tenantId }: VoiceStudioPanelP
   const [simulatingTurn, setSimulatingTurn] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  // Waveform visualization state (16 audio frequency bars)
-  const [bars, setBars] = useState<number[]>(() => Array(16).fill(8));
+  // Genuine Web Audio API FFT frequency bars (16 frequency bands)
+  const [bars, setBars] = useState<number[]>(() => Array(16).fill(6));
+
+  // Audio refs
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  const animFrameRef = useRef<number | null>(null);
+  const streamSessionRef = useRef<VoiceStreamSession | null>(null);
+  const activeAudioSourceRef = useRef<AudioBufferSourceNode | null>(null);
 
   const fetchTelemetry = useCallback(async () => {
     if (!client) return;
@@ -95,27 +104,131 @@ export function VoiceStudioPanel({ hidden, client, tenantId }: VoiceStudioPanelP
     };
   }, [hidden, client]);
 
-  // Dynamic waveform animation driven by session state
-  useEffect(() => {
-    if (sessionState !== "listening" && sessionState !== "speaking") {
-      return;
+  // Genuine Web Audio API Frequency Spectrum Analysis
+  const startAudioSpectrum = (stream: MediaStream) => {
+    try {
+      const AudioCtxClass =
+        typeof window !== "undefined"
+          ? window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+          : null;
+      if (!AudioCtxClass) return;
+
+      if (!audioCtxRef.current) {
+        audioCtxRef.current = new AudioCtxClass();
+      }
+      const ctx = audioCtxRef.current;
+      if (ctx.state === "suspended") {
+        ctx.resume();
+      }
+
+      const source = ctx.createMediaStreamSource(stream);
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 64;
+      analyser.smoothingTimeConstant = 0.8;
+      source.connect(analyser);
+      analyserRef.current = analyser;
+
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+      const updateSpectrum = () => {
+        if (!analyserRef.current) return;
+        analyserRef.current.getByteFrequencyData(dataArray);
+        const heights = Array.from({ length: 16 }, (_, i) => {
+          const raw = dataArray[i * 2] || 0;
+          return Math.max(6, Math.min(54, Math.round((raw / 255) * 54)));
+        });
+        setBars(heights);
+        animFrameRef.current = requestAnimationFrame(updateSpectrum);
+      };
+      updateSpectrum();
+    } catch (e) {
+      console.warn("AudioContext visualization unsupported:", e);
     }
+  };
 
-    const interval = setInterval(() => {
-      setBars(
-        Array.from({ length: 16 }, () =>
-          sessionState === "speaking"
-            ? Math.floor(Math.random() * 48) + 12
-            : Math.floor(Math.random() * 32) + 6
-        )
-      );
-    }, 90);
+  const stopAudioSpectrum = () => {
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current);
+      animFrameRef.current = null;
+    }
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+      mediaStreamRef.current = null;
+    }
+    analyserRef.current = null;
+    setBars(Array(16).fill(6));
+  };
 
+  // Convert raw PCM16 audio chunks to AudioBuffer and play via Web Audio API
+  const playAudioChunk = async (pcm16Bytes: Uint8Array) => {
+    try {
+      const AudioCtxClass =
+        typeof window !== "undefined"
+          ? window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+          : null;
+      if (!AudioCtxClass) return;
+
+      if (!audioCtxRef.current) {
+        audioCtxRef.current = new AudioCtxClass();
+      }
+      const ctx = audioCtxRef.current;
+      if (ctx.state === "suspended") {
+        await ctx.resume();
+      }
+
+      const numSamples = Math.floor(pcm16Bytes.length / 2);
+      const audioBuffer = ctx.createBuffer(1, numSamples, 16000);
+      const channelData = audioBuffer.getChannelData(0);
+      const dataView = new DataView(pcm16Bytes.buffer, pcm16Bytes.byteOffset, pcm16Bytes.byteLength);
+
+      for (let i = 0; i < numSamples; i++) {
+        const int16 = dataView.getInt16(i * 2, true);
+        channelData[i] = int16 / 32768.0;
+      }
+
+      const source = ctx.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(ctx.destination);
+      activeAudioSourceRef.current = source;
+      source.start();
+      setSessionState("speaking");
+    } catch (err) {
+      console.warn("Error playing audio chunk:", err);
+    }
+  };
+
+  // Conversational Barge-In: Halt audio output immediately
+  const handleInterrupt = (reason: string = "user_barge_in") => {
+    if (activeAudioSourceRef.current) {
+      try {
+        activeAudioSourceRef.current.stop();
+      } catch {}
+      activeAudioSourceRef.current = null;
+    }
+    if (streamSessionRef.current) {
+      streamSessionRef.current.interrupt(reason);
+    }
+    setSessionState("listening");
+    setStatusMessage({
+      type: "success",
+      text: "⚡ Conversational barge-in executed: Agent output cancelled.",
+    });
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
     return () => {
-      clearInterval(interval);
-      setBars(Array(16).fill(8));
+      stopAudioSpectrum();
+      if (streamSessionRef.current) {
+        streamSessionRef.current.close();
+        streamSessionRef.current = null;
+      }
+      if (audioCtxRef.current) {
+        audioCtxRef.current.close().catch(() => {});
+        audioCtxRef.current = null;
+      }
     };
-  }, [sessionState]);
+  }, []);
 
   const handleToggleMic = async () => {
     if (sessionState === "disconnected") {
@@ -123,6 +236,7 @@ export function VoiceStudioPanel({ hidden, client, tenantId }: VoiceStudioPanelP
       setStatusMessage(null);
       try {
         let createdSession: VoiceSession;
+
         if (client) {
           createdSession = await client.createVoiceSession({
             tenant_id: tenantId || "tn_demo",
@@ -132,14 +246,75 @@ export function VoiceStudioPanel({ hidden, client, tenantId }: VoiceStudioPanelP
           });
           setSession(createdSession);
 
-          // Exchange WebRTC SDP Offer/Answer signaling
+          // WebRTC SDP Offer/Answer signaling
           await client.sendVoiceSignal({
             session_id: createdSession.session_id,
             message_type: "offer",
             sdp: "v=0\r\no=- 12345 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 9 RTP/SAVPF 111\r\nc=IN IP4 127.0.0.1\r\na=rtpmap:111 opus/48000/2",
           });
+
+          // Connect live WebSocket stream if createVoiceStream is available
+          if (typeof client.createVoiceStream === "function") {
+            try {
+              const streamSess = client.createVoiceStream(
+                createdSession.session_id,
+                {
+                  onSessionReady: () => {
+                    setSessionState("listening");
+                  },
+                  onVadState: (st) => {
+                    if (st === "speech_detected") {
+                      setSessionState("listening");
+                    }
+                  },
+                  onTranscript: (tr) => {
+                    setStatusMessage({
+                      type: "success",
+                      text: `Transcript: "${tr.text}" (${tr.latency_ms ? `${tr.latency_ms}ms` : "real-time"})`,
+                    });
+                  },
+                  onAgentThinking: () => {
+                    setSessionState("thinking");
+                  },
+                  onAgentTextDelta: (delta) => {
+                    setStatusMessage({
+                      type: "success",
+                      text: `Agent delta: ${delta}`,
+                    });
+                  },
+                  onAgentAudioChunk: (chunk) => {
+                    playAudioChunk(chunk);
+                  },
+                  onInterrupted: (evt) => {
+                    handleInterrupt(evt.reason);
+                  },
+                  onTurnComplete: (turn) => {
+                    setTurns((prev) => [turn, ...prev.slice(0, 9)]);
+                    setSessionState("listening");
+                  },
+                  onError: (err) => {
+                    setStatusMessage({
+                      type: "error",
+                      text: typeof err === "string" ? err : err.message,
+                    });
+                  },
+                  onClose: () => {
+                    setSessionState("disconnected");
+                  },
+                },
+                {
+                  sensitivity: vadSensitivity,
+                  voice: selectedVoice,
+                  speed: 1.0,
+                }
+              );
+              streamSessionRef.current = streamSess;
+            } catch (wsErr) {
+              console.warn("WebSocket streaming connection fallback:", wsErr);
+            }
+          }
         } else {
-          // Offline / demo fallback session
+          // Offline fallback session
           createdSession = {
             session_id: `vcs_sim_${Date.now().toString(36)}`,
             tenant_id: tenantId || "tn_demo",
@@ -159,18 +334,35 @@ export function VoiceStudioPanel({ hidden, client, tenantId }: VoiceStudioPanelP
           setSession(createdSession);
         }
 
+        // Connect microphone for real FFT visualizer if available
+        if (typeof navigator !== "undefined" && navigator.mediaDevices?.getUserMedia) {
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaStreamRef.current = stream;
+            startAudioSpectrum(stream);
+          } catch {
+            // Spectrum fallback
+          }
+        }
+
         setSessionState("listening");
         setStatusMessage({
           type: "success",
           text: `WebRTC full-duplex session established (${createdSession.session_id.slice(0, 12)}…). VAD active.`,
         });
       } catch (err: unknown) {
+        stopAudioSpectrum();
         setSessionState("disconnected");
         const msg = err instanceof Error ? err.message : "Failed to initialize WebRTC voice stream";
         setStatusMessage({ type: "error", text: msg });
       }
     } else {
       // Disconnect session
+      if (streamSessionRef.current) {
+        streamSessionRef.current.close();
+        streamSessionRef.current = null;
+      }
+      stopAudioSpectrum();
       setSessionState("disconnected");
       setStatusMessage({
         type: "success",
@@ -194,14 +386,12 @@ export function VoiceStudioPanel({ hidden, client, tenantId }: VoiceStudioPanelP
           text: `Synthesized ${res.chunks_count} neural PCM16 chunks (${res.total_bytes} bytes) in sub-250ms TTFAB.`,
         });
       } else {
-        // Fallback simulation
         await new Promise((r) => setTimeout(r, 180));
         setStatusMessage({
           type: "success",
           text: `[Simulation] Synthesized 4 chunks (38,400 bytes) in 180ms TTFAB via ${selectedVoice}.`,
         });
       }
-      // Trigger speaking waveform pulse
       const priorState = sessionState;
       setSessionState("speaking");
       setTimeout(() => {
@@ -235,7 +425,6 @@ export function VoiceStudioPanel({ hidden, client, tenantId }: VoiceStudioPanelP
           text: `Turn completed: TTFAB ${res.turn.time_to_first_audio_byte_ms}ms, Total ${res.turn.total_turn_duration_ms}ms.`,
         });
       } else {
-        // Fallback simulation
         await new Promise((r) => setTimeout(r, 220));
         const simTurn: VoiceTurn = {
           turn_id: `trn_${Date.now().toString(36)}`,
@@ -282,13 +471,14 @@ export function VoiceStudioPanel({ hidden, client, tenantId }: VoiceStudioPanelP
           </h2>
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", margin: "0.35rem 0" }}>
             <span className={styles.badgeM100}>M100 • v0.85.0</span>
+            <span className={styles.badgeM114}>M114 • v1.4.0-alpha1 (Full-Duplex Stream)</span>
             <span className={styles.badgeBattery}>Platform Battery #20: Active</span>
             <span className={styles.badgeBattery}>Local Whisper ASR (RMS VAD)</span>
             <span className={styles.badgeBattery}>Zero Cloud Egress</span>
           </div>
           <p className={styles.description}>
             Full-duplex bidirectional conversational speech pipeline with sub-250ms Time-to-First-Audio-Byte (TTFAB).
-            Powered by local Whisper ASR endpointing, WebRTC SDP/ICE signaling, and streaming neural speech synthesis.
+            Powered by local Whisper ASR endpointing, real-time Web Audio API spectrum analysis, and conversational barge-in.
           </p>
         </div>
 
@@ -409,12 +599,24 @@ export function VoiceStudioPanel({ hidden, client, tenantId }: VoiceStudioPanelP
                   State: {sessionState === "disconnected" ? "IDLE" : sessionState.toUpperCase()}
                 </span>
               </div>
-              <span className={styles.sessionSessionId}>
-                {session ? session.session_id : "No active session"}
-              </span>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <span className={styles.sessionSessionId}>
+                  {session ? session.session_id : "No active session"}
+                </span>
+                {sessionState === "speaking" && (
+                  <button
+                    data-testid="barge-in-btn"
+                    className={styles.btnInterrupt}
+                    onClick={() => handleInterrupt("user_click_barge_in")}
+                    title="Interrupt active agent speech output"
+                  >
+                    ⚡ Barge-In
+                  </button>
+                )}
+              </div>
             </div>
 
-            {/* Audio Waveform Visualizer */}
+            {/* Audio Waveform Visualizer (Real Web Audio API Spectrum) */}
             <div className={styles.waveformBox} aria-label="Audio Waveform Visualizer">
               {bars.map((height, idx) => (
                 <div
@@ -479,8 +681,8 @@ export function VoiceStudioPanel({ hidden, client, tenantId }: VoiceStudioPanelP
               </div>
             </div>
 
-            {/* Primary Action Deck: Connect / Mic Toggle */}
-            <div className={styles.deckActions}>
+            {/* Primary Action Deck: Connect / Mic Toggle & Barge-In */}
+            <div className={styles.deckActions} style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
               <MagneticButton strength={0.25}>
                 <button
                   className={`${styles.btnMic} ${
@@ -491,6 +693,17 @@ export function VoiceStudioPanel({ hidden, client, tenantId }: VoiceStudioPanelP
                   <span>{sessionState !== "disconnected" ? "⏹ Stop Voice Stream" : "🎙️ Activate Sovereign Mic"}</span>
                 </button>
               </MagneticButton>
+
+              {sessionState !== "disconnected" && (
+                <button
+                  className={styles.btnInterrupt}
+                  onClick={() => handleInterrupt("manual_button")}
+                  disabled={sessionState !== "speaking" && sessionState !== "thinking"}
+                  title="Immediately cancel agent utterance"
+                >
+                  ⚡ Barge-In / Interrupt
+                </button>
+              )}
             </div>
 
             {/* Quick Synthesis Tester */}

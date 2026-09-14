@@ -77,17 +77,14 @@ describe('GatewayPanel Multi-Model Economic Orchestrator (Milestone 105)', () =>
 
     await waitFor(() => {
       expect(screen.getByText('Multi-Model Economic Orchestrator & Smart Tool Gateway')).toBeDefined();
+      expect(screen.getByText('Net Arbitrage Savings')).toBeDefined();
+      expect(screen.getByText('Mid-Tier Workload Share')).toBeDefined();
+      expect(screen.getByText('Mid-Flight Escalation Rate')).toBeDefined();
+      expect(screen.getByText('Effective Cost Reduction')).toBeDefined();
+      expect(screen.getByText('Recent Economic Ledger Transactions')).toBeDefined();
+      expect(screen.getByText('Calculate monthly ROI for vector indexing')).toBeDefined();
+      expect(screen.getByText('Escalated')).toBeDefined();
     });
-
-    expect(screen.getByText('Net Arbitrage Savings')).toBeDefined();
-    expect(screen.getByText('Mid-Tier Workload Share')).toBeDefined();
-    expect(screen.getByText('Mid-Flight Escalation Rate')).toBeDefined();
-    expect(screen.getByText('Effective Cost Reduction')).toBeDefined();
-
-    // Verify recent transactions table renders
-    expect(screen.getByText('Recent Economic Ledger Transactions')).toBeDefined();
-    expect(screen.getByText('Calculate monthly ROI for vector indexing')).toBeDefined();
-    expect(screen.getByText('Escalated')).toBeDefined();
   });
 
   it('classifies task complexity interactively through the lab form', async () => {

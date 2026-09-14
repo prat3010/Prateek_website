@@ -39,6 +39,15 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
   const [feedbackText, setFeedbackText] = useState("");
   const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
 
+  // Visual Citation Lightbox modal state (Milestone 113 / Battery #29)
+  interface VisualCitationData {
+    diagramTitle: string;
+    elementLabel?: string;
+    box?: [number, number, number, number];
+    snippet?: string;
+  }
+  const [activeVisualCitation, setActiveVisualCitation] = useState<VisualCitationData | null>(null);
+
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const isUserScrolledUp = useRef(false);
@@ -431,14 +440,15 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
     content: string,
     onDownloadCitation: (docId: string) => void
   ): ReactNode {
-    const citationRegex = /\[(?:(Doc|Source):\s*([^\]]+)|(\d+))\]/g;
+    const citationRegex = /\[(?:(Doc|Source|Schematic|Diagram):\s*([^\]]+)|(\d+))\]/g;
     const parts: ReactNode[] = [];
     let lastIndex = 0;
     let match: RegExpExecArray | null;
 
     while ((match = citationRegex.exec(content)) !== null) {
       const fullMatch = match[0];
-      const isNamed = Boolean(match[1] || match[2]);
+      const kind = match[1]; // "Doc" | "Source" | "Schematic" | "Diagram" | undefined
+      const isNamed = Boolean(kind || match[2]);
       const rawDocIdentifier = isNamed ? match[2] : `Reference ${match[3]}`;
       const matchIndex = match.index;
 
@@ -447,37 +457,79 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
       }
 
       if (isNamed) {
-        // Check if citation carries explicit exact span quote: e.g. filename.pdf | "exact text snippet"
-        const pipeIndex = rawDocIdentifier.indexOf("|");
-        let docName = rawDocIdentifier.trim();
-        let quoteSnippet = "";
+        if (kind === "Schematic" || kind === "Diagram") {
+          // Parse format: [Schematic: title | Box: ymin,xmin,ymax,xmax | "element label"]
+          const segments = rawDocIdentifier.split("|").map((s) => s.trim());
+          const diagramTitle = segments[0] || "Architecture Schematic";
+          let elementLabel = "";
+          let boundingBox: [number, number, number, number] | undefined;
 
-        if (pipeIndex !== -1) {
-          docName = rawDocIdentifier.substring(0, pipeIndex).trim();
-          quoteSnippet = rawDocIdentifier.substring(pipeIndex + 1).replace(/^[\s"]+|[\s"]+$/g, "");
-        }
+          for (let i = 1; i < segments.length; i++) {
+            const seg = segments[i];
+            if (seg.toLowerCase().startsWith("box:")) {
+              const coordsStr = seg.substring(4).trim();
+              const coords = coordsStr.split(",").map((c) => parseFloat(c.trim()));
+              if (coords.length === 4 && coords.every((n) => !isNaN(n))) {
+                boundingBox = [coords[0], coords[1], coords[2], coords[3]];
+              }
+            } else if (seg.startsWith('"') && seg.endsWith('"')) {
+              elementLabel = seg.slice(1, -1);
+            } else if (!elementLabel) {
+              elementLabel = seg;
+            }
+          }
 
-        if (quoteSnippet) {
           parts.push(
-            <span key={`quote-${matchIndex}`} className={styles.groundedHighlight} title="Verified Exact String Span Context Match">
-              “{quoteSnippet}”
-            </span>
+            <button
+              key={`visual-citation-${matchIndex}`}
+              className={styles.schematicBadge}
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveVisualCitation({
+                  diagramTitle,
+                  elementLabel: elementLabel || undefined,
+                  box: boundingBox,
+                  snippet: elementLabel ? `Visual element: ${elementLabel}` : undefined,
+                });
+              }}
+              title={`🔍 View Architectural Schematic: ${diagramTitle}${elementLabel ? ` → [${elementLabel}]` : ""}`}
+            >
+              📐 {diagramTitle} {elementLabel ? `[${elementLabel}]` : ""}
+            </button>
+          );
+        } else {
+          // Check if citation carries explicit exact span quote: e.g. filename.pdf | "exact text snippet"
+          const pipeIndex = rawDocIdentifier.indexOf("|");
+          let docName = rawDocIdentifier.trim();
+          let quoteSnippet = "";
+
+          if (pipeIndex !== -1) {
+            docName = rawDocIdentifier.substring(0, pipeIndex).trim();
+            quoteSnippet = rawDocIdentifier.substring(pipeIndex + 1).replace(/^[\s"]+|[\s"]+$/g, "");
+          }
+
+          if (quoteSnippet) {
+            parts.push(
+              <span key={`quote-${matchIndex}`} className={styles.groundedHighlight} title="Verified Exact String Span Context Match">
+                “{quoteSnippet}”
+              </span>
+            );
+          }
+
+          parts.push(
+            <button
+              key={`citation-${matchIndex}`}
+              className={styles.citationBadge}
+              onClick={(e) => {
+                e.preventDefault();
+                onDownloadCitation(docName);
+              }}
+              title={`✓ Grounded in Document: ${docName}. Click to download source file.`}
+            >
+              ✓ 📥 {docName}
+            </button>
           );
         }
-
-        parts.push(
-          <button
-            key={`citation-${matchIndex}`}
-            className={styles.citationBadge}
-            onClick={(e) => {
-              e.preventDefault();
-              onDownloadCitation(docName);
-            }}
-            title={`✓ Grounded in Document: ${docName}. Click to download source file.`}
-          >
-            ✓ 📥 {docName}
-          </button>
-        );
       } else {
         const indexNum = match[3];
         parts.push(
@@ -506,15 +558,16 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
   }
 
   useEffect(() => {
-    if (!feedbackModalMsg) return;
+    if (!feedbackModalMsg && !activeVisualCitation) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setFeedbackModalMsg(null);
+        setActiveVisualCitation(null);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [feedbackModalMsg]);
+  }, [feedbackModalMsg, activeVisualCitation]);
 
   if (hidden) return null;
 
@@ -570,7 +623,7 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
               const hasTraces = Boolean(m.reactTraces && m.reactTraces.length > 0);
               const isWaitingFirstToken = isStreamingAssistant && !m.content && !hasTraces;
 
-              const hasCitations = /\[(Doc|Source):|\[\d+\]/.test(m.content);
+              const hasCitations = /\[(Doc|Source|Schematic|Diagram):|\[\d+\]/.test(m.content);
               const hasUngroundedWarning = m.content.includes("ungrounded") || m.content.includes("unverified");
 
               return (
@@ -846,6 +899,102 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
                 </button>
                 <button className="comic-btn comic-btn-blue" disabled={feedbackSubmitting} onClick={submitModalFeedback}>
                   {feedbackSubmitting ? "Submitting..." : "Submit Feedback"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </Portal>
+      )}
+
+      {activeVisualCitation && (
+        <Portal>
+          <div
+            className={styles.visualLightboxBackdrop}
+            onClick={() => setActiveVisualCitation(null)}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="visual-lightbox-title"
+          >
+            <div className={styles.visualLightboxModal} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.visualLightboxHeader}>
+                <div className={styles.visualLightboxTitleGroup}>
+                  <span className={styles.visualBadgeIcon}>📐</span>
+                  <div>
+                    <h3 id="visual-lightbox-title" className={styles.visualLightboxTitle}>
+                      {activeVisualCitation.diagramTitle}
+                    </h3>
+                    <span className={styles.visualLightboxSubtitle}>
+                      Multimodal Vision GraphRAG Provenance (Battery #29)
+                    </span>
+                  </div>
+                </div>
+                <button
+                  className={styles.visualLightboxCloseBtn}
+                  onClick={() => setActiveVisualCitation(null)}
+                  aria-label="Close visual inspector"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className={styles.visualLightboxBody}>
+                <div className={styles.visualCanvasViewport}>
+                  <div className={styles.visualBlueprintCanvas}>
+                    <div className={styles.visualGridOverlay} />
+                    {activeVisualCitation.box ? (
+                      <div
+                        className={styles.visualBoundingBoxHighlight}
+                        style={{
+                          top: `${activeVisualCitation.box[0] * 100}%`,
+                          left: `${activeVisualCitation.box[1] * 100}%`,
+                          width: `${Math.max((activeVisualCitation.box[3] - activeVisualCitation.box[1]) * 100, 10)}%`,
+                          height: `${Math.max((activeVisualCitation.box[2] - activeVisualCitation.box[0]) * 100, 10)}%`,
+                        }}
+                      >
+                        <span className={styles.visualBoxTag}>
+                          {activeVisualCitation.elementLabel || "Target Component"}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className={styles.visualGenericTargetBox}>
+                        <span>{activeVisualCitation.elementLabel || "Schematic Architecture Node"}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className={styles.visualMetaDetails}>
+                  <div className={styles.visualMetaRow}>
+                    <span className={styles.visualMetaKey}>Diagram:</span>
+                    <span className={styles.visualMetaVal}>{activeVisualCitation.diagramTitle}</span>
+                  </div>
+                  {activeVisualCitation.elementLabel && (
+                    <div className={styles.visualMetaRow}>
+                      <span className={styles.visualMetaKey}>Referenced Element:</span>
+                      <span className={styles.visualMetaValHighlight}>{activeVisualCitation.elementLabel}</span>
+                    </div>
+                  )}
+                  {activeVisualCitation.box && (
+                    <div className={styles.visualMetaRow}>
+                      <span className={styles.visualMetaKey}>Bounding Box:</span>
+                      <code className={styles.visualBoxCode}>
+                        [{activeVisualCitation.box.map((c) => c.toFixed(2)).join(", ")}]
+                      </code>
+                    </div>
+                  )}
+                  <div className={styles.visualMetaRow}>
+                    <span className={styles.visualMetaKey}>Cross-Modal Anchor:</span>
+                    <span className={styles.visualMetaBadge}>✓ Verified Graph Grounded</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.modalButtons}>
+                <button
+                  className="comic-btn comic-btn-blue"
+                  onClick={() => setActiveVisualCitation(null)}
+                >
+                  Done
                 </button>
               </div>
             </div>

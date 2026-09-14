@@ -1071,6 +1071,49 @@ export interface VoiceSessionTelemetry {
   synthesis_engine: string;
 }
 
+// ── Milestone 114: Real-Time Audio Streaming & Full-Duplex Voice Agent ───────
+
+export type VoiceStreamEventType =
+  | "session_ready"
+  | "vad_state"
+  | "transcript_partial"
+  | "transcript_final"
+  | "agent_thinking"
+  | "agent_text_delta"
+  | "interrupted"
+  | "turn_complete"
+  | "error"
+  | "ping"
+  | "pong";
+
+export interface VoiceStreamControlMessage {
+  event_type: VoiceStreamEventType;
+  session_id: string;
+  payload: Record<string, unknown>;
+}
+
+export interface VoiceStreamCallbacks {
+  onSessionReady?: (payload: { codec: string; sample_rate_hz: number; channels: number }) => void;
+  onVadState?: (state: "speech_detected" | "endpoint_detected", payload: Record<string, unknown>) => void;
+  onTranscript?: (transcript: { text: string; confidence: number; is_final: boolean; latency_ms?: number }) => void;
+  onAgentThinking?: (payload: Record<string, unknown>) => void;
+  onAgentTextDelta?: (delta: string) => void;
+  onAgentAudioChunk?: (audioChunk: Uint8Array) => void;
+  onInterrupted?: (event: { reason: string; cancelled_turn_id?: string; speech_frames?: number }) => void;
+  onTurnComplete?: (turn: VoiceTurn) => void;
+  onError?: (error: Error | string) => void;
+  onClose?: () => void;
+}
+
+export interface VoiceStreamSession {
+  sendAudioFrame: (frameBytes: Uint8Array | ArrayBuffer) => void;
+  sendTextInput: (text: string) => void;
+  interrupt: (reason?: string) => void;
+  ping: () => void;
+  close: () => void;
+}
+
+
 // ==========================================
 // Model Context Protocol (MCP) Types
 // ==========================================
@@ -1426,6 +1469,78 @@ export interface SwarmDebateEvent {
   data: Record<string, unknown>;
   timestamp: number;
 }
+
+// ── Milestone 113: Multimodal Vision GraphRAG & Schematic Ingestion (Battery #29) ──
+
+export interface VisionBoundingBox {
+  ymin: number;
+  xmin: number;
+  ymax: number;
+  xmax: number;
+  confidence?: number;
+}
+
+export interface VisualElement {
+  element_id: string;
+  label: string;
+  element_type: string;
+  bounding_box: VisionBoundingBox;
+  confidence: number;
+  properties?: Record<string, unknown>;
+}
+
+export interface VisualConnector {
+  connector_id: string;
+  source_element_id: string;
+  target_element_id: string;
+  label: string;
+  directionality: string;
+  protocol?: string;
+  confidence: number;
+}
+
+export interface SchematicDiagram {
+  diagram_id: string;
+  filename: string;
+  document_id?: string;
+  page_number: number;
+  width: number;
+  height: number;
+  elements: VisualElement[];
+  connectors: VisualConnector[];
+  summary: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface MultimodalGraphNode {
+  id: string;
+  label: string;
+  node_type: string;
+  element_type?: string;
+  bounding_box?: VisionBoundingBox;
+  diagram_id?: string;
+  document_id?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface MultimodalGraphEdge {
+  source: string;
+  target: string;
+  relation: string;
+  protocol?: string;
+  is_cross_modal: boolean;
+  confidence: number;
+}
+
+export interface MultimodalGraphResponse {
+  root_entity: string;
+  nodes: MultimodalGraphNode[];
+  edges: MultimodalGraphEdge[];
+  cross_modal_links_count: number;
+  triples_count: number;
+  metadata?: Record<string, unknown>;
+}
+
 
 
 

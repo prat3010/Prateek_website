@@ -32,6 +32,9 @@ Welcome to the **Prateek Sharma Engineering Platform Documentation Map**. This c
 | **31** | **[`31_Synchronizer_CMS_and_Local_Control_Plane_PRD.md`](31_Synchronizer_CMS_and_Local_Control_Plane_PRD.md)** | Local Streamlit control plane (`scripts/synchronizer.py`) for live database management. |
 | **32** | **[`32_Universal_Model_Context_Protocol_PRD.md`](32_Universal_Model_Context_Protocol_PRD.md)** | Universal Model Context Protocol (MCP) Server (SSE + JSON-RPC 2.0) with 20-battery tool registry. |
 | **33** | **[`33_Empirical_Load_Benchmarking_and_Production_Stress_Testing_PRD.md`](33_Empirical_Load_Benchmarking_and_Production_Stress_Testing_PRD.md)** | Automated empirical load benchmarks, P50-P99 latency distribution, and public showcase (`/rag/benchmarks`). |
+| **34** | **[`34_Multimodal_Vision_GraphRAG_and_Schematic_Ingestion_PRD.md`](34_Multimodal_Vision_GraphRAG_and_Schematic_Ingestion_PRD.md)** | Multimodal Vision GraphRAG, Battery #29, architectural schematic extraction, normalized bounding-box coordinates & SaaS Studio visual lightbox. |
+| **35** | **[`35_Realtime_Audio_Streaming_and_Voice_Agent_PRD.md`](35_Realtime_Audio_Streaming_and_Voice_Agent_PRD.md)** | Real-Time Audio Streaming & Full-Duplex WebRTC Voice Agent (M114), 20ms PCM16 frame streaming, in-process VAD endpointing, and conversational barge-in cancellation. |
+
 
 ---
 

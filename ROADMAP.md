@@ -32,7 +32,7 @@ timeline
 
 ---
 
-## Active Milestone Sequence (Phase M: M98 – M102, Phase N: M103 – M109 & Phase O: M110 – M112)
+## Active Milestone Sequence (Phase M: M98 – M102, Phase N: M103 – M109 & Phase O: M110 – M113)
 
 | Milestone | Title | Focus Area | Status | Detailed Specification |
 |:---|:---|:---|:---|:---|
@@ -64,6 +64,9 @@ timeline
 | **M110** | Public Open-Source Launch (`v1.0.0-rc1`) & Decoupled SDKs | 1-line quickstart script (`curl -fsSL https://get.retriever.run \| bash`), Docker Compose stack, `@prat3010/retriever-client` on npm & `retriever-python` on PyPI | **Completed** | [`docs/UNIFIED_MASTER_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md#milestone-110-public-open-source-launch-v100-rc1--decoupled-sdks) |
 | **M111** | Community Connectors Ecosystem & Change-Data-Capture (CDC) Pipeline | Relational DB CDC (PostgreSQL/MySQL), S3/R2 object storage watcher, GitHub/Slack connectors & Battery #27 | **Completed** | [`docs/UNIFIED_MASTER_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md#milestone-111-community-connectors-ecosystem--change-data-capture-cdc-pipeline) |
 | **M112** | Kubernetes Native Operator & Helm Charts (v1.2.0-alpha1) | Production Helm 3 chart, RetrieverCluster CRD, level-triggered reconciler & Battery #28 | **Completed** | [`docs/UNIFIED_MASTER_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md#milestone-112-kubernetes-native-operator--production-helm-charts-v120-alpha1) |
+| **M113** | Multimodal Vision GraphRAG & Schematic Ingestion (v1.3.0-alpha1) | Architectural schematic parsing, normalized bounding-box coordinates, cross-modal GraphRAG & Battery #29 | **Completed** | [`docs/UNIFIED_MASTER_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md#milestone-113-multimodal-vision-graphrag--schematic-ingestion-v130-alpha1) |
+| **M114** | Real-time Audio Streaming & Low-Latency Full-Duplex WebRTC Voice Agent (v1.4.0-alpha1) | Full-duplex WebSocket audio streaming, in-process VAD endpointing, conversational barge-in cancellation & genuine Web Audio spectrum | **Completed** | [`docs/UNIFIED_MASTER_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md#milestone-114-real-time-audio-streaming--low-latency-full-duplex-webrtc-voice-agent) |
+
 
 
 
