@@ -37,6 +37,7 @@ Welcome to the **Prateek Sharma Engineering Platform Documentation Map**. This c
 | **36** | **[`36_Distributed_MCP_Mesh_and_Agent_Federation_PRD.md`](36_Distributed_MCP_Mesh_and_Agent_Federation_PRD.md)** | Distributed Model Context Protocol (MCP) Mesh & Agent Federation (M115), Battery #30, peer node discovery, latency-weighted routing, HMAC trust envelopes & circular loop breaker. |
 | **37** | **[`37_Mesh_Load_Balancing_and_Ephemeral_AutoScaling_PRD.md`](37_Mesh_Load_Balancing_and_Ephemeral_AutoScaling_PRD.md)** | Autonomous Mesh Dynamic Load-Balancing & Ephemeral Enclave Auto-Scaling (M116), Battery #31, Power-of-Two-Choices (P2C), EWMA latency decay, scale-to-zero reaping & 95% load shedding. |
 | **38** | **[`38_Decentralized_Vector_Sharding_and_Raft_Consensus_PRD.md`](38_Decentralized_Vector_Sharding_and_Raft_Consensus_PRD.md)** | Decentralized Multi-Tenant Vector Sharding & Distributed Raft Consensus (M117), Battery #32, 32-bit FNV-1a hash ring, Raft elections, scatter-gather RRF & online 2-phase rebalance. |
+| **39** | **[`39_Zero_Knowledge_Vector_Attestation_PRD.md`](39_Zero_Knowledge_Vector_Attestation_PRD.md)** | Zero-Knowledge Proof (ZKP) Vector Attestation & Verifiable Grounding (M118), Battery #33, binary Merkle tree commitments, sub-millisecond inclusion paths ($\pi_i$), Ed25519 grounding certificates & public zero-knowledge verification. |
 
 
 ---

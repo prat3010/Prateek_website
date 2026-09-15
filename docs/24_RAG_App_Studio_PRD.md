@@ -229,6 +229,11 @@ The revamped `/rag/app` uses a modern **SaaS Left Sidebar + Dedicated Sub-Views 
 - **⚡ Scatter-Gather Retrieval & RRF Fusion:** Concurrent multi-shard vector query dispatch with local cosine similarity filtering, Reciprocal Rank Fusion (RRF, $k=60$) score normalization, and shard breakdown analytics.
 - **🔄 Online 2-Phase Rebalancer:** Zero-downtime 2-phase migration (`PREPARING` $\rightarrow$ delta sync $\rightarrow$ `SYNCHRONIZING` $\rightarrow$ atomic cutover) preventing data loss during cluster scale-out.
 
+#### View 21: Zero-Knowledge Proof (ZKP) Vector Attestation & Verifiable Grounding (`ZkpAttestationPanel` — Milestone 118)
+- **👑 Merkle Tree Explorer:** Real-time visual DAG inspector for tenant documents, displaying root commitments ($R_{\text{doc}}$), leaf node commitments ($h_i$), depth metrics, and sub-millisecond inclusion paths ($\pi_i$).
+- **🛡️ Live Zero-Knowledge Verifier:** Interactive verification sandbox validating Ed25519 digital signatures, turn query/response SHA-256 hashes, cosine similarity thresholds, and Merkle tree root mathematical equivalence without disclosing underlying confidential chunk text.
+- **📜 Compliance Audit Ledger:** Verifiable cryptographic attestation token ledger with 1-click JSON certificate export for enterprise HIPAA, GDPR, and algorithmic accountability audits.
+
 ---
 
 ## 5. Hybrid LLM Key & Billing Strategy

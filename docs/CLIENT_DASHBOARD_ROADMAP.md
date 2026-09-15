@@ -133,6 +133,12 @@ The **Client Dashboard Ecosystem** on `prateeq.in` serves as the primary commerc
   * Full-duplex conversational voice deck with zero third-party cloud audio egress, animated 16-bar frequency visualizer, real-time VAD energy sensitivity slider ($E_{\text{RMS}}$), neural timbre selector (Atlas, Nova, Echo), streaming speech synthesis tester with sub-250ms TTFAB validation, and interactive conversational turn ledger (Platform Battery #20).
 * **Autonomous Agent Tool Surface & MCP Studio Tab (`ToolsPanel.tsx`, M106):**
   * Live 20-battery status indicators, per-tenant capability permissions, interactive multi-turn ReAct trace visualizer with expandable Thought $\to$ Action $\to$ Observation steps, 1-click universal configuration exporter for Claude Desktop (`claude_desktop_config.json`) and Cursor, and real-time economic cost-efficiency meters.
+* **Distributed MCP Mesh & Dynamic Balancing Tab (`McpPanel.tsx`, M115 & M116):**
+  * P2P mesh node discovery, HMAC-SHA256 authenticated trust envelopes, federated ReAct delegation, Power-of-Two-Choices (P2C) load balancing, EWMA latency tracking, and autonomous scale-to-zero enclave lifecycle management (Platform Batteries #30 & #31).
+* **Decentralized Vector Sharding & Raft Consensus Tab (`VectorShardingPanel.tsx`, M117):**
+  * 32-bit FNV-1a virtual-node hash ring explorer, distributed Raft consensus state visualizer (terms, leader leases, log replication), parallel scatter-gather retrieval simulator with RRF score normalization, and online 2-phase shard rebalance trigger (Platform Battery #32).
+* **Zero-Knowledge Proof (ZKP) Vector Attestation Tab (`ZkpAttestationPanel.tsx`, M118):**
+  * Deterministic binary Merkle tree explorer with leaf commitments ($h_i$) and sub-millisecond inclusion paths ($\pi_i$), interactive zero-knowledge grounding verifier with Ed25519 digital signature validation, and compliance audit ledger with 1-click JSON certificate export (Platform Battery #33).
 
 ---
 
