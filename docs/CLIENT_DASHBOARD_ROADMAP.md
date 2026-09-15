@@ -139,6 +139,8 @@ The **Client Dashboard Ecosystem** on `prateeq.in` serves as the primary commerc
   * 32-bit FNV-1a virtual-node hash ring explorer, distributed Raft consensus state visualizer (terms, leader leases, log replication), parallel scatter-gather retrieval simulator with RRF score normalization, and online 2-phase shard rebalance trigger (Platform Battery #32).
 * **Zero-Knowledge Proof (ZKP) Vector Attestation Tab (`ZkpAttestationPanel.tsx`, M118):**
   * Deterministic binary Merkle tree explorer with leaf commitments ($h_i$) and sub-millisecond inclusion paths ($\pi_i$), interactive zero-knowledge grounding verifier with Ed25519 digital signature validation, and compliance audit ledger with 1-click JSON certificate export (Platform Battery #33).
+* **Enterprise Identity Federation & RB-VAC Tab (`IdentityFederationPanel.tsx`, M119):**
+  * SAML 2.0 Identity Provider SSO federation (Okta, Microsoft Entra ID / Azure AD, Google Workspace), X.509 XML certificate verification, dynamic SP metadata XML generation, RFC 7643/7644 SCIM 2.0 enterprise directory sync with bearer token auth, and sub-millisecond pre-retrieval Role-Based Vector Access Control (RB-VAC) simulation with chunk audit pruning telemetry (Platform Battery #34).
 
 ---
 

@@ -1753,6 +1753,93 @@ export class RetrieverClient {
   async listGroundingCertificates(limit = 50): Promise<ZkpGroundingCertificate[]> {
     return this.request<ZkpGroundingCertificate[]>(`/v1/tenants/${encodeURIComponent(this.tenantId)}/zkp/certificates?limit=${limit}`);
   }
+
+  // --- Enterprise Identity Federation & RB-VAC (M119, Battery #34) ---
+
+  async getSamlConfig(): Promise<import("./rag-types").SamlIdpConfig> {
+    return this.request<import("./rag-types").SamlIdpConfig>(`/v1/tenants/${encodeURIComponent(this.tenantId)}/identity/saml/config`);
+  }
+
+  async configureSamlIdp(config: Partial<import("./rag-types").SamlIdpConfig>): Promise<import("./rag-types").SamlIdpConfig> {
+    return this.request<import("./rag-types").SamlIdpConfig>(`/v1/tenants/${encodeURIComponent(this.tenantId)}/identity/saml/config`, {
+      method: "POST",
+      body: JSON.stringify(config),
+    });
+  }
+
+  async getSpMetadataXml(): Promise<string> {
+    const res = await fetch(`${this.config.apiUrl}/v1/tenants/${encodeURIComponent(this.tenantId)}/identity/saml/metadata`, {
+      headers: { "X-API-Key": this.config.apiKey },
+    });
+    return res.text();
+  }
+
+  async validateSamlAcs(samlResponseB64: string): Promise<import("./rag-types").SamlAssertionPayload> {
+    return this.request<import("./rag-types").SamlAssertionPayload>(`/v1/tenants/${encodeURIComponent(this.tenantId)}/identity/saml/acs`, {
+      method: "POST",
+      body: JSON.stringify({ saml_response: samlResponseB64 }),
+    });
+  }
+
+  async generateScimToken(): Promise<{ tenant_id: string; token: string; token_type: string }> {
+    return this.request<{ tenant_id: string; token: string; token_type: string }>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/identity/scim/token`,
+      { method: "POST" }
+    );
+  }
+
+  async listScimUsers(startIndex = 1, count = 20, filter?: string): Promise<import("./rag-types").ScimListResponse<import("./rag-types").ScimUser>> {
+    const params = new URLSearchParams({ startIndex: String(startIndex), count: String(count) });
+    if (filter) params.set("filter", filter);
+    return this.request<import("./rag-types").ScimListResponse<import("./rag-types").ScimUser>>(
+      `/v1/scim/v2/tenants/${encodeURIComponent(this.tenantId)}/Users?${params.toString()}`
+    );
+  }
+
+  async createScimUser(user: Record<string, unknown>): Promise<import("./rag-types").ScimUser> {
+    return this.request<import("./rag-types").ScimUser>(`/v1/scim/v2/tenants/${encodeURIComponent(this.tenantId)}/Users`, {
+      method: "POST",
+      body: JSON.stringify(user),
+    });
+  }
+
+  async patchScimUser(userId: string, operations: unknown[]): Promise<import("./rag-types").ScimUser> {
+    return this.request<import("./rag-types").ScimUser>(`/v1/scim/v2/tenants/${encodeURIComponent(this.tenantId)}/Users/${encodeURIComponent(userId)}`, {
+      method: "PATCH",
+      body: JSON.stringify({ Operations: operations }),
+    });
+  }
+
+  async deleteScimUser(userId: string): Promise<void> {
+    await this.request(`/v1/scim/v2/tenants/${encodeURIComponent(this.tenantId)}/Users/${encodeURIComponent(userId)}`, {
+      method: "DELETE",
+    });
+  }
+
+  async listScimGroups(startIndex = 1, count = 20): Promise<import("./rag-types").ScimListResponse<import("./rag-types").ScimGroup>> {
+    return this.request<import("./rag-types").ScimListResponse<import("./rag-types").ScimGroup>>(
+      `/v1/scim/v2/tenants/${encodeURIComponent(this.tenantId)}/Groups?startIndex=${startIndex}&count=${count}`
+    );
+  }
+
+  async createScimGroup(group: Record<string, unknown>): Promise<import("./rag-types").ScimGroup> {
+    return this.request<import("./rag-types").ScimGroup>(`/v1/scim/v2/tenants/${encodeURIComponent(this.tenantId)}/Groups`, {
+      method: "POST",
+      body: JSON.stringify(group),
+    });
+  }
+
+  async simulateRbVac(
+    userId: string,
+    email: string,
+    securityGroups: string[],
+    candidates: import("./rag-types").RbVacCandidateChunk[] = []
+  ): Promise<import("./rag-types").RbVacSimulationResult> {
+    return this.request<import("./rag-types").RbVacSimulationResult>(`/v1/tenants/${encodeURIComponent(this.tenantId)}/identity/rbvac/simulate`, {
+      method: "POST",
+      body: JSON.stringify({ user_id: userId, email, security_groups: securityGroups, candidates }),
+    });
+  }
 }
 
 

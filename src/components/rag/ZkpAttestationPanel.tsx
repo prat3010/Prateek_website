@@ -24,11 +24,11 @@ type TabKey = "merkle_tree" | "verifier" | "certificates";
 export function ZkpAttestationPanel({ client, tenantId, hidden }: ZkpAttestationPanelProps) {
   const [activeTab, setActiveTab] = useState<TabKey>("merkle_tree");
   const [health, setHealth] = useState<ZkpHealthResponse | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   // Merkle Explorer State
-  const [activeDocumentId, setActiveDocumentId] = useState<string>("doc_enterprise_master_sow");
+  const [activeDocumentId] = useState<string>("doc_enterprise_master_sow");
   const [merkleRoot, setMerkleRoot] = useState<DocumentMerkleRoot | null>(null);
   const [selectedChunkId, setSelectedChunkId] = useState<string>("chk_0");
   const [chunkProof, setChunkProof] = useState<ChunkMerkleProof | null>(null);
@@ -542,7 +542,7 @@ export function ZkpAttestationPanel({ client, tenantId, hidden }: ZkpAttestation
                       </td>
                       <td>{cert.chunk_commitments?.length ?? 0} Chunks</td>
                       <td>≥ {((cert.similarity_bound || 0.7) * 100).toFixed(0)}%</td>
-                      <td>{new Date((cert.issued_at || Date.now() / 1000) * 1000).toLocaleTimeString()}</td>
+                      <td>{cert.issued_at ? new Date(cert.issued_at * 1000).toLocaleTimeString() : "Recent"}</td>
                       <td>
                         <div className={styles.btnGroup}>
                           <button

@@ -71,12 +71,7 @@ timeline
 | **M116** | Autonomous Mesh Dynamic Load-Balancing & Ephemeral Enclave Auto-Scaling (v1.6.0-alpha1) | Power-of-Two-Choices (P2C), EWMA latency decay ($\alpha = 0.2$), scale-to-zero enclave provisioning, 95% load shedding & Battery #31 | **Completed** | [`docs/37_Mesh_Load_Balancing_and_Ephemeral_AutoScaling_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/37_Mesh_Load_Balancing_and_Ephemeral_AutoScaling_PRD.md) |
 | **M117** | Decentralized Multi-Tenant Vector Sharding & Distributed Raft Consensus (v1.7.0-alpha1) | 32-bit FNV-1a consistent hash ring (64 vnodes/shard), Raft leader election & AppendEntries log replication, scatter-gather query with RRF rank fusion, 2-phase online rebalancing & Battery #32 | **Completed** | [`docs/38_Decentralized_Vector_Sharding_and_Raft_Consensus_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/38_Decentralized_Vector_Sharding_and_Raft_Consensus_PRD.md) |
 | **M118** | Zero-Knowledge Proof (ZKP) Vector Attestation & Verifiable Grounding (v1.8.0-alpha1) | Deterministic binary Merkle DAG (odd-leaf duplicate padding), leaf commitments, Ed25519-signed Grounding Certificates, public zero-knowledge verifier & Battery #33 | **Completed** | [`docs/39_Zero_Knowledge_Vector_Attestation_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/39_Zero_Knowledge_Vector_Attestation_PRD.md) |
-
-
-
-
-
-
+| **M119** | Enterprise Identity Federation (SAML 2.0 / SCIM 2.0) & RB-VAC (v1.9.0-alpha1) | SAML 2.0 IdP SSO, RFC 7644 SCIM 2.0 directory engine, pre-retrieval set-intersection RB-VAC pruning, dual-theme SaaS studio cockpit & Battery #34 | **Completed** | [`docs/40_Enterprise_Identity_Federation_and_RBVAC_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/40_Enterprise_Identity_Federation_and_RBVAC_PRD.md) |
 
 ---
 
@@ -85,6 +80,7 @@ timeline
 For deep technical implementation details, schemas, API contracts, and component architectures:
 - **Scoping Engine & Client Workspace Dashboard PRD:** [`docs/25_SOTA_Scoping_Engine_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/25_SOTA_Scoping_Engine_PRD.md)
 - **RAG SaaS Studio Workspace PRD:** [`docs/24_RAG_App_Studio_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/24_RAG_App_Studio_PRD.md)
+- **Enterprise Identity Federation & RB-VAC PRD:** [`docs/40_Enterprise_Identity_Federation_and_RBVAC_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/40_Enterprise_Identity_Federation_and_RBVAC_PRD.md)
 - **Client Workspace Architecture & Contracts:** [`docs/CLIENT_DASHBOARD_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/CLIENT_DASHBOARD_ROADMAP.md)
 - **Autonomous Outreach Agent Technical Spec:** [`docs/AI_OUTREACH_AGENT_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/AI_OUTREACH_AGENT_ROADMAP.md)
 - **Automated AI Blogging Engine Spec:** [`docs/AUTOMATED_AI_BLOGGING_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/AUTOMATED_AI_BLOGGING_ROADMAP.md)

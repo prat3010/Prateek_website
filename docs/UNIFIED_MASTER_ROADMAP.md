@@ -1065,6 +1065,29 @@ timeline
   - **Control Plane Studio Upgraded:** Dedicated `VectorShardingPanel.tsx` in `/rag/app` featuring 4 sub-views (Topology & Hash Ring, Raft Consensus, Scatter-Gather Benchmark, Cluster Rebalancer) under Design System 2.0.
 - **Status:** **Completed (Phase P / v1.7.0-alpha1)**
 
+#### 📜 Milestone 118: Zero-Knowledge Proof (ZKP) Vector Attestation & Verifiable Grounding
+- **Libraries:** Cryptography (SHA-256, Ed25519), Binary Merkle Trees, Inclusion Proofs, FastAPI, React 19, TypeScript, Pytest
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/abstractions/zkp_attestation.py`, `apps/api/src/adapters/security/zkp_attestation_adapter.py`, `apps/api/src/routers/zkp.py`, `apps/api/tests/test_zkp_attestation.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `src/components/rag/ZkpAttestationPanel.tsx`, `src/components/rag/ZkpAttestationPanel.module.css`, `docs/39_Zero_Knowledge_Vector_Attestation_PRD.md`)
+- **Deliverable:**
+  - **Platform Battery #33 Registration:** Cataloged `zkp_vector_attestation` in `BatteryService` under `SAFETY_DEFENSE`.
+  - **Deterministic Binary Merkle Trees:** Built canonical SHA-256 Merkle tree construction with leaf commitments ($h_i = \text{SHA256}(\text{tenant} \mathbin{\Vert} \text{doc} \mathbin{\Vert} i \mathbin{\Vert} \text{chunk\_sha256})$).
+  - **Sub-Millisecond Inclusion Proofs:** Generated authenticated inclusion proof paths ($\pi_i$) enabling rapid zero-disclosure verification of cited chunks.
+  - **Ed25519-Signed Grounding Certificates:** Asymmetric digital signature tokens binding query text, response hash, cited chunk commitments, and Merkle root into verifiable compliance certificates.
+  - **Public Zero-Knowledge Verification:** Unauthenticated `POST /v1/zkp/verify` endpoint for independent external compliance audits.
+  - **Control Plane Studio Upgraded:** Dedicated `ZkpAttestationPanel.tsx` in `/rag/app` under Design System 2.0 (Merkle Tree Explorer, Live Verifier, Audit Ledger).
+- **Status:** **Completed (Phase P / v1.8.0-alpha1)**
+
+#### 🛡️ Milestone 119: Enterprise Identity Federation (SAML 2.0 / SCIM 2.0 Directory Sync) & RB-VAC
+- **Libraries:** Cryptography (X.509, XML Signature SHA-256), RFC 7643/7644 SCIM 2.0, FastAPI, React 19, TypeScript, Pytest
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/abstractions/identity_federation.py`, `apps/api/src/adapters/security/identity_federation_adapter.py`, `apps/api/src/routers/identity_federation.py`, `apps/api/tests/test_identity_federation.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `src/components/rag/IdentityFederationPanel.tsx`, `src/components/rag/IdentityFederationPanel.module.css`, `docs/40_Enterprise_Identity_Federation_and_RBVAC_PRD.md`)
+- **Deliverable:**
+  - **Platform Battery #34 Registration:** Cataloged `enterprise_identity_federation` in `BatteryService` under `SAFETY_DEFENSE`.
+  - **SAML 2.0 IdP Federation Engine:** XML digital signature validation with X.509 certificate parsing, ACS assertion consuming, replay suppression via monotonically tracked assertion IDs, and dynamic SP metadata XML generation (`GET /v1/tenants/{tenantId}/identity/saml/metadata.xml`).
+  - **RFC 7643 / 7644 SCIM 2.0 Directory Sync:** Enterprise IdP lifecycle directory engine with bearer token authorization, User and Group schemas, complex attribute filtering (`userName eq "..."`), RFC 7644 JSON-PATCH operations, and stateful user de-provisioning.
+  - **Role-Based Vector Access Control (RB-VAC):** Sub-millisecond pre-retrieval mathematical set intersection ($C_{\text{chunk}} \cap G_{\text{user}} \neq \emptyset$) pruning unauthorized vector chunks before LLM synthesis and emitting audit telemetry (`RbVacPrunedTelemetry`).
+  - **FastAPI Endpoints & SDK Parity:** Mounted 18 REST endpoints and updated client SDKs in `@prat3010/retriever-client` and `retriever-python`.
+  - **Control Plane Studio Upgraded:** Dedicated `IdentityFederationPanel.tsx` in `/rag/app` under Design System 2.0 (SAML 2.0 SSO, SCIM 2.0 Directory Sync, RB-VAC Simulator).
+- **Status:** **Completed (Phase P / v1.9.0-alpha1)**
 
 ---
 
@@ -1105,6 +1128,7 @@ The following table serves as the definitive directory linking all specialized p
 | **Mesh Load-Balancing & Auto-Scaling PRD** | Phase P (M116): P2C Balancing, EWMA Latency Decay, Ephemeral Enclaves | [37_Mesh_Load_Balancing_and_Ephemeral_AutoScaling_PRD.md](37_Mesh_Load_Balancing_and_Ephemeral_AutoScaling_PRD.md) |
 | **Vector Sharding & Raft Consensus PRD** | Phase P (M117): FNV-1a Consistent Hash Ring, Raft Elections, Scatter-Gather RRF | [38_Decentralized_Vector_Sharding_and_Raft_Consensus_PRD.md](38_Decentralized_Vector_Sharding_and_Raft_Consensus_PRD.md) |
 | **ZKP Vector Attestation & Verifiable Grounding PRD** | Phase P (M118): Binary Merkle DAG, Zero-Knowledge Leaf Commitments, Ed25519 Certificates | [39_Zero_Knowledge_Vector_Attestation_PRD.md](39_Zero_Knowledge_Vector_Attestation_PRD.md) |
+| **Enterprise Identity Federation & RB-VAC PRD** | Phase P (M119): SAML 2.0 IdP SSO, RFC 7644 SCIM 2.0, Pre-Retrieval Set-Intersection RB-VAC | [40_Enterprise_Identity_Federation_and_RBVAC_PRD.md](40_Enterprise_Identity_Federation_and_RBVAC_PRD.md) |
 | **Platform Future Roadmap** | General Portfolio & Ecosystem Evolution Horizon | [21_Future_Roadmap.md](21_Future_Roadmap.md) |
 
 ### 🧠 Engine & Infrastructure Roadmaps (retriever)

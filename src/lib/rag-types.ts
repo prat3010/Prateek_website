@@ -1886,6 +1886,110 @@ export interface VerifyCertificatePayload {
   expected_document_root?: string;
 }
 
+// --- Enterprise Identity Federation & RB-VAC (M119, Battery #34) ---
+
+export interface SamlIdpConfig {
+  tenant_id: string;
+  idp_entity_id: string;
+  sso_url: string;
+  idp_x509_cert: string;
+  sp_entity_id?: string;
+  acs_url?: string;
+  attribute_mapping?: Record<string, string>;
+  default_groups?: string[];
+  enabled?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface SamlAssertionPayload {
+  tenant_id: string;
+  name_id: string;
+  session_index: string;
+  attributes: Record<string, unknown>;
+  security_groups: string[];
+  issuer: string;
+  issue_instant: string;
+  valid_until: string;
+  is_verified: boolean;
+}
+
+export interface ScimMeta {
+  resourceType: string;
+  created: string;
+  lastModified: string;
+  location?: string;
+  version?: string;
+}
+
+export interface ScimEmail {
+  value: string;
+  primary?: boolean;
+  type?: string;
+}
+
+export interface ScimUser {
+  schemas?: string[];
+  id: string;
+  externalId?: string | null;
+  userName: string;
+  displayName?: string | null;
+  active: boolean;
+  emails?: ScimEmail[];
+  groups?: Array<Record<string, string>>;
+  meta?: ScimMeta;
+}
+
+export interface ScimGroupMember {
+  value: string;
+  display?: string | null;
+  ref?: string | null;
+}
+
+export interface ScimGroup {
+  schemas?: string[];
+  id: string;
+  displayName: string;
+  members: ScimGroupMember[];
+  meta?: ScimMeta;
+}
+
+export interface ScimListResponse<T> {
+  schemas: string[];
+  totalResults: number;
+  startIndex: number;
+  itemsPerPage: number;
+  Resources: T[];
+}
+
+export interface RbVacCandidateChunk {
+  chunk_id: string;
+  document_id: string;
+  content: string;
+  score: number;
+  acl_groups: string[];
+  classification: string;
+}
+
+export interface RbVacPrunedTelemetry {
+  chunk_id: string;
+  document_id: string;
+  required_acl_groups: string[];
+  user_groups: string[];
+  similarity_score: number;
+  reason: string;
+}
+
+export interface RbVacSimulationResult {
+  tenant_id: string;
+  user_id: string;
+  user_groups: string[];
+  total_candidates: number;
+  allowed_candidates: RbVacCandidateChunk[];
+  pruned_telemetry: RbVacPrunedTelemetry[];
+  execution_time_ms: number;
+}
+
 
 
 

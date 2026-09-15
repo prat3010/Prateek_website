@@ -234,6 +234,12 @@ The revamped `/rag/app` uses a modern **SaaS Left Sidebar + Dedicated Sub-Views 
 - **🛡️ Live Zero-Knowledge Verifier:** Interactive verification sandbox validating Ed25519 digital signatures, turn query/response SHA-256 hashes, cosine similarity thresholds, and Merkle tree root mathematical equivalence without disclosing underlying confidential chunk text.
 - **📜 Compliance Audit Ledger:** Verifiable cryptographic attestation token ledger with 1-click JSON certificate export for enterprise HIPAA, GDPR, and algorithmic accountability audits.
 
+#### View 22: Enterprise Identity Federation & Role-Based Vector Access Control (`IdentityFederationPanel` — Milestone 119)
+- **🏢 SAML 2.0 Identity Provider Federation:** Enterprise IdP integration cockpit (Okta, Microsoft Entra ID / Azure AD, Google Workspace) supporting SP entity ID configuration, Single Sign-On ACS endpoints, X.509 cryptographic certificate verification, and dynamic SP metadata XML download.
+- **🔄 RFC 7643 / 7644 SCIM 2.0 Directory Sync:** Stateful directory synchronization engine providing bearer-token authentication, User & Group schema parsing, complex attribute filtering, and dynamic user provision/deprovision tracking.
+- **🛡️ Pre-Retrieval RB-VAC Simulator:** Interactive mathematical access control simulator verifying set intersection ($C_{\text{chunk}} \cap G_{\text{user}} \neq \emptyset$) and visual telemetry logging of chunks pruned before LLM context synthesis.
+- *Full specification documented in [PRD 40: Enterprise Identity Federation & RB-VAC](40_Enterprise_Identity_Federation_and_RBVAC_PRD.md).*
+
 ---
 
 ## 5. Hybrid LLM Key & Billing Strategy
