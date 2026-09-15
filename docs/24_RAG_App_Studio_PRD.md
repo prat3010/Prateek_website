@@ -219,6 +219,16 @@ The revamped `/rag/app` uses a modern **SaaS Left Sidebar + Dedicated Sub-Views 
 - **🎙️ Full-Duplex WebRTC Voice Deck:** Bidirectional conversational speech with zero third-party cloud audio egress, preserving strict HIPAA/GDPR data sovereignty.
 - **🎯 RMS Energy & ZCR VAD Endpointing:** Real-time mathematical speech boundary detection, local Whisper ASR, streaming neural TTS with sub-250ms TTFAB, animated 16-bar frequency visualizer, and turn latency ledger.
 
+#### View 19: Universal MCP Server & Distributed Tool Mesh (`McpPanel` — Milestones 103, 106, 115, 116)
+- **🕸️ Decentralized Tool Mesh:** Multi-cluster tool discovery, peer routing, and HMAC-SHA256 authenticated trust envelopes.
+- **⚖️ Dynamic Load Balancing & Autoscaling:** Power-of-Two-Choices (P2C) balancing, EWMA latency decay ($\alpha = 0.2$), 95% saturation load shedding, and scale-to-zero enclave provisioning.
+
+#### View 20: Decentralized Multi-Tenant Vector Sharding & Distributed Raft Consensus (`VectorShardingPanel` — Milestone 117)
+- **💎 32-Bit FNV-1a Hash Ring:** 64 virtual nodes per shard on a circular $[0, 2^{32}-1]$ integer ring with $O(\log N)$ binary search partition lookup.
+- **🗳️ Distributed Raft Consensus:** In-memory Raft state machine with leader elections, majority quorum voting ($\lfloor N/2 \rfloor + 1$), AppendEntries log replication, and write-quorum validation.
+- **⚡ Scatter-Gather Retrieval & RRF Fusion:** Concurrent multi-shard vector query dispatch with local cosine similarity filtering, Reciprocal Rank Fusion (RRF, $k=60$) score normalization, and shard breakdown analytics.
+- **🔄 Online 2-Phase Rebalancer:** Zero-downtime 2-phase migration (`PREPARING` $\rightarrow$ delta sync $\rightarrow$ `SYNCHRONIZING` $\rightarrow$ atomic cutover) preventing data loss during cluster scale-out.
+
 ---
 
 ## 5. Hybrid LLM Key & Billing Strategy
