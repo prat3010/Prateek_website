@@ -1654,6 +1654,143 @@ export interface ClusterLoadSummary {
   clusters: Record<string, ClusterLoadMetrics>;
 }
 
+// ── Milestone 117: Decentralized Multi-Tenant Vector Sharding & Raft Consensus Types ──
+
+export type ShardStatus = "healthy" | "rebalancing" | "snapshot_sync" | "degraded" | "offline";
+export type RaftRole = "leader" | "follower" | "candidate";
+export type ReadQuorum = "local" | "one" | "quorum" | "all";
+export type WriteQuorum = "one" | "quorum" | "all";
+
+export interface ShardPartition {
+  shard_id: string;
+  tenant_id?: string | null;
+  hash_range_start: number;
+  hash_range_end: number;
+  leader_node_id: string;
+  replica_node_ids: string[];
+  status: ShardStatus;
+  vector_count: number;
+  index_size_bytes: number;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface ShardTopologyResponse {
+  cluster_id: string;
+  total_shards: number;
+  replication_factor: number;
+  shards: ShardPartition[];
+  skew_metrics: {
+    cluster_id?: string;
+    node_distribution?: Record<string, number>;
+    mean_vectors_per_node?: number;
+    skew_std_dev?: number;
+    is_skewed?: boolean;
+    [key: string]: unknown;
+  };
+}
+
+export interface RaftLogEntry {
+  index: number;
+  term: number;
+  command_type: string;
+  payload: Record<string, unknown>;
+  timestamp: number;
+}
+
+export interface RaftNodeState {
+  node_id: string;
+  current_term: number;
+  voted_for?: string | null;
+  role: RaftRole;
+  commit_index: number;
+  last_applied: number;
+  leader_id?: string | null;
+  log_length: number;
+  heartbeat_timestamp: number;
+}
+
+export interface RaftConsensusStatus {
+  cluster_id: string;
+  current_term: number;
+  active_leader_id?: string | null;
+  total_nodes: number;
+  leader_elected: boolean;
+  quorum_healthy: boolean;
+  nodes: RaftNodeState[];
+  recent_log_entries: RaftLogEntry[];
+}
+
+export interface ScatterGatherQuery {
+  tenant_id: string;
+  query_vector: number[];
+  top_k?: number;
+  read_quorum?: ReadQuorum;
+  filter_metadata?: Record<string, unknown>;
+}
+
+export interface ShardCandidate {
+  chunk_id: string;
+  score: number;
+  text: string;
+  metadata: Record<string, unknown>;
+  shard_id: string;
+  node_id: string;
+}
+
+export interface ShardQueryBreakdown {
+  shard_id: string;
+  node_id: string;
+  latency_ms: number;
+  candidates_count: number;
+  status: string;
+}
+
+export interface ScatterGatherResponse {
+  query_id: string;
+  tenant_id: string;
+  total_shards_queried: number;
+  successful_shards: number;
+  quorum_achieved: boolean;
+  total_latency_ms: number;
+  shard_breakdown: ShardQueryBreakdown[];
+  results: ShardCandidate[];
+}
+
+export interface ShardMutationRequest {
+  tenant_id: string;
+  document_id: string;
+  vectors: {
+    chunk_id?: string;
+    vector: number[];
+    text?: string;
+    metadata?: Record<string, unknown>;
+  }[];
+  write_quorum?: WriteQuorum;
+}
+
+export interface ShardMutationResponse {
+  shard_id: string;
+  committed_log_index: number;
+  term: number;
+  vectors_written: number;
+  quorum_achieved: boolean;
+  elapsed_ms: number;
+}
+
+export interface ShardRebalancePlan {
+  plan_id: string;
+  source_node_id: string;
+  target_node_id: string;
+  shard_id: string;
+  status: string;
+  vectors_transferred: number;
+  total_vectors: number;
+  start_time: number;
+  completion_time?: number | null;
+  error_message?: string | null;
+}
+
 
 
 

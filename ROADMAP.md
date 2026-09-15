@@ -33,7 +33,7 @@ timeline
 
 ---
 
-## Active Milestone Sequence (Phase O: M110 – M113 & Phase P: M114 – M115)
+## Active Milestone Sequence (Phase O: M110 – M113 & Phase P: M114 – M117)
 
 | Milestone | Title | Focus Area | Status | Detailed Specification |
 |:---|:---|:---|:---|:---|
@@ -69,6 +69,7 @@ timeline
 | **M114** | Real-time Audio Streaming & Low-Latency Full-Duplex WebRTC Voice Agent (v1.4.0-alpha1) | Full-duplex WebSocket audio streaming, in-process VAD endpointing, conversational barge-in cancellation & genuine Web Audio spectrum | **Completed** | [`docs/UNIFIED_MASTER_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md#milestone-114-real-time-audio-streaming--low-latency-full-duplex-webrtc-voice-agent) |
 | **M115** | Distributed Model Context Protocol (MCP) Mesh & Agent Federation (v1.5.0-alpha1) | Decentralized P2P MCP Mesh, HMAC trust envelopes, agent federation & Battery #30 | **Completed** | [`docs/UNIFIED_MASTER_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md#milestone-115-distributed-model-context-protocol-mcp-mesh--agent-federation) |
 | **M116** | Autonomous Mesh Dynamic Load-Balancing & Ephemeral Enclave Auto-Scaling (v1.6.0-alpha1) | Power-of-Two-Choices (P2C), EWMA latency decay ($\alpha = 0.2$), scale-to-zero enclave provisioning, 95% load shedding & Battery #31 | **Completed** | [`docs/37_Mesh_Load_Balancing_and_Ephemeral_AutoScaling_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/37_Mesh_Load_Balancing_and_Ephemeral_AutoScaling_PRD.md) |
+| **M117** | Decentralized Multi-Tenant Vector Sharding & Distributed Raft Consensus (v1.7.0-alpha1) | 32-bit FNV-1a consistent hash ring (64 vnodes/shard), Raft leader election & AppendEntries log replication, scatter-gather query with RRF rank fusion, 2-phase online rebalancing & Battery #32 | **Completed** | [`docs/38_Decentralized_Vector_Sharding_and_Raft_Consensus_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/38_Decentralized_Vector_Sharding_and_Raft_Consensus_PRD.md) |
 
 
 

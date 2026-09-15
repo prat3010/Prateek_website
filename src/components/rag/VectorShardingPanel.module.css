@@ -1,0 +1,433 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.headerGroup {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.headerText {
+  flex: 1;
+  min-width: 280px;
+}
+
+.title {
+  font-family: var(--font-headline, inherit);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 0.35rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.badgeShards {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  background: var(--badge-active-bg, rgba(0, 240, 255, 0.1));
+  color: var(--badge-active-color, #00f0ff);
+  border: 1px solid var(--badge-active-border, rgba(0, 240, 255, 0.25));
+}
+
+.badgeBattery {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  background: var(--surface-elevated);
+  color: var(--color-text-muted);
+  border: 1px solid var(--surface-glass-border);
+}
+
+.description {
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin: 0;
+  max-width: 820px;
+}
+
+/* Metric Cards Grid */
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.metricCard {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.metricCard:hover {
+  border-color: var(--badge-active-border, rgba(0, 240, 255, 0.3));
+}
+
+.metricLabel {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.metricValue {
+  font-family: var(--font-mono, monospace);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+}
+
+.metricSubtext {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+/* Tab Segmented Controller */
+.tabsContainer {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--surface-glass-border);
+  padding-bottom: 0.5rem;
+  overflow-x: auto;
+}
+
+.tabBtn {
+  position: relative;
+  background: transparent;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: color 0.2s ease;
+}
+
+.tabBtn:hover {
+  color: var(--color-text);
+}
+
+.tabBtnActive {
+  color: var(--color-text);
+  background: var(--surface-card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tabPill {
+  position: absolute;
+  bottom: -0.55rem;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--badge-active-color, #00f0ff);
+  border-radius: 2px;
+}
+
+/* Card / Box Containers */
+.panelCard {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.cardTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Shard Grid */
+.shardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.shardCard {
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  transition: border-color 0.2s ease;
+}
+
+.shardCard:hover {
+  border-color: var(--badge-active-border, rgba(0, 240, 255, 0.3));
+}
+
+.shardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.shardId {
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.statusPill {
+  font-size: 0.7rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.statusHealthy {
+  background: rgba(0, 230, 118, 0.15);
+  color: #00E676;
+  border: 1px solid rgba(0, 230, 118, 0.3);
+}
+
+.statusRebalancing {
+  background: rgba(255, 171, 0, 0.15);
+  color: #FFAB00;
+  border: 1px solid rgba(255, 171, 0, 0.3);
+}
+
+.hashRangeBar {
+  background: var(--surface-card);
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.hashRangeFill {
+  height: 100%;
+  background: linear-gradient(90deg, #00f0ff, #7928ca);
+  border-radius: 3px;
+}
+
+.nodeBadgeRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-family: var(--font-mono, monospace);
+}
+
+.leaderPill {
+  background: rgba(0, 240, 255, 0.15);
+  color: var(--badge-active-color, #00f0ff);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 240, 255, 0.3);
+}
+
+.replicaPill {
+  background: var(--surface-card);
+  color: var(--color-text-muted);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--surface-glass-border);
+}
+
+/* Raft Participants Table */
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  font-family: var(--font-mono, monospace);
+}
+
+.table th {
+  text-align: left;
+  padding: 0.6rem 0.8rem;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--surface-glass-border);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.table td {
+  padding: 0.65rem 0.8rem;
+  border-bottom: 1px solid var(--surface-glass-border);
+  color: var(--color-text);
+}
+
+.roleLeader {
+  color: #00E676;
+  font-weight: 700;
+}
+
+.roleFollower {
+  color: var(--color-text-muted);
+}
+
+.roleCandidate {
+  color: #FFAB00;
+  font-weight: 700;
+}
+
+/* Rebalance & Simulator Controls */
+.controlRow {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.input {
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-glass-border);
+  color: var(--color-text);
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-family: var(--font-mono, monospace);
+  flex: 1;
+  min-width: 220px;
+}
+
+.select {
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-glass-border);
+  color: var(--color-text);
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-family: var(--font-mono, monospace);
+  min-width: 140px;
+}
+
+.actionBtn {
+  background: var(--app-btn-primary-bg, #00f0ff);
+  color: var(--app-btn-primary-color, #08080a);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.actionBtn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.actionBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.secondaryBtn {
+  background: var(--surface-elevated);
+  color: var(--color-text);
+  border: 1px solid var(--surface-glass-border);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.waterfallList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.waterfallItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--surface-elevated);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--surface-glass-border);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8rem;
+}
+
+.waterfallBar {
+  height: 4px;
+  background: var(--badge-active-color, #00f0ff);
+  border-radius: 2px;
+  margin-top: 0.25rem;
+}
+
+.candidateCard {
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: 8px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.candidateHeader {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.candidateScore {
+  font-weight: 700;
+  color: #00E676;
+}
+
+.candidateSnippet {
+  font-size: 0.82rem;
+  color: var(--color-text);
+  line-height: 1.4;
+}

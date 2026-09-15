@@ -16,7 +16,7 @@ vi.mock('@/components/ui/MagneticButton', () => ({
 
 import { McpPanel } from '../McpPanel';
 import type { RetrieverClient } from '@/lib/rag-client';
-import type { McpConfigResponse, McpToolSummary, McpToolExecutionResult } from '@/lib/rag-types';
+import type { McpConfigResponse, McpToolSummary } from '@/lib/rag-types';
 
 describe('McpPanel Component', () => {
   const mockGetMcpConfig = vi.fn();

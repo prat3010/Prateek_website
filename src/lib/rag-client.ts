@@ -1663,6 +1663,58 @@ export class RetrieverClient {
       milestone: string;
     }>("/v1/graph/multimodal/status");
   }
+
+  // ── Decentralized Vector Sharding & Distributed Raft Consensus (Battery #32 / M117) ──
+
+  async getShardTopology(): Promise<import("./rag-types").ShardTopologyResponse> {
+    return this.request<import("./rag-types").ShardTopologyResponse>("/v1/shards/topology");
+  }
+
+  async queryShardedVectors(
+    query: import("./rag-types").ScatterGatherQuery
+  ): Promise<import("./rag-types").ScatterGatherResponse> {
+    return this.request<import("./rag-types").ScatterGatherResponse>("/v1/shards/query", {
+      method: "POST",
+      body: JSON.stringify(query),
+    });
+  }
+
+  async mutateShardedVectors(
+    mutation: import("./rag-types").ShardMutationRequest
+  ): Promise<import("./rag-types").ShardMutationResponse> {
+    return this.request<import("./rag-types").ShardMutationResponse>("/v1/shards/mutate", {
+      method: "POST",
+      body: JSON.stringify(mutation),
+    });
+  }
+
+  async getRaftConsensusStatus(): Promise<import("./rag-types").RaftConsensusStatus> {
+    return this.request<import("./rag-types").RaftConsensusStatus>("/v1/shards/raft/status");
+  }
+
+  async triggerRaftElection(
+    candidateNodeId: string
+  ): Promise<{ success: boolean; current_term: number; active_leader_id: string }> {
+    return this.request<{ success: boolean; current_term: number; active_leader_id: string }>("/v1/shards/election", {
+      method: "POST",
+      body: JSON.stringify({ candidate_node_id: candidateNodeId }),
+    });
+  }
+
+  async rebalanceShards(
+    payload?: { source_node_id?: string; target_node_id?: string; shard_id?: string }
+  ): Promise<import("./rag-types").ShardRebalancePlan> {
+    return this.request<import("./rag-types").ShardRebalancePlan>("/v1/shards/rebalance", {
+      method: "POST",
+      body: payload ? JSON.stringify(payload) : undefined,
+    });
+  }
+
+  async snapshotShard(shardId: string): Promise<Record<string, unknown>> {
+    return this.request<Record<string, unknown>>(`/v1/shards/${encodeURIComponent(shardId)}/snapshot`, {
+      method: "POST",
+    });
+  }
 }
 
 

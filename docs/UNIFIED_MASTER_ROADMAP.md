@@ -1052,6 +1052,19 @@ timeline
   - **Control Plane Studio Upgraded:** Added 4th tab "Dynamic Load & Enclaves" in `McpPanel.tsx` with cluster capacity dials, interactive autoscaling policy sliders, and live event audit ledger under Design System 2.0.
 - **Status:** **Completed (Phase P / v1.6.0-alpha1)**
 
+#### 💎 Milestone 117: Decentralized Multi-Tenant Vector Sharding & Distributed Raft Consensus
+- **Libraries:** 32-bit FNV-1a Hashing, Raft Consensus State Machine, Reciprocal Rank Fusion (RRF), FastAPI, React 19, TypeScript, Pytest
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/abstractions/vector_sharding.py`, `apps/api/src/domain/retrieval/vector_raft_sharding_service.py`, `apps/api/src/routers/vector_sharding.py`, `apps/api/tests/test_vector_raft_sharding.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `src/components/rag/VectorShardingPanel.tsx`, `src/components/rag/VectorShardingPanel.module.css`, `src/components/rag/__tests__/VectorShardingPanel.test.tsx`, `docs/38_Decentralized_Vector_Sharding_and_Raft_Consensus_PRD.md`)
+- **Deliverable:**
+  - **Platform Battery #32 Registration:** Cataloged `vector_raft_sharding` in `BatteryService` under `EDGE_DISTRIBUTION`.
+  - **Consistent Virtual-Node Hash Ring:** Pure domain virtual-node hashing (64 vnodes/shard, $[0, 2^{32}-1]$ ring) with clockwise partition assignment and sub-millisecond lookup.
+  - **Distributed Raft Consensus:** In-memory Raft state machine with terms, candidate leader elections, majority quorum voting, AppendEntries heartbeat log replication, and write-quorum validation.
+  - **Scatter-Gather Vector Querying:** Parallel query dispatch across active shards with local cosine similarity filtering, partial result aggregation, and Reciprocal Rank Fusion (RRF, $k=60$) rank merging.
+  - **Online 2-Phase Shard Rebalancing:** Non-blocking 2-phase migration (`PREPARING` -> delta copy -> `SYNCHRONIZING` -> atomic flip) preventing data loss or downtime during scale-out.
+  - **FastAPI Endpoints & SDK Parity:** Mounted `/v1/shards/*` and implemented complete client SDK methods in `@prat3010/retriever-client` and `retriever-python`.
+  - **Control Plane Studio Upgraded:** Dedicated `VectorShardingPanel.tsx` in `/rag/app` featuring 4 sub-views (Topology & Hash Ring, Raft Consensus, Scatter-Gather Benchmark, Cluster Rebalancer) under Design System 2.0.
+- **Status:** **Completed (Phase P / v1.7.0-alpha1)**
+
 
 ---
 
@@ -1089,6 +1102,8 @@ The following table serves as the definitive directory linking all specialized p
 | **Automated AI Blogging Engine** | Phase E (M59): Newsjacking Pipeline, Automated Research & SEO Publisher | [AUTOMATED_AI_BLOGGING_ROADMAP.md](AUTOMATED_AI_BLOGGING_ROADMAP.md) |
 | **Revenue Execution Plan** | Commercial Escrow, Tier Packages, Sales Partner Commissions | [REVENUE_EXECUTION_PLAN.md](commercial/REVENUE_EXECUTION_PLAN.md) |
 | **Scoping Audit Roadmap** | 360° Quality Checklist & Security Validation for Scoping Engine | [SCOPING_AUDIT_ROADMAP.md](archive/SCOPING_AUDIT_ROADMAP_COMPLETED.md) |
+| **Mesh Load-Balancing & Auto-Scaling PRD** | Phase P (M116): P2C Balancing, EWMA Latency Decay, Ephemeral Enclaves | [37_Mesh_Load_Balancing_and_Ephemeral_AutoScaling_PRD.md](37_Mesh_Load_Balancing_and_Ephemeral_AutoScaling_PRD.md) |
+| **Vector Sharding & Raft Consensus PRD** | Phase P (M117): FNV-1a Consistent Hash Ring, Raft Elections, Scatter-Gather RRF | [38_Decentralized_Vector_Sharding_and_Raft_Consensus_PRD.md](38_Decentralized_Vector_Sharding_and_Raft_Consensus_PRD.md) |
 | **Platform Future Roadmap** | General Portfolio & Ecosystem Evolution Horizon | [21_Future_Roadmap.md](21_Future_Roadmap.md) |
 
 ### 🧠 Engine & Infrastructure Roadmaps (retriever)
