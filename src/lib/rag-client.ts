@@ -1715,6 +1715,44 @@ export class RetrieverClient {
       method: "POST",
     });
   }
+
+  // --- Zero-Knowledge Proof (ZKP) Vector Attestation & Grounding (Battery #33 / M118) ---
+
+  async getZkpHealth(): Promise<ZkpHealthResponse> {
+    return this.request<ZkpHealthResponse>("/v1/zkp/health");
+  }
+
+  async computeDocumentMerkleRoot(documentId: string, chunks: Record<string, unknown>[] = []): Promise<DocumentMerkleRoot> {
+    return this.request<DocumentMerkleRoot>(`/v1/tenants/${encodeURIComponent(this.tenantId)}/zkp/merkle-root/${encodeURIComponent(documentId)}`, {
+      method: "POST",
+      body: JSON.stringify({ chunks }),
+    });
+  }
+
+  async getChunkInclusionProof(chunkId: string, documentId: string, chunks: Record<string, unknown>[] = []): Promise<ChunkMerkleProof> {
+    return this.request<ChunkMerkleProof>(`/v1/tenants/${encodeURIComponent(this.tenantId)}/zkp/proof/chunk/${encodeURIComponent(chunkId)}`, {
+      method: "POST",
+      body: JSON.stringify({ document_id: documentId, chunks }),
+    });
+  }
+
+  async issueGroundingCertificate(payload: IssueCertificatePayload): Promise<ZkpGroundingCertificate> {
+    return this.request<ZkpGroundingCertificate>(`/v1/tenants/${encodeURIComponent(this.tenantId)}/zkp/attest`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async verifyGroundingCertificate(payload: VerifyCertificatePayload): Promise<GroundingVerificationResult> {
+    return this.request<GroundingVerificationResult>("/v1/zkp/verify", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async listGroundingCertificates(limit = 50): Promise<ZkpGroundingCertificate[]> {
+    return this.request<ZkpGroundingCertificate[]>(`/v1/tenants/${encodeURIComponent(this.tenantId)}/zkp/certificates?limit=${limit}`);
+  }
 }
 
 
@@ -1793,4 +1831,100 @@ export interface ParseIntentResponse {
   telemetry: ScopingTelemetry;
   unrecognizedRequirements?: string[];
 }
+
+// --- Zero-Knowledge Proof (ZKP) Vector Attestation Types (M118) ---
+
+export interface ZkpHealthResponse {
+  battery_id: string;
+  status: string;
+  authority_public_key: string;
+  hash_algorithm: string;
+  signature_algorithm: string;
+  merkle_tree_padding: string;
+  zero_knowledge_commitments: boolean;
+  public_verification_endpoint: string;
+}
+
+export interface MerkleProofStep {
+  sibling_hash: string;
+  direction: "left" | "right";
+}
+
+export interface ChunkMerkleProof {
+  chunk_id: string;
+  chunk_index: number;
+  leaf_hash: string;
+  merkle_path: MerkleProofStep[];
+  document_root: string;
+}
+
+export interface ChunkCommitment {
+  chunk_id: string;
+  chunk_index: number;
+  leaf_hash: string;
+  merkle_proof: MerkleProofStep[];
+  similarity_score?: number;
+}
+
+export interface DocumentMerkleRoot {
+  document_id: string;
+  tenant_id: string;
+  root_hash: string;
+  chunk_count: number;
+  tree_depth: number;
+  computed_at: number;
+}
+
+export interface ZkpGroundingCertificate {
+  certificate_id: string;
+  tenant_id: string;
+  document_id: string;
+  document_merkle_root: string;
+  query_hash: string;
+  response_hash: string;
+  similarity_bound: number;
+  chunk_commitments: ChunkCommitment[];
+  issued_at: number;
+  expires_at?: number | null;
+  authority_public_key: string;
+  attestation_signature: string;
+}
+
+export interface GroundingVerificationResult {
+  status:
+    | "verified"
+    | "root_mismatch"
+    | "proof_invalid"
+    | "query_mismatch"
+    | "response_mismatch"
+    | "signature_invalid"
+    | "certificate_expired";
+  is_valid: boolean;
+  details: string;
+  verified_at: number;
+  checked_leaf_count: number;
+  merkle_root_matched: boolean;
+  signature_valid: boolean;
+  query_match: boolean;
+  response_match: boolean;
+  execution_time_ms: number;
+}
+
+export interface IssueCertificatePayload {
+  document_id: string;
+  query: string;
+  response: string;
+  cited_chunks: Record<string, unknown>[];
+  all_document_chunks: Record<string, unknown>[];
+  similarity_bound?: number;
+  ttl_seconds?: number;
+}
+
+export interface VerifyCertificatePayload {
+  certificate: ZkpGroundingCertificate;
+  query?: string;
+  response?: string;
+  expected_document_root?: string;
+}
+
 

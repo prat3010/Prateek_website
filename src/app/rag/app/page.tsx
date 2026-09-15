@@ -29,10 +29,11 @@ import { McpPanel } from "@/components/rag/McpPanel";
 import { MemoryPanel } from "@/components/rag/MemoryPanel";
 import { SwarmPanel } from "@/components/rag/SwarmPanel";
 import { VectorShardingPanel } from "@/components/rag/VectorShardingPanel";
+import { ZkpAttestationPanel } from "@/components/rag/ZkpAttestationPanel";
 import { RagErrorBoundary } from "@/components/rag/ErrorBoundary";
 import styles from "@/components/rag/rag.module.css";
 
-type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "workflows" | "rlm" | "agentic" | "prompts" | "gateway" | "guardrails" | "config" | "team" | "integrations" | "feature-studio" | "edge" | "multicloud" | "voice" | "mcp" | "memory" | "swarm" | "sharding";
+type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "workflows" | "rlm" | "agentic" | "prompts" | "gateway" | "guardrails" | "config" | "team" | "integrations" | "feature-studio" | "edge" | "multicloud" | "voice" | "mcp" | "memory" | "swarm" | "sharding" | "zkp";
 
 export default function RagAppStudioPage() {
   const router = useRouter();
@@ -132,6 +133,7 @@ export default function RagAppStudioPage() {
     { id: "memory", label: "Cognitive Memory & Distillation", icon: "🧠" },
     { id: "swarm", label: "Multi-Agent Swarm Quorum", icon: "🤝" },
     { id: "sharding", label: "Vector Shards & Raft", icon: "💎" },
+    { id: "zkp", label: "ZKP Verifiable Grounding", icon: "📜" },
   ];
 
   return (
@@ -285,6 +287,7 @@ export default function RagAppStudioPage() {
             <MemoryPanel client={client} tenantId={tenantId} hidden={activeTab !== "memory"} isExpired={trialDaysRemaining <= 0} />
             <SwarmPanel client={client} tenantId={tenantId} hidden={activeTab !== "swarm"} isExpired={trialDaysRemaining <= 0} />
             <VectorShardingPanel client={client} tenantId={tenantId} hidden={activeTab !== "sharding"} />
+            <ZkpAttestationPanel client={client} tenantId={tenantId} hidden={activeTab !== "zkp"} />
 
           </RagErrorBoundary>
         </main>

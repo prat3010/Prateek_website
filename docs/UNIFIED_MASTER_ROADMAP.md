@@ -1104,6 +1104,7 @@ The following table serves as the definitive directory linking all specialized p
 | **Scoping Audit Roadmap** | 360° Quality Checklist & Security Validation for Scoping Engine | [SCOPING_AUDIT_ROADMAP.md](archive/SCOPING_AUDIT_ROADMAP_COMPLETED.md) |
 | **Mesh Load-Balancing & Auto-Scaling PRD** | Phase P (M116): P2C Balancing, EWMA Latency Decay, Ephemeral Enclaves | [37_Mesh_Load_Balancing_and_Ephemeral_AutoScaling_PRD.md](37_Mesh_Load_Balancing_and_Ephemeral_AutoScaling_PRD.md) |
 | **Vector Sharding & Raft Consensus PRD** | Phase P (M117): FNV-1a Consistent Hash Ring, Raft Elections, Scatter-Gather RRF | [38_Decentralized_Vector_Sharding_and_Raft_Consensus_PRD.md](38_Decentralized_Vector_Sharding_and_Raft_Consensus_PRD.md) |
+| **ZKP Vector Attestation & Verifiable Grounding PRD** | Phase P (M118): Binary Merkle DAG, Zero-Knowledge Leaf Commitments, Ed25519 Certificates | [39_Zero_Knowledge_Vector_Attestation_PRD.md](39_Zero_Knowledge_Vector_Attestation_PRD.md) |
 | **Platform Future Roadmap** | General Portfolio & Ecosystem Evolution Horizon | [21_Future_Roadmap.md](21_Future_Roadmap.md) |
 
 ### 🧠 Engine & Infrastructure Roadmaps (retriever)
