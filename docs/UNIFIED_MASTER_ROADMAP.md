@@ -1089,6 +1089,42 @@ timeline
   - **Control Plane Studio Upgraded:** Dedicated `IdentityFederationPanel.tsx` in `/rag/app` under Design System 2.0 (SAML 2.0 SSO, SCIM 2.0 Directory Sync, RB-VAC Simulator).
 - **Status:** **Completed (Phase P / v1.9.0-alpha1)**
 
+#### 🧪 Milestone 120: Automated Continuous DPO / ORPO Model Fine-Tuning Pipeline
+- **Libraries:** PyTorch/HuggingFace Reference-Free Odds Ratio, Bradley-Terry DPO Loss, FastAPI, React 19, TypeScript, Pytest
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/abstractions/dpo_tuning.py`, `apps/api/src/adapters/ai/dpo_tuning_adapter.py`, `apps/api/src/routers/tuning.py`, `apps/api/tests/test_dpo_tuning.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `src/components/rag/DpoTuningPanel.tsx`, `src/components/rag/DpoTuningPanel.module.css`, `docs/41_Continuous_DPO_ORPO_Tuning_Pipeline_PRD.md`)
+- **Deliverable:**
+  - **Platform Battery #35 Registration:** Cataloged `continuous_dpo_orpo_tuning` in `BatteryService` under `INTELLIGENCE_COGNITION`.
+  - **Autonomous Preference Harvesting:** In-stream telemetry aggregator capturing implicit citation click-throughs ($y_w$) and explicit negative feedback ($y_l$), paired by query context.
+  - **Monolithic Reference-Free ORPO & Bradley-Terry DPO:** Hybrid objective loss function combining SFT cross-entropy with relative log odds ratio regularization without needing a frozen reference model.
+  - **Automated Validation Gating & Hot LoRA Rollback:** Strict benchmark validation threshold ($\text{accuracy} \ge 0.75$) with hot adapter swap and zero-downtime rollback to baseline checkpoints upon regression.
+  - **Control Plane Studio Upgraded:** Dedicated `DpoTuningPanel.tsx` in `/rag/app` under Design System 2.0 with live telemetry charts, hyperparameter tuning controls, and model checkpoint registry.
+- **Status:** **Completed (Phase P / v1.9.0-alpha2)**
+
+#### 🛡️ Milestone 121: Confidential Multi-Party Vector Computation (MPC) Privacy Enclaves
+- **Libraries:** Fixed-Point Scale ($Q_{16.16}$), Beaver Multiplication Triples, Additive Secret Sharing, Laplace Noise Differential Privacy, FastAPI, React 19, TypeScript, Pytest
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/abstractions/mpc_enclave.py`, `apps/api/src/adapters/security/mpc_enclave_adapter.py`, `apps/api/src/routers/mpc.py`, `apps/api/tests/test_mpc_enclave.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `src/components/rag/MpcEnclavePanel.tsx`, `src/components/rag/MpcEnclavePanel.module.css`, `docs/42_Confidential_Multi_Party_Vector_Computation_PRD.md`)
+- **Deliverable:**
+  - **Platform Battery #36 Registration:** Cataloged `confidential_mpc_enclave` in `BatteryService` under `SAFETY_DEFENSE`.
+  - **Additive Secret Sharing Engine:** Arithmetic vector share generation over $Q_{16.16}$ fixed-point representation with complete information-theoretic privacy ($\sum_{i=1}^N [x]_i = x$).
+  - **Beaver Multiplication Triples & PPIP:** Authenticated triple generation ($c = a \cdot b$) executing Privacy-Preserving Inner Product ($\langle q, d \rangle$) and cosine similarity without exposing plain query or document vectors.
+  - **Threshold Top-K Filtering & Privacy Budget:** Oblivious score ranking filtering results above $\tau_{\text{privacy}}$, bounded by differential privacy noise and Shannon entropy auditing.
+  - **Multi-Party Enclave Session Lifecycle:** Real-time state machine (`INITIALIZED` $\to$ `WAITING_FOR_SHARES` $\to$ `COMPUTING` $\to$ `COMPLETED` / `ABORTED`) with cryptographically enforced party authentication and share submission.
+  - **FastAPI Endpoints & SDK Parity:** Mounted 10 REST endpoints (`/v1/mpc/*` and `/v1/tenants/{tenantId}/mpc/*`) and complete client SDK methods in `@prat3010/retriever-client` and `retriever-python`.
+  - **Control Plane Studio Upgraded:** Dedicated `MpcEnclavePanel.tsx` in `/rag/app` under Design System 2.0 featuring 4 sub-views (Consortium Enclaves & Sessions, Secret Share Distributor & Noise, Confidential Inner Product & Top-K, Interactive Beaver Triples & PPIP Math Simulator).
+- **Status:** **Completed (Phase P / v2.0.0-alpha3)**
+
+#### 🎯 Milestone 122: Autonomous Continuous Benchmark & Regression Gatekeeper
+- **Libraries:** SciPy (Student's $t$ CDF), NumPy / Math, FastAPI, React 19, TypeScript, Pytest, Vitest
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/abstractions/benchmark_gatekeeper.py`, `apps/api/src/adapters/eval/benchmark_gatekeeper_adapter.py`, `apps/api/src/routers/benchmark.py`, `apps/api/tests/test_benchmark_gatekeeper.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `src/components/rag/ContinuousBenchmarkPanel.tsx`, `src/components/rag/ContinuousBenchmarkPanel.module.css`, `docs/43_Autonomous_Continuous_Benchmark_and_Regression_Gatekeeper_PRD.md`)
+- **Deliverable:**
+  - **Platform Battery #37 Registration:** Cataloged `autonomous_benchmark_gatekeeper` in `BatteryService` under `ML_INTELLIGENCE`.
+  - **Authentic IR & RAG Triad Metrics:** Authentic implementation of NDCG@K (with $2^{rel} - 1$ gain), MRR@K, Recall@K, Precision@K, Faithfulness token-overlap claim grounding, Answer Relevancy, and latency percentiles (P50, P95, P99).
+  - **Two-Sample Welch's t-Test Engine:** Hypothesis testing evaluating whether observed candidate metric deltas are statistically significant ($p < \alpha$) without assuming equal variances, computing Welch-Satterthwaite degrees of freedom ($\nu$) and two-tailed $p$-values.
+  - **Autonomous Gate Policy & Rollback:** Automated evaluation comparing candidates against golden baselines, emitting discrete verdicts (`PASSED_CLEAN`, `WARNING_DEGRADED`, `REJECTED_REGRESSION`), and triggering automated deployment rollback webhooks upon regression.
+  - **FastAPI Endpoints & SDK Parity:** Mounted 8 REST endpoints under `/v1/benchmarks/*` and `/v1/tenants/{tenant_id}/benchmarks/*` with complete client SDK methods in `@prat3010/retriever-client` and `retriever-python`.
+  - **Control Plane Studio Upgraded:** Dedicated `ContinuousBenchmarkPanel.tsx` in `/rag/app` under Design System 2.0 with 4 sub-views (Benchmark Suites & Runs Ledger, Comparative Regression Diff, Item-Level Query Inspector, Interactive Welch's t-Test Simulator).
+- **Status:** **Completed (Phase P / v2.1.0-alpha1)**
+
 ---
 
 ## 4. Single Source of Truth Entity & Route Matrix
@@ -1130,6 +1166,8 @@ The following table serves as the definitive directory linking all specialized p
 | **ZKP Vector Attestation & Verifiable Grounding PRD** | Phase P (M118): Binary Merkle DAG, Zero-Knowledge Leaf Commitments, Ed25519 Certificates | [39_Zero_Knowledge_Vector_Attestation_PRD.md](39_Zero_Knowledge_Vector_Attestation_PRD.md) |
 | **Enterprise Identity Federation & RB-VAC PRD** | Phase P (M119): SAML 2.0 IdP SSO, RFC 7644 SCIM 2.0, Pre-Retrieval Set-Intersection RB-VAC | [40_Enterprise_Identity_Federation_and_RBVAC_PRD.md](40_Enterprise_Identity_Federation_and_RBVAC_PRD.md) |
 | **Continuous DPO / ORPO Tuning Pipeline PRD** | Phase P (M120): Autonomous Preference Harvesting, Bradley-Terry DPO, ORPO Odds Ratio, Validation Gating | [41_Continuous_DPO_ORPO_Tuning_Pipeline_PRD.md](41_Continuous_DPO_ORPO_Tuning_Pipeline_PRD.md) |
+| **Confidential Multi-Party Vector Computation (MPC) PRD** | Phase P (M121): Additive Secret Sharing, Beaver Multiplication Triples (PPIP), Threshold Top-K, Enclave Session Lifecycle | [42_Confidential_Multi_Party_Vector_Computation_PRD.md](42_Confidential_Multi_Party_Vector_Computation_PRD.md) |
+| **Autonomous Continuous Benchmark & Regression Gatekeeper PRD** | Phase P (M122): Welch's t-Test Hypothesis Testing, NDCG@K, MRR, Faithfulness, Automated Rollback | [43_Autonomous_Continuous_Benchmark_and_Regression_Gatekeeper_PRD.md](43_Autonomous_Continuous_Benchmark_and_Regression_Gatekeeper_PRD.md) |
 | **Platform Future Roadmap** | General Portfolio & Ecosystem Evolution Horizon | [21_Future_Roadmap.md](21_Future_Roadmap.md) |
 
 ### 🧠 Engine & Infrastructure Roadmaps (retriever)

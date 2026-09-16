@@ -1947,6 +1947,181 @@ export class RetrieverClient {
       }
     );
   }
+
+  // --- Confidential Multi-Party Vector Computation (MPC) Privacy Enclaves (M121 / Battery #36) ---
+
+  async createMpcSession(payload: {
+    title: string;
+    protocol?: import("./rag-types").MpcProtocolType;
+    required_parties_count?: number;
+    dimension?: number;
+    privacy_threshold?: number;
+    top_k?: number;
+    epsilon_budget?: number;
+  }): Promise<import("./rag-types").MpcSession> {
+    return this.request<import("./rag-types").MpcSession>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/mpc/sessions`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }
+    );
+  }
+
+  async listMpcSessions(): Promise<import("./rag-types").MpcSession[]> {
+    return this.request<import("./rag-types").MpcSession[]>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/mpc/sessions`
+    );
+  }
+
+  async getMpcSession(sessionId: string): Promise<import("./rag-types").MpcSession> {
+    return this.request<import("./rag-types").MpcSession>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/mpc/sessions/${encodeURIComponent(sessionId)}`
+    );
+  }
+
+  async joinMpcSession(
+    sessionId: string,
+    party: {
+      party_id: string;
+      display_name: string;
+      public_key: string;
+      role?: import("./rag-types").EnclavePartyRole;
+    }
+  ): Promise<import("./rag-types").MpcSession> {
+    return this.request<import("./rag-types").MpcSession>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/mpc/sessions/${encodeURIComponent(sessionId)}/join`,
+      {
+        method: "POST",
+        body: JSON.stringify(party),
+      }
+    );
+  }
+
+  async submitMpcVectorShares(
+    sessionId: string,
+    payload: {
+      party_id: string;
+      shares: import("./rag-types").EncryptedVectorShare[];
+    }
+  ): Promise<import("./rag-types").MpcSession> {
+    return this.request<import("./rag-types").MpcSession>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/mpc/sessions/${encodeURIComponent(sessionId)}/shares`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }
+    );
+  }
+
+  async executeMpcCompute(sessionId: string): Promise<import("./rag-types").MpcResultsResponse> {
+    return this.request<import("./rag-types").MpcResultsResponse>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/mpc/sessions/${encodeURIComponent(sessionId)}/compute`,
+      { method: "POST" }
+    );
+  }
+
+  async getMpcResults(sessionId: string): Promise<import("./rag-types").MpcResultsResponse> {
+    return this.request<import("./rag-types").MpcResultsResponse>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/mpc/sessions/${encodeURIComponent(sessionId)}/results`
+    );
+  }
+
+  async abortMpcSession(sessionId: string, reason = "User aborted"): Promise<import("./rag-types").MpcSession> {
+    return this.request<import("./rag-types").MpcSession>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/mpc/sessions/${encodeURIComponent(sessionId)}/abort`,
+      {
+        method: "POST",
+        body: JSON.stringify({ reason }),
+      }
+    );
+  }
+
+  async simulateMpcMath(
+    request: import("./rag-types").MpcMathSimulationRequest
+  ): Promise<import("./rag-types").MpcMathSimulationResponse> {
+    return this.request<import("./rag-types").MpcMathSimulationResponse>("/v1/mpc/math/simulate", {
+      method: "POST",
+      body: JSON.stringify(request),
+    });
+  }
+
+  // ── Milestone 122: Continuous Benchmark & Regression Gatekeeper (Battery #37) ─
+
+  async listBenchmarkSuites(): Promise<import("./rag-types").BenchmarkSuite[]> {
+    return this.request<import("./rag-types").BenchmarkSuite[]>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/benchmarks/suites`
+    );
+  }
+
+  async createBenchmarkSuite(payload: {
+    name: string;
+    description?: string;
+    k_cutoff?: number;
+    gate_policy?: Partial<import("./rag-types").GatePolicy>;
+  }): Promise<import("./rag-types").BenchmarkSuite> {
+    return this.request<import("./rag-types").BenchmarkSuite>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/benchmarks/suites`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }
+    );
+  }
+
+  async listBenchmarkRuns(suiteId?: string): Promise<import("./rag-types").BenchmarkRun[]> {
+    const query = suiteId ? `?suite_id=${encodeURIComponent(suiteId)}` : "";
+    return this.request<import("./rag-types").BenchmarkRun[]>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/benchmarks/runs${query}`
+    );
+  }
+
+  async getBenchmarkRun(runId: string): Promise<import("./rag-types").BenchmarkRun> {
+    return this.request<import("./rag-types").BenchmarkRun>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/benchmarks/runs/${encodeURIComponent(runId)}`
+    );
+  }
+
+  async triggerBenchmarkRun(payload: {
+    suite_id: string;
+    checkpoint_or_commit: string;
+    is_baseline?: boolean;
+    samples?: import("./rag-types").BenchmarkItemSample[];
+  }): Promise<import("./rag-types").BenchmarkRun> {
+    return this.request<import("./rag-types").BenchmarkRun>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/benchmarks/runs`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }
+    );
+  }
+
+  async evaluateRegressionGate(payload: {
+    suite_id: string;
+    candidate_run_id: string;
+    baseline_run_id?: string;
+  }): Promise<import("./rag-types").GateEvaluationResult> {
+    return this.request<import("./rag-types").GateEvaluationResult>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/benchmarks/evaluate-gate`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }
+    );
+  }
+
+  async simulateBenchmarkMath(
+    request: import("./rag-types").BenchmarkMathSimulationRequest
+  ): Promise<import("./rag-types").BenchmarkMathSimulationResponse> {
+    return this.request<import("./rag-types").BenchmarkMathSimulationResponse>(
+      "/v1/benchmarks/math/simulate",
+      {
+        method: "POST",
+        body: JSON.stringify(request),
+      }
+    );
+  }
 }
 
 

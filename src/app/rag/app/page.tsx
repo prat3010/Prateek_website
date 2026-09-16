@@ -32,10 +32,12 @@ import { VectorShardingPanel } from "@/components/rag/VectorShardingPanel";
 import { ZkpAttestationPanel } from "@/components/rag/ZkpAttestationPanel";
 import { IdentityFederationPanel } from "@/components/rag/IdentityFederationPanel";
 import { ContinuousTuningPanel } from "@/components/rag/ContinuousTuningPanel";
+import { MpcEnclavePanel } from "@/components/rag/MpcEnclavePanel";
+import ContinuousBenchmarkPanel from "@/components/rag/ContinuousBenchmarkPanel";
 import { RagErrorBoundary } from "@/components/rag/ErrorBoundary";
 import styles from "@/components/rag/rag.module.css";
 
-type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "workflows" | "rlm" | "agentic" | "prompts" | "gateway" | "guardrails" | "config" | "team" | "integrations" | "feature-studio" | "edge" | "multicloud" | "voice" | "mcp" | "memory" | "swarm" | "sharding" | "zkp" | "identity" | "tuning";
+type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "workflows" | "rlm" | "agentic" | "prompts" | "gateway" | "guardrails" | "config" | "team" | "integrations" | "feature-studio" | "edge" | "multicloud" | "voice" | "mcp" | "memory" | "swarm" | "sharding" | "zkp" | "identity" | "tuning" | "mpc" | "benchmarks";
 
 export default function RagAppStudioPage() {
   const router = useRouter();
@@ -138,6 +140,8 @@ export default function RagAppStudioPage() {
     { id: "zkp", label: "ZKP Verifiable Grounding", icon: "📜" },
     { id: "identity", label: "Enterprise Identity & RB-VAC", icon: "🛡️" },
     { id: "tuning", label: "Continuous DPO / ORPO Tuning", icon: "🧠" },
+    { id: "mpc", label: "Confidential MPC Enclaves", icon: "🛡️" },
+    { id: "benchmarks", label: "Continuous Benchmark Gate", icon: "🎯" },
   ];
 
   return (
@@ -294,6 +298,8 @@ export default function RagAppStudioPage() {
             <ZkpAttestationPanel client={client} tenantId={tenantId} hidden={activeTab !== "zkp"} />
             <IdentityFederationPanel client={client} tenantId={tenantId} hidden={activeTab !== "identity"} />
             <ContinuousTuningPanel client={client} tenantId={tenantId} hidden={activeTab !== "tuning"} />
+            <MpcEnclavePanel client={client} tenantId={tenantId} hidden={activeTab !== "mpc"} />
+            <ContinuousBenchmarkPanel client={client} tenantId={tenantId} hidden={activeTab !== "benchmarks"} />
 
           </RagErrorBoundary>
         </main>
