@@ -39,6 +39,7 @@ Welcome to the **Prateek Sharma Engineering Platform Documentation Map**. This c
 | **38** | **[`38_Decentralized_Vector_Sharding_and_Raft_Consensus_PRD.md`](38_Decentralized_Vector_Sharding_and_Raft_Consensus_PRD.md)** | Decentralized Multi-Tenant Vector Sharding & Distributed Raft Consensus (M117), Battery #32, 32-bit FNV-1a hash ring, Raft elections, scatter-gather RRF & online 2-phase rebalance. |
 | **39** | **[`39_Zero_Knowledge_Vector_Attestation_PRD.md`](39_Zero_Knowledge_Vector_Attestation_PRD.md)** | Zero-Knowledge Proof (ZKP) Vector Attestation & Verifiable Grounding (M118), Battery #33, binary Merkle tree commitments, sub-millisecond inclusion paths ($\pi_i$), Ed25519 grounding certificates & public zero-knowledge verification. |
 | **40** | **[`40_Enterprise_Identity_Federation_and_RBVAC_PRD.md`](40_Enterprise_Identity_Federation_and_RBVAC_PRD.md)** | Enterprise Identity Federation (SAML 2.0 / SCIM 2.0 Directory Sync) & Role-Based Vector Access Control (M119), Battery #34, X.509 XML signature verification, RFC 7644 directory state machine, pre-retrieval set-intersection RB-VAC pruning & dual-theme SaaS studio cockpit. |
+| **41** | **[`41_Continuous_DPO_ORPO_Tuning_Pipeline_PRD.md`](41_Continuous_DPO_ORPO_Tuning_Pipeline_PRD.md)** | Automated Continuous DPO / ORPO Model Fine-Tuning Pipeline (M120), Battery #35, Bradley-Terry DPO, monolithic reference-free ORPO, automated validation gating (acc >= 0.75), hot LoRA rollback & dual-theme SaaS cockpit. |
 
 
 ---

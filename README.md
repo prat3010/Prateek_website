@@ -25,7 +25,7 @@ A highly interactive, storyteller-driven personal portfolio website designed wit
 | `/admin` | Master Admin Control Center (Google OAuth auth gate, Autonomous Outreach queue, client scopes & ledgers) |
 | `/analytics` | Visitor analytics dashboard |
 | `/rag` | Retriever AI SaaS Product Landing Page — Hero, live mini-RAG sandbox, feature grid, 1-line embed snippet, and dynamic Geo-IP pricing (INR vs. USD) |
-| `/rag/app` | SaaS App Studio Workspace — Chat Studio, Document Library, Search Inspector, Embed Configurator, Vector Sharding, ZKP Verifiable Grounding, Enterprise Identity Federation & RB-VAC, and role-gated admin link |
+| `/rag/app` | SaaS App Studio Workspace — Chat Studio, Document Library, Search Inspector, Embed Configurator, Vector Sharding, ZKP Verifiable Grounding, Enterprise Identity Federation & RB-VAC, Continuous DPO / ORPO Tuning, and role-gated admin link |
 | `/rag/login` | RAG SaaS login / authentication page |
 | `/blog` | Blog listing page |
 | `/blog/[slug]` | Individual blog post page |

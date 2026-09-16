@@ -240,6 +240,13 @@ The revamped `/rag/app` uses a modern **SaaS Left Sidebar + Dedicated Sub-Views 
 - **🛡️ Pre-Retrieval RB-VAC Simulator:** Interactive mathematical access control simulator verifying set intersection ($C_{\text{chunk}} \cap G_{\text{user}} \neq \emptyset$) and visual telemetry logging of chunks pruned before LLM context synthesis.
 - *Full specification documented in [PRD 40: Enterprise Identity Federation & RB-VAC](40_Enterprise_Identity_Federation_and_RBVAC_PRD.md).*
 
+#### View 23: Continuous DPO / ORPO Model Preference Tuning (`ContinuousTuningPanel` — Milestone 120)
+- **📚 Preference Dataset Curator:** Pairwise dataset buffer $(x, y_w, y_l)$ harvested from live user chat interactions (👍/👎), ratings, and explicit corrections with prompt deduplication and buffer threshold auto-dispatch.
+- **⚙️ Continuous Fine-Tuning Jobs & Convergence:** Visual state machine (`COLLECTING` $\to$ `QUEUED` $\to$ `TRAINING` $\to$ `EVALUATING` $\to$ `COMPLETED`) with epoch loss table tracking Bradley-Terry reward margins, odds ratios, and automated evaluation gate checks ($\ge 75\%$ validation accuracy).
+- **🎯 LoRA Adapter Governance & Hot Rollback:** Parameter-efficient LoRA adapter registry with zero-downtime hot promotion and 1-click atomic rollback to prior checkpoints.
+- **🔬 Real-Time DPO / ORPO Math Simulator:** Interactive parameter sliders for temperature $\beta$, ORPO weight $\lambda$, and token probabilities with live mathematical computation of implicit rewards, reward margin, and monolithic ORPO loss.
+- *Full specification documented in [PRD 41: Automated Continuous DPO / ORPO Model Fine-Tuning Pipeline](41_Continuous_DPO_ORPO_Tuning_Pipeline_PRD.md).*
+
 ---
 
 ## 5. Hybrid LLM Key & Billing Strategy

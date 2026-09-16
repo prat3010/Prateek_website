@@ -31,10 +31,11 @@ import { SwarmPanel } from "@/components/rag/SwarmPanel";
 import { VectorShardingPanel } from "@/components/rag/VectorShardingPanel";
 import { ZkpAttestationPanel } from "@/components/rag/ZkpAttestationPanel";
 import { IdentityFederationPanel } from "@/components/rag/IdentityFederationPanel";
+import { ContinuousTuningPanel } from "@/components/rag/ContinuousTuningPanel";
 import { RagErrorBoundary } from "@/components/rag/ErrorBoundary";
 import styles from "@/components/rag/rag.module.css";
 
-type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "workflows" | "rlm" | "agentic" | "prompts" | "gateway" | "guardrails" | "config" | "team" | "integrations" | "feature-studio" | "edge" | "multicloud" | "voice" | "mcp" | "memory" | "swarm" | "sharding" | "zkp" | "identity";
+type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "workflows" | "rlm" | "agentic" | "prompts" | "gateway" | "guardrails" | "config" | "team" | "integrations" | "feature-studio" | "edge" | "multicloud" | "voice" | "mcp" | "memory" | "swarm" | "sharding" | "zkp" | "identity" | "tuning";
 
 export default function RagAppStudioPage() {
   const router = useRouter();
@@ -136,6 +137,7 @@ export default function RagAppStudioPage() {
     { id: "sharding", label: "Vector Shards & Raft", icon: "💎" },
     { id: "zkp", label: "ZKP Verifiable Grounding", icon: "📜" },
     { id: "identity", label: "Enterprise Identity & RB-VAC", icon: "🛡️" },
+    { id: "tuning", label: "Continuous DPO / ORPO Tuning", icon: "🧠" },
   ];
 
   return (
@@ -291,6 +293,7 @@ export default function RagAppStudioPage() {
             <VectorShardingPanel client={client} tenantId={tenantId} hidden={activeTab !== "sharding"} />
             <ZkpAttestationPanel client={client} tenantId={tenantId} hidden={activeTab !== "zkp"} />
             <IdentityFederationPanel client={client} tenantId={tenantId} hidden={activeTab !== "identity"} />
+            <ContinuousTuningPanel client={client} tenantId={tenantId} hidden={activeTab !== "tuning"} />
 
           </RagErrorBoundary>
         </main>

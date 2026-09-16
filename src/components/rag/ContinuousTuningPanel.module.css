@@ -1,0 +1,817 @@
+/* ContinuousTuningPanel.module.css - Design System 2.0 (Azure & Noir Dual-Theme) */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  padding-bottom: 2rem;
+}
+
+.headerCard {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.headerTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.titleArea {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.titleWithBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-family: var(--font-heading, "Playfair Display", serif);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.batteryBadge {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  background: rgba(0, 240, 255, 0.12);
+  color: #00f0ff;
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+:global([data-theme="azure"]) .batteryBadge {
+  background: rgba(224, 109, 83, 0.12);
+  color: #e06d53;
+  border: 1px solid rgba(224, 109, 83, 0.3);
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: 1.5;
+  max-width: 900px;
+}
+
+.metaStats {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.statPill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: 8px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  font-family: var(--font-mono, monospace);
+  color: var(--color-text);
+}
+
+.pulseDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #39ff14;
+  box-shadow: 0 0 8px #39ff14;
+}
+
+:global([data-theme="azure"]) .pulseDot {
+  background: #3f6e91;
+  box-shadow: 0 0 8px rgba(63, 110, 145, 0.6);
+}
+
+.tabBar {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--surface-glass-border);
+  padding-bottom: 0.5rem;
+  overflow-x: auto;
+}
+
+.tabBtn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--color-text-muted);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tabBtn:hover {
+  color: var(--color-text);
+  background: var(--surface-elevated);
+}
+
+.tabBtnActive {
+  color: var(--color-text);
+  background: var(--surface-elevated);
+  border-color: var(--surface-glass-border);
+  font-weight: 600;
+}
+
+.subViewContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Common Card */
+.card {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.cardTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cardSubtitle {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-top: 0.25rem;
+}
+
+/* Action Controls Bar */
+.actionControlsBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.filterControls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.inputField {
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: 8px;
+  color: var(--color-text);
+  padding: 0.45rem 0.75rem;
+  font-size: 0.85rem;
+  outline: none;
+  font-family: inherit;
+}
+
+.inputField:focus {
+  border-color: #00f0ff;
+}
+
+:global([data-theme="azure"]) .inputField:focus {
+  border-color: #e06d53;
+}
+
+/* Pairs Grid / List */
+.pairsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pairCard {
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.pairCard:hover {
+  border-color: rgba(0, 240, 255, 0.4);
+}
+
+:global([data-theme="azure"]) .pairCard:hover {
+  border-color: rgba(224, 109, 83, 0.4);
+}
+
+.pairHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pairPrompt {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
+.pairMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pairBadge {
+  font-size: 0.7rem;
+  font-family: var(--font-mono, monospace);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  background: var(--surface-card);
+  border: 1px solid var(--surface-glass-border);
+  color: var(--color-text-muted);
+}
+
+.pairRating {
+  font-size: 0.8rem;
+  color: #ffd700;
+}
+
+.responsesGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .responsesGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.responseBoxWinning {
+  background: rgba(57, 255, 20, 0.05);
+  border: 1px solid rgba(57, 255, 20, 0.3);
+  border-radius: 8px;
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+:global([data-theme="azure"]) .responseBoxWinning {
+  background: rgba(63, 110, 145, 0.08);
+  border-color: rgba(63, 110, 145, 0.4);
+}
+
+.responseBoxLosing {
+  background: rgba(255, 70, 70, 0.05);
+  border: 1px solid rgba(255, 70, 70, 0.25);
+  border-radius: 8px;
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.responseLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: var(--font-mono, monospace);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.labelWin {
+  color: #39ff14;
+}
+
+:global([data-theme="azure"]) .labelWin {
+  color: #3f6e91;
+}
+
+.labelLose {
+  color: #ff5555;
+}
+
+.responseText {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--color-text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.pairFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--surface-glass-border);
+}
+
+.timestamp {
+  font-size: 0.75rem;
+  font-family: var(--font-mono, monospace);
+  color: var(--color-text-muted);
+}
+
+.deleteBtn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: #ff5555;
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.deleteBtn:hover {
+  background: rgba(255, 70, 70, 0.1);
+  border-color: rgba(255, 70, 70, 0.3);
+}
+
+/* Jobs Subview */
+.jobList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.jobCard {
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.jobHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.jobTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.jobId {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.statusBadge {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status_completed {
+  background: rgba(57, 255, 20, 0.12);
+  color: #39ff14;
+  border: 1px solid rgba(57, 255, 20, 0.3);
+}
+
+:global([data-theme="azure"]) .status_completed {
+  background: rgba(63, 110, 145, 0.12);
+  color: #3f6e91;
+  border-color: rgba(63, 110, 145, 0.3);
+}
+
+.status_training {
+  background: rgba(0, 240, 255, 0.12);
+  color: #00f0ff;
+  border: 1px solid rgba(0, 240, 255, 0.3);
+}
+
+:global([data-theme="azure"]) .status_training {
+  background: rgba(224, 109, 83, 0.12);
+  color: #e06d53;
+  border-color: rgba(224, 109, 83, 0.3);
+}
+
+.status_failed {
+  background: rgba(255, 70, 70, 0.12);
+  color: #ff5555;
+  border: 1px solid rgba(255, 70, 70, 0.3);
+}
+
+.status_queued,
+.status_collecting,
+.status_evaluating {
+  background: rgba(255, 170, 0, 0.12);
+  color: #ffaa00;
+  border: 1px solid rgba(255, 170, 0, 0.3);
+}
+
+.status_rolled_back {
+  background: rgba(140, 140, 140, 0.15);
+  color: #aaa;
+  border: 1px solid rgba(140, 140, 140, 0.3);
+}
+
+.jobMetaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.metricItem {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.metricLabel {
+  font-size: 0.7rem;
+  font-family: var(--font-mono, monospace);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+.metricValue {
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: var(--font-mono, monospace);
+  color: var(--color-text);
+}
+
+/* Evaluation Gate Banner */
+.evalGateBanner {
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.evalGatePassed {
+  background: rgba(57, 255, 20, 0.08);
+  border: 1px solid rgba(57, 255, 20, 0.3);
+}
+
+:global([data-theme="azure"]) .evalGatePassed {
+  background: rgba(63, 110, 145, 0.08);
+  border-color: rgba(63, 110, 145, 0.3);
+}
+
+.evalGateFailed {
+  background: rgba(255, 70, 70, 0.08);
+  border: 1px solid rgba(255, 70, 70, 0.3);
+}
+
+.evalGateTitle {
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-text);
+}
+
+.evalGateText {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+/* Loss History Table */
+.lossTableWrapper {
+  overflow-x: auto;
+}
+
+.lossTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  font-family: var(--font-mono, monospace);
+}
+
+.lossTable th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--surface-glass-border);
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.lossTable td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--color-text);
+}
+
+:global([data-theme="azure"]) .lossTable td {
+  border-bottom-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Adapter Governance Subview */
+.activeAdapterBanner {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.08) 0%, rgba(57, 255, 20, 0.05) 100%);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+:global([data-theme="azure"]) .activeAdapterBanner {
+  background: linear-gradient(135deg, rgba(224, 109, 83, 0.08) 0%, rgba(63, 110, 145, 0.08) 100%);
+  border-color: rgba(224, 109, 83, 0.3);
+}
+
+.activeAdapterInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.activeAdapterId {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+  color: #00f0ff;
+}
+
+:global([data-theme="azure"]) .activeAdapterId {
+  color: #e06d53;
+}
+
+.checkpointGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.checkpointCard {
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.checkpointHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.checkpointId {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* Simulator Subview */
+.simulatorGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .simulatorGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sliderGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.sliderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--color-text);
+}
+
+.sliderValue {
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  color: #00f0ff;
+}
+
+:global([data-theme="azure"]) .sliderValue {
+  color: #e06d53;
+}
+
+.sliderInput {
+  width: 100%;
+  accent-color: #00f0ff;
+  cursor: pointer;
+}
+
+:global([data-theme="azure"]) .sliderInput {
+  accent-color: #e06d53;
+}
+
+.mathOutputs {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mathFormulaBox {
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  font-size: 0.85rem;
+  font-family: var(--font-mono, monospace);
+  line-height: 1.6;
+  color: var(--color-text);
+}
+
+.highlightFormula {
+  color: #00f0ff;
+  font-weight: 600;
+}
+
+:global([data-theme="azure"]) .highlightFormula {
+  color: #e06d53;
+}
+
+/* Modal Overlay & Card (Safe with Portal) */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  padding: 1.5rem;
+}
+
+.modalContent {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: 16px;
+  max-width: 680px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--surface-glass-border);
+  padding-bottom: 1rem;
+}
+
+.modalTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.closeBtn {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.formLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.formTextarea {
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: 8px;
+  color: var(--color-text);
+  padding: 0.75rem;
+  font-size: 0.85rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+  outline: none;
+}
+
+.formTextarea:focus {
+  border-color: #00f0ff;
+}
+
+:global([data-theme="azure"]) .formTextarea:focus {
+  border-color: #e06d53;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  border-top: 1px solid var(--surface-glass-border);
+  padding-top: 1rem;
+}
+
+.secondaryBtn {
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-glass-border);
+  color: var(--color-text);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.secondaryBtn:hover {
+  background: var(--surface-card);
+}

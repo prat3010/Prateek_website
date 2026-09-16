@@ -1840,6 +1840,113 @@ export class RetrieverClient {
       body: JSON.stringify({ user_id: userId, email, security_groups: securityGroups, candidates }),
     });
   }
+
+  // --- Continuous DPO / ORPO Preference Fine-Tuning (M120 / Battery #35) ---
+
+  async getTuningConfig(): Promise<import("./rag-types").ContinuousTuningConfig> {
+    return this.request<import("./rag-types").ContinuousTuningConfig>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/tuning/config`
+    );
+  }
+
+  async updateTuningConfig(
+    config: Partial<import("./rag-types").ContinuousTuningConfig>
+  ): Promise<import("./rag-types").ContinuousTuningConfig> {
+    return this.request<import("./rag-types").ContinuousTuningConfig>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/tuning/config`,
+      {
+        method: "PUT",
+        body: JSON.stringify({ ...config, tenant_id: this.tenantId }),
+      }
+    );
+  }
+
+  async listPreferencePairs(limit = 50, offset = 0): Promise<import("./rag-types").PreferenceListResponse> {
+    return this.request<import("./rag-types").PreferenceListResponse>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/tuning/pairs?limit=${limit}&offset=${offset}`
+    );
+  }
+
+  async harvestPreferencePair(pair: {
+    prompt: string;
+    winning_response: string;
+    losing_response: string;
+    source_message_id?: string;
+    feedback_rating?: number;
+    tags?: string[];
+  }): Promise<import("./rag-types").PreferencePair> {
+    return this.request<import("./rag-types").PreferencePair>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/tuning/pairs`,
+      {
+        method: "POST",
+        body: JSON.stringify(pair),
+      }
+    );
+  }
+
+  async deletePreferencePair(pairId: string): Promise<void> {
+    await this.request(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/tuning/pairs/${encodeURIComponent(pairId)}`,
+      { method: "DELETE" }
+    );
+  }
+
+  async triggerTuningJob(
+    objective: import("./rag-types").TuningObjective = "dpo",
+    hyperparams?: Partial<import("./rag-types").TuningHyperparameters>
+  ): Promise<import("./rag-types").TuningJob> {
+    return this.request<import("./rag-types").TuningJob>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/tuning/jobs`,
+      {
+        method: "POST",
+        body: JSON.stringify({ objective, hyperparameters: hyperparams }),
+      }
+    );
+  }
+
+  async listTuningJobs(limit = 20): Promise<import("./rag-types").TuningJob[]> {
+    return this.request<import("./rag-types").TuningJob[]>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/tuning/jobs?limit=${limit}`
+    );
+  }
+
+  async getTuningJob(jobId: string): Promise<import("./rag-types").TuningJob> {
+    return this.request<import("./rag-types").TuningJob>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/tuning/jobs/${encodeURIComponent(jobId)}`
+    );
+  }
+
+  async promoteTuningJobAdapter(jobId: string): Promise<import("./rag-types").ContinuousTuningConfig> {
+    return this.request<import("./rag-types").ContinuousTuningConfig>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/tuning/jobs/${encodeURIComponent(jobId)}/promote`,
+      { method: "POST" }
+    );
+  }
+
+  async rollbackTuningAdapter(targetAdapterId?: string): Promise<import("./rag-types").ContinuousTuningConfig> {
+    const url = targetAdapterId
+      ? `/v1/tenants/${encodeURIComponent(this.tenantId)}/tuning/rollback?target_adapter_id=${encodeURIComponent(targetAdapterId)}`
+      : `/v1/tenants/${encodeURIComponent(this.tenantId)}/tuning/rollback`;
+    return this.request<import("./rag-types").ContinuousTuningConfig>(url, { method: "POST" });
+  }
+
+  async simulateTuningMath(req: {
+    prompt: string;
+    beta?: number;
+    lambda_orpo?: number;
+    pi_theta_win_prob?: number;
+    pi_ref_win_prob?: number;
+    pi_theta_lose_prob?: number;
+    pi_ref_lose_prob?: number;
+  }): Promise<import("./rag-types").TuningMathSimulationResult> {
+    return this.request<import("./rag-types").TuningMathSimulationResult>(
+      `/v1/tuning/math/simulate`,
+      {
+        method: "POST",
+        body: JSON.stringify(req),
+      }
+    );
+  }
 }
 
 

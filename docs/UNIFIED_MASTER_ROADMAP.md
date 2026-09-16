@@ -1129,6 +1129,7 @@ The following table serves as the definitive directory linking all specialized p
 | **Vector Sharding & Raft Consensus PRD** | Phase P (M117): FNV-1a Consistent Hash Ring, Raft Elections, Scatter-Gather RRF | [38_Decentralized_Vector_Sharding_and_Raft_Consensus_PRD.md](38_Decentralized_Vector_Sharding_and_Raft_Consensus_PRD.md) |
 | **ZKP Vector Attestation & Verifiable Grounding PRD** | Phase P (M118): Binary Merkle DAG, Zero-Knowledge Leaf Commitments, Ed25519 Certificates | [39_Zero_Knowledge_Vector_Attestation_PRD.md](39_Zero_Knowledge_Vector_Attestation_PRD.md) |
 | **Enterprise Identity Federation & RB-VAC PRD** | Phase P (M119): SAML 2.0 IdP SSO, RFC 7644 SCIM 2.0, Pre-Retrieval Set-Intersection RB-VAC | [40_Enterprise_Identity_Federation_and_RBVAC_PRD.md](40_Enterprise_Identity_Federation_and_RBVAC_PRD.md) |
+| **Continuous DPO / ORPO Tuning Pipeline PRD** | Phase P (M120): Autonomous Preference Harvesting, Bradley-Terry DPO, ORPO Odds Ratio, Validation Gating | [41_Continuous_DPO_ORPO_Tuning_Pipeline_PRD.md](41_Continuous_DPO_ORPO_Tuning_Pipeline_PRD.md) |
 | **Platform Future Roadmap** | General Portfolio & Ecosystem Evolution Horizon | [21_Future_Roadmap.md](21_Future_Roadmap.md) |
 
 ### 🧠 Engine & Infrastructure Roadmaps (retriever)
