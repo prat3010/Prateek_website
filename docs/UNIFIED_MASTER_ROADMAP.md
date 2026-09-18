@@ -959,12 +959,13 @@ timeline
 - **Libraries:** Docker, Docker Compose, `@prat3010/retriever-client` (npm), `retriever-python` (PyPI)
 - **Repo Scope:** Both (`retriever` `docker-compose.yml`, `install.sh`, `scripts/quickstart.sh`, `packages/retriever-client/`, `packages/retriever-python/`, `docs/OPEN_SOURCE_LAUNCH_PLAYBOOK.md` & `Prateek_website` `docs/UNIFIED_MASTER_ROADMAP.md`, `ROADMAP.md`)
 - **Deliverable:**
+  - **Public GitHub Repositories Active:** Both [`retriever`](https://github.com/prat3010/retriever) and [`Prateek_website`](https://github.com/prat3010/Prateek_website) published public with official Apache 2.0 open-source licensing.
   - **1-Line Quickstart Drop-In (`curl -fsSL https://get.retriever.run | bash`):** Zero-friction POSIX bash installer featuring automated host hardware sensing (Apple Silicon MPS / NVIDIA CUDA / CPU fallback), port availability checks, `.env` initialization, and live search verification ("30-Second Time-to-Dopamine").
   - **Production Docker Compose Stack (`docker-compose.yml`):** Complete self-hosted stack orchestrating PostgreSQL 16 + pgvector, Redis 7, local Ollama with `nomic-embed-text` auto-caching, multi-stage FastAPI backend, and Next.js Admin Dashboard. Zero external API keys needed.
   - **Auto-Seeded Demo Workspace:** Automated database migration and deterministic demo key issuance (`ret_live_demo_00000000000000000000000000000000`) with sample enterprise whitepaper vector embeddings pre-indexed.
   - **Decoupled TypeScript Client SDK (`@prat3010/retriever-client` v1.0.0):** Published on npm with dual ESM/CJS exports and complete coverage across all 26 batteries (Hybrid Search, ColBERT late interaction, ReAct streaming tool traces, Cognitive Memory, Swarm Quorum debate, Universal MCP, and Micro-Enclaves).
   - **Decoupled Python Client SDK (`retriever-python` v1.0.0):** Published on PyPI with synchronous (`RetrieverClient`) and asynchronous (`AsyncRetrieverClient`) implementations, typed Pydantic models, and streaming SSE generators.
-  - **Reconciled Launch Playbook:** Updated `OPEN_SOURCE_LAUNCH_PLAYBOOK.md` and `README.md` reflecting all 26 platform batteries, empirical sub-10ms ColBERT benchmarks, and scale-to-zero serving economics.
+  - **Reconciled Launch Playbook:** Updated `OPEN_SOURCE_LAUNCH_PLAYBOOK.md` and `README.md` reflecting all platform batteries, empirical sub-10ms ColBERT benchmarks, and scale-to-zero serving economics.
 - **Status:** **Completed (Phase O / v1.0.0-rc1)**
 
 #### 🔌 Milestone 111: Community Connectors Ecosystem & Change-Data-Capture (CDC) Pipeline
@@ -1125,6 +1126,19 @@ timeline
   - **Control Plane Studio Upgraded:** Dedicated `ContinuousBenchmarkPanel.tsx` in `/rag/app` under Design System 2.0 with 4 sub-views (Benchmark Suites & Runs Ledger, Comparative Regression Diff, Item-Level Query Inspector, Interactive Welch's t-Test Simulator).
 - **Status:** **Completed (Phase P / v2.1.0-alpha1)**
 
+#### 🕸️ Milestone 123: Hierarchical Memory Augmentation with Graph-of-Thoughts (GoT) Planning
+- **Libraries:** Python Standard Math, FastAPI, React 19, TypeScript, Pytest, Vitest, Framer Motion, NumberFlow
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/abstractions/got_planner.py`, `apps/api/src/adapters/cognitive/got_planner_adapter.py`, `apps/api/src/routers/got_planning.py`, `apps/api/tests/test_got_planning.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `src/components/rag/GotPlanningPanel.tsx`, `src/components/rag/GotPlanningPanel.module.css`, `docs/44_Hierarchical_Memory_Graph_of_Thoughts_PRD.md`)
+- **Deliverable:**
+  - **Platform Battery #38 Registration:** Cataloged `hierarchical_memory_got_planner` in `BatteryService` under `COMPUTATION_GRAPH`.
+  - **Graph-of-Thoughts DAG Engine:** Non-linear cognitive planning supporting multi-parent thought aggregation ($M \to 1$), recursive thought refinement ($1 \to 1$), exploratory branch generation ($1 \to N$), and heuristic pruning below confidence $\tau_{\text{prune}}$.
+  - **Kahn's Topological Sort & DP Optimal Path:** Enforces strict acyclicity and uses memoized dynamic programming to compute the globally optimal reasoning path from root origin to converged synthesis.
+  - **3-Tier Hierarchical Memory Model:** Structured memory hierarchy across volatile L1 Scratchpad, decaying L2 Episodic memory governed by Hermann Ebbinghaus's exponential forgetting curve ($R(t) = e^{-t/S}$), and persistent L3 Semantic memory graphs.
+  - **Cognitive Graph Distillation:** Distills converged reasoning DAGs into contracted semantic knowledge nodes with contraction ratio reporting ($C = 1 - |V_{\text{dist}}| / |V_{\text{raw}}|$).
+  - **FastAPI Endpoints & SDK Parity:** Mounted 9 REST endpoints under `/v1/got/*` and `/v1/tenants/{tenantId}/got/*` with complete client SDK methods in `@prat3010/retriever-client` and `retriever-python`.
+  - **Control Plane Studio Upgraded:** Dedicated `GotPlanningPanel.tsx` in `/rag/app` under Design System 2.0 with 4 sub-views (Graph Topology DAG Canvas, Hierarchical Memory Pyramid L1/L2/L3, Thought Transformation Ledger, Interactive GoT & Aggregation Math Simulator).
+- **Status:** **Completed (Phase P / v2.2.0-alpha1)**
+
 ---
 
 ## 4. Single Source of Truth Entity & Route Matrix
@@ -1168,6 +1182,7 @@ The following table serves as the definitive directory linking all specialized p
 | **Continuous DPO / ORPO Tuning Pipeline PRD** | Phase P (M120): Autonomous Preference Harvesting, Bradley-Terry DPO, ORPO Odds Ratio, Validation Gating | [41_Continuous_DPO_ORPO_Tuning_Pipeline_PRD.md](41_Continuous_DPO_ORPO_Tuning_Pipeline_PRD.md) |
 | **Confidential Multi-Party Vector Computation (MPC) PRD** | Phase P (M121): Additive Secret Sharing, Beaver Multiplication Triples (PPIP), Threshold Top-K, Enclave Session Lifecycle | [42_Confidential_Multi_Party_Vector_Computation_PRD.md](42_Confidential_Multi_Party_Vector_Computation_PRD.md) |
 | **Autonomous Continuous Benchmark & Regression Gatekeeper PRD** | Phase P (M122): Welch's t-Test Hypothesis Testing, NDCG@K, MRR, Faithfulness, Automated Rollback | [43_Autonomous_Continuous_Benchmark_and_Regression_Gatekeeper_PRD.md](43_Autonomous_Continuous_Benchmark_and_Regression_Gatekeeper_PRD.md) |
+| **Hierarchical Memory & Graph-of-Thoughts (GoT) PRD** | Phase P (M123): GoT DAG Reasoning, Kahn's Topo DP Optimal Path, 3-Tier Memory & Ebbinghaus Decay | [44_Hierarchical_Memory_Graph_of_Thoughts_PRD.md](44_Hierarchical_Memory_Graph_of_Thoughts_PRD.md) |
 | **Platform Future Roadmap** | General Portfolio & Ecosystem Evolution Horizon | [21_Future_Roadmap.md](21_Future_Roadmap.md) |
 
 ### 🧠 Engine & Infrastructure Roadmaps (retriever)

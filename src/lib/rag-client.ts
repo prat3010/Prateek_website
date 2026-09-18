@@ -2122,6 +2122,92 @@ export class RetrieverClient {
       }
     );
   }
+
+  // ── Hierarchical Memory Augmentation with Graph-of-Thoughts (GoT) Planning (Battery #38 / M123) ──
+
+  async createGoTPlan(
+    payload: import("./rag-types").GoTPlanRequest
+  ): Promise<import("./rag-types").GoTPlanResponse> {
+    return this.request<import("./rag-types").GoTPlanResponse>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/got/plans`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }
+    );
+  }
+
+  async getGoTPlan(planId: string): Promise<import("./rag-types").GoTPlanResponse> {
+    return this.request<import("./rag-types").GoTPlanResponse>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/got/plans/${encodeURIComponent(planId)}`
+    );
+  }
+
+  async stepGoTPlan(
+    planId: string,
+    payload: import("./rag-types").GoTStepRequest
+  ): Promise<import("./rag-types").GoTPlanResponse> {
+    return this.request<import("./rag-types").GoTPlanResponse>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/got/plans/${encodeURIComponent(planId)}/step`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }
+    );
+  }
+
+  async executeGoTPlan(
+    planId: string,
+    maxIterations: number = 10
+  ): Promise<import("./rag-types").GoTPlanResponse> {
+    return this.request<import("./rag-types").GoTPlanResponse>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/got/plans/${encodeURIComponent(planId)}/execute?max_iterations=${maxIterations}`,
+      {
+        method: "POST",
+      }
+    );
+  }
+
+  async aggregateGoTThoughts(
+    planId: string,
+    payload: import("./rag-types").GoTAggregateRequest
+  ): Promise<import("./rag-types").GoTPlanResponse> {
+    return this.request<import("./rag-types").GoTPlanResponse>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/got/plans/${encodeURIComponent(planId)}/aggregate`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }
+    );
+  }
+
+  async getHierarchicalMemory(): Promise<import("./rag-types").HierarchicalMemoryView> {
+    return this.request<import("./rag-types").HierarchicalMemoryView>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/got/memory`
+    );
+  }
+
+  async distillGoTPlan(
+    planId: string,
+    payload?: import("./rag-types").DistillationRequest
+  ): Promise<import("./rag-types").DistillationResult> {
+    return this.request<import("./rag-types").DistillationResult>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/got/plans/${encodeURIComponent(planId)}/distill`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload || { target_tier: "L3_SEMANTIC" }),
+      }
+    );
+  }
+
+  async simulateGoTMath(
+    payload?: import("./rag-types").GoTSimulateRequest
+  ): Promise<import("./rag-types").GoTSimulateResponse> {
+    return this.request<import("./rag-types").GoTSimulateResponse>("/v1/got/simulate", {
+      method: "POST",
+      body: JSON.stringify(payload || {}),
+    });
+  }
 }
 
 

@@ -34,10 +34,11 @@ import { IdentityFederationPanel } from "@/components/rag/IdentityFederationPane
 import { ContinuousTuningPanel } from "@/components/rag/ContinuousTuningPanel";
 import { MpcEnclavePanel } from "@/components/rag/MpcEnclavePanel";
 import ContinuousBenchmarkPanel from "@/components/rag/ContinuousBenchmarkPanel";
+import GotPlanningPanel from "@/components/rag/GotPlanningPanel";
 import { RagErrorBoundary } from "@/components/rag/ErrorBoundary";
 import styles from "@/components/rag/rag.module.css";
 
-type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "workflows" | "rlm" | "agentic" | "prompts" | "gateway" | "guardrails" | "config" | "team" | "integrations" | "feature-studio" | "edge" | "multicloud" | "voice" | "mcp" | "memory" | "swarm" | "sharding" | "zkp" | "identity" | "tuning" | "mpc" | "benchmarks";
+type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "workflows" | "rlm" | "agentic" | "prompts" | "gateway" | "guardrails" | "config" | "team" | "integrations" | "feature-studio" | "edge" | "multicloud" | "voice" | "mcp" | "memory" | "swarm" | "sharding" | "zkp" | "identity" | "tuning" | "mpc" | "benchmarks" | "got-planning";
 
 export default function RagAppStudioPage() {
   const router = useRouter();
@@ -142,6 +143,7 @@ export default function RagAppStudioPage() {
     { id: "tuning", label: "Continuous DPO / ORPO Tuning", icon: "🧠" },
     { id: "mpc", label: "Confidential MPC Enclaves", icon: "🛡️" },
     { id: "benchmarks", label: "Continuous Benchmark Gate", icon: "🎯" },
+    { id: "got-planning", label: "Graph-of-Thoughts & Memory", icon: "🕸️" },
   ];
 
   return (
@@ -300,6 +302,7 @@ export default function RagAppStudioPage() {
             <ContinuousTuningPanel client={client} tenantId={tenantId} hidden={activeTab !== "tuning"} />
             <MpcEnclavePanel client={client} tenantId={tenantId} hidden={activeTab !== "mpc"} />
             <ContinuousBenchmarkPanel client={client} tenantId={tenantId} hidden={activeTab !== "benchmarks"} />
+            <GotPlanningPanel client={client} tenantId={tenantId} hidden={activeTab !== "got-planning"} />
 
           </RagErrorBoundary>
         </main>

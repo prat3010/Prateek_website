@@ -1,17 +1,1 @@
-{
-  "contract-and-graph-auditor": {
-    "enabled": true,
-    "PostToolUse": [
-      {
-        "matcher": "replace_file_content|write_to_file|multi_replace_file_content",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 scripts/audit_contracts.py && python3 scripts/sync_graph_with_code.py",
-            "timeout": 30
-          }
-        ]
-      }
-    ]
-  }
-}
+{}

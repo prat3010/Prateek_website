@@ -2324,6 +2324,127 @@ export interface BenchmarkMathSimulationResponse {
   explanation: string;
 }
 
+// ── Milestone 123: Hierarchical Memory Augmentation with Graph-of-Thoughts (GoT) Planning (Battery #38) ──
+
+export type GoTThoughtType = "ORIGIN" | "GENERATION" | "REFINEMENT" | "AGGREGATION" | "PRUNED";
+export type GoTThoughtStatus = "PENDING" | "EVALUATING" | "EXPLORING" | "PRUNED" | "CONVERGED";
+export type MemoryTier = "L1_SCRATCHPAD" | "L2_EPISODIC" | "L3_SEMANTIC";
+
+export interface GoTThoughtNode {
+  node_id: string;
+  plan_id: string;
+  parent_ids: string[];
+  thought_type: GoTThoughtType;
+  status: GoTThoughtStatus;
+  content: string;
+  score: number;
+  depth: number;
+  memory_tier: MemoryTier;
+  retention_strength: number;
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface GoTEdge {
+  source_id: string;
+  target_id: string;
+  edge_type: string;
+  weight: number;
+}
+
+export interface GoTGraph {
+  plan_id: string;
+  tenant_id: string;
+  query: string;
+  nodes: Record<string, GoTThoughtNode>;
+  edges: GoTEdge[];
+  root_node_id: string;
+  converged_node_id?: string | null;
+  optimal_path: string[];
+  iterations_count: number;
+  is_converged: boolean;
+  created_at: string;
+}
+
+export interface GoTPlanRequest {
+  query: string;
+  context?: Record<string, unknown>;
+  branch_factor?: number;
+  max_depth?: number;
+  prune_threshold?: number;
+  convergence_threshold?: number;
+}
+
+export interface GoTPlanResponse {
+  plan_id: string;
+  graph: GoTGraph;
+  message: string;
+}
+
+export interface GoTStepRequest {
+  action: "generate" | "aggregate" | "refine" | "prune" | "converge";
+  node_id?: string;
+  parent_ids?: string[];
+  feedback?: string;
+}
+
+export interface GoTAggregateRequest {
+  parent_node_ids: string[];
+  prompt?: string;
+}
+
+export interface HierarchicalMemoryNode {
+  node_id: string;
+  tier: MemoryTier;
+  content: string;
+  importance: number;
+  retention_strength: number;
+  activation_energy: number;
+  last_accessed: string;
+  associations: string[];
+  metadata: Record<string, unknown>;
+}
+
+export interface HierarchicalMemoryView {
+  tenant_id: string;
+  l1_scratchpad: HierarchicalMemoryNode[];
+  l2_episodic: HierarchicalMemoryNode[];
+  l3_semantic: HierarchicalMemoryNode[];
+  total_nodes: number;
+}
+
+export interface DistillationRequest {
+  target_tier?: MemoryTier;
+}
+
+export interface DistillationResult {
+  distillation_id: string;
+  plan_id: string;
+  target_tier: MemoryTier;
+  distilled_content: string;
+  nodes_consolidated: number;
+  retention_assigned: number;
+  created_at: string;
+}
+
+export interface GoTSimulateRequest {
+  thoughts_generated?: number;
+  aggregation_in_degree?: number;
+  depth?: number;
+  ebbinghaus_elapsed_hours?: number;
+  retention_factor_s?: number;
+}
+
+export interface GoTSimulateResponse {
+  theoretical_paths: number;
+  pruned_branches: number;
+  effective_search_space: number;
+  ebbinghaus_decay_retention: number;
+  graph_contraction_ratio: number;
+  synthesis_notes: string[];
+}
+
+
 
 
 

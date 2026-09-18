@@ -1,5 +1,5 @@
 # 🏛️ Master Architecture Knowledge Graph Index
-**Total Registered Architecture Nodes:** 151 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
+**Total Registered Architecture Nodes:** 152 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
 
 ## ⚡ Quick Navigation
 - [Master Architecture Visual Canvas](MASTER_ARCHITECTURE_MAP.canvas)
@@ -119,7 +119,7 @@
 | `Lib_skills` | **Lib: `skills.ts` (Persona Filter & Narrative Mapper)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Lib_skills.md](architecture_nodes/Lib_skills.md) |
 | `UI_CommercialPDFSuite` | **UI: `pdfTheme.ts`, `pdfFonts.ts` & React-PDF Exporters** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_CommercialPDFSuite.md](architecture_nodes/UI_CommercialPDFSuite.md) |
 
-### 🔹 6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPIs (55 Nodes)
+### 🔹 6. RETRIEVER COGNITIVE CORE: Guardrails, Search & FastAPIs (56 Nodes)
 
 | Node ID | Title / Component | Blast Radius | Security Auth | Specification File |
 | :--- | :--- | :---: | :---: | :--- |
@@ -135,6 +135,7 @@
 | `Engine_Durable_Workflow_Execution` | **Engine: Durable Asynchronous Execution & Background AI Workflow Engine (Milestone 95)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Durable_Workflow_Execution.md](architecture_nodes/Engine_Durable_Workflow_Execution.md) |
 | `Engine_Embedding_Space_Projection` | **Engine Specification: Scikit-Learn 2D/3D Embedding Space Projection Pipeline & SaaS Studio 3D Vector Explorer (Milestone 82)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Embedding_Space_Projection.md](architecture_nodes/Engine_Embedding_Space_Projection.md) |
 | `Engine_GraphRAG_Topology` | **Engine: GraphRAG Knowledge Graph & Dynamic Topology** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_GraphRAG_Topology.md](architecture_nodes/Engine_GraphRAG_Topology.md) |
+| `Engine_Hierarchical_Memory_GoT` | **Engine: Hierarchical Memory Augmentation with Graph-of-Thoughts (GoT) Planning (Platform Battery #38)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_Hierarchical_Memory_GoT.md](architecture_nodes/Engine_Hierarchical_Memory_GoT.md) |
 | `Engine_LLM_Gateway_Smart_Router` | **Engine: Enterprise LLM Gateway & Smart Router (Milestone 93)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_LLM_Gateway_Smart_Router.md](architecture_nodes/Engine_LLM_Gateway_Smart_Router.md) |
 | `Engine_LlamaGuard_Guardrails` | **Engine: Llama Guard 3 Prompt Injection Filter (Milestone 40)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_LlamaGuard_Guardrails.md](architecture_nodes/Engine_LlamaGuard_Guardrails.md) |
 | `Engine_LongLLMLingua_Compression` | **Engine: LongLLMLingua Context Compression (Milestone 49)** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/Engine_LongLLMLingua_Compression.md](architecture_nodes/Engine_LongLLMLingua_Compression.md) |
