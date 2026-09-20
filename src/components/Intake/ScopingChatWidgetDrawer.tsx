@@ -40,6 +40,11 @@ export function ScopingChatWidgetDrawer({
     if (existingScript) existingScript.remove();
 
     const script = document.createElement('script');
+    script.id = 'scoping-widget-script';
+    const apiUrl = process.env.NEXT_PUBLIC_RETRIEVER_API_URL || 'https://rag.prateeq.in';
+    script.src = `${apiUrl}/widget.js`;
+    script.async = true;
+
     const tenantId = process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_TENANT_ID || '';
     const apiKey = process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_API_KEY || '';
     const userId = process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_USER_ID || '';
@@ -52,7 +57,7 @@ export function ScopingChatWidgetDrawer({
     script.setAttribute('data-color', '#2563eb');
     script.setAttribute('data-title', 'Prateeq Scoping Concierge');
     script.setAttribute('data-container', containerId);
-    script.setAttribute('data-api-url', process.env.NEXT_PUBLIC_RETRIEVER_API_URL || 'https://rag.prateeq.in');
+    script.setAttribute('data-api-url', apiUrl);
 
     document.body.appendChild(script);
 

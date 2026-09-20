@@ -60,6 +60,8 @@ venv/
 
 # Local agent config/plans
 .opencode/
+.agents/scripts
 
 # Security audit runs
 strix_runs/
+
