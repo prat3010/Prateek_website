@@ -578,6 +578,29 @@ Stored in the `configurations` table per tenant. Key fields editable via `PUT /v
 
 ---
 
+---
+
+## Revamped `/rag` Product Showcase (2026 Architecture)
+
+The public product showcase at `/rag` is engineered with **Design System 2.0** and presents Retriever's sovereign, hexagonal architecture:
+
+1. **`HeroCognitiveSandbox`**:
+   - Interactive live query tester connected to `https://rag.prateeq.in/v1/tenants/1f85286c-9d9a-4ebc-9c62-a99360a5ece4/search`.
+   - Real-time pipeline waterfall displaying stage latencies: Ollama Embedding (`nomic-embed-text`), Dense HNSW + Sparse BM25, RRF Fusion ($k=60$), and Self-Aware CRAG relevance score.
+   - Grounded evidence chunks with verified source citations.
+2. **`ArchitectureComparisonCanvas`**:
+   - Visual comparison contrasting the fragmented multi-vendor mesh (LangChain + Pinecone + Cohere + LiteLLM + OpenAI) against Retriever's single hexagonal pgvector core.
+3. **`BatteriesBentoMatrix`**:
+   - Interactive Bento Grid showcasing all 38 production batteries with category filters (*Core Retrieval*, *Cognitive Reasoning*, *Long-Horizon Memory*, *Multimodal Ingestion*, *Enterprise Scale & Security*).
+4. **`TcoCalculator`**:
+   - Presentation-tier infrastructure economics calculator illustrating the 90%+ annual savings of $0 local Ollama embeddings vs Pinecone/OpenAI.
+5. **`InteractiveWidgetCustomizer` (Upgraded)**:
+   - Live floating widget preview in the viewport with real-time color swatches and canonical script delivery from `https://rag.prateeq.in/widget.js`.
+6. **`DeveloperApiSection` (Upgraded)**:
+   - Multi-language quickstart tabs: cURL, Python SDK, TypeScript/Node client, and Docker 1-click launch.
+
+---
+
 ## **Related Architecture & Cross-References**
 
 - [RAG SaaS Studio Workspace PRD](24_RAG_App_Studio_PRD.md)

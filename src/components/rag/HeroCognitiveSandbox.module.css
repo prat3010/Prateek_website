@@ -1,0 +1,347 @@
+.sandboxContainer {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  background: var(--surface-card);
+  border: var(--border-medium);
+  border-radius: var(--border-radius-xl, 16px);
+  box-shadow: var(--shadow-comic-lg);
+  overflow: hidden;
+  text-align: left;
+}
+
+.windowHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.25rem;
+  background: var(--surface-secondary);
+  border-bottom: var(--border-medium);
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.windowDots {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.dotRed {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ff5f56;
+  display: inline-block;
+}
+
+.dotYellow {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ffbd2e;
+  display: inline-block;
+}
+
+.dotGreen {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #27c93f;
+  display: inline-block;
+}
+
+.windowTitle {
+  font-size: 0.825rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.liveIndicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--pop-green, #22c55e);
+  box-shadow: 0 0 8px var(--pop-green, #22c55e);
+  animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.modeTabs {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--surface-glass-bg);
+  border: var(--border-thin);
+  border-radius: 8px;
+  padding: 0.2rem;
+}
+
+.modeTab {
+  position: relative;
+  background: transparent;
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: color 0.15s ease;
+  z-index: 1;
+}
+
+.modeTabActive {
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+.tabPill {
+  position: absolute;
+  inset: 0;
+  background: var(--surface-card);
+  border-radius: 6px;
+  box-shadow: var(--shadow-comic-sm);
+  z-index: -1;
+}
+
+.sandboxBody {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.promptBar {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.promptInput {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  font-family: var(--font-body, inherit);
+  border: var(--border-medium);
+  border-radius: 10px;
+  background: var(--surface-secondary);
+  color: var(--color-text);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.promptInput:focus {
+  border-color: var(--color-link);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.executeBtn {
+  padding: 0.75rem 1.25rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 10px;
+  white-space: nowrap;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.pillsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.pillsLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-right: 0.25rem;
+}
+
+.queryPill {
+  background: var(--surface-secondary);
+  border: var(--border-thin);
+  border-radius: 20px;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.75rem;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.queryPill:hover {
+  border-color: var(--color-link);
+  background: var(--surface-elevated);
+  transform: translateY(-1px);
+}
+
+.waterfallCard {
+  background: var(--surface-secondary);
+  border: var(--border-thin);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.waterfallHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-text);
+  border-bottom: 1px dashed var(--color-border);
+  padding-bottom: 0.5rem;
+}
+
+.waterfallBadge {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  background: var(--surface-card);
+  border: var(--border-thin);
+  color: var(--pop-green, #22c55e);
+  font-weight: 600;
+}
+
+.waterfallStages {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.65rem;
+}
+
+.stageItem {
+  background: var(--surface-card);
+  border: var(--border-thin);
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.stageName {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.stageValue {
+  font-size: 0.825rem;
+  font-weight: 700;
+  color: var(--color-text);
+  font-family: var(--font-mono, monospace);
+}
+
+.resultsArea {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.resultsTitle {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.chunkCard {
+  background: var(--surface-card);
+  border: var(--border-thin);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: var(--shadow-comic-sm);
+  transition: border-color 0.15s ease;
+}
+
+.chunkCard:hover {
+  border-color: var(--color-link);
+}
+
+.chunkHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.chunkSource {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-link);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.chunkScoreBadge {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: var(--surface-secondary);
+  border: var(--border-thin);
+  color: var(--color-text);
+}
+
+.chunkContent {
+  font-size: 0.825rem;
+  line-height: 1.55;
+  color: var(--color-text);
+  white-space: pre-wrap;
+  background: var(--surface-secondary);
+  padding: 0.65rem 0.85rem;
+  border-radius: 6px;
+  font-family: var(--font-mono, monospace);
+}
+
+.loadingSpinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 640px) {
+  .promptBar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .windowHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

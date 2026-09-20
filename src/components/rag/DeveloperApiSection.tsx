@@ -5,7 +5,7 @@ import { m } from "framer-motion";
 import styles from "./rag.module.css";
 
 export function DeveloperApiSection() {
-  const [activeTab, setActiveTab] = useState<"curl" | "python" | "typescript">("curl");
+  const [activeTab, setActiveTab] = useState<"curl" | "python" | "typescript" | "docker">("curl");
   const [copied, setCopied] = useState(false);
 
   const snippets = {
@@ -34,12 +34,12 @@ headers = {
     "Content-Type": "application/json"
 }
 
-# 1. Search Knowledge Base
+# 1. Search Knowledge Base (Hybrid HNSW + BM25)
 with httpx.Client() as client:
     resp = client.post(
         f"{API_URL}/v1/tenants/{TENANT_ID}/search",
         headers=headers,
-        json={"query": "RAG architecture HNSW", "top_k": 3}
+        json={"query": "RAG architecture HNSW", "top_k": 3, "enable_hybrid": True}
     )
     print("Search Results:", resp.json())`,
 
@@ -53,8 +53,20 @@ const client = new RetrieverClient({
 });
 
 // Perform one-shot hybrid search
-const searchResults = await client.search("hybrid vector search setup", 5);
+const searchResults = await client.search("hybrid vector search setup", {
+  limit: 5,
+  enableHybrid: true
+});
 console.log("Top Chunks:", searchResults);`,
+
+    docker: `# 1-Click Launch with $0 local Ollama embeddings:
+git clone https://github.com/prat3010/retriever.git
+cd retriever
+./scripts/quickstart.sh
+
+# Interactive Swagger Docs: http://localhost:8000/docs
+# Admin Control Studio:    http://localhost:3000
+# Terminal Chat REPL:      python3 scripts/chat_repl.py`,
   };
 
   const copyCode = () => {
@@ -67,7 +79,7 @@ console.log("Top Chunks:", searchResults);`,
     <section className={styles.devApiSection} id="api-docs">
       <div className={styles.devApiHeader}>
         <span className={styles.devApiBadge}>⚡ Developer RAG Platform</span>
-        <h2 className={styles.devApiTitle}>Build Custom RAG Apps via REST API</h2>
+        <h2 className={styles.devApiTitle}>Build Custom RAG Apps via REST API &amp; SDK</h2>
         <p className={styles.devApiSubtitle}>
           Integrate vector search, custom system prompts, and streaming inference into your existing applications in minutes.
         </p>
@@ -114,6 +126,19 @@ console.log("Top Chunks:", searchResults);`,
                 />
               )}
               TypeScript / Node
+            </button>
+            <button
+              className={`${styles.tabBtn} ${activeTab === "docker" ? styles.tabBtnActive : ""}`}
+              onClick={() => setActiveTab("docker")}
+            >
+              {activeTab === "docker" && (
+                <m.span
+                  layoutId="ragApiTabPill"
+                  className={styles.apiTabPill}
+                  transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                />
+              )}
+              🐳 Docker Quickstart
             </button>
           </div>
 

@@ -9,9 +9,10 @@ export function InteractiveWidgetCustomizer() {
   const [botName, setBotName] = useState("Retriever Concierge");
   const [position, setPosition] = useState("bottom-right");
   const [copied, setCopied] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const snippet = `<script
-  src="https://prateeq.in/widget.js"
+  src="https://rag.prateeq.in/widget.js"
   data-tenant="YOUR_TENANT_ID"
   data-key="YOUR_API_KEY"
   data-color="${color}"
@@ -25,15 +26,14 @@ export function InteractiveWidgetCustomizer() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-
   return (
     <section className={styles.customizerSection} id="widget-builder">
       <div className={styles.customizerContainer}>
         <div className={styles.customizerHeader}>
           <span className={styles.customizerBadge}>🎨 No-Code Widget Configurator</span>
-          <h2 className={styles.customizerTitle}>Customize & Preview Your Live Widget</h2>
+          <h2 className={styles.customizerTitle}>Customize &amp; Preview Your Live Widget</h2>
           <p className={styles.customizerSubtitle}>
-            Configure colors, branding, and placement in seconds. Test the widget directly on this page or copy the 1-line script for your website.
+            Configure colors, branding, and placement in seconds. Test the widget preview directly below or copy the 1-line script for your website.
           </p>
         </div>
 
@@ -100,6 +100,18 @@ export function InteractiveWidgetCustomizer() {
               </div>
             </div>
 
+            {/* Live Interactive Preview Trigger */}
+            <div className={styles.controlGroup}>
+              <label className={styles.controlLabel}>Interactive Sandbox Preview</label>
+              <button
+                className={`comic-btn ${styles.toggleBtnActive}`}
+                style={{ width: "100%", padding: "0.6rem", background: color, color: "#fff", borderColor: color }}
+                onClick={() => setPreviewOpen(!previewOpen)}
+              >
+                {previewOpen ? "✕ Close Widget Preview" : "💬 Open Live Widget Preview"}
+              </button>
+            </div>
+
             <div className={styles.actionRow}>
               <MagneticButton strength={0.25}>
                 <a href="/rag/app" className="comic-btn comic-btn-blue" style={{ textDecoration: "none", display: "inline-block" }}>
@@ -107,10 +119,9 @@ export function InteractiveWidgetCustomizer() {
                 </a>
               </MagneticButton>
             </div>
-
           </div>
 
-          {/* Right: Code Block */}
+          {/* Right: Code Block & Visual Preview */}
           <div className={styles.customizerCodeBox}>
             <div className={styles.codeSnippetHeader}>
               <span>embed-code.html</span>
@@ -124,6 +135,73 @@ export function InteractiveWidgetCustomizer() {
             <div className={styles.codeNote}>
               💡 Paste this single snippet before the closing <code>&lt;/body&gt;</code> tag on any website, Shopify store, or WordPress site.
             </div>
+
+            {/* Embedded Mini-Preview Card */}
+            {previewOpen && (
+              <div
+                style={{
+                  marginTop: "1.25rem",
+                  background: "var(--surface-card)",
+                  border: `2px solid ${color}`,
+                  borderRadius: "12px",
+                  overflow: "hidden",
+                  boxShadow: "var(--shadow-comic-md)",
+                }}
+              >
+                <div
+                  style={{
+                    background: color,
+                    color: "#ffffff",
+                    padding: "0.75rem 1rem",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    fontWeight: 700,
+                    fontSize: "0.9rem",
+                  }}
+                >
+                  <span>💬 {botName}</span>
+                  <span style={{ fontSize: "0.75rem", opacity: 0.9 }}>● Online</span>
+                </div>
+                <div style={{ padding: "1rem", display: "flex", flexDirection: "column", gap: "0.75rem", fontSize: "0.825rem" }}>
+                  <div
+                    style={{
+                      background: "var(--surface-secondary)",
+                      padding: "0.6rem 0.8rem",
+                      borderRadius: "8px",
+                      maxWidth: "85%",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    👋 Hello! I am your AI concierge. Ask me anything about our enterprise architecture, pricing, or documentation.
+                  </div>
+                  <div
+                    style={{
+                      background: color,
+                      color: "#ffffff",
+                      padding: "0.6rem 0.8rem",
+                      borderRadius: "8px",
+                      maxWidth: "85%",
+                      alignSelf: "flex-end",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    What are your security SLAs?
+                  </div>
+                  <div
+                    style={{
+                      background: "var(--surface-secondary)",
+                      padding: "0.6rem 0.8rem",
+                      borderRadius: "8px",
+                      maxWidth: "85%",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    We offer 99.9% uptime SLAs with PostgreSQL Row-Level Security (RLS) and cryptographic SHA-256 audit chains.
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
