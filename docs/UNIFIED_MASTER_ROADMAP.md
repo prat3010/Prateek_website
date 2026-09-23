@@ -1196,6 +1196,7 @@ The following table serves as the definitive directory linking all specialized p
 | **Confidential Multi-Party Vector Computation (MPC) PRD** | Phase P (M121): Additive Secret Sharing, Beaver Multiplication Triples (PPIP), Threshold Top-K, Enclave Session Lifecycle | [42_Confidential_Multi_Party_Vector_Computation_PRD.md](42_Confidential_Multi_Party_Vector_Computation_PRD.md) |
 | **Autonomous Continuous Benchmark & Regression Gatekeeper PRD** | Phase P (M122): Welch's t-Test Hypothesis Testing, NDCG@K, MRR, Faithfulness, Automated Rollback | [43_Autonomous_Continuous_Benchmark_and_Regression_Gatekeeper_PRD.md](43_Autonomous_Continuous_Benchmark_and_Regression_Gatekeeper_PRD.md) |
 | **Hierarchical Memory & Graph-of-Thoughts (GoT) PRD** | Phase P (M123): GoT DAG Reasoning, Kahn's Topo DP Optimal Path, 3-Tier Memory & Ebbinghaus Decay | [44_Hierarchical_Memory_Graph_of_Thoughts_PRD.md](44_Hierarchical_Memory_Graph_of_Thoughts_PRD.md) |
+| **Enterprise SaaS Connectors & ACL Inheritance PRD** | Phase P (M125): Google Drive/Docs, Notion Tables, Confluence/Jira, Microsoft 365 Graph Delta & Sublinear JSONB ACL (?|) Filtering | [45_Enterprise_SaaS_Connectors_and_ACL_Inheritance_PRD.md](45_Enterprise_SaaS_Connectors_and_ACL_Inheritance_PRD.md) |
 | **Platform Future Roadmap** | General Portfolio & Ecosystem Evolution Horizon | [21_Future_Roadmap.md](21_Future_Roadmap.md) |
 
 ### 🧠 Engine & Infrastructure Roadmaps (retriever)
