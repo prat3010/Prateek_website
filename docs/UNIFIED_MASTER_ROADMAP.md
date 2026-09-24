@@ -1197,6 +1197,7 @@ The following table serves as the definitive directory linking all specialized p
 | **Autonomous Continuous Benchmark & Regression Gatekeeper PRD** | Phase P (M122): Welch's t-Test Hypothesis Testing, NDCG@K, MRR, Faithfulness, Automated Rollback | [43_Autonomous_Continuous_Benchmark_and_Regression_Gatekeeper_PRD.md](43_Autonomous_Continuous_Benchmark_and_Regression_Gatekeeper_PRD.md) |
 | **Hierarchical Memory & Graph-of-Thoughts (GoT) PRD** | Phase P (M123): GoT DAG Reasoning, Kahn's Topo DP Optimal Path, 3-Tier Memory & Ebbinghaus Decay | [44_Hierarchical_Memory_Graph_of_Thoughts_PRD.md](44_Hierarchical_Memory_Graph_of_Thoughts_PRD.md) |
 | **Enterprise SaaS Connectors & ACL Inheritance PRD** | Phase P (M125): Google Drive/Docs, Notion Tables, Confluence/Jira, Microsoft 365 Graph Delta & Sublinear JSONB ACL (?|) Filtering | [45_Enterprise_SaaS_Connectors_and_ACL_Inheritance_PRD.md](45_Enterprise_SaaS_Connectors_and_ACL_Inheritance_PRD.md) |
+| **Visual DAG Workflow Canvas & Agentic Graph Composer PRD** | Phase P (M126): React 19 / SVG Studio, Kahn's Topological Sort Cycle Detection, Token Cost Attribution & Enterprise Templates | [46_Visual_DAG_Workflow_Canvas_PRD.md](46_Visual_DAG_Workflow_Canvas_PRD.md) |
 | **Platform Future Roadmap** | General Portfolio & Ecosystem Evolution Horizon | [21_Future_Roadmap.md](21_Future_Roadmap.md) |
 
 ### 🧠 Engine & Infrastructure Roadmaps (retriever)
