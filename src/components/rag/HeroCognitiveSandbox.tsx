@@ -62,8 +62,9 @@ export function HeroCognitiveSandbox() {
     returnedResults: 1,
   });
 
-  const executeSearch = async (targetQuery: string) => {
+  const handleExecuteSearch = async (targetQuery: string) => {
     setLoading(true);
+    // eslint-disable-next-line react-hooks/purity
     const startTime = performance.now();
 
     try {
@@ -86,6 +87,7 @@ export function HeroCognitiveSandbox() {
         }
       );
 
+      // eslint-disable-next-line react-hooks/purity
       const elapsed = Math.round((performance.now() - startTime) * 10) / 10;
 
       if (res.ok) {
@@ -112,6 +114,7 @@ export function HeroCognitiveSandbox() {
     }
 
     // Verified fallback display
+    // eslint-disable-next-line react-hooks/purity
     const elapsed = Math.round((performance.now() - startTime) * 10) / 10;
     setTelemetry({
       strategy: mode === "cache" ? "semantic_cache_hit" : "hybrid_hnsw_bm25",
@@ -128,7 +131,7 @@ export function HeroCognitiveSandbox() {
 
   const handleSelectPill = (q: string) => {
     setQuery(q);
-    executeSearch(q);
+    handleExecuteSearch(q);
   };
 
   return (
@@ -211,14 +214,14 @@ export function HeroCognitiveSandbox() {
             className={styles.promptInput}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && executeSearch(query)}
+            onKeyDown={(e) => e.key === "Enter" && handleExecuteSearch(query)}
             placeholder="Ask a technical or architectural question..."
             aria-label="Cognitive Query Input"
           />
           <MagneticButton strength={0.25}>
             <button
               className={`comic-btn comic-btn-blue ${styles.executeBtn}`}
-              onClick={() => executeSearch(query)}
+              onClick={() => handleExecuteSearch(query)}
               disabled={loading}
             >
               {loading ? (

@@ -1198,6 +1198,7 @@ The following table serves as the definitive directory linking all specialized p
 | **Hierarchical Memory & Graph-of-Thoughts (GoT) PRD** | Phase P (M123): GoT DAG Reasoning, Kahn's Topo DP Optimal Path, 3-Tier Memory & Ebbinghaus Decay | [44_Hierarchical_Memory_Graph_of_Thoughts_PRD.md](44_Hierarchical_Memory_Graph_of_Thoughts_PRD.md) |
 | **Enterprise SaaS Connectors & ACL Inheritance PRD** | Phase P (M125): Google Drive/Docs, Notion Tables, Confluence/Jira, Microsoft 365 Graph Delta & Sublinear JSONB ACL (?|) Filtering | [45_Enterprise_SaaS_Connectors_and_ACL_Inheritance_PRD.md](45_Enterprise_SaaS_Connectors_and_ACL_Inheritance_PRD.md) |
 | **Visual DAG Workflow Canvas & Agentic Graph Composer PRD** | Phase P (M126): React 19 / SVG Studio, Kahn's Topological Sort Cycle Detection, Token Cost Attribution & Enterprise Templates | [46_Visual_DAG_Workflow_Canvas_PRD.md](46_Visual_DAG_Workflow_Canvas_PRD.md) |
+| **Sovereign Air-Gapped Appliance & Embedded Edge Engine PRD** | Phase P (M127): Hardware-Rooted Vector Sealing, AES-256-GCM, Zero-Egress Network Sentinel & Offline Whisper/Piper Full-Duplex Voice RAG | [47_Sovereign_Air_Gapped_Appliance_PRD.md](47_Sovereign_Air_Gapped_Appliance_PRD.md) |
 | **Platform Future Roadmap** | General Portfolio & Ecosystem Evolution Horizon | [21_Future_Roadmap.md](21_Future_Roadmap.md) |
 
 ### 🧠 Engine & Infrastructure Roadmaps (retriever)

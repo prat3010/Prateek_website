@@ -10,7 +10,7 @@
  * 5. Embeddable Widget Script Delivery
  */
 
-import { calcQuote, resolveFeatureDependencies, type Currency, type QuoteSelection } from '../src/lib/pricing';
+import { calcQuote, resolveFeatureDependencies, type QuoteSelection } from '../src/lib/pricing';
 import questionnaireDefaults from '../src/data/intakeQuestionnaireDefaults.json';
 import type { BaseEngineItem, FeatureItem, BrandAssetOption, MaintenancePlanOption } from '../src/data/resume';
 import { POST as parseIntentHandler } from '../src/app/api/scoping/parse-intent/route';
@@ -271,8 +271,8 @@ Delivery Timeline: Need completion within 4 to 6 weeks.
       topScore = data.results?.[0]?.score || 0;
       snippet = data.results?.[0]?.content?.slice(0, 100) || '';
       isTopNotch = resp.status === 200 && hitCount > 0;
-    } catch (err: any) {
-      snippet = err.message;
+    } catch (err: unknown) {
+      snippet = err instanceof Error ? err.message : String(err);
     }
     const lat = performance.now() - start;
 
@@ -297,7 +297,7 @@ Delivery Timeline: Need completion within 4 to 6 weeks.
       const text = await resp.text();
       length = text.length;
       isTopNotch = resp.status === 200 && length > 5000 && text.includes('Retriever');
-    } catch (err: any) {
+    } catch {
       // ignore
     }
     const lat = performance.now() - start;
