@@ -688,6 +688,37 @@ This document serves as the registry of critical architectural design decisions 
 
 ---
 
+# **ADR 43: Razorpay Recurring SaaS Subscriptions & Dual-Cloud Provisioning (Phase 6)**
+
+* **Status**: Approved & Implemented
+* **Context**: Transitioning Retriever from an embedded portfolio demo to a sovereign commercial SaaS offering required automated subscription billing, immediate post-payment workspace provisioning, and webhook resilience. One-time payment deposits did not support monthly/annual recurring quotas, and un-notified client drop-offs during redirect could cause lost purchases.
+* **Decision**: Architected the full recurring subscription lifecycle:
+  1. Created `/api/client/create-razorpay-subscription` generating Razorpay subscription orders (`sub_...`) bound to the client's tenant.
+  2. Implemented `/api/client/verify-razorpay-subscription` checking HMAC-SHA256 signature (`crypto.timingSafeEqual`) over `${razorpayPaymentId}|${razorpaySubscriptionId}` for instant client-side paywall unlocking.
+  3. Built idempotent webhook router in `/api/webhooks/razorpay` listening for `subscription.charged`, `subscription.activated`, `subscription.halted`, and `subscription.cancelled`.
+  4. Dual-Cloud Provisioning: Synchronizes Supabase `rag_tenants.plan_tier` and `rag_subscriptions` while updating the Oracle Cloud VPS engine (`PATCH /v1/admin/tenants/{id}`) to adjust live vector token quotas.
+* **Consequences**:
+  * **Pros**: Immediate soft paywall unlock for paying customers; resilient background webhook state recovery; dual-cloud quota synchronization.
+  * **Cons**: Requires active maintenance of Razorpay plan IDs across local and production environments.
+
+---
+
+# **ADR 44: Tenant AI Persona Customization & Central Enterprise Governance Lock (Phase 8)**
+
+* **Status**: Approved & Implemented
+* **Context**: While Retriever tenants required self-serve capabilities to configure their AI chatbot persona and system instructions, enterprise compliance teams required guarantees that critical legal disclaimers, brand guidelines, and safety policies could not be stripped or modified by tenant API keys.
+* **Decision**: Built the dual-tier prompt governance architecture:
+  1. Self-Service Tenant REST API: `GET/PUT /v1/tenants/{tenantId}/prompts/default` allows tenant API keys to configure their master prompt.
+  2. Central Policy Lock (`is_locked: bool`): Added `is_locked` column to `prompt_templates`.
+  3. Enforced Rejection: When `is_locked == True`, tenant modification requests immediately return `HTTP 403 Forbidden`.
+  4. Admin Studio Cockpit: Cluster administrators retain exclusive authority via `/v1/admin/prompts` to toggle the lock on/off.
+  5. Studio UX: Renders 4 curated persona presets (*E-Commerce Support*, *Strict Technical Docs*, *B2B Sales*, *Compliance*) and a read-only lock banner when governance policy is active.
+* **Consequences**:
+  * **Pros**: Complete self-service personalization for standard tenants; unbreakable governance compliance for enterprise clusters; zero breaking changes to existing inference pipelines.
+  * **Cons**: Tenants under lock must request administrator unlocks to modify system prompts.
+
+---
+
 # **Acceptance Criteria**
 - Registry records cover the core v2 architectural choices.
 - Format follows standard ADR structures (Context, Decision, Consequences).

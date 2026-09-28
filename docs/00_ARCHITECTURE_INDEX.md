@@ -1,5 +1,5 @@
 # 🏛️ Master Architecture Knowledge Graph Index
-**Total Registered Architecture Nodes:** 152 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
+**Total Registered Architecture Nodes:** 157 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
 
 ## ⚡ Quick Navigation
 - [Master Architecture Visual Canvas](MASTER_ARCHITECTURE_MAP.canvas)
@@ -13,7 +13,7 @@
   - [Runbook: RAG Tenant Onboarding](runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)
 ---
 
-### 🔹 1. FRONTEND: Portfolio & Adaptive Identity (19 Nodes)
+### 🔹 1. FRONTEND: Portfolio & Adaptive Identity (23 Nodes)
 
 | Node ID | Title / Component | Blast Radius | Security Auth | Specification File |
 | :--- | :--- | :---: | :---: | :--- |
@@ -23,16 +23,20 @@
 | `Route_terminal` | **Route: `/terminal` (Interactive Diagnostics Console)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Route_terminal.md](architecture_nodes/Route_terminal.md) |
 | `UI_AgentStudioPanel` | **UI Component: `AgentStudioPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_AgentStudioPanel.md](architecture_nodes/UI_AgentStudioPanel.md) |
 | `UI_AnalyticsDashboard` | **UI: `AnalyticsDashboard.tsx`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_AnalyticsDashboard.md](architecture_nodes/UI_AnalyticsDashboard.md) |
+| `UI_ApiKeysPanel` | **UI: `ApiKeysPanel.tsx`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_ApiKeysPanel.md](architecture_nodes/UI_ApiKeysPanel.md) |
 | `UI_BlogEngine` | **UI: `BlogEngine.tsx` / `BlogPost.tsx`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_BlogEngine.md](architecture_nodes/UI_BlogEngine.md) |
 | `UI_CachePanel` | **UI Component: `CachePanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_CachePanel.md](architecture_nodes/UI_CachePanel.md) |
 | `UI_CapabilityStudioPanel` | **UI: `ScaffoldPanel.tsx` (Capability Studio & Metaprogrammer)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_CapabilityStudioPanel.md](architecture_nodes/UI_CapabilityStudioPanel.md) |
 | `UI_EdgeSwarmPanel` | **UI: `EdgePanel.tsx` (Sovereign Edge Swarm Studio)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_EdgeSwarmPanel.md](architecture_nodes/UI_EdgeSwarmPanel.md) |
+| `UI_FloatingChatWidget` | **UI: `FloatingChatWidget.tsx`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_FloatingChatWidget.md](architecture_nodes/UI_FloatingChatWidget.md) |
 | `UI_GatewayPanel` | **UI Component: `GatewayPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_GatewayPanel.md](architecture_nodes/UI_GatewayPanel.md) |
 | `UI_IntegrationsPanel` | **UI Component: `IntegrationsPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_IntegrationsPanel.md](architecture_nodes/UI_IntegrationsPanel.md) |
 | `UI_McpPanel` | **UI: `McpPanel.tsx` (Universal Model Context Protocol Center)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_McpPanel.md](architecture_nodes/UI_McpPanel.md) |
 | `UI_NoirSkyline` | **UI: `NoirSkyline.tsx` (6-Layer Parallax Backdrop)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_NoirSkyline.md](architecture_nodes/UI_NoirSkyline.md) |
 | `UI_PromptOptimizationPanel` | **UI Component: `PromptOptimizationPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_PromptOptimizationPanel.md](architecture_nodes/UI_PromptOptimizationPanel.md) |
+| `UI_QuickLaunchWizardModal` | **UI: `QuickLaunchWizardModal.tsx`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_QuickLaunchWizardModal.md](architecture_nodes/UI_QuickLaunchWizardModal.md) |
 | `UI_RlmStudioPanel` | **UI Component: `RlmStudioPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_RlmStudioPanel.md](architecture_nodes/UI_RlmStudioPanel.md) |
+| `UI_SegmentedPersonaSection` | **UI: `SegmentedPersonaSection.tsx`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_SegmentedPersonaSection.md](architecture_nodes/UI_SegmentedPersonaSection.md) |
 | `UI_TeamPanel` | **UI Component: `TeamPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_TeamPanel.md](architecture_nodes/UI_TeamPanel.md) |
 | `UI_Terminal` | **UI: `Terminal.tsx` (Interactive CLI Engine)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_Terminal.md](architecture_nodes/UI_Terminal.md) |
 | `UI_VectorVisualizerPanel` | **UI Component: `VectorVisualizerPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_VectorVisualizerPanel.md](architecture_nodes/UI_VectorVisualizerPanel.md) |
@@ -60,7 +64,7 @@
 | `UI_ClientWorkspaceDashboard` | **UI: `ClientWorkspaceDashboard.tsx`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_ClientWorkspaceDashboard.md](architecture_nodes/UI_ClientWorkspaceDashboard.md) |
 | `UI_RAGLabPlayground` | **UI: `RAGLabPlayground.tsx` (Retriever SaaS Studio Views)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_RAGLabPlayground.md](architecture_nodes/UI_RAGLabPlayground.md) |
 
-### 🔹 4. API GATEWAY: Next.js 16 Edge & REST Layer (38 Nodes)
+### 🔹 4. API GATEWAY: Next.js 16 Edge & REST Layer (39 Nodes)
 
 | Node ID | Title / Component | Blast Radius | Security Auth | Specification File |
 | :--- | :--- | :---: | :---: | :--- |
@@ -78,6 +82,7 @@
 | `API_client_intake_draft` | **API: `POST /api/client/intake-draft`** | 🟢 `MEDIUM` | `BEARER_JWT` | [architecture_nodes/API_client_intake_draft.md](architecture_nodes/API_client_intake_draft.md) |
 | `API_client_save_scope` | **API: `POST /api/client/save-scope`** | 🟢 `MEDIUM` | `BEARER_JWT` | [architecture_nodes/API_client_save_scope.md](architecture_nodes/API_client_save_scope.md) |
 | `API_client_verify_razorpay_payment` | **API: `POST /api/client/verify-razorpay-payment`** | 🔴 `CRITICAL` | `BEARER_JWT` | [architecture_nodes/API_client_verify_razorpay_payment.md](architecture_nodes/API_client_verify_razorpay_payment.md) |
+| `API_client_verify_razorpay_subscription` | **API: `POST /api/client/verify-razorpay-subscription`** | 🔴 `CRITICAL` | `BEARER_JWT` | [architecture_nodes/API_client_verify_razorpay_subscription.md](architecture_nodes/API_client_verify_razorpay_subscription.md) |
 | `API_contact` | **API: `POST /api/contact` (Contact Form Gateway)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/API_contact.md](architecture_nodes/API_contact.md) |
 | `API_git_log` | **API: `GET /api/git-log`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/API_git_log.md](architecture_nodes/API_git_log.md) |
 | `API_ml_classify_visitor` | **API: `POST /api/ml/classify-visitor`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/API_ml_classify_visitor.md](architecture_nodes/API_ml_classify_visitor.md) |

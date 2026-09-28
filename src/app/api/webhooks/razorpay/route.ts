@@ -138,40 +138,139 @@ export async function POST(req: Request) {
           }
         }
       }
-    } else if (event === 'subscription.charged' || event === 'subscription.authenticated') {
+    } else if (
+      event === 'subscription.charged' ||
+      event === 'subscription.authenticated' ||
+      event === 'subscription.activated' ||
+      event === 'subscription.cancelled' ||
+      event === 'subscription.halted'
+    ) {
       const subEntity = payload.payload?.subscription?.entity;
       const subId = subEntity?.id;
-      const clientEmail = subEntity?.notes?.client_email;
+      const notes = subEntity?.notes || {};
+      const clientEmail = notes?.client_email || notes?.email;
+      let targetTenantId = notes?.tenant_id;
       const planId = subEntity?.plan_id || 'plan_starter_inr';
       const nowIso = new Date().toISOString();
+      const isActive = event !== 'subscription.cancelled' && event !== 'subscription.halted';
+
+      const planTier = planId.includes('business')
+        ? 'business'
+        : planId.includes('pro')
+        ? 'pro'
+        : 'starter';
+
+      const tokenLimit = planTier === 'business' ? 5000000 : planTier === 'pro' ? 1000000 : 250000;
 
       if (subId) {
-        await supabase
-          .from('rag_subscriptions')
-          .upsert(
+        // Resolve tenant ID if not provided in payment notes
+        if (!targetTenantId) {
+          const { data: existingSub } = await supabase
+            .from('rag_subscriptions')
+            .select('tenant_id')
+            .eq('razorpay_subscription_id', subId)
+            .maybeSingle();
+
+          if (existingSub?.tenant_id) {
+            targetTenantId = existingSub.tenant_id;
+          }
+        }
+
+        if (!targetTenantId && clientEmail) {
+          const { data: existingMember } = await supabase
+            .from('rag_tenant_members')
+            .select('tenant_id')
+            .eq('email', clientEmail)
+            .limit(1)
+            .maybeSingle();
+
+          if (existingMember?.tenant_id) {
+            targetTenantId = existingMember.tenant_id;
+          }
+        }
+
+        // If still no tenant exists, bootstrap a fresh workspace
+        if (!targetTenantId && clientEmail) {
+          targetTenantId = crypto.randomUUID();
+          const displayName = clientEmail.split('@')[0];
+          await supabase.from('rag_tenants').insert({
+            tenant_id: targetTenantId,
+            name: `${displayName}'s Workspace`,
+            plan_tier: planTier,
+            is_active: isActive,
+            created_at: nowIso,
+            updated_at: nowIso,
+          });
+
+          await supabase.from('rag_tenant_members').insert({
+            tenant_id: targetTenantId,
+            email: clientEmail,
+            role: 'owner',
+            created_at: nowIso,
+            updated_at: nowIso,
+          });
+        }
+
+        if (targetTenantId) {
+          await supabase.from('rag_subscriptions').upsert(
             {
+              tenant_id: targetTenantId,
               razorpay_subscription_id: subId,
-              plan_tier: planId.includes('pro') ? 'pro' : planId.includes('business') ? 'business' : 'starter',
-              is_active: true,
-              current_period_end: subEntity?.current_end ? new Date(subEntity.current_end * 1000).toISOString() : null,
+              plan_tier: planTier,
+              monthly_token_limit: tokenLimit,
+              is_active: isActive,
+              current_period_end: subEntity?.current_end
+                ? new Date(subEntity.current_end * 1000).toISOString()
+                : null,
               updated_at: nowIso,
             },
-            { onConflict: 'razorpay_subscription_id' }
+            { onConflict: 'tenant_id' }
           );
 
-        if (clientEmail) {
-          try {
-            await supabase
-              .from('rag_tenant_members')
-              .upsert(
+          await supabase
+            .from('rag_tenants')
+            .update({
+              plan_tier: planTier,
+              is_active: isActive,
+              updated_at: nowIso,
+            })
+            .eq('tenant_id', targetTenantId);
+
+          if (clientEmail) {
+            try {
+              await supabase.from('rag_tenant_members').upsert(
                 {
+                  tenant_id: targetTenantId,
                   email: clientEmail,
                   role: 'owner',
                   updated_at: nowIso,
                 },
-                { onConflict: 'email' }
+                { onConflict: 'tenant_id,email' }
               );
-          } catch {}
+            } catch (memberErr) {
+              console.warn('Could not sync rag_tenant_members in webhook:', memberErr);
+            }
+          }
+
+          // Sync upgraded tier to Retriever backend engine if admin credentials exist
+          const retrieverUrl = process.env.RETRIEVER_API_URL || 'https://rag.prateeq.in';
+          const adminKey = process.env.RETRIEVER_ADMIN_KEY || process.env.ADMIN_MASTER_KEY;
+          if (adminKey) {
+            try {
+              await fetch(`${retrieverUrl.replace(/\/$/, '')}/v1/admin/tenants/${targetTenantId}`, {
+                method: 'PATCH',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-Admin-Master-Key': adminKey,
+                },
+                body: JSON.stringify({
+                  tier: planTier === 'starter' ? 'standard' : planTier === 'pro' ? 'premium' : 'enterprise',
+                }),
+              });
+            } catch (engineErr) {
+              console.warn('Could not sync upgraded tier to Retriever engine:', engineErr);
+            }
+          }
         }
       }
     }

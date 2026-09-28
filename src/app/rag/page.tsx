@@ -14,6 +14,8 @@ import { InteractiveWidgetCustomizer } from "@/components/rag/InteractiveWidgetC
 import { ComparisonSection } from "@/components/rag/ComparisonSection";
 import { DeveloperApiSection } from "@/components/rag/DeveloperApiSection";
 import { PricingSection } from "@/components/rag/PricingSection";
+import { SegmentedPersonaSection } from "@/components/rag/SegmentedPersonaSection";
+import { FloatingChatWidget } from "@/components/rag/FloatingChatWidget";
 import { NAVBAR_SCROLL_OFFSET } from "@/lib/constants";
 import styles from "@/components/rag/rag.module.css";
 
@@ -51,23 +53,23 @@ export default function RagLandingPage() {
           </div>
 
           <h1 className={styles.heroTitle}>
-            The Hexagonal Alternative to the Fragmented AI Stack
+            Turn Your Enterprise Documents Into an Infallible AI Copilot in 60 Seconds
           </h1>
 
           <p className={styles.heroSubtitle}>
-            Replace the bloated LangChain + Pinecone + Cohere mesh with a single, high-performance PostgreSQL pgvector engine.
-            Local-first Ollama embeddings ($0 token cost), hybrid BM25 + HNSW + ColBERT MaxSim fusion, GraphRAG community detection, and verified zero-hallucination guardrails.
+            Replace the fragmented SaaS stack with a single high-performance PostgreSQL pgvector engine.
+            Zero hallucinations, $0 local embeddings, hybrid BM25 + HNSW search, and 1-line script embed for any website.
           </p>
 
           <div className={styles.heroCtas}>
             <MagneticButton strength={0.25}>
-              <Link href="/rag/app" className="comic-btn comic-btn-blue">
-                🚀 Launch App Studio (7-Day Trial)
+              <Link href="/rag/app?onboarding=true" className="comic-btn comic-btn-blue">
+                🚀 Start Free Sandbox (No Credit Card)
               </Link>
             </MagneticButton>
             <MagneticButton strength={0.25}>
               <a href="#sandbox-demo" onClick={scrollToDemo} className="comic-btn comic-btn-outline">
-                💬 Test Live Cognitive Sandbox
+                💬 Test Live Dogfooding Sandbox
               </a>
             </MagneticButton>
           </div>
@@ -77,6 +79,11 @@ export default function RagLandingPage() {
             <HeroCognitiveSandbox />
           </div>
         </section>
+      </ScrollSection>
+
+      {/* 2. Segmented Buyer Workflows: E-Commerce, Developers, Enterprise */}
+      <ScrollSection verticalOffset={120} gap={80} disableFade>
+        <SegmentedPersonaSection />
       </ScrollSection>
 
       {/* 2. The Fragmented Stack vs. The Retriever Hexagonal Core */}
@@ -133,6 +140,9 @@ export default function RagLandingPage() {
           </MagneticButton>
         </div>
       </ScrollSection>
+
+      {/* Floating Dogfooding Chat Widget (Connected to live Scoping Tenant) */}
+      <FloatingChatWidget />
     </div>
   );
 }

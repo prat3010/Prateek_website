@@ -2208,6 +2208,32 @@ export class RetrieverClient {
       body: JSON.stringify(payload || {}),
     });
   }
+
+  // ── Master System Prompt & Governance Policy Lock ────────────────────────
+
+  async getSystemPrompt(): Promise<TenantPromptResponse> {
+    return this.request<TenantPromptResponse>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/prompts/default`
+    );
+  }
+
+  async updateSystemPrompt(content: string): Promise<TenantPromptResponse> {
+    return this.request<TenantPromptResponse>(
+      `/v1/tenants/${encodeURIComponent(this.tenantId)}/prompts/default`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content }),
+      }
+    );
+  }
+}
+
+export interface TenantPromptResponse {
+  name: string;
+  content: string;
+  isSystemPrompt: boolean;
+  isLocked: boolean;
 }
 
 

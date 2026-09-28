@@ -1,0 +1,158 @@
+.personaSection {
+  padding: 4rem 1rem;
+  max-width: 1240px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.sectionHeader {
+  margin-bottom: 3rem;
+}
+
+.sectionBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  background: var(--surface-secondary);
+  border: var(--border-thin);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-link);
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow-comic-sm);
+}
+
+.sectionTitle {
+  font-family: var(--font-headline);
+  font-size: clamp(1.8rem, 3.5vw, 2.75rem);
+  color: var(--color-text);
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.sectionSubtitle {
+  font-size: clamp(0.95rem, 1.25vw, 1.15rem);
+  color: var(--color-text-muted);
+  max-width: 760px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.personaGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  text-align: left;
+}
+
+@media (max-width: 1024px) {
+  .personaGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.personaCard {
+  background: var(--surface-card);
+  border: var(--border-medium);
+  border-radius: var(--border-radius-lg, 14px);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  box-shadow: var(--shadow-comic);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.personaCard:hover {
+  border-color: var(--color-link);
+  box-shadow: var(--shadow-comic-lg);
+}
+
+.cardHeader {
+  margin-bottom: 1.5rem;
+}
+
+.iconRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.cardIcon {
+  font-size: 2.25rem;
+  line-height: 1;
+}
+
+.personaTag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  border: var(--border-thin);
+  background: var(--surface-secondary);
+  color: var(--color-text);
+}
+
+.cardHeading {
+  font-family: var(--font-headline);
+  font-size: 1.35rem;
+  color: var(--color-text);
+  margin-bottom: 0.75rem;
+}
+
+.cardDesc {
+  font-size: 0.925rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+.featureList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.featureItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-text);
+}
+
+.featureCheck {
+  color: var(--pop-green, #22c55e);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.cardAction {
+  margin-top: auto;
+  padding-top: 1.25rem;
+  border-top: var(--border-thin);
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: var(--font-headline);
+}

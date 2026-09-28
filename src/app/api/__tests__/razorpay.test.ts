@@ -28,11 +28,15 @@ const mocks = vi.hoisted(() => {
   };
 
   const makeSelectQuery = (data: unknown) => {
-    const query = {
+    const query: Record<string, ReturnType<typeof vi.fn>> = {
       eq: vi.fn(),
+      or: vi.fn(),
+      limit: vi.fn(),
       maybeSingle: vi.fn().mockResolvedValue({ data, error: null }),
     };
     query.eq.mockReturnValue(query);
+    query.or.mockReturnValue(query);
+    query.limit.mockReturnValue(query);
     return query;
   };
 
@@ -46,13 +50,15 @@ const mocks = vi.hoisted(() => {
   };
 
   const insertFn = vi.fn().mockResolvedValue({ data: null, error: null });
+  const upsertFn = vi.fn().mockResolvedValue({ data: null, error: null });
   const fromFn = vi.fn((table: string) => ({
     select: vi.fn(() => makeSelectQuery(table === 'invoices' ? mockInvoiceRow : mockScopeRow)),
     insert: insertFn,
     update: vi.fn(() => makeUpdateQuery()),
+    upsert: upsertFn,
   }));
 
-  return { state, fromFn, insertFn };
+  return { state, fromFn, insertFn, upsertFn };
 });
 
 vi.mock('@/data/supabase', () => ({
@@ -69,6 +75,12 @@ vi.mock('@/lib/sessionVerify', () => ({
     if (!token.startsWith('Bearer ')) return null;
     if (mocks.state.invalidToken) return null;
     return 'client@example.com';
+  }),
+  getVerifiedSessionUser: vi.fn(async (req: Request) => {
+    const token = req.headers.get('authorization') || '';
+    if (!token.startsWith('Bearer ')) return null;
+    if (mocks.state.invalidToken) return null;
+    return { id: 'user-uuid-1', email: 'client@example.com' };
   }),
 }));
 
@@ -230,6 +242,7 @@ describe('POST /api/webhooks/razorpay', () => {
 });
 
 import { POST as createSubPOST } from '@/app/api/client/create-razorpay-subscription/route';
+import { POST as verifySubPOST } from '@/app/api/client/verify-razorpay-subscription/route';
 
 describe('POST /api/client/create-razorpay-subscription', () => {
   it('creates mock subscription when credentials are missing or in dev', async () => {
@@ -238,6 +251,10 @@ describe('POST /api/client/create-razorpay-subscription', () => {
 
     const req = new Request('http://localhost/api/client/create-razorpay-subscription', {
       method: 'POST',
+      headers: {
+        authorization: 'Bearer valid-token',
+        'content-type': 'application/json',
+      },
       body: JSON.stringify({ planId: 'plan_starter_inr' }),
     });
 
@@ -246,5 +263,48 @@ describe('POST /api/client/create-razorpay-subscription', () => {
     const json = await res.json();
     expect(json.isMock).toBe(true);
     expect(json.subscriptionId).toContain('sub_mock_');
+  });
+});
+
+describe('POST /api/client/verify-razorpay-subscription', () => {
+  it('returns 400 when subscription ID is missing', async () => {
+    const req = new Request('http://localhost/api/client/verify-razorpay-subscription', {
+      method: 'POST',
+      headers: {
+        authorization: 'Bearer valid-token',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({}),
+    });
+
+    const res = await verifySubPOST(req);
+    expect(res.status).toBe(400);
+  });
+
+  it('verifies valid subscription signature and upgrades tier', async () => {
+    const subId = 'sub_live_123456';
+    const payId = 'pay_live_654321';
+    const secret = process.env.RAZORPAY_KEY_SECRET || 'ocJs7m0Gr5GxIm4cMnyNT0pK';
+    const sig = crypto.createHmac('sha256', secret).update(`${payId}|${subId}`).digest('hex');
+
+    const req = new Request('http://localhost/api/client/verify-razorpay-subscription', {
+      method: 'POST',
+      headers: {
+        authorization: 'Bearer valid-token',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        razorpaySubscriptionId: subId,
+        razorpayPaymentId: payId,
+        razorpaySignature: sig,
+        planId: 'plan_pro_inr',
+      }),
+    });
+
+    const res = await verifySubPOST(req);
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.success).toBe(true);
+    expect(json.planTier).toBe('pro');
   });
 });

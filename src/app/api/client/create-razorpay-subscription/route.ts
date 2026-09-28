@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
-import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
+import { getVerifiedSessionEmail, getVerifiedSessionUser } from '@/lib/sessionVerify';
 
 export async function POST(req: Request) {
   try {
@@ -10,8 +10,29 @@ export async function POST(req: Request) {
     const planId = (payload.planId as string) || 'plan_starter_inr';
     const totalCount = Number(payload.totalCount) || 12;
 
-    const clientEmail = await getVerifiedSessionEmail(req);
+    const sessionUser = await getVerifiedSessionUser(req);
+    const clientEmail = sessionUser?.email || (await getVerifiedSessionEmail(req));
     const isDev = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
+
+    if (!clientEmail && !isDev) {
+      return NextResponse.json(
+        { error: 'Unauthorized: You must be signed in to start or upgrade a subscription.' },
+        { status: 401 }
+      );
+    }
+
+    let targetTenantId = (payload.tenantId as string) || '';
+    if (clientEmail && supabase) {
+      const { data: member } = await supabase
+        .from('rag_tenant_members')
+        .select('tenant_id')
+        .eq('email', clientEmail)
+        .limit(1)
+        .maybeSingle();
+      if (member?.tenant_id) {
+        targetTenantId = member.tenant_id;
+      }
+    }
 
     if (!KEY_ID || !KEY_SECRET) {
       if (isDev || !supabase) {
@@ -19,6 +40,7 @@ export async function POST(req: Request) {
           isMock: true,
           subscriptionId: `sub_mock_${Date.now()}`,
           planId,
+          tenantId: targetTenantId || 'tn_dev_mock',
           keyId: KEY_ID || 'rzp_test_mock',
         });
       }
@@ -41,6 +63,8 @@ export async function POST(req: Request) {
           customer_notify: 1,
           notes: {
             client_email: clientEmail || 'guest@prateeq.in',
+            tenant_id: targetTenantId,
+            plan_id: planId,
             source: 'prateeq_website',
           },
         }),

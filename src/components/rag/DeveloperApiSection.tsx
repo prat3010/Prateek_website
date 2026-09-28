@@ -76,7 +76,7 @@ cd retriever
   };
 
   return (
-    <section className={styles.devApiSection} id="api-docs">
+    <section className={styles.devApiSection} id="developer-api">
       <div className={styles.devApiHeader}>
         <span className={styles.devApiBadge}>⚡ Developer RAG Platform</span>
         <h2 className={styles.devApiTitle}>Build Custom RAG Apps via REST API &amp; SDK</h2>

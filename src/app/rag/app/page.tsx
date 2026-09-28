@@ -35,10 +35,12 @@ import { ContinuousTuningPanel } from "@/components/rag/ContinuousTuningPanel";
 import { MpcEnclavePanel } from "@/components/rag/MpcEnclavePanel";
 import ContinuousBenchmarkPanel from "@/components/rag/ContinuousBenchmarkPanel";
 import GotPlanningPanel from "@/components/rag/GotPlanningPanel";
+import { ApiKeysPanel } from "@/components/rag/ApiKeysPanel";
+import { QuickLaunchWizardModal } from "@/components/rag/QuickLaunchWizardModal";
 import { RagErrorBoundary } from "@/components/rag/ErrorBoundary";
 import styles from "@/components/rag/rag.module.css";
 
-type SubViewTab = "overview" | "chat" | "upload" | "search" | "visualizer" | "cache" | "workflows" | "rlm" | "agentic" | "prompts" | "gateway" | "guardrails" | "config" | "team" | "integrations" | "feature-studio" | "edge" | "multicloud" | "voice" | "mcp" | "memory" | "swarm" | "sharding" | "zkp" | "identity" | "tuning" | "mpc" | "benchmarks" | "got-planning";
+type SubViewTab = "overview" | "chat" | "upload" | "keys" | "config" | "search" | "visualizer" | "cache" | "workflows" | "rlm" | "agentic" | "prompts" | "gateway" | "guardrails" | "team" | "integrations" | "feature-studio" | "edge" | "multicloud" | "voice" | "mcp" | "memory" | "swarm" | "sharding" | "zkp" | "identity" | "tuning" | "mpc" | "benchmarks" | "got-planning";
 
 export default function RagAppStudioPage() {
   const router = useRouter();
@@ -52,7 +54,11 @@ export default function RagAppStudioPage() {
   const [client, setClient] = useState<RetrieverClient | null>(null);
   const [tenantLoading, setTenantLoading] = useState<boolean>(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
-  const [trialDaysRemaining] = useState<number>(6);
+  const [planTier, setPlanTier] = useState<string>("starter");
+  const [trialDaysRemaining, setTrialDaysRemaining] = useState<number>(7);
+  const [showQuickWizard, setShowQuickWizard] = useState<boolean>(false);
+  const [isUpgradedCelebration, setIsUpgradedCelebration] = useState<boolean>(false);
+  const [advancedOpen, setAdvancedOpen] = useState<boolean>(false);
 
   const initWorkspace = useCallback(async () => {
     setTenantLoading(true);
@@ -72,18 +78,30 @@ export default function RagAppStudioPage() {
             const resolvedUser = data.userId || user.id;
 
             setTenantId(resolvedTenant);
-            setApiKey(token);
+            setApiKey(data.apiKey || token);
             setUserId(resolvedUser);
             setIsAdmin(data.role === "owner" || data.role === "admin");
+            setPlanTier(data.planTier || "starter");
+            setTrialDaysRemaining(data.trialDaysRemaining ?? 7);
 
             const cli = new RetrieverClient({
               apiUrl: process.env.NEXT_PUBLIC_RETRIEVER_API_URL || "https://rag.prateeq.in",
               tenantId: resolvedTenant,
-              apiKey: token,
+              apiKey: data.apiKey || token,
               userId: resolvedUser,
             });
             setClient(cli);
             setTenantLoading(false);
+
+            if (typeof window !== "undefined") {
+              const urlParams = new URLSearchParams(window.location.search);
+              if (urlParams.get("upgraded") === "true") {
+                setIsUpgradedCelebration(true);
+              }
+              if (urlParams.get("onboarding") === "true") {
+                setShowQuickWizard(true);
+              }
+            }
             return;
           }
         }
@@ -93,6 +111,8 @@ export default function RagAppStudioPage() {
       setApiKey("");
       setUserId("");
       setIsAdmin(false);
+      setPlanTier("starter");
+      setTrialDaysRemaining(7);
       setClient(null);
     } catch (err) {
       console.warn("RAG Studio workspace resolution warning:", err);
@@ -114,10 +134,15 @@ export default function RagAppStudioPage() {
     router.push("/rag");
   };
 
-  const navItems: { id: SubViewTab; label: string; icon: string }[] = [
-    { id: "overview", label: "Overview & Analytics", icon: "📊" },
+  const coreNavItems: { id: SubViewTab; label: string; icon: string }[] = [
+    { id: "overview", label: "Overview & Usage", icon: "📊" },
+    { id: "upload", label: "Knowledge & Documents", icon: "📄" },
     { id: "chat", label: "Chat Studio", icon: "💬" },
-    { id: "upload", label: "Knowledge & Graph", icon: "📄" },
+    { id: "config", label: "AI Persona & Widget", icon: "⚙️" },
+    { id: "keys", label: "API Keys & SDK", icon: "🔑" },
+  ];
+
+  const advancedNavItems: { id: SubViewTab; label: string; icon: string }[] = [
     { id: "search", label: "Search & Evaluator", icon: "🔍" },
     { id: "visualizer", label: "3D Vector Explorer", icon: "🪐" },
     { id: "cache", label: "Semantic Cache", icon: "⚡" },
@@ -127,7 +152,6 @@ export default function RagAppStudioPage() {
     { id: "prompts", label: "DSPy Prompt Studio", icon: "✨" },
     { id: "gateway", label: "Smart Router & Gateway", icon: "🔀" },
     { id: "guardrails", label: "NeMo Guardrails & Safety", icon: "🛡️" },
-    { id: "config", label: "Widget Studio", icon: "⚙️" },
     { id: "team", label: "Team & Compliance", icon: "👥" },
     { id: "integrations", label: "Plugins & Integrations", icon: "🔌" },
     { id: "feature-studio", label: "Capability Studio & FDE", icon: "🛠️" },
@@ -146,6 +170,8 @@ export default function RagAppStudioPage() {
     { id: "got-planning", label: "Graph-of-Thoughts & Memory", icon: "🕸️" },
   ];
 
+  const allNavItems = [...coreNavItems, ...advancedNavItems];
+
   return (
     <div className={styles.landingWrapper} style={{ minHeight: "100vh", background: "var(--color-bg, #0b0f19)" }}>
       {/* Sleek Unified 56px B2B AI Studio Top Header Bar */}
@@ -161,21 +187,49 @@ export default function RagAppStudioPage() {
         </div>
 
         <div className={styles.studioTopCenter}>
-          <Link
-            href="/rag#pricing"
-            className={`${styles.trialPillCompact} ${trialDaysRemaining <= 0 ? styles.trialPillExpired : ""}`}
-          >
-            <span>{trialDaysRemaining <= 0 ? "🔒" : "⏱️"}</span>
-            <span>
-              {trialDaysRemaining <= 0
-                ? "Trial Expired (Soft Paywall Active)"
-                : `${trialDaysRemaining} Days Starter Trial`}
-            </span>
-            <span style={{ fontSize: "0.7rem", opacity: 0.8 }}>➔ Upgrade</span>
-          </Link>
+          {planTier === "pro" || planTier === "business" ? (
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.4rem",
+                padding: "0.25rem 0.75rem",
+                borderRadius: "20px",
+                background: "rgba(0, 230, 118, 0.12)",
+                border: "1px solid #00E676",
+                fontSize: "0.78rem",
+                color: "#00E676",
+                fontWeight: 600,
+              }}
+            >
+              <span>⚡</span>
+              <span>{planTier.toUpperCase()} WORKSPACE (Active)</span>
+            </div>
+          ) : (
+            <Link
+              href="/rag#pricing"
+              className={`${styles.trialPillCompact} ${trialDaysRemaining <= 0 ? styles.trialPillExpired : ""}`}
+            >
+              <span>{trialDaysRemaining <= 0 ? "🔒" : "⏱️"}</span>
+              <span>
+                {trialDaysRemaining <= 0
+                  ? "Trial Expired (Soft Paywall Active)"
+                  : `${trialDaysRemaining} Days Starter Trial`}
+              </span>
+              <span style={{ fontSize: "0.7rem", opacity: 0.8 }}>➔ Upgrade</span>
+            </Link>
+          )}
         </div>
 
         <div className={styles.studioTopRight}>
+          <button
+            onClick={() => setShowQuickWizard(true)}
+            className="comic-btn comic-btn-outline"
+            style={{ padding: "0.25rem 0.65rem", fontSize: "0.75rem" }}
+          >
+            🚀 Quick Setup
+          </button>
+
           {authLoading ? (
             <button
               className="comic-btn comic-btn-blue"
@@ -211,16 +265,16 @@ export default function RagAppStudioPage() {
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
       >
         <span>≡</span>
-        <span>{navItems.find((n) => n.id === activeTab)?.icon} {navItems.find((n) => n.id === activeTab)?.label}</span>
+        <span>{allNavItems.find((n) => n.id === activeTab)?.icon} {allNavItems.find((n) => n.id === activeTab)?.label}</span>
       </button>
 
       {/* Phase 2 Left Sidebar Studio Grid */}
       <div className={styles.studioContainer}>
         {/* Left Sidebar Navigation */}
         <aside className={`${styles.studioSidebar} ${mobileMenuOpen ? styles.mobileSidebarOpen : ""}`}>
-          <div className={styles.sidebarTitle}>Workspace Views</div>
-          <nav className={styles.sidebarNav} role="tablist" aria-label="Retriever Studio Workspace Views">
-            {navItems.map((item) => (
+          <div className={styles.sidebarTitle}>Core Essentials</div>
+          <nav className={styles.sidebarNav} role="tablist" aria-label="Retriever Studio Core Views">
+            {coreNavItems.map((item) => (
               <button
                 key={item.id}
                 role="tab"
@@ -244,14 +298,103 @@ export default function RagAppStudioPage() {
               </button>
             ))}
           </nav>
+
+          {/* Advanced Batteries Collapsible Section */}
+          <div style={{ marginTop: "1.25rem", borderTop: "1px solid var(--color-border, #222)", paddingTop: "1rem" }}>
+            <button
+              onClick={() => setAdvancedOpen(!advancedOpen)}
+              style={{
+                width: "100%",
+                background: "transparent",
+                border: "none",
+                color: "var(--color-text-muted)",
+                fontSize: "0.75rem",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                fontWeight: 700,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                cursor: "pointer",
+                padding: "0.25rem 0.5rem",
+              }}
+            >
+              <span>🛠️ Advanced Batteries ({advancedNavItems.length})</span>
+              <span>{advancedOpen ? "▲" : "▼"}</span>
+            </button>
+
+            {advancedOpen && (
+              <nav className={styles.sidebarNav} style={{ marginTop: "0.5rem" }} role="tablist" aria-label="Retriever Studio Advanced Batteries">
+                {advancedNavItems.map((item) => (
+                  <button
+                    key={item.id}
+                    role="tab"
+                    aria-selected={activeTab === item.id}
+                    tabIndex={activeTab === item.id ? 0 : -1}
+                    onClick={() => {
+                      setActiveTab(item.id);
+                      setMobileMenuOpen(false);
+                    }}
+                    className={`${styles.sidebarItem} ${activeTab === item.id ? styles.sidebarItemActive : ""}`}
+                  >
+                    {activeTab === item.id && (
+                      <m.span
+                        layoutId="ragStudioTabPill"
+                        className={styles.sidebarTabPill}
+                        transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                      />
+                    )}
+                    <span style={{ position: "relative", zIndex: 1 }}>{item.icon}</span>
+                    <span style={{ position: "relative", zIndex: 1 }}>{item.label}</span>
+                  </button>
+                ))}
+              </nav>
+            )}
+          </div>
         </aside>
 
         {/* Main Sub-View Content Panel Container */}
         <main className={styles.panelContainer}>
           <RagErrorBoundary>
+            {/* Post-Purchase Celebratory Banner */}
+            {isUpgradedCelebration && (
+              <div
+                style={{
+                  background: "rgba(0, 230, 118, 0.12)",
+                  border: "1px solid #00E676",
+                  borderRadius: "8px",
+                  padding: "0.85rem 1.25rem",
+                  marginBottom: "1.25rem",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  color: "var(--color-text)",
+                  fontSize: "0.875rem",
+                }}
+              >
+                <span>
+                  🎉 <strong>Subscription Active:</strong> Welcome to Retriever {planTier.toUpperCase()}! Your workspace limits have been upgraded to 1,000,000 monthly tokens with 100 documents and custom widget branding unlocked.
+                </span>
+                <button
+                  onClick={() => setIsUpgradedCelebration(false)}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    color: "#00E676",
+                    fontSize: "1rem",
+                    cursor: "pointer",
+                    fontWeight: 700,
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+
             <OverviewPanel client={client} hidden={activeTab !== "overview"} onNavigateTab={(tab) => setActiveTab(tab as SubViewTab)} />
-            <ChatPanel client={client} hidden={activeTab !== "chat"} isExpired={trialDaysRemaining <= 0} />
             <DocumentsPanel client={client} hidden={activeTab !== "upload"} isExpired={trialDaysRemaining <= 0} />
+            <ChatPanel client={client} hidden={activeTab !== "chat"} isExpired={trialDaysRemaining <= 0} />
+            <ApiKeysPanel hidden={activeTab !== "keys"} tenantId={tenantId} apiKey={apiKey} planTier={planTier} />
             <SearchPanel client={client} hidden={activeTab !== "search"} />
             <VectorVisualizerPanel client={client} hidden={activeTab !== "visualizer"} />
             <CachePanel client={client} hidden={activeTab !== "cache"} />
@@ -263,6 +406,7 @@ export default function RagAppStudioPage() {
             <GuardrailsPanel client={client} hidden={activeTab !== "guardrails"} />
 
             <ConfigPanel
+              client={client}
               config={
                 client
                   ? {
@@ -304,6 +448,17 @@ export default function RagAppStudioPage() {
             <ContinuousBenchmarkPanel client={client} tenantId={tenantId} hidden={activeTab !== "benchmarks"} />
             <GotPlanningPanel client={client} tenantId={tenantId} hidden={activeTab !== "got-planning"} />
 
+            <QuickLaunchWizardModal
+              isOpen={showQuickWizard}
+              onClose={() => setShowQuickWizard(false)}
+              tenantId={tenantId}
+              apiKey={apiKey}
+              client={client}
+              onSuccessComplete={() => {
+                setShowQuickWizard(false);
+                setActiveTab("chat");
+              }}
+            />
           </RagErrorBoundary>
         </main>
       </div>

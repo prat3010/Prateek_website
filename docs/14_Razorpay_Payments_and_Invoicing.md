@@ -163,6 +163,47 @@ CREATE TABLE IF NOT EXISTS processed_webhooks (
 
 ---
 
+## **SaaS Subscriptions Architecture (Retriever AI SaaS)**
+
+### 6. **SaaS Subscription Creation Endpoint**: [`POST /api/client/create-razorpay-subscription`](../src/app/api/client/create-razorpay-subscription/route.ts)
+
+* **Authentication**: Requires valid session token via `Authorization: Bearer <token>` verified by `getVerifiedSessionEmail`.
+* **Plan Tier Configuration**: Supports `starter`, `pro`, and `business` tiers with predefined plan IDs (`RAZORPAY_PLAN_STARTER`, `RAZORPAY_PLAN_PRO`, `RAZORPAY_PLAN_BUSINESS`).
+* **Razorpay Subscriptions API Integration**:
+  - Sends an authenticated `POST` to `https://api.razorpay.com/v1/subscriptions` with `plan_id`, `total_count: 12` (annual), `quantity: 1`, `customer_notify: 1`.
+  - Attaches metadata notes: `tenant_id`, `client_email`, `plan_tier`.
+* **Response**: Returns `{ subscriptionId, planTier, keyId }`.
+
+---
+
+### 7. **SaaS Subscription Verification Endpoint**: [`POST /api/client/verify-razorpay-subscription`](../src/app/api/client/verify-razorpay-subscription/route.ts)
+
+* **Authentication**: Session-gated via JWT bearer token.
+* **Subscription Signature Verification**:
+  - Computes HMAC-SHA256 signature using `crypto.timingSafeEqual`:
+    ```ts
+    const expectedSignature = crypto
+      .createHmac("sha256", KEY_SECRET)
+      .update(`${razorpayPaymentId}|${razorpaySubscriptionId}`)
+      .digest("hex");
+    ```
+* **Immediate Soft Paywall Unlock**:
+  - Updates Supabase `rag_tenants.plan_tier` to the purchased tier (`pro` / `business`).
+  - Upserts `rag_subscriptions` with active billing cycle dates (`current_period_end`).
+  - Calls Oracle Cloud Retriever Engine (`PATCH /v1/admin/tenants/{id}`) to adjust live inference token allowances.
+
+---
+
+### 8. **Subscription Webhook Lifecycle Events** ([`POST /api/webhooks/razorpay`](../src/app/api/webhooks/razorpay/route.ts))
+
+The webhook handler listens for the authoritative asynchronous events from Razorpay:
+1. `subscription.charged`: Renewal or upfront subscription payment success. Extends subscription expiry date, refreshes quota, logs invoice in `invoices` table.
+2. `subscription.activated`: Transition from trial/pending to active status.
+3. `subscription.halted`: Payment failure after retry attempts. Downgrades `rag_tenants.plan_tier` to `starter` and enables soft paywall warning.
+4. `subscription.cancelled`: Subscriber requested cancellation. Preserves access until `current_period_end`, then marks subscription cancelled.
+
+---
+
 ## **Security & Compliance Controls**
 
 1. **Row-Level Security (RLS)**:

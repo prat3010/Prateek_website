@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { m } from "framer-motion";
 import NumberFlow from "@number-flow/react";
+import { useAuth } from "@/context/AuthContext";
 import MagneticButton from "@/components/ui/MagneticButton";
 import styles from "./rag.module.css";
 
@@ -48,7 +50,7 @@ const DEFAULT_PRICING_FALLBACK: PricingPayload = {
           "Llama 3.3 70B & Gemini 2.5",
           "Standard Support",
         ],
-        cta: "Start 7-Day Free Trial",
+        cta: "Launch Free Sandbox (No CC)",
         planId: "plan_starter_inr",
       },
       {
@@ -107,7 +109,7 @@ const DEFAULT_PRICING_FALLBACK: PricingPayload = {
           "Llama 3.3 70B & Gemini 2.5",
           "Standard Support",
         ],
-        cta: "Start 7-Day Free Trial",
+        cta: "Launch Free Sandbox (No CC)",
         planId: "plan_starter_usd",
       },
       {
@@ -151,6 +153,8 @@ const DEFAULT_PRICING_FALLBACK: PricingPayload = {
 };
 
 export function PricingSection() {
+  const router = useRouter();
+  const { user, loginWithGoogle, getAccessToken } = useAuth();
   const [pricing, setPricing] = useState<PricingPayload>(DEFAULT_PRICING_FALLBACK);
   const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
   const [currencyMode, setCurrencyMode] = useState<"inr" | "usd">(() => {
@@ -197,6 +201,22 @@ export function PricingSection() {
   };
 
   const handleSubscribe = async (plan: PlanItem) => {
+    // 1. Starter tier: Zero-CC instant sandbox
+    if (plan.id.includes("starter") || plan.name.toLowerCase() === "starter") {
+      if (user) {
+        router.push("/rag/app?onboarding=true");
+      } else {
+        await loginWithGoogle("/rag/app?onboarding=true");
+      }
+      return;
+    }
+
+    // 2. Paid tiers (Pro / Business): Ensure authenticated first
+    if (!user) {
+      await loginWithGoogle(`/rag#pricing?plan=${plan.planId || plan.id}`);
+      return;
+    }
+
     try {
       setLoadingPlanId(plan.id);
       const isLoaded = await loadRazorpayScript();
@@ -206,9 +226,13 @@ export function PricingSection() {
         return;
       }
 
+      const token = await getAccessToken();
       const res = await fetch("/api/client/create-razorpay-subscription", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ planId: plan.planId || plan.id }),
       });
 
@@ -220,7 +244,24 @@ export function PricingSection() {
       }
 
       if (data.isMock) {
-        alert(`⚡ Razorpay Subscription Sandbox Mode:\n\nSimulated active subscription for ${plan.name} Plan (${data.subscriptionId}).`);
+        if (token) {
+          try {
+            await fetch("/api/client/verify-razorpay-subscription", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                razorpaySubscriptionId: data.subscriptionId,
+                razorpayPaymentId: "pay_mock",
+                razorpaySignature: "test_sub_signature_mock",
+                planId: plan.planId || plan.id,
+              }),
+            });
+          } catch {}
+        }
+        router.push("/rag/app?upgraded=true");
         setLoadingPlanId(null);
         return;
       }
@@ -231,8 +272,34 @@ export function PricingSection() {
         name: "Retriever AI SaaS",
         description: `Subscription for ${plan.name} Plan`,
         image: "/images/gremlin-head.png",
-        handler: function (response: { razorpay_subscription_id: string }) {
-          alert(`Subscription activated successfully! ID: ${response.razorpay_subscription_id}`);
+        prefill: {
+          email: user?.email || "",
+        },
+        handler: async function (response: {
+          razorpay_subscription_id: string;
+          razorpay_payment_id?: string;
+          razorpay_signature?: string;
+        }) {
+          try {
+            if (token) {
+              await fetch("/api/client/verify-razorpay-subscription", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                  razorpaySubscriptionId: response.razorpay_subscription_id,
+                  razorpayPaymentId: response.razorpay_payment_id || "pay_verified",
+                  razorpaySignature: response.razorpay_signature || "sig_verified",
+                  planId: plan.planId || plan.id,
+                }),
+              });
+            }
+            router.push("/rag/app?upgraded=true");
+          } catch {
+            router.push("/rag/app?upgraded=true");
+          }
         },
         theme: {
           color: "#0ea5e9",

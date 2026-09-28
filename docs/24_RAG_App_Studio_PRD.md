@@ -1,7 +1,7 @@
 # PRD: Retriever RAG SaaS App Studio Revamp (`/rag/app`)
 
 **Status:** ✅ Fully Implemented, Audited & Certified  
-**Version:** 2.2 (Audited & Expanded Multi-Feature Suite)  
+**Version:** 2.3 (Subscription Revamp, Frictionless Onboarding & Commercial Parity)  
 **Target Release:** Q3 2026  
 **Platform:** Next.js 16 (App Router), React 19, TypeScript, Supabase Auth & RLS, Razorpay Subscriptions, FastAPI (`retriever` engine)
 
@@ -299,6 +299,99 @@ To give subscribers flexibility, Retriever SaaS supports two operational billing
 | **Phase 3** | Core & Advanced Sub-Views | Implementation of all 7 sub-views (Overview, Chat, Knowledge+Graph, Search+Eval, Cache, Widget, Team+Audit) | ✅ Complete |
 | **Phase 4** | Subscription & Trial Integration | 7-day trial countdown engine & Razorpay soft paywall lockout | ✅ Complete |
 | **Phase 5** | End-to-End Verification | Build verification, contract audits, unit tests, and final certification | ✅ Complete |
+| **Phase 6** | Commercial Plumbing & Key Issuance | Razorpay subscription webhooks (`subscription.charged`, `activated`, `halted`), HMAC verification, dual-database provisioning to Oracle Cloud engine, and scoped API key issuance (`ret_live_...`) | ✅ Complete |
+| **Phase 7** | Onboarding UX & Marketing Overhaul | Progressive disclosure (5 Core Essentials vs 24 Advanced Batteries), Quick Launch 3-step modal (`QuickLaunchWizardModal`), API Keys & SDKs panel, outcome-first hero copy, segmented personas section, and live dogfooding chat widget | ✅ Complete |
+| **Phase 8** | AI Persona & Governance Policy Lock | Tenant-level Master System Prompt editing via `GET/PUT /v1/tenants/{id}/prompts/default`, Enterprise Governance Policy Lock (`is_locked: bool`) toggleable by cluster admins, 4 one-click persona presets, and locked alert banner | ✅ Complete |
+
+---
+
+### 7.1 Commercial Subscription & Onboarding Architecture (V2.3)
+
+```
+[Buyer on /rag or /rag/app]
+        │
+        ├─ Free Sandbox ──▶ Instant Access to /rag/app (7-Day Trial, no card required)
+        │
+        └─ Paid Plan (Starter / Pro / Business)
+                 │
+                 ▼
+     [Razorpay Subscription Checkout]
+                 │
+                 ├─ Frontend Verification: POST /api/client/verify-razorpay-subscription
+                 │   (HMAC SHA-256 signature check: payment_id|subscription_id)
+                 │
+                 └─ Asynchronous Webhook: POST /api/webhooks/razorpay
+                     (Handles subscription.charged, activated, cancelled, halted)
+                                 │
+                                 ▼
+                   [Database State Synchronization]
+                   • rag_subscriptions (upsert with onConflict: tenant_id)
+                   • rag_tenants.plan_tier (upgraded to pro/business)
+                   • Oracle Cloud Retriever Engine (PATCH /v1/admin/tenants/{id})
+                                 │
+                                 ▼
+                   [Instant Buyer Deliverables in Studio]
+                   1. Sovereign pgvector tenant with PostgreSQL RLS
+                   2. Scoped API Key (`ret_live_...`) for REST/SDK integration
+                   3. Personalized 1-line script embed tag
+                   4. Quick Launch 3-Step Wizard: Upload doc ➔ Test search ➔ Copy snippet
+```
+
+---
+
+### 7.2 AI Persona & Enterprise Governance Policy Lock Architecture (Phase 8)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Tenant as Workspace Subscriber (/rag/app)
+    participant Web as Next.js Web Application
+    participant API as Retriever Engine (/v1/tenants)
+    participant DB as PostgreSQL (prompt_templates)
+    participant Admin as Cluster Administrator (Admin Studio)
+
+    Note over Admin,DB: Central Administrative Policy Enforcement
+    Admin->>API: PUT /v1/admin/prompts/default {tenantId, isLocked: true}
+    API->>DB: UPDATE prompt_templates SET is_locked = true
+    DB-->>Admin: 200 OK {"name": "default", "status": "updated"}
+
+    Note over Tenant,DB: Workspace Loads AI Persona Studio
+    Tenant->>Web: Opens AI Persona & Widget Studio
+    Web->>API: GET /v1/tenants/{tenantId}/prompts/default
+    API->>DB: SELECT content, is_locked FROM prompt_templates
+    DB-->>API: {content, is_locked: true}
+    API-->>Web: 200 OK {name, content, isLocked: true}
+    Web->>Tenant: Renders "Centrally Managed Enterprise Policy Active" Banner & Disables Textarea
+
+    Note over Tenant,DB: Unauthorized Tenant Override Prevented
+    Tenant->>Web: Attempts unauthorized edit (bypass UI)
+    Web->>API: PUT /v1/tenants/{tenantId}/prompts/default {content: "bypass"}
+    API->>API: Validates existing.is_locked == True
+    API-->>Web: 403 Forbidden ("Master system prompt is locked by cluster administrator policy.")
+```
+
+#### Curated Persona Presets
+The AI Persona Studio surfaces 4 out-of-the-box behavioral presets:
+1. **🛒 E-Commerce & Customer Care:** Empathetic, brand-safe, order status and returns aware.
+2. **💻 Strict Technical Docs:** Precise, concise markdown syntax blocks, spec-adherent, zero hallucination.
+3. **🎯 B2B Sales & Discovery:** Inquisitive, value-led, guides prospects toward booking a discovery demo.
+4. **⚖️ Compliance & Legal:** Disclaimer-rich, risk-averse, precise regulatory guidance.
+
+---
+
+### 7.3 Progressive Disclosure & Quick Launch UX (Phase 7)
+
+To eliminate cognitive overload for new subscribers, the SaaS Studio implements a two-tier navigation structure:
+1. **5 Core Essentials (Default View):**
+   - 📊 **Overview & Usage:** Consumption meters, trial countdown, token burn rate.
+   - 📄 **Knowledge & Documents:** Chunk inspector, real-time vector ingestion.
+   - 💬 **Chat Studio:** Interactive RAG testing playground with citation highlights.
+   - ⚙️ **AI Persona & Widget:** Persona preset configurator & live side-by-side widget preview.
+   - 🔑 **API Keys & SDK:** Scoped tenant keys (`ret_live_...`) with Python/TypeScript snippets.
+2. **24 Advanced Batteries (Toggleable Accordion):**
+   - RLM REPL Studio, GraphRAG Topology, ZKP Grounding, NeMo Guardrails, etc.
+3. **🚀 Quick Launch Wizard (`QuickLaunchWizardModal`):**
+   - 3-step modal auto-triggered post-onboarding: Upload sample file $\to$ Run query test $\to$ Copy embed tag.
 
 ---
 
