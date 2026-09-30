@@ -14,33 +14,29 @@ import { CachePanel } from "@/components/rag/CachePanel";
 import { ConfigPanel } from "@/components/rag/ConfigPanel";
 import { TeamPanel } from "@/components/rag/TeamPanel";
 import { IntegrationsPanel } from "@/components/rag/IntegrationsPanel";
-import { RlmStudioPanel } from "@/components/rag/RlmStudioPanel";
-import { AgentStudioPanel } from "@/components/rag/AgentStudioPanel";
-import { PromptOptimizationPanel } from "@/components/rag/PromptOptimizationPanel";
 import { GatewayPanel } from "@/components/rag/GatewayPanel";
 import { GuardrailsPanel } from "@/components/rag/GuardrailsPanel";
 import { VectorVisualizerPanel } from "@/components/rag/VectorVisualizerPanel";
 import { WorkflowsPanel } from "@/components/rag/WorkflowsPanel";
-import { FeatureStudioPanel } from "@/components/rag/FeatureStudioPanel";
-import { EdgeSyncPanel } from "@/components/rag/EdgeSyncPanel";
-import { MultiCloudPanel } from "@/components/rag/MultiCloudPanel";
-import { VoiceStudioPanel } from "@/components/rag/VoiceStudioPanel";
-import { McpPanel } from "@/components/rag/McpPanel";
-import { MemoryPanel } from "@/components/rag/MemoryPanel";
-import { SwarmPanel } from "@/components/rag/SwarmPanel";
-import { VectorShardingPanel } from "@/components/rag/VectorShardingPanel";
-import { ZkpAttestationPanel } from "@/components/rag/ZkpAttestationPanel";
-import { IdentityFederationPanel } from "@/components/rag/IdentityFederationPanel";
-import { ContinuousTuningPanel } from "@/components/rag/ContinuousTuningPanel";
-import { MpcEnclavePanel } from "@/components/rag/MpcEnclavePanel";
-import ContinuousBenchmarkPanel from "@/components/rag/ContinuousBenchmarkPanel";
-import GotPlanningPanel from "@/components/rag/GotPlanningPanel";
 import { ApiKeysPanel } from "@/components/rag/ApiKeysPanel";
 import { QuickLaunchWizardModal } from "@/components/rag/QuickLaunchWizardModal";
 import { RagErrorBoundary } from "@/components/rag/ErrorBoundary";
 import styles from "@/components/rag/rag.module.css";
 
-type SubViewTab = "overview" | "chat" | "upload" | "keys" | "config" | "search" | "visualizer" | "cache" | "workflows" | "rlm" | "agentic" | "prompts" | "gateway" | "guardrails" | "team" | "integrations" | "feature-studio" | "edge" | "multicloud" | "voice" | "mcp" | "memory" | "swarm" | "sharding" | "zkp" | "identity" | "tuning" | "mpc" | "benchmarks" | "got-planning";
+type SubViewTab =
+  | "overview"
+  | "chat"
+  | "upload"
+  | "search"
+  | "cache"
+  | "config"
+  | "keys"
+  | "team"
+  | "visualizer"
+  | "workflows"
+  | "integrations"
+  | "gateway"
+  | "guardrails";
 
 export default function RagAppStudioPage() {
   const router = useRouter();
@@ -138,36 +134,19 @@ export default function RagAppStudioPage() {
     { id: "overview", label: "Overview & Usage", icon: "📊" },
     { id: "upload", label: "Knowledge & Documents", icon: "📄" },
     { id: "chat", label: "Chat Studio", icon: "💬" },
+    { id: "search", label: "Search Inspector", icon: "🔍" },
+    { id: "cache", label: "Semantic Cache", icon: "⚡" },
     { id: "config", label: "AI Persona & Widget", icon: "⚙️" },
     { id: "keys", label: "API Keys & SDK", icon: "🔑" },
+    { id: "team", label: "Team & Access", icon: "👥" },
   ];
 
   const advancedNavItems: { id: SubViewTab; label: string; icon: string }[] = [
-    { id: "search", label: "Search & Evaluator", icon: "🔍" },
-    { id: "visualizer", label: "3D Vector Explorer", icon: "🪐" },
-    { id: "cache", label: "Semantic Cache", icon: "⚡" },
+    { id: "visualizer", label: "Vector Space Visualizer", icon: "🪐" },
     { id: "workflows", label: "Durable Workflows", icon: "⚡" },
-    { id: "rlm", label: "RLM REPL Studio", icon: "🐍" },
-    { id: "agentic", label: "Agent Studio", icon: "🤖" },
-    { id: "prompts", label: "DSPy Prompt Studio", icon: "✨" },
-    { id: "gateway", label: "Smart Router & Gateway", icon: "🔀" },
-    { id: "guardrails", label: "NeMo Guardrails & Safety", icon: "🛡️" },
-    { id: "team", label: "Team & Compliance", icon: "👥" },
-    { id: "integrations", label: "Plugins & Integrations", icon: "🔌" },
-    { id: "feature-studio", label: "Capability Studio & FDE", icon: "🛠️" },
-    { id: "edge", label: "Sovereign Edge Sync", icon: "💾" },
-    { id: "multicloud", label: "Multi-Cloud & Turso LibSQL", icon: "🌐" },
-    { id: "voice", label: "Sovereign Edge Voice", icon: "🎙️" },
-    { id: "mcp", label: "Model Context Protocol (MCP)", icon: "🔌" },
-    { id: "memory", label: "Cognitive Memory & Distillation", icon: "🧠" },
-    { id: "swarm", label: "Multi-Agent Swarm Quorum", icon: "🤝" },
-    { id: "sharding", label: "Vector Shards & Raft", icon: "💎" },
-    { id: "zkp", label: "ZKP Verifiable Grounding", icon: "📜" },
-    { id: "identity", label: "Enterprise Identity & RB-VAC", icon: "🛡️" },
-    { id: "tuning", label: "Continuous DPO / ORPO Tuning", icon: "🧠" },
-    { id: "mpc", label: "Confidential MPC Enclaves", icon: "🛡️" },
-    { id: "benchmarks", label: "Continuous Benchmark Gate", icon: "🎯" },
-    { id: "got-planning", label: "Graph-of-Thoughts & Memory", icon: "🕸️" },
+    { id: "integrations", label: "Connectors & Ingestion", icon: "🔌" },
+    { id: "gateway", label: "Model Router & Fallback", icon: "🔀" },
+    { id: "guardrails", label: "Safety & Guardrails", icon: "🛡️" },
   ];
 
   const allNavItems = [...coreNavItems, ...advancedNavItems];
@@ -319,12 +298,12 @@ export default function RagAppStudioPage() {
                 padding: "0.25rem 0.5rem",
               }}
             >
-              <span>🛠️ Advanced Batteries ({advancedNavItems.length})</span>
+              <span>🛠️ Developer Tools ({advancedNavItems.length})</span>
               <span>{advancedOpen ? "▲" : "▼"}</span>
             </button>
 
             {advancedOpen && (
-              <nav className={styles.sidebarNav} style={{ marginTop: "0.5rem" }} role="tablist" aria-label="Retriever Studio Advanced Batteries">
+              <nav className={styles.sidebarNav} style={{ marginTop: "0.5rem" }} role="tablist" aria-label="Retriever Studio Developer Tools">
                 {advancedNavItems.map((item) => (
                   <button
                     key={item.id}
@@ -394,17 +373,8 @@ export default function RagAppStudioPage() {
             <OverviewPanel client={client} hidden={activeTab !== "overview"} onNavigateTab={(tab) => setActiveTab(tab as SubViewTab)} />
             <DocumentsPanel client={client} hidden={activeTab !== "upload"} isExpired={trialDaysRemaining <= 0} />
             <ChatPanel client={client} hidden={activeTab !== "chat"} isExpired={trialDaysRemaining <= 0} />
-            <ApiKeysPanel hidden={activeTab !== "keys"} tenantId={tenantId} apiKey={apiKey} planTier={planTier} />
             <SearchPanel client={client} hidden={activeTab !== "search"} />
-            <VectorVisualizerPanel client={client} hidden={activeTab !== "visualizer"} />
             <CachePanel client={client} hidden={activeTab !== "cache"} />
-            <WorkflowsPanel client={client} hidden={activeTab !== "workflows"} />
-            <RlmStudioPanel client={client} hidden={activeTab !== "rlm"} isExpired={trialDaysRemaining <= 0} />
-            <AgentStudioPanel client={client} hidden={activeTab !== "agentic"} isExpired={trialDaysRemaining <= 0} />
-            <PromptOptimizationPanel client={client} hidden={activeTab !== "prompts"} />
-            <GatewayPanel client={client} hidden={activeTab !== "gateway"} />
-            <GuardrailsPanel client={client} hidden={activeTab !== "guardrails"} />
-
             <ConfigPanel
               client={client}
               config={
@@ -431,22 +401,13 @@ export default function RagAppStudioPage() {
               }}
               hidden={activeTab !== "config"}
             />
+            <ApiKeysPanel hidden={activeTab !== "keys"} tenantId={tenantId} apiKey={apiKey} planTier={planTier} />
             <TeamPanel hidden={activeTab !== "team"} tenantId={tenantId} />
+            <VectorVisualizerPanel client={client} hidden={activeTab !== "visualizer"} />
+            <WorkflowsPanel client={client} hidden={activeTab !== "workflows"} />
             <IntegrationsPanel hidden={activeTab !== "integrations"} tenantId={tenantId} />
-            <FeatureStudioPanel client={client} hidden={activeTab !== "feature-studio"} />
-            <EdgeSyncPanel client={client} hidden={activeTab !== "edge"} />
-            <MultiCloudPanel client={client} tenantId={tenantId} hidden={activeTab !== "multicloud"} />
-            <VoiceStudioPanel client={client} tenantId={tenantId} hidden={activeTab !== "voice"} />
-            <McpPanel client={client} tenantId={tenantId} hidden={activeTab !== "mcp"} isExpired={trialDaysRemaining <= 0} />
-            <MemoryPanel client={client} tenantId={tenantId} hidden={activeTab !== "memory"} isExpired={trialDaysRemaining <= 0} />
-            <SwarmPanel client={client} tenantId={tenantId} hidden={activeTab !== "swarm"} isExpired={trialDaysRemaining <= 0} />
-            <VectorShardingPanel client={client} tenantId={tenantId} hidden={activeTab !== "sharding"} />
-            <ZkpAttestationPanel client={client} tenantId={tenantId} hidden={activeTab !== "zkp"} />
-            <IdentityFederationPanel client={client} tenantId={tenantId} hidden={activeTab !== "identity"} />
-            <ContinuousTuningPanel client={client} tenantId={tenantId} hidden={activeTab !== "tuning"} />
-            <MpcEnclavePanel client={client} tenantId={tenantId} hidden={activeTab !== "mpc"} />
-            <ContinuousBenchmarkPanel client={client} tenantId={tenantId} hidden={activeTab !== "benchmarks"} />
-            <GotPlanningPanel client={client} tenantId={tenantId} hidden={activeTab !== "got-planning"} />
+            <GatewayPanel client={client} hidden={activeTab !== "gateway"} />
+            <GuardrailsPanel client={client} hidden={activeTab !== "guardrails"} />
 
             <QuickLaunchWizardModal
               isOpen={showQuickWizard}

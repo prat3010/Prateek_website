@@ -150,8 +150,8 @@ export function OverviewPanel({ hidden, client, onNavigateTab }: OverviewPanelPr
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem", flexWrap: "wrap", gap: "0.5rem" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <span style={{ fontSize: "1.1rem" }}>🔋</span>
-            <strong style={{ fontSize: "0.95rem", color: "var(--color-text)" }}>Active Engine Batteries & Capabilities</strong>
+            <span style={{ fontSize: "1.1rem" }}>⚡</span>
+            <strong style={{ fontSize: "0.95rem", color: "var(--color-text)" }}>Core Subsystems & Latency</strong>
           </div>
           <span
             style={{

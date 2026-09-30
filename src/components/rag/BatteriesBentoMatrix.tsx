@@ -273,29 +273,29 @@ const BATTERIES: BatteryItem[] = [
   {
     id: 28,
     icon: "🛡️",
-    title: "MPC Enclave Cryptographic Isolation",
+    title: "Deterministic Grounding & Citations",
     category: "security",
     categoryLabel: "Enterprise & Security",
-    badge: "Confidential Compute",
-    description: "Secure multi-party computation keeping proprietary model weights and private data encrypted in use.",
+    badge: "Page-Level Match",
+    description: "Extracts exact character ranges and page coordinates so every answer can be audited against original source text.",
   },
   {
     id: 29,
     icon: "📜",
-    title: "Zero-Knowledge Proof (ZKP) Attestation",
+    title: "SHA-256 Merkle Audit Verification",
     category: "security",
     categoryLabel: "Enterprise & Security",
-    badge: "Tamper-Proof",
-    description: "Cryptographically proves query integrity and pipeline conformance without revealing sensitive underlying text.",
+    badge: "Tamper-Evident",
+    description: "Builds cryptographic hash trees across document chunks to verify dataset integrity and detect unauthorized document edits.",
   },
   {
     id: 30,
     icon: "☁️",
-    title: "Active-Active Multi-Cloud Replication",
+    title: "Resilient Circuit Breaker & Failover",
     category: "security",
     categoryLabel: "Enterprise & Security",
-    badge: "Zero Downtime",
-    description: "Replicates vector indexes across multiple cloud regions and sovereign edge nodes with sub-second sync.",
+    badge: "High Availability",
+    description: "Monitors upstream LLM and embedding latency, automatically failing over to backup providers when thresholds exceed SLA.",
   },
   {
     id: 31,
@@ -326,12 +326,12 @@ const BATTERIES: BatteryItem[] = [
   },
   {
     id: 34,
-    icon: "🛡️",
-    title: "Gate 10 Zero-Toy Static AST Verification",
+    icon: "📡",
+    title: "Real-Time SSE Streaming API",
     category: "security",
     categoryLabel: "Enterprise & Security",
-    badge: "Verified Production",
-    description: "Automated AST linters guarantee zero mock data returns, fake timers, or superficial UI facades across the platform.",
+    badge: "Sub-100ms TTFT",
+    description: "Streams tokens immediately via Server-Sent Events with structured citation events emitted dynamically during generation.",
   },
   {
     id: 35,
@@ -354,11 +354,11 @@ const BATTERIES: BatteryItem[] = [
   {
     id: 37,
     icon: "🧪",
-    title: "Autonomous Benchmark Gatekeeper",
+    title: "Automated Regression Benchmark",
     category: "security",
     categoryLabel: "Enterprise & Security",
-    badge: "NDCG / Welch t-test",
-    description: "Battery #37: Statistical regression test suite asserting retrieval quality and preventing regressions before releases.",
+    badge: "NDCG / Recall",
+    description: "Statistical regression test suite asserting retrieval quality and relevance thresholds before releases.",
   },
   {
     id: 38,
@@ -383,20 +383,20 @@ export function BatteriesBentoMatrix() {
       {/* Header */}
       <div className={styles.matrixHeader}>
         <div className={styles.matrixBadge}>
-          ⚡ 38 Production Batteries • Hexagonal Enterprise Architecture
+          ⚡ Unified Architecture • High-Performance Core
         </div>
         <h2 className={styles.matrixTitle}>
-          Engineered Beyond Basic Wrappers
+          Engineered Without Bloat or Multi-Vendor Glue
         </h2>
         <p className={styles.matrixSubtitle}>
-          Retriever integrates 38 specialized production batteries into a single high-performance engine—eliminating bloated multi-vendor dependencies.
+          Retriever integrates core production RAG capabilities into a single high-performance engine—eliminating brittle multi-vendor dependencies.
         </p>
       </div>
 
       {/* Category Filter Tabs */}
       <div className={styles.filterTabs}>
         {[
-          { key: "all", label: "All Batteries (38)" },
+          { key: "all", label: "All Capabilities (38)" },
           { key: "retrieval", label: "Core Retrieval (8)" },
           { key: "reasoning", label: "Cognitive Reasoning (7)" },
           { key: "memory", label: "Long-Horizon Memory (5)" },

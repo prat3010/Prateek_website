@@ -43,22 +43,22 @@ export default function RagLandingPage() {
         <section className={styles.heroSection} id="home">
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", justifyContent: "center", marginBottom: "1rem" }}>
             <div className={styles.heroBadge}>
-              ⚡ 38 Production Batteries • Sovereign Multi-Tenant Cognitive Engine
+              ⚡ Production-Grade Multi-Tenant RAG • PostgreSQL + pgvector
             </div>
             <Link href="/rag/benchmarks" style={{ textDecoration: "none" }}>
               <div className={styles.heroBadge} style={{ cursor: "pointer", borderColor: "var(--color-link)" }}>
-                🛡️ Verified Production Telemetry on Oracle VPS →
+                📊 Production Telemetry & Benchmarks →
               </div>
             </Link>
           </div>
 
           <h1 className={styles.heroTitle}>
-            Turn Your Enterprise Documents Into an Infallible AI Copilot in 60 Seconds
+            Turn Your Company Documents Into a Production AI Knowledge Engine in 60 Seconds
           </h1>
 
           <p className={styles.heroSubtitle}>
-            Replace the fragmented SaaS stack with a single high-performance PostgreSQL pgvector engine.
-            Zero hallucinations, $0 local embeddings, hybrid BM25 + HNSW search, and 1-line script embed for any website.
+            Replace fragmented vector pipelines with a single high-performance PostgreSQL + pgvector engine.
+            Grounded answers, $0 local embeddings via Ollama, hybrid BM25 + HNSW search, and a 1-line script embed for any website.
           </p>
 
           <div className={styles.heroCtas}>
