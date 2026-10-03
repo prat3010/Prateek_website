@@ -31,6 +31,29 @@ export interface ConsoleLine {
   href?: string;
 }
 
+export interface AIChatSessionState {
+  isActive: boolean;
+  history: { role: string; content: string }[];
+}
+
+export const AI_TWIN_BOOT_LINES: ConsoleLine[] = [
+  { text: '  ┌────────────────────────────────────────────────────────────────────────┐', type: 'output' },
+  { text: '  │  🧠 PRATEEQ.AI // DIGITAL TWIN & FORWARD DEPLOYED BRAIN v2.2           │', type: 'success' },
+  { text: '  │  "Because reading 99 architectural decisions is exhausting."           │', type: 'output' },
+  { text: '  ├────────────────────────────────────────────────────────────────────────┤', type: 'output' },
+  { text: '  │  [✓] Establishing neural link ........... Oracle VPS (130.210.35.134)  │', type: 'output' },
+  { text: '  │  [✓] Sarcasm & Wit Subsystems ........... ACTIVE (Level 8.5/10)        │', type: 'output' },
+  { text: '  │  [✓] LangChain Boilerplate .............. 0% DETECTED (Purged)         │', type: 'output' },
+  { text: '  │  [✓] Ponytail Principle Filter .......... MAXIMUM LAZINESS ENGAGED     │', type: 'output' },
+  { text: '  │  [✓] Caffeine Blood Saturation .......... 94.2% (Cold Brew)            │', type: 'output' },
+  { text: '  │  [✓] Memory Corpus Indexed .............. 24 Curated Engineering Docs  │', type: 'output' },
+  { text: '  └────────────────────────────────────────────────────────────────────────┘', type: 'output' },
+  { text: '', type: 'output' },
+  { text: "Hey! I am Prateek's digital clone. I know his code, projects, philosophy, and his deep hatred of bloated AI wrappers.", type: 'success' },
+  { text: "Ask me anything about his work, architecture, or pricing, or type 'exit' to return to standard shell.", type: 'output' },
+  { text: '', type: 'output' },
+];
+
 const BOOT_LOGS: string[] = [
   'SYSTEM // Initializing cyber diagnostics console...',
   'SYSTEM // Loading dynamic route bundles...',
@@ -84,6 +107,10 @@ export function useTerminalCommands({
   const [interviewSession, setInterviewSession] = useState<InterviewSessionState>({
     step: 'role_select',
   });
+  const [aiChatSession, setAiChatSession] = useState<AIChatSessionState>({
+    isActive: false,
+    history: [],
+  });
 
   const cmdCountRef = useRef<number>(0);
 
@@ -118,6 +145,86 @@ export function useTerminalCommands({
       setCmdHistory((prev) => [...prev, cmd]);
       setHistoryIndex(-1);
       setTerminalHistory((prev) => [...prev, { text: `> ${cmd}`, type: 'input' }]);
+
+      // ─── ACTIVE AI CHAT CONVERSATION SESSION ───
+      if (aiChatSession.isActive) {
+        if (['exit', 'quit', 'bye', ':q'].includes(trimmedCmd)) {
+          setAiChatSession({ isActive: false, history: [] });
+          setTerminalHistory((prev) => [
+            ...prev,
+            { text: 'SYSTEM // Neural link closed. Returned to standard shell.', type: 'output' },
+          ]);
+          setTerminalInput('');
+          return;
+        }
+
+        if (trimmedCmd === 'clear') {
+          setTerminalHistory([
+            { text: 'prateeq.ai // Live AI Twin session active. Ask a question or type "exit" to leave.', type: 'success' },
+          ]);
+          setTerminalInput('');
+          return;
+        }
+
+        const userMsg = cmd.trim();
+        const currentHistory = aiChatSession.history;
+
+        setTerminalHistory((prev) => [
+          ...prev,
+          { text: '🧠 Thinking...', type: 'output' },
+        ]);
+
+        fetch('/api/terminal/ai-chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: userMsg,
+            history: currentHistory,
+          }),
+        })
+          .then(async (res) => {
+            const data = await res.json();
+            const reply = data.reply || 'No response generated.';
+            setTerminalHistory((prev) => {
+              const filtered = prev.filter((l) => l.text !== '🧠 Thinking...');
+              const replyLines: ConsoleLine[] = reply.split('\n').map((line: string) => ({
+                text: line,
+                type: 'output',
+              }));
+              return [...filtered, ...replyLines, { text: '', type: 'output' }];
+            });
+
+            setAiChatSession((prev) => ({
+              ...prev,
+              history: [
+                ...prev.history,
+                { role: 'user', content: userMsg },
+                { role: 'assistant', content: reply },
+              ],
+            }));
+          })
+          .catch((err) => {
+            setTerminalHistory((prev) => {
+              const filtered = prev.filter((l) => l.text !== '🧠 Thinking...');
+              return [
+                ...filtered,
+                { text: `⚠️ Neural connection error: ${err.message || 'Server timeout'}`, type: 'error' },
+              ];
+            });
+          });
+
+        setTerminalInput('');
+        return;
+      }
+
+      // ─── LAUNCH INTERACTIVE AI TWIN MODE ───
+      if (['twin', 'ai', 'chat', 'prateeq', 'twin-mode'].includes(trimmedCmd)) {
+        setAiChatSession({ isActive: true, history: [] });
+        unlockAchievement('ai_twin_linked', 'Neural Handshake', "Connected to Prateeq's live AI Twin on Oracle Cloud VPS");
+        setTerminalHistory((prev) => [...prev, ...AI_TWIN_BOOT_LINES]);
+        setTerminalInput('');
+        return;
+      }
 
       let response: ConsoleLine[] = [];
 
@@ -542,42 +649,38 @@ export function useTerminalCommands({
 
       if (trimmedCmd.startsWith('ask ') || trimmedCmd.startsWith('explain ')) {
         const queryText = cmd.trim().replace(/^(ask|explain)\s+/i, '').trim();
-        if (queryText.length >= 3) {
+        if (queryText.length >= 2) {
           setTerminalHistory((prev) => [
             ...prev,
-            { text: `SEARCHING SUPABASE SYSTEM MEMORY VECTORS FOR: "${queryText}"...`, type: 'success' },
+            { text: `QUERYING PRATEEQ.AI KNOWLEDGE VAULT: "${queryText}"...`, type: 'success' },
+            { text: '🧠 Thinking...', type: 'output' },
           ]);
 
-          fetch('/api/terminal/query', {
+          fetch('/api/terminal/ai-chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query: queryText }),
+            body: JSON.stringify({ query: queryText, history: [] }),
           })
-            .then((res) => res.json())
-            .then((data) => {
-              if (data.results && data.results.length > 0) {
-                const lines: ConsoleLine[] = [];
-                lines.push({ text: `RETRIEVED ${data.results.length} CODEBASE EVIDENCE CHUNKS FROM SUPABASE:`, type: 'success' });
-                data.results.forEach((r: { meta_data?: Record<string, unknown>; content: string }, idx: number) => {
-                  const meta = r.meta_data || {};
-                  const file = meta.file_path || 'unknown';
-                  const symbol = meta.symbol_name ? ` | Symbol: ${meta.symbol_name}` : '';
-                  lines.push({ text: `  [${idx + 1}] File: ${file}${symbol}`, type: 'success' });
-                  lines.push({ text: r.content.slice(0, 300) + '...', type: 'output' });
-                });
-                setTerminalHistory((prev) => [...prev, ...lines]);
-              } else {
-                setTerminalHistory((prev) => [
-                  ...prev,
-                  { text: `No matching codebase chunks found for query: "${queryText}"`, type: 'error' },
-                ]);
-              }
+            .then(async (res) => {
+              const data = await res.json();
+              const reply = data.reply || 'No response generated.';
+              setTerminalHistory((prev) => {
+                const filtered = prev.filter((l) => l.text !== '🧠 Thinking...');
+                const replyLines: ConsoleLine[] = reply.split('\n').map((line: string) => ({
+                  text: line,
+                  type: 'output',
+                }));
+                return [...filtered, ...replyLines, { text: '', type: 'output' }];
+              });
             })
-            .catch(() => {
-              setTerminalHistory((prev) => [
-                ...prev,
-                { text: 'Error querying Supabase system memory.', type: 'error' },
-              ]);
+            .catch((err) => {
+              setTerminalHistory((prev) => {
+                const filtered = prev.filter((l) => l.text !== '🧠 Thinking...');
+                return [
+                  ...filtered,
+                  { text: `⚠️ Failed querying AI Twin: ${err.message || 'Server timeout'}`, type: 'error' },
+                ];
+              });
             });
 
           setTerminalInput('');
@@ -589,6 +692,8 @@ export function useTerminalCommands({
         case 'help':
           response = [
             { text: 'Available commands:', type: 'success' },
+            { text: '  twin / ai   - 🧠 Launch interactive conversation with Prateeq\'s AI Twin', type: 'success' },
+            { text: '  ask <query> - Query Prateeq\'s AI Twin vector memory directly for answers', type: 'output' },
             { text: '  pitch       - Executive Summary & Core Engineering Superpowers', type: 'output' },
             { text: '  architecture- Master 8-Tier Developer Ecosystem Architecture Blueprint', type: 'output' },
             { text: '  tests       - Inspect 330+ automated test suites & verification matrix', type: 'output' },
@@ -596,7 +701,6 @@ export function useTerminalCommands({
             { text: '  interview   - Interactive role-tailored interview console (CTO vs Founder)', type: 'output' },
             { text: '  scope <cmd> - Interactive Architecture Scoping CLI (new, list, analyze, add, remove, export, checkout)', type: 'output' },
             { text: '  cart        - View active scoping bill of materials and price ledger', type: 'output' },
-            { text: '  ask <query> - Query Retriever Concierge vector memory for platform specs & docs', type: 'output' },
             { text: '  pathfinder  - Launch interactive 2D Pathfinding & Graph Algorithm Lab', type: 'output' },
             { text: '  projects    - List portfolio projects and tags', type: 'output' },
             { text: '  partner     - Print Sales Partner & Broker Agreement with PDF links', type: 'output' },
@@ -832,7 +936,7 @@ export function useTerminalCommands({
       setTerminalHistory((prev) => [...prev, ...response]);
       setTerminalInput('');
     },
-    [projects, profileData, isNoir, stats, isMatrixActive, setIsMatrixActive, setActiveGame, unlockAchievement, interviewSession, scopeSession]
+    [projects, profileData, isNoir, stats, isMatrixActive, setIsMatrixActive, setActiveGame, unlockAchievement, interviewSession, scopeSession, aiChatSession]
   );
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -882,5 +986,6 @@ export function useTerminalCommands({
     executeCommand,
     handleKeyDown,
     unlockAchievement,
+    isAiChatActive: aiChatSession.isActive,
   };
 }

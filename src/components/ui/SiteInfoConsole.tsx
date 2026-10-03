@@ -18,6 +18,7 @@ import { useTerminalCommands, type ProjectSummary } from './useTerminalCommands'
 
 const QUICK_SHORTCUTS = [
   'help',
+  'twin',
   'scope help',
   'cart',
   'inspect',
@@ -71,6 +72,7 @@ export default function SiteInfoConsole() {
     executeCommand,
     handleKeyDown,
     unlockAchievement,
+    isAiChatActive,
   } = useTerminalCommands({
     projects,
     profileData,
@@ -198,8 +200,12 @@ export default function SiteInfoConsole() {
                   })}
                 </div>
                 <div className={styles.terminalPromptLine}>
-                  <span className={styles.promptSymbol} aria-hidden="true">
-                    &gt;
+                  <span
+                    className={styles.promptSymbol}
+                    style={isAiChatActive ? { color: 'var(--neon-cyan, #38bdf8)' } : undefined}
+                    aria-hidden="true"
+                  >
+                    {isAiChatActive ? 'prateeq.ai:~$' : '>'}
                   </span>
                   <input
                     ref={inputRef}
@@ -208,8 +214,12 @@ export default function SiteInfoConsole() {
                     value={terminalInput}
                     onChange={(e) => setTerminalInput(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Type a command..."
-                    aria-label="Terminal command prompt"
+                    placeholder={
+                      isAiChatActive
+                        ? "Ask Prateek's AI Twin anything... (or 'exit')"
+                        : 'Type a command...'
+                    }
+                    aria-label={isAiChatActive ? 'AI Twin chat prompt' : 'Terminal command prompt'}
                     autoFocus
                   />
                 </div>
