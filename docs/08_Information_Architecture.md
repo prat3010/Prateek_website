@@ -128,11 +128,12 @@ Examples include:
 - Projects
 - Resume / Quotations
 - Scoping Lab (`/scoping`) & Instant Quote Wizard
+- The Playground (`/playground`, `/playground/[slug]`) & Universal Creation Showcase
 - Client Workspace Dashboard (`/dashboard`)
 - RAG SaaS Studio (`/rag`, `/rag/app`)
 - Contact
 - Footer
-- Terminal (`/terminal` & Interactive Pathfinder Lab)
+- Terminal (`/terminal` & Interactive Diagnostics Console)
 - Blog (`/blog`)
 
 Sections should remain modular.

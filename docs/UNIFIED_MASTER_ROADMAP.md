@@ -13,6 +13,7 @@
  ┌────────────────────────────────────────────────────────────────────────────────────────┐
  │ CONTROL PLANE FRONTEND LAYER: Prateek_website (prateeq.in) on Vercel                   │
  │                                                                                        │
+ │  • The Playground (`/playground`, `/playground/[slug]`) ➔ Micro-SaaS, Games & AI Studio│
  │  • Client Workspace Dashboard (`/dashboard`) ➔ Project Scopes, Invoices, Razorpay 50% │
  │  • SaaS RAG App Studio (`/rag/app`) ➔ Chat Studio, Docs, Search Inspector, Embed Config│
  │  • Master Admin Control Center (`/admin`) ➔ Autonomous Outreach & Prospecting Queue    │
@@ -1199,6 +1200,7 @@ The following table serves as the definitive directory linking all specialized p
 | **Enterprise SaaS Connectors & ACL Inheritance PRD** | Phase P (M125): Google Drive/Docs, Notion Tables, Confluence/Jira, Microsoft 365 Graph Delta & Sublinear JSONB ACL (?|) Filtering | [45_Enterprise_SaaS_Connectors_and_ACL_Inheritance_PRD.md](45_Enterprise_SaaS_Connectors_and_ACL_Inheritance_PRD.md) |
 | **Visual DAG Workflow Canvas & Agentic Graph Composer PRD** | Phase P (M126): React 19 / SVG Studio, Kahn's Topological Sort Cycle Detection, Token Cost Attribution & Enterprise Templates | [46_Visual_DAG_Workflow_Canvas_PRD.md](46_Visual_DAG_Workflow_Canvas_PRD.md) |
 | **Sovereign Air-Gapped Appliance & Embedded Edge Engine PRD** | Phase P (M127): Hardware-Rooted Vector Sealing, AES-256-GCM, Zero-Egress Network Sentinel & Offline Whisper/Piper Full-Duplex Voice RAG | [47_Sovereign_Air_Gapped_Appliance_PRD.md](47_Sovereign_Air_Gapped_Appliance_PRD.md) |
+| **The Playground Universal Creation Showcase PRD** | Phase Q (M128): Micro-SaaS Prototypes, Retro Arcade Cabinet Shell, AI Prompt Engineering Lightbox & Cloudflare Pages 3-Tier Hosting | [48_The_Playground_Universal_Creation_Showcase_PRD.md](48_The_Playground_Universal_Creation_Showcase_PRD.md) |
 | **Platform Future Roadmap** | General Portfolio & Ecosystem Evolution Horizon | [21_Future_Roadmap.md](21_Future_Roadmap.md) |
 
 ### 🧠 Engine & Infrastructure Roadmaps (retriever)

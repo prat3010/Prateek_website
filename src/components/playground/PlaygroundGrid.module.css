@@ -1,0 +1,350 @@
+.gridContainer {
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+.headerSection {
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--surface-card, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  border-radius: 9999px;
+  font-family: var(--font-jetbrains-mono, monospace);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary, #38bdf8);
+  margin-bottom: 16px;
+}
+
+.title {
+  font-family: var(--font-playfair-display, serif);
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--color-text, #fff);
+  margin-bottom: 16px;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: var(--color-text-muted, #94a3b8);
+  max-width: 680px;
+  margin: 0 auto 32px;
+  line-height: 1.6;
+}
+
+/* ─── Controls Bar: Search & Filter Tabs ─── */
+.controlsBar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 36px;
+}
+
+.searchBox {
+  position: relative;
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px 16px 12px 42px;
+  background: var(--surface-card, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+  border-radius: 8px;
+  font-family: var(--font-jetbrains-mono, monospace);
+  font-size: 0.95rem;
+  color: var(--color-text, #fff);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.searchInput:focus {
+  border-color: var(--color-primary, #38bdf8);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
+}
+
+.searchIcon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted, #94a3b8);
+  pointer-events: none;
+}
+
+.filterTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.filterBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--surface-card, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  border-radius: 6px;
+  font-family: var(--font-jetbrains-mono, monospace);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text-muted, #94a3b8);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filterBtn:hover {
+  background: var(--surface-elevated, rgba(255, 255, 255, 0.08));
+  color: var(--color-text, #fff);
+  border-color: var(--border-color-hover, rgba(255, 255, 255, 0.2));
+}
+
+.filterBtn.active {
+  background: var(--color-primary, #38bdf8);
+  color: #000;
+  font-weight: 700;
+  border-color: var(--color-primary, #38bdf8);
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.3);
+}
+
+/* ─── Grid Display ─── */
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 24px;
+}
+
+@media (max-width: 640px) {
+  .cardsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.emptyState {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--color-text-muted, #94a3b8);
+  font-family: var(--font-jetbrains-mono, monospace);
+  grid-column: 1 / -1;
+}
+
+/* ─── Base Card Styles ─── */
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-card, rgba(15, 23, 42, 0.6));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-primary, #38bdf8);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), 0 0 16px rgba(56, 189, 248, 0.15);
+}
+
+.cardHeader {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.06));
+}
+
+.kindPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-jetbrains-mono, monospace);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text, #fff);
+}
+
+.statusPill {
+  font-family: var(--font-jetbrains-mono, monospace);
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(56, 189, 248, 0.15);
+  color: var(--color-primary, #38bdf8);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.cardBody {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.cardTitle {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--color-text, #fff);
+  margin-bottom: 8px;
+}
+
+.cardTagline {
+  font-size: 0.95rem;
+  color: var(--color-text-muted, #94a3b8);
+  line-height: 1.5;
+  margin-bottom: 16px;
+  flex: 1;
+}
+
+.tagsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.tagPill {
+  font-family: var(--font-jetbrains-mono, monospace);
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  background: var(--surface-elevated, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  border-radius: 4px;
+  color: var(--color-text-muted, #94a3b8);
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color, rgba(255, 255, 255, 0.06));
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: var(--color-primary, #38bdf8);
+  color: #000;
+  font-family: var(--font-jetbrains-mono, monospace);
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 6px;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.actionBtn:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.actionBtnSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: transparent;
+  color: var(--color-text, #fff);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+  border-radius: 6px;
+  font-family: var(--font-jetbrains-mono, monospace);
+  font-size: 0.85rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.actionBtnSecondary:hover {
+  background: var(--surface-elevated, rgba(255, 255, 255, 0.08));
+  border-color: var(--border-color-hover, rgba(255, 255, 255, 0.3));
+}
+
+/* ─── Media Card (AI Art & Prompts) ─── */
+.mediaPreviewContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #000;
+  cursor: pointer;
+}
+
+.mediaPreviewContainer.square {
+  aspect-ratio: 1 / 1;
+}
+
+.mediaImage {
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.mediaPreviewContainer:hover .mediaImage {
+  transform: scale(1.05);
+}
+
+.mediaOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.1) 60%, transparent 100%);
+  display: flex;
+  align-items: flex-end;
+  padding: 16px;
+}
+
+.mediaModelPill {
+  font-family: var(--font-jetbrains-mono, monospace);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: #fff;
+  backdrop-filter: blur(4px);
+}
+
+.promptPreviewSnippet {
+  font-family: var(--font-jetbrains-mono, monospace);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--color-text-muted, #94a3b8);
+  background: var(--surface-elevated, rgba(0, 0, 0, 0.3));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.06));
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-bottom: 14px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

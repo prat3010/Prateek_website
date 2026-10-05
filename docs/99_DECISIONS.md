@@ -46,6 +46,7 @@ This document serves as the registry of critical architectural design decisions 
 * [ADR 36: Sovereign Zero-Cloud Audio Egress Voice Architecture via Local Whisper & WebRTC (Milestone 100)](#adr-36-sovereign-zero-cloud-audio-egress-voice-architecture-via-local-whisper--webrtc-milestone-100)
 * [ADR 37: Zero-Trust Micro-Enclave KMS, Remote Attestation & Volatile Memory Sanitization (Milestone 101)](#adr-37-zero-trust-micro-enclave-kms-remote-attestation--volatile-memory-sanitization-milestone-101)
 * [ADR 38: Autonomous Edge Fleet Swarm Mesh, Epidemic P2P Gossip & Causal Vector Clock Partition Reconciliation (Milestone 102)](#adr-38-autonomous-edge-fleet-swarm-mesh-epidemic-p2p-gossip--causal-vector-clock-partition-reconciliation-milestone-102)
+* [ADR 45: The Playground — Polymorphic Creation Showcase, Arcade Cabinet Shell, and Cloudflare Pages 3-Tier Hosting](#adr-45-the-playground--polymorphic-creation-showcase-arcade-cabinet-shell-and-cloudflare-pages-3-tier-hosting)
 
 ---
 
@@ -716,6 +717,24 @@ This document serves as the registry of critical architectural design decisions 
 * **Consequences**:
   * **Pros**: Complete self-service personalization for standard tenants; unbreakable governance compliance for enterprise clusters; zero breaking changes to existing inference pipelines.
   * **Cons**: Tenants under lock must request administrator unlocks to modify system prompts.
+
+# **ADR 45: The Playground — Polymorphic Creation Showcase, Arcade Cabinet Shell, and Cloudflare Pages 3-Tier Hosting**
+
+* **Status**: Approved & Implemented
+* **Context**: Interactive vibe-coded games (Snake, 2D Pathfinder Lab, Matrix Rain, Subway Pizza Rat), Micro-SaaS tools, and AI prompt engineering showcases were previously crammed inside `/terminal` or legacy static project cards. This cluttered the diagnostics console, constrained the types of creative projects that could be shared, and risked bundle bloat or Total Blocking Time (TBT) penalties if WebGL or canvas game loops mounted on page load.
+* **Decision**: Architected **The Playground** (`/playground` and `/playground/[slug]`):
+  1. **Polymorphic Single Source of Truth (`src/data/playgroundItems.ts`)**: Supports 5 first-class creation kinds (`saas`, `interactive-toy`, `generative-media`, `cognitive-tool`, `experiment`) with strict TypeScript discrimination.
+  2. **User-Activated Game Gate**: In `ArcadeCabinetShell.tsx`, game canvas loops and audio contexts are never initialized until the visitor clicks "Launch Arcade Game", guaranteeing 0ms initial TBT and 100/100 Core Web Vitals.
+  3. **Retro Arcade Cabinet Features**: Toggleable CSS scanlines, Web Audio 8-bit synthesizer audio control, Fullscreen API, controls HUD, and `data-lenis-prevent` to isolate canvas keys/swipes from smooth scroll.
+  4. **Dedicated AI Chat Route (`/api/playground/chat`)**: Sliding-window rate-limited bridge (20 req/min per IP) to the Oracle Cloud VPS Retriever engine (`https://rag.prateeq.in`).
+  5. **3-Tier Zero-Cost Hosting Rule**:
+     - *Tier 1 (< 10 MB)*: Native Next.js React dynamic component (`renderMode: 'native'`).
+     - *Tier 2 (< 20 MB)*: Static drop-in in `public/playground/apps/[slug]/index.html` (`renderMode: 'iframe'`).
+     - *Tier 3 (> 20 MB)*: Heavy WASM / 3D builds deployed to Cloudflare Pages mapped to `playground.prateeq.in`. Pre-configured CSP in `next.config.ts` (`frame-src 'self' https://playground.prateeq.in https://*.pages.dev;`).
+  6. **Telemetry Preservation**: Excluded `/playground/assets/` and `/playground/apps/` in `src/proxy.ts` to protect database connection pools from game asset polling.
+* **Consequences**:
+  * **Pros**: Complete separation of concerns (decluttered `/terminal` while retaining quick launcher aliases); unlimited flexibility to showcase SaaS, AI prompts, 3D art, and retro games; zero external account/sign-up friction today; pre-baked pathway for unlimited Cloudflare Pages bandwidth if heavy WASM builds are added.
+  * **Cons**: Interactive game adapters must be explicitly registered in `playgroundItems.ts` and wrapped in `ArcadeCabinetShell`.
 
 ---
 

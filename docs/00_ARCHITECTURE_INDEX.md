@@ -1,5 +1,5 @@
 # 🏛️ Master Architecture Knowledge Graph Index
-**Total Registered Architecture Nodes:** 157 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
+**Total Registered Architecture Nodes:** 160 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
 
 ## ⚡ Quick Navigation
 - [Master Architecture Visual Canvas](MASTER_ARCHITECTURE_MAP.canvas)
@@ -13,13 +13,14 @@
   - [Runbook: RAG Tenant Onboarding](runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)
 ---
 
-### 🔹 1. FRONTEND: Portfolio & Adaptive Identity (23 Nodes)
+### 🔹 1. FRONTEND: Portfolio & Adaptive Identity (25 Nodes)
 
 | Node ID | Title / Component | Blast Radius | Security Auth | Specification File |
 | :--- | :--- | :---: | :---: | :--- |
 | `Route_analytics` | **Route: `/analytics` (Public Visitor Telemetry Dashboard)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Route_analytics.md](architecture_nodes/Route_analytics.md) |
 | `Route_blog` | **Route: `/blog` & `/blog/[slug]` (Technical Markdown Publication)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Route_blog.md](architecture_nodes/Route_blog.md) |
 | `Route_home` | **Route: `/` (Adaptive Portfolio Home)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Route_home.md](architecture_nodes/Route_home.md) |
+| `Route_playground` | **Route: `/playground` & `/playground/[slug]` (The Playground)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Route_playground.md](architecture_nodes/Route_playground.md) |
 | `Route_terminal` | **Route: `/terminal` (Interactive Diagnostics Console)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Route_terminal.md](architecture_nodes/Route_terminal.md) |
 | `UI_AgentStudioPanel` | **UI Component: `AgentStudioPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_AgentStudioPanel.md](architecture_nodes/UI_AgentStudioPanel.md) |
 | `UI_AnalyticsDashboard` | **UI: `AnalyticsDashboard.tsx`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_AnalyticsDashboard.md](architecture_nodes/UI_AnalyticsDashboard.md) |
@@ -33,6 +34,7 @@
 | `UI_IntegrationsPanel` | **UI Component: `IntegrationsPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_IntegrationsPanel.md](architecture_nodes/UI_IntegrationsPanel.md) |
 | `UI_McpPanel` | **UI: `McpPanel.tsx` (Universal Model Context Protocol Center)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_McpPanel.md](architecture_nodes/UI_McpPanel.md) |
 | `UI_NoirSkyline` | **UI: `NoirSkyline.tsx` (6-Layer Parallax Backdrop)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_NoirSkyline.md](architecture_nodes/UI_NoirSkyline.md) |
+| `UI_PlaygroundSuite` | **UI: `PlaygroundSuite` (The Playground Component Suite)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_PlaygroundSuite.md](architecture_nodes/UI_PlaygroundSuite.md) |
 | `UI_PromptOptimizationPanel` | **UI Component: `PromptOptimizationPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_PromptOptimizationPanel.md](architecture_nodes/UI_PromptOptimizationPanel.md) |
 | `UI_QuickLaunchWizardModal` | **UI: `QuickLaunchWizardModal.tsx`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_QuickLaunchWizardModal.md](architecture_nodes/UI_QuickLaunchWizardModal.md) |
 | `UI_RlmStudioPanel` | **UI Component: `RlmStudioPanel`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_RlmStudioPanel.md](architecture_nodes/UI_RlmStudioPanel.md) |
@@ -64,7 +66,7 @@
 | `UI_ClientWorkspaceDashboard` | **UI: `ClientWorkspaceDashboard.tsx`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_ClientWorkspaceDashboard.md](architecture_nodes/UI_ClientWorkspaceDashboard.md) |
 | `UI_RAGLabPlayground` | **UI: `RAGLabPlayground.tsx` (Retriever SaaS Studio Views)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/UI_RAGLabPlayground.md](architecture_nodes/UI_RAGLabPlayground.md) |
 
-### 🔹 4. API GATEWAY: Next.js 16 Edge & REST Layer (39 Nodes)
+### 🔹 4. API GATEWAY: Next.js 16 Edge & REST Layer (40 Nodes)
 
 | Node ID | Title / Component | Blast Radius | Security Auth | Specification File |
 | :--- | :--- | :---: | :---: | :--- |
@@ -89,6 +91,7 @@
 | `API_outreach_dispatch` | **API: `POST /api/outreach/dispatch`** | 🟠 `HIGH` | `BEARER_JWT` | [architecture_nodes/API_outreach_dispatch.md](architecture_nodes/API_outreach_dispatch.md) |
 | `API_outreach_get_leads` | **API: `GET /api/outreach/get-leads`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/API_outreach_get_leads.md](architecture_nodes/API_outreach_get_leads.md) |
 | `API_outreach_prospect` | **API: `POST /api/outreach/prospect`** | 🟠 `HIGH` | `PUBLIC` | [architecture_nodes/API_outreach_prospect.md](architecture_nodes/API_outreach_prospect.md) |
+| `API_playground_chat` | **API: `POST /api/playground/chat` (Playground Cognitive Proxy)** | 🟢 `MEDIUM` | `BEARER_JWT` | [architecture_nodes/API_playground_chat.md](architecture_nodes/API_playground_chat.md) |
 | `API_profile` | **API: `GET /api/profile`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/API_profile.md](architecture_nodes/API_profile.md) |
 | `API_projects` | **API: `GET /api/projects` & `[slug]`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/API_projects.md](architecture_nodes/API_projects.md) |
 | `API_rag_invite` | **API: `POST /api/rag/invite`** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/API_rag_invite.md](architecture_nodes/API_rag_invite.md) |

@@ -21,6 +21,7 @@ import {
   handleInterviewModeCommand,
   type InterviewSessionState,
 } from '@/lib/terminalPresentation';
+import { PLAYGROUND_ITEMS } from '@/data/playgroundItems';
 import type { SystemStats } from './useSystemTelemetry';
 
 export interface ConsoleLine {
@@ -694,6 +695,7 @@ export function useTerminalCommands({
             { text: 'Available commands:', type: 'success' },
             { text: '  twin / ai   - 🧠 Launch interactive conversation with Prateeq\'s AI Twin', type: 'success' },
             { text: '  ask <query> - Query Prateeq\'s AI Twin vector memory directly for answers', type: 'output' },
+            { text: '  playground  - 🎨 Explore The Playground: SaaS, Games, AI Art & Prompts', type: 'success' },
             { text: '  pitch       - Executive Summary & Core Engineering Superpowers', type: 'output' },
             { text: '  architecture- Master 8-Tier Developer Ecosystem Architecture Blueprint', type: 'output' },
             { text: '  tests       - Inspect 330+ automated test suites & verification matrix', type: 'output' },
@@ -834,8 +836,28 @@ export function useTerminalCommands({
             { text: '  - Local Command: streamlit run scripts/synchronizer.py', type: 'output' },
           ];
           break;
-        case 'pathfinder':
         case 'playground':
+        case 'arcade':
+        case 'creations':
+        case 'gallery': {
+          response = [
+            { text: '===========================================================', type: 'success' },
+            { text: '        PRATEEQ // THE PLAYGROUND & INNOVATION LAB         ', type: 'success' },
+            { text: '===========================================================', type: 'success' },
+            { text: 'Active Creations & Prototypes Directory:', type: 'output' },
+            ...PLAYGROUND_ITEMS.map((item) => ({
+              text: `  • [${item.kind.toUpperCase()}] ${item.title} — ${item.tagline}`,
+              type: 'link' as const,
+              command: item.slug === 'snake' ? 'snake' : item.slug === 'pathfinder' ? 'pathfinder' : undefined,
+              href: `/playground/${item.slug}`,
+            })),
+            { text: ' ', type: 'output' },
+            { text: '🔗 Launch full interactive web experience: /playground', type: 'link', href: '/playground' },
+            { text: '===========================================================', type: 'success' },
+          ];
+          break;
+        }
+        case 'pathfinder':
         case 'algo':
         case 'lab':
         case 'path':
@@ -845,6 +867,7 @@ export function useTerminalCommands({
             { text: 'LAUNCHING 2D GRAPH PATHFINDER & ALGORITHM LAB...', type: 'success' },
             { text: '  - Select from 13 pathfinding heuristics (A*, Dijkstra, Theta*, JPS).', type: 'output' },
             { text: '  - Press [ESC] or Close Lab to return to terminal console.', type: 'output' },
+            { text: '  🎮 Tip: Play in Widescreen Lab Mode at /playground/pathfinder', type: 'link', href: '/playground/pathfinder' },
           ]);
           setTerminalInput('');
           return;
@@ -856,6 +879,7 @@ export function useTerminalCommands({
             ...prev,
             { text: 'LAUNCHING RETRO TERMINAL SNAKE ENGINE...', type: 'success' },
             { text: '  - High scores are synchronized with Supabase Global Leaderboard.', type: 'output' },
+            { text: '  🎮 Tip: Play in Fullscreen Arcade Mode with CRT scanlines at /playground/snake', type: 'link', href: '/playground/snake' },
           ]);
           setTerminalInput('');
           return;

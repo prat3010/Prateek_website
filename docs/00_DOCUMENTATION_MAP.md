@@ -43,6 +43,7 @@ Welcome to the **Prateek Sharma Engineering Platform Documentation Map**. This c
 | **42** | **[`42_Confidential_Multi_Party_Vector_Computation_PRD.md`](42_Confidential_Multi_Party_Vector_Computation_PRD.md)** | Confidential Multi-Party Vector Computation (MPC) Privacy Enclaves (M121), Battery #36, Additive Secret Sharing ($Q_{16.16}$), Beaver Multiplication Triples (PPIP), Threshold Top-K filtering ($\tau_{\text{privacy}}$), differential privacy noise, and dual-theme SaaS studio cockpit. |
 | **43** | **[`43_Autonomous_Continuous_Benchmark_and_Regression_Gatekeeper_PRD.md`](43_Autonomous_Continuous_Benchmark_and_Regression_Gatekeeper_PRD.md)** | Autonomous Continuous Benchmark & Regression Gatekeeper (M122), Battery #37, Two-Sample Welch's t-test hypothesis testing ($p < \alpha$), authentic IR metrics (NDCG@K, MRR, Recall@K, Precision@K), RAG Triad faithfulness, automated rollback webhooks & dual-theme SaaS studio cockpit. |
 | **44** | **[`44_Hierarchical_Memory_Graph_of_Thoughts_PRD.md`](44_Hierarchical_Memory_Graph_of_Thoughts_PRD.md)** | Hierarchical Memory Augmentation with Graph-of-Thoughts (GoT) Planning (M123), Battery #38, non-linear DAG reasoning, multi-parent aggregation ($M \to 1$), Kahn topological optimal path DP, 3-tier memory & Ebbinghaus decay. |
+| **48** | **[`48_The_Playground_Universal_Creation_Showcase_PRD.md`](48_The_Playground_Universal_Creation_Showcase_PRD.md)** | The Playground Universal Creation Showcase, Polymorphic SSoT Registry, Arcade Cabinet Shell, AI Prompt Engineering Lightbox & Cloudflare Pages 3-Tier Zero-Cost Hosting. |
 
 
 ---
@@ -85,6 +86,7 @@ Welcome to the **Prateek Sharma Engineering Platform Documentation Map**. This c
 
 ## 🚀 6. SRE & Operational Runbooks (`docs/runbooks/`)
 
+- 🕹️ **[`runbooks/RUNBOOK_PLAYGROUND_ADD_ITEM.md`](runbooks/RUNBOOK_PLAYGROUND_ADD_ITEM.md):** Adding a new project, game, SaaS, or AI prompt to The Playground.
 - 🗄️ **[`runbooks/RUNBOOK_DATABASE_MIGRATION.md`](runbooks/RUNBOOK_DATABASE_MIGRATION.md):** Supabase PostgreSQL schema migration workflow.
 - 🔌 **[`runbooks/RUNBOOK_NEW_API_ENDPOINT.md`](runbooks/RUNBOOK_NEW_API_ENDPOINT.md):** Adding and testing a new Next.js 16 API route handler.
 - ⚙️ **[`runbooks/RUNBOOK_NEW_CPQ_FEATURE_OR_ENGINE.md`](runbooks/RUNBOOK_NEW_CPQ_FEATURE_OR_ENGINE.md):** Adding a new engine or feature module to the Scoping Lab.

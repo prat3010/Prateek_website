@@ -18,6 +18,7 @@ import { useTerminalCommands, type ProjectSummary } from './useTerminalCommands'
 
 const QUICK_SHORTCUTS = [
   'help',
+  'playground',
   'twin',
   'scope help',
   'cart',
@@ -107,6 +108,9 @@ export default function SiteInfoConsole() {
           <Link href="/" className={styles.backLink}>
             <ArrowLeft size={18} />
             <span>Return to Base</span>
+          </Link>
+          <Link href="/playground" className={styles.backLink}>
+            <span>The Playground</span>
           </Link>
           <Link href="/analytics" className={styles.backLink}>
             <span>Visitor Analytics</span>

@@ -114,7 +114,32 @@ This document serves as the **Episodic Long-Term Memory** for AI agents and deve
 
 ---
 
-## 6. Agent Workflow & Blast Radius Checklist
+## 6. The Playground & Interactive Toy Architecture
+
+### Quirk: Hydration TBT Penalties from Eager Canvas Mounts
+- **Context / Framework**: React 19 + Three.js / Canvas 2D
+- **Symptom**: Degraded Total Blocking Time (TBT) and Lighthouse performance drop on pages hosting games or WebGL models.
+- **Root Cause**: Automatically mounting `<canvas>` contexts, Three.js scene graphs, or Web Audio oscillators on page mount monopolizes the main thread during hydration.
+- **Anti-Pattern**: Rendering canvas game loops immediately on page load without user gesture.
+- **Enforced Solution**: Implement a **User-Activated Game Gate** (as in `ArcadeCabinetShell.tsx`). Render a lightweight poster with title, controls, and "Launch Game" button. Mount the active canvas ONLY after explicit user interaction.
+
+### Quirk: Lenis Smooth Scroll Key & Touch Hijacking in Games
+- **Context / Framework**: Lenis Smooth Scroll + Keyboard/Touch Games (Snake, Pathfinder)
+- **Symptom**: Pressing Arrow keys or swiping on mobile causes the whole page to jitter or scroll instead of controlling the game character.
+- **Root Cause**: Lenis listens to global keydown and touchmove events unless an ancestor element has the escape attribute.
+- **Enforced Solution**: Always add `data-lenis-prevent` to the outer viewport/stage of any game, canvas, or terminal console.
+
+### Quirk: Bandwidth Exceedance on Free Vercel Hobby Tier for Heavy WASM
+- **Context / Framework**: Vercel Hobby (100 GB/mo limit) vs Heavy 3D/WASM Game Engines
+- **Symptom**: Risk of exceeding bandwidth limits or hitting 50 MB bundle caps if large Unity/Godot WASM builds are added to Next.js.
+- **Enforced Solution**: Follow the 3-Tier Rule:
+  1. `< 10 MB`: Native Next.js React dynamic component (`renderMode: 'native'`).
+  2. `< 20 MB`: Static drop-in in `public/playground/apps/[slug]/index.html`.
+  3. `> 20 MB`: Deploy to Cloudflare Pages (unlimited free bandwidth) mapped to `playground.prateeq.in`. `next.config.ts` CSP is already pre-configured to allow framing from `https://playground.prateeq.in` and `https://*.pages.dev`.
+
+---
+
+## 7. Agent Workflow & Blast Radius Checklist
 
 Before completing any task modifying domain logic or API routes:
 1. **Pre-Flight**: Run `python3 scripts/query_architecture.py --target <entity_or_api>` to inspect blast radius.

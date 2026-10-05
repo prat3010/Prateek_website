@@ -169,6 +169,32 @@ NODES = {
 - [API: git-log](API_git_log.md)
 """,
 
+    "Route_playground.md": """# Route: `/playground` & `/playground/[slug]` (The Playground)
+
+#route #frontend #playground #arcade #saas #ai
+
+> **Universal Creation & Innovation Showcase, Retro Arcade Cabinet Shell & AI Prompt Engineering Lightbox.**
+
+- **Path:** `src/app/playground/page.tsx` & `src/app/playground/[slug]/page.tsx`
+- **Key Features:**
+  - Polymorphic Single Source of Truth (`src/data/playgroundItems.ts`) supporting 5 kinds: `saas`, `interactive-toy`, `generative-media`, `cognitive-tool`, `experiment`.
+  - User-Activated Game Gate in `ArcadeCabinetShell.tsx` (0ms initial TBT, 100/100 Core Web Vitals).
+  - CRT scanlines shader, 8-bit Web Audio synthesizer, controls guide HUD, and Fullscreen API.
+  - Generative AI Media Prompt Lightbox with 1-click clipboard copier and parameter inspection (`<Portal>` containing block escape).
+  - Dedicated Cognitive AI chat route proxy (`/api/playground/chat`) to Oracle Cloud VPS.
+  - 3-Tier Hosting Architecture: Vercel Native, Static Drop-in, and Cloudflare Pages under `playground.prateeq.in`.
+
+---
+
+## 🔗 Related Architecture & Cross-References
+- [48_The_Playground_Universal_Creation_Showcase_PRD](../48_The_Playground_Universal_Creation_Showcase_PRD.md)
+- [ADR 45: Playground & Arcade Cabinet Architecture](../99_DECISIONS.md#adr-45-the-playground--polymorphic-creation-showcase-arcade-cabinet-shell-and-cloudflare-pages-3-tier-hosting)
+- [SOP Runbook: Adding an Item to Playground](../runbooks/RUNBOOK_PLAYGROUND_ADD_ITEM.md)
+- [UI: PlaygroundSuite](UI_PlaygroundSuite.md)
+- [Route: api/playground/chat](Route_api_playground_chat.md)
+- [Route: terminal](Route_terminal.md)
+""",
+
     "Route_analytics.md": """# Route: `/analytics` (Public Visitor Telemetry Dashboard)
 
 #route #frontend #analytics #telemetry
@@ -816,6 +842,28 @@ NODES = {
 - [Tool: Synchronizer](Tool_Synchronizer.md)
 """,
 
+    "API_playground_chat.md": """# API: `POST /api/playground/chat` (Playground Cognitive Proxy)
+
+#api #retriever #rate_limit #proxy #oracle_vps
+
+> **Sliding-Window Rate-Limited Bridge to Retriever Cognitive Intelligence on Oracle Cloud VPS.**
+
+- **Path:** `src/app/api/playground/chat/route.ts`
+- **Key Features:**
+  - In-memory / Upstash Redis sliding-window rate limiter (`20 req/min` via `src/lib/rateLimit.ts`).
+  - Server-side Bearer authentication injection targeting `${RETRIEVER_API_URL}/v1/tenants/${PORTFOLIO_TENANT_ID}/chat/completions`.
+  - Upstream latency tracking and sub-10ms semantic cache detection (`x-cache-lookup`).
+  - Graceful fallback with human-readable error diagnostics if VPS engine is restarting.
+
+---
+
+## 🔗 Related Architecture & Cross-References
+- [48_The_Playground_Universal_Creation_Showcase_PRD](../48_The_Playground_Universal_Creation_Showcase_PRD.md)
+- [Route: playground](Route_playground.md)
+- [Lib: rateLimit.ts](Lib_rateLimit.md)
+- [Retriever: API v1 chat](Retriever_API_v1_chat.md)
+""",
+
     # -------------------------------------------------------------
     # 3. CORE DOMAIN LIBRARIES & IDENTITY PROVIDERS (10 Nodes)
     # -------------------------------------------------------------
@@ -1151,6 +1199,29 @@ NODES = {
 - [Route: /terminal](Route_terminal.md)
 - [API: terminal/qrcode](API_terminal_qrcode.md)
 - [API: terminal/snake-leaderboard](API_terminal_snake_leaderboard.md)
+""",
+
+    "UI_PlaygroundSuite.md": """# UI: `PlaygroundSuite` (The Playground Component Suite)
+
+#ui #frontend #playground #arcade #lightbox
+
+> **Component Ecosystem for Catalog Grid, Retro Arcade Cabinet, Prompt Lightbox & Item Adapters.**
+
+- **Path:** `src/components/playground/`
+- **Key Components:**
+  - `PlaygroundGrid.tsx`: Master catalog with real-time search and category filter pills.
+  - `ArcadeCabinetShell.tsx`: Retro gaming frame with CRT scanlines, 8-bit sound synthesizer audio, and User-Activated Game Gate.
+  - `MediaPromptLightbox.tsx`: Prompt inspection and 1-click clipboard copy modal using `<Portal>` to escape `ScrollSection` containing block traps (ADR 05).
+  - Category Cards: `SaasCard.tsx`, `ToyCard.tsx`, `MediaCard.tsx`, `CognitiveCard.tsx`, `ExperimentCard.tsx`.
+  - Adapters: `PlaygroundSnake.tsx`, `PlaygroundPathfinder.tsx`, `PlaygroundPizzaRat.tsx`, `PlaygroundMatrixRain.tsx`, `PlaygroundNeuralDossier.tsx`.
+  - Lenis scroll isolation via `data-lenis-prevent`.
+
+---
+
+## 🔗 Related Architecture & Cross-References
+- [Route: playground](Route_playground.md)
+- [48_The_Playground_Universal_Creation_Showcase_PRD](../48_The_Playground_Universal_Creation_Showcase_PRD.md)
+- [ADR 45: Playground & Arcade Cabinet Architecture](../99_DECISIONS.md#adr-45-the-playground--polymorphic-creation-showcase-arcade-cabinet-shell-and-cloudflare-pages-3-tier-hosting)
 """,
 
     "UI_RAGLabPlayground.md": """# UI: `RAGLabPlayground.tsx` (Retriever SaaS Studio Views)

@@ -71,12 +71,22 @@ export default function Navbar({ items, className }: NavbarProps) {
         { label: 'Live Demo', href: '/rag#demo' },
       ];
     }
+    if (pathname?.startsWith('/playground')) {
+      return [
+        { label: 'Home', href: '/' },
+        { label: 'Playground', href: '/playground' },
+        { label: 'Scoping Lab', href: '/scoping' },
+        { label: 'Terminal', href: '/terminal' },
+        { label: 'Contact', href: '/#contact' },
+      ];
+    }
     return [
       { label: 'Home', href: '/#home' },
       { label: 'About', href: '/#about' },
       { label: 'Capabilities', href: '/#capabilities' },
       { label: 'Deployments', href: '/#deployments' },
       { label: audience === 'business' ? 'Services & Guarantees' : 'Resume', href: '/#resume' },
+      { label: 'Playground', href: '/playground' },
       { label: 'Contact', href: '/#contact' },
     ];
   }, [items, pathname, audience]);
@@ -88,6 +98,9 @@ export default function Navbar({ items, className }: NavbarProps) {
   const [activeSection, setActiveSection] = useState<string>('');
 
   const effectiveActiveSection = useMemo(() => {
+    if (pathname?.startsWith('/playground')) {
+      return '/playground';
+    }
     if (pathname !== '/' && !pathname?.startsWith('/rag') && !items) {
       return '';
     }

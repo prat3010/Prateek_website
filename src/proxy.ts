@@ -129,7 +129,8 @@ export const config = {
      * - favicon.ico, icon.svg, etc. (standard assets)
      * - robots.txt, sitemap.xml, etc.
      * - images (static theme assets)
+     * - playground/assets (game and media assets)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|icon.svg|robots.txt|sitemap.xml|images/).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|icon.svg|robots.txt|sitemap.xml|images/|playground/assets/).*)',
   ],
 };

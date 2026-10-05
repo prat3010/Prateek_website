@@ -1,42 +1,70 @@
-# **Terminal Pathfinder & Algorithm Lab**
+# **05. The Playground // Universal Creation & Innovation Showcase**
 
 ## **Purpose**
 
-The Pathfinder & Algorithm Lab showcases creative coding, graph theory, heuristic search algorithms, and interactive diagnostics. Integrated directly inside the system console at `/terminal` (command: `pathfinder` / `playground` / `algo`), it acts as an interactive simulation canvas where visitors test search algorithms against dynamic mazes and obstacle layouts.
+The Playground (`/playground` and `/playground/[slug]`) is a high-performance creative laboratory and showcase for Prateek Sharma's vibe-coded software products, playable retro arcade games, generative AI prompt engineering benchmarks, computer vision experiments, and cognitive Retriever experiments.
+
+It eliminates terminal clutter by decoupling heavy interactive games from the system diagnostics CLI (`/terminal`), while giving visitors an engaging, hands-on environment to test production-grade engineering prototypes.
 
 ---
 
 ## **Product Philosophy**
 
-Migrated from the landing page into `/terminal`, the Algorithm Lab sits naturally inside the hacker/diagnostics console. It proves technical execution in graph algorithms, spatial data structures, and state-machine visualizers without disrupting the commercial narrative of the homepage.
+Unlike conventional static portfolio project grids, The Playground treats every creation as an executable artifact:
+- **Zero Fakes / Authentic Production Truth:** Every Micro-SaaS links to genuine cloud deployments; every cognitive tool connects directly to the live Oracle Cloud VPS Retriever backend (`https://rag.prateeq.in`).
+- **User-Activated Game Gate:** Heavy WebGL contexts, Three.js scene graphs, and audio oscillators are deferred behind an interactive gate, ensuring **0ms initial Total Blocking Time (TBT)** and 100/100 Core Web Vitals.
+- **Polymorphic Architecture:** A single typed registry (`src/data/playgroundItems.ts`) unifies 5 distinct creation categories with tailored presentation viewports.
 
 ---
 
-## **Features & Capabilities**
+## **The 5 Creation Categories**
 
-* **13 Pathfinding Heuristics**:
-  - `astar`: A* Heuristic Search (Optimal Manhattan)
-  - `dijkstra`: Dijkstra's Full-Grid Wave Search
-  - `bfs` / `dfs`: Breadth-First & Depth-First Search
-  - `bidirectional`: Bidirectional BFS Dual Search
-  - `jps`: Jump Point Search (Quantum Leap)
-  - `thetastar`: Theta* Any-Angle Direct Line-of-Sight
-  - `iddfs` / `idastar`: Iterative Deepening DFS & A*
-  - `greedy`: Greedy Best-First Search
-  - `tremaux`: Trémaux's Contour Maze Tracker
-  - `wall`: Pledge Wall Follower
-  - `random`: Brownian Motion Random Walk
-* **Procedural Maze Generator**: Instant procedural barricade generation.
-* **Interactive Canvas**: Drag & drop Start/End nodes, live wall drawing/erasing.
-* **Execution Telemetry**: Visited nodes count, path step length, duration in milliseconds.
-* **Gamification**: Unlocks the `🏆 Algorithm Explorer` terminal achievement upon path resolution.
+1. 🚀 **Micro-SaaS & Full Web Apps (`saas`)**: Full-stack utilities with live production URLs, pricing models (Free, Freemium, Open Source), tech stack pills, and GitHub source links (*e.g., Retriever AI, SOTA Scoping Engine*).
+2. 🎮 **Interactive Toys & Arcade Games (`interactive-toy`)**: Retro arcade games rendered inside the **Arcade Cabinet Shell** with toggleable CRT scanlines, 8-bit Web Audio synthesizer, controls guide HUD, and Fullscreen API (*e.g., Snake, 2D Pathfinder Lab, Subway Pizza Rat, Matrix Rain*).
+3. 🎨 **Generative AI Media & Prompts (`generative-media`)**: High-resolution Midjourney v6.1 and Runway Gen-3 showcases featuring 1-click clipboard prompt copying, negative prompt inspection, and full parameter telemetry (aspect ratio, CFG scale, steps, seed).
+4. 🧠 **Cognitive AI & Retriever Tools (`cognitive-tool`)**: Interactive intelligence consoles (*e.g., The Sovereign Neural Dossier*) querying the Oracle VPS with pgvector hybrid search, sub-10ms semantic caching, and verifiable citations.
+5. ⚡ **Experiments & Computer Vision (`experiment`)**: Web prototypes exploring human-computer interaction (*e.g., GestureScroll MediaPipe webcam hand tracking*).
 
 ---
 
-## **Adaptive Behavior**
+## **Architecture & UI Subsystems**
 
-* **Azure Theme**: Clean graphic ink contrast, bright green start nodes, gold path trails.
-* **Noir Theme**: Cyber-noir glowing accents (`#00f0ff` scanlines, `#39ff14` neon nodes, dark obsidian backdrop).
+```text
+  [src/data/playgroundItems.ts] ── SSoT Polymorphic Registry
+             │
+             ├──► /playground (Catalog Grid)
+             │      ├── Search & Category Filter Pills
+             │      ├── Adaptive Cards (Saas, Toy, Media, Cognitive, Experiment)
+             │      └── MediaPromptLightbox (<Portal> ADR 05 escape)
+             │
+             ├──► /playground/[slug] (Dynamic Runner)
+             │      ├── ArcadeCabinetShell (CRT, 8-Bit Audio, Fullscreen)
+             │      ├── Native Component Adapters (Snake, Pathfinder, etc.)
+             │      ├── Cognitive Lab Workbench (Neural Dossier)
+             │      └── Micro-SaaS Product Previews
+             │
+             └──► /api/playground/chat (Rate-Limited VPS Proxy)
+                    └── Upstash / In-Memory Sliding Window (20 req/min)
+```
+
+---
+
+## **3-Tier Hosting & Zero-Cost Scalability**
+
+100% of current projects are hosted with **$0 monthly infrastructure cost** using the existing Vercel Hobby tier and Oracle Cloud VPS:
+- **Tier 1 (Native Next.js Chunk, < 10 MB):** Built directly as React components in `src/components/playground/items/`.
+- **Tier 2 (Static Drop-in, < 20 MB):** Self-contained HTML5/Phaser builds placed in `public/playground/apps/[slug]/index.html` and embedded via sandboxed iframe. Telemetry is excluded in `src/proxy.ts`.
+- **Tier 3 (Heavy WASM / 3D, > 20 MB):** Large Unity or Unreal builds deployed to Cloudflare Pages (unlimited free bandwidth) mapped to **`playground.prateeq.in`**. `next.config.ts` Content Security Policy is pre-configured:
+  ```ts
+  frame-src 'self' https://playground.prateeq.in https://*.pages.dev;
+  ```
+
+---
+
+## **Adaptive Visual Identity (Azure & Noir)**
+
+- **Azure Theme:** Clean, crisp technical glass cards, subtle sky-blue accents (`var(--color-primary)`), high-contrast retro borders.
+- **Noir Theme:** Deep carbon obsidian surfaces, emerald/amber neon scanline glow, phosphor cathode-ray tube aesthetics.
 
 ---
 

@@ -60,7 +60,7 @@ const nextConfig: NextConfig = {
               "object-src 'none'; " +
               "base-uri 'self'; " +
               "form-action 'self'; " +
-              "frame-src 'self' https://www.google.com https://www.gstatic.com https://api.razorpay.com https://checkout.razorpay.com; " +
+              "frame-src 'self' https://playground.prateeq.in https://*.pages.dev https://www.google.com https://www.gstatic.com https://api.razorpay.com https://checkout.razorpay.com; " +
               "frame-ancestors 'none';",
           },
           {
@@ -88,6 +88,23 @@ const nextConfig: NextConfig = {
       {
         source: "/images/:path*",
         headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/playground/assets/:path*",
+        headers: [
+          {
+            key: "X-Frame-Options",
+            value: "SAMEORIGIN",
+          },
+          {
+            key: "Content-Security-Policy",
+            value: "frame-ancestors 'self';",
+          },
           {
             key: "Cache-Control",
             value: "public, max-age=31536000, immutable",
