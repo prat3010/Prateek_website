@@ -47,12 +47,25 @@ export async function POST(req: NextRequest) {
     }
 
     if (action === 'approve') {
-      const pitchToSend = editedPitch || lead.ai_generated_pitch;
+      const pitchToSend = editedPitch || lead.ai_generated_pitch || '';
+
+      // If pitchToSend is a JSON string (3-in-1 format), extract email text for email dispatch
+      let emailText = pitchToSend;
+      try {
+        if (typeof pitchToSend === 'string' && pitchToSend.trim().startsWith('{')) {
+          const parsed = JSON.parse(pitchToSend);
+          if (parsed.email) {
+            emailText = parsed.email;
+          }
+        }
+      } catch {
+        // Fallback to pitchToSend as raw text
+      }
 
       // Dispatch Email via Resend API if key is present
       if (RESEND_API_KEY) {
         try {
-          await fetch('https://api.resend.com/emails', {
+          const res = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -62,11 +75,23 @@ export async function POST(req: NextRequest) {
               from: 'Prateek Sharma <onboarding@resend.dev>',
               to: [lead.email || CONTACT_EMAIL_TO],
               subject: `Partnership & Software Architecture for ${lead.company}`,
-              text: pitchToSend,
+              text: emailText,
             }),
           });
+          if (!res.ok) {
+            const errBody = await res.text().catch(() => '');
+            console.error('Resend email dispatch error:', res.status, errBody);
+            return NextResponse.json(
+              { error: `Email dispatch failed: Resend returned status ${res.status}` },
+              { status: 502 }
+            );
+          }
         } catch (emailErr) {
-          console.warn('Resend email dispatch warning:', emailErr);
+          console.error('Resend email dispatch exception:', emailErr);
+          return NextResponse.json(
+            { error: 'Failed to communicate with email dispatch service' },
+            { status: 502 }
+          );
         }
       }
 
@@ -81,7 +106,7 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        message: `Approved & dispatched email to ${lead.lead_name} (${lead.email})`,
+        message: `Approved & dispatched email to ${lead.lead_name || lead.company} (${lead.email || CONTACT_EMAIL_TO})`,
       });
     }
 

@@ -45,6 +45,31 @@ interface ClientRecord {
 
 import { isAdminEmail } from '@/lib/auth';
 
+interface PitchFormats {
+  email: string;
+  linkedin?: string;
+  coverLetter?: string;
+}
+
+function parsePitchFormats(raw: string): PitchFormats {
+  if (!raw) return { email: '' };
+  try {
+    if (raw.trim().startsWith('{')) {
+      const parsed = JSON.parse(raw);
+      if (parsed.email) {
+        return {
+          email: parsed.email || '',
+          linkedin: parsed.linkedin || '',
+          coverLetter: parsed.cover_letter || '',
+        };
+      }
+    }
+  } catch {
+    // Fallback to raw text
+  }
+  return { email: raw };
+}
+
 export default function AdminControlCenter() {
   const { user, loading: authLoading, loginWithGoogle, logout, getAccessToken } = useAuth();
   const [activeTab, setActiveTab] = useState<'prospects' | 'clients'>('prospects');
@@ -54,7 +79,7 @@ export default function AdminControlCenter() {
   const [loadingLeads, setLoadingLeads] = useState(false);
   const [editingPitchId, setEditingPitchId] = useState<string | null>(null);
   const [editedPitchText, setEditedPitchText] = useState('');
-  const [actionMessage, setActionMessage] = useState<string | null>(null);
+  const [actionMessage, setActionMessage] = useState<{ text: string; isError?: boolean } | null>(null);
 
   // Clients state
   const [clients, setClients] = useState<ClientRecord[]>([]);
@@ -105,7 +130,7 @@ export default function AdminControlCenter() {
 
   useEffect(() => {
     if (actionMessage) {
-      const timer = setTimeout(() => setActionMessage(null), 4000);
+      const timer = setTimeout(() => setActionMessage(null), 5000);
       return () => clearTimeout(timer);
     }
   }, [actionMessage]);
@@ -118,13 +143,15 @@ export default function AdminControlCenter() {
         method: 'POST',
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
+      const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        const data = await res.json();
-        setActionMessage(data.message || 'Generated new prospect pitches!');
+        setActionMessage({ text: data.message || 'Generated new prospect pitches!' });
         fetchLeads();
+      } else {
+        setActionMessage({ text: data.error || 'Failed to trigger AI prospector.', isError: true });
       }
     } catch {
-      setActionMessage('Failed to trigger AI prospector.');
+      setActionMessage({ text: 'Network error triggering AI prospector.', isError: true });
     } finally {
       setLoadingLeads(false);
     }
@@ -146,14 +173,16 @@ export default function AdminControlCenter() {
         }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        setActionMessage(data.message);
+        setActionMessage({ text: data.message || 'Action processed successfully' });
         setEditingPitchId(null);
         fetchLeads();
+      } else {
+        setActionMessage({ text: data.error || 'Failed to process dispatch action.', isError: true });
       }
     } catch {
-      setActionMessage('Failed to process dispatch action.');
+      setActionMessage({ text: 'Network error processing dispatch action.', isError: true });
     }
   };
 
@@ -285,9 +314,9 @@ export default function AdminControlCenter() {
         </div>
 
         {actionMessage && (
-          <div className={styles.messageBanner}>
-            <CheckCircle2 size={16} />
-            <span>{actionMessage}</span>
+          <div className={actionMessage.isError ? styles.errorMessageBanner : styles.messageBanner}>
+            {actionMessage.isError ? <ShieldAlert size={16} /> : <CheckCircle2 size={16} />}
+            <span>{actionMessage.text}</span>
           </div>
         )}
 
@@ -297,7 +326,7 @@ export default function AdminControlCenter() {
             <div className={styles.actionsBar}>
               <button onClick={handleGenerateProspects} disabled={loadingLeads} className={styles.primaryBtn}>
                 <Sparkles size={16} />
-                <span>{loadingLeads ? 'Prospecting Web...' : 'Run AI Prospector (Generate 2 Leads)'}</span>
+                <span>{loadingLeads ? 'Prospecting Web...' : 'Run AI Prospector'}</span>
               </button>
               <button onClick={fetchLeads} className={styles.secondaryBtn}>
                 <RefreshCw size={16} />
@@ -311,73 +340,88 @@ export default function AdminControlCenter() {
               </div>
             ) : (
               <div className={styles.queueGrid}>
-                {pendingLeads.map(lead => (
-                  <div key={lead.id} className={styles.card}>
-                    <div className={styles.cardHeader}>
-                      <div>
-                        <h3 className={styles.leadName}>{lead.lead_name}</h3>
-                        <p className={styles.leadMeta}>
-                          <Building2 size={14} /> {lead.company} • {lead.role}
-                        </p>
-                      </div>
-                      {lead.source_url && (
-                        <a
-                          href={lead.source_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={styles.linkIcon}
-                          aria-label={`Visit source website for ${lead.company}`}
-                        >
-                          <ExternalLink size={16} />
-                        </a>
-                      )}
-                    </div>
-
-                    <div className={styles.emailBadge}>
-                      <Mail size={14} /> {lead.email}
-                    </div>
-
-                    <div className={styles.pitchBox}>
-                      {editingPitchId === lead.id ? (
-                        <textarea
-                          value={editedPitchText}
-                          onChange={e => setEditedPitchText(e.target.value)}
-                          className={styles.pitchTextarea}
-                          aria-label="Edit pitch message text"
-                          rows={6}
-                        />
-                      ) : (
-                        <p className={styles.pitchText}>{lead.ai_generated_pitch}</p>
-                      )}
-                    </div>
-
-                    <div className={styles.cardFooter}>
-                      {editingPitchId === lead.id ? (
-                        <button onClick={() => handleDispatch(lead.id, 'approve')} className={styles.approveBtn}>
-                          <Send size={14} /> Save &amp; Dispatch Email
-                        </button>
-                      ) : (
-                        <>
-                          <button
-                            onClick={() => {
-                              setEditingPitchId(lead.id);
-                              setEditedPitchText(lead.ai_generated_pitch);
-                            }}
-                            className={styles.editBtn}
+                {pendingLeads.map(lead => {
+                  const formats = parsePitchFormats(lead.ai_generated_pitch);
+                  return (
+                    <div key={lead.id} className={styles.card}>
+                      <div className={styles.cardHeader}>
+                        <div>
+                          <h3 className={styles.leadName}>{lead.lead_name}</h3>
+                          <p className={styles.leadMeta}>
+                            <Building2 size={14} /> {lead.company} • {lead.role}
+                          </p>
+                        </div>
+                        {lead.source_url && (
+                          <a
+                            href={lead.source_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={styles.linkIcon}
+                            aria-label={`Visit source website for ${lead.company}`}
                           >
-                            Edit Pitch
-                          </button>
-                          <button onClick={() => handleDispatch(lead.id, 'reject')} className={styles.rejectBtn}>
-                            <X size={14} /> Dismiss
-                          </button>
+                            <ExternalLink size={16} />
+                          </a>
+                        )}
+                      </div>
+
+                      <div className={styles.emailBadge}>
+                        <Mail size={14} /> {lead.email}
+                      </div>
+
+                      <div className={styles.pitchBox}>
+                        {editingPitchId === lead.id ? (
+                          <textarea
+                            value={editedPitchText}
+                            onChange={e => setEditedPitchText(e.target.value)}
+                            className={styles.pitchTextarea}
+                            aria-label="Edit pitch message text"
+                            rows={6}
+                          />
+                        ) : (
+                          <>
+                            <p className={styles.pitchText}>{formats.email || lead.ai_generated_pitch}</p>
+                            {formats.linkedin && (
+                              <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--surface-glass-border)' }}>
+                                <p style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '4px' }}>
+                                  💼 LinkedIn Note ({formats.linkedin.length}/300):
+                                </p>
+                                <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', margin: 0, fontStyle: 'italic' }}>
+                                  {formats.linkedin}
+                                </p>
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+
+                      <div className={styles.cardFooter}>
+                        {editingPitchId === lead.id ? (
                           <button onClick={() => handleDispatch(lead.id, 'approve')} className={styles.approveBtn}>
-                            <Send size={14} /> 1-Click Approve &amp; Send
+                            <Send size={14} /> Save &amp; Dispatch Email
                           </button>
-                        </>
-                      )}
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => {
+                                setEditingPitchId(lead.id);
+                                setEditedPitchText(formats.email || lead.ai_generated_pitch);
+                              }}
+                              className={styles.editBtn}
+                            >
+                              Edit Pitch
+                            </button>
+                            <button onClick={() => handleDispatch(lead.id, 'reject')} className={styles.rejectBtn}>
+                              <X size={14} /> Dismiss
+                            </button>
+                            <button onClick={() => handleDispatch(lead.id, 'approve')} className={styles.approveBtn}>
+                              <Send size={14} /> 1-Click Approve &amp; Send
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

@@ -84,4 +84,34 @@ describe('Admin Outreach Endpoints Security', () => {
     const res = await POSTDispatch(req);
     expect(res.status).toBe(403);
   });
+
+  it('allows verified admin to approve lead with 3-in-1 JSON pitch', async () => {
+    const pitchJson = JSON.stringify({
+      email: 'Hi Jane, verified systems evidence.',
+      linkedin: 'Hi Jane, connecting!',
+      cover_letter: 'Dear Jane, cover letter.',
+    });
+    const req = new NextRequest('http://localhost/api/outreach/dispatch', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer admin_token' },
+      body: JSON.stringify({ leadId: 'lead-1', action: 'approve', editedPitch: pitchJson }),
+    });
+    const res = await POSTDispatch(req);
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data.success).toBe(true);
+  });
+
+  it('allows verified admin to dismiss lead with reject action', async () => {
+    const req = new NextRequest('http://localhost/api/outreach/dispatch', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer admin_token' },
+      body: JSON.stringify({ leadId: 'lead-1', action: 'reject' }),
+    });
+    const res = await POSTDispatch(req);
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data.success).toBe(true);
+    expect(data.message).toContain('dismissed');
+  });
 });

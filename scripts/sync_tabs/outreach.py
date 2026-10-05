@@ -30,7 +30,7 @@ def load_defaults():
     except Exception:
         pass
     return {
-        "activeModel": "gemini-3.6-flash",
+        "activeModel": "gemini-2.5-flash",
         "minQualityScore": 75,
         "maxLeadsPerRun": 25,
         "ctaDeepLink": "https://prateeq.in/scoping?engine=saas"
@@ -46,10 +46,10 @@ def save_defaults(config):
         if st:
             st.error(f"Failed to save defaults: {e}")
 
-def call_gemini_with_fallback(prompt, preferred_model="gemini-3.6-flash", api_key=""):
+def call_gemini_with_fallback(prompt, preferred_model="gemini-2.5-flash", api_key=""):
     if not api_key:
         return None
-    models = [preferred_model, "gemini-3.5-flash", "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-flash-latest"]
+    models = [preferred_model, "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash-lite"]
     seen = set()
     ordered = [m for m in models if not (m in seen or seen.add(m))]
 
@@ -58,7 +58,7 @@ def call_gemini_with_fallback(prompt, preferred_model="gemini-3.6-flash", api_ke
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
             payload = json.dumps({"contents": [{"parts": [{"text": prompt}]}]}).encode("utf-8")
             req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
-            with urllib.request.urlopen(req, timeout=8) as resp:
+            with urllib.request.urlopen(req, timeout=25) as resp:
                 res = json.loads(resp.read().decode("utf-8"))
                 text = res.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
                 if text:
@@ -506,7 +506,9 @@ def fetch_hn_whoishiring_concurrent(known_urls):
             if source_url in known_urls:
                 continue
 
-            raw_text = c.get('text', '')
+            raw_text = c.get('text') or ''
+            if not raw_text:
+                continue
             clean_text = re.sub(r'<[^>]+>', ' ', raw_text).strip()
             lines = [l.strip() for l in clean_text.split('\n') if l.strip()]
             first_line = lines[0] if lines else clean_text[:100]
@@ -814,8 +816,13 @@ def fetch_jobicy_jobs(known_urls):
                 s_max = job.get('annualSalaryMax')
                 s_curr = job.get('salaryCurrency', 'USD')
                 structured_comp = None
-                if s_min and s_max and int(s_max) > 0:
-                    structured_comp = f"${int(s_min):,} - ${int(s_max):,} {s_curr} / yr"
+                if s_min and s_max:
+                    try:
+                        min_i, max_i = int(s_min), int(s_max)
+                        if max_i > 0:
+                            structured_comp = f"${min_i:,} - ${max_i:,} {s_curr} / yr"
+                    except (ValueError, TypeError):
+                        structured_comp = None
                 comp = extract_compensation(clean_desc, structured_comp)
 
                 results.append({
@@ -904,8 +911,8 @@ def fetch_direct_ats_jobs(known_urls):
                 link = j.get('absolute_url', '')
                 if link in known_urls:
                     continue
-                title = j.get('title', '')
-                loc = j.get('location', {}).get('name', '')
+                title = j.get('title') or ''
+                loc = (j.get('location') or {}).get('name') or ''
                 full_text = f"{title} Location: {loc} {slug}"
                 if not is_india_eligible_remote(full_text):
                     continue
@@ -1102,36 +1109,54 @@ def fetch_jobspy_multiboard(known_urls):
     return results
 
 def query_retriever_for_job_match(job_title, job_company, job_details):
-    """Query live Retriever API on rag.prateeq.in for deep semantic vector retrieval & ColBERT evidence."""
-    retriever_url = os.environ.get("NEXT_PUBLIC_RETRIEVER_API_URL") or "https://rag.prateeq.in"
-    tenant_id = os.environ.get("RETRIEVER_SCOPING_TENANT_ID") or "1f85286c-9d9a-4ebc-9c62-a99360a5ece4"
-    api_key = os.environ.get("RETRIEVER_SCOPING_API_KEY") or ""
+    """Query live Retriever API on rag.prateeq.in for deep semantic vector retrieval & verified architecture proof."""
+    retriever_url = os.environ.get("NEXT_PUBLIC_RETRIEVER_API_URL") or env.get("NEXT_PUBLIC_RETRIEVER_API_URL") or "https://rag.prateeq.in"
+    tenant_id = os.environ.get("RETRIEVER_PORTFOLIO_TENANT_ID") or env.get("RETRIEVER_PORTFOLIO_TENANT_ID") or "6797e2c8-745a-4bd1-aa4c-3854b8d79c22"
+    api_key = os.environ.get("RETRIEVER_PORTFOLIO_API_KEY") or env.get("RETRIEVER_PORTFOLIO_API_KEY") or ""
 
-    query_text = f"{job_title} at {job_company}: {job_details[:300]}"
+    # Clean query text focusing on role and tech requirements
+    query_text = f"{job_title} at {job_company}: {job_details[:250]}"
     try:
-        url = f"{retriever_url.rstrip('/')}/v1/search"
+        url = f"{retriever_url.rstrip('/')}/v1/tenants/{tenant_id}/search"
         payload = json.dumps({
-            "tenant_id": tenant_id,
             "query": query_text,
-            "top_k": 3
+            "limit": 2,
+            "top_k": 2,
+            "reranker_engine": "none"
         }).encode("utf-8")
         headers = {
             "Content-Type": "application/json",
-            "User-Agent": "SynchronizerHeadhunter/1.0"
+            "User-Agent": "SynchronizerHeadhunter/2.0",
+            "X-Tenant-ID": tenant_id,
+            "X-User-ID": "00000000-0000-0000-0000-000000000001"
         }
         if api_key:
             headers["Authorization"] = f"Bearer {api_key}"
             headers["X-API-Key"] = api_key
 
         req = urllib.request.Request(url, data=payload, headers=headers)
-        with urllib.request.urlopen(req, timeout=6) as resp:
+        with urllib.request.urlopen(req, timeout=25) as resp:
             data = json.loads(resp.read().decode("utf-8"))
-            return data.get("results", [])
+            raw_results = data.get("results", [])
+            formatted = []
+            for r in raw_results:
+                meta = r.get("metadata", {}) or {}
+                fname = meta.get("filename", "Architecture Spec")
+                content = r.get("content", "")
+                score = r.get("score", 0.0)
+                formatted.append({
+                    "content": content,
+                    "score": score,
+                    "filename": fname,
+                    "document_title": fname,
+                    "chunk_text": content
+                })
+            return formatted
     except Exception as e:
         return [{"error": str(e)}]
 
 def generate_multi_channel_pitches(company, role, snippet_text, config, api_key, lead_type="job"):
-    """Generate 3 distinct high-impact outreach assets (Email, LinkedIn <300 chars, and ATS Cover Letter)."""
+    """Generate 3 distinct high-impact outreach assets grounded in verified Retriever RAG architecture evidence."""
     low_snip = snippet_text.lower()
     if "agent" in low_snip or "workflow" in low_snip or "tool" in low_snip:
         targeted_cta = "https://prateeq.in/scoping?engine=saas&goal=autonomous_agents"
@@ -1141,6 +1166,21 @@ def generate_multi_channel_pitches(company, role, snippet_text, config, api_key,
         targeted_cta = "https://prateeq.in/scoping?engine=saas&goal=saas_app"
 
     clean_snippet = snippet_text[:120].rstrip('.') if snippet_text else role
+
+    # 1. Fetch live verified proof-of-work from Retriever RAG
+    retriever_evidence_text = ""
+    try:
+        retriever_hits = query_retriever_for_job_match(role, company, snippet_text)
+        valid_hits = [h for h in retriever_hits if isinstance(h, dict) and "content" in h and h.get("content")]
+        if valid_hits:
+            evidence_lines = []
+            for i, hit in enumerate(valid_hits[:2]):
+                doc_name = hit.get("filename") or hit.get("document_title", "Verified System Spec")
+                clean_chunk = hit.get("content", "").strip()[:350].replace("\n", " ")
+                evidence_lines.append(f"[Verified Production Proof {i+1} from {doc_name} (Relevance: {round(float(hit.get('score', 0)), 2)})]:\n{clean_chunk}")
+            retriever_evidence_text = "\n\n### VERIFIED PRODUCTION EVIDENCE FROM PRATEEK'S RETRIEVER PLATFORM:\n" + "\n\n".join(evidence_lines)
+    except Exception:
+        retriever_evidence_text = ""
 
     if lead_type == "client":
         fallback_email = f"Hi {company} Team,\n\nI noticed your project requirements for {role} ({clean_snippet}...).\n\nAs an independent AI Solutions Architect & Forward Deployed Engineer, I build custom multi-tenant RAG systems, AI agents, and full-stack software assets on contract with rapid sprint delivery.\n\nI put together an interactive scope & digital architecture spec for your stack: {targeted_cta}\n\nBest,\nPrateek Sharma"
@@ -1171,6 +1211,7 @@ def generate_multi_channel_pitches(company, role, snippet_text, config, api_key,
 
     prompt = f"""You are writing high-conversion multi-channel outreach assets as Prateek Sharma (Forward Deployed Engineer & AI Solutions Architect).
 {PORTFOLIO_CONTEXT_PROMPT}
+{retriever_evidence_text}
 
 Target Opportunity:
 Company: {company}
@@ -1179,17 +1220,19 @@ Posting Details: {snippet_text}
 Lead Type: {lead_type}
 
 Rules:
-1. "email": Write a 3-sentence, hyper-personalized pitch connecting their exact hiring/project needs to Prateek's real production builds (Retriever AI SaaS RAG, ColBERT token MaxSim, pgvector HNSW, Next.js 16 + Supabase). {positioning} Include CTA link {targeted_cta}. Sign off from Prateek Sharma.
+1. "email": Write a 3-sentence, hyper-personalized pitch connecting their exact hiring/project needs to Prateek's verified production builds. If verified architectural proof from Retriever is present above, explicitly reference relevant systems proof (e.g. ColBERT token MaxSim, pgvector HNSW, DeBERTa NLI judge, zero-downtime blue/green OCI deployment, sub-300ms latency). {positioning} Include CTA link {targeted_cta}. Sign off from Prateek Sharma.
 2. "linkedin": Write a punchy, personalized LinkedIn connection note strictly UNDER 280 CHARACTERS (character count is crucial for LinkedIn limit). Highlight Prateek's relevant production architecture (prateeq.in) and express eagerness to connect.
-3. "cover_letter": Write a 2-paragraph technical ATS cover letter snippet explaining specifically why Prateek's production systems and forward deployed engineering velocity make him an ideal fit for {company}.
+3. "cover_letter": Write a 2-paragraph technical ATS cover letter snippet explaining specifically why Prateek's production systems and forward deployed engineering velocity make him an ideal fit for {company}. Cite the verified production systems.
 
 Return ONLY valid JSON matching this exact structure:
 {{"email": "...", "linkedin": "...", "cover_letter": "..."}}"""
 
-    gen_text = call_gemini_with_fallback(prompt, preferred_model=config.get("activeModel", "gemini-3.6-flash"), api_key=api_key)
+    gen_text = call_gemini_with_fallback(prompt, preferred_model=config.get("activeModel", "gemini-2.5-flash"), api_key=api_key)
     if gen_text:
         try:
-            clean_json = re.sub(r"^```json\s*", "", gen_text.strip())
+            json_match = re.search(r"(\{.*\})", gen_text, re.DOTALL)
+            raw_json = json_match.group(1) if json_match else gen_text.strip()
+            clean_json = re.sub(r"^```json\s*", "", raw_json.strip())
             clean_json = re.sub(r"\s*```$", "", clean_json.strip())
             parsed = json.loads(clean_json)
             if isinstance(parsed, dict) and "email" in parsed and "linkedin" in parsed:
@@ -1320,16 +1363,17 @@ def render_outreach_tab():
                 for item in all_discovered:
                     lead_payload = {
                         "lead_name": "Hiring Manager / Founder",
-                        "company": item["company"],
-                        "role": item["role"],
-                        "email": item["email"],
-                        "source_url": item["source_url"],
+                        "company": item.get("company") or "Tech Startup",
+                        "role": item.get("role") or "Remote Software Engineer",
+                        "email": item.get("email"),
+                        "source_url": item.get("source_url") or "",
+                        "snippet": item.get("snippet") or "",
                         "ai_generated_pitch": "", # On-demand pitch generation
-                        "quality_score": item["quality_score"],
-                        "intent_source": item["intent_source"],
-                        "lead_type": item.get("lead_type", "job"),
+                        "quality_score": item.get("quality_score", 75),
+                        "intent_source": item.get("intent_source") or "unknown",
+                        "lead_type": item.get("lead_type") or "job",
                         "compensation": item.get("compensation"),
-                        "verification_reason": item["verification_reason"],
+                        "verification_reason": item.get("verification_reason") or "",
                         "status": "shortlisted",
                         "created_at": datetime.utcnow().isoformat()
                     }
@@ -1364,16 +1408,17 @@ def render_outreach_tab():
                 for item in all_tier1:
                     lead_payload = {
                         "lead_name": "Hiring Manager / Founder",
-                        "company": item["company"],
-                        "role": item["role"],
-                        "email": item["email"],
-                        "source_url": item["source_url"],
+                        "company": item.get("company") or "Tech Startup",
+                        "role": item.get("role") or "Remote Software Engineer",
+                        "email": item.get("email"),
+                        "source_url": item.get("source_url") or "",
+                        "snippet": item.get("snippet") or "",
                         "ai_generated_pitch": "",
-                        "quality_score": item["quality_score"],
-                        "intent_source": item["intent_source"],
-                        "lead_type": item.get("lead_type", "job"),
+                        "quality_score": item.get("quality_score", 75),
+                        "intent_source": item.get("intent_source") or "unknown",
+                        "lead_type": item.get("lead_type") or "job",
                         "compensation": item.get("compensation"),
-                        "verification_reason": item["verification_reason"],
+                        "verification_reason": item.get("verification_reason") or "",
                         "status": "shortlisted",
                         "created_at": datetime.utcnow().isoformat()
                     }
@@ -1469,10 +1514,10 @@ def render_outreach_tab():
             sq_low = search_query.lower()
             filtered_shortlist = [
                 l for l in filtered_shortlist
-                if sq_low in l.get("role", "").lower()
-                or sq_low in l.get("company", "").lower()
-                or sq_low in l.get("verification_reason", "").lower()
-                or sq_low in l.get("snippet", "").lower()
+                if sq_low in (l.get("role") or "").lower()
+                or sq_low in (l.get("company") or "").lower()
+                or sq_low in (l.get("verification_reason") or "").lower()
+                or sq_low in (l.get("snippet") or "").lower()
             ]
 
         # Apply comp filter
@@ -1538,21 +1583,24 @@ def render_outreach_tab():
                         with st.expander("⚡ Deep Retriever Cognitive Search (Live VPS)", expanded=False):
                             if st.button("🔍 Run Semantic Match on rag.prateeq.in", key=f"ret_q_{lead_id}"):
                                 with st.spinner("Querying Retriever API..."):
-                                    res = query_retriever_for_job_match(lead.get('role', ''), lead.get('company', ''), lead.get('verification_reason', '') + " " + lead.get('snippet', ''))
+                                    ret_query_ctx = f"{(lead.get('verification_reason') or '')} {(lead.get('snippet') or '')}".strip()
+                                    res = query_retriever_for_job_match(lead.get('role') or '', lead.get('company') or '', ret_query_ctx)
                                     if res and isinstance(res, list) and len(res) > 0 and "error" not in res[0]:
                                         st.success(f"Retriever verified {len(res)} matching architecture knowledge chunks:")
                                         for r in res[:2]:
-                                            st.markdown(f"- **{r.get('document_title', 'Spec')}** (Score: `{round(r.get('score', 0)*100, 1)}%`): {r.get('chunk_text', '')[:250]}...")
+                                            score_val = round(float(r.get('score') or 0), 2)
+                                            st.markdown(f"- **{r.get('document_title', 'Spec')}** (Score: `{score_val}`): {(r.get('chunk_text') or '')[:250]}...")
                                     else:
                                         st.info(f"Retriever query note: {res}")
 
                     with col_act:
                         if st.button("✍️ Draft 3-in-1 Pitch", key=f"draft_{lead_id}", type="primary", use_container_width=True):
                             with st.spinner("Generating 3-in-1 multi-channel pitch (Email, LinkedIn, Cover Letter)..."):
+                                pitch_context = f"{(lead.get('verification_reason') or '')} {(lead.get('snippet') or '')} {(lead.get('company') or '')}".strip()
                                 pitch = generate_tailored_pitch(
-                                    lead.get("company", ""),
-                                    lead.get("role", ""),
-                                    lead.get("verification_reason", "") + " " + lead.get("snippet", "") + " " + lead.get("company", ""),
+                                    lead.get("company") or "",
+                                    lead.get("role") or "",
+                                    pitch_context,
                                     config,
                                     GEMINI_API_KEY,
                                     lead_type=lead_type
@@ -1582,7 +1630,7 @@ def render_outreach_tab():
                 comp_text = f" | 💰 **Pay:** `{comp_str}`" if comp_str else ""
 
                 # Parse multi-channel pitch JSON
-                raw_pitch = lead.get("ai_generated_pitch", "")
+                raw_pitch = lead.get("ai_generated_pitch") or ""
                 pitch_data = {}
                 try:
                     if raw_pitch and raw_pitch.strip().startswith("{"):

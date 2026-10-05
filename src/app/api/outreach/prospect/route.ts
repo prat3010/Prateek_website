@@ -4,6 +4,8 @@ import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
 import { isAdminEmail } from '@/lib/auth';
 import outreachDefaults from '@/data/outreach_defaults.json';
 
+export const maxDuration = 60;
+
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 const MODEL_NAME = outreachDefaults.activeModel || 'gemini-3.6-flash';
@@ -79,22 +81,76 @@ async function searchLiveWeb(query: string): Promise<WebSearchResult[]> {
   }
 }
 
+async function queryRetrieverForProof(queryText: string): Promise<string> {
+  const apiUrl = process.env.NEXT_PUBLIC_RETRIEVER_API_URL || 'https://rag.prateeq.in';
+  const tenantId = process.env.RETRIEVER_PORTFOLIO_TENANT_ID || '6797e2c8-745a-4bd1-aa4c-3854b8d79c22';
+  const apiKey = process.env.RETRIEVER_PORTFOLIO_API_KEY || '';
+
+  if (!apiKey || !tenantId) return '';
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000);
+
+    const res = await fetch(`${apiUrl.replace(/\/$/, '')}/v1/tenants/${tenantId}/search`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+        'X-Tenant-ID': tenantId,
+        'X-User-ID': '00000000-0000-0000-0000-000000000001',
+      },
+      body: JSON.stringify({
+        query: queryText.slice(0, 250),
+        limit: 2,
+        top_k: 2,
+        reranker_engine: 'none',
+      }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+    if (!res.ok) return '';
+
+    const data = await res.json();
+    const results = (data.results || []) as Array<{ content?: string; metadata?: { filename?: string } }>;
+    if (!results.length) return '';
+
+    const chunks = results
+      .filter((r) => r.content)
+      .slice(0, 2)
+      .map(
+        (r, i) =>
+          `[Verified Production Proof ${i + 1} from ${r.metadata?.filename || 'System Architecture'}]:\n${(r.content || '').slice(0, 300).replace(/\n/g, ' ')}`
+      );
+
+    return chunks.length ? `\n\n### VERIFIED PRODUCTION EVIDENCE FROM PRATEEK'S RETRIEVER PLATFORM:\n${chunks.join('\n\n')}` : '';
+  } catch {
+    return '';
+  }
+}
+
 async function callGeminiWithFallback(prompt: string): Promise<string | null> {
   if (!GEMINI_API_KEY) return null;
-  const models = [MODEL_NAME, 'gemini-3.5-flash', 'gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-flash-latest'];
+  const models = [MODEL_NAME, 'gemini-2.5-flash', 'gemini-3.6-flash'];
   const uniqueModels = Array.from(new Set(models));
 
   for (const model of uniqueModels) {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 25000);
+
       const res = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+          signal: controller.signal,
         }
       );
 
+      clearTimeout(timeoutId);
       if (!res.ok) continue;
       const data = await res.json();
       const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -149,18 +205,20 @@ async function generateGeminiPitch(companyName: string, domain: string, snippet:
   if (!GEMINI_API_KEY) return fallbackPitch;
 
   try {
+    const retrieverEvidence = await queryRetrieverForProof(`${companyName} software requirements: ${snippet}`);
     const promptText = `You are writing a B2B outreach pitch as Prateek Sharma (Forward Deployed Engineer & AI Solutions Architect).
 Prateek's Production Background:
 - Retriever AI SaaS: Multi-tenant hybrid search & pgvector RAG platform on Next.js 16 and Supabase with presigned citation downloads and 1-line script embeds.
-- Synchronizer Control Deck: Streamlit management dashboard integrated with Gemini 3.6 Flash for automated skills scanning, certificate analysis, and real-time database sync.
+- Synchronizer Control Deck: Streamlit management dashboard integrated with Gemini 2.5 Flash for automated skills scanning, certificate analysis, and real-time database sync.
 - Client Workspace Dashboard: Google OAuth 2.0 workspace with interactive milestone tracking, Razorpay payment processing, and dynamic commercial PDF proposal exports.
 - Portfolio & Telemetry Engine: Next.js 16 edge proxy architecture with sub-100ms SQL telemetry aggregations.
+${retrieverEvidence}
 
 Client Information:
 Company=${companyName}, Domain=${domain}, Snippet=${snippet}.
 
 Rules:
-1. Write a 3-sentence, hyper-personalized pitch connecting their hiring needs to Prateek's real production builds.
+1. Write a 3-sentence, hyper-personalized pitch connecting their hiring needs to Prateek's real production builds. If verified architectural proof from Retriever is present above, explicitly reference relevant systems proof (e.g. ColBERT token MaxSim, pgvector HNSW, DeBERTa NLI judge, zero-downtime blue/green OCI deployment, sub-300ms latency).
 2. Position Prateek as a Forward Deployed Engineer who builds custom AI solutions and full-stack software.
 3. Include the CTA deep link: ${ctaLink}
 4. Sign off from Prateek Sharma.
@@ -224,6 +282,9 @@ export async function POST(req: NextRequest) {
             quality_score: evaluation.quality_score,
             intent_source: evaluation.source_type,
             verification_reason: evaluation.reason,
+            snippet: res.snippet || '',
+            lead_type: 'client',
+            compensation: null,
           });
 
           if (prospectsToInsert.length >= (outreachDefaults.maxLeadsPerRun || 5)) break;
@@ -243,6 +304,9 @@ export async function POST(req: NextRequest) {
         quality_score: 90,
         intent_source: 'b2b_agency',
         verification_reason: 'Verified fallback lead',
+        snippet: 'Custom digital software & AI development',
+        lead_type: 'client',
+        compensation: null,
       });
     }
 
@@ -260,6 +324,9 @@ export async function POST(req: NextRequest) {
           quality_score: lead.quality_score,
           intent_source: lead.intent_source,
           verification_reason: lead.verification_reason,
+          snippet: lead.snippet || '',
+          lead_type: lead.lead_type || 'client',
+          compensation: lead.compensation || null,
           status: 'pending',
         })
         .select('*')

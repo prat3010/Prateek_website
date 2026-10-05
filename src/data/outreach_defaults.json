@@ -1,5 +1,5 @@
 {
-  "activeModel": "gemini-3.6-flash",
+  "activeModel": "gemini-2.5-flash",
   "minQualityScore": 75,
   "maxLeadsPerRun": 25,
   "ctaDeepLink": "https://prateeq.in/scoping?engine=saas",
