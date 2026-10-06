@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import type { InvoiceEntity } from '@/lib/clientOrder';
 import { generateInvoicePDF } from '@/utils/pdfGenerator';
 
@@ -75,7 +76,7 @@ export function useDashboardInvoices({
       generateInvoicePDF(inv);
     } catch (err) {
       console.error('Invoice PDF download error:', err);
-      alert('Failed to generate Invoice PDF.');
+      toast.error('Failed to generate Invoice PDF.');
     }
   };
 

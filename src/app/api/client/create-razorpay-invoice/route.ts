@@ -11,7 +11,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized: valid session required.' }, { status: 401 });
     }
 
-    const payload: CreateInvoiceInput = await req.json();
+    const rawPayload = await req.json();
+    const payload: CreateInvoiceInput & { notes?: string; terms?: string } = rawPayload;
 
     if (!payload.customer_name || !payload.customer_email) {
       return NextResponse.json(
@@ -41,8 +42,8 @@ export async function POST(req: Request) {
     const expiryDateIso = payload.expiry_date || new Date(Date.now() + 14 * 86400 * 1000).toISOString();
 
     // Notes and terms truncation to max 2048 chars per Razorpay spec
-    const customerNotes = (payload.customer_notes || '').slice(0, 2048);
-    const termsAndConditions = (payload.terms_and_conditions || '').slice(0, 2048);
+    const customerNotes = (payload.customer_notes || payload.notes || '').slice(0, 2048);
+    const termsAndConditions = (payload.terms_and_conditions || payload.terms || '').slice(0, 2048);
 
     let scopeId: string | null = null;
     let clientId: string | null = null;

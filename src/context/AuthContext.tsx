@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { User, Session } from '@supabase/supabase-js';
 import { supabaseAuth, signInWithGoogle, signOut, universalStorage } from '@/lib/auth';
+import { toast } from 'sonner';
 
 interface AuthContextType {
   user: User | null;
@@ -96,9 +97,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (errorDesc) {
         const decoded = decodeURIComponent(errorDesc).replace(/\+/g, ' ');
         console.error('Supabase OAuth Return Error:', decoded);
-        alert(`Google Sign-In Notice: ${decoded}`);
+        if (typeof window !== 'undefined') {
+          toast.error(`Google Sign-In Notice: ${decoded}`);
+        }
         try {
-          window.history.replaceState(null, '', window.location.pathname);
+          const cleanUrl = new URL(window.location.href);
+          cleanUrl.searchParams.delete('error');
+          cleanUrl.searchParams.delete('error_description');
+          window.history.replaceState(null, '', cleanUrl.pathname + (cleanUrl.search ? cleanUrl.search : ''));
         } catch {}
         if (mounted) {
           setSession(null);
@@ -122,7 +128,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               setLoading(false);
             }
             try {
-              window.history.replaceState(null, '', window.location.pathname);
+              const cleanUrl = new URL(window.location.href);
+              cleanUrl.searchParams.delete('code');
+              window.history.replaceState(null, '', cleanUrl.pathname + (cleanUrl.search ? cleanUrl.search : ''));
             } catch {}
             return;
           } else if (error) {
@@ -150,7 +158,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               setLoading(false);
             }
             try {
-              window.history.replaceState(null, '', window.location.pathname);
+              window.history.replaceState(null, '', window.location.pathname + (window.location.search ? window.location.search : ''));
             } catch {}
             return;
           }
@@ -182,7 +190,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } finally {
         if (searchParams.has('code') || hashParams.has('access_token')) {
           try {
-            window.history.replaceState(null, '', window.location.pathname);
+            const cleanUrl = new URL(window.location.href);
+            cleanUrl.searchParams.delete('code');
+            cleanUrl.hash = '';
+            window.history.replaceState(null, '', cleanUrl.pathname + (cleanUrl.search ? cleanUrl.search : ''));
           } catch {}
         }
         if (mounted) setLoading(false);

@@ -33,7 +33,6 @@ import { formatPricePair, type Currency } from '@/lib/pricing';
 import { QUICK_CATEGORIES } from './IntakeForm';
 import styles from './IntakeForm.module.css';
 import type { User } from '@supabase/supabase-js';
-import { signInWithGoogle } from '@/lib/auth';
 
 const getQuickServiceIcon = (id: string): React.ReactNode => {
   switch (id) {
@@ -121,6 +120,7 @@ interface QuickServiceFlowProps {
   setPopoverAnchor: (anchor: { x: number; y: number } | null) => void;
   onResetServiceType: () => void;
   onQuickSubmit: () => void;
+  onQuickFastPass: () => Promise<void>;
   onDownloadPDF: () => void;
   togglePopover: (e: React.MouseEvent, id: string) => void;
 }
@@ -147,6 +147,7 @@ export function QuickServiceFlow({
   setPopoverAnchor,
   onResetServiceType,
   onQuickSubmit,
+  onQuickFastPass,
   onDownloadPDF,
   togglePopover,
 }: QuickServiceFlowProps) {
@@ -509,12 +510,13 @@ export function QuickServiceFlow({
               {!user && (
                 <button
                   type="button"
-                  onClick={() => signInWithGoogle('/dashboard?imported=true')}
-                  className={`${styles.btn} ${styles.googleFastPassBtn}`}
+                  onClick={onQuickFastPass}
+                  disabled={submitting}
+                  className={`${styles.btn} ${styles.googleFastPassBtn} ${submitting ? styles.btnDisabled : ''}`}
                   title="Fast-pass: Sign in with Google to automatically save your scope"
                 >
                   <Rocket size={16} />
-                  <span>1-CLICK GOOGLE FAST-PASS</span>
+                  <span>{submitting ? 'CONNECTING...' : '1-CLICK GOOGLE FAST-PASS'}</span>
                 </button>
               )}
 

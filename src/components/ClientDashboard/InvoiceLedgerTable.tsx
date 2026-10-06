@@ -9,6 +9,7 @@ import styles from '@/app/dashboard/dashboard.module.css';
 interface InvoiceLedgerTableProps {
   invoices: InvoiceEntity[];
   isLoading: boolean;
+  payingInvoiceId?: string | null;
   onOpenCreateModal: () => void;
   onDownloadPdf: (invoice: InvoiceEntity) => void;
   onPayInvoice: (invoice: InvoiceEntity) => void;
@@ -18,6 +19,7 @@ interface InvoiceLedgerTableProps {
 export function InvoiceLedgerTable({
   invoices,
   isLoading,
+  payingInvoiceId,
   onOpenCreateModal,
   onDownloadPdf,
   onPayInvoice,
@@ -160,10 +162,11 @@ export function InvoiceLedgerTable({
                         {!isPaid && (
                           <button
                             type="button"
-                            className={styles.payMiniBtn}
+                            className={`${styles.payMiniBtn} ${payingInvoiceId === inv.id ? styles.btnDisabled : ''}`}
                             onClick={() => onPayInvoice(inv)}
+                            disabled={payingInvoiceId === inv.id}
                           >
-                            <CreditCard size={14} /> Pay
+                            <CreditCard size={14} /> {payingInvoiceId === inv.id ? 'Loading...' : 'Pay'}
                           </button>
                         )}
                       </div>

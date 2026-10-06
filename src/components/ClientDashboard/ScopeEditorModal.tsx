@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 
 
 import { X, Sparkles, Sliders, CheckCircle2 } from 'lucide-react';
+import { toast } from 'sonner';
 import Portal from '@/components/ui/Portal';
 import { DependencyCascadeModal } from '@/components/Intake/DependencyCascadeModal';
 import intakeDefaults from '@/data/intakeQuestionnaireDefaults.json';
@@ -99,6 +100,7 @@ function ScopeEditorModalInner({
   // Dependency Cascade Modal State
   const [cascadeTarget, setCascadeTarget] = useState<FeatureItem | null>(null);
   const [cascadeDependents, setCascadeDependents] = useState<FeatureItem[]>([]);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
 
   const custQuote = useMemo(() => {
     return calcQuote(
@@ -178,23 +180,32 @@ function ScopeEditorModalInner({
 
   const handleSave = async () => {
     if (!scope.deposit_paid) {
-      const updatedScope: ClientScope = {
-        ...scope,
-        base_engine: custQuote.engine?.title || scope.base_engine,
-        features: custQuote.features.map((f) => f.label),
-        brand_asset: custQuote.brandAsset?.label || scope.brand_asset,
-        maintenance_plan: custQuote.maintenancePlan?.name || scope.maintenance_plan,
-        total_cost_inr: custQuote.netTotalINR,
-        total_cost_usd: custQuote.netTotalUSD,
-        currency: custCurrency,
-        metadata: {
-          ...scope.metadata,
-          engineId: custEngineId,
-          featureIds: custFeatureIds,
-        },
-      };
-      await onSaveDraft(updatedScope);
-      onClose();
+      setIsSavingDraft(true);
+      try {
+        const updatedScope: ClientScope = {
+          ...scope,
+          base_engine: custQuote.engine?.title || scope.base_engine,
+          features: custQuote.features.map((f) => f.label),
+          brand_asset: custQuote.brandAsset?.label || scope.brand_asset,
+          maintenance_plan: custQuote.maintenancePlan?.name || scope.maintenance_plan,
+          total_cost_inr: custQuote.netTotalINR,
+          total_cost_usd: custQuote.netTotalUSD,
+          currency: custCurrency,
+          metadata: {
+            ...scope.metadata,
+            engineId: custEngineId,
+            featureIds: custFeatureIds,
+          },
+        };
+        await onSaveDraft(updatedScope);
+        toast.success('Scope architecture draft saved successfully!');
+        onClose();
+      } catch (err) {
+        console.error('Failed to save scope draft:', err);
+        toast.error('Failed to save scope draft changes.');
+      } finally {
+        setIsSavingDraft(false);
+      }
     } else {
       const baselineFeatureIds = intakeDefaults.features
         .filter((f) =>
@@ -410,10 +421,12 @@ function ScopeEditorModalInner({
             <button
               className={styles.confirmBtn}
               onClick={handleSave}
-              disabled={isSubmittingChangeOrder}
+              disabled={isSubmittingChangeOrder || isSavingDraft}
             >
               {isSubmittingChangeOrder ? (
                 'Submitting Change Order...'
+              ) : isSavingDraft ? (
+                'Saving Architecture...'
               ) : scope.deposit_paid ? (
                 <>
                   <Sparkles size={16} /> Submit Phase 2 Change Order

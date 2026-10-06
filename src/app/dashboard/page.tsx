@@ -14,7 +14,8 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { generateQuestionnairePDF, generateExecutiveBriefPDF } from '@/utils/pdfGenerator';
-import type { ClientScope } from '@/lib/clientOrder';
+import type { ClientScope, InvoiceEntity } from '@/lib/clientOrder';
+import { toast } from 'sonner';
 
 import resumeData from '@/data/resume.json';
 import type { ResumeData } from '@/data/resume';
@@ -48,6 +49,60 @@ export default function ClientDashboardPage() {
     }
   }, [user, loading, router]);
 
+  const [pendingScopePreview] = useState<{
+    scopeCode?: string;
+    companyName?: string;
+    baseEngineTitle?: string;
+  } | null>(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const raw = localStorage.getItem('prateeq_pending_scope');
+      if (raw) return JSON.parse(raw);
+    } catch {}
+    const match = document.cookie.match(new RegExp('(?:^|; )' + encodeURIComponent('prateeq_pending_scope') + '=([^;]*)'));
+    if (match) {
+      try { return JSON.parse(decodeURIComponent(match[1])); } catch {}
+    }
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('scopeCode') || params.get('engine')) {
+      return {
+        scopeCode: params.get('scopeCode') || undefined,
+        companyName: params.get('company') || undefined,
+        baseEngineTitle: params.get('engine') || undefined,
+      };
+    }
+    return null;
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+
+      const params = new URLSearchParams(window.location.search);
+      const err = params.get('error');
+      if (err) {
+        toast.error(`Authentication Notice: ${decodeURIComponent(err)}`);
+        const url = new URL(window.location.href);
+        url.searchParams.delete('error');
+        window.history.replaceState({}, '', url.pathname + (url.search ? url.search : ''));
+      }
+      const imported = params.get('imported');
+      if (imported === 'true') {
+        const scopeCode = params.get('scopeCode');
+        toast.success(scopeCode ? `🎉 Scope ${scopeCode} successfully synced to your workspace!` : '🎉 Scoping brief successfully synced to your workspace!');
+        const url = new URL(window.location.href);
+        url.searchParams.delete('imported');
+        url.searchParams.delete('scopeCode');
+        url.searchParams.delete('company');
+        url.searchParams.delete('engine');
+        url.searchParams.delete('currency');
+        url.searchParams.delete('costINR');
+        url.searchParams.delete('costUSD');
+        url.searchParams.delete('features');
+        window.history.replaceState({}, '', url.pathname + (url.search ? url.search : ''));
+      }
+    }
+  }, []);
+
   const [activeTab, setActiveTab] = useState<'scopes' | 'onboarding' | 'invoices'>('scopes');
   const [authGateError, setAuthGateError] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
@@ -59,6 +114,7 @@ export default function ClientDashboardPage() {
   const [downloadingPdfFormat, setDownloadingPdfFormat] = useState<'exec' | 'sow' | null>(null);
   const [stagingPreviewScope, setStagingPreviewScope] = useState<ClientScope | null>(null);
   const [isSubmittingChangeOrder, setIsSubmittingChangeOrder] = useState(false);
+  const [payingInvoiceId, setPayingInvoiceId] = useState<string | null>(null);
 
   // Scopes & Invoices Data Hooks
   const {
@@ -66,10 +122,10 @@ export default function ClientDashboardPage() {
     setScopes,
     scopeChangeOrders,
     isLoading: isScopesLoading,
+    saveScopeToDatabase,
     loadChangeOrders,
     handleDeleteScope,
     updateScope,
-
   } = useDashboardScopes({
     userEmail: user?.email,
     getAccessToken,
@@ -78,6 +134,7 @@ export default function ClientDashboardPage() {
 
   const {
     invoices,
+    setInvoices,
     isInvoiceLoading,
     showInvoiceModal,
     setShowInvoiceModal,
@@ -95,6 +152,13 @@ export default function ClientDashboardPage() {
       if (typeof window === 'undefined') return resolve(false);
       if (window.Razorpay) return resolve(true);
 
+      const existingScript = document.querySelector('script[src*="checkout.razorpay.com"]');
+      if (existingScript) {
+        existingScript.addEventListener('load', () => resolve(true));
+        existingScript.addEventListener('error', () => resolve(false));
+        return;
+      }
+
       const script = document.createElement('script');
       script.src = 'https://checkout.razorpay.com/v1/checkout.js';
       script.onload = () => resolve(true);
@@ -103,13 +167,21 @@ export default function ClientDashboardPage() {
     });
   };
 
-  const handleRazorpayCheckout = async (scope: ClientScope) => {
+  const handleRazorpayCheckout = async (scope: ClientScope, paymentStructure?: '50/50' | '40/30/30') => {
     try {
+      // Ensure scope is persisted to database before initiating payment
+      await saveScopeToDatabase(scope);
+
       const isLoaded = await loadRazorpayScript();
       if (!isLoaded) {
-        alert('Could not load Razorpay checkout SDK. Please check your network connection.');
+        toast.error('Could not load Razorpay checkout SDK. Please check your network connection.');
         return;
       }
+
+      const selectedStructure = paymentStructure || scope.payment_structure || '50/50';
+      const isThreePart = selectedStructure === '40/30/30';
+      const pct = isThreePart ? 0.4 : 0.5;
+      const pctText = isThreePart ? '40%' : '50%';
 
       const accessToken = await getAccessToken();
       const res = await fetch('/api/client/create-razorpay-order', {
@@ -124,12 +196,13 @@ export default function ClientDashboardPage() {
           totalCostUSD: scope.total_cost_usd,
           currency: scope.currency,
           companyName: scope.company_name,
+          paymentStructure: selectedStructure,
         }),
       });
 
       if (!res.ok) {
         const errJson = await res.json().catch(() => ({}));
-        alert(`Order Creation Error: ${errJson.error || 'Failed to initialize payment'}`);
+        toast.error(`Order Creation Error: ${errJson.error || 'Failed to initialize payment'}`);
         return;
       }
 
@@ -138,11 +211,11 @@ export default function ClientDashboardPage() {
       if (orderData.isMock) {
         const depositDisplay =
           scope.currency === 'INR'
-            ? `₹${Math.round(scope.total_cost_inr * 0.5).toLocaleString('en-IN')}`
-            : `$${Math.round(scope.total_cost_usd * 0.5).toLocaleString('en-US')}`;
+            ? `₹${Math.round(scope.total_cost_inr * pct).toLocaleString('en-IN')}`
+            : `$${Math.round(scope.total_cost_usd * pct).toLocaleString('en-US')}`;
 
         const confirmSimulated = window.confirm(
-          `⚡ Razorpay Sandbox Mode (Offline Dev Server):\n\nSimulate successful 50% deposit lock (${depositDisplay}) for Scope ${scope.scope_code}?`
+          `⚡ Razorpay Sandbox Mode (Offline Dev Server):\n\nSimulate successful ${pctText} deposit lock (${depositDisplay}) for Scope ${scope.scope_code}?`
         );
 
         if (confirmSimulated) {
@@ -170,6 +243,7 @@ export default function ClientDashboardPage() {
                     ? {
                         ...s,
                         deposit_paid: true,
+                        payment_structure: selectedStructure,
                         delivery_stage: 'engineering',
                         status: 'Active Sprint — In Engineering',
                         sow_hash: verifyData.sowHash || s.sow_hash,
@@ -177,7 +251,8 @@ export default function ClientDashboardPage() {
                     : s
                 )
               );
-              alert('🎉 50% Deposit confirmed! Scope has moved to Core Engineering sprint.');
+              await loadInvoices();
+              toast.success(`🎉 ${pctText} Deposit confirmed! Scope has moved to Core Engineering sprint.`);
             }
           } catch (verErr) {
             console.error('Mock verification error:', verErr);
@@ -187,7 +262,7 @@ export default function ClientDashboardPage() {
       }
 
       if (typeof window === 'undefined' || !window.Razorpay) {
-        alert('Payment gateway script failed to load. Please refresh and try again.');
+        toast.error('Payment gateway script failed to load. Please refresh and try again.');
         return;
       }
 
@@ -197,7 +272,7 @@ export default function ClientDashboardPage() {
         amount: orderData.amount,
         currency: orderData.currency,
         name: 'Prateeq Studio',
-        description: `50% Milestone Deposit for Scope #${scope.scope_code}`,
+        description: `${pctText} Milestone Deposit for Scope #${scope.scope_code}`,
         order_id: orderData.orderId,
         handler: async (response: Record<string, string>) => {
           try {
@@ -224,6 +299,7 @@ export default function ClientDashboardPage() {
                     ? {
                         ...s,
                         deposit_paid: true,
+                        payment_structure: selectedStructure,
                         delivery_stage: 'engineering',
                         status: 'Active Sprint — In Engineering',
                         sow_hash: verifyData.sowHash || s.sow_hash,
@@ -231,9 +307,10 @@ export default function ClientDashboardPage() {
                     : s
                 )
               );
-              alert('🎉 Deposit captured! Sprint milestone is now unlocked.');
+              await loadInvoices();
+              toast.success('🎉 Deposit captured! Sprint milestone is now unlocked.');
             } else {
-              alert('Payment signature verification failed. Please contact engineering support.');
+              toast.error('Payment signature verification failed. Please contact engineering support.');
             }
           } catch (verErr) {
             console.error('Verification network error:', verErr);
@@ -245,11 +322,184 @@ export default function ClientDashboardPage() {
           contact: scope.client_phone || '',
         },
         theme: { color: '#00f0ff' },
+        modal: {
+          ondismiss: () => {
+            toast.info('Deposit payment window closed. Scope remains saved in draft.');
+          },
+        },
       });
 
       rzp.open();
     } catch (err) {
       console.error('Checkout launch error:', err);
+    }
+  };
+
+  const handlePayInvoice = async (invoice: InvoiceEntity) => {
+    if (invoice.payment_status === 'paid') {
+      toast.info('This invoice has already been settled.');
+      return;
+    }
+
+    if (invoice.payment_url) {
+      window.open(invoice.payment_url, '_blank');
+      return;
+    }
+
+    setPayingInvoiceId(invoice.id);
+    try {
+      const isLoaded = await loadRazorpayScript();
+      if (!isLoaded) {
+        toast.error('Could not load Razorpay checkout SDK. Please check your network connection.');
+        setPayingInvoiceId(null);
+        return;
+      }
+
+      const accessToken = await getAccessToken();
+      const res = await fetch('/api/client/create-razorpay-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
+        body: JSON.stringify({
+          invoiceId: invoice.id,
+          invoiceNumber: invoice.invoice_number,
+        }),
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        toast.error(`Invoice Checkout Error: ${errJson.error || 'Failed to initialize payment'}`);
+        setPayingInvoiceId(null);
+        return;
+      }
+
+      const orderData = await res.json();
+
+      if (orderData.isMock) {
+        try {
+          const amountDisplay =
+            invoice.currency === 'INR'
+              ? `₹${Number(invoice.amount).toLocaleString('en-IN')}`
+              : `$${Number(invoice.amount).toLocaleString('en-US')}`;
+
+          const confirmSimulated = window.confirm(
+            `⚡ Razorpay Sandbox Mode (Offline Dev Server):\n\nSimulate settling Invoice #${invoice.invoice_number} (${amountDisplay})?`
+          );
+
+          if (confirmSimulated) {
+            try {
+              const token = await getAccessToken();
+              const verifyRes = await fetch('/api/client/verify-razorpay-payment', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                },
+                body: JSON.stringify({
+                  invoiceId: invoice.id,
+                  invoiceNumber: invoice.invoice_number,
+                  razorpayOrderId: orderData.orderId,
+                  razorpayPaymentId: `pay_mock_${Date.now()}`,
+                  razorpaySignature: 'mock_signature_dev_pass',
+                }),
+              });
+
+              if (verifyRes.ok) {
+                setInvoices((prev) =>
+                  prev.map((inv) =>
+                    inv.id === invoice.id || inv.invoice_number === invoice.invoice_number
+                      ? { ...inv, payment_status: 'paid' }
+                      : inv
+                  )
+                );
+                await loadInvoices();
+                toast.success(`🎉 Invoice #${invoice.invoice_number} settled successfully!`);
+              } else {
+                const err = await verifyRes.json().catch(() => ({}));
+                toast.error(`Verification failed: ${err.error || 'Unknown error'}`);
+              }
+            } catch (verErr) {
+              console.error('Mock invoice verification error:', verErr);
+            }
+          }
+        } finally {
+          setPayingInvoiceId(null);
+        }
+        return;
+      }
+
+      if (typeof window === 'undefined' || !window.Razorpay) {
+        toast.error('Payment gateway script failed to load. Please refresh and try again.');
+        setPayingInvoiceId(null);
+        return;
+      }
+
+      const RazorpayClass = window.Razorpay;
+      const rzp = new RazorpayClass({
+        key: orderData.keyId,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'Prateeq Studio',
+        description: `Settlement for Invoice #${invoice.invoice_number}`,
+        order_id: orderData.orderId,
+        handler: async (response: Record<string, string>) => {
+          try {
+            const token = await getAccessToken();
+            const verifyRes = await fetch('/api/client/verify-razorpay-payment', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              },
+              body: JSON.stringify({
+                invoiceId: invoice.id,
+                invoiceNumber: invoice.invoice_number,
+                razorpayOrderId: response.razorpay_order_id,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpaySignature: response.razorpay_signature,
+              }),
+            });
+
+            if (verifyRes.ok) {
+              setInvoices((prev) =>
+                prev.map((inv) =>
+                  inv.id === invoice.id || inv.invoice_number === invoice.invoice_number
+                    ? { ...inv, payment_status: 'paid' }
+                    : inv
+                )
+              );
+              await loadInvoices();
+              toast.success(`🎉 Invoice #${invoice.invoice_number} paid successfully!`);
+            } else {
+              toast.error('Payment signature verification failed. Please contact engineering support.');
+            }
+          } catch (verErr) {
+            console.error('Invoice verification network error:', verErr);
+          } finally {
+            setPayingInvoiceId(null);
+          }
+        },
+        prefill: {
+          name: invoice.customer_name || user?.user_metadata?.full_name || '',
+          email: invoice.customer_email || user?.email || '',
+          contact: invoice.customer_phone || '',
+        },
+        theme: { color: '#00f0ff' },
+        modal: {
+          ondismiss: () => {
+            setPayingInvoiceId(null);
+            toast.info('Invoice payment window closed.');
+          },
+        },
+      });
+
+      rzp.open();
+    } catch (checkoutErr) {
+      console.error('Invoice payment gateway error:', checkoutErr);
+      toast.error('Failed to launch invoice payment gateway.');
+      setPayingInvoiceId(null);
     }
   };
 
@@ -284,14 +534,14 @@ export default function ClientDashboardPage() {
         await loadChangeOrders(scope.scope_code);
         await loadInvoices();
         setCustomizingScope(null);
-        alert('✅ Phase 2 Change Order submitted and added to Invoices ledger!');
+        toast.success('✅ Phase 2 Change Order submitted and added to Invoices ledger!');
       } else {
         const errData = await res.json().catch(() => ({}));
-        alert(`Change Order Error: ${errData.error || 'Failed to create change order'}`);
+        toast.error(`Change Order Error: ${errData.error || 'Failed to create change order'}`);
       }
     } catch (err) {
       console.error('Change order submit error:', err);
-      alert('Failed to submit change order.');
+      toast.error('Failed to submit change order.');
     } finally {
       setIsSubmittingChangeOrder(false);
     }
@@ -326,7 +576,7 @@ export default function ClientDashboardPage() {
       setProposalSuiteScope(null);
     } catch (pdfErr) {
       console.error('Executive PDF export error:', pdfErr);
-      alert('Could not generate Executive Brief PDF.');
+      toast.error('Could not generate Executive Brief PDF.');
     } finally {
       setDownloadingPdfFormat(null);
     }
@@ -360,7 +610,7 @@ export default function ClientDashboardPage() {
       setProposalSuiteScope(null);
     } catch (pdfErr) {
       console.error('Master SOW PDF export error:', pdfErr);
-      alert('Could not generate Master SOW PDF.');
+      toast.error('Could not generate Master SOW PDF.');
     } finally {
       setDownloadingPdfFormat(null);
     }
@@ -390,7 +640,24 @@ export default function ClientDashboardPage() {
         <div className={styles.authCard}>
           <ShieldCheck size={48} className={styles.authIcon} />
           <h2>Client Workspace Authentication</h2>
-          <p>Sign in with your verified Google account to view active project scopes, invoices, and sprint progress.</p>
+          {pendingScopePreview ? (
+            <div className={styles.pendingScopeNotice}>
+              <div className={styles.pendingScopeBadge}>Pending Scope Detected</div>
+              <div className={styles.pendingScopeInfo}>
+                <span className={styles.pendingScopeCode}>
+                  {pendingScopePreview.scopeCode || 'Custom Scope Architecture'}
+                </span>
+                <span className={styles.pendingScopeDetails}>
+                  {pendingScopePreview.companyName || pendingScopePreview.baseEngineTitle || 'Custom Technical Specification'}
+                </span>
+              </div>
+              <p className={styles.pendingScopeHint}>
+                Sign in with Google below to securely link and save this scope to your permanent client workspace.
+              </p>
+            </div>
+          ) : (
+            <p>Sign in with your verified Google account to view active project scopes, invoices, and sprint progress.</p>
+          )}
           <button className={styles.googleSignInBtn} onClick={() => loginWithGoogle()}>
             <svg width="18" height="18" viewBox="0 0 24 24">
               <path
@@ -530,9 +797,10 @@ export default function ClientDashboardPage() {
         <InvoiceLedgerTable
           invoices={invoices}
           isLoading={isInvoiceLoading}
+          payingInvoiceId={payingInvoiceId}
           onOpenCreateModal={() => setShowInvoiceModal(true)}
           onDownloadPdf={handleDownloadInvoicePdf}
-          onPayInvoice={(inv) => alert(`Direct checkout for invoice #${inv.invoice_number} initiated!`)}
+          onPayInvoice={handlePayInvoice}
           onRefresh={loadInvoices}
         />
       )}
@@ -552,9 +820,12 @@ export default function ClientDashboardPage() {
         isOpen={Boolean(signingScope)}
         userEmail={user.email || ''}
         onClose={() => setSigningScope(null)}
-        onConfirmAndPay={async (s) => {
-          setSigningScope(null);
-          await handleRazorpayCheckout(s);
+        onConfirmAndPay={async (s, structure) => {
+          try {
+            await handleRazorpayCheckout(s, structure);
+          } finally {
+            setSigningScope(null);
+          }
         }}
       />
 
@@ -577,6 +848,8 @@ export default function ClientDashboardPage() {
         onClose={() => setShowInvoiceModal(false)}
         getAccessToken={getAccessToken}
         onInvoiceCreated={handleInvoiceCreated}
+        defaultCustomerName={user.user_metadata?.full_name || ''}
+        defaultCustomerEmail={user.email || ''}
       />
 
       {/* Persistent Client Project Copilot Assistant */}

@@ -32,11 +32,13 @@ interface ClientLayoutProps {
 function ClientLayoutContent({ 
   children, 
   isStandaloneAppRoute,
+  isHomeRoute,
   isKonamiActive,
   profile
 }: { 
   children: React.ReactNode; 
   isStandaloneAppRoute: boolean;
+  isHomeRoute: boolean;
   isKonamiActive: boolean; 
   profile?: ResumeData | null;
 }) {
@@ -50,7 +52,7 @@ function ClientLayoutContent({
         {!isStandaloneAppRoute && <CursorTrail />}
         <Navbar />
         
-        {audience === null ? (
+        {audience === null && isHomeRoute ? (
           <OnboardingSelector />
         ) : (
           <main id="main-content">{children}</main>
@@ -74,6 +76,7 @@ export default function ClientLayout({
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith('/admin');
   const isStandaloneAppRoute = isAdminRoute || pathname === '/rag/app';
+  const isHomeRoute = !pathname || pathname === '/';
   const [isKonamiActive, setIsKonamiActive] = useState(false);
 
   // Konami Code global listener
@@ -156,7 +159,7 @@ export default function ClientLayout({
     <AuthProvider>
       <ThemeProvider initialTheme={initialTheme} initialAudience={initialAudience} initialRegion={initialRegion}>
         <LazyMotion features={domAnimation}>
-          <ClientLayoutContent isStandaloneAppRoute={isStandaloneAppRoute} isKonamiActive={isKonamiActive} profile={profile}>
+          <ClientLayoutContent isStandaloneAppRoute={isStandaloneAppRoute} isHomeRoute={isHomeRoute} isKonamiActive={isKonamiActive} profile={profile}>
             {children}
           </ClientLayoutContent>
         </LazyMotion>

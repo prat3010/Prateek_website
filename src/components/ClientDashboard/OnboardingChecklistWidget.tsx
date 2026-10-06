@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { UserCheck, Save } from 'lucide-react';
+import { toast } from 'sonner';
 import { generateOnboardingChecklist, calcOnboardingReadiness } from '@/lib/onboardingChecklist';
 import type { ClientScope } from '@/lib/clientOrder';
 import styles from '@/app/dashboard/dashboard.module.css';
@@ -71,7 +72,7 @@ export function OnboardingChecklistWidget({
         client_phone: newPhone,
       };
       await onUpdateScope(updatedScope);
-      alert('✅ Client Profile details saved!');
+      toast.success('Client profile details saved successfully!');
     } finally {
       setIsSaving(false);
     }

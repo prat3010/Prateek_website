@@ -24,7 +24,6 @@ import {
   formatPricePair,
   resolveFeatureDependencies,
 } from '@/lib/pricing';
-import { signInWithGoogle } from '@/lib/auth';
 import { useLenis } from 'lenis/react';
 
 import { useIntakeFormState, type IntakePreset } from './useIntakeFormState';
@@ -168,6 +167,9 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     applyBlueprint,
     handleSubmitOnline,
     handleQuickSubmit,
+    handleFastPass,
+    handleQuickFastPass,
+    handleProceedToDashboard,
   } = state;
 
   useEffect(() => {
@@ -361,13 +363,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
 
                 <button
                   type="button"
-                  onClick={() => {
-                    if (user?.email) {
-                      window.location.href = '/dashboard?imported=true';
-                    } else {
-                      signInWithGoogle('/dashboard?imported=true');
-                    }
-                  }}
+                  onClick={handleProceedToDashboard}
                   className={`${styles.btn} ${styles.btnPrimary}`}
                 >
                   <span>CONTINUE TO DASHBOARD</span>
@@ -400,6 +396,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
               setPopoverAnchor={setPopoverAnchor}
               onResetServiceType={resetServiceType}
               onQuickSubmit={handleQuickSubmit}
+              onQuickFastPass={handleQuickFastPass}
               onDownloadPDF={handleDownloadQuickPDF}
               togglePopover={togglePopover}
             />
@@ -614,7 +611,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                         {!user && !authLoading && (
                           <button
                             type="button"
-                            onClick={() => signInWithGoogle()}
+                            onClick={handleFastPass}
                             className={`${styles.btn} ${styles.googleFastPassBtn}`}
                             title="Fast-pass: Sign in with Google to automatically save your scope to your client dashboard"
                           >

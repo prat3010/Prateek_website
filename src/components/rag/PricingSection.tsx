@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { m } from "framer-motion";
 import NumberFlow from "@number-flow/react";
 import { useAuth } from "@/context/AuthContext";
@@ -200,7 +201,7 @@ export function PricingSection() {
     });
   };
 
-  const handleSubscribe = async (plan: PlanItem) => {
+  const handleSubscribe = useCallback(async (plan: PlanItem) => {
     // 1. Starter tier: Zero-CC instant sandbox
     if (plan.id.includes("starter") || plan.name.toLowerCase() === "starter") {
       if (user) {
@@ -213,7 +214,7 @@ export function PricingSection() {
 
     // 2. Paid tiers (Pro / Business): Ensure authenticated first
     if (!user) {
-      await loginWithGoogle(`/rag#pricing?plan=${plan.planId || plan.id}`);
+      await loginWithGoogle(`/rag?plan=${encodeURIComponent(plan.planId || plan.id)}#pricing`);
       return;
     }
 
@@ -221,7 +222,7 @@ export function PricingSection() {
       setLoadingPlanId(plan.id);
       const isLoaded = await loadRazorpayScript();
       if (!isLoaded) {
-        alert("Could not load Razorpay checkout SDK. Please check your connection.");
+        toast.error("Could not load Razorpay checkout SDK. Please check your connection.");
         setLoadingPlanId(null);
         return;
       }
@@ -238,7 +239,7 @@ export function PricingSection() {
 
       const data = await res.json();
       if (!res.ok || data.error) {
-        alert(data.error || "Failed to initialize subscription.");
+        toast.error(data.error || "Failed to initialize subscription.");
         setLoadingPlanId(null);
         return;
       }
@@ -310,11 +311,36 @@ export function PricingSection() {
       rzp.open();
     } catch (err) {
       console.error("Subscription launch error:", err);
-      alert("An unexpected error occurred while launching checkout.");
+      toast.error("An unexpected error occurred while launching checkout.");
     } finally {
       setLoadingPlanId(null);
     }
-  };
+  }, [user, router, loginWithGoogle, getAccessToken]);
+
+  useEffect(() => {
+    if (!user) return;
+    if (typeof window === "undefined") return;
+
+    const params = new URLSearchParams(window.location.search);
+    const planParam = params.get("plan");
+    if (!planParam) return;
+
+    const url = new URL(window.location.href);
+    url.searchParams.delete("plan");
+    window.history.replaceState({}, "", url.pathname + (url.search ? url.search : "") + url.hash);
+
+    const allPlans = [...(pricing.inr?.plans || []), ...(pricing.usd?.plans || [])];
+    const targetPlan = allPlans.find(
+      (p) => p.planId === planParam || p.id === planParam || p.name.toLowerCase() === planParam.toLowerCase()
+    );
+
+    if (targetPlan) {
+      const timer = setTimeout(() => {
+        void handleSubscribe(targetPlan);
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [user, pricing, handleSubscribe]);
 
   const currentGroup = currencyMode === "inr" ? pricing.inr : pricing.usd;
 

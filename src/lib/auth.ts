@@ -100,17 +100,27 @@ export const supabaseAuth = createBrowserClient(supabaseUrl, supabaseAnonKey);
 
 /**
  * Initiates Google OAuth Sign-In flow with Supabase Auth.
- * Strips query parameters to ensure canonical match against Supabase Auth Redirect URIs.
+ * Preserves destination path and query parameters via the `next` callback parameter.
  */
 export async function signInWithGoogle(redirectTo?: string) {
   let origin = typeof window !== 'undefined' ? window.location.origin : 'https://prateeq.in';
   if (origin.includes('www.prateeq.in')) {
     origin = origin.replace('www.prateeq.in', 'prateeq.in');
   }
-  const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/dashboard';
-  const defaultTarget = currentPath.startsWith('/rag') ? '/rag/app' : '/dashboard';
-  const pathOnly = redirectTo ? redirectTo.split('?')[0] : defaultTarget;
-  const targetRedirect = `${origin}/auth/callback?next=${encodeURIComponent(pathOnly)}`;
+  const currentPathWithSearch =
+    typeof window !== 'undefined'
+      ? window.location.pathname + window.location.search
+      : '/dashboard';
+  const defaultTarget = currentPathWithSearch.startsWith('/rag')
+    ? '/rag/app'
+    : currentPathWithSearch.startsWith('/admin')
+    ? '/admin'
+    : currentPathWithSearch.startsWith('/scoping')
+    ? '/dashboard?imported=true'
+    : currentPathWithSearch;
+
+  const target = redirectTo || defaultTarget;
+  const targetRedirect = `${origin}/auth/callback?next=${encodeURIComponent(target)}`;
 
   const { data, error } = await supabaseAuth.auth.signInWithOAuth({
     provider: 'google',

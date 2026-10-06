@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
 import type {
@@ -161,9 +161,25 @@ export function useIntakeFormState(
   const [appliedPromo, setAppliedPromo] = useState<PromoDiscountInfo | null>(null);
   const [cascadeState, setCascadeState] = useState<{ targetFeature: FeatureItem; dependentFeatures: FeatureItem[] } | null>(null);
   const [sessionSeed] = useState(() => Math.random().toString(36).slice(2, 8));
+  const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (redirectTimerRef.current) {
+        clearTimeout(redirectTimerRef.current);
+      }
+    };
+  }, []);
+
+  const cancelAutoRedirect = useCallback(() => {
+    if (redirectTimerRef.current) {
+      clearTimeout(redirectTimerRef.current);
+      redirectTimerRef.current = null;
+    }
+  }, []);
 
   const [formData, setFormData] = useState<IntakeFormData>(() => ({
-    companyName: '',
+    companyName: user?.user_metadata?.full_name || '',
     contactEmail: user?.email || '',
     contactPhone: '',
     projectGoal: initialArchetype.label,
@@ -402,6 +418,7 @@ export function useIntakeFormState(
   }, [formData, selectedEngine, totalCost, activeMaintenancePlan, features]);
 
   const handleDownloadPDF = useCallback(async () => {
+    cancelAutoRedirect();
     setGeneratingPdf(true);
     try {
       await generateQuestionnairePDF(resumeData, buildQuestionnaireData(), isNoir, currency);
@@ -417,7 +434,7 @@ export function useIntakeFormState(
     } finally {
       setGeneratingPdf(false);
     }
-  }, [resumeData, buildQuestionnaireData, isNoir, currency]);
+  }, [resumeData, buildQuestionnaireData, isNoir, currency, cancelAutoRedirect]);
 
   const buildQuickServiceData = useCallback(() => {
     const selectedServiceObjs = quickServices.filter((s: QuickServiceItem) => selectedQuickServices.includes(s.id));
@@ -562,6 +579,147 @@ export function useIntakeFormState(
     }));
   }, [goals, features]);
 
+  const buildScopePayload = useCallback(() => {
+    return {
+      scopeCode: generatedScopeCode,
+      companyName: formData.companyName || 'My Custom Project',
+      contactEmail: formData.contactEmail || user?.email || '',
+      contactPhone: formData.contactPhone || '',
+      projectGoal: formData.projectGoal,
+      businessKPI: formData.businessKPI,
+      projectStartType: formData.projectStartType === 'legacy_rebuild' ? 'Legacy Refactor' : 'Greenfield',
+      designReadiness: formData.designReadiness,
+      hostingOwnership: formData.hostingOwnership,
+      taxInvoicingPreference: formData.taxInvoicingPreference,
+      targetAudience: formData.targetAudience,
+      baseEngineTitle: selectedEngine.title,
+      selectedFeatures: features
+        .filter((f: FeatureItem) => formData.selectedFeatures.includes(f.id))
+        .map((f: FeatureItem) => f.label),
+      brandAssetOption: totalCost.brandOpt.label,
+      maintenancePlan: activeMaintenancePlan.name,
+      totalCostINR: totalCost.totalINR,
+      totalCostUSD: totalCost.totalUSD,
+      currency,
+      timeline: formData.timeline,
+    };
+  }, [formData, user, generatedScopeCode, selectedEngine, features, totalCost, activeMaintenancePlan, currency]);
+
+  const getDashboardRedirectUrl = useCallback((payload: {
+    scopeCode: string;
+    companyName?: string;
+    baseEngineTitle?: string;
+    currency?: string;
+    totalCostINR?: number;
+    totalCostUSD?: number;
+    selectedFeatures?: string[];
+    brandAssetOption?: string;
+    maintenancePlan?: string;
+    timeline?: string;
+  }) => {
+    const params = new URLSearchParams({
+      imported: 'true',
+      scopeCode: payload.scopeCode,
+      company: payload.companyName || 'My Custom Project',
+      engine: payload.baseEngineTitle || 'Full-Stack Web Engine',
+      currency: payload.currency || 'INR',
+      costINR: String(payload.totalCostINR || 0),
+      costUSD: String(payload.totalCostUSD || 0),
+    });
+    if (payload.selectedFeatures && payload.selectedFeatures.length > 0) {
+      params.set('features', payload.selectedFeatures.join(','));
+    }
+    if (payload.brandAssetOption) params.set('brand', payload.brandAssetOption);
+    if (payload.maintenancePlan) params.set('plan', payload.maintenancePlan);
+    if (payload.timeline) params.set('timeline', payload.timeline);
+    return `/dashboard?${params.toString()}`;
+  }, []);
+
+  const handleProceedToDashboard = useCallback(() => {
+    cancelAutoRedirect();
+    const scopePayload = buildScopePayload();
+    const redirectUrl = getDashboardRedirectUrl(scopePayload);
+    if (user?.email) {
+      window.location.href = redirectUrl;
+    } else {
+      void signInWithGoogle(redirectUrl);
+    }
+  }, [cancelAutoRedirect, buildScopePayload, getDashboardRedirectUrl, user]);
+
+  const handleQuickFastPass = useCallback(async () => {
+    if (selectedQuickServices.length === 0) return;
+    setSubmitting(true);
+    try {
+      const quote = calcQuickServiceQuote(quickServices, selectedQuickServices, currency);
+      const selectedServiceObjs = quickServices.filter((s: QuickServiceItem) => selectedQuickServices.includes(s.id));
+      const serviceLabels = selectedServiceObjs.map((s: QuickServiceItem) => s.label);
+
+      const quickScopePayload = {
+        scopeCode: generatedScopeCode,
+        companyName: quickFormData.companyName.trim() || 'Quick Service Order',
+        clientPhone: '',
+        baseEngineTitle: `Quick Service: ${serviceLabels.join(', ')}`,
+        selectedFeatures: serviceLabels,
+        brandAssetOption: 'Not Applicable (Existing Site)',
+        maintenancePlan: 'Self-Managed (30-Day Warranty)',
+        totalCostINR: quote.totalINR,
+        totalCostUSD: quote.totalUSD,
+        currency,
+        timeline: selectedServiceObjs[0]?.turnaround || '3–7 days',
+        businessKPI: '⚡ Quick Service Integration',
+        paymentStructure: '50/50',
+      };
+
+      if (typeof window !== 'undefined') {
+        try { localStorage.setItem('prateeq_pending_scope', JSON.stringify(quickScopePayload)); } catch {}
+        document.cookie = `prateeq_pending_scope=${encodeURIComponent(JSON.stringify(quickScopePayload))}; path=/; max-age=86400; SameSite=Lax;`;
+      }
+
+      try {
+        await fetch('/api/client/intake-draft', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(quickScopePayload),
+        });
+      } catch (draftErr) {
+        console.warn('Quick service fast-pass draft API warning:', draftErr);
+      }
+
+      const redirectUrl = getDashboardRedirectUrl(quickScopePayload);
+      await signInWithGoogle(redirectUrl);
+    } catch (err) {
+      console.error('Quick fast-pass error:', err);
+      setSubmitting(false);
+    }
+  }, [selectedQuickServices, quickServices, currency, generatedScopeCode, quickFormData, getDashboardRedirectUrl]);
+
+  const handleFastPass = useCallback(async () => {
+    setSubmitting(true);
+    try {
+      const scopePayload = buildScopePayload();
+      if (typeof window !== 'undefined') {
+        try { localStorage.setItem('prateeq_pending_scope', JSON.stringify(scopePayload)); } catch {}
+        document.cookie = `prateeq_pending_scope=${encodeURIComponent(JSON.stringify(scopePayload))}; path=/; max-age=86400; SameSite=Lax;`;
+      }
+
+      try {
+        await fetch('/api/client/intake-draft', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(scopePayload),
+        });
+      } catch (draftErr) {
+        console.warn('Fast-pass intake draft API warning:', draftErr);
+      }
+
+      const redirectUrl = getDashboardRedirectUrl(scopePayload);
+      await signInWithGoogle(redirectUrl);
+    } catch (err) {
+      console.error('Fast-pass error:', err);
+      setSubmitting(false);
+    }
+  }, [buildScopePayload, getDashboardRedirectUrl]);
+
   const handleSubmitOnline = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.agreedToTerms) {
@@ -584,29 +742,7 @@ export function useIntakeFormState(
     setSubmitting(true);
 
     try {
-      const scopePayload = {
-        scopeCode: generatedScopeCode,
-        companyName: formData.companyName,
-        contactEmail: formData.contactEmail,
-        contactPhone: formData.contactPhone,
-        projectGoal: formData.projectGoal,
-        businessKPI: formData.businessKPI,
-        projectStartType: formData.projectStartType === 'legacy_rebuild' ? 'Legacy Refactor' : 'Greenfield',
-        designReadiness: formData.designReadiness,
-        hostingOwnership: formData.hostingOwnership,
-        taxInvoicingPreference: formData.taxInvoicingPreference,
-        targetAudience: formData.targetAudience,
-        baseEngineTitle: selectedEngine.title,
-        selectedFeatures: features
-          .filter((f: FeatureItem) => formData.selectedFeatures.includes(f.id))
-          .map((f: FeatureItem) => f.label),
-        brandAssetOption: totalCost.brandOpt.label,
-        maintenancePlan: activeMaintenancePlan.name,
-        totalCostINR: totalCost.totalINR,
-        totalCostUSD: totalCost.totalUSD,
-        currency,
-        timeline: formData.timeline,
-      };
+      const scopePayload = buildScopePayload();
 
       if (typeof window !== 'undefined') {
         try { localStorage.setItem('prateeq_pending_scope', JSON.stringify(scopePayload)); } catch {}
@@ -691,20 +827,21 @@ export function useIntakeFormState(
 
       setSubmitted(true);
 
-      setTimeout(() => {
+      const redirectUrl = getDashboardRedirectUrl(scopePayload);
+      redirectTimerRef.current = setTimeout(() => {
         if (user?.email) {
-          window.location.href = '/dashboard?imported=true';
+          window.location.href = redirectUrl;
         } else {
-          signInWithGoogle('/dashboard?imported=true');
+          void signInWithGoogle(redirectUrl);
         }
-      }, 5000);
+      }, 6000);
     } catch (err: unknown) {
       console.error('Intake form submission error:', err);
       setErrorMsg('Something went wrong during submission. Please try again.');
     } finally {
       setSubmitting(false);
     }
-  }, [formData, user, generatedScopeCode, selectedEngine, totalCost, activeMaintenancePlan, currency, recaptchaUnavailable, resumeData, buildQuestionnaireData, isNoir, getAccessToken, features]);
+  }, [formData, user, generatedScopeCode, currency, recaptchaUnavailable, resumeData, buildQuestionnaireData, isNoir, getAccessToken, buildScopePayload, getDashboardRedirectUrl]);
 
   const handleQuickSubmit = useCallback(async () => {
     if (!quickFormData.agreedToTerms || selectedQuickServices.length === 0) return;
@@ -770,18 +907,20 @@ export function useIntakeFormState(
           console.warn('Quick service save scope API warning:', saveErr);
           toast.warning('Scope saved locally but cloud sync failed. It will be retried when you visit the dashboard.');
         }
-        window.location.href = '/dashboard?imported=true';
+        const redirectUrl = getDashboardRedirectUrl(quickScopePayload);
+        window.location.href = redirectUrl;
         return;
       }
 
-      await signInWithGoogle('/dashboard?imported=true');
+      const redirectUrl = getDashboardRedirectUrl(quickScopePayload);
+      await signInWithGoogle(redirectUrl);
     } catch (err: unknown) {
       console.error('Quick service submit error:', err);
       setErrorMsg('Something went wrong during submission. Please try again.');
     } finally {
       setSubmitting(false);
     }
-  }, [quickFormData, selectedQuickServices, quickServices, currency, generatedScopeCode, user, getAccessToken]);
+  }, [quickFormData, selectedQuickServices, quickServices, currency, generatedScopeCode, user, getAccessToken, getDashboardRedirectUrl]);
 
   return {
     goals,
@@ -856,5 +995,9 @@ export function useIntakeFormState(
     applyBlueprint,
     handleSubmitOnline,
     handleQuickSubmit,
+    handleFastPass,
+    handleQuickFastPass,
+    cancelAutoRedirect,
+    handleProceedToDashboard,
   };
 }

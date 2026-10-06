@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { X, Plus, Trash2, FileCheck } from 'lucide-react';
+import { toast } from 'sonner';
 import Portal from '@/components/ui/Portal';
 import { calculateInvoiceTotals, SUPPORTED_CURRENCIES, formatCurrencyAmount } from '@/lib/invoicing';
 import type { InvoiceEntity } from '@/lib/clientOrder';
@@ -12,6 +13,8 @@ interface InvoiceCreatorModalProps {
   onClose: () => void;
   getAccessToken: () => Promise<string | null>;
   onInvoiceCreated: (invoice: InvoiceEntity) => void;
+  defaultCustomerName?: string;
+  defaultCustomerEmail?: string;
 }
 
 export function InvoiceCreatorModal({
@@ -19,9 +22,11 @@ export function InvoiceCreatorModal({
   onClose,
   getAccessToken,
   onInvoiceCreated,
+  defaultCustomerName = '',
+  defaultCustomerEmail = '',
 }: InvoiceCreatorModalProps) {
-  const [invCustomerName, setInvCustomerName] = useState('');
-  const [invCustomerEmail, setInvCustomerEmail] = useState('');
+  const [invCustomerName, setInvCustomerName] = useState(() => defaultCustomerName);
+  const [invCustomerEmail, setInvCustomerEmail] = useState(() => defaultCustomerEmail);
   const [invCustomerPhone, setInvCustomerPhone] = useState('');
   const [invCustomerGstin, setInvCustomerGstin] = useState('');
   const [invStreet, setInvStreet] = useState('Central Park, CP');
@@ -103,11 +108,11 @@ export function InvoiceCreatorModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!invCustomerName || !invCustomerEmail) {
-      alert('Please provide customer name and email.');
+      toast.error('Please provide customer name and email.');
       return;
     }
     if (invLineItems.length === 0) {
-      alert('Please add at least one line item.');
+      toast.error('Please add at least one line item.');
       return;
     }
 
@@ -142,6 +147,8 @@ export function InvoiceCreatorModal({
             tax_rate: Number(item.tax_rate) || 18,
             tax_type: item.tax_type,
           })),
+          customer_notes: invNotes,
+          terms_and_conditions: invTerms,
           notes: invNotes,
           terms: invTerms,
         }),
@@ -149,14 +156,15 @@ export function InvoiceCreatorModal({
 
       const data = await res.json();
       if (res.ok && data?.invoice) {
+        toast.success(`Invoice #${data.invoice.invoice_number} created successfully!`);
         onInvoiceCreated(data.invoice);
         onClose();
       } else {
-        alert(`Invoice Error: ${data.error || 'Failed to create invoice'}`);
+        toast.error(`Invoice Error: ${data.error || 'Failed to create invoice'}`);
       }
     } catch (err) {
       console.error('Invoice creation error:', err);
-      alert('Failed to submit invoice.');
+      toast.error('Failed to submit invoice.');
     } finally {
       setIsSubmitting(false);
     }

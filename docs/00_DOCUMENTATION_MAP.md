@@ -13,6 +13,7 @@ Welcome to the **Prateek Sharma Engineering Platform Documentation Map**. This c
 | 🗺️ **[`ARCHITECTURE_DEPENDENCY_MAP.md`](ARCHITECTURE_DEPENDENCY_MAP.md)** | Complete component-to-data dependency matrix across Data, Web App, PDF, and CMS layers. |
 | 📜 **[`99_DECISIONS.md`](99_DECISIONS.md)** | Architecture Decision Records (ADRs 01–23) governing Next.js 16, theme state, and escrows. |
 | 💼 **[`CLIENT_DASHBOARD_ROADMAP.md`](CLIENT_DASHBOARD_ROADMAP.md)** | Technical specification for the Client Workspace Dashboard (`/dashboard`) and SaaS Studio (`/rag/app`). |
+| 🔐 **[`AUTHENTICATION_ARCHITECTURE.md`](AUTHENTICATION_ARCHITECTURE.md)** | Universal Authentication Blueprint: Google OAuth PKCE, Safari ITP dual storage, session verification, and Retriever connection. |
 | 🤖 **[`AI_OUTREACH_AGENT_ROADMAP.md`](AI_OUTREACH_AGENT_ROADMAP.md)** | Technical specification for the Autonomous AI Lead Prospecting & Outreach engine. |
 | ✍️ **[`AUTOMATED_AI_BLOGGING_ROADMAP.md`](AUTOMATED_AI_BLOGGING_ROADMAP.md)** | Technical specification for the automated SEO newsjacking and technical blogging engine. |
 

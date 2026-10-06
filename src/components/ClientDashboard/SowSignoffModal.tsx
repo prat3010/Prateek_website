@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { X, Lock, CreditCard } from 'lucide-react';
+import { toast } from 'sonner';
 import Portal from '@/components/ui/Portal';
 import type { ClientScope } from '@/lib/clientOrder';
 import styles from '@/app/dashboard/dashboard.module.css';
@@ -29,7 +30,7 @@ export function SowSignoffModal({
 
   const handleConfirm = async () => {
     if (!termsAgreed) {
-      alert('Please confirm that you agree to the commercial scoping specifications & engagement terms.');
+      toast.error('Please confirm that you agree to the commercial scoping specifications & engagement terms.');
       return;
     }
     setIsProcessing(true);

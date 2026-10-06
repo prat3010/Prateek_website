@@ -2,23 +2,34 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import styles from "@/components/rag/rag.module.css";
 
 export default function RagLoginPage() {
-  const { loginWithGoogle } = useAuth();
+  const router = useRouter();
+  const { user, loading: authLoading, loginWithGoogle } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const nextTarget = searchParams?.get("next") || searchParams?.get("returnTo") || "/rag/app";
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.replace(nextTarget);
+    }
+  }, [authLoading, user, nextTarget, router]);
+
   const handleGoogleLogin = async () => {
     setLoading(true);
     setError("");
     try {
-      await loginWithGoogle("/rag/app");
+      await loginWithGoogle(nextTarget);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Google Sign-In failed");
       setLoading(false);

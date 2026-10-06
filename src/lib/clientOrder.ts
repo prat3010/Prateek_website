@@ -423,10 +423,12 @@ export const intakeDraftSchema = {
 
 
 export interface CreateRazorpayOrderPayload {
-  scopeCode: string;
+  scopeCode?: string;
+  invoiceId?: string;
+  invoiceNumber?: string;
+  paymentStructure?: '50/50' | '40/30/30' | string;
   amount?: number;
   currency?: 'INR' | 'USD';
-  invoiceId?: string;
   milestoneStage?: string;
 }
 
@@ -443,8 +445,12 @@ export const createRazorpayOrderSchema = {
     const issues: Array<{ field: string; message: string }> = [];
 
     const scopeCode = typeof obj.scopeCode === 'string' ? obj.scopeCode.trim() : '';
-    if (!scopeCode) {
-      issues.push({ field: 'scopeCode', message: 'scopeCode is required.' });
+    const invoiceId = typeof obj.invoiceId === 'string' ? obj.invoiceId.trim() : undefined;
+    const invoiceNumber = typeof obj.invoiceNumber === 'string' ? obj.invoiceNumber.trim() : undefined;
+    const paymentStructure = typeof obj.paymentStructure === 'string' ? obj.paymentStructure.trim() : undefined;
+
+    if (!scopeCode && !invoiceId && !invoiceNumber) {
+      issues.push({ field: 'scopeCode', message: 'Either scopeCode or invoiceId must be provided.' });
     }
 
     let amount: number | undefined;
@@ -462,10 +468,12 @@ export const createRazorpayOrderSchema = {
     return {
       success: true,
       data: {
-        scopeCode,
+        scopeCode: scopeCode || undefined,
+        invoiceId,
+        invoiceNumber,
+        paymentStructure,
         amount,
         currency: obj.currency === 'USD' ? 'USD' : 'INR',
-        invoiceId: typeof obj.invoiceId === 'string' ? obj.invoiceId : undefined,
         milestoneStage: typeof obj.milestoneStage === 'string' ? obj.milestoneStage : undefined,
       },
     };

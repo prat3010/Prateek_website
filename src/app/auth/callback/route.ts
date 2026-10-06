@@ -19,7 +19,8 @@ export async function GET(request: Request) {
   if (error || errorDescription) {
     console.error('Supabase Auth Callback Error:', error, errorDescription);
     const errMessage = encodeURIComponent(errorDescription || error || 'OAuth authentication failed.');
-    return NextResponse.redirect(`${origin}/dashboard?error=${errMessage}`);
+    const destinationPath = targetPath.startsWith('/') ? targetPath.split('?')[0] : '/dashboard';
+    return NextResponse.redirect(`${origin}${destinationPath}?error=${errMessage}`);
   }
 
   if (code) {
@@ -29,7 +30,7 @@ export async function GET(request: Request) {
       if (!exchangeErr && data.session) {
         const user = data.session.user;
         let redirectPath = targetPath;
-        if (user && isAdminEmail(user.email) && targetPath === '/dashboard') {
+        if (user && isAdminEmail(user.email) && (targetPath === '/dashboard' || targetPath.startsWith('/dashboard?'))) {
           redirectPath = '/admin';
         }
         const response = NextResponse.redirect(`${origin}${redirectPath}`);
@@ -54,6 +55,8 @@ export async function GET(request: Request) {
         return response;
       } else if (exchangeErr) {
         console.warn('OAuth code exchange warning in callback:', exchangeErr.message);
+        const destinationPath = targetPath.startsWith('/') ? targetPath.split('?')[0] : '/dashboard';
+        return NextResponse.redirect(`${origin}${destinationPath}?error=${encodeURIComponent(exchangeErr.message)}`);
       }
     } catch (err) {
       console.error('OAuth callback handler exception:', err);
