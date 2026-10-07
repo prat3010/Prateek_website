@@ -164,7 +164,7 @@ export default function Navbar({ items, className }: NavbarProps) {
   /* ---------- Close mobile menu on desktop resize ---------- */
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth > 768) {
+      if (window.innerWidth > 920) {
         setMobileOpen(false);
       }
     };
@@ -352,7 +352,6 @@ export default function Navbar({ items, className }: NavbarProps) {
         <Link
           href={mounted && user && isAdminEmail(user.email) ? '/admin' : '/dashboard'}
           className={`comic-btn comic-btn-outline ${styles.headerLoginBtn}`}
-          style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem', whiteSpace: 'nowrap' }}
           suppressHydrationWarning
         >
           {mounted && user ? (isAdminEmail(user.email) ? '🛡️ ADMIN' : '👤 DASHBOARD') : 'CLIENT LOGIN'}

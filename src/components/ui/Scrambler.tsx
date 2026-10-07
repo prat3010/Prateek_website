@@ -91,7 +91,7 @@ export default function Scrambler({
     return (
       <Tag
         id={id}
-        className={`${className ?? ''} ${styles.scrambler}`}
+        className={`${className ?? ''} ${styles.scrambler} ${variant === 'nav-label' ? styles.navLabel : ''}`}
         aria-label={ariaLabel ?? targetText}
         aria-live="polite"
       >
@@ -110,7 +110,12 @@ export default function Scrambler({
   }
 
   return (
-    <Tag id={id} className={className} aria-label={ariaLabel} aria-live="polite">
+    <Tag
+      id={id}
+      className={`${className ?? ''} ${variant === 'nav-label' ? styles.navLabel : ''}`}
+      aria-label={ariaLabel}
+      aria-live="polite"
+    >
       {children ?? targetText}
     </Tag>
   );
