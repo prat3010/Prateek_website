@@ -168,15 +168,11 @@ export default function ScrollSection({ children, verticalOffset, centerOnly, ga
   }, [scrollY, prefersReducedMotion, isMobile]);
   /* eslint-enable react-hooks/exhaustive-deps */
 
-  if (prefersReducedMotion || isMobile) {
-    return <div ref={wrapperRef} style={gap ? { marginBottom: gap } : undefined}>{children}</div>;
-  }
-
   return (
     <div ref={wrapperRef} style={gap ? { marginBottom: gap } : undefined}>
       <m.div 
         className={styles.scrollInner} 
-        style={{ y, opacity: scrollOpacity }}
+        style={prefersReducedMotion || isMobile ? undefined : { y, opacity: scrollOpacity }}
       >
         {children}
       </m.div>

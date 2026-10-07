@@ -51,6 +51,12 @@ const LENIS_OPTIONS = {
 };
 
 export function LenisProvider({ children }: { children: ReactNode }) {
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+  }, []);
+
   return (
     <ReactLenis
       root

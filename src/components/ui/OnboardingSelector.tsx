@@ -11,6 +11,9 @@ export default function OnboardingSelector() {
   const { isNoir, setAudience } = useTheme();
 
   const handleSelect = (choice: 'developer' | 'business') => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo(0, 0);
+    }
     setAudience(choice);
   };
 

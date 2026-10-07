@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Playfair_Display, Lora, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
@@ -8,6 +8,15 @@ import { Analytics } from "@vercel/analytics/react";
 import { getProfile, getSkills } from "@/lib/data";
 import { headers } from "next/headers";
 import type { Theme, Audience, Region } from "@/context/ThemeContext";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#F7F2E8" },
+    { media: "(prefers-color-scheme: dark)", color: "#08080A" },
+  ],
+};
 
 const playfairDisplay = Playfair_Display({
   variable: "--font-playfair-display",

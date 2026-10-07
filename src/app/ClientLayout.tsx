@@ -44,6 +44,16 @@ function ClientLayoutContent({
 }) {
   const { audience, theme } = useTheme();
 
+  // Reset scroll to top on home route mount unless targeting an explicit section anchor
+  useEffect(() => {
+    if (isHomeRoute && typeof window !== 'undefined') {
+      const hash = window.location.hash;
+      if (!hash || hash === '#home' || hash === '#main-content') {
+        window.scrollTo(0, 0);
+      }
+    }
+  }, [isHomeRoute]);
+
   return (
     <PerformanceGovernorProvider>
       <LenisProvider>
