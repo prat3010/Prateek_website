@@ -89,17 +89,17 @@
 }
 
 :global([data-theme='noir']) .toggleButton.active {
-  background-color: rgba(255, 23, 68, 0.15);
-  border-color: rgba(255, 23, 68, 0.4);
+  background-color: #240a10;
+  border-color: #FF1744;
   color: #FF1744;
-  box-shadow: 0 0 12px rgba(255, 23, 68, 0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 23, 68, 0.2);
 }
 
 :global([data-theme='noir']) .toggleButton.active:hover {
-  background-color: rgba(255, 23, 68, 0.25);
-  border-color: #FF1744;
+  background-color: #330d17;
+  border-color: #FF4D6D;
   color: #FF4D6D;
-  box-shadow: 0 0 16px rgba(255, 77, 109, 0.4);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 77, 109, 0.3);
 }
 
 /* ── Responsive Mobile ─────────────────────────────────────── */

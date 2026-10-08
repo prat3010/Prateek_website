@@ -62,7 +62,7 @@
   height: 7px;
   border-radius: 50%;
   background: var(--pop-green, #10b981);
-  box-shadow: 0 0 8px var(--pop-green, #10b981);
+  box-shadow: 0 0 0 1.5px rgba(16, 185, 129, 0.3);
 }
 
 .actionBtn {
@@ -570,8 +570,7 @@
 .drawerOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(3px);
+  background: rgba(0, 0, 0, 0.7);
   z-index: 9999;
   display: flex;
   justify-content: flex-end;

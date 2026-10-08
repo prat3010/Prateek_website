@@ -106,7 +106,7 @@ function getRetroTimeString(): string {
 }
 
 export default function AlphaPager() {
-  const { audience } = useTheme();
+  const { audience, isDetailsHidden } = useTheme();
   const isBiz = audience === 'business';
 
   const [messages, setMessages] = useState<PagerMessage[]>(DEFAULT_MESSAGES);
@@ -297,7 +297,7 @@ export default function AlphaPager() {
   return (
     <Portal>
       <div className={styles.viewportBounds} ref={constraintsRef}>
-        <div className={styles.bannerWrapper}>
+        <div className={`${styles.bannerWrapper} ${isDetailsHidden ? styles.hidden : ''}`}>
           {/* ── Draggable Vintage Alphanumeric Pager ── */}
           <m.div
             key="pager-device"

@@ -1,9 +1,7 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.75);
   z-index: 99999;
   display: flex;
   justify-content: flex-end;
@@ -54,7 +52,7 @@
   height: 8px;
   border-radius: 50%;
   background: var(--badge-success-text);
-  box-shadow: 0 0 8px var(--badge-success-text);
+  box-shadow: 0 0 0 1.5px rgba(57, 255, 20, 0.25);
 }
 
 .closeBtn {

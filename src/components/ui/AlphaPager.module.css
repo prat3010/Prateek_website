@@ -12,7 +12,7 @@
   left: -330px;
   right: -330px;
   pointer-events: none;
-  z-index: 9999;
+  z-index: var(--z-fixed, 300);
 }
 
 .bannerWrapper {
@@ -21,9 +21,20 @@
   right: 1.5rem;
   max-width: 380px;
   width: calc(100vw - 3rem);
-  pointer-events: auto;
+  pointer-events: none;
   user-select: none;
   -webkit-user-select: none;
+  transition: 
+    opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 0.4s;
+}
+
+/* ── Zen Mode Support (Hide Pager with UI Chrome) ──────────── */
+.hidden,
+:global(.ui-details-hidden) .bannerWrapper {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
 }
 
 /* ── Pager Device Outer Chassis (Polycarbonate Pocket Casing) ── */
@@ -38,6 +49,7 @@
   color: #FAF9F6;
   position: relative;
   overflow: hidden;
+  pointer-events: auto;
   padding: 0.5rem 0.65rem 0.6rem 0.65rem;
   cursor: grab;
   touch-action: none;
@@ -516,16 +528,16 @@
   color: #00F0FF;
   box-shadow: 
     inset 0 0 12px rgba(0, 240, 255, 0.2),
-    0 0 6px rgba(0, 240, 255, 0.06);
-  text-shadow: 0 0 4px rgba(0, 240, 255, 0.45);
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  text-shadow: none;
 }
 
 :global([data-theme='noir']) .lcdScreen.lcdBacklightOn {
   background-color: #03282F;
   box-shadow: 
     inset 0 0 18px rgba(0, 240, 255, 0.35),
-    0 0 12px rgba(0, 240, 255, 0.25);
-  text-shadow: 0 0 7px rgba(0, 240, 255, 0.8);
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  text-shadow: none;
 }
 
 :global([data-theme='noir']) .lcdDivider {
@@ -594,15 +606,16 @@
 
 @media (max-width: 640px) {
   .viewportBounds {
-    top: 8px;
-    left: 8px;
-    right: 8px;
-    bottom: 8px;
+    top: -120px;
+    left: -260px;
+    right: -260px;
+    bottom: -120px;
   }
   .bannerWrapper {
-    bottom: 0.5rem;
-    right: 0;
-    left: 0;
+    bottom: 58px;
+    right: 0.5rem;
+    left: 0.5rem;
     width: auto;
+    pointer-events: none;
   }
 }

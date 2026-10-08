@@ -118,7 +118,7 @@
 :global([data-theme='noir']) .activeTabPill {
   background: var(--surface-card);
   border: 1px solid var(--border-accent);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.06);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .tabContent {
@@ -237,7 +237,7 @@
 
 :global([data-theme='noir']) .skillGauge {
   color: var(--neon-cyan);
-  text-shadow: var(--neon-cyan-glow);
+  text-shadow: none;
 }
 
 .skillCardBadge {
@@ -356,8 +356,6 @@
   border-color: var(--neon-yellow);
   font-family: var(--font-mono);
   font-weight: bold;
-  text-shadow: 0 0 6px var(--neon-yellow);
-  box-shadow: 0 0 8px rgba(255, 230, 0, 0.15);
 }
 
 :global([data-theme='noir']) .sectionTitle {
@@ -382,10 +380,10 @@
 }
 
 :global([data-theme='noir']) .tabs {
-  background: rgba(12, 12, 14, 0.85);
-  backdrop-filter: blur(12px);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: var(--surface-hardware-chassis);
+  border: 1px solid var(--surface-hardware-border);
   border-radius: 12px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.7), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
 :global([data-theme='noir']) .tab {
@@ -404,38 +402,38 @@
 }
 
 :global([data-theme='noir']) .tabActive {
-  background: var(--surface-primary);
-  color: var(--tab-neon);
-  box-shadow: 0 0 12px var(--tab-neon);
+  background: var(--surface-hardware-keycap);
+  color: var(--tab-neon, #FAFAFA);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6), var(--surface-hardware-bevel);
 }
 
 :global([data-theme='noir']) .tabActive:hover {
-  background: var(--surface-primary);
-  color: var(--tab-neon);
+  background: var(--surface-hardware-keycap-active);
+  color: var(--tab-neon, #FAFAFA);
 }
 
 :global([data-theme='noir']) .skillCard {
-  background: rgba(20, 20, 24, 0.75);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--surface-hardware-card);
+  border: 1px solid var(--surface-hardware-border);
   border-radius: 14px;
-  box-shadow: none;
+  box-shadow: var(--surface-hardware-shadow);
 }
 
 :global([data-theme='noir']) .skillCard:hover {
   border-color: var(--card-accent);
-  box-shadow: 0 0 20px color-mix(in srgb, var(--card-accent) 25%, transparent);
-  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transform: translateY(-3px);
 }
 
 :global([data-theme='noir']) .skillCardIconWrap {
-  background: rgba(255, 255, 255, 0.03);
+  background: #18181F;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
 }
 
 :global([data-theme='noir']) .skillCard:hover .skillCardIconWrap {
-  background: color-mix(in srgb, var(--card-accent) 15%, transparent);
+  background: color-mix(in srgb, var(--card-accent) 15%, #18181F);
   border-color: var(--card-accent);
 }
 
@@ -453,19 +451,16 @@
 :global([data-theme='noir']) .level_legendary {
   color: var(--neon-yellow);
   border-color: var(--neon-yellow);
-  box-shadow: 0 0 6px var(--neon-yellow);
 }
 
 :global([data-theme='noir']) .level_mastered {
   color: var(--neon-cyan);
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 6px var(--neon-cyan);
 }
 
 :global([data-theme='noir']) .level_quest {
   color: var(--neon-pink);
   border-color: var(--neon-pink);
-  box-shadow: 0 0 6px var(--neon-pink);
 }
 
 :global([data-theme='noir']) .skillCardDesc {
@@ -495,7 +490,7 @@
   border-color: var(--neon-cyan);
   color: var(--neon-cyan);
   background: var(--surface-secondary);
-  box-shadow: 0 0 6px var(--neon-cyan);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 }
 
 :global([data-theme='noir']) .skillCardQuest {

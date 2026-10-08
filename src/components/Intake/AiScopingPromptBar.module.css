@@ -5,8 +5,6 @@
   border-radius: 16px;
   padding: 1.25rem;
   box-shadow: var(--shadow-glass);
-  backdrop-filter: blur(var(--surface-glass-blur));
-  -webkit-backdrop-filter: blur(var(--surface-glass-blur));
   position: relative;
   overflow: hidden;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -74,7 +72,7 @@
   background: var(--surface-card);
   color: var(--neon-cyan);
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
 }
 
 .inputWrapper {
@@ -187,7 +185,7 @@
   background: var(--surface-card);
   border-color: var(--neon-cyan);
   color: var(--neon-cyan);
-  box-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 }
 
 .telemetryRow {

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const maxDuration = 60;
+
 const RETRIEVER_API_URL = (process.env.RETRIEVER_API_URL || process.env.NEXT_PUBLIC_RETRIEVER_API_URL || 'https://rag.prateeq.in').replace(/\/$/, '');
 const PORTFOLIO_TENANT_ID = process.env.RETRIEVER_PORTFOLIO_TENANT_ID || '6797e2c8-745a-4bd1-aa4c-3854b8d79c22';
 const PORTFOLIO_API_KEY = process.env.RETRIEVER_PORTFOLIO_API_KEY || 'ret_live_TaaRP0w94H8.a3_CjGsoQY57Fy5bv9Kk40zfUOoH4ak2';
@@ -60,7 +62,9 @@ export async function POST(req: NextRequest) {
         use_repl: false,
         temperature: 0.5,
         max_tokens: 2048,
+        enable_reranking: false,
       }),
+      signal: AbortSignal.timeout(45000),
     });
 
     if (!res.ok) {

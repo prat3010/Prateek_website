@@ -197,15 +197,15 @@
   }
 }
 
-/* ── Neon Noir About Page Overrides ── */
+/* ── Cyber-Editorial About Page Overrides ── */
 :global([data-theme='noir']) .sectionTitle {
   color: var(--neon-pink);
-  text-shadow: var(--neon-pink-glow);
+  text-shadow: none;
 }
 
 :global([data-theme='noir']) .profilePanel:hover {
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 15px var(--neon-cyan);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   transform: scale(1.02) rotate(-1.5deg);
 }
 
@@ -220,6 +220,6 @@
 :global([data-theme='noir']) .factBox:hover {
   border-color: var(--neon-yellow);
   color: var(--neon-yellow);
-  box-shadow: 0 0 10px var(--neon-yellow);
+  box-shadow: 2px 2px 0px var(--neon-yellow);
   transform: scale(1.04);
 }

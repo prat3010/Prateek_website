@@ -100,7 +100,7 @@ export function BenchmarkSection() {
       <div className={styles.specGrid}>
         <div className={styles.specCard}>
           <span className={styles.specLabel}>Infrastructure</span>
-          <span className={styles.specValue}>{data?.meta?.system_specs?.compute || "4 OCPU ARM Ampere, 24 GB RAM"}</span>
+          <span className={styles.specValue}>{data?.meta?.system_specs?.compute || "1 OCPU (AMD x86), 1 GB RAM + 7 GB Swap"}</span>
         </div>
         <div className={styles.specCard}>
           <span className={styles.specLabel}>Database & Index</span>

@@ -1,5 +1,5 @@
 # 🏛️ Master Architecture Knowledge Graph Index
-**Total Registered Architecture Nodes:** 160 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
+**Total Registered Architecture Nodes:** 161 | **Visual Canvases:** 4 | **Standard SOP Runbooks:** 4
 
 ## ⚡ Quick Navigation
 - [Master Architecture Visual Canvas](MASTER_ARCHITECTURE_MAP.canvas)
@@ -13,10 +13,11 @@
   - [Runbook: RAG Tenant Onboarding](runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)
 ---
 
-### 🔹 1. FRONTEND: Portfolio & Adaptive Identity (25 Nodes)
+### 🔹 1. FRONTEND: Portfolio & Adaptive Identity (26 Nodes)
 
 | Node ID | Title / Component | Blast Radius | Security Auth | Specification File |
 | :--- | :--- | :---: | :---: | :--- |
+| `AN_Tactile_Design_Rubric` | **Design System: Tactile Hardware Rubric & Timeless Philosophies** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/AN_Tactile_Design_Rubric.md](architecture_nodes/AN_Tactile_Design_Rubric.md) |
 | `Route_analytics` | **Route: `/analytics` (Public Visitor Telemetry Dashboard)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Route_analytics.md](architecture_nodes/Route_analytics.md) |
 | `Route_blog` | **Route: `/blog` & `/blog/[slug]` (Technical Markdown Publication)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Route_blog.md](architecture_nodes/Route_blog.md) |
 | `Route_home` | **Route: `/` (Adaptive Portfolio Home)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Route_home.md](architecture_nodes/Route_home.md) |

@@ -97,12 +97,12 @@
   height: 8px;
   border-radius: 50%;
   background: #39ff14;
-  box-shadow: 0 0 8px #39ff14;
+  box-shadow: 0 0 0 1.5px rgba(57, 255, 20, 0.3);
 }
 
 :global([data-theme="azure"]) .pulseDot {
   background: #2e7d32;
-  box-shadow: 0 0 8px rgba(46, 125, 50, 0.5);
+  box-shadow: 0 0 0 1.5px rgba(46, 125, 50, 0.3);
 }
 
 /* Sub-Tab Navigation Bar */
@@ -595,8 +595,7 @@
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.75);
   display: flex;
   align-items: center;
   justify-content: center;

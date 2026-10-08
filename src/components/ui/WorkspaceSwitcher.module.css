@@ -7,7 +7,7 @@
   background: var(--surface-glass-card);
   border: 1px solid var(--surface-glass-border);
   border-radius: 12px;
-  backdrop-filter: var(--surface-glass-blur);
+  box-shadow: var(--shadow-glass);
   margin-bottom: 1.5rem;
   flex-wrap: wrap;
 }

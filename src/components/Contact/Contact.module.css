@@ -158,7 +158,7 @@
 }
 
 .scopingBtn:hover {
-  box-shadow: 0 0 20px rgba(90, 142, 182, 0.4);
+  box-shadow: var(--shadow-comic-sm, 2px 2px 0 var(--color-border));
   transform: translateY(-2px);
 }
 
@@ -323,7 +323,7 @@
   background: var(--pop-blue);
   color: #ffffff;
   border-color: var(--pop-blue);
-  box-shadow: 0 0 10px rgba(90, 142, 182, 0.3);
+  box-shadow: 2px 2px 0 var(--color-border);
 }
 
 /* ── Action Row ── */
@@ -411,12 +411,12 @@
 }
 
 /* ============================================================
-   NOIR THEME OVERRIDES (CRT Cyber-Glow)
+   NOIR THEME OVERRIDES (Tactile Cyber-Editorial)
    ============================================================ */
 
 :global([data-theme='noir']) .sectionTitle {
   color: var(--neon-pink, #ff2a55);
-  text-shadow: 0 0 10px rgba(255, 42, 85, 0.4);
+  text-shadow: none;
 }
 
 :global([data-theme='noir']) .telemetryBar {
@@ -437,7 +437,7 @@
   border-color: var(--neon-cyan, #00f0ff);
   color: #ffffff;
   background: #121216;
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 :global([data-theme='noir']) .scopingBanner {
@@ -466,7 +466,7 @@
 }
 
 :global([data-theme='noir']) .scopingBtn:hover {
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 :global([data-theme='noir']) .formCard {
@@ -521,7 +521,7 @@
   background: var(--neon-cyan, #00f0ff);
   color: #08080a;
   border-color: var(--neon-cyan, #00f0ff);
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 :global([data-theme='noir']) .actionRow {
@@ -538,7 +538,7 @@
   background: var(--neon-green, #39ff14);
   color: #08080a;
   border-color: var(--neon-green, #39ff14);
-  box-shadow: 0 0 15px rgba(57, 255, 20, 0.4);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 :global([data-theme='noir']) .quickLinkBtn {

@@ -207,32 +207,47 @@ export function useTerminalCommands({
           }),
         })
           .then(async (res) => {
-            const data = await res.json();
-            const reply = data.reply || 'No response generated.';
+            let data: { reply?: string; error?: string } = {};
+            try {
+              data = await res.json();
+            } catch {
+              data = { reply: `[Gateway Latency] The cognitive engine took longer than expected. Please try again.` };
+            }
+
+            const reply = data.reply || data.error || (res.ok ? 'No response generated.' : `Server error (${res.status})`);
+            const isErrorResponse = !res.ok && !data.reply;
+
             setTerminalHistory((prev) => {
               const filtered = prev.filter((l) => l.text !== '🧠 Thinking...');
               const replyLines: ConsoleLine[] = reply.split('\n').map((line: string) => ({
                 text: line,
-                type: 'output',
+                type: isErrorResponse ? 'error' : 'output',
               }));
               return [...filtered, ...replyLines, { text: '', type: 'output' }];
             });
 
-            setAiChatSession((prev) => ({
-              ...prev,
-              history: [
-                ...prev.history,
-                { role: 'user', content: userMsg },
-                { role: 'assistant', content: reply },
-              ],
-            }));
+            if (res.ok && data.reply) {
+              setAiChatSession((prev) => ({
+                ...prev,
+                history: [
+                  ...prev.history,
+                  { role: 'user', content: userMsg },
+                  { role: 'assistant', content: reply },
+                ],
+              }));
+            }
           })
           .catch((err) => {
+            const isLoadFailed = err?.name === 'TypeError' && String(err?.message || '').toLowerCase().includes('load');
+            const displayMsg = isLoadFailed
+              ? 'Request timed out waiting for the Oracle VPS cognitive engine. Give it one more second and try again.'
+              : (err?.message || 'Server timeout');
+
             setTerminalHistory((prev) => {
               const filtered = prev.filter((l) => l.text !== '🧠 Thinking...');
               return [
                 ...filtered,
-                { text: `⚠️ Neural connection error: ${err.message || 'Server timeout'}`, type: 'error' },
+                { text: `⚠️ Neural connection error: ${displayMsg}`, type: 'error' },
               ];
             });
           });

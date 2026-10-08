@@ -99,16 +99,14 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 0.65rem;
-  background: rgba(43, 43, 54, 0.88);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: #2B2B36;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   user-select: none;
   pointer-events: none;
 }
 
 :global([data-theme='noir']) .browserHeader {
-  background: rgba(8, 8, 10, 0.94);
+  background: #0E0E12;
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
@@ -599,13 +597,13 @@
 :global([data-theme='noir']) .modalClose:hover {
   border-color: var(--neon-pink);
   color: var(--neon-pink);
-  box-shadow: 0 0 12px var(--neon-pink);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 42, 85, 0.3);
 }
 
 /* ---- Neon Cyber-Noir Overrides ---- */
 :global([data-theme='noir']) .sectionTitle {
   color: var(--neon-pink);
-  text-shadow: var(--neon-pink-glow);
+  text-shadow: none;
 }
 
 :global([data-theme='noir']) .panel {
@@ -615,84 +613,84 @@
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
-/* Individual Panel Hover Glows (Cyclic across all cards) */
+/* Individual Panel Hover States (Tactile Hardware Depth across all cards) */
 :global([data-theme='noir']) .panel:nth-child(4n + 1):hover {
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 15px var(--neon-cyan);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 :global([data-theme='noir']) .panel:nth-child(4n + 1):hover .statusLive,
 :global([data-theme='noir']) .panel:nth-child(4n + 1):hover .statusSoon,
 :global([data-theme='noir']) .panel:nth-child(4n + 1):hover .statusPersonal {
   border-color: var(--neon-cyan);
   color: var(--neon-cyan);
-  box-shadow: 0 0 8px var(--neon-cyan);
+  box-shadow: none;
 }
 :global([data-theme='noir']) .panel:nth-child(4n + 1):hover .tag {
   border-color: var(--neon-cyan);
   color: var(--neon-cyan);
-  box-shadow: 0 0 5px var(--neon-cyan);
+  box-shadow: none;
 }
 
 :global([data-theme='noir']) .panel:nth-child(4n + 2):hover {
   border-color: var(--neon-pink);
-  box-shadow: 0 0 15px var(--neon-pink);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 :global([data-theme='noir']) .panel:nth-child(4n + 2):hover .statusLive,
 :global([data-theme='noir']) .panel:nth-child(4n + 2):hover .statusSoon,
 :global([data-theme='noir']) .panel:nth-child(4n + 2):hover .statusPersonal {
   border-color: var(--neon-pink);
   color: var(--neon-pink);
-  box-shadow: 0 0 8px var(--neon-pink);
+  box-shadow: none;
 }
 :global([data-theme='noir']) .panel:nth-child(4n + 2):hover .tag {
   border-color: var(--neon-pink);
   color: var(--neon-pink);
-  box-shadow: 0 0 5px var(--neon-pink);
+  box-shadow: none;
 }
 
 :global([data-theme='noir']) .panel:nth-child(4n + 3):hover {
   border-color: var(--neon-yellow);
-  box-shadow: 0 0 15px var(--neon-yellow);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 :global([data-theme='noir']) .panel:nth-child(4n + 3):hover .statusLive,
 :global([data-theme='noir']) .panel:nth-child(4n + 3):hover .statusSoon,
 :global([data-theme='noir']) .panel:nth-child(4n + 3):hover .statusPersonal {
   border-color: var(--neon-yellow);
   color: var(--neon-yellow);
-  box-shadow: 0 0 8px var(--neon-yellow);
+  box-shadow: none;
 }
 :global([data-theme='noir']) .panel:nth-child(4n + 3):hover .tag {
   border-color: var(--neon-yellow);
   color: var(--neon-yellow);
-  box-shadow: 0 0 5px var(--neon-yellow);
+  box-shadow: none;
 }
 
 :global([data-theme='noir']) .panel:nth-child(4n + 0):hover {
   border-color: var(--neon-green);
-  box-shadow: 0 0 15px var(--neon-green);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 :global([data-theme='noir']) .panel:nth-child(4n + 0):hover .statusLive,
 :global([data-theme='noir']) .panel:nth-child(4n + 0):hover .statusSoon,
 :global([data-theme='noir']) .panel:nth-child(4n + 0):hover .statusPersonal {
   border-color: var(--neon-green);
   color: var(--neon-green);
-  box-shadow: 0 0 8px var(--neon-green);
+  box-shadow: none;
 }
 :global([data-theme='noir']) .panel:nth-child(4n + 0):hover .tag {
   border-color: var(--neon-green);
   color: var(--neon-green);
-  box-shadow: 0 0 5px var(--neon-green);
+  box-shadow: none;
 }
 
-/* Modal Neon Glows */
+/* Modal Tactile Hardware Styling */
 :global([data-theme='noir']) .modalContent {
-  background: var(--surface-primary);
-  border: 1px solid var(--neon-pink);
-  box-shadow: 0 0 25px var(--neon-pink);
+  background: #121216;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 :global([data-theme='noir']) .modalTitle {
   color: var(--neon-pink);
-  text-shadow: var(--neon-pink-glow);
+  text-shadow: none;
 }
 :global([data-theme='noir']) .modalDescription {
   color: var(--color-text);
@@ -701,7 +699,7 @@
   background: var(--surface-primary);
   border-color: var(--neon-pink);
   color: var(--neon-pink);
-  box-shadow: 0 0 8px var(--neon-pink);
+  box-shadow: none;
 }
 
 /* ---- Category Filter Bar ---- */
@@ -1051,7 +1049,7 @@
 
 :global([data-theme='noir']) .metricValue {
   color: var(--neon-cyan);
-  text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+  text-shadow: none;
 }
 
 .metricLabel {

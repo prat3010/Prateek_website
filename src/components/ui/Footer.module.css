@@ -399,12 +399,12 @@
 }
 
 .noirHeart {
-  text-shadow: 0 0 6px #ffffff;
+  text-shadow: none;
 }
 
 .noirGrit {
   color: var(--neon-pink);
-  text-shadow: var(--neon-pink-glow);
+  text-shadow: none;
   font-weight: bold;
 }
 
@@ -418,7 +418,7 @@
 .treeRoot {
   color: var(--neon-cyan);
   font-weight: bold;
-  text-shadow: 0 0 4px rgba(0, 240, 255, 0.25);
+  text-shadow: none;
 }
 
 .treeItem {
@@ -435,12 +435,12 @@
 .treeLink {
   color: #a0a0ab;
   text-decoration: none;
-  transition: color 0.15s ease, text-shadow 0.15s ease;
+  transition: color 0.15s ease;
 }
 
 .treeLink:hover {
   color: var(--neon-cyan);
-  text-shadow: var(--neon-cyan-glow);
+  text-shadow: none;
 }
 
 /* Noir Protocols connect.sh links */
@@ -504,17 +504,17 @@
 
 .greenGlow {
   color: var(--neon-green);
-  text-shadow: var(--neon-green-glow);
+  text-shadow: none;
 }
 
 .cyanGlow {
   color: var(--neon-cyan);
-  text-shadow: var(--neon-cyan-glow);
+  text-shadow: none;
 }
 
 .pinkGlow {
   color: var(--neon-pink);
-  text-shadow: var(--neon-pink-glow);
+  text-shadow: none;
 }
 
 
@@ -602,12 +602,12 @@
 
 .noirView .analyticsLink {
   color: var(--neon-cyan);
-  text-shadow: 0 0 3px rgba(0, 240, 255, 0.2);
+  text-shadow: none;
 }
 
 .noirView .analyticsLink:hover {
   color: var(--neon-yellow);
-  text-shadow: var(--neon-yellow-glow);
+  text-shadow: none;
   transform: translateY(-2px);
 }
 

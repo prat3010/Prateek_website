@@ -79,7 +79,7 @@
 
 :global([data-theme='noir']) .titleBadge {
   color: #00f0ff;
-  text-shadow: 0 0 8px rgba(0, 240, 255, 0.35);
+  text-shadow: none;
 }
 
 .headerRight {

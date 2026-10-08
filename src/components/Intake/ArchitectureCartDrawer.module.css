@@ -1,9 +1,7 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.75);
   z-index: 99999;
   display: flex;
   justify-content: flex-end;
@@ -17,8 +15,6 @@
   background: var(--surface-glass-bg);
   color: var(--color-text);
   border-left: 1px solid var(--surface-glass-border);
-  backdrop-filter: blur(var(--surface-glass-blur));
-  -webkit-backdrop-filter: blur(var(--surface-glass-blur));
   box-shadow: var(--shadow-glass-lg);
   display: flex;
   flex-direction: column;
@@ -529,7 +525,7 @@
 
 :global([data-theme='noir']) .mathTotalRow {
   color: var(--neon-green, #39ff14);
-  text-shadow: 0 0 4px rgba(57, 255, 20, 0.4);
+  text-shadow: none;
 }
 
 .strikethroughPrice {

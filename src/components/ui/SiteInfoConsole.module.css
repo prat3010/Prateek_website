@@ -428,8 +428,8 @@
 
 :global([data-theme='noir']) .input { color: #FAFAFA; }
 :global([data-theme='noir']) .output { color: #e0e0e3; }
-:global([data-theme='noir']) .success { color: var(--neon-green, #39ff14); text-shadow: 0 0 4px rgba(57, 255, 20, 0.4); }
-:global([data-theme='noir']) .error { color: var(--neon-pink, #ff2a55); text-shadow: 0 0 4px rgba(255, 42, 85, 0.4); }
+:global([data-theme='noir']) .success { color: var(--neon-green, #39ff14); text-shadow: none; }
+:global([data-theme='noir']) .error { color: var(--neon-pink, #ff2a55); text-shadow: none; }
 
 :global([data-theme='noir']) .terminalPromptLine {
   border-top: 1px solid #1a1a24;
@@ -437,7 +437,7 @@
 
 :global([data-theme='noir']) .promptSymbol {
   color: var(--neon-cyan, #00f0ff);
-  text-shadow: 0 0 4px rgba(0, 240, 255, 0.4);
+  text-shadow: none;
 }
 
 :global([data-theme='noir']) .terminalInput {
@@ -466,7 +466,7 @@
   border-color: var(--neon-cyan, #00f0ff);
   color: #FFFFFF;
   background-color: #121216;
-  text-shadow: 0 0 2px rgba(0, 240, 255, 0.5);
+  text-shadow: none;
   box-shadow: none;
 }
 
@@ -493,7 +493,7 @@
   transform: translateY(-2px);
   background-color: #1C1C24;
   border-color: var(--neon-cyan, #00f0ff);
-  box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
   color: #FFFFFF;
 }
 
@@ -534,5 +534,5 @@
 
 :global([data-theme='noir']) .terminalImage:hover {
   border-color: var(--neon-pink, #ff2a55);
-  box-shadow: 0 0 15px rgba(255, 42, 85, 0.5);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }

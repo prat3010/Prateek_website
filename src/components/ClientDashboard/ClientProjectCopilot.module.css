@@ -29,7 +29,7 @@
   height: 7px;
   border-radius: 50%;
   background-color: #10b981;
-  box-shadow: 0 0 8px #10b981;
+  box-shadow: 0 0 0 1.5px rgba(16, 185, 129, 0.3);
   animation: pulseAnimation 2s infinite;
 }
 
@@ -41,8 +41,7 @@
 .backdropOverlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(4px);
+  background-color: rgba(0, 0, 0, 0.6);
   z-index: 999999;
   display: flex;
   align-items: flex-end;

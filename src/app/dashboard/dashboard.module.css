@@ -24,8 +24,6 @@
 .authCard {
   background: var(--surface-glass-card);
   border: 1px solid var(--surface-glass-border);
-  backdrop-filter: var(--surface-glass-blur);
-  -webkit-backdrop-filter: var(--surface-glass-blur);
   box-shadow: var(--shadow-glass-lg);
   border-radius: var(--border-radius-xl, 16px);
   padding: 3rem 2rem;
@@ -145,8 +143,6 @@
   align-items: center;
   background: var(--surface-glass-header);
   border: 1px solid var(--surface-glass-border);
-  backdrop-filter: var(--surface-glass-blur);
-  -webkit-backdrop-filter: var(--surface-glass-blur);
   box-shadow: var(--shadow-glass);
   padding: 1.25rem 1.75rem;
   border-radius: var(--border-radius-xl, 16px);
@@ -269,8 +265,6 @@
 .orderCard {
   background: var(--surface-glass-card);
   border: 1px solid var(--surface-glass-border);
-  backdrop-filter: var(--surface-glass-blur);
-  -webkit-backdrop-filter: var(--surface-glass-blur);
   box-shadow: var(--shadow-glass);
   border-radius: var(--border-radius-xl, 16px);
   padding: 1.75rem;
@@ -503,14 +497,14 @@
   background: var(--pop-blue);
   color: var(--pop-white);
   border-color: var(--pop-blue);
-  box-shadow: 0 0 10px rgba(90, 142, 182, 0.4);
+  box-shadow: 0 0 0 2px rgba(90, 142, 182, 0.25);
 }
 
 :global([data-theme='noir']) .stepActive .stepDot {
   background: var(--neon-cyan);
   color: #08080a;
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+  box-shadow: 0 0 0 2px rgba(0, 240, 255, 0.3);
 }
 
 .featuresSection {
@@ -679,8 +673,6 @@
 .tableCard {
   background: var(--surface-glass-card);
   border: 1px solid var(--surface-glass-border);
-  backdrop-filter: var(--surface-glass-blur);
-  -webkit-backdrop-filter: var(--surface-glass-blur);
   box-shadow: var(--shadow-glass);
   border-radius: var(--border-radius-xl, 16px);
   padding: 1.5rem;
@@ -826,9 +818,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.75);
   z-index: 999;
   display: flex;
   align-items: center;
@@ -1395,12 +1385,12 @@
 .engineCardActive {
   border-color: var(--pop-blue) !important;
   background: var(--badge-active-bg) !important;
-  box-shadow: 0 0 12px rgba(63, 110, 145, 0.2);
+  box-shadow: 0 2px 8px rgba(63, 110, 145, 0.2);
 }
 
 :global([data-theme='noir']) .engineCardActive {
   border-color: var(--neon-cyan) !important;
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .featuresGrid {

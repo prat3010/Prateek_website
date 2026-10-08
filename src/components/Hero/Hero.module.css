@@ -49,7 +49,7 @@
 :global([data-theme='noir']) .crosshairBR {
   color: var(--neon-cyan);
   opacity: 0.45;
-  text-shadow: 0 0 6px rgba(0, 240, 255, 0.4);
+  text-shadow: none;
 }
 
 /* ===== TEXT SIDE ===== */
@@ -93,18 +93,18 @@
 
 :global([data-theme='noir']) .editorialStamp {
   border-color: var(--neon-pink);
-  box-shadow: 0 0 10px rgba(255, 42, 85, 0.25);
+  box-shadow: 2px 2px 0px rgba(255, 42, 85, 0.3);
   transform: rotate(-2deg);
 }
 
 :global([data-theme='noir']) .stampIssue {
   color: var(--neon-pink);
-  text-shadow: var(--neon-pink-glow);
+  text-shadow: none;
 }
 
 :global([data-theme='noir']) .stampLabel {
   color: var(--neon-cyan);
-  text-shadow: var(--neon-cyan-glow);
+  text-shadow: none;
 }
 
 @media (max-width: 768px) {
@@ -170,7 +170,7 @@
 
 :global([data-theme='noir']) .highlightText {
   color: var(--neon-pink);
-  text-shadow: var(--neon-pink-glow);
+  text-shadow: none;
 }
 
 :global([data-theme='noir']) .vibeBox {
@@ -181,7 +181,7 @@
 
 :global([data-theme='noir']) .vibeLabel {
   color: var(--neon-yellow);
-  text-shadow: var(--neon-yellow-glow);
+  text-shadow: none;
 }
 
 .cursor {
@@ -306,7 +306,7 @@
   transform: none;
   color: var(--neon-cyan);
   border-color: var(--neon-cyan);
-  text-shadow: var(--neon-cyan-glow);
+  text-shadow: none;
 }
 
 :global([data-theme='noir']) .tagBadge {
@@ -326,7 +326,7 @@
   background-color: var(--surface-card);
   color: var(--neon-pink);
   border-color: var(--neon-pink);
-  box-shadow: 0 0 10px var(--neon-pink);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   transform: translateY(-2px);
 }
 
@@ -334,7 +334,7 @@
   background-color: var(--surface-card);
   color: var(--neon-cyan);
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 10px var(--neon-cyan);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   transform: translateY(-2px);
 }
 
@@ -342,7 +342,7 @@
   background-color: var(--surface-card);
   color: var(--neon-yellow);
   border-color: var(--neon-yellow);
-  box-shadow: 0 0 10px var(--neon-yellow);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   transform: translateY(-2px);
 }
 
@@ -555,7 +555,7 @@
 
 :global([data-theme='noir']) .ctaButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 0 15px var(--neon-yellow);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   background: var(--neon-yellow);
   border-color: var(--neon-yellow);
 }
@@ -577,7 +577,7 @@
   background: var(--pop-pink);
   color: #000000;
   border-color: var(--pop-pink);
-  box-shadow: 0 0 15px var(--pop-pink);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
 :global([data-theme='noir']) .pulseDot {

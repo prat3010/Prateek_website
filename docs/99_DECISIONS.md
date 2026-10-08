@@ -47,6 +47,7 @@ This document serves as the registry of critical architectural design decisions 
 * [ADR 37: Zero-Trust Micro-Enclave KMS, Remote Attestation & Volatile Memory Sanitization (Milestone 101)](#adr-37-zero-trust-micro-enclave-kms-remote-attestation--volatile-memory-sanitization-milestone-101)
 * [ADR 38: Autonomous Edge Fleet Swarm Mesh, Epidemic P2P Gossip & Causal Vector Clock Partition Reconciliation (Milestone 102)](#adr-38-autonomous-edge-fleet-swarm-mesh-epidemic-p2p-gossip--causal-vector-clock-partition-reconciliation-milestone-102)
 * [ADR 45: The Playground — Polymorphic Creation Showcase, Arcade Cabinet Shell, and Cloudflare Pages 3-Tier Hosting](#adr-45-the-playground--polymorphic-creation-showcase-arcade-cabinet-shell-and-cloudflare-pages-3-tier-hosting)
+* [ADR 46: Timeless Design Philosophies & Tactile Hardware Brutalism (Zero-Glassmorphism & Elimination of Fake Neon Halos)](#adr-46-timeless-design-philosophies--tactile-hardware-brutalism-zero-glassmorphism--elimination-of-fake-neon-halos)
 
 ---
 
@@ -738,6 +739,39 @@ This document serves as the registry of critical architectural design decisions 
 
 ---
 
+# **ADR 46: Timeless Design Philosophies & Tactile Hardware Brutalism (Zero-Glassmorphism & Elimination of Fake Neon Halos)**
+
+* **Status**: Approved & Implemented
+* **Context**: The portfolio visual system previously inherited transient, floaty web trends from the early 2020s, specifically generic watery glassmorphism (`backdrop-filter: blur(...)`, translucent panels with `rgba(..., 0.85)` opacity) and synthetic neon glow clouds (`box-shadow: 0 0 20px ...`, `text-shadow: 0 0 12px ...`). These patterns suffered from multiple architectural and design flaws:
+  1. **Compositor Jank & Frame Drops**: CSS `backdrop-filter` creates real-time GPU rasterization overhead, causing noticeable frame drops during 60fps Lenis smooth scrolling.
+  2. **Accessibility & Contrast Violations**: Watery translucent containers allow background content (parallax stars, dot matrix grids, skyline silhouettes) to bleed through typography, degrading WCAG AA contrast ratios and legibility.
+  3. **Aesthetic Dishonesty**: Floaty bathroom-glass styling violates the site's authentic physical identities:
+     - **Azure Theme**: Ligne Claire (Tintin / Hergé comic style), Pop Art, warm cream paper (`#F7F2E8`), crisp ink outlines, solid comic drop shadows (`var(--shadow-comic)`).
+     - **Noir Theme**: Cyber-Editorial / Tactical Hardware, obsidian dark matte surfaces (`#08080A`), crisp ink/white borders, authentic dot-matrix/tactile typography, realistic physical textures (matte ABS, rubber keycaps, physical chamfers, zero fake neon outer glow/halos).
+* **Decision**: Synthesized four timeless design philosophies and systematically restructured the global tokens and component stylesheets:
+  1. **Dieter Rams' 10 Principles of Good Design (Functional Honesty & Longevity)**: UI controls must not pretend to be floating sheets of semi-translucent bathroom glass. Form communicates function with clarity, unobtrusive contrast, and enduring simplicity.
+  2. **Teenage Engineering (Tactile Hardware Brutalism & Physical Affordances)**: Machine-grounded chassis (`--surface-hardware-chassis: #0E0E12`), recessed switch bays (`--surface-hardware-recessed: #0A0A0D` with inset shadow), milled keycaps (`--surface-hardware-keycap: #1C1C22`), and tactile micro-bevels (`--surface-hardware-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.08)`) replace generic floating containers.
+  3. **Swiss / International Typographic Style (Objective Hierarchy & Legibility)**: Background content must never bleed into foreground typography; crisp boundaries, solid surfaces, and mathematical alignment maximize readability.
+  4. **Bauhaus ("Truth to Materials" / Materialgerechtigkeit)**: Respecting the digital display medium by ensuring high contrast, clean rendering, and zero GPU composite thrashing.
+  
+  **Technical Execution**:
+  - **Token Grounding (`src/app/globals.css`)**:
+    - Replaced `--surface-glass-*` tokens with grounded solid surfaces (`--pop-white` for Azure; `#121216` obsidian for Noir) and set `--surface-glass-blur: none`.
+    - Formalized semantic hardware tokens: `--surface-hardware-chassis`, `--surface-hardware-recessed`, `--surface-hardware-card`, `--surface-hardware-keycap`, `--surface-hardware-keycap-active`, `--surface-hardware-border`, `--surface-hardware-bevel`, `--surface-hardware-shadow`, and `--surface-hardware-shadow-sm`.
+    - Zeroed out all `--neon-*-glow` CSS variables (`none`) to eliminate blurry halo artifacts site-wide.
+  - **Zero-Glassmorphism Invariant**: Eradicated all `backdrop-filter` declarations (0 occurrences remaining in `src/`).
+  - **Hardware Affordances**:
+    - `FloatingUtilityBar.module.css`: Transformed from translucent glass capsule into a precision machined hardware capsule with tactile micro-bevels and crisp borders.
+    - `SegmentedToggle.module.css`: Implemented recessed hardware switch bays with tactile keycap active states.
+    - `Skills.module.css`: Converted skill categories into recessed hardware chassis and active tabs into tactile milled keycaps.
+    - `Projects.module.css` & `Hero.module.css`: Replaced neon panel glow clouds with solid tactile drop shadows and micro-bevels.
+    - Contact, Intake, and Modal overlays: Replaced blurry backdrops with high-contrast solid scrims.
+* **Consequences**:
+  * **Pros**: 60fps buttery-smooth Lenis scrolling without compositor jank; guaranteed WCAG AA legibility across light and dark modes; tactile hardware affordances provide authentic physical feel matching Teenage Engineering and Dieter Rams principles; 100% theme parity preserved.
+  * **Cons**: Future component authors must strictly use `--surface-hardware-*` semantic tokens rather than introducing ad-hoc transparency or glow effects.
+
+---
+
 # **Acceptance Criteria**
 - Registry records cover the core v2 architectural choices.
 - Format follows standard ADR structures (Context, Decision, Consequences).
@@ -753,3 +787,4 @@ This document serves as the registry of critical architectural design decisions 
 - [Unified Master Roadmap](UNIFIED_MASTER_ROADMAP.md)
 - [ADR 10: Skyline Parallax Decoupling](architecture_nodes/UI_NoirSkyline.md)
 - [ADR 11 & 12: PDF Token Architecture](architecture_nodes/UI_CommercialPDFSuite.md)
+- [ADR 46: Tactile Design Rubric & Zero Glassmorphism](architecture_nodes/AN_Tactile_Design_Rubric.md)

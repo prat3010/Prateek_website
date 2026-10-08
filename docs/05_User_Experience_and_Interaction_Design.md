@@ -400,4 +400,6 @@ The experience should remain.
 - [Visual & Communication Identities](06_Adaptive_Identity_System.md)
 - [Performance & Motion Accessibility](15_Performance_and_Accessibility.md)
 - [ADR 05 (ScrollSection) & ADR 10 (Skyline Parallax)](99_DECISIONS.md)
+- [ADR 46: Timeless Design Philosophies & Tactile Hardware Brutalism](99_DECISIONS.md#adr-46-timeless-design-philosophies--tactile-hardware-brutalism-zero-glassmorphism--elimination-of-fake-neon-halos)
 - [Architecture Node: Theme & Lenis Providers](architecture_nodes/Context_ThemeProvider_Lenis.md)
+- [Architecture Node: Tactile Design Rubric & Zero Glassmorphism](architecture_nodes/AN_Tactile_Design_Rubric.md)

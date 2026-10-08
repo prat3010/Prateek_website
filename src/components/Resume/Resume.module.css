@@ -1041,7 +1041,7 @@
   background-color: #ffffff;
   color: #000000;
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 15px var(--neon-cyan);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
 /* Agent Log Ticker */
@@ -1063,10 +1063,9 @@
 
 /* Persona Switcher Bar (Dev Mode) */
 :global([data-theme='noir']) .personaBar {
-  background-color: rgba(12, 12, 14, 0.85);
-  backdrop-filter: blur(12px);
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: none;
+  background-color: #121216;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 :global([data-theme='noir']) .personaLabel {
@@ -1091,7 +1090,7 @@
   background-color: #000000;
   color: var(--neon-cyan);
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(0, 240, 255, 0.2);
 }
 
 /* Main Resume Paper & Dossier Content Container */
@@ -1135,7 +1134,7 @@
 :global([data-theme='noir']) .title {
   color: var(--neon-cyan);
   font-family: var(--font-mono);
-  text-shadow: 0 0 6px rgba(0, 240, 255, 0.25);
+  text-shadow: none;
 }
 
 :global([data-theme='noir']) .contactInfo {
@@ -1149,7 +1148,7 @@
 
 :global([data-theme='noir']) .link:hover {
   color: var(--neon-pink);
-  text-shadow: 0 0 6px var(--neon-pink);
+  text-shadow: none;
 }
 
 :global([data-theme='noir']) .divider {
@@ -1307,7 +1306,7 @@
   background-color: var(--neon-cyan);
   color: #08080a;
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
 }
 
 /* Biz Mode: Rate Card Grid */
@@ -1320,7 +1319,7 @@
 
 :global([data-theme='noir']) .quoteCard:hover {
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 15px rgba(0, 240, 255, 0.25);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 :global([data-theme='noir']) .quoteCardLabel {
@@ -1333,7 +1332,7 @@
 :global([data-theme='noir']) .rateValue {
   color: var(--neon-yellow);
   font-family: var(--font-mono);
-  text-shadow: 0 0 8px rgba(255, 230, 0, 0.3);
+  text-shadow: none;
   font-weight: 800;
 }
 
@@ -1354,7 +1353,7 @@
   background-color: #ffffff;
   color: #000000;
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 15px var(--neon-cyan);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
 /* Biz Mode: Commercial Build Engines & Quick Services Grid */
@@ -1367,7 +1366,7 @@
 
 :global([data-theme='noir']) .packageCard:hover {
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 16px rgba(0, 240, 255, 0.2);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.04);
   transform: translateY(-2px);
 }
 
@@ -1391,7 +1390,7 @@
   font-family: var(--font-mono);
   font-size: 0.85rem;
   font-weight: 700;
-  text-shadow: 0 0 6px rgba(255, 230, 0, 0.25);
+  text-shadow: none;
 }
 
 :global([data-theme='noir']) .packageDesc {
@@ -1416,7 +1415,7 @@
   background: var(--neon-cyan);
   color: #08080a;
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
 }
 
 /* Biz Mode: Monthly SLA Care Plans */
@@ -1429,7 +1428,7 @@
 
 :global([data-theme='noir']) .careCard:hover {
   border-color: var(--neon-green);
-  box-shadow: 0 0 12px rgba(57, 255, 20, 0.2);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 :global([data-theme='noir']) .careTitle {
@@ -1444,7 +1443,7 @@
   font-family: var(--font-mono);
   font-size: 0.8rem;
   font-weight: 700;
-  text-shadow: 0 0 6px rgba(57, 255, 20, 0.25);
+  text-shadow: none;
 }
 
 :global([data-theme='noir']) .careDesc {
@@ -1458,7 +1457,7 @@
 :global([data-theme='noir']) .scopingCtaCard {
   background-color: #08080a;
   border: 1.5px dashed var(--neon-cyan);
-  box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
 }
 
 :global([data-theme='noir']) .scopingCtaIcon {
@@ -1480,13 +1479,13 @@
   background: var(--neon-cyan);
   color: #08080a;
   font-family: var(--font-mono);
-  box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 :global([data-theme='noir']) .scopingCtaBtn:hover {
   background: #ffffff;
   color: #08080a;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 /* Accessibility: Focus Visible in Noir Mode */

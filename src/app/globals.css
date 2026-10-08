@@ -40,14 +40,26 @@
   --border-accent-light: var(--pop-black);
   --color-text-dim: #444252;
 
-  /* ─ Surface Glassmorphism & App Tokens ─ */
-  --surface-glass-bg: rgba(250, 249, 246, 0.88);
-  --surface-glass-border: rgba(43, 43, 54, 0.12);
-  --surface-glass-blur: blur(16px);
-  --surface-glass-header: rgba(255, 255, 255, 0.88);
-  --surface-glass-card: rgba(255, 255, 255, 0.90);
-  --shadow-glass: 0 8px 24px rgba(43, 43, 54, 0.05);
-  --shadow-glass-lg: 0 12px 36px rgba(43, 43, 54, 0.07);
+  /* ─ Surface Grounded App Tokens (Honoring Bauhaus truth-to-materials & Dieter Rams functional honesty) ─ */
+  --surface-glass-bg: var(--pop-white);
+  --surface-glass-border: rgba(43, 43, 54, 0.14);
+  --surface-glass-blur: none;
+  --surface-glass-header: var(--pop-white);
+  --surface-glass-card: var(--pop-white);
+  --shadow-glass: 0 2px 8px rgba(43, 43, 54, 0.05), 0 1px 2px rgba(43, 43, 54, 0.03);
+  --shadow-glass-lg: 0 8px 24px rgba(43, 43, 54, 0.08), 0 2px 6px rgba(43, 43, 54, 0.04);
+  --navbar-bg: var(--pop-cream);
+
+  /* ─ Tactile Hardware Surface Tokens (Azure: Crisp Comic Paper / Ligne Claire) ─ */
+  --surface-hardware-chassis: var(--pop-white);
+  --surface-hardware-recessed: var(--pop-cream);
+  --surface-hardware-card: var(--pop-white);
+  --surface-hardware-keycap: var(--pop-yellow);
+  --surface-hardware-keycap-active: var(--pop-white);
+  --surface-hardware-border: var(--color-border);
+  --surface-hardware-bevel: none;
+  --surface-hardware-shadow: var(--shadow-comic);
+  --surface-hardware-shadow-sm: var(--shadow-comic-sm);
 
   /* ─ Semantic Status Tokens ─ */
   --badge-draft-bg: rgba(244, 220, 149, 0.28);
@@ -191,7 +203,7 @@
   --pop-black: #FAFAFA;
   --pop-white: #121214;
   --pop-cream: #08080a;
-  --navbar-bg: rgba(8, 8, 10, 0.85);
+  --navbar-bg: #08080a;
 
   /* ─ Semantic Colors ─ */
   --color-bg: var(--pop-cream);
@@ -215,14 +227,25 @@
   --color-text-muted: #B0B0C4;      /* Muted text color */
   --color-text-dim: #A0A0B0;        /* Dim text color (tuned for WCAG AA contrast) */
 
-  /* ─ Surface Glassmorphism & App Tokens (Noir) ─ */
-  --surface-glass-bg: rgba(18, 20, 26, 0.92);
+  /* ─ Surface Grounded Hardware Tokens (Noir: Tactical Hardware / Obsidian) ─ */
+  --surface-glass-bg: #121216;
   --surface-glass-border: rgba(255, 255, 255, 0.12);
-  --surface-glass-blur: blur(16px);
-  --surface-glass-header: rgba(18, 20, 26, 0.92);
-  --surface-glass-card: rgba(18, 20, 26, 0.94);
-  --shadow-glass: 0 8px 24px rgba(0, 0, 0, 0.35);
-  --shadow-glass-lg: 0 12px 36px rgba(0, 0, 0, 0.45);
+  --surface-glass-blur: none;
+  --surface-glass-header: #121216;
+  --surface-glass-card: #121216;
+  --shadow-glass: 0 4px 16px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --shadow-glass-lg: 0 8px 32px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  /* ─ Tactile Hardware Surface Tokens (Noir: Teenage Engineering Tactical Obsidian) ─ */
+  --surface-hardware-chassis: #0E0E12;
+  --surface-hardware-recessed: #0A0A0D;
+  --surface-hardware-card: #121216;
+  --surface-hardware-keycap: #1C1C22;
+  --surface-hardware-keycap-active: #24242C;
+  --surface-hardware-border: rgba(255, 255, 255, 0.12);
+  --surface-hardware-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --surface-hardware-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --surface-hardware-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 
   /* ─ Semantic Status Tokens (Noir) ─ */
   --badge-draft-bg: rgba(255, 230, 0, 0.12);
@@ -268,17 +291,17 @@
   --dot-pattern-heavy: radial-gradient(circle, rgba(255, 255, 255, 0.34) 2.8px, transparent 2.8px);
   --dot-pattern-color: radial-gradient(circle, rgba(255, 255, 255, 0.24) 2.4px, transparent 2.4px);
 
-  /* ─ Neon Design Tokens for Cyber-Noir Mode ─ */
+  /* ─ Neon Design Tokens for Cyber-Noir Mode (Glows zeroed per Rams & Teenage Engineering tactile discipline) ─ */
   --neon-pink: #ff2a55;
   --neon-cyan: #00f0ff;
   --neon-yellow: #ffe600;
   --neon-green: #39ff14;
   --neon-purple: #bd00ff;
-  --neon-pink-glow: 0 0 4px var(--neon-pink), 0 0 12px rgba(255, 42, 85, 0.4);
-  --neon-cyan-glow: 0 0 4px var(--neon-cyan), 0 0 12px rgba(0, 240, 255, 0.4);
-  --neon-yellow-glow: 0 0 4px var(--neon-yellow), 0 0 12px rgba(255, 230, 0, 0.4);
-  --neon-green-glow: 0 0 4px var(--neon-green), 0 0 12px rgba(57, 255, 20, 0.4);
-  --neon-purple-glow: 0 0 4px var(--neon-purple), 0 0 12px rgba(189, 0, 255, 0.4);
+  --neon-pink-glow: none;
+  --neon-cyan-glow: none;
+  --neon-yellow-glow: none;
+  --neon-green-glow: none;
+  --neon-purple-glow: none;
 }
 
 /* ─ Scrollbar Styling Override in Noir Mode ─ */
@@ -1287,7 +1310,7 @@ footer {
   }
   50% {
     transform: scale(1.04) rotate(-1deg);
-    box-shadow: 0 0 25px var(--panel-color, var(--pop-blue)), 0 0 50px var(--panel-color, var(--pop-blue));
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 0 0 0 3px var(--panel-color, var(--pop-blue));
     border-color: var(--panel-color, var(--pop-blue));
   }
 }
