@@ -17,7 +17,7 @@
 
 | Node ID | Title / Component | Blast Radius | Security Auth | Specification File |
 | :--- | :--- | :---: | :---: | :--- |
-| `AN_Tactile_Design_Rubric` | **Design System: Tactile Hardware Rubric & Timeless Philosophies** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/AN_Tactile_Design_Rubric.md](architecture_nodes/AN_Tactile_Design_Rubric.md) |
+| `AN_Tactile_Design_Rubric` | **UI Architecture: `AN_Tactile_Design_Rubric` (Tactile Hardware Brutalism & Timeless Design Philosophies)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/AN_Tactile_Design_Rubric.md](architecture_nodes/AN_Tactile_Design_Rubric.md) |
 | `Route_analytics` | **Route: `/analytics` (Public Visitor Telemetry Dashboard)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Route_analytics.md](architecture_nodes/Route_analytics.md) |
 | `Route_blog` | **Route: `/blog` & `/blog/[slug]` (Technical Markdown Publication)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Route_blog.md](architecture_nodes/Route_blog.md) |
 | `Route_home` | **Route: `/` (Adaptive Portfolio Home)** | 🟢 `MEDIUM` | `PUBLIC` | [architecture_nodes/Route_home.md](architecture_nodes/Route_home.md) |

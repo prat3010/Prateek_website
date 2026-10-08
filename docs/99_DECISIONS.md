@@ -787,4 +787,3 @@ This document serves as the registry of critical architectural design decisions 
 - [Unified Master Roadmap](UNIFIED_MASTER_ROADMAP.md)
 - [ADR 10: Skyline Parallax Decoupling](architecture_nodes/UI_NoirSkyline.md)
 - [ADR 11 & 12: PDF Token Architecture](architecture_nodes/UI_CommercialPDFSuite.md)
-- [ADR 46: Tactile Design Rubric & Zero Glassmorphism](architecture_nodes/AN_Tactile_Design_Rubric.md)
