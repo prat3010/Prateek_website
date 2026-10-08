@@ -67,9 +67,10 @@ describe('/api/terminal/ai-chat route', () => {
     const [url, options] = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0];
     expect(url).toContain('/chat/completions');
     const sentBody = JSON.parse(options.body);
-    expect(sentBody.messages).toHaveLength(3);
-    expect(sentBody.messages[2]).toEqual({ role: 'user', content: 'What are Prateek top projects?' });
-    expect(sentBody.use_repl).toBe(true);
+    expect(sentBody.messages).toHaveLength(4);
+    expect(sentBody.messages[0].role).toBe('system');
+    expect(sentBody.messages[3]).toEqual({ role: 'user', content: 'What are Prateek top projects?' });
+    expect(sentBody.use_repl).toBe(false);
   });
 
   it('handles upstream HTTP error gracefully with a neural glitch notice', async () => {

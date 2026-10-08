@@ -167,6 +167,29 @@ export function useTerminalCommands({
           return;
         }
 
+        if (['twin', 'ai', 'prateeq', 'twin-mode'].includes(trimmedCmd)) {
+          setTerminalHistory((prev) => [
+            ...prev,
+            { text: '🧠 Neural link already active. You are talking directly with Prateeq\'s AI Twin.', type: 'success' },
+            { text: 'Ask me anything about my architecture, stack, philosophy, or type "exit" to leave.', type: 'output' },
+          ]);
+          setTerminalInput('');
+          return;
+        }
+
+        if (['help', '?'].includes(trimmedCmd)) {
+          setTerminalHistory((prev) => [
+            ...prev,
+            { text: '🧠 AI TWIN INTERACTIVE REPL HELP:', type: 'success' },
+            { text: '  - Ask about architecture: "what is retriever?", "explain your tech stack"', type: 'output' },
+            { text: '  - Ask about philosophy: "what is ponytail principle?", "why no langchain?"', type: 'output' },
+            { text: '  - Ask about commercials: "how much for a landing page?", "contact info"', type: 'output' },
+            { text: '  - Session controls: "clear" (clear screen), "exit" / "quit" (return to shell)', type: 'output' },
+          ]);
+          setTerminalInput('');
+          return;
+        }
+
         const userMsg = cmd.trim();
         const currentHistory = aiChatSession.history;
 

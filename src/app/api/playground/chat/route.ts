@@ -56,7 +56,9 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         messages,
         stream: false,
-        use_repl: true,
+        use_repl: false,
+        temperature: 0.4,
+        max_tokens: 2048,
       }),
       // Set reasonable timeout
       signal: AbortSignal.timeout(12000),
@@ -76,16 +78,17 @@ export async function POST(req: NextRequest) {
     }
 
     const data = await res.json();
-    const choice = 
+    const rawChoice = 
       data?.choices?.[0]?.message?.content || 
       data?.analysis_summary || 
       data?.content || 
       'Cognitive dossier synthesized.';
+    const cleanChoice = rawChoice.replace(/\[\d+(?:,\s*\d+)*\]/g, '').replace(/  +/g, ' ').trim();
     const citations = data?.citations || data?.chunks || [];
     const isCached = res.headers.get('x-cache-lookup') === 'HIT' || Boolean(data?.cached);
 
     return NextResponse.json({
-      reply: choice,
+      reply: cleanChoice,
       citations,
       cached: isCached,
       latencyMs,
