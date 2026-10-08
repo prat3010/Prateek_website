@@ -197,4 +197,13 @@ export interface ResumeData {
     status: 'success' | 'failed';
     summary: string;
   };
+  pager?: {
+    active: boolean;
+    messages: {
+      id: string;
+      freq?: string;
+      sender: string;
+      text: string;
+    }[];
+  };
 }

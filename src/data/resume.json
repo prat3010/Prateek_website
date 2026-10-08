@@ -1026,5 +1026,74 @@
     "paymentTerms": "50% upfront deposit to initiate development, 50% upon final project delivery.",
     "warrantyModel": "Included 30-Day Post-Launch Support & Warranty",
     "deliverySprint": "1 to 3 Weeks Turnaround Sprint"
+  },
+  "pager": {
+    "active": true,
+    "messages": [
+      {
+        "id": "ch_home",
+        "freq": "900.1MHz",
+        "sender": "RADAR // DEV-CORE",
+        "senderBiz": "RADAR // BIZ-EXEC",
+        "text": "DEV CORE: Zero synthetic toys. Zero bloated LangChain wrappers. Hexagonal FastAPI & pgvector running live code. Scroll down to inspect stack.",
+        "textBiz": "EXECUTIVE WIRE: Direct technical partnership with zero agency overhead. 1 to 3 week sprints, fixed milestones & 30-day warranty. Let's build."
+      },
+      {
+        "id": "ch_about",
+        "freq": "908.4MHz",
+        "sender": "RADAR // DOSSIER",
+        "senderBiz": "RADAR // VALUE-PROP",
+        "text": "Prateek's dossier: Forward deployed AI engineering & production architectures. Zero corporate fluff, strictly battle-tested systems.",
+        "textBiz": "Strategic Partner: Turning complex business roadmaps into reliable web apps & AI tools. Fast execution, direct communication."
+      },
+      {
+        "id": "ch_capabilities",
+        "freq": "916.2MHz",
+        "sender": "RADAR // TOPOLOGY",
+        "senderBiz": "RADAR // CAPABILITIES",
+        "text": "Dual Persona Engine: Toggle AZURE (editorial print) / NOIR (cyberpunk terminal) up top. Both maintain 100% design system contrast parity.",
+        "textBiz": "Core Capabilities: Custom web applications, multimodal AI pipelines, and internal ops automation designed for measurable business ROI."
+      },
+      {
+        "id": "ch_deployments",
+        "freq": "924.0MHz",
+        "sender": "RADAR // PROJECTS",
+        "senderBiz": "RADAR // CASE-STUDIES",
+        "text": "Spotlight: Retriever. Replaced LangChain + Pinecone with hexagonal FastAPI & PostgreSQL pgvector on bare-metal Oracle VPS. Zero token leak.",
+        "textBiz": "Production Case Studies: Real revenue-generating platforms & AI engines delivered on-time. Click any card to inspect deployment metrics."
+      },
+      {
+        "id": "ch_resume",
+        "freq": "931.8MHz",
+        "sender": "RADAR // DOSSIER-CV",
+        "senderBiz": "RADAR // GUARANTEES",
+        "text": "Engineering Dossier: Full CV & system design certifications. Instant PDF download available in the section header.",
+        "textBiz": "Commercials & Guarantees: Fixed-price milestone pricing, transparent deliverables, and 30-day post-launch warranty included."
+      },
+      {
+        "id": "ch_playground",
+        "freq": "942.5MHz",
+        "sender": "RADAR // PLAYGROUND",
+        "senderBiz": "RADAR // INNOVATION",
+        "text": "Interactive Sandbox: Micro-SaaS prototypes, retro arcade games, and pathfinding algorithms. 100% playable in-browser.",
+        "textBiz": "Innovation Showcase: Interactive prototypes and working proof-of-concepts demonstrating rapid feature delivery."
+      },
+      {
+        "id": "ch_blog",
+        "freq": "948.3MHz",
+        "sender": "RADAR // DEV-LOGS",
+        "senderBiz": "RADAR // INSIGHTS",
+        "text": "Deep-dive engineering post-mortems and architecture essays. Production lessons learned the hard way in high-stakes environments.",
+        "textBiz": "Executive Insights: Practical essays on deploying AI tools that actually save money, prevent lock-in, and scale cleanly."
+      },
+      {
+        "id": "ch_contact",
+        "freq": "955.0MHz",
+        "sender": "RADAR // COMMS WIRE",
+        "senderBiz": "RADAR // ADVISORY",
+        "text": "Terminal Comms: Ping prateeqsharma@gmail.com directly or launch /terminal to inspect system diagnostics. Response time: < 4 hours.",
+        "textBiz": "Direct Wire: Have an upcoming project or product sprint? Email prateeqsharma@gmail.com for instant scoping & quote consultation."
+      }
+    ]
   }
 }

@@ -46,7 +46,7 @@ export default function ScrollSection({ children, verticalOffset, centerOnly, ga
   const prefersReducedMotion = useReducedMotion();
   const [isMobile, setIsMobile] = useState(false);
 
-  const scrollOpacity = useMotionValue(disableFade ? 1 : 0);
+  const scrollOpacity = useMotionValue(1);
   const y = useMotionValue(0);
 
   useEffect(() => {
@@ -74,7 +74,11 @@ export default function ScrollSection({ children, verticalOffset, centerOnly, ga
 
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
-    if (prefersReducedMotion || isMobile) return;
+    if (prefersReducedMotion || isMobile) {
+      scrollOpacity.set(1);
+      y.set(0);
+      return;
+    }
 
     const el = wrapperRef.current;
     if (!el) return;
@@ -172,7 +176,7 @@ export default function ScrollSection({ children, verticalOffset, centerOnly, ga
     <div ref={wrapperRef} style={gap ? { marginBottom: gap } : undefined}>
       <m.div 
         className={styles.scrollInner} 
-        style={prefersReducedMotion || isMobile ? undefined : { y, opacity: scrollOpacity }}
+        style={prefersReducedMotion || isMobile ? { opacity: 1, transform: 'none' } : { y, opacity: scrollOpacity }}
       >
         {children}
       </m.div>

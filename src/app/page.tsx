@@ -13,7 +13,7 @@ const Projects = dynamic(() => import('@/components/Projects/Projects'));
 const Resume = dynamic(() => import('@/components/Resume/Resume'));
 const PlaygroundSection = dynamic(() => import('@/components/playground/PlaygroundSection'));
 const Contact = dynamic(() => import('@/components/Contact/Contact'));
-const PersonaAdaptiveBanner = dynamic(() => import('@/components/ui/PersonaAdaptiveBanner'));
+const AlphaPager = dynamic(() => import('@/components/ui/AlphaPager'));
 
 function SectionSkeleton({ height }: { height: string }) {
   return (
@@ -98,7 +98,7 @@ export default function Home() {
         <Contact />
       </ScrollSection>
 
-      <PersonaAdaptiveBanner />
+      <AlphaPager />
     </>
   );
 }

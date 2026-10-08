@@ -110,3 +110,25 @@ export function playAchievementSound(): void {
     // Ignore audio errors
   }
 }
+
+export function playPagerChirp(): void {
+  if (isMuted) return;
+  const ctx = getAudioContext();
+  if (!ctx || ctx.state !== 'running') return;
+
+  try {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(1760, ctx.currentTime);
+    osc.frequency.setValueAtTime(2349, ctx.currentTime + 0.04);
+    gain.gain.setValueAtTime(0.015, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.09);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.09);
+  } catch {
+    // Ignore audio errors
+  }
+}

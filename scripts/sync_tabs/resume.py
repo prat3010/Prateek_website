@@ -33,9 +33,10 @@ def render_resume_profile_tab():
 
     res = st.session_state.resume
 
-    tab_res_profile, tab_res_career = st.tabs([
+    tab_res_profile, tab_res_career, tab_res_pager = st.tabs([
         "👤 Profile & Bio Details",
-        "💼 Career & Education Timeline"
+        "💼 Career & Education Timeline",
+        "📟 Pager Dispatch Transmitter"
     ])
 
     # ──────────────────────────────────────────────────────────
@@ -229,6 +230,83 @@ def render_resume_profile_tab():
                     if st.button("🗑️ Delete Education Block", key=f"del_edu_{edu_idx}", type="secondary"):
                         res['education'].pop(edu_idx)
                         st.rerun()
+
+    # ──────────────────────────────────────────────────────────
+    # SUB-TAB 3: 📟 Pager Dispatch Transmitter
+    # ──────────────────────────────────────────────────────────
+    with tab_res_pager:
+        with st.container(border=True):
+            st.markdown('<div class="section-header">📟 Alphanumeric Pager Dispatch Transmitter</div>', unsafe_allow_html=True)
+            st.info("Broadcast live alphanumeric messages directly to the 1990s pocket pager on the website!")
+
+            pager_cfg = res.get('pager', {}) or {}
+            pager_active = st.toggle("Enable Live Pager System", value=pager_cfg.get('active', True), key="pager_active_toggle")
+
+            messages = pager_cfg.get('messages', [])
+            if not messages:
+                messages = [
+                    {
+                        "id": "msg_01",
+                        "sender": "PRATEEQ // ARCHITECT",
+                        "text": "Welcome to the systems vault. Reviewing capabilities or looking to architect a custom platform?"
+                    },
+                    {
+                        "id": "msg_02",
+                        "sender": "AVAILABILITY",
+                        "text": "Open for 1 Q4/Q1 Forward Deployed Engineering advisory slot. Direct ping: prateeqsharma@gmail.com"
+                    },
+                    {
+                        "id": "msg_03",
+                        "sender": "TECH STACK",
+                        "text": "Engineered with Next.js 16 App Router, FastAPI, PostgreSQL pgvector, and local Ollama embeddings."
+                    }
+                ]
+
+            st.markdown(f"##### Active Pager Memory Bank ({len(messages)} Message{'s' if len(messages) != 1 else ''})")
+
+            updated_messages = []
+            for i, msg in enumerate(messages):
+                with st.expander(f"📟 MSG 0{i+1}: {msg.get('sender', 'DISPATCH')}", expanded=(i == 0)):
+                    c1, c2, c3 = st.columns([1, 1, 2])
+                    with c1:
+                        freq = st.text_input("Radio Freq", value=msg.get('freq', '901.2MHz'), key=f"pager_freq_{i}")
+                    with c2:
+                        sender = st.text_input("Sender Tag", value=msg.get('sender', 'DISPATCH'), key=f"pager_sender_{i}")
+                    with c3:
+                        text = st.text_area("Readout (Max 200 chars)", value=msg.get('text', ''), height=70, max_chars=200, key=f"pager_text_{i}")
+                    delete_msg = st.checkbox(f"🗑️ Delete Channel 0{i+1}", key=f"del_msg_{i}")
+                    if not delete_msg:
+                        updated_messages.append({
+                            "id": msg.get("id", f"ch_0{i+1}"),
+                            "freq": freq.strip() or "901.2MHz",
+                            "sender": sender.strip(),
+                            "text": text.strip()
+                        })
+
+            st.markdown("---")
+            st.markdown("##### ➕ Transmit New Pager Dispatch")
+            col_new1, col_new2, col_new3 = st.columns([1, 1, 2])
+            with col_new1:
+                new_freq = st.text_input("Radio Frequency", value="901.2MHz", key="new_pager_freq")
+            with col_new2:
+                new_sender = st.text_input("New Sender Tag", value="ANNOUNCEMENT", key="new_pager_sender")
+            with col_new3:
+                new_text = st.text_area("New Alphanumeric Message", value="", height=70, max_chars=200, placeholder="e.g. Shipped new GraphRAG pipeline to Oracle VPS...", key="new_pager_text")
+
+            if st.button("➕ Queue New Radio Dispatch", key="btn_add_page"):
+                if new_text.strip():
+                    updated_messages.append({
+                        "id": f"ch_0{len(updated_messages)+1}",
+                        "freq": new_freq.strip() or "901.2MHz",
+                        "sender": new_sender.strip() or "DISPATCH",
+                        "text": new_text.strip()
+                    })
+                    st.success("New radio dispatch queued in memory bank! Save changes below to transmit.")
+
+            res['pager'] = {
+                "active": pager_active,
+                "messages": updated_messages
+            }
 
     _save_resume_changes(res, "profile")
 

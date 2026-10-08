@@ -1,0 +1,608 @@
+/* ============================================================
+   Vintage 90s Alphanumeric Pager (Telepage-90)
+   Tactile pocket beeper with Framer Motion inertia dragging,
+   sunken matrix LCD, queue navigation, and physical keycaps.
+   ============================================================ */
+
+.viewportBounds {
+  position: fixed;
+  /* Expanded boundary limits allowing ~90% edge tuck while preserving ~10% grab tab */
+  top: -170px;
+  bottom: -170px;
+  left: -330px;
+  right: -330px;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.bannerWrapper {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  max-width: 380px;
+  width: calc(100vw - 3rem);
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ── Pager Device Outer Chassis (Polycarbonate Pocket Casing) ── */
+.pagerDevice {
+  background: #1B1D24;
+  border: 2px solid #101115;
+  border-radius: 12px 12px 16px 16px;
+  box-shadow: 
+    5px 5px 0px rgba(43, 43, 54, 0.32),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.6);
+  color: #FAF9F6;
+  position: relative;
+  overflow: hidden;
+  padding: 0.5rem 0.65rem 0.6rem 0.65rem;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.pagerDevice * {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.pagerDevice:active {
+  cursor: grabbing;
+}
+
+.pagerDevice:hover {
+  box-shadow: 7px 7px 0px rgba(43, 43, 54, 0.38);
+}
+
+/* ── Top Clip Bar & Molded Branding ── */
+.clipBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+  margin-bottom: 0.45rem;
+}
+
+.brandDeboss {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  font-family: var(--font-code, monospace);
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #727787;
+  text-transform: uppercase;
+}
+
+.brandName {
+  color: #8E94A8;
+}
+
+.brandModel {
+  font-size: 0.55rem;
+  color: #5E6270;
+}
+
+/* ── Alert vs Standby Beacons ── */
+.alertBeacon {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 46, 76, 0.14);
+  padding: 1px 6px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 46, 76, 0.35);
+}
+
+.ledPulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #FF2E4C;
+  box-shadow: 0 0 6px #FF2E4C;
+  animation: pagerBlink 1.2s infinite ease-in-out;
+}
+
+@keyframes pagerBlink {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(1.25);
+  }
+}
+
+.alertText {
+  font-family: var(--font-code, monospace);
+  font-size: 0.55rem;
+  font-weight: 800;
+  color: #FF5A73;
+  letter-spacing: 0.06em;
+}
+
+.radarFlash {
+  animation: radarBeaconLock 0.9s ease;
+}
+
+@keyframes radarBeaconLock {
+  0% { transform: scale(1); filter: brightness(1); }
+  35% { transform: scale(1.08); filter: brightness(1.5); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+
+.standbyBeacon {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(121, 180, 139, 0.12);
+  padding: 1px 6px;
+  border-radius: 3px;
+  border: 1px solid rgba(121, 180, 139, 0.25);
+}
+
+.standbyDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #79B48B;
+  box-shadow: 0 0 4px #79B48B;
+}
+
+.standbyText {
+  font-family: var(--font-code, monospace);
+  font-size: 0.55rem;
+  font-weight: 800;
+  color: #79B48B;
+  letter-spacing: 0.06em;
+}
+
+.topActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.topActionBtn {
+  background: #252833;
+  border: 1.5px solid #13151C;
+  color: #8A90A2;
+  font-family: var(--font-code, monospace);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  padding: 3px 6px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1;
+  box-shadow: 
+    1.5px 1.5px 0px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.topActionBtn:hover {
+  background: #2E3240;
+  color: #FAF9F6;
+  transform: translateY(-0.5px);
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.55);
+}
+
+.topActionBtn:active,
+.topActionBtn.lightBtnActive {
+  transform: translate(1px, 1px);
+  box-shadow: 0.5px 0.5px 0px rgba(0, 0, 0, 0.4);
+  background: #393E50;
+  color: #F4DC95;
+}
+
+.lightIconSvg {
+  flex-shrink: 0;
+}
+
+.lightBtnLabel {
+  font-size: 0.55rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+/* ── Main Body with Molded Grips & Sunken LCD ── */
+.pagerBody {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  margin-bottom: 0.45rem;
+}
+
+.sideGrip {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  width: 5px;
+  flex-shrink: 0;
+  cursor: grab;
+}
+
+.gripRib {
+  display: block;
+  height: 10px;
+  width: 100%;
+  background: #111216;
+  border-radius: 2px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* ── Sunken LCD Bezel Frame ── */
+.lcdBezel {
+  flex: 1;
+  background: #0E0F13;
+  border: 2px solid #14151B;
+  border-radius: 6px;
+  padding: 4px;
+  box-shadow: 
+    inset 2px 2px 5px rgba(0, 0, 0, 0.8),
+    inset -1px -1px 3px rgba(255, 255, 255, 0.07);
+}
+
+/* ── The Signature Matrix LCD Glass Screen ── */
+.lcdScreen {
+  background-color: #8DA778;
+  background-image: 
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.04) 0px, rgba(0, 0, 0, 0.04) 1px, transparent 1px, transparent 2px),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.04) 0px, rgba(0, 0, 0, 0.04) 1px, transparent 1px, transparent 2px);
+  color: #142210;
+  border-radius: 3px;
+  padding: 0.55rem 0.65rem;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.22);
+  font-family: var(--font-code, monospace);
+  position: relative;
+  min-height: 86px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Illuminated Backlight Flash (When 💡 is clicked) */
+.lcdScreen.lcdBacklightOn {
+  background-color: #A4C58C;
+  box-shadow: 
+    inset 0 0 16px rgba(255, 255, 255, 0.4),
+    0 0 12px rgba(164, 197, 140, 0.5);
+  color: #0F1A0B;
+}
+
+/* ── LCD Status Header (Signal, Message Counter, Buzzer, Clock) ── */
+.lcdStatusRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.lcdSignal {
+  font-size: 0.58rem;
+  letter-spacing: 0.02em;
+}
+
+.lcdMsgCount {
+  font-size: 0.62rem;
+}
+
+.lcdBuzzer {
+  font-size: 0.62rem;
+}
+
+.lcdClock {
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+.lcdDivider {
+  border-top: 1px dashed rgba(20, 34, 16, 0.4);
+  margin: 0.35rem 0;
+}
+
+/* ── LCD Content Readout ── */
+.lcdContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1;
+}
+
+.standbyScreen,
+.alertScreen {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.clickableScreen {
+  cursor: pointer;
+  border-radius: 2px;
+  transition: opacity 0.15s ease;
+}
+
+.clickableScreen:hover {
+  opacity: 0.92;
+}
+
+.clickableScreen:focus-visible {
+  outline: 1.5px solid currentColor;
+  outline-offset: 1px;
+}
+
+.navHint {
+  margin-left: auto;
+  font-size: 0.7rem;
+  font-weight: 800;
+  opacity: 0.65;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.clickableScreen:hover .navHint {
+  opacity: 1;
+  transform: translate(1px, -1px);
+}
+
+.lcdCategory {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #101E0D;
+}
+
+.lcdCursor {
+  animation: cursorBlink 1s infinite steps(1);
+}
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.lcdMessage {
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 0;
+  color: #0E1A0B;
+  letter-spacing: 0.01em;
+}
+
+/* ── Physical Bottom Controls & Speaker Grille ── */
+.pagerControls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 0.2rem;
+}
+
+.buttonCluster {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+/* ── Hardware Rubber Keycaps (Prev, Next, Clear) ── */
+.pagerKey {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45rem 0.65rem;
+  border-radius: 6px;
+  background: #2B2E38;
+  color: #F4DC95;
+  font-family: var(--font-code, monospace);
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: 1.5px solid #14151B;
+  cursor: pointer;
+  box-shadow: 
+    2px 2px 0px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
+  user-select: none;
+}
+
+.pagerKey:hover {
+  background: #343744;
+  color: #FFECA8;
+  transform: translateY(-1px);
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.7);
+}
+
+.pagerKey:active {
+  transform: translate(1.5px, 1.5px);
+  box-shadow: 0.5px 0.5px 0px rgba(0, 0, 0, 0.6);
+}
+
+.keyClear {
+  background: #22242D;
+  color: #8E93A6;
+  padding: 0.45rem 0.6rem;
+}
+
+.keyClear:hover {
+  color: #FFFFFF;
+  background: #2A2D38;
+}
+
+/* ── Pierced Piezo Speaker Grille ── */
+.speakerGrille {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 2px 4px;
+}
+
+.speakerSlit {
+  display: block;
+  width: 14px;
+  height: 2px;
+  background: #0D0E12;
+  border-radius: 1px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* ── Noir Theme Overrides (Tactical Matte Obsidian Hardware + EL Backlight) ── */
+:global([data-theme='noir']) .pagerDevice {
+  background: #111318;
+  border-color: #08090C;
+  box-shadow: 
+    5px 5px 0px #040508,
+    inset 0 1px 1px rgba(255, 255, 255, 0.09),
+    inset 0 -1.5px 2px rgba(0, 0, 0, 0.85);
+}
+
+:global([data-theme='noir']) .pagerDevice:hover {
+  border-color: #0E1015;
+  box-shadow: 
+    7px 7px 0px #040508,
+    inset 0 1px 1px rgba(255, 255, 255, 0.12);
+}
+
+:global([data-theme='noir']) .brandDeboss {
+  color: #585D6E;
+}
+
+:global([data-theme='noir']) .brandName {
+  color: #7B8196;
+}
+
+:global([data-theme='noir']) .brandModel {
+  color: #454958;
+}
+
+:global([data-theme='noir']) .lcdBezel {
+  background: #07090D;
+  border-color: #030406;
+  box-shadow: 
+    inset 2.5px 2.5px 6px rgba(0, 0, 0, 0.95),
+    inset -1px -1px 2px rgba(255, 255, 255, 0.05);
+}
+
+/* Electroluminescent Backlight in Noir (Internal LCD Glow only) */
+:global([data-theme='noir']) .lcdScreen {
+  background-color: #02191D;
+  background-image: 
+    repeating-linear-gradient(0deg, rgba(0, 240, 255, 0.04) 0px, rgba(0, 240, 255, 0.04) 1px, transparent 1px, transparent 2px),
+    repeating-linear-gradient(90deg, rgba(0, 240, 255, 0.04) 0px, rgba(0, 240, 255, 0.04) 1px, transparent 1px, transparent 2px);
+  color: #00F0FF;
+  box-shadow: 
+    inset 0 0 12px rgba(0, 240, 255, 0.2),
+    0 0 6px rgba(0, 240, 255, 0.06);
+  text-shadow: 0 0 4px rgba(0, 240, 255, 0.45);
+}
+
+:global([data-theme='noir']) .lcdScreen.lcdBacklightOn {
+  background-color: #03282F;
+  box-shadow: 
+    inset 0 0 18px rgba(0, 240, 255, 0.35),
+    0 0 12px rgba(0, 240, 255, 0.25);
+  text-shadow: 0 0 7px rgba(0, 240, 255, 0.8);
+}
+
+:global([data-theme='noir']) .lcdDivider {
+  border-color: rgba(0, 240, 255, 0.25);
+}
+
+:global([data-theme='noir']) .lcdCategory {
+  color: #00F0FF;
+}
+
+:global([data-theme='noir']) .lcdMessage {
+  color: #B5F7FF;
+}
+
+:global([data-theme='noir']) .topActionBtn {
+  background: #181A22;
+  border-color: #0A0C11;
+  color: #7B8298;
+  box-shadow: 
+    1.5px 1.5px 0px #040507,
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+:global([data-theme='noir']) .topActionBtn:hover {
+  background: #20242E;
+  color: #FAF9F6;
+  box-shadow: 2px 2px 0px #040507;
+}
+
+:global([data-theme='noir']) .topActionBtn.lightBtnActive {
+  background: #242938;
+  color: #00F0FF;
+}
+
+/* Authentic Matte Rubber Keycaps in Noir (Silkscreen silver printing, Zero fake neon) */
+:global([data-theme='noir']) .pagerKey {
+  background: #191B24;
+  color: #D8DCE8;
+  border: 1.5px solid #0D0E14;
+  box-shadow: 
+    2px 2px 0px #040507,
+    inset 0 1px 0 rgba(255, 255, 255, 0.09);
+}
+
+:global([data-theme='noir']) .pagerKey:hover {
+  background: #222530;
+  color: #FFFFFF;
+  transform: translateY(-1px);
+  box-shadow: 3px 3px 0px #040507;
+}
+
+:global([data-theme='noir']) .pagerKey:active {
+  transform: translate(1.5px, 1.5px);
+  box-shadow: 0.5px 0.5px 0px #040507;
+}
+
+:global([data-theme='noir']) .keyClear {
+  background: #14161E;
+  color: #787E92;
+}
+
+:global([data-theme='noir']) .keyClear:hover {
+  background: #1C1E28;
+  color: #D8DCE8;
+}
+
+@media (max-width: 640px) {
+  .viewportBounds {
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+  }
+  .bannerWrapper {
+    bottom: 0.5rem;
+    right: 0;
+    left: 0;
+    width: auto;
+  }
+}
