@@ -2,6 +2,9 @@
 
 import React, { useState, useMemo } from 'react';
 import { Search, Sparkles, Rocket, Gamepad2, Brain, Eye, Layers } from 'lucide-react';
+import { useTheme } from '@/context/ThemeContext';
+import Scrambler from '@/components/ui/Scrambler';
+import type { ScramblerProps } from '@/components/ui/Scrambler';
 import { PLAYGROUND_ITEMS, type PlaygroundKind, type GenerativeMediaPlaygroundItem } from '@/data/playgroundItems';
 import SaasCard from './cards/SaasCard';
 import ToyCard from './cards/ToyCard';
@@ -10,6 +13,11 @@ import CognitiveCard from './cards/CognitiveCard';
 import ExperimentCard from './cards/ExperimentCard';
 import MediaPromptLightbox from './viewers/MediaPromptLightbox';
 import styles from './PlaygroundGrid.module.css';
+
+const PLAYGROUND_PAGE_TITLE_TEXTS: ScramblerProps['texts'] = {
+  developer: { light: 'THE PLAYGROUND', noir: 'PLAYGROUND // ARCHIVE' },
+  business:  { light: 'INNOVATION LAB & PROTOTYPES', noir: 'INNOVATION LAB // PROTOTYPES' },
+};
 
 interface CategoryFilter {
   id: 'all' | PlaygroundKind;
@@ -27,6 +35,7 @@ const CATEGORIES: CategoryFilter[] = [
 ];
 
 export default function PlaygroundGrid() {
+  const { isNoir, audience } = useTheme();
   const [activeCategory, setActiveCategory] = useState<'all' | PlaygroundKind>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeLightboxItem, setActiveLightboxItem] = useState<GenerativeMediaPlaygroundItem | null>(null);
@@ -50,6 +59,11 @@ export default function PlaygroundGrid() {
     });
   }, [activeCategory, searchQuery]);
 
+  const activeAudience = audience || 'developer';
+  const subtitle = activeAudience === 'business'
+    ? 'A dynamic catalog of full-stack SaaS prototypes, interactive applications, custom tools, and experimental cognitive systems.'
+    : 'A dynamic creative laboratory for vibe-coded SaaS prototypes, retro arcade engines, AI prompt engineering showcases, and cognitive Retriever experiments.';
+
   return (
     <div className={styles.gridContainer}>
       <header className={styles.headerSection}>
@@ -57,10 +71,16 @@ export default function PlaygroundGrid() {
           <Sparkles size={13} />
           <span>The Innovation Sandbox</span>
         </div>
-        <h1 className={styles.title}>The Playground</h1>
+        <Scrambler
+          texts={PLAYGROUND_PAGE_TITLE_TEXTS}
+          variant="section-title"
+          as="h1"
+          className={styles.title}
+        >
+          {isNoir ? 'PLAYGROUND // ARCHIVE' : 'THE PLAYGROUND'}
+        </Scrambler>
         <p className={styles.subtitle}>
-          A dynamic creative laboratory for vibe-coded SaaS prototypes, retro arcade engines, 
-          AI prompt engineering showcases, and cognitive Retriever experiments.
+          {subtitle}
         </p>
 
         <div className={styles.controlsBar}>

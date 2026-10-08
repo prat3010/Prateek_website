@@ -162,4 +162,22 @@ describe('Navbar Component Navigation', () => {
     const activeNavLinks = container.querySelectorAll('.active');
     expect(activeNavLinks.length).toBe(0);
   });
+
+  it('smooth scrolls to #playground when clicking Playground link on home page', () => {
+    mockPathname = '/';
+    Object.defineProperty(window, 'location', {
+      value: { pathname: '/' },
+      writable: true,
+    });
+
+    render(<Navbar />);
+
+    const playgroundLink = screen.getAllByRole('link', { name: /playground/i })[0];
+    expect(playgroundLink.getAttribute('href')).toBe('/#playground');
+
+    fireEvent.click(playgroundLink);
+
+    // On home page, clicking /#playground should trigger lenis.scrollTo('#playground')
+    expect(mockLenisScrollTo).toHaveBeenCalledWith('#playground', expect.any(Object));
+  });
 });

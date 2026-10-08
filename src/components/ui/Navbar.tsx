@@ -74,7 +74,7 @@ export default function Navbar({ items, className }: NavbarProps) {
     if (pathname?.startsWith('/playground')) {
       return [
         { label: 'Home', href: '/' },
-        { label: 'Playground', href: '/playground' },
+        { label: 'Playground', href: '/#playground' },
         { label: 'Scoping Lab', href: '/scoping' },
         { label: 'Terminal', href: '/terminal' },
         { label: 'Contact', href: '/#contact' },
@@ -86,7 +86,7 @@ export default function Navbar({ items, className }: NavbarProps) {
       { label: 'Capabilities', href: '/#capabilities' },
       { label: 'Deployments', href: '/#deployments' },
       { label: audience === 'business' ? 'Services & Guarantees' : 'Resume', href: '/#resume' },
-      { label: 'Playground', href: '/playground' },
+      { label: 'Playground', href: '/#playground' },
       { label: 'Contact', href: '/#contact' },
     ];
   }, [items, pathname, audience]);
@@ -99,7 +99,7 @@ export default function Navbar({ items, className }: NavbarProps) {
 
   const effectiveActiveSection = useMemo(() => {
     if (pathname?.startsWith('/playground')) {
-      return '/playground';
+      return '/#playground';
     }
     if (pathname !== '/' && !pathname?.startsWith('/rag') && !items) {
       return '';

@@ -11,6 +11,7 @@ const About = dynamic(() => import('@/components/About/About'));
 const Skills = dynamic(() => import('@/components/Skills/Skills'));
 const Projects = dynamic(() => import('@/components/Projects/Projects'));
 const Resume = dynamic(() => import('@/components/Resume/Resume'));
+const PlaygroundSection = dynamic(() => import('@/components/playground/PlaygroundSection'));
 const Contact = dynamic(() => import('@/components/Contact/Contact'));
 const PersonaAdaptiveBanner = dynamic(() => import('@/components/ui/PersonaAdaptiveBanner'));
 
@@ -78,6 +79,12 @@ export default function Home() {
       <Suspense fallback={<SectionSkeleton height="700px" />}>
         <ScrollSection verticalOffset={120} gap={80}>
           <ResumeSection />
+        </ScrollSection>
+      </Suspense>
+
+      <Suspense fallback={<SectionSkeleton height="600px" />}>
+        <ScrollSection verticalOffset={120} gap={80}>
+          <PlaygroundSection />
         </ScrollSection>
       </Suspense>
 
