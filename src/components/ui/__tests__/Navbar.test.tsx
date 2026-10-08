@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import Navbar from '../Navbar';
 import * as ThemeContext from '@/context/ThemeContext';
 import * as AuthContext from '@/context/AuthContext';
@@ -10,6 +10,7 @@ import { motionValue } from 'framer-motion';
 const mockLenisScrollTo = vi.fn();
 const mockLenisStart = vi.fn();
 let mockPathname = '/';
+let latestObserverCallback: IntersectionObserverCallback | null = null;
 
 // Mock next/navigation
 vi.mock('next/navigation', () => ({
@@ -63,6 +64,9 @@ describe('Navbar Component Navigation', () => {
 
     // Mock IntersectionObserver
     global.IntersectionObserver = class {
+      constructor(cb: IntersectionObserverCallback) {
+        latestObserverCallback = cb;
+      }
       observe = vi.fn();
       unobserve = vi.fn();
       disconnect = vi.fn();
@@ -179,5 +183,93 @@ describe('Navbar Component Navigation', () => {
 
     // On home page, clicking /#playground should trigger lenis.scrollTo('#playground')
     expect(mockLenisScrollTo).toHaveBeenCalledWith('#playground', expect.any(Object));
+  });
+
+  it('highlights Services & Guarantees when scrolled to in business mode', () => {
+    mockPathname = '/';
+    Object.defineProperty(window, 'location', {
+      value: { pathname: '/' },
+      writable: true,
+    });
+
+    vi.spyOn(ThemeContext, 'useTheme').mockReturnValue({
+      theme: 'light',
+      toggleTheme: vi.fn(),
+      setTheme: vi.fn(),
+      isNoir: false,
+      isDetailsHidden: false,
+      toggleDetailsHidden: vi.fn(),
+      audience: 'business',
+      setAudience: vi.fn(),
+      prevAudience: null,
+      modeTransitionSeed: 0,
+      region: 'india',
+      setRegion: vi.fn(),
+    } as unknown as ReturnType<typeof ThemeContext.useTheme>);
+
+    const { container } = render(<Navbar />);
+
+    // Trigger IntersectionObserver for #resume section
+    act(() => {
+      latestObserverCallback?.(
+        [
+          {
+            target: { id: 'resume' },
+            isIntersecting: true,
+            intersectionRect: { height: 320 } as DOMRectReadOnly,
+          } as unknown as IntersectionObserverEntry,
+        ],
+        {} as IntersectionObserver
+      );
+    });
+
+    const activeLinks = container.querySelectorAll('[class*="active"]');
+    expect(activeLinks.length).toBeGreaterThan(0);
+    const activeText = Array.from(activeLinks).map((el) => el.textContent?.trim());
+    expect(activeText.some((text) => text?.includes('Services & Guarantees'))).toBe(true);
+  });
+
+  it('highlights Resume when scrolled to in developer mode', () => {
+    mockPathname = '/';
+    Object.defineProperty(window, 'location', {
+      value: { pathname: '/' },
+      writable: true,
+    });
+
+    vi.spyOn(ThemeContext, 'useTheme').mockReturnValue({
+      theme: 'light',
+      toggleTheme: vi.fn(),
+      setTheme: vi.fn(),
+      isNoir: false,
+      isDetailsHidden: false,
+      toggleDetailsHidden: vi.fn(),
+      audience: 'developer',
+      setAudience: vi.fn(),
+      prevAudience: null,
+      modeTransitionSeed: 0,
+      region: 'india',
+      setRegion: vi.fn(),
+    } as unknown as ReturnType<typeof ThemeContext.useTheme>);
+
+    const { container } = render(<Navbar />);
+
+    // Trigger IntersectionObserver for #resume section
+    act(() => {
+      latestObserverCallback?.(
+        [
+          {
+            target: { id: 'resume' },
+            isIntersecting: true,
+            intersectionRect: { height: 320 } as DOMRectReadOnly,
+          } as unknown as IntersectionObserverEntry,
+        ],
+        {} as IntersectionObserver
+      );
+    });
+
+    const activeLinks = container.querySelectorAll('[class*="active"]');
+    expect(activeLinks.length).toBeGreaterThan(0);
+    const activeText = Array.from(activeLinks).map((el) => el.textContent?.trim());
+    expect(activeText.some((text) => text?.includes('Resume'))).toBe(true);
   });
 });

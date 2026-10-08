@@ -39,13 +39,19 @@
 
 /* ── Pager Device Outer Chassis (Polycarbonate Pocket Casing) ── */
 .pagerDevice {
-  background: #1B1D24;
-  border: 2px solid #101115;
+  background-color: #383C48;
+  background-image: 
+    linear-gradient(175deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.02) 35%, rgba(0, 0, 0, 0.14) 100%),
+    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.04) 0.5px, transparent 0.6px),
+    url("data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' opacity='0.11'%3E%3Ccircle cx='3' cy='4' r='0.75'/%3E%3Ccircle cx='11' cy='2' r='0.6'/%3E%3Ccircle cx='19' cy='5' r='0.8'/%3E%3Ccircle cx='27' cy='3' r='0.7'/%3E%3Ccircle cx='7' cy='11' r='0.65'/%3E%3Ccircle cx='15' cy='13' r='0.75'/%3E%3Ccircle cx='23' cy='10' r='0.6'/%3E%3Ccircle cx='31' cy='12' r='0.8'/%3E%3Ccircle cx='3' cy='19' r='0.7'/%3E%3Ccircle cx='11' cy='21' r='0.65'/%3E%3Ccircle cx='19' cy='18' r='0.8'/%3E%3Ccircle cx='28' cy='20' r='0.6'/%3E%3Ccircle cx='7' cy='28' r='0.75'/%3E%3Ccircle cx='15' cy='26' r='0.6'/%3E%3Ccircle cx='24' cy='29' r='0.7'/%3E%3Ccircle cx='31' cy='27' r='0.65'/%3E%3C/g%3E%3Cg fill='%23000000' opacity='0.22'%3E%3Ccircle cx='7' cy='3' r='0.8'/%3E%3Ccircle cx='15' cy='4' r='0.9'/%3E%3Ccircle cx='23' cy='2' r='0.7'/%3E%3Ccircle cx='31' cy='5' r='0.85'/%3E%3Ccircle cx='3' cy='12' r='0.7'/%3E%3Ccircle cx='11' cy='10' r='0.85'/%3E%3Ccircle cx='19' cy='12' r='0.75'/%3E%3Ccircle cx='27' cy='11' r='0.8'/%3E%3Ccircle cx='7' cy='19' r='0.85'/%3E%3Ccircle cx='15' cy='19' r='0.7'/%3E%3Ccircle cx='23' cy='21' r='0.9'/%3E%3Ccircle cx='3' cy='27' r='0.75'/%3E%3Ccircle cx='11' cy='28' r='0.8'/%3E%3Ccircle cx='19' cy='27' r='0.85'/%3E%3Ccircle cx='27' cy='28' r='0.7'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat, repeat, repeat;
+  background-size: 100% 100%, 4px 4px, 32px 32px;
+  border: 2px solid #20232C;
   border-radius: 12px 12px 16px 16px;
   box-shadow: 
-    5px 5px 0px rgba(43, 43, 54, 0.32),
-    inset 0 1px 1px rgba(255, 255, 255, 0.15),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.6);
+    6px 6px 0px rgba(43, 43, 54, 0.35),
+    inset 0 1.5px 0.5px rgba(255, 255, 255, 0.22),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.45);
   color: #FAF9F6;
   position: relative;
   overflow: hidden;
@@ -69,7 +75,10 @@
 }
 
 .pagerDevice:hover {
-  box-shadow: 7px 7px 0px rgba(43, 43, 54, 0.38);
+  box-shadow: 
+    8px 8px 0px rgba(43, 43, 54, 0.42),
+    inset 0 1.5px 0.5px rgba(255, 255, 255, 0.26),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.45);
 }
 
 /* ── Top Clip Bar & Molded Branding ── */
@@ -78,7 +87,8 @@
   align-items: center;
   justify-content: space-between;
   padding-bottom: 0.35rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12);
   margin-bottom: 0.45rem;
 }
 
@@ -90,17 +100,18 @@
   font-size: 0.6rem;
   font-weight: 800;
   letter-spacing: 0.08em;
-  color: #727787;
   text-transform: uppercase;
 }
 
 .brandName {
-  color: #8E94A8;
+  color: #A4AABC;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.15), 0 -1px 0 rgba(0, 0, 0, 0.7);
 }
 
 .brandModel {
   font-size: 0.55rem;
-  color: #5E6270;
+  color: #767C8F;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.12), 0 -1px 0 rgba(0, 0, 0, 0.7);
 }
 
 /* ── Alert vs Standby Beacons ── */
@@ -185,9 +196,9 @@
 }
 
 .topActionBtn {
-  background: #252833;
-  border: 1.5px solid #13151C;
-  color: #8A90A2;
+  background: #252834;
+  border: 1.5px solid #13151D;
+  color: #9AA0B4;
   font-family: var(--font-code, monospace);
   font-size: 0.58rem;
   font-weight: 800;
@@ -200,24 +211,26 @@
   gap: 4px;
   line-height: 1;
   box-shadow: 
-    1.5px 1.5px 0px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    1.5px 1.5px 0px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
   transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.15s ease, color 0.15s ease;
 }
 
 .topActionBtn:hover {
-  background: #2E3240;
+  background: #2E3342;
   color: #FAF9F6;
   transform: translateY(-0.5px);
-  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.55);
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.6);
 }
 
 .topActionBtn:active,
 .topActionBtn.lightBtnActive {
   transform: translate(1px, 1px);
   box-shadow: 0.5px 0.5px 0px rgba(0, 0, 0, 0.4);
-  background: #393E50;
-  color: #F4DC95;
+  background: #2E2A20;
+  border-color: #8C7430;
+  color: #FADB7F;
+  box-shadow: 0 0 6px rgba(250, 219, 127, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .lightIconSvg {
@@ -244,36 +257,38 @@
   flex-direction: column;
   justify-content: center;
   gap: 4px;
-  width: 5px;
+  width: 6px;
   flex-shrink: 0;
   cursor: grab;
 }
 
 .gripRib {
   display: block;
-  height: 10px;
+  height: 11px;
   width: 100%;
-  background: #111216;
+  background: #15171F;
   border-radius: 2px;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(255, 255, 255, 0.14);
 }
 
 /* ── Sunken LCD Bezel Frame ── */
 .lcdBezel {
   flex: 1;
-  background: #0E0F13;
-  border: 2px solid #14151B;
-  border-radius: 6px;
-  padding: 4px;
+  background: #0E1015;
+  border: 2px solid #161820;
+  border-radius: 7px;
+  padding: 4.5px;
   box-shadow: 
-    inset 2px 2px 5px rgba(0, 0, 0, 0.8),
-    inset -1px -1px 3px rgba(255, 255, 255, 0.07);
+    inset 2.5px 2.5px 6px rgba(0, 0, 0, 0.85),
+    inset -1.5px -1.5px 3px rgba(255, 255, 255, 0.1),
+    0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 /* ── The Signature Matrix LCD Glass Screen ── */
 .lcdScreen {
   background-color: #8DA778;
   background-image: 
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.02) 28%, transparent 55%),
     repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.04) 0px, rgba(0, 0, 0, 0.04) 1px, transparent 1px, transparent 2px),
     repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.04) 0px, rgba(0, 0, 0, 0.04) 1px, transparent 1px, transparent 2px);
   color: #142210;
@@ -426,27 +441,28 @@
   justify-content: center;
   padding: 0.45rem 0.65rem;
   border-radius: 6px;
-  background: #2B2E38;
+  background: #252834;
   color: #F4DC95;
   font-family: var(--font-code, monospace);
   font-size: 0.7rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  border: 1.5px solid #14151B;
+  border: 1.5px solid #13151D;
   cursor: pointer;
   box-shadow: 
-    2px 2px 0px rgba(0, 0, 0, 0.6),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    2.5px 2.5px 0px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5);
   transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
   user-select: none;
 }
 
 .pagerKey:hover {
-  background: #343744;
+  background: #2E3242;
   color: #FFECA8;
   transform: translateY(-1px);
-  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.7);
+  box-shadow: 3.5px 3.5px 0px rgba(0, 0, 0, 0.75);
 }
 
 .pagerKey:active {
@@ -455,14 +471,18 @@
 }
 
 .keyClear {
-  background: #22242D;
-  color: #8E93A6;
+  background: #1D1F27;
+  color: #8E94A8;
   padding: 0.45rem 0.6rem;
+  box-shadow: 
+    2px 2px 0px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5);
 }
 
 .keyClear:hover {
   color: #FFFFFF;
-  background: #2A2D38;
+  background: #252833;
 }
 
 /* ── Pierced Piezo Speaker Grille ── */
@@ -475,54 +495,69 @@
 
 .speakerSlit {
   display: block;
-  width: 14px;
-  height: 2px;
-  background: #0D0E12;
+  width: 15px;
+  height: 2.5px;
+  background: #101217;
   border-radius: 1px;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 255, 255, 0.14);
 }
 
-/* ── Noir Theme Overrides (Tactical Matte Obsidian Hardware + EL Backlight) ── */
+/* ── Noir Theme Overrides (Tactical Matte Slate Hardware + EL Backlight) ── */
 :global([data-theme='noir']) .pagerDevice {
-  background: #111318;
-  border-color: #08090C;
+  background-color: #272B36;
+  background-image: 
+    linear-gradient(175deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.015) 35%, rgba(0, 0, 0, 0.18) 100%),
+    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.035) 0.5px, transparent 0.6px),
+    url("data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' opacity='0.09'%3E%3Ccircle cx='3' cy='4' r='0.75'/%3E%3Ccircle cx='11' cy='2' r='0.6'/%3E%3Ccircle cx='19' cy='5' r='0.8'/%3E%3Ccircle cx='27' cy='3' r='0.7'/%3E%3Ccircle cx='7' cy='11' r='0.65'/%3E%3Ccircle cx='15' cy='13' r='0.75'/%3E%3Ccircle cx='23' cy='10' r='0.6'/%3E%3Ccircle cx='31' cy='12' r='0.8'/%3E%3Ccircle cx='3' cy='19' r='0.7'/%3E%3Ccircle cx='11' cy='21' r='0.65'/%3E%3Ccircle cx='19' cy='18' r='0.8'/%3E%3Ccircle cx='28' cy='20' r='0.6'/%3E%3Ccircle cx='7' cy='28' r='0.75'/%3E%3Ccircle cx='15' cy='26' r='0.6'/%3E%3Ccircle cx='24' cy='29' r='0.7'/%3E%3Ccircle cx='31' cy='27' r='0.65'/%3E%3C/g%3E%3Cg fill='%23000000' opacity='0.28'%3E%3Ccircle cx='7' cy='3' r='0.8'/%3E%3Ccircle cx='15' cy='4' r='0.9'/%3E%3Ccircle cx='23' cy='2' r='0.7'/%3E%3Ccircle cx='31' cy='5' r='0.85'/%3E%3Ccircle cx='3' cy='12' r='0.7'/%3E%3Ccircle cx='11' cy='10' r='0.85'/%3E%3Ccircle cx='19' cy='12' r='0.75'/%3E%3Ccircle cx='27' cy='11' r='0.8'/%3E%3Ccircle cx='7' cy='19' r='0.85'/%3E%3Ccircle cx='15' cy='19' r='0.7'/%3E%3Ccircle cx='23' cy='21' r='0.9'/%3E%3Ccircle cx='3' cy='27' r='0.75'/%3E%3Ccircle cx='11' cy='28' r='0.8'/%3E%3Ccircle cx='19' cy='27' r='0.85'/%3E%3Ccircle cx='27' cy='28' r='0.7'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat, repeat, repeat;
+  background-size: 100% 100%, 4px 4px, 32px 32px;
+  border-color: #141720;
   box-shadow: 
-    5px 5px 0px #040508,
-    inset 0 1px 1px rgba(255, 255, 255, 0.09),
-    inset 0 -1.5px 2px rgba(0, 0, 0, 0.85);
+    6px 6px 0px #040508,
+    inset 0 1.5px 0.5px rgba(255, 255, 255, 0.16),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.7);
 }
 
 :global([data-theme='noir']) .pagerDevice:hover {
-  border-color: #0E1015;
+  border-color: #1C202C;
   box-shadow: 
-    7px 7px 0px #040508,
-    inset 0 1px 1px rgba(255, 255, 255, 0.12);
+    8px 8px 0px #040508,
+    inset 0 1.5px 0.5px rgba(255, 255, 255, 0.2);
+}
+
+:global([data-theme='noir']) .clipBar {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.6);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 :global([data-theme='noir']) .brandDeboss {
-  color: #585D6E;
+  color: #72788C;
 }
 
 :global([data-theme='noir']) .brandName {
-  color: #7B8196;
+  color: #8E95AA;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), 0 -1px 0 rgba(0, 0, 0, 0.85);
 }
 
 :global([data-theme='noir']) .brandModel {
-  color: #454958;
+  color: #5D6376;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.08), 0 -1px 0 rgba(0, 0, 0, 0.85);
 }
 
 :global([data-theme='noir']) .lcdBezel {
-  background: #07090D;
-  border-color: #030406;
+  background: #06080C;
+  border-color: #0B0D13;
   box-shadow: 
-    inset 2.5px 2.5px 6px rgba(0, 0, 0, 0.95),
-    inset -1px -1px 2px rgba(255, 255, 255, 0.05);
+    inset 3px 3px 7px rgba(0, 0, 0, 0.95),
+    inset -1.5px -1.5px 2px rgba(255, 255, 255, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 /* Electroluminescent Backlight in Noir (Internal LCD Glow only) */
 :global([data-theme='noir']) .lcdScreen {
   background-color: #02191D;
   background-image: 
+    linear-gradient(135deg, rgba(0, 240, 255, 0.07) 0%, rgba(0, 240, 255, 0.01) 28%, transparent 55%),
     repeating-linear-gradient(0deg, rgba(0, 240, 255, 0.04) 0px, rgba(0, 240, 255, 0.04) 1px, transparent 1px, transparent 2px),
     repeating-linear-gradient(90deg, rgba(0, 240, 255, 0.04) 0px, rgba(0, 240, 255, 0.04) 1px, transparent 1px, transparent 2px);
   color: #00F0FF;
@@ -553,40 +588,43 @@
 }
 
 :global([data-theme='noir']) .topActionBtn {
-  background: #181A22;
-  border-color: #0A0C11;
+  background: #1A1D27;
+  border-color: #0B0D14;
   color: #7B8298;
   box-shadow: 
     1.5px 1.5px 0px #040507,
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 :global([data-theme='noir']) .topActionBtn:hover {
-  background: #20242E;
+  background: #232734;
   color: #FAF9F6;
   box-shadow: 2px 2px 0px #040507;
 }
 
 :global([data-theme='noir']) .topActionBtn.lightBtnActive {
-  background: #242938;
+  background: #142830;
+  border-color: #00A5B2;
   color: #00F0FF;
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 /* Authentic Matte Rubber Keycaps in Noir (Silkscreen silver printing, Zero fake neon) */
 :global([data-theme='noir']) .pagerKey {
-  background: #191B24;
+  background: #181A24;
   color: #D8DCE8;
-  border: 1.5px solid #0D0E14;
+  border: 1.5px solid #0C0E14;
   box-shadow: 
-    2px 2px 0px #040507,
-    inset 0 1px 0 rgba(255, 255, 255, 0.09);
+    2.5px 2.5px 0px #040507,
+    inset 0 1px 0 rgba(255, 255, 255, 0.11),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6);
 }
 
 :global([data-theme='noir']) .pagerKey:hover {
-  background: #222530;
+  background: #212430;
   color: #FFFFFF;
   transform: translateY(-1px);
-  box-shadow: 3px 3px 0px #040507;
+  box-shadow: 3.5px 3.5px 0px #040507;
 }
 
 :global([data-theme='noir']) .pagerKey:active {
@@ -595,13 +633,27 @@
 }
 
 :global([data-theme='noir']) .keyClear {
-  background: #14161E;
+  background: #13151D;
   color: #787E92;
+  box-shadow: 
+    2px 2px 0px #040507,
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6);
 }
 
 :global([data-theme='noir']) .keyClear:hover {
-  background: #1C1E28;
+  background: #1A1C26;
   color: #D8DCE8;
+}
+
+:global([data-theme='noir']) .gripRib {
+  background: #0E1017;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.95), 0 1px 0 rgba(255, 255, 255, 0.09);
+}
+
+:global([data-theme='noir']) .speakerSlit {
+  background: #0B0C11;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.95), 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 @media (max-width: 640px) {

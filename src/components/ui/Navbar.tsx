@@ -114,11 +114,30 @@ export default function Navbar({ items, className }: NavbarProps) {
   const lenis = useLenis();
   const prefersReducedMotion = useReducedMotion();
 
+  const isClickScrollingRef = useRef(false);
+  const clickScrollTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const activeSectionRef = useRef(activeSection);
+
+  useEffect(() => {
+    activeSectionRef.current = activeSection;
+  }, [activeSection]);
+
+  useEffect(() => {
+    return () => {
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+      if (clickScrollTimerRef.current) clearTimeout(clickScrollTimerRef.current);
+    };
+  }, []);
+
   /* ---------- Scroll direction / scrolled threshold listener ---------- */
   useEffect(() => {
     let lastY = 0;
     const unsub = scrollY.on('change', (y) => {
       setScrolled(y > 50);
+      if (y <= 50 && !isClickScrollingRef.current) {
+        const homeHref = items && items.length > 0 ? items[0].href : (pathname?.startsWith('/rag') ? '/rag#home' : '/#home');
+        setActiveSection(homeHref);
+      }
       const diff = Math.abs(y - lastY);
       if (diff > 2) {
         setIsScrolling(true);
@@ -128,25 +147,46 @@ export default function Navbar({ items, className }: NavbarProps) {
       lastY = y;
     });
     return unsub;
-  }, [scrollY]);
+  }, [scrollY, items, pathname]);
 
   /* ---------- Intersection Observer for Section Tracking ---------- */
   useEffect(() => {
-    const observerOptions = {
+    const visibleEntries = new Map<string, IntersectionObserverEntry>();
+
+    const observerOptions: IntersectionObserverInit = {
       root: null,
-      rootMargin: '-30% 0px -30% 0px',
-      threshold: 0.15,
+      rootMargin: '-20% 0px -25% 0px',
+      threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
     };
 
     const observer = new IntersectionObserver((entries) => {
+      if (isClickScrollingRef.current) return;
+
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const matchingItem = navItems.find((item) => item.href.endsWith(`#${entry.target.id}`));
-          if (matchingItem) {
-            setActiveSection(matchingItem.href);
-          }
-        }
+        visibleEntries.set(entry.target.id, entry);
       });
+
+      const intersecting = Array.from(visibleEntries.values()).filter(
+        (entry) => entry.isIntersecting
+      );
+
+      if (intersecting.length > 0) {
+        intersecting.sort((a, b) => {
+          const diff = b.intersectionRect.height - a.intersectionRect.height;
+          if (Math.abs(diff) > 2) return diff;
+          if (activeSectionRef.current.endsWith(`#${a.target.id}`)) return -1;
+          if (activeSectionRef.current.endsWith(`#${b.target.id}`)) return 1;
+          return diff;
+        });
+
+        const bestEntry = intersecting[0];
+        const matchingItem = navItems.find((item) =>
+          item.href.endsWith(`#${bestEntry.target.id}`)
+        );
+        if (matchingItem) {
+          setActiveSection(matchingItem.href);
+        }
+      }
     }, observerOptions);
 
     navItems.forEach((item) => {
@@ -158,7 +198,10 @@ export default function Navbar({ items, className }: NavbarProps) {
       }
     });
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      visibleEntries.clear();
+    };
   }, [navItems, pathname]);
 
   /* ---------- Close mobile menu on desktop resize ---------- */
@@ -236,6 +279,12 @@ export default function Navbar({ items, className }: NavbarProps) {
 
       if (isCurrentPage && anchorId) {
         e.preventDefault();
+        isClickScrollingRef.current = true;
+        if (clickScrollTimerRef.current) clearTimeout(clickScrollTimerRef.current);
+        clickScrollTimerRef.current = setTimeout(() => {
+          isClickScrollingRef.current = false;
+        }, prefersReducedMotion ? 50 : 1300);
+
         if (lenis) {
           lenis.start();
           lenis.scrollTo(anchorId, { duration: prefersReducedMotion ? 0 : 1.2, offset: NAVBAR_SCROLL_OFFSET });
@@ -379,7 +428,7 @@ export default function Navbar({ items, className }: NavbarProps) {
           <Link
             key={item.href}
             href={item.href}
-            className={`${styles.mobileNavLink} ${activeSection === item.href ? styles.active : ''}`}
+            className={`${styles.mobileNavLink} ${effectiveActiveSection === item.href ? styles.active : ''}`}
             onClick={(e) => handleNavClick(e, item.href)}
           >
             {item.href === '/#resume' ? (
