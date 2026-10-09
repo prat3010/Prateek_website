@@ -109,6 +109,15 @@ export default function AlphaPager() {
   const { audience, isDetailsHidden } = useTheme();
   const isBiz = audience === 'business';
 
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
+  });
+  const [isExpanded, setIsExpanded] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return !(window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches);
+  });
+
   const [messages, setMessages] = useState<PagerMessage[]>(DEFAULT_MESSAGES);
   const [activeMsgIndex, setActiveMsgIndex] = useState(0);
   const [mode, setMode] = useState<'standby' | 'alert'>('standby');
@@ -118,7 +127,39 @@ export default function AlphaPager() {
   const [backlightActive, setBacklightActive] = useState(false);
   const constraintsRef = useRef<HTMLDivElement>(null);
   const activeSectionRef = useRef<string>('home');
+  const lastChirpRef = useRef<number>(0);
+  const flashTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lenis = useLenis();
+
+  // Track viewport resize for responsive mobile layout adjustments
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
+      setIsMobile(mobile);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Dismiss expanded device on mobile when user taps outside the pager
+  useEffect(() => {
+    if (!isMobile || !isExpanded) return;
+
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest(`.${styles.pagerDevice}`)) return;
+      setIsExpanded(false);
+    };
+
+    const timer = setTimeout(() => {
+      document.addEventListener('pointerdown', handleClickOutside);
+    }, 120);
+
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('pointerdown', handleClickOutside);
+    };
+  }, [isMobile, isExpanded]);
 
   // Play subtle chirp and trigger flash when toggling DEV vs BIZ mode
   const prevAudienceRef = useRef<string | null>(audience);
@@ -174,26 +215,39 @@ export default function AlphaPager() {
       threshold: 0.15,
     };
 
+    if (typeof window === 'undefined' || typeof IntersectionObserver === 'undefined') return;
+
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const secId = entry.target.id;
-          if (secId && secId !== activeSectionRef.current) {
-            activeSectionRef.current = secId;
-            const targetIdx = messages.findIndex(
-              (m) => m.sectionId === secId || m.id.endsWith(secId)
-            );
-            if (targetIdx !== -1) {
-              setActiveMsgIndex(targetIdx);
-              setMode('alert');
-              setBeaconText('RADAR LOCKED');
-              playPagerChirp();
-              setRadarFlash(true);
-              setTimeout(() => setRadarFlash(false), 900);
-            }
+      const intersecting = entries.filter((e) => e.isIntersecting);
+      if (intersecting.length === 0) return;
+
+      // Select most visible section in current viewport to avoid rapid ping-pong
+      const bestEntry = intersecting.reduce((best, curr) =>
+        curr.intersectionRatio > best.intersectionRatio ? curr : best
+      );
+
+      const secId = bestEntry.target.id;
+      if (secId && secId !== activeSectionRef.current) {
+        activeSectionRef.current = secId;
+        const targetIdx = messages.findIndex(
+          (m) => m.sectionId === secId || m.id.endsWith(secId)
+        );
+        if (targetIdx !== -1) {
+          setActiveMsgIndex(targetIdx);
+          setMode('alert');
+          setBeaconText('RADAR LOCKED');
+
+          // Debounce audio chirps and flash animation during fast scrolling
+          const now = Date.now();
+          if (now - lastChirpRef.current > 1200) {
+            lastChirpRef.current = now;
+            playPagerChirp();
+            setRadarFlash(true);
+            if (flashTimeoutRef.current) clearTimeout(flashTimeoutRef.current);
+            flashTimeoutRef.current = setTimeout(() => setRadarFlash(false), 900);
           }
         }
-      });
+      }
     }, observerOptions);
 
     sectionIds.forEach((id) => {
@@ -201,7 +255,10 @@ export default function AlphaPager() {
       if (el) observer.observe(el);
     });
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      if (flashTimeoutRef.current) clearTimeout(flashTimeoutRef.current);
+    };
   }, [messages]);
 
   // Clean up any stray selection restrictions on unmount
@@ -212,8 +269,9 @@ export default function AlphaPager() {
     };
   }, []);
 
-  // Prevent background text selection during pager drag gestures
+  // Prevent background text selection during desktop pager drag gestures
   const handlePointerDown = (e: React.PointerEvent) => {
+    if (isMobile) return;
     const target = e.target as HTMLElement | null;
     if (target?.closest('button') || target?.closest(`.${styles.alertScreen}`)) {
       return;
@@ -238,12 +296,14 @@ export default function AlphaPager() {
   };
 
   const handleDragStart = () => {
+    if (isMobile) return;
     document.body.style.userSelect = 'none';
     document.body.style.webkitUserSelect = 'none';
     window.getSelection()?.removeAllRanges();
   };
 
   const handleDragEnd = () => {
+    if (isMobile) return;
     document.body.style.userSelect = '';
     document.body.style.webkitUserSelect = '';
     window.getSelection()?.removeAllRanges();
@@ -266,13 +326,23 @@ export default function AlphaPager() {
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
     playPagerChirp();
-    // CLR silences alerts and returns to passive standby monitoring
-    setMode('standby');
+    // CLR silences alerts and returns to passive standby monitoring; if already in standby on mobile, docks the device
+    if (mode === 'standby' && isMobile) {
+      setIsExpanded(false);
+    } else {
+      setMode('standby');
+    }
   };
 
   const handleToggleLight = (e: React.MouseEvent) => {
     e.stopPropagation();
     setBacklightActive((prev) => !prev);
+  };
+
+  const handleToggleDock = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    playPagerChirp();
+    setIsExpanded((prev) => !prev);
   };
 
   const { stats } = useSystemTelemetry();
@@ -292,200 +362,263 @@ export default function AlphaPager() {
       const el = document.getElementById(targetSecId);
       if (el) el.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [currentMsg, lenis]);
+
+    // On mobile, docking after navigating gives user full viewport view
+    if (isMobile) {
+      setIsExpanded(false);
+    }
+  }, [currentMsg, lenis, isMobile]);
 
   return (
     <Portal>
       <div className={styles.viewportBounds} ref={constraintsRef}>
-        <div className={`${styles.bannerWrapper} ${isDetailsHidden ? styles.hidden : ''}`}>
-          {/* ── Draggable Vintage Alphanumeric Pager ── */}
-          <m.div
-            key="pager-device"
-            className={styles.pagerDevice}
-            drag
-            dragConstraints={constraintsRef}
-            dragMomentum={true}
-            dragElastic={0.08}
-            dragTransition={{ bounceStiffness: 400, bounceDamping: 28 }}
-            onPointerDown={handlePointerDown}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-            whileDrag={{ scale: 1.02, cursor: 'grabbing' }}
-            initial={{ opacity: 0, y: 35, scale: 0.94 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            role="region"
-            aria-label="Vintage Alphanumeric Pager & Section Radar"
-          >
-            {/* Top Belt-Clip Hinge & Casing Branding */}
-            <div className={styles.clipBar}>
-              <div className={styles.brandDeboss}>
-                <span className={styles.brandName}>PRATEEQ</span>
-                <span className={styles.brandModel}>ALPHAPAGE-90</span>
-              </div>
+        <div className={`${styles.bannerWrapper} ${isExpanded ? styles.bannerWrapperExpanded : ''} ${isDetailsHidden ? styles.hidden : ''}`}>
+          {!isExpanded ? (
+            /* ── Compact Belt-Clip Mode (Mobile & Minimized Dock) ── */
+            <m.div
+              key="pager-compact"
+              className={`${styles.pagerDevice} ${styles.compactClip}`}
+              onClick={handleToggleDock}
+              initial={{ opacity: 0, scale: 0.92, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 15 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              role="region"
+              aria-label="Vintage Pager Pocket Clip"
+            >
+              <div className={styles.compactContent}>
+                {mode === 'alert' ? (
+                  <span className={`${styles.compactLed} ${radarFlash ? styles.radarFlash : ''}`} />
+                ) : (
+                  <span className={styles.compactLedStandby} />
+                )}
 
-              {mode === 'alert' ? (
-                <div className={`${styles.alertBeacon} ${radarFlash ? styles.radarFlash : ''}`}>
-                  <span className={styles.ledPulse} />
-                  <span className={styles.alertText}>{beaconText}</span>
+                <div className={styles.compactInfo}>
+                  <span className={styles.compactBrand}>PRATEEQ</span>
+                  <span className={styles.compactDivider}>/</span>
+                  <span className={styles.compactFreq}>
+                    {mode === 'alert' ? (currentMsg.freq || '900.1M') : '900M'}
+                  </span>
+                  <span className={styles.compactDivider}>/</span>
+                  <span className={styles.compactChannel}>
+                    CH 0{activeMsgIndex + 1}
+                  </span>
                 </div>
-              ) : (
-                <div className={styles.standbyBeacon}>
-                  <span className={styles.standbyDot} />
-                  <span className={styles.standbyText}>STANDBY</span>
-                </div>
-              )}
 
-              <div className={styles.topActions}>
                 <button
                   type="button"
-                  className={`${styles.topActionBtn} ${backlightActive ? styles.lightBtnActive : ''}`}
-                  onClick={handleToggleLight}
-                  title={backlightActive ? "Turn off LCD backlight" : "Turn on LCD backlight"}
-                  aria-label="Toggle LCD backlight"
+                  className={styles.compactExpandBtn}
+                  onClick={handleToggleDock}
+                  aria-label="Expand Alphanumeric Pager"
+                  title="Expand pager readout"
                 >
-                  <svg
-                    width="10"
-                    height="10"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                    className={styles.lightIconSvg}
+                  <span className={styles.compactExpandIcon}>▲</span>
+                  <span className={styles.compactExpandLabel}>RADAR</span>
+                </button>
+              </div>
+            </m.div>
+          ) : (
+            /* ── Full Vintage Alphanumeric Pager ── */
+            <m.div
+              key="pager-device"
+              className={styles.pagerDevice}
+              drag={!isMobile}
+              dragConstraints={constraintsRef}
+              dragMomentum={true}
+              dragElastic={0.08}
+              dragTransition={{ bounceStiffness: 400, bounceDamping: 28 }}
+              onPointerDown={handlePointerDown}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
+              whileDrag={!isMobile ? { scale: 1.02, cursor: 'grabbing' } : undefined}
+              initial={{ opacity: 0, y: 25, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              role="region"
+              aria-label="Vintage Alphanumeric Pager & Section Radar"
+            >
+              {/* Top Belt-Clip Hinge & Casing Branding */}
+              <div className={styles.clipBar}>
+                <div className={styles.brandDeboss}>
+                  <span className={styles.brandName}>PRATEEQ</span>
+                  <span className={styles.brandModel}>ALPHAPAGE-90</span>
+                </div>
+
+                {mode === 'alert' ? (
+                  <div className={`${styles.alertBeacon} ${radarFlash ? styles.radarFlash : ''}`}>
+                    <span className={styles.ledPulse} />
+                    <span className={styles.alertText}>{beaconText}</span>
+                  </div>
+                ) : (
+                  <div className={styles.standbyBeacon}>
+                    <span className={styles.standbyDot} />
+                    <span className={styles.standbyText}>STANDBY</span>
+                  </div>
+                )}
+
+                <div className={styles.topActions}>
+                  <button
+                    type="button"
+                    className={`${styles.topActionBtn} ${backlightActive ? styles.lightBtnActive : ''}`}
+                    onClick={handleToggleLight}
+                    title={backlightActive ? "Turn off LCD backlight" : "Turn on LCD backlight"}
+                    aria-label="Toggle LCD backlight"
                   >
-                    <circle cx="12" cy="12" r="4" />
-                    <line x1="12" y1="2" x2="12" y2="5" />
-                    <line x1="12" y1="19" x2="12" y2="22" />
-                    <line x1="4.22" y1="4.22" x2="6.34" y2="6.34" />
-                    <line x1="17.66" y1="17.66" x2="19.78" y2="19.78" />
-                    <line x1="2" y1="12" x2="5" y2="12" />
-                    <line x1="19" y1="12" x2="22" y2="12" />
-                    <line x1="4.22" y1="19.78" x2="6.34" y2="17.66" />
-                    <line x1="17.66" y1="6.34" x2="19.78" y2="4.22" />
-                  </svg>
-                  <span className={styles.lightBtnLabel}>LIGHT</span>
-                </button>
+                    <svg
+                      width="10"
+                      height="10"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                      className={styles.lightIconSvg}
+                    >
+                      <circle cx="12" cy="12" r="4" />
+                      <line x1="12" y1="2" x2="12" y2="5" />
+                      <line x1="12" y1="19" x2="12" y2="22" />
+                      <line x1="4.22" y1="4.22" x2="6.34" y2="6.34" />
+                      <line x1="17.66" y1="17.66" x2="19.78" y2="19.78" />
+                      <line x1="2" y1="12" x2="5" y2="12" />
+                      <line x1="19" y1="12" x2="22" y2="12" />
+                      <line x1="4.22" y1="19.78" x2="6.34" y2="17.66" />
+                      <line x1="17.66" y1="6.34" x2="19.78" y2="4.22" />
+                    </svg>
+                    <span className={styles.lightBtnLabel}>LIGHT</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`${styles.topActionBtn} ${styles.dockBtn}`}
+                    onClick={handleToggleDock}
+                    title="Dock pager to pocket clip"
+                    aria-label="Dock pager"
+                  >
+                    <span className={styles.dockIcon}>▼</span>
+                    <span className={styles.dockBtnLabel}>DOCK</span>
+                  </button>
+                </div>
               </div>
-            </div>
 
-            {/* Main Body with Molded Grips & Sunken LCD */}
-            <div className={styles.pagerBody}>
-              {/* Left Side Grip Ribs (Grab Handle) */}
-              <div className={styles.sideGrip} aria-hidden="true" title="Drag Handle">
-                <span className={styles.gripRib} />
-                <span className={styles.gripRib} />
-                <span className={styles.gripRib} />
-              </div>
+              {/* Main Body with Molded Grips & Sunken LCD */}
+              <div className={styles.pagerBody}>
+                {/* Left Side Grip Ribs (Grab Handle) */}
+                <div className={styles.sideGrip} aria-hidden="true" title="Drag Handle">
+                  <span className={styles.gripRib} />
+                  <span className={styles.gripRib} />
+                  <span className={styles.gripRib} />
+                </div>
 
-              {/* Sunken LCD Screen Bezel */}
-              <div className={styles.lcdBezel}>
-                <div
-                  className={`${styles.lcdScreen} ${backlightActive ? styles.lcdBacklightOn : ''}`}
-                >
-                  {/* LCD Status Header */}
-                  <div className={styles.lcdStatusRow}>
-                    <span className={styles.lcdSignal}>
-                      📶 {mode === 'alert' ? (currentMsg.freq || '900.1MHz') : '900-960MHz'}
-                    </span>
-                    <span className={styles.lcdMsgCount}>
-                      CH 0{activeMsgIndex + 1}/0{queueLength}
-                    </span>
-                    <span className={styles.lcdBuzzer}>((•))</span>
-                    <span className={styles.lcdClock}>{timeStr}</span>
-                  </div>
+                {/* Sunken LCD Screen Bezel */}
+                <div className={styles.lcdBezel}>
+                  <div
+                    className={`${styles.lcdScreen} ${backlightActive ? styles.lcdBacklightOn : ''}`}
+                  >
+                    {/* LCD Status Header */}
+                    <div className={styles.lcdStatusRow}>
+                      <span className={styles.lcdSignal}>
+                        📶 {mode === 'alert' ? (currentMsg.freq || '900.1MHz') : '900-960MHz'}
+                      </span>
+                      <span className={styles.lcdMsgCount}>
+                        CH 0{activeMsgIndex + 1}/0{queueLength}
+                      </span>
+                      <span className={styles.lcdBuzzer}>((•))</span>
+                      <span className={styles.lcdClock}>{timeStr}</span>
+                    </div>
 
-                  {/* LCD Divider */}
-                  <div className={styles.lcdDivider} />
+                    {/* LCD Divider */}
+                    <div className={styles.lcdDivider} />
 
-                  {/* LCD Message Area */}
-                  <div className={styles.lcdContent}>
-                    {mode === 'standby' ? (
-                      <div className={styles.standbyScreen}>
-                        <div className={styles.lcdCategory}>
-                          <span className={styles.lcdCursor}>►</span>
-                          <span>[RADAR SCANNER: 900-960MHz]</span>
+                    {/* LCD Message Area */}
+                    <div className={styles.lcdContent}>
+                      {mode === 'standby' ? (
+                        <div className={styles.standbyScreen}>
+                          <div className={styles.lcdCategory}>
+                            <span className={styles.lcdCursor}>►</span>
+                            <span>[RADAR SCANNER: 900-960MHz]</span>
+                          </div>
+                          <p className={styles.lcdMessage}>
+                            {isBiz
+                              ? `“Tracking client milestones & ROI models across vault... (Uptime: ${stats.uptime})”`
+                              : `“Tracking viewport navigation across systems vault... (Uptime: ${stats.uptime} | ${stats.fps} FPS)”`}
+                          </p>
                         </div>
-                        <p className={styles.lcdMessage}>
-                          {isBiz
-                            ? `“Tracking client milestones & ROI models across vault... (Uptime: ${stats.uptime})”`
-                            : `“Tracking viewport navigation across systems vault... (Uptime: ${stats.uptime} | ${stats.fps} FPS)”`}
-                        </p>
-                      </div>
-                    ) : (
-                      <div
-                        className={`${styles.alertScreen} ${styles.clickableScreen}`}
-                        onClick={handleLcdClick}
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            handleLcdClick();
-                          }
-                        }}
-                        title={`Jump to #${currentMsg.sectionId || 'section'}`}
-                        aria-label={`Jump to ${activeSender}`}
-                      >
-                        <div className={styles.lcdCategory}>
-                          <span className={styles.lcdCursor}>►</span>
-                          <span>[{activeSender.toUpperCase()}]</span>
-                          <span className={styles.navHint} title="Jump to section">↗</span>
+                      ) : (
+                        <div
+                          className={`${styles.alertScreen} ${styles.clickableScreen}`}
+                          onClick={handleLcdClick}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              handleLcdClick();
+                            }
+                          }}
+                          title={`Jump to #${currentMsg.sectionId || 'section'}`}
+                          aria-label={`Jump to ${activeSender}`}
+                        >
+                          <div className={styles.lcdCategory}>
+                            <span className={styles.lcdCursor}>►</span>
+                            <span>[{activeSender.toUpperCase()}]</span>
+                            <span className={styles.navHint} title="Jump to section">↗</span>
+                          </div>
+                          <p className={styles.lcdMessage}>
+                            &ldquo;{activeText}&rdquo;
+                          </p>
                         </div>
-                        <p className={styles.lcdMessage}>
-                          &ldquo;{activeText}&rdquo;
-                        </p>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Physical Bottom Controls & Speaker Grille */}
-            <div className={styles.pagerControls}>
-              <div className={styles.buttonCluster}>
-                <button
-                  type="button"
-                  className={styles.pagerKey}
-                  onClick={handlePrev}
-                  title="Previous section channel"
-                  aria-label="Previous channel"
-                >
-                  <span>◄ PREV</span>
-                </button>
+              {/* Physical Bottom Controls & Speaker Grille */}
+              <div className={styles.pagerControls}>
+                <div className={styles.buttonCluster}>
+                  <button
+                    type="button"
+                    className={styles.pagerKey}
+                    onClick={handlePrev}
+                    title="Previous section channel"
+                    aria-label="Previous channel"
+                  >
+                    <span>◄ PREV</span>
+                  </button>
 
-                <button
-                  type="button"
-                  className={styles.pagerKey}
-                  onClick={handleNext}
-                  title="Next section channel"
-                  aria-label="Next channel"
-                >
-                  <span>NEXT ►</span>
-                </button>
+                  <button
+                    type="button"
+                    className={styles.pagerKey}
+                    onClick={handleNext}
+                    title="Next section channel"
+                    aria-label="Next channel"
+                  >
+                    <span>NEXT ►</span>
+                  </button>
 
-                <button
-                  type="button"
-                  className={`${styles.pagerKey} ${styles.keyClear}`}
-                  onClick={handleClear}
-                  title="Silence alert / enter scanner standby"
-                  aria-label="Silence alert"
-                >
-                  <span>CLR</span>
-                </button>
+                  <button
+                    type="button"
+                    className={`${styles.pagerKey} ${styles.keyClear}`}
+                    onClick={handleClear}
+                    title={mode === 'standby' && isMobile ? "Clear alert and dock pager" : "Silence alert / enter scanner standby"}
+                    aria-label={mode === 'standby' && isMobile ? "Clear and dock pager" : "Silence alert"}
+                  >
+                    <span>CLR</span>
+                  </button>
+                </div>
+
+                {/* Piezo Buzzer Slits */}
+                <div className={styles.speakerGrille} aria-hidden="true" title="Piezo Buzzer">
+                  <span className={styles.speakerSlit} />
+                  <span className={styles.speakerSlit} />
+                  <span className={styles.speakerSlit} />
+                </div>
               </div>
-
-              {/* Piezo Buzzer Slits */}
-              <div className={styles.speakerGrille} aria-hidden="true" title="Piezo Buzzer">
-                <span className={styles.speakerSlit} />
-                <span className={styles.speakerSlit} />
-                <span className={styles.speakerSlit} />
-              </div>
-            </div>
-          </m.div>
+            </m.div>
+          )}
         </div>
       </div>
     </Portal>

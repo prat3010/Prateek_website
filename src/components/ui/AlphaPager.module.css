@@ -656,18 +656,368 @@
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.95), 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-@media (max-width: 640px) {
+/* ── Top Actions Dock Button ───────────────────────────────── */
+.dockBtn {
+  background: #252834;
+  color: #9AA0B4;
+}
+
+.dockBtn:hover {
+  background: #2E3342;
+  color: #FAF9F6;
+}
+
+.dockIcon {
+  font-size: 0.52rem;
+  line-height: 1;
+}
+
+.dockBtnLabel {
+  font-size: 0.54rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+:global([data-theme='noir']) .dockBtn {
+  background: #1A1D27;
+  border-color: #0B0D14;
+  color: #7B8298;
+}
+
+:global([data-theme='noir']) .dockBtn:hover {
+  background: #232734;
+  color: #FAF9F6;
+}
+
+/* ── Compact Belt-Clip Mode (Mobile & Minimized Dock) ───────── */
+.compactClip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.6rem;
+  border-radius: 9999px;
+  background-color: #383C48;
+  background-image: 
+    linear-gradient(175deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.02) 35%, rgba(0, 0, 0, 0.14) 100%),
+    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.04) 0.5px, transparent 0.6px);
+  border: 1.5px solid #20232C;
+  box-shadow: 
+    4px 4px 0px rgba(43, 43, 54, 0.35),
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.22),
+    inset 0 -1.5px 2px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  gap: 6px;
+  touch-action: pan-y;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.compactClip:hover {
+  transform: translateY(-1px);
+  box-shadow: 
+    5px 5px 0px rgba(43, 43, 54, 0.45),
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.25);
+}
+
+.compactContent {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.compactLed {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #FF2E4C;
+  box-shadow: 0 0 6px #FF2E4C;
+  animation: pagerBlink 1.2s infinite ease-in-out;
+  flex-shrink: 0;
+}
+
+.compactLedStandby {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #79B48B;
+  box-shadow: 0 0 4px #79B48B;
+  flex-shrink: 0;
+}
+
+.compactInfo {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-family: var(--font-code, monospace);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.compactBrand {
+  color: #A4AABC;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.12), 0 -1px 0 rgba(0, 0, 0, 0.7);
+}
+
+.compactDivider {
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 0.55rem;
+}
+
+.compactFreq {
+  color: #79B48B;
+}
+
+.compactChannel {
+  color: #F4DC95;
+}
+
+.compactExpandBtn {
+  background: #252834;
+  border: 1.5px solid #13151D;
+  color: #F4DC95;
+  font-family: var(--font-code, monospace);
+  font-size: 0.55rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  padding: 2.5px 6px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  line-height: 1;
+  box-shadow: 
+    1.5px 1.5px 0px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.15s ease, color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.compactExpandBtn:hover {
+  background: #2E3342;
+  color: #FFECA8;
+  transform: translateY(-0.5px);
+}
+
+.compactExpandIcon {
+  font-size: 0.5rem;
+}
+
+.compactExpandLabel {
+  font-size: 0.52rem;
+}
+
+/* ── Noir Theme Overrides for Compact Belt-Clip ─────────────── */
+:global([data-theme='noir']) .compactClip {
+  background-color: #272B36;
+  border-color: #141720;
+  box-shadow: 
+    4px 4px 0px #040508,
+    inset 0 1.5px 0.5px rgba(255, 255, 255, 0.16),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.7);
+}
+
+:global([data-theme='noir']) .compactClip:hover {
+  border-color: #1C202C;
+  box-shadow: 
+    5px 5px 0px #040508,
+    inset 0 1.5px 0.5px rgba(255, 255, 255, 0.2);
+}
+
+:global([data-theme='noir']) .compactBrand {
+  color: #8E95AA;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), 0 -1px 0 rgba(0, 0, 0, 0.85);
+}
+
+:global([data-theme='noir']) .compactDivider {
+  color: rgba(255, 255, 255, 0.18);
+}
+
+:global([data-theme='noir']) .compactFreq {
+  color: #00F0FF;
+}
+
+:global([data-theme='noir']) .compactChannel {
+  color: #D8DCE8;
+}
+
+:global([data-theme='noir']) .compactExpandBtn {
+  background: #181A24;
+  color: #00F0FF;
+  border-color: #0C0E14;
+  box-shadow: 
+    1.5px 1.5px 0px #040507,
+    inset 0 1px 0 rgba(255, 255, 255, 0.11);
+}
+
+:global([data-theme='noir']) .compactExpandBtn:hover {
+  background: #212430;
+  color: #B5F7FF;
+}
+
+/* ── Responsive Mobile Optimization (<= 768px) ─────────────── */
+@media (max-width: 768px) {
   .viewportBounds {
-    top: -120px;
-    left: -260px;
-    right: -260px;
-    bottom: -120px;
-  }
-  .bannerWrapper {
-    bottom: 58px;
-    right: 0.5rem;
-    left: 0.5rem;
-    width: auto;
+    inset: 0;
     pointer-events: none;
+  }
+
+  .bannerWrapper {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+    right: 14px;
+    left: auto;
+    width: auto;
+    max-width: calc(100vw - 120px);
+    pointer-events: none;
+  }
+
+  .bannerWrapperExpanded {
+    left: 14px;
+    right: 14px;
+    max-width: min(360px, calc(100vw - 28px));
+    margin-left: auto;
+    margin-right: 0;
+  }
+
+  .pagerDevice {
+    touch-action: pan-y;
+    cursor: default;
+    padding: 0.4rem 0.5rem 0.45rem 0.5rem;
+    border-radius: 10px 10px 14px 14px;
+    box-shadow: 
+      4px 4px 0px rgba(43, 43, 54, 0.35),
+      inset 0 1px 0.5px rgba(255, 255, 255, 0.2),
+      inset 0 -1.5px 2px rgba(0, 0, 0, 0.4);
+  }
+
+  :global([data-theme='noir']) .pagerDevice {
+    box-shadow: 
+      4px 4px 0px #040508,
+      inset 0 1px 0.5px rgba(255, 255, 255, 0.14),
+      inset 0 -1.5px 2px rgba(0, 0, 0, 0.6);
+  }
+
+  .clipBar {
+    padding-bottom: 0.25rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .brandDeboss {
+    font-size: 0.54rem;
+    gap: 3px;
+  }
+
+  .brandModel {
+    display: none;
+  }
+
+  .alertBeacon,
+  .standbyBeacon {
+    padding: 1px 4px;
+    gap: 3px;
+  }
+
+  .alertText,
+  .standbyText {
+    font-size: 0.5rem;
+  }
+
+  .topActions {
+    gap: 3px;
+  }
+
+  .topActionBtn {
+    padding: 2.5px 5px;
+    font-size: 0.52rem;
+  }
+
+  .lightBtnLabel,
+  .dockBtnLabel {
+    font-size: 0.5rem;
+  }
+
+  .pagerBody {
+    gap: 4px;
+    margin-bottom: 0.35rem;
+  }
+
+  .sideGrip {
+    width: 4px;
+    gap: 3px;
+  }
+
+  .gripRib {
+    height: 9px;
+  }
+
+  .lcdBezel {
+    padding: 3px;
+    border-radius: 5px;
+  }
+
+  .lcdScreen {
+    min-height: 58px;
+    padding: 0.35rem 0.45rem;
+  }
+
+  .lcdStatusRow {
+    font-size: 0.54rem;
+  }
+
+  .lcdSignal {
+    font-size: 0.5rem;
+  }
+
+  .lcdDivider {
+    margin: 0.22rem 0;
+  }
+
+  .lcdCategory {
+    font-size: 0.58rem;
+    gap: 3px;
+  }
+
+  .lcdMessage {
+    font-size: 0.68rem;
+    line-height: 1.25;
+  }
+
+  .pagerControls {
+    gap: 5px;
+    padding-top: 0.15rem;
+  }
+
+  .buttonCluster {
+    gap: 4px;
+  }
+
+  .pagerKey {
+    padding: 0.32rem 0.45rem;
+    font-size: 0.6rem;
+    border-radius: 4px;
+    box-shadow: 
+      1.5px 1.5px 0px rgba(0, 0, 0, 0.65),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+  }
+
+  :global([data-theme='noir']) .pagerKey {
+    box-shadow: 
+      1.5px 1.5px 0px #040507,
+      inset 0 1px 0 rgba(255, 255, 255, 0.11),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.6);
+  }
+
+  .keyClear {
+    padding: 0.32rem 0.45rem;
+  }
+
+  .speakerSlit {
+    width: 10px;
+    height: 2px;
   }
 }
