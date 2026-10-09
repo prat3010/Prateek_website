@@ -3,16 +3,20 @@
 import React, { createContext, useContext, useEffect, useRef, useState, useCallback, ReactNode } from 'react';
 import { useLenisScroll } from '@/context/LenisProvider';
 
-interface SkylineInteractionValue {
+interface SkylineStatusValue {
   isTabVisible: boolean;
   isIdle: boolean;
-  tick: number;
   geometryVersion: number;
   scrollVelocityRef: React.RefObject<number>;
   mousePosRef: React.RefObject<{ x: number; y: number }>;
   lastClickRef: React.RefObject<{ x: number; y: number; time: number } | null>;
 }
 
+export interface SkylineInteractionValue extends SkylineStatusValue {
+  tick: number;
+}
+
+const SkylineStatusContext = createContext<SkylineStatusValue | null>(null);
 const SkylineInteractionContext = createContext<SkylineInteractionValue | null>(null);
 
 const IDLE_TIMEOUT_MS = 10_000;
@@ -133,13 +137,43 @@ export function SkylineInteractionProvider({ children }: { children: ReactNode }
     };
   }, [invalidateGeometry]);
 
+  // Memoized status value: NEVER changes on 160ms tick, completely freezing virtual DOM re-renders of SkylineInner
+  const statusValue = React.useMemo<SkylineStatusValue>(() => ({
+    isTabVisible,
+    isIdle,
+    geometryVersion,
+    scrollVelocityRef,
+    mousePosRef,
+    lastClickRef,
+  }), [isTabVisible, isIdle, geometryVersion]);
+
+  // Ticking interaction value for creature state machines
+  const interactionValue = React.useMemo<SkylineInteractionValue>(() => ({
+    ...statusValue,
+    tick,
+  }), [statusValue, tick]);
+
   return (
-    <SkylineInteractionContext.Provider value={{ isTabVisible, isIdle, tick, geometryVersion, scrollVelocityRef, mousePosRef, lastClickRef }}>
-      {children}
-    </SkylineInteractionContext.Provider>
+    <SkylineStatusContext.Provider value={statusValue}>
+      <SkylineInteractionContext.Provider value={interactionValue}>
+        {children}
+      </SkylineInteractionContext.Provider>
+    </SkylineStatusContext.Provider>
   );
 }
 
+/** Hook for components that only need skyline status/idle state without subscribing to 160ms ticks (prevents skyline re-renders) */
+export function useSkylineStatus(): SkylineStatusValue {
+  const statusCtx = useContext(SkylineStatusContext);
+  const interactionCtx = useContext(SkylineInteractionContext);
+  const ctx = statusCtx ?? interactionCtx;
+  if (!ctx) {
+    throw new Error('useSkylineStatus must be used within SkylineInteractionProvider');
+  }
+  return ctx;
+}
+
+/** Hook for creatures that need the active 160ms tick state machine */
 export function useSkylineInteraction(): SkylineInteractionValue {
   const ctx = useContext(SkylineInteractionContext);
   if (!ctx) {

@@ -554,6 +554,34 @@ const Layer2 = React.memo(function Layer2({ reducedMotion, wobble: propWobble , 
           </g>
         </g>
 
+        {/* Asynchronous Flickering Window Cells (Layer 2 - Unfiltered for performance) */}
+        <g strokeWidth="1.0" fill="none">
+          {/* Staggered double-tower (Left) */}
+          <line x1="170" y1="780" x2="170" y2="783" className={styles.windowFlicker2} />
+          <line x1="210" y1="730" x2="210" y2="733" className={styles.windowFlicker4} />
+
+          {/* Hotel building */}
+          <line x1="1530" y1="720" x2="1530" y2="723" className={styles.windowFlicker1} />
+          <line x1="1570" y1="760" x2="1570" y2="763" className={styles.windowFlicker3} />
+
+          {/* Left Gap Building */}
+          <line x1="435" y1="720" x2="435" y2="723" className={styles.windowFlicker2} />
+          <line x1="455" y1="760" x2="455" y2="763" className={styles.windowFlicker4} />
+
+          {/* Right Gap Building */}
+          <line x1="1340" y1="730" x2="1340" y2="733" className={styles.windowFlicker1} />
+          <line x1="1420" y1="690" x2="1420" y2="693" className={styles.windowFlicker3} />
+        </g>
+      </svg>
+
+      {/* Dynamic Watercraft Layer (Isolated to prevent re-rasterizing static cityscape) */}
+      <svg
+        viewBox="0 0 1920 1080"
+        preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'}
+        className={styles.actorLayerSvg}
+        style={{ overflow: 'visible' }}
+        aria-hidden="true"
+      >
         {/* Chugging Tugboat (Moving behind buildings) */}
         <g className={styles.tugboatTransit}>
           <g className={styles.tugboatBobbing}>
@@ -620,25 +648,6 @@ const Layer2 = React.memo(function Layer2({ reducedMotion, wobble: propWobble , 
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1028 951 Q 1005 948 975 955" className={styles.speedboatWake2} fill="none" stroke="var(--skyline-stroke-fine)" strokeWidth="1" />
             </g>
           </g>
-        </g>
-
-        {/* Asynchronous Flickering Window Cells (Layer 2 - Unfiltered for performance) */}
-        <g strokeWidth="1.0" fill="none">
-          {/* Staggered double-tower (Left) */}
-          <line x1="170" y1="780" x2="170" y2="783" className={styles.windowFlicker2} />
-          <line x1="210" y1="730" x2="210" y2="733" className={styles.windowFlicker4} />
-
-          {/* Hotel building */}
-          <line x1="1530" y1="720" x2="1530" y2="723" className={styles.windowFlicker1} />
-          <line x1="1570" y1="760" x2="1570" y2="763" className={styles.windowFlicker3} />
-
-          {/* Left Gap Building */}
-          <line x1="435" y1="720" x2="435" y2="723" className={styles.windowFlicker2} />
-          <line x1="455" y1="760" x2="455" y2="763" className={styles.windowFlicker4} />
-
-          {/* Right Gap Building */}
-          <line x1="1340" y1="730" x2="1340" y2="733" className={styles.windowFlicker1} />
-          <line x1="1420" y1="690" x2="1420" y2="693" className={styles.windowFlicker3} />
         </g>
       </svg>
     </>

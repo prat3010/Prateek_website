@@ -5,7 +5,7 @@ import { m, useTransform, useMotionValue, useSpring } from 'framer-motion';
 import { useTheme, useThemeTransition } from '@/context/ThemeContext';
 import { useLenisScroll } from '@/context/LenisProvider';
 import { usePerformanceGovernor } from '@/context/PerformanceGovernor';
-import { useSkylineInteraction, SkylineInteractionProvider } from './SkylineInteractionContext';
+import { useSkylineStatus, SkylineInteractionProvider } from './SkylineInteractionContext';
 import styles from './NoirSkyline.module.css';
 
 import Layer0 from './skyline/Layer0';
@@ -19,7 +19,7 @@ function SkylineInner() {
   const { theme } = useTheme();
   const { isTransitioning } = useThemeTransition();
   const { performanceTier } = usePerformanceGovernor();
-  const { isIdle } = useSkylineInteraction();
+  const { isIdle } = useSkylineStatus();
   const perfTierRef = useRef(performanceTier);
   useEffect(() => { perfTierRef.current = performanceTier; }, [performanceTier]);
   const { scrollProgress: scrollYProgress } = useLenisScroll();
@@ -166,7 +166,7 @@ function SkylineInner() {
         <m.div
           style={reducedMotion
             ? { width: '100%', height: '100%' }
-            : { x: layer1X, y: layer1Y, width: '100%', height: '100%', willChange: 'transform' }}
+            : { x: layer1X, y: layer1Y, width: '100%', height: '100%' }}
         >
           <Layer1 reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} />
         </m.div>
@@ -182,7 +182,7 @@ function SkylineInner() {
         <m.div
           style={reducedMotion
             ? { width: '100%', height: '100%' }
-            : { x: layer1_5X, y: layer1_5Y, width: '100%', height: '100%', willChange: 'transform' }}
+            : { x: layer1_5X, y: layer1_5Y, width: '100%', height: '100%' }}
         >
           <Layer1_5 reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} />
         </m.div>
@@ -198,7 +198,7 @@ function SkylineInner() {
         <m.div
           style={reducedMotion
             ? { width: '100%', height: '100%' }
-            : { x: layer2X, y: layer2Y, width: '100%', height: '100%', willChange: 'transform' }}
+            : { x: layer2X, y: layer2Y, width: '100%', height: '100%' }}
         >
           <Layer2 reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} />
         </m.div>
@@ -214,7 +214,7 @@ function SkylineInner() {
         <m.div
           style={reducedMotion
             ? { width: '100%', height: '100%' }
-            : { x: bridgeLayerX, y: bridgeLayerY, width: '100%', height: '100%', willChange: 'transform' }}
+            : { x: bridgeLayerX, y: bridgeLayerY, width: '100%', height: '100%' }}
         >
           <BridgeLayer reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} />
         </m.div>
@@ -230,7 +230,7 @@ function SkylineInner() {
         <m.div
           style={reducedMotion
             ? { width: '100%', height: '100%' }
-            : { x: layer3X, y: layer3Y, width: '100%', height: '100%', willChange: 'transform' }}
+            : { x: layer3X, y: layer3Y, width: '100%', height: '100%' }}
         >
           <Layer3 reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} />
         </m.div>

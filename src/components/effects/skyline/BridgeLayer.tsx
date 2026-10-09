@@ -357,41 +357,49 @@ const BridgeLayer = React.memo(function BridgeLayer({ reducedMotion, wobble: pro
                 <circle cx="1254" cy="827.9" r="1.8" opacity="0.85" />
                 <circle cx="1354" cy="832.3" r="1.8" opacity="0.85" />
               </g>
-
-              {/* Animated Bridge Traffic Dots (CSS keyframes replacing SVG animateMotion) */}
-              <g fill="rgba(250, 250, 250, 0.85)" stroke="none">
-                {/* Outbound Headlights (Left to Right) */}
-                {reducedMotion ? (
-                  <>
-                    <g transform="translate(588, 841.6)"><circle cx="0" cy="0" r="0.9" className={styles.trafficHeadlight} /></g>
-                    <g transform="translate(1168, 837.6)"><circle cx="0" cy="0" r="0.9" className={styles.trafficHeadlight} /></g>
-                    <g transform="translate(750, 828.5)"><circle cx="0" cy="0" r="0.9" className={styles.trafficHeadlight} /></g>
-                    <g transform="translate(500, 845.5)"><circle cx="0" cy="0" r="0.8" className={styles.trafficHeadlight} opacity="0.8" /></g>
-                    <g transform="translate(1350, 848.5)"><circle cx="0" cy="0" r="1.1" className={styles.trafficHeadlight} /></g>
-                    {/* Inbound Taillights (Right to Left) */}
-                    <g transform="translate(979, 824.6)"><circle cx="0" cy="0" r="0.8" className={styles.trafficTaillight} /></g>
-                    <g transform="translate(650, 833.5)"><circle cx="0" cy="0" r="0.8" className={styles.trafficTaillight} /></g>
-                    <g transform="translate(1250, 840.5)"><circle cx="0" cy="0" r="0.8" className={styles.trafficTaillight} /></g>
-                    <g transform="translate(1050, 828.5)"><circle cx="0" cy="0" r="0.7" className={styles.trafficTaillight} /></g>
-                    <g transform="translate(550, 840.5)"><circle cx="0" cy="0" r="1.0" className={styles.trafficTaillight} /></g>
-                  </>
-                ) : (
-                  <>
-                    <g className={styles.trafficHL14} style={{ animationDelay: '0s' }}><circle cx="0" cy="0" r="0.9" className={styles.trafficHeadlight} /></g>
-                    <g className={styles.trafficHL14} style={{ animationDelay: '4.6s' }}><circle cx="0" cy="0" r="0.9" className={styles.trafficHeadlight} /></g>
-                    <g className={styles.trafficHL14} style={{ animationDelay: '9.2s' }}><circle cx="0" cy="0" r="0.9" className={styles.trafficHeadlight} /></g>
-                    <g className={styles.trafficHL10} style={{ animationDelay: '2.5s' }}><circle cx="0" cy="0" r="0.8" className={styles.trafficHeadlight} opacity="0.8" /></g>
-                    <g className={styles.trafficHL20} style={{ animationDelay: '6.8s' }}><circle cx="0" cy="0" r="1.1" className={styles.trafficHeadlight} /></g>
-                    {/* Inbound Taillights (Right to Left) */}
-                    <g className={styles.trafficTL16} style={{ animationDelay: '0s' }}><circle cx="0" cy="0" r="0.8" className={styles.trafficTaillight} /></g>
-                    <g className={styles.trafficTL16} style={{ animationDelay: '5.3s' }}><circle cx="0" cy="0" r="0.8" className={styles.trafficTaillight} /></g>
-                    <g className={styles.trafficTL16} style={{ animationDelay: '10.6s' }}><circle cx="0" cy="0" r="0.8" className={styles.trafficTaillight} /></g>
-                    <g className={styles.trafficTL12} style={{ animationDelay: '3.2s' }}><circle cx="0" cy="0" r="0.7" className={styles.trafficTaillight} /></g>
-                    <g className={styles.trafficTL22} style={{ animationDelay: '7.8s' }}><circle cx="0" cy="0" r="1.0" className={styles.trafficTaillight} /></g>
-                  </>
-                )}
-              </g>
             </g>
+      </svg>
+
+      {/* Dynamic Bridge Traffic Layer (Isolated to prevent re-rasterizing static bridge superstructure) */}
+      <svg
+        viewBox="0 0 1920 1080"
+        preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'}
+        className={styles.actorLayerSvg}
+        style={{ overflow: 'visible' }}
+        aria-hidden="true"
+      >
+        <g fill="rgba(250, 250, 250, 0.85)" stroke="none">
+          {/* Outbound Headlights (Left to Right) */}
+          {reducedMotion ? (
+            <>
+              <g transform="translate(588, 841.6)"><circle cx="0" cy="0" r="0.9" className={styles.trafficHeadlight} /></g>
+              <g transform="translate(1168, 837.6)"><circle cx="0" cy="0" r="0.9" className={styles.trafficHeadlight} /></g>
+              <g transform="translate(750, 828.5)"><circle cx="0" cy="0" r="0.9" className={styles.trafficHeadlight} /></g>
+              <g transform="translate(500, 845.5)"><circle cx="0" cy="0" r="0.8" className={styles.trafficHeadlight} opacity="0.8" /></g>
+              <g transform="translate(1350, 848.5)"><circle cx="0" cy="0" r="1.1" className={styles.trafficHeadlight} /></g>
+              {/* Inbound Taillights (Right to Left) */}
+              <g transform="translate(979, 824.6)"><circle cx="0" cy="0" r="0.8" className={styles.trafficTaillight} /></g>
+              <g transform="translate(650, 833.5)"><circle cx="0" cy="0" r="0.8" className={styles.trafficTaillight} /></g>
+              <g transform="translate(1250, 840.5)"><circle cx="0" cy="0" r="0.8" className={styles.trafficTaillight} /></g>
+              <g transform="translate(1050, 828.5)"><circle cx="0" cy="0" r="0.7" className={styles.trafficTaillight} /></g>
+              <g transform="translate(550, 840.5)"><circle cx="0" cy="0" r="1.0" className={styles.trafficTaillight} /></g>
+            </>
+          ) : (
+            <>
+              <g className={styles.trafficHL14} style={{ animationDelay: '0s' }}><circle cx="0" cy="0" r="0.9" className={styles.trafficHeadlight} /></g>
+              <g className={styles.trafficHL14} style={{ animationDelay: '4.6s' }}><circle cx="0" cy="0" r="0.9" className={styles.trafficHeadlight} /></g>
+              <g className={styles.trafficHL14} style={{ animationDelay: '9.2s' }}><circle cx="0" cy="0" r="0.9" className={styles.trafficHeadlight} /></g>
+              <g className={styles.trafficHL10} style={{ animationDelay: '2.5s' }}><circle cx="0" cy="0" r="0.8" className={styles.trafficHeadlight} opacity="0.8" /></g>
+              <g className={styles.trafficHL20} style={{ animationDelay: '6.8s' }}><circle cx="0" cy="0" r="1.1" className={styles.trafficHeadlight} /></g>
+              {/* Inbound Taillights (Right to Left) */}
+              <g className={styles.trafficTL16} style={{ animationDelay: '0s' }}><circle cx="0" cy="0" r="0.8" className={styles.trafficTaillight} /></g>
+              <g className={styles.trafficTL16} style={{ animationDelay: '5.3s' }}><circle cx="0" cy="0" r="0.8" className={styles.trafficTaillight} /></g>
+              <g className={styles.trafficTL16} style={{ animationDelay: '10.6s' }}><circle cx="0" cy="0" r="0.8" className={styles.trafficTaillight} /></g>
+              <g className={styles.trafficTL12} style={{ animationDelay: '3.2s' }}><circle cx="0" cy="0" r="0.7" className={styles.trafficTaillight} /></g>
+              <g className={styles.trafficTL22} style={{ animationDelay: '7.8s' }}><circle cx="0" cy="0" r="1.0" className={styles.trafficTaillight} /></g>
+            </>
+          )}
+        </g>
       </svg>
     </>
   );
