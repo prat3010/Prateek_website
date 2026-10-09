@@ -510,7 +510,7 @@ timeline
 
 ### Phase J.7: Honest AI Wiring, Trust Hardening & FDE Hiring Credibility (M85.11 – M85.16) — **ACTIVE NEXT**
 
-> 📌 **Origin:** [BRUTAL_MARKET_AUDIT_2026_09_02.md](../../Prateek_Ecosystem_Vault/BRUTAL_MARKET_AUDIT_2026_09_02.md) and [FORENSIC_TECHNICAL_AUDIT_2026_08_26.md](../../Prateek_Ecosystem_Vault/FORENSIC_TECHNICAL_AUDIT_2026_08_26.md). These milestones close the remaining blueprint-to-reality honesty gaps (the `parse-intent` keyword classifier presented as AI), remove trust-damaging communication overclaims, and add the CI + career artifacts needed to land a Forward Deployed Engineering (FDE) role. They continue the M85.x "Blueprint-to-Reality Parity" remediation pattern.
+> 📌 **Origin:** [BRUTAL_MARKET_AUDIT_2026_09_02.md](../../Prateek_Ecosystem_Vault/internal_archives/BRUTAL_MARKET_AUDIT_2026_09_02.md) and [FORENSIC_TECHNICAL_AUDIT_2026_08_26.md](../../Prateek_Ecosystem_Vault/FORENSIC_TECHNICAL_AUDIT_2026_08_26.md). These milestones close the remaining blueprint-to-reality honesty gaps (the `parse-intent` keyword classifier presented as AI), remove trust-damaging communication overclaims, and add the CI + career artifacts needed to land a Forward Deployed Engineering (FDE) role. They continue the M85.x "Blueprint-to-Reality Parity" remediation pattern.
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
