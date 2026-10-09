@@ -96,6 +96,12 @@ export default function Navbar({ items, className }: NavbarProps) {
   const scrollTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>('');
+  const [prevPathname, setPrevPathname] = useState(pathname);
+
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
+    setActiveSection('');
+  }
 
   const effectiveActiveSection = useMemo(() => {
     if (pathname?.startsWith('/playground')) {
@@ -135,8 +141,11 @@ export default function Navbar({ items, className }: NavbarProps) {
     const unsub = scrollY.on('change', (y) => {
       setScrolled(y > 50);
       if (y <= 50 && !isClickScrollingRef.current) {
-        const homeHref = items && items.length > 0 ? items[0].href : (pathname?.startsWith('/rag') ? '/rag#home' : '/#home');
-        setActiveSection(homeHref);
+        const isSectionPage = Boolean(items) || pathname === '/' || pathname?.startsWith('/rag');
+        if (isSectionPage) {
+          const homeHref = items && items.length > 0 ? items[0].href : (pathname?.startsWith('/rag') ? '/rag#home' : '/#home');
+          setActiveSection(homeHref);
+        }
       }
       const diff = Math.abs(y - lastY);
       if (diff > 2) {
@@ -151,7 +160,11 @@ export default function Navbar({ items, className }: NavbarProps) {
 
   /* ---------- Intersection Observer for Section Tracking ---------- */
   useEffect(() => {
+    const isSectionPage = Boolean(items) || pathname === '/' || pathname?.startsWith('/rag');
+    if (!isSectionPage) return;
+
     const visibleEntries = new Map<string, IntersectionObserverEntry>();
+    const observedElements = new Set<Element>();
 
     const observerOptions: IntersectionObserverInit = {
       root: null,
@@ -189,20 +202,58 @@ export default function Navbar({ items, className }: NavbarProps) {
       }
     }, observerOptions);
 
-    navItems.forEach((item) => {
-      const hashIndex = item.href.indexOf('#');
-      if (hashIndex !== -1) {
-        const id = item.href.substring(hashIndex + 1);
+    const targetSectionIds = navItems
+      .filter((item) => {
+        const hashIndex = item.href.indexOf('#');
+        if (hashIndex === -1) return false;
+        const targetPath = item.href.substring(0, hashIndex) || '/';
+        return Boolean(items) || (targetPath === '/' && (pathname === '/' || !pathname)) || targetPath === pathname;
+      })
+      .map((item) => {
+        const hashIndex = item.href.indexOf('#');
+        return item.href.substring(hashIndex + 1);
+      });
+
+    const attachObservers = () => {
+      let allFound = true;
+      targetSectionIds.forEach((id) => {
         const el = document.getElementById(id);
-        if (el) observer.observe(el);
-      }
-    });
+        if (el) {
+          if (!observedElements.has(el)) {
+            observer.observe(el);
+            observedElements.add(el);
+          }
+        } else {
+          allFound = false;
+        }
+      });
+      return allFound;
+    };
+
+    const allFound = attachObservers();
+
+    let mutationObserver: MutationObserver | null = null;
+    if (!allFound && typeof MutationObserver !== 'undefined') {
+      mutationObserver = new MutationObserver(() => {
+        if (attachObservers()) {
+          mutationObserver?.disconnect();
+          mutationObserver = null;
+        }
+      });
+
+      mutationObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
+    }
 
     return () => {
       observer.disconnect();
+      mutationObserver?.disconnect();
       visibleEntries.clear();
+      observedElements.clear();
     };
-  }, [navItems, pathname]);
+  }, [navItems, pathname, items]);
 
   /* ---------- Close mobile menu on desktop resize ---------- */
   useEffect(() => {

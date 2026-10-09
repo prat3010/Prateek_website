@@ -11,6 +11,7 @@ const mockLenisScrollTo = vi.fn();
 const mockLenisStart = vi.fn();
 let mockPathname = '/';
 let latestObserverCallback: IntersectionObserverCallback | null = null;
+const mockObserve = vi.fn();
 
 // Mock next/navigation
 vi.mock('next/navigation', () => ({
@@ -45,6 +46,7 @@ describe('Navbar Component Navigation', () => {
     vi.restoreAllMocks();
     mockLenisScrollTo.mockClear();
     mockLenisStart.mockClear();
+    mockObserve.mockClear();
     mockPathname = '/';
 
     // Mock matchMedia
@@ -67,7 +69,7 @@ describe('Navbar Component Navigation', () => {
       constructor(cb: IntersectionObserverCallback) {
         latestObserverCallback = cb;
       }
-      observe = vi.fn();
+      observe = mockObserve;
       unobserve = vi.fn();
       disconnect = vi.fn();
     } as unknown as typeof IntersectionObserver;
@@ -271,5 +273,59 @@ describe('Navbar Component Navigation', () => {
     expect(activeLinks.length).toBeGreaterThan(0);
     const activeText = Array.from(activeLinks).map((el) => el.textContent?.trim());
     expect(activeText.some((text) => text?.includes('Resume'))).toBe(true);
+  });
+
+  it('dynamically observes sections added to the DOM asynchronously after initial mount (e.g. Suspense streaming)', async () => {
+    mockPathname = '/';
+    Object.defineProperty(window, 'location', {
+      value: { pathname: '/' },
+      writable: true,
+    });
+
+    // Render Navbar when section elements are not yet in the DOM
+    render(<Navbar />);
+
+    // Now simulate Suspense boundary resolving by mounting a section into document.body
+    const aboutSection = document.createElement('section');
+    aboutSection.id = 'about';
+    await act(async () => {
+      document.body.appendChild(aboutSection);
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    });
+
+    // MutationObserver should detect newly attached section and register it with IntersectionObserver
+    expect(mockObserve).toHaveBeenCalledWith(aboutSection);
+
+    // Clean up DOM
+    document.body.removeChild(aboutSection);
+  });
+
+  it('resets activeSection when navigating back from /terminal to /', () => {
+    mockPathname = '/terminal';
+    Object.defineProperty(window, 'location', {
+      value: { pathname: '/terminal' },
+      writable: true,
+    });
+
+    const { rerender, container } = render(<Navbar />);
+
+    // On /terminal, no link should have active class
+    let activeNavLinks = container.querySelectorAll('a[class*="active"]');
+    expect(activeNavLinks.length).toBe(0);
+
+    // Navigate back to /
+    mockPathname = '/';
+    Object.defineProperty(window, 'location', {
+      value: { pathname: '/' },
+      writable: true,
+    });
+
+    rerender(<Navbar />);
+
+    // On /, Home should be active by default
+    activeNavLinks = container.querySelectorAll('a[class*="active"]');
+    expect(activeNavLinks.length).toBeGreaterThan(0);
+    const activeText = Array.from(activeNavLinks).map((el) => el.textContent?.trim());
+    expect(activeText.some((text) => text?.includes('Home'))).toBe(true);
   });
 });
