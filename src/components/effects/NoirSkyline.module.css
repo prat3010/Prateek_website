@@ -13,32 +13,16 @@
   opacity: 1;
 }
 
-/* ─ Energy Saver / Idle Pause: Pauses heavy SVG rasterization animations when user is inactive ─ */
+/* ─ Energy Saver / Idle Pause: Pauses secondary micro-animations when user is inactive ─ */
 .isIdle .searchlight,
 .isIdle .searchlightLeft,
 .isIdle .searchlightRight,
-.isIdle .blimpGroup,
-.isIdle .blimpSpotlight,
 .isIdle .flock,
 .isIdle .star1,
 .isIdle .star2,
 .isIdle .star3,
 .isIdle .fanBlade,
 .isIdle .blowerFan,
-.isIdle .tugboatTransit,
-.isIdle .tugboatBobbing,
-.isIdle .smokePuff1,
-.isIdle .smokePuff2,
-.isIdle .smokePuff3,
-.isIdle .tugboatWake1,
-.isIdle .tugboatWake2,
-.isIdle .sailboatTransit,
-.isIdle .sailboatBobbing,
-.isIdle .sailboatWake,
-.isIdle .speedboatTransit,
-.isIdle .speedboatBobbing,
-.isIdle .speedboatWake1,
-.isIdle .speedboatWake2,
 .isIdle .trafficHL14,
 .isIdle .trafficHL10,
 .isIdle .trafficHL20,

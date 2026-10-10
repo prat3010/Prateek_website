@@ -6,20 +6,20 @@ import { useLenisScroll } from '@/context/LenisProvider';
 interface SkylineStatusValue {
   isTabVisible: boolean;
   isIdle: boolean;
-  geometryVersion: number;
   scrollVelocityRef: React.RefObject<number>;
   mousePosRef: React.RefObject<{ x: number; y: number }>;
   lastClickRef: React.RefObject<{ x: number; y: number; time: number } | null>;
 }
 
 export interface SkylineInteractionValue extends SkylineStatusValue {
+  geometryVersion: number;
   tick: number;
 }
 
 const SkylineStatusContext = createContext<SkylineStatusValue | null>(null);
 const SkylineInteractionContext = createContext<SkylineInteractionValue | null>(null);
 
-const IDLE_TIMEOUT_MS = 10_000;
+const IDLE_TIMEOUT_MS = 60_000;
 
 const ACTIVITY_EVENTS = ['mousemove', 'wheel', 'click', 'keydown', 'touchstart'] as const;
 
@@ -122,36 +122,37 @@ export function SkylineInteractionProvider({ children }: { children: ReactNode }
   }, []);
 
   useEffect(() => {
-    let lastScrollCall = 0;
-    const handleScroll = () => {
-      const now = performance.now();
-      if (now - lastScrollCall < 100) return;
-      lastScrollCall = now;
-      invalidateGeometry();
+    let scrollTimeout: ReturnType<typeof setTimeout> | null = null;
+    const handleScrollEnd = () => {
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        invalidateGeometry();
+      }, 250);
     };
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('scroll', handleScrollEnd, { passive: true });
     window.addEventListener('resize', invalidateGeometry, { passive: true });
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      window.removeEventListener('scroll', handleScrollEnd);
       window.removeEventListener('resize', invalidateGeometry);
     };
   }, [invalidateGeometry]);
 
-  // Memoized status value: NEVER changes on 160ms tick, completely freezing virtual DOM re-renders of SkylineInner
+  // Memoized status value: NEVER changes on scroll or 160ms tick, completely freezing virtual DOM re-renders of SkylineInner
   const statusValue = React.useMemo<SkylineStatusValue>(() => ({
     isTabVisible,
     isIdle,
-    geometryVersion,
     scrollVelocityRef,
     mousePosRef,
     lastClickRef,
-  }), [isTabVisible, isIdle, geometryVersion]);
+  }), [isTabVisible, isIdle]);
 
   // Ticking interaction value for creature state machines
   const interactionValue = React.useMemo<SkylineInteractionValue>(() => ({
     ...statusValue,
+    geometryVersion,
     tick,
-  }), [statusValue, tick]);
+  }), [statusValue, geometryVersion, tick]);
 
   return (
     <SkylineStatusContext.Provider value={statusValue}>

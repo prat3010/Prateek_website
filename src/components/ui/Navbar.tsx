@@ -92,8 +92,7 @@ export default function Navbar({ items, className }: NavbarProps) {
   }, [items, pathname, audience]);
 
   const [scrolled, setScrolled] = useState(false);
-  const [isScrolling, setIsScrolling] = useState(false);
-  const scrollTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const scrolledRef = useRef(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>('');
   const [prevPathname, setPrevPathname] = useState(pathname);
@@ -130,30 +129,25 @@ export default function Navbar({ items, className }: NavbarProps) {
 
   useEffect(() => {
     return () => {
-      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
       if (clickScrollTimerRef.current) clearTimeout(clickScrollTimerRef.current);
     };
   }, []);
 
   /* ---------- Scroll direction / scrolled threshold listener ---------- */
   useEffect(() => {
-    let lastY = 0;
     const unsub = scrollY.on('change', (y) => {
-      setScrolled(y > 50);
-      if (y <= 50 && !isClickScrollingRef.current) {
+      const nextScrolled = y > 50;
+      if (scrolledRef.current !== nextScrolled) {
+        scrolledRef.current = nextScrolled;
+        setScrolled(nextScrolled);
+      }
+      if (!nextScrolled && !isClickScrollingRef.current) {
         const isSectionPage = Boolean(items) || pathname === '/' || pathname?.startsWith('/rag');
         if (isSectionPage) {
           const homeHref = items && items.length > 0 ? items[0].href : (pathname?.startsWith('/rag') ? '/rag#home' : '/#home');
           setActiveSection(homeHref);
         }
       }
-      const diff = Math.abs(y - lastY);
-      if (diff > 2) {
-        setIsScrolling(true);
-        if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
-        scrollTimerRef.current = setTimeout(() => setIsScrolling(false), 800);
-      }
-      lastY = y;
     });
     return unsub;
   }, [scrollY, items, pathname]);
@@ -357,8 +351,8 @@ export default function Navbar({ items, className }: NavbarProps) {
     <nav
       ref={navRef}
       className={`${styles.navbar} ${scrolled ? styles.scrolled : ''} ${
-        isScrolling ? styles.scrollActive : ''
-      } ${mobileOpen ? styles.menuOpen : ''} ${className ?? ''}`}
+        mobileOpen ? styles.menuOpen : ''
+      } ${className ?? ''}`}
       role="navigation"
       aria-label="Main navigation"
     >

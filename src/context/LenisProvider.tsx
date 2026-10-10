@@ -24,12 +24,7 @@ function LenisSync({ children }: { children: ReactNode }) {
 
     if (prefersReducedMotion) return;
 
-    let lastCall = 0;
-    const THROTTLE_MS = 33;
     const unsub = lenis.on('scroll', () => {
-      const now = performance.now();
-      if (now - lastCall < THROTTLE_MS) return;
-      lastCall = now;
       scrollY.set(lenis.scroll);
       scrollProgress.set(lenis.progress);
       velocity.set(lenis.velocity);
@@ -45,9 +40,9 @@ function LenisSync({ children }: { children: ReactNode }) {
 }
 
 const LENIS_OPTIONS = {
-  duration: 1.1,
-  easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+  lerp: 0.1,
   smoothWheel: true,
+  syncTouch: false,
 };
 
 export function LenisProvider({ children }: { children: ReactNode }) {
