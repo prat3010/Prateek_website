@@ -7,7 +7,7 @@
   justify-content: center;
   overflow: hidden;
   background: var(--pop-cream);
-  padding: 2rem clamp(1rem, 4vw, 4rem);
+  padding: 2rem clamp(1rem, 4vw, 4rem) clamp(5rem, 9vh, 7.5rem);
 }
 
 
@@ -546,8 +546,8 @@
   color: #000000;
   border: 1px solid var(--border-muted);
   border-radius: 12px;
-  font-family: var(--font-comic-neue), 'Comic Neue', sans-serif;
-  font-weight: bold;
+  font-family: var(--font-code), 'JetBrains Mono', monospace;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;

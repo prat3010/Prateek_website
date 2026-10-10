@@ -5,7 +5,7 @@
 .wrapper {
   width: 100%;
   min-height: calc(100vh - 120px);
-  padding: var(--space-xl) var(--gutter);
+  padding: calc(70px + 2rem) var(--gutter) var(--space-xl);
   display: flex;
   justify-content: center;
   align-items: flex-start;

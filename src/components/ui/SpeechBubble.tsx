@@ -21,8 +21,6 @@ export default function SpeechBubble({
   variant = 'speech',
   className,
 }: SpeechBubbleProps) {
-  const bgColor = color ?? 'var(--pop-yellow)';
-
   const classNames = [
     styles.bubble,
     styles[direction],
@@ -32,15 +30,17 @@ export default function SpeechBubble({
     .filter(Boolean)
     .join(' ');
 
+  const style = color
+    ? ({
+        '--bubble-bg': color,
+        backgroundColor: color,
+      } as React.CSSProperties)
+    : undefined;
+
   return (
     <div
       className={classNames}
-      style={
-        {
-          '--bubble-bg': bgColor,
-          backgroundColor: bgColor,
-        } as React.CSSProperties
-      }
+      style={style}
       role="note"
       aria-label="Speech bubble"
     >

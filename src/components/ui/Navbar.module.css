@@ -121,7 +121,7 @@
 
 .navLinks {
   display: flex;
-  gap: 8px;
+  gap: clamp(4px, 0.75vw, 8px);
   align-items: center;
   list-style: none;
   margin: 0;
@@ -140,10 +140,10 @@
   align-items: center;
   justify-content: center;
   font-family: var(--font-headline);
-  font-size: 1.05rem;
+  font-size: clamp(0.85rem, 0.95vw, 1.05rem);
   letter-spacing: 0.5px;
   color: var(--pop-black);
-  padding: 8px 12px;
+  padding: 6px clamp(6px, 0.8vw, 12px);
   text-transform: uppercase;
   transition: color 0.2s ease;
   text-decoration: none;

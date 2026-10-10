@@ -24,6 +24,7 @@
   width: 100%;
   justify-content: center;
   letter-spacing: 0.04em;
+  text-shadow: var(--text-halo-headline);
 }
 
 
@@ -70,22 +71,27 @@
 }
 
 .bioBubble {
-  background: var(--pop-white);
+  --bubble-bg: rgba(250, 249, 246, 0.94);
+  background: rgba(250, 249, 246, 0.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 :global([data-theme='noir']) .bioBubble {
   --bubble-bg: var(--surface-bubble);
-  background-color: var(--surface-bubble);
-  color: var(--surface-secondary);
-  border-color: var(--surface-secondary);
-  box-shadow: 4px 4px 0px var(--surface-secondary);
+  background: var(--surface-bubble);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--color-text);
+  border-color: var(--border-muted);
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.7);
 }
 
 :global([data-theme='noir']) .bioBubble::after {
-  border-right-color: var(--surface-secondary);
-  border-left-color: var(--surface-secondary);
-  border-bottom-color: var(--surface-secondary);
-  border-top-color: var(--surface-secondary);
+  border-right-color: var(--border-muted);
+  border-left-color: var(--border-muted);
+  border-bottom-color: var(--border-muted);
+  border-top-color: var(--border-muted);
 }
 
 :global([data-theme='noir']) .bioBubble::before {
@@ -102,7 +108,7 @@
 }
 
 :global([data-theme='noir']) .bioText {
-  color: var(--surface-secondary);
+  color: var(--color-text);
   font-family: var(--font-code);
 }
 
@@ -111,7 +117,7 @@
 }
 
 :global([data-theme='noir']) .bioText strong {
-  color: #901a3e; /* Compliant deep magenta rose for contrast (6.33:1) on cream background */
+  color: var(--neon-pink);
   font-family: var(--font-code);
   font-weight: bold;
 }

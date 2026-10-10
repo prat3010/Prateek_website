@@ -105,7 +105,11 @@ function getRetroTimeString(): string {
   return `${displayHours}:${mins} ${ampm}`;
 }
 
-export default function AlphaPager() {
+export interface AlphaPagerProps {
+  defaultExpanded?: boolean;
+}
+
+export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
   const { audience, isDetailsHidden } = useTheme();
   const isBiz = audience === 'business';
 
@@ -114,6 +118,7 @@ export default function AlphaPager() {
     return window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
   });
   const [isExpanded, setIsExpanded] = useState(() => {
+    if (defaultExpanded !== undefined) return defaultExpanded;
     if (typeof window === 'undefined') return true;
     return !(window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches);
   });

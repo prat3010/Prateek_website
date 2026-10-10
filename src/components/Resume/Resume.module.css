@@ -27,6 +27,7 @@
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-headline);
   line-height: var(--leading-tight);
+  text-shadow: var(--text-halo-headline);
 }
 
 .titleContainer {
@@ -43,6 +44,7 @@
   line-height: var(--leading-relaxed);
   margin: 0;
   max-width: 600px;
+  text-shadow: var(--text-halo-body);
 }
 
 .actions {

@@ -17,7 +17,7 @@ import { NAVBAR_SCROLL_OFFSET } from '@/lib/constants';
 import styles from './Navbar.module.css';
 
 const NAV_LABEL_TEXTS: ScramblerProps['texts'] = {
-  developer: { light: 'Resume',    noir: 'Resume' },
+  developer: { light: 'Resume',                noir: 'Resume' },
   business:  { light: 'Services & Guarantees', noir: 'Services & Guarantees' },
 };
 

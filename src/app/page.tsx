@@ -98,7 +98,7 @@ export default function Home() {
         <Contact />
       </ScrollSection>
 
-      <AlphaPager />
+      <AlphaPager defaultExpanded={false} />
     </>
   );
 }

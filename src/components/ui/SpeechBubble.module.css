@@ -6,6 +6,7 @@
   position: relative;
   display: inline-block;
   padding: 16px 24px;
+  background: var(--bubble-bg, var(--pop-yellow));
   border: 1px solid var(--color-border);
   border-radius: var(--radius-bubble);
   font-family: var(--font-body);

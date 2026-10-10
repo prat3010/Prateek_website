@@ -1,7 +1,7 @@
 .barContainer {
   position: fixed;
-  bottom: 28px;
-  left: 28px;
+  bottom: clamp(16px, 2.5vw, 24px);
+  left: clamp(16px, 2.5vw, 24px);
   right: auto;
   z-index: var(--z-fixed);
   display: flex;
@@ -13,11 +13,13 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 6px;
-  background-color: var(--pop-white);
+  padding: 3px 6px;
+  background-color: rgba(250, 249, 246, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1.5px solid var(--color-border);
   border-radius: 9999px;
-  box-shadow: var(--shadow-comic);
+  box-shadow: var(--shadow-comic-sm);
   transition: 
     background-color var(--transition-normal),
     border-color var(--transition-normal),
@@ -26,7 +28,7 @@
 }
 
 .dockCapsule:hover {
-  box-shadow: var(--shadow-comic-hover);
+  box-shadow: var(--shadow-comic);
   transform: translate(-1px, -1px);
 }
 
@@ -40,9 +42,11 @@
 
 /* ── Noir Theme Overrides (Tactile Hardware Machined Capsule) ─ */
 :global([data-theme='noir']) .dockCapsule {
-  background-color: var(--surface-hardware-chassis);
+  background-color: rgba(14, 14, 18, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--surface-hardware-border);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7), var(--surface-hardware-bevel);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7), var(--surface-hardware-bevel);
 }
 
 :global([data-theme='noir']) .dockCapsule:hover {
