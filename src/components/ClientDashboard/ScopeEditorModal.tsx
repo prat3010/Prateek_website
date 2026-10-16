@@ -88,11 +88,13 @@ function ScopeEditorModalInner({
 }: ScopeEditorModalProps & { scope: ClientScope }) {
   const [custEngineId, setCustEngineId] = useState<string>(() => getInitialEngine(scope));
   const [custFeatureIds, setCustFeatureIds] = useState<string[]>(() => getInitialFeatures(scope));
-  const custBrandId = getInitialBrand(scope);
-  const custMaintenanceId = getInitialMaintenance(scope);
+  const [custBrandId, setCustBrandId] = useState<string>(() => getInitialBrand(scope));
+  const [custMaintenanceId, setCustMaintenanceId] = useState<string>(() => getInitialMaintenance(scope));
 
   const [custCurrency, setCustCurrency] = useState<Currency>(() => (scope.currency === 'USD' ? 'USD' : 'INR') as Currency);
-  const [custPromoCode, setCustPromoCode] = useState<PromoDiscountInfo | null>(null);
+  const [custPromoCode, setCustPromoCode] = useState<PromoDiscountInfo | null>(
+    () => (scope.metadata?.appliedPromoCode as PromoDiscountInfo | undefined) || null
+  );
   const [promoInput, setPromoInput] = useState('');
   const [promoLoading, setPromoLoading] = useState(false);
   const [promoMessage, setPromoMessage] = useState<string | null>(null);
@@ -150,24 +152,28 @@ function ScopeEditorModalInner({
     setPromoLoading(true);
     setPromoMessage(null);
     try {
+      const subtotal =
+        custCurrency === 'INR' ? custQuote.grossTotalINR : custQuote.grossTotalUSD;
       const res = await fetch('/api/scoping/validate-promo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           code: promoInput.trim(),
+          subtotal,
           currency: custCurrency,
         }),
       });
       const data = await res.json();
-      if (data.valid && data.promo) {
+      const promoCodeStr = data.code || data.promo?.code;
+      if (data.valid && promoCodeStr) {
         setCustPromoCode({
-          code: data.promo.code,
-          discountType: data.promo.discount_type || 'percentage',
-          discountValue: Number(data.promo.discount_value) || 0,
-          discountAmountINR: Number(data.promo.discount_amount_inr) || 0,
-          discountAmountUSD: Number(data.promo.discount_amount_usd) || 0,
+          code: promoCodeStr,
+          discountType: data.discountType || data.promo?.discount_type || 'percentage',
+          discountValue: Number(data.discountValue ?? data.promo?.discount_value) || 0,
+          discountAmountINR: Number(data.discountAmountINR ?? data.promo?.discount_amount_inr) || 0,
+          discountAmountUSD: Number(data.discountAmountUSD ?? data.promo?.discount_amount_usd) || 0,
         });
-        setPromoMessage(`✅ Promo '${data.promo.code}' applied!`);
+        setPromoMessage(`✅ Promo '${promoCodeStr}' applied!`);
       } else {
         setPromoMessage(`❌ ${data.error || 'Invalid promo code'}`);
       }
@@ -195,6 +201,9 @@ function ScopeEditorModalInner({
             ...scope.metadata,
             engineId: custEngineId,
             featureIds: custFeatureIds,
+            brandAssetOption: custQuote.brandAsset?.label || scope.brand_asset,
+            maintenancePlan: custQuote.maintenancePlan?.name || scope.maintenance_plan,
+            ...(custPromoCode ? { appliedPromoCode: custPromoCode } : {}),
           },
         };
         await onSaveDraft(updatedScope);
@@ -338,9 +347,62 @@ function ScopeEditorModalInner({
               </div>
             </div>
 
-            {/* 3. Promo Code Engine */}
+            {/* 3. Brand Assets & Maintenance Plans */}
+            {!scope.deposit_paid && (
+              <div className={styles.customizerSection}>
+                <h4 className={styles.customizerSectionTitle}>3. Brand Assets & Care Plan</h4>
+                <div className={styles.engineGrid} style={{ marginBottom: '0.75rem' }}>
+                  {intakeDefaults.brandAssets.map((brand) => {
+                    const isSelected = custBrandId === brand.id;
+                    return (
+                      <button
+                        key={brand.id}
+                        type="button"
+                        className={`${styles.engineOptionCard} ${isSelected ? styles.engineOptionCardActive : ''}`}
+                        onClick={() => setCustBrandId(brand.id)}
+                      >
+                        <div className={styles.engineOptionHeader}>
+                          <span className={styles.engineOptionTitle}>{brand.label}</span>
+                          <span className={styles.engineOptionPrice}>
+                            {brand.priceINR === 0
+                              ? 'Included'
+                              : `+${formatPricePair(brand.priceINR, brand.priceUSD, custCurrency)}`}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className={styles.engineGrid}>
+                  {intakeDefaults.maintenancePlans.map((plan) => {
+                    const isSelected = custMaintenanceId === plan.id;
+                    return (
+                      <button
+                        key={plan.id}
+                        type="button"
+                        className={`${styles.engineOptionCard} ${isSelected ? styles.engineOptionCardActive : ''}`}
+                        onClick={() => setCustMaintenanceId(plan.id)}
+                      >
+                        <div className={styles.engineOptionHeader}>
+                          <span className={styles.engineOptionTitle}>{plan.name}</span>
+                          <span className={styles.engineOptionPrice}>
+                            {plan.priceINR === 0
+                              ? '30-Day Warranty'
+                              : `${formatPricePair(plan.priceINR, plan.priceUSD, custCurrency)}/mo`}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* 4. Promo Code Engine */}
             <div className={styles.customizerSection}>
-              <h4 className={styles.customizerSectionTitle}>3. Promo & Referral Code</h4>
+              <h4 className={styles.customizerSectionTitle}>
+                {scope.deposit_paid ? '3. Promo & Referral Code' : '4. Promo & Referral Code'}
+              </h4>
               <div className={styles.promoInputRow}>
                 <input
                   type="text"

@@ -31,6 +31,7 @@ def render_clients_tab():
     orders = []
     invoices = []
     deliverables = []
+    change_orders = []
 
     if HAS_SYNC:
         try:
@@ -58,13 +59,43 @@ def render_clients_tab():
         except Exception as e:
             st.warning(f"Could not fetch project_deliverables from Supabase: {e}")
 
+        try:
+            change_orders = fetch_records("scope_change_orders") or []
+        except Exception:
+            change_orders = []
+
+        try:
+            rag_tenants = fetch_records("rag_tenants") or []
+        except Exception:
+            rag_tenants = []
+
+        try:
+            rag_subs = fetch_records("rag_subscriptions") or []
+        except Exception:
+            rag_subs = []
+
+        try:
+            rag_members = fetch_records("rag_tenant_members") or []
+        except Exception:
+            rag_members = []
+
     # Commercial Overview Metrics Cards
     total_orders = len(orders)
     paid_orders = [o for o in orders if o.get("deposit_paid")]
-    total_paid_inr = sum(float(o.get("total_cost_inr", 0)) * 0.5 for o in paid_orders)
-    total_paid_usd = sum(float(o.get("total_cost_usd", 0)) * 0.5 for o in paid_orders)
+    paid_inr_invoices = [
+        float(inv.get("amount", 0))
+        for inv in invoices
+        if inv.get("payment_status") == "paid" and inv.get("currency", "INR") == "INR"
+    ]
+    if paid_inr_invoices:
+        total_paid_inr = sum(paid_inr_invoices)
+    else:
+        total_paid_inr = sum(
+            float(o.get("total_cost_inr", 0)) * (0.4 if o.get("payment_structure") == "40/30/30" else 0.5)
+            for o in paid_orders
+        )
 
-    col1, col2, col3, col4, col5 = st.columns(5)
+    col1, col2, col3, col4, col5, col6 = st.columns(6)
     with col1:
         st.metric("Registered Clients", len(clients))
     with col2:
@@ -75,16 +106,19 @@ def render_clients_tab():
         st.metric("Invoices Issued", len(invoices))
     with col5:
         st.metric("Total Paid (INR)", f"₹{total_paid_inr:,.0f}")
+    with col6:
+        st.metric("RAG Tenants", len(rag_tenants))
 
     st.markdown("---")
 
     # 2. Main Tabbed Navigation
-    c_tab1, c_tab2, c_tab3, c_tab4, c_tab5 = st.tabs([
+    c_tab1, c_tab2, c_tab3, c_tab4, c_tab5, c_tab6 = st.tabs([
         "👥 Registered Clients",
         "📋 Scoping Intake Leads",
         "📦 Client Scopes & Delivery",
         "🔑 Deliverables Vault",
-        "🧾 Invoices & GST Credentials"
+        "🧾 Invoices & GST Credentials",
+        "⚡ Retriever SaaS Subscribers",
     ])
 
     # ─────────────────────────────────────────────────────────────
@@ -287,20 +321,22 @@ def render_clients_tab():
                 status = order.get("status", "Draft Proposal")
                 delivery_stage = order.get("delivery_stage", "architecture")
 
-                with st.expander(f"📦 {scope_code} — {company} ({'✅ 50% DEPOSIT PAID' if deposit_paid else '⏳ DRAFT PROPOSAL'})", expanded=False):
+                with st.expander(f"📦 {scope_code} — {company} ({'✅ DEPOSIT PAID' if deposit_paid else '⏳ DRAFT PROPOSAL'})", expanded=False):
+                    engine_title = order.get("base_engine_title") or order.get("base_engine", "Web Engine")
+                    meta = order.get("metadata") if isinstance(order.get("metadata"), dict) else {}
                     c1, c2 = st.columns(2)
                     with c1:
                         st.markdown(f"**Client Email:** `{email}`")
                         st.markdown(f"**Contact Phone:** {order.get('client_phone', 'N/A')}")
-                        st.markdown(f"**Base Engine:** {order.get('base_engine', 'Web Engine')}")
+                        st.markdown(f"**Base Engine:** {engine_title}")
                         st.markdown(f"**Timeline:** {order.get('timeline', 'Standard')}")
                         st.markdown(f"**Total Build Investment:** {order.get('currency', 'INR')} {order.get('total_cost_inr' if order.get('currency') == 'INR' else 'total_cost_usd', 0):,}")
                     with c2:
-                        st.markdown(f"**Deposit Status:** {'✅ PAID' if deposit_paid else '⏳ PENDING'}")
-                        st.markdown(f"**Brand Kit:** {order.get('brand_asset', 'Standard')}")
-                        st.markdown(f"**Care Plan:** {order.get('maintenance_plan', 'Standard')}")
+                        st.markdown(f"**Deposit Status:** {'✅ PAID' if deposit_paid else '⏳ PENDING'} ({order.get('payment_structure', '50/50')})")
+                        st.markdown(f"**Brand Kit:** {order.get('brand_asset') or meta.get('brandAssetOption', 'Standard')}")
+                        st.markdown(f"**Care Plan:** {order.get('maintenance_plan') or meta.get('maintenancePlan', 'Standard')}")
 
-                    features_raw = order.get("features", [])
+                    features_raw = order.get("selected_features") or order.get("features", [])
                     if isinstance(features_raw, str):
                         try:
                             features_raw = json.loads(features_raw)
@@ -309,6 +345,27 @@ def render_clients_tab():
 
                     if features_raw:
                         st.markdown("**Selected Scope Modules:** " + " ".join([f"`{f}`" for f in features_raw]))
+
+                    checklist_raw = order.get("onboarding_checklist") or {}
+                    if isinstance(checklist_raw, str):
+                        try:
+                            checklist_raw = json.loads(checklist_raw)
+                        except Exception:
+                            checklist_raw = {}
+                    if isinstance(checklist_raw, dict) and checklist_raw:
+                        st.markdown("#### 📋 Client Onboarding Readiness & Submitted Links")
+                        for ck_key, ck_val in checklist_raw.items():
+                            st.markdown(f"- **{ck_key}:** `{ck_val}`")
+
+                    scope_cos = [co for co in change_orders if co.get("scope_id") == order.get("id")]
+                    if scope_cos:
+                        st.markdown(f"#### 🔄 Phase 2 Change Orders ({len(scope_cos)})")
+                        for co in scope_cos:
+                            st.markdown(
+                                f"- **#{co.get('change_order_number')}** [{co.get('status', 'pending').upper()}] — "
+                                f"+₹{float(co.get('price_delta_inr', 0)):,.0f} / +${float(co.get('price_delta_usd', 0)):,.0f} "
+                                f"({', '.join(co.get('added_features') or [])})"
+                            )
 
                     st.markdown("---")
                     st.markdown("#### Live Delivery Stage & Payment Control")
@@ -328,7 +385,7 @@ def render_clients_tab():
                         )
                     with c_payment:
                         new_paid = st.checkbox(
-                            f"50% Scope Deposit Locked & Paid",
+                            f"Scope Deposit Locked & Paid",
                             value=deposit_paid,
                             key=f"paid_check_{scope_code}"
                         )
@@ -366,7 +423,7 @@ def render_clients_tab():
                             inv_number = f"INV-{scope_code}-{suffix}"
                             line_items = [
                                 {
-                                    "name": f"{order.get('base_engine', 'Web Application Engine')} — {inv_milestone_type}",
+                                    "name": f"{engine_title} — {inv_milestone_type}",
                                     "description": f"Scope Code {scope_code} ({order.get('company_name', 'Client')})",
                                     "rate": inv_amt,
                                     "quantity": 1,
@@ -385,11 +442,11 @@ def render_clients_tab():
                                 "currency": curr,
                                 "is_gst": False,
                                 "milestone_name": inv_milestone_type,
-                                "payment_status": "issued" if not deposit_paid else "paid",
+                                "payment_status": "issued",
                                 "issue_date": datetime.utcnow().strftime("%Y-%m-%d"),
                                 "due_date": (datetime.utcnow() + timedelta(days=7)).strftime("%Y-%m-%d"),
-                                "line_items": json.dumps(line_items),
-                                "tax_breakup": json.dumps({"total_tax": 0, "is_interstate": False}),
+                                "line_items": line_items,
+                                "tax_breakup": {"total_tax": 0, "is_interstate": False},
                                 "customer_notes": "Commercial Bill / Invoice issued by a Non-GST Registered Freelance Developer under Section 22 of the CGST Act.",
                                 "terms_and_conditions": "100% Intellectual Property transfers upon final balance payment.",
                                 "created_at": datetime.utcnow().isoformat(),
@@ -549,3 +606,73 @@ def render_clients_tab():
                 st.success(f"Saved seller credentials directly to src/data/seller.json! ({git_msg if git_ok else 'Local saved'})")
             except Exception as ex:
                 st.error(f"Failed to save seller credentials: {ex}")
+
+    # ─────────────────────────────────────────────────────────────
+    # TAB 6: RETRIEVER SAAS SUBSCRIBERS DIRECTORY
+    # ─────────────────────────────────────────────────────────────
+    with c_tab6:
+        st.subheader("⚡ Retriever AI SaaS Subscribers & Workspaces")
+        st.markdown(
+            "Live overview of all sovereign Retriever pgvector workspaces, plan tiers, token quotas, and Razorpay subscription references."
+        )
+
+        sub_map = {s.get("tenant_id"): s for s in rag_subs if s.get("tenant_id")}
+        member_map = {}
+        for m in rag_members:
+            tid = m.get("tenant_id")
+            if tid and (m.get("role") == "owner" or tid not in member_map):
+                member_map[tid] = m.get("email")
+
+        client_email_map = {c.get("id"): c.get("email") for c in clients if c.get("id")}
+
+        if not rag_tenants:
+            st.info("No Retriever workspaces found in `rag_tenants` table.")
+        else:
+            paid_count = 0
+            trial_count = 0
+            sub_rows = []
+
+            for t in rag_tenants:
+                tid = t.get("tenant_id")
+                sub = sub_map.get(tid, {})
+                owner_email = member_map.get(tid) or client_email_map.get(t.get("client_id")) or "Unknown"
+                tier = sub.get("plan_tier") or t.get("plan_tier") or "starter"
+                rzp_id = sub.get("razorpay_subscription_id") or ""
+                is_active = sub.get("is_active", t.get("is_active", True))
+
+                is_paid = is_active and (bool(rzp_id.strip()) or tier not in ("starter", "free"))
+                if is_paid:
+                    paid_count += 1
+                    status_label = "⚡ Paid Active"
+                elif not is_active:
+                    status_label = "🔒 Suspended / Expired"
+                else:
+                    trial_count += 1
+                    status_label = "⏱️ Free Trial"
+
+                sub_rows.append({
+                    "Workspace": t.get("name") or "Workspace",
+                    "Owner Email": owner_email,
+                    "Plan Tier": tier.upper(),
+                    "Status": status_label,
+                    "Tokens Limit": f"{int(sub.get('monthly_token_limit', 250000)):,}",
+                    "Razorpay Sub ID": rzp_id or "—",
+                    "API Key": "✓ Stored" if t.get("api_key") else "Missing",
+                    "Tenant ID": str(tid),
+                    "Created": t.get("created_at", "")[:10],
+                })
+
+            s_col1, s_col2, s_col3 = st.columns(3)
+            with s_col1:
+                st.metric("Total Workspaces", len(rag_tenants))
+            with s_col2:
+                st.metric("Paid Subscriptions", paid_count)
+            with s_col3:
+                st.metric("Free Trials", trial_count)
+
+            st.dataframe(sub_rows, use_container_width=True)
+
+            st.markdown(
+                "[Open Sovereign Retriever Admin Control Center (admin.rag.prateeq.in)](https://admin.rag.prateeq.in)"
+            )
+

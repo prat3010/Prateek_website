@@ -11,7 +11,7 @@ interface WorkspaceSwitcherProps {
   active: 'dashboard' | 'rag';
 }
 
-export default function WorkspaceSwitcher({ active }: WorkspaceSwitcherProps) {
+export function WorkspaceSwitcher({ active }: WorkspaceSwitcherProps) {
   const { user } = useAuth();
   const isAdmin = isAdminEmail(user?.email);
 
@@ -44,3 +44,5 @@ export default function WorkspaceSwitcher({ active }: WorkspaceSwitcherProps) {
     </div>
   );
 }
+
+export default WorkspaceSwitcher;

@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
 import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
+import { sendAdminChangeOrderNotification } from '@/lib/emailNotification';
+import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
+import type { FeatureItem } from '@/data/resume';
 
 export async function GET(req: Request) {
   try {
@@ -111,10 +114,26 @@ export async function POST(req: Request) {
     const coIndex = (countRes.count ?? 0) + 1;
     const coNumber = `CO-${scopeCode}-${String(coIndex).padStart(2, '0')}`;
 
-    // 3. Create Milestone Invoice if price delta > 0
+    // 3. Verify feature delta against catalog if addedFeatures match known catalog items
+    const catalogFeatures = (questionnaireDefaults.features || []) as FeatureItem[];
+    const matchedAdded = catalogFeatures.filter((f) =>
+      Array.isArray(addedFeatures) &&
+      addedFeatures.some(
+        (af: string) =>
+          typeof af === 'string' &&
+          (af.toLowerCase() === f.id.toLowerCase() || af.toLowerCase() === f.label.toLowerCase())
+      )
+    );
+    const catalogDeltaINR = matchedAdded.reduce((sum, f) => sum + (f.priceINR || 0), 0);
+    const catalogDeltaUSD = matchedAdded.reduce((sum, f) => sum + (f.priceUSD || 0), 0);
+
+    const verifiedDeltaINR = catalogDeltaINR > 0 ? catalogDeltaINR : Math.max(0, Number(priceDeltaINR) || 0);
+    const verifiedDeltaUSD = catalogDeltaUSD > 0 ? catalogDeltaUSD : Math.max(0, Number(priceDeltaUSD) || 0);
+
+    // 4. Create Milestone Invoice if price delta > 0
     let invoiceId: string | null = null;
     const currency = scope.currency || 'INR';
-    const amount = currency === 'INR' ? Number(priceDeltaINR) : Number(priceDeltaUSD);
+    const amount = currency === 'INR' ? verifiedDeltaINR : verifiedDeltaUSD;
 
     if (amount > 0) {
       const invNumber = `INV-${scopeCode}-CO${String(coIndex).padStart(2, '0')}`;
@@ -141,7 +160,7 @@ export async function POST(req: Request) {
       }
     }
 
-    // 4. Insert Change Order
+    // 5. Insert Change Order
     const { data: changeOrder, error: insertErr } = await supabase
       .from('scope_change_orders')
       .insert({
@@ -150,8 +169,8 @@ export async function POST(req: Request) {
         requested_by_email: clientEmail,
         added_features: addedFeatures,
         removed_features: removedFeatures,
-        price_delta_inr: Number(priceDeltaINR),
-        price_delta_usd: Number(priceDeltaUSD),
+        price_delta_inr: verifiedDeltaINR,
+        price_delta_usd: verifiedDeltaUSD,
         timeline_impact: timelineImpact,
         status: invoiceId ? 'invoiced' : 'pending',
         invoice_id: invoiceId,
@@ -163,6 +182,17 @@ export async function POST(req: Request) {
     if (insertErr) {
       return NextResponse.json({ error: insertErr.message }, { status: 500 });
     }
+
+    sendAdminChangeOrderNotification({
+      changeOrderNumber: coNumber,
+      scopeCode,
+      companyName: scope.company_name || scopeCode,
+      clientEmail,
+      addedFeatures: Array.isArray(addedFeatures) ? addedFeatures : [],
+      removedFeatures: Array.isArray(removedFeatures) ? removedFeatures : [],
+      priceDeltaINR: verifiedDeltaINR,
+      priceDeltaUSD: verifiedDeltaUSD,
+    }).catch((err) => console.warn('Change order email alert warning:', err));
 
     return NextResponse.json({
       success: true,

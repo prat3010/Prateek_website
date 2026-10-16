@@ -4,7 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
 import { isAdminEmail } from '@/lib/auth';
+import { recalculateCanonicalScopeQuote } from '@/lib/pricing';
 import {
   LogOut,
   ShieldCheck,
@@ -42,10 +44,20 @@ declare global {
 export default function ClientDashboardPage() {
   const router = useRouter();
   const { user, loading, logout, loginWithGoogle, getAccessToken } = useAuth();
+  const { theme } = useTheme();
 
   useEffect(() => {
     if (!loading && user && isAdminEmail(user.email)) {
-      router.replace('/admin');
+      const params =
+        typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+      const hasPreviewOrImport =
+        params?.get('preview') === 'client' ||
+        params?.get('imported') === 'true' ||
+        Boolean(params?.get('scopeCode')) ||
+        (typeof window !== 'undefined' && Boolean(localStorage.getItem('prateeq_pending_scope')));
+      if (!hasPreviewOrImport) {
+        router.replace('/admin');
+      }
     }
   }, [user, loading, router]);
 
@@ -551,8 +563,14 @@ export default function ClientDashboardPage() {
   const handleDownloadExecutiveBrief = async (scope: ClientScope) => {
     try {
       setDownloadingPdfFormat('exec');
-      const isNoir = true;
+      const isNoir = theme === 'noir';
       const currency = (scope.currency === 'USD' ? 'USD' : 'INR') as 'INR' | 'USD';
+      const canonicalQuote = recalculateCanonicalScopeQuote({
+        baseEngineTitle: scope.base_engine,
+        selectedFeatures: scope.features,
+        brandAssetOption: scope.brand_asset,
+        maintenancePlan: scope.maintenance_plan,
+      });
       await generateExecutiveBriefPDF(
         resumeData as unknown as ResumeData,
         {
@@ -566,6 +584,8 @@ export default function ClientDashboardPage() {
           features: scope.features,
           assetsStatus: scope.brand_asset,
           maintenancePlan: scope.maintenance_plan,
+          maintenanceCostINR: canonicalQuote.maintenanceINR,
+          maintenanceCostUSD: canonicalQuote.maintenanceUSD,
           totalBuildCostINR: scope.total_cost_inr,
           totalBuildCostUSD: scope.total_cost_usd,
           timeline: scope.timeline,
@@ -585,8 +605,14 @@ export default function ClientDashboardPage() {
   const handleDownloadMasterSOW = async (scope: ClientScope) => {
     try {
       setDownloadingPdfFormat('sow');
-      const isNoir = true;
+      const isNoir = theme === 'noir';
       const currency = (scope.currency === 'USD' ? 'USD' : 'INR') as 'INR' | 'USD';
+      const canonicalQuote = recalculateCanonicalScopeQuote({
+        baseEngineTitle: scope.base_engine,
+        selectedFeatures: scope.features,
+        brandAssetOption: scope.brand_asset,
+        maintenancePlan: scope.maintenance_plan,
+      });
       await generateQuestionnairePDF(
         resumeData as unknown as ResumeData,
         {
@@ -600,6 +626,8 @@ export default function ClientDashboardPage() {
           features: scope.features,
           assetsStatus: scope.brand_asset,
           maintenancePlan: scope.maintenance_plan,
+          maintenanceCostINR: canonicalQuote.maintenanceINR,
+          maintenanceCostUSD: canonicalQuote.maintenanceUSD,
           totalBuildCostINR: scope.total_cost_inr,
           totalBuildCostUSD: scope.total_cost_usd,
           timeline: scope.timeline,
@@ -761,12 +789,21 @@ export default function ClientDashboardPage() {
               <Layers size={48} className={styles.emptyIcon} />
               <h3>No Project Scopes Found</h3>
               <p>Configure a custom architecture stack in the Scoping Lab to save a baseline proposal.</p>
-              <button
-                className={styles.createScopeBtn}
-                onClick={() => router.push('/scoping')}
-              >
-                Go to Scoping Lab <ArrowRight size={16} />
-              </button>
+              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap', marginTop: '1rem' }}>
+                <button
+                  className={styles.createScopeBtn}
+                  onClick={() => router.push('/scoping')}
+                >
+                  Go to Scoping Lab <ArrowRight size={16} />
+                </button>
+                <button
+                  className={styles.createScopeBtn}
+                  style={{ background: 'transparent', border: '1px solid #38bdf8', color: '#38bdf8' }}
+                  onClick={() => router.push('/rag/app')}
+                >
+                  ⚡ Open Retriever AI Studio <ArrowRight size={16} />
+                </button>
+              </div>
             </div>
           ) : (
             scopes.map((scope) => (
@@ -798,7 +835,7 @@ export default function ClientDashboardPage() {
           invoices={invoices}
           isLoading={isInvoiceLoading}
           payingInvoiceId={payingInvoiceId}
-          onOpenCreateModal={() => setShowInvoiceModal(true)}
+          onOpenCreateModal={isAdminEmail(user.email) ? () => setShowInvoiceModal(true) : undefined}
           onDownloadPdf={handleDownloadInvoicePdf}
           onPayInvoice={handlePayInvoice}
           onRefresh={loadInvoices}
@@ -822,7 +859,17 @@ export default function ClientDashboardPage() {
         onClose={() => setSigningScope(null)}
         onConfirmAndPay={async (s, structure) => {
           try {
-            await handleRazorpayCheckout(s, structure);
+            const signedScope: ClientScope = {
+              ...s,
+              payment_structure: structure,
+              onboarding_checklist: {
+                ...(s.onboarding_checklist || {}),
+                sow_accepted: true,
+                signed_at: new Date().toISOString(),
+                signed_by_email: user.email || '',
+              },
+            };
+            await handleRazorpayCheckout(signedScope, structure);
           } finally {
             setSigningScope(null);
           }

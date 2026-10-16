@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
 import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
-import { calculateInvoiceTotals } from '@/lib/invoicing';
+import { calculateInvoiceTotals, SELLER_CONFIG } from '@/lib/invoicing';
 import { createRazorpayOrderSchema } from '@/lib/clientOrder';
+import { recalculateCanonicalScopeQuote, type PromoDiscountInfo } from '@/lib/pricing';
 
 const USD_TO_INR_RATE = 85;
 
@@ -179,6 +180,11 @@ export async function POST(req: Request) {
       scope_code?: string;
       client_id?: string;
       client_email?: string;
+      base_engine?: string;
+      features?: string[];
+      brand_asset?: string;
+      maintenance_plan?: string;
+      metadata?: Record<string, unknown>;
       currency?: string;
       total_cost_inr?: number;
       total_cost_usd?: number;
@@ -233,7 +239,28 @@ export async function POST(req: Request) {
 
     const originalCurrency = scope.currency || 'INR';
     const isUSD = originalCurrency === 'USD';
-    const rawTotal = isUSD ? Number(scope.total_cost_usd || 0) : Number(scope.total_cost_inr || 0);
+
+    // Recalculate canonical quote when engine & features match catalog, falling back to DB stored cost
+    const canonical = recalculateCanonicalScopeQuote({
+      baseEngineTitle: scope.base_engine,
+      selectedFeatures: Array.isArray(scope.features) ? scope.features : [],
+      brandAssetOption: scope.brand_asset,
+      maintenancePlan: scope.maintenance_plan,
+      promoCode: (scope.metadata?.promoCode as PromoDiscountInfo | undefined) ?? null,
+      fallbackINR: Number(scope.total_cost_inr || 0),
+      fallbackUSD: Number(scope.total_cost_usd || 0),
+    });
+
+    const verifiedInr =
+      canonical.matched && Array.isArray(scope.features) && scope.features.length > 0
+        ? canonical.totalINR
+        : Number(scope.total_cost_inr || canonical.totalINR || 0);
+    const verifiedUsd =
+      canonical.matched && Array.isArray(scope.features) && scope.features.length > 0
+        ? canonical.totalUSD
+        : Number(scope.total_cost_usd || canonical.totalUSD || 0);
+
+    const rawTotal = isUSD ? verifiedUsd : verifiedInr;
 
     if (rawTotal <= 0) {
       return NextResponse.json({ error: 'Invalid scope cost amount.' }, { status: 400 });
@@ -248,12 +275,13 @@ export async function POST(req: Request) {
     const inrDepositAmount = isUSD ? Math.round(depositAmount * USD_TO_INR_RATE) : depositAmount;
     const amountInSubunits = Math.max(100, inrDepositAmount * 100);
 
-    // Calculate rich invoice breakdown with SAC code and tax details
+    // Only apply GST breakup when SELLER_CONFIG.gstin is configured
+    const hasSellerGstin = Boolean(SELLER_CONFIG.gstin?.trim());
     const percentageText = isThreePart ? '40%' : '50%';
     const itemDescription = `${percentageText} deposit lock for project scope ${scopeCode}`;
     const invoiceCalc = calculateInvoiceTotals({
       currency: originalCurrency,
-      place_of_supply: 'Delhi',
+      place_of_supply: hasSellerGstin ? 'Delhi' : undefined,
       line_items: [
         {
           name: `Scope Deposit (${percentageText}) — ${scope.company_name || scopeCode}`,
@@ -261,7 +289,7 @@ export async function POST(req: Request) {
           sac_hsn: '998314',
           rate: depositAmount,
           quantity: 1,
-          tax_rate: originalCurrency === 'INR' ? 18 : 0,
+          tax_rate: originalCurrency === 'INR' && hasSellerGstin ? 18 : 0,
           tax_type: 'inclusive',
         },
       ],
@@ -270,6 +298,39 @@ export async function POST(req: Request) {
     const createInvoiceRecord = async (orderId: string) => {
       if (!supabase) return;
       try {
+        // Reuse any existing unpaid deposit invoice for this scope to avoid duplicate pending rows on modal dismiss
+        let existingPendingId: string | null = null;
+        if (scope?.id) {
+          try {
+            const { data: existingInv } = await supabase
+              .from('invoices')
+              .select('id, payment_status')
+              .eq('scope_id', scope.id)
+              .eq('payment_status', 'pending')
+              .maybeSingle();
+            if (existingInv?.id && existingInv.payment_status === 'pending') {
+              existingPendingId = existingInv.id;
+            }
+          } catch {}
+        }
+
+        if (existingPendingId) {
+          await supabase
+            .from('invoices')
+            .update({
+              is_gst: invoiceCalc.is_gst,
+              line_items: invoiceCalc.line_items,
+              tax_breakup: invoiceCalc.tax_breakup,
+              milestone_name: `${percentageText} Scope Deposit & Development Lock`,
+              amount: invoiceCalc.grand_total,
+              currency: originalCurrency,
+              razorpay_order_id: orderId,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', existingPendingId);
+          return;
+        }
+
         await supabase.from('invoices').insert({
           invoice_number: `INV-${orderId.slice(-8).toUpperCase()}`,
           scope_id: scope?.id || null,

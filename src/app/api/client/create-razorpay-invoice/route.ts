@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
 import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
+import { isAdminEmail } from '@/lib/auth';
 import { CreateInvoiceInput } from '@/lib/clientOrder';
 import { calculateInvoiceTotals, generateInvoiceNumber } from '@/lib/invoicing';
 
@@ -9,6 +10,13 @@ export async function POST(req: Request) {
     const clientEmail = await getVerifiedSessionEmail(req);
     if (!clientEmail) {
       return NextResponse.json({ error: 'Unauthorized: valid session required.' }, { status: 401 });
+    }
+
+    if (!isAdminEmail(clientEmail)) {
+      return NextResponse.json(
+        { error: 'Forbidden: only studio administrators can issue custom invoices.' },
+        { status: 403 }
+      );
     }
 
     const rawPayload = await req.json();

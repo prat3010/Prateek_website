@@ -18,8 +18,8 @@ export function StagingPreviewModal({ scope, isOpen, onClose }: StagingPreviewMo
   if (!isOpen || !scope) return null;
 
   const stagingUrl =
-    (scope.metadata?.staging_url as string) ||
-    `https://staging-${scope.scope_code.toLowerCase()}.prateeq.in`;
+    scope.deliverables?.staging_url?.trim() ||
+    (typeof scope.metadata?.staging_url === 'string' ? scope.metadata.staging_url.trim() : '');
 
   return (
     <Portal>
@@ -60,15 +60,19 @@ export function StagingPreviewModal({ scope, isOpen, onClose }: StagingPreviewMo
             </div>
 
             <div className={styles.stagingUrlBar}>
-              <span className={styles.stagingUrlText}>{stagingUrl}</span>
-              <a
-                href={stagingUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.stagingExternalLink}
-              >
-                <ExternalLink size={14} /> Open in New Tab
-              </a>
+              <span className={styles.stagingUrlText}>
+                {stagingUrl || 'Staging URL pending provisioning'}
+              </span>
+              {stagingUrl && (
+                <a
+                  href={stagingUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.stagingExternalLink}
+                >
+                  <ExternalLink size={14} /> Open in New Tab
+                </a>
+              )}
             </div>
           </div>
 
@@ -83,19 +87,34 @@ export function StagingPreviewModal({ scope, isOpen, onClose }: StagingPreviewMo
                     <span className={styles.mockDot} />
                     <span className={styles.mockDot} />
                   </div>
-                  <div className={styles.mockAddressBar}>{stagingUrl}</div>
-                </div>
-                <div className={styles.mockContent}>
-                  <div className={styles.mockWatermark}>
-                    <h4>🚀 Staging Preview Build</h4>
-                    <p>Engine: {scope.base_engine}</p>
-                    <p>Sprint Stage: {(scope.delivery_stage || 'engineering').toUpperCase()}</p>
-                    <p className={styles.mockHint}>
-                      Live sprint artifacts and pull-request builds are continuously deployed to
-                      this preview sandbox.
-                    </p>
+                  <div className={styles.mockAddressBar}>
+                    {stagingUrl || 'Staging URL pending deployment'}
                   </div>
                 </div>
+                {stagingUrl ? (
+                  <iframe
+                    src={stagingUrl}
+                    title={`Staging preview for ${scope.company_name}`}
+                    style={{
+                      width: '100%',
+                      height: '420px',
+                      border: 'none',
+                      background: 'var(--surface-card)',
+                    }}
+                  />
+                ) : (
+                  <div className={styles.mockContent}>
+                    <div className={styles.mockWatermark}>
+                      <h4>⏳ Staging Environment Pending Provisioning</h4>
+                      <p>Engine: {scope.base_engine}</p>
+                      <p>Sprint Stage: {(scope.delivery_stage || 'engineering').toUpperCase()}</p>
+                      <p className={styles.mockHint}>
+                        Once your staging preview deployment URL is provisioned and linked to your
+                        Deliverables Vault, you can inspect and test it live here.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

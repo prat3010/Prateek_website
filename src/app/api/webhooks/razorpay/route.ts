@@ -1,6 +1,12 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { supabase } from '@/data/supabase';
+import { resolvePlanSpec } from '@/app/api/client/create-razorpay-subscription/route';
+import {
+  sendPaymentConfirmationNotifications,
+  sendRetrieverSubscriptionNotifications,
+} from '@/lib/emailNotification';
+import { ensureRetrieverEngineTenant } from '@/lib/retrieverProvision';
 
 export async function POST(req: Request) {
   try {
@@ -68,7 +74,7 @@ export async function POST(req: Request) {
       if (razorpayOrderId) {
         const { data: invoice, error: invoiceError } = await supabase
           .from('invoices')
-          .select('id, scope_id, payment_status, razorpay_payment_id')
+          .select('id, invoice_number, scope_id, payment_status, razorpay_payment_id, amount, currency, customer_email, customer_name, milestone_name')
           .eq('razorpay_order_id', razorpayOrderId)
           .maybeSingle();
 
@@ -90,7 +96,7 @@ export async function POST(req: Request) {
               updated_at: nowIso,
             })
             .eq('id', invoice.id)
-            .eq('payment_status', 'pending');
+            .eq('payment_status', invoice.payment_status || 'pending');
 
           if (updateInvoiceError) {
             console.error('Webhook invoice update failure:', updateInvoiceError);
@@ -98,16 +104,32 @@ export async function POST(req: Request) {
           }
         }
 
+        let targetScopeRow: {
+          scope_code?: string;
+          company_name?: string;
+          client_email?: string;
+          base_engine?: string;
+          features?: string[];
+          brand_asset?: string;
+          maintenance_plan?: string;
+          total_cost_inr?: number;
+          total_cost_usd?: number;
+          currency?: string;
+          timeline?: string;
+          deposit_paid?: boolean;
+        } | null = null;
+
         if (invoice.scope_id) {
           let sowHash = '';
           try {
             const { data: targetScope } = await supabase
               .from('client_scopes')
-              .select('scope_code, client_email, base_engine, features, brand_asset, maintenance_plan, total_cost_inr, total_cost_usd, currency, timeline')
+              .select('scope_code, company_name, client_email, base_engine, features, brand_asset, maintenance_plan, total_cost_inr, total_cost_usd, currency, timeline, deposit_paid')
               .eq('id', invoice.scope_id)
               .maybeSingle();
 
             if (targetScope) {
+              targetScopeRow = targetScope;
               const snapshot = {
                 ...targetScope,
                 deposit_paid_at: nowIso,
@@ -119,6 +141,40 @@ export async function POST(req: Request) {
           } catch (hashErr) {
             console.warn('Could not generate SOW hash on payment capture:', hashErr);
           }
+
+          // Check if this invoice settles a Change Order
+          try {
+            const { data: coRow } = await supabase
+              .from('scope_change_orders')
+              .select('id, added_features, removed_features, price_delta_inr, price_delta_usd')
+              .eq('invoice_id', invoice.id)
+              .maybeSingle();
+
+            if (coRow && coRow.id) {
+              await supabase
+                .from('scope_change_orders')
+                .update({ status: 'paid', updated_at: nowIso })
+                .eq('id', coRow.id);
+
+              if (targetScopeRow) {
+                const currentFeatures = Array.isArray(targetScopeRow.features) ? targetScopeRow.features : [];
+                const added = Array.isArray(coRow.added_features) ? coRow.added_features : [];
+                const removed = new Set(Array.isArray(coRow.removed_features) ? coRow.removed_features : []);
+                const mergedFeatures = Array.from(
+                  new Set([...currentFeatures.filter((f) => !removed.has(f)), ...added])
+                );
+                await supabase
+                  .from('client_scopes')
+                  .update({
+                    features: mergedFeatures,
+                    total_cost_inr: (Number(targetScopeRow.total_cost_inr) || 0) + (Number(coRow.price_delta_inr) || 0),
+                    total_cost_usd: (Number(targetScopeRow.total_cost_usd) || 0) + (Number(coRow.price_delta_usd) || 0),
+                    updated_at: nowIso,
+                  })
+                  .eq('id', invoice.scope_id);
+              }
+            }
+          } catch {}
 
           const { error: updateScopeError } = await supabase
             .from('client_scopes')
@@ -137,32 +193,76 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Could not activate payment scope.' }, { status: 500 });
           }
         }
+
+        const notifyEmail = invoice.customer_email || targetScopeRow?.client_email || '';
+        if (notifyEmail) {
+          sendPaymentConfirmationNotifications({
+            clientEmail: notifyEmail,
+            clientName: invoice.customer_name || targetScopeRow?.company_name,
+            scopeCode: targetScopeRow?.scope_code,
+            projectName: targetScopeRow?.company_name || invoice.customer_name,
+            invoiceNumber: invoice.invoice_number,
+            milestoneName: invoice.milestone_name,
+            amount: Number(invoice.amount) || 0,
+            currency: invoice.currency || targetScopeRow?.currency || 'INR',
+            paymentId: razorpayPaymentId,
+          }).catch((err) => console.warn('Webhook payment notification warning:', err));
+        }
       }
     } else if (
       event === 'subscription.charged' ||
       event === 'subscription.authenticated' ||
       event === 'subscription.activated' ||
       event === 'subscription.cancelled' ||
-      event === 'subscription.halted'
+      event === 'subscription.halted' ||
+      event === 'subscription.paused' ||
+      event === 'subscription.resumed'
     ) {
       const subEntity = payload.payload?.subscription?.entity;
+      const payEntity = payload.payload?.payment?.entity;
       const subId = subEntity?.id;
+      const payId = payEntity?.id;
       const notes = subEntity?.notes || {};
       const clientEmail = notes?.client_email || notes?.email;
       let targetTenantId = notes?.tenant_id;
-      const planId = subEntity?.plan_id || 'plan_starter_inr';
+      const rawPlanIdentifier = notes?.plan_id || notes?.tier || subEntity?.plan_id || 'starter_inr';
+      const planSpec = resolvePlanSpec(rawPlanIdentifier);
+      const planTier = planSpec.tier;
       const nowIso = new Date().toISOString();
-      const isActive = event !== 'subscription.cancelled' && event !== 'subscription.halted';
-
-      const planTier = planId.includes('business')
-        ? 'business'
-        : planId.includes('pro')
-        ? 'pro'
-        : 'starter';
-
-      const tokenLimit = planTier === 'business' ? 5000000 : planTier === 'pro' ? 1000000 : 250000;
+      const isActive =
+        event !== 'subscription.cancelled' &&
+        event !== 'subscription.halted' &&
+        event !== 'subscription.paused';
+      const tokenLimit =
+        planTier === 'business' ? 10_000_000 : planTier === 'pro' ? 1_500_000 : 250_000;
 
       if (subId) {
+        let clientId: string | null = null;
+        if (clientEmail) {
+          try {
+            const displayName = clientEmail.split('@')[0];
+            const { data: clientData } = await supabase
+              .from('clients')
+              .upsert(
+                {
+                  email: clientEmail,
+                  name: displayName,
+                  company_name: `${displayName}'s Workspace`,
+                  notes: `[Retriever SaaS: ${planTier.toUpperCase()}]`,
+                  updated_at: nowIso,
+                },
+                { onConflict: 'email' }
+              )
+              .select('id')
+              .maybeSingle();
+            if (clientData?.id) {
+              clientId = clientData.id;
+            }
+          } catch (clientErr) {
+            console.warn('Webhook subscription client upsert warning:', clientErr);
+          }
+        }
+
         // Resolve tenant ID if not provided in payment notes
         if (!targetTenantId) {
           const { data: existingSub } = await supabase
@@ -189,14 +289,36 @@ export async function POST(req: Request) {
           }
         }
 
-        // If still no tenant exists, bootstrap a fresh workspace
+        const displayName = clientEmail ? clientEmail.split('@')[0] : 'Subscriber';
+        const workspaceName = `${displayName}'s Workspace`;
+
+        let existingApiKey: string | null = null;
+        if (targetTenantId) {
+          const { data: existingTenant } = await supabase
+            .from('rag_tenants')
+            .select('api_key')
+            .eq('tenant_id', targetTenantId)
+            .maybeSingle();
+          existingApiKey = (existingTenant?.api_key as string | null) || null;
+        }
+
+        const provisioned = await ensureRetrieverEngineTenant({
+          existingTenantId: targetTenantId || null,
+          existingApiKey,
+          workspaceName,
+          planTier,
+        });
+
+        // If still no tenant existed prior to webhook, insert the newly provisioned workspace
         if (!targetTenantId && clientEmail) {
-          targetTenantId = crypto.randomUUID();
-          const displayName = clientEmail.split('@')[0];
+          targetTenantId = provisioned.tenantId;
           await supabase.from('rag_tenants').insert({
             tenant_id: targetTenantId,
-            name: `${displayName}'s Workspace`,
+            client_id: clientId,
+            name: workspaceName,
             plan_tier: planTier,
+            api_key: provisioned.apiKey,
+            api_key_hash: provisioned.apiKeyHash,
             is_active: isActive,
             created_at: nowIso,
             updated_at: nowIso,
@@ -209,19 +331,23 @@ export async function POST(req: Request) {
             created_at: nowIso,
             updated_at: nowIso,
           });
+        } else if (targetTenantId) {
+          targetTenantId = provisioned.tenantId;
         }
 
         if (targetTenantId) {
           await supabase.from('rag_subscriptions').upsert(
             {
+              client_id: clientId,
               tenant_id: targetTenantId,
               razorpay_subscription_id: subId,
               plan_tier: planTier,
               monthly_token_limit: tokenLimit,
+              api_key_hash: provisioned.apiKeyHash,
               is_active: isActive,
               current_period_end: subEntity?.current_end
                 ? new Date(subEntity.current_end * 1000).toISOString()
-                : null,
+                : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
               updated_at: nowIso,
             },
             { onConflict: 'tenant_id' }
@@ -230,7 +356,10 @@ export async function POST(req: Request) {
           await supabase
             .from('rag_tenants')
             .update({
+              client_id: clientId,
               plan_tier: planTier,
+              api_key: provisioned.apiKey,
+              api_key_hash: provisioned.apiKeyHash,
               is_active: isActive,
               updated_at: nowIso,
             })
@@ -252,23 +381,52 @@ export async function POST(req: Request) {
             }
           }
 
-          // Sync upgraded tier to Retriever backend engine if admin credentials exist
-          const retrieverUrl = process.env.RETRIEVER_API_URL || 'https://rag.prateeq.in';
-          const adminKey = process.env.RETRIEVER_ADMIN_KEY || process.env.ADMIN_MASTER_KEY;
-          if (adminKey) {
+          // For charged/activated events, ensure an invoice ledger entry exists and notify if not already sent
+          if (isActive && (event === 'subscription.charged' || event === 'subscription.activated') && clientEmail) {
             try {
-              await fetch(`${retrieverUrl.replace(/\/$/, '')}/v1/admin/tenants/${targetTenantId}`, {
-                method: 'PATCH',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'X-Admin-Master-Key': adminKey,
+              const invoiceRef = payId || subId;
+              const invoiceNumber = `RET-${String(invoiceRef).replace(/[^A-Za-z0-9]/g, '').slice(-8).toUpperCase()}`;
+              const { data: existingInv } = await supabase
+                .from('invoices')
+                .select('id, payment_status')
+                .eq('invoice_number', invoiceNumber)
+                .maybeSingle();
+
+              const wasAlreadyPaid = existingInv?.payment_status === 'paid';
+              const amountMajor = Math.round(planSpec.amount / 100);
+
+              await supabase.from('invoices').upsert(
+                {
+                  invoice_number: invoiceNumber,
+                  client_id: clientId,
+                  customer_name: displayName,
+                  customer_email: clientEmail,
+                  milestone_name: `Retriever ${planTier.toUpperCase()} Monthly Subscription`,
+                  amount: amountMajor,
+                  currency: planSpec.currency,
+                  payment_status: 'paid',
+                  razorpay_order_id: subId,
+                  razorpay_payment_id: payId || subId,
+                  paid_at: nowIso,
+                  updated_at: nowIso,
                 },
-                body: JSON.stringify({
-                  tier: planTier === 'starter' ? 'standard' : planTier === 'pro' ? 'premium' : 'enterprise',
-                }),
-              });
-            } catch (engineErr) {
-              console.warn('Could not sync upgraded tier to Retriever engine:', engineErr);
+                { onConflict: 'invoice_number' }
+              );
+
+              if (!wasAlreadyPaid) {
+                await sendRetrieverSubscriptionNotifications({
+                  subscriberEmail: clientEmail,
+                  subscriberName: displayName,
+                  planTier,
+                  amountFormatted: planSpec.formattedPrice,
+                  subscriptionId: subId,
+                  paymentId: payId,
+                  tenantId: targetTenantId,
+                  monthlyTokenLimit: tokenLimit,
+                }).catch((err) => console.warn('Webhook Retriever notification warning:', err));
+              }
+            } catch (invErr) {
+              console.warn('Webhook subscription invoice ledger warning:', invErr);
             }
           }
         }

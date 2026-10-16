@@ -10,7 +10,7 @@ interface InvoiceLedgerTableProps {
   invoices: InvoiceEntity[];
   isLoading: boolean;
   payingInvoiceId?: string | null;
-  onOpenCreateModal: () => void;
+  onOpenCreateModal?: () => void;
   onDownloadPdf: (invoice: InvoiceEntity) => void;
   onPayInvoice: (invoice: InvoiceEntity) => void;
   onRefresh: () => void;
@@ -53,13 +53,15 @@ export function InvoiceLedgerTable({
           >
             <RefreshCw size={15} className={isLoading ? styles.spinning : ''} />
           </button>
-          <button
-            type="button"
-            className={styles.createInvoiceBtn}
-            onClick={onOpenCreateModal}
-          >
-            <Plus size={15} /> Create Invoice
-          </button>
+          {onOpenCreateModal && (
+            <button
+              type="button"
+              className={styles.createInvoiceBtn}
+              onClick={onOpenCreateModal}
+            >
+              <Plus size={15} /> Create Invoice
+            </button>
+          )}
         </div>
       </div>
 

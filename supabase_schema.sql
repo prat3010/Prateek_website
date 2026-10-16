@@ -247,6 +247,8 @@ CREATE TABLE IF NOT EXISTS client_scopes (
   signed_by_email TEXT DEFAULT '',
   onboarding_checklist JSONB DEFAULT '{}',
   sow_hash TEXT DEFAULT '',
+  retriever_tenant_id TEXT,
+  metadata JSONB DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -257,6 +259,8 @@ ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS signed_at TIMESTAMPTZ;
 ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS signed_by_email TEXT DEFAULT '';
 ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS onboarding_checklist JSONB DEFAULT '{}';
 ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS sow_hash TEXT DEFAULT '';
+ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS retriever_tenant_id TEXT;
+ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}';
 
 ALTER TABLE client_scopes ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Clients can select own client_scopes" ON client_scopes;
@@ -316,6 +320,33 @@ CREATE POLICY "Clients can select own invoices" ON invoices FOR SELECT
 CREATE INDEX IF NOT EXISTS idx_invoices_client ON invoices (client_id);
 CREATE INDEX IF NOT EXISTS idx_invoices_scope ON invoices (scope_id);
 
+-- 8c-2. Scope Change Orders Table
+CREATE TABLE IF NOT EXISTS scope_change_orders (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  scope_id UUID REFERENCES client_scopes(id) ON DELETE CASCADE,
+  change_order_number TEXT NOT NULL,
+  requested_by_email TEXT NOT NULL,
+  added_features TEXT[] NOT NULL DEFAULT '{}',
+  removed_features TEXT[] NOT NULL DEFAULT '{}',
+  price_delta_inr NUMERIC DEFAULT 0.00,
+  price_delta_usd NUMERIC DEFAULT 0.00,
+  timeline_impact TEXT,
+  status TEXT DEFAULT 'pending',
+  invoice_id UUID REFERENCES invoices(id) ON DELETE SET NULL,
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE scope_change_orders ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Clients can select own scope_change_orders" ON scope_change_orders;
+CREATE POLICY "Clients can select own scope_change_orders" ON scope_change_orders FOR SELECT
+  USING (auth.jwt() ->> 'email' = requested_by_email);
+
+CREATE INDEX IF NOT EXISTS idx_scope_change_orders_scope ON scope_change_orders (scope_id);
+CREATE INDEX IF NOT EXISTS idx_scope_change_orders_email ON scope_change_orders (requested_by_email);
+CREATE INDEX IF NOT EXISTS idx_scope_change_orders_invoice ON scope_change_orders (invoice_id);
+
 -- 8d. Project Deliverables Vault & Credentials
 CREATE TABLE IF NOT EXISTS project_deliverables (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -367,7 +398,8 @@ CREATE TABLE IF NOT EXISTS rag_tenants (
   tenant_id UUID UNIQUE NOT NULL DEFAULT gen_random_uuid(),
   client_id UUID REFERENCES clients(id) ON DELETE SET NULL,
   name TEXT NOT NULL DEFAULT 'My Workspace',
-  plan_tier TEXT DEFAULT 'starter' CHECK (plan_tier IN ('starter', 'growth', 'enterprise', 'free')),
+  plan_tier TEXT DEFAULT 'starter' CHECK (plan_tier IN ('starter', 'pro', 'business', 'growth', 'enterprise', 'free')),
+  api_key TEXT DEFAULT '',
   api_key_hash TEXT DEFAULT '',
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
@@ -378,7 +410,7 @@ ALTER TABLE rag_tenants ENABLE ROW LEVEL SECURITY;
 
 CREATE TABLE IF NOT EXISTS rag_tenant_members (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  tenant_id UUID NOT NULL REFERENCES rag_tenants(tenant_id) ON DELETE CASCADE,
+  tenant_id UUID NOT NULL REFERENCES rag_tenants(tenant_id) ON UPDATE CASCADE ON DELETE CASCADE,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   email TEXT NOT NULL,
   role TEXT DEFAULT 'member' CHECK (role IN ('owner', 'admin', 'member')),

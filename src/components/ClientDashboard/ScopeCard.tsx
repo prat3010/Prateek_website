@@ -11,6 +11,7 @@ import {
   Activity,
   Server,
   Clock,
+  ExternalLink,
 } from 'lucide-react';
 
 import type { ClientScope, ScopeChangeOrderEntity, ClientDeliveryStage } from '@/lib/clientOrder';
@@ -67,6 +68,14 @@ export function ScopeCard({
     }
   };
 
+  const deliverableLinks = [
+    { label: 'Live Production URL', url: scope.deliverables?.production_url },
+    { label: 'Staging Environment', url: scope.deliverables?.staging_url },
+    { label: 'GitHub Repository', url: scope.deliverables?.github_repo },
+    { label: 'Figma Design System', url: scope.deliverables?.figma_url },
+    { label: 'Signed SOW Document', url: scope.deliverables?.signoff_pdf_url },
+  ].filter((d): d is { label: string; url: string } => Boolean(d.url && d.url.trim()));
+
   return (
     <div className={styles.scopeCard}>
       {/* Scope Card Header */}
@@ -79,7 +88,8 @@ export function ScopeCard({
             </span>
             {isDepositPaid ? (
               <span className={`${styles.statusBadge} ${styles.statusBadgeLive}`}>
-                <CheckCircle2 size={12} /> 50% Escrow Confirmed
+                <CheckCircle2 size={12} />{' '}
+                {scope.payment_structure === '40/30/30' ? '40% Escrow Confirmed' : '50% Escrow Confirmed'}
               </span>
             ) : (
               <span className={`${styles.statusBadge} ${styles.statusBadgeArch}`}>
@@ -139,6 +149,29 @@ export function ScopeCard({
           ))}
         </div>
       </div>
+
+      {/* Deliverables Vault */}
+      {deliverableLinks.length > 0 && (
+        <div className={styles.featuresPillsContainer}>
+          <span className={styles.featuresPillsHeading}>
+            Project Deliverables Vault ({deliverableLinks.length})
+          </span>
+          <div className={styles.featuresPillsList}>
+            {deliverableLinks.map((item, idx) => (
+              <a
+                key={idx}
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.featurePill}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', textDecoration: 'none' }}
+              >
+                <ExternalLink size={12} /> {item.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Cryptographic Hash & Retriever Tenant Info */}
       <div className={styles.securityMetaBar}>

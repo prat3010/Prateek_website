@@ -21,6 +21,7 @@ import { WorkflowsPanel } from "@/components/rag/WorkflowsPanel";
 import { ApiKeysPanel } from "@/components/rag/ApiKeysPanel";
 import { QuickLaunchWizardModal } from "@/components/rag/QuickLaunchWizardModal";
 import { RagErrorBoundary } from "@/components/rag/ErrorBoundary";
+import { WorkspaceSwitcher } from "@/components/ui/WorkspaceSwitcher";
 import styles from "@/components/rag/rag.module.css";
 
 type SubViewTab =
@@ -52,6 +53,8 @@ export default function RagAppStudioPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [planTier, setPlanTier] = useState<string>("starter");
   const [trialDaysRemaining, setTrialDaysRemaining] = useState<number>(7);
+  const [isPaidSubscription, setIsPaidSubscription] = useState<boolean>(false);
+  const [isExpired, setIsExpired] = useState<boolean>(false);
   const [showQuickWizard, setShowQuickWizard] = useState<boolean>(false);
   const [isUpgradedCelebration, setIsUpgradedCelebration] = useState<boolean>(false);
   const [advancedOpen, setAdvancedOpen] = useState<boolean>(false);
@@ -79,6 +82,8 @@ export default function RagAppStudioPage() {
             setIsAdmin(data.role === "owner" || data.role === "admin");
             setPlanTier(data.planTier || "starter");
             setTrialDaysRemaining(data.trialDaysRemaining ?? 7);
+            setIsPaidSubscription(data.isPaidSubscription ?? false);
+            setIsExpired(data.isExpired ?? false);
 
             const cli = new RetrieverClient({
               apiUrl: process.env.NEXT_PUBLIC_RETRIEVER_API_URL || "https://rag.prateeq.in",
@@ -109,6 +114,8 @@ export default function RagAppStudioPage() {
       setIsAdmin(false);
       setPlanTier("starter");
       setTrialDaysRemaining(7);
+      setIsPaidSubscription(false);
+      setIsExpired(false);
       setClient(null);
     } catch (err) {
       console.warn("RAG Studio workspace resolution warning:", err);
@@ -201,6 +208,8 @@ export default function RagAppStudioPage() {
         </div>
 
         <div className={styles.studioTopRight}>
+          <WorkspaceSwitcher active="rag" />
+
           <button
             onClick={() => setShowQuickWizard(true)}
             className="comic-btn comic-btn-outline"
@@ -352,7 +361,7 @@ export default function RagAppStudioPage() {
                 }}
               >
                 <span>
-                  🎉 <strong>Subscription Active:</strong> Welcome to Retriever {planTier.toUpperCase()}! Your workspace limits have been upgraded to 1,000,000 monthly tokens with 100 documents and custom widget branding unlocked.
+                  🎉 <strong>Subscription Active:</strong> Welcome to Retriever {planTier.toUpperCase()}! Your workspace limits are now {planTier === "business" ? "10,000,000" : planTier === "pro" ? "1,500,000" : "250,000"} monthly tokens with {planTier === "business" ? "500" : planTier === "pro" ? "100" : "20"} documents and priority hybrid search unlocked.
                 </span>
                 <button
                   onClick={() => setIsUpgradedCelebration(false)}
@@ -370,9 +379,47 @@ export default function RagAppStudioPage() {
               </div>
             )}
 
+            {/* Expired / Inactive Subscription Alert */}
+            {isExpired && (
+              <div
+                style={{
+                  background: "rgba(255, 77, 77, 0.12)",
+                  border: "1px solid #FF5252",
+                  borderRadius: "8px",
+                  padding: "0.85rem 1.25rem",
+                  marginBottom: "1.25rem",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  color: "var(--color-text)",
+                  fontSize: "0.875rem",
+                  gap: "1rem",
+                }}
+              >
+                <span>
+                  ⚠️ <strong>Workspace Restricted:</strong> Your 7-day free trial or subscription is inactive. Document uploads and chat queries are paused until renewal.
+                </span>
+                <Link
+                  href="/rag?upgrade=true"
+                  style={{
+                    background: "var(--color-accent, #00E676)",
+                    color: "#000",
+                    fontWeight: 700,
+                    padding: "0.45rem 0.95rem",
+                    borderRadius: "6px",
+                    textDecoration: "none",
+                    fontSize: "0.8rem",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Renew or Upgrade
+                </Link>
+              </div>
+            )}
+
             <OverviewPanel client={client} hidden={activeTab !== "overview"} onNavigateTab={(tab) => setActiveTab(tab as SubViewTab)} />
-            <DocumentsPanel client={client} hidden={activeTab !== "upload"} isExpired={trialDaysRemaining <= 0} />
-            <ChatPanel client={client} hidden={activeTab !== "chat"} isExpired={trialDaysRemaining <= 0} />
+            <DocumentsPanel client={client} hidden={activeTab !== "upload"} isExpired={isExpired} />
+            <ChatPanel client={client} hidden={activeTab !== "chat"} isExpired={isExpired} />
             <SearchPanel client={client} hidden={activeTab !== "search"} />
             <CachePanel client={client} hidden={activeTab !== "cache"} />
             <ConfigPanel
@@ -402,7 +449,14 @@ export default function RagAppStudioPage() {
               hidden={activeTab !== "config"}
             />
             <ApiKeysPanel hidden={activeTab !== "keys"} tenantId={tenantId} apiKey={apiKey} planTier={planTier} />
-            <TeamPanel hidden={activeTab !== "team"} tenantId={tenantId} />
+            <TeamPanel
+              hidden={activeTab !== "team"}
+              tenantId={tenantId}
+              planTier={planTier}
+              isPaidSubscription={isPaidSubscription}
+              trialDaysRemaining={trialDaysRemaining}
+              isExpired={isExpired}
+            />
             <VectorVisualizerPanel client={client} hidden={activeTab !== "visualizer"} />
             <WorkflowsPanel client={client} hidden={activeTab !== "workflows"} />
             <IntegrationsPanel hidden={activeTab !== "integrations"} tenantId={tenantId} />

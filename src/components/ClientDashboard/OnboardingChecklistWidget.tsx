@@ -26,6 +26,7 @@ export function OnboardingChecklistWidget({
   >('all');
   const [companyInputs, setCompanyInputs] = useState<Record<string, string>>({});
   const [phoneInputs, setPhoneInputs] = useState<Record<string, string>>({});
+  const [noteInputs, setNoteInputs] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
 
   const currentScope =
@@ -58,6 +59,39 @@ export function OnboardingChecklistWidget({
       onboarding_checklist: updatedChecklist,
     };
     await onUpdateScope(updatedScope);
+  };
+
+  const handleSaveItemNote = async (itemId: string) => {
+    const noteKey = `${currentScope.scope_code}:${itemId}`;
+    const noteValue = (noteInputs[noteKey] ?? String(checklistState[`${itemId}_note`] || '')).trim();
+    const updatedChecklist: Record<string, boolean | string> = {
+      ...checklistState,
+      [`${itemId}_note`]: noteValue,
+      ...(noteValue ? { [itemId]: true } : {}),
+    };
+    setIsSaving(true);
+    try {
+      await onUpdateScope({
+        ...currentScope,
+        onboarding_checklist: updatedChecklist,
+      });
+      toast.success('Onboarding asset link / note saved!');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const getNotePlaceholder = (itemId: string) => {
+    if (itemId === 'brand_assets_uploaded') {
+      return 'Paste Figma file, Google Drive, or Notion brand kit URL...';
+    }
+    if (itemId === 'domain_dns_ready') {
+      return 'Enter target domain (e.g. app.acme.com) & DNS registrar...';
+    }
+    if (itemId === 'api_keys_provisioned') {
+      return 'Enter GitHub username or 1Password / Doppler vault reference...';
+    }
+    return 'Add reference note or link (optional)...';
   };
 
   const handleSaveCompanyPhone = async () => {
@@ -193,6 +227,13 @@ export function OnboardingChecklistWidget({
       <div className={styles.checklistList}>
         {filteredItems.map((item) => {
           const isDone = Boolean(checklistState[item.id]);
+          const noteKey = `${currentScope.scope_code}:${item.id}`;
+          const savedNote =
+            typeof checklistState[`${item.id}_note`] === 'string'
+              ? (checklistState[`${item.id}_note`] as string)
+              : '';
+          const currentNoteVal = noteInputs[noteKey] ?? savedNote;
+
           return (
             <div
               key={item.id}
@@ -215,6 +256,46 @@ export function OnboardingChecklistWidget({
                   <p className={styles.checklistItemDesc}>{item.description}</p>
                 </div>
               </label>
+              {item.id !== 'sow_accepted' && (
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '0.5rem',
+                    marginTop: '0.65rem',
+                    paddingLeft: '1.75rem',
+                  }}
+                >
+                  <input
+                    type="text"
+                    value={currentNoteVal}
+                    onChange={(e) =>
+                      setNoteInputs((prev) => ({
+                        ...prev,
+                        [noteKey]: e.target.value,
+                      }))
+                    }
+                    placeholder={getNotePlaceholder(item.id)}
+                    style={{
+                      flex: 1,
+                      padding: '0.45rem 0.7rem',
+                      fontSize: '0.82rem',
+                      borderRadius: '6px',
+                      border: '1px solid var(--border-subtle)',
+                      background: 'var(--surface-elevated)',
+                      color: 'var(--color-text)',
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className={styles.saveProfileBtn}
+                    style={{ padding: '0.45rem 0.75rem', fontSize: '0.78rem' }}
+                    onClick={() => handleSaveItemNote(item.id)}
+                    disabled={isSaving}
+                  >
+                    <Save size={13} /> Save Link
+                  </button>
+                </div>
+              )}
             </div>
           );
         })}

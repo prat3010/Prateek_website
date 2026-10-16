@@ -2,13 +2,193 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
 import { getVerifiedSessionEmail, getVerifiedSessionUser } from '@/lib/sessionVerify';
 
+export interface RetrieverPlanSpec {
+  planKey: 'starter_inr' | 'pro_inr' | 'business_inr' | 'starter_usd' | 'pro_usd' | 'business_usd';
+  tier: 'starter' | 'pro' | 'business';
+  name: string;
+  description: string;
+  amount: number; // paise or cents
+  currency: 'INR' | 'USD';
+  formattedPrice: string;
+  envKey: string;
+}
+
+const CANONICAL_PLANS: Record<RetrieverPlanSpec['planKey'], RetrieverPlanSpec> = {
+  starter_inr: {
+    planKey: 'starter_inr',
+    tier: 'starter',
+    name: 'Retriever Starter (INR Monthly)',
+    description: 'Retriever AI RAG Engine — Starter Plan (1 Workspace, 20 Docs, 1,000 Queries/mo)',
+    amount: 199900,
+    currency: 'INR',
+    formattedPrice: '₹1,999',
+    envKey: 'RAZORPAY_PLAN_STARTER_INR',
+  },
+  pro_inr: {
+    planKey: 'pro_inr',
+    tier: 'pro',
+    name: 'Retriever Pro (INR Monthly)',
+    description: 'Retriever AI RAG Engine — Pro Plan (5 Workspaces, 100 Docs, 5,000 Queries/mo)',
+    amount: 599900,
+    currency: 'INR',
+    formattedPrice: '₹5,999',
+    envKey: 'RAZORPAY_PLAN_PRO_INR',
+  },
+  business_inr: {
+    planKey: 'business_inr',
+    tier: 'business',
+    name: 'Retriever Business (INR Monthly)',
+    description: 'Retriever AI RAG Engine — Business Plan (Unlimited Workspaces, 500 Docs, 20,000 Queries/mo)',
+    amount: 1499900,
+    currency: 'INR',
+    formattedPrice: '₹14,999',
+    envKey: 'RAZORPAY_PLAN_BUSINESS_INR',
+  },
+  starter_usd: {
+    planKey: 'starter_usd',
+    tier: 'starter',
+    name: 'Retriever Starter (USD Monthly)',
+    description: 'Retriever AI RAG Engine — Starter Plan (1 Workspace, 20 Docs, 1,000 Queries/mo)',
+    amount: 2900,
+    currency: 'USD',
+    formattedPrice: '$29',
+    envKey: 'RAZORPAY_PLAN_STARTER_USD',
+  },
+  pro_usd: {
+    planKey: 'pro_usd',
+    tier: 'pro',
+    name: 'Retriever Pro (USD Monthly)',
+    description: 'Retriever AI RAG Engine — Pro Plan (5 Workspaces, 100 Docs, 5,000 Queries/mo)',
+    amount: 7900,
+    currency: 'USD',
+    formattedPrice: '$79',
+    envKey: 'RAZORPAY_PLAN_PRO_USD',
+  },
+  business_usd: {
+    planKey: 'business_usd',
+    tier: 'business',
+    name: 'Retriever Business (USD Monthly)',
+    description: 'Retriever AI RAG Engine — Business Plan (Unlimited Workspaces, 500 Docs, 20,000 Queries/mo)',
+    amount: 19900,
+    currency: 'USD',
+    formattedPrice: '$199',
+    envKey: 'RAZORPAY_PLAN_BUSINESS_USD',
+  },
+};
+
+export function resolvePlanSpec(rawPlanId: string): RetrieverPlanSpec {
+  const lower = (rawPlanId || '').toLowerCase().trim();
+  const isUsd = lower.includes('usd');
+  if (lower.includes('business') || lower.includes('enterprise')) {
+    return isUsd ? CANONICAL_PLANS.business_usd : CANONICAL_PLANS.business_inr;
+  }
+  if (lower.includes('pro') || lower.includes('growth')) {
+    return isUsd ? CANONICAL_PLANS.pro_usd : CANONICAL_PLANS.pro_inr;
+  }
+  return isUsd ? CANONICAL_PLANS.starter_usd : CANONICAL_PLANS.starter_inr;
+}
+
+const planIdCache = new Map<string, string>();
+
+async function resolveOrCreateRazorpayPlanId(
+  rawPlanId: string,
+  spec: RetrieverPlanSpec,
+  authHeader: string
+): Promise<string> {
+  // 1. If caller already passed a real Razorpay generated plan ID (plan_ + 14 alphanumeric chars)
+  if (/^plan_[A-Za-z0-9]{14}$/.test(rawPlanId)) {
+    return rawPlanId;
+  }
+
+  // 2. Check environment variable override
+  const envOverride = process.env[spec.envKey]?.trim();
+  if (envOverride && /^plan_[A-Za-z0-9]{14}$/.test(envOverride)) {
+    return envOverride;
+  }
+
+  // 3. Check in-memory process cache
+  const cached = planIdCache.get(spec.planKey);
+  if (cached) {
+    return cached;
+  }
+
+  // 4. Query existing Razorpay plans
+  const listRes = await fetch('https://api.razorpay.com/v1/plans?count=100', {
+    method: 'GET',
+    headers: { Authorization: authHeader },
+  });
+
+  if (listRes.ok) {
+    const listData = await listRes.json().catch(() => ({}));
+    const items: Array<{
+      id?: string;
+      period?: string;
+      interval?: number;
+      item?: { name?: string; amount?: number; currency?: string };
+      notes?: Record<string, string>;
+    }> = Array.isArray(listData?.items) ? listData.items : [];
+
+    const match = items.find(
+      (p) =>
+        p.id &&
+        p.period === 'monthly' &&
+        Number(p.item?.amount) === spec.amount &&
+        (p.item?.currency || '').toUpperCase() === spec.currency &&
+        (p.notes?.plan_key === spec.planKey || p.item?.name === spec.name)
+    );
+
+    if (match?.id) {
+      planIdCache.set(spec.planKey, match.id);
+      return match.id;
+    }
+  }
+
+  // 5. Auto-create the monthly plan in Razorpay
+  const createPlanRes = await fetch('https://api.razorpay.com/v1/plans', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: authHeader,
+    },
+    body: JSON.stringify({
+      period: 'monthly',
+      interval: 1,
+      item: {
+        name: spec.name,
+        amount: spec.amount,
+        currency: spec.currency,
+        description: spec.description,
+      },
+      notes: {
+        plan_key: spec.planKey,
+        tier: spec.tier,
+        source: 'prateeq_website',
+      },
+    }),
+  });
+
+  if (!createPlanRes.ok) {
+    const errText = await createPlanRes.text();
+    throw new Error(`Razorpay plan auto-creation failed (${createPlanRes.status}): ${errText}`);
+  }
+
+  const createdPlan = await createPlanRes.json();
+  if (createdPlan?.id) {
+    planIdCache.set(spec.planKey, createdPlan.id);
+    return createdPlan.id;
+  }
+
+  throw new Error('Razorpay plan auto-creation did not return a plan ID.');
+}
+
 export async function POST(req: Request) {
   try {
     const KEY_ID = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || '';
     const KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '';
     const payload = await req.json().catch(() => ({}));
-    const planId = (payload.planId as string) || 'plan_starter_inr';
+    const rawPlanId = (payload.planId as string) || 'starter_inr';
     const totalCount = Number(payload.totalCount) || 12;
+    const planSpec = resolvePlanSpec(rawPlanId);
 
     const sessionUser = await getVerifiedSessionUser(req);
     const clientEmail = sessionUser?.email || (await getVerifiedSessionEmail(req));
@@ -39,7 +219,8 @@ export async function POST(req: Request) {
         return NextResponse.json({
           isMock: true,
           subscriptionId: `sub_mock_${Date.now()}`,
-          planId,
+          planId: planSpec.planKey,
+          tier: planSpec.tier,
           tenantId: targetTenantId || 'tn_dev_mock',
           keyId: KEY_ID || 'rzp_test_mock',
         });
@@ -50,6 +231,8 @@ export async function POST(req: Request) {
     const authHeader = `Basic ${Buffer.from(`${KEY_ID}:${KEY_SECRET}`).toString('base64')}`;
 
     try {
+      const razorpayPlanId = await resolveOrCreateRazorpayPlanId(rawPlanId, planSpec, authHeader);
+
       const response = await fetch('https://api.razorpay.com/v1/subscriptions', {
         method: 'POST',
         headers: {
@@ -57,14 +240,16 @@ export async function POST(req: Request) {
           Authorization: authHeader,
         },
         body: JSON.stringify({
-          plan_id: planId,
+          plan_id: razorpayPlanId,
           total_count: totalCount,
           quantity: 1,
           customer_notify: 1,
           notes: {
             client_email: clientEmail || 'guest@prateeq.in',
             tenant_id: targetTenantId,
-            plan_id: planId,
+            plan_id: planSpec.planKey,
+            tier: planSpec.tier,
+            formatted_price: planSpec.formattedPrice,
             source: 'prateeq_website',
           },
         }),
@@ -77,7 +262,8 @@ export async function POST(req: Request) {
           return NextResponse.json({
             isMock: true,
             subscriptionId: `sub_mock_${Date.now()}`,
-            planId,
+            planId: planSpec.planKey,
+            tier: planSpec.tier,
             keyId: KEY_ID,
           });
         }
@@ -88,7 +274,9 @@ export async function POST(req: Request) {
 
       return NextResponse.json({
         subscriptionId: subData.id,
-        planId: subData.plan_id,
+        planId: planSpec.planKey,
+        razorpayPlanId: subData.plan_id,
+        tier: planSpec.tier,
         status: subData.status,
         keyId: KEY_ID,
       });
@@ -98,7 +286,8 @@ export async function POST(req: Request) {
         return NextResponse.json({
           isMock: true,
           subscriptionId: `sub_mock_${Date.now()}`,
-          planId,
+          planId: planSpec.planKey,
+          tier: planSpec.tier,
           keyId: KEY_ID,
         });
       }

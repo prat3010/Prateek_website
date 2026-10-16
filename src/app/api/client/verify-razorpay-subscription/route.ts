@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { supabase } from '@/data/supabase';
+import { resolvePlanSpec } from '@/app/api/client/create-razorpay-subscription/route';
+import { sendRetrieverSubscriptionNotifications } from '@/lib/emailNotification';
+import { ensureRetrieverEngineTenant } from '@/lib/retrieverProvision';
 import { getVerifiedSessionUser } from '@/lib/sessionVerify';
 
 export async function POST(req: Request) {
@@ -11,7 +14,7 @@ export async function POST(req: Request) {
       razorpaySubscriptionId,
       razorpayPaymentId,
       razorpaySignature,
-      planId = 'plan_pro_inr',
+      planId = 'pro_inr',
     } = payload;
 
     if (!razorpaySubscriptionId) {
@@ -68,24 +71,48 @@ export async function POST(req: Request) {
       }
     }
 
+    const planSpec = resolvePlanSpec(planId);
+    const planTier = planSpec.tier;
+
     if (!supabase) {
       return NextResponse.json({
         success: true,
-        planTier: planId.includes('business') ? 'business' : 'pro',
+        planTier,
         message: 'Subscription verified in degraded mode.',
       });
     }
 
     const nowIso = new Date().toISOString();
-    const planTier = planId.includes('business')
-      ? 'business'
-      : planId.includes('pro')
-      ? 'pro'
-      : 'starter';
+    const tokenLimit =
+      planTier === 'business' ? 10_000_000 : planTier === 'pro' ? 1_500_000 : 250_000;
+    const displayName = sessionUser.email.split('@')[0];
+    const workspaceName = `${displayName}'s Workspace`;
 
-    const tokenLimit = planTier === 'business' ? 5000000 : planTier === 'pro' ? 1000000 : 250000;
+    // 1. Upsert client record in `clients` so subscriber appears in unified CRM / invoice ledger
+    let clientId: string | null = null;
+    try {
+      const { data: clientData } = await supabase
+        .from('clients')
+        .upsert(
+          {
+            email: sessionUser.email,
+            name: displayName,
+            company_name: workspaceName,
+            notes: `[Retriever SaaS: ${planTier.toUpperCase()}]`,
+            updated_at: nowIso,
+          },
+          { onConflict: 'email' }
+        )
+        .select('id')
+        .maybeSingle();
+      if (clientData?.id) {
+        clientId = clientData.id;
+      }
+    } catch (clientErr) {
+      console.warn('Retriever subscription client upsert warning:', clientErr);
+    }
 
-    // Resolve tenant ID for authenticated user
+    // 2. Resolve existing tenant membership for authenticated user
     const { data: member } = await supabase
       .from('rag_tenant_members')
       .select('tenant_id')
@@ -93,15 +120,34 @@ export async function POST(req: Request) {
       .limit(1)
       .maybeSingle();
 
-    let targetTenantId = member?.tenant_id;
+    let existingApiKey: string | null = null;
+    if (member?.tenant_id) {
+      const { data: existingTenant } = await supabase
+        .from('rag_tenants')
+        .select('api_key')
+        .eq('tenant_id', member.tenant_id)
+        .maybeSingle();
+      existingApiKey = (existingTenant?.api_key as string | null) || null;
+    }
 
-    if (!targetTenantId) {
-      targetTenantId = crypto.randomUUID();
-      const displayName = sessionUser.email.split('@')[0];
+    // 3. Provision or reconcile tenant on Retriever OCI backend & ensure API key
+    const provisioned = await ensureRetrieverEngineTenant({
+      existingTenantId: member?.tenant_id || null,
+      existingApiKey,
+      workspaceName,
+      planTier,
+    });
+
+    const targetTenantId = provisioned.tenantId;
+
+    if (!member?.tenant_id) {
       await supabase.from('rag_tenants').insert({
         tenant_id: targetTenantId,
-        name: `${displayName}'s Workspace`,
+        client_id: clientId,
+        name: workspaceName,
         plan_tier: planTier,
+        api_key: provisioned.apiKey,
+        api_key_hash: provisioned.apiKeyHash,
         is_active: true,
         created_at: nowIso,
         updated_at: nowIso,
@@ -115,55 +161,82 @@ export async function POST(req: Request) {
         created_at: nowIso,
         updated_at: nowIso,
       });
+    } else {
+      const tenantsTable = supabase.from('rag_tenants') as unknown as {
+        update?: (u: Record<string, unknown>) => { eq?: (col: string, val: string) => Promise<unknown> };
+      };
+      await tenantsTable
+        .update?.({
+          client_id: clientId,
+          plan_tier: planTier,
+          api_key: provisioned.apiKey,
+          api_key_hash: provisioned.apiKeyHash,
+          is_active: true,
+          updated_at: nowIso,
+        })
+        ?.eq?.('tenant_id', targetTenantId);
     }
 
-    // Upsert subscription ledger
+    // 4. Upsert subscription ledger
+    const currentPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
     await supabase.from('rag_subscriptions').upsert(
       {
+        client_id: clientId,
         tenant_id: targetTenantId,
         razorpay_subscription_id: razorpaySubscriptionId,
         plan_tier: planTier,
         monthly_token_limit: tokenLimit,
+        api_key_hash: provisioned.apiKeyHash,
         is_active: true,
+        current_period_end: currentPeriodEnd,
         updated_at: nowIso,
       },
       { onConflict: 'tenant_id' }
     );
 
-    // Upgrade tenant plan tier
-    await supabase
-      .from('rag_tenants')
-      .update({
-        plan_tier: planTier,
-        is_active: true,
-        updated_at: nowIso,
-      })
-      .eq('tenant_id', targetTenantId);
-
-    // Sync to Retriever cognitive engine backend if admin credentials exist
-    const retrieverUrl = process.env.RETRIEVER_API_URL || 'https://rag.prateeq.in';
-    const adminKey = process.env.RETRIEVER_ADMIN_KEY || process.env.ADMIN_MASTER_KEY;
-    if (adminKey && targetTenantId) {
-      try {
-        await fetch(`${retrieverUrl.replace(/\/$/, '')}/v1/admin/tenants/${targetTenantId}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Admin-Master-Key': adminKey,
-          },
-          body: JSON.stringify({
-            tier: planTier === 'starter' ? 'standard' : planTier === 'pro' ? 'premium' : 'enterprise',
-          }),
-        });
-      } catch (engineErr) {
-        console.warn('Could not sync upgraded tier to Retriever backend:', engineErr);
-      }
+    // 5. Record paid invoice row in `invoices` ledger (idempotent on subscription/payment ref)
+    try {
+      const invoiceRef = razorpayPaymentId || razorpaySubscriptionId;
+      const invoiceNumber = `RET-${invoiceRef.replace(/[^A-Za-z0-9]/g, '').slice(-8).toUpperCase()}`;
+      const amountMajor = Math.round(planSpec.amount / 100);
+      await supabase.from('invoices').upsert(
+        {
+          invoice_number: invoiceNumber,
+          client_id: clientId,
+          customer_name: displayName,
+          customer_email: sessionUser.email,
+          milestone_name: `Retriever ${planTier.toUpperCase()} Monthly Subscription`,
+          amount: amountMajor,
+          currency: planSpec.currency,
+          payment_status: 'paid',
+          razorpay_order_id: razorpaySubscriptionId,
+          razorpay_payment_id: razorpayPaymentId || razorpaySubscriptionId,
+          paid_at: nowIso,
+          updated_at: nowIso,
+        },
+        { onConflict: 'invoice_number' }
+      );
+    } catch (invErr) {
+      console.warn('Retriever subscription invoice ledger insert warning:', invErr);
     }
+
+    // 6. Dispatch Owner Alert + Subscriber Receipt Emails via Resend
+    await sendRetrieverSubscriptionNotifications({
+      subscriberEmail: sessionUser.email,
+      subscriberName: displayName,
+      planTier,
+      amountFormatted: planSpec.formattedPrice,
+      subscriptionId: razorpaySubscriptionId,
+      paymentId: razorpayPaymentId,
+      tenantId: targetTenantId,
+      monthlyTokenLimit: tokenLimit,
+    }).catch((err) => console.warn('Retriever subscription notification warning:', err));
 
     return NextResponse.json({
       success: true,
       planTier,
       tenantId: targetTenantId,
+      apiKey: provisioned.apiKey,
       message: 'Subscription successfully verified and upgraded.',
     });
   } catch (err: unknown) {

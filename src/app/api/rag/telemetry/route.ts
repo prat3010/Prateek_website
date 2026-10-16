@@ -51,6 +51,16 @@ export async function GET(req: Request) {
         if (tenant?.plan_tier) {
           planTier = tenant.plan_tier;
         }
+
+        const { data: sub } = await supabase
+          .from('rag_subscriptions')
+          .select('plan_tier, is_active')
+          .eq('tenant_id', tenantId)
+          .maybeSingle();
+
+        if (sub?.is_active && sub?.plan_tier) {
+          planTier = sub.plan_tier;
+        }
       }
     }
 
@@ -59,11 +69,11 @@ export async function GET(req: Request) {
     let maxDocuments = 1_000;
     let maxStorageBytes = 100 * 1024 * 1024; // 100 MB
 
-    if (planTier === 'growth') {
+    if (planTier === 'pro' || planTier === 'growth') {
       maxMonthlyTokens = 1_500_000;
       maxDocuments = 10_000;
-      maxStorageBytes = 1024 * 1024 * 1024; // 1 GB
-    } else if (planTier === 'enterprise') {
+      maxStorageBytes = 2 * 1024 * 1024 * 1024; // 2 GB
+    } else if (planTier === 'business' || planTier === 'enterprise') {
       maxMonthlyTokens = 10_000_000;
       maxDocuments = 50_000;
       maxStorageBytes = 10 * 1024 * 1024 * 1024; // 10 GB

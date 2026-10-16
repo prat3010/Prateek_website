@@ -1,8 +1,25 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
 import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
-import { sendAdminScopeSavedNotification } from '@/lib/emailNotification';
+import { isAdminEmail } from '@/lib/auth';
+import {
+  sendAdminScopeSavedNotification,
+  sendAdminOnboardingCompletedNotification,
+} from '@/lib/emailNotification';
 import { saveScopeSchema } from '@/lib/clientOrder';
+import { recalculateCanonicalScopeQuote, type PromoDiscountInfo } from '@/lib/pricing';
+
+const CHECKLIST_KEYS = [
+  'brand_assets_uploaded',
+  'domain_dns_ready',
+  'repo_collaborator_added',
+  'kickoff_call_scheduled',
+];
+
+function isChecklistComplete(checklist: Record<string, unknown> | null | undefined): boolean {
+  if (!checklist || typeof checklist !== 'object') return false;
+  return CHECKLIST_KEYS.every((k) => Boolean(checklist[k]));
+}
 
 export async function POST(req: Request) {
   try {
@@ -19,6 +36,7 @@ export async function POST(req: Request) {
     }
 
     const payload = parseResult.data;
+    const rawObj = (rawJson && typeof rawJson === 'object' ? rawJson : {}) as Record<string, unknown>;
     const scopeCode = payload.scopeCode;
 
     // Degraded dev/CI mode: no Supabase environment, skip auth + persistence.
@@ -27,10 +45,30 @@ export async function POST(req: Request) {
     }
 
     // Canonical client email always comes from the verified session token.
-    const clientEmail = await getVerifiedSessionEmail(req);
-    if (!clientEmail) {
+    const sessionEmail = await getVerifiedSessionEmail(req);
+    if (!sessionEmail) {
       return NextResponse.json({ error: 'Unauthorized: valid session required.' }, { status: 401 });
     }
+
+    const isAdmin = isAdminEmail(sessionEmail);
+
+    // Check existing in normalized table first so we know ownership & prior state
+    const { data: existingScope, error: selectErr } = await supabase
+      .from('client_scopes')
+      .select('id, scope_code, client_email, base_engine, total_cost_inr, signed_at, onboarding_checklist')
+      .eq('scope_code', scopeCode)
+      .maybeSingle();
+
+    if (selectErr) {
+      console.warn('Select client_scopes DB error:', selectErr);
+      return NextResponse.json({ error: selectErr.message }, { status: 500 });
+    }
+
+    if (existingScope && existingScope.client_email && existingScope.client_email !== sessionEmail && !isAdmin) {
+      return NextResponse.json({ error: 'Forbidden: scope belongs to another account.' }, { status: 403 });
+    }
+
+    const clientEmail = (isAdmin && existingScope?.client_email) ? existingScope.client_email : sessionEmail;
 
     // 1. Ensure Client Profile entity exists in `clients`
     let clientId: string | undefined;
@@ -69,13 +107,17 @@ export async function POST(req: Request) {
       console.warn('Client profile sync warning:', clientErr);
     }
 
-    // 2. Convert any matching intake_leads draft to converted status
+    // 2. Convert any matching intake_leads draft/new row to converted status
     try {
-      await supabase
+      const leadUpdate = supabase
         .from('intake_leads')
         .update({ status: 'converted' })
-        .eq('contact_email', clientEmail)
-        .eq('status', 'draft');
+        .eq('contact_email', clientEmail);
+      if (typeof (leadUpdate as unknown as { in?: unknown }).in === 'function') {
+        await (leadUpdate as unknown as { in: (col: string, vals: string[]) => Promise<unknown> }).in('status', ['new', 'draft']);
+      } else {
+        await leadUpdate.eq('status', 'draft');
+      }
     } catch {}
 
     const existingChecklist = (payload.onboardingChecklist || {}) as Record<string, unknown>;
@@ -87,8 +129,22 @@ export async function POST(req: Request) {
       ...(payload.inspirationLinks ? { inspiration_links: payload.inspirationLinks } : {}),
     };
 
+    // Recalculate canonical pricing when engine matches catalog
+    const canonical = recalculateCanonicalScopeQuote({
+      baseEngineTitle: payload.baseEngineTitle,
+      selectedFeatures: payload.selectedFeatures || [],
+      brandAssetOption: payload.brandAssetOption,
+      maintenancePlan: payload.maintenancePlan,
+      promoCode: (payload.metadata?.promoCode as PromoDiscountInfo | undefined) ?? null,
+      fallbackINR: Number(payload.totalCostINR) || 0,
+      fallbackUSD: Number(payload.totalCostUSD) || 0,
+    });
+
+    const verifiedCostINR = canonical.matched ? canonical.totalINR : (Number(payload.totalCostINR) || 0);
+    const verifiedCostUSD = canonical.matched ? canonical.totalUSD : (Number(payload.totalCostUSD) || 0);
+
     // 3. Target normalized `client_scopes` table
-    const scopeData = {
+    const scopeData: Record<string, unknown> = {
       scope_code: scopeCode,
       client_id: clientId,
       client_email: clientEmail,
@@ -98,8 +154,8 @@ export async function POST(req: Request) {
       features: payload.selectedFeatures || [],
       brand_asset: payload.brandAssetOption || 'Standard',
       maintenance_plan: payload.maintenancePlan || 'Self-Managed (30-Day Warranty)',
-      total_cost_inr: Number(payload.totalCostINR) || 0,
-      total_cost_usd: Number(payload.totalCostUSD) || 0,
+      total_cost_inr: verifiedCostINR,
+      total_cost_usd: verifiedCostUSD,
       currency: payload.currency || 'INR',
       timeline: payload.timeline || 'Standard Turnaround',
       business_kpi: payload.businessKPI || '',
@@ -113,23 +169,18 @@ export async function POST(req: Request) {
       updated_at: new Date().toISOString(),
     };
 
-    // Check existing in normalized table
-    const { data: existingScope, error: selectErr } = await supabase
-      .from('client_scopes')
-      .select('scope_code, client_email')
-      .eq('scope_code', scopeCode)
-      .maybeSingle();
-
-    if (selectErr) {
-      console.warn('Select client_scopes DB error:', selectErr);
-      return NextResponse.json({ error: selectErr.message }, { status: 500 });
+    if (isAdmin) {
+      if (typeof rawObj.deliveryStage === 'string' && rawObj.deliveryStage) {
+        scopeData.delivery_stage = rawObj.deliveryStage;
+      }
+      if (typeof rawObj.status === 'string' && rawObj.status) {
+        scopeData.status = rawObj.status;
+      }
     }
 
-    if (existingScope) {
-      if (existingScope.client_email && existingScope.client_email !== clientEmail) {
-        return NextResponse.json({ error: 'Forbidden: scope belongs to another account.' }, { status: 403 });
-      }
+    const savedScopeId: string | undefined = existingScope?.id;
 
+    if (existingScope) {
       const { error: updateErr } = await supabase
         .from('client_scopes')
         .update(scopeData)
@@ -153,16 +204,73 @@ export async function POST(req: Request) {
       }
     }
 
-    sendAdminScopeSavedNotification({
-      scopeCode,
-      companyName: scopeData.company_name,
-      clientEmail,
-      baseEngineTitle: scopeData.base_engine,
-      totalCostINR: scopeData.total_cost_inr,
-      totalCostUSD: scopeData.total_cost_usd,
-    }).catch(err => console.warn('Failed to send admin scope saved notification:', err));
+    // If admin provided deliverables in payload, upsert into project_deliverables
+    if (isAdmin && rawObj.deliverables && typeof rawObj.deliverables === 'object' && savedScopeId) {
+      try {
+        const deliv = rawObj.deliverables as Record<string, unknown>;
+        await supabase.from('project_deliverables').upsert(
+          {
+            scope_id: savedScopeId,
+            staging_url: typeof deliv.staging_url === 'string' ? deliv.staging_url : '',
+            production_url: typeof deliv.production_url === 'string' ? deliv.production_url : '',
+            github_repo: typeof deliv.github_repo === 'string' ? deliv.github_repo : '',
+            figma_url: typeof deliv.figma_url === 'string' ? deliv.figma_url : '',
+            signoff_pdf_url: typeof deliv.signoff_pdf_url === 'string' ? deliv.signoff_pdf_url : '',
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'scope_id' }
+        );
+      } catch (delivErr) {
+        console.warn('Admin deliverables upsert warning:', delivErr);
+      }
+    }
 
-    return NextResponse.json({ success: true, message: 'Scope brief persisted successfully.' });
+    // Determine whether to fire admin email notification (avoid spamming on individual checklist toggles)
+    const wasChecklistComplete = isChecklistComplete(
+      existingScope?.onboarding_checklist as Record<string, unknown> | undefined
+    );
+    const nowChecklistComplete = isChecklistComplete(onboardingChecklistMerged);
+
+    if (!wasChecklistComplete && nowChecklistComplete) {
+      const summaryLines = Object.entries(onboardingChecklistMerged)
+        .map(([k, v]) => `${k}: ${String(v)}`)
+        .join('\n');
+      sendAdminOnboardingCompletedNotification({
+        scopeCode,
+        companyName: String(scopeData.company_name),
+        clientEmail,
+        checklistSummary: summaryLines,
+      }).catch((err) => console.warn('Failed to send onboarding completion notification:', err));
+    } else {
+      const isNewScope = !existingScope;
+      const isCommercialChange =
+        existingScope &&
+        (existingScope.base_engine !== scopeData.base_engine ||
+          Number(existingScope.total_cost_inr) !== Number(scopeData.total_cost_inr) ||
+          (!existingScope.signed_at && Boolean(scopeData.signed_at)));
+
+      if (isNewScope || isCommercialChange) {
+        sendAdminScopeSavedNotification({
+          scopeCode,
+          companyName: String(scopeData.company_name),
+          clientEmail,
+          baseEngineTitle: String(scopeData.base_engine),
+          totalCostINR: Number(scopeData.total_cost_inr),
+          totalCostUSD: Number(scopeData.total_cost_usd),
+        }).catch((err) => console.warn('Failed to send admin scope saved notification:', err));
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Scope brief persisted successfully.',
+      scope: {
+        id: savedScopeId || `scope-${scopeCode}`,
+        scope_code: scopeCode,
+        total_cost_inr: verifiedCostINR,
+        total_cost_usd: verifiedCostUSD,
+      },
+    });
   } catch (err: unknown) {
     console.error('Save Scope API error:', err);
     return NextResponse.json({ error: err instanceof Error ? err.message : 'Internal Server Error' }, { status: 500 });

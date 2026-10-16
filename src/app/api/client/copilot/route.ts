@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
       const { data: coData } = await supabase
         .from('scope_change_orders')
         .select('*')
-        .eq('scope_code', activeScope.scope_code)
+        .eq('scope_id', activeScope.id)
         .order('created_at', { ascending: true });
 
       if (coData && coData.length > 0) {

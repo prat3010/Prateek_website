@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
+import { ensureRetrieverEngineTenant } from '@/lib/retrieverProvision';
 import { getVerifiedSessionUser } from '@/lib/sessionVerify';
 
 export async function GET(req: Request) {
@@ -36,18 +37,53 @@ export async function GET(req: Request) {
 
       const activePlanTier = sub?.plan_tier || tenant?.plan_tier || 'starter';
       const isSubActive = sub?.is_active ?? tenant?.is_active ?? true;
+      const hasPaidRazorpaySub = Boolean(sub?.razorpay_subscription_id && String(sub.razorpay_subscription_id).trim() !== '');
+      const isPaidSubscription =
+        isSubActive && (hasPaidRazorpaySub || (activePlanTier !== 'starter' && activePlanTier !== 'free'));
+
       const createdAtMs = tenant?.created_at ? new Date(tenant.created_at).getTime() : Date.now();
       const elapsedDays = Math.floor((Date.now() - createdAtMs) / (1000 * 60 * 60 * 24));
-      const trialDaysRemaining = activePlanTier === 'starter' ? Math.max(0, 7 - elapsedDays) : 365;
+
+      let trialDaysRemaining = 7;
+      if (!isSubActive) {
+        // Cancelled or suspended subscription
+        trialDaysRemaining = 0;
+      } else if (isPaidSubscription) {
+        // Active paid Starter, Pro, or Business subscription
+        trialDaysRemaining = 365;
+      } else {
+        // Unpaid 7-day Starter free trial
+        trialDaysRemaining = Math.max(0, 7 - elapsedDays);
+      }
+
+      const isExpired = !isSubActive || (!isPaidSubscription && trialDaysRemaining <= 0);
+
+      let workspaceTenantId = member.tenant_id;
+      let workspaceApiKey = (tenant?.api_key as string | undefined)?.trim() || '';
+
+      // Self-heal returning workspaces missing a stored API key or OCI provisioning
+      if (!workspaceApiKey || workspaceTenantId.startsWith('tenant_')) {
+        const reconciled = await ensureRetrieverEngineTenant({
+          existingTenantId: workspaceTenantId,
+          existingApiKey: workspaceApiKey,
+          workspaceName: tenant?.name || `${sessionUser.email.split('@')[0]}'s Workspace`,
+          planTier: activePlanTier,
+        });
+        workspaceTenantId = reconciled.tenantId;
+        workspaceApiKey = reconciled.apiKey;
+      }
 
       return NextResponse.json({
-        tenantId: member.tenant_id,
+        tenantId: workspaceTenantId,
         userId: sessionUser.id,
         email: sessionUser.email,
         role: member.role,
         planTier: activePlanTier,
         name: tenant?.name || 'My Workspace',
         isActive: isSubActive,
+        isPaidSubscription,
+        isExpired,
+        apiKey: workspaceApiKey,
         currentPeriodEnd: sub?.current_period_end || null,
         trialDaysRemaining,
         createdAt: tenant?.created_at,
@@ -56,64 +92,25 @@ export async function GET(req: Request) {
 
     // 2. Bootstrap default workspace for new authenticated user
     const displayName = sessionUser.email.split('@')[0];
-    let newTenantId = crypto.randomUUID();
-    let mintedApiKey = '';
+    const workspaceName = `${displayName}'s Workspace`;
     const nowIso = new Date().toISOString();
 
-    const retrieverUrl = (process.env.RETRIEVER_API_URL || 'https://rag.prateeq.in').replace(/\/$/, '');
-    const adminKey = process.env.RETRIEVER_ADMIN_KEY || process.env.ADMIN_MASTER_KEY;
+    const provisioned = await ensureRetrieverEngineTenant({
+      workspaceName,
+      planTier: 'starter',
+    });
 
-    // Call sovereign Retriever engine to provision isolated OCI pgvector tenant
-    if (adminKey) {
-      try {
-        const createRes = await fetch(`${retrieverUrl}/v1/tenants`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Admin-Master-Key': adminKey,
-          },
-          body: JSON.stringify({
-            name: `${displayName}'s Workspace`,
-            tier: 'standard',
-            isolation_level: 'logical',
-          }),
-        });
-
-        if (createRes.ok) {
-          const tenantItem = await createRes.json();
-          if (tenantItem?.tenantId) {
-            newTenantId = tenantItem.tenantId;
-
-            // Mint default workspace API key
-            const keyRes = await fetch(`${retrieverUrl}/v1/admin/tenants/${newTenantId}/api-keys`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'X-Admin-Master-Key': adminKey,
-              },
-              body: JSON.stringify({
-                name: 'Default Workspace Key',
-                role: 'admin',
-              }),
-            });
-
-            if (keyRes.ok) {
-              const keyData = await keyRes.json();
-              mintedApiKey = keyData.apiKey || '';
-            }
-          }
-        }
-      } catch (engineErr) {
-        console.warn('Could not provision tenant in Retriever engine, falling back to local:', engineErr);
-      }
-    }
+    const newTenantId = provisioned.tenantId;
+    const mintedApiKey = provisioned.apiKey;
 
     const { data: newTenant, error: tenantErr } = await supabase
       .from('rag_tenants')
       .insert({
         tenant_id: newTenantId,
-        name: `${displayName}'s Workspace`,
+        name: workspaceName,
         plan_tier: 'starter',
+        api_key: mintedApiKey,
+        api_key_hash: provisioned.apiKeyHash,
         is_active: true,
         created_at: nowIso,
         updated_at: nowIso,
@@ -146,6 +143,7 @@ export async function GET(req: Request) {
         tenant_id: newTenantId,
         plan_tier: 'starter',
         monthly_token_limit: 250000,
+        api_key_hash: provisioned.apiKeyHash,
         is_active: true,
         created_at: nowIso,
         updated_at: nowIso,
@@ -159,8 +157,10 @@ export async function GET(req: Request) {
       email: sessionUser.email,
       role: 'owner',
       planTier: newTenant?.plan_tier || 'starter',
-      name: newTenant?.name || `${displayName}'s Workspace`,
+      name: newTenant?.name || workspaceName,
       isActive: true,
+      isPaidSubscription: false,
+      isExpired: false,
       apiKey: mintedApiKey,
       trialDaysRemaining: 7,
       createdAt: nowIso,

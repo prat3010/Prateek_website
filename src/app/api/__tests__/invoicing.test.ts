@@ -20,7 +20,8 @@ vi.mock('@/lib/sessionVerify', () => ({
   getVerifiedSessionEmail: vi.fn(async (req: Request) => {
     const token = req.headers.get('authorization') || '';
     if (!token.startsWith('Bearer ')) return null;
-    return 'client@example.com';
+    if (token === 'Bearer client-token') return 'client@example.com';
+    return 'prateeqsharma@gmail.com';
   }),
 }));
 
@@ -148,6 +149,16 @@ describe('POST /api/client/create-razorpay-invoice', () => {
     });
     const res = await createInvoicePOST(req);
     expect(res.status).toBe(401);
+  });
+
+  it('returns 403 when called by a non-admin client account', async () => {
+    const req = new Request('http://localhost/api/client/create-razorpay-invoice', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer client-token' },
+      body: JSON.stringify({ customer_name: 'Test', customer_email: 'client@example.com' }),
+    });
+    const res = await createInvoicePOST(req);
+    expect(res.status).toBe(403);
   });
 
   it('returns 400 if required fields are missing', async () => {

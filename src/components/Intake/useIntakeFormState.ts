@@ -385,16 +385,28 @@ export function useIntakeFormState(
   }, [sessionSeed, formData.companyName, formData.projectGoal, formData.selectedBaseEngineId, formData.selectedFeatures]);
 
   const buildQuestionnaireData = useCallback(() => {
+    const selectedFeatureLabels = features
+      .filter((f: FeatureItem) => formData.selectedFeatures.includes(f.id))
+      .map((f: FeatureItem) => f.label);
     return {
       companyName: formData.companyName || 'My Custom Project',
+      contactEmail: formData.contactEmail || user?.email || '',
+      contactPhone: formData.contactPhone || '',
       projectGoal: formData.projectGoal,
+      businessKPI: formData.businessKPI,
+      targetAudience: formData.targetAudience,
+      projectCategory: selectedEngine.title,
+      features: selectedFeatureLabels,
+      assetsStatus: totalCost.brandOpt.label,
+      totalBuildCostINR: totalCost.totalINR,
+      totalBuildCostUSD: totalCost.totalUSD,
+      maintenanceCostINR: activeMaintenancePlan.priceINR,
+      maintenanceCostUSD: activeMaintenancePlan.priceUSD,
       selectedBaseEngineId: formData.selectedBaseEngineId,
       baseEngineTitle: selectedEngine.title,
       baseEnginePriceINR: selectedEngine.priceINR,
       baseEnginePriceUSD: selectedEngine.priceUSD,
-      selectedFeatures: features
-        .filter((f: FeatureItem) => formData.selectedFeatures.includes(f.id))
-        .map((f: FeatureItem) => f.label),
+      selectedFeatures: selectedFeatureLabels,
       brandAssetOption: totalCost.brandOpt.label,
       brandAssetPriceINR: totalCost.brandOpt.priceINR,
       brandAssetPriceUSD: totalCost.brandOpt.priceUSD,
@@ -415,7 +427,7 @@ export function useIntakeFormState(
         formData.additionalNotes,
       ].filter(Boolean).join(' | '),
     };
-  }, [formData, selectedEngine, totalCost, activeMaintenancePlan, features]);
+  }, [formData, user, selectedEngine, totalCost, activeMaintenancePlan, features]);
 
   const handleDownloadPDF = useCallback(async () => {
     cancelAutoRedirect();
@@ -440,11 +452,23 @@ export function useIntakeFormState(
     const selectedServiceObjs = quickServices.filter((s: QuickServiceItem) => selectedQuickServices.includes(s.id));
     const serviceLabels = selectedServiceObjs.map((s: QuickServiceItem) => s.label);
     const quote = calcQuickServiceQuote(quickServices, selectedQuickServices, currency);
+    const engineTitle = `Quick Service: ${serviceLabels.join(', ') || 'Custom Tasks'}`;
     return {
       companyName: quickFormData.companyName.trim() || 'Quick Service Order',
+      contactEmail: user?.email || '',
+      contactPhone: '',
       projectGoal: 'Quick Service Integration',
+      businessKPI: 'Fast-Track Engineering Turnaround',
+      targetAudience: quickFormData.siteUrl ? `Existing Property (${quickFormData.siteUrl})` : 'Existing Web Property',
+      projectCategory: engineTitle,
+      features: serviceLabels,
+      assetsStatus: 'Not Applicable (Existing Site)',
+      totalBuildCostINR: quote.totalINR,
+      totalBuildCostUSD: quote.totalUSD,
+      maintenanceCostINR: 0,
+      maintenanceCostUSD: 0,
       selectedBaseEngineId: 'quick_service',
-      baseEngineTitle: `Quick Service: ${serviceLabels.join(', ') || 'Custom Tasks'}`,
+      baseEngineTitle: engineTitle,
       baseEnginePriceINR: 0,
       baseEnginePriceUSD: 0,
       selectedFeatures: serviceLabels,
@@ -462,7 +486,7 @@ export function useIntakeFormState(
         quickFormData.additionalNotes,
       ].filter(Boolean).join(' | '),
     };
-  }, [quickServices, selectedQuickServices, quickFormData, currency]);
+  }, [quickServices, selectedQuickServices, quickFormData, currency, user]);
 
   const handleDownloadQuickPDF = useCallback(async () => {
     setGeneratingPdf(true);
@@ -668,6 +692,8 @@ export function useIntakeFormState(
         timeline: selectedServiceObjs[0]?.turnaround || '3–7 days',
         businessKPI: '⚡ Quick Service Integration',
         paymentStructure: '50/50',
+        inspirationLinks: quickFormData.siteUrl || '',
+        additionalNotes: quickFormData.additionalNotes || '',
       };
 
       if (typeof window !== 'undefined') {
@@ -789,6 +815,9 @@ export function useIntakeFormState(
           email: user?.email || formData.contactEmail || 'lead@unauthenticated.client',
           message: `[Interactive Scoping Brief Created — ${generatedScopeCode}]`,
           recaptchaToken,
+          pdfAttachment: pdfBase64
+            ? { content: pdfBase64, filename: `${generatedScopeCode}-Scoping-Brief.pdf` }
+            : undefined,
           attachmentBase64: pdfBase64,
           attachmentFileName: `${generatedScopeCode}-Scoping-Brief.pdf`,
         }),
@@ -865,6 +894,8 @@ export function useIntakeFormState(
         timeline: selectedServiceObjs[0]?.turnaround || '3–7 days',
         businessKPI: '⚡ Quick Service Integration',
         paymentStructure: '50/50',
+        inspirationLinks: quickFormData.siteUrl || '',
+        additionalNotes: quickFormData.additionalNotes || '',
       };
 
       if (typeof window !== 'undefined') {

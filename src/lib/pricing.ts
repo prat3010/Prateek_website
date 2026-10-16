@@ -1,3 +1,4 @@
+import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
 import type {
   BaseEngineItem,
   BrandAssetOption,
@@ -30,7 +31,7 @@ export function formatPricePair(inr: number, usd: number, currency: Currency): s
 }
 
 /** Existing geo-IP `region` cookie value ('india' | 'global') → currency. Default: 'INR' for India location. */
-export function resolveDefaultCurrency(region: string | null | undefined): Currency {
+export function resolveDefaultCurrency(region?: string | null | undefined): Currency {
   if (region === 'global') return 'USD';
   if (region === 'india' || region === 'IN' || region === 'in') return 'INR';
 
@@ -526,3 +527,151 @@ export function estimateScopeTimeline(
     isFallback: true,
   };
 }
+
+export interface CanonicalScopeQuoteInput {
+  baseEngineTitle?: string;
+  selectedFeatures?: string[];
+  brandAssetOption?: string;
+  maintenancePlan?: string;
+  promoCode?: PromoDiscountInfo | null;
+  fallbackINR?: number;
+  fallbackUSD?: number;
+}
+
+export interface CanonicalScopeQuoteResult {
+  totalINR: number;
+  totalUSD: number;
+  maintenanceINR: number;
+  maintenanceUSD: number;
+  matched: boolean;
+}
+
+/**
+ * Recalculates canonical INR and USD scope totals directly from intakeQuestionnaireDefaults.json
+ * so URL parameters and client POST bodies cannot tamper with commercial quotes.
+ */
+export function recalculateCanonicalScopeQuote(
+  input: CanonicalScopeQuoteInput
+): CanonicalScopeQuoteResult {
+  const engines = questionnaireDefaults.engines as BaseEngineItem[];
+  const features = questionnaireDefaults.features as FeatureItem[];
+  const brandAssets = questionnaireDefaults.brandAssets as BrandAssetOption[];
+  const maintenancePlans = questionnaireDefaults.maintenancePlans as MaintenancePlanOption[];
+  const quickServices = (questionnaireDefaults.quickServices || []) as QuickServiceItem[];
+
+  const rawEngine = (input.baseEngineTitle || '').trim();
+  const rawFeatures = Array.isArray(input.selectedFeatures) ? input.selectedFeatures : [];
+  const rawBrand = (input.brandAssetOption || '').trim();
+  const rawMaint = (input.maintenancePlan || '').trim();
+
+  const resolvedMaintPlan = maintenancePlans.find(
+    (m) =>
+      m.id.toLowerCase() === rawMaint.toLowerCase() ||
+      m.name.toLowerCase() === rawMaint.toLowerCase() ||
+      (rawMaint.length > 3 && m.name.toLowerCase().includes(rawMaint.toLowerCase()))
+  );
+  const defaultMaintINR = resolvedMaintPlan?.priceINR ?? 0;
+  const defaultMaintUSD = resolvedMaintPlan?.priceUSD ?? 0;
+
+  if (!rawEngine) {
+    return {
+      totalINR: Number(input.fallbackINR) || 0,
+      totalUSD: Number(input.fallbackUSD) || 0,
+      maintenanceINR: defaultMaintINR,
+      maintenanceUSD: defaultMaintUSD,
+      matched: false,
+    };
+  }
+
+  // 1. Check Quick Service Package
+  if (rawEngine.toLowerCase().startsWith('quick service')) {
+    const matchedQuickIds = quickServices
+      .filter((qs) =>
+        rawFeatures.some(
+          (f) =>
+            f.toLowerCase() === qs.id.toLowerCase() ||
+            f.toLowerCase() === qs.label.toLowerCase() ||
+            qs.label.toLowerCase().includes(f.toLowerCase()) ||
+            f.toLowerCase().includes(qs.label.toLowerCase())
+        )
+      )
+      .map((qs) => qs.id);
+
+    if (matchedQuickIds.length > 0) {
+      const qQuote = calcQuickServiceQuote(quickServices, matchedQuickIds, 'INR');
+      return {
+        totalINR: qQuote.totalINR,
+        totalUSD: qQuote.totalUSD,
+        maintenanceINR: 0,
+        maintenanceUSD: 0,
+        matched: true,
+      };
+    }
+  }
+
+  // 2. Match Base Engine from Catalog
+  const matchedEngine = engines.find(
+    (e) =>
+      e.id.toLowerCase() === rawEngine.toLowerCase() ||
+      e.title.toLowerCase() === rawEngine.toLowerCase() ||
+      rawEngine.toLowerCase().includes(e.title.toLowerCase()) ||
+      e.title.toLowerCase().includes(rawEngine.toLowerCase())
+  );
+
+  if (!matchedEngine) {
+    return {
+      totalINR: Number(input.fallbackINR) || 0,
+      totalUSD: Number(input.fallbackUSD) || 0,
+      maintenanceINR: defaultMaintINR,
+      maintenanceUSD: defaultMaintUSD,
+      matched: false,
+    };
+  }
+
+  const matchedFeatureIds = features
+    .filter((f) =>
+      rawFeatures.some(
+        (featStr) =>
+          featStr.toLowerCase() === f.id.toLowerCase() ||
+          featStr.toLowerCase() === f.label.toLowerCase() ||
+          featStr.toLowerCase().includes(f.label.toLowerCase()) ||
+          f.label.toLowerCase().includes(featStr.toLowerCase())
+      )
+    )
+    .map((f) => f.id);
+
+  const extraDeps = resolveFeatureDependencies(matchedFeatureIds, features);
+  const allFeatureIds = Array.from(new Set([...matchedFeatureIds, ...extraDeps]));
+
+  const matchedBrand =
+    brandAssets.find(
+      (b) =>
+        b.id.toLowerCase() === rawBrand.toLowerCase() ||
+        b.label.toLowerCase() === rawBrand.toLowerCase() ||
+        (rawBrand.length > 3 && b.label.toLowerCase().includes(rawBrand.toLowerCase()))
+    ) || brandAssets[0];
+
+  const quote = calcQuote(
+    engines,
+    features,
+    brandAssets,
+    maintenancePlans,
+    {
+      engineId: matchedEngine.id,
+      featureIds: allFeatureIds,
+      brandAssetId: matchedBrand?.id,
+      maintenancePlanId: resolvedMaintPlan?.id,
+      promoCode: input.promoCode ?? null,
+    },
+    'INR'
+  );
+
+  return {
+    totalINR: quote.netTotalINR,
+    totalUSD: quote.netTotalUSD,
+    maintenanceINR: quote.maintenancePriceINR,
+    maintenanceUSD: quote.maintenancePriceUSD,
+    matched: true,
+  };
+}
+

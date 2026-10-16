@@ -1,12 +1,17 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import styles from "./rag.module.css";
 
 interface TeamPanelProps {
   hidden?: boolean;
   tenantId?: string;
+  planTier?: string;
+  isPaidSubscription?: boolean;
+  trialDaysRemaining?: number;
+  isExpired?: boolean;
 }
 
 interface TeamMember {
@@ -16,7 +21,14 @@ interface TeamMember {
   created_at: string;
 }
 
-export function TeamPanel({ hidden, tenantId }: TeamPanelProps) {
+export function TeamPanel({
+  hidden,
+  tenantId,
+  planTier = "starter",
+  isPaidSubscription = false,
+  trialDaysRemaining = 7,
+  isExpired = false,
+}: TeamPanelProps) {
   const { user, getAccessToken } = useAuth();
   const [inviteEmail, setInviteEmail] = useState<string>("");
   const [inviteRole, setInviteRole] = useState<string>("member");
@@ -232,34 +244,88 @@ export function TeamPanel({ hidden, tenantId }: TeamPanelProps) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem", flexWrap: "wrap", gap: "0.5rem" }}>
           <div>
             <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted, #888)", textTransform: "uppercase" }}>Current Active Tier:</span>
-            <div style={{ fontSize: "1.2rem", fontWeight: 700, color: "#FFB300" }}>⏱️ 7-Day Starter Free Trial</div>
+            <div
+              style={{
+                fontSize: "1.2rem",
+                fontWeight: 700,
+                color: isExpired ? "#ef4444" : isPaidSubscription ? "#00E676" : "#FFB300",
+              }}
+            >
+              {isExpired
+                ? "🔒 Subscription Expired / Locked"
+                : isPaidSubscription
+                ? `⚡ Active Paid Subscription — ${planTier.toUpperCase()}`
+                : `⏱️ ${trialDaysRemaining}-Day Starter Free Trial`}
+            </div>
           </div>
-          <span style={{ fontSize: "0.8rem", color: "#00E676" }}>Soft Paywall Active Day 8</span>
+          <span style={{ fontSize: "0.8rem", color: isExpired ? "#ef4444" : "#00E676" }}>
+            {isExpired
+              ? "Reactivate below to unlock API & Chat"
+              : isPaidSubscription
+              ? "Monthly recurring subscription active"
+              : `${trialDaysRemaining} days remaining in trial`}
+          </span>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "0.75rem" }}>
-          <div style={{ border: "1px solid #5A8EB6", borderRadius: "6px", padding: "0.85rem", textAlign: "center" }}>
-            <strong>Starter Tier</strong>
-            <p style={{ margin: "0.25rem 0", fontSize: "0.85rem" }}>₹2,499 / mo ($29/mo)</p>
-            <a href="/rag#pricing" className="comic-btn comic-btn-blue" style={{ fontSize: "0.75rem", width: "100%", textDecoration: "none", display: "inline-block" }}>
-              Upgrade to Starter
-            </a>
+          <div
+            style={{
+              border: planTier === "starter" ? "2px solid #5A8EB6" : "1px solid var(--color-border, #333)",
+              borderRadius: "6px",
+              padding: "0.85rem",
+              textAlign: "center",
+              background: planTier === "starter" ? "rgba(90, 142, 182, 0.08)" : "transparent",
+            }}
+          >
+            <strong>Starter Tier {planTier === "starter" && <span style={{ color: "#5A8EB6", fontSize: "0.75rem" }}>(Current)</span>}</strong>
+            <p style={{ margin: "0.25rem 0", fontSize: "0.85rem" }}>₹1,999 / mo ($29/mo)</p>
+            <Link
+              href="/rag?upgrade=true&plan=starter_inr#pricing"
+              className="comic-btn comic-btn-blue"
+              style={{ fontSize: "0.75rem", width: "100%", textDecoration: "none", display: "inline-block", textAlign: "center" }}
+            >
+              {planTier === "starter" && isPaidSubscription ? "Manage / Renew" : "Subscribe to Starter"}
+            </Link>
           </div>
 
-          <div style={{ border: "1px solid #00E676", borderRadius: "6px", padding: "0.85rem", textAlign: "center", background: "rgba(0, 230, 118, 0.05)" }}>
-            <strong>Pro Tier (Recommended)</strong>
-            <p style={{ margin: "0.25rem 0", fontSize: "0.85rem" }}>₹6,999 / mo ($79/mo)</p>
-            <a href="/rag#pricing" className="comic-btn comic-btn-blue" style={{ fontSize: "0.75rem", width: "100%", textDecoration: "none", display: "inline-block" }}>
-              Upgrade to Pro
-            </a>
+          <div
+            style={{
+              border: planTier === "pro" ? "2px solid #00E676" : "1px solid #00E676",
+              borderRadius: "6px",
+              padding: "0.85rem",
+              textAlign: "center",
+              background: planTier === "pro" ? "rgba(0, 230, 118, 0.12)" : "rgba(0, 230, 118, 0.05)",
+            }}
+          >
+            <strong>Pro Tier {planTier === "pro" ? <span style={{ color: "#00E676", fontSize: "0.75rem" }}>(Active)</span> : "(Recommended)"}</strong>
+            <p style={{ margin: "0.25rem 0", fontSize: "0.85rem" }}>₹5,999 / mo ($79/mo)</p>
+            <Link
+              href="/rag?upgrade=true&plan=pro_inr#pricing"
+              className="comic-btn comic-btn-blue"
+              style={{ fontSize: "0.75rem", width: "100%", textDecoration: "none", display: "inline-block", textAlign: "center" }}
+            >
+              {planTier === "pro" && isPaidSubscription ? "Manage / Renew" : "Upgrade to Pro"}
+            </Link>
           </div>
 
-          <div style={{ border: "1px solid #8b5cf6", borderRadius: "6px", padding: "0.85rem", textAlign: "center" }}>
-            <strong>Business Tier</strong>
-            <p style={{ margin: "0.25rem 0", fontSize: "0.85rem" }}>₹19,999 / mo ($249/mo)</p>
-            <a href="/rag#pricing" className="comic-btn comic-btn-outline" style={{ fontSize: "0.75rem", width: "100%", textDecoration: "none", display: "inline-block" }}>
-              Upgrade to Business
-            </a>
+          <div
+            style={{
+              border: planTier === "business" ? "2px solid #8b5cf6" : "1px solid var(--color-border, #333)",
+              borderRadius: "6px",
+              padding: "0.85rem",
+              textAlign: "center",
+              background: planTier === "business" ? "rgba(139, 92, 246, 0.1)" : "transparent",
+            }}
+          >
+            <strong>Business Tier {planTier === "business" && <span style={{ color: "#8b5cf6", fontSize: "0.75rem" }}>(Active)</span>}</strong>
+            <p style={{ margin: "0.25rem 0", fontSize: "0.85rem" }}>₹14,999 / mo ($199/mo)</p>
+            <Link
+              href="/rag?upgrade=true&plan=business_inr#pricing"
+              className="comic-btn comic-btn-outline"
+              style={{ fontSize: "0.75rem", width: "100%", textDecoration: "none", display: "inline-block", textAlign: "center" }}
+            >
+              {planTier === "business" && isPaidSubscription ? "Manage / Renew" : "Upgrade to Business"}
+            </Link>
           </div>
         </div>
       </div>

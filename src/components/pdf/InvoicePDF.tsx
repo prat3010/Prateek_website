@@ -15,9 +15,28 @@ export function InvoicePDF({ invoice, isNoir = false }: InvoicePDFProps) {
   const theme = getPdfTheme(isNoir);
   const currency = invoice.currency || 'INR';
 
-  const isGst = Boolean(invoice.is_gst);
-  const lineItems = invoice.line_items || [];
-  const taxBreakup = invoice.tax_breakup || { total_tax: 0, is_interstate: false };
+  const hasSellerGstin = Boolean(SELLER_CONFIG.gstin?.trim());
+  const isGst = Boolean(invoice.is_gst) && hasSellerGstin;
+  let lineItems = invoice.line_items || [];
+  if (typeof lineItems === 'string') {
+    try {
+      lineItems = JSON.parse(lineItems);
+    } catch {
+      lineItems = [];
+    }
+  }
+  if (!Array.isArray(lineItems)) {
+    lineItems = [];
+  }
+
+  let taxBreakup = invoice.tax_breakup || { total_tax: 0, is_interstate: false };
+  if (typeof taxBreakup === 'string') {
+    try {
+      taxBreakup = JSON.parse(taxBreakup);
+    } catch {
+      taxBreakup = { total_tax: 0, is_interstate: false };
+    }
+  }
   const billing = invoice.billing_address || {};
   const shipping = invoice.shipping_address || billing;
   const placeOfSupply = invoice.place_of_supply || shipping.state || billing.state || SELLER_CONFIG.address.state;

@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { m } from "framer-motion";
 import NumberFlow from "@number-flow/react";
 import { useAuth } from "@/context/AuthContext";
+import { resolveDefaultCurrency } from "@/lib/pricing";
 import MagneticButton from "@/components/ui/MagneticButton";
 import styles from "./rag.module.css";
 
@@ -159,17 +160,7 @@ export function PricingSection() {
   const [pricing, setPricing] = useState<PricingPayload>(DEFAULT_PRICING_FALLBACK);
   const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
   const [currencyMode, setCurrencyMode] = useState<"inr" | "usd">(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        if (!tz.includes("Kolkata") && !tz.includes("Asia/Calcutta") && !tz.includes("India")) {
-          return "usd";
-        }
-      } catch (e) {
-        console.warn("Timezone detection failed", e);
-      }
-    }
-    return "inr";
+    return resolveDefaultCurrency() === "USD" ? "usd" : "inr";
   });
 
   useEffect(() => {
@@ -178,7 +169,17 @@ export function PricingSection() {
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (active && data && data.inr && data.usd) {
-          setPricing(data);
+          const enrichGroup = (group: CurrencyGroup): CurrencyGroup => ({
+            ...group,
+            plans: (group.plans || []).map((p) => ({
+              ...p,
+              planId: p.planId || p.id,
+            })),
+          });
+          setPricing({
+            inr: enrichGroup(data.inr),
+            usd: enrichGroup(data.usd),
+          });
         }
       })
       .catch(() => {});
@@ -202,17 +203,15 @@ export function PricingSection() {
   };
 
   const handleSubscribe = useCallback(async (plan: PlanItem) => {
-    // 1. Starter tier: Zero-CC instant sandbox
-    if (plan.id.includes("starter") || plan.name.toLowerCase() === "starter") {
-      if (user) {
-        router.push("/rag/app?onboarding=true");
-      } else {
-        await loginWithGoogle("/rag/app?onboarding=true");
-      }
+    const isStarter = plan.id.includes("starter") || plan.name.toLowerCase() === "starter";
+
+    // 1. Unauthenticated users clicking Starter get the 7-day free trial sign-in
+    if (isStarter && !user) {
+      await loginWithGoogle("/rag/app?onboarding=true");
       return;
     }
 
-    // 2. Paid tiers (Pro / Business): Ensure authenticated first
+    // 2. Paid tiers require authentication first
     if (!user) {
       await loginWithGoogle(`/rag?plan=${encodeURIComponent(plan.planId || plan.id)}#pricing`);
       return;
@@ -283,7 +282,7 @@ export function PricingSection() {
         }) {
           try {
             if (token) {
-              await fetch("/api/client/verify-razorpay-subscription", {
+              const verifyRes = await fetch("/api/client/verify-razorpay-subscription", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -296,10 +295,16 @@ export function PricingSection() {
                   planId: plan.planId || plan.id,
                 }),
               });
+              const verifyData = await verifyRes.json().catch(() => ({}));
+              if (!verifyRes.ok || !verifyData.success) {
+                toast.error(verifyData.error || "Subscription verification failed. Please contact support.");
+                return;
+              }
             }
             router.push("/rag/app?upgraded=true");
-          } catch {
-            router.push("/rag/app?upgraded=true");
+          } catch (verifyErr) {
+            console.error("Subscription verification error:", verifyErr);
+            toast.error("Network error while verifying subscription.");
           }
         },
         theme: {
@@ -415,7 +420,13 @@ export function PricingSection() {
                 disabled={loadingPlanId === plan.id}
                 className={`comic-btn ${plan.popular ? "comic-btn-blue" : "comic-btn-outline"} ${styles.planCta}`}
               >
-                {loadingPlanId === plan.id ? "Launching Razorpay..." : plan.cta}
+                {loadingPlanId === plan.id
+                  ? "Launching Razorpay..."
+                  : plan.name.toLowerCase() === "starter"
+                  ? user
+                    ? "Subscribe to Starter"
+                    : "Start 7-Day Free Trial"
+                  : plan.cta}
               </button>
             </MagneticButton>
           </div>

@@ -109,6 +109,70 @@ describe('GET /api/rag/tenant', () => {
     expect(json.planTier).toBe('pro');
     expect(json.role).toBe('owner');
     expect(json.isActive).toBe(true);
+    expect(json.isPaidSubscription).toBe(true);
+    expect(json.apiKey).toBeDefined();
+    expect(json.apiKey).toContain('ret_live_');
+  });
+
+  it('recognizes paid Starter subscription and prevents 7-day trial lockout', async () => {
+    mocks.state.existingMember = {
+      tenant_id: 'tn-starter-paid-456',
+      role: 'owner',
+      email: 'testuser@example.com',
+    };
+    mocks.state.existingTenant = {
+      tenant_id: 'tn-starter-paid-456',
+      name: 'Starter Paid Workspace',
+      plan_tier: 'starter',
+      is_active: true,
+      created_at: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
+    };
+    mocks.state.existingSub = {
+      tenant_id: 'tn-starter-paid-456',
+      plan_tier: 'starter',
+      is_active: true,
+      razorpay_subscription_id: 'sub_live_paid_starter',
+    } as unknown as { tenant_id: string; plan_tier: string; is_active: boolean };
+
+    const req = new Request('http://localhost/api/rag/tenant');
+    const res = await GET(req);
+    expect(res.status).toBe(200);
+
+    const json = await res.json();
+    expect(json.planTier).toBe('starter');
+    expect(json.isPaidSubscription).toBe(true);
+    expect(json.isExpired).toBe(false);
+    expect(json.trialDaysRemaining).toBe(365);
+  });
+
+  it('locks out cancelled subscriptions immediately', async () => {
+    mocks.state.existingMember = {
+      tenant_id: 'tn-cancelled-789',
+      role: 'owner',
+      email: 'testuser@example.com',
+    };
+    mocks.state.existingTenant = {
+      tenant_id: 'tn-cancelled-789',
+      name: 'Cancelled Workspace',
+      plan_tier: 'pro',
+      is_active: false,
+      created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+    };
+    mocks.state.existingSub = {
+      tenant_id: 'tn-cancelled-789',
+      plan_tier: 'pro',
+      is_active: false,
+      razorpay_subscription_id: 'sub_cancelled_123',
+    } as unknown as { tenant_id: string; plan_tier: string; is_active: boolean };
+
+    const req = new Request('http://localhost/api/rag/tenant');
+    const res = await GET(req);
+    expect(res.status).toBe(200);
+
+    const json = await res.json();
+    expect(json.isActive).toBe(false);
+    expect(json.isExpired).toBe(true);
+    expect(json.trialDaysRemaining).toBe(0);
   });
 
   it('bootstraps new tenant for first-time authenticated user', async () => {
@@ -120,6 +184,8 @@ describe('GET /api/rag/tenant', () => {
     expect(json.tenantId).toBeDefined();
     expect(json.planTier).toBe('starter');
     expect(json.trialDaysRemaining).toBe(7);
+    expect(json.apiKey).toBeDefined();
+    expect(json.apiKey).toContain('ret_live_');
     expect(json.email).toBe('testuser@example.com');
   });
 });

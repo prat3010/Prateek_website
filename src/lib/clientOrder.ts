@@ -3,6 +3,7 @@ export type ClientDeliveryStage = 'architecture' | 'engineering' | 'staging' | '
 export interface ClientScope {
   id: string;
   scope_code: string;
+  client_email?: string;
   company_name: string;
   client_phone?: string;
   base_engine: string;
@@ -27,6 +28,7 @@ export interface ClientScope {
   onboarding_checklist?: Record<string, boolean | string>;
   sow_hash?: string;
   retriever_tenant_id?: string;
+  deliverables?: DeliverableEntity;
   metadata?: Record<string, unknown>;
   created_at: string;
 }
@@ -207,6 +209,7 @@ export interface ClientOrderRow {
   onboarding_checklist?: Record<string, boolean | string> | unknown;
   sow_hash?: string;
   retriever_tenant_id?: string;
+  deliverables?: DeliverableEntity | unknown;
   metadata?: Record<string, unknown>;
   created_at?: string;
 }
@@ -220,6 +223,7 @@ export function dbToClientScope(row: ClientOrderRow): ClientScope {
   return {
     id: row.id || `scope-${row.scope_code}`,
     scope_code: row.scope_code,
+    client_email: row.client_email,
     company_name: row.company_name,
     client_phone: row.client_phone,
     base_engine: row.base_engine,
@@ -244,6 +248,10 @@ export function dbToClientScope(row: ClientOrderRow): ClientScope {
     onboarding_checklist: checklistParsed,
     sow_hash: row.sow_hash,
     retriever_tenant_id: row.retriever_tenant_id,
+    deliverables:
+      row.deliverables && typeof row.deliverables === 'object'
+        ? (row.deliverables as DeliverableEntity)
+        : undefined,
     metadata: (row.metadata as Record<string, unknown>) || {},
     created_at: row.created_at || new Date().toISOString(),
   };

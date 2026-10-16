@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
 
     const body = await request.json();
-    const { name, email, message, recaptchaToken, pdfAttachment } = body;
+    const { name, email, message, recaptchaToken, pdfAttachment, attachmentBase64, attachmentFileName } = body;
 
     // Verify reCAPTCHA v3 token if secret key is configured
     if (process.env.RECAPTCHA_SECRET_KEY) {
@@ -77,33 +77,42 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate optional PDF attachment
+    // Validate optional PDF attachment (supports both pdfAttachment and attachmentBase64/attachmentFileName)
     let attachments: { content: string; filename: string }[] = [];
-    if (pdfAttachment) {
+    const resolvedAttachment =
+      pdfAttachment ||
+      (attachmentBase64
+        ? {
+            content: attachmentBase64,
+            filename: attachmentFileName || 'Scoping-Brief.pdf',
+          }
+        : null);
+
+    if (resolvedAttachment) {
       if (
-        typeof pdfAttachment !== 'object' ||
-        pdfAttachment === null ||
-        typeof (pdfAttachment as { content?: unknown }).content !== 'string' ||
-        typeof (pdfAttachment as { filename?: unknown }).filename !== 'string'
+        typeof resolvedAttachment !== 'object' ||
+        resolvedAttachment === null ||
+        typeof (resolvedAttachment as { content?: unknown }).content !== 'string' ||
+        typeof (resolvedAttachment as { filename?: unknown }).filename !== 'string'
       ) {
         return NextResponse.json(
           { error: 'Invalid PDF attachment format.' },
           { status: 400 }
         );
       }
-      if ((pdfAttachment.content as string).length > 7_000_000) {
+      if ((resolvedAttachment.content as string).length > 7_000_000) {
         return NextResponse.json(
           { error: 'PDF attachment is too large.' },
           { status: 400 }
         );
       }
-      if (!/\.pdf$/i.test(pdfAttachment.filename)) {
+      if (!/\.pdf$/i.test(resolvedAttachment.filename)) {
         return NextResponse.json(
           { error: 'Attachment must be a PDF file.' },
           { status: 400 }
         );
       }
-      attachments = [{ content: pdfAttachment.content, filename: pdfAttachment.filename }];
+      attachments = [{ content: resolvedAttachment.content, filename: resolvedAttachment.filename }];
     }
 
     if (!process.env.RESEND_API_KEY) {

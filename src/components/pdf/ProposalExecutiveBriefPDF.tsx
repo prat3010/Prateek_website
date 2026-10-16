@@ -214,8 +214,8 @@ export function ProposalExecutiveBriefPDF({
 
   const totalBuildINR = data?.totalBuildCostINR || 250000;
   const totalBuildUSD = data?.totalBuildCostUSD || 3000;
-  const careCostINR = data?.maintenanceCostINR || 25000;
-  const careCostUSD = data?.maintenanceCostUSD || 300;
+  const careCostINR = data?.maintenanceCostINR ?? 0;
+  const careCostUSD = data?.maintenanceCostUSD ?? 0;
 
   const totalBuildFormatted =
     currency === 'USD'
@@ -223,9 +223,9 @@ export function ProposalExecutiveBriefPDF({
       : formatPricePair(totalBuildINR, totalBuildUSD, 'INR');
 
   const careFormatted =
-    currency === 'USD'
-      ? formatPricePair(careCostINR, careCostUSD, 'USD')
-      : formatPricePair(careCostINR, careCostUSD, 'INR');
+    careCostINR === 0 && careCostUSD === 0
+      ? 'Included (30-Day Warranty)'
+      : `${currency === 'USD' ? formatPricePair(careCostINR, careCostUSD, 'USD') : formatPricePair(careCostINR, careCostUSD, 'INR')}/mo`;
 
   return (
     <Document title={`${companyName} - Executive Pitch Brief`} author={resumeData?.name || 'Prateek Sharma'}>
@@ -296,7 +296,7 @@ export function ProposalExecutiveBriefPDF({
               Post-Launch SLA Retainer ({maintenancePlan})
             </Text>
             <Text style={[styles.metaKey, styles.tableCol2]}>Monthly</Text>
-            <Text style={[styles.metaValue, styles.tableCol3]}>{careFormatted}/mo</Text>
+            <Text style={[styles.metaValue, styles.tableCol3]}>{careFormatted}</Text>
           </View>
         </View>
 

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import type { ClientScope, ScopeChangeOrderEntity } from '@/lib/clientOrder';
 import { dbToClientScope } from '@/lib/clientOrder';
+import { recalculateCanonicalScopeQuote } from '@/lib/pricing';
 
 interface UseDashboardScopesProps {
   userEmail?: string | null;
@@ -42,10 +43,31 @@ const parsePendingScopeFromStorageOrUrl = (): ClientScope | null => {
         : [];
       const brand = parsed.brandAssetOption || parsed.brand_asset || 'Standard';
       const plan = parsed.maintenancePlan || parsed.maintenance_plan || 'Self-Managed (30-Day Warranty)';
-      const costInr = Number(parsed.totalCostINR ?? parsed.total_cost_inr) || 175000;
-      const costUsd = Number(parsed.totalCostUSD ?? parsed.total_cost_usd) || 2500;
       const curr = parsed.currency === 'USD' ? 'USD' : 'INR';
       const timeline = parsed.timeline || 'Standard Turnaround (2-4 Weeks)';
+      const businessKpi = parsed.businessKPI || parsed.business_kpi || '';
+      const metadata: Record<string, unknown> = {
+        ...(typeof parsed.metadata === 'object' && parsed.metadata ? parsed.metadata : {}),
+        brandAssetOption: brand,
+        maintenancePlan: plan,
+        businessKPI: businessKpi,
+        designReadiness: parsed.designReadiness || '',
+        hostingOwnership: parsed.hostingOwnership || '',
+        taxInvoicingPreference: parsed.taxInvoicingPreference || '',
+        inspirationLinks: parsed.inspirationLinks || '',
+        additionalNotes: parsed.additionalNotes || '',
+        ...(parsed.appliedPromoCode ? { appliedPromoCode: parsed.appliedPromoCode } : {}),
+      };
+
+      const canonical = recalculateCanonicalScopeQuote({
+        baseEngineTitle: engine,
+        selectedFeatures: features,
+        brandAssetOption: brand,
+        maintenancePlan: plan,
+        promoCode: parsed.appliedPromoCode || null,
+        fallbackINR: Number(parsed.totalCostINR ?? parsed.total_cost_inr) || 175000,
+        fallbackUSD: Number(parsed.totalCostUSD ?? parsed.total_cost_usd) || 2500,
+      });
 
       return {
         id: `scope-${Date.now()}`,
@@ -56,13 +78,15 @@ const parsePendingScopeFromStorageOrUrl = (): ClientScope | null => {
         features,
         brand_asset: brand,
         maintenance_plan: plan,
-        total_cost_inr: costInr,
-        total_cost_usd: costUsd,
+        total_cost_inr: canonical.totalINR,
+        total_cost_usd: canonical.totalUSD,
         currency: curr,
         timeline,
+        business_kpi: businessKpi,
         status: 'Draft Proposal',
         delivery_stage: 'architecture',
         deposit_paid: false,
+        metadata,
         created_at: new Date().toISOString(),
       };
     } catch (e) {
@@ -78,11 +102,20 @@ const parsePendingScopeFromStorageOrUrl = (): ClientScope | null => {
     const curr = searchParams.get('currency') === 'USD' ? 'USD' : 'INR';
     const code = searchParams.get('scopeCode') || `SCOPE-${Math.floor(10000 + Math.random() * 90000)}`;
     const company = searchParams.get('company')?.trim() || 'My Custom Project';
-    const parsedInr = Number(searchParams.get('costINR'));
-    const parsedUsd = Number(searchParams.get('costUSD'));
     const brand = searchParams.get('brand') || 'Standard';
     const plan = searchParams.get('plan') || 'Self-Managed (30-Day Warranty)';
     const timeline = searchParams.get('timeline') || 'Standard Turnaround (2-4 Weeks)';
+    const metadata: Record<string, unknown> = {
+      brandAssetOption: brand,
+      maintenancePlan: plan,
+    };
+
+    const canonical = recalculateCanonicalScopeQuote({
+      baseEngineTitle: engine,
+      selectedFeatures: features,
+      brandAssetOption: brand,
+      maintenancePlan: plan,
+    });
 
     return {
       id: `scope-${Date.now()}`,
@@ -93,13 +126,14 @@ const parsePendingScopeFromStorageOrUrl = (): ClientScope | null => {
       features,
       brand_asset: brand,
       maintenance_plan: plan,
-      total_cost_inr: !isNaN(parsedInr) && parsedInr > 0 ? parsedInr : (curr === 'INR' ? 175000 : 210000),
-      total_cost_usd: !isNaN(parsedUsd) && parsedUsd > 0 ? parsedUsd : (curr === 'USD' ? 2500 : 2100),
+      total_cost_inr: canonical.totalINR,
+      total_cost_usd: canonical.totalUSD,
       currency: curr,
       timeline,
       status: 'Draft Proposal',
       delivery_stage: 'architecture',
       deposit_paid: false,
+      metadata,
       created_at: new Date().toISOString(),
     };
   }
@@ -170,7 +204,14 @@ export function useDashboardScopes({
           if (data.scope?.id) {
             setScopes((prev) =>
               prev.map((s) =>
-                s.scope_code === updatedScope.scope_code ? { ...s, id: data.scope.id } : s
+                s.scope_code === updatedScope.scope_code
+                  ? {
+                      ...s,
+                      id: data.scope.id,
+                      total_cost_inr: data.scope.total_cost_inr ?? s.total_cost_inr,
+                      total_cost_usd: data.scope.total_cost_usd ?? s.total_cost_usd,
+                    }
+                  : s
               )
             );
           }
