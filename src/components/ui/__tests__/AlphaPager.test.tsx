@@ -206,4 +206,49 @@ describe('AlphaPager Component', () => {
     // Docks back to compact mode on mobile
     expect(screen.getByRole('region', { name: /Vintage Pager Pocket Clip/i })).toBeDefined();
   });
+
+  it('coordinates pager-expanded document class on mobile viewports', () => {
+    Object.defineProperty(window, 'innerWidth', {
+      writable: true,
+      configurable: true,
+      value: 390,
+    });
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      configurable: true,
+      value: vi.fn().mockImplementation(() => ({
+        matches: true,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      })),
+    });
+
+    const { unmount } = render(<AlphaPager />);
+
+    expect(document.documentElement.classList.contains('pager-expanded')).toBe(false);
+
+    const expandBtn = screen.getByRole('button', { name: /Expand Alphanumeric Pager/i });
+    act(() => {
+      fireEvent.click(expandBtn);
+    });
+
+    expect(document.documentElement.classList.contains('pager-expanded')).toBe(true);
+
+    const dockBtn = screen.getByRole('button', { name: /^Dock pager$/i });
+    act(() => {
+      fireEvent.click(dockBtn);
+    });
+
+    expect(document.documentElement.classList.contains('pager-expanded')).toBe(false);
+
+    // Expand again then test unmount cleanup
+    const reExpandBtn = screen.getByRole('button', { name: /Expand Alphanumeric Pager/i });
+    act(() => {
+      fireEvent.click(reExpandBtn);
+    });
+    expect(document.documentElement.classList.contains('pager-expanded')).toBe(true);
+
+    unmount();
+    expect(document.documentElement.classList.contains('pager-expanded')).toBe(false);
+  });
 });

@@ -786,7 +786,9 @@
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.12), 0 -1px 0 rgba(0, 0, 0, 0.7);
 }
 
-.compactDivider {
+.compactDivider,
+.brandDivider,
+.freqDivider {
   color: rgba(255, 255, 255, 0.25);
   font-size: 0.55rem;
 }
@@ -857,7 +859,9 @@
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), 0 -1px 0 rgba(0, 0, 0, 0.85);
 }
 
-:global([data-theme='noir']) .compactDivider {
+:global([data-theme='noir']) .compactDivider,
+:global([data-theme='noir']) .brandDivider,
+:global([data-theme='noir']) .freqDivider {
   color: rgba(255, 255, 255, 0.18);
 }
 
@@ -905,6 +909,32 @@
     max-width: min(360px, calc(100vw - 28px));
     margin-left: auto;
     margin-right: 0;
+    z-index: calc(var(--z-fixed, 300) + 10);
+  }
+
+  /* ── Compact Belt-Clip Mobile Dock Optimization ────────────── */
+  .compactClip {
+    padding: 0.28rem 0.48rem;
+    gap: 4px;
+  }
+
+  .compactContent {
+    gap: 4px;
+  }
+
+  .compactBrand,
+  .brandDivider {
+    display: none;
+  }
+
+  .compactInfo {
+    font-size: 0.58rem;
+    gap: 3px;
+  }
+
+  .compactExpandBtn {
+    padding: 2.5px 5px;
+    font-size: 0.52rem;
   }
 
   .pagerDevice {
@@ -1043,5 +1073,54 @@
   .speakerSlit {
     width: 10px;
     height: 2px;
+  }
+}
+
+@media (max-width: 480px) {
+  .bannerWrapper {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+    right: 12px;
+  }
+
+  .bannerWrapperExpanded {
+    left: 12px;
+    right: 12px;
+    max-width: min(360px, calc(100vw - 24px));
+  }
+
+  .compactClip {
+    padding: 0.24rem 0.42rem;
+    gap: 3px;
+  }
+
+  .compactContent {
+    gap: 3px;
+  }
+
+  .compactFreq,
+  .freqDivider {
+    display: none;
+  }
+
+  .compactChannel {
+    font-size: 0.56rem;
+  }
+
+  .compactExpandBtn {
+    padding: 2px 4.5px;
+    font-size: 0.5rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .bannerWrapper {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
+    right: 8px;
+  }
+
+  .bannerWrapperExpanded {
+    left: 8px;
+    right: 8px;
+    max-width: min(360px, calc(100vw - 16px));
   }
 }

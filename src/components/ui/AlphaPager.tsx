@@ -166,6 +166,18 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
     };
   }, [isMobile, isExpanded]);
 
+  // Sync document class when pager is expanded on mobile to coordinate UI docks and prevent overlap
+  useEffect(() => {
+    if (isMobile && isExpanded) {
+      document.documentElement.classList.add('pager-expanded');
+      return () => {
+        document.documentElement.classList.remove('pager-expanded');
+      };
+    } else {
+      document.documentElement.classList.remove('pager-expanded');
+    }
+  }, [isMobile, isExpanded]);
+
   // Play subtle chirp and trigger flash when toggling DEV vs BIZ mode
   const prevAudienceRef = useRef<string | null>(audience);
   useEffect(() => {
@@ -400,11 +412,11 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
 
                 <div className={styles.compactInfo}>
                   <span className={styles.compactBrand}>PRATEEQ</span>
-                  <span className={styles.compactDivider}>/</span>
+                  <span className={`${styles.compactDivider} ${styles.brandDivider}`}>/</span>
                   <span className={styles.compactFreq}>
                     {mode === 'alert' ? (currentMsg.freq || '900.1M') : '900M'}
                   </span>
-                  <span className={styles.compactDivider}>/</span>
+                  <span className={`${styles.compactDivider} ${styles.freqDivider}`}>/</span>
                   <span className={styles.compactChannel}>
                     CH 0{activeMsgIndex + 1}
                   </span>
