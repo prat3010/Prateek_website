@@ -129,28 +129,29 @@ export default function PlaygroundGrid() {
             No creations found matching &ldquo;{searchQuery}&rdquo;. Try another filter or search term.
           </div>
         ) : (
-          filteredItems.map((item) => {
+          filteredItems.map((item, index) => {
             let cardContent: React.ReactNode = null;
             switch (item.kind) {
               case 'saas':
-                cardContent = <SaasCard item={item} />;
+                cardContent = <SaasCard item={item} index={index} />;
                 break;
               case 'interactive-toy':
-                cardContent = <ToyCard item={item} />;
+                cardContent = <ToyCard item={item} index={index} />;
                 break;
               case 'generative-media':
                 cardContent = (
                   <MediaCard
                     item={item}
+                    index={index}
                     onOpenLightbox={(mediaItem) => setActiveLightboxItem(mediaItem)}
                   />
                 );
                 break;
               case 'cognitive-tool':
-                cardContent = <CognitiveCard item={item} />;
+                cardContent = <CognitiveCard item={item} index={index} />;
                 break;
               case 'experiment':
-                cardContent = <ExperimentCard item={item} />;
+                cardContent = <ExperimentCard item={item} index={index} />;
                 break;
               default:
                 return null;

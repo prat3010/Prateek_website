@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ExternalLink, Rocket, CheckCircle2 } from 'lucide-react';
+import { ExternalLink, CheckCircle2 } from 'lucide-react';
 import type { SaasPlaygroundItem } from '@/data/playgroundItems';
 import styles from '../PlaygroundGrid.module.css';
 
@@ -15,21 +15,25 @@ const GitHubIcon = ({ size = 14 }: { size?: number }) => (
 
 interface SaasCardProps {
   item: SaasPlaygroundItem;
+  index?: number;
 }
 
-export default function SaasCard({ item }: SaasCardProps) {
+export default function SaasCard({ item, index }: SaasCardProps) {
+  const indexStr = index !== undefined ? String(index + 1).padStart(2, '0') : '01';
+
   return (
     <article className={`${styles.card} ${styles.cardSaas}`}>
-      <div className={styles.cardHeader}>
-        <span className={`${styles.kindPill} ${styles.kindPillSaas}`}>
-          <Rocket size={13} />
-          <span>SaaS Prototype</span>
-        </span>
-        {item.metricsBadge && (
-          <span className={`${styles.statusPill} ${styles.statusPillSaas}`}>
-            {item.metricsBadge}
-          </span>
-        )}
+      {/* Comic Storyboard Header with Narrative Caption Box & Comic Rarity/Status Stamp */}
+      <div className={styles.comicHeader} aria-hidden="true">
+        <div className={styles.narrativeBox}>
+          <span className={styles.narrativePrefix}>EXP. {indexStr}</span>
+          <span className={styles.narrativeDivider}>{'//'}</span>
+          <span className={styles.narrativeLabel}>SAAS LAB</span>
+        </div>
+        <div className={styles.comicBadgeStamp}>
+          <span className={styles.comicRarityPip}>★</span>
+          <span className={styles.comicBadgeText}>{item.metricsBadge || item.pricingModel || 'LIVE SAAS'}</span>
+        </div>
       </div>
 
       <div className={styles.cardBody}>

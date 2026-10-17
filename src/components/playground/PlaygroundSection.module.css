@@ -145,8 +145,8 @@
 :global([data-theme='noir']) .categoryBtn.active {
   background: var(--neon-cyan);
   color: #08080a;
-  border-color: #ffffff;
-  box-shadow: 3px 3px 0px #ffffff;
+  border-color: var(--neon-cyan);
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.7);
 }
 
 /* ── Cards Grid ── */
@@ -279,14 +279,15 @@
 :global([data-theme='noir']) .viewAllCta {
   background: var(--neon-cyan);
   color: #08080a;
-  border-color: #ffffff;
-  box-shadow: 4px 4px 0px #ffffff;
+  border-color: var(--neon-cyan);
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.8);
 }
 
 :global([data-theme='noir']) .viewAllCta:hover {
   background: var(--neon-yellow);
   color: #08080a;
-  box-shadow: 6px 6px 0px #ffffff;
+  border-color: var(--neon-yellow);
+  box-shadow: 6px 6px 0px var(--neon-yellow);
 }
 
 .countSubtitle {

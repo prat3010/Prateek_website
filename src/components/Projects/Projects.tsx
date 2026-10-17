@@ -286,19 +286,18 @@ function Projects({ projects }: ProjectsProps) {
                   } as React.CSSProperties}
                   onClick={() => handleOpenModal(project.id)}
                 >
-                  {/* Retro Browser Window Header with Telemetry Status */}
-                  <div className={styles.browserHeader} aria-hidden="true">
-                    <div className={styles.browserDots}>
-                      <span className={styles.browserDot} />
-                      <span className={styles.browserDot} />
-                      <span className={styles.browserDot} />
-                      <span className={styles.systemRoleText}>
-                        {project.systemRole || `SYS-0${index + 1} // DEPLOYMENT`}
+                  {/* Comic Storyboard Header with Narrative Caption Box & Comic Rarity/Scene Badge */}
+                  <div className={styles.comicHeader} aria-hidden="true">
+                    <div className={styles.narrativeBox}>
+                      <span className={styles.narrativePrefix}>SCENE {String(index + 1).padStart(2, '0')}</span>
+                      <span className={styles.narrativeDivider}>{'//'}</span>
+                      <span className={styles.narrativeLabel}>
+                        {project.systemRole ? project.systemRole.replace(/^SYS-\d+\s*\/\/\s*/, '') : 'DEPLOYMENT'}
                       </span>
                     </div>
-                    <div className={styles.telemetryPill}>
-                      <span className={styles.pulseDot} />
-                      <span>{project.telemetryBadge || 'LIVE SYSTEM'}</span>
+                    <div className={styles.comicBadgeStamp}>
+                      <span className={styles.comicRarityPip}>★</span>
+                      <span className={styles.comicBadgeText}>{project.telemetryBadge || 'LIVE ENGINE'}</span>
                     </div>
                   </div>
 
@@ -370,14 +369,18 @@ function Projects({ projects }: ProjectsProps) {
               <div className={styles.modalHeader}>
                 <div>
                   {selected.systemRole && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.35rem' }}>
-                      <span className={styles.systemRoleText} style={{ color: 'var(--color-text-muted)' }}>
-                        {selected.systemRole}
-                      </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.45rem' }}>
+                      <div className={styles.narrativeBox}>
+                        <span className={styles.narrativePrefix}>DOSSIER</span>
+                        <span className={styles.narrativeDivider}>{'//'}</span>
+                        <span className={styles.narrativeLabel}>
+                          {selected.systemRole.replace(/^SYS-\d+\s*\/\/\s*/, '')}
+                        </span>
+                      </div>
                       {selected.telemetryBadge && (
-                        <div className={styles.telemetryPill} style={{ background: 'var(--surface-elevated)' }}>
-                          <span className={styles.pulseDot} />
-                          <span style={{ color: 'var(--color-text)' }}>{selected.telemetryBadge}</span>
+                        <div className={styles.comicBadgeStamp} style={{ background: 'var(--surface-elevated)' }}>
+                          <span className={styles.comicRarityPip}>★</span>
+                          <span className={styles.comicBadgeText}>{selected.telemetryBadge}</span>
                         </div>
                       )}
                     </div>

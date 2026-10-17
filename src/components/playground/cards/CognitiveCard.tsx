@@ -2,25 +2,31 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Brain, Cpu, ArrowRight } from 'lucide-react';
+import { Cpu, ArrowRight } from 'lucide-react';
 import type { CognitiveToolPlaygroundItem } from '@/data/playgroundItems';
 import styles from '../PlaygroundGrid.module.css';
 
 interface CognitiveCardProps {
   item: CognitiveToolPlaygroundItem;
+  index?: number;
 }
 
-export default function CognitiveCard({ item }: CognitiveCardProps) {
+export default function CognitiveCard({ item, index }: CognitiveCardProps) {
+  const indexStr = index !== undefined ? String(index + 1).padStart(2, '0') : '01';
+
   return (
     <article className={`${styles.card} ${styles.cardCognitive}`}>
-      <div className={styles.cardHeader}>
-        <span className={`${styles.kindPill} ${styles.kindPillCognitive}`}>
-          <Brain size={14} />
-          <span>Cognitive AI</span>
-        </span>
-        <span className={`${styles.statusPill} ${styles.statusPillCognitive}`}>
-          {item.metricsBadge || 'ORACLE VPS'}
-        </span>
+      {/* Comic Storyboard Header with Narrative Caption Box & Comic Rarity/Status Stamp */}
+      <div className={styles.comicHeader} aria-hidden="true">
+        <div className={styles.narrativeBox}>
+          <span className={styles.narrativePrefix}>EXP. {indexStr}</span>
+          <span className={styles.narrativeDivider}>{'//'}</span>
+          <span className={styles.narrativeLabel}>COGNITIVE AI</span>
+        </div>
+        <div className={styles.comicBadgeStamp}>
+          <span className={styles.comicRarityPip}>★</span>
+          <span className={styles.comicBadgeText}>{item.metricsBadge || 'ORACLE VPS'}</span>
+        </div>
       </div>
 
       <div className={styles.cardBody}>

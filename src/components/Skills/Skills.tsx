@@ -207,7 +207,7 @@ function Skills({ skills }: SkillsProps) {
     return '■■■■□';
   };
 
-  const renderSkillCard = (skill: Skill) => {
+  const renderSkillCard = (skill: Skill, index: number) => {
     const Icon = iconMap[skill.icon] || Sparkles;
     
     const description = (activeAudience === 'business' && skill.description_business)
@@ -219,6 +219,8 @@ function Skills({ skills }: SkillsProps) {
       : skill.name;
 
     const forgedLabel = activeAudience === 'business' ? 'APPLIED IN:' : 'FORGED IN:';
+    const categoryLabel = skill.category ? skill.category.toUpperCase() : 'CAPABILITY';
+    const indexStr = String(index + 1).padStart(2, '0');
 
     return (
       <TiltCard
@@ -227,29 +229,34 @@ function Skills({ skills }: SkillsProps) {
         className={styles.skillCard}
         style={{ '--card-accent': skill.color } as React.CSSProperties}
       >
-        <div className={styles.skillCardTop}>
-          <div className={styles.skillCardIconWrap}>
-            <Icon className={styles.skillCardIcon} style={{ color: skill.color }} />
+        {/* Comic Storyboard Header with Narrative Caption Box & Comic Rarity/Power Pips */}
+        <div className={styles.comicHeader} aria-hidden="true">
+          <div className={styles.narrativeBox}>
+            <span className={styles.narrativePrefix}>CAP. {indexStr}</span>
+            <span className={styles.narrativeDivider}>{'//'}</span>
+            <span className={styles.narrativeLabel}>{categoryLabel}</span>
           </div>
-          <div className={styles.skillCardMeta}>
-            <div className={styles.skillCardNameRow}>
-              <h3 className={styles.skillCardName}>{displayName}</h3>
-              {skill.level && (
-                <div className={styles.skillLevelContainer}>
-                  <span
-                    className={`${styles.skillCardBadge} ${styles['level_' + (skill.status || 'mastered')]}`}
-                  >
-                    {skill.level}
-                  </span>
-                  <span className={styles.skillGauge} aria-hidden="true" title={`Proficiency: ${getLevelGauge(skill.level)}`}>
-                    {getLevelGauge(skill.level)}
-                  </span>
-                </div>
-              )}
+          {skill.level && (
+            <div className={styles.comicBadgeStamp}>
+              <span className={styles.comicRarityPip}>★</span>
+              <span className={styles.comicBadgeText}>{skill.level}</span>
+              <span className={styles.comicPowerPips} aria-hidden="true" title={`Power: ${getLevelGauge(skill.level)}`}>
+                {getLevelGauge(skill.level)}
+              </span>
             </div>
-            <p className={styles.skillCardDesc}>{description}</p>
-          </div>
+          )}
         </div>
+
+        <div className={styles.skillCardBody}>
+          <div className={styles.skillCardTop}>
+            <div className={styles.skillCardIconWrap}>
+              <Icon className={styles.skillCardIcon} style={{ color: skill.color }} />
+            </div>
+            <div className={styles.skillCardMeta}>
+              <h3 className={styles.skillCardName}>{displayName}</h3>
+              <p className={styles.skillCardDesc}>{description}</p>
+            </div>
+          </div>
 
         {skill.projects && skill.projects.length > 0 && (
           <div className={styles.skillCardFooter}>
@@ -292,6 +299,7 @@ function Skills({ skills }: SkillsProps) {
             <span>Active Quest: Deploying analytical data science pipelines.</span>
           </div>
         )}
+        </div>
       </TiltCard>
     );
   };
@@ -392,7 +400,7 @@ function Skills({ skills }: SkillsProps) {
               className={styles.panel}
             >
               <div className={styles.cardsGrid}>
-                {filteredSkills.map(renderSkillCard)}
+                {filteredSkills.map((skill, index) => renderSkillCard(skill, index))}
               </div>
             </m.div>
           </AnimatePresence>

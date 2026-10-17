@@ -2,27 +2,31 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Gamepad2, Trophy, Volume2, ArrowRight } from 'lucide-react';
+import { Trophy, Volume2, ArrowRight } from 'lucide-react';
 import type { InteractiveToyPlaygroundItem } from '@/data/playgroundItems';
 import styles from '../PlaygroundGrid.module.css';
 
 interface ToyCardProps {
   item: InteractiveToyPlaygroundItem;
+  index?: number;
 }
 
-export default function ToyCard({ item }: ToyCardProps) {
+export default function ToyCard({ item, index }: ToyCardProps) {
+  const indexStr = index !== undefined ? String(index + 1).padStart(2, '0') : '01';
+
   return (
     <article className={`${styles.card} ${styles.cardToy}`}>
-      <div className={styles.cardHeader}>
-        <span className={`${styles.kindPill} ${styles.kindPillToy}`}>
-          <Gamepad2 size={14} />
-          <span>Interactive Toy</span>
-        </span>
-        {item.difficulty && (
-          <span className={`${styles.statusPill} ${styles.statusPillToy}`}>
-            {item.difficulty}
-          </span>
-        )}
+      {/* Comic Storyboard Header with Narrative Caption Box & Comic Rarity/Status Stamp */}
+      <div className={styles.comicHeader} aria-hidden="true">
+        <div className={styles.narrativeBox}>
+          <span className={styles.narrativePrefix}>EXP. {indexStr}</span>
+          <span className={styles.narrativeDivider}>{'//'}</span>
+          <span className={styles.narrativeLabel}>ARCADE TOY</span>
+        </div>
+        <div className={styles.comicBadgeStamp}>
+          <span className={styles.comicRarityPip}>★</span>
+          <span className={styles.comicBadgeText}>{item.metricsBadge || item.difficulty || 'PLAYABLE'}</span>
+        </div>
       </div>
 
       <div className={styles.cardBody}>

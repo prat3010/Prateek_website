@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Sparkles, Copy, Check, Eye } from 'lucide-react';
+import { Copy, Check, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import type { GenerativeMediaPlaygroundItem } from '@/data/playgroundItems';
 import styles from '../PlaygroundGrid.module.css';
@@ -10,10 +10,12 @@ import styles from '../PlaygroundGrid.module.css';
 interface MediaCardProps {
   item: GenerativeMediaPlaygroundItem;
   onOpenLightbox: (item: GenerativeMediaPlaygroundItem) => void;
+  index?: number;
 }
 
-export default function MediaCard({ item, onOpenLightbox }: MediaCardProps) {
+export default function MediaCard({ item, onOpenLightbox, index }: MediaCardProps) {
   const [copied, setCopied] = useState(false);
+  const indexStr = index !== undefined ? String(index + 1).padStart(2, '0') : '01';
 
   const handleCopyPrompt = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -45,14 +47,17 @@ export default function MediaCard({ item, onOpenLightbox }: MediaCardProps) {
         }
       }}
     >
-      <div className={styles.cardHeader}>
-        <span className={`${styles.kindPill} ${styles.kindPillMedia}`}>
-          <Sparkles size={13} />
-          <span>AI Prompt Studio</span>
-        </span>
-        <span className={`${styles.statusPill} ${styles.statusPillMedia}`}>
-          {item.parameters?.aspectRatio ? `AR ${item.parameters.aspectRatio}` : item.model}
-        </span>
+      {/* Comic Storyboard Header with Narrative Caption Box & Comic Rarity/Status Stamp */}
+      <div className={styles.comicHeader} aria-hidden="true">
+        <div className={styles.narrativeBox}>
+          <span className={styles.narrativePrefix}>EXP. {indexStr}</span>
+          <span className={styles.narrativeDivider}>{'//'}</span>
+          <span className={styles.narrativeLabel}>PROMPT STUDIO</span>
+        </div>
+        <div className={styles.comicBadgeStamp}>
+          <span className={styles.comicRarityPip}>★</span>
+          <span className={styles.comicBadgeText}>{item.parameters?.aspectRatio ? `AR ${item.parameters.aspectRatio}` : item.model}</span>
+        </div>
       </div>
 
       <div className={`${styles.mediaPreviewContainer} ${isSquare ? styles.square : ''}`}>

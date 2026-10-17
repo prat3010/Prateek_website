@@ -118,28 +118,29 @@ export default function PlaygroundSection() {
 
         {/* Responsive Cards Grid */}
         <div className={styles.cardsGrid}>
-          {displayedItems.map((item) => {
+          {displayedItems.map((item, index) => {
             let cardContent: React.ReactNode = null;
             switch (item.kind) {
               case 'saas':
-                cardContent = <SaasCard item={item} />;
+                cardContent = <SaasCard item={item} index={index} />;
                 break;
               case 'interactive-toy':
-                cardContent = <ToyCard item={item} />;
+                cardContent = <ToyCard item={item} index={index} />;
                 break;
               case 'generative-media':
                 cardContent = (
                   <MediaCard
                     item={item}
+                    index={index}
                     onOpenLightbox={(mediaItem) => setActiveLightboxItem(mediaItem)}
                   />
                 );
                 break;
               case 'cognitive-tool':
-                cardContent = <CognitiveCard item={item} />;
+                cardContent = <CognitiveCard item={item} index={index} />;
                 break;
               case 'experiment':
-                cardContent = <ExperimentCard item={item} />;
+                cardContent = <ExperimentCard item={item} index={index} />;
                 break;
               default:
                 return null;

@@ -1,27 +1,31 @@
 'use client';
 
 import React from 'react';
-import { Eye, Code2 } from 'lucide-react';
+import { Code2 } from 'lucide-react';
 import type { ExperimentPlaygroundItem } from '@/data/playgroundItems';
 import styles from '../PlaygroundGrid.module.css';
 
 interface ExperimentCardProps {
   item: ExperimentPlaygroundItem;
+  index?: number;
 }
 
-export default function ExperimentCard({ item }: ExperimentCardProps) {
+export default function ExperimentCard({ item, index }: ExperimentCardProps) {
+  const indexStr = index !== undefined ? String(index + 1).padStart(2, '0') : '01';
+
   return (
     <article className={`${styles.card} ${styles.cardExperiment}`}>
-      <div className={styles.cardHeader}>
-        <span className={`${styles.kindPill} ${styles.kindPillExperiment}`}>
-          <Eye size={14} />
-          <span>Experiment</span>
-        </span>
-        {item.metricsBadge && (
-          <span className={`${styles.statusPill} ${styles.statusPillExperiment}`}>
-            {item.metricsBadge}
-          </span>
-        )}
+      {/* Comic Storyboard Header with Narrative Caption Box & Comic Rarity/Status Stamp */}
+      <div className={styles.comicHeader} aria-hidden="true">
+        <div className={styles.narrativeBox}>
+          <span className={styles.narrativePrefix}>EXP. {indexStr}</span>
+          <span className={styles.narrativeDivider}>{'//'}</span>
+          <span className={styles.narrativeLabel}>LAB RECORD</span>
+        </div>
+        <div className={styles.comicBadgeStamp}>
+          <span className={styles.comicRarityPip}>★</span>
+          <span className={styles.comicBadgeText}>{item.metricsBadge || 'ACTIVE'}</span>
+        </div>
       </div>
 
       <div className={styles.cardBody}>
