@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { useLenis } from "lenis/react";
 import { useAuth } from "@/context/AuthContext";
@@ -20,18 +20,9 @@ import { FloatingChatWidget } from "@/components/rag/FloatingChatWidget";
 import { NAVBAR_SCROLL_OFFSET } from "@/lib/constants";
 import styles from "@/components/rag/rag.module.css";
 
-const ANCHOR_LINKS = [
-  { id: "sandbox-demo", label: "💬 Live Demo" },
-  { id: "architecture", label: "⚡ Architecture" },
-  { id: "benchmarks", label: "📊 Benchmarks" },
-  { id: "widget-customizer", label: "🛠️ Embed Customizer" },
-  { id: "pricing", label: "💳 Pricing" },
-] as const;
-
 export default function RagLandingPage() {
   const lenis = useLenis();
   const { user } = useAuth();
-  const [activeSection, setActiveSection] = useState<string>("sandbox-demo");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -47,7 +38,6 @@ export default function RagLandingPage() {
             const top = el.getBoundingClientRect().top + window.scrollY - 120;
             window.scrollTo({ top, behavior: "smooth" });
           }
-          setActiveSection(targetId);
         }
       }, 50);
       return () => clearTimeout(timer);
@@ -56,32 +46,8 @@ export default function RagLandingPage() {
     }
   }, [lenis]);
 
-  useEffect(() => {
-    const sectionIds = ["sandbox-demo", "architecture", "benchmarks", "widget-customizer", "pricing"];
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY + 160;
-      let matched = sectionIds[0];
-      for (let i = sectionIds.length - 1; i >= 0; i--) {
-        const el = document.getElementById(sectionIds[i]);
-        if (el) {
-          const top = el.getBoundingClientRect().top + window.scrollY;
-          if (scrollPosition >= top) {
-            matched = sectionIds[i];
-            break;
-          }
-        }
-      }
-      setActiveSection(matched);
-    };
-
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   const handleAnchorClick = (e: React.MouseEvent, targetId: string) => {
     e.preventDefault();
-    setActiveSection(targetId);
     if (typeof window !== "undefined") {
       window.history.replaceState(null, "", `#${targetId}`);
     }
@@ -102,22 +68,6 @@ export default function RagLandingPage() {
 
   return (
     <div className={styles.landingWrapper}>
-      {/* Sticky Glassmorphic Section Anchor Bar */}
-      <div className={styles.anchorBarContainer}>
-        <nav className={styles.anchorBar} aria-label="Quick Page Navigation">
-          {ANCHOR_LINKS.map((link) => (
-            <button
-              key={link.id}
-              type="button"
-              onClick={(e) => handleAnchorClick(e, link.id)}
-              className={`${styles.anchorLink} ${activeSection === link.id ? styles.anchorLinkActive : ""}`}
-            >
-              {link.label}
-            </button>
-          ))}
-        </nav>
-      </div>
-
       {/* 1. Hero & Strategic Value Proposition */}
       <ScrollSection gap={80} disableFade>
         <section className={styles.heroSection} id="home">

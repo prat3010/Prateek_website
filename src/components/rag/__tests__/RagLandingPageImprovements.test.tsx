@@ -120,16 +120,11 @@ describe("RAG Landing Page Improvements", () => {
     });
   });
 
-  describe("RagLandingPage sticky navigation & stats strip", () => {
-    it("renders Section Anchor Bar with all 5 sections", () => {
+  describe("RagLandingPage layout & stats strip", () => {
+    it("delegates section navigation to main Navbar without rendering duplicate in-page nav", () => {
       render(<RagLandingPage />);
 
-      expect(screen.getByRole("navigation", { name: /quick page navigation/i })).toBeInTheDocument();
-      expect(screen.getByText("💬 Live Demo")).toBeInTheDocument();
-      expect(screen.getByText("⚡ Architecture")).toBeInTheDocument();
-      expect(screen.getByText("📊 Benchmarks")).toBeInTheDocument();
-      expect(screen.getByText("🛠️ Embed Customizer")).toBeInTheDocument();
-      expect(screen.getByText("💳 Pricing")).toBeInTheDocument();
+      expect(screen.queryByRole("navigation", { name: /quick page navigation/i })).toBeNull();
     });
 
     it("renders Hero Micro-Stats Strip with all production metrics", () => {
@@ -164,62 +159,18 @@ describe("RAG Landing Page Improvements", () => {
       expect(heroCta).toHaveAttribute("href", "/rag/app?onboarding=true");
     });
 
-    it("handles anchor clicks by updating activeSection, history hash, and lenis.scrollTo", () => {
+    it("handles hero secondary CTA click by updating history hash and scrolling to #sandbox-demo", () => {
       const replaceStateSpy = vi.spyOn(window.history, "replaceState");
       render(<RagLandingPage />);
 
-      const pricingBtn = screen.getByRole("button", { name: /💳 pricing/i });
-      expect(pricingBtn).toHaveAttribute("type", "button");
+      const demoCta = screen.getByRole("link", { name: /💬 test live dogfooding sandbox/i });
+      fireEvent.click(demoCta);
 
-      fireEvent.click(pricingBtn);
-
-      expect(mockScrollTo).toHaveBeenCalledWith("#pricing", {
+      expect(mockScrollTo).toHaveBeenCalledWith("#sandbox-demo", {
         duration: 1.2,
         offset: -120, // NAVBAR_SCROLL_OFFSET (-80) - 40
       });
-      expect(replaceStateSpy).toHaveBeenCalledWith(null, "", "#pricing");
-      expect(pricingBtn.className).toContain("anchorLinkActive");
-    });
-
-    it("resets active section to sandbox-demo when scrolled back to top", () => {
-      const mockPositions: Record<string, number> = {
-        "sandbox-demo": 600,
-        "architecture": 1500,
-        "benchmarks": 3000,
-        "widget-customizer": 4500,
-        "pricing": 6000,
-      };
-
-      vi.spyOn(document, "getElementById").mockImplementation((id: string) => {
-        const el = document.querySelector(`[id="${id}"]`);
-        if (!el) return null;
-        vi.spyOn(el, "getBoundingClientRect").mockReturnValue({
-          top: (mockPositions[id] ?? 0) - window.scrollY,
-          bottom: (mockPositions[id] ?? 0) - window.scrollY + 500,
-          left: 0,
-          right: 1000,
-          width: 1000,
-          height: 500,
-          x: 0,
-          y: (mockPositions[id] ?? 0) - window.scrollY,
-          toJSON: () => {},
-        });
-        return el as HTMLElement;
-      });
-
-      render(<RagLandingPage />);
-
-      // First click pricing to make it active
-      const pricingBtn = screen.getByRole("button", { name: /💳 pricing/i });
-      fireEvent.click(pricingBtn);
-      expect(pricingBtn.className).toContain("anchorLinkActive");
-
-      // Now simulate scrolling back to top of the page (scrollY = 0)
-      Object.defineProperty(window, "scrollY", { value: 0, writable: true });
-      fireEvent.scroll(window);
-
-      const demoBtn = screen.getByRole("button", { name: /💬 live demo/i });
-      expect(demoBtn.className).toContain("anchorLinkActive");
+      expect(replaceStateSpy).toHaveBeenCalledWith(null, "", "#sandbox-demo");
     });
 
     it("scrolls to hash target on mount if window.location.hash is present", async () => {
