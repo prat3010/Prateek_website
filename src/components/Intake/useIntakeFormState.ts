@@ -666,7 +666,7 @@ export function useIntakeFormState(
     if (user?.email) {
       window.location.href = redirectUrl;
     } else {
-      void signInWithGoogle(redirectUrl);
+      window.location.href = `/login?redirect_to=${encodeURIComponent(redirectUrl)}`;
     }
   }, [cancelAutoRedirect, buildScopePayload, getDashboardRedirectUrl, user]);
 
@@ -843,10 +843,6 @@ export function useIntakeFormState(
         }
       }
 
-      if (typeof window !== 'undefined') {
-        try { localStorage.removeItem('prateeq_scoping_draft'); } catch {}
-      }
-
       try {
         confetti({ particleCount: 120, spread: 80, origin: { y: 0.5 } });
       } catch {}
@@ -857,13 +853,11 @@ export function useIntakeFormState(
       setSubmitted(true);
 
       const redirectUrl = getDashboardRedirectUrl(scopePayload);
-      redirectTimerRef.current = setTimeout(() => {
-        if (user?.email) {
+      if (user?.email) {
+        redirectTimerRef.current = setTimeout(() => {
           window.location.href = redirectUrl;
-        } else {
-          void signInWithGoogle(redirectUrl);
-        }
-      }, 6000);
+        }, 1200);
+      }
     } catch (err: unknown) {
       console.error('Intake form submission error:', err);
       setErrorMsg('Something went wrong during submission. Please try again.');

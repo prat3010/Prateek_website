@@ -4,9 +4,13 @@
 
 .projects {
   padding-block: var(--section-padding);
-  background: var(--pop-cream);
+  background: transparent;
   position: relative;
   overflow: hidden;
+}
+
+:global([data-theme='noir']) .projects {
+  background: transparent;
 }
 
 .container {
@@ -67,12 +71,14 @@
 
 .panel {
   position: relative;
-  border: 1px solid var(--color-border);
+  border: 1.5px solid var(--color-border);
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
-  background: var(--pop-white);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-comic);
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
   display: flex;
   flex-direction: column;
@@ -85,8 +91,9 @@
 }
 
 .panel:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-comic-hover);
+  border-color: var(--pop-black);
 }
 
 /* Retro Browser Window Chrome */
@@ -95,27 +102,33 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 24px;
+  height: 26px;
   z-index: 4;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 0.65rem;
-  background: #2B2B36;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0 0.75rem;
+  background: rgba(247, 242, 232, 0.94);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1.5px solid var(--color-border);
   user-select: none;
   pointer-events: none;
 }
 
 :global([data-theme='noir']) .browserHeader {
-  background: #0E0E12;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(14, 14, 18, 0.95);
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.16);
 }
 
 .browserDots {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
+}
+
+.browserDots .systemRoleText {
+  margin-left: 6px;
 }
 
 .browserDot {
@@ -132,14 +145,18 @@
 .browserAddress {
   font-family: var(--font-code);
   font-size: 0.6rem;
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--color-text-muted);
   letter-spacing: 0.02em;
+}
+
+:global([data-theme='noir']) .browserAddress {
+  color: rgba(255, 255, 255, 0.65);
 }
 
 /* Floating Case Study Hover Tag */
 .caseStudyTag {
   position: absolute;
-  top: 32px;
+  top: 34px;
   right: 10px;
   z-index: 4;
   display: inline-flex;
@@ -148,10 +165,11 @@
   font-family: var(--font-code);
   font-size: 0.62rem;
   font-weight: 700;
-  background: var(--surface-glass-bg);
-  color: var(--color-text);
-  border: 1px solid var(--border-muted);
-  padding: 2px 7px;
+  background: var(--pop-yellow);
+  color: var(--pop-black);
+  border: 1px solid var(--color-border);
+  box-shadow: 2px 2px 0px rgba(43, 43, 54, 0.2);
+  padding: 3px 8px;
   border-radius: 4px;
   opacity: 0;
   transform: translateY(-4px);
@@ -166,10 +184,10 @@
 }
 
 :global([data-theme='noir']) .caseStudyTag {
-  background: rgba(18, 20, 26, 0.9);
+  background: rgba(18, 20, 26, 0.95);
   color: var(--neon-cyan);
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
+  box-shadow: 2px 2px 0px var(--neon-cyan);
 }
 
 .panel:hover .panelOverlay,
@@ -177,9 +195,10 @@
 .panel:focus-within .panelOverlay {
   background: linear-gradient(
     to top,
-    rgba(26, 26, 46, 0.98) 0%,
-    rgba(26, 26, 46, 0.75) 60%,
-    rgba(26, 26, 46, 0.2) 100%
+    rgba(43, 43, 54, 0.98) 0%,
+    rgba(43, 43, 54, 0.82) 55%,
+    rgba(43, 43, 54, 0.35) 85%,
+    transparent 100%
   );
 }
 
@@ -201,8 +220,9 @@
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(26, 26, 46, 0.95) 0%,
-    rgba(26, 26, 46, 0.5) 50%,
+    rgba(43, 43, 54, 0.94) 0%,
+    rgba(43, 43, 54, 0.7) 45%,
+    rgba(43, 43, 54, 0.25) 75%,
     transparent 100%
   );
   display: flex;
@@ -216,15 +236,15 @@
 
 .panelTitle {
   font-family: var(--font-headline);
-  font-size: 1.5rem;
-  color: var(--pop-white);
-  margin-bottom: 0.5rem;
-  text-shadow: 2px 2px 0 var(--pop-black);
+  font-size: 1.45rem;
+  color: #ffffff;
+  margin-bottom: 0.4rem;
+  text-shadow: 1.5px 1.5px 0 var(--pop-black);
 }
 
 .panelDesc {
   font-size: 0.88rem;
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(255, 255, 255, 0.92);
   line-height: 1.4;
   max-height: 0;
   opacity: 0;
@@ -256,9 +276,9 @@
   letter-spacing: 0.04em;
   background: var(--pop-yellow);
   color: var(--pop-black);
-  border: 1px dashed var(--color-border);
+  border: 1px solid var(--color-border);
   border-radius: 4px;
-  font-family: var(--font-code);
+  box-shadow: 1px 1px 0px rgba(43, 43, 54, 0.2);
 }
 
 :global([data-theme='noir']) .tag {
@@ -609,79 +629,121 @@
 }
 
 :global([data-theme='noir']) .panel {
-  background-color: var(--surface-primary);
-  border-color: var(--border-muted);
-  box-shadow: none;
+  background-color: rgba(18, 18, 24, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid var(--border-muted);
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.8);
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
-/* Individual Panel Hover States (Tactile Hardware Depth across all cards) */
-:global([data-theme='noir']) .panel:nth-child(4n + 1):hover {
-  border-color: var(--neon-cyan);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+:global([data-theme='noir']) .panelOverlay {
+  background: linear-gradient(
+    to top,
+    rgba(8, 8, 10, 0.96) 0%,
+    rgba(8, 8, 10, 0.75) 45%,
+    rgba(8, 8, 10, 0.2) 75%,
+    transparent 100%
+  );
 }
-:global([data-theme='noir']) .panel:nth-child(4n + 1):hover .statusLive,
-:global([data-theme='noir']) .panel:nth-child(4n + 1):hover .statusSoon,
-:global([data-theme='noir']) .panel:nth-child(4n + 1):hover .statusPersonal {
+
+:global([data-theme='noir']) .panel:hover .panelOverlay,
+:global([data-theme='noir']) .panel:focus-visible .panelOverlay,
+:global([data-theme='noir']) .panel:focus-within .panelOverlay {
+  background: linear-gradient(
+    to top,
+    rgba(8, 8, 10, 0.98) 0%,
+    rgba(8, 8, 10, 0.82) 55%,
+    rgba(8, 8, 10, 0.35) 85%,
+    transparent 100%
+  );
+}
+
+/* Individual Panel Hover States (Tactile Hardware Depth across all cards in Noir) */
+:global([data-theme='noir']) .grid > *:nth-child(4n + 1) .panel:hover {
+  border-color: var(--neon-cyan);
+  box-shadow: 5px 5px 0px var(--neon-cyan);
+}
+:global([data-theme='noir']) .grid > *:nth-child(4n + 1) .panel:hover .statusLive,
+:global([data-theme='noir']) .grid > *:nth-child(4n + 1) .panel:hover .statusSoon,
+:global([data-theme='noir']) .grid > *:nth-child(4n + 1) .panel:hover .statusPersonal {
   border-color: var(--neon-cyan);
   color: var(--neon-cyan);
   box-shadow: none;
 }
-:global([data-theme='noir']) .panel:nth-child(4n + 1):hover .tag {
+:global([data-theme='noir']) .grid > *:nth-child(4n + 1) .panel:hover .tag {
   border-color: var(--neon-cyan);
   color: var(--neon-cyan);
-  box-shadow: none;
+  box-shadow: 1px 1px 0px var(--neon-cyan);
 }
 
-:global([data-theme='noir']) .panel:nth-child(4n + 2):hover {
+:global([data-theme='noir']) .grid > *:nth-child(4n + 2) .panel:hover {
   border-color: var(--neon-pink);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: 5px 5px 0px var(--neon-pink);
 }
-:global([data-theme='noir']) .panel:nth-child(4n + 2):hover .statusLive,
-:global([data-theme='noir']) .panel:nth-child(4n + 2):hover .statusSoon,
-:global([data-theme='noir']) .panel:nth-child(4n + 2):hover .statusPersonal {
-  border-color: var(--neon-pink);
-  color: var(--neon-pink);
-  box-shadow: none;
-}
-:global([data-theme='noir']) .panel:nth-child(4n + 2):hover .tag {
+:global([data-theme='noir']) .grid > *:nth-child(4n + 2) .panel:hover .statusLive,
+:global([data-theme='noir']) .grid > *:nth-child(4n + 2) .panel:hover .statusSoon,
+:global([data-theme='noir']) .grid > *:nth-child(4n + 2) .panel:hover .statusPersonal {
   border-color: var(--neon-pink);
   color: var(--neon-pink);
   box-shadow: none;
 }
-
-:global([data-theme='noir']) .panel:nth-child(4n + 3):hover {
-  border-color: var(--neon-yellow);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+:global([data-theme='noir']) .grid > *:nth-child(4n + 2) .panel:hover .tag {
+  border-color: var(--neon-pink);
+  color: var(--neon-pink);
+  box-shadow: 1px 1px 0px var(--neon-pink);
 }
-:global([data-theme='noir']) .panel:nth-child(4n + 3):hover .statusLive,
-:global([data-theme='noir']) .panel:nth-child(4n + 3):hover .statusSoon,
-:global([data-theme='noir']) .panel:nth-child(4n + 3):hover .statusPersonal {
+
+:global([data-theme='noir']) .grid > *:nth-child(4n + 3) .panel:hover {
+  border-color: var(--neon-yellow);
+  box-shadow: 5px 5px 0px var(--neon-yellow);
+}
+:global([data-theme='noir']) .grid > *:nth-child(4n + 3) .panel:hover .statusLive,
+:global([data-theme='noir']) .grid > *:nth-child(4n + 3) .panel:hover .statusSoon,
+:global([data-theme='noir']) .grid > *:nth-child(4n + 3) .panel:hover .statusPersonal {
   border-color: var(--neon-yellow);
   color: var(--neon-yellow);
   box-shadow: none;
 }
-:global([data-theme='noir']) .panel:nth-child(4n + 3):hover .tag {
+:global([data-theme='noir']) .grid > *:nth-child(4n + 3) .panel:hover .tag {
   border-color: var(--neon-yellow);
   color: var(--neon-yellow);
-  box-shadow: none;
+  box-shadow: 1px 1px 0px var(--neon-yellow);
 }
 
-:global([data-theme='noir']) .panel:nth-child(4n + 0):hover {
+:global([data-theme='noir']) .grid > *:nth-child(4n + 0) .panel:hover {
   border-color: var(--neon-green);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: 5px 5px 0px var(--neon-green);
 }
-:global([data-theme='noir']) .panel:nth-child(4n + 0):hover .statusLive,
-:global([data-theme='noir']) .panel:nth-child(4n + 0):hover .statusSoon,
-:global([data-theme='noir']) .panel:nth-child(4n + 0):hover .statusPersonal {
+:global([data-theme='noir']) .grid > *:nth-child(4n + 0) .panel:hover .statusLive,
+:global([data-theme='noir']) .grid > *:nth-child(4n + 0) .panel:hover .statusSoon,
+:global([data-theme='noir']) .grid > *:nth-child(4n + 0) .panel:hover .statusPersonal {
   border-color: var(--neon-green);
   color: var(--neon-green);
   box-shadow: none;
 }
-:global([data-theme='noir']) .panel:nth-child(4n + 0):hover .tag {
+:global([data-theme='noir']) .grid > *:nth-child(4n + 0) .panel:hover .tag {
   border-color: var(--neon-green);
   color: var(--neon-green);
-  box-shadow: none;
+  box-shadow: 1px 1px 0px var(--neon-green);
+}
+
+/* Individual Panel Hover States (Graphic Novel Color Accents in Azure) */
+.grid > *:nth-child(4n + 1) .panel:hover {
+  border-color: var(--pop-blue);
+  box-shadow: 5px 5px 0px var(--pop-blue);
+}
+.grid > *:nth-child(4n + 2) .panel:hover {
+  border-color: var(--pop-red);
+  box-shadow: 5px 5px 0px var(--pop-red);
+}
+.grid > *:nth-child(4n + 3) .panel:hover {
+  border-color: var(--pop-orange);
+  box-shadow: 5px 5px 0px var(--pop-orange);
+}
+.grid > *:nth-child(4n + 0) .panel:hover {
+  border-color: var(--pop-green);
+  box-shadow: 5px 5px 0px var(--pop-green);
 }
 
 /* Modal Tactile Hardware Styling */
@@ -719,59 +781,67 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.4rem 0.9rem;
+  padding: 0.45rem 1rem;
   font-family: var(--font-headline);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.5px;
-  background: var(--pop-white);
+  background: rgba(250, 249, 246, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: var(--pop-black);
-  border: 1px solid var(--color-border);
+  border: 1.5px solid var(--color-border);
   border-radius: 20px;
   cursor: pointer;
   transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow-comic-sm);
 }
 
 .filterPill:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-comic);
+  background: var(--surface-card);
 }
 
 .filterPillActive {
   background: var(--pop-yellow);
   color: var(--pop-black);
   border-color: var(--pop-black);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-comic);
 }
 
 .filterCount {
   display: inline-block;
-  padding: 0.1rem 0.4rem;
+  padding: 0.1rem 0.45rem;
   font-size: 0.7rem;
+  font-family: var(--font-code);
+  font-weight: 700;
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.08);
   color: inherit;
 }
 
 :global([data-theme='noir']) .filterPill {
-  background: var(--surface-primary);
+  background: rgba(18, 18, 22, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: var(--color-text-dim);
-  border-color: var(--border-muted);
-  box-shadow: none;
+  border: 1.5px solid var(--border-muted);
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.6);
 }
 
 :global([data-theme='noir']) .filterPill:hover {
   border-color: var(--neon-cyan);
   color: var(--neon-cyan);
-  box-shadow: 0 0 10px var(--neon-cyan);
+  box-shadow: 2px 2px 0px var(--neon-cyan);
+  transform: translateY(-2px);
 }
 
 :global([data-theme='noir']) .filterPillActive {
-  background: var(--surface-primary);
+  background: var(--surface-card);
   color: var(--neon-pink);
   border-color: var(--neon-pink);
-  box-shadow: 0 0 12px var(--neon-pink);
+  box-shadow: 3px 3px 0px var(--neon-pink);
 }
 
 :global([data-theme='noir']) .filterCount {
@@ -946,9 +1016,13 @@
   font-family: var(--font-code);
   font-size: 0.65rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.88);
+  color: var(--color-text-muted);
   letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+:global([data-theme='noir']) .systemRoleText {
+  color: rgba(255, 255, 255, 0.88);
 }
 
 .telemetryPill {
@@ -962,9 +1036,9 @@
   letter-spacing: 0.05em;
   padding: 2px 7px;
   border-radius: 4px;
-  background: rgba(0, 0, 0, 0.4);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(43, 43, 54, 0.06);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
 }
 
 :global([data-theme='noir']) .telemetryPill {

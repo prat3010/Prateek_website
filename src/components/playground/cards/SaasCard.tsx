@@ -19,14 +19,16 @@ interface SaasCardProps {
 
 export default function SaasCard({ item }: SaasCardProps) {
   return (
-    <article className={styles.card}>
+    <article className={`${styles.card} ${styles.cardSaas}`}>
       <div className={styles.cardHeader}>
-        <span className={styles.kindPill}>
+        <span className={`${styles.kindPill} ${styles.kindPillSaas}`}>
           <Rocket size={13} />
           <span>SaaS Prototype</span>
         </span>
         {item.metricsBadge && (
-          <span className={styles.statusPill}>{item.metricsBadge}</span>
+          <span className={`${styles.statusPill} ${styles.statusPillSaas}`}>
+            {item.metricsBadge}
+          </span>
         )}
       </div>
 
@@ -35,10 +37,10 @@ export default function SaasCard({ item }: SaasCardProps) {
         <p className={styles.cardTagline}>{item.tagline}</p>
 
         {item.highlights && item.highlights.length > 0 && (
-          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 16px 0', fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>
+          <ul className={styles.cardHighlightsList}>
             {item.highlights.slice(0, 2).map((h, i) => (
-              <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                <CheckCircle2 size={13} style={{ color: 'var(--color-primary)' }} />
+              <li key={i} className={styles.cardHighlightItem}>
+                <CheckCircle2 size={13} className={styles.cardHighlightIcon} />
                 <span>{h}</span>
               </li>
             ))}

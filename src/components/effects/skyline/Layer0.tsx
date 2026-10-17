@@ -5,6 +5,52 @@ import styles from '../NoirSkyline.module.css';
 import { WobblyPath, WobblyLine, WobblyRect } from '../WobblySVG';
 import type { LayerProps } from './types';
 
+interface MobileStar {
+  top: string;
+  left: string;
+  size: number;
+  type: 1 | 2 | 3;
+}
+
+const MOBILE_STARS: MobileStar[] = [
+  // Upper sky (top 0% - 25%)
+  { top: '3.5%', left: '14%', size: 1.5, type: 1 },
+  { top: '5.2%', left: '46%', size: 1.2, type: 2 },
+  { top: '4.8%', left: '78%', size: 2.0, type: 3 },
+  { top: '7.5%', left: '89%', size: 1.2, type: 1 },
+  { top: '9.0%', left: '28%', size: 1.8, type: 2 },
+  { top: '11.5%', left: '62%', size: 1.2, type: 3 },
+  { top: '13.2%', left: '8%', size: 2.2, type: 1 },
+  { top: '15.0%', left: '84%', size: 1.5, type: 2 },
+  { top: '17.8%', left: '38%', size: 1.2, type: 3 },
+  { top: '20.5%', left: '69%', size: 1.8, type: 1 },
+  { top: '22.0%', left: '19%', size: 1.2, type: 2 },
+  { top: '24.5%', left: '92%', size: 1.5, type: 3 },
+
+  // Mid sky (top 25% - 50%)
+  { top: '26.8%', left: '50%', size: 2.4, type: 1 },
+  { top: '29.2%', left: '11%', size: 1.5, type: 2 },
+  { top: '31.5%', left: '75%', size: 1.2, type: 3 },
+  { top: '34.0%', left: '33%', size: 2.0, type: 1 },
+  { top: '36.5%', left: '63%', size: 1.5, type: 2 },
+  { top: '38.8%', left: '87%', size: 1.2, type: 3 },
+  { top: '41.2%', left: '21%', size: 1.8, type: 1 },
+  { top: '43.5%', left: '53%', size: 1.2, type: 2 },
+  { top: '45.8%', left: '77%', size: 2.2, type: 3 },
+  { top: '48.0%', left: '9%', size: 1.2, type: 1 },
+
+  // Lower sky (top 50% - 68%, above skyline horizon)
+  { top: '50.5%', left: '39%', size: 1.5, type: 2 },
+  { top: '52.8%', left: '85%', size: 1.8, type: 3 },
+  { top: '55.0%', left: '61%', size: 1.2, type: 1 },
+  { top: '57.2%', left: '17%', size: 2.0, type: 2 },
+  { top: '59.5%', left: '47%', size: 1.5, type: 3 },
+  { top: '61.8%', left: '73%', size: 1.2, type: 1 },
+  { top: '63.8%', left: '29%', size: 1.8, type: 2 },
+  { top: '66.0%', left: '91%', size: 1.2, type: 3 },
+  { top: '68.0%', left: '55%', size: 1.4, type: 1 },
+];
+
 const Layer0 = React.memo(function Layer0({ reducedMotion, wobble: propWobble, isMobile }: LayerProps) {
   const wobble = propWobble ?? !reducedMotion;
   const strength = 1.0;
@@ -129,8 +175,8 @@ const Layer0 = React.memo(function Layer0({ reducedMotion, wobble: propWobble, i
 
       {/* Dynamic / Animating Sky Overlay SVG */}
       <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-        {/* Twinkling Starfield */}
-        <g fill="#fafafa" stroke="none">
+        {/* Twinkling Starfield (Desktop) */}
+        <g fill="#fafafa" stroke="none" className={styles.desktopStarfield}>
           <circle cx="120" cy="80" r="0.8" className={styles.star1} />
           <circle cx="250" cy="150" r="1.2" className={styles.star2} />
           <circle cx="340" cy="60" r="0.7" className={styles.star3} />
@@ -245,6 +291,23 @@ const Layer0 = React.memo(function Layer0({ reducedMotion, wobble: propWobble, i
           <path d="M 30 15 Q 35 10 40 15 Q 45 10 50 15" />
         </g>
       </svg>
+
+      {/* Mobile Starfield: distributes twinkling stars across the top half / upper sky on mobile */}
+      <div className={styles.mobileStarfield} aria-hidden="true">
+        {MOBILE_STARS.map((star, idx) => (
+          <span
+            key={idx}
+            className={`${styles.mobileStar} ${styles[`star${star.type}` as 'star1' | 'star2' | 'star3']}`}
+            style={{
+              top: star.top,
+              left: star.left,
+              width: `${star.size}px`,
+              height: `${star.size}px`,
+              ...(star.size >= 2.2 ? { boxShadow: '0 0 3px rgba(250, 250, 250, 0.7)' } : {}),
+            }}
+          />
+        ))}
+      </div>
     </>
   );
 });

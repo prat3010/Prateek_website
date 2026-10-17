@@ -33,7 +33,28 @@ export default function MediaCard({ item, onOpenLightbox }: MediaCardProps) {
   const isSquare = item.parameters?.aspectRatio === '1:1';
 
   return (
-    <article className={styles.card} onClick={() => onOpenLightbox(item)} style={{ cursor: 'pointer' }}>
+    <article
+      className={`${styles.card} ${styles.cardMedia}`}
+      onClick={() => onOpenLightbox(item)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onOpenLightbox(item);
+        }
+      }}
+    >
+      <div className={styles.cardHeader}>
+        <span className={`${styles.kindPill} ${styles.kindPillMedia}`}>
+          <Sparkles size={13} />
+          <span>AI Prompt Studio</span>
+        </span>
+        <span className={`${styles.statusPill} ${styles.statusPillMedia}`}>
+          {item.parameters?.aspectRatio ? `AR ${item.parameters.aspectRatio}` : item.model}
+        </span>
+      </div>
+
       <div className={`${styles.mediaPreviewContainer} ${isSquare ? styles.square : ''}`}>
         <Image
           src={item.thumbnailUrl}
@@ -48,18 +69,6 @@ export default function MediaCard({ item, onOpenLightbox }: MediaCardProps) {
       </div>
 
       <div className={styles.cardBody}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-          <span className={styles.kindPill} style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#c084fc' }}>
-            <Sparkles size={13} />
-            <span>AI Prompt Studio</span>
-          </span>
-          {item.parameters?.aspectRatio && (
-            <span style={{ fontSize: '0.75rem', fontFamily: 'var(--font-jetbrains-mono, monospace)', color: 'var(--color-text-muted)' }}>
-              AR {item.parameters.aspectRatio}
-            </span>
-          )}
-        </div>
-
         <h3 className={styles.cardTitle}>{item.title}</h3>
         <p className={styles.promptPreviewSnippet}>
           &ldquo;{item.prompt}&rdquo;
@@ -68,9 +77,8 @@ export default function MediaCard({ item, onOpenLightbox }: MediaCardProps) {
         <div className={styles.cardFooter}>
           <button
             type="button"
-            className={styles.actionBtn}
+            className={`${styles.actionBtn} ${styles.actionBtnFull}`}
             onClick={handleCopyPrompt}
-            style={{ flex: 1 }}
           >
             {copied ? <Check size={14} /> : <Copy size={14} />}
             <span>{copied ? 'Copied!' : 'Copy Prompt'}</span>
@@ -83,6 +91,7 @@ export default function MediaCard({ item, onOpenLightbox }: MediaCardProps) {
               onOpenLightbox(item);
             }}
             title="Inspect Full Prompt & Parameters"
+            aria-label="Inspect Full Prompt & Parameters"
           >
             <Eye size={14} />
           </button>

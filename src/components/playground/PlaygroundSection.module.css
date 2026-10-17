@@ -5,9 +5,13 @@
 
 .playgroundSection {
   padding-block: var(--section-padding, clamp(3.5rem, 6vw, 6rem));
-  background: var(--surface-secondary, var(--pop-cream));
+  background: transparent;
   position: relative;
   overflow: hidden;
+}
+
+:global([data-theme='noir']) .playgroundSection {
+  background: transparent;
 }
 
 .container {
@@ -26,7 +30,9 @@
   align-items: center;
   gap: 6px;
   padding: 5px 14px;
-  background: var(--surface-card, var(--pop-white));
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1.5px solid var(--color-border);
   border-radius: 9999px;
   font-family: var(--font-code, var(--font-jetbrains-mono, monospace));
@@ -37,6 +43,12 @@
   color: var(--color-text);
   box-shadow: var(--shadow-comic-sm);
   margin-bottom: 1rem;
+}
+
+:global([data-theme='noir']) .badge {
+  background: rgba(18, 18, 22, 0.88);
+  border-color: var(--border-muted);
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.6);
 }
 
 .badgeIcon {
@@ -56,6 +68,11 @@
   margin-bottom: 0.85rem;
   letter-spacing: var(--letter-spacing-headline, 0.02em);
   text-transform: uppercase;
+  text-shadow: var(--text-halo-headline);
+}
+
+:global([data-theme='noir']) .sectionTitle {
+  text-shadow: none;
 }
 
 .sectionSubtitle {
@@ -65,6 +82,11 @@
   max-width: 740px;
   margin: 0 auto 2rem auto;
   color: var(--color-text-muted);
+  text-shadow: var(--text-halo-body);
+}
+
+:global([data-theme='noir']) .sectionSubtitle {
+  text-shadow: none;
 }
 
 /* ── Category Filter Switcher ── */
@@ -81,7 +103,9 @@
   align-items: center;
   gap: 8px;
   padding: 9px 18px;
-  background: var(--surface-card, var(--pop-white));
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1.5px solid var(--color-border);
   border-radius: 8px;
   font-family: var(--font-code, var(--font-jetbrains-mono, monospace));
@@ -96,6 +120,7 @@
 .categoryBtn:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-comic);
+  background: var(--surface-elevated);
 }
 
 .categoryBtn.active {
@@ -105,11 +130,23 @@
   transform: translateY(-2px);
 }
 
+:global([data-theme='noir']) .categoryBtn {
+  background: rgba(18, 18, 22, 0.85);
+  border-color: var(--border-muted);
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.6);
+}
+
+:global([data-theme='noir']) .categoryBtn:hover {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  box-shadow: 2px 2px 0px var(--neon-cyan);
+}
+
 :global([data-theme='noir']) .categoryBtn.active {
   background: var(--neon-cyan);
   color: #08080a;
-  border-color: var(--neon-cyan);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border-color: #ffffff;
+  box-shadow: 3px 3px 0px #ffffff;
 }
 
 /* ── Cards Grid ── */
@@ -129,17 +166,25 @@
 
 /* ── Quick Launcher Bar ── */
 .quickLauncherBar {
-  background: var(--surface-card, var(--pop-white));
+  background: rgba(250, 249, 246, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1.5px solid var(--color-border);
   border-radius: 12px;
   padding: 1.25rem 1.5rem;
   margin-bottom: 2.5rem;
-  box-shadow: var(--shadow-comic-sm);
+  box-shadow: var(--shadow-comic);
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 1rem;
+}
+
+:global([data-theme='noir']) .quickLauncherBar {
+  background: rgba(18, 18, 22, 0.88);
+  border-color: var(--border-muted);
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.7);
 }
 
 .quickLauncherLabel {
@@ -172,6 +217,7 @@
   font-weight: 600;
   color: var(--color-text);
   text-decoration: none;
+  box-shadow: 1px 1px 0px rgba(43, 43, 54, 0.15);
   transition: all 0.2s ease;
 }
 
@@ -181,10 +227,17 @@
   transform: translateY(-1px);
 }
 
+:global([data-theme='noir']) .quickPill {
+  background: rgba(14, 14, 18, 0.9);
+  border-color: var(--border-muted);
+  box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.6);
+}
+
 :global([data-theme='noir']) .quickPill:hover {
   background: var(--neon-yellow);
   color: #08080a;
   border-color: var(--neon-yellow);
+  box-shadow: 1px 1px 0px var(--neon-yellow);
 }
 
 /* ── Footer / Explore All Button ── */

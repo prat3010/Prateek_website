@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -707,6 +708,18 @@ export default function ClientDashboardPage() {
             </svg>
             Sign in with Google
           </button>
+          <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+            <Link
+              href="/login?redirect_to=/dashboard"
+              style={{
+                fontSize: '0.85rem',
+                color: 'var(--color-text-muted)',
+                textDecoration: 'underline',
+              }}
+            >
+              Sign in with Email or Magic Link →
+            </Link>
+          </div>
         </div>
       </div>
     );

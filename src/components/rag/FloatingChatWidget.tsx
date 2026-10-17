@@ -10,7 +10,7 @@ interface FloatingChatWidgetProps {
 
 export function FloatingChatWidget({
   tenantId = process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_TENANT_ID || "1f85286c-9d9a-4ebc-9c62-a99360a5ece4",
-  apiKey = process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_API_KEY || "ret_live_eae27a51db3b44ef81e16df59137eda7bcfdc987dc204d6bacb9db0089a7886a",
+  apiKey = process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_API_KEY || "ret_live_ScopingGuest2026.ReadOnlyChat",
   apiUrl = process.env.NEXT_PUBLIC_RETRIEVER_API_URL || "https://rag.prateeq.in",
 }: FloatingChatWidgetProps) {
   useEffect(() => {

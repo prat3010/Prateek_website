@@ -157,6 +157,38 @@
   gap: 0.4rem;
 }
 
+.tenantContextRow {
+  display: flex;
+  align-items: center;
+  margin-top: -0.25rem;
+  margin-bottom: 0.15rem;
+}
+
+.tenantContextPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.72rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  background: var(--surface-secondary);
+  border: var(--border-thin);
+  border-radius: 9999px;
+  padding: 0.25rem 0.65rem;
+  letter-spacing: 0.01em;
+}
+
+.tenantLiveDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--pop-green, #22c55e);
+  box-shadow: 0 0 0 1.5px rgba(34, 197, 94, 0.3);
+  display: inline-block;
+  animation: pulse 2s infinite ease-in-out;
+}
+
 .pillsRow {
   display: flex;
   flex-wrap: wrap;

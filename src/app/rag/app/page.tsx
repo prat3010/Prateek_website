@@ -108,15 +108,27 @@ export default function RagAppStudioPage() {
         }
       }
 
-      setTenantId("");
-      setApiKey("");
-      setUserId("");
+      // Guest Showroom Sandbox: point to verified populated Showroom tenant (199 chunks)
+      const showroomTenant = process.env.NEXT_PUBLIC_RETRIEVER_PORTFOLIO_TENANT_ID || "6797e2c8-745a-4bd1-aa4c-3854b8d79c22";
+      const guestApiKey = "ret_live_GuestAccessKey2026.ReadOnlyChat";
+      const guestUserId = "00000000-0000-0000-0000-000000000001";
+
+      setTenantId(showroomTenant);
+      setApiKey(guestApiKey);
+      setUserId(guestUserId);
       setIsAdmin(false);
       setPlanTier("starter");
       setTrialDaysRemaining(7);
       setIsPaidSubscription(false);
       setIsExpired(false);
-      setClient(null);
+
+      const cli = new RetrieverClient({
+        apiUrl: process.env.NEXT_PUBLIC_RETRIEVER_API_URL || "https://rag.prateeq.in",
+        tenantId: showroomTenant,
+        apiKey: guestApiKey,
+        userId: guestUserId,
+      });
+      setClient(cli);
     } catch (err) {
       console.warn("RAG Studio workspace resolution warning:", err);
     } finally {
@@ -413,6 +425,44 @@ export default function RagAppStudioPage() {
                   }}
                 >
                   Renew or Upgrade
+                </Link>
+              </div>
+            )}
+
+            {/* Showroom Sandbox Banner for Unauthenticated Visitors */}
+            {!user && (
+              <div
+                style={{
+                  background: "rgba(0, 230, 118, 0.08)",
+                  border: "1px solid rgba(0, 230, 118, 0.3)",
+                  borderRadius: "8px",
+                  padding: "0.85rem 1.25rem",
+                  marginBottom: "1.25rem",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  color: "var(--color-text)",
+                  fontSize: "0.875rem",
+                  gap: "1rem",
+                }}
+              >
+                <span>
+                  🌟 <strong>Interactive Showroom Sandbox:</strong> Exploring live indexed knowledge in read-only mode against the Prateeq Portfolio Twin tenant (199 chunks).
+                </span>
+                <Link
+                  href="/login?redirect_to=/rag/app"
+                  style={{
+                    background: "var(--color-accent, #00E676)",
+                    color: "#000",
+                    fontWeight: 700,
+                    padding: "0.45rem 0.95rem",
+                    borderRadius: "6px",
+                    textDecoration: "none",
+                    fontSize: "0.8rem",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Sign In to Claim Tenant
                 </Link>
               </div>
             )}

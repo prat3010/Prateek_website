@@ -46,7 +46,15 @@ export function DocumentsPanel({ client, hidden, isExpired }: { client: Retrieve
   }, [client]);
 
   useEffect(() => {
+    if (!hidden && client && docs === null) {
+      const timer = setTimeout(() => {
+        void fetchDocs();
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [hidden, client, docs, fetchDocs]);
 
+  useEffect(() => {
     if (subTab === "graph" && client) {
       client.getGraphSummary().then(setGraphSummary).catch(() => {});
     }

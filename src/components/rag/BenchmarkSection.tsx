@@ -83,7 +83,7 @@ export function BenchmarkSection() {
   const maxVal = Math.max(p99 * 1.15, 1);
 
   return (
-    <div className={styles.benchmarkContainer}>
+    <div className={styles.benchmarkContainer} id="benchmarks">
       {/* 1. Header */}
       <div className={styles.header}>
         <div className={styles.badge}>

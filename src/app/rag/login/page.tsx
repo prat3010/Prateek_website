@@ -8,7 +8,7 @@ import styles from "@/components/rag/rag.module.css";
 
 export default function RagLoginPage() {
   const router = useRouter();
-  const { user, loading: authLoading, loginWithGoogle } = useAuth();
+  const { loginWithGoogle } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -16,14 +16,8 @@ export default function RagLoginPage() {
   const nextTarget = searchParams?.get("next") || searchParams?.get("returnTo") || "/rag/app";
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  useEffect(() => {
-    if (!authLoading && user) {
-      router.replace(nextTarget);
-    }
-  }, [authLoading, user, nextTarget, router]);
+    router.replace(`/login?context=rag&redirect_to=${encodeURIComponent(nextTarget)}`);
+  }, [nextTarget, router]);
 
   const handleGoogleLogin = async () => {
     setLoading(true);

@@ -17,6 +17,7 @@ import MediaCard from './cards/MediaCard';
 import CognitiveCard from './cards/CognitiveCard';
 import ExperimentCard from './cards/ExperimentCard';
 import MediaPromptLightbox from './viewers/MediaPromptLightbox';
+import TiltCard from '@/components/ui/TiltCard';
 import styles from './PlaygroundSection.module.css';
 
 const PLAYGROUND_TITLE_TEXTS: ScramblerProps['texts'] = {
@@ -118,26 +119,42 @@ export default function PlaygroundSection() {
         {/* Responsive Cards Grid */}
         <div className={styles.cardsGrid}>
           {displayedItems.map((item) => {
+            let cardContent: React.ReactNode = null;
             switch (item.kind) {
               case 'saas':
-                return <SaasCard key={item.id} item={item} />;
+                cardContent = <SaasCard item={item} />;
+                break;
               case 'interactive-toy':
-                return <ToyCard key={item.id} item={item} />;
+                cardContent = <ToyCard item={item} />;
+                break;
               case 'generative-media':
-                return (
+                cardContent = (
                   <MediaCard
-                    key={item.id}
                     item={item}
                     onOpenLightbox={(mediaItem) => setActiveLightboxItem(mediaItem)}
                   />
                 );
+                break;
               case 'cognitive-tool':
-                return <CognitiveCard key={item.id} item={item} />;
+                cardContent = <CognitiveCard item={item} />;
+                break;
               case 'experiment':
-                return <ExperimentCard key={item.id} item={item} />;
+                cardContent = <ExperimentCard item={item} />;
+                break;
               default:
                 return null;
             }
+
+            return (
+              <TiltCard
+                key={item.id}
+                maxAngle={2.5}
+                glare={false}
+                style={{ width: '100%', height: '100%' }}
+              >
+                {cardContent}
+              </TiltCard>
+            );
           })}
         </div>
 

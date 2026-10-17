@@ -253,10 +253,12 @@ Delivery Timeline: Need completion within 4 to 6 weeks.
     let snippet = '';
 
     try {
-      const resp = await fetch('https://rag.prateeq.in/v1/tenants/1f85286c-9d9a-4ebc-9c62-a99360a5ece4/search', {
+      const tenant = process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_TENANT_ID || '1f85286c-9d9a-4ebc-9c62-a99360a5ece4';
+      const key = process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_API_KEY || 'ret_live_ScopingGuest2026.ReadOnlyChat';
+      const resp = await fetch(`https://rag.prateeq.in/v1/tenants/${tenant}/search`, {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer ret_live_eae27a51db3b44ef81e16df59137eda7bcfdc987dc204d6bacb9db0089a7886a',
+          'Authorization': `Bearer ${key}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({

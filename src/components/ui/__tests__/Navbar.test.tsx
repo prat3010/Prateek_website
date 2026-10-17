@@ -96,6 +96,7 @@ describe('Navbar Component Navigation', () => {
       session: null,
       loading: false,
       loginWithGoogle: vi.fn(),
+      loginWithMagicLink: vi.fn(),
       logout: vi.fn(),
       getAccessToken: vi.fn().mockResolvedValue(null),
     });

@@ -156,7 +156,7 @@ const DEFAULT_PRICING_FALLBACK: PricingPayload = {
 
 export function PricingSection() {
   const router = useRouter();
-  const { user, loginWithGoogle, getAccessToken } = useAuth();
+  const { user, getAccessToken } = useAuth();
   const [pricing, setPricing] = useState<PricingPayload>(DEFAULT_PRICING_FALLBACK);
   const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
   const [currencyMode, setCurrencyMode] = useState<"inr" | "usd">(() => {
@@ -207,13 +207,13 @@ export function PricingSection() {
 
     // 1. Unauthenticated users clicking Starter get the 7-day free trial sign-in
     if (isStarter && !user) {
-      await loginWithGoogle("/rag/app?onboarding=true");
+      router.push(`/login?context=rag&redirect_to=${encodeURIComponent("/rag/app?onboarding=true")}`);
       return;
     }
 
     // 2. Paid tiers require authentication first
     if (!user) {
-      await loginWithGoogle(`/rag?plan=${encodeURIComponent(plan.planId || plan.id)}#pricing`);
+      router.push(`/login?context=rag&redirect_to=${encodeURIComponent(`/rag?plan=${encodeURIComponent(plan.planId || plan.id)}#pricing`)}`);
       return;
     }
 
@@ -320,7 +320,7 @@ export function PricingSection() {
     } finally {
       setLoadingPlanId(null);
     }
-  }, [user, router, loginWithGoogle, getAccessToken]);
+  }, [user, router, getAccessToken]);
 
   useEffect(() => {
     if (!user) return;

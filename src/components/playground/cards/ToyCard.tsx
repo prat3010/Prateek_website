@@ -12,14 +12,14 @@ interface ToyCardProps {
 
 export default function ToyCard({ item }: ToyCardProps) {
   return (
-    <article className={styles.card}>
+    <article className={`${styles.card} ${styles.cardToy}`}>
       <div className={styles.cardHeader}>
-        <span className={styles.kindPill}>
+        <span className={`${styles.kindPill} ${styles.kindPillToy}`}>
           <Gamepad2 size={14} />
           <span>Interactive Toy</span>
         </span>
         {item.difficulty && (
-          <span className={styles.statusPill}>
+          <span className={`${styles.statusPill} ${styles.statusPillToy}`}>
             {item.difficulty}
           </span>
         )}
@@ -31,13 +31,15 @@ export default function ToyCard({ item }: ToyCardProps) {
 
         <div className={styles.tagsRow}>
           {item.hasLeaderboard && (
-            <span className={styles.tagPill} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', borderColor: '#f59e0b', color: '#f59e0b' }}>
-              <Trophy size={11} /> Leaderboard
+            <span className={`${styles.tagPill} ${styles.tagPillSpecial}`}>
+              <Trophy size={11} />
+              <span>Leaderboard</span>
             </span>
           )}
           {item.soundSupported && (
-            <span className={styles.tagPill} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-              <Volume2 size={11} /> 8-Bit Audio
+            <span className={`${styles.tagPill} ${styles.tagPillIcon}`}>
+              <Volume2 size={11} />
+              <span>8-Bit Audio</span>
             </span>
           )}
           {item.tags.slice(0, 3).map((tag) => (
@@ -50,7 +52,7 @@ export default function ToyCard({ item }: ToyCardProps) {
             <span>Play Arcade</span>
             <ArrowRight size={14} />
           </Link>
-          <span style={{ fontSize: '0.75rem', fontFamily: 'var(--font-jetbrains-mono, monospace)', color: 'var(--color-text-muted)' }}>
+          <span className={styles.footerMetaText}>
             v.{item.vibeCodedDate.slice(0, 7)}
           </span>
         </div>

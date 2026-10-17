@@ -11,14 +11,14 @@ interface ExperimentCardProps {
 
 export default function ExperimentCard({ item }: ExperimentCardProps) {
   return (
-    <article className={styles.card}>
+    <article className={`${styles.card} ${styles.cardExperiment}`}>
       <div className={styles.cardHeader}>
-        <span className={styles.kindPill} style={{ background: 'rgba(234, 179, 8, 0.15)', color: '#facc15' }}>
+        <span className={`${styles.kindPill} ${styles.kindPillExperiment}`}>
           <Eye size={14} />
           <span>Experiment</span>
         </span>
         {item.metricsBadge && (
-          <span className={styles.statusPill} style={{ borderColor: 'rgba(234, 179, 8, 0.3)', color: '#facc15' }}>
+          <span className={`${styles.statusPill} ${styles.statusPillExperiment}`}>
             {item.metricsBadge}
           </span>
         )}
@@ -35,7 +35,7 @@ export default function ExperimentCard({ item }: ExperimentCardProps) {
         </div>
 
         <div className={styles.cardFooter}>
-          <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div className={styles.footerMetaText}>
             <Code2 size={14} /> Active in Floating Dock
           </div>
           {item.githubUrl && (

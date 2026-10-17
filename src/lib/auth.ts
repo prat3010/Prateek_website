@@ -147,3 +147,29 @@ export async function signOut() {
   const { error } = await supabaseAuth.auth.signOut();
   if (error) throw error;
 }
+
+/**
+ * Initiates Passwordless Magic Link Sign-In flow with Supabase Auth.
+ */
+export async function signInWithMagicLink(email: string, redirectTo?: string) {
+  let origin = typeof window !== 'undefined' ? window.location.origin : 'https://prateeq.in';
+  if (origin.includes('www.prateeq.in')) {
+    origin = origin.replace('www.prateeq.in', 'prateeq.in');
+  }
+  const target = redirectTo || '/dashboard';
+  const emailRedirectTo = `${origin}/auth/callback?next=${encodeURIComponent(target)}`;
+
+  const { data, error } = await supabaseAuth.auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo,
+    },
+  });
+
+  if (error) {
+    console.error('Magic Link Sign-In Error:', error);
+    throw error;
+  }
+  return data;
+}
+

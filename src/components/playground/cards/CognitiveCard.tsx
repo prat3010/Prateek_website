@@ -12,13 +12,13 @@ interface CognitiveCardProps {
 
 export default function CognitiveCard({ item }: CognitiveCardProps) {
   return (
-    <article className={styles.card}>
+    <article className={`${styles.card} ${styles.cardCognitive}`}>
       <div className={styles.cardHeader}>
-        <span className={styles.kindPill} style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#34d399' }}>
+        <span className={`${styles.kindPill} ${styles.kindPillCognitive}`}>
           <Brain size={14} />
           <span>Cognitive AI</span>
         </span>
-        <span className={styles.statusPill} style={{ borderColor: 'rgba(16, 185, 129, 0.3)', color: '#34d399' }}>
+        <span className={`${styles.statusPill} ${styles.statusPillCognitive}`}>
           {item.metricsBadge || 'ORACLE VPS'}
         </span>
       </div>
@@ -28,12 +28,12 @@ export default function CognitiveCard({ item }: CognitiveCardProps) {
         <p className={styles.cardTagline}>{item.tagline}</p>
 
         {item.capabilities && (
-          <div style={{ marginBottom: '14px', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
-            <div style={{ fontWeight: 600, color: 'var(--color-text)', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+          <div className={styles.cardFeatureSection}>
+            <div className={styles.cardFeatureTitle}>
               <Cpu size={12} /> Pipeline Features:
             </div>
             {item.capabilities.slice(0, 2).map((cap, i) => (
-              <div key={i} style={{ paddingLeft: '8px', borderLeft: '2px solid rgba(56, 189, 248, 0.3)', marginBottom: '3px' }}>
+              <div key={i} className={styles.cardFeatureItem}>
                 {cap}
               </div>
             ))}

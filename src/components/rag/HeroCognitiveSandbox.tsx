@@ -34,6 +34,13 @@ const PRESET_QUERIES = [
   "Explain the active-active multi-cloud vector replication guarantee.",
 ];
 
+const SCOPING_TENANT_ID =
+  process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_TENANT_ID ||
+  "1f85286c-9d9a-4ebc-9c62-a99360a5ece4";
+const SCOPING_API_KEY =
+  process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_API_KEY ||
+  "ret_live_ScopingGuest2026.ReadOnlyChat";
+
 export function HeroCognitiveSandbox() {
   const [query, setQuery] = useState(PRESET_QUERIES[0]);
   const [mode, setMode] = useState<"hybrid" | "cache" | "graph" | "crag">("hybrid");
@@ -70,12 +77,11 @@ export function HeroCognitiveSandbox() {
     try {
       // Dispatches to production Retriever tenant endpoint (dogfooding scoping tenant)
       const res = await fetch(
-        "https://rag.prateeq.in/v1/tenants/1f85286c-9d9a-4ebc-9c62-a99360a5ece4/search",
+        `https://rag.prateeq.in/v1/tenants/${SCOPING_TENANT_ID}/search`,
         {
           method: "POST",
           headers: {
-            Authorization:
-              "Bearer ret_live_eae27a51db3b44ef81e16df59137eda7bcfdc987dc204d6bacb9db0089a7886a",
+            Authorization: `Bearer ${SCOPING_API_KEY}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
@@ -234,6 +240,14 @@ export function HeroCognitiveSandbox() {
               )}
             </button>
           </MagneticButton>
+        </div>
+
+        {/* Live Tenant Context Pill */}
+        <div className={styles.tenantContextRow}>
+          <span className={styles.tenantContextPill}>
+            <span className={styles.tenantLiveDot} />
+            Querying Live Index: Prateeq Engineering SOW &amp; Scoping Knowledge
+          </span>
         </div>
 
         {/* Preset Query Pills */}

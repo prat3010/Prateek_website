@@ -245,6 +245,55 @@
   }
 }
 
+/* ─ Starfield Responsive Controls (Desktop vs Mobile) ─ */
+.desktopStarfield {
+  display: block;
+}
+
+.mobileStarfield {
+  display: none;
+}
+
+.mobileSkyline .desktopStarfield {
+  display: none;
+}
+
+.mobileSkyline .mobileStarfield {
+  display: block;
+  position: absolute;
+  top: 15px;
+  left: 30px;
+  right: 30px;
+  bottom: 15px;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .desktopStarfield {
+    display: none;
+  }
+  .mobileStarfield {
+    display: block;
+    position: absolute;
+    top: 15px;
+    left: 30px;
+    right: 30px;
+    bottom: 15px;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 1;
+  }
+}
+
+.mobileStar {
+  position: absolute;
+  border-radius: 50%;
+  background-color: #fafafa;
+  pointer-events: none;
+}
+
 
 /* ─ Blinking Cat Eyes ─ */
 .catEyes {
@@ -972,6 +1021,7 @@
 /* Light pop-art specific overrides to hide night details */
 .lightPopart .moonBody,
 .lightPopart .moonGlow,
+.lightPopart .mobileStarfield,
 .lightPopart .star1,
 .lightPopart .star2,
 .lightPopart .star3 {

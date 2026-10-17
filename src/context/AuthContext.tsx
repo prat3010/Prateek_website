@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { User, Session } from '@supabase/supabase-js';
-import { supabaseAuth, signInWithGoogle, signOut, universalStorage } from '@/lib/auth';
+import { supabaseAuth, signInWithGoogle, signInWithMagicLink, signOut, universalStorage } from '@/lib/auth';
 import { toast } from 'sonner';
 
 interface AuthContextType {
@@ -10,6 +10,7 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   loginWithGoogle: (redirectTo?: string) => Promise<void>;
+  loginWithMagicLink: (email: string, redirectTo?: string) => Promise<void>;
   logout: () => Promise<void>;
   getAccessToken: () => Promise<string | null>;
 }
@@ -19,6 +20,7 @@ const AuthContext = createContext<AuthContextType>({
   session: null,
   loading: true,
   loginWithGoogle: async () => {},
+  loginWithMagicLink: async () => {},
   logout: async () => {},
   getAccessToken: async () => null,
 });
@@ -221,6 +223,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const handleLoginWithMagicLink = async (email: string, redirectTo?: string) => {
+    setLoading(true);
+    try {
+      await signInWithMagicLink(email, redirectTo);
+      toast.success('Magic Link Sent!', {
+        description: `Check your inbox at ${email} for your secure sign-in link.`,
+      });
+    } catch (err) {
+      toast.error('Failed to send magic link', {
+        description: err instanceof Error ? err.message : 'Please check your email and try again.',
+      });
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleLogout = async () => {
     await signOut().catch(() => {});
     universalStorage.removeItem('prateeq_active_user');
@@ -265,6 +284,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         session,
         loading,
         loginWithGoogle: handleLoginWithGoogle,
+        loginWithMagicLink: handleLoginWithMagicLink,
         logout: handleLogout,
         getAccessToken,
       }}

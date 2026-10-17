@@ -153,7 +153,7 @@ export function useDashboardScopes({
 }: UseDashboardScopesProps) {
   const [scopes, setScopes] = useState<ClientScope[]>(() => getInitialScopes());
   const [scopeChangeOrders, setScopeChangeOrders] = useState<Record<string, ScopeChangeOrderEntity[]>>({});
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => Boolean(userEmail));
 
   const clearPendingScopeFromStorage = (): void => {
     if (typeof window === 'undefined') return;
@@ -234,9 +234,11 @@ export function useDashboardScopes({
         const res = await fetch(`/api/client/change-orders?scopeCode=${encodeURIComponent(scopeCode)}`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
-        const data = await res.json();
-        if (data?.changeOrders) {
-          setScopeChangeOrders((prev) => ({ ...prev, [scopeCode]: data.changeOrders }));
+        if (res && res.ok) {
+          const data = await res.json().catch(() => null);
+          if (data?.changeOrders) {
+            setScopeChangeOrders((prev) => ({ ...prev, [scopeCode]: data.changeOrders }));
+          }
         }
       } catch (err) {
         console.warn('Failed to load change orders:', err);
@@ -365,7 +367,7 @@ export function useDashboardScopes({
     scopes,
     setScopes,
     scopeChangeOrders,
-    isLoading,
+    isLoading: Boolean(userEmail) && isLoading,
     saveScopeToDatabase,
     loadChangeOrders,
     handleDeleteScope,
