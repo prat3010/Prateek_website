@@ -174,7 +174,13 @@ const Layer0 = React.memo(function Layer0({ reducedMotion, wobble: propWobble, i
       </svg>
 
       {/* Dynamic / Animating Sky Overlay SVG */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+      <svg
+        viewBox="0 0 1920 1080"
+        preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'}
+        className={styles.actorLayerSvg}
+        style={{ overflow: 'visible' }}
+        aria-hidden="true"
+      >
         {/* Twinkling Starfield (Desktop) */}
         <g fill="#fafafa" stroke="none" className={styles.desktopStarfield}>
           <circle cx="120" cy="80" r="0.8" className={styles.star1} />

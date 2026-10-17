@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useSkylineInteraction } from '../SkylineInteractionContext';
+import { useSkylineStatus } from '../SkylineInteractionContext';
 import styles from '../NoirSkyline.module.css';
 import { WobblyLine } from '../WobblySVG';
 
@@ -12,7 +12,7 @@ interface RealtimeClockProps {
 
 function RealtimeClock({ wobble, strength }: RealtimeClockProps) {
   const [time, setTime] = useState<Date>(() => new Date());
-  const { isTabVisible } = useSkylineInteraction();
+  const { isTabVisible } = useSkylineStatus();
   const isVisibleRef = useRef(isTabVisible);
 
   useEffect(() => {

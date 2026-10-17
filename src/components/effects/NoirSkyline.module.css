@@ -82,7 +82,6 @@
 .searchlight {
   transform-origin: 50% 100%;
   opacity: 0.12;
-  mix-blend-mode: screen;
 }
 
 .searchlightLeft {
@@ -364,8 +363,7 @@
 .blimpSpotlight {
   transform-origin: 195px 212px;
   animation: blimpSpotlightSweep 10s ease-in-out infinite alternate;
-  mix-blend-mode: screen;
-  opacity: 0.75;
+  opacity: 0.35;
 }
 
 @keyframes blimpSpotlightSweep {
@@ -1728,8 +1726,7 @@
   background-image: url('/images/textures/watercolor_pastel_yellow.jpg');
   background-size: cover;
   background-position: center;
-  opacity: 0.14;
-  mix-blend-mode: multiply;
+  opacity: 0.08;
 }
 
 /* ── GPU Promotion for Static Cityscape Backdrop Layers ── */

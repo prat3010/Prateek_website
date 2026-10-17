@@ -537,7 +537,13 @@ const Layer1 = React.memo(function Layer1({ reducedMotion, wobble: propWobble , 
       </svg>
 
       {/* Animated Layer (Unfiltered) */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+      <svg
+        viewBox="0 0 1920 1080"
+        preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'}
+        className={styles.actorLayerSvg}
+        style={{ overflow: 'visible' }}
+        aria-hidden="true"
+      >
         {/* Asynchronous Flickering Window Cells (Layer 1 - Unfiltered for performance) */}
         <g strokeWidth="1.0" fill="none">
           {/* Empire State */}

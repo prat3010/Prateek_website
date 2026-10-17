@@ -156,7 +156,13 @@ const Layer1_5 = React.memo(function Layer1_5({ reducedMotion, wobble: propWobbl
       </svg>
 
       {/* Animated Layer */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+      <svg
+        viewBox="0 0 1920 1080"
+        preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'}
+        className={styles.actorLayerSvg}
+        style={{ overflow: 'visible' }}
+        aria-hidden="true"
+      >
         {/* Aviation Warning Beacons */}
         <g stroke="none">
           <circle cx="375" cy="450" r="2.0" className={styles.beaconRed2} fill="#ff3b30" stroke="none" />

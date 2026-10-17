@@ -19,7 +19,7 @@ export interface SkylineInteractionValue extends SkylineStatusValue {
 const SkylineStatusContext = createContext<SkylineStatusValue | null>(null);
 const SkylineInteractionContext = createContext<SkylineInteractionValue | null>(null);
 
-const IDLE_TIMEOUT_MS = 60_000;
+const IDLE_TIMEOUT_MS = 10_000;
 
 const ACTIVITY_EVENTS = ['mousemove', 'wheel', 'click', 'keydown', 'touchstart'] as const;
 
