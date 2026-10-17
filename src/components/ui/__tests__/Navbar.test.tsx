@@ -329,4 +329,240 @@ describe('Navbar Component Navigation', () => {
     const activeText = Array.from(activeNavLinks).map((el) => el.textContent?.trim());
     expect(activeText.some((text) => text?.includes('Home'))).toBe(true);
   });
+
+  describe('Navbar on /rag', () => {
+    beforeEach(() => {
+      mockPathname = '/rag';
+      Object.defineProperty(window, 'location', {
+        value: { pathname: '/rag' },
+        writable: true,
+      });
+    });
+
+    it('renders updated RAG nav items pointing to real DOM section IDs with no dead links', () => {
+      render(<Navbar />);
+
+      // Real DOM section IDs
+      const liveDemoLink = screen.getAllByRole('link', { name: /live demo/i })[0];
+      expect(liveDemoLink.getAttribute('href')).toBe('/rag#sandbox-demo');
+
+      const architectureLink = screen.getAllByRole('link', { name: /architecture/i })[0];
+      expect(architectureLink.getAttribute('href')).toBe('/rag#architecture');
+
+      const benchmarksLink = screen.getAllByRole('link', { name: /benchmarks/i })[0];
+      expect(benchmarksLink.getAttribute('href')).toBe('/rag#benchmarks');
+
+      const customizerLink = screen.getAllByRole('link', { name: /customizer/i })[0];
+      expect(customizerLink.getAttribute('href')).toBe('/rag#widget-customizer');
+
+      const pricingLink = screen.getAllByRole('link', { name: /pricing/i })[0];
+      expect(pricingLink.getAttribute('href')).toBe('/rag#pricing');
+
+      // Assert dead links are NOT present
+      expect(screen.queryByRole('link', { name: /^overview$/i })).toBeNull();
+      expect(screen.queryByRole('link', { name: /^features$/i })).toBeNull();
+    });
+
+    it('suppresses the DEV / BIZ Perspective toggle on /rag', () => {
+      render(<Navbar />);
+
+      expect(screen.queryByLabelText(/switch to business perspective/i)).toBeNull();
+      expect(screen.queryByLabelText(/switch to developer perspective/i)).toBeNull();
+      expect(screen.queryByText('DEV')).toBeNull();
+      expect(screen.queryByText('BIZ')).toBeNull();
+    });
+
+    it('renders RETRIEVER AI wordmark, badge, and subtle link back to portfolio home', () => {
+      render(<Navbar />);
+
+      // Gremlin logo on /rag
+      const logoLink = screen.getByLabelText(/go to rag overview/i);
+      expect(logoLink.getAttribute('href')).toBe('/rag');
+
+      // Wordmark and badge
+      const wordmarkLink = screen.getByRole('link', { name: /^retriever\s*ai$/i });
+      expect(wordmarkLink.getAttribute('href')).toBe('/rag');
+      expect(screen.getByText('RETRIEVER')).toBeDefined();
+      expect(screen.getByText('AI')).toBeDefined();
+
+      // Back to prateeq.in link
+      const backLink = screen.getAllByRole('link', { name: /back to prateeq\.in/i })[0];
+      expect(backLink.getAttribute('href')).toBe('/');
+    });
+
+    it('contextualizes auth buttons for unauthenticated user: Sign In and Launch App CTA', () => {
+      render(<Navbar />);
+
+      // Primary CTA
+      const launchAppLinks = screen.getAllByRole('link', { name: /launch app/i });
+      expect(launchAppLinks.length).toBeGreaterThan(0);
+      expect(launchAppLinks[0].getAttribute('href')).toBe('/rag/app');
+
+      // Secondary button should be Sign In (not CLIENT LOGIN)
+      const signInLinks = screen.getAllByRole('link', { name: /sign in/i });
+      expect(signInLinks.length).toBeGreaterThan(0);
+      expect(signInLinks[0].getAttribute('href')).toBe('/login?context=rag');
+      expect(screen.queryByRole('link', { name: /client login/i })).toBeNull();
+    });
+
+    it('contextualizes auth buttons for authenticated user: Studio and Launch App CTA', () => {
+      vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
+        user: { email: 'client@example.com' } as unknown as NonNullable<ReturnType<typeof AuthContext.useAuth>['user']>,
+        session: null,
+        loading: false,
+        loginWithGoogle: vi.fn(),
+        loginWithMagicLink: vi.fn(),
+        logout: vi.fn(),
+        getAccessToken: vi.fn().mockResolvedValue(null),
+      });
+
+      render(<Navbar />);
+
+      // Primary CTA
+      const launchAppLinks = screen.getAllByRole('link', { name: /launch app/i });
+      expect(launchAppLinks[0].getAttribute('href')).toBe('/rag/app');
+
+      // Secondary button should be Studio (not DASHBOARD)
+      const studioLinks = screen.getAllByRole('link', { name: /studio/i });
+      expect(studioLinks.length).toBeGreaterThan(0);
+      expect(studioLinks[0].getAttribute('href')).toBe('/rag/app');
+      expect(screen.queryByRole('link', { name: /dashboard/i })).toBeNull();
+    });
+
+    it('smooth scrolls with adjusted offset when clicking RAG section link', () => {
+      render(<Navbar />);
+
+      const benchmarksLink = screen.getAllByRole('link', { name: /benchmarks/i })[0];
+      fireEvent.click(benchmarksLink);
+
+      // On /rag, offset should be NAVBAR_SCROLL_OFFSET - 40 (-120)
+      expect(mockLenisScrollTo).toHaveBeenCalledWith('#benchmarks', expect.objectContaining({
+        offset: -120,
+      }));
+    });
+
+    it('contextualizes auth buttons for admin user: Admin and Launch App CTA', () => {
+      vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
+        user: { email: 'prateeqsharma@gmail.com' } as unknown as NonNullable<ReturnType<typeof AuthContext.useAuth>['user']>,
+        session: null,
+        loading: false,
+        loginWithGoogle: vi.fn(),
+        loginWithMagicLink: vi.fn(),
+        logout: vi.fn(),
+        getAccessToken: vi.fn().mockResolvedValue(null),
+      });
+
+      render(<Navbar />);
+
+      const adminLinks = screen.getAllByRole('link', { name: /admin/i });
+      expect(adminLinks.length).toBeGreaterThan(0);
+      expect(adminLinks[0].getAttribute('href')).toBe('/admin');
+    });
+
+    it('smooth scrolls to top (0) when clicking logo on /rag', () => {
+      render(<Navbar />);
+
+      const logoLink = screen.getByLabelText(/go to rag overview/i);
+      fireEvent.click(logoLink);
+
+      expect(mockLenisScrollTo).toHaveBeenCalledWith(0, expect.any(Object));
+    });
+
+    it('initializes active section from window.location.hash on mount', () => {
+      Object.defineProperty(window, 'location', {
+        value: { pathname: '/rag', hash: '#pricing' },
+        writable: true,
+      });
+
+      const { container } = render(<Navbar />);
+
+      const activeLinks = container.querySelectorAll('[class*="active"]');
+      expect(activeLinks.length).toBeGreaterThan(0);
+      const activeText = Array.from(activeLinks).map((el) => el.textContent?.trim());
+      expect(activeText.some((text) => text?.includes('Pricing'))).toBe(true);
+    });
+
+    it('highlights active section on /rag via IntersectionObserver', () => {
+      const { container } = render(<Navbar />);
+
+      act(() => {
+        latestObserverCallback?.(
+          [
+            {
+              target: { id: 'benchmarks' },
+              isIntersecting: true,
+              intersectionRect: { height: 350 } as DOMRectReadOnly,
+            } as unknown as IntersectionObserverEntry,
+          ],
+          {} as IntersectionObserver
+        );
+      });
+
+      const activeLinks = container.querySelectorAll('[class*="active"]');
+      expect(activeLinks.length).toBeGreaterThan(0);
+      const activeText = Array.from(activeLinks).map((el) => el.textContent?.trim());
+      expect(activeText.some((text) => text?.includes('Benchmarks'))).toBe(true);
+    });
+
+    it('does not falsely highlight landing page sections as active when on /rag/app', () => {
+      mockPathname = '/rag/app';
+      Object.defineProperty(window, 'location', {
+        value: { pathname: '/rag/app' },
+        writable: true,
+      });
+
+      const { container } = render(<Navbar />);
+
+      const activeNavLinks = container.querySelectorAll(
+        'a[class*="navLink"][class*="active"], a[class*="mobileNavLink"][class*="active"]'
+      );
+      expect(activeNavLinks.length).toBe(0);
+    });
+
+    it('highlights Benchmarks section when on /rag/benchmarks', () => {
+      mockPathname = '/rag/benchmarks';
+      Object.defineProperty(window, 'location', {
+        value: { pathname: '/rag/benchmarks' },
+        writable: true,
+      });
+
+      const { container } = render(<Navbar />);
+
+      const activeLinks = container.querySelectorAll('[class*="active"]');
+      expect(activeLinks.length).toBeGreaterThan(0);
+      const activeText = Array.from(activeLinks).map((el) => el.textContent?.trim());
+      expect(activeText.some((text) => text?.includes('Benchmarks'))).toBe(true);
+    });
+
+    it('handles trailing slash normalization when clicking logo on /rag/', () => {
+      mockPathname = '/rag/';
+      Object.defineProperty(window, 'location', {
+        value: { pathname: '/rag/' },
+        writable: true,
+      });
+
+      render(<Navbar />);
+
+      const logoLink = screen.getByLabelText(/go to rag overview/i);
+      fireEvent.click(logoLink);
+
+      expect(mockLenisScrollTo).toHaveBeenCalledWith(0, expect.any(Object));
+    });
+
+    it('renders mobile back link and closes mobile menu when clicked', () => {
+      const { container } = render(<Navbar />);
+
+      // Open mobile menu
+      const hamburger = screen.getByLabelText(/open menu/i);
+      fireEvent.click(hamburger);
+
+      const mobileBackLink = screen.getByRole('link', { name: /← back to prateeq\.in/i });
+      expect(mobileBackLink).toBeDefined();
+      expect(mobileBackLink.getAttribute('href')).toBe('/');
+
+      // Clicking mobile back link closes the menu
+      fireEvent.click(mobileBackLink);
+      expect(container.querySelector('[class*="menuOpen"]')).toBeNull();
+    });
+  });
 });

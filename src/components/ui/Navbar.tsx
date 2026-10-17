@@ -65,10 +65,11 @@ export default function Navbar({ items, className }: NavbarProps) {
     if (items) return items;
     if (pathname?.startsWith('/rag')) {
       return [
-        { label: 'Overview', href: '/rag#home' },
-        { label: 'Features', href: '/rag#features' },
+        { label: 'Live Demo', href: '/rag#sandbox-demo' },
+        { label: 'Architecture', href: '/rag#architecture' },
+        { label: 'Benchmarks', href: '/rag#benchmarks' },
+        { label: 'Customizer', href: '/rag#widget-customizer' },
         { label: 'Pricing', href: '/rag#pricing' },
-        { label: 'Live Demo', href: '/rag#demo' },
       ];
     }
     if (pathname?.startsWith('/playground')) {
@@ -106,14 +107,24 @@ export default function Navbar({ items, className }: NavbarProps) {
     if (pathname?.startsWith('/playground')) {
       return '/#playground';
     }
-    if (pathname !== '/' && !pathname?.startsWith('/rag') && !items) {
+    if (pathname === '/rag/benchmarks') {
+      return '/rag#benchmarks';
+    }
+    const isRagLanding = pathname === '/rag' || pathname === '/rag/';
+    const isHome = pathname === '/' || !pathname;
+    if (!isHome && !isRagLanding && !items) {
       return '';
     }
     if (activeSection) return activeSection;
+    if (mounted && typeof window !== 'undefined' && window.location.hash) {
+      const hash = window.location.hash;
+      const matchingItem = navItems.find((item) => item.href.endsWith(hash));
+      if (matchingItem) return matchingItem.href;
+    }
     if (items && items.length > 0) return items[0].href;
-    if (pathname?.startsWith('/rag')) return '/rag#home';
+    if (isRagLanding) return '/rag#sandbox-demo';
     return '/#home';
-  }, [activeSection, items, pathname]);
+  }, [activeSection, items, pathname, navItems, mounted]);
 
   const { scrollY } = useLenisScroll();
   const lenis = useLenis();
@@ -133,6 +144,19 @@ export default function Navbar({ items, className }: NavbarProps) {
     };
   }, []);
 
+  /* ---------- Hash change listener ---------- */
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      const matchingItem = navItems.find((item) => item.href.endsWith(hash));
+      if (matchingItem) {
+        setActiveSection(matchingItem.href);
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [navItems]);
+
   /* ---------- Scroll direction / scrolled threshold listener ---------- */
   useEffect(() => {
     const unsub = scrollY.on('change', (y) => {
@@ -142,9 +166,11 @@ export default function Navbar({ items, className }: NavbarProps) {
         setScrolled(nextScrolled);
       }
       if (!nextScrolled && !isClickScrollingRef.current) {
-        const isSectionPage = Boolean(items) || pathname === '/' || pathname?.startsWith('/rag');
+        const isRagLanding = pathname === '/rag' || pathname === '/rag/';
+        const isHome = pathname === '/' || !pathname;
+        const isSectionPage = Boolean(items) || isHome || isRagLanding;
         if (isSectionPage) {
-          const homeHref = items && items.length > 0 ? items[0].href : (pathname?.startsWith('/rag') ? '/rag#home' : '/#home');
+          const homeHref = items && items.length > 0 ? items[0].href : (isRagLanding ? '/rag#sandbox-demo' : '/#home');
           setActiveSection(homeHref);
         }
       }
@@ -154,7 +180,9 @@ export default function Navbar({ items, className }: NavbarProps) {
 
   /* ---------- Intersection Observer for Section Tracking ---------- */
   useEffect(() => {
-    const isSectionPage = Boolean(items) || pathname === '/' || pathname?.startsWith('/rag');
+    const isRagLanding = pathname === '/rag' || pathname === '/rag/';
+    const isHome = pathname === '/' || !pathname;
+    const isSectionPage = Boolean(items) || isHome || isRagLanding;
     if (!isSectionPage) return;
 
     const visibleEntries = new Map<string, IntersectionObserverEntry>();
@@ -318,9 +346,9 @@ export default function Navbar({ items, className }: NavbarProps) {
       const anchorId = hashIndex !== -1 ? href.substring(hashIndex) : '';
       
       const currentPath = window.location.pathname;
-      const isCurrentPage =
-        targetPath === currentPath ||
-        ((targetPath === '/' || targetPath === '') && (currentPath === '/' || currentPath === ''));
+      const normalizedCurrentPath = currentPath.replace(/\/$/, '') || '/';
+      const normalizedTargetPath = targetPath.replace(/\/$/, '') || '/';
+      const isCurrentPage = normalizedTargetPath === normalizedCurrentPath;
 
       if (isCurrentPage && anchorId) {
         e.preventDefault();
@@ -330,21 +358,44 @@ export default function Navbar({ items, className }: NavbarProps) {
           isClickScrollingRef.current = false;
         }, prefersReducedMotion ? 50 : 1300);
 
+        const scrollOffset = pathname?.startsWith('/rag') ? NAVBAR_SCROLL_OFFSET - 40 : NAVBAR_SCROLL_OFFSET;
+
         if (lenis) {
           lenis.start();
-          lenis.scrollTo(anchorId, { duration: prefersReducedMotion ? 0 : 1.2, offset: NAVBAR_SCROLL_OFFSET });
+          lenis.scrollTo(anchorId, { duration: prefersReducedMotion ? 0 : 1.2, offset: scrollOffset });
         } else {
           const el = document.querySelector(anchorId);
-          if (el) el.scrollIntoView({ behavior: 'smooth' });
+          if (el) {
+            const top = el.getBoundingClientRect().top + window.scrollY + scrollOffset;
+            window.scrollTo({ top, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+          }
         }
+        window.history.replaceState(null, '', href);
         setActiveSection(href);
+        setMobileOpen(false);
+        return;
+      }
+
+      if (isCurrentPage && !anchorId && (normalizedCurrentPath === '/rag' || normalizedCurrentPath === '/')) {
+        e.preventDefault();
+        if (lenis) {
+          lenis.scrollTo(0, { duration: prefersReducedMotion ? 0 : 1.2 });
+        } else {
+          window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+        }
+        window.history.replaceState(null, '', href);
+        if (normalizedCurrentPath === '/rag') {
+          setActiveSection('/rag#sandbox-demo');
+        } else {
+          setActiveSection('/#home');
+        }
         setMobileOpen(false);
         return;
       }
 
       setMobileOpen(false);
     },
-    [lenis, prefersReducedMotion],
+    [lenis, prefersReducedMotion, pathname],
   );
 
   return (
@@ -356,35 +407,59 @@ export default function Navbar({ items, className }: NavbarProps) {
       role="navigation"
       aria-label="Main navigation"
     >
-      {/* ---- Logo ---- */}
-      <Link
-        href="/#home"
-        className={styles.logo}
-        onClick={(e) => handleNavClick(e, '/#home')}
-        aria-label="Prateeq Sharma — go to home"
-      >
-        <svg
-          className={styles.logoSvg}
-          viewBox="0 0 100 100"
-          width="100%"
-          height="100%"
-          xmlns="http://www.w3.org/2000/svg"
+      {/* ---- Brand / Logo ---- */}
+      <div className={styles.brandContainer}>
+        <Link
+          href={pathname?.startsWith('/rag') ? "/rag" : "/#home"}
+          className={styles.logo}
+          onClick={(e) => handleNavClick(e, pathname?.startsWith('/rag') ? '/rag' : '/#home')}
+          aria-label={pathname?.startsWith('/rag') ? "Retriever AI — go to RAG overview" : "Prateeq Sharma — go to home"}
         >
-          <circle cx="50" cy="50" r="38" className={styles.logoBg} />
-          <path d="M 26,45 L 32,50 L 26,55" fill="none" className={styles.logoTerminalPrompt} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-          <line x1="35" y1="55" x2="43" y2="55" className={styles.logoTerminalCursor} strokeWidth="3.5" strokeLinecap="round" />
-          <line x1="15" y1="72" x2="85" y2="72" className={styles.logoLine} strokeWidth="3.5" strokeLinecap="round" />
-          <path d="M 32,72 C 32,46 68,46 68,72" className={styles.logoGremlinBody} strokeWidth="3.5" />
-          <path d="M 32,48 L 12,38 Q 24,53 36,55" className={styles.logoGremlinEarLeft} strokeWidth="3" strokeLinejoin="round" />
-          <path d="M 68,48 L 88,38 Q 76,53 64,55" className={styles.logoGremlinEarRight} strokeWidth="3" strokeLinejoin="round" />
-          <circle cx="43" cy="58" r="6.5" className={styles.logoEye} />
-          <circle cx="45" cy="55.5" r="2.5" className={styles.logoPupil} />
-          <circle cx="57" cy="58" r="6.5" className={styles.logoEye} />
-          <circle cx="59" cy="55.5" r="2.5" className={styles.logoPupil} />
-          <ellipse cx="37" cy="63" rx="3.5" ry="2" className={styles.logoBlush} />
-          <ellipse cx="63" cy="63" rx="3.5" ry="2" className={styles.logoBlush} />
-        </svg>
-      </Link>
+          <svg
+            className={styles.logoSvg}
+            viewBox="0 0 100 100"
+            width="100%"
+            height="100%"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle cx="50" cy="50" r="38" className={styles.logoBg} />
+            <path d="M 26,45 L 32,50 L 26,55" fill="none" className={styles.logoTerminalPrompt} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+            <line x1="35" y1="55" x2="43" y2="55" className={styles.logoTerminalCursor} strokeWidth="3.5" strokeLinecap="round" />
+            <line x1="15" y1="72" x2="85" y2="72" className={styles.logoLine} strokeWidth="3.5" strokeLinecap="round" />
+            <path d="M 32,72 C 32,46 68,46 68,72" className={styles.logoGremlinBody} strokeWidth="3.5" />
+            <path d="M 32,48 L 12,38 Q 24,53 36,55" className={styles.logoGremlinEarLeft} strokeWidth="3" strokeLinejoin="round" />
+            <path d="M 68,48 L 88,38 Q 76,53 64,55" className={styles.logoGremlinEarRight} strokeWidth="3" strokeLinejoin="round" />
+            <circle cx="43" cy="58" r="6.5" className={styles.logoEye} />
+            <circle cx="45" cy="55.5" r="2.5" className={styles.logoPupil} />
+            <circle cx="57" cy="58" r="6.5" className={styles.logoEye} />
+            <circle cx="59" cy="55.5" r="2.5" className={styles.logoPupil} />
+            <ellipse cx="37" cy="63" rx="3.5" ry="2" className={styles.logoBlush} />
+            <ellipse cx="63" cy="63" rx="3.5" ry="2" className={styles.logoBlush} />
+          </svg>
+        </Link>
+
+        {pathname?.startsWith('/rag') && (
+          <div className={styles.ragBrandInfo}>
+            <div className={styles.ragWordmarkRow}>
+              <Link
+                href="/rag"
+                className={styles.ragWordmark}
+                onClick={(e) => handleNavClick(e, '/rag')}
+              >
+                RETRIEVER <span className={styles.ragWordmarkBadge}>AI</span>
+              </Link>
+            </div>
+            <Link
+              href="/"
+              className={styles.ragBackLink}
+              title="Return to main portfolio"
+              aria-label="Back to prateeq.in portfolio"
+            >
+              ← prateeq.in
+            </Link>
+          </div>
+        )}
+      </div>
 
       {/* ---- Right Side Controls Group ---- */}
       <div className={styles.rightGroup}>
@@ -413,15 +488,14 @@ export default function Navbar({ items, className }: NavbarProps) {
         {pathname?.startsWith('/rag') && (
           <Link
             href="/rag/app"
-            className="comic-btn comic-btn-blue"
-            style={{ padding: '0.35rem 0.85rem', fontSize: '0.8rem', whiteSpace: 'nowrap' }}
+            className={`comic-btn comic-btn-blue ${styles.ragLaunchBtn}`}
           >
             🚀 Launch App
           </Link>
         )}
 
         {/* ---- Communication Identity Toggle ---- */}
-        {audience && (
+        {audience && !pathname?.startsWith('/rag') && (
           <SegmentedToggle
             id="audience-toggle"
             options={audienceOptions}
@@ -442,14 +516,24 @@ export default function Navbar({ items, className }: NavbarProps) {
           ariaLabel={theme === 'light' ? 'Switch to Noir mode' : 'Switch to Azure mode'}
         />
 
-        {/* ---- Client Dashboard / Master Admin Link ---- */}
-        <Link
-          href={mounted && user && isAdminEmail(user.email) ? '/admin' : '/dashboard'}
-          className={`comic-btn comic-btn-outline ${styles.headerLoginBtn}`}
-          suppressHydrationWarning
-        >
-          {mounted && user ? (isAdminEmail(user.email) ? '🛡️ ADMIN' : '👤 DASHBOARD') : 'CLIENT LOGIN'}
-        </Link>
+        {/* ---- Client Dashboard / Master Admin / RAG Studio / Sign In Link ---- */}
+        {pathname?.startsWith('/rag') ? (
+          <Link
+            href={mounted && user ? (isAdminEmail(user.email) ? '/admin' : '/rag/app') : '/login?context=rag'}
+            className={`comic-btn comic-btn-outline ${styles.headerLoginBtn}`}
+            suppressHydrationWarning
+          >
+            {mounted && user ? (isAdminEmail(user.email) ? '🛡️ ADMIN' : '⚡ Studio') : 'Sign In'}
+          </Link>
+        ) : (
+          <Link
+            href={mounted && user && isAdminEmail(user.email) ? '/admin' : '/dashboard'}
+            className={`comic-btn comic-btn-outline ${styles.headerLoginBtn}`}
+            suppressHydrationWarning
+          >
+            {mounted && user ? (isAdminEmail(user.email) ? '🛡️ ADMIN' : '👤 DASHBOARD') : 'CLIENT LOGIN'}
+          </Link>
+        )}
 
         {/* ---- Hamburger ---- */}
         <button
@@ -486,7 +570,7 @@ export default function Navbar({ items, className }: NavbarProps) {
           </Link>
         ))}
 
-        {audience && (
+        {audience && !pathname?.startsWith('/rag') && (
           <div className={styles.mobileAudienceRow}>
             <span className={styles.mobileAudienceLabel}>Perspective:</span>
             <SegmentedToggle
@@ -500,15 +584,48 @@ export default function Navbar({ items, className }: NavbarProps) {
           </div>
         )}
 
-        <Link
-          href={mounted && user && isAdminEmail(user.email) ? '/admin' : '/dashboard'}
-          className="comic-btn comic-btn-outline"
-          style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem', marginTop: '0.5rem', width: '100%', maxWidth: '280px', textAlign: 'center', justifyContent: 'center' }}
-          onClick={() => setMobileOpen(false)}
-          suppressHydrationWarning
-        >
-          {mounted && user ? (isAdminEmail(user.email) ? '🛡️ ADMIN CONTROL' : '👤 CLIENT DASHBOARD') : 'CLIENT LOGIN'}
-        </Link>
+        {pathname?.startsWith('/rag') && (
+          <Link
+            href="/rag/app"
+            className="comic-btn comic-btn-blue"
+            style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem', marginTop: '0.5rem', width: '100%', maxWidth: '280px', textAlign: 'center', justifyContent: 'center' }}
+            onClick={() => setMobileOpen(false)}
+          >
+            🚀 Launch App
+          </Link>
+        )}
+
+        {pathname?.startsWith('/rag') ? (
+          <Link
+            href={mounted && user ? (isAdminEmail(user.email) ? '/admin' : '/rag/app') : '/login?context=rag'}
+            className="comic-btn comic-btn-outline"
+            style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem', marginTop: '0.5rem', width: '100%', maxWidth: '280px', textAlign: 'center', justifyContent: 'center' }}
+            onClick={() => setMobileOpen(false)}
+            suppressHydrationWarning
+          >
+            {mounted && user ? (isAdminEmail(user.email) ? '🛡️ ADMIN CONTROL' : '⚡ Studio') : 'Sign In'}
+          </Link>
+        ) : (
+          <Link
+            href={mounted && user && isAdminEmail(user.email) ? '/admin' : '/dashboard'}
+            className="comic-btn comic-btn-outline"
+            style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem', marginTop: '0.5rem', width: '100%', maxWidth: '280px', textAlign: 'center', justifyContent: 'center' }}
+            onClick={() => setMobileOpen(false)}
+            suppressHydrationWarning
+          >
+            {mounted && user ? (isAdminEmail(user.email) ? '🛡️ ADMIN CONTROL' : '👤 CLIENT DASHBOARD') : 'CLIENT LOGIN'}
+          </Link>
+        )}
+
+        {pathname?.startsWith('/rag') && (
+          <Link
+            href="/"
+            className={styles.mobileBackLink}
+            onClick={() => setMobileOpen(false)}
+          >
+            ← Back to prateeq.in
+          </Link>
+        )}
       </div>
     </nav>
   );
