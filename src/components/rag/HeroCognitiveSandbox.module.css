@@ -363,8 +363,104 @@
   animation: spin 0.6s linear infinite;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.stageSkeleton {
+  display: inline-block;
+  width: 50px;
+  height: 14px;
+  border-radius: 4px;
+  background: var(--surface-secondary);
+  animation: skeletonPulse 1.5s infinite ease-in-out;
+}
+
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.9; }
+}
+
+.skeletonChunk {
+  background: var(--surface-card);
+  border: var(--border-thin);
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.skeletonLineShort {
+  width: 30%;
+  height: 12px;
+  border-radius: 4px;
+  background: var(--surface-secondary);
+  animation: skeletonPulse 1.5s infinite ease-in-out;
+}
+
+.skeletonLineFull {
+  width: 100%;
+  height: 12px;
+  border-radius: 4px;
+  background: var(--surface-secondary);
+  animation: skeletonPulse 1.5s infinite ease-in-out;
+}
+
+.skeletonLineMedium {
+  width: 75%;
+  height: 12px;
+  border-radius: 4px;
+  background: var(--surface-secondary);
+  animation: skeletonPulse 1.5s infinite ease-in-out;
+}
+
+.errorNotice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: var(--color-text);
+  font-size: 0.825rem;
+  flex-wrap: wrap;
+}
+
+.errorIcon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.errorText {
+  flex: 1;
+  min-width: 200px;
+}
+
+.retryBtn {
+  background: var(--surface-card);
+  border: var(--border-thin);
+  border-radius: 6px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.retryBtn:hover {
+  background: var(--surface-elevated);
+  border-color: var(--color-link);
+}
+
+.emptyResults {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 0.825rem;
+  font-style: italic;
+  background: var(--surface-secondary);
+  border-radius: 8px;
+  border: var(--border-thin);
 }
 
 @media (max-width: 640px) {

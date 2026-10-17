@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { m } from "framer-motion";
 import MagneticButton from "@/components/ui/MagneticButton";
 import styles from "./HeroCognitiveSandbox.module.css";
@@ -16,6 +16,12 @@ interface SearchResultItem {
   };
 }
 
+interface SearchStages {
+  embeddingMs?: number;
+  searchMs?: number;
+  fusionMs?: number;
+}
+
 interface SearchResponseDto {
   query: string;
   results: SearchResultItem[];
@@ -24,7 +30,18 @@ interface SearchResponseDto {
     totalCandidates?: number;
     returnedResults?: number;
     durationMs?: number;
+    stages?: SearchStages;
   };
+}
+
+interface SandboxTelemetry {
+  strategy: string;
+  serverDurationMs: number;
+  clientTransitMs: number;
+  totalDurationMs: number;
+  stages?: SearchStages;
+  totalCandidates: number;
+  returnedResults: number;
 }
 
 const PRESET_QUERIES = [
@@ -41,103 +58,226 @@ const SCOPING_API_KEY =
   process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_API_KEY ||
   "ret_live_ScopingGuest2026.ReadOnlyChat";
 
+function formatStrategy(strategy: string): string {
+  switch (strategy) {
+    case "exact_cache_hit":
+      return "EXACT REDIS CACHE HIT";
+    case "semantic_cache_hit":
+      return "SEMANTIC CACHE HIT";
+    case "hybrid_fusion_rrf":
+      return "HYBRID HNSW + BM25 FUSION";
+    case "vector_only_degraded_reranked":
+      return "VECTOR HNSW + COLBERT RERANK";
+    case "vector_only_degraded":
+      return "VECTOR DEGRADED (FALLBACK)";
+    default:
+      return strategy.replace(/_/g, " ").toUpperCase();
+  }
+}
+
+function parseChunkSourceAndContent(
+  rawContent: string,
+  metadata?: { filename?: string; section_title?: string }
+) {
+  let filename = metadata?.filename;
+  const sectionTitle = metadata?.section_title;
+  let cleanContent = rawContent;
+
+  const docMatch = cleanContent.match(/^\[Document:\s*([^\]]+)\]\s*\n?/);
+  if (docMatch) {
+    if (!filename) {
+      filename = docMatch[1].trim();
+    }
+    cleanContent = cleanContent.slice(docMatch[0].length);
+  }
+
+  return {
+    filename: filename || "source_knowledge.md",
+    sectionTitle,
+    content: cleanContent,
+  };
+}
+
 export function HeroCognitiveSandbox() {
   const [query, setQuery] = useState(PRESET_QUERIES[0]);
   const [mode, setMode] = useState<"hybrid" | "cache" | "graph" | "crag">("hybrid");
-  const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<SearchResultItem[]>([
-    {
-      chunkId: "70c303a5-d0fe-4ab7-871e-7046f745ad94",
-      documentId: "4eeb81bf-6ec9-43eb-b924-3f1105b3d4cc",
-      content:
-        "1. Production Tech Stack: Next.js 16 App Router (React 19), TypeScript, Tailwind CSS / CSS Modules, Supabase PostgreSQL (RLS, pgvector), Vercel Serverless Edge, and Python FastAPI backend on Oracle Cloud.\n2. Transparent Economics: Fixed-scope, productized deliverables with zero surprise invoices. Clear milestone structures (50% upfront deposit / 50% upon deployment sign-off, or 40/30/30 for enterprise builds).",
-      score: 6.787,
-      metadata: {
-        filename: "PRATEEQ_ENGINEERING_CATALOG_SOW_KNOWLEDGE.md",
-        section_title: "1. Core Engineering Philosophy & Delivery Standards",
-      },
-    },
-  ]);
-  const [telemetry, setTelemetry] = useState({
-    strategy: "hybrid_fusion_rrf",
-    durationMs: 14.2,
-    embeddingMs: 1.2,
-    denseSearchMs: 8.4,
-    rrfFusionMs: 2.1,
-    cragConfidence: 0.982,
-    totalCandidates: 3,
-    returnedResults: 1,
-  });
+  const [loading, setLoading] = useState(true);
+  const [results, setResults] = useState<SearchResultItem[]>([]);
+  const [telemetry, setTelemetry] = useState<SandboxTelemetry | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleExecuteSearch = async (targetQuery: string) => {
-    setLoading(true);
-    // eslint-disable-next-line react-hooks/purity
-    const startTime = performance.now();
+  const handleExecuteSearch = useCallback(
+    async (
+      targetQuery: string,
+      targetMode: "hybrid" | "cache" | "graph" | "crag" = mode
+    ) => {
+      setLoading(true);
+      setErrorMessage(null);
+      const startTime = performance.now();
 
-    try {
-      // Dispatches to production Retriever tenant endpoint (dogfooding scoping tenant)
-      const res = await fetch(
-        `https://rag.prateeq.in/v1/tenants/${SCOPING_TENANT_ID}/search`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${SCOPING_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            query: targetQuery,
-            limit: 2,
-            enable_hybrid: mode === "hybrid" || mode === "crag",
-            enable_colbert_rerank: mode === "graph",
-          }),
+      try {
+        const res = await fetch(
+          `https://rag.prateeq.in/v1/tenants/${SCOPING_TENANT_ID}/search`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${SCOPING_API_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              query: targetQuery,
+              limit: 2,
+              enable_hybrid: targetMode === "hybrid" || targetMode === "crag",
+              enable_colbert_rerank: targetMode === "graph",
+            }),
+          }
+        );
+
+        const elapsed = Math.round((performance.now() - startTime) * 10) / 10;
+
+        if (!res.ok) {
+          throw new Error(`Search request failed with status ${res.status}`);
         }
-      );
 
-      // eslint-disable-next-line react-hooks/purity
-      const elapsed = Math.round((performance.now() - startTime) * 10) / 10;
-
-      if (res.ok) {
         const data: SearchResponseDto = await res.json();
+        const serverDuration = data.searchMeta?.durationMs ?? 0;
+        const transitMs = Math.max(
+          0,
+          Math.round((elapsed - serverDuration) * 10) / 10
+        );
+
         if (data.results && data.results.length > 0) {
           setResults(data.results);
-          const isCache = data.searchMeta?.strategy === "semantic_cache_hit";
           setTelemetry({
-            strategy: data.searchMeta?.strategy || (isCache ? "semantic_cache_hit" : "hybrid_fusion_rrf"),
-            durationMs: isCache ? 0.0 : elapsed,
-            embeddingMs: isCache ? 0.0 : 1.2,
-            denseSearchMs: isCache ? 0.0 : Math.round(elapsed * 0.6 * 10) / 10,
-            rrfFusionMs: isCache ? 0.0 : Math.round(elapsed * 0.15 * 10) / 10,
-            cragConfidence: 0.984,
-            totalCandidates: data.searchMeta?.totalCandidates || data.results.length,
+            strategy:
+              data.searchMeta?.strategy ||
+              (targetMode === "cache"
+                ? "exact_cache_hit"
+                : "hybrid_fusion_rrf"),
+            serverDurationMs: Math.round(serverDuration * 10) / 10,
+            clientTransitMs: transitMs,
+            totalDurationMs: elapsed,
+            stages: data.searchMeta?.stages,
+            totalCandidates:
+              data.searchMeta?.totalCandidates || data.results.length,
             returnedResults: data.results.length,
           });
+        } else {
+          setResults([]);
+          setTelemetry({
+            strategy: data.searchMeta?.strategy || "hybrid_fusion_rrf",
+            serverDurationMs: Math.round(serverDuration * 10) / 10,
+            clientTransitMs: transitMs,
+            totalDurationMs: elapsed,
+            stages: data.searchMeta?.stages,
+            totalCandidates: data.searchMeta?.totalCandidates || 0,
+            returnedResults: 0,
+          });
+        }
+      } catch {
+        setErrorMessage(
+          "Cognitive engine at rag.prateeq.in unreachable. Check connection."
+        );
+        setTelemetry(null);
+        setResults([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [mode]
+  );
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function fetchInitialQuery() {
+      const startTime = performance.now();
+      try {
+        const res = await fetch(
+          `https://rag.prateeq.in/v1/tenants/${SCOPING_TENANT_ID}/search`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${SCOPING_API_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              query: PRESET_QUERIES[0],
+              limit: 2,
+              enable_hybrid: true,
+            }),
+          }
+        );
+
+        const elapsed = Math.round((performance.now() - startTime) * 10) / 10;
+        if (!res.ok) {
+          throw new Error(`Search request failed with status ${res.status}`);
+        }
+        const data: SearchResponseDto = await res.json();
+        if (ignore) return;
+
+        const serverDuration = data.searchMeta?.durationMs ?? 0;
+        const transitMs = Math.max(
+          0,
+          Math.round((elapsed - serverDuration) * 10) / 10
+        );
+
+        if (data.results && data.results.length > 0) {
+          setResults(data.results);
+          setTelemetry({
+            strategy: data.searchMeta?.strategy || "hybrid_fusion_rrf",
+            serverDurationMs: Math.round(serverDuration * 10) / 10,
+            clientTransitMs: transitMs,
+            totalDurationMs: elapsed,
+            stages: data.searchMeta?.stages,
+            totalCandidates:
+              data.searchMeta?.totalCandidates || data.results.length,
+            returnedResults: data.results.length,
+          });
+        } else {
+          setResults([]);
+          setTelemetry({
+            strategy: data.searchMeta?.strategy || "hybrid_fusion_rrf",
+            serverDurationMs: Math.round(serverDuration * 10) / 10,
+            clientTransitMs: transitMs,
+            totalDurationMs: elapsed,
+            stages: data.searchMeta?.stages,
+            totalCandidates: data.searchMeta?.totalCandidates || 0,
+            returnedResults: 0,
+          });
+        }
+      } catch {
+        if (!ignore) {
+          setErrorMessage(
+            "Cognitive engine at rag.prateeq.in unreachable. Check connection."
+          );
+          setTelemetry(null);
+          setResults([]);
+        }
+      } finally {
+        if (!ignore) {
           setLoading(false);
-          return;
         }
       }
-    } catch {
-      // Network fallback
     }
 
-    // Verified fallback display
-    // eslint-disable-next-line react-hooks/purity
-    const elapsed = Math.round((performance.now() - startTime) * 10) / 10;
-    setTelemetry({
-      strategy: mode === "cache" ? "semantic_cache_hit" : "hybrid_hnsw_bm25",
-      durationMs: mode === "cache" ? 0.0 : (elapsed > 0 ? elapsed : 16.4),
-      embeddingMs: mode === "cache" ? 0.0 : 1.2,
-      denseSearchMs: mode === "cache" ? 0.0 : 9.1,
-      rrfFusionMs: mode === "cache" ? 0.0 : 2.3,
-      cragConfidence: 0.978,
-      totalCandidates: 3,
-      returnedResults: results.length,
-    });
-    setLoading(false);
-  };
+    fetchInitialQuery();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const handleSelectPill = (q: string) => {
     setQuery(q);
     handleExecuteSearch(q);
+  };
+
+  const handleSelectMode = (
+    newMode: "hybrid" | "cache" | "graph" | "crag"
+  ) => {
+    setMode(newMode);
+    handleExecuteSearch(query, newMode);
   };
 
   return (
@@ -158,7 +298,7 @@ export function HeroCognitiveSandbox() {
         <div className={styles.modeTabs}>
           <button
             className={`${styles.modeTab} ${mode === "hybrid" ? styles.modeTabActive : ""}`}
-            onClick={() => setMode("hybrid")}
+            onClick={() => handleSelectMode("hybrid")}
           >
             {mode === "hybrid" && (
               <m.span
@@ -171,7 +311,7 @@ export function HeroCognitiveSandbox() {
           </button>
           <button
             className={`${styles.modeTab} ${mode === "cache" ? styles.modeTabActive : ""}`}
-            onClick={() => setMode("cache")}
+            onClick={() => handleSelectMode("cache")}
           >
             {mode === "cache" && (
               <m.span
@@ -184,7 +324,7 @@ export function HeroCognitiveSandbox() {
           </button>
           <button
             className={`${styles.modeTab} ${mode === "graph" ? styles.modeTabActive : ""}`}
-            onClick={() => setMode("graph")}
+            onClick={() => handleSelectMode("graph")}
           >
             {mode === "graph" && (
               <m.span
@@ -197,7 +337,7 @@ export function HeroCognitiveSandbox() {
           </button>
           <button
             className={`${styles.modeTab} ${mode === "crag" ? styles.modeTabActive : ""}`}
-            onClick={() => setMode("crag")}
+            onClick={() => handleSelectMode("crag")}
           >
             {mode === "crag" && (
               <m.span
@@ -264,37 +404,93 @@ export function HeroCognitiveSandbox() {
           ))}
         </div>
 
+        {/* Connection Notice banner on failure */}
+        {errorMessage && (
+          <div className={styles.errorNotice} role="alert">
+            <span className={styles.errorIcon}>⚠️</span>
+            <div className={styles.errorText}>
+              <strong>Connection Notice:</strong> {errorMessage}
+            </div>
+            <button
+              type="button"
+              className={styles.retryBtn}
+              onClick={() => handleExecuteSearch(query)}
+            >
+              🔄 Retry
+            </button>
+          </div>
+        )}
+
         {/* 3. Live Pipeline Waterfall */}
         <div className={styles.waterfallCard}>
           <div className={styles.waterfallHeader}>
-            <span>RETRIEVAL PIPELINE STAGES</span>
+            <span>
+              RETRIEVAL PIPELINE STAGES
+              {telemetry ? ` • ${formatStrategy(telemetry.strategy)}` : ""}
+            </span>
             <span className={styles.waterfallBadge}>
-              {telemetry.durationMs === 0 ? "⚡ 0.0ms (Cache Hit)" : `⚡ ${telemetry.durationMs}ms Total`}
+              {loading
+                ? "⚡ Executing Pipeline..."
+                : telemetry
+                  ? telemetry.strategy === "exact_cache_hit"
+                    ? `⚡ ${telemetry.serverDurationMs}ms (Cache Hit)`
+                    : `⚡ ${telemetry.serverDurationMs}ms Server (${telemetry.totalDurationMs}ms Total)`
+                  : "Offline"}
             </span>
           </div>
           <div className={styles.waterfallStages}>
             <div className={styles.stageItem}>
               <span className={styles.stageName}>1. Embedding (Ollama)</span>
               <span className={styles.stageValue}>
-                {telemetry.durationMs === 0 ? "0.0 ms" : `${telemetry.embeddingMs} ms`}
+                {loading ? (
+                  <span className={styles.stageSkeleton} />
+                ) : telemetry?.strategy === "exact_cache_hit" ? (
+                  "0.0 ms (cached)"
+                ) : telemetry?.stages?.embeddingMs != null ? (
+                  `${telemetry.stages.embeddingMs.toFixed(1)} ms`
+                ) : (
+                  "—"
+                )}
               </span>
             </div>
             <div className={styles.stageItem}>
               <span className={styles.stageName}>2. HNSW + BM25</span>
               <span className={styles.stageValue}>
-                {telemetry.durationMs === 0 ? "0.0 ms" : `${telemetry.denseSearchMs} ms`}
+                {loading ? (
+                  <span className={styles.stageSkeleton} />
+                ) : telemetry?.strategy === "exact_cache_hit" ? (
+                  "0.0 ms (cached)"
+                ) : telemetry?.stages?.searchMs != null ? (
+                  `${telemetry.stages.searchMs.toFixed(1)} ms`
+                ) : (
+                  "—"
+                )}
               </span>
             </div>
             <div className={styles.stageItem}>
               <span className={styles.stageName}>3. RRF Fusion (k=60)</span>
               <span className={styles.stageValue}>
-                {telemetry.durationMs === 0 ? "0.0 ms" : `${telemetry.rrfFusionMs} ms`}
+                {loading ? (
+                  <span className={styles.stageSkeleton} />
+                ) : telemetry?.strategy === "exact_cache_hit" ? (
+                  "0.0 ms (cached)"
+                ) : telemetry?.stages?.fusionMs != null ? (
+                  `${telemetry.stages.fusionMs.toFixed(1)} ms`
+                ) : (
+                  "—"
+                )}
               </span>
             </div>
             <div className={styles.stageItem}>
-              <span className={styles.stageName}>4. CRAG Relevance</span>
-              <span className={styles.stageValue} style={{ color: "var(--pop-green, #22c55e)" }}>
-                {telemetry.cragConfidence} (High)
+              <span className={styles.stageName}>4. Network Transit</span>
+              <span className={styles.stageValue}>
+                {loading ? (
+                  <span className={styles.stageSkeleton} />
+                ) : telemetry ? (
+                  `${telemetry.clientTransitMs.toFixed(1)} ms`
+                ) : (
+                  "—"
+                )}
               </span>
             </div>
           </div>
@@ -303,26 +499,46 @@ export function HeroCognitiveSandbox() {
         {/* 4. Retrieved Chunks with Verified Citations */}
         <div className={styles.resultsArea}>
           <div className={styles.resultsTitle}>
-            <span>📄 Grounded Evidence Chunks</span>
-            <span className={styles.chunkScoreBadge}>
-              Top Score: {results[0]?.score ? results[0].score.toFixed(3) : "6.787"}
-            </span>
+            <span>📄 Grounded Evidence Chunks ({results.length})</span>
+            {results.length > 0 && results[0]?.score != null && (
+              <span className={styles.chunkScoreBadge}>
+                Top Score: {results[0].score.toFixed(3)}
+              </span>
+            )}
           </div>
 
-          {results.map((chunk, idx) => (
-            <div key={idx} className={styles.chunkCard}>
-              <div className={styles.chunkHeader}>
-                <span className={styles.chunkSource}>
-                  📂 {chunk.metadata?.filename || "source_knowledge.md"}
-                  {chunk.metadata?.section_title && ` • ${chunk.metadata.section_title}`}
-                </span>
-                <span className={styles.chunkScoreBadge}>
-                  Score: {chunk.score.toFixed(3)}
-                </span>
-              </div>
-              <div className={styles.chunkContent}>{chunk.content}</div>
+          {loading ? (
+            <div className={styles.skeletonChunk}>
+              <div className={styles.skeletonLineShort} />
+              <div className={styles.skeletonLineFull} />
+              <div className={styles.skeletonLineMedium} />
             </div>
-          ))}
+          ) : results.length > 0 ? (
+            results.map((chunk, idx) => {
+              const parsed = parseChunkSourceAndContent(
+                chunk.content,
+                chunk.metadata
+              );
+              return (
+                <div key={chunk.chunkId || idx} className={styles.chunkCard}>
+                  <div className={styles.chunkHeader}>
+                    <span className={styles.chunkSource}>
+                      📂 {parsed.filename}
+                      {parsed.sectionTitle && ` • ${parsed.sectionTitle}`}
+                    </span>
+                    <span className={styles.chunkScoreBadge}>
+                      Score: {chunk.score.toFixed(3)}
+                    </span>
+                  </div>
+                  <div className={styles.chunkContent}>{parsed.content}</div>
+                </div>
+              );
+            })
+          ) : !errorMessage ? (
+            <div className={styles.emptyResults}>
+              No matching chunks returned from index. Try another query above.
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

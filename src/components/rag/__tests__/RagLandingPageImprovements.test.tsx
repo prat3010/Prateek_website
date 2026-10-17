@@ -1,9 +1,34 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { HeroCognitiveSandbox } from "../HeroCognitiveSandbox";
 import { PricingSection } from "../PricingSection";
 import RagLandingPage from "@/app/rag/page";
+
+const mockSearchResponse = {
+  query: "What are the payment terms, milestone split, and deliverable standards for a SaaS build?",
+  results: [
+    {
+      chunkId: "84348cd0-7d0e-4700-9ad8-5c3b7f9a5a56",
+      documentId: "6faee03a-3cf1-4e10-9684-ea29bd3f3513",
+      content:
+        "[Document: 04_commercial_governance_and_sow.md]\n1. **50/50 Milestone Escrow Structure:**\n- 50% Upfront Deposit: Required prior to initiating development.",
+      score: 6.528,
+      metadata: {},
+    },
+  ],
+  searchMeta: {
+    strategy: "exact_cache_hit",
+    totalCandidates: 2,
+    returnedResults: 1,
+    durationMs: 14.2,
+    stages: {
+      embeddingMs: 0.0,
+      searchMs: 0.0,
+      fusionMs: 0.0,
+    },
+  },
+};
 
 // Mocks
 const mockPush = vi.fn();
@@ -83,15 +108,57 @@ describe("RAG Landing Page Improvements", () => {
       loading: false,
       getAccessToken: vi.fn().mockResolvedValue(null),
     });
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => mockSearchResponse,
+    });
   });
 
   describe("HeroCognitiveSandbox", () => {
-    it("renders the live tenant context pill above preset pills", () => {
+    it("renders the live tenant context pill and performs live query on mount", async () => {
       render(<HeroCognitiveSandbox />);
+
       expect(
         screen.getByText("Querying Live Index: Prateeq Engineering SOW & Scoping Knowledge")
       ).toBeInTheDocument();
       expect(screen.getByText("LIVE COGNITIVE REPL • rag.prateeq.in")).toBeInTheDocument();
+
+      await waitFor(() => {
+        expect(global.fetch).toHaveBeenCalledWith(
+          expect.stringContaining("/search"),
+          expect.objectContaining({
+            method: "POST",
+          })
+        );
+      });
+
+      await waitFor(() => {
+        // Source filename parsed from [Document: ...]
+        expect(screen.getByText(/04_commercial_governance_and_sow.md/)).toBeInTheDocument();
+        // Top score rendered from real result
+        expect(screen.getByText(/Top Score: 6.528/)).toBeInTheDocument();
+        // Server telemetry strategy
+        expect(screen.getByText(/EXACT REDIS CACHE HIT/)).toBeInTheDocument();
+      });
+    });
+
+    it("displays honest connection notice and retry button on fetch failure without fake numbers", async () => {
+      global.fetch = vi.fn().mockRejectedValue(new Error("Network connection lost"));
+
+      render(<HeroCognitiveSandbox />);
+
+      await waitFor(() => {
+        expect(screen.getByRole("alert")).toBeInTheDocument();
+        expect(
+          screen.getByText(/Cognitive engine at rag.prateeq.in unreachable. Check connection./)
+        ).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /retry/i })).toBeInTheDocument();
+      });
+
+      // Assert that synthetic fallback values are NOT present
+      expect(screen.queryByText("16.4ms")).toBeNull();
+      expect(screen.queryByText("0.978 (High)")).toBeNull();
     });
   });
 
@@ -121,14 +188,16 @@ describe("RAG Landing Page Improvements", () => {
   });
 
   describe("RagLandingPage layout & stats strip", () => {
-    it("delegates section navigation to main Navbar without rendering duplicate in-page nav", () => {
+    it("delegates section navigation to main Navbar without rendering duplicate in-page nav", async () => {
       render(<RagLandingPage />);
+      await waitFor(() => expect(global.fetch).toHaveBeenCalled());
 
       expect(screen.queryByRole("navigation", { name: /quick page navigation/i })).toBeNull();
     });
 
-    it("renders Hero Micro-Stats Strip with all production metrics", () => {
+    it("renders Hero Micro-Stats Strip with all production metrics", async () => {
       render(<RagLandingPage />);
+      await waitFor(() => expect(global.fetch).toHaveBeenCalled());
 
       expect(screen.getByText("⚡ 14.8ms Median Latency")).toBeInTheDocument();
       expect(screen.getByText("🔒 PostgreSQL RLS Multi-Tenancy")).toBeInTheDocument();
@@ -136,8 +205,9 @@ describe("RAG Landing Page Improvements", () => {
       expect(screen.getByText("📦 1-Line Drop-In Script")).toBeInTheDocument();
     });
 
-    it("routes unauthenticated Hero CTA to unified login with rag context", () => {
+    it("routes unauthenticated Hero CTA to unified login with rag context", async () => {
       render(<RagLandingPage />);
+      await waitFor(() => expect(global.fetch).toHaveBeenCalled());
 
       const heroCta = screen.getByRole("link", { name: /start free sandbox/i });
       expect(heroCta).toHaveAttribute(
@@ -146,7 +216,7 @@ describe("RAG Landing Page Improvements", () => {
       );
     });
 
-    it("routes authenticated Hero CTA directly to app studio", () => {
+    it("routes authenticated Hero CTA directly to app studio", async () => {
       mockUseAuth.mockReturnValue({
         user: { id: "test-user-id", email: "tester@example.com" },
         loading: false,
@@ -154,14 +224,16 @@ describe("RAG Landing Page Improvements", () => {
       });
 
       render(<RagLandingPage />);
+      await waitFor(() => expect(global.fetch).toHaveBeenCalled());
 
       const heroCta = screen.getByRole("link", { name: /start free sandbox/i });
       expect(heroCta).toHaveAttribute("href", "/rag/app?onboarding=true");
     });
 
-    it("handles hero secondary CTA click by updating history hash and scrolling to #sandbox-demo", () => {
+    it("handles hero secondary CTA click by updating history hash and scrolling to #sandbox-demo", async () => {
       const replaceStateSpy = vi.spyOn(window.history, "replaceState");
       render(<RagLandingPage />);
+      await waitFor(() => expect(global.fetch).toHaveBeenCalled());
 
       const demoCta = screen.getByRole("link", { name: /💬 test live dogfooding sandbox/i });
       fireEvent.click(demoCta);
@@ -177,6 +249,7 @@ describe("RAG Landing Page Improvements", () => {
       window.location.hash = "#benchmarks";
 
       render(<RagLandingPage />);
+      await waitFor(() => expect(global.fetch).toHaveBeenCalled());
 
       // Wait for the hash timer (50ms) to fire wrapped in act
       await React.act(async () => {
