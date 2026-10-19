@@ -5,6 +5,7 @@ import { isAdminEmail } from '@/lib/auth';
 import {
   sendAdminScopeSavedNotification,
   sendAdminOnboardingCompletedNotification,
+  sendClientMilestoneStageAdvancedNotification,
 } from '@/lib/emailNotification';
 import { saveScopeSchema } from '@/lib/clientOrder';
 import { recalculateCanonicalScopeQuote, type PromoDiscountInfo } from '@/lib/pricing';
@@ -55,7 +56,7 @@ export async function POST(req: Request) {
     // Check existing in normalized table first so we know ownership & prior state
     const { data: existingScope, error: selectErr } = await supabase
       .from('client_scopes')
-      .select('id, scope_code, client_email, base_engine, total_cost_inr, signed_at, onboarding_checklist')
+      .select('id, scope_code, client_email, company_name, base_engine, total_cost_inr, signed_at, onboarding_checklist, delivery_stage')
       .eq('scope_code', scopeCode)
       .maybeSingle();
 
@@ -270,6 +271,27 @@ export async function POST(req: Request) {
           totalCostUSD: Number(scopeData.total_cost_usd),
         }).catch((err) => console.warn('Failed to send admin scope saved notification:', err));
       }
+    }
+
+    // Dispatch stage advancement alert to client if operator transitioned delivery stage
+    const previousDeliveryStage = (existingScope?.delivery_stage || 'architecture').toLowerCase();
+    const newDeliveryStage = (typeof rawObj.deliveryStage === 'string' ? rawObj.deliveryStage : '').toLowerCase();
+    const isStageAdvanced = isAdmin && Boolean(newDeliveryStage) && newDeliveryStage !== previousDeliveryStage;
+
+    if (isStageAdvanced) {
+      const deliv = (rawObj.deliverables && typeof rawObj.deliverables === 'object')
+        ? (rawObj.deliverables as Record<string, unknown>)
+        : {};
+      sendClientMilestoneStageAdvancedNotification({
+        clientEmail,
+        companyName: String(scopeData.company_name || existingScope?.company_name || scopeCode),
+        scopeCode,
+        previousStage: previousDeliveryStage,
+        newStage: newDeliveryStage,
+        stagingUrl: typeof deliv.staging_url === 'string' ? deliv.staging_url : undefined,
+        productionUrl: typeof deliv.production_url === 'string' ? deliv.production_url : undefined,
+        githubRepo: typeof deliv.github_repo === 'string' ? deliv.github_repo : undefined,
+      }).catch((err) => console.warn('Failed to send stage advancement notification:', err));
     }
 
     return NextResponse.json({

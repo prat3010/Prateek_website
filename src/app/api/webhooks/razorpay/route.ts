@@ -5,6 +5,7 @@ import { resolvePlanSpec } from '@/app/api/client/create-razorpay-subscription/r
 import {
   sendPaymentConfirmationNotifications,
   sendRetrieverSubscriptionNotifications,
+  sendFinalBalanceSettlementNotifications,
 } from '@/lib/emailNotification';
 import { ensureRetrieverEngineTenant } from '@/lib/retrieverProvision';
 
@@ -182,6 +183,9 @@ export async function POST(req: Request) {
         deposit_paid?: boolean;
         balance_paid?: boolean;
       } | null = null;
+      let isBalanceMilestone = false;
+      let isFullMilestone = false;
+      let isChangeOrder = false;
 
       if (invoice.scope_id) {
         let sowHash = '';
@@ -207,7 +211,6 @@ export async function POST(req: Request) {
           console.warn('Could not generate SOW hash on payment capture:', hashErr);
         }
 
-        let isChangeOrder = false;
         // Check if this invoice settles a Change Order
         try {
           const { data: coRow } = await supabase
@@ -244,12 +247,12 @@ export async function POST(req: Request) {
         } catch {}
 
         const milestoneLower = (invoice.milestone_name || '').toLowerCase();
-        const isBalanceMilestone =
+        isBalanceMilestone =
           milestoneLower.includes('balance') ||
           milestoneLower.includes('final') ||
           (Boolean(targetScopeRow?.deposit_paid) && !isChangeOrder);
 
-        const isFullMilestone =
+        isFullMilestone =
           milestoneLower.includes('100%') ||
           milestoneLower.includes('full project');
 
@@ -307,6 +310,37 @@ export async function POST(req: Request) {
             currency: invoice.currency || targetScopeRow?.currency || 'INR',
             paymentId: razorpayPaymentId,
           }).catch((err) => console.warn('Webhook payment notification warning:', err));
+
+          if (targetScopeRow && (isBalanceMilestone || isFullMilestone) && !isChangeOrder) {
+            (async () => {
+              let delivRow: { production_url?: string; github_repo?: string; figma_url?: string } | null = null;
+              if (invoice.scope_id) {
+                try {
+                  const { data } = await supabase
+                    .from('project_deliverables')
+                    .select('production_url, github_repo, figma_url')
+                    .eq('scope_id', invoice.scope_id)
+                    .maybeSingle();
+                  delivRow = data;
+                } catch {}
+              }
+
+              await sendFinalBalanceSettlementNotifications({
+                clientEmail: notifyEmail,
+                clientName: invoice.customer_name || targetScopeRow.company_name,
+                companyName: targetScopeRow.company_name || 'Your Project',
+                scopeCode: targetScopeRow.scope_code || '',
+                invoiceNumber: invoice.invoice_number,
+                amount: Number(invoice.amount) || 0,
+                currency: invoice.currency || targetScopeRow.currency || 'INR',
+                paymentId: razorpayPaymentId,
+                productionUrl: delivRow?.production_url || undefined,
+                githubRepo: delivRow?.github_repo || undefined,
+                figmaUrl: delivRow?.figma_url || undefined,
+                maintenancePlan: targetScopeRow.maintenance_plan,
+              });
+            })().catch((err) => console.warn('Webhook final balance settlement notification warning:', err));
+          }
         }
     } else if (
       event === 'subscription.charged' ||

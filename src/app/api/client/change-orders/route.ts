@@ -2,7 +2,10 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
 import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
 import { isAdminEmail } from '@/lib/auth';
-import { sendAdminChangeOrderNotification } from '@/lib/emailNotification';
+import {
+  sendAdminChangeOrderNotification,
+  sendClientChangeOrderUpdateNotification,
+} from '@/lib/emailNotification';
 import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
 import type { FeatureItem } from '@/data/resume';
 
@@ -248,6 +251,39 @@ export async function PATCH(req: Request) {
 
     const nowIso = new Date().toISOString();
 
+    // Look up linked scope details to enrich client notifications
+    let linkedScope: { scope_code?: string; company_name?: string; client_email?: string } | null = null;
+    if (co.scope_id) {
+      try {
+        const { data: s } = await supabase
+          .from('client_scopes')
+          .select('scope_code, company_name, client_email')
+          .eq('id', co.scope_id)
+          .maybeSingle();
+        linkedScope = s;
+      } catch (err) {
+        console.warn('Failed to fetch linked scope for change order alert:', err);
+      }
+    }
+
+    const notifyClient = (actionType: 'approve' | 'reject' | 'mark_paid') => {
+      const notifyEmail = co.requested_by_email || linkedScope?.client_email;
+      if (notifyEmail) {
+        sendClientChangeOrderUpdateNotification({
+          clientEmail: notifyEmail,
+          companyName: linkedScope?.company_name || 'Your Project',
+          scopeCode: linkedScope?.scope_code || '',
+          changeOrderNumber: co.change_order_number,
+          action: actionType,
+          addedFeatures: Array.isArray(co.added_features) ? co.added_features : [],
+          removedFeatures: Array.isArray(co.removed_features) ? co.removed_features : [],
+          priceDeltaINR: Number(co.price_delta_inr || 0),
+          priceDeltaUSD: Number(co.price_delta_usd || 0),
+          invoiceId: co.invoice_id || undefined,
+        }).catch((err) => console.warn('Client change order notification warning:', err));
+      }
+    };
+
     if (action === 'approve') {
       const { data: updatedCo, error: upErr } = await supabase
         .from('scope_change_orders')
@@ -257,6 +293,7 @@ export async function PATCH(req: Request) {
         .single();
 
       if (upErr) return NextResponse.json({ error: upErr.message }, { status: 500 });
+      notifyClient('approve');
       return NextResponse.json({ success: true, changeOrder: updatedCo });
     }
 
@@ -279,6 +316,7 @@ export async function PATCH(req: Request) {
           .neq('payment_status', 'paid');
       }
 
+      notifyClient('reject');
       return NextResponse.json({ success: true, changeOrder: updatedCo });
     }
 
@@ -333,6 +371,7 @@ export async function PATCH(req: Request) {
         }
       }
 
+      notifyClient('mark_paid');
       return NextResponse.json({ success: true, changeOrder: updatedCo });
     }
 

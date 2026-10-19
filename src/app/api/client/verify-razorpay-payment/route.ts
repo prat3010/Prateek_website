@@ -2,7 +2,10 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { supabase } from '@/data/supabase';
 import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
-import { sendPaymentConfirmationNotifications } from '@/lib/emailNotification';
+import {
+  sendPaymentConfirmationNotifications,
+  sendFinalBalanceSettlementNotifications,
+} from '@/lib/emailNotification';
 
 export async function POST(req: Request) {
   try {
@@ -70,11 +73,12 @@ export async function POST(req: Request) {
       features?: string[];
       total_cost_inr?: number;
       total_cost_usd?: number;
+      maintenance_plan?: string;
     } | null = null;
     if (scopeCode) {
       const { data: scopeData, error: scopeError } = await supabase
         .from('client_scopes')
-        .select('id, deposit_paid, scope_code, company_name, features, total_cost_inr, total_cost_usd')
+        .select('id, deposit_paid, scope_code, company_name, features, total_cost_inr, total_cost_usd, maintenance_plan')
         .eq('scope_code', scopeCode)
         .eq('client_email', clientEmail)
         .maybeSingle();
@@ -144,7 +148,7 @@ export async function POST(req: Request) {
     if (!scope && invoice?.scope_id) {
       const { data: linkedScope } = await supabase
         .from('client_scopes')
-        .select('id, deposit_paid, scope_code, company_name, features, total_cost_inr, total_cost_usd')
+        .select('id, deposit_paid, scope_code, company_name, features, total_cost_inr, total_cost_usd, maintenance_plan')
         .eq('id', invoice.scope_id)
         .eq('client_email', clientEmail)
         .maybeSingle();
@@ -254,6 +258,35 @@ export async function POST(req: Request) {
         currency: invoice?.currency || 'INR',
         paymentId: razorpayPaymentId,
       }).catch((err) => console.warn('Payment notification warning:', err));
+
+      if (scope && (isBalanceMilestone || isFullMilestone)) {
+        (async () => {
+          let delivRow: { production_url?: string; github_repo?: string; figma_url?: string } | null = null;
+          try {
+            const { data } = await supabase
+              .from('project_deliverables')
+              .select('production_url, github_repo, figma_url')
+              .eq('scope_id', scope.id)
+              .maybeSingle();
+            delivRow = data;
+          } catch {}
+
+          await sendFinalBalanceSettlementNotifications({
+            clientEmail,
+            clientName: invoice?.customer_name || scope.company_name,
+            companyName: scope.company_name || 'Your Project',
+            scopeCode: scope.scope_code || scopeCode || '',
+            invoiceNumber: invoice?.invoice_number || invoiceNumber || 'INV-FINAL',
+            amount: Number(invoice?.amount) || 0,
+            currency: invoice?.currency || 'INR',
+            paymentId: razorpayPaymentId,
+            productionUrl: delivRow?.production_url || undefined,
+            githubRepo: delivRow?.github_repo || undefined,
+            figmaUrl: delivRow?.figma_url || undefined,
+            maintenancePlan: scope.maintenance_plan,
+          });
+        })().catch((err) => console.warn('Final balance settlement notification error:', err));
+      }
 
       return NextResponse.json({
         success: true,
