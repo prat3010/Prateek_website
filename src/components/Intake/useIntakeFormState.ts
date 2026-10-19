@@ -588,7 +588,16 @@ export function useIntakeFormState(
       else setSelectedGoalCategory('all');
     }
 
-    const resolvedFeatureIds = resolveFeatureDependencies(blueprint.featureIds, features);
+    const compulsoryIds = matchedGoal?.compulsoryFeatureLabels
+      ? (matchedGoal.compulsoryFeatureLabels
+          .map((label: string) => labelToId(label))
+          .filter(Boolean) as string[])
+      : [];
+
+    const baseFeatureIds = Array.from(new Set([...compulsoryIds, ...(blueprint.featureIds || [])]));
+    const extraDeps = resolveFeatureDependencies(baseFeatureIds, features);
+    const resolvedFeatureIds = Array.from(new Set([...baseFeatureIds, ...extraDeps]));
+    const validFeatureIds = resolvedFeatureIds.filter((id) => features.some((f: FeatureItem) => f.id === id));
     const autoOutcome = matchedGoal?.primaryOutcome || matchedGoal?.description || '';
 
     setFormData((prev: IntakeFormData) => ({
@@ -596,12 +605,14 @@ export function useIntakeFormState(
       projectGoal: matchedGoal?.label || prev.projectGoal,
       businessKPI: autoOutcome || prev.businessKPI,
       selectedBaseEngineId: blueprint.baseEngineId || prev.selectedBaseEngineId,
-      selectedFeatures: resolvedFeatureIds,
-      selectedBrandAssetId: blueprint.brandAssetId || prev.selectedBrandAssetId,
+      selectedFeatures: validFeatureIds,
+      selectedBrandAssetId: matchedGoal?.skipBrandAssets
+        ? brandAssets[0]?.id || 'ready'
+        : (blueprint.brandAssetId || prev.selectedBrandAssetId),
       selectedMaintenanceId: blueprint.maintenancePlanId || prev.selectedMaintenanceId,
       timeline: blueprint.suggestedTimeline || prev.timeline,
     }));
-  }, [goals, features]);
+  }, [goals, features, brandAssets, labelToId]);
 
   const buildScopePayload = useCallback(() => {
     return {

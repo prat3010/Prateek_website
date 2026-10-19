@@ -30,6 +30,7 @@ describe('POST /api/scoping/parse-intent', () => {
     expect(data.baseEngineId).toBe('saas');
     expect(data.featureIds).toContain('ai_rag');
     expect(data.featureIds).toContain('auth');
+    expect(data.featureIds).not.toContain('search');
     expect(data.confidenceScore).toBeGreaterThan(0.9);
     expect(data.telemetry).toBeDefined();
     expect(data.telemetry.tenantId).toBeDefined();
@@ -53,7 +54,7 @@ describe('POST /api/scoping/parse-intent', () => {
     expect(data.featureIds).toContain('ai_rag');
   });
 
-  it('correctly classifies an E-Commerce storefront prompt', async () => {
+  it('correctly classifies an E-Commerce storefront prompt with integrations', async () => {
     const req = new NextRequest('http://localhost:3000/api/scoping/parse-intent', {
       method: 'POST',
       body: JSON.stringify({
@@ -69,6 +70,26 @@ describe('POST /api/scoping/parse-intent', () => {
     expect(data.baseEngineId).toBe('multipage');
     expect(data.featureIds).toContain('commerce');
     expect(data.featureIds).toContain('payments');
+    expect(data.featureIds).toContain('integrations');
+    expect(data.featureIds).not.toContain('analytics');
+  });
+
+  it('correctly classifies an LMS course academy with cms instead of blog', async () => {
+    const req = new NextRequest('http://localhost:3000/api/scoping/parse-intent', {
+      method: 'POST',
+      body: JSON.stringify({
+        prompt: 'Online education academy with course lessons, video player, and student memberships',
+        currency: 'USD',
+      }),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data.success).toBe(true);
+    expect(data.archetypeId).toBe('lms_portal');
+    expect(data.featureIds).toContain('lms');
+    expect(data.featureIds).toContain('cms');
+    expect(data.featureIds).not.toContain('blog');
   });
 
   it('correctly classifies a single-page landing page prompt', async () => {
@@ -85,6 +106,25 @@ describe('POST /api/scoping/parse-intent', () => {
     expect(data.success).toBe(true);
     expect(data.archetypeId).toBe('landing_page');
     expect(data.baseEngineId).toBe('landing');
+  });
+
+  it('correctly uses fallback with valid catalog IDs (cms, pwa) for generic business query', async () => {
+    const req = new NextRequest('http://localhost:3000/api/scoping/parse-intent', {
+      method: 'POST',
+      body: JSON.stringify({
+        prompt: 'A general corporate company website profile',
+        currency: 'USD',
+      }),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data.success).toBe(true);
+    expect(data.archetypeId).toBe('business_multipage');
+    expect(data.featureIds).toContain('cms');
+    expect(data.featureIds).toContain('pwa');
+    expect(data.featureIds).not.toContain('blog');
+    expect(data.featureIds).not.toContain('analytics');
   });
 
   it('correctly uses live Retriever classification when available', async () => {

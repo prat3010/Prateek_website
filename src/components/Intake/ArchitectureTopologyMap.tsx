@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   Network,
   Maximize2,
@@ -48,6 +48,138 @@ const TOPOLOGY_TIERS = [
   { id: 'ai', label: '5. Cognitive AI Engine' },
   { id: 'integrations', label: '6. Integrations & Commerce' },
 ] as const;
+
+export interface TopologyConnection {
+  id: string;
+  from: string;
+  to: string;
+  label?: string;
+}
+
+export interface NodePosition {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export const NODE_POSITIONS: Record<string, NodePosition> = {
+  // Tier 1: Client
+  node_web: { x: 30, y: 65, width: 115, height: 64 },
+  node_pwa: { x: 30, y: 145, width: 115, height: 64 },
+  node_terminal: { x: 30, y: 225, width: 115, height: 64 },
+
+  // Tier 2: Edge Security
+  node_waf: { x: 185, y: 65, width: 115, height: 64 },
+  node_recaptcha: { x: 185, y: 145, width: 115, height: 64 },
+
+  // Tier 3: Core Services
+  node_server_actions: { x: 340, y: 65, width: 115, height: 64 },
+  node_auth: { x: 340, y: 145, width: 115, height: 64 },
+  node_admin: { x: 340, y: 225, width: 115, height: 64 },
+  node_cms: { x: 340, y: 305, width: 115, height: 64 },
+  node_booking: { x: 340, y: 385, width: 115, height: 64 },
+
+  // Tier 4: Data & Vector Storage
+  node_postgres: { x: 505, y: 65, width: 115, height: 64 },
+  node_pgvector: { x: 505, y: 145, width: 115, height: 64 },
+  node_cache: { x: 505, y: 225, width: 115, height: 64 },
+
+  // Tier 5: Cognitive AI
+  node_retriever_rag: { x: 665, y: 65, width: 115, height: 64 },
+  node_docling_ocr: { x: 665, y: 145, width: 115, height: 64 },
+  node_ai_agents: { x: 665, y: 225, width: 115, height: 64 },
+  node_graphrag: { x: 665, y: 305, width: 115, height: 64 },
+
+  // Tier 6: Integrations & Commerce
+  node_razorpay: { x: 825, y: 65, width: 115, height: 64 },
+  node_resend: { x: 825, y: 145, width: 115, height: 64 },
+  node_telemetry: { x: 825, y: 225, width: 115, height: 64 },
+};
+
+export function calculateBezierCircuitPath(fromPos: NodePosition, toPos: NodePosition): string {
+  // If source and target are in the same tier column, route via an outward bracket arc in the gutter
+  if (fromPos.x === toPos.x) {
+    const x1 = fromPos.x + fromPos.width;
+    const y1 = fromPos.y + fromPos.height / 2;
+    const x2 = toPos.x + toPos.width;
+    const y2 = toPos.y + toPos.height / 2;
+    const arcOffset = 25;
+    const cx1 = x1 + arcOffset;
+    const cy1 = y1;
+    const cx2 = x2 + arcOffset;
+    const cy2 = y2;
+    return `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`;
+  }
+
+  // Inter-tier forward (left-to-right) routing
+  if (toPos.x > fromPos.x) {
+    const x1 = fromPos.x + fromPos.width;
+    const y1 = fromPos.y + fromPos.height / 2;
+    const x2 = toPos.x;
+    const y2 = toPos.y + toPos.height / 2;
+    const dx = x2 - x1;
+    const cx1 = x1 + dx * 0.5;
+    const cy1 = y1;
+    const cx2 = x2 - dx * 0.5;
+    const cy2 = y2;
+    return `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`;
+  }
+
+  // Inter-tier reverse (right-to-left) routing
+  const x1 = fromPos.x;
+  const y1 = fromPos.y + fromPos.height / 2;
+  const x2 = toPos.x + toPos.width;
+  const y2 = toPos.y + toPos.height / 2;
+  const dx = x1 - x2;
+  const cx1 = x1 - dx * 0.5;
+  const cy1 = y1;
+  const cx2 = x2 + dx * 0.5;
+  const cy2 = y2;
+  return `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`;
+}
+
+export const TOPOLOGY_CONNECTIONS: TopologyConnection[] = [
+  // Tier 1 -> Tier 2 (Client -> Edge)
+  { id: 'conn_web_waf', from: 'node_web', to: 'node_waf', label: 'HTTPS / TLS 1.3 Proxy' },
+  { id: 'conn_pwa_waf', from: 'node_pwa', to: 'node_waf', label: 'Service Worker Sync' },
+  { id: 'conn_terminal_waf', from: 'node_terminal', to: 'node_waf', label: 'CLI Remote RPC' },
+  { id: 'conn_web_recaptcha', from: 'node_web', to: 'node_recaptcha', label: 'v3 Score Challenge' },
+
+  // Tier 2 -> Tier 3 (Edge -> Core Services)
+  { id: 'conn_waf_server_actions', from: 'node_waf', to: 'node_server_actions', label: 'Shielded Ingress' },
+  { id: 'conn_waf_auth', from: 'node_waf', to: 'node_auth', label: 'OAuth PKCE Handshake' },
+  { id: 'conn_recaptcha_server_actions', from: 'node_recaptcha', to: 'node_server_actions', label: 'Bot Score Assertion' },
+
+  // Tier 3 -> Tier 4 (Core Services -> Storage)
+  { id: 'conn_server_actions_postgres', from: 'node_server_actions', to: 'node_postgres', label: 'Encrypted SQL / RLS' },
+  { id: 'conn_server_actions_cache', from: 'node_server_actions', to: 'node_cache', label: 'L1 Cache Read' },
+  { id: 'conn_server_actions_pgvector', from: 'node_server_actions', to: 'node_pgvector', label: 'Dense Embeddings Store' },
+  { id: 'conn_auth_postgres', from: 'node_auth', to: 'node_postgres', label: 'User Schema & JWT Sessions' },
+  { id: 'conn_admin_postgres', from: 'node_admin', to: 'node_postgres', label: 'Telemetry Aggregations' },
+  { id: 'conn_cms_postgres', from: 'node_cms', to: 'node_postgres', label: 'Headless Content Store' },
+  { id: 'conn_cms_cache', from: 'node_cms', to: 'node_cache', label: 'Purge On Publish' },
+  { id: 'conn_booking_postgres', from: 'node_booking', to: 'node_postgres', label: 'Slot Locking' },
+
+  // Tier 4 -> Tier 5 (Storage -> Cognitive AI)
+  { id: 'conn_pgvector_retriever_rag', from: 'node_pgvector', to: 'node_retriever_rag', label: 'HNSW Nearest Neighbor Index' },
+  { id: 'conn_postgres_retriever_rag', from: 'node_postgres', to: 'node_retriever_rag', label: 'Chunk Metadata Hydration' },
+  { id: 'conn_cache_retriever_rag', from: 'node_cache', to: 'node_retriever_rag', label: 'Semantic Hit Bypassing' },
+  { id: 'conn_postgres_docling_ocr', from: 'node_postgres', to: 'node_docling_ocr', label: 'Raw Asset Streaming' },
+  { id: 'conn_pgvector_ai_agents', from: 'node_pgvector', to: 'node_ai_agents', label: 'Agent Ephemeral Memory' },
+  { id: 'conn_postgres_ai_agents', from: 'node_postgres', to: 'node_ai_agents', label: 'Agent Tool Ledger' },
+  { id: 'conn_retriever_rag_graphrag', from: 'node_retriever_rag', to: 'node_graphrag', label: 'Multi-Hop Entity Traversal' },
+
+  // Tier 3 & Tier 5 -> Tier 6 (Services & Cognitive -> Commerce & Integrations)
+  { id: 'conn_server_actions_razorpay', from: 'node_server_actions', to: 'node_razorpay', label: 'Checkout Webhook Gateway' },
+  { id: 'conn_booking_razorpay', from: 'node_booking', to: 'node_razorpay', label: 'Deposit Escrow' },
+  { id: 'conn_server_actions_resend', from: 'node_server_actions', to: 'node_resend', label: 'Transactional Mail' },
+  { id: 'conn_auth_resend', from: 'node_auth', to: 'node_resend', label: 'Magic Link Dispatch' },
+  { id: 'conn_server_actions_telemetry', from: 'node_server_actions', to: 'node_telemetry', label: 'Event Telemetry' },
+  { id: 'conn_retriever_rag_telemetry', from: 'node_retriever_rag', to: 'node_telemetry', label: 'Inference Metrics' },
+  { id: 'conn_ai_agents_resend', from: 'node_ai_agents', to: 'node_resend', label: 'Autonomous Outreach Dispatch' },
+  { id: 'conn_ai_agents_razorpay', from: 'node_ai_agents', to: 'node_razorpay', label: 'Automated Invoicing' },
+];
 
 export function ArchitectureTopologyMap({
   selectedEngineId,
@@ -188,8 +320,7 @@ export function ArchitectureTopologyMap({
         subtitle: 'Dense Vector Index',
         specs: 'Hierarchical Navigable Small World (HNSW), Cosine Search',
         slaInfo: '<30ms Nearest Neighbor Semantic Lookups',
-        activeWhenFeature: ['ai_rag'],
-        activeWhenEngine: ['saas'],
+        activeWhenFeature: ['ai_rag', 'ai_agents'],
       },
       {
         id: 'node_cache',
@@ -214,13 +345,13 @@ export function ArchitectureTopologyMap({
       },
       {
         id: 'node_docling_ocr',
-        featureId: 'ai_rag',
+        featureId: 'ai_vision_ocr',
         tierId: 'ai',
         title: 'Docling Layout OCR',
         subtitle: 'Vision PDF Extraction',
         specs: 'Layout-Aware Vision Parsing, Table-to-Markdown Pipeline',
         slaInfo: 'Accurate Multi-Column & Scanned PDF Ingestion',
-        activeWhenFeature: ['ai_rag'],
+        activeWhenFeature: ['ai_vision_ocr', 'ai_rag'],
       },
       {
         id: 'node_ai_agents',
@@ -278,14 +409,37 @@ export function ArchitectureTopologyMap({
 
 
   // Compute active state for a given node
-  const isNodeActive = (node: TopologyNode) => {
+  const isNodeActive = useCallback((node: TopologyNode) => {
     if (node.isAlwaysActive) return true;
     if (node.activeWhenEngine && node.activeWhenEngine.includes(selectedEngineId)) return true;
     if (node.activeWhenFeature && node.activeWhenFeature.some((fId) => selectedFeatureIds.includes(fId))) return true;
     return false;
-  };
+  }, [selectedEngineId, selectedFeatureIds]);
 
   const activeCount = nodes.filter(isNodeActive).length;
+
+  const nodeActiveLookup = useMemo(() => {
+    const map = new Map<string, boolean>();
+    for (const node of nodes) {
+      map.set(node.id, isNodeActive(node));
+    }
+    return map;
+  }, [nodes, isNodeActive]);
+
+  const circuitLines = useMemo(() => {
+    return TOPOLOGY_CONNECTIONS.map((connection) => {
+      const fromPos = NODE_POSITIONS[connection.from];
+      const toPos = NODE_POSITIONS[connection.to];
+      if (!fromPos || !toPos) return null;
+
+      const pathD = calculateBezierCircuitPath(fromPos, toPos);
+      const active = Boolean(nodeActiveLookup.get(connection.from) && nodeActiveLookup.get(connection.to));
+
+      return { connection, pathD, active };
+    })
+      .filter((line): line is { connection: TopologyConnection; pathD: string; active: boolean } => Boolean(line))
+      .sort((a, b) => (a.active === b.active ? 0 : a.active ? 1 : -1));
+  }, [nodeActiveLookup]);
 
   const renderSvgContent = () => (
     <svg
@@ -325,58 +479,27 @@ export function ArchitectureTopologyMap({
       <rect x="815" y="20" width="125" height="480" className={styles.tierBackground} />
       <text x="825" y="45" className={styles.tierLabel}>6. COMMERCE</text>
 
-      {/* Connecting Circuit Lines */}
-      <path d="M 155 90 L 175 90" className={`${styles.connectionLine} ${styles.connectionLineActive}`} />
-      <path d="M 310 90 L 330 90" className={`${styles.connectionLine} ${styles.connectionLineActive}`} />
-      <path d="M 475 90 L 495 90" className={`${styles.connectionLine} ${styles.connectionLineActive}`} />
-      <path d="M 475 220 L 495 180" className={`${styles.connectionLine} ${isNodeActive(nodes.find((n) => n.id === 'node_auth')!) ? styles.connectionLineActive : ''}`} />
-      <path d="M 635 180 L 655 90" className={`${styles.connectionLine} ${isNodeActive(nodes.find((n) => n.id === 'node_retriever_rag')!) ? styles.connectionLineActive : ''}`} />
-      <path d="M 475 90 L 815 320" className={`${styles.connectionLine} ${styles.connectionLineActive}`} />
-      <path d="M 475 350 L 815 90" className={`${styles.connectionLine} ${isNodeActive(nodes.find((n) => n.id === 'node_razorpay')!) ? styles.connectionLineActive : ''}`} />
+      {/* Dynamic Dependency-Aware Circuit Connections */}
+      <g className={styles.connectionsGroup}>
+        {circuitLines.map(({ connection, pathD, active }) => (
+          <path
+            key={connection.id}
+            id={connection.id}
+            d={pathD}
+            data-testid={`circuit-trace-${connection.id}`}
+            data-active={active ? 'true' : 'false'}
+            className={`${styles.connectionLine} ${active ? styles.connectionLineActive : ''}`}
+          >
+            {connection.label && <title>{`${connection.label} (${active ? 'Active Flow' : 'Dormant'})`}</title>}
+          </path>
+        ))}
+      </g>
 
       {/* Render Node Cards in Tier Columns */}
       {nodes.map((node) => {
         const active = isNodeActive(node);
-        let x = 30;
-        let y = 60;
-        const width = 115;
-        const height = 64;
-
-        if (node.tierId === 'client') {
-          x = 30;
-          y = node.id === 'node_web' ? 65 : node.id === 'node_pwa' ? 145 : 225;
-        } else if (node.tierId === 'edge') {
-          x = 185;
-          y = node.id === 'node_waf' ? 65 : 145;
-        } else if (node.tierId === 'core') {
-          x = 340;
-          y =
-            node.id === 'node_server_actions'
-              ? 65
-              : node.id === 'node_auth'
-              ? 145
-              : node.id === 'node_admin'
-              ? 225
-              : node.id === 'node_cms'
-              ? 305
-              : 385;
-        } else if (node.tierId === 'data') {
-          x = 505;
-          y = node.id === 'node_postgres' ? 65 : node.id === 'node_pgvector' ? 145 : 225;
-        } else if (node.tierId === 'ai') {
-          x = 665;
-          y =
-            node.id === 'node_retriever_rag'
-              ? 65
-              : node.id === 'node_docling_ocr'
-              ? 145
-              : node.id === 'node_ai_agents'
-              ? 225
-              : 305;
-        } else if (node.tierId === 'integrations') {
-          x = 825;
-          y = node.id === 'node_razorpay' ? 65 : node.id === 'node_resend' ? 145 : 225;
-        }
+        const pos = NODE_POSITIONS[node.id] || { x: 30, y: 65, width: 115, height: 64 };
+        const { x, y, width, height } = pos;
 
         return (
           <g

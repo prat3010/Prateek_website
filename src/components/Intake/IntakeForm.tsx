@@ -71,9 +71,9 @@ export const FEATURE_CATEGORIES = [
   },
   {
     id: 'engagement_cx',
-    title: 'Engagement, Search & Custom Analytics',
-    description: 'Instant site search, customer review feeds, multi-language localization, dynamic blogs, and custom analytics',
-    featureIds: ['search', 'reviews', 'multilingual', 'blog', 'analytics'],
+    title: 'Content, Mobile & CX Localization',
+    description: 'Headless blog CMS, installable PWA shell, multi-language localization, and video streaming',
+    featureIds: ['cms', 'pwa', 'i18n', 'video'],
   },
 ];
 
@@ -248,7 +248,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     if (presetType === 'essential') {
       presetIds = ['auth', 'admin'];
     } else if (presetType === 'growth') {
-      presetIds = ['auth', 'admin', 'payments', 'email', 'analytics', 'search'];
+      presetIds = ['auth', 'admin', 'payments', 'email', 'cms', 'integrations'];
     } else if (presetType === 'ai') {
       presetIds = ['auth', 'admin', 'ai_rag', 'ai_agents', 'ai_voice_agent', 'integrations'];
     }
@@ -463,6 +463,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                     onResetServiceType={resetServiceType}
                     onChangeField={(field, val) => setFormData((prev) => ({ ...prev, [field]: val }))}
                     onApplyBlueprint={applyBlueprint}
+                    onNavigateStep={setCurrentStep}
                     isNoir={isNoir}
                     stepHeadingRef={stepHeadingRef}
                   />

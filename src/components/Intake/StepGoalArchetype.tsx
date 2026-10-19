@@ -93,6 +93,7 @@ interface StepGoalArchetypeProps {
   onResetServiceType: () => void;
   onChangeField: (field: string, value: string) => void;
   onApplyBlueprint?: (blueprint: ParseIntentResponse) => void;
+  onNavigateStep?: (step: number) => void;
   isNoir?: boolean;
   stepHeadingRef?: React.RefObject<HTMLDivElement | null>;
 }
@@ -111,6 +112,7 @@ export function StepGoalArchetype({
   onResetServiceType,
   onChangeField,
   onApplyBlueprint,
+  onNavigateStep,
   isNoir = false,
   stepHeadingRef,
 }: StepGoalArchetypeProps) {
@@ -156,6 +158,7 @@ export function StepGoalArchetype({
         onApplyBlueprint={onApplyBlueprint || (() => {})}
         currency={currency}
         isNoir={isNoir}
+        onNavigateStep={onNavigateStep}
       />
 
       <div className={`${styles.field} ${styles.fieldMarginSm}`}>

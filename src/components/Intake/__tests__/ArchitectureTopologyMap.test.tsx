@@ -98,4 +98,75 @@ describe('ArchitectureTopologyMap Component', () => {
 
     expect(screen.queryByRole('dialog', { name: /Fullscreen Architecture Topology/i })).not.toBeInTheDocument();
   });
+
+  it('dynamically computes Bézier circuit curves and activates connections when connected nodes are active', () => {
+    const { rerender } = render(
+      <ArchitectureTopologyMap
+        selectedEngineId="saas"
+        selectedFeatureIds={['auth']}
+        allEngines={engines}
+        allFeatures={features}
+        currency="USD"
+      />
+    );
+
+    // conn_auth_postgres should be active because both auth and postgres are active
+    const authPostgresTrace = screen.getByTestId('circuit-trace-conn_auth_postgres');
+    expect(authPostgresTrace).toBeInTheDocument();
+    expect(authPostgresTrace.getAttribute('data-active')).toBe('true');
+    expect(authPostgresTrace.getAttribute('d')).toMatch(/^M \d+ \d+ C/);
+
+    // conn_pgvector_retriever_rag should be dormant because ai_rag is not in selectedFeatureIds
+    const ragTrace = screen.getByTestId('circuit-trace-conn_pgvector_retriever_rag');
+    expect(ragTrace.getAttribute('data-active')).toBe('false');
+
+    // conn_retriever_rag_graphrag (intra-tier same column) should be dormant
+    const intraTierTrace = screen.getByTestId('circuit-trace-conn_retriever_rag_graphrag');
+    expect(intraTierTrace.getAttribute('data-active')).toBe('false');
+    // Intra-tier trace should route via outward arc without looping backwards
+    expect(intraTierTrace.getAttribute('d')).toBe('M 780 97 C 805 97, 805 337, 780 337');
+
+    // Now re-render with ai_rag active
+    rerender(
+      <ArchitectureTopologyMap
+        selectedEngineId="saas"
+        selectedFeatureIds={['auth', 'ai_rag']}
+        allEngines={engines}
+        allFeatures={features}
+        currency="USD"
+      />
+    );
+
+    const activeRagTrace = screen.getByTestId('circuit-trace-conn_pgvector_retriever_rag');
+    expect(activeRagTrace.getAttribute('data-active')).toBe('true');
+
+    const activeIntraTierTrace = screen.getByTestId('circuit-trace-conn_retriever_rag_graphrag');
+    expect(activeIntraTierTrace.getAttribute('data-active')).toBe('true');
+  });
+
+  it('activates Docling OCR node when ai_vision_ocr is in blueprint', () => {
+    const { rerender } = render(
+      <ArchitectureTopologyMap
+        selectedEngineId="saas"
+        selectedFeatureIds={['auth']}
+        allEngines={engines}
+        allFeatures={features}
+        currency="USD"
+      />
+    );
+
+    expect(screen.getByRole('button', { name: /Docling Layout OCR \(Dormant\)/i })).toBeInTheDocument();
+
+    rerender(
+      <ArchitectureTopologyMap
+        selectedEngineId="saas"
+        selectedFeatureIds={['auth', 'ai_vision_ocr']}
+        allEngines={engines}
+        allFeatures={features}
+        currency="USD"
+      />
+    );
+
+    expect(screen.getByRole('button', { name: /Docling Layout OCR \(Active\)/i })).toBeInTheDocument();
+  });
 });

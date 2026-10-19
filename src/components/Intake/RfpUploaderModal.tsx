@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   FileUp,
   X,
@@ -35,16 +35,24 @@ export function RfpUploaderModal({
   const [progressStatus, setProgressStatus] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const handleClose = useCallback(() => {
+    if (isUploading) return;
+    setSelectedFile(null);
+    setIsDragging(false);
+    setProgressStatus(null);
+    onClose();
+  }, [isUploading, onClose]);
+
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        onClose();
+        handleClose();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, handleClose]);
 
   if (!isOpen) return null;
 
@@ -83,15 +91,15 @@ export function RfpUploaderModal({
     if (!selectedFile) return;
 
     setIsUploading(true);
-    setProgressStatus('1/3 Parsing Layout & OCR via Retriever M42...');
+    setProgressStatus('Reading and preparing document...');
 
-    const t1 = setTimeout(() => {
-      setProgressStatus('2/3 Running Architect & Critic Consensus...');
-    }, 250);
+    const timer1 = setTimeout(() => {
+      setProgressStatus('Extracting technical requirements with Retriever Cognitive Core...');
+    }, 450);
 
-    const t2 = setTimeout(() => {
-      setProgressStatus('3/3 Synthesizing CPQ Architecture Blueprint...');
-    }, 500);
+    const timer2 = setTimeout(() => {
+      setProgressStatus('Synthesizing CPQ architecture blueprint...');
+    }, 1800);
 
     try {
       const formData = new FormData();
@@ -103,9 +111,6 @@ export function RfpUploaderModal({
         body: formData,
       });
 
-      clearTimeout(t1);
-      clearTimeout(t2);
-
       if (!res.ok) {
         const errData = await res.json();
         throw new Error(errData.error || 'Failed to parse RFP');
@@ -113,11 +118,23 @@ export function RfpUploaderModal({
 
       const blueprint: ParseIntentResponse = await res.json();
       onBlueprintExtracted(blueprint);
-      onClose();
+
+      const modelName = blueprint.telemetry?.modelUsed || 'Retriever Engine';
+      const latency = blueprint.telemetry?.latencyMs ? ` in ${blueprint.telemetry.latencyMs}ms` : '';
+      const confidence = blueprint.confidenceScore ? `${Math.round(blueprint.confidenceScore * 100)}% Match` : 'Parsed';
+
+      toast.success(
+        `🎯 ${confidence} via ${modelName}${latency}: ${blueprint.summaryRationale}`,
+        { duration: 7000 }
+      );
+
+      handleClose();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error';
       toast.error(`RFP analysis failed: ${message}`);
     } finally {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
       setIsUploading(false);
       setProgressStatus(null);
     }
@@ -125,7 +142,13 @@ export function RfpUploaderModal({
 
   return (
     <Portal>
-      <div className={styles.backdrop} onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="rfp-uploader-title">
+      <div
+        className={styles.backdrop}
+        onClick={handleClose}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="rfp-uploader-title"
+      >
         <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
           <div className={styles.header}>
             <div className={styles.titleArea}>
@@ -135,7 +158,8 @@ export function RfpUploaderModal({
             <button
               type="button"
               className={styles.closeBtn}
-              onClick={onClose}
+              onClick={handleClose}
+              disabled={isUploading}
               aria-label="Close RFP uploader modal"
             >
               <X size={18} />
@@ -195,7 +219,7 @@ export function RfpUploaderModal({
             <button
               type="button"
               className={styles.cancelBtn}
-              onClick={onClose}
+              onClick={handleClose}
               disabled={isUploading}
             >
               Cancel

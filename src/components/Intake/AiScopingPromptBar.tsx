@@ -7,6 +7,8 @@ import {
   FileUp,
   MessageSquare,
   Activity,
+  CheckCircle2,
+  ArrowRight,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Currency } from '@/lib/pricing';
@@ -20,6 +22,45 @@ interface AiScopingPromptBarProps {
   onApplyBlueprint: (blueprint: ParseIntentResponse) => void;
   currency: Currency;
   isNoir?: boolean;
+  onNavigateStep?: (step: number) => void;
+}
+
+const ARCHETYPE_NAMES: Record<string, string> = {
+  landing_page: 'High-Converting Landing Page',
+  business_multipage: 'Multi-Page Business Website',
+  ecommerce: 'E-commerce & Digital Store',
+  booking_appointments: 'Booking & Appointments Portal',
+  saas_app: 'Full-Stack SaaS MVP Core',
+  lms_portal: 'Online Course & LMS Portal',
+  crm_admin: 'Internal CRM & Operations Portal',
+  ai_rag_app: 'AI Knowledge Base / RAG Copilot',
+  autonomous_agents: 'Autonomous AI Agents & Workflows',
+  voice_ai_agent_app: 'Real-Time Voice AI Agent',
+  vision_ocr_saas: 'Multimodal Vision & Document OCR',
+  standalone_voice_bot: 'Standalone Voice Bot',
+  standalone_chatbot: 'Standalone AI Chatbot',
+  ai_strategy_consulting: 'AI Architecture Advisory',
+  custom: 'Custom Engineering Architecture',
+};
+
+const ENGINE_NAMES: Record<string, string> = {
+  landing: 'Landing Core Engine',
+  multipage: 'Multi-Page Core Engine',
+  saas: 'Full-Stack SaaS Core Engine',
+};
+
+function formatArchetypeLabel(id: string): string {
+  if (ARCHETYPE_NAMES[id]) return ARCHETYPE_NAMES[id];
+  return id
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function formatEngineLabel(id: string): string {
+  if (ENGINE_NAMES[id]) return ENGINE_NAMES[id];
+  return id
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 const QUICK_SUGGESTIONS = [
@@ -34,12 +75,14 @@ export function AiScopingPromptBar({
   onApplyBlueprint,
   currency,
   isNoir = false,
+  onNavigateStep,
 }: AiScopingPromptBarProps) {
   const [promptText, setPromptText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isRfpModalOpen, setIsRfpModalOpen] = useState(false);
   const [isChatDrawerOpen, setIsChatDrawerOpen] = useState(false);
   const [telemetry, setTelemetry] = useState<ScopingTelemetry | null>(null);
+  const [matchedBlueprint, setMatchedBlueprint] = useState<ParseIntentResponse | null>(null);
 
   const handleAnalyze = async (overridePrompt?: string) => {
     const textToAnalyze = (overridePrompt || promptText).trim();
@@ -70,10 +113,19 @@ export function AiScopingPromptBar({
         setTelemetry(data.telemetry);
       }
 
+      setMatchedBlueprint(data);
       onApplyBlueprint(data);
       toast.success(
         `🎯 ${Math.round(data.confidenceScore * 100)}% Match: ${data.summaryRationale}`,
-        { duration: 5000 }
+        {
+          action: onNavigateStep
+            ? {
+                label: 'Review in Step 2 →',
+                onClick: () => onNavigateStep(2),
+              }
+            : undefined,
+          duration: 8000,
+        }
       );
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error';
@@ -92,10 +144,19 @@ export function AiScopingPromptBar({
     if (blueprint.telemetry) {
       setTelemetry(blueprint.telemetry);
     }
+    setMatchedBlueprint(blueprint);
     onApplyBlueprint(blueprint);
     toast.success(
       `📄 RFP Parsed (${Math.round(blueprint.confidenceScore * 100)}% Confidence): ${blueprint.summaryRationale}`,
-      { duration: 6000 }
+      {
+        action: onNavigateStep
+          ? {
+              label: 'Review in Step 2 →',
+              onClick: () => onNavigateStep(2),
+            }
+          : undefined,
+        duration: 8000,
+      }
     );
   };
 
@@ -175,6 +236,66 @@ export function AiScopingPromptBar({
         <div className={styles.progressContainer}>
           <div className={styles.spinner} />
           <span>Analyzing architecture requirements with Retriever...</span>
+        </div>
+      )}
+
+      {matchedBlueprint && (
+        <div className={styles.matchCard} data-testid="scoping-match-card">
+          <div className={styles.matchCardHeader}>
+            <div className={styles.matchCardBadge}>
+              <CheckCircle2 size={16} className={styles.matchSuccessIcon} />
+              <span>Blueprint Matched ({Math.round(matchedBlueprint.confidenceScore * 100)}% Confidence)</span>
+            </div>
+            {matchedBlueprint.retrieverEngineRecommended && (
+              <span className={styles.engineTag}>⚡ Retriever Recommended</span>
+            )}
+          </div>
+
+          <p className={styles.matchRationale}>
+            {matchedBlueprint.summaryRationale}
+          </p>
+
+          <div className={styles.matchGrid}>
+            <div className={styles.matchItem}>
+              <span className={styles.matchItemLabel}>Matched Archetype</span>
+              <strong className={styles.matchItemValue}>
+                {formatArchetypeLabel(matchedBlueprint.archetypeId)}
+              </strong>
+            </div>
+            <div className={styles.matchItem}>
+              <span className={styles.matchItemLabel}>Base Engine</span>
+              <strong className={styles.matchItemValue}>
+                {formatEngineLabel(matchedBlueprint.baseEngineId)}
+              </strong>
+            </div>
+            <div className={styles.matchItem}>
+              <span className={styles.matchItemLabel}>Active Add-Ons</span>
+              <strong className={styles.matchItemValue}>
+                {(matchedBlueprint.featureIds || []).length}{' '}
+                {(matchedBlueprint.featureIds || []).length === 1 ? 'Module' : 'Modules'} Selected
+              </strong>
+            </div>
+            <div className={styles.matchItem}>
+              <span className={styles.matchItemLabel}>Est. Timeline</span>
+              <strong className={styles.matchItemValue}>
+                {matchedBlueprint.suggestedTimeline || '2 to 4 Weeks'}
+              </strong>
+            </div>
+          </div>
+
+          {onNavigateStep && (
+            <div className={styles.matchCtaRow}>
+              <button
+                type="button"
+                className={styles.reviewBlueprintBtn}
+                onClick={() => onNavigateStep(2)}
+                aria-label="Review Architecture Blueprint in Step 2"
+              >
+                <span>Review Architecture Blueprint (Step 2) →</span>
+                <ArrowRight size={16} aria-hidden="true" />
+              </button>
+            </div>
+          )}
         </div>
       )}
 

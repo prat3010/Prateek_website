@@ -61,7 +61,7 @@ function classifyIntentWithCatalog(prompt: string): {
     return {
       archetypeId: 'ai_rag_app',
       baseEngineId: 'saas',
-      featureIds: ['ai_rag', 'auth', 'admin', 'search', 'email'],
+      featureIds: ['ai_rag', 'auth', 'admin', 'email'],
       brandAssetId: 'basic',
       maintenancePlanId: 'premium',
       suggestedTimeline: '4 Weeks',
@@ -91,7 +91,7 @@ function classifyIntentWithCatalog(prompt: string): {
     return {
       archetypeId: 'lms_portal',
       baseEngineId: 'saas',
-      featureIds: ['lms', 'auth', 'payments', 'blog', 'email'],
+      featureIds: ['lms', 'auth', 'payments', 'cms', 'email'],
       brandAssetId: 'comprehensive',
       maintenancePlanId: 'standard',
       suggestedTimeline: '4 Weeks',
@@ -121,7 +121,7 @@ function classifyIntentWithCatalog(prompt: string): {
     return {
       archetypeId: 'ecommerce',
       baseEngineId: 'multipage',
-      featureIds: ['commerce', 'payments', 'auth', 'email', 'analytics'],
+      featureIds: ['commerce', 'payments', 'auth', 'email', 'integrations'],
       brandAssetId: 'comprehensive',
       maintenancePlanId: 'growth',
       suggestedTimeline: '2 to 3 Weeks',
@@ -181,12 +181,12 @@ function classifyIntentWithCatalog(prompt: string): {
   return {
     archetypeId: 'business_multipage',
     baseEngineId: 'multipage',
-    featureIds: ['email', 'blog', 'analytics'],
+    featureIds: ['email', 'cms', 'pwa'],
     brandAssetId: 'basic',
     maintenancePlanId: 'standard',
     suggestedTimeline: '2 Weeks',
     confidenceScore: 0.91,
-    summaryRationale: 'Configured with Multi-Page Business Website Core Engine, headless blog CMS, GDPR analytics, and lead capture workflows.',
+    summaryRationale: 'Configured with Multi-Page Business Website Core Engine, headless blog CMS, installable PWA shell, and lead capture workflows.',
     retrieverEngineRecommended: false,
     unrecognizedRequirements: [],
   };
