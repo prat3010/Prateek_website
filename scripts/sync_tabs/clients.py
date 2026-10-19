@@ -368,11 +368,69 @@ def render_clients_tab():
                     if scope_cos:
                         st.markdown(f"#### 🔄 Phase 2 Change Orders ({len(scope_cos)})")
                         for co in scope_cos:
-                            st.markdown(
-                                f"- **#{co.get('change_order_number')}** [{co.get('status', 'pending').upper()}] — "
-                                f"+₹{float(co.get('price_delta_inr', 0)):,.0f} / +${float(co.get('price_delta_usd', 0)):,.0f} "
-                                f"({', '.join(co.get('added_features') or [])})"
-                            )
+                            co_id = co.get("id", "")
+                            co_num = co.get("change_order_number", "CO")
+                            co_status = co.get("status", "pending")
+                            co_inr = float(co.get("price_delta_inr", 0))
+                            co_usd = float(co.get("price_delta_usd", 0))
+                            co_added = co.get("added_features") or []
+
+                            with st.container():
+                                st.markdown(
+                                    f"**#{co_num}** `[{co_status.upper()}]` — "
+                                    f"+₹{co_inr:,.0f} / +${co_usd:,.0f} "
+                                    f"(+{', '.join(co_added) if co_added else 'Custom Delta'})"
+                                )
+                                if co_status in ("pending", "invoiced", "approved"):
+                                    c_co1, c_co2, c_co3 = st.columns(3)
+                                    with c_co1:
+                                        if co_status != "approved":
+                                            if st.button(f"✓ Approve #{co_num}", key=f"btn_co_app_{co_id}"):
+                                                if HAS_SYNC:
+                                                    co["status"] = "approved"
+                                                    co["updated_at"] = datetime.utcnow().isoformat()
+                                                    upsert_record("scope_change_orders", co, key_col="id")
+                                                    st.success(f"Approved change order {co_num}!")
+                                                    st.rerun()
+                                    with c_co2:
+                                        if st.button(f"💰 Settle & Merge #{co_num}", key=f"btn_co_merge_{co_id}"):
+                                            if HAS_SYNC:
+                                                now_iso = datetime.utcnow().isoformat()
+                                                co["status"] = "paid"
+                                                co["updated_at"] = now_iso
+                                                upsert_record("scope_change_orders", co, key_col="id")
+
+                                                inv_id = co.get("invoice_id")
+                                                if inv_id:
+                                                    upsert_record("invoices", {"id": inv_id, "payment_status": "paid", "paid_at": now_iso, "updated_at": now_iso}, key_col="id")
+
+                                                curr_feats = order.get("features") or order.get("selected_features") or []
+                                                if isinstance(curr_feats, str):
+                                                    try:
+                                                        curr_feats = json.loads(curr_feats)
+                                                    except Exception:
+                                                        curr_feats = [curr_feats]
+                                                new_feats = list(dict.fromkeys(curr_feats + co_added))
+                                                order["features"] = new_feats
+                                                order["total_cost_inr"] = float(order.get("total_cost_inr", 0)) + co_inr
+                                                order["total_cost_usd"] = float(order.get("total_cost_usd", 0)) + co_usd
+                                                order["updated_at"] = now_iso
+                                                upsert_record("client_scopes", order, key_col="scope_code")
+                                                st.success(f"Settled and merged change order {co_num} into Scope {scope_code}!")
+                                                st.rerun()
+                                    with c_co3:
+                                        if co_status != "rejected":
+                                            if st.button(f"✕ Reject #{co_num}", key=f"btn_co_rej_{co_id}"):
+                                                if HAS_SYNC:
+                                                    now_iso = datetime.utcnow().isoformat()
+                                                    co["status"] = "rejected"
+                                                    co["updated_at"] = now_iso
+                                                    upsert_record("scope_change_orders", co, key_col="id")
+                                                    inv_id = co.get("invoice_id")
+                                                    if inv_id:
+                                                        upsert_record("invoices", {"id": inv_id, "payment_status": "cancelled", "updated_at": now_iso}, key_col="id")
+                                                    st.warning(f"Rejected change order {co_num}!")
+                                                    st.rerun()
 
                     st.markdown("---")
                     st.markdown("#### Live Delivery Stage & Payment Control")

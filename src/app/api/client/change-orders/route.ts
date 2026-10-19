@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
 import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
+import { isAdminEmail } from '@/lib/auth';
 import { sendAdminChangeOrderNotification } from '@/lib/emailNotification';
 import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
 import type { FeatureItem } from '@/data/resume';
@@ -204,3 +205,141 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: err instanceof Error ? err.message : 'Internal Server Error' }, { status: 500 });
   }
 }
+
+export async function PATCH(req: Request) {
+  try {
+    if (!supabase) {
+      return NextResponse.json({ success: true, message: 'Change order action simulated (degraded mode).' });
+    }
+
+    const sessionEmail = await getVerifiedSessionEmail(req);
+    if (!sessionEmail || !isAdminEmail(sessionEmail)) {
+      return NextResponse.json({ error: 'Unauthorized: admin access required.' }, { status: 403 });
+    }
+
+    let body: { changeOrderId?: string; action?: string } = {};
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
+    }
+
+    const { changeOrderId, action } = body;
+    if (!changeOrderId || !action || !['approve', 'reject', 'mark_paid'].includes(action)) {
+      return NextResponse.json(
+        { error: 'Missing or invalid parameters. "changeOrderId" and "action" (approve | reject | mark_paid) are required.' },
+        { status: 400 }
+      );
+    }
+
+    // 1. Fetch target change order
+    const { data: co, error: coErr } = await supabase
+      .from('scope_change_orders')
+      .select('*')
+      .eq('id', changeOrderId)
+      .maybeSingle();
+
+    if (coErr) {
+      return NextResponse.json({ error: coErr.message }, { status: 500 });
+    }
+    if (!co) {
+      return NextResponse.json({ error: 'Change order not found' }, { status: 404 });
+    }
+
+    const nowIso = new Date().toISOString();
+
+    if (action === 'approve') {
+      const { data: updatedCo, error: upErr } = await supabase
+        .from('scope_change_orders')
+        .update({ status: 'approved', updated_at: nowIso })
+        .eq('id', changeOrderId)
+        .select('*')
+        .single();
+
+      if (upErr) return NextResponse.json({ error: upErr.message }, { status: 500 });
+      return NextResponse.json({ success: true, changeOrder: updatedCo });
+    }
+
+    if (action === 'reject') {
+      const { data: updatedCo, error: upErr } = await supabase
+        .from('scope_change_orders')
+        .update({ status: 'rejected', updated_at: nowIso })
+        .eq('id', changeOrderId)
+        .select('*')
+        .single();
+
+      if (upErr) return NextResponse.json({ error: upErr.message }, { status: 500 });
+
+      // Cancel linked invoice if present and not paid
+      if (co.invoice_id) {
+        await supabase
+          .from('invoices')
+          .update({ payment_status: 'cancelled', updated_at: nowIso })
+          .eq('id', co.invoice_id)
+          .neq('payment_status', 'paid');
+      }
+
+      return NextResponse.json({ success: true, changeOrder: updatedCo });
+    }
+
+    if (action === 'mark_paid') {
+      // 1. Update Change Order status to 'paid'
+      const { data: updatedCo, error: upErr } = await supabase
+        .from('scope_change_orders')
+        .update({ status: 'paid', updated_at: nowIso })
+        .eq('id', changeOrderId)
+        .select('*')
+        .single();
+
+      if (upErr) return NextResponse.json({ error: upErr.message }, { status: 500 });
+
+      // 2. Mark invoice paid if linked
+      if (co.invoice_id) {
+        await supabase
+          .from('invoices')
+          .update({
+            payment_status: 'paid',
+            paid_at: nowIso,
+            updated_at: nowIso,
+          })
+          .eq('id', co.invoice_id);
+      }
+
+      // 3. Merge features and add price delta into client_scopes
+      if (co.scope_id) {
+        const { data: scope } = await supabase
+          .from('client_scopes')
+          .select('*')
+          .eq('id', co.scope_id)
+          .maybeSingle();
+
+        if (scope) {
+          const currentFeatures = Array.isArray(scope.features) ? scope.features : [];
+          const added = Array.isArray(co.added_features) ? co.added_features : [];
+          const removed = new Set(Array.isArray(co.removed_features) ? co.removed_features : []);
+          const mergedFeatures = Array.from(
+            new Set([...currentFeatures.filter((f: string) => !removed.has(f)), ...added])
+          );
+
+          await supabase
+            .from('client_scopes')
+            .update({
+              features: mergedFeatures,
+              total_cost_inr: (Number(scope.total_cost_inr) || 0) + (Number(co.price_delta_inr) || 0),
+              total_cost_usd: (Number(scope.total_cost_usd) || 0) + (Number(co.price_delta_usd) || 0),
+              updated_at: nowIso,
+            })
+            .eq('id', scope.id);
+        }
+      }
+
+      return NextResponse.json({ success: true, changeOrder: updatedCo });
+    }
+
+    return NextResponse.json({ error: 'Unsupported action' }, { status: 400 });
+  } catch (err: unknown) {
+    console.error('PATCH Change Orders API error:', err);
+    return NextResponse.json({ error: err instanceof Error ? err.message : 'Internal Server Error' }, { status: 500 });
+  }
+}
+

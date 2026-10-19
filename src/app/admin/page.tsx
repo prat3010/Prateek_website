@@ -60,6 +60,30 @@ interface ClientRecord {
     figma_url?: string;
     signoff_pdf_url?: string;
   };
+  change_orders?: Array<{
+    id: string;
+    scope_id: string;
+    change_order_number: string;
+    requested_by_email: string;
+    added_features: string[];
+    removed_features: string[];
+    price_delta_inr: number;
+    price_delta_usd: number;
+    timeline_impact?: string;
+    status: 'pending' | 'invoiced' | 'approved' | 'paid' | 'rejected';
+    invoice_id?: string;
+    created_at: string;
+  }>;
+  invoices?: Array<{
+    id: string;
+    invoice_number: string;
+    amount: number;
+    currency: string;
+    payment_status: string;
+    milestone_name: string;
+    payment_url?: string;
+    created_at: string;
+  }>;
   created_at: string;
 }
 
@@ -123,10 +147,14 @@ export default function AdminControlCenter() {
   // Clients state
   const [clients, setClients] = useState<ClientRecord[]>([]);
   const [stageEdits, setStageEdits] = useState<Record<string, string>>({});
+  const [paymentEdits, setPaymentEdits] = useState<
+    Record<string, { deposit_paid: boolean; balance_paid: boolean }>
+  >({});
   const [deliverableEdits, setDeliverableEdits] = useState<
     Record<string, { staging_url: string; production_url: string; github_repo: string; figma_url: string }>
   >({});
   const [savingScopeCode, setSavingScopeCode] = useState<string | null>(null);
+  const [actionLoadingCoId, setActionLoadingCoId] = useState<string | null>(null);
 
   // Retriever SaaS Subscribers state
   const [subscribers, setSubscribers] = useState<SubscriberRecord[]>([]);
@@ -170,6 +198,10 @@ export default function AdminControlCenter() {
     try {
       const token = await getAccessToken();
       const newStage = stageEdits[scope.scope_code] || scope.delivery_stage || 'architecture';
+      const payments = paymentEdits[scope.scope_code] || {
+        deposit_paid: Boolean(scope.deposit_paid),
+        balance_paid: Boolean(scope.balance_paid),
+      };
       const deliv = deliverableEdits[scope.scope_code] || {
         staging_url: scope.deliverables?.staging_url || '',
         production_url: scope.deliverables?.production_url || '',
@@ -189,11 +221,14 @@ export default function AdminControlCenter() {
           baseEngineTitle: scope.base_engine || 'Full-Stack Web Engine',
           currency: scope.currency || 'INR',
           deliveryStage: newStage,
+          depositPaid: payments.deposit_paid,
+          balancePaid: payments.balance_paid,
+          isFullyPaid: payments.deposit_paid && payments.balance_paid,
           deliverables: deliv,
         }),
       });
       if (res.ok) {
-        setActionMessage({ text: `Updated milestone & deliverables for Scope #${scope.scope_code}!` });
+        setActionMessage({ text: `Updated milestone, payments & deliverables for Scope #${scope.scope_code}!` });
         await fetchClientScopes();
       } else {
         const err = await res.json().catch(() => ({}));
@@ -203,6 +238,33 @@ export default function AdminControlCenter() {
       setActionMessage({ text: 'Network error updating client scope.', isError: true });
     } finally {
       setSavingScopeCode(null);
+    }
+  };
+
+  const handleChangeOrderAction = async (changeOrderId: string, action: 'approve' | 'reject' | 'mark_paid') => {
+    setActionLoadingCoId(changeOrderId);
+    try {
+      const token = await getAccessToken();
+      const res = await fetch('/api/client/change-orders', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ changeOrderId, action }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        const actionLabel = action === 'approve' ? 'Approved' : action === 'reject' ? 'Rejected' : 'Settled & Merged';
+        setActionMessage({ text: `Change order #${data.changeOrder?.change_order_number || changeOrderId} ${actionLabel} successfully!` });
+        await fetchClientScopes();
+      } else {
+        setActionMessage({ text: data.error || 'Failed to update change order.', isError: true });
+      }
+    } catch {
+      setActionMessage({ text: 'Network error updating change order.', isError: true });
+    } finally {
+      setActionLoadingCoId(null);
     }
   };
 
@@ -590,6 +652,10 @@ export default function AdminControlCenter() {
               ) : (
                 clients.map(c => {
                   const currentStage = stageEdits[c.scope_code] || c.delivery_stage || 'architecture';
+                  const currentPayments = paymentEdits[c.scope_code] || {
+                    deposit_paid: Boolean(c.deposit_paid),
+                    balance_paid: Boolean(c.balance_paid),
+                  };
                   const currentDeliv = deliverableEdits[c.scope_code] || {
                     staging_url: c.deliverables?.staging_url || '',
                     production_url: c.deliverables?.production_url || '',
@@ -615,14 +681,67 @@ export default function AdminControlCenter() {
                               : `₹${Number(c.total_cost_inr || 0).toLocaleString('en-IN')}`}
                           </p>
                         </div>
-                        <span className={styles.badge}>
-                          {c.deposit_paid ? '✅ Deposit Paid' : '⏳ Pending Deposit'}
+                        <span
+                          className={styles.badge}
+                          style={{
+                            background: (c.is_fully_paid || c.balance_paid)
+                              ? 'rgba(34, 197, 94, 0.15)'
+                              : c.deposit_paid
+                              ? 'rgba(56, 189, 248, 0.15)'
+                              : 'rgba(234, 179, 8, 0.15)',
+                            borderColor: (c.is_fully_paid || c.balance_paid)
+                              ? 'rgba(34, 197, 94, 0.35)'
+                              : c.deposit_paid
+                              ? 'rgba(56, 189, 248, 0.35)'
+                              : 'rgba(234, 179, 8, 0.35)',
+                            color: (c.is_fully_paid || c.balance_paid)
+                              ? '#22c55e'
+                              : c.deposit_paid
+                              ? 'var(--color-accent)'
+                              : '#eab308',
+                          }}
+                        >
+                          {c.is_fully_paid || c.balance_paid
+                            ? '✅ Fully Settled (100%)'
+                            : c.deposit_paid
+                            ? '🟢 Deposit Paid (50%)'
+                            : '⏳ Pending Deposit'}
                         </span>
                       </div>
 
                       <div className={styles.emailBadge}>
                         <Mail size={14} /> {c.client_email || c.email || 'No email'}
                         {(c.client_phone || c.phone) ? ` • 📞 ${c.client_phone || c.phone}` : ''}
+                      </div>
+
+                      {/* Financial Milestones Override */}
+                      <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.6rem', padding: '0.5rem 0.75rem', background: 'var(--surface-elevated)', borderRadius: '6px', fontSize: '0.8rem', border: '1px solid var(--surface-glass-border)' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', color: 'var(--color-text)' }}>
+                          <input
+                            type="checkbox"
+                            checked={currentPayments.deposit_paid}
+                            onChange={e =>
+                              setPaymentEdits(prev => ({
+                                ...prev,
+                                [c.scope_code]: { ...currentPayments, deposit_paid: e.target.checked },
+                              }))
+                            }
+                          />
+                          <span>Deposit Paid (50%)</span>
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', color: 'var(--color-text)' }}>
+                          <input
+                            type="checkbox"
+                            checked={currentPayments.balance_paid}
+                            onChange={e =>
+                              setPaymentEdits(prev => ({
+                                ...prev,
+                                [c.scope_code]: { ...currentPayments, balance_paid: e.target.checked },
+                              }))
+                            }
+                          />
+                          <span>Balance Paid (50%)</span>
+                        </label>
                       </div>
 
                       {notes.length > 0 && (
@@ -663,64 +782,310 @@ export default function AdminControlCenter() {
                           </select>
                         </label>
 
-                        <input
-                          type="url"
-                          placeholder="Staging Preview URL (https://...)"
-                          value={currentDeliv.staging_url}
-                          onChange={e =>
-                            setDeliverableEdits(prev => ({
-                              ...prev,
-                              [c.scope_code]: { ...currentDeliv, staging_url: e.target.value },
-                            }))
-                          }
-                          style={{
-                            padding: '0.4rem 0.6rem',
-                            fontSize: '0.8rem',
-                            borderRadius: '6px',
-                            border: '1px solid var(--surface-glass-border)',
-                            background: 'var(--surface-card)',
-                            color: 'var(--color-text)',
-                          }}
-                        />
-                        <input
-                          type="url"
-                          placeholder="Production Live URL (https://...)"
-                          value={currentDeliv.production_url}
-                          onChange={e =>
-                            setDeliverableEdits(prev => ({
-                              ...prev,
-                              [c.scope_code]: { ...currentDeliv, production_url: e.target.value },
-                            }))
-                          }
-                          style={{
-                            padding: '0.4rem 0.6rem',
-                            fontSize: '0.8rem',
-                            borderRadius: '6px',
-                            border: '1px solid var(--surface-glass-border)',
-                            background: 'var(--surface-card)',
-                            color: 'var(--color-text)',
-                          }}
-                        />
-                        <input
-                          type="url"
-                          placeholder="GitHub Repo URL (https://github.com/...)"
-                          value={currentDeliv.github_repo}
-                          onChange={e =>
-                            setDeliverableEdits(prev => ({
-                              ...prev,
-                              [c.scope_code]: { ...currentDeliv, github_repo: e.target.value },
-                            }))
-                          }
-                          style={{
-                            padding: '0.4rem 0.6rem',
-                            fontSize: '0.8rem',
-                            borderRadius: '6px',
-                            border: '1px solid var(--surface-glass-border)',
-                            background: 'var(--surface-card)',
-                            color: 'var(--color-text)',
-                          }}
-                        />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                          <input
+                            type="url"
+                            placeholder="Staging Preview URL (https://...)"
+                            value={currentDeliv.staging_url}
+                            onChange={e =>
+                              setDeliverableEdits(prev => ({
+                                ...prev,
+                                [c.scope_code]: { ...currentDeliv, staging_url: e.target.value },
+                              }))
+                            }
+                            style={{
+                              flex: 1,
+                              padding: '0.4rem 0.6rem',
+                              fontSize: '0.8rem',
+                              borderRadius: '6px',
+                              border: '1px solid var(--surface-glass-border)',
+                              background: 'var(--surface-card)',
+                              color: 'var(--color-text)',
+                            }}
+                          />
+                          {currentDeliv.staging_url && (
+                            <a
+                              href={currentDeliv.staging_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={styles.linkIcon}
+                              title="Open Staging URL"
+                              style={{ padding: '4px' }}
+                            >
+                              <ExternalLink size={16} />
+                            </a>
+                          )}
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                          <input
+                            type="url"
+                            placeholder="Production Live URL (https://...)"
+                            value={currentDeliv.production_url}
+                            onChange={e =>
+                              setDeliverableEdits(prev => ({
+                                ...prev,
+                                [c.scope_code]: { ...currentDeliv, production_url: e.target.value },
+                              }))
+                            }
+                            style={{
+                              flex: 1,
+                              padding: '0.4rem 0.6rem',
+                              fontSize: '0.8rem',
+                              borderRadius: '6px',
+                              border: '1px solid var(--surface-glass-border)',
+                              background: 'var(--surface-card)',
+                              color: 'var(--color-text)',
+                            }}
+                          />
+                          {currentDeliv.production_url && (
+                            <a
+                              href={currentDeliv.production_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={styles.linkIcon}
+                              title="Open Production URL"
+                              style={{ padding: '4px' }}
+                            >
+                              <ExternalLink size={16} />
+                            </a>
+                          )}
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                          <input
+                            type="url"
+                            placeholder="GitHub Repo URL (https://github.com/...)"
+                            value={currentDeliv.github_repo}
+                            onChange={e =>
+                              setDeliverableEdits(prev => ({
+                                ...prev,
+                                [c.scope_code]: { ...currentDeliv, github_repo: e.target.value },
+                              }))
+                            }
+                            style={{
+                              flex: 1,
+                              padding: '0.4rem 0.6rem',
+                              fontSize: '0.8rem',
+                              borderRadius: '6px',
+                              border: '1px solid var(--surface-glass-border)',
+                              background: 'var(--surface-card)',
+                              color: 'var(--color-text)',
+                            }}
+                          />
+                          {currentDeliv.github_repo && (
+                            <a
+                              href={currentDeliv.github_repo}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={styles.linkIcon}
+                              title="Open GitHub Repo"
+                              style={{ padding: '4px' }}
+                            >
+                              <ExternalLink size={16} />
+                            </a>
+                          )}
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                          <input
+                            type="url"
+                            placeholder="Figma Specs URL (https://figma.com/...)"
+                            value={currentDeliv.figma_url}
+                            onChange={e =>
+                              setDeliverableEdits(prev => ({
+                                ...prev,
+                                [c.scope_code]: { ...currentDeliv, figma_url: e.target.value },
+                              }))
+                            }
+                            style={{
+                              flex: 1,
+                              padding: '0.4rem 0.6rem',
+                              fontSize: '0.8rem',
+                              borderRadius: '6px',
+                              border: '1px solid var(--surface-glass-border)',
+                              background: 'var(--surface-card)',
+                              color: 'var(--color-text)',
+                            }}
+                          />
+                          {currentDeliv.figma_url && (
+                            <a
+                              href={currentDeliv.figma_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={styles.linkIcon}
+                              title="Open Figma Specs"
+                              style={{ padding: '4px' }}
+                            >
+                              <ExternalLink size={16} />
+                            </a>
+                          )}
+                        </div>
                       </div>
+
+                      {/* Phase 2 Change Orders Section */}
+                      {c.change_orders && c.change_orders.length > 0 && (
+                        <div style={{ marginTop: '0.85rem', borderTop: '1px dashed var(--surface-glass-border)', paddingTop: '0.65rem' }}>
+                          <p style={{ fontSize: '0.8rem', fontWeight: 700, margin: '0 0 0.5rem 0', color: 'var(--color-text)' }}>
+                            🔄 Phase 2 Change Orders ({c.change_orders.length}):
+                          </p>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            {c.change_orders.map(co => {
+                              const isPending = co.status === 'pending' || co.status === 'invoiced';
+                              const isApproved = co.status === 'approved';
+                              const isPaid = co.status === 'paid';
+                              const isRejected = co.status === 'rejected';
+
+                              return (
+                                <div
+                                  key={co.id}
+                                  style={{
+                                    background: 'var(--surface-elevated)',
+                                    border: '1px solid var(--surface-glass-border)',
+                                    borderRadius: '6px',
+                                    padding: '0.5rem 0.65rem',
+                                    fontSize: '0.78rem',
+                                  }}
+                                >
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
+                                    <span style={{ fontWeight: 700, fontFamily: 'monospace' }}>#{co.change_order_number}</span>
+                                    <span
+                                      style={{
+                                        padding: '2px 6px',
+                                        borderRadius: '4px',
+                                        fontSize: '0.68rem',
+                                        fontWeight: 700,
+                                        textTransform: 'uppercase',
+                                        background: isPaid ? 'rgba(34, 197, 94, 0.2)' : isApproved ? 'rgba(56, 189, 248, 0.2)' : isRejected ? 'rgba(239, 68, 68, 0.2)' : 'rgba(234, 179, 8, 0.2)',
+                                        color: isPaid ? '#22c55e' : isApproved ? '#38bdf8' : isRejected ? '#ef4444' : '#eab308',
+                                      }}
+                                    >
+                                      {co.status}
+                                    </span>
+                                  </div>
+                                  <div style={{ color: 'var(--color-text-muted)', fontSize: '0.74rem' }}>
+                                    {co.added_features?.length > 0 && <span>+{co.added_features.join(', ')} • </span>}
+                                    <strong>
+                                      {c.currency === 'USD'
+                                        ? `+$${Number(co.price_delta_usd || 0).toLocaleString('en-US')}`
+                                        : `+₹${Number(co.price_delta_inr || 0).toLocaleString('en-IN')}`}
+                                    </strong>
+                                    {co.timeline_impact && ` (${co.timeline_impact})`}
+                                  </div>
+                                  {isPending && (
+                                    <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.4rem', flexWrap: 'wrap' }}>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleChangeOrderAction(co.id, 'approve')}
+                                        disabled={actionLoadingCoId === co.id}
+                                        style={{
+                                          padding: '3px 8px',
+                                          fontSize: '0.72rem',
+                                          borderRadius: '4px',
+                                          border: 'none',
+                                          background: '#38bdf8',
+                                          color: '#000',
+                                          fontWeight: 700,
+                                          cursor: 'pointer',
+                                        }}
+                                      >
+                                        ✓ Approve
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleChangeOrderAction(co.id, 'mark_paid')}
+                                        disabled={actionLoadingCoId === co.id}
+                                        style={{
+                                          padding: '3px 8px',
+                                          fontSize: '0.72rem',
+                                          borderRadius: '4px',
+                                          border: 'none',
+                                          background: '#22c55e',
+                                          color: '#000',
+                                          fontWeight: 700,
+                                          cursor: 'pointer',
+                                        }}
+                                      >
+                                        💰 Mark Settled &amp; Merge
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleChangeOrderAction(co.id, 'reject')}
+                                        disabled={actionLoadingCoId === co.id}
+                                        style={{
+                                          padding: '3px 8px',
+                                          fontSize: '0.72rem',
+                                          borderRadius: '4px',
+                                          border: 'none',
+                                          background: 'rgba(239, 68, 68, 0.2)',
+                                          color: '#ef4444',
+                                          fontWeight: 600,
+                                          cursor: 'pointer',
+                                        }}
+                                      >
+                                        ✕ Reject
+                                      </button>
+                                    </div>
+                                  )}
+                                  {isApproved && (
+                                    <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.4rem' }}>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleChangeOrderAction(co.id, 'mark_paid')}
+                                        disabled={actionLoadingCoId === co.id}
+                                        style={{
+                                          padding: '3px 8px',
+                                          fontSize: '0.72rem',
+                                          borderRadius: '4px',
+                                          border: 'none',
+                                          background: '#22c55e',
+                                          color: '#000',
+                                          fontWeight: 700,
+                                          cursor: 'pointer',
+                                        }}
+                                      >
+                                        💰 Mark Settled &amp; Merge
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Invoices Ledger Summary */}
+                      {c.invoices && c.invoices.length > 0 && (
+                        <div style={{ marginTop: '0.65rem', borderTop: '1px dashed var(--surface-glass-border)', paddingTop: '0.5rem' }}>
+                          <p style={{ fontSize: '0.75rem', fontWeight: 600, margin: '0 0 0.35rem 0', color: 'var(--color-text-muted)' }}>
+                            🧾 Issued Invoices ({c.invoices.length}):
+                          </p>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                            {c.invoices.map(inv => (
+                              <div
+                                key={inv.id}
+                                style={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
+                                  fontSize: '0.72rem',
+                                  background: 'var(--surface-elevated)',
+                                  padding: '0.35rem 0.5rem',
+                                  borderRadius: '4px',
+                                }}
+                              >
+                                <span>
+                                  <code>{inv.invoice_number}</code> ({inv.milestone_name})
+                                </span>
+                                <span style={{ fontWeight: 600, color: inv.payment_status === 'paid' ? '#22c55e' : '#eab308' }}>
+                                  {inv.currency} {Number(inv.amount || 0).toLocaleString()} [{inv.payment_status.toUpperCase()}]
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
                       <div className={styles.cardFooter} style={{ marginTop: '0.75rem' }}>
                         <button

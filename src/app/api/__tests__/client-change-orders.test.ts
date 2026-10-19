@@ -5,10 +5,13 @@ const mocks = vi.hoisted(() => {
     invalidToken: false,
     existingScope: true,
     isPaid: true,
+    isAdmin: false,
+    changeOrderNotFound: false,
   };
 
   const selectFn = vi.fn();
   const eqFn = vi.fn();
+  const neqFn = vi.fn();
   const orderFn = vi.fn();
   const maybeSingleFn = vi.fn();
   const singleFn = vi.fn();
@@ -18,6 +21,7 @@ const mocks = vi.hoisted(() => {
   const chain = {
     select: selectFn,
     eq: eqFn,
+    neq: neqFn,
     order: orderFn,
     maybeSingle: maybeSingleFn,
     single: singleFn,
@@ -27,6 +31,7 @@ const mocks = vi.hoisted(() => {
 
   selectFn.mockReturnValue(chain);
   eqFn.mockReturnValue(chain);
+  neqFn.mockReturnValue(chain);
   orderFn.mockResolvedValue({
     data: [
       {
@@ -48,10 +53,12 @@ const mocks = vi.hoisted(() => {
   });
 
   maybeSingleFn.mockImplementation(async () => {
+    if (state.changeOrderNotFound) return { data: null, error: null };
     if (!state.existingScope) return { data: null, error: null };
     return {
       data: {
         id: 'scope-101',
+        scope_id: 'scope-101',
         scope_code: 'SCOPE-10001',
         client_email: 'client@example.com',
         company_name: 'Acme Test Labs',
@@ -59,6 +66,13 @@ const mocks = vi.hoisted(() => {
         total_cost_inr: 100000,
         total_cost_usd: 1500,
         currency: 'INR',
+        features: ['Landing Page'],
+        added_features: ['Custom AI Chatbot'],
+        removed_features: [],
+        price_delta_inr: 25000,
+        price_delta_usd: 350,
+        invoice_id: 'inv-co-1',
+        status: 'invoiced',
       },
       error: null,
     };
@@ -66,11 +80,11 @@ const mocks = vi.hoisted(() => {
 
   singleFn.mockResolvedValue({
     data: {
-      id: 'co-new',
+      id: 'co-1',
       change_order_number: 'CO-SCOPE-10001-01',
       price_delta_inr: 25000,
       price_delta_usd: 350,
-      status: 'invoiced',
+      status: 'approved',
     },
     error: null,
   });
@@ -78,7 +92,7 @@ const mocks = vi.hoisted(() => {
   updateFn.mockReturnValue(chain);
   insertFn.mockReturnValue(chain);
 
-  return { state, selectFn, eqFn, orderFn, maybeSingleFn, singleFn, updateFn, insertFn, chain };
+  return { state, selectFn, eqFn, neqFn, orderFn, maybeSingleFn, singleFn, updateFn, insertFn, chain };
 });
 
 vi.mock('@/data/supabase', () => ({
@@ -94,11 +108,11 @@ vi.mock('@/lib/sessionVerify', () => ({
     const token = req.headers.get('authorization') || '';
     if (!token.startsWith('Bearer ')) return null;
     if (mocks.state.invalidToken) return null;
-    return 'client@example.com';
+    return mocks.state.isAdmin ? 'prateeqsharma@gmail.com' : 'client@example.com';
   }),
 }));
 
-import { GET, POST } from '@/app/api/client/change-orders/route';
+import { GET, POST, PATCH } from '@/app/api/client/change-orders/route';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -208,3 +222,101 @@ describe('POST /api/client/change-orders', () => {
     expect(body.changeOrder.change_order_number).toBe('CO-SCOPE-10001-01');
   });
 });
+
+describe('PATCH /api/client/change-orders', () => {
+  it('returns 403 when session is not an admin', async () => {
+    mocks.state.isAdmin = false;
+    const req = new Request('http://localhost/api/client/change-orders', {
+      method: 'PATCH',
+      headers: authorizedHeaders,
+      body: JSON.stringify({ changeOrderId: 'co-1', action: 'approve' }),
+    });
+    const res = await PATCH(req);
+    expect(res.status).toBe(403);
+  });
+
+  it('returns 400 when changeOrderId or action is missing/invalid', async () => {
+    mocks.state.isAdmin = true;
+    const req = new Request('http://localhost/api/client/change-orders', {
+      method: 'PATCH',
+      headers: authorizedHeaders,
+      body: JSON.stringify({ changeOrderId: 'co-1', action: 'invalid_action' }),
+    });
+    const res = await PATCH(req);
+    expect(res.status).toBe(400);
+  });
+
+  it('returns 404 when change order is not found in database', async () => {
+    mocks.state.isAdmin = true;
+    mocks.state.changeOrderNotFound = true;
+    const req = new Request('http://localhost/api/client/change-orders', {
+      method: 'PATCH',
+      headers: authorizedHeaders,
+      body: JSON.stringify({ changeOrderId: 'co-unknown', action: 'approve' }),
+    });
+    const res = await PATCH(req);
+    expect(res.status).toBe(404);
+  });
+
+  it('approves a change order when action is approve', async () => {
+    mocks.state.isAdmin = true;
+    mocks.state.changeOrderNotFound = false;
+    const req = new Request('http://localhost/api/client/change-orders', {
+      method: 'PATCH',
+      headers: authorizedHeaders,
+      body: JSON.stringify({ changeOrderId: 'co-1', action: 'approve' }),
+    });
+    const res = await PATCH(req);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.success).toBe(true);
+    expect(body.changeOrder.status).toBe('approved');
+  });
+
+  it('rejects a change order and cancels linked invoice when action is reject', async () => {
+    mocks.state.isAdmin = true;
+    mocks.state.changeOrderNotFound = false;
+    mocks.singleFn.mockResolvedValueOnce({
+      data: {
+        id: 'co-1',
+        change_order_number: 'CO-SCOPE-10001-01',
+        status: 'rejected',
+      },
+      error: null,
+    });
+    const req = new Request('http://localhost/api/client/change-orders', {
+      method: 'PATCH',
+      headers: authorizedHeaders,
+      body: JSON.stringify({ changeOrderId: 'co-1', action: 'reject' }),
+    });
+    const res = await PATCH(req);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.success).toBe(true);
+    expect(body.changeOrder.status).toBe('rejected');
+  });
+
+  it('settles and merges a change order when action is mark_paid', async () => {
+    mocks.state.isAdmin = true;
+    mocks.state.changeOrderNotFound = false;
+    mocks.singleFn.mockResolvedValueOnce({
+      data: {
+        id: 'co-1',
+        change_order_number: 'CO-SCOPE-10001-01',
+        status: 'paid',
+      },
+      error: null,
+    });
+    const req = new Request('http://localhost/api/client/change-orders', {
+      method: 'PATCH',
+      headers: authorizedHeaders,
+      body: JSON.stringify({ changeOrderId: 'co-1', action: 'mark_paid' }),
+    });
+    const res = await PATCH(req);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.success).toBe(true);
+    expect(body.changeOrder.status).toBe('paid');
+  });
+});
+

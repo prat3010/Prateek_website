@@ -34,29 +34,78 @@ export async function GET(req: Request) {
 
       const scopesList = Array.isArray(data) ? data : [];
 
-      // Enrich scopes with project_deliverables (and invoices for admin view) when available
+      // Enrich scopes with project_deliverables, change_orders, and invoices in a single pass
       if (scopesList.length > 0) {
         try {
           const scopeIds = scopesList.map((s) => s.id).filter(Boolean);
-          const delivSelect = supabase.from('project_deliverables').select('*');
-          if (scopeIds.length > 0 && typeof (delivSelect as unknown as { in?: unknown }).in === 'function') {
-            const { data: delivRows } = await (
-              delivSelect as unknown as {
-                in: (col: string, vals: string[]) => Promise<{ data: Array<Record<string, unknown>> | null }>;
-              }
-            ).in('scope_id', scopeIds);
+          if (scopeIds.length > 0) {
+            // 1. Deliverables
+            const delivSelect = supabase.from('project_deliverables').select('*');
+            if (typeof (delivSelect as unknown as { in?: unknown }).in === 'function') {
+              const { data: delivRows } = await (
+                delivSelect as unknown as {
+                  in: (col: string, vals: string[]) => Promise<{ data: Array<Record<string, unknown>> | null }>;
+                }
+              ).in('scope_id', scopeIds);
 
-            if (Array.isArray(delivRows) && delivRows.length > 0) {
-              const delivByScopeId = new Map(delivRows.map((d) => [String(d.scope_id), d]));
-              for (const s of scopesList) {
-                const matchedDeliv = delivByScopeId.get(String(s.id));
-                if (matchedDeliv) {
-                  (s as Record<string, unknown>).deliverables = matchedDeliv;
+              if (Array.isArray(delivRows) && delivRows.length > 0) {
+                const delivByScopeId = new Map(delivRows.map((d) => [String(d.scope_id), d]));
+                for (const s of scopesList) {
+                  const matchedDeliv = delivByScopeId.get(String(s.id));
+                  if (matchedDeliv) {
+                    (s as Record<string, unknown>).deliverables = matchedDeliv;
+                  }
+                }
+              }
+            }
+
+            // 2. Change Orders
+            const coSelect = supabase.from('scope_change_orders').select('*');
+            if (typeof (coSelect as unknown as { in?: unknown }).in === 'function') {
+              const { data: coRows } = await (
+                coSelect as unknown as {
+                  in: (col: string, vals: string[]) => Promise<{ data: Array<Record<string, unknown>> | null }>;
+                }
+              ).in('scope_id', scopeIds);
+
+              if (Array.isArray(coRows)) {
+                const coByScopeId = new Map<string, Array<Record<string, unknown>>>();
+                for (const co of coRows) {
+                  const sid = String(co.scope_id);
+                  if (!coByScopeId.has(sid)) coByScopeId.set(sid, []);
+                  coByScopeId.get(sid)!.push(co);
+                }
+                for (const s of scopesList) {
+                  (s as Record<string, unknown>).change_orders = coByScopeId.get(String(s.id)) || [];
+                }
+              }
+            }
+
+            // 3. Invoices
+            const invSelect = supabase.from('invoices').select('*');
+            if (typeof (invSelect as unknown as { in?: unknown }).in === 'function') {
+              const { data: invRows } = await (
+                invSelect as unknown as {
+                  in: (col: string, vals: string[]) => Promise<{ data: Array<Record<string, unknown>> | null }>;
+                }
+              ).in('scope_id', scopeIds);
+
+              if (Array.isArray(invRows)) {
+                const invByScopeId = new Map<string, Array<Record<string, unknown>>>();
+                for (const inv of invRows) {
+                  const sid = String(inv.scope_id);
+                  if (!invByScopeId.has(sid)) invByScopeId.set(sid, []);
+                  invByScopeId.get(sid)!.push(inv);
+                }
+                for (const s of scopesList) {
+                  (s as Record<string, unknown>).invoices = invByScopeId.get(String(s.id)) || [];
                 }
               }
             }
           }
-        } catch {}
+        } catch (enrichErr) {
+          console.warn('Scope enrichment warning:', enrichErr);
+        }
       }
 
       return NextResponse.json({ scopes: scopesList });
