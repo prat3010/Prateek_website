@@ -273,6 +273,12 @@ ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS onboarding_checklist JSONB DE
 ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS sow_hash TEXT DEFAULT '';
 ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS retriever_tenant_id TEXT;
 ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}';
+ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS maintenance_subscription_id TEXT DEFAULT '';
+ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS maintenance_status TEXT DEFAULT 'inactive';
+ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS maintenance_current_period_end TIMESTAMPTZ;
+
+CREATE INDEX IF NOT EXISTS idx_client_scopes_maint_sub ON client_scopes (maintenance_subscription_id);
+CREATE INDEX IF NOT EXISTS idx_client_scopes_maint_status ON client_scopes (maintenance_status);
 
 ALTER TABLE client_scopes ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Clients can select own client_scopes" ON client_scopes;

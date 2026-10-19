@@ -2,7 +2,10 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { supabase } from '@/data/supabase';
 import { resolvePlanSpec } from '@/app/api/client/create-razorpay-subscription/route';
-import { sendRetrieverSubscriptionNotifications } from '@/lib/emailNotification';
+import {
+  sendRetrieverSubscriptionNotifications,
+  sendPaymentConfirmationNotifications,
+} from '@/lib/emailNotification';
 import { ensureRetrieverEngineTenant } from '@/lib/retrieverProvision';
 import { getVerifiedSessionUser } from '@/lib/sessionVerify';
 
@@ -15,6 +18,8 @@ export async function POST(req: Request) {
       razorpayPaymentId,
       razorpaySignature,
       planId = 'pro_inr',
+      scopeCode = '',
+      subscriptionType = '',
     } = payload;
 
     if (!razorpaySubscriptionId) {
@@ -73,6 +78,111 @@ export async function POST(req: Request) {
 
     const planSpec = resolvePlanSpec(planId);
     const planTier = planSpec.tier;
+    const isCarePlan =
+      subscriptionType === 'care_plan' ||
+      Boolean(planSpec.isCarePlan) ||
+      Boolean(scopeCode) ||
+      planId.startsWith('care_');
+
+    if (isCarePlan) {
+      if (!supabase) {
+        return NextResponse.json({
+          success: true,
+          subscriptionType: 'care_plan',
+          planTier,
+          message: 'Maintenance retainer verified in degraded mode.',
+        });
+      }
+
+      const nowIso = new Date().toISOString();
+      const currentPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+      let targetScope: {
+        id: string;
+        scope_code: string;
+        client_id: string | null;
+        company_name: string;
+      } | null = null;
+
+      if (scopeCode) {
+        const { data } = await supabase
+          .from('client_scopes')
+          .select('id, scope_code, client_id, company_name')
+          .eq('scope_code', scopeCode)
+          .maybeSingle();
+        targetScope = data;
+      } else {
+        const { data } = await supabase
+          .from('client_scopes')
+          .select('id, scope_code, client_id, company_name')
+          .eq('client_email', sessionUser.email)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        targetScope = data;
+      }
+
+      if (targetScope) {
+        await supabase
+          .from('client_scopes')
+          .update({
+            maintenance_subscription_id: razorpaySubscriptionId,
+            maintenance_status: 'active',
+            maintenance_current_period_end: currentPeriodEnd,
+            maintenance_plan: planSpec.name,
+            updated_at: nowIso,
+          })
+          .eq('id', targetScope.id);
+      }
+
+      const invoiceRef = razorpayPaymentId || razorpaySubscriptionId;
+      const invoiceNumber = `CARE-${invoiceRef.replace(/[^A-Za-z0-9]/g, '').slice(-8).toUpperCase()}`;
+      const amountMajor = Math.round(planSpec.amount / 100);
+
+      try {
+        await supabase.from('invoices').upsert(
+          {
+            invoice_number: invoiceNumber,
+            client_id: targetScope?.client_id || null,
+            scope_id: targetScope?.id || null,
+            customer_name: sessionUser.email.split('@')[0],
+            customer_email: sessionUser.email,
+            milestone_name: `Maintenance Retainer (${planSpec.name})`,
+            amount: amountMajor,
+            currency: planSpec.currency,
+            payment_status: 'paid',
+            razorpay_order_id: razorpaySubscriptionId,
+            razorpay_payment_id: razorpayPaymentId || razorpaySubscriptionId,
+            paid_at: nowIso,
+            updated_at: nowIso,
+          },
+          { onConflict: 'invoice_number' }
+        );
+      } catch (invErr) {
+        console.warn('Care plan invoice ledger insert warning:', invErr);
+      }
+
+      sendPaymentConfirmationNotifications({
+        clientEmail: sessionUser.email,
+        clientName: targetScope?.company_name || sessionUser.email.split('@')[0],
+        scopeCode: targetScope?.scope_code || scopeCode || 'RETAINER',
+        projectName: targetScope?.company_name || 'Project Care Plan',
+        invoiceNumber,
+        milestoneName: `Monthly Maintenance Retainer (${planSpec.name})`,
+        amount: amountMajor,
+        currency: planSpec.currency,
+        paymentId: razorpayPaymentId || razorpaySubscriptionId,
+      }).catch((err) => console.warn('Care plan payment notification warning:', err));
+
+      return NextResponse.json({
+        success: true,
+        subscriptionType: 'care_plan',
+        planTier,
+        scopeCode: targetScope?.scope_code || scopeCode,
+        currentPeriodEnd,
+        message: 'Monthly maintenance care retainer successfully activated.',
+      });
+    }
 
     if (!supabase) {
       return NextResponse.json({

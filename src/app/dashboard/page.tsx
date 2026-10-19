@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { generateQuestionnairePDF, generateExecutiveBriefPDF } from '@/utils/pdfGenerator';
 import type { ClientScope, InvoiceEntity } from '@/lib/clientOrder';
+import { resolveMaintenancePlanKey } from '@/lib/clientOrder';
 import { toast } from 'sonner';
 
 import resumeData from '@/data/resume.json';
@@ -509,6 +510,156 @@ export default function ClientDashboardPage() {
     }
   };
 
+  const handleActivateMaintenance = async (scope: ClientScope) => {
+    try {
+      const isLoaded = await loadRazorpayScript();
+      if (!isLoaded) {
+        toast.error('Could not load payment checkout gateway. Please check your network connection.');
+        return;
+      }
+
+      const token = await getAccessToken();
+      const curr = (scope.currency === 'USD' ? 'USD' : 'INR') as 'USD' | 'INR';
+      const planId = resolveMaintenancePlanKey(scope.maintenance_plan, curr);
+
+      const res = await fetch('/api/client/create-razorpay-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          planId,
+          scopeCode: scope.scope_code,
+        }),
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        toast.error(`Subscription Error: ${errJson.error || 'Failed to initialize care plan subscription'}`);
+        return;
+      }
+
+      const subData = await res.json();
+
+      if (subData.isMock) {
+        const confirmSimulated = window.confirm(
+          `⚡ Razorpay Sandbox Mode (Offline Dev Server):\n\nSimulate activating monthly recurring care plan subscription (${planId}) for Scope ${scope.scope_code}?`
+        );
+
+        if (confirmSimulated) {
+          try {
+            const verifyRes = await fetch('/api/client/verify-razorpay-subscription', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              },
+              body: JSON.stringify({
+                scopeCode: scope.scope_code,
+                razorpaySubscriptionId: subData.subscriptionId,
+                razorpayPaymentId: `pay_mock_care_${Date.now()}`,
+                razorpaySignature: 'test_sub_signature_mock',
+                planId,
+                subscriptionType: 'care_plan',
+              }),
+            });
+
+            if (verifyRes.ok) {
+              const currentPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+              setScopes((prev) =>
+                prev.map((s) =>
+                  s.id === scope.id
+                    ? {
+                        ...s,
+                        maintenance_subscription_id: subData.subscriptionId,
+                        maintenance_status: 'active',
+                        maintenance_current_period_end: currentPeriodEnd,
+                      }
+                    : s
+                )
+              );
+              await loadInvoices();
+              toast.success('🎉 Monthly maintenance retainer activated! Your SLA guarantee is now active.');
+            }
+          } catch (verErr) {
+            console.error('Mock subscription verification error:', verErr);
+          }
+        }
+        return;
+      }
+
+      if (typeof window === 'undefined' || !window.Razorpay) {
+        toast.error('Payment gateway script failed to load. Please refresh and try again.');
+        return;
+      }
+
+      const RazorpayClass = window.Razorpay;
+      const rzp = new RazorpayClass({
+        key: subData.keyId,
+        subscription_id: subData.subscriptionId,
+        name: 'Prateeq Studio',
+        description: `Monthly Maintenance Care Retainer for Scope #${scope.scope_code}`,
+        handler: async (response: Record<string, string>) => {
+          try {
+            const verifyRes = await fetch('/api/client/verify-razorpay-subscription', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              },
+              body: JSON.stringify({
+                scopeCode: scope.scope_code,
+                razorpaySubscriptionId: response.razorpay_subscription_id,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpaySignature: response.razorpay_signature,
+                planId,
+                subscriptionType: 'care_plan',
+              }),
+            });
+
+            if (verifyRes.ok) {
+              const currentPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+              setScopes((prev) =>
+                prev.map((s) =>
+                  s.id === scope.id
+                    ? {
+                        ...s,
+                        maintenance_subscription_id: response.razorpay_subscription_id,
+                        maintenance_status: 'active',
+                        maintenance_current_period_end: currentPeriodEnd,
+                      }
+                    : s
+                )
+              );
+              await loadInvoices();
+              toast.success('🎉 Monthly maintenance retainer activated! Your SLA guarantee is now active.');
+            } else {
+              toast.error('Subscription verification failed. Please contact engineering support.');
+            }
+          } catch (verErr) {
+            console.error('Subscription verification network error:', verErr);
+          }
+        },
+        prefill: {
+          name: user?.user_metadata?.full_name || scope.company_name,
+          email: user?.email,
+          contact: scope.client_phone || '',
+        },
+        theme: { color: '#00f0ff' },
+        modal: {
+          ondismiss: () => {
+            toast.info('Care retainer checkout window closed.');
+          },
+        },
+      });
+
+      rzp.open();
+    } catch (err) {
+      console.error('Activate maintenance error:', err);
+    }
+  };
+
   const handlePayInvoice = async (invoice: InvoiceEntity) => {
     if (invoice.payment_status === 'paid') {
       toast.info('This invoice has already been settled.');
@@ -991,6 +1142,7 @@ export default function ClientDashboardPage() {
                 onOpenStagingPreview={(s) => setStagingPreviewScope(s)}
                 onDeleteScope={handleDeleteScope}
                 onPayBalance={handlePayBalance}
+                onActivateMaintenance={handleActivateMaintenance}
               />
             ))
           )}

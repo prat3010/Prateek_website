@@ -13,6 +13,9 @@ import {
   Clock,
   ExternalLink,
   CreditCard,
+  ShieldCheck,
+  Zap,
+  Calendar,
 } from 'lucide-react';
 
 import type { ClientScope, ScopeChangeOrderEntity, ClientDeliveryStage } from '@/lib/clientOrder';
@@ -28,7 +31,51 @@ interface ScopeCardProps {
   onOpenStagingPreview: (scope: ClientScope) => void;
   onDeleteScope: (scopeCode: string) => void;
   onPayBalance?: (scope: ClientScope) => void;
+  onActivateMaintenance?: (scope: ClientScope) => void;
 }
+
+const getMaintenanceMeta = (planStr: string, currency: 'INR' | 'USD') => {
+  const lower = (planStr || '').toLowerCase();
+  const isUsd = currency === 'USD';
+  if (lower.includes('premium') || lower.includes('sla')) {
+    return {
+      name: 'Premium AI & Dev SLA Care',
+      price: isUsd ? '$475 / month' : '₹35,000 / month',
+      sla: '24-Hour Priority SLA',
+      allocation: 'Up to 8 hrs dev allocation/mo',
+      highlights: 'AI vector DB & LLM latency tuning, SEO analytics reports, priority bug fixes',
+      planId: isUsd ? 'care_premium_usd' : 'care_premium_inr',
+    };
+  }
+  if (lower.includes('standard')) {
+    return {
+      name: 'Standard Care Plan',
+      price: isUsd ? '$140 / month' : '₹10,000 / month',
+      sla: '1 Business Day SLA',
+      allocation: '3–4 hrs dev allocation/mo',
+      highlights: 'Monthly content updates, page speed tuning, schema updates, daily automated backups',
+      planId: isUsd ? 'care_standard_usd' : 'care_standard_inr',
+    };
+  }
+  if (lower.includes('basic')) {
+    return {
+      name: 'Basic Care Plan',
+      price: isUsd ? '$70 / month' : '₹5,000 / month',
+      sla: '2 Business Days SLA',
+      allocation: 'Up to 1 hr dev allocation/mo',
+      highlights: 'Daily automated PostgreSQL backups, Vercel uptime monitoring, security dependency patches',
+      planId: isUsd ? 'care_basic_usd' : 'care_basic_inr',
+    };
+  }
+  return {
+    name: 'Self-Managed (30-Day Warranty)',
+    price: isUsd ? '$0' : '₹0',
+    sla: '30-Day Post-Launch Warranty',
+    allocation: 'Full handover documentation',
+    highlights: 'Complimentary bug fixes for 30 days post-launch. Upgrade anytime to an active retainer.',
+    planId: isUsd ? 'care_basic_usd' : 'care_basic_inr',
+  };
+};
 
 export function ScopeCard({
   scope,
@@ -39,10 +86,14 @@ export function ScopeCard({
   onOpenStagingPreview,
   onDeleteScope,
   onPayBalance,
+  onActivateMaintenance,
 }: ScopeCardProps) {
   const isDepositPaid = Boolean(scope.deposit_paid);
   const isBalancePaid = Boolean(scope.balance_paid || scope.is_fully_paid);
   const deliveryStage = scope.delivery_stage || (isDepositPaid ? 'engineering' : 'architecture');
+
+  const maintMeta = getMaintenanceMeta(scope.maintenance_plan, (scope.currency === 'USD' ? 'USD' : 'INR'));
+  const isMaintActive = scope.maintenance_status === 'active';
 
   const isThreePart = scope.payment_structure === '40/30/30';
   const balanceMultiplier = isThreePart ? 0.3 : 0.5;
@@ -232,6 +283,78 @@ export function ScopeCard({
           </div>
         </div>
       )}
+
+      {/* Maintenance Care Retainer Widget */}
+      <div
+        className={`${styles.retainerContainer} ${
+          isMaintActive ? styles.retainerContainerActive : ''
+        }`}
+      >
+        <div className={styles.retainerHeader}>
+          <div className={styles.retainerTitleGroup}>
+            <ShieldCheck size={18} className={styles.retainerIcon} />
+            <h4 className={styles.retainerHeading}>Monthly Maintenance &amp; SLA Retainer</h4>
+          </div>
+          {isMaintActive ? (
+            <span className={styles.retainerBadgeActive}>
+              <Zap size={12} className={styles.pulsingIcon} /> Retainer Active
+            </span>
+          ) : (
+            <span className={styles.retainerBadgeInactive}>
+              <Clock size={12} /> {scope.maintenance_plan?.includes('Warranty') ? 'Warranty Only' : 'Inactive Retainer'}
+            </span>
+          )}
+        </div>
+
+        <div className={styles.retainerMetaGrid}>
+          <div className={styles.retainerMetaItem}>
+            <span className={styles.retainerMetaLabel}>Tier &amp; Price</span>
+            <span className={styles.retainerMetaValue}>
+              {maintMeta.name} {maintMeta.price !== '$0' && maintMeta.price !== '₹0' ? `(${maintMeta.price})` : ''}
+            </span>
+          </div>
+          <div className={styles.retainerMetaItem}>
+            <span className={styles.retainerMetaLabel}>Response Guarantee</span>
+            <span className={styles.retainerMetaValue}>{maintMeta.sla}</span>
+          </div>
+          <div className={styles.retainerMetaItem}>
+            <span className={styles.retainerMetaLabel}>Monthly Allocation</span>
+            <span className={styles.retainerMetaValue}>{maintMeta.allocation}</span>
+          </div>
+        </div>
+
+        <p className={styles.retainerHighlights}>{maintMeta.highlights}</p>
+
+        <div className={styles.retainerActionBar}>
+          {isMaintActive ? (
+            <span className={styles.retainerRenewalInfo}>
+              <Calendar size={13} style={{ display: 'inline', verticalAlign: '-2px', marginRight: '4px' }} />
+              {scope.maintenance_current_period_end
+                ? `Active cycle renews on ${new Date(scope.maintenance_current_period_end).toLocaleDateString()}`
+                : 'Subscription active with automated monthly billing'}
+              {scope.maintenance_subscription_id ? ` • #${scope.maintenance_subscription_id}` : ''}
+            </span>
+          ) : (
+            <>
+              <span className={styles.retainerRenewalInfo}>
+                {maintMeta.price !== '$0' && maintMeta.price !== '₹0'
+                  ? `Automated recurring monthly retainer (${maintMeta.price})`
+                  : 'Upgrade to a dedicated monthly retainer for guaranteed SLA support.'}
+              </span>
+              <button
+                type="button"
+                className={styles.retainerCtaBtn}
+                onClick={() => onActivateMaintenance?.(scope)}
+              >
+                <Zap size={14} />
+                {maintMeta.price !== '$0' && maintMeta.price !== '₹0'
+                  ? `Activate ${maintMeta.name}`
+                  : 'Subscribe to Care Retainer'}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
 
       {/* Scope Action Bar */}
       <div className={styles.scopeActionsBar}>

@@ -357,6 +357,7 @@ export async function POST(req: Request) {
       const payId = payEntity?.id;
       const notes = subEntity?.notes || {};
       const clientEmail = notes?.client_email || notes?.email;
+      const scopeCode = notes?.scope_code;
       let targetTenantId = notes?.tenant_id;
       const rawPlanIdentifier = notes?.plan_id || notes?.tier || subEntity?.plan_id || 'starter_inr';
       const planSpec = resolvePlanSpec(rawPlanIdentifier);
@@ -368,6 +369,128 @@ export async function POST(req: Request) {
         event !== 'subscription.paused';
       const tokenLimit =
         planTier === 'business' ? 10_000_000 : planTier === 'pro' ? 1_500_000 : 250_000;
+
+      const isCarePlan =
+        notes?.subscription_type === 'care_plan' ||
+        Boolean(scopeCode) ||
+        Boolean(planSpec.isCarePlan) ||
+        notes?.plan_id?.startsWith('care_') ||
+        rawPlanIdentifier.startsWith('care_');
+
+      if (isCarePlan && subId) {
+        let newStatus: 'active' | 'paused' | 'cancelled' = 'active';
+        if (event === 'subscription.paused') {
+          newStatus = 'paused';
+        } else if (event === 'subscription.cancelled' || event === 'subscription.halted') {
+          newStatus = 'cancelled';
+        }
+
+        const currentPeriodEnd = subEntity?.current_end
+          ? new Date(subEntity.current_end * 1000).toISOString()
+          : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+        let targetScope: {
+          id: string;
+          scope_code: string;
+          client_id: string | null;
+          company_name: string;
+          client_email: string;
+        } | null = null;
+
+        if (scopeCode) {
+          const { data } = await supabase
+            .from('client_scopes')
+            .select('id, scope_code, client_id, company_name, client_email')
+            .eq('scope_code', scopeCode)
+            .maybeSingle();
+          targetScope = data;
+        }
+
+        if (!targetScope && subId) {
+          const { data } = await supabase
+            .from('client_scopes')
+            .select('id, scope_code, client_id, company_name, client_email')
+            .eq('maintenance_subscription_id', subId)
+            .maybeSingle();
+          targetScope = data;
+        }
+
+        if (!targetScope && clientEmail) {
+          const { data } = await supabase
+            .from('client_scopes')
+            .select('id, scope_code, client_id, company_name, client_email')
+            .eq('client_email', clientEmail)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          targetScope = data;
+        }
+
+        if (targetScope) {
+          await supabase
+            .from('client_scopes')
+            .update({
+              maintenance_subscription_id: subId,
+              maintenance_status: newStatus,
+              maintenance_current_period_end: currentPeriodEnd,
+              maintenance_plan: planSpec.name,
+              updated_at: nowIso,
+            })
+            .eq('id', targetScope.id);
+        }
+
+        if (newStatus === 'active' && (event === 'subscription.charged' || event === 'subscription.activated')) {
+          const invoiceRef = payId || subId;
+          const invoiceNumber = `CARE-${String(invoiceRef).replace(/[^A-Za-z0-9]/g, '').slice(-8).toUpperCase()}`;
+          const amountMajor = Math.round(planSpec.amount / 100);
+
+          try {
+            await supabase.from('invoices').upsert(
+              {
+                invoice_number: invoiceNumber,
+                client_id: targetScope?.client_id || null,
+                scope_id: targetScope?.id || null,
+                customer_name: targetScope?.company_name || (clientEmail ? clientEmail.split('@')[0] : 'Client'),
+                customer_email: clientEmail || targetScope?.client_email || '',
+                milestone_name: `Maintenance Retainer (${planSpec.name})`,
+                amount: amountMajor,
+                currency: planSpec.currency,
+                payment_status: 'paid',
+                razorpay_order_id: subId,
+                razorpay_payment_id: payId || subId,
+                paid_at: nowIso,
+                updated_at: nowIso,
+              },
+              { onConflict: 'invoice_number' }
+            );
+
+            const notifyEmail = clientEmail || targetScope?.client_email;
+            if (notifyEmail) {
+              sendPaymentConfirmationNotifications({
+                clientEmail: notifyEmail,
+                clientName: targetScope?.company_name || notifyEmail.split('@')[0],
+                scopeCode: targetScope?.scope_code || scopeCode || 'RETAINER',
+                projectName: targetScope?.company_name || 'Project Care Plan',
+                invoiceNumber,
+                milestoneName: `Monthly Maintenance Retainer (${planSpec.name})`,
+                amount: amountMajor,
+                currency: planSpec.currency,
+                paymentId: payId || subId,
+              }).catch((err) => console.warn('Webhook care retainer notification warning:', err));
+            }
+          } catch (invErr) {
+            console.warn('Webhook care retainer invoice upsert warning:', invErr);
+          }
+        }
+
+        return NextResponse.json({
+          status: 'ok',
+          subscription_type: 'care_plan',
+          event,
+          scope_code: targetScope?.scope_code || scopeCode,
+          maintenance_status: newStatus,
+        });
+      }
 
       if (subId) {
         let clientId: string | null = null;

@@ -2,18 +2,33 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
 import { getVerifiedSessionEmail, getVerifiedSessionUser } from '@/lib/sessionVerify';
 
-export interface RetrieverPlanSpec {
-  planKey: 'starter_inr' | 'pro_inr' | 'business_inr' | 'starter_usd' | 'pro_usd' | 'business_usd';
-  tier: 'starter' | 'pro' | 'business';
+export interface SubscriptionPlanSpec {
+  planKey:
+    | 'starter_inr'
+    | 'pro_inr'
+    | 'business_inr'
+    | 'starter_usd'
+    | 'pro_usd'
+    | 'business_usd'
+    | 'care_basic_inr'
+    | 'care_basic_usd'
+    | 'care_standard_inr'
+    | 'care_standard_usd'
+    | 'care_premium_inr'
+    | 'care_premium_usd';
+  tier: 'starter' | 'pro' | 'business' | 'basic' | 'standard' | 'premium';
   name: string;
   description: string;
   amount: number; // paise or cents
   currency: 'INR' | 'USD';
   formattedPrice: string;
   envKey: string;
+  isCarePlan?: boolean;
 }
 
-const CANONICAL_PLANS: Record<RetrieverPlanSpec['planKey'], RetrieverPlanSpec> = {
+export type RetrieverPlanSpec = SubscriptionPlanSpec;
+
+const CANONICAL_PLANS: Record<SubscriptionPlanSpec['planKey'], SubscriptionPlanSpec> = {
   starter_inr: {
     planKey: 'starter_inr',
     tier: 'starter',
@@ -74,11 +89,90 @@ const CANONICAL_PLANS: Record<RetrieverPlanSpec['planKey'], RetrieverPlanSpec> =
     formattedPrice: '$199',
     envKey: 'RAZORPAY_PLAN_BUSINESS_USD',
   },
+  care_basic_inr: {
+    planKey: 'care_basic_inr',
+    tier: 'basic',
+    name: 'Basic Care Plan (INR Monthly)',
+    description: 'Basic Care Plan — Daily Backups, Uptime Monitoring, Security Patches (2-day SLA)',
+    amount: 500000,
+    currency: 'INR',
+    formattedPrice: '₹5,000',
+    envKey: 'RAZORPAY_PLAN_CARE_BASIC_INR',
+    isCarePlan: true,
+  },
+  care_basic_usd: {
+    planKey: 'care_basic_usd',
+    tier: 'basic',
+    name: 'Basic Care Plan (USD Monthly)',
+    description: 'Basic Care Plan — Daily Backups, Uptime Monitoring, Security Patches (2-day SLA)',
+    amount: 7000,
+    currency: 'USD',
+    formattedPrice: '$70',
+    envKey: 'RAZORPAY_PLAN_CARE_BASIC_USD',
+    isCarePlan: true,
+  },
+  care_standard_inr: {
+    planKey: 'care_standard_inr',
+    tier: 'standard',
+    name: 'Standard Care Plan (INR Monthly)',
+    description: 'Standard Care Plan — 3-4 Hours Dedicated Dev, Performance Tuning, Content Updates (1-day SLA)',
+    amount: 1000000,
+    currency: 'INR',
+    formattedPrice: '₹10,000',
+    envKey: 'RAZORPAY_PLAN_CARE_STANDARD_INR',
+    isCarePlan: true,
+  },
+  care_standard_usd: {
+    planKey: 'care_standard_usd',
+    tier: 'standard',
+    name: 'Standard Care Plan (USD Monthly)',
+    description: 'Standard Care Plan — 3-4 Hours Dedicated Dev, Performance Tuning, Content Updates (1-day SLA)',
+    amount: 14000,
+    currency: 'USD',
+    formattedPrice: '$140',
+    envKey: 'RAZORPAY_PLAN_CARE_STANDARD_USD',
+    isCarePlan: true,
+  },
+  care_premium_inr: {
+    planKey: 'care_premium_inr',
+    tier: 'premium',
+    name: 'Premium AI & Dev SLA Care Plan (INR Monthly)',
+    description: 'Premium SLA Care Plan — Up to 8 Dev Hours, AI Vector/LLM Tuning, SEO Reports (24-hr Priority SLA)',
+    amount: 3500000,
+    currency: 'INR',
+    formattedPrice: '₹35,000',
+    envKey: 'RAZORPAY_PLAN_CARE_PREMIUM_INR',
+    isCarePlan: true,
+  },
+  care_premium_usd: {
+    planKey: 'care_premium_usd',
+    tier: 'premium',
+    name: 'Premium AI & Dev SLA Care Plan (USD Monthly)',
+    description: 'Premium SLA Care Plan — Up to 8 Dev Hours, AI Vector/LLM Tuning, SEO Reports (24-hr Priority SLA)',
+    amount: 47500,
+    currency: 'USD',
+    formattedPrice: '$475',
+    envKey: 'RAZORPAY_PLAN_CARE_PREMIUM_USD',
+    isCarePlan: true,
+  },
 };
 
-export function resolvePlanSpec(rawPlanId: string): RetrieverPlanSpec {
+export function resolvePlanSpec(rawPlanId: string): SubscriptionPlanSpec {
   const lower = (rawPlanId || '').toLowerCase().trim();
   const isUsd = lower.includes('usd');
+
+  // Care Plan Matchers
+  if (lower.startsWith('care_') || lower.includes('care') || lower.includes('retainer') || lower.includes('sla')) {
+    if (lower.includes('premium') || lower.includes('sla') || lower.includes('ai')) {
+      return isUsd ? CANONICAL_PLANS.care_premium_usd : CANONICAL_PLANS.care_premium_inr;
+    }
+    if (lower.includes('standard')) {
+      return isUsd ? CANONICAL_PLANS.care_standard_usd : CANONICAL_PLANS.care_standard_inr;
+    }
+    return isUsd ? CANONICAL_PLANS.care_basic_usd : CANONICAL_PLANS.care_basic_inr;
+  }
+
+  // Retriever SaaS Matchers
   if (lower.includes('business') || lower.includes('enterprise')) {
     return isUsd ? CANONICAL_PLANS.business_usd : CANONICAL_PLANS.business_inr;
   }
@@ -92,7 +186,7 @@ const planIdCache = new Map<string, string>();
 
 async function resolveOrCreateRazorpayPlanId(
   rawPlanId: string,
-  spec: RetrieverPlanSpec,
+  spec: SubscriptionPlanSpec,
   authHeader: string
 ): Promise<string> {
   // 1. If caller already passed a real Razorpay generated plan ID (plan_ + 14 alphanumeric chars)
@@ -187,8 +281,10 @@ export async function POST(req: Request) {
     const KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '';
     const payload = await req.json().catch(() => ({}));
     const rawPlanId = (payload.planId as string) || 'starter_inr';
+    const scopeCode = (payload.scopeCode as string) || '';
     const totalCount = Number(payload.totalCount) || 12;
     const planSpec = resolvePlanSpec(rawPlanId);
+    const isCarePlan = Boolean(planSpec.isCarePlan || scopeCode || rawPlanId.startsWith('care_'));
 
     const sessionUser = await getVerifiedSessionUser(req);
     const clientEmail = sessionUser?.email || (await getVerifiedSessionEmail(req));
@@ -202,7 +298,7 @@ export async function POST(req: Request) {
     }
 
     let targetTenantId = (payload.tenantId as string) || '';
-    if (clientEmail && supabase) {
+    if (!isCarePlan && clientEmail && supabase) {
       const { data: member } = await supabase
         .from('rag_tenant_members')
         .select('tenant_id')
@@ -221,6 +317,8 @@ export async function POST(req: Request) {
           subscriptionId: `sub_mock_${Date.now()}`,
           planId: planSpec.planKey,
           tier: planSpec.tier,
+          subscriptionType: isCarePlan ? 'care_plan' : 'retriever_saas',
+          scopeCode,
           tenantId: targetTenantId || 'tn_dev_mock',
           keyId: KEY_ID || 'rzp_test_mock',
         });
@@ -246,7 +344,9 @@ export async function POST(req: Request) {
           customer_notify: 1,
           notes: {
             client_email: clientEmail || 'guest@prateeq.in',
-            tenant_id: targetTenantId,
+            tenant_id: isCarePlan ? '' : targetTenantId,
+            scope_code: scopeCode,
+            subscription_type: isCarePlan ? 'care_plan' : 'retriever_saas',
             plan_id: planSpec.planKey,
             tier: planSpec.tier,
             formatted_price: planSpec.formattedPrice,
@@ -264,6 +364,8 @@ export async function POST(req: Request) {
             subscriptionId: `sub_mock_${Date.now()}`,
             planId: planSpec.planKey,
             tier: planSpec.tier,
+            subscriptionType: isCarePlan ? 'care_plan' : 'retriever_saas',
+            scopeCode,
             keyId: KEY_ID,
           });
         }
@@ -277,6 +379,8 @@ export async function POST(req: Request) {
         planId: planSpec.planKey,
         razorpayPlanId: subData.plan_id,
         tier: planSpec.tier,
+        subscriptionType: isCarePlan ? 'care_plan' : 'retriever_saas',
+        scopeCode,
         status: subData.status,
         keyId: KEY_ID,
       });
@@ -288,6 +392,8 @@ export async function POST(req: Request) {
           subscriptionId: `sub_mock_${Date.now()}`,
           planId: planSpec.planKey,
           tier: planSpec.tier,
+          subscriptionType: isCarePlan ? 'care_plan' : 'retriever_saas',
+          scopeCode,
           keyId: KEY_ID,
         });
       }

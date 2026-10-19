@@ -186,6 +186,15 @@ export async function POST(req: Request) {
       if (typeof rawObj.isFullyPaid === 'boolean') {
         scopeData.is_fully_paid = rawObj.isFullyPaid;
       }
+      if (typeof rawObj.maintenanceStatus === 'string') {
+        scopeData.maintenance_status = rawObj.maintenanceStatus;
+      }
+      if (typeof rawObj.maintenanceSubscriptionId === 'string') {
+        scopeData.maintenance_subscription_id = rawObj.maintenanceSubscriptionId;
+      }
+      if (typeof rawObj.maintenanceCurrentPeriodEnd === 'string') {
+        scopeData.maintenance_current_period_end = rawObj.maintenanceCurrentPeriodEnd;
+      }
     }
 
     const savedScopeId: string | undefined = existingScope?.id;

@@ -52,6 +52,10 @@ interface ClientRecord {
   is_fully_paid?: boolean;
   delivery_stage?: 'architecture' | 'engineering' | 'staging' | 'live';
   status?: string;
+  maintenance_plan?: string;
+  maintenance_status?: 'inactive' | 'active' | 'paused' | 'cancelled';
+  maintenance_subscription_id?: string;
+  maintenance_current_period_end?: string;
   onboarding_checklist?: Record<string, boolean | string>;
   deliverables?: {
     staging_url?: string;
@@ -150,6 +154,7 @@ export default function AdminControlCenter() {
   const [paymentEdits, setPaymentEdits] = useState<
     Record<string, { deposit_paid: boolean; balance_paid: boolean }>
   >({});
+  const [maintenanceEdits, setMaintenanceEdits] = useState<Record<string, string>>({});
   const [deliverableEdits, setDeliverableEdits] = useState<
     Record<string, { staging_url: string; production_url: string; github_repo: string; figma_url: string }>
   >({});
@@ -202,6 +207,7 @@ export default function AdminControlCenter() {
         deposit_paid: Boolean(scope.deposit_paid),
         balance_paid: Boolean(scope.balance_paid),
       };
+      const maintStatus = maintenanceEdits[scope.scope_code] || scope.maintenance_status || 'inactive';
       const deliv = deliverableEdits[scope.scope_code] || {
         staging_url: scope.deliverables?.staging_url || '',
         production_url: scope.deliverables?.production_url || '',
@@ -224,6 +230,7 @@ export default function AdminControlCenter() {
           depositPaid: payments.deposit_paid,
           balancePaid: payments.balance_paid,
           isFullyPaid: payments.deposit_paid && payments.balance_paid,
+          maintenanceStatus: maintStatus,
           deliverables: deliv,
         }),
       });
@@ -656,6 +663,7 @@ export default function AdminControlCenter() {
                     deposit_paid: Boolean(c.deposit_paid),
                     balance_paid: Boolean(c.balance_paid),
                   };
+                  const currentMaintStatus = maintenanceEdits[c.scope_code] ?? c.maintenance_status ?? 'inactive';
                   const currentDeliv = deliverableEdits[c.scope_code] || {
                     staging_url: c.deliverables?.staging_url || '',
                     production_url: c.deliverables?.production_url || '',
@@ -741,6 +749,58 @@ export default function AdminControlCenter() {
                             }
                           />
                           <span>Balance Paid (50%)</span>
+                        </label>
+                      </div>
+
+                      {/* Maintenance Retainer State */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', marginBottom: '0.6rem', padding: '0.55rem 0.75rem', background: 'var(--surface-elevated)', borderRadius: '6px', border: '1px solid var(--surface-glass-border)', fontSize: '0.8rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.4rem' }}>
+                          <span style={{ fontWeight: 700, color: 'var(--color-text)' }}>
+                            🛡️ Care Retainer: {c.maintenance_plan || 'Self-Managed'}
+                          </span>
+                          <span
+                            style={{
+                              fontSize: '0.7rem',
+                              fontWeight: 700,
+                              padding: '2px 8px',
+                              borderRadius: '9999px',
+                              background: currentMaintStatus === 'active' ? 'rgba(34, 197, 94, 0.15)' : currentMaintStatus === 'paused' ? 'rgba(234, 179, 8, 0.15)' : 'rgba(148, 163, 184, 0.15)',
+                              color: currentMaintStatus === 'active' ? '#22c55e' : currentMaintStatus === 'paused' ? '#eab308' : 'var(--color-text-muted)',
+                              border: `1px solid ${currentMaintStatus === 'active' ? 'rgba(34, 197, 94, 0.35)' : currentMaintStatus === 'paused' ? 'rgba(234, 179, 8, 0.3)' : 'rgba(148, 163, 184, 0.3)'}`,
+                            }}
+                          >
+                            {currentMaintStatus === 'active' ? '🟢 Active' : currentMaintStatus === 'paused' ? '⏸️ Paused' : currentMaintStatus === 'cancelled' ? '✕ Cancelled' : '⚪ Inactive'}
+                          </span>
+                        </div>
+                        {c.maintenance_subscription_id && (
+                          <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', fontFamily: 'monospace' }}>
+                            Sub ID: {c.maintenance_subscription_id}
+                            {c.maintenance_current_period_end ? ` • Renews: ${new Date(c.maintenance_current_period_end).toLocaleDateString()}` : ''}
+                          </div>
+                        )}
+                        <label style={{ fontSize: '0.75rem', fontWeight: 600, marginTop: '0.2rem' }}>
+                          Retainer Status Override:
+                          <select
+                            value={currentMaintStatus}
+                            onChange={e =>
+                              setMaintenanceEdits(prev => ({ ...prev, [c.scope_code]: e.target.value }))
+                            }
+                            style={{
+                              width: '100%',
+                              marginTop: '0.2rem',
+                              padding: '0.35rem',
+                              borderRadius: '5px',
+                              border: '1px solid var(--surface-glass-border)',
+                              background: 'var(--surface-card)',
+                              color: 'var(--color-text)',
+                              fontSize: '0.75rem',
+                            }}
+                          >
+                            <option value="inactive">Inactive / Unsubscribed</option>
+                            <option value="active">Active (Paid Retainer)</option>
+                            <option value="paused">Paused</option>
+                            <option value="cancelled">Cancelled</option>
+                          </select>
                         </label>
                       </div>
 

@@ -34,6 +34,9 @@ export interface ClientScope {
   onboarding_checklist?: Record<string, boolean | string>;
   sow_hash?: string;
   retriever_tenant_id?: string;
+  maintenance_subscription_id?: string;
+  maintenance_status?: 'inactive' | 'active' | 'paused' | 'cancelled';
+  maintenance_current_period_end?: string;
   deliverables?: DeliverableEntity;
   metadata?: Record<string, unknown>;
   created_at: string;
@@ -539,3 +542,15 @@ export const copilotQuerySchema = {
     };
   },
 };
+
+export function resolveMaintenancePlanKey(planNameOrId: string, currency: 'INR' | 'USD'): string {
+  const lower = (planNameOrId || '').toLowerCase().trim();
+  const isUsd = currency === 'USD';
+  if (lower.includes('premium') || lower.includes('sla')) {
+    return isUsd ? 'care_premium_usd' : 'care_premium_inr';
+  }
+  if (lower.includes('standard')) {
+    return isUsd ? 'care_standard_usd' : 'care_standard_inr';
+  }
+  return isUsd ? 'care_basic_usd' : 'care_basic_inr';
+}
