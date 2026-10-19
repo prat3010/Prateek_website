@@ -140,7 +140,7 @@ export function StepTechnicalScope({
                 const isSelected = formData.selectedBaseEngineId === e.id;
                 const isPopoverOpen = activePopoverId === e.id;
                 return (
-                  <TiltCard key={e.id} maxAngle={2} glare={false}>
+                  <TiltCard key={e.id} maxAngle={2} glare={false} className={styles.engineTilt}>
                     <div
                       role="radio"
                       aria-checked={isSelected}

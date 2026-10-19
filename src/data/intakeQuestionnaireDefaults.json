@@ -374,10 +374,10 @@
     },
     {
       "id": "standalone_chatbot",
-      "label": "\ud83d\udcac Standalone Embedded AI Chatbot Widget",
+      "label": "💬 Standalone Embedded AI Chatbot Widget",
       "shortLabel": "AI Chatbot Widget",
-      "description": "Custom Vector RAG Infrastructure & Native Script Embed (pgvector embeddings, PDF chunking pipeline, presigned citations) for your existing website (WordPress, Webflow, Shopify, custom HTML).",
-      "primaryOutcome": "\ud83d\udcac Embed 24/7 AI Knowledge Base & Support Chatbot",
+      "description": "Embed a 24/7 AI chatbot widget with vector search, citations, and instant integration for any website",
+      "primaryOutcome": "💬 Embed 24/7 AI Knowledge Base & Support Chatbot",
       "recommendedEngineId": "standalone_embed",
       "compulsoryFeatureLabels": [
         "Private AI Knowledge Base / Vector Search (RAG)"

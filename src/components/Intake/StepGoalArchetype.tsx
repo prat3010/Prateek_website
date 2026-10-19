@@ -72,6 +72,24 @@ const cleanArchetypeLabel = (label: string): string => {
     .trim();
 };
 
+const getEngineShortTitle = (engine?: BaseEngineItem): string => {
+  if (!engine) return 'Base';
+  switch (engine.id) {
+    case 'landing':
+      return 'Landing Page';
+    case 'multipage':
+      return 'Multi-Page';
+    case 'saas':
+      return 'SaaS MVP';
+    case 'ai_strategy_audit':
+      return 'AI Audit';
+    case 'standalone_embed':
+      return 'Widget Embed';
+    default:
+      return engine.title.replace(' Engine', '').replace(' Core', '');
+  }
+};
+
 interface StepGoalArchetypeProps {
   goals: GoalArchetype[];
   engines: BaseEngineItem[];
@@ -205,7 +223,7 @@ export function StepGoalArchetype({
             const isSelected = formData.projectGoal === g.label;
             const recommendedEngine = engines.find((e) => e.id === g.recommendedEngineId);
             return (
-              <TiltCard key={g.id} maxAngle={2} glare={false}>
+              <TiltCard key={g.id} maxAngle={2} glare={false} className={styles.archetypeTilt}>
                 <div
                   ref={(el) => { archetypeCardRefs.current[idx] = el; }}
                   tabIndex={isSelected || selectedArchetypeIndex === -1 ? 0 : -1}
@@ -248,20 +266,24 @@ export function StepGoalArchetype({
                   </div>
                   <p className={styles.archetypeDesc}>{g.description}</p>
                   <div className={styles.archetypeFooter}>
-                    <span className={styles.engineTag}>
-                      {`Engine: ${recommendedEngine?.title ? recommendedEngine.title.replace(' Engine', '').replace(' Core', '') : 'Base'}`}
-                    </span>
-                    <span className={styles.featureCountTag}>
-                      {`${g.compulsoryFeatureLabels.length} Core Module${g.compulsoryFeatureLabels.length > 1 ? 's' : ''}`}
-                    </span>
-                    <span className={styles.archetypePriceBadge}>
-                      Starts at{' '}
-                      <NumberFlow
-                        value={packageTotalForArchetype(g, engines, features, currency)}
-                        locales={currency === 'INR' ? 'en-IN' : 'en-US'}
-                        format={{ style: 'currency', currency, maximumFractionDigits: 0 }}
-                      />
-                    </span>
+                    <div className={styles.archetypeMetaRow}>
+                      <span className={styles.engineTag}>
+                        {`Engine: ${getEngineShortTitle(recommendedEngine)}`}
+                      </span>
+                      <span className={styles.featureCountTag}>
+                        {`${g.compulsoryFeatureLabels.length} Core Module${g.compulsoryFeatureLabels.length === 1 ? '' : 's'}`}
+                      </span>
+                    </div>
+                    <div className={styles.archetypePriceRow}>
+                      <span className={styles.archetypePriceBadge}>
+                        Starts at{' '}
+                        <NumberFlow
+                          value={packageTotalForArchetype(g, engines, features, currency)}
+                          locales={currency === 'INR' ? 'en-IN' : 'en-US'}
+                          format={{ style: 'currency', currency, maximumFractionDigits: 0 }}
+                        />
+                      </span>
+                    </div>
                   </div>
                 </div>
               </TiltCard>
