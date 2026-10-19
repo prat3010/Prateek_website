@@ -18,6 +18,7 @@ import argparse
 import logging
 import urllib.request
 import urllib.parse
+import random
 from datetime import datetime
 
 # Setup Logging
@@ -96,7 +97,8 @@ def send_resend_email(api_key: str, to_email: str, subject: str, body: str) -> b
     }).encode("utf-8")
     req = urllib.request.Request(url, data=payload, headers={
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {api_key}"
+        "Authorization": f"Bearer {api_key}",
+        "User-Agent": "OCI-Grabber/1.0"
     })
     try:
         with urllib.request.urlopen(req, timeout=10) as resp:
@@ -134,7 +136,7 @@ def notify_all(subject: str, message: str):
 def launch_ampere_instance(oci, compute_client, config_dict, dry_run=False):
     """
     Attempts to launch the Ampere instance using OCI SDK.
-    Returns (success: bool, result_message: str, is_capacity_error: bool)
+    Returns (success: bool, result_message: str, is_retryable: bool, is_rate_limited: bool)
     """
     compartment_id = os.environ.get("OCI_COMPARTMENT_OCID") or config_dict.get("tenancy")
     availability_domain = os.environ.get("OCI_AVAILABILITY_DOMAIN")
@@ -144,8 +146,8 @@ def launch_ampere_instance(oci, compute_client, config_dict, dry_run=False):
     
     display_name = os.environ.get("OCI_INSTANCE_DISPLAY_NAME", "Ampere-A1-AlwaysFree")
     shape = os.environ.get("OCI_SHAPE", "VM.Standard.A1.Flex")
-    ocpus = float(os.environ.get("OCI_OCPUS", "2"))
-    memory_in_gbs = float(os.environ.get("OCI_MEMORY_IN_GBS", "12"))
+    ocpus = float(os.environ.get("OCI_OCPUS", "1"))
+    memory_in_gbs = float(os.environ.get("OCI_MEMORY_IN_GBS", "6"))
     boot_volume_gb = int(os.environ.get("OCI_BOOT_VOLUME_GB", "50"))
 
     # Missing mandatory configs check
@@ -159,12 +161,12 @@ def launch_ampere_instance(oci, compute_client, config_dict, dry_run=False):
     if missing:
         err_msg = f"Missing required OCI parameters: {', '.join(missing)}"
         logger.error(err_msg)
-        return False, err_msg, False
+        return False, err_msg, False, False
 
     if dry_run:
         msg = f"[DRY RUN SUCCESS] Validated parameters for shape {shape} ({ocpus} OCPU, {memory_in_gbs}GB RAM) in AD {availability_domain}."
         logger.info(msg)
-        return True, msg, False
+        return True, msg, False, False
 
     # Construct LaunchInstanceDetails
     launch_details = oci.core.models.LaunchInstanceDetails(
@@ -195,24 +197,29 @@ def launch_ampere_instance(oci, compute_client, config_dict, dry_run=False):
         response = compute_client.launch_instance(launch_instance_details=launch_details)
         instance = response.data
         success_msg = f"🚀 INSTANCE CREATED SUCCESSFULLY!\nInstance ID: {instance.id}\nDisplay Name: {instance.display_name}\nLifecycle State: {instance.lifecycle_state}\nAD: {instance.availability_domain}"
-        return True, success_msg, False
+        return True, success_msg, False, False
 
     except oci.exceptions.ServiceError as e:
         status_code = e.status
         code = e.code or ""
         msg = e.message or str(e)
 
-        # Out of host capacity / Rate limit errors
-        if status_code in (500, 429, 503) or "OutOfCapacity" in code or "Out of host capacity" in msg or "LimitExceeded" in code:
+        is_rate_limited = status_code == 429 or "TooManyRequests" in code or "Too many requests" in msg
+        is_capacity = status_code in (500, 503) or "OutOfCapacity" in code or "Out of host capacity" in msg or "LimitExceeded" in code
+
+        if is_rate_limited:
+            logger.warning(f"Rate limited by Oracle [{status_code} - {code}]: {msg}")
+            return False, f"Rate limited ({code})", True, True
+        elif is_capacity:
             logger.warning(f"Capacity unavailable [{status_code} - {code}]: {msg}")
-            return False, f"Out of capacity ({code})", True
+            return False, f"Out of capacity ({code})", True, False
         else:
             logger.error(f"OCI API Error [{status_code} - {code}]: {msg}")
-            return False, f"OCI API Error [{status_code} - {code}]: {msg}", False
+            return False, f"OCI API Error [{status_code} - {code}]: {msg}", False, False
 
     except Exception as e:
         logger.error(f"Unexpected error during launch: {e}")
-        return False, f"Unexpected error: {str(e)}", False
+        return False, f"Unexpected error: {str(e)}", False, False
 
 
 def main():
@@ -266,40 +273,57 @@ def main():
 
     if args.dry_run:
         logger.info("--- STARTING DRY RUN ---")
-        success, msg, _ = launch_ampere_instance(oci, compute_client, oci_config, dry_run=True)
+        success, msg, _, _ = launch_ampere_instance(oci, compute_client, oci_config, dry_run=True)
         if success:
             notify_all("OCI Grabber Test Notification", "Dry run completed successfully. Notifications are working!")
         else:
             logger.error(f"Dry run failed: {msg}")
         return
 
-    interval = int(os.environ.get("SCAN_INTERVAL_SECONDS", args.interval))
-    logger.info(f"Starting OCI Ampere Capacity Scanner (Retry interval: {interval}s)...")
+    base_interval = int(os.environ.get("SCAN_INTERVAL_SECONDS", args.interval))
+    rate_limit_backoff = int(os.environ.get("RATE_LIMIT_BACKOFF_SECONDS", 120))
+    jitter_max = int(os.environ.get("SCAN_JITTER_SECONDS", 15))
+
+    logger.info(
+        f"Starting OCI Ampere Capacity Scanner (Base interval: {base_interval}s, "
+        f"Jitter: 0-{jitter_max}s, Rate-limit backoff: {rate_limit_backoff}s)..."
+    )
 
     attempts = 0
+    consecutive_rate_limits = 0
     while True:
         attempts += 1
         logger.info(f"Scan attempt #{attempts} at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         
-        success, msg, is_capacity_error = launch_ampere_instance(oci, compute_client, oci_config, dry_run=False)
+        success, msg, is_retryable, is_rate_limited = launch_ampere_instance(oci, compute_client, oci_config, dry_run=False)
 
         if success:
             logger.info("🎉 SUCCESS! Instance launched.")
             notify_all("Oracle Ampere Instance Secured!", msg)
             break
 
-        if not is_capacity_error:
+        if not is_retryable:
             # Fatal or configuration error (e.g. invalid auth, invalid OCID)
             notify_all("OCI Grabber Halted - Configuration Error", f"Grabber stopped due to error: {msg}")
-            logger.error("Stopping grabber due to non-capacity error.")
+            logger.error("Stopping grabber due to non-retryable error.")
             sys.exit(1)
 
         if args.once:
-            logger.info("Single scan complete. Out of capacity.")
+            logger.info(f"Single scan complete. Result: {msg}")
             break
 
-        logger.info(f"Waiting {interval} seconds before next attempt...")
-        time.sleep(interval)
+        if is_rate_limited:
+            consecutive_rate_limits += 1
+            # Exponential backoff on repeated rate limits (e.g. 120s, 180s, max 300s) + jitter
+            backoff = min(rate_limit_backoff * (1.5 ** (consecutive_rate_limits - 1)), 300)
+            sleep_time = int(backoff + random.uniform(0, jitter_max))
+            logger.info(f"Rate limited ({consecutive_rate_limits}x). Cooling down for {sleep_time}s to clear OCI rate limiter...")
+            time.sleep(sleep_time)
+        else:
+            consecutive_rate_limits = 0
+            sleep_time = int(base_interval + random.uniform(0, jitter_max))
+            logger.info(f"Waiting {sleep_time}s before next attempt...")
+            time.sleep(sleep_time)
 
 
 if __name__ == "__main__":

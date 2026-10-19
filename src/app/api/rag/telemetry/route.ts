@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
 import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
+import { generateTraceparent } from '@/lib/tracing';
 
 export async function GET(req: Request) {
   try {
@@ -99,9 +100,12 @@ export async function GET(req: Request) {
 
     if (tenantId && adminKey) {
       try {
+        const { traceparent } = generateTraceparent();
         const liveRes = await fetch(`${retrieverApiUrl}/v1/admin/tenants/${tenantId}/telemetry/live`, {
           headers: {
             'X-Admin-Master-Key': adminKey,
+            'traceparent': traceparent,
+            'X-Tenant-ID': tenantId,
           },
           next: { revalidate: 30 },
         });

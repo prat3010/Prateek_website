@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { generateTraceparent } from '@/lib/tracing';
 
 export const maxDuration = 60;
 
@@ -49,12 +50,15 @@ export async function POST(req: NextRequest) {
     ];
 
     const endpoint = `${RETRIEVER_API_URL}/v1/tenants/${PORTFOLIO_TENANT_ID}/chat/completions`;
+    const { traceparent } = generateTraceparent();
 
     const res = await fetch(endpoint, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${PORTFOLIO_API_KEY}`,
         'Content-Type': 'application/json',
+        traceparent,
+        'X-Tenant-ID': PORTFOLIO_TENANT_ID,
       },
       body: JSON.stringify({
         messages,
