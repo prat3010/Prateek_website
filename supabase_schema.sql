@@ -241,6 +241,12 @@ CREATE TABLE IF NOT EXISTS client_scopes (
   status TEXT DEFAULT 'Draft Proposal',
   delivery_stage TEXT DEFAULT 'architecture',
   deposit_paid BOOLEAN DEFAULT false,
+  balance_paid BOOLEAN DEFAULT false,
+  is_fully_paid BOOLEAN DEFAULT false,
+  balance_amount_inr NUMERIC DEFAULT 0,
+  balance_amount_usd NUMERIC DEFAULT 0,
+  balance_paid_at TIMESTAMPTZ,
+  final_payment_id TEXT DEFAULT '',
   business_kpi TEXT DEFAULT '',
   payment_structure TEXT DEFAULT '50/50',
   signed_at TIMESTAMPTZ,
@@ -253,6 +259,12 @@ CREATE TABLE IF NOT EXISTS client_scopes (
   updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS balance_paid BOOLEAN DEFAULT false;
+ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS is_fully_paid BOOLEAN DEFAULT false;
+ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS balance_amount_inr NUMERIC DEFAULT 0;
+ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS balance_amount_usd NUMERIC DEFAULT 0;
+ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS balance_paid_at TIMESTAMPTZ;
+ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS final_payment_id TEXT DEFAULT '';
 ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS business_kpi TEXT DEFAULT '';
 ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS payment_structure TEXT DEFAULT '50/50';
 ALTER TABLE client_scopes ADD COLUMN IF NOT EXISTS signed_at TIMESTAMPTZ;

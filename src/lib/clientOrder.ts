@@ -17,6 +17,12 @@ export interface ClientScope {
   status: string;
   delivery_stage?: ClientDeliveryStage;
   deposit_paid: boolean;
+  balance_paid?: boolean;
+  is_fully_paid?: boolean;
+  balance_amount_inr?: number;
+  balance_amount_usd?: number;
+  balance_paid_at?: string;
+  final_payment_id?: string;
   business_kpi?: string;
   payment_structure?: '50/50' | '40/30/30' | string;
   signed_at?: string;
@@ -198,6 +204,12 @@ export interface ClientOrderRow {
   status?: string;
   delivery_stage?: ClientDeliveryStage;
   deposit_paid?: boolean;
+  balance_paid?: boolean;
+  is_fully_paid?: boolean;
+  balance_amount_inr?: number | string;
+  balance_amount_usd?: number | string;
+  balance_paid_at?: string;
+  final_payment_id?: string;
   business_kpi?: string;
   payment_structure?: string;
   signed_at?: string;
@@ -237,6 +249,12 @@ export function dbToClientScope(row: ClientOrderRow): ClientScope {
     status: row.status || 'Draft Proposal',
     delivery_stage: row.delivery_stage || 'architecture',
     deposit_paid: Boolean(row.deposit_paid),
+    balance_paid: Boolean(row.balance_paid),
+    is_fully_paid: Boolean(row.is_fully_paid),
+    balance_amount_inr: Number(row.balance_amount_inr) || 0,
+    balance_amount_usd: Number(row.balance_amount_usd) || 0,
+    balance_paid_at: row.balance_paid_at,
+    final_payment_id: row.final_payment_id,
     business_kpi: row.business_kpi || '',
     payment_structure: row.payment_structure || '50/50',
     signed_at: row.signed_at || undefined,

@@ -39,7 +39,11 @@ export async function POST(req: Request) {
 
     const payload = JSON.parse(rawBody);
     const event = payload.event;
-    const eventId = payload.event_id || payload.payload?.payment?.entity?.id;
+    const eventId =
+      payload.event_id ||
+      payload.payload?.payment?.entity?.id ||
+      payload.payload?.order?.entity?.id ||
+      payload.payload?.invoice?.entity?.id;
     if (!eventId) {
       return NextResponse.json({ error: 'Webhook event is missing an event identifier.' }, { status: 400 });
     }
@@ -63,136 +67,232 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Could not record webhook event.' }, { status: 500 });
     }
 
-    if (event === 'payment.captured' || event === 'order.paid') {
-      const entity = payload.payload?.payment?.entity || payload.payload?.order?.entity;
-      const razorpayOrderId = entity?.order_id || entity?.id;
-      const razorpayPaymentId = entity?.id;
+    if (event === 'payment.captured' || event === 'order.paid' || event === 'invoice.paid') {
+      const paymentEntity = payload.payload?.payment?.entity;
+      const orderEntity = payload.payload?.order?.entity;
+      const invoiceEntity = payload.payload?.invoice?.entity;
+
+      const razorpayOrderId =
+        paymentEntity?.order_id ||
+        orderEntity?.id ||
+        invoiceEntity?.order_id ||
+        (paymentEntity?.id?.startsWith('order_') ? paymentEntity?.id : '');
+
+      const razorpayInvoiceId =
+        invoiceEntity?.id ||
+        paymentEntity?.invoice_id ||
+        orderEntity?.invoice_id ||
+        (paymentEntity?.id?.startsWith('inv_') ? paymentEntity?.id : '');
+
+      const razorpayPaymentId =
+        (paymentEntity?.id?.startsWith('pay_') ? paymentEntity?.id : '') ||
+        invoiceEntity?.payment_id ||
+        paymentEntity?.id ||
+        '';
+
       const nowIso = new Date().toISOString();
 
-      // Resolve the internal invoice from the provider order, then use its
-      // scope id. Never trust a user-controlled scope code from payment notes.
+      // Resolve the internal invoice: try razorpay_order_id, razorpay_invoice_id, or notes
+      let invoice: {
+        id: string;
+        invoice_number: string;
+        scope_id: string | null;
+        payment_status: string;
+        razorpay_payment_id: string | null;
+        amount: number;
+        currency: string;
+        customer_email: string;
+        customer_name: string;
+        milestone_name: string;
+      } | null = null;
+
       if (razorpayOrderId) {
-        const { data: invoice, error: invoiceError } = await supabase
+        const { data, error: invoiceError } = await supabase
           .from('invoices')
           .select('id, invoice_number, scope_id, payment_status, razorpay_payment_id, amount, currency, customer_email, customer_name, milestone_name')
           .eq('razorpay_order_id', razorpayOrderId)
           .maybeSingle();
-
         if (invoiceError) {
-          console.error('Webhook invoice lookup failure:', invoiceError);
-          return NextResponse.json({ error: 'Could not load payment invoice.' }, { status: 500 });
+          console.error('Webhook invoice lookup by order failure:', invoiceError);
+        } else if (data) {
+          invoice = data;
         }
-        if (!invoice) {
-          return NextResponse.json({ status: 'ok', ignored: 'unknown_order' });
+      }
+
+      if (!invoice && razorpayInvoiceId) {
+        const { data, error: invoiceError } = await supabase
+          .from('invoices')
+          .select('id, invoice_number, scope_id, payment_status, razorpay_payment_id, amount, currency, customer_email, customer_name, milestone_name')
+          .eq('razorpay_invoice_id', razorpayInvoiceId)
+          .maybeSingle();
+        if (invoiceError) {
+          console.error('Webhook invoice lookup by invoice_id failure:', invoiceError);
+        } else if (data) {
+          invoice = data;
+        }
+      }
+
+      // Fallback: check notes for invoice_id or invoice_number
+      const noteInvId = paymentEntity?.notes?.invoice_id || invoiceEntity?.notes?.invoice_id;
+      const noteInvNum = paymentEntity?.notes?.invoice_number || invoiceEntity?.notes?.invoice_number;
+      if (!invoice && (noteInvId || noteInvNum)) {
+        let altQuery = supabase
+          .from('invoices')
+          .select('id, invoice_number, scope_id, payment_status, razorpay_payment_id, amount, currency, customer_email, customer_name, milestone_name');
+        if (noteInvId) altQuery = altQuery.eq('id', noteInvId);
+        else if (noteInvNum) altQuery = altQuery.eq('invoice_number', noteInvNum);
+        const { data } = await altQuery.maybeSingle();
+        if (data) invoice = data;
+      }
+
+      if (!invoice) {
+        return NextResponse.json({ status: 'ok', ignored: 'unknown_order_or_invoice' });
+      }
+
+      if (invoice.payment_status !== 'paid') {
+        const { error: updateInvoiceError } = await supabase
+          .from('invoices')
+          .update({
+            payment_status: 'paid',
+            paid_at: nowIso,
+            razorpay_payment_id: razorpayPaymentId || invoice.razorpay_payment_id || '',
+            updated_at: nowIso,
+          })
+          .eq('id', invoice.id);
+
+        if (updateInvoiceError) {
+          console.error('Webhook invoice update failure:', updateInvoiceError);
+          return NextResponse.json({ error: 'Could not update payment invoice.' }, { status: 500 });
+        }
+      }
+
+      let targetScopeRow: {
+        id?: string;
+        scope_code?: string;
+        company_name?: string;
+        client_email?: string;
+        base_engine?: string;
+        features?: string[];
+        brand_asset?: string;
+        maintenance_plan?: string;
+        total_cost_inr?: number;
+        total_cost_usd?: number;
+        currency?: string;
+        timeline?: string;
+        deposit_paid?: boolean;
+        balance_paid?: boolean;
+      } | null = null;
+
+      if (invoice.scope_id) {
+        let sowHash = '';
+        try {
+          const { data: targetScope } = await supabase
+            .from('client_scopes')
+            .select('id, scope_code, company_name, client_email, base_engine, features, brand_asset, maintenance_plan, total_cost_inr, total_cost_usd, currency, timeline, deposit_paid, balance_paid')
+            .eq('id', invoice.scope_id)
+            .maybeSingle();
+
+          if (targetScope) {
+            targetScopeRow = targetScope;
+            const snapshot = {
+              ...targetScope,
+              deposit_paid_at: nowIso,
+              razorpay_order_id: razorpayOrderId,
+              razorpay_invoice_id: razorpayInvoiceId,
+              razorpay_payment_id: razorpayPaymentId,
+            };
+            sowHash = crypto.createHash('sha256').update(JSON.stringify(snapshot)).digest('hex');
+          }
+        } catch (hashErr) {
+          console.warn('Could not generate SOW hash on payment capture:', hashErr);
         }
 
-        if (invoice.payment_status !== 'paid') {
-          const { error: updateInvoiceError } = await supabase
-            .from('invoices')
+        let isChangeOrder = false;
+        // Check if this invoice settles a Change Order
+        try {
+          const { data: coRow } = await supabase
+            .from('scope_change_orders')
+            .select('id, added_features, removed_features, price_delta_inr, price_delta_usd')
+            .eq('invoice_id', invoice.id)
+            .maybeSingle();
+
+          if (coRow && coRow.id) {
+            isChangeOrder = true;
+            await supabase
+              .from('scope_change_orders')
+              .update({ status: 'paid', updated_at: nowIso })
+              .eq('id', coRow.id);
+
+            if (targetScopeRow) {
+              const currentFeatures = Array.isArray(targetScopeRow.features) ? targetScopeRow.features : [];
+              const added = Array.isArray(coRow.added_features) ? coRow.added_features : [];
+              const removed = new Set(Array.isArray(coRow.removed_features) ? coRow.removed_features : []);
+              const mergedFeatures = Array.from(
+                new Set([...currentFeatures.filter((f) => !removed.has(f)), ...added])
+              );
+              await supabase
+                .from('client_scopes')
+                .update({
+                  features: mergedFeatures,
+                  total_cost_inr: (Number(targetScopeRow.total_cost_inr) || 0) + (Number(coRow.price_delta_inr) || 0),
+                  total_cost_usd: (Number(targetScopeRow.total_cost_usd) || 0) + (Number(coRow.price_delta_usd) || 0),
+                  updated_at: nowIso,
+                })
+                .eq('id', invoice.scope_id);
+            }
+          }
+        } catch {}
+
+        const milestoneLower = (invoice.milestone_name || '').toLowerCase();
+        const isBalanceMilestone =
+          milestoneLower.includes('balance') ||
+          milestoneLower.includes('final') ||
+          (Boolean(targetScopeRow?.deposit_paid) && !isChangeOrder);
+
+        const isFullMilestone =
+          milestoneLower.includes('100%') ||
+          milestoneLower.includes('full project');
+
+        if (isBalanceMilestone && !isChangeOrder) {
+          const { error: updateScopeError } = await supabase
+            .from('client_scopes')
             .update({
-              payment_status: 'paid',
-              paid_at: nowIso,
-              razorpay_payment_id: razorpayPaymentId || '',
+              balance_paid: true,
+              is_fully_paid: true,
+              balance_amount_inr: (targetScopeRow?.currency === 'INR' || !targetScopeRow?.currency) ? Number(invoice.amount) || 0 : 0,
+              balance_amount_usd: targetScopeRow?.currency === 'USD' ? Number(invoice.amount) || 0 : 0,
+              balance_paid_at: nowIso,
+              final_payment_id: razorpayPaymentId || '',
+              delivery_stage: 'live',
+              status: 'Project Settled — Production Live',
               updated_at: nowIso,
             })
-            .eq('id', invoice.id)
-            .eq('payment_status', invoice.payment_status || 'pending');
+            .eq('id', invoice.scope_id);
 
-          if (updateInvoiceError) {
-            console.error('Webhook invoice update failure:', updateInvoiceError);
-            return NextResponse.json({ error: 'Could not update payment invoice.' }, { status: 500 });
+          if (updateScopeError) {
+            console.error('Webhook scope balance update failure:', updateScopeError);
+            return NextResponse.json({ error: 'Could not update scope balance.' }, { status: 500 });
           }
-        }
-
-        let targetScopeRow: {
-          scope_code?: string;
-          company_name?: string;
-          client_email?: string;
-          base_engine?: string;
-          features?: string[];
-          brand_asset?: string;
-          maintenance_plan?: string;
-          total_cost_inr?: number;
-          total_cost_usd?: number;
-          currency?: string;
-          timeline?: string;
-          deposit_paid?: boolean;
-        } | null = null;
-
-        if (invoice.scope_id) {
-          let sowHash = '';
-          try {
-            const { data: targetScope } = await supabase
-              .from('client_scopes')
-              .select('scope_code, company_name, client_email, base_engine, features, brand_asset, maintenance_plan, total_cost_inr, total_cost_usd, currency, timeline, deposit_paid')
-              .eq('id', invoice.scope_id)
-              .maybeSingle();
-
-            if (targetScope) {
-              targetScopeRow = targetScope;
-              const snapshot = {
-                ...targetScope,
-                deposit_paid_at: nowIso,
-                razorpay_order_id: razorpayOrderId,
-                razorpay_payment_id: razorpayPaymentId,
-              };
-              sowHash = crypto.createHash('sha256').update(JSON.stringify(snapshot)).digest('hex');
-            }
-          } catch (hashErr) {
-            console.warn('Could not generate SOW hash on payment capture:', hashErr);
-          }
-
-          // Check if this invoice settles a Change Order
-          try {
-            const { data: coRow } = await supabase
-              .from('scope_change_orders')
-              .select('id, added_features, removed_features, price_delta_inr, price_delta_usd')
-              .eq('invoice_id', invoice.id)
-              .maybeSingle();
-
-            if (coRow && coRow.id) {
-              await supabase
-                .from('scope_change_orders')
-                .update({ status: 'paid', updated_at: nowIso })
-                .eq('id', coRow.id);
-
-              if (targetScopeRow) {
-                const currentFeatures = Array.isArray(targetScopeRow.features) ? targetScopeRow.features : [];
-                const added = Array.isArray(coRow.added_features) ? coRow.added_features : [];
-                const removed = new Set(Array.isArray(coRow.removed_features) ? coRow.removed_features : []);
-                const mergedFeatures = Array.from(
-                  new Set([...currentFeatures.filter((f) => !removed.has(f)), ...added])
-                );
-                await supabase
-                  .from('client_scopes')
-                  .update({
-                    features: mergedFeatures,
-                    total_cost_inr: (Number(targetScopeRow.total_cost_inr) || 0) + (Number(coRow.price_delta_inr) || 0),
-                    total_cost_usd: (Number(targetScopeRow.total_cost_usd) || 0) + (Number(coRow.price_delta_usd) || 0),
-                    updated_at: nowIso,
-                  })
-                  .eq('id', invoice.scope_id);
-              }
-            }
-          } catch {}
-
+        } else if (!targetScopeRow?.deposit_paid && !isChangeOrder) {
           const { error: updateScopeError } = await supabase
             .from('client_scopes')
             .update({
               deposit_paid: true,
-              delivery_stage: 'engineering',
-              status: 'Deposit Paid — In Development',
+              balance_paid: isFullMilestone,
+              is_fully_paid: isFullMilestone,
+              delivery_stage: isFullMilestone ? 'live' : 'engineering',
+              status: isFullMilestone ? 'Project Settled — Production Live' : 'Deposit Paid — In Development',
               sow_hash: sowHash,
               updated_at: nowIso,
             })
-            .eq('id', invoice.scope_id)
-            .eq('deposit_paid', false);
+            .eq('id', invoice.scope_id);
 
           if (updateScopeError) {
-            console.error('Webhook scope update failure:', updateScopeError);
+            console.error('Webhook scope deposit update failure:', updateScopeError);
             return NextResponse.json({ error: 'Could not activate payment scope.' }, { status: 500 });
           }
         }
+      }
 
         const notifyEmail = invoice.customer_email || targetScopeRow?.client_email || '';
         if (notifyEmail) {
@@ -208,7 +308,6 @@ export async function POST(req: Request) {
             paymentId: razorpayPaymentId,
           }).catch((err) => console.warn('Webhook payment notification warning:', err));
         }
-      }
     } else if (
       event === 'subscription.charged' ||
       event === 'subscription.authenticated' ||

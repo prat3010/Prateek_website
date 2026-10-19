@@ -176,6 +176,15 @@ export async function POST(req: Request) {
       if (typeof rawObj.status === 'string' && rawObj.status) {
         scopeData.status = rawObj.status;
       }
+      if (typeof rawObj.depositPaid === 'boolean') {
+        scopeData.deposit_paid = rawObj.depositPaid;
+      }
+      if (typeof rawObj.balancePaid === 'boolean') {
+        scopeData.balance_paid = rawObj.balancePaid;
+      }
+      if (typeof rawObj.isFullyPaid === 'boolean') {
+        scopeData.is_fully_paid = rawObj.isFullyPaid;
+      }
     }
 
     const savedScopeId: string | undefined = existingScope?.id;
@@ -196,6 +205,8 @@ export async function POST(req: Request) {
         status: 'Draft Proposal',
         delivery_stage: 'architecture',
         deposit_paid: false,
+        balance_paid: false,
+        is_fully_paid: false,
       });
 
       if (insertErr) {

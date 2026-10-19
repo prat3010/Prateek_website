@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Monitor, Smartphone, ExternalLink } from 'lucide-react';
+import { X, Monitor, Smartphone, ExternalLink, CreditCard } from 'lucide-react';
 import Portal from '@/components/ui/Portal';
 import type { ClientScope } from '@/lib/clientOrder';
 import styles from '@/app/dashboard/dashboard.module.css';
@@ -10,12 +10,21 @@ interface StagingPreviewModalProps {
   scope: ClientScope | null;
   isOpen: boolean;
   onClose: () => void;
+  onPayBalance?: (scope: ClientScope) => void;
 }
 
-export function StagingPreviewModal({ scope, isOpen, onClose }: StagingPreviewModalProps) {
+export function StagingPreviewModal({ scope, isOpen, onClose, onPayBalance }: StagingPreviewModalProps) {
   const [viewport, setViewport] = useState<'desktop' | 'mobile'>('desktop');
 
   if (!isOpen || !scope) return null;
+
+  const isBalancePaid = Boolean(scope.balance_paid || scope.is_fully_paid);
+  const isThreePart = scope.payment_structure === '40/30/30';
+  const balanceMultiplier = isThreePart ? 0.3 : 0.5;
+  const curr = (scope.currency === 'USD' ? 'USD' : 'INR') as 'USD' | 'INR';
+  const totalCost = curr === 'USD' ? Number(scope.total_cost_usd || 0) : Number(scope.total_cost_inr || 0);
+  const balanceAmount = Math.round(totalCost * balanceMultiplier);
+  const balanceDisplay = curr === 'USD' ? `$${balanceAmount.toLocaleString('en-US')}` : `₹${balanceAmount.toLocaleString('en-IN')}`;
 
   const stagingUrl =
     scope.deliverables?.staging_url?.trim() ||
@@ -123,6 +132,18 @@ export function StagingPreviewModal({ scope, isOpen, onClose }: StagingPreviewMo
             <button className={styles.cancelBtn} onClick={onClose}>
               Close Preview
             </button>
+            {!isBalancePaid && onPayBalance && (
+              <button
+                type="button"
+                className={styles.balanceCtaBtn}
+                onClick={() => {
+                  onClose();
+                  onPayBalance(scope);
+                }}
+              >
+                <CreditCard size={15} /> Approve Staging & Pay Final Balance ({balanceDisplay})
+              </button>
+            )}
           </div>
         </div>
       </div>

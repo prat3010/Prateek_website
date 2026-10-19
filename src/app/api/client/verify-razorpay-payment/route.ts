@@ -204,13 +204,40 @@ export async function POST(req: Request) {
         } catch {}
       }
 
-      if (scope && !scope.deposit_paid) {
+      const milestoneLower = (invoice?.milestone_name || '').toLowerCase();
+      const isBalanceMilestone =
+        milestoneLower.includes('balance') ||
+        milestoneLower.includes('final') ||
+        (Boolean(scope?.deposit_paid) && isDirectInvoiceSettlement);
+
+      const isFullMilestone =
+        milestoneLower.includes('100%') ||
+        milestoneLower.includes('full project');
+
+      if (scope && isBalanceMilestone) {
+        await supabase
+          .from('client_scopes')
+          .update({
+            balance_paid: true,
+            is_fully_paid: true,
+            balance_amount_inr: (invoice?.currency === 'INR' || !invoice?.currency) ? Number(invoice?.amount) || 0 : 0,
+            balance_amount_usd: invoice?.currency === 'USD' ? Number(invoice?.amount) || 0 : 0,
+            balance_paid_at: nowIso,
+            final_payment_id: razorpayPaymentId,
+            delivery_stage: 'live',
+            status: 'Project Settled — Production Live',
+            updated_at: nowIso,
+          })
+          .eq('id', scope.id);
+      } else if (scope && !scope.deposit_paid) {
         await supabase
           .from('client_scopes')
           .update({
             deposit_paid: true,
-            delivery_stage: 'engineering',
-            status: 'Active Sprint — In Engineering',
+            balance_paid: isFullMilestone,
+            is_fully_paid: isFullMilestone,
+            delivery_stage: isFullMilestone ? 'live' : 'engineering',
+            status: isFullMilestone ? 'Project Settled — Production Live' : 'Active Sprint — In Engineering',
             updated_at: nowIso,
           })
           .eq('id', scope.id);

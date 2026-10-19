@@ -348,6 +348,167 @@ export default function ClientDashboardPage() {
     }
   };
 
+  const handlePayBalance = async (scope: ClientScope) => {
+    if (scope.balance_paid || scope.is_fully_paid) {
+      toast.info('The final balance for this scope has already been settled.');
+      return;
+    }
+
+    try {
+      const isLoaded = await loadRazorpayScript();
+      if (!isLoaded) {
+        toast.error('Could not load Razorpay checkout SDK. Please check your network connection.');
+        return;
+      }
+
+      const isThreePart = scope.payment_structure === '40/30/30';
+      const pct = isThreePart ? 0.3 : 0.5;
+      const pctText = isThreePart ? '30%' : '50%';
+
+      const accessToken = await getAccessToken();
+      const res = await fetch('/api/client/create-razorpay-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
+        body: JSON.stringify({
+          scopeCode: scope.scope_code,
+          isBalancePayment: true,
+        }),
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        toast.error(`Order Creation Error: ${errJson.error || 'Failed to initialize balance payment'}`);
+        return;
+      }
+
+      const orderData = await res.json();
+
+      if (orderData.isMock) {
+        const balanceDisplay =
+          scope.currency === 'USD'
+            ? `$${Math.round(Number(scope.total_cost_usd || 0) * pct).toLocaleString('en-US')}`
+            : `₹${Math.round(Number(scope.total_cost_inr || 0) * pct).toLocaleString('en-IN')}`;
+
+        const confirmSimulated = window.confirm(
+          `⚡ Razorpay Sandbox Mode (Offline Dev Server):\n\nSimulate settling ${pctText} final balance (${balanceDisplay}) for Scope ${scope.scope_code}?`
+        );
+
+        if (confirmSimulated) {
+          try {
+            const token = await getAccessToken();
+            const verifyRes = await fetch('/api/client/verify-razorpay-payment', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              },
+              body: JSON.stringify({
+                scopeCode: scope.scope_code,
+                razorpayOrderId: orderData.orderId,
+                razorpayPaymentId: `pay_mock_bal_${Date.now()}`,
+                razorpaySignature: 'mock_signature_dev_pass',
+              }),
+            });
+
+            if (verifyRes.ok) {
+              setScopes((prev) =>
+                prev.map((s) =>
+                  s.id === scope.id
+                    ? {
+                        ...s,
+                        balance_paid: true,
+                        is_fully_paid: true,
+                        delivery_stage: 'live',
+                        status: 'Project Settled — Production Live',
+                      }
+                    : s
+                )
+              );
+              await loadInvoices();
+              toast.success(`🎉 ${pctText} Final balance settled! Production deployment unlocked.`);
+            }
+          } catch (verErr) {
+            console.error('Mock verification error:', verErr);
+          }
+        }
+        return;
+      }
+
+      if (typeof window === 'undefined' || !window.Razorpay) {
+        toast.error('Payment gateway script failed to load. Please refresh and try again.');
+        return;
+      }
+
+      const RazorpayClass = window.Razorpay;
+      const rzp = new RazorpayClass({
+        key: orderData.keyId,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'Prateeq Studio',
+        description: `${pctText} Final Milestone Balance for Scope #${scope.scope_code}`,
+        order_id: orderData.orderId,
+        handler: async (response: Record<string, string>) => {
+          try {
+            const token = await getAccessToken();
+            const verifyRes = await fetch('/api/client/verify-razorpay-payment', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              },
+              body: JSON.stringify({
+                scopeCode: scope.scope_code,
+                razorpayOrderId: response.razorpay_order_id,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpaySignature: response.razorpay_signature,
+              }),
+            });
+
+            if (verifyRes.ok) {
+              setScopes((prev) =>
+                prev.map((s) =>
+                  s.id === scope.id
+                    ? {
+                        ...s,
+                        balance_paid: true,
+                        is_fully_paid: true,
+                        delivery_stage: 'live',
+                        status: 'Project Settled — Production Live',
+                      }
+                    : s
+                )
+              );
+              await loadInvoices();
+              toast.success('🎉 Final balance settled! Your project is fully cleared for production live handover.');
+            } else {
+              toast.error('Payment signature verification failed. Please contact engineering support.');
+            }
+          } catch (verErr) {
+            console.error('Verification network error:', verErr);
+          }
+        },
+        prefill: {
+          name: user?.user_metadata?.full_name || scope.company_name,
+          email: user?.email,
+          contact: scope.client_phone || '',
+        },
+        theme: { color: '#00f0ff' },
+        modal: {
+          ondismiss: () => {
+            toast.info('Balance settlement window closed.');
+          },
+        },
+      });
+
+      rzp.open();
+    } catch (err) {
+      console.error('Balance checkout launch error:', err);
+    }
+  };
+
   const handlePayInvoice = async (invoice: InvoiceEntity) => {
     if (invoice.payment_status === 'paid') {
       toast.info('This invoice has already been settled.');
@@ -829,6 +990,7 @@ export default function ClientDashboardPage() {
                 onOpenProposalSuite={(s) => setProposalSuiteScope(s)}
                 onOpenStagingPreview={(s) => setStagingPreviewScope(s)}
                 onDeleteScope={handleDeleteScope}
+                onPayBalance={handlePayBalance}
               />
             ))
           )}
@@ -901,6 +1063,7 @@ export default function ClientDashboardPage() {
         scope={stagingPreviewScope}
         isOpen={Boolean(stagingPreviewScope)}
         onClose={() => setStagingPreviewScope(null)}
+        onPayBalance={handlePayBalance}
       />
 
       <InvoiceCreatorModal

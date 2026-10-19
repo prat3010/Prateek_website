@@ -41,7 +41,8 @@ export function generateOnboardingChecklist(scope: ClientScope): ChecklistItem[]
         description: 'Due upon completion and demo sign-off of the UI/UX design system & core API endpoints.',
         category: 'financial',
         isMandatory: true,
-        inputType: 'checkbox',
+        inputType: 'payment',
+        actionLabel: 'Pay Beta Milestone',
       },
       {
         id: 'balance_final',
@@ -49,7 +50,8 @@ export function generateOnboardingChecklist(scope: ClientScope): ChecklistItem[]
         description: 'Due after QA testing approval and prior to production domain mapping.',
         category: 'financial',
         isMandatory: true,
-        inputType: 'checkbox',
+        inputType: 'payment',
+        actionLabel: 'Pay Final Balance',
       }
     );
   } else {
@@ -69,7 +71,8 @@ export function generateOnboardingChecklist(scope: ClientScope): ChecklistItem[]
         description: 'Due after QA security audit completion and prior to production domain handover.',
         category: 'financial',
         isMandatory: true,
-        inputType: 'checkbox',
+        inputType: 'payment',
+        actionLabel: 'Pay Final Balance',
       }
     );
   }
@@ -245,9 +248,19 @@ export function calcOnboardingReadiness(scope: ClientScope): { total: number; co
 
   let completedCount = 0;
   list.forEach((item) => {
-    // Deposit paid automatically completes deposit item
-    if (item.id === 'deposit_upfront' && scope.deposit_paid) {
-      completedCount++;
+    // Financial milestones strictly derive from verified database scope flags
+    if (item.id === 'deposit_upfront') {
+      if (scope.deposit_paid) completedCount++;
+      return;
+    }
+    if (item.id === 'balance_final') {
+      if (scope.balance_paid) completedCount++;
+      return;
+    }
+    if (item.id === 'milestone_beta') {
+      if (scope.delivery_stage === 'staging' || scope.delivery_stage === 'live' || scope.balance_paid) {
+        completedCount++;
+      }
       return;
     }
 

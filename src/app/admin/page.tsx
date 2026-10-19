@@ -48,6 +48,8 @@ interface ClientRecord {
   total_cost_usd?: number;
   currency?: string;
   deposit_paid?: boolean;
+  balance_paid?: boolean;
+  is_fully_paid?: boolean;
   delivery_stage?: 'architecture' | 'engineering' | 'staging' | 'live';
   status?: string;
   onboarding_checklist?: Record<string, boolean | string>;

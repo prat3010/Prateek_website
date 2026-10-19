@@ -91,7 +91,10 @@ def render_clients_tab():
         total_paid_inr = sum(paid_inr_invoices)
     else:
         total_paid_inr = sum(
-            float(o.get("total_cost_inr", 0)) * (0.4 if o.get("payment_structure") == "40/30/30" else 0.5)
+            float(o.get("total_cost_inr", 0)) * (
+                1.0 if (o.get("balance_paid") or o.get("is_fully_paid"))
+                else (0.4 if o.get("payment_structure") == "40/30/30" else 0.5)
+            )
             for o in paid_orders
         )
 
@@ -318,10 +321,13 @@ def render_clients_tab():
                 company = order.get("company_name", "Untitled Client")
                 email = order.get("client_email", "")
                 deposit_paid = order.get("deposit_paid", False)
+                balance_paid = order.get("balance_paid", False)
+                is_fully_paid = order.get("is_fully_paid", False)
                 status = order.get("status", "Draft Proposal")
                 delivery_stage = order.get("delivery_stage", "architecture")
 
-                with st.expander(f"📦 {scope_code} — {company} ({'✅ DEPOSIT PAID' if deposit_paid else '⏳ DRAFT PROPOSAL'})", expanded=False):
+                pay_badge = "✅ FULLY SETTLED" if (is_fully_paid or balance_paid) else ("🟢 DEPOSIT PAID" if deposit_paid else "⏳ DRAFT PROPOSAL")
+                with st.expander(f"📦 {scope_code} — {company} ({pay_badge})", expanded=False):
                     engine_title = order.get("base_engine_title") or order.get("base_engine", "Web Engine")
                     meta = order.get("metadata") if isinstance(order.get("metadata"), dict) else {}
                     c1, c2 = st.columns(2)
@@ -333,6 +339,7 @@ def render_clients_tab():
                         st.markdown(f"**Total Build Investment:** {order.get('currency', 'INR')} {order.get('total_cost_inr' if order.get('currency') == 'INR' else 'total_cost_usd', 0):,}")
                     with c2:
                         st.markdown(f"**Deposit Status:** {'✅ PAID' if deposit_paid else '⏳ PENDING'} ({order.get('payment_structure', '50/50')})")
+                        st.markdown(f"**Final Balance:** {'✅ PAID' if balance_paid else '⏳ PENDING'}")
                         st.markdown(f"**Brand Kit:** {order.get('brand_asset') or meta.get('brandAssetOption', 'Standard')}")
                         st.markdown(f"**Care Plan:** {order.get('maintenance_plan') or meta.get('maintenancePlan', 'Standard')}")
 
@@ -369,7 +376,7 @@ def render_clients_tab():
 
                     st.markdown("---")
                     st.markdown("#### Live Delivery Stage & Payment Control")
-                    c_milestone, c_payment = st.columns(2)
+                    c_milestone, c_pay_deposit, c_pay_bal = st.columns(3)
                     with c_milestone:
                         new_stage = st.selectbox(
                             f"Update Live Milestone for {scope_code}",
@@ -383,21 +390,34 @@ def render_clients_tab():
                             index=["architecture", "engineering", "staging", "live"].index(delivery_stage) if delivery_stage in ["architecture", "engineering", "staging", "live"] else 0,
                             key=f"stage_select_{scope_code}"
                         )
-                    with c_payment:
-                        new_paid = st.checkbox(
-                            f"Scope Deposit Locked & Paid",
+                    with c_pay_deposit:
+                        new_deposit_paid = st.checkbox(
+                            f"Deposit Locked & Paid",
                             value=deposit_paid,
                             key=f"paid_check_{scope_code}"
+                        )
+                    with c_pay_bal:
+                        new_bal_paid = st.checkbox(
+                            f"Balance Milestone Paid",
+                            value=balance_paid,
+                            key=f"bal_paid_check_{scope_code}"
                         )
 
                     if st.button(f"Save Client Scope & Delivery Status for {scope_code}", key=f"btn_save_{scope_code}"):
                         if HAS_SYNC:
                             order["delivery_stage"] = new_stage
-                            order["deposit_paid"] = new_paid
-                            order["status"] = "Deposit Paid — In Development" if new_paid else "Draft Proposal"
+                            order["deposit_paid"] = new_deposit_paid
+                            order["balance_paid"] = new_bal_paid
+                            order["is_fully_paid"] = new_deposit_paid and new_bal_paid
+                            if new_deposit_paid and new_bal_paid:
+                                order["status"] = "Project Settled — Production Live"
+                            elif new_deposit_paid:
+                                order["status"] = "Deposit Paid — In Development"
+                            else:
+                                order["status"] = "Draft Proposal"
                             order["updated_at"] = datetime.utcnow().isoformat()
                             upsert_record("client_scopes", order, key_col="scope_code")
-                            st.success(f"Updated {scope_code}! Stage set to '{new_stage}', Deposit Paid = {new_paid}.")
+                            st.success(f"Updated {scope_code}! Stage set to '{new_stage}', Deposit = {new_deposit_paid}, Balance = {new_bal_paid}.")
 
                     st.markdown("---")
                     st.markdown("#### 🧾 Issue Commercial Non-GST Invoice")

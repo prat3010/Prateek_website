@@ -12,6 +12,7 @@ import {
   Server,
   Clock,
   ExternalLink,
+  CreditCard,
 } from 'lucide-react';
 
 import type { ClientScope, ScopeChangeOrderEntity, ClientDeliveryStage } from '@/lib/clientOrder';
@@ -26,6 +27,7 @@ interface ScopeCardProps {
   onOpenProposalSuite: (scope: ClientScope) => void;
   onOpenStagingPreview: (scope: ClientScope) => void;
   onDeleteScope: (scopeCode: string) => void;
+  onPayBalance?: (scope: ClientScope) => void;
 }
 
 export function ScopeCard({
@@ -36,9 +38,18 @@ export function ScopeCard({
   onOpenProposalSuite,
   onOpenStagingPreview,
   onDeleteScope,
+  onPayBalance,
 }: ScopeCardProps) {
   const isDepositPaid = Boolean(scope.deposit_paid);
+  const isBalancePaid = Boolean(scope.balance_paid || scope.is_fully_paid);
   const deliveryStage = scope.delivery_stage || (isDepositPaid ? 'engineering' : 'architecture');
+
+  const isThreePart = scope.payment_structure === '40/30/30';
+  const balanceMultiplier = isThreePart ? 0.3 : 0.5;
+  const curr = (scope.currency === 'USD' ? 'USD' : 'INR') as 'USD' | 'INR';
+  const totalCost = curr === 'USD' ? Number(scope.total_cost_usd || 0) : Number(scope.total_cost_inr || 0);
+  const balanceAmount = Math.round(totalCost * balanceMultiplier);
+  const balanceDisplay = curr === 'USD' ? `$${balanceAmount.toLocaleString('en-US')}` : `₹${balanceAmount.toLocaleString('en-IN')}`;
 
   const getStageBadgeClass = (stage: ClientDeliveryStage) => {
     switch (stage) {
@@ -272,6 +283,18 @@ export function ScopeCard({
                 <Trash2 size={15} />
               </button>
             </>
+          ) : isBalancePaid ? (
+            <div className={styles.settledNotice}>
+              <CheckCircle2 size={14} /> Project Settled & Live
+            </div>
+          ) : deliveryStage === 'staging' || deliveryStage === 'live' ? (
+            <button
+              type="button"
+              className={styles.balanceCtaBtn}
+              onClick={() => onPayBalance?.(scope)}
+            >
+              <CreditCard size={15} /> Pay Final Balance ({balanceDisplay})
+            </button>
           ) : (
             <div className={styles.sprintActiveNotice}>
               <Activity size={14} className={styles.pulsingIcon} /> Sprint In Progress

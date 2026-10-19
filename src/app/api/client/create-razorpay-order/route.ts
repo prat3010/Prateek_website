@@ -191,6 +191,8 @@ export async function POST(req: Request) {
       company_name?: string;
       payment_structure?: string;
       deposit_paid?: boolean;
+      balance_paid?: boolean;
+      is_fully_paid?: boolean;
     } | null = null;
 
     try {
@@ -218,11 +220,28 @@ export async function POST(req: Request) {
       );
     }
 
-    if (scope.deposit_paid) {
-      return NextResponse.json(
-        { error: 'Deposit has already been recorded for this scope.' },
-        { status: 409 }
-      );
+    const isBalancePayment = Boolean(payload.isBalancePayment || payload.milestoneType === 'balance');
+
+    if (isBalancePayment) {
+      if (!scope.deposit_paid) {
+        return NextResponse.json(
+          { error: 'Upfront deposit must be paid prior to settling the final balance.' },
+          { status: 400 }
+        );
+      }
+      if (scope.balance_paid) {
+        return NextResponse.json(
+          { error: 'Final balance has already been recorded for this scope.' },
+          { status: 409 }
+        );
+      }
+    } else {
+      if (scope.deposit_paid) {
+        return NextResponse.json(
+          { error: 'Deposit has already been recorded for this scope.' },
+          { status: 409 }
+        );
+      }
     }
 
     const targetPaymentStructure = paymentStructure || scope.payment_structure || '50/50';
@@ -267,7 +286,23 @@ export async function POST(req: Request) {
     }
 
     const isThreePart = targetPaymentStructure === '40/30/30';
-    const multiplier = isThreePart ? 0.4 : 0.5;
+    let multiplier: number;
+    let percentageText: string;
+    let milestoneName: string;
+    let itemDescription: string;
+
+    if (isBalancePayment) {
+      multiplier = isThreePart ? 0.3 : 0.5;
+      percentageText = isThreePart ? '30%' : '50%';
+      milestoneName = `${percentageText} Final Milestone Balance`;
+      itemDescription = `${percentageText} final balance settlement for project scope ${scopeCode}`;
+    } else {
+      multiplier = isThreePart ? 0.4 : 0.5;
+      percentageText = isThreePart ? '40%' : '50%';
+      milestoneName = `${percentageText} Scope Deposit & Development Lock`;
+      itemDescription = `${percentageText} deposit lock for project scope ${scopeCode}`;
+    }
+
     const depositAmount = Math.round(rawTotal * multiplier);
 
     // Convert USD to INR for standard Razorpay checkout to prevent "International cards not supported" error
@@ -277,14 +312,14 @@ export async function POST(req: Request) {
 
     // Only apply GST breakup when SELLER_CONFIG.gstin is configured
     const hasSellerGstin = Boolean(SELLER_CONFIG.gstin?.trim());
-    const percentageText = isThreePart ? '40%' : '50%';
-    const itemDescription = `${percentageText} deposit lock for project scope ${scopeCode}`;
     const invoiceCalc = calculateInvoiceTotals({
       currency: originalCurrency,
       place_of_supply: hasSellerGstin ? 'Delhi' : undefined,
       line_items: [
         {
-          name: `Scope Deposit (${percentageText}) — ${scope.company_name || scopeCode}`,
+          name: isBalancePayment
+            ? `Final Balance (${percentageText}) — ${scope.company_name || scopeCode}`
+            : `Scope Deposit (${percentageText}) — ${scope.company_name || scopeCode}`,
           description: itemDescription,
           sac_hsn: '998314',
           rate: depositAmount,
@@ -298,15 +333,17 @@ export async function POST(req: Request) {
     const createInvoiceRecord = async (orderId: string) => {
       if (!supabase) return;
       try {
-        // Reuse any existing unpaid deposit invoice for this scope to avoid duplicate pending rows on modal dismiss
+        const milestonePattern = isBalancePayment ? '%balance%' : '%deposit%';
+        // Reuse any existing unpaid invoice for this milestone to avoid duplicate pending rows on modal dismiss
         let existingPendingId: string | null = null;
         if (scope?.id) {
           try {
             const { data: existingInv } = await supabase
               .from('invoices')
-              .select('id, payment_status')
+              .select('id, payment_status, milestone_name')
               .eq('scope_id', scope.id)
               .eq('payment_status', 'pending')
+              .ilike('milestone_name', milestonePattern)
               .maybeSingle();
             if (existingInv?.id && existingInv.payment_status === 'pending') {
               existingPendingId = existingInv.id;
@@ -321,7 +358,7 @@ export async function POST(req: Request) {
               is_gst: invoiceCalc.is_gst,
               line_items: invoiceCalc.line_items,
               tax_breakup: invoiceCalc.tax_breakup,
-              milestone_name: `${percentageText} Scope Deposit & Development Lock`,
+              milestone_name: milestoneName,
               amount: invoiceCalc.grand_total,
               currency: originalCurrency,
               razorpay_order_id: orderId,
@@ -331,8 +368,9 @@ export async function POST(req: Request) {
           return;
         }
 
+        const invSuffix = isBalancePayment ? 'BAL' : (isThreePart ? '40' : '50');
         await supabase.from('invoices').insert({
-          invoice_number: `INV-${orderId.slice(-8).toUpperCase()}`,
+          invoice_number: `INV-${scopeCode}-${invSuffix}-${orderId.slice(-4).toUpperCase()}`,
           scope_id: scope?.id || null,
           client_id: scope?.client_id || null,
           customer_name: scope?.company_name || 'Valued Client',
@@ -341,7 +379,7 @@ export async function POST(req: Request) {
           is_gst: invoiceCalc.is_gst,
           line_items: invoiceCalc.line_items,
           tax_breakup: invoiceCalc.tax_breakup,
-          milestone_name: `${percentageText} Scope Deposit & Development Lock`,
+          milestone_name: milestoneName,
           amount: invoiceCalc.grand_total,
           currency: originalCurrency,
           payment_status: 'pending',
@@ -392,7 +430,8 @@ export async function POST(req: Request) {
             client_email: clientEmail,
             company_name: scope.company_name || 'My Custom Project',
             original_currency: originalCurrency,
-            original_deposit: depositAmount,
+            original_amount: depositAmount,
+            milestone_type: isBalancePayment ? 'balance' : 'deposit',
           },
         }),
       });

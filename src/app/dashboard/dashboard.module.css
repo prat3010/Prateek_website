@@ -200,12 +200,6 @@
   color: var(--color-text-muted);
 }
 
-.verifiedBadge {
-  font-family: var(--font-code);
-  font-size: 0.75rem;
-  color: var(--badge-success-text);
-  font-weight: 600;
-}
 
 .tabNav {
   display: flex;
@@ -1173,6 +1167,49 @@
   border: 1px solid var(--badge-danger-border);
 }
 
+.verifiedBadge {
+  font-family: var(--font-code);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  background: rgba(34, 197, 94, 0.12);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.lockedBadge {
+  font-family: var(--font-code);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  background: rgba(234, 179, 8, 0.12);
+  color: #eab308;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.financialPromptText {
+  font-family: var(--font-code);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  background: var(--surface-secondary);
+  border: 1px dashed var(--surface-glass-border);
+  padding: 0.5rem 0.85rem;
+  border-radius: var(--border-radius-sm, 6px);
+  margin-top: 0.5rem;
+  margin-left: 1.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .checklistCheckbox {
   width: 18px;
   height: 18px;
@@ -1589,6 +1626,171 @@
   color: #2563eb;
   font-weight: 600;
   font-size: 0.75rem;
+}
+
+/* Scope Card Actions & Balance Button */
+.scopeActionsBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--surface-glass-border);
+  flex-wrap: wrap;
+}
+
+.scopeActionGroupLeft,
+.scopeActionGroupRight {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.customizeBtn,
+.proposalSuiteBtn,
+.stagingPreviewBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: var(--border-radius-md, 8px);
+  font-family: var(--font-code);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--surface-secondary);
+  border: 1px solid var(--surface-glass-border);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.customizeBtn:hover,
+.proposalSuiteBtn:hover,
+.stagingPreviewBtn:hover {
+  background: var(--surface-elevated);
+  border-color: var(--color-accent);
+}
+
+.depositCtaBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1.15rem;
+  border-radius: var(--border-radius-md, 8px);
+  font-family: var(--font-code);
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--pop-blue);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+}
+
+.depositCtaBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
+}
+
+:global([data-theme='noir']) .depositCtaBtn {
+  background: var(--neon-cyan);
+  color: #000;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.35);
+}
+
+.balanceCtaBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1.15rem;
+  border-radius: var(--border-radius-md, 8px);
+  font-family: var(--font-code);
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: #10b981;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+}
+
+.balanceCtaBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.45);
+}
+
+:global([data-theme='noir']) .balanceCtaBtn {
+  background: var(--neon-green, #00ff66);
+  color: #000000;
+  box-shadow: 0 0 16px rgba(0, 255, 102, 0.4);
+}
+
+.deleteScopeBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--border-radius-md, 8px);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #ef4444;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.deleteScopeBtn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+}
+
+.sprintActiveNotice {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: var(--border-radius-md, 8px);
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: var(--color-accent);
+  font-family: var(--font-code);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.settledNotice {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: var(--border-radius-md, 8px);
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  color: #22c55e;
+  font-family: var(--font-code);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.pulsingIcon {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 
 

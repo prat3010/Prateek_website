@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { UserCheck, Save } from 'lucide-react';
+import { UserCheck, Save, CheckCircle2, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 import { generateOnboardingChecklist, calcOnboardingReadiness } from '@/lib/onboardingChecklist';
 import type { ClientScope } from '@/lib/clientOrder';
@@ -53,6 +53,10 @@ export function OnboardingChecklistWidget({
   });
 
   const handleToggleItem = async (itemId: string, value: boolean | string) => {
+    if (['deposit_upfront', 'milestone_beta', 'balance_final'].includes(itemId)) {
+      toast.info('Milestone payments cannot be manually checked. They are automatically verified via payment capture.');
+      return;
+    }
     const updatedChecklist = { ...checklistState, [itemId]: value };
     const updatedScope: ClientScope = {
       ...currentScope,
@@ -226,7 +230,21 @@ export function OnboardingChecklistWidget({
       {/* Checklist Items */}
       <div className={styles.checklistList}>
         {filteredItems.map((item) => {
-          const isDone = Boolean(checklistState[item.id]);
+          const isFinancialPayment = ['deposit_upfront', 'milestone_beta', 'balance_final'].includes(item.id);
+          let isDone = Boolean(checklistState[item.id]);
+
+          if (item.id === 'deposit_upfront') {
+            isDone = Boolean(currentScope.deposit_paid);
+          } else if (item.id === 'balance_final') {
+            isDone = Boolean(currentScope.balance_paid);
+          } else if (item.id === 'milestone_beta') {
+            isDone = Boolean(
+              currentScope.delivery_stage === 'staging' ||
+              currentScope.delivery_stage === 'live' ||
+              currentScope.balance_paid
+            );
+          }
+
           const noteKey = `${currentScope.scope_code}:${item.id}`;
           const savedNote =
             typeof checklistState[`${item.id}_note`] === 'string'
@@ -239,24 +257,61 @@ export function OnboardingChecklistWidget({
               key={item.id}
               className={`${styles.checklistItemCard} ${isDone ? styles.checklistItemCardDone : ''}`}
             >
-              <label className={styles.checklistItemLabel}>
+              <label
+                className={styles.checklistItemLabel}
+                style={{ cursor: isFinancialPayment ? 'default' : 'pointer' }}
+              >
                 <input
                   type="checkbox"
                   checked={isDone}
-                  onChange={(e) => handleToggleItem(item.id, e.target.checked)}
+                  disabled={isFinancialPayment}
+                  onChange={(e) => {
+                    if (!isFinancialPayment) {
+                      handleToggleItem(item.id, e.target.checked);
+                    }
+                  }}
                   className={styles.checklistCheckbox}
+                  title={
+                    isFinancialPayment
+                      ? isDone
+                        ? 'Payment verified in commercial ledger'
+                        : 'Awaiting payment settlement'
+                      : undefined
+                  }
                 />
                 <div className={styles.checklistItemInfo}>
                   <div className={styles.checklistItemHeader}>
                     <span className={styles.checklistItemTitle}>{item.title}</span>
-                    {item.isMandatory && (
-                      <span className={styles.requiredBadge}>Required for Kickoff</span>
+                    {isFinancialPayment ? (
+                      isDone ? (
+                        <span className={styles.verifiedBadge}>
+                          <CheckCircle2 size={12} /> Settled & Verified
+                        </span>
+                      ) : (
+                        <span className={styles.lockedBadge}>
+                          <Lock size={12} /> Milestone Payment Required
+                        </span>
+                      )
+                    ) : (
+                      item.isMandatory && (
+                        <span className={styles.requiredBadge}>Required for Kickoff</span>
+                      )
                     )}
                   </div>
                   <p className={styles.checklistItemDesc}>{item.description}</p>
                 </div>
               </label>
-              {item.id !== 'sow_accepted' && (
+
+              {isFinancialPayment && !isDone && (
+                <div className={styles.financialPromptText}>
+                  <Lock size={13} style={{ flexShrink: 0 }} />
+                  <span>
+                    Milestone secured via Razorpay. Pay this milestone in the Project Scope card above to unlock.
+                  </span>
+                </div>
+              )}
+
+              {!isFinancialPayment && item.id !== 'sow_accepted' && (
                 <div
                   style={{
                     display: 'flex',
