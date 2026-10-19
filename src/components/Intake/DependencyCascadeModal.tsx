@@ -88,6 +88,9 @@ export function DependencyCascadeModal({
           className={styles.modalContainer}
           ref={modalRef}
           onClick={(e) => e.stopPropagation()}
+          data-lenis-prevent
+          data-lenis-prevent-wheel
+          data-lenis-prevent-touch
         >
           {/* Header */}
           <div className={styles.header}>
@@ -110,7 +113,12 @@ export function DependencyCascadeModal({
           </div>
 
           {/* Body */}
-          <div className={styles.body}>
+          <div
+            className={styles.body}
+            data-lenis-prevent
+            data-lenis-prevent-wheel
+            data-lenis-prevent-touch
+          >
             <p id="cascade-modal-desc" className={styles.description}>
               Disabling <span className={styles.targetHighlight}>{targetFeature.label}</span> will automatically affect{' '}
               <strong>{dependentFeatures.length}</strong> dependent module{dependentFeatures.length > 1 ? 's' : ''} configured in your system architecture:

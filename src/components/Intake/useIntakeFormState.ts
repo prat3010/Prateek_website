@@ -637,8 +637,16 @@ export function useIntakeFormState(
       totalCostUSD: totalCost.totalUSD,
       currency,
       timeline: formData.timeline,
+      metadata: {
+        promoCode: appliedPromo,
+        promoDiscountAmountINR: totalCost.promoDiscountAmountINR,
+        promoDiscountAmountUSD: totalCost.promoDiscountAmountUSD,
+        bundleDiscountPercent: totalCost.bundleDiscountPercent,
+        bundleDiscountAmountINR: totalCost.bundleDiscountAmountINR,
+        bundleDiscountAmountUSD: totalCost.bundleDiscountAmountUSD,
+      },
     };
-  }, [formData, user, generatedScopeCode, selectedEngine, features, totalCost, activeMaintenancePlan, currency]);
+  }, [formData, user, generatedScopeCode, selectedEngine, features, totalCost, activeMaintenancePlan, currency, appliedPromo]);
 
   const getDashboardRedirectUrl = useCallback((payload: {
     scopeCode: string;

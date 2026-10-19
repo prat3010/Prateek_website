@@ -172,4 +172,38 @@ describe('POST /api/client/save-scope', () => {
     expect(scopeUpdate).not.toHaveProperty('deposit_paid');
     expect(scopeUpdate).not.toHaveProperty('delivery_stage');
   });
+
+  it('recalculates canonical cost factoring in metadata.promoCode when saving scope', async () => {
+    mocks.state.existingOrder = false;
+    const bodyWithPromo = {
+      scopeCode: 'SCOPE-PROMO-1',
+      companyName: 'Promo Corp',
+      baseEngineTitle: 'Landing Page Core Engine',
+      selectedFeatures: [],
+      metadata: {
+        promoCode: {
+          code: 'PRATEEQ10',
+          discountType: 'percentage',
+          discountValue: 10,
+          discountAmountINR: 3000,
+          discountAmountUSD: 36,
+        },
+      },
+    };
+
+    const req = new Request('http://localhost/api/client/save-scope', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authorizedHeaders },
+      body: JSON.stringify(bodyWithPromo),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+
+    const insertedCalls = mocks.insertFn.mock.calls;
+    const scopeInsert = insertedCalls.find((call) => call[0]?.scope_code === 'SCOPE-PROMO-1')?.[0];
+    expect(scopeInsert).toBeDefined();
+    // Catalog base price is ₹30,000. 10% discount gives ₹27,000.
+    expect(scopeInsert.total_cost_inr).toBe(27000);
+    expect(scopeInsert.metadata.promoCode.code).toBe('PRATEEQ10');
+  });
 });

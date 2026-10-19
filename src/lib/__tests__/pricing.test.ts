@@ -12,7 +12,7 @@ import {
   calcCascadeRemovalSavings,
   estimateScopeTimeline,
 } from '@/lib/pricing';
-import type { BaseEngineItem, FeatureItem } from '@/data/resume';
+import type { BaseEngineItem, FeatureItem, BrandAssetOption, MaintenancePlanOption } from '@/data/resume';
 
 const { engines, features, brandAssets, maintenancePlans, goals } = questionnaireDefaults;
 
@@ -361,6 +361,49 @@ describe('estimateScopeTimeline (Milestone 84 ML Parity)', () => {
     );
 
     expect(voiceScope.riskFactors.some((rf) => rf.includes('Voice AI') || rf.includes('WebRTC'))).toBe(true);
+  });
+
+  it('accurately accounts for functional modules (e.g. pwa, integrations) in hoursP50 and hoursP90', () => {
+    const base = estimateScopeTimeline(
+      { engineId: 'landing', featureIds: [], brandAssetId: '', maintenancePlanId: '' },
+      features as FeatureItem[]
+    );
+
+    const withFunctional = estimateScopeTimeline(
+      { engineId: 'landing', featureIds: ['pwa'], brandAssetId: '', maintenancePlanId: '' },
+      features as FeatureItem[]
+    );
+
+    expect(withFunctional.hoursP50).toBeGreaterThan(base.hoursP50);
+    expect(withFunctional.hoursP90).toBeGreaterThan(base.hoursP90);
+    expect(withFunctional.topEffortDrivers.some((d) => d.category === 'Functional Module')).toBe(true);
+  });
+
+  it('handles nullish fixed promo discount amounts without falling back to raw INR integers', () => {
+    const q = calcQuote(
+      engines as BaseEngineItem[],
+      features as FeatureItem[],
+      brandAssets as BrandAssetOption[],
+      maintenancePlans as MaintenancePlanOption[],
+      {
+        engineId: 'landing',
+        featureIds: ['email'],
+        brandAssetId: 'none',
+        maintenancePlanId: 'essential',
+        promoCode: {
+          code: 'ZERO_USD',
+          discountType: 'fixed',
+          discountValue: 5000,
+          discountAmountINR: 5000,
+          discountAmountUSD: 0,
+        },
+      },
+      'USD'
+    );
+
+    // discountAmountUSD was explicitly 0, so it should be 0, not fall back to discountValue (5000)
+    expect(q.promoDiscountAmountUSD).toBe(0);
+    expect(q.promoDiscountAmountINR).toBe(5000);
   });
 });
 

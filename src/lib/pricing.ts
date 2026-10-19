@@ -167,8 +167,8 @@ export function calcQuote(
       promoDiscountAmountINR = Math.round((baseAfterBundleINR * promo.discountValue) / 100);
       promoDiscountAmountUSD = Math.round((baseAfterBundleUSD * promo.discountValue) / 100);
     } else if (promo.discountType === 'fixed') {
-      promoDiscountAmountINR = promo.discountAmountINR || promo.discountValue;
-      promoDiscountAmountUSD = promo.discountAmountUSD || promo.discountValue;
+      promoDiscountAmountINR = promo.discountAmountINR ?? promo.discountValue;
+      promoDiscountAmountUSD = promo.discountAmountUSD ?? promo.discountValue;
     }
   }
 
@@ -429,6 +429,7 @@ export function estimateScopeTimeline(
   let voiceHours = 0;
   let paymentHours = 0;
   let adminHours = 0;
+  let functionalHours = 0;
 
   const drivers: TimelineEstimateDriver[] = [];
   const riskFactors: string[] = [];
@@ -456,6 +457,7 @@ export function estimateScopeTimeline(
       adminHours += 7.5;
       drivers.push({ featureName: name, category: 'Admin & Operations', addedHoursEstimate: 7.5, riskLevel: 'low' });
     } else {
+      functionalHours += 5;
       drivers.push({ featureName: name, category: 'Functional Module', addedHoursEstimate: 5, riskLevel: 'low' });
     }
   }
@@ -463,7 +465,7 @@ export function estimateScopeTimeline(
   // Dependency coupling
   let depth = 1;
   if (authHours > 0) depth += 1;
-  if (dbHours > 0 || paymentHours > 0 || adminHours > 0) depth += 1;
+  if (dbHours > 0 || paymentHours > 0 || adminHours > 0 || functionalHours > 0) depth += 1;
   if (aiHours > 0 || voiceHours > 0) depth += 1;
 
   // Brand complexity
@@ -474,7 +476,7 @@ export function estimateScopeTimeline(
     else if (bid.includes('essential') || bid.includes('motion')) brandMultiplier = 1.10;
   }
 
-  const moduleHours = authHours + dbHours + aiHours + voiceHours + paymentHours + adminHours;
+  const moduleHours = authHours + dbHours + aiHours + voiceHours + paymentHours + adminHours + functionalHours;
   const depthMultiplier = 1.0 + (depth - 1) * 0.10;
   const rawP50 = (baseHours + moduleHours) * depthMultiplier * brandMultiplier;
   const hoursP50 = Math.round(Math.max(10, rawP50) * 10) / 10;

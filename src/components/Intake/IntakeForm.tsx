@@ -201,6 +201,16 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     return map;
   }, [features]);
 
+  const lockedFeatureIds = React.useMemo(() => {
+    return features
+      .filter(
+        (f: FeatureItem) =>
+          currentArchetype?.compulsoryFeatureLabels?.includes(f.label) ||
+          (formData.projectStartType === 'legacy_rebuild' && f.autoIncludeOnLegacy)
+      )
+      .map((f: FeatureItem) => f.id);
+  }, [currentArchetype, formData.projectStartType, features]);
+
   const priceInCurrency = (inr: number, usd: number) =>
     formatPricePair(inr, usd, currency);
 
@@ -546,7 +556,11 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                   showMobileFormula={showMobileFormula}
                   setShowMobileFormula={setShowMobileFormula}
                   onOpenCart={() => setIsCartOpen(true)}
-                  itemCount={(selectedEngine ? 1 : 0) + formData.selectedFeatures.length}
+                  itemCount={
+                    (selectedEngine ? 1 : 0) +
+                    formData.selectedFeatures.length +
+                    (totalCost.brandOpt && totalCost.brandOpt.priceINR > 0 ? 1 : 0)
+                  }
                 />
 
                 {/* Actions Footer */}
@@ -683,6 +697,8 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
         onProceed={() => setCurrentStep(4)}
         onExportPdf={handleDownloadPDF}
         isNoir={isNoir}
+        lockedFeatureIds={lockedFeatureIds}
+        generatingPdf={generatingPdf}
       />
 
       <DependencyCascadeModal

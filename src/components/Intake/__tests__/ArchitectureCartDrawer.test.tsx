@@ -7,6 +7,7 @@ vi.mock('@/components/ui/Portal', () => ({
 }));
 
 import { ArchitectureCartDrawer } from '../ArchitectureCartDrawer';
+import styles from '../ArchitectureCartDrawer.module.css';
 import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
 import { calcQuote } from '@/lib/pricing';
 
@@ -115,5 +116,128 @@ describe('ArchitectureCartDrawer', () => {
     const removePromoBtn = screen.getByRole('button', { name: /^Remove$/i });
     fireEvent.click(removePromoBtn);
     expect(defaultProps.onRemovePromo).toHaveBeenCalled();
+  });
+
+  it('renders active fixed promo code badge with correct currency in USD ($60 rather than raw $5,000)', () => {
+    render(
+      <ArchitectureCartDrawer
+        {...defaultProps}
+        currency="USD"
+        promoCode={{
+          code: 'FOUNDER50',
+          discountType: 'fixed',
+          discountValue: 5000,
+          discountAmountINR: 5000,
+          discountAmountUSD: 60,
+        }}
+      />
+    );
+    expect(screen.getByText(/FOUNDER50 applied \(-\$60\)/i)).toBeDefined();
+  });
+
+  it('isolates scroll from Lenis and locks body overflow when open', () => {
+    const { unmount } = render(<ArchitectureCartDrawer {...defaultProps} isOpen={true} />);
+
+    // Body overflow is locked to prevent background scroll
+    expect(document.body.style.overflow).toBe('hidden');
+
+    // Cart drawer containers carry data-lenis-prevent to enable native scrolling
+    const cartDialog = screen.getByRole('dialog');
+    expect(cartDialog.getAttribute('data-lenis-prevent')).not.toBeNull();
+
+    const scrollableContent = cartDialog.querySelector(`.${styles.content}`);
+    expect(scrollableContent?.getAttribute('data-lenis-prevent')).not.toBeNull();
+    expect(scrollableContent?.getAttribute('data-lenis-prevent-wheel')).not.toBeNull();
+    expect(scrollableContent?.getAttribute('data-lenis-prevent-touch')).not.toBeNull();
+
+    unmount();
+    expect(document.body.style.overflow).toBe('');
+  });
+
+  it('renders lock badge instead of delete button for compulsory features in lockedFeatureIds', () => {
+    render(
+      <ArchitectureCartDrawer
+        {...defaultProps}
+        lockedFeatureIds={['email']}
+      />
+    );
+
+    // Email is locked - no remove button should exist for it
+    expect(screen.queryByRole('button', { name: /Remove Automated Email/i })).toBeNull();
+    // Instead, lock badge with title/aria-label is rendered
+    expect(screen.getByLabelText('Required by selected goal archetype')).toBeDefined();
+
+    // CRM is NOT locked - remove button should still exist
+    expect(screen.getByRole('button', { name: /Remove CRM & Lead/i })).toBeDefined();
+  });
+
+  it('disables the PDF export button and shows Generating... when generatingPdf is true', () => {
+    render(
+      <ArchitectureCartDrawer
+        {...defaultProps}
+        generatingPdf={true}
+      />
+    );
+
+    const pdfBtn = screen.getByRole('button', { name: /Generating PDF.../i });
+    expect(pdfBtn).toBeDefined();
+    expect(pdfBtn.hasAttribute('disabled')).toBe(true);
+    expect(screen.getByText('Generating...')).toBeDefined();
+  });
+
+  it('sets progressWidth to 0 and progressbar aria-valuenow to 0 when 0 features are selected', () => {
+    const emptyQuote = calcQuote(engines, features, brandAssets, maintenancePlans, {
+      engineId: 'landing',
+      featureIds: [],
+      brandAssetId: 'none',
+      maintenancePlanId: 'essential',
+    }, 'INR');
+
+    render(
+      <ArchitectureCartDrawer
+        {...defaultProps}
+        quote={emptyQuote}
+      />
+    );
+
+    const progressBar = screen.getByRole('progressbar', { name: /Volume Bundle Discount Progress/i });
+    expect(progressBar).toBeDefined();
+    expect(progressBar.getAttribute('aria-valuenow')).toBe('0');
+  });
+
+  it('traps focus inside the drawer and closes on Escape key', async () => {
+    render(<ArchitectureCartDrawer {...defaultProps} />);
+
+    // Initial focus lands on the close button
+    const closeBtn = screen.getByRole('button', { name: /Close cart drawer/i });
+    await waitFor(() => {
+      expect(document.activeElement).toBe(closeBtn);
+    });
+
+    // Escape closes the drawer
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(defaultProps.onClose).toHaveBeenCalled();
+  });
+
+  it('renders promo code validation error with role="alert"', async () => {
+    const onApplyPromoMock = vi.fn().mockResolvedValue(false);
+    render(
+      <ArchitectureCartDrawer
+        {...defaultProps}
+        onApplyPromo={onApplyPromoMock}
+      />
+    );
+
+    const input = screen.getByLabelText(/Promo code or partner referral/i);
+    const applyBtn = screen.getByRole('button', { name: /Apply/i });
+
+    fireEvent.change(input, { target: { value: 'BADCODE' } });
+    fireEvent.click(applyBtn);
+
+    await waitFor(() => {
+      const alert = screen.getByRole('alert');
+      expect(alert).toBeDefined();
+      expect(alert.textContent).toContain('Invalid or expired promo code');
+    });
   });
 });

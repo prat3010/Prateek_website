@@ -12,11 +12,13 @@ import {
   Tag,
   Clock,
   AlertCircle,
+  Lock,
 } from 'lucide-react';
 import Portal from '@/components/ui/Portal';
 import MagneticButton from '@/components/ui/MagneticButton';
 import NumberFlow from '@number-flow/react';
 import { toast } from 'sonner';
+import { useLenis } from 'lenis/react';
 import type { FeatureItem } from '@/data/resume';
 import {
   formatMoney,
@@ -43,6 +45,8 @@ interface ArchitectureCartDrawerProps {
   onProceed: () => void;
   onExportPdf: () => void;
   isNoir?: boolean;
+  lockedFeatureIds?: string[];
+  generatingPdf?: boolean;
 }
 
 export function ArchitectureCartDrawer({
@@ -59,10 +63,22 @@ export function ArchitectureCartDrawer({
   onRemovePromo,
   onProceed,
   onExportPdf,
+  lockedFeatureIds = [],
+  generatingPdf = false,
 }: ArchitectureCartDrawerProps) {
   const [promoInput, setPromoInput] = useState('');
   const [promoLoading, setPromoLoading] = useState(false);
   const [promoError, setPromoError] = useState('');
+
+  const drawerRef = React.useRef<HTMLDivElement>(null);
+  const closeBtnRef = React.useRef<HTMLButtonElement>(null);
+  const lastActiveElementRef = React.useRef<HTMLElement | null>(null);
+
+  // Stable feature IDs key to prevent redundant timeline network re-fetches on currency switches
+  const featureIdsKey = useMemo(
+    () => quote.features.map((f) => f.id).sort().join(','),
+    [quote.features]
+  );
 
   // Milestone 84: ML Sprint Delivery Confidence & Complexity Estimation
   const localTimeline = useMemo(() => {
@@ -75,7 +91,8 @@ export function ArchitectureCartDrawer({
       },
       allFeatures
     );
-  }, [quote.engine?.id, quote.features, quote.brandAsset?.id, quote.maintenancePlan?.id, allFeatures]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- guarded by primitive featureIdsKey to prevent redundant recomputations on currency toggle
+  }, [quote.engine?.id, featureIdsKey, quote.brandAsset?.id, quote.maintenancePlan?.id, allFeatures]);
 
   const [mlTimeline, setMlTimeline] = useState<TimelineEstimateResult | null>(null);
 
@@ -93,27 +110,82 @@ export function ArchitectureCartDrawer({
     })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (isMounted && data && !data.isFallback) {
-          setMlTimeline(data);
+        if (isMounted) {
+          if (data && !data.isFallback) {
+            setMlTimeline(data);
+          } else {
+            setMlTimeline(null);
+          }
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        if (isMounted) {
+          setMlTimeline(null);
+        }
+      });
 
     return () => {
       isMounted = false;
     };
-  }, [quote.engine?.id, quote.features, quote.brandAsset?.id, quote.maintenancePlan?.id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- guarded by primitive featureIdsKey to prevent redundant network fetches on currency toggle
+  }, [quote.engine?.id, featureIdsKey, quote.brandAsset?.id, quote.maintenancePlan?.id]);
 
   const activeTimeline = mlTimeline || localTimeline;
+  const lenis = useLenis();
 
-  // Close drawer on Escape key
+  // Prevent background scrolling while cart drawer is open and isolate scroll from Lenis
   useEffect(() => {
     if (!isOpen) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    lenis?.stop();
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      lenis?.start();
     };
+  }, [isOpen, lenis]);
+
+  // Focus trapping and keyboard management (WCAG 2.1 AA)
+  useEffect(() => {
+    if (!isOpen) return;
+
+    lastActiveElementRef.current = document.activeElement as HTMLElement | null;
+    const focusTimer = setTimeout(() => {
+      closeBtnRef.current?.focus();
+    }, 50);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+
+      if (e.key === 'Tab' && drawerRef.current) {
+        const focusable = drawerRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last?.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first?.focus();
+        }
+      }
+    };
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      clearTimeout(focusTimer);
+      window.removeEventListener('keydown', handleKeyDown);
+      lastActiveElementRef.current?.focus?.();
+    };
   }, [isOpen, onClose]);
 
   // Volume bundle progress meter calculation
@@ -123,7 +195,7 @@ export function ArchitectureCartDrawer({
   let meterHint = '';
 
   if (featureCount === 0) {
-    progressWidth = 10;
+    progressWidth = 0;
     meterHint = 'Add 3 feature modules to unlock the 5% Growth Stack discount!';
   } else if (featureCount < 3) {
     progressWidth = (featureCount / 3) * 50;
@@ -203,8 +275,22 @@ export function ArchitectureCartDrawer({
 
   return (
     <Portal>
-      <div className={styles.backdrop} onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="cart-title">
-        <div className={styles.drawer} onClick={(e) => e.stopPropagation()}>
+      <div
+        className={styles.backdrop}
+        onClick={onClose}
+        data-lenis-prevent
+      >
+        <div
+          ref={drawerRef}
+          className={styles.drawer}
+          onClick={(e) => e.stopPropagation()}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="cart-title"
+          data-lenis-prevent
+          data-lenis-prevent-wheel
+          data-lenis-prevent-touch
+        >
           {/* Header */}
           <div className={styles.header}>
             <div className={styles.titleArea}>
@@ -213,6 +299,7 @@ export function ArchitectureCartDrawer({
               <span className={styles.itemBadge}>{totalItems} {totalItems === 1 ? 'item' : 'items'}</span>
             </div>
             <button
+              ref={closeBtnRef}
               type="button"
               className={styles.closeBtn}
               onClick={onClose}
@@ -223,7 +310,12 @@ export function ArchitectureCartDrawer({
           </div>
 
           {/* Scrollable Content */}
-          <div className={styles.content}>
+          <div
+            className={styles.content}
+            data-lenis-prevent
+            data-lenis-prevent-wheel
+            data-lenis-prevent-touch
+          >
             {/* Volume Bundle Discount Meter */}
             <div className={styles.bundleMeterCard}>
               <div className={styles.meterHeader}>
@@ -235,7 +327,14 @@ export function ArchitectureCartDrawer({
                   {bundlePercent > 0 ? `${bundlePercent}% Off Features` : 'Standard CPQ'}
                 </span>
               </div>
-              <div className={styles.meterBarTrack}>
+              <div
+                className={styles.meterBarTrack}
+                role="progressbar"
+                aria-valuenow={Math.round(progressWidth)}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label="Volume Bundle Discount Progress"
+              >
                 <div className={styles.meterBarFill} style={{ width: `${progressWidth}%` }} />
               </div>
               <div className={styles.meterTicks}>
@@ -292,6 +391,7 @@ export function ArchitectureCartDrawer({
                 ) : (
                   quote.features.map((f) => {
                     const price = currency === 'INR' ? f.priceINR : f.priceUSD;
+                    const isLocked = lockedFeatureIds.includes(f.id);
                     return (
                       <div key={f.id} className={styles.itemCard}>
                         <div className={styles.itemInfo}>
@@ -306,15 +406,25 @@ export function ArchitectureCartDrawer({
                         </div>
                         <div className={styles.itemPriceArea}>
                           <span className={styles.itemPrice}>{formatMoney(price, currency)}</span>
-                          <button
-                            type="button"
-                            className={styles.deleteBtn}
-                            onClick={() => handleRemoveFeatureWithToast(f)}
-                            title={`Remove ${f.label}`}
-                            aria-label={`Remove ${f.label}`}
-                          >
-                            <Trash2 size={15} />
-                          </button>
+                          {isLocked ? (
+                            <span
+                              className={styles.lockedBadge}
+                              title="Required by selected goal archetype"
+                              aria-label="Required by selected goal archetype"
+                            >
+                              <Lock size={15} />
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              className={styles.deleteBtn}
+                              onClick={() => handleRemoveFeatureWithToast(f)}
+                              title={`Remove ${f.label}`}
+                              aria-label={`Remove ${f.label}`}
+                            >
+                              <Trash2 size={15} />
+                            </button>
+                          )}
                         </div>
                       </div>
                     );
@@ -359,6 +469,7 @@ export function ArchitectureCartDrawer({
                         <button
                           type="button"
                           className={styles.upsellAddBtn}
+                          aria-label={`+ Add ${feature.label} (${formatMoney(price, currency)})`}
                           onClick={() => {
                             onAddFeature(feature.id);
                             toast.success(`Added ${feature.label} (+${formatMoney(price, currency)})`);
@@ -386,7 +497,7 @@ export function ArchitectureCartDrawer({
                       {promoCode.code} applied (
                       {promoCode.discountType === 'percentage'
                         ? `-${promoCode.discountValue}%`
-                        : `-${formatMoney(promoCode.discountValue, currency)}`}
+                        : `-${formatMoney(currency === 'INR' ? promoCode.discountAmountINR : promoCode.discountAmountUSD, currency)}`}
                       )
                     </span>
                   </div>
@@ -399,6 +510,7 @@ export function ArchitectureCartDrawer({
                   <input
                     type="text"
                     className={styles.promoInput}
+                    aria-label="Promo code or partner referral"
                     placeholder="ENTER PROMO CODE (e.g. PRATEEQ10)"
                     value={promoInput}
                     onChange={(e) => {
@@ -415,12 +527,64 @@ export function ArchitectureCartDrawer({
                   </button>
                 </form>
               )}
-              {promoError ? <div className={styles.promoError}>{promoError}</div> : null}
+              {promoError ? <div className={styles.promoError} role="alert">{promoError}</div> : null}
+            </div>
+
+            {/* Milestone 84: ML Sprint Delivery Confidence & Complexity Meter */}
+            <div className={styles.sprintMeterCard}>
+              <div className={styles.sprintHeader}>
+                <div className={styles.sprintTitle}>
+                  <Clock size={15} />
+                  <span>Sprint Effort & Delivery Timeline</span>
+                </div>
+                <span className={styles.sprintConfidenceBadge}>
+                  {activeTimeline.isFallback ? 'Deterministic Model' : 'ML Gradient Boosted (P50/P90)'}
+                </span>
+              </div>
+
+              <div className={styles.sprintStatsGrid}>
+                <div className={styles.sprintStatItem}>
+                  <span className={styles.sprintStatLabel}>Estimated Sprint Hours</span>
+                  <span className={styles.sprintStatValue}>
+                    {activeTimeline.hoursP50}h <span className={styles.sprintP90}>({activeTimeline.hoursP90}h buffer)</span>
+                  </span>
+                </div>
+
+                <div className={styles.sprintStatItem}>
+                  <span className={styles.sprintStatLabel}>Delivery Turnaround</span>
+                  <span className={styles.sprintStatValue}>
+                    {activeTimeline.calendarDaysMin}–{activeTimeline.calendarDaysMax} Days
+                  </span>
+                </div>
+
+                <div className={styles.sprintStatItem}>
+                  <span className={styles.sprintStatLabel}>Architecture Complexity</span>
+                  <span className={styles.sprintStatValue}>
+                    <span className={styles.complexityScore}>{activeTimeline.complexityIndex.toFixed(1)}</span> / 5.0
+                  </span>
+                </div>
+              </div>
+
+              {activeTimeline.riskFactors && activeTimeline.riskFactors.length > 0 ? (
+                <div className={styles.sprintRiskArea}>
+                  {activeTimeline.riskFactors.map((rf, idx) => (
+                    <div key={idx} className={styles.sprintRiskItem}>
+                      <AlertCircle size={12} className={styles.sprintRiskIcon} />
+                      <span>{rf}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
             </div>
           </div>
 
           {/* Footer & CPQ Math */}
-          <div className={styles.footer}>
+          <div
+            className={styles.footer}
+            data-lenis-prevent
+            data-lenis-prevent-wheel
+            data-lenis-prevent-touch
+          >
             <div className={styles.mathBreakdown}>
               <div className={styles.mathRow}>
                 <span>Gross Architecture Subtotal:</span>
@@ -480,53 +644,6 @@ export function ArchitectureCartDrawer({
               </div>
             </div>
 
-            {/* Milestone 84: ML Sprint Delivery Confidence & Complexity Meter */}
-            <div className={styles.sprintMeterCard}>
-              <div className={styles.sprintHeader}>
-                <div className={styles.sprintTitle}>
-                  <Clock size={15} />
-                  <span>Sprint Effort & Delivery Timeline</span>
-                </div>
-                <span className={styles.sprintConfidenceBadge}>
-                  {activeTimeline.isFallback ? 'Deterministic Model' : 'ML Gradient Boosted (P50/P90)'}
-                </span>
-              </div>
-
-              <div className={styles.sprintStatsGrid}>
-                <div className={styles.sprintStatItem}>
-                  <span className={styles.sprintStatLabel}>Estimated Sprint Hours</span>
-                  <span className={styles.sprintStatValue}>
-                    {activeTimeline.hoursP50}h <span className={styles.sprintP90}>({activeTimeline.hoursP90}h buffer)</span>
-                  </span>
-                </div>
-
-                <div className={styles.sprintStatItem}>
-                  <span className={styles.sprintStatLabel}>Delivery Turnaround</span>
-                  <span className={styles.sprintStatValue}>
-                    {activeTimeline.calendarDaysMin}–{activeTimeline.calendarDaysMax} Days
-                  </span>
-                </div>
-
-                <div className={styles.sprintStatItem}>
-                  <span className={styles.sprintStatLabel}>Architecture Complexity</span>
-                  <span className={styles.sprintStatValue}>
-                    <span className={styles.complexityScore}>{activeTimeline.complexityIndex.toFixed(1)}</span> / 5.0
-                  </span>
-                </div>
-              </div>
-
-              {activeTimeline.riskFactors && activeTimeline.riskFactors.length > 0 ? (
-                <div className={styles.sprintRiskArea}>
-                  {activeTimeline.riskFactors.map((rf, idx) => (
-                    <div key={idx} className={styles.sprintRiskItem}>
-                      <AlertCircle size={12} className={styles.sprintRiskIcon} />
-                      <span>{rf}</span>
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-            </div>
-
             {/* 50% Deposit Split */}
             <div className={styles.depositSplitCard}>
               <div className={styles.depositCol}>
@@ -570,12 +687,14 @@ export function ArchitectureCartDrawer({
               <MagneticButton strength={0.25}>
                 <button
                   type="button"
-                  className={styles.secondaryActionBtn}
+                  className={`${styles.secondaryActionBtn} ${generatingPdf ? styles.btnDisabled : ''}`}
                   onClick={onExportPdf}
-                  title="Export PDF Brief"
+                  disabled={generatingPdf}
+                  title={generatingPdf ? 'Generating PDF...' : 'Export PDF Brief'}
+                  aria-label={generatingPdf ? 'Generating PDF...' : 'Export PDF Brief'}
                 >
                   <Download size={15} />
-                  <span>PDF Brief</span>
+                  <span>{generatingPdf ? 'Generating...' : 'PDF Brief'}</span>
                 </button>
               </MagneticButton>
             </div>

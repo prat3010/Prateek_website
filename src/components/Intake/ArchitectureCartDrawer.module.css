@@ -1,11 +1,17 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(8, 8, 10, 0.85);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   z-index: 99999;
   display: flex;
   justify-content: flex-end;
   animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:global([data-theme='azure']) .backdrop {
+  background: rgba(43, 43, 54, 0.45);
 }
 
 .drawer {
@@ -14,13 +20,18 @@
   height: 100%;
   background: var(--surface-glass-bg);
   color: var(--color-text);
-  border-left: 1px solid var(--surface-glass-border);
-  box-shadow: var(--shadow-glass-lg);
+  border-left: 1.5px solid var(--border-muted);
+  box-shadow: -10px 0 32px rgba(43, 43, 54, 0.12), -2px 0 6px rgba(43, 43, 54, 0.05);
   display: flex;
   flex-direction: column;
   font-family: var(--font-body);
   animation: slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
+}
+
+:global([data-theme='noir']) .drawer {
+  border-left: 1px solid var(--surface-glass-border);
+  box-shadow: -12px 0 40px rgba(0, 0, 0, 0.75), inset 1px 0 0 rgba(255, 255, 255, 0.06);
 }
 
 @keyframes fadeIn {
@@ -34,6 +45,7 @@
 }
 
 .header {
+  flex-shrink: 0;
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid var(--border-muted);
   display: flex;
@@ -102,12 +114,41 @@
 }
 
 .content {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   padding: 1.25rem 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+}
+
+.content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.content::-webkit-scrollbar-thumb {
+  background: var(--border-muted);
+  border-radius: 9999px;
+}
+
+.content::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border);
+}
+
+:global([data-theme='noir']) .content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+:global([data-theme='noir']) .content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
 }
 
 /* Volume Bundle Discount Meter */
@@ -156,6 +197,11 @@
   background: linear-gradient(90deg, var(--pop-blue) 0%, var(--pop-green) 100%);
   border-radius: 9999px;
   transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:global([data-theme='noir']) .meterBarFill {
+  background: linear-gradient(90deg, var(--neon-cyan) 0%, var(--neon-green) 100%);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
 }
 
 .meterTicks {
@@ -227,12 +273,18 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .itemCard:hover {
   border-color: var(--border-accent);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+  box-shadow: 2px 2px 0px rgba(43, 43, 54, 0.14);
+}
+
+:global([data-theme='noir']) .itemCard:hover {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 3px 12px rgba(0, 240, 255, 0.12);
 }
 
 .itemInfo {
@@ -307,6 +359,25 @@
 .deleteBtn:hover {
   opacity: 1;
   background: var(--badge-danger-bg);
+}
+
+.lockedBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.45rem;
+  background: rgba(90, 142, 182, 0.12);
+  border: 1px solid var(--pop-blue);
+  border-radius: 6px;
+  color: var(--pop-blue);
+  cursor: not-allowed;
+  transition: all 0.15s ease;
+}
+
+:global([data-theme='noir']) .lockedBadge {
+  background: rgba(0, 240, 255, 0.12);
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
 }
 
 .emptyCart {
@@ -485,6 +556,7 @@
 
 /* Footer & Math breakdown */
 .footer {
+  flex-shrink: 0;
   padding: 1.25rem 1.5rem;
   border-top: 1.5px dashed var(--border-muted);
   background: var(--surface-glass-header);
@@ -538,11 +610,16 @@
 .depositSplitCard {
   background: var(--surface-card);
   border: 1px solid var(--border-muted);
+  border-left: 3px solid var(--pop-blue);
   border-radius: var(--border-radius-md, 8px);
   padding: 0.65rem 0.85rem;
   display: flex;
   justify-content: space-between;
   font-size: 0.78rem;
+}
+
+:global([data-theme='noir']) .depositSplitCard {
+  border-left-color: var(--neon-cyan);
 }
 
 .depositCol {
@@ -585,9 +662,11 @@
   border: none;
   border-radius: var(--border-radius-md, 8px);
   padding: 0.75rem 1rem;
-  font-family: var(--font-headline);
-  font-size: 0.9rem;
+  font-family: var(--font-code);
+  font-size: 0.84rem;
   font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -608,9 +687,11 @@
   color: var(--color-text);
   border-radius: var(--border-radius-md, 8px);
   padding: 0.75rem 1rem;
-  font-family: var(--font-headline);
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-family: var(--font-code);
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -631,16 +712,37 @@
   border-color: var(--neon-cyan);
 }
 
+.secondaryActionBtn:disabled,
+.secondaryActionBtn.btnDisabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 @media (max-width: 640px) {
   .drawer {
     max-width: 100%;
   }
   .actionRow {
     flex-direction: column;
+    width: 100%;
+  }
+  .secondaryActionBtn {
+    width: 100%;
   }
   .sprintStatsGrid {
     grid-template-columns: 1fr;
     gap: 0.75rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .depositSplitCard {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .depositColRight {
+    text-align: left;
   }
 }
 
@@ -649,7 +751,7 @@
   border: 1px solid var(--border-muted);
   border-radius: var(--border-radius-md, 8px);
   padding: 1rem 1.15rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 0;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -749,3 +851,34 @@
   flex-shrink: 0;
   margin-top: 1px;
 }
+
+:global([data-theme='noir']) .sprintRiskIcon {
+  color: var(--neon-pink, #ff2a55);
+}
+
+/* Focus-visible accessibility outlines (Azure & Noir design system) */
+.closeBtn:focus-visible,
+.deleteBtn:focus-visible,
+.changeEngineBtn:focus-visible,
+.promoInput:focus-visible,
+.promoApplyBtn:focus-visible,
+.promoRemoveBtn:focus-visible,
+.upsellAddBtn:focus-visible,
+.primaryActionBtn:focus-visible,
+.secondaryActionBtn:focus-visible {
+  outline: 2px solid var(--pop-blue);
+  outline-offset: 2px;
+}
+
+:global([data-theme='noir']) .closeBtn:focus-visible,
+:global([data-theme='noir']) .deleteBtn:focus-visible,
+:global([data-theme='noir']) .changeEngineBtn:focus-visible,
+:global([data-theme='noir']) .promoInput:focus-visible,
+:global([data-theme='noir']) .promoApplyBtn:focus-visible,
+:global([data-theme='noir']) .promoRemoveBtn:focus-visible,
+:global([data-theme='noir']) .upsellAddBtn:focus-visible,
+:global([data-theme='noir']) .primaryActionBtn:focus-visible,
+:global([data-theme='noir']) .secondaryActionBtn:focus-visible {
+  outline-color: var(--neon-cyan);
+}
+

@@ -71,8 +71,21 @@ export function ScopingChatWidgetDrawer({
 
   return (
     <Portal>
-      <div className={styles.backdrop} onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="scoping-drawer-title">
-        <div className={styles.drawer} onClick={(e) => e.stopPropagation()}>
+      <div
+        className={styles.backdrop}
+        onClick={onClose}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="scoping-drawer-title"
+        data-lenis-prevent
+      >
+        <div
+          className={styles.drawer}
+          onClick={(e) => e.stopPropagation()}
+          data-lenis-prevent
+          data-lenis-prevent-wheel
+          data-lenis-prevent-touch
+        >
           <div className={styles.header}>
             <div className={styles.titleArea}>
               <span className={styles.statusDot} />
@@ -95,6 +108,9 @@ export function ScopingChatWidgetDrawer({
             id="scoping-chat-widget-container"
             ref={containerRef}
             className={styles.widgetHost}
+            data-lenis-prevent
+            data-lenis-prevent-wheel
+            data-lenis-prevent-touch
           />
 
           <div className={styles.badgeFooter}>
