@@ -122,22 +122,23 @@
   content: '';
   position: absolute;
   top: 18px;
-  left: 30px;
-  right: 30px;
+  left: 12.5%;
+  right: 12.5%;
   height: 2px;
   background: var(--color-border);
   z-index: 0;
 }
 
 .stepItem {
+  flex: 1;
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  background: var(--surface-elevated);
-  padding: 0 10px;
+  background: transparent;
+  padding: 0 4px;
   cursor: pointer;
   border: none;
   transition: transform 0.2s ease;
@@ -148,6 +149,8 @@
 }
 
 .stepBadge {
+  position: relative;
+  z-index: 1;
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -181,12 +184,15 @@
 }
 
 .stepItemDone {
-  opacity: 0.95;
+  opacity: 1;
 }
 
 .stepItemSkipped {
-  opacity: 0.5;
   cursor: not-allowed;
+}
+
+.stepItemSkipped .stepLabel {
+  opacity: 0.5;
 }
 
 .stepBadgeSkipped {
@@ -194,6 +200,7 @@
   color: var(--color-text-dim) !important;
   border-style: dashed !important;
   box-shadow: none !important;
+  opacity: 0.6;
 }
 
 .stepLabel {
@@ -1491,10 +1498,6 @@
   .card {
     padding: var(--space-lg);
   }
-  .stepIndicator::before {
-    left: 20px;
-    right: 20px;
-  }
   .stepLabel {
     display: none;
   }
@@ -1554,7 +1557,7 @@
 }
 
 :global([data-theme='noir']) .stepItem {
-  background: #08080a;
+  background: transparent;
 }
 
 :global([data-theme='noir']) .stepBadge {
