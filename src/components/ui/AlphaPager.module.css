@@ -6,11 +6,7 @@
 
 .viewportBounds {
   position: fixed;
-  /* Expanded boundary limits allowing ~90% edge tuck while preserving ~10% grab tab */
-  top: -170px;
-  bottom: -170px;
-  left: -330px;
-  right: -330px;
+  inset: 0;
   pointer-events: none;
   z-index: var(--z-fixed, 300);
 }
@@ -24,6 +20,10 @@
   pointer-events: none;
   user-select: none;
   -webkit-user-select: none;
+  contain: layout paint;
+  will-change: transform;
+  transform: translateZ(0);
+  z-index: var(--z-fixed, 300);
   transition: 
     opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
     visibility 0.4s;
@@ -58,7 +58,10 @@
   pointer-events: auto;
   padding: 0.5rem 0.65rem 0.6rem 0.65rem;
   cursor: grab;
-  touch-action: none;
+  touch-action: pan-y;
+  contain: layout paint;
+  will-change: transform;
+  transform: translateZ(0);
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -90,6 +93,7 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.5);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12);
   margin-bottom: 0.45rem;
+  touch-action: none;
 }
 
 .brandDeboss {
@@ -268,6 +272,7 @@
   width: 6px;
   flex-shrink: 0;
   cursor: grab;
+  touch-action: none;
 }
 
 .gripRib {
@@ -309,6 +314,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  contain: paint;
   transition: background-color 0.25s ease, box-shadow 0.25s ease;
 }
 

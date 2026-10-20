@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { m } from 'framer-motion';
+import { m, useDragControls } from 'framer-motion';
 import { useLenis } from 'lenis/react';
 import Portal from '@/components/ui/Portal';
 import { useSystemTelemetry } from '@/components/ui/useSystemTelemetry';
@@ -105,6 +105,23 @@ function getRetroTimeString(): string {
   return `${displayHours}:${mins} ${ampm}`;
 }
 
+function StandbyScreen({ isBiz }: { isBiz: boolean }) {
+  const { stats } = useSystemTelemetry();
+  return (
+    <div className={styles.standbyScreen}>
+      <div className={styles.lcdCategory}>
+        <span className={styles.lcdCursor}>►</span>
+        <span>[RADAR SCANNER: 900-960MHz]</span>
+      </div>
+      <p className={styles.lcdMessage}>
+        {isBiz
+          ? `“Tracking client milestones & ROI models across vault... (Uptime: ${stats.uptime})”`
+          : `“Tracking viewport navigation across systems vault... (Uptime: ${stats.uptime} | ${stats.fps} FPS)”`}
+      </p>
+    </div>
+  );
+}
+
 export interface AlphaPagerProps {
   defaultExpanded?: boolean;
 }
@@ -130,18 +147,35 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
   const [radarFlash, setRadarFlash] = useState(false);
   const [timeStr, setTimeStr] = useState<string>(getRetroTimeString);
   const [backlightActive, setBacklightActive] = useState(false);
-  const constraintsRef = useRef<HTMLDivElement>(null);
   const activeSectionRef = useRef<string>('home');
   const lastChirpRef = useRef<number>(0);
   const flashTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lenis = useLenis();
 
-  // Track viewport resize for responsive mobile layout adjustments
+  // Dynamic numeric drag constraints to eliminate DOM bounding box measuring & layout thrashing on scroll
+  const [dragConstraints, setDragConstraints] = useState<{ top: number; bottom: number; left: number; right: number }>(() => {
+    if (typeof window === 'undefined') return { top: -600, bottom: 80, left: -800, right: 180 };
+    return {
+      top: -(window.innerHeight - 280),
+      bottom: 80,
+      left: -(window.innerWidth - 320),
+      right: 180,
+    };
+  });
+
+  // Track viewport resize for responsive mobile layout adjustments and drag limits
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
       setIsMobile(mobile);
+      setDragConstraints({
+        top: -(window.innerHeight - 280),
+        bottom: 80,
+        left: -(window.innerWidth - 320),
+        right: 180,
+      });
     };
+    handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -157,7 +191,7 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
     };
 
     const timer = setTimeout(() => {
-      document.addEventListener('pointerdown', handleClickOutside);
+      document.addEventListener('pointerdown', handleClickOutside, { passive: true });
     }, 120);
 
     return () => {
@@ -362,7 +396,7 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
     setIsExpanded((prev) => !prev);
   };
 
-  const { stats } = useSystemTelemetry();
+  const dragControls = useDragControls();
   const currentMsg = messages[activeMsgIndex] || DEFAULT_MESSAGES[0];
   const queueLength = messages.length;
 
@@ -388,9 +422,8 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
 
   return (
     <Portal>
-      <div className={styles.viewportBounds} ref={constraintsRef}>
-        <div className={`${styles.bannerWrapper} ${isExpanded ? styles.bannerWrapperExpanded : ''} ${isDetailsHidden ? styles.hidden : ''}`}>
-          {!isExpanded ? (
+      <div className={`${styles.bannerWrapper} ${isExpanded ? styles.bannerWrapperExpanded : ''} ${isDetailsHidden ? styles.hidden : ''}`}>
+        {!isExpanded ? (
             /* ── Compact Belt-Clip Mode (Mobile & Minimized Dock) ── */
             <m.div
               key="pager-compact"
@@ -440,7 +473,9 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
               key="pager-device"
               className={styles.pagerDevice}
               drag={!isMobile}
-              dragConstraints={constraintsRef}
+              dragListener={false}
+              dragControls={dragControls}
+              dragConstraints={dragConstraints}
               dragMomentum={true}
               dragElastic={0.08}
               dragTransition={{ bounceStiffness: 400, bounceDamping: 28 }}
@@ -456,7 +491,15 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
               aria-label="Vintage Alphanumeric Pager & Section Radar"
             >
               {/* Top Belt-Clip Hinge & Casing Branding */}
-              <div className={styles.clipBar}>
+              <div
+                className={styles.clipBar}
+                onPointerDown={(e) => {
+                  const target = e.target as HTMLElement | null;
+                  if (!isMobile && !target?.closest('button')) {
+                    dragControls.start(e);
+                  }
+                }}
+              >
                 <div className={styles.brandDeboss}>
                   <span className={styles.brandName}>PRATEEQ</span>
                   <span className={styles.brandModel}>ALPHAPAGE-90</span>
@@ -523,7 +566,16 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
               {/* Main Body with Molded Grips & Sunken LCD */}
               <div className={styles.pagerBody}>
                 {/* Left Side Grip Ribs (Grab Handle) */}
-                <div className={styles.sideGrip} aria-hidden="true" title="Drag Handle">
+                <div
+                  className={styles.sideGrip}
+                  aria-hidden="true"
+                  title="Drag Handle"
+                  onPointerDown={(e) => {
+                    if (!isMobile) {
+                      dragControls.start(e);
+                    }
+                  }}
+                >
                   <span className={styles.gripRib} />
                   <span className={styles.gripRib} />
                   <span className={styles.gripRib} />
@@ -552,17 +604,7 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
                     {/* LCD Message Area */}
                     <div className={styles.lcdContent}>
                       {mode === 'standby' ? (
-                        <div className={styles.standbyScreen}>
-                          <div className={styles.lcdCategory}>
-                            <span className={styles.lcdCursor}>►</span>
-                            <span>[RADAR SCANNER: 900-960MHz]</span>
-                          </div>
-                          <p className={styles.lcdMessage}>
-                            {isBiz
-                              ? `“Tracking client milestones & ROI models across vault... (Uptime: ${stats.uptime})”`
-                              : `“Tracking viewport navigation across systems vault... (Uptime: ${stats.uptime} | ${stats.fps} FPS)”`}
-                          </p>
-                        </div>
+                        <StandbyScreen isBiz={isBiz} />
                       ) : (
                         <div
                           className={`${styles.alertScreen} ${styles.clickableScreen}`}
@@ -637,7 +679,6 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
             </m.div>
           )}
         </div>
-      </div>
     </Portal>
   );
 }

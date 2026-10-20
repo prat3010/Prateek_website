@@ -1291,9 +1291,9 @@
   font-family: var(--font-code);
   font-size: 0.72rem;
   font-weight: 700;
-  background: var(--badge-success-bg);
-  color: var(--badge-success-text);
-  border: 1px solid var(--badge-success-border);
+  background: rgba(121, 180, 139, 0.18);
+  color: var(--pop-green, #79B48B);
+  border: 1px solid rgba(121, 180, 139, 0.35);
   padding: 0.15rem 0.45rem;
   border-radius: 4px;
   display: inline-flex;
@@ -1770,6 +1770,12 @@
 :global([data-theme='noir']) .stickyTotal {
   color: var(--neon-green, #39ff14);
   text-shadow: none;
+}
+
+:global([data-theme='noir']) .discountBadge {
+  background: var(--badge-success-bg);
+  color: var(--badge-success-text);
+  border: 1px solid var(--badge-success-border);
 }
 
 :global([data-theme='noir']) .careCard {
