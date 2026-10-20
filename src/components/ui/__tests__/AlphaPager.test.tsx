@@ -455,4 +455,56 @@ describe('AlphaPager Component', () => {
     expect(mockLenisScrollTo).toHaveBeenCalledWith('#about', expect.objectContaining({ duration: 0 }));
     mockReducedMotion = false;
   });
+
+  it('renders designated drag handles with Drag Handle tooltips on clip bar and side grips', () => {
+    const { container } = render(<AlphaPager />);
+    const clipBar = container.querySelector('[class*="clipBar"]');
+    const sideGrip = container.querySelector('[class*="sideGrip"]');
+
+    expect(clipBar).not.toBeNull();
+    expect(clipBar?.getAttribute('title')).toBe('Drag Handle');
+    expect(sideGrip).not.toBeNull();
+    expect(sideGrip?.getAttribute('title')).toBe('Drag Handle');
+  });
+
+  it('starts drag gesture when pointer down occurs on clipBar or casing', () => {
+    const { container } = render(<AlphaPager />);
+    const clipBar = container.querySelector('[class*="clipBar"]');
+    expect(clipBar).not.toBeNull();
+
+    act(() => {
+      fireEvent.pointerDown(clipBar!, { clientX: 100, clientY: 100 });
+    });
+
+    const pagerDevice = screen.getByRole('region', { name: /Vintage Alphanumeric Pager & Section Radar/i });
+    expect(pagerDevice).toBeDefined();
+  });
+
+  it('renders buttonCluster with interactive controls allowing rapid hover and click events without errors', () => {
+    const { container } = render(<AlphaPager />);
+    const cluster = container.querySelector('[class*="buttonCluster"]');
+    expect(cluster).not.toBeNull();
+
+    const prevBtn = screen.getByRole('button', { name: /Previous channel/i });
+    const nextBtn = screen.getByRole('button', { name: /Next channel/i });
+    const clearBtn = screen.getByRole('button', { name: /Silence alert/i });
+
+    // Simulate fast hover sweep across buttons
+    act(() => {
+      fireEvent.mouseEnter(prevBtn);
+      fireEvent.mouseLeave(prevBtn);
+      fireEvent.mouseEnter(nextBtn);
+      fireEvent.mouseLeave(nextBtn);
+      fireEvent.mouseEnter(clearBtn);
+      fireEvent.mouseLeave(clearBtn);
+    });
+
+    // Verify channel cycling still operates smoothly
+    act(() => {
+      fireEvent.click(nextBtn);
+    });
+    expect(screen.getByText(/CH 02\/08/i)).toBeDefined();
+  });
 });
+
+

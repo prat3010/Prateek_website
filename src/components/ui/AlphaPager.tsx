@@ -595,7 +595,7 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
               aria-label="Vintage Alphanumeric Pager & Section Radar"
             >
               {/* Top Belt-Clip Hinge & Casing Branding */}
-              <div className={styles.clipBar}>
+              <div className={styles.clipBar} title="Drag Handle">
                 <div className={styles.brandDeboss}>
                   <span className={styles.brandName}>PRATEEQ</span>
                   <span className={styles.brandModel}>ALPHAPAGE-90</span>
