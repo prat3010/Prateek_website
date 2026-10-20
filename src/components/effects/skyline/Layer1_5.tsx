@@ -14,6 +14,20 @@ const Layer1_5 = React.memo(function Layer1_5({ reducedMotion, wobble: propWobbl
       <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
         <g className={styles.buildingGroup} stroke="var(--skyline-stroke-mid)" strokeWidth="1.2">
           {/* Blocky Spire (Center-Left) */}
+          {/* 3D Roofs (Approach B: receding up-right toward x=960) */}
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 373 450 L 377 450 L 391 441 L 387 441 Z" className={styles.bldMidBlockySpire} />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 370 540 L 380 540 L 394 531 L 384 531 Z" className={styles.bldMidBlockySpire} />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 330 710 L 370 710 L 384 701 L 344 701 Z" className={styles.bldMidBlockySpire} />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 380 710 L 420 710 L 434 701 L 394 701 Z" className={styles.bldMidBlockySpire} />
+          {/* 3D Right Side Flanks (In shadow) */}
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 380 540 L 394 531 L 394 701 L 380 710 Z" className={styles.bldMidBlockySpire} />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 380 540 L 394 531 L 394 701 L 380 710 Z" className={styles.shadowHatchMid} />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 420 710 L 434 701 L 434 1080 L 420 1080 Z" className={styles.bldMidBlockySpire} />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 420 710 L 434 701 L 434 1080 L 420 1080 Z" className={styles.shadowHatchMid} />
+          {/* Cornice returns */}
+          <WobblyLine wobble={wobble} wobbleStrength={strength} x1="380" y1="540" x2="394" y2="531" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" fill="none" />
+          <WobblyLine wobble={wobble} wobbleStrength={strength} x1="420" y1="710" x2="434" y2="701" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" fill="none" />
+          {/* Front Facade */}
           <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 330 1080 L 330 710 L 370 710 L 370 540 L 373 540 L 373 450 L 377 450 L 377 540 L 380 540 L 380 710 L 420 710 L 420 1080 Z" className={styles.bldMidBlockySpire} />
           {/* Double cornices & vertical ribs for Blocky Spire */}
           <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
@@ -30,6 +44,14 @@ const Layer1_5 = React.memo(function Layer1_5({ reducedMotion, wobble: propWobbl
           </g>
 
           {/* Slab Building */}
+          {/* 3D Roof (Approach B) */}
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 565 690 L 640 690 L 649 683 L 574 683 Z" className={styles.bldMidSlab} />
+          {/* 3D Right Side Flank (In shadow) */}
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 640 690 L 649 683 L 649 1080 L 640 1080 Z" className={styles.bldMidSlab} />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 640 690 L 649 683 L 649 1080 L 640 1080 Z" className={styles.shadowHatchMid} />
+          {/* Cornice return */}
+          <WobblyLine wobble={wobble} wobbleStrength={strength} x1="640" y1="690" x2="649" y2="683" strokeWidth="1.4" stroke="var(--skyline-stroke-fg)" fill="none" />
+          {/* Front Facade */}
           <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 565 1080 L 565 690 L 640 690 L 640 1080 Z" className={styles.bldMidSlab} />
           {/* Slab Building Satellite Dish */}
           <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
@@ -73,8 +95,17 @@ const Layer1_5 = React.memo(function Layer1_5({ reducedMotion, wobble: propWobbl
           </g>
 
           {/* Wide Warehouse */}
+          {/* 3D Sawtooth Roof Gables (Approach B) */}
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 830 720 L 855 695 L 858 690 L 833 715 Z" className={styles.bldMidWarehouse} />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 855 720 L 880 695 L 883 690 L 858 715 Z" className={styles.bldMidWarehouse} />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 880 720 L 905 695 L 908 690 L 883 715 Z" className={styles.bldMidWarehouse} />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 905 720 L 930 720 L 933 715 L 908 715 Z" className={styles.bldMidWarehouse} />
+          {/* 3D Right Side Flank (In shadow) */}
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 930 720 L 933 715 L 933 1080 L 930 1080 Z" className={styles.bldMidWarehouse} />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 930 720 L 933 715 L 933 1080 L 930 1080 Z" className={styles.shadowHatchMid} />
+          {/* Front Facade */}
           <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 830 1080 L 830 720 L 930 720 L 930 1080 Z" className={styles.bldMidWarehouse} />
-          {/* Sawtooth roof detail */}
+          {/* Sawtooth roof front detail */}
           <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 830 720 L 855 695 L 855 720 L 880 695 L 880 720 L 905 695 L 905 720 L 930 720" fill="var(--skyline-fill-bg)" />
           {/* Warehouse Ventilation Chimneys */}
           <g stroke="var(--skyline-stroke-mid)" strokeWidth="1.0" fill="none">
@@ -114,6 +145,19 @@ const Layer1_5 = React.memo(function Layer1_5({ reducedMotion, wobble: propWobbl
           </g>
 
           {/* Block Tower with setbacks */}
+          {/* 3D Roofs (Approach B: right of 960, recedes up-left) */}
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1134 584 L 1204 584 L 1210 590 L 1140 590 Z" className={styles.bldMidSetbacks} />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1104 644 L 1134 644 L 1140 650 L 1110 650 Z" className={styles.bldMidSetbacks} />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1204 644 L 1234 644 L 1240 650 L 1210 650 Z" className={styles.bldMidSetbacks} />
+          {/* 3D Left Side Flanks (In shadow) */}
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1104 644 L 1110 650 L 1110 1080 L 1104 1080 Z" className={styles.bldMidSetbacks} />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1104 644 L 1110 650 L 1110 1080 L 1104 1080 Z" className={styles.shadowHatchMid} />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1134 584 L 1140 590 L 1140 650 L 1134 644 Z" className={styles.bldMidSetbacks} />
+          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1134 584 L 1140 590 L 1140 650 L 1134 644 Z" className={styles.shadowHatchMid} />
+          {/* Cornice returns */}
+          <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1110" y1="650" x2="1104" y2="644" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" fill="none" />
+          <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1140" y1="590" x2="1134" y2="584" strokeWidth="1.2" stroke="var(--skyline-stroke-fg)" fill="none" />
+          {/* Front Facade */}
           <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1110 1080 L 1110 650 L 1140 650 L 1140 590 L 1210 590 L 1210 650 L 1240 650 L 1240 1080 Z" className={styles.bldMidSetbacks} />
           {/* Block Tower Satellite Dish */}
           <g stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" fill="none">
@@ -146,12 +190,6 @@ const Layer1_5 = React.memo(function Layer1_5({ reducedMotion, wobble: propWobbl
             <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1150" y1="620" x2="1200" y2="620" strokeDasharray="4 6" />
             <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1150" y1="635" x2="1200" y2="635" strokeDasharray="4 6" />
           </g>
-
-          {/* Shadow overlay paths for wobbly hatching depth */}
-          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 375 1080 L 375 450 L 377 450 L 377 540 L 380 540 L 380 710 L 420 710 L 420 1080 Z" className={styles.shadowHatchMid} />
-          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 602.5 1080 L 602.5 690 L 640 690 L 640 1080 Z" className={styles.shadowHatchMid} />
-          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 880 1080 L 880 720 L 930 720 L 930 1080 Z" className={styles.shadowHatchMid} />
-          <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1175 1080 L 1175 590 L 1210 590 L 1210 650 L 1240 650 L 1240 1080 Z" className={styles.shadowHatchMid} />
         </g>
       </svg>
 

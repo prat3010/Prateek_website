@@ -80,6 +80,18 @@ const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble , 
             <g className={styles.buildingGroup} stroke="var(--skyline-stroke-fg)" strokeWidth="1.8">
               
               {/* LEFT ROOFTOP SECTION */}
+              {/* 3D Roof plane */}
+              <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="-1000,808 486,808 460,820 -1000,820" className={styles.bldFgLeftRoof} />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="460" y1="820" x2="486" y2="808" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="-1000" y1="808" x2="486" y2="808" stroke="var(--skyline-stroke-mid)" strokeWidth="1" />
+
+              {/* 3D Right Flank (Shadow wall facing the central canyon) */}
+              <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="460,820 486,808 486,1250 460,1250" className={styles.bldFgLeftRoof} />
+              <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="460,820 486,808 486,1250 460,1250" className={styles.shadowHatchFg} />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="486" y1="808" x2="486" y2="1250" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="460" y1="820" x2="460" y2="1250" stroke="var(--skyline-stroke-mid)" strokeWidth="1.2" />
+
+              {/* Front Facade */}
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M -1000 1250 L -1000 820 L 460 820 L 460 1250 Z" className={styles.bldFgLeftRoof} />
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M -1000 1250 L -1000 820 L 460 820 L 460 1250 Z" fill="url(#brick-fg)" stroke="none" pointerEvents="none" className={styles.brickOverlay} />
 
@@ -158,7 +170,20 @@ const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble , 
                 {/* Center Pipe */}
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="396" y1="792" x2="396" y2="820" strokeWidth="2.2" />
                 
-                {/* Tank Barrel Body */}
+                {/* 3D Tank Barrel Right Flank */}
+                <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="412,748 424,742 424,786 412,792" className={styles.bldFgLeftWaterTankBody} />
+                <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="412,748 424,742 424,786 412,792" className={styles.shadowHatchFg} />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="424" y1="742" x2="424" y2="786" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="412" y1="792" x2="424" y2="786" stroke="var(--skyline-stroke-fine)" strokeWidth="0.8" />
+                {/* Hoops returning on right flank */}
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="412" y1="753" x2="424" y2="747" strokeWidth="0.8" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="412" y1="762" x2="424" y2="756" strokeWidth="0.8" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="412" y1="771" x2="424" y2="765" strokeWidth="0.8" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="412" y1="779" x2="424" y2="773" strokeWidth="0.8" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="412" y1="786" x2="424" y2="780" strokeWidth="0.8" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="412" y1="790" x2="424" y2="784" strokeWidth="0.8" />
+
+                {/* Tank Barrel Body (Front) */}
                 <WobblyRect wobble={wobble} wobbleStrength={strength} x="380" y="748" width="32" height="44" className={styles.bldFgLeftWaterTankBody} />
                 
                 {/* Vertical Staves (Planks) */}
@@ -178,7 +203,14 @@ const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble , 
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="380" y1="786" x2="412" y2="786" strokeWidth="0.8" />
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="380" y1="790" x2="412" y2="790" strokeWidth="0.8" />
                 
-                {/* Conical Roof */}
+                {/* 3D Conical Roof Right Flank Facet */}
+                <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="396,726 402,723 426,742 414,748" className={styles.bldFgLeftWaterTankRoof} />
+                <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="396,726 402,723 426,742 414,748" className={styles.shadowHatchFg} />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="396" y1="726" x2="402" y2="723" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="402" y1="723" x2="426" y2="742" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="414" y1="748" x2="426" y2="742" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
+
+                {/* Conical Roof (Front) */}
                 <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="378,748 396,726 414,748" className={styles.bldFgLeftWaterTankRoof} />
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="396" y1="726" x2="378" y2="748" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="396" y1="726" x2="384" y2="748" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
@@ -219,6 +251,12 @@ const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble , 
 
               {/* Slanted Glass Skylight */}
               <g fill="var(--bld-fg-left-fill)" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2">
+                {/* 3D Top glass plane */}
+                <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="255,805 265,800 295,807 285,812" fill="var(--skyline-fill-bg)" opacity={0.6} />
+                {/* 3D Right facet */}
+                <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="285,812 295,807 295,815 285,820" fill="var(--skyline-fill-bg)" opacity={0.8} />
+                <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="285,812 295,807 295,815 285,820" className={styles.shadowHatchFg} />
+                {/* Front profile */}
                 <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="255,820 255,805 285,812 285,820" />
                 {/* Glass pane partitions */}
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="265" y1="810" x2="265" y2="820" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
@@ -236,6 +274,11 @@ const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble , 
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="138" y1="760" x2="210" y2="820" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" opacity="0.5" />
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="202" y1="760" x2="130" y2="820" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" opacity="0.5" />
 
+                {/* 3D Sign Board Rims */}
+                <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="120,700 128,696 228,696 220,700" fill="var(--skyline-billboard-bg)" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
+                <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="220,700 228,696 228,756 220,760" fill="var(--skyline-billboard-bg)" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
+                <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="220,700 228,696 228,756 220,760" className={styles.shadowHatchFg} />
+
                 {/* Sign Board */}
                 <WobblyRect wobble={wobble} wobbleStrength={strength} x="120" y="700" width="100" height="60" rx="3" fill="var(--skyline-billboard-bg)" stroke="var(--skyline-stroke-fg)" strokeWidth="1.8" />
                 {/* Border line */}
@@ -244,7 +287,18 @@ const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble , 
 
               {/* Rooftop Penthouse Brick Access Shed (Static part) */}
               <g className={styles.bldFgShed} stroke="var(--skyline-stroke-fg)" strokeWidth="1.8">
-                {/* Main Shed Structure */}
+                {/* 3D Roof plane */}
+                <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="290,750 306,742 371,742 355,750" className={styles.bldFgShed} />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="306" y1="742" x2="371" y2="742" stroke="var(--skyline-stroke-mid)" strokeWidth="1" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="355" y1="750" x2="371" y2="742" />
+
+                {/* 3D Right Flank */}
+                <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="355,750 371,742 371,812 355,820" className={styles.bldFgShed} />
+                <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="355,750 371,742 371,812 355,820" className={styles.shadowHatchFg} />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="371" y1="742" x2="371" y2="812" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="355" y1="820" x2="371" y2="812" stroke="var(--skyline-stroke-mid)" strokeWidth="1" />
+
+                {/* Main Shed Structure (Front Facade) */}
                 <WobblyRect wobble={wobble} wobbleStrength={strength} x="290" y="750" width="65" height="70" />
                 {/* Roof Cap */}
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="288" y1="750" x2="357" y2="750" />
@@ -282,6 +336,7 @@ const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble , 
 
               {/* Parapet Wall Cap details on left roof */}
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="-1000" y1="826" x2="460" y2="826" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="460" y1="826" x2="486" y2="814" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="40" y1="820" x2="40" y2="1250" stroke="var(--skyline-stroke-fine)" strokeWidth="1" />
               
               {/* Left Facade Fire Escape */}
@@ -839,6 +894,12 @@ const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble , 
               </g>
 
               {/* Rooftop Pipe Chimneys with Steam path generators */}
+              {/* Left Chimney 1 (3D) */}
+              <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="215,775 223,771 249,771 241,775" className={styles.bldFgChimney} />
+              <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="241,775 249,771 249,777 241,781" className={styles.bldFgChimney} />
+              <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="241,775 249,771 249,777 241,781" className={styles.shadowHatchFg} />
+              <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="236,781 244,777 244,814 236,820" className={styles.bldFgChimney} />
+              <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="236,781 244,777 244,814 236,820" className={styles.shadowHatchFg} />
               <WobblyRect wobble={wobble} wobbleStrength={strength} x="220" y="780" width="16" height="40" className={styles.bldFgChimney} />
               <WobblyRect wobble={wobble} wobbleStrength={strength} x="215" y="775" width="26" height="6" className={styles.bldFgChimney} />
               {/* Left chimney steam puffs */}
@@ -848,6 +909,12 @@ const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble , 
                 <circle cx="228" cy="775" r="1.2" className={styles.smokePuff3} />
               </g>
 
+              {/* Left Chimney 2 (3D) */}
+              <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="354,754 364,749 398,749 388,754" className={styles.bldFgChimney} />
+              <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="388,754 398,749 398,755 388,760" className={styles.bldFgChimney} />
+              <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="388,754 398,749 398,755 388,760" className={styles.shadowHatchFg} />
+              <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="382,760 392,755 392,815 382,820" className={styles.bldFgChimney} />
+              <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="382,760 392,755 392,815 382,820" className={styles.shadowHatchFg} />
               <WobblyRect wobble={wobble} wobbleStrength={strength} x="360" y="760" width="22" height="60" className={styles.bldFgChimney} />
               <WobblyRect wobble={wobble} wobbleStrength={strength} x="354" y="754" width="34" height="6" className={styles.bldFgChimney} />
               {/* Center chimney steam puffs */}
@@ -881,6 +948,18 @@ const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble , 
               />
 
               {/* RIGHT ROOFTOP SECTION */}
+              {/* 3D Roof plane */}
+              <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="1396,748 2920,748 2920,760 1420,760" className={styles.bldFgRightRoof} />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1420" y1="760" x2="1396" y2="748" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1396" y1="748" x2="2920" y2="748" stroke="var(--skyline-stroke-mid)" strokeWidth="1" />
+
+              {/* 3D Left Flank (Shadow wall facing the central canyon) */}
+              <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="1396,748 1420,760 1420,1250 1396,1250" className={styles.bldFgRightRoof} />
+              <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="1396,748 1420,760 1420,1250 1396,1250" className={styles.shadowHatchFg} />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1396" y1="748" x2="1396" y2="1250" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1420" y1="760" x2="1420" y2="1250" stroke="var(--skyline-stroke-mid)" strokeWidth="1.2" />
+
+              {/* Front Facade */}
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1420 1250 L 1420 760 L 2920 760 L 2920 1250 Z" className={styles.bldFgRightRoof} />
               <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1420 1250 L 1420 760 L 2920 760 L 2920 1250 Z" fill="url(#brick-fg)" stroke="none" pointerEvents="none" className={styles.brickOverlay} />
 
@@ -1288,6 +1367,19 @@ const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble , 
               </g>
 
               {/* Roof HVAC Unit */}
+              {/* 3D Roof plane */}
+              <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="1732,706 1797,706 1815,715 1750,715" className={styles.bldFgHvac} />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1750" y1="715" x2="1732" y2="706" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="706" x2="1797" y2="706" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1797" y1="706" x2="1815" y2="715" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
+
+              {/* 3D Left Flank */}
+              <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="1732,706 1750,715 1750,760 1732,751" className={styles.bldFgHvac} />
+              <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="1732,706 1750,715 1750,760 1732,751" className={styles.shadowHatchFg} />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="706" x2="1732" y2="751" />
+              <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1732" y1="751" x2="1750" y2="760" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
+
+              {/* Front Facade */}
               <WobblyRect wobble={wobble} wobbleStrength={strength} x="1750" y="715" width="65" height="45" className={styles.bldFgHvac} />
               {/* HVAC Grid */}
               <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1760" y1="725" x2="1805" y2="725" stroke="var(--skyline-stroke-mid)" strokeWidth="0.8" />
@@ -1296,6 +1388,13 @@ const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble , 
 
               {/* Industrial Blower Unit (Static parts) */}
               <g className={styles.bldFgBlower} stroke="var(--skyline-stroke-fg)" strokeWidth="1.2">
+                {/* 3D Top plane */}
+                <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="1573,718 1595,718 1609,725 1587,725" className={styles.bldFgBlower} />
+                {/* 3D Left Flank */}
+                <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="1573,718 1587,725 1587,760 1573,753" className={styles.bldFgBlower} />
+                <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="1573,718 1587,725 1587,760 1573,753" className={styles.shadowHatchFg} />
+
+                {/* Front */}
                 <WobblyRect wobble={wobble} wobbleStrength={strength} x="1587" y="725" width="22" height="35" rx="1" />
                 {/* Fan casing circle & backplate */}
                 <circle cx="1598" cy="742" r="8" />
@@ -1317,6 +1416,12 @@ const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble , 
               </g>
 
               {/* Roof Chimney Duct for Steam */}
+              {/* 3D Chimney Cap & Shaft */}
+              <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="1838,686 1868,686 1884,694 1854,694" className={styles.bldFgChimney} />
+              <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="1838,686 1854,694 1854,700 1838,692" className={styles.bldFgChimney} />
+              <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="1838,686 1854,694 1854,700 1838,692" className={styles.shadowHatchFg} />
+              <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="1844,692 1860,700 1860,760 1844,752" className={styles.bldFgChimney} />
+              <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="1844,692 1860,700 1860,760 1844,752" className={styles.shadowHatchFg} />
               <WobblyRect wobble={wobble} wobbleStrength={strength} x="1860" y="700" width="18" height="60" className={styles.bldFgChimney} />
               <WobblyRect wobble={wobble} wobbleStrength={strength} x="1854" y="694" width="30" height="6" className={styles.bldFgChimney} />
               {/* Right building chimney steam puffs */}
@@ -1347,7 +1452,20 @@ const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble , 
                 {/* Center Pipe */}
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1465" y1="725" x2="1465" y2="760" strokeWidth="2.5" />
                 
-                {/* Tank Barrel Body */}
+                {/* 3D Tank Barrel Left Flank */}
+                <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="1433,664 1445,670 1445,725 1433,719" className={styles.bldFgRightWaterTankBody} />
+                <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="1433,664 1445,670 1445,725 1433,719" className={styles.shadowHatchFg} />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1433" y1="664" x2="1433" y2="719" stroke="var(--skyline-stroke-fg)" strokeWidth="1.2" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1433" y1="719" x2="1445" y2="725" stroke="var(--skyline-stroke-fine)" strokeWidth="0.8" />
+                {/* Steel hoops returning on left flank */}
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1445" y1="676" x2="1433" y2="670" strokeWidth="0.8" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1445" y1="686" x2="1433" y2="680" strokeWidth="0.8" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1445" y1="697" x2="1433" y2="691" strokeWidth="0.8" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1445" y1="707" x2="1433" y2="701" strokeWidth="0.8" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1445" y1="716" x2="1433" y2="710" strokeWidth="0.8" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1445" y1="721" x2="1433" y2="715" strokeWidth="0.8" />
+
+                {/* Tank Barrel Body (Front) */}
                 <WobblyRect wobble={wobble} wobbleStrength={strength} x="1445" y="670" width="40" height="55" className={styles.bldFgRightWaterTankBody} />
                 
                 {/* Vertical Staves (Planks) */}
@@ -1367,7 +1485,14 @@ const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble , 
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1445" y1="716" x2="1485" y2="716" strokeWidth="0.8" />
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1445" y1="721" x2="1485" y2="721" strokeWidth="0.8" />
                 
-                {/* Conical Roof */}
+                {/* 3D Conical Roof Left Flank Facet */}
+                <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="1459,639 1465,642 1442,670 1430,664" className={styles.bldFgRightWaterTankRoof} />
+                <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="1459,639 1465,642 1442,670 1430,664" className={styles.shadowHatchFg} />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1465" y1="642" x2="1459" y2="639" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1459" y1="639" x2="1430" y2="664" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
+                <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1442" y1="670" x2="1430" y2="664" strokeWidth="0.8" stroke="var(--skyline-stroke-fine)" />
+
+                {/* Conical Roof (Front) */}
                 <WobblyPolygon wobble={wobble} wobbleStrength={strength} points="1442,670 1465,642 1488,670" className={styles.bldFgRightWaterTankRoof} />
                 {/* warning beacon at right tank roof peak */}
                 <circle cx="1465" cy="642" r="2.2" className={styles.waterTankBeacon} />
@@ -1399,20 +1524,6 @@ const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble , 
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1490" y1="720" x2="1493.5" y2="720" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
                 <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1490" y1="725" x2="1493.5" y2="725" strokeWidth="0.6" stroke="var(--skyline-stroke-mid)" />
               </g>
-
-              {/* Shadow overlay paths for wobbly hatching depth (Static) */}
-              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 205 1250 L 205 820 L 460 820 L 460 1250 Z" className={styles.shadowHatchFg} />
-              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1695 1250 L 1695 760 L 2920 760 L 2920 1250 Z" className={styles.shadowHatchFg} />
-              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 322 750 L 355 750 L 355 820 L 322 820 Z" className={styles.shadowHatchFg} />
-              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1782 715 L 1815 715 L 1815 760 L 1782 760 Z" className={styles.shadowHatchFg} />
-
-              {/* Left water tank shadow hatches */}
-              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 396 748 L 412 748 L 412 792 L 396 792 Z" className={styles.shadowHatchFg} />
-              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 396 726 L 414 748 L 396 748 Z" className={styles.shadowHatchFg} />
-              
-              {/* Right water tank shadow hatches */}
-              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1465 670 L 1485 670 L 1485 725 L 1465 725 Z" className={styles.shadowHatchFg} />
-              <WobblyPath wobble={wobble} wobbleStrength={strength} d="M 1465 642 L 1488 670 L 1465 670 Z" className={styles.shadowHatchFg} />
             </g>
       </svg>
 

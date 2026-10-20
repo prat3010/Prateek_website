@@ -11,7 +11,6 @@ describe('AiScopingPromptBar Component', () => {
     expect(screen.getByPlaceholderText(/Describe your project in plain English/i)).toBeDefined();
     expect(screen.getByText(/Analyze Scope/i)).toBeDefined();
     expect(screen.getByText(/Drop RFP \/ PRD/i)).toBeDefined();
-    expect(screen.getByText(/Chat with Scoping AI/i)).toBeDefined();
     expect(screen.queryByText(/Powered by Retriever/i)).toBeNull();
   });
 

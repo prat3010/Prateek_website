@@ -5,7 +5,6 @@ import {
   Sparkles,
   Zap,
   FileUp,
-  MessageSquare,
   Activity,
   CheckCircle2,
   ArrowRight,
@@ -14,7 +13,6 @@ import { toast } from 'sonner';
 import type { Currency } from '@/lib/pricing';
 import type { ParseIntentResponse, ScopingTelemetry } from '@/lib/rag-client';
 import { RfpUploaderModal } from './RfpUploaderModal';
-import { ScopingChatWidgetDrawer } from './ScopingChatWidgetDrawer';
 import MagneticButton from '@/components/ui/MagneticButton';
 import styles from './AiScopingPromptBar.module.css';
 
@@ -80,7 +78,6 @@ export function AiScopingPromptBar({
   const [promptText, setPromptText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isRfpModalOpen, setIsRfpModalOpen] = useState(false);
-  const [isChatDrawerOpen, setIsChatDrawerOpen] = useState(false);
   const [telemetry, setTelemetry] = useState<ScopingTelemetry | null>(null);
   const [matchedBlueprint, setMatchedBlueprint] = useState<ParseIntentResponse | null>(null);
 
@@ -177,16 +174,6 @@ export function AiScopingPromptBar({
           >
             <FileUp size={14} />
             <span>Drop RFP / PRD (PDF)</span>
-          </button>
-
-          <button
-            type="button"
-            className={styles.secondaryActionBtn}
-            onClick={() => setIsChatDrawerOpen(true)}
-            aria-label="Open Scoping AI Chatbot"
-          >
-            <MessageSquare size={14} />
-            <span>Chat with Scoping AI</span>
           </button>
         </div>
       </div>
@@ -343,14 +330,6 @@ export function AiScopingPromptBar({
           onClose={() => setIsRfpModalOpen(false)}
           onBlueprintExtracted={handleRfpApplied}
           currency={currency}
-          isNoir={isNoir}
-        />
-      )}
-
-      {isChatDrawerOpen && (
-        <ScopingChatWidgetDrawer
-          isOpen={isChatDrawerOpen}
-          onClose={() => setIsChatDrawerOpen(false)}
           isNoir={isNoir}
         />
       )}
