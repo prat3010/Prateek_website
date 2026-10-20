@@ -2370,30 +2370,6 @@
   line-height: 1.5;
 }
 
-.scheduleCallBtn {
-  background: var(--surface-card, rgba(255, 255, 255, 0.05));
-  color: var(--color-text, #ffffff);
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
-  border-radius: 8px;
-  padding: 0.45rem 0.85rem;
-  font-family: var(--font-headline);
-  font-size: 0.82rem;
-  font-weight: 700;
-  text-decoration: none;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  transition: all 0.15s ease;
-}
-
-.scheduleCallBtn:hover {
-  background: var(--surface-elevated, rgba(255, 255, 255, 0.1));
-  border-color: var(--accent-color, #38bdf8);
-  color: var(--accent-color, #38bdf8);
-  transform: translateY(-1px);
-}
-
 .discoveryWedgeBox {
   margin: 1.25rem 0 1.75rem;
   border-radius: 12px;

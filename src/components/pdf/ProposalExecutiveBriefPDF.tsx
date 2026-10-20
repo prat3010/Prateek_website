@@ -360,14 +360,14 @@ export function ProposalExecutiveBriefPDF({
           </View>
         </View>
 
-        {/* Commercial Governance & Cal.com Scheduling */}
+        {/* Commercial Governance & Direct Inquiry */}
         <View style={styles.governanceBar}>
           <Text style={styles.governanceTitle}>Commercial Governance &amp; MSA Terms</Text>
           <Text style={styles.governanceText}>
             • Capped Liability (Fees Paid) • New Delhi Territorial Jurisdiction • 30-Day Dormancy Forfeiture • Probabilistic AI Disclaimed
           </Text>
           <Text style={styles.governanceCallout}>
-            Book Technical Architecture Call: https://cal.com/prateeq
+            Direct Architecture Inquiries: prateeqsharma@gmail.com • prateeq.in/#contact
           </Text>
         </View>
 

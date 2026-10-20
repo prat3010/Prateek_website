@@ -13,7 +13,6 @@ import {
   Download,
   Rocket,
   Send,
-  Calendar,
 } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
@@ -592,17 +591,6 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                       <Sparkles size={16} />
                       <span>COPY SHAREABLE LINK</span>
                     </button>
-
-                    <a
-                      href="https://cal.com/prateeq"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`${styles.btn} ${styles.btnSecondary}`}
-                      title="Schedule a 15-min discovery call on Cal.com"
-                    >
-                      <Calendar size={16} />
-                      <span>BOOK DISCOVERY CALL</span>
-                    </a>
 
                     {currentStep > 1 && (
                       <button
