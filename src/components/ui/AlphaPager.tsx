@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { m, useDragControls } from 'framer-motion';
+import { m, useDragControls, useReducedMotion } from 'framer-motion';
 import { useLenis } from 'lenis/react';
 import Portal from '@/components/ui/Portal';
 import { useSystemTelemetry } from '@/components/ui/useSystemTelemetry';
@@ -274,8 +274,11 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
     return () => clearTimeout(timer);
   }, []);
 
+  const prefersReducedMotion = useReducedMotion();
+
   // Section Radar: Velocity-aware tracking synchronized with Lenis smooth scroll
   const sectionBoundsRef = useRef<{ id: string; top: number; bottom: number }[]>([]);
+  const pendingAudioLockRef = useRef<boolean>(false);
 
   const measureSections = useCallback(() => {
     if (typeof window === 'undefined') return;
@@ -284,12 +287,24 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
     for (const id of sectionIds) {
       const el = document.getElementById(id);
       if (el) {
-        const rect = el.getBoundingClientRect();
-        const top = rect.top + window.scrollY;
+        let top = 0;
+        let curr: HTMLElement | null = el;
+        while (curr && curr.offsetParent) {
+          top += curr.offsetTop;
+          curr = curr.offsetParent as HTMLElement | null;
+        }
+        if (top === 0 && el.offsetTop) {
+          top = el.offsetTop;
+        }
+        if (top === 0) {
+          const rect = el.getBoundingClientRect ? el.getBoundingClientRect() : { top: 0, height: 0 };
+          top = rect.top + (typeof window !== 'undefined' ? window.scrollY : 0);
+        }
+        const height = el.offsetHeight || (el.getBoundingClientRect ? el.getBoundingClientRect().height : 0);
         bounds.push({
           id,
           top,
-          bottom: top + rect.height,
+          bottom: top + height,
         });
       }
     }
@@ -298,7 +313,8 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
 
   const handleScrollUpdate = useCallback(
     (currentScroll: number, scrollVelocity: number) => {
-      if (sectionBoundsRef.current.length === 0) {
+      const sectionIds = ['home', 'about', 'capabilities', 'deployments', 'resume', 'playground', 'blog', 'contact'];
+      if (sectionBoundsRef.current.length < sectionIds.length) {
         measureSections();
       }
 
@@ -307,7 +323,13 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
       const matched = sectionBoundsRef.current.find(
         (sec) => focusY >= sec.top && focusY < sec.bottom
       );
-      const secId = matched ? matched.id : (currentScroll < 120 ? 'home' : null);
+
+      const isAtBottom = typeof window !== 'undefined' && 
+        document.documentElement.scrollHeight > window.innerHeight &&
+        currentScroll + window.innerHeight >= document.documentElement.scrollHeight - 60;
+      const isAtTop = currentScroll < 120;
+
+      const secId = isAtBottom ? 'contact' : matched ? matched.id : isAtTop ? 'home' : null;
 
       if (secId && secId !== activeSectionRef.current) {
         activeSectionRef.current = secId;
@@ -318,38 +340,55 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
           setActiveMsgIndex(targetIdx);
           setMode('alert');
           setBeaconText('RADAR LOCKED');
-
-          // Velocity-aware audio: suppress chirp storms during high-speed flick scrolling
-          const now = Date.now();
-          if (now - lastChirpRef.current > 1200 && Math.abs(scrollVelocity) < 6) {
-            lastChirpRef.current = now;
-            playPagerChirp();
-            setRadarFlash(true);
-            if (flashTimeoutRef.current) clearTimeout(flashTimeoutRef.current);
-            flashTimeoutRef.current = setTimeout(() => setRadarFlash(false), 900);
-          }
+          pendingAudioLockRef.current = true;
         }
+      }
+
+      // Velocity-aware audio: trigger once velocity settles or immediately during calm scroll
+      if (pendingAudioLockRef.current && Math.abs(scrollVelocity) < 6) {
+        const now = Date.now();
+        if (now - lastChirpRef.current > 1000) {
+          lastChirpRef.current = now;
+          playPagerChirp();
+          setRadarFlash(true);
+          if (flashTimeoutRef.current) clearTimeout(flashTimeoutRef.current);
+          flashTimeoutRef.current = setTimeout(() => setRadarFlash(false), 900);
+        }
+        pendingAudioLockRef.current = false;
       }
     },
     [messages, measureSections]
   );
 
+  const handleScrollUpdateRef = useRef(handleScrollUpdate);
+  useEffect(() => {
+    handleScrollUpdateRef.current = handleScrollUpdate;
+  }, [handleScrollUpdate]);
+
+  // Memoized Lenis callback to prevent unregister/re-register loops on every render
+  const onLenisScroll = useCallback((lenisInstance: { scroll: number; velocity: number }) => {
+    handleScrollUpdateRef.current(lenisInstance.scroll, lenisInstance.velocity);
+  }, []);
+
   // Subscribe directly to Lenis scroll frames
-  const lenis = useLenis(
-    (lenisInstance) => {
-      handleScrollUpdate(lenisInstance.scroll, lenisInstance.velocity);
-    },
-    [handleScrollUpdate]
-  );
+  const lenis = useLenis(onLenisScroll);
 
   // Measurement and native fallback listener (when Lenis is not active or during initialization)
   useEffect(() => {
     measureSections();
     window.addEventListener('resize', measureSections, { passive: true });
 
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined' && document.body) {
+      ro = new ResizeObserver(() => {
+        measureSections();
+      });
+      ro.observe(document.body);
+    }
+
     const handleNativeScroll = () => {
       if (lenis) return;
-      handleScrollUpdate(window.scrollY, 0);
+      handleScrollUpdateRef.current(window.scrollY, 0);
     };
 
     if (!lenis) {
@@ -359,17 +398,13 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
     return () => {
       window.removeEventListener('resize', measureSections);
       window.removeEventListener('scroll', handleNativeScroll);
+      if (ro) ro.disconnect();
       if (flashTimeoutRef.current) clearTimeout(flashTimeoutRef.current);
-    };
-  }, [lenis, measureSections, handleScrollUpdate]);
-
-  // Clean up any stray selection restrictions on unmount
-  useEffect(() => {
-    return () => {
+      lenis?.start?.();
       document.body.style.userSelect = '';
       document.body.style.webkitUserSelect = '';
     };
-  }, []);
+  }, [lenis, measureSections]);
 
   // Start drag gesture from anywhere on the pager casing, excluding interactive buttons and LCD link
   const handlePointerDown = (e: React.PointerEvent) => {
@@ -465,17 +500,21 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
     if (!targetSecId) return;
 
     if (lenis) {
-      lenis.scrollTo(`#${targetSecId}`, { duration: 1.2, offset: NAVBAR_SCROLL_OFFSET });
+      lenis.start?.();
+      lenis.scrollTo(`#${targetSecId}`, { 
+        duration: prefersReducedMotion ? 0 : 1.2, 
+        offset: NAVBAR_SCROLL_OFFSET 
+      });
     } else {
       const el = document.getElementById(targetSecId);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
+      if (el) el.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth' });
     }
 
     // On mobile, docking after navigating gives user full viewport view
     if (isMobile) {
       setIsExpanded(false);
     }
-  }, [currentMsg, lenis, isMobile]);
+  }, [currentMsg, lenis, isMobile, prefersReducedMotion]);
 
   return (
     <Portal>

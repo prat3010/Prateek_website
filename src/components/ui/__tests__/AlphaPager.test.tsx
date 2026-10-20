@@ -3,6 +3,16 @@ import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import AlphaPager from '../AlphaPager';
 import * as ThemeContext from '@/context/ThemeContext';
+import { playPagerChirp } from '@/lib/terminalAudio';
+
+let mockReducedMotion = false;
+vi.mock('framer-motion', async () => {
+  const actual = await vi.importActual<typeof import('framer-motion')>('framer-motion');
+  return {
+    ...actual,
+    useReducedMotion: () => mockReducedMotion,
+  };
+});
 
 const mockLenisScrollTo = vi.fn();
 const mockLenisStop = vi.fn();
@@ -339,5 +349,110 @@ describe('AlphaPager Component', () => {
 
     expect(screen.getByText(/CH 02\/08/i)).toBeDefined();
     document.body.removeChild(aboutSection);
+  });
+
+  it('suppresses audio chirp during high-velocity fling and locks audio cleanly once velocity settles', () => {
+    const chirpMock = vi.mocked(playPagerChirp);
+    chirpMock.mockClear();
+
+    const aboutSection = document.createElement('div');
+    aboutSection.id = 'about';
+    Object.defineProperty(aboutSection, 'offsetTop', { value: 600 });
+    Object.defineProperty(aboutSection, 'offsetHeight', { value: 800 });
+    document.body.appendChild(aboutSection);
+
+    render(<AlphaPager />);
+
+    // Fast fling frame entering about section: velocity = 25 (> 6)
+    act(() => {
+      lastLenisCallback!({ scroll: 500, velocity: 25.0 });
+    });
+
+    // Pager displays CH 02 (about)
+    expect(screen.getByText(/CH 02\/08/i)).toBeDefined();
+    // Chirp was suppressed during fling
+    expect(chirpMock).not.toHaveBeenCalled();
+
+    // Scroll settles: velocity drops to 1.0 (< 6)
+    act(() => {
+      lastLenisCallback!({ scroll: 500, velocity: 1.0 });
+    });
+
+    // Audio chirp locks cleanly once velocity settles
+    expect(chirpMock).toHaveBeenCalledTimes(1);
+    document.body.removeChild(aboutSection);
+  });
+
+  it('dynamically measures sections that mount asynchronously after initial render', () => {
+    render(<AlphaPager />);
+
+    // Initially only home exists. Now simulate Suspense streaming in deployments section
+    const deploymentsSection = document.createElement('div');
+    deploymentsSection.id = 'deployments';
+    Object.defineProperty(deploymentsSection, 'offsetTop', { value: 2000 });
+    Object.defineProperty(deploymentsSection, 'offsetHeight', { value: 900 });
+    deploymentsSection.getBoundingClientRect = () => ({
+      top: 2000,
+      bottom: 2900,
+      left: 0,
+      right: 1200,
+      width: 1200,
+      height: 900,
+      x: 0,
+      y: 2000,
+      toJSON: () => {},
+    });
+    document.body.appendChild(deploymentsSection);
+
+    // Scroll to deployments section (focusY = 1800 + 768 * 0.35 = 2068.8, within 2000-2900)
+    act(() => {
+      lastLenisCallback!({ scroll: 1800, velocity: 2.0 });
+    });
+
+    // Successfully locks onto channel 4 (deployments)
+    expect(screen.getByText(/CH 04\/08/i)).toBeDefined();
+    document.body.removeChild(deploymentsSection);
+  });
+
+  it('locks to contact section when scrolled to bottom of document', () => {
+    // Mock scrollHeight and innerHeight
+    Object.defineProperty(document.documentElement, 'scrollHeight', { value: 5000, configurable: true });
+    Object.defineProperty(window, 'innerHeight', { value: 1000, configurable: true });
+
+    render(<AlphaPager />);
+
+    // Scroll to within 60px of the bottom (5000 - 1000 - 50 = 3950)
+    act(() => {
+      lastLenisCallback!({ scroll: 3960, velocity: 0 });
+    });
+
+    // Channel 8 is contact
+    expect(screen.getByText(/CH 08\/08/i)).toBeDefined();
+  });
+
+  it('resumes Lenis smooth scroll on unmount to prevent permanent scroll freeze', () => {
+    mockLenisStart.mockClear();
+    const { unmount } = render(<AlphaPager />);
+    unmount();
+    expect(mockLenisStart).toHaveBeenCalled();
+  });
+
+  it('uses duration 0 on LCD click when prefersReducedMotion is enabled', () => {
+    mockReducedMotion = true;
+    render(<AlphaPager />);
+
+    // Advance to alert mode by clicking next
+    const nextBtn = screen.getByRole('button', { name: /Next channel/i });
+    act(() => {
+      fireEvent.click(nextBtn);
+    });
+
+    const lcdScreen = screen.getByRole('button', { name: /Jump to/i });
+    act(() => {
+      fireEvent.click(lcdScreen);
+    });
+
+    expect(mockLenisScrollTo).toHaveBeenCalledWith('#about', expect.objectContaining({ duration: 0 }));
+    mockReducedMotion = false;
   });
 });
