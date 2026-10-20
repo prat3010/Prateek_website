@@ -5,15 +5,33 @@ import AlphaPager from '../AlphaPager';
 import * as ThemeContext from '@/context/ThemeContext';
 
 const mockLenisScrollTo = vi.fn();
+const mockLenisStop = vi.fn();
+const mockLenisStart = vi.fn();
+interface LenisMockPayload {
+  scroll: number;
+  velocity: number;
+  scrollTo?: (target: string | number, options?: object) => void;
+  stop?: () => void;
+  start?: () => void;
+}
+
+let lastLenisCallback: ((lenis: LenisMockPayload) => void) | null = null;
 
 vi.mock('@/components/ui/Portal', () => ({
   default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 vi.mock('lenis/react', () => ({
-  useLenis: () => ({
-    scrollTo: mockLenisScrollTo,
-  }),
+  useLenis: (callback?: (lenis: LenisMockPayload) => void) => {
+    if (callback) lastLenisCallback = callback;
+    return {
+      scrollTo: mockLenisScrollTo,
+      stop: mockLenisStop,
+      start: mockLenisStart,
+      scroll: 0,
+      velocity: 0,
+    };
+  },
 }));
 
 vi.mock('@/lib/terminalAudio', () => ({
@@ -256,5 +274,70 @@ describe('AlphaPager Component', () => {
 
     unmount();
     expect(document.documentElement.classList.contains('pager-expanded')).toBe(false);
+  });
+
+  it('renders data-lenis-prevent attribute on pager and dock wrapper to prevent scroll hijacking', () => {
+    const { container } = render(<AlphaPager />);
+    const pagerDevice = screen.getByRole('region', { name: /Vintage Alphanumeric Pager & Section Radar/i });
+    expect(pagerDevice.hasAttribute('data-lenis-prevent')).toBe(true);
+
+    const bannerWrapper = container.querySelector('[class*="bannerWrapper"]');
+    expect(bannerWrapper?.hasAttribute('data-lenis-prevent')).toBe(true);
+  });
+
+  it('cycles channels when rolling mouse wheel over the pager device', () => {
+    const dateSpy = vi.spyOn(Date, 'now');
+    dateSpy.mockReturnValue(1000);
+
+    render(<AlphaPager />);
+    const pagerDevice = screen.getByRole('region', { name: /Vintage Alphanumeric Pager & Section Radar/i });
+
+    // Initial is channel 01
+    expect(screen.getByText(/CH 01\/08/i)).toBeDefined();
+
+    // Wheel down -> advance channel
+    act(() => {
+      fireEvent.wheel(pagerDevice, { deltaY: 50 });
+    });
+    expect(screen.getByText(/CH 02\/08/i)).toBeDefined();
+
+    // Wait past debounce threshold then wheel up -> previous channel
+    dateSpy.mockReturnValue(1300);
+    act(() => {
+      fireEvent.wheel(pagerDevice, { deltaY: -50 });
+    });
+    expect(screen.getByText(/CH 01\/08/i)).toBeDefined();
+    dateSpy.mockRestore();
+  });
+
+  it('updates active section when Lenis scroll callback triggers', () => {
+    // Set up dummy DOM section targets
+    const aboutSection = document.createElement('div');
+    aboutSection.id = 'about';
+    Object.defineProperty(aboutSection, 'offsetTop', { value: 600 });
+    Object.defineProperty(aboutSection, 'offsetHeight', { value: 800 });
+    aboutSection.getBoundingClientRect = () => ({
+      top: 600,
+      bottom: 1400,
+      left: 0,
+      right: 1200,
+      width: 1200,
+      height: 800,
+      x: 0,
+      y: 600,
+      toJSON: () => {},
+    });
+    document.body.appendChild(aboutSection);
+
+    render(<AlphaPager />);
+
+    // Trigger Lenis scroll frame targeting the about section
+    expect(lastLenisCallback).not.toBeNull();
+    act(() => {
+      lastLenisCallback!({ scroll: 500, velocity: 1.0 });
+    });
+
+    expect(screen.getByText(/CH 02\/08/i)).toBeDefined();
+    document.body.removeChild(aboutSection);
   });
 });

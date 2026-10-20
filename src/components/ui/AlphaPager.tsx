@@ -150,19 +150,53 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
   const activeSectionRef = useRef<string>('home');
   const lastChirpRef = useRef<number>(0);
   const flashTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const constraintsRef = useRef<HTMLDivElement>(null);
-  const lenis = useLenis();
+  const pagerRef = useRef<HTMLDivElement>(null);
 
-  // Track viewport resize for responsive mobile layout adjustments
+  // Dynamic numeric drag constraints to eliminate DOM bounding box measuring & layout thrashing on scroll
+  const [dragBounds, setDragBounds] = useState<{ top: number; bottom: number; left: number; right: number }>(() => {
+    if (typeof window === 'undefined') return { top: -600, bottom: 12, left: -800, right: 12 };
+    return {
+      top: -Math.max(0, window.innerHeight - 240 - 24 - 12),
+      bottom: 12,
+      left: -Math.max(0, window.innerWidth - 380 - 24 - 12),
+      right: 12,
+    };
+  });
+
+  const updateDragBounds = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    const pagerEl = pagerRef.current;
+    const width = pagerEl?.offsetWidth || 380;
+    const height = pagerEl?.offsetHeight || 240;
+    const margin = 12;
+    const insetRight = 24;
+    const insetBottom = 24;
+
+    setDragBounds({
+      top: -Math.max(0, window.innerHeight - height - insetBottom - margin),
+      bottom: Math.max(0, insetBottom - margin),
+      left: -Math.max(0, window.innerWidth - width - insetRight - margin),
+      right: Math.max(0, insetRight - margin),
+    });
+  }, []);
+
+  // Track viewport resize for responsive mobile layout adjustments and drag boundaries
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
       setIsMobile(mobile);
+      updateDragBounds();
     };
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [updateDragBounds]);
+
+  useEffect(() => {
+    if (isExpanded) {
+      updateDragBounds();
+    }
+  }, [isExpanded, updateDragBounds]);
 
   // Dismiss expanded device on mobile when user taps outside the pager
   useEffect(() => {
@@ -240,28 +274,41 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
     return () => clearTimeout(timer);
   }, []);
 
-  // Reactive Section Radar: IntersectionObserver tracking portfolio sections
-  useEffect(() => {
+  // Section Radar: Velocity-aware tracking synchronized with Lenis smooth scroll
+  const sectionBoundsRef = useRef<{ id: string; top: number; bottom: number }[]>([]);
+
+  const measureSections = useCallback(() => {
+    if (typeof window === 'undefined') return;
     const sectionIds = ['home', 'about', 'capabilities', 'deployments', 'resume', 'playground', 'blog', 'contact'];
+    const bounds: { id: string; top: number; bottom: number }[] = [];
+    for (const id of sectionIds) {
+      const el = document.getElementById(id);
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        const top = rect.top + window.scrollY;
+        bounds.push({
+          id,
+          top,
+          bottom: top + rect.height,
+        });
+      }
+    }
+    sectionBoundsRef.current = bounds;
+  }, []);
 
-    const observerOptions = {
-      root: null,
-      rootMargin: '-25% 0px -25% 0px',
-      threshold: 0.15,
-    };
+  const handleScrollUpdate = useCallback(
+    (currentScroll: number, scrollVelocity: number) => {
+      if (sectionBoundsRef.current.length === 0) {
+        measureSections();
+      }
 
-    if (typeof window === 'undefined' || typeof IntersectionObserver === 'undefined') return;
+      const focusY = currentScroll + (typeof window !== 'undefined' ? window.innerHeight * 0.35 : 300);
 
-    const observer = new IntersectionObserver((entries) => {
-      const intersecting = entries.filter((e) => e.isIntersecting);
-      if (intersecting.length === 0) return;
-
-      // Select most visible section in current viewport to avoid rapid ping-pong
-      const bestEntry = intersecting.reduce((best, curr) =>
-        curr.intersectionRatio > best.intersectionRatio ? curr : best
+      const matched = sectionBoundsRef.current.find(
+        (sec) => focusY >= sec.top && focusY < sec.bottom
       );
+      const secId = matched ? matched.id : (currentScroll < 120 ? 'home' : null);
 
-      const secId = bestEntry.target.id;
       if (secId && secId !== activeSectionRef.current) {
         activeSectionRef.current = secId;
         const targetIdx = messages.findIndex(
@@ -272,9 +319,9 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
           setMode('alert');
           setBeaconText('RADAR LOCKED');
 
-          // Debounce audio chirps and flash animation during fast scrolling
+          // Velocity-aware audio: suppress chirp storms during high-speed flick scrolling
           const now = Date.now();
-          if (now - lastChirpRef.current > 1200) {
+          if (now - lastChirpRef.current > 1200 && Math.abs(scrollVelocity) < 6) {
             lastChirpRef.current = now;
             playPagerChirp();
             setRadarFlash(true);
@@ -283,18 +330,38 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
           }
         }
       }
-    }, observerOptions);
+    },
+    [messages, measureSections]
+  );
 
-    sectionIds.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
+  // Subscribe directly to Lenis scroll frames
+  const lenis = useLenis(
+    (lenisInstance) => {
+      handleScrollUpdate(lenisInstance.scroll, lenisInstance.velocity);
+    },
+    [handleScrollUpdate]
+  );
+
+  // Measurement and native fallback listener (when Lenis is not active or during initialization)
+  useEffect(() => {
+    measureSections();
+    window.addEventListener('resize', measureSections, { passive: true });
+
+    const handleNativeScroll = () => {
+      if (lenis) return;
+      handleScrollUpdate(window.scrollY, 0);
+    };
+
+    if (!lenis) {
+      window.addEventListener('scroll', handleNativeScroll, { passive: true });
+    }
 
     return () => {
-      observer.disconnect();
+      window.removeEventListener('resize', measureSections);
+      window.removeEventListener('scroll', handleNativeScroll);
       if (flashTimeoutRef.current) clearTimeout(flashTimeoutRef.current);
     };
-  }, [messages]);
+  }, [lenis, measureSections, handleScrollUpdate]);
 
   // Clean up any stray selection restrictions on unmount
   useEffect(() => {
@@ -311,11 +378,13 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
     if (target?.closest('button') || target?.closest(`.${styles.alertScreen}`)) {
       return;
     }
+    updateDragBounds();
     dragControls.start(e);
   };
 
   const handleDragStart = () => {
     if (isMobile) return;
+    lenis?.stop?.();
     document.body.style.userSelect = 'none';
     document.body.style.webkitUserSelect = 'none';
     window.getSelection()?.removeAllRanges();
@@ -323,9 +392,29 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
 
   const handleDragEnd = () => {
     if (isMobile) return;
+    lenis?.start?.();
     document.body.style.userSelect = '';
     document.body.style.webkitUserSelect = '';
     window.getSelection()?.removeAllRanges();
+  };
+
+  // Rotary mouse-wheel channel scrolling
+  const handleWheel = (e: React.WheelEvent) => {
+    e.stopPropagation();
+    const now = Date.now();
+    if (now - lastChirpRef.current < 200) return;
+
+    if (e.deltaY > 15) {
+      playPagerChirp();
+      if (mode === 'standby') setMode('alert');
+      setActiveMsgIndex((prev) => (prev < messages.length - 1 ? prev + 1 : 0));
+      lastChirpRef.current = now;
+    } else if (e.deltaY < -15) {
+      playPagerChirp();
+      if (mode === 'standby') setMode('alert');
+      setActiveMsgIndex((prev) => (prev > 0 ? prev - 1 : messages.length - 1));
+      lastChirpRef.current = now;
+    }
   };
 
   const handlePrev = (e: React.MouseEvent) => {
@@ -390,13 +479,17 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
 
   return (
     <Portal>
-      <div ref={constraintsRef} className={styles.viewportBounds}>
-        <div className={`${styles.bannerWrapper} ${isExpanded ? styles.bannerWrapperExpanded : ''} ${isDetailsHidden ? styles.hidden : ''}`}>
+      <div className={styles.viewportBounds}>
+        <div
+          className={`${styles.bannerWrapper} ${isExpanded ? styles.bannerWrapperExpanded : ''} ${isDetailsHidden ? styles.hidden : ''}`}
+          data-lenis-prevent
+        >
           {!isExpanded ? (
             /* ── Compact Belt-Clip Mode (Mobile & Minimized Dock) ── */
             <m.div
               key="pager-compact"
               className={`${styles.pagerDevice} ${styles.compactClip}`}
+              data-lenis-prevent
               onClick={handleToggleDock}
               initial={{ opacity: 0, scale: 0.92, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -439,18 +532,21 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
           ) : (
             /* ── Full Vintage Alphanumeric Pager ── */
             <m.div
+              ref={pagerRef}
               key="pager-device"
               className={styles.pagerDevice}
+              data-lenis-prevent
               drag={!isMobile}
               dragListener={false}
               dragControls={dragControls}
-              dragConstraints={constraintsRef}
+              dragConstraints={dragBounds}
               dragMomentum={true}
-              dragElastic={0.08}
-              dragTransition={{ bounceStiffness: 400, bounceDamping: 28 }}
+              dragElastic={0.06}
+              dragTransition={{ bounceStiffness: 400, bounceDamping: 30 }}
               onPointerDown={handlePointerDown}
               onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
+              onWheel={handleWheel}
               whileDrag={!isMobile ? { scale: 1.02, cursor: 'grabbing' } : undefined}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
