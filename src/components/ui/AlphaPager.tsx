@@ -154,12 +154,12 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
 
   // Dynamic numeric drag constraints to eliminate DOM bounding box measuring & layout thrashing on scroll
   const [dragConstraints, setDragConstraints] = useState<{ top: number; bottom: number; left: number; right: number }>(() => {
-    if (typeof window === 'undefined') return { top: -600, bottom: 80, left: -800, right: 180 };
+    if (typeof window === 'undefined') return { top: -600, bottom: 0, left: -800, right: 0 };
     return {
-      top: -(window.innerHeight - 280),
-      bottom: 80,
-      left: -(window.innerWidth - 320),
-      right: 180,
+      top: -Math.max(0, window.innerHeight - 240),
+      bottom: 0,
+      left: -Math.max(0, window.innerWidth - 428),
+      right: 0,
     };
   });
 
@@ -169,10 +169,10 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
       const mobile = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
       setIsMobile(mobile);
       setDragConstraints({
-        top: -(window.innerHeight - 280),
-        bottom: 80,
-        left: -(window.innerWidth - 320),
-        right: 180,
+        top: -Math.max(0, window.innerHeight - 240),
+        bottom: 0,
+        left: -Math.max(0, window.innerWidth - 428),
+        right: 0,
       });
     };
     handleResize();
@@ -320,30 +320,14 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
     };
   }, []);
 
-  // Prevent background text selection during desktop pager drag gestures
+  // Start drag gesture from anywhere on the pager casing, excluding interactive buttons and LCD link
   const handlePointerDown = (e: React.PointerEvent) => {
     if (isMobile) return;
     const target = e.target as HTMLElement | null;
     if (target?.closest('button') || target?.closest(`.${styles.alertScreen}`)) {
       return;
     }
-
-    const preventSelection = (event: Event) => {
-      event.preventDefault();
-    };
-
-    window.addEventListener('selectstart', preventSelection);
-
-    const handlePointerRelease = () => {
-      window.removeEventListener('selectstart', preventSelection);
-      window.removeEventListener('pointerup', handlePointerRelease);
-      window.removeEventListener('pointercancel', handlePointerRelease);
-      document.body.style.userSelect = '';
-      document.body.style.webkitUserSelect = '';
-    };
-
-    window.addEventListener('pointerup', handlePointerRelease);
-    window.addEventListener('pointercancel', handlePointerRelease);
+    dragControls.start(e);
   };
 
   const handleDragStart = () => {
@@ -483,23 +467,15 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
               onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
               whileDrag={!isMobile ? { scale: 1.02, cursor: 'grabbing' } : undefined}
-              initial={{ opacity: 0, y: 25, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
               role="region"
               aria-label="Vintage Alphanumeric Pager & Section Radar"
             >
               {/* Top Belt-Clip Hinge & Casing Branding */}
-              <div
-                className={styles.clipBar}
-                onPointerDown={(e) => {
-                  const target = e.target as HTMLElement | null;
-                  if (!isMobile && !target?.closest('button')) {
-                    dragControls.start(e);
-                  }
-                }}
-              >
+              <div className={styles.clipBar}>
                 <div className={styles.brandDeboss}>
                   <span className={styles.brandName}>PRATEEQ</span>
                   <span className={styles.brandModel}>ALPHAPAGE-90</span>
@@ -570,11 +546,6 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
                   className={styles.sideGrip}
                   aria-hidden="true"
                   title="Drag Handle"
-                  onPointerDown={(e) => {
-                    if (!isMobile) {
-                      dragControls.start(e);
-                    }
-                  }}
                 >
                   <span className={styles.gripRib} />
                   <span className={styles.gripRib} />
