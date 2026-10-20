@@ -6,7 +6,7 @@
 
 .viewportBounds {
   position: fixed;
-  inset: 0;
+  inset: 12px;
   pointer-events: none;
   z-index: var(--z-fixed, 300);
 }
@@ -21,6 +21,8 @@
   user-select: none;
   -webkit-user-select: none;
   z-index: var(--z-fixed, 300);
+  will-change: transform;
+  transform: translateZ(0);
   transition: 
     opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
     visibility 0.4s;
@@ -56,6 +58,8 @@
   padding: 0.5rem 0.65rem 0.6rem 0.65rem;
   cursor: grab;
   touch-action: pan-y;
+  will-change: transform;
+  transform: translateZ(0);
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;

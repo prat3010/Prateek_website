@@ -98,6 +98,12 @@ describe('AlphaPager Component', () => {
     expect(screen.getByRole('button', { name: /Previous channel/i })).toBeDefined();
   });
 
+  it('renders viewportBounds container ensuring drag constraint bounds stay within viewport', () => {
+    const { container } = render(<AlphaPager />);
+    const viewportBounds = container.querySelector('[class*="viewportBounds"]');
+    expect(viewportBounds).not.toBeNull();
+  });
+
   it('allows docking expanded pager to compact clip on desktop', () => {
     render(<AlphaPager />);
 

@@ -150,30 +150,14 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
   const activeSectionRef = useRef<string>('home');
   const lastChirpRef = useRef<number>(0);
   const flashTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const constraintsRef = useRef<HTMLDivElement>(null);
   const lenis = useLenis();
 
-  // Dynamic numeric drag constraints to eliminate DOM bounding box measuring & layout thrashing on scroll
-  const [dragConstraints, setDragConstraints] = useState<{ top: number; bottom: number; left: number; right: number }>(() => {
-    if (typeof window === 'undefined') return { top: -600, bottom: 0, left: -800, right: 0 };
-    return {
-      top: -Math.max(0, window.innerHeight - 240),
-      bottom: 0,
-      left: -Math.max(0, window.innerWidth - 428),
-      right: 0,
-    };
-  });
-
-  // Track viewport resize for responsive mobile layout adjustments and drag limits
+  // Track viewport resize for responsive mobile layout adjustments
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
       setIsMobile(mobile);
-      setDragConstraints({
-        top: -Math.max(0, window.innerHeight - 240),
-        bottom: 0,
-        left: -Math.max(0, window.innerWidth - 428),
-        right: 0,
-      });
     };
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -406,8 +390,9 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
 
   return (
     <Portal>
-      <div className={`${styles.bannerWrapper} ${isExpanded ? styles.bannerWrapperExpanded : ''} ${isDetailsHidden ? styles.hidden : ''}`}>
-        {!isExpanded ? (
+      <div ref={constraintsRef} className={styles.viewportBounds}>
+        <div className={`${styles.bannerWrapper} ${isExpanded ? styles.bannerWrapperExpanded : ''} ${isDetailsHidden ? styles.hidden : ''}`}>
+          {!isExpanded ? (
             /* ── Compact Belt-Clip Mode (Mobile & Minimized Dock) ── */
             <m.div
               key="pager-compact"
@@ -459,7 +444,7 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
               drag={!isMobile}
               dragListener={false}
               dragControls={dragControls}
-              dragConstraints={dragConstraints}
+              dragConstraints={constraintsRef}
               dragMomentum={true}
               dragElastic={0.08}
               dragTransition={{ bounceStiffness: 400, bounceDamping: 28 }}
@@ -650,6 +635,7 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
             </m.div>
           )}
         </div>
+      </div>
     </Portal>
   );
 }
