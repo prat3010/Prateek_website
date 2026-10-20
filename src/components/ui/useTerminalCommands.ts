@@ -37,7 +37,7 @@ export interface AIChatSessionState {
   history: { role: string; content: string }[];
 }
 
-export const AI_TWIN_BOOT_LINES: ConsoleLine[] = [
+const AI_TWIN_BOOT_LINES: ConsoleLine[] = [
   { text: '  ┌────────────────────────────────────────────────────────────────────────┐', type: 'output' },
   { text: '  │  🧠 PRATEEQ.AI // DIGITAL TWIN & FORWARD DEPLOYED BRAIN v2.2           │', type: 'success' },
   { text: '  │  "Because reading 99 architectural decisions is exhausting."           │', type: 'output' },

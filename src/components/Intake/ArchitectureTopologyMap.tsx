@@ -42,7 +42,7 @@ export interface ArchitectureTopologyMapProps {
   isNoir?: boolean;
 }
 
-export const TOPOLOGY_TIERS = [
+const TOPOLOGY_TIERS = [
   {
     id: 'visitor',
     label: '1. Visitor & Customer Access',
@@ -75,14 +75,14 @@ export const TOPOLOGY_TIERS = [
   },
 ] as const;
 
-export interface TopologyConnection {
+interface TopologyConnection {
   id: string;
   from: string;
   to: string;
   label: string;
 }
 
-export interface NodePosition {
+interface NodePosition {
   x: number;
   y: number;
   width: number;
@@ -90,7 +90,7 @@ export interface NodePosition {
 }
 
 // 5 Columns (Width: 175 each, Gap: 20, Canvas: 1000 x 510)
-export const NODE_POSITIONS: Record<string, NodePosition> = {
+const NODE_POSITIONS: Record<string, NodePosition> = {
   // Column 1: Visitor & Customer Access (X: 20)
   node_web: { x: 20, y: 72, width: 175, height: 68 },
   node_pwa: { x: 20, y: 156, width: 175, height: 68 },
@@ -123,7 +123,7 @@ export const NODE_POSITIONS: Record<string, NodePosition> = {
   node_migration: { x: 800, y: 408, width: 175, height: 68 },
 };
 
-export function calculateBezierCircuitPath(fromPos: NodePosition, toPos: NodePosition): string {
+function calculateBezierCircuitPath(fromPos: NodePosition, toPos: NodePosition): string {
   // Intra-tier same column outward gutter arc
   if (fromPos.x === toPos.x) {
     const x1 = fromPos.x + fromPos.width;
@@ -153,7 +153,7 @@ export function calculateBezierCircuitPath(fromPos: NodePosition, toPos: NodePos
   return `M ${x1} ${y1} C ${x1 - dx * 0.5} ${y1}, ${x2 + dx * 0.5} ${y2}, ${x2} ${y2}`;
 }
 
-export const TOPOLOGY_CONNECTIONS: TopologyConnection[] = [
+const TOPOLOGY_CONNECTIONS: TopologyConnection[] = [
   // Pillar 1 -> Pillar 2 (Visitor Access -> Security & Core Platform)
   { id: 'conn_web_security', from: 'node_web', to: 'node_security', label: 'Edge Ingress & Anti-DDoS Shield' },
   { id: 'conn_pwa_security', from: 'node_pwa', to: 'node_security', label: 'Mobile PWA Sync & Edge Cache' },

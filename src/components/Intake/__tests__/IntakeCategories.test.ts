@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
-import { FEATURE_CATEGORIES } from '../IntakeForm';
+import { FEATURE_CATEGORIES } from '../useIntakeFormState';
 
 describe('FEATURE_CATEGORIES Catalog Integrity', () => {
   const catalogFeatures = questionnaireDefaults.features;

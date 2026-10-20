@@ -3,7 +3,7 @@ import { SlidersHorizontal, Layers, Info, X, Boxes, Settings, Zap, Sparkles, Roc
 import Portal from '@/components/ui/Portal';
 import type { GoalArchetype, BaseEngineItem, FeatureItem } from '@/data/resume';
 import { formatPricePair, resolveFeatureDependencies, type Currency } from '@/lib/pricing';
-import { FEATURE_CATEGORIES } from './IntakeForm';
+import { FEATURE_CATEGORIES } from './useIntakeFormState';
 import TiltCard from '@/components/ui/TiltCard';
 import { ArchitectureTopologyMap } from './ArchitectureTopologyMap';
 import styles from './IntakeForm.module.css';

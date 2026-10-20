@@ -45,4 +45,3 @@ export function WorkspaceSwitcher({ active }: WorkspaceSwitcherProps) {
   );
 }
 
-export default WorkspaceSwitcher;

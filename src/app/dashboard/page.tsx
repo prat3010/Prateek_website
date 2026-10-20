@@ -23,7 +23,7 @@ import { toast } from 'sonner';
 
 import resumeData from '@/data/resume.json';
 import type { ResumeData } from '@/data/resume';
-import WorkspaceSwitcher from '@/components/ui/WorkspaceSwitcher';
+import { WorkspaceSwitcher } from '@/components/ui/WorkspaceSwitcher';
 import ClientProjectCopilot from '@/components/ClientDashboard/ClientProjectCopilot';
 import { ScopeCard } from '@/components/ClientDashboard/ScopeCard';
 import { ScopeEditorModal } from '@/components/ClientDashboard/ScopeEditorModal';

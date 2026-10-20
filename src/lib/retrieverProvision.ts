@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { supabase } from '@/data/supabase';
 
-export function mapPlanTierToEngineTier(planTier: string): 'standard' | 'premium' | 'enterprise' {
+function mapPlanTierToEngineTier(planTier: string): 'standard' | 'premium' | 'enterprise' {
   const normalized = (planTier || 'starter').toLowerCase().trim();
   if (normalized === 'business' || normalized === 'enterprise') {
     return 'enterprise';

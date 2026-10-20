@@ -27,7 +27,7 @@ import { formatPricePair, packageTotalForArchetype, type Currency } from '@/lib/
 import NumberFlow from '@number-flow/react';
 import type { ParseIntentResponse } from '@/lib/rag-client';
 import { AiScopingPromptBar } from './AiScopingPromptBar';
-import { GOAL_CATEGORIES } from './IntakeForm';
+import { GOAL_CATEGORIES } from './useIntakeFormState';
 import TiltCard from '@/components/ui/TiltCard';
 import styles from './IntakeForm.module.css';
 import type { User } from '@supabase/supabase-js';

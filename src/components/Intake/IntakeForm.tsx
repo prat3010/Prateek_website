@@ -43,47 +43,6 @@ const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
 
 
-export const GOAL_CATEGORIES: { id: 'all' | 'websites' | 'saas' | 'ai_widgets'; label: string; ids: string[] }[] = [
-  { id: 'all', label: 'All Archetypes', ids: [] },
-  { id: 'websites', label: 'Websites & Stores', ids: ['landing_page', 'business_multipage', 'ecommerce', 'booking_appointments'] },
-  { id: 'saas', label: 'SaaS & Apps', ids: ['saas_app', 'lms_portal', 'crm_admin'] },
-  { id: 'ai_widgets', label: 'AI & Custom Tools', ids: ['ai_rag_app', 'autonomous_agents', 'voice_ai_agent_app', 'vision_ocr_saas', 'standalone_voice_bot', 'standalone_chatbot', 'ai_strategy_consulting', 'custom'] },
-];
-
-export const FEATURE_CATEGORIES = [
-  {
-    id: 'security_infra',
-    title: 'Security, Auth & Core Infrastructure',
-    description: 'User access control, administration center, and data migration pipelines',
-    featureIds: ['auth', 'admin', 'migration'],
-  },
-  {
-    id: 'commerce_billing',
-    title: 'Commerce, Booking & Monetization',
-    description: 'Payment gateway integration, online scheduling, shopping cart, and course portals',
-    featureIds: ['payments', 'booking', 'commerce', 'lms'],
-  },
-  {
-    id: 'ai_automation',
-    title: 'AI Knowledge Base & Workflows',
-    description: 'Vector search (RAG), autonomous AI agents, voice AI, vision OCR, automated emails, CRM tracking, and webhooks',
-    featureIds: ['ai_rag', 'ai_agents', 'ai_voice_agent', 'ai_vision_ocr', 'email', 'crm', 'integrations'],
-  },
-  {
-    id: 'engagement_cx',
-    title: 'Content, Mobile & CX Localization',
-    description: 'Headless blog CMS, installable PWA shell, multi-language localization, and video streaming',
-    featureIds: ['cms', 'pwa', 'i18n', 'video'],
-  },
-];
-
-export const QUICK_CATEGORIES: { id: string; label: string; categories: readonly string[] }[] = [
-  { id: 'all', label: 'All Services', categories: [] },
-  { id: 'ai', label: 'AI & Chatbots', categories: ['AI & Intelligence'] },
-  { id: 'integration', label: 'Integrations & Payments', categories: ['Integrations & Payments'] },
-  { id: 'performance', label: 'Speed & SEO', categories: ['Optimization & Growth', 'Security & Infrastructure'] },
-];
-
 export interface IntakeFormProps {
   resumeData: ResumeData | null;
   initialPreset?: IntakePreset | null;

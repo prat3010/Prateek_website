@@ -13,10 +13,6 @@
   "ignoreBinaries": [
     "streamlit"
   ],
-  "ignoreDependencies": [
-    "pako",
-    "@types/pako"
-  ],
   "rules": {
     "types": "off"
   }
