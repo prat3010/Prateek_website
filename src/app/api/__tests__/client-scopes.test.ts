@@ -206,4 +206,31 @@ describe('POST /api/client/save-scope', () => {
     expect(scopeInsert.total_cost_inr).toBe(27000);
     expect(scopeInsert.metadata.promoCode.code).toBe('PRATEEQ10');
   });
+
+  it('populates dedicated signed_at and signed_by_email columns when signedAt and signedByEmail are passed', async () => {
+    mocks.state.existingOrder = false;
+    const signedTimestamp = '2026-10-20T10:30:00.000Z';
+    const signerEmail = 'client@example.com';
+    const bodyWithSignature = {
+      scopeCode: 'SCOPE-SIGNED-1',
+      companyName: 'Signed Corp',
+      signedAt: signedTimestamp,
+      signedByEmail: signerEmail,
+      selectedFeatures: [],
+    };
+
+    const req = new Request('http://localhost/api/client/save-scope', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authorizedHeaders },
+      body: JSON.stringify(bodyWithSignature),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+
+    const insertedCalls = mocks.insertFn.mock.calls;
+    const scopeInsert = insertedCalls.find((call) => call[0]?.scope_code === 'SCOPE-SIGNED-1')?.[0];
+    expect(scopeInsert).toBeDefined();
+    expect(scopeInsert.signed_at).toBe(signedTimestamp);
+    expect(scopeInsert.signed_by_email).toBe(signerEmail);
+  });
 });

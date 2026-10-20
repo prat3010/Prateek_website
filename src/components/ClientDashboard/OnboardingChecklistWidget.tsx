@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { UserCheck, Save, CheckCircle2, Lock } from 'lucide-react';
+import { UserCheck, Save, CheckCircle2, Lock, Eye, EyeOff, ShieldAlert } from 'lucide-react';
 import { toast } from 'sonner';
 import { generateOnboardingChecklist, calcOnboardingReadiness } from '@/lib/onboardingChecklist';
 import type { ClientScope } from '@/lib/clientOrder';
@@ -27,6 +27,7 @@ export function OnboardingChecklistWidget({
   const [companyInputs, setCompanyInputs] = useState<Record<string, string>>({});
   const [phoneInputs, setPhoneInputs] = useState<Record<string, string>>({});
   const [noteInputs, setNoteInputs] = useState<Record<string, string>>({});
+  const [visibleSecrets, setVisibleSecrets] = useState<Record<string, boolean>>({});
   const [isSaving, setIsSaving] = useState(false);
 
   const currentScope =
@@ -311,46 +312,109 @@ export function OnboardingChecklistWidget({
                 </div>
               )}
 
-              {!isFinancialPayment && item.id !== 'sow_accepted' && (
-                <div
-                  style={{
-                    display: 'flex',
-                    gap: '0.5rem',
-                    marginTop: '0.65rem',
-                    paddingLeft: '1.75rem',
-                  }}
-                >
-                  <input
-                    type="text"
-                    value={currentNoteVal}
-                    onChange={(e) =>
-                      setNoteInputs((prev) => ({
-                        ...prev,
-                        [noteKey]: e.target.value,
-                      }))
-                    }
-                    placeholder={getNotePlaceholder(item.id)}
-                    style={{
-                      flex: 1,
-                      padding: '0.45rem 0.7rem',
-                      fontSize: '0.82rem',
-                      borderRadius: '6px',
-                      border: '1px solid var(--border-subtle)',
-                      background: 'var(--surface-elevated)',
-                      color: 'var(--color-text)',
-                    }}
-                  />
-                  <button
-                    type="button"
-                    className={styles.saveProfileBtn}
-                    style={{ padding: '0.45rem 0.75rem', fontSize: '0.78rem' }}
-                    onClick={() => handleSaveItemNote(item.id)}
-                    disabled={isSaving}
-                  >
-                    <Save size={13} /> Save Link
-                  </button>
-                </div>
-              )}
+              {!isFinancialPayment && item.id !== 'sow_accepted' && (() => {
+                const isSensitive =
+                  item.id.includes('credentials') ||
+                  item.id.includes('key') ||
+                  item.id.includes('secret') ||
+                  item.id.includes('token') ||
+                  item.id.includes('password') ||
+                  item.title.toLowerCase().includes('key') ||
+                  item.title.toLowerCase().includes('credentials') ||
+                  item.title.toLowerCase().includes('token');
+
+                return (
+                  <div style={{ marginTop: '0.65rem', paddingLeft: '1.75rem' }}>
+                    {isSensitive && (
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.4rem',
+                          fontSize: '0.74rem',
+                          color: 'var(--pop-yellow, #f59e0b)',
+                          backgroundColor: 'rgba(245, 158, 11, 0.08)',
+                          border: '1px solid rgba(245, 158, 11, 0.25)',
+                          borderRadius: '6px',
+                          padding: '0.35rem 0.6rem',
+                          marginBottom: '0.45rem',
+                        }}
+                      >
+                        <ShieldAlert size={13} style={{ flexShrink: 0 }} />
+                        <span>
+                          <strong>Security Warning:</strong> Provide scoped read-only keys or Doppler / 1Password guest vaults. Sensitive values are encrypted at rest.
+                        </span>
+                      </div>
+                    )}
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: '0.5rem',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center' }}>
+                        <input
+                          type={isSensitive && !visibleSecrets[noteKey] ? 'password' : 'text'}
+                          value={currentNoteVal}
+                          onChange={(e) =>
+                            setNoteInputs((prev) => ({
+                              ...prev,
+                              [noteKey]: e.target.value,
+                            }))
+                          }
+                          placeholder={getNotePlaceholder(item.id)}
+                          style={{
+                            width: '100%',
+                            padding: isSensitive ? '0.45rem 2.2rem 0.45rem 0.7rem' : '0.45rem 0.7rem',
+                            fontSize: '0.82rem',
+                            borderRadius: '6px',
+                            border: '1px solid var(--border-subtle)',
+                            background: 'var(--surface-elevated)',
+                            color: 'var(--color-text)',
+                            fontFamily: isSensitive && !visibleSecrets[noteKey] ? 'monospace' : 'inherit',
+                          }}
+                        />
+                        {isSensitive && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setVisibleSecrets((prev) => ({
+                                ...prev,
+                                [noteKey]: !prev[noteKey],
+                              }))
+                            }
+                            title={visibleSecrets[noteKey] ? 'Hide secret' : 'Show secret'}
+                            aria-label={visibleSecrets[noteKey] ? 'Hide secret' : 'Show secret'}
+                            style={{
+                              position: 'absolute',
+                              right: '0.6rem',
+                              background: 'none',
+                              border: 'none',
+                              color: 'var(--color-text-muted, #94a3b8)',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              padding: 0,
+                            }}
+                          >
+                            {visibleSecrets[noteKey] ? <EyeOff size={14} /> : <Eye size={14} />}
+                          </button>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        className={styles.saveProfileBtn}
+                        style={{ padding: '0.45rem 0.75rem', fontSize: '0.78rem', flexShrink: 0 }}
+                        onClick={() => handleSaveItemNote(item.id)}
+                        disabled={isSaving}
+                      >
+                        <Save size={13} /> Save Link
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           );
         })}

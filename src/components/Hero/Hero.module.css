@@ -57,8 +57,25 @@
   position: relative;
 }
 
+/* Dynamic Editorial Watermark Stamp Animation */
+@keyframes stampPress {
+  0% {
+    transform: scale(1.28) translateY(-6px) rotate(var(--stamp-angle, 3deg));
+    opacity: 0.2;
+  }
+  65% {
+    transform: scale(0.96) translateY(1px) rotate(var(--stamp-angle, 3deg));
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) translateY(0) rotate(var(--stamp-angle, 3deg));
+    opacity: 0.85;
+  }
+}
+
 /* Vintage Editorial Watermark Stamp */
 .editorialStamp {
+  --stamp-angle: 3deg;
   position: absolute;
   top: -2.5rem;
   right: 0;
@@ -68,11 +85,41 @@
   border: 1.5px dashed var(--pop-red);
   padding: 0.25rem 0.65rem;
   border-radius: 4px;
-  transform: rotate(3deg);
+  transform: rotate(var(--stamp-angle, 3deg));
   opacity: 0.85;
   user-select: none;
   pointer-events: none;
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  transition: opacity 0.3s ease, border-color 0.3s ease;
+  animation: stampPress 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Dev Mode: Blueprint / Lab Stamp */
+.editorialStamp[data-audience='developer'] {
+  --stamp-angle: 3deg;
+  border: 1.5px dashed var(--pop-red);
+}
+
+.editorialStamp[data-audience='developer'] .stampIssue {
+  color: var(--pop-red);
+}
+
+.editorialStamp[data-audience='developer'] .stampLabel {
+  color: var(--color-text-muted);
+}
+
+/* Biz Mode: Notarized / Commercial Brief Seal */
+.editorialStamp[data-audience='business'] {
+  --stamp-angle: -3deg;
+  border: 1.5px solid var(--pop-blue);
+  box-shadow: 2px 2px 0px rgba(90, 142, 182, 0.2);
+}
+
+.editorialStamp[data-audience='business'] .stampIssue {
+  color: var(--pop-blue);
+}
+
+.editorialStamp[data-audience='business'] .stampLabel {
+  color: var(--color-text);
 }
 
 .stampIssue {
@@ -91,29 +138,54 @@
   color: var(--color-text-muted);
 }
 
-:global([data-theme='noir']) .editorialStamp {
+/* Noir Theme Overrides */
+:global([data-theme='noir']) .editorialStamp[data-audience='developer'] {
+  --stamp-angle: -2deg;
   border-color: var(--neon-pink);
   box-shadow: 2px 2px 0px rgba(255, 42, 85, 0.3);
-  transform: rotate(-2deg);
 }
 
-:global([data-theme='noir']) .stampIssue {
+:global([data-theme='noir']) .editorialStamp[data-audience='developer'] .stampIssue {
   color: var(--neon-pink);
   text-shadow: none;
 }
 
-:global([data-theme='noir']) .stampLabel {
+:global([data-theme='noir']) .editorialStamp[data-audience='developer'] .stampLabel {
   color: var(--neon-cyan);
+  text-shadow: none;
+}
+
+:global([data-theme='noir']) .editorialStamp[data-audience='business'] {
+  --stamp-angle: 2deg;
+  border-color: var(--neon-cyan);
+  box-shadow: 2px 2px 0px rgba(0, 240, 255, 0.3);
+}
+
+:global([data-theme='noir']) .editorialStamp[data-audience='business'] .stampIssue {
+  color: var(--neon-cyan);
+  text-shadow: none;
+}
+
+:global([data-theme='noir']) .editorialStamp[data-audience='business'] .stampLabel {
+  color: var(--neon-yellow);
   text-shadow: none;
 }
 
 @media (max-width: 768px) {
   .editorialStamp {
+    --stamp-angle: 0deg !important;
     position: static;
     margin-bottom: 1rem;
     align-items: flex-start;
     transform: rotate(0deg);
     width: fit-content;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .editorialStamp {
+    animation: none;
+    transform: rotate(var(--stamp-angle, 0deg));
   }
 }
 

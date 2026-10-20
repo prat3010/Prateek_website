@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
 import { POST } from '../client/copilot/route';
+import { RetrieverClient } from '@/lib/rag-client';
 
 const mocks = vi.hoisted(() => {
   const state = {
@@ -213,5 +214,87 @@ describe('POST /api/client/copilot', () => {
     expect(json.answer).toContain('CO-SCOPE-8899-01');
     expect(json.answer).toContain('Multi-Language Localization');
     expect(json.citations.some((c: { type: string }) => c.type === 'change_order')).toBe(true);
+  });
+
+  it('invokes authentic RetrieverClient.chatComplete when retriever_tenant_id is present', async () => {
+    vi.stubEnv('RETRIEVER_API_KEY', 'ret_key_test_123');
+    mocks.state.scopes = [
+      {
+        id: 'scope-202',
+        scope_code: 'SCOPE-9900',
+        company_name: 'Nexus Clinical',
+        client_email: 'client@example.com',
+        base_engine: 'SaaS AI Platform Engine',
+        features: ['pgvector Semantic Search'],
+        retriever_tenant_id: 'ten_nexus_clin_9900',
+        metadata: { retriever_api_key: 'custom_tenant_key_77' },
+        deposit_paid: true,
+      },
+    ];
+
+    const createSessionSpy = vi
+      .spyOn(RetrieverClient.prototype, 'createSession')
+      .mockResolvedValue({ sessionId: 'sess-xyz-123', createdAt: '2026-10-20T00:00:00Z' });
+
+    const chatCompleteSpy = vi
+      .spyOn(RetrieverClient.prototype, 'chatComplete')
+      .mockResolvedValue({
+        text: 'According to your verified SOW document, pgvector Semantic Search is fully provisioned with sub-second latency.',
+        citations: [{ id: 'doc-sow-9900', title: 'Nexus SOW Blueprint', document_id: 'doc-sow-9900' }],
+      });
+
+    const req = new NextRequest('http://localhost:3000/api/client/copilot', {
+      method: 'POST',
+      body: JSON.stringify({ query: 'What is my vector search architecture?' }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+    const json = await res.json();
+
+    expect(createSessionSpy).toHaveBeenCalled();
+    expect(chatCompleteSpy).toHaveBeenCalledWith('sess-xyz-123', 'What is my vector search architecture?');
+    expect(json.answer).toContain('According to your verified SOW document');
+    expect(json.citations.some((c: { id: string }) => c.id === 'doc-sow-9900')).toBe(true);
+
+    createSessionSpy.mockRestore();
+    chatCompleteSpy.mockRestore();
+    vi.unstubAllEnvs();
+  });
+
+  it('falls back gracefully to structured synthesis when authentic Retriever call fails', async () => {
+    vi.stubEnv('RETRIEVER_API_KEY', 'ret_key_test_123');
+    mocks.state.scopes = [
+      {
+        id: 'scope-303',
+        scope_code: 'SCOPE-9901',
+        company_name: 'Fallback Systems',
+        client_email: 'client@example.com',
+        base_engine: 'Full-Stack Web Engine',
+        features: ['Supabase DB'],
+        retriever_tenant_id: 'ten_fallback_9901',
+        deposit_paid: true,
+      },
+    ];
+
+    const createSessionSpy = vi
+      .spyOn(RetrieverClient.prototype, 'createSession')
+      .mockRejectedValue(new Error('OCI VPS Connection Timeout'));
+
+    const req = new NextRequest('http://localhost:3000/api/client/copilot', {
+      method: 'POST',
+      body: JSON.stringify({ query: 'Explain my scope' }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+    const json = await res.json();
+
+    expect(createSessionSpy).toHaveBeenCalled();
+    expect(json.answer).toContain('Project Scope Overview (Fallback Systems)');
+    expect(json.answer).toContain('Full-Stack Web Engine');
+
+    createSessionSpy.mockRestore();
+    vi.unstubAllEnvs();
   });
 });

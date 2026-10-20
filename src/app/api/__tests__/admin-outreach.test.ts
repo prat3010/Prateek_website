@@ -114,4 +114,30 @@ describe('Admin Outreach Endpoints Security', () => {
     expect(data.success).toBe(true);
     expect(data.message).toContain('dismissed');
   });
+
+  it('dispatches email from verified domain notifications@prateeq.in when RESEND_API_KEY is configured', async () => {
+    vi.stubEnv('RESEND_API_KEY', 're_test_key_123');
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ id: 'email-123' }),
+    });
+    vi.stubGlobal('fetch', mockFetch);
+
+    const req = new NextRequest('http://localhost/api/outreach/dispatch', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer admin_token' },
+      body: JSON.stringify({ leadId: 'lead-1', action: 'approve', editedPitch: 'Hi Jane' }),
+    });
+    const res = await POSTDispatch(req);
+    expect(res.status).toBe(200);
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://api.resend.com/emails',
+      expect.objectContaining({
+        method: 'POST',
+        body: expect.stringContaining('Prateek Sharma <notifications@prateeq.in>'),
+      })
+    );
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
 });

@@ -1,5 +1,4 @@
-import React from 'react';
-import { Zap, ShoppingCart, Sparkles } from 'lucide-react';
+import { Zap, ShoppingCart, Sparkles, Calendar } from 'lucide-react';
 import NumberFlow from '@number-flow/react';
 import type { BaseEngineItem } from '@/data/resume';
 import type { Currency, PromoDiscountInfo } from '@/lib/pricing';
@@ -89,6 +88,17 @@ export function StickyPriceBar({
             </>
           )}
         </div>
+        <a
+          href="https://cal.com/prateeq"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.scheduleCallBtn}
+          title="Book 15-min discovery call"
+          aria-label="Book 15-minute discovery call on Cal.com"
+        >
+          <Calendar size={14} />
+          <span>Book Discovery Call</span>
+        </a>
         {onOpenCart ? (
           <MagneticButton strength={0.25}>
             <button

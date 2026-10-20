@@ -51,15 +51,32 @@ const mocks = vi.hoisted(() => {
 
   const insertFn = vi.fn().mockResolvedValue({ data: null, error: null });
   const upsertFn = vi.fn().mockResolvedValue({ data: null, error: null });
-  const fromFn = vi.fn((table: string) => ({
-    select: vi.fn(() => makeSelectQuery(table === 'invoices' ? mockInvoiceRow : mockScopeRow)),
-    insert: insertFn,
-    update: vi.fn(() => makeUpdateQuery()),
-    upsert: upsertFn,
-  }));
+  const updateFn = vi.fn((..._args: unknown[]) => {
+    void _args;
+    return makeUpdateQuery();
+  });
+  const fromFn = vi.fn((table: string) => {
+    let rowData: unknown = null;
+    if (table === 'invoices') rowData = mockInvoiceRow;
+    else if (table === 'client_scopes') rowData = mockScopeRow;
+    return {
+      select: vi.fn(() => makeSelectQuery(rowData)),
+      insert: insertFn,
+      update: updateFn,
+      upsert: upsertFn,
+    };
+  });
 
-  return { state, fromFn, insertFn, upsertFn };
+  return { state, fromFn, insertFn, upsertFn, updateFn };
 });
+
+vi.mock('@/lib/retrieverProvision', () => ({
+  ensureRetrieverEngineTenant: vi.fn().mockResolvedValue({
+    tenantId: 'ret_tenant_auto_prov_123',
+    apiKey: 'ret_api_key_secret_456',
+    provisionedOnEngine: true,
+  }),
+}));
 
 vi.mock('@/data/supabase', () => ({
   get supabase() {
@@ -87,6 +104,7 @@ vi.mock('@/lib/sessionVerify', () => ({
 import { POST as createOrderPOST } from '@/app/api/client/create-razorpay-order/route';
 import { POST as verifyPaymentPOST } from '@/app/api/client/verify-razorpay-payment/route';
 import { POST as webhookPOST } from '@/app/api/webhooks/razorpay/route';
+import { ensureRetrieverEngineTenant } from '@/lib/retrieverProvision';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -200,6 +218,14 @@ describe('POST /api/client/verify-razorpay-payment', () => {
 describe('POST /api/webhooks/razorpay', () => {
   const secret = 'ocJs7m0Gr5GxIm4cMnyNT0pK';
 
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      text: async () => '{"status":"indexed"}',
+      json: async () => ({ status: 'indexed' }),
+    }));
+  });
+
   it('returns 400 when signature is missing', async () => {
     const req = new Request('http://localhost/api/webhooks/razorpay', {
       method: 'POST',
@@ -238,6 +264,51 @@ describe('POST /api/webhooks/razorpay', () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.status).toBe('ok');
+  });
+
+  it('provisions dedicated Retriever tenant and records retriever_tenant_id on 50% deposit capture', async () => {
+    const payload = JSON.stringify({
+      event: 'payment.captured',
+      payload: {
+        payment: {
+          entity: {
+            id: 'pay_test_deposit_50',
+            order_id: 'order_test_123456789',
+            notes: { scope_code: 'SCOPE-10001' },
+          },
+        },
+      },
+    });
+
+    const signature = crypto.createHmac('sha256', secret).update(payload).digest('hex');
+
+    const req = new Request('http://localhost/api/webhooks/razorpay', {
+      method: 'POST',
+      headers: {
+        'x-razorpay-signature': signature,
+        'content-type': 'application/json',
+      },
+      body: payload,
+    });
+
+    const res = await webhookPOST(req);
+    expect(res.status).toBe(200);
+    expect(ensureRetrieverEngineTenant).toHaveBeenCalledWith(
+      expect.objectContaining({
+        workspaceName: expect.stringContaining('Acme Test Corp'),
+      })
+    );
+
+    interface ScopeUpdateRecord {
+      retriever_tenant_id?: string;
+      deposit_paid?: boolean;
+      metadata?: Record<string, unknown>;
+    }
+    const updateCalls = mocks.updateFn.mock.calls as Array<[ScopeUpdateRecord]>;
+    const scopeUpdate = updateCalls.find((call) => call[0]?.retriever_tenant_id === 'ret_tenant_auto_prov_123')?.[0];
+    expect(scopeUpdate).toBeDefined();
+    expect(scopeUpdate?.deposit_paid).toBe(true);
+    expect(scopeUpdate?.metadata?.retriever_api_key).toBe('ret_api_key_secret_456');
   });
 });
 

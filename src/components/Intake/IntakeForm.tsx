@@ -13,6 +13,7 @@ import {
   Download,
   Rocket,
   Send,
+  Calendar,
 } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
@@ -301,9 +302,14 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   ];
 
   const termsList = resumeData?.intake?.termsAndConditions || [
-    '• 50% upfront deposit to initiate development; 50% upon final UAT approval prior to source code handoff & cloud deployment.',
-    '• 30-day post-handover warranty for bug fixes included on all deliverables.',
-    '• All intellectual property, source code, and design tokens transfer 100% to client upon final milestone payment.',
+    '1. Payment Milestone Structure: 50% Upfront Deposit required to initiate sprint architecture & development. 50% Final Balance due upon completion and prior to production domain cutover and IP handoff.',
+    '2. Scope Creep & Change Orders: Features, pages, or integrations not specified in this baseline architecture brief are handled as formal Change Orders quoted at standard milestone rates.',
+    '3. Intellectual Property (IP) Transfer: 100% of custom codebase, design tokens, and database schemas transfer irrevocably to the client upon receipt of 100% cleared contract funds.',
+    '4. Third-Party Billing & Upstream Infrastructure: Client maintains direct ownership of hosting (Vercel), database (Supabase), and model APIs (OpenAI, Anthropic, Gemini, Groq). Developer is not liable for upstream cloud/LLM provider outages, rate limits, or platform pricing changes.',
+    '5. AI Quality & Hallucination Disclaimer: Generative AI and vector search outputs are probabilistic by nature. While best-practice hybrid retrieval, prompt guardrails, and validation tests are implemented, Developer does not guarantee zero AI hallucinations or model errors.',
+    '6. Project Dormancy & Abandonment: If client feedback, required assets, or approvals stall for more than 30 consecutive calendar days without written extension, the project is deemed dormant; the upfront deposit is forfeited to compensate allocated engineering bandwidth, and resuming requires a restaging fee.',
+    '7. Limitation of Liability: To the maximum extent permitted by applicable law, Developer\'s total cumulative liability arising out of or related to this engagement is strictly capped at the total fees actually paid by Client under this specific SOW. Developer is not liable for indirect, incidental, or lost-profit damages.',
+    '8. Governing Law & Jurisdiction: This agreement is governed by the laws of India. Any unresolved dispute is subject to amicable mediation, followed if necessary by binding arbitration or the exclusive territorial jurisdiction of the competent courts in New Delhi, India.',
   ];
 
   // Reset form data cleanly when changing service type (Issue 4.8)
@@ -586,6 +592,17 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                       <Sparkles size={16} />
                       <span>COPY SHAREABLE LINK</span>
                     </button>
+
+                    <a
+                      href="https://cal.com/prateeq"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`${styles.btn} ${styles.btnSecondary}`}
+                      title="Schedule a 15-min discovery call on Cal.com"
+                    >
+                      <Calendar size={16} />
+                      <span>BOOK DISCOVERY CALL</span>
+                    </a>
 
                     {currentStep > 1 && (
                       <button

@@ -196,6 +196,16 @@
   fill: #777788;
 }
 
+.tierSubtitleText {
+  font-size: 8.5px;
+  font-weight: 500;
+  fill: var(--color-text-dim, #777788);
+}
+
+:global([data-theme="azure"]) .tierSubtitleText {
+  fill: #888899;
+}
+
 .connectionLine {
   stroke: var(--surface-glass-border, rgba(255, 255, 255, 0.1));
   stroke-width: 1.5;
@@ -286,6 +296,28 @@
 
 .nodeBadgeDormant {
   fill: var(--color-text-muted, #666677);
+}
+
+.nodeBadgeBgActive {
+  fill: rgba(57, 255, 20, 0.12);
+  stroke: rgba(57, 255, 20, 0.3);
+  stroke-width: 0.5;
+}
+
+:global([data-theme="azure"]) .nodeBadgeBgActive {
+  fill: rgba(45, 138, 78, 0.12);
+  stroke: rgba(45, 138, 78, 0.3);
+}
+
+.nodeBadgeBgDormant {
+  fill: rgba(255, 255, 255, 0.04);
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 0.5;
+}
+
+:global([data-theme="azure"]) .nodeBadgeBgDormant {
+  fill: rgba(43, 43, 54, 0.04);
+  stroke: rgba(43, 43, 54, 0.1);
 }
 
 /* Layered Matrix View */
@@ -415,6 +447,114 @@
   border-color: var(--pop-yellow, #e06d53);
 }
 
+/* Non-Tech Blueprint Helper & Legend */
+.blueprintHelperBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface-glass-bg, rgba(255, 255, 255, 0.02));
+  border: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.08));
+  border-radius: 8px;
+  padding: 8px 14px;
+  margin-bottom: 14px;
+  font-size: 0.74rem;
+  color: var(--color-text-muted, #a0a0b0);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+:global([data-theme="azure"]) .blueprintHelperBar {
+  background: #f7f6f2;
+  border-color: rgba(43, 43, 54, 0.1);
+  color: #666677;
+}
+
+.legendGroup {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.legendDotActive {
+  color: var(--neon-green, #39ff14);
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+:global([data-theme="azure"]) .legendDotActive {
+  color: #2d8a4e;
+}
+
+.legendDotDormant {
+  color: var(--color-text-muted, #777788);
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.legendIcon {
+  color: var(--neon-cyan, #00f0ff);
+}
+
+:global([data-theme="azure"]) .legendIcon {
+  color: #3f6e91;
+}
+
+.legendHint {
+  font-style: italic;
+  font-size: 0.72rem;
+  color: var(--color-text-dim, #888899);
+}
+
+:global([data-theme="azure"]) .legendHint {
+  color: #555566;
+}
+
+.tierCardTitleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tierCardSubtitle {
+  font-size: 0.7rem;
+  color: var(--color-text-muted, #888899);
+  text-transform: none;
+}
+
+:global([data-theme="azure"]) .tierCardSubtitle {
+  color: #777788;
+}
+
+.matrixNodeTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.matrixNodeSubtitle {
+  font-size: 0.7rem;
+  color: var(--color-text-dim, #777788);
+}
+
+.matrixNodeLayman {
+  font-size: 0.74rem;
+  line-height: 1.35;
+  color: var(--color-text, #dddddd);
+  margin: 3px 0;
+}
+
+:global([data-theme="azure"]) .matrixNodeLayman {
+  color: #333344;
+}
+
 /* SLA Tooltip Modal Overlay */
 .inspectTooltip {
   position: absolute;
@@ -443,6 +583,13 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  max-width: 78%;
+}
+
+.inspectTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .inspectTitle {
@@ -452,8 +599,63 @@
   color: var(--color-text, #ffffff);
 }
 
+.inspectStatusBadge {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.inspectStatusActive {
+  background: rgba(57, 255, 20, 0.12);
+  color: var(--neon-green, #39ff14);
+  border: 1px solid rgba(57, 255, 20, 0.25);
+}
+
+:global([data-theme="azure"]) .inspectStatusActive {
+  background: rgba(45, 138, 78, 0.12);
+  color: #2d8a4e;
+  border-color: rgba(45, 138, 78, 0.25);
+}
+
+.inspectStatusDormant {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-muted, #888899);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+:global([data-theme="azure"]) .inspectStatusDormant {
+  background: rgba(43, 43, 54, 0.05);
+  color: #666677;
+  border-color: rgba(43, 43, 54, 0.12);
+}
+
+.inspectLayman {
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--color-text, #ffffff);
+  margin: 2px 0;
+}
+
+:global([data-theme="azure"]) .inspectLayman {
+  color: #2b2b36;
+}
+
+.inspectHowItFits {
+  font-size: 0.74rem;
+  line-height: 1.35;
+  color: var(--color-text-dim, #9999aa);
+  margin: 2px 0 4px 0;
+}
+
+:global([data-theme="azure"]) .inspectHowItFits {
+  color: #555566;
+}
+
 .inspectSla {
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   color: var(--color-text-muted, #a0a0b0);
 }
 
@@ -461,6 +663,24 @@
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.activeCheckBadge {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--neon-green, #39ff14);
+  background: rgba(57, 255, 20, 0.1);
+  border: 1px solid rgba(57, 255, 20, 0.25);
+  border-radius: 4px;
+  padding: 4px 8px;
+  white-space: nowrap;
+}
+
+:global([data-theme="azure"]) .activeCheckBadge {
+  color: #2d8a4e;
+  background: rgba(45, 138, 78, 0.1);
+  border-color: rgba(45, 138, 78, 0.25);
 }
 
 .closeInspectBtn {

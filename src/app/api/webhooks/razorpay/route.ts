@@ -182,6 +182,8 @@ export async function POST(req: Request) {
         timeline?: string;
         deposit_paid?: boolean;
         balance_paid?: boolean;
+        retriever_tenant_id?: string;
+        metadata?: Record<string, unknown>;
       } | null = null;
       let isBalanceMilestone = false;
       let isFullMilestone = false;
@@ -192,7 +194,7 @@ export async function POST(req: Request) {
         try {
           const { data: targetScope } = await supabase
             .from('client_scopes')
-            .select('id, scope_code, company_name, client_email, base_engine, features, brand_asset, maintenance_plan, total_cost_inr, total_cost_usd, currency, timeline, deposit_paid, balance_paid')
+            .select('id, scope_code, company_name, client_email, base_engine, features, brand_asset, maintenance_plan, total_cost_inr, total_cost_usd, currency, timeline, deposit_paid, balance_paid, retriever_tenant_id, metadata')
             .eq('id', invoice.scope_id)
             .maybeSingle();
 
@@ -277,6 +279,53 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Could not update scope balance.' }, { status: 500 });
           }
         } else if (!targetScopeRow?.deposit_paid && !isChangeOrder) {
+          let provisionedTenantId: string | null = targetScopeRow?.retriever_tenant_id || null;
+          let provisionedApiKey: string | null = null;
+          try {
+            const tenantResult = await ensureRetrieverEngineTenant({
+              existingTenantId: targetScopeRow?.retriever_tenant_id,
+              workspaceName: `${targetScopeRow?.company_name || 'Client'} Workspace`,
+              planTier: 'standard',
+            });
+            if (tenantResult?.tenantId) {
+              provisionedTenantId = tenantResult.tenantId;
+              if (tenantResult.apiKey) {
+                provisionedApiKey = tenantResult.apiKey;
+              }
+
+              // Index client SOW markdown into provisioned tenant
+              const sowMarkdown = `# Statement of Work (SOW): ${targetScopeRow?.company_name || 'Client Project'}
+- Scope Code: ${targetScopeRow?.scope_code || ''}
+- Company: ${targetScopeRow?.company_name || ''}
+- Base Engine: ${targetScopeRow?.base_engine || ''}
+- Selected Features: ${(Array.isArray(targetScopeRow?.features) ? targetScopeRow.features : []).join(', ')}
+- Brand Collateral: ${targetScopeRow?.brand_asset || 'None'}
+- Maintenance SLA: ${targetScopeRow?.maintenance_plan || 'Standard'}
+- Investment: ${targetScopeRow?.currency || 'INR'} ${targetScopeRow?.total_cost_inr || targetScopeRow?.total_cost_usd || 0}
+- Cryptographic SOW Hash: ${sowHash || 'Pending'}
+- Deposit Paid At: ${nowIso}
+`;
+              const retrieverApiUrl = (process.env.RETRIEVER_API_URL || 'https://rag.prateeq.in').replace(/\/$/, '');
+              const formData = new FormData();
+              const blob = new Blob([sowMarkdown], { type: 'text/markdown' });
+              formData.append('file', blob, `sow_${targetScopeRow?.scope_code || 'client'}.md`);
+              const docHeaders: Record<string, string> = {
+                Authorization: `Bearer ${tenantResult.apiKey}`,
+                'X-Tenant-ID': tenantResult.tenantId,
+                'X-User-ID': '00000000-0000-4000-a000-000000000001',
+              };
+              await fetch(`${retrieverApiUrl}/v1/tenants/${tenantResult.tenantId}/documents`, {
+                method: 'POST',
+                headers: docHeaders,
+                body: formData,
+              }).catch((docErr) => {
+                console.warn('Failed to index SOW markdown into Retriever tenant:', docErr);
+              });
+            }
+          } catch (tenantErr) {
+            console.warn('Could not auto-provision Retriever tenant on deposit capture:', tenantErr);
+          }
+
           const { error: updateScopeError } = await supabase
             .from('client_scopes')
             .update({
@@ -286,6 +335,11 @@ export async function POST(req: Request) {
               delivery_stage: isFullMilestone ? 'live' : 'engineering',
               status: isFullMilestone ? 'Project Settled — Production Live' : 'Deposit Paid — In Development',
               sow_hash: sowHash,
+              retriever_tenant_id: provisionedTenantId,
+              metadata: {
+                ...(targetScopeRow?.metadata || {}),
+                ...(provisionedApiKey ? { retriever_api_key: provisionedApiKey } : {}),
+              },
               updated_at: nowIso,
             })
             .eq('id', invoice.scope_id);

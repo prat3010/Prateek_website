@@ -162,6 +162,52 @@ export class RetrieverClient {
     }
   }
 
+  async chatComplete(sessionId: string, message: string, signal?: AbortSignal): Promise<{ text: string; citations: unknown[] }> {
+    const stream = await this.chat(sessionId, message, signal);
+    if (!stream) {
+      return { text: '', citations: [] };
+    }
+    const reader = stream.getReader();
+    const decoder = new TextDecoder();
+    let text = '';
+    let citations: unknown[] = [];
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr) {
+            try {
+              const data = JSON.parse(jsonStr);
+              if (data.event === 'token' && data.delta) {
+                text += data.delta;
+              } else if (data.event === 'done' && Array.isArray(data.citations)) {
+                citations = data.citations;
+              }
+            } catch {}
+          }
+        }
+      }
+    }
+
+    if (buffer && buffer.startsWith('data: ')) {
+      try {
+        const data = JSON.parse(buffer.slice(6).trim());
+        if (data.event === 'token' && data.delta) text += data.delta;
+        else if (data.event === 'done' && Array.isArray(data.citations)) citations = data.citations;
+      } catch {}
+    }
+
+    return { text: text.trim(), citations };
+  }
+
   async uploadDocument(file: File) {
     const formData = new FormData();
     formData.append("file", file);

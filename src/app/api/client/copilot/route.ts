@@ -114,10 +114,13 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 3. Attempt Live RAG Retrieval from Dedicated Retriever Tenant
+    // 3. Attempt Authentic RAG Chat Completion from Dedicated Retriever Tenant
     let answerText = '';
     const tenantId = activeScope.retriever_tenant_id || process.env.RETRIEVER_SCOPING_TENANT_ID;
-    const apiKey = process.env.RETRIEVER_SCOPING_API_KEY || process.env.RETRIEVER_API_KEY;
+    const apiKey =
+      ((activeScope.metadata as Record<string, unknown> | undefined)?.retriever_api_key as string) ||
+      process.env.RETRIEVER_SCOPING_API_KEY ||
+      process.env.RETRIEVER_API_KEY;
     const apiUrl = process.env.NEXT_PUBLIC_RETRIEVER_API_URL || 'https://rag.prateeq.in';
 
     if (tenantId && apiKey) {
@@ -126,16 +129,34 @@ export async function POST(req: NextRequest) {
           apiUrl,
           tenantId,
           apiKey,
-          userId: '00000000-0000-0000-0000-000000000000',
+          userId: '00000000-0000-4000-a000-000000000001',
         });
 
-        const searchRes = await client.search(query, { limit: 3, enableHybrid: true });
-        if (searchRes && searchRes.results && searchRes.results.length > 0) {
-          const topResult = searchRes.results[0];
-          answerText = `${topResult.content.slice(0, 450)}...\n\n*(Grounded in ${activeScope.company_name || activeScope.scope_code} knowledge vault)*`;
+        const session = await client.createSession();
+        const sessionId = session?.sessionId || (session as unknown as { session_id?: string })?.session_id;
+        if (sessionId) {
+          const completion = await client.chatComplete(sessionId, query);
+          if (completion && completion.text) {
+            answerText = completion.text;
+            if (Array.isArray(completion.citations) && completion.citations.length > 0) {
+              for (const c of completion.citations as Array<Record<string, unknown>>) {
+                if (c && typeof c === 'object') {
+                  const citId = (c.id || c.document_id || c.documentId || `doc-${citations.length + 1}`) as string;
+                  const citLabel = (c.label || c.title || c.fileName || c.file_name || 'Verified SOW Excerpt') as string;
+                  if (!citations.some((existing) => existing.id === citId)) {
+                    citations.push({
+                      id: String(citId),
+                      label: String(citLabel),
+                      type: 'sow',
+                    });
+                  }
+                }
+              }
+            }
+          }
         }
       } catch (ragErr) {
-        console.warn('Retriever live search fallback:', ragErr);
+        console.warn('Retriever authentic chat completion fallback:', ragErr);
       }
     }
 

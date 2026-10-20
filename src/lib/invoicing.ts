@@ -15,6 +15,18 @@ export const SELLER_CONFIG = {
     country: sellerData?.country || process.env.NEXT_PUBLIC_SELLER_COUNTRY || 'India',
   },
   defaultSacCode: sellerData?.defaultSacCode || process.env.NEXT_PUBLIC_DEFAULT_SAC_CODE || '998314', // Information Technology Software Consulting & Development Services
+  lutArn: ((sellerData as Record<string, unknown>)?.lutArn as string) || process.env.SELLER_LUT_ARN || '',
+  lutDisclaimer: ((sellerData as Record<string, unknown>)?.lutDisclaimer as string) || 'Export of services without payment of integrated tax under Letter of Undertaking (LUT) in terms of Section 16 of the IGST Act, 2017.',
+  internationalPayment: ((sellerData as Record<string, unknown>)?.internationalPayment as {
+    provider?: string;
+    beneficiary?: string;
+    achRouting?: string;
+    achAccount?: string;
+    swiftBic?: string;
+    bankName?: string;
+    bankAddress?: string;
+    notes?: string;
+  } | undefined) || null,
 };
 
 export const SUPPORTED_CURRENCIES = [

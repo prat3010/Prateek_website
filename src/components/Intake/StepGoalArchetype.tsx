@@ -20,6 +20,7 @@ import {
   MessageSquare,
   Brain,
   Settings,
+  Sparkles,
 } from 'lucide-react';
 import type { GoalArchetype, BaseEngineItem, FeatureItem } from '@/data/resume';
 import { formatPricePair, packageTotalForArchetype, type Currency } from '@/lib/pricing';
@@ -178,6 +179,58 @@ export function StepGoalArchetype({
         isNoir={isNoir}
         onNavigateStep={onNavigateStep}
       />
+
+      {/* Low-Risk Paid Discovery Wedge */}
+      {(() => {
+        const auditGoal = goals.find((g) => g.id === 'ai_strategy_consulting' || g.recommendedEngineId === 'ai_strategy_audit');
+        const auditLabel = auditGoal ? auditGoal.label : '🧠 AI Strategy & Solutioning Audit';
+        const isAuditSelected = formData.projectGoal === auditLabel || formData.projectGoal === 'ai_strategy_consulting';
+        return (
+          <div className={styles.discoveryWedgeBox}>
+            <div className={styles.discoveryWedgeBadge}>
+              <Sparkles size={13} />
+              <span>PAID DISCOVERY WEDGE</span>
+            </div>
+            <div className={styles.discoveryWedgeContent}>
+              <div className={styles.discoveryWedgeText}>
+                <h3 className={styles.discoveryWedgeTitle}>
+                  🧠 AI Strategy &amp; Architecture Audit
+                </h3>
+                <p className={styles.discoveryWedgeDescription}>
+                  Not ready for a full multi-week build? Start with a 60-minute deep-dive operational workflow audit. We analyze your tech bottlenecks, model AI ROI, and deliver an actionable 3-page custom AI Architecture Blueprint PDF.
+                </p>
+              </div>
+              <div className={styles.discoveryWedgeActions}>
+                <div className={styles.discoveryWedgePrice}>
+                  <span className={styles.discoveryWedgePriceTag}>
+                    {currency === 'INR' ? '₹20,000' : '$300'}
+                  </span>
+                  <span className={styles.discoveryWedgeDuration}>/ 1-Week Sprint</span>
+                </div>
+                <button
+                  type="button"
+                  className={`${styles.discoveryWedgeBtn} ${
+                    isAuditSelected ? styles.discoveryWedgeBtnActive : ''
+                  }`}
+                  onClick={() => onGoalChange(auditLabel)}
+                >
+                  {isAuditSelected ? (
+                    <>
+                      <Check size={14} />
+                      <span>ACTIVE WEDGE</span>
+                    </>
+                  ) : (
+                    <>
+                      <Zap size={14} />
+                      <span>SELECT DISCOVERY WEDGE</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       <div className={`${styles.field} ${styles.fieldMarginSm}`}>
         <label className={styles.label}>

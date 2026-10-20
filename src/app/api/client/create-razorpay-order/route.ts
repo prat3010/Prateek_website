@@ -7,6 +7,17 @@ import { recalculateCanonicalScopeQuote, type PromoDiscountInfo } from '@/lib/pr
 
 const USD_TO_INR_RATE = 85;
 
+function getInternationalPaymentPayload(isUSD: boolean) {
+  if (!isUSD || !SELLER_CONFIG.internationalPayment?.achAccount) {
+    return undefined;
+  }
+  return {
+    method: 'wise_swift',
+    instructions: 'Direct USD Wise Business ACH or SWIFT wire transfers accepted for zero-fee settlement under Indian export LUT guidelines.',
+    wireDetails: SELLER_CONFIG.internationalPayment,
+  };
+}
+
 export async function POST(req: Request) {
   try {
     const KEY_ID = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || '';
@@ -80,9 +91,11 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Invalid invoice amount.' }, { status: 400 });
       }
 
-      const razorpayCurrency = 'INR';
-      const inrAmount = isUSD ? Math.round(rawTotal * USD_TO_INR_RATE) : rawTotal;
-      const amountInSubunits = Math.max(100, Math.round(inrAmount * 100));
+      const preferNative = !parseResult.data.forceInr;
+      const targetCurrency = (isUSD && preferNative) ? 'USD' : 'INR';
+      let amountInSubunits = targetCurrency === 'USD'
+        ? Math.max(100, Math.round(rawTotal * 100))
+        : Math.max(100, Math.round((isUSD ? rawTotal * USD_TO_INR_RATE : rawTotal) * 100));
 
       if (!KEY_ID || !KEY_SECRET) {
         if (isDev) {
@@ -96,8 +109,11 @@ export async function POST(req: Request) {
             isMock: true,
             orderId: mockOrderId,
             amount: amountInSubunits,
-            currency: razorpayCurrency,
+            currency: targetCurrency,
             keyId: 'rzp_test_mock',
+            convertedFromUSD: isUSD && targetCurrency === 'INR',
+            exchangeRate: isUSD && targetCurrency === 'INR' ? USD_TO_INR_RATE : undefined,
+            internationalPayment: getInternationalPaymentPayload(isUSD),
           });
         }
         return NextResponse.json({ error: 'Razorpay API credentials not configured on server.' }, { status: 500 });
@@ -105,16 +121,18 @@ export async function POST(req: Request) {
 
       const authHeader = 'Basic ' + Buffer.from(`${KEY_ID}:${KEY_SECRET}`).toString('base64');
       let razorpayRes: Response | null = null;
-      try {
-        razorpayRes = await fetch('https://api.razorpay.com/v1/orders', {
+      let finalCurrency = targetCurrency;
+
+      const callRazorpayInvoice = async (curr: string, amt: number) => {
+        return fetch('https://api.razorpay.com/v1/orders', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             Authorization: authHeader,
           },
           body: JSON.stringify({
-            amount: amountInSubunits,
-            currency: razorpayCurrency,
+            amount: amt,
+            currency: curr,
             receipt: (invoice.invoice_number || invoice.id).slice(0, 40),
             payment_capture: 1,
             notes: {
@@ -122,9 +140,23 @@ export async function POST(req: Request) {
               invoice_number: invoice.invoice_number,
               customer_email: clientEmail,
               customer_name: invoice.customer_name || 'Client',
+              original_currency: originalCurrency,
             },
           }),
         });
+      };
+
+      try {
+        razorpayRes = await callRazorpayInvoice(targetCurrency, amountInSubunits);
+        if (!razorpayRes.ok && targetCurrency === 'USD') {
+          const errText = await razorpayRes.clone().text().catch(() => '');
+          if (errText.toLowerCase().includes('currency') || razorpayRes.status === 400) {
+            console.warn('Razorpay USD order failed, falling back to converted INR order:', errText);
+            finalCurrency = 'INR';
+            amountInSubunits = Math.max(100, Math.round(rawTotal * USD_TO_INR_RATE * 100));
+            razorpayRes = await callRazorpayInvoice(finalCurrency, amountInSubunits);
+          }
+        }
       } catch (fetchErr) {
         console.warn('Razorpay server fetch offline:', fetchErr);
         if (isDev) {
@@ -134,8 +166,11 @@ export async function POST(req: Request) {
             isMock: true,
             orderId: mockOrderId,
             amount: amountInSubunits,
-            currency: razorpayCurrency,
+            currency: finalCurrency,
             keyId: KEY_ID,
+            convertedFromUSD: isUSD && finalCurrency === 'INR',
+            exchangeRate: isUSD && finalCurrency === 'INR' ? USD_TO_INR_RATE : undefined,
+            internationalPayment: getInternationalPaymentPayload(isUSD),
           });
         }
         return NextResponse.json({ error: 'Unable to reach Razorpay servers.' }, { status: 502 });
@@ -151,8 +186,11 @@ export async function POST(req: Request) {
             isMock: true,
             orderId: mockOrderId,
             amount: amountInSubunits,
-            currency: razorpayCurrency,
+            currency: finalCurrency,
             keyId: KEY_ID,
+            convertedFromUSD: isUSD && finalCurrency === 'INR',
+            exchangeRate: isUSD && finalCurrency === 'INR' ? USD_TO_INR_RATE : undefined,
+            internationalPayment: getInternationalPaymentPayload(isUSD),
           });
         }
         return NextResponse.json({ error: 'Failed to initialize Razorpay order.' }, { status: 500 });
@@ -165,8 +203,11 @@ export async function POST(req: Request) {
         isMock: false,
         orderId: orderData.id,
         amount: orderData.amount,
-        currency: razorpayCurrency,
+        currency: orderData.currency || finalCurrency,
         keyId: KEY_ID,
+        convertedFromUSD: isUSD && (orderData.currency === 'INR' || finalCurrency === 'INR'),
+        exchangeRate: isUSD && (orderData.currency === 'INR' || finalCurrency === 'INR') ? USD_TO_INR_RATE : undefined,
+        internationalPayment: getInternationalPaymentPayload(isUSD),
       });
     }
 
@@ -305,10 +346,12 @@ export async function POST(req: Request) {
 
     const depositAmount = Math.round(rawTotal * multiplier);
 
-    // Convert USD to INR for standard Razorpay checkout to prevent "International cards not supported" error
-    const razorpayCurrency = 'INR';
-    const inrDepositAmount = isUSD ? Math.round(depositAmount * USD_TO_INR_RATE) : depositAmount;
-    const amountInSubunits = Math.max(100, inrDepositAmount * 100);
+    // Support native USD if international cards/currency is enabled, with fallback to INR
+    const targetCurrency = (isUSD && !payload.forceInr) ? 'USD' : 'INR';
+    let finalCurrency = targetCurrency;
+    let amountInSubunits = targetCurrency === 'USD'
+      ? Math.max(100, Math.round(depositAmount * 100))
+      : Math.max(100, Math.round((isUSD ? depositAmount * USD_TO_INR_RATE : depositAmount) * 100));
 
     // Only apply GST breakup when SELLER_CONFIG.gstin is configured
     const hasSellerGstin = Boolean(SELLER_CONFIG.gstin?.trim());
@@ -403,8 +446,11 @@ export async function POST(req: Request) {
           isMock: true,
           orderId: mockOrderId,
           amount: amountInSubunits,
-          currency: razorpayCurrency,
+          currency: finalCurrency,
           keyId: 'rzp_test_mock',
+          convertedFromUSD: isUSD && finalCurrency === 'INR',
+          exchangeRate: isUSD && finalCurrency === 'INR' ? USD_TO_INR_RATE : undefined,
+          internationalPayment: getInternationalPaymentPayload(isUSD),
         });
       }
       return NextResponse.json({ error: 'Razorpay API credentials not configured on server.' }, { status: 500 });
@@ -412,17 +458,16 @@ export async function POST(req: Request) {
 
     // Call Razorpay Order API
     const authHeader = 'Basic ' + Buffer.from(`${KEY_ID}:${KEY_SECRET}`).toString('base64');
-    let razorpayRes: Response | null = null;
-    try {
-      razorpayRes = await fetch('https://api.razorpay.com/v1/orders', {
+    const callRazorpayScope = async (curr: string, amt: number) => {
+      return fetch('https://api.razorpay.com/v1/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: authHeader,
         },
         body: JSON.stringify({
-          amount: amountInSubunits,
-          currency: razorpayCurrency,
+          amount: amt,
+          currency: curr,
           receipt: scopeCode,
           payment_capture: 1,
           notes: {
@@ -435,6 +480,20 @@ export async function POST(req: Request) {
           },
         }),
       });
+    };
+
+    let razorpayRes: Response | null = null;
+    try {
+      razorpayRes = await callRazorpayScope(targetCurrency, amountInSubunits);
+      if (!razorpayRes.ok && targetCurrency === 'USD') {
+        const errText = await razorpayRes.clone().text().catch(() => '');
+        if (errText.toLowerCase().includes('currency') || razorpayRes.status === 400) {
+          console.warn('Razorpay USD scope order failed, falling back to converted INR order:', errText);
+          finalCurrency = 'INR';
+          amountInSubunits = Math.max(100, Math.round(depositAmount * USD_TO_INR_RATE * 100));
+          razorpayRes = await callRazorpayScope(finalCurrency, amountInSubunits);
+        }
+      }
     } catch (fetchErr) {
       console.warn('Razorpay server fetch offline:', fetchErr);
       if (isDev) {
@@ -444,8 +503,11 @@ export async function POST(req: Request) {
           isMock: true,
           orderId: mockOrderId,
           amount: amountInSubunits,
-          currency: razorpayCurrency,
+          currency: finalCurrency,
           keyId: KEY_ID,
+          convertedFromUSD: isUSD && finalCurrency === 'INR',
+          exchangeRate: isUSD && finalCurrency === 'INR' ? USD_TO_INR_RATE : undefined,
+          internationalPayment: getInternationalPaymentPayload(isUSD),
         });
       }
       return NextResponse.json({ error: 'Unable to reach Razorpay servers.' }, { status: 502 });
@@ -461,8 +523,11 @@ export async function POST(req: Request) {
           isMock: true,
           orderId: mockOrderId,
           amount: amountInSubunits,
-          currency: razorpayCurrency,
+          currency: finalCurrency,
           keyId: KEY_ID,
+          convertedFromUSD: isUSD && finalCurrency === 'INR',
+          exchangeRate: isUSD && finalCurrency === 'INR' ? USD_TO_INR_RATE : undefined,
+          internationalPayment: getInternationalPaymentPayload(isUSD),
         });
       }
       return NextResponse.json({ error: 'Failed to initialize Razorpay order.' }, { status: 500 });
@@ -475,8 +540,11 @@ export async function POST(req: Request) {
       isMock: false,
       orderId: orderData.id,
       amount: orderData.amount,
-      currency: razorpayCurrency,
+      currency: orderData.currency || finalCurrency,
       keyId: KEY_ID,
+      convertedFromUSD: isUSD && (orderData.currency === 'INR' || finalCurrency === 'INR'),
+      exchangeRate: isUSD && (orderData.currency === 'INR' || finalCurrency === 'INR') ? USD_TO_INR_RATE : undefined,
+      internationalPayment: getInternationalPaymentPayload(isUSD),
     });
   } catch (err: unknown) {
     console.error('Create Razorpay Order API error:', err);

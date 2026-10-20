@@ -57,8 +57,19 @@ const SECONDARY_TEXTS: ScramblerProps['texts'] = {
   business:  bothThemes('Retriever AI Engine'),
 };
 
+const EDITION_STAMP_CONFIG = {
+  developer: {
+    issue: 'VOL. 26 // ISSUE 1',
+    label: 'ARCHITECT EDITION',
+  },
+  business: {
+    issue: 'DOC. REF // 2026-BRIEF',
+    label: 'COMMERCIAL EDITION',
+  },
+} as const;
+
 export default function HeroClient({ taglines }: HeroClientProps) {
-  const { isNoir, audience } = useTheme();
+  const { isNoir, audience, modeTransitionSeed } = useTheme();
 
   const activeAudience = audience || 'developer';
   const activeTheme = isNoir ? 'noir' : 'light';
@@ -104,10 +115,19 @@ export default function HeroClient({ taglines }: HeroClientProps) {
       <span className={styles.crosshairBR} aria-hidden="true">⌟</span>
 
       <div className={styles.textSide}>
-        {/* Vintage Editorial Watermark Stamp */}
-        <div className={styles.editorialStamp} aria-hidden="true">
-          <span className={styles.stampIssue}>VOL. 26 // ISSUE 1</span>
-          <span className={styles.stampLabel}>ARCHITECT EDITION</span>
+        {/* Dynamic Editorial Watermark Stamp */}
+        <div
+          key={`${activeAudience}-${modeTransitionSeed}`}
+          className={styles.editorialStamp}
+          data-audience={activeAudience}
+          aria-hidden="true"
+        >
+          <span className={styles.stampIssue}>
+            {EDITION_STAMP_CONFIG[activeAudience].issue}
+          </span>
+          <span className={styles.stampLabel}>
+            {EDITION_STAMP_CONFIG[activeAudience].label}
+          </span>
         </div>
 
         <Scrambler

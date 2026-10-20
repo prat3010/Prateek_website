@@ -17,10 +17,10 @@ export interface ProposalExecutiveBriefPDFProps {
 function createStyles(theme: PDFThemeConfig) {
   return StyleSheet.create({
     page: {
-      paddingTop: 20,
-      paddingBottom: 24,
-      paddingLeft: 24,
-      paddingRight: 24,
+      paddingTop: 16,
+      paddingBottom: 18,
+      paddingLeft: 22,
+      paddingRight: 22,
       fontFamily: theme.bodyFont,
       backgroundColor: theme.pageBg,
       fontSize: 8,
@@ -29,18 +29,18 @@ function createStyles(theme: PDFThemeConfig) {
     docHeader: {
       borderBottomWidth: 1,
       borderBottomColor: theme.cardBorder,
-      paddingBottom: 4,
-      marginBottom: 8,
+      paddingBottom: 3,
+      marginBottom: 6,
     },
     docTitle: {
-      fontSize: 10.5,
+      fontSize: 10,
       fontFamily: theme.headlineBoldFont,
       color: theme.textPrimary,
       textTransform: 'uppercase',
       letterSpacing: 0.04,
     },
     docMeta: {
-      fontSize: 6.5,
+      fontSize: 6.2,
       fontFamily: theme.labelFont,
       color: theme.textSecondary,
       marginTop: 2,
@@ -48,15 +48,15 @@ function createStyles(theme: PDFThemeConfig) {
     },
     gridTwoCol: {
       flexDirection: 'row',
-      gap: 8,
-      marginBottom: 8,
+      gap: 6,
+      marginBottom: 6,
     },
     card: {
       backgroundColor: theme.cardBg,
       borderColor: theme.cardBorder,
       borderWidth: 1,
       borderRadius: 4,
-      padding: 7,
+      padding: 6,
       flex: 1,
     },
     sectionLabel: {
@@ -111,12 +111,12 @@ function createStyles(theme: PDFThemeConfig) {
       borderWidth: 1,
       borderRadius: 4,
       overflow: 'hidden',
-      marginBottom: 8,
+      marginBottom: 6,
     },
     tableHeaderRow: {
       flexDirection: 'row',
       backgroundColor: theme.headerBg,
-      padding: '4 6',
+      padding: '3 5',
     },
     tableHeaderText: {
       fontFamily: theme.labelBoldFont,
@@ -126,14 +126,14 @@ function createStyles(theme: PDFThemeConfig) {
     },
     tableRow: {
       flexDirection: 'row',
-      padding: '4 6',
+      padding: '3 5',
       borderTopWidth: 1,
       borderTopColor: theme.cardBorder,
       backgroundColor: theme.cardBg,
     },
     tableRowAlt: {
       flexDirection: 'row',
-      padding: '4 6',
+      padding: '3 5',
       borderTopWidth: 1,
       borderTopColor: theme.cardBorder,
       backgroundColor: theme.tableRowAlt,
@@ -146,27 +146,27 @@ function createStyles(theme: PDFThemeConfig) {
       borderColor: theme.accentColor,
       borderWidth: 1,
       borderRadius: 4,
-      padding: '6 8',
+      padding: '5 7',
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: 8,
+      marginBottom: 6,
     },
     totalLabel: {
       fontFamily: theme.labelBoldFont,
-      fontSize: 7.5,
+      fontSize: 7.2,
       color: theme.textPrimary,
       textTransform: 'uppercase',
       letterSpacing: 0.04,
     },
     totalValue: {
       fontFamily: theme.labelBoldFont,
-      fontSize: 10,
+      fontSize: 9.5,
       color: theme.accentColor,
     },
     timelineGrid: {
       flexDirection: 'row',
-      gap: 6,
+      gap: 5,
     },
     timelineCard: {
       flex: 1,
@@ -174,24 +174,50 @@ function createStyles(theme: PDFThemeConfig) {
       borderColor: theme.cardBorder,
       borderWidth: 1,
       borderRadius: 3,
-      padding: 5,
+      padding: 4,
     },
     timelineStepNumber: {
-      fontSize: 6.5,
+      fontSize: 6,
       fontFamily: theme.labelBoldFont,
       color: theme.accentColor,
-      marginBottom: 2,
+      marginBottom: 1,
     },
     timelineStepTitle: {
-      fontSize: 7,
+      fontSize: 6.8,
       fontFamily: theme.labelBoldFont,
       color: theme.textPrimary,
-      marginBottom: 2,
+      marginBottom: 1,
     },
     timelineStepDesc: {
-      fontSize: 6,
+      fontSize: 5.6,
       color: theme.textSecondary,
-      lineHeight: 1.3,
+      lineHeight: 1.25,
+    },
+    governanceBar: {
+      backgroundColor: theme.cardBg,
+      borderColor: theme.cardBorder,
+      borderWidth: 1,
+      borderRadius: 4,
+      padding: '4 6',
+      marginTop: 6,
+    },
+    governanceTitle: {
+      fontFamily: theme.labelBoldFont,
+      fontSize: 6.5,
+      color: theme.textPrimary,
+      textTransform: 'uppercase',
+      marginBottom: 1,
+    },
+    governanceText: {
+      fontSize: 5.8,
+      color: theme.textSecondary,
+      lineHeight: 1.25,
+      marginBottom: 2,
+    },
+    governanceCallout: {
+      fontFamily: theme.labelBoldFont,
+      fontSize: 6.2,
+      color: theme.accentColor,
     },
   });
 }
@@ -332,6 +358,17 @@ export function ProposalExecutiveBriefPDF({
             <Text style={styles.timelineStepTitle}>Launch & IP Transfer</Text>
             <Text style={styles.timelineStepDesc}>Zero-downtime cutover, SLA activation, and full IP handover.</Text>
           </View>
+        </View>
+
+        {/* Commercial Governance & Cal.com Scheduling */}
+        <View style={styles.governanceBar}>
+          <Text style={styles.governanceTitle}>Commercial Governance &amp; MSA Terms</Text>
+          <Text style={styles.governanceText}>
+            • Capped Liability (Fees Paid) • New Delhi Territorial Jurisdiction • 30-Day Dormancy Forfeiture • Probabilistic AI Disclaimed
+          </Text>
+          <Text style={styles.governanceCallout}>
+            Book Technical Architecture Call: https://cal.com/prateeq
+          </Text>
         </View>
 
         <PdfFooter theme={theme} leftText="EXECUTIVE PROJECT BRIEF — STRICTLY CONFIDENTIAL" />

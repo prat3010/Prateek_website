@@ -27,6 +27,8 @@ export interface ClientScope {
   payment_structure?: '50/50' | '40/30/30' | string;
   signed_at?: string;
   signed_by_email?: string;
+  signedAt?: string;
+  signedByEmail?: string;
   design_readiness?: string;
   hosting_ownership?: string;
   tax_invoicing_preference?: string;
@@ -262,6 +264,8 @@ export function dbToClientScope(row: ClientOrderRow): ClientScope {
     payment_structure: row.payment_structure || '50/50',
     signed_at: row.signed_at || undefined,
     signed_by_email: row.signed_by_email || '',
+    signedAt: row.signed_at || undefined,
+    signedByEmail: row.signed_by_email || '',
     design_readiness: row.design_readiness || (checklistParsed.design_readiness as string) || undefined,
     hosting_ownership: row.hosting_ownership || (checklistParsed.hosting_ownership as string) || undefined,
     tax_invoicing_preference: row.tax_invoicing_preference || (checklistParsed.tax_invoicing_preference as string) || undefined,
@@ -459,6 +463,7 @@ export interface CreateRazorpayOrderPayload {
   amount?: number;
   currency?: 'INR' | 'USD';
   milestoneStage?: string;
+  forceInr?: boolean;
 }
 
 export const createRazorpayOrderSchema = {
@@ -504,6 +509,7 @@ export const createRazorpayOrderSchema = {
         amount,
         currency: obj.currency === 'USD' ? 'USD' : 'INR',
         milestoneStage: typeof obj.milestoneStage === 'string' ? obj.milestoneStage : undefined,
+        forceInr: Boolean(obj.forceInr),
       },
     };
   },

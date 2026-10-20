@@ -152,8 +152,7 @@ export function SowSignoffModal({
                   className={styles.termsCheckbox}
                 />
                 <span className={styles.termsText}>
-                  I confirm acceptance of this Scope of Work (SOW), agree to the payment structure
-                  selected above, and authorize the upfront sprint deposit.
+                  I confirm acceptance of this Scope of Work (SOW) &amp; Master Services Agreement (MSA) terms (capped liability to fees paid, 30-day warranty, New Delhi jurisdiction, 100% IP transfer on final payment), agree to the payment structure selected above, and authorize the upfront sprint deposit.
                 </span>
               </label>
             </div>

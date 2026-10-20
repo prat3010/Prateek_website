@@ -395,7 +395,7 @@ export function StepCommercials({
             onChange={(e) => onChangeField('agreedToTerms', e.target.checked)}
           />
           <span>
-            <strong>I agree to the Standard Commercial Terms</strong> (50% upfront deposit to initiate development, 50% upon final delivery prior to source code transfer &amp; deployment handoff).
+            <strong>I agree to the Master Services Agreement &amp; Standard Commercial Terms</strong> (50% upfront deposit lock, 30-day warranty, liability capped at fees paid, New Delhi jurisdiction, and 100% IP transfer upon final payment).
           </span>
         </label>
         {agreedToTermsError && !formData.agreedToTerms && (

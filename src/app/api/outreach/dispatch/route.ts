@@ -3,11 +3,10 @@ import { supabase } from '@/data/supabase';
 import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
 import { isAdminEmail } from '@/lib/auth';
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
-const CONTACT_EMAIL_TO = process.env.CONTACT_EMAIL_TO || '3010prateeksharma@gmail.com';
-
 export async function POST(req: NextRequest) {
   try {
+    const apiKey = process.env.RESEND_API_KEY || '';
+    const contactEmailTo = process.env.CONTACT_EMAIL_TO || '3010prateeksharma@gmail.com';
     const userEmail = await getVerifiedSessionEmail(req);
     if (!userEmail) {
       return NextResponse.json({ error: 'Unauthorized: Authentication required' }, { status: 401 });
@@ -63,17 +62,17 @@ export async function POST(req: NextRequest) {
       }
 
       // Dispatch Email via Resend API if key is present
-      if (RESEND_API_KEY) {
+      if (apiKey) {
         try {
           const res = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${RESEND_API_KEY}`,
+              Authorization: `Bearer ${apiKey}`,
             },
             body: JSON.stringify({
-              from: 'Prateek Sharma <onboarding@resend.dev>',
-              to: [lead.email || CONTACT_EMAIL_TO],
+              from: 'Prateek Sharma <notifications@prateeq.in>',
+              to: [lead.email || contactEmailTo],
               subject: `Partnership & Software Architecture for ${lead.company}`,
               text: emailText,
             }),
@@ -106,7 +105,7 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        message: `Approved & dispatched email to ${lead.lead_name || lead.company} (${lead.email || CONTACT_EMAIL_TO})`,
+        message: `Approved & dispatched email to ${lead.lead_name || lead.company} (${lead.email || contactEmailTo})`,
       });
     }
 

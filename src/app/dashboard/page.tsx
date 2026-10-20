@@ -280,6 +280,12 @@ export default function ClientDashboardPage() {
         return;
       }
 
+      if (orderData.convertedFromUSD) {
+        toast.info(
+          `International card processing: billed in INR (₹${(orderData.amount / 100).toLocaleString('en-IN')}) via bank conversion.`
+        );
+      }
+
       const RazorpayClass = window.Razorpay;
       const rzp = new RazorpayClass({
         key: orderData.keyId,
@@ -1186,16 +1192,23 @@ export default function ClientDashboardPage() {
         onClose={() => setSigningScope(null)}
         onConfirmAndPay={async (s, structure) => {
           try {
+            const nowIso = new Date().toISOString();
+            const signerEmail = user.email || '';
             const signedScope: ClientScope = {
               ...s,
               payment_structure: structure,
+              signed_at: nowIso,
+              signed_by_email: signerEmail,
+              signedAt: nowIso,
+              signedByEmail: signerEmail,
               onboarding_checklist: {
                 ...(s.onboarding_checklist || {}),
                 sow_accepted: true,
-                signed_at: new Date().toISOString(),
-                signed_by_email: user.email || '',
+                signed_at: nowIso,
+                signed_by_email: signerEmail,
               },
             };
+            await updateScope(signedScope);
             await handleRazorpayCheckout(signedScope, structure);
           } finally {
             setSigningScope(null);

@@ -876,13 +876,14 @@
       ]
     },
     "termsAndConditions": [
-      "1. Payment Milestone Structure: 50% Upfront Deposit required to initiate development & architecture setup. 50% Final Balance prior to domain mapping & production handover.",
-      "2. Scope Creep & Change Orders: Any feature, page, or integration requested after signing that is not listed in Section 2 will be classified as a 'Change Order' and quoted separately under a Phase 2 add-on contract.",
-      "3. Revision Policy: Includes up to 2 rounds of comprehensive design/layout revisions. Revision requests must be provided in writing within 5 business days of draft delivery.",
-      "4. Client Dependencies: Timeline countdown begins ONLY after receiving all required client assets (text, logo, media, API credentials). Client delays in asset delivery will extend the final delivery date accordingly.",
-      "5. Intellectual Property (IP) Ownership: 100% Intellectual Property and code ownership transfer to Client upon receipt of final payment.",
-      "6. Infrastructure & Third-Party Billing: Hosting (Vercel), Database (Supabase), Domain Registration, and API costs (OpenAI/Resend) are billed directly to client-owned accounts. Developer is not liable for third-party service outages.",
-      "7. Post-Launch Warranty: Includes 30 days of complimentary technical support & bug fixes post-launch. Continued support is available under a Monthly Care Plan."
+      "1. Payment Milestone Structure: 50% Upfront Deposit required to initiate sprint architecture & development. 50% Final Balance due upon completion and prior to production domain cutover and IP handoff.",
+      "2. Scope Creep & Change Orders: Any feature, page, or integration requested after signing not listed in the agreed scope will be classified as a formal Change Order and quoted separately.",
+      "3. Intellectual Property (IP) Transfer: 100% of custom codebase, design tokens, and database schemas transfer irrevocably to the client upon receipt of 100% cleared contract funds.",
+      "4. Third-Party Billing & Upstream Infrastructure: Client maintains direct ownership of hosting (Vercel), database (Supabase), and model APIs (OpenAI, Anthropic, Gemini, Groq). Developer is not liable for upstream cloud/LLM provider outages, rate limits, or platform pricing changes.",
+      "5. AI Quality & Hallucination Disclaimer: Generative AI and vector search outputs are probabilistic by nature. While best-practice hybrid retrieval, prompt guardrails, and validation tests are implemented, Developer does not guarantee zero AI hallucinations or model errors.",
+      "6. Project Dormancy & Abandonment: If client feedback, required assets, or approvals stall for more than 30 consecutive calendar days without written extension, the project is deemed dormant; the upfront deposit is forfeited to compensate allocated engineering bandwidth, and resuming requires a restaging fee.",
+      "7. Limitation of Liability: To the maximum extent permitted by applicable law, Developer's total cumulative liability arising out of or related to this engagement is strictly capped at the total fees actually paid by Client under this specific SOW. Developer is not liable for indirect, incidental, or lost-profit damages.",
+      "8. Governing Law & Jurisdiction: This agreement is governed by the laws of India. Any unresolved dispute is subject to amicable mediation, followed if necessary by binding arbitration or the exclusive territorial jurisdiction of the competent courts in New Delhi, India."
     ]
   },
   "summary": {

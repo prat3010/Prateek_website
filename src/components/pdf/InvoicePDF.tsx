@@ -264,7 +264,16 @@ export function InvoicePDF({ invoice, isNoir = false }: InvoicePDFProps) {
             ) : (
               <Text style={styles.metaValue}>Digital Electronic Delivery (Remote Software Services)</Text>
             )}
-            <Text style={styles.metaValue}>Tax Treatment: {isGst ? (taxBreakup.is_interstate ? 'IGST (Inter-State)' : 'CGST + SGST (Intra-State)') : 'Non-GST / Exempt (International)'}</Text>
+            <Text style={styles.metaValue}>
+              Tax Treatment:{' '}
+              {isGst
+                ? taxBreakup.is_interstate
+                  ? 'IGST (Inter-State)'
+                  : 'CGST + SGST (Intra-State)'
+                : SELLER_CONFIG.lutArn
+                  ? `Export under LUT (${SELLER_CONFIG.lutArn}) · Zero-Rated`
+                  : 'Export of Services (Zero-Rated / Exempt)'}
+            </Text>
           </View>
         </View>
 
@@ -333,6 +342,56 @@ export function InvoicePDF({ invoice, isNoir = false }: InvoicePDFProps) {
             </View>
           </View>
         </View>
+
+        {/* International Remittance Instructions (Rendered only if authentic internationalPayment details are configured) */}
+        {currency !== 'INR' && Boolean(SELLER_CONFIG.internationalPayment?.achAccount) && (
+          <View style={[styles.card, styles.section]}>
+            <Text style={styles.cardTitle}>International Wire &amp; Remittance Instructions</Text>
+            <View style={styles.flexRow}>
+              <View style={styles.colHalf}>
+                {SELLER_CONFIG.internationalPayment?.beneficiary && (
+                  <>
+                    <Text style={styles.metaLabel}>Beneficiary Account Name:</Text>
+                    <Text style={styles.metaValue}>{SELLER_CONFIG.internationalPayment.beneficiary}</Text>
+                  </>
+                )}
+                {SELLER_CONFIG.internationalPayment?.bankName && (
+                  <>
+                    <Text style={styles.metaLabel}>Bank Name &amp; Address:</Text>
+                    <Text style={styles.metaValue}>
+                      {SELLER_CONFIG.internationalPayment.bankName}
+                      {SELLER_CONFIG.internationalPayment.bankAddress ? `, ${SELLER_CONFIG.internationalPayment.bankAddress}` : ''}
+                    </Text>
+                  </>
+                )}
+              </View>
+              <View style={styles.colHalf}>
+                {SELLER_CONFIG.internationalPayment?.achRouting && (
+                  <>
+                    <Text style={styles.metaLabel}>USD ACH Routing Number:</Text>
+                    <Text style={styles.metaValue}>{SELLER_CONFIG.internationalPayment.achRouting}</Text>
+                  </>
+                )}
+                <Text style={styles.metaLabel}>Account Number:</Text>
+                <Text style={styles.metaValue}>{SELLER_CONFIG.internationalPayment?.achAccount}</Text>
+                {SELLER_CONFIG.internationalPayment?.swiftBic && (
+                  <>
+                    <Text style={styles.metaLabel}>SWIFT / BIC Code:</Text>
+                    <Text style={styles.metaValue}>{SELLER_CONFIG.internationalPayment.swiftBic}</Text>
+                  </>
+                )}
+              </View>
+            </View>
+            {SELLER_CONFIG.lutDisclaimer && (
+              <>
+                <Text style={[styles.metaLabel, { marginTop: 4 }]}>Export Tax Compliance Disclaimer:</Text>
+                <Text style={[styles.metaValue, { fontSize: 7.5, color: theme.textSecondary }]}>
+                  {SELLER_CONFIG.lutDisclaimer} {SELLER_CONFIG.lutArn ? `(LUT ARN: ${SELLER_CONFIG.lutArn})` : ''}
+                </Text>
+              </>
+            )}
+          </View>
+        )}
 
         {/* Notes & Terms */}
         {invoice.customer_notes ? (
