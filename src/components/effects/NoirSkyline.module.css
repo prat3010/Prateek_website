@@ -107,17 +107,6 @@
   isolation: isolate;
 }
 
-.mobilePortraitLayer {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  height: 100%;
-  transform-origin: 0% 100%;
-  will-change: transform;
-  contain: layout style paint;
-  isolation: isolate;
-}
 
 /* Searchlights */
 .searchlight {
@@ -327,14 +316,6 @@
   }
 }
 
-/* Panoramic Mobile: Sky spans full viewport, render SVG starfield and suppress letterbox dots */
-.panoramicMobile .desktopStarfield {
-  display: block !important;
-}
-
-.panoramicMobile .mobileStarfield {
-  display: none !important;
-}
 
 .mobileStar {
   position: absolute;

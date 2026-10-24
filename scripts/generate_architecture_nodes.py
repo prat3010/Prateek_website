@@ -1072,7 +1072,7 @@ NODES = {
 - **Path:** `src/components/effects/NoirSkyline.tsx`
 - **Performance Contracts:**
   - `isMobile` (width ≤ 768px or coarse pointer) and `reducedMotion` (OS preference or < 4 cores) are tracked separately.
-  - On portrait mobile, renders a 16:9 full-height panoramic stage with multi-layer differential horizontal scroll parallax.
+  - Mobile preserves scroll parallax while switching `preserveAspectRatio` to `xMidYMax meet` with seamless sky extension (`var(--skyline-sky-bg)`).
   - Precompiled compound SVG paths eliminate runtime main-thread draw calls.
 
 ---
