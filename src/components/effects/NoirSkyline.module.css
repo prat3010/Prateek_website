@@ -46,13 +46,32 @@
   animation-play-state: paused !important;
 }
 
-/* Mobile (portrait): the 1920×1080 scene is letterboxed with `meet` and
-   anchored to the bottom, so the tall viewport is mostly sky. Paint the
-   empty area above the scene with the same sky fill the scene itself uses
-   (light blue in popart, transparent in noir where the page bg shows),
-   so the extension is seamless with the panorama band. */
+/* Mobile: the 1920×1080 scene fills viewport height and pans horizontally.
+   Keep background sky fill for seamless theme parity. */
 .mobileSkyline {
   background: var(--skyline-sky-bg);
+}
+
+.mobileSkyline .layer {
+  left: 0;
+  right: auto;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  contain: layout style;
+  overflow: visible;
+}
+
+.mobilePortraitCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: calc(100vh * (16 / 9));
+  width: calc(100dvh * (16 / 9));
+  transform-origin: 0% 100%;
+  will-change: transform;
 }
 
 .vignette {

@@ -9,13 +9,14 @@ import InteractiveGargoyle from './InteractiveGargoyle';
 import BillboardPigeon from './BillboardPigeon';
 import FirePigeon from './FirePigeon';
 
-const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble , isMobile }: LayerProps) {
+const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble , isMobile, preserveAspectRatio: propAspect }: LayerProps) {
   const wobble = propWobble ?? !reducedMotion;
+  const aspect = propAspect ?? (isMobile ? 'xMidYMax meet' : 'xMidYMax slice');
   const strength = 4.0; // Heavy foreground wobbly brush style
   return (
     <>
       {/* Static Layer */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
+      <svg viewBox="0 0 1920 1080" preserveAspectRatio={aspect} className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
             <defs>
               {/* Downward Light Bulb Gradient */}
               <linearGradient id="downwardLightGrad" x1="0" y1="0" x2="0" y2="1">
@@ -1530,7 +1531,7 @@ const Layer3 = React.memo(function Layer3({ reducedMotion, wobble: propWobble , 
       {/* Dynamic Foreground Actors Layer (Isolated to prevent re-rasterizing static cityscape) */}
       <svg
         viewBox="0 0 1920 1080"
-        preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'}
+        preserveAspectRatio={aspect}
         className={styles.actorLayerSvg}
         style={{ overflow: 'visible' }}
         aria-hidden="true"

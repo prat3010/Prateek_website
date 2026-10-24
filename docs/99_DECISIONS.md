@@ -184,6 +184,14 @@ This document serves as the registry of critical architectural design decisions 
   * **Implementation gotchas (found via mobile-simulator QA)**:
     1. **Reduced-motion decoupling**: `reducedMotion` must NOT include the mobile check — the previous design folded `isMobileDevice` into it, which silently froze everything on phones.
     2. **Preserve-aspect-ratio flip**: the `meet`/`slice` switch must be applied to both SVGs in each layer file (the main scene SVG and the pointer-events-none flicker/neon overlay SVG), or the animated overlay desyncs from the buildings.
+* **2026-10 Addendum (Mobile Panoramic Horizontal Scroll-Panning)**:
+  * **Context**: Letterboxing the 16:9 panorama via `meet` created an artificially tall empty sky and squished the architecture into a ~250px band (~90px buildings) on mobile displays.
+  * **Decision**: Upgraded mobile portrait view to a dynamic full-viewport-height (`100dvh`), 16:9 panoramic stage that pans horizontally from left to right as the visitor scrolls vertically down the page (0% to 100% `scrollYProgress`):
+    * **Geometry**: Inner canvas is styled with `height: 100%; width: calc(100dvh * (16 / 9));`. On a standard 390×844 phone, this yields ~1,500px rendered canvas width and `maxPan = canvasWidth - screenWidth ≈ 1,110px` of horizontal travel room.
+    * **Subtle Parallax Gradient**: Foreground (Layer 3) translates at 100% speed (`0` to `-maxPan`), Midground (Layer 2 & Bridge) at 85%, Far Midground (Layer 1.5) at 77%, Background (Layer 1) at 70%, and Sky (Layer 0) at 40%, generating 3D depth without exposing layer edges.
+    * **Vertical Parallax Decoupling**: Mobile vertical transforms are fixed at `scale: 1.0` and `y: 0` to preserve camera stability. Desktop vertical zoom (up to 1.4x) and mouse springs remain untouched.
+    * **Responsive & Motion Resilience**: Reduced motion freezes the horizontal pan and centers the cityscape with `xMidYMax slice`; mobile landscape (`width > height`) falls back to wide centered slice framing; containment on `.mobileSkyline .layer` is relaxed from `contain: paint` to `contain: layout style` to allow unclipped horizontal projection within the fixed `.container` viewport.
+
 
 ---
 

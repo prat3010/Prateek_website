@@ -72,9 +72,16 @@ function SkylineInner() {
   const layer3X = useTransform(springX, (x) => x * -42);
   const layer3Y = useTransform(springY, (y) => y * -28);
 
-  // Mobile composition (full panorama, sky extended above) is decoupled from
-  // reducedMotion: phones render the whole 1920-wide scene and keep the same
-  // scroll parallax as desktop, while OS reduced-motion still freezes life.
+  // Dimensions tracking for responsive horizontal panning
+  const [dimensions, setDimensions] = useState(() => {
+    if (typeof window === 'undefined') return { width: 0, height: 0 };
+    return { width: window.innerWidth, height: window.innerHeight };
+  });
+
+  // Mobile composition (portrait full-height panoramic pan) is decoupled from
+  // reducedMotion: phones render the whole 1920-wide scene at 100vh height and pan
+  // horizontally across the panorama as the user scrolls, while OS reduced-motion
+  // freezes motion into a static centered frame.
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window === 'undefined') return false;
     return window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
@@ -92,6 +99,22 @@ function SkylineInner() {
     return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   });
 
+  const isPortraitMobile = isMobile && dimensions.height > dimensions.width && !reducedMotion;
+
+  // Canvas width when height fills 100vh: 16:9 aspect ratio (1920 / 1080)
+  const canvasWidth = dimensions.height > 0 ? (dimensions.height * 16) / 9 : 0;
+  const maxPan = Math.max(0, canvasWidth - dimensions.width);
+
+  // Mobile horizontal scroll-pan transforms with subtle multi-layer parallax depth gradient:
+  // Foreground (100%), Midground (85%), Far Midground (77%), Background (70%), Sky (40%)
+  const mobilePanFg = useTransform(scrollYProgress, (p) => -p * maxPan);
+  const mobilePanMid = useTransform(scrollYProgress, (p) => -p * (maxPan * 0.85));
+  const mobilePanMidBg = useTransform(scrollYProgress, (p) => -p * (maxPan * 0.77));
+  const mobilePanBg = useTransform(scrollYProgress, (p) => -p * (maxPan * 0.70));
+  const mobilePanSky = useTransform(scrollYProgress, (p) => -p * (maxPan * 0.40));
+
+  const layerAspect = isPortraitMobile ? 'xMinYMax slice' : 'xMidYMax slice';
+
   // Track mouse coordinates for subtle parallax offset & update device/motion state
   useEffect(() => {
     const cores = navigator.hardwareConcurrency ?? 4;
@@ -103,6 +126,7 @@ function SkylineInner() {
       setIsMobile(isMobileDevice);
       setReducedMotion(mediaQuery.matches || lowEnd);
       setWobble(!mediaQuery.matches);
+      setDimensions({ width: window.innerWidth, height: window.innerHeight });
     };
 
     const mediaListener = (e: MediaQueryListEvent) => {
@@ -110,6 +134,7 @@ function SkylineInner() {
       setIsMobile(isMobileDevice);
       setReducedMotion(e.matches || lowEnd);
       setWobble(!e.matches);
+      setDimensions({ width: window.innerWidth, height: window.innerHeight });
     };
     mediaQuery.addEventListener('change', mediaListener);
     window.addEventListener('resize', checkMotionState);
@@ -152,13 +177,20 @@ function SkylineInner() {
 
 
       {/* ── Layer 0: Sky backdrop, Searchlights, and Rain ── */}
-      <div className={styles.layer}>
-        <Layer0 reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} />
+      <div className={styles.layer} style={{ zIndex: 0 }}>
+        <m.div
+          style={reducedMotion || !isPortraitMobile
+            ? { width: '100%', height: '100%' }
+            : { x: mobilePanSky, width: canvasWidth ? `${canvasWidth}px` : 'calc(100dvh * (16 / 9))', height: '100%', willChange: 'transform' }}
+          className={isPortraitMobile ? styles.mobilePortraitCanvas : undefined}
+        >
+          <Layer0 reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} preserveAspectRatio={layerAspect} />
+        </m.div>
       </div>
 
       {/* ── Layer 1: Background Buildings (Parallax Scale 1.12) ── */}
       <m.div
-        style={reducedMotion
+        style={reducedMotion || isPortraitMobile
           ? { zIndex: 1 }
           : { scale: bgScale, y: bgY, zIndex: 1, willChange: 'transform' }}
         className={styles.layer}
@@ -166,15 +198,18 @@ function SkylineInner() {
         <m.div
           style={reducedMotion
             ? { width: '100%', height: '100%' }
+            : isPortraitMobile
+            ? { x: mobilePanBg, width: canvasWidth ? `${canvasWidth}px` : 'calc(100dvh * (16 / 9))', height: '100%', willChange: 'transform' }
             : { x: layer1X, y: layer1Y, width: '100%', height: '100%' }}
+          className={isPortraitMobile ? styles.mobilePortraitCanvas : undefined}
         >
-          <Layer1 reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} />
+          <Layer1 reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} preserveAspectRatio={layerAspect} />
         </m.div>
       </m.div>
 
       {/* ── Layer 1.5: Far Midground Buildings (Parallax Scale 1.10) ── */}
       <m.div
-        style={reducedMotion
+        style={reducedMotion || isPortraitMobile
           ? { zIndex: 1 }
           : { scale: midBgScale, y: midBgY, zIndex: 1, willChange: 'transform' }}
         className={styles.layer}
@@ -182,15 +217,18 @@ function SkylineInner() {
         <m.div
           style={reducedMotion
             ? { width: '100%', height: '100%' }
+            : isPortraitMobile
+            ? { x: mobilePanMidBg, width: canvasWidth ? `${canvasWidth}px` : 'calc(100dvh * (16 / 9))', height: '100%', willChange: 'transform' }
             : { x: layer1_5X, y: layer1_5Y, width: '100%', height: '100%' }}
+          className={isPortraitMobile ? styles.mobilePortraitCanvas : undefined}
         >
-          <Layer1_5 reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} />
+          <Layer1_5 reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} preserveAspectRatio={layerAspect} />
         </m.div>
       </m.div>
 
       {/* ── Layer 2: Midground Buildings ── */}
       <m.div
-        style={reducedMotion
+        style={reducedMotion || isPortraitMobile
           ? { zIndex: 2 }
           : { scale: midScale, y: midY, zIndex: 2, willChange: 'transform' }}
         className={styles.layer}
@@ -198,15 +236,18 @@ function SkylineInner() {
         <m.div
           style={reducedMotion
             ? { width: '100%', height: '100%' }
+            : isPortraitMobile
+            ? { x: mobilePanMid, width: canvasWidth ? `${canvasWidth}px` : 'calc(100dvh * (16 / 9))', height: '100%', willChange: 'transform' }
             : { x: layer2X, y: layer2Y, width: '100%', height: '100%' }}
+          className={isPortraitMobile ? styles.mobilePortraitCanvas : undefined}
         >
-          <Layer2 reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} />
+          <Layer2 reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} preserveAspectRatio={layerAspect} />
         </m.div>
       </m.div>
 
       {/* ── Layer 2.5: Bridge Structure (Parallax Scale bridgeScale) ── */}
       <m.div
-        style={reducedMotion
+        style={reducedMotion || isPortraitMobile
           ? { zIndex: 2 }
           : { scale: bridgeScale, y: bridgeY, zIndex: 2, willChange: 'transform' }}
         className={styles.layer}
@@ -214,15 +255,18 @@ function SkylineInner() {
         <m.div
           style={reducedMotion
             ? { width: '100%', height: '100%' }
+            : isPortraitMobile
+            ? { x: mobilePanMid, width: canvasWidth ? `${canvasWidth}px` : 'calc(100dvh * (16 / 9))', height: '100%', willChange: 'transform' }
             : { x: bridgeLayerX, y: bridgeLayerY, width: '100%', height: '100%' }}
+          className={isPortraitMobile ? styles.mobilePortraitCanvas : undefined}
         >
-          <BridgeLayer reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} />
+          <BridgeLayer reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} preserveAspectRatio={layerAspect} />
         </m.div>
       </m.div>
 
       {/* ── Layer 3: Foreground Rooftops (Parallax Scale 1.8, Masks midground, high opacity) ── */}
       <m.div
-        style={reducedMotion
+        style={reducedMotion || isPortraitMobile
           ? { zIndex: 3 }
           : { scale: fgScale, y: fgY, zIndex: 3, willChange: 'transform' }}
         className={styles.layer}
@@ -230,9 +274,12 @@ function SkylineInner() {
         <m.div
           style={reducedMotion
             ? { width: '100%', height: '100%' }
+            : isPortraitMobile
+            ? { x: mobilePanFg, width: canvasWidth ? `${canvasWidth}px` : 'calc(100dvh * (16 / 9))', height: '100%', willChange: 'transform' }
             : { x: layer3X, y: layer3Y, width: '100%', height: '100%' }}
+          className={isPortraitMobile ? styles.mobilePortraitCanvas : undefined}
         >
-          <Layer3 reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} />
+          <Layer3 reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} preserveAspectRatio={layerAspect} />
         </m.div>
       </m.div>
 

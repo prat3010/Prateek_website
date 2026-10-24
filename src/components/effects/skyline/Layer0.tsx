@@ -51,8 +51,9 @@ const MOBILE_STARS: MobileStar[] = [
   { top: '68.0%', left: '55%', size: 1.4, type: 1 },
 ];
 
-const Layer0 = React.memo(function Layer0({ reducedMotion, wobble: propWobble, isMobile }: LayerProps) {
+const Layer0 = React.memo(function Layer0({ reducedMotion, wobble: propWobble, isMobile, preserveAspectRatio: propAspect }: LayerProps) {
   const wobble = propWobble ?? !reducedMotion;
+  const aspect = propAspect ?? (isMobile ? 'xMidYMax meet' : 'xMidYMax slice');
   const strength = 1.0;
   // Generate 24 conic rays radiating from the center of the horizon (960, 450)
   const raysCount = 24;
@@ -73,7 +74,7 @@ const Layer0 = React.memo(function Layer0({ reducedMotion, wobble: propWobble, i
     <>
 
       {/* Static backdrop SVG */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
+      <svg viewBox="0 0 1920 1080" preserveAspectRatio={aspect} className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
         <defs>
           {/* Left Searchlight Gradient */}
           <linearGradient id="leftLightGrad" x1="0" y1="1" x2="0" y2="0">
@@ -176,7 +177,7 @@ const Layer0 = React.memo(function Layer0({ reducedMotion, wobble: propWobble, i
       {/* Dynamic / Animating Sky Overlay SVG */}
       <svg
         viewBox="0 0 1920 1080"
-        preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'}
+        preserveAspectRatio={aspect}
         className={styles.actorLayerSvg}
         style={{ overflow: 'visible' }}
         aria-hidden="true"
