@@ -323,6 +323,8 @@ export interface SaveScopePayload {
   hostingOwnership?: string;
   taxInvoicingPreference?: string;
   inspirationLinks?: string;
+  chatSessionId?: string;
+  chatTranscript?: Array<{ role: string; content: string; timestamp?: string }>;
 }
 
 export const saveScopeSchema = {
@@ -355,6 +357,12 @@ export const saveScopeSchema = {
       selectedFeatures = obj.selectedFeatures.filter((f): f is string => typeof f === 'string');
     }
 
+    const chatTranscript = Array.isArray(obj.chatTranscript)
+      ? obj.chatTranscript.filter((item): item is { role: string; content: string; timestamp?: string } =>
+          item !== null && typeof item === 'object' && typeof (item as Record<string, unknown>).role === 'string' && typeof (item as Record<string, unknown>).content === 'string'
+        )
+      : undefined;
+
     if (issues.length > 0) {
       return { success: false, error: { message: issues.map((i) => `${i.field}: ${i.message}`).join(', '), issues } };
     }
@@ -385,6 +393,8 @@ export const saveScopeSchema = {
         hostingOwnership: typeof obj.hostingOwnership === 'string' ? obj.hostingOwnership : undefined,
         taxInvoicingPreference: typeof obj.taxInvoicingPreference === 'string' ? obj.taxInvoicingPreference : undefined,
         inspirationLinks: typeof obj.inspirationLinks === 'string' ? obj.inspirationLinks : undefined,
+        chatSessionId: typeof obj.chatSessionId === 'string' ? obj.chatSessionId.trim() : undefined,
+        chatTranscript,
       },
     };
   },
@@ -410,6 +420,8 @@ export interface IntakeDraftPayload {
   timeline?: string;
   inspirationLinks?: string;
   additionalNotes?: string;
+  chatSessionId?: string;
+  chatTranscript?: Array<{ role: string; content: string; timestamp?: string }>;
 }
 
 export const intakeDraftSchema = {
@@ -426,6 +438,11 @@ export const intakeDraftSchema = {
     const selectedFeatures = Array.isArray(obj.selectedFeatures)
       ? obj.selectedFeatures.filter((f): f is string => typeof f === 'string')
       : [];
+    const chatTranscript = Array.isArray(obj.chatTranscript)
+      ? obj.chatTranscript.filter((item): item is { role: string; content: string; timestamp?: string } =>
+          item !== null && typeof item === 'object' && typeof (item as Record<string, unknown>).role === 'string' && typeof (item as Record<string, unknown>).content === 'string'
+        )
+      : undefined;
 
     return {
       success: true,
@@ -449,6 +466,8 @@ export const intakeDraftSchema = {
         timeline: typeof obj.timeline === 'string' ? obj.timeline.trim() : undefined,
         inspirationLinks: typeof obj.inspirationLinks === 'string' ? obj.inspirationLinks.trim() : undefined,
         additionalNotes: typeof obj.additionalNotes === 'string' ? obj.additionalNotes.trim() : undefined,
+        chatSessionId: typeof obj.chatSessionId === 'string' ? obj.chatSessionId.trim() : undefined,
+        chatTranscript,
       },
     };
   },

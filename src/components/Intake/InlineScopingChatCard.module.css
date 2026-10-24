@@ -1,0 +1,404 @@
+.chatCardContainer {
+  margin-bottom: 2rem;
+  background: var(--surface-glass-bg, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.08));
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: var(--shadow-glass, 0 8px 32px 0 rgba(0, 0, 0, 0.2));
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.chatCardContainer:focus-within {
+  border-color: var(--border-accent, #3b82f6);
+  box-shadow: var(--shadow-glass-lg, 0 12px 40px 0 rgba(0, 0, 0, 0.28));
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.875rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--badge-active-bg, rgba(59, 130, 246, 0.15));
+  border: 1px solid var(--badge-active-border, rgba(59, 130, 246, 0.3));
+  color: var(--badge-active-text, #60a5fa);
+  font-family: var(--font-code, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 9999px;
+}
+
+.modelBadge {
+  font-size: 0.72rem;
+  color: var(--color-text-muted, #94a3b8);
+  font-family: var(--font-code, monospace);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.subHeading {
+  font-size: 0.85rem;
+  color: var(--color-text-muted, #94a3b8);
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+/* Prompt Pills */
+.pillGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 1.2rem;
+}
+
+.pillBtn {
+  background: var(--surface-card, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.1));
+  color: var(--color-text, #f1f5f9);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.pillBtn:hover:not(:disabled) {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.pillBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Conversation Area */
+.messagesViewport {
+  background: var(--surface-card, rgba(0, 0, 0, 0.25));
+  border: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.06));
+  border-radius: 12px;
+  padding: 1rem;
+  max-height: 380px;
+  min-height: 160px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 1rem;
+  scroll-behavior: smooth;
+}
+
+.welcomeIntro {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px dashed rgba(59, 130, 246, 0.3);
+  border-radius: 10px;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--color-text, #e2e8f0);
+}
+
+.chatBubbleUser {
+  align-self: flex-end;
+  background: var(--color-primary, #2563eb);
+  color: #ffffff;
+  border-radius: 14px 14px 2px 14px;
+  padding: 10px 14px;
+  max-width: 82%;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.chatBubbleAssistant {
+  align-self: flex-start;
+  background: var(--surface-elevated, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.1));
+  color: var(--color-text, #e2e8f0);
+  border-radius: 14px 14px 14px 2px;
+  padding: 12px 16px;
+  max-width: 90%;
+  font-size: 0.84rem;
+  line-height: 1.6;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.bubbleHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.75;
+}
+
+.bubbleBody {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.bubbleBody p {
+  margin: 0 0 0.5rem 0;
+}
+
+.bubbleBody p:last-child {
+  margin-bottom: 0;
+}
+
+.typingIndicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+}
+
+.typingDot {
+  width: 5px;
+  height: 5px;
+  background: var(--color-text-muted, #94a3b8);
+  border-radius: 50%;
+  animation: typingBounce 1.2s infinite ease-in-out;
+}
+
+.typingDot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typingDot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typingBounce {
+  0%, 80%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  40% {
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+}
+
+/* Blueprint Action Card Box */
+.blueprintBox {
+  margin-top: 12px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(0, 230, 118, 0.35);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.blueprintHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.blueprintTitle {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #00E676;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.blueprintBadges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.blueprintBadge {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text-muted, #94a3b8);
+}
+
+.blueprintPrice {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--color-text, #ffffff);
+  font-family: var(--font-code, monospace);
+}
+
+.blueprintActionRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.applyBlueprintBtn {
+  background: #00E676;
+  color: #000000;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.applyBlueprintBtn:hover {
+  background: #00c864;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 230, 118, 0.3);
+}
+
+.appliedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #00E676;
+  background: rgba(0, 230, 118, 0.15);
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+
+.inspectScopeBtn {
+  background: transparent;
+  color: var(--color-text-muted, #94a3b8);
+  border: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.15));
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+.inspectScopeBtn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text, #ffffff);
+}
+
+/* Chat Input Bar */
+.inputForm {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.inputWrapper {
+  flex: 1;
+  position: relative;
+}
+
+.textInput {
+  width: 100%;
+  background: var(--surface-card, rgba(0, 0, 0, 0.3));
+  border: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.12));
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  color: var(--color-text, #ffffff);
+  resize: none;
+  min-height: 44px;
+  max-height: 120px;
+  font-family: inherit;
+  line-height: 1.4;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.textInput:focus {
+  border-color: var(--color-primary, #3b82f6);
+}
+
+.textInput::placeholder {
+  color: var(--color-text-muted, #64748b);
+}
+
+.sendBtn {
+  background: var(--color-primary, #2563eb);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.sendBtn:hover:not(:disabled) {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.sendBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.resetChatBtn {
+  background: transparent;
+  border: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.1));
+  color: var(--color-text-muted, #94a3b8);
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  transition: all 0.15s ease;
+}
+
+.resetChatBtn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text, #ffffff);
+}

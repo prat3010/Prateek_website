@@ -20,8 +20,35 @@ import {
   X,
   Lock,
   Zap,
+  MessageSquare,
+  Bot,
+  Clock,
 } from 'lucide-react';
+import Portal from '@/components/ui/Portal';
 import styles from './admin.module.css';
+
+export interface IntakeLeadRecord {
+  id: string;
+  draft_token: string;
+  scope_code: string;
+  company_name: string;
+  contact_email: string;
+  contact_phone?: string;
+  project_goal?: string;
+  target_audience?: string;
+  base_engine_id: string;
+  base_engine_title: string;
+  selected_features?: string[];
+  brand_asset_option?: string;
+  maintenance_plan?: string;
+  total_cost_inr: number;
+  total_cost_usd: number;
+  timeline?: string;
+  status: string;
+  chat_session_id?: string;
+  chat_transcript?: Array<{ role: string; content: string; timestamp?: string }>;
+  created_at: string;
+}
 
 interface Lead {
   id: string;
@@ -139,7 +166,7 @@ export interface SubscriberRecord {
 
 export default function AdminControlCenter() {
   const { user, loading: authLoading, loginWithGoogle, logout, getAccessToken } = useAuth();
-  const [activeTab, setActiveTab] = useState<'prospects' | 'clients' | 'subscribers'>('prospects');
+  const [activeTab, setActiveTab] = useState<'prospects' | 'clients' | 'subscribers' | 'leads'>('prospects');
   
   // Leads state
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -147,6 +174,29 @@ export default function AdminControlCenter() {
   const [editingPitchId, setEditingPitchId] = useState<string | null>(null);
   const [editedPitchText, setEditedPitchText] = useState('');
   const [actionMessage, setActionMessage] = useState<{ text: string; isError?: boolean } | null>(null);
+
+  // Scoping Intake Leads & Chats state
+  const [intakeLeads, setIntakeLeads] = useState<IntakeLeadRecord[]>([]);
+  const [loadingIntakeLeads, setLoadingIntakeLeads] = useState(false);
+  const [selectedLeadForDrawer, setSelectedLeadForDrawer] = useState<IntakeLeadRecord | null>(null);
+
+  const fetchIntakeLeads = async () => {
+    setLoadingIntakeLeads(true);
+    try {
+      const token = await getAccessToken();
+      const res = await fetch('/api/admin/intake-leads', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setIntakeLeads(data.leads || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch intake leads:', err);
+    } finally {
+      setLoadingIntakeLeads(false);
+    }
+  };
 
   // Clients state
   const [clients, setClients] = useState<ClientRecord[]>([]);
@@ -312,11 +362,17 @@ export default function AdminControlCenter() {
             headers: token ? { Authorization: `Bearer ${token}` } : {},
           }).then(r => r.ok ? r.json() : { subscribers: [] })
         ),
-      ]).then(([leadsData, clientsData, subsData]) => {
+        getAccessToken().then(token =>
+          fetch('/api/admin/intake-leads', {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          }).then(r => r.ok ? r.json() : { leads: [] })
+        ),
+      ]).then(([leadsData, clientsData, subsData, intakeData]) => {
         if (isMounted) {
           setLeads(leadsData.leads || []);
           setClients(clientsData.scopes || []);
           setSubscribers(subsData.subscribers || []);
+          setIntakeLeads(intakeData.leads || []);
         }
       }).catch(err => {
         console.error('Failed to load admin data:', err);
@@ -331,6 +387,17 @@ export default function AdminControlCenter() {
       return () => clearTimeout(timer);
     }
   }, [actionMessage]);
+
+  useEffect(() => {
+    if (!selectedLeadForDrawer) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedLeadForDrawer(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedLeadForDrawer]);
 
   const handleGenerateProspects = async () => {
     setLoadingLeads(true);
@@ -525,6 +592,20 @@ export default function AdminControlCenter() {
             )}
             <Zap size={16} style={{ position: 'relative', zIndex: 1 }} />
             <span style={{ position: 'relative', zIndex: 1 }}>⚡ Retriever Subscribers ({subscribers.length})</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('leads')}
+            className={`${styles.tabBtn} ${activeTab === 'leads' ? styles.tabActive : ''}`}
+          >
+            {activeTab === 'leads' && (
+              <m.span
+                layoutId="adminTabPill"
+                className={styles.tabPill}
+                transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+              />
+            )}
+            <MessageSquare size={16} style={{ position: 'relative', zIndex: 1 }} />
+            <span style={{ position: 'relative', zIndex: 1 }}>💬 Scoping Leads &amp; Chats ({intakeLeads.length})</span>
           </button>
         </div>
 
@@ -1285,6 +1366,214 @@ export default function AdminControlCenter() {
               </div>
             )}
           </div>
+        )}
+
+        {/* Tab 4: Scoping Leads & Copilot Chats */}
+        {activeTab === 'leads' && (
+          <div>
+            <div className={styles.actionsBar}>
+              <button
+                onClick={fetchIntakeLeads}
+                disabled={loadingIntakeLeads}
+                className={styles.secondaryBtn}
+              >
+                <RefreshCw size={16} />
+                <span>{loadingIntakeLeads ? 'Refreshing...' : 'Refresh Leads & Chats'}</span>
+              </button>
+            </div>
+
+            {intakeLeads.length === 0 ? (
+              <div className={styles.emptyState}>
+                <MessageSquare size={48} className={styles.emptyIcon} />
+                <h3 className={styles.emptyTitle}>No Scoping Leads Captured Yet</h3>
+                <p className={styles.emptySubtitle}>
+                  Drafts, estimates, and AI copilot conversations started by prospective clients in /scoping will automatically appear here.
+                </p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {intakeLeads.map((lead) => {
+                  const hasTranscript = Array.isArray(lead.chat_transcript) && lead.chat_transcript.length > 0;
+                  const isSubmitted = lead.status === 'submitted' || lead.status === 'confirmed';
+
+                  return (
+                    <div
+                      key={lead.id || lead.scope_code}
+                      className={styles.clientCard}
+                      style={{ borderLeft: `4px solid ${isSubmitted ? '#00E676' : '#38bdf8'}` }}
+                    >
+                      <div className={styles.cardHeader}>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                            <span style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--color-text)' }}>
+                              🏢 {lead.company_name || 'Anonymous Prospect'}
+                            </span>
+                            <span
+                              style={{
+                                padding: '2px 8px',
+                                borderRadius: '4px',
+                                fontSize: '0.72rem',
+                                fontWeight: 700,
+                                textTransform: 'uppercase',
+                                background: isSubmitted ? 'rgba(0, 230, 118, 0.15)' : 'rgba(56, 189, 248, 0.15)',
+                                color: isSubmitted ? '#00E676' : '#38bdf8',
+                                border: `1px solid ${isSubmitted ? 'rgba(0, 230, 118, 0.3)' : 'rgba(56, 189, 248, 0.3)'}`,
+                              }}
+                            >
+                              {lead.status}
+                            </span>
+                            <span
+                              style={{
+                                fontFamily: 'monospace',
+                                fontSize: '0.75rem',
+                                color: 'var(--color-text-muted)',
+                              }}
+                            >
+                              Code: {lead.scope_code}
+                            </span>
+                          </div>
+                          <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+                            Email: <strong style={{ color: 'var(--color-text)' }}>{lead.contact_email}</strong>
+                            {lead.contact_phone && <span> • Phone: {lead.contact_phone}</span>}
+                            <span> • Captured: {lead.created_at ? new Date(lead.created_at).toLocaleString() : 'Unknown'}</span>
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          {hasTranscript ? (
+                            <button
+                              onClick={() => setSelectedLeadForDrawer(lead)}
+                              className={styles.leadChatBadge}
+                            >
+                              <Bot size={13} />
+                              <span>💬 View Copilot Chat ({lead.chat_transcript?.length} msgs)</span>
+                            </button>
+                          ) : lead.chat_session_id ? (
+                            <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
+                              Session: {lead.chat_session_id.slice(0, 8)}...
+                            </span>
+                          ) : (
+                            <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', opacity: 0.7 }}>
+                              No Chat History
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem', marginTop: '0.75rem', fontSize: '0.82rem' }}>
+                        <div style={{ background: 'var(--surface-elevated)', padding: '0.5rem 0.75rem', borderRadius: '6px' }}>
+                          <span style={{ color: 'var(--color-text-muted)', display: 'block', fontSize: '0.72rem' }}>BASE ARCHITECTURE</span>
+                          <strong>{lead.base_engine_title || lead.base_engine_id}</strong>
+                        </div>
+                        <div style={{ background: 'var(--surface-elevated)', padding: '0.5rem 0.75rem', borderRadius: '6px' }}>
+                          <span style={{ color: 'var(--color-text-muted)', display: 'block', fontSize: '0.72rem' }}>ESTIMATED TOTAL</span>
+                          <strong>₹{Number(lead.total_cost_inr || 0).toLocaleString()} / ${Number(lead.total_cost_usd || 0).toLocaleString()}</strong>
+                        </div>
+                        <div style={{ background: 'var(--surface-elevated)', padding: '0.5rem 0.75rem', borderRadius: '6px' }}>
+                          <span style={{ color: 'var(--color-text-muted)', display: 'block', fontSize: '0.72rem' }}>ACTIVE FEATURES</span>
+                          <span>{(lead.selected_features || []).length} module(s) selected</span>
+                        </div>
+                        <div style={{ background: 'var(--surface-elevated)', padding: '0.5rem 0.75rem', borderRadius: '6px' }}>
+                          <span style={{ color: 'var(--color-text-muted)', display: 'block', fontSize: '0.72rem' }}>TIMELINE &amp; CARE</span>
+                          <span>{lead.timeline || 'Standard'} • {lead.maintenance_plan || 'No Care'}</span>
+                        </div>
+                      </div>
+
+                      {lead.project_goal && (
+                        <div style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: 'var(--color-text-muted)', background: 'rgba(0,0,0,0.1)', padding: '0.4rem 0.6rem', borderRadius: '4px' }}>
+                          <strong>Project Goal:</strong> {lead.project_goal}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Lead Chat Transcript Drawer Modal */}
+        {selectedLeadForDrawer && (
+          <Portal>
+            <div
+              className={styles.drawerOverlay}
+              onClick={() => setSelectedLeadForDrawer(null)}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="drawer-title"
+            >
+              <div
+                className={styles.drawerContainer}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className={styles.drawerHeader}>
+                  <div>
+                    <h3 id="drawer-title" className={styles.drawerTitle}>
+                      <Bot size={18} />
+                      <span>Copilot Scoping Session Transcript</span>
+                    </h3>
+                    <p className={styles.drawerSubtitle}>
+                      {selectedLeadForDrawer.company_name || 'Anonymous'} • {selectedLeadForDrawer.contact_email} • Code: {selectedLeadForDrawer.scope_code}
+                    </p>
+                  </div>
+                  <button
+                    className={styles.drawerCloseBtn}
+                    onClick={() => setSelectedLeadForDrawer(null)}
+                    aria-label="Close chat transcript"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+
+                <div className={styles.drawerBody}>
+                  {/* Lead Summary Bar */}
+                  <div className={styles.leadDetailsSummary}>
+                    <div className={styles.leadDetailItem}>
+                      <span className={styles.leadDetailLabel}>ENGINE</span>
+                      <span className={styles.leadDetailVal}>{selectedLeadForDrawer.base_engine_title || selectedLeadForDrawer.base_engine_id}</span>
+                    </div>
+                    <div className={styles.leadDetailItem}>
+                      <span className={styles.leadDetailLabel}>ESTIMATE</span>
+                      <span className={styles.leadDetailVal}>₹{Number(selectedLeadForDrawer.total_cost_inr || 0).toLocaleString()} / ${Number(selectedLeadForDrawer.total_cost_usd || 0).toLocaleString()}</span>
+                    </div>
+                    <div className={styles.leadDetailItem}>
+                      <span className={styles.leadDetailLabel}>MODULES</span>
+                      <span className={styles.leadDetailVal}>{(selectedLeadForDrawer.selected_features || []).length} active</span>
+                    </div>
+                    <div className={styles.leadDetailItem}>
+                      <span className={styles.leadDetailLabel}>TIMELINE</span>
+                      <span className={styles.leadDetailVal}>{selectedLeadForDrawer.timeline || '4-6 weeks'}</span>
+                    </div>
+                  </div>
+
+                  {/* Chat Messages */}
+                  {(!selectedLeadForDrawer.chat_transcript || selectedLeadForDrawer.chat_transcript.length === 0) ? (
+                    <div className={styles.emptyState}>
+                      <p>No chat messages recorded for this lead session.</p>
+                    </div>
+                  ) : (
+                    selectedLeadForDrawer.chat_transcript.map((msg, idx) => {
+                      const isUser = msg.role === 'user';
+                      return (
+                        <div key={idx} className={isUser ? styles.chatBubbleUser : styles.chatBubbleAssistant}>
+                          <div className={styles.chatMetaRow}>
+                            <span>{isUser ? '👤 Prospect' : '🤖 Scoping Copilot (Retriever)'}</span>
+                            {msg.timestamp && (
+                              <span>
+                                <Clock size={10} style={{ display: 'inline', marginRight: 3 }} />
+                                {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            )}
+                          </div>
+                          <div className={styles.chatBubbleText}>{msg.content}</div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            </div>
+          </Portal>
         )}
       </div>
     </div>

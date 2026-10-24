@@ -637,10 +637,14 @@ CREATE TABLE IF NOT EXISTS intake_leads (
   additional_notes TEXT,
   status TEXT DEFAULT 'new' NOT NULL,
   ip_hash TEXT,
-  notes_internal TEXT DEFAULT ''
+  notes_internal TEXT DEFAULT '',
+  chat_session_id TEXT,
+  chat_transcript JSONB DEFAULT '[]'::jsonb
 );
 
 ALTER TABLE intake_leads ADD COLUMN IF NOT EXISTS ip_hash TEXT;
+ALTER TABLE intake_leads ADD COLUMN IF NOT EXISTS chat_session_id TEXT;
+ALTER TABLE intake_leads ADD COLUMN IF NOT EXISTS chat_transcript JSONB DEFAULT '[]'::jsonb;
 ALTER TABLE intake_leads ENABLE ROW LEVEL SECURITY;
 -- Direct public reads/writes are disabled; all interactions go through service-role API routes.
 

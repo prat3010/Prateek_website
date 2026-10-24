@@ -165,8 +165,15 @@ export async function POST(req: Request) {
       signed_by_email: payload.signedByEmail || undefined,
       onboarding_checklist: onboardingChecklistMerged,
       sow_hash: payload.sowHash || undefined,
-      retriever_tenant_id: payload.retrieverTenantId || undefined,
-      metadata: payload.metadata || {},
+      metadata: {
+        ...(payload.metadata || {}),
+        ...((payload.chatSessionId || typeof rawObj.chatSessionId === 'string')
+          ? { chatSessionId: payload.chatSessionId || rawObj.chatSessionId }
+          : {}),
+        ...((payload.chatTranscript || Array.isArray(rawObj.chatTranscript))
+          ? { chatTranscript: payload.chatTranscript || rawObj.chatTranscript }
+          : {}),
+      },
       updated_at: new Date().toISOString(),
     };
 

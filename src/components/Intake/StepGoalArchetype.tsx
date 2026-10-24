@@ -27,6 +27,7 @@ import { formatPricePair, packageTotalForArchetype, type Currency } from '@/lib/
 import NumberFlow from '@number-flow/react';
 import type { ParseIntentResponse } from '@/lib/rag-client';
 import { AiScopingPromptBar } from './AiScopingPromptBar';
+import { InlineScopingChatCard } from './InlineScopingChatCard';
 import { GOAL_CATEGORIES } from './useIntakeFormState';
 import TiltCard from '@/components/ui/TiltCard';
 import styles from './IntakeForm.module.css';
@@ -115,6 +116,12 @@ interface StepGoalArchetypeProps {
   onNavigateStep?: (step: number) => void;
   isNoir?: boolean;
   stepHeadingRef?: React.RefObject<HTMLDivElement | null>;
+  chatSessionId?: string | null;
+  setChatSessionId?: (id: string) => void;
+  chatTranscript?: Array<{ role: string; content: string; timestamp?: string }>;
+  setChatTranscript?: React.Dispatch<
+    React.SetStateAction<Array<{ role: string; content: string; timestamp?: string }>>
+  >;
 }
 
 export function StepGoalArchetype({
@@ -134,6 +141,10 @@ export function StepGoalArchetype({
   onNavigateStep,
   isNoir = false,
   stepHeadingRef,
+  chatSessionId,
+  setChatSessionId,
+  chatTranscript,
+  setChatTranscript,
 }: StepGoalArchetypeProps) {
   const archetypeCardRefs = React.useRef<(HTMLDivElement | null)[]>([]);
   const categoryTabRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
@@ -171,6 +182,18 @@ export function StepGoalArchetype({
           ← Change service type
         </button>
       </div>
+
+      {/* Conversational Scoping Copilot Card (Retriever-Native) */}
+      <InlineScopingChatCard
+        currency={currency}
+        isNoir={isNoir}
+        onApplyBlueprint={onApplyBlueprint || (() => {})}
+        onNavigateStep={onNavigateStep}
+        chatSessionId={chatSessionId || null}
+        setChatSessionId={setChatSessionId || (() => {})}
+        chatTranscript={chatTranscript || []}
+        setChatTranscript={setChatTranscript || (() => {})}
+      />
 
       {/* Multimodal AI Intent Discovery Copilot & 1-Line Scoping Bar */}
       <AiScopingPromptBar

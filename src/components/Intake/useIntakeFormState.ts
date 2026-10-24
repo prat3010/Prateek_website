@@ -202,6 +202,10 @@ export function useIntakeFormState(
   const [appliedPromo, setAppliedPromo] = useState<PromoDiscountInfo | null>(null);
   const [cascadeState, setCascadeState] = useState<{ targetFeature: FeatureItem; dependentFeatures: FeatureItem[] } | null>(null);
   const [sessionSeed] = useState(() => Math.random().toString(36).slice(2, 8));
+  const [chatSessionId, setChatSessionId] = useState<string | null>(null);
+  const [chatTranscript, setChatTranscript] = useState<
+    Array<{ role: string; content: string; timestamp?: string }>
+  >([]);
   const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -663,6 +667,7 @@ export function useIntakeFormState(
       contactPhone: formData.contactPhone || '',
       projectGoal: formData.projectGoal,
       businessKPI: formData.businessKPI,
+      baseEngineId: selectedEngine.id,
       projectStartType: formData.projectStartType === 'legacy_rebuild' ? 'Legacy Refactor' : 'Greenfield',
       designReadiness: formData.designReadiness,
       hostingOwnership: formData.hostingOwnership,
@@ -678,6 +683,8 @@ export function useIntakeFormState(
       totalCostUSD: totalCost.totalUSD,
       currency,
       timeline: formData.timeline,
+      chatSessionId: chatSessionId || undefined,
+      chatTranscript: chatTranscript.length > 0 ? chatTranscript : undefined,
       metadata: {
         promoCode: appliedPromo,
         promoDiscountAmountINR: totalCost.promoDiscountAmountINR,
@@ -685,9 +692,11 @@ export function useIntakeFormState(
         bundleDiscountPercent: totalCost.bundleDiscountPercent,
         bundleDiscountAmountINR: totalCost.bundleDiscountAmountINR,
         bundleDiscountAmountUSD: totalCost.bundleDiscountAmountUSD,
+        chatSessionId: chatSessionId || undefined,
+        chatTranscript: chatTranscript.length > 0 ? chatTranscript : undefined,
       },
     };
-  }, [formData, user, generatedScopeCode, selectedEngine, features, totalCost, activeMaintenancePlan, currency, appliedPromo]);
+  }, [formData, user, generatedScopeCode, selectedEngine, features, totalCost, activeMaintenancePlan, currency, appliedPromo, chatSessionId, chatTranscript]);
 
   const getDashboardRedirectUrl = useCallback((payload: {
     scopeCode: string;
@@ -1084,5 +1093,9 @@ export function useIntakeFormState(
     handleQuickFastPass,
     cancelAutoRedirect,
     handleProceedToDashboard,
+    chatSessionId,
+    setChatSessionId,
+    chatTranscript,
+    setChatTranscript,
   };
 }

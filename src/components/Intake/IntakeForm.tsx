@@ -129,6 +129,10 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     handleFastPass,
     handleQuickFastPass,
     handleProceedToDashboard,
+    chatSessionId,
+    setChatSessionId,
+    chatTranscript,
+    setChatTranscript,
   } = state;
 
   useEffect(() => {
@@ -440,6 +444,10 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                     onNavigateStep={setCurrentStep}
                     isNoir={isNoir}
                     stepHeadingRef={stepHeadingRef}
+                    chatSessionId={chatSessionId}
+                    setChatSessionId={setChatSessionId}
+                    chatTranscript={chatTranscript}
+                    setChatTranscript={setChatTranscript}
                   />
                 )}
 

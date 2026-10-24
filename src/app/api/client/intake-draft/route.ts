@@ -77,6 +77,8 @@ export async function POST(req: Request) {
       timeline: payload.timeline || 'Standard',
       inspiration_links: payload.inspirationLinks || '',
       additional_notes: payload.additionalNotes || '',
+      chat_session_id: payload.chatSessionId || (typeof rawObj.chatSessionId === 'string' ? rawObj.chatSessionId.trim() : null),
+      chat_transcript: payload.chatTranscript || (Array.isArray(rawObj.chatTranscript) ? rawObj.chatTranscript : []),
       status: 'new',
       created_at: new Date().toISOString(),
     };

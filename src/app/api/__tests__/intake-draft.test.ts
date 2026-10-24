@@ -117,4 +117,36 @@ describe('POST /api/client/intake-draft', () => {
     expect(json.error).toBe('Too many draft submissions. Please try again later.');
     expect(mocks.insertFn).not.toHaveBeenCalled();
   });
+
+  it('persists chatSessionId and chatTranscript to intake_leads when provided', async () => {
+    const payload = {
+      companyName: 'AI Startup Inc',
+      contactEmail: 'founder@aistartup.inc',
+      baseEngineId: 'saas',
+      baseEngineTitle: 'Full-Stack SaaS Engine',
+      totalCostINR: 375000,
+      totalCostUSD: 5050,
+      chatSessionId: 'retriever-sess-999',
+      chatTranscript: [
+        { role: 'user', content: 'What stack do I need for AI MVP?', timestamp: '2026-10-24T10:00:00.000Z' },
+        { role: 'assistant', content: 'You need SaaS engine with RAG and payments.', timestamp: '2026-10-24T10:00:05.000Z' },
+      ],
+    };
+
+    const req = new Request('http://localhost/api/client/intake-draft', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+
+    expect(mocks.insertFn).toHaveBeenCalled();
+    const inserted = mocks.insertFn.mock.calls[0][0];
+    expect(inserted.chat_session_id).toBe('retriever-sess-999');
+    expect(inserted.chat_transcript).toHaveLength(2);
+    expect(inserted.chat_transcript[0].content).toBe('What stack do I need for AI MVP?');
+    expect(inserted.base_engine_id).toBe('saas');
+  });
 });
