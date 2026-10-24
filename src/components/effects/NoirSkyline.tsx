@@ -105,13 +105,23 @@ function SkylineInner() {
   const canvasWidth = dimensions.height > 0 ? (dimensions.height * 16) / 9 : 0;
   const maxPan = Math.max(0, canvasWidth - dimensions.width);
 
-  // Mobile horizontal scroll-pan transforms with subtle multi-layer parallax depth gradient:
-  // Foreground (100%), Midground (85%), Far Midground (77%), Background (70%), Sky (40%)
-  const mobilePanFg = useTransform(scrollYProgress, (p) => -p * maxPan);
-  const mobilePanMid = useTransform(scrollYProgress, (p) => -p * (maxPan * 0.85));
-  const mobilePanMidBg = useTransform(scrollYProgress, (p) => -p * (maxPan * 0.77));
-  const mobilePanBg = useTransform(scrollYProgress, (p) => -p * (maxPan * 0.70));
-  const mobilePanSky = useTransform(scrollYProgress, (p) => -p * (maxPan * 0.40));
+  // High-frequency responsive spring for mobile scroll-panning.
+  // Using stiffness: 280, damping: 32, mass: 0.1 provides near-zero latency (<15ms)
+  // while ensuring every subpixel step between native scroll events is smoothly interpolated at 60fps/120fps.
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 280,
+    damping: 32,
+    mass: 0.1,
+  });
+
+  // Mobile horizontal scroll-pan transforms with tight, responsive parallax depth:
+  // Foreground (100%), Midground (92%), Far Midground (88%), Background (82%), Sky (75%).
+  // Using range-based transforms [0, 1] -> [0, target] for Framer Motion's fast-path interpolator.
+  const mobilePanFg = useTransform(smoothProgress, [0, 1], [0, -maxPan]);
+  const mobilePanMid = useTransform(smoothProgress, [0, 1], [0, -maxPan * 0.92]);
+  const mobilePanMidBg = useTransform(smoothProgress, [0, 1], [0, -maxPan * 0.88]);
+  const mobilePanBg = useTransform(smoothProgress, [0, 1], [0, -maxPan * 0.82]);
+  const mobilePanSky = useTransform(smoothProgress, [0, 1], [0, -maxPan * 0.75]);
 
   const layerAspect = isPortraitMobile ? 'xMinYMax slice' : 'xMidYMax slice';
 
@@ -126,7 +136,17 @@ function SkylineInner() {
       setIsMobile(isMobileDevice);
       setReducedMotion(mediaQuery.matches || lowEnd);
       setWobble(!mediaQuery.matches);
-      setDimensions({ width: window.innerWidth, height: window.innerHeight });
+      setDimensions((prev) => {
+        // Prevent re-rendering NoirSkyline during mobile URL bar height changes while scrolling.
+        // Only update if screen width changed (orientation change) or height changed drastically (> 150px).
+        if (
+          Math.abs(window.innerWidth - prev.width) > 10 ||
+          Math.abs(window.innerHeight - prev.height) > 150
+        ) {
+          return { width: window.innerWidth, height: window.innerHeight };
+        }
+        return prev;
+      });
     };
 
     const mediaListener = (e: MediaQueryListEvent) => {

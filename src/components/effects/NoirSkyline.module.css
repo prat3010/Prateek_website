@@ -61,6 +61,7 @@
   height: 100%;
   contain: layout style;
   overflow: visible;
+  will-change: auto;
 }
 
 .mobilePortraitCanvas {
@@ -72,6 +73,14 @@
   width: calc(100dvh * (16 / 9));
   transform-origin: 0% 100%;
   will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+}
+
+.mobilePortraitCanvas .staticLayerSvg {
+  will-change: auto;
+  transform: none;
+  contain: none;
 }
 
 .vignette {
