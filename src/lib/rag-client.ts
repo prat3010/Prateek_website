@@ -20,6 +20,9 @@ async function fetchWithRetry(url: string, options: RequestInit, retries = MAX_R
       }
       return res;
     } catch (err) {
+      if ((err as Error)?.name === 'AbortError' || options.signal?.aborted) {
+        throw err;
+      }
       if (attempt < retries) {
         await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, attempt)));
         continue;

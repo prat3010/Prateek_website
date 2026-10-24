@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Bot,
   Send,
@@ -9,10 +9,19 @@ import {
   ArrowRight,
   RotateCcw,
   Loader2,
+  FileUp,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { RetrieverClient, type ParseIntentResponse } from '@/lib/rag-client';
-import type { Currency } from '@/lib/pricing';
+import type { ParseIntentResponse } from '@/lib/rag-client';
+import { calcQuote, type Currency } from '@/lib/pricing';
+import type {
+  BaseEngineItem,
+  FeatureItem,
+  BrandAssetOption,
+  MaintenancePlanOption,
+} from '@/data/resume';
+import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
+import { RfpUploaderModal } from './RfpUploaderModal';
 import styles from './InlineScopingChatCard.module.css';
 
 export interface ChatMessage {
@@ -93,7 +102,7 @@ function extractBlueprint(content: string): { cleanText: string; blueprint: Pars
           baseEngineId: parsed.baseEngineId || 'saas',
           featureIds: Array.isArray(parsed.featureIds) ? parsed.featureIds : [],
           brandAssetId: parsed.brandAssetId || 'ready',
-          maintenancePlanId: parsed.maintenancePlanId || 'growth',
+          maintenancePlanId: parsed.maintenancePlanId || 'standard',
           suggestedTimeline: parsed.suggestedTimeline || '3–4 Weeks',
           title: parsed.title || 'Recommended Architecture Blueprint',
           totalINR: Number(parsed.totalINR || 0),
@@ -127,7 +136,22 @@ function extractBlueprint(content: string): { cleanText: string; blueprint: Pars
     if (detectedFeatures.length >= 2) {
       const engineId = hasSaas ? 'saas' : hasLanding ? 'landing' : 'multipage';
       const archetypeId = hasSaas ? 'saas_app' : hasLanding ? 'landing_page' : 'business_multipage';
-      
+      const maintPlan = detectedFeatures.some((f) => f.startsWith('ai_')) ? 'premium' : 'standard';
+
+      const quote = calcQuote(
+        questionnaireDefaults.engines as BaseEngineItem[],
+        questionnaireDefaults.features as FeatureItem[],
+        questionnaireDefaults.brandAssets as BrandAssetOption[],
+        questionnaireDefaults.maintenancePlans as MaintenancePlanOption[],
+        {
+          engineId,
+          featureIds: detectedFeatures,
+          brandAssetId: 'ready',
+          maintenancePlanId: maintPlan,
+        },
+        'INR'
+      );
+
       return {
         cleanText: content,
         blueprint: {
@@ -135,11 +159,11 @@ function extractBlueprint(content: string): { cleanText: string; blueprint: Pars
           baseEngineId: engineId,
           featureIds: detectedFeatures,
           brandAssetId: 'ready',
-          maintenancePlanId: 'growth',
+          maintenancePlanId: maintPlan,
           suggestedTimeline: '3–4 Weeks',
           title: 'Consultative Solutions Blueprint',
-          totalINR: engineId === 'saas' ? 375000 : 150000,
-          totalUSD: engineId === 'saas' ? 5050 : 2000,
+          totalINR: quote.netTotalINR,
+          totalUSD: quote.netTotalUSD,
         },
       };
     }
@@ -160,27 +184,9 @@ export function InlineScopingChatCard({
 }: InlineScopingChatCardProps) {
   const [inputText, setInputText] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
+  const [isRfpModalOpen, setIsRfpModalOpen] = useState(false);
   const [appliedIndices, setAppliedIndices] = useState<Record<number, boolean>>({});
   const messagesViewportRef = useRef<HTMLDivElement>(null);
-  const clientRef = useRef<RetrieverClient | null>(null);
-
-  // Initialize Retriever client
-  useEffect(() => {
-    const apiUrl = process.env.NEXT_PUBLIC_RETRIEVER_API_URL || 'https://rag.prateeq.in';
-    const tenantId =
-      process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_TENANT_ID || '1f85286c-9d9a-4ebc-9c62-a99360a5ece4';
-    const apiKey =
-      process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_API_KEY || 'ret_live_ScopingGuest2026.ReadOnlyChat';
-    const userId =
-      process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_USER_ID || '36e62429-419e-48ef-af92-533afca9e028';
-
-    clientRef.current = new RetrieverClient({
-      apiUrl,
-      tenantId,
-      apiKey,
-      userId,
-    });
-  }, []);
 
   // Auto-scroll messages
   useEffect(() => {
@@ -189,21 +195,21 @@ export function InlineScopingChatCard({
     }
   }, [chatTranscript, isStreaming]);
 
-  const ensureSession = useCallback(async (): Promise<string | null> => {
-    if (chatSessionId) return chatSessionId;
-    if (!clientRef.current) return null;
-
-    try {
-      const res = await clientRef.current.createSession();
-      if (res?.sessionId) {
-        setChatSessionId(res.sessionId);
-        return res.sessionId;
+  const handleRfpBlueprintExtracted = (blueprint: ParseIntentResponse) => {
+    onApplyBlueprint(blueprint);
+    toast.success(
+      `📄 RFP Parsed (${Math.round(blueprint.confidenceScore * 100)}% Confidence): ${blueprint.summaryRationale}`,
+      {
+        action: onNavigateStep
+          ? {
+              label: 'Review in Step 2 →',
+              onClick: () => onNavigateStep(2),
+            }
+          : undefined,
+        duration: 8000,
       }
-    } catch (err) {
-      console.warn('Failed to create chat session on Retriever:', err);
-    }
-    return null;
-  }, [chatSessionId, setChatSessionId]);
+    );
+  };
 
   const handleSendMessage = async (textToSend?: string) => {
     const messageContent = (textToSend || inputText).trim();
@@ -221,27 +227,41 @@ export function InlineScopingChatCard({
     setIsStreaming(true);
 
     try {
-      const activeSessionId = await ensureSession();
-      if (!activeSessionId || !clientRef.current) {
-        throw new Error('Could not establish chat session with Retriever engine.');
-      }
-
-      // 2. Prepare streaming request
-      const stream = await clientRef.current.chat(activeSessionId, messageContent);
-      if (!stream) {
-        throw new Error('No stream returned from Retriever.');
-      }
-
-      const reader = stream.getReader();
-      const decoder = new TextDecoder();
-      let accumulatedText = '';
-      let buffer = '';
-
-      // Add placeholder assistant message
+      // 2. Add placeholder assistant message
       setChatTranscript([
         ...updatedMessages,
         { role: 'assistant', content: '', timestamp: new Date().toISOString() },
       ]);
+
+      // 3. Request streaming chat from BFF server endpoint
+      const res = await fetch('/api/scoping/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: messageContent,
+          sessionId: chatSessionId || null,
+          currency,
+        }),
+      });
+
+      const returnedSessionId = res.headers.get('x-session-id');
+      if (returnedSessionId && returnedSessionId !== chatSessionId) {
+        setChatSessionId(returnedSessionId);
+      }
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || `HTTP error ${res.status}`);
+      }
+
+      if (!res.body) {
+        throw new Error('No readable stream received from scoping engine.');
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let accumulatedText = '';
+      let buffer = '';
 
       while (true) {
         const { done, value } = await reader.read();
@@ -302,17 +322,17 @@ export function InlineScopingChatCard({
         },
       ]);
     } catch (err: unknown) {
-      console.error('Chat error:', err);
+      console.error('Scoping chat error:', err);
       const errMsg = err instanceof Error ? err.message : String(err);
       toast.error('Scoping Copilot connection interrupted', {
-        description: 'Falling back to standard rule matching.',
+        description: 'Unable to stream response from scoping engine.',
       });
 
       setChatTranscript([
         ...updatedMessages,
         {
           role: 'assistant',
-          content: `⚠️ Note: Scoping engine response unavailable (${errMsg}). You can still use the prompt bar or manual archetype selection below.`,
+          content: `⚠️ Note: Scoping engine response unavailable (${errMsg}). You can still use the prompt presets or manual archetype selection below.`,
           timestamp: new Date().toISOString(),
         },
       ]);
@@ -328,7 +348,7 @@ export function InlineScopingChatCard({
       baseEngineId: blueprint.baseEngineId,
       featureIds: blueprint.featureIds,
       brandAssetId: blueprint.brandAssetId || 'ready',
-      maintenancePlanId: blueprint.maintenancePlanId || 'growth',
+      maintenancePlanId: blueprint.maintenancePlanId || 'standard',
       suggestedTimeline: blueprint.suggestedTimeline || '3–4 Weeks',
       confidenceScore: 0.96,
       summaryRationale: blueprint.title,
@@ -369,17 +389,30 @@ export function InlineScopingChatCard({
           </span>
         </div>
 
-        {chatTranscript.length > 0 && (
+        <div className={styles.headerActions}>
           <button
             type="button"
-            onClick={handleResetChat}
-            className={styles.resetChatBtn}
-            title="Reset conversation"
-            aria-label="Reset conversation"
+            className={styles.rfpBtn}
+            onClick={() => setIsRfpModalOpen(true)}
+            aria-label="Upload RFP or PRD Document"
           >
-            <RotateCcw size={14} />
+            <FileUp size={14} />
+            <span>Drop RFP / PRD (PDF)</span>
           </button>
-        )}
+
+          {chatTranscript.length > 0 && (
+            <button
+              type="button"
+              onClick={handleResetChat}
+              className={styles.resetChatBtn}
+              title="Reset conversation"
+              aria-label="Reset conversation"
+            >
+              <RotateCcw size={14} />
+              <span>Reset</span>
+            </button>
+          )}
+        </div>
       </div>
 
       <p className={styles.subHeading}>
@@ -548,6 +581,14 @@ export function InlineScopingChatCard({
           <span>Send</span>
         </button>
       </form>
+
+      <RfpUploaderModal
+        isOpen={isRfpModalOpen}
+        onClose={() => setIsRfpModalOpen(false)}
+        onBlueprintExtracted={handleRfpBlueprintExtracted}
+        currency={currency}
+        isNoir={isNoir}
+      />
     </div>
   );
 }

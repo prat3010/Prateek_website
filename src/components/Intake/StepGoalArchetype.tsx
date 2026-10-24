@@ -26,7 +26,6 @@ import type { GoalArchetype, BaseEngineItem, FeatureItem } from '@/data/resume';
 import { formatPricePair, packageTotalForArchetype, type Currency } from '@/lib/pricing';
 import NumberFlow from '@number-flow/react';
 import type { ParseIntentResponse } from '@/lib/rag-client';
-import { AiScopingPromptBar } from './AiScopingPromptBar';
 import { InlineScopingChatCard } from './InlineScopingChatCard';
 import { GOAL_CATEGORIES } from './useIntakeFormState';
 import TiltCard from '@/components/ui/TiltCard';
@@ -193,14 +192,6 @@ export function StepGoalArchetype({
         setChatSessionId={setChatSessionId || (() => {})}
         chatTranscript={chatTranscript || []}
         setChatTranscript={setChatTranscript || (() => {})}
-      />
-
-      {/* Multimodal AI Intent Discovery Copilot & 1-Line Scoping Bar */}
-      <AiScopingPromptBar
-        onApplyBlueprint={onApplyBlueprint || (() => {})}
-        currency={currency}
-        isNoir={isNoir}
-        onNavigateStep={onNavigateStep}
       />
 
       {/* Low-Risk Paid Discovery Wedge */}
