@@ -5,14 +5,13 @@ import styles from '../NoirSkyline.module.css';
 import { WobblyPath, WobblyLine } from '../WobblySVG';
 import { LayerProps } from './types';
 
-const Layer1_5 = React.memo(function Layer1_5({ reducedMotion, wobble: propWobble , isMobile, preserveAspectRatio: propAspect }: LayerProps) {
+const Layer1_5 = React.memo(function Layer1_5({ reducedMotion, wobble: propWobble , isMobile }: LayerProps) {
   const wobble = propWobble ?? !reducedMotion;
-  const aspect = propAspect ?? (isMobile ? 'xMidYMax meet' : 'xMidYMax slice');
   const strength = 2.5; // Far midground wobble (between Layer 1 and Layer 2)
   return (
     <>
       {/* Static Layer */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio={aspect} className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
+      <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
         <g className={styles.buildingGroup} stroke="var(--skyline-stroke-mid)" strokeWidth="1.2">
           {/* Blocky Spire (Center-Left) */}
           {/* 3D Roofs (Approach B: receding up-right toward x=960) */}
@@ -197,7 +196,7 @@ const Layer1_5 = React.memo(function Layer1_5({ reducedMotion, wobble: propWobbl
       {/* Animated Layer */}
       <svg
         viewBox="0 0 1920 1080"
-        preserveAspectRatio={aspect}
+        preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'}
         className={styles.actorLayerSvg}
         style={{ overflow: 'visible' }}
         aria-hidden="true"

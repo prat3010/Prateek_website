@@ -29,14 +29,13 @@ const BOLLARD_POSTS: WobblyLineSegment[] = BOLLARD_XS.map((x) => ({
   y2: 938,
 }));
 
-const Layer2 = React.memo(function Layer2({ reducedMotion, wobble: propWobble , isMobile, preserveAspectRatio: propAspect }: LayerProps) {
+const Layer2 = React.memo(function Layer2({ reducedMotion, wobble: propWobble , isMobile }: LayerProps) {
   const wobble = propWobble ?? !reducedMotion;
-  const aspect = propAspect ?? (isMobile ? 'xMidYMax meet' : 'xMidYMax slice');
   const strength = 3.0; // Medium midground wobble
   return (
     <>
       {/* Static Layer */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio={aspect} className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
+      <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
         <defs>
           <pattern id="hatch-mid" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
             <line x1="0" y1="0" x2="0" y2="8" stroke="rgba(250, 250, 250, 0.15)" strokeWidth="1.0" />
@@ -602,7 +601,7 @@ const Layer2 = React.memo(function Layer2({ reducedMotion, wobble: propWobble , 
       </svg>
 
       {/* Animated Layer (Unfiltered) */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio={aspect} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+      <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0, pointerEvents: 'none' }}>
         {/* HOTEL Neon Sign (Blade Sign hanging off the left edge of Hotel building x=1490) */}
         <g stroke="none" fill="none">
           {/* Supporting brackets */}
@@ -645,7 +644,7 @@ const Layer2 = React.memo(function Layer2({ reducedMotion, wobble: propWobble , 
       {/* Dynamic Watercraft Layer (Isolated to prevent re-rasterizing static cityscape) */}
       <svg
         viewBox="0 0 1920 1080"
-        preserveAspectRatio={aspect}
+        preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'}
         className={styles.actorLayerSvg}
         style={{ overflow: 'visible' }}
         aria-hidden="true"
