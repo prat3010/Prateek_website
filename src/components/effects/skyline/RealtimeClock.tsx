@@ -3,14 +3,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSkylineStatus } from '../SkylineInteractionContext';
 import styles from '../NoirSkyline.module.css';
-import { WobblyLine } from '../WobblySVG';
 
-interface RealtimeClockProps {
-  wobble: boolean;
-  strength: number;
-}
-
-function RealtimeClock({ wobble, strength }: RealtimeClockProps) {
+function RealtimeClock() {
   const [time, setTime] = useState<Date>(() => new Date());
   const { isTabVisible } = useSkylineStatus();
   const isVisibleRef = useRef(isTabVisible);
@@ -45,12 +39,12 @@ function RealtimeClock({ wobble, strength }: RealtimeClockProps) {
       
       {/* Hour Hand (pointing straight up at 12 when angle is 0, length = 5.5 units) */}
       <g transform={`rotate(${hoursAngle}, 1275, 580)`}>
-        <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1275" y1="580" x2="1275" y2="574.5" stroke="var(--skyline-clock-details)" strokeWidth="1.3" />
+        <path d="M 1275.4 579.7 L 1275.2 576.6 L 1275.0 573.5" stroke="var(--skyline-clock-details)" strokeWidth="1.3" />
       </g>
 
       {/* Minute Hand (pointing straight up at 12 when angle is 0, length = 8 units) */}
       <g transform={`rotate(${minutesAngle}, 1275, 580)`}>
-        <WobblyLine wobble={wobble} wobbleStrength={strength} x1="1275" y1="580" x2="1275" y2="572" stroke="var(--skyline-clock-details)" strokeWidth="0.9" />
+        <path d="M 1275.4 579.7 L 1275.1 575.2 L 1274.9 571.0" stroke="var(--skyline-clock-details)" strokeWidth="0.9" />
       </g>
 
       {/* Second Hand (pointing straight up at 12 when angle is 0, length = 9 units) */}

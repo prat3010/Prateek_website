@@ -8,6 +8,7 @@ describe('InteractiveGargoyle Component', () => {
   const defaultContextValue = {
     isTabVisible: true,
     isIdle: false,
+    isOccluded: false,
     tick: 0,
     geometryVersion: 0,
     scrollVelocityRef: { current: 0 },

@@ -19,7 +19,7 @@ function SkylineInner() {
   const { theme } = useTheme();
   const { isTransitioning } = useThemeTransition();
   const { performanceTier } = usePerformanceGovernor();
-  const { isIdle } = useSkylineStatus();
+  const { isIdle, isOccluded } = useSkylineStatus();
   const perfTierRef = useRef(performanceTier);
   useEffect(() => { perfTierRef.current = performanceTier; }, [performanceTier]);
   const { scrollProgress: scrollYProgress } = useLenisScroll();
@@ -72,6 +72,13 @@ function SkylineInner() {
   const layer3X = useTransform(springX, (x) => x * -42);
   const layer3Y = useTransform(springY, (y) => y * -28);
 
+  // Consolidated single-layer vertical transforms (scroll Y + mouse Y combined)
+  const layer1CombinedY = useTransform([bgY, layer1Y], ([sy, my]) => Number(sy) + Number(my));
+  const layer1_5CombinedY = useTransform([midBgY, layer1_5Y], ([sy, my]) => Number(sy) + Number(my));
+  const layer2CombinedY = useTransform([midY, layer2Y], ([sy, my]) => Number(sy) + Number(my));
+  const bridgeLayerCombinedY = useTransform([bridgeY, bridgeLayerY], ([sy, my]) => Number(sy) + Number(my));
+  const layer3CombinedY = useTransform([fgY, layer3Y], ([sy, my]) => Number(sy) + Number(my));
+
   // Mobile composition (full panorama, sky extended above) is decoupled from
   // reducedMotion: phones render the whole 1920-wide scene and keep the same
   // scroll parallax as desktop, while OS reduced-motion still freezes life.
@@ -87,11 +94,6 @@ function SkylineInner() {
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches || lowEnd;
   });
 
-  const [wobble, setWobble] = useState(() => {
-    if (typeof window === 'undefined') return true;
-    return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  });
-
   // Track mouse coordinates for subtle parallax offset & update device/motion state
   useEffect(() => {
     const cores = navigator.hardwareConcurrency ?? 4;
@@ -102,14 +104,12 @@ function SkylineInner() {
       const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
       setIsMobile(isMobileDevice);
       setReducedMotion(mediaQuery.matches || lowEnd);
-      setWobble(!mediaQuery.matches);
     };
 
     const mediaListener = (e: MediaQueryListEvent) => {
       const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
       setIsMobile(isMobileDevice);
       setReducedMotion(e.matches || lowEnd);
-      setWobble(!e.matches);
     };
     mediaQuery.addEventListener('change', mediaListener);
     window.addEventListener('resize', checkMotionState);
@@ -145,7 +145,7 @@ function SkylineInner() {
   }, [mouseX, mouseY]);
 
   return (
-    <div className={`${styles.container} ${styles.active} ${isIdle ? styles.isIdle : ''} ${theme === 'light' ? styles.lightPopart : styles.darkNoir} ${reducedMotion ? styles.reducedMotion : ''} ${isMobile ? styles.mobileSkyline : ''}`}>
+    <div className={`${styles.container} ${styles.active} ${isIdle ? styles.isIdle : ''} ${isOccluded ? styles.isOccluded : ''} ${theme === 'light' ? styles.lightPopart : styles.darkNoir} ${reducedMotion ? styles.reducedMotion : ''} ${isMobile ? styles.mobileSkyline : ''}`}>
       {/* ── Vignette Overlay ── */}
       <div className={styles.vignette} aria-hidden="true" />
 
@@ -153,87 +153,57 @@ function SkylineInner() {
 
       {/* ── Layer 0: Sky backdrop, Searchlights, and Rain ── */}
       <div className={styles.layer}>
-        <Layer0 reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} />
+        <Layer0 reducedMotion={reducedMotion} isMobile={isMobile} />
       </div>
 
       {/* ── Layer 1: Background Buildings (Parallax Scale 1.12) ── */}
       <m.div
         style={reducedMotion
           ? { zIndex: 1 }
-          : { scale: bgScale, y: bgY, zIndex: 1, willChange: 'transform' }}
+          : { scale: bgScale, x: layer1X, y: layer1CombinedY, zIndex: 1, willChange: 'transform' }}
         className={styles.layer}
       >
-        <m.div
-          style={reducedMotion
-            ? { width: '100%', height: '100%' }
-            : { x: layer1X, y: layer1Y, width: '100%', height: '100%' }}
-        >
-          <Layer1 reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} />
-        </m.div>
+        <Layer1 reducedMotion={reducedMotion} isMobile={isMobile} />
       </m.div>
 
       {/* ── Layer 1.5: Far Midground Buildings (Parallax Scale 1.10) ── */}
       <m.div
         style={reducedMotion
           ? { zIndex: 1 }
-          : { scale: midBgScale, y: midBgY, zIndex: 1, willChange: 'transform' }}
+          : { scale: midBgScale, x: layer1_5X, y: layer1_5CombinedY, zIndex: 1, willChange: 'transform' }}
         className={styles.layer}
       >
-        <m.div
-          style={reducedMotion
-            ? { width: '100%', height: '100%' }
-            : { x: layer1_5X, y: layer1_5Y, width: '100%', height: '100%' }}
-        >
-          <Layer1_5 reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} />
-        </m.div>
+        <Layer1_5 reducedMotion={reducedMotion} isMobile={isMobile} />
       </m.div>
 
       {/* ── Layer 2: Midground Buildings ── */}
       <m.div
         style={reducedMotion
           ? { zIndex: 2 }
-          : { scale: midScale, y: midY, zIndex: 2, willChange: 'transform' }}
+          : { scale: midScale, x: layer2X, y: layer2CombinedY, zIndex: 2, willChange: 'transform' }}
         className={styles.layer}
       >
-        <m.div
-          style={reducedMotion
-            ? { width: '100%', height: '100%' }
-            : { x: layer2X, y: layer2Y, width: '100%', height: '100%' }}
-        >
-          <Layer2 reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} />
-        </m.div>
+        <Layer2 reducedMotion={reducedMotion} isMobile={isMobile} />
       </m.div>
 
       {/* ── Layer 2.5: Bridge Structure (Parallax Scale bridgeScale) ── */}
       <m.div
         style={reducedMotion
           ? { zIndex: 2 }
-          : { scale: bridgeScale, y: bridgeY, zIndex: 2, willChange: 'transform' }}
+          : { scale: bridgeScale, x: bridgeLayerX, y: bridgeLayerCombinedY, zIndex: 2, willChange: 'transform' }}
         className={styles.layer}
       >
-        <m.div
-          style={reducedMotion
-            ? { width: '100%', height: '100%' }
-            : { x: bridgeLayerX, y: bridgeLayerY, width: '100%', height: '100%' }}
-        >
-          <BridgeLayer reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} />
-        </m.div>
+        <BridgeLayer reducedMotion={reducedMotion} isMobile={isMobile} />
       </m.div>
 
       {/* ── Layer 3: Foreground Rooftops (Parallax Scale 1.8, Masks midground, high opacity) ── */}
       <m.div
         style={reducedMotion
           ? { zIndex: 3 }
-          : { scale: fgScale, y: fgY, zIndex: 3, willChange: 'transform' }}
+          : { scale: fgScale, x: layer3X, y: layer3CombinedY, zIndex: 3, willChange: 'transform' }}
         className={styles.layer}
       >
-        <m.div
-          style={reducedMotion
-            ? { width: '100%', height: '100%' }
-            : { x: layer3X, y: layer3Y, width: '100%', height: '100%' }}
-        >
-          <Layer3 reducedMotion={reducedMotion} wobble={wobble} isMobile={isMobile} />
-        </m.div>
+        <Layer3 reducedMotion={reducedMotion} isMobile={isMobile} />
       </m.div>
 
       {/* ── Watercolor Texture Overlay (only in light theme to preserve watercolor paper feel without SVG render overhead) ── */}

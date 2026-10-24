@@ -6,6 +6,7 @@ import { useLenisScroll } from '@/context/LenisProvider';
 interface SkylineStatusValue {
   isTabVisible: boolean;
   isIdle: boolean;
+  isOccluded: boolean;
   scrollVelocityRef: React.RefObject<number>;
   mousePosRef: React.RefObject<{ x: number; y: number }>;
   lastClickRef: React.RefObject<{ x: number; y: number; time: number } | null>;
@@ -26,6 +27,8 @@ const ACTIVITY_EVENTS = ['mousemove', 'wheel', 'click', 'keydown', 'touchstart']
 export function SkylineInteractionProvider({ children }: { children: ReactNode }) {
   const [isTabVisible, setIsTabVisible] = useState(true);
   const [isIdle, setIsIdle] = useState(false);
+  const [isOccluded, setIsOccluded] = useState(false);
+  const isOccludedRef = useRef(false);
   const [tick, setTick] = useState(0);
   const geometryVersionRef = useRef(0);
   const [geometryVersion, setGeometryVersion] = useState(0);
@@ -33,10 +36,22 @@ export function SkylineInteractionProvider({ children }: { children: ReactNode }
   const isIdleRef = useRef(false);
   const isTabVisibleRef = useRef(true);
 
-  const { velocity: scrollVelocity } = useLenisScroll();
+  const { velocity: scrollVelocity, scrollProgress: scrollYProgress } = useLenisScroll();
   const scrollVelocityRef = useRef(0);
   const mousePosRef = useRef({ x: -100, y: -100 });
   const lastClickRef = useRef<{ x: number; y: number; time: number } | null>(null);
+
+  useEffect(() => {
+    const unsub = scrollYProgress.on('change', (p) => {
+      // Occluded when scrolled past Hero (~0.12) and before reaching final Contact footer (~0.88)
+      const occluded = p > 0.12 && p < 0.88;
+      if (isOccludedRef.current !== occluded) {
+        isOccludedRef.current = occluded;
+        setIsOccluded(occluded);
+      }
+    });
+    return unsub;
+  }, [scrollYProgress]);
 
   useEffect(() => {
     const unsub = scrollVelocity.on('change', (v) => {
@@ -109,7 +124,7 @@ export function SkylineInteractionProvider({ children }: { children: ReactNode }
   // Single shared 160ms tick for all skyline animated characters
   useEffect(() => {
     const id = setInterval(() => {
-      if (isTabVisibleRef.current && !isIdleRef.current) {
+      if (isTabVisibleRef.current && !isIdleRef.current && !isOccludedRef.current) {
         setTick(t => t + 1);
       }
     }, 160);
@@ -138,14 +153,15 @@ export function SkylineInteractionProvider({ children }: { children: ReactNode }
     };
   }, [invalidateGeometry]);
 
-  // Memoized status value: NEVER changes on scroll or 160ms tick, completely freezing virtual DOM re-renders of SkylineInner
+  // Memoized status value: NEVER changes on 160ms tick, completely freezing virtual DOM re-renders of SkylineInner
   const statusValue = React.useMemo<SkylineStatusValue>(() => ({
     isTabVisible,
     isIdle,
+    isOccluded,
     scrollVelocityRef,
     mousePosRef,
     lastClickRef,
-  }), [isTabVisible, isIdle]);
+  }), [isTabVisible, isIdle, isOccluded]);
 
   // Ticking interaction value for creature state machines
   const interactionValue = React.useMemo<SkylineInteractionValue>(() => ({
