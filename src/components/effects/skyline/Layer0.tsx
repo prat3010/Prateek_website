@@ -3,6 +3,7 @@
 import React from 'react';
 import styles from '../NoirSkyline.module.css';
 import type { LayerProps } from './types';
+import SkylineDefs from './SkylineDefs';
 
 interface MobileStar {
   top: string;
@@ -71,84 +72,7 @@ const Layer0 = React.memo(function Layer0({ isMobile }: LayerProps) {
 
       {/* Static backdrop SVG */}
       <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
-        <defs>
-          {/* Left Searchlight Gradient */}
-          <linearGradient id="leftLightGrad" x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0%" stopColor="rgba(250, 250, 250, 0.15)" />
-            <stop offset="60%" stopColor="rgba(250, 250, 250, 0.04)" />
-            <stop offset="100%" stopColor="rgba(250, 250, 250, 0)" />
-          </linearGradient>
-
-          {/* Right Searchlight Gradient */}
-          <linearGradient id="rightLightGrad" x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0%" stopColor="rgba(250, 250, 250, 0.18)" />
-            <stop offset="50%" stopColor="rgba(250, 250, 250, 0.05)" />
-            <stop offset="100%" stopColor="rgba(250, 250, 250, 0)" />
-          </linearGradient>
-
-          {/* Blimp Searchlight Gradient */}
-          <linearGradient id="blimpLightGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgba(255, 255, 255, 0.28)" />
-            <stop offset="60%" stopColor="rgba(255, 255, 255, 0.08)" />
-            <stop offset="100%" stopColor="rgba(255, 255, 255, 0)" />
-          </linearGradient>
-
-          {/* Radial Moon Glow Gradient */}
-          <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="rgba(255, 255, 255, 0.45)" />
-            <stop offset="70%" stopColor="rgba(255, 255, 255, 0.08)" />
-            <stop offset="100%" stopColor="rgba(255, 255, 255, 0)" />
-          </radialGradient>
-
-          {/* Left Searchlight Gradient Popart */}
-          <linearGradient id="leftLightGradPopart" x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0%" stopColor="rgba(41, 121, 255, 0.25)" />
-            <stop offset="60%" stopColor="rgba(41, 121, 255, 0.06)" />
-            <stop offset="100%" stopColor="rgba(41, 121, 255, 0)" />
-          </linearGradient>
-
-          {/* Right Searchlight Gradient Popart */}
-          <linearGradient id="rightLightGradPopart" x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0%" stopColor="rgba(255, 23, 68, 0.25)" />
-            <stop offset="50%" stopColor="rgba(255, 23, 68, 0.06)" />
-            <stop offset="100%" stopColor="rgba(255, 23, 68, 0)" />
-          </linearGradient>
-
-          {/* Blimp Searchlight Gradient Popart */}
-          <linearGradient id="blimpLightGradPopart" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgba(0, 230, 118, 0.35)" />
-            <stop offset="60%" stopColor="rgba(0, 230, 118, 0.1)" />
-            <stop offset="100%" stopColor="rgba(0, 230, 118, 0)" />
-          </linearGradient>
-
-          {/* Left Searchlight Gradient Neon (Cyan) */}
-          <linearGradient id="leftLightGradNeon" x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0%" stopColor="rgba(0, 240, 255, 0.25)" />
-            <stop offset="60%" stopColor="rgba(0, 240, 255, 0.06)" />
-            <stop offset="100%" stopColor="rgba(0, 240, 255, 0)" />
-          </linearGradient>
-
-          {/* Right Searchlight Gradient Neon (Pink) */}
-          <linearGradient id="rightLightGradNeon" x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0%" stopColor="rgba(255, 42, 85, 0.25)" />
-            <stop offset="50%" stopColor="rgba(255, 42, 85, 0.06)" />
-            <stop offset="100%" stopColor="rgba(255, 42, 85, 0)" />
-          </linearGradient>
-
-          {/* Blimp Searchlight Gradient Neon (Yellow) */}
-          <linearGradient id="blimpLightGradNeon" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgba(255, 230, 0, 0.35)" />
-            <stop offset="60%" stopColor="rgba(255, 230, 0, 0.1)" />
-            <stop offset="100%" stopColor="rgba(255, 230, 0, 0)" />
-          </linearGradient>
-
-          {/* Sky Gradient Popart */}
-          <radialGradient id="skyGradPopart" cx="50%" cy="40%" r="70%">
-            <stop offset="0%" stopColor="#FFFDF6" />
-            <stop offset="40%" stopColor="#FFE082" />
-            <stop offset="100%" stopColor="#90CAF9" />
-          </radialGradient>
-        </defs>
+        <SkylineDefs />
 
         {/* Sky background layer (uses radial gradient in Popart, transparent in Noir) */}
         <rect width="100%" height="100%" fill="var(--skyline-sky-bg)" />
