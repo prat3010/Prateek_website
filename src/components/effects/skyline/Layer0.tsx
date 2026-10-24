@@ -51,7 +51,8 @@ const MOBILE_STARS: MobileStar[] = [
   { top: '68.0%', left: '55%', size: 1.4, type: 1 },
 ];
 
-const Layer0 = React.memo(function Layer0({ isMobile }: LayerProps) {
+const Layer0 = React.memo(function Layer0({ isMobile, preserveAspectRatio: preserveAspectRatioProp }: LayerProps) {
+  const par = preserveAspectRatioProp ?? (isMobile ? 'xMidYMax meet' : 'xMidYMax slice');
   // Generate 24 conic rays radiating from the center of the horizon (960, 450)
   const raysCount = 24;
   const raysPath = Array.from({ length: raysCount }).map((_, i) => {
@@ -71,7 +72,7 @@ const Layer0 = React.memo(function Layer0({ isMobile }: LayerProps) {
     <>
 
       {/* Static backdrop SVG */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
+      <svg viewBox="0 0 1920 1080" preserveAspectRatio={par} className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
         <SkylineDefs />
 
         {/* Sky background layer (uses radial gradient in Popart, transparent in Noir) */}
@@ -97,7 +98,7 @@ const Layer0 = React.memo(function Layer0({ isMobile }: LayerProps) {
       {/* Dynamic / Animating Sky Overlay SVG */}
       <svg
         viewBox="0 0 1920 1080"
-        preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'}
+        preserveAspectRatio={par}
         className={styles.actorLayerSvg}
         style={{ overflow: 'visible' }}
         aria-hidden="true"

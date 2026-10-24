@@ -7,11 +7,12 @@ import RealtimeClock from './RealtimeClock';
 
 const DOCK_LIGHT_XS = [485, 755, 985, 1225];
 
-const Layer2 = React.memo(function Layer2({ isMobile }: LayerProps) {
+const Layer2 = React.memo(function Layer2({ isMobile, preserveAspectRatio: preserveAspectRatioProp }: LayerProps) {
+  const par = preserveAspectRatioProp ?? (isMobile ? 'xMidYMax meet' : 'xMidYMax slice');
   return (
     <>
       {/* Static Layer */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
+      <svg viewBox="0 0 1920 1080" preserveAspectRatio={par} className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
         {/* Midground buildings (Solid fill masks Layer 1) */}
         <g className={styles.buildingGroup} stroke="var(--skyline-stroke-mid)" strokeWidth="1.2">
           {/* Far Left block */}
@@ -564,7 +565,7 @@ const Layer2 = React.memo(function Layer2({ isMobile }: LayerProps) {
       </svg>
 
       {/* Animated Layer (Unfiltered) */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+      <svg viewBox="0 0 1920 1080" preserveAspectRatio={par} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0, pointerEvents: 'none' }}>
         {/* HOTEL Neon Sign (Blade Sign hanging off the left edge of Hotel building x=1490) */}
         <g stroke="none" fill="none">
           {/* Supporting brackets */}
@@ -607,7 +608,7 @@ const Layer2 = React.memo(function Layer2({ isMobile }: LayerProps) {
       {/* Dynamic Watercraft Layer (Isolated to prevent re-rasterizing static cityscape) */}
       <svg
         viewBox="0 0 1920 1080"
-        preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'}
+        preserveAspectRatio={par}
         className={styles.actorLayerSvg}
         style={{ overflow: 'visible' }}
         aria-hidden="true"

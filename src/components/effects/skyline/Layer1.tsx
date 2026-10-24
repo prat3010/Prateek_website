@@ -4,11 +4,12 @@ import React from 'react';
 import styles from '../NoirSkyline.module.css';
 import { LayerProps } from './types';
 
-const Layer1 = React.memo(function Layer1({ isMobile }: LayerProps) {
+const Layer1 = React.memo(function Layer1({ isMobile, preserveAspectRatio: preserveAspectRatioProp }: LayerProps) {
+  const par = preserveAspectRatioProp ?? (isMobile ? 'xMidYMax meet' : 'xMidYMax slice');
   return (
     <>
       {/* Static Layer */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
+      <svg viewBox="0 0 1920 1080" preserveAspectRatio={par} className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
         <g className={styles.buildingGroup} stroke="var(--skyline-stroke-bg)" strokeWidth="0.8">
           {/* Left distant skyscrapers */}
           {/* 3D Roofs (Approach B: receding up-right) */}
@@ -462,7 +463,7 @@ const Layer1 = React.memo(function Layer1({ isMobile }: LayerProps) {
       {/* Animated Layer (Unfiltered) */}
       <svg
         viewBox="0 0 1920 1080"
-        preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'}
+        preserveAspectRatio={par}
         className={styles.actorLayerSvg}
         style={{ overflow: 'visible' }}
         aria-hidden="true"

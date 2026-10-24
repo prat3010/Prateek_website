@@ -4,11 +4,12 @@ import React from 'react';
 import styles from '../NoirSkyline.module.css';
 import { LayerProps } from './types';
 
-const BridgeLayer = React.memo(function BridgeLayer({ reducedMotion, isMobile }: LayerProps) {
+const BridgeLayer = React.memo(function BridgeLayer({ reducedMotion, isMobile, preserveAspectRatio: preserveAspectRatioProp }: LayerProps) {
+  const par = preserveAspectRatioProp ?? (isMobile ? 'xMidYMax meet' : 'xMidYMax slice');
   return (
     <>
       {/* Static Layer */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
+      <svg viewBox="0 0 1920 1080" preserveAspectRatio={par} className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
             <g className={styles.buildingGroup} stroke="var(--skyline-stroke-fg)" strokeWidth="1.8">
               {/* MIDDLE BRIDGE STRUCTURE (Fills the gap between rooftops) */}
               <path d="M 849.9 1249.1 L 850.0 1245.2 L 849.8 1241.2 L 849.6 1236.7 L 849.1 1232.4 L 848.5 1228.3 L 848.5 1224.6 L 848.4 1221.2 L 848.7 1217.6 L 849.7 1213.9 L 850.7 1210.4 L 851.3 1206.8 L 851.9 1202.6 L 852.4 1197.9 L 851.7 1194.1 L 850.9 1190.5 L 850.5 1186.8 L 850.3 1182.6 L 849.9 1178.2 L 850.4 1174.6 L 850.7 1170.6 L 850.7 1166.4 L 850.9 1162.2 L 850.7 1158.1 L 850.7 1153.8 L 850.7 1150.0 L 850.9 1146.3 L 850.9 1142.6 L 851.0 1138.8 L 850.4 1134.5 L 850.2 1130.4 L 850.4 1126.1 L 851.2 1121.9 L 851.3 1117.4 L 851.0 1113.8 L 850.7 1109.8 L 850.4 1105.7 L 850.4 1101.7 L 850.8 1097.7 L 851.2 1093.7 L 850.5 1089.4 L 849.7 1085.0 L 849.2 1081.2 L 848.8 1077.3 L 848.7 1073.3 L 849.1 1069.3 L 849.7 1065.5 L 850.5 1062.0 L 850.7 1057.6 L 850.8 1053.4 L 850.8 1049.7 L 850.6 1046.0 L 850.1 1042.2 L 849.5 1038.4 L 848.9 1034.3 L 848.5 1030.1 L 848.3 1025.6 L 848.2 1021.4 L 849.1 1017.3 L 849.8 1013.0 L 850.3 1008.7 L 851.1 1003.9 L 851.4 999.3 L 851.0 995.3 L 850.6 991.4 L 850.1 987.7 L 849.6 984.4 L 849.4 981.1 L 849.5 977.2 L 849.4 973.8 L 849.2 969.9 L 849.1 965.5 L 849.3 961.4 L 849.4 957.8 L 849.9 954.1 L 850.1 949.8 L 850.5 945.2 L 850.2 941.2 L 850.1 937.7 L 850.3 934.0 L 850.6 930.1 L 850.9 925.8 L 851.2 921.5 L 851.2 917.1 L 850.3 912.8 L 849.0 908.2 L 848.3 903.5 L 848.4 899.6 L 848.4 895.6 L 848.2 891.6 L 848.0 887.8 L 848.4 884.0 L 848.6 879.5 L 849.1 875.7 L 849.5 872.2 L 849.8 867.6 L 850.4 863.2 L 851.2 859.7 L 851.6 856.1 L 851.6 852.0 L 851.3 847.8 L 851.1 843.7 L 850.8 839.2 L 850.4 835.4 L 850.4 831.7 L 850.4 827.5 L 850.7 823.4 L 850.2 819.2 L 850.1 815.8 L 850.4 812.1 L 850.8 807.9 L 851.1 803.6 L 851.6 799.3 L 851.3 795.9 L 850.7 792.0 L 849.8 787.7 L 849.2 783.5 L 848.6 779.2 L 849.7 775.2 L 851.4 771.4 L 853.3 768.0 L 855.4 764.9 L 857.3 761.6 L 859.0 758.0 L 860.9 754.2 L 862.8 750.5 L 864.4 746.2 L 865.7 742.1 L 866.6 738.4 L 867.7 734.0 L 869.2 729.6 L 873.0 729.8 L 877.0 730.2 L 881.2 730.9 L 885.6 731.6 L 889.7 731.9 L 891.7 735.8 L 893.6 739.6 L 895.4 743.2 L 897.6 746.4 L 898.9 749.7 L 899.3 753.4 L 900.9 757.1 L 903.0 761.1 L 904.6 765.5 L 906.1 769.1 L 907.3 772.9 L 908.5 776.8 L 910.2 780.4 L 910.6 783.8 L 910.7 787.5 L 910.9 791.4 L 911.0 795.2 L 911.3 798.4 L 910.8 802.0 L 910.2 806.4 L 909.5 811.0 L 908.4 815.5 L 907.9 819.5 L 907.6 824.2 L 907.7 829.0 L 907.8 833.1 L 908.0 836.7 L 908.4 840.5 L 909.2 844.2 L 910.0 847.7 L 910.1 852.1 L 910.1 856.7 L 910.0 861.6 L 910.5 865.8 L 911.2 870.2 L 911.7 874.3 L 911.3 878.7 L 910.7 883.0 L 910.6 886.7 L 910.6 890.5 L 910.8 894.0 L 910.2 898.0 L 910.2 901.7 L 910.6 905.4 L 911.0 908.9 L 911.2 912.6 L 911.0 916.4 L 910.6 920.0 L 910.2 923.9 L 909.9 927.8 L 909.8 931.8 L 909.7 935.8 L 909.7 939.9 L 909.7 944.4 L 909.5 949.2 L 909.7 953.7 L 910.3 957.6 L 910.1 961.0 L 909.4 964.7 L 908.5 968.4 L 908.3 972.1 L 908.4 976.2 L 908.8 980.5 L 909.1 984.7 L 909.2 989.0 L 909.6 993.2 L 910.0 997.2 L 909.9 1001.2 L 909.7 1005.1 L 909.5 1009.2 L 909.3 1012.8 L 909.3 1016.6 L 909.3 1020.9 L 909.5 1025.2 L 909.8 1029.4 L 910.0 1033.2 L 909.9 1037.2 L 909.7 1042.2 L 910.1 1046.9 L 911.0 1050.4 L 911.2 1054.7 L 911.2 1058.7 L 911.2 1062.2 L 910.5 1066.2 L 909.6 1070.9 L 909.5 1075.2 L 909.8 1079.5 L 910.1 1083.4 L 910.1 1086.9 L 909.5 1090.1 L 908.6 1093.8 L 908.8 1097.6 L 909.5 1101.2 L 909.5 1105.4 L 909.3 1109.8 L 909.6 1113.5 L 910.2 1117.8 L 910.4 1122.1 L 910.3 1126.0 L 910.4 1129.9 L 910.6 1133.3 L 911.0 1137.0 L 911.5 1140.9 L 911.9 1145.0 L 912.0 1149.2 L 911.7 1153.5 L 911.6 1157.1 L 911.1 1160.7 L 910.3 1165.2 L 909.9 1169.4 L 909.4 1173.0 L 908.7 1176.1 L 908.4 1180.2 L 908.5 1185.0 L 908.9 1189.7 L 909.2 1194.2 L 910.0 1198.6 L 910.2 1202.7 L 910.2 1206.8 L 910.4 1211.0 L 910.4 1215.1 L 909.7 1218.5 L 909.5 1222.5 L 909.4 1227.2 L 909.6 1231.1 L 909.5 1234.8 L 909.5 1238.7 L 909.6 1242.2 L 909.8 1245.6 L 910.5 1249.1 L 906.6 1248.6 L 902.7 1248.8 L 898.5 1249.1 L 894.0 1248.9 L 890.1 1248.9 L 886.2 1249.3 L 882.7 1249.7 L 878.9 1249.7 L 875.1 1249.4 L 871.1 1249.0 L 867.1 1248.7 L 862.4 1248.8 L 858.0 1248.8 L 853.9 1249.2 L 849.9 1249.1 Z" className={styles.bldFgBridgeTower} />
@@ -140,7 +141,7 @@ const BridgeLayer = React.memo(function BridgeLayer({ reducedMotion, isMobile }:
       </svg>
 
       {/* Animated Layer (Unfiltered) */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+      <svg viewBox="0 0 1920 1080" preserveAspectRatio={par} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0, pointerEvents: 'none' }}>
             <g fill="var(--skyline-fill-bg)" stroke="var(--skyline-stroke-fg)" strokeWidth="1.8" className={styles.buildingGroup}>
               {/* Warning Beacon at Tower Peak */}
               <circle cx="880" cy="670" r="2.2" className={styles.bridgeBeacon} />
@@ -153,7 +154,7 @@ const BridgeLayer = React.memo(function BridgeLayer({ reducedMotion, isMobile }:
       {/* Dynamic Bridge Traffic Layer (Isolated to prevent re-rasterizing static bridge superstructure) */}
       <svg
         viewBox="0 0 1920 1080"
-        preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'}
+        preserveAspectRatio={par}
         className={styles.actorLayerSvg}
         style={{ overflow: 'visible' }}
         aria-hidden="true"

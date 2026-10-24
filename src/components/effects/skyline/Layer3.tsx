@@ -8,11 +8,12 @@ import InteractiveGargoyle from './InteractiveGargoyle';
 import BillboardPigeon from './BillboardPigeon';
 import FirePigeon from './FirePigeon';
 
-const Layer3 = React.memo(function Layer3({ reducedMotion, isMobile }: LayerProps) {
+const Layer3 = React.memo(function Layer3({ reducedMotion, isMobile, preserveAspectRatio: preserveAspectRatioProp }: LayerProps) {
+  const par = preserveAspectRatioProp ?? (isMobile ? 'xMidYMax meet' : 'xMidYMax slice');
   return (
     <>
       {/* Static Layer */}
-      <svg viewBox="0 0 1920 1080" preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'} className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
+      <svg viewBox="0 0 1920 1080" preserveAspectRatio={par} className={styles.staticLayerSvg} style={{ width: '100%', height: '100%', overflow: 'visible', position: 'absolute', inset: 0 }}>
              {/* Group A: Foreground Static Elements (Wobbled for hand-drawn look) */}
             <g className={styles.buildingGroup} stroke="var(--skyline-stroke-fg)" strokeWidth="1.8">
               
@@ -1040,7 +1041,7 @@ const Layer3 = React.memo(function Layer3({ reducedMotion, isMobile }: LayerProp
       {/* Dynamic Foreground Actors Layer (Isolated to prevent re-rasterizing static cityscape) */}
       <svg
         viewBox="0 0 1920 1080"
-        preserveAspectRatio={isMobile ? 'xMidYMax meet' : 'xMidYMax slice'}
+        preserveAspectRatio={par}
         className={styles.actorLayerSvg}
         style={{ overflow: 'visible' }}
         aria-hidden="true"

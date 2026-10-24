@@ -184,6 +184,12 @@ This document serves as the registry of critical architectural design decisions 
   * **Implementation gotchas (found via mobile-simulator QA)**:
     1. **Reduced-motion decoupling**: `reducedMotion` must NOT include the mobile check — the previous design folded `isMobileDevice` into it, which silently froze everything on phones.
     2. **Preserve-aspect-ratio flip**: the `meet`/`slice` switch must be applied to both SVGs in each layer file (the main scene SVG and the pointer-events-none flicker/neon overlay SVG), or the animated overlay desyncs from the buildings.
+* **2026-10 Addendum (Mobile Panoramic Horizontal Scroll-Panning)**:
+  - Transitioned mobile portrait mode from the letterboxed ~220px bottom band (`meet`) to a full-viewport-height (`100%`/`100dvh`), 16:9 panoramic stage that pans horizontally from left to right as the user scrolls vertically down the homepage.
+  - Layer canvas width scales to `innerHeight * (16 / 9)` (~1,500px wide on modern phones), providing ~1,110px of panning travel without any vertical cropping or letterboxing.
+  - Implemented multi-layer differential 3D depth parallax: Layer 3 moves at 100% speed (`-maxPan * 1.0`), BridgeLayer & Layer 2 at 85% (`-maxPan * 0.85`), Layer 1.5 at 77% (`-maxPan * 0.77`), Layer 1 at 70% (`-maxPan * 0.70`), and Layer 0 at 40% (`-maxPan * 0.40`).
+  - Perfect section-to-landmark alignment: Hero aligns with Left rooftop billboard & cat, About/Skills/Projects centers on the Grand Suspension Bridge and downtown towers, and Contact/Footer reveals the Clock Tower, Gothic Cathedral, and Interactive Gargoyle.
+  - Desktop, mobile landscape, and reduced-motion modes remain untouched and isolate desktop-parity parallax.
 
 ---
 
