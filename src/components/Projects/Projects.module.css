@@ -114,6 +114,7 @@
   border-bottom: 1.5px solid var(--color-border);
   user-select: none;
   pointer-events: none;
+  white-space: nowrap;
 }
 
 :global([data-theme='noir']) .comicHeader {
@@ -139,6 +140,8 @@
   letter-spacing: 0.05em;
   text-transform: uppercase;
   line-height: 1.2;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 :global([data-theme='noir']) .narrativeBox {
@@ -150,14 +153,19 @@
 
 .narrativePrefix {
   font-weight: 800;
+  flex-shrink: 0;
 }
 
 .narrativeDivider {
   opacity: 0.5;
+  flex-shrink: 0;
 }
 
 .narrativeLabel {
   font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .comicBadgeStamp {
@@ -175,6 +183,9 @@
   color: var(--color-text);
   border: 1px solid var(--color-border);
   line-height: 1.2;
+  white-space: nowrap;
+  min-width: 0;
+  flex-shrink: 0;
 }
 
 :global([data-theme='noir']) .comicBadgeStamp {
@@ -187,6 +198,7 @@
   color: var(--pop-red);
   font-size: 0.72rem;
   line-height: 1;
+  flex-shrink: 0;
 }
 
 :global([data-theme='noir']) .comicRarityPip {
@@ -195,6 +207,9 @@
 
 .comicBadgeText {
   font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Floating Case Study Hover Tag */
@@ -465,7 +480,7 @@
 @media (max-width: 1100px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
-    grid-auto-rows: 260px;
+    grid-auto-rows: 290px;
   }
 
   .grid > *:nth-child(n) {
@@ -476,18 +491,76 @@
 @media (max-width: 768px) {
   .grid {
     grid-template-columns: 1fr;
-    grid-auto-rows: 240px;
+    grid-auto-rows: 320px;
   }
 
   .grid > *:nth-child(n) {
     grid-column: span 1;
   }
 
+  .comicHeader {
+    height: 32px;
+    padding: 0 0.5rem;
+    gap: 0.35rem;
+  }
+
+  .narrativeBox {
+    padding: 1.5px 6px;
+    font-size: 0.58rem;
+    max-width: 58%;
+    flex-shrink: 1;
+  }
+
+  .narrativeLabel {
+    display: inline-block;
+    max-width: 110px;
+  }
+
+  .comicBadgeStamp {
+    padding: 1.5px 6px;
+    font-size: 0.56rem;
+    max-width: 40%;
+    flex-shrink: 0;
+  }
+
+  .comicBadgeText {
+    display: inline-block;
+    max-width: 85px;
+  }
+
   .panelOverlay {
     opacity: 1;
+    padding: 1.15rem 1rem 1rem;
+    padding-top: calc(32px + 1rem);
+    background: linear-gradient(
+      to top,
+      rgba(24, 24, 32, 0.96) 0%,
+      rgba(24, 24, 32, 0.88) 50%,
+      rgba(24, 24, 32, 0.65) 75%,
+      rgba(24, 24, 32, 0.35) 100%
+    );
+  }
+
+  :global([data-theme='noir']) .panelOverlay {
+    background: linear-gradient(
+      to top,
+      rgba(8, 8, 10, 0.98) 0%,
+      rgba(8, 8, 10, 0.90) 50%,
+      rgba(8, 8, 10, 0.70) 75%,
+      rgba(8, 8, 10, 0.40) 100%
+    );
+  }
+
+  .panelTitle {
+    font-size: clamp(1.15rem, 4.2vw, 1.35rem);
+    line-height: 1.22;
+    margin-bottom: 0.35rem;
+    text-shadow: 2px 2px 0 var(--pop-black);
   }
 
   .panelDesc {
+    font-size: 0.82rem;
+    line-height: 1.35;
     max-height: 48px;
     opacity: 0.95;
     margin-bottom: 0.5rem;
@@ -495,6 +568,15 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+
+  .panelTags {
+    gap: 0.35rem;
+  }
+
+  .tag {
+    padding: 0.18rem 0.45rem;
+    font-size: 0.62rem;
   }
 
   .modal {

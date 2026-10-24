@@ -39,17 +39,24 @@ function ProjectImage({ src, fallbackSrc, alt, fill, width, height, sizes, class
   const [currentSrc, setCurrentSrc] = useState(src);
   const [prevPropSrc, setPrevPropSrc] = useState(src);
   const [error, setError] = useState(false);
+  const [retried, setRetried] = useState(false);
 
   if (src !== prevPropSrc) {
     setPrevPropSrc(src);
     setCurrentSrc(src);
     setError(false);
+    setRetried(false);
   }
 
   const handleError = () => {
     const fallback = fallbackSrc || (currentSrc.includes('-noir.webp') ? currentSrc.replace('-noir.webp', '.webp') : null);
     if (fallback && currentSrc !== fallback) {
       setCurrentSrc(fallback);
+    } else if (!retried) {
+      setRetried(true);
+      setTimeout(() => {
+        setCurrentSrc(`${src}${src.includes('?') ? '&' : '?'}retry=1`);
+      }, 500);
     } else {
       setError(true);
     }
@@ -59,8 +66,8 @@ function ProjectImage({ src, fallbackSrc, alt, fill, width, height, sizes, class
     return (
       <div
         style={{
-          background: 'var(--pop-black)',
-          color: 'var(--pop-white)',
+          background: 'var(--surface-card, #1e1e24)',
+          color: 'var(--color-text)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -72,7 +79,7 @@ function ProjectImage({ src, fallbackSrc, alt, fill, width, height, sizes, class
           borderRadius: '4px',
         }}
       >
-        <Code2 size={48} strokeWidth={1.5} style={{ opacity: 0.7 }} />
+        <Code2 size={48} strokeWidth={1.5} style={{ opacity: 0.6 }} />
       </div>
     );
   }
