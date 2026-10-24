@@ -7,7 +7,7 @@ import React from 'react';
  * Centralizes all atmospheric lighting gradients, searchlight cones, and architectural hatch patterns
  * into a single global <defs> block mounted in Layer0.
  */
-export const SkylineDefs = React.memo(function SkylineDefs() {
+const SkylineDefs = React.memo(function SkylineDefs() {
   return (
     <defs>
       {/* ── Searchlight Gradients (Noir / Default) ── */}

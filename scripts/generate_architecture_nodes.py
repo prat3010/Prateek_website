@@ -1069,11 +1069,11 @@ NODES = {
 
 > **Fixed 6-Layer Deterministic Hand-Drawn Skyline with Decoupled Mobile Parallax.**
 
-- **Path:** `src/components/effects/NoirSkyline.tsx` & `wobblyPaths.generated.ts`
+- **Path:** `src/components/effects/NoirSkyline.tsx`
 - **Performance Contracts:**
   - `isMobile` (width ≤ 768px or coarse pointer) and `reducedMotion` (OS preference or < 4 cores) are tracked separately.
   - Mobile preserves scroll parallax while switching `preserveAspectRatio` to `xMidYMax meet` with seamless sky extension (`var(--skyline-sky-bg)`).
-  - Prebaked SVG wobble paths prevent runtime main-thread polygon displacement.
+  - Precompiled compound SVG paths eliminate runtime main-thread draw calls.
 
 ---
 
