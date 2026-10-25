@@ -11,13 +11,29 @@ from pathlib import Path
 import shutil
 import time
 import urllib.error
+import os
 import urllib.request
 
-TENANT_ID = "6797e2c8-745a-4bd1-aa4c-3854b8d79c22"
-API_KEY = "ret_live_TaaRP0w94H8.a3_CjGsoQY57Fy5bv9Kk40zfUOoH4ak2"
-TARGET_URL = "https://rag.prateeq.in"
-
 WEB_ROOT = Path(__file__).resolve().parent.parent
+
+def _load_env_key(key_name: str, fallback: str = "") -> str:
+    val = os.environ.get(key_name)
+    if val:
+        return val
+    env_local = WEB_ROOT / ".env.local"
+    if env_local.is_file():
+        for line in env_local.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                if k.strip() == key_name:
+                    return v.strip().strip("'\"")
+    return fallback
+
+TENANT_ID = _load_env_key("RETRIEVER_PORTFOLIO_TENANT_ID", "6797e2c8-745a-4bd1-aa4c-3854b8d79c22")
+API_KEY = _load_env_key("RETRIEVER_PORTFOLIO_API_KEY", "")
+TARGET_URL = _load_env_key("RETRIEVER_API_URL", "https://rag.prateeq.in").rstrip("/")
+
 RETRIEVER_ROOT = WEB_ROOT.parent / "retriever"
 STAGING_DIR = Path("/tmp/prateeq_dogfood_corpus")
 

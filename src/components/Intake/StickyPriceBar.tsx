@@ -1,4 +1,4 @@
-import { Zap, ShoppingCart, Sparkles } from 'lucide-react';
+import { Zap, ShoppingCart, Sparkles, Bot } from 'lucide-react';
 import NumberFlow from '@number-flow/react';
 import type { BaseEngineItem } from '@/data/resume';
 import type { Currency, PromoDiscountInfo } from '@/lib/pricing';
@@ -22,6 +22,7 @@ interface StickyPriceBarProps {
   showMobileFormula: boolean;
   setShowMobileFormula: React.Dispatch<React.SetStateAction<boolean>>;
   onOpenCart?: () => void;
+  onOpenCopilot?: () => void;
   itemCount?: number;
 }
 
@@ -33,6 +34,7 @@ export function StickyPriceBar({
   showMobileFormula,
   setShowMobileFormula,
   onOpenCart,
+  onOpenCopilot,
   itemCount,
 }: StickyPriceBarProps) {
   const hasDiscount = (totalCost.bundleDiscountPercent && totalCost.bundleDiscountPercent > 0) || totalCost.promoDiscount;
@@ -88,6 +90,33 @@ export function StickyPriceBar({
             </>
           )}
         </div>
+        {onOpenCopilot ? (
+          <MagneticButton strength={0.25}>
+            <button
+              type="button"
+              onClick={onOpenCopilot}
+              className={styles.cartBtn}
+              style={{
+                borderColor: 'var(--border-accent, rgba(59, 130, 246, 0.4))',
+                background: 'rgba(59, 130, 246, 0.1)',
+                color: 'var(--color-text, #ffffff)',
+              }}
+              aria-label="Open Scope Copilot"
+            >
+              <Bot size={15} style={{ color: '#60a5fa' }} />
+              <span>Scope Copilot</span>
+              <span
+                style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  background: '#10b981',
+                  boxShadow: '0 0 6px #10b981',
+                }}
+              />
+            </button>
+          </MagneticButton>
+        ) : null}
         {onOpenCart ? (
           <MagneticButton strength={0.25}>
             <button

@@ -23,6 +23,8 @@ import {
   MessageSquare,
   Bot,
   Clock,
+  Copy,
+  Check,
 } from 'lucide-react';
 import Portal from '@/components/ui/Portal';
 import styles from './admin.module.css';
@@ -48,6 +50,12 @@ export interface IntakeLeadRecord {
   chat_session_id?: string;
   chat_transcript?: Array<{ role: string; content: string; timestamp?: string }>;
   created_at: string;
+  visitor_country?: string;
+  model_used?: string;
+  latency_ms?: number;
+  agent_intent?: string;
+  agent_reasoning?: string;
+  turn_count?: number;
 }
 
 interface Lead {
@@ -179,6 +187,14 @@ export default function AdminControlCenter() {
   const [intakeLeads, setIntakeLeads] = useState<IntakeLeadRecord[]>([]);
   const [loadingIntakeLeads, setLoadingIntakeLeads] = useState(false);
   const [selectedLeadForDrawer, setSelectedLeadForDrawer] = useState<IntakeLeadRecord | null>(null);
+  const [isGeneratingPitch, setIsGeneratingPitch] = useState(false);
+  const [isSendingPitch, setIsSendingPitch] = useState(false);
+  const [leadPitchDraft, setLeadPitchDraft] = useState<{
+    subject: string;
+    emailBody: string;
+    keyPainPoints: string[];
+  } | null>(null);
+  const [hasCopiedProposal, setHasCopiedProposal] = useState(false);
 
   const fetchIntakeLeads = async () => {
     setLoadingIntakeLeads(true);
@@ -393,11 +409,85 @@ export default function AdminControlCenter() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setSelectedLeadForDrawer(null);
+        setLeadPitchDraft(null);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedLeadForDrawer]);
+
+  const handleGenerateLeadPitch = async (lead: IntakeLeadRecord) => {
+    setIsGeneratingPitch(true);
+    try {
+      const token = await getAccessToken();
+      const res = await fetch('/api/admin/draft-pitch', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ leadId: lead.id, action: 'draft' }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.draft) {
+        setLeadPitchDraft(data.draft);
+      } else {
+        setActionMessage({ text: data.error || 'Failed to generate proposal draft.', isError: true });
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setActionMessage({ text: `Proposal generation error: ${msg}`, isError: true });
+    } finally {
+      setIsGeneratingPitch(false);
+    }
+  };
+
+  const handleSendLeadPitch = async () => {
+    if (!selectedLeadForDrawer || !leadPitchDraft) return;
+    setIsSendingPitch(true);
+    try {
+      const token = await getAccessToken();
+      const res = await fetch('/api/admin/draft-pitch', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          leadId: selectedLeadForDrawer.id,
+          action: 'send',
+          subject: leadPitchDraft.subject,
+          emailBody: leadPitchDraft.emailBody,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success) {
+        setActionMessage({ text: data.message || `Proposal dispatched to ${selectedLeadForDrawer.contact_email}!` });
+        setSelectedLeadForDrawer((prev) => (prev ? { ...prev, status: 'contacted' } : null));
+        fetchIntakeLeads();
+      } else {
+        setActionMessage({ text: data.error || 'Failed to send proposal.', isError: true });
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setActionMessage({ text: `Proposal dispatch error: ${msg}`, isError: true });
+    } finally {
+      setIsSendingPitch(false);
+    }
+  };
+
+  const handleCopyProposalToClipboard = async () => {
+    if (!leadPitchDraft) return;
+    const fullText = `Subject: ${leadPitchDraft.subject}\n\n${leadPitchDraft.emailBody}`;
+    try {
+      await navigator.clipboard.writeText(fullText);
+      setHasCopiedProposal(true);
+      setTimeout(() => setHasCopiedProposal(false), 2500);
+      setActionMessage({ text: 'Copied executive proposal to clipboard!' });
+    } catch {
+      setActionMessage({ text: 'Unable to write to clipboard.', isError: true });
+    }
+  };
 
   const handleGenerateProspects = async () => {
     setLoadingLeads(true);
@@ -1431,9 +1521,47 @@ export default function AdminControlCenter() {
                             >
                               Code: {lead.scope_code}
                             </span>
+                            {lead.visitor_country && lead.visitor_country !== 'Unknown' && (
+                              <span style={{
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                fontSize: '0.7rem',
+                                background: 'rgba(255, 255, 255, 0.08)',
+                                color: 'var(--color-text-muted)',
+                              }}>
+                                🌍 {lead.visitor_country}
+                              </span>
+                            )}
+                            {lead.model_used && (
+                              <span style={{
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                fontSize: '0.7rem',
+                                background: 'rgba(255, 255, 255, 0.08)',
+                                color: 'var(--color-text-muted)',
+                              }}>
+                                🧠 {lead.model_used}
+                              </span>
+                            )}
+                            {lead.latency_ms ? (
+                              <span style={{
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                fontSize: '0.7rem',
+                                background: 'rgba(255, 255, 255, 0.08)',
+                                color: 'var(--color-text-muted)',
+                              }}>
+                                ⏱️ {lead.latency_ms}ms
+                              </span>
+                            ) : null}
                           </div>
                           <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-                            Email: <strong style={{ color: 'var(--color-text)' }}>{lead.contact_email}</strong>
+                            Email:{' '}
+                            {lead.contact_email?.toLowerCase().endsWith('@unauthenticated.client') ? (
+                              <span style={{ color: '#f59e0b', fontWeight: 600 }}>⚠️ Unauthenticated Prospect</span>
+                            ) : (
+                              <strong style={{ color: 'var(--color-text)' }}>{lead.contact_email}</strong>
+                            )}
                             {lead.contact_phone && <span> • Phone: {lead.contact_phone}</span>}
                             <span> • Captured: {lead.created_at ? new Date(lead.created_at).toLocaleString() : 'Unknown'}</span>
                           </div>
@@ -1442,7 +1570,10 @@ export default function AdminControlCenter() {
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           {hasTranscript ? (
                             <button
-                              onClick={() => setSelectedLeadForDrawer(lead)}
+                              onClick={() => {
+                                setSelectedLeadForDrawer(lead);
+                                setLeadPitchDraft(null);
+                              }}
                               className={styles.leadChatBadge}
                             >
                               <Bot size={13} />
@@ -1497,7 +1628,10 @@ export default function AdminControlCenter() {
           <Portal>
             <div
               className={styles.drawerOverlay}
-              onClick={() => setSelectedLeadForDrawer(null)}
+              onClick={() => {
+                setSelectedLeadForDrawer(null);
+                setLeadPitchDraft(null);
+              }}
               role="dialog"
               aria-modal="true"
               aria-labelledby="drawer-title"
@@ -1518,7 +1652,10 @@ export default function AdminControlCenter() {
                   </div>
                   <button
                     className={styles.drawerCloseBtn}
-                    onClick={() => setSelectedLeadForDrawer(null)}
+                    onClick={() => {
+                      setSelectedLeadForDrawer(null);
+                      setLeadPitchDraft(null);
+                    }}
                     aria-label="Close chat transcript"
                   >
                     <X size={18} />
@@ -1544,6 +1681,169 @@ export default function AdminControlCenter() {
                       <span className={styles.leadDetailLabel}>TIMELINE</span>
                       <span className={styles.leadDetailVal}>{selectedLeadForDrawer.timeline || '4-6 weeks'}</span>
                     </div>
+                  </div>
+
+                  {/* Cognitive Observability & Agent Reasoning */}
+                  <div style={{
+                    margin: '0.75rem 0',
+                    padding: '0.75rem 1rem',
+                    background: 'rgba(59, 130, 246, 0.08)',
+                    border: '1px solid rgba(59, 130, 246, 0.25)',
+                    borderRadius: '8px',
+                    fontSize: '0.82rem',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                      <strong style={{ color: '#60a5fa', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Bot size={15} />
+                        <span>Cognitive Intelligence &amp; Agent Reasoning</span>
+                      </strong>
+                      <div style={{ display: 'flex', gap: '6px', fontSize: '0.72rem' }}>
+                        {selectedLeadForDrawer.visitor_country && selectedLeadForDrawer.visitor_country !== 'Unknown' && (
+                          <span style={{ padding: '2px 6px', background: 'rgba(255,255,255,0.08)', borderRadius: '4px' }}>
+                            🌍 {selectedLeadForDrawer.visitor_country}
+                          </span>
+                        )}
+                        {selectedLeadForDrawer.model_used && (
+                          <span style={{ padding: '2px 6px', background: 'rgba(255,255,255,0.08)', borderRadius: '4px' }}>
+                            🧠 {selectedLeadForDrawer.model_used}
+                          </span>
+                        )}
+                        {selectedLeadForDrawer.latency_ms ? (
+                          <span style={{ padding: '2px 6px', background: 'rgba(255,255,255,0.08)', borderRadius: '4px' }}>
+                            ⏱️ {selectedLeadForDrawer.latency_ms}ms
+                          </span>
+                        ) : null}
+                      </div>
+                    </div>
+
+                    {selectedLeadForDrawer.agent_intent && (
+                      <div style={{ marginBottom: '4px', color: 'var(--color-text)' }}>
+                        <span style={{ color: 'var(--color-text-muted)' }}>Classified Intent: </span>
+                        <strong>{selectedLeadForDrawer.agent_intent}</strong>
+                      </div>
+                    )}
+
+                    {selectedLeadForDrawer.agent_reasoning && (
+                      <div style={{ color: 'var(--color-text-muted)', lineHeight: '1.4' }}>
+                        <span style={{ color: 'var(--color-text)' }}>Rationale: </span>
+                        {selectedLeadForDrawer.agent_reasoning}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 1-Click AI Executive Proposal Drafter */}
+                  <div className={styles.proposalSection}>
+                    <div className={styles.proposalSectionHeader}>
+                      <div className={styles.proposalHeaderTitle}>
+                        <Sparkles size={16} style={{ color: '#00E676' }} />
+                        <span>AI Executive Proposal Drafter</span>
+                      </div>
+                      {!leadPitchDraft && (
+                        <button
+                          type="button"
+                          className={styles.generateProposalBtn}
+                          onClick={() => handleGenerateLeadPitch(selectedLeadForDrawer)}
+                          disabled={isGeneratingPitch}
+                        >
+                          <Zap size={14} />
+                          <span>{isGeneratingPitch ? 'Drafting Proposal with Gemini...' : '⚡ Generate AI Proposal Draft'}</span>
+                        </button>
+                      )}
+                    </div>
+
+                    {leadPitchDraft && (
+                      <div className={styles.proposalCard}>
+                        {leadPitchDraft.keyPainPoints && leadPitchDraft.keyPainPoints.length > 0 && (
+                          <div className={styles.painPointsRow}>
+                            <span className={styles.painPointsLabel}>Key Pain Points:</span>
+                            {leadPitchDraft.keyPainPoints.map((pt, i) => (
+                              <span key={i} className={styles.painPointPill}>
+                                • {pt}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className={styles.proposalInputGroup}>
+                          <label className={styles.proposalLabel}>Email Subject</label>
+                          <input
+                            type="text"
+                            className={styles.proposalSubjectInput}
+                            value={leadPitchDraft.subject}
+                            onChange={(e) =>
+                              setLeadPitchDraft((prev) =>
+                                prev ? { ...prev, subject: e.target.value } : null
+                              )
+                            }
+                          />
+                        </div>
+
+                        <div className={styles.proposalInputGroup}>
+                          <label className={styles.proposalLabel}>Email Body (Editable)</label>
+                          <textarea
+                            className={styles.proposalTextarea}
+                            rows={8}
+                            value={leadPitchDraft.emailBody}
+                            onChange={(e) =>
+                              setLeadPitchDraft((prev) =>
+                                prev ? { ...prev, emailBody: e.target.value } : null
+                              )
+                            }
+                          />
+                        </div>
+
+                        <div className={styles.proposalActionRow}>
+                          <button
+                            type="button"
+                            className={styles.copyProposalBtn}
+                            onClick={handleCopyProposalToClipboard}
+                          >
+                            {hasCopiedProposal ? <Check size={14} /> : <Copy size={14} />}
+                            <span>{hasCopiedProposal ? 'Copied to Clipboard!' : 'Copy Proposal'}</span>
+                          </button>
+
+                          {(!selectedLeadForDrawer.contact_email ||
+                          !selectedLeadForDrawer.contact_email.includes('@') ||
+                          selectedLeadForDrawer.contact_email.toLowerCase().endsWith('@unauthenticated.client')) ? (
+                            <div
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                fontSize: '0.8rem',
+                                color: '#f59e0b',
+                                background: 'rgba(245, 158, 11, 0.1)',
+                                border: '1px solid rgba(245, 158, 11, 0.25)',
+                                padding: '6px 12px',
+                                borderRadius: '6px',
+                              }}
+                            >
+                              <span>⚠️ Unauthenticated prospect (Email dispatch disabled)</span>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              className={styles.sendProposalBtn}
+                              onClick={handleSendLeadPitch}
+                              disabled={isSendingPitch}
+                            >
+                              <Send size={14} />
+                              <span>{isSendingPitch ? 'Dispatching via Resend...' : `Send to ${selectedLeadForDrawer.contact_email}`}</span>
+                            </button>
+                          )}
+
+                          <button
+                            type="button"
+                            className={styles.regenerateProposalBtn}
+                            onClick={() => handleGenerateLeadPitch(selectedLeadForDrawer)}
+                            disabled={isGeneratingPitch}
+                          >
+                            <RefreshCw size={13} className={isGeneratingPitch ? 'animate-spin' : ''} />
+                            <span>Regenerate</span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Chat Messages */}

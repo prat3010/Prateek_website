@@ -3,7 +3,7 @@
     "id": "rag-lab",
     "title": "Retriever AI (Enterprise Cognitive RAG Platform)",
     "description": "Enterprise-grade Retrieval-Augmented Generation platform featuring Hexagonal Architecture, pgvector hybrid search, local Ollama embeddings, RLM reasoning, and sub-100ms semantic response caching.",
-    "longDescription": "Retriever AI is a production-grade RAG platform built using strict Hexagonal Architecture boundaries. It ingests multi-format documents (PDF, Markdown, text, OpenAPI), executing dense vector embeddings via local Ollama instances (nomic-embed-text) and sparse BM25 keyword indexing in pgvector. Features multi-tenant PostgreSQL RLS isolation, streaming response synthesis with RLM reasoning loops, automated query rewriting, presigned citation downloads, and sub-100ms semantic response caching (⚡ Cached).",
+    "longDescription": "Retriever AI is a production-grade RAG platform built using strict Hexagonal Architecture boundaries. It ingests multi-format documents (PDF, Markdown, text, OpenAPI), executing dense vector embeddings via local Ollama instances (nomic-embed-text) and lexical full-text indexing in PostgreSQL with reciprocal rank fusion (RRF) and late-interaction ColBERT MaxSim reranking. Features multi-tenant PostgreSQL RLS isolation, streaming response synthesis with RLM reasoning loops, automated query rewriting, presigned citation downloads, and sub-100ms semantic response caching (⚡ Cached).",
     "image": "/images/project-rag-lab.webp",
     "tags": [
       "Next.js 16",

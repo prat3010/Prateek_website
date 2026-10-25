@@ -85,6 +85,16 @@ Welcome to the **Prateek Sharma Engineering Platform Documentation Map**. This c
 
 ---
 
+## 🗺️ 5.5 Product Roadmaps & Strategic Tracks
+
+- 🌐 **[`UNIFIED_MASTER_ROADMAP.md`](UNIFIED_MASTER_ROADMAP.md):** Single Source of Truth Master Implementation Timeline (M1–M115).
+- 🚀 **[`SCOPING_COPILOT_SOTA_ROADMAP.md`](SCOPING_COPILOT_SOTA_ROADMAP.md):** SOTA Conversational Scoping Copilot Roadmap (Socratic Discovery, Budget Sculpting, Topology Diagrams, and Omnichannel Closers).
+- 🤖 **[`AI_OUTREACH_AGENT_ROADMAP.md`](AI_OUTREACH_AGENT_ROADMAP.md):** Autonomous Multi-Channel Prospecting & Lead Enrichment Pipeline.
+- 💼 **[`CLIENT_DASHBOARD_ROADMAP.md`](CLIENT_DASHBOARD_ROADMAP.md):** Authenticated Workspace, Milestone Invoicing, and Change Orders.
+- ✍️ **[`AUTOMATED_AI_BLOGGING_ROADMAP.md`](AUTOMATED_AI_BLOGGING_ROADMAP.md):** Newsjacking Blog Engine and Automatic Technical Articles.
+
+---
+
 ## 🚀 6. SRE & Operational Runbooks (`docs/runbooks/`)
 
 - 🕹️ **[`runbooks/RUNBOOK_PLAYGROUND_ADD_ITEM.md`](runbooks/RUNBOOK_PLAYGROUND_ADD_ITEM.md):** Adding a new project, game, SaaS, or AI prompt to The Playground.

@@ -17,6 +17,12 @@ vi.mock('@/lib/emailNotification', () => ({
   sendAdminSignupNotification: vi.fn(async () => ({})),
 }));
 
+const mockStitchAnonymousSession = vi.fn().mockResolvedValue(undefined);
+
+vi.mock('@/lib/scopingObservability', () => ({
+  stitchAnonymousSession: (...args: unknown[]) => mockStitchAnonymousSession(...args),
+}));
+
 describe('Auth Callback Route (GET /auth/callback)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -124,5 +130,69 @@ describe('Auth Callback Route (GET /auth/callback)', () => {
 
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toContain('/dashboard?error=User%20cancelled');
+  });
+
+  it('triggers session stitching when pending scope or draft cookies are present', async () => {
+    mockExchangeCodeForSession.mockResolvedValueOnce({
+      data: {
+        session: {
+          user: {
+            id: 'u-stitch',
+            email: 'converted@lead.com',
+            user_metadata: { name: 'Converted Lead' },
+            app_metadata: { provider: 'google' },
+            created_at: new Date().toISOString(),
+          },
+        },
+      },
+      error: null,
+    });
+
+    const req = new Request('https://prateeq.in/auth/callback?code=stitch-code&next=/dashboard', {
+      headers: {
+        cookie: 'prateeq_pending_scope_code=SCOPE-98765; prateeq_draft_token=draft_token_123',
+      },
+    });
+
+    const res = await GET(req);
+    expect(res.status).toBe(307);
+    expect(mockStitchAnonymousSession).toHaveBeenCalledWith(
+      'draft_token_123',
+      'converted@lead.com',
+      'SCOPE-98765',
+      'draft_token_123'
+    );
+  });
+
+  it('prioritizes prateeq_chat_session_id over draft token for session stitching while preserving draft token', async () => {
+    mockExchangeCodeForSession.mockResolvedValueOnce({
+      data: {
+        session: {
+          user: {
+            id: 'u-chat-stitch',
+            email: 'chatprospect@example.com',
+            user_metadata: { name: 'Chat Prospect' },
+            app_metadata: { provider: 'google' },
+            created_at: new Date().toISOString(),
+          },
+        },
+      },
+      error: null,
+    });
+
+    const req = new Request('https://prateeq.in/auth/callback?code=chat-code&next=/dashboard', {
+      headers: {
+        cookie: 'prateeq_chat_session_id=chat_sess_999; prateeq_draft_token=draft_token_123; prateeq_pending_scope_code=SCOPE-44556',
+      },
+    });
+
+    const res = await GET(req);
+    expect(res.status).toBe(307);
+    expect(mockStitchAnonymousSession).toHaveBeenCalledWith(
+      'chat_sess_999',
+      'chatprospect@example.com',
+      'SCOPE-44556',
+      'draft_token_123'
+    );
   });
 });

@@ -9,6 +9,8 @@ import type {
 } from '@/data/resume';
 import { RetrieverClient } from '@/lib/rag-client';
 import { checkRateLimit, rateLimitResponse } from '@/lib/rateLimit';
+import { getIpHash } from '@/lib/security';
+import { logScopingChatTrace } from '@/lib/scopingObservability';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -35,6 +37,34 @@ interface BlueprintRecommendation {
   title: string;
   summary: string;
   techHighlights: string[];
+}
+
+export interface ScopeContext {
+  currentStep?: number;
+  baseEngineId?: string;
+  selectedFeatures?: string[];
+  totalINR?: number;
+  totalUSD?: number;
+  scopeCode?: string;
+}
+
+export interface PhasedBreakdown {
+  phase1: {
+    title: string;
+    featureIds: string[];
+    suggestedTimeline: string;
+    totalINR: number;
+    totalUSD: number;
+    deliverablesSummary: string;
+  };
+  phase2: {
+    title: string;
+    featureIds: string[];
+    suggestedTimeline: string;
+    totalINR: number;
+    totalUSD: number;
+    deliverablesSummary: string;
+  };
 }
 
 /**
@@ -407,23 +437,131 @@ function classifyPromptForBlueprint(prompt: string): BlueprintRecommendation {
 }
 
 /**
+ * Computes deterministic Phase 1 (Lean MVP) vs Phase 2 (Scale & Growth) breakdown.
+ */
+function computePhasedBreakdown(
+  baseEngineId: string,
+  resolvedFeatures: string[],
+  currency: Currency,
+  brandAssetId: string,
+  maintenancePlanId: string
+): PhasedBreakdown {
+  const isAiOrDomain = (f: string) =>
+    f.startsWith('ai_') || f === 'commerce' || f === 'booking' || f === 'lms' || f === 'video';
+
+  let phase1FeatureIds: string[] = [];
+
+  if (resolvedFeatures.length <= 2) {
+    phase1FeatureIds = [...resolvedFeatures];
+  } else {
+    const domainFeatures = resolvedFeatures.filter(isAiOrDomain);
+    const authFeatures = resolvedFeatures.filter((f) => f === 'auth');
+
+    phase1FeatureIds = [...domainFeatures.slice(0, 2), ...authFeatures];
+    if (phase1FeatureIds.length === 0 && resolvedFeatures.length > 0) {
+      phase1FeatureIds = resolvedFeatures.slice(0, 2);
+    }
+  }
+
+  const phase1Resolved = Array.from(
+    new Set([...phase1FeatureIds, ...resolveFeatureDependencies(phase1FeatureIds, featureCatalog)])
+  );
+
+  const phase2FeatureIds = resolvedFeatures.filter((f) => !phase1Resolved.includes(f));
+
+  const phase1Quote = calcQuote(
+    engines,
+    featureCatalog,
+    brandAssets,
+    maintenancePlans,
+    {
+      engineId: baseEngineId,
+      featureIds: phase1Resolved,
+      brandAssetId,
+      maintenancePlanId: 'standard',
+    },
+    currency
+  );
+
+  const fullQuote = calcQuote(
+    engines,
+    featureCatalog,
+    brandAssets,
+    maintenancePlans,
+    {
+      engineId: baseEngineId,
+      featureIds: resolvedFeatures,
+      brandAssetId,
+      maintenancePlanId,
+    },
+    currency
+  );
+
+  const phase1FeatureLabels = phase1Resolved
+    .map((id) => featureCatalog.find((f) => f.id === id)?.label)
+    .filter(Boolean) as string[];
+
+  const phase2FeatureLabels = phase2FeatureIds
+    .map((id) => featureCatalog.find((f) => f.id === id)?.label)
+    .filter(Boolean) as string[];
+
+  const phase2INR = Math.max(0, fullQuote.netTotalINR - phase1Quote.netTotalINR);
+  const phase2USD = Math.max(0, fullQuote.netTotalUSD - phase1Quote.netTotalUSD);
+
+  const isLanding = baseEngineId === 'landing';
+
+  return {
+    phase1: {
+      title: 'Phase 1: Core Lean MVP',
+      featureIds: phase1Resolved,
+      suggestedTimeline: isLanding ? '1–2 Weeks' : '2–3 Weeks',
+      totalINR: phase1Quote.netTotalINR,
+      totalUSD: phase1Quote.netTotalUSD,
+      deliverablesSummary:
+        phase1FeatureLabels.length > 0
+          ? `Production-ready launch with ${phase1FeatureLabels.join(', ')}.`
+          : 'Core functional engine launch with zero technical debt.',
+    },
+    phase2: {
+      title: 'Phase 2: Scale & Automation',
+      featureIds: phase2FeatureIds,
+      suggestedTimeline: isLanding ? '1 Week' : '1–2 Weeks',
+      totalINR: phase2INR,
+      totalUSD: phase2USD,
+      deliverablesSummary:
+        phase2FeatureLabels.length > 0
+          ? `Growth & scale add-ons: ${phase2FeatureLabels.join(', ')}.`
+          : 'Continuous enhancement, telemetry, and automated workflows.',
+    },
+  };
+}
+
+/**
  * Builds the complete fallback conversational response with structured <blueprint_action>
  */
-function buildFallbackResponseText(prompt: string, currency: Currency): string {
+function buildFallbackResponseText(
+  prompt: string,
+  currency: Currency,
+  currentScope?: ScopeContext | null
+): string {
   const blueprintRec = classifyPromptForBlueprint(prompt);
+
+  const hasExistingScope = Boolean(currentScope?.selectedFeatures && currentScope.selectedFeatures.length > 0);
+  const targetEngineId = hasExistingScope && currentScope?.baseEngineId ? currentScope.baseEngineId : blueprintRec.baseEngineId;
+  const targetFeatures = hasExistingScope && currentScope?.selectedFeatures ? currentScope.selectedFeatures : blueprintRec.featureIds;
 
   // Ensure transitive feature dependencies are included
   const extraDependencies = resolveFeatureDependencies(
-    blueprintRec.featureIds,
+    targetFeatures,
     featureCatalog
   );
   const resolvedFeatures = Array.from(
-    new Set([...blueprintRec.featureIds, ...extraDependencies])
+    new Set([...targetFeatures, ...extraDependencies])
   );
 
   const maintenancePlanId =
     blueprintRec.maintenancePlanId ||
-    (blueprintRec.featureIds.some((f) => f.startsWith('ai_')) ? 'premium' : 'standard');
+    (resolvedFeatures.some((f) => f.startsWith('ai_')) ? 'premium' : 'standard');
   const brandAssetId = blueprintRec.brandAssetId || 'ready';
 
   // Calculate deterministic quote prices from questionnaire defaults
@@ -433,7 +571,7 @@ function buildFallbackResponseText(prompt: string, currency: Currency): string {
     brandAssets,
     maintenancePlans,
     {
-      engineId: blueprintRec.baseEngineId,
+      engineId: targetEngineId,
       featureIds: resolvedFeatures,
       brandAssetId,
       maintenancePlanId,
@@ -443,28 +581,184 @@ function buildFallbackResponseText(prompt: string, currency: Currency): string {
 
   const totalINR = quote.netTotalINR;
   const totalUSD = quote.netTotalUSD;
-  const engineObj = engines.find((e) => e.id === blueprintRec.baseEngineId);
-  const engineTitle = engineObj ? engineObj.title : blueprintRec.baseEngineId.toUpperCase();
+  const engineObj = engines.find((e) => e.id === targetEngineId);
+  const engineTitle = engineObj ? engineObj.title : targetEngineId.toUpperCase();
 
   const featureNames = resolvedFeatures
     .map((id) => featureCatalog.find((f) => f.id === id)?.label)
     .filter(Boolean) as string[];
 
+  const phased = computePhasedBreakdown(
+    targetEngineId,
+    resolvedFeatures,
+    currency,
+    brandAssetId,
+    maintenancePlanId
+  );
+
   const blueprintActionJson = JSON.stringify(
     {
       archetypeId: blueprintRec.archetypeId,
-      baseEngineId: blueprintRec.baseEngineId,
+      baseEngineId: targetEngineId,
       featureIds: resolvedFeatures,
       brandAssetId,
       maintenancePlanId,
       suggestedTimeline: blueprintRec.suggestedTimeline,
-      title: blueprintRec.title,
+      title: hasExistingScope ? `Refined ${engineTitle} Scope` : blueprintRec.title,
       totalINR,
       totalUSD,
+      phasedBreakdown: phased,
     },
     null,
     2
   );
+
+  const p = prompt.toLowerCase();
+  const isBudgetQuery =
+    p.includes('budget') ||
+    p.includes('cheap') ||
+    p.includes('cut cost') ||
+    p.includes('cut costs') ||
+    p.includes('lower price') ||
+    p.includes('lean') ||
+    p.includes('de-scope') ||
+    p.includes('descope') ||
+    p.includes('tight') ||
+    p.includes('affordable') ||
+    p.includes('cost too high') ||
+    p.includes('reduce cost') ||
+    p.includes('sculpt') ||
+    p.includes('cut $') ||
+    p.includes('cut ₹') ||
+    /\b(under|less than|cut|save|trim|reduce)\s*([$₹]|usd|inr)?\s*\d+/i.test(p);
+
+  const isTimelineQuery =
+    p.includes('timeline') ||
+    p.includes('how long') ||
+    p.includes('delivery') ||
+    p.includes('duration') ||
+    p.includes('how many weeks') ||
+    p.includes('when can');
+
+  const isDependencyQuery =
+    p.includes('depend') ||
+    p.includes('prereq') ||
+    p.includes('why do i need') ||
+    p.includes('why auth') ||
+    p.includes('why vector');
+
+  const wordCount = prompt.trim().split(/\s+/).length;
+  const isVagueQuery =
+    !hasExistingScope &&
+    wordCount <= 4 &&
+    !isBudgetQuery &&
+    !isTimelineQuery &&
+    !isDependencyQuery &&
+    !p.includes('voice') &&
+    !p.includes('speech') &&
+    !p.includes('rag') &&
+    !p.includes('ocr') &&
+    !p.includes('youtube') &&
+    !p.includes('podcast') &&
+    !p.includes('booking') &&
+    !p.includes('course') &&
+    !p.includes('store') &&
+    !p.includes('shop') &&
+    !p.includes('ecommerce') &&
+    !p.includes('audit');
+
+  if (isBudgetQuery) {
+    const p1Price = currency === 'USD' ? `$${phased.phase1.totalUSD.toLocaleString()}` : `₹${phased.phase1.totalINR.toLocaleString()}`;
+    const p2Price = currency === 'USD' ? `$${phased.phase2.totalUSD.toLocaleString()}` : `₹${phased.phase2.totalINR.toLocaleString()}`;
+    const currentPriceStr = currency === 'USD' ? `$${totalUSD.toLocaleString()}` : `₹${totalINR.toLocaleString()}`;
+
+    const contextPrefix = hasExistingScope
+      ? `Based on your active Step 2 selection (**${resolvedFeatures.length} modules, currently ${currentPriceStr}**), I have structured a lean MVP path to bring your immediate investment down to **${p1Price}**:`
+      : `To respect your budget target while eliminating technical debt, I have decoupled your scope into a **Phase 1 Lean MVP** and a **Phase 2 Scale Layer**.`;
+
+    return `### 💡 Budget-Sculpted Architecture: Phased MVP Roadmap
+${contextPrefix}
+
+### 📦 Phase 1: Core Lean MVP (Launch Ready)
+- **Engine:** ${engineTitle}
+- **Target Investment:** ${p1Price}
+- **Timeline:** ${phased.phase1.suggestedTimeline}
+- **Included Modules:** ${phased.phase1.featureIds.map((id) => featureCatalog.find((f) => f.id === id)?.label).filter(Boolean).join(', ')}
+- **Deliverables:** ${phased.phase1.deliverablesSummary}
+
+### 🚀 Phase 2: Scale & Automation (Deferred Add-on)
+- **Target Investment:** ${p2Price}
+- **Timeline:** ${phased.phase2.suggestedTimeline}
+- **Included Modules:** ${phased.phase2.featureIds.map((id) => featureCatalog.find((f) => f.id === id)?.label).filter(Boolean).join(', ') || 'Growth optimizations'}
+- **Deliverables:** ${phased.phase2.deliverablesSummary}
+
+Tap **"👉 Apply Phase 1 MVP"** below to update your live technical scope, or **"👉 Apply Full Scope"** for the complete architecture.
+
+<blueprint_action>
+${blueprintActionJson}
+</blueprint_action>`;
+  }
+
+  if (isTimelineQuery && hasExistingScope) {
+    const estWeeks = resolvedFeatures.length <= 2 ? '1–2 Weeks' : resolvedFeatures.length <= 5 ? '3–4 Weeks' : '4–6 Weeks';
+    return `### ⏱️ Estimated Production Delivery: ${estWeeks}
+For your active configuration of **${resolvedFeatures.length} modules** on the **${engineTitle}**:
+
+### 📅 Sprint Delivery Breakdown:
+- **Phase 1 (Sprint 1–2):** Core platform engine scaffolding, database architecture with Row-Level Security (RLS), and foundation modules (${resolvedFeatures.slice(0, 2).map((id) => featureCatalog.find((f) => f.id === id)?.label).filter(Boolean).join(', ')}).
+- **Phase 2 (Sprint ${resolvedFeatures.length <= 2 ? '2' : '3–4'}):** Feature matrix integration (${resolvedFeatures.slice(2).map((id) => featureCatalog.find((f) => f.id === id)?.label).filter(Boolean).join(', ') || 'real-time integrations'}), end-to-end automated testing, and client portal staging.
+- **Phase 3 (Final Handover):** Production deployment on Vercel/Oracle VPS edge, performance optimization, and 30-day bug warranty inception.
+
+<blueprint_action>
+${blueprintActionJson}
+</blueprint_action>`;
+  }
+
+  if (isDependencyQuery && hasExistingScope) {
+    return `### 🧩 Architectural Dependency Analysis
+In our engineering standard, modules adhere to explicit dependencies to ensure security and zero runtime faults:
+
+- **Authentication (Supabase Auth & RLS):** Required by customer payments, private user data stores, and client workspaces to bind session tokens to PostgreSQL policies.
+- **pgvector Vector Database:** Prerequisite for semantic hybrid search (BM25 + HNSW) and multi-agent memory retrieval.
+- **Transactional Email (Resend):** Directly wired into authentication triggers and payment success webhooks for immediate receipt delivery.
+
+Your active selection on the **${engineTitle}** satisfies all necessary system dependencies with zero orphan modules.
+
+<blueprint_action>
+${blueprintActionJson}
+</blueprint_action>`;
+  }
+
+  if (isVagueQuery) {
+    return `Here is a custom architecture plan designed for your requirements:
+
+### 🎯 Architecture: ${blueprintRec.title}
+${blueprintRec.summary}
+
+### 🛠️ Recommended Technology Stack:
+- **Core Engine:** ${engineTitle}
+- **App Framework:** Next.js 16 App Router, React 19, TypeScript
+- **Database & Security:** Supabase PostgreSQL with strict Row-Level Security (RLS)
+- **Key Modules:** ${featureNames.join(', ')}
+- **Estimated Delivery:** ${blueprintRec.suggestedTimeline}
+
+### ⚡ Architectural Highlights:
+${blueprintRec.techHighlights.map((h) => `- ${h}`).join('\n')}
+
+### 🧭 Socratic Diagnostic Alignment:
+To calibrate this specification to your exact operational goals, consider:
+1. **Target Audience:** Will this be consumer-facing (self-serve) or an internal team workspace?
+2. **Access & Monetization:** Do you require user accounts, role-based permissions, or upfront payment/subscription billing?
+3. **Data Integration:** Do you have existing databases, PDFs, or third-party APIs that this platform must interface with?
+
+You can reply with your answers to refine this scope further, or apply the starting blueprint below:
+
+<blueprint_action>
+${blueprintActionJson}
+</blueprint_action>`;
+  }
+
+  const p1PriceSummary = currency === 'USD' ? `$${phased.phase1.totalUSD.toLocaleString()}` : `₹${phased.phase1.totalINR.toLocaleString()}`;
 
   return `Here is a custom architecture plan designed for your requirements:
 
@@ -481,7 +775,7 @@ ${blueprintRec.summary}
 ### ⚡ Architectural Highlights:
 ${blueprintRec.techHighlights.map((h) => `- ${h}`).join('\n')}
 
-I have configured a formal starting blueprint below. Tap **"👉 Apply Blueprint to Quote"** to automatically populate your interactive quote in Step 2.
+💡 *Budget Phasing Available:* You can choose between launching the **Phase 1 Lean MVP** (${p1PriceSummary}) to validate fast, or applying the **Full Architecture** below.
 
 <blueprint_action>
 ${blueprintActionJson}
@@ -550,7 +844,64 @@ function createTextStream(
   });
 }
 
+function extractCleanProseFromSse(rawSse: string): string {
+  let cleanText = '';
+  const lines = rawSse.split('\n');
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    if (trimmed.startsWith('data: ')) {
+      const payload = trimmed.slice(6).trim();
+      if (payload === '[DONE]') continue;
+      try {
+        const parsed = JSON.parse(payload);
+        if (typeof parsed.delta === 'string') cleanText += parsed.delta;
+        else if (typeof parsed.text === 'string') cleanText += parsed.text;
+        else if (typeof parsed.content === 'string') cleanText += parsed.content;
+      } catch {
+        cleanText += payload;
+      }
+    } else if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (typeof parsed.delta === 'string') cleanText += parsed.delta;
+        else if (typeof parsed.text === 'string') cleanText += parsed.text;
+        else if (typeof parsed.content === 'string') cleanText += parsed.content;
+      } catch {
+        // Not JSON
+      }
+    }
+  }
+  return cleanText || rawSse;
+}
+
+function createTappedStream(
+  sourceStream: ReadableStream<Uint8Array>,
+  onDone: (accumulated: string) => void
+): ReadableStream<Uint8Array> {
+  const decoder = new TextDecoder();
+  let accumulated = '';
+  const transform = new TransformStream<Uint8Array, Uint8Array>({
+    transform(chunk, controller) {
+      accumulated += decoder.decode(chunk, { stream: true });
+      controller.enqueue(chunk);
+    },
+    flush() {
+      accumulated += decoder.decode();
+      try {
+        const cleanProse = extractCleanProseFromSse(accumulated);
+        onDone(cleanProse);
+      } catch (err) {
+        console.warn('Tapped stream onDone callback warning:', err);
+      }
+    },
+  });
+  return sourceStream.pipeThrough(transform);
+}
+
 export async function POST(req: NextRequest) {
+  const startTime = performance.now();
+
   // 1. Sliding window rate limit check (25 requests / min)
   const rateLimit = await checkRateLimit(req, {
     scope: 'scoping_chat',
@@ -566,7 +917,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const prompt = (body.message || body.query || '').trim();
     const sessionId = (body.sessionId || '').trim() || null;
+    const scopeCode = (body.scopeCode || (body.currentScope as ScopeContext)?.scopeCode || '').trim();
+    const turnIndex = typeof body.turnIndex === 'number' ? body.turnIndex : 1;
     const currency: Currency = body.currency === 'USD' ? 'USD' : 'INR';
+    const currentScope = (body.currentScope as ScopeContext) || null;
 
     if (!prompt) {
       return NextResponse.json(
@@ -574,6 +928,14 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    const visitorCountry = req.headers.get('x-vercel-ip-country') || 'Unknown';
+    const rawIp = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || '127.0.0.1';
+    const ipHash = await getIpHash(rawIp);
+    const userAgent = req.headers.get('user-agent') || '';
+
+    // Extract preliminary intent & reasoning for deep observability
+    const blueprintRec = classifyPromptForBlueprint(prompt);
 
     const tenantId =
       process.env.RETRIEVER_SCOPING_TENANT_ID ||
@@ -594,6 +956,14 @@ export async function POST(req: NextRequest) {
       '36e62429-419e-48ef-af92-533afca9e028';
 
     let activeSessionId = sessionId;
+
+    let promptWithContext = prompt;
+    if (currentScope?.selectedFeatures?.length) {
+      const activeLabels = currentScope.selectedFeatures
+        .map((id) => featureCatalog.find((f) => f.id === id)?.label || id)
+        .join(', ');
+      promptWithContext = `[Client Step ${currentScope.currentStep || 2} Context: Engine=${currentScope.baseEngineId}, Modules=${activeLabels}, Total=${currency === 'USD' ? `$${currentScope.totalUSD}` : `₹${currentScope.totalINR}`}]\n\nUser Question: ${prompt}`;
+    }
 
     // 2. Attempt Live Retrieval & Streaming Inference via Retriever VPS
     if (tenantId && apiKey) {
@@ -630,18 +1000,43 @@ export async function POST(req: NextRequest) {
           try {
             const upstreamStream = await client.chat(
               activeSessionId,
-              prompt,
+              promptWithContext,
               chatAbortController.signal
             );
             clearTimeout(chatTimeoutId);
 
             if (upstreamStream) {
-              return new Response(upstreamStream, {
+              const tappedStream = createTappedStream(upstreamStream, (accumulatedText) => {
+                const elapsed = Math.round(performance.now() - startTime);
+                logScopingChatTrace({
+                  sessionId: activeSessionId || 'unknown_session',
+                  scopeCode,
+                  turnIndex,
+                  userQuery: prompt,
+                  assistantResponse: accumulatedText,
+                  agentIntent: blueprintRec.archetypeId,
+                  agentReasoning: `${blueprintRec.title}: ${blueprintRec.summary}`,
+                  modelUsed: 'retriever-vps',
+                  latencyMs: elapsed,
+                  isFallback: false,
+                  currency,
+                  currentEngine: currentScope?.baseEngineId || blueprintRec.baseEngineId,
+                  selectedFeatures: currentScope?.selectedFeatures || blueprintRec.featureIds,
+                  quoteINR: currentScope?.totalINR || 0,
+                  quoteUSD: currentScope?.totalUSD || 0,
+                  visitorIpHash: ipHash,
+                  visitorCountry,
+                  visitorUserAgent: userAgent,
+                }).catch((err) => console.warn('Trace logging warning:', err));
+              });
+
+              return new Response(tappedStream, {
                 headers: {
                   'Content-Type': 'text/event-stream',
                   'Cache-Control': 'no-cache, no-transform',
                   'Connection': 'keep-alive',
                   'X-Session-ID': activeSessionId,
+                  'Set-Cookie': `prateeq_chat_session_id=${encodeURIComponent(activeSessionId)}; Path=/; Max-Age=2592000; SameSite=Lax`,
                 },
               });
             }
@@ -659,8 +1054,31 @@ export async function POST(req: NextRequest) {
     // If Retriever VPS is unreachable, times out, or throws, provide instant high-fidelity response.
     const fallbackSessionId =
       activeSessionId || `scoping_fallback_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-    const fallbackText = buildFallbackResponseText(prompt, currency);
+    const fallbackText = buildFallbackResponseText(prompt, currency, currentScope);
     const fallbackStream = createTextStream(fallbackText, 10, req.signal);
+
+    // Asynchronously log fallback trace
+    const elapsed = Math.round(performance.now() - startTime);
+    logScopingChatTrace({
+      sessionId: fallbackSessionId,
+      scopeCode,
+      turnIndex,
+      userQuery: prompt,
+      assistantResponse: fallbackText,
+      agentIntent: blueprintRec.archetypeId,
+      agentReasoning: `${blueprintRec.title}: ${blueprintRec.summary}`,
+      modelUsed: 'heuristic-rule-engine',
+      latencyMs: elapsed,
+      isFallback: true,
+      currency,
+      currentEngine: currentScope?.baseEngineId || blueprintRec.baseEngineId,
+      selectedFeatures: currentScope?.selectedFeatures || blueprintRec.featureIds,
+      quoteINR: currentScope?.totalINR || 0,
+      quoteUSD: currentScope?.totalUSD || 0,
+      visitorIpHash: ipHash,
+      visitorCountry,
+      visitorUserAgent: userAgent,
+    }).catch((err) => console.warn('Fallback trace logging warning:', err));
 
     return new Response(fallbackStream, {
       headers: {
@@ -669,6 +1087,7 @@ export async function POST(req: NextRequest) {
         'Connection': 'keep-alive',
         'X-Session-ID': fallbackSessionId,
         'X-Fallback-Mode': 'true',
+        'Set-Cookie': `prateeq_chat_session_id=${encodeURIComponent(fallbackSessionId)}; Path=/; Max-Age=2592000; SameSite=Lax`,
       },
     });
   } catch (error) {

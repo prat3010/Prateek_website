@@ -31,6 +31,7 @@ test_suites:
 - **Domain Subsystem:** Multi-Vector Retrieval & Hardware-Accelerated Token Reranking
 - **Source Paths:**
   - `retriever/apps/api/src/domain/retrieval/colbert_engine.py` (Pure Hexagonal Mathematical Domain)
+  - `retriever/apps/api/src/domain/retrieval/colbert_onnx_engine.py` (NeuralColbertEngine with FastEmbed / ONNX late interaction)
   - `retriever/apps/api/src/domain/abstractions/retrieval.py` (`SearchQuery`, `SearchResult`)
   - `retriever/apps/api/src/domain/retrieval/search_service.py` (`SearchService._apply_reranking`)
   - `retriever/apps/api/src/routers/search.py` & `src/schemas/search.py` (FastAPI Search Endpoint)

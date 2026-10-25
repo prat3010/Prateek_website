@@ -3,6 +3,7 @@ import type { EmailOtpType, Session, User, AuthError } from '@supabase/supabase-
 import { createClient } from '@/lib/supabase/server';
 import { sendAdminSignupNotification } from '@/lib/emailNotification';
 import { isAdminEmail } from '@/lib/auth';
+import { stitchAnonymousSession } from '@/lib/scopingObservability';
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
@@ -65,6 +66,37 @@ export async function GET(request: Request) {
             provider: user.app_metadata?.provider || (otpType ? 'Magic Link' : 'Google OAuth'),
             signedUpAt: user.created_at,
           }).catch(err => console.warn('Failed to send admin signup notification:', err));
+
+          // Session Stitching: Link any anonymous scoping traces to verified user
+          const cookieHeader = request.headers.get('cookie') || '';
+          const rawScopeCode = cookieHeader
+            .split(';')
+            .find(c => c.trim().startsWith('prateeq_pending_scope_code='))
+            ?.split('=')[1]?.trim();
+          const pendingScopeCode = rawScopeCode ? decodeURIComponent(rawScopeCode) : '';
+
+          const rawDraftToken = cookieHeader
+            .split(';')
+            .find(c => c.trim().startsWith('prateeq_draft_token='))
+            ?.split('=')[1]?.trim();
+          const pendingDraftToken = rawDraftToken ? decodeURIComponent(rawDraftToken) : '';
+
+          const rawChatSessionId = cookieHeader
+            .split(';')
+            .find(c => c.trim().startsWith('prateeq_chat_session_id='))
+            ?.split('=')[1]?.trim();
+          const chatSessionId = rawChatSessionId ? decodeURIComponent(rawChatSessionId) : '';
+
+          const effectiveSessionId = chatSessionId || pendingDraftToken || '';
+
+          Promise.resolve(
+            stitchAnonymousSession(
+              effectiveSessionId,
+              user.email || '',
+              pendingScopeCode,
+              pendingDraftToken
+            )
+          ).catch(err => console.warn('Session stitching warning in auth callback:', err));
         }
 
         return response;

@@ -201,8 +201,13 @@ export function useIntakeFormState(
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [appliedPromo, setAppliedPromo] = useState<PromoDiscountInfo | null>(null);
   const [cascadeState, setCascadeState] = useState<{ targetFeature: FeatureItem; dependentFeatures: FeatureItem[] } | null>(null);
-  const [sessionSeed] = useState(() => Math.random().toString(36).slice(2, 8));
-  const [chatSessionId, setChatSessionId] = useState<string | null>(null);
+  const [chatSessionId, setChatSessionId] = useState<string | null>(() => {
+    if (typeof document !== 'undefined') {
+      const match = document.cookie.match(/(?:^|; )prateeq_chat_session_id=([^;]*)/);
+      return match ? decodeURIComponent(match[1]) : null;
+    }
+    return null;
+  });
   const [chatTranscript, setChatTranscript] = useState<
     Array<{ role: string; content: string; timestamp?: string }>
   >([]);
@@ -418,16 +423,15 @@ export function useIntakeFormState(
     return calcQuickServiceQuote(quickServices, selectedQuickServices, currency);
   }, [quickServices, selectedQuickServices, currency]);
 
-  const generatedScopeCode = useMemo(() => {
-    let hash = 0;
-    const key = `${sessionSeed}-${formData.companyName}-${formData.projectGoal}-${formData.selectedBaseEngineId}-${formData.selectedFeatures.join(',')}`;
-    for (let i = 0; i < key.length; i++) {
-      hash = (hash << 5) - hash + key.charCodeAt(i);
-      hash |= 0;
+  const [generatedScopeCode] = useState(() => {
+    if (typeof document !== 'undefined') {
+      const match = document.cookie.match(/(?:^|; )prateeq_pending_scope_code=([^;]*)/);
+      if (match && match[1]?.trim()) {
+        return decodeURIComponent(match[1].trim());
+      }
     }
-    const positiveHash = Math.abs(hash) % 90000 + 10000;
-    return `SCOPE-${positiveHash}`;
-  }, [sessionSeed, formData.companyName, formData.projectGoal, formData.selectedBaseEngineId, formData.selectedFeatures]);
+    return `SCOPE-${Math.floor(10000 + Math.random() * 90000)}`;
+  });
 
   const buildQuestionnaireData = useCallback(() => {
     const selectedFeatureLabels = features
@@ -639,7 +643,10 @@ export function useIntakeFormState(
           .filter(Boolean) as string[])
       : [];
 
-    const baseFeatureIds = Array.from(new Set([...compulsoryIds, ...(blueprint.featureIds || [])]));
+    const isExplicitPhase1 = Boolean(blueprint.featureIds && blueprint.featureIds.length > 0);
+    const baseFeatureIds = isExplicitPhase1
+      ? Array.from(new Set(blueprint.featureIds))
+      : Array.from(new Set([...compulsoryIds, ...(blueprint.featureIds || [])]));
     const extraDeps = resolveFeatureDependencies(baseFeatureIds, features);
     const resolvedFeatureIds = Array.from(new Set([...baseFeatureIds, ...extraDeps]));
     const validFeatureIds = resolvedFeatureIds.filter((id) => features.some((f: FeatureItem) => f.id === id));
@@ -697,6 +704,37 @@ export function useIntakeFormState(
       },
     };
   }, [formData, user, generatedScopeCode, selectedEngine, features, totalCost, activeMaintenancePlan, currency, appliedPromo, chatSessionId, chatTranscript]);
+
+  // Auto-persist scoping discovery draft to intake_leads when chat transcript has messages
+  const lastSavedTranscriptLengthRef = useRef(0);
+  useEffect(() => {
+    if (!chatTranscript || chatTranscript.length === 0) {
+      lastSavedTranscriptLengthRef.current = 0;
+      return;
+    }
+    if (chatTranscript.length === lastSavedTranscriptLengthRef.current) return;
+
+    // Only sync if there is at least 1 user message and 1 assistant message
+    const hasUser = chatTranscript.some((m) => m.role === 'user');
+    const hasAssistant = chatTranscript.some((m) => m.role === 'assistant' && m.content.trim().length > 0);
+    if (!hasUser || !hasAssistant) return;
+
+    const debounceTimer = setTimeout(async () => {
+      try {
+        lastSavedTranscriptLengthRef.current = chatTranscript.length;
+        const payload = buildScopePayload();
+        await fetch('/api/client/intake-draft', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      } catch {
+        // Silently catch background draft persistence error
+      }
+    }, 2000);
+
+    return () => clearTimeout(debounceTimer);
+  }, [chatTranscript, buildScopePayload]);
 
   const getDashboardRedirectUrl = useCallback((payload: {
     scopeCode: string;

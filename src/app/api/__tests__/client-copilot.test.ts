@@ -253,7 +253,10 @@ describe('POST /api/client/copilot', () => {
     const json = await res.json();
 
     expect(createSessionSpy).toHaveBeenCalled();
-    expect(chatCompleteSpy).toHaveBeenCalledWith('sess-xyz-123', 'What is my vector search architecture?');
+    expect(chatCompleteSpy).toHaveBeenCalledWith(
+      'sess-xyz-123',
+      expect.stringContaining('What is my vector search architecture?')
+    );
     expect(json.answer).toContain('According to your verified SOW document');
     expect(json.citations.some((c: { id: string }) => c.id === 'doc-sow-9900')).toBe(true);
 

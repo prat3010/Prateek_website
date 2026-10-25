@@ -11,7 +11,8 @@ export async function POST(request: NextRequest) {
   }
 
   revalidateTag('portfolio-data', 'max');
-  console.log('Revalidated cache tag: portfolio-data');
+  revalidateTag('projects', 'max');
+  console.log('Revalidated cache tags: portfolio-data, projects');
   return NextResponse.json({ revalidated: true, method: 'POST', now: Date.now() });
 }
 
@@ -23,6 +24,7 @@ export async function GET(request: NextRequest) {
   }
 
   revalidateTag('portfolio-data', 'max');
-  console.log('Revalidated cache tag: portfolio-data (via GET)');
+  revalidateTag('projects', 'max');
+  console.log('Revalidated cache tags: portfolio-data, projects (via GET)');
   return NextResponse.json({ revalidated: true, method: 'GET', now: Date.now() });
 }

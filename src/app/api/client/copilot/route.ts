@@ -135,7 +135,8 @@ export async function POST(req: NextRequest) {
         const session = await client.createSession();
         const sessionId = session?.sessionId || (session as unknown as { session_id?: string })?.session_id;
         if (sessionId) {
-          const completion = await client.chatComplete(sessionId, query);
+          const contextHeader = `[Active Project: ${activeScope.scope_code || 'PROJ'} (${activeScope.company_name || 'Client'}) | Stage: ${deliveryStage.toUpperCase()} | Engine: ${engineTitle} | Modules: ${featuresList} | Investment: ${costINR || costUSD || 'Confirmed'} | Plan: ${maintenance}]\n\nClient Inquiry: ${query}`;
+          const completion = await client.chatComplete(sessionId, contextHeader);
           if (completion && completion.text) {
             answerText = completion.text;
             if (Array.isArray(completion.citations) && completion.citations.length > 0) {

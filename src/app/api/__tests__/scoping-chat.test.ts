@@ -1,4 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/lib/scopingObservability', () => ({
+  logScopingChatTrace: vi.fn().mockResolvedValue(undefined),
+  stitchAnonymousSession: vi.fn().mockResolvedValue(undefined),
+}));
+
 import { NextRequest } from 'next/server';
 import { POST } from '../scoping/chat/route';
 import { RetrieverClient } from '@/lib/rag-client';
@@ -272,5 +278,110 @@ describe('POST /api/scoping/chat', () => {
       delete process.env.RETRIEVER_SCOPING_TENANT_ID;
       delete process.env.RETRIEVER_SCOPING_API_KEY;
     }
+  });
+
+  it('handles budget de-escalation query and generates phased MVP breakdown', async () => {
+    const req = new NextRequest('http://localhost:3000/api/scoping/chat', {
+      method: 'POST',
+      body: JSON.stringify({
+        message: 'Can we sculpt a lean Phase 1 MVP under $3,000 / ₹2,50,000? What features can we de-scope?',
+        currency: 'USD',
+      }),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+
+    const accumulatedText = await parseSseStream(res.body!);
+    expect(accumulatedText).toContain('Budget-Sculpted Architecture: Phased MVP Roadmap');
+    expect(accumulatedText).toContain('Phase 1: Core Lean MVP');
+    expect(accumulatedText).toContain('Phase 2: Scale & Automation');
+    expect(accumulatedText).toContain('<blueprint_action>');
+
+    const match = accumulatedText.match(/<blueprint_action>([\s\S]*?)<\/blueprint_action>/);
+    expect(match).toBeTruthy();
+    const blueprint = JSON.parse(match![1].trim());
+    expect(blueprint.phasedBreakdown).toBeDefined();
+    expect(blueprint.phasedBreakdown.phase1).toBeDefined();
+    expect(blueprint.phasedBreakdown.phase1.totalUSD).toBeGreaterThan(0);
+    expect(blueprint.phasedBreakdown.phase1.featureIds.length).toBeGreaterThan(0);
+    expect(blueprint.phasedBreakdown.phase2).toBeDefined();
+
+    // Verify zero duplicate features between Phase 1 MVP and Phase 2 scale add-ons
+    const phase1Set = new Set(blueprint.phasedBreakdown.phase1.featureIds);
+    for (const fId of blueprint.phasedBreakdown.phase2.featureIds) {
+      expect(phase1Set.has(fId)).toBe(false);
+    }
+  });
+
+  it('provides Socratic diagnostic questions for brief/vague prompts', async () => {
+    const req = new NextRequest('http://localhost:3000/api/scoping/chat', {
+      method: 'POST',
+      body: JSON.stringify({
+        message: 'make app',
+        currency: 'INR',
+      }),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+
+    const accumulatedText = await parseSseStream(res.body!);
+    expect(accumulatedText).toContain('Socratic Diagnostic Alignment');
+    expect(accumulatedText).toContain('Target Audience');
+    expect(accumulatedText).toContain('Access & Monetization');
+    expect(accumulatedText).toContain('<blueprint_action>');
+  });
+
+  it('handles active currentScope context for budget sculpting on Step 2', async () => {
+    const req = new NextRequest('http://localhost:3000/api/scoping/chat', {
+      method: 'POST',
+      body: JSON.stringify({
+        message: 'How can I cut $1,000 without losing core UX?',
+        currency: 'USD',
+        currentScope: {
+          currentStep: 2,
+          baseEngineId: 'saas',
+          selectedFeatures: ['auth', 'payments', 'ai_rag', 'admin'],
+          totalINR: 350000,
+          totalUSD: 4200,
+        },
+      }),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+
+    const accumulatedText = await parseSseStream(res.body!);
+    expect(accumulatedText).toContain('active Step 2 selection');
+    expect(accumulatedText).toContain('Phase 1: Core Lean MVP');
+    expect(accumulatedText).toContain('<blueprint_action>');
+
+    const match = accumulatedText.match(/<blueprint_action>([\s\S]*?)<\/blueprint_action>/);
+    expect(match).toBeTruthy();
+    const blueprint = JSON.parse(match![1].trim());
+    expect(blueprint.baseEngineId).toBe('saas');
+    expect(blueprint.phasedBreakdown).toBeDefined();
+  });
+
+  it('handles delivery timeline query with active currentScope context', async () => {
+    const req = new NextRequest('http://localhost:3000/api/scoping/chat', {
+      method: 'POST',
+      body: JSON.stringify({
+        message: 'What is the estimated delivery timeline for these exact modules?',
+        currency: 'USD',
+        currentScope: {
+          currentStep: 2,
+          baseEngineId: 'saas',
+          selectedFeatures: ['auth', 'payments', 'ai_rag'],
+          totalINR: 280000,
+          totalUSD: 3400,
+        },
+      }),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+
+    const accumulatedText = await parseSseStream(res.body!);
+    expect(accumulatedText).toContain('Estimated Production Delivery');
+    expect(accumulatedText).toContain('Sprint Delivery Breakdown');
+    expect(accumulatedText).toContain('<blueprint_action>');
   });
 });

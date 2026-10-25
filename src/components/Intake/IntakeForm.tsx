@@ -35,7 +35,9 @@ import { StepCommercials } from './StepCommercials';
 import { QuickServiceFlow } from './QuickServiceFlow';
 import { StickyPriceBar } from './StickyPriceBar';
 import { ArchitectureCartDrawer } from './ArchitectureCartDrawer';
+import { ScopeCopilotDrawer } from './ScopeCopilotDrawer';
 import { DependencyCascadeModal } from './DependencyCascadeModal';
+import type { CurrentScopeContext } from './InlineScopingChatCard';
 
 import styles from './IntakeForm.module.css';
 
@@ -134,6 +136,28 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     chatTranscript,
     setChatTranscript,
   } = state;
+
+  const [isCopilotDrawerOpen, setIsCopilotDrawerOpen] = React.useState(false);
+
+  const currentScopeContext: CurrentScopeContext = React.useMemo(() => ({
+    currentStep,
+    baseEngineId: selectedEngine.id,
+    selectedFeatures: formData.selectedFeatures,
+    selectedBrandAssetId: formData.selectedBrandAssetId,
+    selectedMaintenanceId: formData.selectedMaintenanceId,
+    totalINR: totalCost.totalINR,
+    totalUSD: totalCost.totalUSD,
+    scopeCode: generatedScopeCode,
+  }), [
+    currentStep,
+    selectedEngine.id,
+    formData.selectedFeatures,
+    formData.selectedBrandAssetId,
+    formData.selectedMaintenanceId,
+    totalCost.totalINR,
+    totalCost.totalUSD,
+    generatedScopeCode,
+  ]);
 
   useEffect(() => {
     if (containerRef.current && currentStep > 1) {
@@ -448,6 +472,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                     setChatSessionId={setChatSessionId}
                     chatTranscript={chatTranscript}
                     setChatTranscript={setChatTranscript}
+                    currentScope={currentScopeContext}
                   />
                 )}
 
@@ -473,6 +498,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                     togglePopover={togglePopover}
                     dependsOnMap={dependsOnMap}
                     stepHeadingRef={stepHeadingRef}
+                    onOpenCopilot={() => setIsCopilotDrawerOpen(true)}
                   />
                 )}
 
@@ -528,6 +554,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                   showMobileFormula={showMobileFormula}
                   setShowMobileFormula={setShowMobileFormula}
                   onOpenCart={() => setIsCartOpen(true)}
+                  onOpenCopilot={() => setIsCopilotDrawerOpen(true)}
                   itemCount={
                     (selectedEngine ? 1 : 0) +
                     formData.selectedFeatures.length +
@@ -671,6 +698,20 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
         isNoir={isNoir}
         lockedFeatureIds={lockedFeatureIds}
         generatingPdf={generatingPdf}
+      />
+
+      <ScopeCopilotDrawer
+        isOpen={isCopilotDrawerOpen}
+        onClose={() => setIsCopilotDrawerOpen(false)}
+        currency={currency}
+        isNoir={isNoir}
+        onApplyBlueprint={applyBlueprint}
+        onNavigateStep={setCurrentStep}
+        chatSessionId={chatSessionId}
+        setChatSessionId={setChatSessionId}
+        chatTranscript={chatTranscript}
+        setChatTranscript={setChatTranscript}
+        currentScope={currentScopeContext}
       />
 
       <DependencyCascadeModal

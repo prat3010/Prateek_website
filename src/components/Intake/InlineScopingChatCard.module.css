@@ -259,6 +259,136 @@
   font-family: var(--font-code, monospace);
 }
 
+/* Phased MVP vs Full Scope Grid */
+.phasedGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+  margin: 6px 0;
+}
+
+.phaseCard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(0, 230, 118, 0.25);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.phaseCard:hover {
+  background: rgba(0, 230, 118, 0.05);
+  border-color: rgba(0, 230, 118, 0.45);
+}
+
+.phaseCardFull {
+  border-color: rgba(59, 130, 246, 0.25);
+}
+
+.phaseCardFull:hover {
+  background: rgba(59, 130, 246, 0.05);
+  border-color: rgba(59, 130, 246, 0.45);
+}
+
+.phaseCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.phaseBadge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(0, 230, 118, 0.15);
+  color: #00E676;
+  border: 1px solid rgba(0, 230, 118, 0.3);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.phaseBadgeFull {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.phasePrice {
+  font-size: 0.95rem;
+  font-weight: 800;
+  font-family: var(--font-code, monospace);
+  color: var(--color-text, #ffffff);
+}
+
+.phaseCardTitle {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-text, #f1f5f9);
+}
+
+.phaseCardSummary {
+  font-size: 0.72rem;
+  color: var(--color-text-muted, #94a3b8);
+  line-height: 1.35;
+  margin: 0;
+}
+
+.phaseMetaRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.68rem;
+  color: var(--color-text-muted, #94a3b8);
+  margin-top: 2px;
+}
+
+.applyPhaseBtn {
+  background: #00E676;
+  color: #000000;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 4px;
+  transition: all 0.2s ease;
+}
+
+.applyPhaseBtn:hover {
+  background: #00c864;
+  transform: translateY(-1px);
+}
+
+.applyFullBtn {
+  background: #3b82f6;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 4px;
+  transition: all 0.2s ease;
+}
+
+.applyFullBtn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
 .blueprintActionRow {
   display: flex;
   align-items: center;
@@ -439,4 +569,192 @@
   background: rgba(255, 255, 255, 0.08);
   color: var(--color-text, #ffffff);
 }
+
+/* Scope Sync Live Banner */
+.scopeSyncBanner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 8px;
+  padding: 6px 12px;
+  margin-bottom: 0.85rem;
+  width: 100%;
+}
+
+.livePulseDot {
+  width: 8px;
+  height: 8px;
+  background-color: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #10b981;
+  animation: pulseLiveDot 2s infinite ease-in-out;
+  flex-shrink: 0;
+}
+
+@keyframes pulseLiveDot {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 0.6;
+  }
+}
+
+.scopeSyncText {
+  font-size: 0.78rem;
+  color: #34d399;
+  font-family: var(--font-code, monospace);
+  line-height: 1.4;
+}
+
+.scopeSyncText strong {
+  color: #ffffff;
+}
+
+/* Drawer Mode Overrides */
+.drawerMode {
+  margin-bottom: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
+.drawerMode .messagesViewport {
+  max-height: 52vh;
+  min-height: 260px;
+}
+
+/* Verified User Pill */
+.verifiedUserPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #34d399;
+}
+
+.verifiedDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  animation: pulseLiveDot 2s infinite ease-in-out;
+}
+
+/* Near Limit Warning Pill */
+.nearLimitAlert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  margin: 0 0 8px 0;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: #fbbf24;
+  line-height: 1.4;
+}
+
+.nearLimitIcon {
+  flex-shrink: 0;
+  color: #fbbf24;
+}
+
+/* Freemium Soft Gate Callout Card */
+.softGateCard {
+  margin: 12px 0 6px 0;
+  padding: 14px 16px;
+  background: var(--surface-card, #131720);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.3), 0 0 16px -2px rgba(59, 130, 246, 0.2);
+  border-radius: 10px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.softGateHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.softGateIconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: rgba(59, 130, 246, 0.18);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  color: #60a5fa;
+  flex-shrink: 0;
+}
+
+.softGateTitle {
+  margin: 0 0 4px 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--color-text, #f8fafc);
+  letter-spacing: -0.01em;
+}
+
+.softGateText {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--color-text-muted, #94a3b8);
+  line-height: 1.45;
+}
+
+.softGateActionRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.softGateBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+}
+
+.softGateBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45);
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
 

@@ -38,7 +38,99 @@ export async function POST(req: Request) {
         maxAge: 604800,
         sameSite: 'lax',
       });
+      res.cookies.set('prateeq_pending_scope_code', scopeCode, {
+        path: '/',
+        maxAge: 604800,
+        sameSite: 'lax',
+      });
       return res;
+    }
+
+    // 1. Check if an existing intake lead with this scope_code already exists for update
+    if (scopeCode) {
+      const { data: existingLead } = await supabase
+        .from('intake_leads')
+        .select('id, draft_token, notes_internal, contact_email, company_name, base_engine_title, contact_phone, total_cost_inr, total_cost_usd, timeline')
+        .eq('scope_code', scopeCode)
+        .maybeSingle();
+
+      if (existingLead?.id) {
+        const updatePayload: Record<string, unknown> = {
+          company_name: payload.companyName || undefined,
+          contact_email: payload.contactEmail || undefined,
+          contact_phone: payload.contactPhone || undefined,
+          project_goal: payload.projectGoal || undefined,
+          target_audience: payload.targetAudience || undefined,
+          base_engine_id: payload.baseEngineId || undefined,
+          base_engine_title: payload.baseEngineTitle || undefined,
+          selected_features: payload.selectedFeatures || undefined,
+          brand_asset_option: payload.brandAssetOption || undefined,
+          maintenance_plan: payload.maintenancePlan || undefined,
+          total_cost_inr: payload.totalCostINR !== undefined ? Number(payload.totalCostINR) : undefined,
+          total_cost_usd: payload.totalCostUSD !== undefined ? Number(payload.totalCostUSD) : undefined,
+          timeline: payload.timeline || undefined,
+          inspiration_links: payload.inspirationLinks || undefined,
+          additional_notes: payload.additionalNotes || undefined,
+          chat_session_id: payload.chatSessionId || (typeof rawObj.chatSessionId === 'string' ? rawObj.chatSessionId.trim() : undefined),
+          chat_transcript: payload.chatTranscript || (Array.isArray(rawObj.chatTranscript) ? rawObj.chatTranscript : undefined),
+        };
+
+        const effectiveEmail = payload.contactEmail || existingLead.contact_email;
+        const effectiveCompany = payload.companyName || existingLead.company_name;
+        const effectiveChat = payload.chatTranscript || (Array.isArray(rawObj.chatTranscript) ? rawObj.chatTranscript : undefined);
+
+        const hasRealEmail = Boolean(effectiveEmail && effectiveEmail !== 'lead@unauthenticated.client');
+        const hasCustomCompany = Boolean(
+          effectiveCompany &&
+          effectiveCompany !== 'Untitled Project' &&
+          effectiveCompany !== 'My Custom Project'
+        );
+        const hasSufficientChat = Boolean(Array.isArray(effectiveChat) && effectiveChat.length >= 6);
+
+        let shouldSendAlert = false;
+        if (existingLead.notes_internal !== 'alert_sent' && (hasRealEmail || hasCustomCompany || hasSufficientChat)) {
+          shouldSendAlert = true;
+          updatePayload.notes_internal = 'alert_sent';
+        }
+
+        const { data, error } = await supabase
+          .from('intake_leads')
+          .update(updatePayload)
+          .eq('id', existingLead.id)
+          .select('id, draft_token')
+          .maybeSingle();
+
+        if (error) {
+          console.warn('Update intake_lead DB error:', error);
+          return NextResponse.json({ error: error.message }, { status: 500 });
+        }
+
+        if (shouldSendAlert) {
+          sendAdminIntakeLeadNotification({
+            scopeCode,
+            companyName: (effectiveCompany || 'Untitled Project') as string,
+            contactEmail: (effectiveEmail || 'lead@unauthenticated.client') as string,
+            contactPhone: (payload.contactPhone || existingLead.contact_phone || '') as string,
+            baseEngineTitle: (payload.baseEngineTitle || existingLead.base_engine_title || 'Full-Stack Web Engine') as string,
+            totalCostINR: payload.totalCostINR !== undefined ? Number(payload.totalCostINR) : Number(existingLead.total_cost_inr) || 0,
+            totalCostUSD: payload.totalCostUSD !== undefined ? Number(payload.totalCostUSD) : Number(existingLead.total_cost_usd) || 0,
+            timeline: (payload.timeline || existingLead.timeline || 'Standard') as string,
+          }).catch(err => console.warn('Failed to send admin intake lead email alert on update:', err));
+        }
+
+        const res = NextResponse.json({ success: true, draftId: data?.id || existingLead.id, scopeCode });
+        res.cookies.set('prateeq_draft_token', existingLead.draft_token || draftToken, {
+          path: '/',
+          maxAge: 604800,
+          sameSite: 'lax',
+        });
+        res.cookies.set('prateeq_pending_scope_code', scopeCode, {
+          path: '/',
+          maxAge: 604800,
+          sameSite: 'lax',
+        });
+        return res;
+      }
     }
 
     const forwardedFor = req.headers.get('x-forwarded-for');
@@ -79,9 +171,24 @@ export async function POST(req: Request) {
       additional_notes: payload.additionalNotes || '',
       chat_session_id: payload.chatSessionId || (typeof rawObj.chatSessionId === 'string' ? rawObj.chatSessionId.trim() : null),
       chat_transcript: payload.chatTranscript || (Array.isArray(rawObj.chatTranscript) ? rawObj.chatTranscript : []),
+      notes_internal: '',
       status: 'new',
       created_at: new Date().toISOString(),
     };
+
+    // Trigger admin email alert for meaningful intake lead (prevent spam from 1-message anonymous visits)
+    const hasRealEmail = Boolean(leadData.contact_email && leadData.contact_email !== 'lead@unauthenticated.client');
+    const hasCustomCompany = Boolean(
+      leadData.company_name &&
+      leadData.company_name !== 'Untitled Project' &&
+      leadData.company_name !== 'My Custom Project'
+    );
+    const hasSufficientChat = Boolean(Array.isArray(leadData.chat_transcript) && leadData.chat_transcript.length >= 6);
+    const shouldSendInsertAlert = hasRealEmail || hasCustomCompany || hasSufficientChat;
+
+    if (shouldSendInsertAlert) {
+      leadData.notes_internal = 'alert_sent';
+    }
 
     const { data, error } = await supabase
       .from('intake_leads')
@@ -94,17 +201,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Trigger admin email alert for new intake lead
-    sendAdminIntakeLeadNotification({
-      scopeCode,
-      companyName: leadData.company_name,
-      contactEmail: leadData.contact_email,
-      contactPhone: leadData.contact_phone,
-      baseEngineTitle: leadData.base_engine_title,
-      totalCostINR: leadData.total_cost_inr,
-      totalCostUSD: leadData.total_cost_usd,
-      timeline: leadData.timeline,
-    }).catch(err => console.warn('Failed to send admin intake lead email alert:', err));
+    if (shouldSendInsertAlert) {
+      sendAdminIntakeLeadNotification({
+        scopeCode,
+        companyName: leadData.company_name,
+        contactEmail: leadData.contact_email,
+        contactPhone: leadData.contact_phone,
+        baseEngineTitle: leadData.base_engine_title,
+        totalCostINR: leadData.total_cost_inr,
+        totalCostUSD: leadData.total_cost_usd,
+        timeline: leadData.timeline,
+      }).catch(err => console.warn('Failed to send admin intake lead email alert:', err));
+    }
 
     const response = NextResponse.json({ success: true, draftId: data?.id || draftToken, scopeCode });
 

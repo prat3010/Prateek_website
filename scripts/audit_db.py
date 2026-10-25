@@ -59,6 +59,15 @@ def parse_local_schema():
             if m_col:
                 columns.append(m_col.group(1))
         tables[table_name] = columns
+
+    # Also parse ALTER TABLE ... ADD COLUMN IF NOT EXISTS ...
+    alter_matches = re.finditer(r'ALTER TABLE\s+(?:public\.)?(\w+)\s+ADD COLUMN IF NOT EXISTS\s+(\w+)', content, re.IGNORECASE)
+    for match in alter_matches:
+        tbl = match.group(1)
+        col = match.group(2)
+        if tbl in tables and col not in tables[tbl]:
+            tables[tbl].append(col)
+
     return tables
 
 def fetch_live_schema():

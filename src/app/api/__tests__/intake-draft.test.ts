@@ -10,21 +10,35 @@ const mocks = vi.hoisted(() => {
     }),
   });
 
+  const updateFn = vi.fn().mockReturnValue({
+    eq: vi.fn().mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        maybeSingle: vi.fn().mockResolvedValue({
+          data: { id: 'lead-uuid-123', draft_token: 'draft_SCOPE-123_1000' },
+          error: null,
+        }),
+      }),
+    }),
+  });
+
   const selectGteFn = vi.fn().mockResolvedValue({
     count: 0,
     data: [],
     error: null,
   });
 
+  const maybeSingleFn = vi.fn().mockResolvedValue({ data: null, error: null });
+
   const selectEqFn = vi.fn().mockReturnValue({
     gte: selectGteFn,
+    maybeSingle: maybeSingleFn,
   });
 
   const selectFn = vi.fn().mockReturnValue({
     eq: selectEqFn,
   });
 
-  return { insertFn, selectFn, selectEqFn, selectGteFn };
+  return { insertFn, updateFn, selectFn, selectEqFn, selectGteFn, maybeSingleFn };
 });
 
 vi.mock('@/data/supabase', () => ({
@@ -32,6 +46,7 @@ vi.mock('@/data/supabase', () => ({
     return {
       from: vi.fn(() => ({
         insert: mocks.insertFn,
+        update: mocks.updateFn,
         select: mocks.selectFn,
       })),
     };
@@ -148,5 +163,42 @@ describe('POST /api/client/intake-draft', () => {
     expect(inserted.chat_transcript).toHaveLength(2);
     expect(inserted.chat_transcript[0].content).toBe('What stack do I need for AI MVP?');
     expect(inserted.base_engine_id).toBe('saas');
+  });
+
+  it('updates existing intake lead when scopeCode already exists', async () => {
+    mocks.maybeSingleFn.mockResolvedValueOnce({
+      data: { id: 'lead-existing-456', draft_token: 'draft_SCOPE-EXISTING_999' },
+      error: null,
+    });
+
+    const payload = {
+      scopeCode: 'SCOPE-EXISTING',
+      companyName: 'Updated Company Name',
+      contactEmail: 'updated@company.com',
+      chatTranscript: [
+        { role: 'user', content: 'Updated question' },
+      ],
+    };
+
+    const req = new Request('http://localhost/api/client/intake-draft', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.success).toBe(true);
+    expect(json.draftId).toBe('lead-uuid-123');
+
+    expect(mocks.updateFn).toHaveBeenCalled();
+    const updatePayload = mocks.updateFn.mock.calls[0][0];
+    expect(updatePayload.company_name).toBe('Updated Company Name');
+    expect(updatePayload.chat_transcript).toHaveLength(1);
+    expect(mocks.insertFn).not.toHaveBeenCalled();
+
+    const setCookieHeader = res.headers.get('set-cookie');
+    expect(setCookieHeader).toContain('prateeq_pending_scope_code=SCOPE-EXISTING');
   });
 });

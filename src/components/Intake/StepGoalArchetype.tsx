@@ -26,7 +26,7 @@ import type { GoalArchetype, BaseEngineItem, FeatureItem } from '@/data/resume';
 import { formatPricePair, packageTotalForArchetype, type Currency } from '@/lib/pricing';
 import NumberFlow from '@number-flow/react';
 import type { ParseIntentResponse } from '@/lib/rag-client';
-import { InlineScopingChatCard } from './InlineScopingChatCard';
+import { InlineScopingChatCard, type CurrentScopeContext } from './InlineScopingChatCard';
 import { GOAL_CATEGORIES } from './useIntakeFormState';
 import TiltCard from '@/components/ui/TiltCard';
 import styles from './IntakeForm.module.css';
@@ -121,6 +121,7 @@ interface StepGoalArchetypeProps {
   setChatTranscript?: React.Dispatch<
     React.SetStateAction<Array<{ role: string; content: string; timestamp?: string }>>
   >;
+  currentScope?: CurrentScopeContext | null;
 }
 
 export function StepGoalArchetype({
@@ -144,6 +145,7 @@ export function StepGoalArchetype({
   setChatSessionId,
   chatTranscript,
   setChatTranscript,
+  currentScope = null,
 }: StepGoalArchetypeProps) {
   const archetypeCardRefs = React.useRef<(HTMLDivElement | null)[]>([]);
   const categoryTabRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
@@ -192,6 +194,7 @@ export function StepGoalArchetype({
         setChatSessionId={setChatSessionId || (() => {})}
         chatTranscript={chatTranscript || []}
         setChatTranscript={setChatTranscript || (() => {})}
+        currentScope={currentScope}
       />
 
       {/* Low-Risk Paid Discovery Wedge */}

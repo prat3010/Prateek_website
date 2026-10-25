@@ -949,7 +949,7 @@
           "creative": "Engineered interactive workspace interfaces including an RAG Lab sandbox with SSE real-time streaming, parameter sliders, and dual-theme state propagation."
         },
         {
-          "ai": "Engineered token-level late-interaction ColBERT MaxSim reranking operator and sublinear BM25 sparse vectorizer, solving exact code symbol, error-trace, and technical identifier retrieval.",
+          "ai": "Engineered token-level late-interaction ColBERT MaxSim reranking operator and corpus-frequency scaled BM25 reranker over PostgreSQL full-text search, solving exact code symbol, error-trace, and technical identifier retrieval.",
           "fullstack": "Implemented hybrid search merging dense HNSW vectors and BM25 sparse hits with Reciprocal Rank Fusion (RRF) and Cross-Encoder reranking pipelines.",
           "general": "Integrated hybrid dense-sparse vector search and ColBERT reranking, improving retrieval precision for complex enterprise technical documentation.",
           "creative": "Built interactive 3D vector space explorer and cluster visualizations in Next.js using Three.js and WebGL canvas projections."

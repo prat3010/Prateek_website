@@ -21,9 +21,14 @@ from sync_tabs.shared import (
     run_safe_git_command,
     HAS_SYNC,
     run_async_task,
-    sanitize_local_path
+    sanitize_local_path,
+    trigger_revalidation,
 )
 from sync_git import commit_and_push_paths
+from sync_retriever import (
+    sync_project_to_retriever,
+    bulk_sync_all_projects_to_retriever,
+)
 
 def render_projects_tab():
     with st.container(border=True):
@@ -242,7 +247,23 @@ def render_projects_tab():
                         }
                         write_resume_file(resume)
                         st.session_state.resume = resume
-                    
+
+                    # 1. Sync to Supabase if online
+                    is_offline = st.session_state.get("offline_mode", False)
+                    if HAS_SYNC and not is_offline:
+                        try:
+                            sync_projects(current_projects)
+                        except Exception as e:
+                            warnings.append(f"Supabase sync notice: {e}")
+
+                    # 2. Trigger Next.js cache revalidation
+                    trigger_revalidation()
+
+                    # 3. Automatically ingest into Retriever cognitive vector DB
+                    retriever_res = sync_project_to_retriever(new_project)
+                    if retriever_res.get("scoping_ok"):
+                        warnings.append(f"⚡ Ingested into Retriever Scoping Concierge: `{retriever_res['filename']}`")
+
                     git_logs_output = ""
                     if not dry_run_proj:
                         commit_msg = f"chore(sync): publish project sync - {new_project['title']}"
@@ -273,7 +294,14 @@ def render_projects_tab():
     if not current_projects:
         st.info("No active systems found in projects.json.")
     else:
-        st.write(f"Currently managing **{len(current_projects)}** deployed system(s):")
+        col_hdr1, col_hdr2 = st.columns([3, 2])
+        with col_hdr1:
+            st.write(f"Currently managing **{len(current_projects)}** deployed system(s):")
+        with col_hdr2:
+            if st.button(f"⚡ Re-index All ({len(current_projects)}) Systems to Retriever", key="btn_bulk_reindex_retriever"):
+                with st.spinner("Re-indexing all system case studies into Retriever vector cognitive engine..."):
+                    res = bulk_sync_all_projects_to_retriever(current_projects)
+                    st.success(f"Indexed {res.get('scoping_synced', 0)}/{res.get('total', 0)} systems into Retriever Scoping Concierge!")
         
         for idx, project in enumerate(current_projects):
             p_id = project.get("id")
@@ -472,6 +500,14 @@ def render_projects_tab():
                                     is_offline = st.session_state.get("offline_mode", False)
                                     if HAS_SYNC and not is_offline:
                                         sync_projects(current_projects)
+
+                                    # Trigger Next.js cache revalidation
+                                    trigger_revalidation()
+
+                                    # Ingest updated project to Retriever cognitive engine
+                                    retriever_res = sync_project_to_retriever(project)
+                                    if retriever_res.get("scoping_ok"):
+                                        st.toast(f"⚡ Ingested into Retriever: `{retriever_res['filename']}`")
                                         
                                     st.success(f"Successfully saved system changes locally and synced!")
                                     
@@ -501,6 +537,13 @@ def render_projects_tab():
                                 if HAS_SYNC and not is_offline and not delete_project(p_id):
                                     raise Exception("Database delete failed. Local files were not changed.")
                                 write_projects_file(updated_projects)
+
+                                # Trigger Next.js cache revalidation
+                                trigger_revalidation()
+
+                                # Delete from local mirror and record deletion
+                                sync_project_to_retriever(project, is_delete=True)
+
                                 deleted_assets = []
                                 if img_path and "project-" in img_path:
                                     target_img = os.path.join("public", img_path.lstrip("/"))

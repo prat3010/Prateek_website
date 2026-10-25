@@ -255,6 +255,9 @@ CREATE TABLE IF NOT EXISTS client_scopes (
   sow_hash TEXT DEFAULT '',
   retriever_tenant_id TEXT,
   metadata JSONB DEFAULT '{}',
+  maintenance_subscription_id TEXT DEFAULT '',
+  maintenance_status TEXT DEFAULT 'inactive',
+  maintenance_current_period_end TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -824,9 +827,51 @@ ALTER TABLE outreach_leads ADD COLUMN IF NOT EXISTS compensation TEXT DEFAULT NU
 
 ALTER TABLE outreach_leads ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow service role full access outreach_leads" ON outreach_leads;
-CREATE POLICY "Allow service role full access outreach_leads" ON outreach_leads USING (true);
+CREATE POLICY "Allow service role full access outreach_leads" ON outreach_leads TO service_role USING (true) WITH CHECK (true);
 
 CREATE INDEX IF NOT EXISTS idx_outreach_leads_status ON outreach_leads (status, created_at DESC);
+
+
+-- ============================================================
+-- 15. Scoping Chat Traces & Cognitive Observability Telemetry
+-- ============================================================
+CREATE TABLE IF NOT EXISTS scoping_chat_traces (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  session_id TEXT NOT NULL,
+  scope_code TEXT DEFAULT '',
+  turn_index INTEGER NOT NULL DEFAULT 1,
+  user_query TEXT NOT NULL,
+  assistant_response TEXT NOT NULL,
+  agent_intent TEXT DEFAULT '',
+  agent_reasoning TEXT DEFAULT '',
+  retrieved_chunks JSONB DEFAULT '[]'::jsonb,
+  model_used TEXT DEFAULT 'retriever',
+  latency_ms INTEGER DEFAULT 0,
+  tokens_prompt INTEGER DEFAULT 0,
+  tokens_completion INTEGER DEFAULT 0,
+  is_fallback BOOLEAN DEFAULT false,
+  currency TEXT DEFAULT 'INR',
+  current_engine TEXT DEFAULT '',
+  selected_features JSONB DEFAULT '[]'::jsonb,
+  quote_inr NUMERIC DEFAULT 0,
+  quote_usd NUMERIC DEFAULT 0,
+  visitor_ip_hash TEXT DEFAULT '',
+  visitor_country TEXT DEFAULT '',
+  visitor_user_agent TEXT DEFAULT '',
+  user_email TEXT DEFAULT NULL,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE scoping_chat_traces ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow service role full access scoping_chat_traces" ON scoping_chat_traces;
+CREATE POLICY "Allow service role full access scoping_chat_traces" ON scoping_chat_traces TO service_role USING (true) WITH CHECK (true);
+
+CREATE INDEX IF NOT EXISTS idx_scoping_traces_session ON scoping_chat_traces (session_id, turn_index);
+CREATE INDEX IF NOT EXISTS idx_scoping_traces_scope ON scoping_chat_traces (scope_code);
+CREATE INDEX IF NOT EXISTS idx_scoping_traces_email ON scoping_chat_traces (user_email);
+CREATE INDEX IF NOT EXISTS idx_scoping_traces_created ON scoping_chat_traces (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_scoping_traces_country ON scoping_chat_traces (visitor_country);
+
 
 
 

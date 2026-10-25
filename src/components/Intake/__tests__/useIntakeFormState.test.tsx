@@ -135,4 +135,112 @@ describe('useIntakeFormState - applyBlueprint', () => {
     expect(result.current.formData.selectedFeatures).not.toContain('phantom_analytics_id');
     expect(result.current.formData.selectedFeatures).not.toContain('non_existent_search');
   });
+
+  it('keeps generatedScopeCode stable across feature selections and company name updates', () => {
+    const { result } = renderHook(() =>
+      useIntakeFormState(mockResumeData, null, null, false)
+    );
+
+    const initialCode = result.current.generatedScopeCode;
+    expect(initialCode).toMatch(/^SCOPE-\d{5}$/);
+
+    act(() => {
+      result.current.addFeature('auth');
+    });
+
+    expect(result.current.generatedScopeCode).toBe(initialCode);
+
+    act(() => {
+      result.current.setFormData((prev) => ({ ...prev, companyName: 'New Test Company' }));
+    });
+
+    expect(result.current.generatedScopeCode).toBe(initialCode);
+  });
+
+  it('preserves lean Phase 1 MVP feature selection without forcibly injecting compulsory features', () => {
+    const { result } = renderHook(() =>
+      useIntakeFormState(mockResumeData, null, null, false)
+    );
+
+    const leanMvpBlueprint: ParseIntentResponse = {
+      success: true,
+      archetypeId: 'saas_app',
+      baseEngineId: 'saas',
+      featureIds: ['auth'],
+      brandAssetId: 'ready',
+      maintenancePlanId: 'standard',
+      suggestedTimeline: '2 Weeks',
+      confidenceScore: 0.99,
+      summaryRationale: 'Phase 1 lean MVP',
+      retrieverEngineRecommended: false,
+      telemetry: mockTelemetry,
+      unrecognizedRequirements: [],
+    };
+
+    act(() => {
+      result.current.applyBlueprint(leanMvpBlueprint);
+    });
+
+    expect(result.current.formData.selectedFeatures).toEqual(['auth']);
+  });
+
+  it('rehydrates generatedScopeCode from prateeq_pending_scope_code cookie when present', () => {
+    Object.defineProperty(document, 'cookie', {
+      writable: true,
+      value: 'prateeq_pending_scope_code=SCOPE-77777; prateeq_chat_session_id=session-abc',
+    });
+
+    const { result } = renderHook(() =>
+      useIntakeFormState(mockResumeData, null, null, false)
+    );
+
+    expect(result.current.generatedScopeCode).toBe('SCOPE-77777');
+    expect(result.current.chatSessionId).toBe('session-abc');
+  });
+
+  it('resets auto-persist tracking ref when chat transcript is reset so subsequent conversations auto-persist', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true, draftId: 'draft-123' }),
+    });
+    global.fetch = fetchMock;
+
+    const { result } = renderHook(() =>
+      useIntakeFormState(mockResumeData, null, null, false)
+    );
+
+    // Initial 2-message conversation
+    act(() => {
+      result.current.setChatTranscript([
+        { role: 'user', content: 'Turn 1 user' },
+        { role: 'assistant', content: 'Turn 1 assistant' },
+      ]);
+    });
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 2100));
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    // User resets chat
+    act(() => {
+      result.current.setChatTranscript([]);
+    });
+
+    // User starts a new 2-message conversation
+    act(() => {
+      result.current.setChatTranscript([
+        { role: 'user', content: 'Turn 2 new user' },
+        { role: 'assistant', content: 'Turn 2 new assistant' },
+      ]);
+    });
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 2100));
+    });
+
+    // Should have saved the second conversation as well
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
 });

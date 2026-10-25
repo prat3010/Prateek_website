@@ -607,3 +607,202 @@
   font-weight: 600;
 }
 
+/* AI Executive Proposal Drafter */
+.proposalSection {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(0, 230, 118, 0.25);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.proposalSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.proposalHeaderTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.generateProposalBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #00E676;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.generateProposalBtn:hover:not(:disabled) {
+  background: #00c864;
+  transform: translateY(-1px);
+}
+
+.generateProposalBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.proposalCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.painPointsRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.painPointsLabel {
+  font-weight: 700;
+  color: var(--color-text-muted);
+  font-size: 11px;
+}
+
+.painPointPill {
+  background: rgba(0, 230, 118, 0.12);
+  border: 1px solid rgba(0, 230, 118, 0.25);
+  color: #00E676;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.proposalInputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.proposalLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.proposalSubjectInput {
+  background: var(--surface-card, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--surface-glass-border);
+  color: var(--color-text);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.proposalSubjectInput:focus {
+  outline: none;
+  border-color: #00E676;
+}
+
+.proposalTextarea {
+  background: var(--surface-card, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--surface-glass-border);
+  color: var(--color-text);
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: inherit;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.proposalTextarea:focus {
+  outline: none;
+  border-color: #00E676;
+}
+
+.proposalActionRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.copyProposalBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-card);
+  border: 1px solid var(--surface-glass-border);
+  color: var(--color-text);
+  padding: 7px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.copyProposalBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.sendProposalBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #00E676;
+  color: #000;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sendProposalBtn:hover:not(:disabled) {
+  background: #00c864;
+  transform: translateY(-1px);
+}
+
+.sendProposalBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.regenerateProposalBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: 1px solid var(--surface-glass-border);
+  color: var(--color-text-muted);
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.regenerateProposalBtn:hover:not(:disabled) {
+  color: var(--color-text);
+  background: rgba(255, 255, 255, 0.04);
+}
+
