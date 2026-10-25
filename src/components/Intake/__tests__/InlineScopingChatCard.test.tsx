@@ -523,4 +523,23 @@ describe('InlineScopingChatCard Component', () => {
     expect(mockOnNavigateStep).toHaveBeenCalledWith(2);
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
+
+  it('renders data-lenis-prevent attributes on messagesViewport to prevent Lenis scroll hijacking', () => {
+    render(
+      <InlineScopingChatCard
+        currency="USD"
+        isNoir={false}
+        onApplyBlueprint={mockOnApplyBlueprint}
+        chatSessionId={null}
+        setChatSessionId={mockSetChatSessionId}
+        chatTranscript={[]}
+        setChatTranscript={mockSetChatTranscript}
+      />
+    );
+
+    const viewport = screen.getByRole('region', { name: /Scoping conversation transcript/i });
+    expect(viewport.getAttribute('data-lenis-prevent')).not.toBeNull();
+    expect(viewport.getAttribute('data-lenis-prevent-wheel')).not.toBeNull();
+    expect(viewport.getAttribute('data-lenis-prevent-touch')).not.toBeNull();
+  });
 });

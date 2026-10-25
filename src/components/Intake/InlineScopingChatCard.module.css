@@ -98,14 +98,37 @@
   border: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.06));
   border-radius: 12px;
   padding: 1rem;
-  max-height: 380px;
+  max-height: 480px;
   min-height: 160px;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
   display: flex;
   flex-direction: column;
   gap: 12px;
   margin-bottom: 1rem;
   scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(59, 130, 246, 0.5) rgba(0, 0, 0, 0.15);
+}
+
+.messagesViewport::-webkit-scrollbar {
+  width: 6px;
+}
+
+.messagesViewport::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+.messagesViewport::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.4);
+  border-radius: 4px;
+}
+
+.messagesViewport::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.7);
 }
 
 .welcomeIntro {

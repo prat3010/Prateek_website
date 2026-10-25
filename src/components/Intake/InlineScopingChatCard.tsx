@@ -618,7 +618,16 @@ export function InlineScopingChatCard({
       </div>
 
       {/* Messages Viewport */}
-      <div className={styles.messagesViewport} ref={messagesViewportRef}>
+      <div
+        className={styles.messagesViewport}
+        ref={messagesViewportRef}
+        data-lenis-prevent
+        data-lenis-prevent-wheel
+        data-lenis-prevent-touch
+        tabIndex={0}
+        role="region"
+        aria-label="Scoping conversation transcript"
+      >
         {chatTranscript.length === 0 ? (
           <div className={styles.welcomeIntro}>
             <Bot size={22} style={{ flexShrink: 0, color: 'var(--color-primary, #3b82f6)' }} />
