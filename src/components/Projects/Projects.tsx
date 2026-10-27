@@ -262,9 +262,24 @@ function Projects({ projects }: ProjectsProps) {
               aria-selected={activeCategory === cat.id}
               className={`${styles.filterPill} ${activeCategory === cat.id ? styles.filterPillActive : ''}`}
               onClick={() => setActiveCategory(cat.id)}
+              style={{ position: 'relative' }}
             >
-              <span>{cat.label}</span>
-              <span className={styles.filterCount}>{categoryCounts[cat.id] || 0}</span>
+              {activeCategory === cat.id && (
+                <motion.span
+                  layoutId="activeProjectCategoryPill"
+                  transition={{ type: 'spring', stiffness: 450, damping: 32 }}
+                  style={{
+                    position: 'absolute',
+                    inset: -2,
+                    borderRadius: '9999px',
+                    border: '2px solid var(--neon-cyan, var(--pop-blue, #2563eb))',
+                    pointerEvents: 'none',
+                    zIndex: 0,
+                  }}
+                />
+              )}
+              <span style={{ position: 'relative', zIndex: 1 }}>{cat.label}</span>
+              <span className={styles.filterCount} style={{ position: 'relative', zIndex: 1 }}>{categoryCounts[cat.id] || 0}</span>
             </button>
           ))}
         </div>

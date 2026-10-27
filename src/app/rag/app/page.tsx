@@ -376,7 +376,9 @@ export default function RagAppStudioPage() {
                   🎉 <strong>Subscription Active:</strong> Welcome to Retriever {planTier.toUpperCase()}! Your workspace limits are now {planTier === "business" ? "10,000,000" : planTier === "pro" ? "1,500,000" : "250,000"} monthly tokens with {planTier === "business" ? "500" : planTier === "pro" ? "100" : "20"} documents and priority hybrid search unlocked.
                 </span>
                 <button
+                  type="button"
                   onClick={() => setIsUpgradedCelebration(false)}
+                  aria-label="Dismiss subscription notification"
                   style={{
                     background: "transparent",
                     border: "none",

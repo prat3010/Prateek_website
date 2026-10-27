@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { toast } from "sonner";
 import { RetrieverClient } from "@/lib/rag-client";
 import type { DocumentMeta, GraphQueryResponse, GraphSummaryResponse, EntityTripleItem } from "@/lib/rag-types";
 import styles from "./rag.module.css";
@@ -93,12 +94,12 @@ export function DocumentsPanel({ client, hidden, isExpired }: { client: Retrieve
     }
   }
 
-  async function handleDelete(doc: DocumentMeta) {
+  async function executeDelete(doc: DocumentMeta) {
     if (!client) return;
-    if (!confirm(`Delete "${doc.filename}"?`)) return;
     try {
       await client.deleteDocument(doc.documentId);
-      setDocs((prev) => prev ? prev.filter((d) => d.documentId !== doc.documentId) : null);
+      setDocs((prev) => (prev ? prev.filter((d) => d.documentId !== doc.documentId) : null));
+      toast.success(`Deleted "${doc.filename}"`);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "";
       if (msg.includes("403") || msg.includes("scope") || msg.includes("Forbidden")) {
@@ -107,6 +108,21 @@ export function DocumentsPanel({ client, hidden, isExpired }: { client: Retrieve
         setError(msg || "Delete failed");
       }
     }
+  }
+
+  function handleDelete(doc: DocumentMeta) {
+    if (!client) return;
+    toast(`Delete "${doc.filename}"?`, {
+      description: "Permanently purges document vector embeddings from the corpus.",
+      action: {
+        label: "Delete",
+        onClick: () => void executeDelete(doc),
+      },
+      cancel: {
+        label: "Cancel",
+        onClick: () => {},
+      },
+    });
   }
 
   const handleTraverseGraph = async (e?: React.FormEvent) => {

@@ -72,6 +72,16 @@ Craftsmanship requires standard semantic architecture:
   }
   ```
 
+### **5. Modal Focus Trapping & Lenis Scroll Isolation (WCAG 2.1 AA)**
+* **Escape Listener**: Every modal overlay and slide-out sheet must close immediately upon pressing the <kbd>Escape</kbd> key.
+* **Focus Containment**: Tabbing forward past the last focusable element must wrap back to the first interactive element (`Tab` / `Shift+Tab` focus trap).
+* **Lenis Isolation**: Modals call `lenis?.stop()` upon mounting and `lenis?.start()` upon unmounting. Inner scroll containers apply `data-lenis-prevent` to prevent touch/mousewheel event leakage to outer page smooth scrolling.
+* **Close Button Labeling**: Icon-only dismiss buttons (`<X />`) must declare an informative `aria-label` (e.g. `aria-label="Close dialog"`). The modal root must declare `role="dialog"` and `aria-modal="true"`.
+
+### **6. Accessible Form Controls & Option Sets**
+* Form inputs and textareas must be programmatically associated with descriptive `<label>` elements via matching `htmlFor` and `id` attributes.
+* Custom interactive chip selectors or intent switches must declare semantic ARIA attributes: container `role="radiogroup"`, options `role="radio"`, and dynamic `aria-checked` state.
+
 ---
 
 # **Acceptance Criteria**

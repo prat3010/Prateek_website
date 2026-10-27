@@ -13,6 +13,9 @@ This is Prateek Sharma's personal portfolio, built with Next.js 16 App Router, R
 ### ScrollSection Containing Block
 `ScrollSection` wraps every page section in an `m.div` with `will-change: transform` and a Framer Motion `translateY`. Both properties create a CSS containing block that traps `position: fixed` descendants. Any modal, overlay, or fullscreen element rendered inside a `ScrollSection` **must** use the `<Portal>` component (`src/components/ui/Portal.tsx`) to escape this containing block. See `docs/99_DECISIONS.md` ADR 05.
 
+### Modal Accessible Containment & Lenis Scroll Lock
+Modals and fullscreen overlays rendered via `<Portal>` must implement WCAG 2.1 AA keyboard focus containment (`Tab` / `Shift+Tab`), <kbd>Escape</kbd> dismissal, and Lenis smooth scroll isolation. Use `useLenis()` to call `lenis?.stop()` on mount and `lenis?.start()` on unmount, and add `data-lenis-prevent` to inner scrollable containers to prevent event leakage to background page scroll listeners. See `docs/99_DECISIONS.md` ADR 47.
+
 ### Identity State Propagation
 The selected audience profile and visual theme are propagated through server-side cookie checks and React context:
 ```text

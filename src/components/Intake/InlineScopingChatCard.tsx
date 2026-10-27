@@ -15,6 +15,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import NumberFlow from '@number-flow/react';
 import { useAuth } from '@/context/AuthContext';
 import type { ParseIntentResponse } from '@/lib/rag-client';
 import { calcQuote, formatPricePair, type Currency } from '@/lib/pricing';
@@ -757,9 +758,11 @@ export function InlineScopingChatCard({
                         <span>{blueprint.title}</span>
                       </div>
                       <div className={styles.blueprintPrice}>
-                        {currency === 'INR'
-                          ? `₹${blueprint.totalINR ? blueprint.totalINR.toLocaleString() : '—'}`
-                          : `$${blueprint.totalUSD ? blueprint.totalUSD.toLocaleString() : '—'}`}
+                        <NumberFlow
+                          value={currency === 'INR' ? (blueprint.totalINR || 0) : (blueprint.totalUSD || 0)}
+                          locales={currency === 'INR' ? 'en-IN' : 'en-US'}
+                          format={{ style: 'currency', currency, maximumFractionDigits: 0 }}
+                        />
                       </div>
                     </div>
 
@@ -782,9 +785,11 @@ export function InlineScopingChatCard({
                           <div className={styles.phaseCardHeader}>
                             <div className={styles.phaseBadge}>Phase 1 (MVP)</div>
                             <div className={styles.phasePrice}>
-                              {currency === 'INR'
-                                ? `₹${blueprint.phasedBreakdown.phase1.totalINR ? blueprint.phasedBreakdown.phase1.totalINR.toLocaleString() : '—'}`
-                                : `$${blueprint.phasedBreakdown.phase1.totalUSD ? blueprint.phasedBreakdown.phase1.totalUSD.toLocaleString() : '—'}`}
+                              <NumberFlow
+                                value={currency === 'INR' ? (blueprint.phasedBreakdown.phase1.totalINR || 0) : (blueprint.phasedBreakdown.phase1.totalUSD || 0)}
+                                locales={currency === 'INR' ? 'en-IN' : 'en-US'}
+                                format={{ style: 'currency', currency, maximumFractionDigits: 0 }}
+                              />
                             </div>
                           </div>
                           <div className={styles.phaseCardTitle}>
@@ -845,9 +850,11 @@ export function InlineScopingChatCard({
                           <div className={styles.phaseCardHeader}>
                             <div className={`${styles.phaseBadge} ${styles.phaseBadgeFull}`}>Full Roadmap</div>
                             <div className={styles.phasePrice}>
-                              {currency === 'INR'
-                                ? `₹${blueprint.totalINR ? blueprint.totalINR.toLocaleString() : '—'}`
-                                : `$${blueprint.totalUSD ? blueprint.totalUSD.toLocaleString() : '—'}`}
+                              <NumberFlow
+                                value={currency === 'INR' ? (blueprint.totalINR || 0) : (blueprint.totalUSD || 0)}
+                                locales={currency === 'INR' ? 'en-IN' : 'en-US'}
+                                format={{ style: 'currency', currency, maximumFractionDigits: 0 }}
+                              />
                             </div>
                           </div>
                           <div className={styles.phaseCardTitle}>
@@ -992,6 +999,7 @@ export function InlineScopingChatCard({
                 handleSendMessage();
               }
             }}
+            aria-label="Describe your project idea or ask an architecture question"
             placeholder={
               isTurnGated
                 ? 'Turn limit reached for anonymous session. Sign in with Google above to continue.'

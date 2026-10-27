@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { Search, Sparkles, Rocket, Gamepad2, Brain, Eye, Layers } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import Scrambler from '@/components/ui/Scrambler';
@@ -112,10 +113,27 @@ export default function PlaygroundGrid() {
                   className={`${styles.filterBtn} ${isActive ? styles.active : ''}`}
                   onClick={() => setActiveCategory(cat.id)}
                   type="button"
+                  style={{ position: 'relative' }}
                 >
-                  {cat.icon}
-                  <span>{cat.label}</span>
-                  <span style={{ opacity: 0.6, fontSize: '0.75rem' }}>({count})</span>
+                  {isActive && (
+                    <motion.span
+                      layoutId="activePlaygroundCategoryPill"
+                      transition={{ type: 'spring', stiffness: 450, damping: 32 }}
+                      style={{
+                        position: 'absolute',
+                        inset: -2,
+                        borderRadius: '8px',
+                        border: '2px solid var(--neon-cyan, var(--pop-blue, #2563eb))',
+                        pointerEvents: 'none',
+                        zIndex: 0,
+                      }}
+                    />
+                  )}
+                  <span style={{ position: 'relative', zIndex: 1, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    {cat.icon}
+                    <span>{cat.label}</span>
+                    <span style={{ opacity: 0.6, fontSize: '0.75rem' }}>({count})</span>
+                  </span>
                 </button>
               );
             })}

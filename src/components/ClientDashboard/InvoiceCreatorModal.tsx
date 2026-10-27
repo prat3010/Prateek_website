@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Plus, Trash2, FileCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import Portal from '@/components/ui/Portal';
+import { useLenis } from 'lenis/react';
 import { calculateInvoiceTotals, SUPPORTED_CURRENCIES, formatCurrencyAmount } from '@/lib/invoicing';
 import type { InvoiceEntity } from '@/lib/clientOrder';
 import styles from '@/app/dashboard/dashboard.module.css';
@@ -48,21 +49,77 @@ export function InvoiceCreatorModal({
       sac_hsn: string;
       rate: number;
       quantity: number;
-      tax_rate: number;
-      tax_type: 'inclusive' | 'exclusive';
     }[]
   >([
     {
-      name: 'Web Application Engineering Services',
-      description: 'Phase 1 Core Engineering & Architecture Build',
+      name: 'Custom Web Engineering & System Deployment',
+      description: 'Milestone delivery as per agreed Statement of Work baseline',
       sac_hsn: '998314',
-      rate: 87500,
+      rate: 150000,
       quantity: 1,
-      tax_rate: 18,
-      tax_type: 'exclusive',
     },
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const modalRef = useRef<HTMLDivElement>(null);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const lastActiveElementRef = useRef<HTMLElement | null>(null);
+  const lenis = useLenis();
+
+  // Prevent background scrolling while modal is open and isolate from Lenis
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    lenis?.stop();
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      lenis?.start();
+    };
+  }, [isOpen, lenis]);
+
+  // Focus trapping and Escape key management (WCAG 2.1 AA)
+  useEffect(() => {
+    if (!isOpen) return;
+
+    lastActiveElementRef.current = document.activeElement as HTMLElement | null;
+    const focusTimer = setTimeout(() => {
+      closeBtnRef.current?.focus();
+    }, 50);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+
+      if (e.key === 'Tab' && modalRef.current) {
+        const focusable = modalRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last?.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first?.focus();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      clearTimeout(focusTimer);
+      window.removeEventListener('keydown', handleKeyDown);
+      lastActiveElementRef.current?.focus?.();
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -75,55 +132,52 @@ export function InvoiceCreatorModal({
         sac_hsn: '998314',
         rate: 0,
         quantity: 1,
-        tax_rate: 18,
-        tax_type: 'exclusive',
       },
     ]);
   };
 
-  const handleRemoveLineItem = (index: number) => {
-    setInvLineItems((prev) => prev.filter((_, i) => i !== index));
+  const handleRemoveLineItem = (idx: number) => {
+    setInvLineItems((prev) => prev.filter((_, i) => i !== idx));
   };
 
-  const handleUpdateLineItem = (index: number, field: string, value: string | number) => {
+  const handleUpdateLineItem = (
+    idx: number,
+    field: 'name' | 'description' | 'sac_hsn' | 'rate' | 'quantity',
+    value: string | number
+  ) => {
     setInvLineItems((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
+      prev.map((item, i) => (i === idx ? { ...item, [field]: value } : item))
     );
   };
 
   const calculatedTotals = calculateInvoiceTotals({
-    currency: invCurrency,
-    place_of_supply: invPlaceOfSupply || 'Delhi',
-    line_items: invLineItems.map((item) => ({
-      name: item.name || 'Untitled Line Item',
-      description: item.description,
-      sac_hsn: item.sac_hsn,
-      rate: Number(item.rate) || 0,
-      quantity: Number(item.quantity) || 1,
-      tax_rate: Number(item.tax_rate) || 0,
-      tax_type: item.tax_type,
+    line_items: invLineItems.map((li) => ({
+      ...li,
+      amount: li.rate * li.quantity,
     })),
+    currency: invCurrency,
+    place_of_supply: invPlaceOfSupply,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!invCustomerName || !invCustomerEmail) {
-      toast.error('Please provide customer name and email.');
+    if (!invCustomerName.trim() || !invCustomerEmail.trim()) {
+      toast.error('Customer name and email are mandatory.');
       return;
     }
-    if (invLineItems.length === 0) {
-      toast.error('Please add at least one line item.');
+    if (invLineItems.some((li) => !li.name.trim() || li.rate <= 0)) {
+      toast.error('All line items must have a title and positive rate.');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const accessToken = await getAccessToken();
+      const token = await getAccessToken();
       const res = await fetch('/api/client/create-razorpay-invoice', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           customer_name: invCustomerName,
@@ -135,36 +189,29 @@ export function InvoiceCreatorModal({
             city: invCity,
             state: invState,
             pincode: invPincode,
+            country: 'India',
           },
           place_of_supply: invPlaceOfSupply,
           currency: invCurrency,
-          line_items: invLineItems.map((item) => ({
-            name: item.name || 'Services',
-            description: item.description,
-            sac_hsn: item.sac_hsn,
-            rate: Number(item.rate) || 0,
-            quantity: Number(item.quantity) || 1,
-            tax_rate: Number(item.tax_rate) || 18,
-            tax_type: item.tax_type,
-          })),
-          customer_notes: invNotes,
-          terms_and_conditions: invTerms,
+          line_items: invLineItems,
           notes: invNotes,
-          terms: invTerms,
+          terms_conditions: invTerms,
         }),
       });
 
-      const data = await res.json();
-      if (res.ok && data?.invoice) {
-        toast.success(`Invoice #${data.invoice.invoice_number} created successfully!`);
-        onInvoiceCreated(data.invoice);
-        onClose();
-      } else {
-        toast.error(`Invoice Error: ${data.error || 'Failed to create invoice'}`);
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        toast.error(`Invoice Generation Failed: ${errJson.error || 'Server error'}`);
+        return;
       }
+
+      const created = await res.json();
+      toast.success(`🎉 Invoice #${created.invoice_number} created successfully!`);
+      onInvoiceCreated(created);
+      onClose();
     } catch (err) {
-      console.error('Invoice creation error:', err);
-      toast.error('Failed to submit invoice.');
+      console.error('Invoice creation network failure:', err);
+      toast.error('Could not connect to billing server. Please check your network.');
     } finally {
       setIsSubmitting(false);
     }
@@ -172,35 +219,47 @@ export function InvoiceCreatorModal({
 
   return (
     <Portal>
-      <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalOverlay} onClick={onClose} role="presentation">
         <div
-          className={`${styles.modalCard} ${styles.invoiceModalCard}`}
+          ref={modalRef}
+          className={`${styles.modalCard} ${styles.invoiceCreatorModalCard}`}
           onClick={(e) => e.stopPropagation()}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="invoice-creator-title"
+          data-lenis-prevent
         >
           <div className={styles.modalHeader}>
             <div className={styles.modalHeaderTitle}>
               <FileCheck size={20} className={styles.modalIcon} />
               <div>
-                <h3>Create GST-Compliant Commercial Invoice</h3>
+                <h3 id="invoice-creator-title">Create GST-Compliant Commercial Invoice</h3>
                 <p className={styles.modalSubtitle}>
                   Generate tax invoice with Razorpay payment link & PDF export
                 </p>
               </div>
             </div>
-            <button className={styles.closeBtn} onClick={onClose}>
+            <button
+              ref={closeBtnRef}
+              className={styles.closeBtn}
+              onClick={onClose}
+              type="button"
+              aria-label="Close invoice creator modal"
+            >
               <X size={20} />
             </button>
           </div>
 
           <form onSubmit={handleSubmit} className={styles.invoiceForm}>
-            <div className={styles.invoiceFormGrid}>
+            <div className={styles.invoiceFormGrid} data-lenis-prevent>
               {/* Customer Details */}
               <div className={styles.formSection}>
                 <h4 className={styles.formSectionTitle}>1. Customer & Billing Entity</h4>
                 <div className={styles.inputRow}>
                   <div className={styles.inputGroup}>
-                    <label>Customer / Company Name *</label>
+                    <label htmlFor="inv-customer-name">Customer / Company Name *</label>
                     <input
+                      id="inv-customer-name"
                       type="text"
                       required
                       value={invCustomerName}
@@ -209,8 +268,9 @@ export function InvoiceCreatorModal({
                     />
                   </div>
                   <div className={styles.inputGroup}>
-                    <label>Customer Email *</label>
+                    <label htmlFor="inv-customer-email">Customer Email *</label>
                     <input
+                      id="inv-customer-email"
                       type="email"
                       required
                       value={invCustomerEmail}
@@ -222,8 +282,9 @@ export function InvoiceCreatorModal({
 
                 <div className={styles.inputRow}>
                   <div className={styles.inputGroup}>
-                    <label>Phone Number</label>
+                    <label htmlFor="inv-customer-phone">Phone Number</label>
                     <input
+                      id="inv-customer-phone"
                       type="tel"
                       value={invCustomerPhone}
                       onChange={(e) => setInvCustomerPhone(e.target.value)}
@@ -231,8 +292,9 @@ export function InvoiceCreatorModal({
                     />
                   </div>
                   <div className={styles.inputGroup}>
-                    <label>GSTIN (Optional)</label>
+                    <label htmlFor="inv-customer-gstin">GSTIN (Optional)</label>
                     <input
+                      id="inv-customer-gstin"
                       type="text"
                       value={invCustomerGstin}
                       onChange={(e) => setInvCustomerGstin(e.target.value)}
@@ -243,61 +305,70 @@ export function InvoiceCreatorModal({
 
                 <div className={styles.inputRow}>
                   <div className={styles.inputGroup}>
-                    <label>Billing Street</label>
+                    <label htmlFor="inv-customer-street">Billing Street</label>
                     <input
+                      id="inv-customer-street"
                       type="text"
                       value={invStreet}
                       onChange={(e) => setInvStreet(e.target.value)}
                     />
                   </div>
                   <div className={styles.inputGroup}>
-                    <label>City, State & Pincode</label>
+                    <label htmlFor="inv-customer-city">City, State & Pincode</label>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                       <input
+                        id="inv-customer-city"
                         type="text"
                         value={invCity}
                         onChange={(e) => setInvCity(e.target.value)}
                         placeholder="City"
+                        aria-label="City"
                       />
                       <input
+                        id="inv-customer-state"
                         type="text"
                         value={invState}
                         onChange={(e) => setInvState(e.target.value)}
                         placeholder="State"
+                        aria-label="State"
                       />
                       <input
+                        id="inv-customer-pincode"
                         type="text"
                         value={invPincode}
                         onChange={(e) => setInvPincode(e.target.value)}
-                        placeholder="Pincode"
-                        style={{ width: '110px' }}
+                        placeholder="PIN"
+                        style={{ maxWidth: '90px' }}
+                        aria-label="Postal Pincode"
                       />
                     </div>
                   </div>
                 </div>
               </div>
 
-
-              {/* Currency & Tax Place */}
+              {/* Taxation & Location */}
               <div className={styles.formSection}>
                 <h4 className={styles.formSectionTitle}>2. Currency & Place of Supply</h4>
                 <div className={styles.inputRow}>
                   <div className={styles.inputGroup}>
-                    <label>Currency</label>
+                    <label htmlFor="inv-currency">Invoice Currency</label>
                     <select
+                      id="inv-currency"
                       value={invCurrency}
                       onChange={(e) => setInvCurrency(e.target.value)}
+                      aria-label="Invoice Currency"
                     >
                       {SUPPORTED_CURRENCIES.map((c) => (
                         <option key={c.code} value={c.code}>
-                          {c.code} — {c.name}
+                          {c.code} ({c.symbol} {c.name})
                         </option>
                       ))}
                     </select>
                   </div>
                   <div className={styles.inputGroup}>
-                    <label>Place of Supply (State)</label>
+                    <label htmlFor="inv-place-of-supply">Place of Supply (State / Country)</label>
                     <input
+                      id="inv-place-of-supply"
                       type="text"
                       value={invPlaceOfSupply}
                       onChange={(e) => setInvPlaceOfSupply(e.target.value)}
@@ -330,12 +401,14 @@ export function InvoiceCreatorModal({
                           placeholder="Item Name / Description"
                           value={item.name}
                           onChange={(e) => handleUpdateLineItem(idx, 'name', e.target.value)}
+                          aria-label={`Item ${idx + 1} Name`}
                         />
                         <input
                           type="text"
                           placeholder="Details / Specifications"
                           value={item.description}
                           onChange={(e) => handleUpdateLineItem(idx, 'description', e.target.value)}
+                          aria-label={`Item ${idx + 1} Details`}
                         />
                       </div>
                       <div className={styles.lineItemFieldSmall}>
@@ -344,6 +417,7 @@ export function InvoiceCreatorModal({
                           placeholder="SAC/HSN"
                           value={item.sac_hsn}
                           onChange={(e) => handleUpdateLineItem(idx, 'sac_hsn', e.target.value)}
+                          aria-label={`Item ${idx + 1} SAC/HSN code`}
                         />
                       </div>
                       <div className={styles.lineItemFieldSmall}>
@@ -356,6 +430,7 @@ export function InvoiceCreatorModal({
                           onChange={(e) =>
                             handleUpdateLineItem(idx, 'rate', parseFloat(e.target.value) || 0)
                           }
+                          aria-label={`Item ${idx + 1} Rate`}
                         />
                       </div>
                       <div className={styles.lineItemFieldSmall}>
@@ -367,6 +442,7 @@ export function InvoiceCreatorModal({
                           onChange={(e) =>
                             handleUpdateLineItem(idx, 'quantity', parseInt(e.target.value) || 1)
                           }
+                          aria-label={`Item ${idx + 1} Quantity`}
                         />
                       </div>
                       {invLineItems.length > 1 && (
@@ -374,6 +450,7 @@ export function InvoiceCreatorModal({
                           type="button"
                           className={styles.removeLineItemBtn}
                           onClick={() => handleRemoveLineItem(idx)}
+                          aria-label={`Remove item ${idx + 1}`}
                         >
                           <Trash2 size={16} />
                         </button>
@@ -388,8 +465,9 @@ export function InvoiceCreatorModal({
                 <h4 className={styles.formSectionTitle}>4. Notes & Terms</h4>
                 <div className={styles.inputRow}>
                   <div className={styles.inputGroup}>
-                    <label>Invoice Notes</label>
+                    <label htmlFor="inv-notes">Invoice Notes</label>
                     <input
+                      id="inv-notes"
                       type="text"
                       value={invNotes}
                       onChange={(e) => setInvNotes(e.target.value)}
@@ -397,8 +475,9 @@ export function InvoiceCreatorModal({
                     />
                   </div>
                   <div className={styles.inputGroup}>
-                    <label>Payment Terms</label>
+                    <label htmlFor="inv-terms">Payment Terms</label>
                     <input
+                      id="inv-terms"
                       type="text"
                       value={invTerms}
                       onChange={(e) => setInvTerms(e.target.value)}
@@ -407,7 +486,6 @@ export function InvoiceCreatorModal({
                   </div>
                 </div>
               </div>
-
 
               {/* Totals Summary */}
               <div className={styles.invoiceTotalsSummary}>

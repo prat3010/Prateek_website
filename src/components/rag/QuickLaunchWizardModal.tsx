@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Portal from "@/components/ui/Portal";
 import MagneticButton from "@/components/ui/MagneticButton";
+import { useLenis } from "lenis/react";
 import { RetrieverClient } from "@/lib/rag-client";
 
 interface QuickLaunchWizardModalProps {
@@ -32,6 +33,66 @@ export function QuickLaunchWizardModal({
   const [chatLoading, setChatLoading] = useState(false);
   const [copiedSnippet, setCopiedSnippet] = useState(false);
   const [uploadError, setUploadError] = useState("");
+
+  const modalRef = useRef<HTMLDivElement>(null);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const lastActiveElementRef = useRef<HTMLElement | null>(null);
+  const lenis = useLenis();
+
+  // Prevent background scrolling while modal is open and isolate from Lenis
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    lenis?.stop();
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      lenis?.start();
+    };
+  }, [isOpen, lenis]);
+
+  // Focus trapping and Escape key management (WCAG 2.1 AA)
+  useEffect(() => {
+    if (!isOpen) return;
+
+    lastActiveElementRef.current = document.activeElement as HTMLElement | null;
+    const focusTimer = setTimeout(() => {
+      closeBtnRef.current?.focus();
+    }, 50);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+
+      if (e.key === "Tab" && modalRef.current) {
+        const focusable = modalRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last?.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first?.focus();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      clearTimeout(focusTimer);
+      window.removeEventListener("keydown", handleKeyDown);
+      lastActiveElementRef.current?.focus?.();
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -134,8 +195,16 @@ export function QuickLaunchWizardModal({
           zIndex: 9999,
           padding: "1rem",
         }}
+        onClick={onClose}
+        role="presentation"
       >
         <div
+          ref={modalRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="quick-launch-wizard-title"
+          data-lenis-prevent
+          onClick={(e) => e.stopPropagation()}
           style={{
             background: "var(--surface-card, #121826)",
             border: "1px solid var(--color-border, #2a3449)",
@@ -153,12 +222,15 @@ export function QuickLaunchWizardModal({
               <span style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-link)" }}>
                 🚀 60-Second Quick Launch
               </span>
-              <h2 style={{ fontSize: "1.4rem", fontWeight: 700, margin: "0.25rem 0 0" }}>
+              <h2 id="quick-launch-wizard-title" style={{ fontSize: "1.4rem", fontWeight: 700, margin: "0.25rem 0 0" }}>
                 Setup Your AI Knowledge Base
               </h2>
             </div>
             <button
+              ref={closeBtnRef}
               onClick={onClose}
+              type="button"
+              aria-label="Close setup wizard modal"
               style={{
                 background: "transparent",
                 border: "none",
@@ -229,6 +301,7 @@ export function QuickLaunchWizardModal({
                   onChange={handleFileUpload}
                   disabled={isUploading}
                   style={{ display: "none" }}
+                  aria-label="Upload document file"
                 />
               </label>
 
@@ -242,6 +315,7 @@ export function QuickLaunchWizardModal({
                   placeholder="Document Title (e.g. Return Policy)"
                   value={ingestTitle}
                   onChange={(e) => setIngestTitle(e.target.value)}
+                  aria-label="Document Title"
                   style={{
                     width: "100%",
                     padding: "0.55rem 0.75rem",
@@ -258,6 +332,7 @@ export function QuickLaunchWizardModal({
                   value={ingestText}
                   onChange={(e) => setIngestText(e.target.value)}
                   rows={3}
+                  aria-label="Document Content"
                   style={{
                     width: "100%",
                     padding: "0.55rem 0.75rem",
@@ -303,6 +378,7 @@ export function QuickLaunchWizardModal({
                     placeholder="e.g. What is the cancellation policy?"
                     value={testQuery}
                     onChange={(e) => setTestQuery(e.target.value)}
+                    aria-label="Test query against knowledge base"
                     style={{
                       flex: 1,
                       padding: "0.6rem 0.75rem",

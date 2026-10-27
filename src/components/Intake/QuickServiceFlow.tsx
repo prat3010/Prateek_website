@@ -399,11 +399,12 @@ export function QuickServiceFlow({
             <span>YOUR DETAILS &amp; QUOTE</span>
           </div>
           <div className={styles.field}>
-            <label className={styles.label}>
+            <label htmlFor="quick-company-name" className={styles.label}>
               <Building2 size={14} className={styles.inlineIcon} />
               Company / Brand Name
             </label>
             <input
+              id="quick-company-name"
               type="text"
               className={styles.input}
               placeholder="Your company or brand name"
@@ -412,11 +413,12 @@ export function QuickServiceFlow({
             />
           </div>
           <div className={styles.field}>
-            <label className={styles.label}>
+            <label htmlFor="quick-site-url" className={styles.label}>
               <Globe size={14} className={styles.inlineIcon} />
               Existing Website URL
             </label>
             <input
+              id="quick-site-url"
               type="url"
               className={styles.input}
               placeholder="https://your-existing-site.com"
@@ -425,11 +427,12 @@ export function QuickServiceFlow({
             />
           </div>
           <div className={styles.field}>
-            <label className={styles.label}>
+            <label htmlFor="quick-additional-notes" className={styles.label}>
               <FileText size={14} className={styles.inlineIcon} />
               Additional Notes
             </label>
             <textarea
+              id="quick-additional-notes"
               className={styles.textarea}
               rows={3}
               placeholder="Any specifics about what you need..."

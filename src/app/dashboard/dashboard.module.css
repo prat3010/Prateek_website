@@ -238,6 +238,14 @@
   z-index: 0;
 }
 
+.tabLabel {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .tabBtn:hover {
   color: var(--color-text);
 }
@@ -246,6 +254,7 @@
   color: var(--pop-black);
 }
 
+.tabBtnActive,
 .activeTab {
   color: var(--app-btn-primary-text) !important;
 }

@@ -48,6 +48,7 @@ This document serves as the registry of critical architectural design decisions 
 * [ADR 38: Autonomous Edge Fleet Swarm Mesh, Epidemic P2P Gossip & Causal Vector Clock Partition Reconciliation (Milestone 102)](#adr-38-autonomous-edge-fleet-swarm-mesh-epidemic-p2p-gossip--causal-vector-clock-partition-reconciliation-milestone-102)
 * [ADR 45: The Playground — Polymorphic Creation Showcase, Arcade Cabinet Shell, and Cloudflare Pages 3-Tier Hosting](#adr-45-the-playground--polymorphic-creation-showcase-arcade-cabinet-shell-and-cloudflare-pages-3-tier-hosting)
 * [ADR 46: Timeless Design Philosophies & Tactile Hardware Brutalism (Zero-Glassmorphism & Elimination of Fake Neon Halos)](#adr-46-timeless-design-philosophies--tactile-hardware-brutalism-zero-glassmorphism--elimination-of-fake-neon-halos)
+* [ADR 47: Global App Router Resilience Boundaries, WCAG 2.1 AA Modal Scroll Containment, and Dynamic Sensory Kinetics](#adr-47-global-app-router-resilience-boundaries-wcag-21-aa-modal-scroll-containment-and-dynamic-sensory-kinetics)
 
 ---
 
@@ -772,6 +773,34 @@ This document serves as the registry of critical architectural design decisions 
 * **Consequences**:
   * **Pros**: 60fps buttery-smooth Lenis scrolling without compositor jank; guaranteed WCAG AA legibility across light and dark modes; tactile hardware affordances provide authentic physical feel matching Teenage Engineering and Dieter Rams principles; 100% theme parity preserved.
   * **Cons**: Future component authors must strictly use `--surface-hardware-*` semantic tokens rather than introducing ad-hoc transparency or glow effects.
+
+---
+
+# **ADR 47: Global App Router Resilience Boundaries, WCAG 2.1 AA Modal Scroll Containment, and Dynamic Sensory Kinetics**
+
+* **Status**: Approved & Implemented
+* **Context**: A full-spectrum frontend audit across `Prateek_website` and `retriever/apps/web` identified four systemic resilience and UX gaps:
+  1. **App Router Fragility**: Absence of root `error.tsx`, `global-error.tsx`, and a custom `not-found.tsx` caused uncaught client component exceptions to render an unstyled blank white screen with zero recovery CTAs.
+  2. **Lenis Scroll Leakage**: Background page Lenis smooth scroll remained active beneath open modal dialogs, causing scroll wheel jitter and background dislocation. Modals also lacked <kbd>Escape</kbd> dismissal and keyboard focus containment.
+  3. **Form Control Orphanage**: Several form inputs lacked programmatic `<label htmlFor>` bindings or accessible `role="radiogroup"` / `role="radio"` semantics for screen reader navigation.
+  4. **Sensory Kinetics Gaps**: Category tabs switched abruptly without fluid spring physics, and dynamic AI blueprint prices in Scoping Chat changed via static text updates rather than animated digit rolls.
+* **Decision**: Implemented unified resilience and interaction standards:
+  1. **Dual-Tier App Router Crash Containment**:
+     - `src/app/error.tsx`: Comic-styled Next.js App Router boundary with error digest display, error reporting telemetry, and `reset()` / `Return to Base` recovery CTAs.
+     - `src/app/global-error.tsx`: Standalone root crash boundary with self-contained `<html>` and `<body>` tags and hard application reload.
+     - `src/app/not-found.tsx`: Comic 404 dossier ("404 // SIGNAL LOST") with direct routing hub to `/scoping`, `/terminal`, and `/playground`.
+  2. **Modal Accessible Containment & Lenis Scroll Lock**:
+     - All Client Workspace Dashboard modals (`ProposalSuiteModal`, `StagingPreviewModal`, `InvoiceCreatorModal`, `ScopeEditorModal`, `SowSignoffModal`) and RAG modals (`QuickLaunchWizardModal`) invoke `lenis?.stop()` on mount and `lenis?.start()` on unmount.
+     - Inner modal containers declare `data-lenis-prevent` to isolate local wheel/swipe events.
+     - Added keyboard focus traps cycling `Tab` / `Shift+Tab` and <kbd>Escape</kbd> key listeners.
+  3. **Design Tokens & Theme Parity**:
+     - Eliminated hardcoded dark Tailwind hexes in `InlineScopingChatCard.module.css` in favor of semantic CSS tokens (`var(--surface-card)`, `var(--color-text)`, etc.) and `:global([data-theme='noir'])` overrides for high-contrast Azure/Noir parity.
+  4. **Fluid Sensory Kinetics**:
+     - Framer Motion shared layout springs (`layoutId="activeProjectCategoryPill"`, `activePlaygroundCategoryPill`, `activeDashboardTabPill`) on category and workspace tab switchers.
+     - Wrapped scoping blueprint prices in `@number-flow/react` `<NumberFlow>` for animated digit rolling.
+* **Consequences**:
+  * **Pros**: 100% elimination of unstyled crash white screens; robust 404 recovery; guaranteed WCAG 2.1 AA modal accessibility; zero scroll jitter while interacting with dashboard modals; rich tactile micro-interactions.
+  * **Cons**: All future modal components must explicitly integrate `useLenis()` locking and `data-lenis-prevent`.
 
 ---
 

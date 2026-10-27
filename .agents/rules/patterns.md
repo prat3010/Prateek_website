@@ -100,3 +100,17 @@
   3. **High-Leverage Production Prioritization:** Always prioritize mission-critical production systems (zero-downtime deployment pipelines, automated load/latency benchmarks, empirical GraphRAG community clustering, and revenue-generating lead pipelines) over decorative flair.
   4. **Fully Working & Verified:** Never declare a task complete unless every interaction path is fully wired, verified with real inputs, and backed by automated tests.
 
+### 15. Modal Accessible Containment & Lenis Scroll Lock Invariant
+- **Rule:** Every modal dialog, popover overlay, or slide-out sheet rendered via `<Portal>` MUST enforce WCAG 2.1 AA keyboard accessibility and Lenis scroll isolation.
+- **Strict Invariants:**
+  1. **Lenis Scroll Lock:** When the modal mounts, execute `lenis?.stop()` and restore with `lenis?.start()` upon unmount. Apply `data-lenis-prevent` to the modal container to isolate internal mousewheel and touch gestures from outer page scroll listeners.
+  2. **Keyboard Trap & Escape:** Listen for <kbd>Escape</kbd> to trigger `onClose()`. Implement a focus trap cycling `Tab` and `Shift+Tab` across interactive elements within the modal.
+  3. **Accessible Attributes:** Close buttons must provide an explicit `aria-label` (e.g. `aria-label="Close dialog"`). The modal root must declare `role="dialog"` and `aria-modal="true"`.
+
+### 16. App Router Resilience & Error Containment
+- **Rule:** Maintain robust Next.js 16 App Router crash recovery at both component and root layout boundaries.
+- **Strict Invariants:**
+  1. **Component Error Boundary (`src/app/error.tsx`):** Catches unhandled client component exceptions, displays error digests, and provides immediate `reset()` and return-to-base actions without unmounting the root navigation and layout shell.
+  2. **Root Layout Crash Boundary (`src/app/global-error.tsx`):** Standalone boundary rendering its own `<html>` and `<body>` tags with inline styles to recover from root layout hydration failures via full page reload.
+  3. **Custom 404 Hub (`src/app/not-found.tsx`):** Provides a comic-styled dossier navigation hub back to `/`, `/scoping`, and `/terminal`.
+

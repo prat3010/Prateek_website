@@ -221,14 +221,20 @@ function Contact() {
 
               {/* Communication Intent Selector Chips */}
               <div className={styles.field}>
-                <label className={styles.label}>
+                <label className={styles.label} id="intent-selector-label">
                   Communication Intent
                 </label>
-                <div className={styles.chipGrid}>
+                <div
+                  className={styles.chipGrid}
+                  role="radiogroup"
+                  aria-labelledby="intent-selector-label"
+                >
                   {intentOptions.map((opt) => (
                     <button
                       key={opt.id}
                       type="button"
+                      role="radio"
+                      aria-checked={activeIntent === opt.id}
                       className={`${styles.intentChip} ${activeIntent === opt.id ? styles.intentChipActive : ''}`}
                       onClick={() => setSelectedIntent(opt.id)}
                     >

@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { useLenis } from 'lenis/react';
 
 
 import { X, Sparkles, Sliders, CheckCircle2 } from 'lucide-react';
@@ -103,6 +104,62 @@ function ScopeEditorModalInner({
   const [cascadeTarget, setCascadeTarget] = useState<FeatureItem | null>(null);
   const [cascadeDependents, setCascadeDependents] = useState<FeatureItem[]>([]);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
+
+  const modalRef = useRef<HTMLDivElement>(null);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const lastActiveElementRef = useRef<HTMLElement | null>(null);
+  const lenis = useLenis();
+
+  // Prevent background scrolling while modal is open and isolate from Lenis
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    lenis?.stop();
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      lenis?.start();
+    };
+  }, [lenis]);
+
+  // Focus trapping and Escape key management (WCAG 2.1 AA)
+  useEffect(() => {
+    lastActiveElementRef.current = document.activeElement as HTMLElement | null;
+    const focusTimer = setTimeout(() => {
+      closeBtnRef.current?.focus();
+    }, 50);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+
+      if (e.key === 'Tab' && modalRef.current) {
+        const focusable = modalRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last?.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first?.focus();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      clearTimeout(focusTimer);
+      window.removeEventListener('keydown', handleKeyDown);
+      lastActiveElementRef.current?.focus?.();
+    };
+  }, [onClose]);
 
   const custQuote = useMemo(() => {
     return calcQuote(
@@ -244,16 +301,21 @@ function ScopeEditorModalInner({
 
   return (
     <Portal>
-      <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalOverlay} onClick={onClose} role="presentation">
         <div
+          ref={modalRef}
           className={`${styles.modalCard} ${styles.customizerModalCard}`}
           onClick={(e) => e.stopPropagation()}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="scope-editor-modal-title"
+          data-lenis-prevent
         >
           <div className={styles.modalHeader}>
             <div className={styles.modalHeaderTitle}>
               <Sliders size={20} className={styles.modalIcon} />
               <div>
-                <h3>
+                <h3 id="scope-editor-modal-title">
                   {scope.deposit_paid ? 'Submit Scope Change Order' : 'Customize Project Architecture'}
                 </h3>
                 <p className={styles.modalSubtitle}>
@@ -263,12 +325,18 @@ function ScopeEditorModalInner({
                 </p>
               </div>
             </div>
-            <button className={styles.closeBtn} onClick={onClose}>
+            <button
+              ref={closeBtnRef}
+              className={styles.closeBtn}
+              onClick={onClose}
+              type="button"
+              aria-label="Close architecture customizer modal"
+            >
               <X size={20} />
             </button>
           </div>
 
-          <div className={styles.customizerBody}>
+          <div className={styles.customizerBody} data-lenis-prevent>
             {/* 1. Base Engine */}
             <div className={styles.customizerSection}>
               <h4 className={styles.customizerSectionTitle}>1. Base Architecture Engine</h4>

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { isAdminEmail } from '@/lib/auth';
@@ -1086,29 +1087,65 @@ export default function ClientDashboardPage() {
 
       {/* Main Tab Navigation */}
 
-      <nav className={styles.tabNav}>
+      <nav className={styles.tabNav} role="tablist" aria-label="Dashboard views">
         <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'scopes'}
           className={`${styles.tabBtn} ${activeTab === 'scopes' ? styles.tabBtnActive : ''}`}
           onClick={() => setActiveTab('scopes')}
         >
-          <Layers size={18} />
-          <span>Active Project Scopes ({scopes.length})</span>
+          {activeTab === 'scopes' && (
+            <motion.span
+              layoutId="activeDashboardTabPill"
+              className={styles.tabPill}
+              transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+            />
+          )}
+          <span className={styles.tabLabel}>
+            <Layers size={18} />
+            <span>Active Project Scopes ({scopes.length})</span>
+          </span>
         </button>
 
         <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'onboarding'}
           className={`${styles.tabBtn} ${activeTab === 'onboarding' ? styles.tabBtnActive : ''}`}
           onClick={() => setActiveTab('onboarding')}
         >
-          <UserCheck size={18} />
-          <span>Client Onboarding Checklist</span>
+          {activeTab === 'onboarding' && (
+            <motion.span
+              layoutId="activeDashboardTabPill"
+              className={styles.tabPill}
+              transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+            />
+          )}
+          <span className={styles.tabLabel}>
+            <UserCheck size={18} />
+            <span>Client Onboarding Checklist</span>
+          </span>
         </button>
 
         <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'invoices'}
           className={`${styles.tabBtn} ${activeTab === 'invoices' ? styles.tabBtnActive : ''}`}
           onClick={() => setActiveTab('invoices')}
         >
-          <CreditCard size={18} />
-          <span>Invoices & Ledger ({invoices.length})</span>
+          {activeTab === 'invoices' && (
+            <motion.span
+              layoutId="activeDashboardTabPill"
+              className={styles.tabPill}
+              transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+            />
+          )}
+          <span className={styles.tabLabel}>
+            <CreditCard size={18} />
+            <span>Invoices & Ledger ({invoices.length})</span>
+          </span>
         </button>
       </nav>
 

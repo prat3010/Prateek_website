@@ -148,3 +148,33 @@ Before completing any task modifying domain logic or API routes:
 4. **Post-Tool Audit**: Run `python3 scripts/audit_contracts.py`.
 5. **Graph Sync**: Run `python3 scripts/sync_graph_with_code.py` to keep Obsidian Canvas in 100% sync.
 
+---
+
+## 8. App Router Resilience & Modal Accessibility Quirks
+
+### Quirk: Lenis Smooth Scroll Background Leakage in Modals & Dialogs
+- **Context / Framework**: Lenis Smooth Scroll + Fullscreen / Center Modals (`ProposalSuiteModal`, `InvoiceCreatorModal`, `ScopeEditorModal`, `QuickLaunchWizardModal`, etc.)
+- **Symptom**: When a modal is open, mousewheel or touch-swipe gestures inside the modal scroll the background body underneath the backdrop scrim, causing visual jitter and disorienting the user upon modal dismiss.
+- **Root Cause**: Lenis attaches window-level passive scroll listeners. Even if `overflow: hidden` is applied to `document.body`, Lenis's internal virtual scroll accumulator continues ticking unless explicitly stopped or isolated.
+- **Anti-Pattern**:
+  ```tsx
+  // BAD: Only sets body overflow without stopping Lenis or isolating events
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
+  }, []);
+  ```
+- **Enforced Solution**:
+  1. Use `useLenis()` to call `lenis?.stop()` on mount and `lenis?.start()` on unmount.
+  2. Add `data-lenis-prevent` to the modal container / inner scrollable element to isolate local mousewheel and touch swipe events.
+  3. Ensure focus trap and <kbd>Escape</kbd> key handlers are wired for WCAG 2.1 AA compliance.
+
+### Quirk: Next.js 16 App Router Error Boundary Granularity
+- **Context / Framework**: Next.js 16 App Router
+- **Symptom**: Uncaught exceptions in client components cause an unstyled blank white screen; root layout hydration failures crash the entire HTML shell.
+- **Root Cause**: Next.js App Router requires two distinct levels of error boundaries:
+  1. `src/app/error.tsx`: Intercepts client errors in nested route components while keeping the root layout (nav, theme, footer) intact. Must be a Client Component (`'use client'`).
+  2. `src/app/global-error.tsx`: Catches fatal errors thrown inside `RootLayout` itself. Must render standalone `<html>` and `<body>` tags and can only use hard reloads (`window.location.href = '/'` or full browser reload) because React routing context may be destroyed.
+- **Enforced Solution**: Maintain both `error.tsx` and `global-error.tsx` styled with design system tokens and explicit retry actions.
+
+
