@@ -40,6 +40,17 @@ const QUICK_SHORTCUTS = [
   'clear',
 ];
 
+const AI_TWIN_SHORTCUTS = [
+  'exit',
+  'is he good?',
+  'who are you?',
+  'architecture',
+  'tech stack',
+  'rag engine',
+  'pricing tiers',
+  'clear',
+];
+
 export default function SiteInfoConsole() {
   const { isNoir } = useTheme();
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
@@ -123,18 +134,35 @@ export default function SiteInfoConsole() {
             <div className={styles.indicators}>
               <span className={`${styles.dot} ${styles.red}`} />
               <span className={`${styles.dot} ${styles.yellow}`} />
-              <span className={`${styles.dot} ${styles.green}`} />
+              <span className={`${styles.dot} ${styles.green} ${isAiChatActive ? styles.dotPulse : ''}`} />
             </div>
             <h2 className={styles.titleText}>
-              {isNoir ? 'SYSTEM DIAGNOSTICS & LOGS (v2.5)' : 'COBALT TERMINAL CORE // SITE SCHEMATICS'}
+              {isAiChatActive
+                ? 'PRATEEQ.AI TWIN CONSOLE // ACTIVE NEURAL LINK'
+                : isNoir
+                  ? 'SYSTEM DIAGNOSTICS & LOGS (v2.5)'
+                  : 'COBALT TERMINAL CORE // SITE SCHEMATICS'}
             </h2>
+            {isAiChatActive && (
+              <button
+                type="button"
+                className={styles.twinExitBtn}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  executeCommand('exit');
+                }}
+                title="Disconnect AI Twin and return to standard shell"
+              >
+                DISCONNECT [EXIT]
+              </button>
+            )}
           </div>
 
           {/* Telemetry & Web Vitals Dashboard */}
           <ConsoleTelemetryGrid stats={stats} webVitals={webVitals} />
 
           {/* Terminal Console */}
-          <div className={styles.terminalContainer} onClick={focusTerminalInput}>
+          <div className={`${styles.terminalContainer} ${isAiChatActive ? styles.terminalAiActive : ''}`} onClick={focusTerminalInput}>
             {activeGame === 'snake' ? (
               <TerminalSnakeGame
                 onClose={() => setActiveGame('none')}
@@ -156,6 +184,42 @@ export default function SiteInfoConsole() {
                   aria-label="Terminal output stream"
                 >
                   {terminalHistory.map((line, index) => {
+                    if (line.type === 'twin-card') {
+                      return (
+                        <div key={index} className={styles.twinCard}>
+                          <div className={styles.twinCardHeader}>
+                            <div className={styles.twinCardBadge}>
+                              <span className={styles.twinLiveDot} />
+                              <span>PRATEEQ.AI // DIGITAL TWIN v2.5</span>
+                            </div>
+                            <span className={styles.twinHostTag}>ORACLE VPS · 130.210.35.134</span>
+                          </div>
+
+                          <div className={styles.twinMatrixGrid}>
+                            <div className={styles.twinMatrixItem}>
+                              <span className={styles.twinMatrixKey}>[✓] SARCASM &amp; WIT</span>
+                              <span className={styles.twinMatrixVal}>ACTIVE (8.5/10)</span>
+                            </div>
+                            <div className={styles.twinMatrixItem}>
+                              <span className={styles.twinMatrixKey}>[✓] LANGCHAIN BLOAT</span>
+                              <span className={styles.twinMatrixVal}>0% DETECTED</span>
+                            </div>
+                            <div className={styles.twinMatrixItem}>
+                              <span className={styles.twinMatrixKey}>[✓] COGNITIVE MEMORY</span>
+                              <span className={styles.twinMatrixVal}>24 ARCH DOSSIERS</span>
+                            </div>
+                            <div className={styles.twinMatrixItem}>
+                              <span className={styles.twinMatrixKey}>[✓] VECTOR ENGINE</span>
+                              <span className={styles.twinMatrixVal}>HNSW + BM25 HYBRID</span>
+                            </div>
+                          </div>
+
+                          <div className={styles.twinGreeting}>
+                            Hey! I am Prateek&apos;s digital clone. I know his code, architecture, philosophy, and his deep hatred of bloated AI wrappers. Ask me anything about his work, stack, or pricing—or type <code className={styles.exitCode}>exit</code> to leave.
+                          </div>
+                        </div>
+                      );
+                    }
                     if (line.type === 'image' && line.imageUrl) {
                       return (
                         <div key={index} className={styles.terminalImageContainer}>
@@ -233,13 +297,15 @@ export default function SiteInfoConsole() {
 
           {/* Command Shortcuts list for easy mobile use */}
           <div className={styles.shortcutsContainer}>
-            <span className={styles.shortcutsLabel}>QUICK SHORTCUTS:</span>
+            <span className={styles.shortcutsLabel}>
+              {isAiChatActive ? 'AI TWIN SHORTCUTS:' : 'QUICK SHORTCUTS:'}
+            </span>
             <div className={styles.shortcutsGrid}>
-              {QUICK_SHORTCUTS.map((cmd) => (
+              {(isAiChatActive ? AI_TWIN_SHORTCUTS : QUICK_SHORTCUTS).map((cmd) => (
                 <button
                   key={cmd}
                   onClick={() => executeCommand(cmd)}
-                  className={styles.shortcutBtn}
+                  className={`${styles.shortcutBtn} ${isAiChatActive && cmd === 'exit' ? styles.shortcutBtnExit : ''}`}
                   type="button"
                 >
                   {cmd}

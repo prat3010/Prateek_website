@@ -26,7 +26,7 @@ import type { SystemStats } from './useSystemTelemetry';
 
 export interface ConsoleLine {
   text: string;
-  type: 'input' | 'output' | 'error' | 'success' | 'link' | 'image';
+  type: 'input' | 'output' | 'error' | 'success' | 'link' | 'image' | 'twin-card';
   command?: string;
   imageUrl?: string;
   href?: string;
@@ -38,20 +38,14 @@ export interface AIChatSessionState {
 }
 
 const AI_TWIN_BOOT_LINES: ConsoleLine[] = [
-  { text: '  ┌────────────────────────────────────────────────────────────────────────┐', type: 'output' },
-  { text: '  │  🧠 PRATEEQ.AI // DIGITAL TWIN & FORWARD DEPLOYED BRAIN v2.2           │', type: 'success' },
-  { text: '  │  "Because reading 99 architectural decisions is exhausting."           │', type: 'output' },
-  { text: '  ├────────────────────────────────────────────────────────────────────────┤', type: 'output' },
-  { text: '  │  [✓] Establishing neural link ........... Oracle VPS (130.210.35.134)  │', type: 'output' },
-  { text: '  │  [✓] Sarcasm & Wit Subsystems ........... ACTIVE (Level 8.5/10)        │', type: 'output' },
-  { text: '  │  [✓] LangChain Boilerplate .............. 0% DETECTED (Purged)         │', type: 'output' },
-  { text: '  │  [✓] Ponytail Principle Filter .......... MAXIMUM LAZINESS ENGAGED     │', type: 'output' },
-  { text: '  │  [✓] Caffeine Blood Saturation .......... 94.2% (Cold Brew)            │', type: 'output' },
-  { text: '  │  [✓] Memory Corpus Indexed .............. 24 Curated Engineering Docs  │', type: 'output' },
-  { text: '  └────────────────────────────────────────────────────────────────────────┘', type: 'output' },
-  { text: '', type: 'output' },
-  { text: "Hey! I am Prateek's digital clone. I know his code, projects, philosophy, and his deep hatred of bloated AI wrappers.", type: 'success' },
-  { text: "Ask me anything about his work, architecture, or pricing, or type 'exit' to return to standard shell.", type: 'output' },
+  {
+    type: 'twin-card',
+    text: "[✓] Neural link active. Connected to Prateeq's AI Twin on Oracle Cloud VPS (130.210.35.134).",
+  },
+  {
+    type: 'success',
+    text: "Tip: Ask me about my architecture, stack, war stories, or pricing tiers (or type 'exit' to disconnect).",
+  },
   { text: '', type: 'output' },
 ];
 
