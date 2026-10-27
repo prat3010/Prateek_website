@@ -20,6 +20,7 @@ import {
   sendPaymentConfirmationNotifications,
   sendAdminChangeOrderNotification,
   sendAdminOnboardingCompletedNotification,
+  sendHotLeadAlertNotification,
 } from '@/lib/emailNotification';
 
 describe('emailNotification service', () => {
@@ -336,6 +337,50 @@ describe('emailNotification service', () => {
       expect(res).toBe(true);
       expect(sendMock).toHaveBeenCalledTimes(1);
       expect(sendMock.mock.calls[0][0].subject).toContain('Onboarding Checklist 100% Complete');
+    });
+
+    it('sendHotLeadAlertNotification sends executive alert for high-value prospect', async () => {
+      const res = await sendHotLeadAlertNotification({
+        sessionId: 'session_hot_123',
+        scopeCode: 'SCOPE-HOT-99',
+        userQuery: 'We need an enterprise SaaS with pgvector AI search and Stripe payments.',
+        totalINR: 320000,
+        totalUSD: 4200,
+        engine: 'saas',
+        featureCount: 4,
+        featureLabels: ['Authentication', 'Payments', 'AI Vector Search', 'Analytics'],
+        turnIndex: 2,
+        visitorCountry: 'US',
+        userEmail: 'cto@futurecorp.com',
+      });
+      expect(res).toBe(true);
+      expect(sendMock).toHaveBeenCalledTimes(1);
+      const call = sendMock.mock.calls[0][0];
+      expect(call.to).toBe('prateek@test.com');
+      expect(call.subject).toContain('HOT SCOPING LEAD: $4,200 / ₹320,000 [SAAS] (US)');
+      expect(call.html).toContain('cto@futurecorp.com');
+      expect(call.html).toContain('AI Vector Search');
+      expect(call.html).toContain('enterprise SaaS with pgvector');
+    });
+
+    it('sendHotLeadAlertNotification handles physical escrow escalation subject', async () => {
+      const res = await sendHotLeadAlertNotification({
+        sessionId: 'session_escrow_456',
+        userQuery: 'Can you come physically paint my bedroom walls?',
+        totalINR: 0,
+        totalUSD: 0,
+        engine: 'saas',
+        featureCount: 0,
+        featureLabels: [],
+        turnIndex: 1,
+        visitorCountry: 'IN',
+        isEscrow: true,
+      });
+      expect(res).toBe(true);
+      expect(sendMock).toHaveBeenCalledTimes(1);
+      const call = sendMock.mock.calls[0][0];
+      expect(call.subject).toContain('ESCROW ESCALATION: Bespoke/Physical Inquiry (IN)');
+      expect(call.html).toContain('Executive Escrow Escalation');
     });
   });
 });

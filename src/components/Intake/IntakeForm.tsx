@@ -473,6 +473,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                     chatTranscript={chatTranscript}
                     setChatTranscript={setChatTranscript}
                     currentScope={currentScopeContext}
+                    resumeData={resumeData}
                   />
                 )}
 
@@ -712,6 +713,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
         chatTranscript={chatTranscript}
         setChatTranscript={setChatTranscript}
         currentScope={currentScopeContext}
+        resumeData={resumeData}
       />
 
       <DependencyCascadeModal

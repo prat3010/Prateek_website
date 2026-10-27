@@ -10,6 +10,7 @@ import {
   InlineScopingChatCard,
   type CurrentScopeContext,
 } from './InlineScopingChatCard';
+import type { ResumeData } from '@/data/resume';
 import styles from './ScopeCopilotDrawer.module.css';
 
 interface ScopeCopilotDrawerProps {
@@ -26,6 +27,7 @@ interface ScopeCopilotDrawerProps {
     React.SetStateAction<Array<{ role: string; content: string; timestamp?: string }>>
   >;
   currentScope?: CurrentScopeContext | null;
+  resumeData?: ResumeData | null;
 }
 
 export function ScopeCopilotDrawer({
@@ -40,6 +42,7 @@ export function ScopeCopilotDrawer({
   chatTranscript,
   setChatTranscript,
   currentScope = null,
+  resumeData = null,
 }: ScopeCopilotDrawerProps) {
   const drawerRef = useRef<HTMLDivElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
@@ -161,6 +164,7 @@ export function ScopeCopilotDrawer({
               currentScope={currentScope}
               isDrawerMode={true}
               onCloseDrawer={onClose}
+              resumeData={resumeData}
             />
           </div>
         </div>

@@ -815,6 +815,20 @@ ${blueprintActionJson}
 
   const p1PriceSummary = currency === 'USD' ? `$${phased.phase1.totalUSD.toLocaleString()}` : `₹${phased.phase1.totalINR.toLocaleString()}`;
 
+  const portfolioProofNote =
+    targetEngineId === 'saas' &&
+    resolvedFeatures.some(
+      (f) =>
+        f.includes('ai') ||
+        f.includes('rag') ||
+        f.includes('search') ||
+        f.includes('vector')
+    )
+      ? `\n\n🏛️ **Verified Production Proof:** Prateek has built and deployed this exact pattern in our **Retriever Cognitive Engine** (\`https://rag.prateeq.in\`) using PostgreSQL pgvector hybrid search and sub-300ms streaming. You can test a live working demo directly in the [Playground: Retriever](/playground).`
+      : p.includes('terminal') || p.includes('game') || p.includes('arcade')
+        ? `\n\n🕹️ **Verified Production Proof:** Prateek engineered the interactive Web Terminal OS (\`/terminal\`) and retro arcade engines with zero-dependency Canvas loops and Web Audio API synthesis. Check out [Playground: Terminal](/playground).`
+        : `\n\n🏛️ **Engineering Authority:** Every architecture is delivered with clean TypeScript, strict PostgreSQL Row-Level Security (RLS), and a 30-day bug warranty backed by verified production case studies.`;
+
   return `Here is a custom architecture plan designed for your requirements:
 
 ### 🎯 Architecture: ${blueprintRec.title}
@@ -829,6 +843,7 @@ ${blueprintRec.summary}
 
 ### ⚡ Architectural Highlights:
 ${blueprintRec.techHighlights.map((h) => `- ${h}`).join('\n')}
+${portfolioProofNote}
 
 💡 *Budget Phasing Available:* You can choose between launching the **Phase 1 Lean MVP** (${p1PriceSummary}) to validate fast, or applying the **Full Architecture** below.
 

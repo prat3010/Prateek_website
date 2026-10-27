@@ -1,4 +1,9 @@
 import { supabase } from '@/data/supabase';
+import { sendHotLeadAlertNotification } from '@/lib/emailNotification';
+import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
+
+// In-memory deduplication set to prevent duplicate hot-lead alerts for the same session
+const alertedHotLeadSessions = new Set<string>();
 
 export interface ScopingTraceRecord {
   sessionId: string;
@@ -63,6 +68,50 @@ export async function logScopingChatTrace(record: ScopingTraceRecord): Promise<v
     if (error) {
       // Table may not yet be migrated in some environments; log warning without breaking
       console.warn('Scoping trace telemetry insert notice:', error.message);
+    }
+
+    // Evaluate qualification for immediate real-time Hot-Lead executive alert
+    const quoteUSD = Number(record.quoteUSD) || 0;
+    const quoteINR = Number(record.quoteINR) || 0;
+    const turnIndex = record.turnIndex || 1;
+    const isEscrow =
+      record.modelUsed === 'escrow-escalation-router' ||
+      record.agentIntent === 'escrow_escalation';
+    const isHighValue = quoteUSD >= 2500 || quoteINR >= 200000;
+    const isEngagedLead = turnIndex >= 3 && quoteUSD >= 1500;
+
+    if (
+      (isHighValue || isEscrow || isEngagedLead) &&
+      record.sessionId &&
+      !alertedHotLeadSessions.has(record.sessionId)
+    ) {
+      alertedHotLeadSessions.add(record.sessionId);
+      if (alertedHotLeadSessions.size > 2000) {
+        const firstKey = alertedHotLeadSessions.values().next().value;
+        if (firstKey) alertedHotLeadSessions.delete(firstKey);
+      }
+
+      const featureCatalog = (questionnaireDefaults.features || []) as Array<{ id: string; label: string }>;
+      const featureLabels = (record.selectedFeatures || []).map((id) => {
+        const match = featureCatalog.find((f) => f.id === id);
+        return match ? match.label : id;
+      });
+
+      sendHotLeadAlertNotification({
+        sessionId: record.sessionId,
+        scopeCode: record.scopeCode,
+        userQuery: record.userQuery,
+        totalINR: quoteINR,
+        totalUSD: quoteUSD,
+        engine: record.currentEngine || 'saas',
+        featureCount: record.selectedFeatures?.length || 0,
+        featureLabels,
+        turnIndex,
+        visitorCountry: record.visitorCountry,
+        userEmail: record.userEmail,
+        isEscrow,
+        reasoning: record.agentReasoning,
+      }).catch((err) => console.warn('Hot lead alert dispatch notice:', err));
     }
   } catch (err) {
     console.warn('Unhandled scoping trace telemetry error:', err);

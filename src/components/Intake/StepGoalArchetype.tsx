@@ -22,7 +22,7 @@ import {
   Settings,
   Sparkles,
 } from 'lucide-react';
-import type { GoalArchetype, BaseEngineItem, FeatureItem } from '@/data/resume';
+import type { GoalArchetype, BaseEngineItem, FeatureItem, ResumeData } from '@/data/resume';
 import { formatPricePair, packageTotalForArchetype, type Currency } from '@/lib/pricing';
 import NumberFlow from '@number-flow/react';
 import type { ParseIntentResponse } from '@/lib/rag-client';
@@ -122,6 +122,7 @@ interface StepGoalArchetypeProps {
     React.SetStateAction<Array<{ role: string; content: string; timestamp?: string }>>
   >;
   currentScope?: CurrentScopeContext | null;
+  resumeData?: ResumeData | null;
 }
 
 export function StepGoalArchetype({
@@ -146,6 +147,7 @@ export function StepGoalArchetype({
   chatTranscript,
   setChatTranscript,
   currentScope = null,
+  resumeData = null,
 }: StepGoalArchetypeProps) {
   const archetypeCardRefs = React.useRef<(HTMLDivElement | null)[]>([]);
   const categoryTabRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
@@ -195,6 +197,7 @@ export function StepGoalArchetype({
         chatTranscript={chatTranscript || []}
         setChatTranscript={setChatTranscript || (() => {})}
         currentScope={currentScope}
+        resumeData={resumeData}
       />
 
       {/* Low-Risk Paid Discovery Wedge */}

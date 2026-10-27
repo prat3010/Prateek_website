@@ -10,6 +10,7 @@ import {
   RotateCcw,
   Loader2,
   FileUp,
+  FileDown,
   X,
   Sparkles,
 } from 'lucide-react';
@@ -22,7 +23,10 @@ import type {
   FeatureItem,
   BrandAssetOption,
   MaintenancePlanOption,
+  ResumeData,
 } from '@/data/resume';
+import defaultResume from '@/data/resume.json';
+import { generateExecutiveBriefPDF, type QuestionnaireData } from '@/utils/pdfGenerator';
 import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
 import { RfpUploaderModal } from './RfpUploaderModal';
 import styles from './InlineScopingChatCard.module.css';
@@ -91,28 +95,45 @@ export interface InlineScopingChatCardProps {
   currentScope?: CurrentScopeContext | null;
   isDrawerMode?: boolean;
   onCloseDrawer?: () => void;
+  resumeData?: ResumeData | null;
 }
 
 const STEP_2_QUICK_PROMPTS = [
   {
+    icon: '🛡️',
+    label: 'Run Architecture Tier Audit',
+    query:
+      'Run a comprehensive architecture audit on my active tier modules across the 5 tiers (Visitor, Security, Commerce, AI, Data). Are there any missing security, caching, or SLA safeguards?',
+  },
+  {
     icon: '📉',
     label: 'Cut $1,000 / ₹75k (Prune to MVP)',
-    query: 'How can I cut ~$1,000 / ₹75,000 from this scope without losing core user experience?',
+    query:
+      'How can I cut ~$1,000 / ₹75,000 from this scope without losing core user experience?',
+  },
+  {
+    icon: '⚡',
+    label: 'Optimize Latency & Scale',
+    query:
+      'How can I optimize the latency and edge performance of this selected architecture with caching and security layers?',
   },
   {
     icon: '⏱️',
     label: 'Delivery Timeline',
-    query: 'What is the estimated delivery timeline and sprint milestone breakdown for these exact active modules?',
+    query:
+      'What is the estimated delivery timeline and sprint milestone breakdown for these exact active modules?',
   },
   {
     icon: '💡',
     label: 'Suggest Lean Phase 1 MVP',
-    query: 'Suggest an optimal Phase 1 Lean MVP split for this selection so I can launch fast and defer scale add-ons.',
+    query:
+      'Suggest an optimal Phase 1 Lean MVP split for this selection so I can launch fast and defer scale add-ons.',
   },
   {
     icon: '🧩',
     label: 'Architecture Dependencies',
-    query: 'Can you explain the technical dependencies between my selected modules and why they are required?',
+    query:
+      'Can you explain the technical dependencies between my selected modules and why they are required?',
   },
 ];
 
@@ -286,10 +307,12 @@ export function InlineScopingChatCard({
   currentScope = null,
   isDrawerMode = false,
   onCloseDrawer,
+  resumeData = null,
 }: InlineScopingChatCardProps) {
   const { user, loginWithGoogle } = useAuth();
   const [inputText, setInputText] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [isRfpModalOpen, setIsRfpModalOpen] = useState(false);
   const [appliedIndices, setAppliedIndices] = useState<Record<number, boolean>>({});
   const messagesViewportRef = useRef<HTMLDivElement>(null);
@@ -515,6 +538,57 @@ export function InlineScopingChatCard({
     });
   };
 
+  const handleDownloadExecutiveMemo = async (
+    blueprint: ParsedBlueprint,
+    customPhase?: {
+      title: string;
+      featureIds: string[];
+      suggestedTimeline: string;
+      totalINR: number;
+      totalUSD: number;
+      deliverablesSummary: string;
+    }
+  ) => {
+    try {
+      setIsGeneratingPdf(true);
+      toast.info('Generating branded Executive Scoping Memo (PDF)...');
+
+      const targetTitle = customPhase?.title || blueprint.title;
+      const targetEngine = (blueprint.baseEngineId || 'saas').toUpperCase();
+      const targetFeatures = customPhase?.featureIds || blueprint.featureIds;
+      const targetTimeline =
+        customPhase?.suggestedTimeline || blueprint.suggestedTimeline || '2–4 Weeks';
+      const targetCostINR = customPhase?.totalINR || blueprint.totalINR;
+      const targetCostUSD = customPhase?.totalUSD || blueprint.totalUSD;
+
+      const briefData: QuestionnaireData = {
+        companyName: user?.user_metadata?.full_name || 'Prospective Client',
+        contactEmail: user?.email || '',
+        projectGoal: targetTitle,
+        businessKPI:
+          customPhase?.deliverablesSummary ||
+          'Rapid market validation, high conversion, and sub-second edge performance.',
+        projectCategory: `${targetEngine} Application Architecture`,
+        timeline: targetTimeline,
+        totalBuildCostINR: targetCostINR,
+        totalBuildCostUSD: targetCostUSD,
+        features: targetFeatures,
+        assetsStatus: blueprint.brandAssetId || 'ready',
+        maintenancePlan: blueprint.maintenancePlanId || 'standard',
+        additionalNotes: `Generated via Prateeq Scoping Lab Solutions Architect Copilot (Session: ${chatSessionId || 'Direct'}).`,
+      };
+
+      const activeResume = (resumeData || defaultResume) as unknown as ResumeData;
+      await generateExecutiveBriefPDF(activeResume, briefData, isNoir, currency);
+      toast.success('📄 Executive Scoping Memo generated successfully!');
+    } catch (err) {
+      console.error('Failed to generate Executive Scoping Memo PDF:', err);
+      toast.error('Unable to generate PDF memo. Please try again.');
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
+
   const handleResetChat = () => {
     setChatSessionId('');
     setChatTranscript([]);
@@ -726,23 +800,44 @@ export function InlineScopingChatCard({
                             <span>•</span>
                             <span>{blueprint.phasedBreakdown.phase1.featureIds.length} Modules</span>
                           </div>
-                          {!isApplied ? (
+                          <div className={styles.phaseCardActions}>
+                            {!isApplied ? (
+                              <button
+                                type="button"
+                                className={styles.applyPhaseBtn}
+                                onClick={() =>
+                                  handleApplyBlueprintClick(
+                                    blueprint,
+                                    idx,
+                                    blueprint.phasedBreakdown!.phase1.featureIds,
+                                    blueprint.phasedBreakdown!.phase1.title
+                                  )
+                                }
+                              >
+                                <Zap size={13} />
+                                <span>👉 Apply Phase 1 MVP</span>
+                              </button>
+                            ) : null}
                             <button
                               type="button"
-                              className={styles.applyPhaseBtn}
+                              className={styles.downloadPdfSecondaryBtn}
                               onClick={() =>
-                                handleApplyBlueprintClick(
+                                handleDownloadExecutiveMemo(
                                   blueprint,
-                                  idx,
-                                  blueprint.phasedBreakdown!.phase1.featureIds,
-                                  blueprint.phasedBreakdown!.phase1.title
+                                  blueprint.phasedBreakdown!.phase1
                                 )
                               }
+                              disabled={isGeneratingPdf}
+                              title="Download Phase 1 MVP Brief (PDF)"
                             >
-                              <Zap size={13} />
-                              <span>👉 Apply Phase 1 MVP</span>
+                              {isGeneratingPdf ? (
+                                <Loader2 size={12} className={styles.spinIcon} />
+                              ) : (
+                                <FileDown size={12} />
+                              )}
+                              <span>MVP Memo</span>
                             </button>
-                          ) : null}
+                          </div>
                         </div>
 
                         {/* Full Scope Card */}
@@ -798,6 +893,21 @@ export function InlineScopingChatCard({
                           <span>👉 Apply Blueprint to Quote</span>
                         </button>
                       ) : null}
+
+                      <button
+                        type="button"
+                        className={styles.downloadPdfBtn}
+                        onClick={() => handleDownloadExecutiveMemo(blueprint)}
+                        disabled={isGeneratingPdf}
+                        title="Download 1-Page Executive Pitch Brief (PDF)"
+                      >
+                        {isGeneratingPdf ? (
+                          <Loader2 size={13} className={styles.spinIcon} />
+                        ) : (
+                          <FileDown size={13} />
+                        )}
+                        <span>📄 Executive Memo (PDF)</span>
+                      </button>
 
                       {onNavigateStep && (
                         <button

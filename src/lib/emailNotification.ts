@@ -962,4 +962,136 @@ export async function sendFinalBalanceSettlementNotifications(
   return { adminSent, clientSent };
 }
 
+export interface HotLeadAlertParams {
+  sessionId: string;
+  scopeCode?: string;
+  userQuery: string;
+  assistantSummary?: string;
+  totalINR: number;
+  totalUSD: number;
+  engine: string;
+  featureCount: number;
+  featureLabels: string[];
+  turnIndex: number;
+  visitorCountry?: string;
+  userEmail?: string | null;
+  isEscrow?: boolean;
+  reasoning?: string;
+}
+
+/**
+ * Sends an instant high-priority executive alert email to Prateek when a hot scoping lead or escrow escalation occurs.
+ */
+export async function sendHotLeadAlertNotification(params: HotLeadAlertParams): Promise<boolean> {
+  const client = getResendClient();
+  if (!client) {
+    console.warn('Skipping sendHotLeadAlertNotification: RESEND_API_KEY not configured.');
+    return false;
+  }
+
+  const queryEscaped = escapeHtml(params.userQuery || 'N/A');
+  const engineEscaped = escapeHtml(params.engine.toUpperCase() || 'CUSTOM');
+  const countryEscaped = escapeHtml(params.visitorCountry || 'Global / Unknown');
+  const scopeCodeEscaped = escapeHtml(params.scopeCode || 'DRAFT');
+  const userEmailEscaped = params.userEmail ? escapeHtml(params.userEmail) : 'Anonymous Visitor';
+  const featuresEscaped = params.featureLabels
+    .map(
+      (f) =>
+        `<span style="display: inline-block; background: #334155; color: #38bdf8; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin: 2px 4px 2px 0;">${escapeHtml(f)}</span>`
+    )
+    .join('');
+  const quoteFormatted = `$${params.totalUSD.toLocaleString()} / ₹${params.totalINR.toLocaleString()}`;
+
+  const subject = params.isEscrow
+    ? `🚨 ESCROW ESCALATION: Bespoke/Physical Inquiry (${countryEscaped})`
+    : `🔥 HOT SCOPING LEAD: ${quoteFormatted} [${engineEscaped}] (${countryEscaped})`;
+
+  const adminUrl = 'https://prateeq.in/admin';
+
+  try {
+    const { error } = await client.resend.emails.send({
+      from: 'Prateeq Studio Scoping <notifications@prateeq.in>',
+      to: client.recipient,
+      subject,
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <body style="font-family: system-ui, sans-serif; background: #0f172a; color: #f8fafc; padding: 24px;">
+            <div style="max-width: 600px; margin: 0 auto; background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+              <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #334155; padding-bottom: 14px; margin-bottom: 18px;">
+                <h2 style="color: ${params.isEscrow ? '#f59e0b' : '#38bdf8'}; margin: 0; font-size: 20px;">
+                  ${params.isEscrow ? '🚨 Executive Escrow Escalation' : '🔥 High-Value Scoping Prospect'}
+                </h2>
+                <span style="background: ${params.isEscrow ? 'rgba(245, 158, 11, 0.2)' : 'rgba(56, 189, 248, 0.2)'}; color: ${params.isEscrow ? '#fbbf24' : '#38bdf8'}; border: 1px solid ${params.isEscrow ? '#f59e0b' : '#38bdf8'}; border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 700;">
+                  Turn ${params.turnIndex}
+                </span>
+              </div>
+
+              <div style="background: #0f172a; border-radius: 8px; padding: 16px; margin-bottom: 18px; border: 1px solid #334155;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                  <span style="color: #94a3b8; font-size: 13px;">Estimated Investment:</span>
+                  <strong style="color: #4ade80; font-size: 15px;">${quoteFormatted}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                  <span style="color: #94a3b8; font-size: 13px;">Target Engine:</span>
+                  <span style="color: #f8fafc; font-size: 13px; font-weight: 600;">${engineEscaped} Core</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                  <span style="color: #94a3b8; font-size: 13px;">Visitor Origin:</span>
+                  <span style="color: #f8fafc; font-size: 13px;">${countryEscaped}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                  <span style="color: #94a3b8; font-size: 13px;">Prospect Identity:</span>
+                  <span style="color: #38bdf8; font-size: 13px;">${userEmailEscaped}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: #94a3b8; font-size: 13px;">Scope Code:</span>
+                  <code style="color: #cbd5e1; font-size: 12px;">${scopeCodeEscaped}</code>
+                </div>
+              </div>
+
+              <div style="margin-bottom: 18px;">
+                <strong style="color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 6px;">
+                  Prospect Inquiry / Need:
+                </strong>
+                <div style="background: #0f172a; border-left: 3px solid #38bdf8; padding: 12px 14px; border-radius: 4px; font-size: 14px; color: #f1f5f9; line-height: 1.5; font-style: italic;">
+                  &ldquo;${queryEscaped}&rdquo;
+                </div>
+              </div>
+
+              ${
+                params.featureLabels.length > 0
+                  ? `
+                <div style="margin-bottom: 20px;">
+                  <strong style="color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 6px;">
+                    Included Modules (${params.featureCount}):
+                  </strong>
+                  <div>${featuresEscaped}</div>
+                </div>
+              `
+                  : ''
+              }
+
+              <div style="text-align: center; margin-top: 24px;">
+                <a href="${adminUrl}" style="display: inline-block; background: #38bdf8; color: #0f172a; padding: 12px 24px; font-weight: 700; border-radius: 8px; text-decoration: none; font-size: 14px;">
+                  Open Admin Command Center →
+                </a>
+              </div>
+            </div>
+          </body>
+        </html>
+      `,
+    });
+
+    if (error) {
+      console.warn('sendHotLeadAlertNotification Resend error:', error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.warn('sendHotLeadAlertNotification network exception:', err);
+    return false;
+  }
+}
+
 
