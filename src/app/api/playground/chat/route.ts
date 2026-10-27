@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit, rateLimitResponse } from '@/lib/rateLimit';
 import { generateTraceparent } from '@/lib/tracing';
 
+export const maxDuration = 60;
+
 const RETRIEVER_API_URL = (
   process.env.RETRIEVER_API_URL || 
   process.env.NEXT_PUBLIC_RETRIEVER_API_URL || 
@@ -68,7 +70,7 @@ export async function POST(req: NextRequest) {
         max_tokens: 2048,
       }),
       // Set reasonable timeout
-      signal: AbortSignal.timeout(12000),
+      signal: AbortSignal.timeout(35000),
     });
 
     const latencyMs = Date.now() - startTime;
