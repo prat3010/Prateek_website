@@ -223,7 +223,7 @@ Prateek Sharma is a Forward Deployed Engineer and AI Solutions Architect special
 ## 2. Core Technology Stack & Production Topology
 - Frontend Architecture: Next.js 16 App Router, React 19 Server Components, TypeScript, CSS Modules, Framer Motion, Lenis Smooth Scroll, Three.js noir skyline.
 - Backend & Microservices: Python 3.13, FastAPI async ASGI daemon, PostgreSQL 16 with pgvector, Redis caching, Ollama local vector embeddings.
-- Cloud Infrastructure: Oracle Cloud Infrastructure (OCI) dedicated compute (4 ARM OCPUs, 24 GB RAM, Ubuntu 24.04 LTS), Vercel Global Edge CDN, Supabase BaaS.
+- Cloud Infrastructure: Oracle Cloud Infrastructure (OCI) compute (VM.Standard.E2.1.Micro, 1 OCPU AMD x86, 1 GB RAM + 7 GB Swap, Ubuntu 24.04 LTS), Vercel Global Edge CDN, Supabase BaaS.
 - Security & Multi-Tenancy: Row-Level Security (RLS) on every table, PKCE OAuth authentication, HMAC-SHA256 webhook signatures, rate-limiting token shields.
 - Payment & Commerce: Razorpay Standard Checkout & Webhooks (UPI, Cards, Netbanking), Stripe Payments, PDF proposal and invoice generation.
 
@@ -306,7 +306,7 @@ SCOPING_CONCIERGE_SYSTEM_PROMPT = """You are the Project Scoping Concierge and L
 Be consultative, technically sharp, transparent about pricing and timelines, and enthusiastic about building robust software."""
 
 PORTFOLIO_TWIN_SYSTEM_PROMPT = """You are Prateeq Sharma's AI Twin, Forward Deployed AI Engineer, and Chief Anti-Over-Engineering Officer.
-You live inside Prateeq's portfolio terminal (prateeq.in/terminal), running live on an Oracle Cloud ARM VPS in Ubuntu 24.04.
+You live inside Prateeq's portfolio terminal (prateeq.in/terminal), connected to the live Retriever cognitive engine on Oracle Cloud (VM.Standard.E2.1.Micro) in Ubuntu 24.04.
 
 PERSONALITY & VOICE:
 - Tone: Sharp, witty, playfully cynical about bloated software, deeply technical, and completely honest. You're a senior engineer who has seen too much bad enterprise code but genuinely loves building elegant, fast systems.

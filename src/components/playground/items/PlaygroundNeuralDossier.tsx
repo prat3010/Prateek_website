@@ -106,7 +106,7 @@ export default function PlaygroundNeuralDossier() {
             <ShieldCheck size={13} /> pgvector RLS Active
           </span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-            <Cpu size={13} /> OCI ARM Core
+            <Cpu size={13} /> OCI Compute Core
           </span>
         </div>
       </div>

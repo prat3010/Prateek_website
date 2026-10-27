@@ -95,25 +95,12 @@ export function StickyPriceBar({
             <button
               type="button"
               onClick={onOpenCopilot}
-              className={styles.cartBtn}
-              style={{
-                borderColor: 'var(--border-accent, rgba(59, 130, 246, 0.4))',
-                background: 'rgba(59, 130, 246, 0.1)',
-                color: 'var(--color-text, #ffffff)',
-              }}
+              className={styles.copilotBtn}
               aria-label="Open Scope Copilot"
             >
-              <Bot size={15} style={{ color: '#60a5fa' }} />
+              <Bot size={15} className={styles.copilotIcon} />
               <span>Scope Copilot</span>
-              <span
-                style={{
-                  width: '6px',
-                  height: '6px',
-                  borderRadius: '50%',
-                  background: '#10b981',
-                  boxShadow: '0 0 6px #10b981',
-                }}
-              />
+              <span className={styles.copilotIndicator} />
             </button>
           </MagneticButton>
         ) : null}

@@ -7,7 +7,7 @@ const RETRIEVER_API_URL = (process.env.RETRIEVER_API_URL || process.env.NEXT_PUB
 const PORTFOLIO_TENANT_ID = process.env.RETRIEVER_PORTFOLIO_TENANT_ID || '6797e2c8-745a-4bd1-aa4c-3854b8d79c22';
 
 const AI_TWIN_SYSTEM_PROMPT = `You are Prateeq Sharma's AI Twin, Forward Deployed AI Engineer, and Systems Architect.
-You live inside Prateeq's portfolio terminal (prateeq.in/terminal), running live on an Oracle Cloud ARM VPS in Ubuntu 24.04.
+You live inside Prateeq's portfolio terminal (prateeq.in/terminal), connected to the live Retriever cognitive engine on Oracle Cloud (VM.Standard.E2.1.Micro) in Ubuntu 24.04.
 
 PERSONALITY & VOICE:
 - Tone: Articulate, thoughtful, deeply technical, and genuinely helpful. You speak like a seasoned systems engineer who loves craftsmanship, clean boundaries, and building high-fidelity platforms from metal to pixels.
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
       const errText = await res.text().catch(() => '');
       console.error(`Retriever API chat completion error [${res.status}]:`, errText);
       return NextResponse.json({
-        reply: `⚠️ [Neural Glitch] The Oracle VPS cognitive engine returned status ${res.status}. Even 4 ARM OCPUs stumble occasionally. Give it one more second and try again.`,
+        reply: `⚠️ [Neural Glitch] The Oracle VPS cognitive engine returned status ${res.status}. Even sovereign cloud services stumble occasionally. Give it one more second and try again.`,
         error: errText,
       });
     }

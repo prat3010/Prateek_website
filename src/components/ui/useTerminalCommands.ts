@@ -40,7 +40,7 @@ export interface AIChatSessionState {
 const AI_TWIN_BOOT_LINES: ConsoleLine[] = [
   { text: '================================================================================', type: 'success' },
   { text: '   PRATEEQ.AI // INTERACTIVE KNOWLEDGE TWIN (v2.5)', type: 'success' },
-  { text: '   Live Neural Bridge • Oracle Cloud ARM VPS (rag.prateeq.in)', type: 'output' },
+  { text: '   Live Neural Bridge • Oracle Cloud VPS (rag.prateeq.in)', type: 'output' },
   { text: '================================================================================', type: 'success' },
   { text: ' ', type: 'output' },
   { text: 'SYSTEM STATUS & TELEMETRY:', type: 'success' },

@@ -1277,6 +1277,66 @@
   transform: translateY(-1px);
 }
 
+.copilotBtn {
+  background: #2563EB;
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 0.45rem 0.85rem;
+  font-family: var(--font-headline);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.copilotBtn:hover {
+  background: #1D4ED8;
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45);
+}
+
+.copilotIcon {
+  color: #DBEAFE;
+  display: flex;
+  align-items: center;
+}
+
+.copilotIndicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34D399;
+  box-shadow: 0 0 6px #34D399;
+}
+
+:global([data-theme='noir']) .copilotBtn {
+  background: rgba(0, 240, 255, 0.12);
+  color: #00F0FF;
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
+}
+
+:global([data-theme='noir']) .copilotBtn:hover {
+  background: rgba(0, 240, 255, 0.2);
+  border-color: #00F0FF;
+  box-shadow: 0 0 18px rgba(0, 240, 255, 0.35);
+}
+
+:global([data-theme='noir']) .copilotIcon {
+  color: #00F0FF;
+}
+
+:global([data-theme='noir']) .copilotIndicator {
+  background: #00F0FF;
+  box-shadow: 0 0 6px #00F0FF;
+}
+
 .cartBadge {
   background: rgba(255, 255, 255, 0.25);
   color: inherit;
