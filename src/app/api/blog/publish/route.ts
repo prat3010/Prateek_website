@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidateTag } from 'next/cache';
 import { supabase } from '@/data/supabase';
+import { timingSafeCompare } from '@/lib/security';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,7 +9,7 @@ export async function GET(request: NextRequest) {
   const secret = request.nextUrl.searchParams.get('secret') || request.headers.get('x-api-key');
   const slug = request.nextUrl.searchParams.get('slug');
 
-  if (!secret || secret !== process.env.SYNC_API_KEY) {
+  if (!timingSafeCompare(secret, process.env.SYNC_API_KEY)) {
     return NextResponse.json({ error: 'Unauthorized: Invalid secret' }, { status: 401 });
   }
 

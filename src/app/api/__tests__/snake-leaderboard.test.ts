@@ -35,6 +35,19 @@ describe('Snake Leaderboard API (/api/terminal/snake-leaderboard)', () => {
     expect(data.error).toBeDefined();
   });
 
+  it('POST rejects score exceeding realistic boundary', async () => {
+    const req = new Request('http://localhost/api/terminal/snake-leaderboard', {
+      method: 'POST',
+      body: JSON.stringify({ player_name: 'EXPLOITER', score: 99999 }),
+    });
+
+    const res = await POST(req);
+    const data = await res.json();
+
+    expect(res.status).toBe(400);
+    expect(data.error).toContain('Score exceeds maximum realistic boundary');
+  });
+
   it('POST records valid score and returns updated leaderboard', async () => {
     const req = new Request('http://localhost/api/terminal/snake-leaderboard', {
       method: 'POST',

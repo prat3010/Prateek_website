@@ -5,7 +5,6 @@ export const maxDuration = 60;
 
 const RETRIEVER_API_URL = (process.env.RETRIEVER_API_URL || process.env.NEXT_PUBLIC_RETRIEVER_API_URL || 'https://rag.prateeq.in').replace(/\/$/, '');
 const PORTFOLIO_TENANT_ID = process.env.RETRIEVER_PORTFOLIO_TENANT_ID || '6797e2c8-745a-4bd1-aa4c-3854b8d79c22';
-const PORTFOLIO_API_KEY = process.env.RETRIEVER_PORTFOLIO_API_KEY || 'ret_live_TaaRP0w94H8.a3_CjGsoQY57Fy5bv9Kk40zfUOoH4ak2';
 
 const AI_TWIN_SYSTEM_PROMPT = `You are Prateeq Sharma's AI Twin, Forward Deployed AI Engineer, and Chief Anti-Over-Engineering Officer.
 You live inside Prateeq's portfolio terminal (prateeq.in/terminal), running live on an Oracle Cloud ARM VPS in Ubuntu 24.04.
@@ -41,6 +40,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Query is required.' }, { status: 400 });
     }
 
+    const apiKey = process.env.RETRIEVER_PORTFOLIO_API_KEY;
+    if (!apiKey && process.env.NODE_ENV !== 'test') {
+      return NextResponse.json({ error: 'Retriever portfolio API key is not configured.' }, { status: 500 });
+    }
+    const resolvedApiKey = apiKey || 'ret_live_test_mock_key';
+
     // Build message thread with first-class system prompt and history
     const messages = [
       { role: 'system', content: AI_TWIN_SYSTEM_PROMPT },
@@ -57,7 +62,7 @@ export async function POST(req: NextRequest) {
     const res = await fetch(endpoint, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${PORTFOLIO_API_KEY}`,
+        Authorization: `Bearer ${resolvedApiKey}`,
         'Content-Type': 'application/json',
         traceparent,
         'X-Tenant-ID': PORTFOLIO_TENANT_ID,

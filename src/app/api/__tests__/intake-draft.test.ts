@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+vi.mock('server-only', () => ({}));
+
 const mocks = vi.hoisted(() => {
   const insertFn = vi.fn().mockReturnValue({
     select: vi.fn().mockReturnValue({
@@ -165,7 +167,7 @@ describe('POST /api/client/intake-draft', () => {
     expect(inserted.base_engine_id).toBe('saas');
   });
 
-  it('updates existing intake lead when scopeCode already exists', async () => {
+  it('updates existing intake lead when scopeCode already exists and caller holds valid draft token', async () => {
     mocks.maybeSingleFn.mockResolvedValueOnce({
       data: { id: 'lead-existing-456', draft_token: 'draft_SCOPE-EXISTING_999' },
       error: null,
@@ -182,7 +184,10 @@ describe('POST /api/client/intake-draft', () => {
 
     const req = new Request('http://localhost/api/client/intake-draft', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        cookie: 'prateeq_draft_token=draft_SCOPE-EXISTING_999',
+      },
       body: JSON.stringify(payload),
     });
 
@@ -200,5 +205,33 @@ describe('POST /api/client/intake-draft', () => {
 
     const setCookieHeader = res.headers.get('set-cookie');
     expect(setCookieHeader).toContain('prateeq_pending_scope_code=SCOPE-EXISTING');
+  });
+
+  it('rejects update with 403 when caller lacks matching draft token or session (IDOR defense)', async () => {
+    mocks.maybeSingleFn.mockResolvedValueOnce({
+      data: { id: 'lead-existing-456', draft_token: 'draft_SCOPE-VICTIM_999', contact_email: 'victim@company.com' },
+      error: null,
+    });
+
+    const payload = {
+      scopeCode: 'SCOPE-VICTIM',
+      companyName: 'Attacker Malicious Overwrite',
+      contactEmail: 'attacker@evil.com',
+    };
+
+    const req = new Request('http://localhost/api/client/intake-draft', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        cookie: 'prateeq_draft_token=draft_DIFFERENT_TOKEN_111',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(403);
+    const json = await res.json();
+    expect(json.error).toContain('Forbidden');
+    expect(mocks.updateFn).not.toHaveBeenCalled();
   });
 });

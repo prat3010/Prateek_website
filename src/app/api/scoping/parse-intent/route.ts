@@ -237,7 +237,7 @@ export async function POST(req: NextRequest) {
     const tenantId = process.env.RETRIEVER_SCOPING_TENANT_ID || '';
     const apiKey = process.env.RETRIEVER_SCOPING_API_KEY || '';
     const apiUrl = (process.env.RETRIEVER_API_URL || 'https://rag.prateeq.in').replace(/\/$/, '');
-    const userId = process.env.RETRIEVER_SCOPING_USER_ID || '00000000-0000-0000-0000-000000000000';
+    const userId = process.env.RETRIEVER_SCOPING_USER_ID || crypto.randomUUID();
 
     // 1. Attempt Live Structured Classification from Retriever Cognitive Core
     if (apiKey && tenantId) {

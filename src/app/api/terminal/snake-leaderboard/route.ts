@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { checkRateLimit, rateLimitResponse } from '@/lib/rateLimit';
 
 export const dynamic = 'force-dynamic';
 
@@ -87,6 +88,15 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    const rateLimit = await checkRateLimit(req, {
+      scope: 'snake_leaderboard',
+      limit: 10,
+      windowSeconds: 60,
+    });
+    if (!rateLimit.success) {
+      return rateLimitResponse(rateLimit);
+    }
+
     const body = await req.json().catch(() => ({}));
     const rawName = body.player_name || body.playerName || '';
     const score = Number(body.score);
@@ -95,6 +105,10 @@ export async function POST(req: Request) {
 
     if (isNaN(score) || score <= 0 || !isFinite(score)) {
       return NextResponse.json({ error: 'Valid positive score is required.' }, { status: 400 });
+    }
+
+    if (score > 3000) {
+      return NextResponse.json({ error: 'Score exceeds maximum realistic boundary (3000).' }, { status: 400 });
     }
 
     const currentEntries = (await fetchSupabaseLeaderboard()) || MEMORY_LEADERBOARD;

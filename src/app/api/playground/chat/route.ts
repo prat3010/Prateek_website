@@ -11,9 +11,6 @@ const RETRIEVER_API_URL = (
 const PORTFOLIO_TENANT_ID = 
   process.env.RETRIEVER_PORTFOLIO_TENANT_ID || '6797e2c8-745a-4bd1-aa4c-3854b8d79c22';
 
-const PORTFOLIO_API_KEY = 
-  process.env.RETRIEVER_PORTFOLIO_API_KEY || 'ret_live_TaaRP0w94H8.a3_CjGsoQY57Fy5bv9Kk40zfUOoH4ak2';
-
 export async function POST(req: NextRequest) {
   // 1. Sliding window rate limit check (20 requests / minute)
   const rateResult = await checkRateLimit(req, {
@@ -37,6 +34,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Query is required.' }, { status: 400 });
     }
 
+    const apiKey = process.env.RETRIEVER_PORTFOLIO_API_KEY;
+    if (!apiKey && process.env.NODE_ENV !== 'test') {
+      return NextResponse.json({ error: 'Retriever portfolio API key is not configured.' }, { status: 500 });
+    }
+    const resolvedApiKey = apiKey || 'ret_live_test_mock_key';
+
     // Build standard OpenAI/Retriever message thread
     const messages = [
       ...history.map((m: { role: string; content: string }) => ({
@@ -52,7 +55,7 @@ export async function POST(req: NextRequest) {
     const res = await fetch(endpoint, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${PORTFOLIO_API_KEY}`,
+        Authorization: `Bearer ${resolvedApiKey}`,
         'Content-Type': 'application/json',
         traceparent,
         'X-Tenant-ID': PORTFOLIO_TENANT_ID,

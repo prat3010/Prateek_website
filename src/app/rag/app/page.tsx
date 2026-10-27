@@ -110,8 +110,8 @@ export default function RagAppStudioPage() {
 
       // Guest Showroom Sandbox: point to verified populated Showroom tenant (199 chunks)
       const showroomTenant = process.env.NEXT_PUBLIC_RETRIEVER_PORTFOLIO_TENANT_ID || "6797e2c8-745a-4bd1-aa4c-3854b8d79c22";
-      const guestApiKey = "ret_live_GuestAccessKey2026.ReadOnlyChat";
-      const guestUserId = "00000000-0000-0000-0000-000000000001";
+      const guestApiKey = process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_API_KEY || "ret_live_GuestAccessKey2026.ReadOnlyChat";
+      const guestUserId = process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_USER_ID || "00000000-0000-0000-0000-000000000001";
 
       setTenantId(showroomTenant);
       setApiKey(guestApiKey);

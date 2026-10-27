@@ -3,6 +3,7 @@ import { supabase } from '@/data/supabase';
 import { sendAdminIntakeLeadNotification } from '@/lib/emailNotification';
 import { getIpHash } from '@/lib/security';
 import { intakeDraftSchema } from '@/lib/clientOrder';
+import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
 
 export async function POST(req: Request) {
   try {
@@ -55,6 +56,24 @@ export async function POST(req: Request) {
         .maybeSingle();
 
       if (existingLead?.id) {
+        // IDOR Defense: verify caller owns this lead via draft token cookie/body or verified session email
+        const cookieMatch = (req.headers.get('cookie') || '').match(/(?:^|;\s*)prateeq_draft_token=([^;]+)/);
+        const cookieDraftToken = cookieMatch ? decodeURIComponent(cookieMatch[1]) : null;
+        const clientDraftToken = (typeof rawObj.draftToken === 'string' && rawObj.draftToken.trim())
+          ? rawObj.draftToken.trim()
+          : cookieDraftToken;
+
+        const sessionEmail = await getVerifiedSessionEmail(req);
+        const isTokenOwner = Boolean(existingLead.draft_token && clientDraftToken === existingLead.draft_token);
+        const isEmailOwner = Boolean(sessionEmail && existingLead.contact_email && sessionEmail.toLowerCase() === existingLead.contact_email.toLowerCase());
+
+        if (existingLead.draft_token && !isTokenOwner && !isEmailOwner) {
+          return NextResponse.json(
+            { error: 'Forbidden: Invalid draft token or session for this scope code.' },
+            { status: 403 }
+          );
+        }
+
         const updatePayload: Record<string, unknown> = {
           company_name: payload.companyName || undefined,
           contact_email: payload.contactEmail || undefined,
