@@ -417,6 +417,34 @@ function classifyPromptForBlueprint(prompt: string): BlueprintRecommendation {
     };
   }
 
+  // 13. Fine Artists, Visual Painters, Sculptors & Artisans
+  if (
+    p.includes('paint') ||
+    p.includes('artist') ||
+    p.includes('sculpt') ||
+    p.includes('photo') ||
+    p.includes('gallery') ||
+    p.includes('canvas') ||
+    p.includes('craft')
+  ) {
+    return {
+      archetypeId: 'saas_app',
+      baseEngineId: 'saas',
+      featureIds: ['auth', 'payments', 'commerce', 'booking', 'video', 'email'],
+      suggestedTimeline: '3–4 Weeks',
+      title: "Fine Artist's Studio Gallery & Bespoke Commission Hub",
+      summary:
+        'A dedicated direct-to-fan platform empowering visual artists and painters to showcase high-res artwork, take custom commission bookings with upfront deposits, sell prints with zero marketplace fees, and provide collectors with a private proofing portal.',
+      techHighlights: [
+        'High-resolution visual art gallery with lightbox and studio process video showcases',
+        'Direct-to-fan print and original artwork checkout with zero platform cuts via Razorpay/Stripe',
+        'Custom commission intake questionnaire with calendar consultation booking and 50% deposit gating',
+        'Private collector dashboard (Auth) for commission progress updates and proofing reviews',
+        'Automated collector email newsletters and exhibition release announcements',
+      ],
+    };
+  }
+
   // Default Custom SaaS / Full-Stack Application
   return {
     archetypeId: 'saas_app',
@@ -667,6 +695,33 @@ function buildFallbackResponseText(
     !p.includes('ecommerce') &&
     !p.includes('audit');
 
+  if (blueprintRec.title.includes('Artist')) {
+    return `### 🎨 Tailored Creative Architecture: Artist's Studio & Commission Hub
+As a visual artist or painter, establishing direct collector ownership eliminates 30–50% gallery cuts, automates upfront commission deposits, and provides a private milestone proofing portal.
+
+### 📦 Recommended Solution Architecture:
+- **Core Engine:** ${engineTitle}
+- **Target Investment:** ${currency === 'USD' ? `$${totalUSD.toLocaleString()}` : `₹${totalINR.toLocaleString()}`}
+- **Timeline:** ${blueprintRec.suggestedTimeline}
+- **Key Modules:** ${featureNames.join(', ')}
+
+### ⚡ Why These Modules Were Selected:
+1. **E-Commerce & Merch Store (\`commerce\`):** Sell original paintings, canvas drops, and limited-edition prints directly with zero platform cuts.
+2. **Integrated Payments (\`payments\`):** Collect upfront 50% milestone deposits for custom portrait commissions via Razorpay/Stripe.
+3. **Interactive Calendar Booking (\`booking\`):** Let clients book 1-on-1 discovery calls or commission consultation slots directly.
+4. **Client Portal (\`auth\`):** A private dashboard for collectors to view in-progress proofing photos and approve finals.
+5. **Video Vault (\`video\`):** Host behind-the-scenes painting process videos and time-lapse demonstrations.
+
+💡 *To help me sculpt this into your exact workflow:*
+1. Do you plan to sell original physical canvases, digital prints, or take bespoke portrait commissions?
+2. Do you want clients to pay an upfront milestone deposit before you begin work?
+3. Do you have an existing brand identity, or do you need a complete brand kit?
+
+<blueprint_action>
+${blueprintActionJson}
+</blueprint_action>`;
+  }
+
   if (isBudgetQuery) {
     const p1Price = currency === 'USD' ? `$${phased.phase1.totalUSD.toLocaleString()}` : `₹${phased.phase1.totalINR.toLocaleString()}`;
     const p2Price = currency === 'USD' ? `$${phased.phase2.totalUSD.toLocaleString()}` : `₹${phased.phase2.totalINR.toLocaleString()}`;
@@ -877,17 +932,31 @@ function extractCleanProseFromSse(rawSse: string): string {
 
 function createTappedStream(
   sourceStream: ReadableStream<Uint8Array>,
+  fallbackBlueprintJson: string | null,
   onDone: (accumulated: string) => void
 ): ReadableStream<Uint8Array> {
   const decoder = new TextDecoder();
+  const encoder = new TextEncoder();
   let accumulated = '';
   const transform = new TransformStream<Uint8Array, Uint8Array>({
     transform(chunk, controller) {
       accumulated += decoder.decode(chunk, { stream: true });
       controller.enqueue(chunk);
     },
-    flush() {
+    flush(controller) {
       accumulated += decoder.decode();
+      // If Retriever generated a rich response but omitted <blueprint_action>, append it!
+      if (
+        fallbackBlueprintJson &&
+        !accumulated.includes('<blueprint_action>') &&
+        !accumulated.toLowerCase().includes('escrow queue')
+      ) {
+        const blueprintChunk = `\n\n<blueprint_action>\n${fallbackBlueprintJson}\n</blueprint_action>`;
+        accumulated += blueprintChunk;
+        controller.enqueue(
+          encoder.encode(`data: ${JSON.stringify({ event: 'token', delta: blueprintChunk })}\n\n`)
+        );
+      }
       try {
         const cleanProse = extractCleanProseFromSse(accumulated);
         onDone(cleanProse);
@@ -955,7 +1024,66 @@ export async function POST(req: NextRequest) {
       process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_USER_ID ||
       '36e62429-419e-48ef-af92-533afca9e028';
 
-    let activeSessionId = sessionId;
+    // Check if the user query is an out-of-scope physical labor request
+    const pLower = prompt.toLowerCase();
+    const isPhysicalOutOfScope =
+      (pLower.includes('wall') ||
+        pLower.includes('living room') ||
+        pLower.includes('bedroom') ||
+        pLower.includes('house') ||
+        pLower.includes('physical') ||
+        pLower.includes('plumb') ||
+        pLower.includes('car')) &&
+      (pLower.includes('paint') ||
+        pLower.includes('clean') ||
+        pLower.includes('repair') ||
+        pLower.includes('fix'));
+
+    if (isPhysicalOutOfScope) {
+      const escrowText = `Your unique request has been logged directly into Prateek Sharma's executive escrow queue. Because this requires bespoke personal handling outside our automated software scoping modules, Prateek will review your inquiry personally. To receive a personal response and evaluation from Prateek, please enter your email or sign up below.`;
+      const fallbackSessionId =
+        sessionId || `scoping_escrow_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+      const escrowStream = createTextStream(escrowText, 10, req.signal);
+
+      const elapsed = Math.round(performance.now() - startTime);
+      logScopingChatTrace({
+        sessionId: fallbackSessionId,
+        scopeCode,
+        turnIndex,
+        userQuery: prompt,
+        assistantResponse: escrowText,
+        agentIntent: 'escrow_escalation',
+        agentReasoning: 'Physical or non-software task routed to executive escrow review queue.',
+        modelUsed: 'escrow-escalation-router',
+        latencyMs: elapsed,
+        isFallback: false,
+        currency,
+        currentEngine: currentScope?.baseEngineId || 'saas',
+        selectedFeatures: currentScope?.selectedFeatures || [],
+        quoteINR: currentScope?.totalINR || 0,
+        quoteUSD: currentScope?.totalUSD || 0,
+        visitorIpHash: ipHash,
+        visitorCountry,
+        visitorUserAgent: userAgent,
+      }).catch((err) => console.warn('Escrow trace logging warning:', err));
+
+      return new Response(escrowStream, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache, no-transform',
+          'Connection': 'keep-alive',
+          'X-Session-ID': fallbackSessionId,
+          'X-Fallback-Mode': 'false',
+          'Set-Cookie': `prateeq_chat_session_id=${encodeURIComponent(fallbackSessionId)}; Path=/; Max-Age=2592000; SameSite=Lax`,
+        },
+      });
+    }
+
+    const cookieSessionId = req.cookies.get('prateeq_chat_session_id')?.value;
+    let activeSessionId = sessionId || cookieSessionId || null;
+    if (activeSessionId && activeSessionId.startsWith('scoping_fallback_')) {
+      activeSessionId = null;
+    }
 
     let promptWithContext = prompt;
     if (currentScope?.selectedFeatures?.length) {
@@ -975,13 +1103,13 @@ export async function POST(req: NextRequest) {
           userId,
         });
 
-        // Ensure session exists with a tight timeout
+        // Ensure session exists with an adequate 10-second timeout on first turn
         if (!activeSessionId) {
           try {
             const sessionRes = await Promise.race([
               client.createSession(),
               new Promise<null>((_, reject) =>
-                setTimeout(() => reject(new Error('Session creation timeout')), 2500)
+                setTimeout(() => reject(new Error('Session creation timeout')), 10000)
               ),
             ]);
             if (sessionRes?.sessionId) {
@@ -993,9 +1121,9 @@ export async function POST(req: NextRequest) {
         }
 
         if (activeSessionId) {
-          // Attempt chat message streaming with a 3.5-second abort timeout
+          // Allow up to 25s for hybrid retrieval + initial token generation on VPS
           const chatAbortController = new AbortController();
-          const chatTimeoutId = setTimeout(() => chatAbortController.abort(), 3500);
+          const chatTimeoutId = setTimeout(() => chatAbortController.abort(), 25000);
 
           try {
             const upstreamStream = await client.chat(
@@ -1005,8 +1133,36 @@ export async function POST(req: NextRequest) {
             );
             clearTimeout(chatTimeoutId);
 
+            // Compute blueprint action JSON to append if Retriever omits it
+            const targetEngineId = currentScope?.baseEngineId || blueprintRec.baseEngineId;
+            const targetFeatures = currentScope?.selectedFeatures?.length
+              ? currentScope.selectedFeatures
+              : blueprintRec.featureIds;
+            const fallbackBlueprintObj = {
+              archetypeId: blueprintRec.archetypeId,
+              baseEngineId: targetEngineId,
+              featureIds: targetFeatures,
+              brandAssetId: blueprintRec.brandAssetId || 'ready',
+              maintenancePlanId: blueprintRec.maintenancePlanId || 'standard',
+              suggestedTimeline: blueprintRec.suggestedTimeline,
+              title: blueprintRec.title,
+              totalINR: currentScope?.totalINR || 390000,
+              totalUSD: currentScope?.totalUSD || 5250,
+              phasedBreakdown: computePhasedBreakdown(
+                targetEngineId,
+                targetFeatures,
+                currency,
+                blueprintRec.brandAssetId || 'ready',
+                blueprintRec.maintenancePlanId || 'standard'
+              ),
+            };
+            const fallbackBlueprintJson = JSON.stringify(fallbackBlueprintObj, null, 2);
+
             if (upstreamStream) {
-              const tappedStream = createTappedStream(upstreamStream, (accumulatedText) => {
+              const tappedStream = createTappedStream(
+                upstreamStream,
+                fallbackBlueprintJson,
+                (accumulatedText) => {
                 const elapsed = Math.round(performance.now() - startTime);
                 logScopingChatTrace({
                   sessionId: activeSessionId || 'unknown_session',
