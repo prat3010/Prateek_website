@@ -148,4 +148,31 @@ describe('SiteInfoConsole Component (Decomposed Architecture)', () => {
     fireEvent.keyDown(promptInput, { key: 'ArrowDown' });
     expect(promptInput.value).toBe('');
   });
+
+  it('launches text-based AI Twin session and disconnects via "exit"', async () => {
+    render(<SiteInfoConsole />);
+
+    const promptInput = screen.getByLabelText(/Terminal command prompt/i) as HTMLInputElement;
+    fireEvent.change(promptInput, { target: { value: 'twin' } });
+    fireEvent.keyDown(promptInput, { key: 'Enter', code: 'Enter' });
+
+    await waitFor(() => {
+      expect(screen.getByText(/PRATEEQ\.AI \/\/ INTERACTIVE KNOWLEDGE TWIN \(v2\.5\)/i)).toBeDefined();
+      expect(screen.getByText(/SYSTEM STATUS & TELEMETRY:/i)).toBeDefined();
+      expect(screen.getByText(/Hello! I am Prateek's interactive AI Twin\./i)).toBeDefined();
+    });
+
+    // Check prompt switched to AI Twin prompt
+    const aiPromptInput = screen.getByLabelText(/AI Twin chat prompt/i) as HTMLInputElement;
+    expect(aiPromptInput).toBeDefined();
+
+    // Type exit to disconnect
+    fireEvent.change(aiPromptInput, { target: { value: 'exit' } });
+    fireEvent.keyDown(aiPromptInput, { key: 'Enter', code: 'Enter' });
+
+    await waitFor(() => {
+      expect(screen.getByText(/SYSTEM \/\/ Neural link closed\. Returned to standard shell\./i)).toBeDefined();
+      expect(screen.getByLabelText(/Terminal command prompt/i)).toBeDefined();
+    });
+  });
 });

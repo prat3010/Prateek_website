@@ -269,63 +269,6 @@
   word-break: break-word;
 }
 
-/* ─── AI Twin Rich Cyber Card ─── */
-.twinCard {
-  background: rgba(20, 20, 26, 0.95);
-  border: 1px solid var(--color-border);
-  border-left: 3px solid var(--pop-blue, #38bdf8);
-  border-radius: var(--border-radius-sm, 6px);
-  padding: 12px 14px;
-  margin: 4px 0 8px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
-  font-family: var(--font-code), 'JetBrains Mono', monospace;
-  animation: twinCardFadeIn 0.25s ease-out;
-}
-
-@keyframes twinCardFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.twinCardHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
-  padding-bottom: 8px;
-}
-
-.twinCardBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 700;
-  font-size: 0.78rem;
-  letter-spacing: 0.04em;
-  color: var(--neon-cyan, var(--pop-blue, #38bdf8));
-}
-
-.twinLiveDot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background-color: var(--neon-green, #39ff14);
-  box-shadow: 0 0 8px var(--neon-green, #39ff14);
-  display: inline-block;
-  animation: dotBlink 1.8s infinite ease-in-out;
-}
-
 .dotPulse {
   animation: dotBlink 1.5s infinite ease-in-out;
   box-shadow: 0 0 8px var(--pop-green);
@@ -334,57 +277,6 @@
 @keyframes dotBlink {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.4; transform: scale(0.8); }
-}
-
-.twinHostTag {
-  font-size: 0.7rem;
-  color: var(--color-text-muted, #94a3b8);
-  background: rgba(255, 255, 255, 0.05);
-  padding: 2px 6px;
-  border-radius: 3px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.twinMatrixGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 6px 12px;
-  font-size: 0.73rem;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 8px 10px;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-.twinMatrixItem {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-}
-
-.twinMatrixKey {
-  color: var(--color-text-muted, #94a3b8);
-  font-weight: 500;
-}
-
-.twinMatrixVal {
-  color: var(--neon-green, #39ff14);
-  font-weight: 600;
-}
-
-.twinGreeting {
-  font-size: 0.82rem;
-  line-height: 1.5;
-  color: var(--pop-cream, #e2e8f0);
-}
-
-.exitCode {
-  color: var(--neon-pink, var(--pop-orange, #f97316));
-  background: rgba(255, 255, 255, 0.08);
-  padding: 1px 5px;
-  border-radius: 3px;
-  font-weight: 700;
 }
 
 .twinExitBtn {
@@ -640,30 +532,6 @@
 
 :global([data-theme='noir']) .shortcutBtn:active {
   transform: translateY(1px);
-}
-
-:global([data-theme='noir']) .twinCard {
-  background: #0d0d12;
-  border: 1px solid #2F2F3D;
-  border-left: 3px solid var(--neon-cyan, #00f0ff);
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.07);
-}
-
-:global([data-theme='noir']) .twinMatrixGrid {
-  background: #08080c;
-  border: 1px solid #1a1a24;
-}
-
-:global([data-theme='noir']) .twinMatrixKey {
-  color: #71717a;
-}
-
-:global([data-theme='noir']) .twinMatrixVal {
-  color: var(--neon-green, #39ff14);
-}
-
-:global([data-theme='noir']) .twinGreeting {
-  color: #e4e4e7;
 }
 
 :global([data-theme='noir']) .dotPulse {

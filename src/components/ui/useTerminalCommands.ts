@@ -26,7 +26,7 @@ import type { SystemStats } from './useSystemTelemetry';
 
 export interface ConsoleLine {
   text: string;
-  type: 'input' | 'output' | 'error' | 'success' | 'link' | 'image' | 'twin-card';
+  type: 'input' | 'output' | 'error' | 'success' | 'link' | 'image';
   command?: string;
   imageUrl?: string;
   href?: string;
@@ -38,14 +38,24 @@ export interface AIChatSessionState {
 }
 
 const AI_TWIN_BOOT_LINES: ConsoleLine[] = [
-  {
-    type: 'twin-card',
-    text: "[✓] Neural link active. Connected to Prateeq's AI Twin on Oracle Cloud VPS (130.210.35.134).",
-  },
-  {
-    type: 'success',
-    text: "Tip: Ask me about my architecture, stack, war stories, or pricing tiers (or type 'exit' to disconnect).",
-  },
+  { text: '================================================================================', type: 'success' },
+  { text: '   PRATEEQ.AI // INTERACTIVE KNOWLEDGE TWIN (v2.5)', type: 'success' },
+  { text: '   Live Neural Bridge • Oracle Cloud ARM VPS (rag.prateeq.in)', type: 'output' },
+  { text: '================================================================================', type: 'success' },
+  { text: ' ', type: 'output' },
+  { text: 'SYSTEM STATUS & TELEMETRY:', type: 'success' },
+  { text: '  • Architecture   : Hexagonal Core (FastAPI 3.11+ / Next.js 16 App Router)', type: 'output' },
+  { text: '  • Cognitive Core : Retriever Hybrid Fusion (Dense HNSW + Sparse BM25)', type: 'output' },
+  { text: '  • Vector Engine  : Local nomic-embed-text via Ollama (Zero External Token Leak)', type: 'output' },
+  { text: '  • Knowledge Base : Architecture Blueprints, Production Code & Project Dossiers', type: 'output' },
+  { text: ' ', type: 'output' },
+  { text: "Hello! I am Prateek's interactive AI Twin.", type: 'output' },
+  { text: 'I have full context on his engineering background, systems architecture,', type: 'output' },
+  { text: 'production codebases, and commercial services.', type: 'output' },
+  { text: ' ', type: 'output' },
+  { text: 'Ask me anything about his projects, architecture, tech stack, or engineering philosophy.', type: 'output' },
+  { text: 'Type "exit" at any time to disconnect and return to the standard terminal shell.', type: 'success' },
+  { text: '================================================================================', type: 'success' },
   { text: '', type: 'output' },
 ];
 
@@ -164,7 +174,7 @@ export function useTerminalCommands({
         if (['twin', 'ai', 'prateeq', 'twin-mode'].includes(trimmedCmd)) {
           setTerminalHistory((prev) => [
             ...prev,
-            { text: '🧠 Neural link already active. You are talking directly with Prateeq\'s AI Twin.', type: 'success' },
+            { text: '🧠 Neural link already active. You are connected to Prateek\'s AI Twin.', type: 'success' },
             { text: 'Ask me anything about my architecture, stack, philosophy, or type "exit" to leave.', type: 'output' },
           ]);
           setTerminalInput('');
@@ -176,7 +186,7 @@ export function useTerminalCommands({
             ...prev,
             { text: '🧠 AI TWIN INTERACTIVE REPL HELP:', type: 'success' },
             { text: '  - Ask about architecture: "what is retriever?", "explain your tech stack"', type: 'output' },
-            { text: '  - Ask about philosophy: "what is ponytail principle?", "why no langchain?"', type: 'output' },
+            { text: '  - Ask about philosophy: "what is ponytail principle?", "how do you design systems?"', type: 'output' },
             { text: '  - Ask about commercials: "how much for a landing page?", "contact info"', type: 'output' },
             { text: '  - Session controls: "clear" (clear screen), "exit" / "quit" (return to shell)', type: 'output' },
           ]);

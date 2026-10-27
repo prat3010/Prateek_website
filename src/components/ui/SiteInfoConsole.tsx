@@ -42,7 +42,6 @@ const QUICK_SHORTCUTS = [
 
 const AI_TWIN_SHORTCUTS = [
   'exit',
-  'is he good?',
   'who are you?',
   'architecture',
   'tech stack',
@@ -184,42 +183,6 @@ export default function SiteInfoConsole() {
                   aria-label="Terminal output stream"
                 >
                   {terminalHistory.map((line, index) => {
-                    if (line.type === 'twin-card') {
-                      return (
-                        <div key={index} className={styles.twinCard}>
-                          <div className={styles.twinCardHeader}>
-                            <div className={styles.twinCardBadge}>
-                              <span className={styles.twinLiveDot} />
-                              <span>PRATEEQ.AI // DIGITAL TWIN v2.5</span>
-                            </div>
-                            <span className={styles.twinHostTag}>ORACLE VPS · 130.210.35.134</span>
-                          </div>
-
-                          <div className={styles.twinMatrixGrid}>
-                            <div className={styles.twinMatrixItem}>
-                              <span className={styles.twinMatrixKey}>[✓] SARCASM &amp; WIT</span>
-                              <span className={styles.twinMatrixVal}>ACTIVE (8.5/10)</span>
-                            </div>
-                            <div className={styles.twinMatrixItem}>
-                              <span className={styles.twinMatrixKey}>[✓] LANGCHAIN BLOAT</span>
-                              <span className={styles.twinMatrixVal}>0% DETECTED</span>
-                            </div>
-                            <div className={styles.twinMatrixItem}>
-                              <span className={styles.twinMatrixKey}>[✓] COGNITIVE MEMORY</span>
-                              <span className={styles.twinMatrixVal}>24 ARCH DOSSIERS</span>
-                            </div>
-                            <div className={styles.twinMatrixItem}>
-                              <span className={styles.twinMatrixKey}>[✓] VECTOR ENGINE</span>
-                              <span className={styles.twinMatrixVal}>HNSW + BM25 HYBRID</span>
-                            </div>
-                          </div>
-
-                          <div className={styles.twinGreeting}>
-                            Hey! I am Prateek&apos;s digital clone. I know his code, architecture, philosophy, and his deep hatred of bloated AI wrappers. Ask me anything about his work, stack, or pricing—or type <code className={styles.exitCode}>exit</code> to leave.
-                          </div>
-                        </div>
-                      );
-                    }
                     if (line.type === 'image' && line.imageUrl) {
                       return (
                         <div key={index} className={styles.terminalImageContainer}>
