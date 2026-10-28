@@ -209,29 +209,18 @@ describe('POST /api/scoping/chat', () => {
     process.env.RETRIEVER_SCOPING_TENANT_ID = 'test_tenant_live_123';
     process.env.RETRIEVER_SCOPING_API_KEY = 'test_api_key_live_456';
 
-    const encoder = new TextEncoder();
-    const mockUpstreamStream = new ReadableStream({
-      start(controller) {
-        controller.enqueue(
-          encoder.encode('data: {"event":"token","delta":"Live Retriever guidance"}\n\n')
-        );
-        controller.enqueue(encoder.encode('data: [DONE]\n\n'));
-        controller.close();
-      },
-    });
-
-    const createSessionSpy = vi
-      .spyOn(RetrieverClient.prototype, 'createSession')
-      .mockResolvedValue({ sessionId: 'session_mock_777', createdAt: new Date().toISOString() });
-    const chatSpy = vi
-      .spyOn(RetrieverClient.prototype, 'chat')
-      .mockResolvedValue(mockUpstreamStream);
+    const completionsSpy = vi
+      .spyOn(RetrieverClient.prototype, 'completions')
+      .mockResolvedValue({
+        content: 'Live Retriever guidance with custom architecture recommendations.',
+      });
 
     try {
       const req = new NextRequest('http://localhost:3000/api/scoping/chat', {
         method: 'POST',
         body: JSON.stringify({
           message: 'Can you recommend an architecture?',
+          sessionId: 'session_mock_777',
           currency: 'USD',
         }),
       });
@@ -239,12 +228,51 @@ describe('POST /api/scoping/chat', () => {
       expect(res.status).toBe(200);
       expect(res.headers.get('X-Session-ID')).toBe('session_mock_777');
       expect(res.headers.get('Content-Type')).toContain('text/event-stream');
+      expect(res.headers.get('X-Fallback-Mode')).toBe('false');
 
       const text = await parseSseStream(res.body!);
       expect(text).toContain('Live Retriever guidance');
     } finally {
-      createSessionSpy.mockRestore();
-      chatSpy.mockRestore();
+      completionsSpy.mockRestore();
+      delete process.env.RETRIEVER_SCOPING_TENANT_ID;
+      delete process.env.RETRIEVER_SCOPING_API_KEY;
+    }
+  });
+
+  it('forwards conversation history to Retriever completions', async () => {
+    process.env.RETRIEVER_SCOPING_TENANT_ID = 'test_tenant_live_123';
+    process.env.RETRIEVER_SCOPING_API_KEY = 'test_api_key_live_456';
+
+    const completionsSpy = vi
+      .spyOn(RetrieverClient.prototype, 'completions')
+      .mockResolvedValue({
+        content: 'I remember our prior discussion about auth.',
+      });
+
+    try {
+      const req = new NextRequest('http://localhost:3000/api/scoping/chat', {
+        method: 'POST',
+        body: JSON.stringify({
+          message: 'Can you now add stripe billing?',
+          history: [
+            { role: 'user', content: 'I need auth' },
+            { role: 'assistant', content: 'Sure, Supabase auth is recommended' },
+          ],
+          currency: 'USD',
+        }),
+      });
+      const res = await POST(req);
+      expect(res.status).toBe(200);
+      expect(completionsSpy).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.objectContaining({ role: 'user', content: 'I need auth' }),
+          expect.objectContaining({ role: 'assistant', content: 'Sure, Supabase auth is recommended' }),
+          expect.objectContaining({ role: 'user', content: expect.stringContaining('Can you now add stripe billing?') }),
+        ]),
+        expect.objectContaining({ enable_reranking: false })
+      );
+    } finally {
+      completionsSpy.mockRestore();
       delete process.env.RETRIEVER_SCOPING_TENANT_ID;
       delete process.env.RETRIEVER_SCOPING_API_KEY;
     }
@@ -254,8 +282,8 @@ describe('POST /api/scoping/chat', () => {
     process.env.RETRIEVER_SCOPING_TENANT_ID = 'test_tenant_live_123';
     process.env.RETRIEVER_SCOPING_API_KEY = 'test_api_key_live_456';
 
-    const createSessionSpy = vi
-      .spyOn(RetrieverClient.prototype, 'createSession')
+    const completionsSpy = vi
+      .spyOn(RetrieverClient.prototype, 'completions')
       .mockRejectedValue(new Error('Connection refused by VPS'));
 
     try {
@@ -274,7 +302,7 @@ describe('POST /api/scoping/chat', () => {
       expect(text).toContain('<blueprint_action>');
       expect(text).toContain('Direct-to-Consumer E-Commerce Store');
     } finally {
-      createSessionSpy.mockRestore();
+      completionsSpy.mockRestore();
       delete process.env.RETRIEVER_SCOPING_TENANT_ID;
       delete process.env.RETRIEVER_SCOPING_API_KEY;
     }

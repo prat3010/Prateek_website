@@ -211,6 +211,58 @@ export class RetrieverClient {
     return { text: text.trim(), citations };
   }
 
+  async completions(
+    messages: { role: string; content: string }[],
+    options?: {
+      temperature?: number;
+      max_tokens?: number;
+      enable_reranking?: boolean;
+      signal?: AbortSignal;
+    }
+  ): Promise<{ content: string; citations?: unknown[]; id?: string; model?: string }> {
+    const url = `${this.config.apiUrl.replace(/\/$/, "")}/v1/tenants/${this.config.tenantId}/chat/completions`;
+    const validUserId = requireUserId(this.config.userId);
+    const { traceparent, traceId } = generateTraceparent();
+    this.lastTraceId = traceId;
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${this.config.apiKey}`,
+      "X-User-ID": validUserId,
+      "X-Tenant-ID": this.config.tenantId,
+      "traceparent": traceparent,
+    };
+    if (this.config.llmKey) headers["X-LLM-Key"] = this.config.llmKey;
+    if (this.config.llmProvider) headers["X-LLM-Provider"] = this.config.llmProvider;
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        messages,
+        stream: false,
+        use_repl: false,
+        temperature: options?.temperature ?? 0.4,
+        max_tokens: options?.max_tokens ?? 2048,
+        enable_reranking: options?.enable_reranking ?? false,
+      }),
+      signal: options?.signal,
+    });
+
+    if (!res.ok) {
+      throw new Error(`Retriever completions error [${res.status}]: ${await res.text()}`);
+    }
+
+    const data = await res.json();
+    const content = data?.choices?.[0]?.message?.content || data?.content || '';
+    return {
+      content,
+      citations: data?.citations || [],
+      id: data?.id,
+      model: data?.model,
+    };
+  }
+
   async uploadDocument(file: File) {
     const formData = new FormData();
     formData.append("file", file);

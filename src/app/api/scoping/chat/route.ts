@@ -945,44 +945,6 @@ function extractCleanProseFromSse(rawSse: string): string {
   return cleanText || rawSse;
 }
 
-function createTappedStream(
-  sourceStream: ReadableStream<Uint8Array>,
-  fallbackBlueprintJson: string | null,
-  onDone: (accumulated: string) => void
-): ReadableStream<Uint8Array> {
-  const decoder = new TextDecoder();
-  const encoder = new TextEncoder();
-  let accumulated = '';
-  const transform = new TransformStream<Uint8Array, Uint8Array>({
-    transform(chunk, controller) {
-      accumulated += decoder.decode(chunk, { stream: true });
-      controller.enqueue(chunk);
-    },
-    flush(controller) {
-      accumulated += decoder.decode();
-      // If Retriever generated a rich response but omitted <blueprint_action>, append it!
-      if (
-        fallbackBlueprintJson &&
-        !accumulated.includes('<blueprint_action>') &&
-        !accumulated.toLowerCase().includes('escrow queue')
-      ) {
-        const blueprintChunk = `\n\n<blueprint_action>\n${fallbackBlueprintJson}\n</blueprint_action>`;
-        accumulated += blueprintChunk;
-        controller.enqueue(
-          encoder.encode(`data: ${JSON.stringify({ event: 'token', delta: blueprintChunk })}\n\n`)
-        );
-      }
-      try {
-        const cleanProse = extractCleanProseFromSse(accumulated);
-        onDone(cleanProse);
-      } catch (err) {
-        console.warn('Tapped stream onDone callback warning:', err);
-      }
-    },
-  });
-  return sourceStream.pipeThrough(transform);
-}
-
 export async function POST(req: NextRequest) {
   const startTime = performance.now();
 
@@ -1000,9 +962,10 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
     const prompt = (body.message || body.query || '').trim();
+    const history = Array.isArray(body.history) ? body.history : [];
     const sessionId = (body.sessionId || '').trim() || null;
     const scopeCode = (body.scopeCode || (body.currentScope as ScopeContext)?.scopeCode || '').trim();
-    const turnIndex = typeof body.turnIndex === 'number' ? body.turnIndex : 1;
+    const turnIndex = typeof body.turnIndex === 'number' ? body.turnIndex : (history.length ? Math.floor(history.length / 2) + 1 : 1);
     const currency: Currency = body.currency === 'USD' ? 'USD' : 'INR';
     const currentScope = (body.currentScope as ScopeContext) || null;
 
@@ -1095,10 +1058,10 @@ export async function POST(req: NextRequest) {
     }
 
     const cookieSessionId = req.cookies.get('prateeq_chat_session_id')?.value;
-    let activeSessionId = sessionId || cookieSessionId || null;
-    if (activeSessionId && activeSessionId.startsWith('scoping_fallback_')) {
-      activeSessionId = null;
-    }
+    const resolvedSessionId =
+      sessionId ||
+      cookieSessionId ||
+      `scoping_session_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
     let promptWithContext = prompt;
     if (currentScope?.selectedFeatures?.length) {
@@ -1108,202 +1071,122 @@ export async function POST(req: NextRequest) {
       promptWithContext = `[Client Step ${currentScope.currentStep || 2} Context: Engine=${currentScope.baseEngineId}, Modules=${activeLabels}, Total=${currency === 'USD' ? `$${currentScope.totalUSD}` : `₹${currentScope.totalINR}`}]\n\nUser Question: ${prompt}`;
     }
 
-    // 2. Resolve Active Session and Determine Initial Engine Mode
-    let isFallback = true;
-    let client: RetrieverClient | null = null;
+    // 2. Compute Blueprint Recommendation Action Payload
+    const targetEngineId = currentScope?.baseEngineId || blueprintRec.baseEngineId;
+    const targetFeatures = currentScope?.selectedFeatures?.length
+      ? currentScope.selectedFeatures
+      : blueprintRec.featureIds;
+    const fallbackBlueprintObj = {
+      archetypeId: blueprintRec.archetypeId,
+      baseEngineId: targetEngineId,
+      featureIds: targetFeatures,
+      brandAssetId: blueprintRec.brandAssetId || 'ready',
+      maintenancePlanId: blueprintRec.maintenancePlanId || 'standard',
+      suggestedTimeline: blueprintRec.suggestedTimeline,
+      title: blueprintRec.title,
+      totalINR: currentScope?.totalINR || 390000,
+      totalUSD: currentScope?.totalUSD || 5250,
+      phasedBreakdown: computePhasedBreakdown(
+        targetEngineId,
+        targetFeatures,
+        currency,
+        blueprintRec.brandAssetId || 'ready',
+        blueprintRec.maintenancePlanId || 'standard'
+      ),
+    };
+    const fallbackBlueprintJson = JSON.stringify(fallbackBlueprintObj, null, 2);
+
+    // 3. Attempt Fast Stateless Completions from Retriever Cognitive Engine
+    let fullResponseText = '';
+    let usedRetriever = false;
 
     if (tenantId && apiKey) {
-      client = new RetrieverClient({
+      const client = new RetrieverClient({
         apiUrl,
         tenantId,
         apiKey,
         userId,
       });
 
-      if (!activeSessionId) {
-        try {
-          const sessionRes = await Promise.race([
-            client.createSession(),
-            new Promise<null>((_, reject) =>
-              setTimeout(() => reject(new Error('Session creation timeout')), 5000)
-            ),
-          ]);
-          if (sessionRes?.sessionId) {
-            activeSessionId = sessionRes.sessionId;
-            isFallback = false;
-          }
-        } catch (sessionErr) {
-          console.warn('Retriever session creation failed:', sessionErr);
-          isFallback = true;
+      try {
+        const messages = [
+          ...history.map((m: { role: string; content: string }) => ({
+            role: m.role === 'assistant' ? 'assistant' : 'user',
+            content: String(m.content || ''),
+          })),
+          { role: 'user', content: promptWithContext },
+        ];
+
+        // 8-second strict timeout: well within Vercel's execution window, avoiding slow CPU reranking
+        const compPromise = client.completions(messages, {
+          enable_reranking: false,
+          temperature: 0.4,
+          max_tokens: 2048,
+        });
+
+        const compRes = await Promise.race([
+          compPromise,
+          new Promise<null>((_, reject) =>
+            setTimeout(() => reject(new Error('Retriever completions timeout (8s limit)')), 8000)
+          ),
+        ]);
+
+        if (compRes?.content && compRes.content.trim().length > 0) {
+          fullResponseText = compRes.content.trim();
+          usedRetriever = true;
         }
-      } else {
-        isFallback = false;
+      } catch (err) {
+        console.warn('Retriever completions failed or timed out; falling back to local blueprint engine:', err);
       }
     }
 
-    const resolvedSessionId =
-      activeSessionId ||
-      `scoping_fallback_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    // 4. Graceful Fallback Mode: Local Heuristic Rule-Based Blueprint Engine
+    if (!usedRetriever || !fullResponseText.trim()) {
+      fullResponseText = buildFallbackResponseText(prompt, currency, currentScope);
+    }
 
-    // 3. Instant-Flush Response Pipeline with Keep-Alive Heartbeats
-    // Flushes HTTP headers and initial bytes immediately (<100ms TTFB) to eliminate Safari CFNetwork "Load failed" drops.
-    const stream = new TransformStream<Uint8Array, Uint8Array>();
-    const writer = stream.writable.getWriter();
-    const encoder = new TextEncoder();
-    const decoder = new TextDecoder();
+    // 5. Append <blueprint_action> if missing from model output
+    if (
+      fallbackBlueprintJson &&
+      !fullResponseText.includes('<blueprint_action>') &&
+      !fullResponseText.toLowerCase().includes('escrow queue')
+    ) {
+      fullResponseText += `\n\n<blueprint_action>\n${fallbackBlueprintJson}\n</blueprint_action>`;
+    }
 
-    (async () => {
-      let isDone = false;
-      // Send initial keep-alive comment so TTFB is instantaneous
-      try {
-        await writer.write(encoder.encode(': keep-alive\n\n'));
-      } catch {
-        return;
-      }
+    // 6. Realistic, collision-free SSE Stream
+    const stream = createTextStream(fullResponseText, 10, req.signal);
 
-      // Keep-alive ping interval to keep intermediate firewalls and mobile Safari connections warm
-      const pingInterval = setInterval(() => {
-        if (!isDone) {
-          writer.write(encoder.encode(': ping\n\n')).catch(() => {});
-        }
-      }, 3000);
+    // Asynchronously log telemetry trace
+    const elapsed = Math.round(performance.now() - startTime);
+    logScopingChatTrace({
+      sessionId: resolvedSessionId,
+      scopeCode,
+      turnIndex,
+      userQuery: prompt,
+      assistantResponse: extractCleanProseFromSse(fullResponseText),
+      agentIntent: blueprintRec.archetypeId,
+      agentReasoning: `${blueprintRec.title}: ${blueprintRec.summary}`,
+      modelUsed: usedRetriever ? 'retriever-vps' : 'heuristic-rule-engine',
+      latencyMs: elapsed,
+      isFallback: !usedRetriever,
+      currency,
+      currentEngine: targetEngineId,
+      selectedFeatures: targetFeatures,
+      quoteINR: currentScope?.totalINR || 0,
+      quoteUSD: currentScope?.totalUSD || 0,
+      visitorIpHash: ipHash,
+      visitorCountry,
+      visitorUserAgent: userAgent,
+    }).catch((err) => console.warn('Trace logging warning:', err));
 
-      const cleanup = () => {
-        isDone = true;
-        clearInterval(pingInterval);
-      };
-
-      let usedRetriever = false;
-      let accumulatedRaw = '';
-
-      try {
-        if (!isFallback && client && activeSessionId && !req.signal.aborted) {
-          // Allow up to 20 seconds for hybrid search + first token generation on VPS
-          const chatAbortController = new AbortController();
-          const chatTimeoutId = setTimeout(() => chatAbortController.abort(), 20000);
-
-          try {
-            const upstreamStream = await client.chat(
-              activeSessionId,
-              promptWithContext,
-              chatAbortController.signal
-            );
-            clearTimeout(chatTimeoutId);
-
-            if (upstreamStream && !req.signal.aborted) {
-              usedRetriever = true;
-              const reader = upstreamStream.getReader();
-
-              while (true) {
-                const { done, value } = await reader.read();
-                if (done || req.signal.aborted) break;
-                accumulatedRaw += decoder.decode(value, { stream: true });
-                await writer.write(value);
-              }
-              accumulatedRaw += decoder.decode();
-
-              // Compute blueprint action JSON to append if Retriever omits it
-              const targetEngineId = currentScope?.baseEngineId || blueprintRec.baseEngineId;
-              const targetFeatures = currentScope?.selectedFeatures?.length
-                ? currentScope.selectedFeatures
-                : blueprintRec.featureIds;
-              const fallbackBlueprintObj = {
-                archetypeId: blueprintRec.archetypeId,
-                baseEngineId: targetEngineId,
-                featureIds: targetFeatures,
-                brandAssetId: blueprintRec.brandAssetId || 'ready',
-                maintenancePlanId: blueprintRec.maintenancePlanId || 'standard',
-                suggestedTimeline: blueprintRec.suggestedTimeline,
-                title: blueprintRec.title,
-                totalINR: currentScope?.totalINR || 390000,
-                totalUSD: currentScope?.totalUSD || 5250,
-                phasedBreakdown: computePhasedBreakdown(
-                  targetEngineId,
-                  targetFeatures,
-                  currency,
-                  blueprintRec.brandAssetId || 'ready',
-                  blueprintRec.maintenancePlanId || 'standard'
-                ),
-              };
-              const fallbackBlueprintJson = JSON.stringify(fallbackBlueprintObj, null, 2);
-
-              if (
-                fallbackBlueprintJson &&
-                !accumulatedRaw.includes('<blueprint_action>') &&
-                !accumulatedRaw.toLowerCase().includes('escrow queue')
-              ) {
-                const blueprintChunk = `\n\n<blueprint_action>\n${fallbackBlueprintJson}\n</blueprint_action>`;
-                accumulatedRaw += blueprintChunk;
-                await writer.write(
-                  encoder.encode(`data: ${JSON.stringify({ event: 'token', delta: blueprintChunk })}\n\n`)
-                );
-              }
-            }
-          } catch (chatError) {
-            clearTimeout(chatTimeoutId);
-            console.warn('Retriever VPS chat stream error or timeout (falling back):', chatError);
-          }
-        }
-
-        // 4. Graceful Fallback Mode: Local Conversational Blueprint Streaming
-        if (!usedRetriever && !req.signal.aborted) {
-          const fallbackText = buildFallbackResponseText(prompt, currency, currentScope);
-          accumulatedRaw = fallbackText;
-          const words = fallbackText.split(' ');
-          for (let i = 0; i < words.length; i += 3) {
-            if (req.signal.aborted) break;
-            const chunk = words.slice(i, i + 3).join(' ') + (i + 3 < words.length ? ' ' : '');
-            await writer.write(
-              encoder.encode(`data: ${JSON.stringify({ delta: chunk })}\n\n`)
-            );
-            await new Promise((r) => setTimeout(r, 10));
-          }
-        }
-
-        if (!req.signal.aborted) {
-          await writer.write(encoder.encode('data: [DONE]\n\n'));
-        }
-      } catch (pipelineErr) {
-        console.warn('Scoping chat stream pipeline error:', pipelineErr);
-      } finally {
-        cleanup();
-        try {
-          await writer.close();
-        } catch {
-          // already closed
-        }
-
-        const elapsed = Math.round(performance.now() - startTime);
-        logScopingChatTrace({
-          sessionId: resolvedSessionId,
-          scopeCode,
-          turnIndex,
-          userQuery: prompt,
-          assistantResponse: extractCleanProseFromSse(accumulatedRaw),
-          agentIntent: blueprintRec.archetypeId,
-          agentReasoning: `${blueprintRec.title}: ${blueprintRec.summary}`,
-          modelUsed: usedRetriever ? 'retriever-vps' : 'heuristic-rule-engine',
-          latencyMs: elapsed,
-          isFallback: !usedRetriever,
-          currency,
-          currentEngine: currentScope?.baseEngineId || blueprintRec.baseEngineId,
-          selectedFeatures: currentScope?.selectedFeatures || blueprintRec.featureIds,
-          quoteINR: currentScope?.totalINR || 0,
-          quoteUSD: currentScope?.totalUSD || 0,
-          visitorIpHash: ipHash,
-          visitorCountry,
-          visitorUserAgent: userAgent,
-        }).catch((err) => console.warn('Trace logging warning:', err));
-      }
-    })();
-
-    return new Response(stream.readable, {
+    return new Response(stream, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache, no-transform',
         'Connection': 'keep-alive',
         'X-Session-ID': resolvedSessionId,
-        'X-Fallback-Mode': isFallback ? 'true' : 'false',
+        'X-Fallback-Mode': usedRetriever ? 'false' : 'true',
         'Set-Cookie': `prateeq_chat_session_id=${encodeURIComponent(resolvedSessionId)}; Path=/; Max-Age=2592000; SameSite=Lax`,
       },
     });

@@ -398,6 +398,10 @@ export function InlineScopingChatCard({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: messageContent,
+          history: updatedMessages.slice(-8).map((m) => ({
+            role: m.role,
+            content: m.content,
+          })),
           sessionId: chatSessionId || null,
           scopeCode: currentScope?.scopeCode || undefined,
           currency,
