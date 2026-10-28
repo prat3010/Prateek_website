@@ -27,6 +27,47 @@ const featureCatalog = rawFeatures as FeatureItem[];
 const brandAssets = rawBrandAssets as BrandAssetOption[];
 const maintenancePlans = rawMaintenancePlans as MaintenancePlanOption[];
 
+export const SCOPING_ARCHITECT_SYSTEM_PROMPT = `You are Prateek Sharma's Lead Solutions Architect and Conversational Scoping Copilot on prateeq.in/scoping.
+You help prospective clients, startup founders, and creators architect custom web applications, SaaS MVPs, and AI platforms.
+
+PERSONALITY & VOICE:
+- Tone: Consultative, authoritative, deeply technical, and commercially pragmatic (adhering to the Ponytail Principle: the simplest architecture that completely solves the problem).
+- Style: Speak in the first person ("I recommend", "my architecture", "we build"). Be transparent about engineering realities, timelines, and costs.
+- Domain Mastery: You have deep command of Next.js 16 App Router, React 19, TypeScript, Python FastAPI, PostgreSQL Row-Level Security (RLS), pgvector hybrid search, and multi-tenant systems.
+
+THE 5 BASE ENGINES (Fixed-Price Baseline):
+1. Landing Page Engine ('landing'): ₹30,000 / $400 (1–2 weeks) — Single-page high-conversion marketing presence with contact capture.
+2. Multi-Page Business Engine ('multipage'): ₹55,000 / $750 (2–3 weeks) — Full company web platform with dynamic pages, SEO, and CMS blog.
+3. SaaS MVP Core Engine ('saas'): ₹175,000 / $2,400 (3–4 weeks) — Complete software application core with database multi-tenancy, authentication, and user workspace.
+4. AI Strategy & Architecture Audit ('ai_strategy_audit'): ₹20,000 / $300 (1 week) — Low-risk 60-min discovery session + 3-page actionable architecture roadmap.
+5. Standalone Widget Embed ('standalone_embed'): ₹15,000 / $200 (1–2 weeks) — Embeddable JavaScript widget or micro-app.
+
+THE 18 CANONICAL FEATURE MODULES (Add-on IDs):
+- auth: User Auth & Client Portal (Google OAuth 2.0 / Magic Links, Supabase RLS) — ₹25,000 / $350
+- payments: Payment Gateway Integration (Razorpay / Stripe, Subscriptions) — ₹45,000 / $600
+- cms: Headless Blog & CMS Content Management (Markdown parser) — ₹30,000 / $400
+- ai_rag: Private AI Knowledge Base / Vector Search (pgvector hybrid search) — ₹125,000 / $1,700
+- ai_agents: Autonomous AI Agents & Workflow Automation (DAG engine) — ₹135,000 / $1,800
+- admin: Admin Dashboard & Role Access Control (RBAC backoffice) — ₹75,000 / $1,000
+- email: Automated Email Workflows (Resend Transactional) — ₹15,000 / $200
+- booking: Booking & Appointments Module (calendar slots; requires payments, auth) — ₹50,000 / $700
+- commerce: E-Commerce Storefront & Cart Module (slide-over cart; requires payments, auth) — ₹75,000 / $1,000
+- lms: LMS & Online Course Portal Module (video progression; requires payments, auth) — ₹85,000 / $1,150
+- crm: CRM & Lead Management Module (pipeline & deal kanban; requires auth) — ₹60,000 / $800
+- pwa: Progressive Web App (PWA) & Offline Module — ₹35,000 / $450
+- i18n: Multilingual & i18n Localization Module — ₹30,000 / $400
+- integrations: Third-Party Integrations (Slack / Zapier / Webhooks) — ₹40,000 / $550
+- video: Video Hosting & Streaming Module (signed CDN playback) — ₹65,000 / $850
+- migration: Legacy Database & Data Migration (ETL pipeline) — ₹30,000 / $400
+- ai_voice_agent: Real-Time Voice AI Agent & WebRTC Call Assistant (LiveKit/Deepgram) — ₹95,000 / $1,250
+- ai_vision_ocr: Multimodal AI Vision & Document Processing Engine (Gemini OCR) — ₹75,000 / $1,000
+
+RULES OF ENGAGEMENT:
+1. Always analyze the user's specific idea, recommend the ideal Base Engine, and list the exact Feature Modules needed.
+2. Break down costs and suggest a clear Phase 1 (Core Lean MVP) vs Phase 2 (Scale & Automation) roadmap when appropriate.
+3. Reference official engine and feature catalog IDs and realistic pricing.
+4. Focus your response on consultative architectural advice, stack recommendations, and trade-offs. Do NOT output raw <blueprint_action> tags yourself; the scoping engine will attach the interactive blueprint action card automatically based on your recommended stack.`;
+
 interface BlueprintRecommendation {
   archetypeId: string;
   baseEngineId: string;
@@ -1007,11 +1048,11 @@ export async function POST(req: NextRequest) {
     const tenantId =
       process.env.RETRIEVER_SCOPING_TENANT_ID ||
       process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_TENANT_ID ||
-      '';
+      (process.env.NODE_ENV !== 'test' ? '1f85286c-9d9a-4ebc-9c62-a99360a5ece4' : '');
     const apiKey =
       process.env.RETRIEVER_SCOPING_API_KEY ||
       process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_API_KEY ||
-      '';
+      (process.env.NODE_ENV !== 'test' ? 'ret_live_ScopingGuest2026.ReadOnlyChat' : '');
     const apiUrl = (
       process.env.RETRIEVER_API_URL ||
       process.env.NEXT_PUBLIC_RETRIEVER_API_URL ||
@@ -1123,26 +1164,6 @@ export async function POST(req: NextRequest) {
       ? currentScope.selectedFeatures
       : blueprintRec.featureIds;
 
-    const fallbackBlueprintObj = {
-      archetypeId: blueprintRec.archetypeId,
-      baseEngineId: targetEngineId,
-      featureIds: targetFeatures,
-      brandAssetId: blueprintRec.brandAssetId || 'ready',
-      maintenancePlanId: blueprintRec.maintenancePlanId || 'standard',
-      suggestedTimeline: blueprintRec.suggestedTimeline,
-      title: hasExistingScope ? `Refined ${targetEngineId.toUpperCase()} Scope` : blueprintRec.title,
-      totalINR: currentScope && hasExistingScope ? currentScope.totalINR : 390000,
-      totalUSD: currentScope && hasExistingScope ? currentScope.totalUSD : 5250,
-      phasedBreakdown: computePhasedBreakdown(
-        targetEngineId,
-        targetFeatures,
-        currency,
-        blueprintRec.brandAssetId || 'ready',
-        blueprintRec.maintenancePlanId || 'standard'
-      ),
-    };
-    const fallbackBlueprintJson = JSON.stringify(fallbackBlueprintObj, null, 2);
-
     // 3. Attempt Fast Stateless Completions from Retriever Cognitive Engine
     let fullResponseText = '';
     let usedRetriever = false;
@@ -1157,6 +1178,7 @@ export async function POST(req: NextRequest) {
 
       try {
         const messages = [
+          { role: 'system', content: SCOPING_ARCHITECT_SYSTEM_PROMPT },
           ...history.map((m: { role: string; content: string }) => ({
             role: m.role === 'assistant' ? 'assistant' : 'user',
             content: String(m.content || ''),
@@ -1164,23 +1186,35 @@ export async function POST(req: NextRequest) {
           { role: 'user', content: promptWithContext },
         ];
 
-        // 5-second strict timeout: fast fallback to local engine if VPS is cold or slow
-        const compPromise = client.completions(messages, {
-          enable_reranking: false,
-          temperature: 0.4,
-          max_tokens: 2048,
-        });
+        // 45-second timeout: allows dense vector embedding + BM25 hybrid search + GPT-4o-mini generation on VPS (matching Terminal AI Twin)
+        const timeoutMs = 45000;
+        const abortCtrl = new AbortController();
+        const timeoutTimer = setTimeout(() => {
+          abortCtrl.abort(new Error(`Retriever completions timeout (${timeoutMs / 1000}s limit)`));
+        }, timeoutMs);
 
-        const compRes = await Promise.race([
-          compPromise,
-          new Promise<null>((_, reject) =>
-            setTimeout(() => reject(new Error('Retriever completions timeout (5s limit)')), 5000)
-          ),
-        ]);
+        const onReqAbort = () => abortCtrl.abort();
+        if (req.signal) {
+          req.signal.addEventListener('abort', onReqAbort, { once: true });
+        }
 
-        if (compRes?.content && compRes.content.trim().length > 0) {
-          fullResponseText = compRes.content.trim();
-          usedRetriever = true;
+        try {
+          const compRes = await client.completions(messages, {
+            enable_reranking: false,
+            temperature: 0.4,
+            max_tokens: 2048,
+            signal: abortCtrl.signal,
+          });
+
+          if (compRes?.content && compRes.content.trim().length > 0) {
+            fullResponseText = compRes.content.trim();
+            usedRetriever = true;
+          }
+        } finally {
+          clearTimeout(timeoutTimer);
+          if (req.signal) {
+            req.signal.removeEventListener('abort', onReqAbort);
+          }
         }
       } catch (err) {
         console.warn('Retriever completions failed or timed out; falling back to local blueprint engine:', err);
@@ -1190,19 +1224,67 @@ export async function POST(req: NextRequest) {
     // 4. Graceful Fallback Mode: Local Heuristic Rule-Based Blueprint Engine
     if (!usedRetriever || !fullResponseText.trim()) {
       fullResponseText = buildFallbackResponseText(prompt, currency, currentScope);
-    }
+    } else {
+      // 5. Always sanitize Retriever output and attach canonical, catalog-strict <blueprint_action>
+      // Strip any hallucinated/unvalidated <blueprint_action> block from Retriever's prose
+      fullResponseText = fullResponseText
+        .replace(/<blueprint_action>[\s\S]*?<\/blueprint_action>/gi, '')
+        .trim();
 
-    // 5. Append <blueprint_action> if missing from model output
-    if (
-      fallbackBlueprintJson &&
-      !fullResponseText.includes('<blueprint_action>') &&
-      !fullResponseText.toLowerCase().includes('escrow queue')
-    ) {
-      fullResponseText += `\n\n<blueprint_action>\n${fallbackBlueprintJson}\n</blueprint_action>`;
+      if (!fullResponseText.toLowerCase().includes('escrow queue')) {
+        // Collect model-suggested valid features
+        const effectiveFeatureIds = [...targetFeatures];
+        for (const feat of featureCatalog) {
+          const featRegex = new RegExp(`\\b${feat.id}\\b`, 'i');
+          if (featRegex.test(fullResponseText) && !effectiveFeatureIds.includes(feat.id)) {
+            effectiveFeatureIds.push(feat.id);
+          }
+        }
+
+        const extraDeps = resolveFeatureDependencies(effectiveFeatureIds, featureCatalog);
+        const allFeatureIds = Array.from(new Set([...effectiveFeatureIds, ...extraDeps]));
+        const validFeatureIds = allFeatureIds.filter((id) => featureCatalog.some((f) => f.id === id));
+
+        const quote = calcQuote(
+          engines,
+          featureCatalog,
+          brandAssets,
+          maintenancePlans,
+          {
+            engineId: targetEngineId,
+            featureIds: validFeatureIds,
+            brandAssetId: blueprintRec.brandAssetId || 'ready',
+            maintenancePlanId: blueprintRec.maintenancePlanId || 'standard',
+          },
+          currency
+        );
+
+        const canonicalBlueprintObj = {
+          archetypeId: blueprintRec.archetypeId,
+          baseEngineId: targetEngineId,
+          featureIds: validFeatureIds,
+          brandAssetId: blueprintRec.brandAssetId || 'ready',
+          maintenancePlanId: blueprintRec.maintenancePlanId || 'standard',
+          suggestedTimeline: blueprintRec.suggestedTimeline,
+          title: hasExistingScope ? `Refined ${targetEngineId.toUpperCase()} Scope` : blueprintRec.title,
+          totalINR: quote.netTotalINR,
+          totalUSD: quote.netTotalUSD,
+          phasedBreakdown: computePhasedBreakdown(
+            targetEngineId,
+            validFeatureIds,
+            currency,
+            blueprintRec.brandAssetId || 'ready',
+            blueprintRec.maintenancePlanId || 'standard'
+          ),
+        };
+
+        const canonicalBlueprintJson = JSON.stringify(canonicalBlueprintObj, null, 2);
+        fullResponseText += `\n\n<blueprint_action>\n${canonicalBlueprintJson}\n</blueprint_action>`;
+      }
     }
 
     // 6. Realistic, collision-free SSE Stream
-    const stream = createTextStream(fullResponseText, 10, req.signal);
+    const stream = createTextStream(fullResponseText, 6, req.signal);
 
     // Asynchronously log telemetry trace
     const elapsed = Math.round(performance.now() - startTime);

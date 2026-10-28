@@ -516,10 +516,40 @@ export function InlineScopingChatCard({
         description: 'Unable to stream response from scoping engine.',
       });
 
-      const fallbackContent =
-        accumulatedText.trim().length > 0
-          ? accumulatedText
-          : `⚠️ Note: Scoping engine response unavailable (${errMsg}). You can still use the prompt presets or manual archetype selection below.`;
+      let fallbackContent = accumulatedText.trim();
+      if (!fallbackContent) {
+        const defaultEngine = currentScope?.baseEngineId || 'saas';
+        const defaultFeatures = currentScope?.selectedFeatures?.length
+          ? currentScope.selectedFeatures
+          : ['auth', 'admin', 'email'];
+        const quote = calcQuote(
+          questionnaireDefaults.engines as BaseEngineItem[],
+          questionnaireDefaults.features as FeatureItem[],
+          questionnaireDefaults.brandAssets as BrandAssetOption[],
+          questionnaireDefaults.maintenancePlans as MaintenancePlanOption[],
+          {
+            engineId: defaultEngine,
+            featureIds: defaultFeatures,
+            brandAssetId: 'ready',
+            maintenancePlanId: 'standard',
+          },
+          currency
+        );
+
+        const offlineBlueprint = {
+          archetypeId: 'saas_app',
+          baseEngineId: defaultEngine,
+          featureIds: defaultFeatures,
+          brandAssetId: 'ready',
+          maintenancePlanId: 'standard',
+          suggestedTimeline: '3–4 Weeks',
+          title: 'Resilient Offline Blueprint',
+          totalINR: quote.netTotalINR,
+          totalUSD: quote.netTotalUSD,
+        };
+
+        fallbackContent = `⚠️ Note: Scoping engine response unavailable (${errMsg}). You can still use the prompt presets or manual archetype selection below.\n\n<blueprint_action>\n${JSON.stringify(offlineBlueprint, null, 2)}\n</blueprint_action>`;
+      }
 
       setChatTranscript([
         ...updatedMessages,
