@@ -37,6 +37,7 @@ export interface TerminalScopingResult {
   }>;
   nextSession: TerminalScopeSession;
   triggerExportPdf?: boolean;
+  triggerOpenVisualScoping?: boolean;
   triggerCheckoutQr?: {
     amount: number;
     currency: Currency;
@@ -67,6 +68,143 @@ export function createInitialTerminalScopeSession(currency: Currency = 'INR'): T
     currency,
     companyName: 'Terminal Architect',
     projectGoal: 'High-Performance Web Platform',
+  };
+}
+
+/**
+ * Hydrates a TerminalScopeSession from a stored pending scope JSON (e.g. from localStorage['prateeq_pending_scope']).
+ */
+export function sessionFromPendingScope(
+  rawScope: Record<string, unknown> | null | undefined,
+  engines: BaseEngineItem[] = defaultEngines,
+  features: FeatureItem[] = defaultFeatures,
+  brandAssets: BrandAssetOption[] = defaultBrandAssets,
+  maintenancePlans: MaintenancePlanOption[] = defaultMaintenancePlans,
+  defaultCurrency: Currency = 'INR'
+): TerminalScopeSession {
+  if (!rawScope) {
+    return createInitialTerminalScopeSession(defaultCurrency);
+  }
+
+  // Engine resolution: title or id
+  const rawEngine = (rawScope.baseEngineTitle || rawScope.base_engine || rawScope.selectedBaseEngineId || '') as string;
+  const matchedEngine =
+    engines.find((e) => e.id === rawEngine || e.title.toLowerCase() === rawEngine.toLowerCase()) ||
+    engines.find((e) => rawEngine.toLowerCase().includes(e.id.toLowerCase())) ||
+    engines[0];
+
+  // Features resolution: label or id array
+  const rawFeatures = (rawScope.selectedFeatures || rawScope.features || []) as string[];
+  const selectedFeatures: string[] = [];
+  rawFeatures.forEach((rf) => {
+    const fObj = features.find((f) => f.id === rf || f.label.toLowerCase() === rf.toLowerCase());
+    if (fObj && !selectedFeatures.includes(fObj.id)) {
+      selectedFeatures.push(fObj.id);
+    }
+  });
+
+  // Brand Asset resolution
+  const rawBrand = (rawScope.brandAssetOption || rawScope.brand_asset || rawScope.selectedBrandAssetId || '') as string;
+  const matchedBrand =
+    brandAssets.find((b) => b.id === rawBrand || b.label.toLowerCase() === rawBrand.toLowerCase()) ||
+    brandAssets[0];
+
+  // Maintenance Plan resolution
+  const rawPlan = (rawScope.maintenancePlan || rawScope.maintenance_plan || rawScope.selectedMaintenanceId || '') as string;
+  const matchedPlan =
+    maintenancePlans.find((m) => m.id === rawPlan || m.name.toLowerCase() === rawPlan.toLowerCase()) ||
+    maintenancePlans[0];
+
+  const currency: Currency = rawScope.currency === 'USD' ? 'USD' : (rawScope.currency === 'INR' ? 'INR' : defaultCurrency);
+  const companyName = ((rawScope.companyName || rawScope.company_name) as string)?.trim() || 'Custom Project';
+  const projectGoal = ((rawScope.projectGoal || rawScope.businessKPI || rawScope.business_kpi) as string)?.trim() || 'Custom Architecture';
+
+  let appliedPromo: PromoDiscountInfo | null = null;
+  const rawMeta = (rawScope.metadata || {}) as Record<string, unknown>;
+  if (rawMeta.promoCode && typeof rawMeta.promoCode === 'object') {
+    appliedPromo = rawMeta.promoCode as PromoDiscountInfo;
+  }
+
+  return {
+    selectedEngineId: matchedEngine?.id || 'landing',
+    selectedFeatures: selectedFeatures.length > 0 ? selectedFeatures : ['auth', 'email'],
+    selectedBrandAssetId: matchedBrand?.id || 'none',
+    selectedMaintenancePlanId: matchedPlan?.id || 'essential',
+    appliedPromo,
+    currency,
+    companyName,
+    projectGoal,
+  };
+}
+
+/**
+ * Converts a TerminalScopeSession into the canonical pending scope payload shape
+ * expected by localStorage['prateeq_pending_scope'] and the intake form.
+ */
+export function sessionToPendingScopePayload(
+  session: TerminalScopeSession,
+  engines: BaseEngineItem[] = defaultEngines,
+  features: FeatureItem[] = defaultFeatures,
+  brandAssets: BrandAssetOption[] = defaultBrandAssets,
+  maintenancePlans: MaintenancePlanOption[] = defaultMaintenancePlans,
+  scopeCode?: string
+): Record<string, unknown> {
+  const quote = calcQuote(
+    engines,
+    features,
+    brandAssets,
+    maintenancePlans,
+    {
+      engineId: session.selectedEngineId,
+      featureIds: session.selectedFeatures,
+      brandAssetId: session.selectedBrandAssetId,
+      maintenancePlanId: session.selectedMaintenancePlanId,
+      promoCode: session.appliedPromo,
+    },
+    session.currency
+  );
+
+  const matchedEngine = engines.find((e) => e.id === session.selectedEngineId) || engines[0];
+  const matchedBrand = brandAssets.find((b) => b.id === session.selectedBrandAssetId) || brandAssets[0];
+  const matchedPlan = maintenancePlans.find((m) => m.id === session.selectedMaintenancePlanId) || maintenancePlans[0];
+
+  const selectedFeatureLabels = features
+    .filter((f) => session.selectedFeatures.includes(f.id))
+    .map((f) => f.label);
+
+  const finalScopeCode = scopeCode || `SCOPE-${Math.floor(10000 + Math.random() * 90000)}`;
+
+  return {
+    scopeCode: finalScopeCode,
+    companyName: session.companyName,
+    clientPhone: '',
+    projectGoal: session.projectGoal,
+    businessKPI: 'Terminal Scoping CLI Architecture',
+    projectStartType: 'greenfield',
+    designReadiness: 'figma_ready',
+    hostingOwnership: 'client_owned',
+    taxInvoicingPreference: 'standard',
+    targetAudience: '',
+    baseEngineTitle: matchedEngine.title,
+    selectedBaseEngineId: matchedEngine.id,
+    selectedFeatures: selectedFeatureLabels,
+    brandAssetOption: matchedBrand.label,
+    selectedBrandAssetId: matchedBrand.id,
+    maintenancePlan: matchedPlan.name,
+    selectedMaintenanceId: matchedPlan.id,
+    totalCostINR: quote.netTotalINR,
+    totalCostUSD: quote.netTotalUSD,
+    currency: session.currency,
+    timeline: matchedEngine.tier,
+    metadata: {
+      origin: 'terminal_scoping_cli',
+      selectedEngineId: session.selectedEngineId,
+      selectedFeatureIds: session.selectedFeatures,
+      promoCode: session.appliedPromo,
+      bundleDiscountPercent: quote.bundleDiscountPercent,
+      bundleDiscountAmountINR: quote.bundleDiscountAmountINR,
+      bundleDiscountAmountUSD: quote.bundleDiscountAmountUSD,
+    },
   };
 }
 
@@ -183,6 +321,16 @@ export async function handleTerminalScopeCommand(
     if (sub === 'checkout') {
       return handleCheckout(session, parts.slice(2), engines, features, brandAssets, maintenancePlans);
     }
+    if (sub === 'open' || sub === 'visual') {
+      return {
+        lines: [
+          { text: '🌐 Launching Visual Architecture Scoping Lab...', type: 'success' },
+          { text: '🔗 Opening /scoping with active terminal cart loaded.', type: 'link', href: '/scoping' },
+        ],
+        nextSession: session,
+        triggerOpenVisualScoping: true,
+      };
+    }
     const table = formatTerminalCartTable(session, engines, features, brandAssets, maintenancePlans);
     return {
       lines: table.map((t) => ({ text: t, type: 'output' })),
@@ -212,6 +360,8 @@ export async function handleTerminalScopeCommand(
         { text: ' scope promo <promo_code>       -> Apply referral / discount promo code', type: 'output' },
         { text: ' scope currency <inr|usd>       -> Toggle currency between INR and USD', type: 'output' },
         { text: ' scope cart / cart              -> Print formatted ASCII bill of materials', type: 'output' },
+        { text: ' scope open / cart open         -> Open interactive visual Scoping Lab (/scoping)', type: 'output' },
+        { text: ' scope reset                    -> Reset cart to factory defaults', type: 'output' },
         { text: ' scope export                   -> Download verified Scoping Proposal PDF', type: 'output' },
         { text: ' scope checkout [--deposit 50]  -> Generate Mobile Payment QR & Fast-Pass', type: 'output' },
         { text: '========================================================================', type: 'output' },
@@ -587,6 +737,30 @@ export async function handleTerminalScopeCommand(
     return {
       lines: table.map((t) => ({ text: t, type: 'output' })),
       nextSession: session,
+    };
+  }
+
+  // 11. scope open / scope visual
+  if (sub === 'open' || sub === 'visual') {
+    return {
+      lines: [
+        { text: '🌐 Launching Visual Architecture Scoping Lab...', type: 'success' },
+        { text: '🔗 Opening /scoping with active terminal cart loaded.', type: 'link', href: '/scoping' },
+      ],
+      nextSession: session,
+      triggerOpenVisualScoping: true,
+    };
+  }
+
+  // 12. scope reset
+  if (sub === 'reset') {
+    const freshSession = createInitialTerminalScopeSession(session.currency);
+    return {
+      lines: [
+        { text: '🔄 Terminal cart reset to factory defaults (Landing Page + Auth, Email).', type: 'success' },
+        { text: `Type 'cart' to view the updated bill of materials.`, type: 'output' },
+      ],
+      nextSession: freshSession,
     };
   }
 

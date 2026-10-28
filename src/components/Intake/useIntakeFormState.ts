@@ -228,25 +228,86 @@ export function useIntakeFormState(
     }
   }, []);
 
-  const [formData, setFormData] = useState<IntakeFormData>(() => ({
-    companyName: user?.user_metadata?.full_name || '',
-    contactEmail: user?.email || '',
-    contactPhone: '',
-    projectGoal: initialArchetype.label,
-    businessKPI: initialArchetype.primaryOutcome || initialArchetype.description,
-    projectStartType: 'greenfield',
-    designReadiness: 'figma_ready',
-    hostingOwnership: 'client_owned',
-    taxInvoicingPreference: 'standard',
-    targetAudience: '',
-    selectedBaseEngineId: initialEngineObj.id,
-    selectedFeatures: initialFeatureIds,
-    selectedBrandAssetId: initialPreset?.brandId || brandAssets[0]?.id || 'ready',
-    selectedMaintenanceId: initialPreset?.careId || maintenancePlans[0]?.id || 'growth',
-    timeline: 'Standard (3–4 weeks)',
-    additionalNotes: '',
-    agreedToTerms: false,
-  }));
+  const [formData, setFormData] = useState<IntakeFormData>(() => {
+    let restoredBaseEngineId = initialEngineObj.id;
+    let restoredFeatures = initialFeatureIds;
+    let restoredBrandId = initialPreset?.brandId || brandAssets[0]?.id || 'ready';
+    let restoredMaintenanceId = initialPreset?.careId || maintenancePlans[0]?.id || 'growth';
+    let restoredCompany = user?.user_metadata?.full_name || '';
+    let restoredGoal = initialArchetype.label;
+    let restoredKpi = initialArchetype.primaryOutcome || initialArchetype.description;
+
+    if (typeof window !== 'undefined' && !initialPreset?.engineId && !initialPreset?.featureIds) {
+      try {
+        const stored = localStorage.getItem('prateeq_pending_scope');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          const meta = (parsed.metadata || {}) as Record<string, unknown>;
+
+          // Match engine
+          const rawEngine = (parsed.selectedBaseEngineId || meta.selectedEngineId || parsed.baseEngineTitle || parsed.base_engine || '') as string;
+          const foundEngine = engines.find((e: BaseEngineItem) => e.id === rawEngine || e.title.toLowerCase() === rawEngine.toLowerCase());
+          if (foundEngine) restoredBaseEngineId = foundEngine.id;
+
+          // Match features
+          const rawFeatIds = (meta.selectedFeatureIds || []) as string[];
+          const rawFeatLabels = (parsed.selectedFeatures || parsed.features || []) as string[];
+          const foundFeats: string[] = [];
+
+          rawFeatIds.forEach((fid: string) => {
+            if (features.some((f: FeatureItem) => f.id === fid) && !foundFeats.includes(fid)) {
+              foundFeats.push(fid);
+            }
+          });
+
+          rawFeatLabels.forEach((fl: string) => {
+            const fObj = features.find((f: FeatureItem) => f.id === fl || f.label.toLowerCase() === fl.toLowerCase());
+            if (fObj && !foundFeats.includes(fObj.id)) {
+              foundFeats.push(fObj.id);
+            }
+          });
+
+          if (foundFeats.length > 0) restoredFeatures = foundFeats;
+
+          // Match brand
+          const rawBrand = (parsed.selectedBrandAssetId || parsed.brandAssetOption || parsed.brand_asset || '') as string;
+          const foundBrand = brandAssets.find((b: BrandAssetOption) => b.id === rawBrand || b.label.toLowerCase() === rawBrand.toLowerCase());
+          if (foundBrand) restoredBrandId = foundBrand.id;
+
+          // Match care
+          const rawCare = (parsed.selectedMaintenanceId || parsed.maintenancePlan || parsed.maintenance_plan || '') as string;
+          const foundCare = maintenancePlans.find((m: MaintenancePlanOption) => m.id === rawCare || m.name.toLowerCase() === rawCare.toLowerCase());
+          if (foundCare) restoredMaintenanceId = foundCare.id;
+
+          if (parsed.companyName || parsed.company_name) {
+            restoredCompany = (parsed.companyName || parsed.company_name) as string;
+          }
+          if (parsed.projectGoal) restoredGoal = parsed.projectGoal as string;
+          if (parsed.businessKPI || parsed.business_kpi) restoredKpi = (parsed.businessKPI || parsed.business_kpi) as string;
+        }
+      } catch {}
+    }
+
+    return {
+      companyName: restoredCompany,
+      contactEmail: user?.email || '',
+      contactPhone: '',
+      projectGoal: restoredGoal,
+      businessKPI: restoredKpi,
+      projectStartType: 'greenfield',
+      designReadiness: 'figma_ready',
+      hostingOwnership: 'client_owned',
+      taxInvoicingPreference: 'standard',
+      targetAudience: '',
+      selectedBaseEngineId: restoredBaseEngineId,
+      selectedFeatures: restoredFeatures,
+      selectedBrandAssetId: restoredBrandId,
+      selectedMaintenanceId: restoredMaintenanceId,
+      timeline: 'Standard (3–4 weeks)',
+      additionalNotes: '',
+      agreedToTerms: false,
+    };
+  });
 
   const triggerLockedHint = useCallback((id: string) => {
     setLockedHintId(id);

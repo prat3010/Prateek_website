@@ -3,6 +3,8 @@ import {
   createInitialTerminalScopeSession,
   formatTerminalCartTable,
   handleTerminalScopeCommand,
+  sessionFromPendingScope,
+  sessionToPendingScopePayload,
   type TerminalScopeSession,
 } from '../terminalScoping';
 import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
@@ -127,5 +129,54 @@ describe('terminalScoping Domain Module', () => {
   it('handles direct "cart" command', async () => {
     const result = await handleTerminalScopeCommand('cart', session, engines, features, brandAssets, maintenancePlans);
     expect(result.lines.some((l) => l.text.includes('PRATEEQ ARCHITECTURE SCOPING LEDGER'))).toBe(true);
+  });
+
+  it('handles "scope open" and "cart open" to trigger visual scoping handoff', async () => {
+    const result = await handleTerminalScopeCommand('scope open', session, engines, features, brandAssets, maintenancePlans);
+    expect(result.triggerOpenVisualScoping).toBe(true);
+    expect(result.lines.some((l) => l.href === '/scoping')).toBe(true);
+
+    const cartResult = await handleTerminalScopeCommand('cart open', session, engines, features, brandAssets, maintenancePlans);
+    expect(cartResult.triggerOpenVisualScoping).toBe(true);
+  });
+
+  it('handles "scope reset" to reset cart to defaults', async () => {
+    const modifiedSession = {
+      ...session,
+      selectedEngineId: 'saas',
+      selectedFeatures: ['auth', 'ai_rag', 'vector_pipeline'],
+    };
+    const result = await handleTerminalScopeCommand('scope reset', modifiedSession, engines, features, brandAssets, maintenancePlans);
+    expect(result.nextSession.selectedEngineId).toBe('landing');
+    expect(result.lines.some((l) => l.text.includes('Terminal cart reset to factory defaults'))).toBe(true);
+  });
+
+  it('hydrates session from pending scope and serializes back to pending scope payload', () => {
+    const rawStored = {
+      scopeCode: 'SCOPE-99999',
+      companyName: 'Acme AI Corp',
+      baseEngineTitle: 'Full-Stack SaaS Platform',
+      selectedFeatures: ['Authentication & Session State', 'AI Copilot Integration'],
+      brandAssetOption: 'Complete Digital Brand Identity',
+      maintenancePlan: 'Growth Tier Care',
+      currency: 'USD',
+      metadata: {
+        selectedEngineId: 'saas',
+        selectedFeatureIds: ['auth', 'ai_rag'],
+      },
+    };
+
+    const hydrated = sessionFromPendingScope(rawStored, engines, features, brandAssets, maintenancePlans, 'USD');
+    expect(hydrated.companyName).toBe('Acme AI Corp');
+    expect(hydrated.currency).toBe('USD');
+    expect(hydrated.selectedEngineId).toBe('saas');
+    expect(hydrated.selectedFeatures).toContain('auth');
+
+    const serialized = sessionToPendingScopePayload(hydrated, engines, features, brandAssets, maintenancePlans, 'SCOPE-99999');
+    expect(serialized.companyName).toBe('Acme AI Corp');
+    expect(serialized.currency).toBe('USD');
+    expect(serialized.selectedBaseEngineId).toBe('saas');
+    expect(serialized.scopeCode).toBe('SCOPE-99999');
+    expect(serialized.totalCostUSD).toBeGreaterThan(0);
   });
 });

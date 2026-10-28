@@ -10,6 +10,8 @@ import questionnaireDefaults from '@/data/intakeQuestionnaireDefaults.json';
 import {
   createInitialTerminalScopeSession,
   handleTerminalScopeCommand,
+  sessionFromPendingScope,
+  sessionToPendingScopePayload,
   type TerminalScopeSession,
 } from '@/lib/terminalScoping';
 import { generateQuestionnairePDF } from '@/utils/pdfGenerator';
@@ -106,9 +108,24 @@ export function useTerminalCommands({
   );
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number>(-1);
-  const [scopeSession, setScopeSession] = useState<TerminalScopeSession>(() =>
-    createInitialTerminalScopeSession('INR')
-  );
+  const [scopeSession, setScopeSession] = useState<TerminalScopeSession>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('prateeq_pending_scope');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          const { engines, features, brandAssets, maintenancePlans } = questionnaireDefaults as {
+            engines: BaseEngineItem[];
+            features: FeatureItem[];
+            brandAssets: BrandAssetOption[];
+            maintenancePlans: MaintenancePlanOption[];
+          };
+          return sessionFromPendingScope(parsed, engines, features, brandAssets, maintenancePlans, 'INR');
+        }
+      } catch {}
+    }
+    return createInitialTerminalScopeSession('INR');
+  });
   const [interviewSession, setInterviewSession] = useState<InterviewSessionState>({
     step: 'role_select',
   });
@@ -118,6 +135,27 @@ export function useTerminalCommands({
   });
 
   const cmdCountRef = useRef<number>(0);
+
+  // Reactively hydrate scopeSession if localStorage changes or on initial client mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const stored = localStorage.getItem('prateeq_pending_scope');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        const { engines, features, brandAssets, maintenancePlans } = questionnaireDefaults as {
+          engines: BaseEngineItem[];
+          features: FeatureItem[];
+          brandAssets: BrandAssetOption[];
+          maintenancePlans: MaintenancePlanOption[];
+        };
+        const restored = sessionFromPendingScope(parsed, engines, features, brandAssets, maintenancePlans, 'INR');
+        /* eslint-disable react-hooks/set-state-in-effect -- intentional: syncing localStorage (external state) once on mount for hydration safety */
+        setScopeSession(restored);
+        /* eslint-enable react-hooks/set-state-in-effect */
+      }
+    } catch {}
+  }, []);
 
   const unlockAchievement = useCallback((id: string, title: string, desc: string) => {
     if (typeof window === 'undefined') return;
@@ -325,7 +363,24 @@ export function useTerminalCommands({
             setScopeSession(result.nextSession);
             unlockAchievement('cyber_scoper', 'Cyber Scoper', 'Configured an enterprise architecture blueprint entirely via CLI');
 
+            // Persist updated terminal cart directly to localStorage and cookie for seamless sync with /scoping & /dashboard
+            if (typeof window !== 'undefined') {
+              try {
+                const payload = sessionToPendingScopePayload(result.nextSession, engines, features, brandAssets, maintenancePlans);
+                localStorage.setItem('prateeq_pending_scope', JSON.stringify(payload));
+                document.cookie = `prateeq_pending_scope=${encodeURIComponent(JSON.stringify(payload))}; path=/; max-age=86400; SameSite=Lax;`;
+              } catch {}
+            }
+
             const newHistory = [...result.lines];
+
+            if (result.triggerOpenVisualScoping) {
+              if (typeof window !== 'undefined') {
+                setTimeout(() => {
+                  window.location.href = '/scoping';
+                }, 800);
+              }
+            }
 
             if (result.triggerExportPdf) {
               try {
