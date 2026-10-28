@@ -572,9 +572,63 @@ function buildFallbackResponseText(
   currency: Currency,
   currentScope?: ScopeContext | null
 ): string {
+  const p = prompt.toLowerCase();
   const blueprintRec = classifyPromptForBlueprint(prompt);
 
-  const hasExistingScope = Boolean(currentScope?.selectedFeatures && currentScope.selectedFeatures.length > 0);
+  const isBudgetQuery =
+    p.includes('budget') ||
+    p.includes('cheap') ||
+    p.includes('cut cost') ||
+    p.includes('cut costs') ||
+    p.includes('lower price') ||
+    p.includes('lean') ||
+    p.includes('de-scope') ||
+    p.includes('descope') ||
+    p.includes('tight') ||
+    p.includes('affordable') ||
+    p.includes('cost too high') ||
+    p.includes('reduce cost') ||
+    p.includes('sculpt') ||
+    p.includes('cut $') ||
+    p.includes('cut ₹') ||
+    /\b(under|less than|cut|save|trim|reduce)\s*([$₹]|usd|inr)?\s*\d+/i.test(p);
+
+  const isTimelineQuery =
+    p.includes('timeline') ||
+    p.includes('how long') ||
+    p.includes('delivery') ||
+    p.includes('duration') ||
+    p.includes('how many weeks') ||
+    p.includes('when can');
+
+  const isDependencyQuery =
+    p.includes('depend') ||
+    p.includes('prereq') ||
+    p.includes('why do i need') ||
+    p.includes('why auth') ||
+    p.includes('why vector');
+
+  // Check if user is introducing a brand new build/archetype vision
+  const isNewBuildVision =
+    p.includes('launch') ||
+    p.includes('build') ||
+    p.includes('create') ||
+    p.includes('store') ||
+    p.includes('shop') ||
+    p.includes('ecommerce') ||
+    p.includes('saas') ||
+    p.includes('platform') ||
+    p.includes('calling bot') ||
+    p.includes('voice agent') ||
+    p.includes('vault') ||
+    p.includes('streamer') ||
+    p.includes('podcast');
+
+  const hasExistingScope =
+    Boolean(currentScope?.selectedFeatures && currentScope.selectedFeatures.length > 0) &&
+    !isNewBuildVision &&
+    (isBudgetQuery || isTimelineQuery || isDependencyQuery || p.includes('my scope') || p.includes('current scope') || p.includes('these exact'));
+
   const targetEngineId = hasExistingScope && currentScope?.baseEngineId ? currentScope.baseEngineId : blueprintRec.baseEngineId;
   const targetFeatures = hasExistingScope && currentScope?.selectedFeatures ? currentScope.selectedFeatures : blueprintRec.featureIds;
 
@@ -640,40 +694,6 @@ function buildFallbackResponseText(
     null,
     2
   );
-
-  const p = prompt.toLowerCase();
-  const isBudgetQuery =
-    p.includes('budget') ||
-    p.includes('cheap') ||
-    p.includes('cut cost') ||
-    p.includes('cut costs') ||
-    p.includes('lower price') ||
-    p.includes('lean') ||
-    p.includes('de-scope') ||
-    p.includes('descope') ||
-    p.includes('tight') ||
-    p.includes('affordable') ||
-    p.includes('cost too high') ||
-    p.includes('reduce cost') ||
-    p.includes('sculpt') ||
-    p.includes('cut $') ||
-    p.includes('cut ₹') ||
-    /\b(under|less than|cut|save|trim|reduce)\s*([$₹]|usd|inr)?\s*\d+/i.test(p);
-
-  const isTimelineQuery =
-    p.includes('timeline') ||
-    p.includes('how long') ||
-    p.includes('delivery') ||
-    p.includes('duration') ||
-    p.includes('how many weeks') ||
-    p.includes('when can');
-
-  const isDependencyQuery =
-    p.includes('depend') ||
-    p.includes('prereq') ||
-    p.includes('why do i need') ||
-    p.includes('why auth') ||
-    p.includes('why vector');
 
   const wordCount = prompt.trim().split(/\s+/).length;
   const isVagueQuery =
@@ -1072,10 +1092,37 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Compute Blueprint Recommendation Action Payload
-    const targetEngineId = currentScope?.baseEngineId || blueprintRec.baseEngineId;
-    const targetFeatures = currentScope?.selectedFeatures?.length
+    const isNewBuildVision =
+      pLower.includes('launch') ||
+      pLower.includes('build') ||
+      pLower.includes('create') ||
+      pLower.includes('store') ||
+      pLower.includes('shop') ||
+      pLower.includes('ecommerce') ||
+      pLower.includes('saas') ||
+      pLower.includes('platform') ||
+      pLower.includes('calling bot') ||
+      pLower.includes('voice agent') ||
+      pLower.includes('vault') ||
+      pLower.includes('streamer') ||
+      pLower.includes('podcast');
+
+    const hasExistingScope =
+      Boolean(currentScope?.selectedFeatures?.length) &&
+      !isNewBuildVision &&
+      (pLower.includes('budget') ||
+        pLower.includes('cut') ||
+        pLower.includes('timeline') ||
+        pLower.includes('cheaper') ||
+        pLower.includes('my scope') ||
+        pLower.includes('active scope') ||
+        pLower.includes('these exact'));
+
+    const targetEngineId = hasExistingScope && currentScope?.baseEngineId ? currentScope.baseEngineId : blueprintRec.baseEngineId;
+    const targetFeatures = hasExistingScope && currentScope?.selectedFeatures?.length
       ? currentScope.selectedFeatures
       : blueprintRec.featureIds;
+
     const fallbackBlueprintObj = {
       archetypeId: blueprintRec.archetypeId,
       baseEngineId: targetEngineId,
@@ -1083,9 +1130,9 @@ export async function POST(req: NextRequest) {
       brandAssetId: blueprintRec.brandAssetId || 'ready',
       maintenancePlanId: blueprintRec.maintenancePlanId || 'standard',
       suggestedTimeline: blueprintRec.suggestedTimeline,
-      title: blueprintRec.title,
-      totalINR: currentScope?.totalINR || 390000,
-      totalUSD: currentScope?.totalUSD || 5250,
+      title: hasExistingScope ? `Refined ${targetEngineId.toUpperCase()} Scope` : blueprintRec.title,
+      totalINR: currentScope && hasExistingScope ? currentScope.totalINR : 390000,
+      totalUSD: currentScope && hasExistingScope ? currentScope.totalUSD : 5250,
       phasedBreakdown: computePhasedBreakdown(
         targetEngineId,
         targetFeatures,
@@ -1117,7 +1164,7 @@ export async function POST(req: NextRequest) {
           { role: 'user', content: promptWithContext },
         ];
 
-        // 8-second strict timeout: well within Vercel's execution window, avoiding slow CPU reranking
+        // 5-second strict timeout: fast fallback to local engine if VPS is cold or slow
         const compPromise = client.completions(messages, {
           enable_reranking: false,
           temperature: 0.4,
@@ -1127,7 +1174,7 @@ export async function POST(req: NextRequest) {
         const compRes = await Promise.race([
           compPromise,
           new Promise<null>((_, reject) =>
-            setTimeout(() => reject(new Error('Retriever completions timeout (8s limit)')), 8000)
+            setTimeout(() => reject(new Error('Retriever completions timeout (5s limit)')), 5000)
           ),
         ]);
 
@@ -1187,6 +1234,7 @@ export async function POST(req: NextRequest) {
         'Connection': 'keep-alive',
         'X-Session-ID': resolvedSessionId,
         'X-Fallback-Mode': usedRetriever ? 'false' : 'true',
+        'X-Accel-Buffering': 'no',
         'Set-Cookie': `prateeq_chat_session_id=${encodeURIComponent(resolvedSessionId)}; Path=/; Max-Age=2592000; SameSite=Lax`,
       },
     });
