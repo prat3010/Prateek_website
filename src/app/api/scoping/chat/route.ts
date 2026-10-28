@@ -1108,37 +1108,79 @@ export async function POST(req: NextRequest) {
       promptWithContext = `[Client Step ${currentScope.currentStep || 2} Context: Engine=${currentScope.baseEngineId}, Modules=${activeLabels}, Total=${currency === 'USD' ? `$${currentScope.totalUSD}` : `₹${currentScope.totalINR}`}]\n\nUser Question: ${prompt}`;
     }
 
-    // 2. Attempt Live Retrieval & Streaming Inference via Retriever VPS
+    // 2. Resolve Active Session and Determine Initial Engine Mode
+    let isFallback = true;
+    let client: RetrieverClient | null = null;
+
     if (tenantId && apiKey) {
-      try {
-        const client = new RetrieverClient({
-          apiUrl,
-          tenantId,
-          apiKey,
-          userId,
-        });
+      client = new RetrieverClient({
+        apiUrl,
+        tenantId,
+        apiKey,
+        userId,
+      });
 
-        // Ensure session exists with an adequate 10-second timeout on first turn
-        if (!activeSessionId) {
-          try {
-            const sessionRes = await Promise.race([
-              client.createSession(),
-              new Promise<null>((_, reject) =>
-                setTimeout(() => reject(new Error('Session creation timeout')), 10000)
-              ),
-            ]);
-            if (sessionRes?.sessionId) {
-              activeSessionId = sessionRes.sessionId;
-            }
-          } catch (sessionErr) {
-            console.warn('Retriever session creation failed:', sessionErr);
+      if (!activeSessionId) {
+        try {
+          const sessionRes = await Promise.race([
+            client.createSession(),
+            new Promise<null>((_, reject) =>
+              setTimeout(() => reject(new Error('Session creation timeout')), 5000)
+            ),
+          ]);
+          if (sessionRes?.sessionId) {
+            activeSessionId = sessionRes.sessionId;
+            isFallback = false;
           }
+        } catch (sessionErr) {
+          console.warn('Retriever session creation failed:', sessionErr);
+          isFallback = true;
         }
+      } else {
+        isFallback = false;
+      }
+    }
 
-        if (activeSessionId) {
-          // Allow up to 45s for hybrid retrieval + initial token generation on VPS (within 60s maxDuration budget)
+    const resolvedSessionId =
+      activeSessionId ||
+      `scoping_fallback_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+
+    // 3. Instant-Flush Response Pipeline with Keep-Alive Heartbeats
+    // Flushes HTTP headers and initial bytes immediately (<100ms TTFB) to eliminate Safari CFNetwork "Load failed" drops.
+    const stream = new TransformStream<Uint8Array, Uint8Array>();
+    const writer = stream.writable.getWriter();
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
+
+    (async () => {
+      let isDone = false;
+      // Send initial keep-alive comment so TTFB is instantaneous
+      try {
+        await writer.write(encoder.encode(': keep-alive\n\n'));
+      } catch {
+        return;
+      }
+
+      // Keep-alive ping interval to keep intermediate firewalls and mobile Safari connections warm
+      const pingInterval = setInterval(() => {
+        if (!isDone) {
+          writer.write(encoder.encode(': ping\n\n')).catch(() => {});
+        }
+      }, 3000);
+
+      const cleanup = () => {
+        isDone = true;
+        clearInterval(pingInterval);
+      };
+
+      let usedRetriever = false;
+      let accumulatedRaw = '';
+
+      try {
+        if (!isFallback && client && activeSessionId && !req.signal.aborted) {
+          // Allow up to 20 seconds for hybrid search + first token generation on VPS
           const chatAbortController = new AbortController();
-          const chatTimeoutId = setTimeout(() => chatAbortController.abort(), 45000);
+          const chatTimeoutId = setTimeout(() => chatAbortController.abort(), 20000);
 
           try {
             const upstreamStream = await client.chat(
@@ -1148,117 +1190,121 @@ export async function POST(req: NextRequest) {
             );
             clearTimeout(chatTimeoutId);
 
-            // Compute blueprint action JSON to append if Retriever omits it
-            const targetEngineId = currentScope?.baseEngineId || blueprintRec.baseEngineId;
-            const targetFeatures = currentScope?.selectedFeatures?.length
-              ? currentScope.selectedFeatures
-              : blueprintRec.featureIds;
-            const fallbackBlueprintObj = {
-              archetypeId: blueprintRec.archetypeId,
-              baseEngineId: targetEngineId,
-              featureIds: targetFeatures,
-              brandAssetId: blueprintRec.brandAssetId || 'ready',
-              maintenancePlanId: blueprintRec.maintenancePlanId || 'standard',
-              suggestedTimeline: blueprintRec.suggestedTimeline,
-              title: blueprintRec.title,
-              totalINR: currentScope?.totalINR || 390000,
-              totalUSD: currentScope?.totalUSD || 5250,
-              phasedBreakdown: computePhasedBreakdown(
-                targetEngineId,
-                targetFeatures,
-                currency,
-                blueprintRec.brandAssetId || 'ready',
-                blueprintRec.maintenancePlanId || 'standard'
-              ),
-            };
-            const fallbackBlueprintJson = JSON.stringify(fallbackBlueprintObj, null, 2);
+            if (upstreamStream && !req.signal.aborted) {
+              usedRetriever = true;
+              const reader = upstreamStream.getReader();
 
-            if (upstreamStream) {
-              const tappedStream = createTappedStream(
-                upstreamStream,
-                fallbackBlueprintJson,
-                (accumulatedText) => {
-                const elapsed = Math.round(performance.now() - startTime);
-                logScopingChatTrace({
-                  sessionId: activeSessionId || 'unknown_session',
-                  scopeCode,
-                  turnIndex,
-                  userQuery: prompt,
-                  assistantResponse: accumulatedText,
-                  agentIntent: blueprintRec.archetypeId,
-                  agentReasoning: `${blueprintRec.title}: ${blueprintRec.summary}`,
-                  modelUsed: 'retriever-vps',
-                  latencyMs: elapsed,
-                  isFallback: false,
+              while (true) {
+                const { done, value } = await reader.read();
+                if (done || req.signal.aborted) break;
+                accumulatedRaw += decoder.decode(value, { stream: true });
+                await writer.write(value);
+              }
+              accumulatedRaw += decoder.decode();
+
+              // Compute blueprint action JSON to append if Retriever omits it
+              const targetEngineId = currentScope?.baseEngineId || blueprintRec.baseEngineId;
+              const targetFeatures = currentScope?.selectedFeatures?.length
+                ? currentScope.selectedFeatures
+                : blueprintRec.featureIds;
+              const fallbackBlueprintObj = {
+                archetypeId: blueprintRec.archetypeId,
+                baseEngineId: targetEngineId,
+                featureIds: targetFeatures,
+                brandAssetId: blueprintRec.brandAssetId || 'ready',
+                maintenancePlanId: blueprintRec.maintenancePlanId || 'standard',
+                suggestedTimeline: blueprintRec.suggestedTimeline,
+                title: blueprintRec.title,
+                totalINR: currentScope?.totalINR || 390000,
+                totalUSD: currentScope?.totalUSD || 5250,
+                phasedBreakdown: computePhasedBreakdown(
+                  targetEngineId,
+                  targetFeatures,
                   currency,
-                  currentEngine: currentScope?.baseEngineId || blueprintRec.baseEngineId,
-                  selectedFeatures: currentScope?.selectedFeatures || blueprintRec.featureIds,
-                  quoteINR: currentScope?.totalINR || 0,
-                  quoteUSD: currentScope?.totalUSD || 0,
-                  visitorIpHash: ipHash,
-                  visitorCountry,
-                  visitorUserAgent: userAgent,
-                }).catch((err) => console.warn('Trace logging warning:', err));
-              });
+                  blueprintRec.brandAssetId || 'ready',
+                  blueprintRec.maintenancePlanId || 'standard'
+                ),
+              };
+              const fallbackBlueprintJson = JSON.stringify(fallbackBlueprintObj, null, 2);
 
-              return new Response(tappedStream, {
-                headers: {
-                  'Content-Type': 'text/event-stream',
-                  'Cache-Control': 'no-cache, no-transform',
-                  'Connection': 'keep-alive',
-                  'X-Session-ID': activeSessionId,
-                  'Set-Cookie': `prateeq_chat_session_id=${encodeURIComponent(activeSessionId)}; Path=/; Max-Age=2592000; SameSite=Lax`,
-                },
-              });
+              if (
+                fallbackBlueprintJson &&
+                !accumulatedRaw.includes('<blueprint_action>') &&
+                !accumulatedRaw.toLowerCase().includes('escrow queue')
+              ) {
+                const blueprintChunk = `\n\n<blueprint_action>\n${fallbackBlueprintJson}\n</blueprint_action>`;
+                accumulatedRaw += blueprintChunk;
+                await writer.write(
+                  encoder.encode(`data: ${JSON.stringify({ event: 'token', delta: blueprintChunk })}\n\n`)
+                );
+              }
             }
           } catch (chatError) {
             clearTimeout(chatTimeoutId);
             console.warn('Retriever VPS chat stream error or timeout (falling back):', chatError);
           }
         }
-      } catch (clientErr) {
-        console.warn('Retriever client error (falling back to local generator):', clientErr);
+
+        // 4. Graceful Fallback Mode: Local Conversational Blueprint Streaming
+        if (!usedRetriever && !req.signal.aborted) {
+          const fallbackText = buildFallbackResponseText(prompt, currency, currentScope);
+          accumulatedRaw = fallbackText;
+          const words = fallbackText.split(' ');
+          for (let i = 0; i < words.length; i += 3) {
+            if (req.signal.aborted) break;
+            const chunk = words.slice(i, i + 3).join(' ') + (i + 3 < words.length ? ' ' : '');
+            await writer.write(
+              encoder.encode(`data: ${JSON.stringify({ delta: chunk })}\n\n`)
+            );
+            await new Promise((r) => setTimeout(r, 10));
+          }
+        }
+
+        if (!req.signal.aborted) {
+          await writer.write(encoder.encode('data: [DONE]\n\n'));
+        }
+      } catch (pipelineErr) {
+        console.warn('Scoping chat stream pipeline error:', pipelineErr);
+      } finally {
+        cleanup();
+        try {
+          await writer.close();
+        } catch {
+          // already closed
+        }
+
+        const elapsed = Math.round(performance.now() - startTime);
+        logScopingChatTrace({
+          sessionId: resolvedSessionId,
+          scopeCode,
+          turnIndex,
+          userQuery: prompt,
+          assistantResponse: extractCleanProseFromSse(accumulatedRaw),
+          agentIntent: blueprintRec.archetypeId,
+          agentReasoning: `${blueprintRec.title}: ${blueprintRec.summary}`,
+          modelUsed: usedRetriever ? 'retriever-vps' : 'heuristic-rule-engine',
+          latencyMs: elapsed,
+          isFallback: !usedRetriever,
+          currency,
+          currentEngine: currentScope?.baseEngineId || blueprintRec.baseEngineId,
+          selectedFeatures: currentScope?.selectedFeatures || blueprintRec.featureIds,
+          quoteINR: currentScope?.totalINR || 0,
+          quoteUSD: currentScope?.totalUSD || 0,
+          visitorIpHash: ipHash,
+          visitorCountry,
+          visitorUserAgent: userAgent,
+        }).catch((err) => console.warn('Trace logging warning:', err));
       }
-    }
+    })();
 
-    // 3. Graceful Fallback Mode: Local Conversational Blueprint Streaming
-    // If Retriever VPS is unreachable, times out, or throws, provide instant high-fidelity response.
-    const fallbackSessionId =
-      activeSessionId || `scoping_fallback_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-    const fallbackText = buildFallbackResponseText(prompt, currency, currentScope);
-    const fallbackStream = createTextStream(fallbackText, 10, req.signal);
-
-    // Asynchronously log fallback trace
-    const elapsed = Math.round(performance.now() - startTime);
-    logScopingChatTrace({
-      sessionId: fallbackSessionId,
-      scopeCode,
-      turnIndex,
-      userQuery: prompt,
-      assistantResponse: fallbackText,
-      agentIntent: blueprintRec.archetypeId,
-      agentReasoning: `${blueprintRec.title}: ${blueprintRec.summary}`,
-      modelUsed: 'heuristic-rule-engine',
-      latencyMs: elapsed,
-      isFallback: true,
-      currency,
-      currentEngine: currentScope?.baseEngineId || blueprintRec.baseEngineId,
-      selectedFeatures: currentScope?.selectedFeatures || blueprintRec.featureIds,
-      quoteINR: currentScope?.totalINR || 0,
-      quoteUSD: currentScope?.totalUSD || 0,
-      visitorIpHash: ipHash,
-      visitorCountry,
-      visitorUserAgent: userAgent,
-    }).catch((err) => console.warn('Fallback trace logging warning:', err));
-
-    return new Response(fallbackStream, {
+    return new Response(stream.readable, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache, no-transform',
         'Connection': 'keep-alive',
-        'X-Session-ID': fallbackSessionId,
-        'X-Fallback-Mode': 'true',
-        'Set-Cookie': `prateeq_chat_session_id=${encodeURIComponent(fallbackSessionId)}; Path=/; Max-Age=2592000; SameSite=Lax`,
+        'X-Session-ID': resolvedSessionId,
+        'X-Fallback-Mode': isFallback ? 'true' : 'false',
+        'Set-Cookie': `prateeq_chat_session_id=${encodeURIComponent(resolvedSessionId)}; Path=/; Max-Age=2592000; SameSite=Lax`,
       },
     });
   } catch (error) {
