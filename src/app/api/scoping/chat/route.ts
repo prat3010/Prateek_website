@@ -13,7 +13,7 @@ import { getIpHash } from '@/lib/security';
 import { logScopingChatTrace } from '@/lib/scopingObservability';
 
 export const dynamic = 'force-dynamic';
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 const {
   engines: rawEngines,
@@ -1136,9 +1136,9 @@ export async function POST(req: NextRequest) {
         }
 
         if (activeSessionId) {
-          // Allow up to 25s for hybrid retrieval + initial token generation on VPS
+          // Allow up to 45s for hybrid retrieval + initial token generation on VPS (within 60s maxDuration budget)
           const chatAbortController = new AbortController();
-          const chatTimeoutId = setTimeout(() => chatAbortController.abort(), 25000);
+          const chatTimeoutId = setTimeout(() => chatAbortController.abort(), 45000);
 
           try {
             const upstreamStream = await client.chat(

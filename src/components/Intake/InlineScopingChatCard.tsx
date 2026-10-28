@@ -331,6 +331,27 @@ export function InlineScopingChatCard({
     }
   }, [chatTranscript, isStreaming]);
 
+  // Pre-warm / establish chat session in the background on mount if not yet assigned
+  useEffect(() => {
+    if (!chatSessionId) {
+      let isMounted = true;
+      fetch('/api/scoping/session', { method: 'POST' })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (isMounted && data?.sessionId) {
+            setChatSessionId(data.sessionId);
+            setClientCookie('prateeq_chat_session_id', data.sessionId);
+          }
+        })
+        .catch(() => {
+          // Non-blocking pre-warm; chat route handles fallback creation
+        });
+      return () => {
+        isMounted = false;
+      };
+    }
+  }, [chatSessionId, setChatSessionId]);
+
   const handleRfpBlueprintExtracted = (blueprint: ParseIntentResponse) => {
     onApplyBlueprint(blueprint);
     toast.success(
@@ -361,6 +382,8 @@ export function InlineScopingChatCard({
     ];
     setChatTranscript(updatedMessages);
     setIsStreaming(true);
+
+    let accumulatedText = '';
 
     try {
       // 2. Add placeholder assistant message
@@ -402,7 +425,6 @@ export function InlineScopingChatCard({
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
-      let accumulatedText = '';
       let buffer = '';
 
       while (true) {
@@ -490,11 +512,16 @@ export function InlineScopingChatCard({
         description: 'Unable to stream response from scoping engine.',
       });
 
+      const fallbackContent =
+        accumulatedText.trim().length > 0
+          ? accumulatedText
+          : `⚠️ Note: Scoping engine response unavailable (${errMsg}). You can still use the prompt presets or manual archetype selection below.`;
+
       setChatTranscript([
         ...updatedMessages,
         {
           role: 'assistant',
-          content: `⚠️ Note: Scoping engine response unavailable (${errMsg}). You can still use the prompt presets or manual archetype selection below.`,
+          content: fallbackContent,
           timestamp: new Date().toISOString(),
         },
       ]);
