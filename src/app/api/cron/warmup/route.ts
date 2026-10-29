@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 const RETRIEVER_API_URL = (
   process.env.RETRIEVER_API_URL ||
@@ -73,7 +73,7 @@ async function handleWarmup(req: NextRequest) {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({}),
-            signal: AbortSignal.timeout(20000),
+            signal: AbortSignal.timeout(50000),
             cache: 'no-store',
           }
         );
@@ -104,7 +104,10 @@ async function handleWarmup(req: NextRequest) {
 
   return NextResponse.json(
     { ok: warmed > 0, warmed, results },
-    { headers: { 'Cache-Control': 'no-store' } }
+    {
+      status: warmed > 0 ? 200 : 503,
+      headers: { 'Cache-Control': 'no-store' },
+    }
   );
 }
 

@@ -20,7 +20,7 @@ jobs:
 
       - name: Call warmup endpoint
         run: |
-          curl -fsS --max-time 60 \
+          curl -fsS --max-time 75 \
             -X POST \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             https://prateeq.in/api/cron/warmup
