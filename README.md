@@ -49,6 +49,7 @@ The client-side commercial PDFs (Scoping Brief, Services & Pricing Guide, Sales 
 | `/api/analytics-summary` | GET | Aggregated visitor stats |
 | `/api/contact` | POST | Send contact form email |
 | `/api/terminal/qrcode` | GET | Generate ASCII / PNG QR code for terminal |
+| `/api/terminal/ai-chat` | POST | Stream the portfolio AI Twin reply from Retriever (SSE; `stream: false` returns JSON) |
 | `/api/client/save-scope` | POST | Upsert client scope with Zod validation (requires Supabase `Bearer` session token) |
 | `/api/client/get-scopes` | GET | List scopes for the verified session email (requires Supabase `Bearer` session token) |
 | `/api/client/delete-scope` | DELETE | Delete draft/unpaid scope (session-gated) |
@@ -65,6 +66,8 @@ The client-side commercial PDFs (Scoping Brief, Services & Pricing Guide, Sales 
 | `/api/rag/telemetry` | GET | Fetch real-time RAG usage telemetry & cache stats |
 | `/api/webhooks/razorpay` | POST | Verify webhook signature and process payment/subscription events |
 | `/api/revalidate` | POST, GET | Purge Next.js cache (requires `SYNC_API_KEY`) |
+| `/api/cron/warmup` | POST, GET | Warm Retriever embedding/vector/Redis pools (requires `CRON_SECRET`) |
+| `/api/scoping/chat` | POST | Stream the scoping copilot reply with a local blueprint fallback |
 | `/api/scoping/parse-intent` | POST | AI intent classification for scoping copilot |
 | `/api/scoping/parse-rfp` | POST | AI extraction of scope from uploaded RFP documents |
 | `/api/scoping/validate-promo` | POST | Validate promotional discount codes |
@@ -102,6 +105,10 @@ GEMINI_API_KEY=your_gemini_api_key
 
 # Shared secret for synchronizer / API route writes (any string)
 SYNC_API_KEY=your_sync_api_key
+
+# Shared secret for the scheduled Retriever warm-up endpoint
+# Add the same value as a GitHub Actions repository secret named CRON_SECRET.
+CRON_SECRET=your_cron_secret
 
 # Optional GitHub Token (to avoid anonymous rate limit on status tracker)
 GITHUB_TOKEN=your_github_token

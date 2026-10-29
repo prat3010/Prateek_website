@@ -32,11 +32,207 @@ export interface ConsoleLine {
   command?: string;
   imageUrl?: string;
   href?: string;
+  streaming?: boolean;
 }
 
 export interface AIChatSessionState {
   isActive: boolean;
   history: { role: string; content: string }[];
+}
+
+interface AiTwinStreamHandlers {
+  onStart: () => void;
+  onRetry?: () => void;
+  onDelta: (accumulated: string) => void;
+  onComplete: (finalText: string) => void;
+  onError: (message: string, retryable: boolean) => void;
+}
+
+const AI_TWIN_TIMEOUT_MS = 48_000;
+const AI_TWIN_RETRY_DELAY_MS = 2_000;
+const AI_TWIN_THINKING_TEXT = '🧠 Thinking...';
+const AI_TWIN_RETRY_TEXT = '🧠 Engine cold — retrying once...';
+
+const isAiTwinPendingLine = (line: ConsoleLine) =>
+  line.text === AI_TWIN_THINKING_TEXT || line.text === AI_TWIN_RETRY_TEXT;
+
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function isAiTwinTimeout(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    (error.name === 'TimeoutError' ||
+      error.name === 'AbortError' ||
+      /timeout|timed out/i.test(error.message))
+  );
+}
+
+/**
+ * Requests an AI Twin reply, preferring the SSE stream but falling back to a
+ * JSON body for older backends. Retries once before any tokens are rendered.
+ */
+async function requestAiTwin(
+  query: string,
+  history: { role: string; content: string }[],
+  handlers: AiTwinStreamHandlers
+): Promise<void> {
+  let lastError = 'Unable to reach the AI Twin.';
+
+  for (let attempt = 0; attempt < 2; attempt++) {
+    let streamStarted = false;
+
+    try {
+      const res = await fetch('/api/terminal/ai-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, history, stream: true }),
+        signal: AbortSignal.timeout(AI_TWIN_TIMEOUT_MS),
+      });
+
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as {
+          error?: string;
+          reply?: string;
+          retryable?: boolean;
+        };
+        lastError = data.error || data.reply || `Server error (${res.status})`;
+
+        if (res.status >= 500 && attempt === 0) {
+          handlers.onRetry?.();
+          await delay(AI_TWIN_RETRY_DELAY_MS);
+          continue;
+        }
+
+        handlers.onError(lastError, data.retryable !== false);
+        return;
+      }
+
+      const contentType = res.headers.get('content-type') || '';
+
+      // Backward-compatible path: a cached/older backend may answer with JSON.
+      if (!res.body || !contentType.includes('text/event-stream')) {
+        const data = (await res.json().catch(() => ({}))) as {
+          reply?: string;
+          error?: string;
+        };
+        const reply = typeof data.reply === 'string' ? data.reply : '';
+
+        if (reply) {
+          handlers.onStart();
+          handlers.onComplete(reply);
+          return;
+        }
+
+        lastError = data.error || 'The cognitive engine returned an empty response.';
+        if (attempt === 0) {
+          handlers.onRetry?.();
+          await delay(AI_TWIN_RETRY_DELAY_MS);
+          continue;
+        }
+
+        handlers.onError(lastError, true);
+        return;
+      }
+
+      handlers.onStart();
+      streamStarted = true;
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let accumulated = '';
+      let lastRendered = 0;
+      let streamError: string | null = null;
+
+      readStream: while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed.startsWith('data:')) continue;
+
+          const payload = trimmed.slice(5).trim();
+          if (!payload) continue;
+          if (payload === '[DONE]') break readStream;
+
+          try {
+            const parsed = JSON.parse(payload);
+            if (parsed?.error) {
+              streamError = String(parsed.error);
+              break readStream;
+            }
+
+            const delta =
+              parsed?.delta ??
+              parsed?.choices?.[0]?.delta?.content ??
+              parsed?.text ??
+              parsed?.content;
+
+            if (typeof delta === 'string' && delta.length > 0) {
+              accumulated += delta;
+              const now = Date.now();
+              if (now - lastRendered > 60) {
+                lastRendered = now;
+                handlers.onDelta(accumulated);
+              }
+            }
+          } catch {
+            // Ignore malformed frames
+          }
+        }
+      }
+
+      reader.cancel().catch(() => {});
+
+      if (streamError) {
+        handlers.onError(streamError, true);
+        return;
+      }
+
+      const finalText = accumulated
+        .replace(/\[\d+(?:,\s*\d+)*\]/g, '')
+        .trim();
+
+      if (finalText) {
+        handlers.onComplete(finalText);
+        return;
+      }
+
+      lastError = 'The cognitive engine returned an empty response.';
+      if (attempt === 0) {
+        handlers.onRetry?.();
+        await delay(AI_TWIN_RETRY_DELAY_MS);
+        continue;
+      }
+
+      handlers.onError(lastError, true);
+      return;
+    } catch (error) {
+      lastError = isAiTwinTimeout(error)
+        ? 'The cognitive engine took longer than expected. Please try again.'
+        : error instanceof Error
+          ? error.message
+          : 'Unknown network failure';
+
+      // Do not auto-retry after tokens have started rendering: it would
+      // duplicate the partial answer in the transcript.
+      if (attempt === 0 && !streamStarted) {
+        handlers.onRetry?.();
+        await delay(AI_TWIN_RETRY_DELAY_MS);
+        continue;
+      }
+
+      handlers.onError(lastError, true);
+      return;
+    }
+  }
+
+  handlers.onError(lastError, true);
 }
 
 const AI_TWIN_BOOT_LINES: ConsoleLine[] = [
@@ -133,6 +329,80 @@ export function useTerminalCommands({
     isActive: false,
     history: [],
   });
+  const [isAiChatLoading, setIsAiChatLoading] = useState(false);
+  const aiChatInFlightRef = useRef(false);
+
+  const startAiChatStream = useCallback(() => {
+    setTerminalHistory((prev) => {
+      const filtered = prev.filter((line) => !isAiTwinPendingLine(line));
+      return [
+        ...filtered,
+        { text: AI_TWIN_THINKING_TEXT, type: 'output', streaming: true },
+      ];
+    });
+  }, []);
+
+  const updateAiChatStream = useCallback((accumulated: string) => {
+    setTerminalHistory((prev) => {
+      const index = prev.findIndex((line) => line.streaming);
+      if (index === -1) return prev;
+      const next = [...prev];
+      next[index] = { ...next[index], text: accumulated };
+      return next;
+    });
+  }, []);
+
+  const completeAiChatStream = useCallback((text: string) => {
+    setTerminalHistory((prev) => {
+      const output: ConsoleLine[] = [];
+      for (const line of prev) {
+        if (line.streaming) {
+          output.push(
+            ...text.split('\n').map((part) => ({ text: part, type: 'output' as const }))
+          );
+        } else if (!isAiTwinPendingLine(line)) {
+          output.push(line);
+        }
+      }
+      output.push({ text: '', type: 'output' });
+      return output;
+    });
+  }, []);
+
+  const failAiChatStream = useCallback((message: string, retryable: boolean) => {
+    setTerminalHistory((prev) => {
+      const output: ConsoleLine[] = [];
+      for (const line of prev) {
+        if (isAiTwinPendingLine(line)) continue;
+        if (line.streaming) {
+          if (line.text.trim()) {
+            output.push(
+              ...line.text
+                .split('\n')
+                .map((part) => ({ text: part, type: 'output' as const }))
+            );
+          }
+          continue;
+        }
+        output.push(line);
+      }
+      output.push({
+        text: `⚠️ ${message}${retryable ? ' Retrying may help.' : ''}`,
+        type: 'error',
+      });
+      return output;
+    });
+  }, []);
+
+  const markAiChatRetry = useCallback(() => {
+    setTerminalHistory((prev) =>
+      prev.map((line) =>
+        line.text === AI_TWIN_THINKING_TEXT
+          ? { ...line, text: AI_TWIN_RETRY_TEXT }
+          : line
+      )
+    );
+  }, []);
 
   const cmdCountRef = useRef<number>(0);
 
@@ -232,67 +502,54 @@ export function useTerminalCommands({
           return;
         }
 
+        if (aiChatInFlightRef.current) {
+          setTerminalHistory((prev) => [
+            ...prev,
+            {
+              text: 'SYSTEM // The AI Twin is still working on the previous message. Please wait for it to finish.',
+              type: 'output',
+            },
+          ]);
+          setTerminalInput('');
+          return;
+        }
+
         const userMsg = cmd.trim();
-        const currentHistory = aiChatSession.history;
+        // Eight turns keeps the prompt bounded without losing recent context.
+        const currentHistory = aiChatSession.history.slice(-16);
 
         setTerminalHistory((prev) => [
           ...prev,
           { text: '🧠 Thinking...', type: 'output' },
         ]);
 
-        fetch('/api/terminal/ai-chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            query: userMsg,
-            history: currentHistory,
-          }),
-        })
-          .then(async (res) => {
-            let data: { reply?: string; error?: string } = {};
-            try {
-              data = await res.json();
-            } catch {
-              data = { reply: `[Gateway Latency] The cognitive engine took longer than expected. Please try again.` };
-            }
+        aiChatInFlightRef.current = true;
+        setIsAiChatLoading(true);
 
-            const reply = data.reply || data.error || (res.ok ? 'No response generated.' : `Server error (${res.status})`);
-            const isErrorResponse = !res.ok && !data.reply;
-
-            setTerminalHistory((prev) => {
-              const filtered = prev.filter((l) => l.text !== '🧠 Thinking...');
-              const replyLines: ConsoleLine[] = reply.split('\n').map((line: string) => ({
-                text: line,
-                type: isErrorResponse ? 'error' : 'output',
-              }));
-              return [...filtered, ...replyLines, { text: '', type: 'output' }];
+        void (async () => {
+          try {
+            await requestAiTwin(userMsg, currentHistory, {
+              onStart: startAiChatStream,
+              onRetry: markAiChatRetry,
+              onDelta: updateAiChatStream,
+              onComplete: (finalText) => {
+                completeAiChatStream(finalText);
+                setAiChatSession((prev) => ({
+                  ...prev,
+                  history: [
+                    ...prev.history,
+                    { role: 'user', content: userMsg },
+                    { role: 'assistant', content: finalText },
+                  ].slice(-16),
+                }));
+              },
+              onError: failAiChatStream,
             });
-
-            if (res.ok && data.reply) {
-              setAiChatSession((prev) => ({
-                ...prev,
-                history: [
-                  ...prev.history,
-                  { role: 'user', content: userMsg },
-                  { role: 'assistant', content: reply },
-                ],
-              }));
-            }
-          })
-          .catch((err) => {
-            const isLoadFailed = err?.name === 'TypeError' && String(err?.message || '').toLowerCase().includes('load');
-            const displayMsg = isLoadFailed
-              ? 'Request timed out waiting for the Oracle VPS cognitive engine. Give it one more second and try again.'
-              : (err?.message || 'Server timeout');
-
-            setTerminalHistory((prev) => {
-              const filtered = prev.filter((l) => l.text !== '🧠 Thinking...');
-              return [
-                ...filtered,
-                { text: `⚠️ Neural connection error: ${displayMsg}`, type: 'error' },
-              ];
-            });
-          });
+          } finally {
+            aiChatInFlightRef.current = false;
+            setIsAiChatLoading(false);
+          }
+        })();
 
         setTerminalInput('');
         return;
@@ -748,38 +1005,41 @@ export function useTerminalCommands({
       if (trimmedCmd.startsWith('ask ') || trimmedCmd.startsWith('explain ')) {
         const queryText = cmd.trim().replace(/^(ask|explain)\s+/i, '').trim();
         if (queryText.length >= 2) {
+          if (aiChatInFlightRef.current) {
+            setTerminalHistory((prev) => [
+              ...prev,
+              {
+                text: 'SYSTEM // The AI Twin is still working on the previous message. Please wait for it to finish.',
+                type: 'output',
+              },
+            ]);
+            setTerminalInput('');
+            return;
+          }
+
           setTerminalHistory((prev) => [
             ...prev,
             { text: `QUERYING PRATEEQ.AI KNOWLEDGE VAULT: "${queryText}"...`, type: 'success' },
             { text: '🧠 Thinking...', type: 'output' },
           ]);
 
-          fetch('/api/terminal/ai-chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query: queryText, history: [] }),
-          })
-            .then(async (res) => {
-              const data = await res.json();
-              const reply = data.reply || 'No response generated.';
-              setTerminalHistory((prev) => {
-                const filtered = prev.filter((l) => l.text !== '🧠 Thinking...');
-                const replyLines: ConsoleLine[] = reply.split('\n').map((line: string) => ({
-                  text: line,
-                  type: 'output',
-                }));
-                return [...filtered, ...replyLines, { text: '', type: 'output' }];
+          aiChatInFlightRef.current = true;
+          setIsAiChatLoading(true);
+
+          void (async () => {
+            try {
+              await requestAiTwin(queryText, [], {
+                onStart: startAiChatStream,
+                onRetry: markAiChatRetry,
+                onDelta: updateAiChatStream,
+                onComplete: completeAiChatStream,
+                onError: failAiChatStream,
               });
-            })
-            .catch((err) => {
-              setTerminalHistory((prev) => {
-                const filtered = prev.filter((l) => l.text !== '🧠 Thinking...');
-                return [
-                  ...filtered,
-                  { text: `⚠️ Failed querying AI Twin: ${err.message || 'Server timeout'}`, type: 'error' },
-                ];
-              });
-            });
+            } finally {
+              aiChatInFlightRef.current = false;
+              setIsAiChatLoading(false);
+            }
+          })();
 
           setTerminalInput('');
           return;
@@ -1057,7 +1317,7 @@ export function useTerminalCommands({
       setTerminalHistory((prev) => [...prev, ...response]);
       setTerminalInput('');
     },
-    [projects, profileData, isNoir, stats, isMatrixActive, setIsMatrixActive, setActiveGame, unlockAchievement, interviewSession, scopeSession, aiChatSession]
+    [projects, profileData, isNoir, stats, isMatrixActive, setIsMatrixActive, setActiveGame, unlockAchievement, interviewSession, scopeSession, aiChatSession, startAiChatStream, updateAiChatStream, completeAiChatStream, failAiChatStream, markAiChatRetry]
   );
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -1108,5 +1368,6 @@ export function useTerminalCommands({
     handleKeyDown,
     unlockAchievement,
     isAiChatActive: aiChatSession.isActive,
+    isAiChatLoading,
   };
 }

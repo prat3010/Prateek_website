@@ -1,0 +1,26 @@
+name: Warm Retriever
+
+on:
+  schedule:
+    # Every five minutes. GitHub may delay scheduled runs during peak load.
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  warm:
+    name: Warm embedding, vector, and Redis pools
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify warmup secret is configured
+        run: |
+          if [ -z "${{ secrets.CRON_SECRET }}" ]; then
+            echo "::error::CRON_SECRET repository secret is not configured."
+            exit 1
+          fi
+
+      - name: Call warmup endpoint
+        run: |
+          curl -fsS --max-time 60 \
+            -X POST \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            https://prateeq.in/api/cron/warmup

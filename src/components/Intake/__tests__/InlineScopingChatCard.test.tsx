@@ -264,7 +264,7 @@ describe('InlineScopingChatCard Component', () => {
             method: 'POST',
             body: JSON.stringify({
               message: 'Build me an app',
-              history: [{ role: 'user', content: 'Build me an app' }],
+              history: [],
               sessionId: null,
               currency: 'USD',
               turnIndex: 1,

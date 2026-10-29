@@ -217,6 +217,10 @@ export class RetrieverClient {
       temperature?: number;
       max_tokens?: number;
       enable_reranking?: boolean;
+      top_k?: number;
+      enable_query_rewriting?: boolean;
+      enable_self_query?: boolean;
+      enable_colbert_rerank?: boolean;
       signal?: AbortSignal;
     }
   ): Promise<{ content: string; citations?: unknown[]; id?: string; model?: string }> {
@@ -245,6 +249,16 @@ export class RetrieverClient {
         temperature: options?.temperature ?? 0.4,
         max_tokens: options?.max_tokens ?? 2048,
         enable_reranking: options?.enable_reranking ?? false,
+        ...(options?.top_k !== undefined ? { top_k: options.top_k } : {}),
+        ...(options?.enable_query_rewriting !== undefined
+          ? { enable_query_rewriting: options.enable_query_rewriting }
+          : {}),
+        ...(options?.enable_self_query !== undefined
+          ? { enable_self_query: options.enable_self_query }
+          : {}),
+        ...(options?.enable_colbert_rerank !== undefined
+          ? { enable_colbert_rerank: options.enable_colbert_rerank }
+          : {}),
       }),
       signal: options?.signal,
     });

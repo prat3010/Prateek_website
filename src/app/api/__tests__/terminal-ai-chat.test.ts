@@ -73,6 +73,49 @@ describe('/api/terminal/ai-chat route', () => {
     expect(sentBody.use_repl).toBe(false);
   });
 
+  it('proxies upstream SSE deltas when the caller requests streaming', async () => {
+    const encoder = new TextEncoder();
+    const upstream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(
+          encoder.encode('data: {"choices":[{"delta":{"content":"Hello "}}]}\n\n')
+        );
+        controller.enqueue(
+          encoder.encode('data: {"choices":[{"delta":{"content":"world"}}]}\n\n')
+        );
+        controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+        controller.close();
+      },
+    });
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      headers: new Headers({
+        'Content-Type': 'text/event-stream',
+        'X-Cache-Lookup': 'MISS',
+      }),
+      body: upstream,
+    } as unknown as Response);
+
+    const req = new NextRequest('http://localhost/api/terminal/ai-chat', {
+      method: 'POST',
+      body: JSON.stringify({ query: 'Say hello', history: [], stream: true }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('Content-Type')).toContain('text/event-stream');
+    expect(res.headers.get('X-Cache-Lookup')).toBe('MISS');
+
+    const body = await res.text();
+    expect(body).toContain('data: {"delta":"Hello "}');
+    expect(body).toContain('data: {"delta":"world"}');
+    expect(body).toContain('data: [DONE]');
+
+    const [, options] = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0];
+    expect(JSON.parse(options.body).stream).toBe(true);
+  });
+
   it('handles upstream HTTP error gracefully with a neural glitch notice', async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: false,
@@ -86,10 +129,11 @@ describe('/api/terminal/ai-chat route', () => {
     });
 
     const res = await POST(req);
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(502);
     const data = await res.json();
     expect(data.reply).toContain('Neural Glitch');
     expect(data.error).toBe('Service Unavailable');
+    expect(data.retryable).toBe(true);
   });
 
   it('handles network failure with 500 status', async () => {

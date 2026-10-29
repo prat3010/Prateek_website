@@ -30,11 +30,21 @@ PERSONALITY & VOICE:
   * Never output raw bracket citations like [1, 2] in conversational replies.
   * Complete every thought fully and cleanly. Never truncate mid-sentence.`;
 
+function isTimeoutError(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    (error.name === 'TimeoutError' ||
+      error.name === 'AbortError' ||
+      /timeout|timed out/i.test(error.message))
+  );
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const query = (body.query || '').trim();
-    const history = Array.isArray(body.history) ? body.history : [];
+    const history = Array.isArray(body.history) ? body.history.slice(-16) : [];
+    const wantsStream = body.stream === true;
 
     if (!query) {
       return NextResponse.json({ error: 'Query is required.' }, { status: 400 });
@@ -69,34 +79,153 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         messages,
-        stream: false,
+        stream: wantsStream,
         use_repl: false,
         temperature: 0.5,
-        max_tokens: 2048,
+        max_tokens: 700,
+        top_k: 3,
         enable_reranking: false,
+        enable_query_rewriting: false,
+        enable_self_query: false,
+        enable_colbert_rerank: false,
       }),
       signal: AbortSignal.timeout(45000),
     });
 
     if (!res.ok) {
       const errText = await res.text().catch(() => '');
+      const isTimeout = res.status === 504 || res.status === 408;
       console.error(`Retriever API chat completion error [${res.status}]:`, errText);
       return NextResponse.json({
         reply: `⚠️ [Neural Glitch] The Oracle VPS cognitive engine returned status ${res.status}. Even sovereign cloud services stumble occasionally. Give it one more second and try again.`,
-        error: errText,
+        error: errText || `Upstream status ${res.status}`,
+        retryable: true,
+      }, { status: isTimeout ? 504 : 502 });
+    }
+
+    const contentType = res.headers.get('content-type') || '';
+    if (!wantsStream || !contentType.includes('text/event-stream')) {
+      const data = await res.json();
+      const rawChoice = data?.choices?.[0]?.message?.content || data?.analysis_summary || data?.content || 'No response received.';
+      // Strip raw bracket citations (e.g. [1, 2]) for clean terminal presentation
+      const cleanChoice = rawChoice.replace(/\[\d+(?:,\s*\d+)*\]/g, '').replace(/  +/g, ' ').trim();
+      const citations = data?.citations || data?.chunks || [];
+
+      return NextResponse.json({
+        reply: cleanChoice,
+        citations,
+        cacheLookup: res.headers.get('x-cache-lookup') || 'MISS',
       });
     }
 
-    const data = await res.json();
-    const rawChoice = data?.choices?.[0]?.message?.content || data?.analysis_summary || data?.content || 'No response received.';
-    // Strip raw bracket citations (e.g. [1, 2]) for clean terminal presentation
-    const cleanChoice = rawChoice.replace(/\[\d+(?:,\s*\d+)*\]/g, '').replace(/  +/g, ' ').trim();
-    const citations = data?.citations || data?.chunks || [];
+    if (!res.body) {
+      return NextResponse.json({
+        reply: '⚠️ [Neural Glitch] The cognitive engine returned an empty stream.',
+        error: 'Empty upstream stream',
+        retryable: true,
+      }, { status: 502 });
+    }
 
-    return NextResponse.json({
-      reply: cleanChoice,
-      citations,
-      cacheLookup: res.headers.get('x-cache-lookup') || 'MISS',
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
+    const cacheLookup = res.headers.get('x-cache-lookup') || 'MISS';
+    const upstreamBody = res.body;
+
+    const stream = new ReadableStream<Uint8Array>({
+      async start(controller) {
+        const reader = upstreamBody.getReader();
+        let buffer = '';
+        let closed = false;
+
+        const sendRaw = (frame: string) => {
+          if (closed) return;
+          try {
+            controller.enqueue(encoder.encode(`data: ${frame}\n\n`));
+          } catch {
+            closed = true;
+          }
+        };
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
+
+            for (const line of lines) {
+              const trimmed = line.trim();
+              if (!trimmed.startsWith('data:')) continue;
+
+              const payload = trimmed.slice(5).trim();
+              if (!payload) continue;
+              if (payload === '[DONE]') {
+                sendRaw('[DONE]');
+                closed = true;
+                continue;
+              }
+
+              try {
+                const parsed = JSON.parse(payload);
+                const delta =
+                  parsed?.choices?.[0]?.delta?.content ??
+                  parsed?.delta ??
+                  parsed?.text ??
+                  parsed?.content;
+
+                if (typeof delta === 'string' && delta.length > 0) {
+                  // Strip citations per-chunk; the model is instructed not to
+                  // emit bracketed citations, so split-token edge cases are rare.
+                  const clean = delta.replace(/\[\d+(?:,\s*\d+)*\]/g, '');
+                  if (clean) sendRaw(JSON.stringify({ delta: clean }));
+                }
+
+                if (parsed?.error) {
+                  sendRaw(JSON.stringify({
+                    error: String(parsed.error),
+                    retryable: parsed.retryable !== false,
+                  }));
+                }
+              } catch {
+                // Ignore non-JSON frames
+              }
+            }
+          }
+        } catch (error) {
+          const message = isTimeoutError(error)
+            ? 'The cognitive engine took longer than 45 seconds. Please retry.'
+            : error instanceof Error
+              ? error.message
+              : 'Stream interrupted';
+          sendRaw(JSON.stringify({ error: message, retryable: true }));
+        } finally {
+          try {
+            controller.close();
+          } catch {
+            // already closed
+          }
+          try {
+            reader.releaseLock();
+          } catch {
+            // already released
+          }
+        }
+      },
+      cancel() {
+        upstreamBody.cancel().catch(() => {});
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache, no-transform',
+        Connection: 'keep-alive',
+        'X-Accel-Buffering': 'no',
+        'X-Cache-Lookup': cacheLookup,
+      },
     });
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Unknown network failure';
@@ -104,6 +233,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       reply: `⚠️ [Connection Timeout] Could not establish neural bridge to rag.prateeq.in: ${msg}. Check network connectivity.`,
       error: msg,
-    }, { status: 500 });
+      retryable: true,
+    }, { status: isTimeoutError(error) ? 504 : 500 });
   }
 }

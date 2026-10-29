@@ -804,6 +804,22 @@ This document serves as the registry of critical architectural design decisions 
 
 ---
 
+# **ADR 48: Low-Latency AI Twin Streaming and Scheduled Retriever Warm-Up**
+
+* **Status**: Approved & Implemented
+* **Context**: The portfolio terminal's first AI Twin message timed out while an identical repeat succeeded in roughly three seconds. The uncached path paid for a cold Ollama load, hybrid retrieval, and full answer generation on the 1 OCPU / 1 GB Oracle VPS, exceeding the BFF's 45-second abort. The chat cache key also hashed only the latest user query, so answers could leak between conversations, and the UI could issue overlapping requests or report upstream failures as successful `200` responses.
+* **Decision**:
+  1. **True streaming**: Retriever `/v1/tenants/{tenantId}/chat/completions` now supports `stream: true` and emits OpenAI-compatible SSE delta frames followed by `[DONE]`. The terminal BFF proxies the stream to the browser, and the terminal UI renders incremental tokens instead of waiting for a complete JSON body. Non-streaming callers remain backward compatible.
+  2. **Bounded request cost**: Terminal requests cap history at 16 messages, `max_tokens` at 700, and `top_k` at 3, and explicitly disable query rewriting, self-query, ColBERT rerank, and reranking. The scoping BFF uses the same retrieval reductions with an 800-token cap.
+  3. **Correct cache semantics**: The chat cache key is versioned and hashes the full message thread, model, retrieval flags, `top_k`, temperature, and `max_tokens`. Entries expire after 600 seconds, completed streams are cached, and interrupted streams are not. Cache hits replay as SSE when the caller requested a stream.
+  4. **Warm-up path**: Retriever exposes `POST /v1/tenants/{tenantId}/warmup`, which runs a unique low-cost search to exercise Ollama, the vector store, and Redis without spending LLM tokens. Vercel serves `/api/cron/warmup`, authenticated by `CRON_SECRET`, and `.github/workflows/warmup.yml` calls it every five minutes.
+  5. **Truthful client errors**: The terminal BFF returns `502`/`504` with `retryable: true` on upstream failures. The terminal client retries once before any tokens render, guards against in-flight duplicate requests, and surfaces the real failure text. The scoping card keeps its deterministic local blueprint fallback and now shortens the upstream wait to 25 seconds, showing a toast when fallback mode is active.
+* **Consequences**:
+  * **Pros**: First-token latency is visible during cold starts, warm requests stay fast, cache entries are conversation-safe, scheduled warm-ups reduce cold Ollama penalties, and failed requests no longer masquerade as successful answers.
+  * **Cons**: `CRON_SECRET` must be configured in both Vercel and GitHub Actions. The scoping copilot still replays its local fallback word by word rather than streaming true model tokens. The 45-second BFF ceiling and Ollama embedding timeout remain and are tracked as follow-up work.
+
+---
+
 # **Acceptance Criteria**
 - Registry records cover the core v2 architectural choices.
 - Format follows standard ADR structures (Context, Decision, Consequences).

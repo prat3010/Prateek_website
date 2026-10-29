@@ -1186,8 +1186,9 @@ export async function POST(req: NextRequest) {
           { role: 'user', content: promptWithContext },
         ];
 
-        // 45-second timeout: allows dense vector embedding + BM25 hybrid search + GPT-4o-mini generation on VPS (matching Terminal AI Twin)
-        const timeoutMs = 45000;
+        // 25-second timeout: the local blueprint fallback should not leave the
+        // visitor staring at an empty bubble for the full 45s budget.
+        const timeoutMs = 25000;
         const abortCtrl = new AbortController();
         const timeoutTimer = setTimeout(() => {
           abortCtrl.abort(new Error(`Retriever completions timeout (${timeoutMs / 1000}s limit)`));
@@ -1202,7 +1203,11 @@ export async function POST(req: NextRequest) {
           const compRes = await client.completions(messages, {
             enable_reranking: false,
             temperature: 0.4,
-            max_tokens: 2048,
+            max_tokens: 800,
+            top_k: 3,
+            enable_query_rewriting: false,
+            enable_self_query: false,
+            enable_colbert_rerank: false,
             signal: abortCtrl.signal,
           });
 

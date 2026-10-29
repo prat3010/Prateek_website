@@ -398,7 +398,7 @@ export function InlineScopingChatCard({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: messageContent,
-          history: updatedMessages.slice(-8).map((m) => ({
+          history: updatedMessages.slice(0, -1).slice(-8).map((m) => ({
             role: m.role,
             content: m.content,
           })),
@@ -421,6 +421,12 @@ export function InlineScopingChatCard({
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         throw new Error(errorData.error || `HTTP error ${res.status}`);
+      }
+
+      if (res.headers.get('x-fallback-mode') === 'true') {
+        toast.info('Scoping engine busy', {
+          description: 'This blueprint was generated locally while the cognitive engine warms up.',
+        });
       }
 
       if (!res.body) {
