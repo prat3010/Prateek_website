@@ -357,7 +357,7 @@ describe('emailNotification service', () => {
       expect(sendMock).toHaveBeenCalledTimes(1);
       const call = sendMock.mock.calls[0][0];
       expect(call.to).toBe('prateek@test.com');
-      expect(call.subject).toContain('HOT SCOPING LEAD: $4,200 / ₹320,000 [SAAS] (US)');
+      expect(call.subject).toContain('HOT SCOPING LEAD: $4,200 / ₹3,20,000 [SAAS] (US)');
       expect(call.html).toContain('cto@futurecorp.com');
       expect(call.html).toContain('AI Vector Search');
       expect(call.html).toContain('enterprise SaaS with pgvector');

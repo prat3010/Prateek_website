@@ -1000,7 +1000,7 @@ export async function sendHotLeadAlertNotification(params: HotLeadAlertParams): 
         `<span style="display: inline-block; background: #334155; color: #38bdf8; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin: 2px 4px 2px 0;">${escapeHtml(f)}</span>`
     )
     .join('');
-  const quoteFormatted = `$${params.totalUSD.toLocaleString()} / ₹${params.totalINR.toLocaleString()}`;
+  const quoteFormatted = `$${params.totalUSD.toLocaleString('en-US')} / ₹${params.totalINR.toLocaleString('en-IN')}`;
 
   const subject = params.isEscrow
     ? `🚨 ESCROW ESCALATION: Bespoke/Physical Inquiry (${countryEscaped})`
