@@ -53,7 +53,7 @@ The client-side commercial PDFs (Scoping Brief, Services & Pricing Guide, Sales 
 | `/api/client/save-scope` | POST | Upsert client scope with Zod validation (requires Supabase `Bearer` session token) |
 | `/api/client/get-scopes` | GET | List scopes for the verified session email (requires Supabase `Bearer` session token) |
 | `/api/client/delete-scope` | DELETE | Delete draft/unpaid scope (session-gated) |
-| `/api/client/copilot` | POST | Grounded AI copilot querying client's dedicated Retriever RAG tenant |
+| `/api/client/copilot` | POST | Grounded AI copilot querying client's Retriever RAG tenant (40s budget; `502`/`504` on upstream failure) |
 | `/api/client/change-orders` | POST, GET | Submit and list Phase 2 Change Orders for active sprint scopes |
 | `/api/client/intake-draft` | POST | Save unauthenticated scoping draft to intake_leads with Zod validation |
 | `/api/client/create-razorpay-order` | POST | Initiate 50% scope deposit Razorpay order |
@@ -66,8 +66,8 @@ The client-side commercial PDFs (Scoping Brief, Services & Pricing Guide, Sales 
 | `/api/rag/telemetry` | GET | Fetch real-time RAG usage telemetry & cache stats |
 | `/api/webhooks/razorpay` | POST | Verify webhook signature and process payment/subscription events |
 | `/api/revalidate` | POST, GET | Purge Next.js cache (requires `SYNC_API_KEY`) |
-| `/api/cron/warmup` | POST, GET | Warm Retriever embedding/vector/Redis pools (requires `CRON_SECRET`) |
-| `/api/scoping/chat` | POST | Stream the scoping copilot reply with a local blueprint fallback |
+| `/api/cron/warmup` | POST, GET | Warm Retriever embedding/vector/Redis pools and generation path (requires `CRON_SECRET`) |
+| `/api/scoping/chat` | POST | Stream live Retriever tokens for the scoping copilot with a local blueprint fallback |
 | `/api/scoping/parse-intent` | POST | AI intent classification for scoping copilot |
 | `/api/scoping/parse-rfp` | POST | AI extraction of scope from uploaded RFP documents |
 | `/api/scoping/validate-promo` | POST | Validate promotional discount codes |
@@ -109,6 +109,17 @@ SYNC_API_KEY=your_sync_api_key
 # Shared secret for the scheduled Retriever warm-up endpoint
 # Add the same value as a GitHub Actions repository secret named CRON_SECRET.
 CRON_SECRET=your_cron_secret
+
+# Retriever cognitive engine (server-side)
+RETRIEVER_API_URL=https://rag.prateeq.in
+# Live scoping copilot. If either the tenant or key is absent, /api/scoping/chat
+# uses the deterministic local blueprint engine instead.
+RETRIEVER_SCOPING_TENANT_ID=your_scoping_tenant_id
+RETRIEVER_SCOPING_API_KEY=your_scoping_api_key
+RETRIEVER_SCOPING_USER_ID=your_scoping_user_id
+# Warm-up targets
+RETRIEVER_PORTFOLIO_TENANT_ID=your_portfolio_tenant_id
+RETRIEVER_PORTFOLIO_API_KEY=your_portfolio_api_key
 
 # Optional GitHub Token (to avoid anonymous rate limit on status tracker)
 GITHUB_TOKEN=your_github_token

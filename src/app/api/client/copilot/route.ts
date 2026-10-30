@@ -5,6 +5,11 @@ import { copilotQuerySchema } from '@/lib/clientOrder';
 import { RetrieverClient } from '@/lib/rag-client';
 import { checkRateLimit, rateLimitResponse, applyRateLimitHeaders } from '@/lib/rateLimit';
 
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
+
+const COPILOT_RETRIEVER_BUDGET_MS = 40_000;
+
 export async function POST(req: NextRequest) {
   try {
     const clientEmail = await getVerifiedSessionEmail(req);
@@ -121,9 +126,26 @@ export async function POST(req: NextRequest) {
       ((activeScope.metadata as Record<string, unknown> | undefined)?.retriever_api_key as string) ||
       process.env.RETRIEVER_SCOPING_API_KEY ||
       process.env.RETRIEVER_API_KEY;
-    const apiUrl = process.env.NEXT_PUBLIC_RETRIEVER_API_URL || 'https://rag.prateeq.in';
+    const apiUrl = (
+      process.env.RETRIEVER_API_URL ||
+      process.env.NEXT_PUBLIC_RETRIEVER_API_URL ||
+      'https://rag.prateeq.in'
+    ).replace(/\/$/, '');
 
     if (tenantId && apiKey) {
+      const abortController = new AbortController();
+      let timedOut = false;
+      const budgetTimer = setTimeout(() => {
+        timedOut = true;
+        abortController.abort(
+          new Error(`Retriever copilot timeout (${COPILOT_RETRIEVER_BUDGET_MS / 1000}s limit)`)
+        );
+      }, COPILOT_RETRIEVER_BUDGET_MS);
+      const onReqAbort = () => abortController.abort();
+      if (req.signal) {
+        req.signal.addEventListener('abort', onReqAbort, { once: true });
+      }
+
       try {
         const client = new RetrieverClient({
           apiUrl,
@@ -132,11 +154,15 @@ export async function POST(req: NextRequest) {
           userId: '00000000-0000-4000-a000-000000000001',
         });
 
-        const session = await client.createSession();
+        const session = await client.createSession(abortController.signal);
         const sessionId = session?.sessionId || (session as unknown as { session_id?: string })?.session_id;
         if (sessionId) {
           const contextHeader = `[Active Project: ${activeScope.scope_code || 'PROJ'} (${activeScope.company_name || 'Client'}) | Stage: ${deliveryStage.toUpperCase()} | Engine: ${engineTitle} | Modules: ${featuresList} | Investment: ${costINR || costUSD || 'Confirmed'} | Plan: ${maintenance}]\n\nClient Inquiry: ${query}`;
-          const completion = await client.chatComplete(sessionId, contextHeader);
+          const completion = await client.chatComplete(
+            sessionId,
+            contextHeader,
+            abortController.signal
+          );
           if (completion && completion.text) {
             answerText = completion.text;
             if (Array.isArray(completion.citations) && completion.citations.length > 0) {
@@ -157,7 +183,26 @@ export async function POST(req: NextRequest) {
           }
         }
       } catch (ragErr) {
-        console.warn('Retriever authentic chat completion fallback:', ragErr);
+        console.warn('Retriever authentic chat completion failed:', ragErr);
+        const isTimeout =
+          timedOut ||
+          (ragErr instanceof Error &&
+            (ragErr.name === 'TimeoutError' || ragErr.name === 'AbortError'));
+
+        return NextResponse.json(
+          {
+            error: isTimeout
+              ? 'The project copilot timed out while contacting Retriever. Please retry.'
+              : 'The project copilot could not reach Retriever right now. Please retry.',
+            retryable: true,
+          },
+          { status: isTimeout ? 504 : 502 }
+        );
+      } finally {
+        clearTimeout(budgetTimer);
+        if (req.signal) {
+          req.signal.removeEventListener('abort', onReqAbort);
+        }
       }
     }
 

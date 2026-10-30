@@ -252,10 +252,11 @@ describe('POST /api/client/copilot', () => {
     expect(res.status).toBe(200);
     const json = await res.json();
 
-    expect(createSessionSpy).toHaveBeenCalled();
+    expect(createSessionSpy).toHaveBeenCalledWith(expect.any(AbortSignal));
     expect(chatCompleteSpy).toHaveBeenCalledWith(
       'sess-xyz-123',
-      expect.stringContaining('What is my vector search architecture?')
+      expect.stringContaining('What is my vector search architecture?'),
+      expect.any(AbortSignal)
     );
     expect(json.answer).toContain('According to your verified SOW document');
     expect(json.citations.some((c: { id: string }) => c.id === 'doc-sow-9900')).toBe(true);
@@ -265,7 +266,7 @@ describe('POST /api/client/copilot', () => {
     vi.unstubAllEnvs();
   });
 
-  it('falls back gracefully to structured synthesis when authentic Retriever call fails', async () => {
+  it('returns a truthful 502 when the authentic Retriever call fails', async () => {
     vi.stubEnv('RETRIEVER_API_KEY', 'ret_key_test_123');
     mocks.state.scopes = [
       {
@@ -282,7 +283,7 @@ describe('POST /api/client/copilot', () => {
 
     const createSessionSpy = vi
       .spyOn(RetrieverClient.prototype, 'createSession')
-      .mockRejectedValue(new Error('OCI VPS Connection Timeout'));
+      .mockRejectedValue(new Error('OCI VPS Connection Refused'));
 
     const req = new NextRequest('http://localhost:3000/api/client/copilot', {
       method: 'POST',
@@ -290,14 +291,53 @@ describe('POST /api/client/copilot', () => {
     });
 
     const res = await POST(req);
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(502);
     const json = await res.json();
-
-    expect(createSessionSpy).toHaveBeenCalled();
-    expect(json.answer).toContain('Project Scope Overview (Fallback Systems)');
-    expect(json.answer).toContain('Full-Stack Web Engine');
+    expect(json.retryable).toBe(true);
+    expect(json.error).toContain('could not reach Retriever');
 
     createSessionSpy.mockRestore();
+    vi.unstubAllEnvs();
+  });
+
+  it('returns a truthful 504 when the Retriever call exceeds the bounded budget', async () => {
+    vi.stubEnv('RETRIEVER_API_KEY', 'ret_key_test_123');
+    mocks.state.scopes = [
+      {
+        id: 'scope-404',
+        scope_code: 'SCOPE-9902',
+        company_name: 'Timeout Systems',
+        client_email: 'client@example.com',
+        base_engine: 'SaaS AI Platform Engine',
+        features: ['pgvector Semantic Search'],
+        retriever_tenant_id: 'ten_timeout_9902',
+        deposit_paid: true,
+      },
+    ];
+
+    const createSessionSpy = vi
+      .spyOn(RetrieverClient.prototype, 'createSession')
+      .mockResolvedValue({ sessionId: 'sess-timeout-123', createdAt: '2026-10-20T00:00:00Z' });
+
+    const chatCompleteSpy = vi
+      .spyOn(RetrieverClient.prototype, 'chatComplete')
+      .mockRejectedValue(
+        Object.assign(new Error('The operation timed out.'), { name: 'TimeoutError' })
+      );
+
+    const req = new NextRequest('http://localhost:3000/api/client/copilot', {
+      method: 'POST',
+      body: JSON.stringify({ query: 'What is my vector search architecture?' }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(504);
+    const json = await res.json();
+    expect(json.retryable).toBe(true);
+    expect(json.error).toContain('timed out');
+
+    createSessionSpy.mockRestore();
+    chatCompleteSpy.mockRestore();
     vi.unstubAllEnvs();
   });
 });

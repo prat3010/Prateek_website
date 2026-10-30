@@ -7,6 +7,17 @@ export interface RetrieverConfig {
   llmProvider?: string;
 }
 
+interface ChatCompletionOptions {
+  temperature?: number;
+  max_tokens?: number;
+  enable_reranking?: boolean;
+  top_k?: number;
+  enable_query_rewriting?: boolean;
+  enable_self_query?: boolean;
+  enable_colbert_rerank?: boolean;
+  signal?: AbortSignal;
+}
+
 const REQUEST_TIMEOUT = 90_000;
 const MAX_RETRIES = 2;
 
@@ -122,11 +133,11 @@ export class RetrieverClient {
     return this.request<import("./rag-types").DocumentMeta[]>(`/v1/tenants/${this.config.tenantId}/documents`);
   }
 
-  async createSession() {
+  async createSession(signal?: AbortSignal) {
     const validUserId = requireUserId(this.config.userId);
     return this.request<{ sessionId: string; createdAt: string }>(
       `/v1/tenants/${this.config.tenantId}/chat/sessions`,
-      { method: "POST", body: JSON.stringify({ user_id: validUserId }) },
+      { method: "POST", body: JSON.stringify({ user_id: validUserId }), signal },
     );
   }
 
@@ -213,16 +224,7 @@ export class RetrieverClient {
 
   async completions(
     messages: { role: string; content: string }[],
-    options?: {
-      temperature?: number;
-      max_tokens?: number;
-      enable_reranking?: boolean;
-      top_k?: number;
-      enable_query_rewriting?: boolean;
-      enable_self_query?: boolean;
-      enable_colbert_rerank?: boolean;
-      signal?: AbortSignal;
-    }
+    options?: ChatCompletionOptions
   ): Promise<{ content: string; citations?: unknown[]; id?: string; model?: string }> {
     const url = `${this.config.apiUrl.replace(/\/$/, "")}/v1/tenants/${this.config.tenantId}/chat/completions`;
     const validUserId = requireUserId(this.config.userId);
@@ -242,24 +244,7 @@ export class RetrieverClient {
     const res = await fetch(url, {
       method: "POST",
       headers,
-      body: JSON.stringify({
-        messages,
-        stream: false,
-        use_repl: false,
-        temperature: options?.temperature ?? 0.4,
-        max_tokens: options?.max_tokens ?? 2048,
-        enable_reranking: options?.enable_reranking ?? false,
-        ...(options?.top_k !== undefined ? { top_k: options.top_k } : {}),
-        ...(options?.enable_query_rewriting !== undefined
-          ? { enable_query_rewriting: options.enable_query_rewriting }
-          : {}),
-        ...(options?.enable_self_query !== undefined
-          ? { enable_self_query: options.enable_self_query }
-          : {}),
-        ...(options?.enable_colbert_rerank !== undefined
-          ? { enable_colbert_rerank: options.enable_colbert_rerank }
-          : {}),
-      }),
+      body: JSON.stringify(this.buildCompletionsPayload(messages, options, false)),
       signal: options?.signal,
     });
 
@@ -274,6 +259,72 @@ export class RetrieverClient {
       citations: data?.citations || [],
       id: data?.id,
       model: data?.model,
+    };
+  }
+
+  /**
+   * Open a true token stream from Retriever's OpenAI-compatible completions
+   * endpoint. The caller owns the abort signal and must consume/cancel the body.
+   */
+  async completionsStream(
+    messages: { role: string; content: string }[],
+    options?: ChatCompletionOptions
+  ): Promise<ReadableStream<Uint8Array>> {
+    const url = `${this.config.apiUrl.replace(/\/$/, "")}/v1/tenants/${this.config.tenantId}/chat/completions`;
+    const validUserId = requireUserId(this.config.userId);
+    const { traceparent, traceId } = generateTraceparent();
+    this.lastTraceId = traceId;
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${this.config.apiKey}`,
+      "X-User-ID": validUserId,
+      "X-Tenant-ID": this.config.tenantId,
+      "traceparent": traceparent,
+      Accept: "text/event-stream",
+    };
+    if (this.config.llmKey) headers["X-LLM-Key"] = this.config.llmKey;
+    if (this.config.llmProvider) headers["X-LLM-Provider"] = this.config.llmProvider;
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(this.buildCompletionsPayload(messages, options, true)),
+      signal: options?.signal,
+    });
+
+    if (!res.ok) {
+      throw new Error(`Retriever completions stream error [${res.status}]: ${await res.text()}`);
+    }
+    if (!res.body) {
+      throw new Error("Retriever completions stream returned an empty body.");
+    }
+
+    return res.body;
+  }
+
+  private buildCompletionsPayload(
+    messages: { role: string; content: string }[],
+    options: ChatCompletionOptions | undefined,
+    stream: boolean
+  ) {
+    return {
+      messages,
+      stream,
+      use_repl: false,
+      temperature: options?.temperature ?? 0.4,
+      max_tokens: options?.max_tokens ?? 2048,
+      enable_reranking: options?.enable_reranking ?? false,
+      ...(options?.top_k !== undefined ? { top_k: options.top_k } : {}),
+      ...(options?.enable_query_rewriting !== undefined
+        ? { enable_query_rewriting: options.enable_query_rewriting }
+        : {}),
+      ...(options?.enable_self_query !== undefined
+        ? { enable_self_query: options.enable_self_query }
+        : {}),
+      ...(options?.enable_colbert_rerank !== undefined
+        ? { enable_colbert_rerank: options.enable_colbert_rerank }
+        : {}),
     };
   }
 

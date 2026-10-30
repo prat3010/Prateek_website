@@ -73,13 +73,14 @@ async function handleWarmup(req: NextRequest) {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({}),
-            signal: AbortSignal.timeout(50000),
+            signal: AbortSignal.timeout(55000),
             cache: 'no-store',
           }
         );
 
         const payload = (await res.json().catch(() => ({}))) as {
           latency_ms?: number;
+          generation_latency_ms?: number;
         };
         return {
           name: target.name,
@@ -88,6 +89,10 @@ async function handleWarmup(req: NextRequest) {
           latencyMs: Date.now() - started,
           upstreamLatencyMs:
             typeof payload?.latency_ms === 'number' ? payload.latency_ms : undefined,
+          generationLatencyMs:
+            typeof payload?.generation_latency_ms === 'number'
+              ? payload.generation_latency_ms
+              : undefined,
         };
       } catch (error) {
         return {

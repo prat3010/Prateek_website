@@ -8,7 +8,7 @@ on:
 
 jobs:
   warm:
-    name: Warm embedding, vector, and Redis pools
+    name: Warm embedding, vector, Redis, and generation paths
     runs-on: ubuntu-latest
     steps:
       - name: Verify warmup secret is configured

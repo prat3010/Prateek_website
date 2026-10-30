@@ -15,6 +15,11 @@ import { logScopingChatTrace } from '@/lib/scopingObservability';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
+const SCOPING_CONNECT_TIMEOUT_MS = 25_000;
+const SCOPING_STREAM_IDLE_TIMEOUT_MS = 25_000;
+const BLUEPRINT_OPEN_TAG = '<blueprint_action>';
+const BLUEPRINT_CLOSE_TAG = '</blueprint_action>';
+
 const {
   engines: rawEngines,
   features: rawFeatures,
@@ -606,6 +611,69 @@ function computePhasedBreakdown(
 }
 
 /**
+ * Builds the canonical, catalog-strict <blueprint_action> block that is
+ * appended to a live Retriever reply. Any upstream blueprint block is stripped
+ * before this runs, so the interactive card always matches the real catalog.
+ */
+function buildCanonicalBlueprintBlock(
+  prose: string,
+  targetEngineId: string,
+  targetFeatures: string[],
+  blueprintRec: BlueprintRecommendation,
+  currency: Currency,
+  hasExistingScope: boolean
+): string {
+  if (prose.toLowerCase().includes('escrow queue')) return '';
+
+  const effectiveFeatureIds = [...targetFeatures];
+  for (const feat of featureCatalog) {
+    const featRegex = new RegExp(`\\b${feat.id}\\b`, 'i');
+    if (featRegex.test(prose) && !effectiveFeatureIds.includes(feat.id)) {
+      effectiveFeatureIds.push(feat.id);
+    }
+  }
+
+  const extraDeps = resolveFeatureDependencies(effectiveFeatureIds, featureCatalog);
+  const allFeatureIds = Array.from(new Set([...effectiveFeatureIds, ...extraDeps]));
+  const validFeatureIds = allFeatureIds.filter((id) => featureCatalog.some((f) => f.id === id));
+
+  const quote = calcQuote(
+    engines,
+    featureCatalog,
+    brandAssets,
+    maintenancePlans,
+    {
+      engineId: targetEngineId,
+      featureIds: validFeatureIds,
+      brandAssetId: blueprintRec.brandAssetId || 'ready',
+      maintenancePlanId: blueprintRec.maintenancePlanId || 'standard',
+    },
+    currency
+  );
+
+  const canonicalBlueprintObj = {
+    archetypeId: blueprintRec.archetypeId,
+    baseEngineId: targetEngineId,
+    featureIds: validFeatureIds,
+    brandAssetId: blueprintRec.brandAssetId || 'ready',
+    maintenancePlanId: blueprintRec.maintenancePlanId || 'standard',
+    suggestedTimeline: blueprintRec.suggestedTimeline,
+    title: hasExistingScope ? `Refined ${targetEngineId.toUpperCase()} Scope` : blueprintRec.title,
+    totalINR: quote.netTotalINR,
+    totalUSD: quote.netTotalUSD,
+    phasedBreakdown: computePhasedBreakdown(
+      targetEngineId,
+      validFeatureIds,
+      currency,
+      blueprintRec.brandAssetId || 'ready',
+      blueprintRec.maintenancePlanId || 'standard'
+    ),
+  };
+
+  return `\n\n${BLUEPRINT_OPEN_TAG}\n${JSON.stringify(canonicalBlueprintObj, null, 2)}\n${BLUEPRINT_CLOSE_TAG}`;
+}
+
+/**
  * Builds the complete fallback conversational response with structured <blueprint_action>
  */
 function buildFallbackResponseText(
@@ -975,35 +1043,165 @@ function createTextStream(
   });
 }
 
-function extractCleanProseFromSse(rawSse: string): string {
-  let cleanText = '';
-  const lines = rawSse.split('\n');
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed) continue;
-    if (trimmed.startsWith('data: ')) {
-      const payload = trimmed.slice(6).trim();
-      if (payload === '[DONE]') continue;
-      try {
-        const parsed = JSON.parse(payload);
-        if (typeof parsed.delta === 'string') cleanText += parsed.delta;
-        else if (typeof parsed.text === 'string') cleanText += parsed.text;
-        else if (typeof parsed.content === 'string') cleanText += parsed.content;
-      } catch {
-        cleanText += payload;
-      }
-    } else if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
-      try {
-        const parsed = JSON.parse(trimmed);
-        if (typeof parsed.delta === 'string') cleanText += parsed.delta;
-        else if (typeof parsed.text === 'string') cleanText += parsed.text;
-        else if (typeof parsed.content === 'string') cleanText += parsed.content;
-      } catch {
-        // Not JSON
-      }
+interface UpstreamSseEvent {
+  text?: string;
+  error?: string;
+  done: boolean;
+}
+
+/**
+ * Reads Retriever's OpenAI-compatible SSE frames into plain text deltas.
+ * The idle timeout bounds a stalled upstream stream without cutting off a
+ * healthy long answer.
+ */
+function createUpstreamSseReader(
+  stream: ReadableStream<Uint8Array>,
+  idleTimeoutMs: number
+) {
+  const reader = stream.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let closed = false;
+
+  async function readChunk(): Promise<ReadableStreamReadResult<Uint8Array>> {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      return await Promise.race([
+        reader.read(),
+        new Promise<never>((_, reject) => {
+          timer = setTimeout(() => {
+            reader.cancel().catch(() => {});
+            reject(new Error(`Retriever stream idle timeout (${idleTimeoutMs / 1000}s)`));
+          }, idleTimeoutMs);
+        }),
+      ]);
+    } finally {
+      if (timer) clearTimeout(timer);
     }
   }
-  return cleanText || rawSse;
+
+  async function next(): Promise<UpstreamSseEvent> {
+    while (!closed) {
+      const newline = buffer.indexOf('\n');
+      if (newline !== -1) {
+        const rawLine = buffer.slice(0, newline);
+        buffer = buffer.slice(newline + 1);
+        const line = rawLine.replace(/\r$/, '').trim();
+        if (!line || !line.startsWith('data:')) continue;
+
+        const payload = line.slice(5).trim();
+        if (payload === '[DONE]') {
+          closed = true;
+          return { done: true };
+        }
+
+        try {
+          const parsed = JSON.parse(payload);
+          if (parsed?.error) {
+            return { error: String(parsed.error), done: false };
+          }
+          const text =
+            parsed?.choices?.[0]?.delta?.content ??
+            parsed?.delta ??
+            parsed?.text ??
+            parsed?.content;
+          if (typeof text === 'string' && text.length > 0) {
+            return { text, done: false };
+          }
+        } catch {
+          // Ignore malformed frames and SSE comments.
+        }
+        continue;
+      }
+
+      const { done, value } = await readChunk();
+      if (done) {
+        closed = true;
+        return { done: true };
+      }
+      buffer += decoder.decode(value, { stream: true });
+    }
+    return { done: true };
+  }
+
+  return {
+    next,
+    cancel: () => {
+      closed = true;
+      reader.cancel().catch(() => {});
+    },
+  };
+}
+
+/**
+ * Removes <blueprint_action> blocks from a token stream even when the tag is
+ * split across upstream chunks, while retaining a small tail to detect partial
+ * opening tags.
+ */
+function createBlueprintTagFilter() {
+  let buffer = '';
+  let insideBlueprint = false;
+
+  function drain(final: boolean): string {
+    let output = '';
+
+    while (buffer.length > 0) {
+      const lowerBuffer = buffer.toLowerCase();
+
+      if (insideBlueprint) {
+        const closeIndex = lowerBuffer.indexOf(BLUEPRINT_CLOSE_TAG);
+        if (closeIndex === -1) {
+          if (final) {
+            buffer = '';
+          } else {
+            const keep = BLUEPRINT_CLOSE_TAG.length - 1;
+            if (buffer.length > keep) buffer = buffer.slice(-keep);
+          }
+          break;
+        }
+        buffer = buffer.slice(closeIndex + BLUEPRINT_CLOSE_TAG.length);
+        insideBlueprint = false;
+        continue;
+      }
+
+      const openIndex = lowerBuffer.indexOf(BLUEPRINT_OPEN_TAG);
+      if (openIndex === -1) {
+        if (final) {
+          const partialStart = lowerBuffer.lastIndexOf('<');
+          const partialTag =
+            partialStart === -1 ? '' : lowerBuffer.slice(partialStart);
+          output +=
+            partialTag && BLUEPRINT_OPEN_TAG.startsWith(partialTag)
+              ? buffer.slice(0, partialStart)
+              : buffer;
+          buffer = '';
+        } else {
+          const keep = BLUEPRINT_OPEN_TAG.length - 1;
+          if (buffer.length > keep) {
+            output += buffer.slice(0, buffer.length - keep);
+            buffer = buffer.slice(-keep);
+          }
+        }
+        break;
+      }
+
+      output += buffer.slice(0, openIndex);
+      buffer = buffer.slice(openIndex + BLUEPRINT_OPEN_TAG.length);
+      insideBlueprint = true;
+    }
+
+    return output;
+  }
+
+  return {
+    push(text: string): string {
+      buffer += text;
+      return drain(false);
+    },
+    flush(): string {
+      return drain(true);
+    },
+  };
 }
 
 export async function POST(req: NextRequest) {
@@ -1048,11 +1246,11 @@ export async function POST(req: NextRequest) {
     const tenantId =
       process.env.RETRIEVER_SCOPING_TENANT_ID ||
       process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_TENANT_ID ||
-      (process.env.NODE_ENV !== 'test' ? '1f85286c-9d9a-4ebc-9c62-a99360a5ece4' : '');
+      '';
     const apiKey =
       process.env.RETRIEVER_SCOPING_API_KEY ||
       process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_API_KEY ||
-      (process.env.NODE_ENV !== 'test' ? 'ret_live_ScopingGuest2026.ReadOnlyChat' : '');
+      '';
     const apiUrl = (
       process.env.RETRIEVER_API_URL ||
       process.env.NEXT_PUBLIC_RETRIEVER_API_URL ||
@@ -1164,9 +1362,10 @@ export async function POST(req: NextRequest) {
       ? currentScope.selectedFeatures
       : blueprintRec.featureIds;
 
-    // 3. Attempt Fast Stateless Completions from Retriever Cognitive Engine
-    let fullResponseText = '';
+    // 3. Attempt true token streaming from Retriever's cognitive engine.
     let usedRetriever = false;
+    let upstreamReader: ReturnType<typeof createUpstreamSseReader> | null = null;
+    let firstText = '';
 
     if (tenantId && apiKey) {
       const client = new RetrieverClient({
@@ -1176,143 +1375,253 @@ export async function POST(req: NextRequest) {
         userId,
       });
 
+      const messages = [
+        { role: 'system', content: SCOPING_ARCHITECT_SYSTEM_PROMPT },
+        ...history.map((m: { role: string; content: string }) => ({
+          role: m.role === 'assistant' ? 'assistant' : 'user',
+          content: String(m.content || ''),
+        })),
+        { role: 'user', content: promptWithContext },
+      ];
+
+      const abortCtrl = new AbortController();
+      const connectTimer = setTimeout(() => {
+        abortCtrl.abort(
+          new Error(`Retriever completions timeout (${SCOPING_CONNECT_TIMEOUT_MS / 1000}s limit)`)
+        );
+      }, SCOPING_CONNECT_TIMEOUT_MS);
+      const onReqAbort = () => abortCtrl.abort();
+      if (req.signal) {
+        req.signal.addEventListener('abort', onReqAbort, { once: true });
+      }
+
       try {
-        const messages = [
-          { role: 'system', content: SCOPING_ARCHITECT_SYSTEM_PROMPT },
-          ...history.map((m: { role: string; content: string }) => ({
-            role: m.role === 'assistant' ? 'assistant' : 'user',
-            content: String(m.content || ''),
-          })),
-          { role: 'user', content: promptWithContext },
-        ];
+        const upstream = await client.completionsStream(messages, {
+          enable_reranking: false,
+          temperature: 0.4,
+          max_tokens: 800,
+          top_k: 3,
+          enable_query_rewriting: false,
+          enable_self_query: false,
+          enable_colbert_rerank: false,
+          signal: abortCtrl.signal,
+        });
 
-        // 25-second timeout: the local blueprint fallback should not leave the
-        // visitor staring at an empty bubble for the full 45s budget.
-        const timeoutMs = 25000;
-        const abortCtrl = new AbortController();
-        const timeoutTimer = setTimeout(() => {
-          abortCtrl.abort(new Error(`Retriever completions timeout (${timeoutMs / 1000}s limit)`));
-        }, timeoutMs);
+        const reader = createUpstreamSseReader(
+          upstream,
+          SCOPING_STREAM_IDLE_TIMEOUT_MS
+        );
+        upstreamReader = reader;
 
-        const onReqAbort = () => abortCtrl.abort();
+        // Wait for the first token before committing to a 200 streaming
+        // response, so a dead upstream can still use the deterministic local
+        // blueprint fallback with truthful headers.
+        while (true) {
+          const event = await reader.next();
+          if (event.error) throw new Error(event.error);
+          if (event.done) break;
+          if (event.text) {
+            firstText = event.text;
+            break;
+          }
+        }
+
+        usedRetriever = firstText.length > 0;
+        if (!usedRetriever) {
+          reader.cancel();
+          upstreamReader = null;
+        }
+      } catch (err) {
+        console.warn(
+          'Retriever stream failed or timed out; falling back to local blueprint engine:',
+          err
+        );
+        upstreamReader?.cancel();
+        upstreamReader = null;
+      } finally {
+        clearTimeout(connectTimer);
         if (req.signal) {
-          req.signal.addEventListener('abort', onReqAbort, { once: true });
+          req.signal.removeEventListener('abort', onReqAbort);
+        }
+      }
+    }
+
+    const logTrace = (
+      assistantResponse: string,
+      latencyMs: number,
+      trace: { isFallback: boolean; modelUsed: string }
+    ) => {
+      logScopingChatTrace({
+        sessionId: resolvedSessionId,
+        scopeCode,
+        turnIndex,
+        userQuery: prompt,
+        assistantResponse,
+        agentIntent: blueprintRec.archetypeId,
+        agentReasoning: `${blueprintRec.title}: ${blueprintRec.summary}`,
+        modelUsed: trace.modelUsed,
+        latencyMs,
+        isFallback: trace.isFallback,
+        currency,
+        currentEngine: targetEngineId,
+        selectedFeatures: targetFeatures,
+        quoteINR: currentScope?.totalINR || 0,
+        quoteUSD: currentScope?.totalUSD || 0,
+        visitorIpHash: ipHash,
+        visitorCountry,
+        visitorUserAgent: userAgent,
+      }).catch((err) => console.warn('Trace logging warning:', err));
+    };
+
+    // 4. Graceful Fallback Mode: Local Heuristic Rule-Based Blueprint Engine
+    if (!usedRetriever || !upstreamReader) {
+      const fallbackText = buildFallbackResponseText(prompt, currency, currentScope);
+      const fallbackStream = createTextStream(fallbackText, 6, req.signal);
+
+      logTrace(fallbackText, Math.round(performance.now() - startTime), {
+        isFallback: true,
+        modelUsed: 'heuristic-rule-engine',
+      });
+
+      return new Response(fallbackStream, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache, no-transform',
+          'Connection': 'keep-alive',
+          'X-Session-ID': resolvedSessionId,
+          'X-Fallback-Mode': 'true',
+          'X-Accel-Buffering': 'no',
+          'Set-Cookie': `prateeq_chat_session_id=${encodeURIComponent(resolvedSessionId)}; Path=/; Max-Age=2592000; SameSite=Lax`,
+        },
+      });
+    }
+
+    // 5. Proxy real Retriever tokens, stripping any upstream blueprint block,
+    // then append the canonical catalog-strict card.
+    const reader = upstreamReader;
+    const tagFilter = createBlueprintTagFilter();
+    let proseText = '';
+    let finalText = '';
+    let servedFallback = false;
+    let streamClosed = false;
+
+    const stream = new ReadableStream<Uint8Array>({
+      async start(controller) {
+        const encoder = new TextEncoder();
+        const emit = (text: string) => {
+          if (!text || streamClosed) return;
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ delta: text })}\n\n`));
+        };
+
+        const onAbort = () => {
+          if (streamClosed) return;
+          streamClosed = true;
+          reader.cancel();
+          try {
+            controller.close();
+          } catch {
+            // already closed
+          }
+        };
+
+        if (req.signal) {
+          if (req.signal.aborted) {
+            onAbort();
+            return;
+          }
+          req.signal.addEventListener('abort', onAbort, { once: true });
         }
 
         try {
-          const compRes = await client.completions(messages, {
-            enable_reranking: false,
-            temperature: 0.4,
-            max_tokens: 800,
-            top_k: 3,
-            enable_query_rewriting: false,
-            enable_self_query: false,
-            enable_colbert_rerank: false,
-            signal: abortCtrl.signal,
-          });
+          const firstFiltered = tagFilter.push(firstText);
+          if (firstFiltered) {
+            proseText += firstFiltered;
+            emit(firstFiltered);
+          }
 
-          if (compRes?.content && compRes.content.trim().length > 0) {
-            fullResponseText = compRes.content.trim();
-            usedRetriever = true;
+          while (!streamClosed) {
+            const event = await reader.next();
+            if (event.error) throw new Error(event.error);
+            if (event.done) break;
+            if (event.text) {
+              const filtered = tagFilter.push(event.text);
+              if (filtered) {
+                proseText += filtered;
+                emit(filtered);
+              }
+            }
+          }
+
+          const tail = tagFilter.flush();
+          if (tail) {
+            proseText += tail;
+            emit(tail);
+          }
+
+          const blueprintBlock = buildCanonicalBlueprintBlock(
+            proseText,
+            targetEngineId,
+            targetFeatures,
+            blueprintRec,
+            currency,
+            hasExistingScope
+          );
+          if (blueprintBlock) emit(blueprintBlock);
+          finalText = proseText + blueprintBlock;
+
+          if (!streamClosed) {
+            controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+            controller.close();
+            streamClosed = true;
+          }
+        } catch (err) {
+          console.warn('Retriever token stream interrupted:', err);
+
+          if (!proseText.trim()) {
+            const fallbackText = buildFallbackResponseText(prompt, currency, currentScope);
+            servedFallback = true;
+            finalText = fallbackText;
+            emit(fallbackText);
+          } else {
+            const interruption =
+              '\n\nThe architecture stream was interrupted. Please retry.';
+            const blueprintBlock = buildCanonicalBlueprintBlock(
+              proseText,
+              targetEngineId,
+              targetFeatures,
+              blueprintRec,
+              currency,
+              hasExistingScope
+            );
+            finalText = proseText + interruption + blueprintBlock;
+            emit(interruption);
+            if (blueprintBlock) emit(blueprintBlock);
+          }
+
+          if (!streamClosed) {
+            try {
+              controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+              controller.close();
+            } catch {
+              // already closed
+            }
+            streamClosed = true;
           }
         } finally {
-          clearTimeout(timeoutTimer);
           if (req.signal) {
-            req.signal.removeEventListener('abort', onReqAbort);
+            req.signal.removeEventListener('abort', onAbort);
           }
+          logTrace(finalText || proseText, Math.round(performance.now() - startTime), {
+            isFallback: servedFallback,
+            modelUsed: servedFallback ? 'heuristic-rule-engine' : 'retriever-vps',
+          });
         }
-      } catch (err) {
-        console.warn('Retriever completions failed or timed out; falling back to local blueprint engine:', err);
-      }
-    }
-
-    // 4. Graceful Fallback Mode: Local Heuristic Rule-Based Blueprint Engine
-    if (!usedRetriever || !fullResponseText.trim()) {
-      fullResponseText = buildFallbackResponseText(prompt, currency, currentScope);
-    } else {
-      // 5. Always sanitize Retriever output and attach canonical, catalog-strict <blueprint_action>
-      // Strip any hallucinated/unvalidated <blueprint_action> block from Retriever's prose
-      fullResponseText = fullResponseText
-        .replace(/<blueprint_action>[\s\S]*?<\/blueprint_action>/gi, '')
-        .trim();
-
-      if (!fullResponseText.toLowerCase().includes('escrow queue')) {
-        // Collect model-suggested valid features
-        const effectiveFeatureIds = [...targetFeatures];
-        for (const feat of featureCatalog) {
-          const featRegex = new RegExp(`\\b${feat.id}\\b`, 'i');
-          if (featRegex.test(fullResponseText) && !effectiveFeatureIds.includes(feat.id)) {
-            effectiveFeatureIds.push(feat.id);
-          }
-        }
-
-        const extraDeps = resolveFeatureDependencies(effectiveFeatureIds, featureCatalog);
-        const allFeatureIds = Array.from(new Set([...effectiveFeatureIds, ...extraDeps]));
-        const validFeatureIds = allFeatureIds.filter((id) => featureCatalog.some((f) => f.id === id));
-
-        const quote = calcQuote(
-          engines,
-          featureCatalog,
-          brandAssets,
-          maintenancePlans,
-          {
-            engineId: targetEngineId,
-            featureIds: validFeatureIds,
-            brandAssetId: blueprintRec.brandAssetId || 'ready',
-            maintenancePlanId: blueprintRec.maintenancePlanId || 'standard',
-          },
-          currency
-        );
-
-        const canonicalBlueprintObj = {
-          archetypeId: blueprintRec.archetypeId,
-          baseEngineId: targetEngineId,
-          featureIds: validFeatureIds,
-          brandAssetId: blueprintRec.brandAssetId || 'ready',
-          maintenancePlanId: blueprintRec.maintenancePlanId || 'standard',
-          suggestedTimeline: blueprintRec.suggestedTimeline,
-          title: hasExistingScope ? `Refined ${targetEngineId.toUpperCase()} Scope` : blueprintRec.title,
-          totalINR: quote.netTotalINR,
-          totalUSD: quote.netTotalUSD,
-          phasedBreakdown: computePhasedBreakdown(
-            targetEngineId,
-            validFeatureIds,
-            currency,
-            blueprintRec.brandAssetId || 'ready',
-            blueprintRec.maintenancePlanId || 'standard'
-          ),
-        };
-
-        const canonicalBlueprintJson = JSON.stringify(canonicalBlueprintObj, null, 2);
-        fullResponseText += `\n\n<blueprint_action>\n${canonicalBlueprintJson}\n</blueprint_action>`;
-      }
-    }
-
-    // 6. Realistic, collision-free SSE Stream
-    const stream = createTextStream(fullResponseText, 6, req.signal);
-
-    // Asynchronously log telemetry trace
-    const elapsed = Math.round(performance.now() - startTime);
-    logScopingChatTrace({
-      sessionId: resolvedSessionId,
-      scopeCode,
-      turnIndex,
-      userQuery: prompt,
-      assistantResponse: extractCleanProseFromSse(fullResponseText),
-      agentIntent: blueprintRec.archetypeId,
-      agentReasoning: `${blueprintRec.title}: ${blueprintRec.summary}`,
-      modelUsed: usedRetriever ? 'retriever-vps' : 'heuristic-rule-engine',
-      latencyMs: elapsed,
-      isFallback: !usedRetriever,
-      currency,
-      currentEngine: targetEngineId,
-      selectedFeatures: targetFeatures,
-      quoteINR: currentScope?.totalINR || 0,
-      quoteUSD: currentScope?.totalUSD || 0,
-      visitorIpHash: ipHash,
-      visitorCountry,
-      visitorUserAgent: userAgent,
-    }).catch((err) => console.warn('Trace logging warning:', err));
+      },
+      cancel() {
+        streamClosed = true;
+        reader.cancel();
+      },
+    });
 
     return new Response(stream, {
       headers: {

@@ -45,7 +45,7 @@ describe('/api/cron/warmup route', () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
-      json: vi.fn().mockResolvedValue({ latency_ms: 12000 }),
+      json: vi.fn().mockResolvedValue({ latency_ms: 12000, generation_latency_ms: 250 }),
     } as unknown as Response);
 
     const req = new NextRequest('http://localhost/api/cron/warmup', {
@@ -58,6 +58,7 @@ describe('/api/cron/warmup route', () => {
     const data = await res.json();
     expect(data.ok).toBe(true);
     expect(data.warmed).toBe(2);
+    expect(data.results[0].generationLatencyMs).toBe(250);
     expect(global.fetch).toHaveBeenCalledTimes(2);
   });
 });

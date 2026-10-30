@@ -40,6 +40,20 @@ async function parseSseStream(stream: ReadableStream<Uint8Array>): Promise<strin
   return accumulated;
 }
 
+function retrieverFrame(content: string): string {
+  return `data: ${JSON.stringify({ choices: [{ delta: { content } }] })}\n\n`;
+}
+
+function createRetrieverSseStream(frames: string[]): ReadableStream<Uint8Array> {
+  const encoder = new TextEncoder();
+  return new ReadableStream({
+    start(controller) {
+      for (const frame of frames) controller.enqueue(encoder.encode(frame));
+      controller.close();
+    },
+  });
+}
+
 describe('POST /api/scoping/chat', () => {
   it('returns 400 when message is empty', async () => {
     const req = new NextRequest('http://localhost:3000/api/scoping/chat', {
@@ -205,15 +219,19 @@ describe('POST /api/scoping/chat', () => {
     expect(res.headers.get('Content-Type')).toContain('text/event-stream');
   });
 
-  it('streams upstream tokens directly when RetrieverClient succeeds', async () => {
+  it('streams live Retriever token frames directly when configured', async () => {
     process.env.RETRIEVER_SCOPING_TENANT_ID = 'test_tenant_live_123';
     process.env.RETRIEVER_SCOPING_API_KEY = 'test_api_key_live_456';
 
-    const completionsSpy = vi
-      .spyOn(RetrieverClient.prototype, 'completions')
-      .mockResolvedValue({
-        content: 'Live Retriever guidance with custom architecture recommendations.',
-      });
+    const streamSpy = vi
+      .spyOn(RetrieverClient.prototype, 'completionsStream')
+      .mockResolvedValue(
+        createRetrieverSseStream([
+          retrieverFrame('Live Retriever guidance with '),
+          retrieverFrame('custom architecture recommendations.'),
+          'data: [DONE]\n\n',
+        ])
+      );
 
     try {
       const req = new NextRequest('http://localhost:3000/api/scoping/chat', {
@@ -231,9 +249,22 @@ describe('POST /api/scoping/chat', () => {
       expect(res.headers.get('X-Fallback-Mode')).toBe('false');
 
       const text = await parseSseStream(res.body!);
-      expect(text).toContain('Live Retriever guidance');
+      expect(text).toContain('Live Retriever guidance with custom architecture recommendations.');
+      expect(text).toContain('<blueprint_action>');
+
+      expect(streamSpy).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.objectContaining({ role: 'user', content: expect.stringContaining('Can you recommend an architecture?') }),
+        ]),
+        expect.objectContaining({
+          enable_reranking: false,
+          max_tokens: 800,
+          top_k: 3,
+          signal: expect.any(AbortSignal),
+        })
+      );
     } finally {
-      completionsSpy.mockRestore();
+      streamSpy.mockRestore();
       delete process.env.RETRIEVER_SCOPING_TENANT_ID;
       delete process.env.RETRIEVER_SCOPING_API_KEY;
     }
@@ -243,11 +274,14 @@ describe('POST /api/scoping/chat', () => {
     process.env.RETRIEVER_SCOPING_TENANT_ID = 'test_tenant_live_123';
     process.env.RETRIEVER_SCOPING_API_KEY = 'test_api_key_live_456';
 
-    const completionsSpy = vi
-      .spyOn(RetrieverClient.prototype, 'completions')
-      .mockResolvedValue({
-        content: 'I remember our prior discussion about auth.',
-      });
+    const streamSpy = vi
+      .spyOn(RetrieverClient.prototype, 'completionsStream')
+      .mockResolvedValue(
+        createRetrieverSseStream([
+          retrieverFrame('I remember our prior discussion about auth.'),
+          'data: [DONE]\n\n',
+        ])
+      );
 
     try {
       const req = new NextRequest('http://localhost:3000/api/scoping/chat', {
@@ -263,7 +297,7 @@ describe('POST /api/scoping/chat', () => {
       });
       const res = await POST(req);
       expect(res.status).toBe(200);
-      expect(completionsSpy).toHaveBeenCalledWith(
+      expect(streamSpy).toHaveBeenCalledWith(
         expect.arrayContaining([
           expect.objectContaining({ role: 'user', content: 'I need auth' }),
           expect.objectContaining({ role: 'assistant', content: 'Sure, Supabase auth is recommended' }),
@@ -272,7 +306,7 @@ describe('POST /api/scoping/chat', () => {
         expect.objectContaining({ enable_reranking: false })
       );
     } finally {
-      completionsSpy.mockRestore();
+      streamSpy.mockRestore();
       delete process.env.RETRIEVER_SCOPING_TENANT_ID;
       delete process.env.RETRIEVER_SCOPING_API_KEY;
     }
@@ -282,8 +316,8 @@ describe('POST /api/scoping/chat', () => {
     process.env.RETRIEVER_SCOPING_TENANT_ID = 'test_tenant_live_123';
     process.env.RETRIEVER_SCOPING_API_KEY = 'test_api_key_live_456';
 
-    const completionsSpy = vi
-      .spyOn(RetrieverClient.prototype, 'completions')
+    const streamSpy = vi
+      .spyOn(RetrieverClient.prototype, 'completionsStream')
       .mockRejectedValue(new Error('Connection refused by VPS'));
 
     try {
@@ -302,7 +336,110 @@ describe('POST /api/scoping/chat', () => {
       expect(text).toContain('<blueprint_action>');
       expect(text).toContain('Direct-to-Consumer E-Commerce Store');
     } finally {
-      completionsSpy.mockRestore();
+      streamSpy.mockRestore();
+      delete process.env.RETRIEVER_SCOPING_TENANT_ID;
+      delete process.env.RETRIEVER_SCOPING_API_KEY;
+    }
+  });
+
+  it('falls back locally without calling Retriever when no API key is configured', async () => {
+    const streamSpy = vi.spyOn(RetrieverClient.prototype, 'completionsStream');
+
+    try {
+      const req = new NextRequest('http://localhost:3000/api/scoping/chat', {
+        method: 'POST',
+        body: JSON.stringify({
+          message: 'Build me an online store with checkout',
+          currency: 'INR',
+        }),
+      });
+      const res = await POST(req);
+      expect(res.status).toBe(200);
+      expect(res.headers.get('X-Fallback-Mode')).toBe('true');
+      expect(streamSpy).not.toHaveBeenCalled();
+
+      const text = await parseSseStream(res.body!);
+      expect(text).toContain('<blueprint_action>');
+    } finally {
+      streamSpy.mockRestore();
+    }
+  });
+
+  it('strips an upstream blueprint block split across frames and appends the canonical card', async () => {
+    process.env.RETRIEVER_SCOPING_TENANT_ID = 'test_tenant_live_123';
+    process.env.RETRIEVER_SCOPING_API_KEY = 'test_api_key_live_456';
+
+    const streamSpy = vi
+      .spyOn(RetrieverClient.prototype, 'completionsStream')
+      .mockResolvedValue(
+        createRetrieverSseStream([
+          retrieverFrame('Grounded architecture advice. <blueprint_'),
+          retrieverFrame('action>{"featureIds":["hacked_module"]}</blueprint_action>'),
+          retrieverFrame(' Keep the stack lean.'),
+          'data: [DONE]\n\n',
+        ])
+      );
+
+    try {
+      const req = new NextRequest('http://localhost:3000/api/scoping/chat', {
+        method: 'POST',
+        body: JSON.stringify({
+          message: 'I need a private AI knowledge base with vector search',
+          currency: 'USD',
+        }),
+      });
+      const res = await POST(req);
+      expect(res.status).toBe(200);
+      expect(res.headers.get('X-Fallback-Mode')).toBe('false');
+
+      const text = await parseSseStream(res.body!);
+      expect(text).toContain('Grounded architecture advice.');
+      expect(text).toContain('Keep the stack lean.');
+      expect(text).not.toContain('hacked_module');
+      expect(text.match(/<blueprint_action>/g)).toHaveLength(1);
+
+      const match = text.match(/<blueprint_action>([\s\S]*?)<\/blueprint_action>/);
+      expect(match).toBeTruthy();
+      const blueprint = JSON.parse(match![1].trim());
+      expect(blueprint.featureIds).toContain('ai_rag');
+      expect(blueprint.featureIds).not.toContain('hacked_module');
+    } finally {
+      streamSpy.mockRestore();
+      delete process.env.RETRIEVER_SCOPING_TENANT_ID;
+      delete process.env.RETRIEVER_SCOPING_API_KEY;
+    }
+  });
+
+  it('falls back when the upstream stream reports an error before any token', async () => {
+    process.env.RETRIEVER_SCOPING_TENANT_ID = 'test_tenant_live_123';
+    process.env.RETRIEVER_SCOPING_API_KEY = 'test_api_key_live_456';
+
+    const streamSpy = vi
+      .spyOn(RetrieverClient.prototype, 'completionsStream')
+      .mockResolvedValue(
+        createRetrieverSseStream([
+          `data: ${JSON.stringify({ error: 'The cognitive engine stream was interrupted. Please retry.', retryable: true })}\n\n`,
+          'data: [DONE]\n\n',
+        ])
+      );
+
+    try {
+      const req = new NextRequest('http://localhost:3000/api/scoping/chat', {
+        method: 'POST',
+        body: JSON.stringify({
+          message: 'Build me an online store with checkout',
+          currency: 'INR',
+        }),
+      });
+      const res = await POST(req);
+      expect(res.status).toBe(200);
+      expect(res.headers.get('X-Fallback-Mode')).toBe('true');
+
+      const text = await parseSseStream(res.body!);
+      expect(text).toContain('Direct-to-Consumer E-Commerce Store');
+      expect(text).not.toContain('cognitive engine stream was interrupted');
+    } finally {
+      streamSpy.mockRestore();
       delete process.env.RETRIEVER_SCOPING_TENANT_ID;
       delete process.env.RETRIEVER_SCOPING_API_KEY;
     }

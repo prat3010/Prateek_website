@@ -65,6 +65,9 @@ The project uses the following environment variables (stored in `.env.local` loc
 - `GEMINI_API_KEY`: Google AI Gemini API key (version `gemini-3.6-flash`), used by the local Synchronizer dashboard for certificate analysis and skill scanning.
 - `SYNC_API_KEY`: Shared secret key used to authenticate requests to the Next.js API revalidation endpoint (`/api/revalidate`) and ensure secure cache purging.
 - `CRON_SECRET`: Shared secret key used to authenticate `/api/cron/warmup`. The same value must be stored as a GitHub Actions repository secret so `.github/workflows/warmup.yml` can call the endpoint every five minutes.
+- `RETRIEVER_API_URL`: Base URL for the Retriever API (defaults to `https://rag.prateeq.in`).
+- `RETRIEVER_SCOPING_TENANT_ID`, `RETRIEVER_SCOPING_API_KEY`, `RETRIEVER_SCOPING_USER_ID`: Server-side credentials for the live scoping copilot. If the tenant or key is missing, `/api/scoping/chat` falls back to the deterministic local blueprint engine. Never add a hardcoded fallback key.
+- `RETRIEVER_PORTFOLIO_TENANT_ID`, `RETRIEVER_PORTFOLIO_API_KEY`: Credentials used by `/api/cron/warmup` to warm the portfolio tenant.
 - `GITHUB_TOKEN` (or `GITHUB_PAT` / `GH_TOKEN`): Optional GitHub personal access token, used by the local Synchronizer dashboard to raise the rate limit on deployment status checks.
 
 ## Caching & Cache Revalidation
@@ -77,7 +80,7 @@ The project uses the following environment variables (stored in `.env.local` loc
 ## Project Shape
 
 - `.agents/` contains workspace custom skills and configuration rules (e.g., `skills/ponytail` and `skills/ponytail-review` for enforcing minimal code solutions).
-- `.github/workflows/` contains CI/CD workflows (e.g. `db_sync.yml` to auto-sync JSON content to Supabase on push; also triggerable manually via the "Run workflow" button / `gh workflow run`). `warmup.yml` calls `/api/cron/warmup` every five minutes to keep the Retriever embedding, vector, and Redis pools warm.
+- `.github/workflows/` contains CI/CD workflows (e.g. `db_sync.yml` to auto-sync JSON content to Supabase on push; also triggerable manually via the "Run workflow" button / `gh workflow run`). `warmup.yml` calls `/api/cron/warmup` every five minutes to keep the Retriever embedding, vector, Redis, and generation paths warm.
 - `src/app/` contains routes, layouts, metadata, API routes, sitemap, robots, and the app shell.
   - `/` — home page (all portfolio sections).
   - `/terminal` — interactive diagnostics terminal console.
@@ -204,7 +207,7 @@ A Streamlit-based local dashboard (`scripts/synchronizer.py`) for resume, portfo
 
 ## Testing And Verification
 
-- **Unit & Integration Tests:** Run `npm test` (Vitest) to execute all 355 tests across 46 test files. Uses `pool: 'forks'` for proper `process.env` isolation between test files.
+- **Unit & Integration Tests:** Run `npm test` (Vitest) to execute all 660 tests across 86 test files. Uses `pool: 'forks'` for proper `process.env` isolation between test files.
 - **Watch Mode:** Run `npm run test:watch` during development for instant feedback.
 - **Coverage:** Run `npm run test:coverage` to generate a V8 coverage report.
 - **Workspace Verification:** Run `npm run verify` (or `./scripts/verify.sh`) to execute full workspace validation (cleaning caches, checking types, running lints, unit tests, and test builds).

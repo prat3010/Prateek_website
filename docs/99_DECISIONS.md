@@ -816,7 +816,26 @@ This document serves as the registry of critical architectural design decisions 
   5. **Truthful client errors**: The terminal BFF returns `502`/`504` with `retryable: true` on upstream failures. The terminal client retries once before any tokens render, guards against in-flight duplicate requests, and surfaces the real failure text. The scoping card keeps its deterministic local blueprint fallback and now shortens the upstream wait to 25 seconds, showing a toast when fallback mode is active.
 * **Consequences**:
   * **Pros**: First-token latency is visible during cold starts, warm requests stay fast, cache entries are conversation-safe, scheduled warm-ups reduce cold Ollama penalties, and failed requests no longer masquerade as successful answers.
-  * **Cons**: `CRON_SECRET` must be configured in both Vercel and GitHub Actions. The scoping copilot still replays its local fallback word by word rather than streaming true model tokens. The 45-second BFF ceiling and Ollama embedding timeout remain and are tracked as follow-up work.
+  * **Cons**: `CRON_SECRET` must be configured in both Vercel and GitHub Actions. The scoping copilot still replays its local fallback word by word rather than streaming true model tokens. The 45-second BFF ceiling and Ollama embedding timeout remain and are tracked as follow-up work. *The scoping replay and warm-up coverage gaps are closed in ADR 49.*
+
+---
+
+# **ADR 49: True Scoping Streaming, Bounded Copilot Budget, and Generation Warm-Up**
+
+* **Status**: Approved & Implemented
+* **Context**: ADR 48 delivered terminal streaming and a scheduled warm-up, but four P1 gaps remained:
+  1. The scoping BFF called the non-streaming completions endpoint and then replayed the completed string through a synthetic word timer, so visitors never saw real model tokens.
+  2. `/api/client/copilot` had no explicit `maxDuration` and inherited the Retriever client's 90-second timeout plus retries, which could exceed the serverless function ceiling.
+  3. The scoping route carried a hardcoded read-only API key as a production fallback, violating the environment-only credential rule.
+  4. Retriever `/warmup` only exercised embedding, vector, and Redis search. It did not warm provider auth, routing, or model execution.
+* **Decision**:
+  1. **True scoping streaming**: `RetrieverClient.completionsStream()` opens `/v1/tenants/{tenantId}/chat/completions` with `stream: true`. The scoping BFF waits for the first real token (25-second connect/idle budget), proxies subsequent token frames as SSE deltas, strips any upstream `<blueprint_action>` block even when its tags split across chunks, and appends the canonical catalog-strict card at completion. If no token arrives, the deterministic local blueprint stream is returned with `X-Fallback-Mode: true`.
+  2. **Bounded copilot budget**: `/api/client/copilot` declares `maxDuration = 60` and wraps session creation plus chat completion in one 40-second `AbortSignal`. Upstream timeouts return `504`; other Retriever failures return `502`. Both responses set `retryable: true` and no longer masquerade as a successful structured fallback.
+  3. **No hardcoded scoping key**: Scoping credentials come only from `RETRIEVER_SCOPING_TENANT_ID` and `RETRIEVER_SCOPING_API_KEY` (plus the optional user ID). If either is absent, the route skips Retriever and uses the local blueprint engine immediately.
+  4. **Generation warm-up**: Retriever `/warmup` now runs a unique low-cost search and a 4-token generation probe through the real gateway cascade. Search and generation each have explicit timeouts (30s and 20s), and failures return `502`/`504` instead of reporting a warm tenant. The website BFF raises its upstream budget to 55 seconds and records `generation_latency_ms`.
+* **Consequences**:
+  * **Pros**: Scoping visitors see authentic first-token latency, the interactive blueprint remains catalog-safe, copilot failures are truthful and bounded, deployments cannot silently rely on a shared fallback key, and scheduled warm-ups now cover the generation path.
+  * **Cons**: Live scoping requires both tenant and key environment variables in every deployment. The first scoping token still depends on Retriever retrieval and provider cold-start latency; the 25-second connect budget falls back locally rather than waiting longer.
 
 ---
 
