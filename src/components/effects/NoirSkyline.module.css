@@ -20,6 +20,16 @@
 .isOccluded .searchlightLeft,
 .isIdle .searchlightRight,
 .isOccluded .searchlightRight,
+.isIdle .blimpPropeller,
+.isOccluded .blimpPropeller,
+.isIdle .blimpSpotlight,
+.isOccluded .blimpSpotlight,
+.isIdle .blimpBeacon,
+.isOccluded .blimpBeacon,
+.isIdle .blimpBeaconRed,
+.isOccluded .blimpBeaconRed,
+.isIdle .blimpWindow,
+.isOccluded .blimpWindow,
 .isIdle .flock,
 .isOccluded .flock,
 .isIdle .star1,
@@ -391,27 +401,105 @@
   }
 }
 
+/* ─ Decoupled Aerodynamic Buoyancy Wave ─ */
+.blimpBuoyancy {
+  transform-origin: 175px 185px;
+  animation: blimpBuoyancyAnim 14s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes blimpBuoyancyAnim {
+  0% {
+    transform: translateY(-5px) rotate(-0.8deg);
+  }
+  35% {
+    transform: translateY(2px) rotate(0.3deg);
+  }
+  70% {
+    transform: translateY(-2px) rotate(-0.2deg);
+  }
+  100% {
+    transform: translateY(4px) rotate(0.6deg);
+  }
+}
+
 .blimpSpotlight {
   transform-origin: 195px 212px;
   animation: blimpSpotlightSweep 10s ease-in-out infinite alternate;
-  opacity: 0.35;
+  opacity: 0.42;
 }
 
 @keyframes blimpSpotlightSweep {
   0% {
-    transform: rotate(-12deg);
+    transform: rotate(-14deg);
   }
   100% {
-    transform: rotate(18deg);
+    transform: rotate(16deg);
   }
 }
 
+/* ─ Rapid Pusher Propeller Spin ─ */
+.blimpPropeller {
+  transform-origin: 130.1px 204.2px;
+  animation: propSpin 0.14s linear infinite;
+}
+
+@keyframes propSpin {
+  0% {
+    opacity: 0.95;
+    transform: scaleY(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scaleY(0.2);
+  }
+  100% {
+    opacity: 0.95;
+    transform: scaleY(1);
+  }
+}
+
+.blimpPropellerDisc {
+  fill: var(--skyline-blimp-stroke-fine);
+  opacity: 0.35;
+}
+
+/* ─ Illuminated Gondola Cabin Windows ─ */
+.blimpWindow {
+  fill: var(--skyline-blimp-window);
+  transition: fill var(--transition-slow);
+}
+
+.darkNoir .blimpWindow {
+  animation: blimpWindowGlow 7s ease-in-out infinite alternate;
+}
+
+@keyframes blimpWindowGlow {
+  0%, 100% { opacity: 0.88; }
+  45% { opacity: 0.96; }
+  48% { opacity: 0.72; }
+  52% { opacity: 0.94; }
+  85% { opacity: 0.86; }
+}
+
+/* ─ Alternating Dual Aviation Strobes ─ */
 .blimpBeacon {
   fill: #ffffff;
   animation: beaconFlash 1.2s step-start infinite;
 }
 
 @keyframes beaconFlash {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+.blimpBeaconRed {
+  fill: #ff2a55;
+  animation: beaconFlashRed 1.2s step-start infinite;
+  animation-delay: 0.6s;
+}
+
+@keyframes beaconFlashRed {
   0%, 100% { opacity: 0; }
   50% { opacity: 1; }
 }
@@ -901,10 +989,11 @@
   
   --skyline-searchlight-left: url(#leftLightGradNeon);
   --skyline-searchlight-right: url(#rightLightGradNeon);
-  --skyline-blimp-spotlight: url(#blimpLightGradNeon);
+  --skyline-blimp-spotlight: url(#blimpLightGrad);
   --skyline-blimp-envelope: var(--color-bg);
   --skyline-blimp-stroke: rgba(250, 250, 250, 0.48);
   --skyline-blimp-stroke-fine: rgba(250, 250, 250, 0.25);
+  --skyline-blimp-window: #ffeaa7;
   
   --skyline-shed-door: var(--color-bg);
   --skyline-bulb-glow: #fafafa;
@@ -997,6 +1086,7 @@
   --skyline-blimp-envelope: var(--pop-yellow);
   --skyline-blimp-stroke: var(--pop-black);
   --skyline-blimp-stroke-fine: rgba(26, 26, 46, 0.4);
+  --skyline-blimp-window: var(--pop-cyan);
   
   --skyline-shed-door: var(--pop-orange);
   --skyline-bulb-glow: var(--pop-yellow);
@@ -1660,8 +1750,12 @@
 .reducedMotion .fanBlade,
 .reducedMotion .blowerFan,
 .reducedMotion .blimpGroup,
+.reducedMotion .blimpBuoyancy,
 .reducedMotion .blimpSpotlight,
 .reducedMotion .blimpBeacon,
+.reducedMotion .blimpBeaconRed,
+.reducedMotion .blimpPropeller,
+.reducedMotion .blimpWindow,
 .reducedMotion .bridgeBeacon,
 .reducedMotion .tugboatTransit,
 .reducedMotion .tugboatBobbing,
@@ -1684,8 +1778,12 @@
   opacity: 0.15;
 }
 .reducedMotion .blimpBeacon,
+.reducedMotion .blimpBeaconRed,
 .reducedMotion .bridgeBeacon {
   opacity: 0.8;
+}
+.reducedMotion .blimpWindow {
+  opacity: 0.9;
 }
 .reducedMotion .blimpSpotlight {
   opacity: 0.25;

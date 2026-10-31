@@ -24,8 +24,9 @@ const SkylineDefs = React.memo(function SkylineDefs() {
       </linearGradient>
 
       <linearGradient id="blimpLightGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor="rgba(255, 255, 255, 0.28)" />
-        <stop offset="60%" stopColor="rgba(255, 255, 255, 0.08)" />
+        <stop offset="0%" stopColor="rgba(255, 255, 255, 0.42)" />
+        <stop offset="25%" stopColor="rgba(255, 255, 255, 0.22)" />
+        <stop offset="65%" stopColor="rgba(255, 255, 255, 0.06)" />
         <stop offset="100%" stopColor="rgba(255, 255, 255, 0)" />
       </linearGradient>
 
@@ -50,8 +51,9 @@ const SkylineDefs = React.memo(function SkylineDefs() {
       </linearGradient>
 
       <linearGradient id="blimpLightGradPopart" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor="rgba(0, 230, 118, 0.35)" />
-        <stop offset="60%" stopColor="rgba(0, 230, 118, 0.1)" />
+        <stop offset="0%" stopColor="rgba(0, 230, 118, 0.45)" />
+        <stop offset="30%" stopColor="rgba(0, 230, 118, 0.22)" />
+        <stop offset="70%" stopColor="rgba(0, 230, 118, 0.05)" />
         <stop offset="100%" stopColor="rgba(0, 230, 118, 0)" />
       </linearGradient>
 
@@ -69,9 +71,10 @@ const SkylineDefs = React.memo(function SkylineDefs() {
       </linearGradient>
 
       <linearGradient id="blimpLightGradNeon" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor="rgba(255, 230, 0, 0.35)" />
-        <stop offset="60%" stopColor="rgba(255, 230, 0, 0.1)" />
-        <stop offset="100%" stopColor="rgba(255, 230, 0, 0)" />
+        <stop offset="0%" stopColor="rgba(0, 240, 255, 0.45)" />
+        <stop offset="30%" stopColor="rgba(0, 240, 255, 0.20)" />
+        <stop offset="70%" stopColor="rgba(0, 240, 255, 0.05)" />
+        <stop offset="100%" stopColor="rgba(0, 240, 255, 0)" />
       </linearGradient>
 
       {/* ── Sky Gradient Popart ── */}
