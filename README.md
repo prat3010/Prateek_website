@@ -25,7 +25,7 @@ A highly interactive, storyteller-driven personal portfolio website designed wit
 | `/admin` | Master Admin Control Center (Google OAuth auth gate, Autonomous Outreach queue, client scopes & ledgers) |
 | `/analytics` | Visitor analytics dashboard |
 | `/rag` | Retriever AI SaaS Product Landing Page — Hero, live mini-RAG sandbox, feature grid, 1-line embed snippet, and dynamic Geo-IP pricing (INR vs. USD) |
-| `/rag/app` | SaaS App Studio Workspace — Chat Studio, Document Library, Search Inspector, Embed Configurator, Vector Sharding, ZKP Verifiable Grounding, Enterprise Identity Federation & RB-VAC, Continuous DPO / ORPO Tuning, and role-gated admin link |
+| `/rag/app` | Login-required SaaS App Studio Workspace — Chat Studio, Document Library, Search Inspector, Embed Configurator, Vector Sharding, ZKP Verifiable Grounding, Enterprise Identity Federation & RB-VAC, Continuous DPO / ORPO Tuning, and role-gated admin link |
 | `/rag/login` | RAG SaaS login / authentication page |
 | `/blog` | Blog listing page |
 | `/blog/[slug]` | Individual blog post page |
@@ -64,9 +64,10 @@ The client-side commercial PDFs (Scoping Brief, Services & Pricing Guide, Sales 
 | `/api/rag/invite` | POST | Dispatch team member invitation email |
 | `/api/rag/members` | GET, DELETE | Manage RAG tenant team memberships |
 | `/api/rag/telemetry` | GET | Fetch real-time RAG usage telemetry & cache stats |
+| `/api/rag/guest/[...path]` | POST | Server-side guest proxy for read-only chat/session/search; injects the guest tenant key, rate-limits, and streams SSE |
 | `/api/webhooks/razorpay` | POST | Verify webhook signature and process payment/subscription events |
 | `/api/revalidate` | POST, GET | Purge Next.js cache (requires `SYNC_API_KEY`) |
-| `/api/cron/warmup` | POST, GET | Warm Retriever embedding/vector/Redis pools and generation path (requires `CRON_SECRET`) |
+| `/api/cron/warmup` | POST, GET | Warm Retriever embedding/vector/Redis pools and generation path (requires `CRON_SECRET`; returns `200` only when every configured tenant is warm, `503` on any failure or when none are configured) |
 | `/api/scoping/chat` | POST | Stream live Retriever tokens for the scoping copilot with a local blueprint fallback |
 | `/api/scoping/parse-intent` | POST | AI intent classification for scoping copilot |
 | `/api/scoping/parse-rfp` | POST | AI extraction of scope from uploaded RFP documents |
@@ -106,17 +107,22 @@ GEMINI_API_KEY=your_gemini_api_key
 # Shared secret for synchronizer / API route writes (any string)
 SYNC_API_KEY=your_sync_api_key
 
-# Shared secret for the scheduled Retriever warm-up endpoint
+# Shared secret for the external Retriever warm-up canary
 # Add the same value as a GitHub Actions repository secret named CRON_SECRET.
+# The primary five-minute warm-up runs from the systemd timer on the Oracle VM.
 CRON_SECRET=your_cron_secret
 
 # Retriever cognitive engine (server-side)
 RETRIEVER_API_URL=https://rag.prateeq.in
-# Live scoping copilot. If either the tenant or key is absent, /api/scoping/chat
+# Live scoping copilot. If any of these are absent, /api/scoping/chat
 # uses the deterministic local blueprint engine instead.
 RETRIEVER_SCOPING_TENANT_ID=your_scoping_tenant_id
 RETRIEVER_SCOPING_API_KEY=your_scoping_api_key
 RETRIEVER_SCOPING_USER_ID=your_scoping_user_id
+# Guest RAG proxy. Dedicated credentials are recommended; if omitted, the
+# scoping credentials above are used. Never expose either key to the browser.
+RETRIEVER_GUEST_TENANT_ID=your_guest_tenant_id
+RETRIEVER_GUEST_API_KEY=your_guest_api_key
 # Warm-up targets
 RETRIEVER_PORTFOLIO_TENANT_ID=your_portfolio_tenant_id
 RETRIEVER_PORTFOLIO_API_KEY=your_portfolio_api_key
@@ -221,6 +227,10 @@ The website is fully deployed and hosted on **Vercel**.
 - **Production Domain:** [https://prateeq.in](https://prateeq.in)
 - **Domain Registry:** GoDaddy (configured with DNS records pointing to Vercel)
 - **Automatic Deploys:** Vercel automatically deploys updates on every push to the `main` branch.
+
+### Retriever Warm-Up
+
+The primary warm-up scheduler is a systemd timer on the Retriever Oracle VM (`retriever-warmup.timer`, every five minutes). It calls the local API directly and reads credentials from `/etc/retriever-warmup.env`. The `.github/workflows/warmup.yml` workflow is an hourly external canary for the public Vercel path, not the primary scheduler.
 
 ---
 

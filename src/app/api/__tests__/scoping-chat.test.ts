@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/lib/scopingObservability', () => ({
   logScopingChatTrace: vi.fn().mockResolvedValue(undefined),
@@ -55,6 +55,10 @@ function createRetrieverSseStream(frames: string[]): ReadableStream<Uint8Array> 
 }
 
 describe('POST /api/scoping/chat', () => {
+  beforeEach(() => {
+    process.env.RETRIEVER_SCOPING_USER_ID = '11111111-1111-4111-8111-111111111111';
+  });
+
   it('returns 400 when message is empty', async () => {
     const req = new NextRequest('http://localhost:3000/api/scoping/chat', {
       method: 'POST',

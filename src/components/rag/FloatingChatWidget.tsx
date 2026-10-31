@@ -2,16 +2,17 @@
 
 import { useEffect } from "react";
 
+const DEFAULT_WIDGET_ORIGIN = "https://rag.prateeq.in";
+const DEFAULT_GUEST_PROXY_PATH = "/api/rag/guest";
+
 interface FloatingChatWidgetProps {
-  tenantId?: string;
-  apiKey?: string;
-  apiUrl?: string;
+  widgetOrigin?: string;
+  proxyPath?: string;
 }
 
 export function FloatingChatWidget({
-  tenantId = process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_TENANT_ID || "1f85286c-9d9a-4ebc-9c62-a99360a5ece4",
-  apiKey = process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_API_KEY || "ret_live_ScopingGuest2026.ReadOnlyChat",
-  apiUrl = process.env.NEXT_PUBLIC_RETRIEVER_API_URL || "https://rag.prateeq.in",
+  widgetOrigin = process.env.NEXT_PUBLIC_RETRIEVER_API_URL || DEFAULT_WIDGET_ORIGIN,
+  proxyPath = DEFAULT_GUEST_PROXY_PATH,
 }: FloatingChatWidgetProps) {
   useEffect(() => {
     const scriptId = "retriever-floating-widget-script";
@@ -24,14 +25,13 @@ export function FloatingChatWidget({
 
     const script = document.createElement("script");
     script.id = scriptId;
-    script.src = `${apiUrl.replace(/\/$/, "")}/widget.js`;
+    script.src = `${widgetOrigin.replace(/\/$/, "")}/widget.js`;
     script.async = true;
-    script.setAttribute("data-tenant", tenantId);
-    script.setAttribute("data-key", apiKey);
+    script.setAttribute("data-tenant", "guest");
+    script.setAttribute("data-api-url", proxyPath);
     script.setAttribute("data-color", "#2563eb");
     script.setAttribute("data-title", "Retriever Concierge");
     script.setAttribute("data-position", "bottom-right");
-    script.setAttribute("data-api-url", apiUrl);
 
     document.body.appendChild(script);
 
@@ -41,7 +41,7 @@ export function FloatingChatWidget({
       document.querySelectorAll(".retriever-widget-launcher").forEach((el) => el.remove());
       document.querySelectorAll(".retriever-widget-panel:not(.retriever-widget-inline)").forEach((el) => el.remove());
     };
-  }, [tenantId, apiKey, apiUrl]);
+  }, [widgetOrigin, proxyPath]);
 
   return null;
 }

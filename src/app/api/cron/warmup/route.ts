@@ -4,15 +4,10 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 const RETRIEVER_API_URL = (
-  process.env.RETRIEVER_API_URL ||
-  process.env.NEXT_PUBLIC_RETRIEVER_API_URL ||
-  'https://rag.prateeq.in'
+  process.env.RETRIEVER_API_URL || 'https://rag.prateeq.in'
 ).replace(/\/$/, '');
 
-const PORTFOLIO_TENANT_ID =
-  process.env.RETRIEVER_PORTFOLIO_TENANT_ID || '6797e2c8-745a-4bd1-aa4c-3854b8d79c22';
-const SCOPING_TENANT_ID =
-  process.env.RETRIEVER_SCOPING_TENANT_ID || '1f85286c-9d9a-4ebc-9c62-a99360a5ece4';
+
 
 interface WarmupTarget {
   name: string;
@@ -42,23 +37,23 @@ async function handleWarmup(req: NextRequest) {
   const targets: WarmupTarget[] = [
     {
       name: 'portfolio',
-      tenantId: PORTFOLIO_TENANT_ID,
+      tenantId: process.env.RETRIEVER_PORTFOLIO_TENANT_ID || '',
       apiKey: process.env.RETRIEVER_PORTFOLIO_API_KEY,
     },
     {
       name: 'scoping',
-      tenantId: SCOPING_TENANT_ID,
+      tenantId: process.env.RETRIEVER_SCOPING_TENANT_ID || '',
       apiKey: process.env.RETRIEVER_SCOPING_API_KEY,
     },
   ];
 
   const results = await Promise.all(
     targets.map(async (target) => {
-      if (!target.apiKey) {
+      if (!target.tenantId || !target.apiKey) {
         return {
           name: target.name,
           status: 'skipped' as const,
-          reason: 'Retriever API key is not configured.',
+          reason: 'Retriever tenant or API key is not configured.',
         };
       }
 
@@ -106,11 +101,14 @@ async function handleWarmup(req: NextRequest) {
   );
 
   const warmed = results.filter((result) => result.status === 'warm').length;
+  const failed = results.filter((result) => result.status === 'error').length;
+  const skipped = results.filter((result) => result.status === 'skipped').length;
+  const ok = failed === 0 && warmed > 0;
 
   return NextResponse.json(
-    { ok: warmed > 0, warmed, results },
+    { ok, warmed, failed, skipped, results },
     {
-      status: warmed > 0 ? 200 : 503,
+      status: ok ? 200 : 503,
       headers: { 'Cache-Control': 'no-store' },
     }
   );

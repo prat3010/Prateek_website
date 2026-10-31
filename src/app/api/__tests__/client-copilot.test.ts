@@ -217,7 +217,6 @@ describe('POST /api/client/copilot', () => {
   });
 
   it('invokes authentic RetrieverClient.chatComplete when retriever_tenant_id is present', async () => {
-    vi.stubEnv('RETRIEVER_API_KEY', 'ret_key_test_123');
     mocks.state.scopes = [
       {
         id: 'scope-202',
@@ -267,7 +266,6 @@ describe('POST /api/client/copilot', () => {
   });
 
   it('returns a truthful 502 when the authentic Retriever call fails', async () => {
-    vi.stubEnv('RETRIEVER_API_KEY', 'ret_key_test_123');
     mocks.state.scopes = [
       {
         id: 'scope-303',
@@ -277,6 +275,7 @@ describe('POST /api/client/copilot', () => {
         base_engine: 'Full-Stack Web Engine',
         features: ['Supabase DB'],
         retriever_tenant_id: 'ten_fallback_9901',
+        metadata: { retriever_api_key: 'tenant_key_fallback_9901' },
         deposit_paid: true,
       },
     ];
@@ -301,7 +300,6 @@ describe('POST /api/client/copilot', () => {
   });
 
   it('returns a truthful 504 when the Retriever call exceeds the bounded budget', async () => {
-    vi.stubEnv('RETRIEVER_API_KEY', 'ret_key_test_123');
     mocks.state.scopes = [
       {
         id: 'scope-404',
@@ -311,6 +309,7 @@ describe('POST /api/client/copilot', () => {
         base_engine: 'SaaS AI Platform Engine',
         features: ['pgvector Semantic Search'],
         retriever_tenant_id: 'ten_timeout_9902',
+        metadata: { retriever_api_key: 'tenant_key_timeout_9902' },
         deposit_paid: true,
       },
     ];

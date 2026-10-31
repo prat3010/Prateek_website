@@ -51,12 +51,7 @@ const PRESET_QUERIES = [
   "Explain the active-active multi-cloud vector replication guarantee.",
 ];
 
-const SCOPING_TENANT_ID =
-  process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_TENANT_ID ||
-  "1f85286c-9d9a-4ebc-9c62-a99360a5ece4";
-const SCOPING_API_KEY =
-  process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_API_KEY ||
-  "ret_live_ScopingGuest2026.ReadOnlyChat";
+const GUEST_SEARCH_ENDPOINT = "/api/rag/guest/search";
 
 function formatStrategy(strategy: string): string {
   switch (strategy) {
@@ -116,22 +111,18 @@ export function HeroCognitiveSandbox() {
       const startTime = performance.now();
 
       try {
-        const res = await fetch(
-          `https://rag.prateeq.in/v1/tenants/${SCOPING_TENANT_ID}/search`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${SCOPING_API_KEY}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              query: targetQuery,
-              limit: 2,
-              enable_hybrid: targetMode === "hybrid" || targetMode === "crag",
-              enable_colbert_rerank: targetMode === "graph",
-            }),
-          }
-        );
+        const res = await fetch(GUEST_SEARCH_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            query: targetQuery,
+            limit: 2,
+            enable_hybrid: targetMode === "hybrid" || targetMode === "crag",
+            enable_colbert_rerank: targetMode === "graph",
+          }),
+        });
 
         const elapsed = Math.round((performance.now() - startTime) * 10) / 10;
 
@@ -176,7 +167,7 @@ export function HeroCognitiveSandbox() {
         }
       } catch {
         setErrorMessage(
-          "Cognitive engine at rag.prateeq.in unreachable. Check connection."
+          "Guest RAG service unreachable. Check connection."
         );
         setTelemetry(null);
         setResults([]);
@@ -193,21 +184,17 @@ export function HeroCognitiveSandbox() {
     async function fetchInitialQuery() {
       const startTime = performance.now();
       try {
-        const res = await fetch(
-          `https://rag.prateeq.in/v1/tenants/${SCOPING_TENANT_ID}/search`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${SCOPING_API_KEY}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              query: PRESET_QUERIES[0],
-              limit: 2,
-              enable_hybrid: true,
-            }),
-          }
-        );
+        const res = await fetch(GUEST_SEARCH_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            query: PRESET_QUERIES[0],
+            limit: 2,
+            enable_hybrid: true,
+          }),
+        });
 
         const elapsed = Math.round((performance.now() - startTime) * 10) / 10;
         if (!res.ok) {
@@ -249,7 +236,7 @@ export function HeroCognitiveSandbox() {
       } catch {
         if (!ignore) {
           setErrorMessage(
-            "Cognitive engine at rag.prateeq.in unreachable. Check connection."
+            "Guest RAG service unreachable. Check connection."
           );
           setTelemetry(null);
           setResults([]);

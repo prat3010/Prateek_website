@@ -247,16 +247,9 @@ export function InteractiveWidgetCustomizer() {
                     setChatMessages((prev) => [...prev, { role: "user", text: q }]);
                     setChatLoading(true);
                     try {
-                      const scopingTenant =
-                        process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_TENANT_ID ||
-                        "1f85286c-9d9a-4ebc-9c62-a99360a5ece4";
-                      const scopingKey =
-                        process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_API_KEY ||
-                        "ret_live_ScopingGuest2026.ReadOnlyChat";
-                      const res = await fetch(`https://rag.prateeq.in/v1/tenants/${scopingTenant}/search`, {
+                      const res = await fetch("/api/rag/guest/search", {
                         method: "POST",
                         headers: {
-                          Authorization: `Bearer ${scopingKey}`,
                           "Content-Type": "application/json",
                         },
                         body: JSON.stringify({ query: q, limit: 1 }),

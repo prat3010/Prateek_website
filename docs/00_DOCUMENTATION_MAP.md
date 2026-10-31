@@ -102,6 +102,7 @@ Welcome to the **Prateek Sharma Engineering Platform Documentation Map**. This c
 - 🔌 **[`runbooks/RUNBOOK_NEW_API_ENDPOINT.md`](runbooks/RUNBOOK_NEW_API_ENDPOINT.md):** Adding and testing a new Next.js 16 API route handler.
 - ⚙️ **[`runbooks/RUNBOOK_NEW_CPQ_FEATURE_OR_ENGINE.md`](runbooks/RUNBOOK_NEW_CPQ_FEATURE_OR_ENGINE.md):** Adding a new engine or feature module to the Scoping Lab.
 - 🏢 **[`runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md`](runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md):** Provisioning a client tenant on the Retriever AI platform.
+- 🔐 **[`runbooks/RUNBOOK_GUEST_RAG_PROXY.md`](runbooks/RUNBOOK_GUEST_RAG_PROXY.md):** Deploying the guest RAG proxy and rotating the formerly browser-exposed Retriever keys.
 
 ---
 

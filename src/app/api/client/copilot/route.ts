@@ -121,16 +121,16 @@ export async function POST(req: NextRequest) {
 
     // 3. Attempt Authentic RAG Chat Completion from Dedicated Retriever Tenant
     let answerText = '';
-    const tenantId = activeScope.retriever_tenant_id || process.env.RETRIEVER_SCOPING_TENANT_ID;
-    const apiKey =
-      ((activeScope.metadata as Record<string, unknown> | undefined)?.retriever_api_key as string) ||
-      process.env.RETRIEVER_SCOPING_API_KEY ||
-      process.env.RETRIEVER_API_KEY;
+    const tenantId = (activeScope.retriever_tenant_id as string | undefined) || '';
+    const metadataApiKey = (activeScope.metadata as Record<string, unknown> | undefined)?.retriever_api_key;
+    const apiKey = typeof metadataApiKey === 'string' ? metadataApiKey : '';
     const apiUrl = (
-      process.env.RETRIEVER_API_URL ||
-      process.env.NEXT_PUBLIC_RETRIEVER_API_URL ||
-      'https://rag.prateeq.in'
+      process.env.RETRIEVER_API_URL || 'https://rag.prateeq.in'
     ).replace(/\/$/, '');
+
+    if (!tenantId || !apiKey) {
+      console.warn('Copilot workspace is missing its dedicated Retriever tenant or key.');
+    }
 
     if (tenantId && apiKey) {
       const abortController = new AbortController();
@@ -151,7 +151,7 @@ export async function POST(req: NextRequest) {
           apiUrl,
           tenantId,
           apiKey,
-          userId: '00000000-0000-4000-a000-000000000001',
+          userId: String(activeScope.id),
         });
 
         const session = await client.createSession(abortController.signal);

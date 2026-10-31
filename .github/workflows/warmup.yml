@@ -2,8 +2,9 @@ name: Warm Retriever
 
 on:
   schedule:
-    # Every five minutes. GitHub may delay scheduled runs during peak load.
-    - cron: '*/5 * * * *'
+    # External canary only. The primary five-minute warm-up is the systemd
+    # timer on the Oracle VM; GitHub scheduled workflows are often delayed.
+    - cron: '17 * * * *'
   workflow_dispatch:
 
 jobs:

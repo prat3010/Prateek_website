@@ -1243,23 +1243,12 @@ export async function POST(req: NextRequest) {
     // Extract preliminary intent & reasoning for deep observability
     const blueprintRec = classifyPromptForBlueprint(prompt);
 
-    const tenantId =
-      process.env.RETRIEVER_SCOPING_TENANT_ID ||
-      process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_TENANT_ID ||
-      '';
-    const apiKey =
-      process.env.RETRIEVER_SCOPING_API_KEY ||
-      process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_API_KEY ||
-      '';
+    const tenantId = process.env.RETRIEVER_SCOPING_TENANT_ID || '';
+    const apiKey = process.env.RETRIEVER_SCOPING_API_KEY || '';
     const apiUrl = (
-      process.env.RETRIEVER_API_URL ||
-      process.env.NEXT_PUBLIC_RETRIEVER_API_URL ||
-      'https://rag.prateeq.in'
+      process.env.RETRIEVER_API_URL || 'https://rag.prateeq.in'
     ).replace(/\/$/, '');
-    const userId =
-      process.env.RETRIEVER_SCOPING_USER_ID ||
-      process.env.NEXT_PUBLIC_RETRIEVER_SCOPING_USER_ID ||
-      '36e62429-419e-48ef-af92-533afca9e028';
+    const userId = process.env.RETRIEVER_SCOPING_USER_ID || '';
 
     // Check if the user query is an out-of-scope physical labor request
     const pLower = prompt.toLowerCase();
@@ -1367,7 +1356,7 @@ export async function POST(req: NextRequest) {
     let upstreamReader: ReturnType<typeof createUpstreamSseReader> | null = null;
     let firstText = '';
 
-    if (tenantId && apiKey) {
+    if (tenantId && apiKey && userId) {
       const client = new RetrieverClient({
         apiUrl,
         tenantId,

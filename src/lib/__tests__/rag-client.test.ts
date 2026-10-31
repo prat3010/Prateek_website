@@ -77,4 +77,57 @@ describe('RetrieverClient streaming completions', () => {
     const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
     expect(init.signal).toBe(controller.signal);
   });
+
+  it('assembles chatComplete text and citations from CRLF SSE frames', async () => {
+    const encoder = new TextEncoder();
+    const sse = [
+      'id: 1\r\ndata: {"event":"token","delta":"Hello "}\r\n',
+      'id: 2\r\ndata: {"event":"token","delta":"world"}\r\n',
+      'id: 3\r\ndata: {"event":"done","citations":[{"id":"doc-1"}]}\r\n',
+    ].join('\r\n');
+    global.fetch = vi.fn().mockResolvedValue(
+      new Response(encoder.encode(sse), { status: 200 })
+    );
+
+    const result = await makeClient().chatComplete('sess_1', 'hi');
+
+    expect(result.text).toBe('Hello world');
+    expect(result.citations).toEqual([{ id: 'doc-1' }]);
+  });
+
+  it('throws instead of returning partial text when Retriever streams an error event', async () => {
+    const encoder = new TextEncoder();
+    const sse =
+      'data: {"event":"token","delta":"partial"}\n\n' +
+      'data: {"event":"error","message":"engine interrupted"}\n\n';
+    global.fetch = vi.fn().mockResolvedValue(
+      new Response(encoder.encode(sse), { status: 200 })
+    );
+
+    await expect(makeClient().chatComplete('sess_1', 'hi')).rejects.toThrow(
+      'engine interrupted'
+    );
+  });
+
+  it('reads a plain JSON chat response returned outside the SSE path', async () => {
+    global.fetch = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ content: 'Steered response' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+
+    const result = await makeClient().chatComplete('sess_1', 'hi');
+    expect(result.text).toBe('Steered response');
+  });
+
+  it('does not retry a chat POST after a 5xx response', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(new Response('upstream failed', { status: 502 }));
+    global.fetch = fetchMock;
+
+    await expect(makeClient().chat('sess_1', 'hi')).rejects.toThrow('502');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
 });

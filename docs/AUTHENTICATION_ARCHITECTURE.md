@@ -183,7 +183,7 @@ Identity state connects `prateeq.in` to the Retriever Cognitive Engine:
 1. **Dual Account SSO:** An authenticated session on `prateeq.in` authorizes the user to access both their custom engineering workspace (`/dashboard`) and the RAG SaaS App Studio (`/rag/app`).
 2. **Automatic 7-Day Trial Provisioning:** When a client completes their scope and signs in, the platform provisions a dedicated tenant (`tn_client_<uuid>`) on Retriever with an automatic 7-day trial.
 3. **Immutable SOW Grounding:** The agreed architecture, features, and milestones are compiled into an immutable system document (`is_system: true`, `is_deletable: false`) indexed into their Retriever tenant. This pre-grounds their dashboard AI Copilot on the exact project specifications.
-4. **Public Guest Chat Mode:** For unauthenticated visitors exploring the interactive RAG sandbox on `/rag`, requests use a dedicated, rate-limited guest key (`ret_live_GuestAccessKey2026.ReadOnlyChat`) seeded in the backend `api_keys` table.
+4. **Public Guest Chat Mode:** For unauthenticated visitors exploring the interactive RAG sandbox on `/rag`, requests go through the same-origin `/api/rag/guest/*` proxy. The server injects a dedicated, rate-limited guest key; no API key is sent to the browser. The full `/rag/app` studio requires login.
 
 ---
 
@@ -198,6 +198,9 @@ Identity state connects `prateeq.in` to the Retriever Cognitive Engine:
 | `CONTACT_EMAIL_TO` | Server-Only | Recipient email for admin registration and contact alerts |
 | `RAZORPAY_KEY_ID` | Client + Server | Public Key ID for standard checkout modal |
 | `RAZORPAY_KEY_SECRET` | Server-Only | HMAC-SHA256 signature verification key for payments |
+| `RETRIEVER_SCOPING_TENANT_ID` / `RETRIEVER_SCOPING_API_KEY` / `RETRIEVER_SCOPING_USER_ID` | **Server-Only** | Live scoping copilot credentials; missing values disable the upstream and use the local blueprint engine |
+| `RETRIEVER_GUEST_TENANT_ID` / `RETRIEVER_GUEST_API_KEY` | **Server-Only** | Optional guest RAG proxy credentials; falls back to the scoping credentials |
+| `RETRIEVER_PORTFOLIO_TENANT_ID` / `RETRIEVER_PORTFOLIO_API_KEY` | **Server-Only** | Terminal AI twin and warm-up credentials |
 
 ---
 

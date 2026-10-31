@@ -45,11 +45,20 @@ export function getClientIdentifier(req: Request | NextRequest, explicitId?: str
     return explicitId.trim().toLowerCase();
   }
 
-  const forwardedFor = req.headers.get('x-forwarded-for');
+  // Prefer headers set by the hosting platform. Vercel overwrites
+  // x-vercel-forwarded-for and x-real-ip, while a caller-supplied
+  // x-forwarded-for can be spoofed to bypass per-IP limits.
+  const vercelForwardedFor = req.headers.get('x-vercel-forwarded-for');
   const realIp = req.headers.get('x-real-ip');
+  const forwardedFor = req.headers.get('x-forwarded-for');
   const cfIp = req.headers.get('cf-connecting-ip');
 
-  const rawIp = forwardedFor ? forwardedFor.split(',')[0].trim() : (realIp || cfIp || '127.0.0.1');
+  const rawIp =
+    vercelForwardedFor?.split(',')[0].trim() ||
+    realIp?.trim() ||
+    forwardedFor?.split(',')[0].trim() ||
+    cfIp?.trim() ||
+    '127.0.0.1';
   return rawIp;
 }
 

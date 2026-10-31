@@ -24,6 +24,25 @@ describe('Universal Rate Limiter (Edge AI Token Shield)', () => {
     expect(explicit).toBe('user_12345');
   });
 
+  it('prefers platform-set IP headers over caller-supplied x-forwarded-for', () => {
+    const req = new NextRequest('http://localhost:3000/api/test', {
+      headers: {
+        'x-vercel-forwarded-for': '192.0.2.10, 10.0.0.1',
+        'x-real-ip': '192.0.2.11',
+        'x-forwarded-for': '203.0.113.99',
+      },
+    });
+    expect(getClientIdentifier(req)).toBe('192.0.2.10');
+
+    const realIpOnly = new NextRequest('http://localhost:3000/api/test', {
+      headers: {
+        'x-real-ip': '192.0.2.11',
+        'x-forwarded-for': '203.0.113.99',
+      },
+    });
+    expect(getClientIdentifier(realIpOnly)).toBe('192.0.2.11');
+  });
+
   it('allows requests within rate limit budget using in-memory engine', async () => {
     const scope = `test_allow_${Date.now()}`;
     const req = new NextRequest('http://localhost:3000/api/test', {

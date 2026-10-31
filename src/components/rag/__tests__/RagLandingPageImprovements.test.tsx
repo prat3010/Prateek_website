@@ -126,7 +126,7 @@ describe("RAG Landing Page Improvements", () => {
 
       await waitFor(() => {
         expect(global.fetch).toHaveBeenCalledWith(
-          expect.stringContaining("/search"),
+          "/api/rag/guest/search",
           expect.objectContaining({
             method: "POST",
           })
@@ -151,7 +151,7 @@ describe("RAG Landing Page Improvements", () => {
       await waitFor(() => {
         expect(screen.getByRole("alert")).toBeInTheDocument();
         expect(
-          screen.getByText(/Cognitive engine at rag.prateeq.in unreachable. Check connection./)
+          screen.getByText(/Guest RAG service unreachable. Check connection./)
         ).toBeInTheDocument();
         expect(screen.getByRole("button", { name: /retry/i })).toBeInTheDocument();
       });
@@ -266,15 +266,17 @@ describe("RAG Landing Page Improvements", () => {
     });
   });
 
-  describe("FloatingChatWidget fallback configuration", () => {
-    it("injects script with guest scoping API key fallback when env key is absent", async () => {
+  describe("FloatingChatWidget guest proxy configuration", () => {
+    it("injects the widget without a browser API key and points it at the guest proxy", async () => {
       const { FloatingChatWidget: ActualFloatingChatWidget } =
         await vi.importActual<typeof import("../FloatingChatWidget")>("../FloatingChatWidget");
       render(<ActualFloatingChatWidget />);
       const script = document.getElementById("retriever-floating-widget-script");
       expect(script).toBeInTheDocument();
-      expect(script).toHaveAttribute("data-key", "ret_live_ScopingGuest2026.ReadOnlyChat");
-      expect(script).toHaveAttribute("data-tenant", "1f85286c-9d9a-4ebc-9c62-a99360a5ece4");
+      expect(script).not.toHaveAttribute("data-key");
+      expect(script).toHaveAttribute("data-tenant", "guest");
+      expect(script).toHaveAttribute("data-api-url", "/api/rag/guest");
+      expect(script).toHaveAttribute("src", "https://rag.prateeq.in/widget.js");
     });
   });
 });

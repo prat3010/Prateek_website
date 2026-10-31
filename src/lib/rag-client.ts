@@ -161,12 +161,14 @@ export class RetrieverClient {
       : controller.signal;
 
     try {
+      // A chat POST persists a message upstream; retrying on 5xx can duplicate
+      // the user turn and generate a second answer, so send it exactly once.
       const res = await fetchWithRetry(url, {
         method: "POST",
         headers,
         body: JSON.stringify({ query: message, stream: true }),
         signal: combinedSignal,
-      });
+      }, 0);
       clearTimeout(timeoutId);
       if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
       return res.body;
@@ -186,6 +188,42 @@ export class RetrieverClient {
     let text = '';
     let citations: unknown[] = [];
     let buffer = '';
+    let streamError = '';
+
+    const handleFrame = (rawLine: string) => {
+      const line = rawLine.replace(/\r$/, '');
+      if (!line.startsWith('data:')) return;
+      const jsonStr = line.slice(5).trim();
+      if (!jsonStr || jsonStr === '[DONE]') return;
+
+      let data: Record<string, unknown>;
+      try {
+        data = JSON.parse(jsonStr) as Record<string, unknown>;
+      } catch {
+        return;
+      }
+
+      if (data.event === 'error') {
+        streamError =
+          typeof data.message === 'string' && data.message.trim()
+            ? data.message
+            : 'Retriever stream failed.';
+        return;
+      }
+      if (data.event === 'token' && typeof data.delta === 'string') {
+        text += data.delta;
+        return;
+      }
+      if (data.event === 'done' && Array.isArray(data.citations)) {
+        citations = data.citations;
+        return;
+      }
+
+      // OpenAI-compatible frames from the completions endpoint.
+      const choices = data.choices as Array<{ delta?: { content?: unknown } }> | undefined;
+      const delta = choices?.[0]?.delta?.content;
+      if (typeof delta === 'string') text += delta;
+    };
 
     while (true) {
       const { done, value } = await reader.read();
@@ -193,29 +231,29 @@ export class RetrieverClient {
       buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split('\n');
       buffer = lines.pop() || '';
-
-      for (const line of lines) {
-        if (line.startsWith('data: ')) {
-          const jsonStr = line.slice(6).trim();
-          if (jsonStr) {
-            try {
-              const data = JSON.parse(jsonStr);
-              if (data.event === 'token' && data.delta) {
-                text += data.delta;
-              } else if (data.event === 'done' && Array.isArray(data.citations)) {
-                citations = data.citations;
-              }
-            } catch {}
-          }
-        }
-      }
+      for (const line of lines) handleFrame(line);
     }
 
-    if (buffer && buffer.startsWith('data: ')) {
+    buffer += decoder.decode();
+    if (buffer.trim()) handleFrame(buffer);
+
+    if (streamError) {
+      throw new Error(streamError);
+    }
+
+    // Some guardrail paths return a plain JSON body instead of SSE.
+    if (!text.trim() && buffer.trim() && !buffer.trim().startsWith('data:')) {
       try {
-        const data = JSON.parse(buffer.slice(6).trim());
-        if (data.event === 'token' && data.delta) text += data.delta;
-        else if (data.event === 'done' && Array.isArray(data.citations)) citations = data.citations;
+        const payload = JSON.parse(buffer.trim()) as {
+          content?: unknown;
+          choices?: Array<{ message?: { content?: unknown }; delta?: { content?: unknown } }>;
+        };
+        const plain =
+          typeof payload.content === 'string'
+            ? payload.content
+            : payload.choices?.[0]?.message?.content ??
+              payload.choices?.[0]?.delta?.content;
+        if (typeof plain === 'string') text = plain;
       } catch {}
     }
 

@@ -4,13 +4,17 @@ import { POST } from '../terminal/ai-chat/route';
 
 describe('/api/terminal/ai-chat route', () => {
   const originalFetch = global.fetch;
+  const originalEnv = { ...process.env };
 
   beforeEach(() => {
     vi.clearAllMocks();
+    process.env.RETRIEVER_PORTFOLIO_TENANT_ID = 'portfolio_tenant';
+    process.env.RETRIEVER_PORTFOLIO_API_KEY = 'portfolio_key';
   });
 
   afterEach(() => {
     global.fetch = originalFetch;
+    process.env = { ...originalEnv };
   });
 
   it('returns 400 if query is missing or empty', async () => {

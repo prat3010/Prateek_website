@@ -6,10 +6,12 @@ import { RetrieverClient } from '@/lib/rag-client';
 describe('POST /api/scoping/session', () => {
   const origTenant = process.env.RETRIEVER_SCOPING_TENANT_ID;
   const origKey = process.env.RETRIEVER_SCOPING_API_KEY;
+  const origUser = process.env.RETRIEVER_SCOPING_USER_ID;
 
   beforeEach(() => {
     process.env.RETRIEVER_SCOPING_TENANT_ID = 'test_tenant_live_123';
     process.env.RETRIEVER_SCOPING_API_KEY = 'test_api_key_live_456';
+    process.env.RETRIEVER_SCOPING_USER_ID = '11111111-1111-4111-8111-111111111111';
   });
 
   afterEach(() => {
@@ -18,6 +20,9 @@ describe('POST /api/scoping/session', () => {
 
     if (origKey) process.env.RETRIEVER_SCOPING_API_KEY = origKey;
     else delete process.env.RETRIEVER_SCOPING_API_KEY;
+
+    if (origUser) process.env.RETRIEVER_SCOPING_USER_ID = origUser;
+    else delete process.env.RETRIEVER_SCOPING_USER_ID;
   });
 
   it('returns existing session if cookie is present and valid', async () => {

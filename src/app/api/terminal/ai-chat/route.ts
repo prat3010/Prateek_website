@@ -3,8 +3,8 @@ import { generateTraceparent } from '@/lib/tracing';
 
 export const maxDuration = 60;
 
-const RETRIEVER_API_URL = (process.env.RETRIEVER_API_URL || process.env.NEXT_PUBLIC_RETRIEVER_API_URL || 'https://rag.prateeq.in').replace(/\/$/, '');
-const PORTFOLIO_TENANT_ID = process.env.RETRIEVER_PORTFOLIO_TENANT_ID || '6797e2c8-745a-4bd1-aa4c-3854b8d79c22';
+const RETRIEVER_API_URL = (process.env.RETRIEVER_API_URL || 'https://rag.prateeq.in').replace(/\/$/, '');
+
 
 const AI_TWIN_SYSTEM_PROMPT = `You are Prateeq Sharma's AI Twin, Forward Deployed AI Engineer, and Systems Architect.
 You live inside Prateeq's portfolio terminal (prateeq.in/terminal), connected to the live Retriever cognitive engine on Oracle Cloud (VM.Standard.E2.1.Micro) in Ubuntu 24.04.
@@ -50,11 +50,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Query is required.' }, { status: 400 });
     }
 
-    const apiKey = process.env.RETRIEVER_PORTFOLIO_API_KEY;
-    if (!apiKey && process.env.NODE_ENV !== 'test') {
-      return NextResponse.json({ error: 'Retriever portfolio API key is not configured.' }, { status: 500 });
+    const tenantId = process.env.RETRIEVER_PORTFOLIO_TENANT_ID || '';
+    const apiKey = process.env.RETRIEVER_PORTFOLIO_API_KEY || '';
+    if (!tenantId || !apiKey) {
+      return NextResponse.json(
+        { error: 'Retriever portfolio tenant or API key is not configured.' },
+        { status: 503 }
+      );
     }
-    const resolvedApiKey = apiKey || 'ret_live_test_mock_key';
+    const resolvedApiKey = apiKey;
 
     // Build message thread with first-class system prompt and history
     const messages = [
@@ -66,7 +70,7 @@ export async function POST(req: NextRequest) {
       { role: 'user', content: query },
     ];
 
-    const endpoint = `${RETRIEVER_API_URL}/v1/tenants/${PORTFOLIO_TENANT_ID}/chat/completions`;
+    const endpoint = `${RETRIEVER_API_URL}/v1/tenants/${tenantId}/chat/completions`;
     const { traceparent } = generateTraceparent();
 
     const res = await fetch(endpoint, {
@@ -75,7 +79,7 @@ export async function POST(req: NextRequest) {
         Authorization: `Bearer ${resolvedApiKey}`,
         'Content-Type': 'application/json',
         traceparent,
-        'X-Tenant-ID': PORTFOLIO_TENANT_ID,
+        'X-Tenant-ID': tenantId,
       },
       body: JSON.stringify({
         messages,
