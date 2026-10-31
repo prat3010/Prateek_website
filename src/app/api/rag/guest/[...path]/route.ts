@@ -81,6 +81,8 @@ function buildUpstreamBody(
     return {
       query,
       limit: Math.min(5, Math.max(1, Math.round(requestedLimit))),
+      enable_hybrid:
+        typeof payload.enable_hybrid === 'boolean' ? payload.enable_hybrid : true,
       enable_colbert_rerank: payload.enable_colbert_rerank === true,
     };
   }
@@ -106,7 +108,19 @@ function upstreamHeaders(apiKey: string, accept: string | null, guestUserId: str
 
 async function guestUserIdForRequest(req: NextRequest): Promise<string> {
   const ipHash = await getIpHash(getClientIdentifier(req));
-  return `guest_${ipHash.slice(0, 32)}`;
+  // Retriever requires X-User-ID to be a UUID. Derive an opaque, daily-rotating
+  // UUID from the IP hash so no raw or stable guest identifier is sent upstream.
+  const hex = ipHash.slice(0, 32).split('');
+  hex[12] = '4';
+  hex[16] = ((parseInt(hex[16], 16) & 0x3) | 0x8).toString(16);
+  const uuid = hex.join('');
+  return [
+    uuid.slice(0, 8),
+    uuid.slice(8, 12),
+    uuid.slice(12, 16),
+    uuid.slice(16, 20),
+    uuid.slice(20, 32),
+  ].join('-');
 }
 
 async function handleGuestRequest(

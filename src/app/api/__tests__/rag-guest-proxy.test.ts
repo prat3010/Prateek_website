@@ -4,6 +4,8 @@ import { GET, POST } from '../rag/guest/[...path]/route';
 
 const GUEST_TENANT = '11111111-1111-4111-8111-111111111111';
 const GUEST_KEY = 'ret_live_test_guest_key';
+const GUEST_USER_ID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
 let requestCounter = 0;
 
@@ -76,7 +78,7 @@ describe('/api/rag/guest proxy', () => {
     const res = await POST(
       guestRequest(
         'search',
-        { query: 'hybrid retrieval', limit: 99, enable_colbert_rerank: true },
+        { query: 'hybrid retrieval', limit: 99, enable_hybrid: true, enable_colbert_rerank: true },
         { authorization: 'Bearer attacker-key', 'x-user-id': 'spoofed-user' }
       ),
       context(['search'])
@@ -88,9 +90,34 @@ describe('/api/rag/guest proxy', () => {
     expect((options.headers as Headers).get('Authorization')).toBe(`Bearer ${GUEST_KEY}`);
     const sentBody = JSON.parse(options.body);
     expect(sentBody.limit).toBe(5);
+    expect(sentBody.enable_hybrid).toBe(true);
     expect(sentBody.enable_colbert_rerank).toBe(true);
-    expect((options.headers as Headers).get('X-User-ID')).toMatch(/^guest_[a-f0-9]{32}$/);
+    expect((options.headers as Headers).get('X-User-ID')).toMatch(GUEST_USER_ID_PATTERN);
     expect((options.headers as Headers).get('X-User-ID')).not.toBe('spoofed-user');
+  });
+
+  it('honors an explicit hybrid opt-out and defaults it on when omitted', async () => {
+    global.fetch = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ results: [] }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      })
+    );
+
+    await POST(
+      guestRequest('search', { query: 'exact lookup', enable_hybrid: false }),
+      context(['search'])
+    );
+    const optOut = JSON.parse(
+      (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0][1].body
+    );
+    expect(optOut.enable_hybrid).toBe(false);
+
+    await POST(guestRequest('search', { query: 'default lookup' }), context(['search']));
+    const defaulted = JSON.parse(
+      (global.fetch as ReturnType<typeof vi.fn>).mock.calls[1][1].body
+    );
+    expect(defaulted.enable_hybrid).toBe(true);
   });
 
   it('maps the public tenant alias to the configured tenant for widget sessions', async () => {
@@ -110,7 +137,8 @@ describe('/api/rag/guest proxy', () => {
     const [url, options] = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0];
     expect(url).toBe(`https://retriever.test/v1/tenants/${GUEST_TENANT}/chat/sessions`);
     const sentBody = JSON.parse(options.body);
-    expect(sentBody.user_id).toMatch(/^guest_[a-f0-9]{32}$/);
+    expect(sentBody.user_id).toMatch(GUEST_USER_ID_PATTERN);
+    expect((options.headers as Headers).get('X-User-ID')).toBe(sentBody.user_id);
     expect(sentBody.user_id).not.toBe('client-chosen');
   });
 
