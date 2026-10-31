@@ -123,6 +123,9 @@ RETRIEVER_SCOPING_USER_ID=your_scoping_user_id
 # scoping credentials above are used. Never expose either key to the browser.
 RETRIEVER_GUEST_TENANT_ID=your_guest_tenant_id
 RETRIEVER_GUEST_API_KEY=your_guest_api_key
+# Optional: UUID of a dedicated user row in the guest tenant. When omitted,
+# RETRIEVER_SCOPING_USER_ID is reused.
+RETRIEVER_GUEST_USER_ID=your_guest_user_id
 # Warm-up targets
 RETRIEVER_PORTFOLIO_TENANT_ID=your_portfolio_tenant_id
 RETRIEVER_PORTFOLIO_API_KEY=your_portfolio_api_key

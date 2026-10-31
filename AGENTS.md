@@ -67,7 +67,7 @@ The project uses the following environment variables (stored in `.env.local` loc
 - `CRON_SECRET`: Shared secret key used to authenticate `/api/cron/warmup`. The same value must be stored as a GitHub Actions repository secret so the hourly external canary in `.github/workflows/warmup.yml` can call the endpoint. The primary five-minute warm-up is the systemd timer on the Oracle VM.
 - `RETRIEVER_API_URL`: Base URL for the Retriever API (defaults to `https://rag.prateeq.in`).
 - `RETRIEVER_SCOPING_TENANT_ID`, `RETRIEVER_SCOPING_API_KEY`, `RETRIEVER_SCOPING_USER_ID`: Server-side credentials for the live scoping copilot. If any are missing, `/api/scoping/chat` falls back to the deterministic local blueprint engine. Never add a hardcoded fallback key.
-- `RETRIEVER_GUEST_TENANT_ID`, `RETRIEVER_GUEST_API_KEY`: Optional dedicated server-side credentials for `/api/rag/guest/*`. When omitted, the scoping credentials are reused. Guest keys are never sent to the browser.
+- `RETRIEVER_GUEST_TENANT_ID`, `RETRIEVER_GUEST_API_KEY`, `RETRIEVER_GUEST_USER_ID`: Optional dedicated server-side credentials for `/api/rag/guest/*`. `RETRIEVER_GUEST_USER_ID` must be the UUID of a real `users` row in the guest tenant because Retriever enforces that foreign key for chat sessions and messages. When omitted, the scoping credentials and user ID are reused. Guest keys are never sent to the browser.
 - `RETRIEVER_PORTFOLIO_TENANT_ID`, `RETRIEVER_PORTFOLIO_API_KEY`: Credentials used by `/api/cron/warmup` and the terminal AI twin to warm/query the portfolio tenant.
 - `GITHUB_TOKEN` (or `GITHUB_PAT` / `GH_TOKEN`): Optional GitHub personal access token, used by the local Synchronizer dashboard to raise the rate limit on deployment status checks.
 

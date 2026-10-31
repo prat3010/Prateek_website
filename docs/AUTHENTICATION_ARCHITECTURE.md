@@ -199,7 +199,7 @@ Identity state connects `prateeq.in` to the Retriever Cognitive Engine:
 | `RAZORPAY_KEY_ID` | Client + Server | Public Key ID for standard checkout modal |
 | `RAZORPAY_KEY_SECRET` | Server-Only | HMAC-SHA256 signature verification key for payments |
 | `RETRIEVER_SCOPING_TENANT_ID` / `RETRIEVER_SCOPING_API_KEY` / `RETRIEVER_SCOPING_USER_ID` | **Server-Only** | Live scoping copilot credentials; missing values disable the upstream and use the local blueprint engine |
-| `RETRIEVER_GUEST_TENANT_ID` / `RETRIEVER_GUEST_API_KEY` | **Server-Only** | Optional guest RAG proxy credentials; falls back to the scoping credentials |
+| `RETRIEVER_GUEST_TENANT_ID` / `RETRIEVER_GUEST_API_KEY` / `RETRIEVER_GUEST_USER_ID` | **Server-Only** | Optional guest RAG proxy credentials; user ID must reference a real guest user in the tenant, and missing values fall back to the scoping credentials |
 | `RETRIEVER_PORTFOLIO_TENANT_ID` / `RETRIEVER_PORTFOLIO_API_KEY` | **Server-Only** | Terminal AI twin and warm-up credentials |
 
 ---

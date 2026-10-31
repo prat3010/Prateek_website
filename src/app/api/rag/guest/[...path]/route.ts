@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { checkRateLimit, getClientIdentifier, rateLimitResponse } from '@/lib/rateLimit';
-import { getIpHash } from '@/lib/security';
+import { checkRateLimit, rateLimitResponse } from '@/lib/rateLimit';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -106,23 +105,6 @@ function upstreamHeaders(apiKey: string, accept: string | null, guestUserId: str
   return headers;
 }
 
-async function guestUserIdForRequest(req: NextRequest): Promise<string> {
-  const ipHash = await getIpHash(getClientIdentifier(req));
-  // Retriever requires X-User-ID to be a UUID. Derive an opaque, daily-rotating
-  // UUID from the IP hash so no raw or stable guest identifier is sent upstream.
-  const hex = ipHash.slice(0, 32).split('');
-  hex[12] = '4';
-  hex[16] = ((parseInt(hex[16], 16) & 0x3) | 0x8).toString(16);
-  const uuid = hex.join('');
-  return [
-    uuid.slice(0, 8),
-    uuid.slice(8, 12),
-    uuid.slice(12, 16),
-    uuid.slice(16, 20),
-    uuid.slice(20, 32),
-  ].join('-');
-}
-
 async function handleGuestRequest(
   req: NextRequest,
   context: { params: Promise<{ path?: string[] }> }
@@ -138,8 +120,16 @@ async function handleGuestRequest(
     process.env.RETRIEVER_SCOPING_API_KEY ||
     ''
   ).trim();
+  // Retriever requires a UUID in X-User-ID and enforces a users-table foreign
+  // key for chat sessions/messages. Use a provisioned guest user in the same
+  // tenant so public traffic is never attributed to a real account.
+  const guestUserId = (
+    process.env.RETRIEVER_GUEST_USER_ID ||
+    process.env.RETRIEVER_SCOPING_USER_ID ||
+    ''
+  ).trim();
 
-  if (!guestTenantId || !guestApiKey) {
+  if (!guestTenantId || !guestApiKey || !guestUserId) {
     console.error('[rag-guest] Guest Retriever credentials are not configured.');
     return NextResponse.json(
       { error: 'Guest RAG is not configured.' },
@@ -188,7 +178,6 @@ async function handleGuestRequest(
     );
   }
 
-  const guestUserId = await guestUserIdForRequest(req);
   const upstreamBody = buildUpstreamBody(operation, payload, guestUserId);
   if (!upstreamBody) {
     return NextResponse.json(

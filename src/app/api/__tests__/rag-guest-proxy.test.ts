@@ -4,8 +4,9 @@ import { GET, POST } from '../rag/guest/[...path]/route';
 
 const GUEST_TENANT = '11111111-1111-4111-8111-111111111111';
 const GUEST_KEY = 'ret_live_test_guest_key';
-const GUEST_USER_ID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+const GUEST_USER = '22222222-2222-4222-8222-222222222222';
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
 let requestCounter = 0;
 
@@ -33,6 +34,7 @@ describe('/api/rag/guest proxy', () => {
   beforeEach(() => {
     process.env.RETRIEVER_GUEST_TENANT_ID = GUEST_TENANT;
     process.env.RETRIEVER_GUEST_API_KEY = GUEST_KEY;
+    process.env.RETRIEVER_GUEST_USER_ID = GUEST_USER;
     process.env.RETRIEVER_API_URL = 'https://retriever.test';
   });
 
@@ -45,14 +47,37 @@ describe('/api/rag/guest proxy', () => {
   it('returns 503 when guest credentials are absent', async () => {
     delete process.env.RETRIEVER_GUEST_TENANT_ID;
     delete process.env.RETRIEVER_GUEST_API_KEY;
+    delete process.env.RETRIEVER_GUEST_USER_ID;
     delete process.env.RETRIEVER_SCOPING_TENANT_ID;
     delete process.env.RETRIEVER_SCOPING_API_KEY;
+    delete process.env.RETRIEVER_SCOPING_USER_ID;
     global.fetch = vi.fn();
 
     const res = await POST(guestRequest('search', { query: 'hello' }), context(['search']));
 
     expect(res.status).toBe(503);
     expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('falls back to the scoping credentials when no guest identity is dedicated', async () => {
+    delete process.env.RETRIEVER_GUEST_TENANT_ID;
+    delete process.env.RETRIEVER_GUEST_API_KEY;
+    delete process.env.RETRIEVER_GUEST_USER_ID;
+    process.env.RETRIEVER_SCOPING_TENANT_ID = GUEST_TENANT;
+    process.env.RETRIEVER_SCOPING_API_KEY = GUEST_KEY;
+    process.env.RETRIEVER_SCOPING_USER_ID = GUEST_USER;
+    global.fetch = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ results: [] }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      })
+    );
+
+    const res = await POST(guestRequest('search', { query: 'hello' }), context(['search']));
+
+    expect(res.status).toBe(200);
+    const [, options] = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0];
+    expect((options.headers as Headers).get('X-User-ID')).toBe(GUEST_USER);
   });
 
   it('rejects tenant paths outside the configured guest tenant', async () => {
@@ -92,7 +117,7 @@ describe('/api/rag/guest proxy', () => {
     expect(sentBody.limit).toBe(5);
     expect(sentBody.enable_hybrid).toBe(true);
     expect(sentBody.enable_colbert_rerank).toBe(true);
-    expect((options.headers as Headers).get('X-User-ID')).toMatch(GUEST_USER_ID_PATTERN);
+    expect((options.headers as Headers).get('X-User-ID')).toBe(GUEST_USER);
     expect((options.headers as Headers).get('X-User-ID')).not.toBe('spoofed-user');
   });
 
@@ -137,7 +162,8 @@ describe('/api/rag/guest proxy', () => {
     const [url, options] = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0];
     expect(url).toBe(`https://retriever.test/v1/tenants/${GUEST_TENANT}/chat/sessions`);
     const sentBody = JSON.parse(options.body);
-    expect(sentBody.user_id).toMatch(GUEST_USER_ID_PATTERN);
+    expect(sentBody.user_id).toBe(GUEST_USER);
+    expect(UUID_PATTERN.test(sentBody.user_id)).toBe(true);
     expect((options.headers as Headers).get('X-User-ID')).toBe(sentBody.user_id);
     expect(sentBody.user_id).not.toBe('client-chosen');
   });

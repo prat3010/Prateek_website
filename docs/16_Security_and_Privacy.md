@@ -89,7 +89,7 @@ Dynamic vulnerability scanning and proof-of-concept (PoC) security validation ar
 
 # **RAG Guest API Key & Session Security**
 
-* **Server-Side Guest Key**: Public RAG chat/search requests on `prateeq.in/rag` go through `/api/rag/guest/*`. The server injects the guest tenant key, derives a per-IP guest user ID, rate-limits requests, and allows only read-only chat/session/search operations. No guest API key is shipped to the browser.
+* **Server-Side Guest Key**: Public RAG chat/search requests on `prateeq.in/rag` go through `/api/rag/guest/*`. The server injects the guest tenant key and a dedicated guest user UUID provisioned in that tenant, rate-limits requests, and allows only read-only chat/session/search operations. No guest API key or raw visitor IP is sent to Retriever.
 * **Request-Level Identity Caching**: Backend API security checks (`get_current_user`) cache resolved `UserContext` on `request.state` to eliminate redundant database queries per request and prevent external OIDC JWKS lookup timeouts.
 * **Fast-Path Session Isolation**: Chat session creation (`/v1/tenants/{tenantId}/chat/sessions`) uses isolated UUID generation and fast-path fallback handling to protect guest tenant boundaries without exposing user directory table locks.
 

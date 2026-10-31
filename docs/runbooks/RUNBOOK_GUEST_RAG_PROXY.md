@@ -5,7 +5,7 @@ Use this runbook when deploying the server-side guest proxy or rotating the Retr
 ## Architecture
 
 - Public `/rag` previews call `/api/rag/guest/*` on `prateeq.in`.
-- The proxy injects `RETRIEVER_GUEST_API_KEY` (or `RETRIEVER_SCOPING_API_KEY` when no dedicated guest key is set).
+- The proxy injects `RETRIEVER_GUEST_API_KEY` (or `RETRIEVER_SCOPING_API_KEY` when no dedicated guest key is set) and `RETRIEVER_GUEST_USER_ID` (or `RETRIEVER_SCOPING_USER_ID`).
 - `/rag/app` is login-only and no longer uses a guest showroom tenant.
 - The old browser-exposed keys must be revoked after the proxy is live.
 
@@ -39,9 +39,24 @@ Store the returned `apiKey` and `keyId` in the password manager.
 
 ## 3. Update server-side configuration
 
+Provision the guest identity first. `RETRIEVER_GUEST_USER_ID` must be the UUID of a real `users` row in the guest tenant; Retriever rejects unknown UUIDs when persisting chat sessions and messages. Create a dedicated row so guest traffic is not attributed to a real account:
+
+```sql
+BEGIN;
+SET LOCAL app.current_tenant_id = '<guest-tenant-uuid>';
+INSERT INTO users (user_id, tenant_id, external_id, display_name, is_active, created_at)
+VALUES (gen_random_uuid(), '<guest-tenant-uuid>', 'guest.rag.proxy@guest.local', 'Guest RAG Proxy', true, now())
+ON CONFLICT (tenant_id, external_id) DO UPDATE SET is_active = true
+RETURNING user_id;
+COMMIT;
+```
+
+If `RETRIEVER_GUEST_USER_ID` is omitted, the proxy reuses `RETRIEVER_SCOPING_USER_ID`.
+
 Update these values in Vercel Production and Preview:
 
 - `RETRIEVER_GUEST_API_KEY` = new key
+- `RETRIEVER_GUEST_USER_ID` = guest user UUID (optional if reusing scoping identity)
 - `RETRIEVER_SCOPING_API_KEY` = new key (if the scoping tenant shares the key)
 
 Also update local `.env.local` and, on the Oracle VM, `/etc/retriever-warmup.env`:
