@@ -76,9 +76,7 @@
   gap: 0.35rem;
   margin-bottom: 3rem;
   padding: 0.35rem;
-  background: rgba(250, 249, 246, 0.92);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: var(--surface-card, #FAF9F6);
   border-radius: 12px;
   border: 1.5px solid var(--color-border);
   width: fit-content;
@@ -153,9 +151,7 @@
 
 /* ===== SKILL CARD ===== */
 .skillCard {
-  background: rgba(255, 255, 255, 0.90);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: var(--surface-card, #FAF9F6);
   border: 1.5px solid var(--color-border);
   border-radius: 12px;
   padding: 0;
@@ -471,9 +467,7 @@
 }
 
 :global([data-theme='noir']) .tabs {
-  background: rgba(14, 14, 18, 0.9);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: var(--surface-hardware-recessed, #0A0A0D);
   border: 1.5px solid var(--surface-hardware-border);
   border-radius: 12px;
   box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.6);
@@ -507,9 +501,7 @@
 }
 
 :global([data-theme='noir']) .skillCard {
-  background: rgba(18, 18, 24, 0.88);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: var(--surface-hardware-card, #121216);
   border: 1.5px solid var(--border-muted);
   border-radius: 12px;
   box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.7);
@@ -538,12 +530,12 @@
 
 :global([data-theme='noir']) .pulseDot {
   background: var(--neon-cyan);
-  box-shadow: 0 0 6px var(--neon-cyan);
+  box-shadow: 0 0 0 1.5px rgba(0, 240, 255, 0.4);
 }
 
 :global([data-theme='noir']) .pulseDotQuest {
   background: var(--neon-pink);
-  box-shadow: 0 0 6px var(--neon-pink);
+  box-shadow: 0 0 0 1.5px rgba(255, 42, 85, 0.4);
 }
 
 :global([data-theme='noir']) .skillCardIconWrap {

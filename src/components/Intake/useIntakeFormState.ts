@@ -644,8 +644,11 @@ export function useIntakeFormState(
       setPopoverAnchor(null);
     } else {
       const rect = e.currentTarget.getBoundingClientRect();
+      const clampedX = typeof window !== 'undefined'
+        ? Math.max(12, Math.min(rect.left, window.innerWidth - 300))
+        : rect.left;
       setActivePopoverId(id);
-      setPopoverAnchor({ x: rect.left, y: rect.bottom + 6 });
+      setPopoverAnchor({ x: clampedX, y: rect.bottom + 6 });
     }
   }, [activePopoverId]);
 

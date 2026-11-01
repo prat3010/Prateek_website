@@ -7,8 +7,6 @@
   position: fixed;
   inset: 0;
   background: rgba(43, 43, 54, 0.45);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
   z-index: 99999;
   display: flex;
   justify-content: flex-end;
@@ -18,8 +16,6 @@
 .backdropNoir,
 :global([data-theme='noir']) .backdrop {
   background: rgba(8, 8, 10, 0.85);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
 }
 
 .drawer {

@@ -71,17 +71,13 @@
 }
 
 .bioBubble {
-  --bubble-bg: rgba(250, 249, 246, 0.94);
-  background: rgba(250, 249, 246, 0.94);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  --bubble-bg: var(--pop-white, #FAF9F6);
+  background: var(--pop-white, #FAF9F6);
 }
 
 :global([data-theme='noir']) .bioBubble {
-  --bubble-bg: var(--surface-bubble);
-  background: var(--surface-bubble);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  --bubble-bg: var(--surface-bubble, #121216);
+  background: var(--surface-bubble, #121216);
   color: var(--color-text);
   border-color: var(--border-muted);
   box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.7);

@@ -36,7 +36,7 @@
 .noirTheme:focus-within,
 :global([data-theme='noir']) .chatCardContainer:focus-within {
   border-color: var(--neon-cyan, #00f0ff);
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.25);
+  box-shadow: 0 0 0 1px var(--neon-cyan, #00f0ff), 0 8px 32px rgba(0, 0, 0, 0.6);
 }
 
 /* ── Header Toolbar ─────────────────────────────────────────── */
@@ -71,7 +71,7 @@
   background: rgba(0, 240, 255, 0.12);
   border-color: rgba(0, 240, 255, 0.35);
   color: var(--neon-cyan, #00f0ff);
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.15);
+  box-shadow: 1px 1px 0px rgba(0, 240, 255, 0.2);
 }
 
 .modelBadge {
@@ -128,14 +128,14 @@
   height: 6px;
   border-radius: 50%;
   background: var(--pop-green, #79B48B);
-  box-shadow: 0 0 6px rgba(121, 180, 139, 0.85);
+  box-shadow: 0 0 0 1.5px rgba(121, 180, 139, 0.4);
   animation: pulseLiveDot 2s infinite ease-in-out;
 }
 
 .noirTheme .verifiedDot,
 :global([data-theme='noir']) .verifiedDot {
   background: var(--neon-green, #39ff14);
-  box-shadow: 0 0 8px rgba(57, 255, 20, 0.85);
+  box-shadow: 0 0 0 1.5px rgba(57, 255, 20, 0.4);
 }
 
 .rfpBtn {
@@ -176,7 +176,7 @@
   background: var(--surface-card, #1e1e24);
   color: var(--neon-cyan, #00f0ff);
   border-color: var(--neon-cyan, #00f0ff);
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
+  box-shadow: 2px 2px 0px rgba(0, 240, 255, 0.3);
   transform: translateY(-1px);
 }
 
@@ -217,7 +217,7 @@
   background: rgba(255, 42, 85, 0.12);
   color: var(--neon-pink, #ff2a55);
   border-color: var(--neon-pink, #ff2a55);
-  box-shadow: 0 0 10px rgba(255, 42, 85, 0.3);
+  box-shadow: 2px 2px 0px rgba(255, 42, 85, 0.3);
 }
 
 /* ── Live Scope Sync Banner ─────────────────────────────────── */
@@ -238,7 +238,7 @@
 :global([data-theme='noir']) .scopeSyncBanner {
   background: rgba(57, 255, 20, 0.1);
   border: 1px solid rgba(57, 255, 20, 0.3);
-  box-shadow: 0 0 10px rgba(57, 255, 20, 0.15);
+  box-shadow: 2px 2px 0px rgba(57, 255, 20, 0.15);
 }
 
 .livePulseDot {
@@ -246,7 +246,7 @@
   height: 8px;
   background-color: var(--pop-green, #79B48B);
   border-radius: 50%;
-  box-shadow: 0 0 8px rgba(121, 180, 139, 0.8);
+  box-shadow: 0 0 0 2px rgba(121, 180, 139, 0.4);
   animation: pulseLiveDot 2s infinite ease-in-out;
   flex-shrink: 0;
 }
@@ -254,7 +254,7 @@
 .noirTheme .livePulseDot,
 :global([data-theme='noir']) .livePulseDot {
   background-color: var(--neon-green, #39ff14);
-  box-shadow: 0 0 10px var(--neon-green, #39ff14);
+  box-shadow: 0 0 0 2px rgba(57, 255, 20, 0.4);
 }
 
 @keyframes pulseLiveDot {
@@ -364,7 +364,7 @@
   background: rgba(0, 240, 255, 0.12);
   border-color: var(--neon-cyan, #00f0ff);
   color: var(--neon-cyan, #00f0ff);
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
+  box-shadow: 2px 2px 0px rgba(0, 240, 255, 0.3);
   transform: translateY(-1px);
 }
 
@@ -472,7 +472,7 @@
   background: rgba(0, 240, 255, 0.14);
   color: #ffffff;
   border: 1px solid var(--neon-cyan, #00f0ff);
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
+  box-shadow: 2px 2px 0px rgba(0, 240, 255, 0.25);
   font-family: var(--font-code, monospace);
   font-size: 0.84rem;
 }
@@ -602,7 +602,7 @@
 :global([data-theme='noir']) .blueprintBox {
   background: #121216;
   border: 1px solid rgba(0, 240, 255, 0.4);
-  box-shadow: 0 0 16px rgba(0, 240, 255, 0.15);
+  box-shadow: 2px 2px 0px rgba(0, 240, 255, 0.18);
 }
 
 .blueprintHeader {
@@ -713,7 +713,7 @@
 :global([data-theme='noir']) .phaseCard:hover {
   background: rgba(0, 240, 255, 0.06);
   border-color: var(--neon-cyan, #00f0ff);
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+  box-shadow: 2px 2px 0px rgba(0, 240, 255, 0.25);
 }
 
 .phaseCardFull {
@@ -853,14 +853,14 @@
   background: var(--neon-green, #39ff14);
   color: #000000;
   border: none;
-  box-shadow: 0 0 12px rgba(57, 255, 20, 0.35);
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
 }
 
 .noirTheme .applyPhaseBtn:hover,
 :global([data-theme='noir']) .applyPhaseBtn:hover {
   background: #4efc2e;
   transform: translateY(-1px);
-  box-shadow: 0 0 18px rgba(57, 255, 20, 0.55);
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.6);
 }
 
 .applyFullBtn {
@@ -892,14 +892,14 @@
   background: var(--neon-cyan, #00f0ff);
   color: #000000;
   border: none;
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.35);
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
 }
 
 .noirTheme .applyFullBtn:hover,
 :global([data-theme='noir']) .applyFullBtn:hover {
   background: #3df3ff;
   transform: translateY(-1px);
-  box-shadow: 0 0 18px rgba(0, 240, 255, 0.55);
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.6);
 }
 
 .blueprintActionRow {
@@ -938,14 +938,14 @@
   background: var(--neon-green, #39ff14);
   color: #000000;
   border: none;
-  box-shadow: 0 0 14px rgba(57, 255, 20, 0.35);
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
 }
 
 .noirTheme .applyBlueprintBtn:hover,
 :global([data-theme='noir']) .applyBlueprintBtn:hover {
   background: #4efc2e;
   transform: translateY(-1px);
-  box-shadow: 0 0 20px rgba(57, 255, 20, 0.55);
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.6);
 }
 
 .appliedBadge {
@@ -1006,7 +1006,7 @@
   color: var(--neon-cyan, #00f0ff);
   border-color: var(--neon-cyan, #00f0ff);
   background: rgba(0, 240, 255, 0.08);
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+  box-shadow: 2px 2px 0px rgba(0, 240, 255, 0.25);
 }
 
 .downloadPdfBtn {
@@ -1052,7 +1052,7 @@
   background: rgba(0, 240, 255, 0.2);
   color: #ffffff;
   border-color: var(--neon-cyan, #00f0ff);
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+  box-shadow: 2px 2px 0px rgba(0, 240, 255, 0.3);
   transform: translateY(-1px);
 }
 
@@ -1163,7 +1163,7 @@
 .noirTheme .textInput:focus,
 :global([data-theme='noir']) .textInput:focus {
   border-color: var(--neon-cyan, #00f0ff);
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
+  box-shadow: 0 0 0 2px rgba(0, 240, 255, 0.25), inset 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
 .sendBtn {
@@ -1208,14 +1208,14 @@
   background: var(--neon-cyan, #00f0ff);
   color: #08080a;
   border: none;
-  box-shadow: 0 0 14px rgba(0, 240, 255, 0.35);
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
 }
 
 .noirTheme .sendBtn:hover:not(:disabled),
 :global([data-theme='noir']) .sendBtn:hover:not(:disabled) {
   background: #3df3ff;
   transform: translateY(-1px);
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.55);
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.6);
 }
 
 /* ── Near Limit Warning Callout ─────────────────────────────── */
@@ -1266,7 +1266,7 @@
 :global([data-theme='noir']) .softGateCard {
   background: #121216;
   border-color: var(--neon-cyan, #00f0ff);
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+  box-shadow: 2px 2px 0px rgba(0, 240, 255, 0.25);
 }
 
 .softGateHeader {
@@ -1358,14 +1358,14 @@
   background: var(--neon-cyan, #00f0ff);
   color: #000000;
   border: none;
-  box-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
 }
 
 .noirTheme .softGateBtn:hover,
 :global([data-theme='noir']) .softGateBtn:hover {
   background: #3df3ff;
   transform: translateY(-1px);
-  box-shadow: 0 0 22px rgba(0, 240, 255, 0.6);
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.6);
 }
 
 /* ── Dedicated Drawer Mode Overrides ────────────────────────── */

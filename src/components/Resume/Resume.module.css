@@ -362,7 +362,7 @@
 :global([data-theme='noir']) .timeline::before {
   background: var(--neon-cyan);
   opacity: 0.35;
-  box-shadow: 0 0 6px rgba(0, 240, 255, 0.3);
+  box-shadow: none;
 }
 
 .timelineItem {
@@ -393,12 +393,12 @@
 :global([data-theme='noir']) .timelineItem::before {
   background: #08080a;
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 6px rgba(0, 240, 255, 0.6);
+  box-shadow: 0 0 0 2px rgba(0, 240, 255, 0.25);
 }
 
 :global([data-theme='noir']) .timelineItem:hover::before {
   border-color: var(--neon-pink);
-  box-shadow: 0 0 8px rgba(255, 42, 85, 0.7);
+  box-shadow: 0 0 0 2px rgba(255, 42, 85, 0.35);
 }
 
 .timelineHeader {
@@ -1187,7 +1187,7 @@
 :global([data-theme='noir']) .skillTag:hover {
   border-color: var(--neon-cyan);
   color: var(--neon-cyan);
-  box-shadow: 0 0 6px rgba(0, 240, 255, 0.3);
+  box-shadow: 1px 1px 0px rgba(0, 240, 255, 0.4);
 }
 
 /* Dev Mode: Experience Timeline */

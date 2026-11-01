@@ -335,7 +335,12 @@ export function QuickServiceFlow({
                         />
                         <div
                           className={styles.popoverPortal}
-                          style={{ left: popoverAnchor.x, top: popoverAnchor.y }}
+                          style={{
+                            left: typeof window !== 'undefined'
+                              ? Math.max(12, Math.min(popoverAnchor.x, window.innerWidth - 300))
+                              : popoverAnchor.x,
+                            top: popoverAnchor.y,
+                          }}
                           onClick={(ev) => ev.stopPropagation()}
                         >
                           <div className={`${styles.popoverBox} ${styles.popoverStatic}`}>

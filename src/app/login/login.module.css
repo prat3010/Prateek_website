@@ -8,14 +8,11 @@
 
 .card {
   width: 100%;
-  max-width: 440px;
-  background: var(--surface-glass-card, rgba(18, 18, 24, 0.85));
-  border: 1px solid var(--surface-glass-border, rgba(255, 255, 255, 0.1));
-  box-shadow: var(--shadow-glass-lg, 0 8px 32px rgba(0, 0, 0, 0.4));
+  background: var(--surface-card, #121216);
+  border: 1px solid var(--surface-hardware-border, rgba(255, 255, 255, 0.1));
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   border-radius: var(--border-radius-xl, 16px);
   padding: 2.5rem 2rem;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   display: flex;
   flex-direction: column;
   gap: 1.5rem;

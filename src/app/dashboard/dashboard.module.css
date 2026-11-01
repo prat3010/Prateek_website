@@ -1405,7 +1405,7 @@
 }
 
 :global([data-theme='noir']) .categoryFilterBtn:hover {
-  color: var(--pop-black);
+  color: #ffffff;
   background: rgba(255, 255, 255, 0.08);
 }
 

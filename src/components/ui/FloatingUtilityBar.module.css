@@ -17,9 +17,7 @@
   align-items: center;
   gap: 4px;
   padding: 3px 6px;
-  background-color: rgba(250, 249, 246, 0.92);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background-color: var(--surface-card, #FAF9F6);
   border: 1.5px solid var(--color-border);
   border-radius: 9999px;
   box-shadow: var(--shadow-comic-sm);
@@ -45,9 +43,7 @@
 
 /* ── Noir Theme Overrides (Tactile Hardware Machined Capsule) ─ */
 :global([data-theme='noir']) .dockCapsule {
-  background-color: rgba(14, 14, 18, 0.92);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background-color: var(--surface-hardware-chassis, #0E0E12);
   border: 1px solid var(--surface-hardware-border);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7), var(--surface-hardware-bevel);
 }

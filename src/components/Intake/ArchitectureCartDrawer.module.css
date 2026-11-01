@@ -2,8 +2,6 @@
   position: fixed;
   inset: 0;
   background: rgba(8, 8, 10, 0.85);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
   z-index: 99999;
   display: flex;
   justify-content: flex-end;
