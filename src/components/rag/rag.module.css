@@ -71,6 +71,17 @@
   margin-bottom: 1.25rem;
 }
 
+.panelHeaderGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.panelHeaderGroup .panelDesc {
+  margin-bottom: 0;
+}
+
 .label {
   display: block;
   font-size: 0.8125rem;
@@ -2220,6 +2231,10 @@
   margin-bottom: 1rem;
 }
 
+.mobileSidebarOpen {
+  display: flex;
+}
+
 @media (max-width: 900px) {
   .studioContainer {
     grid-template-columns: 1fr;
@@ -2230,7 +2245,13 @@
   }
 
   .studioSidebar {
+    display: none;
     position: static;
+  }
+
+  .studioSidebar.mobileSidebarOpen,
+  .mobileSidebarOpen {
+    display: flex !important;
   }
 }
 
@@ -2943,5 +2964,145 @@
 :global(#widget-customizer),
 :global(#pricing) {
   scroll-margin-top: 130px;
+}
+
+/* Gateway Panel Form Controls & Sub-Views */
+.tabContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.primaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.15rem;
+  border-radius: var(--border-radius-md, 8px);
+  background: var(--pop-blue, #0066ff);
+  color: #ffffff;
+  font-family: var(--font-headline, inherit);
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.primaryBtn:hover:not(:disabled) {
+  background: #0052cc;
+  transform: translateY(-1px);
+}
+
+.primaryBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+:global([data-theme='noir']) .primaryBtn {
+  background: var(--neon-cyan, #00f0ff);
+  color: #050811;
+}
+
+:global([data-theme='noir']) .primaryBtn:hover:not(:disabled) {
+  background: #33f3ff;
+}
+
+.secondaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.15rem;
+  border-radius: var(--border-radius-md, 8px);
+  background: var(--surface-secondary, rgba(0, 0, 0, 0.04));
+  border: 1px solid var(--border-medium, var(--color-border));
+  color: var(--color-text);
+  font-family: var(--font-headline, inherit);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.secondaryBtn:hover:not(:disabled) {
+  background: rgba(43, 43, 54, 0.08);
+  border-color: var(--color-text-muted);
+}
+
+.secondaryBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+:global([data-theme='noir']) .secondaryBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--color-text);
+}
+
+:global([data-theme='noir']) .secondaryBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--neon-cyan, #00f0ff);
+}
+
+.inputField {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--border-radius-sm, 6px);
+  border: 1px solid var(--color-border);
+  background: var(--surface-card, #ffffff);
+  color: var(--color-text);
+  font-family: var(--font-code, monospace);
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.inputField:focus {
+  border-color: var(--pop-blue, #0066ff);
+  box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.15);
+}
+
+:global([data-theme='noir']) .inputField {
+  background: #0d0d10;
+  border-color: #2F2F3D;
+  color: #FAFAFA;
+}
+
+:global([data-theme='noir']) .inputField:focus {
+  border-color: var(--neon-cyan, #00f0ff);
+  box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.15);
+}
+
+.selectInput {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--border-radius-sm, 6px);
+  border: 1px solid var(--color-border);
+  background: var(--surface-card, #ffffff);
+  color: var(--color-text);
+  font-family: var(--font-code, monospace);
+  font-size: 0.85rem;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.selectInput:focus {
+  border-color: var(--pop-blue, #0066ff);
+  box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.15);
+}
+
+:global([data-theme='noir']) .selectInput {
+  background: #0d0d10;
+  border-color: #2F2F3D;
+  color: #FAFAFA;
+}
+
+:global([data-theme='noir']) .selectInput:focus {
+  border-color: var(--neon-cyan, #00f0ff);
+  box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.15);
 }
 
