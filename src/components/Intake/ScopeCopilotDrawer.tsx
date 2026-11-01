@@ -109,21 +109,28 @@ export function ScopeCopilotDrawer({
   return (
     <Portal>
       <div
-        className={styles.backdrop}
+        className={`${styles.backdrop} ${isNoir ? styles.backdropNoir : ''}`}
         onClick={(e) => {
           if (e.target === e.currentTarget) {
             onClose();
           }
         }}
         role="presentation"
+        data-lenis-prevent="true"
       >
         <div
           ref={drawerRef}
-          className={styles.drawer}
+          className={`${styles.drawer} ${isNoir ? styles.drawerNoir : ''}`}
           role="dialog"
           aria-modal="true"
           aria-label="Conversational Scope Copilot Drawer"
+          data-lenis-prevent="true"
+          data-lenis-prevent-wheel="true"
+          data-lenis-prevent-touch="true"
         >
+          {/* Top Decorative Graphic Accent Wire */}
+          <div className={styles.topAccentLine} aria-hidden="true" />
+
           {/* Header */}
           <div className={styles.header}>
             <div className={styles.titleArea}>

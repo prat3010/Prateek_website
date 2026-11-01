@@ -717,7 +717,7 @@ export function InlineScopingChatCard({
             <button
               type="button"
               onClick={onCloseDrawer}
-              className={styles.resetChatBtn}
+              className={`${styles.resetChatBtn} ${styles.drawerCloseBtn}`}
               title="Close drawer"
               aria-label="Close drawer"
             >
