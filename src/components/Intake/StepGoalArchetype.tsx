@@ -123,6 +123,7 @@ interface StepGoalArchetypeProps {
   currentScope?: CurrentScopeContext | null;
   resumeData?: ResumeData | null;
   onOpenCopilot?: () => void;
+  errorMsg?: string;
 }
 
 export function StepGoalArchetype({
@@ -142,6 +143,7 @@ export function StepGoalArchetype({
   isNoir = false,
   stepHeadingRef,
   onOpenCopilot,
+  errorMsg,
 }: StepGoalArchetypeProps) {
   const archetypeCardRefs = React.useRef<(HTMLDivElement | null)[]>([]);
   const categoryTabRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
@@ -421,14 +423,23 @@ export function StepGoalArchetype({
         </div>
 
         <div className={styles.field}>
-          <label className={styles.label}>
+          <label className={styles.label} htmlFor="intake-target-audience">
             <UserCheck size={14} className={styles.inlineIcon} />
-            Target Audience Persona &amp; Industry
+            Target Audience Persona &amp; Industry{' '}
+            <span className={styles.requiredIndicator} aria-hidden="true">*</span>
           </label>
           <input
+            id="intake-target-audience"
             type="text"
-            className={styles.input}
-            aria-label="Target Audience Persona & Industry"
+            required
+            aria-required="true"
+            aria-invalid={Boolean(errorMsg && (!formData.targetAudience || formData.targetAudience.trim().length < 2))}
+            className={`${styles.input} ${
+              errorMsg && (!formData.targetAudience || formData.targetAudience.trim().length < 2)
+                ? styles.inputError
+                : ''
+            }`}
+            aria-label="Target Audience Persona & Industry (Required)"
             placeholder="e.g., B2B Tech Founders, Healthcare SMBs, E-Commerce Buyers"
             value={formData.targetAudience}
             onChange={(e) => onChangeField('targetAudience', e.target.value)}

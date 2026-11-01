@@ -243,4 +243,40 @@ describe('useIntakeFormState - applyBlueprint', () => {
     // Should have saved the second conversation as well
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
+
+  it('validateStep1 blocks progression when targetAudience is blank or < 2 characters', () => {
+    const { result } = renderHook(() =>
+      useIntakeFormState(mockResumeData, null, null, false)
+    );
+
+    expect(result.current.formData.targetAudience).toBe('');
+    let isValid = false;
+    act(() => {
+      isValid = result.current.validateStep1();
+    });
+    expect(isValid).toBe(false);
+    expect(result.current.errorMsg).toContain('target audience');
+
+    act(() => {
+      result.current.setFormData((prev) => ({ ...prev, targetAudience: 'B2B SaaS Founders' }));
+    });
+    act(() => {
+      isValid = result.current.validateStep1();
+    });
+    expect(isValid).toBe(true);
+    expect(result.current.errorMsg).toBe('');
+  });
+
+  it('sets submitAttempted to true on handleSubmitOnline', async () => {
+    const { result } = renderHook(() =>
+      useIntakeFormState(mockResumeData, null, null, false)
+    );
+
+    expect(result.current.submitAttempted).toBe(false);
+    const mockEvent = { preventDefault: vi.fn() } as unknown as React.FormEvent;
+    await act(async () => {
+      await result.current.handleSubmitOnline(mockEvent);
+    });
+    expect(result.current.submitAttempted).toBe(true);
+  });
 });

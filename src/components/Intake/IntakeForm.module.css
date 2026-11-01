@@ -272,6 +272,12 @@
   letter-spacing: 0.05em;
 }
 
+.requiredIndicator {
+  color: #dc2626;
+  font-weight: 700;
+  margin-left: 4px;
+}
+
 .inlineIcon {
   display: inline-block;
   vertical-align: -2px;
@@ -872,6 +878,15 @@
 .input:focus, .textarea:focus, .select:focus {
   border-color: var(--pop-blue);
   box-shadow: 0 0 0 3px rgba(90, 142, 182, 0.25);
+}
+
+.inputError {
+  border-color: #dc2626 !important;
+}
+
+.inputError:focus {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2) !important;
 }
 
 /* ── Checkbox Feature Cards ── */
@@ -1962,6 +1977,19 @@
 :global([data-theme='noir']) .select:focus {
   border-color: var(--neon-cyan, #00f0ff);
   box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.15);
+}
+
+:global([data-theme='noir']) .inputError {
+  border-color: #ef4444 !important;
+}
+
+:global([data-theme='noir']) .inputError:focus {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
+}
+
+:global([data-theme='noir']) .requiredIndicator {
+  color: #ef4444;
 }
 
 :global([data-theme='noir']) .checkboxCard {

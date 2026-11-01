@@ -89,9 +89,12 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     showMobileFormula,
     setShowMobileFormula,
     submitted,
+    submitAttempted,
     submitting,
     generatingPdf,
     errorMsg,
+    setErrorMsg,
+    validateStep1,
     activePopoverId,
     setActivePopoverId,
     popoverAnchor,
@@ -159,6 +162,36 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
     totalCost.totalUSD,
     generatedScopeCode,
   ]);
+
+  const handleValidateAndNavigate = React.useCallback((targetStep: number) => {
+    if (currentStep === 1 && targetStep > 1) {
+      if (!validateStep1()) {
+        const input = document.getElementById('intake-target-audience');
+        input?.focus();
+        input?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+    }
+    setErrorMsg('');
+    setCurrentStep(targetStep);
+  }, [currentStep, validateStep1, setErrorMsg, setCurrentStep]);
+
+  const handleNextStep = React.useCallback(() => {
+    if (currentStep === 1) {
+      if (!validateStep1()) {
+        const input = document.getElementById('intake-target-audience');
+        input?.focus();
+        input?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+    }
+    setErrorMsg('');
+    if (currentStep === 2 && shouldSkipBrandStep) {
+      setCurrentStep(4);
+    } else if (currentStep < 4) {
+      setCurrentStep((prev) => prev + 1);
+    }
+  }, [currentStep, shouldSkipBrandStep, validateStep1, setErrorMsg, setCurrentStep]);
 
   useEffect(() => {
     if (isFirstMountRef.current) {
@@ -431,7 +464,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                         aria-selected={isActive}
                         aria-label={`Step ${s.num}: ${s.title}`}
                         className={`${styles.stepItem} ${isActive ? styles.stepItemActive : ''} ${isDone ? styles.stepItemDone : ''} ${isSkipped ? styles.stepItemSkipped : ''}`}
-                        onClick={() => !isSkipped && setCurrentStep(s.num)}
+                        onClick={() => !isSkipped && handleValidateAndNavigate(s.num)}
                         disabled={isSkipped}
                         title={isSkipped ? 'Brand Kit skipped (Standalone / Widget scope)' : `Go to Step ${s.num}: ${s.title}`}
                       >
@@ -470,7 +503,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                     onResetServiceType={resetServiceType}
                     onChangeField={(field, val) => setFormData((prev) => ({ ...prev, [field]: val }))}
                     onApplyBlueprint={applyBlueprint}
-                    onNavigateStep={setCurrentStep}
+                    onNavigateStep={handleValidateAndNavigate}
                     isNoir={isNoir}
                     stepHeadingRef={stepHeadingRef}
                     chatSessionId={chatSessionId}
@@ -480,6 +513,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                     currentScope={currentScopeContext}
                     resumeData={resumeData}
                     onOpenCopilot={() => setIsCopilotDrawerOpen(true)}
+                    errorMsg={errorMsg}
                   />
                 )}
 
@@ -542,7 +576,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                     termsList={termsList}
                     togglePopover={togglePopover}
                     onChangeField={(field, val) => setFormData((prev) => ({ ...prev, [field]: val }))}
-                    agreedToTermsError={!formData.agreedToTerms}
+                    agreedToTermsError={(submitted || submitAttempted) && !formData.agreedToTerms}
                     stepHeadingRef={stepHeadingRef}
                     user={user}
                   />
@@ -569,13 +603,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                     (totalCost.brandOpt && totalCost.brandOpt.priceINR > 0 ? 1 : 0)
                   }
                   currentStep={currentStep}
-                  onNextStep={() => {
-                    if (currentStep === 2 && shouldSkipBrandStep) {
-                      setCurrentStep(4);
-                    } else if (currentStep < 4) {
-                      setCurrentStep((prev) => prev + 1);
-                    }
-                  }}
+                  onNextStep={handleNextStep}
                   nextStepLabel={
                     currentStep === 1
                       ? 'NEXT: TECHNICAL SCOPE'
@@ -633,13 +661,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                     {currentStep < 4 ? (
                       <button
                         type="button"
-                        onClick={() => {
-                          if (currentStep === 2 && shouldSkipBrandStep) {
-                            setCurrentStep(4);
-                          } else {
-                            setCurrentStep((prev) => prev + 1);
-                          }
-                        }}
+                        onClick={handleNextStep}
                         className={`${styles.btn} ${styles.btnPrimary}`}
                       >
                         <span>NEXT STEP</span>

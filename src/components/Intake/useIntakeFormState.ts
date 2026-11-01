@@ -190,6 +190,7 @@ export function useIntakeFormState(
   const [showEngineOverride, setShowEngineOverride] = useState(false);
   const [showMobileFormula, setShowMobileFormula] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitAttempted, setSubmitAttempted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [generatingPdf, setGeneratingPdf] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -914,8 +915,18 @@ export function useIntakeFormState(
     }
   }, [buildScopePayload, getDashboardRedirectUrl]);
 
+  const validateStep1 = useCallback((): boolean => {
+    if (!formData.targetAudience || formData.targetAudience.trim().length < 2) {
+      setErrorMsg('Please specify a target audience persona or industry in Step 1 before proceeding.');
+      return false;
+    }
+    setErrorMsg('');
+    return true;
+  }, [formData.targetAudience]);
+
   const handleSubmitOnline = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitAttempted(true);
     if (!formData.agreedToTerms) {
       setErrorMsg('Please accept the standard commercial terms before submitting.');
       return;
@@ -1144,10 +1155,13 @@ export function useIntakeFormState(
     setShowMobileFormula,
     submitted,
     setSubmitted,
+    submitAttempted,
+    setSubmitAttempted,
     submitting,
     generatingPdf,
     errorMsg,
     setErrorMsg,
+    validateStep1,
     activePopoverId,
     setActivePopoverId,
     popoverAnchor,

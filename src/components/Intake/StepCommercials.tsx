@@ -580,7 +580,7 @@ export function StepCommercials({
           </span>
         </label>
         {agreedToTermsError && !formData.agreedToTerms && (
-          <p className={styles.fieldHint} role="alert">
+          <p className={`${styles.fieldHint} ${styles.formError}`} role="alert">
             You must accept the terms to submit your scope.
           </p>
         )}

@@ -75,12 +75,26 @@ function Contact() {
       setTimeout(() => setRecaptchaReady(true), 0);
       return;
     }
+
+    const fallbackTimer = setTimeout(() => {
+      setRecaptchaReady(true);
+    }, 3000);
+
     const script = document.createElement('script');
     script.id = 'recaptcha-script';
     script.src = `https://www.google.com/recaptcha/api.js?render=${SITE_KEY}`;
     script.async = true;
-    script.onload = () => window.grecaptcha?.ready(() => setRecaptchaReady(true));
+    script.onload = () => {
+      clearTimeout(fallbackTimer);
+      window.grecaptcha?.ready(() => setRecaptchaReady(true));
+    };
+    script.onerror = () => {
+      clearTimeout(fallbackTimer);
+      setRecaptchaReady(true);
+    };
     document.head.appendChild(script);
+
+    return () => clearTimeout(fallbackTimer);
   }, []);
 
   const handleCopyEmail = useCallback(() => {
