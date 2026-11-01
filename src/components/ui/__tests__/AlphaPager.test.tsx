@@ -186,6 +186,25 @@ describe('AlphaPager Component', () => {
     expect(screen.getByRole('button', { name: /^Dock pager$/i })).toBeDefined();
   });
 
+  it('expands compact clip when Enter or Space key is pressed on the compact dock', () => {
+    Object.defineProperty(window, 'innerWidth', {
+      writable: true,
+      configurable: true,
+      value: 390,
+    });
+
+    render(<AlphaPager />);
+
+    const clip = screen.getByRole('region', { name: /Vintage Pager Pocket Clip/i });
+    expect(clip).toBeDefined();
+
+    act(() => {
+      fireEvent.keyDown(clip, { key: 'Enter', code: 'Enter' });
+    });
+
+    expect(screen.getByRole('region', { name: /Vintage Alphanumeric Pager & Section Radar/i })).toBeDefined();
+  });
+
   it('cycles messages when PREV and NEXT buttons are clicked', () => {
     render(<AlphaPager />);
 

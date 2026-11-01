@@ -56,6 +56,7 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
   useEffect(() => {
     if (!feedbackModalMsg) return;
 
+    const previouslyFocused = document.activeElement as HTMLElement | null;
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     lenis?.stop();
@@ -98,6 +99,7 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
       document.body.style.overflow = originalOverflow;
       lenis?.start();
       window.removeEventListener("keydown", handleKeyDown);
+      previouslyFocused?.focus();
     };
   }, [feedbackModalMsg, lenis]);
 
@@ -105,6 +107,7 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
   useEffect(() => {
     if (!activeVisualCitation) return;
 
+    const previouslyFocused = document.activeElement as HTMLElement | null;
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     lenis?.stop();
@@ -147,6 +150,7 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
       document.body.style.overflow = originalOverflow;
       lenis?.start();
       window.removeEventListener("keydown", handleKeyDown);
+      previouslyFocused?.focus();
     };
   }, [activeVisualCitation, lenis]);
 

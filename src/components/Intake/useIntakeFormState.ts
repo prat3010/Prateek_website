@@ -644,8 +644,9 @@ export function useIntakeFormState(
       setPopoverAnchor(null);
     } else {
       const rect = e.currentTarget.getBoundingClientRect();
+      const maxLeft = typeof window !== 'undefined' ? Math.max(12, window.innerWidth - 332) : rect.left;
       const clampedX = typeof window !== 'undefined'
-        ? Math.max(12, Math.min(rect.left, window.innerWidth - 300))
+        ? Math.max(12, Math.min(rect.left, maxLeft))
         : rect.left;
       setActivePopoverId(id);
       setPopoverAnchor({ x: clampedX, y: rect.bottom + 6 });

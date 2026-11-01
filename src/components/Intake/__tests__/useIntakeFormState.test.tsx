@@ -258,6 +258,22 @@ describe('useIntakeFormState - applyBlueprint', () => {
     expect(result.current.errorMsg).toContain('target audience');
 
     act(() => {
+      result.current.setFormData((prev) => ({ ...prev, targetAudience: '   ' }));
+    });
+    act(() => {
+      isValid = result.current.validateStep1();
+    });
+    expect(isValid).toBe(false);
+
+    act(() => {
+      result.current.setFormData((prev) => ({ ...prev, targetAudience: 'X' }));
+    });
+    act(() => {
+      isValid = result.current.validateStep1();
+    });
+    expect(isValid).toBe(false);
+
+    act(() => {
       result.current.setFormData((prev) => ({ ...prev, targetAudience: 'B2B SaaS Founders' }));
     });
     act(() => {
@@ -265,6 +281,43 @@ describe('useIntakeFormState - applyBlueprint', () => {
     });
     expect(isValid).toBe(true);
     expect(result.current.errorMsg).toBe('');
+  });
+
+  it('clamps popover coordinates safely within narrow viewport bounds', () => {
+    Object.defineProperty(window, 'innerWidth', {
+      writable: true,
+      configurable: true,
+      value: 320,
+    });
+
+    const { result } = renderHook(() =>
+      useIntakeFormState(mockResumeData, null, null, false)
+    );
+
+    const mockEvent = {
+      stopPropagation: vi.fn(),
+      currentTarget: {
+        getBoundingClientRect: () => ({
+          left: 200,
+          right: 250,
+          top: 100,
+          bottom: 120,
+          width: 50,
+          height: 20,
+        }),
+      },
+    } as unknown as React.MouseEvent<HTMLButtonElement>;
+
+    act(() => {
+      result.current.togglePopover(mockEvent, 'test-feature');
+    });
+
+    expect(result.current.activePopoverId).toBe('test-feature');
+    expect(result.current.popoverAnchor).toBeDefined();
+    // Clamped left must not exceed screen width - padding and must not be below 12
+    expect(result.current.popoverAnchor?.x).toBeGreaterThanOrEqual(12);
+    expect(result.current.popoverAnchor?.x).toBeLessThanOrEqual(320 - 12);
+    expect(result.current.popoverAnchor?.y).toBe(126);
   });
 
   it('sets submitAttempted to true on handleSubmitOnline', async () => {

@@ -57,6 +57,7 @@ export default function ClientProjectCopilot() {
   useEffect(() => {
     if (!isOpen) return;
 
+    const previouslyFocused = document.activeElement as HTMLElement | null;
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     lenis?.stop();
@@ -99,6 +100,7 @@ export default function ClientProjectCopilot() {
       document.body.style.overflow = originalOverflow;
       lenis?.start();
       window.removeEventListener('keydown', handleKeyDown);
+      previouslyFocused?.focus();
     };
   }, [isOpen, lenis]);
 

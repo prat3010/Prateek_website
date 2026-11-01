@@ -166,6 +166,8 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   const handleValidateAndNavigate = React.useCallback((targetStep: number) => {
     if (currentStep === 1 && targetStep > 1) {
       if (!validateStep1()) {
+        setIsCartOpen(false);
+        setIsCopilotDrawerOpen(false);
         const input = document.getElementById('intake-target-audience');
         input?.focus();
         input?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -173,8 +175,9 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
       }
     }
     setErrorMsg('');
-    setCurrentStep(targetStep);
-  }, [currentStep, validateStep1, setErrorMsg, setCurrentStep]);
+    const finalStep = targetStep === 3 && shouldSkipBrandStep ? 4 : targetStep;
+    setCurrentStep(finalStep);
+  }, [currentStep, shouldSkipBrandStep, validateStep1, setErrorMsg, setCurrentStep, setIsCartOpen, setIsCopilotDrawerOpen]);
 
   const handleNextStep = React.useCallback(() => {
     if (currentStep === 1) {
@@ -501,7 +504,12 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                     onGoalChange={handleGoalChange}
                     onScopeStartTypeChange={handleScopeStartTypeChange}
                     onResetServiceType={resetServiceType}
-                    onChangeField={(field, val) => setFormData((prev) => ({ ...prev, [field]: val }))}
+                    onChangeField={(field, val) => {
+                      setFormData((prev) => ({ ...prev, [field]: val }));
+                      if (field === 'targetAudience' && typeof val === 'string' && val.trim().length >= 2 && errorMsg.includes('target audience')) {
+                        setErrorMsg('');
+                      }
+                    }}
                     onApplyBlueprint={applyBlueprint}
                     onNavigateStep={handleValidateAndNavigate}
                     isNoir={isNoir}
@@ -736,11 +744,11 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
         allFeatures={features}
         onRemoveFeature={requestRemoveFeature}
         onAddFeature={addFeature}
-        onSwitchEngine={() => setCurrentStep(2)}
+        onSwitchEngine={() => handleValidateAndNavigate(2)}
         promoCode={appliedPromo}
         onApplyPromo={applyPromoCode}
         onRemovePromo={removePromoCode}
-        onProceed={() => setCurrentStep(4)}
+        onProceed={() => handleValidateAndNavigate(4)}
         onExportPdf={handleDownloadPDF}
         isNoir={isNoir}
         lockedFeatureIds={lockedFeatureIds}
@@ -753,7 +761,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
         currency={currency}
         isNoir={isNoir}
         onApplyBlueprint={applyBlueprint}
-        onNavigateStep={setCurrentStep}
+        onNavigateStep={handleValidateAndNavigate}
         chatSessionId={chatSessionId}
         setChatSessionId={setChatSessionId}
         chatTranscript={chatTranscript}

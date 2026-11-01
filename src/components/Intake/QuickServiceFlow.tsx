@@ -337,7 +337,7 @@ export function QuickServiceFlow({
                           className={styles.popoverPortal}
                           style={{
                             left: typeof window !== 'undefined'
-                              ? Math.max(12, Math.min(popoverAnchor.x, window.innerWidth - 300))
+                              ? Math.max(12, Math.min(popoverAnchor.x, Math.max(12, window.innerWidth - 332)))
                               : popoverAnchor.x,
                             top: popoverAnchor.y,
                           }}
