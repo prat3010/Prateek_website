@@ -8,10 +8,10 @@ Welcome to the **Prateek Sharma Engineering Platform Documentation Map**. This c
 
 | Document | Scope & Purpose |
 | :--- | :--- |
-| 📌 **[`UNIFIED_MASTER_ROADMAP.md`](UNIFIED_MASTER_ROADMAP.md)** | **Sole SSoT for Platform Milestones (M1–M102)** across Frontend, CPQ Scoping, Escrow, and RAG. |
+| 📌 **[`UNIFIED_MASTER_ROADMAP.md`](UNIFIED_MASTER_ROADMAP.md)** | **Sole SSoT for Platform Milestones (M1–M129)** across Frontend, CPQ Scoping, Escrow, and RAG. |
 | 🏛️ **[`00_ARCHITECTURE_INDEX.md`](00_ARCHITECTURE_INDEX.md)** | AST-generated index of all 97 live system architecture nodes and API endpoints. |
 | 🗺️ **[`ARCHITECTURE_DEPENDENCY_MAP.md`](ARCHITECTURE_DEPENDENCY_MAP.md)** | Complete component-to-data dependency matrix across Data, Web App, PDF, and CMS layers. |
-| 📜 **[`99_DECISIONS.md`](99_DECISIONS.md)** | Architecture Decision Records (ADRs 01–23) governing Next.js 16, theme state, and escrows. |
+| 📜 **[`99_DECISIONS.md`](99_DECISIONS.md)** | Architecture Decision Records (ADRs 01–50) governing Next.js 16, theme state, and escrows. |
 | 💼 **[`CLIENT_DASHBOARD_ROADMAP.md`](CLIENT_DASHBOARD_ROADMAP.md)** | Technical specification for the Client Workspace Dashboard (`/dashboard`) and SaaS Studio (`/rag/app`). |
 | 🔐 **[`AUTHENTICATION_ARCHITECTURE.md`](AUTHENTICATION_ARCHITECTURE.md)** | Universal Authentication Blueprint: Google OAuth PKCE, Safari ITP dual storage, session verification, and Retriever connection. |
 | 🤖 **[`AI_OUTREACH_AGENT_ROADMAP.md`](AI_OUTREACH_AGENT_ROADMAP.md)** | Technical specification for the Autonomous AI Lead Prospecting & Outreach engine. |
@@ -44,6 +44,9 @@ Welcome to the **Prateek Sharma Engineering Platform Documentation Map**. This c
 | **42** | **[`42_Confidential_Multi_Party_Vector_Computation_PRD.md`](42_Confidential_Multi_Party_Vector_Computation_PRD.md)** | Confidential Multi-Party Vector Computation (MPC) Privacy Enclaves (M121), Battery #36, Additive Secret Sharing ($Q_{16.16}$), Beaver Multiplication Triples (PPIP), Threshold Top-K filtering ($\tau_{\text{privacy}}$), differential privacy noise, and dual-theme SaaS studio cockpit. |
 | **43** | **[`43_Autonomous_Continuous_Benchmark_and_Regression_Gatekeeper_PRD.md`](43_Autonomous_Continuous_Benchmark_and_Regression_Gatekeeper_PRD.md)** | Autonomous Continuous Benchmark & Regression Gatekeeper (M122), Battery #37, Two-Sample Welch's t-test hypothesis testing ($p < \alpha$), authentic IR metrics (NDCG@K, MRR, Recall@K, Precision@K), RAG Triad faithfulness, automated rollback webhooks & dual-theme SaaS studio cockpit. |
 | **44** | **[`44_Hierarchical_Memory_Graph_of_Thoughts_PRD.md`](44_Hierarchical_Memory_Graph_of_Thoughts_PRD.md)** | Hierarchical Memory Augmentation with Graph-of-Thoughts (GoT) Planning (M123), Battery #38, non-linear DAG reasoning, multi-parent aggregation ($M \to 1$), Kahn topological optimal path DP, 3-tier memory & Ebbinghaus decay. |
+| **45** | **[`45_Enterprise_SaaS_Connectors_and_ACL_Inheritance_PRD.md`](45_Enterprise_SaaS_Connectors_and_ACL_Inheritance_PRD.md)** | Turn-Key Enterprise SaaS Connectors & Document-Level ACL Inheritance (M125), Battery No. 39, Google Drive, Notion, Confluence, Jira, Microsoft 365 delta crawlers & sublinear JSONB ACL (?|) filtering. |
+| **46** | **[`46_Visual_DAG_Workflow_Canvas_PRD.md`](46_Visual_DAG_Workflow_Canvas_PRD.md)** | Visual DAG Workflow Canvas & Agentic Graph Composer (M126), Battery No. 40, React 19 / Next.js 16 SVG Studio, Kahn's cycle detection, stage-by-stage pipeline executor & token cost attribution. |
+| **47** | **[`47_Sovereign_Air_Gapped_Appliance_PRD.md`](47_Sovereign_Air_Gapped_Appliance_PRD.md)** | Sovereign Air-Gapped Appliance & Embedded Edge Engine (M127), Battery No. 41, Hardware-Rooted AES-256-GCM Vector Sealing (TPM/Secure Enclave), zero-egress network sentinel & offline Whisper/Piper full-duplex voice RAG. |
 | **48** | **[`48_The_Playground_Universal_Creation_Showcase_PRD.md`](48_The_Playground_Universal_Creation_Showcase_PRD.md)** | The Playground Universal Creation Showcase, Polymorphic SSoT Registry, Arcade Cabinet Shell, AI Prompt Engineering Lightbox & Cloudflare Pages 3-Tier Zero-Cost Hosting. |
 
 
@@ -87,7 +90,7 @@ Welcome to the **Prateek Sharma Engineering Platform Documentation Map**. This c
 
 ## 🗺️ 5.5 Product Roadmaps & Strategic Tracks
 
-- 🌐 **[`UNIFIED_MASTER_ROADMAP.md`](UNIFIED_MASTER_ROADMAP.md):** Single Source of Truth Master Implementation Timeline (M1–M115).
+- 🌐 **[`UNIFIED_MASTER_ROADMAP.md`](UNIFIED_MASTER_ROADMAP.md):** Single Source of Truth Master Implementation Timeline (M1–M129).
 - 🚀 **[`SCOPING_COPILOT_SOTA_ROADMAP.md`](SCOPING_COPILOT_SOTA_ROADMAP.md):** SOTA Conversational Scoping Copilot Roadmap (Socratic Discovery, Budget Sculpting, Topology Diagrams, and Omnichannel Closers).
 - 🤖 **[`AI_OUTREACH_AGENT_ROADMAP.md`](AI_OUTREACH_AGENT_ROADMAP.md):** Autonomous Multi-Channel Prospecting & Lead Enrichment Pipeline.
 - 💼 **[`CLIENT_DASHBOARD_ROADMAP.md`](CLIENT_DASHBOARD_ROADMAP.md):** Authenticated Workspace, Milestone Invoicing, and Change Orders.

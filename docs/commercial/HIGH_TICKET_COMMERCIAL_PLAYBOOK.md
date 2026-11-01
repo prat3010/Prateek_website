@@ -57,10 +57,10 @@ This playbook documents the productized commercial framework embedded across `pr
 
 | Engine Architecture | Target Engagement | INR Price | USD Price | Delivery Window |
 | :--- | :--- | :--- | :--- | :--- |
-| **High-Conversion Landing Page** | Single-page product launch, 3D Canvas skyline, lead capture. | ₹45,000 | $600 | 5–7 Days |
-| **Multi-Page Corporate Platform** | Enterprise CMS, blog newsjacking, dynamic case studies, team portal. | ₹95,000 | $1,250 | 10–14 Days |
-| **Full-Stack SaaS MVP** | Supabase Auth, Razorpay subscriptions, PostgreSQL RLS, dashboard workspace. | ₹1,85,000 | $2,400 | 21–28 Days |
-| **Autonomous AI RAG Engine** | Multi-tenant hybrid search, pgvector, GraphRAG, local Ollama embeddings. | ₹2,80,000 | $3,600 | 30–45 Days |
+| **Landing Page Core Engine (`landing`)** | Single-page product launch, 3D Canvas skyline, lead capture. | ₹30,000 | $400 | 5–7 Days |
+| **Multi-Page Web App Core Engine (`multipage`)** | Enterprise CMS, blog newsjacking, dynamic case studies, team portal. | ₹55,000 | $750 | 10–14 Days |
+| **Full-Stack SaaS MVP Core Engine (`saas`)** | Supabase Auth, Razorpay subscriptions, PostgreSQL RLS, dashboard workspace. | ₹1,75,000 | $2,400 | 21–28 Days |
+| **Autonomous AI RAG Engine (`saas` + `ai_rag`)** | Multi-tenant hybrid search, pgvector, GraphRAG, local Ollama embeddings. | ₹2,80,000 | $3,600 | 30–45 Days |
 
 ### Feature Add-On Pricing Rules
 - **Transitive Dependency Resolution:** Adding advanced features automatically includes necessary infrastructure prerequisites (e.g. `vector_db` ➔ requires `postgresql_persistence`).
@@ -81,11 +81,11 @@ When a client requests out-of-scope enhancements during development (e.g., addin
 
 External consultants, agencies, and network connectors earn recurring revenue by referring qualified high-ticket clients:
 
-| Commission Band | Deal Size Range (INR) | Commission Rate | Payout Schedule |
+| Commission Band | Deal Size Range (INR / USD) | Commission Rate | Payout Schedule |
 | :--- | :--- | :--- | :--- |
-| **Band A** | Up to ₹1,00,000 ($1,250) | **10%** of gross deal value | 50% on client deposit, 50% on final delivery |
-| **Band B** | ₹1,00,001 to ₹3,00,000 ($3,600) | **12%** of gross deal value | 50% on client deposit, 50% on final delivery |
-| **Band C** | ₹3,00,001 and above | **15%** of gross deal value | 50% on client deposit, 50% on final delivery |
+| **Band A** | Up to ₹75,000 ($1,000) | **10%** of gross deal value | 50% on client deposit, 50% on final delivery |
+| **Band B** | ₹75,001 to ₹2,49,999 ($1,001–$3,299) | **12%** of gross deal value | 50% on client deposit, 50% on final delivery |
+| **Band C** | ₹2,50,000 and above ($3,300+) | **15%** of gross deal value | 50% on client deposit, 50% on final delivery |
 | **Recurring Care** | Monthly retainer maintenance | **10% recurring** monthly | Disbursed on the 1st of every calendar month |
 
 - **Legal Framework:** Governed by the formal 3-page [`MiddlemanAgreementPDF.tsx`](../../src/components/pdf/MiddlemanAgreementPDF.tsx) with non-circumvention and non-disclosure covenants.

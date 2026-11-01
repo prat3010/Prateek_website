@@ -46,9 +46,18 @@ This document serves as the registry of critical architectural design decisions 
 * [ADR 36: Sovereign Zero-Cloud Audio Egress Voice Architecture via Local Whisper & WebRTC (Milestone 100)](#adr-36-sovereign-zero-cloud-audio-egress-voice-architecture-via-local-whisper--webrtc-milestone-100)
 * [ADR 37: Zero-Trust Micro-Enclave KMS, Remote Attestation & Volatile Memory Sanitization (Milestone 101)](#adr-37-zero-trust-micro-enclave-kms-remote-attestation--volatile-memory-sanitization-milestone-101)
 * [ADR 38: Autonomous Edge Fleet Swarm Mesh, Epidemic P2P Gossip & Causal Vector Clock Partition Reconciliation (Milestone 102)](#adr-38-autonomous-edge-fleet-swarm-mesh-epidemic-p2p-gossip--causal-vector-clock-partition-reconciliation-milestone-102)
+* [ADR 39: Autonomous Multi-Turn ReAct Tool Loop & Self-Healing Execution Engine (Milestone 104)](#adr-39-autonomous-multi-turn-react-tool-loop--self-healing-execution-engine-milestone-104)
+* [ADR 40: Smart Tool Gateway & Multi-Model Economic Orchestrator (Milestone 105)](#adr-40-smart-tool-gateway--multi-model-economic-orchestrator-milestone-105)
+* [ADR 41: Cognitive Agent Memory Consolidation & Long-Horizon Experience Distillation (Milestone 108)](#adr-41-cognitive-agent-memory-consolidation--long-horizon-experience-distillation-milestone-108)
+* [ADR 42: Multi-Agent Swarm Quorum & Dynamic Debate Consensus Engine (Milestone 109)](#adr-42-multi-agent-swarm-quorum--dynamic-debate-consensus-engine-milestone-109)
+* [ADR 43: Razorpay Recurring SaaS Subscriptions & Dual-Cloud Provisioning (Phase 6)](#adr-43-razorpay-recurring-saas-subscriptions--dual-cloud-provisioning-phase-6)
+* [ADR 44: Tenant AI Persona Customization & Central Enterprise Governance Lock (Phase 8)](#adr-44-tenant-ai-persona-customization--central-enterprise-governance-lock-phase-8)
 * [ADR 45: The Playground — Polymorphic Creation Showcase, Arcade Cabinet Shell, and Cloudflare Pages 3-Tier Hosting](#adr-45-the-playground--polymorphic-creation-showcase-arcade-cabinet-shell-and-cloudflare-pages-3-tier-hosting)
 * [ADR 46: Timeless Design Philosophies & Tactile Hardware Brutalism (Zero-Glassmorphism & Elimination of Fake Neon Halos)](#adr-46-timeless-design-philosophies--tactile-hardware-brutalism-zero-glassmorphism--elimination-of-fake-neon-halos)
 * [ADR 47: Global App Router Resilience Boundaries, WCAG 2.1 AA Modal Scroll Containment, and Dynamic Sensory Kinetics](#adr-47-global-app-router-resilience-boundaries-wcag-21-aa-modal-scroll-containment-and-dynamic-sensory-kinetics)
+* [ADR 48: Low-Latency AI Twin Streaming and Scheduled Retriever Warm-Up](#adr-48-low-latency-ai-twin-streaming-and-scheduled-retriever-warm-up)
+* [ADR 49: True Scoping Streaming, Bounded Copilot Budget, and Generation Warm-Up](#adr-49-true-scoping-streaming-bounded-copilot-budget-and-generation-warm-up)
+* [ADR 50: Reliable Warm-Up Scheduling and Server-Side Guest RAG](#adr-50-reliable-warm-up-scheduling-and-server-side-guest-rag)
 
 ---
 

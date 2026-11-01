@@ -15,16 +15,23 @@
 
 .container {
   width: 100%;
-  max-width: var(--max-width-narrow, 960px);
+  max-width: var(--max-width, 1200px);
   margin: 0 auto;
 }
 
-.header {
-  margin-bottom: var(--space-lg);
+.headerSection {
+  margin-bottom: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.navRow {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
   flex-wrap: wrap;
+  gap: 12px;
 }
 
 .backLink {
@@ -33,7 +40,7 @@
   gap: 8px;
   font-family: var(--font-headline);
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: var(--color-text);
   padding: 6px 14px;
   background-color: var(--surface-card);
@@ -71,6 +78,31 @@
   color: var(--badge-active-text);
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.titleArea {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title {
+  font-family: var(--font-headline);
+  font-size: clamp(1.85rem, 4vw, 2.75rem);
+  font-weight: 900;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-family: var(--font-body);
+  font-size: clamp(0.92rem, 2vw, 1.05rem);
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: 1.5;
+  font-weight: 500;
 }
 
 /* ── Noir Theme Overrides: Tactical Hardware ── */

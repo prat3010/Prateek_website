@@ -1,6 +1,6 @@
 # Product & Architectural Roadmap (Single Source of Truth)
 
-> 📌 **Master Roadmap Location:** For the comprehensive, platform-wide sequential timeline (M1 to M112) and active milestone tracking across both `Prateek_website` and `retriever`, see:
+> 📌 **Master Roadmap Location:** For the comprehensive, platform-wide sequential timeline (M1 to M129) and active milestone tracking across both `Prateek_website` and `retriever`, see:
 > 👉 **[`docs/UNIFIED_MASTER_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md)**
 
 ---
@@ -28,12 +28,13 @@ timeline
     Phase M (M98–M102) : Sovereign Edge & Multi-Cloud Resiliency : Completed
     Phase N (M103–M109) : Autonomous Agent Swarms, Long-Horizon Memory & Multi-Agent Quorum : Completed
     Phase O (M110–M113) : Public Open-Source Launch & Community Ecosystem : Completed
-    Phase P (M114+) : Multimodal Real-Time Voice & Distributed Agentic Mesh : Active
+    Phase P (M114–M129) : Multimodal Voice, Distributed Mesh & Autonomous Cognitive Batteries : Completed
+    Phase Q (M130+) : Instant Cloud Playground & Multi-Region Sandbox Hub : Planned
 ```
 
 ---
 
-## Active Milestone Sequence (Phase O: M110 – M113 & Phase P: M114 – M117)
+## Active Milestone Sequence (Phase P: M114 – M129 & Phase Q: M130+)
 
 | Milestone | Title | Focus Area | Status | Detailed Specification |
 |:---|:---|:---|:---|:---|
@@ -76,6 +77,13 @@ timeline
 | **M121** | Confidential Multi-Party Vector Computation (MPC) Privacy Enclaves (v2.0.0-alpha3) | Additive Secret Sharing, Beaver Multiplication Triples (PPIP), threshold Top-K filtering, dual-theme SaaS studio cockpit & Battery #36 | **Completed** | [`docs/42_Confidential_Multi_Party_Vector_Computation_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/42_Confidential_Multi_Party_Vector_Computation_PRD.md) |
 | **M122** | Autonomous Continuous Benchmark & Regression Gatekeeper (v2.1.0-alpha1) | Two-sample Welch's t-test hypothesis testing ($p < \alpha$), authentic IR metrics (NDCG@K, MRR, Recall, Precision), RAG Triad faithfulness, automated rollback webhooks & Battery #37 | **Completed** | [`docs/43_Autonomous_Continuous_Benchmark_and_Regression_Gatekeeper_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/43_Autonomous_Continuous_Benchmark_and_Regression_Gatekeeper_PRD.md) |
 | **M123** | Hierarchical Memory Augmentation with Graph-of-Thoughts (GoT) Planning (v2.2.0-alpha1) | Non-linear DAG reasoning, multi-parent aggregation ($M \to 1$), Kahn's topological sort, DP optimal path, 3-tier memory (L1/L2/L3) with Ebbinghaus decay ($R(t)=e^{-t/S}$) & Battery #38 | **Completed** | [`docs/44_Hierarchical_Memory_Graph_of_Thoughts_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/44_Hierarchical_Memory_Graph_of_Thoughts_PRD.md) |
+| **M124** | Agent-Native Enterprise Modernization & Dual-Channel Fan-Out (v2.3.0-alpha1) | PostgreSQL RLS memory persistence, concurrent `asyncio.gather` fan-out (HNSW+BM25), dynamic LLM consensus synthesis, Neural ColBERT ONNX & resilient circuit breaker | **Completed** | [`docs/UNIFIED_MASTER_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md#milestone-124-agent-native-enterprise-modernization-cognitive-persistence-dual-channel-fan-out--resilient-inference) |
+| **M125** | Turn-Key Enterprise SaaS Connectors & Document-Level ACL Inheritance (v2.3.0) | Google Workspace, Notion, Atlassian Confluence/Jira, Microsoft 365 delta crawlers, sublinear JSONB ACL (?|) filtering & Battery No. 39 | **Completed** | [`docs/45_Enterprise_SaaS_Connectors_and_ACL_Inheritance_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/45_Enterprise_SaaS_Connectors_and_ACL_Inheritance_PRD.md) |
+| **M126** | Visual DAG Workflow Canvas & Agentic Graph Composer (v2.4.0) | Interactive SVG studio, Kahn's topological sort cycle detection, concurrent sub-stage execution, token cost attribution & Battery No. 40 | **Completed** | [`docs/46_Visual_DAG_Workflow_Canvas_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/46_Visual_DAG_Workflow_Canvas_PRD.md) |
+| **M127** | Sovereign Air-Gapped Appliance & Embedded Edge Engine (v2.5.0) | Hardware-Rooted AES-256-GCM Vector Sealing (TPM/Secure Enclave), zero-egress network sentinel, offline full-duplex Whisper/Piper voice RAG & Battery No. 41 | **Completed** | [`docs/47_Sovereign_Air_Gapped_Appliance_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/47_Sovereign_Air_Gapped_Appliance_PRD.md) |
+| **M128** | System 1 Fast-Path Decision Plane & TypeSafe Jev Integration (v2.6.0) | Non-autoregressive sub-100ms intent classifier, sub-150ms CRAG evaluator, zero-token routing with 98% cost reduction & Battery No. 42 | **Completed** | [`docs/UNIFIED_MASTER_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md#milestone-128-system-1-fast-path-decision-plane--typesafe-jev-integration) |
+| **M129** | Tenant AI Persona Engine & Enterprise Governance Policy Lock (v2.7.0) | Self-service tenant prompt REST API, cluster administrator policy lock (`is_locked: bool`), HTTP 403 enforcement & Admin Web Studio integration | **Completed** | [`docs/UNIFIED_MASTER_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/UNIFIED_MASTER_ROADMAP.md#milestone-129-tenant-ai-persona-engine--enterprise-governance-policy-lock) |
+| **M130** | Instant Cloud Playground & Multi-Region Sandbox Hub (v2.8.0) | Ephemeral 1-click 30-minute sandbox tenants with pre-ingested corpora, interactive rate-limited REST playground & public benchmark leaderboard | **Planned** | [`docs/48_The_Playground_Universal_Creation_Showcase_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/48_The_Playground_Universal_Creation_Showcase_PRD.md) |
 
 ---
 
@@ -89,6 +97,10 @@ For deep technical implementation details, schemas, API contracts, and component
 - **Confidential Multi-Party Vector Computation PRD:** [`docs/42_Confidential_Multi_Party_Vector_Computation_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/42_Confidential_Multi_Party_Vector_Computation_PRD.md)
 - **Autonomous Continuous Benchmark & Regression Gatekeeper PRD:** [`docs/43_Autonomous_Continuous_Benchmark_and_Regression_Gatekeeper_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/43_Autonomous_Continuous_Benchmark_and_Regression_Gatekeeper_PRD.md)
 - **Hierarchical Memory & Graph-of-Thoughts Planning PRD:** [`docs/44_Hierarchical_Memory_Graph_of_Thoughts_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/44_Hierarchical_Memory_Graph_of_Thoughts_PRD.md)
+- **Enterprise SaaS Connectors & ACL Inheritance PRD:** [`docs/45_Enterprise_SaaS_Connectors_and_ACL_Inheritance_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/45_Enterprise_SaaS_Connectors_and_ACL_Inheritance_PRD.md)
+- **Visual DAG Workflow Canvas & Agentic Graph Composer PRD:** [`docs/46_Visual_DAG_Workflow_Canvas_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/46_Visual_DAG_Workflow_Canvas_PRD.md)
+- **Sovereign Air-Gapped Appliance & Embedded Edge Engine PRD:** [`docs/47_Sovereign_Air_Gapped_Appliance_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/47_Sovereign_Air_Gapped_Appliance_PRD.md)
+- **The Playground Universal Creation Showcase PRD:** [`docs/48_The_Playground_Universal_Creation_Showcase_PRD.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/48_The_Playground_Universal_Creation_Showcase_PRD.md)
 - **Client Workspace Architecture & Contracts:** [`docs/CLIENT_DASHBOARD_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/CLIENT_DASHBOARD_ROADMAP.md)
 - **Autonomous Outreach Agent Technical Spec:** [`docs/AI_OUTREACH_AGENT_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/AI_OUTREACH_AGENT_ROADMAP.md)
 - **Automated AI Blogging Engine Spec:** [`docs/AUTOMATED_AI_BLOGGING_ROADMAP.md`](file:///Users/prateeksharma/Developer/Prateek_website/docs/AUTOMATED_AI_BLOGGING_ROADMAP.md)

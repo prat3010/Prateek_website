@@ -1,4 +1,4 @@
-import { Zap, ShoppingCart, Sparkles, Bot } from 'lucide-react';
+import { Zap, ShoppingCart, Sparkles, Bot, ArrowRight } from 'lucide-react';
 import NumberFlow from '@number-flow/react';
 import type { BaseEngineItem } from '@/data/resume';
 import type { Currency, PromoDiscountInfo } from '@/lib/pricing';
@@ -24,6 +24,10 @@ interface StickyPriceBarProps {
   onOpenCart?: () => void;
   onOpenCopilot?: () => void;
   itemCount?: number;
+  currentStep?: number;
+  onNextStep?: () => void;
+  nextStepLabel?: string;
+  isNextDisabled?: boolean;
 }
 
 export function StickyPriceBar({
@@ -36,11 +40,15 @@ export function StickyPriceBar({
   onOpenCart,
   onOpenCopilot,
   itemCount,
+  currentStep,
+  onNextStep,
+  nextStepLabel,
+  isNextDisabled = false,
 }: StickyPriceBarProps) {
   const hasDiscount = (totalCost.bundleDiscountPercent && totalCost.bundleDiscountPercent > 0) || totalCost.promoDiscount;
 
   return (
-    <div className={styles.stickyBar} style={{ marginTop: '1.5rem' }}>
+    <div className={styles.stickyBar}>
       <div className={styles.stickyLeft}>
         <div className={styles.stickyTitleRow}>
           <span className={styles.stickyTitle}>
@@ -69,22 +77,22 @@ export function StickyPriceBar({
               : '')}
         </span>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-        <div className={styles.stickyTotal} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+      <div className={styles.stickyRight}>
+        <div className={styles.stickyTotal}>
           <span>Estimated Total: </span>
           {currency === 'INR' ? (
             <>
               <NumberFlow value={totalCost.totalINR} locales="en-IN" format={{ style: 'currency', currency: 'INR', maximumFractionDigits: 0 }} />
-              <span style={{ opacity: 0.55, margin: '0 2px' }}>/</span>
-              <span style={{ opacity: 0.72, fontSize: '0.92em' }}>
+              <span className={styles.currencyDivider}>/</span>
+              <span className={styles.secondaryCurrency}>
                 <NumberFlow value={totalCost.totalUSD} locales="en-US" format={{ style: 'currency', currency: 'USD', maximumFractionDigits: 0 }} />
               </span>
             </>
           ) : (
             <>
               <NumberFlow value={totalCost.totalUSD} locales="en-US" format={{ style: 'currency', currency: 'USD', maximumFractionDigits: 0 }} />
-              <span style={{ opacity: 0.55, margin: '0 2px' }}>/</span>
-              <span style={{ opacity: 0.72, fontSize: '0.92em' }}>
+              <span className={styles.currencyDivider}>/</span>
+              <span className={styles.secondaryCurrency}>
                 <NumberFlow value={totalCost.totalINR} locales="en-IN" format={{ style: 'currency', currency: 'INR', maximumFractionDigits: 0 }} />
               </span>
             </>
@@ -99,7 +107,7 @@ export function StickyPriceBar({
               aria-label="Open Scope Copilot"
             >
               <Bot size={15} className={styles.copilotIcon} />
-              <span>Scope Copilot</span>
+              <span className={styles.btnText}>Scope Copilot</span>
               <span className={styles.copilotIndicator} />
             </button>
           </MagneticButton>
@@ -113,7 +121,7 @@ export function StickyPriceBar({
               aria-label="Open Architecture Cart"
             >
               <ShoppingCart size={15} />
-              <span>Architecture Cart</span>
+              <span className={styles.btnText}>Architecture Cart</span>
               {itemCount !== undefined ? (
                 <span className={styles.cartBadge}>
                   {itemCount}
@@ -122,8 +130,21 @@ export function StickyPriceBar({
             </button>
           </MagneticButton>
         ) : null}
+        {onNextStep && currentStep && currentStep < 4 ? (
+          <MagneticButton strength={0.25}>
+            <button
+              type="button"
+              onClick={onNextStep}
+              disabled={isNextDisabled}
+              className={styles.stickyNextBtn}
+              aria-label={nextStepLabel || 'Advance to Next Step'}
+            >
+              <span>{nextStepLabel || 'NEXT STEP'}</span>
+              <ArrowRight size={14} />
+            </button>
+          </MagneticButton>
+        ) : null}
       </div>
     </div>
   );
 }
-

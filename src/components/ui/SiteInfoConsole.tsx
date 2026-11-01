@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Gamepad2, BarChart3, Maximize2, Minimize2 } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import TerminalSnakeGame from './TerminalSnakeGame';
 import TerminalPathfinder from './TerminalPathfinder';
@@ -14,12 +14,20 @@ import type { ResumeData } from '@/data/resume';
 import resumeFallback from '@/data/resume.json';
 import { useSystemTelemetry } from './useSystemTelemetry';
 import ConsoleTelemetryGrid from './ConsoleTelemetryGrid';
+import ConsoleCompactStatusBar from './ConsoleCompactStatusBar';
 import { useTerminalCommands, type ProjectSummary } from './useTerminalCommands';
+
+const STORAGE_KEY_TELEMETRY_COLLAPSED = 'terminal_telemetry_collapsed';
 
 const QUICK_SHORTCUTS = [
   'help',
-  'playground',
+  'pitch',
+  'architecture',
+  'tests',
+  'war-stories',
+  'interview',
   'twin',
+  'playground',
   'scope help',
   'cart',
   'inspect',
@@ -32,10 +40,14 @@ const QUICK_SHORTCUTS = [
   'projects',
   'partner',
   'system',
+  'telemetry',
   'storage',
   'sync',
   'analytics',
   'git-info',
+  'history',
+  'whoami',
+  'ls',
   'qrcode',
   'clear',
 ];
@@ -56,9 +68,33 @@ export default function SiteInfoConsole() {
   const [profileData, setProfileData] = useState<ResumeData>(resumeFallback as unknown as ResumeData);
   const [activeGame, setActiveGame] = useState<'none' | 'snake' | 'pathfinder'>('none');
   const [isMatrixActive, setIsMatrixActive] = useState<boolean>(false);
+  const [isTelemetryCollapsed, setIsTelemetryCollapsed] = useState<boolean>(false);
 
   const terminalScreenRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Restore persisted Focus Mode / Collapsed preference safely after mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_TELEMETRY_COLLAPSED);
+      if (saved === 'true') {
+        const frameId = requestAnimationFrame(() => {
+          setIsTelemetryCollapsed(true);
+        });
+        return () => cancelAnimationFrame(frameId);
+      }
+    } catch {}
+  }, []);
+
+  const toggleTelemetry = useCallback((forceState?: boolean) => {
+    setIsTelemetryCollapsed((prev) => {
+      const next = typeof forceState === 'boolean' ? forceState : !prev;
+      try {
+        localStorage.setItem(STORAGE_KEY_TELEMETRY_COLLAPSED, String(next));
+      } catch {}
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
     fetch('/api/projects')
@@ -92,19 +128,38 @@ export default function SiteInfoConsole() {
     setActiveGame,
     isMatrixActive,
     setIsMatrixActive,
+    isTelemetryCollapsed,
+    toggleTelemetry,
   });
 
-  // Auto-scroll terminal screen to bottom
+  // Auto-scroll terminal screen to bottom (instant to prevent jank during fast streams)
   useEffect(() => {
-    if (terminalScreenRef.current && typeof terminalScreenRef.current.scrollTo === 'function') {
-      terminalScreenRef.current.scrollTo({
-        top: terminalScreenRef.current.scrollHeight,
-        behavior: 'smooth',
-      });
+    const screen = terminalScreenRef.current;
+    if (!screen) return;
+    const isNearBottom = screen.scrollHeight - screen.scrollTop - screen.clientHeight <= 140;
+    if (isNearBottom || terminalHistory.length <= 6) {
+      screen.scrollTop = screen.scrollHeight;
     }
   }, [terminalHistory]);
 
+  // Ensure prompt view stays in frame when expanding or collapsing focus mode
+  useEffect(() => {
+    const screen = terminalScreenRef.current;
+    if (!screen) return;
+    screen.scrollTop = screen.scrollHeight;
+    const timer = setTimeout(() => {
+      if (screen) {
+        screen.scrollTop = screen.scrollHeight;
+      }
+    }, 320);
+    return () => clearTimeout(timer);
+  }, [isTelemetryCollapsed]);
+
   const focusTerminalInput = () => {
+    if (typeof window !== 'undefined') {
+      const selection = window.getSelection();
+      if (selection && selection.toString().length > 0) return;
+    }
     if (inputRef.current) {
       inputRef.current.focus();
     }
@@ -114,15 +169,17 @@ export default function SiteInfoConsole() {
     <div className={styles.wrapper}>
       <div className={styles.container}>
         {/* ---- Go Back Header ---- */}
-        <div className={styles.header} style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          <Link href="/" className={styles.backLink}>
-            <ArrowLeft size={18} />
+        <div className={styles.header}>
+          <Link href="/" className={styles.backLink} prefetch={false}>
+            <ArrowLeft size={16} />
             <span>Return to Base</span>
           </Link>
-          <Link href="/playground" className={styles.backLink}>
+          <Link href="/playground" className={styles.backLink} prefetch={false}>
+            <Gamepad2 size={16} />
             <span>The Playground</span>
           </Link>
-          <Link href="/analytics" className={styles.backLink}>
+          <Link href="/analytics" className={styles.backLink} prefetch={false}>
+            <BarChart3 size={16} />
             <span>Visitor Analytics</span>
           </Link>
         </div>
@@ -130,38 +187,99 @@ export default function SiteInfoConsole() {
         <div className={styles.consoleContainer}>
           {/* Title Bar */}
           <div className={styles.consoleTitleBar}>
-            <div className={styles.indicators}>
-              <span className={`${styles.dot} ${styles.red}`} />
-              <span className={`${styles.dot} ${styles.yellow}`} />
-              <span className={`${styles.dot} ${styles.green} ${isAiChatActive ? styles.dotPulse : ''}`} />
+            <div className={styles.titleBarLeft}>
+              <div className={styles.indicators}>
+                <button
+                  type="button"
+                  className={`${styles.dot} ${styles.red}`}
+                  onClick={() => executeCommand('clear')}
+                  title="Clear terminal (clear)"
+                  aria-label="Clear terminal output"
+                />
+                <button
+                  type="button"
+                  className={`${styles.dot} ${styles.yellow}`}
+                  onClick={() => executeCommand('help')}
+                  title="Print command manual (help)"
+                  aria-label="Print command manual"
+                />
+                <button
+                  type="button"
+                  className={`${styles.dot} ${styles.green} ${isAiChatActive ? styles.dotPulse : ''}`}
+                  onClick={() => executeCommand(isAiChatActive ? 'exit' : 'twin')}
+                  title={isAiChatActive ? 'Disconnect AI Twin (exit)' : 'Connect to Live AI Twin (twin)'}
+                  aria-label={isAiChatActive ? 'Disconnect AI Twin' : 'Connect to Live AI Twin'}
+                />
+              </div>
+              <h2 className={styles.titleText}>
+                {isAiChatActive
+                  ? 'PRATEEQ.AI TWIN CONSOLE // ACTIVE NEURAL LINK'
+                  : isNoir
+                    ? 'SYSTEM DIAGNOSTICS & LOGS (v2.5)'
+                    : 'COBALT TERMINAL CORE // SITE SCHEMATICS'}
+              </h2>
             </div>
-            <h2 className={styles.titleText}>
-              {isAiChatActive
-                ? 'PRATEEQ.AI TWIN CONSOLE // ACTIVE NEURAL LINK'
-                : isNoir
-                  ? 'SYSTEM DIAGNOSTICS & LOGS (v2.5)'
-                  : 'COBALT TERMINAL CORE // SITE SCHEMATICS'}
-            </h2>
-            {isAiChatActive && (
+            <div className={styles.titleBarActions}>
               <button
                 type="button"
-                className={styles.twinExitBtn}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  executeCommand('exit');
-                }}
-                title="Disconnect AI Twin and return to standard shell"
+                className={`${styles.telemetryToggleBtn} ${isTelemetryCollapsed ? styles.telemetryToggleActive : ''}`}
+                onClick={() => toggleTelemetry()}
+                title={
+                  isTelemetryCollapsed
+                    ? 'Expand Telemetry Matrix (telemetry on)'
+                    : 'Collapse Telemetry into Focus Mode (telemetry off)'
+                }
+                aria-label={
+                  isTelemetryCollapsed
+                    ? 'Expand Telemetry Matrix'
+                    : 'Collapse Telemetry into Focus Mode'
+                }
+                aria-expanded={!isTelemetryCollapsed}
               >
-                DISCONNECT [EXIT]
+                {isTelemetryCollapsed ? (
+                  <>
+                    <Maximize2 size={12} className={styles.toggleBtnIcon} aria-hidden="true" />
+                    <span>SHOW TELEMETRY</span>
+                  </>
+                ) : (
+                  <>
+                    <Minimize2 size={12} className={styles.toggleBtnIcon} aria-hidden="true" />
+                    <span>FOCUS MODE</span>
+                  </>
+                )}
               </button>
-            )}
+              {isAiChatActive && (
+                <button
+                  type="button"
+                  className={styles.twinExitBtn}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    executeCommand('exit');
+                  }}
+                  title="Disconnect AI Twin and return to standard shell"
+                >
+                  DISCONNECT [EXIT]
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Telemetry & Web Vitals Dashboard */}
-          <ConsoleTelemetryGrid stats={stats} webVitals={webVitals} />
+          {isTelemetryCollapsed ? (
+            <ConsoleCompactStatusBar
+              stats={stats}
+              webVitals={webVitals}
+              onExpand={() => toggleTelemetry(false)}
+            />
+          ) : (
+            <ConsoleTelemetryGrid stats={stats} webVitals={webVitals} />
+          )}
 
           {/* Terminal Console */}
-          <div className={`${styles.terminalContainer} ${isAiChatActive ? styles.terminalAiActive : ''}`} onClick={focusTerminalInput}>
+          <div
+            className={`${styles.terminalContainer} ${isAiChatActive ? styles.terminalAiActive : ''} ${isTelemetryCollapsed ? styles.terminalFocusMode : ''}`}
+            onClick={focusTerminalInput}
+          >
             {activeGame === 'snake' ? (
               <TerminalSnakeGame
                 onClose={() => setActiveGame('none')}

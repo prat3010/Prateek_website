@@ -17,12 +17,18 @@
   width: 100%;
   max-width: var(--max-width-narrow, 960px);
   margin: 0 auto;
+  contain: layout;
 }
 
 .header {
   margin-bottom: var(--space-lg);
   display: flex;
   justify-content: flex-start;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  isolation: isolate;
+  contain: layout;
 }
 
 .backLink {
@@ -33,23 +39,32 @@
   font-weight: 700;
   font-size: 1.1rem;
   color: var(--pop-black);
-  padding: 6px 12px;
+  padding: 6px 14px;
   background-color: var(--pop-white);
   border: 1px solid var(--color-border);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   border-radius: var(--border-radius-sm);
-  transition: transform 0.2s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  transition: transform 0.2s ease, box-shadow 0.25s ease, background-color 0.2s ease;
 }
 
 .backLink:hover {
-  transform: translateY(-2px);
+  transform: translateY(-2px) translateZ(0);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   background-color: var(--pop-yellow);
 }
 
 .backLink:active {
-  transform: translateY(0);
+  transform: translateY(0) translateZ(0);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.backLink:focus-visible {
+  outline: 2px solid var(--neon-cyan, var(--pop-blue));
+  outline-offset: 2px;
 }
 
 /* ──────────────────────────────────────────────────────────
@@ -65,6 +80,9 @@
   font-family: var(--font-code);
   color: var(--pop-cream);
   position: relative;
+  isolation: isolate;
+  contain: layout;
+  transform: translateZ(0);
   transition: 
     background-color var(--transition-normal),
     border-color var(--transition-normal),
@@ -75,14 +93,25 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
   border-bottom: 3px solid var(--pop-black);
   padding-bottom: 12px;
   margin-bottom: 16px;
 }
 
+.titleBarLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
 .indicators {
   display: flex;
   gap: 6px;
+  flex-shrink: 0;
 }
 
 .dot {
@@ -91,6 +120,19 @@
   border-radius: 50%;
   display: inline-block;
   border: 1px solid var(--pop-black);
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.dot:hover {
+  transform: scale(1.25);
+  opacity: 0.85;
+}
+
+.dot:focus-visible {
+  outline: 2px solid var(--neon-cyan, var(--pop-blue));
+  outline-offset: 1px;
 }
 
 .red { background-color: var(--pop-red); }
@@ -106,34 +148,71 @@
   margin: 0;
 }
 
+.titleBarActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.telemetryToggleBtn {
+  font-family: var(--font-code), 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: var(--border-radius-sm, 4px);
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: var(--pop-cream);
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.telemetryToggleBtn:hover {
+  background: var(--pop-yellow);
+  color: var(--pop-black);
+  border-color: var(--pop-black);
+  transform: translateY(-1px);
+}
+
+.telemetryToggleBtn:active {
+  transform: translateY(0);
+}
+
+.telemetryToggleBtn:focus-visible {
+  outline: 2px solid var(--neon-cyan, var(--pop-blue));
+  outline-offset: 2px;
+}
+
+.telemetryToggleBtn.telemetryToggleActive {
+  background: rgba(0, 230, 118, 0.15);
+  border-color: rgba(0, 230, 118, 0.4);
+  color: var(--pop-green);
+}
+
+.telemetryToggleBtn.telemetryToggleActive:hover {
+  background: var(--pop-green);
+  color: var(--pop-black);
+  border-color: var(--pop-black);
+}
+
+.toggleBtnIcon {
+  flex-shrink: 0;
+}
+
 /* Dashboard Grid Widgets */
 .consoleGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
   margin-bottom: 16px;
-}
-
-@media (max-width: 640px) {
-  .consoleContainer {
-    padding: 12px;
-  }
-
-  .consoleGrid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .terminalContainer {
-    min-height: 480px;
-    height: auto;
-    padding: 10px 8px;
-    overflow: visible;
-  }
-
-  .terminalScreen {
-    height: 320px;
-  }
+  contain: layout;
+  animation: telemetryFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .consoleWidget {
@@ -205,6 +284,127 @@
   transition: width 0.4s ease;
 }
 
+/* ──────────────────────────────────────────────────────────
+   COMPACT SINGLE-LINE STATUS BAR (Focus Mode Live HUD)
+   ────────────────────────────────────────────────────────── */
+
+.compactStatusBar {
+  background-color: #1c1c21;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  padding: 8px 14px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+  font-family: var(--font-code), 'JetBrains Mono', monospace;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  contain: layout;
+  transition: transform 0.2s ease, box-shadow 0.25s ease, background-color 0.2s ease, border-color 0.2s ease;
+  animation: telemetryFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.compactStatusBar:hover {
+  transform: translateY(-1px);
+  background-color: #222228;
+  border-color: var(--pop-yellow);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.compactStatusBar:focus-visible {
+  outline: 2px solid var(--neon-cyan, var(--pop-blue));
+  outline-offset: 2px;
+}
+
+.compactMetricsGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.compactMetricItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+}
+
+.compactPulseDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--pop-green);
+  animation: dotBlink 1.5s infinite ease-in-out;
+  flex-shrink: 0;
+}
+
+.compactLabel {
+  color: #a0a0ab;
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+}
+
+.compactValue {
+  color: var(--pop-yellow);
+  font-weight: 700;
+}
+
+.compactDivider {
+  color: #383844;
+  user-select: none;
+}
+
+.compactExpandAction {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.compactBadge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: rgba(255, 208, 39, 0.12);
+  border: 1px solid rgba(255, 208, 39, 0.3);
+  color: var(--pop-yellow);
+}
+
+.compactExpandBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--pop-cream);
+  opacity: 0.85;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.compactStatusBar:hover .compactExpandBtn {
+  opacity: 1;
+  color: var(--pop-yellow);
+}
+
+@keyframes telemetryFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Terminal Screen Area */
 .terminalContainer {
   background-color: #121215;
@@ -220,12 +420,25 @@
   height: 400px;
   display: flex;
   flex-direction: column;
+  isolation: isolate;
+  transform: translateZ(0);
+  backface-visibility: hidden;
   transition: min-height 0.3s ease, height 0.3s ease;
 }
 
 .terminalContainer.terminalAiActive {
   min-height: 480px;
   height: 480px;
+}
+
+.terminalContainer.terminalFocusMode {
+  min-height: clamp(560px, 85vh, 1200px);
+  height: clamp(560px, 85vh, 1200px);
+}
+
+.terminalContainer.terminalFocusMode.terminalAiActive {
+  min-height: clamp(600px, 88vh, 1300px);
+  height: clamp(600px, 88vh, 1300px);
 }
 
 .terminalScreen {
@@ -243,11 +456,19 @@
   gap: 4px;
   padding-right: 6px;
   flex: 1;
+  transform: translateZ(0);
+  backface-visibility: hidden;
   transition: height 0.3s ease;
 }
 
 .terminalContainer.terminalAiActive .terminalScreen {
   height: 415px;
+}
+
+.terminalContainer.terminalFocusMode .terminalScreen {
+  height: 100%;
+  min-height: 0;
+  flex: 1;
 }
 
 /* Custom scrollbar inside terminal screen */
@@ -429,6 +650,74 @@
   color: #8a8a93;
 }
 
+:global([data-theme='noir']) .telemetryToggleBtn {
+  background-color: #0c0c0e;
+  border: 1px solid #2F2F3D;
+  color: #8a8a93;
+}
+
+:global([data-theme='noir']) .telemetryToggleBtn:hover {
+  background-color: #121216;
+  border-color: var(--neon-cyan, #00f0ff);
+  color: #FFFFFF;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+}
+
+:global([data-theme='noir']) .telemetryToggleBtn.telemetryToggleActive {
+  background: rgba(0, 240, 255, 0.12);
+  border-color: rgba(0, 240, 255, 0.4);
+  color: var(--neon-cyan, #00f0ff);
+}
+
+:global([data-theme='noir']) .telemetryToggleBtn.telemetryToggleActive:hover {
+  background: rgba(0, 240, 255, 0.25);
+  color: #ffffff;
+  border-color: var(--neon-cyan, #00f0ff);
+}
+
+:global([data-theme='noir']) .compactStatusBar {
+  background-color: #0d0d10;
+  border: 1px solid #2F2F3D;
+  box-shadow: none;
+}
+
+:global([data-theme='noir']) .compactStatusBar:hover {
+  background-color: #121216;
+  border-color: var(--neon-cyan, #00f0ff);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+:global([data-theme='noir']) .compactPulseDot {
+  background-color: var(--neon-green, #39ff14);
+  box-shadow: 0 0 6px var(--neon-green, #39ff14);
+}
+
+:global([data-theme='noir']) .compactLabel {
+  color: #8a8a93;
+}
+
+:global([data-theme='noir']) .compactValue {
+  color: var(--neon-cyan, #00f0ff);
+}
+
+:global([data-theme='noir']) .compactDivider {
+  color: #2F2F3D;
+}
+
+:global([data-theme='noir']) .compactBadge {
+  background: rgba(0, 240, 255, 0.1);
+  border-color: rgba(0, 240, 255, 0.3);
+  color: var(--neon-cyan, #00f0ff);
+}
+
+:global([data-theme='noir']) .compactExpandBtn {
+  color: #8a8a93;
+}
+
+:global([data-theme='noir']) .compactStatusBar:hover .compactExpandBtn {
+  color: var(--neon-cyan, #00f0ff);
+}
+
 :global([data-theme='noir']) .consoleWidget {
   background-color: #0d0d10;
   border: 1px solid #2F2F3D;
@@ -479,6 +768,9 @@
   z-index: 2;
   background-size: 100% 3px, 6px 100%;
   pointer-events: none;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  contain: strict;
 }
 
 :global([data-theme='noir']) .terminalScreen::-webkit-scrollbar-thumb {
@@ -563,10 +855,13 @@
   border: 1px solid #3F3F4E;
   box-shadow: none;
   border-radius: 4px;
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 :global([data-theme='noir']) .backLink:hover {
-  transform: translateY(-2px);
+  transform: translateY(-2px) translateZ(0);
   background-color: #1C1C24;
   border-color: var(--neon-cyan, #00f0ff);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
@@ -574,7 +869,7 @@
 }
 
 :global([data-theme='noir']) .backLink:active {
-  transform: translateY(0);
+  transform: translateY(0) translateZ(0);
 }
 
 /* ──────────────────────────────────────────────────────────
@@ -612,3 +907,104 @@
   border-color: var(--neon-pink, #ff2a55);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
+
+/* ──────────────────────────────────────────────────────────
+   RESPONSIVE MOBILE VIEWPORT OVERRIDES
+   ────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .consoleContainer {
+    padding: 12px;
+  }
+
+  .consoleGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .terminalContainer {
+    min-height: 480px;
+    height: auto;
+    padding: 10px 8px;
+    overflow: visible;
+  }
+
+  .terminalContainer.terminalAiActive {
+    min-height: 520px;
+    height: auto;
+  }
+
+  .terminalScreen {
+    height: 320px;
+  }
+
+  .terminalContainer.terminalAiActive .terminalScreen {
+    height: 380px;
+  }
+
+  .terminalInput {
+    font-size: 16px; /* Prevents iOS Safari auto-zoom on prompt focus */
+  }
+
+  .compactStatusBar {
+    padding: 7px 10px;
+    gap: 8px;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .compactStatusBar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .compactMetricsGroup {
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .compactBadge {
+    display: none;
+  }
+
+  .compactHideMobile {
+    display: none;
+  }
+
+  .compactDivider {
+    display: none;
+  }
+
+  .terminalContainer.terminalFocusMode {
+    min-height: clamp(480px, 85dvh, 1000px);
+    height: clamp(480px, 85dvh, 1000px);
+    overflow: hidden;
+  }
+
+  .terminalContainer.terminalFocusMode .terminalScreen {
+    height: 100%;
+    min-height: 0;
+    flex: 1;
+  }
+
+  .backLink {
+    font-size: 0.9rem;
+    padding: 5px 10px;
+  }
+
+  :global([data-theme='noir']) .backLink {
+    font-size: 0.75rem;
+    padding: 5px 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .consoleGrid,
+  .compactStatusBar,
+  .terminalContainer {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+

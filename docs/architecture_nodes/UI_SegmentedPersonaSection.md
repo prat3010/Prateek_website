@@ -20,7 +20,7 @@ invariants:
 test_suites:
   - src/lib/__tests__/data.test.ts
 downstream:
-  - Route_rag
+  - Route_rag_app
   - ../24_RAG_App_Studio_PRD
 ---
 
@@ -42,7 +42,7 @@ downstream:
 ---
 
 ## 🔗 Related Architecture & Cross-References
-- [Route: /rag](Route_rag.md)
+- [Route: /rag/app](Route_rag_app.md)
 - [24_RAG_App_Studio_PRD](../24_RAG_App_Studio_PRD.md)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints

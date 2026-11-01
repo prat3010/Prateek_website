@@ -21,7 +21,7 @@ invariants:
 test_suites:
   - apps/api/tests/test_architecture.py
 downstream:
-  - ../../../retriever/docs/RAG_2026_PRODUCT_ROADMAP
+  - ../../../Prateek_Ecosystem_Vault/internal_archives/retriever/RAG_2026_PRODUCT_ROADMAP
   - ../24_RAG_App_Studio_PRD
   - ../00_ARCHITECTURE_INDEX
 ---
@@ -46,7 +46,7 @@ downstream:
 ---
 
 ## 🔗 Related Architecture & Cross-References
-- [Retriever: RAG 2026 Roadmap](../../../retriever/docs/RAG_2026_PRODUCT_ROADMAP.md)
+- [Retriever: RAG 2026 Roadmap](../../../Prateek_Ecosystem_Vault/internal_archives/retriever/RAG_2026_PRODUCT_ROADMAP.md)
 - [24_RAG_App_Studio_PRD](../24_RAG_App_Studio_PRD.md)
 - [00_ARCHITECTURE_INDEX](../00_ARCHITECTURE_INDEX.md)
 

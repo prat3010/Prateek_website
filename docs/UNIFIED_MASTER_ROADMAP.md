@@ -41,7 +41,7 @@
 
 ---
 
-## 2. Master Sequential Implementation Timeline (M1 – M115)
+## 2. Master Sequential Implementation Timeline (M1 – M129)
 
 ```mermaid
 timeline
@@ -63,7 +63,8 @@ timeline
     Phase M (M98–M102) : Global Distributed Sovereign Edge & Multi-Cloud Resiliency : Completed
     Phase N (M103–M109) : Autonomous Agent Swarms, Long-Horizon Memory & Multi-Agent Quorum : Completed
     Phase O (M110–M113) : Public Open-Source Launch & Community Ecosystem : Completed
-    Phase P (M114+) : Multimodal Real-Time Voice & Distributed Agentic Mesh : Active
+    Phase P (M114–M129) : Multimodal Voice, Distributed Mesh & Autonomous Cognitive Batteries : Completed
+    Phase Q (M130+) : Instant Cloud Playground & Multi-Region Sandbox Hub : Planned
 ```
 
 ---
@@ -1152,6 +1153,59 @@ timeline
   - **Automated Verification:** 28 tests passing across 6 new test suites; zero-toy audit verified across 346 files with 0 violations.
 - **Status:** **Completed (Phase P / v2.3.0-alpha1)**
 
+#### 🔌 Milestone 125: Turn-Key Enterprise SaaS Connectors & Document-Level ACL Inheritance
+- **Libraries:** Google API Client, Notion Client, Atlassian Python API, MSAL / Microsoft Graph SDK, PostgreSQL JSONB containment (`?`, `?|`), Pytest
+- **Repo Scope:** Both (`retriever` `apps/api/src/adapters/connectors/`, `apps/api/src/domain/abstractions/connectors.py`, `apps/api/src/adapters/vector/filter_builder.py`, `apps/api/src/domain/retrieval/search_service.py`, `apps/api/tests/test_enterprise_saas_connectors.py`, `apps/api/tests/test_document_acl_retrieval.py` & `Prateek_website` `docs/45_Enterprise_SaaS_Connectors_and_ACL_Inheritance_PRD.md`)
+- **Deliverable:**
+  - **Platform Battery No. 39 Registration:** Cataloged `enterprise_saas_connectors_acl` in `BatteryService` under `SYSTEM_EXTENSIBILITY`.
+  - **Turn-Key SaaS Connectors:** Implemented high-throughput connectors for Google Workspace (Drive & Docs), Notion Enterprise, Atlassian Confluence & Jira, and Microsoft 365 (SharePoint & OneDrive) with incremental delta sync cursors.
+  - **Document-Level ACL Inheritance & Pre-Retrieval Pruning:** Propagated `allowed_users`, `allowed_groups`, and `is_public` into chunk metadata. Updated `build_filter_clause` and all search adapters with sublinear JSONB array containment (`?` and `?|`) with tenant admin bypass.
+- **Status:** **Completed (Phase P / v2.3.0)**
+
+#### 🎨 Milestone 126: Visual DAG Workflow Canvas & Agentic Graph Composer
+- **Libraries:** React 19, Next.js 16 SVG Studio, Kahn's Topological Sort, FastAPI, Pydantic, asyncio
+- **Repo Scope:** Both (`retriever` `apps/api/src/domain/workflow/dag_compiler.py`, `apps/api/src/domain/workflow/dag_executor.py`, `apps/api/src/domain/workflow/templates.py`, `apps/api/src/routers/workflow_dag.py`, `apps/web/src/components/visual-dag-canvas.tsx`, `apps/api/tests/test_dag_workflow.py` & `Prateek_website` `docs/46_Visual_DAG_Workflow_Canvas_PRD.md`)
+- **Deliverable:**
+  - **Platform Battery No. 40 Registration:** Registered `visual_dag_workflow_composer` in `BatteryService` under `SYSTEM_EXTENSIBILITY`.
+  - **Visual DAG Studio in `apps/web`:** Interactive SVG canvas (`VisualDagCanvas.tsx`) with pan/zoom viewport, draggable typed nodes, cubic Bézier spline connectors, and step-level telemetry.
+  - **Topological Compiler & Kahn's Cycle Detection:** Built `DAGWorkflowCompiler` detecting cycles, isolating cycles with `CyclicWorkflowError`, and level-partitioning stages for concurrent execution.
+  - **DAG Workflow Execution Engine:** Real-time stage stepper with token cost attribution ($/token rate tables) and authentic node handlers.
+  - **Enterprise Template Library:** 4 production templates (Legal Analyzer, Customer Support, Codebase Assistant, Multimodal Inspector).
+- **Status:** **Completed (Phase P / v2.4.0)**
+
+#### 🛡️ Milestone 127: Sovereign Air-Gapped Appliance & Embedded Edge Engine
+- **Libraries:** Docker OCI Distroless, SQLite 3 FTS5, AES-256-GCM, HKDF-SHA256, Whisper.cpp, Piper Neural TTS, FastAPI
+- **Repo Scope:** Both (`retriever` `deploy/docker/Dockerfile.appliance`, `apps/api/src/adapters/appliance/hardware_vector_sealer.py`, `apps/api/src/domain/appliance/airgap_sentinel.py`, `apps/api/src/domain/appliance/voice_rag_engine.py`, `apps/api/src/domain/appliance/appliance_manager.py`, `apps/api/src/routers/appliance.py`, `apps/web/src/components/sovereign-appliance-cockpit.tsx`, `apps/api/tests/test_sovereign_appliance.py` & `Prateek_website` `docs/47_Sovereign_Air_Gapped_Appliance_PRD.md`)
+- **Deliverable:**
+  - **Platform Battery No. 41 Registration:** Registered `sovereign_air_gapped_appliance` in `BatteryService` under `EDGE_DISTRIBUTION`.
+  - **Distroless Edge Container:** Self-contained OCI recipe bundling embedded SQLite FTS5, quantized models, and non-root execution.
+  - **Hardware-Rooted Vector Sealing:** Authenticated AES-256-GCM vector index sealing bound to TPM 2.0 PCR registers or Apple Secure Enclave silicon seeds.
+  - **Zero-Egress Strict Mode (Fail-Closed Sentinel):** In-process network sentinel (`AirgapNetworkSentinel`) continuously auditing system sockets and DNS resolvers.
+  - **Offline Full-Duplex Neural Voice RAG:** Sub-350ms hands-free voice loop (Whisper ASR $\to$ SQLite hybrid search $\to$ Piper neural TTS).
+  - **Sovereign Cockpit in `apps/web`:** Administrative UI with real-time Air-Gap Security Shield, PCR attestation card, and 1-click seal/unseal controls.
+- **Status:** **Completed (Phase P / v2.5.0)**
+
+#### ⚡ Milestone 128: System 1 Fast-Path Decision Plane & TypeSafe Jev Integration
+- **Libraries:** Asyncio, Pydantic, httpx, Pytest, FastAPI
+- **Repo Scope:** `retriever` (`apps/api/src/adapters/cognitive/jev_client.py`, `apps/api/src/adapters/cognitive/jev_decision_adapters.py`, `apps/api/src/domain/batteries/battery_service.py`, `apps/api/tests/test_system_one_jev_decision.py`, `docs/features/system-one-fast-decision-plane.md`)
+- **Deliverable:**
+  - **Platform Battery No. 42 Registration:** Registered `system_one_fast_decision_plane` in `BatteryService` under `ML_INTELLIGENCE`.
+  - **Resilient Async Jev Decision Client:** Built `JevClient` with stateful circuit breaker (`CLOSED` $\to$ `OPEN` $\to$ `HALF_OPEN`), EWMA latency tracking, and multi-tenant `X-Tenant-ID` isolation headers.
+  - **Sub-100ms Query Intent Classifier:** Built `JevQueryIntentAdapter` implementing `QueryIntentClassifier`, parallelizing `top_k`, `enable_hybrid`, `enable_reranking`, and `enable_web_search` decisions in a single non-autoregressive pass.
+  - **Sub-150ms Corrective RAG (CRAG) Candidate Evaluator:** Built `JevCorrectiveRetrievalAdapter` providing calibrated confidence scoring and instant web search triggering.
+  - **Automated Verification:** 10 automated unit and integration tests passing in `test_system_one_jev_decision.py`.
+- **Status:** **Completed (Phase P / v2.6.0)**
+
+#### 👑 Milestone 129: Tenant AI Persona Engine & Enterprise Governance Policy Lock
+- **Libraries:** SQLAlchemy 2.0, Alembic, FastAPI, React 19, TypeScript, Pytest
+- **Repo Scope:** Both (`retriever` `apps/api/alembic/versions/p1q2r3s4t5u6_add_is_locked_to_prompt_templates.py`, `apps/api/src/routers/tenant.py`, `apps/api/src/routers/admin.py`, `apps/api/src/adapters/database/models.py`, `apps/web/src/components/tenant-prompts.tsx`, `apps/api/tests/test_tenant_prompt_governance.py`, `docs/features/tenant-master-prompt-governance.md`)
+- **Deliverable:**
+  - **Self-Service Tenant Prompt REST API:** Implemented `GET /v1/tenants/{tenantId}/prompts/default` and `PUT /v1/tenants/{tenantId}/prompts/default` allowing tenant API keys to inspect and customize master system instructions.
+  - **Enterprise Governance Policy Lock (`is_locked: bool`):** Added `is_locked` boolean column to `prompt_templates` via migration `p1q2r3s4t5u6`. Mutations under lock return `HTTP 403 Forbidden` (`detail="Master system prompt is locked by cluster administrator policy."`).
+  - **Admin Web Studio Integration:** Centralized toggle in Admin Web Studio allowing cluster operators to enforce policy locks across tenants.
+  - **Automated Verification:** Verified across 5 Pytest suites (`test_tenant_prompt_governance.py`), 42 admin API tests, zero-toy invariant check, and clean Ruff linting.
+- **Status:** **Completed (Phase P / v2.7.0)**
+
 ---
 
 ## 4. Single Source of Truth Entity & Route Matrix
@@ -1207,10 +1261,10 @@ The following table serves as the definitive directory linking all specialized p
 | Roadmap / Blueprint | Focus & Scope | File Link |
 | :--- | :--- | :--- |
 | **Retriever Backend Roadmap** | Complete Backend Milestones (M1–M73), Database Schemas, RLS, Storage | [../../retriever/ROADMAP.md](../../retriever/ROADMAP.md) |
-| **2026 SOTA RAG Engine Spec** | Phase H (M69–M73): Contextual Chunking, ColBERT Rerank, CRAG, Leiden GraphRAG | [../../retriever/docs/RAG_2026_PRODUCT_ROADMAP.md](../../retriever/docs/RAG_2026_PRODUCT_ROADMAP.md) |
-| **Admin Dashboard Roadmap** | Admin Control Panel (`apps/web` on `admin.rag.prateeq.in`), Tenant Management | [../../retriever/docs/ADMIN_DASHBOARD_ROADMAP.md](../../retriever/docs/ADMIN_DASHBOARD_ROADMAP.md) |
-| **Retriever Project Status** | Live Operational Health, Test Status (485 Tests), Completed Milestones | [../../retriever/PROJECT_STATUS.md](../../retriever/docs/operations/PROJECT_STATUS.md) |
-| **Technical Debt & Deferred** | Audit Findings, Tracked Security Items, Deferred Optimizations | [../../retriever/TECH_DEBT.md](../../retriever/docs/operations/TECH_DEBT.md) |
+| **2026 SOTA RAG Engine Spec (Archived)** | Phase H (M69–M73): Contextual Chunking, ColBERT Rerank, CRAG, Leiden GraphRAG | [../../Prateek_Ecosystem_Vault/internal_archives/retriever/RAG_2026_PRODUCT_ROADMAP.md](../../Prateek_Ecosystem_Vault/internal_archives/retriever/RAG_2026_PRODUCT_ROADMAP.md) |
+| **Admin Dashboard Roadmap (Archived)** | Admin Control Panel (`apps/web` on `admin.rag.prateeq.in`), Tenant Management | [../../Prateek_Ecosystem_Vault/internal_archives/retriever/ADMIN_DASHBOARD_ROADMAP.md](../../Prateek_Ecosystem_Vault/internal_archives/retriever/ADMIN_DASHBOARD_ROADMAP.md) |
+| **Retriever Project Status** | Live Operational Health, Test Status, Completed Milestones | [../../retriever/docs/operations/PROJECT_STATUS.md](../../retriever/docs/operations/PROJECT_STATUS.md) |
+| **Technical Debt & Deferred** | Audit Findings, Tracked Security Items, Deferred Optimizations | [../../retriever/docs/operations/TECH_DEBT.md](../../retriever/docs/operations/TECH_DEBT.md) |
 
 ---
 

@@ -25,7 +25,7 @@ interface ThemeTransitionContextType {
   pendingTheme: Theme | null;
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+export const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 const ThemeTransitionContext = createContext<ThemeTransitionContextType | undefined>(undefined);
 
 export function ThemeProvider({ 

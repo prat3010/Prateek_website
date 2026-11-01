@@ -138,6 +138,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   } = state;
 
   const [isCopilotDrawerOpen, setIsCopilotDrawerOpen] = React.useState(false);
+  const isFirstMountRef = React.useRef(true);
 
   const currentScopeContext: CurrentScopeContext = React.useMemo(() => ({
     currentStep,
@@ -160,7 +161,11 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
   ]);
 
   useEffect(() => {
-    if (containerRef.current && currentStep > 1) {
+    if (isFirstMountRef.current) {
+      isFirstMountRef.current = false;
+      return;
+    }
+    if (containerRef.current) {
       if (lenis) {
         lenis.scrollTo(containerRef.current, { offset: -90, duration: 0.8 });
       } else {
@@ -474,6 +479,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                     setChatTranscript={setChatTranscript}
                     currentScope={currentScopeContext}
                     resumeData={resumeData}
+                    onOpenCopilot={() => setIsCopilotDrawerOpen(true)}
                   />
                 )}
 
@@ -538,6 +544,7 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                     onChangeField={(field, val) => setFormData((prev) => ({ ...prev, [field]: val }))}
                     agreedToTermsError={!formData.agreedToTerms}
                     stepHeadingRef={stepHeadingRef}
+                    user={user}
                   />
                 )}
 
@@ -560,6 +567,23 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                     (selectedEngine ? 1 : 0) +
                     formData.selectedFeatures.length +
                     (totalCost.brandOpt && totalCost.brandOpt.priceINR > 0 ? 1 : 0)
+                  }
+                  currentStep={currentStep}
+                  onNextStep={() => {
+                    if (currentStep === 2 && shouldSkipBrandStep) {
+                      setCurrentStep(4);
+                    } else if (currentStep < 4) {
+                      setCurrentStep((prev) => prev + 1);
+                    }
+                  }}
+                  nextStepLabel={
+                    currentStep === 1
+                      ? 'NEXT: TECHNICAL SCOPE'
+                      : currentStep === 2
+                      ? (shouldSkipBrandStep ? 'NEXT: COMMERCIALS' : 'NEXT: BRAND KIT')
+                      : currentStep === 3
+                      ? 'NEXT: COMMERCIALS'
+                      : undefined
                   }
                 />
 

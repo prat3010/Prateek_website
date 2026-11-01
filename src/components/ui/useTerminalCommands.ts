@@ -264,6 +264,63 @@ const BOOT_LOGS: string[] = [
   'SYSTEM // Diagnostics core online. Welcome.',
 ];
 
+export const SHELL_COMMANDS: string[] = [
+  'help',
+  'pitch',
+  'architecture',
+  'tests',
+  'war-stories',
+  'interview',
+  'twin',
+  'ai',
+  'ask',
+  'explain',
+  'playground',
+  'scope',
+  'cart',
+  'pathfinder',
+  'snake',
+  'matrix',
+  'sfx',
+  'pizzarat',
+  'projects',
+  'partner',
+  'inspect',
+  'system',
+  'telemetry',
+  'focus',
+  'storage',
+  'stack',
+  'sync',
+  'analytics',
+  'git-info',
+  'history',
+  'whoami',
+  'ls',
+  'pwd',
+  'cat',
+  'qrcode',
+  'clear',
+  'cls',
+  'exit',
+  'sudo',
+];
+
+export const AI_COMMANDS: string[] = [
+  'exit',
+  'quit',
+  'clear',
+  'cls',
+  'help',
+  'telemetry',
+  'focus',
+  'who are you?',
+  'architecture',
+  'tech stack',
+  'rag engine',
+  'pricing tiers',
+];
+
 export interface ProjectSummary {
   title: string;
   tags: string[];
@@ -287,6 +344,8 @@ export interface UseTerminalCommandsOptions {
   setActiveGame: (game: 'none' | 'snake' | 'pathfinder') => void;
   isMatrixActive: boolean;
   setIsMatrixActive: React.Dispatch<React.SetStateAction<boolean>>;
+  isTelemetryCollapsed?: boolean;
+  toggleTelemetry?: (forceState?: boolean) => void;
 }
 
 export function useTerminalCommands({
@@ -297,6 +356,8 @@ export function useTerminalCommands({
   setActiveGame,
   isMatrixActive,
   setIsMatrixActive,
+  isTelemetryCollapsed = false,
+  toggleTelemetry,
 }: UseTerminalCommandsOptions) {
   const [terminalInput, setTerminalInput] = useState('');
   const [terminalHistory, setTerminalHistory] = useState<ConsoleLine[]>(
@@ -331,6 +392,13 @@ export function useTerminalCommands({
   });
   const [isAiChatLoading, setIsAiChatLoading] = useState(false);
   const aiChatInFlightRef = useRef(false);
+  const statsRef = useRef(stats);
+  useEffect(() => {
+    statsRef.current = stats;
+  }, [stats]);
+  const draftInputRef = useRef('');
+  const hasExecutedUrlCmdRef = useRef(false);
+  const cmdHistoryRef = useRef<string[]>([]);
 
   const startAiChatStream = useCallback(() => {
     setTerminalHistory((prev) => {
@@ -455,9 +523,122 @@ export function useTerminalCommands({
         unlockAchievement('terminal_master', 'Terminal Master', 'Executed 5 terminal commands');
       }
 
-      setCmdHistory((prev) => [...prev, cmd]);
+      setCmdHistory((prev) => {
+        const next = [...prev, cmd];
+        cmdHistoryRef.current = next;
+        return next;
+      });
       setHistoryIndex(-1);
       setTerminalHistory((prev) => [...prev, { text: `> ${cmd}`, type: 'input' }]);
+
+      // ─── TELEMETRY & FOCUS MODE CONTROL (AVAILABLE IN ALL MODES) ───
+      if (
+        trimmedCmd === 'telemetry' ||
+        trimmedCmd.startsWith('telemetry ') ||
+        trimmedCmd === 'focus' ||
+        trimmedCmd.startsWith('focus ')
+      ) {
+        const parts = trimmedCmd.split(/\s+/);
+        const main = parts[0]?.toLowerCase();
+        const sub = parts[1]?.toLowerCase();
+
+        if (sub === 'help' || sub === '-h' || sub === '--help') {
+          const response: ConsoleLine[] = [
+            { text: '── TELEMETRY & FOCUS MODE CONTROLS ────────────────────────', type: 'success' },
+            { text: '  telemetry          - Toggle between full matrix and compact focus mode', type: 'output', command: 'telemetry' },
+            { text: '  telemetry on       - Expand full Telemetry Matrix & Web Vitals widgets', type: 'output', command: 'telemetry on' },
+            { text: '  telemetry off      - Collapse telemetry into sleek single-line status HUD', type: 'output', command: 'telemetry off' },
+            { text: '  telemetry status   - Display current telemetry viewport display status', type: 'output', command: 'telemetry status' },
+            { text: '  focus [on|off]     - Direct alias to enable or disable Focus Mode', type: 'output', command: 'focus' },
+            { text: ' ', type: 'output' },
+            { text: 'Tip: You can also click the FOCUS MODE / SHOW TELEMETRY button in the title bar.', type: 'success' },
+          ];
+          setTerminalHistory((prev) => [...prev, ...response]);
+          setTerminalInput('');
+          return;
+        }
+
+        if (sub === 'status') {
+          const response: ConsoleLine[] = [
+            {
+              text: `TELEMETRY STATUS: ${isTelemetryCollapsed ? 'COLLAPSED (Focus Mode Active)' : 'EXPANDED (Full Matrix Active)'}`,
+              type: 'output',
+            },
+            {
+              text: isTelemetryCollapsed
+                ? '  - Terminal screen is currently maximized (~85% viewport height).'
+                : '  - Telemetry matrix & Web Vitals widgets are currently visible.',
+              type: 'output',
+            },
+            {
+              text: '  - Tip: Run "telemetry" or click the title bar button to toggle.',
+              type: 'success',
+            },
+          ];
+          setTerminalHistory((prev) => [...prev, ...response]);
+          setTerminalInput('');
+          return;
+        }
+
+        let nextCollapsed: boolean;
+
+        if (main === 'focus') {
+          if (!sub || sub === 'on' || sub === 'mode') {
+            nextCollapsed = true;
+          } else if (sub === 'off') {
+            nextCollapsed = false;
+          } else if (sub === 'toggle') {
+            nextCollapsed = !isTelemetryCollapsed;
+          } else {
+            const response: ConsoleLine[] = [
+              { text: `Unknown focus option: "${sub}". Usage: focus [on|off|toggle|status|help]`, type: 'error' },
+            ];
+            setTerminalHistory((prev) => [...prev, ...response]);
+            setTerminalInput('');
+            return;
+          }
+        } else {
+          // main === 'telemetry'
+          if (!sub || sub === 'toggle') {
+            nextCollapsed = !isTelemetryCollapsed;
+          } else if (sub === 'off' || sub === 'hide' || sub === 'collapse' || sub === 'min') {
+            nextCollapsed = true;
+          } else if (sub === 'on' || sub === 'show' || sub === 'expand' || sub === 'max') {
+            nextCollapsed = false;
+          } else {
+            const response: ConsoleLine[] = [
+              { text: `Unknown telemetry option: "${sub}". Usage: telemetry [on|off|toggle|status|collapse|expand|help]`, type: 'error' },
+            ];
+            setTerminalHistory((prev) => [...prev, ...response]);
+            setTerminalInput('');
+            return;
+          }
+        }
+
+        toggleTelemetry?.(nextCollapsed);
+
+        const response: ConsoleLine[] = [
+          {
+            text: nextCollapsed
+              ? 'TELEMETRY MATRIX // Collapsed into Focus Mode. Terminal screen maximized to ~85% viewport.'
+              : 'TELEMETRY MATRIX // Expanded. Full telemetry matrix & Web Vitals grid restored.',
+            type: 'success',
+          },
+          {
+            text: nextCollapsed
+              ? '  • Sleek live HUD active (FPS, Uptime, DOM nodes, LCP).'
+              : '  • Full dual-widget diagnostics & frame rate monitors active.',
+            type: 'output',
+          },
+          {
+            text: '  • Tip: Use the title bar toggle button or type "telemetry" anytime to switch.',
+            type: 'output',
+          },
+        ];
+        setTerminalHistory((prev) => [...prev, ...response]);
+        setTerminalInput('');
+        return;
+      }
 
       // ─── ACTIVE AI CHAT CONVERSATION SESSION ───
       if (aiChatSession.isActive) {
@@ -1050,32 +1231,49 @@ export function useTerminalCommands({
         case 'help':
           response = [
             { text: 'Available commands:', type: 'success' },
-            { text: '  twin / ai   - 🧠 Launch interactive conversation with Prateeq\'s AI Twin', type: 'success' },
-            { text: '  ask <query> - Query Prateeq\'s AI Twin vector memory directly for answers', type: 'output' },
-            { text: '  playground  - 🎨 Explore The Playground: SaaS, Games, AI Art & Prompts', type: 'success' },
-            { text: '  pitch       - Executive Summary & Core Engineering Superpowers', type: 'output' },
-            { text: '  architecture- Master 8-Tier Developer Ecosystem Architecture Blueprint', type: 'output' },
-            { text: '  tests       - Inspect 330+ automated test suites & verification matrix', type: 'output' },
-            { text: '  war-stories - Real-world production engineering feats & tough traps solved', type: 'output' },
-            { text: '  interview   - Interactive role-tailored interview console (CTO vs Founder)', type: 'output' },
-            { text: '  scope <cmd> - Interactive Architecture Scoping CLI (new, list, analyze, add, remove, export, checkout)', type: 'output' },
-            { text: '  cart        - View active scoping bill of materials and price ledger', type: 'output' },
-            { text: '  pathfinder  - Launch interactive 2D Pathfinding & Graph Algorithm Lab', type: 'output' },
-            { text: '  projects    - List portfolio projects and tags', type: 'output' },
-            { text: '  partner     - Print Sales Partner & Broker Agreement with PDF links', type: 'output' },
-            { text: '  inspect     - Probe real Supabase latency, JS heap memory & React state', type: 'output' },
-            { text: '  matrix      - Toggle retro Matrix green digital rain overlay', type: 'output' },
-            { text: '  sfx         - Toggle Web Audio 8-bit sound synthesizer', type: 'output' },
-            { text: '  snake       - Launch interactive Snake Game with Supabase Leaderboard', type: 'output' },
-            { text: '  pizzarat    - Toggle 3D WebGL NYC Pizza Rat physics model', type: 'output' },
-            { text: '  system      - Show CPU, memory, and display metrics', type: 'output' },
-            { text: '  storage     - Inspect local and session storage', type: 'output' },
-            { text: '  stack       - Print tech stack & copy architecture dossier to clipboard', type: 'output' },
-            { text: '  sync        - Show the local content sync workflow', type: 'output' },
-            { text: '  analytics   - Show visitor statistics summary', type: 'output' },
-            { text: '  git-info    - Open the generated portfolio commit log (subcommands: show, repo)', type: 'output' },
-            { text: '  qrcode      - Scan default PhonePe QR or generate dynamic (e.g. qrcode 500)', type: 'output' },
-            { text: '  clear       - Clear the command interface screen', type: 'output' },
+            { text: ' ', type: 'output' },
+            { text: '── CORE BLUEPRINTS & STORIES ──────────────────────────────', type: 'success' },
+            { text: '  pitch        - Executive summary & core engineering superpowers', type: 'output', command: 'pitch' },
+            { text: '  architecture - Master 8-Tier developer ecosystem architecture blueprint', type: 'output', command: 'architecture' },
+            { text: '  tests        - Inspect 330+ automated test suites & verification matrix', type: 'output', command: 'tests' },
+            { text: '  war-stories  - Real-world production engineering feats & tough traps solved', type: 'output', command: 'war-stories' },
+            { text: '  interview    - Interactive role-tailored interview console (CTO vs Founder)', type: 'output', command: 'interview' },
+            { text: ' ', type: 'output' },
+            { text: '── AI & COGNITIVE TWIN ────────────────────────────────────', type: 'success' },
+            { text: '  twin / ai    - 🧠 Launch interactive conversation with Prateeq\'s AI Twin', type: 'success', command: 'twin' },
+            { text: '  ask <query>  - Query Prateeq\'s AI Twin vector memory directly for answers', type: 'output' },
+            { text: '  explain <q>  - Deep dive into architectural decisions via AI Twin', type: 'output' },
+            { text: ' ', type: 'output' },
+            { text: '── COMMERCIAL & SCOPING LAB ───────────────────────────────', type: 'success' },
+            { text: '  scope <cmd>  - Interactive Architecture Scoping CLI (new, list, add, remove, export, checkout)', type: 'output', command: 'scope help' },
+            { text: '  cart         - View active scoping bill of materials and price ledger', type: 'output', command: 'cart' },
+            { text: '  partner      - Print Sales Partner & Broker Agreement with PDF links', type: 'output', command: 'partner' },
+            { text: '  qrcode       - Scan default PhonePe QR or generate dynamic (e.g. qrcode 500)', type: 'output', command: 'qrcode' },
+            { text: ' ', type: 'output' },
+            { text: '── ARCADE & EXPERIMENTAL LABS ─────────────────────────────', type: 'success' },
+            { text: '  playground   - 🎨 Explore The Playground: SaaS, Games, AI Art & Prompts', type: 'output', command: 'playground' },
+            { text: '  pathfinder   - Launch interactive 2D Pathfinding & Graph Algorithm Lab', type: 'output', command: 'pathfinder' },
+            { text: '  snake        - Launch interactive Snake Game with Supabase Leaderboard', type: 'output', command: 'snake' },
+            { text: '  matrix       - Toggle retro Matrix green digital rain canvas overlay', type: 'output', command: 'matrix' },
+            { text: '  sfx          - Toggle Web Audio 8-bit sound synthesizer effects', type: 'output', command: 'sfx' },
+            { text: '  pizzarat     - Toggle 3D WebGL NYC Pizza Rat physics model', type: 'output', command: 'pizzarat' },
+            { text: ' ', type: 'output' },
+            { text: '── SYSTEM DIAGNOSTICS & SHELL ─────────────────────────────', type: 'success' },
+            { text: '  projects     - List all portfolio projects and tech tags', type: 'output', command: 'projects' },
+            { text: '  inspect      - Probe real Supabase latency, JS heap memory & React state', type: 'output', command: 'inspect' },
+            { text: '  system       - Show CPU, memory, and display hardware metrics', type: 'output', command: 'system' },
+            { text: '  telemetry    - Toggle telemetry matrix & Web Vitals (Focus Mode on/off)', type: 'output', command: 'telemetry' },
+            { text: '  storage      - Inspect local and session storage footprint', type: 'output', command: 'storage' },
+            { text: '  stack        - Print tech stack & copy architecture dossier to clipboard', type: 'output', command: 'stack' },
+            { text: '  sync         - Show the local Python/Streamlit content sync workflow', type: 'output', command: 'sync' },
+            { text: '  analytics    - Show visitor statistics summary from live database', type: 'output', command: 'analytics' },
+            { text: '  git-info     - Open the generated portfolio commit journal', type: 'output', command: 'git-info' },
+            { text: '  history      - View previously executed commands in this session', type: 'output', command: 'history' },
+            { text: '  whoami       - Display active terminal session identity', type: 'output', command: 'whoami' },
+            { text: '  ls / pwd     - Inspect virtual project directory structure', type: 'output', command: 'ls' },
+            { text: '  clear / cls  - Clear the command interface screen (Ctrl+L / Cmd+K)', type: 'output', command: 'clear' },
+            { text: ' ', type: 'output' },
+            { text: 'Tip: You can click on any command above to run it instantly, or use Tab to autocomplete.', type: 'success' },
           ];
           break;
         case 'projects':
@@ -1251,6 +1449,7 @@ export function useTerminalCommands({
               const heapLimit = memory ? `${Math.round(memory.jsHeapSizeLimit / 1048576)} MB` : 'Unavailable';
               const activeTheme = isNoir ? 'Noir Cyber-Glow' : 'Comic Ink Light';
 
+              const currentStats = statsRef.current;
               const lines: ConsoleLine[] = [
                 { text: '===========================================================', type: 'success' },
                 { text: '      REAL-TIME SYSTEM & SUPABASE ARCHITECTURE PROBE       ', type: 'success' },
@@ -1258,8 +1457,8 @@ export function useTerminalCommands({
                 { text: `⚡ SUPABASE RLS DATABASE LATENCY : ${latency} ms`, type: 'success' },
                 { text: `🧠 JS HEAP MEMORY FOOTPRINT      : ${heapUsed} (Limit: ${heapLimit})`, type: 'output' },
                 { text: `🎨 ACTIVE DESIGN THEME ENGINE     : ${activeTheme}`, type: 'output' },
-                { text: `📜 LOADED SCRIPT BUNDLE FOOTPRINT : ${stats.bundleSize} KB`, type: 'output' },
-                { text: `🌐 DOM CONTAINER NODES COUNT     : ${stats.domNodes} elements`, type: 'output' },
+                { text: `📜 LOADED SCRIPT BUNDLE FOOTPRINT : ${currentStats.bundleSize} KB`, type: 'output' },
+                { text: `🌐 DOM CONTAINER NODES COUNT     : ${currentStats.domNodes} elements`, type: 'output' },
                 { text: '===========================================================', type: 'success' },
               ];
               setTerminalHistory((prev) => [...prev, ...lines]);
@@ -1303,7 +1502,96 @@ export function useTerminalCommands({
           setTerminalInput('');
           return;
         }
+        case 'history': {
+          const historyList = cmdHistoryRef.current;
+          if (historyList.length === 0) {
+            response = [{ text: 'No commands in session history yet.', type: 'output' }];
+          } else {
+            response = [
+              { text: 'COMMAND EXECUTION HISTORY:', type: 'success' },
+              ...historyList.map((c, i) => ({
+                text: `  ${String(i + 1).padStart(3, ' ')}  ${c}`,
+                type: 'output' as const,
+                command: c,
+              })),
+              { text: 'Tip: Click on any history command line to re-execute.', type: 'success' },
+            ];
+          }
+          break;
+        }
+        case 'whoami': {
+          response = [
+            { text: 'USER IDENTITY // TERMINAL CONSOLE SESSION:', type: 'success' },
+            { text: '  - Identity : guest@prateeq.in (Session Active)', type: 'output' },
+            { text: '  - Role     : Technical Reviewer / Client Partner Scout', type: 'output' },
+            { text: '  - Access   : System Schematics, Diagnostics & Scoping Engine', type: 'output' },
+            { text: '  - Terminal : Cobalt Ink Shell v2.5', type: 'output' },
+            { text: 'Tip: Type "twin" to chat with Prateek\'s AI Twin or "pitch" for executive summary.', type: 'success' },
+          ];
+          break;
+        }
+        case 'pwd': {
+          response = [
+            { text: '/home/prateeq/developer-ecosystem', type: 'output' },
+          ];
+          break;
+        }
+        case 'ls': {
+          response = [
+            { text: 'DIRECTORY: /home/prateeq/developer-ecosystem', type: 'success' },
+            { text: '  drwxr-xr-x   projects/       Portfolio project dossiers', type: 'link', command: 'projects' },
+            { text: '  drwxr-xr-x   architecture/   Master 8-tier system blueprint', type: 'link', command: 'architecture' },
+            { text: '  drwxr-xr-x   scoping/        Technical pricing & proposal engine', type: 'link', command: 'cart' },
+            { text: '  drwxr-xr-x   playground/     Interactive prototypes & labs', type: 'link', command: 'playground' },
+            { text: '  drwxr-xr-x   telemetry/      Supabase live traffic analytics', type: 'link', command: 'analytics' },
+            { text: '  -rw-r--r--   README.md       Executive briefing card', type: 'link', command: 'cat README.md' },
+            { text: '  -rw-r--r--   TESTS.md        330+ verification matrix report', type: 'link', command: 'tests' },
+            { text: 'Tip: Click any directory or file to inspect, or type "cat README.md".', type: 'success' },
+          ];
+          break;
+        }
+        case 'cat':
+        case 'cat readme.md':
+        case 'cat readme': {
+          response = [
+            { text: '===========================================================', type: 'success' },
+            { text: '        PRATEEK SHARMA // EXECUTIVE BRIEFING CARD          ', type: 'success' },
+            { text: '===========================================================', type: 'success' },
+            { text: 'Role     : Forward Deployed AI Engineer & Systems Architect', type: 'output' },
+            { text: 'Focus    : Enterprise RAG (Retriever), Full-Stack Next.js 16, Python/FastAPI', type: 'output' },
+            { text: 'Stack    : TypeScript, Python, PostgreSQL/pgvector, Three.js, Docker', type: 'output' },
+            { text: 'Ethos    : Ponytail Principle (Simplicity, Zero Simulated Toys, Direct Truth)', type: 'output' },
+            { text: 'Contact  : prateeqsharma@gmail.com • Bangalore, India', type: 'output' },
+            { text: '===========================================================', type: 'success' },
+            { text: 'Tip: Type "twin" to speak with the live AI Twin on Oracle Cloud VPS.', type: 'success' },
+          ];
+          break;
+        }
+        case 'cat tests.md':
+        case 'cat tests': {
+          setTerminalHistory((prev) => [...prev, ...TERMINAL_TEST_SUITE_LINES]);
+          setTerminalInput('');
+          return;
+        }
+        case 'exit':
+        case 'quit':
+        case ':q': {
+          response = [
+            { text: 'TERMINAL SHELL SESSION:', type: 'success' },
+            { text: '  - You are at the top-level shell session.', type: 'output' },
+            { text: '  - To return to the main portfolio website, click "Return to Base" at top.', type: 'output' },
+            { text: '  - To clear screen, type "clear" or press Ctrl+L.', type: 'output' },
+          ];
+          break;
+        }
+        case 'sudo': {
+          response = [
+            { text: "Permission denied: User 'guest' is not in the sudoers file. This incident will be reported to Prateek.", type: 'error' },
+          ];
+          break;
+        }
         case 'clear':
+        case 'cls':
           setTerminalHistory([]);
           setTerminalInput('');
           toast.info('Terminal screen cleared');
@@ -1317,7 +1605,7 @@ export function useTerminalCommands({
       setTerminalHistory((prev) => [...prev, ...response]);
       setTerminalInput('');
     },
-    [projects, profileData, isNoir, stats, isMatrixActive, setIsMatrixActive, setActiveGame, unlockAchievement, interviewSession, scopeSession, aiChatSession, startAiChatStream, updateAiChatStream, completeAiChatStream, failAiChatStream, markAiChatRetry]
+    [projects, profileData, isNoir, isMatrixActive, setIsMatrixActive, setActiveGame, unlockAchievement, interviewSession, scopeSession, aiChatSession, startAiChatStream, updateAiChatStream, completeAiChatStream, failAiChatStream, markAiChatRetry, isTelemetryCollapsed, toggleTelemetry]
   );
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -1326,6 +1614,9 @@ export function useTerminalCommands({
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       if (cmdHistory.length === 0) return;
+      if (historyIndex === -1) {
+        draftInputRef.current = terminalInput;
+      }
       const nextIndex = historyIndex === -1 ? cmdHistory.length - 1 : Math.max(0, historyIndex - 1);
       setHistoryIndex(nextIndex);
       setTerminalInput(cmdHistory[nextIndex] || '');
@@ -1335,20 +1626,249 @@ export function useTerminalCommands({
       const nextIndex = historyIndex + 1;
       if (nextIndex >= cmdHistory.length) {
         setHistoryIndex(-1);
-        setTerminalInput('');
+        setTerminalInput(draftInputRef.current);
       } else {
         setHistoryIndex(nextIndex);
         setTerminalInput(cmdHistory[nextIndex] || '');
+      }
+    } else if (e.key === 'Tab') {
+      e.preventDefault();
+      const input = terminalInput.trimStart();
+      const lower = input.toLowerCase();
+      if (!lower) {
+        setTerminalInput('help');
+        return;
+      }
+
+      if (aiChatSession.isActive) {
+        const matches = AI_COMMANDS.filter((c) => c.startsWith(lower));
+        if (matches.length === 1) {
+          setTerminalInput(matches[0]);
+        } else if (matches.length > 1) {
+          const commonPrefix = matches.reduce((acc, curr) => {
+            let i = 0;
+            while (i < acc.length && i < curr.length && acc[i] === curr[i]) i++;
+            return acc.slice(0, i);
+          });
+          if (commonPrefix.length > lower.length) {
+            setTerminalInput(commonPrefix);
+          } else {
+            const formatted = matches.join('   ');
+            setTerminalHistory((prev) => {
+              if (prev.length > 0 && prev[prev.length - 1].text === formatted) return prev;
+              return [
+                ...prev,
+                { text: `> ${terminalInput}`, type: 'input' },
+                { text: formatted, type: 'output' },
+              ];
+            });
+          }
+        }
+        return;
+      }
+
+      // Standard shell tab completion with subcommand intelligence
+      const SCOPE_SUBCOMMANDS = ['new', 'list', 'add', 'remove', 'analyze', 'export', 'checkout', 'reset', 'help'];
+      const GIT_SUBCOMMANDS = ['show', 'repo'];
+      const CAT_SUBCOMMANDS = ['README.md', 'TESTS.md'];
+      const TELEMETRY_SUBCOMMANDS = ['on', 'off', 'toggle', 'status', 'expand', 'collapse', 'help'];
+      const FOCUS_SUBCOMMANDS = ['on', 'off', 'toggle', 'status', 'help'];
+
+      if (lower.startsWith('scope ') || lower === 'scope') {
+        const arg = lower.replace(/^scope\s*/, '');
+        if (!arg) {
+          const formatted = SCOPE_SUBCOMMANDS.map((s) => `scope ${s}`).join('   ');
+          setTerminalHistory((prev) => {
+            if (prev.length > 0 && prev[prev.length - 1].text === formatted) return prev;
+            return [
+              ...prev,
+              { text: `> ${terminalInput}`, type: 'input' },
+              { text: formatted, type: 'output' },
+            ];
+          });
+          setTerminalInput('scope ');
+          return;
+        }
+        const subMatches = SCOPE_SUBCOMMANDS.filter((s) => s.startsWith(arg));
+        if (subMatches.length === 1) {
+          setTerminalInput(`scope ${subMatches[0]} `);
+        } else if (subMatches.length > 1) {
+          const common = subMatches.reduce((acc, curr) => {
+            let i = 0;
+            while (i < acc.length && i < curr.length && acc[i] === curr[i]) i++;
+            return acc.slice(0, i);
+          });
+          if (common.length > arg.length) {
+            setTerminalInput(`scope ${common}`);
+          } else {
+            const formatted = subMatches.map((s) => `scope ${s}`).join('   ');
+            setTerminalHistory((prev) => {
+              if (prev.length > 0 && prev[prev.length - 1].text === formatted) return prev;
+              return [
+                ...prev,
+                { text: `> ${terminalInput}`, type: 'input' },
+                { text: formatted, type: 'output' },
+              ];
+            });
+          }
+        }
+        return;
+      }
+
+      if (lower.startsWith('git-info ') || lower === 'git-info') {
+        const arg = lower.replace(/^git-info\s*/, '');
+        if (!arg) {
+          const formatted = GIT_SUBCOMMANDS.map((s) => `git-info ${s}`).join('   ');
+          setTerminalHistory((prev) => {
+            if (prev.length > 0 && prev[prev.length - 1].text === formatted) return prev;
+            return [
+              ...prev,
+              { text: `> ${terminalInput}`, type: 'input' },
+              { text: formatted, type: 'output' },
+            ];
+          });
+          setTerminalInput('git-info ');
+          return;
+        }
+        const subMatches = GIT_SUBCOMMANDS.filter((s) => s.startsWith(arg));
+        if (subMatches.length === 1) {
+          setTerminalInput(`git-info ${subMatches[0]} `);
+        }
+        return;
+      }
+
+      if (lower.startsWith('telemetry ') || lower === 'telemetry') {
+        const arg = lower.replace(/^telemetry\s*/, '');
+        if (!arg) {
+          const formatted = TELEMETRY_SUBCOMMANDS.map((s) => `telemetry ${s}`).join('   ');
+          setTerminalHistory((prev) => {
+            if (prev.length > 0 && prev[prev.length - 1].text === formatted) return prev;
+            return [
+              ...prev,
+              { text: `> ${terminalInput}`, type: 'input' },
+              { text: formatted, type: 'output' },
+            ];
+          });
+          setTerminalInput('telemetry ');
+          return;
+        }
+        const subMatches = TELEMETRY_SUBCOMMANDS.filter((s) => s.startsWith(arg));
+        if (subMatches.length === 1) {
+          setTerminalInput(`telemetry ${subMatches[0]} `);
+        } else if (subMatches.length > 1) {
+          const common = subMatches.reduce((acc, curr) => {
+            let i = 0;
+            while (i < acc.length && i < curr.length && acc[i] === curr[i]) i++;
+            return acc.slice(0, i);
+          });
+          if (common.length > arg.length) {
+            setTerminalInput(`telemetry ${common}`);
+          } else {
+            const formatted = subMatches.map((s) => `telemetry ${s}`).join('   ');
+            setTerminalHistory((prev) => {
+              if (prev.length > 0 && prev[prev.length - 1].text === formatted) return prev;
+              return [
+                ...prev,
+                { text: `> ${terminalInput}`, type: 'input' },
+                { text: formatted, type: 'output' },
+              ];
+            });
+          }
+        }
+        return;
+      }
+
+      if (lower.startsWith('focus ') || lower === 'focus') {
+        const arg = lower.replace(/^focus\s*/, '');
+        if (!arg) {
+          const formatted = FOCUS_SUBCOMMANDS.map((s) => `focus ${s}`).join('   ');
+          setTerminalHistory((prev) => {
+            if (prev.length > 0 && prev[prev.length - 1].text === formatted) return prev;
+            return [
+              ...prev,
+              { text: `> ${terminalInput}`, type: 'input' },
+              { text: formatted, type: 'output' },
+            ];
+          });
+          setTerminalInput('focus ');
+          return;
+        }
+        const subMatches = FOCUS_SUBCOMMANDS.filter((s) => s.startsWith(arg));
+        if (subMatches.length === 1) {
+          setTerminalInput(`focus ${subMatches[0]} `);
+        } else if (subMatches.length > 1) {
+          const formatted = subMatches.map((s) => `focus ${s}`).join('   ');
+          setTerminalHistory((prev) => {
+            if (prev.length > 0 && prev[prev.length - 1].text === formatted) return prev;
+            return [
+              ...prev,
+              { text: `> ${terminalInput}`, type: 'input' },
+              { text: formatted, type: 'output' },
+            ];
+          });
+        }
+        return;
+      }
+
+      if (lower.startsWith('cat ') || lower === 'cat') {
+        const arg = lower.replace(/^cat\s*/, '');
+        if (!arg) {
+          setTerminalInput('cat README.md');
+          return;
+        }
+        const subMatches = CAT_SUBCOMMANDS.filter((s) => s.toLowerCase().startsWith(arg));
+        if (subMatches.length === 1) {
+          setTerminalInput(`cat ${subMatches[0]}`);
+        }
+        return;
+      }
+
+      // Top-level commands
+      const matches = SHELL_COMMANDS.filter((c) => c.startsWith(lower));
+      if (matches.length === 1) {
+        const cmd = matches[0];
+        const takesArg = ['ask', 'explain', 'scope', 'git-info', 'qrcode', 'cat'].includes(cmd);
+        setTerminalInput(takesArg ? `${cmd} ` : cmd);
+      } else if (matches.length > 1) {
+        const commonPrefix = matches.reduce((acc, curr) => {
+          let i = 0;
+          while (i < acc.length && i < curr.length && acc[i] === curr[i]) i++;
+          return acc.slice(0, i);
+        });
+        if (commonPrefix.length > lower.length) {
+          setTerminalInput(commonPrefix);
+        } else {
+          const formattedList = matches.join('   ');
+          setTerminalHistory((prev) => {
+            if (prev.length > 0 && prev[prev.length - 1].text === formattedList) return prev;
+            return [
+              ...prev,
+              { text: `> ${terminalInput}`, type: 'input' },
+              { text: formattedList, type: 'output' },
+            ];
+          });
+        }
+      }
+    } else if ((e.ctrlKey && e.key.toLowerCase() === 'l') || (e.metaKey && e.key.toLowerCase() === 'k')) {
+      e.preventDefault();
+      executeCommand('clear');
+    } else if (e.ctrlKey && e.key.toLowerCase() === 'c') {
+      e.preventDefault();
+      if (aiChatSession.isActive) {
+        executeCommand('exit');
+      } else {
+        setTerminalInput('');
       }
     }
   };
 
   // URL query parameter auto-execution (e.g. /terminal?exec=pitch or /terminal?cmd=interview-mode)
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && !hasExecutedUrlCmdRef.current) {
       const params = new URLSearchParams(window.location.search);
       const autoCmd = params.get('exec') || params.get('cmd');
       if (autoCmd) {
+        hasExecutedUrlCmdRef.current = true;
         const timer = setTimeout(() => {
           executeCommand(autoCmd);
         }, 150);

@@ -21,7 +21,7 @@ invariants:
 test_suites:
   - apps/api/tests/test_architecture.py
 downstream:
-  - ../../../retriever/docs/RAG_2026_PRODUCT_ROADMAP
+  - ../../../Prateek_Ecosystem_Vault/internal_archives/retriever/RAG_2026_PRODUCT_ROADMAP
   - ../UNIFIED_MASTER_ROADMAP
   - ../../../retriever/docs/runbooks/RUNBOOK_GUARDRAILS_OPS
   - ../../../retriever/docs/decisions/016-nemo-conversational-guardrails
@@ -46,7 +46,7 @@ downstream:
 ---
 
 ## 🔗 Related Architecture & Cross-References
-- [Retriever: RAG 2026 Roadmap](../../../retriever/docs/RAG_2026_PRODUCT_ROADMAP.md)
+- [Retriever: RAG 2026 Roadmap](../../../Prateek_Ecosystem_Vault/internal_archives/retriever/RAG_2026_PRODUCT_ROADMAP.md)
 - [Unified Master Roadmap](../UNIFIED_MASTER_ROADMAP.md)
 - [Operational Runbook](../../../retriever/docs/runbooks/RUNBOOK_GUARDRAILS_OPS.md)
 - [ADR-016: NeMo Conversational Guardrails](../../../retriever/docs/decisions/016-nemo-conversational-guardrails.md)

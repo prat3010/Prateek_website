@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useLenis } from 'lenis/react';
 import {
   Network,
   Maximize2,
@@ -203,6 +204,76 @@ export function ArchitectureTopologyMap({
   const [viewMode, setViewMode] = useState<'diagram' | 'matrix'>('diagram');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [inspectedNode, setInspectedNode] = useState<TopologyNode | null>(null);
+  const lenis = useLenis();
+  const fullscreenModalRef = useRef<HTMLDivElement>(null);
+  const fullscreenCloseBtnRef = useRef<HTMLButtonElement>(null);
+  const fullscreenTriggerBtnRef = useRef<HTMLButtonElement>(null);
+
+  // Auto-default to Matrix View on mobile viewports (<768px) or coarse pointers
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const isCoarse = window.matchMedia?.('(pointer: coarse)')?.matches;
+      const isMobileWidth = window.innerWidth > 0 && window.innerWidth < 768;
+      if (isCoarse || isMobileWidth) {
+        const frameId = requestAnimationFrame(() => {
+          setViewMode('matrix');
+        });
+        return () => cancelAnimationFrame(frameId);
+      }
+    }
+  }, []);
+
+  // Pattern 15 / ADR 47: Fullscreen modal accessible containment & Lenis scroll lock
+  useEffect(() => {
+    if (!isFullscreen) return;
+
+    const originalOverflow = document.body.style.overflow;
+    const triggerEl = fullscreenTriggerBtnRef.current;
+    document.body.style.overflow = 'hidden';
+    lenis?.stop();
+
+    requestAnimationFrame(() => {
+      fullscreenCloseBtnRef.current?.focus();
+    });
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setIsFullscreen(false);
+      }
+
+      if (e.key === 'Tab' && fullscreenModalRef.current) {
+        const focusableElements = fullscreenModalRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement?.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement?.focus();
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      lenis?.start();
+      window.removeEventListener('keydown', handleKeyDown);
+      triggerEl?.focus();
+    };
+  }, [isFullscreen, lenis]);
 
   const selectedEngine = useMemo(() => {
     return allEngines.find((e) => e.id === selectedEngineId) || allEngines[0];
@@ -664,6 +735,7 @@ export function ArchitectureTopologyMap({
             Matrix View
           </button>
           <button
+            ref={fullscreenTriggerBtnRef}
             type="button"
             className={styles.expandBtn}
             onClick={() => setIsFullscreen(true)}
@@ -824,13 +896,21 @@ export function ArchitectureTopologyMap({
       {/* Fullscreen Modal View with Portal */}
       {isFullscreen && (
         <Portal>
-          <div className={styles.fullscreenOverlay} role="dialog" aria-modal="true" aria-label="Fullscreen Architecture Topology">
+          <div
+            ref={fullscreenModalRef}
+            className={styles.fullscreenOverlay}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Fullscreen Architecture Topology"
+            data-lenis-prevent
+          >
             <div className={styles.fullscreenHeader}>
               <div className={styles.titleArea}>
                 <Network size={18} className={styles.titleIcon} />
                 <span className={styles.titleText}>Full System Architecture Blueprint ({selectedEngine.title})</span>
               </div>
               <button
+                ref={fullscreenCloseBtnRef}
                 type="button"
                 className={styles.expandBtn}
                 onClick={() => setIsFullscreen(false)}
@@ -839,7 +919,7 @@ export function ArchitectureTopologyMap({
                 <Minimize2 size={16} />
               </button>
             </div>
-            <div className={styles.fullscreenBody}>{renderSvgContent()}</div>
+            <div className={styles.fullscreenBody} data-lenis-prevent>{renderSvgContent()}</div>
           </div>
         </Portal>
       )}

@@ -21,9 +21,8 @@ invariants:
 test_suites:
   - apps/api/tests/test_architecture.py
 downstream:
-  - Retriever_API_v1_got
-  - UI_GotPlanningPanel
   - ../44_Hierarchical_Memory_Graph_of_Thoughts_PRD
+  - ../../../retriever/docs/features/hierarchical-memory-got-planning
 ---
 
 # Engine: Hierarchical Memory Augmentation with Graph-of-Thoughts (GoT) Planning (Platform Battery #38)
@@ -41,9 +40,8 @@ downstream:
 ---
 
 ## 🔗 Related Architecture & Cross-References
-- [Retriever_API: v1/got](Retriever_API_v1_got.md)
-- [UI: GotPlanningPanel](UI_GotPlanningPanel.md)
 - [44_Hierarchical_Memory_Graph_of_Thoughts_PRD](../44_Hierarchical_Memory_Graph_of_Thoughts_PRD.md)
+- [Retriever: Hierarchical Memory & GoT Feature Guide](../../../retriever/docs/features/hierarchical-memory-got-planning.md)
 
 ## 🛡️ Non-Negotiable Invariants & Safety Constraints
 > **Blast Radius:** `HIGH` &nbsp;|&nbsp; 📖 **Runbook:** [RUNBOOK_RAG_TENANT_ONBOARDING](docs/runbooks/RUNBOOK_RAG_TENANT_ONBOARDING.md)

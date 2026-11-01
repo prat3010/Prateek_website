@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import Script from 'next/script';
-import { ArrowLeft, Rocket } from 'lucide-react';
+import ScopingHeader from './ScopingHeader';
 import IntakeForm from '@/components/Intake/IntakeForm';
 import { getProfile } from '@/lib/data';
 import styles from './scoping.module.css';
@@ -81,18 +80,8 @@ export default async function ScopingPage({ searchParams }: ScopingPageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
       />
       <div className={styles.container}>
-        <div className={styles.header}>
-          <Link href="/" className={styles.backLink}>
-            <ArrowLeft size={18} />
-            <span>Return to Base</span>
-          </Link>
-          <div className={styles.brandBadge}>
-            <Rocket size={14} />
-            <span>PRATEEQ.IN | PROJECT SCOPING LAB &amp; INSTANT QUOTE</span>
-          </div>
-        </div>
+        <ScopingHeader />
         <main>
-          <h1 className="sr-only">Project Scoping Lab &amp; Instant Quote</h1>
           <IntakeForm resumeData={profile} initialPreset={preset} />
         </main>
       </div>

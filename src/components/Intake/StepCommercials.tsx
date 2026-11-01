@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import {
   ShieldCheck,
   Info,
@@ -12,11 +12,17 @@ import {
   Globe,
   Building2,
   Sparkles,
+  Lock,
+  Code2,
+  Scale,
+  Mail,
+  Phone,
 } from 'lucide-react';
 import NumberFlow from '@number-flow/react';
 import Portal from '@/components/ui/Portal';
 import type { BaseEngineItem, MaintenancePlanOption } from '@/data/resume';
-import { type Currency } from '@/lib/pricing';
+import { formatPricePair, type Currency, type PromoDiscountInfo } from '@/lib/pricing';
+import type { User } from '@supabase/supabase-js';
 import styles from './IntakeForm.module.css';
 
 interface StepCommercialsProps {
@@ -27,6 +33,16 @@ interface StepCommercialsProps {
     featuresINR: number;
     featuresUSD: number;
     brandOpt: { label: string; priceINR: number; priceUSD: number };
+    bundleDiscountPercent?: number;
+    bundleDiscountAmountINR?: number;
+    bundleDiscountAmountUSD?: number;
+    promoDiscount?: PromoDiscountInfo | null;
+    promoDiscountAmountINR?: number;
+    promoDiscountAmountUSD?: number;
+    depositINR?: number;
+    depositUSD?: number;
+    balanceINR?: number;
+    balanceUSD?: number;
   };
   maintenancePlans: MaintenancePlanOption[];
   formData: {
@@ -37,6 +53,8 @@ interface StepCommercialsProps {
     hostingOwnership: 'client_owned' | 'needs_setup';
     taxInvoicingPreference: 'standard' | 'corporate_gst';
     agreedToTerms: boolean;
+    contactEmail?: string;
+    contactPhone?: string;
   };
   autoMaintenancePlanId: string;
   activePopoverId: string | null;
@@ -51,6 +69,7 @@ interface StepCommercialsProps {
   onChangeField: (field: string, value: string | boolean) => void;
   agreedToTermsError?: boolean;
   stepHeadingRef?: React.RefObject<HTMLDivElement | null>;
+  user?: User | null;
 }
 
 export function StepCommercials({
@@ -71,8 +90,10 @@ export function StepCommercials({
   onChangeField,
   agreedToTermsError,
   stepHeadingRef,
+  user,
 }: StepCommercialsProps) {
   const popoverCloseRef = useRef<HTMLButtonElement>(null);
+  const [isFullTermsOpen, setIsFullTermsOpen] = useState(false);
 
   useEffect(() => {
     if (activePopoverId && popoverAnchor) {
@@ -87,6 +108,12 @@ export function StepCommercials({
       return () => document.removeEventListener('keydown', handleEscape);
     }
   }, [activePopoverId, popoverAnchor, setActivePopoverId, setPopoverAnchor]);
+
+  const depositINR = totalCost.depositINR ?? Math.round(totalCost.totalINR * 0.5);
+  const depositUSD = totalCost.depositUSD ?? Math.round(totalCost.totalUSD * 0.5);
+  const balanceINR = totalCost.balanceINR ?? (totalCost.totalINR - depositINR);
+  const balanceUSD = totalCost.balanceUSD ?? (totalCost.totalUSD - depositUSD);
+
   return (
     <div className={styles.formStep}>
       <div className={styles.groupTitle} ref={stepHeadingRef} tabIndex={-1}>
@@ -94,7 +121,7 @@ export function StepCommercials({
         <span>STEP 4: COMMERCIAL PROPOSAL &amp; MAINTENANCE CARE PLAN</span>
       </div>
 
-      {/* Summary Box */}
+      {/* Summary Box with Itemized Volume & Promo Savings */}
       <div className={styles.summaryBox}>
         <div className={styles.summaryRow}>
           <span className={styles.summaryLabel}>SELECTED BASE ENGINE</span>
@@ -116,6 +143,57 @@ export function StepCommercials({
               : 'Included'}
           </span>
         </div>
+
+        {/* Itemized Volume Bundle Savings Line */}
+        {totalCost.bundleDiscountPercent && totalCost.bundleDiscountPercent > 0 ? (
+          <div className={`${styles.summaryRow} ${styles.summarySavingsRow}`}>
+            <span className={styles.summarySavingsLabel}>
+              <Sparkles size={13} className={styles.inlineIcon} />
+              VOLUME BUNDLE SAVINGS (-{totalCost.bundleDiscountPercent}%)
+            </span>
+            <span className={styles.summarySavingsValue}>
+              -{currency === 'INR' ? (
+                <NumberFlow
+                  value={totalCost.bundleDiscountAmountINR || 0}
+                  locales="en-IN"
+                  format={{ style: 'currency', currency: 'INR', maximumFractionDigits: 0 }}
+                />
+              ) : (
+                <NumberFlow
+                  value={totalCost.bundleDiscountAmountUSD || 0}
+                  locales="en-US"
+                  format={{ style: 'currency', currency: 'USD', maximumFractionDigits: 0 }}
+                />
+              )}
+            </span>
+          </div>
+        ) : null}
+
+        {/* Itemized Promo Code Savings Line */}
+        {totalCost.promoDiscount && (
+          <div className={`${styles.summaryRow} ${styles.summarySavingsRow}`}>
+            <span className={styles.summarySavingsLabel}>
+              <Sparkles size={13} className={styles.inlineIcon} />
+              PROMO CODE SAVINGS ({totalCost.promoDiscount.code || 'APPLIED'})
+            </span>
+            <span className={styles.summarySavingsValue}>
+              -{currency === 'INR' ? (
+                <NumberFlow
+                  value={totalCost.promoDiscountAmountINR || 0}
+                  locales="en-IN"
+                  format={{ style: 'currency', currency: 'INR', maximumFractionDigits: 0 }}
+                />
+              ) : (
+                <NumberFlow
+                  value={totalCost.promoDiscountAmountUSD || 0}
+                  locales="en-US"
+                  format={{ style: 'currency', currency: 'USD', maximumFractionDigits: 0 }}
+                />
+              )}
+            </span>
+          </div>
+        )}
+
         <div className={styles.summaryTotalRow} aria-live="polite" aria-atomic="true">
           <span className={styles.summaryTotalLabel}>TOTAL BUILD INVESTMENT (ESTIMATE)</span>
           <span className={styles.summaryTotalValue}>
@@ -167,45 +245,32 @@ export function StepCommercials({
                     card?.focus();
                   }
                 }}
-                style={{ position: 'relative' }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div>
+                <div className={styles.careHeader}>
+                  <div className={styles.careTitleArea}>
+                    <span className={styles.careTitle}>{p.name}</span>
                     {isAutoRecommended && (
-                      <div className={styles.careCardBadge}>
-                        <Sparkles size={10} className={styles.inlineIcon} />
-                        {p.badge ? p.badge.replace(/^[\p{Emoji_Presentation}\p{Extended_Pictographic}\u{FE00}-\u{FE0F}\u{200D}\s]+/gu, '').trim() : 'RECOMMENDED FOR ACTIVE SCOPE'}
-                      </div>
+                      <span className={styles.recommendedBadge}>Auto-Recommended for Scope</span>
                     )}
-                    <div className={styles.careCardTitle}>
-                      {p.name}
-                      <button
-                        type="button"
-                        onClick={(ev) => togglePopover(ev, p.id)}
-                        className={`${styles.infoBtn} ${isPopoverOpen ? styles.infoBtnActive : ''}`}
-                        title="Click to view Technical SLA Specs"
-                        aria-label="View Technical SLA Specs"
-                      >
-                        <Info size={12} />
-                      </button>
-                    </div>
+                  </div>
+                  <div className={styles.carePriceArea}>
+                    <span className={styles.carePrice}>
+                      {p.priceINR === 0 ? 'Free / Self-Hosted' : formatPricePair(p.priceINR, p.priceUSD, currency)}
+                    </span>
+                    {p.priceINR > 0 && <span className={styles.carePeriod}>{p.period}</span>}
+                    <button
+                      type="button"
+                      onClick={(ev) => togglePopover(ev, p.id)}
+                      className={`${styles.infoBtn} ${isPopoverOpen ? styles.infoBtnActive : ''}`}
+                      title="Click to view SLA Coverage & Technical Deliverables"
+                      aria-label="View SLA Coverage & Technical Deliverables"
+                    >
+                      <Info size={12} />
+                    </button>
                   </div>
                 </div>
 
-                <div className={styles.careCardPrice}>
-                  {p.priceINR > 0
-                    ? `${priceInCurrency(p.priceINR, p.priceUSD)}${p.period}`
-                    : 'Included (30-Day Warranty)'}
-                </div>
-                <p className={styles.careCardDesc}>
-                  {p.laymanDescription}
-                </p>
-
-                <ul className={styles.careCardList}>
-                  {p.includes.map((inc, iIdx) => (
-                    <li key={iIdx}>{inc}</li>
-                  ))}
-                </ul>
+                <p className={styles.careDesc}>{p.laymanDescription}</p>
 
                 {isPopoverOpen && popoverAnchor && (
                   <Portal>
@@ -226,22 +291,31 @@ export function StepCommercials({
                           <div className={styles.popoverHeader}>
                             <span>
                               <Wrench size={12} className={styles.inlineIcon} />
-                              TECHNICAL SLA SPECS
+                              SLA TECHNICAL COVERAGE
                             </span>
                             <button
-                                type="button"
-                                ref={popoverCloseRef}
-                                className={styles.popoverCloseBtn}
-                                aria-label="Close"
-                                onClick={() => {
-                                  setActivePopoverId(null);
-                                  setPopoverAnchor(null);
-                                }}
-                              >
-                                <X size={12} />
-                              </button>
+                              ref={popoverCloseRef}
+                              type="button"
+                              onClick={() => {
+                                setActivePopoverId(null);
+                                setPopoverAnchor(null);
+                              }}
+                              className={styles.popoverCloseBtn}
+                              aria-label="Close details"
+                            >
+                              <X size={14} />
+                            </button>
                           </div>
-                          <p className={styles.popoverTechText}>{p.techSpecs}</p>
+                          <div className={styles.popoverContent}>
+                            <p className={styles.popoverDesc}>{p.techSpecs}</p>
+                            {p.includes && p.includes.length > 0 && (
+                              <ul className={styles.popoverList}>
+                                {p.includes.map((inc, i) => (
+                                  <li key={i}>{inc}</li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </>
@@ -257,17 +331,17 @@ export function StepCommercials({
         <div className={styles.field}>
           <label className={styles.label}>
             <Clock size={14} className={styles.inlineIcon} />
-            Target Launch Timeline
+            Target Delivery Timeline
           </label>
           <select
             className={styles.select}
-            aria-label="Target Launch Timeline"
             value={formData.timeline}
+            aria-label="Target Delivery Timeline"
             onChange={(e) => onChangeField('timeline', e.target.value)}
           >
-            {timelineOptions.map((tl) => (
-              <option key={tl} value={tl}>
-                {tl}
+            {timelineOptions.map((opt) => (
+              <option key={opt} value={opt}>
+                {opt}
               </option>
             ))}
           </select>
@@ -276,26 +350,26 @@ export function StepCommercials({
         <div className={styles.field}>
           <label className={styles.label}>
             <FileText size={14} className={styles.inlineIcon} />
-            Additional Scope Notes (Optional)
+            Specific Project Context &amp; Integrations
           </label>
           <input
             type="text"
             className={styles.input}
-            aria-label="Additional Scope Notes"
-            placeholder="Special constraints, legacy data to migrate..."
+            aria-label="Specific Project Context & Integrations"
+            placeholder="e.g., Stripe, Hubspot, existing Postgres DB..."
             value={formData.additionalNotes}
             onChange={(e) => onChangeField('additionalNotes', e.target.value)}
           />
         </div>
       </div>
 
-      <div className={`${styles.fieldGrid} ${styles.fieldMarginTop}`}>
+      <div className={styles.fieldGrid}>
         <div className={styles.field}>
           <label className={styles.label}>
             <Cloud size={14} className={styles.inlineIcon} />
-            Cloud Infrastructure Ownership
+            Cloud Infrastructure &amp; Domain Hosting
           </label>
-          <div className={styles.chipGrid} role="radiogroup" aria-label="Cloud Infrastructure Ownership">
+          <div className={styles.chipGrid} role="radiogroup" aria-label="Cloud Hosting Setup">
             <button
               type="button"
               role="radio"
@@ -304,7 +378,7 @@ export function StepCommercials({
               onClick={() => onChangeField('hostingOwnership', 'client_owned')}
             >
               <Globe size={14} className={styles.inlineIcon} />
-              Client-Owned Accounts
+              Deploy to My Existing Vercel / Cloud Account
             </button>
             <button
               type="button"
@@ -313,8 +387,8 @@ export function StepCommercials({
               className={`${styles.chipCard} ${formData.hostingOwnership === 'needs_setup' ? styles.chipCardActive : ''}`}
               onClick={() => onChangeField('hostingOwnership', 'needs_setup')}
             >
-              <Wrench size={14} className={styles.inlineIcon} />
-              Setup Support Required
+              <Cloud size={14} className={styles.inlineIcon} />
+              Set Up Fresh Hosting Infrastructure for Me
             </button>
           </div>
         </div>
@@ -355,33 +429,140 @@ export function StepCommercials({
         </div>
       </div>
 
+      {/* Deferred Lead Capture: Contact Email & Phone */}
       <div className={styles.field}>
         <label className={styles.label}>
-          <FileCode size={14} className={styles.inlineIcon} />
-          Standard Commercial Terms (T&amp;Cs) Summary
+          <Mail size={14} className={styles.inlineIcon} />
+          Proposal Delivery &amp; Contact Details
         </label>
-        <div className={styles.termsContentBox}>
-          {termsList.map((t, idx) => (
-            <p key={idx}>{t}</p>
-          ))}
+        <p className={styles.fieldHint}>
+          Specify where you want your formal scope brief, milestone schedule, and proposal saved.
+        </p>
+        <div className={styles.fieldGrid}>
+          <div className={styles.field}>
+            <label className={styles.label}>
+              <Mail size={14} className={styles.inlineIcon} />
+              Contact Email {!user && '(Required to save proposal)'}
+            </label>
+            <input
+              type="email"
+              inputMode="email"
+              className={styles.input}
+              aria-label="Contact Email"
+              placeholder="e.g., founder@company.com"
+              value={formData.contactEmail || ''}
+              onChange={(e) => onChangeField('contactEmail', e.target.value)}
+            />
+          </div>
+
+          <div className={styles.field}>
+            <label className={styles.label}>
+              <Phone size={14} className={styles.inlineIcon} />
+              Contact Phone / WhatsApp (Optional)
+            </label>
+            <input
+              type="tel"
+              inputMode="tel"
+              className={styles.input}
+              aria-label="Contact Phone or WhatsApp"
+              placeholder="e.g., +91 99107 93616 / +1 (555) 019-2831"
+              value={formData.contactPhone || ''}
+              onChange={(e) => onChangeField('contactPhone', e.target.value)}
+            />
+          </div>
         </div>
       </div>
 
-      {/* Visual Payment Milestones (Issue 3.1) */}
+      {/* Structured Commercial Guarantees + Expandable Full Terms */}
+      <div className={styles.field}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+          <label className={styles.label} style={{ margin: 0 }}>
+            <FileCode size={14} className={styles.inlineIcon} />
+            Standard Commercial Terms &amp; Guarantees
+          </label>
+          <button
+            type="button"
+            className={styles.termsAccordionToggle}
+            onClick={() => setIsFullTermsOpen((prev) => !prev)}
+            aria-expanded={isFullTermsOpen}
+          >
+            <span>{isFullTermsOpen ? 'Hide Full Legal Terms (8 Clauses) ▲' : 'View Full Legal Terms (8 Clauses) ▼'}</span>
+          </button>
+        </div>
+
+        <div className={styles.guaranteesGrid}>
+          <div className={styles.guaranteeCard}>
+            <div className={styles.guaranteeHeader}>
+              <Lock size={15} className={styles.guaranteeIcon} />
+              <span>50% Milestone Lock</span>
+            </div>
+            <p className={styles.guaranteeDesc}>
+              Deposit locks your sprint reservation. Final 50% balance is due only upon staging signoff and live handoff.
+            </p>
+          </div>
+
+          <div className={styles.guaranteeCard}>
+            <div className={styles.guaranteeHeader}>
+              <ShieldCheck size={15} className={styles.guaranteeIcon} />
+              <span>30-Day Post-Launch Warranty</span>
+            </div>
+            <p className={styles.guaranteeDesc}>
+              Comprehensive bug fixes, performance tuning, and cross-browser fixes included at zero extra charge.
+            </p>
+          </div>
+
+          <div className={styles.guaranteeCard}>
+            <div className={styles.guaranteeHeader}>
+              <Code2 size={15} className={styles.guaranteeIcon} />
+              <span>100% IP Transfer</span>
+            </div>
+            <p className={styles.guaranteeDesc}>
+              Full intellectual property, Git codebase repository, and production deployment credentials transfer to you.
+            </p>
+          </div>
+
+          <div className={styles.guaranteeCard}>
+            <div className={styles.guaranteeHeader}>
+              <Scale size={15} className={styles.guaranteeIcon} />
+              <span>Capped Commercial Liability</span>
+            </div>
+            <p className={styles.guaranteeDesc}>
+              Professional indemnity capped strictly at developer fees paid; governed under New Delhi jurisdiction.
+            </p>
+          </div>
+        </div>
+
+        {isFullTermsOpen && (
+          <div className={styles.termsContentBox}>
+            {termsList.map((t, idx) => (
+              <p key={idx}>{t}</p>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Visual Payment Milestones with Real Computed Cash Figures */}
       <div className={styles.paymentMilestones}>
         <div className={styles.milestoneStep}>
           <span className={styles.milestoneBadge}>50%</span>
-          <span>Upfront Deposit</span>
+          <span className={styles.milestoneTitle}>Upfront Deposit</span>
+          <span className={styles.milestoneAmount}>
+            {formatPricePair(depositINR, depositUSD, currency)}
+          </span>
         </div>
         <div className={styles.milestoneConnector} />
         <div className={styles.milestoneStep}>
           <span className={styles.milestoneBadge}>Build</span>
-          <span>Development &amp; QA</span>
+          <span className={styles.milestoneTitle}>Development &amp; QA</span>
+          <span className={styles.milestoneAmount}>Sprint Milestone</span>
         </div>
         <div className={styles.milestoneConnector} />
         <div className={styles.milestoneStep}>
           <span className={styles.milestoneBadge}>50%</span>
-          <span>Final Handoff</span>
+          <span className={styles.milestoneTitle}>Final Handoff</span>
+          <span className={styles.milestoneAmount}>
+            {formatPricePair(balanceINR, balanceUSD, currency)}
+          </span>
         </div>
       </div>
 

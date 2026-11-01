@@ -6,8 +6,6 @@ import {
   Sprout,
   Wrench,
   UserCheck,
-  Mail,
-  Phone,
   Zap,
   ShoppingCart,
   Calendar,
@@ -26,7 +24,8 @@ import type { GoalArchetype, BaseEngineItem, FeatureItem, ResumeData } from '@/d
 import { formatPricePair, packageTotalForArchetype, type Currency } from '@/lib/pricing';
 import NumberFlow from '@number-flow/react';
 import type { ParseIntentResponse } from '@/lib/rag-client';
-import { InlineScopingChatCard, type CurrentScopeContext } from './InlineScopingChatCard';
+import { AiScopingPromptBar } from './AiScopingPromptBar';
+import { type CurrentScopeContext } from './InlineScopingChatCard';
 import { GOAL_CATEGORIES } from './useIntakeFormState';
 import TiltCard from '@/components/ui/TiltCard';
 import styles from './IntakeForm.module.css';
@@ -123,6 +122,7 @@ interface StepGoalArchetypeProps {
   >;
   currentScope?: CurrentScopeContext | null;
   resumeData?: ResumeData | null;
+  onOpenCopilot?: () => void;
 }
 
 export function StepGoalArchetype({
@@ -133,7 +133,6 @@ export function StepGoalArchetype({
   selectedGoalCategory,
   setSelectedGoalCategory,
   currency,
-  user,
   onGoalChange,
   onScopeStartTypeChange,
   onResetServiceType,
@@ -142,12 +141,7 @@ export function StepGoalArchetype({
   onNavigateStep,
   isNoir = false,
   stepHeadingRef,
-  chatSessionId,
-  setChatSessionId,
-  chatTranscript,
-  setChatTranscript,
-  currentScope = null,
-  resumeData = null,
+  onOpenCopilot,
 }: StepGoalArchetypeProps) {
   const archetypeCardRefs = React.useRef<(HTMLDivElement | null)[]>([]);
   const categoryTabRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
@@ -186,19 +180,29 @@ export function StepGoalArchetype({
         </button>
       </div>
 
-      {/* Conversational Scoping Copilot Card (Retriever-Native) */}
-      <InlineScopingChatCard
-        currency={currency}
-        isNoir={isNoir}
-        onApplyBlueprint={onApplyBlueprint || (() => {})}
-        onNavigateStep={onNavigateStep}
-        chatSessionId={chatSessionId || null}
-        setChatSessionId={setChatSessionId || (() => {})}
-        chatTranscript={chatTranscript || []}
-        setChatTranscript={setChatTranscript || (() => {})}
-        currentScope={currentScope}
-        resumeData={resumeData}
-      />
+      {/* 1-Line Natural Language Intent Bar & RFP Dropzone */}
+      <div className={styles.intentBarContainer}>
+        <AiScopingPromptBar
+          onApplyBlueprint={onApplyBlueprint || (() => {})}
+          currency={currency}
+          isNoir={isNoir}
+          onNavigateStep={onNavigateStep}
+        />
+        {onOpenCopilot && (
+          <div className={styles.copilotTriggerRow}>
+            <button
+              type="button"
+              className={styles.copilotTriggerBtn}
+              onClick={onOpenCopilot}
+              aria-label="Open Scope Copilot chat drawer"
+            >
+              <Bot size={15} />
+              <span>Prefer conversational scoping? Chat with Solutions Architect</span>
+              <span className={styles.copilotIndicator} />
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* Low-Risk Paid Discovery Wedge */}
       {(() => {
@@ -428,38 +432,6 @@ export function StepGoalArchetype({
             placeholder="e.g., B2B Tech Founders, Healthcare SMBs, E-Commerce Buyers"
             value={formData.targetAudience}
             onChange={(e) => onChangeField('targetAudience', e.target.value)}
-          />
-        </div>
-
-        <div className={styles.field}>
-          <label className={styles.label}>
-            <Mail size={14} className={styles.inlineIcon} />
-            Contact Email {!user && '(Required for Guest Scoping)'}
-          </label>
-          <input
-            type="email"
-            inputMode="email"
-            className={styles.input}
-            aria-label="Contact Email"
-            placeholder="e.g., founder@company.com"
-            value={formData.contactEmail}
-            onChange={(e) => onChangeField('contactEmail', e.target.value)}
-          />
-        </div>
-
-        <div className={styles.field}>
-          <label className={styles.label}>
-            <Phone size={14} className={styles.inlineIcon} />
-            Contact Phone / WhatsApp (Optional)
-          </label>
-          <input
-            type="tel"
-            inputMode="tel"
-            className={styles.input}
-            aria-label="Contact Phone or WhatsApp"
-            placeholder="e.g., +91 99107 93616 / +1 (555) 019-2831"
-            value={formData.contactPhone}
-            onChange={(e) => onChangeField('contactPhone', e.target.value)}
           />
         </div>
       </div>

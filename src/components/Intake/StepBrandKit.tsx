@@ -1,5 +1,5 @@
 import React from 'react';
-import { Palette } from 'lucide-react';
+import { Palette, Check } from 'lucide-react';
 import type { BrandAssetOption } from '@/data/resume';
 import { formatPricePair, type Currency } from '@/lib/pricing';
 import styles from './IntakeForm.module.css';
@@ -11,6 +11,21 @@ interface StepBrandKitProps {
   onSelectBrandAsset: (asset: BrandAssetOption) => void;
   stepHeadingRef?: React.RefObject<HTMLDivElement | null>;
 }
+
+const BRAND_DELIVERABLES: Record<string, { chips: string[]; tag: string }> = {
+  ready: {
+    tag: 'Included in Base',
+    chips: ['Client Figma Spec Ingestion', '100% Component Parity', 'Zero Scope Bloat'],
+  },
+  copy: {
+    tag: 'Copywriting Add-On',
+    chips: ['Technical Storytelling', 'Conversion Copy', 'Up to 5 Pages Copy', '1 Revision Round'],
+  },
+  scratch: {
+    tag: 'Full Brand & Content',
+    chips: ['3 Logo Concepts', 'Color & Type System', 'Component Guidelines', 'Copywriting & SEO', '2 Revision Rounds'],
+  },
+};
 
 export function StepBrandKit({
   brandAssets,
@@ -45,6 +60,11 @@ export function StepBrandKit({
         <div className={styles.checkboxGrid} role="radiogroup" aria-label="Design & Content Readiness">
           {brandAssets.map((b, idx) => {
             const isSelected = selectedBrandAssetId === b.id;
+            const deliverableConfig = BRAND_DELIVERABLES[b.id] || {
+              tag: b.priceINR > 0 ? 'Add-on Tier' : 'Included in Base',
+              chips: ['Component System', 'Layout Specs'],
+            };
+
             return (
               <button
                 key={b.id}
@@ -63,12 +83,25 @@ export function StepBrandKit({
                 }}
               >
                 <div className={styles.cardHeader}>
-                  <span className={styles.cardTitle}>{b.label}</span>
+                  <div className={styles.brandTitleCol}>
+                    <span className={styles.cardTitle}>{b.label}</span>
+                    <span className={b.priceINR > 0 ? styles.brandScopeTagAddon : styles.brandScopeTagIncluded}>
+                      {deliverableConfig.tag}
+                    </span>
+                  </div>
                   <span className={`${styles.itemPrice} ${styles.cardPrice}`}>
-                    {b.priceINR > 0 ? `+${formatPricePair(b.priceINR, b.priceUSD, currency)}` : 'Included in Base Engine'}
+                    {b.priceINR > 0 ? `+${formatPricePair(b.priceINR, b.priceUSD, currency)}` : 'Included in Base'}
                   </span>
                 </div>
                 <p className={styles.cardDesc}>{b.description}</p>
+                <div className={styles.brandDeliverablesRow}>
+                  {deliverableConfig.chips.map((chip, cIdx) => (
+                    <span key={cIdx} className={styles.brandDeliverableChip}>
+                      <Check size={11} className={styles.inlineIcon} />
+                      {chip}
+                    </span>
+                  ))}
+                </div>
               </button>
             );
           })}

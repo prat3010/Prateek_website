@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import Portal from '@/components/ui/Portal';
+import { useLenis } from 'lenis/react';
 import type { Currency } from '@/lib/pricing';
 import type { ParseIntentResponse } from '@/lib/rag-client';
 import styles from './RfpUploaderModal.module.css';
@@ -34,6 +35,9 @@ export function RfpUploaderModal({
   const [isUploading, setIsUploading] = useState(false);
   const [progressStatus, setProgressStatus] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const lenis = useLenis();
 
   const handleClose = useCallback(() => {
     if (isUploading) return;
@@ -43,16 +47,54 @@ export function RfpUploaderModal({
     onClose();
   }, [isUploading, onClose]);
 
+  // Pattern 15 / ADR 47: Focus trap, Escape dismissal, and Lenis scroll lock
   useEffect(() => {
     if (!isOpen) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    lenis?.stop();
+
+    requestAnimationFrame(() => {
+      closeBtnRef.current?.focus();
+    });
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         handleClose();
       }
+
+      if (e.key === 'Tab' && modalRef.current) {
+        const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement?.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement?.focus();
+          }
+        }
+      }
     };
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, handleClose]);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      lenis?.start();
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, handleClose, lenis]);
 
   if (!isOpen) return null;
 
@@ -149,13 +191,19 @@ export function RfpUploaderModal({
         aria-modal="true"
         aria-labelledby="rfp-uploader-title"
       >
-        <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <div
+          ref={modalRef}
+          className={styles.modal}
+          onClick={(e) => e.stopPropagation()}
+          data-lenis-prevent
+        >
           <div className={styles.header}>
             <div className={styles.titleArea}>
               <FileUp size={20} className={styles.titleIcon} />
               <h2 id="rfp-uploader-title" className={styles.title}>Multimodal RFP / PRD Parser</h2>
             </div>
             <button
+              ref={closeBtnRef}
               type="button"
               className={styles.closeBtn}
               onClick={handleClose}

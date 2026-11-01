@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import { AlertTriangle, X, Trash2, ShieldCheck, Box } from 'lucide-react';
 import Portal from '@/components/ui/Portal';
+import { useLenis } from 'lenis/react';
 import MagneticButton from '@/components/ui/MagneticButton';
 import type { FeatureItem } from '@/data/resume';
 import { formatPricePair, type Currency } from '@/lib/pricing';
@@ -27,10 +28,15 @@ export function DependencyCascadeModal({
 }: DependencyCascadeModalProps) {
   const cancelBtnRef = useRef<HTMLButtonElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+  const lenis = useLenis();
 
-  // Focus management and Escape key handling
+  // Focus management, Escape key handling, and Lenis scroll lock
   useEffect(() => {
     if (!isOpen) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    lenis?.stop();
 
     // Auto-focus cancel button for safe keyboard default
     cancelBtnRef.current?.focus();
@@ -64,8 +70,12 @@ export function DependencyCascadeModal({
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onCancel]);
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      lenis?.start();
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onCancel, lenis]);
 
   if (!isOpen || !targetFeature) return null;
 
@@ -89,8 +99,6 @@ export function DependencyCascadeModal({
           ref={modalRef}
           onClick={(e) => e.stopPropagation()}
           data-lenis-prevent
-          data-lenis-prevent-wheel
-          data-lenis-prevent-touch
         >
           {/* Header */}
           <div className={styles.header}>

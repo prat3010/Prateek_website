@@ -61,6 +61,36 @@ export function StepTechnicalScope({
 }: StepTechnicalScopeProps) {
   const popoverCloseRef = useRef<HTMLButtonElement>(null);
 
+  const hasAiPresetFeatures = React.useMemo(() => {
+    return ['ai_rag', 'ai_agents', 'ai_voice_agent'].some((id) =>
+      formData.selectedFeatures.includes(id)
+    );
+  }, [formData.selectedFeatures]);
+
+  const hasGrowthPresetFeatures = React.useMemo(() => {
+    return ['payments', 'email', 'cms'].some((id) =>
+      formData.selectedFeatures.includes(id)
+    );
+  }, [formData.selectedFeatures]);
+
+  const isAiActive = React.useMemo(() => {
+    return ['auth', 'admin', 'ai_rag', 'ai_agents', 'ai_voice_agent', 'integrations'].every((id) =>
+      formData.selectedFeatures.includes(id)
+    );
+  }, [formData.selectedFeatures]);
+
+  const isGrowthActive = React.useMemo(() => {
+    if (hasAiPresetFeatures) return false;
+    return ['auth', 'admin', 'payments', 'email', 'cms', 'integrations'].every((id) =>
+      formData.selectedFeatures.includes(id)
+    );
+  }, [formData.selectedFeatures, hasAiPresetFeatures]);
+
+  const isEssentialActive = React.useMemo(() => {
+    if (hasAiPresetFeatures || hasGrowthPresetFeatures) return false;
+    return ['auth', 'admin'].every((id) => formData.selectedFeatures.includes(id));
+  }, [formData.selectedFeatures, hasAiPresetFeatures, hasGrowthPresetFeatures]);
+
   useEffect(() => {
     if (activePopoverId && popoverAnchor) {
       popoverCloseRef.current?.focus();
@@ -272,25 +302,28 @@ export function StepTechnicalScope({
           <div className={styles.smartPresetButtons}>
             <button
               type="button"
-              className={styles.smartPresetBtn}
+              className={`${styles.smartPresetBtn} ${isEssentialActive ? styles.smartPresetBtnActive : ''}`}
               onClick={() => onApplySmartPreset('essential')}
             >
+              {isEssentialActive && <span className={styles.activePresetDot} aria-hidden="true" />}
               <Sparkles size={12} className={styles.inlineIcon} />
               Essential MVP
             </button>
             <button
               type="button"
-              className={styles.smartPresetBtn}
+              className={`${styles.smartPresetBtn} ${isGrowthActive ? styles.smartPresetBtnActive : ''}`}
               onClick={() => onApplySmartPreset('growth')}
             >
+              {isGrowthActive && <span className={styles.activePresetDot} aria-hidden="true" />}
               <Rocket size={12} className={styles.inlineIcon} />
               Growth Bundle
             </button>
             <button
               type="button"
-              className={styles.smartPresetBtn}
+              className={`${styles.smartPresetBtn} ${isAiActive ? styles.smartPresetBtnActive : ''}`}
               onClick={() => onApplySmartPreset('ai')}
             >
+              {isAiActive && <span className={styles.activePresetDot} aria-hidden="true" />}
               <Bot size={12} className={styles.inlineIcon} />
               Full AI Powerhouse
             </button>
@@ -298,42 +331,17 @@ export function StepTechnicalScope({
         </div>
 
         {onOpenCopilot && (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: '12px',
-              padding: '12px 16px',
-              background: 'rgba(59, 130, 246, 0.08)',
-              border: '1px solid rgba(59, 130, 246, 0.25)',
-              borderRadius: '10px',
-              marginBottom: '1.25rem',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Bot size={16} style={{ color: '#60a5fa', flexShrink: 0 }} />
-              <span style={{ fontSize: '0.82rem', color: 'var(--color-text, #ffffff)' }}>
+          <div className={styles.copilotBanner}>
+            <div className={styles.copilotBannerContent}>
+              <Bot size={16} className={styles.copilotBannerIcon} />
+              <span className={styles.copilotBannerText}>
                 Need architecture advice, budget sculpting, or timeline validation for these modules?
               </span>
             </div>
             <button
               type="button"
               onClick={onOpenCopilot}
-              style={{
-                background: 'rgba(59, 130, 246, 0.2)',
-                border: '1px solid rgba(59, 130, 246, 0.4)',
-                color: '#93c5fd',
-                fontSize: '0.78rem',
-                fontWeight: 600,
-                padding: '5px 12px',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '5px',
-              }}
+              className={styles.copilotBannerBtn}
             >
               <span>Consult Scope Copilot</span>
               <span>→</span>

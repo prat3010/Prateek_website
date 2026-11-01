@@ -27,6 +27,9 @@
   --color-link-hover: var(--pop-red);
   --color-selection-bg: var(--pop-yellow);
   --color-selection-text: var(--pop-black);
+  --color-primary: var(--pop-blue);
+  --text-muted: var(--color-text-muted);
+  --accent-color: var(--pop-blue);
 
   /* ─ Surface Colors ─ */
   --surface-primary: var(--pop-white);
@@ -218,6 +221,9 @@
   --color-link-hover: #A0A0AB;
   --color-selection-bg: #FAFAFA;
   --color-selection-text: #08080a;
+  --color-primary: var(--neon-cyan);
+  --text-muted: var(--color-text-muted);
+  --accent-color: var(--neon-cyan);
 
   --surface-primary: #121214;       /* Primary panel background */
   --surface-secondary: #0c0c0e;     /* Page base background */
