@@ -46,6 +46,16 @@ export interface QuestionnaireData {
   additionalNotes?: string;
 }
 
+function triggerDownloadFallback(blobUrl: string, fileName: string) {
+  if (typeof document === 'undefined') return;
+  const link = document.createElement('a');
+  link.href = blobUrl;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 async function renderAndOpenPDF(element: React.ReactElement<DocumentProps>, fileName: string) {
   // Synchronously open a new blank tab during the user gesture to avoid popup blockers
   const newWindow = typeof window !== 'undefined' ? window.open('about:blank', '_blank') : null;
@@ -55,21 +65,27 @@ async function renderAndOpenPDF(element: React.ReactElement<DocumentProps>, file
     const blobUrl = URL.createObjectURL(blob);
 
     if (newWindow && !newWindow.closed) {
-      newWindow.location.href = blobUrl;
+      try {
+        newWindow.location.href = blobUrl;
+      } catch {
+        // If updating the opened tab fails (e.g. cross-origin/iframe security), fallback to direct download
+        try {
+          if (!newWindow.closed) newWindow.close();
+        } catch {}
+        triggerDownloadFallback(blobUrl, fileName);
+      }
     } else {
-      // Fallback if popup blocker prevented synchronous opening
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // Fallback if popup blocker prevented synchronous opening or tab was closed
+      triggerDownloadFallback(blobUrl, fileName);
     }
   } catch (err) {
     if (newWindow && !newWindow.closed) {
-      newWindow.close();
+      try {
+        newWindow.close();
+      } catch {}
     }
     console.error('Failed to open React-PDF preview:', err);
+    throw err;
   }
 }
 

@@ -11,7 +11,7 @@ interface InvoiceLedgerTableProps {
   isLoading: boolean;
   payingInvoiceId?: string | null;
   onOpenCreateModal?: () => void;
-  onDownloadPdf: (invoice: InvoiceEntity) => void;
+  onDownloadPdf: (invoice: InvoiceEntity) => Promise<void> | void;
   onPayInvoice: (invoice: InvoiceEntity) => void;
   onRefresh: () => void;
 }
@@ -26,6 +26,16 @@ export function InvoiceLedgerTable({
   onRefresh,
 }: InvoiceLedgerTableProps) {
   const [filter, setFilter] = useState<'all' | 'unpaid' | 'paid'>('all');
+  const [downloadingInvoiceId, setDownloadingInvoiceId] = useState<string | null>(null);
+
+  const handleDownloadClick = async (inv: InvoiceEntity) => {
+    setDownloadingInvoiceId(inv.id);
+    try {
+      await onDownloadPdf(inv);
+    } finally {
+      setDownloadingInvoiceId(null);
+    }
+  };
 
   const filteredInvoices = invoices.filter((inv) => {
     if (filter === 'all') return true;
@@ -155,11 +165,20 @@ export function InvoiceLedgerTable({
                       <div className={styles.tableActionButtons}>
                         <button
                           type="button"
-                          className={styles.pdfDownloadMiniBtn}
-                          onClick={() => onDownloadPdf(inv)}
-                          title="Download PDF"
+                          className={`${styles.pdfDownloadMiniBtn} ${downloadingInvoiceId === inv.id ? styles.btnDisabled : ''}`}
+                          onClick={() => handleDownloadClick(inv)}
+                          disabled={downloadingInvoiceId === inv.id}
+                          title={downloadingInvoiceId === inv.id ? 'Compiling PDF...' : 'Download PDF'}
                         >
-                          <Download size={14} /> PDF
+                          {downloadingInvoiceId === inv.id ? (
+                            <>
+                              <RefreshCw size={14} className={styles.spinning} /> PDF
+                            </>
+                          ) : (
+                            <>
+                              <Download size={14} /> PDF
+                            </>
+                          )}
                         </button>
                         {!isPaid && (
                           <button

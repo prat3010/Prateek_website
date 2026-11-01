@@ -9,6 +9,8 @@ import { MiddlemanAgreementPDF } from '@/components/pdf/MiddlemanAgreementPDF';
 import { ScopingBriefPDF } from '@/components/pdf/ScopingBriefPDF';
 import { ProposalExecutiveBriefPDF } from '@/components/pdf/ProposalExecutiveBriefPDF';
 import { DeveloperResumePDF } from '@/components/pdf/DeveloperResumePDF';
+import { InvoicePDF } from '@/components/pdf/InvoicePDF';
+import type { InvoiceEntity } from '@/lib/clientOrder';
 import { registerPdfFontsServer } from '@/components/pdf/pdfFontsServer';
 
 function pageCount(pdfBuffer: Buffer): number {
@@ -96,5 +98,51 @@ describe('commercial PDF render smoke tests', () => {
     const tmp = path.join(os.tmpdir(), `resume_${isNoir ? 'noir' : 'azure'}_${Date.now()}.pdf`);
     fs.writeFileSync(tmp, pdf);
     process.env.__RESUME_PDF_PATH__ = tmp;
+  }, 60000);
+
+  it.each([
+    ['azure', false],
+    ['noir', true],
+  ] as const)('InvoicePDF renders a valid PDF in %s theme with sanitized INR amounts', async (_theme, isNoir) => {
+    const sampleInvoice: InvoiceEntity = {
+      id: 'inv-test-123',
+      invoice_number: 'INV-2026-TEST',
+      customer_name: 'Test Client Corp',
+      customer_email: 'client@example.com',
+      milestone_name: 'Phase 1 MVP Architecture',
+      amount: 118000,
+      currency: 'INR',
+      payment_status: 'pending',
+      created_at: new Date().toISOString(),
+      is_gst: true,
+      place_of_supply: 'Delhi',
+      line_items: [
+        {
+          name: 'Next.js 16 Web Application',
+          description: 'Custom SaaS platform build',
+          sac_hsn: '998314',
+          rate: 100000,
+          quantity: 1,
+          tax_rate: 18,
+          tax_amount: 18000,
+          total: 118000,
+          subtotal: 100000,
+        },
+      ],
+      tax_breakup: {
+        cgst_rate: 9,
+        cgst_amount: 9000,
+        sgst_rate: 9,
+        sgst_amount: 9000,
+        total_tax: 18000,
+        is_interstate: false,
+      },
+    };
+
+    const pdf = await renderToPdf(
+      React.createElement(InvoicePDF, { invoice: sampleInvoice, isNoir }) as React.ReactElement<DocumentProps>,
+    );
+    expect(pdf.subarray(0, 5).toString()).toBe('%PDF-');
+    expect(pageCount(pdf)).toBeGreaterThanOrEqual(1);
   }, 60000);
 });

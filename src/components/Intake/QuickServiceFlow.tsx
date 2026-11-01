@@ -519,9 +519,9 @@ export function QuickServiceFlow({
                 <button
                   type="button"
                   onClick={onQuickFastPass}
-                  disabled={submitting}
-                  className={`${styles.btn} ${styles.googleFastPassBtn} ${submitting ? styles.btnDisabled : ''}`}
-                  title="Fast-pass: Sign in with Google to automatically save your scope"
+                  disabled={submitting || !quickFormData.agreedToTerms}
+                  className={`${styles.btn} ${styles.googleFastPassBtn} ${submitting || !quickFormData.agreedToTerms ? styles.btnDisabled : ''}`}
+                  title={!quickFormData.agreedToTerms ? 'Accept commercial terms to use Google Fast-Pass' : 'Fast-pass: Sign in with Google to automatically save your scope'}
                 >
                   <Rocket size={16} />
                   <span>{submitting ? 'CONNECTING...' : '1-CLICK GOOGLE FAST-PASS'}</span>

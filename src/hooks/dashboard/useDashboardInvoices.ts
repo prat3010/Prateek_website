@@ -8,11 +8,13 @@ import { generateInvoicePDF } from '@/utils/pdfGenerator';
 interface UseDashboardInvoicesProps {
   userEmail?: string | null;
   getAccessToken: () => Promise<string | null>;
+  isNoir?: boolean;
 }
 
 export function useDashboardInvoices({
   userEmail,
   getAccessToken,
+  isNoir = false,
 }: UseDashboardInvoicesProps) {
   const [invoices, setInvoices] = useState<InvoiceEntity[]>([]);
   const [isInvoiceLoading, setIsInvoiceLoading] = useState(false);
@@ -71,9 +73,11 @@ export function useDashboardInvoices({
       setIsInvoiceLoading(false);
     }
   };
-  const handleDownloadInvoicePdf = (inv: InvoiceEntity) => {
+
+  const handleDownloadInvoicePdf = async (inv: InvoiceEntity) => {
     try {
-      generateInvoicePDF(inv);
+      await generateInvoicePDF(inv, isNoir);
+      toast.success(`Downloaded Invoice #${inv.invoice_number}`);
     } catch (err) {
       console.error('Invoice PDF download error:', err);
       toast.error('Failed to generate Invoice PDF.');
@@ -82,7 +86,6 @@ export function useDashboardInvoices({
 
   const handleInvoiceCreated = (newInvoice: InvoiceEntity) => {
     setInvoices((prev) => [newInvoice, ...prev]);
-    handleDownloadInvoicePdf(newInvoice);
   };
 
   return {

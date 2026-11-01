@@ -845,6 +845,11 @@ export function useIntakeFormState(
 
   const handleQuickFastPass = useCallback(async () => {
     if (selectedQuickServices.length === 0) return;
+    if (!quickFormData.agreedToTerms) {
+      setErrorMsg('Please accept the standard commercial terms before using Fast-Pass.');
+      toast.error('Please accept the standard commercial terms before using Fast-Pass.');
+      return;
+    }
     setSubmitting(true);
     try {
       const quote = calcQuickServiceQuote(quickServices, selectedQuickServices, currency);
@@ -893,6 +898,11 @@ export function useIntakeFormState(
   }, [selectedQuickServices, quickServices, currency, generatedScopeCode, quickFormData, getDashboardRedirectUrl]);
 
   const handleFastPass = useCallback(async () => {
+    if (!formData.agreedToTerms) {
+      setErrorMsg('Please accept the standard commercial terms before using Fast-Pass.');
+      toast.error('Please accept the standard commercial terms before using Fast-Pass.');
+      return;
+    }
     setSubmitting(true);
     try {
       const scopePayload = buildScopePayload();
@@ -917,7 +927,7 @@ export function useIntakeFormState(
       console.error('Fast-pass error:', err);
       setSubmitting(false);
     }
-  }, [buildScopePayload, getDashboardRedirectUrl]);
+  }, [formData.agreedToTerms, buildScopePayload, getDashboardRedirectUrl]);
 
   const validateStep1 = useCallback((): boolean => {
     if (!formData.targetAudience || formData.targetAudience.trim().length < 2) {

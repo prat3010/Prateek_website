@@ -332,4 +332,36 @@ describe('useIntakeFormState - applyBlueprint', () => {
     });
     expect(result.current.submitAttempted).toBe(true);
   });
+
+  it('blocks handleFastPass when agreedToTerms is false', async () => {
+    const { result } = renderHook(() =>
+      useIntakeFormState(mockResumeData, null, null, false)
+    );
+
+    expect(result.current.formData.agreedToTerms).toBe(false);
+    await act(async () => {
+      await result.current.handleFastPass();
+    });
+
+    expect(result.current.errorMsg).toContain('commercial terms');
+    expect(result.current.submitting).toBe(false);
+  });
+
+  it('blocks handleQuickFastPass when agreedToTerms is false', async () => {
+    const { result } = renderHook(() =>
+      useIntakeFormState(mockResumeData, null, null, false)
+    );
+
+    act(() => {
+      result.current.setSelectedQuickServices(['analytics-setup']);
+    });
+
+    expect(result.current.quickFormData.agreedToTerms).toBe(false);
+    await act(async () => {
+      await result.current.handleQuickFastPass();
+    });
+
+    expect(result.current.errorMsg).toContain('commercial terms');
+    expect(result.current.submitting).toBe(false);
+  });
 });

@@ -274,7 +274,13 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
       try {
         const res = await client.getDownloadUrl(docIdOrName);
         if (res?.downloadUrl) {
-          window.open(res.downloadUrl, "_blank");
+          const a = document.createElement("a");
+          a.href = res.downloadUrl;
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
         }
       } catch (err) {
         console.warn("[Download] Failed to get presigned URL:", err);

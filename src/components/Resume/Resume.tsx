@@ -25,6 +25,7 @@ import {
   Layers
 } from 'lucide-react';
 import { getSkillsHighlight, type Persona } from '@/lib/skills';
+import { generateResumePDF, generateServicesAndPricingPDF } from '@/utils/pdfGenerator';
 import {
   formatPricePair,
   packageTotalForArchetype,
@@ -109,15 +110,15 @@ function Resume({ resumeData, certificates }: ResumeProps) {
     return plan ? `${formatPricePair(plan.priceINR, plan.priceUSD, currency)}/mo` : '';
   };
 
-  const handleDownloadPDF = () => {
-    if (activeAudience === 'business') {
-      import('@/utils/pdfGenerator').then(({ generateServicesAndPricingPDF }) => {
-        generateServicesAndPricingPDF(resumeData, isNoir);
-      });
-    } else {
-      import('@/utils/pdfGenerator').then(({ generateResumePDF }) => {
-        generateResumePDF(activePersona, resumeData, isNoir);
-      });
+  const handleDownloadPDF = async () => {
+    try {
+      if (activeAudience === 'business') {
+        await generateServicesAndPricingPDF(resumeData, isNoir);
+      } else {
+        await generateResumePDF(activePersona, resumeData, isNoir);
+      }
+    } catch (err) {
+      console.error('Failed to generate PDF:', err);
     }
   };
 

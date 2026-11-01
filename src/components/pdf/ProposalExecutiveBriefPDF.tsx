@@ -243,15 +243,17 @@ export function ProposalExecutiveBriefPDF({
   const careCostINR = data?.maintenanceCostINR ?? 0;
   const careCostUSD = data?.maintenanceCostUSD ?? 0;
 
-  const totalBuildFormatted =
+  const totalBuildFormatted = cleanPDFText(
     currency === 'USD'
       ? formatPricePair(totalBuildINR, totalBuildUSD, 'USD')
-      : formatPricePair(totalBuildINR, totalBuildUSD, 'INR');
+      : formatPricePair(totalBuildINR, totalBuildUSD, 'INR')
+  );
 
-  const careFormatted =
+  const careFormatted = cleanPDFText(
     careCostINR === 0 && careCostUSD === 0
       ? 'Included (30-Day Warranty)'
-      : `${currency === 'USD' ? formatPricePair(careCostINR, careCostUSD, 'USD') : formatPricePair(careCostINR, careCostUSD, 'INR')}/mo`;
+      : `${currency === 'USD' ? formatPricePair(careCostINR, careCostUSD, 'USD') : formatPricePair(careCostINR, careCostUSD, 'INR')}/mo`
+  );
 
   return (
     <Document title={`${companyName} - Executive Pitch Brief`} author={resumeData?.name || 'Prateek Sharma'}>

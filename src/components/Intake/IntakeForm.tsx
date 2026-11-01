@@ -681,8 +681,9 @@ export default function IntakeForm({ resumeData, initialPreset = null }: IntakeF
                           <button
                             type="button"
                             onClick={handleFastPass}
-                            className={`${styles.btn} ${styles.googleFastPassBtn}`}
-                            title="Fast-pass: Sign in with Google to automatically save your scope to your client dashboard"
+                            disabled={submitting || !formData.agreedToTerms}
+                            className={`${styles.btn} ${styles.googleFastPassBtn} ${submitting || !formData.agreedToTerms ? styles.btnDisabled : ''}`}
+                            title={!formData.agreedToTerms ? 'Accept commercial terms to use Google Fast-Pass' : 'Fast-pass: Sign in with Google to automatically save your scope to your client dashboard'}
                           >
                             <Rocket size={16} />
                             <span>1-CLICK GOOGLE FAST-PASS</span>

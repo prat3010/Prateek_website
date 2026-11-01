@@ -48,6 +48,7 @@ export default function ClientDashboardPage() {
   const router = useRouter();
   const { user, loading, logout, loginWithGoogle, getAccessToken } = useAuth();
   const { theme } = useTheme();
+  const isNoir = theme === 'noir';
 
   useEffect(() => {
     if (!loading && user && isAdminEmail(user.email)) {
@@ -113,6 +114,7 @@ export default function ClientDashboardPage() {
         url.searchParams.delete('costINR');
         url.searchParams.delete('costUSD');
         url.searchParams.delete('features');
+        url.searchParams.set('preview', 'client');
         window.history.replaceState({}, '', url.pathname + (url.search ? url.search : ''));
       }
     }
@@ -159,6 +161,7 @@ export default function ClientDashboardPage() {
   } = useDashboardInvoices({
     userEmail: user?.email,
     getAccessToken,
+    isNoir,
   });
 
   // Razorpay Checkout Integration

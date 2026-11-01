@@ -206,7 +206,7 @@ export function InvoiceCreatorModal({
       }
 
       const created = await res.json();
-      toast.success(`🎉 Invoice #${created.invoice_number} created successfully!`);
+      toast.success(`🎉 Invoice #${created.invoice_number} created successfully! You can download the PDF anytime from the ledger.`);
       onInvoiceCreated(created);
       onClose();
     } catch (err) {

@@ -2,7 +2,7 @@ import React from 'react';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import { InvoiceEntity } from '@/lib/clientOrder';
 import { SELLER_CONFIG, formatCurrencyAmount } from '@/lib/invoicing';
-import { getPdfTheme } from './pdfTheme';
+import { getPdfTheme, cleanPDFText } from './pdfTheme';
 import { PdfBrandHeader } from './PdfBrandHeader';
 import { PdfFooter } from './PdfFooter';
 
@@ -14,6 +14,9 @@ interface InvoicePDFProps {
 export function InvoicePDF({ invoice, isNoir = false }: InvoicePDFProps) {
   const theme = getPdfTheme(isNoir);
   const currency = invoice.currency || 'INR';
+
+  const formatPDFPrice = (amount: number, curr: string = currency) =>
+    cleanPDFText(formatCurrencyAmount(amount, curr));
 
   const hasSellerGstin = Boolean(SELLER_CONFIG.gstin?.trim());
   const isGst = Boolean(invoice.is_gst) && hasSellerGstin;
@@ -243,23 +246,23 @@ export function InvoicePDF({ invoice, isNoir = false }: InvoicePDFProps) {
         <View style={[styles.flexRow, styles.section]}>
           <View style={[styles.colHalf, styles.card]}>
             <Text style={styles.cardTitle}>Billed To</Text>
-            <Text style={styles.metaValue}>{invoice.customer_name || 'Valued Client'}</Text>
-            <Text style={styles.metaValue}>Email: {invoice.customer_email || 'N/A'}</Text>
-            {invoice.customer_phone && <Text style={styles.metaValue}>Phone: {invoice.customer_phone}</Text>}
-            {invoice.customer_gstin && <Text style={styles.metaValue}>GSTIN: {invoice.customer_gstin}</Text>}
+            <Text style={styles.metaValue}>{cleanPDFText(invoice.customer_name || 'Valued Client')}</Text>
+            <Text style={styles.metaValue}>Email: {cleanPDFText(invoice.customer_email || 'N/A')}</Text>
+            {invoice.customer_phone && <Text style={styles.metaValue}>Phone: {cleanPDFText(invoice.customer_phone)}</Text>}
+            {invoice.customer_gstin && <Text style={styles.metaValue}>GSTIN: {cleanPDFText(invoice.customer_gstin)}</Text>}
             {billing.street && (
               <Text style={styles.metaValue}>
-                {billing.street}, {billing.city}, {billing.state} {billing.pincode}
+                {cleanPDFText(`${billing.street}, ${billing.city}, ${billing.state} ${billing.pincode}`)}
               </Text>
             )}
           </View>
 
           <View style={[styles.colHalf, styles.card]}>
             <Text style={styles.cardTitle}>Place of Supply & Delivery</Text>
-            <Text style={styles.metaValue}>Place of Supply: {placeOfSupply}</Text>
+            <Text style={styles.metaValue}>Place of Supply: {cleanPDFText(placeOfSupply)}</Text>
             {shipping.street ? (
               <Text style={styles.metaValue}>
-                Shipping: {shipping.street}, {shipping.city}, {shipping.state} {shipping.pincode}
+                Shipping: {cleanPDFText(`${shipping.street}, ${shipping.city}, ${shipping.state} ${shipping.pincode}`)}
               </Text>
             ) : (
               <Text style={styles.metaValue}>Digital Electronic Delivery (Remote Software Services)</Text>
@@ -291,14 +294,14 @@ export function InvoicePDF({ invoice, isNoir = false }: InvoicePDFProps) {
           {lineItems.map((item, idx) => (
             <View key={idx} style={[styles.tableRow, idx % 2 === 1 ? styles.tableRowAlt : {}]}>
               <View style={styles.colDesc}>
-                <Text style={{ fontFamily: theme.labelBoldFont, fontSize: 9 }}>{item.name}</Text>
-                {item.description ? <Text style={{ color: theme.textSecondary, fontSize: 8 }}>{item.description}</Text> : null}
+                <Text style={{ fontFamily: theme.labelBoldFont, fontSize: 9 }}>{cleanPDFText(item.name)}</Text>
+                {item.description ? <Text style={{ color: theme.textSecondary, fontSize: 8 }}>{cleanPDFText(item.description)}</Text> : null}
               </View>
-              <Text style={[styles.metaValue, styles.colSac]}>{item.sac_hsn || '-'}</Text>
+              <Text style={[styles.metaValue, styles.colSac]}>{cleanPDFText(item.sac_hsn || '-')}</Text>
               <Text style={[styles.metaValue, styles.colQty]}>{item.quantity}</Text>
-              <Text style={[styles.metaValue, styles.colRate]}>{formatCurrencyAmount(item.rate, currency)}</Text>
-              <Text style={[styles.metaValue, styles.colTax]}>{formatCurrencyAmount(item.tax_amount, currency)}</Text>
-              <Text style={[styles.metaValue, styles.colTotal]}>{formatCurrencyAmount(item.total, currency)}</Text>
+              <Text style={[styles.metaValue, styles.colRate]}>{formatPDFPrice(item.rate)}</Text>
+              <Text style={[styles.metaValue, styles.colTax]}>{formatPDFPrice(item.tax_amount)}</Text>
+              <Text style={[styles.metaValue, styles.colTotal]}>{formatPDFPrice(item.total)}</Text>
             </View>
           ))}
         </View>
@@ -309,9 +312,8 @@ export function InvoicePDF({ invoice, isNoir = false }: InvoicePDFProps) {
             <View style={styles.summaryRow}>
               <Text style={styles.metaLabel}>Subtotal:</Text>
               <Text style={styles.metaValue}>
-                {formatCurrencyAmount(
-                  lineItems.reduce((acc, item) => acc + item.subtotal, 0) || invoice.amount,
-                  currency
+                {formatPDFPrice(
+                  lineItems.reduce((acc, item) => acc + item.subtotal, 0) || invoice.amount
                 )}
               </Text>
             </View>
@@ -320,11 +322,11 @@ export function InvoicePDF({ invoice, isNoir = false }: InvoicePDFProps) {
               <>
                 <View style={styles.summaryRow}>
                   <Text style={styles.metaLabel}>CGST ({taxBreakup.cgst_rate}%):</Text>
-                  <Text style={styles.metaValue}>{formatCurrencyAmount(taxBreakup.cgst_amount || 0, currency)}</Text>
+                  <Text style={styles.metaValue}>{formatPDFPrice(taxBreakup.cgst_amount || 0)}</Text>
                 </View>
                 <View style={styles.summaryRow}>
                   <Text style={styles.metaLabel}>SGST ({taxBreakup.sgst_rate}%):</Text>
-                  <Text style={styles.metaValue}>{formatCurrencyAmount(taxBreakup.sgst_amount || 0, currency)}</Text>
+                  <Text style={styles.metaValue}>{formatPDFPrice(taxBreakup.sgst_amount || 0)}</Text>
                 </View>
               </>
             ) : null}
@@ -332,13 +334,13 @@ export function InvoicePDF({ invoice, isNoir = false }: InvoicePDFProps) {
             {isGst && taxBreakup.igst_amount ? (
               <View style={styles.summaryRow}>
                 <Text style={styles.metaLabel}>IGST ({taxBreakup.igst_rate}%):</Text>
-                <Text style={styles.metaValue}>{formatCurrencyAmount(taxBreakup.igst_amount || 0, currency)}</Text>
+                <Text style={styles.metaValue}>{formatPDFPrice(taxBreakup.igst_amount || 0)}</Text>
               </View>
             ) : null}
 
             <View style={styles.summaryTotalRow}>
               <Text style={styles.summaryTotalText}>Grand Total:</Text>
-              <Text style={styles.summaryTotalText}>{formatCurrencyAmount(invoice.amount, currency)}</Text>
+              <Text style={styles.summaryTotalText}>{formatPDFPrice(invoice.amount)}</Text>
             </View>
           </View>
         </View>
@@ -352,15 +354,16 @@ export function InvoicePDF({ invoice, isNoir = false }: InvoicePDFProps) {
                 {SELLER_CONFIG.internationalPayment?.beneficiary && (
                   <>
                     <Text style={styles.metaLabel}>Beneficiary Account Name:</Text>
-                    <Text style={styles.metaValue}>{SELLER_CONFIG.internationalPayment.beneficiary}</Text>
+                    <Text style={styles.metaValue}>{cleanPDFText(SELLER_CONFIG.internationalPayment.beneficiary)}</Text>
                   </>
                 )}
                 {SELLER_CONFIG.internationalPayment?.bankName && (
                   <>
                     <Text style={styles.metaLabel}>Bank Name &amp; Address:</Text>
                     <Text style={styles.metaValue}>
-                      {SELLER_CONFIG.internationalPayment.bankName}
-                      {SELLER_CONFIG.internationalPayment.bankAddress ? `, ${SELLER_CONFIG.internationalPayment.bankAddress}` : ''}
+                      {cleanPDFText(
+                        `${SELLER_CONFIG.internationalPayment.bankName}${SELLER_CONFIG.internationalPayment.bankAddress ? `, ${SELLER_CONFIG.internationalPayment.bankAddress}` : ''}`
+                      )}
                     </Text>
                   </>
                 )}
@@ -369,15 +372,15 @@ export function InvoicePDF({ invoice, isNoir = false }: InvoicePDFProps) {
                 {SELLER_CONFIG.internationalPayment?.achRouting && (
                   <>
                     <Text style={styles.metaLabel}>USD ACH Routing Number:</Text>
-                    <Text style={styles.metaValue}>{SELLER_CONFIG.internationalPayment.achRouting}</Text>
+                    <Text style={styles.metaValue}>{cleanPDFText(SELLER_CONFIG.internationalPayment.achRouting)}</Text>
                   </>
                 )}
                 <Text style={styles.metaLabel}>Account Number:</Text>
-                <Text style={styles.metaValue}>{SELLER_CONFIG.internationalPayment?.achAccount}</Text>
+                <Text style={styles.metaValue}>{cleanPDFText(SELLER_CONFIG.internationalPayment?.achAccount)}</Text>
                 {SELLER_CONFIG.internationalPayment?.swiftBic && (
                   <>
                     <Text style={styles.metaLabel}>SWIFT / BIC Code:</Text>
-                    <Text style={styles.metaValue}>{SELLER_CONFIG.internationalPayment.swiftBic}</Text>
+                    <Text style={styles.metaValue}>{cleanPDFText(SELLER_CONFIG.internationalPayment.swiftBic)}</Text>
                   </>
                 )}
               </View>
@@ -386,7 +389,7 @@ export function InvoicePDF({ invoice, isNoir = false }: InvoicePDFProps) {
               <>
                 <Text style={[styles.metaLabel, { marginTop: 4 }]}>Export Tax Compliance Disclaimer:</Text>
                 <Text style={[styles.metaValue, { fontSize: 7.5, color: theme.textSecondary }]}>
-                  {SELLER_CONFIG.lutDisclaimer} {SELLER_CONFIG.lutArn ? `(LUT ARN: ${SELLER_CONFIG.lutArn})` : ''}
+                  {cleanPDFText(`${SELLER_CONFIG.lutDisclaimer} ${SELLER_CONFIG.lutArn ? `(LUT ARN: ${SELLER_CONFIG.lutArn})` : ''}`)}
                 </Text>
               </>
             )}
@@ -397,14 +400,14 @@ export function InvoicePDF({ invoice, isNoir = false }: InvoicePDFProps) {
         {invoice.customer_notes ? (
           <View style={[styles.card, styles.section]}>
             <Text style={styles.notesTitle}>Customer Notes</Text>
-            <Text style={styles.notesBody}>{invoice.customer_notes}</Text>
+            <Text style={styles.notesBody}>{cleanPDFText(invoice.customer_notes)}</Text>
           </View>
         ) : null}
 
         {invoice.terms_and_conditions ? (
           <View style={[styles.card, styles.section]}>
             <Text style={styles.notesTitle}>Terms & Conditions</Text>
-            <Text style={styles.notesBody}>{invoice.terms_and_conditions}</Text>
+            <Text style={styles.notesBody}>{cleanPDFText(invoice.terms_and_conditions)}</Text>
           </View>
         ) : null}
 

@@ -800,7 +800,7 @@ export function useTerminalCommands({
         };
 
         handleTerminalScopeCommand(cmd, scopeSession, engines, features, brandAssets, maintenancePlans)
-          .then((result) => {
+          .then(async (result) => {
             setScopeSession(result.nextSession);
             unlockAchievement('cyber_scoper', 'Cyber Scoper', 'Configured an enterprise architecture blueprint entirely via CLI');
 
@@ -836,10 +836,11 @@ export function useTerminalCommands({
                   totalBuildCostINR: selectedEngine.priceINR,
                   totalBuildCostUSD: selectedEngine.priceUSD,
                 };
-                generateQuestionnairePDF(profileData, questionnaireData, isNoir, result.nextSession.currency);
+                await generateQuestionnairePDF(profileData, questionnaireData, isNoir, result.nextSession.currency);
                 toast.success('Downloaded Scoping Proposal PDF');
               } catch (pdfErr) {
                 console.error('PDF export error:', pdfErr);
+                toast.error('Failed to export scoping proposal PDF');
               }
             }
 
