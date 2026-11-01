@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback, ReactNode } from "react";
 import { RetrieverClient } from "@/lib/rag-client";
 import { GroundingDiffResponse, ClaimClassification, ReActTraceStep } from "@/lib/rag-types";
 import Portal from "@/components/ui/Portal";
+import { useLenis } from "lenis/react";
 import styles from "./rag.module.css";
 
 interface ChatMessageItem {
@@ -18,6 +19,7 @@ interface ChatMessageItem {
 }
 
 export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClient | null; hidden: boolean; isExpired?: boolean }) {
+  const lenis = useLenis();
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Array<ChatMessageItem>>([]);
   const [input, setInput] = useState("");
@@ -38,6 +40,7 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
   const [feedbackModalMsg, setFeedbackModalMsg] = useState<{ msgId: number; backendMessageId?: string } | null>(null);
   const [feedbackText, setFeedbackText] = useState("");
   const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
+  const feedbackModalRef = useRef<HTMLDivElement>(null);
 
   // Visual Citation Lightbox modal state (Milestone 113 / Battery #29)
   interface VisualCitationData {
@@ -47,6 +50,105 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
     snippet?: string;
   }
   const [activeVisualCitation, setActiveVisualCitation] = useState<VisualCitationData | null>(null);
+  const visualCitationModalRef = useRef<HTMLDivElement>(null);
+
+  // Focus management, Escape key handling, and Lenis scroll lock for Feedback Modal
+  useEffect(() => {
+    if (!feedbackModalMsg) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    lenis?.stop();
+
+    const focusables = feedbackModalRef.current?.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    focusables?.[0]?.focus();
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setFeedbackModalMsg(null);
+      }
+
+      if (e.key === "Tab" && feedbackModalRef.current) {
+        const els = feedbackModalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (!els.length) return;
+        const first = els[0];
+        const last = els[els.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last?.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first?.focus();
+          }
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      lenis?.start();
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [feedbackModalMsg, lenis]);
+
+  // Focus management, Escape key handling, and Lenis scroll lock for Visual Citation Modal
+  useEffect(() => {
+    if (!activeVisualCitation) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    lenis?.stop();
+
+    const focusables = visualCitationModalRef.current?.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    focusables?.[0]?.focus();
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setActiveVisualCitation(null);
+      }
+
+      if (e.key === "Tab" && visualCitationModalRef.current) {
+        const els = visualCitationModalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (!els.length) return;
+        const first = els[0];
+        const last = els[els.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last?.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first?.focus();
+          }
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      lenis?.start();
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [activeVisualCitation, lenis]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -881,7 +983,7 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
             aria-modal="true"
             aria-labelledby="feedback-dialog-title"
           >
-            <div className={styles.feedbackModal} onClick={(e) => e.stopPropagation()}>
+            <div ref={feedbackModalRef} className={styles.feedbackModal} data-lenis-prevent onClick={(e) => e.stopPropagation()}>
               <h3 id="feedback-dialog-title" className={styles.feedbackTitle}>Provide Response Feedback</h3>
               <p style={{ fontSize: "0.85rem", opacity: 0.7, margin: 0 }}>
                 Help us improve responses by sharing details:
@@ -915,7 +1017,7 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
             aria-modal="true"
             aria-labelledby="visual-lightbox-title"
           >
-            <div className={styles.visualLightboxModal} onClick={(e) => e.stopPropagation()}>
+            <div ref={visualCitationModalRef} className={styles.visualLightboxModal} data-lenis-prevent onClick={(e) => e.stopPropagation()}>
               <div className={styles.visualLightboxHeader}>
                 <div className={styles.visualLightboxTitleGroup}>
                   <span className={styles.visualBadgeIcon}>📐</span>
@@ -937,7 +1039,7 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
                 </button>
               </div>
 
-              <div className={styles.visualLightboxBody}>
+              <div className={styles.visualLightboxBody} data-lenis-prevent>
                 <div className={styles.visualCanvasViewport}>
                   <div className={styles.visualBlueprintCanvas}>
                     <div className={styles.visualGridOverlay} />

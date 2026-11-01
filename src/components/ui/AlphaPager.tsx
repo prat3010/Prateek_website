@@ -482,8 +482,8 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
     setBacklightActive((prev) => !prev);
   };
 
-  const handleToggleDock = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleToggleDock = (e?: React.MouseEvent | React.KeyboardEvent) => {
+    e?.stopPropagation();
     playPagerChirp();
     setIsExpanded((prev) => !prev);
   };
@@ -530,6 +530,13 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
               className={`${styles.pagerDevice} ${styles.compactClip}`}
               data-lenis-prevent
               onClick={handleToggleDock}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleToggleDock();
+                }
+              }}
+              tabIndex={0}
               initial={{ opacity: 0, scale: 0.92, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.92, y: 15 }}

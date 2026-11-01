@@ -1,6 +1,7 @@
 'use client';
 
 import { ReactLenis, useLenis } from 'lenis/react';
+export { useLenis };
 import { createContext, useContext, useEffect, ReactNode } from 'react';
 import { MotionValue, useMotionValue, useReducedMotion } from 'framer-motion';
 

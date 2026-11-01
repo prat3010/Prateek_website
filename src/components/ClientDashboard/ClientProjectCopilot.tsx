@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Bot, Send, Sparkles, X, FileText, CheckCircle2, RefreshCw } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useLenis } from 'lenis/react';
 import Portal from '@/components/ui/Portal';
 import styles from './ClientProjectCopilot.module.css';
 
@@ -29,6 +30,7 @@ const SUGGESTED_PROMPTS = [
 
 export default function ClientProjectCopilot() {
   const { getAccessToken } = useAuth();
+  const lenis = useLenis();
   const [isOpen, setIsOpen] = useState(false);
   const [inputQuery, setInputQuery] = useState('');
   const [loading, setLoading] = useState(false);
@@ -40,6 +42,7 @@ export default function ClientProjectCopilot() {
   ]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -53,14 +56,51 @@ export default function ClientProjectCopilot() {
 
   useEffect(() => {
     if (!isOpen) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    lenis?.stop();
+
+    const focusables = modalRef.current?.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    focusables?.[0]?.focus();
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        e.preventDefault();
         setIsOpen(false);
       }
+
+      if (e.key === 'Tab' && modalRef.current) {
+        const els = modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (!els.length) return;
+        const first = els[0];
+        const last = els[els.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last?.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first?.focus();
+          }
+        }
+      }
     };
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen]);
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      lenis?.start();
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, lenis]);
 
   const handleSend = async (customQuery?: string) => {
     const query = (customQuery || inputQuery).trim();
@@ -137,10 +177,12 @@ export default function ClientProjectCopilot() {
         <Portal>
           <div className={styles.backdropOverlay} onClick={() => setIsOpen(false)}>
             <div
+              ref={modalRef}
               role="dialog"
               aria-modal="true"
               aria-label="Client Project Copilot"
               className={styles.copilotDialog}
+              data-lenis-prevent
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
@@ -164,7 +206,7 @@ export default function ClientProjectCopilot() {
               </div>
 
               {/* Messages Container */}
-              <div className={styles.messagesList}>
+              <div className={styles.messagesList} data-lenis-prevent>
                 {messages.map((m, idx) => (
                   <div
                     key={idx}

@@ -237,7 +237,7 @@ export default function PrivacyPage() {
         </nav>
 
         {/* Content Sections */}
-        <main className={styles.content}>
+        <div className={styles.content}>
           {/* 01. Scope & Philosophy */}
           <section id="section-scope" className={styles.section}>
             <div className={styles.sectionTitleRow}>
@@ -809,7 +809,7 @@ export default function PrivacyPage() {
               </div>
             </div>
           </section>
-        </main>
+        </div>
 
         {/* Footer Navigation */}
         <footer className={styles.footerNav}>

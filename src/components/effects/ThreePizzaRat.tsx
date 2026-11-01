@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { Group, WebGLRenderer, Scene, PerspectiveCamera, Mesh, BufferGeometry, MeshStandardMaterial } from 'three';
 import { useTheme } from '@/context/ThemeContext';
 
@@ -22,13 +22,24 @@ export default function ThreePizzaRat() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { isNoir } = useTheme();
   const isNoirRef = useRef(isNoir);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   useEffect(() => {
     isNoirRef.current = isNoir;
   }, [isNoir]);
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (prefersReducedMotion || !containerRef.current) return;
 
     let active = true;
     let isTabVisible = true;
@@ -855,7 +866,11 @@ export default function ThreePizzaRat() {
         renderer.dispose();
       }
     };
-  }, []);
+  }, [prefersReducedMotion]);
+
+  if (prefersReducedMotion) {
+    return null;
+  }
 
   return <div className="pizza-rat-canvas-container" ref={containerRef} />;
 }

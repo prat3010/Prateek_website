@@ -114,7 +114,7 @@ export default async function PlaygroundItemPage({ params }: PlaygroundSlugPageP
   if (item.kind === 'cognitive-tool') {
     const cog = item as CognitiveToolPlaygroundItem;
     return (
-      <main className={styles.container}>
+      <div className={styles.container}>
         <Link href="/playground" className={styles.backNav}>
           <ArrowLeft size={16} />
           <span>Back to Playground</span>
@@ -149,7 +149,7 @@ export default async function PlaygroundItemPage({ params }: PlaygroundSlugPageP
             ))}
           </ul>
         </div>
-      </main>
+      </div>
     );
   }
 
@@ -157,7 +157,7 @@ export default async function PlaygroundItemPage({ params }: PlaygroundSlugPageP
   if (item.kind === 'generative-media') {
     const media = item as GenerativeMediaPlaygroundItem;
     return (
-      <main className={styles.container}>
+      <div className={styles.container}>
         <Link href="/playground" className={styles.backNav}>
           <ArrowLeft size={16} />
           <span>Back to Playground</span>
@@ -251,7 +251,7 @@ export default async function PlaygroundItemPage({ params }: PlaygroundSlugPageP
             </div>
           </div>
         </div>
-      </main>
+      </div>
     );
   }
 
@@ -259,7 +259,7 @@ export default async function PlaygroundItemPage({ params }: PlaygroundSlugPageP
   if (item.kind === 'saas') {
     const saas = item as SaasPlaygroundItem;
     return (
-      <main className={styles.container}>
+      <div className={styles.container}>
         <Link href="/playground" className={styles.backNav}>
           <ArrowLeft size={16} />
           <span>Back to Playground</span>
@@ -339,14 +339,14 @@ export default async function PlaygroundItemPage({ params }: PlaygroundSlugPageP
             )}
           </div>
         </div>
-      </main>
+      </div>
     );
   }
 
   // ─── ⚡ 5. EXPERIMENTS & WEB LABS ───
   const exp = item as ExperimentPlaygroundItem;
   return (
-    <main className={styles.container}>
+    <div className={styles.container}>
       <Link href="/playground" className={styles.backNav}>
         <ArrowLeft size={16} />
         <span>Back to Playground</span>
@@ -408,6 +408,6 @@ export default async function PlaygroundItemPage({ params }: PlaygroundSlugPageP
           )}
         </div>
       </div>
-    </main>
+    </div>
   );
 }

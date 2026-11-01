@@ -131,6 +131,18 @@ export default function CursorTrail() {
   const [isTouch] = useState(
     () => typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
   );
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
   const perfTierRef = useRef(performanceTier);
   useEffect(() => { perfTierRef.current = performanceTier; }, [performanceTier]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -390,7 +402,7 @@ export default function CursorTrail() {
   }, []);
 
   useEffect(() => {
-    if (isTouch) return;
+    if (isTouch || prefersReducedMotion) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -435,9 +447,9 @@ export default function CursorTrail() {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       cancelAnimationFrame(frameRef.current);
     };
-  }, [isTouch, wakeLoop]);
+  }, [isTouch, prefersReducedMotion, wakeLoop]);
 
-  if (isTouch || performanceTier === 'low') {
+  if (isTouch || prefersReducedMotion || performanceTier === 'low') {
     return null;
   }
 

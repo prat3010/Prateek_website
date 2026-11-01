@@ -81,9 +81,7 @@ export default async function ScopingPage({ searchParams }: ScopingPageProps) {
       />
       <div className={styles.container}>
         <ScopingHeader />
-        <main>
-          <IntakeForm resumeData={profile} initialPreset={preset} />
-        </main>
+        <IntakeForm resumeData={profile} initialPreset={preset} />
       </div>
     </div>
   );

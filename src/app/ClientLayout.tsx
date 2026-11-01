@@ -62,11 +62,13 @@ function ClientLayoutContent({
         {!isStandaloneAppRoute && <CursorTrail />}
         <Navbar />
         
-        {audience === null && isHomeRoute ? (
-          <OnboardingSelector />
-        ) : (
-          <main id="main-content">{children}</main>
-        )}
+        <main id="main-content">
+          {audience === null && isHomeRoute ? (
+            <OnboardingSelector />
+          ) : (
+            children
+          )}
+        </main>
 
         {!isStandaloneAppRoute && <Footer profile={profile} />}
         {!isStandaloneAppRoute && <FloatingUtilityBar />}

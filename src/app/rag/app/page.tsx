@@ -351,7 +351,7 @@ export default function RagAppStudioPage() {
         </aside>
 
         {/* Main Sub-View Content Panel Container */}
-        <main className={styles.panelContainer}>
+        <div className={styles.panelContainer}>
           <RagErrorBoundary>
             {/* Post-Purchase Celebratory Banner */}
             {isUpgradedCelebration && (
@@ -486,7 +486,7 @@ export default function RagAppStudioPage() {
               }}
             />
           </RagErrorBoundary>
-        </main>
+        </div>
       </div>
     </div>
   );
