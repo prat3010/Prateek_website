@@ -432,13 +432,13 @@
 }
 
 .terminalContainer.terminalFocusMode {
-  min-height: clamp(560px, 85vh, 1200px);
-  height: clamp(560px, 85vh, 1200px);
+  min-height: clamp(480px, 58vh, 580px);
+  height: clamp(480px, 58vh, 580px);
 }
 
 .terminalContainer.terminalFocusMode.terminalAiActive {
-  min-height: clamp(600px, 88vh, 1300px);
-  height: clamp(600px, 88vh, 1300px);
+  min-height: clamp(520px, 64vh, 640px);
+  height: clamp(520px, 64vh, 640px);
 }
 
 .terminalScreen {
@@ -977,8 +977,8 @@
   }
 
   .terminalContainer.terminalFocusMode {
-    min-height: clamp(480px, 85dvh, 1000px);
-    height: clamp(480px, 85dvh, 1000px);
+    min-height: clamp(380px, 58dvh, 480px);
+    height: clamp(380px, 58dvh, 480px);
     overflow: hidden;
   }
 

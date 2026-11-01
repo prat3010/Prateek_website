@@ -503,5 +503,55 @@ describe('SiteInfoConsole Component (Decomposed Architecture)', () => {
 
     expect(promptInput.value).toBe('telemetry status ');
   });
+
+  it('auto-scrolls terminal screen to bottom when a new command is executed', async () => {
+    const { container } = render(<SiteInfoConsole />);
+    const screenEl = container.querySelector('[role="log"]') as HTMLDivElement;
+    expect(screenEl).toBeDefined();
+
+    // Mock scrollHeight to simulate expanded command output
+    Object.defineProperty(screenEl, 'scrollHeight', {
+      configurable: true,
+      get: () => 1200,
+    });
+
+    const promptInput = screen.getByLabelText(/Terminal command prompt/i) as HTMLInputElement;
+    fireEvent.change(promptInput, { target: { value: 'help' } });
+    fireEvent.keyDown(promptInput, { key: 'Enter', code: 'Enter' });
+
+    await waitFor(() => {
+      expect(screenEl.scrollTop).toBe(1200);
+    });
+  });
+
+  it('resets scroll position to latest return when command is run even after user scrolled up', async () => {
+    const { container } = render(<SiteInfoConsole />);
+    const screenEl = container.querySelector('[role="log"]') as HTMLDivElement;
+    expect(screenEl).toBeDefined();
+
+    let currentScrollHeight = 800;
+    Object.defineProperty(screenEl, 'scrollHeight', {
+      configurable: true,
+      get: () => currentScrollHeight,
+    });
+    Object.defineProperty(screenEl, 'clientHeight', {
+      configurable: true,
+      get: () => 300,
+    });
+
+    // Simulate user scrolling up (scrollTop = 100, so distanceFromBottom = 800 - 100 - 300 = 400 > 60)
+    screenEl.scrollTop = 100;
+    fireEvent.scroll(screenEl);
+
+    // New command given
+    currentScrollHeight = 1500;
+    const promptInput = screen.getByLabelText(/Terminal command prompt/i) as HTMLInputElement;
+    fireEvent.change(promptInput, { target: { value: 'tests' } });
+    fireEvent.keyDown(promptInput, { key: 'Enter', code: 'Enter' });
+
+    await waitFor(() => {
+      expect(screenEl.scrollTop).toBe(1500);
+    });
+  });
 });
 

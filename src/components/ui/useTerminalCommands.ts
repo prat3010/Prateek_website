@@ -346,6 +346,7 @@ export interface UseTerminalCommandsOptions {
   setIsMatrixActive: React.Dispatch<React.SetStateAction<boolean>>;
   isTelemetryCollapsed?: boolean;
   toggleTelemetry?: (forceState?: boolean) => void;
+  onCommandExecuted?: () => void;
 }
 
 export function useTerminalCommands({
@@ -358,6 +359,7 @@ export function useTerminalCommands({
   setIsMatrixActive,
   isTelemetryCollapsed = false,
   toggleTelemetry,
+  onCommandExecuted,
 }: UseTerminalCommandsOptions) {
   const [terminalInput, setTerminalInput] = useState('');
   const [terminalHistory, setTerminalHistory] = useState<ConsoleLine[]>(
@@ -518,6 +520,7 @@ export function useTerminalCommands({
       if (!trimmedCmd) return;
 
       playKeySound();
+      onCommandExecuted?.();
       cmdCountRef.current += 1;
       if (cmdCountRef.current >= 5) {
         unlockAchievement('terminal_master', 'Terminal Master', 'Executed 5 terminal commands');
@@ -1605,7 +1608,7 @@ export function useTerminalCommands({
       setTerminalHistory((prev) => [...prev, ...response]);
       setTerminalInput('');
     },
-    [projects, profileData, isNoir, isMatrixActive, setIsMatrixActive, setActiveGame, unlockAchievement, interviewSession, scopeSession, aiChatSession, startAiChatStream, updateAiChatStream, completeAiChatStream, failAiChatStream, markAiChatRetry, isTelemetryCollapsed, toggleTelemetry]
+    [projects, profileData, isNoir, isMatrixActive, setIsMatrixActive, setActiveGame, unlockAchievement, interviewSession, scopeSession, aiChatSession, startAiChatStream, updateAiChatStream, completeAiChatStream, failAiChatStream, markAiChatRetry, isTelemetryCollapsed, toggleTelemetry, onCommandExecuted]
   );
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

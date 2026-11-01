@@ -72,6 +72,16 @@ export default function SiteInfoConsole() {
 
   const terminalScreenRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isAtBottomRef = useRef<boolean>(true);
+
+  // Monitor user scrolling to pause auto-scroll only if user explicitly scrolls up
+  const handleScroll = useCallback(() => {
+    const screen = terminalScreenRef.current;
+    if (!screen) return;
+    const distanceFromBottom = screen.scrollHeight - screen.scrollTop - screen.clientHeight;
+    // Considered pinned to bottom if within 60px of the bottom edge
+    isAtBottomRef.current = distanceFromBottom <= 60;
+  }, []);
 
   // Restore persisted Focus Mode / Collapsed preference safely after mount
   useEffect(() => {
@@ -112,6 +122,10 @@ export default function SiteInfoConsole() {
 
   const { stats, webVitals } = useSystemTelemetry(projects.length);
 
+  const handleCommandExecuted = useCallback(() => {
+    isAtBottomRef.current = true;
+  }, []);
+
   const {
     terminalInput,
     setTerminalInput,
@@ -130,15 +144,31 @@ export default function SiteInfoConsole() {
     setIsMatrixActive,
     isTelemetryCollapsed,
     toggleTelemetry,
+    onCommandExecuted: handleCommandExecuted,
   });
 
-  // Auto-scroll terminal screen to bottom (instant to prevent jank during fast streams)
+  const handleInputKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        isAtBottomRef.current = true;
+      }
+      handleKeyDown(e);
+    },
+    [handleKeyDown]
+  );
+
+  // Auto-scroll terminal screen to bottom whenever output updates and user is pinned to bottom
   useEffect(() => {
     const screen = terminalScreenRef.current;
     if (!screen) return;
-    const isNearBottom = screen.scrollHeight - screen.scrollTop - screen.clientHeight <= 140;
-    if (isNearBottom || terminalHistory.length <= 6) {
+    if (isAtBottomRef.current) {
       screen.scrollTop = screen.scrollHeight;
+      const frameId = requestAnimationFrame(() => {
+        if (screen && isAtBottomRef.current) {
+          screen.scrollTop = screen.scrollHeight;
+        }
+      });
+      return () => cancelAnimationFrame(frameId);
     }
   }, [terminalHistory]);
 
@@ -146,6 +176,7 @@ export default function SiteInfoConsole() {
   useEffect(() => {
     const screen = terminalScreenRef.current;
     if (!screen) return;
+    isAtBottomRef.current = true;
     screen.scrollTop = screen.scrollHeight;
     const timer = setTimeout(() => {
       if (screen) {
@@ -295,6 +326,7 @@ export default function SiteInfoConsole() {
                 <div
                   className={styles.terminalScreen}
                   ref={terminalScreenRef}
+                  onScroll={handleScroll}
                   data-lenis-prevent
                   role="log"
                   aria-live="polite"
@@ -362,7 +394,7 @@ export default function SiteInfoConsole() {
                     className={styles.terminalInput}
                     value={terminalInput}
                     onChange={(e) => setTerminalInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
+                    onKeyDown={handleInputKeyDown}
                     placeholder={
                       isAiChatActive
                         ? "Ask Prateek's AI Twin anything... (or 'exit')"
