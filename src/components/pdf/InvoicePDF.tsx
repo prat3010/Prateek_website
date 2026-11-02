@@ -13,10 +13,10 @@ interface InvoicePDFProps {
 
 export function InvoicePDF({ invoice, isNoir = false }: InvoicePDFProps) {
   const theme = getPdfTheme(isNoir);
-  const currency = invoice.currency || 'INR';
+  const currency = cleanPDFText(invoice.currency || 'INR');
 
   const formatPDFPrice = (amount: number, curr: string = currency) =>
-    cleanPDFText(formatCurrencyAmount(amount, curr));
+    cleanPDFText(formatCurrencyAmount(Number.isFinite(amount) ? amount : 0, curr));
 
   const hasSellerGstin = Boolean(SELLER_CONFIG.gstin?.trim());
   const isGst = Boolean(invoice.is_gst) && hasSellerGstin;
@@ -200,7 +200,7 @@ export function InvoicePDF({ invoice, isNoir = false }: InvoicePDFProps) {
           <View style={[styles.colHalf, styles.card]}>
             <Text style={styles.cardTitle}>Invoice Details</Text>
             <Text style={styles.metaLabel}>Invoice Number:</Text>
-            <Text style={styles.metaValue}>{invoice.invoice_number}</Text>
+            <Text style={styles.metaValue}>{cleanPDFText(invoice.invoice_number)}</Text>
 
             <Text style={styles.metaLabel}>Issue Date:</Text>
             <Text style={styles.metaValue}>
@@ -225,20 +225,19 @@ export function InvoicePDF({ invoice, isNoir = false }: InvoicePDFProps) {
             </Text>
 
             <View style={styles.badge}>
-              <Text>{(invoice.payment_status || 'PENDING').toUpperCase()}</Text>
+              <Text>{cleanPDFText((invoice.payment_status || 'PENDING').toUpperCase())}</Text>
             </View>
           </View>
 
           <View style={[styles.colHalf, styles.card]}>
             <Text style={styles.cardTitle}>Seller / Supplier</Text>
-            <Text style={styles.metaValue}>{SELLER_CONFIG.company}</Text>
-            <Text style={styles.metaValue}>{SELLER_CONFIG.name}</Text>
+            <Text style={styles.metaValue}>{cleanPDFText(SELLER_CONFIG.company)}</Text>
+            <Text style={styles.metaValue}>{cleanPDFText(SELLER_CONFIG.name)}</Text>
             <Text style={styles.metaValue}>
-              {SELLER_CONFIG.address.street}, {SELLER_CONFIG.address.city},{' '}
-              {SELLER_CONFIG.address.state} - {SELLER_CONFIG.address.pincode}
+              {cleanPDFText(`${SELLER_CONFIG.address.street}, ${SELLER_CONFIG.address.city}, ${SELLER_CONFIG.address.state} - ${SELLER_CONFIG.address.pincode}`)}
             </Text>
-            <Text style={styles.metaValue}>Email: {SELLER_CONFIG.email}</Text>
-            {isGst && <Text style={styles.metaValue}>GSTIN: {SELLER_CONFIG.gstin}</Text>}
+            <Text style={styles.metaValue}>Email: {cleanPDFText(SELLER_CONFIG.email)}</Text>
+            {isGst && <Text style={styles.metaValue}>GSTIN: {cleanPDFText(SELLER_CONFIG.gstin)}</Text>}
           </View>
         </View>
 
@@ -274,7 +273,7 @@ export function InvoicePDF({ invoice, isNoir = false }: InvoicePDFProps) {
                   ? 'IGST (Inter-State)'
                   : 'CGST + SGST (Intra-State)'
                 : SELLER_CONFIG.lutArn
-                  ? `Export under LUT (${SELLER_CONFIG.lutArn}) · Zero-Rated`
+                  ? `Export under LUT (${cleanPDFText(SELLER_CONFIG.lutArn)}) · Zero-Rated`
                   : 'Export of Services (Zero-Rated / Exempt)'}
             </Text>
           </View>
@@ -313,7 +312,7 @@ export function InvoicePDF({ invoice, isNoir = false }: InvoicePDFProps) {
               <Text style={styles.metaLabel}>Subtotal:</Text>
               <Text style={styles.metaValue}>
                 {formatPDFPrice(
-                  lineItems.reduce((acc, item) => acc + item.subtotal, 0) || invoice.amount
+                  lineItems.reduce((acc, item) => acc + (item.subtotal ?? ((item.rate || 0) * (item.quantity || 1))), 0) || invoice.amount
                 )}
               </Text>
             </View>

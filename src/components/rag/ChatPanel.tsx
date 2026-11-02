@@ -270,7 +270,7 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
 
   const handleCitationDownload = useCallback(
     async (docIdOrName: string) => {
-      if (!client) return;
+      if (!client || typeof document === 'undefined') return;
       try {
         const res = await client.getDownloadUrl(docIdOrName);
         if (res?.downloadUrl) {
@@ -278,6 +278,7 @@ export function ChatPanel({ client, hidden, isExpired }: { client: RetrieverClie
           a.href = res.downloadUrl;
           a.target = "_blank";
           a.rel = "noopener noreferrer";
+          a.download = docIdOrName.split('/').pop() || '';
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);

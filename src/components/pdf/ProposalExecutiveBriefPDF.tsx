@@ -256,7 +256,7 @@ export function ProposalExecutiveBriefPDF({
   );
 
   return (
-    <Document title={`${companyName} - Executive Pitch Brief`} author={resumeData?.name || 'Prateek Sharma'}>
+    <Document title={`${companyName} - Executive Pitch Brief`} author={cleanPDFText(resumeData?.name || 'Prateek Sharma')}>
       <Page size="A4" style={styles.page}>
         <PdfBrandHeader
           theme={theme}

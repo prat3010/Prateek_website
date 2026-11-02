@@ -111,6 +111,7 @@ function Resume({ resumeData, certificates }: ResumeProps) {
   };
 
   const handleDownloadPDF = async () => {
+    if (!resumeData) return;
     try {
       if (activeAudience === 'business') {
         await generateServicesAndPricingPDF(resumeData, isNoir);

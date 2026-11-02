@@ -11,6 +11,7 @@ import { ProposalExecutiveBriefPDF } from '@/components/pdf/ProposalExecutiveBri
 import { DeveloperResumePDF } from '@/components/pdf/DeveloperResumePDF';
 import { InvoicePDF } from '@/components/pdf/InvoicePDF';
 import type { InvoiceEntity } from '@/lib/clientOrder';
+import { cleanPDFText } from '@/components/pdf/pdfTheme';
 import { registerPdfFontsServer } from '@/components/pdf/pdfFontsServer';
 
 function pageCount(pdfBuffer: Buffer): number {
@@ -116,10 +117,12 @@ describe('commercial PDF render smoke tests', () => {
       created_at: new Date().toISOString(),
       is_gst: true,
       place_of_supply: 'Delhi',
+      customer_notes: 'Payment includes ₹18,000 GST deposit 🚀',
+      terms_and_conditions: 'Standard commercial contract terms • ₹ INR currency basis',
       line_items: [
         {
-          name: 'Next.js 16 Web Application',
-          description: 'Custom SaaS platform build',
+          name: 'Next.js 16 Web Application ⚡',
+          description: 'Custom SaaS platform build with ₹1,00,000 milestone value',
           sac_hsn: '998314',
           rate: 100000,
           quantity: 1,
@@ -145,4 +148,14 @@ describe('commercial PDF render smoke tests', () => {
     expect(pdf.subarray(0, 5).toString()).toBe('%PDF-');
     expect(pageCount(pdf)).toBeGreaterThanOrEqual(1);
   }, 60000);
+
+  it('cleanPDFText converts rupee symbol and strips emojis cleanly', () => {
+    expect(cleanPDFText('₹1,18,000')).toBe('INR 1,18,000');
+    expect(cleanPDFText('₹ 50,000')).toBe('INR 50,000');
+    expect(cleanPDFText('Deposit: ₹25,000 🚀')).toBe('Deposit: INR 25,000');
+    expect(cleanPDFText('Phase 1 ⚡ MVP Build')).toBe('Phase 1 MVP Build');
+    expect(cleanPDFText(null)).toBe('');
+    expect(cleanPDFText(undefined)).toBe('');
+    expect(cleanPDFText('   multiple   spaces   ')).toBe('multiple spaces');
+  });
 });
