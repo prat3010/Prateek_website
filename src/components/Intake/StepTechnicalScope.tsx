@@ -207,16 +207,18 @@ export function StepTechnicalScope({
                       <div className={styles.engineCardInner}>
                         <div className={styles.engineCardHeader}>
                           <div className={styles.engineCardTitleRow}>
-                            <span className={styles.engineCardTitle}>{`${e.title} (${e.tier})`}</span>
-                            <button
-                              type="button"
-                              onClick={(ev) => togglePopover(ev, e.id)}
-                              className={`${styles.infoBtn} ${isPopoverOpen ? styles.infoBtnActive : ''}`}
-                              title="Click to view Technical Engineering Specs"
-                              aria-label="View Technical Engineering Specs"
-                            >
-                              <Info size={12} />
-                            </button>
+                            <span className={styles.engineCardTitle}>
+                              {`${e.title} (${e.tier})`}
+                              <button
+                                type="button"
+                                onClick={(ev) => togglePopover(ev, e.id)}
+                                className={`${styles.infoBtn} ${isPopoverOpen ? styles.infoBtnActive : ''}`}
+                                title="Click to view Technical Engineering Specs"
+                                aria-label="View Technical Engineering Specs"
+                              >
+                                <Info size={11} />
+                              </button>
+                            </span>
                           </div>
                           <span className={styles.priceBadge}>
                             {formatPricePair(e.priceINR, e.priceUSD, currency)}
@@ -350,7 +352,9 @@ export function StepTechnicalScope({
         )}
 
         {FEATURE_CATEGORIES.map((cat) => {
-          const categoryFeatures = features.filter((f) => cat.featureIds.includes(f.id));
+          const categoryFeatures = cat.featureIds
+            .map((id) => features.find((f) => f.id === id))
+            .filter((f): f is FeatureItem => Boolean(f));
           if (categoryFeatures.length === 0) return null;
           return (
             <div key={cat.id} className={styles.featureCategoryBlock}>
@@ -407,7 +411,18 @@ export function StepTechnicalScope({
                       <div className={styles.engineCardInner}>
                         <div className={styles.engineCardHeader}>
                           <div className={styles.engineCardTitleRow}>
-                            <span className={styles.engineCardTitle}>{m.label}</span>
+                            <span className={styles.engineCardTitle}>
+                              {m.label}
+                              <button
+                                type="button"
+                                onClick={(ev) => togglePopover(ev, m.id)}
+                                className={`${styles.infoBtn} ${isPopoverOpen ? styles.infoBtnActive : ''}`}
+                                title="Click to view Technical Engineering Specs"
+                                aria-label="View Technical Engineering Specs"
+                              >
+                                <Info size={11} />
+                              </button>
+                            </span>
                             {isCompulsory ? (
                               <span
                                 className={styles.lockedBadge}
@@ -430,15 +445,6 @@ export function StepTechnicalScope({
                                 REQUIRED BY SELECTED MODULE
                               </span>
                             ) : null}
-                            <button
-                              type="button"
-                              onClick={(ev) => togglePopover(ev, m.id)}
-                              className={`${styles.infoBtn} ${isPopoverOpen ? styles.infoBtnActive : ''}`}
-                              title="Click to view Technical Engineering Specs"
-                              aria-label="View Technical Engineering Specs"
-                            >
-                              <Info size={12} />
-                            </button>
                           </div>
                           <span className={styles.priceBadge}>{`+${priceInCurrency(m.priceINR, m.priceUSD)}`}</span>
                         </div>
