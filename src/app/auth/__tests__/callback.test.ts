@@ -15,6 +15,7 @@ vi.mock('@/lib/supabase/server', () => ({
 
 vi.mock('@/lib/emailNotification', () => ({
   sendAdminSignupNotification: vi.fn(async () => ({})),
+  sendUserWelcomeNotification: vi.fn(async () => true),
 }));
 
 const mockStitchAnonymousSession = vi.fn().mockResolvedValue(undefined);

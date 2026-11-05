@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useLenis } from 'lenis/react';
 import { useReducedMotion } from 'framer-motion';
-import { Sun, Moon, Code2, Briefcase } from 'lucide-react';
+import { Sun, Moon, Code2, Briefcase, ShieldCheck, LogOut } from 'lucide-react';
 import { useTheme, type Audience } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import { isAdminEmail } from '@/lib/auth';
@@ -40,7 +40,7 @@ const getServerSnapshot = () => false;
 export default function Navbar({ items, className }: NavbarProps) {
   const pathname = usePathname();
   const { theme, toggleTheme, audience, setAudience } = useTheme();
-  const { user } = useAuth();
+  const { user, logout, loginWithGoogle } = useAuth();
   const mounted = useSyncExternalStore(emptySubscribe, getSnapshot, getServerSnapshot);
 
   const handleAudienceChange = useCallback((value: string) => {
@@ -61,8 +61,28 @@ export default function Navbar({ items, className }: NavbarProps) {
     { value: 'noir', label: 'NOIR', icon: <Moon size={14} strokeWidth={2.5} /> },
   ] as [SegmentedOption, SegmentedOption], []);
 
+  const isAudiencePage = useMemo(() => {
+    return pathname === '/' || !pathname || pathname.startsWith('/blog');
+  }, [pathname]);
+
   const navItems = useMemo(() => {
     if (items) return items;
+    if (pathname?.startsWith('/admin')) {
+      return [
+        { label: 'Public Analytics', href: '/analytics' },
+        { label: 'Client Portal', href: '/dashboard?preview=client' },
+        { label: 'Retriever SaaS', href: 'https://admin.rag.prateeq.in' },
+        { label: 'Terminal', href: '/terminal' },
+      ];
+    }
+    if (pathname?.startsWith('/dashboard')) {
+      return [
+        { label: 'Scoping Lab', href: '/scoping' },
+        { label: 'Retriever Studio', href: '/rag/app' },
+        { label: 'Terminal', href: '/terminal' },
+        { label: 'Contact', href: '/#contact' },
+      ];
+    }
     if (pathname?.startsWith('/rag')) {
       return [
         { label: 'Live Demo', href: '/rag#sandbox-demo' },
@@ -70,6 +90,41 @@ export default function Navbar({ items, className }: NavbarProps) {
         { label: 'Benchmarks', href: '/rag#benchmarks' },
         { label: 'Customizer', href: '/rag#widget-customizer' },
         { label: 'Pricing', href: '/rag#pricing' },
+      ];
+    }
+    if (pathname?.startsWith('/scoping')) {
+      return [
+        { label: 'Home', href: '/' },
+        { label: 'Playground', href: '/#playground' },
+        { label: 'Retriever AI', href: '/rag' },
+        { label: 'Terminal', href: '/terminal' },
+        { label: 'Client Portal', href: '/dashboard' },
+      ];
+    }
+    if (pathname?.startsWith('/terminal')) {
+      return [
+        { label: 'Home', href: '/' },
+        { label: 'Playground', href: '/#playground' },
+        { label: 'Scoping Lab', href: '/scoping' },
+        { label: 'Retriever AI', href: '/rag' },
+        { label: 'Contact', href: '/#contact' },
+      ];
+    }
+    if (pathname?.startsWith('/analytics')) {
+      return [
+        { label: 'Home', href: '/' },
+        { label: 'Terminal', href: '/terminal' },
+        { label: 'Scoping Lab', href: '/scoping' },
+        { label: 'Retriever AI', href: '/rag' },
+        { label: 'Contact', href: '/#contact' },
+      ];
+    }
+    if (pathname === '/login') {
+      return [
+        { label: 'Home', href: '/' },
+        { label: 'Scoping Lab', href: '/scoping' },
+        { label: 'Retriever AI', href: '/rag' },
+        { label: 'Contact', href: '/#contact' },
       ];
     }
     if (pathname?.startsWith('/playground')) {
@@ -410,10 +465,37 @@ export default function Navbar({ items, className }: NavbarProps) {
       {/* ---- Brand / Logo ---- */}
       <div className={styles.brandContainer}>
         <Link
-          href={pathname?.startsWith('/rag') ? "/rag" : "/#home"}
+          href={
+            pathname?.startsWith('/rag')
+              ? "/rag"
+              : (pathname?.startsWith('/admin')
+                  ? "/admin"
+                  : (pathname?.startsWith('/dashboard')
+                      ? "/dashboard"
+                      : "/#home"))
+          }
           className={styles.logo}
-          onClick={(e) => handleNavClick(e, pathname?.startsWith('/rag') ? '/rag' : '/#home')}
-          aria-label={pathname?.startsWith('/rag') ? "Retriever AI — go to RAG overview" : "Prateeq Sharma — go to home"}
+          onClick={(e) =>
+            handleNavClick(
+              e,
+              pathname?.startsWith('/rag')
+                ? '/rag'
+                : (pathname?.startsWith('/admin')
+                    ? '/admin'
+                    : (pathname?.startsWith('/dashboard')
+                        ? '/dashboard'
+                        : '/#home'))
+            )
+          }
+          aria-label={
+            pathname?.startsWith('/rag')
+              ? "Retriever AI — go to RAG overview"
+              : (pathname?.startsWith('/admin')
+                  ? "Admin Control Center"
+                  : (pathname?.startsWith('/dashboard')
+                      ? "Client Portal Dashboard"
+                      : "Prateeq Sharma — go to home"))
+          }
         >
           <svg
             className={styles.logoSvg}
@@ -459,29 +541,77 @@ export default function Navbar({ items, className }: NavbarProps) {
             </Link>
           </div>
         )}
+
+        {pathname?.startsWith('/admin') && (
+          <div className={styles.adminBrandInfo}>
+            <div className={styles.adminWordmarkRow}>
+              <Link
+                href="/admin"
+                className={styles.adminWordmark}
+                onClick={(e) => handleNavClick(e, '/admin')}
+              >
+                PRATEEQ <span className={styles.adminWordmarkBadge}>ADMIN</span>
+              </Link>
+            </div>
+            <Link
+              href="/"
+              className={styles.adminBackLink}
+              title="Return to main portfolio"
+              aria-label="Back to prateeq.in portfolio"
+            >
+              ← prateeq.in
+            </Link>
+          </div>
+        )}
+
+        {pathname?.startsWith('/dashboard') && (
+          <div className={styles.clientBrandInfo}>
+            <div className={styles.clientWordmarkRow}>
+              <Link
+                href="/dashboard"
+                className={styles.clientWordmark}
+                onClick={(e) => handleNavClick(e, '/dashboard')}
+              >
+                PRATEEQ <span className={styles.clientWordmarkBadge}>CLIENT</span>
+              </Link>
+            </div>
+            <Link
+              href="/"
+              className={styles.clientBackLink}
+              title="Return to main portfolio"
+              aria-label="Back to prateeq.in portfolio"
+            >
+              ← prateeq.in
+            </Link>
+          </div>
+        )}
       </div>
 
       {/* ---- Right Side Controls Group ---- */}
       <div className={styles.rightGroup}>
         {/* ---- Desktop links ---- */}
         <ul className={styles.navLinks}>
-          {navItems.map((item) => (
-            <li key={item.href}>
-              <Link
-                href={item.href}
-                className={`${styles.navLink} ${effectiveActiveSection === item.href ? styles.active : ''}`}
-                onClick={(e) => handleNavClick(e, item.href)}
-              >
-                {item.href === '/#resume' ? (
-                  <Scrambler texts={NAV_LABEL_TEXTS} variant="nav-label" as="span">
-                    {item.label}
-                  </Scrambler>
-                ) : (
-                  item.label
-                )}
-              </Link>
-            </li>
-          ))}
+          {navItems.map((item) => {
+            const isExternal = item.href.startsWith('http');
+            return (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className={`${styles.navLink} ${effectiveActiveSection === item.href ? styles.active : ''}`}
+                  onClick={(e) => handleNavClick(e, item.href)}
+                  {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                >
+                  {item.href === '/#resume' ? (
+                    <Scrambler texts={NAV_LABEL_TEXTS} variant="nav-label" as="span">
+                      {item.label}
+                    </Scrambler>
+                  ) : (
+                    item.label
+                  )}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
 
         {/* ---- RAG Context Action Button ---- */}
@@ -495,7 +625,7 @@ export default function Navbar({ items, className }: NavbarProps) {
         )}
 
         {/* ---- Communication Identity Toggle ---- */}
-        {audience && !pathname?.startsWith('/rag') && (
+        {audience && isAudiencePage && (
           <SegmentedToggle
             id="audience-toggle"
             options={audienceOptions}
@@ -517,7 +647,69 @@ export default function Navbar({ items, className }: NavbarProps) {
         />
 
         {/* ---- Client Dashboard / Master Admin / RAG Studio / Sign In Link ---- */}
-        {pathname?.startsWith('/rag') ? (
+        {pathname?.startsWith('/admin') ? (
+          mounted && user ? (
+            <div className={styles.adminAuthGroup}>
+              <div className={styles.adminBadge} title={`Logged in as ${user.email}`}>
+                <ShieldCheck size={14} />
+                <span className={styles.adminBadgeEmail}>{user.email}</span>
+              </div>
+              <button
+                onClick={logout}
+                className={`comic-btn comic-btn-outline ${styles.adminSignOutBtn}`}
+                aria-label="Sign Out"
+                title="Sign Out"
+              >
+                <LogOut size={14} />
+                <span>Sign Out</span>
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => loginWithGoogle('/admin')}
+              className={`comic-btn comic-btn-blue ${styles.headerLoginBtn}`}
+            >
+              Sign In
+            </button>
+          )
+        ) : pathname?.startsWith('/dashboard') ? (
+          mounted && user ? (
+            isAdminEmail(user.email) ? (
+              <Link
+                href="/admin"
+                className={`comic-btn comic-btn-outline ${styles.headerLoginBtn}`}
+                suppressHydrationWarning
+              >
+                🛡️ ADMIN
+              </Link>
+            ) : (
+              <div className={styles.adminAuthGroup}>
+                <div className={styles.adminBadge} title={`Client logged in as ${user.email}`}>
+                  <ShieldCheck size={14} />
+                  <span className={styles.adminBadgeEmail}>{user.email}</span>
+                </div>
+                <button
+                  onClick={logout}
+                  className={`comic-btn comic-btn-outline ${styles.adminSignOutBtn}`}
+                  aria-label="Sign Out"
+                  title="Sign Out"
+                >
+                  <LogOut size={14} />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            )
+          ) : (
+            <button
+              onClick={() => loginWithGoogle('/dashboard')}
+              className={`comic-btn comic-btn-blue ${styles.headerLoginBtn}`}
+            >
+              CLIENT LOGIN
+            </button>
+          )
+        ) : pathname === '/login' ? (
+          null
+        ) : pathname?.startsWith('/rag') ? (
           <Link
             href={mounted && user ? (isAdminEmail(user.email) ? '/admin' : '/rag/app') : '/login?context=rag'}
             className={`comic-btn comic-btn-outline ${styles.headerLoginBtn}`}
@@ -553,24 +745,28 @@ export default function Navbar({ items, className }: NavbarProps) {
         className={`${styles.mobileOverlay} ${mobileOpen ? styles.open : ''}`}
         aria-hidden={!mobileOpen}
       >
-        {navItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`${styles.mobileNavLink} ${effectiveActiveSection === item.href ? styles.active : ''}`}
-            onClick={(e) => handleNavClick(e, item.href)}
-          >
-            {item.href === '/#resume' ? (
-              <Scrambler texts={NAV_LABEL_TEXTS} variant="nav-label" as="span">
-                {item.label}
-              </Scrambler>
-            ) : (
-              item.label
-            )}
-          </Link>
-        ))}
+        {navItems.map((item) => {
+          const isExternal = item.href.startsWith('http');
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`${styles.mobileNavLink} ${effectiveActiveSection === item.href ? styles.active : ''}`}
+              onClick={(e) => handleNavClick(e, item.href)}
+              {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+            >
+              {item.href === '/#resume' ? (
+                <Scrambler texts={NAV_LABEL_TEXTS} variant="nav-label" as="span">
+                  {item.label}
+                </Scrambler>
+              ) : (
+                item.label
+              )}
+            </Link>
+          );
+        })}
 
-        {audience && !pathname?.startsWith('/rag') && (
+        {audience && isAudiencePage && (
           <div className={styles.mobileAudienceRow}>
             <span className={styles.mobileAudienceLabel}>Perspective:</span>
             <SegmentedToggle
@@ -595,7 +791,70 @@ export default function Navbar({ items, className }: NavbarProps) {
           </Link>
         )}
 
-        {pathname?.startsWith('/rag') ? (
+        {pathname?.startsWith('/admin') ? (
+          mounted && user ? (
+            <button
+              onClick={() => {
+                setMobileOpen(false);
+                logout();
+              }}
+              className="comic-btn comic-btn-outline"
+              style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem', marginTop: '0.5rem', width: '100%', maxWidth: '280px', textAlign: 'center', justifyContent: 'center', display: 'flex', alignItems: 'center', gap: '6px' }}
+            >
+              <LogOut size={14} />
+              Sign Out ({user.email?.split('@')[0]})
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                setMobileOpen(false);
+                loginWithGoogle('/admin');
+              }}
+              className="comic-btn comic-btn-blue"
+              style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem', marginTop: '0.5rem', width: '100%', maxWidth: '280px', textAlign: 'center', justifyContent: 'center' }}
+            >
+              Sign In
+            </button>
+          )
+        ) : pathname?.startsWith('/dashboard') ? (
+          mounted && user ? (
+            isAdminEmail(user.email) ? (
+              <Link
+                href="/admin"
+                className="comic-btn comic-btn-outline"
+                style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem', marginTop: '0.5rem', width: '100%', maxWidth: '280px', textAlign: 'center', justifyContent: 'center' }}
+                onClick={() => setMobileOpen(false)}
+              >
+                🛡️ ADMIN CONTROL
+              </Link>
+            ) : (
+              <button
+                onClick={() => {
+                  setMobileOpen(false);
+                  logout();
+                }}
+                className="comic-btn comic-btn-outline"
+                style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem', marginTop: '0.5rem', width: '100%', maxWidth: '280px', textAlign: 'center', justifyContent: 'center', display: 'flex', alignItems: 'center', gap: '6px' }}
+              >
+                <LogOut size={14} />
+                Sign Out ({user.email?.split('@')[0]})
+              </button>
+            )
+          ) : (
+            <button
+              onClick={() => {
+                setMobileOpen(false);
+                loginWithGoogle('/dashboard');
+              }}
+              className="comic-btn comic-btn-blue"
+              style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem', marginTop: '0.5rem', width: '100%', maxWidth: '280px', textAlign: 'center', justifyContent: 'center' }}
+            >
+              CLIENT LOGIN
+            </button>
+          )
+        ) : pathname === '/login' ? (
+          null
+        ) : pathname?.startsWith('/rag') ? (
           <Link
             href={mounted && user ? (isAdminEmail(user.email) ? '/admin' : '/rag/app') : '/login?context=rag'}
             className="comic-btn comic-btn-outline"
@@ -617,7 +876,7 @@ export default function Navbar({ items, className }: NavbarProps) {
           </Link>
         )}
 
-        {pathname?.startsWith('/rag') && (
+        {(pathname?.startsWith('/rag') || pathname?.startsWith('/admin') || pathname?.startsWith('/dashboard')) && (
           <Link
             href="/"
             className={styles.mobileBackLink}

@@ -120,6 +120,194 @@
   color: var(--neon-cyan);
 }
 
+/* ---- Admin Context Styling ---- */
+
+.adminBrandInfo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.adminWordmarkRow {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.adminWordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-headline);
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: var(--pop-black);
+  text-decoration: none;
+  line-height: 1;
+  white-space: nowrap;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.adminWordmark:hover {
+  color: var(--pop-blue);
+}
+
+:global([data-theme='noir']) .adminWordmark {
+  color: var(--color-text);
+}
+
+:global([data-theme='noir']) .adminWordmark:hover {
+  color: var(--neon-cyan);
+}
+
+.adminWordmarkBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-code, monospace);
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background-color: var(--badge-success-bg, #dcfce7);
+  color: var(--badge-success-text, #166534);
+  border: 1.5px solid var(--badge-success-border, #86efac);
+  box-shadow: 1px 1px 0 var(--pop-black);
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+}
+
+:global([data-theme='noir']) .adminWordmarkBadge {
+  background-color: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border-color: rgba(34, 197, 94, 0.4);
+  box-shadow: none;
+}
+
+.adminBackLink {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-code, monospace);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text-muted, #666);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  transition: color 0.2s ease, transform 0.2s ease;
+  line-height: 1;
+}
+
+.adminBackLink:hover {
+  color: var(--pop-blue);
+  text-decoration: underline;
+  transform: translateX(-2px);
+}
+
+:global([data-theme='noir']) .adminBackLink {
+  color: var(--color-text-muted, #8b949e);
+}
+
+:global([data-theme='noir']) .adminBackLink:hover {
+  color: var(--neon-cyan);
+}
+
+/* ---- Client Dashboard Context Styling ---- */
+
+.clientBrandInfo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.clientWordmarkRow {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.clientWordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-headline);
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: var(--pop-black);
+  text-decoration: none;
+  line-height: 1;
+  white-space: nowrap;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.clientWordmark:hover {
+  color: var(--pop-blue);
+}
+
+:global([data-theme='noir']) .clientWordmark {
+  color: var(--color-text);
+}
+
+:global([data-theme='noir']) .clientWordmark:hover {
+  color: var(--neon-cyan);
+}
+
+.clientWordmarkBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-code, monospace);
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background-color: var(--pop-blue, #2563eb);
+  color: var(--pop-white, #ffffff);
+  border: 1.5px solid var(--pop-black);
+  box-shadow: 1px 1px 0 var(--pop-black);
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+}
+
+:global([data-theme='noir']) .clientWordmarkBadge {
+  background-color: #1e1b4b;
+  color: #818cf8;
+  border-color: #818cf8;
+  box-shadow: none;
+}
+
+.clientBackLink {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-code, monospace);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text-muted, #666);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  transition: color 0.2s ease, transform 0.2s ease;
+  line-height: 1;
+}
+
+.clientBackLink:hover {
+  color: var(--pop-blue);
+  text-decoration: underline;
+  transform: translateX(-2px);
+}
+
+:global([data-theme='noir']) .clientBackLink {
+  color: var(--color-text-muted, #8b949e);
+}
+
+:global([data-theme='noir']) .clientBackLink:hover {
+  color: var(--neon-cyan);
+}
+
 .logo {
   position: relative;
   display: flex;
@@ -449,6 +637,51 @@
   white-space: nowrap;
 }
 
+.adminAuthGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.adminBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--badge-success-bg, rgba(34, 197, 94, 0.1));
+  border: 1px solid var(--badge-success-border, rgba(34, 197, 94, 0.3));
+  color: var(--badge-success-text, #166534);
+  padding: 3px 8px;
+  border-radius: 14px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+  font-family: var(--font-code, monospace);
+}
+
+:global([data-theme='noir']) .adminBadge {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.35);
+  color: #4ade80;
+}
+
+.adminBadgeEmail {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adminSignOutBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
 .mobileBackLink {
   font-family: var(--font-code, monospace);
   font-size: 0.82rem;
@@ -532,6 +765,21 @@
   .ragBackLink {
     font-size: 0.65rem;
   }
+  .adminWordmark {
+    font-size: 0.92rem;
+  }
+  .adminBackLink {
+    font-size: 0.65rem;
+  }
+  .clientWordmark {
+    font-size: 0.92rem;
+  }
+  .clientBackLink {
+    font-size: 0.65rem;
+  }
+  .adminBadgeEmail {
+    display: none;
+  }
   .logo {
     width: 38px;
     height: 38px;
@@ -581,6 +829,22 @@
     font-size: 0.62rem;
   }
 
+  .adminWordmark {
+    font-size: 0.88rem;
+  }
+
+  .adminBackLink {
+    font-size: 0.62rem;
+  }
+
+  .clientWordmark {
+    font-size: 0.88rem;
+  }
+
+  .clientBackLink {
+    font-size: 0.62rem;
+  }
+
   .logo {
     width: 40px;
     height: 40px;
@@ -625,6 +889,10 @@
   .ragLaunchBtn {
     display: none;
   }
+
+  .adminAuthGroup {
+    display: none;
+  }
 }
 
 @media (max-width: 420px) {
@@ -632,6 +900,18 @@
     font-size: 0.8rem;
   }
   .ragBackLink {
+    font-size: 0.58rem;
+  }
+  .adminWordmark {
+    font-size: 0.8rem;
+  }
+  .adminBackLink {
+    font-size: 0.58rem;
+  }
+  .clientWordmark {
+    font-size: 0.8rem;
+  }
+  .clientBackLink {
     font-size: 0.58rem;
   }
 }

@@ -1220,6 +1220,10 @@ timeline
 | **Change Orders** | `scope_change_orders` | `Prateek_website` | Post-deposit scope deltas & add-on milestones |
 | **Promos** | `promo_codes` | `Prateek_website` | Coupon discounts & Sales Partner middleman attribution |
 | **Billing** | `invoices` & `rag_subscriptions` | `Prateek_website` | Commercial milestone invoices & Razorpay SaaS subscriptions |
+| **Lifecycle** | `/api/cron/lifecycle-checks` | `Prateek_website` | Authenticated lifecycle health audit (expiring trials, overdue invoices) |
+| **Subscriptions** | `/api/client/cancel-razorpay-subscription` | `Prateek_website` | Self-service Care Plan & SaaS subscription cancellation |
+| **Leads & Contacts** | `contact_submissions` & `intake_leads` | `Prateek_website` | Inbound inquiry persistence ledger & auto-reply dispatch |
+| **Tenant Credentials** | `rag_tenant_credentials` | `Prateek_website` | Isolated tenant master API keys with owner-only RLS policies |
 | **RAG Chat** | `POST /v1/tenants/{id}/chat/sessions/{id}/messages` | `retriever` | Persistent copilot chat with grounded citations |
 | **RAG Docs** | `POST /v1/tenants/{id}/documents` | `retriever` | Knowledge document parsing, OCR & vector indexing |
 | **GraphRAG** | `POST /v1/admin/tenants/{id}/graph/query` | `retriever` | Entity-relationship graph traversal & upsell recommender |

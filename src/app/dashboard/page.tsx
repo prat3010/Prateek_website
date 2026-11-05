@@ -16,7 +16,9 @@ import {
   CreditCard,
   UserCheck,
   ArrowRight,
+  Settings,
 } from 'lucide-react';
+import { SectionErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { generateQuestionnairePDF, generateExecutiveBriefPDF } from '@/utils/pdfGenerator';
 import type { ClientScope, InvoiceEntity } from '@/lib/clientOrder';
 import { resolveMaintenancePlanKey } from '@/lib/clientOrder';
@@ -42,6 +44,14 @@ declare global {
   interface Window {
     Razorpay?: new (options: Record<string, unknown>) => { open: () => void };
   }
+}
+
+function getMockPaymentId(prefix: string): string {
+  return `${prefix}_${Date.now()}`;
+}
+
+function getMockPeriodEndIso(days = 30): string {
+  return new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
 }
 
 export default function ClientDashboardPage() {
@@ -120,9 +130,39 @@ export default function ClientDashboardPage() {
     }
   }, []);
 
-  const [activeTab, setActiveTab] = useState<'scopes' | 'onboarding' | 'invoices'>('scopes');
+  const [activeTab, setActiveTab] = useState<'scopes' | 'onboarding' | 'invoices' | 'settings'>('scopes');
   const [authGateError, setAuthGateError] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
+  const [cancellingScopeCode, setCancellingScopeCode] = useState<string | null>(null);
+
+  const handleCancelSubscription = async (scopeCode: string) => {
+    if (!confirm('Are you sure you want to cancel this recurring subscription?')) return;
+    setCancellingScopeCode(scopeCode);
+    try {
+      const token = await getAccessToken();
+      const res = await fetch('/api/client/cancel-razorpay-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ scopeCode }),
+      });
+      if (res.ok) {
+        toast.success('Subscription cancelled successfully.');
+        setScopes(prev =>
+          prev.map(s => (s.scope_code === scopeCode ? { ...s, maintenance_status: 'cancelled' } : s))
+        );
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error(err.error || 'Failed to cancel subscription.');
+      }
+    } catch {
+      toast.error('Network error cancelling subscription.');
+    } finally {
+      setCancellingScopeCode(null);
+    }
+  };
 
   // Modal States
   const [customizingScope, setCustomizingScope] = useState<ClientScope | null>(null);
@@ -419,7 +459,7 @@ export default function ClientDashboardPage() {
               body: JSON.stringify({
                 scopeCode: scope.scope_code,
                 razorpayOrderId: orderData.orderId,
-                razorpayPaymentId: `pay_mock_bal_${Date.now()}`,
+                razorpayPaymentId: getMockPaymentId('pay_mock_bal'),
                 razorpaySignature: 'mock_signature_dev_pass',
               }),
             });
@@ -568,7 +608,7 @@ export default function ClientDashboardPage() {
               body: JSON.stringify({
                 scopeCode: scope.scope_code,
                 razorpaySubscriptionId: subData.subscriptionId,
-                razorpayPaymentId: `pay_mock_care_${Date.now()}`,
+                razorpayPaymentId: getMockPaymentId('pay_mock_care'),
                 razorpaySignature: 'test_sub_signature_mock',
                 planId,
                 subscriptionType: 'care_plan',
@@ -576,7 +616,7 @@ export default function ClientDashboardPage() {
             });
 
             if (verifyRes.ok) {
-              const currentPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+              const currentPeriodEnd = getMockPeriodEndIso(30);
               setScopes((prev) =>
                 prev.map((s) =>
                   s.id === scope.id
@@ -1150,10 +1190,31 @@ export default function ClientDashboardPage() {
             <span>Invoices & Ledger ({invoices.length})</span>
           </span>
         </button>
+
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'settings'}
+          className={`${styles.tabBtn} ${activeTab === 'settings' ? styles.tabBtnActive : ''}`}
+          onClick={() => setActiveTab('settings')}
+        >
+          {activeTab === 'settings' && (
+            <motion.span
+              layoutId="activeDashboardTabPill"
+              className={styles.tabPill}
+              transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+            />
+          )}
+          <span className={styles.tabLabel}>
+            <Settings size={18} />
+            <span>Profile &amp; Subscriptions</span>
+          </span>
+        </button>
       </nav>
 
       {/* Active Tab View */}
-      {activeTab === 'scopes' && (
+      <SectionErrorBoundary sectionName="Dashboard Views">
+        {activeTab === 'scopes' && (
         <div className={styles.scopesList}>
           {scopes.length === 0 ? (
             <div className={styles.emptyState}>
@@ -1214,6 +1275,74 @@ export default function ClientDashboardPage() {
           onRefresh={loadInvoices}
         />
       )}
+
+      {activeTab === 'settings' && (
+        <div style={{ maxWidth: '640px', background: 'var(--surface-card)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '1.75rem', margin: '0 auto' }}>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.25rem', color: 'var(--color-text)' }}>
+            Profile &amp; Subscription Settings
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <div>
+              <label style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '6px' }}>
+                Account Email
+              </label>
+              <div style={{ padding: '10px 14px', background: 'var(--surface-elevated)', border: '1px solid var(--border-color)', borderRadius: '6px', color: 'var(--color-text)', fontSize: '0.9rem' }}>
+                {user?.email || 'N/A'}
+              </div>
+            </div>
+
+            <div>
+              <label style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '6px' }}>
+                Active Recurring Care Subscriptions
+              </label>
+              {scopes.filter(s => s.maintenance_status === 'active' || (s.maintenance_plan && s.maintenance_plan !== 'None')).length === 0 ? (
+                <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', background: 'var(--surface-elevated)', padding: '12px', borderRadius: '6px' }}>
+                  No active Care Plan subscriptions found for this account.
+                </div>
+              ) : (
+                scopes.filter(s => s.maintenance_status === 'active' || (s.maintenance_plan && s.maintenance_plan !== 'None')).map(s => (
+                  <div key={s.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 14px', background: 'var(--surface-elevated)', border: '1px solid var(--border-color)', borderRadius: '8px', marginTop: '6px' }}>
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: '0.92rem', color: 'var(--color-text)' }}>
+                        {s.maintenance_plan || 'Care Plan'} ({s.scope_code})
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                        Status: <span style={{ color: s.maintenance_status === 'cancelled' ? '#ef4444' : '#10b981', fontWeight: 600 }}>{s.maintenance_status || 'active'}</span>
+                      </div>
+                    </div>
+                    {s.maintenance_status !== 'cancelled' && (
+                      <button
+                        type="button"
+                        onClick={() => handleCancelSubscription(s.scope_code)}
+                        disabled={cancellingScopeCode === s.scope_code}
+                        style={{
+                          padding: '6px 14px',
+                          background: 'rgba(239, 68, 68, 0.1)',
+                          border: '1px solid rgba(239, 68, 68, 0.3)',
+                          borderRadius: '6px',
+                          color: '#ef4444',
+                          fontSize: '0.78rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {cancellingScopeCode === s.scope_code ? 'Cancelling...' : 'Cancel Subscription'}
+                      </button>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
+              <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', lineHeight: '1.5' }}>
+                Need to update billing addresses, request custom enterprise invoices, or transfer project ownership? Contact support directly via <a href="mailto:prateeqsharma@gmail.com" style={{ color: '#38bdf8' }}>prateeqsharma@gmail.com</a>.
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      </SectionErrorBoundary>
 
       {/* Modals */}
       <ScopeEditorModal

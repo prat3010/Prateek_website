@@ -206,7 +206,7 @@ export async function POST(req: Request) {
         .upsert(
           {
             email: sessionUser.email,
-            name: displayName,
+            full_name: displayName,
             company_name: workspaceName,
             notes: `[Retriever SaaS: ${planTier.toUpperCase()}]`,
             updated_at: nowIso,

@@ -9,7 +9,10 @@ import json
 import urllib.request
 
 API_BASE = sys.argv[1] if len(sys.argv) > 1 else os.getenv("API_BASE", "https://rag.prateeq.in")
-ADMIN_KEY = sys.argv[2] if len(sys.argv) > 2 else os.getenv("ADMIN_MASTER_KEY", "2f4a1713e6a2526f51e7e6b7825689509c9071e0b61fa59a5804ccfdbdafd266")
+ADMIN_KEY = sys.argv[2] if len(sys.argv) > 2 else os.getenv("ADMIN_MASTER_KEY", "")
+if not ADMIN_KEY:
+    print("Error: ADMIN_MASTER_KEY must be provided via argument or environment variable.")
+    sys.exit(1)
 
 HEADERS = {"X-Admin-Master-Key": ADMIN_KEY}
 

@@ -32,12 +32,14 @@ interface ClientLayoutProps {
 function ClientLayoutContent({ 
   children, 
   isStandaloneAppRoute,
+  isRagAppRoute,
   isHomeRoute,
   isKonamiActive,
   profile
 }: { 
   children: React.ReactNode; 
   isStandaloneAppRoute: boolean;
+  isRagAppRoute: boolean;
   isHomeRoute: boolean;
   isKonamiActive: boolean; 
   profile?: ResumeData | null;
@@ -60,7 +62,7 @@ function ClientLayoutContent({
         <Toaster position="bottom-right" theme={theme === 'noir' ? 'dark' : 'light'} richColors closeButton />
         {!isStandaloneAppRoute && <NoirSkyline />}
         {!isStandaloneAppRoute && <CursorTrail />}
-        <Navbar />
+        {!isRagAppRoute && <Navbar />}
         
         <main id="main-content">
           {audience === null && isHomeRoute ? (
@@ -87,7 +89,8 @@ export default function ClientLayout({
 }: ClientLayoutProps) {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith('/admin');
-  const isStandaloneAppRoute = isAdminRoute || pathname === '/rag/app';
+  const isRagAppRoute = pathname === '/rag/app' || Boolean(pathname?.startsWith('/rag/app'));
+  const isStandaloneAppRoute = isAdminRoute || isRagAppRoute;
   const isHomeRoute = !pathname || pathname === '/';
   const [isKonamiActive, setIsKonamiActive] = useState(false);
 
@@ -171,7 +174,7 @@ export default function ClientLayout({
     <AuthProvider>
       <ThemeProvider initialTheme={initialTheme} initialAudience={initialAudience} initialRegion={initialRegion}>
         <LazyMotion features={domAnimation}>
-          <ClientLayoutContent isStandaloneAppRoute={isStandaloneAppRoute} isHomeRoute={isHomeRoute} isKonamiActive={isKonamiActive} profile={profile}>
+          <ClientLayoutContent isStandaloneAppRoute={isStandaloneAppRoute} isRagAppRoute={isRagAppRoute} isHomeRoute={isHomeRoute} isKonamiActive={isKonamiActive} profile={profile}>
             {children}
           </ClientLayoutContent>
         </LazyMotion>

@@ -32,7 +32,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized: valid session required.' }, { status: 401 });
     }
 
-    const isDev = process.env.NODE_ENV === 'development' || !supabase;
+    const isDev = process.env.NODE_ENV === 'development';
     const isMockBypass =
       isDev &&
       (razorpayOrderId.startsWith('order_mock_') ||
@@ -59,7 +59,13 @@ export async function POST(req: Request) {
     }
 
     if (!supabase) {
-      return NextResponse.json({ success: true, message: 'Payment acknowledged (degraded mode).' });
+      if (isDev && isMockBypass) {
+        return NextResponse.json({ success: true, message: 'Payment acknowledged (local dev mocked mode).' });
+      }
+      return NextResponse.json(
+        { error: 'Database service unavailable. Payment verification could not be recorded.' },
+        { status: 503 }
+      );
     }
 
     const isDirectInvoiceSettlement = Boolean(invoiceId || invoiceNumber);

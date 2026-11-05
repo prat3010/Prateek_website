@@ -108,7 +108,21 @@ export async function GET(req: Request) {
         }
       }
 
-      return NextResponse.json({ scopes: scopesList });
+      let allInvoicesList: Array<Record<string, unknown>> = [];
+      if (wantsAll) {
+        try {
+          const { data: rawAllInv } = await supabase
+            .from('invoices')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(150);
+          allInvoicesList = rawAllInv || [];
+        } catch (invErr) {
+          console.warn('Admin allInvoices fetch warning:', invErr);
+        }
+      }
+
+      return NextResponse.json({ scopes: scopesList, allInvoices: allInvoicesList });
     } catch (dbErr) {
       console.warn('Get scopes DB connection warning (returning empty array fallback):', dbErr);
       return NextResponse.json({ scopes: [] });

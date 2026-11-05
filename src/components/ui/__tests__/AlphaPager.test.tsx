@@ -44,8 +44,19 @@ vi.mock('lenis/react', () => ({
   },
 }));
 
+let mockAudioMuted = false;
 vi.mock('@/lib/terminalAudio', () => ({
   playPagerChirp: vi.fn(),
+  playKeySound: vi.fn(),
+  toggleAudio: vi.fn(() => {
+    mockAudioMuted = !mockAudioMuted;
+    return !mockAudioMuted;
+  }),
+  isAudioMuted: vi.fn(() => mockAudioMuted),
+  setAudioMuted: vi.fn((m: boolean) => {
+    mockAudioMuted = m;
+  }),
+  triggerHaptic: vi.fn(),
 }));
 
 vi.mock('@/components/ui/useSystemTelemetry', () => ({
@@ -69,6 +80,7 @@ describe('AlphaPager Component', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     mockLenisScrollTo.mockClear();
+    mockAudioMuted = false;
 
     // Default desktop window mock
     Object.defineProperty(window, 'innerWidth', {
@@ -523,6 +535,142 @@ describe('AlphaPager Component', () => {
       fireEvent.click(nextBtn);
     });
     expect(screen.getByText(/CH 02\/08/i)).toBeDefined();
+  });
+
+  it('allows muting and unmuting the piezo buzzer via the LCD status bar button', () => {
+    render(<AlphaPager />);
+
+    const muteBtn = screen.getByRole('button', { name: /Mute pager audio/i });
+    expect(muteBtn).toBeDefined();
+    expect(muteBtn.textContent).toBe('((•))');
+
+    // Click to mute
+    act(() => {
+      fireEvent.click(muteBtn);
+    });
+
+    const unMuteBtn = screen.getByRole('button', { name: /Unmute pager audio/i });
+    expect(unMuteBtn.textContent).toBe('(X)');
+
+    // Click to unmute
+    act(() => {
+      fireEvent.click(unMuteBtn);
+    });
+
+    expect(screen.getByRole('button', { name: /Mute pager audio/i }).textContent).toBe('((•))');
+  });
+
+  it('engages alert mode when clicking the standby screen', () => {
+    render(<AlphaPager />);
+
+    const clearBtn = screen.getByRole('button', { name: /Silence alert/i });
+    // Switch to standby mode
+    act(() => {
+      fireEvent.click(clearBtn);
+    });
+
+    const standbyScreen = screen.getByRole('button', { name: /Scanner standby mode/i });
+    expect(standbyScreen).toBeDefined();
+
+    // Click standby screen to engage alert/radar mode
+    act(() => {
+      fireEvent.click(standbyScreen);
+    });
+
+    // Alert screen is now active
+    expect(screen.getByRole('button', { name: /Jump to/i })).toBeDefined();
+  });
+
+  it('turns off backlight automatically after auto-off timer fires', () => {
+    vi.useFakeTimers();
+    render(<AlphaPager />);
+
+    const lightBtn = screen.getByRole('button', { name: /Toggle LCD backlight/i });
+    expect(lightBtn.getAttribute('title')).toContain('Turn on LCD backlight');
+
+    // Turn on backlight
+    act(() => {
+      fireEvent.click(lightBtn);
+    });
+    expect(lightBtn.getAttribute('title')).toContain('Turn off LCD backlight');
+
+    // Fast-forward past 8-second auto-off timer
+    act(() => {
+      vi.advanceTimersByTime(8500);
+    });
+
+    // Automatically turned off
+    expect(screen.getByRole('button', { name: /Toggle LCD backlight/i }).getAttribute('title')).toContain('Turn on LCD backlight');
+    vi.useRealTimers();
+  });
+
+  it('supports keyboard shortcuts when expanded (Esc to dock, Arrows to cycle, L for light, M for mute)', () => {
+    render(<AlphaPager />);
+
+    const pagerDevice = screen.getByRole('region', { name: /Vintage Alphanumeric Pager & Section Radar/i });
+
+    // ArrowRight cycles to CH 02
+    act(() => {
+      fireEvent.keyDown(pagerDevice, { key: 'ArrowRight', code: 'ArrowRight' });
+    });
+    expect(screen.getByText(/CH 02\/08/i)).toBeDefined();
+
+    // ArrowLeft cycles back to CH 01
+    act(() => {
+      fireEvent.keyDown(pagerDevice, { key: 'ArrowLeft', code: 'ArrowLeft' });
+    });
+    expect(screen.getByText(/CH 01\/08/i)).toBeDefined();
+
+    // 'm' key toggles mute
+    act(() => {
+      fireEvent.keyDown(pagerDevice, { key: 'm', code: 'KeyM' });
+    });
+    expect(screen.getByRole('button', { name: /Unmute pager audio/i })).toBeDefined();
+
+    // 'Escape' key docks the pager
+    act(() => {
+      fireEvent.keyDown(pagerDevice, { key: 'Escape', code: 'Escape' });
+    });
+    expect(screen.getByRole('region', { name: /Vintage Pager Pocket Clip/i })).toBeDefined();
+  });
+
+  it('flashes PAGE INCOMING beacon when dynamic messages arrive from API', async () => {
+    vi.useFakeTimers();
+    // Provide non-empty messages
+    global.fetch = vi.fn().mockImplementation(() =>
+      Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            active: true,
+            messages: [
+              {
+                id: 'ch_custom',
+                sender: 'DISPATCH',
+                text: 'New dispatch incoming via satellite...',
+              },
+            ],
+          }),
+      })
+    );
+
+    render(<AlphaPager />);
+
+    // Resolve fetch promise microtasks
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10);
+    });
+
+    // Beacon shows PAGE INCOMING
+    expect(screen.getByText('PAGE INCOMING')).toBeDefined();
+
+    // Advance past beacon timeout
+    act(() => {
+      vi.advanceTimersByTime(3500);
+    });
+
+    expect(screen.getByText('RADAR LOCKED')).toBeDefined();
+    vi.useRealTimers();
   });
 });
 

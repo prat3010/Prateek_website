@@ -3,6 +3,7 @@ import { Resend } from 'resend';
 import { escapeHtml } from '@/utils/sanitize';
 import { supabase } from '@/data/supabase';
 import { checkRateLimit, rateLimitResponse } from '@/lib/rateLimit';
+import { sendContactConfirmationNotification } from '@/lib/emailNotification';
 
 export async function POST(request: Request) {
   try {
@@ -115,8 +116,71 @@ export async function POST(request: Request) {
       attachments = [{ content: resolvedAttachment.content, filename: resolvedAttachment.filename }];
     }
 
+    // Sanitize name for subject line to prevent CRLF injection or HTML tags in the subject
+    const cleanSubjectName = name.replace(/[\r\n]/g, '').replace(/<[^>]*>/g, '').trim();
+
+    // 1. Guaranteed Database Persistence BEFORE email dispatch (RSK-02)
+    let submissionId: string | null = null;
+    if (supabase) {
+      try {
+        const { data: subData, error: subErr } = await supabase
+          .from('contact_submissions')
+          .insert({
+            name,
+            email,
+            subject: cleanSubjectName || 'Portfolio Inquiry',
+            message,
+            has_intake: Boolean(body.intakeDetails),
+            intake_data: body.intakeDetails || null,
+            status: 'received',
+            created_at: new Date().toISOString(),
+          })
+          .select('id')
+          .maybeSingle();
+
+        if (subData?.id) {
+          submissionId = subData.id;
+        } else if (subErr) {
+          console.warn('contact_submissions insert notice:', subErr.message);
+        }
+      } catch (dbErr) {
+        console.warn('contact_submissions error:', dbErr);
+      }
+
+      // Persist structured intake brief to intake_leads if provided
+      if (body.intakeDetails) {
+        try {
+          const details = body.intakeDetails;
+          const { error: dbErr } = await supabase.from('intake_leads').insert({
+            company_name: name,
+            contact_email: email,
+            contact_phone: details.contactPhone || null,
+            project_goal: details.projectGoal || null,
+            target_audience: details.targetAudience || null,
+            base_engine_id: details.baseEngineId || 'landing',
+            base_engine_title: details.baseEngineTitle || 'Landing Page Engine',
+            selected_features: details.selectedFeatures || [],
+            brand_asset_option: details.brandAssetOption || null,
+            maintenance_plan: details.maintenancePlan || null,
+            total_cost_inr: details.totalCostINR || 0,
+            total_cost_usd: details.totalCostUSD || 0,
+            timeline: details.timeline || null,
+            inspiration_links: details.inspirationLinks || null,
+            additional_notes: details.additionalNotes || null,
+            status: 'new',
+            notes_internal: '',
+          });
+          if (dbErr) {
+            console.error('Supabase intake_leads insert error:', dbErr.message);
+          }
+        } catch (dbErr) {
+          console.error('Failed to persist intake lead to Supabase:', dbErr);
+        }
+      }
+    }
+
     if (!process.env.RESEND_API_KEY) {
-      console.error('RESEND_API_KEY is not set in environment variables.');
+      console.error('RESEND_API_KEY is not set in environment variables. Lead saved to database.');
       return NextResponse.json(
         { error: 'Email service is not configured.' },
         { status: 500 }
@@ -130,9 +194,6 @@ export async function POST(request: Request) {
     const escapedName = escapeHtml(name);
     const escapedEmail = escapeHtml(email);
     const escapedMessage = escapeHtml(message);
-
-    // Sanitize name for subject line to prevent CRLF injection or HTML tags in the subject
-    const cleanSubjectName = name.replace(/[\r\n]/g, '').replace(/<[^>]*>/g, '').trim();
 
     // Send the email via verified domain prateeq.in
     const { data, error } = await resend.emails.send({
@@ -243,39 +304,31 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error('Resend API Error:', error);
-      return NextResponse.json({ error: error.message }, { status: 400 });
+      if (supabase && submissionId) {
+        await supabase
+          .from('contact_submissions')
+          .update({ status: 'failed' })
+          .eq('id', submissionId);
+      }
+      return NextResponse.json(
+        { success: true, message: 'Your message has been safely logged. Email notification is experiencing a brief delay.', warning: error.message },
+        { status: 202 }
+      );
     }
 
-    // Persist structured intake brief to Supabase intake_leads table if provided
-    if (supabase && body.intakeDetails) {
-      try {
-        const details = body.intakeDetails;
-        const { error: dbErr } = await supabase.from('intake_leads').insert({
-          company_name: name,
-          contact_email: email,
-          contact_phone: details.contactPhone || null,
-          project_goal: details.projectGoal || null,
-          target_audience: details.targetAudience || null,
-          base_engine_id: details.baseEngineId || 'landing',
-          base_engine_title: details.baseEngineTitle || 'Landing Page Engine',
-          selected_features: details.selectedFeatures || [],
-          brand_asset_option: details.brandAssetOption || null,
-          maintenance_plan: details.maintenancePlan || null,
-          total_cost_inr: details.totalCostINR || 0,
-          total_cost_usd: details.totalCostUSD || 0,
-          timeline: details.timeline || null,
-          inspiration_links: details.inspirationLinks || null,
-          additional_notes: details.additionalNotes || null,
-          status: 'new',
-          notes_internal: ''
-        });
-        if (dbErr) {
-          console.error('Supabase intake_leads insert error:', dbErr.message);
-        }
-      } catch (dbErr) {
-        console.error('Failed to persist intake lead to Supabase:', dbErr);
-      }
+    if (supabase && submissionId) {
+      await supabase
+        .from('contact_submissions')
+        .update({ status: 'emailed' })
+        .eq('id', submissionId);
     }
+
+    // Send confirmation auto-reply to the visitor
+    sendContactConfirmationNotification({
+      email,
+      name,
+      subject: cleanSubjectName,
+    }).catch(err => console.warn('Contact auto-reply notice:', err));
 
     return NextResponse.json({ success: true, data }, { status: 200 });
   } catch (e: unknown) {

@@ -7,7 +7,14 @@ import Portal from '@/components/ui/Portal';
 import { useSystemTelemetry } from '@/components/ui/useSystemTelemetry';
 import { useTheme } from '@/context/ThemeContext';
 import { NAVBAR_SCROLL_OFFSET } from '@/lib/constants';
-import { playPagerChirp } from '@/lib/terminalAudio';
+import { 
+  playPagerChirp, 
+  playKeySound, 
+  toggleAudio, 
+  isAudioMuted, 
+  setAudioMuted, 
+  triggerHaptic 
+} from '@/lib/terminalAudio';
 import styles from './AlphaPager.module.css';
 
 export interface PagerMessage {
@@ -105,19 +112,54 @@ function getRetroTimeString(): string {
   return `${displayHours}:${mins} ${ampm}`;
 }
 
-function StandbyScreen({ isBiz }: { isBiz: boolean }) {
+const getStoredValue = (key: string): string | null => {
+  if (typeof window === 'undefined') return null;
+  try {
+    return window.localStorage ? window.localStorage.getItem(key) : null;
+  } catch {
+    return null;
+  }
+};
+
+const setStoredValue = (key: string, value: string): void => {
+  if (typeof window === 'undefined') return;
+  try {
+    if (window.localStorage) {
+      window.localStorage.setItem(key, value);
+    }
+  } catch {
+    // Ignore storage quota or access errors
+  }
+};
+
+function StandbyScreen({ isBiz, onWake }: { isBiz: boolean; onWake?: () => void }) {
   const { stats } = useSystemTelemetry();
   return (
-    <div className={styles.standbyScreen}>
+    <div
+      className={`${styles.standbyScreen} ${styles.clickableScreen}`}
+      onClick={onWake}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onWake?.();
+        }
+      }}
+      title="Engage radar scanner"
+      aria-label="Scanner standby mode. Click to lock onto current section."
+    >
       <div className={styles.lcdCategory}>
         <span className={styles.lcdCursor}>►</span>
         <span>[RADAR SCANNER: 900-960MHz]</span>
+        <span className={styles.navHint} title="Engage radar">⚡</span>
       </div>
       <p className={styles.lcdMessage}>
         {isBiz
           ? `“Tracking client milestones & ROI models across vault... (Uptime: ${stats.uptime})”`
           : `“Tracking viewport navigation across systems vault... (Uptime: ${stats.uptime} | ${stats.fps} FPS)”`}
       </p>
+      <span className={styles.standbyPrompt}>[TAP SCREEN TO ENGAGE]</span>
     </div>
   );
 }
@@ -137,7 +179,20 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
   const [isExpanded, setIsExpanded] = useState(() => {
     if (defaultExpanded !== undefined) return defaultExpanded;
     if (typeof window === 'undefined') return true;
+    const saved = getStoredValue('pager_expanded');
+    if (saved !== null) return saved === 'true';
     return !(window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches);
+  });
+
+  const [isMuted, setIsMuted] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    const stored = getStoredValue('pager_muted');
+    if (stored !== null) {
+      const muted = stored === 'true';
+      setAudioMuted(muted);
+      return muted;
+    }
+    return isAudioMuted();
   });
 
   const [messages, setMessages] = useState<PagerMessage[]>(DEFAULT_MESSAGES);
@@ -150,7 +205,19 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
   const activeSectionRef = useRef<string>('home');
   const lastChirpRef = useRef<number>(0);
   const flashTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const beaconTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const backlightTimerRef = useRef<NodeJS.Timeout | null>(null);
   const pagerRef = useRef<HTMLDivElement>(null);
+
+  const triggerBeaconAlert = useCallback((text: 'RADAR LOCKED' | 'PAGE INCOMING' = 'PAGE INCOMING', duration = 3000) => {
+    setBeaconText(text);
+    setRadarFlash(true);
+    if (beaconTimeoutRef.current) clearTimeout(beaconTimeoutRef.current);
+    beaconTimeoutRef.current = setTimeout(() => {
+      setBeaconText('RADAR LOCKED');
+      setRadarFlash(false);
+    }, duration);
+  }, []);
 
   // Dynamic numeric drag constraints to eliminate DOM bounding box measuring & layout thrashing on scroll
   const [dragBounds, setDragBounds] = useState<{ top: number; bottom: number; left: number; right: number }>(() => {
@@ -252,10 +319,14 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
             ...msg,
           }));
           setMessages(merged);
+          setMode('alert');
+          triggerBeaconAlert('PAGE INCOMING', 3000);
+          playPagerChirp();
+          triggerHaptic([30, 60, 30]);
         }
       })
       .catch(() => {});
-  }, []);
+  }, [triggerBeaconAlert]);
 
   // Update clock every minute
   useEffect(() => {
@@ -268,11 +339,17 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
   // Initial 2.5-second standby transition into active radar alert mode
   useEffect(() => {
     const timer = setTimeout(() => {
-      setMode((current) => (current === 'standby' ? 'alert' : current));
+      setMode((current) => {
+        if (current === 'standby') {
+          triggerBeaconAlert('RADAR LOCKED', 1200);
+          return 'alert';
+        }
+        return current;
+      });
       setTimeStr(getRetroTimeString());
     }, 2500);
     return () => clearTimeout(timer);
-  }, []);
+  }, [triggerBeaconAlert]);
 
   const prefersReducedMotion = useReducedMotion();
 
@@ -350,6 +427,7 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
         if (now - lastChirpRef.current > 1000) {
           lastChirpRef.current = now;
           playPagerChirp();
+          triggerHaptic([20, 40, 20]);
           setRadarFlash(true);
           if (flashTimeoutRef.current) clearTimeout(flashTimeoutRef.current);
           flashTimeoutRef.current = setTimeout(() => setRadarFlash(false), 900);
@@ -406,6 +484,14 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
     };
   }, [lenis, measureSections]);
 
+  // Clean up standing timer refs on component unmount
+  useEffect(() => {
+    return () => {
+      if (beaconTimeoutRef.current) clearTimeout(beaconTimeoutRef.current);
+      if (backlightTimerRef.current) clearTimeout(backlightTimerRef.current);
+    };
+  }, []);
+
   // Start drag gesture from anywhere on the pager casing, excluding interactive buttons and LCD link
   const handlePointerDown = (e: React.PointerEvent) => {
     if (isMobile) return;
@@ -433,6 +519,27 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
     window.getSelection()?.removeAllRanges();
   };
 
+  const handleWakeStandby = useCallback(() => {
+    playKeySound();
+    triggerHaptic(15);
+    setMode('alert');
+    triggerBeaconAlert('RADAR LOCKED', 1200);
+  }, [triggerBeaconAlert]);
+
+  const handleToggleMute = useCallback((e?: React.MouseEvent | React.KeyboardEvent) => {
+    e?.stopPropagation();
+    const nextUnmuted = toggleAudio();
+    const muted = !nextUnmuted;
+    setIsMuted(muted);
+    triggerHaptic(10);
+    setStoredValue('pager_muted', String(muted));
+    if (!muted) {
+      playPagerChirp();
+    } else {
+      playKeySound();
+    }
+  }, []);
+
   // Rotary mouse-wheel channel scrolling
   const handleWheel = (e: React.WheelEvent) => {
     e.stopPropagation();
@@ -440,12 +547,14 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
     if (now - lastChirpRef.current < 200) return;
 
     if (e.deltaY > 15) {
-      playPagerChirp();
+      playKeySound();
+      triggerHaptic(10);
       if (mode === 'standby') setMode('alert');
       setActiveMsgIndex((prev) => (prev < messages.length - 1 ? prev + 1 : 0));
       lastChirpRef.current = now;
     } else if (e.deltaY < -15) {
-      playPagerChirp();
+      playKeySound();
+      triggerHaptic(10);
       if (mode === 'standby') setMode('alert');
       setActiveMsgIndex((prev) => (prev > 0 ? prev - 1 : messages.length - 1));
       lastChirpRef.current = now;
@@ -454,21 +563,24 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
 
   const handlePrev = (e: React.MouseEvent) => {
     e.stopPropagation();
-    playPagerChirp();
+    playKeySound();
+    triggerHaptic(10);
     if (mode === 'standby') setMode('alert');
     setActiveMsgIndex((prev) => (prev > 0 ? prev - 1 : messages.length - 1));
   };
 
   const handleNext = (e: React.MouseEvent) => {
     e.stopPropagation();
-    playPagerChirp();
+    playKeySound();
+    triggerHaptic(10);
     if (mode === 'standby') setMode('alert');
     setActiveMsgIndex((prev) => (prev < messages.length - 1 ? prev + 1 : 0));
   };
 
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
-    playPagerChirp();
+    playKeySound();
+    triggerHaptic(10);
     // CLR silences alerts and returns to passive standby monitoring; if already in standby on mobile, docks the device
     if (mode === 'standby' && isMobile) {
       setIsExpanded(false);
@@ -479,13 +591,52 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
 
   const handleToggleLight = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setBacklightActive((prev) => !prev);
+    playKeySound();
+    triggerHaptic(10);
+    if (backlightTimerRef.current) {
+      clearTimeout(backlightTimerRef.current);
+      backlightTimerRef.current = null;
+    }
+    setBacklightActive((prev) => {
+      const next = !prev;
+      if (next) {
+        backlightTimerRef.current = setTimeout(() => {
+          setBacklightActive(false);
+          backlightTimerRef.current = null;
+        }, 8000);
+      }
+      return next;
+    });
   };
 
   const handleToggleDock = (e?: React.MouseEvent | React.KeyboardEvent) => {
     e?.stopPropagation();
-    playPagerChirp();
-    setIsExpanded((prev) => !prev);
+    playKeySound();
+    triggerHaptic(15);
+    setIsExpanded((prev) => {
+      const next = !prev;
+      setStoredValue('pager_expanded', String(next));
+      return next;
+    });
+  };
+
+  const handleDeviceKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      handleToggleDock(e);
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      handlePrev(e as unknown as React.MouseEvent);
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      handleNext(e as unknown as React.MouseEvent);
+    } else if (e.key === 'l' || e.key === 'L') {
+      e.preventDefault();
+      handleToggleLight(e as unknown as React.MouseEvent);
+    } else if (e.key === 'm' || e.key === 'M') {
+      e.preventDefault();
+      handleToggleMute(e);
+    }
   };
 
   const dragControls = useDragControls();
@@ -543,6 +694,7 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
               transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
               role="region"
               aria-label="Vintage Pager Pocket Clip"
+              title={`PRATEEQ ALPHAPAGE-90: Tuned to CH 0${activeMsgIndex + 1} (${mode === 'alert' ? (currentMsg.freq || '900.1M') : '900M'}) — ${activeSender}. Click to expand.`}
             >
               <div className={styles.compactContent}>
                 {mode === 'alert' ? (
@@ -582,6 +734,8 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
               key="pager-device"
               className={styles.pagerDevice}
               data-lenis-prevent
+              tabIndex={0}
+              onKeyDown={handleDeviceKeyDown}
               drag={!isMobile}
               dragListener={false}
               dragControls={dragControls}
@@ -692,7 +846,15 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
                       <span className={styles.lcdMsgCount}>
                         CH 0{activeMsgIndex + 1}/0{queueLength}
                       </span>
-                      <span className={styles.lcdBuzzer}>((•))</span>
+                      <button
+                        type="button"
+                        className={`${styles.lcdBuzzerBtn} ${isMuted ? styles.lcdBuzzerBtnMuted : ''}`}
+                        onClick={handleToggleMute}
+                        title={isMuted ? "Unmute piezo buzzer (Click or press M)" : "Mute piezo buzzer (Click or press M)"}
+                        aria-label={isMuted ? "Unmute pager audio" : "Mute pager audio"}
+                      >
+                        {isMuted ? '(X)' : '((•))'}
+                      </button>
                       <span className={styles.lcdClock}>{timeStr}</span>
                     </div>
 
@@ -702,7 +864,7 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
                     {/* LCD Message Area */}
                     <div className={styles.lcdContent}>
                       {mode === 'standby' ? (
-                        <StandbyScreen isBiz={isBiz} />
+                        <StandbyScreen isBiz={isBiz} onWake={handleWakeStandby} />
                       ) : (
                         <div
                           className={`${styles.alertScreen} ${styles.clickableScreen}`}
@@ -768,7 +930,11 @@ export default function AlphaPager({ defaultExpanded }: AlphaPagerProps = {}) {
                 </div>
 
                 {/* Piezo Buzzer Slits */}
-                <div className={styles.speakerGrille} aria-hidden="true" title="Piezo Buzzer">
+                <div
+                  className={styles.speakerGrille}
+                  aria-hidden="true"
+                  title={isMuted ? "Piezo Buzzer (MUTED - Click ((•)) to unmute)" : "Piezo Buzzer (ACTIVE)"}
+                >
                   <span className={styles.speakerSlit} />
                   <span className={styles.speakerSlit} />
                   <span className={styles.speakerSlit} />

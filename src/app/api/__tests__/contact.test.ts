@@ -4,6 +4,9 @@ vi.mock('server-only', () => ({}));
 vi.mock('@/data/supabase', () => ({
   supabase: null,
 }));
+vi.mock('@/lib/emailNotification', () => ({
+  sendContactConfirmationNotification: vi.fn(async () => true),
+}));
 
 let lastSendPayload: Record<string, unknown> | null = null;
 

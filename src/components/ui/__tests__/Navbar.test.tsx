@@ -565,4 +565,309 @@ describe('Navbar Component Navigation', () => {
       expect(container.querySelector('[class*="menuOpen"]')).toBeNull();
     });
   });
+
+  describe('Navbar on /admin', () => {
+    const mockLogout = vi.fn();
+    const mockLoginWithGoogle = vi.fn();
+
+    beforeEach(() => {
+      mockPathname = '/admin';
+      mockLogout.mockClear();
+      mockLoginWithGoogle.mockClear();
+
+      vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
+        user: { id: 'admin-1', email: '3010prateeksharma@gmail.com' } as unknown as NonNullable<ReturnType<typeof AuthContext.useAuth>['user']>,
+        session: null,
+        loading: false,
+        loginWithGoogle: mockLoginWithGoogle,
+        loginWithMagicLink: vi.fn(),
+        logout: mockLogout,
+        getAccessToken: vi.fn(),
+      });
+    });
+
+    it('renders admin nav items pointing to companion operational workspaces', () => {
+      render(<Navbar />);
+
+      const analyticsLink = screen.getAllByRole('link', { name: /public analytics/i })[0];
+      expect(analyticsLink.getAttribute('href')).toBe('/analytics');
+
+      const portalLink = screen.getAllByRole('link', { name: /client portal/i })[0];
+      expect(portalLink.getAttribute('href')).toBe('/dashboard?preview=client');
+
+      const ragSaaSLink = screen.getAllByRole('link', { name: /retriever saas/i })[0];
+      expect(ragSaaSLink.getAttribute('href')).toBe('https://admin.rag.prateeq.in');
+      expect(ragSaaSLink.getAttribute('target')).toBe('_blank');
+
+      const terminalLink = screen.getAllByRole('link', { name: /terminal/i })[0];
+      expect(terminalLink.getAttribute('href')).toBe('/terminal');
+    });
+
+    it('does NOT render public portfolio section links on /admin', () => {
+      render(<Navbar />);
+
+      expect(screen.queryByRole('link', { name: /^home$/i })).toBeNull();
+      expect(screen.queryByRole('link', { name: /^about$/i })).toBeNull();
+      expect(screen.queryByRole('link', { name: /^capabilities$/i })).toBeNull();
+      expect(screen.queryByRole('link', { name: /^deployments$/i })).toBeNull();
+      expect(screen.queryByRole('link', { name: /^contact$/i })).toBeNull();
+    });
+
+    it('suppresses the DEV / BIZ Perspective toggle on /admin', () => {
+      render(<Navbar />);
+
+      expect(screen.queryByLabelText(/switch to business perspective/i)).toBeNull();
+      expect(screen.queryByLabelText(/switch to developer perspective/i)).toBeNull();
+      expect(screen.queryByText('DEV')).toBeNull();
+      expect(screen.queryByText('BIZ')).toBeNull();
+    });
+
+    it('renders PRATEEQ ADMIN wordmark, badge, and back link to portfolio home', () => {
+      render(<Navbar />);
+
+      const logoLink = screen.getByLabelText(/admin control center/i);
+      expect(logoLink.getAttribute('href')).toBe('/admin');
+
+      const wordmarkLink = screen.getByRole('link', { name: /^prateeq\s*admin$/i });
+      expect(wordmarkLink.getAttribute('href')).toBe('/admin');
+      expect(screen.getByText('PRATEEQ')).toBeDefined();
+      expect(screen.getByText('ADMIN')).toBeDefined();
+
+      const backLink = screen.getAllByRole('link', { name: /back to prateeq\.in/i })[0];
+      expect(backLink.getAttribute('href')).toBe('/');
+    });
+
+    it('renders admin verified identity badge and sign out button for authenticated admin', () => {
+      render(<Navbar />);
+
+      expect(screen.getByText('3010prateeksharma@gmail.com')).toBeDefined();
+
+      const signOutBtn = screen.getAllByRole('button', { name: /sign out/i })[0];
+      expect(signOutBtn).toBeDefined();
+
+      fireEvent.click(signOutBtn);
+      expect(mockLogout).toHaveBeenCalledTimes(1);
+    });
+
+    it('renders Sign In button when unauthenticated on /admin', () => {
+      vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
+        user: null,
+        session: null,
+        loading: false,
+        loginWithGoogle: mockLoginWithGoogle,
+        loginWithMagicLink: vi.fn(),
+        logout: mockLogout,
+        getAccessToken: vi.fn(),
+      });
+
+      render(<Navbar />);
+
+      const signInBtn = screen.getAllByRole('button', { name: /sign in/i })[0];
+      expect(signInBtn).toBeDefined();
+
+      fireEvent.click(signInBtn);
+      expect(mockLoginWithGoogle).toHaveBeenCalledWith('/admin');
+    });
+
+    it('renders mobile back link and admin drawer items', () => {
+      const { container } = render(<Navbar />);
+
+      const hamburger = screen.getByLabelText(/open menu/i);
+      fireEvent.click(hamburger);
+
+      const mobileBackLink = screen.getByRole('link', { name: /← back to prateeq\.in/i });
+      expect(mobileBackLink).toBeDefined();
+      expect(mobileBackLink.getAttribute('href')).toBe('/');
+
+      const mobileSignOut = screen.getByRole('button', { name: /sign out \(3010prateeksharma\)/i });
+      expect(mobileSignOut).toBeDefined();
+
+      fireEvent.click(mobileSignOut);
+      expect(mockLogout).toHaveBeenCalledTimes(1);
+      expect(container.querySelector('[class*="menuOpen"]')).toBeNull();
+    });
+  });
+
+  describe('Navbar on /dashboard', () => {
+    const mockLogout = vi.fn();
+    const mockLoginWithGoogle = vi.fn();
+
+    beforeEach(() => {
+      mockPathname = '/dashboard';
+      mockLogout.mockClear();
+      mockLoginWithGoogle.mockClear();
+
+      vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
+        user: { id: 'client-1', email: 'acme@client.com' } as unknown as NonNullable<ReturnType<typeof AuthContext.useAuth>['user']>,
+        session: null,
+        loading: false,
+        loginWithGoogle: mockLoginWithGoogle,
+        loginWithMagicLink: vi.fn(),
+        logout: mockLogout,
+        getAccessToken: vi.fn(),
+      });
+    });
+
+    it('renders client ecosystem nav items', () => {
+      render(<Navbar />);
+
+      const scopingLink = screen.getAllByRole('link', { name: /scoping lab/i })[0];
+      expect(scopingLink.getAttribute('href')).toBe('/scoping');
+
+      const studioLink = screen.getAllByRole('link', { name: /retriever studio/i })[0];
+      expect(studioLink.getAttribute('href')).toBe('/rag/app');
+
+      const terminalLink = screen.getAllByRole('link', { name: /terminal/i })[0];
+      expect(terminalLink.getAttribute('href')).toBe('/terminal');
+
+      const contactLink = screen.getAllByRole('link', { name: /contact/i })[0];
+      expect(contactLink.getAttribute('href')).toBe('/#contact');
+    });
+
+    it('suppresses the DEV / BIZ Perspective toggle on /dashboard', () => {
+      render(<Navbar />);
+
+      expect(screen.queryByLabelText(/switch to business perspective/i)).toBeNull();
+      expect(screen.queryByLabelText(/switch to developer perspective/i)).toBeNull();
+      expect(screen.queryByText('DEV')).toBeNull();
+      expect(screen.queryByText('BIZ')).toBeNull();
+    });
+
+    it('renders PRATEEQ CLIENT wordmark, badge, and back link to portfolio home', () => {
+      render(<Navbar />);
+
+      const logoLink = screen.getByLabelText(/client portal dashboard/i);
+      expect(logoLink.getAttribute('href')).toBe('/dashboard');
+
+      const wordmarkLink = screen.getByRole('link', { name: /^prateeq\s*client$/i });
+      expect(wordmarkLink.getAttribute('href')).toBe('/dashboard');
+      expect(screen.getByText('PRATEEQ')).toBeDefined();
+      expect(screen.getByText('CLIENT')).toBeDefined();
+
+      const backLink = screen.getAllByRole('link', { name: /back to prateeq\.in/i })[0];
+      expect(backLink.getAttribute('href')).toBe('/');
+    });
+
+    it('renders client verified identity badge and sign out button for authenticated client', () => {
+      render(<Navbar />);
+
+      expect(screen.getByText('acme@client.com')).toBeDefined();
+
+      const signOutBtn = screen.getAllByRole('button', { name: /sign out/i })[0];
+      expect(signOutBtn).toBeDefined();
+
+      fireEvent.click(signOutBtn);
+      expect(mockLogout).toHaveBeenCalledTimes(1);
+    });
+
+    it('renders 🛡️ ADMIN button when admin views /dashboard', () => {
+      vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
+        user: { id: 'admin-1', email: '3010prateeksharma@gmail.com' } as unknown as NonNullable<ReturnType<typeof AuthContext.useAuth>['user']>,
+        session: null,
+        loading: false,
+        loginWithGoogle: mockLoginWithGoogle,
+        loginWithMagicLink: vi.fn(),
+        logout: mockLogout,
+        getAccessToken: vi.fn(),
+      });
+
+      render(<Navbar />);
+
+      const adminBtn = screen.getAllByRole('link', { name: /🛡️ admin/i })[0];
+      expect(adminBtn.getAttribute('href')).toBe('/admin');
+    });
+
+    it('renders CLIENT LOGIN button when unauthenticated on /dashboard', () => {
+      vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
+        user: null,
+        session: null,
+        loading: false,
+        loginWithGoogle: mockLoginWithGoogle,
+        loginWithMagicLink: vi.fn(),
+        logout: mockLogout,
+        getAccessToken: vi.fn(),
+      });
+
+      render(<Navbar />);
+
+      const loginBtn = screen.getAllByRole('button', { name: /client login/i })[0];
+      expect(loginBtn).toBeDefined();
+
+      fireEvent.click(loginBtn);
+      expect(mockLoginWithGoogle).toHaveBeenCalledWith('/dashboard');
+    });
+
+    it('renders mobile back link and client drawer items', () => {
+      const { container } = render(<Navbar />);
+
+      const hamburger = screen.getByLabelText(/open menu/i);
+      fireEvent.click(hamburger);
+
+      const mobileBackLink = screen.getByRole('link', { name: /← back to prateeq\.in/i });
+      expect(mobileBackLink).toBeDefined();
+      expect(mobileBackLink.getAttribute('href')).toBe('/');
+
+      const mobileSignOut = screen.getByRole('button', { name: /sign out \(acme\)/i });
+      expect(mobileSignOut).toBeDefined();
+
+      fireEvent.click(mobileSignOut);
+      expect(mockLogout).toHaveBeenCalledTimes(1);
+      expect(container.querySelector('[class*="menuOpen"]')).toBeNull();
+    });
+  });
+
+  describe('Navbar on Utility Routes (/scoping, /terminal, /analytics, /login, /playground)', () => {
+    it('suppresses DEV / BIZ toggle on /scoping, /terminal, /analytics, /login, and /playground', () => {
+      const routes = ['/scoping', '/terminal', '/analytics', '/login', '/playground'];
+
+      routes.forEach((route) => {
+        mockPathname = route;
+        const { unmount } = render(<Navbar />);
+
+        expect(screen.queryByLabelText(/switch to business perspective/i)).toBeNull();
+        expect(screen.queryByLabelText(/switch to developer perspective/i)).toBeNull();
+        expect(screen.queryByText('DEV')).toBeNull();
+        expect(screen.queryByText('BIZ')).toBeNull();
+
+        unmount();
+      });
+    });
+
+    it('renders DEV / BIZ toggle on / and /blog', () => {
+      ['/', '/blog', '/blog/sample-post'].forEach((route) => {
+        mockPathname = route;
+        const { unmount } = render(<Navbar />);
+
+        expect(screen.getAllByText('DEV').length).toBeGreaterThan(0);
+        expect(screen.getAllByText('BIZ').length).toBeGreaterThan(0);
+
+        unmount();
+      });
+    });
+
+    it('renders tailored ecosystem navigation on /scoping', () => {
+      mockPathname = '/scoping';
+      render(<Navbar />);
+
+      expect(screen.getAllByRole('link', { name: /playground/i })[0].getAttribute('href')).toBe('/#playground');
+      expect(screen.getAllByRole('link', { name: /retriever ai/i })[0].getAttribute('href')).toBe('/rag');
+      expect(screen.getAllByRole('link', { name: /client portal/i })[0].getAttribute('href')).toBe('/dashboard');
+    });
+
+    it('renders tailored ecosystem navigation on /terminal', () => {
+      mockPathname = '/terminal';
+      render(<Navbar />);
+
+      expect(screen.getAllByRole('link', { name: /scoping lab/i })[0].getAttribute('href')).toBe('/scoping');
+      expect(screen.getAllByRole('link', { name: /retriever ai/i })[0].getAttribute('href')).toBe('/rag');
+    });
+
+    it('suppresses redundant CLIENT LOGIN CTA button on /login', () => {
+      mockPathname = '/login';
+      render(<Navbar />);
+
+      expect(screen.queryByRole('link', { name: /client login/i })).toBeNull();
+      expect(screen.queryByRole('button', { name: /client login/i })).toBeNull();
+    });
+  });
 });

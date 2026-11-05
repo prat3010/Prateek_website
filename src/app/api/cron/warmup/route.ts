@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { timingSafeCompare } from '@/lib/security';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -30,7 +31,7 @@ async function handleWarmup(req: NextRequest) {
     : '';
   const provided = bearer || req.nextUrl.searchParams.get('secret') || '';
 
-  if (provided !== secret) {
+  if (!timingSafeCompare(provided, secret)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

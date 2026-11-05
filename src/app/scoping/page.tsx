@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Script from 'next/script';
 import ScopingHeader from './ScopingHeader';
 import IntakeForm from '@/components/Intake/IntakeForm';
+import { SectionErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { getProfile } from '@/lib/data';
 import styles from './scoping.module.css';
 
@@ -81,7 +82,9 @@ export default async function ScopingPage({ searchParams }: ScopingPageProps) {
       />
       <div className={styles.container}>
         <ScopingHeader />
-        <IntakeForm resumeData={profile} initialPreset={preset} />
+        <SectionErrorBoundary sectionName="Scoping Lab Wizard">
+          <IntakeForm resumeData={profile} initialPreset={preset} />
+        </SectionErrorBoundary>
       </div>
     </div>
   );

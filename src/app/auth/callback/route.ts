@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { EmailOtpType, Session, User, AuthError } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/server';
-import { sendAdminSignupNotification } from '@/lib/emailNotification';
+import { sendAdminSignupNotification, sendUserWelcomeNotification } from '@/lib/emailNotification';
 import { isAdminEmail } from '@/lib/auth';
 import { stitchAnonymousSession } from '@/lib/scopingObservability';
 
@@ -59,13 +59,29 @@ export async function GET(request: Request) {
             secure: origin.startsWith('https:'),
           });
 
-          // Trigger admin email alert asynchronously (does not block redirect)
-          sendAdminSignupNotification({
-            email: user.email || 'unknown@client.com',
-            fullName: user.user_metadata?.full_name || user.user_metadata?.name || 'Client',
-            provider: user.app_metadata?.provider || (otpType ? 'Magic Link' : 'Google OAuth'),
-            signedUpAt: user.created_at,
-          }).catch(err => console.warn('Failed to send admin signup notification:', err));
+          // Trigger signup notifications only for brand-new users (deduplicating routine logins, RSK-07)
+          const createdAtMs = user.created_at ? new Date(user.created_at).getTime() : 0;
+          const lastSignInAtMs = user.last_sign_in_at ? new Date(user.last_sign_in_at).getTime() : createdAtMs;
+          const isBrandNewUser =
+            !user.created_at ||
+            Date.now() - createdAtMs < 120000 ||
+            Math.abs(lastSignInAtMs - createdAtMs) < 15000;
+
+          if (isBrandNewUser) {
+            sendAdminSignupNotification({
+              email: user.email || 'unknown@client.com',
+              fullName: user.user_metadata?.full_name || user.user_metadata?.name || 'Client',
+              provider: user.app_metadata?.provider || (otpType ? 'Magic Link' : 'Google OAuth'),
+              signedUpAt: user.created_at,
+            }).catch(err => console.warn('Failed to send admin signup notification:', err));
+
+            if (user.email) {
+              sendUserWelcomeNotification({
+                email: user.email,
+                fullName: user.user_metadata?.full_name || user.user_metadata?.name || '',
+              }).catch(err => console.warn('Failed to send user welcome notification:', err));
+            }
+          }
 
           // Session Stitching: Link any anonymous scoping traces to verified user
           const cookieHeader = request.headers.get('cookie') || '';
@@ -89,14 +105,16 @@ export async function GET(request: Request) {
 
           const effectiveSessionId = chatSessionId || pendingDraftToken || '';
 
-          Promise.resolve(
-            stitchAnonymousSession(
+          try {
+            await stitchAnonymousSession(
               effectiveSessionId,
               user.email || '',
               pendingScopeCode,
               pendingDraftToken
-            )
-          ).catch(err => console.warn('Session stitching warning in auth callback:', err));
+            );
+          } catch (err) {
+            console.warn('Session stitching warning in auth callback:', err);
+          }
         }
 
         return response;

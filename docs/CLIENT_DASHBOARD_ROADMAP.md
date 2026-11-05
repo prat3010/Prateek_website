@@ -248,6 +248,16 @@ timeline
   - ✅ Post-launch SLA & production uptime monitoring cockpit (5-minute health pings, Retriever token metering, automated monthly SLA report PDF).
   - ✅ Multi-format commercial proposal suite (1-Page Executive Pitch vs 3-Page Master SOW PDF).
 
+* **Milestone 69: Account Observability, RLS Isolation & Multi-Tenant Lifecycle Integrity (Completed)**
+  - ✅ Explicitly await `stitchAnonymousSession()` in `/auth/callback` before HTTP 303 redirect, eliminating serverless background context drop.
+  - ✅ Decouple inbound contact inquiries into dedicated `contact_submissions` table before triggering Resend delivery; send confirmation auto-replies.
+  - ✅ Auto-link deposit paying clients into `rag_tenant_members` as `owner` on project scope deposit capture.
+  - ✅ Enforce RLS across legacy tables and isolate master API keys in `rag_tenant_credentials` with owner-only access.
+  - ✅ Build `/api/client/cancel-razorpay-subscription` for self-service Care Plan and SaaS workspace subscription termination.
+  - ✅ Implement `/api/cron/lifecycle-checks` authenticated with `CRON_SECRET` to monitor expiring 7-day trials and overdue invoices.
+  - ✅ Wrap Client Dashboard views and Scoping Wizard in `SectionErrorBoundary` and add user Settings tab in `/dashboard`.
+  - ✅ Support dynamic workspace context switching via `?tenantId=` on `/api/rag/tenant`.
+
 ---
 
 ### Phase 8: Predictive Machine Learning & 3D Studio Visualizer (M79 – M85) — **PLANNED**
@@ -287,8 +297,11 @@ timeline
 | `invoices` | Supabase DB Table | Itemized milestone invoices, GST tax ledger, and Razorpay payment tracking |
 | `sprint_capacity` | Supabase DB Table | Quarterly engineering slots & fast-track rush capacity limits |
 | `rag_tenants` | Supabase DB Table | RAG tenant registry mapping client to `retriever` `tenant_id` |
+| `rag_tenant_credentials` | Supabase DB Table | Isolated tenant master API keys with owner-only RLS policies |
 | `rag_tenant_members` | Supabase DB Table | Multi-user team memberships (`tenant_id`, `user_id`, `role`) |
 | `rag_subscriptions` | Supabase DB Table | Subscription billing tracking (`plan_tier`, `monthly_token_limit`, `razorpay_subscription_id`) |
+| `contact_submissions` | Supabase DB Table | Inbound contact inquiry audit ledger with guaranteed pre-email persistence |
+| `email_logs` | Supabase DB Table | System email dispatch audit log with template names & delivery status |
 | `/api/scoping/parse-intent` | Next.js API Route | Natural language intent parser proxying to Retriever `prateeq_scoping` |
 | `/api/scoping/parse-rfp` | Next.js API Route | Multimodal RFP/PRD PDF parser proxying to Retriever M42/M22 |
 | `/api/scoping/estimate-timeline` | Next.js API Route | ML regression endpoint predicting sprint hours & confidence bounds (M84) |
@@ -296,6 +309,8 @@ timeline
 | `/api/client/save-scope` | Next.js API Route | Save/update scope feature customizations in draft mode |
 | `/api/client/create-razorpay-order` | Next.js API Route | Initiate 50% scope deposit Razorpay order |
 | `/api/client/create-razorpay-subscription` | Next.js API Route | Initiate RAG SaaS plan subscription |
+| `/api/client/cancel-razorpay-subscription` | Next.js API Route | Self-service Care Plan & SaaS subscription cancellation |
+| `/api/cron/lifecycle-checks` | Next.js API Route | Authenticated lifecycle cron monitoring expiring trials & overdue invoices |
 | `/api/terminal/qrcode` | Next.js API Route | Generate ASCII / PNG QR code for terminal mobile checkout |
 | `/api/webhooks/razorpay` | Next.js API Route | Process Razorpay payment & subscription webhooks |
 | `/api/rag/workflow-webhook` | Next.js API Route | Process background durable workflow execution status webhooks (M95) |

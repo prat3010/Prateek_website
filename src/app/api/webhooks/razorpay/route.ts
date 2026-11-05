@@ -321,6 +321,31 @@ export async function POST(req: Request) {
               }).catch((docErr) => {
                 console.warn('Failed to index SOW markdown into Retriever tenant:', docErr);
               });
+
+              // Ensure client is linked as owner in rag_tenant_members (RSK-03)
+              const clientEmail = (invoice.customer_email || targetScopeRow?.client_email || '').toLowerCase().trim();
+              if (clientEmail && provisionedTenantId) {
+                try {
+                  const { data: existingMember } = await supabase
+                    .from('rag_tenant_members')
+                    .select('id')
+                    .eq('tenant_id', provisionedTenantId)
+                    .eq('email', clientEmail)
+                    .maybeSingle();
+
+                  if (!existingMember) {
+                    await supabase.from('rag_tenant_members').insert({
+                      tenant_id: provisionedTenantId,
+                      email: clientEmail,
+                      role: 'owner',
+                      created_at: nowIso,
+                      updated_at: nowIso,
+                    });
+                  }
+                } catch (memberLinkErr) {
+                  console.warn('Failed to link client membership to SOW tenant:', memberLinkErr);
+                }
+              }
             }
           } catch (tenantErr) {
             console.warn('Could not auto-provision Retriever tenant on deposit capture:', tenantErr);
@@ -556,7 +581,7 @@ export async function POST(req: Request) {
               .upsert(
                 {
                   email: clientEmail,
-                  name: displayName,
+                  full_name: displayName,
                   company_name: `${displayName}'s Workspace`,
                   notes: `[Retriever SaaS: ${planTier.toUpperCase()}]`,
                   updated_at: nowIso,

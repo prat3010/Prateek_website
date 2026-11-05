@@ -3,9 +3,7 @@ import { supabase } from '@/data/supabase';
 import { getVerifiedSessionEmail } from '@/lib/sessionVerify';
 import { calculateInvoiceTotals, SELLER_CONFIG } from '@/lib/invoicing';
 import { createRazorpayOrderSchema } from '@/lib/clientOrder';
-import { recalculateCanonicalScopeQuote, type PromoDiscountInfo } from '@/lib/pricing';
-
-const USD_TO_INR_RATE = 85;
+import { recalculateCanonicalScopeQuote, USD_TO_INR_RATE, type PromoDiscountInfo } from '@/lib/pricing';
 
 function getInternationalPaymentPayload(isUSD: boolean) {
   if (!isUSD || !SELLER_CONFIG.internationalPayment?.achAccount) {

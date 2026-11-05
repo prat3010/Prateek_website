@@ -340,6 +340,39 @@
   font-size: 0.62rem;
 }
 
+.lcdBuzzerBtn {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 0 3px;
+  cursor: pointer;
+  line-height: 1;
+  border-radius: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+  user-select: none;
+}
+
+.lcdBuzzerBtn:hover {
+  opacity: 0.8;
+  transform: scale(1.08);
+}
+
+.lcdBuzzerBtn:focus-visible {
+  outline: 1px dashed currentColor;
+  outline-offset: 1px;
+}
+
+.lcdBuzzerBtnMuted {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
 .lcdClock {
   font-size: 0.62rem;
   font-weight: 800;
@@ -419,6 +452,15 @@
   margin: 0;
   color: #0E1A0B;
   letter-spacing: 0.01em;
+}
+
+.standbyPrompt {
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  opacity: 0.72;
+  margin-top: 0.15rem;
+  display: block;
 }
 
 /* ── Physical Bottom Controls & Speaker Grille ── */

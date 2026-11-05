@@ -267,40 +267,76 @@ def render_resume_profile_tab():
             updated_messages = []
             for i, msg in enumerate(messages):
                 with st.expander(f"📟 MSG 0{i+1}: {msg.get('sender', 'DISPATCH')}", expanded=(i == 0)):
-                    c1, c2, c3 = st.columns([1, 1, 2])
+                    c1, c2, c3, c4 = st.columns([1, 1, 1, 2])
                     with c1:
                         freq = st.text_input("Radio Freq", value=msg.get('freq', '901.2MHz'), key=f"pager_freq_{i}")
                     with c2:
-                        sender = st.text_input("Sender Tag", value=msg.get('sender', 'DISPATCH'), key=f"pager_sender_{i}")
+                        sender = st.text_input("Sender Tag (Dev)", value=msg.get('sender', 'DISPATCH'), key=f"pager_sender_{i}")
                     with c3:
-                        text = st.text_area("Readout (Max 200 chars)", value=msg.get('text', ''), height=70, max_chars=200, key=f"pager_text_{i}")
+                        section_id = st.text_input("Section Target", value=msg.get('sectionId', ''), placeholder="e.g. deployments", key=f"pager_sec_{i}")
+                    with c4:
+                        text = st.text_area("Readout - Dev (Max 200 chars)", value=msg.get('text', ''), height=70, max_chars=200, key=f"pager_text_{i}")
+
+                    with st.expander("💼 Business Persona Override (Optional)", expanded=bool(msg.get('senderBiz') or msg.get('textBiz'))):
+                        cb1, cb2 = st.columns([1, 2])
+                        with cb1:
+                            sender_biz = st.text_input("Sender Tag (Biz)", value=msg.get('senderBiz', ''), placeholder="e.g. RADAR // CASE-STUDIES", key=f"pager_sender_biz_{i}")
+                        with cb2:
+                            text_biz = st.text_area("Readout - Biz (Max 200 chars)", value=msg.get('textBiz', ''), height=70, max_chars=200, key=f"pager_text_biz_{i}")
+
                     delete_msg = st.checkbox(f"🗑️ Delete Channel 0{i+1}", key=f"del_msg_{i}")
                     if not delete_msg:
-                        updated_messages.append({
+                        item = {
                             "id": msg.get("id", f"ch_0{i+1}"),
                             "freq": freq.strip() or "901.2MHz",
                             "sender": sender.strip(),
                             "text": text.strip()
-                        })
+                        }
+                        sec = section_id.strip() or msg.get("sectionId", "")
+                        if sec:
+                            item["sectionId"] = sec
+                        sbiz = sender_biz.strip() or msg.get("senderBiz", "")
+                        if sbiz:
+                            item["senderBiz"] = sbiz
+                        tbiz = text_biz.strip() or msg.get("textBiz", "")
+                        if tbiz:
+                            item["textBiz"] = tbiz
+                        updated_messages.append(item)
 
             st.markdown("---")
             st.markdown("##### ➕ Transmit New Pager Dispatch")
-            col_new1, col_new2, col_new3 = st.columns([1, 1, 2])
+            col_new1, col_new2, col_new3, col_new4 = st.columns([1, 1, 1, 2])
             with col_new1:
                 new_freq = st.text_input("Radio Frequency", value="901.2MHz", key="new_pager_freq")
             with col_new2:
-                new_sender = st.text_input("New Sender Tag", value="ANNOUNCEMENT", key="new_pager_sender")
+                new_sender = st.text_input("New Sender Tag (Dev)", value="ANNOUNCEMENT", key="new_pager_sender")
             with col_new3:
+                new_sec = st.text_input("Target Section (Optional)", value="", placeholder="e.g. blog", key="new_pager_sec")
+            with col_new4:
                 new_text = st.text_area("New Alphanumeric Message", value="", height=70, max_chars=200, placeholder="e.g. Shipped new GraphRAG pipeline to Oracle VPS...", key="new_pager_text")
+
+            with st.expander("💼 New Business Persona Override (Optional)"):
+                cnb1, cnb2 = st.columns([1, 2])
+                with cnb1:
+                    new_sender_biz = st.text_input("New Sender Tag (Biz)", value="", placeholder="e.g. RADAR // VALUE-PROP", key="new_pager_sender_biz")
+                with cnb2:
+                    new_text_biz = st.text_area("New Message (Biz)", value="", height=70, max_chars=200, placeholder="Executive ROI and milestone summary...", key="new_pager_text_biz")
 
             if st.button("➕ Queue New Radio Dispatch", key="btn_add_page"):
                 if new_text.strip():
-                    updated_messages.append({
+                    new_item = {
                         "id": f"ch_0{len(updated_messages)+1}",
                         "freq": new_freq.strip() or "901.2MHz",
                         "sender": new_sender.strip() or "DISPATCH",
                         "text": new_text.strip()
-                    })
+                    }
+                    if new_sec.strip():
+                        new_item["sectionId"] = new_sec.strip()
+                    if new_sender_biz.strip():
+                        new_item["senderBiz"] = new_sender_biz.strip()
+                    if new_text_biz.strip():
+                        new_item["textBiz"] = new_text_biz.strip()
+                    updated_messages.append(new_item)
                     st.success("New radio dispatch queued in memory bank! Save changes below to transmit.")
 
             res['pager'] = {

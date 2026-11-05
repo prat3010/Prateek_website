@@ -55,17 +55,21 @@ def main():
     
     # Sync Runbooks & Index to Obsidian Ecosystem Vault
     vault_dir = Path("/Users/prateeksharma/Developer/Prateek_Ecosystem_Vault")
+    retriever_dir = Path("/Users/prateeksharma/Developer/retriever")
     try:
         if vault_dir.exists():
             import shutil
             (vault_dir / "runbooks").mkdir(exist_ok=True)
             for rb in (DOCS_DIR / "runbooks").glob("*.md"):
                 shutil.copy2(rb, vault_dir / "runbooks" / rb.name)
+            if (retriever_dir / "docs" / "runbooks").exists():
+                for rb in (retriever_dir / "docs" / "runbooks").glob("*.md"):
+                    shutil.copy2(rb, vault_dir / "runbooks" / rb.name)
             if (DOCS_DIR / "00_ARCHITECTURE_INDEX.md").exists():
                 idx_content = (DOCS_DIR / "00_ARCHITECTURE_INDEX.md").read_text(encoding="utf-8")
                 idx_vault = idx_content.replace("(architecture_nodes/", "(Prateek_Website/architecture_nodes/")
                 (vault_dir / "00_ARCHITECTURE_INDEX.md").write_text(idx_vault, encoding="utf-8")
-            print("✓ Synced Runbooks and Architecture Index to Ecosystem Vault")
+            print("✓ Synced Runbooks (Website + Retriever) and Architecture Index to Ecosystem Vault")
     except Exception as e:
         print(f"ℹ Note on Vault sync (running sandboxed): {e}")
     

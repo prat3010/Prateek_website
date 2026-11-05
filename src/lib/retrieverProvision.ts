@@ -154,6 +154,22 @@ export async function ensureRetrieverEngineTenant(
           .update?.({ tenant_id: resolvedTenantId, updated_at: new Date().toISOString() })
           ?.eq?.('tenant_id', existingTenantId);
       }
+
+      if (resolvedApiKey && resolvedTenantId) {
+        try {
+          const credsTable = supabase.from('rag_tenant_credentials') as unknown as {
+            upsert?: (u: Record<string, unknown>) => Promise<unknown>;
+          };
+          await credsTable.upsert?.({
+            tenant_id: resolvedTenantId,
+            api_key: resolvedApiKey,
+            api_key_hash: apiKeyHash,
+            updated_at: new Date().toISOString(),
+          });
+        } catch {
+          // Table may not yet be migrated in some environments
+        }
+      }
     } catch (dbErr) {
       console.warn('Supabase tenant reconciliation warning:', dbErr);
     }

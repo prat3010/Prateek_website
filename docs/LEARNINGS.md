@@ -177,4 +177,27 @@ Before completing any task modifying domain logic or API routes:
   2. `src/app/global-error.tsx`: Catches fatal errors thrown inside `RootLayout` itself. Must render standalone `<html>` and `<body>` tags and can only use hard reloads (`window.location.href = '/'` or full browser reload) because React routing context may be destroyed.
 - **Enforced Solution**: Maintain both `error.tsx` and `global-error.tsx` styled with design system tokens and explicit retry actions.
 
+---
+
+## 9. Serverless Lifecycle, Identity Stitching & React Compiler Purity Quirks
+
+### Quirk: Premature HTTP 303 Redirect Terminating Serverless Background Context
+- **Context / Framework**: Next.js 16 Route Handlers (`src/app/auth/callback/route.ts`) + Supabase Auth
+- **Symptom**: Anonymous session data (scoping drafts, telemetry tokens, cart selections) fails to stitch into authenticated user profiles intermittently upon OAuth redirect.
+- **Root Cause**: Launching asynchronous work (`stitchAnonymousSession()`) without `await` immediately before returning `NextResponse.redirect()` causes the Vercel/Node.js serverless execution context to freeze or terminate the dangling microtask before DB writes complete.
+- **Enforced Solution**: Always `await` cross-session migration routines inside a bounded `try/catch` with latency logging prior to emitting the redirect response.
+
+### Quirk: React Compiler / ESLint Purity Constraint on `Date.now()`
+- **Context / Framework**: React 19 + Next.js 16 (`react-hooks/purity`)
+- **Symptom**: ESLint error: `Error: Cannot call impure function during render. Date.now is an impure function.`
+- **Root Cause**: The React Compiler static analyzer detects impure function calls (`Date.now()`, `Math.random()`) inside component closures if they are referenced during render calculations or in event handlers parsed without pure boundaries.
+- **Enforced Solution**: Define non-deterministic utility helpers (`getMockPaymentId`, `getMockPeriodEndIso`) outside the React component scope or invoke them within strictly isolated callback contexts.
+
+### Quirk: Client-Test Isolation & `server-only` Invariant
+- **Context / Framework**: Vitest + Next.js App Router (`import 'server-only'`)
+- **Symptom**: Vitest test runs fail with `Error: This module cannot be imported from a Client Component module` when testing shared utilities.
+- **Root Cause**: Directly importing `@/data/supabase` (which imports `server-only`) inside any utility file that can be imported by client components or run in client test environments (`happy-dom`) violates Next.js runtime boundaries.
+- **Enforced Solution**: Keep `server-only` modules strictly confined to API route handlers and server components. Shared libraries (like `emailNotification.ts`) must never import `@/data/supabase`.
+
+
 

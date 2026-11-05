@@ -101,6 +101,134 @@ export async function sendAdminSignupNotification(params: AdminSignupAlertParams
   }
 }
 
+export interface UserWelcomeEmailParams {
+  email: string;
+  fullName?: string;
+}
+
+/**
+ * Sends a welcome email to a newly registered user/client.
+ */
+export async function sendUserWelcomeNotification(params: UserWelcomeEmailParams): Promise<boolean> {
+  const client = getResendClient();
+  if (!client) {
+    console.warn('Skipping sendUserWelcomeNotification: RESEND_API_KEY not configured.');
+    return false;
+  }
+
+  const nameEscaped = escapeHtml(params.fullName || 'there');
+
+  try {
+    const { error } = await client.resend.emails.send({
+      from: 'Prateeq Sharma <notifications@prateeq.in>',
+      to: params.email,
+      replyTo: 'prateeqsharma@gmail.com',
+      subject: `Welcome to Prateeq Studio, ${nameEscaped}!`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <body style="font-family: system-ui, -apple-system, sans-serif; background: #0f172a; color: #f8fafc; padding: 24px; margin: 0;">
+            <div style="max-width: 560px; margin: 0 auto; background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+              <div style="text-align: center; margin-bottom: 24px;">
+                <h1 style="color: #38bdf8; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">PRATEEQ STUDIO</h1>
+                <p style="color: #94a3b8; font-size: 13px; margin: 4px 0 0 0;">High-Performance Engineering &amp; AI Systems</p>
+              </div>
+
+              <h2 style="color: #f8fafc; font-size: 18px; margin-top: 0;">Welcome, ${nameEscaped}!</h2>
+              <p style="color: #cbd5e1; font-size: 14px; line-height: 1.6;">
+                Thank you for creating your account. Whether you're exploring custom software development, reviewing your interactive technical project scope, or utilizing the Retriever AI workspace, your client workspace is ready.
+              </p>
+
+              <div style="background: #0f172a; border-radius: 8px; padding: 18px; margin: 20px 0; border: 1px solid #334155;">
+                <div style="color: #94a3b8; font-size: 12px; text-transform: uppercase; font-weight: bold; margin-bottom: 8px;">Workspace Quick Links</div>
+                <div style="margin-bottom: 8px;">
+                  <a href="https://prateeq.in/dashboard" style="color: #38bdf8; text-decoration: none; font-size: 14px; font-weight: 600;">📊 Client Dashboard &rarr;</a>
+                  <div style="color: #64748b; font-size: 12px;">Track active project scopes, milestones, and invoice receipts.</div>
+                </div>
+                <div>
+                  <a href="https://prateeq.in/rag/app" style="color: #38bdf8; text-decoration: none; font-size: 14px; font-weight: 600;">⚡ Retriever SaaS Studio &rarr;</a>
+                  <div style="color: #64748b; font-size: 12px;">Access cognitive hybrid search, document libraries, and API keys.</div>
+                </div>
+              </div>
+
+              <p style="color: #94a3b8; font-size: 13px; line-height: 1.5;">
+                If you have any questions or would like to schedule a technical walkthrough, reply directly to this email.
+              </p>
+
+              <div style="border-top: 1px solid #334155; margin-top: 24px; padding-top: 16px; font-size: 12px; color: #64748b; text-align: center;">
+                Prateeq Sharma &bull; Bengaluru, India &bull; <a href="https://prateeq.in" style="color: #38bdf8; text-decoration: none;">prateeq.in</a>
+              </div>
+            </div>
+          </body>
+        </html>
+      `,
+    });
+
+    if (error) {
+      console.warn('sendUserWelcomeNotification error:', error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.warn('sendUserWelcomeNotification exception:', err);
+    return false;
+  }
+}
+
+export interface ContactConfirmationParams {
+  email: string;
+  name?: string;
+  subject?: string;
+}
+
+/**
+ * Sends a confirmation auto-reply when a visitor submits the contact form.
+ */
+export async function sendContactConfirmationNotification(params: ContactConfirmationParams): Promise<boolean> {
+  const client = getResendClient();
+  if (!client) return false;
+
+  const nameEscaped = escapeHtml(params.name || 'there');
+  const subjectEscaped = escapeHtml(params.subject || 'Portfolio Inquiry');
+
+  try {
+    const { error } = await client.resend.emails.send({
+      from: 'Prateeq Sharma <notifications@prateeq.in>',
+      to: params.email,
+      replyTo: 'prateeqsharma@gmail.com',
+      subject: `We've received your message: ${subjectEscaped}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <body style="font-family: system-ui, -apple-system, sans-serif; background: #0f172a; color: #f8fafc; padding: 24px; margin: 0;">
+            <div style="max-width: 560px; margin: 0 auto; background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+              <h2 style="color: #38bdf8; margin-top: 0; font-size: 20px;">Message Received</h2>
+              <p style="color: #cbd5e1; font-size: 14px; line-height: 1.6;">
+                Hi ${nameEscaped},<br><br>
+                Thank you for reaching out! Your inquiry regarding <strong>${subjectEscaped}</strong> has been received and logged directly into our engineering backlog.
+              </p>
+              <p style="color: #94a3b8; font-size: 13px; line-height: 1.5;">
+                I personally review all signals and will get back to you within 24 hours.
+              </p>
+              <div style="border-top: 1px solid #334155; margin-top: 24px; padding-top: 16px; font-size: 12px; color: #64748b; text-align: center;">
+                Prateeq Sharma &bull; <a href="https://prateeq.in" style="color: #38bdf8; text-decoration: none;">prateeq.in</a>
+              </div>
+            </div>
+          </body>
+        </html>
+      `,
+    });
+    if (error) {
+      console.warn('sendContactConfirmationNotification error:', error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.warn('sendContactConfirmationNotification exception:', err);
+    return false;
+  }
+}
+
 export interface AdminIntakeLeadAlertParams {
   scopeCode: string;
   companyName: string;

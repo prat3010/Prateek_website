@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/data/supabase';
+import { USD_TO_INR_RATE } from '@/lib/pricing';
 
 interface PromoCodeRow {
   code: string;
@@ -127,22 +128,22 @@ export async function POST(req: NextRequest) {
       const rate = promoData.discount_value / 100;
       if (currency === 'INR') {
         discountAmountINR = Math.round(subtotal * rate);
-        discountAmountUSD = Math.round((subtotal / 83) * rate);
+        discountAmountUSD = Math.round((subtotal / USD_TO_INR_RATE) * rate);
       } else {
         discountAmountUSD = Math.round(subtotal * rate);
-        discountAmountINR = Math.round(subtotal * 83 * rate);
+        discountAmountINR = Math.round(subtotal * USD_TO_INR_RATE * rate);
       }
     } else {
       // Fixed discount
       if (promoData.currency === 'INR') {
         discountAmountINR = promoData.discount_value;
-        discountAmountUSD = Math.round(promoData.discount_value / 83);
+        discountAmountUSD = Math.round(promoData.discount_value / USD_TO_INR_RATE);
       } else if (promoData.currency === 'USD') {
         discountAmountUSD = promoData.discount_value;
-        discountAmountINR = Math.round(promoData.discount_value * 83);
+        discountAmountINR = Math.round(promoData.discount_value * USD_TO_INR_RATE);
       } else {
-        discountAmountINR = currency === 'INR' ? promoData.discount_value : Math.round(promoData.discount_value * 83);
-        discountAmountUSD = currency === 'USD' ? promoData.discount_value : Math.round(promoData.discount_value / 83);
+        discountAmountINR = currency === 'INR' ? promoData.discount_value : Math.round(promoData.discount_value * USD_TO_INR_RATE);
+        discountAmountUSD = currency === 'USD' ? promoData.discount_value : Math.round(promoData.discount_value / USD_TO_INR_RATE);
       }
     }
 

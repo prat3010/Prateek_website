@@ -14,15 +14,33 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Unauthorized: valid session required.' }, { status: 401 });
     }
 
-    // 1. Check existing tenant membership for this user or email
-    const { data: member } = await supabase
+    const { searchParams } = new URL(req.url);
+    const requestedTenantId = searchParams.get('tenantId');
+
+    // 1. Check existing tenant membership for this user or email (Multi-tenancy support, RSK-12)
+    let memberQuery = supabase
       .from('rag_tenant_members')
-      .select('tenant_id, role, email')
+      .select('tenant_id, role, email, user_id');
+
+    if (requestedTenantId) {
+      memberQuery = memberQuery.eq('tenant_id', requestedTenantId);
+    }
+
+    const { data: member } = await memberQuery
       .or(`user_id.eq.${sessionUser.id},email.eq.${sessionUser.email}`)
       .limit(1)
       .maybeSingle();
 
     if (member) {
+      if (!member.user_id && sessionUser.id) {
+        try {
+          await supabase
+            .from('rag_tenant_members')
+            .update({ user_id: sessionUser.id, updated_at: new Date().toISOString() })
+            .eq('tenant_id', member.tenant_id)
+            .eq('email', member.email);
+        } catch {}
+      }
       const { data: tenant } = await supabase
         .from('rag_tenants')
         .select('*')
@@ -61,6 +79,19 @@ export async function GET(req: Request) {
       let workspaceTenantId = member.tenant_id;
       let workspaceApiKey = (tenant?.api_key as string | undefined)?.trim() || '';
 
+      if (!workspaceApiKey) {
+        try {
+          const { data: credRow } = await supabase
+            .from('rag_tenant_credentials')
+            .select('api_key')
+            .eq('tenant_id', workspaceTenantId)
+            .maybeSingle();
+          if (credRow?.api_key) {
+            workspaceApiKey = credRow.api_key;
+          }
+        } catch {}
+      }
+
       // Self-heal returning workspaces missing a stored API key or OCI provisioning
       if (!workspaceApiKey || workspaceTenantId.startsWith('tenant_')) {
         const reconciled = await ensureRetrieverEngineTenant({
@@ -87,6 +118,7 @@ export async function GET(req: Request) {
         currentPeriodEnd: sub?.current_period_end || null,
         trialDaysRemaining,
         createdAt: tenant?.created_at,
+        availableWorkspaces: [{ tenantId: workspaceTenantId, role: member.role }],
       });
     }
 
@@ -121,6 +153,16 @@ export async function GET(req: Request) {
     if (tenantErr) {
       console.warn('Bootstrapping rag_tenants warning:', tenantErr.message);
     }
+
+    try {
+      await supabase.from('rag_tenant_credentials').insert({
+        tenant_id: newTenantId,
+        api_key: mintedApiKey,
+        api_key_hash: provisioned.apiKeyHash,
+        created_at: nowIso,
+        updated_at: nowIso,
+      });
+    } catch {}
 
     const { error: memberErr } = await supabase
       .from('rag_tenant_members')

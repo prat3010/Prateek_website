@@ -172,6 +172,39 @@ export interface SubscriberRecord {
   updatedAt: string;
 }
 
+export interface AdminInvoiceRecord {
+  id: string;
+  scope_id?: string;
+  invoice_number: string;
+  amount: number;
+  currency: string;
+  payment_status: string;
+  milestone_name: string;
+  customer_email?: string;
+  customer_name?: string;
+  payment_url?: string;
+  created_at: string;
+}
+
+export interface AdminScopingTraceRecord {
+  id: string;
+  session_id: string;
+  scope_code?: string;
+  turn_index: number;
+  user_query: string;
+  assistant_response: string;
+  agent_intent?: string;
+  agent_reasoning?: string;
+  model_used?: string;
+  latency_ms?: number;
+  currency?: string;
+  quote_inr?: number;
+  quote_usd?: number;
+  visitor_country?: string;
+  user_email?: string;
+  created_at: string;
+}
+
 export default function AdminControlCenter() {
   const { user, loading: authLoading, loginWithGoogle, logout, getAccessToken } = useAuth();
   const [activeTab, setActiveTab] = useState<'prospects' | 'clients' | 'subscribers' | 'leads'>('prospects');
@@ -185,6 +218,7 @@ export default function AdminControlCenter() {
 
   // Scoping Intake Leads & Chats state
   const [intakeLeads, setIntakeLeads] = useState<IntakeLeadRecord[]>([]);
+  const [scopingTraces, setScopingTraces] = useState<AdminScopingTraceRecord[]>([]);
   const [loadingIntakeLeads, setLoadingIntakeLeads] = useState(false);
   const [selectedLeadForDrawer, setSelectedLeadForDrawer] = useState<IntakeLeadRecord | null>(null);
   const [isGeneratingPitch, setIsGeneratingPitch] = useState(false);
@@ -206,6 +240,9 @@ export default function AdminControlCenter() {
       if (res.ok) {
         const data = await res.json();
         setIntakeLeads(data.leads || []);
+        if (Array.isArray(data.traces)) {
+          setScopingTraces(data.traces);
+        }
       }
     } catch (err) {
       console.error('Failed to fetch intake leads:', err);
@@ -216,6 +253,7 @@ export default function AdminControlCenter() {
 
   // Clients state
   const [clients, setClients] = useState<ClientRecord[]>([]);
+  const [allInvoices, setAllInvoices] = useState<AdminInvoiceRecord[]>([]);
   const [stageEdits, setStageEdits] = useState<Record<string, string>>({});
   const [paymentEdits, setPaymentEdits] = useState<
     Record<string, { deposit_paid: boolean; balance_paid: boolean }>
@@ -258,6 +296,9 @@ export default function AdminControlCenter() {
       if (res.ok) {
         const data = await res.json();
         setClients(data.scopes || []);
+        if (Array.isArray(data.allInvoices)) {
+          setAllInvoices(data.allInvoices);
+        }
       }
     } catch (err) {
       console.error('Failed to fetch client scopes:', err);
@@ -387,8 +428,14 @@ export default function AdminControlCenter() {
         if (isMounted) {
           setLeads(leadsData.leads || []);
           setClients(clientsData.scopes || []);
+          if (Array.isArray(clientsData.allInvoices)) {
+            setAllInvoices(clientsData.allInvoices);
+          }
           setSubscribers(subsData.subscribers || []);
           setIntakeLeads(intakeData.leads || []);
+          if (Array.isArray(intakeData.traces)) {
+            setScopingTraces(intakeData.traces);
+          }
         }
       }).catch(err => {
         console.error('Failed to load admin data:', err);
@@ -1335,6 +1382,55 @@ export default function AdminControlCenter() {
                 })
               )}
             </div>
+
+            {/* Master Commercial Invoice Ledger */}
+            {allInvoices && allInvoices.length > 0 && (
+              <div style={{ marginTop: '2.5rem' }}>
+                <h4 style={{ color: 'var(--color-text)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.05rem', marginBottom: '0.85rem' }}>
+                  <span>🧾 Master Commercial Invoice Ledger ({allInvoices.length})</span>
+                </h4>
+                <div style={{ overflowX: 'auto', background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border-color)', borderRadius: '8px' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', textAlign: 'left' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid var(--border-color)', background: 'rgba(255, 255, 255, 0.04)' }}>
+                        <th style={{ padding: '8px 12px' }}>Invoice #</th>
+                        <th style={{ padding: '8px 12px' }}>Customer / Email</th>
+                        <th style={{ padding: '8px 12px' }}>Milestone / Purpose</th>
+                        <th style={{ padding: '8px 12px' }}>Amount</th>
+                        <th style={{ padding: '8px 12px' }}>Status</th>
+                        <th style={{ padding: '8px 12px' }}>Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {allInvoices.map((inv) => (
+                        <tr key={inv.id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                          <td style={{ padding: '8px 12px', fontFamily: 'monospace', color: '#38bdf8' }}>{inv.invoice_number}</td>
+                          <td style={{ padding: '8px 12px' }}>{inv.customer_email || inv.customer_name || 'Client'}</td>
+                          <td style={{ padding: '8px 12px' }}>{inv.milestone_name || 'Standard Milestone'}</td>
+                          <td style={{ padding: '8px 12px', fontWeight: 600 }}>{inv.currency} {Number(inv.amount || 0).toLocaleString()}</td>
+                          <td style={{ padding: '8px 12px' }}>
+                            <span style={{
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                              fontSize: '0.7rem',
+                              fontWeight: 700,
+                              textTransform: 'uppercase',
+                              background: inv.payment_status === 'paid' ? 'rgba(0, 230, 118, 0.15)' : 'rgba(234, 179, 8, 0.15)',
+                              color: inv.payment_status === 'paid' ? '#00E676' : '#eab308',
+                            }}>
+                              {inv.payment_status || 'issued'}
+                            </span>
+                          </td>
+                          <td style={{ padding: '8px 12px', color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>
+                            {new Date(inv.created_at).toLocaleDateString()}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -1618,6 +1714,61 @@ export default function AdminControlCenter() {
                     </div>
                   );
                 })}
+              </div>
+            )}
+
+            {/* AI Scoping Telemetry Traces (Observability for unattached / active copilot chats) */}
+            {scopingTraces && scopingTraces.length > 0 && (
+              <div style={{ marginTop: '2.5rem' }}>
+                <h4 style={{ color: 'var(--color-text)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.05rem', marginBottom: '0.85rem' }}>
+                  <Bot size={18} style={{ color: '#38bdf8' }} />
+                  <span>Recent AI Scoping Telemetry Traces ({scopingTraces.length})</span>
+                </h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {scopingTraces.slice(0, 15).map((tr) => (
+                    <div
+                      key={tr.id}
+                      style={{
+                        padding: '12px 16px',
+                        background: 'rgba(255, 255, 255, 0.02)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '8px',
+                        fontSize: '0.82rem',
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px', flexWrap: 'wrap', gap: '6px' }}>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <span style={{ fontWeight: 700, color: 'var(--color-text)' }}>
+                            {tr.user_email ? `👤 ${tr.user_email}` : `Session: ${tr.session_id.slice(0, 12)}...`}
+                          </span>
+                          {tr.scope_code && (
+                            <span style={{ color: '#38bdf8', fontFamily: 'monospace' }}>[{tr.scope_code}]</span>
+                          )}
+                          {tr.visitor_country && (
+                            <span style={{ color: 'var(--color-text-muted)' }}>🌍 {tr.visitor_country}</span>
+                          )}
+                          {tr.model_used && (
+                            <span style={{ color: '#818cf8', fontSize: '0.72rem' }}>🧠 {tr.model_used}</span>
+                          )}
+                          {tr.latency_ms ? (
+                            <span style={{ color: 'var(--color-text-muted)', fontSize: '0.72rem' }}>⏱️ {tr.latency_ms}ms</span>
+                          ) : null}
+                        </div>
+                        <span style={{ color: 'var(--color-text-muted)', fontSize: '0.72rem' }}>
+                          {new Date(tr.created_at).toLocaleString()}
+                        </span>
+                      </div>
+                      <div style={{ color: '#cbd5e1', marginBottom: '4px' }}>
+                        <strong style={{ color: '#38bdf8' }}>User:</strong> {tr.user_query}
+                      </div>
+                      {tr.assistant_response && (
+                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', lineHeight: '1.4' }}>
+                          <strong style={{ color: '#10b981' }}>Copilot:</strong> {tr.assistant_response.slice(0, 200)}...
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>

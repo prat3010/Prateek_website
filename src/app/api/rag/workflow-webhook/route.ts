@@ -23,11 +23,27 @@ export async function POST(req: Request) {
     const secret = process.env.RETRIEVER_WEBHOOK_SECRET;
     const signature = req.headers.get('x-workflow-signature-256');
 
-    if (secret && signature) {
+    if (secret) {
+      if (!signature) {
+        return NextResponse.json(
+          { error: 'Missing required x-workflow-signature-256 header' },
+          { status: 401 }
+        );
+      }
+
       const computed = 'sha256=' + crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
-      if (computed !== signature) {
+      const sigBuf = Buffer.from(signature);
+      const compBuf = Buffer.from(computed);
+
+      if (sigBuf.length !== compBuf.length || !crypto.timingSafeEqual(sigBuf, compBuf)) {
         return NextResponse.json({ error: 'Invalid HMAC signature' }, { status: 401 });
       }
+    } else if (process.env.NODE_ENV === 'production') {
+      console.error('[Durable Workflow Webhook] RETRIEVER_WEBHOOK_SECRET is not configured on server.');
+      return NextResponse.json(
+        { error: 'Webhook service authentication not configured' },
+        { status: 500 }
+      );
     }
 
     const payload: WorkflowWebhookPayload = JSON.parse(rawBody);

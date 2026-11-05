@@ -1,7 +1,8 @@
 import glob, os, re
 from pathlib import Path
 
-NODES_DIR = Path('docs/architecture_nodes')
+DOCS_DIR = Path(__file__).resolve().parent.parent / "docs"
+NODES_DIR = DOCS_DIR / "architecture_nodes"
 node_files = sorted(NODES_DIR.glob('*.md'))
 
 tiers = {
@@ -85,7 +86,7 @@ for tkey, ttitle in tier_titles.items():
         badge = f"🔴 `{blast}`" if blast == "CRITICAL" else (f"🟠 `{blast}`" if blast == "HIGH" else f"🟢 `{blast}`")
         lines.append(f"| `{nid}` | **{title}** | {badge} | `{auth}` | [architecture_nodes/{fname}](architecture_nodes/{fname}) |")
 
-with open("docs/00_ARCHITECTURE_INDEX.md", "w") as f:
+with open(DOCS_DIR / "00_ARCHITECTURE_INDEX.md", "w") as f:
     f.write("\n".join(lines) + "\n")
 
 print("✓ Successfully generated docs/00_ARCHITECTURE_INDEX.md!")

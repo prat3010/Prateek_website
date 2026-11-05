@@ -10,6 +10,9 @@ import type {
 
 export type Currency = 'INR' | 'USD';
 
+/** Canonical default USD to INR currency conversion rate across pricing, quoting, and invoicing. */
+export const USD_TO_INR_RATE = 85;
+
 export const ESTIMATE_DISCLAIMER =
   'All listed prices are starting prices for the stated baseline scope. Final pricing may vary based on ' +
   'functionality, integrations, content volume, data migration, compliance requirements, delivery timeline, ' +

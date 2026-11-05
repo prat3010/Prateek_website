@@ -20,6 +20,24 @@ export function toggleAudio(): boolean {
   return !isMuted;
 }
 
+export function isAudioMuted(): boolean {
+  return isMuted;
+}
+
+export function setAudioMuted(muted: boolean): void {
+  isMuted = muted;
+}
+
+export function triggerHaptic(pattern: number | number[] = 10): void {
+  if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+    try {
+      navigator.vibrate(pattern);
+    } catch {
+      // Ignore vibration errors
+    }
+  }
+}
+
 
 export function playKeySound(): void {
   if (isMuted) return;

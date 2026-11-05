@@ -864,6 +864,28 @@ This document serves as the registry of critical architectural design decisions 
 
 ---
 
+# **ADR 51: Account Observability, RLS Isolation, and End-to-End Lifecycle Integrity**
+
+* **Status**: Approved & Implemented
+* **Context**: Following an end-to-end multi-agent audit documented in `docs/audits/account_observability_flow_audit.md`, several critical architectural boundaries and operational blind spots were identified across onboarding, authentication, lead capture, and multi-tenancy:
+  1. **Premature serverless HTTP 303 redirection**: Asynchronous session stitching (`stitchAnonymousSession`) in `/auth/callback` was launched without awaiting, risking microtask termination on Vercel before anonymous session data could merge into the authenticated profile.
+  2. **Lead loss risk on email delivery failures**: In `/api/contact`, lead persistence was coupled to third-party Resend email dispatch; an email API outage resulted in lost contact inquiries.
+  3. **Multi-tenant workspace orphanage on deposit**: Verifying a 50% project deposit webhook created the billing record and client scope but failed to link the client as an `owner` in `rag_tenant_members`.
+  4. **Unshielded tables and credential exposure**: Tables such as `promo_codes`, `tenants`, `documents`, and `vector_records` lacked strict RLS enforcement. Furthermore, storing master Retriever API keys directly in `rag_tenants` exposed them to ordinary team members.
+  5. **Missing client self-service cancellation & lifecycle monitoring**: Clients had no self-service path to cancel recurring Care Plans or SaaS workspaces, and operators lacked proactive alerts for expiring trials or overdue invoices.
+* **Decision**:
+  1. **Awaited session stitching**: `/auth/callback` explicitly awaits `stitchAnonymousSession` with latency instrumentation inside a protected `try/catch` block before emitting the HTTP 303 redirect.
+  2. **Guaranteed lead persistence & confirmation auto-replies**: Created the `contact_submissions` table with RLS enabled. `/api/contact` writes to `contact_submissions` and `intake_leads` *before* attempting Resend email delivery. Dispatches `sendContactConfirmationNotification()` to visitors and `sendUserWelcomeNotification()` to new users upon initial signup (deduplicating admin alerts).
+  3. **Automatic tenant member linking**: Razorpay payment verification webhooks check for linked `retriever_tenant_id` on project scopes and upsert the client into `rag_tenant_members` as `owner`.
+  4. **Strict RLS & credential isolation**: Migration `20261106_enable_missing_rls.sql` enforces RLS across all legacy tables and establishes `rag_tenant_credentials` with owner-only access.
+  5. **Self-service cancellation & lifecycle cron**: Created `/api/client/cancel-razorpay-subscription` (with scope-level email and tenant owner role validation) and `/api/cron/lifecycle-checks` (authenticated via `CRON_SECRET` using `timingSafeCompare`) to audit expiring 7-day trials and overdue invoices.
+  6. **UI containment & multi-tenancy**: Wrapped client dashboard views in `SectionErrorBoundary`, added a Settings tab in `/dashboard`, and enabled tenant workspace switching via `?tenantId=` on `/api/rag/tenant`.
+* **Consequences**:
+  * **Pros**: Guaranteed inbound lead capture, zero workspace orphanage on SOW deposits, complete multi-tenant credential isolation, automated operational lifecycle auditing, and graceful client crash containment.
+  * **Cons**: Database migration `20261106_enable_missing_rls.sql` must be applied to Supabase environments; `CRON_SECRET` must be configured in cron runners.
+
+---
+
 # **Acceptance Criteria**
 - Registry records cover the core v2 architectural choices.
 - Format follows standard ADR structures (Context, Decision, Consequences).
