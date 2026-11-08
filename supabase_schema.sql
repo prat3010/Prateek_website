@@ -1038,6 +1038,180 @@ ALTER TABLE email_logs ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Service role manages email logs" ON email_logs;
 CREATE POLICY "Service role manages email logs" ON email_logs TO service_role USING (true) WITH CHECK (true);
 
+-- ============================================================
+-- 17. The Playground: Products, Digital Goods & Orders Schema
+-- ============================================================
+
+-- 17.1 Playground Products & Catalog Table
+CREATE TABLE IF NOT EXISTS playground_products (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  slug TEXT UNIQUE NOT NULL,
+  title TEXT NOT NULL,
+  tagline TEXT NOT NULL,
+  description TEXT NOT NULL,
+  kind TEXT NOT NULL CHECK (kind IN ('saas', 'interactive-toy', 'generative-media', 'cognitive-tool', 'experiment')),
+  taxonomy TEXT NOT NULL DEFAULT 'toys-and-games' CHECK (taxonomy IN ('commercial', 'toys-and-games', 'ecosystem')),
+  tags JSONB NOT NULL DEFAULT '[]',
+  vibe_coded_date DATE NOT NULL DEFAULT CURRENT_DATE,
+  featured BOOLEAN NOT NULL DEFAULT FALSE,
+  status TEXT NOT NULL DEFAULT 'live' CHECK (status IN ('live', 'beta', 'concept', 'archived')),
+  metrics_badge TEXT DEFAULT '',
+  preview_image TEXT DEFAULT '',
+  
+  -- Commercial Configuration (Optional for Backward Compatibility)
+  is_commercial BOOLEAN NOT NULL DEFAULT FALSE,
+  price_inr INTEGER DEFAULT NULL,
+  price_usd INTEGER DEFAULT NULL,
+  pricing_tiers JSONB DEFAULT '[]', -- Array of { id, title, priceINR, priceUSD, features, licenseType, downloadKey }
+  pricing_model TEXT DEFAULT 'Free',
+  
+  -- Component Decoupling & Interactive Execution
+  component_name TEXT DEFAULT NULL,
+  app_url TEXT DEFAULT '',
+  github_url TEXT DEFAULT '',
+  tech_stack JSONB NOT NULL DEFAULT '[]',
+  highlights JSONB NOT NULL DEFAULT '[]',
+  controls_guide JSONB NOT NULL DEFAULT '[]',
+  
+  -- Digital Goods & Asset Packaging
+  download_package_key TEXT DEFAULT NULL, -- Path in private 'playground-releases' bucket
+  github_repo_source TEXT DEFAULT NULL,   -- e.g. 'prat3010/job-hunter' for GitHub invite delivery rail
+  file_size TEXT DEFAULT NULL,            -- e.g. '14.8 MB'
+  checksum_sha256 TEXT DEFAULT NULL,      -- SHA-256 binary hash
+  version TEXT DEFAULT '1.0.0',
+  license_type TEXT DEFAULT 'free' CHECK (license_type IN ('free', 'personal', 'commercial_single', 'commercial_unlimited', 'cloud_pass')),
+  showcase_projects JSONB NOT NULL DEFAULT '[]', -- Array of { title, url, description, author, stats }
+  
+  -- Dynamic Media & Cognitive Parameters
+  parameters JSONB DEFAULT '{}',
+  metadata JSONB NOT NULL DEFAULT '{}',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Indexes for Catalog Queries
+CREATE INDEX IF NOT EXISTS idx_playground_products_slug ON playground_products (slug);
+CREATE INDEX IF NOT EXISTS idx_playground_products_taxonomy ON playground_products (taxonomy);
+CREATE INDEX IF NOT EXISTS idx_playground_products_commercial ON playground_products (is_commercial);
+CREATE INDEX IF NOT EXISTS idx_playground_products_featured ON playground_products (featured, vibe_coded_date DESC);
+
+-- 17.2 Playground Orders & Transactions Table
+CREATE TABLE IF NOT EXISTS playground_orders (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  order_number TEXT UNIQUE NOT NULL, -- Format: ORD-PLAY-YYYYMMDD-XXXX
+  product_id UUID REFERENCES playground_products(id) ON DELETE SET NULL,
+  product_slug TEXT NOT NULL,
+  product_title TEXT NOT NULL,
+  customer_name TEXT NOT NULL,
+  customer_email TEXT NOT NULL,
+  tier_id TEXT NOT NULL DEFAULT 'standard',
+  amount NUMERIC(12, 2) NOT NULL,
+  currency TEXT NOT NULL CHECK (currency IN ('INR', 'USD', 'EUR', 'GBP')),
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'paid', 'failed', 'refunded')),
+  
+  -- Razorpay Payment Bridge
+  razorpay_order_id TEXT UNIQUE DEFAULT NULL,
+  razorpay_payment_id TEXT DEFAULT NULL,
+  razorpay_signature TEXT DEFAULT NULL,
+  
+  -- Digital Fulfillment Guardrails & Tokenized Guest Re-downloads
+  download_count INTEGER NOT NULL DEFAULT 0,
+  max_downloads INTEGER NOT NULL DEFAULT 10,
+  download_token TEXT UNIQUE NOT NULL DEFAULT encode(gen_random_bytes(32), 'hex'),
+  github_username TEXT DEFAULT NULL, -- Optional handle for automated GitHub repo invite
+  
+  -- Affiliate & Middleman Partner Attribution
+  referral_code TEXT DEFAULT NULL,
+  referral_partner_id TEXT DEFAULT NULL,
+  
+  metadata JSONB NOT NULL DEFAULT '{}',
+  paid_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_playground_orders_email ON playground_orders (customer_email);
+CREATE INDEX IF NOT EXISTS idx_playground_orders_rzp_order ON playground_orders (razorpay_order_id);
+CREATE INDEX IF NOT EXISTS idx_playground_orders_status ON playground_orders (status);
+CREATE INDEX IF NOT EXISTS idx_playground_orders_referral ON playground_orders (referral_code);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_playground_orders_download_token ON playground_orders (download_token);
+
+-- 17.3 Digital Licenses Table
+CREATE TABLE IF NOT EXISTS playground_licenses (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  license_key TEXT UNIQUE NOT NULL, -- Format: PRTK-PLAY-XXXX-XXXX-XXXX-XXXX
+  order_id UUID REFERENCES playground_orders(id) ON DELETE CASCADE NOT NULL UNIQUE, -- Strict 1-to-1 constraint
+  customer_email TEXT NOT NULL,
+  product_slug TEXT NOT NULL,
+  license_type TEXT NOT NULL DEFAULT 'commercial_single',
+  is_active BOOLEAN NOT NULL DEFAULT TRUE,
+  revocation_reason TEXT DEFAULT NULL,
+  metadata JSONB NOT NULL DEFAULT '{}',
+  expires_at TIMESTAMP WITH TIME ZONE DEFAULT NULL, -- NULL = Perpetual Lifetime
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_playground_licenses_key ON playground_licenses (license_key);
+CREATE INDEX IF NOT EXISTS idx_playground_licenses_email ON playground_licenses (customer_email);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_playground_licenses_order_id ON playground_licenses (order_id);
+
+-- Row Level Security (RLS) Policies
+ALTER TABLE playground_products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE playground_orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE playground_licenses ENABLE ROW LEVEL SECURITY;
+
+-- Products: Public Read-Only
+DROP POLICY IF EXISTS "Allow public read access to playground_products" ON playground_products;
+CREATE POLICY "Allow public read access to playground_products"
+  ON playground_products FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Service role manages playground_products" ON playground_products;
+CREATE POLICY "Service role manages playground_products"
+  ON playground_products TO service_role USING (true) WITH CHECK (true);
+
+-- Orders: Service-Role Only (Never exposed to anonymous public queries; tokenized guest downloads query via server API)
+DROP POLICY IF EXISTS "Deny anonymous access to playground_orders" ON playground_orders;
+CREATE POLICY "Deny anonymous access to playground_orders"
+  ON playground_orders FOR ALL USING (false);
+
+DROP POLICY IF EXISTS "Service role manages playground_orders" ON playground_orders;
+CREATE POLICY "Service role manages playground_orders"
+  ON playground_orders TO service_role USING (true) WITH CHECK (true);
+
+-- Licenses: Read allowed if caller matches authenticated session email
+DROP POLICY IF EXISTS "Allow users to read their own licenses" ON playground_licenses;
+CREATE POLICY "Allow users to read their own licenses"
+  ON playground_licenses FOR SELECT
+  USING (auth.jwt() ->> 'email' = customer_email);
+
+DROP POLICY IF EXISTS "Service role manages playground_licenses" ON playground_licenses;
+CREATE POLICY "Service role manages playground_licenses"
+  ON playground_licenses TO service_role USING (true) WITH CHECK (true);
+
+-- 17.4 Private Supabase Storage Bucket for Digital Goods Releases
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'playground-releases',
+  'playground-releases',
+  false,
+  262144000, -- 250 MB limit (Pro tier max 5 GB)
+  ARRAY['application/zip', 'application/x-zip-compressed', 'application/gzip', 'application/x-tar']
+) ON CONFLICT (id) DO NOTHING;
+
+-- Storage RLS Policies for playground-releases
+DROP POLICY IF EXISTS "Deny public download for playground-releases" ON storage.objects;
+CREATE POLICY "Deny public download for playground-releases"
+  ON storage.objects FOR SELECT
+  USING (bucket_id = 'playground-releases' AND false);
+
+DROP POLICY IF EXISTS "Service role manages playground-releases" ON storage.objects;
+CREATE POLICY "Service role manages playground-releases"
+  ON storage.objects TO service_role
+  USING (bucket_id = 'playground-releases')
+  WITH CHECK (bucket_id = 'playground-releases');
+
+
 
 
 

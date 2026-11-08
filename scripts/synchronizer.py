@@ -55,6 +55,7 @@ from sync_tabs.rag_pricing import render_rag_pricing_tab
 from sync_tabs.clients import render_clients_tab
 from sync_tabs.questionnaire import render_questionnaire_tab
 from sync_tabs.outreach import render_outreach_tab
+from sync_tabs.playground import render_playground_tab
 
 st.set_page_config(
     page_title="Resume & Portfolio Manager",
@@ -147,6 +148,7 @@ st.sidebar.markdown("""
 nav_options = [
     "👤 Profile, Bio & Career",
     "🚀 Deployed Systems & Architecture",
+    "🎮 Playground & Micro-SaaS",
     "⚡ Skills Matrix",
     "📜 Verified Badges",
     "🖼️ Photos & Assets",
@@ -349,6 +351,7 @@ def render_control_room_tab():
 NAV_DISPATCH = {
     "👤 Profile, Bio & Career": render_resume_profile_tab,
     "🚀 Deployed Systems & Architecture": render_projects_tab,
+    "🎮 Playground & Micro-SaaS": render_playground_tab,
     "⚡ Skills Matrix": render_skills_tab,
     "📜 Verified Badges": render_certificates_tab,
     "🖼️ Photos & Assets": render_photos_tab,

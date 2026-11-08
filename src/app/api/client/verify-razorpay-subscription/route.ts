@@ -61,9 +61,12 @@ export async function POST(req: Request) {
         .update(`${razorpayPaymentId}|${razorpaySubscriptionId}`)
         .digest('hex');
 
+      const expBuf = Buffer.from(expectedSignature, 'utf-8');
+      const sigBuf = Buffer.from(razorpaySignature, 'utf-8');
+
       if (
-        expectedSignature.length !== razorpaySignature.length ||
-        !crypto.timingSafeEqual(Buffer.from(expectedSignature), Buffer.from(razorpaySignature))
+        expBuf.byteLength !== sigBuf.byteLength ||
+        !crypto.timingSafeEqual(expBuf, sigBuf)
       ) {
         console.warn('Razorpay subscription signature mismatch:', {
           expectedSignature,

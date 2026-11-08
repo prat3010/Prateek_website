@@ -4,12 +4,14 @@ import type { Project } from '@/data/projects';
 import type { Skill } from '@/data/skills';
 import type { Certificate } from '@/data/certificates';
 import type { ResumeData } from '@/data/resume';
+import type { PlaygroundItem } from '@/data/playgroundItems';
 
 // Fallback JSON imports
 import projectsFallback from '@/data/projects.json';
 import skillsFallback from '@/data/skills.json';
 import certificatesFallback from '@/data/certificates.json';
 import resumeFallback from '@/data/resume.json';
+import playgroundFallback from '@/data/playgroundItems.json';
 
 const getErrorMessage = (err: unknown): string => {
   if (err && typeof err === 'object' && 'message' in err) {
@@ -124,4 +126,66 @@ export const getProfile = unstable_cache(
   ['getProfile'],
   { tags: ['portfolio-data', 'profile'] }
 );
+
+export const getPlaygroundProducts = unstable_cache(
+  async (): Promise<PlaygroundItem[]> => {
+    if (!supabase) {
+      return playgroundFallback as unknown as PlaygroundItem[];
+    }
+    try {
+      const { data, error } = await supabase
+        .from('playground_products')
+        .select('*')
+        .order('featured', { ascending: false })
+        .order('vibe_coded_date', { ascending: false });
+
+      if (error || !data || data.length === 0) {
+        throw error || new Error('No playground data found in Supabase');
+      }
+
+      // Map snake_case columns back to canonical TypeScript interface
+      return data.map((item: Record<string, unknown>) => ({
+        id: String(item.id || ''),
+        slug: String(item.slug || ''),
+        title: String(item.title || ''),
+        tagline: item.tagline,
+        description: item.description,
+        kind: item.kind,
+        taxonomy: item.taxonomy || 'toys-and-games',
+        tags: item.tags || [],
+        vibeCodedDate: item.vibe_coded_date,
+        featured: item.featured,
+        status: item.status,
+        metricsBadge: item.metrics_badge,
+        previewImage: item.preview_image,
+        isCommercial: item.is_commercial,
+        priceINR: item.price_inr,
+        priceUSD: item.price_usd,
+        pricingTiers: item.pricing_tiers || [],
+        pricingModel: item.pricing_model,
+        componentName: item.component_name,
+        appUrl: item.app_url,
+        githubUrl: item.github_url,
+        techStack: item.tech_stack || [],
+        highlights: item.highlights || [],
+        controlsGuide: item.controls_guide || [],
+        downloadPackageKey: item.download_package_key,
+        githubRepoSource: item.github_repo_source,
+        fileSize: item.file_size,
+        checksumSha256: item.checksum_sha256,
+        version: item.version,
+        licenseType: item.license_type,
+        showcaseProjects: item.showcase_projects || [],
+        parameters: item.parameters || {},
+        metadata: item.metadata || {},
+      })) as PlaygroundItem[];
+    } catch (err) {
+      console.warn('Playground products data notice (using local fallback):', getErrorMessage(err));
+      return playgroundFallback as unknown as PlaygroundItem[];
+    }
+  },
+  ['getPlaygroundProducts'],
+  { tags: ['portfolio-data', 'playground-items'] }
+);
+
 

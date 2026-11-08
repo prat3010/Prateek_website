@@ -1222,4 +1222,139 @@ export async function sendHotLeadAlertNotification(params: HotLeadAlertParams): 
   }
 }
 
+export interface PlaygroundFulfillmentEmailParams {
+  customerName: string;
+  customerEmail: string;
+  orderNumber: string;
+  productTitle: string;
+  productSlug: string;
+  amount: number;
+  currency: string;
+  licenseKey: string;
+  downloadSignedUrl: string;
+  downloadToken: string;
+  githubUsername?: string;
+  githubRepoSource?: string;
+}
+
+/**
+ * Sends digital goods fulfillment receipt with license key, 24h signed URL,
+ * permanent tokenized re-download link, and statutory GST LUT export notice.
+ */
+export async function sendPlaygroundFulfillmentEmail(params: PlaygroundFulfillmentEmailParams): Promise<boolean> {
+  const client = getResendClient();
+  if (!client) {
+    console.warn('Skipping sendPlaygroundFulfillmentEmail: RESEND_API_KEY not configured.');
+    return false;
+  }
+
+  const nameEscaped = escapeHtml(params.customerName);
+  const titleEscaped = escapeHtml(params.productTitle);
+  const orderEscaped = escapeHtml(params.orderNumber);
+  const licenseEscaped = escapeHtml(params.licenseKey);
+  const currencyEscaped = escapeHtml(params.currency);
+  const amountStr = `${currencyEscaped} ${params.amount.toLocaleString()}`;
+  const signedUrlSanitized = sanitizeUrl(params.downloadSignedUrl);
+  const magicLink = `https://prateeq.in/api/playground/download?token=${encodeURIComponent(params.downloadToken)}&order=${encodeURIComponent(params.orderNumber)}`;
+  const magicLinkSanitized = sanitizeUrl(magicLink);
+
+  const ghNotice = (params.githubUsername && params.githubRepoSource)
+    ? `<div style="background: rgba(0, 230, 118, 0.08); border: 1px solid rgba(0, 230, 118, 0.25); border-radius: 8px; padding: 14px; margin: 16px 0; color: #f8fafc; font-size: 13px;">
+         <strong style="color: #00e676;">✓ GitHub Collaborator Access:</strong> An invitation has been dispatched to GitHub <strong>@${escapeHtml(params.githubUsername)}</strong> for repository <code>${escapeHtml(params.githubRepoSource)}</code>. Check your notifications on GitHub to accept collaborator access.
+       </div>`
+    : '';
+
+  try {
+    const { error } = await client.resend.emails.send({
+      from: 'Prateeq Studio Digital <orders@prateeq.in>',
+      to: params.customerEmail,
+      subject: `🎉 Your Digital Goods: ${params.productTitle} License & Download // Prateeq Studio`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <body style="font-family: system-ui, -apple-system, sans-serif; background: #08090c; color: #f8fafc; padding: 32px 16px; margin: 0;">
+            <div style="max-width: 600px; margin: 0 auto; background: #12151d; border: 1px solid #232938; border-radius: 12px; padding: 28px; box-shadow: 0 16px 40px rgba(0,0,0,0.5);">
+              
+              <div style="border-bottom: 1px solid #232938; padding-bottom: 20px; margin-bottom: 20px;">
+                <div style="color: #00e676; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">PRATEEQ STUDIO // DIGITAL FULFILLMENT</div>
+                <h1 style="color: #ffffff; font-size: 22px; margin: 8px 0 4px 0;">Order Confirmed & Delivered</h1>
+                <div style="color: #94a3b8; font-size: 13px;">Order Number: <strong style="color: #f1f5f9; font-family: monospace;">${orderEscaped}</strong></div>
+              </div>
+
+              <p style="color: #cbd5e1; font-size: 14px; line-height: 1.6;">
+                Hi ${nameEscaped},<br />
+                Thank you for purchasing <strong>${titleEscaped}</strong>. Your commercial software license and production package are ready below.
+              </p>
+
+              <!-- License Key Display Box -->
+              <div style="background: #090b10; border: 1px solid #283044; border-radius: 8px; padding: 18px; margin: 20px 0;">
+                <div style="color: #94a3b8; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;">Your Software License Key</div>
+                <div style="color: #00e676; font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700; letter-spacing: 0.04em;">${licenseEscaped}</div>
+                <div style="color: #64748b; font-size: 11px; margin-top: 6px;">Perpetual Single-Developer Commercial License • Keep this key for updates</div>
+              </div>
+
+              <!-- Instant Download CTA Button -->
+              <div style="text-align: center; margin: 24px 0;">
+                <a href="${signedUrlSanitized}" style="display: inline-block; background: #00e676; color: #08090c; padding: 14px 28px; font-weight: 700; border-radius: 8px; text-decoration: none; font-size: 15px; box-shadow: 0 4px 16px rgba(0, 230, 118, 0.3);">
+                  ⬇ Download Release Package (.zip)
+                </a>
+                <div style="color: #64748b; font-size: 11px; margin-top: 8px;">Authenticated & quota-protected download link (10 downloads included). Use the lifetime magic link anytime.</div>
+              </div>
+
+              ${ghNotice}
+
+              <!-- Lifetime Magic Re-download Link -->
+              <div style="background: #181d28; border: 1px solid #283044; border-radius: 8px; padding: 14px; margin: 20px 0;">
+                <strong style="color: #38bdf8; font-size: 13px;">🔗 Permanent Magic Re-download Link:</strong>
+                <p style="color: #94a3b8; font-size: 12px; margin: 6px 0 10px 0; line-height: 1.5;">
+                  Non-Google or guest buyer? Bookmark this private link to generate fresh signed downloads anytime up to your quota limit:
+                </p>
+                <div style="word-break: break-all;">
+                  <a href="${magicLinkSanitized}" style="color: #38bdf8; font-family: monospace; font-size: 11px; text-decoration: underline;">
+                    ${magicLinkSanitized}
+                  </a>
+                </div>
+              </div>
+
+              <!-- Itemized Receipt Summary -->
+              <div style="border-top: 1px solid #232938; padding-top: 18px; margin-top: 24px;">
+                <div style="color: #94a3b8; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Itemized Receipt</div>
+                <table style="width: 100%; font-size: 13px; color: #cbd5e1; border-collapse: collapse;">
+                  <tr>
+                    <td style="padding: 6px 0;">${titleEscaped} (Commercial Release)</td>
+                    <td style="padding: 6px 0; text-align: right; font-weight: 600; color: #f8fafc;">${amountStr}</td>
+                  </tr>
+                  <tr style="border-top: 1px solid #1e2433;">
+                    <td style="padding: 8px 0; font-weight: 700; color: #ffffff;">Total Settled</td>
+                    <td style="padding: 8px 0; text-align: right; font-weight: 700; color: #00e676;">${amountStr}</td>
+                  </tr>
+                </table>
+              </div>
+
+              <!-- Statutory GST LUT Notice -->
+              <div style="border-top: 1px solid #232938; padding-top: 16px; margin-top: 20px; font-size: 11px; color: #64748b; line-height: 1.5;">
+                <strong style="color: #94a3b8;">Statutory Tax & Export Notice:</strong><br />
+                Export of software services without payment of integrated tax (IGST) under Letter of Undertaking (LUT) in terms of Section 16(3)(a) of IGST Act, 2017.<br />
+                Entity: Prateeq Studio • Prateek Sharma • New Delhi, India.<br />
+                Need help or custom scoping? Reply directly to this email or visit <a href="https://prateeq.in/dashboard" style="color: #38bdf8; text-decoration: none;">prateeq.in/dashboard</a>.
+              </div>
+
+            </div>
+          </body>
+        </html>
+      `,
+    });
+
+    if (error) {
+      console.warn('sendPlaygroundFulfillmentEmail Resend error:', error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.warn('sendPlaygroundFulfillmentEmail network exception:', err);
+    return false;
+  }
+}
+
+
 

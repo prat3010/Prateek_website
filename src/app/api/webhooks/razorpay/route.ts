@@ -6,8 +6,17 @@ import {
   sendPaymentConfirmationNotifications,
   sendRetrieverSubscriptionNotifications,
   sendFinalBalanceSettlementNotifications,
+  sendPlaygroundFulfillmentEmail,
 } from '@/lib/emailNotification';
 import { ensureRetrieverEngineTenant } from '@/lib/retrieverProvision';
+import {
+  claimAndSettlePlaygroundOrder,
+  generatePlaygroundLicenseKey,
+  inviteCustomerToGitHubRepo,
+  recordPlaygroundAffiliateCommission,
+  resolvePlaygroundTierPackage,
+} from '@/lib/playgroundCommerce';
+import { getPlaygroundItemBySlug, type PlaygroundItem } from '@/data/playgroundItems';
 
 export async function POST(req: Request) {
   try {
@@ -30,9 +39,12 @@ export async function POST(req: Request) {
       .update(rawBody)
       .digest('hex');
 
+    const expectedBuf = Buffer.from(expectedSignature, 'utf-8');
+    const signatureBuf = Buffer.from(signature, 'utf-8');
+
     if (
-      expectedSignature.length !== signature.length ||
-      !crypto.timingSafeEqual(Buffer.from(expectedSignature), Buffer.from(signature))
+      expectedBuf.byteLength !== signatureBuf.byteLength ||
+      !crypto.timingSafeEqual(expectedBuf, signatureBuf)
     ) {
       console.warn('Razorpay webhook signature mismatch');
       return NextResponse.json({ error: 'Invalid webhook signature' }, { status: 400 });
@@ -92,6 +104,98 @@ export async function POST(req: Request) {
         '';
 
       const nowIso = new Date().toISOString();
+
+      // Check for digital goods playground order settlement
+      if (razorpayOrderId) {
+        try {
+          const { data: pgOrder } = await supabase
+            .from('playground_orders')
+            .select('*')
+            .eq('razorpay_order_id', razorpayOrderId)
+            .maybeSingle();
+
+          if (pgOrder) {
+            const { wonSettlementRace, order } = await claimAndSettlePlaygroundOrder(
+              supabase,
+              pgOrder.id,
+              razorpayPaymentId || pgOrder.razorpay_payment_id || '',
+              signature
+            );
+
+            if (wonSettlementRace && order) {
+              let product = getPlaygroundItemBySlug(order.product_slug);
+              try {
+                const { data: dbProduct } = await supabase
+                  .from('playground_products')
+                  .select('*')
+                  .eq('slug', order.product_slug)
+                  .maybeSingle();
+                if (dbProduct) {
+                  product = { ...product, ...dbProduct } as unknown as PlaygroundItem;
+                }
+              } catch {}
+
+              const tierResolution = product
+                ? resolvePlaygroundTierPackage(product, order.tier_id)
+                : { packageKey: `${order.product_slug}/package.zip`, licenseType: 'commercial_single' };
+
+              let licenseKey = generatePlaygroundLicenseKey();
+              const { error: licErr } = await supabase.from('playground_licenses').insert({
+                license_key: licenseKey,
+                order_id: order.id,
+                customer_email: order.customer_email,
+                product_slug: order.product_slug,
+                license_type: tierResolution.licenseType,
+                is_active: true,
+              });
+              if (licErr) {
+                const { data: existingLic } = await supabase
+                  .from('playground_licenses')
+                  .select('license_key')
+                  .eq('order_id', order.id)
+                  .maybeSingle();
+                if (existingLic?.license_key) {
+                  licenseKey = existingLic.license_key;
+                }
+              }
+
+              const downloadGatewayUrl = `/api/playground/download?token=${encodeURIComponent(order.download_token)}&order=${encodeURIComponent(order.order_number)}`;
+
+              sendPlaygroundFulfillmentEmail({
+                customerName: order.customer_name || 'Valued Customer',
+                customerEmail: order.customer_email,
+                orderNumber: order.order_number,
+                productTitle: order.product_title,
+                productSlug: order.product_slug,
+                amount: Number(order.amount),
+                currency: order.currency,
+                licenseKey,
+                downloadSignedUrl: downloadGatewayUrl,
+                downloadToken: order.download_token,
+                githubUsername: order.github_username || undefined,
+                githubRepoSource: product?.githubRepoSource,
+              }).catch((e) => console.warn('Webhook email error:', e));
+
+              if (order.github_username && product?.githubRepoSource) {
+                inviteCustomerToGitHubRepo(product.githubRepoSource, order.github_username).catch(() => {});
+              }
+
+              if (order.referral_code) {
+                recordPlaygroundAffiliateCommission(supabase, order).catch(() => {});
+              }
+            }
+
+            return NextResponse.json({
+              status: 'ok',
+              playground_order: pgOrder.order_number,
+              settled: wonSettlementRace,
+              idempotent: !wonSettlementRace,
+            });
+          }
+        } catch (pgErr) {
+          console.warn('Webhook playground order check error:', pgErr);
+        }
+      }
 
       // Resolve the internal invoice: try razorpay_order_id, razorpay_invoice_id, or notes
       let invoice: {

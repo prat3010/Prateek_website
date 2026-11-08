@@ -17,8 +17,10 @@ import {
   UserCheck,
   ArrowRight,
   Settings,
+  ShoppingBag,
 } from 'lucide-react';
 import { SectionErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { PlaygroundLicenseHub } from '@/components/dashboard/PlaygroundLicenseHub';
 import { generateQuestionnairePDF, generateExecutiveBriefPDF } from '@/utils/pdfGenerator';
 import type { ClientScope, InvoiceEntity } from '@/lib/clientOrder';
 import { resolveMaintenancePlanKey } from '@/lib/clientOrder';
@@ -56,7 +58,7 @@ function getMockPeriodEndIso(days = 30): string {
 
 export default function ClientDashboardPage() {
   const router = useRouter();
-  const { user, loading, logout, loginWithGoogle, getAccessToken } = useAuth();
+  const { user, session, loading, logout, loginWithGoogle, getAccessToken } = useAuth();
   const { theme } = useTheme();
   const isNoir = theme === 'noir';
 
@@ -130,7 +132,7 @@ export default function ClientDashboardPage() {
     }
   }, []);
 
-  const [activeTab, setActiveTab] = useState<'scopes' | 'onboarding' | 'invoices' | 'settings'>('scopes');
+  const [activeTab, setActiveTab] = useState<'scopes' | 'onboarding' | 'invoices' | 'licenses' | 'settings'>('scopes');
   const [authGateError, setAuthGateError] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
   const [cancellingScopeCode, setCancellingScopeCode] = useState<string | null>(null);
@@ -1194,6 +1196,26 @@ export default function ClientDashboardPage() {
         <button
           type="button"
           role="tab"
+          aria-selected={activeTab === 'licenses'}
+          className={`${styles.tabBtn} ${activeTab === 'licenses' ? styles.tabBtnActive : ''}`}
+          onClick={() => setActiveTab('licenses')}
+        >
+          {activeTab === 'licenses' && (
+            <motion.span
+              layoutId="activeDashboardTabPill"
+              className={styles.tabPill}
+              transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+            />
+          )}
+          <span className={styles.tabLabel}>
+            <ShoppingBag size={18} />
+            <span>Digital Goods &amp; Licenses</span>
+          </span>
+        </button>
+
+        <button
+          type="button"
+          role="tab"
           aria-selected={activeTab === 'settings'}
           className={`${styles.tabBtn} ${activeTab === 'settings' ? styles.tabBtnActive : ''}`}
           onClick={() => setActiveTab('settings')}
@@ -1273,6 +1295,13 @@ export default function ClientDashboardPage() {
           onDownloadPdf={handleDownloadInvoicePdf}
           onPayInvoice={handlePayInvoice}
           onRefresh={loadInvoices}
+        />
+      )}
+
+      {activeTab === 'licenses' && (
+        <PlaygroundLicenseHub
+          sessionToken={session?.access_token}
+          getAccessToken={getAccessToken}
         />
       )}
 

@@ -308,6 +308,55 @@ if posts_to_sync:
     upsert('posts', posts_to_sync, 'slug')
 print(f'  {len(posts_to_sync)} blog posts synced')
 
+# ── 7. Playground Products ────────────────────────────────────────────
+print('\nSeeding playground_products...')
+playground_json_path = os.path.join(ROOT, 'src', 'data', 'playgroundItems.json')
+if os.path.exists(playground_json_path):
+    try:
+        with open(playground_json_path, 'r', encoding='utf-8') as f:
+            pg_items = json.load(f)
+        pg_rows = []
+        for item in pg_items:
+            pg_rows.append({
+                'slug': item.get('slug', ''),
+                'title': item.get('title', ''),
+                'tagline': item.get('tagline', ''),
+                'description': item.get('description', ''),
+                'kind': item.get('kind', 'saas'),
+                'taxonomy': item.get('taxonomy', 'toys-and-games'),
+                'is_commercial': item.get('isCommercial', False),
+                'price_inr': item.get('priceINR'),
+                'price_usd': item.get('priceUSD'),
+                'pricing_model': item.get('pricingModel', 'Free'),
+                'pricing_tiers': item.get('pricingTiers', []),
+                'status': item.get('status', 'live'),
+                'featured': item.get('featured', False),
+                'metrics_badge': item.get('metricsBadge', ''),
+                'preview_image': item.get('previewImage', ''),
+                'vibe_coded_date': item.get('vibeCodedDate', '2026-11-08'),
+                'tags': item.get('tags', []),
+                'tech_stack': item.get('techStack', []),
+                'highlights': item.get('highlights', []),
+                'controls_guide': item.get('controlsGuide', []),
+                'app_url': item.get('appUrl', ''),
+                'github_url': item.get('githubUrl', ''),
+                'component_name': item.get('componentName'),
+                'github_repo_source': item.get('githubRepoSource'),
+                'download_package_key': item.get('downloadPackageKey'),
+                'file_size': item.get('fileSize'),
+                'checksum_sha256': item.get('checksumSha256'),
+                'version': item.get('version', '1.0.0'),
+                'license_type': item.get('licenseType', 'free'),
+                'showcase_projects': item.get('showcaseProjects', []),
+                'parameters': item.get('parameters', {}),
+            })
+        if pg_rows:
+            upsert('playground_products', pg_rows, 'slug')
+            print(f'  {len(pg_rows)} playground products synced')
+    except Exception as e:
+        print(f'  Failed to seed playground_products: {e}')
+
 print('')
 print('Done!')
+
 

@@ -401,5 +401,29 @@ def upsert_record(table, record, key_col='id'):
         return None
 
 
+def upload_storage_file(bucket, path, file_bytes, content_type='application/zip'):
+    """Uploads file bytes to Supabase Storage bucket using service role credentials."""
+    if not _has_config():
+        return False, "Missing Supabase configuration"
+    url = f'{_URL}/storage/v1/object/{bucket}/{path}'
+    headers = {
+        'apikey': _KEY,
+        'Authorization': f'Bearer {_KEY}',
+        'Content-Type': content_type,
+        'x-upsert': 'true',
+    }
+    req = urllib.request.Request(url, data=file_bytes, headers=headers, method='POST')
+    try:
+        with urllib.request.urlopen(req, timeout=300) as resp:
+            return True, "Success"
+    except urllib.error.HTTPError as e:
+        err = e.read().decode()
+        print(f'  HTTP {e.code} uploading to storage {bucket}/{path}: {err}')
+        return False, f"HTTP {e.code}: {err}"
+    except Exception as e:
+        return False, str(e)
+
+
+
 
 
