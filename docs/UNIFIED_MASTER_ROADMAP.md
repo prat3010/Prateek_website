@@ -1030,44 +1030,6 @@ timeline
   - **Control Plane Voice Studio Upgrade:** Integrated genuine Web Audio API `AudioContext` + `AnalyserNode` frequency spectrum visualization in `VoiceStudioPanel.tsx` and purged all fake `Math.random()` bars and timer mocks.
 - **Status:** **Completed (Phase P / v1.4.0-alpha1)**
 
-#### 🕸️ Milestone 115: Distributed Model Context Protocol (MCP) Mesh & Agent Federation
-- **Libraries:** HMAC-SHA256, JSON-RPC 2.0, FastAPI, React 19, TypeScript, Pytest
-- **Repo Scope:** Both (`retriever` `apps/api/src/domain/abstractions/mcp_mesh.py`, `apps/api/src/domain/mcp/mesh_service.py`, `apps/api/src/domain/mcp/federation_service.py`, `apps/api/src/routers/mcp_mesh.py`, `apps/api/tests/test_mcp_mesh.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `src/components/rag/McpPanel.tsx`, `src/components/rag/McpPanel.module.css`, `src/components/rag/__tests__/McpPanel.test.tsx`, `docs/36_Distributed_MCP_Mesh_and_Agent_Federation_PRD.md`)
-- **Deliverable:**
-  - **Platform Battery #30 Registration:** Cataloged `distributed_mcp_mesh` in `BatteryService` under `SYSTEM_EXTENSIBILITY`.
-  - **Decentralized MCP Tool Mesh:** Multi-cluster tool discovery, dynamic capability advertisement, heartbeat leasing (120s eviction), and latency-weighted peer routing.
-  - **Cryptographic Trust Envelopes:** Inter-cluster tool execution and delegation signed via HMAC-SHA256 with 60-second sliding-window nonce replay protection.
-  - **Cross-Cluster Agent Federation:** Distributed ReAct cognitive loop allowing agents to delegate sub-goals to specialist agents on remote sovereign clusters with strict circular loop breakers (`FederationLoopError`).
-  - **Decoupled API Client SDKs Extended:** Added full mesh and federation API parity to `@prat3010/retriever-client` (npm) and `retriever-python` (PyPI).
-  - **Control Plane Studio Upgraded:** Integrated 3-tab segmented controller in `McpPanel.tsx` with decentralized node topology visualizer, live routing dispatcher, and cross-cluster agent delegation cockpit under Design System 2.0.
-- **Status:** **Completed (Phase P / v1.5.0-alpha1)**
-
-#### ⚖️ Milestone 116: Autonomous Mesh Dynamic Load-Balancing & Ephemeral Enclave Auto-Scaling
-- **Libraries:** Power-of-Two-Choices (P2C), EWMA Latency Decay ($\alpha = 0.2$), FastAPI, React 19, TypeScript, Pytest
-- **Repo Scope:** Both (`retriever` `apps/api/src/domain/mcp/load_balancer_service.py`, `apps/api/src/routers/mcp_mesh.py`, `apps/api/tests/test_mesh_load_balancer.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `src/components/rag/McpPanel.tsx`, `src/components/rag/McpPanel.module.css`, `src/components/rag/__tests__/McpPanel.test.tsx`, `docs/37_Mesh_Load_Balancing_and_Ephemeral_AutoScaling_PRD.md`)
-- **Deliverable:**
-  - **Platform Battery #31 Registration:** Cataloged `mesh_load_balancer` in `BatteryService` under `SYSTEM_EXTENSIBILITY`.
-  - **Power-of-Two-Choices (P2C) Balancing:** Random sampling of 2 candidate nodes to minimize composite load scores ($\text{EWMA} \times (1 + \text{queue}) \times (1 + \text{slot\_utilization})$), preventing traffic stampedes.
-  - **EWMA Latency Decay ($\alpha = 0.2$):** Execution slot tracking with Exponentially Weighted Moving Average decay incorporating authentic execution runtimes.
-  - **Autonomous Scale-to-Zero Reaping:** Spawns ephemeral edge enclaves on demand under pressure ($\ge 80\%$ utilization or queue $\ge 10$) and reaps idle enclaves after 300s of inactivity.
-  - **Circuit-Breaker Load-Shedding:** Enforces a hard 95% cluster slot saturation ceiling, emitting HTTP 429 Too Many Requests to prevent cascade failure.
-  - **FastAPI Endpoints & SDK Parity:** Mounted `/v1/mesh/load/*` and added complete client SDK methods to `@prat3010/retriever-client` and `retriever-python`.
-  - **Control Plane Studio Upgraded:** Added 4th tab "Dynamic Load & Enclaves" in `McpPanel.tsx` with cluster capacity dials, interactive autoscaling policy sliders, and live event audit ledger under Design System 2.0.
-- **Status:** **Completed (Phase P / v1.6.0-alpha1)**
-
-#### 💎 Milestone 117: Decentralized Multi-Tenant Vector Sharding & Distributed Raft Consensus
-- **Libraries:** 32-bit FNV-1a Hashing, Raft Consensus State Machine, Reciprocal Rank Fusion (RRF), FastAPI, React 19, TypeScript, Pytest
-- **Repo Scope:** Both (`retriever` `apps/api/src/domain/abstractions/vector_sharding.py`, `apps/api/src/domain/retrieval/vector_raft_sharding_service.py`, `apps/api/src/routers/vector_sharding.py`, `apps/api/tests/test_vector_raft_sharding.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `src/components/rag/VectorShardingPanel.tsx`, `src/components/rag/VectorShardingPanel.module.css`, `src/components/rag/__tests__/VectorShardingPanel.test.tsx`, `docs/38_Decentralized_Vector_Sharding_and_Raft_Consensus_PRD.md`)
-- **Deliverable:**
-  - **Platform Battery #32 Registration:** Cataloged `vector_raft_sharding` in `BatteryService` under `EDGE_DISTRIBUTION`.
-  - **Consistent Virtual-Node Hash Ring:** Pure domain virtual-node hashing (64 vnodes/shard, $[0, 2^{32}-1]$ ring) with clockwise partition assignment and sub-millisecond lookup.
-  - **Distributed Raft Consensus:** In-memory Raft state machine with terms, candidate leader elections, majority quorum voting, AppendEntries heartbeat log replication, and write-quorum validation.
-  - **Scatter-Gather Vector Querying:** Parallel query dispatch across active shards with local cosine similarity filtering, partial result aggregation, and Reciprocal Rank Fusion (RRF, $k=60$) rank merging.
-  - **Online 2-Phase Shard Rebalancing:** Non-blocking 2-phase migration (`PREPARING` -> delta copy -> `SYNCHRONIZING` -> atomic flip) preventing data loss or downtime during scale-out.
-  - **FastAPI Endpoints & SDK Parity:** Mounted `/v1/shards/*` and implemented complete client SDK methods in `@prat3010/retriever-client` and `retriever-python`.
-  - **Control Plane Studio Upgraded:** Dedicated `VectorShardingPanel.tsx` in `/rag/app` featuring 4 sub-views (Topology & Hash Ring, Raft Consensus, Scatter-Gather Benchmark, Cluster Rebalancer) under Design System 2.0.
-- **Status:** **Completed (Phase P / v1.7.0-alpha1)**
-
 #### 📜 Milestone 118: Zero-Knowledge Proof (ZKP) Vector Attestation & Verifiable Grounding
 - **Libraries:** Cryptography (SHA-256, Ed25519), Binary Merkle Trees, Inclusion Proofs, FastAPI, React 19, TypeScript, Pytest
 - **Repo Scope:** Both (`retriever` `apps/api/src/domain/abstractions/zkp_attestation.py`, `apps/api/src/adapters/security/zkp_attestation_adapter.py`, `apps/api/src/routers/zkp.py`, `apps/api/tests/test_zkp_attestation.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `src/components/rag/ZkpAttestationPanel.tsx`, `src/components/rag/ZkpAttestationPanel.module.css`, `docs/39_Zero_Knowledge_Vector_Attestation_PRD.md`)
@@ -1102,19 +1064,6 @@ timeline
   - **Automated Validation Gating & Hot LoRA Rollback:** Strict benchmark validation threshold ($\text{accuracy} \ge 0.75$) with hot adapter swap and zero-downtime rollback to baseline checkpoints upon regression.
   - **Control Plane Studio Upgraded:** Dedicated `DpoTuningPanel.tsx` in `/rag/app` under Design System 2.0 with live telemetry charts, hyperparameter tuning controls, and model checkpoint registry.
 - **Status:** **Completed (Phase P / v1.9.0-alpha2)**
-
-#### 🛡️ Milestone 121: Confidential Multi-Party Vector Computation (MPC) Privacy Enclaves
-- **Libraries:** Fixed-Point Scale ($Q_{16.16}$), Beaver Multiplication Triples, Additive Secret Sharing, Laplace Noise Differential Privacy, FastAPI, React 19, TypeScript, Pytest
-- **Repo Scope:** Both (`retriever` `apps/api/src/domain/abstractions/mpc_enclave.py`, `apps/api/src/adapters/security/mpc_enclave_adapter.py`, `apps/api/src/routers/mpc.py`, `apps/api/tests/test_mpc_enclave.py`, `packages/retriever-client/`, `packages/retriever-python/` & `Prateek_website` `src/lib/rag-types.ts`, `src/lib/rag-client.ts`, `src/components/rag/MpcEnclavePanel.tsx`, `src/components/rag/MpcEnclavePanel.module.css`, `docs/42_Confidential_Multi_Party_Vector_Computation_PRD.md`)
-- **Deliverable:**
-  - **Platform Battery #36 Registration:** Cataloged `confidential_mpc_enclave` in `BatteryService` under `SAFETY_DEFENSE`.
-  - **Additive Secret Sharing Engine:** Arithmetic vector share generation over $Q_{16.16}$ fixed-point representation with complete information-theoretic privacy ($\sum_{i=1}^N [x]_i = x$).
-  - **Beaver Multiplication Triples & PPIP:** Authenticated triple generation ($c = a \cdot b$) executing Privacy-Preserving Inner Product ($\langle q, d \rangle$) and cosine similarity without exposing plain query or document vectors.
-  - **Threshold Top-K Filtering & Privacy Budget:** Oblivious score ranking filtering results above $\tau_{\text{privacy}}$, bounded by differential privacy noise and Shannon entropy auditing.
-  - **Multi-Party Enclave Session Lifecycle:** Real-time state machine (`INITIALIZED` $\to$ `WAITING_FOR_SHARES` $\to$ `COMPUTING` $\to$ `COMPLETED` / `ABORTED`) with cryptographically enforced party authentication and share submission.
-  - **FastAPI Endpoints & SDK Parity:** Mounted 10 REST endpoints (`/v1/mpc/*` and `/v1/tenants/{tenantId}/mpc/*`) and complete client SDK methods in `@prat3010/retriever-client` and `retriever-python`.
-  - **Control Plane Studio Upgraded:** Dedicated `MpcEnclavePanel.tsx` in `/rag/app` under Design System 2.0 featuring 4 sub-views (Consortium Enclaves & Sessions, Secret Share Distributor & Noise, Confidential Inner Product & Top-K, Interactive Beaver Triples & PPIP Math Simulator).
-- **Status:** **Completed (Phase P / v2.0.0-alpha3)**
 
 #### 🎯 Milestone 122: Autonomous Continuous Benchmark & Regression Gatekeeper
 - **Libraries:** SciPy (Student's $t$ CDF), NumPy / Math, FastAPI, React 19, TypeScript, Pytest, Vitest
@@ -1172,18 +1121,6 @@ timeline
   - **DAG Workflow Execution Engine:** Real-time stage stepper with token cost attribution ($/token rate tables) and authentic node handlers.
   - **Enterprise Template Library:** 4 production templates (Legal Analyzer, Customer Support, Codebase Assistant, Multimodal Inspector).
 - **Status:** **Completed (Phase P / v2.4.0)**
-
-#### 🛡️ Milestone 127: Sovereign Air-Gapped Appliance & Embedded Edge Engine
-- **Libraries:** Docker OCI Distroless, SQLite 3 FTS5, AES-256-GCM, HKDF-SHA256, Whisper.cpp, Piper Neural TTS, FastAPI
-- **Repo Scope:** Both (`retriever` `deploy/docker/Dockerfile.appliance`, `apps/api/src/adapters/appliance/hardware_vector_sealer.py`, `apps/api/src/domain/appliance/airgap_sentinel.py`, `apps/api/src/domain/appliance/voice_rag_engine.py`, `apps/api/src/domain/appliance/appliance_manager.py`, `apps/api/src/routers/appliance.py`, `apps/web/src/components/sovereign-appliance-cockpit.tsx`, `apps/api/tests/test_sovereign_appliance.py` & `Prateek_website` `docs/47_Sovereign_Air_Gapped_Appliance_PRD.md`)
-- **Deliverable:**
-  - **Platform Battery No. 41 Registration:** Registered `sovereign_air_gapped_appliance` in `BatteryService` under `EDGE_DISTRIBUTION`.
-  - **Distroless Edge Container:** Self-contained OCI recipe bundling embedded SQLite FTS5, quantized models, and non-root execution.
-  - **Hardware-Rooted Vector Sealing:** Authenticated AES-256-GCM vector index sealing bound to TPM 2.0 PCR registers or Apple Secure Enclave silicon seeds.
-  - **Zero-Egress Strict Mode (Fail-Closed Sentinel):** In-process network sentinel (`AirgapNetworkSentinel`) continuously auditing system sockets and DNS resolvers.
-  - **Offline Full-Duplex Neural Voice RAG:** Sub-350ms hands-free voice loop (Whisper ASR $\to$ SQLite hybrid search $\to$ Piper neural TTS).
-  - **Sovereign Cockpit in `apps/web`:** Administrative UI with real-time Air-Gap Security Shield, PCR attestation card, and 1-click seal/unseal controls.
-- **Status:** **Completed (Phase P / v2.5.0)**
 
 #### ⚡ Milestone 128: System 1 Fast-Path Decision Plane & TypeSafe Jev Integration
 - **Libraries:** Asyncio, Pydantic, httpx, Pytest, FastAPI
@@ -1247,17 +1184,13 @@ The following table serves as the definitive directory linking all specialized p
 | **Automated AI Blogging Engine** | Phase E (M59): Newsjacking Pipeline, Automated Research & SEO Publisher | [AUTOMATED_AI_BLOGGING_ROADMAP.md](AUTOMATED_AI_BLOGGING_ROADMAP.md) |
 | **Revenue Execution Plan** | Commercial Escrow, Tier Packages, Sales Partner Commissions | [REVENUE_EXECUTION_PLAN.md](commercial/REVENUE_EXECUTION_PLAN.md) |
 | **Scoping Audit Roadmap** | 360° Quality Checklist & Security Validation for Scoping Engine | [SCOPING_AUDIT_ROADMAP.md](archive/SCOPING_AUDIT_ROADMAP_COMPLETED.md) |
-| **Mesh Load-Balancing & Auto-Scaling PRD** | Phase P (M116): P2C Balancing, EWMA Latency Decay, Ephemeral Enclaves | [37_Mesh_Load_Balancing_and_Ephemeral_AutoScaling_PRD.md](37_Mesh_Load_Balancing_and_Ephemeral_AutoScaling_PRD.md) |
-| **Vector Sharding & Raft Consensus PRD** | Phase P (M117): FNV-1a Consistent Hash Ring, Raft Elections, Scatter-Gather RRF | [38_Decentralized_Vector_Sharding_and_Raft_Consensus_PRD.md](38_Decentralized_Vector_Sharding_and_Raft_Consensus_PRD.md) |
 | **ZKP Vector Attestation & Verifiable Grounding PRD** | Phase P (M118): Binary Merkle DAG, Zero-Knowledge Leaf Commitments, Ed25519 Certificates | [39_Zero_Knowledge_Vector_Attestation_PRD.md](39_Zero_Knowledge_Vector_Attestation_PRD.md) |
 | **Enterprise Identity Federation & RB-VAC PRD** | Phase P (M119): SAML 2.0 IdP SSO, RFC 7644 SCIM 2.0, Pre-Retrieval Set-Intersection RB-VAC | [40_Enterprise_Identity_Federation_and_RBVAC_PRD.md](40_Enterprise_Identity_Federation_and_RBVAC_PRD.md) |
 | **Continuous DPO / ORPO Tuning Pipeline PRD** | Phase P (M120): Autonomous Preference Harvesting, Bradley-Terry DPO, ORPO Odds Ratio, Validation Gating | [41_Continuous_DPO_ORPO_Tuning_Pipeline_PRD.md](41_Continuous_DPO_ORPO_Tuning_Pipeline_PRD.md) |
-| **Confidential Multi-Party Vector Computation (MPC) PRD** | Phase P (M121): Additive Secret Sharing, Beaver Multiplication Triples (PPIP), Threshold Top-K, Enclave Session Lifecycle | [42_Confidential_Multi_Party_Vector_Computation_PRD.md](42_Confidential_Multi_Party_Vector_Computation_PRD.md) |
 | **Autonomous Continuous Benchmark & Regression Gatekeeper PRD** | Phase P (M122): Welch's t-Test Hypothesis Testing, NDCG@K, MRR, Faithfulness, Automated Rollback | [43_Autonomous_Continuous_Benchmark_and_Regression_Gatekeeper_PRD.md](43_Autonomous_Continuous_Benchmark_and_Regression_Gatekeeper_PRD.md) |
 | **Hierarchical Memory & Graph-of-Thoughts (GoT) PRD** | Phase P (M123): GoT DAG Reasoning, Kahn's Topo DP Optimal Path, 3-Tier Memory & Ebbinghaus Decay | [44_Hierarchical_Memory_Graph_of_Thoughts_PRD.md](44_Hierarchical_Memory_Graph_of_Thoughts_PRD.md) |
 | **Enterprise SaaS Connectors & ACL Inheritance PRD** | Phase P (M125): Google Drive/Docs, Notion Tables, Confluence/Jira, Microsoft 365 Graph Delta & Sublinear JSONB ACL (?|) Filtering | [45_Enterprise_SaaS_Connectors_and_ACL_Inheritance_PRD.md](45_Enterprise_SaaS_Connectors_and_ACL_Inheritance_PRD.md) |
 | **Visual DAG Workflow Canvas & Agentic Graph Composer PRD** | Phase P (M126): React 19 / SVG Studio, Kahn's Topological Sort Cycle Detection, Token Cost Attribution & Enterprise Templates | [46_Visual_DAG_Workflow_Canvas_PRD.md](46_Visual_DAG_Workflow_Canvas_PRD.md) |
-| **Sovereign Air-Gapped Appliance & Embedded Edge Engine PRD** | Phase P (M127): Hardware-Rooted Vector Sealing, AES-256-GCM, Zero-Egress Network Sentinel & Offline Whisper/Piper Full-Duplex Voice RAG | [47_Sovereign_Air_Gapped_Appliance_PRD.md](47_Sovereign_Air_Gapped_Appliance_PRD.md) |
 | **The Playground Universal Creation Showcase PRD** | Phase Q (M128): Autonomous Software Laboratory, Retro Arcade Cabinet Shell, AI Prompt Lightbox & Digital Goods Commerce | [48_The_Playground_Universal_Creation_Showcase_PRD.md](48_The_Playground_Universal_Creation_Showcase_PRD.md) & [PRD_PLAYGROUND_COMMERCE.md](specs/PRD_PLAYGROUND_COMMERCE.md) |
 | **Platform Future Roadmap** | General Portfolio & Ecosystem Evolution Horizon | [21_Future_Roadmap.md](21_Future_Roadmap.md) |
 

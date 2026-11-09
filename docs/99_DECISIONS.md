@@ -544,7 +544,7 @@ This document serves as the registry of critical architectural design decisions 
 
 # **ADR 33: Dual-Persona Autonomous Metaprogrammer & AST Hexagonal Boundary Enforcement (Milestone 97)**
 
-* **Status**: Approved & Implemented
+* **Status**: Superseded & Purged (Zero-Toy Grounding Audit — dynamic in-memory code scaffolding was removed in favor of verified code workflows)
 * **Context**: As platform batteries expanded, business users needed zero-code capability discovery, while Forward Deployed Engineers (FDEs) needed to build bespoke enterprise connectors (HubSpot, Salesforce, proprietary scoring algorithms) without manual boilerplate authoring or architectural drift. Uncontrolled dynamic code generation in a shared multi-tenant SaaS runtime risks importing heavy frameworks into domain layers or crashing the server during boot.
 * **Decision**: Built an Autonomous FDE Metaprogrammer & Capability Studio as **Platform Battery #17** (`apps/api/src/domain/scaffold/ast_engine.py`, `src/routers/scaffold.py`, `apps/web/src/app/(dashboard)/scaffold/page.tsx`):
   1. Dual-Persona Solution Engine: Zero-code capability matching for business operators, and full-spectrum Hexagonal code slice generation (`abstractions.py`, `service.py`, `adapter.py`, `router.py`, `test_plugin.py`, `manifest.json`) for FDEs.
@@ -604,7 +604,7 @@ This document serves as the registry of critical architectural design decisions 
 
 # **ADR 37: Zero-Trust Micro-Enclave KMS, Remote Attestation & Volatile Memory Sanitization (Milestone 101)**
 
-* **Status**: Approved & Implemented
+* **Status**: Superseded & Purged (Zero-Toy Grounding Audit — in-memory enclave simulation was removed; cryptographic integrity is anchored via Battery #26 ZKP Grounding Audit Chain)
 * **Context**: Edge nodes, field hardware, and multi-tenant hosting environments are vulnerable to physical memory dumping (cold-boot RAM attacks), privileged root host inspection, and cross-tenant ciphertext transplanting. Cloud KMS services introduce latency and external network dependencies that compromise air-gapped deployments.
 * **Decision**: Built the Confidential Micro-Enclave cryptographic subsystem as **Platform Battery #21** (`apps/api/src/domain/abstractions/enclave.py`, `src/adapters/security/enclave_adapter.py`, `src/adapters/security/memory_sanitizer.py`, `src/routers/enclave.py`):
   1. Hardware Trust Root Simulation: Supports Intel SGX, AMD SEV-SNP, AWS Nitro Enclaves, Apple Secure Enclave, and TPM 2.0.
@@ -620,7 +620,7 @@ This document serves as the registry of critical architectural design decisions 
 
 # **ADR 38: Autonomous Edge Fleet Swarm Mesh, Epidemic P2P Gossip & Causal Vector Clock Partition Reconciliation (Milestone 102)**
 
-* **Status**: Approved
+* **Status**: Superseded & Purged (Zero-Toy Grounding Audit — in-memory gossip swarm simulation was removed; consensus is anchored via Battery #22 Multi-Model Dialectic Debate)
 * **Context**: Sovereign edge nodes frequently operate across mobile, branch office, or field environments subject to WAN blackouts, network partitions, and intermittent packet loss. Centralized coordination relays create single-point-of-failure vulnerabilities, while naive direct pinging causes false-alarm failovers during asymmetric packet loss. Furthermore, concurrent offline mutations across disconnected edge subgroups risk split-brain data corruption upon reconnection.
 * **Decision**: Implement a fully decentralized peer-to-peer (P2P) edge coordination mesh (Platform Battery #22: `autonomous_swarm_mesh`) delivering:
   1. SWIM Failure Detection: Direct pings with indirect auxiliary `ping-req` probes ($k=3$) to prevent false suspect churn from asymmetric packet drops.

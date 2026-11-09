@@ -92,3 +92,11 @@ export type PlaygroundTaxonomy =
 - [SOP Runbook: Adding an Item to Playground](../runbooks/RUNBOOK_PLAYGROUND_ADD_ITEM.md)
 - [Route Architecture Node: Route_playground](../architecture_nodes/Route_playground.md)
 - [UI Architecture Node: UI_PlaygroundSuite](../architecture_nodes/UI_PlaygroundSuite.md)
+
+---
+
+## **Related Architecture & Cross-References**
+
+- [Previous Section: Projects](04_Projects.md)
+- [WebGL & Performance Throttling](../15_Performance_and_Accessibility.md)
+- [Next Section: Resume](06_Resume_and_Quotations.md)

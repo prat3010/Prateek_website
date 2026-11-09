@@ -127,20 +127,14 @@ The **Client Dashboard Ecosystem** on `prateeq.in` serves as the primary commerc
   * AST security gate (0 framework imports in domain), multi-slice code tabs, 1-click workspace deployment, and 1-click community PR generator with Git branch checkout.
 * **Sovereign Edge Sync Tab (`EdgeSyncPanel.tsx`, M98):**
   * Embedded SQLite 3 distributed vector synchronization, sub-2ms local hybrid search simulator (FTS5 BM25 + float32 BLOB vector cosine), 1-click standalone `.sqlite` bundle exporter, simulated network partition switch, and Lamport LWW offline mutation reconciler (Platform Battery #18).
-* **Multi-Cloud Failover & Turso LibSQL Tab (`MultiCloudPanel.tsx`, M99):**
-  * Active-active cluster topology visualizer (Oracle Cloud Mumbai, AWS us-east-1, Fly.io Frankfurt, Cloudflare Global Anycast), mathematical quorum consensus ($Q = \lfloor N/2 \rfloor + 1 = 3/4$), monotonic generation term monitoring, dynamic EWMA latency tracking, and embedded Turso LibSQL WAL replica synchronization (Platform Battery #19).
 * **Sovereign Edge Voice Studio Tab (`VoiceStudioPanel.tsx`, M100):**
-  * Full-duplex conversational voice deck with zero third-party cloud audio egress, animated 16-bar frequency visualizer, real-time VAD energy sensitivity slider ($E_{\text{RMS}}$), neural timbre selector (Atlas, Nova, Echo), streaming speech synthesis tester with sub-250ms TTFAB validation, and interactive conversational turn ledger (Platform Battery #20).
+  * Full-duplex conversational voice deck with zero third-party cloud audio egress, animated 16-bar frequency visualizer, real-time VAD energy sensitivity slider ($E_{\text{RMS}}$), neural timbre selector (Atlas, Nova, Echo), streaming speech synthesis tester with sub-250ms TTFAB validation, and interactive conversational turn ledger (Platform Battery #18).
 * **Autonomous Agent Tool Surface & MCP Studio Tab (`ToolsPanel.tsx`, M106):**
-  * Live 20-battery status indicators, per-tenant capability permissions, interactive multi-turn ReAct trace visualizer with expandable Thought $\to$ Action $\to$ Observation steps, 1-click universal configuration exporter for Claude Desktop (`claude_desktop_config.json`) and Cursor, and real-time economic cost-efficiency meters.
-* **Distributed MCP Mesh & Dynamic Balancing Tab (`McpPanel.tsx`, M115 & M116):**
-  * P2P mesh node discovery, HMAC-SHA256 authenticated trust envelopes, federated ReAct delegation, Power-of-Two-Choices (P2C) load balancing, EWMA latency tracking, and autonomous scale-to-zero enclave lifecycle management (Platform Batteries #30 & #31).
-* **Decentralized Vector Sharding & Raft Consensus Tab (`VectorShardingPanel.tsx`, M117):**
-  * 32-bit FNV-1a virtual-node hash ring explorer, distributed Raft consensus state visualizer (terms, leader leases, log replication), parallel scatter-gather retrieval simulator with RRF score normalization, and online 2-phase shard rebalance trigger (Platform Battery #32).
-* **Zero-Knowledge Proof (ZKP) Vector Attestation Tab (`ZkpAttestationPanel.tsx`, M118):**
-  * Deterministic binary Merkle tree explorer with leaf commitments ($h_i$) and sub-millisecond inclusion paths ($\pi_i$), interactive zero-knowledge grounding verifier with Ed25519 digital signature validation, and compliance audit ledger with 1-click JSON certificate export (Platform Battery #33).
+  * Live status indicators, per-tenant capability permissions, interactive multi-turn ReAct trace visualizer with expandable Thought $\to$ Action $\to$ Observation steps, 1-click universal configuration exporter for Claude Desktop (`claude_desktop_config.json`) and Cursor, and real-time economic cost-efficiency meters (Platform Battery #19).
+* **Cryptographic Grounding & Tamper-Proof Audit Chain Tab (`ZkpAttestationPanel.tsx`, M118):**
+  * Deterministic binary Merkle tree explorer with leaf commitments ($h_i$) and sub-millisecond inclusion paths ($\pi_i$), interactive zero-knowledge grounding verifier with Ed25519 digital signature validation, and compliance audit ledger with 1-click JSON certificate export (Platform Battery #26).
 * **Enterprise Identity Federation & RB-VAC Tab (`IdentityFederationPanel.tsx`, M119):**
-  * SAML 2.0 Identity Provider SSO federation (Okta, Microsoft Entra ID / Azure AD, Google Workspace), X.509 XML certificate verification, dynamic SP metadata XML generation, RFC 7643/7644 SCIM 2.0 enterprise directory sync with bearer token auth, and sub-millisecond pre-retrieval Role-Based Vector Access Control (RB-VAC) simulation with chunk audit pruning telemetry (Platform Battery #34).
+  * SAML 2.0 Identity Provider SSO federation (Okta, Microsoft Entra ID / Azure AD, Google Workspace), X.509 XML certificate verification, dynamic SP metadata XML generation, RFC 7643/7644 SCIM 2.0 enterprise directory sync with bearer token auth, and sub-millisecond pre-retrieval Role-Based Vector Access Control (RB-VAC) simulation with chunk audit pruning telemetry (Platform Battery #27).
 
 ---
 
